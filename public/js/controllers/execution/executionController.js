@@ -386,7 +386,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 
 	//Save TestSuite Functionality
-	$scope.updateTestSuite = function(){
+	$scope.updateTestSuite = function(e){
 		blockUI("Saving in progress. Please Wait...");
 		var batchInfo = [];
 		var batchDetails = {};
@@ -483,6 +483,11 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				openDialogExe("Save Test Suite", "Test suite saved successfully.")
 				//$("#saveSuitesModal").modal("show")
 				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
+				//Transaction Activity for Save Test Suite Button Action
+				var labelArr = [];
+				var infoArr = [];
+				labelArr.push(txnHistory.codesDict['SaveTestSuite']);
+				txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
 			}
 			else{
 				openDialogExe("Save Test Suite", "Failed to save test suite.")
@@ -495,7 +500,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	//Save TestSuite Functionality
 
 	//Save QC Details
-	$scope.saveQcCredentials = function(){
+	$scope.saveQcCredentials = function(e){
 		$("#almURL, #almUserName, #almPassword").removeClass('inputErrorBorder')
 		if(!$scope.almURL) {
 			$("#almURL").addClass('inputErrorBorder')
@@ -561,9 +566,15 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 							suiteInfo.appType = appType;
 							//console.log("suiteInfo:::" + suiteInfo)
 							$scope.moduleInfo.push(suiteInfo);
+							//Transaction Activity for SaveQcCredentialsExecution Button Action
+							var labelArr = [];
+							var infoArr = [];
+							labelArr.push(txnHistory.codesDict['SaveQcCredentialsExecution']);
+							txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
 						}
 					});
 					$("#ALMSyncWindow").find("button.close").trigger("click");
+
 				}
 			},
 			function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
@@ -572,7 +583,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	}
 
 	//Execute TestSuite Functionality
-	$scope.ExecuteTestSuite = function(){
+	$scope.ExecuteTestSuite = function($event){
 		if($scope.moduleInfo.length <= 0){
 			$.each($(".parentSuiteChk"), function(){
 				var suiteInfo = {};
@@ -642,6 +653,14 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 				$scope.moduleInfo = [];
 				$("#syncScenario").prop("disabled",true);
+				//Transaction Activity for ExecuteTestSuite Button Action
+				var labelArr = [];
+				var infoArr = [];
+				infoArr.push({"appType" : appType});
+				infoArr.push({"status" : data});
+				labelArr.push(txnHistory.codesDict['ExecuteTestSuite']);
+				txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+
 			},
 			function(error){
 				unblockUI()
@@ -679,7 +698,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	// }
 	// //Submit Task Function
 
-	 $scope.submit_task=function(action) {
+	 $scope.submit_task=function(action,e) {
         var taskinfo = JSON.parse(window.localStorage['_CT']);
         var taskid = taskinfo.subTaskId;
         var taskstatus = taskinfo.status;
@@ -688,17 +707,26 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		var projectId=taskinfo.projectId;
         if (action != undefined && action == 'reassign') {
             taskstatus = action;
-        }
+		}
+		
+		//Transaction Activity for Task Submit/Approve/Reassign Button Action
+        var labelArr = [];
+		var infoArr = [];
+		
         mindmapServices.reviewTask(projectId,taskid,taskstatus,version,batchTaskIDs).then(function(result){
         		if (result == 'fail') {
                     openDialogExe("Task Submission Error", "Reviewer is not assigned !",true)
                 } else if (taskstatus == 'reassign') {
-                    openDialogExe("Task Reassignment Success", "Task Reassigned scucessfully!",true)
+					openDialogExe("Task Reassignment Success", "Task Reassigned scucessfully!",true);
+					labelArr.push(txnHistory.codesDict['TaskReassign']);
                 } else if (taskstatus == 'review') {
-                    openDialogExe("Task Completion Success", "Task Approved scucessfully!",true)
+					openDialogExe("Task Completion Success", "Task Approved scucessfully!",true);
+					labelArr.push(txnHistory.codesDict['TaskApprove']);
                 } else {
-                    openDialogExe("Task Submission Success", "Task Submitted scucessfully!",true)
-                }
+					openDialogExe("Task Submission Success", "Task Submitted scucessfully!",true);
+					labelArr.push(txnHistory.codesDict['TaskSubmit']);
+				}
+				txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
         },function(error){
             console.log(error);
         })

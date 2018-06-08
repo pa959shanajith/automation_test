@@ -345,7 +345,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 		}
 	}
 	//Add to list and schedule
-	$scope.initSchedule = function(){
+	$scope.initSchedule = function($event){
 		var moduleInfo = [];
 		var doNotSchedule = false;
 		if(appType != "SAP" && browserTypeExe.length == 0)	openModelPopup("Schedule Test Suite", "Please select a browser");
@@ -498,6 +498,11 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 							$(".selectBrowserSc").find(".sb").removeClass("sb");
 							$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;").val("");
 							getScheduledDetails();
+							//Transaction Activity for InitSchedule Button Action
+							var labelArr = [];
+							var infoArr = [];
+							labelArr.push(txnHistory.codesDict['InitSchedule']);
+							txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 						}
 						else if(data == "few"){
 							openModelPopup("Schedule Test Suite", "Few suites are failed to schedule");

@@ -65,12 +65,12 @@
 			<!-- Table Buttons -->
 			<div id="tableActionButtons">
 				<div><span class='parentBatchContainer'><input title='Select Batch' type='checkbox' class='checkStylebox checkParentBatch' /><span class='parentObject'>Select Batch</span></span></div>
-				<button id="excSaveBtn" class="btn btn-xs btn-xs-custom btnPanel" ng-click="updateTestSuite()"  title="Save">Save</button>
+				<button id="excSaveBtn" class="btn btn-xs btn-xs-custom btnPanel" ng-click="updateTestSuite($event)"  title="Save">Save</button>
 				<button disabled class="btn btn-xs btn-xs-custom btnPanel"  title="Configure">Configure</button>
 				<button class="btn btn-xs btn-xs-custom btnPanel" id='syncScenario' title='Sync Test Scenario' disabled><!--<img src='../imgs/ic-alm.png'/>-->ALM</button>
 				<button class="btn btn-md pull-right submitTaskBtn" ng-click="submitTaskExecution()"  title="Submit Task">Submit</button>
 				<button class="btn btn-md pull-right reassignTaskBtn" style="display:None" ng-click="submitTaskExecution('reassign')"  title="Reassign Task">Reassign</button>
-				<button class="btn btn-md pull-right executeBtn" style="margin-right:10px" ng-click="ExecuteTestSuite()"  title="Execute">Execute</button>
+				<button class="btn btn-md pull-right executeBtn" style="margin-right:10px" ng-click="ExecuteTestSuite($event)"  title="Execute">Execute</button>
 				<!--<button disabled class="btn btn-md pull-right scheduleBtn" style="margin-right:10px"  title="Schedule">Schedule</button>-->
 			</div>
 			<!-- Table Buttons -->
@@ -229,7 +229,7 @@
 				<p>Are you sure you want to submit the task ?</p>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default btn-default-yes" ng-click="submit_task(stask)"  data-dismiss="modal">Yes</button>
+				<button type="button" class="btn btn-default btn-default-yes" ng-click="submit_task(stask,$event)"  data-dismiss="modal">Yes</button>
 				<button type="button" class="btn btn-default" data-dismiss="modal">No</button>
 			</div>
 		</div>
@@ -336,7 +336,7 @@
 					</p>
 					<p align="right">
 						<span class="error-msg-exeQc"></span>
-						<button type="button" class="btn btn-default btn-default-modal almQclogin" ng-click="saveQcCredentials()">Save</button>
+						<button type="button" class="btn btn-default btn-default-modal almQclogin" ng-click="saveQcCredentials($event)">Save</button>
 					</p>
 				</div>
 				<!-- Top -->
