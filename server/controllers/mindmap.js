@@ -259,8 +259,11 @@ exports.getModules=function(req,res){
 		var d=req.body;
 		var tab=d.tab;
 		var prjId=d.prjId;
+		var modName = d.modName;
 		var relId=d.relId;
 		var cycId=d.cycId;
+		var qmod = ''
+		if(modName == 'fetch all'){
 			if(d.tab=='tabAssign' || d.tab=='endToend'){
 				qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{projectID:'"+prjId+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
 				qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{projectID:'"+prjId+"'}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
@@ -349,6 +352,124 @@ exports.getModules=function(req,res){
 					res.status(status).send(maps);
 				}
 			});
+		}		
+		else if(modName){
+			qmod = ',moduleName:"'+modName+'"';
+			if(d.tab=='tabAssign' || d.tab=='endToend'){
+				qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{projectID:'"+prjId+"' "+qmod+"})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
+				qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{projectID:'"+prjId+"' "+qmod+"}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
+
+			}
+			qList.push({"statement":" MATCH path=(n:MODULES{projectID:'"+prjId+"' "+qmod+"})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
+			qList.push({"statement":"MATCH path=(n:MODULES{projectID:'"+prjId+"' "+qmod+"}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
+			//MATCH (a:MODULES) WHERE NOT (a)-[:FMTTS]->() return a
+
+			neo4jAPI.executeQueries(qList,function(status,result){
+				res.setHeader('Content-Type', 'application/json');
+				if(status!=200) res.status(status).send(result);
+				else{
+					var k=0,rIndex=[],lbl,neoIdDict={},maps=[],tList=[];
+					var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"projectID":"projectID","childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c","taskexists":"taskexists"},"testcases":{"projectID":"projectID","childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c","taskexists":"taskexists"},"tasks":{"taskID":"id_n","task":"t","batchName":"bn","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","re_estimation":"re_estimation","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc","cx":"cx"}};
+					var jsonData=result;
+
+					var all_modules=jsonData[0].data;
+
+					if (d.tab=='tabAssign' || d.tab=='endToend'){
+						all_modules=jsonData[0].data.concat(jsonData[1].data).concat(jsonData[2].data).concat(jsonData[3].data);
+
+					}else{
+						all_modules=jsonData[0].data.concat(jsonData[1].data);
+					}
+					all_modules.forEach(function(row){
+						row.graph.nodes.forEach(function(n){
+							if (idDict[n.id] === undefined) {
+								lbl=n.labels[0].toLowerCase();
+								if(lbl=='testscenarios') lbl='scenarios';
+								for (var attrs in n.properties){
+									if(attrDict[lbl][attrs] !== undefined) n[attrDict[lbl][attrs]]=n.properties[attrs];
+									delete n.properties[attrs];
+								}
+								if(lbl=="tasks"){
+									try{
+										nData.push({id:n.id_n,oid:n.id,task:n.t,batchName:n.bn,assignedTo:n.at,reviewer:n.rw,startDate:n.sd,endDate:n.ed,re_estimation:n.re_estimation,release:n.re,cycle:n.cy,details:n.det,nodeID:n.pid,parent:n.anc.slice(1,-1).split(','),cx:n.cx});
+									}
+									catch (ex){
+					
+										logger.error("exception in mindmapService: ",ex);
+									}
+								}
+								else{
+									if(lbl=="modules" || lbl=="modules_endtoend") n.childIndex=0;
+									nData.push({projectID:n.projectID,childIndex:n.childIndex,id:n.id,"type":lbl,name:n.name,id_n:n.id_n,pid_n:n.pid_n,id_c:n.id_c,children:[],task:null});
+								}
+								if(lbl=="modules" || lbl=="modules_endtoend") rIndex.push(k);
+								idDict[n.id]=k;neoIdDict[n.id_n]=k;
+								k++;
+							}
+						});
+						row.graph.relationships.forEach(function(r){
+							try{
+								var srcIndex=idDict[r.startNode.toString()];
+								var tgtIndex=idDict[r.endNode.toString()];
+								//if(nData[tgtIndex].children===undefined) nData[srcIndex].task=nData[tgtIndex];
+								if(nData[tgtIndex].children===undefined){
+									if((tab=='tabAssign'&& nData[tgtIndex].release==relId && nData[tgtIndex].cycle==cycId)||tab=='tabCreate'||tab=='endToend'){
+										nData[srcIndex].task=nData[tgtIndex];
+									}else if(nData[srcIndex].type=='testcases' || nData[srcIndex].type=='screens'){
+										nData[srcIndex].taskexists=nData[tgtIndex];
+									}
+										
+								} 
+								else if(nData[srcIndex].children.indexOf(nData[tgtIndex])==-1){
+									nData[srcIndex].children.push(nData[tgtIndex]);
+									if(nData[tgtIndex].childIndex==undefined){
+										nData[tgtIndex].childIndex=nData[srcIndex].children.length;
+									}
+								}
+							}catch (ex){
+
+								logger.error("exception in mindmapService: ",ex);
+							}
+						});
+					});
+					//tList.forEach(function(t){nData[neoIdDict[t.nodeID]].task=t;});
+					nData.forEach(function(e){
+						if(e.pid_n){
+							if(neoIdDict[e.pid_n]!==undefined) e.pid_n=nData[neoIdDict[e.pid_n]].id;
+							else e.pid_n=null;
+						}
+					});
+					rIndex.forEach(function(m){maps.push(nData[m]);});
+					res.status(status).send(maps);
+				}
+			});
+		}
+		else{
+			qList.push({"statement":" MATCH (n:MODULES{projectID:'"+prjId+"'}) RETURN n.moduleName,n.moduleID","resultDataContents":["row"]});
+			if(d.tab=='tabAssign' || d.tab=='endToend'){
+				qList.push({"statement":"MATCH (n:MODULES_ENDTOEND{projectID:'"+prjId+"'}) RETURN n.moduleName,n.moduleID","resultDataContents":["row"]});
+			}
+
+			neo4jAPI.executeQueries(qList,function(status,result){
+				var modulenames = [];
+				res.setHeader('Content-Type', 'application/json');
+				if(status!=200) res.status(status).send(result);
+				else{
+					
+					result[0].data.forEach(function(e,i){
+						modulenames.push({name:e.row[0],type:'modules',id_n:e.row[1]});
+					});
+					if(result[1]){
+						result[1].data.forEach(function(e,i){
+							modulenames.push({name:e.row[0],type:'modules_endtoend',id_n:e.row[1]});
+						});	
+					}
+
+					res.status(status).send(modulenames);
+
+				}
+			});			
+		}
 	}
 	else{
 		logger.error("Invalid Session");
@@ -1281,6 +1402,48 @@ exports.excelToMindmap = function(req,res){
 	}
 	else
 		res.status(200).send(qObj);
+	
+}
+
+exports.getScreens=function(req,res){
+	logger.info("Inside UI service: populateScenarios");
+	if (utils.isSessionActive(req.session)) {
+		var d=req.body;
+		var prjId=d.projectId;
+		var screenList = [];
+		var testCasesList = [];
+		var qList = [];
+		qList.push({'statement':"MATCH (n:SCREENS{projectID:'"+prjId+"'}) RETURN n.screenID_c,n.screenID,n.screenName,ID(n)"});
+		qList.push({'statement':"MATCH (n:TESTCASES{projectID:'"+prjId+"'}) RETURN n.testCaseID_c,n.testCaseID,n.testCaseName,ID(n)"});
+		
+		var scenarioList=[];
+		neo4jAPI.executeQueries(qList,function(status,result){
+			res.setHeader('Content-Type', 'application/json');
+			if(status!=200) res.status(status).send(result);
+				try{
+					result[0].data.forEach(function(e,i){
+						screenList.push({'name':e.row[2],'id_c':e.row[0],'id_n':e.row[1],'id':e.row[3]})
+					})
+					result[1].data.forEach(function(e,i){
+						testCasesList.push({'name':e.row[2],'id_c':e.row[0],'id_n':e.row[1],'id':e.row[3]})
+					})
+					// res_data=result;
+					// res_data[0].data.forEach(function(row){
+					// 	scenarioList.push(row.row[0])
+					// });
+					 res.status(200).send({'screenList':screenList,'testCaseList':testCasesList});
+					}catch(ex){
+						logger.error("exception in mindmapService: ",ex);
+						res.status(200).send('fail');
+					}
+
+			});
+	}
+	else{
+		logger.error("Invalid Session");
+		res.send("Invalid Session");
+	}
+
 }
 
 //MATCH (n)-[r:FMTTS{id:'bad100b6-c223-4888-a8e9-ad26a2de4a61'}]->(o:TESTSCENARIOS) DETACH DELETE r,o

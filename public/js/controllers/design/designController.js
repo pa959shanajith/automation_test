@@ -433,13 +433,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 openDialog("Debug Testcase", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
             }
 
-            //Transaction Activity for DebugTestCase
+			//Transaction Activity for DebugTestCase
             var labelArr = [];
             var infoArr = [];
             infoArr.push({"appType" : appType});
             infoArr.push({"status" : data});
             labelArr.push(txnHistory.codesDict['DebugTestCase']);
-            txnHistory.log(e.type,labelArr,infoArr,$location.$$path); 
+            txnHistory.log(e.type,labelArr,infoArr,$location.$$path); 										
 
         },function(error) {
             console.log("Error while traversing while executing debugTestcase method!! \r\n " + (error.data));
@@ -491,11 +491,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                         if (data == "success") {
                                             angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
                                             openDialog("Import Testcase", "TestCase Json imported successfully.");
-                                            //Transaction Activity for Import Testcase Button Action
+											//Transaction Activity for Import Testcase Button Action
                                             var labelArr = [];
                                             var infoArr = [];
                                             labelArr.push(txnHistory.codesDict['ImportTestCase']);
-                                            txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+                                            txnHistory.log($event.type,labelArr,infoArr,$location.$$path);	
                                         } else {
                                             openDialog("Import Testcase", "Please Check the file format you have uploaded!")
                                         }
@@ -622,7 +622,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                     if (data == "success") {
                                         angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
                                         openDialog("Import Testcase", "TestCase Json imported successfully.");
-                                        //Transaction Activity for Import Testcase Button Action
+										//Transaction Activity for Import Testcase Button Action
                                         var labelArr = [];
                                         var infoArr = [];
                                         labelArr.push(txnHistory.codesDict['ImportTestCase']);
@@ -730,11 +730,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             a.dispatchEvent(e);
                         }
                     }
-                     //Transaction Activity for Export Testcase Button Action
+					//Transaction Activity for Export Testcase Button Action
                      var labelArr = [];
                      var infoArr = [];
                      labelArr.push(txnHistory.codesDict['ExportTestCase']);
-                     txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+                     txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
                 },
                 function(error) {});
     }
@@ -845,7 +845,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                         }                                  
                                     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                     // }                                       
-                                // }        
+                                // }
                                 angular.element(innerUL).append(li);                        
                             }
                             $(".checkStylebox, .checkall").prop("disabled", false);
@@ -1378,8 +1378,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             $(document).find("#OEBSPath").removeClass("inputErrorBorder");
             $(document).find("#mobilityAPKPath, #mobilitySerialPath, #mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").removeClass("inputErrorBorder");
             $(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion").removeClass("inputErrorBorder");
-            
-            //Transaction Activity for InitCompareAndUpdate/initScraping Button Action
+			
+			//Transaction Activity for InitCompareAndUpdate/initScraping Button Action
             var labelArr = [];
             var infoArr = [];
             if($rootScope.compareFlag == true)
@@ -1388,7 +1388,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 labelArr.push(txnHistory.codesDict['InitScraping']);
             infoArr.push($scope.getScreenView);
             txnHistory.log(e.type,labelArr,infoArr,$location.$$path); 
-            
+			
             //For Desktop
             if ($scope.getScreenView == "Desktop") {
                 if ($(document).find("#desktopPath").val() == "") {
@@ -2067,11 +2067,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
           }
       }
 
-      //Transaction Activity for Delete Scraped Objects Button Action
+	  //Transaction Activity for Delete Scraped Objects Button Action
       var labelArr = [];
       var infoArr = [];
       labelArr.push(txnHistory.codesDict['DeleteScrapedObjects']);
-      txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
+      txnHistory.log(e.type,labelArr,infoArr,$location.$$path);					
      
     }
 
@@ -2834,11 +2834,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             //$("#addObjectSuccess").modal("show")
             $("#saveObjects").prop("disabled", false)
             flag = "false";
-            //Transaction Activity for Submit Custom Objects Action
+			//Transaction Activity for Submit Custom Objects Action
             var labelArr = [];
             var infoArr = [];
             labelArr.push(txnHistory.codesDict['SubmitCustomObject']);
-            txnHistory.log(e.type,labelArr,infoArr,$location.$$path); 
+            txnHistory.log(e.type,labelArr,infoArr,$location.$$path);				   
         }
 
         //Building Tree
@@ -3158,7 +3158,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
   
     function saveScrapedObjects(e) {
-        if (noSave == "false") {
+        if (noSave = "false") {
             var xpath;
             var duplicateCustnames = [];
             var duplicateXpathElements = {};
@@ -3339,12 +3339,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
                     $("#saveObjects").attr('disabled', true);
                     deleteScrapeDataservice = true;
-                    //Transaction Activity for Save Scraped Objects Button Action
+					//Transaction Activity for Save Scraped Objects Button Action
                     var labelArr = [];
                     var infoArr = [];
                     labelArr.push(txnHistory.codesDict['SaveScrapedObjects']);
                     infoArr.push(scrapeObject.appType)
-                    txnHistory.log(e.type,labelArr,infoArr,$location.$$path); 
+                    txnHistory.log(e.type,labelArr,infoArr,$location.$$path); 			   
                 } else {
                     //enableScreenShotHighlight = false;
                     openDialog("Save Scraped data", "Failed to save")
@@ -3562,7 +3562,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		        			}*/
                                         angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
                                         openDialog("Save Testcase", "Testcase saved successfully")
-                                        //Transaction Activity for SaveTestcase Button Action
+										//Transaction Activity for SaveTestcase Button Action
                                         var labelArr = [];
                                         var infoArr = [];
                                         labelArr.push(txnHistory.codesDict['SaveTestcase']);
@@ -3772,23 +3772,35 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 }
                             }
                         }
-                    
-                        var sorted_custnames = allCustnames.slice().sort();
-                        for (var p = 0; p < allCustnames.length - 1; p++) {
-                            if (sorted_custnames[p + 1] == sorted_custnames[p]) {
-                                duplicateCustnames.push(sorted_custnames[p]);               //get duplicate custnames
+                        var custnameIndices = {};
+									  
+                        for(var p=0;p<allCustnames.length;p++)
+                        {
+                            if(!custnameIndices.hasOwnProperty(allCustnames[p]))
+                            {
+                                //custnameIndices[allCustnames[p]] = custnameIndices[allCustnames[p]] + 1;
+                                custnameIndices[allCustnames[p]] = [];
+                            }
+                                custnameIndices[allCustnames[p]].push(p);
+                        }
+                        var custnameIndices = Object.values(custnameIndices);
+								
+                        for(var q=0;q<custnameIndices.length;q++)
+                        {
+                            if(custnameIndices[q].length > 1)
+                            {
+                                $.each($("#scraplist li"), function() {
+                                    for(var r=0;r<custnameIndices[q].length -1;r++)
+                                    {
+                                        if(parseInt($(this)[0].getAttribute("val")) == parseInt(custnameIndices[q][r]))                                   // if($.trim($(this)[0].childNodes[0].childNodes[2].innerHTML) == $.trim(duplicateCustnamesLen[q]))
+                                        {
+                                            $(this)[0].style.display = 'block';               //Display duplicate custnames only
+                                        }
+                                    }
+								 
+                                });
                             }
                         }
-                        //console.log("Duplicate Custnames", duplicateCustnames);
-                        $.each($("#scraplist li"), function() {
-                                for(var q=0;q<duplicateCustnames.length;q++)
-                                {
-                                    if($.trim($(this)[0].childNodes[0].childNodes[2].innerHTML) == $.trim(duplicateCustnames[q]))
-                                    {
-                                        $(this).show();                                         //Display duplicate custnames only
-                                    }
-                                }
-                            });
                 }
                 else{
                     $.each($("#scraplist li"), function() {
@@ -3896,11 +3908,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 $("#globalModal").find('.modal-body p').html("Failed to save dependent testcases");
                                 $("#globalModal").modal("show");
                             }
-                            //Transaction Activity for AddDependentTestCase Button Action
+							//Transaction Activity for AddDependentTestCase Button Action
                             var labelArr = [];
                             var infoArr = [];
                             labelArr.push(txnHistory.codesDict['AddDependentTestCase']);
-                            txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);
+                            txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);						
                         }
                     });
                 }, function(error) {});
@@ -3966,10 +3978,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         if (action != undefined && action == 'reassign') {
             taskstatus = action;
         }
-        //Transaction Activity for Task Submit/Approve/Reassign Button Action
+		//Transaction Activity for Task Submit/Approve/Reassign Button Action
         var labelArr = [];
         var infoArr = [];
-      
+	  
         mindmapServices.reviewTask(projectId,taskid,taskstatus,version,batchTaskIDs).then(function(result){
         if (result == 'fail') {
                     openDialog("Task Submission Error", "Reviewer is not assigned !",true)
@@ -4382,11 +4394,11 @@ function contentTable(newTestScriptDataLS) {
                 $("#jqGrid tbody tr td.selectedRemarkCell").removeClass('selectedRemarkCell');
                 $(this).parent(".modal-footer").parent(".modal-content").find(".close").trigger('click');
             }
-            //Transaction Activity for AddRemarksTestStep Button Action
+			//Transaction Activity for AddRemarksTestStep Button Action
             var labelArr = [];
             var infoArr = [];
             labelArr.push(txnHistory.codesDict['AddRemarksTestStep']);
-            txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);
+            txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);				   
         }
     })
 
@@ -4451,11 +4463,11 @@ function contentTable(newTestScriptDataLS) {
                 }
              
                 $(".close:visible").trigger('click'); 
-                //Transaction Activity for Filter Button Action
+				//Transaction Activity for Filter Button Action
                 var labelArr = [];
                 var infoArr = [];
                 labelArr.push(txnHistory.codesDict['SaveTestStepDetails']);
-                txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);
+                txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);					 
            }  
         });
 
@@ -4742,13 +4754,15 @@ function contentTable(newTestScriptDataLS) {
         //ends here
 		//Object
 		else if (selectedText == "@Object") {
+            var sc = Object.keys(keywordArrayList.object);
+            selectedKeywordList = "object";
             objName = "@Object";
             url = "";
             var sc;
             var res = '';
             if (appTypeLocal == 'Web') {
-                sc = Object.keys(keywordArrayList.object);
-                selectedKeywordList = "object";
+														  
+											   
                 var newTSDataLS = angular.element(document.getElementById('jqGrid')).scope().newTestScriptDataLS;
                 if (newTSDataLS) {
                     if (newTSDataLS != "undefined") {
@@ -5567,11 +5581,11 @@ $(document).on('click', '#btnDeleteStepYes', function(e) {
     $("#jqGrid").trigger("reloadGrid");
     $('.modal-header:visible').find('.close').trigger('click')
     //deleteStep = true;
-    //Transaction Activity for DeleteTestScriptRow Button Action
+	//Transaction Activity for DeleteTestScriptRow Button Action
     var labelArr = [];
     var infoArr = [];
     labelArr.push(txnHistory.codesDict['DeleteTestScriptRow']);
-    txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);
+    txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);						   
 })
 
 function addTestScriptRow(e) {
@@ -5656,8 +5670,8 @@ function addTestScriptRow(e) {
             flagClass == "false"
         }
     }
-
-    //Transaction Activity for AddTestScriptRow Button Action
+	
+	//Transaction Activity for AddTestScriptRow Button Action
     var labelArr = [];
     var infoArr = [];
     labelArr.push(txnHistory.codesDict['AddTestScriptRow']);
@@ -5706,7 +5720,7 @@ function rearrangeTestScriptRow(e) {
     $("#jqGrid").find(">tbody").sortable("enable");
     enabledEdit = "false";
 
-    //Transaction Activity for RearrangeTestScriptRow Button Action
+	//Transaction Activity for RearrangeTestScriptRow Button Action
     var labelArr = [];
     var infoArr = [];
     labelArr.push(txnHistory.codesDict['RearrangeTestScriptRow']);
@@ -5790,11 +5804,11 @@ function editTestCaseRow(e) {
             }
         });
 
-        //Transaction Activity for EditTestCaseRow Button Action
+		//Transaction Activity for EditTestCaseRow Button Action
         var labelArr = [];
         var infoArr = [];
         labelArr.push(txnHistory.codesDict['EditTestCaseRow']);
-        txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);
+        txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);					 
     }
 }
 
@@ -5879,11 +5893,11 @@ function copyTestStep(e) {
         $("#jqGrid").find(">tbody").sortable("enable");
         window.localStorage['anotherScriptId'] = JSON.parse(window.localStorage['_CT']).testCaseId; //window.localStorage['testScriptIdVal'];
         window.localStorage['getAppTypeForPaste'] = taskInfo.appType; //window.localStorage['appTypeScreen']
-        //Transaction Activity for CopyTestStep Button Action
+		//Transaction Activity for CopyTestStep Button Action
         var labelArr = [];
         var infoArr = [];
         labelArr.push(txnHistory.codesDict['CopyTestStep']);
-        txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);
+        txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);						 
     }
 }
 //Need to work
@@ -6111,11 +6125,11 @@ function pasteInGrid(e) {
             $(this).children("td[aria-describedby='jqGrid_cb']").children("input").attr("id", "jqg_jqGrid_" + $(this).index()).attr("name", "jqg_jqGrid_" + $(this).index());
         })
     }
-    //Transaction Activity for PasteTestStep Button Action
+	//Transaction Activity for PasteTestStep Button Action
     var labelArr = [];
     var infoArr = [];
     labelArr.push(txnHistory.codesDict['PasteTestStep']);
-    txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);
+    txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);							   
 }
 //Copy-Paste TestStep Functionality
 
@@ -6248,12 +6262,12 @@ function commentStep(e) {
             }
         });
         $("#jqGrid").trigger("reloadGrid");
-        
-        //Transaction Activity for CommentStep Button Action
+		
+		//Transaction Activity for CommentStep Button Action
         var labelArr = [];
         var infoArr = [];
         labelArr.push(txnHistory.codesDict['CommentStep']);
-        txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);
+        txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);					 
     } else {
         openDialog("Skip Testcase step", "Please select step to skip")
     }
@@ -6285,7 +6299,7 @@ function getTags(data) {
     var obnames = [];
     var appTypeLocal = JSON.parse(window.localStorage['_CT']).appType;
     if (appTypeLocal == "Web") {
-        obnames = ["@Generic","@Excel","@Custom","@Browser","@BrowserPopUp"];
+        obnames = ["@Generic","@Excel","@Custom","@Browser","@BrowserPopUp","@Object"];
     } else if (appTypeLocal == "Webservice") {
         obnames = ["@Generic","@Excel","WebService List"];
     } else if (appTypeLocal == "Mainframe") {

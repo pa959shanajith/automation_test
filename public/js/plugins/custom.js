@@ -601,7 +601,7 @@ var txnHistory = {
 		   	};
 		   request.onsuccess = function(event) {	
 			   
-			   console.log("delete success!");							 
+			   console.log("deleted from idb!");							 
 
 	   		};
 		}
