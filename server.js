@@ -6,10 +6,10 @@ try {
     if (fs.existsSync(envFilePath)) {
         env(envFilePath);
     } else {
-        console.error("Error occurred in loading ENVIRONMENT VARIABLES, .env file is missing! ")
+        console.error("Error occurred in loading ENVIRONMENT VARIABLES, .env file is missing! ");
     }
 } catch (ex) {
-    console.error("Error occurred in loading ENVIRONMENT VARIABLES")
+    console.error("Error occurred in loading ENVIRONMENT VARIABLES");
     console.error(ex);
 }
 
