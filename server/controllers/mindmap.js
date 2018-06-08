@@ -263,7 +263,7 @@ exports.getModules=function(req,res){
 		var relId=d.relId;
 		var cycId=d.cycId;
 		var qmod = ''
-		if(modName = 'fetch all'){
+		if(modName == 'fetch all'){
 			if(d.tab=='tabAssign' || d.tab=='endToend'){
 				qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{projectID:'"+prjId+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
 				qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{projectID:'"+prjId+"'}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});

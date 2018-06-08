@@ -139,8 +139,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     });
                 }
                 var default_releaseid = '';
-                if (!selectedProject)
+                if (!selectedProject){
                     selectedProject = res.projectId[0];
+                }
+                if(!$scope.projectNameO){
+                    $scope.projectNameO = res.projectId[0];
+                }
                 if ($scope.tab == 'tabAssign') {
                     mindmapServices.populateReleases(selectedProject).then(function(result) {
                         if (result == "Invalid Session") {
@@ -197,7 +201,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 }
 
                 // $(".project-list").val(selectedProject);
-                $scope.projectName = selectedProject;
                 selectedProject = undefined;
 
                 if ($scope.param == 0 && $scope.tab == 'tabCreate') {
@@ -212,6 +215,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 //Calling the function to restrict the user to give default node names
                 $("#ct-canvas").click(callme);
                 unblockUI();
+                $scope.projectName4 = $scope.projectNameO;
+                $scope.projectName3 = $scope.projectNameO;
+                $scope.projectName2 = $scope.projectNameO;
+                $scope.projectName1 = $scope.projectNameO;                
             }
         }, function(error) {
             console.log("Error:", error);
@@ -219,7 +226,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         })
     }
 
-    $scope.projectListChange = function() {
+    $scope.projectListChange = function(prjName) {
+        $scope.projectNameO = prjName;
+        $scope.projectName4 = $scope.projectNameO;
+        $scope.projectName3 = $scope.projectNameO;
+        $scope.projectName2 = $scope.projectNameO;
+        $scope.projectName1 = $scope.projectNameO;        
         if ($scope.tab == 'mindmapEndtoEndModules') { 
             selectedProject = $("#selectProjectEtem").val();
             //alert($scope.projectName);
@@ -238,7 +250,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $('.fa.fa-clipboard.fa-lg.plus-icon').removeClass('active-map');
         $('#searchModule-create').val('');
         $('#searchModule-assign').val('');
-        selectedProject = $scope.projectName;
+        selectedProject = $scope.projectNameO;
 
         if ($scope.tab == 'tabAssign') {
             if ($("#ct-AssignBox").hasClass("ct-open") == true) {
@@ -317,7 +329,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             $("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
         }
         if ($scope.param == 1) {
-            mindmapServices.getVersions($scope.projectName).then(
+            mindmapServices.getVersions($scope.projectNameO).then(
                 function(res) {
                     if (res == "Invalid Session") {
                         $rootScope.redirectPage();
@@ -453,7 +465,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if ($scope.param == 1) {
             version_num = $('.version-list').val();
         }
-        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectName || $scope.projectList[0].id, parseFloat(version_num), $('.release-list').val(), $('.cycle-list').val())
+        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO || $scope.projectList[0].id, parseFloat(version_num), $('.release-list').val(), $('.cycle-list').val())
             .then(function(res) {
                 if (res == "Invalid Session") {
                     $rootScope.redirectPage();
@@ -571,7 +583,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         initiate();
         clearSvg();
         var modName = $('#createNewConfirmationPopup').attr('mapid');
-        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectName, 0, $('.release-list').val(), $('.cycle-list').val(), modName).then(function(result) {
+        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, 0, $('.release-list').val(), $('.cycle-list').val(), modName).then(function(result) {
             if (result == "Invalid Session") {
                 $rootScope.redirectPage();
             }
@@ -1291,7 +1303,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
                 $('#ct-assignedTo').append("<option value='select user' >Select User</option>");
                 //PAssing selected projectid to the service
-                mindmapServices.populateUsers($scope.projectName)
+                mindmapServices.populateUsers($scope.projectNameO)
                     .then(function(res) {
                         if (res == "Invalid Session") {
                             $rootScope.redirectPage();
@@ -1310,7 +1322,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 v.append('span').attr('class', 'ct-assignItem fl-left').html('Reviewer');
                 var d = v.append('select').attr('id', 'ct-assignRevw'); //.attr('class','reviwedBy');
                 $('#ct-assignRevw').append("<option value='select reviewer' select=selected>" + "Select Reviewer" + "</option>");
-                mindmapServices.populateUsers($scope.projectName)
+                mindmapServices.populateUsers($scope.projectNameO)
                     .then(function(res) {
                         if (res == "Invalid Session") {
                             $rootScope.redirectPage();
@@ -1931,8 +1943,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         recurseDelChild(dNodes[sid], $scope.tab);
         for (j = dLinks.length - 1; j >= 0; j--) {
             if (dLinks[j].target.id == sid) {
-                d3.select('#ct-link-' + dLinks[j].id).remove();
+                // d3.select('#ct-link-' + dLinks[j].id).remove();
                 dLinks[j].deleted = !0;
+                delete $scope.linkDisplay['link-'+dLinks[j].source.id+'-'+dLinks[j].target.id];
                 break;
             }
         }
@@ -1961,7 +1974,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 var temp = dLinks;
                 for (j = temp.length - 1; j >= 0; j--) {
                     if (temp[j].target.id == d.id) {
-                        d3.select('#ct-link-' + temp[j].id).remove();
+                        // d3.select('#ct-link-' + temp[j].id).remove();
+                        delete $scope.linkDisplay['link-'+temp[j].source.id+'-'+temp[j].target.id];
                         temp[j].deleted = !0;
                     }
                 }
@@ -1985,7 +1999,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         var temp = dLinks;
                         for (j = temp.length - 1; j >= 0; j--) {
                             if (temp[j].target.id == d.id) {
-                                d3.select('#ct-link-' + temp[j].id).remove();
+                                // d3.select('#ct-link-' + temp[j].id).remove();
+                                delete $scope.linkDisplay['link-'+temp[j].source.id+'-'+temp[j].target.id];
                                 temp[j].deleted = !0;
                             }
                         }
@@ -2038,7 +2053,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
         for (j = temp.length - 1; j >= 0; j--) {
             if (temp[j].source.id == d.id) {
-                d3.select('#ct-link-' + temp[j].id).remove();
+                // d3.select('#ct-link-' + temp[j].id).remove();
+                delete $scope.linkDisplay['link-'+temp[j].source.id+'-'+temp[j].target.id];
                 temp[j].deleted = !0;
             }
         }
@@ -2529,7 +2545,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     var vn = '';
                     if ($('.version-list').length != 0)
                         from_v = to_v = $('.version-list').val()
-                    mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectName, parseFloat(from_v), $('.release-list').val(), $('.cycle-list').val()).then(function(result) {
+                    mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'],$scope.projectNameO, parseFloat(from_v), $('.release-list').val(), $('.cycle-list').val()).then(function(result) {
                         if (result == "Invalid Session") {
                             $rootScope.redirectPage();
                         }
@@ -2760,7 +2776,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
 
         })
-        dataReuse['projectid'] = $scope.projectName;
+        dataReuse['projectid'] = $scope.projectNameO;
         if (versioningEnabled) {
             // Add version number
             dataReuse['versionNumber'] = $('.version-list').val();
@@ -2932,7 +2948,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         blockUI('Loading UI');
         var userInfo = JSON.parse(window.localStorage['_UI']);
         var user_id = userInfo.user_id;
-        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectName, parseFloat(version_num), $('.release-list').val(), $('.cycle-list').val(),"fetch all").then(
+        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, parseFloat(version_num), $('.release-list').val(), $('.cycle-list').val(),"fetch all").then(
             function(result) {
                 if (result == "Invalid Session") {
                     $rootScope.redirectPage();
@@ -2942,7 +2958,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 for (var i = 0; i < result_details.length; i++) {
                     var module_info = {
                         "appType": "",
-                        "projectId": $scope.projectName,
+                        "projectId": $scope.projectNameO,
                         "cycleId": "",
                         "moduleId": "",
                         "moduleName": "",
@@ -2974,13 +2990,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     }
                 }
                 if (flag) {
-                    mindmapServices.getProjectTypeMM_Nineteen68($scope.projectName).then(
+                    mindmapServices.getProjectTypeMM_Nineteen68($scope.projectNameO).then(
                         function(project_type) {
                             if (project_type == "Invalid Session") {
                                 $rootScope.redirectPage();
                             }
                             parsed_project_data = project_type;
-                            mindmapServices.getCRId($scope.projectName).then(
+                            mindmapServices.getCRId($scope.projectNameO).then(
                                 function(rel_cycle_data) {
                                     if (rel_cycle_data == "Invalid Session") {
                                         $rootScope.redirectPage();
@@ -3534,34 +3550,34 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         d3.select('#ct-inpSugg').classed('no-disp', !0);
     };
 
-    function deleteNode_W(e) {
-        //If module is in edit mode, then return do not add any node
-        if (d3.select('#ct-inpBox').attr('class') == "") return;
-        d3.select('#ct-ctrlBox').classed('no-disp', !0);
-        var s = d3.select(activeNode);
-        //513-'Mindmap: When we delete an existing Module and create another module in the same work space  then a new Module instance is being appended .
-        var t = s.attr('data-nodetype');
-        if (t == 'modules_endtoend') return;
-        var sid = s.attr('id').split('-')[2];
-        var p = dNodes[sid].parent;
-        recurseDelChild(dNodes[sid], $scope.tab);
-        for (j = dLinks.length - 1; j >= 0; j--) {
-            if (dLinks[j].target.id == sid) {
-                d3.select('#ct-link-' + dLinks[j].id).remove();
-                dLinks[j].deleted = !0;
-                break;
-            }
-        }
-        p.children.some(function(d, i) {
-            if (d.id == sid) {
-                //var nodeDel=dNodes.pop(sid);
-                p.children.splice(i, 1);
-                return !0;
-            }
-            return !1;
-        });
-        if (p.children.length == 0) d3.select('#ct-node-' + p.id).select('.ct-cRight').remove();
-    };
+    // function deleteNode_W(e) {
+    //     //If module is in edit mode, then return do not add any node
+    //     if (d3.select('#ct-inpBox').attr('class') == "") return;
+    //     d3.select('#ct-ctrlBox').classed('no-disp', !0);
+    //     var s = d3.select(activeNode);
+    //     //513-'Mindmap: When we delete an existing Module and create another module in the same work space  then a new Module instance is being appended .
+    //     var t = s.attr('data-nodetype');
+    //     if (t == 'modules_endtoend') return;
+    //     var sid = s.attr('id').split('-')[2];
+    //     var p = dNodes[sid].parent;
+    //     recurseDelChild(dNodes[sid], $scope.tab);
+    //     for (j = dLinks.length - 1; j >= 0; j--) {
+    //         if (dLinks[j].target.id == sid) {
+    //             d3.select('#ct-link-' + dLinks[j].id).remove();
+    //             dLinks[j].deleted = !0;
+    //             break;
+    //         }
+    //     }
+    //     p.children.some(function(d, i) {
+    //         if (d.id == sid) {
+    //             //var nodeDel=dNodes.pop(sid);
+    //             p.children.splice(i, 1);
+    //             return !0;
+    //         }
+    //         return !1;
+    //     });
+    //     if (p.children.length == 0) d3.select('#ct-node-' + p.id).select('.ct-cRight').remove();
+    // };
 
     function moveNode_W(e) {
         e = e || window.event;
@@ -4099,7 +4115,7 @@ Purpose : displaying pop up for replication of project
         var user_id = userInfo.user_id;
         console.log("inside replicate project");
         blockUI('Loading....')
-        mindmapServices.createVersion('project_replicate', window.localStorage['_SR'], $scope.projectName, pid, from_v, to_v, 10).then(
+        mindmapServices.createVersion('project_replicate', window.localStorage['_SR'], $scope.projectNameO, pid, from_v, to_v, 10).then(
             function(res) {
                 if (res == "Invalid Session") {
                     $rootScope.redirectPage();
@@ -4211,7 +4227,7 @@ Purpose : displaying pop up for replication of project
             title: active_version
         });
         blockUI('Loading...');
-        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectName, parseFloat(active_version), $('.release-list').val(), $('.cycle-list').val()).then(
+        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, parseFloat(active_version), $('.release-list').val(), $('.cycle-list').val()).then(
             function(res) {
                 if (res == "Invalid Session") {
                     $rootScope.redirectPage();
@@ -4256,7 +4272,7 @@ Purpose : displaying pop up for replication of project
             return;
         }
         blockUI('Loading...');
-        mindmapServices.createVersion('', window.localStorage['_SR'], $scope.projectName, '', from_v, to_v, 10).then(
+        mindmapServices.createVersion('', window.localStorage['_SR'], $scope.projectNameO, '', from_v, to_v, 10).then(
             function(res) {
                 if (res == "Invalid Session") {
                     $rootScope.redirectPage();
@@ -4312,7 +4328,7 @@ Purpose : displaying pop up for replication of project
       param: e : event to get the source version number tab
     */
     function versionInputDialogShow() {
-        mindmapServices.getVersions($scope.projectName).then(
+        mindmapServices.getVersions($scope.projectNameO).then(
             function(res) {
                 if (res == "Invalid Session") {
                     $rootScope.redirectPage();
@@ -4340,7 +4356,7 @@ Purpose : displaying pop up for replication of project
     function createNewVersion(from_v) {
         console.log(from_v);
         inputVersion = parseFloat($('#versionNumberInput').val());
-        mindmapServices.getVersions($scope.projectName).then(
+        mindmapServices.getVersions($scope.projectNameO).then(
             function(result) {
                 if (result == "Invalid Session") {
                     $rootScope.redirectPage();
@@ -4578,6 +4594,8 @@ Purpose : displaying pop up for replication of project
         $scope.tab = option;
         $scope.nodeDisplay = {};
         $scope.linkDisplay = {};
+        dNodes = [];
+        dLinks = [];
     }
 
     $scope.collapseETE = function() {
@@ -4795,7 +4813,7 @@ Purpose : displaying pop up for replication of project
     }, 500);
 
     $('.project-list-popup').change(function(e, i) {
-        $('.project-list').val($('.project-list-popup').val());
+        $scope.projectNameO = $('.project-list-popup').val();
     });
 
 

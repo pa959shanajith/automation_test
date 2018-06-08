@@ -12,7 +12,7 @@
                         <a id='createImg1' ng-click="tab = 'mindmapCreateOption'; createMapsCall()" href="#" title="Create"><span ><img id='createImg' class="highlightImg highlightImg1" src="images_mindmap/create.png" alt="Create"></span>Create</a>
                      </li>
                      <li>
-                        <a id='assignImg1' ng-click="tab = 'tabAssign'; createMapsCall();createMap('tabAssign');" href="#" title="Assign"><span><img id='assignImg' class="highlightImg highlightImg1" src="images_mindmap/assign.png" alt="Assign"></span>Assign</a>
+                        <a id='assignImg1' ng-click="createMap('tabAssign'); createMapsCall();" href="#" title="Assign"><span><img id='assignImg' class="highlightImg highlightImg1" src="images_mindmap/assign.png" alt="Assign"></span>Assign</a>
                      </li>
                   </ul>
                </div>
@@ -60,8 +60,8 @@
       <div class="endtoend-modulesContainer">
          <div class="endtoend-modules-left endtoend-module-upperSection">
             <div class="endtoend-modules-left-upper">
-               <select class="makeElementFloatleft project-list" id="selectProjectEtem" ng-change="projectListChange()" ng-model="projectName">
-                  <option ng-repeat="project in projectList" ng-selected="projectName == project.id" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}'>{{project.name}}</option>
+               <select class="makeElementFloatleft project-list" id="selectProjectEtem" ng-change="projectListChange(projectName1)" ng-model="projectName1">
+                  <option ng-repeat="project in projectList" ng-selected="projectNameO == project.id" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}'>{{project.name}}</option>
                </select>
                <input type="text" class="makeElementFloatleft" id="eteSearchModules"  ng-keyup = "searchModule('eteSearchModules')" placeholder="Search modules" /><img alt="Search Icon" class="searchModuleimg" src="imgs/ic-search-icon.png" >
                <span class="eteLabel makeElementFloatleft no-disp">End to End Modules</span>
@@ -187,8 +187,8 @@
             </span>
             <span class="selectProject">
                <label class="selectProjectLabel">Project:</label>
-               <select class="project-list" ng-change="projectListChange()" ng-model="projectName">
-                    <option ng-repeat="project in projectList" ng-selected="projectName == project.id" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}'>{{project.name}}</option>
+               <select class="project-list" ng-change="projectListChange(projectName2)" ng-model="projectName2">
+                    <option ng-repeat="project in projectList" ng-selected="projectNameO == project.id" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}'>{{project.name}}</option>
                </select>
                <span id="copy-paste">
                <i class="fa fa-crop fa-lg plus-icon" id="copyImg1" title="add a rectangle" ng-click="startCopy()"></i>
@@ -216,8 +216,8 @@
             </span>
             <span class="selectProject">
                <label class="selectProjectLabel">Project:</label>
-               <select class="project-list" ng-change="projectListChange()" ng-model="projectName">
-                    <option ng-repeat="project in projectList" ng-selected="projectName == project.id" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}'>{{project.name}}</option>
+               <select class="project-list" ng-change="projectListChange(projectName3)" ng-model="projectName3">
+                    <option ng-repeat="project in projectList" ng-selected="projectNameO == project.id" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}'>{{project.name}}</option>
                </select>
             </span>
             <span class="selectRelease selectProjectPosition"> 
@@ -671,10 +671,9 @@
             <h4 class="modal-title">Select a Project</h4>
          </div>
          <div class="modal-body">
-            <select class="project-list project-list-popup" ng-change="projectListChange()" ng-model="projectName">
+            <select class="project-list project-list-popup" ng-change="projectListChange(projectName4)" ng-model="projectName4">
                <option value="" disabled selected>Please Select Project</option>
-               <option value="project1">Project1</option>
-               <option value="project2">Project2</option>
+               <option ng-repeat="project in projectList" ng-selected="projectNameO == project.id" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}'>{{project.name}}</option>
             </select>
          </div>
          <div class="modal-footer">
