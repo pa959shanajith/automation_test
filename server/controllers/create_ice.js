@@ -391,18 +391,18 @@ exports.createStructure_Nineteen68 = function (req, res) {
 									function (result, response) {
 									if (response.statusCode != 200 || result.rows == "fail") {
 										logger.error("Error occured in create_ice/insertInSuite_ICE: projectsUnderDomain, Error Code : ERRNDAC");
-									} else {
+									}// else {
 										//Execute neo4j query!!
-										if(scenario_query=='notflagscenarios'){
+										//if(scenario_query=='notflagscenarios'){
 											//Execute neo4j query!!
-											qList.push({"statement":"MERGE (n:TESTSCENARIOS_NG {projectid:'"+projectid+"',testscenarioname:'"+scenarioName+"',testscenarioid:'"+scenarioId+"',testcaseids:[]}) SET n.deleted='false' return n"});
+											//qList.push({"statement":"MERGE (n:TESTSCENARIOS_NG {projectid:'"+projectid+"',testscenarioname:'"+scenarioName+"',testscenarioid:'"+scenarioId+"',testcaseids:[]}) SET n.deleted='false' return n"});
 											//Add relationship between scenario and testsuite
-											qList.push({"statement":"MATCH (a:TESTSUITES_NG),(b:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}) WHERE '"+scenarioId+"' IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:'"+scenarioId+"'}]->(b)RETURN a,b,r"});
+											//qList.push({"statement":"MATCH (a:TESTSUITES_NG),(b:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}) WHERE '"+scenarioId+"' IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:'"+scenarioId+"'}]->(b)RETURN a,b,r"});
 											
-											qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}),(b:TESTCASES_NG) WHERE b.testcaseid IN a.testcaseids MERGE (a)-[r:FTSCTTCE_NG{id:b.testcaseid}]->(b) RETURN a,r,b"});
-										}
-										else if(scenario_query=='deletescenarios')
-											qList.push({"statement":"MATCH (n: TESTSCENARIOS_NG { testscenarioname: '"+scenarioName+"',testscenarioid: '"+scenarioId+"' }) set n.testcaseids=[]"});
+											//qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}),(b:TESTCASES_NG) WHERE b.testcaseid IN a.testcaseids MERGE (a)-[r:FTSCTTCE_NG{id:b.testcaseid}]->(b) RETURN a,r,b"});
+										//}
+										//else if(scenario_query=='deletescenarios')
+											//qList.push({"statement":"MATCH (n: TESTSCENARIOS_NG { testscenarioname: '"+scenarioName+"',testscenarioid: '"+scenarioId+"' }) set n.testcaseids=[]"});
 
 										scenarioidlist.push(scenarioId);
 										var screen = iterator.screenDetails;
@@ -477,12 +477,12 @@ exports.createStructure_Nineteen68 = function (req, res) {
 														logger.error("Error occured in create_ice/insertInScreen_ICE: createStructure_Nineteen68");
 													} else {
                                                         //Execute neo4j query!!
-                                                        if(screen_query=='notflagscreen'){
-                                                            qList.push({"statement":"MERGE (n:SCREENS_NG {projectid:'"+projectid+"',screenname:'"+screenName+"',screenid:'"+screenId+"'}) SET n.deleted='false' return n"});
+                                                        //if(screen_query=='notflagscreen'){
+                                                            //qList.push({"statement":"MERGE (n:SCREENS_NG {projectid:'"+projectid+"',screenname:'"+screenName+"',screenid:'"+screenId+"'}) SET n.deleted='false' return n"});
                                                             //relationship
-                                                            qList.push({"statement":"MATCH (a:TESTCASES_NG{screenid:'"+screenId+"'}),(b:SCREENS_NG {projectid:'"+projectid+"',screenname:'"+screenName+"',screenid:'"+screenId+"'}) MERGE (a)-[r:FTCETSCR_NG{id:'"+screenId+"'}]->(b) RETURN a,r,b"});
+                                                           // qList.push({"statement":"MATCH (a:TESTCASES_NG{screenid:'"+screenId+"'}),(b:SCREENS_NG {projectid:'"+projectid+"',screenname:'"+screenName+"',screenid:'"+screenId+"'}) MERGE (a)-[r:FTCETSCR_NG{id:'"+screenId+"'}]->(b) RETURN a,r,b"});
                                                             //reqToAPI(qList,urlData);
-                                                        }
+                                                        //}
 														var testcase = screenDetails.testcaseDetails;
 														async.forEachSeries(testcase, function (testcaseitr, callback4) {
 															var testcaseID = uuid();
@@ -556,13 +556,13 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																		logger.error("Error occured in create_ice/insertInTestcase_ICE: createStructure_Nineteen68 service");
 																	}
 																	else {
-																		if(testcase_query=='notflagtestcase'){
-																			qList.push({"statement":"MERGE (n:TESTCASES_NG {screenid:'"+screenId+"',testcasename:'"+testcaseName+"',testcaseid:'"+testcaseID+"',versionnumber:'1'}) SET n.deleted='false' return n"});
+																		//if(testcase_query=='notflagtestcase'){
+																			//qList.push({"statement":"MERGE (n:TESTCASES_NG {screenid:'"+screenId+"',testcasename:'"+testcaseName+"',testcaseid:'"+testcaseID+"',versionnumber:'1'}) SET n.deleted='false' return n"});
 																			//Relationship
-																			qList.push({"statement":"MATCH (a:TESTCASES_NG{testcaseid:'"+testcaseID+"'}),(b:SCREENS_NG {screenid:'"+screenId+"'}) MERGE (a)-[r:FTCETSCR_NG{id:'"+screenId+"'}]->(b) RETURN a,r,b"});
-																			qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG),(b:TESTCASES_NG{testcaseid:'"+testcaseID+"'}) WHERE '"+testcaseID+"' IN a.testcaseids MERGE (a)-[r:FTSCTTCE_NG{id:'"+testcaseID+"'}]->(b)RETURN a,r,b"});
+																			//qList.push({"statement":"MATCH (a:TESTCASES_NG{testcaseid:'"+testcaseID+"'}),(b:SCREENS_NG {screenid:'"+screenId+"'}) MERGE (a)-[r:FTCETSCR_NG{id:'"+screenId+"'}]->(b) RETURN a,r,b"});
+																			//qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG),(b:TESTCASES_NG{testcaseid:'"+testcaseID+"'}) WHERE '"+testcaseID+"' IN a.testcaseids MERGE (a)-[r:FTSCTTCE_NG{id:'"+testcaseID+"'}]->(b)RETURN a,r,b"});
 																		// reqToAPI(qList,urlData);
-																		}
+																		//}
 																		
 																		testcaseidlist.push(testcaseID);
 																		var inputs = {
@@ -589,11 +589,11 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																			}
 																			else {
 																				logger.info("Successfully updated testscenarios");
-																				qList.push({"statement":"MATCH (n:TESTSCENARIOS_NG {projectid:'"+projectid+"',testscenarioname:'"+scenarioName+"',testscenarioid:'"+scenarioId+"'}) SET n.testcaseids=n.testcaseids+['"+testcaseID+"'] return n"});
+																				//qList.push({"statement":"MATCH (n:TESTSCENARIOS_NG {projectid:'"+projectid+"',testscenarioname:'"+scenarioName+"',testscenarioid:'"+scenarioId+"'}) SET n.testcaseids=n.testcaseids+['"+testcaseID+"'] return n"});
 																				//Add relationship between scenario and testsuite
 																				//qListR.push({"statement":"MATCH (a:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'})-[r]->(b:TESTCASES_NG) delete r"})
-																				qList.push({"statement":"MATCH (a:TESTSUITES_NG),(b:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}) WHERE '"+scenarioId+"' IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:'"+scenarioId+"'}]->(b)RETURN a,r,b"});
-																				qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}),(b:TESTCASES_NG{testcaseid:'"+testcaseID+"'}) MERGE (a)-[r:FTSCTTCE_NG{id:'"+testcaseID+"'}]->(b)RETURN a,r,b"});
+																				//qList.push({"statement":"MATCH (a:TESTSUITES_NG),(b:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}) WHERE '"+scenarioId+"' IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:'"+scenarioId+"'}]->(b)RETURN a,r,b"});
+																				//qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}),(b:TESTCASES_NG{testcaseid:'"+testcaseID+"'}) MERGE (a)-[r:FTSCTTCE_NG{id:'"+testcaseID+"'}]->(b)RETURN a,r,b"});
 																				callback4();
 																			}
 																		});
@@ -1045,7 +1045,7 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 						logger.error("Error occured in create_ice/delete_node_ICE: updatetestscenarioname - delete, Error Code : ERRNDAC");
 					} else {
 						//Execute neo4j query!!
-						qList.push({"statement":"MATCH (n: TESTSCENARIOS_NG { testscenarioname: '"+inputs.node_name+"',testscenarioid: '"+inputs.id+"' }) detach delete n"});
+						//qList.push({"statement":"MATCH (n: TESTSCENARIOS_NG { testscenarioname: '"+inputs.node_name+"',testscenarioid: '"+inputs.id+"' }) detach delete n"});
 						flagtocheckifdeleted = true;
 					}
 					callback();
@@ -1088,7 +1088,7 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 						logger.error("Error occured in create_ice/updateTestscenarioname_ICE: updatetestscenarioname - update, Error Code : ERRNDAC");
 					} else {
 	                    //Execute neo4j query!!
-	                    qList.push({"statement":"MATCH(n:TESTSCENARIOS_NG{testScenarioid:'"+inputs.testscenarioid+"'}) SET n.testscenarioname='"+inputs.testscenarioname+"'"+",n.projectid='"+inputs.projectid+"' return n"});
+	                    //qList.push({"statement":"MATCH(n:TESTSCENARIOS_NG{testScenarioid:'"+inputs.testscenarioid+"'}) SET n.testscenarioname='"+inputs.testscenarioname+"'"+",n.projectid='"+inputs.projectid+"' return n"});
 						logger.info('Succesfully renamed Testscenario name');
 					}
 					callback(null, "success");
@@ -1261,7 +1261,7 @@ function updatetestscreenname(testscreendetails, cb, data) {
 						// if(deleted.rows != undefined && deleted.rows.length!=0){
 						flagtocheckifdeleted = true;
 						//Execute neo4j query!!
-						qList.push({"statement":"MATCH (n: SCREENS_NG { screenname: '"+inputs.node_name+"',screenid: '"+inputs.id+"',versionnumber:'"+inputs.version_number+"' }) detach delete n"});
+						//qList.push({"statement":"MATCH (n: SCREENS_NG { screenname: '"+inputs.node_name+"',screenid: '"+inputs.id+"',versionnumber:'"+inputs.version_number+"' }) detach delete n"});
 					}
 					callback();
 				});
@@ -1305,7 +1305,7 @@ function updatetestscreenname(testscreendetails, cb, data) {
 					} else {
 						logger.info('Succesfully renamed Screen name');
 						//Execute neo4j query!!
-						qList.push({"statement":"MATCH(n:SCREENS_NG{screenid:'"+inputs.screenid+"'}) SET n.screenname='"+inputs.screenname+"'"+",n.projectid='"+inputs.projectid+"' return n"});
+						//qList.push({"statement":"MATCH(n:SCREENS_NG{screenid:'"+inputs.screenid+"'}) SET n.screenname='"+inputs.screenname+"'"+",n.projectid='"+inputs.projectid+"' return n"});
 					}
 					callback(null, "success");
 				});
@@ -1477,7 +1477,7 @@ function updatetestcasename(testcasedetails, cb, data) {
 						// if(deleted.rows != undefined && deleted.rows.length!=0){
 						flagtocheckifdeleted = true;
                         //Execute neo4j query!!
-                        qList.push({"statement":"MATCH (n: TESTCASES_NG { testCaseName: '"+inputs.node_name+"',testCaseID: '"+inputs.id+"',versionnumber:'"+inputs.version_number+"' }) detach delete n"});
+                        //qList.push({"statement":"MATCH (n: TESTCASES_NG { testCaseName: '"+inputs.node_name+"',testCaseID: '"+inputs.id+"',versionnumber:'"+inputs.version_number+"' }) detach delete n"});
 					// }
 					}
 					callback();
@@ -1522,7 +1522,7 @@ function updatetestcasename(testcasedetails, cb, data) {
 					} else {
 						logger.info('Succesfully renamed Testcase name');
 						//Execute neo4j query!!
-						qList.push({"statement":"MATCH(n:TESTCASES_NG{testcaseid:'"+inputs.testcaseid+"'}) SET n.testcasename='"+inputs.testcasename+"' return n"});
+						//qList.push({"statement":"MATCH(n:TESTCASES_NG{testcaseid:'"+inputs.testcaseid+"'}) SET n.testcasename='"+inputs.testcasename+"' return n"});
 					}
 					callback(null, "success");
 				});
