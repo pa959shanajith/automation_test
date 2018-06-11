@@ -391,7 +391,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 									function (result, response) {
 									if (response.statusCode != 200 || result.rows == "fail") {
 										logger.error("Error occured in create_ice/insertInSuite_ICE: projectsUnderDomain, Error Code : ERRNDAC");
-									}// else {
+									} else {
 										//Execute neo4j query!!
 										//if(scenario_query=='notflagscenarios'){
 											//Execute neo4j query!!

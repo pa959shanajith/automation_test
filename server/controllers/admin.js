@@ -661,7 +661,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 
                                                    /* qList.push({"statement":"MATCH (a:RELEASES_NG{releaseid:'"+newReleaseID+
                                                                 "'}),(b:CYCLES_NG {releaseid:'"+newReleaseID+
-                                                                "',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:b.cycleid}]->(b) return a,r,b"});
+                                                                "',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:b.cycleid}]->(b) return a,r,b"});*/
                                                     // reqToAPI(qList,urlData);
 
 													async.forEachSeries(cycleDetails, function (eachCycleDetail, cycleNamescallback) {
@@ -781,9 +781,9 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 												} else {
                                                     //Execute neo4j query!! deleterelease
                                                     //var qList=[];
-                                                    qList.push({"statement":"MATCH (n:RELEASES_NG {projectid:'"+inputs.projectid+
+                                                    /*qList.push({"statement":"MATCH (n:RELEASES_NG {projectid:'"+inputs.projectid+
                                                                 "',releaseid:'"+inputs.releaseid+"',releasename:'"+
-                                                                inputs.releasename+"'}) detach delete n"});
+                                                                inputs.releasename+"'}) detach delete n"});*/
                                                     //reqToAPI(qList,urlData);
 													var cyclesOfRelease = eachprojectDetail.cycleDetails;
 													async.forEachSeries(cyclesOfRelease, function (eachCycleDetail, eachCycleCallback) {
@@ -810,9 +810,9 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																} else {
                                                                     //Execute neo4j query!! deletecycle
                                                                     //var qList=[];
-                                                                    qList.push({"statement":"MATCH (n:CYCLES_NG {cycleid:'"+inputs.cycleid+
+                                                                   /* qList.push({"statement":"MATCH (n:CYCLES_NG {cycleid:'"+inputs.cycleid+
                                                                                 "',releaseid:'"+inputs.releaseid+"',cyclename:'"+
-                                                                                inputs.cyclename+"'}) detach delete n"});
+                                                                                inputs.cyclename+"'}) detach delete n"});*/
                                                                     //reqToAPI(qList,urlData);
                                                                     eachCycleCallback();
 																}
@@ -856,9 +856,9 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																} else {
                                                                     //Execute neo4j query!! deletecycle
                                                                     //var qList=[];
-                                                                    qList.push({"statement":"MATCH (n:CYCLES_NG {cycleid:'"+inputs.cycleid+
+                                                                    /*qList.push({"statement":"MATCH (n:CYCLES_NG {cycleid:'"+inputs.cycleid+
                                                                                 "',releaseid:'"+inputs.releaseid+"',cyclename:'"+
-                                                                                inputs.cyclename+"'}) detach delete n"});
+                                                                                inputs.cyclename+"'}) detach delete n"});*/
                                                                     //reqToAPI(qList,urlData);
                                                                     eachCycleCallback();
 																}
