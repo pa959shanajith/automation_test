@@ -173,12 +173,12 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 
 function addUsernameAndIdInLogs(username,flag,userid){
 	if(flag == "validCredential"){
-		//logger.info("User " + username + " authenticated");
-		//logger.rewriters.push(function(level, msg, meta) {
-		//	meta.username = username;
-			//meta.userid = userid;
-			//return meta;
-		//});
+		logger.info("User " + username + " authenticated");
+		logger.rewriters[0]=function(level, msg, meta) {
+			meta.username = username;
+			meta.userid = userid;
+		    return meta;
+		};
 	}
 }
 
