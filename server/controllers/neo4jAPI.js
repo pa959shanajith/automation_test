@@ -11,6 +11,7 @@ var requestHeaders = {
 
 exports.executeQueries = function (d, cb) {
 	logger.info("Inside UI service: executeQueries");
+	var st=Date.now();
 	var args = {
 		"data": {"statements": d},
 		"headers": requestHeaders
@@ -18,6 +19,9 @@ exports.executeQueries = function (d, cb) {
 	client.post(neoURL, args, function (result, resp) {
 		if (resp.statusCode != 200) cb(500, "fail");
 		else if (result.errors.length !== 0) cb(400, result.errors);
-		else cb(200, result.results);
+		else {
+			logger.info("time taken by neo4j: ",(Date.now()-st));
+			cb(200, result.results);
+		}
 	});
 };

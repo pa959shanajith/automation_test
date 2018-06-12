@@ -64,7 +64,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
       
   }
 
-  $scope.executeGo = function(){
+  $scope.executeGo = function($event){
   	localStorage.setItem("navigateEnable", false);
     $scope.enableGenerate = false;
     $scope.crawledLinks = [];
@@ -180,7 +180,11 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 
       socket.disconnect('', { query: "check=true" })
     });
-
+    //Transaction Activity for WebocularGoClick
+    var labelArr = [];
+    var infoArr = [];
+    labelArr.push(txnHistory.codesDict['WebocularGoClick']);
+    txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
   }
 
   $scope.addDomainDot = function(){
@@ -418,7 +422,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
   }
 
   var positionNode = {"x":0 , "y":0};
-  $scope.generateGraph = function(){
+  $scope.generateGraph = function($event){
     $("#result-canvas").show();
     $scope.showInfo = true;
     $scope.hideBaseContent = { message: 'true' };;
@@ -882,10 +886,15 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
       root.size = recurse(root);
       return nodes;
     }
+    //Transaction Activity for generateGraph
+    var labelArr = [];
+    var infoArr = [];
+    labelArr.push(txnHistory.codesDict['generateGraphClick']);
+    txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
   }
 
   /* function to show a table report*/
-  $scope.showReport = function(){
+  $scope.showReport = function($event){
     $scope.hideBaseContent = { message: 'true' };;
     var myNode = document.getElementById("report-canvas");
     while (myNode.firstChild) {
@@ -949,5 +958,10 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
     tbl.appendChild(tbdy);
     reportDiv.appendChild(tbl);
     body.appendChild(reportDiv);
+    //Transaction Activity for showReportClick
+    var labelArr = [];
+    var infoArr = [];
+    labelArr.push(txnHistory.codesDict['showReportClick']);
+    txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
   }
 }]);

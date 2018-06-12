@@ -2985,6 +2985,7 @@ input[disabled]{
     padding: 3px !important;
     float: left;
     overflow: auto;
+    overflow-x: hidden;
 }
 .historyContents span{
 	color: black;

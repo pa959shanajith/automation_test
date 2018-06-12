@@ -61,11 +61,11 @@ exports.openScreenShot = function (req, res) {
 		redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 			if (redisres[1]>0) {
 				logger.info("Sending socket request for render_screenshot to redis");
-				dataToIce = {"emitAction" : "render_screenshot","username" : name, "path":path};
+				var dataToIce = {"emitAction" : "render_screenshot","username" : name, "path":path};
 				redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 				var updateSessionExpiry = utils.resetSession(req.session);
 				function render_screenshot_listener(channel,message) {
-					data = JSON.parse(message);
+					var data = JSON.parse(message);
 					if(name == data.username){
 						redisServer.redisSubServer.removeListener('message',render_screenshot_listener);
 						if (data.onAction == "unavailableLocalServer") {
@@ -1016,12 +1016,12 @@ exports.connectJira_ICE = function (req, res) {
 						redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 							if (redisres[1]>0) {
 								logger.info("Sending socket request for jira_login to redis");
-								dataToIce = {"emitAction": "jiralogin", "username": name, "action": req.body.action, "inputs": inputs};
+								var dataToIce = {"emitAction": "jiralogin", "username": name, "action": req.body.action, "inputs": inputs};
 								redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 								var updateSessionExpiry = utils.resetSession(req.session);
 								var count = 0;
 								function jira_login_1_listener(channel,message) {
-									data = JSON.parse(message);
+									var data = JSON.parse(message);
 									if(name == data.username){
 										redisServer.redisSubServer.removeListener("message",jira_login_1_listener);
 										if (data.onAction == "unavailableLocalServer") {
@@ -1085,7 +1085,7 @@ exports.connectJira_ICE = function (req, res) {
 								var updateSessionExpiry = utils.resetSession(req.session);
 								var count = 0;
 								function jira_login_2_listener(channel,message) {
-									data = JSON.parse(message);
+									var data = JSON.parse(message);
 									if(name == data.username){
 										redisServer.redisSubServer.removeListener("message",jira_login_2_listener);
 										if (data.onAction == "unavailableLocalServer") {

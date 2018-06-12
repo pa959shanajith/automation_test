@@ -218,7 +218,7 @@
 		<div class="modal-dialog modal-md">
 			<div class="modal-content">
 				<div class="modal-header">
-					<button type="button" class="close" ng-click="goBacktoPlugin()">&times;</button>
+					<button type="button" class="close" ng-click="goBacktoPlugin($event)">&times;</button>
 					<h4 class="modal-title">ALM Login</h4>
 				</div>
 				<div class="modal-body">
@@ -231,7 +231,7 @@
 				<div class="modal-footer">
 					<span id="qcErrorMsg" style="color: red; float: left; margin-left: 15px; margin-top: 5px;"></span>
 					<img class="qcLoginload" src="imgs/loader.gif" alt="Loading..." style="float: left; display: none;">
-					<button type="button" class="btn btn-default btn-default-modal qcConnsubmit" ng-click="loginQCServer()">Submit</button>
+					<button type="button" class="btn btn-default btn-default-modal qcConnsubmit" ng-click="loginQCServer($event)">Submit</button>
 				</div>
 			</div>
 		</div>

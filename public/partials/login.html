@@ -34,7 +34,7 @@
 							<input ng-model="ud.password" type="password" class="form-control" name="password" placeholder="Password" autocomplete="off">
 						</div>
 						<span ng-show="loginValidation" class="absoluteError errorMessages">{{loginValidation}}</span>
-						<button ng-click="check_credentials('/plugin')" type="submit" class="btn btn-block">Login</button>
+						<button ng-click="check_credentials('/plugin', $event)" type="submit" class="btn btn-block">Login</button>
 					</form>
 				</div>
 				<div class="wrap login-wrap" ng-if="restartForm==true">

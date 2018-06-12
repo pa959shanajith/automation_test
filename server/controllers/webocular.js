@@ -16,15 +16,16 @@ exports.getCrawlResults = function (req, res) {
 			validateWebocular();
 			function validateWebocular() {
 				logger.info("Inside function: validateWebocular");
-				check_url = validator.isURL(req.body.url);
+				var check_url = validator.isURL(req.body.url);
+				var validate_url,validate_level,validate_agent;
 				if (check_url == true) {
 					validate_url = true;
 				}
-				check_level = validator.isEmpty(req.body.level.toString());
+				var check_level = validator.isEmpty(req.body.level.toString());
 				if (check_level == false) {
 					validate_level = true;
 				}
-				check_agent = validator.isAlpha(req.body.agent);
+				var check_agent = validator.isAlpha(req.body.agent);
 				if (check_agent == true) {
 					validate_agent = true;
 				}
@@ -39,7 +40,7 @@ exports.getCrawlResults = function (req, res) {
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						var updateSessionExpiry = utils.resetSession(req.session);
 						function webCrawlerGo_listener(channel,message) {
-							data = JSON.parse(message);
+							var data = JSON.parse(message);
 							if(name == data.username){
 								var value = data.value;
 								if (data.onAction == "unavailableLocalServer") {

@@ -270,7 +270,7 @@ function next_function(resultobj, cb, data) {
 								}
 								else {
 									
-										result1 = result;
+										var result1 = result;
 										if(result1[0].data.length >0 && result1[0].data[0].row[0] != undefined){
 											testSuiteDetails_obj.testsuitename = result1[0].data[0].row[0];
 											maincallback();

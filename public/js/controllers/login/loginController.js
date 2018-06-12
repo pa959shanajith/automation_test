@@ -7,14 +7,13 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 	window.localStorage.clear();
 	window.localStorage['LoginSuccess'] = "False";
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear();
-
 	//if checkLoggedIn was true, means, user was logged in but now the session is expired
 	if (window.sessionStorage.getItem('checkLoggedIn') == "true") {
 		$scope.loginValidation = "Your session has expired, Please login again";
 		window.sessionStorage['checkLoggedIn'] = "false";
 	}
 
-	$scope.check_credentials = function (path) {
+	$scope.check_credentials = function (path, $event) {
 		cfpLoadingBar.start();
 		$scope.loginValidation = "";
 		$(".ic-username, .ic-password").parent().removeClass("input-border-error")
@@ -65,6 +64,7 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 						if (data != "fail") {
 							window.localStorage['LoginSuccess'] = "True";
 							window.localStorage['_SR'] = data.rolename;
+							defaultRole = data.rolename;
 							window.localStorage['_UI'] = JSON.stringify(data);
 							window.sessionStorage["checkLoggedIn"] = "true";
 							if (data.rolename == "Admin") {
@@ -74,6 +74,11 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 								window.localStorage['navigateScreen'] = "plugin";
 								$location.path("/plugin");
 							}
+							//Transaction Activity for Login Button Action
+							var labelArr = [];
+							var infoArr = [];
+							labelArr.push(txnHistory.codesDict['Login']);
+							txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
 						} else {
 							$scope.loginValidation = "Failed to Login.";
 							console.log("Failed to Load UserInfo.");
@@ -98,12 +103,15 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 				} else {
 					$scope.loginValidation = "Failed to Login.";
 				}
+			
 			}, function (error) {
 				console.log("Failed to Authenticate User.")
 				$scope.loginValidation = "Failed to Authenticate User.";
 				cfpLoadingBar.complete();
 			});
+
 		}
+		
 	};
 
 	$scope.restartServer = function (serverid, serverName) {

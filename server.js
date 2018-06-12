@@ -6,10 +6,10 @@ try {
     if (fs.existsSync(envFilePath)) {
         env(envFilePath);
     } else {
-        console.error("Error occurred in loading ENVIRONMENT VARIABLES, .env file is missing! ")
+        console.error("Error occurred in loading ENVIRONMENT VARIABLES, .env file is missing! ");
     }
 } catch (ex) {
-    console.error("Error occurred in loading ENVIRONMENT VARIABLES")
+    console.error("Error occurred in loading ENVIRONMENT VARIABLES");
     console.error(ex);
 }
 
@@ -233,18 +233,18 @@ if (cluster.isMaster) {
                         logger.error("Please run the Service API and Restart the Server");
                     } else {
                         if (result.rows == "True") {
-                            logger.rewriters.push(function(level, msg, meta) {
-                                if (req.session && req.session.uniqueId) {
-                                    meta.username = req.session.username;
-                                    meta.userid = req.session.userid;
-                                    meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
-                                    return meta;
-                                } else {
-                                    meta.username = null;
-                                    meta.userid = null;
-                                    return meta;
-                                }
-                            });
+                            logger.rewriters.push[0]=function(level, msg, meta) {
+                                 if (req.session && req.session.uniqueId) {
+                                     meta.username = req.session.username;
+                                     meta.userid = req.session.userid;
+                                     meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
+                                     return meta;
+                                 } else {
+                                     meta.username = null;
+                                     meta.userid = null;
+                                     return meta;
+                                 }
+                            };
                             return next();
                         } else {
                             req.session.destroy();
@@ -284,12 +284,12 @@ if (cluster.isMaster) {
             res.clearCookie('io');
             res.clearCookie('mm_pid');
             req.session.destroy();
-            logger.rewriters.push(function(level, msg, meta) {
+            logger.rewriters[0]=function(level, msg, meta) {
                 meta.username = null;
                 meta.userid = null;
                 meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
                 return meta;
-            });
+            };
             res.sendFile("index.html", {
                 root: __dirname + "/public/"
             });
@@ -342,7 +342,7 @@ if (cluster.isMaster) {
 
         function sessionCheck(req, res, roles) {
             logger.info("Inside sessioncheck for URL : %s", req.url);
-            logger.rewriters.push(function(level, msg, meta) {
+            logger.rewriters[0]=function(level, msg, meta) {
                 if (req.session != undefined && req.session.userid != undefined) {
                     meta.username = req.session.username;
                     meta.userid = req.session.userid;
@@ -351,9 +351,9 @@ if (cluster.isMaster) {
                 } else {
                     meta.username = null;
                     meta.userid = null;
-                    return meta;
+                   return meta;
                 }
-            });
+            };
 
             if (req.session.activeRole == req.session.defaultRoleId) {
                 if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >= 0) {

@@ -392,7 +392,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     }; //	getTestScriptData end
 
     // browser icon clicked
-    $scope.debugTestCase_ICE = function(selectedBrowserType) {
+    $scope.debugTestCase_ICE = function(selectedBrowserType,e) {
         var taskInfo = JSON.parse(window.localStorage['_CT']);
         var testcaseID = [];
         var browserType = [];
@@ -433,13 +433,21 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 openDialog("Debug Testcase", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
             }
 
+			//Transaction Activity for DebugTestCase
+            var labelArr = [];
+            var infoArr = [];
+            infoArr.push({"appType" : appType});
+            infoArr.push({"status" : data});
+            labelArr.push(txnHistory.codesDict['DebugTestCase']);
+            txnHistory.log(e.type,labelArr,infoArr,$location.$$path); 										
+
         },function(error) {
             console.log("Error while traversing while executing debugTestcase method!! \r\n " + (error.data));
         });
     }; // browser invocation ends
 
     //Import Test case
-    $scope.importTestCase = function() {
+    $scope.importTestCase = function($event) {
         var counter1 = 0;
         var userInfo = JSON.parse(window.localStorage['_UI']);
         var taskInfo = JSON.parse(window.localStorage['_CT']);
@@ -483,6 +491,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                         if (data == "success") {
                                             angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
                                             openDialog("Import Testcase", "TestCase Json imported successfully.");
+											//Transaction Activity for Import Testcase Button Action
+                                            var labelArr = [];
+                                            var infoArr = [];
+                                            labelArr.push(txnHistory.codesDict['ImportTestCase']);
+                                            txnHistory.log($event.type,labelArr,infoArr,$location.$$path);	
                                         } else {
                                             openDialog("Import Testcase", "Please Check the file format you have uploaded!")
                                         }
@@ -566,11 +579,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         });
     })
 
-    $("#overWriteJson").on("click", function() {
-        angular.element(document.getElementById("left-bottom-section")).scope().importTestCase1();
+    $("#overWriteJson").on("click", function(e) {
+        angular.element(document.getElementById("left-bottom-section")).scope().importTestCase1(e);
     })
     //Import Testcase1
-    $scope.importTestCase1 = function() {
+    $scope.importTestCase1 = function($event) {
         var counter = 0;
         var userInfo = JSON.parse(window.localStorage['_UI']);
         var taskInfo = JSON.parse(window.localStorage['_CT']);
@@ -609,6 +622,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                     if (data == "success") {
                                         angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
                                         openDialog("Import Testcase", "TestCase Json imported successfully.");
+										//Transaction Activity for Import Testcase Button Action
+                                        var labelArr = [];
+                                        var infoArr = [];
+                                        labelArr.push(txnHistory.codesDict['ImportTestCase']);
+                                        txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
                                     } else {
                                         openDialog("Import Testcase", "Please Check the file format you have uploaded!")
                                     }
@@ -627,7 +645,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     //Import Test case
 
     //Export Test case
-    $scope.exportTestCase = function() {
+    $scope.exportTestCase = function($event) {
         var taskInfo = JSON.parse(window.localStorage['_CT']);
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
@@ -712,6 +730,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             a.dispatchEvent(e);
                         }
                     }
+					//Transaction Activity for Export Testcase Button Action
+                     var labelArr = [];
+                     var infoArr = [];
+                     labelArr.push(txnHistory.codesDict['ExportTestCase']);
+                     txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
                 },
                 function(error) {});
     }
@@ -1355,6 +1378,17 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             $(document).find("#OEBSPath").removeClass("inputErrorBorder");
             $(document).find("#mobilityAPKPath, #mobilitySerialPath, #mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").removeClass("inputErrorBorder");
             $(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion").removeClass("inputErrorBorder");
+			
+			//Transaction Activity for InitCompareAndUpdate/initScraping Button Action
+            var labelArr = [];
+            var infoArr = [];
+            if($rootScope.compareFlag == true)
+                labelArr.push(txnHistory.codesDict['InitCompareAndUpdate']);
+            else
+                labelArr.push(txnHistory.codesDict['InitScraping']);
+            infoArr.push($scope.getScreenView);
+            txnHistory.log(e.type,labelArr,infoArr,$location.$$path); 
+			
             //For Desktop
             if ($scope.getScreenView == "Desktop") {
                 if ($(document).find("#desktopPath").val() == "") {
@@ -1967,7 +2001,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     });
 
     //Delete Scraped Objects
-    function deleteScrapedObjects()
+    function deleteScrapedObjects(e)
     {
         var totalElements = $(".ellipsis").length;
         var selectedElements = $("input[type=checkbox].checkall:checked:visible").length;
@@ -2016,7 +2050,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 "left":  $(this).closest("li").attr('data-left'),
                 "tempId":  parseInt($(this).closest("li").attr('val'))
             };
-            getIndexOfDeletedObjects.push(json);
+
+              getIndexOfDeletedObjects.push(json);
           })
            var currentElements = $(".ellipsis:visible").length;
           if(currentElements > 0)
@@ -2032,11 +2067,17 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
               $("#saveObjects").prop("disabled", false);
           }
       }
+
+	  //Transaction Activity for Delete Scraped Objects Button Action
+      var labelArr = [];
+      var infoArr = [];
+      labelArr.push(txnHistory.codesDict['DeleteScrapedObjects']);
+      txnHistory.log(e.type,labelArr,infoArr,$location.$$path);					
      
     }
 
     //To delete Scrape Objects
-    $scope.del_Objects = function() {
+    $scope.del_Objects = function(e) {
         $("#deleteObjectsModal").modal("hide");
        
         if (deleteScrapeDataservice) {
@@ -2053,9 +2094,19 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 $('input[type=checkbox].checkall:checked:visible').each(function() {
                     var id = $(this).parent().attr('id').split("_");
                     id = id[1];
-                    deletedCustNames.push(viewString.view[id].custname);
-                    deletedCustPath.push(viewString.view[id].xpath);
-                    deletedIndex.push(id);
+                    if(eaCheckbox == false && Object.keys(viewString.view).length != 0)
+                    {
+                        deletedCustNames.push(viewString.view[id].custname);
+                        deletedCustPath.push(viewString.view[id].xpath);
+                        deletedIndex.push(id);
+                    }
+                    else if(eaCheckbox == true && Object.keys(viewString.view).length == 0)
+                    {
+                        deletedCustNames.push(newScrapedList.view[id].custname);
+                        deletedCustPath.push(newScrapedList.view[id].xpath);
+                        deletedIndex.push(id);
+                    }
+                 
                     //deletedIndex.push()
                     // console.log(viewString.view[id])
                 });
@@ -2104,7 +2155,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 }
             }
               //Delete all objects ------------------------------------------
-              deleteScrapedObjects();
+              deleteScrapedObjects(e);
               $("#saveObjects").trigger('click');
         } else {
             var tempModifiednames;
@@ -2220,7 +2271,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     }
                 }
                 else{
-                        deleteScrapedObjects();  
+                        deleteScrapedObjects(e);  
                 }
                 $("#deleteObjects").prop("disabled", true);
             }
@@ -2599,7 +2650,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     //WSDL Functionality
 
     //Submit Custom Object Functionality
-    $scope.submitCustomObject = function() {
+    $scope.submitCustomObject = function(e) {
         var err = "false";
         $('input.inputErrorBorderBottom').removeClass('inputErrorBorderBottom');
         $scope.errorMessage = "";
@@ -2794,6 +2845,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             //$("#addObjectSuccess").modal("show")
             $("#saveObjects").prop("disabled", false)
             flag = "false";
+			//Transaction Activity for Submit Custom Objects Action
+            var labelArr = [];
+            var infoArr = [];
+            labelArr.push(txnHistory.codesDict['SubmitCustomObject']);
+            txnHistory.log(e.type,labelArr,infoArr,$location.$$path);				   
         }
 
         //Building Tree
@@ -3009,7 +3065,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     /****Show prev value functionality for map object****/
 
     /****Submit Map Object Functionality****/
-    $scope.submitMapObject = function() {
+    $scope.submitMapObject = function(e) {
         $(".submitObjectWarning, .objectExistMap, .noObjectToMap").hide()
         if ($("#customObjforMap").text() == "") {
             $(".noObjectToMap").show()
@@ -3060,7 +3116,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 $rootScope.redirectPage();
                             }
                             $("#dialog-mapObject").modal("hide");
-                            if (data == "success") openDialog("Map Object", "Objects have been mapped successfully."); //$("#mapObjSuccess").modal("show");
+                            if (data == "success") {
+                                openDialog("Map Object", "Objects have been mapped successfully."); //$("#mapObjSuccess").modal("show");
+                                //Transaction Activity for Submit Map Objects Action
+                                var labelArr = [];
+                                var infoArr = [];
+                                labelArr.push(txnHistory.codesDict['SubmitMapObject']);
+                                txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
+                            }
                             else if (data == "TagMissMatch") openDialog("Map Object", "Failed to map objects."); //$("#mapObjTagMissMatch").modal("show");
                             else if (typeof data == "object") openDialog("Map Object", "Failed to map objects."); //$("mapObjSameObject").modal("show");
                             angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
@@ -3089,7 +3152,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             $("#reUsedObjectsModal").modal("show");
             return false;
         }
-        saveScrapedObjects();
+        saveScrapedObjects(e);
     })
 
     $scope.saveScrapedObjects = function() {
@@ -3105,7 +3168,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     };
 
   
-    function saveScrapedObjects() {
+    function saveScrapedObjects(e) {
         if (noSave = "false") {
             var xpath;
             var duplicateCustnames = [];
@@ -3172,20 +3235,20 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 }
 
             }
-            renameScrapedObjects();
+            renameScrapedObjects(e);
         }
     }
 
 	$(document).on('click', '#saveElements', function(e) {
         $("#saveConfirmObjects").modal('hide');
-        renameScrapedObjects();
+        renameScrapedObjects(e);
     });
     $(document).on('click', '#noSaveElements', function(e) {
         $("#saveConfirmObjects").modal('hide');
         return false;
     });
 
-	function renameScrapedObjects() {
+	function renameScrapedObjects(e) {
         var custnames = [];
         var viewStringXpath = [];
         var modifiedCustXpath = [];
@@ -3235,7 +3298,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         var getScrapeData;
         if (eaCheckbox){
             for(var i=0; i<getIndexOfDeletedObjects.length;i++){
-                delete newScrapedList.view[getIndexOfDeletedObjects[i]];
+                   //delete newScrapedList.view[getIndexOfDeletedObjects[i].tempId];
+                   if(getIndexOfDeletedObjects[i].hasOwnProperty("tempId")) { 
+                        delete newScrapedList.view[getIndexOfDeletedObjects[i].tempId];
+                    }
+                   else{
+                        delete newScrapedList.view[getIndexOfDeletedObjects[i]];
+                   }
+                    
                 //newScrapedList.view.splice(getIndexOfDeletedObjects[i], 1);
             }
             newScrapedList.view =  newScrapedList.view.filter(function(n){ return n != null });
@@ -3287,6 +3357,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
                     $("#saveObjects").attr('disabled', true);
                     deleteScrapeDataservice = true;
+					//Transaction Activity for Save Scraped Objects Button Action
+                    var labelArr = [];
+                    var infoArr = [];
+                    labelArr.push(txnHistory.codesDict['SaveScrapedObjects']);
+                    infoArr.push(scrapeObject.appType)
+                    txnHistory.log(e.type,labelArr,infoArr,$location.$$path); 			   
                 } else {
                     //enableScreenShotHighlight = false;
                     openDialog("Save Scraped data", "Failed to save")
@@ -3365,7 +3441,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     $(document).find('#load_jqGrid').prop('display', 'none !important');
 
     //save button clicked - save the testcase steps
-    $scope.updateTestCase_ICE = function() {
+    $scope.updateTestCase_ICE = function(e) {
         var task=JSON.parse(window.localStorage['_CT'])
        if (task.reuse == 'True') {
             //$("#reUsedTestcaseModal").find('.modal-title').text("");
@@ -3373,13 +3449,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             $("#reUsedTestcaseModal").modal("show");
             return false;
         }
-        updateTestCase();
+        updateTestCase(e);
     };
 
-    $scope.saveTestcase = function() {
+    $scope.saveTestcase = function(e) {
         $("#reUsedTestcaseModal").modal("hide");
         noSaveTestcase = "false";
-        updateTestCase();
+        updateTestCase(e);
     };
 
     $scope.noSaveTestcaseFn = function() {
@@ -3393,7 +3469,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     }
     
 
-    function updateTestCase() {
+    function updateTestCase(e) {
         if (noSaveTestcase == "false") {
             cfpLoadingBar.start();
             var userInfo = JSON.parse(window.localStorage['_UI']);
@@ -3504,6 +3580,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		        			}*/
                                         angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
                                         openDialog("Save Testcase", "Testcase saved successfully")
+										//Transaction Activity for SaveTestcase Button Action
+                                        var labelArr = [];
+                                        var infoArr = [];
+                                        labelArr.push(txnHistory.codesDict['SaveTestcase']);
+                                        txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
                                         /*if(deleteStep == false){
                                         	selectRowStepNoFlag = true;
 
@@ -3710,6 +3791,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             }
                         }
                         var custnameIndices = {};
+									  
                         for(var p=0;p<allCustnames.length;p++)
                         {
                             if(!custnameIndices.hasOwnProperty(allCustnames[p]))
@@ -3720,6 +3802,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 custnameIndices[allCustnames[p]].push(p);
                         }
                         var custnameIndices = Object.values(custnameIndices);
+								
                         for(var q=0;q<custnameIndices.length;q++)
                         {
                             if(custnameIndices[q].length > 1)
@@ -3732,6 +3815,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                             $(this)[0].style.display = 'block';               //Display duplicate custnames only
                                         }
                                     }
+								 
                                 });
                             }
                         }
@@ -3818,7 +3902,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     //Display testcase in the modal
                     $("#dialog-addDependentTestCase").modal("show");
 
-                    $(document).on('click', '#debugOn', function() {
+                    $(document).on('click', '#debugOn', function(e) {
                         var checkedLength = $(".checkTestCase:checked").length;
                         checkedTestcases = [];
                         if (checkedLength == 0) {
@@ -3842,6 +3926,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 $("#globalModal").find('.modal-body p').html("Failed to save dependent testcases");
                                 $("#globalModal").modal("show");
                             }
+							//Transaction Activity for AddDependentTestCase Button Action
+                            var labelArr = [];
+                            var infoArr = [];
+                            labelArr.push(txnHistory.codesDict['AddDependentTestCase']);
+                            txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);						
                         }
                     });
                 }, function(error) {});
@@ -3897,7 +3986,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     });
 
 
-      $scope.submit_task=function(action) {
+      $scope.submit_task=function(action,e) {
         var taskinfo = JSON.parse(window.localStorage['_CT']);
         var taskid = taskinfo.subTaskId;
         var taskstatus = taskinfo.status;
@@ -3907,16 +3996,25 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         if (action != undefined && action == 'reassign') {
             taskstatus = action;
         }
+		//Transaction Activity for Task Submit/Approve/Reassign Button Action
+        var labelArr = [];
+        var infoArr = [];
+	  
         mindmapServices.reviewTask(projectId,taskid,taskstatus,version,batchTaskIDs).then(function(result){
         if (result == 'fail') {
                     openDialog("Task Submission Error", "Reviewer is not assigned !",true)
                 } else if (taskstatus == 'reassign') {
-                    openDialog("Task Reassignment Success", "Task Reassigned scucessfully!",true)
+                    openDialog("Task Reassignment Success", "Task Reassigned successfully!",true)
+                    labelArr.push(txnHistory.codesDict['TaskReassign']);
                 } else if (taskstatus == 'review') {
-                    openDialog("Task Completion Success", "Task Approved scucessfully!",true)
+                    openDialog("Task Completion Success", "Task Approved successfully!",true)
+                    labelArr.push(txnHistory.codesDict['TaskApprove']);
                 } else {
-                    openDialog("Task Submission Success", "Task Submitted scucessfully!",true)
+                    openDialog("Task Submission Success", "Task Submitted successfully!",true)
+                    labelArr.push(txnHistory.codesDict['TaskSubmit']);
                 }
+
+                txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
                 $timeout(function() {
                     $(".close:visible").addClass('globalSubmit');
                 },200)
@@ -4298,7 +4396,7 @@ function contentTable(newTestScriptDataLS) {
         $("#modalDialogRemarks").modal("show");
     })
 
-    $(document).on('click', '#btnaddRemarks', function() {
+    $(document).on('click', '#btnaddRemarks', function(e) {
         //var oldRemarks = $("#jqGrid tbody tr td.selectedRemarkCell").text().trim();
         if (!$("#getremarksData").val().trim()) {
             $("#getremarksData").addClass("inputErrorBorderFull");
@@ -4314,6 +4412,11 @@ function contentTable(newTestScriptDataLS) {
                 $("#jqGrid tbody tr td.selectedRemarkCell").removeClass('selectedRemarkCell');
                 $(this).parent(".modal-footer").parent(".modal-content").find(".close").trigger('click');
             }
+			//Transaction Activity for AddRemarksTestStep Button Action
+            var labelArr = [];
+            var infoArr = [];
+            labelArr.push(txnHistory.codesDict['AddRemarksTestStep']);
+            txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);				   
         }
     })
 
@@ -4378,6 +4481,11 @@ function contentTable(newTestScriptDataLS) {
                 }
              
                 $(".close:visible").trigger('click'); 
+				//Transaction Activity for Filter Button Action
+                var labelArr = [];
+                var infoArr = [];
+                labelArr.push(txnHistory.codesDict['SaveTestStepDetails']);
+                txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);					 
            }  
         });
 
@@ -4671,6 +4779,8 @@ function contentTable(newTestScriptDataLS) {
             var sc;
             var res = '';
             if (appTypeLocal == 'Web') {
+														  
+											   
                 var newTSDataLS = angular.element(document.getElementById('jqGrid')).scope().newTestScriptDataLS;
                 if (newTSDataLS) {
                     if (newTSDataLS != "undefined") {
@@ -5467,7 +5577,7 @@ function deleteTestScriptRow(e) {
     }
 }
 
-$(document).on('click', '#btnDeleteStepYes', function() {
+$(document).on('click', '#btnDeleteStepYes', function(e) {
     var selectedRowIds = []; //$("#jqGrid").jqGrid('getGridParam','selarrrow').map(Number);
     $.each($(".ui-state-highlight"), function() {
         selectedRowIds.push($(this).attr("id"));
@@ -5489,9 +5599,14 @@ $(document).on('click', '#btnDeleteStepYes', function() {
     $("#jqGrid").trigger("reloadGrid");
     $('.modal-header:visible').find('.close').trigger('click')
     //deleteStep = true;
+	//Transaction Activity for DeleteTestScriptRow Button Action
+    var labelArr = [];
+    var infoArr = [];
+    labelArr.push(txnHistory.codesDict['DeleteTestScriptRow']);
+    txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);						   
 })
 
-function addTestScriptRow() {
+function addTestScriptRow(e) {
     if ($('.ui-state-highlight').find('td:nth-child(2)').find('input').is(":checked") && $('.ui-state-highlight').find('td:nth-child(7)').find('input').length > 0) {
 
     } else {
@@ -5573,9 +5688,15 @@ function addTestScriptRow() {
             flagClass == "false"
         }
     }
+	
+	//Transaction Activity for AddTestScriptRow Button Action
+    var labelArr = [];
+    var infoArr = [];
+    labelArr.push(txnHistory.codesDict['AddTestScriptRow']);
+    txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);
 }
 
-function rearrangeTestScriptRow() {
+function rearrangeTestScriptRow(e) {
     $("#jqGrid").trigger("reloadGrid");
     $("#jqGrid").jqGrid("setColProp", "stepNo", {
         editable: false
@@ -5616,6 +5737,12 @@ function rearrangeTestScriptRow() {
     $("#jqGrid").resetSelection();
     $("#jqGrid").find(">tbody").sortable("enable");
     enabledEdit = "false";
+
+	//Transaction Activity for RearrangeTestScriptRow Button Action
+    var labelArr = [];
+    var infoArr = [];
+    labelArr.push(txnHistory.codesDict['RearrangeTestScriptRow']);
+    txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);
 }
 
 var selectedRow;
@@ -5624,7 +5751,7 @@ var selectedRowIds;
 var lastSelectedRowId
 
 //Edit Testscript Row
-function editTestCaseRow() {
+function editTestCaseRow(e) {
     var rowSelect = $(document).find(".ui-state-highlight").children("td:nth-child(1)").text();
     if ($('#jqGrid tbody tr.ui-widget-content').length <= 0) {
         openDialog("Edit step", "No steps to edit")
@@ -5694,11 +5821,17 @@ function editTestCaseRow() {
                 $(this).focus().trigger('click');
             }
         });
+
+		//Transaction Activity for EditTestCaseRow Button Action
+        var labelArr = [];
+        var infoArr = [];
+        labelArr.push(txnHistory.codesDict['EditTestCaseRow']);
+        txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);					 
     }
 }
 
 //Copy-Paste TestStep Functionality
-function copyTestStep() {
+function copyTestStep(e) {
     window.localStorage['emptyTestStep'] = "false";
     var taskInfo = JSON.parse(window.localStorage['_CT']);
     if (($(document).find(".ui-state-highlight").length <= 0 && $('#jqGrid tbody tr.ui-widget-content').children('td:nth-child(5)').text().trim() == "") || ($(document).find(".ui-state-highlight").length == 1 && $(document).find(".ui-state-highlight").children('td:nth-child(5)').text().trim() == "")) {
@@ -5778,10 +5911,15 @@ function copyTestStep() {
         $("#jqGrid").find(">tbody").sortable("enable");
         window.localStorage['anotherScriptId'] = JSON.parse(window.localStorage['_CT']).testCaseId; //window.localStorage['testScriptIdVal'];
         window.localStorage['getAppTypeForPaste'] = taskInfo.appType; //window.localStorage['appTypeScreen']
+		//Transaction Activity for CopyTestStep Button Action
+        var labelArr = [];
+        var infoArr = [];
+        labelArr.push(txnHistory.codesDict['CopyTestStep']);
+        txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);						 
     }
 }
 //Need to work
-function pasteTestStep() {
+function pasteTestStep(e) {
     var getRowJsonToPaste = JSON.parse(window.localStorage['getRowJsonCopy']);
     if (getRowJsonToPaste == [] || getRowJsonToPaste == undefined || getRowJsonToPaste.length <= 0) {
         openDialog("Paste Testcase step", "Copy steps to paste")
@@ -5858,7 +5996,7 @@ $(document).on("click", "#btnPasteTestStepYes", function() {
     }
 })
 
-$(document).on("click", "#btnPasteTestStep", function() {
+$(document).on("click", "#btnPasteTestStep", function(e) {
     var chkNo;
     var selectedStepNo = [];
     var proceed = true;
@@ -5891,7 +6029,7 @@ $(document).on("click", "#btnPasteTestStep", function() {
             for (i = 0; i < selectedStepNo.length; i++) {
                 pasteSelecteStepNo[i] = selectedStepNo[i];
             }
-            pasteInGrid();
+            pasteInGrid(e);
             /*$('.domainLoader').remove();
             $("#dialogOverlay, #dialogContainer").remove();*/
             $("#modalDialog-inputField").find(".close").trigger("click");
@@ -5917,7 +6055,7 @@ $(document).on('focus', '.copyPasteValidation', function() {
     $('#errorMsgs1, #errorMsgs2, #errorMsgs3').hide();
 })
 
-function pasteInGrid() {
+function pasteInGrid(e) {
     var gridData = $("#jqGrid").jqGrid('getRowData');
     var increaseSplice;
     var getRowJsonCopyTemp = [];
@@ -6005,12 +6143,16 @@ function pasteInGrid() {
             $(this).children("td[aria-describedby='jqGrid_cb']").children("input").attr("id", "jqg_jqGrid_" + $(this).index()).attr("name", "jqg_jqGrid_" + $(this).index());
         })
     }
-
+	//Transaction Activity for PasteTestStep Button Action
+    var labelArr = [];
+    var infoArr = [];
+    labelArr.push(txnHistory.codesDict['PasteTestStep']);
+    txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);							   
 }
 //Copy-Paste TestStep Functionality
 
 //Commenting TestScript Row
-function commentStep() {
+function commentStep(e) {
     if ($('#jqGrid tbody tr.ui-widget-content').length <= 0) {
         openDialog("Comment step", "No steps to comment")
     } else if (($(document).find(".ui-state-highlight").length <= 0 && $('#jqGrid tbody tr.ui-widget-content').children('td:nth-child(5)').text().trim() == "") || ($(document).find(".ui-state-highlight").length == 1 && $(document).find(".ui-state-highlight").children('td:nth-child(5)').text().trim() == "")) {
@@ -6138,6 +6280,12 @@ function commentStep() {
             }
         });
         $("#jqGrid").trigger("reloadGrid");
+		
+		//Transaction Activity for CommentStep Button Action
+        var labelArr = [];
+        var infoArr = [];
+        labelArr.push(txnHistory.codesDict['CommentStep']);
+        txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);					 
     } else {
         openDialog("Skip Testcase step", "Please select step to skip")
     }

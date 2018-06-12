@@ -507,7 +507,7 @@ exports.reviewTask=function(req,res){
 						res.status(status_code).send(result);
 					}else{
 						try{
-							res_data=result;
+							var res_data=result;
 							
 							if(res_data[0].data.length!= 0 && res_data[0].data[0]['graph']['nodes'] != null){
 								
@@ -992,16 +992,16 @@ exports.saveData=function(req,res){
 					if(err)
 					res.status(500).send(err);
 					else{
-						datatosend=data;
+						var module_type='modules';
+						var parsing_result=update_cassandraID(data,urlData,module_type);
+						neo4jAPI.executeQueries(parsing_result[0],function(status,result){
+							if(status!=200) res.status(status).send(result);
+							else res.status(200).send(parsing_result[1]);
+						});
 
 					}
 				
-					var module_type='modules';
-					var parsing_result=update_cassandraID(data,urlData,module_type);
-					neo4jAPI.executeQueries(parsing_result[0],function(status,result){
-						if(status!=200) res.status(status).send(result);
-						else res.status(200).send(parsing_result[1]);
-					});
+					
 				});
 			}
 	}else{
@@ -1194,16 +1194,16 @@ exports.saveEndtoEndData=function(req,res){
 
 					
 					else{
-						datatosend=data;
+						var module_type='modules_endtoend';
+						var parsing_result=update_cassandraID(data,urlData,module_type);
+						
+						neo4jAPI.executeQueries(parsing_result[0],function(status,result){
+							if(status!=200) res.status(status).send(result);
+							else res.status(200).send(parsing_result[1]);
+						});
 					}
 					
-					var module_type='modules_endtoend';
-					var parsing_result=update_cassandraID(data,urlData,module_type);
 					
-					neo4jAPI.executeQueries(parsing_result[0],function(status,result){
-						if(status!=200) res.status(status).send(result);
-						else res.status(200).send(parsing_result[1]);
-					});
 				});
 			}
 	}

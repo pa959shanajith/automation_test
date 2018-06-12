@@ -11,10 +11,10 @@
 			<div id="left-top-section" ng-if="getScreenView == 'Web'">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
-					<li><a href='#' ng-click="debugTestCase_ICE('3');" title="Debug on Internet Explorer"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
-					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="Debug on Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
-					<li><a href='#' ng-click="debugTestCase_ICE('2');" title="Debug on Firefox"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
-					<li class="safariBrowser" style="display: none;"><a href='#' ng-click="debugTestCase_ICE('6');" title="Debug on Safari"><span><img src='imgs/ic-safari.png' alt='Safari' /></span>Safari</a></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('3',$event);" title="Debug on Internet Explorer"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('1',$event);" title="Debug on Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('2',$event);" title="Debug on Firefox"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
+					<li class="safariBrowser" style="display: none;"><a href='#' ng-click="debugTestCase_ICE('6',$event);" title="Debug on Safari"><span><img src='imgs/ic-safari.png' alt='Safari' /></span>Safari</a></li>
 					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value=""></span><label class='addDependentTestCase' for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
@@ -24,7 +24,7 @@
 			<div id="left-top-section" ng-if="getScreenView == 'DesktopJava'" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
-					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="OEBS Apps"><span><img src='imgs/ic-desktop.png' alt='OEBS Apps' /></span>OEBS Apps</a></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('1',$event);" title="OEBS Apps"><span><img src='imgs/ic-desktop.png' alt='OEBS Apps' /></span>OEBS Apps</a></li>
 					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value=""></span><label class='addDependentTestCase' for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
@@ -34,7 +34,7 @@
 			<div id="left-top-section" ng-if="getScreenView == 'Desktop'" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
-					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="Desktop Apps"><span><img src='imgs/ic-desktop.png' alt='Desktop Apps' /></span>Desktop Apps</a></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('1',$event);" title="Desktop Apps"><span><img src='imgs/ic-desktop.png' alt='Desktop Apps' /></span>Desktop Apps</a></li>
 					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value=""></span><label class='addDependentTestCase' for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
@@ -44,7 +44,7 @@
 			<div id="left-top-section" ng-if="getScreenView == 'System'" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
-					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="System Apps"><span><img src='imgs/ic-desktop.png' alt='System Apps' /></span>System Apps</a></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('1',$event);" title="System Apps"><span><img src='imgs/ic-desktop.png' alt='System Apps' /></span>System Apps</a></li>
 				</ul>
 			</div>
 			<!-- System -->
@@ -53,7 +53,7 @@
 			<div id="left-top-section" ng-if="getScreenView == 'SAP'" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
-					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="SAP Apps"><span><img src='imgs/ic-desktop.png' alt='SAP Apps' /></span>SAP Apps</a></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('1',$event);" title="SAP Apps"><span><img src='imgs/ic-desktop.png' alt='SAP Apps' /></span>SAP Apps</a></li>
 					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value=""></span><label class='addDependentTestCase' for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
@@ -63,7 +63,7 @@
 			<div id="left-top-section" ng-if="getScreenView == 'Webservice'" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
-					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="Web Services"><span><img src='imgs/ic-webservice.png' alt='Webservices' /></span>Web Services</a></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('1',$event);" title="Web Services"><span><img src='imgs/ic-webservice.png' alt='Webservices' /></span>Web Services</a></li>
 					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value=""></span><label class='addDependentTestCase' for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
@@ -73,7 +73,7 @@
 			<div id="left-top-section" ng-if="getScreenView == 'MobileApp'" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
-					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="Android Apps"><span><img src='imgs/ic-mobility.png' alt='Android Apps' /></span>Mobile Apps</a></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('1',$event);" title="Android Apps"><span><img src='imgs/ic-mobility.png' alt='Android Apps' /></span>Mobile Apps</a></li>
 					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value=""></span><label class='addDependentTestCase' for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
@@ -83,7 +83,7 @@
 			<div id="left-top-section" ng-if="getScreenView == 'MobileWeb'" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
-					<li><a href='#'  ng-click="debugTestCase_ICE();" title="Android Web"><span><img src='imgs/ic-mobility.png' alt='Android Web' /></span>Mobile Web</a></li>
+					<li><a href='#'  ng-click="debugTestCase_ICE($event);" title="Android Web"><span><img src='imgs/ic-mobility.png' alt='Android Web' /></span>Mobile Web</a></li>
 					<li class="last"  title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value=""></span><label class='addDependentTestCase' for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
@@ -93,7 +93,7 @@
 			<div id="left-top-section" ng-if="getScreenView == 'Mainframe'" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
-					<li><a href='#'  ng-click="debugTestCase_ICE();" title="Mainframe"><span><img src='imgs/ic-mainframe.png' alt='Mainframe' style="background-color: white; border-radius: 7px;"/></span>Mainframe</a></li>
+					<li><a href='#'  ng-click="debugTestCase_ICE($event);" title="Mainframe"><span><img src='imgs/ic-mainframe.png' alt='Mainframe' style="background-color: white; border-radius: 7px;"/></span>Mainframe</a></li>
 					<li class="last"  title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value=""></span><label class='addDependentTestCase' for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
@@ -103,9 +103,9 @@
 			
 			<div id="left-bottom-section">
 				<ul>
-					<li><a href='#' ng-click="importTestCase()"  title="Import TestCase"><span><img src='imgs/ic-import-script.png' alt='Import TestCase' /></span>Import Test Case</a><input style="visibility: hidden;" type="file" id="importTestCaseFile" accept=".json"></li>
-					<li style="visibility: hidden; display: none;"><a href='#' ng-click="importTestCase1()"></a><input style="visibility: hidden;" type="file" id="overWriteJson" accept=".json"></li>
-					<li><a href='#' ng-click="exportTestCase()"  title="Export TestCase"><span><img src='imgs/ic-export-script.png' alt='Export TestScript' /></span>Export Test Case</a></li>
+					<li><a href='#' ng-click="importTestCase($event)"  title="Import TestCase"><span><img src='imgs/ic-import-script.png' alt='Import TestCase' /></span>Import Test Case</a><input style="visibility: hidden;" type="file" id="importTestCaseFile" accept=".json"></li>
+					<li style="visibility: hidden; display: none;"><a href='#' ng-click="importTestCase1($event)"></a><input style="visibility: hidden;" type="file" id="overWriteJson" accept=".json"></li>
+					<li><a href='#' ng-click="exportTestCase($event)"  title="Export TestCase"><span><img src='imgs/ic-export-script.png' alt='Export TestScript' /></span>Export Test Case</a></li>
 				</ul>
 			</div>
 		</div>
@@ -123,18 +123,18 @@
 		<!-- Table Action Buttons -->
 		<div id="tableActionButtons">
 		<span>
-			<img class="btn btn-action" src="imgs/ic-jq-addstep.png" alt="Add Steps" onclick="addTestScriptRow()"  title="Add Test step">
-			<img class="btn btn-action" src="imgs/ic-jq-editstep.png" alt="Edit Steps" onclick="editTestCaseRow()"  title="Edit Test step">
-			<img class="btn btn-action" src="imgs/ic-jq-dragstep.png" alt="Drag Steps" onclick="rearrangeTestScriptRow()"  title="Drag & Drop Test step">
-			<img class="btn btn-action" src="imgs/ic-jq-copystep.png" alt="Copy Steps" onclick="copyTestStep()"  title="Copy Test step">
-			<img class="btn btn-action" src="imgs/ic-jq-pastestep.png" alt="Paste Steps" onclick="pasteTestStep()"  title="Paste Test step">
+			<img class="btn btn-action" src="imgs/ic-jq-addstep.png" alt="Add Steps" onclick="addTestScriptRow(event)"  title="Add Test step">
+			<img class="btn btn-action" src="imgs/ic-jq-editstep.png" alt="Edit Steps" onclick="editTestCaseRow(event)"  title="Edit Test step">
+			<img class="btn btn-action" src="imgs/ic-jq-dragstep.png" alt="Drag Steps" onclick="rearrangeTestScriptRow(event)"  title="Drag & Drop Test step">
+			<img class="btn btn-action" src="imgs/ic-jq-copystep.png" alt="Copy Steps" onclick="copyTestStep(event)"  title="Copy Test step">
+			<img class="btn btn-action" src="imgs/ic-jq-pastestep.png" alt="Paste Steps" onclick="pasteTestStep(event)"  title="Paste Test step">
 			<img class="btn btn-action" src="imgs/ic-jq-commentstep.png" alt="Comment Steps" onclick="commentStep(event)"  title="Skip Test step">
 		</span>
 		<span>
-			<button class="btn btn-xs btn-xs-custom btn-xs-action" ng-click="updateTestCase_ICE()"  title="Save Test Case">Save</button>
+			<button class="btn btn-xs btn-xs-custom btn-xs-action" ng-click="updateTestCase_ICE($event)"  title="Save Test Case">Save</button>
 		</span>
 		<span>
-			<button class="btn btn-xs btn-xs-custom btn-xs-action" onclick="deleteTestScriptRow()"  title="Delete Test step" style="margin-left: 0;">Delete</button>
+			<button class="btn btn-xs btn-xs-custom btn-xs-action" onclick="deleteTestScriptRow(event)"  title="Delete Test step" style="margin-left: 0;">Delete</button>
 			<button class="btn btn-md pull-right submitTaskBtn" style="margin-top: 2px" ng-click="submitTasksTestCase('submit')"  title="Submit Task">Submit</button>
 			<button class="btn btn-md pull-right reassignTaskBtn" style="margin-top: 2px;display:None" ng-click="submitTasksTestCase('reassign')"  title="Reassign Task">Reassign</button>
 			<!--<button class="btn btn-md pull-right submitTaskBtn" style="margin-top: 2px" ng-click="submitTasksTestCase()"  title="Submit Task">Submit</button>-->
@@ -377,7 +377,7 @@
 				<p>Are you sure you want to submit the task ?</p>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="submit_task(stask)">Yes</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="submit_task(stask,$event)">Yes</button>
 				<button type="button" class="btn btn-default" data-dismiss="modal">No</button>
 			</div>
 		</div>
@@ -438,7 +438,7 @@
 	        <p></p>
 	      </div>
 	      <div class="modal-footer">
-	        <button type="button"  class="btn btn-default" ng-click="saveTestcase()" >Yes</button>
+	        <button type="button"  class="btn btn-default" ng-click="saveTestcase($event)" >Yes</button>
 	        <button type="button"  class="btn btn-default"  ng-click="noSaveTestcaseFn()" data-dismiss="modal">No</button>
 	      </div>
 	    </div>

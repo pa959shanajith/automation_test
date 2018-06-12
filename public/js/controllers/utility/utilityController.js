@@ -83,9 +83,14 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
     }
 
     //Reset Encrypt
-    $scope.resetEncrypt = function() {
+    $scope.resetEncrypt = function($event) {
         $('#encryptData').val('');
         $('#encryptedData').val('');
+          //Transaction Activity for Encryption
+          var labelArr = [];
+          var infoArr = [];
+          labelArr.push(txnHistory.codesDict['ResetEncryptionData']);
+          txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
     };
 
     //Export Pairwise
@@ -232,7 +237,7 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
     }
 
     //button hide and show
-    $(document).on('change', "#utilityMethods", function() {
+    $(document).on('change', "#utilityMethods", function(e) {
         $('#encryptData').val('');
         $('#encryptedData').val('');
         if ($("#utilityMethods option:selected").val() == "AES") {
@@ -247,10 +252,15 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
         } else {
             $("#encryption_btns").hide();
         }
+        //Transaction Activity for SelectEncryptionMethod
+        var labelArr = [];
+        var infoArr = [];
+        labelArr.push(txnHistory.codesDict['SelectEncryptionMethod']);
+        txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
     })
 
     //Encryption
-    $scope.EncryptData = function() {
+    $scope.EncryptData = function($event) {
         //$("#encryptData").removeClass("inputErrorBorderFull");
         //$("#utilityMethods").removeClass("selectErrorBorder");
         if ($("#utilityMethods option:selected").val() == "Select Method") {
@@ -269,6 +279,11 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
                         $rootScope.redirectPage();
                     } else if (data != "fail") {
                         $("#encryptedData").val(data);
+                        //Transaction Activity for Encryption
+                        var labelArr = [];
+                        var infoArr = [];
+                        labelArr.push(txnHistory.codesDict['Encryption']);
+                        txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
                     } else {
                         console.log(data);
                     }

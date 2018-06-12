@@ -345,7 +345,7 @@
 			</div>
 			<div class="modal-footer">
 				<button ng-click="resetTextFields()" type="button" id="resetObjRow" class="btn btn-default">Reset</button>
-				<button ng-click="submitCustomObject()" type="button" id="rubmitObjRow" class="btn btn-default">Submit</button>
+				<button ng-click="submitCustomObject($event)" type="button" id="rubmitObjRow" class="btn btn-default">Submit</button>
 			</div>
 			</div>
 		</div>
@@ -388,7 +388,7 @@
 					<span class="error-msg-abs error-msg-abs3 ng-cloak objectExistMap">Object already merged</span>
 					<button type="button"  class="btn btn-default showAllObjects" >Show all Objects</button>
 					<button type="button" disabled class="btn btn-default unlinkButton" ng-click="unlinkMapObj()">Un-link</button>
-					<button id='submitMapObj' type="button" class="btn btn-default" ng-click="submitMapObject()">Submit</button>
+					<button id='submitMapObj' type="button" class="btn btn-default" ng-click="submitMapObject($event)">Submit</button>
 				</div>
 			</div>
 		</div>
@@ -426,7 +426,7 @@
 	        <p></p>
 	      </div>
 	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" ng-click="del_Objects()">Yes</button>
+	        <button type="button" class="btn btn-default" ng-click="del_Objects($event)">Yes</button>
 	        <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
 	      </div>
 	    </div>
@@ -446,7 +446,7 @@
 					<p>Are you sure you want to submit the task ?</p>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="submit_task(stask)">Yes</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="submit_task(stask,$event)">Yes</button>
 					<button type="button" class="btn btn-default" data-dismiss="modal">No</button>
 				</div>
 			</div>

@@ -314,7 +314,7 @@ exports.getDomains_ICE = function getDomains_ICE(req, res) {
 };
 
 exports.createProject_ICE = function createProject_ICE(req, res) {
-    qList = [];
+    //qList = [];
 	try {
 		logger.info("Inside UI service: createProject_ICE");
 		if (utils.isSessionActive(req.session)) {
@@ -408,12 +408,12 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
                                     newProjectID = insertProjectData.rows[0].projectid;
                                     //Execute neo4j query!!
                                     //var qList=[];
-                                    qList.push({"statement":"MERGE (n:PROJECTS_NG {projectid:'"+newProjectID+
+                                    /*qList.push({"statement":"MERGE (n:PROJECTS_NG {projectid:'"+newProjectID+
                                                 "',domainid:'"+inputs.domainid+"',projectname:'"+
-                                                inputs.projectname+"'}) return n"});
+                                                inputs.projectname+"'}) return n"});*/
                                     //Relationships
-                                    qList.push({"statement":"MATCH (a:DOMAINS_NG{domainid:'"+inputs.domainid+"'}),(b:PROJECTS_NG {projectid:'"+newProjectID+
-                                                "',domainid:'"+inputs.domainid+"',projectname:'"+inputs.projectname+"'}) MERGE(a)-[r:FDOMTPRJ_NG{id:'"+newProjectID+"'}]->(b) return a,r,b"});
+                                   /* qList.push({"statement":"MATCH (a:DOMAINS_NG{domainid:'"+inputs.domainid+"'}),(b:PROJECTS_NG {projectid:'"+newProjectID+
+                                                "',domainid:'"+inputs.domainid+"',projectname:'"+inputs.projectname+"'}) MERGE(a)-[r:FDOMTPRJ_NG{id:'"+newProjectID+"'}]->(b) return a,r,b"});*/
                                     callback();
 
 								}
@@ -454,21 +454,21 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 											newReleaseID = data.rows[0].releaseid;
                                             //Execute neo4j query!! createrelease
                                             //var qList=[];
-                                            qList.push({"statement":"MERGE (n:RELEASES_NG {releaseid:'"+newReleaseID+
+                                            /*qList.push({"statement":"MERGE (n:RELEASES_NG {releaseid:'"+newReleaseID+
                                                         "',projectid:'"+inputs.projectid+"',releasename:'"+
-                                                        inputs.releasename+"',deleted:'"+false+"'}) return n"});
+                                                        inputs.releasename+"',deleted:'"+false+"'}) return n"});*/
                                             //Relationships
-                                            qList.push({"statement":"MATCH (a:PROJECTS_NG{projectid:'"+inputs.projectid+"'}),(b:RELEASES_NG {releaseid:'"+newReleaseID+
+                                           /* qList.push({"statement":"MATCH (a:PROJECTS_NG{projectid:'"+inputs.projectid+"'}),(b:RELEASES_NG {releaseid:'"+newReleaseID+
                                                         "',projectid:'"+inputs.projectid+"',releasename:'"+
                                                         inputs.releasename+"',deleted:'"+false+"'}) MERGE(a)-[r:FPRJTREL_NG{id:'"+newReleaseID+
-                                                        "'}]->(b) return a,r,b"});
+                                                        "'}]->(b) return a,r,b"});*/
 
                                             //qList.push({"statement":"MATCH (c:RELEASES_NG{releaseid:'"+newReleaseID+"'}) return c"})
                                             //qList.push({"statement":"MATCH (c:CYCLES_NG{releaseid:'"+newReleaseID+"'}) return c"})
 
-                                            qList.push({"statement":"MATCH (a:RELEASES_NG{releaseid:'"+newReleaseID+
+                                           /* qList.push({"statement":"MATCH (a:RELEASES_NG{releaseid:'"+newReleaseID+
                                                         "'}),(b:CYCLES_NG {releaseid:'"+newReleaseID+
-                                                        "',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:b.cycleid}]->(b) return a,r,b"});
+                                                        "',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:b.cycleid}]->(b) return a,r,b"});*/
                                             //reqToAPI(qList,urlData);
 											async.forEachSeries(cycleNames, function (cycleName, cycleNamescallback) {
 												try {
@@ -519,16 +519,16 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 					if (err) {
 						logger.error(err);
 					} else {
-						logger.info("Calling neo4jAPI execute queries for createProject_ICE");
-                        neo4jAPI.executeQueries(qList,function(status,result){
-                            if(status!=200){
-                               logger.info("Error in neo4jAPI execute queries with status for createProject_ICE: %d",status,"\nresponse for createProject_ICE:Response: %s",result);
-                            }
-                            else{
-								logger.info("neo4jAPI execute queries with status for createProject_ICE: %d",status,"\nresponse for createProject_ICE:Response: %s",result);
-                                logger.info('neo4jAPI execute queries for createProject_ICE executed successfully');
-                            }
-                        });
+						// logger.info("Calling neo4jAPI execute queries for createProject_ICE");
+                        // neo4jAPI.executeQueries(qList,function(status,result){
+                            // if(status!=200){
+                               // logger.info("Error in neo4jAPI execute queries with status for createProject_ICE: %d",status,"\nresponse for createProject_ICE:Response: %s",result);
+                            // }
+                            // else{
+								// logger.info("neo4jAPI execute queries with status for createProject_ICE: %d",status,"\nresponse for createProject_ICE:Response: %s",result);
+                                // logger.info('neo4jAPI execute queries for createProject_ICE executed successfully');
+                            // }
+                        // });
 					}
 				});
 			} else {
@@ -557,14 +557,14 @@ function createCycle(args, createCycleCallback) {
 			} else {
 				var newCycleID  = result.rows[0].cycleid;
 				//var qList=[];
-				qList.push({"statement":"MERGE (n:CYCLES_NG {releaseid:'"+args.data.releaseid+
+				/*qList.push({"statement":"MERGE (n:CYCLES_NG {releaseid:'"+args.data.releaseid+
                 "',cyclename:'"+args.data.cyclename+"',cycleid:'"+
-                newCycleID+"',deleted:'"+false+"'}) return n"});
+                newCycleID+"',deleted:'"+false+"'}) return n"});*/
 				//Relationships
-				qList.push({"statement":"MATCH (a:RELEASES_NG{releaseid:'"+args.data.releaseid+"'}),(b:CYCLES_NG {releaseid:'"+args.data.releaseid+
+				/*qList.push({"statement":"MATCH (a:RELEASES_NG{releaseid:'"+args.data.releaseid+"'}),(b:CYCLES_NG {releaseid:'"+args.data.releaseid+
                 "',cyclename:'"+args.data.cyclename+"',cycleid:'"+
                 newCycleID+"',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:'"+
-                newCycleID+"'}]->(b) return a,r,b"});
+                newCycleID+"'}]->(b) return a,r,b"});*/
 
 				//statusFlag = "success";
 				//createCycleCallback(null, statusFlag);
@@ -646,22 +646,22 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 												} else {
 													newReleaseID = data.rows[0].releaseid;
                                                     //Execute neo4j query!! createrelease
-                                                    qList.push({"statement":"MERGE (n:RELEASES_NG {releaseid:'"+newReleaseID+
+                                                    /*qList.push({"statement":"MERGE (n:RELEASES_NG {releaseid:'"+newReleaseID+
                                                                 "',projectid:'"+inputs.projectid+"',releasename:'"+
-                                                                inputs.releasename+"',deleted:'"+false+"'}) return n"});
+                                                                inputs.releasename+"',deleted:'"+false+"'}) return n"});*/
                                                     //reqToAPI(qList,urlData);
                                                     //Relationships
-                                                    qList.push({"statement":"MATCH (a:PROJECTS_NG{projectid:'"+inputs.projectid+"'}),(b:RELEASES_NG {releaseid:'"+newReleaseID+
+                                                   /* qList.push({"statement":"MATCH (a:PROJECTS_NG{projectid:'"+inputs.projectid+"'}),(b:RELEASES_NG {releaseid:'"+newReleaseID+
                                                                 "',projectid:'"+inputs.projectid+"',releasename:'"+
                                                                 inputs.releasename+"',deleted:'"+false+"'}) MERGE(a)-[r:FPRJTREL_NG{id:'"+newReleaseID+
-                                                                "'}]->(b) return a,r,b"});
+                                                                "'}]->(b) return a,r,b"});*/
 
                                                     //qList.push({"statement":"MATCH (c:RELEASES_NG{releaseid:'"+newReleaseID+"'}) return c"})
                                                     //qList.push({"statement":"MATCH (c:CYCLES_NG{releaseid:'"+newReleaseID+"'}) return c"})
 
-                                                    qList.push({"statement":"MATCH (a:RELEASES_NG{releaseid:'"+newReleaseID+
+                                                   /* qList.push({"statement":"MATCH (a:RELEASES_NG{releaseid:'"+newReleaseID+
                                                                 "'}),(b:CYCLES_NG {releaseid:'"+newReleaseID+
-                                                                "',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:b.cycleid}]->(b) return a,r,b"});
+                                                                "',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:b.cycleid}]->(b) return a,r,b"});*/
                                                     // reqToAPI(qList,urlData);
 
 													async.forEachSeries(cycleDetails, function (eachCycleDetail, cycleNamescallback) {
@@ -781,9 +781,9 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 												} else {
                                                     //Execute neo4j query!! deleterelease
                                                     //var qList=[];
-                                                    qList.push({"statement":"MATCH (n:RELEASES_NG {projectid:'"+inputs.projectid+
+                                                    /*qList.push({"statement":"MATCH (n:RELEASES_NG {projectid:'"+inputs.projectid+
                                                                 "',releaseid:'"+inputs.releaseid+"',releasename:'"+
-                                                                inputs.releasename+"'}) detach delete n"});
+                                                                inputs.releasename+"'}) detach delete n"});*/
                                                     //reqToAPI(qList,urlData);
 													var cyclesOfRelease = eachprojectDetail.cycleDetails;
 													async.forEachSeries(cyclesOfRelease, function (eachCycleDetail, eachCycleCallback) {
@@ -810,9 +810,9 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																} else {
                                                                     //Execute neo4j query!! deletecycle
                                                                     //var qList=[];
-                                                                    qList.push({"statement":"MATCH (n:CYCLES_NG {cycleid:'"+inputs.cycleid+
+                                                                   /* qList.push({"statement":"MATCH (n:CYCLES_NG {cycleid:'"+inputs.cycleid+
                                                                                 "',releaseid:'"+inputs.releaseid+"',cyclename:'"+
-                                                                                inputs.cyclename+"'}) detach delete n"});
+                                                                                inputs.cyclename+"'}) detach delete n"});*/
                                                                     //reqToAPI(qList,urlData);
                                                                     eachCycleCallback();
 																}
@@ -856,9 +856,9 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																} else {
                                                                     //Execute neo4j query!! deletecycle
                                                                     //var qList=[];
-                                                                    qList.push({"statement":"MATCH (n:CYCLES_NG {cycleid:'"+inputs.cycleid+
+                                                                    /*qList.push({"statement":"MATCH (n:CYCLES_NG {cycleid:'"+inputs.cycleid+
                                                                                 "',releaseid:'"+inputs.releaseid+"',cyclename:'"+
-                                                                                inputs.cyclename+"'}) detach delete n"});
+                                                                                inputs.cyclename+"'}) detach delete n"});*/
                                                                     //reqToAPI(qList,urlData);
                                                                     eachCycleCallback();
 																}
@@ -1639,12 +1639,12 @@ exports.assignProjects_ICE = function (req, res) {
                         inputs.projectids1 = "'"+inputs.projectids.join('\',\'')+"'";
                         //Execute neo4j query!!
                         var qList=[];
-                        qList.push({"statement":"MERGE (n:ICEPERMISSIONS_NG {userid:'"+inputs.userid+
-                                    "',domainid:'"+inputs.domainid+"'}) set n.projectids=["+inputs.projectids1+"] return n"});
+                        /*qList.push({"statement":"MERGE (n:ICEPERMISSIONS_NG {userid:'"+inputs.userid+
+                                    "',domainid:'"+inputs.domainid+"'}) set n.projectids=["+inputs.projectids1+"] return n"});*/
                         //Relationships
-                        qList.push({"statement":"MATCH (a:ICEPERMISSIONS_NG{userid:'"+inputs.userid+
+                        /*qList.push({"statement":"MATCH (a:ICEPERMISSIONS_NG{userid:'"+inputs.userid+
                                     "',domainid:'"+inputs.domainid+"'}),(b:DOMAINS_NG {domainid:'"+
-                                    inputs.domainid+"'}) MERGE(a)-[r:FICETDOM_NG{id:'"+inputs.domainid+"'}]->(b) return a,r,b"});
+                                    inputs.domainid+"'}) MERGE(a)-[r:FICETDOM_NG{id:'"+inputs.domainid+"'}]->(b) return a,r,b"});*/
 
 						// MATCH p = (a:DOMAINS_NG{userid:'bced8722-1ce1-41e0-b7d3-d9a9c0bcd800'})-[r1]->(d:DOMAINS_NG) return p
 						

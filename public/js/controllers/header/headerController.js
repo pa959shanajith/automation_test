@@ -147,9 +147,14 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	
 	}
 
-	$scope.naviPg = function(){
+	$scope.naviPg = function($event){
 		if (localStorage.getItem("navigateEnable") == "true") {
 			window.localStorage['navigateScreen'] = "plugin";
+			//Transaction Activity for Nineteen68 Logo Action
+			var labelArr = [];
+			var infoArr = [];
+			labelArr.push(txnHistory.codesDict['Nineteen68Logo']);
+			txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 			$timeout(function () {
 				$location.path('/plugin');
 		   	}, 100);
@@ -195,7 +200,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		}
 	};
 
-	$scope.switchedRole = function () {
+	$scope.switchedRole = function ($event) {
 		$("#switchRoleModal").modal("hide");
 		blockUI("Switching to " + selectedRoleName);
 		LoginService.loadUserInfo_Nineteen68(selectedRoleID)
@@ -205,6 +210,13 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 				window.localStorage['_SR'] = selectedRoleName;
 				window.localStorage['_UI'] = JSON.stringify(data);
 				window.localStorage['_SRS'] = "success";
+				//Transaction Activity for SwitchRole Button Action
+				var labelArr = [];
+				var infoArr = [];
+				//labelArr.push($event.target.outerText);
+				labelArr.push(txnHistory.codesDict['SwitchRole']);
+				infoArr.push({"selectedRoleName" : selectedRoleName});
+				txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 				if (selectedRoleName == "Admin") {
 					window.localStorage['navigateScreen'] = "admin";
 					window.location.href = "/admin";
@@ -262,7 +274,12 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		}, function(error) {	console.log("Failed to fetch projectInfo")});
 	}
 
-	$scope.logout = function(){
+	$scope.logout = function($event){
+		//Transaction Activity for Logout Button Action
+		var labelArr = [];
+		var infoArr = [];
+		labelArr.push(txnHistory.codesDict['Logout']);
+		txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 		window.sessionStorage.clear();
 		$rootScope.redirectPage();
 	};

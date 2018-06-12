@@ -9,7 +9,7 @@ var client = new Client();
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var logger = require('../../logger');
 //base RequestElement
-var baseRequestBody = {};
+//var baseRequestBody = {};
 //xpath for view
 var allXpaths = [];
 //custname for view
@@ -26,7 +26,8 @@ var utils = require('../lib/utils');
  * the service is used to init scraping & fetch scrape objects
  */
 exports.initScraping_ICE = function (req, res) {
-	var name;
+	var name,value;
+	var dataToIce={};
 	logger.info("Inside UI service: initScraping_ICE");
 	try {
 		if (utils.isSessionActive(req.session)) {
@@ -42,13 +43,12 @@ exports.initScraping_ICE = function (req, res) {
 					reqScrapJson.action = "SCRAPE";
 					if (req.body.screenViewObject.appType == "Desktop") {
 						var applicationPath = req.body.screenViewObject.applicationPath;
-						var data = "LAUNCH_DESKTOP";
 						logger.info("Sending socket request for LAUNCH_DESKTOP to redis");
 						dataToIce = {"emitAction" : "LAUNCH_DESKTOP","username" : name, "applicationPath":applicationPath};
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						var updateSessionExpiry = utils.resetSession(req.session);
 						function LAUNCH_DESKTOP_listener(channel, message) {
-							data = JSON.parse(message);
+							var data = JSON.parse(message);
 							//LB: make sure to send recieved data to corresponding user
 							if (name == data.username) {
 								value = data.value;
@@ -69,13 +69,12 @@ exports.initScraping_ICE = function (req, res) {
 						redisServer.redisSubServer.on("message",LAUNCH_DESKTOP_listener);
 					} else if (req.body.screenViewObject.appType == "SAP") {
 						var applicationPath = req.body.screenViewObject.applicationPath;
-						var data = "LAUNCH_SAP";
 						logger.info("Sending socket request for LAUNCH_SAP to redis");
 						dataToIce = {"emitAction" : "LAUNCH_SAP","username" : name, "applicationPath":applicationPath};
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						var updateSessionExpiry = utils.resetSession(req.session);
 						function LAUNCH_SAP_listener(channel, message) {
-							data = JSON.parse(message);
+							var data = JSON.parse(message);
 							//LB: make sure to send recieved data to corresponding user
 							if (name == data.username) {
 								value = data.value;
@@ -96,14 +95,13 @@ exports.initScraping_ICE = function (req, res) {
 						redisServer.redisSubServer.on("message",LAUNCH_SAP_listener);
 					} else if (req.body.screenViewObject.appType == "DesktopJava") {
 						var applicationPath = req.body.screenViewObject.applicationPath;
-						var data = "LAUNCH_OEBS";
 						logger.info("Sending socket request for LAUNCH_OEBS to redis");
 						dataToIce = {"emitAction" : "LAUNCH_OEBS","username" :name,
 									 "applicationPath":applicationPath};
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						var updateSessionExpiry = utils.resetSession(req.session);
 						function LAUNCH_OEBS_listener(channel, message) {
-							data = JSON.parse(message);
+							var data = JSON.parse(message);
 							//LB: make sure to send recieved data to corresponding user
 							if (name == data.username) {
 								value = data.value;
@@ -128,7 +126,6 @@ exports.initScraping_ICE = function (req, res) {
 						var mobileDeviceName = req.body.screenViewObject.mobileDeviceName;
 						var mobileIosVersion = req.body.screenViewObject.mobileIosVersion;
 						var mobileUDID = req.body.screenViewObject.mobileUDID;
-						var data = "LAUNCH_MOBILE";
 						logger.info("Sending socket request for LAUNCH_MOBILE to redis");
 						dataToIce = {"emitAction" : "LAUNCH_MOBILE","username" : name,
 									 "apkPath":apkPath,"serial":serial,"mobileDeviceName":mobileDeviceName,
@@ -136,7 +133,7 @@ exports.initScraping_ICE = function (req, res) {
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						var updateSessionExpiry = utils.resetSession(req.session);
 						function LAUNCH_MOBILE_listener(channel, message) {
-							data = JSON.parse(message);
+							var data = JSON.parse(message);
 							//LB: make sure to send recieved data to corresponding user
 							if (name == data.username) {
 								value = data.value;
@@ -158,14 +155,13 @@ exports.initScraping_ICE = function (req, res) {
 					} else if (req.body.screenViewObject.appType == "MobileWeb") {
 						var mobileSerial = req.body.screenViewObject.mobileSerial;
 						var androidVersion = req.body.screenViewObject.androidVersion;
-						var data = "LAUNCH_MOBILE_WEB";
 						logger.info("Sending socket request for LAUNCH_MOBILE_WEB to redis");
 						dataToIce = {"emitAction" : "LAUNCH_MOBILE_WEB","username" : name,
 									 "mobileSerial":mobileSerial,"androidVersion":androidVersion};
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						var updateSessionExpiry = utils.resetSession(req.session);
 						function LAUNCH_MOBILE_WEB_listener(channel, message) {
-							data = JSON.parse(message);
+							var data = JSON.parse(message);
 							//LB: make sure to send recieved data to corresponding user
 							if (name == data.username) {
 								redisServer.redisSubServer.removeListener('message', LAUNCH_MOBILE_WEB_listener);
@@ -281,7 +277,7 @@ exports.highlightScrapElement_ICE = function (req, res) {
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
 			logger.info("Sending socket request for focus to redis");
-			dataToIce = {"emitAction" : "focus","username" : name,
+			var dataToIce = {"emitAction" : "focus","username" : name,
 						 "focusParam":focusParam,"elementURL":elementURL,"appType":appType};
 			redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 			var flag = 'success';
@@ -428,7 +424,7 @@ exports.updateScreen_ICE = function (req, res) {
 										if (requestedBody.indexOf('Envelope') !== -1) {
 											var obj = parse(requestedBody);
 											if ('root' in obj) {
-												baseRequestBody = obj.root;
+												var baseRequestBody = obj.root;
 												allXpaths = [];
 												allCustnames = [];
 												try {
@@ -628,8 +624,7 @@ exports.updateScreen_ICE = function (req, res) {
 					 * @author vishvas.a
 					 * deleting of the scraped data based on the custom names and xpath.
 					 */
-					var deleteCustNames,
-					deleteXpathNames;
+					var deleteCustNames,deleteXpathNames;
 					deleteCustNames = updateData.deletedList.deletedCustName;
 					deleteXpathNames = updateData.deletedList.deletedXpath;
 					var elementschanged = 0;
@@ -1088,6 +1083,8 @@ exports.updateScreen_ICE = function (req, res) {
 			//this code will be called only if the statusFlag is empty.
 			function finalFunction(scrapedObjects, finalcallback) {
 				logger.info("Inside the finalFunction: service updateScreen_ICE");
+				allXpaths=[];
+				allCustnames=[];
 				try {
 					if (statusFlag == "" && scrapedObjects != "scrape data error: Fail") {
 						var args = {

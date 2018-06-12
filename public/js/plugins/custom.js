@@ -92,12 +92,12 @@ window.addEventListener('popstate', function () {
 // 	}
 // })
 
-$(document).ajaxSend(function(elm, xhr, s){
-    if (s.type == "POST") {
-        s.data += s.data?"&":"";
-        s.data += "_token=" + $('#csrf-token').val();
-    }
-});
+// $(document).ajaxSend(function(elm, xhr, s){
+//     if (s.type == "POST") {
+//         s.data += s.data?"&":"";
+//         s.data += "_token=" + $('#csrf-token').val();
+//     }
+// });
 
 //Document Ready Function
 $(document).ready(function() {
@@ -473,4 +473,218 @@ function getCookie(cname) {
         }
     }
     return "";
+}
+
+var txnHistory = {
+	/*
+	Params: 
+	1. action: the action related to the transaction
+	2. labelArr: an array of label codes for the action
+	3. infoArr:  an array of info related to the action
+	4. url: the current url when action was performed
+	*/
+
+    log: function(action,labelArr,infoArr,url) {
+
+		var data = {};
+		var timeStampInMs = window.performance && window.performance.now && window.performance.timing && window.performance.timing.navigationStart ? window.performance.now() + window.performance.timing.navigationStart : Date.now();
+		        data.username = JSON.parse(window.localStorage['_UI']).username;
+				data.timestamp = timeStampInMs
+		        data.action = action;
+				data.labels = labelArr;
+				data.category = "UI";
+				data.infoArr  = infoArr;
+				data.elapsedTime = '';
+				data.url = url;
+				data.role = window.localStorage['_SR'];
+        var idbSupported = false;
+        var db;
+
+        //Check Indexed DB Support
+        if (window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB) {
+            idbSupported = true;
+        }
+
+        //IFF Indexed DB is supported
+        if (idbSupported) {
+            var openRequest = indexedDB.open("transactionHistorydb", 1);       //Indexed DB instantiated
+            //Indexed DB on Upgrade
+            openRequest.onupgradeneeded = function(e) {
+                console.log("Upgrading idb...");
+                db = e.target.result;
+                if (!db.objectStoreNames.contains("transactionHistory")) {
+                    db.createObjectStore("transactionHistory", {
+                        keyPath: "transactionId",
+                        autoIncrement: true
+                    });
+                }
+            }
+            //Indexed DB on Success DB connection
+            openRequest.onsuccess = function(e) {
+                db = e.target.result;
+				saveTransactionHistory(); 										// Save Transaction History function being called
+            }
+            //Indexed DB on Error DB connection
+            openRequest.onerror = function(e) {
+                console.log("Error in opening idb");
+			}
+			
+        }
+		// Save a Transaction
+        function saveTransactionHistory() {
+            var transaction = db.transaction(["transactionHistory"], "readwrite");
+            var objectStore = transaction.objectStore("transactionHistory");
+            var request = objectStore.put(data); //Saves a transaction in the idb
+            request.onsuccess = function(event) {
+				if(labelArr.indexOf("100") > -1 || labelArr.indexOf("104") > -1){
+					console.log("sending from idb!");
+					var data = sendAllTransactions();
+					}
+			}
+
+			request.onerror = function(e) {
+				console.log("Error in saving txn");
+			}
+
+	}
+		
+		//Send All Transactions
+		function sendAllTransactions(){
+			
+			 var transaction = db.transaction(["transactionHistory"]);          //Create Transaction
+                var objectStore = transaction.objectStore("transactionHistory");   //Get ObjectStore
+				
+				//To get all objects from the db
+				var request = objectStore.getAll();								   
+                request.onerror = function(event) {								  // Handle errors!
+                    console.log("Error in fetching all txn data");
+               };
+                request.onsuccess = function(event) {
+					var hostName = window.location.host;
+					var host = hostName.split(':')[0];
+					apiurl = 'https://'+host+':4242/addTransactions'					
+					data = {"transactionsData":request.result};
+					$.ajax({
+						type: 'POST',
+						url: apiurl,
+						data: JSON.stringify(data),
+				        contentType: 'application/json',
+						success: function(data){
+							console.log(data);
+							deleteAllData();
+						},
+						error: function (xhr, ajaxOptions, thrownError) {
+							console.log("Error while sending txn data");
+						  }
+				});
+					return request.result;
+               };
+		}
+
+		//Delete all the data from the object store and then delete the object store
+		function deleteAllData(){
+			
+			var transaction = db.transaction(["transactionHistory"],"readwrite");          //access the Transaction
+			var objectStore = transaction.objectStore("transactionHistory");   //Get ObjectStore
+			
+			//Now, delete the object store
+			//db.deleteObjectStore("transactionHistory");
+			
+
+			
+			
+			//Clear the object store
+			var request = objectStore.clear();
+			
+			request.onerror = function(event) {								  // Handle errors!
+				console.log("Error in delete txn data");
+		   	};
+		   request.onsuccess = function(event) {	
+			   
+			   console.log("deleted from idb!");							 
+
+	   		};
+		}
+
+	},
+
+	codesDict : {
+		"Login" : "100",
+		"Nineteen68Logo" : "101",
+		"BellIcon" : "102",
+		"SwitchRole" : "103",
+		"Logout" : "104",		
+		"PluginNavigation" : "201",
+		"FilterTaskBySearch" : "202",
+		"FilterTaskByParams" : "203",
+		"TaskNavigation" : "204",
+		"CancelALMLogin" : "301",
+		"SubmitALMLogin" : "302",
+		"Generate" : "401",
+		"ViewComplexity" : "402",
+		"GenerateDataFlowDiagram" : "403",
+		"OpenFileInEditor" : "404",
+		"WMCCalculate" : "405",
+		"ShowFlowGraphHome" : "406",
+		"FilterProjectsForReports" : "1001",
+		"SuiteNodeClick" : "1002",
+		"SuiteDrillDownClick": "1003",
+		"selectReportFormatClick": "1004",
+		"PDFReportClick": "1005",
+		"HTMLReportClick": "1006",
+		"ExportToJSONClick": "1007",
+		"JiraLoginConnection": "1008",
+		"WebocularGoClick": "1101",
+		"generateGraphClick": "1102",
+		"showReportClick": "1103",
+		"SelectEncryptionMethod": "1201",
+		"Encryption": "1202",
+		"ResetEncryptionData": "1203",
+		"UserConfmanage" : "1301",
+		"CreateProject" : "1302",
+		"UpdateProject" : "1303",
+		"AssignProjects" : "1304",
+		"LdapConftest" : "1305",
+		"LdapConfmanage" : "1306",
+		"InitScraping" : "1401",
+		"InitCompareAndUpdate" : "1402",
+		"SaveScrapedObjects" : "1403",
+		"DeleteScrapedObjects" : "1404",
+		"TaskReassign" : "1405",
+		"TaskApprove" : "1406",
+		"TaskSubmit" : "1407",
+		"SubmitCustomObject" : "1408",
+		"SubmitMapObject" : "1409",
+		"DebugTestCase" : "1501",
+		"AddDependentTestCase" : "1502",
+		"ImportTestCase" : "1503",
+		"ExportTestCase" : "1504",
+		"AddTestScriptRow" : "1505",
+		"EditTestCaseRow":"1506",
+		"RearrangeTestScriptRow" : "1507",
+		"CopyTestStep" : "1508",
+		"PasteTestStep" : "1509",
+		"CommentStep" : "1510",
+		"SaveTestcase" : "1511",
+		"DeleteTestScriptRow" : "1512",
+		"AddRemarksTestStep" : "1513",
+		"SaveTestStepDetails" : "1514",
+		"SaveTestSuite" : "1601",
+		"SaveQcCredentialsExecution" : "1602",
+		"ExecuteTestSuite" : "1603",
+		"InitSchedule" : "1701",
+
+
+
+
+
+
+
+
+
+
+
+		
+		
+	}
 }

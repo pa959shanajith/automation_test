@@ -26,7 +26,7 @@
 	<div id="middle-content-section">
 		<!--Task Name-->
 			<div id="page-taskName">
-				<span style="cursor:pointer; position : relative" ng-click="showFlowGraphHome()">Automated Path Generator</Flowgraph></span>
+				<span style="cursor:pointer; position : relative" ng-click="showFlowGraphHome($event)">Automated Path Generator</Flowgraph></span>
 			</div>
 			<!--Task Name-->
 			<!-- Generate DIV -->
@@ -48,8 +48,8 @@
 				<br>
 				<span><b>Path:</b></span>
 				<input name="pathInput" type="text" ng-model="text" class="pathInput" id="path" placeholder="Enter Path of Folder/Zip/File" required> 
-				<button ng-if="flowgraph_form.pathInput.$invalid" disabled class="btn btn-md pull-right pairwise-GenBtn" ng-click="executeGenerate()">Generate</button>
-				<button ng-if="flowgraph_form.pathInput.$valid" class="btn btn-md pull-right pairwise-GenBtn" ng-click="executeGenerate()">Generate</button>
+				<button ng-if="flowgraph_form.pathInput.$invalid" disabled class="btn btn-md pull-right pairwise-GenBtn" ng-click="executeGenerate($event)">Generate</button>
+				<button ng-if="flowgraph_form.pathInput.$valid" class="btn btn-md pull-right pairwise-GenBtn" ng-click="executeGenerate($event)">Generate</button>
 			</form>
 			</div>
 			
@@ -76,7 +76,7 @@
 			<h4 class="heading-bold">Method Level Complexity Info:  
 			</h4>
 			<div >
-				Weighted Method Class Complexity : <button type="button" class="btn btn-primary btn-md" id="wmcCalculate" ng-click="wmcCalculate()">Calculate!</button>
+				Weighted Method Class Complexity : <button type="button" class="btn btn-primary btn-md" id="wmcCalculate" ng-click="wmcCalculate($event)">Calculate!</button>
 			</div>
 			<div class='divMethodContainer'>
 				<table id='tblMethodLevel'>

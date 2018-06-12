@@ -112,7 +112,7 @@ exports.readTestSuite_ICE = function (req, res) {
 								}
 								respeachscenario.dataparam = outdataparam;
 								respeachscenario.testsuitename = eachSuite.testsuitename;
-								scenarioidindex = 0;
+								var scenarioidindex = 0;
 								responsedata[eachSuite.testsuiteid] = respeachscenario;
 								async.forEachSeries(outscenarioids, function (eachoutscenarioid, outscenarioidcallback) {
 									scenarioidindex = scenarioidindex + 1;
@@ -269,7 +269,7 @@ function readTestSuite_ICE_SVN(req,callback) {
 										outdataparam = eachSuiterow.getparampaths;
 									}
 									respeachscenario.dataparam = outdataparam;
-									scenarioidindex = 0;
+									var scenarioidindex = 0;
 									async.forEachSeries(outscenarioids, function (eachoutscenarioid, outscenarioidcallback) {
 										scenarioidindex = scenarioidindex + 1;
 										/**
@@ -486,13 +486,13 @@ exports.updateTestSuite_ICE = function (req, res) {
 						} else {
 							//Execute neo4j query!!
 							//var qList=[];
-							qList.push({"statement":"MATCH (n:TESTSUITES_NG {cycleid:'"+inputs.cycleid
+							/*qList.push({"statement":"MATCH (n:TESTSUITES_NG {cycleid:'"+inputs.cycleid
 									+"',testsuitename:'"+inputs.testsuitename+",'testsuiteid:'"+inputs.testsuiteid
-									+"',versionnumber:["+inputs.versionnumber+"]}) set n.testscenarioids=[], n.donotexecute='null' return n"});
+									+"',versionnumber:["+inputs.versionnumber+"]}) set n.testscenarioids=[], n.donotexecute='null' return n"});*/
 
 							//Relationships
-							qList.push({"statement":"MATCH (a:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid
-									+"'})-[r]->(b:TESTSCENARIOS_NG) delete r"});
+							/*qList.push({"statement":"MATCH (a:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid
+									+"'})-[r]->(b:TESTSCENARIOS_NG) delete r"});*/
 
 							flag = "success";
 							deleteSuitecallback(null, flag);
@@ -532,14 +532,14 @@ exports.updateTestSuite_ICE = function (req, res) {
 							} else {
 								//Execute neo4j query!!
 								//var qList=[];
-								qList.push({"statement":"MATCH (n:TESTSUITES_NG {cycleid:'"+inputs2.cycleid
+								/*qList.push({"statement":"MATCH (n:TESTSUITES_NG {cycleid:'"+inputs2.cycleid
 											+"',testsuiteid:'"+inputs2.testsuiteid+"',testsuitename:'"+inputs2.testsuitename
 											+"',versionnumber:["+inputs2.versionnumber+"]}) set n.testscenarioids=n.testscenarioids+["
-											+inputs2.testscenarioids+"], n.donotexecute='"+inputs2.donotexecute+"'"});
+											+inputs2.testscenarioids+"], n.donotexecute='"+inputs2.donotexecute+"'"});*/
 								//Relationship
-								qList.push({"statement":"MATCH (a:TESTSUITES_NG{cycleid:'"+inputs2.cycleid
+								/*qList.push({"statement":"MATCH (a:TESTSUITES_NG{cycleid:'"+inputs2.cycleid
 									+"',testsuiteid:'"+inputs2.testsuiteid+"',testsuitename:'"+inputs2.testsuitename
-									+"',versionnumber:["+inputs2.versionnumber+"]})),(b:TESTSCENARIOS_NG{testscenarioid:'"+inputs2.testscenarioids+"'}) MERGE (a)-[r:FTSUTTSC_NG{id:'"+inputs2.testscenarioids+"'}]->(b)RETURN a,b,r"});
+									+"',versionnumber:["+inputs2.versionnumber+"]})),(b:TESTSCENARIOS_NG{testscenarioid:'"+inputs2.testscenarioids+"'}) MERGE (a)-[r:FTSUTTSC_NG{id:'"+inputs2.testscenarioids+"'}]->(b)RETURN a,b,r"});*/
 
 								//reqToAPI(qList,urlData);
 								flag = "success";
@@ -608,7 +608,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		var executionId = uuid();
 		var starttime = new Date().getTime();
 		//updating number of executions happened
-		batchlength = batchExecutionData.length;
+		var batchlength = batchExecutionData.length;
 		var updateinp = {
 			"query": "testsuites",
 			"count": batchlength,
@@ -1071,7 +1071,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 								var executionId = uuid();
 								var starttime = new Date().getTime();
 								//updating number of executions happened
-								batchlength = batchExecutionData.length;
+								var batchlength = batchExecutionData.length;
 								var updateinp = {
 									"query": "testsuites",
 									"count": batchlength,
@@ -2109,17 +2109,17 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 						cb1(null, flag);
 					} else {
 						for(var te=0;te<inputs.testscenarioids.length;te++){inputs.testscenarioids[te]='"'+inputs.testscenarioids[te]+'"';}
-						qList.push({"statement":"MERGE (n:TESTSUITES_NG {cycleid:'"+inputs.cycleid
+						/*qList.push({"statement":"MERGE (n:TESTSUITES_NG {cycleid:'"+inputs.cycleid
 									+"',testsuitename:'"+inputs.testsuitename+"',testsuiteid:'"+inputs.testsuiteid+"',testscenarioids:["
 									+inputs.testscenarioids+"],donotexecute:'["
 									+inputs.donotexecute+"]',versionnumber:["+inputs.versionnumber
-									+"]}) SET n.deleted='"+inputs.deleted+"'"});
+									+"]}) SET n.deleted='"+inputs.deleted+"'"});*/
 									//Relationships
-									for(i=0; i<inputs.testscenarioids.length;i++){
-										qList.push({"statement":"MATCH (a:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid
-									+"'}),(b:TESTSCENARIOS_NG{testscenarioid:"+inputs.testscenarioids[i]+"}) MERGE (a)-[r:FTSUTTSC_NG{id:"+inputs.testscenarioids[i]+"}]->(b)RETURN r"});
-									}
-									qList.push({"statement":"MATCH (a:CYCLES_NG{cycleid:'"+inputs.cycleid+"'}),(b:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid+"'}) MERGE (a)-[r:FCYCTTSU_NG{id:'"+inputs.testsuiteid+"'}]->(b)RETURN r"});
+									//for(i=0; i<inputs.testscenarioids.length;i++){
+										/*qList.push({"statement":"MATCH (a:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid
+									+"'}),(b:TESTSCENARIOS_NG{testscenarioid:"+inputs.testscenarioids[i]+"}) MERGE (a)-[r:FTSUTTSC_NG{id:"+inputs.testscenarioids[i]+"}]->(b)RETURN r"});*/
+									//}
+									//qList.push({"statement":"MATCH (a:CYCLES_NG{cycleid:'"+inputs.cycleid+"'}),(b:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid+"'}) MERGE (a)-[r:FCYCTTSU_NG{id:'"+inputs.testsuiteid+"'}]->(b)RETURN r"});
 						//reqToAPI(qList,urlData);
 						callback(null, flag);
 					}
@@ -2242,12 +2242,12 @@ function updatescenariodetailsinsuite(req, cb, data) {
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occured in suite/readTestSuite_ICE from updatescenariodetailsinsuite - delete, Error Code: ERRNDAC");
-				} else {
+				} //else {
 					//Execute neo4j query!!
 					//var qList=[];
-					qList.push({"statement":"MATCH (n:TESTSUITES_NG {cycleid:'"+inputs.cycleid
-					+"',testsuitename:'"+inputs.testsuitename+"',testsuiteid:'"+inputs.testsuiteid+"'}) DETACH DELETE n"});
-				}
+					/*qList.push({"statement":"MATCH (n:TESTSUITES_NG {cycleid:'"+inputs.cycleid
+					+"',testsuitename:'"+inputs.testsuitename+"',testsuiteid:'"+inputs.testsuiteid+"'}) DETACH DELETE n"});*/
+				//}
 				simplecallback();
 			});
 		},
@@ -2290,19 +2290,19 @@ function updatescenariodetailsinsuite(req, cb, data) {
 					for(var te=0;te<inputs.donotexecute.length;te++){inputs.donotexecute[te]='"'+inputs.donotexecute[te]+'"';}
 					inputs.donotexecute1 = inputs.donotexecute.join(',');
 					inputs.testscenarioids1 = inputs.testscenarioids.join(',');
-					qList.push({"statement":"MERGE (n:TESTSUITES_NG {cycleid:'"+inputs.cycleid
+					/*qList.push({"statement":"MERGE (n:TESTSUITES_NG {cycleid:'"+inputs.cycleid
 								+"',testsuitename:'"+inputs.testsuitename+"',testsuiteid:'"+inputs.testsuiteid+"',deleted:'"+inputs.deleted
 								+"',versionnumber:["+inputs.versionnumber+"]}) set n.testscenarioids=["
-								+inputs.testscenarioids1+"], n.donotexecute=["+inputs.donotexecute1+"]"});
+								+inputs.testscenarioids1+"], n.donotexecute=["+inputs.donotexecute1+"]"});*/
 
 					//Relationships
-					qList.push({"statement":"MATCH (a:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid
-									+"'})-[r]->(b:TESTSCENARIOS_NG) delete r"});
-					for(var te=0;te<inputs.testscenarioids.length;te++){
-						qList.push({"statement":"MATCH (a:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid
-									+"'}),(b:TESTSCENARIOS_NG) WHERE b.testscenarioid IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:'"+inputs.testscenarioids[te]+"'}]->(b)RETURN r"});
-					}
-					qList.push({"statement":"MATCH (a:CYCLES_NG{cycleid:'"+inputs.cycleid+"'}),(b:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid+"'}) MERGE (a)-[r:FCYCTTSU_NG{id:'"+inputs.testsuiteid+"'}]->(b)RETURN r"});
+					/*qList.push({"statement":"MATCH (a:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid
+									+"'})-[r]->(b:TESTSCENARIOS_NG) delete r"});*/
+					//for(var te=0;te<inputs.testscenarioids.length;te++){
+						/*qList.push({"statement":"MATCH (a:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid
+									+"'}),(b:TESTSCENARIOS_NG) WHERE b.testscenarioid IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:'"+inputs.testscenarioids[te]+"'}]->(b)RETURN r"});*/
+					//}
+					//qList.push({"statement":"MATCH (a:CYCLES_NG{cycleid:'"+inputs.cycleid+"'}),(b:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid+"'}) MERGE (a)-[r:FCYCTTSU_NG{id:'"+inputs.testsuiteid+"'}]->(b)RETURN r"});
 					//reqToAPI(qList,urlData);
 
 					simplecallback(null, result);
