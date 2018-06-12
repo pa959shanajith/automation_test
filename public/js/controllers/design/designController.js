@@ -2050,7 +2050,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 "left":  $(this).closest("li").attr('data-left'),
                 "tempId":  parseInt($(this).closest("li").attr('val'))
             };
-            getIndexOfDeletedObjects.push(json);
+
+              getIndexOfDeletedObjects.push(json);
           })
            var currentElements = $(".ellipsis:visible").length;
           if(currentElements > 0)
@@ -2093,9 +2094,19 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 $('input[type=checkbox].checkall:checked:visible').each(function() {
                     var id = $(this).parent().attr('id').split("_");
                     id = id[1];
-                    deletedCustNames.push(viewString.view[id].custname);
-                    deletedCustPath.push(viewString.view[id].xpath);
-                    deletedIndex.push(id);
+                    if(eaCheckbox == false && Object.keys(viewString.view).length != 0)
+                    {
+                        deletedCustNames.push(viewString.view[id].custname);
+                        deletedCustPath.push(viewString.view[id].xpath);
+                        deletedIndex.push(id);
+                    }
+                    else if(eaCheckbox == true && Object.keys(viewString.view).length == 0)
+                    {
+                        deletedCustNames.push(newScrapedList.view[id].custname);
+                        deletedCustPath.push(newScrapedList.view[id].xpath);
+                        deletedIndex.push(id);
+                    }
+                 
                     //deletedIndex.push()
                     // console.log(viewString.view[id])
                 });
@@ -3287,7 +3298,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         var getScrapeData;
         if (eaCheckbox){
             for(var i=0; i<getIndexOfDeletedObjects.length;i++){
-                delete newScrapedList.view[getIndexOfDeletedObjects[i]];
+                   //delete newScrapedList.view[getIndexOfDeletedObjects[i].tempId];
+                   if(getIndexOfDeletedObjects[i].hasOwnProperty("tempId")) { 
+                        delete newScrapedList.view[getIndexOfDeletedObjects[i].tempId];
+                    }
+                   else{
+                        delete newScrapedList.view[getIndexOfDeletedObjects[i]];
+                   }
+                    
                 //newScrapedList.view.splice(getIndexOfDeletedObjects[i], 1);
             }
             newScrapedList.view =  newScrapedList.view.filter(function(n){ return n != null });
