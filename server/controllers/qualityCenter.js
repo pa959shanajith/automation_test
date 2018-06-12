@@ -17,20 +17,21 @@ exports.loginQCServer_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: loginQCServer_ICE");
 		if (utils.isSessionActive(req.session)) {
-			name = req.session.username;
+			var name = req.session.username;
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("ICE Socket connecting IP: %s" , ip);
 			logger.debug("ICE Socket requesting Address: %s" , name);
-            check_qcUrl = validator.isEmpty(req.body.qcURL);
+            var check_qcUrl = validator.isEmpty(req.body.qcURL);
+			var validate_qcUsername,validate_qcPassword,validate_qcUrl;
             if(check_qcUrl == false) {
                 validate_qcUrl = true;
             }
-            check_qcUsername = validator.isEmpty(req.body.qcUsername);
+            var check_qcUsername = validator.isEmpty(req.body.qcUsername);
             if(check_qcUsername == false) {
                 validate_qcUsername = true;
             }
-            check_qcPassword = validator.isEmpty(req.body.qcPassword);
+            var check_qcPassword = validator.isEmpty(req.body.qcPassword);
             if(check_qcPassword == false) {
                  validate_qcPassword = true;
             }
@@ -52,7 +53,7 @@ exports.loginQCServer_ICE = function (req, res) {
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						var updateSessionExpiry = utils.resetSession(req.session);
 						function qclogin_listener(channel,message) {
-							data = JSON.parse(message);
+							var data = JSON.parse(message);
 							if(name == data.username){
 								clearInterval(updateSessionExpiry);
 								redisServer.redisSubServer.removeListener('message',qclogin_listener);
@@ -131,7 +132,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						var updateSessionExpiry = utils.resetSession(req.session);
 						function qclogin_listener(channel,message) {
-							data = JSON.parse(message);
+							var data = JSON.parse(message);
 							if(name == data.username){
 								clearInterval(updateSessionExpiry);
 								redisServer.redisSubServer.removeListener('message',qclogin_listener);
@@ -211,7 +212,7 @@ function getProjectsForUser(userid, cb) {
 					logger.error("Error occured in qualityCenter/qcProjectDetails_ICE from getprojectDetails Error Code : ERRNDAC");
 				} else {
 					if (projectrows.rows.length != 0) {
-						flagtocheckifexists = true;
+						//flagtocheckifexists = true;
 						projectidlist = projectrows.rows[0].projectids;
 					}
 				}
@@ -286,7 +287,7 @@ function projectandscenario(projectid, cb) {
 					logger.error("Error occured in getProjectsForUser from scenariodata Error Code : ERRNDAC");
 				} else {
 					if (scenariorows.rows.length != 0) {
-						flagtocheckifexists = true;
+						//flagtocheckifexists = true;
 						scenarios_list = JSON.parse(JSON.stringify(scenariorows.rows));
 						projectDetails.project_id = projectid;
 						projectDetails.scenario_details = scenarios_list;
@@ -325,7 +326,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					var updateSessionExpiry = utils.resetSession(req.session);
 					function qclogin_listener(channel,message) {
-						data = JSON.parse(message);
+						var data = JSON.parse(message);
 						if(name == data.username){
 							clearInterval(updateSessionExpiry);
 							redisServer.redisSubServer.removeListener('message',qclogin_listener);
@@ -497,7 +498,7 @@ function getQcDetailsForUser(userid, cb) {
 				logger.error("Error occured in qualityCenter/qcProjectDetails_ICE from getQcDetailsForUser Error Code : ERRNDAC");
 				} else {
 					if (projectrows.rows.length != 0) {
-						flagtocheckifexists = true;
+						//flagtocheckifexists = true;
 						projectidlist = projectrows.rows[0].projectids;
 					}
 
@@ -551,7 +552,7 @@ function qcscenariodetails(projectid, cb) {
 					logger.error("Error occured in qualityCenter/qcProjectDetails_ICE from qcscenariodetails Error Code : ERRNDAC");
 				} else {
 					if (scenariorows.rows.length != 0) {
-						flagtocheckifexists = true;
+						//flagtocheckifexists = true;
 						scenarios_list = JSON.parse(JSON.stringify(scenariorows.rows));
 						// projectDetails.project_id = projectid;
 						// projectDetails.scenario_details = scenarios_list;
@@ -581,7 +582,7 @@ function qcscenariodetails(projectid, cb) {
 						logger.error("Error occured inqualityCenter/viewQcMappedList_ICE from qcdetails Error Code : ERRNDAC");
 					} else {
 						if (qcdetailsows.rows.length != 0) {
-							flagtocheckifexists = true;
+							//flagtocheckifexists = true;
 							qcdetails = JSON.parse(JSON.stringify(qcdetailsows.rows[0]));
 							qcdetails.testscenarioname = itr.testscenarioname;
 							// projectDetails.project_id = projectid;
@@ -634,7 +635,7 @@ function getProjectsAndModules(userid,cb){
 
                 }else{
                     if(projectrows.rows.length!=0){
-                        flagtocheckifexists = true;
+                        //flagtocheckifexists = true;
                         projectidlist = projectrows.rows[0].projectids;
                     }
                 }

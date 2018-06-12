@@ -314,7 +314,7 @@ exports.getDomains_ICE = function getDomains_ICE(req, res) {
 };
 
 exports.createProject_ICE = function createProject_ICE(req, res) {
-    qList = [];
+    //qList = [];
 	try {
 		logger.info("Inside UI service: createProject_ICE");
 		if (utils.isSessionActive(req.session)) {
@@ -519,16 +519,16 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 					if (err) {
 						logger.error(err);
 					} else {
-						logger.info("Calling neo4jAPI execute queries for createProject_ICE");
-                        neo4jAPI.executeQueries(qList,function(status,result){
-                            if(status!=200){
-                               logger.info("Error in neo4jAPI execute queries with status for createProject_ICE: %d",status,"\nresponse for createProject_ICE:Response: %s",result);
-                            }
-                            else{
-								logger.info("neo4jAPI execute queries with status for createProject_ICE: %d",status,"\nresponse for createProject_ICE:Response: %s",result);
-                                logger.info('neo4jAPI execute queries for createProject_ICE executed successfully');
-                            }
-                        });
+						// logger.info("Calling neo4jAPI execute queries for createProject_ICE");
+                        // neo4jAPI.executeQueries(qList,function(status,result){
+                            // if(status!=200){
+                               // logger.info("Error in neo4jAPI execute queries with status for createProject_ICE: %d",status,"\nresponse for createProject_ICE:Response: %s",result);
+                            // }
+                            // else{
+								// logger.info("neo4jAPI execute queries with status for createProject_ICE: %d",status,"\nresponse for createProject_ICE:Response: %s",result);
+                                // logger.info('neo4jAPI execute queries for createProject_ICE executed successfully');
+                            // }
+                        // });
 					}
 				});
 			} else {

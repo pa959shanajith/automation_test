@@ -1547,7 +1547,7 @@ exports.getReleaseIDs_Ninteen68 = function (req, res) {
 	inputs = {
 		"projectid": project_id
 	};
-	args = {
+	var args = {
 		data: inputs,
 		headers: {
 			"Content-Type": "application/json"
@@ -1588,7 +1588,7 @@ exports.getCycleIDs_Ninteen68 = function (req, res) {
 	inputs = {
 		"releaseid": release_id
 	};
-	args = {
+	var args = {
 		data: inputs,
 		headers: {
 			"Content-Type": "application/json"
@@ -1632,7 +1632,7 @@ exports.getProjectIDs_Nineteen68 = function (req, res) {
 		"userid": user_id,
 		"query": allflag
 	};
-	args = {
+	var args = {
 		data: inputs,
 		headers: {
 			"Content-Type": "application/json"
@@ -1668,10 +1668,10 @@ exports.getProjectType_Nineteen68 = function (req, res) {
 		project_id: ''
 	};
 	var project_id = req;
-	inputs = {
+	var inputs = {
 		"projectid": project_id
 	};
-	args = {
+	var args = {
 		data: inputs,
 		headers: {
 			"Content-Type": "application/json"
@@ -1882,14 +1882,14 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 exports.submitTask = function (req, res) {
 	logger.info("Inside UI service: submitTask");
 	var taskdetails = req.taskdetails;
-	inputs = {
+	var inputs = {
 		'status': req.status,
 		'table': taskdetails.labels[0],
 		'details': taskdetails.properties,
 		'username': req.user,
 		'versionnumber': req.versionnumber
 	};
-	args = {
+	var args = {
 		data: inputs,
 		headers: {
 			"Content-Type": "application/json"

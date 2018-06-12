@@ -33,7 +33,7 @@ exports.flowGraphResults = function(req, res){
 			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 				if (redisres[1]>0) {
 					logger.info("Sending socket request for generateFlowGraph to redis");
-					dataToIce = {"emitAction" : "generateFlowGraph","username" : name, "version":version, "path" : path};
+					var dataToIce = {"emitAction" : "generateFlowGraph","username" : name, "version":version, "path" : path};
 					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					function generateFlowGraph_listener(channel,message) {
 						data = JSON.parse(message);
@@ -100,7 +100,7 @@ exports.APG_OpenFileInEditor = function (req, res) {
 					var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 					logger.info("ICE Socket requesting Address: %s" , name);
 					logger.info("Sending socket request for apgOpenFileInEditor to redis");
-					dataToIce = {"emitAction" : "apgOpenFileInEditor","username" : name,
+					var dataToIce = {"emitAction" : "apgOpenFileInEditor","username" : name,
 								"editorName":editorName,"filePath":filePath,"lineNumber":lineNumber};
 					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					function apgOpenFileInEditor_listener(channel,message) {

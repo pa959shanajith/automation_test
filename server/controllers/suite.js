@@ -112,7 +112,7 @@ exports.readTestSuite_ICE = function (req, res) {
 								}
 								respeachscenario.dataparam = outdataparam;
 								respeachscenario.testsuitename = eachSuite.testsuitename;
-								scenarioidindex = 0;
+								var scenarioidindex = 0;
 								responsedata[eachSuite.testsuiteid] = respeachscenario;
 								async.forEachSeries(outscenarioids, function (eachoutscenarioid, outscenarioidcallback) {
 									scenarioidindex = scenarioidindex + 1;
@@ -269,7 +269,7 @@ function readTestSuite_ICE_SVN(req,callback) {
 										outdataparam = eachSuiterow.getparampaths;
 									}
 									respeachscenario.dataparam = outdataparam;
-									scenarioidindex = 0;
+									var scenarioidindex = 0;
 									async.forEachSeries(outscenarioids, function (eachoutscenarioid, outscenarioidcallback) {
 										scenarioidindex = scenarioidindex + 1;
 										/**
@@ -608,7 +608,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		var executionId = uuid();
 		var starttime = new Date().getTime();
 		//updating number of executions happened
-		batchlength = batchExecutionData.length;
+		var batchlength = batchExecutionData.length;
 		var updateinp = {
 			"query": "testsuites",
 			"count": batchlength,
@@ -1071,7 +1071,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 								var executionId = uuid();
 								var starttime = new Date().getTime();
 								//updating number of executions happened
-								batchlength = batchExecutionData.length;
+								var batchlength = batchExecutionData.length;
 								var updateinp = {
 									"query": "testsuites",
 									"count": batchlength,

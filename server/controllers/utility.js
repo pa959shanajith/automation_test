@@ -15,7 +15,8 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 		if (utils.isSessionActive(req.session)) {
 			var methodSelected = req.body.encryptionType;
 			var encrytData = req.body.encryptionValue;
-			var encryptedValue;
+			var encryptedValue,check_encryptionType;
+			var validate_encryptionType,validate_check_encryptData;
 			validateEncryption();
 			function validateEncryption()
 			{
