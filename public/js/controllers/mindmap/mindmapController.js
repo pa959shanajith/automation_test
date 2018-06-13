@@ -660,7 +660,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                  'transform':"translate(" + (n.x).toString() + "," + (n.y).toString() + ")",
                                  'opacity':!(n.id_c == "null" || n.id_c == null || n.id_c == undefined) ? 1 : 0.5,
                                  'title':n.name,
-                                 'name':n.display_name
+                                 'name':n.display_name,
+                                 'img_src':img_src
                                 };
 
         var v = '#ct-node-'+n.id;
@@ -3404,7 +3405,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                  'transform':"translate(" + (n.x).toString() + "," + (n.y).toString() + ")",
                                  'opacity':!(n.id_c == "null" || n.id_c == null || n.id_c == undefined) ? 1 : 0.5,
                                  'title':n.name,
-                                 'name':n.display_name
+                                 'name':n.display_name,
+                                 'img_src':"images_mindmap/node-"+n.type+".png"
                                 }; 
         // if (m && pi) {
         //     var p = d3.select('#ct-node-' + pi.id);
