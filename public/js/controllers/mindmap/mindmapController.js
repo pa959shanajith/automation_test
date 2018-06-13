@@ -2557,7 +2557,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             $rootScope.redirectPage();
                         }
                         var nodeBox = d3.select('.ct-nodeBox');
-                        $(nodeBox[0]).empty();
+                        // $(nodeBox[0]).empty();
                         $scope.allMMaps = result;
                         // $scope.allMMaps.forEach(function(e, i) {
                         //     //var t=e.name.replace(/_/g,' ');
@@ -3217,7 +3217,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $rootScope.redirectPage();
             }
             var nodeBox = d3.select('#etemModuleContainer');
-            $(nodeBox[0]).empty();
+            // $(nodeBox[0]).empty();
             $scope.allMMaps = allMaps_info = result;
 
             $scope.allMMaps.forEach(function(e, i) {
@@ -3822,7 +3822,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             $rootScope.redirectPage();
                         }
                         var nodeBox = d3.select('#etemModuleContainer');
-                        $(nodeBox[0]).empty();
+                        // $(nodeBox[0]).empty();
                         $scope.allMMaps = allMaps_info = result;
                         //<span class='moduleContainer' data-moduleId=''><img alt='Module icon' class='eteMbox' src='imgs/ic-reportbox.png' title=''><br/><span class='modulename' title=''>Module"+(i+1)+"</span></span>
                         $scope.allMMaps.forEach(function(e, i) {
