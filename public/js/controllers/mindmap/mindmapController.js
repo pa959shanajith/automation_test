@@ -227,7 +227,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     $scope.projectListChange = function(prjName) {
-        clearSvg();
         $scope.projectNameO = prjName;
         $scope.projectName4 = $scope.projectNameO;
         $scope.projectName3 = $scope.projectNameO;
@@ -2688,11 +2687,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         })
     };
 
-    $scope.loadEndToEnd = function(mapid,type,name){
-        if(type == 'modules_endtoend') loadScenarios(name);
-        loadEndtoEndModule(name,mapid,type);
-    }
-    
     $scope.actionEvent_W = function(e) {
         if ($(e.target.parentElement).hasClass('disableButton') || $(e.target.parentElement).hasClass('no-access')) return;
         var selectedNodeTitle = $('.nodeBoxSelected').attr('title');
@@ -2813,7 +2807,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 }
                 setModuleBoxHeight_W();
                 clearSvg();
-                treeBuilder_W(currMap);
+                currMap = res;               
+                treeBuilder_W(res);
                 unassignTask = [];
                 //var selectedTab = window.localStorage['tabMindMap']
                 unblockUI();
@@ -2912,7 +2907,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
         })
 
-    };
+    };    
+
+    $scope.loadEndToEnd = function(mapid,type,name){
+        if(type == 'modules_endtoend') loadScenarios(name);
+        loadEndtoEndModule(name,mapid,type);
+    }
 
     function toggleExpand(e, tab) {
         var s = d3.select($(e.target).parent());
