@@ -2659,6 +2659,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         })
     };
 
+    $scope.loadEndToEnd = function(mapid,type,name){
+        if(type == 'modules_endtoend') loadScenarios(name);
+        loadEndtoEndScenarios(name,mapid,type);
+    }
+    
     $scope.actionEvent_W = function(e) {
         if ($(e.target.parentElement).hasClass('disableButton') || $(e.target.parentElement).hasClass('no-access')) return;
         var selectedNodeTitle = $('.nodeBoxSelected').attr('title');
@@ -2772,9 +2777,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (!sts) {
                     mid = allMaps_info.length;
                     allMaps_info.push(res);
-                    var node = d3.select('#etemModuleContainer').append('span').attr('class', 'moduleContainer').attr('data-mapid', mid).attr('title', res.name).on('click', loadScenarios);
-                    node.append('img').attr('class', 'ct-nodeIcon eteMbox').attr('src', 'imgs/ic-reportbox.png').attr('alt', 'Module').attr('aria-hidden', true);
-                    node.append('span').attr('class', 'ct-nodeLabel modulename').html(res.name.replace(/_/g, ' '));
+                    $scope.allMMaps.push(res);
+                    // var node = d3.select('#etemModuleContainer').append('span').attr('class', 'moduleContainer').attr('data-mapid', mid).attr('title', res.name).on('click', loadScenarios);
+                    // node.append('img').attr('class', 'ct-nodeIcon eteMbox').attr('src', 'imgs/ic-reportbox.png').attr('alt', 'Module').attr('aria-hidden', true);
+                    // node.append('span').attr('class', 'ct-nodeLabel modulename').html(res.name.replace(/_/g, ' '));
                 }
                 setModuleBoxHeight_W();
                 clearSvg();
@@ -2797,22 +2803,22 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         // $(nodeBox[0]).empty();
                         $scope.allMMaps = allMaps_info = result;
                         //<span class='moduleContainer' data-moduleId=''><img alt='Module icon' class='eteMbox' src='imgs/ic-reportbox.png' title=''><br/><span class='modulename' title=''>Module"+(i+1)+"</span></span>
-                        $scope.allMMaps.forEach(function(e, i) {
-                            //var t=e.name.replace(/_/g,' ');
-                            var src_image = 'imgs/ic-reportbox.png'
-                            var class_name = 'eteMbox';
-                            var onclick_func = displayScenarios;
-                            if (e.type == 'modules_endtoend') {
-                                class_name = 'eteMboxETE';
-                                onclick_func = loadScenarios;
-                                src_image = 'images_mindmap/endToEnd.png';
-                            }
-                        var t = $.trim(e.name);
-                        var node = nodeBox.append('span').attr('class', 'moduleContainer').attr('data-mapid', i).attr('title', t).on('click', onclick_func);
-                        node.append('img').attr('class', 'ct-nodeIcon ' + class_name).attr('src', src_image).attr('alt', 'Module').attr('aria-hidden', true);
-                        if (t.length > 20) t = t.substring(0, 20) + '...';
-                        node.append('span').attr('class', 'ct-nodeLabel modulename').html(t);
-                        });
+                        // $scope.allMMaps.forEach(function(e, i) {
+                        //     //var t=e.name.replace(/_/g,' ');
+                        //     var src_image = 'imgs/ic-reportbox.png'
+                        //     var class_name = 'eteMbox';
+                        //     var onclick_func = displayScenarios;
+                        //     if (e.type == 'modules_endtoend') {
+                        //         class_name = 'eteMboxETE';
+                        //         onclick_func = loadScenarios;
+                        //         src_image = 'images_mindmap/endToEnd.png';
+                        //     }
+                        // var t = $.trim(e.name);
+                        // var node = nodeBox.append('span').attr('class', 'moduleContainer').attr('data-mapid', i).attr('title', t).on('click', onclick_func);
+                        // node.append('img').attr('class', 'ct-nodeIcon ' + class_name).attr('src', src_image).attr('alt', 'Module').attr('aria-hidden', true);
+                        // if (t.length > 20) t = t.substring(0, 20) + '...';
+                        // node.append('span').attr('class', 'ct-nodeLabel modulename').html(t);
+                        // });
                         $('span[title=' + selectedNodeTitle + ']').addClass('nodeBoxSelected');
                         initScroller();
                         setModuleBoxHeight_W();
@@ -3456,22 +3462,22 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             // $(nodeBox[0]).empty();
             $scope.allMMaps = allMaps_info = result;
 
-            $scope.allMMaps.forEach(function(e, i) {
-                //var t=e.name.replace(/_/g,' ');
-                var src_image = 'imgs/ic-reportbox.png'
-                var class_name = 'eteMbox';
-                var onclick_func = loadEndtoEndModule;
-                if (e.type == 'modules_endtoend') {
-                    class_name = 'eteMboxETE';
-                    onclick_func = loadScenarios;
-                    src_image = 'images_mindmap/endToEnd.png';
-                }
-                var t = $.trim(e.name);
-                var node = nodeBox.append('span').attr('class', 'moduleContainer').attr('data-mapid', i).attr('title', t).on('click', onclick_func);
-                node.append('img').attr('class', 'ct-nodeIcon ' + class_name).attr('src', src_image).attr('alt', 'Module').attr('aria-hidden', true);
-                if (t.length > 20) t = t.substring(0, 20) + '...';
-                node.append('span').attr('class', 'ct-nodeLabel modulename').html(t);
-            });
+            // $scope.allMMaps.forEach(function(e, i) {
+            //     //var t=e.name.replace(/_/g,' ');
+            //     var src_image = 'imgs/ic-reportbox.png'
+            //     var class_name = 'eteMbox';
+            //     var onclick_func = loadEndtoEndModule;
+            //     if (e.type == 'modules_endtoend') {
+            //         class_name = 'eteMboxETE';
+            //         onclick_func = loadScenarios;
+            //         src_image = 'images_mindmap/endToEnd.png';
+            //     }
+            //     var t = $.trim(e.name);
+            //     var node = nodeBox.append('span').attr('class', 'moduleContainer').attr('data-mapid', i).attr('title', t).on('click', onclick_func);
+            //     node.append('img').attr('class', 'ct-nodeIcon ' + class_name).attr('src', src_image).attr('alt', 'Module').attr('aria-hidden', true);
+            //     if (t.length > 20) t = t.substring(0, 20) + '...';
+            //     node.append('span').attr('class', 'ct-nodeLabel modulename').html(t);
+            // });
 
             initScroller();
             setModuleBoxHeight_W();
@@ -3537,9 +3543,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         editNode_W(e);
     };
 
-    function loadScenarios(e) {
+    function loadScenarios(title) {
         $scope.functionTBE = 'loadScenariosPopupConfirmed';
-        $('#createNewConfirmationPopup').attr('mapid', d3.select(this).attr('title'));
+        $('#createNewConfirmationPopup').attr('mapid', title);
         if (Object.keys($scope.nodeDisplay).length != 0) {
             $('#createNewConfirmationPopup').modal('show');
         } else
@@ -3571,13 +3577,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     }
 
-    function loadEndtoEndModule(e) {
+    function loadEndtoEndScenarios(name,mapid,type) {
         if ($scope.nodeDisplay == 0) { // if no map is loaded 
             openDialogMindmap('Error', 'First, Please select an end to end module or create a new one!');
             return;
         }
-        if ($($(this).children()[0]).hasClass('eteMbox')) {
-            var som = 'Module Name: ' + $(this)[0].title;
+        if (type != 'modules_endtoend') {
+            var som = 'Module Name: ' + name;
             if (som.length > 31)
                 $('.endtoend-modules-right-upper label').text(som.substring(0, 30) + '...');
             else
@@ -3592,12 +3598,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $('.addScenarios-ete').addClass('disableButton');
         //#821 UI issues in e2e
         $('#eteSearchScenarios').val("");
-
         var container = $("#eteScenarioContainer");
-
-        var id = d3.select(this).attr('data-mapid');
-        var moduleid = allMaps_info[id].id_n;
-        if (allMaps_info[id].type == "modules_endtoend") {
+        container.empty();
+        var moduleid = allMaps_info[mapid].id_n;
+        if (allMaps_info[mapid].type == "modules_endtoend") {
             return;
         }
         mindmapServices.populateScenarios(moduleid).then(function(result) {
@@ -4587,6 +4591,7 @@ Purpose : displaying pop up for replication of project
         $scope.linkDisplay = {};
         dNodes = [];
         dLinks = [];
+        $scope.allMMaps = [];
     }
 
     $scope.collapseETE = function() {

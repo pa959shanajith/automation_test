@@ -191,8 +191,8 @@
      border-radius: 11px;
 }
  .eteMbox{
-     padding: 10px;
-     background-color: #5c5ce4;
+     padding: 0px 16px;
+     /* background-color: #5c5ce4; */
      border-radius: 8px;
 }
  .modulename, .eteScenrios{
