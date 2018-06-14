@@ -2093,7 +2093,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         d.parent = null;
         d.children = null;
         d.task = null;
-        d3.select('#ct-node-' + d.id).remove();
+        // d3.select('#ct-node-' + d.id).remove();
+        delete $scope.nodeDisplay[d.id];
         deletednode_info.push(d);
         if (d.oid != undefined) {
             deletednode.push(d.oid);
