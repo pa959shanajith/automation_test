@@ -66,7 +66,13 @@
                <input type="text" class="makeElementFloatleft" id="eteSearchModules"  ng-keyup = "searchModule('eteSearchModules')" placeholder="Search modules" /><img alt="Search Icon" class="searchModuleimg" src="imgs/ic-search-icon.png" >
                <span class="eteLabel makeElementFloatleft no-disp">End to End Modules</span>
             </div>
-            <div class="scrollbar-inner endtoend-modules-left-lower makeElementFloatleft" style="overflow-y:hidden !important" id="etemModuleContainer"></div>
+            <div class="scrollbar-inner endtoend-modules-left-lower makeElementFloatleft" style="overflow-y:hidden !important" id="etemModuleContainer">
+                <span class="moduleContainer" ng-repeat="map in allMMaps" ng-click="loadEndToEnd($index,map.type,map.name)" data-mapid="{{$index}}" title="{{map.name}}">
+                    <img class="ct-nodeIcon eteMbox" src="images_mindmap/node-{{map.type}}.png" alt="Module" aria-hidden="true">
+                    <span class="ct-nodeLabel">{{map.name}}</span>
+                </span>                 
+            </div>
+      
          </div>
          <div class="endtoend-modules-right endtoend-module-upperSection">
             <div class="endtoend-modules-right-upper">
@@ -110,7 +116,7 @@
             <g id="ct-mindMap">
                 <path ng-repeat="(id,link) in linkDisplay" ng-model="link" id="{{id}}" class="ct-link" d="{{link.d}}"></path>           
                 <g ng-repeat="(id, node) in nodeDisplay" ng-model="dispnode" id="ct-node-{{id}}" class="ct-node" data-nodetype="{{node.type}}" transform="{{node.transform}}">
-                    <image height="40px" width="40px" class="ct-nodeIcon" xlink:href={{"images_mindmap/node-"+node.type+".png"}} style="opacity:1;" ng-click="nodeUniversalClick($index)" ></image>
+                    <image height="40px" width="40px" class="ct-nodeIcon" xlink:href={{node.img_src}} style="opacity:{{node.opacity}}" ng-click="nodeUniversalClick(id)" ></image>
                     <text class="ct-nodeLabel" text-anchor="middle" x="20" title="{{node.title}}" y="50">{{node.name}}</text>
                     <title>{{node.title}}</title>
                     <circle ng-if="node.type=='modules'|| node.type=='modules_endtoend'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="{{verticalLayout ? 20 : 44}}" cy="{{verticalLayout ? 55 : 20}}" r="4" ng-click = "toggleNode(id)"></circle>
@@ -141,11 +147,11 @@
          </svg>
          <svg id="ct-actionBox">
             <g>
-               <g id="ct-saveAction" class="ct-actionButton" ng-click = "actionEvent($event)">
+               <g id="ct-saveAction" class="ct-actionButton" ng-click = "actionEvent_W($event)">
                   <rect x="0" y="0" rx="12" ry="12" width="80px" height="50px"></rect>
                   <text x="23" y="18">Save</text>
                </g>
-               <g id="ct-createAction" class="ct-actionButton disableButton" ng-click = "actionEvent($event)">
+               <g id="ct-createAction" class="ct-actionButton disableButton" ng-click = "actionEvent_W($event)">
                   <rect x="100" y="0" rx="12" ry="12" width="80px" height="50px"></rect>
                   <text x="114" y="18">Create</text>
                </g>
@@ -261,7 +267,7 @@
             <g id="ct-mindMap">
                 <path ng-repeat="(id,link) in linkDisplay" ng-model="link" id="{{id}}" class="ct-link" d="{{link.d}}"></path>           
                 <g ng-repeat="(id, node) in nodeDisplay" ng-model="dispnode" id="ct-node-{{id}}" class="ct-node" data-nodetype="{{node.type}}" transform="{{node.transform}}">
-                    <image height="40px" width="40px" class="ct-nodeIcon" xlink:href={{"images_mindmap/node-"+node.type+".png"}} style="opacity:1;" ng-click="nodeUniversalClick($index)"></image>
+                    <image height="40px" width="40px" class="ct-nodeIcon" xlink:href={{node.img_src}} style="opacity:{{node.opacity}};" ng-click="nodeUniversalClick(id)"></image>
                     <image ng-if="node.task == true" class="ct-nodeTask" width="21px" height="21px" xlink:href="images_mindmap/node-task-assigned.png" style="opacity:{{node.taskOpacity}}" x="29" y="-10"></image>                    
                     <text class="ct-nodeLabel" text-anchor="middle" x="20" title="{{node.title}}" y="50">{{node.name}}</text>
                     <title>{{node.title}}</title>
@@ -297,10 +303,10 @@
                   <rect x="0" y="0" rx="12" ry="12" width="80px" height="50px"></rect>
                   <text x="23" y="18">Save</text>
                </g>
-               <g id="ct-createAction" class="ct-actionButton disableButton" ng-click = "actionEvent($event)">
+               <!-- <g id="ct-createAction" class="ct-actionButton disableButton" ng-click = "actionEvent($event)">
                   <rect x="100" y="0" rx="12" ry="12" width="80px" height="50px"></rect>
                   <text x="114" y="18">Create</text>
-               </g>
+               </g> -->
             </g>
          </svg>
          <svg id="ct-legendBox">
@@ -353,7 +359,7 @@
             <g id="ct-mindMap">
                 <path ng-repeat="(id,link) in linkDisplay" ng-model="link" id="{{id}}" class="ct-link" d="{{link.d}}"></path>           
                 <g ng-repeat="(id, node) in nodeDisplay" ng-model="dispnode" id="ct-node-{{id}}" class="ct-node" data-nodetype="{{node.type}}" transform="{{node.transform}}">
-                    <image height="40px" width="40px" class="ct-nodeIcon" xlink:href={{"images_mindmap/node-"+node.type+".png"}} style="opacity:1;" ng-click="nodeUniversalClick($index)"></image>
+                    <image height="40px" width="40px" class="ct-nodeIcon" xlink:href={{node.img_src}} style="opacity:{{node.opacity}};" ng-click="nodeUniversalClick(id)"></image>
                     <text class="ct-nodeLabel" text-anchor="middle" x="20" title="{{node.title}}" y="50">{{node.name}}</text>
                     <title>{{node.title}}</title>
                     <circle ng-if="node.type=='scenarios' || node.type=='screens' || node.type=='modules'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="{{verticalLayout ? 20 : 44}}" cy="{{verticalLayout ? 55 : 20}}" r="4"  ng-click = "toggleNode(id)"></circle>
