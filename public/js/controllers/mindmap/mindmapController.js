@@ -1163,32 +1163,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     };
 
-    // function nodeCtrlClick_W(e) {
-    //     activeNode = '#ct-node-'+e
-    //     var p = d3.select(activeNode);
-    //     var t = p.attr('data-nodetype');
-    //     var split_char = ',';
-    //     if (isIE) split_char = ' ';
-    //     var l = p.attr('transform').slice(10, -1).split(split_char);
-    //     l = [(parseFloat(l[0]) + 40) * cScale + cSpan[0], (parseFloat(l[1]) + 40) * cScale + cSpan[1]];
-    //     var c = d3.select('#ct-ctrlBox').style('top', l[1] + 'px').style('left', l[0] + 'px').classed('no-disp', !1);
-    //     c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
-    //     c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !1);
-    //     c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
-    //     if (t == 'modules_endtoend') {
-    //         c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !0);
-    //         c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Module');
-    //         //513-'Mindmap: When we delete an existing Module and create another module in the same work space  then a new Module instance is being appended .
-    //         c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !0);
-    //         //c.select('p.'+faRef.delete+' .ct-tooltiptext').html('Delete Module');
-    //     } else if (t == 'scenarios') {
-    //         c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !0);
-    //         c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !0);
-    //         c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Scenario');
-    //     }
-
-    // };
-
     function nodeClick(e) {
         d3.select('#window-pi p.proj-info-wrap').empty();
         if (IncompleteFlowFlag) {
@@ -1465,6 +1439,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     $scope.nodeUniversalClick = function(idx){
+        addInfo({
+            type: dNodes[idx].type,
+            attributes: {
+                'name': dNodes[idx].name
+            }
+        });
         activeNode = "#ct-node-"+idx;
         if($scope.tab == 'tabCreate') nodeCtrlClick();
         else if($scope.tab == 'mindmapEndtoEndModules') nodeCtrlClick();
