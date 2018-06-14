@@ -227,6 +227,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     $scope.projectListChange = function(prjName) {
+        clearSvg();
         $scope.projectNameO = prjName;
         $scope.projectName4 = $scope.projectNameO;
         $scope.projectName3 = $scope.projectNameO;
@@ -301,29 +302,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         console.log("Error in populating Cycles");
                     })
                 });
-                // mindmapServices.populateCycles(default_releaseid).then(function(result_cycles) {
-                //     var result2 = result_cycles;
-                //     $('.cycle-list').empty();
-                //     for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
-                //         $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
-                //     }
-                //     loadMindmapData1($scope.param);
-
-                //     //var selectedCyc=result2.c_ids[0];
-                //     //var selectedCyc = 'select cycle';
-                //     // if (tObj.cy != "") {
-                //     //     selectedCyc = tObj.cy;
-                //     // }
-                // }, function(error) {
-                //     console.log("Error in populating Cycles");
-                // })
                 //display assign box after populating data
             }, function(error) {
                 console.log("Error in populating Releases");
             })
         }
-        //////////////////////////////////////////////////////
-
 
         if ($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop")) {
             $("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
@@ -478,7 +461,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 unblockUI();
 
             }, function(error) {
-                console.log("Error:::::::::::::", error);
+                console.log("Error:", error);
                 unblockUI();
             })
     }
@@ -556,7 +539,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         v = addNode(dNodes[uNix - 1], !1, null);
         childNode = v;
         activeNode = undefined;
-        if (!moduleName) $scope.editNode(node);
+        if (!moduleName){
+            setTimeout(function(){$scope.editNode(node);}, 100);
+        } 
     };
 
     $scope.loadMap = function(idx) {
@@ -569,6 +554,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function loadMapPopupConfirmed() {
+        blockUI("Loading module.. Please wait..");
         $scope.nodeDisplay = {};
         $scope.linkDisplay = {};
         if (progressFlag) return;
@@ -601,7 +587,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 IncompleteFlowFlag = true;
             }
             $("#minimap").minimap($('#ct-mapSvg'));
+            unblockUI();
         }, function(error) {
+            unblockUI();
+            openDialogMindmap("Error","Error while loading module");
             console.log(error);
         })
     }
@@ -1779,8 +1768,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 //By default when a node is created it's name should be in ediatable mode
                 CreateEditFlag = true;
                 if (obj);
-                else
-                    $scope.editNode(currentNode);
+                else{
+                    setTimeout(function(){$scope.editNode(node);}, 100);
+                }
             }
 
         } else {
@@ -1884,7 +1874,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     //------End of Create Multiple Child Node-------//
 
     $scope.editNode = function(node) {
-        $scope.$apply(); // to load the newly added node
+        // $scope.$apply(); // to load the newly added node
         $('#ct-inpAct').removeClass('errorClass');
         d3.select('#ct-inpAct').classed('no-disp', !1);
         if (node == undefined) {
@@ -1951,6 +1941,45 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         d3.select('#ct-inpAct').attr('data-nodeid', null).property('value', name).node().focus();
         d3.select('#ct-inpSugg').classed('no-disp', !0);
     };
+    // function editNode_W(e, node) {
+
+    //     $('#ct-inpAct').removeClass('errorClass');
+    //     e = e || window.event;
+    //     e.cancelbubble = !0;
+    //     if (e.stopPropagation) e.stopPropagation();
+    //     //logic to create the node in editable mode
+    //     if (node == 0) {
+    //         childNode = null;
+    //         var p = d3.select(activeNode);
+    //     } else var p = childNode;
+    //     var pi = p.attr('id').split('-')[2];
+    //     var t = p.attr('data-nodetype');
+    //     if (t == 'scenarios') return;
+    //     var split_char = ',';
+    //     if (isIE) split_char = ' ';
+    //     var l = p.attr('transform').slice(10, -1).split(split_char);
+    //     d3.select('#ct-ctrlBox').classed('no-disp', !0);
+    //     if (p.select('.ct-nodeTask')[0][0] != null) {
+    //         var msg = 'Unassign the task to rename';
+    //         if (t == 'screens') {
+    //             msg = 'Unassign the task to rename. And unassign the corresponding testcases tasks';
+    //         }
+    //         openDialogMindmap('Rename Error', msg);
+    //         return;
+    //     }
+
+    //     d3.select('#ct-ctrlBox').classed('no-disp', !0);
+    //     var name = '';
+    //     //By default when a node is created it's name should be in ediatable mode
+
+    //     name = dNodes[pi].name;
+    //     //name=p.text();
+    //     l = [(parseFloat(l[0]) - 20) * cScale + cSpan[0], (parseFloat(l[1]) + 42) * cScale + cSpan[1]];
+    //     d3.select('#ct-inpBox').style('top', l[1] + 'px').style('left', l[0] + 'px').classed('no-disp', !1);
+    //     d3.select('#ct-inpPredict').property('value', '');
+    //     d3.select('#ct-inpAct').attr('data-nodeid', null).property('value', name).node().focus();
+    //     d3.select('#ct-inpSugg').classed('no-disp', !0);
+    // };
 
     $scope.deleteNode = function() {
         //If module is in edit mode, then return do not add any node
@@ -2661,7 +2690,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     $scope.loadEndToEnd = function(mapid,type,name){
         if(type == 'modules_endtoend') loadScenarios(name);
-        loadEndtoEndScenarios(name,mapid,type);
+        loadEndtoEndModule(name,mapid,type);
     }
     
     $scope.actionEvent_W = function(e) {
@@ -3540,7 +3569,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //To fix issue 710-Create a module and see that module name does not display in edit mode
         v = addNode_W(dNodes[uNix - 1], !1, null);
         childNode = v;
-        editNode_W(e);
+        setTimeout(function(){$scope.editNode(node);}, 100);
     };
 
     function loadScenarios(title) {
@@ -3561,7 +3590,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $('[title=' + $('#createNewConfirmationPopup').attr('mapid') + ']').addClass("nodeBoxSelected");
         cur_module = $('[data-mapid=' + $('#createNewConfirmationPopup').attr('mapid') + ']');
         initiate();
-        d3.select('#ct-inpBox').classed('no-disp', !0);
         clearSvg();
         var modName = $('#createNewConfirmationPopup').attr('mapid');
         mindmapServices.getModules(versioning_enabled, 'endToend', $scope.projectNameO, '', $('.release-list').val(), $('.cycle-list').val(), modName)
@@ -3577,12 +3605,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     }
 
-    function loadEndtoEndScenarios(name,mapid,type) {
-        if ($scope.nodeDisplay == 0) { // if no map is loaded 
-            openDialogMindmap('Error', 'First, Please select an end to end module or create a new one!');
-            return;
-        }
+    function loadEndtoEndModule(name,mapid,type) {
         if (type != 'modules_endtoend') {
+            if (Object.keys($scope.nodeDisplay).length == 0) { // if no map is loaded 
+                openDialogMindmap('Error', 'First, Please select an end to end module or create a new one!');
+                return;
+            }            
             var som = 'Module Name: ' + name;
             if (som.length > 31)
                 $('.endtoend-modules-right-upper label').text(som.substring(0, 30) + '...');
@@ -3604,6 +3632,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (allMaps_info[mapid].type == "modules_endtoend") {
             return;
         }
+        blockUI("Loading module.. Please wait..");
         mindmapServices.populateScenarios(moduleid).then(function(result) {
             if (result == "Invalid Session") {
                 $rootScope.redirectPage();
@@ -3624,18 +3653,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     }
                 })
             })
+            unblockUI();
         }, function(error) {
+            unblockUI();
+            openDialogMindmap("error","error occured while loading module");
             console.log(error);
         })
-
     }
 
-
-
     //To Unassign the task of a particular node
-
-
-
     function createScenario_Node(text, scenario_prjId) {
         if (text == '') return;
         //If module is in edit mode, then return do not add any node
@@ -3721,45 +3747,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     };
 
-    function editNode_W(e, node) {
 
-        $('#ct-inpAct').removeClass('errorClass');
-        e = e || window.event;
-        e.cancelbubble = !0;
-        if (e.stopPropagation) e.stopPropagation();
-        //logic to create the node in editable mode
-        if (node == 0) {
-            childNode = null;
-            var p = d3.select(activeNode);
-        } else var p = childNode;
-        var pi = p.attr('id').split('-')[2];
-        var t = p.attr('data-nodetype');
-        if (t == 'scenarios') return;
-        var split_char = ',';
-        if (isIE) split_char = ' ';
-        var l = p.attr('transform').slice(10, -1).split(split_char);
-        d3.select('#ct-ctrlBox').classed('no-disp', !0);
-        if (p.select('.ct-nodeTask')[0][0] != null) {
-            var msg = 'Unassign the task to rename';
-            if (t == 'screens') {
-                msg = 'Unassign the task to rename. And unassign the corresponding testcases tasks';
-            }
-            openDialogMindmap('Rename Error', msg);
-            return;
-        }
-
-        d3.select('#ct-ctrlBox').classed('no-disp', !0);
-        var name = '';
-        //By default when a node is created it's name should be in ediatable mode
-
-        name = dNodes[pi].name;
-        //name=p.text();
-        l = [(parseFloat(l[0]) - 20) * cScale + cSpan[0], (parseFloat(l[1]) + 42) * cScale + cSpan[1]];
-        d3.select('#ct-inpBox').style('top', l[1] + 'px').style('left', l[0] + 'px').classed('no-disp', !1);
-        d3.select('#ct-inpPredict').property('value', '');
-        d3.select('#ct-inpAct').attr('data-nodeid', null).property('value', name).node().focus();
-        d3.select('#ct-inpSugg').classed('no-disp', !0);
-    };
 
     // function deleteNode_W(e) {
     //     //If module is in edit mode, then return do not add any node
@@ -3938,7 +3926,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         cScale = 1;
         mapSaved = !1;
         zoom.scale(cScale).translate(cSpan);
-        zoom.event(d3.select('#ct-mapSvg'));   
+        zoom.event(d3.select('#ct-mapSvg'));  
+        d3.select('#ct-inpBox').classed('no-disp', !0); 
     };
 
     //FUnction is tagged to every click on 'cnavas' element to validate the names of nodes when created
@@ -4680,7 +4669,7 @@ Purpose : displaying pop up for replication of project
         else
             var temp = dNodes.length;
 
-        if ($scope.nodeDisplay == 0) {
+        if (Object.keys($scope.nodeDisplay).length == 0) {
             openDialogMindmap('Error', "Please select a module first");
         } else if ((selectedTab == 'mindmapEndtoEndModules' || selectedTab == 'tabCreate') && !$('#ct-inpBox').hasClass('no-disp')) {
             openDialogMindmap('Error', "Please complete editing first");
