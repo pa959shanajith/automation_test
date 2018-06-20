@@ -2584,6 +2584,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         var nodeBox = d3.select('.ct-nodeBox');
                         // $(nodeBox[0]).empty();
                         $scope.allMMaps = result;
+                        currMap = res;  
                         // $scope.allMMaps.forEach(function(e, i) {
                         //     //var t=e.name.replace(/_/g,' ');
                         //     var img_src = 'images_mindmap/node-modules-no.png';
