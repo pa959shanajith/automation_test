@@ -271,7 +271,7 @@
                     <image ng-if="node.task == true" class="ct-nodeTask" width="21px" height="21px" xlink:href="images_mindmap/node-task-assigned.png" style="opacity:{{node.taskOpacity}}" x="29" y="-10"></image>                    
                     <text class="ct-nodeLabel" text-anchor="middle" x="20" title="{{node.title}}" y="50">{{node.name}}</text>
                     <title>{{node.title}}</title>
-                    <circle ng-if="node.type=='scenarios' || node.type=='screens' || node.type=='modules' || node.type=='modules_endtoend'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="{{verticalLayout ? 20 : 44}}" cy="{{verticalLayout ? 55 : 20}}" r="4" ng-click="toggleNode(id)"></circle>
+                    <circle ng-if="(node.type=='scenarios' && modType == 'generic') || node.type=='screens' || node.type=='modules' || node.type=='modules_endtoend'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="{{verticalLayout ? 20 : 44}}" cy="{{verticalLayout ? 55 : 20}}" r="4" ng-click="toggleNode(id)"></circle>
                     <circle ng-if="node.type=='scenarios' || node.type=='screens' || node.type=='testcases'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="-3" cy="20" r="4" ></circle>    
                 </g>         
             </g>

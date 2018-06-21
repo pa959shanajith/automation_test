@@ -568,6 +568,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         initiate();
         clearSvg();
         var modName = $('#createNewConfirmationPopup').attr('mapid');
+        $scope.modType = 'e2e';
         mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, 0, $('.release-list').val(), $('.cycle-list').val(), modName).then(function(result) {
             if (result == "Invalid Session") {
                 $rootScope.redirectPage();
@@ -580,8 +581,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             treeBuilder(currMap);
             IncompleteFlowFlag = false;
             var errTemp = false;
-            if (dNodes[0].type != 'modules_endtoend')
+            if (dNodes[0].type != 'modules_endtoend'){
                 errTemp = treeIterator(undefined, dNodes[0], false);
+                $scope.modType = 'generic';
+            }
             if (errTemp) {
                 IncompleteFlowFlag = true;
             }
@@ -2113,12 +2116,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $scope.toggleNode = function (id) {
         var p = d3.select('#ct-node-'+id);
         var pi = id;
-        if (dNodes[pi].children) {
+        if (dNodes[pi].children && dNodes[pi].children.length>0) {
             p.select('.ct-cRight').classed('ct-nodeBubble', !1);
             dNodes[pi]._children = dNodes[pi].children;
             dNodes[pi].children = null;
             recurseTogChild(dNodes[pi], !0);
-        } else if (dNodes[pi]._children) {
+        } else if (dNodes[pi]._children && dNodes[pi]._children.length>0) {
             p.select('.ct-cRight').classed('ct-nodeBubble', !0);
             dNodes[pi].children = dNodes[pi]._children;
             dNodes[pi]._children = null;
