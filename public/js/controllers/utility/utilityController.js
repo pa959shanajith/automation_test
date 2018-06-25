@@ -87,10 +87,10 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
         $('#encryptData').val('');
         $('#encryptedData').val('');
           //Transaction Activity for Encryption
-          var labelArr = [];
-          var infoArr = [];
-          labelArr.push(txnHistory.codesDict['ResetEncryptionData']);
-          txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
+        //   var labelArr = [];
+        //   var infoArr = [];
+        //   labelArr.push(txnHistory.codesDict['ResetEncryptionData']);
+        //   txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
     };
 
     //Export Pairwise
@@ -253,10 +253,10 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
             $("#encryption_btns").hide();
         }
         //Transaction Activity for SelectEncryptionMethod
-        var labelArr = [];
-        var infoArr = [];
-        labelArr.push(txnHistory.codesDict['SelectEncryptionMethod']);
-        txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
+        // var labelArr = [];
+        // var infoArr = [];
+        // labelArr.push(txnHistory.codesDict['SelectEncryptionMethod']);
+        // txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
     })
 
     //Encryption
@@ -280,10 +280,10 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
                     } else if (data != "fail") {
                         $("#encryptedData").val(data);
                         //Transaction Activity for Encryption
-                        var labelArr = [];
-                        var infoArr = [];
-                        labelArr.push(txnHistory.codesDict['Encryption']);
-                        txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
+                        // var labelArr = [];
+                        // var infoArr = [];
+                        // labelArr.push(txnHistory.codesDict['Encryption']);
+                        // txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
                     } else {
                         console.log(data);
                     }
