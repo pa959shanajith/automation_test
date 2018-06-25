@@ -54,7 +54,8 @@
 				<div class="userLDAPFetch" ng-if="userConf.ldapActive">
 					<div class="userForm adminControl">
 						<select ng-change="userConf.ldapSetServer()" class='adminSelect selectlg form-control' ng-model="userConf.ldap.server" id="ldapServer" class="form-control rightControl selectControl">
-							<option ng-repeat="ldapids in userConf.ldapAllServerList" value="{{ldapids.value}}" ng-selected="ldapids.value==userConf.ldap.server" ng-disabled="userConf.ldap.expired==ldapids.value">{{ldapids.html}}</option>
+							<option value="" disabled selected>Select LDAP Server</option>
+							<option ng-repeat="ldapids in userConf.ldapAllServerList" value="{{ldapids}}" ng-selected="ldapids.value==userConf.ldap.server" ng-disabled="userConf.ldap.expired==ldapids">{{ldapids}}</option>
 						</select>
 					</div>
 					<label><input type="radio" ng-model="userConf.ldap.fetch" value="map" name="ldapFetch" ng-change='userConf.ldapSwitchFetch()' ng-disabled="userConf.ldap.server == ''"/> Map New User</label>
@@ -64,8 +65,9 @@
 						<input type="text" id="ldapDirectory" name="ldapDirectory" ng-model="userConf.ldap.user"  style="padding-right:90px" class="form-control form-control-custom create" placeholder="User Domain Name"/>
 					</div>
 					<div class="userForm adminControl" ng-if="userConf.ldap.fetch == 'import'">
-						<select ng-change="userConf.ldapGetUser()" class='adminSelect selectlg form-control' ng-model="userConf.ldap.user" ng-disabled="userConf.ldap.server == ''" id="ldapDirectory" class="form-control rightControl selectControl">
+						<select id="ldapDirectory" class='adminSelect form-control rightControl selectlg' ng-model="userConf.ldap.user" ng-disabled="userConf.ldap.server == ''" ng-change="userConf.ldapGetUser()">
 							<option value="" disabled selected>Select LDAP User</option>
+							<option ng-repeat="luser in userConf.ldapAllUserList" value="{{luser.value}}">{{luser.html}}</option>
 						</select>
 					</div>
 				</div>
