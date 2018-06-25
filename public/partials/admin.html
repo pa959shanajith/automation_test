@@ -64,12 +64,20 @@
 						<button title="Fetch" class="btn btn-xs userTypeBtn userTypeBtnActive" style="right:0" ng-click="userConf.ldapGetUser()" ng-disabled="userConf.ldap.server == ''">Fetch</button>
 						<input type="text" id="ldapDirectory" name="ldapDirectory" ng-model="userConf.ldap.user"  style="padding-right:90px" class="form-control form-control-custom create" placeholder="User Domain Name"/>
 					</div>
-					<div class="userForm adminControl" ng-if="userConf.ldap.fetch == 'import'">
+					<!-- <div class="userForm adminControl" ng-if="userConf.ldap.fetch == 'import'">
 						<select id="ldapDirectory" class='adminSelect form-control rightControl selectlg' ng-model="userConf.ldap.user" ng-disabled="userConf.ldap.server == ''" ng-change="userConf.ldapGetUser()">
 							<option value="" disabled selected>Select LDAP User</option>
 							<option ng-repeat="luser in userConf.ldapAllUserList" value="{{luser.value}}">{{luser.html}}</option>
 						</select>
-					</div>
+					</div> -->
+
+					<div class="dropdown dropdown-scroll userForm adminControl" ng-if="userConf.ldap.fetch == 'import'">
+							<input class="btn btn-users dropdown-toggle" type="text" id="dropdownMenu1" data-toggle="dropdown" ng-model="query" placeholder="Search User.." ng-click = "query=''"></input>
+							<ul class="dropdown-menu dropdown-menu-users" role="menu" aria-labelledby="dropdownMenu1">
+								<li role="presentation" ng-repeat='luser in userConf.ldapAllUserList | filter:query' ng-click="userConf.ldap.user=luser.value; $parent.query=luser.html; userConf.ldapGetUser()" value="{{luser.value}}"> {{luser.html}}</li>
+							</ul>
+					</div>					
+
 				</div>
 
 				<div ng-if="!userConf.ciActive">
@@ -125,15 +133,20 @@
 			<div class="col-xs-9 form-group adminForm">
 				<div class='userForm adminControl'>
 					<button title="LDAP" class="btn btn-xs userTypeBtn ldapBtn" style="margin:2px 0" disabled>LDAP</button>
-					<select ng-change="userConf.getUserData()" style="width: 87%" class='adminSelect selectlg form-control' ng-model="userConf.userIdName" id="userIdName" class="form-control rightControl selectControl">
+					<!-- <select ng-change="userConf.getUserData()" style="width: 87%" class='adminSelect selectlg form-control' ng-model="userConf.userIdName" id="userIdName" class="form-control rightControl selectControl">
 						<option value="" disabled selected>Select User</option>
 						<option ng-repeat="uid in userConf.allUsersList" value="{{uid[1]}};{{uid[0]}}">{{uid[0]}}</option>
-					</select>
+					</select> -->
+					<input class="btn btn-users users-edit dropdown-toggle" type="text" id="dropdownMenu1" data-toggle="dropdown" ng-model="query1" placeholder="Search User.." ng-click = "query1=''">
+					<ul class="dropdown-menu dropdown-menu-users users-edit" role="menu" aria-labelledby="dropdownMenu1">
+						<li role="presentation" ng-repeat='uid in userConf.allUsersList | filter:query1' ng-click="userConf.userIdName=uid[1]+';'+uid[0] ;$parent.query1=uid[0]; userConf.getUserData()" value="{{uid[1]}};{{uid[0]}}"> {{uid[0]}}</li>
+					</ul>					
 				</div>
+
 				<div class="userLDAPFetch" ng-if="userConf.ldapActive">
 					<div class="userForm adminControl">
 						<select ng-change="userConf.ldapSetServer()" class='adminSelect selectlg form-control' ng-model="userConf.ldap.server" id="ldapServer" class="form-control rightControl selectControl">
-							<option ng-repeat="ldapids in userConf.ldapAllServerList" value="{{ldapids.value}}" ng-selected="ldapids.value==userConf.ldap.server" ng-disabled="userConf.ldap.expired==ldapids.value">{{ldapids.html}}</option>
+							<option ng-repeat="ldapids in userConf.ldapAllServerList" value="{{ldapids}}" ng-selected="ldapids==userConf.ldap.server" ng-disabled="userConf.ldap.expired==ldapids">{{ldapids}}</option>
 						</select>
 					</div>
 					<div class="userForm adminControl">

@@ -1877,6 +1877,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			blockUI("Fetching LDAP users...");
 			adminServices.getLDAPConfig("user", ldapServer)
 			.then(function(data){
+				$scope.userConf.ldapAllUserList=[];
 				unblockUI();
 				if(data == "Invalid Session") {
 					$rootScope.redirectPage();
@@ -1888,7 +1889,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					openModalPopup("Create User","There are no users available in this Server.");
 				} else {
 					$scope.userConf.nocreate = false;
-					$scope.userConf.ldapAllUserList=[];//{value:"",html:"Select LDAP User"}];
 					data.sort(function(a,b) { return a > b; });
 					data.forEach(function(e) {
 						$scope.userConf.ldapAllUserList.push({value:e[1],html:e[0]});

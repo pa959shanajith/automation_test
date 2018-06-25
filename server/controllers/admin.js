@@ -2021,7 +2021,10 @@ exports.getLDAPConfig = function(req, res){
 							var filter = dataMaps.uName;
 							var ad = new activeDirectory(adConfig);
 							if (opts.length > 0) {
+								var resSent = false;
 								ad.findUser(opts, function (err, result) {
+									if (resSent) return;
+									resSent = !resSent;
 									if (err) {
 										if (err.lde_message.indexOf("DSID-031522C9") > -1) {
 											logger.error("Error occured in admin/getLDAPConfig: Fetch User Details: Insufficient Access");
@@ -2048,7 +2051,10 @@ exports.getLDAPConfig = function(req, res){
 									return res.send(data);
 								});
 							} else {
+								var resSent = false;
 								ad.find(filter+"=*", function (err, result) {
+									if (resSent) return;
+									resSent = !resSent;
 									if (err) {
 										if (err.lde_message.indexOf("DSID-031522C9") > -1) {
 											logger.error("Error occured in admin/getLDAPConfig: Fetch Users: Insufficient Access");
