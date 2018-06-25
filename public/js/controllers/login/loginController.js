@@ -75,10 +75,10 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 								$location.path("/plugin");
 							}
 							//Transaction Activity for Login Button Action
-							var labelArr = [];
-							var infoArr = [];
-							labelArr.push(txnHistory.codesDict['Login']);
-							txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
+							// var labelArr = [];
+							// var infoArr = [];
+							// labelArr.push(txnHistory.codesDict['Login']);
+							// txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
 						} else {
 							$scope.loginValidation = "Failed to Login.";
 							console.log("Failed to Load UserInfo.");

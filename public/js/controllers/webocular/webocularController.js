@@ -181,10 +181,10 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
       socket.disconnect('', { query: "check=true" })
     });
     //Transaction Activity for WebocularGoClick
-    var labelArr = [];
-    var infoArr = [];
-    labelArr.push(txnHistory.codesDict['WebocularGoClick']);
-    txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
+    // var labelArr = [];
+    // var infoArr = [];
+    // labelArr.push(txnHistory.codesDict['WebocularGoClick']);
+    // txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
   }
 
   $scope.addDomainDot = function(){
@@ -887,10 +887,10 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
       return nodes;
     }
     //Transaction Activity for generateGraph
-    var labelArr = [];
-    var infoArr = [];
-    labelArr.push(txnHistory.codesDict['generateGraphClick']);
-    txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
+    // var labelArr = [];
+    // var infoArr = [];
+    // labelArr.push(txnHistory.codesDict['generateGraphClick']);
+    // txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
   }
 
   /* function to show a table report*/
@@ -959,9 +959,9 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
     reportDiv.appendChild(tbl);
     body.appendChild(reportDiv);
     //Transaction Activity for showReportClick
-    var labelArr = [];
-    var infoArr = [];
-    labelArr.push(txnHistory.codesDict['showReportClick']);
-    txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
+    // var labelArr = [];
+    // var infoArr = [];
+    // labelArr.push(txnHistory.codesDict['showReportClick']);
+    // txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
   }
 }]);
