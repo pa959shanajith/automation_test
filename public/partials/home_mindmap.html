@@ -81,7 +81,7 @@
             </div>
             <div class="endtoend-modules-right-lower makeElementFloatleft">
                <div class="scrollbar-inner endtoend-modules-rightfirst-lower makeElementFloatleft" id="eteScenarioContainer"></div>
-               <button class="createNew-ete" ng-click="createNewMap_W()">CreateNew</button>
+               <button class="createNew-ete" ng-click="createNewMap_W($event)">CreateNew</button>
                <button class="addScenarios-ete" ng-click ="addScenariosete()" >Add</button>
             </div>
          </div>
@@ -101,10 +101,10 @@
             <ul id="ct-inpSugg" class="no-disp"></ul>
          </div>
          <div id="ct-ctrlBox" class="no-disp" style="top: 413px; left: 457.333px;">
-            <p class="ct-ctrl fa fa-plus" ng-click="createNode()"><span class="ct-tooltiptext">Create Scenarios</span></p>
+            <p class="ct-ctrl fa fa-plus" ng-click="createNode($event)"><span class="ct-tooltiptext">Create Scenarios</span></p>
             <!-- <p class="ct-ctrl fa fa-hand-peace-o" ng-click="createMultipleNode()"><span class="ct-tooltiptext">Create Multiple Scenarios</span></p> -->
-            <p class="ct-ctrl fa fa-pencil-square-o" ng-click="editNode()"><span class="ct-tooltiptext">Edit Module</span></p>
-            <p class="ct-ctrl fa fa-trash-o ct-ctrl-inactive" ng-click="deleteNode()"><span class="ct-tooltiptext"></span></p>
+            <p class="ct-ctrl fa fa-pencil-square-o" ng-click="editNode($event)"><span class="ct-tooltiptext">Edit Module</span></p>
+            <p class="ct-ctrl fa fa-trash-o ct-ctrl-inactive" ng-click="deleteNode($event)"><span class="ct-tooltiptext"></span></p>
          </div>
          <div id="ct-assignBox" class="no-disp">
             <div id="ct-assignTable"></div>
@@ -344,10 +344,10 @@
             <ul id="ct-inpSugg" class="no-disp"></ul>
          </div>
          <div id="ct-ctrlBox" class="no-disp" style="top: 413px; left: 457.333px;">
-            <p class="ct-ctrl fa fa-plus" ng-click="createNode()"><span class="ct-tooltiptext">Create Scenarios</span></p>
-            <p class="ct-ctrl fa fa-hand-peace-o" ng-click="createMultipleNode()"><span class="ct-tooltiptext">Create Multiple Scenarios</span></p>
-            <p class="ct-ctrl fa fa-pencil-square-o" ng-click="editNode()"><span class="ct-tooltiptext">Edit Module</span></p>
-            <p class="ct-ctrl fa fa-trash-o ct-ctrl-inactive" ng-click="deleteNode()"><span class="ct-tooltiptext"></span></p>
+            <p class="ct-ctrl fa fa-plus" ng-click="createNode($event)"><span class="ct-tooltiptext">Create Scenarios</span></p>
+            <p class="ct-ctrl fa fa-hand-peace-o" ng-click="createMultipleNode($event)"><span class="ct-tooltiptext">Create Multiple Scenarios</span></p>
+            <p class="ct-ctrl fa fa-pencil-square-o" ng-click="editNode($event)"><span class="ct-tooltiptext">Edit Module</span></p>
+            <p class="ct-ctrl fa fa-trash-o ct-ctrl-inactive" ng-click="deleteNode($event)"><span class="ct-tooltiptext"></span></p>
          </div>
          <div id="ct-assignBox" class="no-disp">
             <div id="ct-assignTable"></div>
@@ -423,7 +423,7 @@
                </div>
                <div class="modal-footer">
                   <button ng-click="clearNodes()" type="button" id="resetObjRow" class="btn btn-default">Reset</button>
-                  <button ng-click="createNodes()" type="button" id="rubmitObjRow" class="btn btn-default">Create</button>
+                  <button ng-click="createNodes($event)" type="button" id="rubmitObjRow" class="btn btn-default">Create</button>
                </div>
             </div>
          </div>
@@ -683,7 +683,7 @@
             </select>
          </div>
          <div class="modal-footer">
-            <button type="button" class="btn btn-default" ng-click="createFromJson()" data-dismiss="modal">Create Flow</button>
+            <button type="button" class="btn btn-default" ng-click="createFromJson($event)" data-dismiss="modal">Create Flow</button>
          </div>
       </div>
    </div>
