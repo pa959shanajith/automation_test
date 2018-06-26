@@ -547,7 +547,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $scope.loadMap = function(idx) {
         $scope.functionTBE = 'loadMapPopupConfirmed';
         $('#createNewConfirmationPopup').attr('mapid', $scope.allMMaps[idx].name);
-        if ($scope.nodeDisplay != 0) {
+        if ( Object.keys($scope.nodeDisplay).length != 0) {
             $('#createNewConfirmationPopup').modal('show');
         } else
             loadMapPopupConfirmed();
