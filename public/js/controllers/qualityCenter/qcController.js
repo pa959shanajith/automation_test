@@ -98,10 +98,10 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 					$("#loginToQCpop").modal("hide");
 					$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">User Name :</span><span class="content">'+qcUserName+'</span></p>')
 					//Transaction Activity for ALMLogin Submit Button Action
-					var labelArr = [];
-					var infoArr = [];
-					labelArr.push(txnHistory.codesDict['SubmitALMLogin']);
-					txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+					// var labelArr = [];
+					// var infoArr = [];
+					// labelArr.push(txnHistory.codesDict['SubmitALMLogin']);
+					// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 				}
 			},
 			function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
@@ -111,10 +111,10 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 
 	$scope.goBacktoPlugin = function($event){
 		//Transaction Activity for ALMLogin Cancel Button Action
-		var labelArr = [];
-		var infoArr = [];
-		labelArr.push(txnHistory.codesDict['CancelALMLogin']);
-		txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+		// var labelArr = [];
+		// var infoArr = [];
+		// labelArr.push(txnHistory.codesDict['CancelALMLogin']);
+		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 		window.localStorage['navigateScreen'] = "plugin";
 		window.location.assign('plugin');
 	}

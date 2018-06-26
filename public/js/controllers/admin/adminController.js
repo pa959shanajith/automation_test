@@ -236,10 +236,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		//console.log(assignProjectsObj);
 
 		//Transaction Activity for Assign Project Button Action
-		var labelArr = [];
-		var infoArr = [];
-		labelArr.push(txnHistory.codesDict['AssignProjects']);
-		txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+		// var labelArr = [];
+		// var infoArr = [];
+		// labelArr.push(txnHistory.codesDict['AssignProjects']);
+		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 
 		blockUI('Saving in Progress. Please Wait...');
 		adminServices.assignProjects_ICE(assignProjectsObj)
@@ -375,10 +375,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				} else {
 
 					//Transaction Activity for Create Project Button Action
-					var labelArr = [];
-					var infoArr = [];
-					labelArr.push(txnHistory.codesDict['CreateProject']);
-					txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+					// var labelArr = [];
+					// var infoArr = [];
+					// labelArr.push(txnHistory.codesDict['CreateProject']);
+					// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 					if ($('#selDomain').val() != "") {
 						requestedids.push(domainId);
 						idtype.push('domainsall');
@@ -543,10 +543,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			if (proceedFlag == true) {
 
 				//Transaction Activity for Update Project Button Action
-				var labelArr = [];
-				var infoArr = [];
-				labelArr.push(txnHistory.codesDict['UpdateProject']);
-				txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+				// var labelArr = [];
+				// var infoArr = [];
+				// labelArr.push(txnHistory.codesDict['UpdateProject']);
+				// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 
 				if (updateProjectObj.newProjectDetails.length <= 0)
 					updateProjectObj.newProjectDetails = newProjectDetails;
@@ -1751,11 +1751,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.userConf.manage = function(action,$event) {
 		
 		//Transaction Activity for Create/ Update/ Delete User button Action
-		var labelArr = [];
-		var infoArr = [];
-		labelArr.push(txnHistory.codesDict['UserConfmanage']);
-		infoArr.push(action);
-		txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+		// var labelArr = [];
+		// var infoArr = [];
+		// labelArr.push(txnHistory.codesDict['UserConfmanage']);
+		// infoArr.push(action);
+		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 		
 		var userConf = $scope.userConf;
 		if (!userConf.validate(action)) return;
@@ -2308,11 +2308,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		};
 		blockUI(bAction.slice(0,-1)+"ing configuration...");
 		//Transaction Activity for Create/ Update/ Delete LDAP conf button Action
-		var labelArr = [];
-		var infoArr = [];
-		labelArr.push(txnHistory.codesDict['LdapConfmanage']);
-		infoArr.push(action);
-		txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+		// var labelArr = [];
+		// var infoArr = [];
+		// labelArr.push(txnHistory.codesDict['LdapConfmanage']);
+		// infoArr.push(action);
+		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 		adminServices.manageLDAPConfig(action, confObj)
 		.then(function(data){
 			unblockUI();
@@ -2424,10 +2424,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.ldapConf.test = function($event){
 		if (!this.validate("test")) return;
 		//Transaction Activity for LDAP conf Test Button Action
-		var labelArr = [];
-		var infoArr = [];
-		labelArr.push(txnHistory.codesDict['LdapConftest']);
-		txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+		// var labelArr = [];
+		// var infoArr = [];
+		// labelArr.push(txnHistory.codesDict['LdapConftest']);
+		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 		var url = this.url;
 		var base_dn = this.baseDN;
 		var bind_dn = this.bindDN;

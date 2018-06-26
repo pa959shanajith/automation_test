@@ -43,10 +43,10 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 	$scope.showFlowGraphHome = function($event){
 
 		//Transaction Activity for ShowFlowGraphHome Action
-		var labelArr = [];
-		var infoArr = [];
-		labelArr.push(txnHistory.codesDict['ShowFlowGraphHome']);
-		txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+		// var labelArr = [];
+		// var infoArr = [];
+		// labelArr.push(txnHistory.codesDict['ShowFlowGraphHome']);
+		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 
 		$scope.enableDataflow = false;
 		$(".projectInfoWrap").empty();
@@ -146,10 +146,10 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 	$scope.executeGenerate = function($event){
 		
 		//Transaction Activity for Generate Action
-		var labelArr = [];
-		var infoArr = [];
-		labelArr.push(txnHistory.codesDict['Generate']);
-		txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+		// var labelArr = [];
+		// var infoArr = [];
+		// labelArr.push(txnHistory.codesDict['Generate']);
+		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 
 		$scope.obj = {};
 		$scope.enableGenerate = false;
@@ -789,10 +789,10 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				$scope.expandSidebars();
 
 				//Transaction Activity for viewComplexity button Action
-				var labelArr = [];
-				var infoArr = [];
-				labelArr.push(txnHistory.codesDict['ViewComplexity']);
-				txnHistory.log(event.type,labelArr,infoArr,window.location.pathname);
+				// var labelArr = [];
+				// var infoArr = [];
+				// labelArr.push(txnHistory.codesDict['ViewComplexity']);
+				// txnHistory.log(event.type,labelArr,infoArr,window.location.pathname);
 
 				if(d == undefined || d.complexity== "Undefined"){
 					openDialog('APG', "Complexity can't be determined for this class.");
@@ -858,10 +858,10 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		$scope.wmcCalculate =function(e){
 
 			//Transaction Activity for WMCCalculate Action
-			var labelArr = [];
-			var infoArr = [];
-			labelArr.push(txnHistory.codesDict['WMCCalculate']);
-			txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
+			// var labelArr = [];
+			// var infoArr = [];
+			// labelArr.push(txnHistory.codesDict['WMCCalculate']);
+			// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
 			var listWeight=$("[id^=weightage_]");
 			var ccData = $(".ccvalue");
 			var weightedSum = 0; 
@@ -943,10 +943,10 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		var edges = [];
 
 		//Transaction Activity for generateDataFlowDiagram Action
-		var labelArr = [];
-		var infoArr = [];
-		labelArr.push(txnHistory.codesDict['GenerateDataFlowDiagram']);
-		txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+		// var labelArr = [];
+		// var infoArr = [];
+		// labelArr.push(txnHistory.codesDict['GenerateDataFlowDiagram']);
+		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 
 		if(classes[i] == undefined){
 			openDialog('APG', "Data flow can't be generated for this class.");
@@ -1325,10 +1325,10 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		//logic to open file in the editor
 
 		//Transaction Activity for openFileInEditor Action
-		var labelArr = [];
-		var infoArr = [];
-		labelArr.push(txnHistory.codesDict['OpenFileInEditor']);
-		txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
+		// var labelArr = [];
+		// var infoArr = [];
+		// labelArr.push(txnHistory.codesDict['OpenFileInEditor']);
+		// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
 		var e = $("tr.hightlight_Complexity_row")[0]
 		if(e != undefined){
 			lineNumber = (e.getAttribute('name')).split('_')[1];

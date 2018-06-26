@@ -475,7 +475,7 @@
 			<div class="adminActionBtn">
 				<button class="btn btn-md pull-right adminBtn" ng-click="ldapConf.manage('update',$event)" ng-disabled="ldapConf.serverName == ''" title="Update Configuration">Update</button>
 				<button class="btn btn-md pull-right adminBtn" ng-click="ldapConf.delete()" ng-disabled="ldapConf.serverName == ''" style="margin-right:10px" title="Delete Configuration">Delete</button>
-				<button class="btn btn-md pull-right adminBtn" ng-click="ldapConf.test()" ng-disabled="ldapConf.serverName == ''" style="margin-right:10px" title="Test Configuration">Test</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="ldapConf.test($event)" ng-disabled="ldapConf.serverName == ''" style="margin-right:10px" title="Test Configuration">Test</button>
 			</div>
 			<!-- Button -->
 			<!-- Edit Configuration Form -->
