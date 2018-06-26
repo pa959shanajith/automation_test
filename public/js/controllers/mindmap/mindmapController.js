@@ -146,6 +146,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     $scope.projectNameO = res.projectId[0];
                 }
                 if ($scope.tab == 'tabAssign') {
+                    $("#ctExpandAssign .iconSpaceArrow").trigger('click');
                     mindmapServices.populateReleases($scope.projectNameO).then(function(result) {
                         if (result == "Invalid Session") {
                             $rootScope.redirectPage();
@@ -2825,13 +2826,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     function toggleExpand(e, tab) {
+        if($scope.allMMaps.length == 0 && $("#ct-" + tab + "Box").hasClass("ct-open") != true) return;       
         var s = d3.select($(e.target).parent());
         var p = d3.select($(e.target).parent().parent());
         $(e.target).parent().toggleClass('ct-rev');
         $(e.target).parent().parent().toggleClass('ct-open');
         $(e.target).toggleClass("iconSpaceArrowTop");
         e.stopImmediatePropagation();
-        if ($("#ct-" + tab + "Box").hasClass("ct-open") == true) {
+        if ($("#ct-" + tab + "Box").hasClass("ct-open") == true) {        
             $("#ct-canvas").css("top", "5px");
             $(".ct-nodeBox .ct-node").css("width", "139px");
             $(".ct-nodeBox").css({
