@@ -537,8 +537,9 @@ var txnHistory = {
             var request = objectStore.put(data); //Saves a transaction in the idb
             request.onsuccess = function(event) {
 				if(labelArr.indexOf("100") > -1 || labelArr.indexOf("104") > -1){
-					console.log("sending from idb!");
-					var data = sendAllTransactions();
+					//commenting sending part as of now
+					// console.log("sending from idb!");
+					// var data = sendAllTransactions();
 					}
 			}
 

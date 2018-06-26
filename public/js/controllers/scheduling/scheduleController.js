@@ -499,10 +499,10 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 							$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;").val("");
 							getScheduledDetails();
 							//Transaction Activity for InitSchedule Button Action
-							var labelArr = [];
-							var infoArr = [];
-							labelArr.push(txnHistory.codesDict['InitSchedule']);
-							txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+							// var labelArr = [];
+							// var infoArr = [];
+							// labelArr.push(txnHistory.codesDict['InitSchedule']);
+							// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 						}
 						else if(data == "few"){
 							openModelPopup("Schedule Test Suite", "Few suites are failed to schedule");
