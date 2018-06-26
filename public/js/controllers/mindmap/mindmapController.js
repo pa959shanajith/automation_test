@@ -986,7 +986,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     var tempTask = jQuery.extend(true, {}, dNodes[pi].task);
                     if (reuseDict[pi].length > 0) {
                         reuseDict[pi].forEach(function(e, i) {
-
+                            if(dNodes[e].id_c == "null") return;
                             dNodes[e].task = tempTask;
                             dNodes[e].task.copied = true;
                             dNodes[e].task.copiedidx = pi;
