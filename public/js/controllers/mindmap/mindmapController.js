@@ -990,7 +990,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             dNodes[e].task = tempTask;
                             dNodes[e].task.copied = true;
                             dNodes[e].task.copiedidx = pi;
-                            d3.select('#ct-node-' + e).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('style', 'opacity:0.6').attr('x', 29).attr('y', -10);
+                            d3.select('#ct-node-' + e).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('style', 'opacity:1').attr('x', 29).attr('y', -10);
                         });
                     }
                     dNodes[pi].task.copied = false;
