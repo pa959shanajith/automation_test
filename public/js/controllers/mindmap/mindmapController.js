@@ -146,7 +146,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     $scope.projectNameO = res.projectId[0];
                 }
                 if ($scope.tab == 'tabAssign') {
-                    mindmapServices.populateReleases(selectedProject).then(function(result) {
+                    $("#ctExpandAssign .iconSpaceArrow").trigger('click');
+                    mindmapServices.populateReleases($scope.projectNameO).then(function(result) {
                         if (result == "Invalid Session") {
                             $rootScope.redirectPage();
                         }
@@ -258,7 +259,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
             $('#ctExpandAssign').unbind('click');
             unloadMindmapData();
-            mindmapServices.populateReleases(selectedProject).then(function(result) {
+            mindmapServices.populateReleases($scope.projectNameO).then(function(result) {
                 if (result == "Invalid Session") {
                     $rootScope.redirectPage();
                 }
@@ -539,14 +540,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         childNode = v;
         activeNode = undefined;
         if (!moduleName){
-            setTimeout(function(){$scope.editNode(node);}, 100);
+            setTimeout(function(){$scope.editNode(true,node);}, 100);
         } 
     };
 
     $scope.loadMap = function(idx) {
         $scope.functionTBE = 'loadMapPopupConfirmed';
         $('#createNewConfirmationPopup').attr('mapid', $scope.allMMaps[idx].name);
-        if ($scope.nodeDisplay != 0) {
+        if ( Object.keys($scope.nodeDisplay).length != 0) {
             $('#createNewConfirmationPopup').modal('show');
         } else
             loadMapPopupConfirmed();
@@ -568,6 +569,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         initiate();
         clearSvg();
         var modName = $('#createNewConfirmationPopup').attr('mapid');
+        $scope.modType = 'e2e';
         mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, 0, $('.release-list').val(), $('.cycle-list').val(), modName).then(function(result) {
             if (result == "Invalid Session") {
                 $rootScope.redirectPage();
@@ -580,8 +582,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             treeBuilder(currMap);
             IncompleteFlowFlag = false;
             var errTemp = false;
-            if (dNodes[0].type != 'modules_endtoend')
+            if (dNodes[0].type != 'modules_endtoend'){
                 errTemp = treeIterator(undefined, dNodes[0], false);
+                $scope.modType = 'generic';
+            }
             if (errTemp) {
                 IncompleteFlowFlag = true;
             }
@@ -983,11 +987,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     var tempTask = jQuery.extend(true, {}, dNodes[pi].task);
                     if (reuseDict[pi].length > 0) {
                         reuseDict[pi].forEach(function(e, i) {
-
+                            if(dNodes[e].id_c == "null") return;
                             dNodes[e].task = tempTask;
                             dNodes[e].task.copied = true;
                             dNodes[e].task.copiedidx = pi;
-                            d3.select('#ct-node-' + e).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('style', 'opacity:0.6').attr('x', 29).attr('y', -10);
+                            d3.select('#ct-node-' + e).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('style', 'opacity:1').attr('x', 29).attr('y', -10);
                         });
                     }
                     dNodes[pi].task.copied = false;
@@ -1046,7 +1050,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
 
-    function nodeCtrlClick(e) {
+    function nodeCtrlClick($event) {
         d3.select('#ct-inpBox').classed('no-disp', !0);
         //In case of paste
         var activeNode_temp;
@@ -1059,13 +1063,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     dNodes_c.forEach(function(e, i) {
                         activeNode = activeNode_temp;
                         if (e.type == 'screens') {
-                            $scope.createNode({
+                            $scope.createNode(true,{
                                 name: e.name
                             });
                             activeNode = childNode;
                             dLinks_c.forEach(function(f, j) {
                                 if (f.source.id == e.id) {
-                                    $scope.createNode({
+                                    $scope.createNode(true,{
                                         name: f.target.name
                                     });
                                 }
@@ -1080,7 +1084,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     dNodes_c.forEach(function(e, i) {
                         if (e.type == 'scenarios') {
                             activeNode = '#ct-node-0';
-                            $scope.createNode({
+                            $scope.createNode(true,{
                                 name: e.name
                             });
                             activeNode = childNode;
@@ -1088,13 +1092,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             dLinks_c.forEach(function(f, j) {
                                 if (f.source.id == e.id && f.target.type == 'screens') {
                                     activeNode = activenode_scr;
-                                    $scope.createNode({
+                                    $scope.createNode(true,{
                                         name: f.target.name
                                     });
                                     activeNode = childNode;
                                     dLinks_c.forEach(function(g, k) {
                                         if (g.source.id == f.target.id && g.source.type == 'screens') {
-                                            $scope.createNode({
+                                            $scope.createNode(true,{
                                                 name: g.target.name
                                             });
                                         }
@@ -1670,9 +1674,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         return dmin;
     }
 
-    $scope.createNode = function(obj) {
+    $scope.createNode = function($event,obj) {
         //If module is in edit mode, then return do not add any node
-        if (d3.select('#ct-inpBox').attr('class') == "") return;
+        if ($event!==true && (d3.select('#ct-inpBox').attr('class') == "" || d3.select($event.target).classed('ct-ctrl-inactive'))) return;
         d3.select('#ct-inpBox').classed('no-disp', !0);
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
         var pi = activeNode.split('-')[2];
@@ -1748,7 +1752,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 CreateEditFlag = true;
                 if (obj);
                 else{
-                    setTimeout(function(){$scope.editNode(node);}, 100);
+                    setTimeout(function(){$scope.editNode(true,node);}, 100);
                 }
             }
 
@@ -1820,7 +1824,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         });
     });
 
-    $scope.createNodes = function() {
+    $scope.createNodes = function($event) {
         blockUI('Validating names..');
         var nodeNames = [];
         $('.errBorder').removeClass('errBorder');
@@ -1833,7 +1837,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if ($('.errBorder').length == 0) {
             console.log("NodeNames:", nodeNames);
             nodeNames.forEach(function(node, i) {
-                $scope.createNode({
+                $scope.createNode(true,{
                     name: node
                 });
             });
@@ -1852,8 +1856,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     //------End of Create Multiple Child Node-------//
 
-    $scope.editNode = function(node) {
+    $scope.editNode = function($event,node) {
         // $scope.$apply(); // to load the newly added node
+        if($event!==true && d3.select($event.target).classed('ct-ctrl-inactive')) return;
         $('#ct-inpAct').removeClass('errorClass');
         d3.select('#ct-inpAct').classed('no-disp', !1);
         if (node == undefined) {
@@ -1896,8 +1901,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 cSpanY = cSpanY - temp;
             }
 
-
-            d3.select('#ct-mindMap').attr('transform', "translate(" + cSpanX + "," + cSpanY + ")scale(" + cScale + ")");
+            zoom.translate([cSpanX, cSpanY]);
+            zoom.event(d3.select('#ct-mindMap'));
+            //d3.select('#ct-mindMap').attr('transform', "translate(" + cSpanX + "," + cSpanY + ")scale(" + cScale + ")");
             //cSpan[0]=cSpan[0]-l[0]/2 //after edit mindmap doesn't move to orignal position
             l = p.attr('transform').slice(10, -1).split(split_char);
             l = [(parseFloat(l[0]) - 20) * cScale + cSpanX, (parseFloat(l[1]) + 42) * cScale + cSpanY];
@@ -1920,49 +1926,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         d3.select('#ct-inpAct').attr('data-nodeid', null).property('value', name).node().focus();
         d3.select('#ct-inpSugg').classed('no-disp', !0);
     };
-    // function editNode_W(e, node) {
 
-    //     $('#ct-inpAct').removeClass('errorClass');
-    //     e = e || window.event;
-    //     e.cancelbubble = !0;
-    //     if (e.stopPropagation) e.stopPropagation();
-    //     //logic to create the node in editable mode
-    //     if (node == 0) {
-    //         childNode = null;
-    //         var p = d3.select(activeNode);
-    //     } else var p = childNode;
-    //     var pi = p.attr('id').split('-')[2];
-    //     var t = p.attr('data-nodetype');
-    //     if (t == 'scenarios') return;
-    //     var split_char = ',';
-    //     if (isIE) split_char = ' ';
-    //     var l = p.attr('transform').slice(10, -1).split(split_char);
-    //     d3.select('#ct-ctrlBox').classed('no-disp', !0);
-    //     if (p.select('.ct-nodeTask')[0][0] != null) {
-    //         var msg = 'Unassign the task to rename';
-    //         if (t == 'screens') {
-    //             msg = 'Unassign the task to rename. And unassign the corresponding testcases tasks';
-    //         }
-    //         openDialogMindmap('Rename Error', msg);
-    //         return;
-    //     }
-
-    //     d3.select('#ct-ctrlBox').classed('no-disp', !0);
-    //     var name = '';
-    //     //By default when a node is created it's name should be in ediatable mode
-
-    //     name = dNodes[pi].name;
-    //     //name=p.text();
-    //     l = [(parseFloat(l[0]) - 20) * cScale + cSpan[0], (parseFloat(l[1]) + 42) * cScale + cSpan[1]];
-    //     d3.select('#ct-inpBox').style('top', l[1] + 'px').style('left', l[0] + 'px').classed('no-disp', !1);
-    //     d3.select('#ct-inpPredict').property('value', '');
-    //     d3.select('#ct-inpAct').attr('data-nodeid', null).property('value', name).node().focus();
-    //     d3.select('#ct-inpSugg').classed('no-disp', !0);
-    // };
-
-    $scope.deleteNode = function() {
+    $scope.deleteNode = function($event) {
         //If module is in edit mode, then return do not add any node
         if (d3.select('#ct-inpBox').attr('class') == "") return;
+        if($event!==true && d3.select($event.target).classed('ct-ctrl-inactive')) return;
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
         var s = d3.select(activeNode);
         SaveCreateED('#ct-createAction', 1, 0);
@@ -1988,7 +1956,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
             return !1;
         });
-        if (p.children.length == 0) d3.select('#ct-node-' + p.id).select('.ct-cRight').remove();
     };
 
     function deleteTestCases(pi) {
@@ -2152,12 +2119,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $scope.toggleNode = function (id) {
         var p = d3.select('#ct-node-'+id);
         var pi = id;
-        if (dNodes[pi].children) {
+        if (dNodes[pi].children && dNodes[pi].children.length>0) {
             p.select('.ct-cRight').classed('ct-nodeBubble', !1);
             dNodes[pi]._children = dNodes[pi].children;
             dNodes[pi].children = null;
             recurseTogChild(dNodes[pi], !0);
-        } else if (dNodes[pi]._children) {
+        } else if (dNodes[pi]._children && dNodes[pi]._children.length>0) {
             p.select('.ct-cRight').classed('ct-nodeBubble', !0);
             dNodes[pi].children = dNodes[pi]._children;
             dNodes[pi]._children = null;
@@ -2206,7 +2173,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             return;
         }
         if (!validNodeDetails(val)) return;
-        //if(!validNodeDetails(this)) return;
         if (childNode != null) {
             var p = d3.select(childNode);
         } else {
@@ -2221,12 +2187,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             dNodes[pi].rnm = !0;
         }
         if (t == 'screens' && scrList[inp.attr('data-nodeid')] !== undefined) {
-            //The below line leads to duplicate id_n of nodes when the node name is selected from suggestions list (only via mouse click)
-            //dNodes[pi].id_n=scrList[inp.attr('data-nodeid')].id_n;
             dNodes[pi].name = scrList[inp.attr('data-nodeid')].name;
         } else if (t == 'testcases' && tcList[inp.attr('data-nodeid')] !== undefined) {
-            //The below line leads to duplicate id_n of nodes when the node name is selected from suggestions list (only via mouse click)
-            //dNodes[pi].id_n=tcList[inp.attr('data-nodeid')].id_n;
             dNodes[pi].name = tcList[inp.attr('data-nodeid')].name;
         } else {
             dNodes[pi].name = val;
@@ -2557,9 +2519,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     if (!sts) {
                         mid = $scope.allMMaps.length;
                         $scope.allMMaps.push(res);
-                        // var node = d3.select('.ct-nodeBox').append('div').attr('class', 'ct-node fl-left').attr('data-mapid', mid).attr('title', res.name).on('click', loadMap);
-                        // node.append('img').attr('class', 'ct-nodeIcon').attr('src', 'images_mindmap/node-modules-no.png').attr('alt', 'Module').attr('aria-hidden', true);
-                        // node.append('span').attr('class', 'ct-nodeLabel').html(res.name.replace(/_/g, ' '));
                     }
                     setModuleBoxHeight();
                     if (selectedTab == 'tabCreate') populateDynamicInputList();
@@ -2584,16 +2543,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         var nodeBox = d3.select('.ct-nodeBox');
                         // $(nodeBox[0]).empty();
                         $scope.allMMaps = result;
-                        // $scope.allMMaps.forEach(function(e, i) {
-                        //     //var t=e.name.replace(/_/g,' ');
-                        //     var img_src = 'images_mindmap/node-modules-no.png';
-                        //     if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
-                        //     var t = $.trim(e.name);
-                        //     var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
-                        //     node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
-                        //     if(t.length>20) t = t.substring(0, 20)+'...';
-                        //     node.append('span').attr('class', 'ct-nodeLabel').html(t);
-                        // });
+                        currMap = res;  
                         $('div[title=' + selectedNodeTitle + ']').addClass('nodeBoxSelected');
                         if (selectedTab == 'tabCreate')
                             populateDynamicInputList();
@@ -2782,9 +2732,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     mid = allMaps_info.length;
                     allMaps_info.push(res);
                     $scope.allMMaps.push(res);
-                    // var node = d3.select('#etemModuleContainer').append('span').attr('class', 'moduleContainer').attr('data-mapid', mid).attr('title', res.name).on('click', loadScenarios);
-                    // node.append('img').attr('class', 'ct-nodeIcon eteMbox').attr('src', 'imgs/ic-reportbox.png').attr('alt', 'Module').attr('aria-hidden', true);
-                    // node.append('span').attr('class', 'ct-nodeLabel modulename').html(res.name.replace(/_/g, ' '));
                 }
                 setModuleBoxHeight_W();
                 clearSvg();
@@ -2807,23 +2754,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         var nodeBox = d3.select('#etemModuleContainer');
                         // $(nodeBox[0]).empty();
                         $scope.allMMaps = allMaps_info = result;
-                        //<span class='moduleContainer' data-moduleId=''><img alt='Module icon' class='eteMbox' src='imgs/ic-reportbox.png' title=''><br/><span class='modulename' title=''>Module"+(i+1)+"</span></span>
-                        // $scope.allMMaps.forEach(function(e, i) {
-                        //     //var t=e.name.replace(/_/g,' ');
-                        //     var src_image = 'imgs/ic-reportbox.png'
-                        //     var class_name = 'eteMbox';
-                        //     var onclick_func = displayScenarios;
-                        //     if (e.type == 'modules_endtoend') {
-                        //         class_name = 'eteMboxETE';
-                        //         onclick_func = loadScenarios;
-                        //         src_image = 'images_mindmap/endToEnd.png';
-                        //     }
-                        // var t = $.trim(e.name);
-                        // var node = nodeBox.append('span').attr('class', 'moduleContainer').attr('data-mapid', i).attr('title', t).on('click', onclick_func);
-                        // node.append('img').attr('class', 'ct-nodeIcon ' + class_name).attr('src', src_image).attr('alt', 'Module').attr('aria-hidden', true);
-                        // if (t.length > 20) t = t.substring(0, 20) + '...';
-                        // node.append('span').attr('class', 'ct-nodeLabel modulename').html(t);
-                        // });
                         $('span[title=' + selectedNodeTitle + ']').addClass('nodeBoxSelected');
                         initScroller();
                         setModuleBoxHeight_W();
@@ -2896,13 +2826,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     function toggleExpand(e, tab) {
+        if($scope.allMMaps.length == 0 && $("#ct-" + tab + "Box").hasClass("ct-open") != true) return;       
         var s = d3.select($(e.target).parent());
         var p = d3.select($(e.target).parent().parent());
         $(e.target).parent().toggleClass('ct-rev');
         $(e.target).parent().parent().toggleClass('ct-open');
         $(e.target).toggleClass("iconSpaceArrowTop");
         e.stopImmediatePropagation();
-        if ($("#ct-" + tab + "Box").hasClass("ct-open") == true) {
+        if ($("#ct-" + tab + "Box").hasClass("ct-open") == true) {        
             $("#ct-canvas").css("top", "5px");
             $(".ct-nodeBox .ct-node").css("width", "139px");
             $(".ct-nodeBox").css({
@@ -3306,16 +3237,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         );
     }
 
-
-    // function addExport(versioning_status) {
-    //     $('.selectProject').append($('<i>').attr({
-    //         class: 'glyphicon glyphicon-export export-icon',
-    //         title: "Export Version"
-    //     }).click(function(e) {
-    //         exportData(versioning_status);
-    //     }));
-    // }
-
     /*
     function : jsonDownload()
     Purpose : download json file
@@ -3472,23 +3393,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             // $(nodeBox[0]).empty();
             $scope.allMMaps = allMaps_info = result;
 
-            // $scope.allMMaps.forEach(function(e, i) {
-            //     //var t=e.name.replace(/_/g,' ');
-            //     var src_image = 'imgs/ic-reportbox.png'
-            //     var class_name = 'eteMbox';
-            //     var onclick_func = loadEndtoEndModule;
-            //     if (e.type == 'modules_endtoend') {
-            //         class_name = 'eteMboxETE';
-            //         onclick_func = loadScenarios;
-            //         src_image = 'images_mindmap/endToEnd.png';
-            //     }
-            //     var t = $.trim(e.name);
-            //     var node = nodeBox.append('span').attr('class', 'moduleContainer').attr('data-mapid', i).attr('title', t).on('click', onclick_func);
-            //     node.append('img').attr('class', 'ct-nodeIcon ' + class_name).attr('src', src_image).attr('alt', 'Module').attr('aria-hidden', true);
-            //     if (t.length > 20) t = t.substring(0, 20) + '...';
-            //     node.append('span').attr('class', 'ct-nodeLabel modulename').html(t);
-            // });
-
             initScroller();
             setModuleBoxHeight_W();
             unblockUI();
@@ -3505,7 +3409,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         return [parseFloat(s.style("width")), parseFloat(s.style("height"))];
     };
 
-    function createNewMap_W(e) {
+    $scope.createNewMap_W = function($event) {
         initiate();
         clearSvg();
         var s = getElementDimm(d3.select("#ct-mapSvg"));
@@ -3550,7 +3454,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //To fix issue 710-Create a module and see that module name does not display in edit mode
         v = addNode_W(dNodes[uNix - 1], !1, null);
         childNode = v;
-        setTimeout(function(){$scope.editNode(node);}, 100);
+        setTimeout(function(){$scope.editNode(true,node);}, 100);
     };
 
     function loadScenarios(title) {
@@ -3728,37 +3632,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     };
 
-
-
-    // function deleteNode_W(e) {
-    //     //If module is in edit mode, then return do not add any node
-    //     if (d3.select('#ct-inpBox').attr('class') == "") return;
-    //     d3.select('#ct-ctrlBox').classed('no-disp', !0);
-    //     var s = d3.select(activeNode);
-    //     //513-'Mindmap: When we delete an existing Module and create another module in the same work space  then a new Module instance is being appended .
-    //     var t = s.attr('data-nodetype');
-    //     if (t == 'modules_endtoend') return;
-    //     var sid = s.attr('id').split('-')[2];
-    //     var p = dNodes[sid].parent;
-    //     recurseDelChild(dNodes[sid], $scope.tab);
-    //     for (j = dLinks.length - 1; j >= 0; j--) {
-    //         if (dLinks[j].target.id == sid) {
-    //             d3.select('#ct-link-' + dLinks[j].id).remove();
-    //             dLinks[j].deleted = !0;
-    //             break;
-    //         }
-    //     }
-    //     p.children.some(function(d, i) {
-    //         if (d.id == sid) {
-    //             //var nodeDel=dNodes.pop(sid);
-    //             p.children.splice(i, 1);
-    //             return !0;
-    //         }
-    //         return !1;
-    //     });
-    //     if (p.children.length == 0) d3.select('#ct-node-' + p.id).select('.ct-cRight').remove();
-    // };
-
     function moveNode_W(e) {
         e = e || window.event;
         //#886 Unable to rearrange nodes in e2e
@@ -3871,10 +3744,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 openDialogMindmap('Error', 'Scenario is not created');
             }
         });
-    };
-
-    $scope.createNewMap_W = function(e) {
-        createNewMap_W();
     };
 
 
@@ -4783,7 +4652,7 @@ Purpose : displaying pop up for replication of project
     });
 
 
-    $scope.createFromJson = function() {
+    $scope.createFromJson = function($event) {
         var typeo, typen;
         $scope.dataJSON.forEach(function(e, i) {
             if (i == 0) {
@@ -4804,7 +4673,7 @@ Purpose : displaying pop up for replication of project
                         activeNode = '#ct-node-' + dNodes[dNodes.length - 1].parent.parent.parent.id;
                     }
                 }
-                $scope.createNode({
+                $scope.createNode(true,{
                     name: $scope.dataJSON[i].name
                 });
                 typeo = typen;
@@ -5132,7 +5001,6 @@ Purpose : displaying pop up for replication of project
             console.log(error);
         })
     };
-
 }]);
 
 mySPA.directive('onReadFile', function($parse) {

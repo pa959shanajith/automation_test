@@ -1631,7 +1631,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			this.ldapActive = true;
 			$scope.userConf.activateLDAP();
 		}
-		this.ldapAllServerList=[{value:"",html:"Select LDAP Server"}];
+		this.ldapAllServerList=[];
+		this.ldapAllUserList=[];
 	};
 
 	//Fetch All Available User Roles
@@ -1843,12 +1844,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				$scope.userConf.nocreate = true;
 				openModalPopup("Create User","There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section.");
 			} else {
-				$scope.userConf.ldapAllServerList=[{value:"",html:"Select LDAP Server"}];
+				$scope.userConf.ldapAllServerList=[];
 				data.sort(function(a,b) { return a > b; });
 				data.forEach(function(e) {
-					$scope.userConf.ldapAllServerList.push({value:e,html:e});
+					$scope.userConf.ldapAllServerList.push(e);
 				});
-				//$scope.userConf.ldapAllServerList = data;
 				cb();
 			}
 		}, function (error) {
@@ -1877,6 +1877,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			blockUI("Fetching LDAP users...");
 			adminServices.getLDAPConfig("user", ldapServer)
 			.then(function(data){
+				$scope.userConf.ldapAllUserList=[];
 				unblockUI();
 				if(data == "Invalid Session") {
 					$rootScope.redirectPage();
@@ -1889,13 +1890,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				} else {
 					$scope.userConf.nocreate = false;
 					data.sort(function(a,b) { return a > b; });
-					var selBox = $('#ldapDirectory');
-					selBox.empty();
-					selBox.append("<option value=\"\" disabled selected>Select LDAP User</option>");
-					for (var i = 0; i < data.length; i++) {
-						selBox.append($("<option value=\""+data[i][1]+"\"></option>").text(data[i][0]));
-					}
-					selBox.prop("selectedIndex", 0);
+					data.forEach(function(e) {
+						$scope.userConf.ldapAllUserList.push({value:e[1],html:e[0]});
+					});
 				}
 			}, function (error) {
 				unblockUI();
@@ -2042,8 +2039,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					var ldapuser = data.ldapuser.user;
 					$scope.userConf.activateLDAP(function() {
 						userConf.ldap.expired = false;
-						if (!userConf.ldapAllServerList.some(function(e) { return e.value == ldapserver;})) {
-							userConf.ldapAllServerList.push({value:ldapserver,html:ldapserver});
+						if (!userConf.ldapAllServerList.some(function(e) { return e == ldapserver;})) {
+							userConf.ldapAllServerList.push(ldapserver);
 							userConf.ldap.expired = ldapserver;
 						}
 						userConf.ldap.user = ldapuser;

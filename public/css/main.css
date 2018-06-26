@@ -5530,3 +5530,28 @@ ul.browserInlineIcons
 {
     overflow: hidden !important;
 }
+
+.btn-users{
+    background: none;
+    border: 1px solid;
+    width: 100%;
+    height: 30px;
+}
+.users-edit{
+    width: 87%;
+}
+.dropdown-menu-users{
+    max-height:120px;
+    overflow-y:scroll;
+    width: 100%;
+    padding: 6px;
+}
+.dropdown-menu-users>li{
+    padding: 3px 12px;
+}
+.dropdown-menu-users>li:hover{
+    background:#633691;
+    border-radius: 3px;
+    color:#fff;
+    cursor: pointer;
+}

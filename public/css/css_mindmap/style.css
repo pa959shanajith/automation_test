@@ -596,7 +596,7 @@
 }
  .ct-node .ct-nodeLabel{
     display:block;
-    font-size:10px;
+    font-size:12px;
     cursor:default;
     word-wrap: break-word;
     padding-top: 2px;
@@ -1476,4 +1476,11 @@
     top: 9px;
     position: absolute;
     display: flex;
+}
+.ct-node-e2e{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    width: 140px;    
 }

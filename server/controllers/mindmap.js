@@ -456,15 +456,14 @@ exports.getModules=function(req,res){
 				if(status!=200) res.status(status).send(result);
 				else{
 					
-					result[0].data.forEach(function(e,i){
-						modulenames.push({name:e.row[0],type:'modules',id_n:e.row[1]});
-					});
 					if(result[1]){
 						result[1].data.forEach(function(e,i){
 							modulenames.push({name:e.row[0],type:'modules_endtoend',id_n:e.row[1]});
 						});	
 					}
-
+					result[0].data.forEach(function(e,i){
+						modulenames.push({name:e.row[0],type:'modules',id_n:e.row[1]});
+					});
 					res.status(status).send(modulenames);
 
 				}
