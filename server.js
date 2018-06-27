@@ -139,17 +139,29 @@ if (cluster.isMaster) {
             return next();
         });
 
-        app.use(helmet());
-        app.use(lusca.p3p('ABCDEF'));
-        app.use(helmet.referrerPolicy({
-            policy: 'same-origin'
-        }));
-        var ninetyDaysInSeconds = 7776000;
-        app.use(helmet.hpkp({
-            maxAge: ninetyDaysInSeconds,
-            sha256s: ['AbCdEf123=', 'ZyXwVu456=']
-        }));
-        app.use(helmet.noCache());
+        //Based on NGINX Config Security Headers are configured
+        if(process.env.NGINX_ON == "FALSE"){
+            app.use(helmet());
+            app.use(lusca.p3p('/w3c/p3p.xml", CP="IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT'));
+            app.use(helmet.referrerPolicy({
+                policy: 'same-origin'
+            }));
+            var ninetyDaysInSeconds = 7776000;
+            app.use(helmet.hpkp({
+                maxAge: ninetyDaysInSeconds,
+                sha256s: ['base64+primary==', 'base64+backup==']
+            }));
+            app.use(helmet.contentSecurityPolicy({
+                directives: {
+                    imgSrc: ["'self'", 'data:'],
+                    //   fontSrc: ["'self'"],
+                    objectSrc: ["'none'"],
+                    mediaSrc: ["'self'"],
+                    frameSrc: ["data:"]
+                }
+            }));
+        // app.use(helmet.noCache());
+        }
 
         app.post('/restartService', function(req, res) {
             logger.info("Inside UI Service: restartService");
@@ -268,16 +280,6 @@ if (cluster.isMaster) {
             res.header('Access-Control-Allow-Headers', 'X-Requested-With');
             next();
         });
-        //Content Security Policy Enabled for Images and Fonts.
-        app.use(helmet.contentSecurityPolicy({
-            directives: {
-                imgSrc: ["'self'", 'data:'],
-                //   fontSrc: ["'self'"],
-                objectSrc: ["'none'"],
-                mediaSrc: ["'self'"],
-                frameSrc: ["data:"]
-            }
-        }));
 
         app.get('/', function(req, res) {
             res.clearCookie('connect.sid');
@@ -546,7 +548,7 @@ if (cluster.isMaster) {
         app.post('/APG_OpenFileInEditor', flowGraph.APG_OpenFileInEditor);
         app.post('/APG_createAPGProject', flowGraph.APG_createAPGProject);
         //-------------SERVER START------------//
-        var hostFamilyType = '0.0.0.0';
+        var hostFamilyType = process.env.NGINX_ON == "TRUE" ? '127.0.0.1' : '0.0.0.0';
         var portNumber = process.env.serverPort;
         httpsServer.listen(portNumber, hostFamilyType); //Https Server
         try {
