@@ -160,6 +160,13 @@ if (cluster.isMaster) {
                     frameSrc: ["data:"]
                 }
             }));
+            //CORS
+            app.all('*', function(req, res, next) {
+                var origin = req.get('host');
+                res.setHeader('Access-Control-Allow-Origin', origin);
+                res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+                next();
+            });
         // app.use(helmet.noCache());
         }
 
@@ -273,13 +280,7 @@ if (cluster.isMaster) {
                 logger.error("Please run the Service API and Restart the Server");
             });
         });
-        //CORS
-        app.all('*', function(req, res, next) {
-            var origin = req.get('host');
-            res.setHeader('Access-Control-Allow-Origin', origin);
-            res.header('Access-Control-Allow-Headers', 'X-Requested-With');
-            next();
-        });
+    
 
         app.get('/', function(req, res) {
             res.clearCookie('connect.sid');
