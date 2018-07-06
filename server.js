@@ -82,10 +82,10 @@ if (cluster.isMaster) {
         module.exports.httpsServer = httpsServer;
         var io = require('./server/lib/socket');
 
-        //Caching static files for One Day
-        var oneDay = 86400000; // in milliseconds
+        //Caching static files for thirtyDays 
+        var thirtyDays = 2592000; // in milliseconds
         app.use(express.static(__dirname + "/public/", {
-            maxage: oneDay
+            maxage: thirtyDays
         }));
 
         //serve all asset files from necessary directories
