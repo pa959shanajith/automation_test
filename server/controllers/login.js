@@ -117,6 +117,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 							req.session.username = username;
 							req.session.uniqueId = sessId;
 							req.session.userid = userid;
+							req.session.ip = req.ip;
 							logger.info("User Authenticated successfully");
 							res.send(flag);
 						} else if (validUser == true && assignedProjects == false) {
@@ -136,6 +137,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 							req.session.username = username;
 							req.session.uniqueId = sessId;
 							req.session.userid = userid;
+							req.session.ip = req.ip;
 							logger.info("User Authenticated successfully");
 							res.send(flag);
 						} else {

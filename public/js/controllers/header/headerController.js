@@ -53,7 +53,11 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	}
 	$("#notifications-count").hide();
 
-	
+
+	socket.on('killSession', function (value) {
+		$rootScope.redirectPage();
+	});
+
 	socket.on('notify', function (value) {
 		if(value.count == 0){
 			var dateTime = new Date().toLocaleString();

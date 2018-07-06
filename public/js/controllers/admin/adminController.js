@@ -2479,12 +2479,49 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$(".selectedIcon").removeClass("selectedIcon");
 		$("#sessionTab").find("img").addClass("selectedIcon");
 		blockUI("Retrieving session data...");
-		adminServices.getSessionData()
-		.then(function (res) {
-			if (res == "Invalid Session") {
+		adminServices.manageSessionData("get")
+		.then(function (data) {
+			if (data == "Invalid Session") {
 				$rootScope.redirectPage();
 			} else {
-				console.log(res);
+				data.sessionData.sort(function(a,b) { return a.username > b.username; });
+				data.clientData.sort(function(a,b) { return a.username > b.username; });
+				$scope.sessionConf.sessions = data.sessionData;
+				$scope.sessionConf.clients = data.clientData;
+			}
+			unblockUI();
+		}, function (error) {
+			console.error("Fail to load session data", error);
+		});
+	};
+
+	// Session Management: Logoff/Disconnect User
+	$scope.sessionConf.kill = function ($event) {
+		var ele = $event.target;
+		var action = $event.target.innerHTML.trim().toLowerCase();
+		var id = parseInt($event.target.dataset.id);
+		var msg, rootObj, key, obj;
+		if (action == "logout") {
+			msg = "Logging out ";
+			rootObj = $scope.sessionConf.sessions;
+			obj = rootObj[id];
+			key = obj.id;
+		} else {
+			msg = "Disconnecting ";
+			rootObj = $scope.sessionConf.clients;
+			obj = rootObj[id];
+			key = obj.mode;
+		}
+		var user = obj.username;
+		blockUI(msg+user+"...");
+		adminServices.manageSessionData(action,user,key)
+		.then(function (data) {
+			if (data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if (data == "fail") {
+				openModalPopup("Session Management", msg+"failed!")
+			} else {
+				rootObj.splice(id,1);
 			}
 			unblockUI();
 		}, function (error) {

@@ -82,8 +82,12 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
-		getSessionData: function () {
-			return $http.post('/getSessionData')
+		manageSessionData: function (action, user, key) {
+			return $http.post('/manageSessionData', {
+				action: action,
+				user: user,
+				key: key
+			})
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},

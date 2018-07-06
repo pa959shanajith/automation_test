@@ -18,7 +18,7 @@
 						<span><img src='imgs/project.png' alt='Project'/></span>Assign Projects</a></li>
 					<li><a id='ldapConfigTab' title="Manage LDAP Configuration" ng-click="tab = 'tabldapConfig';ldapConf.click()" class="selectBrowser" data-name="4">
 						<span><img src='imgs/ldap-config.png' alt='LDAP Configuration'/></span>LDAP Configuration</a></li>
-					<li ng-if="false"><a id='sessionTab' title="Session Management" ng-click="tab = 'tabSession';sessionConf.click()" class="selectBrowser" data-name="5">
+					<li><a id='sessionTab' title="Session Management" ng-click="tab = 'tabSession';sessionConf.click()" class="selectBrowser" data-name="5">
 						<span><img src='imgs/session.png' alt='Session' /></span>Session Management</a></li>
 					<li style="margin-bottom: 30px"><a id='preferencesTab' title="Preferences" ng-click="tab='tabPreferences';preferences.click()" class="selectBrowser" data-name="2">
 						<span><img src='imgs/preferences.png' alt='Preferences' /></span>Preferences</a></li>
@@ -534,9 +534,57 @@
 			<!--Task Name-->
 			<!-- Button -->
 			<div class="adminActionBtn">
-				<button class="btn btn-md pull-right adminBtn createProjectBtn" ng-click="refresh()">Refresh</button>
+				<button class="btn btn-md pull-right adminBtn createProjectBtn" ng-click="sessionConf.click()">Refresh</button>
 			</div>
 			<!-- Button -->
+			<!-- Action area -->
+			<div class="col-xs-9 form-group adminForm" style="height:90%">
+				<div class="containerWrap sessionItemWrap">
+					<div class="sessionHeading" data-toggle="collapse" data-target="#activeUsers-x">
+						<h4>Active Users</h4>
+					</div>
+					<div id="activeUsers" class="wrap scrollbar-inner">
+						<table class = "table table-hover sessionTable">
+							<tr>
+								<th> Username </th>
+								<th> Role </th>
+								<th> Logged in </th>
+								<th> IP </th>
+								<th><button class="btn" style="visibility:hidden"> Logout </button></th>
+							</tr>
+							<tr ng-repeat="user in sessionConf.sessions">
+								<td> {{user.username}} </td>
+								<td> {{user.role}} </td>
+								<td> {{user.loggedin}} </td>
+								<td> {{user.ip}} </td>
+								<td><button class="btn" data-id="{{$index}}" ng-click="sessionConf.kill($event)"> Logout </button></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+				<div class="containerWrap sessionItemWrap" style="top:60%">
+					<div class="sessionHeading" data-toggle="collapse" data-target="#clientUsers-x">
+						<h4>ICE Engine Clients</h4>
+					</div>
+					<div id="clientUsers" class="wrap scrollbar-inner">
+						<table class = "table table-hover sessionTable">
+							<tr>
+								<th> Username </th>
+								<th> Mode </th>
+								<th> IP </th>
+								<th><button class="btn" style="visibility:hidden"> Disconnect </button></th>
+							</tr>
+							<tr ng-repeat="user in sessionConf.clients">
+								<td> {{user.username}} </td>
+								<td> {{user.mode}} </td>
+								<td> {{user.ip}} </td>
+								<td><button class="btn" data-id="{{$index}}" ng-click="sessionConf.kill($event)"> Disconnect </button></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+			<!-- Action area -->
 		</div>
 		<!-- Session Management -->
 
