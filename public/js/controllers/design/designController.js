@@ -2269,6 +2269,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             })
                         }
                     }
+					  $("#saveObjects").trigger('click');
                 }
                 else{
                         deleteScrapedObjects(e);  
