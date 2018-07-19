@@ -24,7 +24,7 @@
 			<div ng-if="getScreenView == 'Desktop'" id="left-top-section" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
-					<li><a href='#'  title="Desktop Apps" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-desktop.png' alt='Desktop Apps' /></span>Desktop Apps</a></li>
+					<li><a class='browserIcon' href='#'  title="Desktop Apps" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-desktop.png' alt='Desktop Apps' /></span>Desktop Apps</a></li>
 					<li class="last"  title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
 				</ul>
 			</div>
@@ -34,7 +34,7 @@
 			<div ng-if="getScreenView == 'SAP'" id="left-top-section" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
-					<li><a href='#'  title="SAP Apps" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-desktop.png' alt='SAP Apps' /></span>SAP Apps</a></li>
+					<li><a class='browserIcon' href='#'  title="SAP Apps" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-desktop.png' alt='SAP Apps' /></span>SAP Apps</a></li>
 					<li class="last"  title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
 				</ul>
 			</div>
@@ -44,7 +44,7 @@
 			<div ng-if="getScreenView == 'DesktopJava'" id="left-top-section" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
-					<li><a href='#'  title="OEBS Apps" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-desktop.png' alt='OEBS Apps' /></span>OEBS Apps</a></li>
+					<li><a class='browserIcon' href='#'  title="OEBS Apps" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-desktop.png' alt='OEBS Apps' /></span>OEBS Apps</a></li>
 					<li class="last"  title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
 				</ul>
 			</div>
@@ -54,7 +54,7 @@
 			<div ng-if="getScreenView == 'MobileApp'" id="left-top-section" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
-					<li><a href='#'  title="Android Apps" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-mobility.png' alt='Mobile Apps' /></span>Mobile Apps</a></li>
+					<li><a class='browserIcon' href='#'  title="Android Apps" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-mobility.png' alt='Mobile Apps' /></span>Mobile Apps</a></li>
 					<li class="last"  title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
 				</ul>
 			</div>
@@ -64,7 +64,7 @@
 			<div ng-if="getScreenView == 'MobileWeb'" id="left-top-section" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
-					<li><a href='#'  title="Android Web" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-mobility.png' alt='Mobile Web' /></span>Mobile Web</a></li>
+					<li><a class='browserIcon' href='#'  title="Android Web" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-mobility.png' alt='Mobile Web' /></span>Mobile Web</a></li>
 					<li class="last"  title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
 				</ul>
 			</div>
@@ -74,7 +74,7 @@
 			<div style="border-bottom:0" ng-if="getScreenView == 'Webservice'" id="left-top-section" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
-					<li><a href='#'  title="Web Services" ng-class="enbledWS ? 'enableActionsWS' : 'disableActionsWS'" data-toggle="modal" ng-click="initScrapeWS($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-webservice.png' alt='Webservices' /></span>Web Services</a></li>
+					<li><a class='browserIcon' href='#'  title="Web Services" ng-class="enbledWS ? 'enableActionsWS' : 'disableActionsWS'" data-toggle="modal" ng-click="initScrapeWS($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-webservice.png' alt='Webservices' /></span>Web Services</a></li>
 					<li class="last"  title="Edit"><span style="margin-bottom:-5px"><input ng-model="enbledWS" id="enbledWS" type='checkbox' value=""></span><label for="enbledWS">Edit</label></li>
 				</ul>
 			</div>
