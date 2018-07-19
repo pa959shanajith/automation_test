@@ -3354,7 +3354,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     localStorage.removeItem("_modified");
                     saveScrapeDataFlag = true;
                     openDialog("Save Scraped data", "Scraped data saved successfully.")
-                    $("a.enableActions").addClass("disableActions").removeClass("enableActions");
+                    $("a.browserIcon").removeClass("enableActions").addClass("disableActions");
                     angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
                     $("#saveObjects").attr('disabled', true);
                     deleteScrapeDataservice = true;
