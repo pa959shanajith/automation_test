@@ -2468,6 +2468,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             if (s.attr('id') == 'ct-saveAction') {
                 blockUI('Saving Flow! Please wait...');
                 flag = 10;
+                if($scope.tab == 'tabAssign') flag = 30;
                 d3.select('#ct-inpBox').classed('no-disp', !0);
                 saveFlag = true;
                 //$('#ct-createAction').removeClass('disableButton');
@@ -2505,7 +2506,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     $rootScope.redirectPage();
                 }
                 unblockUI();
-                if (flag == 10) {
+                if (flag == 10 || flag == 30) {
                     var res = result;
                     mapSaved = !0;
                     var mid, sts = $scope.allMMaps.some(function(m, i) {
