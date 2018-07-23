@@ -516,7 +516,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             y: s[1] * 0.4,
             x: s[0] * 0.1 * 0.9,
             children: [],
-            parent: null
+            parent: null,
+            state: 'created'
         };
         if (moduleName) node.name = moduleName;
 
@@ -1718,7 +1719,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 y: h * (0.15 * (1.34 + nNext[pt][1]) + Math.random() * 0.1),
                 x: 90 + 30 * Math.floor(Math.random() * (Math.floor((w - 150) / 80))),
                 children: [],
-                parent: dNodes[pi]
+                parent: dNodes[pi],
+                state: 'created'
             };
             node = getNewPosition(node, pi, arr_co); //pi: active node ID
             var curNode = node;
@@ -1733,7 +1735,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             nCount[nNext[pt][1]]++;
             dNodes[pi].children.push(dNodes[uNix]);
             dNodes[uNix].childIndex = dNodes[pi].children.length;
-
+            dNodes[uNix].cidxch = 'true'; // child index updated
             var currentNode = addNode(dNodes[uNix], !0, dNodes[pi]);
             if (currentNode != null) {
                 childNode = currentNode;
@@ -1968,6 +1970,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 deletednode_info.push(d);
                 if (d.oid != undefined) {
                     deletednode.push(d.oid);
+                    dNodes[d.id].state = 'deleted';
                 }
                 var temp = dLinks;
                 for (j = temp.length - 1; j >= 0; j--) {
@@ -1993,6 +1996,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         deletednode_info.push(d);
                         if (d.oid != undefined) {
                             deletednode.push(d.oid);
+                            dNodes[d.id].state = 'deleted';
                         }
                         var temp = dLinks;
                         for (j = temp.length - 1; j >= 0; j--) {
@@ -2045,6 +2049,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         deletednode_info.push(d);
         if (d.oid != undefined) {
             deletednode.push(d.oid);
+            dNodes[d.id].state = 'deleted';
         }
         var temp = dLinks;
         if (tab == 'mindmapEndtoEndModules') {
@@ -2344,6 +2349,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 renamed: (d.rnm) ? d.rnm : !1,
                 orig_name: (d.original_name) ? d.original_name : null,
                 taskexists: (d.taskexists) ? d.taskexists : null,
+                state:(d.state) ? d.state : null,
+                cidxch:(d.cidxch) ? d.cidxch : null // childindex changed
             });
             if (d.type == 'testcases') c[c.length - 1].scr_name = d.parent.name;
         }
@@ -2424,7 +2431,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             'testcases': 1
         };
         temp_data.forEach(function(e, i) {
-            dNodes[e.idx].childIndex = counter[e.type];
+            if(dNodes[e.idx].childIndex != counter[e.type]){
+                dNodes[e.idx].childIndex = counter[e.type];
+                dNodes[e.idx].cidxch = 'true'; // child index updated
+            }
             counter[e.type] = counter[e.type] + 1;
         })
         var restrict_scenario_reuse = parseDataReuse(true);
@@ -2656,7 +2666,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             'scenarios': 1
         };
         temp_data.forEach(function(e, i) {
-            dNodes[e.idx].childIndex = counter[e.type];
+            if(dNodes[e.idx].childIndex != counter[e.type]){
+                dNodes[e.idx].childIndex = counter[e.type];
+                dNodes[e.idx].cidxch = 'true'; // child index updated
+            }
             counter[e.type] = counter[e.type] + 1;
         })
         error = treeIterator_W(mapData, dNodes[0], error);
@@ -3438,7 +3451,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 y: s[1] * 0.4,
                 x: s[0] * 0.2,
                 children: [],
-                parent: null
+                parent: null,
+                state:'created'
             };
         }
 
@@ -3573,7 +3587,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 y: h * (0.15 * (1.34 + 1) + Math.random() * 0.1),
                 x: 90 + 30 * Math.floor(Math.random() * (Math.floor((w - 150) / 80))),
                 children: [],
-                parent: dNodes[pi]
+                parent: dNodes[pi],
+                state: 'created'
             };
             //TO fix issue with random positions of newly created nodes
             if (dNodes[pi].children.length > 0) {
@@ -3611,6 +3626,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                };            
             dNodes[pi].children.push(dNodes[uNix]);
             dNodes[uNix].childIndex = dNodes[pi].children.length
+            dNodes[uNix].cidxch = 'true'; // child index updated
             var currentNode = addNode_W(dNodes[uNix], !0, dNodes[pi]);
             if (currentNode != null) {
                 childNode = currentNode;
