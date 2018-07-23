@@ -2352,7 +2352,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 state:(d.state) ? d.state : null,
                 cidxch:(d.cidxch) ? d.cidxch : null // childindex changed
             });
-            if (d.type == 'testcases') c[c.length - 1].scr_name = d.parent.name;
+            if (d.type == 'testcases') c[c.length - 1].screenname = d.parent.name;   // **Impact check**
         }
         if (d.children && d.children.length > 0) d.children.forEach(function(t) {
             e = treeIterator(c, t, e);
