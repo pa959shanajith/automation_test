@@ -12,7 +12,9 @@ default_sub.on("message", function (channel, message) {
 	var socketchannel = channel.split('_')[1];
 	var sockets = require("./socket");
 	var mySocket;
-	if (socketchannel === "scheduling")
+	if (socketchannel === "notify")
+		mySocket = sockets.socketMapNotify[data.username];
+	else if (socketchannel === "scheduling")
 		mySocket = sockets.allSchedulingSocketsMap[data.username];
 	else
 		mySocket = sockets.allSocketsMap[data.username];
@@ -78,11 +80,19 @@ default_sub.on("message", function (channel, message) {
 		break;
 	
 	case "apgOpenFileInEditor":
-	mySocket.emit("apgOpenFileInEditor", data.editorName, data.filePath, data.lineNumber);
+		mySocket.emit("apgOpenFileInEditor", data.editorName, data.filePath, data.lineNumber);
 	break;
-		 
+
 	case "generateFlowGraph":
 		mySocket.emit("generateFlowGraph", data.version, data.path);
+		break;
+
+	case "getSocketInfo":
+		server_pub.publish("ICE2_" + data.username, JSON.stringify({"username": data.username, "value": mySocket.handshake.address}));
+		break;
+
+	case "killSession":
+		mySocket.emit("killSession", data.cmdBy);
 		break;
 
 	default:
@@ -104,7 +114,7 @@ server_pub.on("error",redisErrorHandler);
 module.exports.redisSubClient = default_sub;
 module.exports.redisPubICE = default_pub;
 module.exports.redisSubServer = server_sub;
-module.exports.redisPubServer = server_pub;
+//module.exports.redisPubServer = server_pub;
 
 module.exports.initListeners = function(mySocket){
 	var username = mySocket.handshake.query.username;

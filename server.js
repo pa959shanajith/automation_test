@@ -471,7 +471,7 @@ if (cluster.isMaster) {
         app.post('/assignProjects_ICE', admin.assignProjects_ICE);
         app.post('/getAssignedProjects_ICE', admin.getAssignedProjects_ICE);
         app.post('/getAvailablePlugins', admin.getAvailablePlugins);
-        app.post('/getSessionData', admin.getSessionData);
+        app.post('/manageSessionData', admin.manageSessionData);
         app.post('/manageUserDetails', admin.manageUserDetails);
         app.post('/getUserDetails', admin.getUserDetails);
         app.post('/testLDAPConnection', admin.testLDAPConnection);

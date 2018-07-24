@@ -20,29 +20,32 @@ var screenShotPath = uiConfig.storageConfig.screenShotPath;
 
 io.on('connection', function (socket) {
 	logger.info("Inside Socket connection");
-	var address = socket.handshake.query.username;
-	logger.info("Socket connecting address %s", address);
+	var address;
 	if (socket.request._query.check == "true") {
 		logger.info("Socket request from UI");
 		address = socket.request._query.username;
+		logger.info("Socket connecting address %s", address);
 		socketMapUI[address] = socket;
 		socket.emit("connectionAck", "Success");
 	} else if (socket.request._query.check == "notify") {
 		socket.on('key', function (data) {
 			if (typeof(data) == "string") {
 				address = Buffer.from(data, "base64").toString();
+				logger.info("Socket connecting address %s", address);
 				socketMapNotify[address] = socket;
+				redisServer.redisSubClient.subscribe('UI_notify_' + address, 1);
+				//Broadcast Message
+				var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/mindmap', '/p_Utility', '/p_Reports', 'p_Weboccular', '/neuronGraphs2D', '/p_ALM', '/p_APG'];
+				notificationMsg.to = broadcastTo;
+				notificationMsg.notifyMsg = 'Server Maintenance Scheduled';
+				// var soc = socketMapNotify[address];
+				// soc.emit("notify",notificationMsg);
 			}
 		});
-		//Broadcast Message
-		var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/mindmap', '/p_Utility', '/p_Reports', 'p_Weboccular', '/neuronGraphs2D', '/p_ALM', '/p_APG'];
-		notificationMsg.to = broadcastTo;
-		notificationMsg.notifyMsg = 'Server Maintenance Scheduled';
-		// var soc = socketMapNotify[address];
-		// soc.emit("notify",notificationMsg);
 	} else {
 		logger.info("Socket request from ICE");
 		address = socket.handshake.query.username;
+		logger.info("Socket connecting address %s", address);
 		var icesession = socket.handshake.query.icesession;
 		var inputs = {
 			"icesession": icesession,
@@ -96,9 +99,9 @@ io.on('connection', function (socket) {
 			address = socket.request._query.username;
 			logger.info("Disconnecting from UI socket: %s", address);
 		} else if (socket.request._query.check == "notify") {
-			// address = socket.handshake.query.username;
 			// logger.info("Disconnecting from Notification socket: %s", address);
-			// address = Buffer.from(socket.request._query.username, "base64").toString();
+			//address = Buffer.from(socket.request._query.username, "base64").toString();
+			//redisServer.redisSubClient.unsubscribe('UI_notify_' + address, 1);
 		} else {
 			var connect_flag = false;
 			logger.info("Inside ICE Socket disconnection");
