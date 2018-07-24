@@ -659,8 +659,6 @@ exports.saveData=function(req,res){
 				}
 			}
 			
-			//TO support task deletion
-			
 			if(flag==10){
 				var uidx=0,t,lts,rnmList=[];
 				deletednodes.forEach(function(t,i){
@@ -685,8 +683,220 @@ exports.saveData=function(req,res){
 					idDict[e.id]=(e.id_n)?e.id_n:uuidV4();
 					e.id=idDict[e.id];
 					t=e.task;
-					//Even on saving of data in assign tab where x rel and y cyc is chosen, where tasks for screen and testcases are originally assigned in a x rel and z cyc
-					//relation between the node and tasks were getting detached.
+					nameDict[e.id] = e.name;
+					var taskstatus='assigned';
+					// if(e.type=='modules_endtoend'){
+					// 	if(e.oid!=null){
+					// 		//qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS) DETACH DELETE r,o"});
+					// 		if(e.renamed) qList.push({"statement":"MATCH(n:MODULES_ENDTOEND{moduleID:'"+e.id+"'}) SET n.moduleName='"+e.name+"'"+",n.unique_property='["+e.name+','+prjId+"]'"});
+					// 	}
+					// 	else qList.push({"statement":"MERGE(n:MODULES_ENDTOEND{projectID:'"+prjId+"',moduleName:'"+e.name+"',moduleID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',moduleID_c:'"+e.id_c+"',unique_property:'["+e.name+','+prjId+"]'}) SET n.childIndex='"+e.childIndex+"'"});
+					// }
+					if(e.type=='modules'){
+						if(e.oid!=null){
+						//Added new queries to allow saving of incomplete structure
+							//qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS)-[s]->(p:SCREENS)-[t]->(q:TESTCASES) DETACH DELETE r,s,t,o,p,q"});
+							// qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS)-[s]->(p:SCREENS)-[t]->(q:TESTCASES) DETACH DELETE t,q"});
+							// qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS)-[s]->(p:SCREENS) DETACH DELETE s,p"});
+							// qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS) DETACH DELETE r,o"});
+
+							if(e.renamed) qList.push({"statement":"MATCH(n:MODULES{moduleID:'"+e.id+"'}) SET n.moduleName='"+e.name+"'"+",n.unique_property='["+e.name+','+prjId+"]'"});
+						}
+						else qList.push({"statement":"MERGE(n:MODULES{projectID:'"+prjId+"',moduleName:'"+e.name+"',moduleID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',moduleID_c:'"+e.id_c+"',unique_property:'["+e.name+','+prjId+"]'}) SET n.childIndex='"+e.childIndex+"'"}); 
+					}
+ 					else if(e.type=='scenarios' ){
+ 					//Part of Issue 1685, take projectid from the scenarios in case of end to end modules
+						var temp_prjID=prjId;
+						
+						// if (tab=='end_to_end'){
+						// 	temp_prjID=e.projectID;
+						// }
+						if(e.state == 'created'){
+							qList.push({"statement":"MERGE(n:TESTSCENARIOS{projectID:'"+temp_prjID+"',moduleID:'"+idDict[e.pid]+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',testScenarioID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});						
+							// if(tab!='end_to_end'){
+							// 	qList.push({"statement":"MATCH (a:MODULES{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
+							// }
+							// else{
+							qList.push({"statement":"MATCH (a:MODULES{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
+							// }	
+						}
+					}
+					else if(e.type=='screens'){
+						uidx++;lts=idDict[e.pid];
+						if(e.state == 'created'){
+							qList.push({"statement":"MERGE(n:SCREENS{projectID:'"+prjId+"',testScenarioID:'"+idDict[e.pid]+"',screenName:'"+e.name+"',screenID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',screenID_c:'"+e.id_c+"'})SET n.childIndex='"+e.childIndex+"'"});
+							qList.push({"statement":"MATCH (a:TESTSCENARIOS{testScenarioID:'"+idDict[e.pid]+"'}),(b:SCREENS{testScenarioID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FTSTS {id:'"+idDict[e.pid]+"'}]-(b)"});			  	
+						}
+					}
+					else if(e.type=='testcases' && e.state == 'created'){						
+						if(e.pid_c!='null' && e.pid_c!=undefined){
+							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',screenName:'"+nameDict[idDict[e.pid]] +"',projectID:'" + prjId + "',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.screenID_c='"+e.pid_c+"',n.childIndex='"+e.childIndex+"'"});
+						}else{
+							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',screenName:'"+nameDict[idDict[e.pid]] +"',projectID:'" + prjId + "',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
+						}
+							qList.push({"statement":"MATCH (a:SCREENS{screenID:'"+idDict[e.pid]+"'}),(b:TESTCASES{screenID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FSTTS {id:'"+idDict[e.pid]+"'}]-(b)"});				   
+					}
+				});
+				rnmList = getRenameQueries(data,prjId);
+				data.forEach(function(e,i){
+					var nodetype = {'modules':'moduleID','modules_endtoend':'moduleID','scenarios':'testScenarioID','screens':'screenID','testcases':'testCaseID'}
+					var ntype = e.type.toUpperCase();
+					if(ntype == 'SCENARIOS') ntype = 'TESTSCENARIOS';
+					if(e.cidxch){
+						qList.push({"statement":"MATCH (n:"+ntype+"{"+nodetype[e.type.toLowerCase()]+":'"+e.id+"'}) SET n.childIndex='"+e.childIndex+"'"});						
+					}
+				})				
+				// if(tab!='end_to_end'){
+					
+				qList.push({"statement":"MATCH (a) remove a.uid"});
+				qList=qList.concat(rnmList);
+				qList.push({"statement":"MATCH path=(n:MODULES{moduleID:'"+data[0].id+"'}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
+				qList.push({"statement":"MATCH path=(n:MODULES{moduleID:'"+data[0].id+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
+				// }else{
+					
+				// qList.push({"statement":"MATCH (a) remove a.uid"});
+				// qList=qList.concat(rnmList);
+				// qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{moduleID:'"+data[0].id+"'}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
+				// qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{moduleID:'"+data[0].id+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
+				// }
+
+
+				neo4jAPI.executeQueries(qList,function(status,result){
+					
+					if(status!=200){
+						//res.setHeader('Content-Type', 'text');
+						logger.debug(result[0]);
+						logger.error('Error occured in saveData Query');
+						result=JSON.stringify(result)
+						if(result.indexOf('Schema.ConstraintValidationFailed')>-1){
+							result='DuplicateModules';
+						}else{
+							result='fail';
+						}
+						res.status(status).send(result);
+					} 
+					else{
+						res.setHeader('Content-Type', 'application/json');
+						var k=0,rIndex,lbl,neoIdDict={};
+						idDict={};
+
+						var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"projectID":"projectID","childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c","taskexists":"taskexists"},"testcases":{"projectID":"projectID","childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c","taskexists":"taskexists"},"tasks":{"taskID":"id_n","task":"t","batchName":"bn","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","re_estimation":"re_estimation","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc","cx":"cx"}};
+						var jsonData=result;
+
+						var new_res=jsonData[jsonData.length-1].data;
+						if(new_res.length==0){
+							new_res=jsonData[jsonData.length-2].data;
+						}
+						new_res.forEach(function(row){
+							row.graph.nodes.forEach(function(n){
+								if (idDict[n.id] === undefined) {
+									lbl=n.labels[0].toLowerCase();
+									if(lbl=='testscenarios') lbl='scenarios';
+									for (var attrs in n.properties){
+										if(attrDict[lbl][attrs] !== undefined) n[attrDict[lbl][attrs]]=n.properties[attrs];
+										delete n.properties[attrs];
+									}
+									if(lbl=="tasks") nData.push({id:n.id_n,oid:n.id,task:n.t,batchName:n.bn,assignedTo:n.at,reviewer:n.rw,startDate:n.sd,endDate:n.ed,re_estimation:n.re_estimation,release:n.re,cycle:n.cy,details:n.det,nodeID:n.pid,parent:n.anc.slice(1,-1).split(','),cx:n.cx});
+									else{
+										if(lbl=="modules" || lbl=="modules_endtoend") n.childIndex=0;
+										nData.push({projectID:n.projectID,childIndex:n.childIndex,id:n.id,"type":lbl,name:n.name,id_n:n.id_n,pid_n:n.pid_n,id_c:n.id_c,children:[],task:null});
+									}
+									if(lbl=="modules" || lbl=="modules_endtoend") rIndex=k;
+									idDict[n.id]=k;neoIdDict[n.id_n]=k;
+									k++;
+								}
+							});
+							row.graph.relationships.forEach(function(r){
+								var srcIndex=idDict[r.startNode.toString()];
+								var tgtIndex=idDict[r.endNode.toString()];
+								//if(nData[tgtIndex].children===undefined) nData[srcIndex].task=nData[tgtIndex];
+								//Part of Issue 1685, after saving of data proper task should be written since multiple tasks are conencte dto single node
+								if(nData[tgtIndex].children===undefined){
+									if((selectedTab=='tabAssign'&& nData[tgtIndex].release==relId && nData[tgtIndex].cycle==cycId)||tab=='tabCreate'||tab=='endToend'){
+										nData[srcIndex].task=nData[tgtIndex];
+									}else if(nData[srcIndex].type=='testcases' || nData[srcIndex].type=='screens'){
+										nData[srcIndex].taskexists=nData[tgtIndex];
+									}
+										
+								}
+								else if(nData[srcIndex].children.indexOf(nData[tgtIndex])==-1){
+									nData[srcIndex].children.push(nData[tgtIndex]);
+									if(nData[tgtIndex].childIndex==undefined) nData[tgtIndex].childIndex=nData[srcIndex].children.length;
+
+								}
+							});
+						});
+						nData.forEach(function(e){
+							if(e.pid_n){
+								if(neoIdDict[e.pid_n]!==undefined) e.pid_n=nData[neoIdDict[e.pid_n]].id;
+								else e.pid_n=null;
+							}
+						});
+						res.status(status).send(nData[rIndex]);
+					}
+				});
+			}			
+			else if(flag==20){
+				var uidx=0,rIndex;
+				var idn_v_idc = {};
+				// var relId=inputs.relId;
+				// var cycId=inputs.cycId;
+
+				var qObj={"projectId":prjId,"releaseId":relId,"cycleId":cycId,"appType":"Web","testsuiteDetails":[]};
+				var nObj=[],tsList=[];
+				data.forEach(function(e,i){
+					if(e.type=="modules") rIndex=uidx;
+					if(e.task!=null) delete e.task.oid;
+					idn_v_idc[e.id_n] = e.id_c;
+					nObj.push({id:e.id_n,id_c:e.id_c,name:e.name,task:e.task,children:[]});
+					if(e.type=="testcases") nObj[nObj.length-1]['pid_c']=e.pid_c;
+					if(idDict[e.pid]!==undefined) nObj[idDict[e.pid]].children.push(nObj[uidx]);
+					idDict[e.id]=uidx++;
+				});
+				nObj[rIndex].children.forEach(function(ts,i){
+					var sList=[];
+					ts.children.forEach(function(s,i){
+						var tcList=[];
+						s.children.forEach(function(tc,i){
+							tcList.push({"screenID_c":tc.pid_c,"testcaseId":tc.id,"testcaseId_c":tc.id_c,"testcaseName":tc.name,"task":tc.task});
+						});
+						sList.push({"screenId":s.id,"screenId_c":s.id_c,"screenName":s.name,"task":s.task,"testcaseDetails":tcList});
+					});
+					tsList.push({"testscenarioId":ts.id,"testscenarioId_c":ts.id_c,"testscenarioName":ts.name,"tasks":ts.task,"screenDetails":sList});
+				});
+				qObj.testsuiteDetails=[{"testsuiteId":nObj[rIndex].id,"testsuiteId_c":nObj[rIndex].id_c,"testsuiteName":nObj[rIndex].name,"task":nObj[rIndex].task,"testscenarioDetails":tsList}];
+				qObj.userName=user;
+
+				create_ice.createStructure_Nineteen68(qObj,function(err,data){
+
+					if(err)
+					res.status(500).send(err);
+					else{
+						var module_type='modules';
+						var parsing_result=update_cassandraID(data,urlData,module_type,idn_v_idc);
+						neo4jAPI.executeQueries(parsing_result[0],function(status,result){
+							if(status!=200) res.status(status).send(result);
+							else res.status(200).send(parsing_result[1]);
+						});
+
+					}
+				
+					
+				});
+			}
+			else if(flag==30){	//Assign
+				removeTask.forEach(function(t,i){
+					//Issue 1685 Release and cycle Id filters are given for task to delete the task only from that release and cycle attached to that node
+					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]-(b:TASKS{release:'"+relId+"',cycle:'"+cycId+"'}) DETACH DELETE b"});
+				});		
+				data.forEach(function(e,i){
+					idxDict[e.id]=i; 
+				})
+
+				data.forEach(function(e,i){
+					idDict[e.id]=(e.id_n)?e.id_n:uuidV4();
+					e.id=idDict[e.id];
+					t=e.task;						
 					if((e.taskexists || e.task) && (e.type=='screens' || e.type=='testcases')){
 						if(e.task==null){
 							t=e.taskexists;
@@ -703,15 +913,9 @@ exports.saveData=function(req,res){
 					nameDict[e.id] = e.name;
 					var taskstatus='assigned';
 					if(e.type=='modules_endtoend'){
-						if(e.oid!=null){
-							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS) DETACH DELETE r,o"});
-							if(e.renamed) qList.push({"statement":"MATCH(n:MODULES_ENDTOEND{moduleID:'"+e.id+"'}) SET n.moduleName='"+e.name+"'"+",n.unique_property='["+e.name+','+prjId+"]'"});
-						}
-						else qList.push({"statement":"MERGE(n:MODULES_ENDTOEND{projectID:'"+prjId+"',moduleName:'"+e.name+"',moduleID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',moduleID_c:'"+e.id_c+"',unique_property:'["+e.name+','+prjId+"]'}) SET n.childIndex='"+e.childIndex+"'"});
-						if(t!=null && e.id_c !=null){
+						if(t!=null && e.id_c !=null && (t.tstatus=='created' ||t.tstatus=='updated')){
 							t.parent=[prjId].concat(e.id_c);
 							t.id=(t.id!=null)?t.id:uuidV4();
-
 							if(t.oid!=null){
 							//Part of Issue 1685, before relID and cycId from create tab was undefined
 								if (t.updatedParent != undefined){
@@ -726,17 +930,7 @@ exports.saveData=function(req,res){
 						}
 					}
 					else if(e.type=='modules'){
-						if(e.oid!=null){
-						//Added new queries to allow saving of incomplete structure
-							//qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS)-[s]->(p:SCREENS)-[t]->(q:TESTCASES) DETACH DELETE r,s,t,o,p,q"});
-							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS)-[s]->(p:SCREENS)-[t]->(q:TESTCASES) DETACH DELETE t,q"});
-							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS)-[s]->(p:SCREENS) DETACH DELETE s,p"});
-							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS) DETACH DELETE r,o"});
-
-							if(e.renamed) qList.push({"statement":"MATCH(n:MODULES{moduleID:'"+e.id+"'}) SET n.moduleName='"+e.name+"'"+",n.unique_property='["+e.name+','+prjId+"]'"});
-						}
-						else qList.push({"statement":"MERGE(n:MODULES{projectID:'"+prjId+"',moduleName:'"+e.name+"',moduleID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',moduleID_c:'"+e.id_c+"',unique_property:'["+e.name+','+prjId+"]'}) SET n.childIndex='"+e.childIndex+"'"});
-						if(t!=null && e.id_c !=null){
+						if(t!=null && e.id_c !=null && (t.tstatus=='created' ||t.tstatus=='updated')){
 							t.parent=[prjId].concat(e.id_c);
 							t.id=(t.id!=null)?t.id:uuidV4();
 
@@ -759,18 +953,9 @@ exports.saveData=function(req,res){
 						if (tab=='end_to_end'){
 							temp_prjID=e.projectID;
 						}
-						qList.push({"statement":"MERGE(n:TESTSCENARIOS{projectID:'"+temp_prjID+"',moduleID:'"+idDict[e.pid]+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',testScenarioID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});						
-						
-						// Yashi
-						//Relating scenario with moduleId
-						if(tab!='end_to_end'){
-							qList.push({"statement":"MATCH (a:MODULES{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
-						}
-						else{
-							qList.push({"statement":"MATCH (a:MODULES_ENDTOEND{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
-						}			   
+
 						//Supporting task assignment for scenarios
-						if(t!=null && e.id_c!=null){
+						if(t!=null && e.id_c!=null && (t.tstatus=='created' ||t.tstatus=='updated')){
 							t.parent=[temp_prjID].concat(e.pid_c,e.id_c);
 							t.id=(t.id!=null)?t.id:uuidV4();
 							if(t.oid!=null){
@@ -783,27 +968,22 @@ exports.saveData=function(req,res){
 							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',re_estimation:'"+t.re_estimation+"',release:'"+relId+"',cycle:'"+cycId+"',details:'"+t.details+"',parent:'["+t.parent+"]',cx:'"+t.cx+"'})"});
 							qList.push({"statement":"MATCH (a:TESTSCENARIOS{projectID:'"+temp_prjID+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:a.testScenarioID}]-(b)"});
 						}
-						//else if(e.id_n==null){ // In case added first time to end to end then connect to all task if exist
-													
-						//}						
-						//qList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioID:'"+e.id+"'}) SET n.testScenarioName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
-
 						if(tab!='end_to_end'){
 							qList.push({"statement":"MATCH (m:MODULES)-[mt]-(c:TESTSCENARIOS{projectID:'"+temp_prjID+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"'}) ,(a:TASKS) where not c.testScenarioID_c='null' and a.parent=~('.*'+m.moduleID_c+','+c.testScenarioID_c+']') MERGE (c)-[rel:FNTT {id:c.testScenarioID}]-(a)"});	
 						}
 						else{
 							qList.push({"statement":"MATCH (m:MODULES_ENDTOEND)-[mt]-(c:TESTSCENARIOS{projectID:'"+temp_prjID+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"'}) ,(a:TASKS) where not c.testScenarioID_c='null' and a.parent=~('.*'+m.moduleID_c+','+c.testScenarioID_c+']') MERGE (c)-[rel:FNTT {id:c.testScenarioID}]-(a)"});
-						}
+						}						
+						//else if(e.id_n==null){ // In case added first time to end to end then connect to all task if exist
+													
+						//}						
+						//qList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioID:'"+e.id+"'}) SET n.testScenarioName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
 
 					}
 					else if(e.type=='screens'){
 						uidx++;lts=idDict[e.pid];
 						
-						qList.push({"statement":"MERGE(n:SCREENS{projectID:'"+prjId+"',testScenarioID:'"+idDict[e.pid]+"',screenName:'"+e.name+"',screenID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',screenID_c:'"+e.id_c+"'})SET n.childIndex='"+e.childIndex+"'"});
-						//Relating scenario with screens
-						//Yashi
-							qList.push({"statement":"MATCH (a:TESTSCENARIOS{testScenarioID:'"+idDict[e.pid]+"'}),(b:SCREENS{testScenarioID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FTSTS {id:'"+idDict[e.pid]+"'}]-(b)"});			  
-						if(t!=null && e.id_c!=null){
+						if(t!=null && e.id_c!=null && (t.tstatus=='created' ||t.tstatus=='updated')){
 							t.id=(t.id!=null)?t.id:uuidV4();
 							if(t.oid!=null){
 							//Part of Issue 1685
@@ -821,26 +1001,13 @@ exports.saveData=function(req,res){
 								t.parent=[prjId].concat(t.parent);
 								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',re_estimation:'"+t.re_estimation+"',details:'"+t.details+"',parent:'["+t.parent+"]',uid:'"+uidx+"',cx:'"+t.cx+"'})"});
 							}		 
-							else if(t.copied){
-								qList.push({"statement":"MATCH (a:SCREENS{screenID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'"+data[idxDict[t.copiedidx]].task.id+"'}) MERGE (a)-[r:FNTT {id:a.screenID}]-(b)"});								
-							}
 							qList.push({"statement":"MATCH (a:SCREENS{screenID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:a.screenID}]-(b)"});
 						}
 					}
 					else if(e.type=='testcases'){
-						var screen_data='';
 						var screenid_c='null';
-						
-						if(e.pid_c!='null' && e.pid_c!=undefined){
-							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',screenName:'"+nameDict[idDict[e.pid]] +"',projectID:'" + prjId + "',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.screenID_c='"+e.pid_c+"',n.childIndex='"+e.childIndex+"'"});
-						}else{
-							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',screenName:'"+nameDict[idDict[e.pid]] +"',projectID:'" + prjId + "',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
-						}
 
-						//Relating testcases with screens
-						//Yashi
-							qList.push({"statement":"MATCH (a:SCREENS{screenID:'"+idDict[e.pid]+"'}),(b:TESTCASES{screenID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FSTTS {id:'"+idDict[e.pid]+"'}]-(b)"});				   
-						if(t!=null  && e.id_c!=null){
+						if(t!=null  && e.id_c!=null && (t.tstatus=='created' ||t.tstatus=='updated')){
 							t.id=(t.id!=null)?t.id:uuidV4();
 							//var parent=[prjId].concat(t.parent);
 							if(t.oid!=null){
@@ -858,25 +1025,22 @@ exports.saveData=function(req,res){
 								t.parent=[prjId].concat(t.parent);
 								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',re_estimation:'"+t.re_estimation+"',details:'"+t.details+"',parent:'["+t.parent+"]',uid:'"+uidx+"',cx:'"+t.cx+"'})"});
 							}
-							else if(t.copied){
-								qList.push({"statement":"MATCH (a:TESTCASES{testCaseID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'"+data[idxDict[t.copiedidx]].task.id+"'}) MERGE (a)-[r:FNTT {id:a.testCaseID}]-(b)"});								   
-							}
+
 								//In case of reuse
 							qList.push({"statement":"MATCH (a:TESTCASES{testCaseID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:a.testCaseID}]-(b)"});								   
 						}
 					}
 				});
-				rnmList = getRenameQueries(data,prjId);
 				if(tab!='end_to_end'){
 					
 					qList.push({"statement":"MATCH (a) remove a.uid"});
-					qList=qList.concat(rnmList);
+					//qList=qList.concat(rnmList);
 					qList.push({"statement":"MATCH path=(n:MODULES{moduleID:'"+data[0].id+"'}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
 					qList.push({"statement":"MATCH path=(n:MODULES{moduleID:'"+data[0].id+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
 				}else{
 					
 					qList.push({"statement":"MATCH (a) remove a.uid"});
-					qList=qList.concat(rnmList);
+					//qList=qList.concat(rnmList);
 					qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{moduleID:'"+data[0].id+"'}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
 					qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{moduleID:'"+data[0].id+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
 				}
@@ -956,52 +1120,7 @@ exports.saveData=function(req,res){
 						res.status(status).send(nData[rIndex]);
 					}
 				});
-			}
-			else if(flag==20){
-				var uidx=0,rIndex;
-				// var relId=inputs.relId;
-				// var cycId=inputs.cycId;
-
-				var qObj={"projectId":prjId,"releaseId":relId,"cycleId":cycId,"appType":"Web","testsuiteDetails":[]};
-				var nObj=[],tsList=[];
-				data.forEach(function(e,i){
-					if(e.type=="modules") rIndex=uidx;
-					if(e.task!=null) delete e.task.oid;
-					nObj.push({id:e.id_n,id_c:e.id_c,name:e.name,task:e.task,children:[]});
-					if(e.type=="testcases") nObj[nObj.length-1]['pid_c']=e.pid_c;
-					if(idDict[e.pid]!==undefined) nObj[idDict[e.pid]].children.push(nObj[uidx]);
-					idDict[e.id]=uidx++;
-				});
-				nObj[rIndex].children.forEach(function(ts,i){
-					var sList=[];
-					ts.children.forEach(function(s,i){
-						var tcList=[];
-						s.children.forEach(function(tc,i){
-							tcList.push({"screenID_c":tc.pid_c,"testcaseId":tc.id,"testcaseId_c":tc.id_c,"testcaseName":tc.name,"task":tc.task});
-						});
-						sList.push({"screenId":s.id,"screenId_c":s.id_c,"screenName":s.name,"task":s.task,"testcaseDetails":tcList});
-					});
-					tsList.push({"testscenarioId":ts.id,"testscenarioId_c":ts.id_c,"testscenarioName":ts.name,"tasks":ts.task,"screenDetails":sList});
-				});
-				qObj.testsuiteDetails=[{"testsuiteId":nObj[rIndex].id,"testsuiteId_c":nObj[rIndex].id_c,"testsuiteName":nObj[rIndex].name,"task":nObj[rIndex].task,"testscenarioDetails":tsList}];
-				qObj.userName=user;
-
-				create_ice.createStructure_Nineteen68(qObj,function(err,data){
-
-					if(err)
-					res.status(500).send(err);
-					else{
-						var module_type='modules';
-						var parsing_result=update_cassandraID(data,urlData,module_type);
-						neo4jAPI.executeQueries(parsing_result[0],function(status,result){
-							if(status!=200) res.status(status).send(result);
-							else res.status(200).send(parsing_result[1]);
-						});
-
-					}
 				
-					
-				});
 			}
 	}else{
 		logger.error("Invalid Session");
@@ -1255,7 +1374,7 @@ function getQueries(qdata){
 	return qList_reuse;
 }
 
-var update_cassandraID = function(d,urlData,module_type) {
+var update_cassandraID = function(d,urlData,module_type,idn_v_idc = null) {
 	logger.info("Inside function: update_cassandraID ");
 	var data = d;
 	var qList_new=[];
@@ -1270,10 +1389,12 @@ var update_cassandraID = function(d,urlData,module_type) {
 		var moduleID_c_json=e.testsuiteId_c;
 		//var modulename_json=e.testsuiteName;
 		var testscenarioDetails_json=e.testscenarioDetails;
-		if (module_type=='modules'){
-			qList_new.push({"statement":"MATCH (a:MODULES) WHERE a.moduleName='"+modulename_json+"' and a.projectID='"+data.projectId+"' SET a.moduleID_c='"+moduleID_c_json+"'"});
-		}else
-		qList_new.push({"statement":"MATCH (a:MODULES_ENDTOEND) WHERE a.moduleName='"+modulename_json+"' and a.projectID='"+data.projectId+"' SET a.moduleID_c='"+moduleID_c_json+"'"});
+		if(!(idn_v_idc && idn_v_idc[e.testsuiteId] == moduleID_c_json)){
+			if (module_type=='modules'){
+				qList_new.push({"statement":"MATCH (a:MODULES) WHERE a.moduleName='"+modulename_json+"' and a.projectID='"+data.projectId+"' SET a.moduleID_c='"+moduleID_c_json+"'"});
+			}else
+			qList_new.push({"statement":"MATCH (a:MODULES_ENDTOEND) WHERE a.moduleName='"+modulename_json+"' and a.projectID='"+data.projectId+"' SET a.moduleID_c='"+moduleID_c_json+"'"});	
+		}
 		cassandraId_dict[moduleID_json]=moduleID_c_json;
 		//updateJson.push(cassandraId_dict);
 			testscenarioDetails_json.forEach(function(sc,i){
@@ -1283,12 +1404,13 @@ var update_cassandraID = function(d,urlData,module_type) {
 				//var modulename_json=sc.testsuiteName;
 				var screenDetails_json=sc.screenDetails;
 				//console.log(testscenarioId_json,testscenarioId_c_json);
-				if (module_type=='modules')
-					qList_new.push({"statement":"MATCH (a:TESTSCENARIOS) WHERE a.testScenarioName='"+testscenarioname_json+"' and a.projectID='"+data.projectId+"' SET a.testScenarioID_c='"+testscenarioId_c_json+"'"});
-				else{
-					qList_new.push({"statement":"MATCH (a:TESTSCENARIOS) WHERE a.testScenarioName='"+testscenarioname_json+"' and a.projectID='"+sc.scenario_PrjId+"' SET a.testScenarioID_c='"+testscenarioId_c_json+"'"});
+				if(!(idn_v_idc && idn_v_idc[sc.testscenarioId] == testscenarioId_c_json)){
+					if (module_type=='modules')
+						qList_new.push({"statement":"MATCH (a:TESTSCENARIOS) WHERE a.testScenarioName='"+testscenarioname_json+"' and a.projectID='"+data.projectId+"' SET a.testScenarioID_c='"+testscenarioId_c_json+"'"});
+					else{
+						qList_new.push({"statement":"MATCH (a:TESTSCENARIOS) WHERE a.testScenarioName='"+testscenarioname_json+"' and a.projectID='"+sc.scenario_PrjId+"' SET a.testScenarioID_c='"+testscenarioId_c_json+"'"});
+					}
 				}
-
 				cassandraId_dict[testscenarioId_json]=testscenarioId_c_json;
 				screenDetails_json.forEach(function(scr,i){
 					var screenId_json=scr.screenId;
@@ -1296,15 +1418,17 @@ var update_cassandraID = function(d,urlData,module_type) {
 					var screenname_json=scr.screenName;
 					//var modulename_json=sc.testsuiteName;
 					var testcaseDetails_json=scr.testcaseDetails;
-					qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenName='"+screenname_json+"' and a.projectID='"+data.projectId+"' SET a.screenID_c='"+screenId_c_json+"'"});
-					//Screen Task update in case of reuse
-					qList_new.push({"statement":"MATCH p=(a:SCREENS{screenID_c:'"+screenId_c_json+"'})-[r]-(b:TASKS),(q:SCREENS{screenID_c:'"+screenId_c_json+"'}) MERGE (q)-[s:FNTT{id:q.screenID}]-(b)"});
-					//qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenName='"+screenname_json+"' and a.projectID='"+data.projectId+"' SET a.screenID_c='"+screenId_c_json+"'"});
-					//updateJson.push({screenId_json:screenId_c_json});
+					if(!(idn_v_idc && idn_v_idc[scr.screenId] == screenId_c_json)){
+						qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenName='"+screenname_json+"' and a.projectID='"+data.projectId+"' SET a.screenID_c='"+screenId_c_json+"'"});
+						//Screen Task update in case of reuse
+						qList_new.push({"statement":"MATCH p=(a:SCREENS{screenID_c:'"+screenId_c_json+"'})-[r]-(b:TASKS),(q:SCREENS{screenID_c:'"+screenId_c_json+"'}) MERGE (q)-[s:FNTT{id:q.screenID}]-(b)"});
+						//qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenName='"+screenname_json+"' and a.projectID='"+data.projectId+"' SET a.screenID_c='"+screenId_c_json+"'"});
+						//updateJson.push({screenId_json:screenId_c_json});	
+					}					
 					cassandraId_dict[screenId_json]=screenId_c_json;
 				//updateJson.push(cassandraId_dict);
 
-						testcaseDetails_json.forEach(function(tc,i){
+					testcaseDetails_json.forEach(function(tc,i){
 						var testcaseId_json=tc.testcaseId;
 						var testcaseId_c_json=tc.testcaseId_c;
 						var testcaseName_json=tc.testcaseName;
@@ -1312,13 +1436,12 @@ var update_cassandraID = function(d,urlData,module_type) {
 						//console.log('testcaseId_json',testcaseId_c_json);
 						if(screenId_C_neo == 'null' || screenId_C_neo == undefined){
 							qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID='"+screenId_json+"' SET a.screenID_c='"+screenId_c_json+"'"});
-							qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID_c='"+screenId_c_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
-						}else{
-							qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID_c='"+screenId_c_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
 						}
-						//TestCase Task update in case of reuse
-						qList_new.push({"statement":"MATCH (a:SCREENS{screenID_c:'"+screenId_c_json+"'})-[r]-(b:TESTCASES{testCaseID_c:'"+testcaseId_c_json+"'})-[s]-(c:TASKS) ,(d:TESTCASES{testCaseID_c:'"+testcaseId_c_json+"'}) MERGE (d)-[t:FNTT{id:d.testCaseID}]-(c)"});
-
+						if(!(idn_v_idc && idn_v_idc[tc.testcaseId] == testcaseId_c_json)){
+							qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID_c='"+screenId_c_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
+							//TestCase Task update in case of reuse
+							qList_new.push({"statement":"MATCH (a:SCREENS{screenID_c:'"+screenId_c_json+"'})-[r]-(b:TESTCASES{testCaseID_c:'"+testcaseId_c_json+"'})-[s]-(c:TASKS) ,(d:TESTCASES{testCaseID_c:'"+testcaseId_c_json+"'}) MERGE (d)-[t:FNTT{id:d.testCaseID}]-(c)"});
+						}
 						cassandraId_dict[testcaseId_json]=testcaseId_c_json;
 					});
 				});
