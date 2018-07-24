@@ -717,7 +717,7 @@ exports.saveData=function(req,res){
 							// 	qList.push({"statement":"MATCH (a:MODULES{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
 							// }
 							// else{
-							qList.push({"statement":"MATCH (a:MODULES_ENDTOEND{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
+							qList.push({"statement":"MATCH (a:MODULES{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
 							// }	
 						}
 					}
@@ -838,6 +838,7 @@ exports.saveData=function(req,res){
 			}			
 			else if(flag==20){
 				var uidx=0,rIndex;
+				var idn_v_idc = {};
 				// var relId=inputs.relId;
 				// var cycId=inputs.cycId;
 
@@ -846,6 +847,7 @@ exports.saveData=function(req,res){
 				data.forEach(function(e,i){
 					if(e.type=="modules") rIndex=uidx;
 					if(e.task!=null) delete e.task.oid;
+					idn_v_idc[e.id_n] = e.id_c;
 					nObj.push({id:e.id_n,id_c:e.id_c,name:e.name,task:e.task,children:[]});
 					if(e.type=="testcases") nObj[nObj.length-1]['pid_c']=e.pid_c;
 					if(idDict[e.pid]!==undefined) nObj[idDict[e.pid]].children.push(nObj[uidx]);
@@ -871,7 +873,7 @@ exports.saveData=function(req,res){
 					res.status(500).send(err);
 					else{
 						var module_type='modules';
-						var parsing_result=update_cassandraID(data,urlData,module_type);
+						var parsing_result=update_cassandraID(data,urlData,module_type,idn_v_idc);
 						neo4jAPI.executeQueries(parsing_result[0],function(status,result){
 							if(status!=200) res.status(status).send(result);
 							else res.status(200).send(parsing_result[1]);
@@ -882,7 +884,7 @@ exports.saveData=function(req,res){
 					
 				});
 			}
-			else if(flag==30){
+			else if(flag==30){	//Assign
 				removeTask.forEach(function(t,i){
 					//Issue 1685 Release and cycle Id filters are given for task to delete the task only from that release and cycle attached to that node
 					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]-(b:TASKS{release:'"+relId+"',cycle:'"+cycId+"'}) DETACH DELETE b"});
@@ -965,13 +967,13 @@ exports.saveData=function(req,res){
 							}
 							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',re_estimation:'"+t.re_estimation+"',release:'"+relId+"',cycle:'"+cycId+"',details:'"+t.details+"',parent:'["+t.parent+"]',cx:'"+t.cx+"'})"});
 							qList.push({"statement":"MATCH (a:TESTSCENARIOS{projectID:'"+temp_prjID+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:a.testScenarioID}]-(b)"});
-							if(tab!='end_to_end'){
-								qList.push({"statement":"MATCH (m:MODULES)-[mt]-(c:TESTSCENARIOS{projectID:'"+temp_prjID+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"'}) ,(a:TASKS) where not c.testScenarioID_c='null' and a.parent=~('.*'+m.moduleID_c+','+c.testScenarioID_c+']') MERGE (c)-[rel:FNTT {id:c.testScenarioID}]-(a)"});	
-							}
-							else{
-								qList.push({"statement":"MATCH (m:MODULES_ENDTOEND)-[mt]-(c:TESTSCENARIOS{projectID:'"+temp_prjID+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"'}) ,(a:TASKS) where not c.testScenarioID_c='null' and a.parent=~('.*'+m.moduleID_c+','+c.testScenarioID_c+']') MERGE (c)-[rel:FNTT {id:c.testScenarioID}]-(a)"});
-							}
 						}
+						if(tab!='end_to_end'){
+							qList.push({"statement":"MATCH (m:MODULES)-[mt]-(c:TESTSCENARIOS{projectID:'"+temp_prjID+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"'}) ,(a:TASKS) where not c.testScenarioID_c='null' and a.parent=~('.*'+m.moduleID_c+','+c.testScenarioID_c+']') MERGE (c)-[rel:FNTT {id:c.testScenarioID}]-(a)"});	
+						}
+						else{
+							qList.push({"statement":"MATCH (m:MODULES_ENDTOEND)-[mt]-(c:TESTSCENARIOS{projectID:'"+temp_prjID+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"'}) ,(a:TASKS) where not c.testScenarioID_c='null' and a.parent=~('.*'+m.moduleID_c+','+c.testScenarioID_c+']') MERGE (c)-[rel:FNTT {id:c.testScenarioID}]-(a)"});
+						}						
 						//else if(e.id_n==null){ // In case added first time to end to end then connect to all task if exist
 													
 						//}						
@@ -1372,7 +1374,7 @@ function getQueries(qdata){
 	return qList_reuse;
 }
 
-var update_cassandraID = function(d,urlData,module_type) {
+var update_cassandraID = function(d,urlData,module_type,idn_v_idc = null) {
 	logger.info("Inside function: update_cassandraID ");
 	var data = d;
 	var qList_new=[];
@@ -1387,10 +1389,12 @@ var update_cassandraID = function(d,urlData,module_type) {
 		var moduleID_c_json=e.testsuiteId_c;
 		//var modulename_json=e.testsuiteName;
 		var testscenarioDetails_json=e.testscenarioDetails;
-		if (module_type=='modules'){
-			qList_new.push({"statement":"MATCH (a:MODULES) WHERE a.moduleName='"+modulename_json+"' and a.projectID='"+data.projectId+"' SET a.moduleID_c='"+moduleID_c_json+"'"});
-		}else
-		qList_new.push({"statement":"MATCH (a:MODULES_ENDTOEND) WHERE a.moduleName='"+modulename_json+"' and a.projectID='"+data.projectId+"' SET a.moduleID_c='"+moduleID_c_json+"'"});
+		if(!(idn_v_idc && idn_v_idc[e.testsuiteId] == moduleID_c_json)){
+			if (module_type=='modules'){
+				qList_new.push({"statement":"MATCH (a:MODULES) WHERE a.moduleName='"+modulename_json+"' and a.projectID='"+data.projectId+"' SET a.moduleID_c='"+moduleID_c_json+"'"});
+			}else
+			qList_new.push({"statement":"MATCH (a:MODULES_ENDTOEND) WHERE a.moduleName='"+modulename_json+"' and a.projectID='"+data.projectId+"' SET a.moduleID_c='"+moduleID_c_json+"'"});	
+		}
 		cassandraId_dict[moduleID_json]=moduleID_c_json;
 		//updateJson.push(cassandraId_dict);
 			testscenarioDetails_json.forEach(function(sc,i){
@@ -1400,12 +1404,13 @@ var update_cassandraID = function(d,urlData,module_type) {
 				//var modulename_json=sc.testsuiteName;
 				var screenDetails_json=sc.screenDetails;
 				//console.log(testscenarioId_json,testscenarioId_c_json);
-				if (module_type=='modules')
-					qList_new.push({"statement":"MATCH (a:TESTSCENARIOS) WHERE a.testScenarioName='"+testscenarioname_json+"' and a.projectID='"+data.projectId+"' SET a.testScenarioID_c='"+testscenarioId_c_json+"'"});
-				else{
-					qList_new.push({"statement":"MATCH (a:TESTSCENARIOS) WHERE a.testScenarioName='"+testscenarioname_json+"' and a.projectID='"+sc.scenario_PrjId+"' SET a.testScenarioID_c='"+testscenarioId_c_json+"'"});
+				if(!(idn_v_idc && idn_v_idc[sc.testscenarioId] == testscenarioId_c_json)){
+					if (module_type=='modules')
+						qList_new.push({"statement":"MATCH (a:TESTSCENARIOS) WHERE a.testScenarioName='"+testscenarioname_json+"' and a.projectID='"+data.projectId+"' SET a.testScenarioID_c='"+testscenarioId_c_json+"'"});
+					else{
+						qList_new.push({"statement":"MATCH (a:TESTSCENARIOS) WHERE a.testScenarioName='"+testscenarioname_json+"' and a.projectID='"+sc.scenario_PrjId+"' SET a.testScenarioID_c='"+testscenarioId_c_json+"'"});
+					}
 				}
-
 				cassandraId_dict[testscenarioId_json]=testscenarioId_c_json;
 				screenDetails_json.forEach(function(scr,i){
 					var screenId_json=scr.screenId;
@@ -1413,15 +1418,17 @@ var update_cassandraID = function(d,urlData,module_type) {
 					var screenname_json=scr.screenName;
 					//var modulename_json=sc.testsuiteName;
 					var testcaseDetails_json=scr.testcaseDetails;
-					qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenName='"+screenname_json+"' and a.projectID='"+data.projectId+"' SET a.screenID_c='"+screenId_c_json+"'"});
-					//Screen Task update in case of reuse
-					qList_new.push({"statement":"MATCH p=(a:SCREENS{screenID_c:'"+screenId_c_json+"'})-[r]-(b:TASKS),(q:SCREENS{screenID_c:'"+screenId_c_json+"'}) MERGE (q)-[s:FNTT{id:q.screenID}]-(b)"});
-					//qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenName='"+screenname_json+"' and a.projectID='"+data.projectId+"' SET a.screenID_c='"+screenId_c_json+"'"});
-					//updateJson.push({screenId_json:screenId_c_json});
+					if(!(idn_v_idc && idn_v_idc[scr.screenId] == screenId_c_json)){
+						qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenName='"+screenname_json+"' and a.projectID='"+data.projectId+"' SET a.screenID_c='"+screenId_c_json+"'"});
+						//Screen Task update in case of reuse
+						qList_new.push({"statement":"MATCH p=(a:SCREENS{screenID_c:'"+screenId_c_json+"'})-[r]-(b:TASKS),(q:SCREENS{screenID_c:'"+screenId_c_json+"'}) MERGE (q)-[s:FNTT{id:q.screenID}]-(b)"});
+						//qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenName='"+screenname_json+"' and a.projectID='"+data.projectId+"' SET a.screenID_c='"+screenId_c_json+"'"});
+						//updateJson.push({screenId_json:screenId_c_json});	
+					}					
 					cassandraId_dict[screenId_json]=screenId_c_json;
 				//updateJson.push(cassandraId_dict);
 
-						testcaseDetails_json.forEach(function(tc,i){
+					testcaseDetails_json.forEach(function(tc,i){
 						var testcaseId_json=tc.testcaseId;
 						var testcaseId_c_json=tc.testcaseId_c;
 						var testcaseName_json=tc.testcaseName;
@@ -1429,13 +1436,12 @@ var update_cassandraID = function(d,urlData,module_type) {
 						//console.log('testcaseId_json',testcaseId_c_json);
 						if(screenId_C_neo == 'null' || screenId_C_neo == undefined){
 							qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID='"+screenId_json+"' SET a.screenID_c='"+screenId_c_json+"'"});
-							qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID_c='"+screenId_c_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
-						}else{
-							qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID_c='"+screenId_c_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
 						}
-						//TestCase Task update in case of reuse
-						qList_new.push({"statement":"MATCH (a:SCREENS{screenID_c:'"+screenId_c_json+"'})-[r]-(b:TESTCASES{testCaseID_c:'"+testcaseId_c_json+"'})-[s]-(c:TASKS) ,(d:TESTCASES{testCaseID_c:'"+testcaseId_c_json+"'}) MERGE (d)-[t:FNTT{id:d.testCaseID}]-(c)"});
-
+						if(!(idn_v_idc && idn_v_idc[tc.testcaseId] == testcaseId_c_json)){
+							qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID_c='"+screenId_c_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
+							//TestCase Task update in case of reuse
+							qList_new.push({"statement":"MATCH (a:SCREENS{screenID_c:'"+screenId_c_json+"'})-[r]-(b:TESTCASES{testCaseID_c:'"+testcaseId_c_json+"'})-[s]-(c:TASKS) ,(d:TESTCASES{testCaseID_c:'"+testcaseId_c_json+"'}) MERGE (d)-[t:FNTT{id:d.testCaseID}]-(c)"});
+						}
 						cassandraId_dict[testcaseId_json]=testcaseId_c_json;
 					});
 				});
