@@ -841,7 +841,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                             ob.hiddentag = "No",
                                             tag = "iris",
                                             ob.url = "",
-                                            ob.xpath = "iris;"+ob.custname
+                                            ob.xpath = "iris;"+ob.custname+";"+ob.left+";"+ob.top+";"+(ob.width+ob.left)+";"+(ob.height+ob.top)+";"+ob.tag
 										}                                  
                                     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                     // }                                       
@@ -1784,7 +1784,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                         ob.hiddentag = "No",
                                         tag = "iris",
                                         ob.url = "",
-                                        ob.xpath = "iris;"+ob.custname
+                                        ob.xpath = "iris;"+ob.custname+";"+ob.left+";"+ob.top+";"+(ob.width+ob.left)+";"+(ob.height+ob.top)+";"+ob.tag
 									}        
 
                                     // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
@@ -1827,7 +1827,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                                 ob.hiddentag = "No",
                                                 tag = "iris",
                                                 ob.url = "",
-                                                ob.xpath = "iris;"+ob.custname
+                                                ob.xpath = "iris;"+ob.custname+";"+ob.left+";"+ob.top+";"+(ob.width+ob.left)+";"+(ob.height+ob.top)+";"+ob.tag
 											}
                                             var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                         // }    
@@ -1872,7 +1872,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                             ob.hiddentag = "No",
                                             tag = "iris",
                                             ob.url = "",
-                                            ob.xpath = "iris;"+ob.custname
+                                            ob.xpath = "iris;"+ob.custname+";"+ob.left+";"+ob.top+";"+(ob.width+ob.left)+";"+(ob.height+ob.top)+";"+ob.tag
 										}                                      
                                     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                     // }
@@ -5013,7 +5013,7 @@ function contentTable(newTestScriptDataLS) {
                     }
 					if (ob.cord){
                         selectedKeywordList = 'iris';
-                        objName = custname1;
+                        objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
                         cord = ob.cord
                         obType = "iris";
                         url = "";
@@ -5410,6 +5410,9 @@ function contentTable(newTestScriptDataLS) {
                         } else if (obType == 'internal frame') {
                             sc = Object.keys(keywordArrayList.internalframe);
                             selectedKeywordList = "internalframe";
+                        } else if(obType =='iris'){
+                            sc = Object.keys(keywordArrayList.iris);
+                            selectedKeywordList = "iris";
                         } else {
                             sc = Object.keys(keywordArrayList.element);
                             selectedKeywordList = "element";
@@ -5428,6 +5431,8 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+						if(obType == 'iris')
+                            $grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     } else {
                         var sc = Object.keys(keywordArrayList[obType]);
