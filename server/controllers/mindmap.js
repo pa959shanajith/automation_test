@@ -1421,7 +1421,10 @@ var update_cassandraID = function(d,urlData,module_type,idn_v_idc = null) {
 					if(!(idn_v_idc && idn_v_idc[scr.screenId] == screenId_c_json)){
 						qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenName='"+screenname_json+"' and a.projectID='"+data.projectId+"' SET a.screenID_c='"+screenId_c_json+"'"});
 						//Screen Task update in case of reuse
-						qList_new.push({"statement":"MATCH p=(a:SCREENS{screenID_c:'"+screenId_c_json+"'})-[r]-(b:TASKS),(q:SCREENS{screenID_c:'"+screenId_c_json+"'}) MERGE (q)-[s:FNTT{id:q.screenID}]-(b)"});
+						//qList_new.push({"statement":"MATCH p=(a:SCREENS{screenID_c:'"+screenId_c_json+"'})-[r]-(b:TASKS),(q:SCREENS{screenID_c:'"+screenId_c_json+"'}) MERGE (q)-[s:FNTT{id:q.screenID}]-(b)"});
+						// reg ex query
+						qList_new.push({"statement":"MATCH (c:TASKS) ,(d:SCREENS{screenID:'"+scr.screenId+"'}) where c.parent=~('.*,'+d.screenID_c+']') MERGE (d)-[t:FNTT{id:d.screenID}]-(c)"});
+
 						//qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenName='"+screenname_json+"' and a.projectID='"+data.projectId+"' SET a.screenID_c='"+screenId_c_json+"'"});
 						//updateJson.push({screenId_json:screenId_c_json});	
 					}					
@@ -1440,7 +1443,8 @@ var update_cassandraID = function(d,urlData,module_type,idn_v_idc = null) {
 						if(!(idn_v_idc && idn_v_idc[tc.testcaseId] == testcaseId_c_json)){
 							qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID_c='"+screenId_c_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
 							//TestCase Task update in case of reuse
-							qList_new.push({"statement":"MATCH (a:SCREENS{screenID_c:'"+screenId_c_json+"'})-[r]-(b:TESTCASES{testCaseID_c:'"+testcaseId_c_json+"'})-[s]-(c:TASKS) ,(d:TESTCASES{testCaseID_c:'"+testcaseId_c_json+"'}) MERGE (d)-[t:FNTT{id:d.testCaseID}]-(c)"});
+							//qList_new.push({"statement":"MATCH (a:SCREENS{screenID_c:'"+screenId_c_json+"'})-[r]-(b:TESTCASES{testCaseID_c:'"+testcaseId_c_json+"'})-[s]-(c:TASKS) ,(d:TESTCASES{testCaseID_c:'"+testcaseId_c_json+"'}) MERGE (d)-[t:FNTT{id:d.testCaseID}]-(c)"});
+							qList_new.push({"statement":"MATCH (c:TASKS) ,(d:TESTCASES{testCaseID:'"+tc.testcaseId+"'}) where c.parent=~('.*'+d.testCaseID_c+']') MERGE (d)-[t:FNTT{id:d.testCaseID}]-(c)"});
 						}
 						cassandraId_dict[testcaseId_json]=testcaseId_c_json;
 					});
