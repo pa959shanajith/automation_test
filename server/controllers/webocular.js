@@ -14,10 +14,10 @@ exports.getCrawlResults = function (req, res) {
 			var level = req.body.level;
 			var agent = req.body.agent;
 			validateWebocular();
+			var validate_url,validate_level,validate_agent,check_agent;
 			function validateWebocular() {
 				logger.info("Inside function: validateWebocular");
 				var check_url = validator.isURL(req.body.url);
-				var validate_url,validate_level,validate_agent;
 				if (check_url == true) {
 					validate_url = true;
 				}
@@ -25,7 +25,7 @@ exports.getCrawlResults = function (req, res) {
 				if (check_level == false) {
 					validate_level = true;
 				}
-				var check_agent = validator.isAlpha(req.body.agent);
+				check_agent = validator.isAlpha(req.body.agent);
 				if (check_agent == true) {
 					validate_agent = true;
 				}

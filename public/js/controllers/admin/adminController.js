@@ -2130,7 +2130,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				regex = /[\\[\]\~`!@#$%^&*()+={}|;:"',<>?/\s]/g;
 			if (e.target.id == 'ldapServerURL')
 				regex = /[\\[\]\~`!@#$%^&*()+={}|;"',<>?\s]/g;
-			else if (e.target.id == 'projectName' || e.target.id == 'releaseTxt' || e.target.id == 'cycleTxt')
+			else if (e.target.id == 'projectName' || e.target.id == 'releaseTxt' || e.target.id == 'cycleTxt' || e.target.id == 'releaseName' || e.target.id == 'cycleName')
 				regex = /[-\\[\]\~`!@#$%^&*()+={}|;:"',.<>?/\s]/g;
 			else
 				regex = /[-\\0-9[\]\~`!@#$%^&*()-+={}|;:"',.<>?/\s_]/g;

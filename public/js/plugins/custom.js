@@ -226,11 +226,12 @@ $(document).ready(function() {
 			}
 		}
 		//Filter My Tasks
-		$(document).find('.searchInputMyTask').keyup(function() {
-			filterMyTasks(this); 
+		$(document).on("keyup", ".searchInputMyTask", function(e){
+			filterMyTasks(this,e);
+			e.stopImmediatePropagation(); 
 		});
-
-		function filterMyTasks(element) {
+		function filterMyTasks(element,e) {
+			setTimeout(function () {
 			var value = $(element).val();
 			$(".panel-default span.assignedTaskInner").each(function () {
 				if ($(this).text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
@@ -244,6 +245,7 @@ $(document).ready(function() {
 				$(this).text(counter) 
 				counter++;
 			});
+		},5);
 		} 
 	})
 	.on("click", ".closePopup", function(){

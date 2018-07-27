@@ -139,21 +139,31 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 			return "fail";
 		})
 	}
-	var showSearchBox = true;
-	$(document).on("click", ".searchScrapEle", function(){
-		if(showSearchBox){
-			$(".searchScrapInput").show();
-			$(".searchScrapEle").addClass('positionInputSerachBox');
-			showSearchBox=false;
-			$(".searchScrapInput").focus();
-		}	else{
-			$(".searchScrapEle").removeClass('positionInputSerachBox');
-			$(".searchScrapInput").hide();
-			showSearchBox=true;
-		}
-	})
 
-	$(document).on('keyup', '#searchModule', function(){
+	var showSearchBox = true;
+	/************ SEARCH *****************/
+	$(document).off('click.filterSuites', '.searchScrapEle');	
+	$(document).on({
+		'click.filterSuites': searchScrapeElement         
+	}, '.searchScrapEle')
+	function searchScrapeElement(e)
+	{
+		//$(document).on("click", ".searchScrapEle", function(){
+			if(showSearchBox){
+				$(".searchScrapInput").show();
+				$(".searchScrapEle").addClass('positionInputSerachBox');
+				showSearchBox=false;
+				$(".searchScrapInput").focus();
+			}	else{
+				$(".searchScrapEle").removeClass('positionInputSerachBox');
+				$(".searchScrapInput").hide();
+				showSearchBox=true;
+			}
+		//})
+	}
+	
+
+	$(document).on('keyup', '#searchModule', function(e){
 		input = document.getElementById("searchModule");
     	filter = input.value.toUpperCase();
 		elems = $('.dynamicTestsuiteContainer .suiteContainer');
@@ -164,9 +174,11 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 						elems[i].style.display = "none";
 				}
 		}
+		e.stopImmediatePropagation();
 	});
 
 	//Service call to get start and end details of suites
+	/************ SUITE CLICK *****************/
 	$(document).off('click.suiteContainerClick', '.suiteContainer');	
 	$(document).on({
 		'click.suiteContainerClick': suiteContainerClick         
@@ -245,7 +257,7 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 	}
 
 	//Date sorting
-	$(document).on('click', '#dateDESC', function(){
+	$(document).on('click', '#dateDESC', function(e){
 		$(this).hide();
 		var dateArray;
 		if($(this).parents('table').attr("id") == "testSuitesTimeTable"){
@@ -267,8 +279,9 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 				$("tbody.scrollbar-inner-scenarioreports").append(dateArray[i]);
 			}
 		}
-	})
-	$(document).on('click', '#dateASC', function(){
+		e.stopImmediatePropagation();
+	});
+	$(document).on('click', '#dateASC', function(e){
 		$(this).hide();
 		if($(this).parents('table').attr("id") == "testSuitesTimeTable"){
 			$('#dateDESC').show();
@@ -289,7 +302,8 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 				$("tbody.scrollbar-inner-scenarioreports").append(dateArray[i]);
 			}
 		}
-	})
+		e.stopImmediatePropagation();
+	});
 
 	function dateDESC(dateArray){
 		dateArray.sort(function(a,b){
@@ -342,7 +356,13 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 	}
 	//Date sorting
 	//Service call to get scenario status
-	$(document).on('click', '.scenariostatusreport', function(e){
+	/**********SUITE TIME CLICK ****************/
+	$(document).off('click.suiteTimeClick', '.scenariostatusreport');
+	$(document).on({
+		'click.suiteTimeClick':  scenariostatusreport        
+	}, '.scenariostatusreport');
+	function scenariostatusreport(e) {
+	//$(document).on('click', '.scenariostatusreport', function(e){
 		$(this).addClass('scenariostatusreportselect');
 		$(this).siblings().removeClass('scenariostatusreportselect');
 		executionId = $(this).attr('data-executionid');
@@ -421,9 +441,16 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 			// var infoArr = [];
 			// labelArr.push(txnHistory.codesDict['SuiteDrillDownClick']);
 			// txnHistory.log(event.type,labelArr,infoArr,window.location.pathname); 
-			});
-
-	$(document).on('click', '.selectFormat', function(e){
+			//});
+	    }
+		
+		/********** SELECT REPORT FORMAT CLICK ****************/
+		$(document).off('click.reportFormat', '.selectFormat');
+		$(document).on({
+			'click.reportFormat':  selectReportFormatClick        
+		}, '.selectFormat');
+		function selectReportFormatClick(e) {
+				//$(document).on('click', '.selectFormat', function(e){
 		$('.formatpdfbrwsrexport').remove();
 		var repID = $(this).parent().attr("data-reportid");
 		$(this).parent().append("<span class='formatpdfbrwsrexport'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus' data-getrep='wkhtmltopdf' data-reportid='"+repID+"' style='cursor: pointer; margin-right: 10px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus' data-getrep='html' data-reportid='"+repID+"' style='cursor: pointer; margin-right: 10px; width: 23px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON' data-reportid='"+repID+"' style='cursor: pointer;' src='imgs/ic-export-to-json.png' title='Export to Json'></span>")
@@ -433,7 +460,9 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 		// var infoArr = [];
 		// labelArr.push(txnHistory.codesDict['selectReportFormatClick']);
 		// txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
-	});
+	//});
+		}
+
 
 	$('span.formatpdfbrwsrexport').focusout(function(){
 		$('.formatpdfbrwsrexport').remove();
@@ -487,7 +516,15 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 		'click.as': onIconSpaceClick         
 	}, '.iconSpace-reports');
 
-	$(document).on('click', '.openreportstatus', function(e){
+	/********** HTML REPORT CLICK ****************/
+	$(document).off('click.htmlRepClick', '.openreportstatus');
+	$(document).on({
+		'click.htmlRepClick':  htlmReportClick        
+	}, '.openreportstatus');
+
+	//$(document).on('click', '.openreportstatus', function(e){
+		function htlmReportClick(e)
+		{
 		var reportID = $(this).attr('data-reportid');
 		var reportType = $(this).attr('data-getrep');
 		var testsuitename = $(".reportboxselected").text();
@@ -686,11 +723,20 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 		function(error) {
 			console.log("Error-------"+error);
 		});
-	});
+	}
+	//});
 
 
 	//Export To JSON
-	$(document).on('click', '.exportToJSON', function(e){
+		//Service call to get start and end details of suites
+		/************ EXPORT JSON CLICK *****************/
+		$(document).off('click.exportReportJSON', '.exportToJSON');	
+		$(document).on({
+			'click.exportReportJSON': exportJSONReport         
+		}, '.exportToJSON')
+		function exportJSONReport(e)
+		{
+	//$(document).on('click', '.exportToJSON', function(e){
 		var repId = $(this).attr('data-reportid');
 		reportService.exportToJson_ICE(repId)
 		.then(function(response) {
@@ -782,5 +828,6 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 			console.log("Error while exportsing JSON.\n "+(error.data));
 		});
 		$('.formatpdfbrwsrexport').remove();
-	})
+	//})
+	}
 }]);
