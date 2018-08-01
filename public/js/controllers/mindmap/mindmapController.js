@@ -663,6 +663,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         n.display_name = n.name;
         var nodeOpacity = !(n.id_c == "null" || n.id_c == null || n.id_c == undefined) ? 1 : 0.5;
         var ch = 15;
+		img_src = "images_mindmap/node-"+n.type+".png";
         if (n.name.length > ch) {
             n.display_name = n.display_name.slice(0, ch) + '...';
         }
@@ -673,7 +674,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                  'opacity':!(n.id_c == "null" || n.id_c == null || n.id_c == undefined) ? 1 : 0.5,
                                  'title':n.name,
                                  'name':n.display_name,
-                                 'img_src':"images_mindmap/node-"+n.type+".png"
+                                 'img_src':img_src
                                 }; 
         var v = '#ct-node-'+n.id;
         return v;
