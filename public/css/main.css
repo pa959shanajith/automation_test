@@ -203,7 +203,9 @@ body {
 	background:#ff7300
 }
 
-
+input[type="radio"]{
+    vertical-align: sub;
+}
 
 .submitTaskBtn.focus,
 .submitTaskBtn,

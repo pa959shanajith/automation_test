@@ -918,6 +918,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             if ($scope.getScreenView == "Desktop") {
                 $("#launchDesktopApps").modal("show")
                 $(document).find("#desktopPath").val('')
+                $(document).find('#app_pid').val('');
                 $(document).find("#desktopPath").removeClass("inputErrorBorder");
             } else if ($scope.getScreenView == "DesktopJava") {
                 $("#launchOEBSApps").modal("show");
@@ -1361,6 +1362,46 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     })
     //Mobile Serial Number Keyup Function
 
+//toggling radio buttons in desktop app launch modal
+    
+$('#radio_check1').click(function() {
+    var isChecked = $('#radio_check2').is(':checked');
+    if(isChecked==true){
+        //$('input[type="radio"]').not(':checked').prop("checked", true);
+        $('#radio_check1').attr('checked',true);
+        $('#radio_check2').attr('checked',false);
+    }
+    else{
+         $('#radio_check1').attr('checked',true);
+         $('#radio_check2').attr('checked',false);   
+        //$('input[type="radio"]:not(.checked').prop("checked", true);
+    }
+    
+});
+
+$('#radio_check2').click(function() {
+    var isChecked = $('#radio_check1').is(':checked');
+    if(isChecked==true){
+        //$('input[type="radio"]').not(':checked').prop("checked", true);
+        $('#radio_check2').attr('checked',true);
+        $('#radio_check1').attr('checked',false);
+    }
+    else{
+         $('#radio_check2').attr('checked',true);
+         $('#radio_check1').attr('checked',false);   
+        //$('input[type="radio"]:not(.checked').prop("checked", true);
+    }
+    
+});
+//toggling radio buttons in desktop app launch modal
+
+// Number filter in desktop application lauch modal
+$(document).on('keypress', '#app_pid', function(e) {
+    if ((e.charCode >= 48 && e.charCode <= 57) || e.charCode == 59) return true;
+    else return false;
+    }) 
+
+
     //Initiating Scraping
     $scope.initScraping = function(e, browserType) {
         $('#compareObjectModal').modal('hide');
@@ -1391,13 +1432,15 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			
             //For Desktop
             if ($scope.getScreenView == "Desktop") {
-                if ($(document).find("#desktopPath").val() == "") {
+                if ($(document).find("#desktopPath").val() == "" && $(document).find("#app_pid").val()=="") {
                     $(document).find("#desktopPath").addClass("inputErrorBorder")
                     return false
                 } else {
                     $(document).find("#desktopPath").removeClass("inputErrorBorder")
-                    screenViewObject.appType = $scope.getScreenView,
+                        screenViewObject.appType = $scope.getScreenView,
                         screenViewObject.applicationPath = $(document).find("#desktopPath").val();
+                        screenViewObject.processID = $(document).find("#app_pid").val();
+                        screenViewObject.scrapeMethod = $("input[name='first']:checked").val();
                     $("#launchDesktopApps").modal("hide");
                     if( $rootScope.compareFlag == true){
                         blockUI(blockMsg2);
