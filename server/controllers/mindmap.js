@@ -54,7 +54,7 @@ exports.populateScenarios=function(req,res){
 	if (utils.isSessionActive(req.session)) {
 		var moduleId=req.body.moduleId;
 			//var taskID=d.taskId;
-			query={'statement':"MATCH (a{moduleID:'"+moduleId+"'})-[:FMTTS]->(b) RETURN b"};
+			query={'statement':"MATCH (a{moduleID:'"+moduleId+"'})-[:FMTTS]->(b) RETURN b ORDER BY b.childIndex"};
 			var qlist_query=[query];
 			var scenarioList=[];
 			neo4jAPI.executeQueries(qlist_query,function(status,result){
