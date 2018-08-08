@@ -738,19 +738,25 @@
 			.reportsDetail{line-height: 2; text-align: center; height: calc(100% - 35px); overflow: auto;font-size: 14px;}
 			.reportsDetail tr { page-break-inside: avoid; }
 			.rDstepDes{text-align: left; word-break: break-word;}
-			.reportsDetail tr.reportdetailsrow:nth-child(even){background: #f9f9f9;}
+			.reportsDetail tr.reportdetailsrow:nth-child(even){background: #d9d9d9;}
 			.reportdetailsrow td{padding-top: 9px;}
 			@media screen and (max-height: 675px) {
 					.reportsDetail{
 							height: 174px;
 					}
 			}
-			.reportsDetails th,td
+			.reportsDetails th
+			{
+					text-align: left !important;
+					padding: 8px;
+					width: 10%;
+			}
+			.reportsDetails td
 			{
 					text-align: left !important;
 					padding: 2px;
 					width: 10%;
-			}
+			}	
 			.pdfReport{
 					float:left;
 					width: 100%;
@@ -767,7 +773,7 @@
 	
 			<div class="leftSummary">
 					<h3>Details</h3>
-					<label>Testcase</label><span>: {{testcasename}}</span><br/>
+					<label>Testcase Name</label><span>: {{testcasename}}</span><br/>
 			</div>
 			{{/each}}
 			<div class="maintabCont">

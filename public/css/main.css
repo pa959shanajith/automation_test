@@ -5615,3 +5615,8 @@ ul.browserInlineIcons
     color:#fff;
     cursor: pointer;
 }
+
+.viewReadOnlyTC:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}

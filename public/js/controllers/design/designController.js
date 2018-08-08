@@ -3892,6 +3892,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 }
                                 var source = $("#handlebar-template-testcase").html();
                                 var template = Handlebars.compile(source);
+                                try{
+                                    JSON.parse(response.testcasesteps);
+                                }
+                                catch{
+                                    response.testcasesteps = '[]';
+                                }                                
                                 var dat = template({name:[{testcasename:response.testcasename}],rows:JSON.parse(response.testcasesteps)});
                                 var newWindow = window.open();
                                 newWindow.document.write(dat);
