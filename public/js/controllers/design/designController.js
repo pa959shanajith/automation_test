@@ -3869,7 +3869,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             $("span.errTestCase").addClass("hide");
             //subTask = JSON.parse(window.localStorage['_CT']).subtask;
             //var testScenarioId = "e191bb4a-2c4f-4909-acef-32bc60e527bc";
-            var testScenarioId = JSON.parse(window.localStorage['_CT']).scenarioId;
+            var ctj = JSON.parse(window.localStorage['_CT']);
+            var testScenarioId = ctj.scenarioId;
+            //var screenId = ctj.screenId;
             DesignServices.getTestcasesByScenarioId_ICE(testScenarioId)
                 .then(function(data) {
                     if (data == "Invalid Session") {
@@ -3878,9 +3880,25 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     $("#dependentTestCasesContent").empty();
                     //data = data.sort();
                     for (var i = 0; i < data.length; i++) {
-                        $("#dependentTestCasesContent").append("<span class='testcaseListItem'><input data-attr = " + data[i].testcaseId + " class='checkTestCase' type='checkbox' id='dependentTestCase_" + i + "' /><label title=" + data[i].testcaseName + " class='dependentTestcases' for='dependentTestCase_" + i + "'>" + data[i].testcaseName + "</label></span><br />");
+                        $("#dependentTestCasesContent").append("<span class='testcaseListItem'><input data-attr = " + data[i].testcaseId + " class='checkTestCase' type='checkbox' id='dependentTestCase_" + i + "' /><label title=" + data[i].testcaseName + " class='dependentTestcases' for='dependentTestCase_" + i + "'>" + data[i].testcaseName + "</label></span><span class='viewReadOnlyTC'  data-id = " + data[i].testcaseId + " data-name = "+ data[i].testcaseName +"><button type='button' class='btn btn-link'>View</button></span><br />");
                     }
-
+                    $( ".viewReadOnlyTC" ).click(function() {
+                        var testCaseName = this.getAttribute('data-name'),
+                        testCaseId = this.getAttribute('data-id');
+                        DesignServices.readTestCase_ICE(undefined, testCaseId, testCaseName, 0)
+                        .then(function(response) {
+                                if (response == "Invalid Session") {
+                                    $rootScope.redirectPage();
+                                }
+                                var source = $("#handlebar-template-testcase").html();
+                                var template = Handlebars.compile(source);
+                                var dat = template({name:[{testcasename:response.testcasename}],rows:JSON.parse(response.testcasesteps)});
+                                var newWindow = window.open();
+                                newWindow.document.write(dat);
+                            },
+                            function(error) {});
+                            //alert( "Handler for .click() called." );
+                      });
                     //$(document).on('shown.bs.modal','#dialog-addDependentTestCase', function () {
                     if (checkedTestcases.length > 0)
                         $("input[type=checkbox].checkTestCase").prop("checked", false);
