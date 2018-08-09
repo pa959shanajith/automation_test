@@ -1,5 +1,5 @@
 var appType;var releaseName;var cycleName;var testSuiteName;
-mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeout','$location','ExecutionService','mindmapServices','cfpLoadingBar', 'socket', function ($scope, $rootScope, $http, $timeout, $location, ExecutionService, mindmapServices,cfpLoadingBar,socket) {
+mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeout','$location','ExecutionService','mindmapServices','DesignServices','cfpLoadingBar', 'socket', function ($scope, $rootScope, $http, $timeout, $location, ExecutionService, mindmapServices,DesignServices,cfpLoadingBar,socket) {
 	cfpLoadingBar.start();
 	var getEachScenario = [] //Contains Each RowData of Scenarios
 	var userinfo = {} //Contains Userinfo
@@ -375,8 +375,32 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			 }
 			for(i=0; i<data.projectnames.length && data.testcasenames.length && data.screennames.length; i++){
 				//document.getElementById("scenarioDetailsContent").innerHTML += '<div class="sDInnerContentsWrap"><div class="sDInnerContents">'+data.testcasenames[i]+'</div><div class="sDInnerContents">'+data.screennames[i]+'</div><div class="sDInnerContents">'+data.projectnames[i]+'</div></div>'
-				$("#scenarioDetailsContent").append('<div class="sDInnerContentsWrap"><div class="sDInnerContents">'+data.testcasenames[i]+'</div><div class="sDInnerContents">'+data.screennames[i]+'</div><div class="sDInnerContents">'+data.projectnames[i]+'</div></div>')
+				$("#scenarioDetailsContent").append('<div class="sDInnerContentsWrap"><div class="sDInnerContents viewReadOnlyTC" data-name='+data.testcasenames[i]+' data-id='+data.testcaseids[i]+'>'+data.testcasenames[i]+'</div><div class="sDInnerContents">'+data.screennames[i]+'</div><div class="sDInnerContents">'+data.projectnames[i]+'</div></div>')
 			}
+			$( ".viewReadOnlyTC" ).click(function() {
+				var testCaseName = this.getAttribute('data-name'),
+				testCaseId = this.getAttribute('data-id');
+				DesignServices.readTestCase_ICE(undefined, testCaseId, testCaseName, 0)
+				.then(function(response) {
+						if (response == "Invalid Session") {
+							$rootScope.redirectPage();
+						}
+						var source = $("#handlebar-template-testcase").html();
+						var template = Handlebars.compile(source);
+						try{
+							JSON.parse(response.testcasesteps);
+						}
+						catch{
+							response.testcasesteps = '[]';
+						}
+						var dat = template({name:[{testcasename:response.testcasename}],rows:JSON.parse(response.testcasesteps)});
+						var newWindow = window.open();
+						newWindow.document.write(dat);
+					},
+					function(error) {});
+					//alert( "Handler for .click() called." );
+			  });	
+	
 		},
 		function(error){
 			console.log(error)
