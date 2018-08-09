@@ -3895,7 +3895,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 try{
                                     JSON.parse(response.testcasesteps);
                                 }
-                                catch{
+                                catch(err){
                                     response.testcasesteps = '[]';
                                 }                                
                                 var dat = template({name:[{testcasename:response.testcasename}],rows:JSON.parse(response.testcasesteps)});
