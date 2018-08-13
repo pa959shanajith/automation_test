@@ -206,6 +206,12 @@ $(document).ready(function() {
 		if(window.localStorage['_CT'])
 		{
 			if(JSON.parse(window.localStorage['_CT']).appType == "MobileWeb" && navigator.appVersion.indexOf("Win")!=-1){
+				if(typeof(viewString) == "undefined")
+				{
+					viewString = {};
+					viewString.mirrorwidth = '';
+					viewString.mirrorheight = '';
+				}
 				if(parseInt(viewString.mirrorwidth) > 800)
 				{}
 				else{
