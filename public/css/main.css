@@ -5620,3 +5620,7 @@ ul.browserInlineIcons
     text-decoration: underline;
     cursor: pointer;
 }
+.disableFilter
+{
+    pointer-events: none;
+}

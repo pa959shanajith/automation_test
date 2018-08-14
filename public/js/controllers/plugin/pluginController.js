@@ -104,7 +104,9 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 
 						}
 						  	//prevent mouseclick before loading tasks
-						  	$("span.toggleClick").removeClass('toggleClick');
+							  $("span.toggleClick").removeClass('toggleClick');
+							// Enable Filter
+							$("span.filterIcon").removeClass('disableFilter');
 						}
 
 						PluginService.getNames_ICE($scope.filterDat.releaseids,Array($scope.filterDat.releaseids.length).fill('releases'))
@@ -390,6 +392,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	}
 
 	$scope.clearFilter = function(){
+		$("#cycle-filter-list option:disabled").removeAttr('disabled');
 		$scope.filterData['relval']='Select Release';
 		$scope.filterData['cycval']='Select Cycle'; 
 		
