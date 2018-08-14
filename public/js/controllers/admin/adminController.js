@@ -1633,6 +1633,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		}
 		this.ldapAllServerList=[];
 		this.ldapAllUserList=[];
+		this.query0 = '';
+		this.query1 = '';
 	};
 
 	//Fetch All Available User Roles
@@ -1749,14 +1751,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	//Create / Update / Delete User
 	$scope.userConf.manage = function(action,$event) {
-		
 		//Transaction Activity for Create/ Update/ Delete User button Action
 		// var labelArr = [];
 		// var infoArr = [];
 		// labelArr.push(txnHistory.codesDict['UserConfmanage']);
 		// infoArr.push(action);
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
-		
+
 		var userConf = $scope.userConf;
 		if (!userConf.validate(action)) return;
 		var bAction = action.charAt(0).toUpperCase() + action.substr(1);

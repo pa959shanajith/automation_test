@@ -72,10 +72,10 @@
 					</div> -->
 
 					<div class="dropdown dropdown-scroll userForm adminControl" ng-if="userConf.ldap.fetch == 'import'">
-							<input class="btn btn-users dropdown-toggle" type="text" id="dropdownMenu1" data-toggle="dropdown" ng-model="query" placeholder="Search User.." ng-click = "query=''"></input>
-							<ul class="dropdown-menu dropdown-menu-users" role="menu" aria-labelledby="dropdownMenu1">
-								<li role="presentation" ng-repeat='luser in userConf.ldapAllUserList | filter:query' ng-click="userConf.ldap.user=luser.value; $parent.query=luser.html; userConf.ldapGetUser()" value="{{luser.value}}"> {{luser.html}}</li>
-							</ul>
+						<input class="btn btn-users dropdown-toggle" type="text" id="ldapDirectory" data-toggle="dropdown" ng-model="userConf.query0" placeholder="Search User.." ng-click = "userConf.query0=''"></input>
+						<ul class="dropdown-menu dropdown-menu-users" role="menu" aria-labelledby="ldapDirectory">
+							<li role="presentation" ng-repeat='luser in userConf.ldapAllUserList | filter:userConf.query0' ng-click="userConf.ldap.user=luser.value; userConf.query0=luser.html; userConf.ldapGetUser()" value="{{luser.value}}"> {{luser.html}}</li>
+						</ul>
 					</div>					
 
 				</div>
@@ -137,9 +137,9 @@
 						<option value="" disabled selected>Select User</option>
 						<option ng-repeat="uid in userConf.allUsersList" value="{{uid[1]}};{{uid[0]}}">{{uid[0]}}</option>
 					</select> -->
-					<input class="btn btn-users users-edit dropdown-toggle" type="text" id="dropdownMenu1" data-toggle="dropdown" ng-model="query1" placeholder="Search User.." ng-click = "query1=''">
-					<ul class="dropdown-menu dropdown-menu-users users-edit" role="menu" aria-labelledby="dropdownMenu1">
-						<li role="presentation" ng-repeat='uid in userConf.allUsersList | filter:query1' ng-click="userConf.userIdName=uid[1]+';'+uid[0] ;$parent.query1=uid[0]; userConf.getUserData()" value="{{uid[1]}};{{uid[0]}}"> {{uid[0]}}</li>
+					<input class="btn btn-users users-edit dropdown-toggle" type="text" id="userIdName" data-toggle="dropdown" ng-model="userConf.query1" placeholder="Search User.." ng-click = "userConf.query1=''">
+					<ul class="dropdown-menu dropdown-menu-users users-edit" role="menu" aria-labelledby="userIdName">
+						<li role="presentation" ng-repeat='uid in userConf.allUsersList | filter:userConf.query1' ng-click="userConf.userIdName=uid[1]+';'+uid[0] ;userConf.query1=uid[0]; userConf.getUserData()" value="{{uid[1]}};{{uid[0]}}"> {{uid[0]}}</li>
 					</ul>					
 				</div>
 
