@@ -464,8 +464,12 @@
 				</div>
 				<div class="modal-body">
 					<p><input class='launchPopupInput form-control' type='text' placeholder='Enter window name' id='desktopPath'/></p>
+					<p><input class='launchPopupInput form-control' type='text' autocomplete="off" placeholder='Enter process ID' id='app_pid'/></p>
 				</div>
 				<div class="modal-footer">
+					<span style="float: left;margin-left: 18px;font-size: 17px;margin-top:  2px;font-variant: bold;"	>Object Identification: </span>
+					<span style="float: left;margin-left: 19px;margin-top: 5px;"><input type="radio" id="radio_check1" name="first" value="A" checked="checked"> Method A </span>
+					<span style="float: left;margin-left: 31px;margin-top: 5px;"><input type="radio" id="radio_check2" name="first" value="B"> Method B </span>
 					<button type="button" class="btn btn-default btn-default-modal" ng-click="initScraping($event)">Launch</button>
 				</div>
 			</div>

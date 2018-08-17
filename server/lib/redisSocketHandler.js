@@ -24,7 +24,7 @@ default_sub.on("message", function (channel, message) {
 		break;
 
 	case "LAUNCH_DESKTOP":
-		mySocket.emit("LAUNCH_DESKTOP", data.applicationPath);
+		mySocket.emit("LAUNCH_DESKTOP", data.applicationPath, data.processID, data.scrapeMethod);
 		break;
 
 	case "LAUNCH_SAP":
