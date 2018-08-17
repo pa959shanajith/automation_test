@@ -8,6 +8,7 @@ var notificationMsg = require("../notifications/notifyMessages");
 var logger = require('../../logger');
 var utils = require('../lib/utils');
 var xlsx = require('xlsx');
+var excelbuilder = require('msexcel-builder');
 
 /* Convert excel file to CSV Object. */
 var xlsToCSV = function(workbook) {
@@ -1572,4 +1573,95 @@ exports.getScreens=function(req,res){
 
 }
 
-//MATCH (n)-[r:FMTTS{id:'bad100b6-c223-4888-a8e9-ad26a2de4a61'}]->(o:TESTSCENARIOS) DETACH DELETE r,o
+exports.exportToExcel = function(req,res){
+	logger.info("Writing  Module structure to Excel");
+	if(utils.isSessionActive(req.session)){
+		var path = require('path');
+		var d = req.body;
+		var excelMap = d.excelMap;
+		
+		//create a new workbook file in current working directory
+		var workbook = excelbuilder.createWorkbook("./etc","samp234.xlsx");
+		
+		console.log(excelMap.name);
+		
+		
+		//create the new worksheet with 10 coloumns and 20 rows
+		var sheet1 = workbook.createSheet('sheet1',10,20);
+		//var dNodes = [];
+		var curr = {};
+		//var dNodes = [];
+		curr = excelMap;
+		
+
+var sce_row_count = 2;
+var scr_row_count = 2;
+var tes_row_count = 2;
+
+
+//To fill some data
+
+    sheet1.width(1, 40);sheet1.height(1, 20);sheet1.width(2, 40);sheet1.height(2, 20);
+    sheet1.width(3, 40);sheet1.height(3, 20);sheet1.width(4, 40);sheet1.height(4, 20);
+    sheet1.set(1,1,'Module');sheet1.set(2,1,'Scenario');
+    sheet1.set(3,1,'Screen');sheet1.set(4,1,'Script');
+
+	 sheet1.set(1,2,curr.name);
+	 try{
+     //loop to iterate through number of scenarios
+     for(i=0 ; i<curr.children.length; i++){
+         sheet1.set(2,sce_row_count,curr.children[0].name);
+         //loop to iterate through number of screens
+        for(j=0 ; j<curr.children[i].children.length; j++){
+            sheet1.set(3,scr_row_count,curr.children[i].children[j].name);
+            //loop through number of test cases
+            for(k=0 ; k<curr.children[i].children[j].children.length ; k++){
+                sheet1.set(4,tes_row_count,curr.children[i].children[j].children[k].name);
+                tes_row_count++;
+
+            }
+            scr_row_count = tes_row_count;
+        }
+        sce_row_count = tes_row_count;
+     }
+
+
+
+//save it 
+    workbook.save(function(ok){
+        if(!ok)
+            workbook.cancel();
+        else
+			console.log("workbook created");
+			var filePath = path.join(__dirname,'../../etc','samp234.xlsx');
+    
+			console.log(__dirname);
+			
+			res.writeHead(200, {
+				'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+				
+			});
+			var rstream = fs.createReadStream(filePath);
+			rstream.pipe(res);
+			fs1.emptyDir(path.join(__dirname, '../..', 'etc'), err => {
+				if (err) return console.error(err)
+			  
+				console.log('success!')
+			  })
+	});
+	
+
+	
+	
+	  
+}catch(ex){
+	logger.error("exception in mindmapService: ",ex);
+	
+}
+	
+	}
+	else{
+		logger.error("Invalid session");
+		res.send("Invalid Session");
+	}
+}

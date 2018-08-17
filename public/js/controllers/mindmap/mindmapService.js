@@ -201,5 +201,18 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
+		exportToExcel: function(excelMap){
+			var param = "/exportToExcel";
+			return $http.post('/exportToExcel',{
+				 action: param,
+				 excelMap: excelMap
+				 //responseType: 'arraybuffer'
+			},{responseType:'arraybuffer'})
+			
+    		
+    		.then(function (response) { return response.data; },
+    				function (response) { return $q.reject(response.data); });
+    	
+		}
 	}
 }]);

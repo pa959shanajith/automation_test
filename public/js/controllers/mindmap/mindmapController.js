@@ -37,6 +37,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     var cycdata = {};
     //Workflow//
     var currMap = {};
+	var excelMap = {};
+	var excelFlag = 0;
     var dragsearch = false;
     $scope.allMMaps = [];
     // Complexity
@@ -576,6 +578,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $rootScope.redirectPage();
             }
             currMap = result[0];
+			excelMap = JSON.parse(JSON.stringify(currMap));
             $('div[title=' + modName + ']').addClass('nodeBoxSelected');
             if ($scope.tab == 'tabCreate')
                 populateDynamicInputList();
@@ -4986,6 +4989,49 @@ Purpose : displaying pop up for replication of project
     $scope.toggleMinimap = function() {
         $("#minimap-wrapper").toggle();
     }
+	$scope.exportToExcel = function(){
+        //var excelMap = {};
+       
+        if(excelFlag!=1){
+            openDialogMindmap("Fail", "Select the Module to export to excel");
+            
+        }
+        else{
+            
+            mindmapServices.exportToExcel(excelMap).then(function(result){
+                if (result == "Invalid Session") {
+                    $rootScope.redirectPage();
+                }
+                else{
+					
+                    //openDialogMindmap("Success", "Exported to Excel successfully");
+					openWindow = 0;
+								if(openWindow == 0){
+									var file = new Blob([result], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+									var fileURL = URL.createObjectURL(file);
+									var a = document.createElement('a');
+									a.href = fileURL;
+									a.download = 'sample';
+									
+									
+									
+									document.body.appendChild(a);
+									a.click();
+									
+									URL.revokeObjectURL(fileURL);
+								}
+								openWindow++;
+								
+
+                }
+				
+                
+            });
+    
+        }
+    
+    }
+
 
     $scope.showContent = function($fileContent) {
         var validate = true;
