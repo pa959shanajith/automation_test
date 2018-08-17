@@ -1396,9 +1396,9 @@ $('#radio_check2').click(function() {
 //toggling radio buttons in desktop app launch modal
 
 // Number filter in desktop application lauch modal
-$(document).on('keypress', '#app_pid', function(e) {
-    if ((e.charCode >= 48 && e.charCode <= 57) || e.charCode == 59) return true;
-    else return false;
+$(document).on('keypress', '#app_pid', function(e) {
+    if ((e.charCode >= 48 && e.charCode <= 57) || e.charCode == 59) return true;
+    else return false;
     }) 
 
 
