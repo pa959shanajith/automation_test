@@ -414,10 +414,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		blockUI("Saving in progress. Please Wait...");
 		var batchInfo = [];
 		var batchDetails = {};
-		userinfo = {
-				username : JSON.parse(window.localStorage['_UI']).username.toLowerCase(),
-				role : window.localStorage['_SR']
-		}
 		//updateTestSuite
 		var loopingtimes=0;
 		$.each($(".parentSuiteChk"), function(){
@@ -490,7 +486,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			batchInfo.push(suiteInfo);
 			//console.log("batchInfo", batchInfo);
 			batchDetails.suiteDetails = batchInfo;
-			batchDetails.userinfo = userinfo;
 			loopingtimes = loopingtimes + 1;
 			//console.log("batchDetails",batchDetails);
 			//}

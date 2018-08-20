@@ -22,7 +22,6 @@ mySPA.factory('ExecutionService', ['$http','$q', function ($http,$q)   {
 		ExecuteTestSuite_ICE : function(moduleInfo){
 			return $http.post('/ExecuteTestSuite_ICE',{
 				param : 'ExecuteTestSuite_ICE',
-				userInfo: JSON.parse(window.localStorage['_UI']),
 				moduleInfo: moduleInfo
 			//	jsonData : JSON.stringify(selectedRowData),
 			//	browserType : browserTypeExe,

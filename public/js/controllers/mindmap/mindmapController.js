@@ -2510,7 +2510,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             if ($('.version-list').length != 0)
                 from_v = to_v = $('.version-list').val();
 
-            mindmapServices.saveData(versioning_enabled, assignedTo, flag, window.localStorage['_SR'], from_v, to_v, cur_module, mapData, deletednode, unassignTask,
+            mindmapServices.saveData(versioning_enabled, assignedTo, flag, from_v, to_v, cur_module, mapData, deletednode, unassignTask,
                 $('.project-list').val(), $('.release-list').val(), $('.cycle-list').val(), selectedTab).then(function(result) {
                 if (result == "Invalid Session") {
                     $rootScope.redirectPage();
@@ -2725,7 +2725,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var from_v = to_v = '';
 
 
-        mindmapServices.saveEndtoEndData(username, flag, window.localStorage['_SR'], from_v, to_v, 'endToend', mapData, deletednode, unassignTask, selectedProject, $('#ct-assignRel').val(), $('#ct-assignCyc').val()).then(function(result) {
+        mindmapServices.saveEndtoEndData(username, flag, from_v, to_v, 'endToend', mapData, deletednode, unassignTask, selectedProject, $('#ct-assignRel').val(), $('#ct-assignCyc').val()).then(function(result) {
             if (result == "Invalid Session") {
                 $rootScope.redirectPage();
             }
@@ -3966,7 +3966,7 @@ Purpose : displaying pop up for replication of project
         var user_id = userInfo.user_id;
         console.log("inside replicate project");
         blockUI('Loading....')
-        mindmapServices.createVersion('project_replicate', window.localStorage['_SR'], $scope.projectNameO, pid, from_v, to_v, 10).then(
+        mindmapServices.createVersion('project_replicate', $scope.projectNameO, pid, from_v, to_v, 10).then(
             function(res) {
                 if (res == "Invalid Session") {
                     $rootScope.redirectPage();
@@ -4104,8 +4104,6 @@ Purpose : displaying pop up for replication of project
                 unblockUI();
             }
         )
-
-
     }
 
 
@@ -4123,7 +4121,7 @@ Purpose : displaying pop up for replication of project
             return;
         }
         blockUI('Loading...');
-        mindmapServices.createVersion('', window.localStorage['_SR'], $scope.projectNameO, '', from_v, to_v, 10).then(
+        mindmapServices.createVersion('', $scope.projectNameO, '', from_v, to_v, 10).then(
             function(res) {
                 if (res == "Invalid Session") {
                     $rootScope.redirectPage();

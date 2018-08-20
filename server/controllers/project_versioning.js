@@ -170,7 +170,7 @@ exports.createVersion=function(req,res){
 			var destination_project=inputs.dstprojectId;
 			var vn_from = inputs.vn_from;
 			var vn_to = inputs.vn_to;
-			var userRole = inputs.userRole;
+			var userRole = req.session.activeRole;
 			if (action == "project_replicate") {
 				prjId = destination_project
 			}
@@ -265,7 +265,6 @@ exports.createVersion=function(req,res){
 							//console.log("testCase id: ",e.attrs.testCaseID, "testCase name  : ",e.name)
 						}
 					});
-
 
 					var uidx = 0, t, lts, qList = [];
 					var createdOn = new Date().toLocaleString();
@@ -440,7 +439,7 @@ exports.saveDataVersioning=function(req,res){
 			var nameDict = {};
 			var nData=[],qList=[],idDict={};
 			var urlData=req.get('host').split(':');
-			var inputs=req.body; 
+			var inputs=req.body;
 			var data=inputs.map;
 			var tab=inputs.tab;
 			var prjId=inputs.prjId;
@@ -453,7 +452,7 @@ exports.saveDataVersioning=function(req,res){
 			var flag=inputs.write;
 			var removeTask=inputs.unassignTask;
 			var sendNotify=inputs.sendNotify;
-			var userRole=inputs.userRole;
+			var userRole=req.session.activeRole;
 			var createdOn = new Date().toLocaleString();
 			//Assigned Tasks Notification
 			//if('socketMapNotify' in myserver && d.data.sendNotify in myserver.socketMapNotify){
@@ -488,7 +487,7 @@ exports.saveDataVersioning=function(req,res){
 				deletednodes.forEach(function (t, i) {
 					// Delete task if single connection
 					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]->(b) with b as b MATCH(b)<-[s:FNTT]-(M) WITH count(M) as rel_cnt,b as b  WHERE rel_cnt=1 DETACH DELETE b"});
-					// Else delete just connection					
+					// Else delete just connection
 					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]-(b) DELETE r"});
 				});
 				//TO support task deletion
