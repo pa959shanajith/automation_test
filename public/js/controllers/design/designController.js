@@ -5125,7 +5125,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
                         break;
                     } else if (appTypeLocal == 'Desktop' && (obType == 'button' || obType == 'input' || obType == 'select' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType =='treeview'|| obType=='TreeView' || obType=='tree' ||
-                            obType == 'list' || obType == 'edit' || obType == null || obType == 'checkbox' || obType == 'radiobutton' || obType == 'tab' || obType == 'datepicker' || obType != undefined)) {
+                            obType == 'list' || obType == 'edit' || obType == null || obType == 'checkbox' || obType == 'radiobutton' || obType == 'tab' || obType == 'datepicker' || obType == 'table' || obType != undefined)) {
                         var res = '';
                         var sc;
                         var listType = ob.canselectmultiple;
@@ -5170,7 +5170,10 @@ function contentTable(newTestScriptDataLS) {
                         } else if(obType =='iris'){
                             sc = Object.keys(keywordArrayList.iris);
                             selectedKeywordList = "iris";
-                        } else {
+                        } else if (obType == 'table') {
+                            sc = Object.keys(keywordArrayList.table);
+                            selectedKeywordList = "table";
+                        }else {
                             sc = Object.keys(keywordArrayList.element);
                             selectedKeywordList = "element";
                         }
@@ -5191,7 +5194,7 @@ function contentTable(newTestScriptDataLS) {
                             $grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     } else if (appTypeLocal == 'Desktop' && (!(obType == 'push_button' || obType == 'text' || obType == 'combo_box' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType =='treeview'|| obType=='TreeView' || obType=='tree' ||
-                            obType == 'list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box' || obType == 'radio_button' || obType == 'tab' || obType == 'datepicker'))) {
+                            obType == 'list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box' || obType == 'radio_button' || obType == 'tab' || obType == 'datepicker' || obType == 'table'))) {
                         var res = '';
                         var sc = Object.keys(keywordArrayList.element);
                         selectedKeywordList = "element";

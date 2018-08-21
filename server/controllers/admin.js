@@ -56,7 +56,7 @@ exports.manageUserDetails = function(req, res){
 			var inputs = {};
 			inputs.action = action;
 			inputs.createdby = req.session.username;
-			inputs.createdbyrole = req.session.defaultRole;
+			inputs.createdbyrole = req.session.activeRole;
 			inputs.username = (reqData.username || "").trim();
 			inputs.ciuser = reqData.ciUser || false;
 			inputs.ldapuser = reqData.ldapUser;
@@ -2135,7 +2135,7 @@ exports.manageSessionData = function (req, res) {
 									data.sessionData.push({
 										username: e.username,
 										id: Buffer.from(e.uniqueId).toString("base64"),
-										role: e.defaultRole,
+										role: e.activeRole,
 										loggedin: (new Date(e.cookie.expires)).toLocaleString(),
 										ip: e.ip
 									});

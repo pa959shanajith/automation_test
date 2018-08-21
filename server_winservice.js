@@ -18,15 +18,13 @@ nodewin.isAdminUser(function(isAdmin){
 		// Listen for the "install" event, which indicates the
 		// process is available as a service.
 		svc.on('install',function(){
-		  console.log("Nineteen68 Webserver service installed, starting...");
-		  svc.start();
+		  console.log("Nineteen68 Webserver service installed.");
 		});
 
 		// Listen for the "alreadyinstalled" event, which indicates the
 		// process is already available as a service.
 		svc.on('alreadyinstalled',function(){
-			console.log("Nineteen68 Webserver service is already installed, starting...");
-			svc.start();
+			console.log("Nineteen68 Webserver service is already installed.");
 		});
 
 		// Listen for the "uninstall" event so we know when it's done.
@@ -34,7 +32,7 @@ nodewin.isAdminUser(function(isAdmin){
 		  console.log('Nineteen68 Webserver service uninstallation complete.');
 		});
 
-		//arg could be 'install', 'uninstall', 'start', 'stop', by default 'install' will be considered
+		// arg could be 'install', 'uninstall', 'start', 'stop', by default 'install' will be considered
 		// perform operations based upon command line arguments
 
 		arg = process.argv[2];
@@ -55,7 +53,7 @@ nodewin.isAdminUser(function(isAdmin){
 					svc.stop();
 					break;
 				default:
-					console.log('invalid action passed, allowed actions: install, uninstall, start, stop');	
+					console.log('Invalid command, allowed options are: install, uninstall, start, stop');	
 					break;
 			}
 		}

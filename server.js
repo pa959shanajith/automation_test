@@ -210,7 +210,7 @@ if (cluster.isMaster) {
 
         //Role Based User Access to services
         app.post('*', function(req, res, next) {
-            var roleId = req.session.activeRole;
+            var roleId = req.session.activeRoleId;
             var updateinp = {
                 roleid: roleId || "ignore",
                 servicename: req.url.replace("/", "")
@@ -355,7 +355,7 @@ if (cluster.isMaster) {
                 }
             };
 
-            if (req.session.activeRole == req.session.defaultRoleId) {
+            if (req.session.activeRoleId == req.session.defaultRoleId) {
                 if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >= 0) {
                     req.session.destroy();
                     res.status(401).redirect('/');
