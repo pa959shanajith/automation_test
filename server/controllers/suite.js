@@ -40,6 +40,7 @@ exports.readTestSuite_ICE = function (req, res) {
 			var outscenarionames = [];
 			var outprojectnames = [];
 			testsuitesindex = testsuitesindex + 1;
+			eachSuite.userInfo = {"username": req.session.username, "role": req.session.activeRole};
 			logger.info("Calling function TestSuiteDetails_Module_ICE from readTestSuite_ICE");
 			TestSuiteDetails_Module_ICE(eachSuite, function (TestSuiteDetailserror, TestSuiteDetailsCallback) {
 				if (TestSuiteDetailserror) {
