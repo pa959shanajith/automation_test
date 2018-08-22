@@ -595,7 +595,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		var name = req.session.username;
 		redisServer.redisSubServer.subscribe('ICE2_' + name);
 		var batchExecutionData = req.body.moduleInfo;
-		var userinfo = {"user_id": req.session.username, "role": req.session.activeRole};
+		var userInfo = {"user_id": req.session.username, "role": req.session.activeRole};
 		var testsuitedetailslist = [];
 		var testsuiteIds = [];
 		var executionRequest = {
