@@ -9,6 +9,8 @@ var logger = require('../../logger');
 var utils = require('../lib/utils');
 var xlsx = require('xlsx');
 var excelbuilder = require('msexcel-builder');
+var path = require('path');
+var fs = require('fs');
 
 /* Convert excel file to CSV Object. */
 var xlsToCSV = function(workbook) {
@@ -1576,12 +1578,24 @@ exports.getScreens=function(req,res){
 exports.exportToExcel = function(req,res){
 	logger.info("Writing  Module structure to Excel");
 	if(utils.isSessionActive(req.session)){
-		var path = require('path');
+		
 		var d = req.body;
 		var excelMap = d.excelMap;
+		var dir = './../../excel';
+		var filepath1 = path.join(__dirname,'../../excel');
+		try{
+			if (!fs.existsSync(filepath1)){
+				console.log("inside directory");
+    				fs.mkdirSync(filepath1);
+					//console.log("created"+dir);
+			}
+		}
+		catch(e){
+			logger.error("exception in mindmapService: ",ex);
+		}
 		
 		//create a new workbook file in current working directory
-		var workbook = excelbuilder.createWorkbook("./etc","samp234.xlsx");
+		var workbook = excelbuilder.createWorkbook("./excel","samp234.xlsx");
 		
 		console.log(excelMap.name);
 		
@@ -1633,7 +1647,7 @@ var tes_row_count = 2;
             workbook.cancel();
         else
 			console.log("workbook created");
-			var filePath = path.join(__dirname,'../../etc','samp234.xlsx');
+			var filePath = path.join(__dirname,'../../excel','samp234.xlsx');
     
 			console.log(__dirname);
 			
@@ -1643,11 +1657,8 @@ var tes_row_count = 2;
 			});
 			var rstream = fs.createReadStream(filePath);
 			rstream.pipe(res);
-			fs1.emptyDir(path.join(__dirname, '../..', 'etc'), err => {
-				if (err) return console.error(err)
-			  
-				console.log('success!')
-			  })
+			//to remove the created files
+			 fs.unlinkSync(path.join(filePath));
 	});
 	
 
