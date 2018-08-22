@@ -1477,6 +1477,10 @@ exports.readTestCase_ICE = function (req, res) {
 				"versionnumber": requestedversionnumber,
 				"query": "readtestcase"
 			};
+			if (!requestedscreenid){ // if there is no screenid fetch just by testcase id in add dependent test cases
+				inputs.query = "testcaseid";
+				inputs.readonly = true;
+			}
 			var args = {
 				data: inputs,
 				headers: {
@@ -1502,31 +1506,46 @@ exports.readTestCase_ICE = function (req, res) {
 							logger.error("Exception while sending response from the service readTestCase_ICE: %s", exception);
 						}
 					} else {
-						try {
-							for (var i = 0; i < result.rows.length; i++) {
-								testcasesteps = result.rows[i].testcasesteps;
-								testcasename = result.rows[i].testcasename;
-							}
-							var inputs = {
-								"query": "debugtestcase",
-								"screenid": requestedscreenid
-							};
-							logger.info("Calling function fetchScrapedData from the service readTestCase_ICE");
-							fetchScrapedData(inputs, function (err, scrapedobjects) {
-								try {
-									if (scrapedobjects != null && scrapedobjects.trim() != '' && scrapedobjects != undefined) {
-										var newParse = JSON.parse(scrapedobjects);
-										if ('body' in newParse) {
-											template = newParse.body;
-											responsedata.template = template;
-											responsedata.testcase = testcasesteps;
-											responsedata.testcasename = testcasename;
-											try {
-												res.send(responsedata);
-											} catch (exception) {
-												logger.error("Exception while sending response data from the service readTestCase_ICE - fetchScrapedData: %s", exception);
+						if (!requestedscreenid){
+							res.send(result.rows[0]);
+						}else{
+							try {
+								for (var i = 0; i < result.rows.length; i++) {
+									testcasesteps = result.rows[i].testcasesteps;
+									testcasename = result.rows[i].testcasename;
+								}
+								var inputs = {
+									"query": "debugtestcase",
+									"screenid": requestedscreenid
+								};
+								logger.info("Calling function fetchScrapedData from the service readTestCase_ICE");
+								fetchScrapedData(inputs, function (err, scrapedobjects) {
+									try {
+										if (scrapedobjects != null && scrapedobjects.trim() != '' && scrapedobjects != undefined) {
+											var newParse = JSON.parse(scrapedobjects);
+											if ('body' in newParse) {
+												template = newParse.body;
+												responsedata.template = template;
+												responsedata.testcase = testcasesteps;
+												responsedata.testcasename = testcasename;
+												try {
+													res.send(responsedata);
+												} catch (exception) {
+													logger.error("Exception while sending response data from the service readTestCase_ICE - fetchScrapedData: %s", exception);
+												}
+											} else {
+												responsedata = {
+													template: "",
+													testcase: testcasesteps,
+													testcasename: testcasename
+												};
+												try {
+													res.send(responsedata);
+												} catch (exception) {
+													logger.error("Exception while sending response data from the service readTestCase_ICE - fetchScrapedData: %s", exception);
+												}
 											}
-										} else {
+										} else if ((scrapedobjects == null || scrapedobjects.trim() == '' || scrapedobjects == undefined) && (testcasesteps != null && testcasesteps != '' || testcasesteps != undefined)) {
 											responsedata = {
 												template: "",
 												testcase: testcasesteps,
@@ -1537,38 +1556,28 @@ exports.readTestCase_ICE = function (req, res) {
 											} catch (exception) {
 												logger.error("Exception while sending response data from the service readTestCase_ICE - fetchScrapedData: %s", exception);
 											}
+										} else {
+											//this case is merely impossible in V2.0 as creation happens in MindMaps
+											responsedata = {
+												template: "",
+												testcase: "[]",
+												testcasename: ""
+											};
+											try {
+												res.send(responsedata);
+											} catch (exception) {
+												logger.error("Exception while sending response data from the service readTestCase_ICE - fetchScrapedData: %s", exception);
+											}
 										}
-									} else if ((scrapedobjects == null || scrapedobjects.trim() == '' || scrapedobjects == undefined) && (testcasesteps != null && testcasesteps != '' || testcasesteps != undefined)) {
-										responsedata = {
-											template: "",
-											testcase: testcasesteps,
-											testcasename: testcasename
-										};
-										try {
-											res.send(responsedata);
-										} catch (exception) {
-											logger.error("Exception while sending response data from the service readTestCase_ICE - fetchScrapedData: %s", exception);
-										}
-									} else {
-										//this case is merely impossible in V2.0 as creation happens in MindMaps
-										responsedata = {
-											template: "",
-											testcase: "[]",
-											testcasename: ""
-										};
-										try {
-											res.send(responsedata);
-										} catch (exception) {
-											logger.error("Exception while sending response data from the service readTestCase_ICE - fetchScrapedData: %s", exception);
-										}
+									} catch (exception) {
+										logger.error("Exception in the service readTestCase_ICE - fetchScrapedData: %s", exception);
 									}
-								} catch (exception) {
-									logger.error("Exception in the service readTestCase_ICE - fetchScrapedData: %s", exception);
-								}
-							});
-						} catch (exception) {
-							logger.error("Exception in the service readTestCase_ICE: %s", exception);
+								});
+							} catch (exception) {
+								logger.error("Exception in the service readTestCase_ICE: %s", exception);
+							}
 						}
+
 					}
 				} catch (exception) {
 					logger.error("Exception in the service readTestCase_ICE: %s", exception);
