@@ -2365,11 +2365,11 @@ input[disabled]{
 	display: block;
 	float: left;
 }
-.executionDataTable tbody tr:nth-child(odd), .designDataTable tbody tr:nth-child(odd){
+.executionDataTable tbody tr:nth-child(odd), .designDataTable tbody tr:nth-child(odd),.reportDataTable tbody tr:nth-child(odd){
 	/*background:#e8e6ff;	*/
     background: #e8e6fe;
 }
-.designDataTable tbody tr:nth-child(even) {
+.designDataTable tbody tr:nth-child(even),.reportDataTable tbody tr:nth-child(even) {
     background: #fff;
 }
 .executionDataTable tbody, .designDataTable tbody {
@@ -2477,12 +2477,13 @@ input[disabled]{
 	width: 100%;
 	margin-top: 1px;
 }
-.scenarioHeaders{
+.scenarioHeaders,.reportHeaders{
 	background: #5e626b;
     color: #fff;
     font-size: 17px;
     font-family: 'LatoWebLight';
 }
+
 .scenarioHeaders tr{width: 100%;}
 .scenarioHeaders tr td{
 	padding: 0 5px 0 5px;
@@ -5632,8 +5633,30 @@ ul.browserInlineIcons
 {
     pointer-events: none;
 }
-.filterReports
+.filterReports,.reportDataTable
 {
     float:left;
     width: 100%;
+}
+.reportDataTable
+{
+   margin-top: 5%;
+}
+.reportDataTable
+{
+    display:none;
+    width: 100% !important;
+}
+.reportHeaders tr th, .reportHeaders tr thead
+{
+    border-right: 1px solid #fff;
+    padding: 5px !important;
+    font-weight: normal;
+    font-family: Latoweblight;
+    font-size: 17px;
+    text-align: left;
+}
+.executionCount
+{
+    cursor: pointer;
 }

@@ -3,11 +3,7 @@
 <!--Header-->
 
 <!--Content Area-->
-<!--<section class="container-fluid container-fluid-inner" id="reportSection">
-	
-</section>-->
 <section class="container-fluid container-fluid-inner" id="reportSection">
-
 <!--Left Panel-->
 <div id="left-nav-section">
         <div class="scrollbar-macosx">
@@ -43,7 +39,37 @@
             </div>
         </form>
 <!-- Dropdown Div -->
+<!-- Module Table Div -->{{result_reportData.testsuites}}
+<div class="table-responsive reportDataTable">
+    <table class="table table-striped">
+        <thead class='reportHeaders'>
+            <tr>
+              <th scope="col">Sl.No</th>
+              <th scope="col">Module Name</th>
+              <th scope="col">Scenario Name</th>
+              <th scope="col">Scenario Description</th>
+              <th scope="col">Execution Count</th>
+              <th scope="col">Last Execution Status</th>
+              <th scope="col">Executed On</th>
+              <th scope="col">View Report</th>
+            </tr>
+          </thead>
+          <tbody class='reportBody'>
+            <tr ng-repeat="report in result_reportData">
+              <td scope="row" >{{report.id}}</td>
+              <td>{{report.ModuleName }}</td>
+              <td>{{report.ScenarioName}}</td>
+              <td>{{report.description}}</td>
+              <td>{{report.count}}</td>
+              <td>{{report.latestStatus}}</td>
+              <td>{{report.executedon}}</td>
+              <td>View Report</td>
+            </tr>
+          </tbody>
+    </table>
+  </div>
 </div>
+<!-- Module Table Div -->
 <!--Middle Panel-->
             	<!--Right Panel-->
             	<div id="right-dependencies-section">
