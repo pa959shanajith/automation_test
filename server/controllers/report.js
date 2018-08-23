@@ -1146,9 +1146,118 @@ exports.connectJira_ICE = function (req, res) {
 	}
 };
 
+function latestReport(reportObjList,column){
+	reportObjList.sort(function(a, b){
+		var keyA = new Date(a.executedtime),
+			keyB = new Date(b.executedtime);
+		// Compare the 2 dates
+		if(keyA < keyB) return 1;
+		if(keyA > keyB) return -1;
+		return 0;
+	});
+	return reportObjList[0][column];
+}
+
 exports.getReportsData_ICE = function (req, res) {
 	logger.info("Inside UI service: getReportsData_ICE");
-	logger.info(req.body.reportsInputData)
+	console.log(req.body.reportsInputData) //redundant fields
+	var inputs = {
+		"query": "scenariodetails",
+		"id": req.body.reportsInputData.cycleId
+	};	
+	var args = {
+		data: inputs,
+		headers: {
+			"Content-Type": "application/json"
+		}
+	};	
+	var mainReportObj = {cycleid:req.body.reportsInputData.cycleId};
+	client.post(epurl + "reports/getAllSuites_ICE", args,
+		function (result1, response1) {
+		if (response1.statusCode != 200 || result1.rows == "fail") {
+			logger.error("Error occured in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
+			res.send("fail");
+		} else {
+			console.log(result1.rows)	//contains suiiteids suitename and scenarioids
+			//res.send(result);
+			var suObj = [],mainObj = {};
+			async.forEachSeries(result1.rows, function (eachtestsuite, scenariodetailscb) {
+			//result1.rows.forEach(function(eachtestsuite,i){
+				var reportScenarioObj = [];
+				var inputs = {
+					"query": "scenarionamemap",
+					"scenarioid": eachtestsuite.testscenarioids
+				};	
+				var args = {
+					data: inputs,
+					headers: {
+						"Content-Type": "application/json"
+					}
+				};								
+				client.post(epurl + "reports/reportStatusScenarios_ICE", args,
+				function (result2, response2) {
+					if (response2.statusCode != 200 || result2.rows == "fail") {
+						logger.error("Error occured in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
+						res.send("fail");
+					} else {
+						console.log(result2);	// contains scenarioid vs scenarioname
+						//res.send(result);
+						async.forEachSeries(Object.keys(result2), function (scenarioid, scenariomapcb) {
+						//for (var scenarioid in result2){
+							var inputs = {
+								"query": "allreports",
+								"scenarioid": scenarioid
+							};	
+							var args = {
+								data: inputs,
+								headers: {
+									"Content-Type": "application/json"
+								}
+							};								
+							client.post(epurl + "reports/reportStatusScenarios_ICE", args,
+								function (result3, response3) {
+								if (response3.statusCode != 200 || result3.rows == "fail") {
+									logger.error("Error occured in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
+									res.send("fail");
+								} else {
+									console.log("============");
+									console.log(result3);
+									console.log("*********************************")
+									reportScenarioObj.push({
+										scenarioid:scenarioid,
+										scenarioname:result2[scenarioid],
+										description:"under construction",
+										count:result3.rows.length,
+										latestStatus: latestReport(result3.rows,'status'),
+										executedon: latestReport(result3.rows,'executedtime'),
+									});
+									scenariomapcb();
+								}
+							});		
+						//}							
+						},function(){
+							console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+							suObj.push({
+								'testsuiteid':eachtestsuite.testsuiteid,
+								'testsuitename':eachtestsuite.testsuitename,
+								'scenarios':reportScenarioObj
+							});
+							scenariodetailscb();
+						});	
+
+					}
+				});
+
+			},function(){
+				mainObj = {
+					"cycleid":req.body.reportsInputData.cycleId,
+					"testsuites":suObj
+				};
+				res.send(mainObj);
+	
+			});
+		}
+	});
 };
 
 function validateData(content, type){

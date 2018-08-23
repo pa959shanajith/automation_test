@@ -99,7 +99,7 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 				reportsInputData.projectId = $scope.projectNames;
 				reportsInputData.releaseId = $scope.releaseNames;
 				reportsInputData.cycleId = $scope.cycleNames;
-				reportService.getReportsData_ICE(reportsInputData).then(function(result_reportData) {
+				reportService.getReportsData_ICE(reportsInputData).then(function(result_reportData,response_reportData) {
 					//reportData
 				});
 			};
