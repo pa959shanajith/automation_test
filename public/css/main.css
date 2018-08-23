@@ -4458,19 +4458,25 @@ select:-webkit-autofill:focus {
 }
 .rpSelectProjects{
     float: left;
-    margin-left: 18px;
-    margin-top: 3px;
 }
 .rpSelectProjects>label{
     margin: 0;
-    position: relative;
-    top: 6px;
 }
-.rpSelectProjects .rpProjects{
+.rpSelectProjects .rpProjects {
     width: 200px;
     height: 24px;
     border-radius: 4px;
     border-color: #633693;
+    margin-top: 5%;
+    outline: none;
+}
+.rpReleases, .rpCycles{
+    width: 200px;
+    height: 24px;
+    border-radius: 4px;
+    border-color: #633693;
+    margin-top: 5%;
+    outline: none;
 }
 .search-reports{
     float: right;
@@ -5625,4 +5631,9 @@ ul.browserInlineIcons
 .disableFilter
 {
     pointer-events: none;
+}
+.filterReports
+{
+    float:left;
+    width: 100%;
 }

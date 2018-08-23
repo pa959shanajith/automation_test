@@ -1146,6 +1146,11 @@ exports.connectJira_ICE = function (req, res) {
 	}
 };
 
+exports.getReportsData_ICE = function (req, res) {
+	logger.info("Inside UI service: getReportsData_ICE");
+	logger.info(req.body.reportsInputData)
+};
+
 function validateData(content, type){
 	logger.info("Inside function: validateData");
 	switch(type){

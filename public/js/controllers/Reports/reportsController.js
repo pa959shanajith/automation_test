@@ -1,4 +1,4 @@
-mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$location', '$timeout','$window', 'reportService','cfpLoadingBar','$sce', function($scope, $rootScope, $http,$location,$timeout,$window,reportService, cfpLoadingBar, $sce) {
+mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$location', '$timeout','$window', 'reportService','mindmapServices','cfpLoadingBar','$sce', function($scope, $rootScope, $http,$location,$timeout,$window,reportService, mindmapServices,cfpLoadingBar, $sce) {
 	$("body").css("background","#eee");
 	$("head").append('<link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
 	var getUserInfo = JSON.parse(window.localStorage['_UI']);
@@ -43,28 +43,68 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 
 
 	//service call to get projects and testsuites
-	$(document).on('change', ".rpProjects", function(e){
-		var projectId = $(this).children("option:selected").val();
-		if(projectId){
-			$('.suiteContainer, .scenariostatusreport').remove();
-			$('.scenarioReportstbody tr').remove();
-			$('.progress-bar-success, .progress-bar-danger, .progress-bar-warning, .progress-bar-norun').css('width','0%');
-			$('.passPercent, .failPercent, .terminatePercent, .incompletePercent').text('');
+	// $(document).on('change', ".rpProjects", function(e){
+	// 	var projectId = $(this).children("option:selected").val();
+	// 	if(projectId){
+	// 		$('.suiteContainer, .scenariostatusreport').remove();
+	// 		$('.scenarioReportstbody tr').remove();
+	// 		$('.progress-bar-success, .progress-bar-danger, .progress-bar-warning, .progress-bar-norun').css('width','0%');
+	// 		$('.passPercent, .failPercent, .terminatePercent, .incompletePercent').text('');
 			
-			if($(".dynamicTestsuiteContainer").is(":Visible")){
-				$('.iconSpace-reports').trigger('click');
+	// 		if($(".dynamicTestsuiteContainer").is(":Visible")){
+	// 			$('.iconSpace-reports').trigger('click');
+	// 		}
+	// 		$('#searchModule').val('');
+	// 		// openArrow = 0;
+	// 		//Transaction Activity for FilterProjectsForReports
+	// 		// var labelArr = [];
+	// 		// var infoArr = [];
+	// 		// labelArr.push(txnHistory.codesDict['FilterProjectsForReports']);
+	// 		// txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
+	// 		getProjectsAndSuites(projectId, "reports");
+	// 		e.stopImmediatePropagation();
+	// 	}
+	// })
+
+	//ON CHANGE PROJECTS
+	$scope.selProjectsFilter = function() {
+		var projectId = $scope.projectNames;
+		mindmapServices.populateReleases(projectId).then(function(result) {
+			if (result == "Invalid Session") {
+				$rootScope.redirectPage();
 			}
-			$('#searchModule').val('');
-			// openArrow = 0;
-			//Transaction Activity for FilterProjectsForReports
-			// var labelArr = [];
-			// var infoArr = [];
-			// labelArr.push(txnHistory.codesDict['FilterProjectsForReports']);
-			// txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
-			getProjectsAndSuites(projectId, "reports");
-			e.stopImmediatePropagation();
-		}
-	})
+			$('.rpReleases').empty();
+			$('.rpReleases').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+			$('.rpCycles').empty();
+			$('.rpCycles').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+			for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
+			  $('.rpReleases').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
+			}
+			$scope.selReleasesFilter = function() {
+				var releaseId = $scope.releaseNames;
+				mindmapServices.populateCycles(releaseId).then(function(result_cycles) {
+					if (result_cycles == "Invalid Session") {
+						$rootScope.redirectPage();
+					}
+					$('.rpCycles').empty();
+					$('.rpCycles').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+					for (i = 0; i < result_cycles.c_ids.length && result_cycles.cyc.length; i++) {
+						$('.rpCycles').append("<option data-id='" + result_cycles.cyc[i] + "' value='" + result_cycles.c_ids[i] + "'>" + result_cycles.cyc[i] + "</option>");
+					}
+				});
+			};
+			$scope.selCyclesFilter = function() {
+				var cycleId = $scope.cycleNames;
+				var reportsInputData = {};
+				reportsInputData.projectId = $scope.projectNames;
+				reportsInputData.releaseId = $scope.releaseNames;
+				reportsInputData.cycleId = $scope.cycleNames;
+				reportService.getReportsData_ICE(reportsInputData).then(function(result_reportData) {
+					//reportData
+				});
+			};
+		});
+	};
 
 	//getAllSuites_ICE function call
 	function getProjectsAndSuites(ID, type){

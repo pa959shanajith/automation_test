@@ -20,19 +20,19 @@ var winston = require('winston');
 var epurl = "http://" + process.env.NDAC_IP + ":" + process.env.NDAC_PORT + "/";
 var logger = require('./logger');
 
-if (cluster.isMaster) {
-    cluster.fork();
-    cluster.on('disconnect', function(worker) {
-        logger.error('Nineteen68 server has encountered some problems, Disconnecting!');
-    });
-    cluster.on('exit', function(worker) {
-        if (worker.exitedAfterDisconnect !== true) {
-            logger.error('Worker %d is killed!', worker.id);
-            cluster.fork();
-        }
-    });
-} else
-{
+// if (cluster.isMaster) {
+//     cluster.fork();
+//     cluster.on('disconnect', function(worker) {
+//         logger.error('Nineteen68 server has encountered some problems, Disconnecting!');
+//     });
+//     cluster.on('exit', function(worker) {
+//         if (worker.exitedAfterDisconnect !== true) {
+//             logger.error('Worker %d is killed!', worker.id);
+//             cluster.fork();
+//         }
+//     });
+// } else
+// {
     try {
         var express = require('express');
         var app = express();
@@ -517,6 +517,7 @@ if (cluster.isMaster) {
         app.post('/exportToJson_ICE', report.exportToJson_ICE);
         app.post('/openScreenShot', report.openScreenShot);
         app.post('/connectJira_ICE', report.connectJira_ICE);
+        app.post('/getReportsData_ICE', report.getReportsData_ICE);
         //Plugin Routes
         app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
         app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
@@ -619,4 +620,4 @@ if (cluster.isMaster) {
             cluster.worker.kill();
         }, 200);
     }
-}
+//}
