@@ -5659,7 +5659,7 @@ ul.browserInlineIcons
 }
 .reportScenarioDataTable
 {
-    max-height: calc(100% - 130px) !important;
+    max-height: 320px !important;
 }
 
 .reportHeaders tr th, .reportHeaders tr thead
@@ -5668,8 +5668,8 @@ ul.browserInlineIcons
     padding: 5px !important;
     font-weight: normal;
     font-family: Latoweblight;
-    font-size: 17px;
     text-align: left;
+    line-height: 1.1 !important;
 }
 .executionCount
 {
@@ -5679,4 +5679,38 @@ ul.browserInlineIcons
 {
     float: left;
     width: 100%;
+}
+.reportDataTable tr,.reportScenarioDataTable tr
+{
+    width: 100%;
+}
+
+.reportDataTable th:nth-child(1),.reportDataTable td:nth-child(1){width: 4%;  word-break: break-word; }
+.reportDataTable th:nth-child(2),.reportDataTable td:nth-child(2){width: 8%;  word-break: break-word;}
+.reportDataTable th:nth-child(3),.reportDataTable td:nth-child(3){width: 9%; word-break: break-word; text-align:left}
+.reportDataTable th:nth-child(4),.reportDataTable td:nth-child(4){width: 11%; word-break: break-word; text-align:left}
+.reportDataTable th:nth-child(5),.reportDataTable td:nth-child(5){width: 6%; word-break: break-word; text-align:left}
+.reportDataTable th:nth-child(6),.reportDataTable td:nth-child(6){width: 12%; word-break: break-word; text-align:left}
+.reportDataTable th:nth-child(7),.reportDataTable td:nth-child(7){width: 8%; word-break: break-word; text-align:left}
+.reportDataTable th:nth-child(8),.reportDataTable td:nth-child(8){width: 7%; word-break: break-word; text-align:left}
+
+.reportScenarioDataTable th:nth-child(1),.reportScenarioDataTable td:nth-child(1){width: 4%;  word-break: break-word; }
+.reportScenarioDataTable th:nth-child(2),.reportScenarioDataTable td:nth-child(2){width: 10%;  word-break: break-word;}
+.reportScenarioDataTable th:nth-child(3),.reportScenarioDataTable td:nth-child(3){width: 10%; word-break: break-word; text-align:left}
+.reportScenarioDataTable th:nth-child(4),.reportScenarioDataTable td:nth-child(4){width: 5%; word-break: break-word; text-align:left}
+.reportScenarioDataTable th:nth-child(5),.reportScenarioDataTable td:nth-child(5){width: 6.5%; word-break: break-word; text-align:left}
+.reportScenarioDataTable th:nth-child(6),.reportScenarioDataTable td:nth-child(6){width: 5%; word-break: break-word; text-align:left}
+
+.reportFormat
+{
+    width: 27px;
+    height: 27px;
+    padding: 2px;
+    cursor: pointer;
+}
+.searchReports
+{
+    position: absolute;
+    top: 11px;
+    left: 173px;
 }
