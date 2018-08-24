@@ -4484,6 +4484,8 @@ select:-webkit-autofill:focus {
     margin-top: 9px;
     border-radius: 7px;
     border: 1px solid #461F6E;
+    outline: none !important;
+    padding: 10px !important;
 }
 .search-reports{
     float: right;
@@ -5647,11 +5649,19 @@ ul.browserInlineIcons
 .reportDataTable,.reportScenarioDataTable
 {
    margin-top: 5%;
-   max-height: 350px;
    overflow:auto;
    display:none;
    width: 100% !important;
 }
+.reportDataTable
+{
+    max-height: 350px !important;
+}
+.reportScenarioDataTable
+{
+    max-height: calc(100% - 130px) !important;
+}
+
 .reportHeaders tr th, .reportHeaders tr thead
 {
     border-right: 1px solid #fff;
@@ -5664,4 +5674,9 @@ ul.browserInlineIcons
 .executionCount
 {
     cursor: pointer;
+}
+.filterReport
+{
+    float: left;
+    width: 100%;
 }
