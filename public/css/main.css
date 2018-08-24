@@ -5695,6 +5695,7 @@ ul.browserInlineIcons
 .reportDataTable tr,.reportScenarioDataTable tr
 {
     width: 100%;
+    font-family: Latoweb;
 }
 
 .reportDataTable th:nth-child(1),.reportDataTable td:nth-child(1){width: 4%;  word-break: break-word; }

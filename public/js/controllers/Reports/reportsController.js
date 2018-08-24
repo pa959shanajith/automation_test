@@ -131,15 +131,21 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 
 	//Execution count click
 	$scope.getscenarioDetails = function($event) {
-		  var scenarioId = $(this)[0].report.scenarioId;
-		  var reportsInputData = {};
-		  reportsInputData.scenarioid = scenarioId;
-		  reportsInputData.type = "scenarioreports";
-		  $scope.reportIdx = $(this)[0].report.idx;
-		  reportService.getReportsData_ICE(reportsInputData).then(function (result_res_scenarioData, response_scenarioData) {
-		  $scope.result_res_scenarioData = result_res_scenarioData.rows;
-		  $("#reportScenarioDataTable").show();
-		  });
+		  if($(this)[0].report.count > 0)
+		  {
+			var scenarioId = $(this)[0].report.scenarioId;
+			var reportsInputData = {};
+			reportsInputData.scenarioid = scenarioId;
+			reportsInputData.type = "scenarioreports";
+			$scope.reportIdx = $(this)[0].report.idx;
+			reportService.getReportsData_ICE(reportsInputData).then(function (result_res_scenarioData, response_scenarioData) {
+			$scope.result_res_scenarioData = result_res_scenarioData.rows;
+			$("#reportScenarioDataTable").show();
+			});
+		  }
+		  else{
+			$("#reportScenarioDataTable").hide();
+		  }
 
 	};
 
