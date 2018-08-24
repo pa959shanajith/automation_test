@@ -68,7 +68,7 @@
             </tr>
           </thead>
           <tbody class='reportBody report-table-body'>
-            <tr ng-repeat="report in result_reportData">
+            <tr class='getScenarioTestCaseDetails' ng-repeat="report in result_reportData" ng-click='getScenarioTestCaseDetails($event)'>
               <td scope="row">{{report.id}}</td>
               <td class="reptable-modulename">{{report.ModuleName }}</td>
               <td class="reptable-scenarioname">{{report.ScenarioName}}</td>
@@ -126,7 +126,6 @@
       </div>
       <!-- Module Table Div -->
 </div>
-
 <!--Middle Panel-->
             	<!--Right Panel-->
             	<div id="right-dependencies-section">
@@ -187,6 +186,34 @@
                         <!--Images Blocks-->
                     </div>
                     <!--Right Panel-->
+<!-- Modal Scenario Details -->
+<div class="modal fade" id="modalScenarioDetails" role="dialog" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-md modalScenarioDetails">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"></h4>
+                </div>
+                <div class="modal-body">
+                    <!-- Heading Part -->
+                    <div class="scenarioDetails scenarioDetailsHeading">
+                        <div class="sDInnerContents">Test Case Name</div>
+                        <div class="sDInnerContents">Screen Name</div>
+                        <div class="sDInnerContents">Project Name</div>
+                    </div>
+                    <!-- Heading Part -->
+                    
+                    <!-- Content Area -->
+                    <div id="scenarioDetailsContent" class="scenarioDetails scenarioDetailsContent scrollbar-inner"></div>
+                    <!-- Content Area -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Scenario Details -->
 </section>
 <!--Content Area-->
 
