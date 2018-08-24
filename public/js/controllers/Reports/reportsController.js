@@ -143,16 +143,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 
 	};
 
-	//Report Table row click
-	$scope.getScenarioTestCaseDetails = function($event) {
-		var scenarioName = $(this)[0].report.ScenarioName;
-		$("#scenarioDetailsContent").empty();
-		$("#modalScenarioDetails").find(".modal-title").text(scenarioName);
-		$("#modalScenarioDetails").modal("show");
-		$('#modalScenarioDetails').find('.btn-default').focus();
-
-	};
-
 	//getAllSuites_ICE function call
 	function getProjectsAndSuites(ID, type) {
 		reportService.getAllSuites_ICE(ID, type)
