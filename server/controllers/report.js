@@ -1147,6 +1147,7 @@ exports.connectJira_ICE = function (req, res) {
 };
 
 function latestReport(reportObjList,column){
+	if(reportObjList.length == 0) return null;
 	reportObjList.sort(function(a, b){
 		var keyA = new Date(a.executedtime),
 			keyB = new Date(b.executedtime);
@@ -1234,24 +1235,21 @@ exports.getReportsData_ICE = function (req, res) {
 									headers: {
 										"Content-Type": "application/json"
 									}
-								};								
+								};						
 								client.post(epurl + "reports/reportStatusScenarios_ICE", args,
 									function (result3, response3) {
 									if (response3.statusCode != 200 || result3.rows == "fail") {
 										logger.error("Error occured in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
 										res.send("fail");
 									} else {
-										if(result3.rows.length > 0)
-										{
-											reportScenarioObj.push({
-												scenarioid:scenarioid,
-												scenarioname:result2[scenarioid],
-												description:"under construction",
-												count:result3.rows.length,
-												latestStatus: latestReport(result3.rows,'status'),
-												executedon: latestReport(result3.rows,'executedtime'),
-											});
-										}		
+										reportScenarioObj.push({
+											scenarioid:scenarioid,
+											scenarioname:result2[scenarioid],
+											description:"under construction",
+											count:result3.rows.length,
+											latestStatus: latestReport(result3.rows,'status'),
+											executedon: latestReport(result3.rows,'executedtime'),
+										});	
 										scenariomapcb();
 									}
 								});	
