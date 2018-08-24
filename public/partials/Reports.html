@@ -69,17 +69,21 @@
           </thead>
           <tbody class='reportBody report-table-body'>
             <tr ng-repeat="report in result_reportData">
-              <td scope="row" >{{report.id}}</td>
-              <td>{{report.ModuleName }}</td>
-              <td>{{report.ScenarioName}}</td>
+              <td scope="row">{{report.id}}</td>
+              <td class="reptable-modulename">{{report.ModuleName }}</td>
+              <td class="reptable-scenarioname">{{report.ScenarioName}}</td>
               <td>{{report.description}}</td>
               <td class='executionCount' ng-click='getscenarioDetails($event)'>{{report.count}}</td>
               <td>{{report.latestStatus}}</td>
               <td>{{report.executedon}}</td>
               <td>
-                    <span><img alt='Pdf Icon' class='reportFormat' src='imgs/ic-pdf.png' title='PDF Report'></span>
-                    <span><img alt='Browser Icon' class='reportFormat' src='imgs/ic-web.png' title='Browser Report'></span>
-                    <span><img alt='Export JSON' class='reportFormat' src='imgs/ic-export-json.png' title='Select format' /></span>
+                    <img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus' data-getrep='wkhtmltopdf' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer;' src='imgs/ic-pdf.png' title='PDF Report'>
+                    <img alt='-' class='getSpecificReportBrowser openreportstatus' data-getrep='html' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer; width: 23px;' src='imgs/ic-web.png' title='Browser Report'>
+                    <img alt='Export JSON' class='exportToJSON' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer;' src='imgs/ic-export-to-json.png' title='Export to Json'>
+                
+                    <!-- <span><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{report.reportid}}' src='imgs/ic-pdf.png' title='PDF Report'></span>
+                    <span><img alt='Browser Icon' class='reportFormat getSpecificReportBrowser' data-reportid='{{report.reportid}}' src='imgs/ic-web.png' title='Browser Report'></span>
+                    <span><img alt='Export JSON' class='reportFormat exportToJSON' data-reportid='{{report.reportid}}' src='imgs/ic-export-json.png' title='Select format' /></span> -->
                 </td>
             </tr>
           </tbody>
@@ -108,9 +112,13 @@
                   <td>{{scenario.browser}}</td>
                   <td>{{scenario.status}}</td>
                   <td>
-                    <span><img alt='Pdf Icon' class='reportFormat' src='imgs/ic-pdf.png' title='PDF Report'></span>
-                    <span><img alt='Browser Icon' class='reportFormat' src='imgs/ic-web.png' title='Browser Report'></span>
-                    <span><img alt='Export JSON' class='reportFormat' src='imgs/ic-export-json.png' title='Select format' /></span>
+                        <img alt='Pdf Icon' class='archivedreport getSpecificReportBrowser openreportstatus' data-getrep='wkhtmltopdf' data-reportid='{{scenario.reportid}}' style='cursor: pointer;' src='imgs/ic-pdf.png' title='PDF Report'>
+                        <img alt='-' class='archivedreport getSpecificReportBrowser openreportstatus' data-getrep='html' data-reportid='{{scenario.reportid}}' style='cursor: pointer;  width: 23px;' src='imgs/ic-web.png' title='Browser Report'>
+                        <img alt='Export JSON' class='exportToJSON' data-reportid='{{scenario.reportid}}' style='cursor: pointer;' src='imgs/ic-export-to-json.png' title='Export to Json'>
+
+                    <!-- <span><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{scenario.reportid}}' src='imgs/ic-pdf.png' title='PDF Report'></span>
+                    <span><img alt='Browser Icon' class='reportFormat getSpecificReportBrowser' data-reportid='{{scenario.reportid}}' src='imgs/ic-web.png' title='Browser Report'></span>
+                    <span><img alt='Export JSON' class='reportFormat exportToJSON' data-reportid='{{scenario.reportid}}' src='imgs/ic-export-json.png' title='Select format' /></span> -->
                 </td>
                 </tr>
               </tbody>

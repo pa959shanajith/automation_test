@@ -5,6 +5,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 	var userID = getUserInfo.user_id;
 	var openArrow = 0; var openWindow = 0;
 	var executionId, testsuiteId;
+	$scope.reportIdx = '';
 	$("#page-taskName").empty().append('<span>Reports</span>')
 
 	cfpLoadingBar.start()
@@ -113,9 +114,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 						angular.forEach(result_res_reportData.testsuites, function (value, index) {
 							angular.forEach(value.scenarios, function (val, position) {
 								if(position == 0){
-									$scope.result_reportData.push({'id':index+1,'ModuleName': value.testsuitename,'ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid})
+									$scope.result_reportData.push({'id':index+1,'ModuleName': value.testsuitename,'ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':index+1})
 								}else{
-									$scope.result_reportData.push({'id':'','ModuleName':'','ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid})
+									$scope.result_reportData.push({'id':'','ModuleName':'','ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':index+1})
 								}
 							})
 						});
@@ -134,10 +135,12 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 		  var reportsInputData = {};
 		  reportsInputData.scenarioid = scenarioId;
 		  reportsInputData.type = "scenarioreports";
+		  $scope.reportIdx = $(this)[0].report.idx;
 		  reportService.getReportsData_ICE(reportsInputData).then(function (result_res_scenarioData, response_scenarioData) {
 		  $scope.result_res_scenarioData = result_res_scenarioData.rows;
 		  $("#reportScenarioDataTable").show();
 		  });
+
 	};
 
 	//getAllSuites_ICE function call
@@ -607,10 +610,19 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 
 	//$(document).on('click', '.openreportstatus', function(e){
 	function htlmReportClick(e) {
-		var reportID = $(this).attr('data-reportid');
+		console.log($scope.result_reportData);
 		var reportType = $(this).attr('data-getrep');
-		var testsuitename = $(".reportboxselected").text();
-		var scenarioName = $('.openreportstatus').parents('tr').find('td:first-child').text();
+		if($(this)[0].classList.contains('archivedreport')){
+			var idx = $scope.reportIdx-1;
+		} else{
+			var idx =$(this).attr('data-reportidx')-1;
+		}
+		var reportID = $scope.result_reportData[idx].reportid;
+		var testsuiteId =$scope.result_reportData[idx].testsuiteid;
+		var testsuitename = $scope.result_reportData[idx].testsuitename;
+		var scenarioName = $scope.result_reportData[idx].ScenarioName;			
+		//var testsuitename = $(".reportboxselected").text();
+		//var scenarioName = $('.openreportstatus').parents('tr').find('td:first-child').text();
 		//var d = new Date();
 		//var DATE = ("0" + (d.getMonth()+1)).slice(-2) + "/" + ("0" + d.getDate()).slice(-2) + "/" + d.getFullYear();
 		//var TIME = ("0" + d.getHours()).slice(-2) +":"+ ("0" + d.getMinutes()).slice(-2) +":"+ ("0" + d.getSeconds()).slice(-2);
