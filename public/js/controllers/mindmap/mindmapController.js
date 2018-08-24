@@ -2314,7 +2314,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     var k = d3.select('#ct-inpAct');
                     d3.select('#ct-inpSugg').classed('no-disp', !0);
                     d3.select('#ct-inpPredict').property('value', '');
-                    d3.select('#ct-inpAct').attr('data-nodeid', k.attr('data-nodeid')).property('value', this.text).node().focus();
+                    d3.select('#ct-inpAct').attr('data-nodeid', k.attr('data-nodeid')).property('value', d.name).node().focus();
                 });
             }
         });
