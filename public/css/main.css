@@ -5653,13 +5653,25 @@ ul.browserInlineIcons
    display:none;
    width: 100% !important;
 }
+/* .report-table-body{
+    overflow: auto;
+    max-height: 350px !important;
+    position: absolute;
+    width: 96%;
+} */
+/* .report-scenario-body{
+    overflow: auto;
+    max-height: 290px !important;
+    position: absolute;
+    width: 96%;
+}  */
 .reportDataTable
 {
     max-height: 350px !important;
 }
 .reportScenarioDataTable
 {
-    max-height: 290px !important;
+    max-height: 230px !important;
 }
 
 .reportHeaders tr th, .reportHeaders tr thead
