@@ -5648,7 +5648,7 @@ ul.browserInlineIcons
 }
 .reportDataTable,.reportScenarioDataTable
 {
-   margin-top: 5%;
+   margin-top: 3%;
    overflow:auto;
    display:none;
    width: 100% !important;
@@ -5659,7 +5659,7 @@ ul.browserInlineIcons
 }
 .reportScenarioDataTable
 {
-    max-height: 320px !important;
+    max-height: 290px !important;
 }
 
 .reportHeaders tr th, .reportHeaders tr thead
