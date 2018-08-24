@@ -19,24 +19,29 @@
 <div id="middle-content-section" class="middle-content-section-reports">
 <!-- Dropdown Div -->
         <form class="form-inline filterReports"> 
-                <div class='col-sm-4'>   
+            <div class='col-sm-3'>   
                 <div class="form-group rpSelectProjects">
                     <label for="projects">Projects:</label>
                     <select id='selectProjects' class="rpProjects" ng-model="projectNames" ng-change='selProjectsFilter()'></select>
                 </div>
-                </div>
-                <div class='col-sm-4'>
+            </div>
+            <div class='col-sm-3'>
                 <div class="form-group rpSelectProjects">
                         <label for="projects">Releases:</label>
                         <select id='selectReleases' class="rpReleases" ng-model="releaseNames" ng-change='selReleasesFilter()'><option>Select Releases</option></select>
                 </div>
-                </div>
-                <div class='col-sm-4'>
+            </div>
+            <div class='col-sm-3'>
                 <div class="form-group rpSelectProjects">
                         <label for="projects">Cycles:</label>
                         <select id='selectCycles' class="rpCycles"  ng-model="cycleNames" ng-change='selCyclesFilter()'><option>Select Cycles</option></select>
                 </div>
             </div>
+            <div class='col-sm-3'>
+                <div class="form-group rpSearch">
+                        <input class="reports-search" type="text" placeholder="Search" aria-label="Search">
+                </div>
+            </div>            
         </form>
 <!-- Dropdown Div -->
 <!-- Module Table Div -->{{result_reportData.testsuites}}
@@ -54,7 +59,7 @@
               <th scope="col">View Report</th>
             </tr>
           </thead>
-          <tbody class='reportBody'>
+          <tbody class='reportBody report-table-body'>
             <tr ng-repeat="report in result_reportData">
               <td scope="row" >{{report.id}}</td>
               <td>{{report.ModuleName }}</td>

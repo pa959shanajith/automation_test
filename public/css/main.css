@@ -4464,7 +4464,7 @@ select:-webkit-autofill:focus {
     margin: 0;
 }
 .rpSelectProjects .rpProjects {
-    width: 200px;
+    width: 145px;
     height: 24px;
     border-radius: 4px;
     border-color: #633693;
@@ -4472,12 +4472,18 @@ select:-webkit-autofill:focus {
     outline: none;
 }
 .rpReleases, .rpCycles{
-    width: 200px;
+    width: 145px;
     height: 24px;
     border-radius: 4px;
     border-color: #633693;
     margin-top: 5%;
     outline: none;
+}
+.reports-search{
+    height: 26px;
+    margin-top: 9px;
+    border-radius: 7px;
+    border: 1px solid #461F6E;
 }
 .search-reports{
     float: right;

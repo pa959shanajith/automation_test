@@ -241,6 +241,13 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 		e.stopImmediatePropagation();
 	});
 
+	$(".reports-search").on("keyup", function() {
+		var value = $(this).val().toLowerCase();
+		$(".report-table-body tr").filter(function() {
+		  $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+		});
+	  });
+
 	//Service call to get start and end details of suites
 	/************ SUITE CLICK *****************/
 	$(document).off('click.suiteContainerClick', '.suiteContainer');
