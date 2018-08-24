@@ -18,6 +18,7 @@
 <!--Middle Panel-->
 <div id="middle-content-section" class="middle-content-section-reports">
 <!-- Dropdown Div -->
+        <div class='filterReport'>
         <form class="form-inline filterReports"> 
             <div class='col-sm-3'>   
                 <div class="form-group rpSelectProjects">
@@ -43,9 +44,10 @@
                 </div>
             </div>            
         </form>
+        </div>
 <!-- Dropdown Div -->
-<!-- Module Table Div -->{{result_reportData.testsuites}}
-<div class="table-responsive reportDataTable">
+<!-- Module Table Div -->
+<div class="table-responsive reportDataTable" id='reportDataTable'>
     <table class="table table-striped">
         <thead class='reportHeaders'>
             <tr>
@@ -65,16 +67,52 @@
               <td>{{report.ModuleName }}</td>
               <td>{{report.ScenarioName}}</td>
               <td>{{report.description}}</td>
-              <td>{{report.count}}</td>
+              <td class='executionCount' ng-click='getscenarioDetails($event)'>{{report.count}}</td>
               <td>{{report.latestStatus}}</td>
               <td>{{report.executedon}}</td>
-              <td>View Report</td>
+              <td>
+                    <span><img alt='Pdf Icon' class='reportFormat' src='imgs/ic-pdf.png' title='PDF Report'></span>
+                    <span><img alt='Browser Icon' class='reportFormat' src='imgs/ic-web.png' title='Browser Report'></span>
+                    <span><img alt='Export JSON' class='reportFormat' src='imgs/ic-export-json.png' title='Select format' /></span>
+                </td>
             </tr>
           </tbody>
     </table>
   </div>
+  <!-- Module Table Div -->
+
+  <!-- Scenario Table Div -->
+<div class="table-responsive reportScenarioDataTable" id='reportScenarioDataTable'>
+        <table class="table table-striped">
+            <thead class='reportHeaders'>
+                <tr>
+                  <th scope="col">Sl.No</th>
+                  <th scope="col">Execution Time (Start Time)</th>
+                  <th scope="col">Execution Time (End Time)</th>
+                  <th scope="col">Executed On</th>
+                  <th scope="col">Execution Status</th>
+                  <th scope="col">View Report</th>
+                </tr>
+              </thead>
+              <tbody class='reportBody'>
+                 <tr ng-repeat="scenario in result_res_scenarioData">
+                  <td scope="row" >{{$index+1}}</td>
+                  <td>{{scenario.executedtime }}</td>
+                  <td>{{scenario.executedtime}}</td>
+                  <td>{{scenario.browser}}</td>
+                  <td>{{scenario.status}}</td>
+                  <td>
+                    <span><img alt='Pdf Icon' class='reportFormat' src='imgs/ic-pdf.png' title='PDF Report'></span>
+                    <span><img alt='Browser Icon' class='reportFormat' src='imgs/ic-web.png' title='Browser Report'></span>
+                    <span><img alt='Export JSON' class='reportFormat' src='imgs/ic-export-json.png' title='Select format' /></span>
+                </td>
+                </tr>
+              </tbody>
+        </table>
+      </div>
+      <!-- Module Table Div -->
 </div>
-<!-- Module Table Div -->
+
 <!--Middle Panel-->
             	<!--Right Panel-->
             	<div id="right-dependencies-section">

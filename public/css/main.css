@@ -2365,11 +2365,11 @@ input[disabled]{
 	display: block;
 	float: left;
 }
-.executionDataTable tbody tr:nth-child(odd), .designDataTable tbody tr:nth-child(odd),.reportDataTable tbody tr:nth-child(odd){
+.executionDataTable tbody tr:nth-child(odd), .designDataTable tbody tr:nth-child(odd),.reportDataTable tbody tr:nth-child(odd),.reportScenarioDataTable tbody tr:nth-child(odd){
 	/*background:#e8e6ff;	*/
     background: #e8e6fe;
 }
-.designDataTable tbody tr:nth-child(even),.reportDataTable tbody tr:nth-child(even) {
+.designDataTable tbody tr:nth-child(even),.reportDataTable tbody tr:nth-child(even),.reportScenarioDataTable tbody tr:nth-child(even){
     background: #fff;
 }
 .executionDataTable tbody, .designDataTable tbody {
@@ -5639,19 +5639,18 @@ ul.browserInlineIcons
 {
     pointer-events: none;
 }
-.filterReports,.reportDataTable
+.filterReports,.reportDataTable,.reportScenarioDataTable
 {
     float:left;
     width: 100%;
 }
-.reportDataTable
+.reportDataTable,.reportScenarioDataTable
 {
    margin-top: 5%;
-}
-.reportDataTable
-{
-    display:none;
-    width: 100% !important;
+   max-height: 350px;
+   overflow:auto;
+   display:none;
+   width: 100% !important;
 }
 .reportHeaders tr th, .reportHeaders tr thead
 {

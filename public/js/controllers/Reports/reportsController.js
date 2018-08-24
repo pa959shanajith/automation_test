@@ -73,7 +73,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 			if (result == "Invalid Session") {
 				$rootScope.redirectPage();
 			}
-			$('.reportDataTable').hide();
+			$('#reportDataTable','#reportScenarioDataTable').hide();
 			$('.rpReleases').empty();
 			$('.rpReleases').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
 			$('.rpCycles').empty();
@@ -106,26 +106,38 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 					console.log(result_res_reportData);
 					if(Object.keys(result_res_reportData.testsuites).length == 0)
 					{
-						$(".reportDataTable").hide();
+						$("#reportDataTable").hide();
 					}
 					else{
 						$scope.result_reportData = [];
 						angular.forEach(result_res_reportData.testsuites, function (value, index) {
 							angular.forEach(value.scenarios, function (val, position) {
 								if(position == 0){
-									$scope.result_reportData.push({'id':index+1,'ModuleName': value.testsuitename,'ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon})
+									$scope.result_reportData.push({'id':index+1,'ModuleName': value.testsuitename,'ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid})
 								}else{
-									$scope.result_reportData.push({'id':'','ModuleName':'','ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon})
+									$scope.result_reportData.push({'id':'','ModuleName':'','ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid})
 								}
 							})
 						});
 						//console.log("scope", $scope.result_reportData);
-					    $(".reportDataTable").show();
+					    $("#reportDataTable").show();
 					}
 				});
 
 			};
 		});
+	};
+
+	//Execution count click
+	$scope.getscenarioDetails = function($event) {
+		  var scenarioId = $(this)[0].report.scenarioId;
+		  var reportsInputData = {};
+		  reportsInputData.scenarioid = scenarioId;
+		  reportsInputData.type = "scenarioreports";
+		  reportService.getReportsData_ICE(reportsInputData).then(function (result_res_scenarioData, response_scenarioData) {
+		  $scope.result_res_scenarioData = result_res_scenarioData.rows;
+		  $("#reportScenarioDataTable").show();
+		  });
 	};
 
 	//getAllSuites_ICE function call
