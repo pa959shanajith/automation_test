@@ -240,10 +240,10 @@
                 <th>Status</th>
                 <th>Elapsed Time</th>
                 <th class='toggleComments'>Comments</th>
-                <th class='toggleRemarks'>Remarks</th> <th>Expected Result</th><th>Actual Result</th></tr>
+                <th class='toggleRemarks'>Remarks</th>
+                <th>Expected Result</th><th>Actual Result</th></tr>
             </thead>
             <tbody class="reportsDetail" >
-             
                 {{#each rows}}
                 <tr id="report-slno{{slno}}" style="width: 100%;" class="reportdetailsrow">
                     <td class="rDid tabCont">{{slno}}</td> 
@@ -254,7 +254,6 @@
 
                     <td class="rDcomments tabCont" style="padding-left: 10px;">{{comment}}</td>
                     <td class="rDremarks tabCont" style="padding-left: 10px;">{{Remark}}</td>
-                    
                      {{#ifEquals testcase_details.testcaseDetails undefined}}
                       <td class="rDExpectedRes tabCont"></td>
                      {{/ifEquals}}
