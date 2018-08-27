@@ -1605,7 +1605,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             index = dNodes[pi].children.length - 1;
             if (layout_vertical)
                 new_one = {
-                    x: parseInt(dNodes[pi].children[index].x) + 80,
+                    x: parseInt(dNodes[pi].children[index].x) + 100,
                     y: sections[node.type]
                 }; // Go beside last sibling node
             else
