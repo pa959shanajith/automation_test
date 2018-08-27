@@ -123,7 +123,9 @@ exports.renderReport_ICE = function (req, res) {
 				},
 				data: {
 					"overallstatus": finalReports.overallstatus,
-					"rows": finalReports.rows
+					"rows": finalReports.rows,
+					"remarksLength": finalReports.remarksLength.length,
+					'commentsLength': finalReports.commentsLength.length
 				}
 			}, function (err, response) {
 				if (err) {

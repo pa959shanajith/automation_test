@@ -23,11 +23,28 @@
             $("#overlayContainer").fadeOut(300).remove()
         }
         setTimeout(function() {
+             var remarksLength = parseInt($('.remarksLength').text());
+             var commentsLength = parseInt($('.commentsLength').text());
+             if(remarksLength == 0)
+             {
+                $('.toggleRemarks').hide();
+             }
+             else{
+                $('.toggleRemarks').show();
+             }
+             if(commentsLength == 0)
+             {
+                $('.toggleComments').hide();
+             }
+             else{
+                $('.toggleComments').show();
+             }
             /*if($('.reportsDetail .reportdetailsrow').length < 12){
             	$('.rDstep').css('width','10.1%');
             	$('.rDstepDes').css('width','49.6%');
             	$('.rDstatus').css('width','10%');
             }*/
+      
             var getRows = $('.reportdetailsrow');
             for (i = 0; i < getRows.length; i++) {
                 var getRowId = parseInt(getRows[i].getAttribute('data-id'));
@@ -1184,12 +1201,18 @@
 			overflow: hidden;
 			transition: max-height 0.2s ease-out;
 			background-color: #f1f1f1;
-		}		
+		}
+        .hide{
+            display:none;
+        }		
     </style>
 </head>
 
 <body>
+   
     <div class="mainContainer">
+         <span class='hide remarksLength'>{{remarksLength}}</span>
+         <span class='hide commentsLength'>{{commentsLength}}</span>
         {{#each overallstatus}}
         <div class="hearderCon">
             <div class="headerRepDetails">
@@ -1275,8 +1298,8 @@
                     <th>Test Step Description</th>
                     <th>Status</th>
                     <th>Elapsed Time</th>
-                    <th>Comments</th>
-                    <th>Remarks</th>
+                    <th class='toggleComments'>Comments</th>
+                    <th class='toggleRemarks'>Remarks</th>
                     <th>Defect ID</th>
                     <th>Expected Result</th>
                     <th>Actual Result</th>
@@ -1294,7 +1317,7 @@
                         <div class="rDstatus tabCont openscreenshot" style="color:{{getColor status}}" data-screenshot="{{screenshot_path}}">{{status}}</div>
                         <div class="rDellaps tabCont">{{EllapsedTime}}</div>
                         <div class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</div>
-                        <div class="rDremarks tabCont" style="padding-left: 10px;">{{Remark}}</div>
+                        <div class="rDremarks tabCont toggleRemarks" style="padding-left: 10px;">{{Remark}}</div>
                         <div class="rjira tabCont"><span class="opendescpopup" title="Create Issue"></span></div>
                         {{#ifEquals testcase_details.testcaseDetails undefined}}
                         <div class="rDExpectedRes tabCont"></div>

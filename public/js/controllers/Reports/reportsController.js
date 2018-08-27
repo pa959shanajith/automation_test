@@ -164,33 +164,38 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 							$(".rpProjects").append("<option value='" + data.projectids[i] + "'>" + data.projectnames[i] + "</option>");
 						}
 						var proId;
-						if (localStorage.getItem('fromExecution') == "true") {
-							var testSuites = JSON.parse(localStorage.getItem("_CT")).testSuiteDetails;
-							if (testSuites.length > 0) {
-								for (var i = 0; i < testSuites.length; i++) {
-									proId = testSuites[i].projectidts;
-								}
-							}
-							else {
-								proId = JSON.parse(localStorage.getItem("_CT")).projectId;
-							}
-							var options = $(".rpProjects option");
-							for (var i = 0; i < options.length; i++) {
-								if (options[i].value == proId) {
-									$(".rpProjects").prop('selectedIndex', i);
-									localStorage.setItem('fromExecution', 'false')
-									break;
-								}
-							}
-						}
-						else {
-							//$(".rpProjects").prop('selectedIndex', 1);
-							$('.rpReleases').empty()
-							$('.rpReleases').append("<option data-id='Select' value='Select' selected>Select</option>");
-							$('.rpCycles').empty();
-							$('.rpCycles').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-							proId = data.projectids[0];
-						}
+						// if (localStorage.getItem('fromExecution') == "true") {
+						// 	var testSuites = JSON.parse(localStorage.getItem("_CT")).testSuiteDetails;
+						// 	if (testSuites.length > 0) {
+						// 		for (var i = 0; i < testSuites.length; i++) {
+						// 			proId = testSuites[i].projectidts;
+						// 		}
+						// 	}
+						// 	else {
+						// 		proId = JSON.parse(localStorage.getItem("_CT")).projectId;
+						// 	}
+						// 	var options = $(".rpProjects option");
+						// 	for (var i = 0; i < options.length; i++) {
+						// 		if (options[i].value == proId) {
+						// 			$(".rpProjects").prop('selectedIndex', i);
+						// 			localStorage.setItem('fromExecution', 'false')
+						// 			break;
+						// 		}
+						// 	}
+						// }
+						// else {
+						// 	//$(".rpProjects").prop('selectedIndex', 1);
+						// 	$('.rpReleases').empty()
+						// 	$('.rpReleases').append("<option data-id='Select' value='Select' selected>Select</option>");
+						// 	$('.rpCycles').empty();
+						// 	$('.rpCycles').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+						// 	proId = data.projectids[0];
+						// }
+						$('.rpReleases').empty()
+						$('.rpReleases').append("<option data-id='Select' value='Select' selected>Select</option>");
+						$('.rpCycles').empty();
+						$('.rpCycles').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+						proId = data.projectids[0];
 						getProjectsAndSuites(proId, "reports");
 					}
 					else console.log("Unable to load test suites.");
@@ -660,7 +665,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 				if (data == "Invalid Session") {
 					$rootScope.redirectPage();
 				}
-
+				var remarksLength = [];
+				var commentsLength = [];
 				if (data != "fail") {
 					if (data.length > 0) {
 						finalReports.overallstatus[0].domainName = data[0].domainname
@@ -670,6 +676,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 						finalReports.overallstatus[0].scenarioName = data[0].testscenarioname
 
 						var obj2 = JSON.parse(data[1].reportdata);
+						//console.log("Remarks", obj2);
 						var elapTym;
 						for (j = 0; j < obj2.overallstatus.length; j++) {
 							finalReports.overallstatus[0].browserVersion = (obj2.overallstatus[j].browserVersion) == "" ? "-" : obj2.overallstatus[j].browserVersion;
@@ -687,6 +694,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 							// finalReports.overallstatus[0].expectedResult = obj2.overallstatus[j];
 						}
 						for (k = 0; k < obj2.rows.length; k++) {
+					
 							finalReports.rows.push(obj2.rows[k]);
 							finalReports.rows[k].slno = k + 1;
 							if (finalReports.rows[k]["Step "] != undefined) {// && finalReports.rows[k]["Step "].indexOf("Step") !== -1){
@@ -734,11 +742,29 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 								}
 							}
 
+							if('Remark' in finalReports.rows[k]){
+								debugger;
+								console.log(finalReports.rows[k].Remark);
+								if(finalReports.rows[k].Remark !=" " && finalReports.rows[k].Remark != null && finalReports.rows[k].Remark != "")
+								{
+									remarksLength.push(finalReports.rows[k].Remark)
+								}
+							}
+							if('Comments' in finalReports.rows[k]){
+								if(finalReports.rows[k].Comments !=" " && finalReports.rows[k].Comments != null && finalReports.rows[k].Comments != "" )
+								{
+									commentsLength.push(finalReports.rows[k].Comments)
+								}
+							}
+
 
 						}
 						finalReports.overallstatus[0].pass = (parseFloat((pass / total) * 100).toFixed(2)) > 0 ? parseFloat((pass / total) * 100).toFixed(2) : parseInt(0);
 						finalReports.overallstatus[0].fail = (parseFloat((fail / total) * 100).toFixed(2)) > 0 ? parseFloat((fail / total) * 100).toFixed(2) : parseInt(0);
 						finalReports.overallstatus[0].terminate = (parseFloat((terminated / total) * 100).toFixed(2)) > 0 ? parseFloat((terminated / total) * 100).toFixed(2) : parseInt(0);
+						finalReports.remarksLength = remarksLength;
+						finalReports.commentsLength = commentsLength;
+						console.log('finalReportsa',finalReports);
 					}
 					if (reportType == "html") {
 						//Service call to get Html reports
