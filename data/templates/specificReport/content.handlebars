@@ -375,11 +375,17 @@
 				coll[i].addEventListener("click", function() {
 					this.classList.toggle("active");
 					var content = this.nextElementSibling;
-					if (content.style.display === "block") {
+					if (content.style.display != "none") {
 							content.style.display = "none";
 						} else {
 							content.style.display = "block";
 						}
+					var content = this.nextElementSibling.nextElementSibling;
+					if (content.style.display != "none") {
+							content.style.display = "none";
+						} else {
+							content.style.display = "block";
+						}                      
 				});
 			}
             function clearData() {
@@ -1284,7 +1290,7 @@
                     <div style="width: 100%; display: table;" class="reportdetailsrow" data-id={{id}} data-parentid={{parentId}}>
                         <div class="rDid tabCont">{{slno}}</div>
                         <div class="rDstep tabCont">{{Step}}</div>
-                        <div class="rDstepDes tabCont" style="padding-left: 10px; font-weight:{{getStyle StepDescription}}">{{StepDescription}}</div>
+                        <div class="{{getClass StepDescription}}" style="padding-left: 10px; font-weight:{{getStyle StepDescription}}">{{StepDescription}}</div>
                         <div class="rDstatus tabCont openscreenshot" style="color:{{getColor status}}" data-screenshot="{{screenshot_path}}">{{status}}</div>
                         <div class="rDellaps tabCont">{{EllapsedTime}}</div>
                         <div class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</div>
