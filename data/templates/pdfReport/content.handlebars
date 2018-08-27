@@ -151,10 +151,15 @@
     .latobold{
         font-weight: bold;
     }
+    .hide{
+        display:none;
+    }		
 </style>
 
 
 <div class="mainContainer">
+    <span class='hide remarksLength'>{{remarksLength}}</span>
+    <span class='hide commentsLength'>{{commentsLength}}</span>
     {{#each overallstatus}}
     <div class="h2Header" >
       <div class="headerRepDetails" >
@@ -234,18 +239,20 @@
                 <th>Test Step Description</th>
                 <th>Status</th>
                 <th>Elapsed Time</th>
-                 <th>Comments</th>
-                <th>Remarks</th> <th>Expected Result</th><th>Actual Result</th></tr>
+                <th class='toggleComments'>Comments</th>
+                <th class='toggleRemarks'>Remarks</th> <th>Expected Result</th><th>Actual Result</th></tr>
             </thead>
             <tbody class="reportsDetail" >
+             
                 {{#each rows}}
                 <tr id="report-slno{{slno}}" style="width: 100%;" class="reportdetailsrow">
-                    <td class="rDid tabCont">{{slno}}</td>
+                    <td class="rDid tabCont">{{slno}}</td> 
                     <td class="rDstep tabCont">{{Step}}</td>
                     <td class="rDstepDes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
                     <td class="rDstatus tabCont" style="padding-left: 10px; color: {{getColor status}}"><a style="color:inherit;text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
                     <td class="rDellaps tabCont">{{EllapsedTime}}</td>
-                    <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td>
+
+                    <td class="rDcomments tabCont" style="padding-left: 10px;">{{comment}}</td>
                     <td class="rDremarks tabCont" style="padding-left: 10px;">{{Remark}}</td>
                     
                      {{#ifEquals testcase_details.testcaseDetails undefined}}

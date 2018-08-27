@@ -743,8 +743,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 							}
 
 							if('Remark' in finalReports.rows[k]){
-								debugger;
-								console.log(finalReports.rows[k].Remark);
 								if(finalReports.rows[k].Remark !=" " && finalReports.rows[k].Remark != null && finalReports.rows[k].Remark != "")
 								{
 									remarksLength.push(finalReports.rows[k].Remark)
