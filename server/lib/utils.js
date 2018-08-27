@@ -42,7 +42,7 @@ module.exports.getSocketList = function(toFetch, cb) {
 					var data = JSON.parse(message);
 					if (user == data.username) {
 						redisServer.redisSubServer.removeListener('message', fetchIP);
-						connectusers.push([user,mode,data.value]);
+						if (value != "fail") connectusers.push([user,mode,data.value]);
 					}
 					innerCB();
 				}
