@@ -5727,3 +5727,109 @@ ul.browserInlineIcons
     top: 11px;
     left: 173px;
 }
+
+/* Start of CSS for collapsible left navigation bar */
+#ct-lSide {
+    left: 0;
+    position: relative;
+}
+.ct-side {
+    height: 100%;
+    width: 6px;
+    color: #fff;
+    background-color: #633690;
+}
+.fl-left {
+    float: left!important;
+}
+
+#ct-expand-left.ct-rev {
+    position: relative;
+    left: 160px;
+    z-index: 9999;
+}
+
+.ct-side .ct-expand {
+    top: 50%;
+    width: 6px;
+    height: 25px;
+}
+
+.ct-expand {
+    cursor: pointer;
+    overflow: hidden;
+    background-color: rgba(255,255,255,.7);
+}
+
+#ct-expand-left::after {
+    left: 1px;
+    border-left-color: #333;
+    border-right-color: transparent;
+}
+
+#ct-expand-left.ct-rev::after {
+    left: -5px;
+    border-left-color: transparent;
+    border-right-color: #333;
+}
+.ct-expand::after {
+    position: absolute;
+    content: '';
+    top: 7.5px;
+    border: 5px solid transparent;
+}
+
+.reports-left-section
+{
+    border-bottom: 0px !important;
+}
+/* End of CSS for collapsible left navigation bar */
+
+/* Start of CSS for collapsible right navigation bar */
+#ct-rSide {
+    right: 0;
+    position: relative;
+    top: 0;
+}
+.ct-side {
+    height: 100%;
+    width: 6px;
+    color: #fff;
+    background-color: #633690;
+}
+.fl-right, .fl-right-assign {
+    float: right!important;
+}
+#ct-expand-right.ct-rev {
+    position: relative;
+    right: 84px;
+    z-index: 9999;
+}
+.ct-side .ct-expand {
+    top: 50%;
+    width: 6px;
+    height: 25px;
+}
+.ct-expand {
+    cursor: pointer;
+    overflow: hidden;
+    background-color: rgba(255,255,255,.7);
+}
+#ct-expand-right.ct-expand.ct-rev::after {
+    left: 1px;
+    border-left-color: #333;
+    border-right-color: transparent;
+}
+.ct-expand::after {
+    position: absolute;
+    content: '';
+    top: 7.5px;
+    border: 5px solid transparent;
+}
+
+#ct-expand-right.ct-expand::after {
+    left: -5px;
+    border-left-color: transparent;
+    border-right-color: #333;
+}
+/* End of CSS for collapsible right navigation bar */

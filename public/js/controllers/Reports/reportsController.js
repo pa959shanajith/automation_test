@@ -613,6 +613,39 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 		'click.as': onIconSpaceClick
 	}, '.iconSpace-reports');
 
+	//Left Bar Expand/Collapse
+	$("#ct-expand-left").click(function(e) {
+        console.log('leftbar click')
+        if ($("#ct-expand-left").hasClass("ct-rev")) $(".lsSlide").animate({
+            width: 0
+        }, 200, function() {
+            $(".lsSlide").hide();
+        })
+        else
+            $(".lsSlide").show().animate({
+                width: 166
+            }, 200);
+        $("#ct-expand-left").toggleClass("ct-rev");
+        $("#ct-main").toggleClass("leftBarOpen");
+       // adjustMidPanel();
+	});
+	
+	//Right Bar Expand/Collapse
+	$("#ct-expand-right").click(function(e) {
+        console.log('rightbar click')
+        if ($("#ct-expand-right").hasClass("ct-rev")) $(".rsSlide").animate({
+            width: 0
+        }, 200, function() {
+            $(".rsSlide").hide();
+        })
+        else $(".rsSlide").show().animate({
+            width: 90
+        }, 200);
+        $("#ct-expand-right").toggleClass("ct-rev");
+        $("#ct-main").toggleClass("rightBarOpen");
+       // adjustMidPanel();
+    });
+
 	/********** HTML REPORT CLICK ****************/
 	$(document).off('click.htmlRepClick', '.openreportstatus');
 	$(document).on({
@@ -754,8 +787,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 									commentsLength.push(finalReports.rows[k].Comments)
 								}
 							}
-
-
 						}
 						finalReports.overallstatus[0].pass = (parseFloat((pass / total) * 100).toFixed(2)) > 0 ? parseFloat((pass / total) * 100).toFixed(2) : parseInt(0);
 						finalReports.overallstatus[0].fail = (parseFloat((fail / total) * 100).toFixed(2)) > 0 ? parseFloat((fail / total) * 100).toFixed(2) : parseInt(0);
