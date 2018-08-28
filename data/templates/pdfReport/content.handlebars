@@ -109,12 +109,13 @@
     .reportsDetails th:nth-child(1),.rDid{width: 4%;  word-break: break-word; }
     .reportsDetails th:nth-child(2),.rDstep{width: 5%;  word-break: break-word;}
     .reportsDetails th:nth-child(3),.rDstepDes{width: 12%; word-break: break-word; text-align:left}
-    .reportsDetails th:nth-child(4),.rDstatus{width: 5%; word-break: break-word; text-align:left}
-    .reportsDetails th:nth-child(5),.rDellaps{width: 5.5%; word-break: break-word; text-align:left}
-    .reportsDetails th:nth-child(6),.rDcomments{width: 9%; word-break: break-word; text-align:left}
-    .reportsDetails th:nth-child(7),.rDremarks{width: 9%; word-break: break-word; text-align:left}
+    .reportsDetails th:nth-child(4),.rDellaps{width: 8%; word-break: break-word; text-align:left}
+    .reportsDetails th:nth-child(5),.rDcomments{width: 8%; word-break: break-word; text-align:left}
+    .reportsDetails th:nth-child(6),.rDremarks{width: 9%; word-break: break-word; text-align:left}
+    .reportsDetails th:nth-child(7),.rDExpectedRes{width: 9%; word-break: break-word; text-align:left}
     .reportsDetails th:nth-child(8),.rDActualRes{width: 9%; word-break: break-word; text-align:left}
-    .reportsDetails th:nth-child(9),.rDExpectedRes{width: 7%; word-break: break-word; text-align:left}
+    
+    .reportsDetails th:nth-child(9),.rDstatus{width: 5%; word-break: break-word; text-align:left}
     .maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc; height: 49%;}
     .tabCont{display: table-cell; border-bottom: 1px solid #ececec; border-right: 1px solid #ececec;word-wrap:break-word}
     .reportsDetail{line-height: 2; text-align: center; height: calc(100% - 35px); overflow: auto;font-size: 14px;}
@@ -151,15 +152,10 @@
     .latobold{
         font-weight: bold;
     }
-    .hide{
-        display:none;
-    }		
 </style>
 
 
 <div class="mainContainer">
-    <span class='hide remarksLength'>{{remarksLength}}</span>
-    <span class='hide commentsLength'>{{commentsLength}}</span>
     {{#each overallstatus}}
     <div class="h2Header" >
       <div class="headerRepDetails" >
@@ -237,23 +233,22 @@
                <tr><th>Sl No.</th>
                 <th>Test Step No.</th>
                 <th>Test Step Description</th>
-                <th>Status</th>
                 <th>Elapsed Time</th>
-                <th class='toggleComments'>Comments</th>
-                <th class='toggleRemarks'>Remarks</th>
-                <th>Expected Result</th><th>Actual Result</th></tr>
+                 <th>Comments</th>
+                <th>Remarks</th> <th>Expected Result</th><th>Actual Result</th>
+                <th>Status</th></tr>
             </thead>
             <tbody class="reportsDetail" >
                 {{#each rows}}
                 <tr id="report-slno{{slno}}" style="width: 100%;" class="reportdetailsrow">
-                    <td class="rDid tabCont">{{slno}}</td> 
+                    <td class="rDid tabCont">{{slno}}</td>
                     <td class="rDstep tabCont">{{Step}}</td>
                     <td class="rDstepDes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
-                    <td class="rDstatus tabCont" style="padding-left: 10px; color: {{getColor status}}"><a style="color:inherit;text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
+                    
                     <td class="rDellaps tabCont">{{EllapsedTime}}</td>
-
-                    <td class="rDcomments tabCont" style="padding-left: 10px;">{{comment}}</td>
+                    <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td>
                     <td class="rDremarks tabCont" style="padding-left: 10px;">{{Remark}}</td>
+                    
                      {{#ifEquals testcase_details.testcaseDetails undefined}}
                       <td class="rDExpectedRes tabCont"></td>
                      {{/ifEquals}}
@@ -291,6 +286,7 @@
                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}</td>
                         {{/ifnotEquals}}
                     {{/ifEquals}}
+                        <td class="rDstatus tabCont" style="padding-left: 10px; color: {{getColor status}}"><a style="color:inherit;text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
 
                     {{!-- {{#ifEquals status "Terminate"}}
                         {{#ifEquals testcase_details.actualResult_fail ""}}

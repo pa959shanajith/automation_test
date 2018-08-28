@@ -28,16 +28,20 @@
              if(remarksLength == 0)
              {
                 $('.toggleRemarks').hide();
+                $('.rDremarks').hide();
              }
              else{
                 $('.toggleRemarks').show();
+                $('.rDremarks').show();
              }
              if(commentsLength == 0)
              {
                 $('.toggleComments').hide();
+                $('.rDcomments').hide();
              }
              else{
                 $('.toggleComments').show();
+                $('.rDcomments').show();
              }
             /*if($('.reportsDetail .reportdetailsrow').length < 12){
             	$('.rDstep').css('width','10.1%');
@@ -51,11 +55,11 @@
                 var name = getRows[i].children[2].innerHTML;
                 var rowCount = 0;
                 var getParentId;
-                if (getRows[i].children[3].getAttribute("data-screenshot").length <= 0 || getRows[i].children[3].getAttribute("data-screenshot").toLowerCase().indexOf(".png") == -1) {
-                    getRows[i].children[3].classList.remove("openscreenshot");
+                if (getRows[i].children[9].getAttribute("data-screenshot").length <= 0 || getRows[i].children[9].getAttribute("data-screenshot").toLowerCase().indexOf(".png") == -1) {
+                    getRows[i].children[9].classList.remove("openscreenshot");
                 }
                 if (name.indexOf("Testscriptname") >= 0 || name.indexOf("TestCase Name") >= 0) {
-                    getRows[i].children[7].children[0].remove();
+                    getRows[i].children[6].children[0].remove();
                 }
                 for (j = i; j < getRows.length; j++) {
                     if (parseInt(getRows[j].getAttribute('data-parentid')).length == NaN) getParentId = parseInt(getRows[j].getAttribute('data-parentid').split(",")[1]);
@@ -423,7 +427,7 @@
             float: left;
             padding: 14px;
             width: 97%;
-            height: calc(100% - 50px);
+            height: calc(100% - 30px);
         }
 
         .hearderCon {
@@ -569,51 +573,50 @@
         }
 
         .reportsDetails th:nth-child(4) {
-            width: 6%;
-        }
+            width: 9%;
+        } 
 
         .rDstatus {
             width: 6.1% !important;
             word-break: break-word;
         }
 
-        .reportsDetails th:nth-child(5) {
-            width: 8%;
-        }
-
         .rDellaps {
-            width: 8.5% !important;
+            width: 9% !important;
             word-break: break-word;
         }
 
-        .reportsDetails th:nth-child(6),
+        .reportsDetails th:nth-child(5),
         .rDcomments {
             width: 13%;
             word-break: break-word;
         }
 
-        .reportsDetails th:nth-child(7),
+        .reportsDetails th:nth-child(6),
         .rDremarks {
             width: 15%;
             word-break: break-word;
         }
 
-        .reportsDetails th:nth-child(8),
+        .reportsDetails th:nth-child(7),
         .rjira {
             width: 7%;
             word-break: break-word;
         }
 
-        .reportsDetails th:nth-child(9),
+        .reportsDetails th:nth-child(8),
         .rDExpectedRes {
             width: 12%;
             word-break: break-word;
         }
 
-        .reportsDetails th:nth-child(10),
+        .reportsDetails th:nth-child(9),
         .rDActualRes {
             width: 12%;
             word-break: break-word;
+        }
+        .reportsDetails th:nth-child(10) {
+            width: 6.1%;
         }
 
         .maintabCont {
@@ -1205,6 +1208,39 @@
         .hide{
             display:none;
         }		
+
+        .scroll-table-container {    /* border: 2px solid green; */
+            height: 92%;
+            width: 100%;
+            overflow-y: scroll;
+            box-sizing: border-box;
+            
+            border: 1px solid #dcdcdc;
+        }
+		.scroll-table{border-collapse:collapse;width: 100%;}
+            
+			
+			/* width */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        // style for scroll bar
+        /* Track */
+        ::-webkit-scrollbar-track {
+            box-shadow: inset 0 0 5px grey; 
+            border-radius: 10px;
+        }
+        
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); 
+            border-radius: 10px;
+        }
+
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); 
+        }
     </style>
 </head>
 
@@ -1296,52 +1332,55 @@
                     <th>Sl No.</th>
                     <th>Test Step No.</th>
                     <th>Test Step Description</th>
-                    <th>Status</th>
                     <th>Elapsed Time</th>
                     <th class='toggleComments'>Comments</th>
                     <th class='toggleRemarks'>Remarks</th>
                     <th>Defect ID</th>
                     <th>Expected Result</th>
                     <th>Actual Result</th>
+                    <th>Status</th>
                     {{!--
                     <th>Expected Result</th> --}}
                 </thead>
             </table>
-            <table style='table-layout: fixed;width:100%'>
-                <div class="reportsDetail">
-                    {{#each rows}}
-                    <div style="width: 100%; display: table;" class="reportdetailsrow" data-id={{id}} data-parentid={{parentId}}>
-                        <div class="rDid tabCont">{{slno}}</div>
-                        <div class="rDstep tabCont">{{Step}}</div>
-                        <div class="{{getClass StepDescription}}" style="padding-left: 10px; font-weight:{{getStyle StepDescription}}">{{StepDescription}}</div>
-                        <div class="rDstatus tabCont openscreenshot" style="color:{{getColor status}}" data-screenshot="{{screenshot_path}}">{{status}}</div>
-                        <div class="rDellaps tabCont">{{EllapsedTime}}</div>
-                        <div class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</div>
-                        <div class="rDremarks tabCont toggleRemarks" style="padding-left: 10px;">{{Remark}}</div>
-                        <div class="rjira tabCont"><span class="opendescpopup" title="Create Issue"></span></div>
-                        {{#ifEquals testcase_details.testcaseDetails undefined}}
-                        <div class="rDExpectedRes tabCont"></div>
-                        {{/ifEquals}} {{#ifEquals testcase_details.testcaseDetails ""}}
-                        <div class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}</div>
-                        {{/ifEquals}} {{#ifnotEquals testcase_details.testcaseDetails ""}} {{#ifnotEquals testcase_details undefined}}
-                        <div class="rDExpectedRes tabCont" style="padding-left: 10px;">{{testcase_details.testcaseDetails}}</div>
-                        {{/ifnotEquals}} {{/ifnotEquals}} {{#ifEquals status undefined}}
-                        <div class="rDActualRes tabCont"></div>
-                        {{/ifEquals}} {{#ifEquals status ""}}
-                        <div class="rDActualRes tabCont"></div>
-                        {{/ifEquals}} {{#ifEquals status "Pass"}} {{#ifEquals testcase_details.actualResult_pass ""}}
-                        <div class="rDActualRes tabCont" style="padding-left: 10px;">{{status}}</div>
-                        {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_pass ""}}
-                        <div class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}}</div>
-                        {{/ifnotEquals}} {{/ifEquals}} {{#ifEquals status "Fail"}} {{#ifEquals testcase_details.actualResult_fail ""}}
-                        <div class="rDActualRes tabCont" style="padding-left: 10px;">{{status}}</div>
-                        {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_fail ""}}
-                        <div class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}</div>
-                        {{/ifnotEquals}} {{/ifEquals}}
-                    </div>
-                    {{/each}}
-                </div>
-            </table>
+            <div class="scroll-table-container">
+                <table class="scroll-table">
+                    <tbody class="reportsDetail">
+                        {{#each rows}}
+                        <tr style="width: 100%;" class="reportdetailsrow" data-id={{id}} data-parentid={{parentId}}>
+                            <td class="rDid tabCont">{{slno}}</td>
+                            <td class="rDstep tabCont">{{Step}}</td>
+                            <td class="{{getClass StepDescription}}" style="padding-left: 10px; font-weight:{{getStyle StepDescription}}">{{StepDescription}}</td>
+                            <td class="rDellaps tabCont">{{EllapsedTime}}</td>
+                            <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td>
+                            <td class="rDremarks tabCont toggleRemarks" style="padding-left: 10px;">{{Remark}}</td>
+                            <td class="rjira tabCont"><span class="opendescpopup" title="Create Issue"></span></td>
+                            {{#ifEquals testcase_details.testcaseDetails undefined}}
+                            <td class="rDExpectedRes tabCont"></td>
+                            {{/ifEquals}} {{#ifEquals testcase_details.testcaseDetails ""}}
+                            <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
+                            {{/ifEquals}} {{#ifnotEquals testcase_details.testcaseDetails ""}} {{#ifnotEquals testcase_details undefined}}
+                            <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{testcase_details.testcaseDetails}}</td>
+                            {{/ifnotEquals}} {{/ifnotEquals}} {{#ifEquals status undefined}}
+                            <td class="rDActualRes tabCont"></td>
+                            {{/ifEquals}} {{#ifEquals status ""}}
+                            <td class="rDActualRes tabCont"></td>
+                            {{/ifEquals}} {{#ifEquals status "Pass"}} {{#ifEquals testcase_details.actualResult_pass ""}}
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{status}}</td>
+                            {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_pass ""}}
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}}</td>
+                            {{/ifnotEquals}} {{/ifEquals}} {{#ifEquals status "Fail"}} {{#ifEquals testcase_details.actualResult_fail ""}}
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{status}}</td>
+                            {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_fail ""}}
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}</td>
+                            {{/ifnotEquals}} {{/ifEquals}}
+                            <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}}" data-screenshot="{{screenshot_path}}">{{status}}</td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
             <div id="overlay"></div>
             <!-- Jira login window popup-->
             <div class="jiraWindow" style="display: none;">
