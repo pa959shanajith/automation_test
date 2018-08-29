@@ -228,14 +228,21 @@
     </div>
     {{/each}}
     <div class="maintabCont">
+        <span class='hide'>{{remarksLength}}</span>
+        <span class='hide'>{{commentsLength}}</span>
         <table class='pdfReport' style="width: 100%;" >
             <thead class="reportsDetails">
                <tr><th>Sl No.</th>
                 <th>Test Step No.</th>
                 <th>Test Step Description</th>
                 <th>Elapsed Time</th>
+                {{#ifnotEquals commentsLength 0}}
                  <th>Comments</th>
-                <th>Remarks</th> <th>Expected Result</th><th>Actual Result</th>
+                {{/ifnotEquals}}
+                {{#ifnotEquals remarksLength 0}}
+                <th>Remarks</th> 
+                {{/ifnotEquals}}
+                <th>Expected Result</th><th>Actual Result</th>
                 <th>Status</th></tr>
             </thead>
             <tbody class="reportsDetail" >
@@ -246,9 +253,12 @@
                     <td class="rDstepDes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
                     
                     <td class="rDellaps tabCont">{{EllapsedTime}}</td>
+                    {{#ifnotEquals  ../commentsLength 0}}
                     <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td>
+                    {{/ifnotEquals}}
+                    {{#ifnotEquals  ../remarksLength 0}}
                     <td class="rDremarks tabCont" style="padding-left: 10px;">{{Remark}}</td>
-                    
+                     {{/ifnotEquals}}
                      {{#ifEquals testcase_details.testcaseDetails undefined}}
                       <td class="rDExpectedRes tabCont"></td>
                      {{/ifEquals}}
