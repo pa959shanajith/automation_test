@@ -128,21 +128,36 @@
                     });
                 }
             })
-			$(document).on('click','.collapsible-tc',function(){
-				
-				console.log(this);
-				var abc = this.parentElement.getAttribute("data-id");
-				var len = $('.reportdetailsrow').length;
-			   
-			   while(len--){
-				   abc = parseInt(abc) +1;
-				   if($($("[data-id="+abc+"]")[0]).find('.collapsible-tc').length !=0)
-					break;
-				   else
-					$("[data-id="+abc+"]").toggleClass("no-disp");
-			   }
-			  
-			})
+		   $(document).on('click','.collapsible',function(){
+                 if($(this).hasClass('active') == true)
+                 {
+                    $(this).children('span').children('span.arrow-down').removeClass('arrow-down').addClass('arrow-up');
+                 }
+                 else{
+                    $(this).children('span').children('span.arrow-up').removeClass('arrow-up').addClass('arrow-down');
+                 }
+             });
+             $('.collapsible-tc').append('<span class="arrow-down-sm"></span>');
+         $(document).on('click','.collapsible-tc',function(){
+         var abc = this.parentElement.getAttribute("data-id");
+         var len = $('.reportdetailsrow').length;
+                 if($(this).hasClass('collapse-active') == false)
+                 {
+                     $(this).addClass('collapse-active');
+                     $(this).children('span.arrow-down-sm').removeClass('arrow-down-sm').addClass('arrow-up-sm');
+                 }
+                 else{
+                      $(this).removeClass('collapse-active');
+                      $(this).children('span.arrow-up-sm').removeClass('arrow-up-sm').addClass('arrow-down-sm');
+                 }
+         while(len--){
+         abc = parseInt(abc) +1;
+         if($($("[data-id="+abc+"]")[0]).find('.collapsible-tc').length !=0)
+         break;
+         else
+         $("[data-id="+abc+"]").toggleClass("no-disp");
+         }
+         });
             $(document).on('click', '.expand', function() {
                 var getID = $(this).parents('.reportdetailsrow').attr('data-id');
                 $(this).removeClass('expand').addClass('unexpand');
@@ -1241,6 +1256,41 @@
         ::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); 
         }
+         .arrow-down,.arrow-up {
+         height: 0px;
+         width: 0px;
+         border: none;
+         border-top: 7px solid #000000;
+         border-left: 6px solid rgba(0,0,0,0);
+         border-right: 6px solid rgba(0,0,0,0);
+         float: left;
+         position: absolute;
+         left: -20px;
+         top: 4px;
+         cursor: pointer;
+         }
+         .arrow-up {
+         border-bottom: 7px solid #000000;
+         border-top:0px !important;
+         }
+         .arrow-down-sm,.arrow-up-sm {
+         display: inline;
+         height: 0px;
+         width: 0px;
+         border: none;
+         border-top: 5px solid #000000;
+         border-left: 5px solid rgba(0,0,0,0);
+         border-right: 5px solid rgba(0,0,0,0);
+         position: relative;
+         left: -5px;
+         top: 9px;
+         float: left;
+         cursor: pointer;
+         }
+         .arrow-up-sm {
+         border-bottom: 5px solid #000000;
+         border-top:0px !important;
+         }
     </style>
 </head>
 
@@ -1261,7 +1311,7 @@
                 <h4>SLK Nineteen68 Execution Report</h4>
             </div>
         </div>
-        <button class="collapsible"><span style="left: 40px;position: relative">Result Summary</span></button>
+        <button class="collapsible"><span style="left: 40px;position: relative"><span class="arrow-down"></span>Result Summary</span></button>
         <div style="width: 100%;">
             <div class="leftSummary">
                 <label>Scenario :</label><span>{{scenarioName}}</span>
