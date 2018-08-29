@@ -1331,14 +1331,14 @@
                 <thead class="reportsDetails">
                     <th>Sl No.</th>
                     <th>Test Step No.</th>
-                    <th>Test Step Description</th>
+                    <th style="display:none">Test Step Description</th>
                     <th>Elapsed Time</th>
                     <th class='toggleComments'>Comments</th>
                     <th class='toggleRemarks'>Remarks</th>
                     <th>Defect ID</th>
                     <th>Expected Result</th>
                     <th>Actual Result</th>
-                    <th>Status</th>
+                    <th style="display:none">Status</th>
                     {{!--
                     <th>Expected Result</th> --}}
                 </thead>
@@ -1350,31 +1350,31 @@
                         <tr style="width: 100%;" class="reportdetailsrow" data-id={{id}} data-parentid={{parentId}}>
                             <td class="rDid tabCont">{{slno}}</td>
                             <td class="rDstep tabCont">{{Step}}</td>
-                            <td class="{{getClass StepDescription}}" style="padding-left: 10px; font-weight:{{getStyle StepDescription}}">{{StepDescription}}</td>
+                            <td class="{{getClass StepDescription}}" style="display:none; padding-left: 10px; font-weight:{{getStyle StepDescription}}">{{StepDescription}}</td>
                             <td class="rDellaps tabCont">{{EllapsedTime}}</td>
                             <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td>
                             <td class="rDremarks tabCont toggleRemarks" style="padding-left: 10px;">{{Remark}}</td>
                             <td class="rjira tabCont"><span class="opendescpopup" title="Create Issue"></span></td>
                             {{#ifEquals testcase_details.testcaseDetails undefined}}
-                            <td class="rDExpectedRes tabCont"></td>
+                            <td class="rDExpectedRes tabCont {{getClass StepDescription}}">{{StepDescription}}</td>
                             {{/ifEquals}} {{#ifEquals testcase_details.testcaseDetails ""}}
                             <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
                             {{/ifEquals}} {{#ifnotEquals testcase_details.testcaseDetails ""}} {{#ifnotEquals testcase_details undefined}}
-                            <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{testcase_details.testcaseDetails}}</td>
+                            <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}} <br/>Expected Result is: {{testcase_details.testcaseDetails}}</td>
                             {{/ifnotEquals}} {{/ifnotEquals}} {{#ifEquals status undefined}}
                             <td class="rDActualRes tabCont"></td>
                             {{/ifEquals}} {{#ifEquals status ""}}
                             <td class="rDActualRes tabCont"></td>
                             {{/ifEquals}} {{#ifEquals status "Pass"}} {{#ifEquals testcase_details.actualResult_pass ""}}
-                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{status}}</td>
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;"><text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text></td>
                             {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_pass ""}}
-                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}}</td>
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}},<text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text></td>
                             {{/ifnotEquals}} {{/ifEquals}} {{#ifEquals status "Fail"}} {{#ifEquals testcase_details.actualResult_fail ""}}
-                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{status}}</td>
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;"><text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text></td>
                             {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_fail ""}}
-                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}</td>
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}},<text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text></td>
                             {{/ifnotEquals}} {{/ifEquals}}
-                            <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}}" data-screenshot="{{screenshot_path}}">{{status}}</td>
+                            <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}}; display:none" data-screenshot="{{screenshot_path}}">{{status}}</td>
                         </tr>
                         {{/each}}
                     </tbody>
