@@ -415,7 +415,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 									jsonService.username = service.username.toLowerCase();
 									selectedRole = selectedRole||jsonService.role;
 									req.session.defaultRoleId = jsonService.role;
-									req.session.activeRole = selectedRole;
+									req.session.activeRoleId = selectedRole;
 								} else {
 									logger.info("User info not found");
 									res.send("fail");
@@ -452,6 +452,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 									res.send("fail");
 								} else {
 									if (selectedRole == req.session.defaultRoleId) req.session.defaultRole = rolename;
+									req.session.activeRole = rolename;
 									jsonService.rolename = req.session.defaultRole;
 								}
 								callback();

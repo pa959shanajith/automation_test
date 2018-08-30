@@ -918,6 +918,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             if ($scope.getScreenView == "Desktop") {
                 $("#launchDesktopApps").modal("show")
                 $(document).find("#desktopPath").val('')
+                $(document).find('#app_pid').val('');
                 $(document).find("#desktopPath").removeClass("inputErrorBorder");
             } else if ($scope.getScreenView == "DesktopJava") {
                 $("#launchOEBSApps").modal("show");
@@ -1361,6 +1362,46 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     })
     //Mobile Serial Number Keyup Function
 
+//toggling radio buttons in desktop app launch modal
+    
+$('#radio_check1').click(function() {
+    var isChecked = $('#radio_check2').is(':checked');
+    if(isChecked==true){
+        //$('input[type="radio"]').not(':checked').prop("checked", true);
+        $('#radio_check1').attr('checked',true);
+        $('#radio_check2').attr('checked',false);
+    }
+    else{
+         $('#radio_check1').attr('checked',true);
+         $('#radio_check2').attr('checked',false);   
+        //$('input[type="radio"]:not(.checked').prop("checked", true);
+    }
+    
+});
+
+$('#radio_check2').click(function() {
+    var isChecked = $('#radio_check1').is(':checked');
+    if(isChecked==true){
+        //$('input[type="radio"]').not(':checked').prop("checked", true);
+        $('#radio_check2').attr('checked',true);
+        $('#radio_check1').attr('checked',false);
+    }
+    else{
+         $('#radio_check2').attr('checked',true);
+         $('#radio_check1').attr('checked',false);   
+        //$('input[type="radio"]:not(.checked').prop("checked", true);
+    }
+    
+});
+//toggling radio buttons in desktop app launch modal
+
+// Number filter in desktop application lauch modal
+$(document).on('keypress', '#app_pid', function(e) {
+    if ((e.charCode >= 48 && e.charCode <= 57) || e.charCode == 59) return true;
+    else return false;
+    }) 
+
+
     //Initiating Scraping
     $scope.initScraping = function(e, browserType) {
         $('#compareObjectModal').modal('hide');
@@ -1391,13 +1432,15 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			
             //For Desktop
             if ($scope.getScreenView == "Desktop") {
-                if ($(document).find("#desktopPath").val() == "") {
+                if ($(document).find("#desktopPath").val() == "" && $(document).find("#app_pid").val()=="") {
                     $(document).find("#desktopPath").addClass("inputErrorBorder")
                     return false
                 } else {
                     $(document).find("#desktopPath").removeClass("inputErrorBorder")
-                    screenViewObject.appType = $scope.getScreenView,
+                        screenViewObject.appType = $scope.getScreenView,
                         screenViewObject.applicationPath = $(document).find("#desktopPath").val();
+                        screenViewObject.processID = $(document).find("#app_pid").val();
+                        screenViewObject.scrapeMethod = $("input[name='first']:checked").val();
                     $("#launchDesktopApps").modal("hide");
                     if( $rootScope.compareFlag == true){
                         blockUI(blockMsg2);
@@ -3869,7 +3912,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             $("span.errTestCase").addClass("hide");
             //subTask = JSON.parse(window.localStorage['_CT']).subtask;
             //var testScenarioId = "e191bb4a-2c4f-4909-acef-32bc60e527bc";
-            var testScenarioId = JSON.parse(window.localStorage['_CT']).scenarioId;
+            var ctj = JSON.parse(window.localStorage['_CT']);
+            var testScenarioId = ctj.scenarioId;
+            //var screenId = ctj.screenId;
             DesignServices.getTestcasesByScenarioId_ICE(testScenarioId)
                 .then(function(data) {
                     if (data == "Invalid Session") {
@@ -3878,9 +3923,31 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     $("#dependentTestCasesContent").empty();
                     //data = data.sort();
                     for (var i = 0; i < data.length; i++) {
-                        $("#dependentTestCasesContent").append("<span class='testcaseListItem'><input data-attr = " + data[i].testcaseId + " class='checkTestCase' type='checkbox' id='dependentTestCase_" + i + "' /><label title=" + data[i].testcaseName + " class='dependentTestcases' for='dependentTestCase_" + i + "'>" + data[i].testcaseName + "</label></span><br />");
+                        $("#dependentTestCasesContent").append("<span class='testcaseListItem'><input data-attr = " + data[i].testcaseId + " class='checkTestCase' type='checkbox' id='dependentTestCase_" + i + "' /><label title=" + data[i].testcaseName + " class='dependentTestcases' for='dependentTestCase_" + i + "'>" + data[i].testcaseName + "</label></span><span class='viewReadOnlyTC'  data-id = " + data[i].testcaseId + " data-name = "+ data[i].testcaseName +"><button type='button' class='btn btn-link'>View</button></span><br />");
                     }
-
+                    $( ".viewReadOnlyTC" ).click(function() {
+                        var testCaseName = this.getAttribute('data-name'),
+                        testCaseId = this.getAttribute('data-id');
+                        DesignServices.readTestCase_ICE(undefined, testCaseId, testCaseName, 0)
+                        .then(function(response) {
+                                if (response == "Invalid Session") {
+                                    $rootScope.redirectPage();
+                                }
+                                var source = $("#handlebar-template-testcase").html();
+                                var template = Handlebars.compile(source);
+                                try{
+                                    JSON.parse(response.testcasesteps);
+                                }
+                                catch(err){
+                                    response.testcasesteps = '[]';
+                                }                                
+                                var dat = template({name:[{testcasename:response.testcasename}],rows:JSON.parse(response.testcasesteps)});
+                                var newWindow = window.open();
+                                newWindow.document.write(dat);
+                            },
+                            function(error) {});
+                            //alert( "Handler for .click() called." );
+                      });
                     //$(document).on('shown.bs.modal','#dialog-addDependentTestCase', function () {
                     if (checkedTestcases.length > 0)
                         $("input[type=checkbox].checkTestCase").prop("checked", false);
@@ -5058,7 +5125,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
                         break;
                     } else if (appTypeLocal == 'Desktop' && (obType == 'button' || obType == 'input' || obType == 'select' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType =='treeview'|| obType=='TreeView' || obType=='tree' ||
-                            obType == 'list' || obType == 'edit' || obType == null || obType == 'checkbox' || obType == 'radiobutton' || obType == 'tab' || obType == 'datepicker' || obType != undefined)) {
+                            obType == 'list' || obType == 'edit' || obType == null || obType == 'checkbox' || obType == 'radiobutton' || obType == 'tab' || obType == 'datepicker' || obType == 'table' || obType != undefined)) {
                         var res = '';
                         var sc;
                         var listType = ob.canselectmultiple;
@@ -5103,7 +5170,10 @@ function contentTable(newTestScriptDataLS) {
                         } else if(obType =='iris'){
                             sc = Object.keys(keywordArrayList.iris);
                             selectedKeywordList = "iris";
-                        } else {
+                        } else if (obType == 'table') {
+                            sc = Object.keys(keywordArrayList.table);
+                            selectedKeywordList = "table";
+                        }else {
                             sc = Object.keys(keywordArrayList.element);
                             selectedKeywordList = "element";
                         }
@@ -5124,7 +5194,7 @@ function contentTable(newTestScriptDataLS) {
                             $grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     } else if (appTypeLocal == 'Desktop' && (!(obType == 'push_button' || obType == 'text' || obType == 'combo_box' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType =='treeview'|| obType=='TreeView' || obType=='tree' ||
-                            obType == 'list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box' || obType == 'radio_button' || obType == 'tab' || obType == 'datepicker'))) {
+                            obType == 'list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box' || obType == 'radio_button' || obType == 'tab' || obType == 'datepicker' || obType == 'table'))) {
                         var res = '';
                         var sc = Object.keys(keywordArrayList.element);
                         selectedKeywordList = "element";

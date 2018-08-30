@@ -232,7 +232,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 	var cycleId = RequestedJSON.cycleId;
 	var releaseId = RequestedJSON.releaseId;
 	var appType = RequestedJSON.appType;
-	var username_role = 'Nineteen68_Admin';
+	var userrole = RequestedJSON.userRole;
 	var username = RequestedJSON.userName.toLowerCase();
 	var suiteID = uuid();
 	var suitedetails = RequestedJSON.testsuiteDetails[0];
@@ -264,7 +264,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 				"modulename": testsuiteName,
 				"moduleid": moduleid_c,
 				'modifiedby': username,
-				'modifiedbyrole':username_role,
+				'modifiedbyrole':userrole,
 				"pid": projectid,
 				"versionnumber": versionnumber,
 				"newversionnumber": newversionnumber
@@ -337,7 +337,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 								"testscenarioid": scenarioid_c,
 								"pid": projectid,
 								'modifiedby': username,
-								'modifiedbyrole':username_role,
+								'modifiedbyrole':userrole,
 								"versionnumber": versionnumber,
 								"newversionnumber": newversionnumber
 							}, function (err, scenariodata) {
@@ -421,7 +421,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 												"testscreenid": screenid_c,
 												"pid": projectid,
 												'modifiedby': username,
-												'modifiedbyrole':username_role,
+												'modifiedbyrole':userrole,
 												"versionnumber": versionnumber,
 												"newversionnumber": newversionnumber
 											}, function (err, screendata) {
@@ -499,7 +499,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																"testcaseid": testcaseid_c,
 																"pid": projectid,
 																'modifiedby': username,
-																'modifiedbyrole':username_role,
+																'modifiedbyrole':userrole,
 																"versionnumber": versionnumber,
 																"newversionnumber": newversionnumber
 															}, function (err, testcasedata) {
@@ -568,7 +568,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																		var inputs = {
 																			'testcaseid': testcaseID,
 																			'modifiedby': username,
-																			'modifiedbyrole': username_role,
+																			'modifiedbyrole': userrole,
 																			'projectid': projectid,
 																			'testscenarioid': scenarioId,
 																			'modifiedflag': scenarioflag,
@@ -627,7 +627,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 				'modulename': testsuiteName,
 				'modifiedflag': suiteflag,
 				'modifiedby': username,
-				'modifiedbyrole':username_role,
+				'modifiedbyrole':userrole,
 				'versionnumber': newversionnumber
 			};
 			var args = {
@@ -1706,8 +1706,8 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 	var cycleId = RequestedJSON.cycleId;
 	var releaseId = RequestedJSON.releaseId;
 	var appType = RequestedJSON.appType;
-	var username = RequestedJSON.userName.toLowerCase();
-	var username_role = 'Nineteen68_Admin';
+	var username = RequestedJSON.userName;
+	var userrole = RequestedJSON.userRole;
 	var suiteID = uuid();
 	var suitedetails = RequestedJSON.testsuiteDetails[0];
 	var testsuiteName = suitedetails.testsuiteName;
@@ -1730,7 +1730,7 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 				"modulename": testsuiteName,
 				"moduleid": moduleid_c,
 				'modifiedby': username,
-				'modifiedbyrole':username_role,
+				'modifiedbyrole':userrole,
 				"pid": projectid,
 				"versionnumber": versionnumber,
 				"newversionnumber": versionnumber
@@ -1797,7 +1797,7 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 								"testscenarioname": scenarioName,
 								"testscenarioid": scenarioid_c,
 								'modifiedby': username,
-								'modifiedbyrole':username_role,
+								'modifiedbyrole':userrole,
 								"pid": prjID,
 								"versionnumber": versionnumber,
 								"newversionnumber": versionnumber
@@ -1840,7 +1840,7 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 				'modulename': testsuiteName,
 				'modifiedflag': suiteflag,
 				'modifiedby': username,
-				'modifiedbyrole':username_role,
+				'modifiedbyrole':userrole,
 				'versionnumber': versionnumber
 			};
 			var args = {

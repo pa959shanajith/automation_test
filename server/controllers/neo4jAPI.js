@@ -16,12 +16,16 @@ exports.executeQueries = function (d, cb) {
 		"data": {"statements": d},
 		"headers": requestHeaders
 	};
-	client.post(neoURL, args, function (result, resp) {
+	var apireq = client.post(neoURL, args, function (result, resp) {
 		if (resp.statusCode != 200) cb(500, "fail");
 		else if (result.errors.length !== 0) cb(400, result.errors);
 		else {
-			logger.info("time taken by neo4j: ",(Date.now()-st));
+			logger.debug("Time taken by Mindmap DB: ",(Date.now()-st));
 			cb(200, result.results);
 		}
+	});
+	apireq.on('error', function(err) {
+		logger.error("Please run the Mindmap DB");
+		cb(500, "mm_db_na");
 	});
 };

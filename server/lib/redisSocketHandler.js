@@ -24,7 +24,7 @@ default_sub.on("message", function (channel, message) {
 		break;
 
 	case "LAUNCH_DESKTOP":
-		mySocket.emit("LAUNCH_DESKTOP", data.applicationPath);
+		mySocket.emit("LAUNCH_DESKTOP", data.applicationPath, data.processID, data.scrapeMethod);
 		break;
 
 	case "LAUNCH_SAP":
@@ -88,7 +88,9 @@ default_sub.on("message", function (channel, message) {
 		break;
 
 	case "getSocketInfo":
-		server_pub.publish("ICE2_" + data.username, JSON.stringify({"username": data.username, "value": mySocket.handshake.address}));
+		var data_packet = {"username": data.username, "value": "fail"};
+		if (mySocket) data_packet.value = mySocket.handshake.address;
+		server_pub.publish("ICE2_" + data.username, JSON.stringify(data_packet));
 		break;
 
 	case "killSession":
