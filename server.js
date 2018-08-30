@@ -455,7 +455,7 @@ if (cluster.isMaster) {
         app.post('/saveEndtoEndData', mindmap.saveEndtoEndData);
         app.post('/excelToMindmap', mindmap.excelToMindmap);
 		app.post('/getScreens',mindmap.getScreens);
-
+        app.post('/exportToExcel',mindmap.exportToExcel);
         //Login Routes
         app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
         app.post('/loadUserInfo_Nineteen68', login.loadUserInfo_Nineteen68);

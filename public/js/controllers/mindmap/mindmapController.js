@@ -37,6 +37,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     var cycdata = {};
     //Workflow//
     var currMap = {};
+	var excelMap = {};
+	var excelFlag = 0;
     var dragsearch = false;
     $scope.allMMaps = [];
     // Complexity
@@ -576,6 +578,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $rootScope.redirectPage();
             }
             currMap = result[0];
+			excelMap = JSON.parse(JSON.stringify(currMap));
             $('div[title=' + modName + ']').addClass('nodeBoxSelected');
             if ($scope.tab == 'tabCreate')
                 populateDynamicInputList();
@@ -663,6 +666,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         n.display_name = n.name;
         var nodeOpacity = !(n.id_c == "null" || n.id_c == null || n.id_c == undefined) ? 1 : 0.5;
         var ch = 15;
+		img_src = "images_mindmap/node-"+n.type+".png";
         if (n.name.length > ch) {
             n.display_name = n.display_name.slice(0, ch) + '...';
         }
@@ -673,7 +677,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                  'opacity':!(n.id_c == "null" || n.id_c == null || n.id_c == undefined) ? 1 : 0.5,
                                  'title':n.name,
                                  'name':n.display_name,
-                                 'img_src':"images_mindmap/node-"+n.type+".png"
+                                 'img_src':img_src
                                 }; 
         var v = '#ct-node-'+n.id;
         return v;
@@ -1601,7 +1605,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             index = dNodes[pi].children.length - 1;
             if (layout_vertical)
                 new_one = {
-                    x: parseInt(dNodes[pi].children[index].x) + 80,
+                    x: parseInt(dNodes[pi].children[index].x) + 100,
                     y: sections[node.type]
                 }; // Go beside last sibling node
             else
@@ -2310,7 +2314,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     var k = d3.select('#ct-inpAct');
                     d3.select('#ct-inpSugg').classed('no-disp', !0);
                     d3.select('#ct-inpPredict').property('value', '');
-                    d3.select('#ct-inpAct').attr('data-nodeid', k.attr('data-nodeid')).property('value', this.text).node().focus();
+                    d3.select('#ct-inpAct').attr('data-nodeid', k.attr('data-nodeid')).property('value', d.name).node().focus();
                 });
             }
         });
@@ -4983,6 +4987,49 @@ Purpose : displaying pop up for replication of project
     $scope.toggleMinimap = function() {
         $("#minimap-wrapper").toggle();
     }
+	$scope.exportToExcel = function(){
+        //var excelMap = {};
+       
+        if(excelFlag!=1){
+            openDialogMindmap("Fail", "Select the Module to export to excel");
+            
+        }
+        else{
+            
+            mindmapServices.exportToExcel(excelMap).then(function(result){
+                if (result == "Invalid Session") {
+                    $rootScope.redirectPage();
+                }
+                else{
+					
+                    //openDialogMindmap("Success", "Exported to Excel successfully");
+					openWindow = 0;
+								if(openWindow == 0){
+									var file = new Blob([result], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+									var fileURL = URL.createObjectURL(file);
+									var a = document.createElement('a');
+									a.href = fileURL;
+									a.download = 'sample';
+									
+									
+									
+									document.body.appendChild(a);
+									a.click();
+									
+									URL.revokeObjectURL(fileURL);
+								}
+								openWindow++;
+								
+
+                }
+				
+                
+            });
+    
+        }
+    
+    }
+
 
     $scope.showContent = function($fileContent) {
         var validate = true;

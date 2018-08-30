@@ -69,7 +69,7 @@
             <div class="scrollbar-inner endtoend-modules-left-lower makeElementFloatleft" style="overflow-y:hidden !important" id="etemModuleContainer">
                 <span class="moduleContainer" ng-repeat="map in allMMaps" ng-click="loadEndToEnd($index,map.type,map.name)" data-mapid="{{$index}}" title="{{map.name}}">
                     <img class="ct-nodeIcon eteMbox" src="images_mindmap/node-{{map.type}}.png" alt="Module" aria-hidden="true">
-                    <span class="ct-nodeLabel ct-node-e2e">{{map.name}}</span>
+                    <span class="ct-nodeLabel ct-node-e2e" style="width: 120px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 20px;">{{map.name}}</span>
                 </span>                 
             </div>
       
@@ -201,6 +201,7 @@
                <i class="fa fa-files-o fa-lg plus-icon" title="copy selected map" ng-click="copyMindMap()"></i>
                <i class="fa fa-clipboard fa-lg plus-icon" id="pasteImg1" title="Paste map" ng-click="pasteMap()"></i>
                <i class="glyphicon glyphicon-export export-icon" ng-click="exportData(0)" title="Export Version"></i>
+			   <i class="glyphicon glyphicon-save export-excel-icon" id="export-excel" ng-click="exportToExcel()" title="Export To Excel"></i>
                </span>
             </span>
          </div>
@@ -208,7 +209,7 @@
          <div class="ct-nodeBox">
             <div ng-repeat="map in allMMaps" ng-click="loadMap($index)" class="ct-node fl-left" data-mapid="{{$index}}" title="{{map.name}}" style="width: 139px;">
                <img class="ct-nodeIcon" src="images_mindmap/node-modules.png" alt="Module" aria-hidden="true">
-               <span class="ct-nodeLabel">{{map.name}}</span>
+               <span class="ct-nodeLabel" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">{{map.name}}</span>
             </div>
          </div>
          <span id='ctExpandCreate' class=''><img alt="Collapse Icon" class="iconSpaceArrow" src="imgs/ic-collapse.png"></span>
@@ -238,7 +239,7 @@
          <div class="ct-nodeBox">
             <div ng-repeat="map in allMMaps" ng-click="loadMap($index)" class="ct-node fl-left" data-mapid="{{$index}}" title="{{map.name}}" style="width: 139px;">
                <img class="ct-nodeIcon" src="images_mindmap/node-{{map.type}}.png" alt="Module" aria-hidden="true">
-               <span class="ct-nodeLabel">{{map.name}}</span>
+               <span class="ct-nodeLabel" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;>{{map.name}}</span>
             </div>
          </div>
          <span id='ctExpandAssign' class=''><img alt="Collapse Icon" class="iconSpaceArrow" src="imgs/ic-collapse.png"></span>
