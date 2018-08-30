@@ -77,6 +77,10 @@
                     rowCount = 0;
                 }
             }
+            if($('.rDstatus:contains("Fail")').length>0){
+                var offset = $($('.rDstatus:contains("Fail")')[0]).offset().top-$('.scroll-table-container').offset().top;  
+                $('.scroll-table-container')[0].scrollTo(0,offset); 
+            }
 
             window.stop();
 
