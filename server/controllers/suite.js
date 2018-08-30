@@ -937,6 +937,8 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 	var testsuite_creation_data = {};
 	var result_to_send = { "execution_status": [] };
 	async.eachSeries(req.body.execution_data, function (uservalidation_iterator, cb_validation) {
+		uservalidation_iterator.userInfo.ice_username = uservalidation_iterator.userInfo.ice_username.toLowerCase();
+		uservalidation_iterator.userInfo.username = uservalidation_iterator.userInfo.username.toLowerCase();
 		result_status = {
 			"userName": uservalidation_iterator.userInfo.username,
 			"ice_userName": uservalidation_iterator.userInfo.ice_username,

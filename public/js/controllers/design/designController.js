@@ -2476,10 +2476,10 @@ $(document).on('keypress', '#app_pid', function(e) {
             d.css('border', "1px solid red");
             if (appType == "MobileApp") {
                 if (navigator.appVersion.indexOf("Win") != -1) {
-                    d.css('left', (rect.x / 3) + 'px');
-                    d.css('top', (rect.y / 3) - 3 + 'px');
-                    d.css('height', (rect.h / 3) + 'px');
-                    d.css('width', (rect.w / 3) + 'px');
+                    d.css('left', (rect.x * scale_highlight) + 'px');
+                    d.css('top', (rect.y * scale_highlight) + 'px');
+                    d.css('height', (rect.h * scale_highlight) + 'px');
+                    d.css('width', (rect.w * scale_highlight) + 'px');
                 } else if (navigator.appVersion.indexOf("Mac") != -1) {
                     d.css('left', rect.x + 'px');
                     if(rect.y > 450) d.css('top', (rect.y - 12) + 'px');
