@@ -5845,3 +5845,41 @@ ul.browserInlineIcons
     border-right-color: #333;
 }
 /* End of CSS for collapsible right navigation bar */
+
+/*** Click Action on Expand/Collapse Buttons for Reports ***/
+.leftBar-collapsed
+{
+    left: 10px !important;
+    width: calc(100% - 107px) !important;
+}
+.rightBar-collapsed
+{
+    width: calc(100% - 186px) !important;
+}
+.reportScenarioTableLeftExpand
+{
+    margin-top: calc(100% - 820px) !important;
+}
+.reportScenarioTableRightExpand
+{
+    margin-top: calc(100% - 730px) !important;
+}
+.leftRightBar-collapsed
+{
+    width: calc(100% - 20px) !important;
+}
+.reportScenarioTableBothExpand
+{
+    margin-top: calc(100% - 900px) !important;
+}
+.bothBar-collapsed
+{
+    left: 10px !important;
+    width: calc(100% - 20px) !important;
+}
+.reportScenarioTableBothExpand
+{
+    margin-top: calc(100% - 900px) !important;
+}
+
+/*** Click Action on Expand/Collapse Buttons for Reports ***/

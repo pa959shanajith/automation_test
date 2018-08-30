@@ -614,9 +614,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 		'click.as': onIconSpaceClick
 	}, '.iconSpace-reports');
 
-	//Left Bar Expand/Collapse
+	//Left Navigation Bar Expand/Collapse
 	$("#ct-expand-left").click(function(e) {
-        console.log('leftbar click')
         if ($("#ct-expand-left").hasClass("ct-rev")) $(".lsSlide").animate({
             width: 0
         }, 200, function() {
@@ -627,13 +626,12 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 width: 166
             }, 200);
         $("#ct-expand-left").toggleClass("ct-rev");
-        $("#ct-main").toggleClass("leftBarOpen");
-       // adjustMidPanel();
+        $("#middle-content-section").toggleClass("leftBarOpen");
+        adjustMidPanel();
 	});
 	
-	//Right Bar Expand/Collapse
+	//Right Navigation Bar Expand/Collapse
 	$("#ct-expand-right").click(function(e) {
-        console.log('rightbar click')
         if ($("#ct-expand-right").hasClass("ct-rev")) $(".rsSlide").animate({
             width: 0
         }, 200, function() {
@@ -643,9 +641,28 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             width: 90
         }, 200);
         $("#ct-expand-right").toggleClass("ct-rev");
-        $("#ct-main").toggleClass("rightBarOpen");
-       // adjustMidPanel();
-    });
+        $("#middle-content-section").toggleClass("rightBarOpen");
+        adjustMidPanel();
+	});
+	
+	function adjustMidPanel(e) {
+        if ($('.leftBarOpen.rightBarOpen').length > 0) {
+			$("#middle-content-section").removeClass('leftBar-collapsed rightBar-collapsed');
+			$("#reportScenarioDataTable").removeClass('reportScenarioTableLeftExpand reportScenarioTableRightExpand');
+			$("#middle-content-section").addClass('bothBar-collapsed');
+			$("#reportScenarioDataTable").addClass('reportScenarioTableBothExpand');
+        } else if ($('.leftBarOpen').length > 0) {
+			$("#middle-content-section").removeClass('rightBar-collapsed leftRightBar-collapsed bothBar-collapsed').addClass('leftBar-collapsed');
+			$('#reportScenarioDataTable').removeClass('reportScenarioTableRightExpand reportScenarioTableBothExpand').addClass('reportScenarioTableLeftExpand');
+        } else if ($('.rightBarOpen').length > 0) {
+			$("#middle-content-section").removeClass('leftBar-collapsed leftRightBar-collapsed bothBar-collapsed').addClass('rightBar-collapsed');
+			$('#reportScenarioDataTable').removeClass('reportScenarioTableLeftExpand reportScenarioTableBothExpand').addClass('reportScenarioTableRightExpand');
+        } else {
+			 $("#middle-content-section").removeClass('leftBar-collapsed rightBar-collapsed bothBar-collapsed');
+			 $("#reportScenarioDataTable").removeClass('reportScenarioTableLeftExpand reportScenarioTableRightExpand reportScenarioTableBothExpand');
+		}
+		e.stopImmediatePropagation();
+    }
 
 	/********** HTML REPORT CLICK ****************/
 	$(document).off('click.htmlRepClick', '.openreportstatus');
