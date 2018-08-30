@@ -104,8 +104,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 				reportsInputData.type = 'allreports';
 				$("#reportScenarioDataTable").hide();
 				reportService.getReportsData_ICE(reportsInputData).then(function (result_res_reportData, response_reportData) {
-					//reportData
-					console.log(result_res_reportData);
 					if(Object.keys(result_res_reportData.testsuites).length == 0)
 					{
 						$("#reportDataTable,#reportScenarioDataTable").hide();
@@ -627,7 +625,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             }, 200);
         $("#ct-expand-left").toggleClass("ct-rev");
         $("#middle-content-section").toggleClass("leftBarOpen");
-        adjustMidPanel();
+		adjustMidPanel();
+		e.stopImmediatePropagation();
 	});
 	
 	//Right Navigation Bar Expand/Collapse
@@ -642,10 +641,11 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         }, 200);
         $("#ct-expand-right").toggleClass("ct-rev");
         $("#middle-content-section").toggleClass("rightBarOpen");
-        adjustMidPanel();
+		adjustMidPanel();
+		e.stopImmediatePropagation();
 	});
 	
-	function adjustMidPanel(e) {
+	function adjustMidPanel() {
         if ($('.leftBarOpen.rightBarOpen').length > 0) {
 			$("#middle-content-section").removeClass('leftBar-collapsed rightBar-collapsed');
 			$("#reportScenarioDataTable").removeClass('reportScenarioTableLeftExpand reportScenarioTableRightExpand');
@@ -661,7 +661,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 			 $("#middle-content-section").removeClass('leftBar-collapsed rightBar-collapsed bothBar-collapsed');
 			 $("#reportScenarioDataTable").removeClass('reportScenarioTableLeftExpand reportScenarioTableRightExpand reportScenarioTableBothExpand');
 		}
-		e.stopImmediatePropagation();
     }
 
 	/********** HTML REPORT CLICK ****************/
