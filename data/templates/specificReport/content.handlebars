@@ -3,6 +3,11 @@
 <head>
     <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
     <title>SLK Nineteen68</title>
+	<style>
+		.no-disp{
+			display:none!important;
+		}
+	</style>	
     <link rel="stylesheet" type="text/css" href="{#asset latofonts.css @encoding=link}" />
     <link rel="stylesheet" type="text/css" href="{#asset font-awesome.min.css @encoding=link}" />
     <script type="text/javascript" src="{#asset jquery.min.js @encoding=link}"></script>
@@ -18,22 +23,43 @@
             $("#overlayContainer").fadeOut(300).remove()
         }
         setTimeout(function() {
+             var remarksLength = parseInt($('.remarksLength').text());
+             var commentsLength = parseInt($('.commentsLength').text());
+             if(remarksLength == 0)
+             {
+                $('.toggleRemarks').hide();
+                $('.rDremarks').hide();
+             }
+             else{
+                $('.toggleRemarks').show();
+                $('.rDremarks').show();
+             }
+             if(commentsLength == 0)
+             {
+                $('.toggleComments').hide();
+                $('.rDcomments').hide();
+             }
+             else{
+                $('.toggleComments').show();
+                $('.rDcomments').show();
+             }
             /*if($('.reportsDetail .reportdetailsrow').length < 12){
             	$('.rDstep').css('width','10.1%');
             	$('.rDstepDes').css('width','49.6%');
             	$('.rDstatus').css('width','10%');
             }*/
+      
             var getRows = $('.reportdetailsrow');
             for (i = 0; i < getRows.length; i++) {
                 var getRowId = parseInt(getRows[i].getAttribute('data-id'));
                 var name = getRows[i].children[2].innerHTML;
                 var rowCount = 0;
                 var getParentId;
-                if (getRows[i].children[3].getAttribute("data-screenshot").length <= 0 || getRows[i].children[3].getAttribute("data-screenshot").toLowerCase().indexOf(".png") == -1) {
-                    getRows[i].children[3].classList.remove("openscreenshot");
+                if (getRows[i].children[9].getAttribute("data-screenshot").length <= 0 || getRows[i].children[9].getAttribute("data-screenshot").toLowerCase().indexOf(".png") == -1) {
+                    getRows[i].children[9].classList.remove("openscreenshot");
                 }
                 if (name.indexOf("Testscriptname") >= 0 || name.indexOf("TestCase Name") >= 0) {
-                    getRows[i].children[7].children[0].remove();
+                    getRows[i].children[6].children[0].remove();
                 }
                 for (j = i; j < getRows.length; j++) {
                     if (parseInt(getRows[j].getAttribute('data-parentid')).length == NaN) getParentId = parseInt(getRows[j].getAttribute('data-parentid').split(",")[1]);
@@ -50,6 +76,10 @@
                     }
                     rowCount = 0;
                 }
+            }
+            if($('.rDstatus:contains("Fail")').length>0){
+                var offset = $($('.rDstatus:contains("Fail"):visible')[0]).offset().top-$('.scroll-table-container').offset().top;  
+                $('.scroll-table-container')[0].scrollTo(0,offset); 
             }
 
             window.stop();
@@ -102,7 +132,36 @@
                     });
                 }
             })
-
+		   $(document).on('click','.collapsible',function(){
+                 if($(this).hasClass('active') == true)
+                 {
+                    $(this).children('span').children('span.arrow-down').removeClass('arrow-down').addClass('arrow-up');
+                 }
+                 else{
+                    $(this).children('span').children('span.arrow-up').removeClass('arrow-up').addClass('arrow-down');
+                 }
+             });
+             $('.collapsible-tc').append('<span class="arrow-down-sm"></span>');
+         $(document).on('click','.collapsible-tc',function(){
+         var abc = this.parentElement.getAttribute("data-id");
+         var len = $('.reportdetailsrow').length;
+                 if($(this).hasClass('collapse-active') == false)
+                 {
+                     $(this).addClass('collapse-active');
+                     $(this).children('span.arrow-down-sm').removeClass('arrow-down-sm').addClass('arrow-up-sm');
+                 }
+                 else{
+                      $(this).removeClass('collapse-active');
+                      $(this).children('span.arrow-up-sm').removeClass('arrow-up-sm').addClass('arrow-down-sm');
+                 }
+         while(len--){
+         abc = parseInt(abc) +1;
+         if($($("[data-id="+abc+"]")[0]).find('.collapsible-tc').length !=0)
+         break;
+         else
+         $("[data-id="+abc+"]").toggleClass("no-disp");
+         }
+         });
             $(document).on('click', '.expand', function() {
                 var getID = $(this).parents('.reportdetailsrow').attr('data-id');
                 $(this).removeClass('expand').addClass('unexpand');
@@ -349,7 +408,26 @@
                 }
             })
             //Create Issues in Jira
+			var coll = document.getElementsByClassName("collapsible");
+			var i;
 
+			for (i = 0; i < coll.length; i++) {
+				coll[i].addEventListener("click", function() {
+					this.classList.toggle("active");
+					var content = this.nextElementSibling;
+					if (content.style.display != "none") {
+							content.style.display = "none";
+						} else {
+							content.style.display = "block";
+						}
+					var content = this.nextElementSibling.nextElementSibling;
+					if (content.style.display != "none") {
+							content.style.display = "none";
+						} else {
+							content.style.display = "block";
+						}                      
+				});
+			}
             function clearData() {
                 $("#jiraURL, #jiraUserName, #jiraPassword").val("");
             }
@@ -368,7 +446,7 @@
             float: left;
             padding: 14px;
             width: 97%;
-            height: calc(100% - 50px);
+            height: calc(100% - 30px);
         }
 
         .hearderCon {
@@ -429,6 +507,7 @@
             width: 64%;
             padding-bottom: 5px;
             font-weight: bold;
+            word-break: break-all;
         }
 
         .summaryCon {
@@ -514,51 +593,50 @@
         }
 
         .reportsDetails th:nth-child(4) {
-            width: 6%;
-        }
+            width: 9%;
+        } 
 
         .rDstatus {
             width: 6.1% !important;
             word-break: break-word;
         }
 
-        .reportsDetails th:nth-child(5) {
-            width: 8%;
-        }
-
         .rDellaps {
-            width: 8.5% !important;
+            width: 9% !important;
             word-break: break-word;
         }
 
-        .reportsDetails th:nth-child(6),
+        .reportsDetails th:nth-child(5),
         .rDcomments {
             width: 13%;
             word-break: break-word;
         }
 
-        .reportsDetails th:nth-child(7),
+        .reportsDetails th:nth-child(6),
         .rDremarks {
             width: 15%;
             word-break: break-word;
         }
 
-        .reportsDetails th:nth-child(8),
+        .reportsDetails th:nth-child(7),
         .rjira {
             width: 7%;
             word-break: break-word;
         }
 
-        .reportsDetails th:nth-child(9),
+        .reportsDetails th:nth-child(8),
         .rDExpectedRes {
             width: 12%;
             word-break: break-word;
         }
 
-        .reportsDetails th:nth-child(10),
+        .reportsDetails th:nth-child(9),
         .rDActualRes {
             width: 12%;
             word-break: break-word;
+        }
+        .reportsDetails th:nth-child(10) {
+            width: 6.1%;
         }
 
         .maintabCont {
@@ -1119,11 +1197,113 @@
             text-align: left !important;
             padding: 2px;
         }
+		.collapsible {
+			
+			color: black;
+			cursor: pointer;
+			
+			width: 100%;
+			border: 1px solid #cfcfcf;
+			text-align: left;
+			outline: none;
+			font-size: 15px;
+			border-radius: 5px;
+			height: 40px;
+			background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+		}
+
+		.active, .collapsible:hover {
+			background-color: #555;
+			
+			background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+		}
+
+		.content {
+			padding: 0 18px;
+			display: block;
+			overflow: hidden;
+			transition: max-height 0.2s ease-out;
+			background-color: #f1f1f1;
+		}
+        .hide{
+            display:none;
+        }		
+
+        .scroll-table-container {    /* border: 2px solid green; */
+            height: 92%;
+            width: 100%;
+            overflow-y: scroll;
+            box-sizing: border-box;
+            
+            border: 1px solid #dcdcdc;
+        }
+		.scroll-table{border-collapse:collapse;width: 100%;}
+            
+			
+			/* width */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        // style for scroll bar
+        /* Track */
+        ::-webkit-scrollbar-track {
+            box-shadow: inset 0 0 5px grey; 
+            border-radius: 10px;
+        }
+        
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); 
+            border-radius: 10px;
+        }
+
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); 
+        }
+         .arrow-down,.arrow-up {
+         height: 0px;
+         width: 0px;
+         border: none;
+         border-top: 7px solid #000000;
+         border-left: 6px solid rgba(0,0,0,0);
+         border-right: 6px solid rgba(0,0,0,0);
+         float: left;
+         position: absolute;
+         left: -20px;
+         top: 4px;
+         cursor: pointer;
+         }
+         .arrow-up {
+         border-bottom: 7px solid #000000;
+         border-top:0px !important;
+         }
+         .arrow-down-sm,.arrow-up-sm {
+         display: inline;
+         height: 0px;
+         width: 0px;
+         border: none;
+         border-top: 5px solid #000000;
+         border-left: 5px solid rgba(0,0,0,0);
+         border-right: 5px solid rgba(0,0,0,0);
+         position: relative;
+         left: -2px;
+         top: 9px;
+         float: left;
+         cursor: pointer;
+         }
+         .arrow-up-sm {
+         border-bottom: 5px solid #000000;
+         border-top:0px !important;
+         }
     </style>
 </head>
 
 <body>
+   
     <div class="mainContainer">
+         <span class='hide remarksLength'>{{remarksLength}}</span>
+         <span class='hide commentsLength'>{{commentsLength}}</span>
         {{#each overallstatus}}
         <div class="hearderCon">
             <div class="headerRepDetails">
@@ -1136,9 +1316,7 @@
                 <h4>SLK Nineteen68 Execution Report</h4>
             </div>
         </div>
-        <div class="summaryCon">
-            <span>Result Summary</span>
-        </div>
+        <button class="collapsible"><span style="left: 40px;position: relative"><span class="arrow-down"></span>Result Summary</span></button>
         <div style="width: 100%;">
             <div class="leftSummary">
                 <label>Scenario :</label><span>{{scenarioName}}</span>
@@ -1208,53 +1386,56 @@
                 <thead class="reportsDetails">
                     <th>Sl No.</th>
                     <th>Test Step No.</th>
-                    <th>Test Step Description</th>
-                    <th>Status</th>
+                    <th style="display:none">Test Step Description</th>
                     <th>Elapsed Time</th>
-                    <th>Comments</th>
-                    <th>Remarks</th>
+                    <th class='toggleComments'>Comments</th>
+                    <th class='toggleRemarks'>Remarks</th>
                     <th>Defect ID</th>
                     <th>Expected Result</th>
                     <th>Actual Result</th>
+                    <th style="display:none">Status</th>
                     {{!--
                     <th>Expected Result</th> --}}
                 </thead>
             </table>
-            <table style='table-layout: fixed;width:100%'>
-                <div class="reportsDetail">
-                    {{#each rows}}
-                    <div style="width: 100%; display: table;" class="reportdetailsrow" data-id={{id}} data-parentid={{parentId}}>
-                        <div class="rDid tabCont">{{slno}}</div>
-                        <div class="rDstep tabCont">{{Step}}</div>
-                        <div class="rDstepDes tabCont" style="padding-left: 10px; font-weight:{{getStyle StepDescription}}">{{StepDescription}}</div>
-                        <div class="rDstatus tabCont openscreenshot" style="color:{{getColor status}}" data-screenshot="{{screenshot_path}}">{{status}}</div>
-                        <div class="rDellaps tabCont">{{EllapsedTime}}</div>
-                        <div class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</div>
-                        <div class="rDremarks tabCont" style="padding-left: 10px;">{{Remark}}</div>
-                        <div class="rjira tabCont"><span class="opendescpopup" title="Create Issue"></span></div>
-                        {{#ifEquals testcase_details.testcaseDetails undefined}}
-                        <div class="rDExpectedRes tabCont"></div>
-                        {{/ifEquals}} {{#ifEquals testcase_details.testcaseDetails ""}}
-                        <div class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}</div>
-                        {{/ifEquals}} {{#ifnotEquals testcase_details.testcaseDetails ""}} {{#ifnotEquals testcase_details undefined}}
-                        <div class="rDExpectedRes tabCont" style="padding-left: 10px;">{{testcase_details.testcaseDetails}}</div>
-                        {{/ifnotEquals}} {{/ifnotEquals}} {{#ifEquals status undefined}}
-                        <div class="rDActualRes tabCont"></div>
-                        {{/ifEquals}} {{#ifEquals status ""}}
-                        <div class="rDActualRes tabCont"></div>
-                        {{/ifEquals}} {{#ifEquals status "Pass"}} {{#ifEquals testcase_details.actualResult_pass ""}}
-                        <div class="rDActualRes tabCont" style="padding-left: 10px;">{{status}}</div>
-                        {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_pass ""}}
-                        <div class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}}</div>
-                        {{/ifnotEquals}} {{/ifEquals}} {{#ifEquals status "Fail"}} {{#ifEquals testcase_details.actualResult_fail ""}}
-                        <div class="rDActualRes tabCont" style="padding-left: 10px;">{{status}}</div>
-                        {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_fail ""}}
-                        <div class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}</div>
-                        {{/ifnotEquals}} {{/ifEquals}}
-                    </div>
-                    {{/each}}
-                </div>
-            </table>
+            <div class="scroll-table-container">
+                <table class="scroll-table">
+                    <tbody class="reportsDetail">
+                        {{#each rows}}
+                        <tr style="width: 100%;" class="reportdetailsrow" data-id={{id}} data-parentid={{parentId}}>
+                            <td class="rDid tabCont">{{slno}}</td>
+                            <td class="rDstep tabCont">{{Step}}</td>
+                            <td class="{{getClass StepDescription}}" style="display:none; padding-left: 10px; font-weight:{{getStyle StepDescription}}">{{StepDescription}}</td>
+                            <td class="rDellaps tabCont">{{EllapsedTime}}</td>
+                            <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td>
+                            <td class="rDremarks tabCont toggleRemarks" style="padding-left: 10px;">{{Remark}}</td>
+                            <td class="rjira tabCont"><span class="opendescpopup" title="Create Issue"></span></td>
+                            {{#ifEquals testcase_details.testcaseDetails undefined}}
+                            <td class="rDExpectedRes tabCont {{getClass StepDescription}}">{{StepDescription}}</td>
+                            {{/ifEquals}} {{#ifEquals testcase_details.testcaseDetails ""}}
+                            <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
+                            {{/ifEquals}} {{#ifnotEquals testcase_details.testcaseDetails ""}} {{#ifnotEquals testcase_details undefined}}
+                            <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}} <br/>Expected Result is: {{testcase_details.testcaseDetails}}</td>
+                            {{/ifnotEquals}} {{/ifnotEquals}} {{#ifEquals status undefined}}
+                            <td class="rDActualRes tabCont"></td>
+                            {{/ifEquals}} {{#ifEquals status ""}}
+                            <td class="rDActualRes tabCont"></td>
+                            {{/ifEquals}} {{#ifEquals status "Pass"}} {{#ifEquals testcase_details.actualResult_pass ""}}
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;"><text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text></td>
+                            {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_pass ""}}
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}},<text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text></td>
+                            {{/ifnotEquals}} {{/ifEquals}} {{#ifEquals status "Fail"}} {{#ifEquals testcase_details.actualResult_fail ""}}
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;"><text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text></td>
+                            {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_fail ""}}
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}},<text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text></td>
+                            {{/ifnotEquals}} {{/ifEquals}}
+                            <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}}; display:none" data-screenshot="{{screenshot_path}}">{{status}}</td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
             <div id="overlay"></div>
             <!-- Jira login window popup-->
             <div class="jiraWindow" style="display: none;">

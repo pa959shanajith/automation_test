@@ -126,6 +126,18 @@ mySPA.factory('reportService', ['$http','$q', function ($http,$q)   {
 			function(response){
 				return $q.reject(response.data)
 			})
-		}
+		},
+		getReportsData_ICE : function(reportsInputData){
+			return $http.post('/getReportsData_ICE',{
+				param : 'getReportsData_ICE',
+				reportsInputData : reportsInputData
+			})
+			.then(function(response)  {
+				return response.data
+			},
+			function(response){
+				return $q.reject(response.data)
+			})
+		},
 	}
 }]);

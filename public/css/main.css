@@ -2365,11 +2365,11 @@ input[disabled]{
 	display: block;
 	float: left;
 }
-.executionDataTable tbody tr:nth-child(odd), .designDataTable tbody tr:nth-child(odd){
+.executionDataTable tbody tr:nth-child(odd), .designDataTable tbody tr:nth-child(odd),.reportDataTable tbody tr:nth-child(odd),.reportScenarioDataTable tbody tr:nth-child(odd){
 	/*background:#e8e6ff;	*/
     background: #e8e6fe;
 }
-.designDataTable tbody tr:nth-child(even) {
+.designDataTable tbody tr:nth-child(even),.reportDataTable tbody tr:nth-child(even),.reportScenarioDataTable tbody tr:nth-child(even){
     background: #fff;
 }
 .executionDataTable tbody, .designDataTable tbody {
@@ -2477,12 +2477,13 @@ input[disabled]{
 	width: 100%;
 	margin-top: 1px;
 }
-.scenarioHeaders{
+.scenarioHeaders,.reportHeaders{
 	background: #5e626b;
     color: #fff;
-    font-size: 17px;
+    font-size: 15px;
     font-family: 'LatoWebLight';
 }
+
 .scenarioHeaders tr{width: 100%;}
 .scenarioHeaders tr td{
 	padding: 0 5px 0 5px;
@@ -4458,19 +4459,33 @@ select:-webkit-autofill:focus {
 }
 .rpSelectProjects{
     float: left;
-    margin-left: 18px;
-    margin-top: 3px;
 }
 .rpSelectProjects>label{
     margin: 0;
-    position: relative;
-    top: 6px;
 }
-.rpSelectProjects .rpProjects{
-    width: 200px;
+.rpSelectProjects .rpProjects {
+    width: 145px;
     height: 24px;
     border-radius: 4px;
     border-color: #633693;
+    margin-top: 5%;
+    outline: none;
+}
+.rpReleases, .rpCycles{
+    width: 145px;
+    height: 24px;
+    border-radius: 4px;
+    border-color: #633693;
+    margin-top: 5%;
+    outline: none;
+}
+.reports-search{
+    height: 26px;
+    margin-top: 9px;
+    border-radius: 7px;
+    border: 1px solid #461F6E;
+    outline: none !important;
+    padding: 10px !important;
 }
 .search-reports{
     float: right;
@@ -5626,3 +5641,245 @@ ul.browserInlineIcons
 {
     pointer-events: none;
 }
+.filterReports,.reportDataTable,.reportScenarioDataTable
+{
+    float:left;
+    width: 100%;
+}
+.reportDataTable,.reportScenarioDataTable
+{
+    margin-top: 3%;
+    /* overflow: auto; */
+    display: none;
+    width: 100% !important;
+}
+.reportScenarioDataTable
+{
+    margin-top: calc(100% - 650px) !important;
+}
+/* .report-table-body{
+    overflow: auto;
+    max-height: 350px !important;
+    position: absolute;
+    width: 96%;
+} */
+/* .report-scenario-body{
+    overflow: auto;
+    max-height: 290px !important;
+    position: absolute;
+    width: 96%;
+}  */
+/* .reportDataTable
+{
+    max-height: 350px !important;
+} */
+/* .reportScenarioDataTable
+{
+    max-height: 230px !important;
+} */
+.tblstruct
+{
+    width: 97%;
+}
+.getScenarioTestCaseDetails td,.reportHeaders thead tr th,.executionTimeDetails td
+{
+    padding: 5px !important;
+}
+
+.reportHeaders tr th, .reportHeaders tr thead
+{
+    border-right: 1px solid #fff;
+    padding: 5px !important;
+    font-weight: normal;
+    font-family: Latoweblight;
+    text-align: left;
+    line-height: 1.1 !important;
+}
+.executionCount
+{
+    cursor: pointer;
+}
+.filterReport
+{
+    float: left;
+    width: 100%;
+}
+.reportDataTable tr,.reportScenarioDataTable tr
+{
+    width: 100%;
+    font-family: Latoweb;
+}
+
+.reportDataTable th:nth-child(1),.reportDataTable td:nth-child(1){width: 4%;  word-break: break-word; }
+.reportDataTable th:nth-child(2),.reportDataTable td:nth-child(2){width: 8%;  word-break: break-word;}
+.reportDataTable th:nth-child(3),.reportDataTable td:nth-child(3){width: 9%; word-break: break-word; text-align:left}
+.reportDataTable th:nth-child(4),.reportDataTable td:nth-child(4){width: 11%; word-break: break-word; text-align:left}
+.reportDataTable th:nth-child(5),.reportDataTable td:nth-child(5){width: 6%; word-break: break-word; text-align:left}
+.reportDataTable th:nth-child(6),.reportDataTable td:nth-child(6){width: 12%; word-break: break-word; text-align:left}
+.reportDataTable th:nth-child(7),.reportDataTable td:nth-child(7){width: 8%; word-break: break-word; text-align:left}
+.reportDataTable th:nth-child(8),.reportDataTable td:nth-child(8){width: 7%; word-break: break-word; text-align:left}
+
+.reportScenarioDataTable th:nth-child(1),.reportScenarioDataTable td:nth-child(1){width: 3%;  word-break: break-word; }
+.reportScenarioDataTable th:nth-child(2),.reportScenarioDataTable td:nth-child(2){width: 10%;  word-break: break-word;}
+.reportScenarioDataTable th:nth-child(3),.reportScenarioDataTable td:nth-child(3){width: 10%; word-break: break-word; text-align:left}
+.reportScenarioDataTable th:nth-child(4),.reportScenarioDataTable td:nth-child(4){width: 5%; word-break: break-word; text-align:left}
+.reportScenarioDataTable th:nth-child(5),.reportScenarioDataTable td:nth-child(5){width: 6.5%; word-break: break-word; text-align:left}
+.reportScenarioDataTable th:nth-child(6),.reportScenarioDataTable td:nth-child(6){width: 5%; word-break: break-word; text-align:left}
+
+.reportFormat
+{
+    width: 27px;
+    height: 27px;
+    padding: 2px;
+    cursor: pointer;
+}
+.searchReports
+{
+    position: absolute;
+    top: 11px;
+    left: 173px;
+}
+
+/* Start of CSS for collapsible left navigation bar */
+#ct-lSide {
+    left: 0;
+    position: relative;
+}
+.ct-side {
+    height: 100%;
+    width: 6px;
+    color: #fff;
+    background-color: #633690;
+}
+.fl-left {
+    float: left!important;
+}
+
+#ct-expand-left.ct-rev {
+    position: relative;
+    left: 160px;
+    z-index: 9999;
+}
+
+.ct-side .ct-expand {
+    top: 50%;
+    width: 6px;
+    height: 25px;
+}
+
+.ct-expand {
+    cursor: pointer;
+    overflow: hidden;
+    background-color: rgba(255,255,255,.7);
+}
+
+#ct-expand-left::after {
+    left: 1px;
+    border-left-color: #333;
+    border-right-color: transparent;
+}
+
+#ct-expand-left.ct-rev::after {
+    left: -5px;
+    border-left-color: transparent;
+    border-right-color: #333;
+}
+.ct-expand::after {
+    position: absolute;
+    content: '';
+    top: 7.5px;
+    border: 5px solid transparent;
+}
+
+.reports-left-section
+{
+    border-bottom: 0px !important;
+}
+/* End of CSS for collapsible left navigation bar */
+
+/* Start of CSS for collapsible right navigation bar */
+#ct-rSide {
+    right: 0;
+    position: relative;
+    top: 0;
+}
+.ct-side {
+    height: 100%;
+    width: 6px;
+    color: #fff;
+    background-color: #633690;
+}
+.fl-right, .fl-right-assign {
+    float: right!important;
+}
+#ct-expand-right.ct-rev {
+    position: relative;
+    right: 84px;
+    z-index: 9999;
+}
+.ct-side .ct-expand {
+    top: 50%;
+    width: 6px;
+    height: 25px;
+}
+.ct-expand {
+    cursor: pointer;
+    overflow: hidden;
+    background-color: rgba(255,255,255,.7);
+}
+#ct-expand-right.ct-expand.ct-rev::after {
+    left: 1px;
+    border-left-color: #333;
+    border-right-color: transparent;
+}
+.ct-expand::after {
+    position: absolute;
+    content: '';
+    top: 7.5px;
+    border: 5px solid transparent;
+}
+
+#ct-expand-right.ct-expand::after {
+    left: -5px;
+    border-left-color: transparent;
+    border-right-color: #333;
+}
+/* End of CSS for collapsible right navigation bar */
+
+/*** Click Action on Expand/Collapse Buttons for Reports ***/
+.leftBar-collapsed
+{
+    left: 10px !important;
+    width: calc(100% - 107px) !important;
+}
+.rightBar-collapsed
+{
+    width: calc(100% - 186px) !important;
+}
+.reportScenarioTableLeftExpand
+{
+    margin-top: calc(100% - 820px) !important;
+}
+.reportScenarioTableRightExpand
+{
+    margin-top: calc(100% - 730px) !important;
+}
+.leftRightBar-collapsed
+{
+    width: calc(100% - 20px) !important;
+}
+.reportScenarioTableBothExpand
+{
+    margin-top: calc(100% - 900px) !important;
+}
+.bothBar-collapsed
+{
+    left: 10px !important;
+    width: calc(100% - 20px) !important;
+}
+.reportScenarioTableBothExpand
+{
+    margin-top: calc(100% - 900px) !important;
+}
+
+/*** Click Action on Expand/Collapse Buttons for Reports ***/

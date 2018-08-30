@@ -256,6 +256,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/controllers/chatbot/chatbotService.js',
 						'js/controllers/login/loginService.js',						
 						'js/controllers/header/headerController.js',
+						'js/controllers/mindmap/mindmapService.js',
 						'js/controllers/Reports/reportsController.js',
 						'js/controllers/Reports/reportService.js'
                     ]);

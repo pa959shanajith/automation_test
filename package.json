@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node --max_old_space_size=4096 --optimize_for_size server.js",
-    "service" : "node server_winservice.js"
+    "service": "node server_winservice.js"
   },
   "author": "Dimension Labs",
   "license": "Copyright (c) SLK Software Services Pvt. Ltd.",
@@ -31,6 +31,7 @@
     "jsreport-client": "^0.4.1",
     "jsreport-wkhtmltopdf": "^1.4.0",
     "lusca": "^1.5.2",
+    "msexcel-builder": "0.0.2",
     "node-env-file": "^0.1.8",
     "node-rest-client": "^3.1.0",
     "node-schedule": "^1.2.5",
@@ -42,7 +43,7 @@
     "validator": "^9.2.0",
     "winston": "^2.4.0",
     "winston-daily-rotate-file": "^1.7.2",
-	"xlsx":"^0.12.6",
+    "xlsx": "^0.12.6",
     "xml-parser": "^1.2.1"
   }
 }

@@ -588,6 +588,65 @@
 }
 /* Execution mid section  */
 
+/********** Scrollbar for Reports Table *******************/
+.report-table-body.scroll-wrapper > .scroll-content {
+    border: none !important;
+    height: 650px !important;
+    left: 0;
+    margin: 0;
+    max-width: none !important;
+    overflow: auto !important;
+    padding: 0;
+    position: absolute !important;
+    top: 0;
+    width: 100% !important;
+    overflow-x: hidden !important;
+	margin-bottom: 0px;
+    margin-right: 0px;
+    max-height: 300px;
+}
+
+.report-table-body.scroll-wrapper {
+    overflow-y: auto !important;
+    padding: 0 !important;
+    position: absolute !important;
+    float: left;
+    width: 93% !important;
+    height: 100%;
+    max-height: 300px !important;
+    overflow-x: hidden;
+}
+.report-scenario-body.scroll-wrapper > .scroll-content {
+    border: none !important;
+    height: 210px !important;
+    left: 0;
+    margin: 0;
+    max-width: none !important;
+    overflow: auto !important;
+    padding: 0;
+    position: absolute !important;
+    top: 0;
+    width: 100% !important;
+    overflow-x: hidden !important;
+	margin-bottom: 0px;
+    margin-right: 0px;
+    max-height: 300px;
+}
+
+.report-scenario-body.scroll-wrapper {
+    overflow-y: auto !important;
+    padding: 0 !important;
+    position: absolute !important;
+    float: left;
+    width: 93% !important;
+    height: 100%;
+    max-height: 225px !important;
+    overflow-x: hidden;
+}
+/********** Scrollbar for Reports Table *******************/
+
+
+
 /*****************Scrollbar for testscenarios in execution*******************/
 .scroll-wrapper > .testScenarioScroll{
 	width: 100% !important;
@@ -952,5 +1011,5 @@
     .scroll-wrapper.scrollbar-inner-rep{max-height: 241px !important;}
 }
 @media only screen and (width: 1440px) and (height: 794px){
-    .scroll-wrapper.scrollbar-inner-rep�{max-height:�243px !important;}                                                                                                                                                                       
+    .scroll-wrapper.scrollbar-inner-rep{max-height: 243px !important;}                                                                                                                                                                       
 }
