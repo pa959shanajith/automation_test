@@ -78,7 +78,7 @@
                 }
             }
             if($('.rDstatus:contains("Fail")').length>0){
-                var offset = $($('.rDstatus:contains("Fail")')[0]).offset().top-$('.scroll-table-container').offset().top;  
+                var offset = $($('.rDstatus:contains("Fail"):visible')[0]).offset().top-$('.scroll-table-container').offset().top;  
                 $('.scroll-table-container')[0].scrollTo(0,offset); 
             }
 
