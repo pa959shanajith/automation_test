@@ -2480,7 +2480,7 @@ input[disabled]{
 .scenarioHeaders,.reportHeaders{
 	background: #5e626b;
     color: #fff;
-    font-size: 17px;
+    font-size: 15px;
     font-family: 'LatoWebLight';
 }
 
@@ -5648,10 +5648,14 @@ ul.browserInlineIcons
 }
 .reportDataTable,.reportScenarioDataTable
 {
-   margin-top: 3%;
-   overflow:auto;
-   display:none;
-   width: 100% !important;
+    margin-top: 3%;
+    /* overflow: auto; */
+    display: none;
+    width: 100% !important;
+}
+.reportScenarioDataTable
+{
+    margin-top: calc(100% - 650px) !important;
 }
 /* .report-table-body{
     overflow: auto;
@@ -5665,13 +5669,21 @@ ul.browserInlineIcons
     position: absolute;
     width: 96%;
 }  */
-.reportDataTable
+/* .reportDataTable
 {
     max-height: 350px !important;
-}
-.reportScenarioDataTable
+} */
+/* .reportScenarioDataTable
 {
     max-height: 230px !important;
+} */
+.tblstruct
+{
+    width: 97%;
+}
+.getScenarioTestCaseDetails td,.reportHeaders thead tr th,.executionTimeDetails td
+{
+    padding: 5px !important;
 }
 
 .reportHeaders tr th, .reportHeaders tr thead

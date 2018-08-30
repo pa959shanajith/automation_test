@@ -89,7 +89,7 @@
               <th scope="col">View Report</th>
             </tr>
           </thead>
-          <tbody class='reportBody report-table-body'>
+          <tbody class='reportBody report-table-body scrollbar-inner'>
             <tr class='getScenarioTestCaseDetails' ng-repeat="report in result_reportData">
               <td scope="row">{{report.id}}</td>
               <td class="reptable-modulename">{{report.ModuleName }}</td>
@@ -115,7 +115,7 @@
 
   <!-- Scenario Table Div -->
 <div class="table-responsive reportScenarioDataTable" id='reportScenarioDataTable'>
-        <table class="table table-striped tblstruct" width='100%'>
+        <table class="table table-striped tblstruct">
             <thead class='reportHeaders'>
                 <tr>
                   <th scope="col">Sl.No</th>
@@ -126,8 +126,8 @@
                   <th scope="col">View Report</th>
                 </tr>
               </thead>
-              <tbody class='reportBody report-scenario-body'>
-                 <tr ng-repeat="scenario in result_res_scenarioData">
+              <tbody class='reportBody report-scenario-body scrollbar-inner'>
+                 <tr class='executionTimeDetails' ng-repeat="scenario in result_res_scenarioData">
                   <td scope="row" >{{$index+1}}</td>
                   <td>{{scenario.executedtime }}</td>
                   <td>{{scenario.executedtime}}</td>

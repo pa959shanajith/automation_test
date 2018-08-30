@@ -102,12 +102,13 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 				reportsInputData.releaseId = $scope.releaseNames;
 				reportsInputData.cycleId = $scope.cycleNames;
 				reportsInputData.type = 'allreports';
+				$("#reportScenarioDataTable").hide();
 				reportService.getReportsData_ICE(reportsInputData).then(function (result_res_reportData, response_reportData) {
 					//reportData
 					console.log(result_res_reportData);
 					if(Object.keys(result_res_reportData.testsuites).length == 0)
 					{
-						$("#reportDataTable").hide();
+						$("#reportDataTable,#reportScenarioDataTable").hide();
 					}
 					else{
 						$scope.result_reportData = [];
