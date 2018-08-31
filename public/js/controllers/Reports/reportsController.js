@@ -651,15 +651,20 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 			$("#reportScenarioDataTable").removeClass('reportScenarioTableLeftExpand reportScenarioTableRightExpand');
 			$("#middle-content-section").addClass('bothBar-collapsed');
 			$("#reportScenarioDataTable").addClass('reportScenarioTableBothExpand');
+			$('.reportBody.scroll-wrapper').addClass('reportTblWidth');
+			$(".reportDataTable th:nth-child(5), .reportDataTable td:nth-child(5)").css('width','7%');
         } else if ($('.leftBarOpen').length > 0) {
 			$("#middle-content-section").removeClass('rightBar-collapsed leftRightBar-collapsed bothBar-collapsed').addClass('leftBar-collapsed');
 			$('#reportScenarioDataTable').removeClass('reportScenarioTableRightExpand reportScenarioTableBothExpand').addClass('reportScenarioTableLeftExpand');
+			$('.reportBody.scroll-wrapper').addClass('reportTblWidth');
         } else if ($('.rightBarOpen').length > 0) {
 			$("#middle-content-section").removeClass('leftBar-collapsed leftRightBar-collapsed bothBar-collapsed').addClass('rightBar-collapsed');
 			$('#reportScenarioDataTable').removeClass('reportScenarioTableLeftExpand reportScenarioTableBothExpand').addClass('reportScenarioTableRightExpand');
+			$('.reportBody.scroll-wrapper').addClass('reportTblWidth');
         } else {
 			 $("#middle-content-section").removeClass('leftBar-collapsed rightBar-collapsed bothBar-collapsed');
 			 $("#reportScenarioDataTable").removeClass('reportScenarioTableLeftExpand reportScenarioTableRightExpand reportScenarioTableBothExpand');
+			 $('.reportBody.scroll-wrapper').removeClass('reportTblWidth');
 		}
     }
 
