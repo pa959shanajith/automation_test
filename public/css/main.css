@@ -5714,7 +5714,7 @@ ul.browserInlineIcons
 .reportDataTable th:nth-child(2),.reportDataTable td:nth-child(2){width: 8%;  word-break: break-word;}
 .reportDataTable th:nth-child(3),.reportDataTable td:nth-child(3){width: 9%; word-break: break-word; text-align:left}
 .reportDataTable th:nth-child(4),.reportDataTable td:nth-child(4){width: 11%; word-break: break-word; text-align:left}
-.reportDataTable th:nth-child(5),.reportDataTable td:nth-child(5){width: 6%; word-break: break-word; text-align:left}
+.reportDataTable th:nth-child(5),.reportDataTable td:nth-child(5){width: 9%; word-break: break-word; text-align:left}
 .reportDataTable th:nth-child(6),.reportDataTable td:nth-child(6){width: 12%; word-break: break-word; text-align:left}
 .reportDataTable th:nth-child(7),.reportDataTable td:nth-child(7){width: 8%; word-break: break-word; text-align:left}
 .reportDataTable th:nth-child(8),.reportDataTable td:nth-child(8){width: 7%; word-break: break-word; text-align:left}
