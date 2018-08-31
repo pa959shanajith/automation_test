@@ -517,10 +517,7 @@ if (cluster.isMaster) {
         app.post('/exportToJson_ICE', report.exportToJson_ICE);
         app.post('/openScreenShot', report.openScreenShot);
         app.post('/connectJira_ICE', report.connectJira_ICE);
-<<<<<<< HEAD
         app.post('/getReportsData_ICE', report.getReportsData_ICE);
-=======
->>>>>>> 961f7678b2da5b3edd0db8900f09f471c081c624
         //Plugin Routes
         app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
         app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
@@ -623,8 +620,4 @@ if (cluster.isMaster) {
             cluster.worker.kill();
         }, 200);
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 961f7678b2da5b3edd0db8900f09f471c081c624
