@@ -5063,7 +5063,27 @@ function contentTable(newTestScriptDataLS) {
             $("select#" + rowId + "_keywordVal", row[0]).html(res);
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', 'Generic');
-        } else {
+        } //Adding @Word to the objectName dropdown
+        else if (selectedText == "@Word") {
+            objName = " ";
+            url = " ";
+            //new
+            var sc = Object.keys(keywordArrayList.word);
+            selectedKeywordList = "word";
+            var res = '';
+            for (var i = 0; i < sc.length; i++) {
+                if (selectedKeyword == sc[i]) {
+                    res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
+                } else
+                    res += '<option role="option" value="' + sc[i] + '">' + sc[i] + '</option>';
+            }
+            var row = $(e.target).closest('tr.jqgrow');
+            var rowId = row.attr('id');
+            $("select#" + rowId + "_keywordVal", row[0]).html(res);
+            selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
+            $grid.jqGrid('setCell', rowId, 'appType', 'Generic');
+        }
+        else {
 
             selectedText = replaceHtmlEntites(selectedText.trim());
             for (var i = 0; i < scrappedData.length; i++) {
@@ -6393,23 +6413,23 @@ function getTags(data) {
     var obnames = [];
     var appTypeLocal = JSON.parse(window.localStorage['_CT']).appType;
     if (appTypeLocal == "Web") {
-        obnames = ["@Generic","@Excel","@Custom","@Browser","@BrowserPopUp","@Object"];
+        obnames = ["@Generic","@Excel","@Custom","@Browser","@BrowserPopUp","@Object","@Word"];
     } else if (appTypeLocal == "Webservice") {
-        obnames = ["@Generic","@Excel","WebService List"];
+        obnames = ["@Generic","@Excel","WebService List","@Word"];
     } else if (appTypeLocal == "Mainframe") {
-        obnames = ["@Generic","@Excel","Mainframe List"];
+        obnames = ["@Generic","@Excel","Mainframe List","@Word"];
     } else if (appTypeLocal == "Desktop") {
-        obnames = ["@Generic","@Excel","@Window","@Custom","@Email"];
+        obnames = ["@Generic","@Excel","@Window","@Custom","@Email","@Word"];
     } else if (appTypeLocal == "DesktopJava") {
-        obnames = ["@Generic","@Excel","@Oebs","@Custom"];
+        obnames = ["@Generic","@Excel","@Oebs","@Custom","@Word"];
     } else if (appTypeLocal == "MobileApp") {
         obnames = ["@Generic","@Mobile","@Action"];
     } else if (appTypeLocal == "MobileWeb") {
         obnames = ["@Generic","@Browser","@BrowserPopUp","@Action"];
     } else if (appTypeLocal == "SAP") {
-        obnames = ["@Generic", "@Sap", "@Custom"]
+        obnames = ["@Generic", "@Sap", "@Custom","@Word"]
     } else if(appTypeLocal="System"){
-        obnames=["@Generic","@Excel","@System"];
+        obnames=["@Generic","@Excel","@System","@Word"];
     }
     for (var i = 0; i < data.length; i++) {
         obnames.push(data[i].custname);
