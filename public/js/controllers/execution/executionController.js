@@ -1,4 +1,4 @@
-var appType;var releaseName;var cycleName;var testSuiteName;
+var appType;var releaseName;var cycleName;var testSuiteName;var rowId;var scenarioDescription;
 mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeout','$location','ExecutionService','mindmapServices','DesignServices','cfpLoadingBar', 'socket', function ($scope, $rootScope, $http, $timeout, $location, ExecutionService, mindmapServices,DesignServices,cfpLoadingBar,socket) {
 	cfpLoadingBar.start();
 	var getEachScenario = [] //Contains Each RowData of Scenarios
@@ -124,7 +124,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					$("#executionDataTable_"+m+" tbody tr").remove();
 					rowData = eachData[m];
 					$("div.executionTableDnd").attr('id','batch_'+m);
-					$("#batch_"+m+"").append("<div class='suiteNameTxt' id='page-taskName_"+m+"'><span title="+rowData.testsuitename+" class='taskname'><input id='parentSuite_"+m+"' class='parentSuiteChk' type='checkbox' name='' />"+rowData.testsuitename+"</span></div><div id='exeData_"+m+"' class='exeDataTable testSuiteBatch'><table id='executionDataTable_"+m+"' class='executionDataTable' cellspacing='0' cellpadding='0'><thead><tr><th style='width: 4%' id='contextmenu'></th><th style='width: 3%; padding: 5px 0px'><i class='fa fa-ban' title='Do Not Execute' aria-hidden='true' style='font-size: 14px;'></i><input id='parentExecute_"+m+"' class='d-execute' type='checkbox' /></th>	<th style='width: 28%; text-align:left; border-right: 1px solid #fff;'>Scenario Name</th><th style='width: 24%; border-right: 1px solid #fff'>Data Parameterization</th>	<th style='width: 18%; border-right: 1px solid #fff'>Condition</th><th style='width: 23%;'>Project Name</th></tr><input type='hidden' value='"+rowData.testsuiteid+"'/></thead><tbody class='scrollbar-inner testScenarioScroll'></tbody></table></div>");//<th style='width: 8%; text-align: center;'>ALM</th>
+					$("#batch_"+m+"").append("<div class='suiteNameTxt' id='page-taskName_"+m+"'><span title="+rowData.testsuitename+" class='taskname'><input id='parentSuite_"+m+"' class='parentSuiteChk' type='checkbox' name='' />"+rowData.testsuitename+"</span></div><div id='exeData_"+m+"' class='exeDataTable testSuiteBatch'><table id='executionDataTable_"+m+"' class='executionDataTable' cellspacing='0' cellpadding='0'><thead><tr><th style='width: 4%' id='contextmenu'></th><th style='width: 3%; padding: 5px 0px'><i class='fa fa-ban' title='Do Not Execute' aria-hidden='true' style='font-size: 14px;'></i><input id='parentExecute_"+m+"' class='d-execute' type='checkbox' /></th>	<th style='width: 20%; text-align:left; border-right: 1px solid #fff;'>Scenario Name</th><th style='width: 24%; border-right: 1px solid #fff'>Data Parameterization</th>	<th style='width: 18%; border-right: 1px solid #fff'>Condition</th><th style='width: 19%; border-right: 1px solid #fff;'>Project Name</th><th style='width: 10%;text-align:center;cursor:pointer;'>Description</th></tr><input type='hidden' value='"+rowData.testsuiteid+"'/></thead><tbody class='scrollbar-inner testScenarioScroll'></tbody></table></div>");//<th style='width: 8%; text-align: center;'>ALM</th>
 					//<img class='expandTable' src='imgs/icon-minus.png'>
 
 				    var row = $("#executionDataTable_"+m+"").find('tbody');
@@ -172,7 +172,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					else if(getEachScenario[i].executeStatus == 1){
 						row.append($("<td class='tabeleCellPadding exe-ExecuteStatus' style='width:3%; padding-top: 7px !important'><input ng-checked='executeAll' type='checkbox' title='Select to execute this scenario' class='doNotExecuteScenario d-execute' checked></td>"));
 					}
-					row.append($("<td title="+getEachScenario[i].scenarionames+"  class='tabeleCellPadding exe-scenarioIds' onclick='loadLocationDetails(this.innerHTML, this.getAttribute(\"sId\"))' sId="+getEachScenario[i].scenarioIds+" style='width: 26%; margin-right: 2%; cursor:pointer; word-break: break-all; text-align:left'>" + getEachScenario[i].scenarionames+ "</td>"));
+					row.append($("<td title="+getEachScenario[i].scenarionames+"  class='tabeleCellPadding exe-scenarioIds' onclick='loadLocationDetails(this.innerHTML, this.getAttribute(\"sId\"))' sId="+getEachScenario[i].scenarioIds+" style='width: 18%; margin-right: 2%; cursor:pointer; word-break: break-all; text-align:left'>" + getEachScenario[i].scenarionames+ "</td>"));
 					if(getEachScenario[i].dataParam == undefined){
 						row.append($('<td style="width: 24%" class="tabeleCellPadding exe-dataParam"><input class="getParamPath form-control" type="text" value=""/></td>'));
 					}
@@ -185,10 +185,94 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					else{
 						row.append($('<td style="width:18%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertGreen"><option value="'+getEachScenario[i].condition+'" selected>True</option><option value="0">False</option></select> </td>'));
 					}
-					row.append($("<td class='projectName' title="+getEachScenario[i].projectnames+" style='width:23%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + getEachScenario[i].projectnames + "</td>"));
+					row.append($("<td class='projectName' title="+getEachScenario[i].projectnames+" style='width:20%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + getEachScenario[i].projectnames + "</td>"));
+					row.append($("<td class='variableMap' title='' style='width:10%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important;cursor:pointer;' class='tabeleCellPadding'><span class='descriptionContainer'><img alt='scenarioDescription' title='' id=scenarioDesc_"+count+" src='imgs/ic-details-inactive.png' class='scenarioDescIcon inactiveDesc'></span></td>"));	
 					//row.append($("<td style='width:8%' class='tabeleCellPadding'><img src='../imgs/ic-alm.png' id='syncScenario' title='Sync Test Scenario' style='cursor: pointer;'/></td>"));
 					count++;
-				    }
+					}
+
+					//Add Scenario Description Functionality
+					$(document).on('click','.descriptionContainer' , function(e) {
+						var getScenarioDescVal;
+						$('.scenarioDescTxt:visible').text('');
+						rowId = parseInt(e.target.id.split('_')[1]);
+						$("#dialog-addScenarioDesc").modal("show");
+						$("#addScenarioDescContainer").empty();
+						if ($(".addScenarioDesc-row").length > 1) $(".addScenarioDesc-row").remove()
+						if($("#getScenarioDescVal_"+rowId+"").text() != '')
+						{
+							getScenarioDescVal = JSON.parse($("#getScenarioDescVal_"+rowId+"").text());
+						}
+						else{
+							getScenarioDescVal = [];
+						}
+						
+						if(getScenarioDescVal.length > 0)
+						{
+							for(var i=0;i<getScenarioDescVal.length;i++)
+							{
+								$("#addScenarioDescContainer").append('<div class="row row-modal addScenarioDesc-row"><div class="form-group form-inline scenarioDescFormGroup"><input max-length ="50" type="text" class="form-control form-control-custom varVal" placeholder="Enter Variable Key" value='+getScenarioDescVal[i].variableKey+' "></div><div class="form-group scenarioDescFormGroupval"><input max-length ="50" type="text" class="form-control form-control-custom scenarioDescVal" placeholder="Enter Variable Value"  Value='+getScenarioDescVal[i].variableVal+'></div><span class="delScenarioDesc"><img class="deleteScenarioDescRow" src="imgs/ic-delete.png" /></span></div>');
+							}
+						}
+						else{
+								$("#addScenarioDescContainer").append('<div class="row row-modal addScenarioDesc-row"><div class="form-group form-inline scenarioDescFormGroup"><input max-length ="50" type="text" class="form-control form-control-custom varVal" placeholder="Enter Variable Key"></div><div class="form-group scenarioDescFormGroupval"><input max-length ="50" type="text" class="form-control form-control-custom scenarioDescVal" placeholder="Enter Variable Value"></div><span class="delScenarioDesc"><img class="deleteScenarioDescRow" src="imgs/ic-delete.png" /></span></div>');
+						}
+						var getScenarioDescriptionText = $("#scenarioDescriptionTxt_"+rowId+"").text();
+						if($("#scenarioDescriptionTxt_"+rowId+"").text() != '')
+						{
+							$("#"+event.target.id).parents('body.modal-open').find('input.scenarioDescTxt').val($("#scenarioDescriptionTxt_"+rowId+"").text())
+						}
+						else{
+							$("#"+event.target.id).parents('body.modal-open').find('input.scenarioDescTxt').val('')
+						}
+						e.stopImmediatePropagation();
+					});
+						
+					//Add More Scenario Description row Functionality
+					$scope.addMoreScenarioObject = function() {
+						$("#addScenarioDescContainer").append('<div class="row row-modal addScenarioDesc-row"><div class="form-group form-inline scenarioDescFormGroup"><input max-length ="50" type="text" class="form-control form-control-custom varVal" placeholder="Enter Variable Key"></div><div class="form-group scenarioDescFormGroupval"><input max-length ="50" type="text" class="form-control form-control-custom scenarioDescVal" placeholder="Enter Variable Value"></div><span class="delScenarioDesc"><img class="deleteScenarioDescRow" src="imgs/ic-delete.png" /></span></div>');
+					};
+
+					//Delete Scenario Description row Functionality
+					$(document).on("click", ".deleteScenarioDescRow", function() {
+						$(this).parent().parent(".addScenarioDesc-row").remove();
+					});
+
+					//Reset Scenario Description rows Functionality
+					$scope.resetScenarioDescFields = function() {
+						$('.addScenarioDesc-row').find("input:visible").val('');
+					};
+
+					//Save Scenario Description rows Functionality 
+					$scope.saveScenarioDescDetails = function($event) {
+						$scope.scenarioDescriptionObj = [];
+						$('.addScenarioDesc-row').each(function() {
+							$scope.scenarioDescriptionObj.push({'variableKey' : $(this).find('.varVal').val(), 'variableVal': $(this).find('.scenarioDescVal').val() });
+						});
+						var scenarioDescriptionText = $.trim($("#"+$event.target.id).parents('.modal-dialog').find('.scenarioDescTxt').val());
+						$("#dialog-addScenarioDesc").modal("hide");
+						openDialogExe("Scenario Description", "Scenario Description added successfully");
+						if($scope.scenarioDescriptionObj.length > 0)
+						{
+							$scope.scenarioDescriptionObj = JSON.stringify($scope.scenarioDescriptionObj);
+							$('img#scenarioDesc_'+rowId+'').attr('src','imgs/ic-details-active.png');
+							$("img#scenarioDesc_"+rowId+"").append('<span id="getScenarioDescVal_'+rowId+'" class="getScenarioDescVal hide"></span><span id="scenarioDescriptionTxt_'+rowId+'" class ="scenarioDescriptionTxt hide"></span>');
+							$("#getScenarioDescVal_"+rowId+"").text($scope.scenarioDescriptionObj);
+						}
+						else{
+							$scope.scenarioDescriptionObj = JSON.stringify($scope.scenarioDescriptionObj);
+							$('img#scenarioDesc_'+rowId+'').attr('src','imgs/ic-details-inactive.png');
+							$("img#scenarioDesc_"+rowId+"").append('<span id="getScenarioDescVal_'+rowId+'" class="getScenarioDescVal hide"></span><span id="scenarioDescriptionTxt_'+rowId+'" class ="scenarioDescriptionTxt hide"></span>');
+							$("#getScenarioDescVal_"+rowId+"").text($scope.scenarioDescriptionObj);
+						}
+
+						$("#scenarioDescriptionTxt_"+rowId+"").text(scenarioDescriptionText);
+						//Service to be called for saving scenario description 
+					};
+
+
+
+				
 					//No Execution Status Marking Red
 					$(".noExe").parent("tr").css({'border-left':'4px solid red'});
 					$(".noExe").prev().css({'width':'calc(3.9% - 4px)'})
@@ -337,6 +421,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		})
 	};
 
+
+
+
 	$(document).on('click', '.expandTable', function(){
 		if ($(this).attr('src') ==  "imgs/icon-plus.png" ) {
 			$(this).prop("src", "imgs/icon-minus.png")
@@ -425,6 +512,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			var getParamPaths = [];
 			var conditionCheck = [];
 			var executeStatus = [];
+			var scenarioDescObj = [];
+			var scenarioDescriptionText = [];
 			if(window.localStorage['_CT']){
 				var window_ct=JSON.parse(window.localStorage['_CT']);
 				var cycleid = window_ct.testSuiteDetails;
@@ -436,6 +525,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				testScenarioIds.push($(this).attr("sId"));
 				getParamPaths.push("\'"+$(this).parent().find(".getParamPath").val().trim()+"\'");
 				conditionCheck.push($(this).parent().find(".conditionCheck option:selected").val());
+				scenarioDescObj.push($.trim($(this).parent().find('.getScenarioDescVal').text()));
+				scenarioDescriptionText.push($(this).parent().children('td.variableMap').find('.scenarioDescriptionTxt ').text());
 				if($(this).parent().find(".doNotExecuteScenario").is(":checked"))
 					executeStatus.push(1);
 				else
@@ -456,6 +547,15 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				})*/
 			testSuiteName = $(this).parents('span.taskname').text();
 			testSuiteId =  $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
+
+			//scenarioDescObj = $(this).parents('div.executionTableDnd').find('span.descriptionContainer').text();
+			// $variableMap = $(this).parents('div.executionTableDnd').children('div.testSuiteBatch').children().find('td.variableMap');
+
+			// $variableMap.each(function() {
+			// 	scenarioDescObj.push($.trim($(this).find('.getScenarioDescVal ').text()));
+			// });
+			scenarioDescObj = scenarioDescObj.toString();
+			scenarioDescObj = JSON.stringify(scenarioDescObj);
 			// console.log("testScenarioIds",testScenarioIds);
 			// console.log("getParamPaths",getParamPaths);
 			// console.log("conditionCheck",conditionCheck);
@@ -480,6 +580,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			suiteDetails.donotexecute = executeStatus;
 			suiteDetails.versionnumber = versionnumber;
 			suiteDetails.testscycleid = JSON.parse(window.localStorage['_CT']).testSuiteDetails[loopingtimes].cycleid;
+			suiteDetails.scenarioKeyVal = scenarioDescObj;
+			suiteDetails.scenarioDescText = scenarioDescriptionText;
 			//console.log("suiteDetails",suiteDetails);
 			suiteInfo[testSuiteName] = suiteDetails;
 			//console.log("suiteInfo", suiteInfo);
