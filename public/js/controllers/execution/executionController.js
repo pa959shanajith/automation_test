@@ -124,7 +124,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					$("#executionDataTable_"+m+" tbody tr").remove();
 					rowData = eachData[m];
 					$("div.executionTableDnd").attr('id','batch_'+m);
-					$("#batch_"+m+"").append("<div class='suiteNameTxt' id='page-taskName_"+m+"'><span title="+rowData.testsuitename+" class='taskname'><input id='parentSuite_"+m+"' class='parentSuiteChk' type='checkbox' name='' />"+rowData.testsuitename+"</span></div><div id='exeData_"+m+"' class='exeDataTable testSuiteBatch'><table id='executionDataTable_"+m+"' class='executionDataTable' cellspacing='0' cellpadding='0'><thead><tr><th style='width: 4%' id='contextmenu'></th><th style='width: 3%; padding: 5px 0px'><i class='fa fa-ban' title='Do Not Execute' aria-hidden='true' style='font-size: 14px;'></i><input id='parentExecute_"+m+"' class='d-execute' type='checkbox' /></th>	<th style='width: 20%; text-align:left; border-right: 1px solid #fff;'>Scenario Name</th><th style='width: 24%; border-right: 1px solid #fff'>Data Parameterization</th>	<th style='width: 18%; border-right: 1px solid #fff'>Condition</th><th style='width: 19%; border-right: 1px solid #fff;'>Project Name</th><th style='width: 10%;text-align:center;cursor:pointer;'>Description</th></tr><input type='hidden' value='"+rowData.testsuiteid+"'/></thead><tbody class='scrollbar-inner testScenarioScroll'></tbody></table></div>");//<th style='width: 8%; text-align: center;'>ALM</th>
+					$("#batch_"+m+"").append("<div class='suiteNameTxt' id='page-taskName_"+m+"'><span title="+rowData.testsuitename+" class='taskname'><input id='parentSuite_"+m+"' class='parentSuiteChk' type='checkbox' name='' />"+rowData.testsuitename+"</span></div><div id='exeData_"+m+"' class='exeDataTable testSuiteBatch'><table id='executionDataTable_"+m+"' class='executionDataTable' cellspacing='0' cellpadding='0'><thead><tr><th style='width: 4%' id='contextmenu'></th><th style='width: 3%; padding: 5px 0px'><i class='fa fa-ban' title='Do Not Execute' aria-hidden='true' style='font-size: 14px;'></i><input id='parentExecute_"+m+"' class='d-execute' type='checkbox' /></th>	<th style='width: 20%; text-align:left; border-right: 1px solid #fff;'>Scenario Name</th><th style='width: 24%; border-right: 1px solid #fff'>Data Parameterization</th>	<th style='width: 18%; border-right: 1px solid #fff'>Condition</th><th style='width: 19%; border-right: 1px solid #fff;'>Project Name</th><th style='width: 10%;text-align:center;cursor:pointer;'>Remarks</th></tr><input type='hidden' value='"+rowData.testsuiteid+"'/></thead><tbody class='scrollbar-inner testScenarioScroll'></tbody></table></div>");//<th style='width: 8%; text-align: center;'>ALM</th>
 					//<img class='expandTable' src='imgs/icon-minus.png'>
 
 				    var row = $("#executionDataTable_"+m+"").find('tbody');
@@ -198,7 +198,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 						rowId = parseInt(e.target.id.split('_')[1]);
 						$("#dialog-addScenarioDesc").modal("show");
 						$(document).on('shown.bs.modal', '#dialog-addScenarioDesc', function() {
-							$('.varVal:first').focus();
+							$('.scenarioDescVal:first').focus();
 						});
 						$("#addScenarioDescContainer").empty();
 						if ($(".addScenarioDesc-row").length > 1) $(".addScenarioDesc-row").remove()
@@ -214,11 +214,11 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 						{
 							for(var i=0;i<getScenarioDescVal.length;i++)
 							{
-								$("#addScenarioDescContainer").append('<div class="row row-modal addScenarioDesc-row"><div class="form-group form-inline scenarioDescFormGroup"><input max-length ="50" type="text" class="form-control form-control-custom varVal" placeholder="Enter Variable Key" value='+getScenarioDescVal[i].variableKey+' "></div><div class="form-group scenarioDescFormGroupval"><input max-length ="50" type="text" class="form-control form-control-custom scenarioDescVal" placeholder="Enter Variable Value"  Value='+getScenarioDescVal[i].variableVal+'></div><span class="delScenarioDesc"><img class="deleteScenarioDescRow" src="imgs/ic-delete.png" /></span></div>');
+								$("#addScenarioDescContainer").append('<div class="row row-modal addScenarioDesc-row"><div class="form-group form-inline scenarioDescFormGroup"><input id="varVal_lbl" maxLength ="20" type="text" class="form-control form-control-custom varVal" placeholder="" value="Account Number"></div><div class="form-group scenarioDescFormGroupval"><input maxLength ="20" type="text" class="form-control form-control-custom scenarioDescVal" placeholder="Enter Account Number"  Value='+getScenarioDescVal[i].accountNoVal+'></div><span class="delScenarioDesc"><img class="deleteScenarioDescRow" src="imgs/ic-delete.png" /></span></div>');
 							}
 						}
 						else{
-								$("#addScenarioDescContainer").append('<div class="row row-modal addScenarioDesc-row"><div class="form-group form-inline scenarioDescFormGroup"><input max-length ="50" type="text" class="form-control form-control-custom varVal" placeholder="Enter Variable Key"></div><div class="form-group scenarioDescFormGroupval"><input max-length ="50" type="text" class="form-control form-control-custom scenarioDescVal" placeholder="Enter Variable Value"></div><span class="delScenarioDesc"><img class="deleteScenarioDescRow" src="imgs/ic-delete.png" /></span></div>');
+								$("#addScenarioDescContainer").append('<div class="row row-modal addScenarioDesc-row"><div class="form-group form-inline scenarioDescFormGroup"><input id="varVal_txt" maxLength ="20" type="text" class="form-control form-control-custom varVal" placeholder="" value="Account Number"></div><div class="form-group scenarioDescFormGroupval"><input maxLength ="20" type="text" class="form-control form-control-custom scenarioDescVal" placeholder="Enter Account Number"></div><span class="delScenarioDesc"><img class="deleteScenarioDescRow" src="imgs/ic-delete.png" /></span></div>');
 						}
 						var getScenarioDescriptionText = $("#scenarioDescriptionTxt_"+rowId+"").text();
 						if($("#scenarioDescriptionTxt_"+rowId+"").text() != '')
@@ -230,29 +230,41 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 						}
 						e.stopImmediatePropagation();
 					});
+
+				//Input only number on Keypress Event for Account Number
+				$(document).on('keypress','.scenarioDescVal' , function(e) {
+						if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+							return false;
+					   }
+					  });
+				//Input only number on Paste Event for Account Number
+			    $(document).on('input','.scenarioDescVal' , function(e) {
+					e.target.value = e.target.value.replace(/[^0-9]/g,'')
+				});
 						
 					//Add More Scenario Description row Functionality
 					$scope.addMoreScenarioObject = function() {
-						$("#addScenarioDescContainer").append('<div class="row row-modal addScenarioDesc-row"><div class="form-group form-inline scenarioDescFormGroup"><input max-length ="50" type="text" class="form-control form-control-custom varVal" placeholder="Enter Variable Key"></div><div class="form-group scenarioDescFormGroupval"><input max-length ="50" type="text" class="form-control form-control-custom scenarioDescVal" placeholder="Enter Variable Value"></div><span class="delScenarioDesc"><img class="deleteScenarioDescRow" src="imgs/ic-delete.png" /></span></div>');
-						$(".varVal:last").focus();
+						$("#addScenarioDescContainer").append('<div class="row row-modal addScenarioDesc-row"><div class="form-group form-inline scenarioDescFormGroup"><input  maxLength ="20" id="varVal_text" type="text" class="form-control form-control-custom varVal" value="Account Number" placeholder=""></div><div class="form-group scenarioDescFormGroupval" value= "Account Number"><input maxLength ="50" type="text" class="form-control form-control-custom scenarioDescVal" placeholder="Enter Account Number"></div><span class="delScenarioDesc"><img class="deleteScenarioDescRow" src="imgs/ic-delete.png" /></span></div>');
+						$(".scenarioDescVal:last").focus();
 					};
 
 					//Delete Scenario Description row Functionality
 					$(document).on("click", ".deleteScenarioDescRow", function() {
 						$(this).parent().parent(".addScenarioDesc-row").remove();
-						$(".varVal:last").focus();
+						$(".scenarioDescVal:last").focus();
 					});
 
 					//Reset Scenario Description rows Functionality
 					$scope.resetScenarioDescFields = function() {
-						$('.addScenarioDesc-row').find("input:visible").val('');
+						$('.addScenarioDesc-row').find("input.scenarioDescVal:visible").val('');
+						$('input.scenarioDescTxt:visible').val('');
 					};
 
 					//Save Scenario Description rows Functionality 
 					$scope.saveScenarioDescDetails = function($event) {
 						$scope.scenarioDescriptionObj = [];
 						$('.addScenarioDesc-row').each(function() {
-							$scope.scenarioDescriptionObj.push({'variableKey' : $(this).find('.varVal').val(), 'variableVal': $(this).find('.scenarioDescVal').val() });
+							$scope.scenarioDescriptionObj.push({'accountNoKey' : $(this).find('.varVal').val(), 'accountNoVal': $(this).find('.scenarioDescVal').val() });
 						});
 						var scenarioDescriptionText = $.trim($("#"+$event.target.id).parents('.modal-dialog').find('.scenarioDescTxt').val());
 						$("#dialog-addScenarioDesc").modal("hide");
@@ -517,8 +529,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			var getParamPaths = [];
 			var conditionCheck = [];
 			var executeStatus = [];
-			var scenarioDescObj = [];
+			//var scenarioDescObj = [];
 			var scenarioDescriptionText = [];
+			var scenarioAccNoMap = {};
 			if(window.localStorage['_CT']){
 				var window_ct=JSON.parse(window.localStorage['_CT']);
 				var cycleid = window_ct.testSuiteDetails;
@@ -527,16 +540,25 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			//if($(this).is(":checked") == true){
 			//Getting ScenarioIds
 			$.each($(this).parents('.suiteNameTxt').next('div').find('.exe-scenarioIds'), function(){
+				var scenarioDescObj = [];
 				testScenarioIds.push($(this).attr("sId"));
 				getParamPaths.push("\'"+$(this).parent().find(".getParamPath").val().trim()+"\'");
 				conditionCheck.push($(this).parent().find(".conditionCheck option:selected").val());
-				scenarioDescObj.push($.trim($(this).parent().find('.getScenarioDescVal').text()));
-				scenarioDescriptionText.push($(this).parent().children('td.variableMap').find('.scenarioDescriptionTxt ').text());
+				if(($(this).parent().find('.getScenarioDescVal').text() != ''))
+				{
+					scenarioDescObj = JSON.parse($.trim($(this).parent().find('.getScenarioDescVal').text()));
+				}
+				else{
+					scenarioDescObj = $.trim($(this).parent().find('.getScenarioDescVal').text());
+				}
+			
+				scenarioAccNoMap[$(this).attr("sId")] = scenarioDescObj;
+				scenarioDescriptionText.push($(this).parent().children('td.variableMap').find('.scenarioDescriptionTxt').text());
 				if($(this).parent().find(".doNotExecuteScenario").is(":checked"))
 					executeStatus.push(1);
 				else
 					executeStatus.push(0);
-			})
+			});
 			/*//Getting DataParamPaths
 				$.each($(this).parents('.suiteNameTxt').next('div').find('.exe-dataParam'), function(){
 					getParamPaths.push("\'"+$(this).find("input").val()+"\'")
@@ -585,8 +607,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			suiteDetails.donotexecute = executeStatus;
 			suiteDetails.versionnumber = versionnumber;
 			suiteDetails.testscycleid = JSON.parse(window.localStorage['_CT']).testSuiteDetails[loopingtimes].cycleid;
-			suiteDetails.scenarioKeyVal = scenarioDescObj;
-			suiteDetails.scenarioDescText = scenarioDescriptionText;
+			suiteDetails.scenarioAccNoMap = scenarioAccNoMap;
+			suiteDetails.scenarioDescriptions = scenarioDescriptionText;
 			//console.log("suiteDetails",suiteDetails);
 			suiteInfo[testSuiteName] = suiteDetails;
 			//console.log("suiteInfo", suiteInfo);
