@@ -5911,7 +5911,7 @@ ul.browserInlineIcons
 {
     width: 35% !important;
 } */
-varVal_lbl,#varVal_txt,#varVal_text
+#varVal_lbl,#varVal_txt,#varVal_text
 {
     border: 0px !important;
     pointer-events: none !important;
