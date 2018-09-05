@@ -197,6 +197,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 						$('.scenarioDescTxt:visible').text('');
 						rowId = parseInt(e.target.id.split('_')[1]);
 						$("#dialog-addScenarioDesc").modal("show");
+						$(document).on('shown.bs.modal', '#dialog-addScenarioDesc', function() {
+							$('.varVal:first').focus();
+						});
 						$("#addScenarioDescContainer").empty();
 						if ($(".addScenarioDesc-row").length > 1) $(".addScenarioDesc-row").remove()
 						if($("#getScenarioDescVal_"+rowId+"").text() != '')
@@ -231,11 +234,13 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					//Add More Scenario Description row Functionality
 					$scope.addMoreScenarioObject = function() {
 						$("#addScenarioDescContainer").append('<div class="row row-modal addScenarioDesc-row"><div class="form-group form-inline scenarioDescFormGroup"><input max-length ="50" type="text" class="form-control form-control-custom varVal" placeholder="Enter Variable Key"></div><div class="form-group scenarioDescFormGroupval"><input max-length ="50" type="text" class="form-control form-control-custom scenarioDescVal" placeholder="Enter Variable Value"></div><span class="delScenarioDesc"><img class="deleteScenarioDescRow" src="imgs/ic-delete.png" /></span></div>');
+						$(".varVal:last").focus();
 					};
 
 					//Delete Scenario Description row Functionality
 					$(document).on("click", ".deleteScenarioDescRow", function() {
 						$(this).parent().parent(".addScenarioDesc-row").remove();
+						$(".varVal:last").focus();
 					});
 
 					//Reset Scenario Description rows Functionality
@@ -554,8 +559,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			// $variableMap.each(function() {
 			// 	scenarioDescObj.push($.trim($(this).find('.getScenarioDescVal ').text()));
 			// });
-			scenarioDescObj = scenarioDescObj.toString();
-			scenarioDescObj = JSON.stringify(scenarioDescObj);
+			//scenarioDescObj = scenarioDescObj.toString();
+			//scenarioDescObj = JSON.stringify(scenarioDescObj);
 			// console.log("testScenarioIds",testScenarioIds);
 			// console.log("getParamPaths",getParamPaths);
 			// console.log("conditionCheck",conditionCheck);
