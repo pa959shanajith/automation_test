@@ -1148,17 +1148,14 @@ exports.connectJira_ICE = function (req, res) {
 	}
 };
 
-function latestReport(reportObjList,column){
+function latestReport(reportObjList){
 	if(reportObjList.length == 0) return null;
-	reportObjList.sort(function(a, b){
-		var keyA = new Date(a.executedtime),
-			keyB = new Date(b.executedtime);
-		// Compare the 2 dates
-		if(keyA < keyB) return 1;
-		if(keyA > keyB) return -1;
-		return 0;
+	var lrobj = reportObjList[0];
+	reportObjList.forEach(function(e, i){
+		if(new Date(e.executedtime)>new Date(lrobj.executedtime))
+			lrobj = reportObjList[i];
 	});
-	return reportObjList[0][column];
+	return lrobj;
 }
 
 exports.getReportsData_ICE = function (req, res) {
@@ -1244,15 +1241,17 @@ exports.getReportsData_ICE = function (req, res) {
 										logger.error("Error occured in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
 										res.send("fail");
 									} else {
+										var robj = latestReport(result3.rows);
 										console.log(result3.rows);
 										reportScenarioObj.push({
 											scenarioid:scenarioid,
 											scenarioname:result2[scenarioid],
 											description:"under construction",
 											count:result3.rows.length,
-											latestStatus: latestReport(result3.rows,'status'),
-											executedon: latestReport(result3.rows,'executedtime'),
-											reportid: latestReport(result3.rows,'reportid')
+											description: robj['varmap'],
+											latestStatus: robj['status'],
+											executedon: robj['executedtime'],
+											reportid: robj['reportid']
 										});	
 										scenariomapcb();
 									}

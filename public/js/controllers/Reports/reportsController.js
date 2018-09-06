@@ -117,6 +117,12 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 						$scope.result_reportData = [];
 						angular.forEach(result_res_reportData.testsuites, function (value, index) {
 							angular.forEach(value.scenarios, function (val, position) {
+								try{
+									val.description = JSON.parse(val.description).scenariodescription;
+								}
+								catch(ex){
+									val.description = '';
+								}
 								if(position == 0){
 									$scope.result_reportData.push({'id':index+1,'ModuleName': value.testsuitename,'ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':index+1})
 								}else{
