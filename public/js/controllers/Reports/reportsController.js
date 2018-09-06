@@ -70,6 +70,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 	//ON CHANGE PROJECTS
 	$scope.selProjectsFilter = function () {
 		var projectId = $scope.projectNames;
+		blockUI("Loading releases.. please wait..");
 		mindmapServices.populateReleases(projectId).then(function (result) {
 			if (result == "Invalid Session") {
 				$rootScope.redirectPage();
@@ -84,6 +85,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 			}
 			$scope.selReleasesFilter = function () {
 				var releaseId = $scope.releaseNames;
+				blockUI("Loading cycles.. please wait..");
 				mindmapServices.populateCycles(releaseId).then(function (result_cycles) {
 					if (result_cycles == "Invalid Session") {
 						$rootScope.redirectPage();
@@ -94,6 +96,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 						$('.rpCycles').append("<option data-id='" + result_cycles.cyc[i] + "' value='" + result_cycles.c_ids[i] + "'>" + result_cycles.cyc[i] + "</option>");
 					}
 				});
+				unblockUI();
 			};
 			$scope.selCyclesFilter = function () {
 				var cycleId = $scope.cycleNames;
@@ -103,10 +106,12 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 				reportsInputData.cycleId = $scope.cycleNames;
 				reportsInputData.type = 'allreports';
 				$("#reportScenarioDataTable").hide();
+				blockUI("Loading reports.. please wait..");
 				reportService.getReportsData_ICE(reportsInputData).then(function (result_res_reportData, response_reportData) {
 					if(Object.keys(result_res_reportData.testsuites).length == 0)
 					{
 						$("#reportDataTable,#reportScenarioDataTable").hide();
+						unblockUI();
 					}
 					else{
 						$scope.result_reportData = [];
@@ -120,16 +125,19 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 							})
 						});
 						//console.log("scope", $scope.result_reportData);
-					    $("#reportDataTable").show();
+						$("#reportDataTable").show();
+						unblockUI();
 					}
 				});
 
 			};
 		});
+		unblockUI();
 	};
 
 	//Execution count click
 	$scope.getscenarioDetails = function($event) {
+		  blockUI("Loading reports..please wait..");
 		  if($(this)[0].report.count > 0)
 		  {
 			var scenarioId = $(this)[0].report.scenarioId;
@@ -140,10 +148,12 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 			reportService.getReportsData_ICE(reportsInputData).then(function (result_res_scenarioData, response_scenarioData) {
 			$scope.result_res_scenarioData = result_res_scenarioData.rows;
 			$("#reportScenarioDataTable").show();
+			unblockUI();
 			});
 		  }
 		  else{
 			$("#reportScenarioDataTable").hide();
+			unblockUI();
 		  }
 
 	};
@@ -818,6 +828,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 					}
 					if (reportType == "html") {
 						//Service call to get Html reports
+						blockUI("Generating Report..please wait..");
 						reportService.renderReport_ICE(finalReports, reportType).then(
 							function (data1) {
 								if (data1 == "Invalid Session") $rootScope.redirectPage();
@@ -839,6 +850,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 							function (error) {
 								console.log("Error-------" + error);
 							});
+							unblockUI();
 						//Transaction Activity for HTMLReportClick
 						// var labelArr = [];
 						// var infoArr = [];
@@ -852,6 +864,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 								if (dataURIs == "fail" || dataURIs == "unavailableLocalServer") scrShot.paths.forEach(function (d, i) { finalReports.rows[scrShot.idx[i]].screenshot_dataURI = dataURIs; });
 								else dataURIs.forEach(function (d, i) { finalReports.rows[scrShot.idx[i]].screenshot_dataURI = d; });
 								//Service call to get Pdf reports
+								blockUI("Generating report..please wait..");
 								reportService.renderReport_ICE(finalReports, reportType).then(
 									function (data1) {
 										if (data1 == "Invalid Session") $rootScope.redirectPage();
@@ -883,6 +896,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 									function (error) {
 										console.log("Error-------" + error);
 									});
+									unblockUI();
 							},
 							function (error) {
 								console.log("Error-------" + error);
@@ -909,6 +923,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 	function exportJSONReport(e) {
 		//$(document).on('click', '.exportToJSON', function(e){
 		var repId = $(this).attr('data-reportid');
+		blockUI("Downloading json report.. please wait");
 		reportService.exportToJson_ICE(repId)
 			.then(function (response) {
 				if (response == "Invalid Session") {
@@ -998,6 +1013,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 			function (error) {
 				console.log("Error while exportsing JSON.\n " + (error.data));
 			});
+			unblockUI();
 		$('.formatpdfbrwsrexport').remove();
 		//})
 	}

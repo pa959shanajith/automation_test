@@ -89,7 +89,7 @@
               <th scope="col">View Report</th>
             </tr>
           </thead>
-          <tbody class='reportBody report-table-body scrollbar-inner'>
+          <tbody class='reportBody report-table-body scrollbar-inner' style = "font-size: 12.5px;">
             <tr class='getScenarioTestCaseDetails' ng-repeat="report in result_reportData">
               <td scope="row">{{report.id}}</td>
               <td class="reptable-modulename">{{report.ModuleName }}</td>
@@ -99,9 +99,9 @@
               <td>{{report.latestStatus}}</td>
               <td>{{report.executedon}}</td>
               <td>
-                    <img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer;' src='imgs/ic-pdf.png' title='PDF Report'>
-                    <img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer; width: 23px;' src='imgs/ic-web.png' title='Browser Report'>
-                    <img alt='Export JSON' class='exportToJSON reportFormat' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer;' src='imgs/ic-export-to-json.png' title='Export to Json'>
+                    <img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'>
+                    <img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'>
+                    <img alt='Export JSON' class='exportToJSON reportFormat' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'>
                 
                     <!-- <span><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{report.reportid}}' src='imgs/ic-pdf.png' title='PDF Report'></span>
                     <span><img alt='Browser Icon' class='reportFormat getSpecificReportBrowser' data-reportid='{{report.reportid}}' src='imgs/ic-web.png' title='Browser Report'></span>
@@ -114,8 +114,8 @@
   <!-- Module Table Div -->
 
   <!-- Scenario Table Div -->
-<div class="table-responsive reportScenarioDataTable" id='reportScenarioDataTable'>
-        <table class="table table-striped tblstruct">
+    <div class="table-responsive reportScenarioDataTable" id='reportScenarioDataTable'>
+        <table id="rowspan" class="table table-striped tblstruct tablesorter">
             <thead class='reportHeaders'>
                 <tr>
                   <th scope="col">Sl.No</th>
@@ -126,7 +126,7 @@
                   <th scope="col">View Report</th>
                 </tr>
               </thead>
-              <tbody class='reportBody report-scenario-body scrollbar-inner'>
+              <tbody class='reportBody report-scenario-body scrollbar-inner' style = "font-size: 12.5px;">
                  <tr class='executionTimeDetails' ng-repeat="scenario in result_res_scenarioData">
                   <td scope="row" >{{$index+1}}</td>
                   <td>{{scenario.executedtime }}</td>
@@ -134,9 +134,9 @@
                   <td>{{scenario.browser}}</td>
                   <td>{{scenario.status}}</td>
                   <td>
-                        <img alt='Pdf Icon' class='archivedreport getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{scenario.reportid}}' style='cursor: pointer;' src='imgs/ic-pdf.png' title='PDF Report'>
-                        <img alt='-' class='archivedreport getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid='{{scenario.reportid}}' style='cursor: pointer;  width: 23px;' src='imgs/ic-web.png' title='Browser Report'>
-                        <img alt='Export JSON' class='exportToJSON reportFormat' data-reportid='{{scenario.reportid}}' style='cursor: pointer;' src='imgs/ic-export-to-json.png' title='Export to Json'>
+                        <img alt='Pdf Icon' class='archivedreport getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{scenario.reportid}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'>
+                        <img alt='-' class='archivedreport getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid='{{scenario.reportid}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'>
+                        <img alt='Export JSON' class='exportToJSON reportFormat' data-reportid='{{scenario.reportid}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'>
 
                     <!-- <span><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{scenario.reportid}}' src='imgs/ic-pdf.png' title='PDF Report'></span>
                     <span><img alt='Browser Icon' class='reportFormat getSpecificReportBrowser' data-reportid='{{scenario.reportid}}' src='imgs/ic-web.png' title='Browser Report'></span>
@@ -145,7 +145,7 @@
                 </tr>
               </tbody>
         </table>
-      </div>
+    </div>
       <!-- Module Table Div -->
 </div>
 <!--Middle Panel-->
