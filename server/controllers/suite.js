@@ -597,6 +597,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		var batchExecutionData = req.body.moduleInfo;
 		var userInfo = {"user_id": req.session.userid, "role": req.session.activeRole};
 		var testsuitedetailslist = [];
+		var scenariodescriptionobject = {};
 		var testsuiteIds = [];
 		var executionRequest = {
 			"executionId": "",
@@ -654,6 +655,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 				conditionchecklist.push(eachsuiteDetails.condition);
 				browserTypelist.push(eachsuiteDetails.browserType);
 				currentscenarioid = eachsuiteDetails.scenarioids;
+				scenariodescriptionobject[eachsuiteDetails.scenarioids] = eachsuiteDetails.scenariodescription;
 				logger.info("Calling function TestCaseDetails_Suite_ICE from ExecuteTestSuite_ICE");
 				TestCaseDetails_Suite_ICE(currentscenarioid, userInfo.user_id, function (currentscenarioidError, currentscenarioidResponse) {
 					var scenariotestcaseobj = {};
@@ -687,6 +689,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					executionjson.dataparampath = dataparamlist;
 					executionjson.testsuiteid = testsuiteid;
 					executionjson.testsuitename = testsuitename;
+					executionjson.scenariodescriptionobject = scenariodescriptionobject;
 					testsuitedetailslist.push(executionjson);
 					if (testsuitedetailslist.length == batchExecutionData.length) {
 						logger.info("Calling function excutionObjectBuilding from updateData function");
@@ -778,6 +781,30 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 													flag = "success";
 												}
 											});
+											var inputs = {
+												"reportid": reportId,
+												"reportmap": JSON.stringify(executionRequest.suitedetails[testsuitecount].scenariodescriptionobject[scenarioid]),
+												"query": "insertmapquery",
+												"executionid": executionid,
+											};
+											var args = {
+												data: inputs,
+												headers: {
+													"Content-Type": "application/json"
+												}
+											};
+											logger.info("Calling NDAC Service from executionFunction: suite/ExecuteTestSuite_ICE");
+											client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+												function (result, response) {
+												if (response.statusCode != 200 || result.rows == "fail") {
+													logger.error("Error occured in suite/ExecuteTestSuite_ICE from executionFunction Error Code : ERRNDAC");
+													flag = "fail";
+												} else {
+													logger.info("Successfully inserted report data");
+													flag = "success";
+												}
+											});
+
 											if (completedSceCount == scenarioCount) {
 												if (statusPass == scenarioCount) {
 													suiteStatus = "Pass";

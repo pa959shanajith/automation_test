@@ -6,6 +6,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	var browserTypeExe = []; // Contains selected browser id for execution
 	var scenarioIdQC;
 	$scope.moduleInfo = [];
+	$scope.somevar = {};
 	$("body").css("background","#eee");
 	$timeout(function(){
 		$('.scrollbar-inner').scrollbar();
@@ -186,7 +187,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 						row.append($('<td style="width:18%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertGreen"><option value="'+getEachScenario[i].condition+'" selected>True</option><option value="0">False</option></select> </td>'));
 					}
 					row.append($("<td class='projectName' title="+getEachScenario[i].projectnames+" style='width:20%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + getEachScenario[i].projectnames + "</td>"));
-					row.append($("<td class='variableMap' title='' style='width:10%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important;cursor:pointer;' class='tabeleCellPadding'><span class='descriptionContainer'><img alt='scenarioDescription' title='' id=scenarioDesc_"+count+" src='imgs/ic-details-inactive.png' class='scenarioDescIcon inactiveDesc'></span></td>"));	
+					row.append($("<td class='variableMap' title='' style='width:10%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important;cursor:pointer;' class='tabeleCellPadding'><span class='descriptionContainer'><img alt='scenarioDescription' title='' id=scenarioDesc_"+count+" src='imgs/ic-details-inactive.png' data-scenarioid='"+getEachScenario[i].scenarioIds+"' class='scenarioDescIcon inactiveDesc'></span></td>"));	
 					//row.append($("<td style='width:8%' class='tabeleCellPadding'><img src='../imgs/ic-alm.png' id='syncScenario' title='Sync Test Scenario' style='cursor: pointer;'/></td>"));
 					count++;
 					}
@@ -196,6 +197,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 						var getScenarioDescVal;
 						$('.scenarioDescTxt:visible').text('');
 						rowId = parseInt(e.target.id.split('_')[1]);
+						$("#dialog-addScenarioDesc").attr('data-scenarioid',e.target.getAttribute('data-scenarioid'));
 						$("#dialog-addScenarioDesc").modal("show");
 						$(document).on('shown.bs.modal', '#dialog-addScenarioDesc', function() {
 							$('.scenarioDescVal:first').focus();
@@ -285,6 +287,10 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 						$("#scenarioDescriptionTxt_"+rowId+"").text(scenarioDescriptionText);
 						//Service to be called for saving scenario description 
+						$scope.somevar[$("#dialog-addScenarioDesc").attr('data-scenarioid')] = {
+							"map":JSON.parse($scope.scenarioDescriptionObj),
+							"scenariodescription":scenarioDescriptionText
+						};
 					};
 
 
@@ -744,6 +750,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 							dataparam : [$(this).parent().siblings(".exe-dataParam").find("input").val().trim()],
 							executestatus : 1,
 							scenarioids : $(this).parent().siblings(".exe-scenarioIds").attr("sId"),
+							scenariodescription: $scope.somevar[$(this).parent().siblings(".exe-scenarioIds").attr("sId")],
 							qccredentials: {
 								qcurl: "",
 								qcusername: "",
