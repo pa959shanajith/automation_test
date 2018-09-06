@@ -5,7 +5,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 	var userID = getUserInfo.user_id;
 	var openArrow = 0; var openWindow = 0;
 	var executionId, testsuiteId;
-	$scope.reportIdx = '';
+	$scope.reportIdx = ''; // for execution count click
 	$("#page-taskName").empty().append('<span>Reports</span>')
 
 	cfpLoadingBar.start()
@@ -698,7 +698,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 		} else{
 			var idx =$(this).attr('data-reportidx')-1;
 		}
-		var reportID = $scope.result_reportData[idx].reportid;
+		var reportID = $(this).attr('data-reportid');
 		var testsuiteId =$scope.result_reportData[idx].testsuiteid;
 		var testsuitename = $scope.result_reportData[idx].testsuitename;
 		var scenarioName = $scope.result_reportData[idx].ScenarioName;			

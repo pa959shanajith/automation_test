@@ -1241,12 +1241,19 @@ exports.getReportsData_ICE = function (req, res) {
 										logger.error("Error occured in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
 										res.send("fail");
 									} else {
-										var robj = latestReport(result3.rows);
-										console.log(result3.rows);
+										if(result3.rows.length==0){
+											var robj = {};
+											robj['varmap'] = {};
+											robj['status'] = '';
+											robj['executedtime']='';
+											robj['reportid'] = '';
+										}
+										else{
+											var robj = latestReport(result3.rows);
+										}
 										reportScenarioObj.push({
 											scenarioid:scenarioid,
 											scenarioname:result2[scenarioid],
-											description:"under construction",
 											count:result3.rows.length,
 											description: robj['varmap'],
 											latestStatus: robj['status'],
