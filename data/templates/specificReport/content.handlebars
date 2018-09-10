@@ -55,11 +55,11 @@
                 var name = getRows[i].children[2].innerHTML;
                 var rowCount = 0;
                 var getParentId;
-                if (getRows[i].children[9].getAttribute("data-screenshot").length <= 0 || getRows[i].children[9].getAttribute("data-screenshot").toLowerCase().indexOf(".png") == -1) {
-                    getRows[i].children[9].classList.remove("openscreenshot");
+                if (getRows[i].children[8].getAttribute("data-screenshot").length <= 0 || getRows[i].children[8].getAttribute("data-screenshot").toLowerCase().indexOf(".png") == -1) {
+                    getRows[i].children[8].classList.remove("openscreenshot");
                 }
                 if (name.indexOf("Testscriptname") >= 0 || name.indexOf("TestCase Name") >= 0) {
-                    getRows[i].children[6].children[0].remove();
+                    getRows[i].children[9].children[0].remove();
                 }
                 for (j = i; j < getRows.length; j++) {
                     if (parseInt(getRows[j].getAttribute('data-parentid')).length == NaN) getParentId = parseInt(getRows[j].getAttribute('data-parentid').split(",")[1]);
@@ -136,7 +136,7 @@
                  if($(this).hasClass('active') == true)
                  {
                     $(this).children('span').children('span.arrow-down').removeClass('arrow-down').addClass('arrow-up');
-                    $('.mainTabCont:visible').addClass('mainTabContCollapsed');
+                     $('.mainTabCont:visible').addClass('mainTabContCollapsed');
                  }
                  else{
                     $(this).children('span').children('span.arrow-up').removeClass('arrow-up').addClass('arrow-down');
@@ -567,7 +567,7 @@
             height: 32px;
         }
 
-        .reportsDetails th:nth-child(1) {
+         .reportsDetails th:nth-child(1) {
             width: 4%;
         }
 
@@ -623,16 +623,16 @@
             word-break: break-word;
         }
 
-        .reportsDetails th:nth-child(7) {
+        .reportsDetails th:nth-child(10) {
             width: 6.5%;
             
         }
          .rjira {
-            width: 7%;
+            width: 6.4%;
             word-break: break-word;
         }
 
-        .reportsDetails th:nth-child(8){
+        .reportsDetails th:nth-child(7){
             width: 14.5%;
             
         }
@@ -642,15 +642,15 @@
         }
 
 
-        .reportsDetails th:nth-child(9) {
+        .reportsDetails th:nth-child(8) {
             width: 12.1%;
            
         }
          .rDActualRes {
-            width: 12%;
+            width: 12.5%;
             word-break: break-word;
         }
-        .reportsDetails th:nth-child(10) {
+        .reportsDetails th:nth-child(9) {
             width: 6.1%;
         }
 
@@ -1276,7 +1276,7 @@
         ::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); 
         }
-           .arrow-down {
+          .arrow-down {
          height: 0px;
          width: 0px;
          border: none;
@@ -1425,10 +1425,10 @@
                     <th>Elapsed Time</th>
                     <th class='toggleComments'>Comments</th>
                     <th class='toggleRemarks'>Remarks</th>
-                    <th>Defect ID</th>
                     <th>Expected Result</th>
                     <th>Actual Result</th>
                     <th style="display:none">Status</th>
+                    <th>Defect ID</th>
                     {{!--
                     <th>Expected Result</th> --}}
                 </thead>
@@ -1444,7 +1444,6 @@
                             <td class="rDellaps tabCont">{{EllapsedTime}}</td>
                             <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td>
                             <td class="rDremarks tabCont toggleRemarks" style="padding-left: 10px;">{{Remark}}</td>
-                            <td class="rjira tabCont"><span class="opendescpopup" title="Create Issue"></span></td>
                             {{#ifEquals testcase_details.testcaseDetails undefined}}
                             <td class="rDExpectedRes tabCont {{getClass StepDescription}}">{{StepDescription}}</td>
                             {{/ifEquals}} {{#ifEquals testcase_details.testcaseDetails ""}}
@@ -1465,6 +1464,7 @@
                             <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}},<text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text></td>
                             {{/ifnotEquals}} {{/ifEquals}}
                             <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}}; display:none" data-screenshot="{{screenshot_path}}">{{status}}</td>
+                            <td class="rjira tabCont"><span class="opendescpopup" title="Create Issue"></span></td>
                         </tr>
                         {{/each}}
                     </tbody>
