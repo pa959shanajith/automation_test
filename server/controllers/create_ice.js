@@ -28,11 +28,11 @@ function get_moduleName(moduleId, cb, data) {
 			"Content-Type": "application/json"
 		}
 	};
-	logger.info("Calling NDAC Service from get_moduleName: create_ice/getNames_Ninteen68");
-	client.post(epurl+"create_ice/getNames_Ninteen68", args,
+	logger.info("Calling NDAC Service from get_moduleName: create_ice/getNames_Nineteen68");
+	client.post(epurl+"create_ice/getNames_Nineteen68", args,
 		function (modulename, response) {
 		if (response.statusCode != 200 || modulename.rows == "fail") {
-			logger.error("Error occured in create_ice/getNames_Ninteen68: get_moduleName, Error Code : ERRNDAC");
+			logger.error("Error occured in create_ice/getNames_Nineteen68: get_moduleName, Error Code : ERRNDAC");
 			cb(null, modulename.rows);
 		} else {
 			if (modulename.rows.length != 0) {
@@ -61,11 +61,11 @@ function get_screenName(screenId, cb, data) {
 			"Content-Type": "application/json"
 		}
 	};
-	logger.info("Calling NDAC Service from get_screenName: create_ice/getNames_Ninteen68");
-	client.post(epurl+"create_ice/getNames_Ninteen68", args,
+	logger.info("Calling NDAC Service from get_screenName: create_ice/getNames_Nineteen68");
+	client.post(epurl+"create_ice/getNames_Nineteen68", args,
 		function (screenname, response) {
 		if (response.statusCode != 200 || screenname.rows == "fail") {
-			logger.error("Error occured in create_ice/getNames_Ninteen68: get_screenName, Error Code : ERRNDAC");
+			logger.error("Error occured in create_ice/getNames_Nineteen68: get_screenName, Error Code : ERRNDAC");
 			cb(null, screenname.rows);
 		} else {
 			if (screenname.rows.length != 0) {
@@ -93,11 +93,11 @@ function get_scenarioName(testscenarioId, cb, data) {
 			"Content-Type": "application/json"
 		}
 	};
-	logger.info("Calling NDAC Service from get_scenarioName: create_ice/getNames_Ninteen68");
-	client.post(epurl+"create_ice/getNames_Ninteen68", args,
+	logger.info("Calling NDAC Service from get_scenarioName: create_ice/getNames_Nineteen68");
+	client.post(epurl+"create_ice/getNames_Nineteen68", args,
 		function (testscenarioname, response) {
 		if (response.statusCode != 200 || testscenarioname.rows == "fail") {
-			logger.error("Error occured in create_ice/getNames_Ninteen68: get_scenarioName, Error Code : ERRNDAC");
+			logger.error("Error occured in create_ice/getNames_Nineteen68: get_scenarioName, Error Code : ERRNDAC");
 			cb(null, testscenarioname.rows);
 		} else {
 			if (testscenarioname.rows.length != 0) {
@@ -125,11 +125,11 @@ function get_testcaseName(testcaseId, cb, data) {
 			"Content-Type": "application/json"
 		}
 	};
-	logger.info("Calling NDAC Service from get_testcaseName: create_ice/getNames_Ninteen68");
-	client.post(epurl+"create_ice/getNames_Ninteen68", args,
+	logger.info("Calling NDAC Service from get_testcaseName: create_ice/getNames_Nineteen68");
+	client.post(epurl+"create_ice/getNames_Nineteen68", args,
 		function (testcasename, response) {
 		if (response.statusCode != 200 || testcasename.rows == "fail") {
-			logger.error("Error occured in create_ice/getNames_Ninteen68: get_testcaseName, Error Code : ERRNDAC");
+			logger.error("Error occured in create_ice/getNames_Nineteen68: get_testcaseName, Error Code : ERRNDAC");
 			cb(null, testcasename.rows);
 		} else {
 			if (testcasename.rows.length != 0) {
@@ -1535,8 +1535,8 @@ function updatetestcasename(testcasedetails, cb, data) {
 	});
 }
 
-exports.getReleaseIDs_Ninteen68 = function (req, res) {
-	logger.info("Inside UI service: getReleaseIDs_Ninteen68");
+exports.getReleaseIDs_Nineteen68 = function (req, res) {
+	logger.info("Inside UI service: getReleaseIDs_Nineteen68");
 	var rname = [];
 	var r_ids = [];
 	var rel = {
@@ -1553,12 +1553,12 @@ exports.getReleaseIDs_Ninteen68 = function (req, res) {
 			"Content-Type": "application/json"
 		}
 	};
-	logger.info("Calling NDAC Service from getReleaseIDs_Ninteen68: create_ice/getReleaseIDs_Ninteen68");
-	client.post(epurl+"create_ice/getReleaseIDs_Ninteen68", args,
+	logger.info("Calling NDAC Service from getReleaseIDs_Nineteen68: create_ice/getReleaseIDs_Nineteen68");
+	client.post(epurl+"create_ice/getReleaseIDs_Nineteen68", args,
 		function (result, response) {
 			try {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in create_ice/getReleaseIDs_Ninteen68: getReleaseIDs_Ninteen68, Error Code : ERRNDAC");
+					logger.error("Error occured in create_ice/getReleaseIDs_Nineteen68: getReleaseIDs_Nineteen68, Error Code : ERRNDAC");
 					res(null, result.rows);
 				} else {
 					async.forEachSeries(result.rows, function (iterator, callback1) {
@@ -1571,13 +1571,13 @@ exports.getReleaseIDs_Ninteen68 = function (req, res) {
 					res(null, rel);
 				}
 			} catch (ex) {
-				logger.error("Exception in the service getReleaseIDs_Ninteen68: %s", ex);
+				logger.error("Exception in the service getReleaseIDs_Nineteen68: %s", ex);
 			}
 		});
 };
 
-exports.getCycleIDs_Ninteen68 = function (req, res) {
-	logger.info("Inside UI service: getCycleIDs_Ninteen68");
+exports.getCycleIDs_Nineteen68 = function (req, res) {
+	logger.info("Inside UI service: getCycleIDs_Nineteen68");
 	var cname = [];
 	var c_ids = [];
 	var cyc = {
@@ -1594,12 +1594,12 @@ exports.getCycleIDs_Ninteen68 = function (req, res) {
 			"Content-Type": "application/json"
 		}
 	};
-	logger.info("Calling NDAC Service from getCycleIDs_Ninteen68: create_ice/getCycleIDs_Ninteen68");
-	client.post(epurl+"create_ice/getCycleIDs_Ninteen68", args,
+	logger.info("Calling NDAC Service from getCycleIDs_Nineteen68: create_ice/getCycleIDs_Nineteen68");
+	client.post(epurl+"create_ice/getCycleIDs_Nineteen68", args,
 		function (result, response) {
 			try {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in create_ice/getCycleIDs_Ninteen68: getCycleIDs_Ninteen68, Error Code : ERRNDAC");
+					logger.error("Error occured in create_ice/getCycleIDs_Nineteen68: getCycleIDs_Nineteen68, Error Code : ERRNDAC");
 					res(null, result.rows);
 				} else {
 					async.forEachSeries(result.rows, function (iterator, callback1) {
@@ -1612,7 +1612,7 @@ exports.getCycleIDs_Ninteen68 = function (req, res) {
 					res(null, cyc);
 				}
 			} catch (ex) {
-				logger.error("Exception in the service getCycleIDs_Ninteen68: %s", ex);
+				logger.error("Exception in the service getCycleIDs_Nineteen68: %s", ex);
 			}
 		});
 };

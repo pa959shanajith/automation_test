@@ -752,7 +752,7 @@ exports.updateScreen_ICE = function (req, res) {
 				var uiUserProvidedNamesList = [];
 				//index of objects added
 				var addedObjectIndexes = [];
-				//list of base elements supported in Ninteen68(ICE)
+				//list of base elements supported in Nineteen68(ICE)
 				var baseElementsList = ["a", "radiobutton", "checkbox", "input", "list", "select", "table", "button", "img"];
 				//location of each element to be deleted from scraped list
 				var addedObjectIndexes = [];
