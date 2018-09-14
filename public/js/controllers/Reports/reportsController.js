@@ -27,19 +27,21 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 	//Loading Project
 
 	$scope.getReports_ICE = function () {
-		reportService.getMainReport_ICE()
-			.then(function (data1) {
-				if (data1 == "Invalid Session") {
-					$rootScope.redirectPage();
-				}
-				if (data1 != "fail") {
-					$("#reportSection").append(data1);
-					$("#middle-content-section").css('visibility', 'visible');
-					getProjectsAndSuites(userID, "projects");
-				}
-				else console.log("Failed to get reports.")
-			}, function (error) {
-			});
+		$("#middle-content-section").css('visibility', 'visible');
+		getProjectsAndSuites(userID, "projects");
+		// reportService.getMainReport_ICE()
+		// 	.then(function (data1) {
+		// 		if (data1 == "Invalid Session") {
+		// 			$rootScope.redirectPage();
+		// 		}
+		// 		if (data1 != "fail") {
+		// 			$("#reportSection").append(data1);
+		// 			$("#middle-content-section").css('visibility', 'visible');
+		// 			getProjectsAndSuites(userID, "projects");
+		// 		}
+		// 		else console.log("Failed to get reports.")
+		// 	}, function (error) {
+		// 	});
 	}
 
 

@@ -3,7 +3,7 @@
  */
 var async = require('async');
 var myserver = require('../lib/socket');
-var jsreportClient = require("jsreport-client");
+// var jsreportClient = require("jsreport-client");
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
@@ -11,41 +11,96 @@ var validator =  require('validator');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
+var Handlebars = require('../lib/handlebar.js');
+var wkhtmltopdf = require('wkhtmltopdf');
+// var templatepdf = require('../../data/templates/pdfReport/content.handlebars');
+// var templateweb = require('../../data/templates/specificReport/content.handlebars');
+var fs = require('fs');
+wkhtmltopdf.command = "../../assets/wkhtmltox/bin/";
+var reportpath = "../../data/templates";
+var templatepdf = '', templateweb = '';
+fs.readFile('data/templates/pdfReport/content.handlebars', 'utf8', function(err, data) {
+	templatepdf = data;
+});
 
-exports.getMainReport_ICE = function (req, res) {
-	logger.info("Inside UI service: getMainReport_ICE");
-	try {
-		if (utils.isSessionActive(req.session)) {
-			var jsrclient = jsreportClient("https://" + req.headers.host + "/reportServer/");
-			jsrclient.render({
-				template: {
-					shortid: "HJP1pqMcg",
-					recipe: "html",
-					engine: "none"
-				}
-			}, function (err, response) {
-				if (err) {
-					logger.error('Error occured in getMainReport_ICE when trying to render report: %s', err);
-					res.send("fail");
-				} else {
-					try {
-						logger.info('Reports rendered successfully');
-						response.pipe(res);
-					} catch (exception) {
-						logger.error('Exception in getMainReport_ICE when trying to render report: %s', exception);
-						res.send("fail");
-					}
-				}
-			});
-		} else {
-			logger.error("Invalid Session");
-			res.send("Invalid Session");
-		}
-	} catch (exception) {
-		logger.error('Exception in getMainReport_ICE when trying to render report: %s', exception);
-		res.send("fail");
-	}
-};
+fs.readFile('data/templates/specificReport/content.handlebars', 'utf8', function(err, data) {
+	templateweb = data;
+});
+
+Handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
+    return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+});
+
+Handlebars.registerHelper('ifnotEquals', function(arg1, arg2, options) {
+    return (arg1 != arg2) ? options.fn(this) : options.inverse(this);
+});
+
+Handlebars.registerHelper('getStyle', function(StepDescription) {
+    if(StepDescription.indexOf("Testscriptname") !== -1 || StepDescription.indexOf("TestCase Name") !== -1) return "bold";
+    else return;
+});
+
+Handlebars.registerHelper('getClass', function(StepDescription) {
+    if(StepDescription.indexOf("Testscriptname") !== -1 || StepDescription.indexOf("TestCase Name") !== -1) return "collapsible-tc demo1";
+    else return "rDstepDes tabCont";
+});
+
+Handlebars.registerHelper('getColor', function(overAllStatus) {
+	if(overAllStatus == "Pass") return "green";
+	else if(overAllStatus == "Fail")    return "red";
+	else if(overAllStatus == "Terminate")    return "#faa536";
+});
+
+Handlebars.registerHelper('validateImageID', function(path,slno) {
+	if(path!=null) return "#img-"+slno;
+	else return '';
+});
+
+Handlebars.registerHelper('validateImagePath', function(path) {
+	if(path!=null) return 'block';
+	else return 'none';
+});
+
+Handlebars.registerHelper('getDataURI', function(uri) {
+	var f="data:image/PNG;base64,";
+	if(uri=="fail" || uri=="unavailableLocalServer") return f;
+	else return f+uri;
+});
+
+// exports.getMainReport_ICE = function (req, res) {
+// 	logger.info("Inside UI service: getMainReport_ICE");
+// 	try {
+// 		if (utils.isSessionActive(req.session)) {
+// 			var jsrclient = jsreportClient("https://" + req.headers.host + "/reportServer/");
+// 			jsrclient.render({
+// 				template: {
+// 					shortid: "HJP1pqMcg",
+// 					recipe: "html",
+// 					engine: "none"
+// 				}
+// 			}, function (err, response) {
+// 				if (err) {
+// 					logger.error('Error occured in getMainReport_ICE when trying to render report: %s', err);
+// 					res.send("fail");
+// 				} else {
+// 					try {
+// 						logger.info('Reports rendered successfully');
+// 						response.pipe(res);
+// 					} catch (exception) {
+// 						logger.error('Exception in getMainReport_ICE when trying to render report: %s', exception);
+// 						res.send("fail");
+// 					}
+// 				}
+// 			});
+// 		} else {
+// 			logger.error("Invalid Session");
+// 			res.send("Invalid Session");
+// 		}
+// 	} catch (exception) {
+// 		logger.error('Exception in getMainReport_ICE when trying to render report: %s', exception);
+// 		res.send("fail");
+// 	}
+// };
 
 //to open screen shot
 exports.openScreenShot = function (req, res) {
@@ -105,42 +160,68 @@ exports.openScreenShot = function (req, res) {
 	}
 };
 
+// exports.renderReport_ICE = function (req, res) {
+// 	logger.info("Inside UI service: renderReport_ICE");
+// 	try {
+// 		if (utils.isSessionActive(req.session)) {
+// 			var finalReports = req.body.finalreports;
+// 			var reportType = req.body.reporttype;
+// 			var shortId = "rkE973-5l";
+// 			if (reportType != "html")
+// 				shortId = "H1Orcdvhg";
+// 			var jsrclient = jsreportClient("https://" + req.headers.host + "/reportServer/");
+// 			jsrclient.render({
+// 				template: {
+// 					shortid: shortId,
+// 					recipe: reportType,
+// 					engine: "handlebars"
+// 				},
+// 				data: {
+// 					"overallstatus": finalReports.overallstatus,
+// 					"rows": finalReports.rows,
+// 					"remarksLength": finalReports.remarksLength.length,
+// 					'commentsLength': finalReports.commentsLength.length
+// 				}
+// 			}, function (err, response) {
+// 				if (err) {
+// 					logger.error("Error occured in renderReport_ICE when trying to render report: %s",err);
+// 					res.send("fail");
+// 				} else {
+// 					try {
+// 						logger.info('Reports rendered successfully');
+// 						response.pipe(res);
+// 					} catch (exception) {
+// 						logger.error("Exception occured in renderReport_ICE when trying to render report: %s",exception);
+// 						res.send("fail");
+// 					}
+// 				}
+// 			});
+// 		} else {
+// 			logger.error("Invalid Session");
+// 			res.send("Invalid Session");
+// 		}
+// 	} catch (exception) {
+// 		logger.error("Exception occured in renderReport_ICE when trying to render report: %s",exception);
+// 		res.send("fail");
+// 	}
+// };
 exports.renderReport_ICE = function (req, res) {
 	logger.info("Inside UI service: renderReport_ICE");
 	try {
 		if (utils.isSessionActive(req.session)) {
 			var finalReports = req.body.finalreports;
 			var reportType = req.body.reporttype;
-			var shortId = "rkE973-5l";
-			if (reportType != "html")
-				shortId = "H1Orcdvhg";
-			var jsrclient = jsreportClient("https://" + req.headers.host + "/reportServer/");
-			jsrclient.render({
-				template: {
-					shortid: shortId,
-					recipe: reportType,
-					engine: "handlebars"
-				},
-				data: {
-					"overallstatus": finalReports.overallstatus,
-					"rows": finalReports.rows,
-					"remarksLength": finalReports.remarksLength.length,
-					'commentsLength': finalReports.commentsLength.length
-				}
-			}, function (err, response) {
-				if (err) {
-					logger.error("Error occured in renderReport_ICE when trying to render report: %s",err);
-					res.send("fail");
-				} else {
-					try {
-						logger.info('Reports rendered successfully');
-						response.pipe(res);
-					} catch (exception) {
-						logger.error("Exception occured in renderReport_ICE when trying to render report: %s",exception);
-						res.send("fail");
-					}
-				}
-			});
+			var data = {
+				"overallstatus": finalReports.overallstatus,
+				"rows": finalReports.rows,
+				"remarksLength": finalReports.remarksLength.length,
+				'commentsLength': finalReports.commentsLength.length
+			}			
+			if (reportType != "html") var source = templatepdf;
+			else var source = templateweb;
+			var template = Handlebars.compile(source);
+			var html = template(data);
+
 		} else {
 			logger.error("Invalid Session");
 			res.send("Invalid Session");
@@ -150,7 +231,6 @@ exports.renderReport_ICE = function (req, res) {
 		res.send("fail");
 	}
 };
-
 exports.getAllSuites_ICE = function (req, res) {
 	logger.info("Inside UI service: getAllSuites_ICE");
 	if (utils.isSessionActive(req.session)) {
