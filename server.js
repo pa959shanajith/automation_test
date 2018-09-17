@@ -269,15 +269,15 @@ if (cluster.isMaster) {
             next();
         });
         //Content Security Policy Enabled for Images and Fonts.
-        app.use(helmet.contentSecurityPolicy({
-            directives: {
-                imgSrc: ["'self'", 'data:'],
-                //   fontSrc: ["'self'"],
-                objectSrc: ["'none'"],
-                mediaSrc: ["'self'"],
-                frameSrc: ["data:"]
-            }
-        }));
+        // app.use(helmet.contentSecurityPolicy({
+        //     directives: {
+        //         imgSrc: ["'self'", 'data:'],
+        //         //   fontSrc: ["'self'"],
+        //         objectSrc: ["'none'"],
+        //         mediaSrc: ["'self'"],
+        //         frameSrc: ["data:"]
+        //     }
+        // }));
 
         app.get('/', function(req, res) {
             res.clearCookie('connect.sid');
@@ -574,25 +574,7 @@ if (cluster.isMaster) {
             logger.error("Please run the Service API");
         }
 
-        //-------------JS REPORT SERVER BEGINS------------//
-        var reportingApp = express();
-        app.use('/reportServer', reportingApp);
-        var jsreport = require('jsreport')({
-            express: {
-                app: reportingApp,
-                server: httpsServer
-            },
-            appPath: "/reportServer"
-        });
-
-        jsreport.init(function() {
-            // running
-        }).catch(function(e) {
-            // error during startup
-            logger.error(e.stack);
-            process.exit(1);
-        });
-        //-------------JS REPORT SERVER ENDS------------//
+      
 
         //To prevent can't send header response
         app.use(function(req, res, next) {

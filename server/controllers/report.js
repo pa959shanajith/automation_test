@@ -13,10 +13,8 @@ var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
 var Handlebars = require('../lib/handlebar.js');
 var wkhtmltopdf = require('wkhtmltopdf');
-// var templatepdf = require('../../data/templates/pdfReport/content.handlebars');
-// var templateweb = require('../../data/templates/specificReport/content.handlebars');
 var fs = require('fs');
-wkhtmltopdf.command = "../../assets/wkhtmltox/bin/";
+wkhtmltopdf.command = process.cwd() +"\\assets\\wkhtmltox\\bin\\wkhtmltopdf.exe"
 var reportpath = "../../data/templates";
 var templatepdf = '', templateweb = '';
 fs.readFile('data/templates/pdfReport/content.handlebars', 'utf8', function(err, data) {
@@ -216,13 +214,16 @@ exports.renderReport_ICE = function (req, res) {
 				"rows": finalReports.rows,
 				"remarksLength": finalReports.remarksLength.length,
 				'commentsLength': finalReports.commentsLength.length
-			}			
+			}	
+			//PDF Reports		
 			if (reportType != "html") 
 			{
 				var source = templatepdf;
 				var template = Handlebars.compile(source);
 				var html = template(data);
+				wkhtmltopdf(html).pipe(res);
 			}
+			//HTML Reports
 			else {
 				var source = templateweb;
 				var template = Handlebars.compile(source);
