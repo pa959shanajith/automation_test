@@ -217,10 +217,18 @@ exports.renderReport_ICE = function (req, res) {
 				"remarksLength": finalReports.remarksLength.length,
 				'commentsLength': finalReports.commentsLength.length
 			}			
-			if (reportType != "html") var source = templatepdf;
-			else var source = templateweb;
-			var template = Handlebars.compile(source);
-			var html = template(data);
+			if (reportType != "html") 
+			{
+				var source = templatepdf;
+				var template = Handlebars.compile(source);
+				var html = template(data);
+			}
+			else {
+				var source = templateweb;
+				var template = Handlebars.compile(source);
+				var html = template(data);
+				res.send(html);
+			}
 
 		} else {
 			logger.error("Invalid Session");
