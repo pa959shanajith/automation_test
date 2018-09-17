@@ -269,15 +269,15 @@ if (cluster.isMaster) {
             next();
         });
         //Content Security Policy Enabled for Images and Fonts.
-        // app.use(helmet.contentSecurityPolicy({
-        //     directives: {
-        //         imgSrc: ["'self'", 'data:'],
-        //         //   fontSrc: ["'self'"],
-        //         objectSrc: ["'none'"],
-        //         mediaSrc: ["'self'"],
-        //         frameSrc: ["data:"]
-        //     }
-        // }));
+        app.use(helmet.contentSecurityPolicy({
+            directives: {
+                imgSrc: ["'self'", 'data:'],
+                //   fontSrc: ["'self'"],
+                objectSrc: ["'none'"],
+                mediaSrc: ["'self'"],
+                frameSrc: ["data:"]
+            }
+        }));
 
         app.get('/', function(req, res) {
             res.clearCookie('connect.sid');
