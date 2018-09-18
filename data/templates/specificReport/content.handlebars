@@ -54,7 +54,7 @@
                 var name = getRows[i].children[2].innerHTML;
                 var rowCount = 0;
                 var getParentId;
-                if (getRows[i].children[8].getAttribute("data-screenshot").length <= 0 || getRows[i].children[8].getAttribute("data-screenshot").toLowerCase().indexOf(".png") == -1) {
+                if (getRows[i].children[8].getAttribute("data-screenshot") && (getRows[i].children[8].getAttribute("data-screenshot").length <= 0 || getRows[i].children[8].getAttribute("data-screenshot").toLowerCase().indexOf(".png") == -1)) {
                     getRows[i].children[8].classList.remove("openscreenshot");
                 }
                 if (name.indexOf("Testscriptname") >= 0 || name.indexOf("TestCase Name") >= 0) {
