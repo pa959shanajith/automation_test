@@ -5925,3 +5925,15 @@ ul.browserInlineIcons
     width: 65% !important;
     margin-left: -5%;
 }
+.colorStatusRed
+{
+    color: red;
+}
+.colorStatusGreen
+{
+    color: green;
+}
+.colorStatusOrnage
+{
+    color: #faa536;
+}

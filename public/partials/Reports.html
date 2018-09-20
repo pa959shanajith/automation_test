@@ -96,7 +96,9 @@
               <td class="reptable-scenarioname">{{report.ScenarioName}}</td>
               <td>{{report.description}}</td>
               <td class='executionCount' ng-click='getscenarioDetails($event)'>{{report.count}}</td>
-              <td>{{report.latestStatus}}</td>
+              <td ng-if="report.latestStatus == 'Fail'" class="colorStatusRed">{{report.latestStatus}}</td>
+              <td ng-if="report.latestStatus == 'Pass'" class="colorStatusGreen">{{report.latestStatus}}</td>
+              <td ng-if="report.latestStatus == 'Terminate'" class="colorStatusOrnage">{{report.latestStatus}}</td>
               <td>{{report.executedon}}</td>
               <td>
                   <div ng-hide="report.count==0" >
