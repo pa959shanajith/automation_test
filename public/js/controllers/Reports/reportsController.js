@@ -117,6 +117,13 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 					}
 					else{
 						$scope.result_reportData = [];
+						var redirected = false,latestidx = 0,robj,latesttime = 0;
+						if(window.localStorage['redirectedReportObj'] && window.localStorage['redirectedReportObj']!=''){
+							redirected = true;
+							robj = JSON.parse(window.localStorage['redirectedReportObj']);
+							window.localStorage['redirectedReportObj'] = '';
+						}	
+						
 						angular.forEach(result_res_reportData.testsuites, function (value, index) {
 							angular.forEach(value.scenarios, function (val, position) {
 								try{
@@ -125,6 +132,14 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 								catch(ex){
 									val.description = '';
 								}
+
+								if(redirected){
+									if(robj.testSuiteDetails[0].testsuiteid == value.testsuiteid && new Date(val.executedon)>new Date(latesttime) && position==0){
+										latestidx = index+1;
+										latesttime = val.executedon;
+									}
+								}
+						
 								if(position == 0){
 									$scope.result_reportData.push({'id':index+1,'ModuleName': value.testsuitename,'ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':index+1})
 								}else{
@@ -132,6 +147,14 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 								}
 							})
 						});
+						$timeout(function(){
+							$('.reportBody.report-table-body').animate({
+								scrollTop: $("[report-idx="+latestidx+"]").offset().top-$("[report-idx=1]").offset().top
+							}, 500);	
+							$("[report-idx="+latestidx+"]").css('border','2px solid orange');
+							$timeout(function(){$("[report-idx="+latestidx+"]").css('border','none');},10000);
+						},500);
+						
 						//console.log("scope", $scope.result_reportData);
 						$("#reportDataTable").show();
 						unblockUI();
@@ -155,6 +178,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 			$scope.reportIdx = $(this)[0].report.idx;
 			reportService.getReportsData_ICE(reportsInputData).then(function (result_res_scenarioData, response_scenarioData) {
 			$scope.result_res_scenarioData = result_res_scenarioData.rows;
+			$scope.result_res_scenarioData = $scope.result_res_scenarioData.sort(function(a,b){
+												return new Date(b.executedtime) - new Date(a.executedtime);
+											});
 			$("#reportScenarioDataTable").show();
 			unblockUI();
 			});
@@ -1025,4 +1051,18 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 		$('.formatpdfbrwsrexport').remove();
 		//})
 	}
+	if(window.localStorage['redirectedReportObj'] && window.localStorage['redirectedReportObj']!=''){
+		blockUI("loading report ...");
+		$timeout(function(){
+			var robj = JSON.parse(window.localStorage['redirectedReportObj']);
+			$('#selectProjects').val(robj.projectId);
+			$('#selectProjects').trigger('change');
+			$timeout(function(){$('#selectReleases').val(robj.releaseid);
+			$('#selectReleases').trigger('change');},1500);
+			$timeout(function(){$('#selectCycles').val(robj.cycleid);
+				$('#selectCycles').trigger('change'); unblockUI();
+			},3000);
+		},1500);
+	}	
+	
 }]);
