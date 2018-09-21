@@ -179,6 +179,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 			reportsInputData.scenarioid = scenarioId;
 			reportsInputData.type = "scenarioreports";
 			$scope.reportIdx = $(this)[0].report.idx;
+			$(".highlightReportRow").removeClass("highlightReportRow");
+			$("[report-idx="+$event.target.parentElement.getAttribute('report-idx')+"]").addClass("highlightReportRow");
 			reportService.getReportsData_ICE(reportsInputData).then(function (result_res_scenarioData, response_scenarioData) {
 			$scope.result_res_scenarioData = result_res_scenarioData.rows;
 			$scope.result_res_scenarioData = $scope.result_res_scenarioData.sort(function(a,b){
