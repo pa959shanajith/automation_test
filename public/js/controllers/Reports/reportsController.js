@@ -75,6 +75,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 		var projectId = $scope.projectNames;
 		blockUI("Loading releases.. please wait..");
 		mindmapServices.populateReleases(projectId).then(function (result) {
+			$(".no-reports").css("display","none");
 			unblockUI();
 			if (result == "Invalid Session") {
 				$rootScope.redirectPage();
@@ -113,8 +114,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 				blockUI("Loading reports.. please wait..");
 				reportService.getReportsData_ICE(reportsInputData).then(function (result_res_reportData, response_reportData) {
 					unblockUI();
+					$(".no-reports").css("display","none");
 					if(Object.keys(result_res_reportData.testsuites).length == 0)
-					{
+					{	
+						$(".no-reports").css("display","block");
 						$("#reportDataTable,#reportScenarioDataTable").hide();
 					}
 					else{
