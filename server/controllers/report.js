@@ -39,7 +39,7 @@ Handlebars.registerHelper('getStyle', function(StepDescription) {
 });
 
 Handlebars.registerHelper('getClass', function(StepDescription) {
-    if(StepDescription.indexOf("Testscriptname") !== -1 || StepDescription.indexOf("TestCase Name") !== -1) return "collapsible-tc demo1";
+    if(StepDescription.indexOf("Testscriptname") !== -1 || StepDescription.indexOf("TestCase Name") !== -1) return "collapsible-tc demo1 txtStepDescription";
     else return "rDstepDes tabCont";
 });
 

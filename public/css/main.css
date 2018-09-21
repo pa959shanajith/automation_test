@@ -5413,7 +5413,7 @@ border-radius: 6px;
     cursor:pointer;
     overflow:hidden;
     background-color:rgba(255,255,255,.7);
-    z-index:9999;
+    /* z-index:9999; */
 }
 
 #ct-expand-left-apg {
@@ -5758,7 +5758,7 @@ ul.browserInlineIcons
 #ct-expand-left.ct-rev {
     position: relative;
     left: 160px;
-    z-index: 9999;
+    /* z-index: 9999; */
 }
 
 .ct-side .ct-expand {
@@ -5815,7 +5815,6 @@ ul.browserInlineIcons
 #ct-expand-right.ct-rev {
     position: relative;
     right: 84px;
-    z-index: 9999;
 }
 .ct-side .ct-expand {
     top: 50%;
@@ -5936,8 +5935,4 @@ ul.browserInlineIcons
 .colorStatusOrnage
 {
     color: #faa536;
-}
-.highlightReportRow
-{
-    background-color: #e3caff !important;
 }
