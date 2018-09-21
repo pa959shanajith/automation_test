@@ -5758,7 +5758,7 @@ ul.browserInlineIcons
 #ct-expand-left.ct-rev {
     position: relative;
     left: 160px;
-    z-index: 9999;
+    /* z-index: 9999; */
 }
 
 .ct-side .ct-expand {
@@ -5815,7 +5815,6 @@ ul.browserInlineIcons
 #ct-expand-right.ct-rev {
     position: relative;
     right: 84px;
-    z-index: 9999;
 }
 .ct-side .ct-expand {
     top: 50%;
@@ -5940,4 +5939,8 @@ ul.browserInlineIcons
 .highlightReportRow
 {
     background-color: #e3caff !important;
+}
+.colorStatusYellow
+{
+    color: #333;
 }

@@ -34,7 +34,7 @@
                     </div>
         </div>
 </div>
-<div id="ct-expand-left" class="ct-expand ct-rev" style='z-index:10 !important;'></div>
+<div id="ct-expand-left" class="ct-expand ct-rev"></div>
 </div>
 <!--Left Panel-->
 <!--Middle Panel-->
@@ -100,6 +100,7 @@
               <td ng-if="report.latestStatus == 'Fail'" class="colorStatusRed">{{report.latestStatus}}</td>
               <td ng-if="report.latestStatus == 'Pass'" class="colorStatusGreen">{{report.latestStatus}}</td>
               <td ng-if="report.latestStatus == 'Terminate'" class="colorStatusOrnage">{{report.latestStatus}}</td>
+              <td ng-if="report.latestStatus == 'Incomplete'" class="colorStatusYellow">{{report.latestStatus}}</td>
               <td>{{report.executedon}}</td>
               <td>
                   <div ng-hide="report.count==0" >
@@ -177,7 +178,7 @@
            <chatbot chatbot></chatbot>
            <!--Images Blocks-->
         </div>
-        <div id='ct-expand-right' class="ct-expand ct-rev" style='z-index:10 !important;'></div>
+        <div id='ct-expand-right' class="ct-expand ct-rev"></div>
      </div>
      <!-- Right Section -->  
 </section>
