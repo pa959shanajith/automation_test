@@ -5235,6 +5235,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+						$grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     }
                     //adding for SAP
