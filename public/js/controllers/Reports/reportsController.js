@@ -147,13 +147,16 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 								}
 							})
 						});
-						$timeout(function(){
-							$('.reportBody.report-table-body').animate({
-								scrollTop: $("[report-idx="+latestidx+"]").offset().top-$("[report-idx=1]").offset().top
-							}, 500);	
-							$("[report-idx="+latestidx+"]").css('border','2px solid orange');
-							$timeout(function(){$("[report-idx="+latestidx+"]").css('border','none');},10000);
-						},500);
+						if(redirected){
+							$timeout(function(){
+								$('.reportBody.report-table-body').animate({
+									scrollTop: $("[report-idx="+latestidx+"]").offset().top-$("[report-idx=1]").offset().top
+								}, 500);	
+								$("[report-idx="+latestidx+"]").css('border','2px solid orange');
+								$timeout(function(){$("[report-idx="+latestidx+"]").css('border','none');},10000);
+							},500);
+	
+						}
 						
 						//console.log("scope", $scope.result_reportData);
 						$("#reportDataTable").show();

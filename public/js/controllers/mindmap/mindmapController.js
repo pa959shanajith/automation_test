@@ -116,6 +116,21 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     var clist;
     $scope.nodeDisplay = {};
     $scope.linkDisplay = {};
+    var flowMove = false;
+    var elemlist = {
+        'mindmapCreateOption':{
+            'idx':0,
+            'elems':[
+            '#createImg',
+            '#assignImg',
+            '[title="Create New"]',
+            '[title="End to End flow"]',
+            '[title="Import from Excel"]',
+            '[alt="Tasks"]',
+            '[title="Info"]',
+            '[title="Prof J"]'
+        ]},
+    }     
     //-------------------End of Global Variables-----------------------//
     var faRef = {
         "plus": "fa-plus",
@@ -333,6 +348,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     function addSearchNodeListeners() {
         var reg = /[^a-zA-Z0-9\_]+/;
+        $('.searchimg-canvas').unbind("click");
         $('.searchimg-canvas').click(function(e) {
             if (!dragsearch) {
                 if ($('.search-canvas').hasClass('search-visible')) {
@@ -555,9 +571,98 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         } else
             loadMapPopupConfirmed();
     };
+    function moveMap(dir){
+        var offset = -20; // blocks to move
+        switch(dir) {
+            case "left":
+                zoom.translate([cSpan[0]-offset, cSpan[1]]);
+                break;
+            case "up":
+                zoom.translate([cSpan[0], cSpan[1]-offset]);
+                break;
+            case "right":
+                zoom.translate([cSpan[0]+offset, cSpan[1]]);
+                break;            
+            case "down":
+                zoom.translate([cSpan[0], cSpan[1]+offset]);
+                break;
+            default:
+                console.log("no direction provided.");
+        }    
+        zoom.event(d3.select('#ct-mindMap'));           
+    }
+
+    function zoomedmap() {
+        cSpan = zoom.translate();
+        cScale = zoom.scale();
+        d3.select('#ct-mindMap').attr("transform",
+            "translate(" + zoom.translate() + ")" +
+            "scale(" + zoom.scale() + ")"
+        );
+    }
+    
+    function interpolateZoom (translate, scale) {
+        var self = this;
+        return d3.transition().duration(350).tween("zoom", function () {
+            var iTranslate = d3.interpolate(zoom.translate(), translate),
+                iScale = d3.interpolate(zoom.scale(), scale);
+            return function (t) {
+                zoom
+                    .scale(iScale(t))
+                    .translate(iTranslate(t));
+                zoomedmap();
+            };
+        });
+    }
+
+    function zoomClick() {
+        var direction = 1,
+            factor = 0.4,
+            target_zoom = 1,
+            center = [$('#ct-mapSvg').width() / 2, $('#ct-mapSvg').height() / 2],
+            extent = zoom.scaleExtent(),
+            translate = zoom.translate(),
+            translate0 = [],
+            l = [],
+            view = {x: translate[0], y: translate[1], k: zoom.scale()};
+    
+        d3.event.preventDefault();
+        //direction = 1;
+        direction = (this.id === 'zoom_in') ? 1 : -1;
+        target_zoom = zoom.scale() * (1 + factor * direction);
+    
+        if (target_zoom < extent[0] || target_zoom > extent[1]) { return false; }
+    
+        translate0 = [(center[0] - view.x) / view.k, (center[1] - view.y) / view.k];
+        view.k = target_zoom;
+        l = [translate0[0] * view.k + view.x, translate0[1] * view.k + view.y];
+    
+        view.x += center[0] - l[0];
+        view.y += center[1] - l[1];
+    
+        interpolateZoom([view.x, view.y], view.k);
+    }   
 
     function loadMapPopupConfirmed() {
         blockUI("Loading module.. Please wait..");
+        d3.selectAll('.zoom-btn').on('click', zoomClick);
+        $('.navigate-widget').removeClass("no-disp");
+        $('.navigate-widget').draggable({containment: "#ct-mapSvg"});
+        $('.arrow-box-ic').unbind('mousedown');
+        $('.arrow-box-ic').unbind('mouseup');
+        $('.arrow-box-ic').unbind('mouseout');
+        $('.arrow-box-ic').mousedown(function(e,i){
+            refreshIntervalId = setInterval(function(){moveMap(e.target.classList[1])},20);
+        });        
+        $('.arrow-box-ic').mouseout(function(e,i){
+            try{clearInterval(refreshIntervalId);}
+            catch(err){ console.log("no interval found.");}
+            
+        });   
+        $('.arrow-box-ic').mouseup(function(e,i){
+            try{clearInterval(refreshIntervalId);}
+            catch(err){ console.log("no interval found.");}
+        });           
         $scope.nodeDisplay = {};
         $scope.linkDisplay = {};
         if (progressFlag) return;
@@ -602,6 +707,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         })
     }
 
+    
     function getReuseDetails() {
         // reuse details within the same module
         var dictTmp = {};
@@ -3486,6 +3592,24 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function loadScenariosPopupConfirmed() {
+        d3.selectAll('.zoom-btn').on('click', zoomClick);
+        $('.navigate-widget').removeClass("no-disp");
+        $('.navigate-widget').draggable({containment: "#ct-mapSvg"});
+        $('.arrow-box-ic').unbind('mousedown');
+        $('.arrow-box-ic').unbind('mouseup');
+        $('.arrow-box-ic').unbind('mouseout');
+        $('.arrow-box-ic').mousedown(function(e,i){
+            refreshIntervalId = setInterval(function(){moveMap(e.target.classList[1])},20);
+        });        
+        $('.arrow-box-ic').mouseout(function(e,i){
+            try{clearInterval(refreshIntervalId);}
+            catch(err){ console.log("no interval found.");}
+            
+        });   
+        $('.arrow-box-ic').mouseup(function(e,i){
+            try{clearInterval(refreshIntervalId);}
+            catch(err){ console.log("no interval found.");}
+        });           
         d3.select('.addScenarios-ete').classed('disableButton', !0);
         saveFlag_W = false;
         //$('#ct-createAction_W').addClass('disableButton');
@@ -3713,25 +3837,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         p.classed('ct-movable', !1);
     };
 
-    function toggleNode_W(e) {
-        var isIE = /*@cc_on!@*/ false || !!document.documentMode;
-        var p = d3.select(this.parentElement);
-        if (isIE) {
-            var p = d3.select(this.parentNode);
-        }
-        var pi = p.attr('id').split('-')[2];
-        if (dNodes[pi].children) {
-            p.select('.ct-cRight').classed('ct-nodeBubble', !1);
-            dNodes[pi]._children = dNodes[pi].children;
-            dNodes[pi].children = null;
-            recurseTogChild_W(dNodes[pi], !0);
-        } else if (dNodes[pi]._children) {
-            p.select('.ct-cRight').classed('ct-nodeBubble', !0);
-            dNodes[pi].children = dNodes[pi]._children;
-            dNodes[pi]._children = null;
-            recurseTogChild_W(dNodes[pi], !1);
-        }
-    };
 
     function recurseTogChild_W(d, v) {
         if (d.children) d.children.forEach(function(e) {
@@ -3803,7 +3908,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     //FUnction is tagged to every click on 'cnavas' element to validate the names of nodes when created
     function callme() {
-        if (childNode != null && (childNode.text() == 'Module_0' || childNode.text() == 'Screen_0' || childNode.text() == 'Scenario_0' || childNode.text() == 'Testcase_0')) {
+        if(childNode != null && (d3.select(childNode).text() == 'Module_0' || d3.select(childNode).text() == 'Screen_0' || d3.select(childNode).text() == 'Scenario_0' || d3.select(childNode).text() == 'Testcase_0')) {
             d3.select('#ct-inpBox').classed('no-disp', !1);
         }
 
@@ -4274,7 +4379,7 @@ Purpose : displaying pop up for replication of project
     //--------------------End of Versioning.js---------------------//
     //--------------------Controller logic-------------------------//
     $("body").css("background", "#eee");
-    $("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
+    $("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" /><link id="mindmapCSS3" rel="stylesheet" type="text/css" href="css/css_mindmap/jquery-ui.css" />');
     if (window.localStorage['navigateScreen'] != "mindmap") {
         $rootScope.redirectPage();
     }
@@ -5063,6 +5168,51 @@ Purpose : displaying pop up for replication of project
             console.log(error);
         })
     };
+    // Shortcut Controller
+    document.onkeyup = function(e) {
+
+        //$('[title="Create New"]').attr("tabindex",-1).focus();
+        if(e.target.getAttribute('shortcut')=="disabled"){
+            return;
+        }
+        else if(e.which == 13){
+            $(e.target).trigger('click');
+        }
+
+        else if($scope.tab == 'mindmapCreateOption'){
+            if (e.ctrlKey && e.which == 65) $('[title="Create New"]').trigger('click');
+            else if (e.ctrlKey && e.which == 67) $("#assignImg1").trigger('click');
+            else if (e.ctrlKey && e.which == 69) $('[title="End to End flow"]').trigger('click');
+            else if (e.ctrlKey && e.which == 69) $('[title="End to End flow"]').trigger('click');
+
+            else if((!e.ctrlKey) &&  (e.which == 39 ||e.which == 40)){
+                elemlist[$scope.tab].idx = (elemlist[$scope.tab].idx+1)%elemlist[$scope.tab].elems.length;
+                $(elemlist[$scope.tab].elems[elemlist[$scope.tab].idx]).attr("tabindex",-1).focus();
+            }
+            else if((!e.ctrlKey) &&  (e.which == 38 ||e.which == 37)){
+                elemlist[$scope.tab].idx = (elemlist[$scope.tab].elems.length+elemlist[$scope.tab].idx-1)%elemlist[$scope.tab].elems.length;
+                $(elemlist[$scope.tab].elems[elemlist[$scope.tab].idx]).attr("tabindex",-1).focus();            
+            }
+        }
+        else if($scope.tab == 'tabCreate'){
+
+        }else if($scope.tab == 'mindmapEndtoEndModules'){
+
+        }else if($scope.tab == 'tabAssign'){
+
+        }
+        else return;
+
+        // if (e.which == 77) {
+        //   alert("M key was pressed");
+        // } else if (e.ctrlKey && e.which == 66) {
+        //   alert("Ctrl + B shortcut combination was pressed");
+        // } else if (e.ctrlKey && e.altKey && e.which == 89) {
+        //   alert("Ctrl + Alt + Y shortcut combination was pressed");
+        // } else if (e.ctrlKey && e.altKey && e.shiftKey && e.which == 85) {
+        //   alert("Ctrl + Alt + Shift + U shortcut combination was pressed");
+        // }
+    };      
 }]);
 
 mySPA.directive('onReadFile', function($parse) {
