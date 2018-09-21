@@ -3577,6 +3577,9 @@ $(document).on('keypress', '#app_pid', function(e) {
                                 if (mydata[i].url == undefined) {
                                     mydata[i].url = "";
                                 }
+								if (mydata[i].cord == null) {
+                                    mydata[i].cord = "";
+                                }
                                 if (mydata[i].remarks != undefined) {
                                     if (mydata[i].remarks != getTR[i].textContent && getTR[i].textContent.trim().length > 0) {
                                         if (mydata[i].remarks.length > 0) {
@@ -5092,6 +5095,7 @@ function contentTable(newTestScriptDataLS) {
                 var custval = ob.custname;
                 custname1 = $('<input>').html(custval).text().trim();
                 if ((custname1.replace(/\s/g, ' ') == (selectedText.replace('/\s/g', ' ')).replace('\n', ' ')) ) {
+					cord = null;
                     if(ob.xpath){
                         objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
                         url = ob.url;
@@ -5101,7 +5105,7 @@ function contentTable(newTestScriptDataLS) {
 					if (ob.cord){
                         selectedKeywordList = 'iris';
                         objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
-                        cord = ob.cord
+                        cord = ob.cord;
                         obType = "iris";
                         url = "";
                     }
@@ -5125,6 +5129,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+						$grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     } else if (obType == 'elementWS') {
                         var sc = Object.keys(keywordArrayList.elementWS);
@@ -5210,8 +5215,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-                        if(obType == 'iris')
-                            $grid.jqGrid('setCell', rowId, 'cord',cord);
+						$grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     } else if (appTypeLocal == 'Desktop' && (!(obType == 'push_button' || obType == 'text' || obType == 'combo_box' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType =='treeview'|| obType=='TreeView' || obType=='tree' ||
                             obType == 'list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box' || obType == 'radio_button' || obType == 'tab' || obType == 'datepicker' || obType == 'table'))) {
@@ -5309,8 +5313,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-						if(obType == 'iris')
-                            $grid.jqGrid('setCell', rowId, 'cord',cord);
+						$grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     } else if (appTypeLocal == 'MobileApp' &&
                         (obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0 ||
@@ -5521,8 +5524,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-						if(obType == 'iris')
-                            $grid.jqGrid('setCell', rowId, 'cord',cord);
+						$grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     } else {
                         var sc = Object.keys(keywordArrayList[obType]);
@@ -5541,8 +5543,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-                        if(obType == 'iris')
-                            $grid.jqGrid('setCell', rowId, 'cord',cord);
+						$grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     }
                 }

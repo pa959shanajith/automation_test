@@ -365,7 +365,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 	$(document).on('click', ".qcSyncronise", function(event){
 		var getDomainName = $(".qcSelectDomain option:selected").val();
 		var getProjectName = $(".qcSelectProject option:selected").val();
-		var qcTestcaseName = $(this).siblings("label").text();
+		var qcTestcaseName = $(this).siblings("label").children()[1].innerText;
 		var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
 		var qcFolderPath = $(this).parent("li").parent("ul").prev("li").parent("ul").prev("li").data("folderpath");
 		var N68ScenarioId = $(".qcN68TreeContainer").find(".selectedToMap").data("scenarioid");
