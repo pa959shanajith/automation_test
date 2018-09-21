@@ -5937,3 +5937,7 @@ ul.browserInlineIcons
 {
     color: #faa536;
 }
+.highlightReportRow
+{
+    background-color: #e3caff !important;
+}
