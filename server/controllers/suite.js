@@ -889,7 +889,7 @@ exports.getCRId = function (req, res) {
 		}
 	};
 	logger.info("Calling NDAC Service from the node service getCRId to: create_ice/getReleaseIDs_nineteen68");
-	client.post(epurl + "create_ice/getReleaseIDs_Ninteen68", args,
+	client.post(epurl + "create_ice/getReleaseIDs_Nineteen68", args,
 		function (result, response) {
 			if (response.statusCode != 200 || result.status == "fail") {
 				logger.error("Error occured in getCRId service from create_ice/getReleaseIDs_nineteen68 Error Code : ERRNDAC");
@@ -905,7 +905,7 @@ exports.getCRId = function (req, res) {
 							"Content-Type": "application/json"
 						}
 					};
-					client.post(epurl + "create_ice/getCycleIDs_Ninteen68", args, function (result1, response1) {
+					client.post(epurl + "create_ice/getCycleIDs_Nineteen68", args, function (result1, response1) {
 						if (response1.statusCode != 200 || result1.status == "fail") {
 							logger.error("Error occured in getCRId service from create_ice/getCycleIDs_nineteen68 Error Code : ERRNDAC");
 							res(400, result1);

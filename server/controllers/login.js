@@ -366,10 +366,9 @@ function ldapCheck(ldapdata, cb) {
 					logger.error("Error occurred in ldap authentication");
 					logger.debug("Error occurred in ldap authentication : " + JSON.stringify(err));
 					cb("fail");
-				} else {
-					if (auth) cb("pass");
-					else cb("pass");
 				}
+				else if (auth) cb("pass");
+				else cb("fail");
 			});
 		}
 	});

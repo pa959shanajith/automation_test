@@ -134,7 +134,7 @@ exports.populateReleases=function(req,res){
 			var datatosend ='';
 			var d=req.body;
 			var project_id={projectId: d.projectId};
-			create_ice.getReleaseIDs_Ninteen68(project_id,function(err,data){
+			create_ice.getReleaseIDs_Nineteen68(project_id,function(err,data){
 				res.setHeader('Content-Type', 'application/json');
 				if(err)
 				res.status(500).send('Fail')
@@ -157,7 +157,7 @@ exports.populateCycles=function(req,res){
 	if (utils.isSessionActive(req.session)) {
 		var datatosend ='';
 			var rel_id={relId : req.body.releaseId};
-			create_ice.getCycleIDs_Ninteen68(rel_id,function(err,data){
+			create_ice.getCycleIDs_Nineteen68(rel_id,function(err,data){
 				res.setHeader('Content-Type', 'application/json');
 				if(err)
 				res.status(500).send(err)
