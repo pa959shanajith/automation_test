@@ -512,7 +512,7 @@ if (cluster.isMaster) {
         app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
         app.post('/reportStatusScenarios_ICE', report.reportStatusScenarios_ICE);
         app.post('/renderReport_ICE', report.renderReport_ICE);
-        app.post('/getMainReport_ICE', report.getMainReport_ICE);
+        // app.post('/getMainReport_ICE', report.getMainReport_ICE);
         app.post('/getReport_Nineteen68', report.getReport_Nineteen68);
         app.post('/exportToJson_ICE', report.exportToJson_ICE);
         app.post('/openScreenShot', report.openScreenShot);
@@ -574,25 +574,7 @@ if (cluster.isMaster) {
             logger.error("Please run the Service API");
         }
 
-        //-------------JS REPORT SERVER BEGINS------------//
-        var reportingApp = express();
-        app.use('/reportServer', reportingApp);
-        var jsreport = require('jsreport')({
-            express: {
-                app: reportingApp,
-                server: httpsServer
-            },
-            appPath: "/reportServer"
-        });
-
-        jsreport.init(function() {
-            // running
-        }).catch(function(e) {
-            // error during startup
-            logger.error(e.stack);
-            process.exit(1);
-        });
-        //-------------JS REPORT SERVER ENDS------------//
+      
 
         //To prevent can't send header response
         app.use(function(req, res, next) {

@@ -6,7 +6,7 @@
 <section class="container-fluid container-fluid-inner" id="reportSection">
 <!--Left Panel-->
 <div class="ct-side fl-left" id="ct-lSide">
-<div id="left-nav-section" style='z-index:9999;' class='left-sec-mindmap lsSlide'>
+<div id="left-nav-section" class='left-sec-mindmap lsSlide'>
         <div class="scroll-wrapper scrollbar-macosx" style="position: relative;">
                 <div class="scroll-wrapper scrollbar-macosx scroll-content" style="position: relative;">
                         <div class="scrollbar-macosx scroll-content" style="height: auto; margin-bottom: 0px; margin-right: 0px; max-height: 780px;">
@@ -34,7 +34,7 @@
                     </div>
         </div>
 </div>
-<div id="ct-expand-left" class="ct-expand ct-rev"></div>
+<div id="ct-expand-left" class="ct-expand ct-rev" style='z-index:10 !important;'></div>
 </div>
 <!--Left Panel-->
 <!--Middle Panel-->
@@ -75,6 +75,7 @@
         </div>
 <!-- Dropdown Div -->
 <!-- Module Table Div -->
+<img class="no-reports" src="imgs/nothing-here.svg" style="display: none;margin-left: auto;margin-right: auto; width: 50%;position: relative; top: 76px;">
 <div class="table-responsive reportDataTable" id='reportDataTable'>
     <table class="table table-striped tblstruct">
         <thead class='reportHeaders'>
@@ -89,20 +90,24 @@
               <th scope="col">View Report</th>
             </tr>
           </thead>
-          <tbody class='reportBody report-table-body scrollbar-inner'>
-            <tr class='getScenarioTestCaseDetails' ng-repeat="report in result_reportData">
+          <tbody class='reportBody report-table-body scrollbar-inner' style = "font-size: 12.5px;">
+            <tr class='getScenarioTestCaseDetails' ng-repeat="report in result_reportData"  report-idx="{{$index+1}}">
               <td scope="row">{{report.id}}</td>
               <td class="reptable-modulename">{{report.ModuleName }}</td>
               <td class="reptable-scenarioname">{{report.ScenarioName}}</td>
               <td>{{report.description}}</td>
               <td class='executionCount' ng-click='getscenarioDetails($event)'>{{report.count}}</td>
-              <td>{{report.latestStatus}}</td>
+              <td ng-if="report.latestStatus == 'Fail'" class="colorStatusRed">{{report.latestStatus}}</td>
+              <td ng-if="report.latestStatus == 'Pass'" class="colorStatusGreen">{{report.latestStatus}}</td>
+              <td ng-if="report.latestStatus == 'Terminate'" class="colorStatusOrnage">{{report.latestStatus}}</td>
+              <td ng-if="report.latestStatus == 'Incomplete'" class="colorStatusYellow">{{report.latestStatus}}</td>
               <td>{{report.executedon}}</td>
               <td>
-                    <img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer;' src='imgs/ic-pdf.png' title='PDF Report'>
-                    <img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer; width: 23px;' src='imgs/ic-web.png' title='Browser Report'>
-                    <img alt='Export JSON' class='exportToJSON reportFormat' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer;' src='imgs/ic-export-to-json.png' title='Export to Json'>
-                
+                  <div ng-hide="report.count==0" >
+                    <img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'>
+                    <img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'>
+                    <img alt='Export JSON' class='exportToJSON reportFormat' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'>
+                  </div>
                     <!-- <span><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{report.reportid}}' src='imgs/ic-pdf.png' title='PDF Report'></span>
                     <span><img alt='Browser Icon' class='reportFormat getSpecificReportBrowser' data-reportid='{{report.reportid}}' src='imgs/ic-web.png' title='Browser Report'></span>
                     <span><img alt='Export JSON' class='reportFormat exportToJSON' data-reportid='{{report.reportid}}' src='imgs/ic-export-json.png' title='Select format' /></span> -->
@@ -114,8 +119,8 @@
   <!-- Module Table Div -->
 
   <!-- Scenario Table Div -->
-<div class="table-responsive reportScenarioDataTable" id='reportScenarioDataTable'>
-        <table class="table table-striped tblstruct">
+    <div class="table-responsive reportScenarioDataTable" id='reportScenarioDataTable'>
+        <table id="rowspan" class="table table-striped tblstruct tablesorter">
             <thead class='reportHeaders'>
                 <tr>
                   <th scope="col">Sl.No</th>
@@ -126,7 +131,7 @@
                   <th scope="col">View Report</th>
                 </tr>
               </thead>
-              <tbody class='reportBody report-scenario-body scrollbar-inner'>
+              <tbody class='reportBody report-scenario-body scrollbar-inner' style = "font-size: 12.5px;">
                  <tr class='executionTimeDetails' ng-repeat="scenario in result_res_scenarioData">
                   <td scope="row" >{{$index+1}}</td>
                   <td>{{scenario.executedtime }}</td>
@@ -134,9 +139,9 @@
                   <td>{{scenario.browser}}</td>
                   <td>{{scenario.status}}</td>
                   <td>
-                        <img alt='Pdf Icon' class='archivedreport getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{scenario.reportid}}' style='cursor: pointer;' src='imgs/ic-pdf.png' title='PDF Report'>
-                        <img alt='-' class='archivedreport getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid='{{scenario.reportid}}' style='cursor: pointer;  width: 23px;' src='imgs/ic-web.png' title='Browser Report'>
-                        <img alt='Export JSON' class='exportToJSON reportFormat' data-reportid='{{scenario.reportid}}' style='cursor: pointer;' src='imgs/ic-export-to-json.png' title='Export to Json'>
+                        <img alt='Pdf Icon' class='archivedreport getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{scenario.reportid}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'>
+                        <img alt='-' class='archivedreport getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid='{{scenario.reportid}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'>
+                        <img alt='Export JSON' class='exportToJSON reportFormat' data-reportid='{{scenario.reportid}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'>
 
                     <!-- <span><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{scenario.reportid}}' src='imgs/ic-pdf.png' title='PDF Report'></span>
                     <span><img alt='Browser Icon' class='reportFormat getSpecificReportBrowser' data-reportid='{{scenario.reportid}}' src='imgs/ic-web.png' title='Browser Report'></span>
@@ -145,7 +150,7 @@
                 </tr>
               </tbody>
         </table>
-      </div>
+    </div>
       <!-- Module Table Div -->
 </div>
 <!--Middle Panel-->
@@ -173,7 +178,7 @@
            <chatbot chatbot></chatbot>
            <!--Images Blocks-->
         </div>
-        <div id='ct-expand-right' class="ct-expand ct-rev"></div>
+        <div id='ct-expand-right' class="ct-expand ct-rev" style='z-index:10 !important;'></div>
      </div>
      <!-- Right Section -->  
 </section>

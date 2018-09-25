@@ -251,11 +251,16 @@
             </thead>
             <tbody class="reportsDetail" >
                 {{#each rows}}
+                 {{#ifnotEquals hidestep "true"}}
                 <tr id="report-slno{{slno}}" style="width: 100%;" class="reportdetailsrow">
                     <td class="rDid tabCont">{{slno}}</td>
-                    <td class="rDstep tabCont">{{Step}}</td>
+                    {{#ifnotEquals testcase_details.testcaseDetails undefined}}
+                        <td class="rDstep tabCont">{{Step}}</td>
+                    {{/ifnotEquals}}
+                    {{#ifEquals testcase_details.testcaseDetails undefined}}
+                      <td class="rDstep tabCont">{{StepDescription}}</td>
+                    {{/ifEquals}}
                     <td style="display:none" class="rDstepDes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
-                    
                     <td class="rDellaps tabCont">{{EllapsedTime}}</td>
                     {{#ifnotEquals  ../commentsLength 0}}
                     <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td>
@@ -263,8 +268,10 @@
                     {{#ifnotEquals  ../remarksLength 0}}
                     <td class="rDremarks tabCont" style="padding-left: 10px;">{{Remark}}</td>
                      {{/ifnotEquals}}
+                    <!-- If Hide Test Details is False -->
+                      {{#ifnotEquals hidestep "true"}}
                      {{#ifEquals testcase_details.testcaseDetails undefined}}
-                      <td class="rDExpectedRes tabCont">{{StepDescription}}</td>
+                      <td class="rDExpectedRes tabCont"></td>
                      {{/ifEquals}}
                     {{#ifEquals testcase_details.testcaseDetails ""}}
                         <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
@@ -300,6 +307,10 @@
                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}},<a style="color: {{getColor status}};text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
                         {{/ifnotEquals}}
                     {{/ifEquals}}
+                      {{/ifnotEquals}} 
+                       <!-- If Hide Test Details is False -->
+
+
                         <td class="rDstatus tabCont" style="display:none; padding-left: 10px; color: {{getColor status}}"><a style="color:inherit;text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
 
                     {{!-- {{#ifEquals status "Terminate"}}
@@ -318,6 +329,7 @@
                      <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}</td> --}}
                     {{!-- <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td> --}}
                 </tr>
+                  {{/ifnotEquals}}
                 {{/each}}
             </tbody>
         </table>

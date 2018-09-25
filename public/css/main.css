@@ -2410,7 +2410,7 @@ input[disabled]{
 	padding: 1px 0px;
 	display: inline-block;
 	text-align: center;
-	float:left;
+	/* float:left; */
 }
 
 .executionDataTable .form-control, #scheduleDataBody .form-control, .designDataTable .form-control{
@@ -5413,7 +5413,7 @@ border-radius: 6px;
     cursor:pointer;
     overflow:hidden;
     background-color:rgba(255,255,255,.7);
-    z-index:9999;
+    /* z-index:9999; */
 }
 
 #ct-expand-left-apg {
@@ -5714,7 +5714,7 @@ ul.browserInlineIcons
 .reportDataTable th:nth-child(2),.reportDataTable td:nth-child(2){width: 8%;  word-break: break-word;}
 .reportDataTable th:nth-child(3),.reportDataTable td:nth-child(3){width: 9%; word-break: break-word; text-align:left}
 .reportDataTable th:nth-child(4),.reportDataTable td:nth-child(4){width: 11%; word-break: break-word; text-align:left}
-.reportDataTable th:nth-child(5),.reportDataTable td:nth-child(5){width: 6%; word-break: break-word; text-align:left}
+.reportDataTable th:nth-child(5),.reportDataTable td:nth-child(5){width: 9%; word-break: break-word; text-align:left}
 .reportDataTable th:nth-child(6),.reportDataTable td:nth-child(6){width: 12%; word-break: break-word; text-align:left}
 .reportDataTable th:nth-child(7),.reportDataTable td:nth-child(7){width: 8%; word-break: break-word; text-align:left}
 .reportDataTable th:nth-child(8),.reportDataTable td:nth-child(8){width: 7%; word-break: break-word; text-align:left}
@@ -5883,3 +5883,65 @@ ul.browserInlineIcons
 }
 
 /*** Click Action on Expand/Collapse Buttons for Reports ***/
+
+/** scenario description **/
+.addScenarioTopWrap{
+	margin: 0;
+    float: left;
+    margin-left: -15px;
+    margin-bottom: 20px;
+    width: 100%;
+    position: relative;
+}
+.delScenarioDesc{
+    float: left;
+    width: auto;
+    margin-top: 1.5%;
+    margin-left: -3%;
+}
+.deleteScenarioDescRow
+{
+    cursor: pointer;
+}
+.scenarioDescTxt
+{
+    margin-top: 5%;
+}
+/* .scenarioDescFormGroup,.scenarioDescFormGroupval
+{
+    width: 35% !important;
+} */
+#varVal_lbl,#varVal_txt,#varVal_text
+{
+    border: 0px !important;
+    pointer-events: none !important;
+}   
+.scenarioDescFormGroup
+{
+    width : 20% !important;
+}
+.scenarioDescFormGroupval
+{
+    width: 65% !important;
+    margin-left: -5%;
+}
+.colorStatusRed
+{
+    color: red;
+}
+.colorStatusGreen
+{
+    color: green;
+}
+.colorStatusOrnage
+{
+    color: #faa536;
+}
+.highlightReportRow
+{
+    background-color: #e3caff !important;
+}
+.colorStatusYellow
+{
+    color: #333;
+}

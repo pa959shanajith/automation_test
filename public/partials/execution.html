@@ -420,4 +420,36 @@
 </div>
 <!-- ALM Window -->
 
+
+<!-- Scenario Description Modal -->
+<div id="dialog-addScenarioDesc" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog" style="width: 700px">
+		<!-- Modal content-->
+		<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">&times;</button>
+			<h4 class="modal-title">Add Scenario Description</h4>
+		</div>
+		<div class="modal-body modal-body-add_scenario_desc">
+			<!-- Add Button -->
+			<div class="row addScenarioTopWrap">
+				<!-- <span ng-show="errorMessage" class="error-msg-abs ng-cloak addObjeError">{{errorMessage}}</span> -->
+				<button ng-click="addMoreScenarioObject()" type="button" id="addMoreScenarioDescRow" class="btn btn-default btn-no-bg pull-left"><img src="imgs/ic-add.png" /> Add</button>
+			</div>
+			<!-- Add Button -->
+
+			<!--Modal Content-->
+			<form class="form-inline scrollbar-inner addObjectScroll scenarioObjectScroll" id="addScenarioDescContainer"></form>
+			<input maxLength="50" type="text" class="form-control form-control-custom scenarioDescTxt" placeholder="Enter Scenario Description">
+			<!--Modal Content-->
+		</div>
+		<div class="modal-footer">
+			<button ng-click="resetScenarioDescFields()" type="button" id="resetDescRow" class="btn btn-default">Reset</button>
+			<button ng-click="saveScenarioDescDetails($event)" type="button" id="saveScenarioDescRow" class="btn btn-default">Save</button>
+		</div>
+		</div>
+	</div>
+</div>
+<!-- Scenario Description Modal -->
+
 <testcasetemplate testcasetemplate></testcasetemplate>

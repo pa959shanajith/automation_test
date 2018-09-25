@@ -31,7 +31,6 @@
     "jsreport-client": "^0.4.1",
     "jsreport-wkhtmltopdf": "^1.4.0",
     "lusca": "^1.5.2",
-    "msexcel-builder": "0.0.2",
     "node-env-file": "^0.1.8",
     "node-rest-client": "^3.1.0",
     "node-schedule": "^1.2.5",
@@ -43,6 +42,7 @@
     "validator": "^9.2.0",
     "winston": "^2.4.0",
     "winston-daily-rotate-file": "^1.7.2",
+    "wkhtmltopdf": "^0.3.4",
     "xlsx": "^0.12.6",
     "xml-parser": "^1.2.1"
   }

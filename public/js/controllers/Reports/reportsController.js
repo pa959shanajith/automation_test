@@ -5,7 +5,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 	var userID = getUserInfo.user_id;
 	var openArrow = 0; var openWindow = 0;
 	var executionId, testsuiteId;
-	$scope.reportIdx = '';
+	$scope.reportIdx = ''; // for execution count click
 	$("#page-taskName").empty().append('<span>Reports</span>')
 
 	cfpLoadingBar.start()
@@ -14,6 +14,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 		$('.scrollbar-macosx').scrollbar();
 		/*document.getElementById("currentYear").innerHTML = new Date().getFullYear()*/
 		angular.element(document.getElementById("reportSection")).scope().getReports_ICE();
+		$('#ct-expand-left,#ct-expand-right').trigger('click');
 	}, 100)
 	if (window.localStorage['navigateScreen'] != "p_Reports") {
 		$rootScope.redirectPage();
@@ -27,19 +28,21 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 	//Loading Project
 
 	$scope.getReports_ICE = function () {
-		reportService.getMainReport_ICE()
-			.then(function (data1) {
-				if (data1 == "Invalid Session") {
-					$rootScope.redirectPage();
-				}
-				if (data1 != "fail") {
-					$("#reportSection").append(data1);
-					$("#middle-content-section").css('visibility', 'visible');
-					getProjectsAndSuites(userID, "projects");
-				}
-				else console.log("Failed to get reports.")
-			}, function (error) {
-			});
+		$("#middle-content-section").css('visibility', 'visible');
+		getProjectsAndSuites(userID, "projects");
+		// reportService.getMainReport_ICE()
+		// 	.then(function (data1) {
+		// 		if (data1 == "Invalid Session") {
+		// 			$rootScope.redirectPage();
+		// 		}
+		// 		if (data1 != "fail") {
+		// 			$("#reportSection").append(data1);
+		// 			$("#middle-content-section").css('visibility', 'visible');
+		// 			getProjectsAndSuites(userID, "projects");
+		// 		}
+		// 		else console.log("Failed to get reports.")
+		// 	}, function (error) {
+		// 	});
 	}
 
 
@@ -70,7 +73,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 	//ON CHANGE PROJECTS
 	$scope.selProjectsFilter = function () {
 		var projectId = $scope.projectNames;
+		blockUI("Loading releases.. please wait..");
 		mindmapServices.populateReleases(projectId).then(function (result) {
+			$(".no-reports").css("display","none");
+			unblockUI();
 			if (result == "Invalid Session") {
 				$rootScope.redirectPage();
 			}
@@ -84,7 +90,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 			}
 			$scope.selReleasesFilter = function () {
 				var releaseId = $scope.releaseNames;
+				blockUI("Loading cycles.. please wait..");
 				mindmapServices.populateCycles(releaseId).then(function (result_cycles) {
+					unblockUI();
 					if (result_cycles == "Invalid Session") {
 						$rootScope.redirectPage();
 					}
@@ -103,15 +111,40 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 				reportsInputData.cycleId = $scope.cycleNames;
 				reportsInputData.type = 'allreports';
 				$("#reportScenarioDataTable").hide();
+				blockUI("Loading reports.. please wait..");
 				reportService.getReportsData_ICE(reportsInputData).then(function (result_res_reportData, response_reportData) {
+					unblockUI();
+					$(".no-reports").css("display","none");
 					if(Object.keys(result_res_reportData.testsuites).length == 0)
-					{
+					{	
+						$(".no-reports").css("display","block");
 						$("#reportDataTable,#reportScenarioDataTable").hide();
 					}
 					else{
 						$scope.result_reportData = [];
+						var redirected = false,latestidx = 0,robj,latesttime = 0;
+						if(window.localStorage['redirectedReportObj'] && window.localStorage['redirectedReportObj']!=''){
+							redirected = true;
+							robj = JSON.parse(window.localStorage['redirectedReportObj']);
+							window.localStorage['redirectedReportObj'] = '';
+						}	
+						
 						angular.forEach(result_res_reportData.testsuites, function (value, index) {
 							angular.forEach(value.scenarios, function (val, position) {
+								try{
+									val.description = JSON.parse(val.description).scenariodescription;
+								}
+								catch(ex){
+									val.description = '';
+								}
+
+								if(redirected){
+									if(robj.testSuiteDetails[0].testsuiteid == value.testsuiteid && new Date(val.executedon)>new Date(latesttime) && position==0){
+										latestidx = index+1;
+										latesttime = val.executedon;
+									}
+								}
+						
 								if(position == 0){
 									$scope.result_reportData.push({'id':index+1,'ModuleName': value.testsuitename,'ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':index+1})
 								}else{
@@ -119,8 +152,19 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 								}
 							})
 						});
+						if(redirected){
+							$timeout(function(){
+								$('.reportBody.report-table-body').animate({
+									scrollTop: $("[report-idx="+latestidx+"]").offset().top-$("[report-idx=1]").offset().top
+								}, 500);	
+								$("[report-idx="+latestidx+"]").css('border','2px solid orange');
+								$timeout(function(){$("[report-idx="+latestidx+"]").css('border','none');},10000);
+							},500);
+	
+						}
+						
 						//console.log("scope", $scope.result_reportData);
-					    $("#reportDataTable").show();
+						$("#reportDataTable").show();
 					}
 				});
 
@@ -130,6 +174,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 
 	//Execution count click
 	$scope.getscenarioDetails = function($event) {
+		  blockUI("Loading reports..please wait..");
 		  if($(this)[0].report.count > 0)
 		  {
 			var scenarioId = $(this)[0].report.scenarioId;
@@ -137,13 +182,20 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 			reportsInputData.scenarioid = scenarioId;
 			reportsInputData.type = "scenarioreports";
 			$scope.reportIdx = $(this)[0].report.idx;
+			$(".highlightReportRow").removeClass("highlightReportRow");
+			$("[report-idx="+$event.target.parentElement.getAttribute('report-idx')+"]").addClass("highlightReportRow");
 			reportService.getReportsData_ICE(reportsInputData).then(function (result_res_scenarioData, response_scenarioData) {
 			$scope.result_res_scenarioData = result_res_scenarioData.rows;
+			$scope.result_res_scenarioData = $scope.result_res_scenarioData.sort(function(a,b){
+												return new Date(b.executedtime) - new Date(a.executedtime);
+											});
 			$("#reportScenarioDataTable").show();
+			unblockUI();
 			});
 		  }
 		  else{
 			$("#reportScenarioDataTable").hide();
+			unblockUI();
 		  }
 
 	};
@@ -652,7 +704,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 			$("#middle-content-section").addClass('bothBar-collapsed');
 			$("#reportScenarioDataTable").addClass('reportScenarioTableBothExpand');
 			$('.reportBody.scroll-wrapper').addClass('reportTblWidth');
-			$(".reportDataTable th:nth-child(5), .reportDataTable td:nth-child(5)").css('width','7%');
         } else if ($('.leftBarOpen').length > 0) {
 			$("#middle-content-section").removeClass('rightBar-collapsed leftRightBar-collapsed bothBar-collapsed').addClass('leftBar-collapsed');
 			$('#reportScenarioDataTable').removeClass('reportScenarioTableRightExpand reportScenarioTableBothExpand').addClass('reportScenarioTableLeftExpand');
@@ -683,7 +734,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 		} else{
 			var idx =$(this).attr('data-reportidx')-1;
 		}
-		var reportID = $scope.result_reportData[idx].reportid;
+		var reportID = $(this).attr('data-reportid');
 		var testsuiteId =$scope.result_reportData[idx].testsuiteid;
 		var testsuitename = $scope.result_reportData[idx].testsuitename;
 		var scenarioName = $scope.result_reportData[idx].ScenarioName;			
@@ -819,8 +870,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 					}
 					if (reportType == "html") {
 						//Service call to get Html reports
+						blockUI("Generating Report..please wait..");
 						reportService.renderReport_ICE(finalReports, reportType).then(
 							function (data1) {
+								unblockUI();
 								if (data1 == "Invalid Session") $rootScope.redirectPage();
 								else if (data1 == "fail") console.log("Failed to render reports.");
 								else {
@@ -838,8 +891,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 								}
 							},
 							function (error) {
+								unblockUI();
 								console.log("Error-------" + error);
 							});
+							
 						//Transaction Activity for HTMLReportClick
 						// var labelArr = [];
 						// var infoArr = [];
@@ -853,8 +908,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 								if (dataURIs == "fail" || dataURIs == "unavailableLocalServer") scrShot.paths.forEach(function (d, i) { finalReports.rows[scrShot.idx[i]].screenshot_dataURI = dataURIs; });
 								else dataURIs.forEach(function (d, i) { finalReports.rows[scrShot.idx[i]].screenshot_dataURI = d; });
 								//Service call to get Pdf reports
+								blockUI("Generating report..please wait..");
 								reportService.renderReport_ICE(finalReports, reportType).then(
 									function (data1) {
+										unblockUI();
 										if (data1 == "Invalid Session") $rootScope.redirectPage();
 										else if (data1 == "fail") console.log("Failed to render reports.");
 										else {
@@ -882,10 +939,12 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 										}
 									},
 									function (error) {
+										unblockUI();
 										console.log("Error-------" + error);
 									});
 							},
 							function (error) {
+								unblockUI();
 								console.log("Error-------" + error);
 							});
 					}
@@ -910,8 +969,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 	function exportJSONReport(e) {
 		//$(document).on('click', '.exportToJSON', function(e){
 		var repId = $(this).attr('data-reportid');
+		blockUI("Downloading json report.. please wait");
 		reportService.exportToJson_ICE(repId)
 			.then(function (response) {
+				unblockUI();
 				if (response == "Invalid Session") {
 					$rootScope.redirectPage();
 				}
@@ -997,9 +1058,24 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 				// txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
 			},
 			function (error) {
+				unblockUI();
 				console.log("Error while exportsing JSON.\n " + (error.data));
 			});
 		$('.formatpdfbrwsrexport').remove();
 		//})
 	}
+	if(window.localStorage['redirectedReportObj'] && window.localStorage['redirectedReportObj']!=''){
+		blockUI("loading report ...");
+		$timeout(function(){
+			var robj = JSON.parse(window.localStorage['redirectedReportObj']);
+			$('#selectProjects').val(robj.projectId);
+			$('#selectProjects').trigger('change');
+			$timeout(function(){$('#selectReleases').val(robj.releaseid);
+			$('#selectReleases').trigger('change');},1500);
+			$timeout(function(){$('#selectCycles').val(robj.cycleid);
+				$('#selectCycles').trigger('change'); unblockUI();
+			},3000);
+		},1500);
+	}	
+	
 }]);

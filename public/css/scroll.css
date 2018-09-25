@@ -499,6 +499,10 @@
        float: none;
        height:160px !important
 }
+.scroll-wrapper.scenarioObjectScroll {
+    float: none;
+    height:100px !important
+}
 .addObjectScroll > .scroll-element.scroll-y .scroll-bar{
        background: #321e4f
 }

@@ -116,6 +116,21 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     var clist;
     $scope.nodeDisplay = {};
     $scope.linkDisplay = {};
+    var flowMove = false;
+    var elemlist = {
+        'mindmapCreateOption':{
+            'idx':0,
+            'elems':[
+            '#createImg',
+            '#assignImg',
+            '[title="Create New"]',
+            '[title="End to End flow"]',
+            '[title="Import from Excel"]',
+            '[alt="Tasks"]',
+            '[title="Info"]',
+            '[title="Prof J"]'
+        ]},
+    }     
     //-------------------End of Global Variables-----------------------//
     var faRef = {
         "plus": "fa-plus",
@@ -333,6 +348,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     function addSearchNodeListeners() {
         var reg = /[^a-zA-Z0-9\_]+/;
+        $('.searchimg-canvas').unbind("click");
         $('.searchimg-canvas').click(function(e) {
             if (!dragsearch) {
                 if ($('.search-canvas').hasClass('search-visible')) {
@@ -555,9 +571,98 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         } else
             loadMapPopupConfirmed();
     };
+    function moveMap(dir){
+        var offset = -20; // blocks to move
+        switch(dir) {
+            case "left":
+                zoom.translate([cSpan[0]-offset, cSpan[1]]);
+                break;
+            case "up":
+                zoom.translate([cSpan[0], cSpan[1]-offset]);
+                break;
+            case "right":
+                zoom.translate([cSpan[0]+offset, cSpan[1]]);
+                break;            
+            case "down":
+                zoom.translate([cSpan[0], cSpan[1]+offset]);
+                break;
+            default:
+                console.log("no direction provided.");
+        }    
+        zoom.event(d3.select('#ct-mindMap'));           
+    }
+
+    function zoomedmap() {
+        cSpan = zoom.translate();
+        cScale = zoom.scale();
+        d3.select('#ct-mindMap').attr("transform",
+            "translate(" + zoom.translate() + ")" +
+            "scale(" + zoom.scale() + ")"
+        );
+    }
+    
+    function interpolateZoom (translate, scale) {
+        var self = this;
+        return d3.transition().duration(350).tween("zoom", function () {
+            var iTranslate = d3.interpolate(zoom.translate(), translate),
+                iScale = d3.interpolate(zoom.scale(), scale);
+            return function (t) {
+                zoom
+                    .scale(iScale(t))
+                    .translate(iTranslate(t));
+                zoomedmap();
+            };
+        });
+    }
+
+    function zoomClick() {
+        var direction = 1,
+            factor = 0.4,
+            target_zoom = 1,
+            center = [$('#ct-mapSvg').width() / 2, $('#ct-mapSvg').height() / 2],
+            extent = zoom.scaleExtent(),
+            translate = zoom.translate(),
+            translate0 = [],
+            l = [],
+            view = {x: translate[0], y: translate[1], k: zoom.scale()};
+    
+        d3.event.preventDefault();
+        //direction = 1;
+        direction = (this.id === 'zoom_in') ? 1 : -1;
+        target_zoom = zoom.scale() * (1 + factor * direction);
+    
+        if (target_zoom < extent[0] || target_zoom > extent[1]) { return false; }
+    
+        translate0 = [(center[0] - view.x) / view.k, (center[1] - view.y) / view.k];
+        view.k = target_zoom;
+        l = [translate0[0] * view.k + view.x, translate0[1] * view.k + view.y];
+    
+        view.x += center[0] - l[0];
+        view.y += center[1] - l[1];
+    
+        interpolateZoom([view.x, view.y], view.k);
+    }   
 
     function loadMapPopupConfirmed() {
         blockUI("Loading module.. Please wait..");
+        d3.selectAll('.zoom-btn').on('click', zoomClick);
+        $('.navigate-widget').removeClass("no-disp");
+        $('.navigate-widget').draggable({containment: "#ct-mapSvg"});
+        $('.arrow-box-ic').unbind('mousedown');
+        $('.arrow-box-ic').unbind('mouseup');
+        $('.arrow-box-ic').unbind('mouseout');
+        $('.arrow-box-ic').mousedown(function(e,i){
+            refreshIntervalId = setInterval(function(){moveMap(e.target.classList[1])},20);
+        });        
+        $('.arrow-box-ic').mouseout(function(e,i){
+            try{clearInterval(refreshIntervalId);}
+            catch(err){ console.log("no interval found.");}
+            
+        });   
+        $('.arrow-box-ic').mouseup(function(e,i){
+            try{clearInterval(refreshIntervalId);}
+            catch(err){ console.log("no interval found.");}
+        });           
         $scope.nodeDisplay = {};
         $scope.linkDisplay = {};
         if (progressFlag) return;
@@ -593,7 +698,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             if (errTemp) {
                 IncompleteFlowFlag = true;
             }
-            $("#minimap").minimap($('#ct-mapSvg'));
             unblockUI();
         }, function(error) {
             unblockUI();
@@ -602,6 +706,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         })
     }
 
+    
     function getReuseDetails() {
         // reuse details within the same module
         var dictTmp = {};
@@ -3486,6 +3591,24 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function loadScenariosPopupConfirmed() {
+        d3.selectAll('.zoom-btn').on('click', zoomClick);
+        $('.navigate-widget').removeClass("no-disp");
+        $('.navigate-widget').draggable({containment: "#ct-mapSvg"});
+        $('.arrow-box-ic').unbind('mousedown');
+        $('.arrow-box-ic').unbind('mouseup');
+        $('.arrow-box-ic').unbind('mouseout');
+        $('.arrow-box-ic').mousedown(function(e,i){
+            refreshIntervalId = setInterval(function(){moveMap(e.target.classList[1])},20);
+        });        
+        $('.arrow-box-ic').mouseout(function(e,i){
+            try{clearInterval(refreshIntervalId);}
+            catch(err){ console.log("no interval found.");}
+            
+        });   
+        $('.arrow-box-ic').mouseup(function(e,i){
+            try{clearInterval(refreshIntervalId);}
+            catch(err){ console.log("no interval found.");}
+        });           
         d3.select('.addScenarios-ete').classed('disableButton', !0);
         saveFlag_W = false;
         //$('#ct-createAction_W').addClass('disableButton');
@@ -3713,25 +3836,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         p.classed('ct-movable', !1);
     };
 
-    function toggleNode_W(e) {
-        var isIE = /*@cc_on!@*/ false || !!document.documentMode;
-        var p = d3.select(this.parentElement);
-        if (isIE) {
-            var p = d3.select(this.parentNode);
-        }
-        var pi = p.attr('id').split('-')[2];
-        if (dNodes[pi].children) {
-            p.select('.ct-cRight').classed('ct-nodeBubble', !1);
-            dNodes[pi]._children = dNodes[pi].children;
-            dNodes[pi].children = null;
-            recurseTogChild_W(dNodes[pi], !0);
-        } else if (dNodes[pi]._children) {
-            p.select('.ct-cRight').classed('ct-nodeBubble', !0);
-            dNodes[pi].children = dNodes[pi]._children;
-            dNodes[pi]._children = null;
-            recurseTogChild_W(dNodes[pi], !1);
-        }
-    };
 
     function recurseTogChild_W(d, v) {
         if (d.children) d.children.forEach(function(e) {
@@ -3803,7 +3907,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     //FUnction is tagged to every click on 'cnavas' element to validate the names of nodes when created
     function callme() {
-        if (childNode != null && (childNode.text() == 'Module_0' || childNode.text() == 'Screen_0' || childNode.text() == 'Scenario_0' || childNode.text() == 'Testcase_0')) {
+        if(childNode != null && (d3.select(childNode).text() == 'Module_0' || d3.select(childNode).text() == 'Screen_0' || d3.select(childNode).text() == 'Scenario_0' || d3.select(childNode).text() == 'Testcase_0')) {
             d3.select('#ct-inpBox').classed('no-disp', !1);
         }
 
@@ -4274,7 +4378,7 @@ Purpose : displaying pop up for replication of project
     //--------------------End of Versioning.js---------------------//
     //--------------------Controller logic-------------------------//
     $("body").css("background", "#eee");
-    $("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
+    $("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" /><link id="mindmapCSS3" rel="stylesheet" type="text/css" href="css/css_mindmap/jquery-ui.css" />');
     if (window.localStorage['navigateScreen'] != "mindmap") {
         $rootScope.redirectPage();
     }
@@ -4701,292 +4805,7 @@ Purpose : displaying pop up for replication of project
 
     };
 
-    (function($) {
-        $.fn.minimap = function($mapSource) {
-            var x, y, l, t, w, h;
-            var color = {
-                'modules': '#5c5ce4',
-                'scenarios': '#4299e1',
-                'testcases': '#eba22a',
-                'screens': '#18b9ad'
-            };
-            var width_v, height_v, xmin_v, ymin_v;
-            var $window = $(window);
-            var $minimap = this;
-            var minimapWidth = $minimap.width();
-            var minimapHeight = $minimap.height();
-            $('.minimap-viewport').remove();
-            var $viewport = $("<div></div>").addClass("minimap-viewport");
-            $minimap.append($viewport);
-            $viewport.append('<div id="vpresize" class="vpresize"></div>');
-            synchronize();
-            $window.on("resize", synchronize);
-            $mapSource.on("mousemove", synchronize);
-            $(document).bind('mousewheel', function() {
-                redraw()
-            });
-            $mapSource.on("click", init);
-            $minimap.on("mousedown touchstart", down);
-            $("#minimap-header").draggable({
-                containment: "#ct-mapSvg",
-                drag: function() {
-                    $('#minimap-wrapper').css("left", $('#minimap-header').css('left')).css("top", String($('#minimap-header').offset().top) + "px");
-                }
-            });
 
-            var scale;
-
-            function down(e) {
-                console.log("down event");
-                console.log("e:", e, "this: ", $($(e)[0].target).hasClass('vpresize'));
-                var moveEvent, upEvent;
-                var pos = $minimap.position();
-                console.log("l,t,w,h: ", l, t, w, h);
-                x = (pos.left + l + w / 2); //center x of viewport (absolute)
-                y = (pos.top + t + h / 2); //center y of viewport (absolute)
-                if ($($(e)[0].target).hasClass('vpresize'))
-                    movevp(e);
-                else
-                    move(e);
-
-                if (e.type === "touchstart") {
-                    moveEvent = "touchmove.minimapDown";
-                    upEvent = "touchend";
-                } else {
-                    moveEvent = "mousemove.minimapDown";
-                    upEvent = "mouseup";
-                }
-
-                if ($($(e)[0].target).hasClass('vpresize')) {
-                    $window.on(moveEvent, movevp);
-                    $window.one(upEvent, up);
-                } else {
-                    $window.on(moveEvent, move);
-                    $window.one(upEvent, up);
-                }
-            }
-
-            function move(e) {
-                e.preventDefault();
-
-                if (e.type.match(/touch/)) {
-                    if (e.touches.length > 1) {
-                        return;
-                    }
-                    var event = e.touches[0];
-                } else {
-                    var event = e;
-                }
-                //console.log("event.clientX, event.clientY: ",event.clientX,event.clientY);
-                var dx = event.clientX - x;
-                var dy = event.clientY - y;
-                //console.log("dx,dy: ",dx,dy);
-                if (l + dx < 0) {
-                    dx = -l;
-                }
-                if (t + dy < 0) {
-                    dy = -t;
-                }
-                if (l + w + dx > minimapWidth) {
-                    dx = minimapWidth - l - w;
-                }
-                if (t + h + dy > minimapHeight) {
-                    dy = minimapHeight - t - h;
-                }
-
-                x += dx;
-                y += dy;
-
-                l += dx;
-                t += dy;
-
-                redraw();
-                updateMindMap();
-            }
-
-            function movevp(e) {
-                e.preventDefault();
-
-                if (e.type.match(/touch/)) {
-                    if (e.touches.length > 1) {
-                        return;
-                    }
-                    var event = e.touches[0];
-                } else {
-                    var event = e;
-                }
-                //console.log("event.clientX, event.clientY: ",event.clientX,event.clientY);
-                var xvp = $minimap.position().left + l + w - 3;
-                var yvp = $minimap.position().top + t + h - 3;
-                //console.log("xvp,yvp: ",);
-                var dx = event.clientX - xvp;
-                var dy = event.clientY - yvp;
-                //console.log("dx,dy: ",dx,dy);
-                // if ( l + dx < 0 ) {
-                // 	dx = -l;
-                // }
-                // if ( t + dy < 0 ) {
-                // 	dy = -t;
-                // }
-                // if ( l + w + dx > minimapWidth ) {
-                // 	dx = minimapWidth - l - w;
-                // }
-                // if ( t + h + dy > minimapHeight ) {
-                // 	dy = minimapHeight - t - h;
-                // }
-                dy = dx * h / w;
-                w += dx;
-                h += dy;
-
-                redraw();
-                updateMindMap_vp(dx, dy);
-            }
-
-            function up() {
-                $window.off(".minimapDown");
-            }
-
-            function synchronize() {
-                scale = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[3];
-                //console.log("height_v: ",height_v,"width_v: ",width_v);
-                w = $('#ct-mapSvg').width() * $('#minimap').width() / $('#ct-mindMap').width();
-                h = $('#ct-mapSvg').height() * $('#minimap').height() / $('#ct-mindMap').height();
-
-                x = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[0];
-                y = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[1];
-                var xmin = 1000,
-                    ymin = 1000,
-                    xmax = 0,
-                    ymax = 0;
-                dNodes.forEach(function(e, i) {
-                    if (xmin > e.x) xmin = e.x;
-                    else if (xmax < e.x) xmax = e.x;
-                    if (ymin > e.y) ymin = e.y;
-                    else if (ymax < e.y) ymax = e.y;
-                })
-                l = (-xmin_v * scale - x) * $('#minimap').width() / $('#ct-mindMap').width();
-                t = (-ymin_v * scale - y) * $('#minimap').height() / $('#ct-mindMap').height();
-                //set the mini viewport dimesions
-                redraw();
-            }
-
-            function updateMindMap() {
-                scale = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[3];
-                //console.log("current transform: ",d3.select("#ct-mindMap").attr("transform"));
-                x_l = -xmin_v * scale - l * $('#ct-mindMap').width() / $('#minimap').width();
-                y_l = -ymin_v * scale - t * $('#ct-mindMap').height() / $('#minimap').height();
-                //d3.select('#ct-mindMap').attr('transform','translate('+x_l+','+y_l+')scale('+scale+')');
-
-                zoom.translate([x_l, y_l]);
-                zoom.scale(scale);
-                zoom.event(d3.select('#ct-mindMap'));
-                //console.log("updated transform: ",d3.select("#ct-mindMap").attr("transform"));
-
-            }
-
-            function updateMindMap_vp(dx, dy) {
-                //h,w,l,t => transform(x,y)scale(z)
-                var xvp = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[0];
-                var yvp = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[1];
-                scale = (d3.select("#ct-mindMap").attr("transform").split(/[()]/)[3]);
-                console.log("DX/W: ", dx / w);
-                var temp = Math.round((dx / w) * 10000) / 10000;
-                console.log("temp: ", temp);
-                var delta = (1 - temp);
-                scale = scale * delta;
-                console.log("scale: ", scale);
-                d3.select('#ct-mindMap').attr('transform', 'translate(' + xvp * delta + ',' + yvp * delta + ')scale(' + scale + ')');
-                //console.log("updated transform: ",d3.select("#ct-mindMap").attr("transform"));
-
-            }
-
-            function redraw() {
-                scale = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[3];
-                // var width_t = w>$('#minimap').width()?$('#minimap').width():w;
-                // var height_t = h>$('#minimap').height()?$('#minimap').height():h;
-                // var left_t = w>$('#minimap').width()?$('#minimap').width():l;
-                // var top_t = h>$('#minimap').height()?$('#minimap').height():t;
-                // if(l<0) {w=$('#minimap').width()+l; l=0;};
-                // if ((l+w)>$('#minimap').width()) w=$('#minimap').width()-l;
-                // if(t<0) {h=$('#minimap').height()+t; t=0;};
-                // if ((h+t)>$('#minimap').height()) w=$('#minimap').height()-t;
-                $viewport.css({
-                    width: w,
-                    height: h,
-                    left: l,
-                    top: t,
-                });
-            }
-
-            function init() {
-                console.log('Init');
-                x = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[0];
-                y = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[1];
-                $minimap = $('#minimap');
-                $minimap.find(".minimap-node").remove();
-                var xmin = 1000,
-                    ymin = 1000,
-                    xmax = 0,
-                    ymax = 0;
-                var width, height;
-                dNodes.forEach(function(e, i) {
-                    if (xmin > e.x) xmin = e.x;
-                    else if (xmax < e.x) xmax = e.x;
-                    if (ymin > e.y) ymin = e.y;
-                    else if (ymax < e.y) ymax = e.y;
-                })
-                xmin_v = xmin;
-                ymin_v = ymin;
-                //console.log("xmin: ",xmin,"xmax: ",xmax);
-                //console.log("ymin: ",ymin,"ymax: ",ymax);
-                width_v = width = $("#ct-mindMap").width();
-                height_v = height = $("#ct-mindMap").height();
-                //console.log("width: ",width,"height: ",height);
-                hw = Math.max(width, height);
-                $('.line').remove();
-                dLinks.forEach(function(e, i) {
-                    var sx, sy, dx, dy;
-                    var ratioX = $minimap.width() / (width);
-                    var ratioY = $minimap.height() / (height);
-                    sx = (e.source.x - xmin) * scale * ratioX;
-                    dx = (e.target.x - xmin) * scale * ratioX;
-                    sy = (e.source.y - ymin) * scale * ratioY;
-                    dy = (e.target.y - ymin) * scale * ratioY;
-                    $('#minimap').line(sx + 4, sy + 4, dx + 4, dy + 4);
-                })
-
-                dNodes.forEach(function(e, i) {
-                    var $child = $('#ct-node-' + i);
-                    var mini = $("<div></div>").addClass("minimap-node");
-                    $minimap.append(mini);
-                    var ratioX = $minimap.width() / (width);
-                    var ratioY = $minimap.height() / (height);
-                    //console.log("ratioX: ",ratioX,"ratioY: ",ratioY,"scale:",scale);
-                    var wM = 8;
-                    var hM = 8;
-                    var xM = (e.x - xmin) * scale * ratioX;
-                    var yM = (e.y - ymin) * scale * ratioY;
-                    //console.log("xm: ",xM,"ym: ",yM);
-                    mini.css({
-                        width: wM,
-                        height: hM,
-                        left: xM,
-                        top: yM,
-                        background: color[e.type]
-                    });
-                });
-
-            }
-
-
-            return this;
-        }
-    })(jQuery);
-    //$( "#minimap" ).minimap( $('#ct-mapSvg') );
-
-    $scope.toggleMinimap = function() {
-        $("#minimap-wrapper").toggle();
-    }
 	$scope.exportToExcel = function(){
         //var excelMap = {};
        
@@ -5063,6 +4882,51 @@ Purpose : displaying pop up for replication of project
             console.log(error);
         })
     };
+    // Shortcut Controller
+    document.onkeyup = function(e) {
+
+        //$('[title="Create New"]').attr("tabindex",-1).focus();
+        if(e.target.getAttribute('shortcut')=="disabled"){
+            return;
+        }
+        else if(e.which == 13){
+            $(e.target).trigger('click');
+        }
+
+        else if($scope.tab == 'mindmapCreateOption'){
+            if (e.ctrlKey && e.which == 65) $('[title="Create New"]').trigger('click');
+            else if (e.ctrlKey && e.which == 67) $("#assignImg1").trigger('click');
+            else if (e.ctrlKey && e.which == 69) $('[title="End to End flow"]').trigger('click');
+            else if (e.ctrlKey && e.which == 69) $('[title="End to End flow"]').trigger('click');
+
+            else if((!e.ctrlKey) &&  (e.which == 39 ||e.which == 40)){
+                elemlist[$scope.tab].idx = (elemlist[$scope.tab].idx+1)%elemlist[$scope.tab].elems.length;
+                $(elemlist[$scope.tab].elems[elemlist[$scope.tab].idx]).attr("tabindex",-1).focus();
+            }
+            else if((!e.ctrlKey) &&  (e.which == 38 ||e.which == 37)){
+                elemlist[$scope.tab].idx = (elemlist[$scope.tab].elems.length+elemlist[$scope.tab].idx-1)%elemlist[$scope.tab].elems.length;
+                $(elemlist[$scope.tab].elems[elemlist[$scope.tab].idx]).attr("tabindex",-1).focus();            
+            }
+        }
+        else if($scope.tab == 'tabCreate'){
+
+        }else if($scope.tab == 'mindmapEndtoEndModules'){
+
+        }else if($scope.tab == 'tabAssign'){
+
+        }
+        else return;
+
+        // if (e.which == 77) {
+        //   alert("M key was pressed");
+        // } else if (e.ctrlKey && e.which == 66) {
+        //   alert("Ctrl + B shortcut combination was pressed");
+        // } else if (e.ctrlKey && e.altKey && e.which == 89) {
+        //   alert("Ctrl + Alt + Y shortcut combination was pressed");
+        // } else if (e.ctrlKey && e.altKey && e.shiftKey && e.which == 85) {
+        //   alert("Ctrl + Alt + Shift + U shortcut combination was pressed");
+        // }
+    };      
 }]);
 
 mySPA.directive('onReadFile', function($parse) {

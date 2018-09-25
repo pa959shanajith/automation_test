@@ -8,9 +8,8 @@
 			display:none!important;
 		}
 	</style>	
-    <link rel="stylesheet" type="text/css" href="{#asset latofonts.css @encoding=link}" />
-    <link rel="stylesheet" type="text/css" href="{#asset font-awesome.min.css @encoding=link}" />
-    <script type="text/javascript" src="{#asset jquery.min.js @encoding=link}"></script>
+    <link rel="stylesheet" type="text/css" href="fonts/latofonts.css" />
+    <script type="text/javascript" src="js/plugins/jquery.min.js"></script>
     <script>
         var url, userName, pwd;
 
@@ -43,23 +42,33 @@
                 $('.toggleComments').show();
                 $('.rDcomments').show();
              }
-            /*if($('.reportsDetail .reportdetailsrow').length < 12){
-            	$('.rDstep').css('width','10.1%');
-            	$('.rDstepDes').css('width','49.6%');
-            	$('.rDstatus').css('width','10%');
-            }*/
-      
+                //Hide Testcase details if checkbox in test step details is checked to true(Expected Result & Actual Result)
+             $('.hideStep').each(function (){
+                 var hideStepTxt = $(this).text();
+                 if(hideStepTxt == "true")
+                 {
+                     $(this).siblings('td.rDExpectedRes:visible').parent('tr').hide();
+                     $(this).siblings('td.rDActualRes:visible').parent('tr').hide();
+                 }
+             });
+             // Display Testcase name in test step number
+              $(".txtStepDescription:visible").each(function() {
+                  var StepDescription = $(this).text();
+                  $(this).siblings('.rDstep').append(StepDescription).addClass('collapsible-tc demo1');
+                  $(this).empty();
+                  $(this).removeClass('collapsible-tc demo1');
+              });
             var getRows = $('.reportdetailsrow');
             for (i = 0; i < getRows.length; i++) {
                 var getRowId = parseInt(getRows[i].getAttribute('data-id'));
                 var name = getRows[i].children[2].innerHTML;
                 var rowCount = 0;
                 var getParentId;
-                if (getRows[i].children[9].getAttribute("data-screenshot").length <= 0 || getRows[i].children[9].getAttribute("data-screenshot").toLowerCase().indexOf(".png") == -1) {
-                    getRows[i].children[9].classList.remove("openscreenshot");
+                if (getRows[i].children[8].getAttribute("data-screenshot") && (getRows[i].children[8].getAttribute("data-screenshot").length <= 0 || getRows[i].children[8].getAttribute("data-screenshot").toLowerCase().indexOf(".png") == -1)) {
+                    getRows[i].children[8].classList.remove("openscreenshot");
                 }
                 if (name.indexOf("Testscriptname") >= 0 || name.indexOf("TestCase Name") >= 0) {
-                    getRows[i].children[6].children[0].remove();
+                    getRows[i].children[9].children[0].remove();
                 }
                 for (j = i; j < getRows.length; j++) {
                     if (parseInt(getRows[j].getAttribute('data-parentid')).length == NaN) getParentId = parseInt(getRows[j].getAttribute('data-parentid').split(",")[1]);
@@ -136,9 +145,11 @@
                  if($(this).hasClass('active') == true)
                  {
                     $(this).children('span').children('span.arrow-down').removeClass('arrow-down').addClass('arrow-up');
+                     $('.mainTabCont:visible').addClass('mainTabContCollapsed');
                  }
                  else{
                     $(this).children('span').children('span.arrow-up').removeClass('arrow-up').addClass('arrow-down');
+                    $('.mainTabCont:visible').removeClass('mainTabContCollapsed');
                  }
              });
              $('.collapsible-tc').append('<span class="arrow-down-sm"></span>');
@@ -565,21 +576,22 @@
             height: 32px;
         }
 
-        .reportsDetails th:nth-child(1) {
-            width: 4%;
+         .reportsDetails th:nth-child(1) {
+            width: 3.2%;
         }
 
         .rDid {
-            width: 4.3% !important;
+            width: 3.3% !important;
             word-break: break-word;
         }
 
         .reportsDetails th:nth-child(2) {
-            width: 6%;
+           /* width: 6.4%;*/
+           width: 16%;
         }
 
         .rDstep {
-            width: 6.1% !important;
+            width: 16.5% !important;
             word-break: break-word;
         }
 
@@ -593,49 +605,67 @@
         }
 
         .reportsDetails th:nth-child(4) {
-            width: 9%;
+            width: 9.6%;
         } 
+        .rDellaps {
+            width: 10% !important;
+            word-break: break-word;
+        }
 
         .rDstatus {
             width: 6.1% !important;
             word-break: break-word;
         }
 
-        .rDellaps {
-            width: 9% !important;
-            word-break: break-word;
-        }
+        .reportsDetails th:nth-child(5)
+        {
+           width: 12.7%;
+           word-break: break-word;
 
-        .reportsDetails th:nth-child(5),
+        }
         .rDcomments {
             width: 13%;
             word-break: break-word;
         }
 
-        .reportsDetails th:nth-child(6),
+        .reportsDetails th:nth-child(6)
+        {
+            width: 14.5%;
+            
+        }
         .rDremarks {
-            width: 15%;
+            width: 14.9%;
             word-break: break-word;
         }
 
-        .reportsDetails th:nth-child(7),
-        .rjira {
-            width: 7%;
-            word-break: break-word;
-        }
-
-        .reportsDetails th:nth-child(8),
-        .rDExpectedRes {
-            width: 12%;
-            word-break: break-word;
-        }
-
-        .reportsDetails th:nth-child(9),
-        .rDActualRes {
-            width: 12%;
-            word-break: break-word;
-        }
         .reportsDetails th:nth-child(10) {
+            width: 5%;
+            
+        }
+         .rjira {
+            width: 4.4%;
+            word-break: break-word;
+        }
+
+        .reportsDetails th:nth-child(7){
+            width: 14.5%;
+            
+        }
+        .rDExpectedRes {
+            width: 14.9%;
+            word-break: break-word;
+        }
+
+
+        .reportsDetails th:nth-child(8) {
+            width: 12%;
+           
+        }
+         .rDActualRes {
+            width: 12.3%;
+            word-break: break-word;
+        }
+        .reportsDetails th:nth-child(9) {
             width: 6.1%;
         }
 
@@ -1261,7 +1291,7 @@
         ::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); 
         }
-         .arrow-down,.arrow-up {
+          .arrow-down {
          height: 0px;
          width: 0px;
          border: none;
@@ -1275,10 +1305,19 @@
          cursor: pointer;
          }
          .arrow-up {
-         border-bottom: 7px solid #000000;
-         border-top:0px !important;
-         }
-         .arrow-down-sm,.arrow-up-sm {
+            width: 0;
+            height: 0;
+            border-top: 5px solid transparent;
+            border-bottom: 7px solid transparent;
+            border-left: 9px solid #000;
+            float: left;
+            position: absolute;
+            left: -16px;
+            top: 3px;
+            cursor: pointer;
+        }
+
+         .arrow-down-sm {
          display: inline;
          height: 0px;
          width: 0px;
@@ -1292,10 +1331,21 @@
          float: left;
          cursor: pointer;
          }
-         .arrow-up-sm {
-         border-bottom: 5px solid #000000;
-         border-top:0px !important;
-         }
+        .arrow-up-sm {
+            width: 0;
+            height: 0;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-left: 5px solid #000;
+            float: left;
+            position: relative;
+            top: 8px;
+            left: 0px;
+            cursor: pointer;
+        }
+        .maintabContCollapsed {
+            height: calc(100% - 75px);
+        } 
     </style>
 </head>
 
@@ -1390,10 +1440,10 @@
                     <th>Elapsed Time</th>
                     <th class='toggleComments'>Comments</th>
                     <th class='toggleRemarks'>Remarks</th>
-                    <th>Defect ID</th>
                     <th>Expected Result</th>
                     <th>Actual Result</th>
                     <th style="display:none">Status</th>
+                    <th>Defect ID</th>
                     {{!--
                     <th>Expected Result</th> --}}
                 </thead>
@@ -1409,7 +1459,6 @@
                             <td class="rDellaps tabCont">{{EllapsedTime}}</td>
                             <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td>
                             <td class="rDremarks tabCont toggleRemarks" style="padding-left: 10px;">{{Remark}}</td>
-                            <td class="rjira tabCont"><span class="opendescpopup" title="Create Issue"></span></td>
                             {{#ifEquals testcase_details.testcaseDetails undefined}}
                             <td class="rDExpectedRes tabCont {{getClass StepDescription}}">{{StepDescription}}</td>
                             {{/ifEquals}} {{#ifEquals testcase_details.testcaseDetails ""}}
@@ -1430,6 +1479,8 @@
                             <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}},<text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text></td>
                             {{/ifnotEquals}} {{/ifEquals}}
                             <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}}; display:none" data-screenshot="{{screenshot_path}}">{{status}}</td>
+                            <td class="rjira tabCont"><span class="opendescpopup" title="Create Issue"></span></td>
+                            <td class='hide hideStep'>{{hidestep}}</td>
                         </tr>
                         {{/each}}
                     </tbody>

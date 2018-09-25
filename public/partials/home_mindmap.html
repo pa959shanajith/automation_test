@@ -88,13 +88,6 @@
          <span class="suitedropdownicon"><img alt="Collapse Icon" class="iconSpace collapseEte" src="imgs/ic-collapse.png" ng-click = "collapseETE()"></span>
       </div>
       <div class="ct-canvas-Container" id="ct-canvas">
-         <div id="minimap-wrapper" style="display: none;">
-            <div id="minimap-header">
-               <img class="move-ic-img" src="imgs/move_img.svg" alt="move" style="height: 15px;">
-            </div>
-            <div id="minimap">
-            </div>
-         </div>
          <div id="search-canvas-icon" class="ui-draggable ui-draggable-handle"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>
          <div id="ct-inpBox" class="no-disp">
             <input id="ct-inpPredict" class="ct-inp"><input id="ct-inpAct" maxlength="255" class="ct-inp" ng-model="inpText" ng-keyup="txtBoxKeyup($event.keyCode)">
@@ -124,7 +117,18 @@
                 </g>         
             </g>
          </svg>
-
+         <div class="navigate-widget no-disp">
+            <div class="arrow-box">
+                    <p><i class="arrow-box-ic up"></i></p>
+                    <p><i class="arrow-box-ic left"></i><i class="arrow-box-ic right"></i></p>
+                    <p><i class="arrow-box-ic down"></i></p>
+            </div>   
+            <div class="zoom-box">
+                <div><button class="zoom-btn my-btn" id="zoom_in">+</button></div>
+                <div><button class="zoom-btn my-btn" id="zoom_out">-</button></div>
+                <!-- <div id="slider-range-min"></div> -->
+            </div>     
+        </div>
          <svg id="ct-legendBox">
             <g transform="translate(10,10)">
                <g>
@@ -156,27 +160,7 @@
                   <text x="114" y="18">Create</text>
                </g>
             </g>
-         </svg>
-         <svg id="ct-legendBox">
-            <g transform="translate(10,10)">
-               <g>
-                  <circle class="ct-modules" cx="0" cy="0" r="10"></circle>
-                  <text class="ct-nodeLabel" x="15" y="3">Modules</text>
-               </g>
-               <g>
-                  <circle class="ct-scenarios" cx="90" cy="0" r="10"></circle>
-                  <text class="ct-nodeLabel" x="105" y="3">Scenarios</text>
-               </g>
-               <g>
-                  <circle class="ct-screens" cx="180" cy="0" r="10"></circle>
-                  <text class="ct-nodeLabel" x="195" y="3">Screens</text>
-               </g>
-               <g>
-                  <circle class="ct-testcases" cx="270" cy="0" r="10"></circle>
-                  <text class="ct-nodeLabel" x="285" y="3">Test Cases</text>
-               </g>
-            </g>
-         </svg>         
+         </svg>      
       </div>
    </div>
    <div id="ct-main" class="fl-left">
@@ -246,13 +230,6 @@
          <!--<div id="ctExpandAssign" class="ct-expand"></div>-->
       </div>
       <div ng-if="tab == 'tabAssign'" id="ct-canvasforAssign" class="tabAssign">
-         <div id="minimap-wrapper" style="display: none;">
-            <div id="minimap-header">
-               <img class="move-ic-img" src="imgs/move_img.svg" alt="move" style="height: 15px;">
-            </div>
-            <div id="minimap">
-            </div>
-         </div>
          <div id="search-canvas-icon" class="ui-draggable ui-draggable-handle"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>
          <div id="ct-inpBox" class="no-disp">
                 <input id="ct-inpPredict" class="ct-inp"><input id="ct-inpAct" maxlength="255" class="ct-inp" ng-model="inpText" ng-keyup="txtBoxKeyup($event.keyCode)">
@@ -277,7 +254,18 @@
                 </g>         
             </g>
          </svg>
-
+         <div class="navigate-widget no-disp">
+            <div class="arrow-box">
+                    <p><i class="arrow-box-ic up"></i></p>
+                    <p><i class="arrow-box-ic left"></i><i class="arrow-box-ic right"></i></p>
+                    <p><i class="arrow-box-ic down"></i></p>
+            </div>   
+            <div class="zoom-box">
+                <div><button class="zoom-btn my-btn" id="zoom_in">+</button></div>
+                <div><button class="zoom-btn my-btn" id="zoom_out">-</button></div>
+                <!-- <div id="slider-range-min"></div> -->
+            </div>     
+        </div>
          <svg id="ct-legendBox">
             <g transform="translate(10,10)">
                <g>
@@ -309,36 +297,10 @@
                   <text x="114" y="18">Create</text>
                </g> -->
             </g>
-         </svg>
-         <svg id="ct-legendBox">
-            <g transform="translate(10,10)">
-               <g>
-                  <circle class="ct-modules" cx="0" cy="0" r="10"></circle>
-                  <text class="ct-nodeLabel" x="15" y="3">Modules</text>
-               </g>
-               <g>
-                  <circle class="ct-scenarios" cx="90" cy="0" r="10"></circle>
-                  <text class="ct-nodeLabel" x="105" y="3">Scenarios</text>
-               </g>
-               <g>
-                  <circle class="ct-screens" cx="180" cy="0" r="10"></circle>
-                  <text class="ct-nodeLabel" x="195" y="3">Screens</text>
-               </g>
-               <g>
-                  <circle class="ct-testcases" cx="270" cy="0" r="10"></circle>
-                  <text class="ct-nodeLabel" x="285" y="3">Test Cases</text>
-               </g>
-            </g>
-         </svg>         
+         </svg>      
       </div>
       <div ng-if="tab == 'tabCreate'" id="ct-canvas" class="tabCreate">
-         <div id="minimap-wrapper" style="display: none;">
-            <div id="minimap-header">
-               <img class="move-ic-img" src="imgs/move_img.svg" alt="move" style="height: 15px;">
-            </div>
-            <div id="minimap">
-            </div>
-         </div>
+
          <div id="search-canvas-icon" class="ui-draggable ui-draggable-handle"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>
          <div id="ct-inpBox" class="no-disp">
             <input id="ct-inpPredict" class="ct-inp"><input id="ct-inpAct" maxlength="255" class="ct-inp" ng-model="inpText" ng-keyup="txtBoxKeyup($event.keyCode)">
@@ -368,6 +330,18 @@
                 </g>         
             </g>
         </svg>
+        <div class="navigate-widget no-disp">
+            <div class="arrow-box">
+                    <p><i class="arrow-box-ic up"></i></p>
+                    <p><i class="arrow-box-ic left"></i><i class="arrow-box-ic right"></i></p>
+                    <p><i class="arrow-box-ic down"></i></p>
+            </div>   
+            <div class="zoom-box">
+                <div><button class="zoom-btn my-btn" id="zoom_in">+</button></div>
+                <div><button class="zoom-btn my-btn" id="zoom_out">-</button></div>
+                <!-- <div id="slider-range-min"></div> -->
+            </div>     
+        </div>        
          <svg id="ct-legendBox">
             <g transform="translate(10,10)">
                <g>
@@ -476,15 +450,6 @@
                <img class="thumb-ic" src="imgs/fscr.png" alt="full screen" style="height: 55px;">
                <div class="caption">
                   <p>Full Screen</p>
-               </div>
-            </a>
-         </div>
-         <div ng-show="tab == 'tabCreate'" class="thumbnail thumbnail-custom">
-            <!--<div class="thumbnail thumbnail-custom">-->
-            <a class="slidePopup" ng-click ="toggleMinimap()" id="togglemini" title="toggle minimap">
-               <img class="thumb-ic" src="imgs/ic-webservice.png" alt="full screen" style="height: 55px;">
-               <div class="caption">
-                  <p>Toggle Minimap View</p>
                </div>
             </a>
          </div>
