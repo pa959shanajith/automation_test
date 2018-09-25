@@ -48,7 +48,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 				.then(function (data) {
 					if(data == "Invalid Session"){
 						$rootScope.redirectPage();
-					}else{
+					} else {
 						var tasksJson = data;
 						$scope.taskJson = data;
 						//window.localStorage['_TJ'] = angular.toJson(tasksJson);
@@ -101,45 +101,35 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 								counter++;
 								fillFilterValues(tasksJson[i],j);
 							}
-
 						}
 						  	//prevent mouseclick before loading tasks
 							  $("span.toggleClick").removeClass('toggleClick');
 							// Enable Filter
 							$("span.filterIcon").removeClass('disableFilter');
+					}
+
+					PluginService.getNames_ICE($scope.filterDat.releaseids,Array($scope.filterDat.releaseids.length).fill('releases'))
+					.then(function (response) {
+						if(response == "Invalid Session"){
+							$rootScope.redirectPage();
+						} else {
+							response.respnames.forEach(function(name,i){
+								$scope.filterDat.idnamemaprel[response.requestedids[i]] = name;
+							});
+							PluginService.getNames_ICE($scope.filterDat.cycleids,Array($scope.filterDat.cycleids.length).fill('cycles'))
+							.then(function (response) {
+								if(response == "Invalid Session"){
+									$rootScope.redirectPage();
+								}
+								else{
+									response.respnames.forEach(function(name,i){
+										$scope.filterDat.idnamemapcyc[response.requestedids[i]] = name;
+									});
+								}
+							}, function (error) { console.log("Error:::::::::::::", error) })
 						}
-
-						PluginService.getNames_ICE($scope.filterDat.releaseids,Array($scope.filterDat.releaseids.length).fill('releases'))
-						.then(function (response) {
-							if(response == "Invalid Session"){
-								$rootScope.redirectPage();
-							}
-							else{
-								response.respnames.forEach(function(name,i){
-									$scope.filterDat.idnamemaprel[response.requestedids[i]] = name;
-								});
-								PluginService.getNames_ICE($scope.filterDat.cycleids,Array($scope.filterDat.cycleids.length).fill('cycles'))
-								.then(function (response) {
-									if(response == "Invalid Session"){
-										$rootScope.redirectPage();
-									}
-									else{
-										response.respnames.forEach(function(name,i){
-											$scope.filterDat.idnamemapcyc[response.requestedids[i]] = name;
-										});
-				
-									/* 
-									*  filtering logic
-									*/
-				
-										
-				
-									}
-								}, function (error) { console.log("Error:::::::::::::", error) })
-							}
-						}, function (error) { console.log("Error:::::::::::::", error) })					
+					}, function (error) { console.log("Error:::::::::::::", error) })					
 					//$("#plugin-container").removeClass("inactiveLink");
-
 				}, function (error) { 
 					console.log("Error:::::::::::::", error);
 				})
@@ -151,7 +141,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	}
 
 	//Search form
-
 	var isOpen = false;
 	$(document).on('click',".searchIcon", function(){
 		if(isOpen == false){
@@ -178,7 +167,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		filter(this,event); 
 		e.stopImmediatePropagation();
 	});
-
 
 	function filter(element,event) {
 		var value = $(element).val();
@@ -219,6 +207,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			// txnHistory.log(event.type,labelArr,infoArr,$location.$$path); 
 	   	}, 100);
 	}
+
 	window.localStorage['_TJ'] = "";
 	window.localStorage['_CT'] = "";
 	//Task Function
@@ -440,14 +429,10 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		$scope.filterDat.relcycmap[$('#release-filter-list').val()].forEach(function(cval,i){
 			$('[value='+cval+']').removeAttr("disabled");
 		});
-
 	});
 
-}]);
-
-//Plugin click event - Creating Scope to define the function and returning back to controller
-
-	$(document).on("click", ".pluginBox ", function(e){
+	//Plugin click event - Creating Scope to define the function and returning back to controller
+	$(document).on("click", ".pluginBox ", function(event){
 		var name = $(this).attr('data-name');
 		var pluginDetails = [];
 		var selectedPlugin ='';
@@ -455,22 +440,17 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		var encodedVal =  Encrypt.encode(name);
 		var pluginVal = $(this).next('input[type=hidden]').attr('title').split("_")[1];
 		var pluginPath = "p_"+ $(this).next('input[type=hidden]').attr('title').split("_")[0];
-	// 	var pluginTxt = angular.element(document.body).scope().$root.plugins;
+		//var pluginTxt = angular.element(document.body).scope().$root.plugins;
 		$(".plugins").each(function() {
 			var id = $(this).attr('title').split("_")[1];
-			path = pluginPath;
-			if(id == encodedVal)
-			{
-				angular.element(document.getElementsByClassName("plugin-block")).scope().pluginFunction(path,event);
+			if (id == encodedVal) {
+				$scope.pluginFunction(pluginPath,event);
 				return;
 			}
 	  });
 	});
-
-// function p_event(name){ 	
-// }
+}]);
 
 function taskRedirection(testsuitedetails,scenarioflag,assignedtestscenarioids,subtask,subtaskid,screenid,screenname,projectid,taskname,testcaseid,testcasename,apptype,scenarioid,versionnumber,status,batchTaskIDs,releaseid,cycleid,reuse,event){
 	angular.element(document.getElementsByClassName("assignedTask")).scope().taskRedirection(testsuitedetails,scenarioflag,assignedtestscenarioids,subtask,subtaskid,screenid,screenname,projectid,taskname,testcaseid,testcasename,apptype,scenarioid,versionnumber,status,batchTaskIDs,releaseid,cycleid,reuse,event)
-
 }

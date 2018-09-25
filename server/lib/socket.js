@@ -58,7 +58,7 @@ io.on('connection', function (socket) {
 			}
 		};
 		logger.info("Calling NDAC Service: updateActiveIceSessions");
-		apiclient.post(epurl + "server/updateActiveIceSessions", args,
+		var apireq = apiclient.post(epurl + "server/updateActiveIceSessions", args,
 			function (result, response) {
 			if (response.statusCode != 200) {
 				logger.error("Error occurred in updateActiveIceSessions Error Code: ERRNDAC");
@@ -81,8 +81,15 @@ io.on('connection', function (socket) {
 						logger.error("%s is not authorized to connect", address);
 					}
 					socket.disconnect(false);
+					//socket.emit("killSession", data.cmdBy);
 				}
 			}
+		});
+		apireq.on('error', function(err) {
+			socket.send("fail", "conn");
+			io.close();
+			httpsServer.close()
+			logger.error("PPlease run the Service API and Restart the Server");
 		});
 	}
 	module.exports.allSocketsMap = socketMap;
@@ -91,7 +98,7 @@ io.on('connection', function (socket) {
 	module.exports.socketMapNotify = socketMapNotify;
 	httpsServer.setTimeout();
 
-	socket.on('disconnect', function () {
+	socket.on('disconnect', function (reason) {
 		logger.info("Inside Socket disconnect");
 		var address;
 		// var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
@@ -135,13 +142,19 @@ io.on('connection', function (socket) {
 					}
 				};
 				logger.info("Calling NDAC Service: updateActiveIceSessions");
-				apiclient.post(epurl + "server/updateActiveIceSessions", args,
+				var apireq = apiclient.post(epurl + "server/updateActiveIceSessions", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						logger.error("Error occurred in updateActiveIceSessions Error Code: ERRNDAC");
 					} else {
 						logger.info("%s is disconnected", address);
 					}
+				});
+				apireq.on('error', function(err) {
+					socket.send("fail", "disconn");
+					io.close();
+					httpsServer.close()
+					logger.error("PPPlease run the Service API and Restart the Server");
 				});
 			}
 		}

@@ -1849,15 +1849,18 @@ exports.testLDAPConnection = function(req, res){
 					else if (err.errno == "INSUFFICIENT_ACCESS_RIGHTS") {
 						if (authType == "simple") flag = "insufficient_access";
 						else flag = "success";
-					} else if (err.lde_message.indexOf("DSID-0C0906E8") > -1) {
-						if (authType == "simple") flag = "insufficient_access";
-						else flag = "invalid_auth";
-					} else if (err.lde_message.indexOf("DSID-031522C9") > -1) {
-						flag = "insufficient_access";
-						logger.error("User Does not have sufficient Access!");
-					} else if (err.lde_message.indexOf("DSID-0C0903A9") > -1 && authType == "simple") flag = "invalid_credentials";
-					else if (err.lde_message.indexOf("DSID-031007DB") > -1) flag = "invalid_basedn";
+					} else if (err.lde_message) {
+						if (err.lde_message.indexOf("DSID-0C0906E8") > -1) {
+							if (authType == "simple") flag = "insufficient_access";
+							else flag = "invalid_auth";
+						} else if (err.lde_message.indexOf("DSID-031522C9") > -1) {
+							flag = "insufficient_access";
+							logger.error("User Does not have sufficient Access!");
+						} else if (((err.lde_message.indexOf("DSID-0C0903A9") > -1) || (err.lde_message.indexOf("DSID-0C090400") > -1)) && authType == "simple") flag = "invalid_credentials";
+						else if (err.lde_message.indexOf("DSID-031007DB") > -1) flag = "invalid_basedn";
+					}
 					else flag = "fail";
+					logger.debug("Error occured in admin/testLDAPConnection: " + JSON.stringify(err));
 				}
 				if (flag == "success") {
 					logger.info('LDAP Connection test passed!');
@@ -2036,9 +2039,8 @@ exports.getLDAPConfig = function(req, res){
 										}
 									}
 									if (result) {
-										var uName = result.dn.split(',')[0].split('=')[1];
 										data = {
-											username: uName,
+											username: result[filter],
 											firstname: result[dataMaps.fName],
 											lastname: result[dataMaps.lName],
 											email: result[dataMaps.email],

@@ -7,7 +7,8 @@
 	<!--Left Panel-->
 	<div id="left-nav-section">
 		<div class="scrollbar-macosx">
-			<div id="left-top-section" ng-if="getScreenView == 'Web' || getScreenView == 'Desktop' || getScreenView == 'MobileApp' || getScreenView == 'Webservice' || getScreenView == 'DesktopJava' || getScreenView == 'MobileWeb'">
+			<!-- Web -->
+			<div id="left-top-section" ng-if="getScreenView == 'Web'">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Execute On</a></span></li>
 					<li><a class="selectBrowser" data-name="3"  title="Execute on IE"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
@@ -16,13 +17,61 @@
 					<li style="margin-bottom: 30px"><a class="selectBrowser" data-name="2"  title="Execute on Mozilla Firefox"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
 				</ul>
 			</div>
+			<!-- Web -->
 			
+			<!-- SAP -->
 			<div id="left-top-section" ng-if="getScreenView == 'SAP'" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Execute On</a></span></li>
 					<li><a class="selectBrowser" data-name="1"  title="Execute on SAP Apps"><span><img src='imgs/ic-desktop.png' alt='SAP Apps' /></span>SAP Apps</a></li>
 				</ul>
 			</div>
+			<!-- SAP -->
+			
+			<!-- Desktop -->
+			<div id="left-top-section" ng-if="getScreenView == 'Desktop'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Execute On</a></span></li>
+					<li><a class="selectBrowser" data-name="1"  title="Execute on Desktop Apps"><span><img src='imgs/ic-desktop.png' alt='Desktop Apps' /></span>Desktop Apps</a></li>
+				</ul>
+			</div>
+			<!-- Desktop -->
+			
+			<!-- Mobile App -->
+			<div id="left-top-section" ng-if="getScreenView == 'MobileApp'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Execute On</a></span></li>
+					<li><a class="selectBrowser" data-name="1"  title="Execute on Mobile Apps"><span><img src='imgs/ic-mobility.png' alt='Mobile Apps' /></span>Mobile Apps</a></li>
+				</ul>
+			</div>
+			<!-- Mobile App -->
+			
+			<!-- Web Services -->
+			<div id="left-top-section" ng-if="getScreenView == 'Webservice'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Execute On</a></span></li>
+					<li><a class="selectBrowser" data-name="1"  title="Execute on Web Services"><span><img src='imgs/ic-webservice.png' alt='Web Services' /></span>Web Services</a></li>
+				</ul>
+			</div>
+			<!-- Web Services -->
+			
+			<!-- OEBS -->
+			<div id="left-top-section" ng-if="getScreenView == 'DesktopJava'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Execute On</a></span></li>
+					<li><a class="selectBrowser" data-name="1"  title="Execute on OEBS Apps"><span><img src='imgs/ic-desktop.png' alt='OEBS Apps' /></span>OEBS Apps</a></li>
+				</ul>
+			</div>
+			<!-- OEBS -->
+			
+			<!-- Mobile Web -->
+			<div id="left-top-section" ng-if="getScreenView == 'MobileWeb'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Execute On</a></span></li>
+					<li><a class="selectBrowser" data-name="1"  title="Execute on Mobile Web"><span><img src='imgs/ic-mobility.png' alt='Mobile Web' /></span>Mobile Web</a></li>
+				</ul>
+			</div>
+			<!-- Mobile Web -->
 
 			<!-- Mainframe -->
 			<div id="left-top-section" ng-if="getScreenView == 'Mainframe'" class="ApptypeScreenView">

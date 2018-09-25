@@ -3577,6 +3577,9 @@ $(document).on('keypress', '#app_pid', function(e) {
                                 if (mydata[i].url == undefined) {
                                     mydata[i].url = "";
                                 }
+								if (mydata[i].cord == null) {
+                                    mydata[i].cord = "";
+                                }
                                 if (mydata[i].remarks != undefined) {
                                     if (mydata[i].remarks != getTR[i].textContent && getTR[i].textContent.trim().length > 0) {
                                         if (mydata[i].remarks.length > 0) {
@@ -5076,7 +5079,27 @@ function contentTable(newTestScriptDataLS) {
             $("select#" + rowId + "_keywordVal", row[0]).html(res);
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', 'Generic');
-        } else {
+        } //Adding @Word to the objectName dropdown
+        else if (selectedText == "@Word") {
+            objName = " ";
+            url = " ";
+            //new
+            var sc = Object.keys(keywordArrayList.word);
+            selectedKeywordList = "word";
+            var res = '';
+            for (var i = 0; i < sc.length; i++) {
+                if (selectedKeyword == sc[i]) {
+                    res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
+                } else
+                    res += '<option role="option" value="' + sc[i] + '">' + sc[i] + '</option>';
+            }
+            var row = $(e.target).closest('tr.jqgrow');
+            var rowId = row.attr('id');
+            $("select#" + rowId + "_keywordVal", row[0]).html(res);
+            selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
+            $grid.jqGrid('setCell', rowId, 'appType', 'Generic');
+        }
+        else {
 
             selectedText = replaceHtmlEntites(selectedText.trim());
             for (var i = 0; i < scrappedData.length; i++) {
@@ -5085,6 +5108,7 @@ function contentTable(newTestScriptDataLS) {
                 var custval = ob.custname;
                 custname1 = $('<input>').html(custval).text().trim();
                 if ((custname1.replace(/\s/g, ' ') == (selectedText.replace('/\s/g', ' ')).replace('\n', ' ')) ) {
+					cord = null;
                     if(ob.xpath){
                         objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
                         url = ob.url;
@@ -5094,7 +5118,7 @@ function contentTable(newTestScriptDataLS) {
 					if (ob.cord){
                         selectedKeywordList = 'iris';
                         objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
-                        cord = ob.cord
+                        cord = ob.cord;
                         obType = "iris";
                         url = "";
                     }
@@ -5118,6 +5142,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+						$grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     } else if (obType == 'elementWS') {
                         var sc = Object.keys(keywordArrayList.elementWS);
@@ -5203,8 +5228,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-                        if(obType == 'iris')
-                            $grid.jqGrid('setCell', rowId, 'cord',cord);
+						$grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     } else if (appTypeLocal == 'Desktop' && (!(obType == 'push_button' || obType == 'text' || obType == 'combo_box' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType =='treeview'|| obType=='TreeView' || obType=='tree' ||
                             obType == 'list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box' || obType == 'radio_button' || obType == 'tab' || obType == 'datepicker' || obType == 'table'))) {
@@ -5224,6 +5248,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+						$grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     }
                     //adding for SAP
@@ -5302,8 +5327,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-						if(obType == 'iris')
-                            $grid.jqGrid('setCell', rowId, 'cord',cord);
+						$grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     } else if (appTypeLocal == 'MobileApp' &&
                         (obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0 ||
@@ -5514,8 +5538,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-						if(obType == 'iris')
-                            $grid.jqGrid('setCell', rowId, 'cord',cord);
+						$grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     } else {
                         var sc = Object.keys(keywordArrayList[obType]);
@@ -5534,8 +5557,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-                        if(obType == 'iris')
-                            $grid.jqGrid('setCell', rowId, 'cord',cord);
+						$grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     }
                 }
@@ -6406,23 +6428,23 @@ function getTags(data) {
     var obnames = [];
     var appTypeLocal = JSON.parse(window.localStorage['_CT']).appType;
     if (appTypeLocal == "Web") {
-        obnames = ["@Generic","@Excel","@Custom","@Browser","@BrowserPopUp","@Object"];
+        obnames = ["@Generic","@Excel","@Custom","@Browser","@BrowserPopUp","@Object","@Word"];
     } else if (appTypeLocal == "Webservice") {
-        obnames = ["@Generic","@Excel","WebService List"];
+        obnames = ["@Generic","@Excel","WebService List","@Word"];
     } else if (appTypeLocal == "Mainframe") {
-        obnames = ["@Generic","@Excel","Mainframe List"];
+        obnames = ["@Generic","@Excel","Mainframe List","@Word"];
     } else if (appTypeLocal == "Desktop") {
-        obnames = ["@Generic","@Excel","@Window","@Custom","@Email"];
+        obnames = ["@Generic","@Excel","@Window","@Custom","@Email","@Word"];
     } else if (appTypeLocal == "DesktopJava") {
-        obnames = ["@Generic","@Excel","@Oebs","@Custom"];
+        obnames = ["@Generic","@Excel","@Oebs","@Custom","@Word"];
     } else if (appTypeLocal == "MobileApp") {
         obnames = ["@Generic","@Mobile","@Action"];
     } else if (appTypeLocal == "MobileWeb") {
         obnames = ["@Generic","@Browser","@BrowserPopUp","@Action"];
     } else if (appTypeLocal == "SAP") {
-        obnames = ["@Generic", "@Sap", "@Custom"]
+        obnames = ["@Generic", "@Sap", "@Custom","@Word"]
     } else if(appTypeLocal="System"){
-        obnames=["@Generic","@Excel","@System"];
+        obnames=["@Generic","@Excel","@System","@Word"];
     }
     for (var i = 0; i < data.length; i++) {
         obnames.push(data[i].custname);
