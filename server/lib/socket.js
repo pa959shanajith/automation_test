@@ -8,7 +8,6 @@ var socketMapNotify = {};
 
 var myserver = require('./../../server');
 var httpsServer = myserver.httpsServer;
-// var io = require('socket.io')(httpsServer);
 var io = require('socket.io').listen(httpsServer, { cookie: false });
 var notificationMsg = require('./../notifications/notifyMessages');
 var epurl = "http://" + process.env.NDAC_IP + ":" + process.env.NDAC_PORT + "/";
@@ -89,7 +88,7 @@ io.on('connection', function (socket) {
 			socket.send("fail", "conn");
 			io.close();
 			httpsServer.close()
-			logger.error("PPlease run the Service API and Restart the Server");
+			logger.error("Please run the Service API and Restart the Server");
 		});
 	}
 	module.exports.allSocketsMap = socketMap;
@@ -154,7 +153,7 @@ io.on('connection', function (socket) {
 					socket.send("fail", "disconn");
 					io.close();
 					httpsServer.close()
-					logger.error("PPPlease run the Service API and Restart the Server");
+					logger.error("Please run the Service API and Restart the Server");
 				});
 			}
 		}
