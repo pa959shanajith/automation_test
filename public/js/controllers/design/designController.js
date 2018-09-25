@@ -5104,20 +5104,17 @@ function contentTable(newTestScriptDataLS) {
             selectedText = replaceHtmlEntites(selectedText.trim());
             for (var i = 0; i < scrappedData.length; i++) {
                 var ob = scrappedData[i];
-                var custname1,cord;
+                var custname1;
                 var custval = ob.custname;
                 custname1 = $('<input>').html(custval).text().trim();
                 if ((custname1.replace(/\s/g, ' ') == (selectedText.replace('/\s/g', ' ')).replace('\n', ' ')) ) {
-					cord = null;
-                    if(ob.xpath){
-                        objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
-                        url = ob.url;
-                        var obType = ob.tag;
-                        var listType = ob.canselectmultiple;
-                    }
+					var cord = null;
+					objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
+					url = ob.url;
+					var obType = ob.tag;
+					var listType = ob.canselectmultiple;
 					if (ob.cord){
                         selectedKeywordList = 'iris';
-                        objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
                         cord = ob.cord;
                         obType = "iris";
                         url = "";
