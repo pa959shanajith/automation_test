@@ -186,7 +186,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					else{
 						row.append($('<td style="width:20%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertGreen"><option value="'+getEachScenario[i].condition+'" selected>True</option><option value="0">False</option></select> </td>'));
 					}
-					// row.append($("<td class='projectName' title="+getEachScenario[i].projectnames+" style='width:20%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + getEachScenario[i].projectnames + "</td>"));
+					row.append($("<td class='projectName' title="+getEachScenario[i].projectnames+" style='width:20%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + getEachScenario[i].projectnames + "</td>"));
 					// row.append($("<td class='variableMap' title='' style='width:10%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important;cursor:pointer;' class='tabeleCellPadding'><span class='descriptionContainer'><img alt='scenarioDescription' title='' id=scenarioDesc_"+count+" src='imgs/ic-details-inactive.png' data-scenarioid='"+getEachScenario[i].scenarioIds+"' class='scenarioDescIcon inactiveDesc'></span></td>"));	
 					//row.append($("<td style='width:8%' class='tabeleCellPadding'><img src='../imgs/ic-alm.png' id='syncScenario' title='Sync Test Scenario' style='cursor: pointer;'/></td>"));
 					count++;
