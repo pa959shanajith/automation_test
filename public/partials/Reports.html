@@ -83,7 +83,7 @@
               <th scope="col">Sl.No</th>
               <th scope="col">Module Name</th>
               <th scope="col">Scenario Name</th>
-              <th scope="col">Scenario Description</th>
+              <!-- <th scope="col">Scenario Description</th> -->
               <th scope="col">Execution Count</th>
               <th scope="col">Last Execution Status</th>
               <th scope="col">Executed On</th>
@@ -95,12 +95,13 @@
               <td scope="row">{{report.id}}</td>
               <td class="reptable-modulename">{{report.ModuleName }}</td>
               <td class="reptable-scenarioname">{{report.ScenarioName}}</td>
-              <td>{{report.description}}</td>
+              <!-- <td>{{report.description}}</td> -->
               <td class='executionCount' ng-click='getscenarioDetails($event)'>{{report.count}}</td>
               <td ng-if="report.latestStatus == 'Fail'" class="colorStatusRed">{{report.latestStatus}}</td>
               <td ng-if="report.latestStatus == 'Pass'" class="colorStatusGreen">{{report.latestStatus}}</td>
               <td ng-if="report.latestStatus == 'Terminate'" class="colorStatusOrnage">{{report.latestStatus}}</td>
               <td ng-if="report.latestStatus == 'Incomplete'" class="colorStatusYellow">{{report.latestStatus}}</td>
+              <td ng-if="report.latestStatus == ''" class="colorStatusYellow">{{report.latestStatus}}</td>
               <td>{{report.executedon}}</td>
               <td>
                   <div ng-hide="report.count==0" >

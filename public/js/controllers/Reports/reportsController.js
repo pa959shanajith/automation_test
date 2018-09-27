@@ -157,8 +157,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 								$('.reportBody.report-table-body').animate({
 									scrollTop: $("[report-idx="+latestidx+"]").offset().top-$("[report-idx=1]").offset().top
 								}, 500);	
-								$("[report-idx="+latestidx+"]").css('border','2px solid orange');
-								$timeout(function(){$("[report-idx="+latestidx+"]").css('border','none');},10000);
+								$("[report-idx="+latestidx+"]").addClass('highlightReportRow');
+								$timeout(function(){$("[report-idx="+latestidx+"]").removeClass('highlightReportRow');},10000);
 							},500);
 	
 						}
