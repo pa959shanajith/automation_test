@@ -138,7 +138,10 @@
                   <td>{{scenario.executedtime }}</td>
                   <td>{{scenario.executedtime}}</td>
                   <td>{{scenario.browser}}</td>
-                  <td>{{scenario.status}}</td>
+                  <td ng-if="scenario.status == 'Fail'" class="colorStatusRed">{{scenario.status}}</td>
+                  <td ng-if="scenario.status == 'Pass'" class="colorStatusGreen">{{scenario.status}}</td>
+                  <td ng-if="scenario.status == 'Terminate'" class="colorStatusOrnage">{{scenario.status}}</td>
+                  <td ng-if="scenario.status == 'Incomplete'" class="colorStatusYellow">{{scenario.status}}</td>                  
                   <td>
                         <img alt='Pdf Icon' class='archivedreport getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{scenario.reportid}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'>
                         <img alt='-' class='archivedreport getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid='{{scenario.reportid}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'>
