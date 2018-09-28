@@ -463,7 +463,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			var scenarioNames = e.target.parentElement.nextSibling.getElementsByClassName("testScenarioScroll")[0].children;
 			$("#suiteDetailsContent").empty();
 			$("#modalSuiteDetails").find(".modal-title").text(e.target.textContent);
-			var projectName = $(".projectName").text();
+			var projectName = $(e.target).parents('.executionTableDnd').find('.projectName:first').text();
 			for(var i=0; i<scenarioNames.length;i++){
 				$("#suiteDetailsContent").append('<div class="sDInnerContentsWrap"><div class="sDInnerContents" style="width: 50%;">'+scenarioNames[i].getElementsByClassName("exe-scenarioIds")[0].textContent+'</div><div class="sDInnerContents" style="width: 50%;">'+projectName+'</div></div>');
 			}
