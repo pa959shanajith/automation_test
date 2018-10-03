@@ -40,6 +40,7 @@ exports.readTestSuite_ICE = function (req, res) {
 			var outscenarionames = [];
 			var outprojectnames = [];
 			testsuitesindex = testsuitesindex + 1;
+			eachSuite.userInfo = {"username": req.session.username, "role": req.session.activeRole};
 			logger.info("Calling function TestSuiteDetails_Module_ICE from readTestSuite_ICE");
 			TestSuiteDetails_Module_ICE(eachSuite, function (TestSuiteDetailserror, TestSuiteDetailsCallback) {
 				if (TestSuiteDetailserror) {
@@ -334,8 +335,6 @@ function readTestSuite_ICE_SVN(req,callback) {
 	}
 }
 
-
-
 /**
  * Projectnametestcasename_ICE function is to fetch projectname and testscenario
  * created by shreeram p on 15th mar 2017
@@ -412,7 +411,7 @@ exports.updateTestSuite_ICE = function (req, res) {
 	logger.info("Inside UI service: updateTestSuite_ICE");
     qList = [];
 	if (utils.isSessionActive(req.session)) {
-		var userinfo = req.body.batchDetails.userinfo;
+		var userinfo = {"username": req.session.username, "role": req.session.activeRole};
 		var batchDetails = req.body.batchDetails.suiteDetails;
 		var batchDetailslength = batchDetails.length;
 		var batchindex = 0;
@@ -509,7 +508,7 @@ exports.updateTestSuite_ICE = function (req, res) {
 							"donotexecute": donotexecute[scenarioidindex],
 							"getparampaths": getparampaths[scenarioidindex],
 							"testscenarioids": testscenarioids[scenarioidindex],
-							"modifiedby": userinfo.username.toLowerCase(),
+							"modifiedby": userinfo.username,
 							"modifiedbyrole": userinfo.role,
 							"cycleid": testscycleid,
 							"testsuiteid": requestedtestsuiteid,
@@ -596,8 +595,9 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		var name = req.session.username;
 		redisServer.redisSubServer.subscribe('ICE2_' + name);
 		var batchExecutionData = req.body.moduleInfo;
-		var userInfo = req.body.userInfo;
+		var userInfo = {"user_id": req.session.userid, "role": req.session.activeRole};
 		var testsuitedetailslist = [];
+		var scenariodescriptionobject = {};
 		var testsuiteIds = [];
 		var executionRequest = {
 			"executionId": "",
@@ -655,6 +655,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 				conditionchecklist.push(eachsuiteDetails.condition);
 				browserTypelist.push(eachsuiteDetails.browserType);
 				currentscenarioid = eachsuiteDetails.scenarioids;
+				scenariodescriptionobject[eachsuiteDetails.scenarioids] = eachsuiteDetails.scenariodescription;
 				logger.info("Calling function TestCaseDetails_Suite_ICE from ExecuteTestSuite_ICE");
 				TestCaseDetails_Suite_ICE(currentscenarioid, userInfo.user_id, function (currentscenarioidError, currentscenarioidResponse) {
 					var scenariotestcaseobj = {};
@@ -688,6 +689,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					executionjson.dataparampath = dataparamlist;
 					executionjson.testsuiteid = testsuiteid;
 					executionjson.testsuitename = testsuitename;
+					executionjson.scenariodescriptionobject = scenariodescriptionobject;
 					testsuitedetailslist.push(executionjson);
 					if (testsuitedetailslist.length == batchExecutionData.length) {
 						logger.info("Calling function excutionObjectBuilding from updateData function");
@@ -779,6 +781,30 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 													flag = "success";
 												}
 											});
+											var inputs = {
+												"reportid": reportId,
+												"reportmap": JSON.stringify(executionRequest.suitedetails[testsuitecount].scenariodescriptionobject[scenarioid]),
+												"query": "insertmapquery",
+												"executionid": executionid,
+											};
+											var args = {
+												data: inputs,
+												headers: {
+													"Content-Type": "application/json"
+												}
+											};
+											logger.info("Calling NDAC Service from executionFunction: suite/ExecuteTestSuite_ICE");
+											client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+												function (result, response) {
+												if (response.statusCode != 200 || result.rows == "fail") {
+													logger.error("Error occured in suite/ExecuteTestSuite_ICE from executionFunction Error Code : ERRNDAC");
+													flag = "fail";
+												} else {
+													logger.info("Successfully inserted report data");
+													flag = "success";
+												}
+											});
+
 											if (completedSceCount == scenarioCount) {
 												if (statusPass == scenarioCount) {
 													suiteStatus = "Pass";
@@ -838,8 +864,6 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 	}
 };
 
-
-
 /*
 @SVN Service
   return : Scheduled ICE Socket Map
@@ -891,11 +915,11 @@ exports.getCRId = function (req, res) {
 			"Content-Type": "application/json"
 		}
 	};
-	logger.info("Calling NDAC Service from the node service getCRId to: create_ice/getReleaseIDs_Ninteen68");
-	client.post(epurl + "create_ice/getReleaseIDs_Ninteen68", args,
+	logger.info("Calling NDAC Service from the node service getCRId to: create_ice/getReleaseIDs_nineteen68");
+	client.post(epurl + "create_ice/getReleaseIDs_Nineteen68", args,
 		function (result, response) {
 			if (response.statusCode != 200 || result.status == "fail") {
-				logger.error("Error occured in getCRId service from create_ice/getReleaseIDs_Ninteen68 Error Code : ERRNDAC");
+				logger.error("Error occured in getCRId service from create_ice/getReleaseIDs_nineteen68 Error Code : ERRNDAC");
 				res(400, result);
 			} else {
 				if (result.rows.length === 0) {
@@ -908,9 +932,9 @@ exports.getCRId = function (req, res) {
 							"Content-Type": "application/json"
 						}
 					};
-					client.post(epurl + "create_ice/getCycleIDs_Ninteen68", args, function (result1, response1) {
+					client.post(epurl + "create_ice/getCycleIDs_Nineteen68", args, function (result1, response1) {
 						if (response1.statusCode != 200 || result1.status == "fail") {
-							logger.error("Error occured in getCRId service from create_ice/getCycleIDs_Ninteen68 Error Code : ERRNDAC");
+							logger.error("Error occured in getCRId service from create_ice/getCycleIDs_nineteen68 Error Code : ERRNDAC");
 							res(400, result1);
 						} else {
 							if (result1.rows.length === 0) {
@@ -940,9 +964,14 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 	var testsuite_creation_data = {};
 	var result_to_send = { "execution_status": [] };
 	async.eachSeries(req.body.execution_data, function (uservalidation_iterator, cb_validation) {
-		result_status = { "userName": "", "ice_userName": "", "moduleInfo": [], "tokenValidation": "failed" };
-		result_status.userName = uservalidation_iterator.userInfo.username;
-		result_status.ice_userName = uservalidation_iterator.userInfo.ice_username;
+		uservalidation_iterator.userInfo.ice_username = uservalidation_iterator.userInfo.ice_username.toLowerCase();
+		uservalidation_iterator.userInfo.username = uservalidation_iterator.userInfo.username.toLowerCase();
+		result_status = {
+			"userName": uservalidation_iterator.userInfo.username,
+			"ice_userName": uservalidation_iterator.userInfo.ice_username,
+			"moduleInfo": [],
+			"tokenValidation": "failed"
+		};
 		args_validation = {
 			data: { 'username': result_status.userName },
 			headers: {
@@ -959,7 +988,8 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 				for (var i = 0; i < result.rows.length; i++) {
 					validUser = bcrypt.compareSync(uservalidation_iterator.userInfo.token_id, result.rows[i].password);
 					if (validUser) {
-						uservalidation_iterator.userInfo['user_id'] = result.rows[i].userid;
+						uservalidation_iterator.userInfo.user_id = result.rows[i].userid;
+						uservalidation_iterator.userInfo.userrole = "CI";  // Since it's a CI_User, so it has execute only permissions. Hence role is CI.
 						break;
 					}
 				}
@@ -1023,6 +1053,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 									"testsuiteid": moduleinfo_iterator.moduleId,
 									"testsuitename": moduleinfo_iterator.moduleName,
 									"versionnumber": moduleinfo_iterator.versionNumber,
+									"userInfo": userdata_iterator.userInfo
 								};
 								for (var j = 0; j < moduleinfo_iterator.suiteDetails.length; j++) {
 									var testsuite_data = {
@@ -1323,7 +1354,6 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 		var name = req.session.username;
 		redisServer.redisSubServer.subscribe('ICE2_' + name);
 		var batchExecutionData = req.body.moduleInfo;
-		var userInfo = req.body.userInfo;
 		var testsuitedetailslist = [];
 		var testsuiteIds = [];
 		var executionRequest = {
@@ -1338,7 +1368,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 		var updateinp = {
 			"query": "testsuites",
 			"count": batchlength,
-			"userid": userInfo.user_id
+			"userid": name
 		};
 		var args = {
 			data: updateinp,
@@ -1381,7 +1411,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 				browserTypelist.push(eachsuiteDetails.browserType);
 				currentscenarioid = eachsuiteDetails.scenarioids;
 				logger.info("Calling function TestCaseDetails_Suite_ICE from ExecuteTestSuite_ICE_CI");
-				TestCaseDetails_Suite_ICE(currentscenarioid, userInfo.user_id, function (currentscenarioidError, currentscenarioidResponse) {
+				TestCaseDetails_Suite_ICE(currentscenarioid, name, function (currentscenarioidError, currentscenarioidResponse) {
 					var scenariotestcaseobj = {};
 					if (currentscenarioidError) {
 						logger.error("Error occured in the function TestCaseDetails_Suite_ICE from ExecuteTestSuite_ICE_CI: %s",currentscenarioidError);
@@ -2005,6 +2035,7 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 	var requiredcycleid = req.cycleid;
 	var requiredtestsuiteid = req.testsuiteid;
 	var requiredtestsuitename = req.testsuitename;
+	var userInfo = req.userInfo;
 	var resultstring = [];
 	var data = [];
 	var resultdata = '';
@@ -2085,8 +2116,8 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 					"testsuiteid": requiredtestsuiteid,
 					"versionnumber": versionnumber,
 					"conditioncheck": conditioncheckvalues,
-					"createdby": "Ninteen68_admin",
-					"createdthrough": "createdthrough",
+					"createdby": userInfo.username,
+					"createdthrough": "Mindmaps Creation",
 					"deleted": false,
 					"donotexecute": donotexecutevalues,
 					"getparampaths": getparampathvalues,
@@ -2130,7 +2161,8 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 					"cycleid": requiredcycleid,
 					"testsuitename": requiredtestsuitename,
 					"versionnumber": versionnumber,
-					"testscenarioids": testscenarioids
+					"testscenarioids": testscenarioids,
+					"userInfo": userInfo
 				};
 				logger.info("Calling function updatescenariodetailsinsuite from TestSuiteDetails_Module_ICE - testcasesteps");
 				updatescenariodetailsinsuite(jsondata, function (err, data) {
@@ -2261,11 +2293,12 @@ function updatescenariodetailsinsuite(req, cb, data) {
 				"conditioncheck": conditioncheck1,
 				"createdby": suiterowdetails.createdby,
 				"createdon": new Date(suiterowdetails.createdon).getTime().toString(),
-				"createdthrough": "createdthrough",
+				"createdthrough": suiterowdetails.createdthrough,
 				"deleted": false,
 				"donotexecute": donotexecute1,
 				"getparampaths": getparampath1,
-				"modifiedby": "Ninteen68_admin",
+				"modifiedby": req.userInfo.username,
+				"modifiedbyrole": req.userInfo.userrole,
 				"skucodetestsuite": "skucodetestsuite",
 				"tags": "tags",
 				"testscenarioids": req.testscenarioids,

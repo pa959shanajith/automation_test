@@ -1633,6 +1633,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		}
 		this.ldapAllServerList=[];
 		this.ldapAllUserList=[];
+		this.query0 = '';
+		this.query1 = '';
 	};
 
 	//Fetch All Available User Roles
@@ -1749,14 +1751,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	//Create / Update / Delete User
 	$scope.userConf.manage = function(action,$event) {
-		
 		//Transaction Activity for Create/ Update/ Delete User button Action
 		// var labelArr = [];
 		// var infoArr = [];
 		// labelArr.push(txnHistory.codesDict['UserConfmanage']);
 		// infoArr.push(action);
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
-		
+
 		var userConf = $scope.userConf;
 		if (!userConf.validate(action)) return;
 		var bAction = action.charAt(0).toUpperCase() + action.substr(1);
@@ -2130,7 +2131,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				regex = /[\\[\]\~`!@#$%^&*()+={}|;:"',<>?/\s]/g;
 			if (e.target.id == 'ldapServerURL')
 				regex = /[\\[\]\~`!@#$%^&*()+={}|;"',<>?\s]/g;
-			else if (e.target.id == 'projectName' || e.target.id == 'releaseTxt' || e.target.id == 'cycleTxt')
+			else if (e.target.id == 'projectName' || e.target.id == 'releaseTxt' || e.target.id == 'cycleTxt' || e.target.id == 'releaseName' || e.target.id == 'cycleName')
 				regex = /[-\\[\]\~`!@#$%^&*()+={}|;:"',.<>?/\s]/g;
 			else
 				regex = /[-\\0-9[\]\~`!@#$%^&*()-+={}|;:"',.<>?/\s_]/g;
@@ -2479,12 +2480,49 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$(".selectedIcon").removeClass("selectedIcon");
 		$("#sessionTab").find("img").addClass("selectedIcon");
 		blockUI("Retrieving session data...");
-		adminServices.getSessionData()
-		.then(function (res) {
-			if (res == "Invalid Session") {
+		adminServices.manageSessionData("get")
+		.then(function (data) {
+			if (data == "Invalid Session") {
 				$rootScope.redirectPage();
 			} else {
-				console.log(res);
+				data.sessionData.sort(function(a,b) { return a.username > b.username; });
+				data.clientData.sort(function(a,b) { return a.username > b.username; });
+				$scope.sessionConf.sessions = data.sessionData;
+				$scope.sessionConf.clients = data.clientData;
+			}
+			unblockUI();
+		}, function (error) {
+			console.error("Fail to load session data", error);
+		});
+	};
+
+	// Session Management: Logoff/Disconnect User
+	$scope.sessionConf.kill = function ($event) {
+		var ele = $event.target;
+		var action = $event.target.innerHTML.trim().toLowerCase();
+		var id = parseInt($event.target.dataset.id);
+		var msg, rootObj, key, obj;
+		if (action == "logout") {
+			msg = "Logging out ";
+			rootObj = $scope.sessionConf.sessions;
+			obj = rootObj[id];
+			key = obj.id;
+		} else {
+			msg = "Disconnecting ";
+			rootObj = $scope.sessionConf.clients;
+			obj = rootObj[id];
+			key = obj.mode;
+		}
+		var user = obj.username;
+		blockUI(msg+user+"...");
+		adminServices.manageSessionData(action,user,key)
+		.then(function (data) {
+			if (data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if (data == "fail") {
+				openModalPopup("Session Management", msg+"failed!")
+			} else {
+				rootObj.splice(id,1);
 			}
 			unblockUI();
 		}, function (error) {

@@ -841,8 +841,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                             ob.hiddentag = "No",
                                             tag = "iris",
                                             ob.url = "",
-                                            ob.xpath = ""                                        
-                                        }                                  
+                                            ob.xpath = "iris;"+ob.custname+";"+ob.left+";"+ob.top+";"+(ob.width+ob.left)+";"+(ob.height+ob.top)+";"+ob.tag
+										}                                  
                                     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                     // }                                       
                                 // }
@@ -918,6 +918,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             if ($scope.getScreenView == "Desktop") {
                 $("#launchDesktopApps").modal("show")
                 $(document).find("#desktopPath").val('')
+                $(document).find('#app_pid').val('');
                 $(document).find("#desktopPath").removeClass("inputErrorBorder");
             } else if ($scope.getScreenView == "DesktopJava") {
                 $("#launchOEBSApps").modal("show");
@@ -1361,6 +1362,46 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     })
     //Mobile Serial Number Keyup Function
 
+//toggling radio buttons in desktop app launch modal
+    
+$('#radio_check1').click(function() {
+    var isChecked = $('#radio_check2').is(':checked');
+    if(isChecked==true){
+        //$('input[type="radio"]').not(':checked').prop("checked", true);
+        $('#radio_check1').attr('checked',true);
+        $('#radio_check2').attr('checked',false);
+    }
+    else{
+         $('#radio_check1').attr('checked',true);
+         $('#radio_check2').attr('checked',false);   
+        //$('input[type="radio"]:not(.checked').prop("checked", true);
+    }
+    
+});
+
+$('#radio_check2').click(function() {
+    var isChecked = $('#radio_check1').is(':checked');
+    if(isChecked==true){
+        //$('input[type="radio"]').not(':checked').prop("checked", true);
+        $('#radio_check2').attr('checked',true);
+        $('#radio_check1').attr('checked',false);
+    }
+    else{
+         $('#radio_check2').attr('checked',true);
+         $('#radio_check1').attr('checked',false);   
+        //$('input[type="radio"]:not(.checked').prop("checked", true);
+    }
+    
+});
+//toggling radio buttons in desktop app launch modal
+
+// Number filter in desktop application lauch modal
+$(document).on('keypress', '#app_pid', function(e) {
+    if ((e.charCode >= 48 && e.charCode <= 57) || e.charCode == 59) return true;
+    else return false;
+    }) 
+
+
     //Initiating Scraping
     $scope.initScraping = function(e, browserType) {
         $('#compareObjectModal').modal('hide');
@@ -1391,13 +1432,15 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			
             //For Desktop
             if ($scope.getScreenView == "Desktop") {
-                if ($(document).find("#desktopPath").val() == "") {
+                if ($(document).find("#desktopPath").val() == "" && $(document).find("#app_pid").val()=="") {
                     $(document).find("#desktopPath").addClass("inputErrorBorder")
                     return false
                 } else {
                     $(document).find("#desktopPath").removeClass("inputErrorBorder")
-                    screenViewObject.appType = $scope.getScreenView,
+                        screenViewObject.appType = $scope.getScreenView,
                         screenViewObject.applicationPath = $(document).find("#desktopPath").val();
+                        screenViewObject.processID = $(document).find("#app_pid").val();
+                        screenViewObject.scrapeMethod = $("input[name='first']:checked").val();
                     $("#launchDesktopApps").modal("hide");
                     if( $rootScope.compareFlag == true){
                         blockUI(blockMsg2);
@@ -1784,8 +1827,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                         ob.hiddentag = "No",
                                         tag = "iris",
                                         ob.url = "",
-                                        ob.xpath = ""                                        
-                                    }        
+                                        ob.xpath = "iris;"+ob.custname+";"+ob.left+";"+ob.top+";"+(ob.width+ob.left)+";"+(ob.height+ob.top)+";"+ob.tag
+									}        
 
                                     // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
                                     //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
@@ -1827,8 +1870,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                                 ob.hiddentag = "No",
                                                 tag = "iris",
                                                 ob.url = "",
-                                                ob.xpath = ""                                        
-                                            }   
+                                                ob.xpath = "iris;"+ob.custname+";"+ob.left+";"+ob.top+";"+(ob.width+ob.left)+";"+(ob.height+ob.top)+";"+ob.tag
+											}
                                             var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                         // }    
                                   
@@ -1872,8 +1915,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                             ob.hiddentag = "No",
                                             tag = "iris",
                                             ob.url = "",
-                                            ob.xpath = ""                                        
-                                        }                                      
+                                            ob.xpath = "iris;"+ob.custname+";"+ob.left+";"+ob.top+";"+(ob.width+ob.left)+";"+(ob.height+ob.top)+";"+ob.tag
+										}                                      
                                     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                     // }
                                 // }
@@ -2269,6 +2312,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             })
                         }
                     }
+					  $("#saveObjects").trigger('click');
                 }
                 else{
                         deleteScrapedObjects(e);  
@@ -2432,10 +2476,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             d.css('border', "1px solid red");
             if (appType == "MobileApp") {
                 if (navigator.appVersion.indexOf("Win") != -1) {
-                    d.css('left', (rect.x / 3) + 'px');
-                    d.css('top', (rect.y / 3) - 3 + 'px');
-                    d.css('height', (rect.h / 3) + 'px');
-                    d.css('width', (rect.w / 3) + 'px');
+                    d.css('left', (rect.x * scale_highlight) + 'px');
+                    d.css('top', (rect.y * scale_highlight) + 'px');
+                    d.css('height', (rect.h * scale_highlight) + 'px');
+                    d.css('width', (rect.w * scale_highlight) + 'px');
                 } else if (navigator.appVersion.indexOf("Mac") != -1) {
                     d.css('left', rect.x + 'px');
                     if(rect.y > 450) d.css('top', (rect.y - 12) + 'px');
@@ -3353,7 +3397,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     localStorage.removeItem("_modified");
                     saveScrapeDataFlag = true;
                     openDialog("Save Scraped data", "Scraped data saved successfully.")
-                    $("a.enableActions").addClass("disableActions").removeClass("enableActions");
+                    $("a.browserIcon").removeClass("enableActions").addClass("disableActions");
                     angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
                     $("#saveObjects").attr('disabled', true);
                     deleteScrapeDataservice = true;
@@ -3532,6 +3576,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 }
                                 if (mydata[i].url == undefined) {
                                     mydata[i].url = "";
+                                }
+								if (mydata[i].cord == null) {
+                                    mydata[i].cord = "";
                                 }
                                 if (mydata[i].remarks != undefined) {
                                     if (mydata[i].remarks != getTR[i].textContent && getTR[i].textContent.trim().length > 0) {
@@ -3868,7 +3915,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             $("span.errTestCase").addClass("hide");
             //subTask = JSON.parse(window.localStorage['_CT']).subtask;
             //var testScenarioId = "e191bb4a-2c4f-4909-acef-32bc60e527bc";
-            var testScenarioId = JSON.parse(window.localStorage['_CT']).scenarioId;
+            var ctj = JSON.parse(window.localStorage['_CT']);
+            var testScenarioId = ctj.scenarioId;
+            //var screenId = ctj.screenId;
             DesignServices.getTestcasesByScenarioId_ICE(testScenarioId)
                 .then(function(data) {
                     if (data == "Invalid Session") {
@@ -3877,9 +3926,31 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     $("#dependentTestCasesContent").empty();
                     //data = data.sort();
                     for (var i = 0; i < data.length; i++) {
-                        $("#dependentTestCasesContent").append("<span class='testcaseListItem'><input data-attr = " + data[i].testcaseId + " class='checkTestCase' type='checkbox' id='dependentTestCase_" + i + "' /><label title=" + data[i].testcaseName + " class='dependentTestcases' for='dependentTestCase_" + i + "'>" + data[i].testcaseName + "</label></span><br />");
+                        $("#dependentTestCasesContent").append("<span class='testcaseListItem'><input data-attr = " + data[i].testcaseId + " class='checkTestCase' type='checkbox' id='dependentTestCase_" + i + "' /><label title=" + data[i].testcaseName + " class='dependentTestcases' for='dependentTestCase_" + i + "'>" + data[i].testcaseName + "</label></span><span class='viewReadOnlyTC'  data-id = " + data[i].testcaseId + " data-name = "+ data[i].testcaseName +"><button type='button' class='btn btn-link'>View</button></span><br />");
                     }
-
+                    $( ".viewReadOnlyTC" ).click(function() {
+                        var testCaseName = this.getAttribute('data-name'),
+                        testCaseId = this.getAttribute('data-id');
+                        DesignServices.readTestCase_ICE(undefined, testCaseId, testCaseName, 0)
+                        .then(function(response) {
+                                if (response == "Invalid Session") {
+                                    $rootScope.redirectPage();
+                                }
+                                var source = $("#handlebar-template-testcase").html();
+                                var template = Handlebars.compile(source);
+                                try{
+                                    JSON.parse(response.testcasesteps);
+                                }
+                                catch(err){
+                                    response.testcasesteps = '[]';
+                                }                                
+                                var dat = template({name:[{testcasename:response.testcasename}],rows:JSON.parse(response.testcasesteps)});
+                                var newWindow = window.open();
+                                newWindow.document.write(dat);
+                            },
+                            function(error) {});
+                            //alert( "Handler for .click() called." );
+                      });
                     //$(document).on('shown.bs.modal','#dialog-addDependentTestCase', function () {
                     if (checkedTestcases.length > 0)
                         $("input[type=checkbox].checkTestCase").prop("checked", false);
@@ -3939,6 +4010,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
     
 
+    // Details Icon Click
     $(document).on('click', '.detailsIcon', function(e) {
         modalId = '';
         modalId = e.target.id;
@@ -3946,7 +4018,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         if(e.target.className.includes('inActiveDetails')){
             openModalFormDialog('Add Test Step Details','');
             $(".stepDetailsContainer").empty()
-            $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div")
+            $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div><div class='form-group'><div class='checkbox'><label><input id='hideDetailsCheck_"+modalId+"' style='margin-top:2px;width:15px;height:16px;' class='' type='checkbox' value=''>Hide Test Step Details in Reports</label></div>")
             
         }
         else{
@@ -3959,8 +4031,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             .then(function(response) {
                     if (response == "Invalid Session") {
                         $rootScope.redirectPage();
-                    }
-                   console.log("Responseeee",response);
+                    }    
                     var testcaseSteps  = JSON.parse(response.testcase);
                     if(typeof(testcaseSteps[modalId -1].addTestCaseDetailsInfo) == "object")
                     {
@@ -3972,18 +4043,29 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                    
                     openModalFormDialog('Add Test Step Details','');
                      $(".stepDetailsContainer").empty()
-                     $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div");
+                     $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div<div class='form-group'><div class='checkbox'><label><input id='hideDetailsCheck_"+modalId+"' style='margin-top:2px;width:15px;height:16px;' class='' type='checkbox' value=''>Hide Test Step Details in Reports</label></div>");
                      $("#testDetails_"+modalId+"").val(details.testcaseDetails);
                      //$("#pass_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_pass);
                      $("#pass_"+modalId+"").find("#actualResult_"+modalId+"").val(details.actualResult_pass);
                     // $("#fail_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_fail);
                      $("#fail_"+modalId+"").find("#actualResult_"+modalId+"").val(details.actualResult_fail);
+                    var currentTestStep = testcaseSteps[modalId -1];
+                    console.log('currentTeststep', currentTestStep);
+                    if('hideTestcaseDetails' in currentTestStep)
+                    {
+                        if(currentTestStep.hideTestcaseDetails == true)
+                        {
+                            $('input#hideDetailsCheck_'+modalId+'').prop('checked', true);
+                        }
+                        else{
+                            $('input#hideDetailsCheck_'+modalId+'').prop('checked', false);
+                        }
+                    }
                 },
                 function(error) {});
         }
-      
         e.stopImmediatePropagation();
-    });
+    });;
 
 
       $scope.submit_task=function(action,e) {
@@ -4453,8 +4535,10 @@ function contentTable(newTestScriptDataLS) {
                     "actualResult_pass": actualResult_pass,
                     "actualResult_fail": actualResult_fail,
                 };
-              
+                var hideDetails = $('#hideDetailsCheck_'+modalId+'').is(':checked');
+                getTestStepDetailsRowData.hideTestcaseDetails = hideDetails;
                 $grid.jqGrid('setCell', modalId, 'addTestCaseDetailsInfo',JSON.stringify(getTestStepDetailsRowData.addTestCaseDetailsInfo));
+                $grid.jqGrid('setCell', modalId, 'hideTestcaseDetails', getTestStepDetailsRowData.hideTestcaseDetails);
                 var gridData =  $grid.jqGrid('getGridParam','data');
                 for(let i=0;i<gridData.length;i++)
                 {
@@ -4995,25 +5079,43 @@ function contentTable(newTestScriptDataLS) {
             $("select#" + rowId + "_keywordVal", row[0]).html(res);
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', 'Generic');
-        } else {
+        } //Adding @Word to the objectName dropdown
+        else if (selectedText == "@Word") {
+            objName = " ";
+            url = " ";
+            //new
+            var sc = Object.keys(keywordArrayList.word);
+            selectedKeywordList = "word";
+            var res = '';
+            for (var i = 0; i < sc.length; i++) {
+                if (selectedKeyword == sc[i]) {
+                    res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
+                } else
+                    res += '<option role="option" value="' + sc[i] + '">' + sc[i] + '</option>';
+            }
+            var row = $(e.target).closest('tr.jqgrow');
+            var rowId = row.attr('id');
+            $("select#" + rowId + "_keywordVal", row[0]).html(res);
+            selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
+            $grid.jqGrid('setCell', rowId, 'appType', 'Generic');
+        }
+        else {
 
             selectedText = replaceHtmlEntites(selectedText.trim());
             for (var i = 0; i < scrappedData.length; i++) {
                 var ob = scrappedData[i];
-                var custname1,cord;
+                var custname1;
                 var custval = ob.custname;
                 custname1 = $('<input>').html(custval).text().trim();
                 if ((custname1.replace(/\s/g, ' ') == (selectedText.replace('/\s/g', ' ')).replace('\n', ' ')) ) {
-                    if(ob.xpath){
-                        objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
-                        url = ob.url;
-                        var obType = ob.tag;
-                        var listType = ob.canselectmultiple;
-                    }
-                    else if (ob.cord){
+					var cord = null;
+					objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
+					url = ob.url;
+					var obType = ob.tag;
+					var listType = ob.canselectmultiple;
+					if (ob.cord){
                         selectedKeywordList = 'iris';
-                        objName = custname1;
-                        cord = ob.cord
+                        cord = ob.cord;
                         obType = "iris";
                         url = "";
                     }
@@ -5037,6 +5139,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+						$grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     } else if (obType == 'elementWS') {
                         var sc = Object.keys(keywordArrayList.elementWS);
@@ -5057,7 +5160,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
                         break;
                     } else if (appTypeLocal == 'Desktop' && (obType == 'button' || obType == 'input' || obType == 'select' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType =='treeview'|| obType=='TreeView' || obType=='tree' ||
-                            obType == 'list' || obType == 'edit' || obType == null || obType == 'checkbox' || obType == 'radiobutton' || obType == 'tab' || obType == 'datepicker' || obType != undefined)) {
+                            obType == 'list' || obType == 'edit' || obType == null || obType == 'checkbox' || obType == 'radiobutton' || obType == 'tab' || obType == 'datepicker' || obType == 'table' || obType != undefined)) {
                         var res = '';
                         var sc;
                         var listType = ob.canselectmultiple;
@@ -5102,7 +5205,10 @@ function contentTable(newTestScriptDataLS) {
                         } else if(obType =='iris'){
                             sc = Object.keys(keywordArrayList.iris);
                             selectedKeywordList = "iris";
-                        } else {
+                        } else if (obType == 'table') {
+                            sc = Object.keys(keywordArrayList.table);
+                            selectedKeywordList = "table";
+                        }else {
                             sc = Object.keys(keywordArrayList.element);
                             selectedKeywordList = "element";
                         }
@@ -5119,11 +5225,10 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-                        if(obType == 'iris')
-                            $grid.jqGrid('setCell', rowId, 'cord',cord);
+						$grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     } else if (appTypeLocal == 'Desktop' && (!(obType == 'push_button' || obType == 'text' || obType == 'combo_box' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType =='treeview'|| obType=='TreeView' || obType=='tree' ||
-                            obType == 'list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box' || obType == 'radio_button' || obType == 'tab' || obType == 'datepicker'))) {
+                            obType == 'list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box' || obType == 'radio_button' || obType == 'tab' || obType == 'datepicker' || obType == 'table'))) {
                         var res = '';
                         var sc = Object.keys(keywordArrayList.element);
                         selectedKeywordList = "element";
@@ -5140,6 +5245,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+						$grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     }
                     //adding for SAP
@@ -5218,8 +5324,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-						if(obType == 'iris')
-                            $grid.jqGrid('setCell', rowId, 'cord',cord);
+						$grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     } else if (appTypeLocal == 'MobileApp' &&
                         (obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0 ||
@@ -5409,6 +5514,9 @@ function contentTable(newTestScriptDataLS) {
                         } else if (obType == 'internal frame') {
                             sc = Object.keys(keywordArrayList.internalframe);
                             selectedKeywordList = "internalframe";
+                        } else if(obType =='iris'){
+                            sc = Object.keys(keywordArrayList.iris);
+                            selectedKeywordList = "iris";
                         } else {
                             sc = Object.keys(keywordArrayList.element);
                             selectedKeywordList = "element";
@@ -5427,6 +5535,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+						$grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     } else {
                         var sc = Object.keys(keywordArrayList[obType]);
@@ -5445,8 +5554,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-                        if(obType == 'iris')
-                            $grid.jqGrid('setCell', rowId, 'cord',cord);
+						$grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     }
                 }
@@ -6317,23 +6425,23 @@ function getTags(data) {
     var obnames = [];
     var appTypeLocal = JSON.parse(window.localStorage['_CT']).appType;
     if (appTypeLocal == "Web") {
-        obnames = ["@Generic","@Excel","@Custom","@Browser","@BrowserPopUp","@Object"];
+        obnames = ["@Generic","@Excel","@Custom","@Browser","@BrowserPopUp","@Object","@Word"];
     } else if (appTypeLocal == "Webservice") {
-        obnames = ["@Generic","@Excel","WebService List"];
+        obnames = ["@Generic","@Excel","WebService List","@Word"];
     } else if (appTypeLocal == "Mainframe") {
-        obnames = ["@Generic","@Excel","Mainframe List"];
+        obnames = ["@Generic","@Excel","Mainframe List","@Word"];
     } else if (appTypeLocal == "Desktop") {
-        obnames = ["@Generic","@Excel","@Window","@Custom","@Email"];
+        obnames = ["@Generic","@Excel","@Window","@Custom","@Email","@Word"];
     } else if (appTypeLocal == "DesktopJava") {
-        obnames = ["@Generic","@Excel","@Oebs","@Custom"];
+        obnames = ["@Generic","@Excel","@Oebs","@Custom","@Word"];
     } else if (appTypeLocal == "MobileApp") {
         obnames = ["@Generic","@Mobile","@Action"];
     } else if (appTypeLocal == "MobileWeb") {
         obnames = ["@Generic","@Browser","@BrowserPopUp","@Action"];
     } else if (appTypeLocal == "SAP") {
-        obnames = ["@Generic", "@Sap", "@Custom"]
+        obnames = ["@Generic", "@Sap", "@Custom","@Word"]
     } else if(appTypeLocal="System"){
-        obnames=["@Generic","@Excel","@System"];
+        obnames=["@Generic","@Excel","@System","@Word"];
     }
     for (var i = 0; i < data.length; i++) {
         obnames.push(data[i].custname);

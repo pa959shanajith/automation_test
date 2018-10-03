@@ -8,7 +8,6 @@ var socketMapNotify = {};
 
 var myserver = require('./../../server');
 var httpsServer = myserver.httpsServer;
-// var io = require('socket.io')(httpsServer);
 var io = require('socket.io').listen(httpsServer, { cookie: false });
 var notificationMsg = require('./../notifications/notifyMessages');
 var epurl = "http://" + process.env.NDAC_IP + ":" + process.env.NDAC_PORT + "/";
@@ -20,29 +19,32 @@ var screenShotPath = uiConfig.storageConfig.screenShotPath;
 
 io.on('connection', function (socket) {
 	logger.info("Inside Socket connection");
-	var address = socket.handshake.query.username;
-	logger.info("Socket connecting address %s", address);
+	var address;
 	if (socket.request._query.check == "true") {
 		logger.info("Socket request from UI");
 		address = socket.request._query.username;
+		logger.info("Socket connecting address %s", address);
 		socketMapUI[address] = socket;
 		socket.emit("connectionAck", "Success");
 	} else if (socket.request._query.check == "notify") {
 		socket.on('key', function (data) {
 			if (typeof(data) == "string") {
 				address = Buffer.from(data, "base64").toString();
+				logger.info("Socket connecting address %s", address);
 				socketMapNotify[address] = socket;
+				redisServer.redisSubClient.subscribe('UI_notify_' + address, 1);
+				//Broadcast Message
+				var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/mindmap', '/p_Utility', '/p_Reports', 'p_Weboccular', '/neuronGraphs2D', '/p_ALM', '/p_APG'];
+				notificationMsg.to = broadcastTo;
+				notificationMsg.notifyMsg = 'Server Maintenance Scheduled';
+				// var soc = socketMapNotify[address];
+				// soc.emit("notify",notificationMsg);
 			}
 		});
-		//Broadcast Message
-		var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/mindmap', '/p_Utility', '/p_Reports', 'p_Weboccular', '/neuronGraphs2D', '/p_ALM', '/p_APG'];
-		notificationMsg.to = broadcastTo;
-		notificationMsg.notifyMsg = 'Server Maintenance Scheduled';
-		// var soc = socketMapNotify[address];
-		// soc.emit("notify",notificationMsg);
 	} else {
 		logger.info("Socket request from ICE");
 		address = socket.handshake.query.username;
+		logger.info("Socket connecting address %s", address);
 		var icesession = socket.handshake.query.icesession;
 		var inputs = {
 			"icesession": icesession,
@@ -55,7 +57,7 @@ io.on('connection', function (socket) {
 			}
 		};
 		logger.info("Calling NDAC Service: updateActiveIceSessions");
-		apiclient.post(epurl + "server/updateActiveIceSessions", args,
+		var apireq = apiclient.post(epurl + "server/updateActiveIceSessions", args,
 			function (result, response) {
 			if (response.statusCode != 200) {
 				logger.error("Error occurred in updateActiveIceSessions Error Code: ERRNDAC");
@@ -78,8 +80,15 @@ io.on('connection', function (socket) {
 						logger.error("%s is not authorized to connect", address);
 					}
 					socket.disconnect(false);
+					//socket.emit("killSession", data.cmdBy);
 				}
 			}
+		});
+		apireq.on('error', function(err) {
+			socket.send("fail", "conn");
+			io.close();
+			httpsServer.close()
+			logger.error("Please run the Service API and Restart the Server");
 		});
 	}
 	module.exports.allSocketsMap = socketMap;
@@ -88,7 +97,7 @@ io.on('connection', function (socket) {
 	module.exports.socketMapNotify = socketMapNotify;
 	httpsServer.setTimeout();
 
-	socket.on('disconnect', function () {
+	socket.on('disconnect', function (reason) {
 		logger.info("Inside Socket disconnect");
 		var address;
 		// var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
@@ -96,9 +105,9 @@ io.on('connection', function (socket) {
 			address = socket.request._query.username;
 			logger.info("Disconnecting from UI socket: %s", address);
 		} else if (socket.request._query.check == "notify") {
-			// address = socket.handshake.query.username;
 			// logger.info("Disconnecting from Notification socket: %s", address);
-			// address = Buffer.from(socket.request._query.username, "base64").toString();
+			//address = Buffer.from(socket.request._query.username, "base64").toString();
+			//redisServer.redisSubClient.unsubscribe('UI_notify_' + address, 1);
 		} else {
 			var connect_flag = false;
 			logger.info("Inside ICE Socket disconnection");
@@ -132,13 +141,19 @@ io.on('connection', function (socket) {
 					}
 				};
 				logger.info("Calling NDAC Service: updateActiveIceSessions");
-				apiclient.post(epurl + "server/updateActiveIceSessions", args,
+				var apireq = apiclient.post(epurl + "server/updateActiveIceSessions", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						logger.error("Error occurred in updateActiveIceSessions Error Code: ERRNDAC");
 					} else {
 						logger.info("%s is disconnected", address);
 					}
+				});
+				apireq.on('error', function(err) {
+					socket.send("fail", "disconn");
+					io.close();
+					httpsServer.close()
+					logger.error("Please run the Service API and Restart the Server");
 				});
 			}
 		}

@@ -229,7 +229,7 @@ if (cluster.isMaster) {
 
         //Role Based User Access to services
         app.post('*', function(req, res, next) {
-            var roleId = req.session.activeRole;
+            var roleId = req.session.activeRoleId;
             var updateinp = {
                 roleid: roleId || "ignore",
                 servicename: req.url.replace("/", "")
@@ -358,7 +358,7 @@ if (cluster.isMaster) {
                 }
             };
 
-            if (req.session.activeRole == req.session.defaultRoleId) {
+            if (req.session.activeRoleId == req.session.defaultRoleId) {
                 if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >= 0) {
                     req.session.destroy();
                     res.status(401).redirect('/');
@@ -457,8 +457,8 @@ if (cluster.isMaster) {
         app.post('/saveData', mindmap.saveData);
         app.post('/saveEndtoEndData', mindmap.saveEndtoEndData);
         app.post('/excelToMindmap', mindmap.excelToMindmap);
-		app.post('/getScreens',mindmap.getScreens);
-
+        app.post('/getScreens',mindmap.getScreens);
+        app.post('/exportToExcel',mindmap.exportToExcel);
         //Login Routes
         app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
         app.post('/loadUserInfo_Nineteen68', login.loadUserInfo_Nineteen68);
@@ -474,7 +474,7 @@ if (cluster.isMaster) {
         app.post('/assignProjects_ICE', admin.assignProjects_ICE);
         app.post('/getAssignedProjects_ICE', admin.getAssignedProjects_ICE);
         app.post('/getAvailablePlugins', admin.getAvailablePlugins);
-        app.post('/getSessionData', admin.getSessionData);
+        app.post('/manageSessionData', admin.manageSessionData);
         app.post('/manageUserDetails', admin.manageUserDetails);
         app.post('/getUserDetails', admin.getUserDetails);
         app.post('/testLDAPConnection', admin.testLDAPConnection);
@@ -515,11 +515,12 @@ if (cluster.isMaster) {
         app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
         app.post('/reportStatusScenarios_ICE', report.reportStatusScenarios_ICE);
         app.post('/renderReport_ICE', report.renderReport_ICE);
-        app.post('/getMainReport_ICE', report.getMainReport_ICE);
+        // app.post('/getMainReport_ICE', report.getMainReport_ICE);
         app.post('/getReport_Nineteen68', report.getReport_Nineteen68);
         app.post('/exportToJson_ICE', report.exportToJson_ICE);
         app.post('/openScreenShot', report.openScreenShot);
         app.post('/connectJira_ICE', report.connectJira_ICE);
+        app.post('/getReportsData_ICE', report.getReportsData_ICE);
         //Plugin Routes
         app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
         app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
@@ -576,25 +577,7 @@ if (cluster.isMaster) {
             logger.error("Please run the Service API");
         }
 
-        //-------------JS REPORT SERVER BEGINS------------//
-        var reportingApp = express();
-        app.use('/reportServer', reportingApp);
-        var jsreport = require('jsreport')({
-            express: {
-                app: reportingApp,
-                server: httpsServer
-            },
-            appPath: "/reportServer"
-        });
-
-        jsreport.init(function() {
-            // running
-        }).catch(function(e) {
-            // error during startup
-            logger.error(e.stack);
-            process.exit(1);
-        });
-        //-------------JS REPORT SERVER ENDS------------//
+      
 
         //To prevent can't send header response
         app.use(function(req, res, next) {

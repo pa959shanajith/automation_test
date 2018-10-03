@@ -56,7 +56,7 @@ exports.manageUserDetails = function(req, res){
 			var inputs = {};
 			inputs.action = action;
 			inputs.createdby = req.session.username;
-			inputs.createdbyrole = req.session.defaultRole;
+			inputs.createdbyrole = req.session.activeRole;
 			inputs.username = (reqData.username || "").trim();
 			inputs.ciuser = reqData.ciUser || false;
 			inputs.ldapuser = reqData.ldapUser;
@@ -1849,15 +1849,18 @@ exports.testLDAPConnection = function(req, res){
 					else if (err.errno == "INSUFFICIENT_ACCESS_RIGHTS") {
 						if (authType == "simple") flag = "insufficient_access";
 						else flag = "success";
-					} else if (err.lde_message.indexOf("DSID-0C0906E8") > -1) {
-						if (authType == "simple") flag = "insufficient_access";
-						else flag = "invalid_auth";
-					} else if (err.lde_message.indexOf("DSID-031522C9") > -1) {
-						flag = "insufficient_access";
-						logger.error("User Does not have sufficient Access!");
-					} else if (err.lde_message.indexOf("DSID-0C0903A9") > -1 && authType == "simple") flag = "invalid_credentials";
-					else if (err.lde_message.indexOf("DSID-031007DB") > -1) flag = "invalid_basedn";
+					} else if (err.lde_message) {
+						if (err.lde_message.indexOf("DSID-0C0906E8") > -1) {
+							if (authType == "simple") flag = "insufficient_access";
+							else flag = "invalid_auth";
+						} else if (err.lde_message.indexOf("DSID-031522C9") > -1) {
+							flag = "insufficient_access";
+							logger.error("User Does not have sufficient Access!");
+						} else if (((err.lde_message.indexOf("DSID-0C0903A9") > -1) || (err.lde_message.indexOf("DSID-0C090400") > -1)) && authType == "simple") flag = "invalid_credentials";
+						else if (err.lde_message.indexOf("DSID-031007DB") > -1) flag = "invalid_basedn";
+					}
 					else flag = "fail";
+					logger.debug("Error occured in admin/testLDAPConnection: " + JSON.stringify(err));
 				}
 				if (flag == "success") {
 					logger.info('LDAP Connection test passed!');
@@ -2036,9 +2039,8 @@ exports.getLDAPConfig = function(req, res){
 										}
 									}
 									if (result) {
-										var uName = result.dn.split(',')[0].split('=')[1];
 										data = {
-											username: uName,
+											username: result[filter],
 											firstname: result[dataMaps.fName],
 											lastname: result[dataMaps.lName],
 											email: result[dataMaps.email],
@@ -2106,30 +2108,62 @@ exports.getLDAPConfig = function(req, res){
 	}
 };
 
-exports.getSessionData = function (req, res) {
-	logger.info("Inside UI service: getSessionData");
+exports.manageSessionData = function (req, res) {
+	logger.info("Inside UI service: manageSessionData");
 	try {
 		if (utils.isSessionActive(req.session)) {
-			utils.allSess(function(err, sessions){
-				if (err) {
-					logger.error("Error occurred in admin/getSessionData");
-					logger.debug(err);
-					return res.status(500).send("fail");
-				}
-				var sessionData = {};
-				sessions.forEach(function(e){
-					sessionData[e.username]={
-						id: Buffer.from(e.uniqueId).toString("base64"),
-						role: e.defaultRole
-					};
+			var currUser = req.session.username;
+			var action = req.body.action;
+			var user = req.body.user;
+			var key = req.body.key;
+			var data = {sessionData: [], clientData: []};
+			if (action == "get") {
+				logger.info("Inside UI service: manageSessionData/getSessions");
+				utils.getSocketList("ICE", function(connectusers) {
+					connectusers.forEach(function(e) {
+						data.clientData.push({
+							username: e[0],
+							mode: e[1],
+							ip: e[2]
+						});
+					});
+					utils.allSess(function(err, sessions){
+						if (err) {
+							logger.error("Error occurred in admin/manageSessionData");
+							logger.debug(err);
+						} else {
+							sessions.forEach(function(e) {
+								if (currUser != e.username) {
+									data.sessionData.push({
+										username: e.username,
+										id: Buffer.from(e.uniqueId).toString("base64"),
+										role: e.activeRole,
+										loggedin: (new Date(e.cookie.expires)).toLocaleString(),
+										ip: e.ip
+									});
+								}
+							});
+						}
+						return res.send(data);
+					});
 				});
-				res.send(sessionData);
-			});
+			} else if (action == "logout" || action == "disconnect") {
+				logger.info("Inside UI service: manageSessionData/"+action);
+				if (action == "logout") key = Buffer.from(req.body.key, "base64").toString();
+				var d2s = {"action":action, "key":key, "user":user, "cmdBy":currUser};
+				utils.delSession(d2s, function(err){
+					if (err) {
+						logger.error("Error occurred in admin/manageSessionData: Fail to "+action+" "+user);
+						logger.debug(err);
+						return res.status(500).send("fail");
+					} else return res.send("success");
+				});
+			}
 		} else {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error("Error occurred in admin/getSessionData:",exception);
+		logger.error("Error occurred in admin/manageSessionData:",exception);
 		res.status(500).send("fail");
 	}
 };

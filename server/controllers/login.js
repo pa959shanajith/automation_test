@@ -117,6 +117,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 							req.session.username = username;
 							req.session.uniqueId = sessId;
 							req.session.userid = userid;
+							req.session.ip = req.ip;
 							logger.info("User Authenticated successfully");
 							res.send(flag);
 						} else if (validUser == true && assignedProjects == false) {
@@ -136,6 +137,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 							req.session.username = username;
 							req.session.uniqueId = sessId;
 							req.session.userid = userid;
+							req.session.ip = req.ip;
 							logger.info("User Authenticated successfully");
 							res.send(flag);
 						} else {
@@ -364,10 +366,9 @@ function ldapCheck(ldapdata, cb) {
 					logger.error("Error occurred in ldap authentication");
 					logger.debug("Error occurred in ldap authentication : " + JSON.stringify(err));
 					cb("fail");
-				} else {
-					if (auth) cb("pass");
-					else cb("pass");
 				}
+				else if (auth) cb("pass");
+				else cb("fail");
 			});
 		}
 	});
@@ -413,7 +414,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 									jsonService.username = service.username.toLowerCase();
 									selectedRole = selectedRole||jsonService.role;
 									req.session.defaultRoleId = jsonService.role;
-									req.session.activeRole = selectedRole;
+									req.session.activeRoleId = selectedRole;
 								} else {
 									logger.info("User info not found");
 									res.send("fail");
@@ -450,6 +451,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 									res.send("fail");
 								} else {
 									if (selectedRole == req.session.defaultRoleId) req.session.defaultRole = rolename;
+									req.session.activeRole = rolename;
 									jsonService.rolename = req.session.defaultRole;
 								}
 								callback();

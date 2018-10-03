@@ -84,7 +84,7 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
-		saveData: function (versioning_enabled,assignedTo,writeFlag,userRole,from_v,to_v,cur_module,mapData,deletednode,unassignTask,prjId,relId,cycId,selectedTab){
+		saveData: function (versioning_enabled,assignedTo,writeFlag,from_v,to_v,cur_module,mapData,deletednode,unassignTask,prjId,relId,cycId,selectedTab){
 			var param = "/saveData";
 			if (versioning_enabled==1){
 				param = "/saveDataVersioning";
@@ -93,7 +93,6 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 					action: param,
 					sendNotify:assignedTo,
 					write:writeFlag,
-					userRole:userRole,
 					vn_from: from_v,
 					vn_to: to_v,
 					tab: cur_module,
@@ -107,17 +106,13 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 			})
 			.then(function (response) { return response.data; },
 					function (response) { return $q.reject(response.data); });
-
-    		
     	},
-		saveEndtoEndData: function (assignedTo,writeFlag,userRole,from_v,to_v,cur_module,mapData,deletednode,unassignTask,prjId,relId,cycId){
-					
+		saveEndtoEndData: function (assignedTo,writeFlag,from_v,to_v,cur_module,mapData,deletednode,unassignTask,prjId,relId,cycId){
     		var param = "saveEndtoEndData";
     		return $http.post('/saveEndtoEndData', {
     			action: param,
 				sendNotify:assignedTo,
 				write:writeFlag,
-				userRole:userRole,
 				vn_from: from_v,
 				vn_to: to_v,
 				tab: cur_module,
@@ -132,7 +127,6 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     				function (response) { return $q.reject(response.data); });
     	},
 		reviewTask: function (projectId,taskId,taskstatus,version,batchTaskIDs){
-					
     		var param = "reviewTask";
     		return $http.post('/reviewTask', {
     			action: param,
@@ -170,16 +164,14 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
-		createVersion: function (param,userRole,srcprojectId,dstprojectId,vn_from,vn_to,write) {
+		createVersion: function (param,srcprojectId,dstprojectId,vn_from,vn_to,write) {
     		return $http.post('/createVersion', {
     			action: param,
-				userRole:userRole,
 				srcprojectId:srcprojectId,
 				dstprojectId:dstprojectId,
 				vn_from:vn_from,
 				vn_to:vn_to,
 				write:write
-
     		})
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
@@ -201,5 +193,18 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
+		exportToExcel: function(excelMap){
+			var param = "/exportToExcel";
+			return $http.post('/exportToExcel',{
+				 action: param,
+				 excelMap: excelMap
+				 //responseType: 'arraybuffer'
+			},{responseType:'arraybuffer'})
+			
+    		
+    		.then(function (response) { return response.data; },
+    				function (response) { return $q.reject(response.data); });
+    	
+		}
 	}
 }]);

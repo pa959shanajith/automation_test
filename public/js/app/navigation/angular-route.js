@@ -134,6 +134,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/plugins/jquery-ui.min.js',
 						'js/plugins/dtree.m.scrapper.js',
 						'js/plugins/jquery.tablednd.js',
+						'js/plugins/handlebar.js',
 						'js/controllers/chatbot/chatbotController.js',
 						'js/controllers/chatbot/chatbotService.js',
 						'js/controllers/login/loginService.js',
@@ -152,6 +153,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
+						'js/plugins/handlebar.js',
 						'js/factories/socketFactory.js',
 						'js/controllers/chatbot/chatbotController.js',
 						'js/controllers/chatbot/chatbotService.js',
@@ -159,7 +161,8 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/controllers/header/headerController.js',
 						'js/controllers/mindmap/mindmapService.js',
 						'js/controllers/execution/executionController.js',
-						'js/controllers/execution/executionService.js'
+						'js/controllers/execution/executionService.js',
+						'js/controllers/design/designService.js'
                     ]);
                 }]
             }
@@ -253,6 +256,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/controllers/chatbot/chatbotService.js',
 						'js/controllers/login/loginService.js',						
 						'js/controllers/header/headerController.js',
+						'js/controllers/mindmap/mindmapService.js',
 						'js/controllers/Reports/reportsController.js',
 						'js/controllers/Reports/reportService.js'
                     ]);

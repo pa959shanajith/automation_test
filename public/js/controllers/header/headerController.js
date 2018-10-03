@@ -53,43 +53,67 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	}
 	$("#notifications-count").hide();
 
-	
+
+	socket.on('killSession', function (value) {
+		$rootScope.redirectPage();
+	});
+
 	socket.on('notify', function (value) {
-		if(value.count == 0){
-			var dateTime = new Date().toLocaleString();
-			if (value.to.indexOf($location.$$path) >= 0) {
-				$('.top-left').notify({
-					message: {
-						text: value.notifyMsg
-					},
-					animate: {
-						enter: 'animated fadeInRight',
-						exit: 'animated fadeOutRight'
+		var isDuplicateNotificationMsg;
+		if(window.localStorage.notification)
+		{
+			var notificationArrList = JSON.parse(window.localStorage.notification);
+			for(let i=0;i<notificationArrList.length;i++)
+			{
+				if(value.notifyMsg == notificationArrList[i].notifyMsg)
+				{
+					isDuplicateNotificationMsg = true;
+				}
+			}
+			if(isDuplicateNotificationMsg == true)
+			{
+				return;
+			}
+		}
+		if(isDuplicateNotificationMsg != true)
+		{
+			if(value.count == 0){
+				var dateTime = new Date().toLocaleString();
+				if (value.to.indexOf($location.$$path) >= 0) {
+					$('.top-left').notify({
+						message: {
+							text: value.notifyMsg
+						},
+						animate: {
+							enter: 'animated fadeInRight',
+							exit: 'animated fadeOutRight'
+						}
+					}).show();
+			}
+				
+					value.count = value.count + 1;
+					if (window.localStorage.notification) {
+						var notificationArr = window.localStorage.notification;
+						notificationArr = JSON.parse(notificationArr);
+						value.dateTime = dateTime;
+						notificationArr.push(value);
+						notificationArr = JSON.stringify(notificationArr);
+						window.localStorage.notification = notificationArr;
+						$scope.notifications = JSON.parse(window.localStorage.notification);
+						$scope.$apply();
+					}else {
+						var notificationArr = [];
+						value.dateTime = dateTime;
+						notificationArr.push(value);
+						notificationArr = JSON.stringify(notificationArr)
+						window.localStorage.notification = notificationArr;
+						$scope.notifications = JSON.parse(window.localStorage.notification);
+						$scope.$apply();
 					}
-				}).show();
+					unreadNotifications();
+					}
 		}
-			
-		value.count = value.count + 1;
-		if (window.localStorage.notification) {
-			var notificationArr = window.localStorage.notification;
-			notificationArr = JSON.parse(notificationArr);
-			value.dateTime = dateTime;
-			notificationArr.push(value);
-			notificationArr = JSON.stringify(notificationArr);
-			window.localStorage.notification = notificationArr;
-			$scope.notifications = JSON.parse(window.localStorage.notification);
-			$scope.$apply();
-		}else {
-			var notificationArr = [];
-			value.dateTime = dateTime;
-			notificationArr.push(value);
-			notificationArr = JSON.stringify(notificationArr)
-			window.localStorage.notification = notificationArr;
-			$scope.notifications = JSON.parse(window.localStorage.notification);
-			$scope.$apply();
-		}
-		unreadNotifications();
-		}
+
 	});
 
 	function unreadNotifications() {
