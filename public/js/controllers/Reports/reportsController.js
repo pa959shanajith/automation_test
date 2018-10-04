@@ -1068,12 +1068,13 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 		blockUI("loading report ...");
 		$timeout(function(){
 			var robj = JSON.parse(window.localStorage['redirectedReportObj']);
-			$('#selectProjects').val(robj.projectId);
+			$('#selectProjects').val(robj.testSuiteDetails[0].projectidts);
 			$('#selectProjects').trigger('change');
-			$timeout(function(){$('#selectReleases').val(robj.releaseid);
+			$timeout(function(){$('#selectReleases').val(robj.testSuiteDetails[0].releaseid);
 			$('#selectReleases').trigger('change');},1500);
-			$timeout(function(){$('#selectCycles').val(robj.cycleid);
-				$('#selectCycles').trigger('change'); unblockUI();
+			$timeout(function(){$('#selectCycles').val(robj.testSuiteDetails[0].cycleid);
+				unblockUI();
+				$('#selectCycles').trigger('change'); 
 			},3000);
 		},1500);
 	}	
