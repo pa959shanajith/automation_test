@@ -3191,9 +3191,16 @@ li.select_all .addCustObj{
 
 /*****************ADMIN CSS NEW ************************/
 .containerWrap {
-	float: left;
-	width: 100%;
-	height: 100%
+    float: left;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    max-height: calc(100% - 0px);
+}
+
+#releaseList,#cycleList
+{
+    overflow-y: auto !important; 
 }
 
 .adminActionBtn {
