@@ -323,6 +323,11 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 		$(".report-table-body tr").filter(function() {
 		  $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
 		});
+		var counter = 1;
+		$(".report-table-body tr:visible").each(function(){
+			$(this).children('td[scope=row]').text(counter);
+			counter++;
+		});
 	  });
 
 	//Service call to get start and end details of suites
