@@ -5147,8 +5147,15 @@ function contentTable(newTestScriptDataLS) {
                 var custval = ob.custname;
                 custname1 = $('<input>').html(custval).text().trim();
                 if ((custname1.replace(/\s/g, ' ') == (selectedText.replace('/\s/g', ' ')).replace('\n', ' ')) ) {
+					var isIos = scrappedData[i].text;
+                    if(isIos == 'ios')
+                    {
+                        objName = ob.xpath;
+                    }
+                    else{
+					    objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
+					}
 					var cord = null;
-					objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
 					url = ob.url;
 					var obType = ob.tag;
 					var listType = ob.canselectmultiple;
