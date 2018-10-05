@@ -783,6 +783,9 @@ input[type="radio"]{
 
 .description-item{
     padding: 1px 10px;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 /*****************Plugin CSS*****************/
 
