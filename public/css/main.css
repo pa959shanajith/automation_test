@@ -774,6 +774,16 @@ input[type="radio"]{
 .pluginSection{
 	height: calc(100% - 124px);
 }
+
+
+.description-container{
+    background: #dad8d8;
+    margin: 0!important;
+}
+
+.description-item{
+    padding: 1px 10px;
+}
 /*****************Plugin CSS*****************/
 
 
