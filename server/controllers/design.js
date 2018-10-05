@@ -128,10 +128,24 @@ exports.initScraping_ICE = function (req, res) {
 						var mobileDeviceName = req.body.screenViewObject.mobileDeviceName;
 						var mobileIosVersion = req.body.screenViewObject.mobileIosVersion;
 						var mobileUDID = req.body.screenViewObject.mobileUDID;
+						var deviceName = req.body.screenViewObject.deviceName;
+						var versionNumber = req.body.screenViewObject.versionNumber;
+						var bundleId = req.body.screenViewObject.bundleId;
+						var ipAddress = req.body.screenViewObject.ipAddress;
+						var data = "LAUNCH_MOBILE";
 						logger.info("Sending socket request for LAUNCH_MOBILE to redis");
-						dataToIce = {"emitAction" : "LAUNCH_MOBILE","username" : name,
-									 "apkPath":apkPath,"serial":serial,"mobileDeviceName":mobileDeviceName,
-									 "mobileIosVersion":mobileIosVersion,"mobileUDID":mobileUDID};
+						if(req.body.screenViewObject.param == 'ios')
+						{
+							dataToIce = {"emitAction" : "LAUNCH_MOBILE","username" : name,
+							"deviceName":deviceName,"versionNumber":versionNumber,"bundleId":bundleId,
+							"ipAddress":ipAddress,"param":"ios"};
+						}
+						else{
+							dataToIce = {"emitAction" : "LAUNCH_MOBILE","username" : name,
+							"apkPath":apkPath,"serial":serial,"mobileDeviceName":mobileDeviceName,
+							"mobileIosVersion":mobileIosVersion,"mobileUDID":mobileUDID};
+						}
+						
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						var updateSessionExpiry = utils.resetSession(req.session);
 						function LAUNCH_MOBILE_listener(channel, message) {
