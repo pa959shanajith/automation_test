@@ -410,7 +410,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			$scope.filterDat.releaseids.push(obj.taskDetails[tidx].releaseid);
 			$scope.filterDat.relcycmap[obj.taskDetails[tidx].releaseid] = [obj.taskDetails[tidx].cycleid];
 		}
-		else if($scope.filterDat.cycleids.indexOf(obj.taskDetails[tidx].cycleid) == -1){
+		if($scope.filterDat.cycleids.indexOf(obj.taskDetails[tidx].cycleid) == -1){
 			$scope.filterDat.cycleids.push(obj.taskDetails[tidx].cycleid);
 			$scope.filterDat.relcycmap[obj.taskDetails[tidx].releaseid].push(obj.taskDetails[tidx].cycleid);			
 		}

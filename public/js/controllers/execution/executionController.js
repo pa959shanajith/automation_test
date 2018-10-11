@@ -739,10 +739,13 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	//Execute TestSuite Functionality
 	$scope.ExecuteTestSuite = function($event){
 		if($scope.moduleInfo.length <= 0){
+			var current_task = JSON.parse(window.localStorage['_CT']);
 			$.each($(".parentSuiteChk"), function(){
 				var suiteInfo = {};
 				var selectedRowData = [];
 				//suiteInfo.suiteDetails = [];
+				var relidreport = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].releaseid;
+				var cycidreport = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].cycleid;				
 				if($(this).is(":checked") == true){
 					$(this).parent().parent().next().find('tbody input[type=checkbox]:checked').each(function() {
 						selectedRowData.push({
@@ -764,6 +767,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					suiteInfo.testsuiteid = $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
 					suiteInfo.browserType = browserTypeExe;
 					suiteInfo.appType = appType;
+					suiteInfo.releaseid = relidreport;
+					suiteInfo.cycleid = cycidreport;					
 					//console.log("suiteInfo:::" + suiteInfo)
 					$scope.moduleInfo.push(suiteInfo);
 				}

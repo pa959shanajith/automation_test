@@ -767,8 +767,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 													reportInfoObj.projectid = projectid;
 													var inputs = {
 														"query": "cycleid",
-														"suiteid": testsuiteId,
-														"suitename": testsuitename
+														"reportid": reportId
 													};
 													var args = {
 														data: inputs,
@@ -1253,7 +1252,8 @@ exports.getReportsData_ICE = function (req, res) {
 	if(req.body.reportsInputData.type == "scenarioreports"){
 		var inputs = {
 			"query": "allreports",
-			"scenarioid": req.body.reportsInputData.scenarioid
+			"scenarioid": req.body.reportsInputData.scenarioid,
+			"cycleid": req.body.reportsInputData.cycleid			
 		};	
 		var args = {
 			data: inputs,
@@ -1296,7 +1296,7 @@ exports.getReportsData_ICE = function (req, res) {
 					var reportScenarioObj = [];
 					var inputs = {
 						"query": "scenarionamemap",
-						"scenarioid": eachtestsuite.testscenarioids
+						"scenarioid": eachtestsuite.testscenarioids,
 					};	
 					var args = {
 						data: inputs,
@@ -1316,7 +1316,8 @@ exports.getReportsData_ICE = function (req, res) {
 	
 								var inputs = {
 									"query": "allreports",
-									"scenarioid": scenarioid
+									"scenarioid": scenarioid,
+									"cycleid": req.body.reportsInputData.cycleId									
 								};	
 								var args = {
 									data: inputs,

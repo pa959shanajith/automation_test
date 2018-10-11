@@ -180,6 +180,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 			var scenarioId = $(this)[0].report.scenarioId;
 			var reportsInputData = {};
 			reportsInputData.scenarioid = scenarioId;
+			reportsInputData.cycleid = $scope.cycleNames;
 			reportsInputData.type = "scenarioreports";
 			$scope.reportIdx = $(this)[0].report.idx;
 			$(".highlightReportRow").removeClass("highlightReportRow");
