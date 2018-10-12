@@ -596,7 +596,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		redisServer.redisSubServer.subscribe('ICE2_' + name);
 		var batchExecutionData = req.body.moduleInfo;
 		var userInfo = {"user_id": req.session.userid, "role": req.session.activeRole};
-		var testsuitedetailslist = [];
+		var testsuitedetailslist = [],testsuiteidcycmap = {};
 		var scenariodescriptionobject = {};
 		var testsuiteIds = [];
 		var executionRequest = {
@@ -633,6 +633,8 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 			var suiteDetails = eachbatchExecutionData.suiteDetails;
 			var testsuitename = eachbatchExecutionData.testsuitename;
 			var testsuiteid = eachbatchExecutionData.testsuiteid;
+			var releaseid = eachbatchExecutionData.releaseid;
+			var cycleid = eachbatchExecutionData.cycleid;			
 			var browserType = eachbatchExecutionData.browserType;
 			var apptype = eachbatchExecutionData.appType;
 			var listofscenarioandtestcases = [];
@@ -641,6 +643,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 			var conditionchecklist = [];
 			var browserTypelist = [];
 			testsuiteIds.push(testsuiteid);
+			testsuiteidcycmap[testsuiteid] = cycleid;
 			async.forEachSeries(suiteDetails, function (eachsuiteDetails, eachsuiteDetailscallback) {
 				var executionjson = {
 					"scenarioIds": [],
@@ -655,6 +658,8 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 				conditionchecklist.push(eachsuiteDetails.condition);
 				browserTypelist.push(eachsuiteDetails.browserType);
 				currentscenarioid = eachsuiteDetails.scenarioids;
+				executionjson.releaseid = releaseid;
+				executionjson.cycleid = cycleid;			
 				scenariodescriptionobject[eachsuiteDetails.scenarioids] = eachsuiteDetails.scenariodescription;
 				logger.info("Calling function TestCaseDetails_Suite_ICE from ExecuteTestSuite_ICE");
 				TestCaseDetails_Suite_ICE(currentscenarioid, userInfo.user_id, function (currentscenarioidError, currentscenarioidResponse) {
@@ -760,6 +765,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 												"testsuiteid": testsuiteid,
 												"testscenarioid": scenarioid,
 												"browser": req_browser,
+												"cycleid": testsuiteidcycmap[testsuiteid],
 												"status": resultData.reportData.overallstatus[0].overallstatus,
 												"report": JSON.stringify(reportdata),
 												"query": "insertreportquery"

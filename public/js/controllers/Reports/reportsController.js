@@ -157,8 +157,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 								$('.reportBody.report-table-body').animate({
 									scrollTop: $("[report-idx="+latestidx+"]").offset().top-$("[report-idx=1]").offset().top
 								}, 500);	
-								$("[report-idx="+latestidx+"]").css('border','2px solid orange');
-								$timeout(function(){$("[report-idx="+latestidx+"]").css('border','none');},10000);
+								$("[report-idx="+latestidx+"]").addClass('highlightReportRow');
+								$timeout(function(){$("[report-idx="+latestidx+"]").removeClass('highlightReportRow');},10000);
 							},500);
 	
 						}
@@ -180,6 +180,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 			var scenarioId = $(this)[0].report.scenarioId;
 			var reportsInputData = {};
 			reportsInputData.scenarioid = scenarioId;
+			reportsInputData.cycleid = $scope.cycleNames;
 			reportsInputData.type = "scenarioreports";
 			$scope.reportIdx = $(this)[0].report.idx;
 			$(".highlightReportRow").removeClass("highlightReportRow");
@@ -322,6 +323,11 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 		var value = $(this).val().toLowerCase();
 		$(".report-table-body tr").filter(function() {
 		  $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+		});
+		var counter = 1;
+		$(".report-table-body tr:visible").each(function(){
+			$(this).children('td[scope=row]').text(counter);
+			counter++;
 		});
 	  });
 
@@ -1068,12 +1074,13 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 		blockUI("loading report ...");
 		$timeout(function(){
 			var robj = JSON.parse(window.localStorage['redirectedReportObj']);
-			$('#selectProjects').val(robj.projectId);
+			$('#selectProjects').val(robj.testSuiteDetails[0].projectidts);
 			$('#selectProjects').trigger('change');
-			$timeout(function(){$('#selectReleases').val(robj.releaseid);
+			$timeout(function(){$('#selectReleases').val(robj.testSuiteDetails[0].releaseid);
 			$('#selectReleases').trigger('change');},1500);
-			$timeout(function(){$('#selectCycles').val(robj.cycleid);
-				$('#selectCycles').trigger('change'); unblockUI();
+			$timeout(function(){$('#selectCycles').val(robj.testSuiteDetails[0].cycleid);
+				unblockUI();
+				$('#selectCycles').trigger('change'); 
 			},3000);
 		},1500);
 	}	
