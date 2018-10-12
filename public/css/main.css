@@ -5715,9 +5715,17 @@ ul.browserInlineIcons
     text-align: left;
     line-height: 1.1 !important;
 }
+
 .executionCount
 {
+    color: blue;    
+}
+
+.executionCount:hover
+{
     cursor: pointer;
+    text-decoration: underline;
+    color: #633690;    
 }
 .filterReport
 {
