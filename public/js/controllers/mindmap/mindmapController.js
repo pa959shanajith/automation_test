@@ -1021,7 +1021,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (taskUndef) {
                     tObj.id = null;
                     tObj.oid = null;
-                    d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
+                    d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
                 }
                 // If task already exists then set it to true
                 if (dNodes[pi].task) taskStatus = 'updated';
@@ -1101,7 +1101,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             dNodes[e].task = tempTask;
                             dNodes[e].task.copied = true;
                             dNodes[e].task.copiedidx = pi;
-                            d3.select('#ct-node-' + e).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('style', 'opacity:1').attr('x', 29).attr('y', -10);
+                            d3.select('#ct-node-' + e).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('style', 'opacity:1').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
                         });
                     }
                     dNodes[pi].task.copied = false;
@@ -1128,7 +1128,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         } else if (reviewerFlag == false) {
             openDialogMindmap("Task Assignment Error", "Please select Reviewer/Assigned User")
         } else if (taskflag) {
-            if (p.select('.ct-nodeTask')[0][0] == null) p.append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
+            if (p.select('.ct-nodeTask')[0][0] == null) p.append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
         } else if (taskflag == false) {
             openDialogMindmap("Task Assignment Error", "Please create the structure before assigning task")
         }
@@ -2980,7 +2980,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function clickHideElements(e) {
-        if( event.target !== this ) {return;}
+        if( d3.event.target !== this ) {return;}
         d3.select('#ct-inpBox').classed('no-disp', !0);
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
         d3.select('#ct-assignBox').classed('no-disp', !0);    
@@ -3962,7 +3962,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             d.id = uNix++;
             addNode_W(d, !0, d.parent);
             if ($scope.tab != 'mindmapEndtoEndModules') {
-                if (d.task != null) d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
+                if (d.task != null) d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
             }
         });
         dLinks = d3Tree.links(dNodes);
