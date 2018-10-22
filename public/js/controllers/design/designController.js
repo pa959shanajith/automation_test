@@ -4057,7 +4057,7 @@ $(document).on('keypress', '#app_pid', function(e) {
         if(e.target.className.includes('inActiveDetails')){
             openModalFormDialog('Add Test Step Details','');
             $(".stepDetailsContainer").empty()
-            $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div><div class='form-group'><div class='checkbox'><label><input id='hideDetailsCheck_"+modalId+"' style='margin-top:2px;width:15px;height:16px;' class='' type='checkbox' value=''>Hide Test Step Details in Reports</label></div>")
+            $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div>")
             
         }
         else{
@@ -4082,24 +4082,24 @@ $(document).on('keypress', '#app_pid', function(e) {
                    
                     openModalFormDialog('Add Test Step Details','');
                      $(".stepDetailsContainer").empty()
-                     $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div<div class='form-group'><div class='checkbox'><label><input id='hideDetailsCheck_"+modalId+"' style='margin-top:2px;width:15px;height:16px;' class='' type='checkbox' value=''>Hide Test Step Details in Reports</label></div>");
+                     $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div>");
                      $("#testDetails_"+modalId+"").val(details.testcaseDetails);
                      //$("#pass_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_pass);
                      $("#pass_"+modalId+"").find("#actualResult_"+modalId+"").val(details.actualResult_pass);
                     // $("#fail_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_fail);
                      $("#fail_"+modalId+"").find("#actualResult_"+modalId+"").val(details.actualResult_fail);
-                    var currentTestStep = testcaseSteps[modalId -1];
-                    console.log('currentTeststep', currentTestStep);
-                    if('hideTestcaseDetails' in currentTestStep)
-                    {
-                        if(currentTestStep.hideTestcaseDetails == true)
-                        {
-                            $('input#hideDetailsCheck_'+modalId+'').prop('checked', true);
-                        }
-                        else{
-                            $('input#hideDetailsCheck_'+modalId+'').prop('checked', false);
-                        }
-                    }
+                    // var currentTestStep = testcaseSteps[modalId -1];
+                    // console.log('currentTeststep', currentTestStep);
+                    // if('hideTestcaseDetails' in currentTestStep)
+                    // {
+                    //     if(currentTestStep.hideTestcaseDetails == true)
+                    //     {
+                    //         $('input#hideDetailsCheck_'+modalId+'').prop('checked', true);
+                    //     }
+                    //     else{
+                    //         $('input#hideDetailsCheck_'+modalId+'').prop('checked', false);
+                    //     }
+                    // }
                 },
                 function(error) {});
         }
@@ -4575,9 +4575,9 @@ function contentTable(newTestScriptDataLS) {
                     "actualResult_fail": actualResult_fail,
                 };
                 var hideDetails = $('#hideDetailsCheck_'+modalId+'').is(':checked');
-                getTestStepDetailsRowData.hideTestcaseDetails = hideDetails;
+                //getTestStepDetailsRowData.hideTestcaseDetails = hideDetails;
                 $grid.jqGrid('setCell', modalId, 'addTestCaseDetailsInfo',JSON.stringify(getTestStepDetailsRowData.addTestCaseDetailsInfo));
-                $grid.jqGrid('setCell', modalId, 'hideTestcaseDetails', getTestStepDetailsRowData.hideTestcaseDetails);
+                //$grid.jqGrid('setCell', modalId, 'hideTestcaseDetails', getTestStepDetailsRowData.hideTestcaseDetails);
                 var gridData =  $grid.jqGrid('getGridParam','data');
                 for(let i=0;i<gridData.length;i++)
                 {
