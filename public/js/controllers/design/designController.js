@@ -3859,7 +3859,8 @@ $(document).on('keypress', '#app_pid', function(e) {
                                     {
                                         if(parseInt($(this)[0].getAttribute("val")) == parseInt(custnameIndices[q][r]))                                   // if($.trim($(this)[0].childNodes[0].childNodes[2].innerHTML) == $.trim(duplicateCustnamesLen[q]))
                                         {
-                                            $(this)[0].style.display = 'block';               //Display duplicate custnames only
+                                            $(this)[0].style.display = 'block';                     //Display duplicate custnames only
+                                            $(this)[0].children[0].children[2].style.color = 'red'; //Display duplicate custnames in red color
                                         }
                                     }
 								 
