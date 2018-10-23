@@ -472,7 +472,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             var resultString = JSON.parse(reader.result);
                             //var resultString = reader.result;
                             for (i = 0; i < resultString.length; i++) {
-                                if (resultString[i].appType == appType || resultString[i].appType.toLowerCase() == "generic") {
+                                if(resultString[i].appType.toLowerCase() == "generic"){
+                                    flag = true;
+                                } else if (resultString[i].appType == appType) {
                                     flag = true;
                                     break;
                                 } else {
@@ -542,7 +544,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     if ((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase() == "json") {
                         var resultString = JSON.parse(reader.result);
                         for (i = 0; i < resultString.length; i++) {
-                            if (resultString[i].appType == appType || resultString[i].appType.toLowerCase() == "generic") {
+                            if (resultString[i].appType.toLowerCase() == "generic"){
+                                flag = true;
+                            } else if (resultString[i].appType == appType) {
                                 flag = true;
                                 break;
                             } else {
@@ -603,7 +607,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     reader.onload = function(e) {
                         var resultString = JSON.parse(reader.result);
                         for (i = 0; i < resultString.length; i++) {
-                            if (resultString[i].appType == appType || resultString[i].appType.toLowerCase() == "generic") {
+                            if (resultString[i].appType.toLowerCase() == "generic"){
+                                flag = true;
+                            }
+                            else if (resultString[i].appType == appType) {
                                 flag = true;
                                 break;
                             } else {
