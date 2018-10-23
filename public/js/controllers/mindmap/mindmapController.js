@@ -4574,7 +4574,7 @@ Purpose : displaying pop up for replication of project
                 $(".endtoend-modulesContainer").prop("style", "height: 28% !important;");
                 //$("#ct-canvas").prop("style","height: 352px !important")
             } else {
-                $(".endtoend-modulesContainer").css("height", "calc(100% - 643px)");
+                $(".endtoend-modulesContainer").css("height", "calc(100% - 657px)");
                 //$("#ct-canvas").prop("style","height: 660px !important")
             }
             $(this).attr("src", "imgs/ic-collapse.png");
