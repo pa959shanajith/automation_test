@@ -540,7 +540,8 @@ input[type="radio"]{
 }
 
 .task-heading {
-    font-family: LatoWeb
+    font-family: LatoWeb;
+    -moz-margin-start: -13px;
 }
 
 .list-inline-right {
