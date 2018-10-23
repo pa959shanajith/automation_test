@@ -1890,6 +1890,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                         //If enable append is inactive
                         else {
                             //Before Saving the Scrape JSON to the Database
+                            debugger;
                             for (var i = 0; i < viewString.view.length; i++) {
                                 var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
 
@@ -3262,6 +3263,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                     }
 
                 });
+                console.log('duplicateCustnames', duplicateCustnames);
                  if(isDuplicateCustNames) {
                     openDialog("Save Scrape data", "");
                     $("#globalModal").find('.modal-body p').html("<span><strong>Please rename/delete duplicate scraped objects</strong></span><br /><br /><strong>Object characterstics are same for:</strong>").css("color", "#000").append("<ul class='custList'></ul>");
@@ -3815,14 +3817,14 @@ $(document).on('keypress', '#app_pid', function(e) {
                             {
                                 for(var l=0;l<newScrapedList.view.length;l++)
                                 {
-                                    allCustnames.push(newScrapedList.view[l].custname);       //get all custnames
+                                    allCustnames.push($.trim(newScrapedList.view[l].custname).replace(/[<>]/g, ''));       //get all custnames
                                 }
                             }
                             if('view' in viewString)
                             {
                                 for(var m=0;m<viewString.view.length;m++)
                                 {
-                                    allCustnames.push(viewString.view[m].custname);           //get all custnames
+                                    allCustnames.push($.trim(viewString.view[m].custname).replace(/[<>]/g, ''));           //get all custnames
                                 }
                             }
                            
@@ -3833,7 +3835,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                             {
                                 for(var n=0;n<viewString.view.length;n++)
                                 {
-                                    allCustnames.push(viewString.view[n].custname);           //get all custnames
+                                    allCustnames.push($.trim(viewString.view[n].custname).replace(/[<>]/g, ''));           //get all custnames
                                 }
                             }
                         }
@@ -3857,7 +3859,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                                 $.each($("#scraplist li"), function() {
                                     for(var r=0;r<custnameIndices[q].length -1;r++)
                                     {
-                                        if(parseInt($(this)[0].getAttribute("val")) == parseInt(custnameIndices[q][r]))                                   // if($.trim($(this)[0].childNodes[0].childNodes[2].innerHTML) == $.trim(duplicateCustnamesLen[q]))
+                                        if($.trim(parseInt($(this)[0].getAttribute("val"))) == $.trim(parseInt(custnameIndices[q][r])))                                   // if($.trim($(this)[0].childNodes[0].childNodes[2].innerHTML) == $.trim(duplicateCustnamesLen[q]))
                                         {
                                             $(this)[0].style.display = 'block';                     //Display duplicate custnames only
                                             $(this)[0].children[0].children[2].style.color = 'red'; //Display duplicate custnames in red color
@@ -3866,6 +3868,10 @@ $(document).on('keypress', '#app_pid', function(e) {
 								 
                                 });
                             }
+                            // else if(custnameIndices[q].length == 1)
+                            // {
+                            //   console.log('QQQQQ',custnameIndices[q]);
+                            // }
                         }
                 }
                 else{
