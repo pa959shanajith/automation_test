@@ -1890,7 +1890,6 @@ $(document).on('keypress', '#app_pid', function(e) {
                         //If enable append is inactive
                         else {
                             //Before Saving the Scrape JSON to the Database
-                            debugger;
                             for (var i = 0; i < viewString.view.length; i++) {
                                 var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
 
@@ -4333,7 +4332,6 @@ function contentTable(newTestScriptDataLS) {
                         if (getScrapeDataforCustomObj[i].xpath == "" && !getScrapeDataforCustomObj[i].cord) {
                             var testGridData = $("#jqGrid tbody tr:not(.jqgfirstrow)");
                             $.each(testGridData, function() {
-                                debugger;
                                 if ($(this).find("td[aria-describedby='jqGrid_custname']").text() == scrappedData[i].custname) {
                                     $(this).find("td[aria-describedby='jqGrid_custname']").addClass("addCustObj");
 
@@ -6492,7 +6490,6 @@ function drop(ev) {
         $(".objectExistMap").show();
         return false
     } else {
-        debugger;
         $(".objectExistMap").hide()
         getDraggedEle = ev.dataTransfer.getData("text/plain").trim()
         getDraggedEle = $(getDraggedEle)[0];
