@@ -787,6 +787,10 @@ input[type="radio"]{
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.task-switch{
+    color: #633693!important;
+}
 /*****************Plugin CSS*****************/
 
 
