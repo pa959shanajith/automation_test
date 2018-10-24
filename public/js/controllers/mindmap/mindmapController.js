@@ -441,7 +441,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 "attributes": ["at", "rw", "sd", "ed", "re_estimation", "pg", "cx"]
             },
             "testcases": {
-                "task": ["Update", "Design"],
+                "task": ["Design", "Update"],
                 "attributes": ["at", "rw", "sd", "ed", "re_estimation", "cx"]
             }
         };
@@ -1403,6 +1403,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             $('#ct-assignedTo').append("<option data-id='" + res.userRoles[i] + "' value='" + res.r_ids[i] + "'>" + res.userRoles[i] + "</option>");
                         }
                         $("#ct-assignedTo option[value='" + tObj.at + "']").attr('selected', 'selected');
+                        if($("#ct-assignedTo").val() != "select user"){
+                            $('#ct-assignedTo').attr('disabled', 'disabled');
+                            $('#ct-assignedTo').css('background', '#ebebe4');    
+                        }
                     }, function(error) {
                         console.log("Error:::::::::::::", error);
                         unblockUI();
@@ -3120,7 +3124,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         };
         childCounter(1, tree);
         var newHeight = d3.max(levelCount) * 90;
-        var d3Tree = d3.layout.tree().size([newHeight * 1.5, cSize[0]]);
+        var d3Tree = d3.layout.tree().size([newHeight * 2, cSize[0]]);
         // if(tree.oid===undefined) d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
         // else d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
 
