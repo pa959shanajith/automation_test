@@ -2288,7 +2288,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                         var dontChkViewString = 0;
                         $.each($("input[type=checkbox].checkall:checked"), function() {  
                             for (var i = 0; i < newScrapedList.view.length; i++) {
-                                if ($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == newScrapedList.view[i].custname.trim()) {
+                                if ($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == newScrapedList.view[i].custname.trim().replace(/[<>]/g, '')) {
                                     if(!(isInArray(newScrapedList.view.indexOf(newScrapedList.view[i]), getIndexOfDeletedObjects))){
                                         getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
                                         $(this).parents("li.select_all").remove();
@@ -2301,7 +2301,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                         if($("input[type=checkbox].checkall:checked").length != dontChkViewString){ 
                             $.each($("input[type=checkbox].checkall:checked"), function() {
                                 for (var i = 0; i < viewString.view.length; i++) {
-                                    if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == viewString.view[i].custname.trim()) {
+                                    if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ').replace(/[<>]/g, '') == viewString.view[i].custname.trim().replace(/[<>]/g, '')) {
                                         if(!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))){
                                             getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
                                             $(this).parents("li.select_all").remove();
