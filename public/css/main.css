@@ -951,7 +951,8 @@ input[type="radio"]{
 	transition: opacity .2s;
 	-webkit-transition: opacity .2s;
 	transition-timing-function: ease-out;
-	-webkit-transition-timing-function: ease-out;
+    -webkit-transition-timing-function: ease-out;
+    pointer-events: none;
 }
 
 #left-top-section ul li a.disableActions:hover, #left-top-section ul li a.disableActions:hover span img{
