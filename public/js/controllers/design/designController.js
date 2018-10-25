@@ -1814,7 +1814,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                                     var path = newScrapedList.view[i].xpath;
                                     var ob = newScrapedList.view[i];
                                     ob.tempId = i;
-                                    custN = ob.custname;
+                                    custN = ob.custname.replace(/[<>]/g, '');
                                     var tag = ob.tag;
                                     if (tag == "dropdown") {
                                         imgTag = "select"
