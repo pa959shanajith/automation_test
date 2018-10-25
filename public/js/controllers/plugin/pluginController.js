@@ -446,22 +446,22 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		* Another dict for releaseid and cyclelist out of task json
 		* List of apptype and tasktype
 		*/
-		if(!validID(obj.projectId)) return;
-		if(!validID(obj.taskDetails[tidx].releaseid)) return;
-		if(!validID(obj.taskDetails[tidx].cycleid)) return;
+		// if(!validID(obj.projectId)) return;
+		// if(!validID(obj.taskDetails[tidx].releaseid)) return;
+		// if(!validID(obj.taskDetails[tidx].cycleid)) return;
 
-		if($scope.filterDat.projectids.indexOf(obj.projectId) == -1){
+		if(validID(obj.projectId) && $scope.filterDat.projectids.indexOf(obj.projectId) == -1){
 			$scope.filterDat.projectids.push(obj.projectId);
 			$scope.filterDat.prjrelmap[obj.projectId] = [obj.taskDetails[tidx].releaseid];
 		}
-		if($scope.filterDat.releaseids.indexOf(obj.taskDetails[tidx].releaseid) == -1){
+		if(validID(obj.taskDetails[tidx].releaseid) && $scope.filterDat.releaseids.indexOf(obj.taskDetails[tidx].releaseid) == -1){
 			$scope.filterDat.releaseids.push(obj.taskDetails[tidx].releaseid);
-			if($scope.filterDat.prjrelmap[obj.projectId].indexOf(obj.taskDetails[tidx].releaseid) == -1){
+			if(validID(obj.projectId) && $scope.filterDat.prjrelmap[obj.projectId].indexOf(obj.taskDetails[tidx].releaseid) == -1){
 				$scope.filterDat.prjrelmap[obj.projectId].push(obj.taskDetails[tidx].releaseid);
 			}
 			$scope.filterDat.relcycmap[obj.taskDetails[tidx].releaseid] = [obj.taskDetails[tidx].cycleid];
 		}
-		if($scope.filterDat.cycleids.indexOf(obj.taskDetails[tidx].cycleid) == -1){
+		if(validID(obj.taskDetails[tidx].cycleid) && $scope.filterDat.cycleids.indexOf(obj.taskDetails[tidx].cycleid) == -1){
 			$scope.filterDat.cycleids.push(obj.taskDetails[tidx].cycleid);
 			$scope.filterDat.relcycmap[obj.taskDetails[tidx].releaseid].push(obj.taskDetails[tidx].cycleid);			
 		}
