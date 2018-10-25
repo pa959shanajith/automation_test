@@ -1091,7 +1091,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     dNodes[pi].task.cx = undefined;
                     dNodes[pi].task.details = '';
                 }
-
+                if(!taskUndef && !origTask){
+                    dNodes[pi].task.reviewer = tObj.rw;
+                    dNodes[pi].task.endDate = tObj.ed;
+                }
                 dNodes[pi].task.tstatus = taskStatus;
 
                 function replicateTask(pi) {

@@ -792,6 +792,12 @@ input[type="radio"]{
 .task-switch{
     color: #633693!important;
 }
+.active-task{
+    border: none!important;
+    background: #dad8d8!important;
+    padding: 1px!important; 
+    margin-top: 0px !important;   
+}
 /*****************Plugin CSS*****************/
 
 

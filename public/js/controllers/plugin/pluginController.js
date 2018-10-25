@@ -478,16 +478,19 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			else
 				var olddescriptionid = "null"
 			$(".description-container").remove();
+			$(".active-task").removeClass("active-task");
 			var clickedtask = this.parentElement.parentElement.parentElement.getAttribute('panel-id');
 			if(clickedtask == olddescriptionid){
 				$(".description-container").remove();
+				$(".active-task").removeClass("active-task");
 				return;
 			} 
 			if($scope.taskJson[clickedtask].taskDetails[0].taskType == 'Design')
 				var adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+$scope.filterDat.idnamemaprel[$scope.taskJson[clickedtask].releaseid]+'">Release: '+$scope.filterDat.idnamemaprel[$scope.taskJson[clickedtask].releaseid]+'</li><li class="description-item" title="Cycle: '+$scope.filterDat.idnamemapcyc[$scope.taskJson[clickedtask].cycleid]+'">Cycle: '+$scope.filterDat.idnamemapcyc[$scope.taskJson[clickedtask].cycleid]+'</li><li class="description-item" title="Apptype: '+$scope.taskJson[0].appType+'">Apptype: '+$scope.taskJson[0].appType+'</li></div>';
 			else
 				var adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+$scope.filterDat.idnamemaprel[$scope.taskJson[clickedtask].testSuiteDetails[0].releaseid]+'">Release: '+$scope.filterDat.idnamemaprel[$scope.taskJson[clickedtask].testSuiteDetails[0].releaseid]+'</li><li class="description-item" title="Cycle: '+$scope.filterDat.idnamemapcyc[$scope.taskJson[clickedtask].testSuiteDetails[0].cycleid]+'">Cycle: '+$scope.filterDat.idnamemapcyc[$scope.taskJson[clickedtask].testSuiteDetails[0].cycleid]+'</li><li class="description-item" title="Apptype: '+$scope.taskJson[0].appType+'">Apptype: '+$scope.taskJson[0].appType+'</li></div>';
-			$(adddetailhtml).insertAfter("[panel-id="+clickedtask+"]",1000).hide().show('slow');
+			$(adddetailhtml).insertAfter("[panel-id="+clickedtask+"]");
+			$("[panel-id="+clickedtask+"]").addClass("active-task");
 		});
 	}
 
