@@ -4752,9 +4752,11 @@ Purpose : displaying pop up for replication of project
         if (mod) {
             //add to module
             $('[data-nodetype=modules]').addClass('node-selected');
+			$('[data-nodetype=modules]').children('title').text('Click this Module to Paste');
         } else {
             //highlight scenarios
             $('[data-nodetype=scenarios]').addClass('node-selected');
+			$('[data-nodetype=scenarios]').children('title').text('Click this Scenario to Paste');
         }
         if (!$('#pasteImg1').hasClass('active-map')) {
             dNodes_c = [];
