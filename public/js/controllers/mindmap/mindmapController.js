@@ -4748,21 +4748,30 @@ Purpose : displaying pop up for replication of project
         dNodes_c.forEach(function(e, i) {
             if (e.type == 'scenarios')
                 mod = true; // then check for dangling screen
-        })
+        })        
         if (mod) {
             //add to module
             $('[data-nodetype=modules]').addClass('node-selected');
-			$('[data-nodetype=modules]').children('title').text('Click this Module to Paste');
         } else {
             //highlight scenarios
             $('[data-nodetype=scenarios]').addClass('node-selected');
-			$('[data-nodetype=scenarios]').children('title').text('Click this Scenario to Paste');
         }
         if (!$('#pasteImg1').hasClass('active-map')) {
             dNodes_c = [];
             dLinks_c = [];
-            $('.node-selected').removeClass('node-selected');
+            $('.node-selected').removeClass('node-selected');            
         }
+        $(".node-selected").mouseenter(function(){
+            if(!$(this).children("title").text().includes("Click ")){
+                $(this).children("title").text("Click "+$(this).children("title").text()+" to Paste");
+            }
+        })
+        $(".node-selected").mouseleave(function(){
+            if($(this).children("title").text().includes("Click ")){
+                $(this).children("title").text($(this).children("title").text().replace("Click ",""));
+                $(this).children("title").text($(this).children("title").text().replace(" to Paste",""));
+            }
+        })
     }
     $scope.parsefile = function() {
         console.log("Hi! parsed file.");
