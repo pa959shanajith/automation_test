@@ -540,7 +540,8 @@ input[type="radio"]{
 }
 
 .task-heading {
-    font-family: LatoWeb
+    font-family: LatoWeb;
+    -moz-margin-start: -13px;
 }
 
 .list-inline-right {
@@ -700,7 +701,7 @@ input[type="radio"]{
     font-size: 14px;
     border-radius: 20px;
     height: 25px;
-    width: 75px;
+    width: 80px;
     background: #a08ab7;
     color: white;
     font-weight: lighter;
@@ -950,7 +951,8 @@ input[type="radio"]{
 	transition: opacity .2s;
 	-webkit-transition: opacity .2s;
 	transition-timing-function: ease-out;
-	-webkit-transition-timing-function: ease-out;
+    -webkit-transition-timing-function: ease-out;
+    pointer-events: none;
 }
 
 #left-top-section ul li a.disableActions:hover, #left-top-section ul li a.disableActions:hover span img{

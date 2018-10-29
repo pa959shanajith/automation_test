@@ -163,9 +163,9 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	})
 
 	//Search form filter
-	$('.searchInput').keyup(function(e) {
+	$('.searchInput').keyup(function(event) {
 		filter(this,event); 
-		e.stopImmediatePropagation();
+		event.stopImmediatePropagation();
 	});
 
 	function filter(element,event) {
