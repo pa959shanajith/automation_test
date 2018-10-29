@@ -1643,3 +1643,7 @@ var tes_row_count = 2;
 		res.send("Invalid Session");
 	}
 }
+
+exports.getDomain = function(req,res){
+	admin.getDomains_ICE(req,res);
+}

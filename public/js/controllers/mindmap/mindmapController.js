@@ -11,6 +11,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     var idxSearch = 0;
     $scope.verticalLayout = false;
     $scope.moving = false;
+    $scope.apptype = '';
     var sections = {
         'modules': 112,
         'scenarios': 237,
@@ -149,6 +150,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             if (res == "Invalid Session") {
                 $rootScope.redirectPage();
             }
+            
+            // Fetch apptype and domain
+    
+
             if (res.projectId.length > 0) {
                 $scope.projectList = [];
                 for (i = 0; i < (res.projectId.length && res.projectName.length); i++) {
@@ -165,6 +170,22 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (!$scope.projectNameO) {
                     $scope.projectNameO = res.projectId[0];
                 }
+                mindmapServices.getDomain().then(function(result) {
+                    if (result == "Invalid Session") {
+                        $rootScope.redirectPage();
+                    } else {
+                        $scope.domaininfo = result;
+                        mindmapServices.getProjectTypeMM_Nineteen68($scope.projectNameO).then(function(res1){
+                            $scope.apptypelist = res1;
+                            $scope.apptype = res1.project_typename;
+                            addInfo({'attributes':{
+                                                    'Domain': $scope.domaininfo[0].domainName,
+                                                    'Apptype':$scope.apptype
+                                                }
+                                    });
+                        });                   
+                    }
+                });                
                 if ($scope.tab == 'tabAssign') {
                     $("#ctExpandAssign .iconSpaceArrow").trigger('click');
                     mindmapServices.populateReleases($scope.projectNameO).then(function(result) {
@@ -347,6 +368,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         } else if ($scope.tab == 'tabCreate') {
             loadMindmapData1();
         }
+        mindmapServices.getProjectTypeMM_Nineteen68($scope.projectNameO).then(function(res1){
+            $scope.apptypelist = res1;
+            $scope.apptype = res1.project_typename;
+            addInfo({'attributes':{
+                'Domain': $scope.domaininfo[0].domainName,
+                'Apptype':$scope.apptype
+                }
+            });
+        });            
     };
 
     function addSearchNodeListeners() {
@@ -1157,10 +1187,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function addInfo(d) {
-        attrArr = "<strong>Node Type:</strong> " + d.type;
+        if(d.type){
+            attrArr = "<strong>Node Type:</strong> " + d.type+"<br>";
+        }
+        else{
+            attrArr = "";            
+        }
         for (var key in d.attributes) {
             if (d.attributes[key])
-                attrArr += "<br><strong>" + key + ":</strong> " + d.attributes[key];
+                attrArr += "<strong>" + key + ":</strong> " + d.attributes[key]+"<br>";
         }
         d3.select('#window-pi p.proj-info-wrap').html(attrArr);
     };
@@ -1298,7 +1333,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 attributes: {
                     'Task': dNodes[pi].taskexists.task,
                     'Release': reldata[dNodes[pi].taskexists.release],
-                    'Cycle': cycdata[dNodes[pi].taskexists.cycle]
+                    'Cycle': cycdata[dNodes[pi].taskexists.cycle],
+                    'Domain': $scope.domaininfo[0].domainName,
+                    'Apptype':$scope.apptype
                 }
             });
             if (!$("#right-dependencies-section").is(":visible")) {
@@ -1565,7 +1602,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         addInfo({
             type: dNodes[idx].type,
             attributes: {
-                'name': dNodes[idx].name
+                'Name': dNodes[idx].name,
+                'Domain': $scope.domaininfo[0].domainName,
+                'Apptype':$scope.apptype
             }
         });
         activeNode = "#ct-node-" + idx;
