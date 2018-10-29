@@ -2156,7 +2156,7 @@ exports.manageSessionData = function (req, res) {
 										username: e.username,
 										id: Buffer.from(e.uniqueId).toString("base64"),
 										role: e.activeRole,
-										loggedin: (new Date(e.cookie.expires)).toLocaleString(),
+										loggedin: (new Date(e.loggedin)).toLocaleString(),
 										ip: e.ip
 									});
 								}
