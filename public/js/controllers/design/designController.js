@@ -831,7 +831,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                     var ob = viewString.view[i];
                                     addcusOb = '';
                                     ob.tempId = i;
-                                    custN = ob.custname;
+                                    custN = ob.custname.replace(/[<>]/g, '').trim();
                                     var tag = ob.tag;
                                     if (tag == "dropdown") {
                                         imgTag = "select"
@@ -3269,7 +3269,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                     }
 
                 });
-                console.log('duplicateCustnames', duplicateCustnames);
+                //console.log('duplicateCustnames', duplicateCustnames);
                  if(isDuplicateCustNames) {
                     openDialog("Save Scrape data", "");
                     $("#globalModal").find('.modal-body p').html("<span><strong>Please rename/delete duplicate scraped objects</strong></span><br /><br /><strong>Object characterstics are same for:</strong>").css("color", "#000").append("<ul class='custList'></ul>");
