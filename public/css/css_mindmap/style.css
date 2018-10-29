@@ -459,7 +459,7 @@
     padding:0 10px;
     top:0px;
     z-index:100;
-    height:34px;
+    height:40px;
     width:83%;
     background-color:#e6e7e9;
     border:1px solid#e6e7e9;
@@ -508,7 +508,7 @@
  #ct-expand-left.ct-rev{
     position:relative;
     left:160px;
-    z-index:9999;
+    z-index:9999
 }
  #ct-expand-left.ct-rev::after{
     left:-5px;
@@ -522,7 +522,7 @@
  #ct-expand-right.ct-rev{
     position:relative;
     right:84px;
-    z-index:9999;
+    z-index:9999
 }
  #ct-expand-right.ct-expand::after{
     left:-5px;
@@ -1279,6 +1279,8 @@
 }
  #ctExpandCreate img, #ctExpandAssign img {
      vertical-align: bottom;
+     position: absolute;
+     top: -8px;
 }
  .searchbox-assign, .searchbox-create{
      margin-left:6.5%;

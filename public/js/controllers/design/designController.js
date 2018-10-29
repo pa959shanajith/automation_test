@@ -472,7 +472,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             var resultString = JSON.parse(reader.result);
                             //var resultString = reader.result;
                             for (i = 0; i < resultString.length; i++) {
-                                if (resultString[i].appType == appType || resultString[i].appType.toLowerCase() == "generic") {
+                                if(resultString[i].appType.toLowerCase() == "generic"){
+                                    flag = true;
+                                } else if (resultString[i].appType == appType) {
                                     flag = true;
                                     break;
                                 } else {
@@ -542,7 +544,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     if ((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase() == "json") {
                         var resultString = JSON.parse(reader.result);
                         for (i = 0; i < resultString.length; i++) {
-                            if (resultString[i].appType == appType || resultString[i].appType.toLowerCase() == "generic") {
+                            if (resultString[i].appType.toLowerCase() == "generic"){
+                                flag = true;
+                            } else if (resultString[i].appType == appType) {
                                 flag = true;
                                 break;
                             } else {
@@ -603,7 +607,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     reader.onload = function(e) {
                         var resultString = JSON.parse(reader.result);
                         for (i = 0; i < resultString.length; i++) {
-                            if (resultString[i].appType == appType || resultString[i].appType.toLowerCase() == "generic") {
+                            if (resultString[i].appType.toLowerCase() == "generic"){
+                                flag = true;
+                            }
+                            else if (resultString[i].appType == appType) {
                                 flag = true;
                                 break;
                             } else {
@@ -764,7 +771,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             $(".disableActions").addClass("enableActions").removeClass("disableActions");
             $("#enableAppend").prop("disabled", true).css('cursor', 'no-drop')
         } else {
-            $(".enableActions").addClass("disableActions").removeClass("enableActions");
+            $(".enableActions").addClass("disableActions").removeClass("enableActions").parent('li').css('cursor','not-allowed');
             $("#enableAppend").prop("disabled", false).css('cursor', 'pointer')
         }
         //enableScreenShotHighlight = true;
@@ -803,7 +810,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         } else {
 
                             console.log("Data There");
-                            $(".enableActions").addClass("disableActions").removeClass("enableActions");
+                            $(".enableActions").addClass("disableActions").removeClass("enableActions").parent('li').css('cursor','not-allowed');
                             $("#enableAppend").prop("disabled", false).css('cursor', 'pointer')
                         }
                         //console.log("response data: ", viewString);
@@ -1621,7 +1628,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                         eaCheckbox = false;
                         var scrapedObjectsLen = $("span.ellipsis").length;
                         if(scrapedObjectsLen > 0) {
-                           $(".enableActions").removeClass("enableActions").addClass("disableActions");
+                           $(".enableActions").removeClass("enableActions").addClass("disableActions").parent('li').css('cursor','not-allowed');
                         } else {
                            $(".disableActions").removeClass("disableActions").addClass("enableActions");
                         }
@@ -1632,7 +1639,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                         eaCheckbox = false;
                         var scrapedObjectsLen = $("span.ellipsis").length;
                         if(scrapedObjectsLen > 0) {
-							$(".enableActions").removeClass("enableActions").addClass("disableActions");
+							$(".enableActions").removeClass("enableActions").addClass("disableActions").parent('li').css('cursor','not-allowed');
                         } else {
                             $(".disableActions").removeClass("disableActions").addClass("enableActions");
                         }
@@ -3398,7 +3405,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                     localStorage.removeItem("_modified");
                     saveScrapeDataFlag = true;
                     openDialog("Save Scraped data", "Scraped data saved successfully.")
-                    $("a.browserIcon").removeClass("enableActions").addClass("disableActions");
+                    $("a.browserIcon").removeClass("enableActions").addClass("disableActions").parent('li').css('cursor','not-allowed');
                     angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
                     $("#saveObjects").attr('disabled', true);
                     deleteScrapeDataservice = true;
