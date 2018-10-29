@@ -4611,17 +4611,17 @@ Purpose : displaying pop up for replication of project
                 $(".endtoend-modulesContainer").css("height", "calc(100% - 430px)");
                 //$("#ct-canvas").prop("style","height: 410px !important")
             }
-            $(this).attr("src", "imgs/ic-collapseup.png");
+            $('.iconSpace.collapseEte').attr("src", "imgs/ic-collapseup.png");
             collapseEteflag = false;
         } else {
             if (screen.height < 1024) {
                 $(".endtoend-modulesContainer").prop("style", "height: 28% !important;");
                 //$("#ct-canvas").prop("style","height: 352px !important")
             } else {
-                $(".endtoend-modulesContainer").css("height", "calc(100% - 657px)");
+                $(".endtoend-modulesContainer").css("height", "");
                 //$("#ct-canvas").prop("style","height: 660px !important")
             }
-            $(this).attr("src", "imgs/ic-collapse.png");
+            $('.iconSpace.collapseEte').attr("src", "imgs/ic-collapse.png");
             collapseEteflag = true;
         }
     }
