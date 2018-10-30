@@ -85,7 +85,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 									if (validUser == true && userLogged == true) {
 										flag = "userLogged";
 										logger.info("User already logged in");
-										req.session.destroy();
+										//req.session.destroy();
 										res.send(flag);
 									} else {
 										//Check whether projects are assigned for a user
@@ -101,50 +101,40 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 				}
 			}
 
-			function checkAssignedProjects_callback(err, assignedProjectsData, role) {
+			function checkAssignedProjects_callback(err, assignedProjects, role) {
 				if(err == 'fail') {
 					logger.error("Error occured in authenticateUser_Nineteen68 Error Code : ERRNDAC");
 					res.send('fail');
 				} else {
 					logger.info("Inside function call of checkAssignedProjects");
-					if (role != "Admin" && role != "Business Analyst" && role != "Tech Lead") {
-						if (assignedProjectsData > 0) {
-							assignedProjects = true;
-						}
-						if (validUser == true && assignedProjects == true) {
+					if (validUser == true) {
+						req.session.username = username;
+						req.session.uniqueId = sessId;
+						req.session.userid = userid;
+						req.session.ip = req.ip;
+						req.session.loggedin = (new Date).toISOString()
+						if (role == "Admin") {
 							flag = 'validCredential';
 							addUsernameAndIdInLogs(username,flag,userid);
-							req.session.username = username;
-							req.session.uniqueId = sessId;
-							req.session.userid = userid;
-							req.session.ip = req.ip;
 							logger.info("User Authenticated successfully");
 							res.send(flag);
-						} else if (validUser == true && assignedProjects == false) {
-							flag = 'noProjectsAssigned';
-							logger.info("User has not been assigned any projects");
-							req.session.destroy();
-							res.send(flag);
 						} else {
-							logger.info("User Authentication failed");
-							req.session.destroy();
-							res.send(flag);
+							if (assignedProjects) {
+								flag = 'validCredential';
+								addUsernameAndIdInLogs(username,flag,userid);
+								logger.info("User Authenticated successfully");
+								res.send(flag);
+							} else {
+								flag = 'noProjectsAssigned';
+								logger.info("User has not been assigned any projects");
+								req.session.destroy();
+								res.send(flag);
+							}
 						}
 					} else {
-						if (validUser == true) {
-							flag = 'validCredential';
-							addUsernameAndIdInLogs(username,flag,userid);
-							req.session.username = username;
-							req.session.uniqueId = sessId;
-							req.session.userid = userid;
-							req.session.ip = req.ip;
-							logger.info("User Authenticated successfully");
-							res.send(flag);
-						} else {
-							logger.info("User Authentication failed");
-							req.session.destroy();
-							res.send(flag);
-						}
+						logger.info("User Authentication failed");
+						req.session.destroy();
+						res.send(flag);
 					}
 				}
 			}
@@ -193,7 +183,7 @@ function checkAssignedProjects(username, callback) {
 	var userid = '';
 	var roleid = '';
 	var rolename;
-	var assignedProjectsLen = '';
+	var assignedProjects = false;
 	var flag = 'fail';
 	async.series({
 		getUserId: function (callback) {
@@ -268,12 +258,9 @@ function checkAssignedProjects(username, callback) {
 						callback(flag);
 					} else {
 						if (projectsResult.rows.length > 0 && projectsResult.rows[0].projectids != null) {
-							assignedProjectsLen = projectsResult.rows[0].projectids.length;
-							callback(null, assignedProjectsLen, rolename);
-						} else {
-							assignedProjectsLen = 0;
-							callback(null, assignedProjectsLen, rolename);
+							assignedProjects = projectsResult.rows[0].projectids.length!=0;
 						}
+						callback(null, assignedProjects, rolename);
 					}
 				});
 			} catch (exception) {
@@ -287,7 +274,7 @@ function checkAssignedProjects(username, callback) {
 				logger.error(err);
 				callback(flag);
 			} else {
-				callback(null, assignedProjectsLen, rolename);
+				callback(null, assignedProjects, rolename);
 			}
 		} catch (exception) {
 			logger.error(exception.message);

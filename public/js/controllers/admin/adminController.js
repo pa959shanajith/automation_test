@@ -183,7 +183,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	};
 
 	//	Assign Projects Button Click
-	$scope.assignProjects = function ($event) {
+	$scope.assignProjects = function($event){
+		$("#assignProjectModal").modal("show");
+	}
+	$scope.assignProjects1 = function ($event) {
+		$("#assignProjectModal").modal("hide");
 		unAssignedProjects = [];
 		assignedProjects = [];
 		$("#selAssignUser,#selAssignProject").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');

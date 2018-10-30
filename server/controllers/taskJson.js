@@ -226,10 +226,10 @@ function next_function(resultobj, cb, data) {
 							task_json.projectId = "";
 							taskDetails.taskName = t.task + versioningCheck() + t.batchName;
 							testSuiteDetails_obj.testsuitename = m.moduleName;
-							if (batch_dict[t.batchName] == undefined) {
-								batch_dict[t.batchName] = user_task_json.length;
+							if (batch_dict[t.batchName+'_'+t.cycle] == undefined) {
+								batch_dict[t.batchName+'_'+t.cycle] = user_task_json.length;
 							} else {
-								parent_index = batch_dict[t.batchName];
+								parent_index = batch_dict[t.batchName+'_'+t.cycle];
 								batch_task = user_task_json[parent_index];
 								batch_task.taskDetails[0].batchTaskIDs.push(t.taskID);
 								testSuiteDetails_obj.subTaskId = t.taskID;

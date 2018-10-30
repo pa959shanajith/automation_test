@@ -831,7 +831,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                     var ob = viewString.view[i];
                                     addcusOb = '';
                                     ob.tempId = i;
-                                    custN = ob.custname;
+                                    custN = ob.custname.replace(/[<>]/g, '').trim();
                                     var tag = ob.tag;
                                     if (tag == "dropdown") {
                                         imgTag = "select"
@@ -1821,7 +1821,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                                     var path = newScrapedList.view[i].xpath;
                                     var ob = newScrapedList.view[i];
                                     ob.tempId = i;
-                                    custN = ob.custname;
+                                    custN = ob.custname.replace(/[<>]/g, '');
                                     var tag = ob.tag;
                                     if (tag == "dropdown") {
                                         imgTag = "select"
@@ -2295,7 +2295,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                         var dontChkViewString = 0;
                         $.each($("input[type=checkbox].checkall:checked"), function() {  
                             for (var i = 0; i < newScrapedList.view.length; i++) {
-                                if ($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == newScrapedList.view[i].custname.trim()) {
+                                if ($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == newScrapedList.view[i].custname.trim().replace(/[<>]/g, '')) {
                                     if(!(isInArray(newScrapedList.view.indexOf(newScrapedList.view[i]), getIndexOfDeletedObjects))){
                                         getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
                                         $(this).parents("li.select_all").remove();
@@ -2308,7 +2308,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                         if($("input[type=checkbox].checkall:checked").length != dontChkViewString){ 
                             $.each($("input[type=checkbox].checkall:checked"), function() {
                                 for (var i = 0; i < viewString.view.length; i++) {
-                                    if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == viewString.view[i].custname.trim()) {
+                                    if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ').replace(/[<>]/g, '') == viewString.view[i].custname.trim().replace(/[<>]/g, '')) {
                                         if(!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))){
                                             getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
                                             $(this).parents("li.select_all").remove();
@@ -3269,6 +3269,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                     }
 
                 });
+                //console.log('duplicateCustnames', duplicateCustnames);
                  if(isDuplicateCustNames) {
                     openDialog("Save Scrape data", "");
                     $("#globalModal").find('.modal-body p').html("<span><strong>Please rename/delete duplicate scraped objects</strong></span><br /><br /><strong>Object characterstics are same for:</strong>").css("color", "#000").append("<ul class='custList'></ul>");
@@ -3822,14 +3823,14 @@ $(document).on('keypress', '#app_pid', function(e) {
                             {
                                 for(var l=0;l<newScrapedList.view.length;l++)
                                 {
-                                    allCustnames.push(newScrapedList.view[l].custname);       //get all custnames
+                                    allCustnames.push($.trim(newScrapedList.view[l].custname).replace(/[<>]/g, ''));       //get all custnames
                                 }
                             }
                             if('view' in viewString)
                             {
                                 for(var m=0;m<viewString.view.length;m++)
                                 {
-                                    allCustnames.push(viewString.view[m].custname);           //get all custnames
+                                    allCustnames.push($.trim(viewString.view[m].custname).replace(/[<>]/g, ''));           //get all custnames
                                 }
                             }
                            
@@ -3840,7 +3841,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                             {
                                 for(var n=0;n<viewString.view.length;n++)
                                 {
-                                    allCustnames.push(viewString.view[n].custname);           //get all custnames
+                                    allCustnames.push($.trim(viewString.view[n].custname).replace(/[<>]/g, ''));           //get all custnames
                                 }
                             }
                         }
@@ -3864,14 +3865,19 @@ $(document).on('keypress', '#app_pid', function(e) {
                                 $.each($("#scraplist li"), function() {
                                     for(var r=0;r<custnameIndices[q].length -1;r++)
                                     {
-                                        if(parseInt($(this)[0].getAttribute("val")) == parseInt(custnameIndices[q][r]))                                   // if($.trim($(this)[0].childNodes[0].childNodes[2].innerHTML) == $.trim(duplicateCustnamesLen[q]))
+                                        if($.trim(parseInt($(this)[0].getAttribute("val"))) == $.trim(parseInt(custnameIndices[q][r])))                                   // if($.trim($(this)[0].childNodes[0].childNodes[2].innerHTML) == $.trim(duplicateCustnamesLen[q]))
                                         {
-                                            $(this)[0].style.display = 'block';               //Display duplicate custnames only
+                                            $(this)[0].style.display = 'block';                     //Display duplicate custnames only
+                                            $(this)[0].children[0].children[2].style.color = 'red'; //Display duplicate custnames in red color
                                         }
                                     }
 								 
                                 });
                             }
+                            // else if(custnameIndices[q].length == 1)
+                            // {
+                            //   console.log('QQQQQ',custnameIndices[q]);
+                            // }
                         }
                 }
                 else{
@@ -4333,7 +4339,6 @@ function contentTable(newTestScriptDataLS) {
                         if (getScrapeDataforCustomObj[i].xpath == "" && !getScrapeDataforCustomObj[i].cord) {
                             var testGridData = $("#jqGrid tbody tr:not(.jqgfirstrow)");
                             $.each(testGridData, function() {
-                                debugger;
                                 if ($(this).find("td[aria-describedby='jqGrid_custname']").text() == scrappedData[i].custname) {
                                     $(this).find("td[aria-describedby='jqGrid_custname']").addClass("addCustObj");
 
@@ -6492,7 +6497,6 @@ function drop(ev) {
         $(".objectExistMap").show();
         return false
     } else {
-        debugger;
         $(".objectExistMap").hide()
         getDraggedEle = ev.dataTransfer.getData("text/plain").trim()
         getDraggedEle = $(getDraggedEle)[0];

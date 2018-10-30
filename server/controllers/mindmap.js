@@ -13,15 +13,13 @@ var path = require('path');
 var fs = require('fs');
 
 /* Convert excel file to CSV Object. */
-var xlsToCSV = function(workbook) {
+var xlsToCSV = function(workbook,sheetname) {
 	var result = [];
-	workbook.SheetNames.forEach(function(sheetName) {
-		var csv = xlsx.utils.sheet_to_csv(workbook.Sheets[sheetName]);
-		if (csv.length > 0) {
-			result.push(sheetName);
-			result.push(csv);
-		}
-	});
+	var csv = xlsx.utils.sheet_to_csv(workbook.Sheets[sheetname]);
+	if (csv.length > 0) {
+		result.push(sheetname);
+		result.push(csv);
+	}
 	//return result.join("\n");
 	return result;
 };
@@ -1431,10 +1429,13 @@ var update_cassandraID = function(d,urlData,module_type,idn_v_idc = null) {
 };
 
 exports.excelToMindmap = function(req,res){
-	console.log(req.body.type);
-	var wb = xlsx.read(req.body.data, {type:'binary'});
+	var wb1 = xlsx.read(req.body.data.content, {type:'binary'});
+	if(req.body.data.flag == 'sheetname'){
+		res.status(200).send(wb1.SheetNames);
+		return;
+	}
 	try{
-		var myCSV=xlsToCSV(wb);
+		var myCSV=xlsToCSV(wb1,req.body.data.sheetname);
 	}
 	catch(exc){
 		console.log(exc);
@@ -1642,4 +1643,8 @@ var tes_row_count = 2;
 		logger.error("Invalid session");
 		res.send("Invalid Session");
 	}
+}
+
+exports.getDomain = function(req,res){
+	admin.getDomains_ICE(req,res);
 }

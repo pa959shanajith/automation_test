@@ -438,6 +438,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			// 	$("#parentExecute").prop("checked", false);
 			// }
 			//}
+			var suiteidsexecution = [];
+			$(".parentSuiteChk:checked").each(function(i,e){suiteidsexecution.push(e.getAttribute('id').split('_')[1])});
+			window.localStorage.setItem("executionidxreport", JSON.stringify({"idxlist":suiteidsexecution}));			
 		},
 		function(error) {
 			console.log("Error")
@@ -526,6 +529,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		var batchDetails = {};
 		//updateTestSuite
 		var loopingtimes=0;
+		var suiteidsexecution = [];
+		$(".parentSuiteChk:checked").each(function(i,e){suiteidsexecution.push(e.getAttribute('id').split('_')[1])});
+		window.localStorage.setItem("executionidxreport", JSON.stringify({"idxlist":suiteidsexecution}));
 		$.each($(".parentSuiteChk"), function(){
 			var suiteInfo = {};
 			var suiteDetails = {};
