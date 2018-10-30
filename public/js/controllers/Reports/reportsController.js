@@ -110,6 +110,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 				reportsInputData.releaseId = $scope.releaseNames;
 				reportsInputData.cycleId = $scope.cycleNames;
 				reportsInputData.type = 'allreports';
+				var counter = 0;
 				$("#reportScenarioDataTable").hide();
 				blockUI("Loading reports.. please wait..");
 				reportService.getReportsData_ICE(reportsInputData).then(function (result_res_reportData, response_reportData) {
@@ -128,7 +129,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 							robj = JSON.parse(window.localStorage['redirectedReportObj']);
 							window.localStorage['redirectedReportObj'] = '';
 						}	
-						
+						var suiteidx = JSON.parse(window.localStorage['executionidxreport']).idxlist[0];
 						angular.forEach(result_res_reportData.testsuites, function (value, index) {
 							angular.forEach(value.scenarios, function (val, position) {
 								try{
@@ -139,17 +140,18 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 								}
 
 								if(redirected){
-									if(robj.testSuiteDetails[0].testsuiteid == value.testsuiteid && new Date(val.executedon)>new Date(latesttime) && position==0){
-										latestidx = index+1;
+									if(robj.testSuiteDetails[suiteidx].testsuiteid == value.testsuiteid && new Date(val.executedon)>new Date(latesttime) && position==0){
+										latestidx = counter+1;
 										latesttime = val.executedon;
 									}
 								}
 						
 								if(position == 0){
-									$scope.result_reportData.push({'id':index+1,'ModuleName': value.testsuitename,'ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':index+1})
+									$scope.result_reportData.push({'id':index+1,'ModuleName': value.testsuitename,'ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':counter+1})
 								}else{
-									$scope.result_reportData.push({'id':'','ModuleName':'','ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':index+1})
+									$scope.result_reportData.push({'id':'','ModuleName':'','ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':counter+1})
 								}
+								counter = counter + 1;
 							})
 						});
 						if(redirected){
@@ -158,7 +160,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 									scrollTop: $("[report-idx="+latestidx+"]").offset().top-$("[report-idx=1]").offset().top
 								}, 500);	
 								$("[report-idx="+latestidx+"]").addClass('highlightReportRow');
-								$timeout(function(){$("[report-idx="+latestidx+"]").removeClass('highlightReportRow');},10000);
+								$timeout(function(){$("[report-idx="+latestidx+"]").removeClass('highlightReportRow');});
 							},500);
 	
 						}
@@ -1082,7 +1084,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 				unblockUI();
 				$('#selectCycles').trigger('change'); 
 			},3000);
-		},1500);
+		},4000);
 	}	
 	
 }]);
