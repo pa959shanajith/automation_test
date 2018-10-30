@@ -146,6 +146,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     function loadMindmapData() {
         //param 0: normal , 1: normal with versioning, 2: end to end
         blockUI("Loading...");
+        $('#searchModule-create').val('');
+        $('#searchModule-assign').val('');
         mindmapServices.populateProjects().then(function(res) {
             if (res == "Invalid Session") {
                 $rootScope.redirectPage();
