@@ -361,7 +361,7 @@
                 else if (!issuetype || issuetype == "Select Issue") $("#jIssuetype").css('border-color', 'red');
                 else if (!summary) $("#jSummary").css('border-color', 'red');
                 //else if(!description) $("#jDescription").css('border-color','red');
-                else if (!priority || priority == "Select Priority") $("#jPriority").css('border-color', 'red');
+                //else if (!priority || priority == "Select Priority") $("#jPriority").css('border-color', 'red');
                 //else if(!label) $("#jLabel").css('border-color','red');
                 //else if(!attachment) $("#jAttachment").css('border-color','red');
                 else {
@@ -411,7 +411,7 @@
                                 $(".statusWindow").show();
                                 $("#showStatus").text("Invalid Session. Login again");
                             } else {
-                                getRows[parseInt($("#inputSlno").val()) - 1].children[7].innerText = data;
+                                getRows[parseInt($("#inputSlno").val()) - 1].children[9].innerText = data;
                                 $(".createIssueWindow").hide();
                                 $(".statusWindow").show();
                                 $("#showStatus").text("Issue bearing ID " + data + " created successfully.");
@@ -1448,7 +1448,7 @@
                     <th>Expected Result</th>
                     <th>Actual Result</th>
                     <th style="display:none">Status</th>
-                    <th>Defect ID</th>
+                    <th>JIRA Defect ID</th>
                     {{!--
                     <th>Expected Result</th> --}}
                 </thead>
@@ -1518,7 +1518,7 @@
                 <p id='parentIssue'><label>Parent Issue Id<span class="mandatory">*</span></label><input type="text" class="jirapopupinput" id="jpIssueid" /></p>
                 <p><label>Summary<span class="mandatory">*</span></label><input type="text" class="jirapopupinput" id="jSummary" maxlength="255" title="Maximum 255 characters accepted." /></p>
                 <p><label>Description</label><textarea class="jirapopupinput" id="jDescription"></textarea></p>
-                <p><label>Priority<span class="mandatory">*</span></label><select class="jirapopupinput" id="jPriority"><option value="" selected disabled>Select Priority</option></select></p>
+                <p><label>Priority</label><select class="jirapopupinput" id="jPriority"><option value="" selected disabled>Select Priority</option></select></p>
                 <p><label>Label</label><textarea class="jirapopupinput" id="jLabel"></textarea></p>
                 <p><label>Attachment Path</label><input type="text" id="scrnShotPath" class="jirapopupinput" /></p>
                 <p><span class="error-msg"></span><button type="button" class="cancelIssues">Cancel</button><button type="button" class="createIssues">Create</button></p>
