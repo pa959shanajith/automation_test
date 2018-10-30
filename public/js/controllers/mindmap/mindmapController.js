@@ -4893,11 +4893,26 @@ Purpose : displaying pop up for replication of project
 
     }
 
-
-    $scope.showContent = function($fileContent) {
-        var validate = true;
+    $scope.getSheetName = function($fileContent) {
         $scope.content = $fileContent;
-        mindmapServices.excelToMindmap($scope.content).then(function(result) {
+        mindmapServices.excelToMindmap({'content':$scope.content,'flag':'sheetname'}).then(function(result) {
+            if (result == "Invalid Session") {
+                $rootScope.redirectPage();
+            } else if (result == 'fail') {
+                openDialogMindmap('Error', 'error fetching sheet names');
+            } else {
+                $scope.sheetnames = result;
+                $("#SheetInput").modal("show");
+            }
+        }, function(error) {
+            console.log(error);
+        })        
+    }
+
+    $scope.showContent = function(sheetname) {
+        $("#SheetInput").modal("hide");
+        var validate = true;
+        mindmapServices.excelToMindmap({'content':$scope.content,'flag':'data','sheetname':sheetname}).then(function(result) {
             if (result == "Invalid Session") {
                 $rootScope.redirectPage();
             } else if (result == 'fail') {
