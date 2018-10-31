@@ -123,13 +123,13 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 					}
 					else{
 						$scope.result_reportData = [];
-						var redirected = false,latestidx = 0,robj,latesttime = 0;
+						var redirected = false,latestidx = 0,robj,latesttime = 0,suiteidx = 0;
 						if(window.localStorage['redirectedReportObj'] && window.localStorage['redirectedReportObj']!=''){
 							redirected = true;
 							robj = JSON.parse(window.localStorage['redirectedReportObj']);
 							window.localStorage['redirectedReportObj'] = '';
+							suiteidx = JSON.parse(window.localStorage['executionidxreport']).idxlist[0];
 						}	
-						var suiteidx = JSON.parse(window.localStorage['executionidxreport']).idxlist[0];
 						angular.forEach(result_res_reportData.testsuites, function (value, index) {
 							angular.forEach(value.scenarios, function (val, position) {
 								try{
