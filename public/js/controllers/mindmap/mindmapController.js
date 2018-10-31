@@ -1927,16 +1927,16 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $scope.createMultipleNode = function() {
         switch (d3.select(activeNode).attr('data-nodetype')) {
             case 'modules_endtoend':
-                $scope.addedntype = 'Scenario_';
+                $scope.addedntype = 'Scenario';
                 break;
             case 'modules':
-                $scope.addedntype = 'Scenario_';
+                $scope.addedntype = 'Scenario';
                 break;
             case 'scenarios':
-                $scope.addedntype = 'Screen_';
+                $scope.addedntype = 'Screen';
                 break;
             case 'screens':
-                $scope.addedntype = 'Testcase_';
+                $scope.addedntype = 'Testcase';
                 break;
         }
         $("#addObjContainer").empty();
@@ -1953,12 +1953,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     $scope.addMoreNode = function() {
         if ($('.row.row-modal.addObj-row').length < 10) {
-            var idxAddNode = 0 + $('.row.row-modal.addObj-row').length;
+            var nodeId = {
+                'Scenario': 1,
+                'Screen': 2,
+                'Testcase': 3
+            }
+            var idxAddNode = 1 + $('.row.row-modal.addObj-row').length;
             $("#addObjContainer").append(`<div class="row row-modal addObj-row">
                                                 <form class="form-horizontal" role="form" onSubmit="return false;">
                                                         <div class="col-sm-2 addNode-label"><label>` + idxAddNode + `</label></div>
                                                         <div class="col-sm-6">
-                                                        <input type="text" class="form-control form-control-custom" placeholder="Enter node name" maxlength="255" value='` + $scope.addedntype + idxAddNode + `'>
+                                                        <input type="text" class="form-control form-control-custom" placeholder="Enter node name" maxlength="255" value='` + $scope.addedntype +"_"+ (nCount[nodeId[$scope.addedntype]]++) + `'>
                                                         </div>
                                                         <div class="col-sm-2 deleteAddObjRow"><img src="imgs/ic-delete.png" /></div>
                                                 </form>
