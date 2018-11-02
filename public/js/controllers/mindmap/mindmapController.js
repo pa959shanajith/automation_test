@@ -600,6 +600,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     $scope.loadMap = function(idx) {
         $scope.functionTBE = 'loadMapPopupConfirmed';
+        excelFlag = 1;
         $('#createNewConfirmationPopup').attr('mapid', $scope.allMMaps[idx].name);
         if (Object.keys($scope.nodeDisplay).length != 0) {
             $('#createNewConfirmationPopup').modal('show');
@@ -1925,6 +1926,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     //------Create Multiple Child Node-------//
     $scope.createMultipleNode = function() {
+        $(".view-msg").empty();
         switch (d3.select(activeNode).attr('data-nodetype')) {
             case 'modules_endtoend':
                 $scope.addedntype = 'Scenario';
@@ -1974,6 +1976,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     $scope.clearNodes = function() {
+        $(".view-msg").empty();
         $("input").val('');
         $(".addObj-row").find("input").removeClass('inputErrorBorder')
         $(".addObj-row").find("select").removeClass('selectErrorBorder')
@@ -2015,6 +2018,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $("#dialog-addObject").modal("hide");
                 openDialogMindmap("Success", "Nodes created successfully!");
             }
+        } else {
+             $(".view-msg").text("Please provide a valid name!");
         }
         unblockUI();
     }
