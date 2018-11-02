@@ -208,7 +208,8 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 					for(var j=0; j<nineteen68_projects_details[i].scenario_details.length; j++){
 						N68Container.find("ul").append("<li class='testSet testScenariolink' data-scenarioid='"+nineteen68_projects_details[i].scenario_details[j].testscenarioid+"'><label title='"+nineteen68_projects_details[i].scenario_details[j].testscenarioname+"'>"+nineteen68_projects_details[i].scenario_details[j].testscenarioname+"</label></li>")
 					}
-					if(nineteen68_projects_details[i].scenario_details.length >= 25)	$('.scrollbar-inner').scrollbar();
+					//if(nineteen68_projects_details[i].scenario_details.length >= 25)
+					$('.scrollbar-inner').scrollbar();
 					$(".searchScenarioN68").show();
 				}else{
 					N68Container.append("This project does not contain any scenarios");
@@ -320,9 +321,9 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 					if(getParent.hasClass("Tfolnode"))	$(this).prop("src","imgs/ic-qcCollapse.png");
 				}
 		}
-		if(($(".qcTreeContainer ul").length + $(".qcTreeContainer li").length) >= 25){
-			$('.scrollbar-inner').scrollbar();			
-		}
+		//if(($(".qcTreeContainer ul").length + $(".qcTreeContainer li").length) >= 25){
+		$('.scrollbar-inner').scrollbar();
+		//}
 	})
 	
 	//Select testset

@@ -33,19 +33,19 @@
     border: 1px solid #000;
     position: relative;
     top: 14px;
-    height: 680px;
+    height: 91%;
     padding: 5px;
-    width: calc(100% - 500px);
+    width: 47%;
     float: left;
 }
-.leftQcStructure{margin-right: 30px;}
+.leftQcStructure{margin-right: 35px;}
 .qcDomProContainer{padding: 10px 8px 2px 8px;}
 .qcProContainer{padding: 10px 4px 2px 8px;}
-.qcProContainer input{height: 24px; border-radius: 5px; border: 1px solid #000; width: 184px; opacity: 0; padding-left: 6px;}
+.qcProContainer input{height: 24px; border-radius: 5px; border: 1px solid #000; width: 40%; opacity: 0; padding-left: 6px;}
 .searchScenarioN68{padding: 4px 0 4px 0; border-radius: 5px; border: 1px solid #000; position: relative; top: 1px; cursor: pointer; display: none;}
 .searchScenarioN68 img{width: 26px;}
 .qcDomProContainer select, .qcProContainer select{
-    width: calc(100% - 223px);
+    width: 48%;
     height: 24px;
     border-radius: 5px;
     border: 1px solid #000;
@@ -53,19 +53,25 @@
 .qcTreeContainer, .qcN68TreeContainer{
     float: left;
     width: 100%;
-    height: 616px;
+    height: 90%;
     margin-top: 20px;
     padding: 0 6px 0 6px;
 }
 .qcTreeContainer ul:nth-child(1), .qcN68TreeContainer ul:nth-child(1){height: 616px !important;}
 .qcTreeContainer ul, .qcN68TreeContainer ul{padding: 0 !important;}
 .qcTreeContainer ul label{margin-left: 10px;}
-.qcTreeContainer ul li.testSet label{margin-left: 34px !important; position: relative; top: 3px; overflow: hidden; text-overflow: ellipsis; width: 265px; white-space: nowrap;margin-bottom: 0;}
+.qcTreeContainer ul li.testSet label{margin-left: 34px !important; position: relative; top: 3px; overflow: hidden; text-overflow: ellipsis; width: 70%; white-space: nowrap;margin-bottom: 0;}
 .qcTreeContainer ul li.testSet img{float: right; margin-right: 8px; height: 13px; position: relative; top: 6px; cursor: pointer;}
 .qcN68TreeContainer ul li.testSet{padding-left: 10px;}
 .qcN68TreeContainer ul li.testSet label{position: relative;top: 3px;}
 .testSet:hover{background-color: #f3eaff; border-radius: 5px !important;}
 .root ul{margin-left: 17px;}
+
+.qcTreeContainer ul li.Tsetnode label{position: relative; top: 3px; overflow: hidden; text-overflow: ellipsis; width: 70%;}
+.qcTreeContainer ul li.Tsetnode img{float: left; position: relative; top: 6px; cursor: pointer;}
+.qcTreeContainer ul li.Tfolnode label{position: relative; top: 3px; overflow: hidden; text-overflow: ellipsis; width: 70%;}
+.qcTreeContainer ul li.Tfolnode img{float: left; position: relative; top: 6px; cursor: pointer;}
+
 .mappedFiles{
     height: calc(100% - 27px) !important;
     padding: 10px;
@@ -77,13 +83,15 @@
     margin-bottom: 26px;
 }
 .linkedTestset label{
-    width: 425px;
+    width: 45%;
     float: left;
     background-color: #E1CAFF; 
     border-radius: 5px;
     padding: 5px 5px 5px 30px;
     font-size: 16px;
     font-family: 'LatoWebLight';
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 .linkedTestset span{
     float: left;

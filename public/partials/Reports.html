@@ -101,7 +101,7 @@
               <td ng-if="report.latestStatus == 'Pass'" class="colorStatusGreen">{{report.latestStatus}}</td>
               <td ng-if="report.latestStatus == 'Terminate'" class="colorStatusOrnage">{{report.latestStatus}}</td>
               <td ng-if="report.latestStatus == 'Incomplete'" class="colorStatusYellow">{{report.latestStatus}}</td>
-              <td ng-if="report.latestStatus == ''" class="colorStatusYellow">{{report.latestStatus}}</td>
+              <td ng-if="report.latestStatus == 'Skipped'" class="colorStatusBlue">{{report.latestStatus}}</td>
               <td>{{report.executedon}}</td>
               <td>
                   <div ng-hide="report.count==0" >
@@ -141,7 +141,8 @@
                   <td ng-if="scenario.status == 'Fail'" class="colorStatusRed">{{scenario.status}}</td>
                   <td ng-if="scenario.status == 'Pass'" class="colorStatusGreen">{{scenario.status}}</td>
                   <td ng-if="scenario.status == 'Terminate'" class="colorStatusOrnage">{{scenario.status}}</td>
-                  <td ng-if="scenario.status == 'Incomplete'" class="colorStatusYellow">{{scenario.status}}</td>                  
+                  <td ng-if="scenario.status == 'Incomplete'" class="colorStatusYellow">{{scenario.status}}</td>
+				  <td ng-if="scenario.status == 'Skipped'" class="colorStatusBlue">{{scenario.status}}</td>
                   <td>
                         <img alt='Pdf Icon' class='archivedreport getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{scenario.reportid}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'>
                         <img alt='-' class='archivedreport getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid='{{scenario.reportid}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'>
