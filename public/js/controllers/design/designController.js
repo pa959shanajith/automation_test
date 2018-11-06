@@ -5112,13 +5112,14 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'appType', 'Generic');
         }
         else {
-
+			var scrappedDataCustnames = [];
             selectedText = replaceHtmlEntites(selectedText.trim());
             for (var i = 0; i < scrappedData.length; i++) {
                 var ob = scrappedData[i];
                 var custname1;
                 var custval = ob.custname;
                 custname1 = $('<input>').html(custval).text().trim();
+				scrappedDataCustnames.push(custval);
                 if ((custname1.replace(/\s/g, ' ') == (selectedText.replace('/\s/g', ' ')).replace('\n', ' ')) ) {
 					var cord = null;
 					objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
@@ -5570,6 +5571,19 @@ function contentTable(newTestScriptDataLS) {
                         break;
                     }
                 }
+            }
+			if($.inArray(selectedText, scrappedDataCustnames) == '-1' && ($(e.target).parents('tr').children('td').find('.editable').length > 0 || $(e.target).children('td').find('select.editable').length > 0))
+            {
+                console.log(scrappedData);
+                var mydata =   $grid.jqGrid('getRowData');
+                console.log('mydata',mydata);
+				var row = $(e.target).closest('tr.jqgrow');
+                var rowId = row.attr('id');
+				$("select#" + rowId + "_keywordVal", row[0]).html(res);
+				selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
+				$grid.jqGrid('setCell', rowId, 'objectName', ' ');
+				$grid.jqGrid('setCell', rowId, 'url', ' ');
+				$grid.jqGrid('setCell', rowId, 'appType', 'Generic');
             }
         }
     }
