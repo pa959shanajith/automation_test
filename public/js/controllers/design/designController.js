@@ -87,7 +87,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     //Default Function to reset all input, select
     socket.on('ICEnotAvailable', function () {
         unblockUI();
-		openDialog("Debug Testcase", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+		openDialog("Debug Testcase", $rootScope.unavailableLocalServer_msg);
 	});
     var current_task=JSON.parse(window.localStorage['_CT']);
     var getTaskName = current_task.taskName;
@@ -415,7 +415,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             }
             if (data == "unavailableLocalServer") {
                 unblockUI();
-                openDialog("Debug Testcase", "ICE Engine is not available. Please run the batch file and connect to the Server.")
+                openDialog("Debug Testcase", $rootScope.unavailableLocalServer_msg)
             } else if (data == "success") {
                 unblockUI();
                 openDialog("Debug Testcase", "Debug completed successfully.")
@@ -1211,7 +1211,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     }
                     if (data == "unavailableLocalServer") {
                         unblockUI();
-                        openDialog("Web Service Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+                        openDialog("Web Service Screen", $rootScope.unavailableLocalServer_msg);
                         return false
                     }
                     if (data == "scheduleModeOn") {
@@ -1266,7 +1266,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         }
                         if (data == "unavailableLocalServer") {
                             unblockUI();
-                            openDialog("WSDL-Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+                            openDialog("WSDL-Scrape Screen", $rootScope.unavailableLocalServer_msg);
                             return false
                         }
                         if (data == "scheduleModeOn") {
@@ -1306,7 +1306,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         }
                         if (data == "unavailableLocalServer") {
                             unblockUI();
-                            openDialog("WSDL Add-Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+                            openDialog("WSDL Add-Scrape Screen", $rootScope.unavailableLocalServer_msg);
                             return false
                         }
                         if (data == "scheduleModeOn") {
@@ -1644,7 +1644,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                             $(".disableActions").removeClass("disableActions").addClass("enableActions");
                         }
                         $("#enableAppend").prop('checked',false);
-                        openDialog("Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+                        openDialog("Scrape Screen", $rootScope.unavailableLocalServer_msg);
                         return false
                     } else if (data == "fail") {
                         openDialog("Scrape", "Failed to scrape.")

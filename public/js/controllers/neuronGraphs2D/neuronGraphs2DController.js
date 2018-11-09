@@ -1465,7 +1465,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
                 if (data == "Terminate") {
                     openDialog("Terminate", "execution Terminated")
                 } else if (data == "unavailableLocalServer") {
-                    openDialog('Error', "Execute Test Suite, ICE Engine is not available. Please run the batch file and connect to the Server.")
+                    openDialog('Error', "Execute Test Suite,"+$rootScope.unavailableLocalServer_msg)
                 } else {
                     openDialog("Success", "execution successful")
                     globalobj['module_id'] = globalobj['jsondata'][0].testsuiteid

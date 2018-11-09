@@ -5,6 +5,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	var releaseId = [];
 	var cycleId = [];
 	var screenId = [];
+	$rootScope.unavailableLocalServer_msg="No Intelligent Core Engine (ICE) connection found with the Nineteen68 logged in username. Please run the ICE batch file once again and connect to Server.";
 
 	if(window.localStorage['_UI']){
 		userDetails = JSON.parse(window.localStorage['_UI']);
