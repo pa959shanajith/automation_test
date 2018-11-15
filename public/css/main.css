@@ -2428,6 +2428,8 @@ input[disabled]{
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-align: center;
+    vertical-align: middle;
 }
 .designDataTable tbody tr, .ui-widget-content{cursor: pointer;}
 .executionDataTable th, .executionDataTable td, .scheduleDataHeader span, .scheduleDataBodyRow div, .designDataTable th, .designDataTable td{
@@ -2540,9 +2542,19 @@ input[disabled]{
 	border: 1px solid #5e636b;
     border-radius: 4px;
 }
-.scenarioBody tr td:first-child{text-align: left;}
-.scenarioBody tr td:first-child span{margin-right: 10px; margin-left: 4px; position: relative; bottom: 5px;}
-.scenarioBody tr td:first-child input{position: relative;top: 2px;}
+.scenarioBody tr td:first-child{text-align: left; float: left; width: 100%;}
+.scenarioBody tr td:first-child span{/*margin-right: 10px; margin-left: 4px; position: relative; bottom: 5px;*/
+    float: left;
+    width: 50%;
+    margin-top: 5%;
+}
+.scenarioBody tr td:first-child input{
+    position: relative;
+    top: 2px;  
+    left: 0px;  
+    float: left;
+    width: auto;
+}
 
 .selectBrowser, .selectBrowserSc{
 	cursor: pointer;
