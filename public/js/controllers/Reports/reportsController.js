@@ -1084,7 +1084,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 				unblockUI();
 				$('#selectCycles').trigger('change'); 
 			},3000);
-		},4000);
+		},5000);
 	}	
 	
 }]);

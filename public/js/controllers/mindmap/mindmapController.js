@@ -698,7 +698,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $('.arrow-box-ic').mouseup(function(e, i) {
             try { clearInterval(refreshIntervalId); } catch (err) { console.log("no interval found."); }
         });
-        $scope.nodeDisplay = {};
+        $scope.nodeDisplay = {};    // node id (numeric) vs properties map
         $scope.linkDisplay = {};
         if (progressFlag) return;
         progressFlag = true;
@@ -941,6 +941,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     function updateTaskObject(tObj, data) {
+
         var t = {
             taskvn: tObj.tvn,
             id: tObj.id,
@@ -1124,11 +1125,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     dNodes[pi].task.cx = undefined;
                     dNodes[pi].task.details = '';
                 }
+                if(!origTask && taskUndef){
+                    dNodes[pi].task.details =  dNodes[pi].task.task + " " + dNodes[pi].type + " " + dNodes[pi].name;
+                }                
                 if(!taskUndef && !origTask){
                     dNodes[pi].task.reviewer = tObj.rw;
                     dNodes[pi].task.endDate = tObj.ed;
                 }
                 dNodes[pi].task.tstatus = taskStatus;
+              
 
                 function replicateTask(pi) {
                     //replicate task to reused node
@@ -1437,13 +1442,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 v.append('span').attr('class', 'ct-assignItem fl-left').html('Assigned to');
                 var d = v.append('select').attr('id', 'ct-assignedTo'); //.attr('class','assignedTo')
 
-                $('#ct-assignedTo').append("<option value='select user' >Select User</option>");
+                
                 //PAssing selected projectid to the service
                 mindmapServices.populateUsers($scope.projectNameO)
                     .then(function(res) {
                         if (res == "Invalid Session") {
                             $rootScope.redirectPage();
                         }
+                        $('#ct-assignedTo').empty().append("<option value='select user' >Select User</option>");
                         for (i = 0; i < res.userRoles.length && res.r_ids.length; i++) {
                             $('#ct-assignedTo').append("<option data-id='" + res.userRoles[i] + "' value='" + res.r_ids[i] + "'>" + res.userRoles[i] + "</option>");
                         }
@@ -1460,13 +1466,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             } else if (tk == 'rw') {
                 var result1 = {};
                 v.append('span').attr('class', 'ct-assignItem fl-left').html('Reviewer');
-                var d = v.append('select').attr('id', 'ct-assignRevw'); //.attr('class','reviwedBy');
-                $('#ct-assignRevw').append("<option value='select reviewer' select=selected>" + "Select Reviewer" + "</option>");
+                var d = v.append('select').attr('id', 'ct-assignRevw'); //.attr('class','reviwedBy');                
                 mindmapServices.populateUsers($scope.projectNameO)
                     .then(function(res) {
                         if (res == "Invalid Session") {
                             $rootScope.redirectPage();
                         }
+                        $('#ct-assignRevw').empty();
+                        $('#ct-assignRevw').append("<option value='select reviewer' select=selected>" + "Select Reviewer" + "</option>");
                         for (i = 0; i < res.userRoles.length && res.r_ids.length; i++) {
                             $('#ct-assignRevw').append("<option data-id='" + res.userRoles[i] + "' value='" + res.r_ids[i] + "'>" + res.userRoles[i] + "</option>");
                         }
@@ -2136,8 +2143,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 d.task = null;
                 d3.select('#ct-node-' + d.id).remove();
                 deletednode_info.push(d);
-                if (d.oid != undefined) {
+                if (d.oid != undefined && d.oid != '' ) {
                     deletednode.push(d.oid);
+                    delete $scope.nodeDisplay[d.id];
                     dNodes[d.id].state = 'deleted';
                 }
                 var temp = dLinks;
@@ -2162,8 +2170,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         d.task = null;
                         d3.select('#ct-node-' + d.id).remove();
                         deletednode_info.push(d);
-                        if (d.oid != undefined) {
+                        if (d.oid != undefined && d.oid != '') {
                             deletednode.push(d.oid);
+                            delete $scope.nodeDisplay[d.id];
                             dNodes[d.id].state = 'deleted';
                         }
                         var temp = dLinks;
@@ -2202,7 +2211,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             unblockUI();
             console.log("Error: checkReuse service 1");
         });
-        if (!dNodes[pi].children || dNodes[pi].children.length == 0) d3.select('#ct-node-' + pi).select('.ct-cRight').remove();
+        //if (!dNodes[pi].children || dNodes[pi].children.length == 0) d3.select('#ct-node-' + pi).select('.ct-cRight').remove();
     }
 
     function recurseDelChild(d, tab) {
