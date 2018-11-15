@@ -3048,7 +3048,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function clickHideElements(e) {
-        if (event.target !== this) { return; }
+        if (d3.event.target!== this) { return; }
         d3.select('#ct-inpBox').classed('no-disp', !0);
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
         d3.select('#ct-assignBox').classed('no-disp', !0);
