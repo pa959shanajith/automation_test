@@ -1454,7 +1454,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             $('#ct-assignedTo').append("<option data-id='" + res.userRoles[i] + "' value='" + res.r_ids[i] + "'>" + res.userRoles[i] + "</option>");
                         }
                         $("#ct-assignedTo option[value='" + tObj.at + "']").attr('selected', 'selected');
-                        if ($("#ct-assignedTo").val() != "select user") {
+                        if ($("#ct-assignedTo").val() != "select user" && nt.oid != null) {
                             $('#ct-assignedTo').attr('disabled', 'disabled');
                             $('#ct-assignedTo').css('background', '#ebebe4');
                         }
@@ -1505,7 +1505,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     $("#startDate").datepicker("show");
                 });
                 f = w.append('ul').attr('class', 'ct-asValCalBox dropdown-menu'); //.on('click',$('.ct-asValBoxIcon.ct-asItemCal.btn.dropdown-toggle').datepicker());
-                if (tObj.sd != '') {
+                if (tObj.sd != '' && nt.oid != null) {
                     $("#startDate").attr('disabled', 'disabled');
                 }
                 $("#startDate").val(tObj.sd);
@@ -3048,7 +3048,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function clickHideElements(e) {
-        if (event.target !== this) { return; }
+        if (d3.event.target!== this) { return; }
         d3.select('#ct-inpBox').classed('no-disp', !0);
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
         d3.select('#ct-assignBox').classed('no-disp', !0);
