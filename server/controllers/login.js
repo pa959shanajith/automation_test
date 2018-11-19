@@ -85,7 +85,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 									if (validUser == true && userLogged == true) {
 										flag = "userLogged";
 										logger.info("User already logged in");
-										//req.session.destroy();
+										req.session.destroy();
 										res.send(flag);
 									} else {
 										//Check whether projects are assigned for a user
