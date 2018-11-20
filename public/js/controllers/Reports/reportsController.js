@@ -5,6 +5,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 	var userID = getUserInfo.user_id;
 	var openArrow = 0; var openWindow = 0;
 	var executionId, testsuiteId;
+	var robj,redirected = false;
 	$scope.reportIdx = ''; // for execution count click
 	$("#page-taskName").empty().append('<span>Reports</span>')
 
@@ -18,6 +19,13 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 	}, 100)
 	if (window.localStorage['navigateScreen'] != "p_Reports") {
 		$rootScope.redirectPage();
+	}
+
+
+	if(window.localStorage['redirectedReportObj'] && window.localStorage['redirectedReportObj']!=''){
+		blockUI("loading report ...");
+		redirected = true;
+		robj = JSON.parse(window.localStorage['redirectedReportObj']);
 	}
 	//Loading Project Info
 	//var getProjInfo = JSON.parse(window.localStorage['_T'])
@@ -88,6 +96,13 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 			for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
 				$('.rpReleases').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
 			}
+			if(redirected){
+				$timeout(function(){
+					$('#selectReleases').val(robj.testSuiteDetails[0].releaseid);
+					$('#selectReleases').trigger('change');					
+				},500);	
+			}
+						
 			$scope.selReleasesFilter = function () {
 				var releaseId = $scope.releaseNames;
 				blockUI("Loading cycles.. please wait..");
@@ -100,6 +115,13 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 					$('.rpCycles').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
 					for (i = 0; i < result_cycles.c_ids.length && result_cycles.cyc.length; i++) {
 						$('.rpCycles').append("<option data-id='" + result_cycles.cyc[i] + "' value='" + result_cycles.c_ids[i] + "'>" + result_cycles.cyc[i] + "</option>");
+					}
+					if(redirected){
+						$timeout(function(){
+							$('#selectCycles').val(robj.testSuiteDetails[0].cycleid);
+							unblockUI();
+							$('#selectCycles').trigger('change'); 				
+						},500);							
 					}
 				});
 			};
@@ -123,10 +145,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 					}
 					else{
 						$scope.result_reportData = [];
-						var redirected = false,latestidx = 0,robj,latesttime = 0,suiteidx = 0;
+						var latestidx = 0,latesttime = 0,suiteidx = 0;
 						if(window.localStorage['redirectedReportObj'] && window.localStorage['redirectedReportObj']!=''){
-							redirected = true;
-							robj = JSON.parse(window.localStorage['redirectedReportObj']);
 							window.localStorage['redirectedReportObj'] = '';
 							suiteidx = JSON.parse(window.localStorage['executionidxreport']).idxlist[0];
 						}	
@@ -161,7 +181,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 								}, 500);	
 								$("[report-idx="+latestidx+"]").addClass('highlightReportRow');
 							},500);
-	
 						}
 						
 						//console.log("scope", $scope.result_reportData);
@@ -250,6 +269,13 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 						$('.rpCycles').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
 						proId = data.projectids[0];
 						getProjectsAndSuites(proId, "reports");
+						if(redirected){
+							$timeout(function(){
+								$('#selectProjects').val(robj.testSuiteDetails[0].projectidts);
+								$('#selectProjects').trigger('change');
+							},500);
+
+						}
 					}
 					else console.log("Unable to load test suites.");
 				}
@@ -1071,19 +1097,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 		$('.formatpdfbrwsrexport').remove();
 		//})
 	}
-	if(window.localStorage['redirectedReportObj'] && window.localStorage['redirectedReportObj']!=''){
-		blockUI("loading report ...");
-		$timeout(function(){
-			var robj = JSON.parse(window.localStorage['redirectedReportObj']);
-			$('#selectProjects').val(robj.testSuiteDetails[0].projectidts);
-			$('#selectProjects').trigger('change');
-			$timeout(function(){$('#selectReleases').val(robj.testSuiteDetails[0].releaseid);
-			$('#selectReleases').trigger('change');},1500);
-			$timeout(function(){$('#selectCycles').val(robj.testSuiteDetails[0].cycleid);
-				unblockUI();
-				$('#selectCycles').trigger('change'); 
-			},3000);
-		},5000);
-	}	
+
+	
 	
 }]);
