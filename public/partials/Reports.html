@@ -91,7 +91,7 @@
             </tr>
           </thead>
           <tbody class='reportBody report-table-body scrollbar-inner' style = "font-size: 12.5px;">
-            <tr class='getScenarioTestCaseDetails' ng-repeat="report in result_reportData"  report-idx="{{$index+1}}">
+            <tr class='getScenarioTestCaseDetails' ng-repeat="report in result_reportData"  report-idx="{{$index+1}}" style= "word-break: break-all;">
               <td scope="row">{{report.id}}</td>
               <td class="reptable-modulename">{{report.ModuleName }}</td>
               <td class="reptable-scenarioname">{{report.ScenarioName}}</td>
