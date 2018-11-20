@@ -35,6 +35,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 		$(".projectInfoWrap").empty()
 		//testSuiteName = window_ct.testSuiteName;
 	}
+	$scope.getScreenView = JSON.parse(window.localStorage['_CT']).appType;
 	
 	/*$timeout(function(){
 		var releaseId = JSON.parse(window.localStorage['_CT']).testSuiteDetails[0].releaseId;
@@ -134,7 +135,6 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 	function getScheduledDetails(){
 		ScheduleService.getScheduledDetails_ICE()
 		.then(function(result) {
-			console.log(result)
 			if(result == "fail"){}
 			else if(result && result.length > 0){
 				for(var k=0; k<result.length; k++){
@@ -315,7 +315,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 			if(slctdOption == "Completed")	keySlctd = "Completed";
 			else if(slctdOption == "In Progress")	keySlctd = "Inprogress";
 			else if(slctdOption == "Terminated")	keySlctd = "Terminate";
-			else if(slctdOption == "Failed 00")	keySlctd = "Failed 00";
+			else if(slctdOption == "Skipped")	keySlctd = "Skipped";
 			else if(slctdOption == "Failed 01")	keySlctd = "Failed 01";
 			else if(slctdOption == "Failed 02")	keySlctd = "Failed 02";
 			else if(slctdOption == "Cancelled")	keySlctd = "cancelled";
@@ -430,7 +430,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 						suiteInfo.browserType = browserTypeExe;
 						suiteInfo.reschedule = false;
 						suiteInfo.scheduleid = "";
-						suiteInfo.userInfo = JSON.parse(window.localStorage['_UI'])
+						suiteInfo.userInfo = JSON.parse(window.localStorage['_UI']);
 						var scenarioDetails = JSON.parse(window.localStorage["_CT"]).testSuiteDetails;
 						for(var i=0; i<scenarioDetails.length;i++){
 							if(scenarioDetails[i].testsuiteid == suiteInfo.testsuiteid){
@@ -489,7 +489,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 			}
 			function proceedScheduling(){
 				if(doNotSchedule == false){
-					var chktype = "schedule"
+					var chktype = "schedule";
 					ScheduleService.testSuitesScheduler_ICE(chktype,moduleInfo)
 					.then(function(data){
 						if(data == "success"){

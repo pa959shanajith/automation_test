@@ -7,14 +7,95 @@
 	<!--Left Panel-->
 	<div id="left-nav-section">
 		<div class="scrollbar-macosx">
-			<div id="left-top-section">
+			<!--<div id="left-top-section">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Schedule On</a></span></li>
 					<li><a class="selectBrowserSc"  data-name="3" title="Schedule On IE"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
 					<li><a class="selectBrowserSc"  data-name="1" title="Schedule On Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
 					<li style="margin-bottom: 30px"><a class="selectBrowserSc"  data-name="2" title="Schedule On Firefox"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
 				</ul>
+			</div>-->
+			<!-- Web -->
+			<div id="left-top-section" ng-if="getScreenView == 'Web'">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Schedule On</a></span></li>
+					<li><a class="selectBrowserSc" data-name="3"  title="Schedule on IE"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
+					<li><a class="selectBrowserSc" data-name="1"  title="Schedule on Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
+					<li style="margin-bottom: 30px"><a class="selectBrowserSc" data-name="2"  title="Schedule on Firefox"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
+				</ul>
 			</div>
+			<!-- Web -->
+			
+			<!-- SAP -->
+			<div id="left-top-section" ng-if="getScreenView == 'SAP'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Schedule On</a></span></li>
+					<li><a class="selectBrowserSc" data-name="1"  title="Schedule on SAP Apps"><span><img src='imgs/ic-desktop.png' alt='SAP Apps' /></span>SAP Apps</a></li>
+				</ul>
+			</div>
+			<!-- SAP -->
+			
+			<!-- Desktop -->
+			<div id="left-top-section" ng-if="getScreenView == 'Desktop'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Schedule On</a></span></li>
+					<li><a class="selectBrowserSc" data-name="1"  title="Schedule on Desktop Apps"><span><img src='imgs/ic-desktop.png' alt='Desktop Apps' /></span>Desktop Apps</a></li>
+				</ul>
+			</div>
+			<!-- Desktop -->
+			
+			<!-- Mobile App -->
+			<div id="left-top-section" ng-if="getScreenView == 'MobileApp'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Schedule On</a></span></li>
+					<li><a class="selectBrowserSc" data-name="1"  title="Schedule on Mobile Apps"><span><img src='imgs/ic-mobility.png' alt='Mobile Apps' /></span>Mobile Apps</a></li>
+				</ul>
+			</div>
+			<!-- Mobile App -->
+			
+			<!-- Web Services -->
+			<div id="left-top-section" ng-if="getScreenView == 'Webservice'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Schedule On</a></span></li>
+					<li><a class="selectBrowserSc" data-name="1"  title="Schedule on Web Services"><span><img src='imgs/ic-webservice.png' alt='Web Services' /></span>Web Services</a></li>
+				</ul>
+			</div>
+			<!-- Web Services -->
+			
+			<!-- OEBS -->
+			<div id="left-top-section" ng-if="getScreenView == 'DesktopJava'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Schedule On</a></span></li>
+					<li><a class="selectBrowserSc" data-name="1"  title="Schedule on OEBS Apps"><span><img src='imgs/ic-desktop.png' alt='OEBS Apps' /></span>OEBS Apps</a></li>
+				</ul>
+			</div>
+			<!-- OEBS -->
+			
+			<!-- Mobile Web -->
+			<div id="left-top-section" ng-if="getScreenView == 'MobileWeb'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Schedule On</a></span></li>
+					<li><a class="selectBrowserSc" data-name="1"  title="Schedule on Mobile Web"><span><img src='imgs/ic-mobility.png' alt='Mobile Web' /></span>Mobile Web</a></li>
+				</ul>
+			</div>
+			<!-- Mobile Web -->
+
+			<!-- Mainframe -->
+			<div id="left-top-section" ng-if="getScreenView == 'Mainframe'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Schedule On</a></span></li>
+					<li><a class="selectBrowserSc" data-name="1"  title="Schedule Mainframe"><span><img src='imgs/ic-mainframe.png' alt='Mainframe' style="background-color: white; border-radius: 7px;"/></span>Mainframe</a></li>
+				</ul>
+			</div>
+
+			<!-- System -->
+			<div id="left-top-section" ng-if="getScreenView == 'System'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Schedule On</a></span></li>
+					<li><a class="selectBrowserSc" data-name="1"  title="Schedule System"><span><img src='imgs/ic-desktop.png' alt='System' style="border-radius: 7px;"/></span>System</a></li>
+				</ul>
+			</div>
+			<!-- System -->
 
 			<!--<div class='clear-both'></div>-->
 
@@ -81,9 +162,9 @@
 							<option>Scheduled</option>
 							<option>Terminated</option>
 							<option>Cancelled</option>
-							<option>Failed 00</option>
 							<option>Failed 01</option>
 							<option>Failed 02</option>
+							<option>Skipped</option>
 							<option>Show All</option>
 						</select>
 					</div>
@@ -93,8 +174,8 @@
 					<div class="scheduleDataTable">
 						<!-- Schedule Table Header -->
 						<div class="scheduleDataHeader">
-							<span style="width: 20%; border-right: 1px solid #fff; cursor: pointer;" title="Click to sort" ng-click="reverse=!reverse;predicate='scheduledatetime'">Date & Time</span>
-							<span style="width: 13%; border-right: 1px solid #fff">Host</span>
+							<span style="width: 18%; border-right: 1px solid #fff; cursor: pointer;" title="Click to sort" ng-click="reverse=!reverse;predicate='scheduledatetime'">Date & Time</span>
+							<span style="width: 12%; border-right: 1px solid #fff">Host</span>
 							<span style="width: 20%; border-right: 1px solid #fff">Scenario Name</span>
 							<span style="width: 20%; border-right: 1px solid #fff">Test Suite</span>
 							<span style="width: 15%; border-right: 1px solid #fff">Browsers</span>
@@ -106,8 +187,8 @@
 						<div id="scheduledDataBody" class="scrollbar-inner scheduledDataBody">
 							<div class='scheduleDataBodyRow' ng-repeat="schdata in scheduledData | orderBy:predicate:reverse">
 								<div ng-repeat="data in schdata.scenariodetails" class="scheduleDataBodyRowChild">
-									<div style='width: 20%'>{{schdata.scheduledatetime}}</div><!-- {{schdata.scheduledatetime.split("T")[1].split(".")[0]}}-->
-									<div style='width: 13%' data-userid={{schdata.userid}}>{{schdata.clientipaddress}}</div>
+									<div style='width: 18%'>{{schdata.scheduledatetime}}</div><!-- {{schdata.scheduledatetime.split("T")[1].split(".")[0]}}-->
+									<div style='width: 12%' data-userid={{schdata.userid}}>{{schdata.clientipaddress}}</div>
 									<div style='width: 20%' title={{data.scenarioname}}>{{data.scenarioname}}</div>
 									<div style='width: 20%' title={{schdata.testsuitename}}>{{schdata.testsuitename}}</div>
 									<div style='width: 15%'><img ng-repeat="brow in schdata.browserlist" ng-src={{browImg(brow)}} style="margin-right: 5px;"/></div>
