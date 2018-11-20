@@ -4663,6 +4663,7 @@ function contentTable(newTestScriptDataLS) {
         var keywordArrayList = JSON.parse(keywordArrayList1);
         var taskInfo = JSON.parse(window.localStorage['_CT']);
         var appTypeLocal = taskInfo.appType; //window.localStorage['appTypeScreen'];
+		var cord = null;
         if (selectedText == "") {
             selectedText = "@Generic"
         }
@@ -4708,6 +4709,7 @@ function contentTable(newTestScriptDataLS) {
                 $grid.jqGrid('setCell', rowId, 'appType', "Generic");
                 $grid.jqGrid('setCell', rowId, 'url', url);
                 $grid.jqGrid('setCell', rowId, 'objectName', objName);
+				$grid.jqGrid('setCell', rowId, 'cord', cord);
             }
         }
         else if (selectedText == "@System") {
@@ -4748,6 +4750,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
             $grid.jqGrid('setCell', rowId, 'url', url);
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
+			$grid.jqGrid('setCell', rowId, 'cord', cord);
         } else if (selectedText == "@BrowserPopUp") {
             objName = " ";
             url = " ";
@@ -4767,6 +4770,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
             $grid.jqGrid('setCell', rowId, 'url', url);
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
+			$grid.jqGrid('setCell', rowId, 'cord', cord);
         }
         /**
          * To Handle custom objects mapping @custom to element keywords
@@ -4815,6 +4819,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
             $grid.jqGrid('setCell', rowId, 'url', url);
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+			$grid.jqGrid('setCell', rowId, 'cord', cord);
         }
         //ends here
         //Object
@@ -4859,6 +4864,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
             $grid.jqGrid('setCell', rowId, 'url', url);
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+			$grid.jqGrid('setCell', rowId, 'cord', cord);
         }
         //ends here
         else if (selectedText == "WebService List") {
@@ -4912,6 +4918,7 @@ function contentTable(newTestScriptDataLS) {
             $("select#" + rowId + "_keywordVal", row[0]).html(res);
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+			$grid.jqGrid('setCell', rowId, 'cord', cord);
         } else if (selectedText == "@Window") {
             objName = " ";
             url = " ";
@@ -4931,6 +4938,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
             $grid.jqGrid('setCell', rowId, 'url', url);
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
+			$grid.jqGrid('setCell', rowId, 'cord', cord);
         } else if (selectedText == "@Oebs") {
             objName = "";
             url = "";
@@ -4950,6 +4958,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
             $grid.jqGrid('setCell', rowId, 'url', url);
+			$grid.jqGrid('setCell', rowId, 'cord', cord);
         } else if (selectedText == "@Mobile") {
             objName = " ";
             url = " ";
@@ -4988,6 +4997,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
             $grid.jqGrid('setCell', rowId, 'url', url);
+			$grid.jqGrid('setCell', rowId, 'cord', cord);
         } else if (selectedText == "@MobileiOS") {
             objName = " ";
             url = " ";
@@ -5022,6 +5032,7 @@ function contentTable(newTestScriptDataLS) {
             $("select#" + rowId + "_keywordVal", row[0]).html(res);
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+			$grid.jqGrid('setCell', rowId, 'cord', cord);
         }
         //Adding @Excel to the objectName dropdown
         else if (selectedText == "@Excel") {
@@ -5042,6 +5053,7 @@ function contentTable(newTestScriptDataLS) {
             $("select#" + rowId + "_keywordVal", row[0]).html(res);
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', 'Generic');
+			$grid.jqGrid('setCell', rowId, 'cord', cord);
         } //Adding @Word to the objectName dropdown
         else if (selectedText == "@Word") {
             objName = " ";
@@ -5061,6 +5073,7 @@ function contentTable(newTestScriptDataLS) {
             $("select#" + rowId + "_keywordVal", row[0]).html(res);
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', 'Generic');
+			$grid.jqGrid('setCell', rowId, 'cord', cord);
         }
         else {
             var scrappedDataCustnames = [];
@@ -5072,7 +5085,6 @@ function contentTable(newTestScriptDataLS) {
                 custname1 = $('<input>').html(custval).text().trim();
                 scrappedDataCustnames.push(custval);
                 if ((custname1.replace(/\s/g, ' ') == (selectedText.replace('/\s/g', ' ')).replace('\n', ' '))) {
-                    var cord = null;
                     objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
                     url = ob.url;
                     var obType = ob.tag;
