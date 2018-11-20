@@ -1315,7 +1315,7 @@ exports.getReportsData_ICE = function (req, res) {
 							//for (var scenarioid in result2){
 	
 								var inputs = {
-									"query": "allreports",
+									"query": "latestreport",
 									"scenarioid": scenarioid,
 									"cycleid": req.body.reportsInputData.cycleId									
 								};	
@@ -1339,12 +1339,12 @@ exports.getReportsData_ICE = function (req, res) {
 											robj['reportid'] = '';
 										}
 										else{
-											var robj = latestReport(result3.rows);
+											var robj = result3.rows;
 										}
 										reportScenarioObj.push({
 											scenarioid:scenarioid,
 											scenarioname:result2[scenarioid],
-											count:result3.rows.length,
+											count:robj['count'],
 											description: robj['varmap'],
 											latestStatus: robj['status'],
 											executedon: robj['executedtime'],

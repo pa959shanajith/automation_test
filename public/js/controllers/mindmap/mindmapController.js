@@ -600,6 +600,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     $scope.loadMap = function(idx) {
         $scope.functionTBE = 'loadMapPopupConfirmed';
+        excelFlag = 1;
         $('#createNewConfirmationPopup').attr('mapid', $scope.allMMaps[idx].name);
         if (Object.keys($scope.nodeDisplay).length != 0) {
             $('#createNewConfirmationPopup').modal('show');
@@ -697,7 +698,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $('.arrow-box-ic').mouseup(function(e, i) {
             try { clearInterval(refreshIntervalId); } catch (err) { console.log("no interval found."); }
         });
-        $scope.nodeDisplay = {};
+        $scope.nodeDisplay = {};    // node id (numeric) vs properties map
         $scope.linkDisplay = {};
         if (progressFlag) return;
         progressFlag = true;
@@ -940,6 +941,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     function updateTaskObject(tObj, data) {
+
         var t = {
             taskvn: tObj.tvn,
             id: tObj.id,
@@ -1123,11 +1125,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     dNodes[pi].task.cx = undefined;
                     dNodes[pi].task.details = '';
                 }
+                if(!origTask && taskUndef){
+                    dNodes[pi].task.details =  dNodes[pi].task.task + " " + dNodes[pi].type + " " + dNodes[pi].name;
+                }                
                 if(!taskUndef && !origTask){
                     dNodes[pi].task.reviewer = tObj.rw;
                     dNodes[pi].task.endDate = tObj.ed;
                 }
                 dNodes[pi].task.tstatus = taskStatus;
+              
 
                 function replicateTask(pi) {
                     //replicate task to reused node
@@ -1436,18 +1442,19 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 v.append('span').attr('class', 'ct-assignItem fl-left').html('Assigned to');
                 var d = v.append('select').attr('id', 'ct-assignedTo'); //.attr('class','assignedTo')
 
-                $('#ct-assignedTo').append("<option value='select user' >Select User</option>");
+                
                 //PAssing selected projectid to the service
                 mindmapServices.populateUsers($scope.projectNameO)
                     .then(function(res) {
                         if (res == "Invalid Session") {
                             $rootScope.redirectPage();
                         }
+                        $('#ct-assignedTo').empty().append("<option value='select user' >Select User</option>");
                         for (i = 0; i < res.userRoles.length && res.r_ids.length; i++) {
                             $('#ct-assignedTo').append("<option data-id='" + res.userRoles[i] + "' value='" + res.r_ids[i] + "'>" + res.userRoles[i] + "</option>");
                         }
                         $("#ct-assignedTo option[value='" + tObj.at + "']").attr('selected', 'selected');
-                        if ($("#ct-assignedTo").val() != "select user") {
+                        if ($("#ct-assignedTo").val() != "select user" && nt.oid != null) {
                             $('#ct-assignedTo').attr('disabled', 'disabled');
                             $('#ct-assignedTo').css('background', '#ebebe4');
                         }
@@ -1459,13 +1466,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             } else if (tk == 'rw') {
                 var result1 = {};
                 v.append('span').attr('class', 'ct-assignItem fl-left').html('Reviewer');
-                var d = v.append('select').attr('id', 'ct-assignRevw'); //.attr('class','reviwedBy');
-                $('#ct-assignRevw').append("<option value='select reviewer' select=selected>" + "Select Reviewer" + "</option>");
+                var d = v.append('select').attr('id', 'ct-assignRevw'); //.attr('class','reviwedBy');                
                 mindmapServices.populateUsers($scope.projectNameO)
                     .then(function(res) {
                         if (res == "Invalid Session") {
                             $rootScope.redirectPage();
                         }
+                        $('#ct-assignRevw').empty();
+                        $('#ct-assignRevw').append("<option value='select reviewer' select=selected>" + "Select Reviewer" + "</option>");
                         for (i = 0; i < res.userRoles.length && res.r_ids.length; i++) {
                             $('#ct-assignRevw').append("<option data-id='" + res.userRoles[i] + "' value='" + res.r_ids[i] + "'>" + res.userRoles[i] + "</option>");
                         }
@@ -1497,7 +1505,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     $("#startDate").datepicker("show");
                 });
                 f = w.append('ul').attr('class', 'ct-asValCalBox dropdown-menu'); //.on('click',$('.ct-asValBoxIcon.ct-asItemCal.btn.dropdown-toggle').datepicker());
-                if (tObj.sd != '') {
+                if (tObj.sd != '' && nt.oid != null) {
                     $("#startDate").attr('disabled', 'disabled');
                 }
                 $("#startDate").val(tObj.sd);
@@ -1925,18 +1933,19 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     //------Create Multiple Child Node-------//
     $scope.createMultipleNode = function() {
+        $(".view-msg").empty();
         switch (d3.select(activeNode).attr('data-nodetype')) {
             case 'modules_endtoend':
-                $scope.addedntype = 'Scenario_';
+                $scope.addedntype = 'Scenario';
                 break;
             case 'modules':
-                $scope.addedntype = 'Scenario_';
+                $scope.addedntype = 'Scenario';
                 break;
             case 'scenarios':
-                $scope.addedntype = 'Screen_';
+                $scope.addedntype = 'Screen';
                 break;
             case 'screens':
-                $scope.addedntype = 'Testcase_';
+                $scope.addedntype = 'Testcase';
                 break;
         }
         $("#addObjContainer").empty();
@@ -1953,12 +1962,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     $scope.addMoreNode = function() {
         if ($('.row.row-modal.addObj-row').length < 10) {
-            var idxAddNode = 0 + $('.row.row-modal.addObj-row').length;
+            var nodeId = {
+                'Scenario': 1,
+                'Screen': 2,
+                'Testcase': 3
+            }
+            var idxAddNode = 1 + $('.row.row-modal.addObj-row').length;
             $("#addObjContainer").append(`<div class="row row-modal addObj-row">
                                                 <form class="form-horizontal" role="form" onSubmit="return false;">
                                                         <div class="col-sm-2 addNode-label"><label>` + idxAddNode + `</label></div>
                                                         <div class="col-sm-6">
-                                                        <input type="text" class="form-control form-control-custom" placeholder="Enter node name" maxlength="255" value='` + $scope.addedntype + idxAddNode + `'>
+                                                        <input type="text" class="form-control form-control-custom" placeholder="Enter node name" maxlength="255" value='` + $scope.addedntype +"_"+ (nCount[nodeId[$scope.addedntype]]++) + `'>
                                                         </div>
                                                         <div class="col-sm-2 deleteAddObjRow"><img src="imgs/ic-delete.png" /></div>
                                                 </form>
@@ -1969,6 +1983,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     $scope.clearNodes = function() {
+        $(".view-msg").empty();
         $("input").val('');
         $(".addObj-row").find("input").removeClass('inputErrorBorder')
         $(".addObj-row").find("select").removeClass('selectErrorBorder')
@@ -2010,6 +2025,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $("#dialog-addObject").modal("hide");
                 openDialogMindmap("Success", "Nodes created successfully!");
             }
+        } else {
+             $(".view-msg").text("Please provide a valid name!");
         }
         unblockUI();
     }
@@ -2126,8 +2143,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 d.task = null;
                 d3.select('#ct-node-' + d.id).remove();
                 deletednode_info.push(d);
-                if (d.oid != undefined) {
+                if (d.oid != undefined && d.oid != '' ) {
                     deletednode.push(d.oid);
+                    delete $scope.nodeDisplay[d.id];
                     dNodes[d.id].state = 'deleted';
                 }
                 var temp = dLinks;
@@ -2152,8 +2170,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         d.task = null;
                         d3.select('#ct-node-' + d.id).remove();
                         deletednode_info.push(d);
-                        if (d.oid != undefined) {
+                        if (d.oid != undefined && d.oid != '') {
                             deletednode.push(d.oid);
+                            delete $scope.nodeDisplay[d.id];
                             dNodes[d.id].state = 'deleted';
                         }
                         var temp = dLinks;
@@ -2192,7 +2211,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             unblockUI();
             console.log("Error: checkReuse service 1");
         });
-        if (!dNodes[pi].children || dNodes[pi].children.length == 0) d3.select('#ct-node-' + pi).select('.ct-cRight').remove();
+        //if (!dNodes[pi].children || dNodes[pi].children.length == 0) d3.select('#ct-node-' + pi).select('.ct-cRight').remove();
     }
 
     function recurseDelChild(d, tab) {
@@ -3029,7 +3048,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function clickHideElements(e) {
-        if (event.target !== this) { return; }
+        if (d3.event.target!== this) { return; }
         d3.select('#ct-inpBox').classed('no-disp', !0);
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
         d3.select('#ct-assignBox').classed('no-disp', !0);

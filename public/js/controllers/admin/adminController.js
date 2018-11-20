@@ -1,4 +1,4 @@
-var domainId, DOMAINID, releaseName, cycleName, count=0,delCount=0,editReleaseId='',editCycleId='',deleteReleaseId='',deleteRelid,deleteCycleId='',deleteCycId,taskName;var releaseNamesArr =[];
+var domainId, DOMAINID, releaseName, cycleName, count=0,delCount=0,editReleaseId='',editCycleId='',deleteReleaseId='',deleteRelid,deleteCycleId='',deleteCycId,taskName,unAssignedFlag=false;var releaseNamesArr =[];
 var createprojectObj = {}; var projectDetails = [];var flag;var projectExists;var updateProjectDetails = [];
 var editedProjectDetails = [];
 var deletedProjectDetails = [];
@@ -184,7 +184,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	//	Assign Projects Button Click
 	$scope.assignProjects = function($event){
-		$("#assignProjectModal").modal("show");
+		if(unAssignedFlag == true)
+		{
+			$("#assignProjectModal").modal("show");
+		}
+		else{
+			$scope.assignProjects1();
+		}
 	}
 	$scope.assignProjects1 = function ($event) {
 		$("#assignProjectModal").modal("hide");
@@ -2218,18 +2224,22 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	}
 
 	$scope.moveItems.leftgo = function (to,from) {
+		unAssignedFlag = true;
 		moveItems(to,from);
 	};
 
 	$scope.moveItems.rightgo = function (from,to) {
+		unAssignedFlag = false;
 		moveItems(from,to);
 	};
 
 	$scope.moveItems.leftall = function (to,from) {
+		unAssignedFlag = true;
 		moveAllItems(to,from);
 	};
 
 	$scope.moveItems.rightall = function (from,to) {
+		unAssignedFlag = false;
 		moveAllItems(from,to);
 	};
 

@@ -160,7 +160,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 									scrollTop: $("[report-idx="+latestidx+"]").offset().top-$("[report-idx=1]").offset().top
 								}, 500);	
 								$("[report-idx="+latestidx+"]").addClass('highlightReportRow');
-								$timeout(function(){$("[report-idx="+latestidx+"]").removeClass('highlightReportRow');});
 							},500);
 	
 						}
@@ -1084,7 +1083,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 				unblockUI();
 				$('#selectCycles').trigger('change'); 
 			},3000);
-		},4000);
+		},5000);
 	}	
 	
 }]);

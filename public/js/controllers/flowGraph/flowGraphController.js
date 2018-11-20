@@ -120,7 +120,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			$scope.$apply();
 		});
 		document.getElementById('path').value = '';
-		openDialog("APG", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+		openDialog("APG", $rootScope.unavailableLocalServer_msg);
 	});
 	  
 	$scope.disableButton = function($event){
@@ -175,7 +175,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				$scope.hideBaseContent = { message: 'false' };
 				$('#progress-canvas').hide();
 				document.getElementById('path').value = '';
-				openDialog("APG", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+				openDialog("APG", $rootScope.unavailableLocalServer_msg);
 				return false;
 			}else if(data == "Invalid Session"){
 				document.getElementById('path').value = '';
@@ -1337,7 +1337,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 					$scope.hideBaseContent = { message: 'false' };
 					$('#progress-canvas').hide();
 					document.getElementById('path').value = '';
-					openDialog("Flowgraph Generator", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+					openDialog("Flowgraph Generator", $rootScope.unavailableLocalServer_msg);
 					return false;
 				}else if(data == "Invalid Session"){
 					document.getElementById('path').value = '';
@@ -1414,7 +1414,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				$scope.hideBaseContent = { message: 'false' };
 				$('#progress-canvas').hide();
 				document.getElementById('path').value = '';
-				openDialog("APG", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+				openDialog("APG", $rootScope.unavailableLocalServer_msg);
 				return false;
 			}else if(data == "Invalid Session"){
 				document.getElementById('path').value = '';

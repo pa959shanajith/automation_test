@@ -30,7 +30,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 	socket.on('ICEnotAvailable', function () {
 		unblockUI();
-		openDialogExe("Execute Test Suite", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+		openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
 	});
 	/*var taskAuth;
 	if(window.localStorage['_CT'] == "")
@@ -800,7 +800,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					$('#executionTerminated').find('.btn-default').focus();
 				}
 				else if(data == "unavailableLocalServer"){
-					openDialogExe("Execute Test Suite", "ICE Engine is not available. Please run the batch file and connect to the Server.")
+					openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg)
 					//$('#executionserverunavailable').modal('show');
 				}
 				else if(data == "scheduleModeOn")

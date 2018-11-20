@@ -1551,6 +1551,14 @@ exports.exportToExcel = function(req,res){
 		var excelMap = d.excelMap;
 		var dir = './../../excel';
 		var filepath1 = path.join(__dirname,'../../excel');
+		var filePath = path.join(__dirname,'../../excel','samp234.xlsx');
+
+        try {
+			//to remove the created files
+			fs.unlinkSync(path.join(filePath));
+		} catch(e){
+            logger.error("Error in loading excel ",e);
+		}
 		try{
 			if (!fs.existsSync(filepath1)){
 				console.log("inside directory");
@@ -1611,11 +1619,11 @@ var tes_row_count = 2;
 
 //save it 
     workbook.save(function(ok){
-        if(!ok)
-            workbook.cancel();
-        else
-			console.log("workbook created");
-			var filePath = path.join(__dirname,'../../excel','samp234.xlsx');
+        //if(!ok)
+           // workbook.cancel();
+        //else
+			//console.log("workbook created");
+			
     
 			console.log(__dirname);
 			
@@ -1625,8 +1633,7 @@ var tes_row_count = 2;
 			});
 			var rstream = fs.createReadStream(filePath);
 			rstream.pipe(res);
-			//to remove the created files
-			 fs.unlinkSync(path.join(filePath));
+			
 	});
 	
 

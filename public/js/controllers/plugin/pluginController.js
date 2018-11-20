@@ -419,7 +419,29 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		// var infoArr = [];
 		// labelArr.push(txnHistory.codesDict['FilterTaskByParams']);
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
-		
+		$(".panel-additional-details").off("click");
+		$(".panel-additional-details").click(function(e){
+			console.log($scope.filterDat);
+			var tdes = this.parentElement.children[1].getAttribute('data-taskdes');
+			if($(".description-container").length>0)
+				var olddescriptionid = $(".description-container")[0].getAttribute("description-id");
+			else
+				var olddescriptionid = "null"
+			$(".description-container").remove();
+			$(".active-task").removeClass("active-task");
+			var clickedtask = this.parentElement.parentElement.parentElement.getAttribute('panel-id');
+			if(clickedtask == olddescriptionid){
+				$(".description-container").remove();
+				$(".active-task").removeClass("active-task");
+				return;
+			} 
+			if($scope.taskJson[clickedtask].taskDetails[0].taskType == 'Design')
+				var adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+$scope.filterDat.idnamemaprel[$scope.taskJson[clickedtask].releaseid]+'">Release: '+$scope.filterDat.idnamemaprel[$scope.taskJson[clickedtask].releaseid]+'</li><li class="description-item" title="Cycle: '+$scope.filterDat.idnamemapcyc[$scope.taskJson[clickedtask].cycleid]+'">Cycle: '+$scope.filterDat.idnamemapcyc[$scope.taskJson[clickedtask].cycleid]+'</li><li class="description-item" title="Apptype: '+$scope.taskJson[clickedtask].appType+'">Apptype: '+$scope.taskJson[clickedtask].appType+'</li></div>';
+			else
+				var adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+$scope.filterDat.idnamemaprel[$scope.taskJson[clickedtask].testSuiteDetails[0].releaseid]+'">Release: '+$scope.filterDat.idnamemaprel[$scope.taskJson[clickedtask].testSuiteDetails[0].releaseid]+'</li><li class="description-item" title="Cycle: '+$scope.filterDat.idnamemapcyc[$scope.taskJson[clickedtask].testSuiteDetails[0].cycleid]+'">Cycle: '+$scope.filterDat.idnamemapcyc[$scope.taskJson[clickedtask].testSuiteDetails[0].cycleid]+'</li><li class="description-item" title="Apptype: '+$scope.taskJson[clickedtask].appType+'">Apptype: '+$scope.taskJson[clickedtask].appType+'</li></div>';
+			$(adddetailhtml).insertAfter("[panel-id="+clickedtask+"]");
+			$("[panel-id="+clickedtask+"]").addClass("active-task");
+		});		
 	}
 
 	$scope.clearFilter = function(){

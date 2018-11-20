@@ -1555,3 +1555,14 @@
   .my-btn:hover{
   background: #643693;
 }
+.view-msg{
+    float: left;
+    text-align: left;
+    color: red;
+}
+.modal-body p{
+    word-wrap: break-word;
+}
+#export-excel{
+    padding-left: 15px;
+}

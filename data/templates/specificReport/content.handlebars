@@ -685,7 +685,8 @@
             display: table-cell;
             border-bottom: 1px solid #ececec;
             border-right: 1px solid #ececec;
-            word-wrap: break-word
+            word-wrap: break-word;
+            word-break: break-all
         }
 
         .reportsDetail {
@@ -1457,7 +1458,7 @@
                 <table class="scroll-table">
                     <tbody class="reportsDetail">
                         {{#each rows}}
-                        <tr style="width: 100%;" class="reportdetailsrow" data-id={{id}} data-parentid={{parentId}}>
+                        <tr style="width: 100%;" class="reportdetailsrow" data-id="{{id}}" data-parentid="{{parentId}}">
                             <td class="rDid tabCont">{{slno}}</td>
                             <td class="rDstep tabCont">{{Step}}</td>
                             <td class="{{getClass StepDescription}}" style="display:none; padding-left: 10px; font-weight:{{getStyle StepDescription}}">{{StepDescription}}</td>

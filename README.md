@@ -11,7 +11,9 @@ These instructions will help setting up the project and running on a local machi
 * Clone and Run [Cassandra](https://10.41.31.131/nineteen68v2.0/db) DB
 * Clone and Run [Redis](ssh://slklocal@10.41.31.52:/home/slklocal/Nineteen68BnR/redis.git) DB
 * Clone and Run [Mindmaps](https://10.41.31.131/nineteen68v2.0/Mindmap_DB) DB(Neo4j)
+* Clone and Run [LicenseServer](https://10.41.31.131/nineteen68v2.0/licenseserver) API
 * Clone and Run [NDAC](https://10.41.31.131/nineteen68v2.0/ndac) API
+
 
 ### Setup
 
