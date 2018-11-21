@@ -3235,6 +3235,16 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 });
                 if (!isDuplicateCustNames) {
                     $.each($("#scraplist span.ellipsis"), function () {
+                        xpath = $(this).parent().parent().attr("data-xpath");
+                        if ($(this).parent().parent().attr("data-xpath") != "" && $(this).parent().parent().attr("data-xpath") != undefined) {
+                        if (appType == 'Web') {
+                            xpath = xpath.split(";")[1];
+                        } else if (appType == 'MobileWeb') {
+                            xpath = xpath.split(";")[2];
+                        }
+                        else {
+                            xpath = xpath;
+                        }
                         if (!duplicateXpathElements.hasOwnProperty(xpath)) {
                             duplicateXpathElements[xpath] = $(this).text();
                         } else {
@@ -3243,6 +3253,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             isDuplicateXpath = true;
                             count = 1;
                         }
+                    }
                     });
                 }
 
