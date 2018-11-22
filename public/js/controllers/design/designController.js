@@ -1247,7 +1247,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         $("#wsldInput").removeClass("inputErrorBorderFull")
         var wsdlUrl = $("#wsldInput").val();
         if (!wsdlUrl) openDialog("Launch WSDL", "Invalid WSDL url."); //$("#wsldInput").addClass("inputErrorBorderFull")
-        else if (wsdlUrl.toLowerCase().indexOf(".svc?wsdl") === -1 && wsdlUrl.toLowerCase().indexOf(".asmx?wsdl") === -1) openDialog("Launch WSDL", "Invalid WSDL url."); //$("#wsldInput").addClass("inputErrorBorderFull")
+        //else if (wsdlUrl.toLowerCase().indexOf(".svc?wsdl") === -1 && wsdlUrl.toLowerCase().indexOf(".asmx?wsdl") === -1) openDialog("Launch WSDL", "Invalid WSDL url."); //$("#wsldInput").addClass("inputErrorBorderFull")
         else {
             blockUI(blockMsg);
             DesignServices.launchWSDLGo(wsdlUrl)
