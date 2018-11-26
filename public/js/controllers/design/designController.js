@@ -251,7 +251,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             //$("#submitTasksTestCase").find('.modal-footer button')[0].setAttribute('ng-click',"submit_task('reassign')")
         }
         if (action == 'submit' && $(".submitTaskBtn:visible").text() == 'Approve') {
-        $scope.stask = 'approve';
+            $scope.stask = 'approve';
             $("#submitTasksTestCase").find('.modal-title').text('Approve Task');
             $("#submitTasksTestCase").find('.modal-body p').text('Are you sure you want to approve the task ?')
         }
@@ -1247,7 +1247,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         $("#wsldInput").removeClass("inputErrorBorderFull")
         var wsdlUrl = $("#wsldInput").val();
         if (!wsdlUrl) openDialog("Launch WSDL", "Invalid WSDL url."); //$("#wsldInput").addClass("inputErrorBorderFull")
-        //else if (wsdlUrl.toLowerCase().indexOf(".svc?wsdl") === -1 && wsdlUrl.toLowerCase().indexOf(".asmx?wsdl") === -1) openDialog("Launch WSDL", "Invalid WSDL url."); //$("#wsldInput").addClass("inputErrorBorderFull")
+       //else if (wsdlUrl.toLowerCase().indexOf(".svc?wsdl") === -1 && wsdlUrl.toLowerCase().indexOf(".asmx?wsdl") === -1) openDialog("Launch WSDL", "Invalid WSDL url."); //$("#wsldInput").addClass("inputErrorBorderFull")
         else {
             blockUI(blockMsg);
             DesignServices.launchWSDLGo(wsdlUrl)
@@ -1816,7 +1816,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 var path = newScrapedList.view[i].xpath;
                                 var ob = newScrapedList.view[i];
                                 ob.tempId = i;
-                                custN = ob.custname.replace(/[<>]/g, '');
+                                if (appType == "DesktopJava") {
+                                    custN = ob.custname.replace('/\s/g', ' ').replace('\n', ' ').replace(/[<>]/g, '');
+                                }
+                                else {
+                                    custN = ob.custname.replace(/[<>]/g, '');
+                                }
                                 var tag = ob.tag;
                                 if (tag == "dropdown") {
                                     imgTag = "select"
@@ -1835,10 +1840,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
                                 //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                 // } else {
-                                var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                 // }
                                 // }                                
-
+                                if (appType == "DesktopJava") {
+                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                }
+                                else {
+                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                }
                                 angular.element(innerUL).append(li);
                             }
                             //Getting the Existing Scrape Data
@@ -1856,7 +1865,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                     tempId++
                                     var path = viewString.view[i].xpath;
                                     var ob = viewString.view[i];
-                                    var custN = ob.custname.replace(/[<>]/g, '').trim();
+                                    if (appType == "DesktopJava") {
+                                        var custN = ob.custname.replace('/\s/g', ' ').replace('\n', ' ').replace(/[<>]/g, '');
+                                    }
+                                    else {
+                                        var custN = ob.custname.replace(/[<>]/g, '').trim();
+                                    }
                                     var tag = ob.tag;
                                     if (tag == "dropdown") {
                                         imgTag = "select"
@@ -1874,7 +1888,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                             ob.url = "",
                                             ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
                                     }
-                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                    if (appType == "DesktopJava") {
+                                        var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                    }
+                                    else {
+                                        var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                    }
                                     // }    
 
                                     // }                                    
@@ -1902,7 +1921,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 var path = viewString.view[i].xpath;
                                 var ob = viewString.view[i];
                                 ob.tempId = i;
-                                var custN = ob.custname.replace(/[<>]/g, '').trim();
+                                if (appType == "DesktopJava") {
+                                    var custN = ob.custname.replace('/\s/g', ' ').replace('\n', ' ').replace(/[<>]/g, '');
+                                }
+                                else {
+                                    var custN = ob.custname.replace(/[<>]/g, '').trim();
+                                }
                                 var tag = ob.tag;
                                 if (tag == "dropdown") {
                                     imgTag = "select"
@@ -1919,9 +1943,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                         ob.url = "",
                                         ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
                                 }
-                                var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                 // }
                                 // }
+                                if (appType == "DesktopJava") {
+                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                }
+                                else {
+                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                }
                                 angular.element(innerUL).append(li);
 
 
@@ -2278,12 +2307,24 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         var dontChkViewString = 0;
                         $.each($("input[type=checkbox].checkall:checked"), function () {
                             for (var i = 0; i < newScrapedList.view.length; i++) {
-                                if ($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == newScrapedList.view[i].custname.trim().replace(/[<>]/g, '')) {
-                                    if (!(isInArray(newScrapedList.view.indexOf(newScrapedList.view[i]), getIndexOfDeletedObjects))) {
-                                        getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
-                                        $(this).parents("li.select_all").remove();
-                                        dontChkViewString++;
-                                        break;
+                                if (appType == 'DesktopJava') {
+                                    if ($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim()).replace(/[<>]/g, '').replace('\n', ' ') == newScrapedList.view[i].custname.trim().replace(/[<>]/g, '').replace('/\s/g', ' ').replace(/  +/g, ' ').replace('\n', ' ')) {
+                                        if (!(isInArray(newScrapedList.view.indexOf(newScrapedList.view[i]), getIndexOfDeletedObjects))) {
+                                            getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
+                                            $(this).parents("li.select_all").remove();
+                                            dontChkViewString++;
+                                            break;
+                                        }
+                                    }
+                                }
+                                else {
+                                    if ($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == newScrapedList.view[i].custname.trim().replace(/[<>]/g, '')) {
+                                        if (!(isInArray(newScrapedList.view.indexOf(newScrapedList.view[i]), getIndexOfDeletedObjects))) {
+                                            getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
+                                            $(this).parents("li.select_all").remove();
+                                            dontChkViewString++;
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -2291,11 +2332,22 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         if ($("input[type=checkbox].checkall:checked").length != dontChkViewString) {
                             $.each($("input[type=checkbox].checkall:checked"), function () {
                                 for (var i = 0; i < viewString.view.length; i++) {
-                                    if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ').replace(/[<>]/g, '') == viewString.view[i].custname.trim().replace(/[<>]/g, '')) {
-                                        if (!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))) {
-                                            getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
-                                            $(this).parents("li.select_all").remove();
-                                            break;
+                                    if (appType == 'DesktopJava') {
+                                        if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ').replace(/[<>]/g, '') == viewString.view[i].custname.trim().replace(/[<>]/g, '').replace('/\s/g', ' ').replace(/  +/g, ' ').replace('\n', ' ')) {
+                                            if (!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))) {
+                                                getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
+                                                $(this).parents("li.select_all").remove();
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ').replace(/[<>]/g, '') == viewString.view[i].custname.trim().replace(/[<>]/g, '')) {
+                                            if (!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))) {
+                                                getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
+                                                $(this).parents("li.select_all").remove();
+                                                break;
+                                            }
                                         }
                                     }
                                 }
@@ -3237,23 +3289,23 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     $.each($("#scraplist span.ellipsis"), function () {
                         xpath = $(this).parent().parent().attr("data-xpath");
                         if ($(this).parent().parent().attr("data-xpath") != "" && $(this).parent().parent().attr("data-xpath") != undefined) {
-                        if (appType == 'Web') {
-                            xpath = xpath.split(";")[1];
-                        } else if (appType == 'MobileWeb') {
-                            xpath = xpath.split(";")[2];
+                            if (appType == 'Web') {
+                                xpath = xpath.split(";")[1];
+                            } else if (appType == 'MobileWeb') {
+                                xpath = xpath.split(";")[2];
+                            }
+                            else {
+                                xpath = xpath;
+                            }
+                            if (!duplicateXpathElements.hasOwnProperty(xpath)) {
+                                duplicateXpathElements[xpath] = $(this).text();
+                            } else {
+                                $(this).addClass('duplicateXpath').css('color', 'red');
+                                duplicateCustnames.push($(this).text());
+                                isDuplicateXpath = true;
+                                count = 1;
+                            }
                         }
-                        else {
-                            xpath = xpath;
-                        }
-                        if (!duplicateXpathElements.hasOwnProperty(xpath)) {
-                            duplicateXpathElements[xpath] = $(this).text();
-                        } else {
-                            $(this).addClass('duplicateXpath').css('color', 'red');
-                            duplicateCustnames.push($(this).text());
-                            isDuplicateXpath = true;
-                            count = 1;
-                        }
-                    }
                     });
                 }
 
@@ -4674,7 +4726,7 @@ function contentTable(newTestScriptDataLS) {
         var keywordArrayList = JSON.parse(keywordArrayList1);
         var taskInfo = JSON.parse(window.localStorage['_CT']);
         var appTypeLocal = taskInfo.appType; //window.localStorage['appTypeScreen'];
-		var cord = null;
+        var cord = null;
         if (selectedText == "") {
             selectedText = "@Generic"
         }
@@ -4720,7 +4772,7 @@ function contentTable(newTestScriptDataLS) {
                 $grid.jqGrid('setCell', rowId, 'appType', "Generic");
                 $grid.jqGrid('setCell', rowId, 'url', url);
                 $grid.jqGrid('setCell', rowId, 'objectName', objName);
-				$grid.jqGrid('setCell', rowId, 'cord', cord);
+                $grid.jqGrid('setCell', rowId, 'cord', cord);
             }
         }
         else if (selectedText == "@System") {
@@ -4761,7 +4813,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
             $grid.jqGrid('setCell', rowId, 'url', url);
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
-			$grid.jqGrid('setCell', rowId, 'cord', cord);
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         } else if (selectedText == "@BrowserPopUp") {
             objName = " ";
             url = " ";
@@ -4781,7 +4833,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
             $grid.jqGrid('setCell', rowId, 'url', url);
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
-			$grid.jqGrid('setCell', rowId, 'cord', cord);
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         }
         /**
          * To Handle custom objects mapping @custom to element keywords
@@ -4830,7 +4882,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
             $grid.jqGrid('setCell', rowId, 'url', url);
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-			$grid.jqGrid('setCell', rowId, 'cord', cord);
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         }
         //ends here
         //Object
@@ -4875,7 +4927,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
             $grid.jqGrid('setCell', rowId, 'url', url);
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-			$grid.jqGrid('setCell', rowId, 'cord', cord);
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         }
         //ends here
         else if (selectedText == "WebService List") {
@@ -4929,7 +4981,7 @@ function contentTable(newTestScriptDataLS) {
             $("select#" + rowId + "_keywordVal", row[0]).html(res);
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-			$grid.jqGrid('setCell', rowId, 'cord', cord);
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         } else if (selectedText == "@Window") {
             objName = " ";
             url = " ";
@@ -4949,7 +5001,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
             $grid.jqGrid('setCell', rowId, 'url', url);
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
-			$grid.jqGrid('setCell', rowId, 'cord', cord);
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         } else if (selectedText == "@Oebs") {
             objName = "";
             url = "";
@@ -4969,7 +5021,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
             $grid.jqGrid('setCell', rowId, 'url', url);
-			$grid.jqGrid('setCell', rowId, 'cord', cord);
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         } else if (selectedText == "@Mobile") {
             objName = " ";
             url = " ";
@@ -5008,7 +5060,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
             $grid.jqGrid('setCell', rowId, 'url', url);
-			$grid.jqGrid('setCell', rowId, 'cord', cord);
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         } else if (selectedText == "@MobileiOS") {
             objName = " ";
             url = " ";
@@ -5043,7 +5095,7 @@ function contentTable(newTestScriptDataLS) {
             $("select#" + rowId + "_keywordVal", row[0]).html(res);
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-			$grid.jqGrid('setCell', rowId, 'cord', cord);
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         }
         //Adding @Excel to the objectName dropdown
         else if (selectedText == "@Excel") {
@@ -5064,7 +5116,7 @@ function contentTable(newTestScriptDataLS) {
             $("select#" + rowId + "_keywordVal", row[0]).html(res);
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', 'Generic');
-			$grid.jqGrid('setCell', rowId, 'cord', cord);
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         } //Adding @Word to the objectName dropdown
         else if (selectedText == "@Word") {
             objName = " ";
@@ -5084,7 +5136,7 @@ function contentTable(newTestScriptDataLS) {
             $("select#" + rowId + "_keywordVal", row[0]).html(res);
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', 'Generic');
-			$grid.jqGrid('setCell', rowId, 'cord', cord);
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         }
         else {
             var scrappedDataCustnames = [];
