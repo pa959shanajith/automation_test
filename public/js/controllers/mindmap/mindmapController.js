@@ -263,6 +263,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $scope.projectName3 = $scope.projectNameO;
                 $scope.projectName2 = $scope.projectNameO;
                 $scope.projectName1 = $scope.projectNameO;
+                collapseSidebars();
             }
         }, function(error) {
             console.log("Error:", error);
