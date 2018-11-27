@@ -1189,6 +1189,7 @@ exports.connectJira_ICE = function (req, res) {
 											clearInterval(updateSessionExpiry);
 											if (resultData != "Fail") {
 												if(count == 0){
+													var updateStatus= updateDbReportData(createObj.reportId,createObj.executionId,createObj.slno,resultData);
 													logger.info('Jira: Issue created successfully.');
 													res.send(resultData);
 													count++;
@@ -1235,6 +1236,31 @@ exports.connectJira_ICE = function (req, res) {
 		res.send("Fail");
 	}
 };
+
+function updateDbReportData(reportId,executionId,slno,defectId){
+	var inputs = {
+		"reportid":reportId,
+		"slno":slno,
+		"defectid":defectId,
+		"executionid":executionId
+	};
+	var args = {
+		data: inputs,
+		headers: {
+			"Content-Type": "application/json"
+		}
+	};
+	logger.info("Calling NDAC Service from connectJira_ICE for updateDbReportData: reports/updateReportData");
+	client.post(epurl + "reports/updateReportData", args,
+	function (reportdata, response) {
+		if (response.statusCode != 200 || reportdata.rows == "fail") {
+			logger.error("Error occured in reports/updateReportData from updateDbReportData Error Code : ERRNDAC");
+			return false;
+		} else {
+			return true;
+		}
+	});
+}
 
 function latestReport(reportObjList){
 	if(reportObjList.length == 0) return null;

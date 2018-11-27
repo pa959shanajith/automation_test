@@ -115,8 +115,8 @@
     .reportsDetails th:nth-child(6),.rDremarks{width: 9%; word-break: break-word; text-align:left}
     .reportsDetails th:nth-child(7),.rDExpectedRes{width: 9%; word-break: break-word; text-align:left}
     .reportsDetails th:nth-child(8),.rDActualRes{width: 9%; word-break: break-word; text-align:left}
-    
-    .reportsDetails th:nth-child(9),.rDstatus{width: 5%; word-break: break-word; text-align:left}
+	.reportsDetails th:nth-child(9),.rjira{width: 9%; word-break: break-word; text-align:left}
+    .reportsDetails th:nth-child(10),.rDstatus{width: 5%; word-break: break-word; text-align:left}
     .maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc; height: 49%;}
     .tabCont{display: table-cell; border-bottom: 1px solid #ececec; border-right: 1px solid #ececec;word-wrap:break-word}
     .reportsDetail{line-height: 2; text-align: center; height: calc(100% - 35px); overflow: auto;font-size: 14px;}
@@ -247,6 +247,7 @@
                 <th>Remarks</th> 
                 {{/ifnotEquals}}
                 <th>Expected Result</th><th>Actual Result</th>
+				<th>Jira Defect ID</th>
                 <th style="display:none">Status</th></tr>
             </thead>
             <tbody class="reportsDetail" >
@@ -328,6 +329,7 @@
                      {{!-- <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{testcase_details.expectedResult_fail}}</td>
                      <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}</td> --}}
                     {{!-- <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td> --}}
+					<td class="rjira tabCont" style="padding-left: 10px;">{{jira_defect_id}}</td>
                 </tr>
                   {{/ifnotEquals}}
                 {{/each}}

@@ -6022,7 +6022,8 @@ function copyTestStep(e) {
                     "url": $(this).children("td:nth-child(11)").text().trim(),
                     "appType": $(this).children("td:nth-child(12)").text(),
                     "addTestCaseDetails": $(this).children("td:nth-child(13)").children('img')[0].outerHTML,
-                    "addTestCaseDetailsInfo": getRowData.addTestCaseDetailsInfo
+                    "addTestCaseDetailsInfo": getRowData.addTestCaseDetailsInfo,
+					"cord": getRowData.cord
                 });
             }
         });

@@ -169,9 +169,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 								}
 						
 								if(position == 0){
-									$scope.result_reportData.push({'id':index+1,'ModuleName': value.testsuitename,'ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':counter+1})
+									$scope.result_reportData.push({'id':index+1,'ModuleName': value.testsuitename,'ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':counter+1,'executionid':val.executionid})
 								}else{
-									$scope.result_reportData.push({'id':'','ModuleName':'','ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':counter+1})
+									$scope.result_reportData.push({'id':'','ModuleName':'','ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':counter+1,'executionid':val.executionid})
 								}
 								counter = counter + 1;
 							})
@@ -848,10 +848,13 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 	function htlmReportClick(e) {
 		console.log($scope.result_reportData);
 		var reportType = $(this).attr('data-getrep');
+		var executionId = '';
 		if($(this)[0].classList.contains('archivedreport')){
 			var idx = $scope.reportIdx-1;
+			executionId = $scope.result_res_scenarioData[$(this).attr('data-reportidx')].executionid;
 		} else{
 			var idx =$(this).attr('data-reportidx')-1;
+			executionId = $scope.result_reportData[idx].executionid;
 		}
 		var reportID = $(this).attr('data-reportid');
 		var testsuiteId =$scope.result_reportData[idx].testsuiteid;
@@ -881,7 +884,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 				"time": "",
 				"pass": "",
 				"fail": "",
-				"terminate": ""
+				"terminate": "",
+				"reportId":"",
+				"executionId":""
 			}],
 			rows: []
 		};
@@ -899,6 +904,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 						finalReports.overallstatus[0].releaseName = data[0].releasename
 						finalReports.overallstatus[0].cycleName = data[0].cyclename
 						finalReports.overallstatus[0].scenarioName = data[0].testscenarioname
+						finalReports.overallstatus[0].reportId=reportID;
+						finalReports.overallstatus[0].executionId=executionId;
 
 						var obj2 = JSON.parse(data[1].reportdata);
 						//console.log("Remarks", obj2);
