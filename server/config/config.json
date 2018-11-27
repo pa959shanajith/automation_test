@@ -1,13 +1,18 @@
 {
     "certificate": {
-    	"key": "./server/https/server.key",
-    	"cert": "./server/https/server.crt"
+        "key": "./server/https/server.key",
+        "cert": "./server/https/server.crt"
     },
     "host": "localhost:7474",
     "username": "bmVvNGo=",
     "password": "bG9jYWw3NDc0",
+    "sso_config": {
+        "identitity_provider_url": "",
+        "client_id": "",
+        "client_secret": ""
+    },
     "screenShotPath": {
-    	"default": "",
-    	"mac": ""
+        "default": "",
+        "mac": ""
     }
 }

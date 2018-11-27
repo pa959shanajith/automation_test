@@ -787,8 +787,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (n.name.length > 15) {
             n.display_name = n.display_name.slice(0, ch) + '...';
         }
-        var img_src = 'images_mindmap/node-' + n.type + '.png';
-        if (n.reuse && (n.type == 'testcases' || n.type == 'screens')) img_src = 'images_mindmap/' + n.type + '-reuse.png';
+        var img_src = 'imgs/node-' + n.type + '.png';
+        if (n.reuse && (n.type == 'testcases' || n.type == 'screens')) img_src = 'imgs/' + n.type + '-reuse.png';
 
         $scope.nodeDisplay[n.id] = {
             'type': n.type,
@@ -806,7 +806,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         n.display_name = n.name;
         var nodeOpacity = !(n.id_c == "null" || n.id_c == null || n.id_c == undefined) ? 1 : 0.5;
         var ch = 15;
-        img_src = "images_mindmap/node-" + n.type + ".png";
+        img_src = "imgs/node-" + n.type + ".png";
         if (n.name.length > ch) {
             n.display_name = n.display_name.slice(0, ch) + '...';
         }
@@ -1002,7 +1002,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             Object.keys(tObj).forEach(function(k) {
                 if (tObj[k] === undefined) tObj[k] = null;
             });
-            //if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+            //if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','imgs/node-task-assigned.png').attr('x',29).attr('y',-10);
             if (nType == "modules" || nType == "modules_endtoend") {
                 if (dNodes[pi].id_c != "null") {
 
@@ -1058,7 +1058,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (taskUndef) {
                     tObj.id = null;
                     tObj.oid = null;
-                    d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
+                    d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
                 }
                 // If task already exists then set it to true
                 if (dNodes[pi].task) taskStatus = 'updated';
@@ -1145,7 +1145,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             dNodes[e].task = tempTask;
                             dNodes[e].task.copied = true;
                             dNodes[e].task.copiedidx = pi;
-                            d3.select('#ct-node-' + e).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('style', 'opacity:1').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
+                            d3.select('#ct-node-' + e).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('style', 'opacity:1').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
                         });
                     }
                     dNodes[pi].task.copied = false;
@@ -1172,7 +1172,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         } else if (reviewerFlag == false) {
             openDialogMindmap("Task Assignment Error", "Please select Reviewer/Assigned User")
         } else if (taskflag) {
-            if (p.select('.ct-nodeTask')[0][0] == null) p.append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
+            if (p.select('.ct-nodeTask')[0][0] == null) p.append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
         } else if (taskflag == false) {
             openDialogMindmap("Task Assignment Error", "Please create the structure before assigning task")
         }
@@ -1488,10 +1488,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 v.append('span').attr('class', 'ct-assignItem fl-left').html('Start Date');
                 w = v.append('div').attr('class', 'ct-assignItem btn-group dropdown fl-right-assign dateBoxSd');
                 // w.append('input').attr('class','ct-asValBox btn dropdown-toggle').attr('data-toggle','dropdown').append('a').attr('id','ct-assignStart').html(tObj.sd);
-                // w.append('button').attr('class','ct-asValBoxIcon ct-asItemCal btn dropdown-toggle').attr('data-toggle','dropdown').append('img').attr('src','images_mindmap/ic-datepicker.png').attr('alt','calIcon');
+                // w.append('button').attr('class','ct-asValBoxIcon ct-asItemCal btn dropdown-toggle').attr('data-toggle','dropdown').append('img').attr('src','imgs/ic-datepicker.png').attr('alt','calIcon');
                 w.append('input').attr('class', 'datepicker').attr('id', 'startDate');
-                //$("img[src='images_mindmap/ic-datepicker.png']:not(.dateIcon)").remove();
-                $(".dateBoxSd").append("<img id='dateIconStartDate' class='dateIcon' src='images_mindmap/ic-datepicker.png' />").attr('alt', 'calIcon');
+                //$("img[src='imgs/ic-datepicker.png']:not(.dateIcon)").remove();
+                $(".dateBoxSd").append("<img id='dateIconStartDate' class='dateIcon' src='imgs/ic-datepicker.png' />").attr('alt', 'calIcon');
                 $('#startDate').datepicker({
                     format: "dd/mm/yyyy",
                     todayHighlight: true,
@@ -1512,10 +1512,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
             } else if (tk == 'ed') {
                 v.append('span').attr('class', 'ct-assignItem fl-left').html('End Date');
-                $(".fl-right-assign").append("<img src='images_mindmap/ic-datepicker.png' />").attr('alt', 'calIcon');
+                $(".fl-right-assign").append("<img src='imgs/ic-datepicker.png' />").attr('alt', 'calIcon');
                 w = v.append('div').attr('class', 'ct-assignItem btn-group dropdown fl-right-assign dateBoxEd');
                 w.append('input').attr('class', 'datepicker').attr('id', 'endDate');
-                $(".dateBoxEd").append("<img id='dateIconEndDate' class='dateIcon' src='images_mindmap/ic-datepicker.png' />").attr('alt', 'calIcon');
+                $(".dateBoxEd").append("<img id='dateIconEndDate' class='dateIcon' src='imgs/ic-datepicker.png' />").attr('alt', 'calIcon');
                 $('#endDate').datepicker({
                     format: "dd/mm/yyyy",
                     todayHighlight: true,
@@ -3232,14 +3232,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $scope.nodeDisplay[d.id].task = false;
                 if (d.task != null && $scope.tab != 'tabCreate') {
                     if (d.task.release == $('.release-list').val() && d.task.cycle == $('.cycle-list').val()) {
-                        //d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
+                        //d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10);
                         $scope.nodeDisplay[d.id].task = true;
                         $scope.nodeDisplay[d.id].taskOpacity = 1;
                     }
                 }
                 //Enhancement : Part of Issue 1685 showing the task assigned icon little transperent to indicate that task originally do not belongs to this release and cycle but task exists in some other release and cycle
                 else if (d.taskexists && $scope.tab != 'tabCreate') {
-                    //d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('style', 'opacity:0.6').attr('x', 29).attr('y', -10);
+                    //d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('style', 'opacity:0.6').attr('x', 29).attr('y', -10);
                     $scope.nodeDisplay[d.id].task = true;
                     $scope.nodeDisplay[d.id].taskOpacity = 0.6;
                 }
@@ -4027,7 +4027,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             d.id = uNix++;
             addNode_W(d, !0, d.parent);
             if ($scope.tab != 'mindmapEndtoEndModules') {
-                if (d.task != null) d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
+                if (d.task != null) d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
             }
         });
         dLinks = d3Tree.links(dNodes);
@@ -4261,8 +4261,8 @@ Purpose : displaying pop up for replication of project
                 $scope.allMMaps = res;
                 // $scope.allMMaps.forEach(function (e, i) {
                 //     var t = $.trim(e.name);
-                //     var img_src = 'images_mindmap/node-modules-no.png';
-                //     if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
+                //     var img_src = 'imgs/node-modules-no.png';
+                //     if (e.type == 'modules_endtoend') img_src = 'imgs/MM5.png';
                 //     var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
                 //     node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
                 //     if(t.length>20) t = t.substring(0, 20)+'...';

@@ -19,6 +19,9 @@ var expressWinston = require('express-winston');
 var winston = require('winston');
 var epurl = "http://" + process.env.NDAC_IP + ":" + process.env.NDAC_PORT + "/";
 var logger = require('./logger');
+var nginxEnabled = process.env.NGINX_ON.toLowerCase() == "true";
+var ssoEnabled = process.env.ENABLE_SSO.toLowerCase() == "true";
+var ssoClient = process.env.SSO_CLIENT.toLowerCase();
 
 if (cluster.isMaster) {
     cluster.fork();
@@ -64,8 +67,8 @@ if (cluster.isMaster) {
 
         //HTTPS Configuration
         var uiConfig = require('./server/config/options');
-        var certificate = uiConfig.storageConfig.certificate.cert;
-        var privateKey = uiConfig.storageConfig.certificate.key;
+        var certificate = uiConfig.certificate.cert;
+        var privateKey = uiConfig.certificate.key;
         var credentials = {
             key: privateKey,
             cert: certificate,
@@ -95,7 +98,6 @@ if (cluster.isMaster) {
         app.use("/images_mindmap", express.static(__dirname + "/public/images_mindmap"));
         app.use("/css", express.static(__dirname + "/public/css"));
         app.use("/fonts", express.static(__dirname + "/public/fonts"));
-
 
         app.use(bodyParser.json({
             limit: '50mb'
@@ -132,6 +134,26 @@ if (cluster.isMaster) {
             store: redisSessionStore
         }));
 
+        const { ExpressOIDC } = require('@okta/oidc-middleware');
+        var oidc = undefined;
+        console.log(uiConfig);
+        if (ssoEnabled) {
+            if (ssoClient == 'okta') {
+                oidc = new ExpressOIDC({
+                    issuer: uiConfig.sso_config.identitity_provider_url,
+                    client_id: uiConfig.sso_config.client_id,
+                    client_secret: uiConfig.sso_config.client_secret,
+                    redirect_uri: 'https://localhost:3443/authorization-code/callback',
+                    routes: { callback: { defaultRedirect: "/" } },
+                    scope: 'openid profile email'
+                });
+                app.use(oidc.router);  // ExpressOIDC will attach handlers for the /login and /authorization-code/callback routes
+                oidc.on('error', err => {
+                    console.log('Unable to configure ExpressOIDC', err);
+                });
+            }
+        }
+
         app.use('*', function(req, res, next) {
             if (req.session === undefined) {
                 return res.status(500).send("<html><body><p>[ECODE 600] Internal Server Error Occured!</p></body></html>");
@@ -140,7 +162,7 @@ if (cluster.isMaster) {
         });
 
         //Based on NGINX Config Security Headers are configured
-        if(process.env.NGINX_ON == "FALSE"){
+        if(!nginxEnabled){
             app.use(helmet());
             app.use(lusca.p3p('/w3c/p3p.xml", CP="IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT'));
             app.use(helmet.referrerPolicy({
@@ -227,84 +249,73 @@ if (cluster.isMaster) {
             }
         });
 
-        //Role Based User Access to services
-        app.post('*', function(req, res, next) {
-            var roleId = req.session.activeRoleId;
-            var updateinp = {
-                roleid: roleId || "ignore",
-                servicename: req.url.replace("/", "")
-            };
-            var args = {
-                data: updateinp,
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            };
-            var apireq = apiclient.post(epurl + "utility/userAccess_Nineteen68", args, function(result, response) {
-                if (req.session && roleId) {
-                    if (response.statusCode != 200 || result.rows == "fail") {
-                        logger.error("Error occured in userAccess_Nineteen68");
-                        res.send("Invalid Session");
-                    } else if (result.rows == "off") {
-                        res.status(500).send("fail");
-                        httpsServer.close();
-                        logger.error("License Expired!!");
-                        logger.error("Please run the Service API and Restart the Server");
-                    } else {
-                        if (result.rows == "True") {
-                            logger.rewriters.push[0]=function(level, msg, meta) {
-                                 if (req.session && req.session.uniqueId) {
-                                     meta.username = req.session.username;
-                                     meta.userid = req.session.userid;
-                                     meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
-                                     return meta;
-                                 } else {
-                                     meta.username = null;
-                                     meta.userid = null;
-                                     return meta;
-                                 }
-                            };
-                            return next();
+        app.use('/', function(req, res, next) {
+            if (req.url != '/') return next();
+            if (req.method == "POST") {
+                req.session.emsg = req.session.emsg || "ok";
+                res.setHeader('message', req.session.emsg);
+                delete req.session.emsg;
+                return res.send("check");
+            }
+            var userLogged = req.session.logged;
+            var usrCtx = (ssoClient=="okta")? req.userContext : undefined;
+            if (req.session.username==undefined) {
+                if (ssoEnabled && usrCtx) {
+                    var username = usrCtx.userinfo.nineteen68_username;
+                    redisSessionStore.all(function (err, allKeys) {
+                        if (err) {
+                            logger.info("User Authentication failed");
+                            req.session.emsg = "fail";
                         } else {
-                            req.session.destroy();
-                            res.status(401).redirect('/');
+                            for (var ki = 0; ki < allKeys.length; ki++) {
+                                if (username == allKeys[ki].username) {
+                                    userLogged=true;
+                                    break;
+                                }
+                            }
+                            if (userLogged) { 
+                                req.session.emsg = "userLogged";
+                            } else {
+                                req.session.username = username;
+                                req.session.uniqueId = req.session.id;
+                                req.session.ip = req.ip;
+                                req.session.loggedin = (new Date).toISOString();
+                                logger.rewriters[0]=function(level, msg, meta) {
+                                    meta.username = null;
+                                    meta.userid = null;
+                                    meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
+                                    return meta;
+                                };
+                            }
                         }
-                    }
+                    });
                 } else {
-                    return next();
+                    logger.rewriters[0]=function(level, msg, meta) {
+                        meta.username = null;
+                        meta.userid = null;
+                        meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
+                        return meta;
+                    };
+                    req.session.destroy();
+                    res.clearCookie('connect.sid');
+                    return res.redirect('login');
                 }
-            });
-            apireq.on('error', function(err) {
-                res.status(500).send("fail");
-                httpsServer.close();
-                logger.error("Please run the Service API and Restart the Server");
-            });
-        });
-    
-
-        app.get('/', function(req, res) {
-            res.clearCookie('connect.sid');
-            res.clearCookie('io');
-            res.clearCookie('mm_pid');
-            req.session.destroy();
-            logger.rewriters[0]=function(level, msg, meta) {
-                meta.username = null;
-                meta.userid = null;
-                meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
-                return meta;
-            };
-            res.sendFile("index.html", {
-                root: __dirname + "/public/"
-            });
+            } else if (userLogged) {
+                req.session.emsg = "userLogged";
+            }
+            req.session.logged = true;
+            return res.sendFile("app.html", { root: __dirname + "/public/" });
         });
 
-        app.get('/login', function(req, res) {
-            res.clearCookie('connect.sid');
-            req.session.destroy();
-            res.sendFile("index.html", {
-                root: __dirname + "/public/"
+        if (!ssoEnabled) {
+            app.get('/login', function(req, res) {
+                res.clearCookie('connect.sid');
+                req.session.destroy();
+                res.sendFile("app.html", {
+                    root: __dirname + "/public/"
+                });
             });
-        });
+        }
 
         app.get('/admin', function(req, res) {
             if (!req.session.defaultRole || req.session.defaultRole != 'Admin') {
@@ -312,7 +323,7 @@ if (cluster.isMaster) {
                 res.status(401).redirect('/');
             } else {
                 if (req.session.uniqueId != undefined) {
-                    res.sendFile("index.html", {
+                    res.sendFile("app.html", {
                         root: __dirname + "/public/"
                     });
                 } else {
@@ -364,7 +375,7 @@ if (cluster.isMaster) {
                     res.status(401).redirect('/');
                 } else {
                     if (req.session.uniqueId != undefined) {
-                        res.sendFile("index.html", {
+                        res.sendFile("app.html", {
                             root: __dirname + "/public/"
                         });
                     } else {
@@ -374,7 +385,7 @@ if (cluster.isMaster) {
                 }
             } else {
                 if (req.session.uniqueId != undefined) {
-                    res.sendFile("index.html", {
+                    res.sendFile("app.html", {
                         root: __dirname + "/public/"
                     });
                 } else {
@@ -386,7 +397,7 @@ if (cluster.isMaster) {
 
         app.get('/favicon.ico', function(req, res) {
             if (req.session.uniqueId != undefined) {
-                res.sendFile("index.html", {
+                res.sendFile("app.html", {
                     root: __dirname + "/public/"
                 });
             } else {
@@ -397,7 +408,7 @@ if (cluster.isMaster) {
 
         app.get('/css/fonts/Lato/Lato-Regular.ttf', function(req, res) {
             if (req.session.uniqueId != undefined) {
-                res.sendFile("index.html", {
+                res.sendFile("app.html", {
                     root: __dirname + "/public/"
                 });
             } else {
@@ -406,8 +417,62 @@ if (cluster.isMaster) {
             }
         });
 
+        //Role Based User Access to services
+        app.post('*', function(req, res, next) {
+            var roleId = (req.session)? req.session.activeRoleId : undefined;
+            var updateinp = {
+                roleid: roleId || "ignore",
+                servicename: req.url.replace("/", "")
+            };
+            var args = {
+                data: updateinp,
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            };
+            var apireq = apiclient.post(epurl + "utility/userAccess_Nineteen68", args, function(result, response) {
+                if (roleId) {
+                    if (response.statusCode != 200 || result.rows == "fail") {
+                        logger.error("Error occured in userAccess_Nineteen68");
+                        res.send("Invalid Session");
+                    } else if (result.rows == "off") {
+                        res.status(500).send("fail");
+                        httpsServer.close();
+                        logger.error("License Expired!!");
+                        logger.error("Please run the Service API and Restart the Server");
+                    } else {
+                        if (result.rows == "True") {
+                            logger.rewriters.push[0]=function(level, msg, meta) {
+                                 if (req.session && req.session.uniqueId) {
+                                     meta.username = req.session.username;
+                                     meta.userid = req.session.userid;
+                                     meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
+                                     return meta;
+                                 } else {
+                                     meta.username = null;
+                                     meta.userid = null;
+                                     return meta;
+                                 }
+                            };
+                            return next();
+                        } else {
+                            req.session.destroy();
+                            res.status(401).redirect('/');
+                        }
+                    }
+                } else {
+                    return next();
+                }
+            });
+            apireq.on('error', function(err) {
+                res.status(500).send("fail");
+                httpsServer.close();
+                logger.error("Please run the Service API and Restart the Server");
+            });
+        });
+
         app.post('/designTestCase', function(req, res) {
-            res.sendFile("index.html", {
+            res.sendFile("app.html", {
                 root: __dirname + "/public/"
             });
         });
@@ -552,9 +617,17 @@ if (cluster.isMaster) {
         app.post('/APG_OpenFileInEditor', flowGraph.APG_OpenFileInEditor);
         app.post('/APG_createAPGProject', flowGraph.APG_createAPGProject);
         //-------------SERVER START------------//
-        var hostFamilyType = process.env.NGINX_ON == "TRUE" ? '127.0.0.1' : '0.0.0.0';
+        var hostFamilyType = (nginxEnabled) ? '127.0.0.1' : '0.0.0.0';
         var portNumber = process.env.serverPort;
-        httpsServer.listen(portNumber, hostFamilyType); //Https Server
+        if (!ssoEnabled) {
+            httpsServer.listen(portNumber, hostFamilyType); //Https Server
+        } else {
+            if (ssoClient == 'okta') {
+                oidc.on('ready', () => {
+                    httpsServer.listen(portNumber, hostFamilyType); //Https Server
+                });
+            }
+        }
         try {
             var apireq = apiclient.post(epurl + "server", function(data, response) {
                 try {
@@ -578,8 +651,6 @@ if (cluster.isMaster) {
             httpsServer.close();
             logger.error("Please run the Service API");
         }
-
-      
 
         //To prevent can't send header response
         app.use(function(req, res, next) {

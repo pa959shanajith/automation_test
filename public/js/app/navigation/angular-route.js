@@ -2,9 +2,20 @@
  * Angular Routes
  */
 mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
-
-    $urlRouterProvider.otherwise('/login');
     $stateProvider
+        .state('base', {
+            url: '/',
+            templateUrl: 'partials/base.html',
+            controller: 'baseController',
+            resolve: {
+                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+						'js/controllers/login/baseController.js',
+						'js/controllers/login/loginService.js'
+                    ]);
+                }]
+            }
+		})
         .state('login', {
             url: '/login',
             templateUrl: 'partials/login.html',
@@ -317,16 +328,12 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 .run(function($rootScope, $location, headerServices){
 	$rootScope.redirectPage = function(){
 		unblockUI();
+		window.localStorage.clear();
 		headerServices.logoutUser_Nineteen68()
 		.then(function(data){
-			if(data == "Session Expired"){
-				window.localStorage.clear();
-				//$location.path('/login');
-				window.location='/';
-			}
+			$location.path('/');
 		}, function(error) {
 			console.log("Failed to Logout");
-			//window.location='/';
 		});
 	}
 });

@@ -11,6 +11,7 @@
   "author": "Dimension Labs",
   "license": "Copyright (c) SLK Software Services Pvt. Ltd.",
   "dependencies": {
+    "@okta/oidc-middleware": "^1.0.2",
     "activedirectory": "^0.7.2",
     "async": "^2.6.0",
     "bcrypt": "^1.0.3",

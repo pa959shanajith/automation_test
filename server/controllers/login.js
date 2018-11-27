@@ -112,7 +112,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 						req.session.uniqueId = sessId;
 						req.session.userid = userid;
 						req.session.ip = req.ip;
-						req.session.loggedin = (new Date).toISOString()
+						req.session.loggedin = (new Date).toISOString();
 						if (role == "Admin") {
 							flag = 'validCredential';
 							addUsernameAndIdInLogs(username,flag,userid);
@@ -386,9 +386,8 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 						client.post(epurl + "login/loadUserInfo_Nineteen68", args,
 							function (userResult, response) {
 							if (response.statusCode != 200 || userResult.rows == "fail") {
-								var flag = "fail";
 								logger.error("Error occurred in loadUserInfo_Nineteen68 Error Code : ERRNDAC");
-								res.send(flag);
+								res.send("fail");
 							} else {
 								if (userResult.rows.length > 0) {
 									var service = userResult.rows[0];
@@ -400,7 +399,8 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 									jsonService.role = service.defaultrole;
 									jsonService.username = service.username.toLowerCase();
 									selectedRole = selectedRole||jsonService.role;
-									req.session.defaultRoleId = jsonService.role;
+									req.session.userid = service.userid;
+									req.session.defaultRoleId = service.defaultrole;
 									req.session.activeRoleId = selectedRole;
 								} else {
 									logger.info("User info not found");
@@ -555,8 +555,5 @@ exports.logoutUser_Nineteen68 = function (req, res) {
 	res.clearCookie('connect.sid');
 	logger.info("%s logged out successfully", req.session.username);
 	req.session.destroy();
-	if (req.session == undefined) {
-		logger.info("Session Expired");
-		res.send('Session Expired');
-	}
+	res.send('Session Expired');
 };
