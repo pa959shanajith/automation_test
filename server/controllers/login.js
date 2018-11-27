@@ -387,7 +387,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 							function (userResult, response) {
 							if (response.statusCode != 200 || userResult.rows == "fail") {
 								logger.error("Error occurred in loadUserInfo_Nineteen68 Error Code : ERRNDAC");
-								res.send("fail");
+								return res.send("fail");
 							} else {
 								if (userResult.rows.length > 0) {
 									var service = userResult.rows[0];
@@ -404,14 +404,14 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 									req.session.activeRoleId = selectedRole;
 								} else {
 									logger.info("User info not found");
-									res.send("fail");
+									return res.send("fail");
 								}
 							}
 							callback();
 						});
 					} catch (exception) {
 						logger.error(exception.message);
-						res.send("fail");
+						return res.send("fail");
 					}
 				},
 				loggedinRole: function (callback) {
@@ -429,13 +429,13 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 						function (rolesResult, response) {
 						if (response.statusCode != 200 || rolesResult.rows == "fail") {
 							logger.error("Error occurred in loadUserInfo_Nineteen68 Error Code : ERRNDAC");
-							res.send("fail");
+							return res.send("fail");
 						} else {
 							try {
 								var rolename = rolesResult.rows[selectedRole];
 								if (!rolename) {
 									logger.error("User role not found");
-									res.send("fail");
+									return res.send("fail");
 								} else {
 									if (selectedRole == req.session.defaultRoleId) req.session.defaultRole = rolename;
 									req.session.activeRole = rolename;
@@ -444,7 +444,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 								callback();
 							} catch (exception) {
 								logger.error(exception.message);
-								res.send("fail");
+								return res.send("fail");
 							}
 						}
 					});
@@ -467,12 +467,12 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 							function (pluginResult, response) {
 							if (response.statusCode != 200 || pluginResult.rows == "fail") {
 								logger.error("Error occured in loadUserInfo_Nineteen68 Error Code : ERRNDAC");
-								res.send("fail");
+								return res.send("fail");
 							} else {
 								try {
 									if (pluginResult.rows.length == 0) {
 										logger.info("User plugins not found");
-										res.send("fail");
+										return res.send("fail");
 									} else {
 										var pluginsArr = [];
 										var key = ["ALM", "APG", "Dashboard", "Dead Code Identifier", "Mindmap", "Neuron Graphs", "Oxbow Code Identifier", "Reports", "Utility", "Webocular"];
@@ -487,20 +487,20 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 									}
 								} catch (exception) {
 									logger.error(exception.message);
-									res.send("fail");
+									return res.send("fail");
 								}
 							}
 							callback();
 						});
 					} catch (exception) {
 						logger.error(exception.message);
-						res.send("fail");
+						return res.send("fail");
 					}
 				}
 			}, function (err, data) {
 				if (err) {
 					logger.error(err);
-					res.send("fail");
+					return res.send("fail");
 				} else {
 					res.send(jsonService);
 				}
@@ -511,7 +511,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 		}
 	} catch (exception) {
 		logger.error(exception.message);
-		res.send("fail");
+		return res.send("fail");
 	}
 };
 

@@ -9,7 +9,8 @@
     "sso_config": {
         "identitity_provider_url": "",
         "client_id": "",
-        "client_secret": ""
+        "client_secret": "",
+        "redirect_uri": ""
     },
     "screenShotPath": {
         "default": "",

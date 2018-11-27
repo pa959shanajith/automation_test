@@ -136,14 +136,13 @@ if (cluster.isMaster) {
 
         const { ExpressOIDC } = require('@okta/oidc-middleware');
         var oidc = undefined;
-        console.log(uiConfig);
         if (ssoEnabled) {
             if (ssoClient == 'okta') {
                 oidc = new ExpressOIDC({
                     issuer: uiConfig.sso_config.identitity_provider_url,
                     client_id: uiConfig.sso_config.client_id,
                     client_secret: uiConfig.sso_config.client_secret,
-                    redirect_uri: 'https://localhost:3443/authorization-code/callback',
+                    redirect_uri: uiConfig.sso_config.redirect_uri,
                     routes: { callback: { defaultRedirect: "/" } },
                     scope: 'openid profile email'
                 });
@@ -311,9 +310,7 @@ if (cluster.isMaster) {
             app.get('/login', function(req, res) {
                 res.clearCookie('connect.sid');
                 req.session.destroy();
-                res.sendFile("app.html", {
-                    root: __dirname + "/public/"
-                });
+                return res.sendFile("app.html", { root: __dirname + "/public/" });
             });
         }
 
@@ -323,9 +320,7 @@ if (cluster.isMaster) {
                 res.status(401).redirect('/');
             } else {
                 if (req.session.uniqueId != undefined) {
-                    res.sendFile("app.html", {
-                        root: __dirname + "/public/"
-                    });
+                    res.sendFile("app.html", { root: __dirname + "/public/" });
                 } else {
                     req.session.destroy();
                     res.status(401).redirect('/login');
@@ -375,9 +370,7 @@ if (cluster.isMaster) {
                     res.status(401).redirect('/');
                 } else {
                     if (req.session.uniqueId != undefined) {
-                        res.sendFile("app.html", {
-                            root: __dirname + "/public/"
-                        });
+                        res.sendFile("app.html", { root: __dirname + "/public/" });
                     } else {
                         req.session.destroy();
                         res.status(401).redirect('/login');
@@ -385,9 +378,7 @@ if (cluster.isMaster) {
                 }
             } else {
                 if (req.session.uniqueId != undefined) {
-                    res.sendFile("app.html", {
-                        root: __dirname + "/public/"
-                    });
+                    res.sendFile("app.html", { root: __dirname + "/public/" });
                 } else {
                     req.session.destroy();
                     res.status(401).redirect('/login');
@@ -397,9 +388,7 @@ if (cluster.isMaster) {
 
         app.get('/favicon.ico', function(req, res) {
             if (req.session.uniqueId != undefined) {
-                res.sendFile("app.html", {
-                    root: __dirname + "/public/"
-                });
+                res.sendFile("app.html", { root: __dirname + "/public/" });
             } else {
                 req.session.destroy();
                 res.status(401).redirect('/login');
@@ -408,9 +397,7 @@ if (cluster.isMaster) {
 
         app.get('/css/fonts/Lato/Lato-Regular.ttf', function(req, res) {
             if (req.session.uniqueId != undefined) {
-                res.sendFile("app.html", {
-                    root: __dirname + "/public/"
-                });
+                res.sendFile("app.html", { root: __dirname + "/public/" });
             } else {
                 req.session.destroy();
                 res.status(401).redirect('/login');
@@ -472,9 +459,7 @@ if (cluster.isMaster) {
         });
 
         app.post('/designTestCase', function(req, res) {
-            res.sendFile("app.html", {
-                root: __dirname + "/public/"
-            });
+            res.sendFile("app.html", { root: __dirname + "/public/" });
         });
 
         //Route Directories
@@ -525,7 +510,7 @@ if (cluster.isMaster) {
         app.post('/getScreens',mindmap.getScreens);
         app.post('/exportToExcel',mindmap.exportToExcel);
         app.post('/getDomain',mindmap.getDomain);
-        
+
         //Login Routes
         app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
         app.post('/loadUserInfo_Nineteen68', login.loadUserInfo_Nineteen68);
