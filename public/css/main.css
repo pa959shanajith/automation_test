@@ -5758,8 +5758,11 @@ ul.browserInlineIcons
 }
 .reportDataTable tr,.reportScenarioDataTable tr
 {
-    width: 100%;
+    /* width: 80%; */
     font-family: Latoweb;
+    float: left;
+    width: 100%;
+    display: table;
 }
 
 .reportDataTable th:nth-child(1),.reportDataTable td:nth-child(1){width: 4%;  word-break: break-word; }

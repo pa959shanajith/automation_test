@@ -103,7 +103,7 @@
               <td ng-if="report.latestStatus == 'Incomplete'" class="colorStatusYellow">{{report.latestStatus}}</td>
               <td ng-if="report.latestStatus == 'Skipped'" class="colorStatusBlue">{{report.latestStatus}}</td>
               <td ng-if="report.latestStatus != 'Skipped' && report.latestStatus != 'Fail' && report.latestStatus != 'Pass' && report.latestStatus != 'Terminate' && report.latestStatus != 'Incomplete'" class="">{{report.latestStatus}}</td>
-
+              <td ng-if="report.latestStatus == ''"></td>
               <td>{{report.executedon}}</td>
               <td>
                   <div ng-hide="report.count==0" >
