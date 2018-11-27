@@ -1816,7 +1816,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 var path = newScrapedList.view[i].xpath;
                                 var ob = newScrapedList.view[i];
                                 ob.tempId = i;
-                                if (appType == "DesktopJava") {
+                                if (appType == "DesktopJava" || appType == "Desktop") {
                                     custN = ob.custname.replace('/\s/g', ' ').replace('\n', ' ').replace(/[<>]/g, '');
                                 }
                                 else {
@@ -1842,8 +1842,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 // } else {
                                 // }
                                 // }                                
-                                if (appType == "DesktopJava") {
-                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                if (appType == "DesktopJava" || appType == "Desktop") {
+                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                 }
                                 else {
                                     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
@@ -1865,7 +1865,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                     tempId++
                                     var path = viewString.view[i].xpath;
                                     var ob = viewString.view[i];
-                                    if (appType == "DesktopJava") {
+                                    if (appType == "DesktopJava" || appType == "Desktop") {
                                         var custN = ob.custname.replace('/\s/g', ' ').replace('\n', ' ').replace(/[<>]/g, '');
                                     }
                                     else {
@@ -1888,8 +1888,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                             ob.url = "",
                                             ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
                                     }
-                                    if (appType == "DesktopJava") {
-                                        var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                    if (appType == "DesktopJava" || appType == "Desktop") {
+                                        var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                     }
                                     else {
                                         var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
@@ -1921,7 +1921,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 var path = viewString.view[i].xpath;
                                 var ob = viewString.view[i];
                                 ob.tempId = i;
-                                if (appType == "DesktopJava") {
+                                if (appType == "DesktopJava" || appType == "Desktop") {
                                     var custN = ob.custname.replace('/\s/g', ' ').replace('\n', ' ').replace(/[<>]/g, '');
                                 }
                                 else {
@@ -1945,8 +1945,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 }
                                 // }
                                 // }
-                                if (appType == "DesktopJava") {
-                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                if (appType == "DesktopJava" || appType == "Desktop") {
+                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                 }
                                 else {
                                     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
@@ -2307,8 +2307,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         var dontChkViewString = 0;
                         $.each($("input[type=checkbox].checkall:checked"), function () {
                             for (var i = 0; i < newScrapedList.view.length; i++) {
-                                if (appType == 'DesktopJava') {
-                                    if ($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim()).replace(/[<>]/g, '').replace('\n', ' ') == newScrapedList.view[i].custname.trim().replace(/[<>]/g, '').replace('/\s/g', ' ').replace(/  +/g, ' ').replace('\n', ' ')) {
+                                if (appType == 'DesktopJava'|| appType == 'Desktop') {
+                                    if ($(this).parents("li").data("xpath").replace(/[\"]/g, "\'") == newScrapedList.view[i].xpath.replace(/\n/g," ") && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim()).replace(/[<>]/g, '').replace('\n', ' ') == newScrapedList.view[i].custname.trim().replace(/[<>]/g, '').replace('/\s/g', ' ').replace(/  +/g, ' ').replace('\n', ' ')) {
                                         if (!(isInArray(newScrapedList.view.indexOf(newScrapedList.view[i]), getIndexOfDeletedObjects))) {
                                             getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
                                             $(this).parents("li.select_all").remove();
