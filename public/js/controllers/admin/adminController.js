@@ -1617,7 +1617,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		event.stopImmediatePropagation();
 	});
 
-	$scope.userConf.click = function() {
+	$scope.userConf.click = function(query) {
 		$(".selectedIcon").removeClass("selectedIcon");
 		$("button.userTypeBtnActive").removeClass('userTypeBtnActive');
 		$("#userTab").find("img").addClass("selectedIcon");
@@ -1634,15 +1634,17 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		this.nocreate = false;
 		this.getUserRoles();
 		this.ciActive = false;
-		if (!this.ldapActive) {
-			this.ldapActive = false;
-			this.ldap = {server: '', fetch: "map", user: '', expired: false};
-		} else {
-			this.ldapActive = true;
-			$scope.userConf.activateLDAP();
+		if (query != "retainldap") {
+			if (!this.ldapActive) {
+				this.ldapActive = false;
+				this.ldap = {server: '', fetch: "map", user: '', expired: false};
+			} else {
+				this.ldapActive = true;
+				$scope.userConf.activateLDAP();
+			}
+			this.ldapAllServerList=[];
+			this.ldapAllUserList=[];
 		}
-		this.ldapAllServerList=[];
-		this.ldapAllUserList=[];
 		this.query0 = '';
 		this.query1 = '';
 	};
