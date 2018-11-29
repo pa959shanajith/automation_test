@@ -357,6 +357,9 @@
                 var label = $("#jLabel").val().split(" ");
                 var attachment = $("#scrnShotPath").val();
                 var pissue = $("#jpIssueid").val();
+				var reportId=$('.reportId').text();
+				var executionId=$('.executionId').text();
+				var slno=$('#inputSlno').val();
                 if (!projectid) $("#jProjects").css('border-color', 'red');
                 else if (!issuetype || issuetype == "Select Issue") $("#jIssuetype").css('border-color', 'red');
                 else if (!summary) $("#jSummary").css('border-color', 'red');
@@ -378,7 +381,10 @@
                             'url': url,
                             'username': userName,
                             'password': pwd,
-                            'parentissue': ''
+                            'parentissue': '',
+							'reportId':reportId,
+							'slno':slno,
+							'executionId':executionId
                         },
                         "action": "createIssueInJira"
                     }
@@ -1382,6 +1388,8 @@
                 <label>Domain :</label><span>{{domainName}}</span>
                 <label>Browser Type :</label><span>{{browserType}}</span>
                 <label>Browser Version :</label><span>{{browserVersion}}</span>
+				<span style='visibility:hidden' class="reportId">{{reportId}}</span>
+				<span style='visibility:hidden' class="executionId">{{executionId}}</span>
             </div>
             <div id="rightSummaryFunc" class="rightSummaryFunc">
                 <div class="reportStatus">
@@ -1485,7 +1493,7 @@
                             <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}},<text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text></td>
                             {{/ifnotEquals}} {{/ifEquals}}
                             <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}}; display:none" data-screenshot="{{screenshot_path}}">{{status}}</td>
-                            <td class="rjira tabCont"><span class="opendescpopup" title="Create Issue"></span></td>
+                            <td class="rjira tabCont"><span class="opendescpopup" title="Create Issue">{{jira_defect_id}}</span></td>
                             <td class='hide hideStep'>{{hidestep}}</td>
                         </tr>
                         {{/each}}

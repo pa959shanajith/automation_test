@@ -6754,4 +6754,13 @@ button.close {
     display: none !important;
   }
 }
+@-moz-document url-prefix() {
+   .map-object{ 
+     margin-top: -20% !important; 
+     margin-left: -28% !important; 
+    }
+  .modal.in .map-object{
+    -moz-transform: translate(0, 0) !important;
+  }
+}
 /*# sourceMappingURL=bootstrap.css.map */
