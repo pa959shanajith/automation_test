@@ -441,6 +441,9 @@ if (cluster.isMaster) {
         } catch (Ex) {
             process.env.projectVersioning = "disabled";
             logger.warn('Versioning is disabled');
+            app.post('/getProjectsNeo', function(req,res){
+                res.send("false");
+            });
         }
 
         // Route Mapping
