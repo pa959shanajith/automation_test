@@ -149,13 +149,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $scope.nodeDisplay = {};
         $scope.linkDisplay = {};
     }
-    /*function collapseSidebars() {
+
+    function collapseSidebars() {
         if ($('#left-nav-section').is(':visible'))
             $("#ct-expand-left").trigger("click");
         if ($('#right-dependencies-section').is(':visible'))
             $("#ct-expand-right").trigger("click");
-    }*/
-
+    }
     function loadMindmapData() {
         //param 0: normal , 1: normal with versioning, 2: end to end
         blockUI("Loading...");
@@ -276,7 +276,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $scope.projectName3 = $scope.projectNameO;
                 $scope.projectName2 = $scope.projectNameO;
                 $scope.projectName1 = $scope.projectNameO;
-                collapseSidebars();
+                $timeout(function(){
+                    collapseSidebars();
+                },200);
             }
         }, function(error) {
             console.log("Error:", error);
@@ -4563,12 +4565,7 @@ Purpose : displaying pop up for replication of project
         }, function(err) {
             load_tab();
         })
-        function collapseSidebars() {
-            if ($('#left-nav-section').is(':visible'))
-                $("#ct-expand-left").trigger("click");
-            if ($('#right-dependencies-section').is(':visible'))
-                $("#ct-expand-right").trigger("click");
-        }
+
         function load_tab() {
             function selectOpt(tab) {
                 $("img.selectedIcon").removeClass("selectedIcon");
