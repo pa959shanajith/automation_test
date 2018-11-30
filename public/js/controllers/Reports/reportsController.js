@@ -1038,6 +1038,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 								else dataURIs.forEach(function (d, i) { finalReports.rows[scrShot.idx[i]].screenshot_dataURI = d; });
 								//Service call to get Pdf reports
 								blockUI("Generating report..please wait..");
+                                var isIE = /*@cc_on!@*/ false || !!document.documentMode;
 								reportService.renderReport_ICE(finalReports, reportType).then(
 									function (data1) {
 										unblockUI();
@@ -1047,6 +1048,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 											openWindow = 0;
 											if (openWindow == 0) {
 												var file = new Blob([data1], { type: 'application/pdf' });
+                                                if (isIE) {
+                                                    navigator.msSaveOrOpenBlob(file);
+                                                }else{
 												var fileURL = URL.createObjectURL(file);
 												var a = document.createElement('a');
 												a.href = fileURL;
@@ -1057,6 +1061,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 												document.body.removeChild(a);
 												//$window.open(fileURL, '_blank');
 												URL.revokeObjectURL(fileURL);
+                                                }
 											}
 											openWindow++;
 											//Transaction Activity for PDFReportClick

@@ -4485,6 +4485,11 @@ select:-webkit-autofill:focus {
     left: 61px;
     margin: 3px;
 }
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    .filterIcon{
+        left: 28px;
+        }
+    }
 .searchInput{
 	  border-radius: 7px 0px 0px 7px;
     border: none;
@@ -4530,6 +4535,11 @@ select:-webkit-autofill:focus {
     border: 1px solid #461F6E;
     outline: none !important;
     padding: 10px !important;
+}
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    .reports-search{
+        padding: 5px !important;
+       }
 }
 .search-reports{
     float: right;
