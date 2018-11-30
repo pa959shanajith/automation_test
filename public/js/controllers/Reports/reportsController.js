@@ -193,6 +193,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 							clearInterval(intrvlid);
 						});
 						var reportloadingintervalid = setInterval(function(){
+								if($("#page-taskName").text() != 'Reports'){
+									clearInterval(reportloadingintervalid);
+									return;
+								};
 								if(!pauseloadinginterval){
 									var scenarioId = $scope.result_reportData[report_loaded_idx].scenarioId;
 									var reportsInputData = {};
@@ -846,7 +850,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 
 	//$(document).on('click', '.openreportstatus', function(e){
 	function htlmReportClick(e) {
-		console.log($scope.result_reportData);
 		var reportType = $(this).attr('data-getrep');
 		var executionId = '';
 		if($(this)[0].classList.contains('archivedreport')){
@@ -992,7 +995,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 						finalReports.overallstatus[0].terminate = (parseFloat((terminated / total) * 100).toFixed(2)) > 0 ? parseFloat((terminated / total) * 100).toFixed(2) : parseInt(0);
 						finalReports.remarksLength = remarksLength;
 						finalReports.commentsLength = commentsLength;
-						console.log('finalReportsa',finalReports);
+
 					}
 					if (reportType == "html") {
 						//Service call to get Html reports
