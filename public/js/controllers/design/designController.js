@@ -1271,6 +1271,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         return false
                     }
                     //  console.log(data)
+                    document.getElementById("wsldInput").value = wsdlUrl.trim()
                     $("#wsldSelect").empty().append('<option value selected disabled>Select Operation</option>')
                     for (i = 0; i < data.listofoperations.length; i++) {
                         $("#wsldSelect").append('<option value="' + data.listofoperations[i] + '">' + data.listofoperations[i] + '</option>')
@@ -1774,9 +1775,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         else {
                             openDialog("Compare Objects", "Failed to compare objects");
                             $rootScope.compareFlag = false;
-                            setTimeout(() => {
+                            setTimeout(function() {
                                 $(".close:visible, .btn-default:visible").addClass('navigateToDesign');
-                                $(document).on('click', '.navigateToDesign', function () {
+                                $(document).on('click','.navigateToDesign',function() {
                                     $(".scrollbar-compare,.saveCompareDiv").hide(); //Hide Compare Div
                                     angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
                                     $("#scrapTree,.fsScroll").show(); //Show Scraped Objects
