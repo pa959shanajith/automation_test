@@ -1669,8 +1669,10 @@ exports.assignProjects_ICE = function (req, res) {
 						// if length of unassigned projects > 0 then delete tasks of that project
 						if(assignProjectsDetails.deletetasksofprojects.length > 0){
 							assignProjectsDetails.deletetasksofprojects.forEach(function(e,i){
-								qList.push({"statement":"match p = (m{projectID:'"+e.projectid+"'})-[FNTT]-(t:TASKS{assignedTo:'"+assignProjectsDetails.userId+"'}) where not t.status = 'review' detach delete t;"});
+								qList.push({"statement":"match p = (m{projectID:'"+e.projectid+"'})-[FNTT]-(t:TASKS{assignedTo:'"+assignProjectsDetails.userId+"'}) where t.status = 'assigned' or t.status = 'inprogress' or t.status = 'reassign' detach delete t;"});
 								qList.push({"statement":"match p = (m{projectID:'"+e.projectid+"'})-[FNTT]-(t:TASKS{reviewer:'"+assignProjectsDetails.userId+"'}) where t.status = 'review' detach delete t;"});
+								qList.push({"statement":"match p = (m{projectID:'"+e.projectid+"'})-[FNTT]-(t:TASKS{assignedTo:'"+assignProjectsDetails.userId+"'}) set m.assignedTo = '' "});
+								qList.push({"statement":"match p = (m{projectID:'"+e.projectid+"'})-[FNTT]-(t:TASKS{reviewer:'"+assignProjectsDetails.userId+"'}) set m.reviewer = '' "});
 							});
 						}
 
