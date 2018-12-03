@@ -845,11 +845,11 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 	/********** HTML REPORT CLICK ****************/
 	$(document).off('click.htmlRepClick', '.openreportstatus');
 	$(document).on({
-		'click.htmlRepClick': htlmReportClick
+		'click.htmlRepClick': htmlReportClick
 	}, '.openreportstatus');
 
 	//$(document).on('click', '.openreportstatus', function(e){
-	function htlmReportClick(e) {
+	function htmlReportClick(e) {
 		var reportType = $(this).attr('data-getrep');
 		var executionId = '';
 		if($(this)[0].classList.contains('archivedreport')){
