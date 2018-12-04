@@ -6,6 +6,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 	var openArrow = 0; var openWindow = 0;
 	var executionId, testsuiteId;
 	var robj,redirected = false;
+	var pauseloadinginterval = false;
+	var clearIntervalList = [];
 	$scope.reportIdx = ''; // for execution count click
 	$("#page-taskName").empty().append('<span>Reports</span>')
 
@@ -160,16 +162,16 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 								}
 
 								if(redirected){
-									if(robj.testSuiteDetails[suiteidx].testsuiteid == value.testsuiteid && new Date(val.executedon)>new Date(latesttime) && position==0){
+									if(robj.testSuiteDetails[suiteidx].testsuiteid == value.testsuiteid && position==0){
 										latestidx = counter+1;
 										latesttime = val.executedon;
 									}
 								}
 						
 								if(position == 0){
-									$scope.result_reportData.push({'id':index+1,'ModuleName': value.testsuitename,'ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':counter+1})
+									$scope.result_reportData.push({'id':index+1,'ModuleName': value.testsuitename,'ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':counter+1,'executionid':val.executionid})
 								}else{
-									$scope.result_reportData.push({'id':'','ModuleName':'','ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':counter+1})
+									$scope.result_reportData.push({'id':'','ModuleName':'','ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':counter+1,'executionid':val.executionid})
 								}
 								counter = counter + 1;
 							})
@@ -180,12 +182,78 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 									scrollTop: $("[report-idx="+latestidx+"]").offset().top-$("[report-idx=1]").offset().top
 								}, 500);	
 								$("[report-idx="+latestidx+"]").addClass('highlightReportRow');
+								$("[report-idx="+latestidx+"]").trigger('mouseenter');
 							},500);
 						}
 						
 						//console.log("scope", $scope.result_reportData);
 						$("#reportDataTable").show();
+						var report_loaded_idx = 0;
+						clearIntervalList.forEach(function(intrvlid,i){
+							clearInterval(intrvlid);
+						});
+						var reportloadingintervalid = setInterval(function(){
+								if($("#page-taskName").text() != 'Reports'){
+									clearInterval(reportloadingintervalid);
+									return;
+								};
+								if(!pauseloadinginterval){
+									var scenarioId = $scope.result_reportData[report_loaded_idx].scenarioId;
+									var reportsInputData = {};
+									reportsInputData.scenarioid = scenarioId;
+									reportsInputData.cycleid = $("#selectCycles").val();
+									reportsInputData.type = "latestreport";
+									reportsInputData.report_loaded_idx = report_loaded_idx;
+									reportService.getReportsData_ICE(reportsInputData).then(function (result_res_scenarioData, response_scenarioData) {
+										$scope.result_reportData[result_res_scenarioData.report_loaded_idx].count = result_res_scenarioData.count;
+										$scope.result_reportData[result_res_scenarioData.report_loaded_idx].latestStatus = result_res_scenarioData.status;
+										$scope.result_reportData[result_res_scenarioData.report_loaded_idx].executedon = result_res_scenarioData.executedtime;
+										$scope.result_reportData[result_res_scenarioData.report_loaded_idx].reportid = result_res_scenarioData.reportid;
+										$scope.result_reportData[result_res_scenarioData.report_loaded_idx].executionid =result_res_scenarioData.executionid;									
+									});	
+									if(report_loaded_idx<$scope.result_reportData.length-1){
+										report_loaded_idx = report_loaded_idx + 1;								
+									}
+									else clearInterval(reportloadingintervalid);
+								}
+							}, 700);	
+						clearIntervalList.push(reportloadingintervalid);
+						var setTimeoutConst = '';
+						$timeout(function(){
+							$('.getScenarioTestCaseDetails').off("hover");
+							$('.getScenarioTestCaseDetails').hover(function(){
+								var ridx = this.getAttribute("report-idx");
+								if($('[report-idx="'+(parseInt(ridx)+1)+'"]>.executionCount').text() != 'loading...'){
+									return;
+								} 
+								pauseloadinginterval = true;
+								setTimeoutConst = setTimeout(function(){
+									/* Do Some Stuff*/
+									var scenarioId = $scope.result_reportData[parseInt(ridx)-1].scenarioId;
+									var reportsInputData = {};
+									reportsInputData.scenarioid = scenarioId;
+									reportsInputData.cycleid = $("#selectCycles").val();
+									reportsInputData.type = "latestreport";
+									reportsInputData.report_loaded_idx = parseInt(ridx)-1;
+									reportService.getReportsData_ICE(reportsInputData).then(function (result_res_scenarioData, response_scenarioData) {
+										$scope.result_reportData[result_res_scenarioData.report_loaded_idx].count = result_res_scenarioData.count;
+										$scope.result_reportData[result_res_scenarioData.report_loaded_idx].latestStatus = result_res_scenarioData.status;
+										$scope.result_reportData[result_res_scenarioData.report_loaded_idx].executedon = result_res_scenarioData.executedtime;
+										$scope.result_reportData[result_res_scenarioData.report_loaded_idx].reportid = result_res_scenarioData.reportid;
+										$scope.result_reportData[result_res_scenarioData.report_loaded_idx].executionid =result_res_scenarioData.executionid;									
+										pauseloadinginterval = false;
+									});	
+
+								}, 300);
+							},function(){
+								clearTimeout(setTimeoutConst);
+								pauseloadinginterval = false;
+							})	
+						},100);
+						
+						
 					}
+
 				});
 
 			};
@@ -194,9 +262,30 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 
 	//Execution count click
 	$scope.getscenarioDetails = function($event) {
-		  blockUI("Loading reports..please wait..");
-		  if($(this)[0].report.count > 0)
+		  pauseloadinginterval = true;
+		  if($(this)[0].report.count == 'loading...'){
+			  blockUI("Loading execution details..");
+			  pauseloadinginterval = true;
+			  var reportsInputData = {};
+			  reportsInputData.scenarioid = $(this)[0].report.scenarioId;
+			  reportsInputData.cycleid = $scope.cycleNames;
+			  reportsInputData.type = "latestreport";
+			  reportsInputData.report_loaded_idx = $(this)[0].report.idx-1;
+			  reportService.getReportsData_ICE(reportsInputData).then(function (result_res_scenarioData, response_scenarioData) {
+				  $scope.result_reportData[result_res_scenarioData.report_loaded_idx].count = result_res_scenarioData.count;
+				  $scope.result_reportData[result_res_scenarioData.report_loaded_idx].latestStatus = result_res_scenarioData.status;
+				  $scope.result_reportData[result_res_scenarioData.report_loaded_idx].executedon = result_res_scenarioData.executedtime;
+				  $scope.result_reportData[result_res_scenarioData.report_loaded_idx].reportid = result_res_scenarioData.reportid;
+				  $scope.result_reportData[result_res_scenarioData.report_loaded_idx].executionid =result_res_scenarioData.executionid;										
+				  $timeout(function(){
+					$('[report-idx="'+parseInt(result_res_scenarioData.report_loaded_idx+1)+'"]>.executionCount').trigger("click");
+				  },100);
+			  });				  
+		  }
+		  else if($(this)[0].report.count > 0)
 		  {
+			unblockUI();
+			blockUI("Loading reports..please wait..");
 			var scenarioId = $(this)[0].report.scenarioId;
 			var reportsInputData = {};
 			reportsInputData.scenarioid = scenarioId;
@@ -212,6 +301,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 											});
 			$("#reportScenarioDataTable").show();
 			unblockUI();
+			pauseloadinginterval = false;
 			});
 		  }
 		  else{
@@ -755,17 +845,19 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 	/********** HTML REPORT CLICK ****************/
 	$(document).off('click.htmlRepClick', '.openreportstatus');
 	$(document).on({
-		'click.htmlRepClick': htlmReportClick
+		'click.htmlRepClick': htmlReportClick
 	}, '.openreportstatus');
 
 	//$(document).on('click', '.openreportstatus', function(e){
-	function htlmReportClick(e) {
-		console.log($scope.result_reportData);
+	function htmlReportClick(e) {
 		var reportType = $(this).attr('data-getrep');
+		var executionId = '';
 		if($(this)[0].classList.contains('archivedreport')){
 			var idx = $scope.reportIdx-1;
+			executionId = $scope.result_res_scenarioData[$(this).attr('data-reportidx')].executionid;
 		} else{
 			var idx =$(this).attr('data-reportidx')-1;
+			executionId = $scope.result_reportData[idx].executionid;
 		}
 		var reportID = $(this).attr('data-reportid');
 		var testsuiteId =$scope.result_reportData[idx].testsuiteid;
@@ -795,7 +887,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 				"time": "",
 				"pass": "",
 				"fail": "",
-				"terminate": ""
+				"terminate": "",
+				"reportId":"",
+				"executionId":""
 			}],
 			rows: []
 		};
@@ -813,6 +907,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 						finalReports.overallstatus[0].releaseName = data[0].releasename
 						finalReports.overallstatus[0].cycleName = data[0].cyclename
 						finalReports.overallstatus[0].scenarioName = data[0].testscenarioname
+						finalReports.overallstatus[0].reportId=reportID;
+						finalReports.overallstatus[0].executionId=executionId;
 
 						var obj2 = JSON.parse(data[1].reportdata);
 						//console.log("Remarks", obj2);
@@ -899,7 +995,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 						finalReports.overallstatus[0].terminate = (parseFloat((terminated / total) * 100).toFixed(2)) > 0 ? parseFloat((terminated / total) * 100).toFixed(2) : parseInt(0);
 						finalReports.remarksLength = remarksLength;
 						finalReports.commentsLength = commentsLength;
-						console.log('finalReportsa',finalReports);
+
 					}
 					if (reportType == "html") {
 						//Service call to get Html reports
@@ -942,6 +1038,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 								else dataURIs.forEach(function (d, i) { finalReports.rows[scrShot.idx[i]].screenshot_dataURI = d; });
 								//Service call to get Pdf reports
 								blockUI("Generating report..please wait..");
+                                var isIE = /*@cc_on!@*/ false || !!document.documentMode;
 								reportService.renderReport_ICE(finalReports, reportType).then(
 									function (data1) {
 										unblockUI();
@@ -951,6 +1048,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 											openWindow = 0;
 											if (openWindow == 0) {
 												var file = new Blob([data1], { type: 'application/pdf' });
+                                                if (isIE) {
+                                                    navigator.msSaveOrOpenBlob(file);
+                                                }else{
 												var fileURL = URL.createObjectURL(file);
 												var a = document.createElement('a');
 												a.href = fileURL;
@@ -961,6 +1061,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 												document.body.removeChild(a);
 												//$window.open(fileURL, '_blank');
 												URL.revokeObjectURL(fileURL);
+                                                }
 											}
 											openWindow++;
 											//Transaction Activity for PDFReportClick
