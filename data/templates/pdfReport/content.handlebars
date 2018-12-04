@@ -349,7 +349,12 @@
         </div>-->
         {{#each rows}}
         <div class="screenshot-container" style="display:{{validateImagePath screenshot_path}}">
-            <img id="img-{{slno}}" src="{{getDataURI screenshot_dataURI}}" style="width:100%;display:block;" alt="Image for Sl No. {{slno}}">
+            {{#ifEquals ../overallstatus.0.browserType "MobileApp"}}
+                <img id="img-{{slno}}" src="{{getDataURI screenshot_dataURI}}" style="width:70%;display:block;" alt="Image for Sl No. {{slno}}">
+            {{/ifEquals}}
+            {{#ifnotEquals ../overallstatus.0.browserType "MobileApp"}}
+                <img id="img-{{slno}}" src="{{getDataURI screenshot_dataURI}}" style="width:100%;display:block;" alt="Image for Sl No. {{slno}}">
+            {{/ifnotEquals}}
             <a href="#report-slno{{slno}}">Above Image belongs to Sl No. {{slno}}</a>
         </div>
         {{/each}}

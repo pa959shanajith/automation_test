@@ -714,6 +714,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 										var req_reportStepsArray = reportdata.rows;
 										if (reportdata.overallstatus.length != 0) {
 											var req_overAllStatus = reportdata.overallstatus;
+											reportdata.overallstatus[0].browserType = (executionRequest.apptype=="MobileApp")?"MobileApp":reportdata.overallstatus[0].browserType;
 											var req_browser = reportdata.overallstatus[0].browserType;
 											reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
 											reportdata = JSON.parse(reportdata);
