@@ -216,7 +216,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 									}
 									else clearInterval(reportloadingintervalid);
 								}
-							}, 400);	
+							}, 700);	
 						clearIntervalList.push(reportloadingintervalid);
 						var setTimeoutConst = '';
 						$timeout(function(){
