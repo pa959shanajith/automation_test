@@ -3258,9 +3258,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     var count = 0;
                     if ($(this).parent().parent().attr("data-xpath") != "" && $(this).parent().parent().attr("data-xpath") != undefined) {
                         xpath = $(this).parent().parent().attr("data-xpath");
-                        if (appType == 'Web') {
-                            xpath = xpath.split(";")[1];
-                        } else if (appType == 'MobileWeb') {
+                        if (appType == 'MobileWeb') {
                             xpath = xpath.split(";")[2];
                         }
                         else {
@@ -3287,12 +3285,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     }
                 });
                 if (!isDuplicateCustNames) {
+                    var count = 0;
                     $.each($("#scraplist span.ellipsis"), function () {
                         xpath = $(this).parent().parent().attr("data-xpath");
                         if ($(this).parent().parent().attr("data-xpath") != "" && $(this).parent().parent().attr("data-xpath") != undefined) {
-                            if (appType == 'Web') {
-                                xpath = xpath.split(";")[1];
-                            } else if (appType == 'MobileWeb') {
+                            if (appType == 'MobileWeb') {
                                 xpath = xpath.split(";")[2];
                             }
                             else {
@@ -3321,7 +3318,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 else {
                     if (isDuplicateXpath) {
                         $("#saveConfirmObjects").modal('show');
-                        $("#saveConfirmObjects").find('.modal-body p').html("<strong>Are you sure you want to save objects.<br />Do you still want to continue ?  <br /><br/ >Object characterstics are still same for:").css("color", "#000").append("<ul class='custList'></ul>");
+                        $("#saveConfirmObjects").find('.modal-body p').html("<strong>Object characteristics are same for the below list of objects.").css("color", "#000").append("<ul class='custList'></ul><br /> Do you still want to continue?");
                         for (var j = 0; j < duplicateCustnames.length; j++) {
                             $("#saveConfirmObjects").find('.modal-body p ul').append("<li>" + duplicateCustnames[j] + "</li>");
                         }
