@@ -2589,7 +2589,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $scope.actionEvent = function($event) {
         e = $event;
         var selectedNodeTitle = $('.nodeBoxSelected').attr('title');
-        if ($(e.target.parentNode).hasClass('disableButton') || $(e.target.parentNode).hasClass('no-access')) return;
+        if(isIE){
+            if ($(e.target.parentNode).hasClass('disableButton') || $(e.target.parentNode).hasClass('no-access')) return;
+                var selectedTab = window.localStorage['tabMindMap'];
+                var s = d3.select(e.target.parentNode);
+        }else{
+            if ($(e.target.parentElement).hasClass('disableButton') || $(e.target.parentElement).hasClass('no-access')) return;
+                var selectedTab = window.localStorage['tabMindMap'];
+                var s = d3.select(e.target.parentElement);
+        }
         var selectedTab = window.localStorage['tabMindMap'];
         var s = d3.select(e.target.parentNode);
         var cur_module = null;
@@ -2827,9 +2835,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     $scope.actionEvent_W = function($event) {
-        if ($(event.target.parentNode).hasClass('disableButton') || $(event.target.parentNode).hasClass('no-access')) return;
-        var selectedNodeTitle = $('.nodeBoxSelected').attr('title');
-        var s = d3.select(event.target.parentNode);
+        if(isIE){
+            if ($($event.target.parentNode).hasClass('disableButton') || $($event.target.parentNode).hasClass('no-access')) return;
+                var selectedNodeTitle = $('.nodeBoxSelected').attr('title');
+                var s = d3.select($event.target.parentNode);
+        }else{
+            if ($($event.target.parentElement).hasClass('disableButton') || $($event.target.parentElement).hasClass('no-access')) return;
+                var selectedNodeTitle = $('.nodeBoxSelected').attr('title');
+                var s = d3.select($event.target.parentElement);
+        }
         var error = !1,
             mapData = [],
             flag = 0,
