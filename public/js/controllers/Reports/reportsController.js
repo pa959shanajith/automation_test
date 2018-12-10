@@ -942,6 +942,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 						// txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
 					}
 					else if(reportType == 'json'){
+						blockUI("Generating Report..please wait..");
 						exportJSONReport(finalReports);
 					}
 					else {
@@ -1084,6 +1085,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 				a.dispatchEvent(e);
 			}
 		}
+		unblockUI();
 	};
 	
 	
