@@ -1995,7 +1995,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 'Testcase': 3
             }
             var idxAddNode = 1 + $('.row.row-modal.addObj-row').length;
-            $("#addObjContainer").append("<div class='row row-modal addObj-row'><form class='form-horizontal' role='form' onSubmit='return false;'><div class='col-sm-2 addNode-label'><label>" + idxAddNode + "</label></div><div class='col-sm-6'><input type='text' class='form-control form-control-custom' placeholder='Enter node name' maxlength='255' value=" + $scope.addedntype + idxAddNode + "></div><div class='col-sm-2 deleteAddObjRow'><img src='imgs/ic-delete.png' /></div></form></div>");
+            $("#addObjContainer").append("<div class='row row-modal addObj-row'><form class='form-horizontal' role='form' onSubmit='return false;'><div class='col-sm-2 addNode-label'><label>" + idxAddNode + "</label></div><div class='col-sm-6'><input type='text' class='form-control form-control-custom' placeholder='Enter node name' maxlength='255' value=" + $scope.addedntype + "_"+ (nCount[nodeId[$scope.addedntype]]++) + "></div><div class='col-sm-2 deleteAddObjRow'><img src='imgs/ic-delete.png' /></div></form></div>");
         } else {
             openDialogMindmap('Error', 'At a time only 10 nodes can be added');
         }
@@ -2589,7 +2589,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $scope.actionEvent = function($event) {
         e = $event;
         var selectedNodeTitle = $('.nodeBoxSelected').attr('title');
-        if ($(e.target.parentNode).hasClass('disableButton') || $(e.target.parentNode).hasClass('no-access')) return;
+        if(isIE){
+            if ($(e.target.parentNode).hasClass('disableButton') || $(e.target.parentNode).hasClass('no-access')) return;
+                var selectedTab = window.localStorage['tabMindMap'];
+                var s = d3.select(e.target.parentNode);
+        }else{
+            if ($(e.target.parentElement).hasClass('disableButton') || $(e.target.parentElement).hasClass('no-access')) return;
+                var selectedTab = window.localStorage['tabMindMap'];
+                var s = d3.select(e.target.parentElement);
+        }
         var selectedTab = window.localStorage['tabMindMap'];
         var s = d3.select(e.target.parentNode);
         var cur_module = null;
@@ -2641,7 +2649,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 return;
             }
         }
+        if (s.attr('id') == 'ct-saveAction') {
+            blockUI('Saving Flow! Please wait...');
 
+        } else if (s.attr('id') == 'ct-createAction') {
+            blockUI('Creating Structure! Please wait...');
+        }
         mindmapServices.checkReuse(restrict_scenario_reuse).then(function(result_reuse) {
             if (result_reuse == "Invalid Session") {
                 $rootScope.redirectPage();
@@ -2673,7 +2686,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
 
             if (s.attr('id') == 'ct-saveAction') {
-                blockUI('Saving Flow! Please wait...');
+                // blockUI('Saving Flow! Please wait...');
                 flag = 10;
                 if ($scope.tab == 'tabAssign') flag = 30;
                 d3.select('#ct-inpBox').classed('no-disp', !0);
@@ -2688,7 +2701,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     return;
                 }
                 flag = 20;
-                blockUI('Creating Structure! Please wait...');
+                // blockUI('Creating Structure! Please wait...');
                 d3.select('#ct-inpBox').classed('no-disp', !0);
 
             }
@@ -2827,9 +2840,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     $scope.actionEvent_W = function($event) {
-        if ($(event.target.parentNode).hasClass('disableButton') || $(event.target.parentNode).hasClass('no-access')) return;
-        var selectedNodeTitle = $('.nodeBoxSelected').attr('title');
-        var s = d3.select(event.target.parentNode);
+        if(isIE){
+            if ($($event.target.parentNode).hasClass('disableButton') || $($event.target.parentNode).hasClass('no-access')) return;
+                var selectedNodeTitle = $('.nodeBoxSelected').attr('title');
+                var s = d3.select($event.target.parentNode);
+        }else{
+            if ($($event.target.parentElement).hasClass('disableButton') || $($event.target.parentElement).hasClass('no-access')) return;
+                var selectedNodeTitle = $('.nodeBoxSelected').attr('title');
+                var s = d3.select($event.target.parentElement);
+        }
         var error = !1,
             mapData = [],
             flag = 0,

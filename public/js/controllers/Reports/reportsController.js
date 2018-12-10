@@ -625,95 +625,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 			return dateArray;
 		})
 	}
-	//Date sorting
-	//Service call to get scenario status
-	/**********SUITE TIME CLICK ****************/
-	$(document).off('click.suiteTimeClick', '.scenariostatusreport');
-	$(document).on({
-		'click.suiteTimeClick': scenariostatusreport
-	}, '.scenariostatusreport');
-	function scenariostatusreport(e) {
-		//$(document).on('click', '.scenariostatusreport', function(e){
-		$(this).addClass('scenariostatusreportselect');
-		$(this).siblings().removeClass('scenariostatusreportselect');
-		executionId = $(this).attr('data-executionid');
-		var testsuiteid = $(".reportboxselected").attr('data-suiteid');
-		$('.formatpdfbrwsrexport').remove();
-		reportService.reportStatusScenarios_ICE(executionId, testsuiteid)
-			.then(function (data) {
-				if (data == "Invalid Session") {
-					$rootScope.redirectPage();
-				}
-				if (data != "fail") {
-					var scenarioContainer = $('#scenarioReportsTable');
-					if (Object.prototype.toString.call(data) === '[object Array]') {
-						var pass = fail = terminated = incomplete = P = F = T = I = 0;
-						var total = data.length;
-						scenarioContainer.find('tbody').empty();
-						var browserIcon, brow = "";
-						var styleColor, exeDate, exeDat, exeTime;
-						for (i = 0; i < data.length; i++) {
-							browserIcon = ""; brow = "";
-							if (data[i].browser.toLowerCase() == "chrome") browserIcon = "ic-reports-chrome.png";
-							else if (data[i].browser.toLowerCase() == "firefox") browserIcon = "ic-reports-firefox.png";
-							else if (data[i].browser.toLowerCase() == "internet explorer") browserIcon = "ic-reports-ie.png";
-							else if (data[i].browser.toLowerCase() == "safari") browserIcon = "ic-reports-safari.png";
-							if (browserIcon) brow = "imgs/" + browserIcon;
-							else brow = "imgs/no_img1.png"
-							if (data[i].status == "Pass") { pass++; styleColor = "style='color: #009444 !important; text-decoration-line: none;'"; }
-							else if (data[i].status == "Fail") { fail++; styleColor = "style='color: #b31f2d !important; text-decoration-line: none;'"; }
-							else if (data[i].status == "Terminate") { terminated++; styleColor = "style='color: #faa536 !important; text-decoration-line: none;'"; }
-							else if (data[i].status == "Incomplete") { incomplete++; styleColor = "style='color: #58595b !important; text-decoration-line: none;'"; }
-							// exeDate = data[i].executedtime.split(" ")[0].split("-");
-							// exeDat = ("0" + exeDate[0]).slice(-2) +"-"+ ("0" + exeDate[1]).slice(-2) +"-"+ exeDate[2];
-							// var fst = data[i].executedtime.split(" ")[1].split(":");
-							// exeTime = ("0" + fst[0]).slice(-2) +":"+ ("0" + fst[1]).slice(-2);
-
-							scenarioContainer.find('tbody').append("<tr><td title='" + data[i].testscenarioname + "'>" + data[i].testscenarioname + "</td><td><span style='margin-right: 28px;'>" + data[i].executedtime.trim() + "</span></td><td><img class='sap' alt='-' src='" + brow + "'></td><td class='openReports' data-reportid='" + data[i].reportid + "'><a class='openreportstatus' " + styleColor + ">" + data[i].status + "</a></td><td data-reportid='" + data[i].reportid + "'><img alt='Select format' class='selectFormat' src='imgs/ic-export-json.png' style='cursor: pointer;' title='Select format'></td></tr>");
-						}
-						if (data.length > 2) {
-							$("#scenarioReportsTable #dateDESC").show();
-						}
-						else {
-							$("#scenarioReportsTable #dateDESC").hide();
-							$("#scenarioReportsTable #dateASC").hide();
-						}
-						$("#scenarioReportsTable").find("#dateASC").hide();
-						var dateArray = $('tbody.scrollbar-inner-scenarioreports').children('tr');
-						dateASC(dateArray);
-						$("tbody.scrollbar-inner-scenarioreports").empty();
-						for (i = 0; i < dateArray.length; i++) {
-							//dateArray[i].firstChild.innerText = i+1;
-							$("tbody.scrollbar-inner-scenarioreports").append(dateArray[i]);
-						}
-						if (data.length > 0) {
-							P = parseFloat((pass / total) * 100).toFixed();
-							F = parseFloat((fail / total) * 100).toFixed();
-							T = parseFloat((terminated / total) * 100).toFixed();
-							I = parseFloat((incomplete / total) * 100).toFixed();
-							$('.progress-bar-success').css('width', P + "%"); $('.passPercent').text(P + " %");
-							$('.progress-bar-danger').css('width', F + "%"); $('.failPercent').text(F + " %");
-							$('.progress-bar-warning').css('width', T + "%"); $('.terminatePercent').text(T + " %");
-							$('.progress-bar-norun').css('width', I + "%"); $('.incompletePercent').text(I + " %");
-						}
-						else {
-							$('.progress-bar-success, .progress-bar-danger, .progress-bar-warning, .progress-bar-norun').css('width', '0%');
-							$('.passPercent, .failPercent, .terminatePercent, .incompletePercent').text('');
-						}
-					}
-				}
-				else console.log("Failed to get scenario status");
-			},
-			function (error) {
-				console.log("Error-------" + error);
-			})
-		//Transaction Activity for SuiteDrillDownClick
-		// var labelArr = [];
-		// var infoArr = [];
-		// labelArr.push(txnHistory.codesDict['SuiteDrillDownClick']);
-		// txnHistory.log(event.type,labelArr,infoArr,window.location.pathname); 
-		//});
-	}
 
 	/********** SELECT REPORT FORMAT CLICK ****************/
 	$(document).off('click.reportFormat', '.selectFormat');
@@ -1030,6 +941,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 						// labelArr.push(txnHistory.codesDict['HTMLReportClick']);
 						// txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
 					}
+					else if(reportType == 'json'){
+						blockUI("Generating Report..please wait..");
+						exportJSONReport(finalReports);
+					}
 					else {
 						//Service call to get screenshots for Pdf reports
 						reportService.getScreenshotDataURL_ICE(scrShot.paths).then(
@@ -1096,109 +1011,82 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 	//Export To JSON
 	//Service call to get start and end details of suites
 	/************ EXPORT JSON CLICK *****************/
-	$(document).off('click.exportReportJSON', '.exportToJSON');
-	$(document).on({
-		'click.exportReportJSON': exportJSONReport
-	}, '.exportToJSON')
-	function exportJSONReport(e) {
-		//$(document).on('click', '.exportToJSON', function(e){
-		var repId = $(this).attr('data-reportid');
-		blockUI("Downloading json report.. please wait");
-		reportService.exportToJson_ICE(repId)
-			.then(function (response) {
-				unblockUI();
-				if (response == "Invalid Session") {
-					$rootScope.redirectPage();
+	// $(document).off('click.exportReportJSON', '.exportToJSON');
+	// $(document).on({
+	// 	'click.exportReportJSON': exportJSONReport
+	// }, '.exportToJSON')
+	function exportJSONReport(response) {
+		filename = response.overallstatus[0].scenarioName + ".json";
+		var responseData = JSON.stringify(response, undefined, 2);
+		var objAgent = $window.navigator.userAgent;
+		var objbrowserName = navigator.appName;
+		var objfullVersion = '' + parseFloat(navigator.appVersion);
+		var objBrMajorVersion = parseInt(navigator.appVersion, 10);
+		var objOffsetName, objOffsetVersion, ix;
+		// In Chrome
+		if ((objOffsetVersion = objAgent.indexOf("Chrome")) != -1) {
+			objbrowserName = "Chrome";
+			objfullVersion = objAgent.substring(objOffsetVersion + 7);
+		}
+		// In Microsoft internet explorer
+		else if ((objOffsetVersion = objAgent.indexOf("MSIE")) != -1) {
+			objbrowserName = "Microsoft Internet Explorer";
+			objfullVersion = objAgent.substring(objOffsetVersion + 5);
+		}
+		// In Firefox
+		else if ((objOffsetVersion = objAgent.indexOf("Firefox")) != -1) {
+			objbrowserName = "Firefox";
+		}
+		// In Safari
+		else if ((objOffsetVersion = objAgent.indexOf("Safari")) != -1) {
+			objbrowserName = "Safari";
+			objfullVersion = objAgent.substring(objOffsetVersion + 7);
+			if ((objOffsetVersion = objAgent.indexOf("Version")) != -1)
+				objfullVersion = objAgent.substring(objOffsetVersion + 8);
+		}
+		// For other browser "name/version" is at the end of userAgent
+		else if ((objOffsetName = objAgent.lastIndexOf(' ') + 1) < (objOffsetVersion = objAgent.lastIndexOf('/'))) {
+			objbrowserName = objAgent.substring(objOffsetName, objOffsetVersion);
+			objfullVersion = objAgent.substring(objOffsetVersion + 1);
+			if (objbrowserName.toLowerCase() == objbrowserName.toUpperCase()) {
+				objbrowserName = navigator.appName;
+			}
+		}
+		// trimming the fullVersion string at semicolon/space if present
+		if ((ix = objfullVersion.indexOf(";")) != -1) objfullVersion = objfullVersion.substring(0, ix);
+		if ((ix = objfullVersion.indexOf(" ")) != -1) objfullVersion = objfullVersion.substring(0, ix);
+		objBrMajorVersion = parseInt('' + objfullVersion, 10);
+		if (isNaN(objBrMajorVersion)) {
+			objfullVersion = '' + parseFloat(navigator.appVersion);
+			objBrMajorVersion = parseInt(navigator.appVersion, 10);
+		}
+		if (objBrMajorVersion == "9") {
+			if (objbrowserName == "Microsoft Internet Explorer") {
+				window.navigator.msSaveOrOpenBlob(new Blob([responseData], { type: "text/json;charset=utf-8" }), filename);
+			}
+		} else {
+			var blob = new Blob([responseData], { type: 'text/json' }),
+				e = document.createEvent('MouseEvents'),
+				a = document.createElement('a');
+			a.download = filename;
+			if (objbrowserName == "Microsoft Internet Explorer" || objbrowserName == "Netscape") {
+				window.navigator.msSaveOrOpenBlob(new Blob([responseData], { type: "text/json;charset=utf-8" }), filename);
+				//saveAs(blob, filename);
+			} else {
+				a.href = window.URL.createObjectURL(blob);
+				a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+				e.initMouseEvent('click', true, true, window,
+					0, 0, 0, 0, 0, false, false, false, false, 0, null);
+				/*if(counter == 0)
+				{
+					a.dispatchEvent(e);
 				}
-				if (response != "fail") {
-					if (typeof response === 'object') {
-						var temp = JSON.parse(response.reportdata);
-						var responseData = JSON.stringify(temp, undefined, 2);
-					}
-					filename = response.scenarioname + ".json";
-					var objAgent = $window.navigator.userAgent;
-					var objbrowserName = navigator.appName;
-					var objfullVersion = '' + parseFloat(navigator.appVersion);
-					var objBrMajorVersion = parseInt(navigator.appVersion, 10);
-					var objOffsetName, objOffsetVersion, ix;
-					// In Chrome
-					if ((objOffsetVersion = objAgent.indexOf("Chrome")) != -1) {
-						objbrowserName = "Chrome";
-						objfullVersion = objAgent.substring(objOffsetVersion + 7);
-					}
-					// In Microsoft internet explorer
-					else if ((objOffsetVersion = objAgent.indexOf("MSIE")) != -1) {
-						objbrowserName = "Microsoft Internet Explorer";
-						objfullVersion = objAgent.substring(objOffsetVersion + 5);
-					}
-					// In Firefox
-					else if ((objOffsetVersion = objAgent.indexOf("Firefox")) != -1) {
-						objbrowserName = "Firefox";
-					}
-					// In Safari
-					else if ((objOffsetVersion = objAgent.indexOf("Safari")) != -1) {
-						objbrowserName = "Safari";
-						objfullVersion = objAgent.substring(objOffsetVersion + 7);
-						if ((objOffsetVersion = objAgent.indexOf("Version")) != -1)
-							objfullVersion = objAgent.substring(objOffsetVersion + 8);
-					}
-					// For other browser "name/version" is at the end of userAgent
-					else if ((objOffsetName = objAgent.lastIndexOf(' ') + 1) < (objOffsetVersion = objAgent.lastIndexOf('/'))) {
-						objbrowserName = objAgent.substring(objOffsetName, objOffsetVersion);
-						objfullVersion = objAgent.substring(objOffsetVersion + 1);
-						if (objbrowserName.toLowerCase() == objbrowserName.toUpperCase()) {
-							objbrowserName = navigator.appName;
-						}
-					}
-					// trimming the fullVersion string at semicolon/space if present
-					if ((ix = objfullVersion.indexOf(";")) != -1) objfullVersion = objfullVersion.substring(0, ix);
-					if ((ix = objfullVersion.indexOf(" ")) != -1) objfullVersion = objfullVersion.substring(0, ix);
-					objBrMajorVersion = parseInt('' + objfullVersion, 10);
-					if (isNaN(objBrMajorVersion)) {
-						objfullVersion = '' + parseFloat(navigator.appVersion);
-						objBrMajorVersion = parseInt(navigator.appVersion, 10);
-					}
-					if (objBrMajorVersion == "9") {
-						if (objbrowserName == "Microsoft Internet Explorer") {
-							window.navigator.msSaveOrOpenBlob(new Blob([responseData], { type: "text/json;charset=utf-8" }), filename);
-						}
-					} else {
-						var blob = new Blob([responseData], { type: 'text/json' }),
-							e = document.createEvent('MouseEvents'),
-							a = document.createElement('a');
-						a.download = filename;
-						if (objbrowserName == "Microsoft Internet Explorer" || objbrowserName == "Netscape") {
-							window.navigator.msSaveOrOpenBlob(new Blob([responseData], { type: "text/json;charset=utf-8" }), filename);
-							//saveAs(blob, filename);
-						} else {
-							a.href = window.URL.createObjectURL(blob);
-							a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
-							e.initMouseEvent('click', true, true, window,
-								0, 0, 0, 0, 0, false, false, false, false, 0, null);
-							/*if(counter == 0)
-							{
-								a.dispatchEvent(e);
-							}
-							counter++;*/
-							a.dispatchEvent(e);
-						}
-					}
-				}
-				else console.log("Error while exporting JSON.\n");
-				//Transaction Activity for ExportToJSONClick
-				// var labelArr = [];
-				// var infoArr = [];
-				// labelArr.push(txnHistory.codesDict['ExportToJSONClick']);
-				// txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
-			},
-			function (error) {
-				unblockUI();
-				console.log("Error while exportsing JSON.\n " + (error.data));
-			});
-		$('.formatpdfbrwsrexport').remove();
-		//})
-	}
-
+				counter++;*/
+				a.dispatchEvent(e);
+			}
+		}
+		unblockUI();
+	};
 	
 	
 }]);
