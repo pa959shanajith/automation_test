@@ -3318,7 +3318,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 else {
                     if (isDuplicateXpath) {
                         $("#saveConfirmObjects").modal('show');
-                        $("#saveConfirmObjects").find('.modal-body p').html("<strong>Object characteristics are same for the below list of objects.").css("color", "#000").append("<ul class='custList'></ul><br /> Do you still want to continue?");
+                        $("#saveConfirmObjects").find('.modal-body p').html("<strong>Object characteristics are same for the below list of objects:").css("color", "#000").append("<ul class='custList'></ul><br /> Do you still want to continue?");
                         for (var j = 0; j < duplicateCustnames.length; j++) {
                             $("#saveConfirmObjects").find('.modal-body p ul').append("<li>" + duplicateCustnames[j] + "</li>");
                         }
