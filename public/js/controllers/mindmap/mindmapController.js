@@ -2649,7 +2649,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 return;
             }
         }
+        if (s.attr('id') == 'ct-saveAction') {
+            blockUI('Saving Flow! Please wait...');
 
+        } else if (s.attr('id') == 'ct-createAction') {
+            blockUI('Creating Structure! Please wait...');
+        }
         mindmapServices.checkReuse(restrict_scenario_reuse).then(function(result_reuse) {
             if (result_reuse == "Invalid Session") {
                 $rootScope.redirectPage();
@@ -2681,7 +2686,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
 
             if (s.attr('id') == 'ct-saveAction') {
-                blockUI('Saving Flow! Please wait...');
+                // blockUI('Saving Flow! Please wait...');
                 flag = 10;
                 if ($scope.tab == 'tabAssign') flag = 30;
                 d3.select('#ct-inpBox').classed('no-disp', !0);
@@ -2696,7 +2701,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     return;
                 }
                 flag = 20;
-                blockUI('Creating Structure! Please wait...');
+                // blockUI('Creating Structure! Please wait...');
                 d3.select('#ct-inpBox').classed('no-disp', !0);
 
             }
