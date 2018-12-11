@@ -63,7 +63,7 @@ exports.readTestSuite_ICE = function (req, res) {
 					client.post(epurl + "suite/readTestSuite_ICE", args,
 						function (result, response) {
 						if (response.statusCode != 200 || result.rows == "fail") {
-							logger.error("Error occured in suite/readTestSuite_ICE from readTestSuite_ICE Error Code : ERRNDAC");
+							logger.error("Error occurred in suite/readTestSuite_ICE from readTestSuite_ICE Error Code : ERRNDAC");
 							var flag = "Error in readTestSuite_ICE : Fail";
 							res.send(flag);
 						} else {
@@ -223,7 +223,7 @@ function readTestSuite_ICE_SVN(req,callback) {
 					client.post(epurl + "suite/readTestSuite_ICE", args,
 						function (result, response) {
 							if (response.statusCode != 200 || result.rows == "fail") {
-								logger.error("Error occured in suite/readTestSuite_ICE_SVN from readTestSuite_ICE Error Code : ERRNDAC");
+								logger.error("Error occurred in suite/readTestSuite_ICE_SVN from readTestSuite_ICE Error Code : ERRNDAC");
 								var flag = "Error in readTestSuite_ICE : Fail";
 								callback(false);
 								//res(400, flag);
@@ -362,7 +362,7 @@ function Projectnametestcasename_ICE(req, cb, data) {
 			client.post(epurl + "suite/readTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in the function testcasename of Projectnametestcasename_ICE: suite/readTestSuite_ICE - fail");
+					logger.error("Error occurred in the function testcasename of Projectnametestcasename_ICE: suite/readTestSuite_ICE - fail");
 				} else {
 					if (result.rows.length != 0) {
 						projectid = result.rows[0].projectid;
@@ -387,7 +387,7 @@ function Projectnametestcasename_ICE(req, cb, data) {
 			client.post(epurl + "suite/readTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in the function projectname of Projectnametestcasename_ICE: suite/readTestSuite_ICE - fail");
+					logger.error("Error occurred in the function projectname of Projectnametestcasename_ICE: suite/readTestSuite_ICE - fail");
 				} else {
 					if (result.rows.length != 0)
 						testcaseNproject.projectname = result.rows[0].projectname;
@@ -449,7 +449,7 @@ exports.updateTestSuite_ICE = function (req, res) {
 						logger.info("Calling function saveSuite (deletetestsuitequery) from updateTestSuite_ICE");
 						saveSuite(function (err, response) {
 							if (err) {
-								logger.error("Error occured in the function saveSuite (deletetestsuitequery) from updateTestSuite_ICE");
+								logger.error("Error occurred in the function saveSuite (deletetestsuitequery) from updateTestSuite_ICE");
 								flag = "fail";
 								res.send(flag);
 							} else {
@@ -481,7 +481,7 @@ exports.updateTestSuite_ICE = function (req, res) {
 					client.post(epurl + "suite/updateTestSuite_ICE", args,
 						function (data, response) {
 						if (response.statusCode != 200 || data.rows == "fail") {
-							logger.error("Error occured in suite/updateTestSuite_ICE from updateTestSuite_ICE: deleteSuite function - Error Code : ERRNDAC");
+							logger.error("Error occurred in suite/updateTestSuite_ICE from updateTestSuite_ICE: deleteSuite function - Error Code : ERRNDAC");
 						} else {
 							//Execute neo4j query!!
 							//var qList=[];
@@ -527,7 +527,7 @@ exports.updateTestSuite_ICE = function (req, res) {
 						client.post(epurl + "suite/updateTestSuite_ICE", args,
 							function (data, response) {
 							if (response.statusCode != 200 || data.rows == "fail") {
-								logger.error("Error occured in suite/updateTestSuite_ICE from updateTestSuite_ICE: saveSuite function - Error Code : ERRNDAC");
+								logger.error("Error occurred in suite/updateTestSuite_ICE from updateTestSuite_ICE: saveSuite function - Error Code : ERRNDAC");
 							} else {
 								//Execute neo4j query!!
 								//var qList=[];
@@ -551,7 +551,7 @@ exports.updateTestSuite_ICE = function (req, res) {
 			batchDetailscallback();
 		});
 	} else {
-		logger.error("Error occured in the service updateTestSuite_ICE: Invalid Session");
+		logger.error("Error occurred in the service updateTestSuite_ICE: Invalid Session");
 		res.send("Invalid Session");
 	}
 };
@@ -576,7 +576,7 @@ function updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus)
 	client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 		function (result, response) {
 		if (response.statusCode != 200 || result.rows == "fail") {
-			logger.error("Error occured in updateExecutionStatus: suite/ExecuteTestSuite_ICE, Error Code : ERRNDAC");
+			logger.error("Error occurred in updateExecutionStatus: suite/ExecuteTestSuite_ICE, Error Code : ERRNDAC");
 			flag = "fail";
 		} else {
 			logger.info("Execution status updated successfully from updateExecutionStatus: suite/ExecuteTestSuite_ICE");
@@ -624,7 +624,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		client.post(epurl + "utility/dataUpdator_ICE", args,
 			function (result, response) {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				logger.error("Error occured in utility/dataUpdator_ICE service from ExecuteTestSuite_ICE: Data Updator Fail");
+				logger.error("Error occurred in utility/dataUpdator_ICE service from ExecuteTestSuite_ICE: Data Updator Fail");
 			} else {
 				logger.info("Data Updator Success");
 			}
@@ -665,7 +665,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 				TestCaseDetails_Suite_ICE(currentscenarioid, userInfo.user_id, function (currentscenarioidError, currentscenarioidResponse) {
 					var scenariotestcaseobj = {};
 					if (currentscenarioidError) {
-						logger.error("Error occured in the function TestCaseDetails_Suite_ICE: %s",currentscenarioidError);
+						logger.error("Error occurred in the function TestCaseDetails_Suite_ICE: %s",currentscenarioidError);
 					} else {
 						if (currentscenarioidResponse != null || currentscenarioidResponse != undefined) {
 							scenariotestcaseobj[currentscenarioid] = currentscenarioidResponse.listoftestcasedata;
@@ -731,7 +731,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 							if (data.onAction == "unavailableLocalServer") {
 								clearInterval(updateSessionExpiry);
 								redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
-								logger.error("Error occured in ExecuteTestSuite_ICE: Socket Disconnected");
+								logger.error("Error occurred in ExecuteTestSuite_ICE: Socket Disconnected");
 								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 									var soc = myserver.socketMapNotify[name];
 									soc.emit("ICEnotAvailable");
@@ -780,7 +780,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 											client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 												function (result, response) {
 												if (response.statusCode != 200 || result.rows == "fail") {
-													logger.error("Error occured in suite/ExecuteTestSuite_ICE from executionFunction Error Code : ERRNDAC");
+													logger.error("Error occurred in suite/ExecuteTestSuite_ICE from executionFunction Error Code : ERRNDAC");
 													flag = "fail";
 												} else {
 													logger.info("Successfully inserted report data");
@@ -803,7 +803,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 											client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 												function (result, response) {
 												if (response.statusCode != 200 || result.rows == "fail") {
-													logger.error("Error occured in suite/ExecuteTestSuite_ICE from executionFunction Error Code : ERRNDAC");
+													logger.error("Error occurred in suite/ExecuteTestSuite_ICE from executionFunction Error Code : ERRNDAC");
 													flag = "fail";
 												} else {
 													logger.info("Successfully inserted report data");
@@ -857,7 +857,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 						if (found) flag = "scheduleModeOn";
 						else {
 							flag = "unavailableLocalServer";
-							logger.error("Error occured in the function executionFunction: Socket not Available");
+							logger.error("Error occurred in the function executionFunction: Socket not Available");
 						}
 						res.send(flag);
 					});
@@ -865,7 +865,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 			});
 		}
 	} else {
-		logger.error("Error occured in the function executionFunction: Invalid Session");
+		logger.error("Error occurred in the function executionFunction: Invalid Session");
 		res.send("Invalid Session");
 	}
 };
@@ -884,7 +884,7 @@ exports.getListofScheduledSocketMap = function (req, res) {
 	logger.info("Calling NDAC Service from the node service getListofScheduledSocketMap to: login/authenticateUser_Nineteen68");
 	client.post(epurl + "login/authenticateUser_Nineteen68", args, function (result, response) {
 		if (response.statusCode != 200 || result.rows == "fail") {
-			logger.error("Error occured in getListofScheduledSocketMap service from login/authenticateUser_Nineteen68 Error Code : ERRNDAC");
+			logger.error("Error occurred in getListofScheduledSocketMap service from login/authenticateUser_Nineteen68 Error Code : ERRNDAC");
 			res.send({ "status": "fail", "username": "", "tokenValidation": "failed" });
 		}
 		else {
@@ -925,7 +925,7 @@ exports.getCRId = function (req, res) {
 	client.post(epurl + "create_ice/getReleaseIDs_Nineteen68", args,
 		function (result, response) {
 			if (response.statusCode != 200 || result.status == "fail") {
-				logger.error("Error occured in getCRId service from create_ice/getReleaseIDs_nineteen68 Error Code : ERRNDAC");
+				logger.error("Error occurred in getCRId service from create_ice/getReleaseIDs_nineteen68 Error Code : ERRNDAC");
 				res(400, result);
 			} else {
 				if (result.rows.length === 0) {
@@ -940,7 +940,7 @@ exports.getCRId = function (req, res) {
 					};
 					client.post(epurl + "create_ice/getCycleIDs_Nineteen68", args, function (result1, response1) {
 						if (response1.statusCode != 200 || result1.status == "fail") {
-							logger.error("Error occured in getCRId service from create_ice/getCycleIDs_nineteen68 Error Code : ERRNDAC");
+							logger.error("Error occurred in getCRId service from create_ice/getCycleIDs_nineteen68 Error Code : ERRNDAC");
 							res(400, result1);
 						} else {
 							if (result1.rows.length === 0) {
@@ -987,7 +987,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 		logger.info("Calling NDAC Service from ExecuteTestSuite_ICE_SVN: login/authenticateUser_Nineteen68");
 		client.post(epurl + "login/authenticateUser_Nineteen68", args_validation, function (result, response) {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				logger.error("Error occured in ExecuteTestSuite_ICE_SVN service from login/authenticateUser_Nineteen68 Error Code : ERRNDAC");
+				logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service from login/authenticateUser_Nineteen68 Error Code : ERRNDAC");
 				cb_validation('err');
 			} else {
 				var validUser = false;
@@ -1014,7 +1014,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 		});
 	}, function (err) {
 		if (err || valid_userdata.length == 0){
-			logger.error("Error occured in ExecuteTestSuite_ICE_SVN service token validation");
+			logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service token validation");
 			res.send('failed in validation');
 		}
 		else {
@@ -1046,7 +1046,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 					client.post(epurl + "suite/readTestSuite_ICE", testsuite_args,
 						function (result_details, response) {
 							if (response.statusCode != 200 || result_details.rows == "fail") {
-								logger.error("Error occured in ExecuteTestSuite_ICE_SVN service from suite/readTestSuite_ICE Error Code : ERRNDAC");
+								logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service from suite/readTestSuite_ICE Error Code : ERRNDAC");
 							}
 							else {
 								var module_index = userdata_iterator.moduleInfo.indexOf(moduleinfo_iterator);
@@ -1084,14 +1084,14 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 						});
 				}, function (err) {
 					if (err) {
-						logger.error("Error occured in ExecuteTestSuite_ICE_SVN service:",err);
+						logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service:",err);
 						cb();
 					}
 					else {
 						data_to_send = { "data": testsuite_creation_data[userdata_iterator.userInfo.ice_username] };
 						readTestSuite_ICE_SVN(data_to_send, function (suite_status) {
 							if (!suite_status) {
-								logger.error("Error occured in ExecuteTestSuite_ICE_SVN service in creating testsuites");
+								logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service in creating testsuites");
 								res.send('Secnarios creation failed');
 							}
 							else {
@@ -1124,7 +1124,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 								client.post(epurl + "utility/dataUpdator_ICE", args,
 									function (result, response) {
 										if (response.statusCode != 200 || result.rows == "fail") {
-											logger.error("Error occured in ExecuteTestSuite_ICE_SVN service from utility/dataUpdator_ICE Error Code : ERRNDAC");
+											logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service from utility/dataUpdator_ICE Error Code : ERRNDAC");
 										} else {
 											logger.info("Inside ExecuteTestSuite_ICE_SVN service from utility/dataUpdator_ICE:Data updator Success");
 										}
@@ -1158,7 +1158,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 										TestCaseDetails_Suite_ICE(currentscenarioid, userInfo.user_id, function (currentscenarioidError, currentscenarioidResponse) {
 											var scenariotestcaseobj = {};
 											if (currentscenarioidError) {
-												logger.error("Error occured in ExecuteTestSuite_ICE_SVN service");
+												logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service");
 											} else {
 												if (currentscenarioidResponse != null || currentscenarioidResponse != undefined) {
 													scenariotestcaseobj[currentscenarioid] = currentscenarioidResponse.listoftestcasedata;
@@ -1219,7 +1219,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 													if (data.onAction == "unavailableLocalServer") {
 														// clearInterval(updateSessionExpiry);
 														redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
-														logger.error("Error occured in ExecuteTestSuite_ICE_SVN: Socket Disconnected");
+														logger.error("Error occurred in ExecuteTestSuite_ICE_SVN: Socket Disconnected");
 														if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 															var soc = myserver.socketMapNotify[name];
 															soc.emit("ICEnotAvailable");
@@ -1271,7 +1271,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 																	client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 																		function (result, response) {
 																			if (response.statusCode != 200 || result.rows == "fail") {
-																				logger.error("Error occured in ExecuteTestSuite_ICE_SVN service from suite/ExecuteTestSuite_ICE Error Code : ERRNDAC");
+																				logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service from suite/ExecuteTestSuite_ICE Error Code : ERRNDAC");
 																				flag = "fail";
 																			} else {
 																				flag = "success";
@@ -1292,7 +1292,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 																	}
 																}
 															} catch (ex) {
-																logger.error("Error occured in ExecuteTestSuite_ICE_SVN service:",ex);
+																logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service:",ex);
 															}
 														}
 														if (resultData == "success" || resultData == "Terminate") {
@@ -1303,7 +1303,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 																cb();
 															} catch (ex) {
 																//	cb();
-																logger.error("Error occured in ExecuteTestSuite_ICE_SVN service:",ex);
+																logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service:",ex);
 															}
 
 														}
@@ -1317,7 +1317,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 												if (found) flag = "scheduleModeOn";
 												else {
 													flag = "unavailableLocalServer";
-													logger.error("Error occured in ExecuteTestSuite_ICE_SVN service: Socket not Available");
+													logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service: Socket not Available");
 												}
 												res.send(flag);
 											});
@@ -1331,7 +1331,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 			}, function (err) {
 				if (err) {
 					res.send('failed');
-					logger.error("Error occured in ExecuteTestSuite_ICE_SVN service:",err);
+					logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service:",err);
 				}
 				else {
 					res.send(result_to_send);
@@ -1386,7 +1386,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 		client.post(epurl + "utility/dataUpdator_ICE", args,
 			function (result, response) {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				logger.error("Error occured in utility/dataUpdator_ICE service from ExecuteTestSuite_ICE_CI: Data Updator Fail");
+				logger.error("Error occurred in utility/dataUpdator_ICE service from ExecuteTestSuite_ICE_CI: Data Updator Fail");
 			} else {
 				logger.info("Data Updator Success");
 			}
@@ -1420,7 +1420,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 				TestCaseDetails_Suite_ICE(currentscenarioid, name, function (currentscenarioidError, currentscenarioidResponse) {
 					var scenariotestcaseobj = {};
 					if (currentscenarioidError) {
-						logger.error("Error occured in the function TestCaseDetails_Suite_ICE from ExecuteTestSuite_ICE_CI: %s",currentscenarioidError);
+						logger.error("Error occurred in the function TestCaseDetails_Suite_ICE from ExecuteTestSuite_ICE_CI: %s",currentscenarioidError);
 					} else {
 						if (currentscenarioidResponse != null || currentscenarioidResponse != undefined) {
 							scenariotestcaseobj[currentscenarioid] = currentscenarioidResponse;
@@ -1484,7 +1484,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 							if (data.onAction == "unavailableLocalServer") {
 								clearInterval(updateSessionExpiry);
 								redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
-								logger.error("Error occured in ExecuteTestSuite_ICE_CI: Socket Disconnected");
+								logger.error("Error occurred in ExecuteTestSuite_ICE_CI: Socket Disconnected");
 								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 									var soc = myserver.socketMapNotify[name];
 									soc.emit("ICEnotAvailable");
@@ -1530,7 +1530,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 											client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 												function (result, response) {
 												if (response.statusCode != 200 || result.rows == "fail") {
-													logger.error("Error occured in suite/ExecuteTestSuite_ICE from executionFunction in ExecuteTestSuite_ICE_CI Error Code : ERRNDAC");
+													logger.error("Error occurred in suite/ExecuteTestSuite_ICE from executionFunction in ExecuteTestSuite_ICE_CI Error Code : ERRNDAC");
 													flag = "fail";
 												} else {
 													logger.info("Successfully inserted report data");
@@ -1582,7 +1582,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 						if (found) flag = "scheduleModeOn";
 						else {
 							flag = "unavailableLocalServer";
-							logger.error("Error occured in the function executionFunction in ExecuteTestSuite_ICE_CI: Socket not Available");
+							logger.error("Error occurred in the function executionFunction in ExecuteTestSuite_ICE_CI: Socket not Available");
 						}
 						res.send(flag);
 					});
@@ -1590,7 +1590,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 			});
 		}
 	} else {
-		logger.error("Error occured in the function executionFunction in ExecuteTestSuite_ICE_CI: Invalid Session");
+		logger.error("Error occurred in the function executionFunction in ExecuteTestSuite_ICE_CI: Invalid Session");
 		res.send("Invalid Session");
 	}
 };
@@ -1620,7 +1620,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 			client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcaseid, Error Code : ERRNDAC");
+					logger.error("Error occurred in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcaseid, Error Code : ERRNDAC");
 				} else {
 					if (result.rows.length != 0) {
 						data = JSON.parse(JSON.stringify(result.rows[0].testcaseids));
@@ -1652,7 +1652,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 				client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 					function (screenidresponse, response) {
 					if (response.statusCode != 200 || screenidresponse.rows == "fail") {
-						logger.error("Error occured in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasesteps, Error Code : ERRNDAC");
+						logger.error("Error occurred in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasesteps, Error Code : ERRNDAC");
 					} else {
 						try {
 							if (screenidresponse.rows.length != 0) {
@@ -1670,7 +1670,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 								client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 									function (screendataresponse, response) {
 									if (response.statusCode != 200 || screendataresponse.rows == "fail") {
-										logger.error("Error occured in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - getscreendataquery, Error Code : ERRNDAC");
+										logger.error("Error occurred in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - getscreendataquery, Error Code : ERRNDAC");
 									} else {
 										try {
 											try {
@@ -1695,7 +1695,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 													client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 														function (answers, response) {
 														if (response.statusCode != 200 || answers.rows == "fail") {
-															logger.error("Error occured in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery, Error Code : ERRNDAC");
+															logger.error("Error occurred in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery, Error Code : ERRNDAC");
 														} else {
 															responsedata.template = wsscreentemplate;
 															if (answers.rows.length != 0) {
@@ -1721,7 +1721,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 													client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 														function (answers, response) {
 														if (response.statusCode != 200 || answers.rows == "fail") {
-															logger.error("Error occured in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery, Error Code : ERRNDAC");
+															logger.error("Error occurred in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery, Error Code : ERRNDAC");
 														} else {
 															responsedata.template = "";
 															if (answers.rows.length != 0) {
@@ -1748,7 +1748,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 												client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 													function (answers, response) {
 													if (response.statusCode != 200 || answers.rows == "fail") {
-														logger.error("Error occured in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery, Error Code : ERRNDAC");
+														logger.error("Error occurred in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery, Error Code : ERRNDAC");
 													} else {
 														responsedata.template = "";
 														if (answers.rows.length != 0) {
@@ -1775,7 +1775,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 											client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 												function (answers, response) {
 												if (response.statusCode != 200 || answers.rows == "fail") {
-													logger.error("Error occured in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery, Error Code : ERRNDAC");
+													logger.error("Error occurred in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery, Error Code : ERRNDAC");
 												} else {
 													responsedata.template = "";
 													if (answers.rows.length != 0) {
@@ -1805,7 +1805,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 								client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 									function (answers, response) {
 									if (response.statusCode != 200 || answers.rows == "fail") {
-										logger.error("Error occured in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery, Error Code : ERRNDAC");
+										logger.error("Error occurred in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery, Error Code : ERRNDAC");
 									} else {
 										responsedata.template = "";
 										if (answers.rows.length != 0) {
@@ -1818,7 +1818,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 								});
 							}
 						} catch (exception) {
-							logger.error("Exception occured in TestCaseDetails_Suite_ICE : %s", exception);
+							logger.error("Exception occurred in TestCaseDetails_Suite_ICE : %s", exception);
 						}
 					}
 				});
@@ -1841,7 +1841,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 			client.post(epurl + "qualityCenter/viewQcMappedList_ICE", args,
 				function (qcdetailsows, response) {
 				if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
-					logger.error("Error occured in qualityCenter/viewQcMappedList_ICE from qcscenariodetails Error Code : ERRNDAC");
+					logger.error("Error occurred in qualityCenter/viewQcMappedList_ICE from qcscenariodetails Error Code : ERRNDAC");
 				} else {
 
 					if (qcdetailsows.rows.length != 0) {
@@ -1860,7 +1860,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 			"qcdetails": qcdetails
 		};
 		if (err) {
-			logger.error("Error occured in the final function of TestCaseDetails_Suite_ICE");
+			logger.error("Error occurred in the final function of TestCaseDetails_Suite_ICE");
 			cb(err);
 		} else {
 			logger.info("Sending testcase data and QC details from final function of TestCaseDetails_Suite_ICE");
@@ -1880,19 +1880,19 @@ exports.getTestcaseDetailsForScenario_ICE = function (req, res) {
 		logger.info("Calling function testcasedetails_testscenarios from getTestcaseDetailsForScenario_ICE");
 		testcasedetails_testscenarios(requiredtestscenarioid, function (err, data) {
 			if (err) {
-				logger.error("Error occured in the testcasedetails_testscenarios function of getTestcaseDetailsForScenario_ICE");
+				logger.error("Error occurred in the testcasedetails_testscenarios function of getTestcaseDetailsForScenario_ICE");
 				res.send("fail");
 			} else {
 				try {
 					logger.info("Sending response data from testcasedetails_testscenarios function of getTestcaseDetailsForScenario_ICE");
 					res.send(JSON.stringify(data));
 				} catch (ex) {
-					logger.error("Exception occured in getTestcaseDetailsForScenario_ICE: %s", ex);
+					logger.error("Exception occurred in getTestcaseDetailsForScenario_ICE: %s", ex);
 				}
 			}
 		});
 	} else {
-		logger.error("Error occured in the testcasedetails_testscenarios: Invalid Session");
+		logger.error("Error occurred in the testcasedetails_testscenarios: Invalid Session");
 		res.send("Invalid Session");
 	}
 };
@@ -1922,7 +1922,7 @@ function testcasedetails_testscenarios(req, cb, data) {
 			client.post(epurl + "suite/getTestcaseDetailsForScenario_ICE", args,
 				function (testscenarioresult, response) {
 				if (response.statusCode != 200 || testscenarioresult.rows == "fail") {
-					logger.error("Error occured in suite/getTestcaseDetailsForScenario_ICE from testcasedetails_testscenarios - testscenariotable, Error Code : ERRNDAC");
+					logger.error("Error occurred in suite/getTestcaseDetailsForScenario_ICE from testcasedetails_testscenarios - testscenariotable, Error Code : ERRNDAC");
 				} else {
 					if (testscenarioresult.rows.length != 0)
 						testcaseids = testscenarioresult.rows[0].testcaseids;
@@ -1947,7 +1947,7 @@ function testcasedetails_testscenarios(req, cb, data) {
 				client.post(epurl + "suite/getTestcaseDetailsForScenario_ICE", args,
 					function (testcaseresult, response) {
 					if (response.statusCode != 200 || testcaseresult.rows == "fail") {
-						logger.error("Error occured in suite/getTestcaseDetailsForScenario_ICE from testcasedetails_testscenarios - testcasetable, Error Code : ERRNDAC");
+						logger.error("Error occurred in suite/getTestcaseDetailsForScenario_ICE from testcasedetails_testscenarios - testcasetable, Error Code : ERRNDAC");
 					} else {
 						if (testcaseresult.rows.length != 0) {
 							testcasenamelist.push(testcaseresult.rows[0].testcasename);
@@ -1974,7 +1974,7 @@ function testcasedetails_testscenarios(req, cb, data) {
 				client.post(epurl + "suite/getTestcaseDetailsForScenario_ICE", args,
 					function (screenresult, response) {
 					if (response.statusCode != 200 || screenresult.rows == "fail") {
-						logger.error("Error occured in suite/getTestcaseDetailsForScenario_ICE from testcasedetails_testscenarios - screentable, Error Code : ERRNDAC");
+						logger.error("Error occurred in suite/getTestcaseDetailsForScenario_ICE from testcasedetails_testscenarios - screentable, Error Code : ERRNDAC");
 					} else {
 						if (screenresult.rows.length != 0) {
 							screennamelist.push(screenresult.rows[0].screenname);
@@ -2001,7 +2001,7 @@ function testcasedetails_testscenarios(req, cb, data) {
 				client.post(epurl + "suite/getTestcaseDetailsForScenario_ICE", args,
 					function (projectresult, response) {
 					if (response.statusCode != 200 || projectresult.rows == "fail") {
-						logger.error("Error occured in suite/getTestcaseDetailsForScenario_ICE from testcasedetails_testscenarios - projecttable, Error Code : ERRNDAC");
+						logger.error("Error occurred in suite/getTestcaseDetailsForScenario_ICE from testcasedetails_testscenarios - projecttable, Error Code : ERRNDAC");
 					} else {
 						if (projectresult.rows.length != 0)
 							projectnamelist.push(projectresult.rows[0].projectname);
@@ -2013,7 +2013,7 @@ function testcasedetails_testscenarios(req, cb, data) {
 	}, function (err, data) {
 		logger.info("Inside final function of testcasedetails_testscenarios");
 		if (err) {
-			logger.error("Error occured in final function of testcasedetails_testscenarios: %s", err);
+			logger.error("Error occurred in final function of testcasedetails_testscenarios: %s", err);
 			cb(err, "fail");
 		} else {
 			var resultdata = {
@@ -2064,7 +2064,7 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 			client.post(epurl + "suite/readTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in suite/readTestSuite_ICE from TestSuiteDetails_Module_ICE - testsuitecheck, Error Code : ERRNDAC");
+					logger.error("Error occurred in suite/readTestSuite_ICE from TestSuiteDetails_Module_ICE - testsuitecheck, Error Code : ERRNDAC");
 				} else {
 					if (result.rows.length != 0) {
 						flag = true;
@@ -2089,7 +2089,7 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 			client.post(epurl + "suite/readTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in suite/readTestSuite_ICE from TestSuiteDetails_Module_ICE - selectmodule, Error Code : ERRNDAC");
+					logger.error("Error occurred in suite/readTestSuite_ICE from TestSuiteDetails_Module_ICE - selectmodule, Error Code : ERRNDAC");
 				} else {
 					if (result.rows.length != 0) {
 						data = JSON.parse(JSON.stringify(result.rows[0]));
@@ -2142,7 +2142,7 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 				client.post(epurl + "suite/readTestSuite_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in suite/readTestSuite_ICE from TestSuiteDetails_Module_ICE - testcasesteps, Error Code : ERRNDAC");
+						logger.error("Error occurred in suite/readTestSuite_ICE from TestSuiteDetails_Module_ICE - testcasesteps, Error Code : ERRNDAC");
 						cb1(null, flag);
 					} else {
 						for(var te=0;te<inputs.testscenarioids.length;te++){inputs.testscenarioids[te]='"'+inputs.testscenarioids[te]+'"';}
@@ -2216,7 +2216,7 @@ function updatescenariodetailsinsuite(req, cb, data) {
 			client.post(epurl + "suite/readTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in suite/readTestSuite_ICE from updatescenariodetailsinsuite - fetchdata, Error Code: ERRNDAC");
+					logger.error("Error occurred in suite/readTestSuite_ICE from updatescenariodetailsinsuite - fetchdata, Error Code: ERRNDAC");
 				} else {
 					if (result.rows.length != 0)
 						suiterowdetails = result.rows[0];
@@ -2279,7 +2279,7 @@ function updatescenariodetailsinsuite(req, cb, data) {
 			client.post(epurl + "suite/readTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in suite/readTestSuite_ICE from updatescenariodetailsinsuite - delete, Error Code: ERRNDAC");
+					logger.error("Error occurred in suite/readTestSuite_ICE from updatescenariodetailsinsuite - delete, Error Code: ERRNDAC");
 				} //else {
 					//Execute neo4j query!!
 					//var qList=[];
@@ -2320,7 +2320,7 @@ function updatescenariodetailsinsuite(req, cb, data) {
 			client.post(epurl + "suite/readTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in suite/readTestSuite_ICE from updatescenariodetailsinsuite - updatescenarioinnsuite, Error Code: ERRNDAC");
+					logger.error("Error occurred in suite/readTestSuite_ICE from updatescenariodetailsinsuite - updatescenarioinnsuite, Error Code: ERRNDAC");
 					cb(null, "fail");
 				} else {
 					//Execute neo4j query!!
@@ -2351,13 +2351,13 @@ function updatescenariodetailsinsuite(req, cb, data) {
 	}, function (err, data) {
 		logger.info("Inside final function of updatescenariodetailsinsuite");
 		if (err) {
-			logger.error("Error occured in the final function of updatescenariodetailsinsuite: %s", err);
+			logger.error("Error occurred in the final function of updatescenariodetailsinsuite: %s", err);
 			cb(null, err);
 		} else {
 			try {
 				cb(null, 'Successsssssss');
 			} catch (ex) {
-				logger.error("Exception occured in the updating scenarios in the final function of updatescenariodetailsinsuite: %s", ex);
+				logger.error("Exception occurred in the updating scenarios in the final function of updatescenariodetailsinsuite: %s", ex);
 			}
 		}
 	});
@@ -2398,7 +2398,7 @@ exports.testSuitesScheduler_ICE = function (req, res) {
 			client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
 				function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in suite/ScheduleTestSuite_ICE from testSuitesScheduler_ICE service, Error Code : ERRNDAC");
+						logger.error("Error occurred in suite/ScheduleTestSuite_ICE from testSuitesScheduler_ICE service, Error Code : ERRNDAC");
 						res.send("fail");
 					} else {
 						res.send(result.rows);
@@ -2465,7 +2465,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 				client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in suite/ScheduleTestSuite_ICE from scheduleTestSuite Error Code : ERRNDAC");
+						logger.error("Error occurred in suite/ScheduleTestSuite_ICE from scheduleTestSuite Error Code : ERRNDAC");
 						schedFlag = "fail";
 						schedcallback(null, schedFlag);
 					} else {
@@ -2553,7 +2553,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 			client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in suite/ScheduleTestSuite_ICE from executeScheduling Error Code : ERRNDAC");
+					logger.error("Error occurred in suite/ScheduleTestSuite_ICE from executeScheduling Error Code : ERRNDAC");
 					scheduleStatus = "Failed 02";
 					logger.info("Calling function updateStatus from executeScheduling");
 					updateStatus(sessObj, function (err, data) {
@@ -2602,7 +2602,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 							TestCaseDetails_Suite_ICE(currentscenarioid, uid, function (currentscenarioidError, currentscenarioidResponse) {
 								var scenariotestcaseobj = {};
 								if (currentscenarioidError) {
-									logger.error("Error occured in the function TestCaseDetails_Suite_ICE from executeScheduling Error Code - ERRNDAC: %s", currentscenarioidError);
+									logger.error("Error occurred in the function TestCaseDetails_Suite_ICE from executeScheduling Error Code - ERRNDAC: %s", currentscenarioidError);
 								} else {
 									if (currentscenarioidResponse != null || currentscenarioidResponse != undefined) {
 										scenariotestcaseobj[currentscenarioid] = currentscenarioidResponse.listoftestcasedata;
@@ -2729,7 +2729,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 															client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 																function (result, response) {
 																if (response.statusCode != 200 || result.rows == "fail") {
-																	logger.error("Error occured in suite/ExecuteTestSuite_ICE from scheduleFunction, Error Code : ERRNDAC");
+																	logger.error("Error occurred in suite/ExecuteTestSuite_ICE from scheduleFunction, Error Code : ERRNDAC");
 																	flag = "fail";
 																} else {
 																	flag = "success";
@@ -2758,7 +2758,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 															}
 														}
 													} catch (ex) {
-														logger.error("Exception occured in the scheduleFunction: %s", ex);
+														logger.error("Exception occurred in the scheduleFunction: %s", ex);
 													}
 												}
 												else if (resultData) {
@@ -2781,7 +2781,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 														//res.send(resultData);
 														//console.log(resultData);
 													} catch (ex) {
-														logger.error("Exception occured in the updateStatus function of scheduleFunction: %s", ex);
+														logger.error("Exception occurred in the updateStatus function of scheduleFunction: %s", ex);
 													}
 												}
 											}
@@ -2789,7 +2789,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 									}
 									redisServer.redisSubServer.on("message",executeTestSuite_listener);
 								} else {
-									logger.error("Error occured in the function scheduleFunction: Socket not Available");
+									logger.error("Error occurred in the function scheduleFunction: Socket not Available");
 									// deleteFlag = true;
 									// deleteScheduledData(deleteFlag, sessObj)
 									var testsuiteid = JSON.parse(JSON.stringify(result.rows[0].testsuiteids))[0];
@@ -2818,7 +2818,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 				}
 			});
 		} catch (exception) {
-			logger.error("Exception occured in the executeScheduling function: %s", ex);
+			logger.error("Exception occurred in the executeScheduling function: %s", ex);
 			// deleteFlag = true;
 			// deleteScheduledData(deleteFlag, sessObj)
 			scheduleStatus = "Failed 02";
@@ -2851,7 +2851,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 		client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 			function (result, response) {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				logger.error("Error occured in suite/ExecuteTestSuite_ICE from updateSchedulingStatus, Error Code : ERRNDAC");
+				logger.error("Error occurred in suite/ExecuteTestSuite_ICE from updateSchedulingStatus, Error Code : ERRNDAC");
 				flag = "fail";
 			} else {
 				flag = "success";
@@ -2881,7 +2881,7 @@ function updateStatus(sessObj, updateStatuscallback) {
 			client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
 				function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in suite/ScheduleTestSuite_ICE from executeScheduling Error Code : ERRNDAC");
+						logger.error("Error occurred in suite/ScheduleTestSuite_ICE from executeScheduling Error Code : ERRNDAC");
 					} else {
 						if (result.rows[0].schedulestatus != "Skipped"){
 							var inputs = {
@@ -2902,14 +2902,14 @@ function updateStatus(sessObj, updateStatuscallback) {
 								client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
 									function (result, response) {
 									if (response.statusCode != 200 || result.rows == "fail") {
-										logger.error("Error occured in suite/ScheduleTestSuite_ICE from updateStatus, Error Code : ERRNDAC");
+										logger.error("Error occurred in suite/ScheduleTestSuite_ICE from updateStatus, Error Code : ERRNDAC");
 										updateStatuscallback(null, "fail");
 									} else {
 										updateStatuscallback(null, "success");
 									}
 								});
 							} catch (exception) {
-								logger.error("Exception occured in suite/ScheduleTestSuite_ICE from updateStatus: %s",exception);
+								logger.error("Exception occurred in suite/ScheduleTestSuite_ICE from updateStatus: %s",exception);
 								updateStatuscallback(null, "fail");
 							}
 						}
@@ -2917,7 +2917,7 @@ function updateStatus(sessObj, updateStatuscallback) {
 				});
 		}
 	} catch (exception) {
-		logger.error("Exception occured in updateStatus: %s",exception);
+		logger.error("Exception occurred in updateStatus: %s",exception);
 		updateStatuscallback(null, "fail");
 	}
 }
@@ -2946,7 +2946,7 @@ function updateSkippedScheduleStatus(sessObj, msg, updateStatuscallback){
 				client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in suite/ScheduleTestSuite_ICE from updateSkippedScheduleStatus, Error Code : ERRNDAC");
+						logger.error("Error occurred in suite/ScheduleTestSuite_ICE from updateSkippedScheduleStatus, Error Code : ERRNDAC");
 						updateStatuscallback(null, "fail");
 					}
 				});
@@ -3002,7 +3002,7 @@ function updateSkippedScheduleStatus(sessObj, msg, updateStatuscallback){
 						client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 							function (result, response) {
 							if (response.statusCode != 200 || result.rows == "fail") {
-								logger.error("Error occured in suite/ExecuteTestSuite_ICE from scheduleFunction, Error Code : ERRNDAC");
+								logger.error("Error occurred in suite/ExecuteTestSuite_ICE from scheduleFunction, Error Code : ERRNDAC");
 								updateStatuscallback(null, "fail");
 							} else {
 								updateStatuscallback(null, "success");
@@ -3011,12 +3011,12 @@ function updateSkippedScheduleStatus(sessObj, msg, updateStatuscallback){
 					}
 				}
 			} catch (exception) {
-				logger.error("Exception occured in suite/ScheduleTestSuite_ICE from updateSkippedScheduleStatus: %s",exception);
+				logger.error("Exception occurred in suite/ScheduleTestSuite_ICE from updateSkippedScheduleStatus: %s",exception);
 				updateStatuscallback(null, "fail");
 			} 
 		}
 	} catch (exception) {
-		logger.error("Exception occured in updateSkippedScheduleStatus: %s",exception);
+		logger.error("Exception occurred in updateSkippedScheduleStatus: %s",exception);
 		updateStatuscallback(null, "fail");
 	}
 }
@@ -3027,19 +3027,19 @@ exports.getScheduledDetails_ICE = function (req, res) {
 		logger.info("Calling function getScheduledDetails from getScheduledDetails_ICE");
 		getScheduledDetails("getallscheduledata", function (err, getSchedcallback) {
 			if (err) {
-				logger.error("Error occured in getScheduledDetails from getScheduledDetails_ICE: %s",err);
+				logger.error("Error occurred in getScheduledDetails from getScheduledDetails_ICE: %s",err);
 				res.send("fail");
 			} else {
 				try {
 					res.send(getSchedcallback);
 				} catch (exception) {
-					logger.error("Exception occured while sending response getSchedcallback: %s",exception);
+					logger.error("Exception occurred while sending response getSchedcallback: %s",exception);
 					res.send("fail");
 				}
 			}
 		});
 	} else {
-		logger.error("Error occured in getScheduledDetails_ICE: Invalid Session");
+		logger.error("Error occurred in getScheduledDetails_ICE: Invalid Session");
 		res.send("Invalid Session");
 	}
 };
@@ -3075,7 +3075,7 @@ exports.cancelScheduledJob_ICE = function (req, res) {
 				client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in suite/ScheduleTestSuite_ICE from cancelScheduledJob_ICE service, Error Code : ERRNDAC");
+						logger.error("Error occurred in suite/ScheduleTestSuite_ICE from cancelScheduledJob_ICE service, Error Code : ERRNDAC");
 						res.send("fail");
 					} else {
 						var status = result.rows[0].schedulestatus;
@@ -3131,7 +3131,7 @@ function getScheduledDetails(dbquery, schedDetailscallback) {
 		client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
 			function (result, response) {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				logger.error("Error occured in suite/ScheduleTestSuite_ICE from getScheduledDetails, Error Code : ERRNDAC");
+				logger.error("Error occurred in suite/ScheduleTestSuite_ICE from getScheduledDetails, Error Code : ERRNDAC");
 				schedDetailscallback(null, "fail");
 			} else {
 				schedDetailscallback(null, result.rows);
@@ -3151,7 +3151,7 @@ exports.reScheduleTestsuite = function (req, res) {
 		logger.info("Calling function getScheduledDetails from reScheduleTestsuite service");
 		getScheduledDetails("getallscheduleddetails", function (err, reSchedcallback) {
 			if (err) {
-				logger.error("Error occured in getScheduledDetails from reScheduleTestsuite service: %s", err);
+				logger.error("Error occurred in getScheduledDetails from reScheduleTestsuite service: %s", err);
 			} else {
 				if (reSchedcallback != "fail") {
 					var status;

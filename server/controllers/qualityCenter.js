@@ -58,7 +58,7 @@ exports.loginQCServer_ICE = function (req, res) {
 								clearInterval(updateSessionExpiry);
 								redisServer.redisSubServer.removeListener('message',qclogin_listener);
 								if (data.onAction == "unavailableLocalServer") {
-									logger.error("Error occured in loginQCServer_ICE: Socket Disconnected");
+									logger.error("Error occurred in loginQCServer_ICE: Socket Disconnected");
 									if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 										var soc = myserver.socketMapNotify[name];
 										soc.emit("ICEnotAvailable");
@@ -137,7 +137,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 								clearInterval(updateSessionExpiry);
 								redisServer.redisSubServer.removeListener('message',qclogin_listener);
 								if (data.onAction == "unavailableLocalServer") {
-									logger.error("Error occured in qcProjectDetails_ICE: Socket Disconnected");
+									logger.error("Error occurred in qcProjectDetails_ICE: Socket Disconnected");
 									if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 										var soc = myserver.socketMapNotify[name];
 										soc.emit("ICEnotAvailable");
@@ -209,7 +209,7 @@ function getProjectsForUser(userid, cb) {
 			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
 				function (projectrows, response) {
 				if (response.statusCode != 200 || projectrows.rows == "fail") {
-					logger.error("Error occured in qualityCenter/qcProjectDetails_ICE from getprojectDetails Error Code : ERRNDAC");
+					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from getprojectDetails Error Code : ERRNDAC");
 				} else {
 					if (projectrows.rows.length != 0) {
 						//flagtocheckifexists = true;
@@ -260,7 +260,7 @@ function projectandscenario(projectid, cb) {
 				function (projectdata, response) {
 				if (response.statusCode != 200 || projectdata.rows == "fail") {
 					
-					logger.error("Error occured in getProjectsForUser from projectname1 Error Code : ERRNDAC");
+					logger.error("Error occurred in getProjectsForUser from projectname1 Error Code : ERRNDAC");
 				} else {
 					if (projectdata.rows.length != 0) {
 						projectname = projectdata.rows[0].projectname;
@@ -284,7 +284,7 @@ function projectandscenario(projectid, cb) {
 			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
 				function (scenariorows, response) {
 				if (response.statusCode != 200 || scenariorows.rows == "fail") {
-					logger.error("Error occured in getProjectsForUser from scenariodata Error Code : ERRNDAC");
+					logger.error("Error occurred in getProjectsForUser from scenariodata Error Code : ERRNDAC");
 				} else {
 					if (scenariorows.rows.length != 0) {
 						//flagtocheckifexists = true;
@@ -331,7 +331,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 							clearInterval(updateSessionExpiry);
 							redisServer.redisSubServer.removeListener('message',qclogin_listener);
 							if (data.onAction == "unavailableLocalServer") {
-								logger.error("Error occured in qcFolderDetails_ICE: Socket Disconnected");
+								logger.error("Error occurred in qcFolderDetails_ICE: Socket Disconnected");
 								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 									var soc = myserver.socketMapNotify[name];
 									soc.emit("ICEnotAvailable");
@@ -412,7 +412,7 @@ exports.saveQcDetails_ICE = function (req, res) {
 		client.post(epurl + "qualityCenter/saveQcDetails_ICE", args,
 			function (qcdetailsows, response) {
 			if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
-					logger.error("Error occured in saveQcDetails_ICE Error Code : ERRNDAC");
+					logger.error("Error occurred in saveQcDetails_ICE Error Code : ERRNDAC");
 				flag = false;
 			}
 			callback();
@@ -495,7 +495,7 @@ function getQcDetailsForUser(userid, cb) {
 			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
 				function (projectrows, response) {
 				if (response.statusCode != 200 || projectrows.rows == "fail") {
-				logger.error("Error occured in qualityCenter/qcProjectDetails_ICE from getQcDetailsForUser Error Code : ERRNDAC");
+				logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from getQcDetailsForUser Error Code : ERRNDAC");
 				} else {
 					if (projectrows.rows.length != 0) {
 						//flagtocheckifexists = true;
@@ -549,7 +549,7 @@ function qcscenariodetails(projectid, cb) {
 			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
 				function (scenariorows, response) {
 				if (response.statusCode != 200 || scenariorows.rows == "fail") {
-					logger.error("Error occured in qualityCenter/qcProjectDetails_ICE from qcscenariodetails Error Code : ERRNDAC");
+					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from qcscenariodetails Error Code : ERRNDAC");
 				} else {
 					if (scenariorows.rows.length != 0) {
 						//flagtocheckifexists = true;
@@ -579,7 +579,7 @@ function qcscenariodetails(projectid, cb) {
 				client.post(epurl + "qualityCenter/viewQcMappedList_ICE", args,
 					function (qcdetailsows, response) {
 					if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
-						logger.error("Error occured inqualityCenter/viewQcMappedList_ICE from qcdetails Error Code : ERRNDAC");
+						logger.error("Error occurred inqualityCenter/viewQcMappedList_ICE from qcdetails Error Code : ERRNDAC");
 					} else {
 						if (qcdetailsows.rows.length != 0) {
 							//flagtocheckifexists = true;
@@ -631,7 +631,7 @@ function getProjectsAndModules(userid,cb){
            // dbConnICE.execute(getprojects,function(err,projectrows){
                 //if(err){
                     //console.log(err);
-                  					logger.error("Error occured in qualityCenter/qcProjectDetails_ICE from getProjectsAndModules Error Code : ERRNDAC");
+                  					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from getProjectsAndModules Error Code : ERRNDAC");
 
                 }else{
                     if(projectrows.rows.length!=0){
@@ -679,7 +679,7 @@ function projectandmodule(projectid,cb,data){
             // dbConnICE.execute(projectnamequery,function(err,projectdata){
             //         if(err){
             //             console.log(err);
-					logger.error("Error occured in qualityCenter/qcProjectDetails_ICE from projectname1 Error Code : ERRNDAC");
+					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from projectname1 Error Code : ERRNDAC");
                     }else{
                         if(projectdata.rows.length!=0){
                             projectname = projectdata.rows[0].projectname;
@@ -704,7 +704,7 @@ function projectandmodule(projectid,cb,data){
                 dbConnICE.execute(modulequery,function(err,modulerows){
                 if(err){
                     console.log(err);
-                        console.log("Error occured in getProjectsForUser: fail , scenariodata");
+                        console.log("Error occurred in getProjectsForUser: fail , scenariodata");
                 }else{
                     if(modulerows.rows.length!=0){
                         flagtocheckifexists = true;
@@ -780,7 +780,7 @@ function getTestCaseDetails(testcaseids,cb){
         var testcasequery = "select testcasename,testcaseid from testcases where testcaseid="+itr;
         dbConnICE.execute(testcasequery,function(err,testcasedata){
             if(err){
-                console.log("Error occured is :",err);
+                console.log("Error occurred is :",err);
                 callback();
             }else{
                 if(testcasedata.rows.length >0){

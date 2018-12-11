@@ -73,7 +73,7 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 							function (results, response) {
 							// if (err){
 								if(response.statusCode != 200){
-								logger.error("Error occured in encrypt_ICE Error Code : ERRNDAC");
+								logger.error("Error occurred in encrypt_ICE Error Code : ERRNDAC");
 								res.send("fail");
 							}else{
 									// results is an array consisting of messages collected during execution

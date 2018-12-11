@@ -766,7 +766,7 @@ exports.saveData=function(req,res){
 				if(status!=200){
 					//res.setHeader('Content-Type', 'text');
 					logger.debug(result[0]);
-					logger.error('Error occured in saveData Query');
+					logger.error('Error occurred in saveData Query');
 					result=JSON.stringify(result)
 					if(result.indexOf('Schema.ConstraintValidationFailed')>-1){
 						result='DuplicateModules';
@@ -1036,7 +1036,7 @@ exports.saveData=function(req,res){
 				if(status!=200){
 					//res.setHeader('Content-Type', 'text');
 					logger.debug(result[0]);
-					logger.error('Error occured in saveData Query');
+					logger.error('Error occurred in saveData Query');
 					result=JSON.stringify(result)
 					if(result.indexOf('Schema.ConstraintValidationFailed')>-1){
 						result='DuplicateModules';

@@ -14,16 +14,17 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 		$scope.loginValidation = "Your session has expired, Please login again";
 		cfpLoadingBar.complete();
 	} else {
-		LoginService.checkState_Nineteen68()
-		.then(function (res) {
+		LoginService.checkUserState_Nineteen68()
+		.then(function (data) {
 			cfpLoadingBar.complete();
-			var data = res.headers().message;
 			var emsg = '';
-			if (data == "fail") {
-				emsg = "Failed to load user profile.";
-			} else if (data == "userLogged") {
-				emsg = "User is already logged in! Please logout from the previous session.";
-			} else {
+			if (data == "fail") emsg = "Failed to load user profile.";
+			else if (data == "unauthorized") emsg = "User is not authorized to use Nineteen68.";
+			else if (data == "userLogged") emsg = "User is already logged in! Please logout from the previous session.";
+			else if (data == "invalid_username") emsg = "The username or password you entered isn't correct. Please try again.";
+			else if (data == "inValidCredential") emsg = "The username or password you entered isn't correct. Please try again.";
+			else if (data == "noProjectsAssigned") emsg = "To Login, user must be allocated to a Domain and Project. Please contact Admin.";
+			else {
 				LoginService.loadUserInfo_Nineteen68()
 				.then(function (data) {
 					if (data != "fail") {
@@ -47,8 +48,8 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 					console.log("Fail to Load UserInfo")
 				});
 			}
-			console.log(emsg)
 			$scope.loginValidation = emsg;
+			if (emsg) console.log(emsg)
 		}, function (error) {
 			var emsg = "Failed to load user profile.";
 			console.log(emsg)

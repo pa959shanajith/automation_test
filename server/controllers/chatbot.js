@@ -18,7 +18,7 @@ exports.getTopMatches_ProfJ = function getTopMatches(req, res) {
                         function (results, response) {
                         // if (err){
                             if(response.statusCode != 200){
-                            console.log("error occured : ",err);
+                            console.log("error occurred : ",err);
                             res.send("fail");
                         }else{
                                 // results is an array consisting of messages collected during execution 
@@ -63,7 +63,7 @@ exports.updateFrequency_ProfJ = function(req, res) {
                         function (results, response) {
                         // if (err){
                             if(response.statusCode != 200){
-                            console.log("error occured : ",err);
+                            console.log("error occurred : ",err);
                             res.send("fail");
                         }else{
                                 // results is an array consisting of messages collected during execution 

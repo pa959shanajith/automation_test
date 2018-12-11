@@ -41,7 +41,7 @@ exports.flowGraphResults = function(req, res){
 							var value = data.value;
 							if (data.onAction == "unavailableLocalServer") {
 								redisServer.redisSubServer.removeListener('message',generateFlowGraph_listener);	
-								logger.error("Error occured in flowGraphResults: Socket Disconnected");
+								logger.error("Error occurred in flowGraphResults: Socket Disconnected");
 								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 									var soc = myserver.socketMapNotify[name];
 									soc.emit("ICEnotAvailable");
@@ -74,12 +74,12 @@ exports.flowGraphResults = function(req, res){
 			});
 		}
 		else{
-			logger.info("Error occured in the service flowGraphResults: Invalid Session");
+			logger.info("Error occurred in the service flowGraphResults: Invalid Session");
 			return res.send("Invalid session");
 		}
 	}catch(exception){
 		logger.error(exception.message);
-		logger.error("Error occured in flowGraphResults");
+		logger.error("Error occurred in flowGraphResults");
 	}
 }
 /**
@@ -109,7 +109,7 @@ exports.APG_OpenFileInEditor = function (req, res) {
 							var value = data.value;
 							if (data.onAction == "unavailableLocalServer") {
 								redisServer.redisSubServer.removeListener('message',apgOpenFileInEditor_listener);	
-								logger.error("Error occured in APG_OpenFileInEditor: Socket Disconnected");
+								logger.error("Error occurred in APG_OpenFileInEditor: Socket Disconnected");
 								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 									var soc = myserver.socketMapNotify[name];
 									soc.emit("ICEnotAvailable");
@@ -133,7 +133,7 @@ exports.APG_OpenFileInEditor = function (req, res) {
 				}
 			});
 		} else {
-			logger.error("Error occured in the service APG_OpenFileInEditor: Invalid Session");
+			logger.error("Error occurred in the service APG_OpenFileInEditor: Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
@@ -163,7 +163,7 @@ exports.APG_createAPGProject = function(req,res){
 				client.post(epurl+"apg/createAPGProject", args,
 				function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in apg/createAPGProject: APG_createAPGProject service");
+						logger.error("Error occurred in apg/createAPGProject: APG_createAPGProject service");
 						res.status(response.statusCode).json({success: false})
 					}
 					else {
@@ -172,12 +172,12 @@ exports.APG_createAPGProject = function(req,res){
 				});
 				
 			}else {
-				logger.error("Error occured in the service APG_createAPGProject: Invalid Session");
+				logger.error("Error occurred in the service APG_createAPGProject: Invalid Session");
 				res.send("Invalid Session");
 			}
 	}
 	catch(exception){
 		logger.error(exception.message);
-		logger.error("Error occured in APG_createAPGProject");
+		logger.error("Error occurred in APG_createAPGProject");
 	}
 };

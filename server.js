@@ -143,7 +143,7 @@ if (cluster.isMaster) {
                     client_id: uiConfig.sso_config.client_id,
                     client_secret: uiConfig.sso_config.client_secret,
                     redirect_uri: uiConfig.sso_config.redirect_uri,
-                    routes: { callback: { defaultRedirect: "/" } },
+                    routes: { callback: { defaultRedirect: "/", failureRedirect: "/?e=401" } },
                     scope: 'openid profile email'
                 });
                 app.use(oidc.router);  // ExpressOIDC will attach handlers for the /login and /authorization-code/callback routes
@@ -249,45 +249,46 @@ if (cluster.isMaster) {
         });
 
         app.use('/', function(req, res, next) {
-            if (req.url != '/') return next();
-            if (req.method == "POST") {
-                req.session.emsg = req.session.emsg || "ok";
-                res.setHeader('message', req.session.emsg);
-                delete req.session.emsg;
-                return res.send("check");
-            }
+            if (!(req.url == '/' || req.url.startsWith("/?"))) return next();
+			var emsg=req.query.e;
             var userLogged = req.session.logged;
             var usrCtx = (ssoClient=="okta")? req.userContext : undefined;
-            if (req.session.username==undefined) {
+			if (emsg) {
+				if (emsg == 401) req.session.emsg = "unauthorized";
+				else req.session.emsg = emsg;
+			}
+            else if (req.session.username==undefined) {
                 if (ssoEnabled && usrCtx) {
                     var username = usrCtx.userinfo.nineteen68_username;
-                    redisSessionStore.all(function (err, allKeys) {
-                        if (err) {
-                            logger.info("User Authentication failed");
-                            req.session.emsg = "fail";
-                        } else {
-                            for (var ki = 0; ki < allKeys.length; ki++) {
-                                if (username == allKeys[ki].username) {
-                                    userLogged=true;
-                                    break;
-                                }
-                            }
-                            if (userLogged) { 
-                                req.session.emsg = "userLogged";
-                            } else {
-                                req.session.username = username;
-                                req.session.uniqueId = req.session.id;
-                                req.session.ip = req.ip;
-                                req.session.loggedin = (new Date).toISOString();
-                                logger.rewriters[0]=function(level, msg, meta) {
-                                    meta.username = null;
-                                    meta.userid = null;
-                                    meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
-                                    return meta;
-                                };
-                            }
-                        }
-                    });
+					if (username == undefined) {
+						req.session.emsg = "invalid_username";
+					} else {
+						redisSessionStore.all(function (err, allKeys) {
+							if (err) {
+								logger.info("User Authentication failed");
+								req.session.emsg = "fail";
+							} else {
+								for (var ki = 0; ki < allKeys.length; ki++) {
+									if (username == allKeys[ki].username) {
+										userLogged=true;
+										break;
+									}
+								}
+								if (userLogged) {
+									req.session.emsg = "userLogged";
+								} else {
+									req.session.username = username;
+									req.session.uniqueId = req.session.id;
+									logger.rewriters[0]=function(level, msg, meta) {
+										meta.username = null;
+										meta.userid = null;
+										meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
+										return meta;
+									};
+								}
+							}
+						});
+					}
                 } else {
                     logger.rewriters[0]=function(level, msg, meta) {
                         meta.username = null;
@@ -513,6 +514,7 @@ if (cluster.isMaster) {
 
         //Login Routes
         app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
+        app.post('/checkUserState_Nineteen68', login.checkUserState_Nineteen68);
         app.post('/loadUserInfo_Nineteen68', login.loadUserInfo_Nineteen68);
         app.post('/getRoleNameByRoleId_Nineteen68', login.getRoleNameByRoleId_Nineteen68);
         app.post('/logoutUser_Nineteen68', login.logoutUser_Nineteen68);
@@ -621,7 +623,7 @@ if (cluster.isMaster) {
                         logger.error("Please run the Service API and Restart the Server");
                     } else {
                         suite.reScheduleTestsuite();
-                        console.info("Nineteen68 Server Ready...");
+                        console.info("Nineteen68 Server Ready...\n");
                     }
                 } catch (exception) {
                     httpsServer.close();

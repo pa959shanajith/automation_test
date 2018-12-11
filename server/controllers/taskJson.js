@@ -18,7 +18,7 @@ exports.updateTaskstatus_mindmaps = function (req, res) {
 				}
 			});
 		} catch (error) {
-			logger.error("exception occured in updateTaskstatus_mindmaps",error);
+			logger.error("exception occurred in updateTaskstatus_mindmaps",error);
 		}
 	} else {
 		res.send("Invalid Session");
@@ -45,7 +45,7 @@ exports.getTaskJson_mindmaps = function (req, res) {
 					};
 					next_function(resultobj, function (err, data) {
 						if (err) {
-							logger.error('error occured in getTaskJson_mindmaps',err);
+							logger.error('error occurred in getTaskJson_mindmaps',err);
 							res.send('fail');
 						} else {
 							res.send(data);

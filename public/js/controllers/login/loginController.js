@@ -68,22 +68,17 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 					$scope.loginValidation = "User is already logged in! Please logout from the previous session.";
 				} else if (data == "inValidLDAPServer") {
 					$scope.loginValidation = "LDAP Server Configuration is invalid!";
-				} else if (data == 'noProjectsAssigned') {
-					$scope.loginValidation = "To Login, user must be allocated to a Domain and Project. Please contact Admin.";
 				} else if (data == 'invalid_username_password') {
 					$scope.loginValidation = "The username or password you entered isn't correct. Please try again.";
 				} else {
 					$scope.loginValidation = "Failed to Login.";
 				}
-			
 			}, function (error) {
 				console.log("Failed to Authenticate User.")
 				$scope.loginValidation = "Failed to Authenticate User.";
 				cfpLoadingBar.complete();
 			});
-
 		}
-		
 	};
 
 	$scope.restartServer = function (serverid, serverName) {
