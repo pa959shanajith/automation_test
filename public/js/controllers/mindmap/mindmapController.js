@@ -2670,6 +2670,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
                 })
                 if (reuse.length > 0) {
+                    unblockUI();
                     openDialogMindmap('Error', "Scenario names cannot be reused, please rename the following: '" + reuse.join() + "'");
                     return;
                 }
@@ -2696,6 +2697,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
             } else if (s.attr('id') == 'ct-createAction') {
                 if (error) {
+                    unblockUI();
                     openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases")
                         //$('#Mindmap_error').modal('show');
                     return;
@@ -2713,6 +2715,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             var assignedTo = assignedObj;
 
             if ($('.project-list').val() == null) {
+                unblockUI();
                 openDialogMindmap('Error', 'No projects is assigned to User');
                 return !1;
             }
