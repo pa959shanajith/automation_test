@@ -4615,7 +4615,7 @@ Purpose : displaying pop up for replication of project
                 // if(!versioningEnabled){
                 $("#ct-main").hide();
                 selectOpt('createImg');
-                collapseSidebars();
+                //collapseSidebars();
                 //loadMindmapData_W();
                 $scope.param = 2;
                 loadMindmapData();
@@ -4638,7 +4638,7 @@ Purpose : displaying pop up for replication of project
                     $("#ct-main").show();
                 }
 
-                collapseSidebars();
+                //collapseSidebars();
                 //if versioning.js file is present then call addVersioning function else call loadMindmapData()
                 if (versioningEnabled) {
                     loadMindmapData_V();
