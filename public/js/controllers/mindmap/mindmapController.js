@@ -335,6 +335,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $('.cycle-list').empty();
                 $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
                 $('.cycle-list').addClass('errorClass');
+				if ($('.search-canvas').hasClass('search-visible')) {
+					$('.search-canvas').removeClass('search-visible');
+					$('.search-canvas').val('');
+				}
                 reldata = {};
                 for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
                     $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
@@ -399,7 +403,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 'Apptype':$scope.apptype
                 }
             });
-        });            
+        });
+		if ($scope.tab == 'tabCreate') {
+			if ($('.search-canvas').hasClass('search-visible')) {
+					$('.search-canvas').removeClass('search-visible');
+					$('.search-canvas').val('');
+				}
+		}
     };
 
     function addSearchNodeListeners() {
