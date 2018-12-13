@@ -44,6 +44,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     var excelFlag = 0;
     var dragsearch = false;
     $scope.allMMaps = [];
+    var split_char = ',';
+    if (isIE) {
+        split_char = ' ';
+    }    
     // Complexity
     var cx_weightage = { //scale , weightage
         'Application Type': 3,
@@ -142,6 +146,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         "edit": "fa-pencil-square-o",
         "delete": "fa-trash-o"
     };
+    
     //------------------Createmap.js---------------------//
 
     function unloadMindmapData() {
@@ -330,6 +335,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $('.cycle-list').empty();
                 $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
                 $('.cycle-list').addClass('errorClass');
+				if ($('.search-canvas').hasClass('search-visible')) {
+					$('.search-canvas').removeClass('search-visible');
+					$('.search-canvas').val('');
+				}
                 reldata = {};
                 for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
                     $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
@@ -394,7 +403,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 'Apptype':$scope.apptype
                 }
             });
-        });            
+        });
+		if ($scope.tab == 'tabCreate') {
+			if ($('.search-canvas').hasClass('search-visible')) {
+					$('.search-canvas').removeClass('search-visible');
+					$('.search-canvas').val('');
+				}
+		}
     };
 
     function addSearchNodeListeners() {
@@ -2294,10 +2309,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         d3.select('#ct-mapSvg').on('mousemove.nodemove', null);
         var isIE = /*@cc_on!@*/ false || !!document.documentMode;
         var p = d3.select("#ct-node-" + idx);
-        var split_char = ',';
-        if (isIE) {
-            split_char = ' ';
-        }
+
 
         var pi = idx;
         var l = p.attr('transform').slice(10, -1).split(split_char);
@@ -2670,6 +2682,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
                 })
                 if (reuse.length > 0) {
+                    unblockUI();
                     openDialogMindmap('Error', "Scenario names cannot be reused, please rename the following: '" + reuse.join() + "'");
                     return;
                 }
@@ -2696,6 +2709,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
             } else if (s.attr('id') == 'ct-createAction') {
                 if (error) {
+                    unblockUI();
                     openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases")
                         //$('#Mindmap_error').modal('show');
                     return;
@@ -2713,6 +2727,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             var assignedTo = assignedObj;
 
             if ($('.project-list').val() == null) {
+                unblockUI();
                 openDialogMindmap('Error', 'No projects is assigned to User');
                 return !1;
             }
@@ -3507,8 +3522,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $('.ct-node').removeClass('node-selected node-error');
         $('.ct-link').removeClass('link-selected');
         // console.log('Resize');
-        var xvp = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[0];
-        var yvp = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[1];
+        var xvp = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(split_char)[0];
+        var yvp = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(split_char)[1];
         var scale = (d3.select("#ct-mindMap").attr("transform").split(/[()]/)[3]);
 
         dNodes.forEach(function(e, i) {
@@ -4600,7 +4615,7 @@ Purpose : displaying pop up for replication of project
                 // if(!versioningEnabled){
                 $("#ct-main").hide();
                 selectOpt('createImg');
-                collapseSidebars();
+                //collapseSidebars();
                 //loadMindmapData_W();
                 $scope.param = 2;
                 loadMindmapData();
@@ -4623,7 +4638,7 @@ Purpose : displaying pop up for replication of project
                     $("#ct-main").show();
                 }
 
-                collapseSidebars();
+                //collapseSidebars();
                 //if versioning.js file is present then call addVersioning function else call loadMindmapData()
                 if (versioningEnabled) {
                     loadMindmapData_V();
@@ -5040,6 +5055,24 @@ Purpose : displaying pop up for replication of project
         //   alert("Ctrl + Alt + Shift + U shortcut combination was pressed");
         // }
     };
+    if (FileReader.prototype.readAsBinaryString === undefined) {
+        FileReader.prototype.readAsBinaryString = function (fileData) {
+            var binary = "";
+            var pt = this;
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var bytes = new Uint8Array(reader.result);
+                var length = bytes.byteLength;
+                for (var i = 0; i < length; i++) {
+                    binary += String.fromCharCode(bytes[i]);
+                }
+                //pt.result  - readonly so assign content to another property
+                pt.content = binary;
+                pt.onload(); // thanks to @Denis comment
+            }
+            reader.readAsArrayBuffer(fileData);
+        }
+    }          
 }]);
 
 mySPA.directive('onReadFile', function($parse) {
@@ -5050,16 +5083,24 @@ mySPA.directive('onReadFile', function($parse) {
             var fn = $parse(attrs.onReadFile);
 
             element.on('change', function(onChangeEvent) {
+                if((onChangeEvent.srcElement || onChangeEvent.target).files[0] == null) return;
                 var reader = new FileReader();
 
                 reader.onload = function(onLoadEvent) {
+                    try{
+                        var res = onLoadEvent.target.result;
+                    }
+                    catch(ex){
+                        var res = this.content;
+                    }
                     scope.$apply(function() {
                         fn(scope, {
-                            $fileContent: onLoadEvent.target.result
+                            $fileContent: res
                         });
                     });
-                };
-
+                };          
+                
+                
                 reader.readAsBinaryString((onChangeEvent.srcElement || onChangeEvent.target).files[0]);
                 this.value = null;
             });

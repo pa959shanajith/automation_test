@@ -1337,7 +1337,7 @@ exports.getReportsData_ICE = function (req, res) {
 							res.send("fail");
 						} else {
 							//res.send(result);
-							async.forEachSeries(Object.keys(result2), function (scenarioid, scenariomapcb) {
+							async.forEachSeries(eachtestsuite.testscenarioids, function (scenarioid, scenariomapcb) {
 							//for (var scenarioid in result2){
 	
 								// var inputs = {

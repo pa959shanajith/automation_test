@@ -780,11 +780,17 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				}
 			});
 		}
-		console.log("moduleInfo:::" + $scope.moduleInfo)
+		//console.log("moduleInfo:::" + $scope.moduleInfo)
 		//moduleInfo.push(suiteInfo);
 		//Getting each row data as an object
-		if((appType != "SAP" && appType != "Mainframe") && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select a browser")
+		if((appType == "Web" ) && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select a browser")
+		else if(appType == "Webservice" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select Web Services option")
+		else if(appType == "MobileApp" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select Mobile Apps option")
+		else if(appType == "Desktop" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select Desktop Apps option")
+		else if(appType == "Mainframe" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select Mainframe option")
+		else if(appType == "DesktopJava" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select OEBS Apps option")
 		else if(appType == "SAP" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select SAP Apps option")
+		else if(appType == "MobileWeb" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select Mobile Web option")
 
 		else if($(".exe-ExecuteStatus input:checked").length == 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute")
 		else{
