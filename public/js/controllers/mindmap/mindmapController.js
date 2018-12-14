@@ -4955,7 +4955,7 @@ Purpose : displaying pop up for replication of project
                             var fileURL = URL.createObjectURL(file);
                             var a = document.createElement('a');
                             a.href = fileURL;
-                            a.download = 'sample';
+                            a.download = 'sample.xlsx';
                             //a.target="_new";
                             document.body.appendChild(a);
                             a.click();
