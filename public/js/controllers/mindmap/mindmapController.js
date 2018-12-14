@@ -3493,17 +3493,24 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     */
 
     function jsonDownload(filename, responseData) {
-        var blob = new Blob([responseData], {
+        var objbrowserName = navigator.appName;
+        if (isIE) {
+            window.navigator.msSaveOrOpenBlob(new Blob([responseData], { type: "text/json;charset=utf-8" }), filename);
+            //saveAs(blob, filename);
+        }
+        else{
+            var blob = new Blob([responseData], {
                 type: 'text/json'
             }),
             e = document.createEvent('MouseEvents'),
             a = document.createElement('a');
-        a.download = filename;
-        a.href = window.URL.createObjectURL(blob);
-        a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
-        e.initMouseEvent('click', true, true, window,
-            0, 0, 0, 0, 0, false, false, false, false, 0, null);
-        a.dispatchEvent(e);
+            a.download = filename;
+            a.href = window.URL.createObjectURL(blob);
+            a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+            e.initMouseEvent('click', true, true, window,
+                0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            a.dispatchEvent(e);
+        }
     }
 
     function draww() {
@@ -4939,24 +4946,26 @@ Purpose : displaying pop up for replication of project
                 if (result == "Invalid Session") {
                     $rootScope.redirectPage();
                 } else {
-
-                    //openDialogMindmap("Success", "Exported to Excel successfully");
                     openWindow = 0;
                     if (openWindow == 0) {
                         var file = new Blob([result], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                        var fileURL = URL.createObjectURL(file);
-                        var a = document.createElement('a');
-                        a.href = fileURL;
-                        a.download = 'sample';
-
-
-
-                        document.body.appendChild(a);
-                        a.click();
-
-                        URL.revokeObjectURL(fileURL);
+                        if (isIE) {
+                            navigator.msSaveOrOpenBlob(file);
+                        }else{
+                            var fileURL = URL.createObjectURL(file);
+                            var a = document.createElement('a');
+                            a.href = fileURL;
+                            a.download = 'sample.xlsx';
+                            //a.target="_new";
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            //$window.open(fileURL, '_blank');
+                            URL.revokeObjectURL(fileURL);
+                        }
                     }
                     openWindow++;
+
 
 
                 }

@@ -1584,36 +1584,43 @@ exports.exportToExcel = function(req,res){
 		curr = excelMap;
 		
 
-var sce_row_count = 2;
-var scr_row_count = 2;
-var tes_row_count = 2;
+	var sce_row_count = 2;
+	var scr_row_count = 2;
+	var tes_row_count = 2;
 
-
-//To fill some data
+	
+	
+	//To fill some data
 
     sheet1.width(1, 40);sheet1.height(1, 20);sheet1.width(2, 40);sheet1.height(2, 20);
     sheet1.width(3, 40);sheet1.height(3, 20);sheet1.width(4, 40);sheet1.height(4, 20);
     sheet1.set(1,1,'Module');sheet1.set(2,1,'Scenario');
     sheet1.set(3,1,'Screen');sheet1.set(4,1,'Script');
-
+	var min_tc_idx = 100000;
+	var min_scr_idx = 100000;
 	 sheet1.set(1,2,curr.name);
 	 try{
      //loop to iterate through number of scenarios
      for(i=0 ; i<curr.children.length; i++){
-         sheet1.set(2,sce_row_count,curr.children[0].name);
+		min_scr_idx = 100000;
          //loop to iterate through number of screens
         for(j=0 ; j<curr.children[i].children.length; j++){
-            sheet1.set(3,scr_row_count,curr.children[i].children[j].name);
+			min_tc_idx = 100000;
             //loop through number of test cases
             for(k=0 ; k<curr.children[i].children[j].children.length ; k++){
-                sheet1.set(4,tes_row_count,curr.children[i].children[j].children[k].name);
-                tes_row_count++;
-
-            }
-            scr_row_count = tes_row_count;
-        }
-        sce_row_count = tes_row_count;
-     }
+				sheet1.set(4,1+parseInt(curr.children[i].children[j].children[k].childIndex),curr.children[i].children[j].children[k].name);
+				if(parseInt(curr.children[i].children[j].children[k].childIndex)<parseInt(min_tc_idx)){
+					min_tc_idx = curr.children[i].children[j].children[k].childIndex;
+				}
+			}
+            sheet1.set(3,1+parseInt(min_tc_idx),curr.children[i].children[j].name);			
+			if(parseInt(min_tc_idx)<parseInt(min_scr_idx)){
+				min_scr_idx = min_tc_idx;
+			}
+		}
+		
+		sheet1.set(2,1+parseInt(min_scr_idx),curr.children[i].name);
+	}
 
 
 
