@@ -316,18 +316,18 @@ exports.checkUserState_Nineteen68 = function (req, res) {
 					}
 				}
 			}, function (emsg) {
-				if (emsg != "ok") req.session.destroy();
-				else res.cookie('maintain.sid',uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed:true});
+				if (emsg == "ok") res.cookie('maintain.sid',uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed:true});
+				else if (!req.session.dndSess) req.clearSession();
 				return res.send(emsg);
 			});
 		} else {
 			logger.info("Invalid Session");
-			req.session.destroy();
+			req.clearSession();
 			res.send("invalid_session");
 		}
 	} catch (exception) {
 		logger.error(exception.message);
-		req.session.destroy();
+		req.clearSession();
 		res.send("fail");
 	}
 };
@@ -495,7 +495,7 @@ exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
 
 exports.logoutUser_Nineteen68 = function (req, res) {
 	logger.info("Inside UI Service: logoutUser_Nineteen68");
-	req.clearSession();
 	logger.info("%s logged out successfully", req.session.username);
+	req.clearSession();
 	res.send('Session Expired');
 };

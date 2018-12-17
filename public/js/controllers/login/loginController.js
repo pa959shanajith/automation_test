@@ -1,8 +1,7 @@
 mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $http, $location, LoginService, cfpLoadingBar, adminServices) {
 	$(".ic-username, .ic-password").parent().removeClass("input-border-error");
 	$scope.loginValidation = "";
-	//$scope.ud = {userName:"ranjan.agrawal", password:"Welcome@1"};
-	$scope.ud = {userName:"admin", password:"Welcome@1"};
+	$scope.ud = {};
 	$scope.serverList = [{"name": "License Server", "active": false}, {"name": "NDAC Server", "active": false}, {"name": "Web Server", "active": false}];
 	$scope.restartForm = false;
 	window.localStorage.clear();

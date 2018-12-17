@@ -27,17 +27,17 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 			else {
 				LoginService.loadUserInfo_Nineteen68()
 				.then(function (data) {
-					if (data == "invalid_session") emsg = "Your session has expired, Please login again";
-					else if (data != "fail") {
+					if (data == "Invalid Session") emsg = "Your session has expired, Please login again";
+					else if (data == "fail") emsg = "Failed to Login.";
+					else {
 						window.localStorage['_SR'] = data.rolename;
 						window.localStorage['_UI'] = JSON.stringify(data);
 						window.sessionStorage.checkLoggedIn = true;
 						window.localStorage.navigateScreen = data.page;
 						$location.path("/"+data.page);
-					} else {
-						$scope.loginValidation = "Failed to Login.";
-						console.log("Failed to Load UserInfo.");
 					}
+					$scope.loginValidation = emsg;
+					if (emsg != "Loading Profile...") console.log(emsg);
 				}, function (error) {
 					$scope.loginValidation = "Failed to Login.";
 					console.log("Fail to Load UserInfo");

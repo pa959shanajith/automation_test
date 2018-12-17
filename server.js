@@ -154,7 +154,7 @@ if (cluster.isMaster) {
                     client_id: uiConfig.sso_config.client_id,
                     client_secret: uiConfig.sso_config.client_secret,
                     redirect_uri: uiConfig.sso_config.redirect_uri,
-                    routes: { callback: { defaultRedirect: "/", failureRedirect: "/error?e=401" } },
+                    routes: { callback: { defaultRedirect: "/", failureRedirect: "/error?e=403" } },
                     scope: 'openid profile email'
                 });
                 app.use(oidc.router);  // ExpressOIDC will attach handlers for the /login and /authorization-code/callback routes
@@ -263,8 +263,13 @@ if (cluster.isMaster) {
             var emsg=req.query.e;
             if (emsg) {
                 req.session.uniqueId = req.session.id
-                if (emsg == 401) req.session.emsg = "unauthorized";
-                else req.session.emsg = emsg;
+                if (emsg == "401") emsg = "invalid_session";
+                else if (emsg == "403") emsg = "unauthorized";
+                else if (emsg == "sessexists") {
+                    emsg = "userLogged";
+                    req.session.dndSess = true;
+                }
+                req.session.emsg = emsg;
             }
             res.redirect('/');
         });
@@ -363,16 +368,14 @@ if (cluster.isMaster) {
                 return meta;
             };
 
-            var sessionToken = (req.session)? req.session.uniqueId:undefined;
-            var sessionCheck = (sessionToken!==undefined) && (req.sessionID==sessionToken);
-            var cookies = req.signedCookies;
-            var cookieCheck = (cookies["connect.sid"]!==undefined) && (cookies["maintain.sid"]!==undefined);
-            return sessionCheck && cookieCheck;
-
-            if (sess.uniqueId && sess.activeRole && roles.indexOf(sess.activeRole) == -1)
-                return res.sendFile("app.html", { root: __dirname + "/public/" });
-            req.clearSession();
-            return res.status(401).redirect('/');
+			var sessChk = sess.uniqueId && sess.activeRole && (roles.indexOf(sess.activeRole) != -1);
+            var maintCookie = req.signedCookies["maintain.sid"];
+            if (sessChk) {
+				return (maintCookie)? res.sendFile("app.html", { root: __dirname + "/public/" }) : res.redirect("/error?e=sessexists");
+			} else {
+				req.clearSession();
+				return res.redirect("/error?e=401");
+			}
         }
 
         //Role Based User Access to services
@@ -414,8 +417,8 @@ if (cluster.isMaster) {
                             };
                             return next();
                         } else {
-                            req.session.destroy();
-                            res.status(401).redirect('/');
+							req.clearSession();
+							return res.send("Invalid Session");
                         }
                     }
                 } else {
