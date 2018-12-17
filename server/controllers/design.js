@@ -30,7 +30,7 @@ exports.initScraping_ICE = function (req, res) {
 	var dataToIce={};
 	logger.info("Inside UI service: initScraping_ICE");
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			name = req.session.username;
 			redisServer.redisSubServer.subscribe('ICE2_' + name);	
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -269,7 +269,7 @@ exports.initScraping_ICE = function (req, res) {
 exports.highlightScrapElement_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: highlightScrapElement_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var name = req.session.username;
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			var focusParam = req.body.elementXpath;
@@ -302,7 +302,7 @@ exports.highlightScrapElement_ICE = function (req, res) {
 exports.getScrapeDataScreenLevel_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: getScrapeDataScreenLevel_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var inputs = {
 				"screenid": req.body.screenId,
 				"projectid": req.body.projectId,
@@ -371,7 +371,7 @@ function fetchScrapedData(inputs, fetchScrapedDatacallback) {
 exports.updateScreen_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: updateScreen_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var updateData = req.body.scrapeObject;
 			var projectID = updateData.projectId;
 			var screenID = updateData.screenId;
@@ -1459,7 +1459,7 @@ function uploadTestCaseData(inputs, uploadTestCaseDatacallback) {
 exports.readTestCase_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: readTestCase_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			//base output elements
 			var testcasesteps = "";
 			var testcasename = "";
@@ -1600,7 +1600,7 @@ exports.readTestCase_ICE = function (req, res) {
 exports.updateTestCase_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: updateTestCase_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var hasrow = false;
 			//base request elements
 			var requestedscreenid = req.body.screenid;
@@ -1700,7 +1700,7 @@ exports.debugTestCase_ICE = function (req, res) {
 	var name;
 	try {
 		logger.info("Inside UI service: debugTestCase_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			name = req.session.username;
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -2083,7 +2083,7 @@ exports.debugTestCase_ICE = function (req, res) {
 exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 	try {
 		logger.info("Inside UI service: getKeywordDetails_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var requestedprojecttypename = req.body.projecttypename;
 			// Query 1 fetching the objecttype,keywords basked on projecttypename
 			var individualsyntax = {};
@@ -2134,7 +2134,7 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req, res) {
 	try {
 		logger.info("Inside UI service: getTestcasesByScenarioId_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var testcasesArr = [];
 			var testScenarioId = req.body.testScenarioId;
 			var inputs = {

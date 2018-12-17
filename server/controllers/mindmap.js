@@ -26,7 +26,7 @@ var xlsToCSV = function(workbook,sheetname) {
 
 exports.populateProjects=function(req,res){
 	logger.info("Inside UI service: populateProjects");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		//var d=req.body;
 		var datatosend ='';
 			var reqData={
@@ -52,7 +52,7 @@ exports.populateProjects=function(req,res){
 }
 exports.populateScenarios=function(req,res){
 	logger.info("Inside UI service: populateScenarios");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var moduleId=req.body.moduleId;
 			//var taskID=d.taskId;
 			query={'statement':"MATCH (a{moduleID:'"+moduleId+"'})-[:FMTTS]->(b) RETURN b ORDER BY b.childIndex"};
@@ -84,7 +84,7 @@ exports.populateScenarios=function(req,res){
 
 exports.getProjectTypeMM_Nineteen68=function(req,res){
 	logger.info("Inside UI service: getProjectTypeMM_Nineteen68");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 			var inputs = req.body.projectId;
 			create_ice.getProjectType_Nineteen68(inputs,function(err,result){
 				if(err){
@@ -105,7 +105,7 @@ exports.getProjectTypeMM_Nineteen68=function(req,res){
 
 exports.populateUsers=function(req,res){
 	logger.info("Inside UI service: populateUsers");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var d=req.body;
 		var datatosend ='';
 			admin.getUsers_Nineteen68({prjId:d.projectId},function(err,data){
@@ -128,7 +128,7 @@ exports.populateUsers=function(req,res){
 
 exports.populateReleases=function(req,res){
 	logger.info("Inside UI service: populateReleases");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 			var datatosend ='';
 			var d=req.body;
 			var project_id={projectId: d.projectId};
@@ -152,7 +152,7 @@ exports.populateReleases=function(req,res){
 
 exports.populateCycles=function(req,res){
 	logger.info("Inside UI service: populateCycles");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var datatosend ='';
 			var rel_id={relId : req.body.releaseId};
 			create_ice.getCycleIDs_Nineteen68(rel_id,function(err,data){
@@ -176,7 +176,7 @@ exports.populateCycles=function(req,res){
 
 exports.getCRId=function(req,res){
 	logger.info("Inside UI service: getCRId");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var inputs = { "projectid": req.body.projectid};
 		suite.getCRId(inputs, function (status, result) {
 				res.setHeader('Content-Type', 'application/json');
@@ -195,7 +195,7 @@ exports.getCRId=function(req,res){
 
 exports.checkReuse=function(req,res){
 	logger.info("Inside UI service: checkReuse");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 			var d=req.body;
 			var qData = d.parsedata;
 			var qListReuse = getQueries(qData);
@@ -254,7 +254,7 @@ exports.checkReuse=function(req,res){
 
 exports.getModules=function(req,res){
 	logger.info("Inside UI service: getModules");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var nData=[],qList=[],idDict={};
 		var urlData=req.get('host').split(':');
 		var d=req.body;
@@ -480,7 +480,7 @@ exports.getModules=function(req,res){
 
 exports.reviewTask=function(req,res){
 	logger.info("Inside UI service: reviewTask");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 			var inputs=req.body;
 			var taskID=inputs.taskId;
 			var batchIds=inputs.batchIds;
@@ -618,7 +618,7 @@ function getRenameQueries(map,prjId){
 }
 exports.saveData=function(req,res){
 	logger.info("Inside UI service: saveData");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var tasks =[];
 		var nameDict = {};
 		var nData=[],qList=[],idDict={};
@@ -1114,7 +1114,7 @@ exports.saveData=function(req,res){
 
 exports.saveEndtoEndData=function(req,res){
 	logger.info("Inside UI service: saveEndtoEndData");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var nData=[],qList=[],idDict={};
 		var urlData=req.get('host').split(':');
 		var inputs=req.body; 
@@ -1504,7 +1504,7 @@ exports.excelToMindmap = function(req,res){
 
 exports.getScreens=function(req,res){
 	logger.info("Inside UI service: populateScenarios");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var d=req.body;
 		var prjId=d.projectId;
 		var screenList = [];
@@ -1545,7 +1545,7 @@ exports.getScreens=function(req,res){
 
 exports.exportToExcel = function(req,res){
 	logger.info("Writing  Module structure to Excel");
-	if(utils.isSessionActive(req.session)){
+	if(utils.isSessionActive(req)){
 		
 		var d = req.body;
 		var excelMap = d.excelMap;

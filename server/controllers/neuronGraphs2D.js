@@ -64,7 +64,7 @@ var cleanData = function(data){
 exports.getGraphData = function(req, res){
 	logger.info("Inside UI service: getGraphData");
 	try{
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var qList=[];
 			//var urlData=req.get('host').split(':');
 			var userid=req.body.uid;

@@ -7,7 +7,7 @@ var utils = require('../lib/utils');
 exports.getCrawlResults = function (req, res) {
 	try {
 		logger.info("Inside UI service: getCrawlResults");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var name = req.session.username;
 			redisServer.redisSubServer.subscribe('ICE2_' + name ,1);
 			var input_url = req.body.url;

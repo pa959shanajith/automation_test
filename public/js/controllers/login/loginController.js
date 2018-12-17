@@ -1,13 +1,14 @@
 mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $http, $location, LoginService, cfpLoadingBar, adminServices) {
-	$(".ic-username, .ic-password").parent().removeClass("input-border-error")
+	$(".ic-username, .ic-password").parent().removeClass("input-border-error");
 	$scope.loginValidation = "";
-	$scope.ud = {};
+	//$scope.ud = {userName:"ranjan.agrawal", password:"Welcome@1"};
+	$scope.ud = {userName:"admin", password:"Welcome@1"};
 	$scope.serverList = [{"name": "License Server", "active": false}, {"name": "NDAC Server", "active": false}, {"name": "Web Server", "active": false}];
 	$scope.restartForm = false;
 	window.localStorage.clear();
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear();
 	//if checkLoggedIn was true, means, user was logged in but now the session is expired
-	if (window.sessionStorage.getItem('checkLoggedIn') == true) {
+	if (window.sessionStorage.getItem('checkLoggedIn')) {
 		$scope.loginValidation = "Your session has expired, Please login again";
 		window.sessionStorage.clear();
 	}
@@ -15,19 +16,19 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 	$scope.check_credentials = function (path, $event) {
 		cfpLoadingBar.start();
 		$scope.loginValidation = "";
-		$(".ic-username, .ic-password").parent().removeClass("input-border-error")
+		$(".ic-username, .ic-password").parent().removeClass("input-border-error");
 		if (!$scope.ud.userName) {
 			$(".ic-username").children().attr("src", "imgs/ic-username-error.png");
-			$(".ic-username").parent().addClass("input-border-error")
+			$(".ic-username").parent().addClass("input-border-error");
 			$(".ic-password").children().attr("src", "imgs/ic-password.png");
-			$(".ic-password").parent().removeClass("input-border-error")
+			$(".ic-password").parent().removeClass("input-border-error");
 			$scope.loginValidation = "Please Enter Username";
 			cfpLoadingBar.complete();
 		} else if (!$scope.ud.password) {
 			$(".ic-username").children().attr("src", "imgs/ic-username.png");
-			$(".ic-username").parent().removeClass("input-border-error")
+			$(".ic-username").parent().removeClass("input-border-error");
 			$(".ic-password").children().attr("src", "imgs/ic-password-error.png");
-			$(".ic-password").parent().addClass("input-border-error")
+			$(".ic-password").parent().addClass("input-border-error");
 			$scope.loginValidation = "Please Enter Password";
 			cfpLoadingBar.complete();
 		} else {
@@ -62,7 +63,7 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 				} else if (data == 'inValidCredential') {
 					$(".ic-username").children().attr("src", "imgs/ic-username-error.png");
 					$(".ic-password").children().attr("src", "imgs/ic-password-error.png");
-					$(".ic-password").parent().addClass("input-border-error")
+					$(".ic-password").parent().addClass("input-border-error");
 					$scope.loginValidation = "The username or password you entered isn't correct. Please try again.";
 				} else if (data == "userLogged") {
 					$scope.loginValidation = "User is already logged in! Please logout from the previous session.";
@@ -74,7 +75,7 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 					$scope.loginValidation = "Failed to Login.";
 				}
 			}, function (error) {
-				console.log("Failed to Authenticate User.")
+				console.log("Failed to Authenticate User.");
 				$scope.loginValidation = "Failed to Authenticate User.";
 				cfpLoadingBar.complete();
 			});

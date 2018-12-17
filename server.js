@@ -41,6 +41,7 @@ if (cluster.isMaster) {
         var app = express();
         var bodyParser = require('body-parser');
         var sessions = require('express-session');
+        var cookieParser = require('cookie-parser')
         var helmet = require('helmet');
         var lusca = require('lusca');
         var consts = require('constants');
@@ -120,6 +121,7 @@ if (cluster.isMaster) {
         process.env.SESSION_AGE = 30 * 60 * 1000;
         process.env.SESSION_INTERVAL = 20 * 60 * 1000;
 
+        app.use(cookieParser("$^%EDE%^tfd65e7ufyCYDR^%IU"));
         app.use(sessions({
             cookie: {
                 path: '/',
@@ -134,6 +136,15 @@ if (cluster.isMaster) {
             store: redisSessionStore
         }));
 
+        app.use(function(req, res, next) {
+            req.clearSession = function clearSession() {
+                res.clearCookie('connect.sid');
+                res.clearCookie('maintain.sid');
+                req.session.destroy();
+            }
+            next();
+        });
+
         const { ExpressOIDC } = require('@okta/oidc-middleware');
         var oidc = undefined;
         if (ssoEnabled) {
@@ -143,7 +154,7 @@ if (cluster.isMaster) {
                     client_id: uiConfig.sso_config.client_id,
                     client_secret: uiConfig.sso_config.client_secret,
                     redirect_uri: uiConfig.sso_config.redirect_uri,
-                    routes: { callback: { defaultRedirect: "/", failureRedirect: "/?e=401" } },
+                    routes: { callback: { defaultRedirect: "/", failureRedirect: "/error?e=401" } },
                     scope: 'openid profile email'
                 });
                 app.use(oidc.router);  // ExpressOIDC will attach handlers for the /login and /authorization-code/callback routes
@@ -248,47 +259,54 @@ if (cluster.isMaster) {
             }
         });
 
-        app.use('/', function(req, res, next) {
-            if (!(req.url == '/' || req.url.startsWith("/?"))) return next();
-			var emsg=req.query.e;
+        app.get('/error', function(req, res, next) {
+            var emsg=req.query.e;
+            if (emsg) {
+                req.session.uniqueId = req.session.id
+                if (emsg == 401) req.session.emsg = "unauthorized";
+                else req.session.emsg = emsg;
+            }
+            res.redirect('/');
+        });
+
+        app.get('/', function(req, res, next) {
+            if (req.url != '/') return next();
             var userLogged = req.session.logged;
             var usrCtx = (ssoClient=="okta")? req.userContext : undefined;
-			if (emsg) {
-				if (emsg == 401) req.session.emsg = "unauthorized";
-				else req.session.emsg = emsg;
-			}
-            else if (req.session.username==undefined) {
+            if (userLogged) req.session.emsg = req.session.emsg || "userLogged";
+            else if (!req.session.emsg && req.session.username==undefined) {
                 if (ssoEnabled && usrCtx) {
                     var username = usrCtx.userinfo.nineteen68_username;
-					if (username == undefined) {
-						req.session.emsg = "invalid_username";
-					} else {
-						redisSessionStore.all(function (err, allKeys) {
-							if (err) {
-								logger.info("User Authentication failed");
-								req.session.emsg = "fail";
-							} else {
-								for (var ki = 0; ki < allKeys.length; ki++) {
-									if (username == allKeys[ki].username) {
-										userLogged=true;
-										break;
-									}
-								}
-								if (userLogged) {
-									req.session.emsg = "userLogged";
-								} else {
-									req.session.username = username;
-									req.session.uniqueId = req.session.id;
-									logger.rewriters[0]=function(level, msg, meta) {
-										meta.username = null;
-										meta.userid = null;
-										meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
-										return meta;
-									};
-								}
-							}
-						});
-					}
+                    if (username == undefined) {
+                        req.session.emsg = "invalid_username";
+                    } else {
+                        username = username.toLowerCase();
+                        redisSessionStore.all(function (err, allKeys) {
+                            if (err) {
+                                logger.info("User Authentication failed");
+                                req.session.emsg = "fail";
+                            } else {
+                                for (var ki = 0; ki < allKeys.length; ki++) {
+                                    if (username == allKeys[ki].username) {
+                                        userLogged=true;
+                                        break;
+                                    }
+                                }
+                                if (userLogged) {
+                                    req.session.emsg = "userLogged";
+                                } else {
+                                    req.session.username = username;
+                                    req.session.uniqueId = req.session.id;
+                                    logger.rewriters[0]=function(level, msg, meta) {
+                                        meta.username = username;
+                                        meta.userid = null;
+                                        meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
+                                        return meta;
+                                    };
+                                }
+                            }
+                        });
+                    }
                 } else {
                     logger.rewriters[0]=function(level, msg, meta) {
                         meta.username = null;
@@ -296,12 +314,9 @@ if (cluster.isMaster) {
                         meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
                         return meta;
                     };
-                    req.session.destroy();
-                    res.clearCookie('connect.sid');
+                    req.clearSession();
                     return res.redirect('login');
                 }
-            } else if (userLogged) {
-                req.session.emsg = "userLogged";
             }
             req.session.logged = true;
             return res.sendFile("app.html", { root: __dirname + "/public/" });
@@ -309,101 +324,56 @@ if (cluster.isMaster) {
 
         if (!ssoEnabled) {
             app.get('/login', function(req, res) {
-                res.clearCookie('connect.sid');
-                req.session.destroy();
+                req.clearSession();
                 return res.sendFile("app.html", { root: __dirname + "/public/" });
             });
         }
 
+        //Only Admin have access
         app.get('/admin', function(req, res) {
-            if (!req.session.defaultRole || req.session.defaultRole != 'Admin') {
-                req.session.destroy();
-                res.status(401).redirect('/');
-            } else {
-                if (req.session.uniqueId != undefined) {
-                    res.sendFile("app.html", { root: __dirname + "/public/" });
-                } else {
-                    req.session.destroy();
-                    res.status(401).redirect('/login');
-                }
-            }
+            var roles = ["Admin"];   //Allowed roles
+            sessionCheck(req, res, roles);
         });
 
         //Only Test Engineer and Test Lead have access
         app.get(/^\/(design|designTestCase|execute|scheduling)$/, function(req, res) {
-            //Denied roles
-            var roles = ["Admin", "Business Analyst", "Tech Lead", "Test Manager"];
+            var roles = ["Test Lead", "Test Engineer"];   //Allowed roles
             sessionCheck(req, res, roles);
         });
 
         //Test Engineer,Test Lead and Test Manager can access
         app.get(/^\/(specificreports|mindmap|p_Utility|p_Reports|plugin)$/, function(req, res) {
-            //Denied roles
-            var roles = ["Admin", "Business Analyst", "Tech Lead"];
+            var roles = ["Test Manager", "Test Lead", "Test Engineer"];   //Allowed roles
             sessionCheck(req, res, roles);
         });
 
-        //Test Lead and Test Manager can access Webocular Plugin
+        //Test Lead and Test Manager can access
         app.get(/^\/(p_Webocular|neuronGraphs|p_ALM|p_Dashboard|p_APG)$/, function(req, res) {
-            //Denied roles
-            var roles = ["Admin", "Business Analyst", "Tech Lead", "Test Engineer"];
+            var roles = ["Test Manager", "Test Lead"];   //Allowed roles
             sessionCheck(req, res, roles);
         });
 
         function sessionCheck(req, res, roles) {
             logger.info("Inside sessioncheck for URL : %s", req.url);
+            var sess  = req.session;
             logger.rewriters[0]=function(level, msg, meta) {
-                if (req.session != undefined && req.session.userid != undefined) {
-                    meta.username = req.session.username;
-                    meta.userid = req.session.userid;
-                    meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
-                    return meta;
-                } else {
-                    meta.username = null;
-                    meta.userid = null;
-                   return meta;
-                }
+                meta.username = (sess && sess.username)? sess.username:null;
+                meta.userid = (sess && sess.userid)? sess.userid:null;
+                meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
+                return meta;
             };
 
-            if (req.session.activeRoleId == req.session.defaultRoleId) {
-                if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >= 0) {
-                    req.session.destroy();
-                    res.status(401).redirect('/');
-                } else {
-                    if (req.session.uniqueId != undefined) {
-                        res.sendFile("app.html", { root: __dirname + "/public/" });
-                    } else {
-                        req.session.destroy();
-                        res.status(401).redirect('/login');
-                    }
-                }
-            } else {
-                if (req.session.uniqueId != undefined) {
-                    res.sendFile("app.html", { root: __dirname + "/public/" });
-                } else {
-                    req.session.destroy();
-                    res.status(401).redirect('/login');
-                }
-            }
+            var sessionToken = (req.session)? req.session.uniqueId:undefined;
+            var sessionCheck = (sessionToken!==undefined) && (req.sessionID==sessionToken);
+            var cookies = req.signedCookies;
+            var cookieCheck = (cookies["connect.sid"]!==undefined) && (cookies["maintain.sid"]!==undefined);
+            return sessionCheck && cookieCheck;
+
+            if (sess.uniqueId && sess.activeRole && roles.indexOf(sess.activeRole) == -1)
+                return res.sendFile("app.html", { root: __dirname + "/public/" });
+            req.clearSession();
+            return res.status(401).redirect('/');
         }
-
-        app.get('/favicon.ico', function(req, res) {
-            if (req.session.uniqueId != undefined) {
-                res.sendFile("app.html", { root: __dirname + "/public/" });
-            } else {
-                req.session.destroy();
-                res.status(401).redirect('/login');
-            }
-        });
-
-        app.get('/css/fonts/Lato/Lato-Regular.ttf', function(req, res) {
-            if (req.session.uniqueId != undefined) {
-                res.sendFile("app.html", { root: __dirname + "/public/" });
-            } else {
-                req.session.destroy();
-                res.status(401).redirect('/login');
-            }
-        });
 
         //Role Based User Access to services
         app.post('*', function(req, res, next) {
@@ -457,10 +427,6 @@ if (cluster.isMaster) {
                 httpsServer.close();
                 logger.error("Please run the Service API and Restart the Server");
             });
-        });
-
-        app.post('/designTestCase', function(req, res) {
-            res.sendFile("app.html", { root: __dirname + "/public/" });
         });
 
         //Route Directories

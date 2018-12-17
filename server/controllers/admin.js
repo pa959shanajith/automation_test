@@ -18,7 +18,7 @@ var utils = require('../lib/utils');
 exports.getUserRoles_Nineteen68 = function (req, res) {
 	try {
 		logger.info("Inside UI service: getUserRoles_Nineteen68");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			logger.info("Calling NDAC Service: getUserRoles_Nineteen68");
 			client.post(epurl + "admin/getUserRoles_Nineteen68",
 				function (result, response) {
@@ -48,7 +48,7 @@ exports.getUserRoles_Nineteen68 = function (req, res) {
 exports.manageUserDetails = function(req, res){
 	logger.info("Inside UI Service: manageUserDetails");
 	try{
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var flag = ['2','0','0','0','0','0','0','0','0','0','0'];
 			var salt = bcrypt.genSaltSync(10);
 			var reqData = req.body.user;
@@ -181,7 +181,7 @@ exports.manageUserDetails = function(req, res){
 exports.getUserDetails = function (req, res) {
 	logger.info("Inside UI Service: getUserDetails");
 	try{
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var action = req.body.action;
 			var userid = req.body.args;
 			logger.info("Calling NDAC Service: getUserDetails");
@@ -283,7 +283,7 @@ exports.getUsers_Nineteen68 = function (req, res) {
 exports.getDomains_ICE = function getDomains_ICE(req, res) {
 	logger.info("Inside UI service: getDomains_ICE");
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var responsedata = [];
 			var args = {
 				headers: {
@@ -335,7 +335,7 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
     //qList = [];
 	try {
 		logger.info("Inside UI service: createProject_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var createProjectObj = req.body.createProjectObj;
 			var userinfo = req.body.userDetails;
 			var requestedskucode = "skucodetestcase";
@@ -603,7 +603,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 	qList=[];
 	try {
 		logger.info("Inside UI Service: updateProject_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var updateProjectDetails = req.body.updateProjectObj;
 			var userinfo = req.body.userDetails;
 			var flag = "";
@@ -1166,7 +1166,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 exports.getNames_ICE = function (req, res) {
 	logger.info("Inside UI service: getNames_ICE");
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var requestedidslist = req.body.requestedids;
 			var idtypes = req.body.idtype;
 			var index = 0;
@@ -1324,7 +1324,7 @@ exports.getDetails_ICE = function (req, res) {
 	var checkresBody = validator.isJSON(JSON.stringify(req.body));
 	if (checkresBody == true) {
 		try {
-			if (utils.isSessionActive(req.session)) {
+			if (utils.isSessionActive(req)) {
 				var requestedidslist = req.body.requestedids;
 				var idtypes = req.body.idtype;
 				var responsedata = {};
@@ -1592,7 +1592,7 @@ exports.getDetails_ICE = function (req, res) {
 exports.assignProjects_ICE = function (req, res) {
 	logger.info("Inside UI Service: assignProjects_ICE");
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var assignProjectsDetails = req.body.assignProjectsObj;
 			var projectDetails = assignProjectsDetails.assignedProjects;
 			var projectIds = [];
@@ -1707,7 +1707,7 @@ exports.assignProjects_ICE = function (req, res) {
 exports.getAssignedProjects_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: getAssignedProjects_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var requestDetails = req.body.getAssignProj;
 			var assignedProjectIds = [];
 			var assignedProjObj = [];
@@ -1795,7 +1795,7 @@ exports.getAssignedProjects_ICE = function (req, res) {
 exports.getAvailablePlugins = function (req, res) {
 	logger.info("Inside UI service: getAvailablePlugins");
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			client.post(epurl + "admin/getAvailablePlugins",
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
@@ -1816,7 +1816,7 @@ exports.getAvailablePlugins = function (req, res) {
 exports.generateCItoken = function (req, res) {
 	logger.info("Inside UI service: generateCItoken");
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var user_info = {
 				user_name: "ci_user",
 				token: uuid()
@@ -1834,7 +1834,7 @@ exports.generateCItoken = function (req, res) {
 exports.testLDAPConnection = function(req, res){
 	logger.info("Inside UI Service: testLDAPConnection");
 	try{
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var reqData = req.body;
 			var ldapURL = (reqData.ldapURL || "").trim();
 			if (ldapURL.slice(0,8) == "ldaps://") {
@@ -1904,7 +1904,7 @@ exports.testLDAPConnection = function(req, res){
 exports.manageLDAPConfig = function(req, res){
 	logger.info("Inside UI Service: manageLDAPConfig");
 	try{
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var flag = ['1','0','0','0','0','0','0','0','0'];
 			var reqData = req.body.conf;
 			var action = req.body.action;
@@ -1995,7 +1995,7 @@ exports.manageLDAPConfig = function(req, res){
 exports.getLDAPConfig = function(req, res){
 	logger.info("Inside UI Service: getLDAPConfig");
 	try{
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var action = req.body.action;
 			var name = req.body.args;
 			var opts = (req.body.opts || "").trim();
@@ -2129,7 +2129,7 @@ exports.getLDAPConfig = function(req, res){
 exports.manageSessionData = function (req, res) {
 	logger.info("Inside UI service: manageSessionData");
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var currUser = req.session.username;
 			var action = req.body.action;
 			var user = req.body.user;

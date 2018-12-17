@@ -10,7 +10,7 @@ var utils = require('../lib/utils');
 
 exports.getVersions=function(req,res){
 	logger.info("Inside UI service: getVersions");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var prjId = req.body.projectId;
 		var urlData = req.get('host').split(':');
 		logger.info('Inside the getVersion task of UI Service versioning ');
@@ -58,7 +58,7 @@ exports.getVersions=function(req,res){
 
 exports.getModulesVersioning=function(req,res){
 	logger.info("Inside UI service: getModulesVersioning");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 			logger.info('Inside the getModules task of UI Service versioning ')
 			var nData = [], qList = [], idDict = {};
 			var inputs=req.body;
@@ -160,7 +160,7 @@ exports.getModulesVersioning=function(req,res){
 
 exports.createVersion=function(req,res){
 	logger.info("Inside UI service: createVersion");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 			var nData = [];
 			var inputs=req.body;
 			var prjId = inputs.srcprojectId;
@@ -392,7 +392,7 @@ exports.createVersion=function(req,res){
 }
 exports.getProjectsNeo=function(req,res){
 	logger.info("Inside UI service: getProjectsNeo");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var qList = [];
 		qList.push({ "statement": "MATCH (n:MODULES) return distinct n.projectID" });
 		logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
@@ -433,7 +433,7 @@ function getRenameQueries(map,prjId,vn_from,createdOn){
 }
 exports.saveDataVersioning=function(req,res){
 	logger.info("Inside UI service: saveDataVersioning");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		logger.info('Inside the UI Service saveDataVersioning')
 			var tasks =[];
 			var nameDict = {};

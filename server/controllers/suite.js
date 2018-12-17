@@ -26,7 +26,7 @@ var qList = [];
 exports.readTestSuite_ICE = function (req, res) {
 	logger.info("Inside UI service: readTestSuite_ICE");
 	qList = [];
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var requiredreadTestSuite = req.body.readTestSuite;
 		var fromFlg = req.body.fromFlag;
 		var responsedata = {};
@@ -410,7 +410,7 @@ function Projectnametestcasename_ICE(req, cb, data) {
 exports.updateTestSuite_ICE = function (req, res) {
 	logger.info("Inside UI service: updateTestSuite_ICE");
     qList = [];
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var userinfo = {"username": req.session.username, "role": req.session.activeRole};
 		var batchDetails = req.body.batchDetails.suiteDetails;
 		var batchDetailslength = batchDetails.length;
@@ -591,7 +591,7 @@ function updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus)
  */
 exports.ExecuteTestSuite_ICE = function (req, res) {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var name = req.session.username;
 		redisServer.redisSubServer.subscribe('ICE2_' + name);
 		var batchExecutionData = req.body.moduleInfo;
@@ -1875,7 +1875,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
  */
 exports.getTestcaseDetailsForScenario_ICE = function (req, res) {
 	logger.info("Inside Ui service getTestcaseDetailsForScenario_ICE");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var requiredtestscenarioid = req.body.testScenarioId;
 		logger.info("Calling function testcasedetails_testscenarios from getTestcaseDetailsForScenario_ICE");
 		testcasedetails_testscenarios(requiredtestscenarioid, function (err, data) {
@@ -2366,7 +2366,7 @@ function updatescenariodetailsinsuite(req, cb, data) {
 /***********************Scheduling jobs***************************/
 exports.testSuitesScheduler_ICE = function (req, res) {
 	logger.info("Inside UI service testSuitesScheduler_ICE");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		if(req.body.chkType == "schedule"){			
 			var modInfo = req.body.moduleInfo;
 			logger.info("Calling function scheduleTestSuite from testSuitesScheduler_ICE");
@@ -3023,7 +3023,7 @@ function updateSkippedScheduleStatus(sessObj, msg, updateStatuscallback){
 
 exports.getScheduledDetails_ICE = function (req, res) {
 	logger.info("Inside UI service getScheduledDetails_ICE");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		logger.info("Calling function getScheduledDetails from getScheduledDetails_ICE");
 		getScheduledDetails("getallscheduledata", function (err, getSchedcallback) {
 			if (err) {
@@ -3047,7 +3047,7 @@ exports.getScheduledDetails_ICE = function (req, res) {
 //cancel scheduled Jobs
 exports.cancelScheduledJob_ICE = function (req, res) {
 	logger.info("Inside UI service cancelScheduledJob_ICE");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var cycleid = req.body.suiteDetails.cycleid;
 		var scheduleid = req.body.suiteDetails.scheduleid;
 		var schedStatus = req.body.schedStatus;

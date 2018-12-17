@@ -1,5 +1,6 @@
 var async = require('async');
 var bcrypt = require('bcrypt');
+var uidsafe = require('uid-safe');
 var validator = require('validator');
 var activeDirectory = require('activedirectory');
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
@@ -104,6 +105,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 						logger.rewriters[0]=function(level, msg, meta) {
 							meta.username = username;
 							meta.userid = userid;
+							meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
 							return meta;
 						};
 					}
@@ -287,7 +289,7 @@ function ldapCheck(ldapdata, cb) {
 exports.checkUserState_Nineteen68 = function (req, res) {
 	try {
 		logger.info("Inside UI Service: checkUserState_Nineteen68");
-		if (utils.isSessionActive(req.session)) {
+		if (req.session && req.sessionID==req.session.uniqueId) {
 			var emsg = req.session.emsg || "ok";
 			async.series({
 				checkProjects_ifOK: function(callback) {
@@ -315,9 +317,13 @@ exports.checkUserState_Nineteen68 = function (req, res) {
 				}
 			}, function (emsg) {
 				if (emsg != "ok") req.session.destroy();
-				//else res.cookie('sid','sessionendsatbrowserclose', {path: '/', httpOnly: true, secure: true})
+				else res.cookie('maintain.sid',uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed:true});
 				return res.send(emsg);
 			});
+		} else {
+			logger.info("Invalid Session");
+			req.session.destroy();
+			res.send("invalid_session");
 		}
 	} catch (exception) {
 		logger.error(exception.message);
@@ -330,56 +336,46 @@ exports.checkUserState_Nineteen68 = function (req, res) {
 exports.loadUserInfo_Nineteen68 = function (req, res) {
 	try {
 		logger.info("Inside UI Service: loadUserInfo_Nineteen68");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var selectedRole = req.body.selRole;
 			var userName = req.session.username;
 			var jsonService = {};
-			async.series({
-				userInfo: function (callback) {
-					try {
-						var inputs = {
-							"username": userName,
-							"query": "userInfo"
-						};
-						var args = {
-							data: inputs,
-							headers: {
-								"Content-Type": "application/json"
-							}
-						};
-						logger.info("Calling NDAC Service from userInfo : loadUserInfo_Nineteen68");
-						client.post(epurl + "login/loadUserInfo_Nineteen68", args,
-							function (userResult, response) {
-							if (response.statusCode != 200 || userResult.rows == "fail") {
-								logger.error("Error occurred in loadUserInfo_Nineteen68 Error Code : ERRNDAC");
-								return res.send("fail");
-							} else {
-								if (userResult.rows.length > 0) {
-									var service = userResult.rows[0];
-									jsonService.user_id = service.userid;
-									jsonService.email_id = service.emailid;
-									jsonService.additionalrole = service.additionalroles;
-									jsonService.firstname = service.firstname;
-									jsonService.lastname = service.lastname;
-									jsonService.role = service.defaultrole;
-									jsonService.username = service.username.toLowerCase();
-									selectedRole = selectedRole||jsonService.role;
-									req.session.userid = service.userid;
-									req.session.defaultRoleId = service.defaultrole;
-									req.session.activeRoleId = selectedRole;
-								} else {
-									logger.info("User info not found");
-									return res.send("invalid_username");
-								}
-							}
-							callback();
-						});
-					} catch (exception) {
-						logger.error(exception.message);
-						return res.send("fail");
-					}
+			async.waterfall([
+				function userInfo(callback) {
+					var inputs = {
+						"username": userName,
+						"query": "userInfo"
+					};
+					var args = {
+						data: inputs,
+						headers: {
+							"Content-Type": "application/json"
+						}
+					};
+					logger.info("Calling NDAC Service from userInfo : loadUserInfo_Nineteen68");
+					client.post(epurl + "login/loadUserInfo_Nineteen68", args,
+						function (userResult, response) {
+						if (response.statusCode != 200 || userResult.rows == "fail") {
+							logger.error("Error occurred in loadUserInfo_Nineteen68 Error Code : ERRNDAC");
+							callback("fail");
+						} else {
+							var service = userResult.rows[0];
+							jsonService.user_id = service.userid;
+							jsonService.email_id = service.emailid;
+							jsonService.additionalrole = service.additionalroles;
+							jsonService.firstname = service.firstname;
+							jsonService.lastname = service.lastname;
+							jsonService.role = service.defaultrole;
+							jsonService.username = service.username.toLowerCase();
+							selectedRole = selectedRole||jsonService.role;
+							req.session.userid = service.userid;
+							req.session.defaultRoleId = service.defaultrole;
+							req.session.activeRoleId = selectedRole;
+							callback(null);
+						}
+					});
 				},
-				loggedinRole: function (callback) {
+				function loggedinRole(callback) {
 					var inputs = {
 						"roleid": [selectedRole]
 					};
@@ -394,81 +390,63 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 						function (rolesResult, response) {
 						if (response.statusCode != 200 || rolesResult.rows == "fail") {
 							logger.error("Error occurred in loadUserInfo_Nineteen68 Error Code : ERRNDAC");
-							return res.send("fail");
+							callback("fail");
 						} else {
-							try {
-								var rolename = rolesResult.rows[selectedRole];
-								if (!rolename) {
-									logger.error("User role not found");
-									return res.send("fail");
-								} else {
-									if (selectedRole == req.session.defaultRoleId) req.session.defaultRole = rolename;
-									req.session.activeRole = rolename;
-									jsonService.rolename = req.session.defaultRole;
-								}
-								callback();
-							} catch (exception) {
-								logger.error(exception.message);
-								return res.send("fail");
+							var rolename = rolesResult.rows[selectedRole];
+							if (!rolename) {
+								logger.error("User role not found");
+								callback("fail");
+							} else {
+								if (selectedRole == req.session.defaultRoleId) req.session.defaultRole = rolename;
+								req.session.activeRole = rolename;
+								jsonService.rolename = req.session.defaultRole;
+								jsonService.page = (jsonService.rolename == "Admin")? "admin":"plugin";
+								callback(null);
 							}
 						}
 					});
 				},
 				//Service call to get the plugins accessible for the user
-				userPlugins: function (callback) {
-					try {
-						var inputs = {
-							"roleid": selectedRole,
-							"query": "userPlugins"
-						};
-						var args = {
-							data: inputs,
-							headers: {
-								"Content-Type": "application/json"
-							}
-						};
-						logger.info("Calling NDAC Service from userPlugins: loadUserInfo_Nineteen68");
-						client.post(epurl + "login/loadUserInfo_Nineteen68", args,
-							function (pluginResult, response) {
-							if (response.statusCode != 200 || pluginResult.rows == "fail") {
-								logger.error("Error occurred in loadUserInfo_Nineteen68 Error Code : ERRNDAC");
-								return res.send("fail");
+				function userPlugins(callback) {
+					var inputs = {
+						"roleid": selectedRole,
+						"query": "userPlugins"
+					};
+					var args = {
+						data: inputs,
+						headers: {
+							"Content-Type": "application/json"
+						}
+					};
+					logger.info("Calling NDAC Service from userPlugins: loadUserInfo_Nineteen68");
+					client.post(epurl + "login/loadUserInfo_Nineteen68", args,
+						function (pluginResult, response) {
+						if (response.statusCode != 200 || pluginResult.rows == "fail") {
+							logger.error("Error occurred in loadUserInfo_Nineteen68 Error Code : ERRNDAC");
+							callback("fail");
+						} else {
+							if (pluginResult.rows.length === 0) {
+								logger.info("User plugins not found");
+								callback("fail");
 							} else {
-								try {
-									if (pluginResult.rows.length === 0) {
-										logger.info("User plugins not found");
-										return res.send("fail");
-									} else {
-										var pluginsArr = [];
-										var key = ["ALM", "APG", "Dashboard", "Dead Code Identifier", "Mindmap", "Neuron Graphs", "Oxbow Code Identifier", "Reports", "Utility", "Webocular"];
-										var vals = Object.values(pluginResult.rows[0]);
-										for(var i=0; i < key.length; i++){
-											pluginsArr.push({
-												"pluginName" : key[i],
-												"pluginValue" : vals[i]
-											});
-										}
-										jsonService.pluginsInfo = pluginsArr;
-									}
-								} catch (exception) {
-									logger.error(exception.message);
-									return res.send("fail");
+								var pluginsArr = [];
+								var key = ["ALM", "APG", "Dashboard", "Dead Code Identifier", "Mindmap", "Neuron Graphs", "Oxbow Code Identifier", "Reports", "Utility", "Webocular"];
+								var vals = Object.values(pluginResult.rows[0]);
+								for(var i=0; i < key.length; i++){
+									pluginsArr.push({
+										"pluginName" : key[i],
+										"pluginValue" : vals[i]
+									});
 								}
+								jsonService.pluginsInfo = pluginsArr;
+								callback(null);
 							}
-							callback();
-						});
-					} catch (exception) {
-						logger.error(exception.message);
-						return res.send("fail");
-					}
+						}
+					});
 				}
-			}, function (err, data) {
-				if (err) {
-					logger.error(err);
-					return res.send("fail");
-				} else {
-					res.send(jsonService);
-				}
+			], function (err) {
+				if (err) jsonService = err;
+				return res.send(jsonService);
 			});
 		} else {
 			logger.info("Invalid Session");
@@ -484,7 +462,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
 	try {
 		logger.info("Inside UI service: getRoleNameByRoleId_Nineteen68");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var roleList = req.body.role;
 			var inputs = {
 				"roleid": roleList
@@ -517,8 +495,7 @@ exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
 
 exports.logoutUser_Nineteen68 = function (req, res) {
 	logger.info("Inside UI Service: logoutUser_Nineteen68");
-	res.clearCookie('connect.sid');
+	req.clearSession();
 	logger.info("%s logged out successfully", req.session.username);
-	req.session.destroy();
 	res.send('Session Expired');
 };

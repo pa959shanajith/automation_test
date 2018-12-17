@@ -1,5 +1,4 @@
 mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http, $location, LoginService, cfpLoadingBar) {
-	$(".ic-username, .ic-password").parent().removeClass("input-border-error")
 	$scope.loginValidation = "Loading Profile...";
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear();
 	var chkLogOut = window.sessionStorage.getItem('checkLoggedOut');
@@ -17,9 +16,10 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 		LoginService.checkUserState_Nineteen68()
 		.then(function (data) {
 			cfpLoadingBar.complete();
-			var emsg = '';
+			var emsg = "Loading Profile...";
 			if (data == "fail") emsg = "Failed to load user profile.";
 			else if (data == "unauthorized") emsg = "User is not authorized to use Nineteen68.";
+			else if (data == "invalid_session") emsg = "Your session has expired, Please login again";
 			else if (data == "userLogged") emsg = "User is already logged in! Please logout from the previous session.";
 			else if (data == "invalid_username") emsg = "The username or password you entered isn't correct. Please try again.";
 			else if (data == "inValidCredential") emsg = "The username or password you entered isn't correct. Please try again.";
@@ -27,35 +27,29 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 			else {
 				LoginService.loadUserInfo_Nineteen68()
 				.then(function (data) {
-					if (data != "fail") {
+					if (data == "invalid_session") emsg = "Your session has expired, Please login again";
+					else if (data != "fail") {
 						window.localStorage['_SR'] = data.rolename;
-						defaultRole = data.rolename;
 						window.localStorage['_UI'] = JSON.stringify(data);
-						window.sessionStorage["checkLoggedIn"] = true;
-						if (data.rolename == "Admin") {
-							window.localStorage['navigateScreen'] = "admin";
-							$location.path("/admin");
-						} else {
-							window.localStorage['navigateScreen'] = "plugin";
-							$location.path("/plugin");
-						}
+						window.sessionStorage.checkLoggedIn = true;
+						window.localStorage.navigateScreen = data.page;
+						$location.path("/"+data.page);
 					} else {
 						$scope.loginValidation = "Failed to Login.";
 						console.log("Failed to Load UserInfo.");
 					}
 				}, function (error) {
 					$scope.loginValidation = "Failed to Login.";
-					console.log("Fail to Load UserInfo")
+					console.log("Fail to Load UserInfo");
 				});
 			}
 			$scope.loginValidation = emsg;
-			if (emsg) console.log(emsg)
+			if (emsg != "Loading Profile...") console.log(emsg);
 		}, function (error) {
 			var emsg = "Failed to load user profile.";
-			console.log(emsg)
+			console.log(emsg);
 			$scope.loginValidation = emsg;
 			cfpLoadingBar.complete();
 		});
 	}
-
 });

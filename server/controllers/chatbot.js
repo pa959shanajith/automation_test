@@ -6,7 +6,7 @@ var utils = require('../lib/utils');
 
 exports.getTopMatches_ProfJ = function getTopMatches(req, res) {
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var query= req.body.userQuery;
 			try{
                     var args = {
@@ -50,7 +50,7 @@ exports.getTopMatches_ProfJ = function getTopMatches(req, res) {
 
 exports.updateFrequency_ProfJ = function(req, res) {
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var qid= req.body.qid;
 			try{
                     var args = {

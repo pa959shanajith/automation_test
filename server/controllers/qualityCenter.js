@@ -16,7 +16,7 @@ exports.loginQCServer_ICE = function (req, res) {
 	var name;
 	try {
 		logger.info("Inside UI service: loginQCServer_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var name = req.session.username;
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -113,7 +113,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 	};
 	var name;
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			name = req.session.username;
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
@@ -313,7 +313,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 	};
 	var name;
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var qcDetails = req.body;
 			name = req.session.username;
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
@@ -420,7 +420,7 @@ exports.saveQcDetails_ICE = function (req, res) {
 	}, function () {
 		if (flag) {
 			try {
-				if (utils.isSessionActive(req.session)) {
+				if (utils.isSessionActive(req)) {
 					/*var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 					console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", ip);
 					var mySocket = myserver.allSocketsMap[ip];
