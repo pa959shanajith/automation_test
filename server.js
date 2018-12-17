@@ -368,14 +368,14 @@ if (cluster.isMaster) {
                 return meta;
             };
 
-			var sessChk = sess.uniqueId && sess.activeRole && (roles.indexOf(sess.activeRole) != -1);
+            var sessChk = sess.uniqueId && sess.activeRole && (roles.indexOf(sess.activeRole) != -1);
             var maintCookie = req.signedCookies["maintain.sid"];
             if (sessChk) {
-				return (maintCookie)? res.sendFile("app.html", { root: __dirname + "/public/" }) : res.redirect("/error?e=sessexists");
-			} else {
-				req.clearSession();
-				return res.redirect("/error?e=401");
-			}
+                return (maintCookie)? res.sendFile("app.html", { root: __dirname + "/public/" }) : res.redirect("/error?e=sessexists");
+            } else {
+                req.clearSession();
+                return res.redirect("/error?e=401");
+            }
         }
 
         //Role Based User Access to services
@@ -417,8 +417,8 @@ if (cluster.isMaster) {
                             };
                             return next();
                         } else {
-							req.clearSession();
-							return res.send("Invalid Session");
+                            req.clearSession();
+                            return res.send("Invalid Session");
                         }
                     }
                 } else {
@@ -461,6 +461,9 @@ if (cluster.isMaster) {
         } catch (Ex) {
             process.env.projectVersioning = "disabled";
             logger.warn('Versioning is disabled');
+            app.post('/getProjectsNeo', function(req,res){
+                res.send("false");
+            });
         }
 
         // Route Mapping

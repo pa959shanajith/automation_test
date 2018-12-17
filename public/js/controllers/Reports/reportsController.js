@@ -6,6 +6,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 	var openArrow = 0; var openWindow = 0;
 	var executionId, testsuiteId;
 	var robj,redirected = false;
+	var pauseloadinginterval = false;
+	var clearIntervalList = [];
 	$scope.reportIdx = ''; // for execution count click
 	$("#page-taskName").empty().append('<span>Reports</span>')
 
@@ -160,16 +162,16 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 								}
 
 								if(redirected){
-									if(robj.testSuiteDetails[suiteidx].testsuiteid == value.testsuiteid && new Date(val.executedon)>new Date(latesttime) && position==0){
+									if(robj.testSuiteDetails[suiteidx].testsuiteid == value.testsuiteid && position==0){
 										latestidx = counter+1;
 										latesttime = val.executedon;
 									}
 								}
 						
 								if(position == 0){
-									$scope.result_reportData.push({'id':index+1,'ModuleName': value.testsuitename,'ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':counter+1})
+									$scope.result_reportData.push({'id':index+1,'ModuleName': value.testsuitename,'ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':counter+1,'executionid':val.executionid})
 								}else{
-									$scope.result_reportData.push({'id':'','ModuleName':'','ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':counter+1})
+									$scope.result_reportData.push({'id':'','ModuleName':'','ScenarioName':val.scenarioname,'description':val.description,'count':val.count,'latestStatus':val.latestStatus,'executedon':val.executedon,'scenarioId':val.scenarioid,'reportid':val.reportid,'testsuitename': value.testsuitename,'testsuiteid':value.testsuiteid,'idx':counter+1,'executionid':val.executionid})
 								}
 								counter = counter + 1;
 							})
@@ -180,12 +182,78 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 									scrollTop: $("[report-idx="+latestidx+"]").offset().top-$("[report-idx=1]").offset().top
 								}, 500);	
 								$("[report-idx="+latestidx+"]").addClass('highlightReportRow');
+								$("[report-idx="+latestidx+"]").trigger('mouseenter');
 							},500);
 						}
 						
 						//console.log("scope", $scope.result_reportData);
 						$("#reportDataTable").show();
+						var report_loaded_idx = 0;
+						clearIntervalList.forEach(function(intrvlid,i){
+							clearInterval(intrvlid);
+						});
+						var reportloadingintervalid = setInterval(function(){
+								if($("#page-taskName").text() != 'Reports'){
+									clearInterval(reportloadingintervalid);
+									return;
+								};
+								if(!pauseloadinginterval){
+									var scenarioId = $scope.result_reportData[report_loaded_idx].scenarioId;
+									var reportsInputData = {};
+									reportsInputData.scenarioid = scenarioId;
+									reportsInputData.cycleid = $("#selectCycles").val();
+									reportsInputData.type = "latestreport";
+									reportsInputData.report_loaded_idx = report_loaded_idx;
+									reportService.getReportsData_ICE(reportsInputData).then(function (result_res_scenarioData, response_scenarioData) {
+										$scope.result_reportData[result_res_scenarioData.report_loaded_idx].count = result_res_scenarioData.count;
+										$scope.result_reportData[result_res_scenarioData.report_loaded_idx].latestStatus = result_res_scenarioData.status;
+										$scope.result_reportData[result_res_scenarioData.report_loaded_idx].executedon = result_res_scenarioData.executedtime;
+										$scope.result_reportData[result_res_scenarioData.report_loaded_idx].reportid = result_res_scenarioData.reportid;
+										$scope.result_reportData[result_res_scenarioData.report_loaded_idx].executionid =result_res_scenarioData.executionid;									
+									});	
+									if(report_loaded_idx<$scope.result_reportData.length-1){
+										report_loaded_idx = report_loaded_idx + 1;								
+									}
+									else clearInterval(reportloadingintervalid);
+								}
+							}, 700);	
+						clearIntervalList.push(reportloadingintervalid);
+						var setTimeoutConst = '';
+						$timeout(function(){
+							$('.getScenarioTestCaseDetails').off("hover");
+							$('.getScenarioTestCaseDetails').hover(function(){
+								var ridx = this.getAttribute("report-idx");
+								if($('[report-idx="'+(parseInt(ridx)+1)+'"]>.executionCount').text() != 'loading...'){
+									return;
+								} 
+								pauseloadinginterval = true;
+								setTimeoutConst = setTimeout(function(){
+									/* Do Some Stuff*/
+									var scenarioId = $scope.result_reportData[parseInt(ridx)-1].scenarioId;
+									var reportsInputData = {};
+									reportsInputData.scenarioid = scenarioId;
+									reportsInputData.cycleid = $("#selectCycles").val();
+									reportsInputData.type = "latestreport";
+									reportsInputData.report_loaded_idx = parseInt(ridx)-1;
+									reportService.getReportsData_ICE(reportsInputData).then(function (result_res_scenarioData, response_scenarioData) {
+										$scope.result_reportData[result_res_scenarioData.report_loaded_idx].count = result_res_scenarioData.count;
+										$scope.result_reportData[result_res_scenarioData.report_loaded_idx].latestStatus = result_res_scenarioData.status;
+										$scope.result_reportData[result_res_scenarioData.report_loaded_idx].executedon = result_res_scenarioData.executedtime;
+										$scope.result_reportData[result_res_scenarioData.report_loaded_idx].reportid = result_res_scenarioData.reportid;
+										$scope.result_reportData[result_res_scenarioData.report_loaded_idx].executionid =result_res_scenarioData.executionid;									
+										pauseloadinginterval = false;
+									});	
+
+								}, 300);
+							},function(){
+								clearTimeout(setTimeoutConst);
+								pauseloadinginterval = false;
+							})	
+						},100);
+						
+						
 					}
+
 				});
 
 			};
@@ -194,9 +262,30 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 
 	//Execution count click
 	$scope.getscenarioDetails = function($event) {
-		  blockUI("Loading reports..please wait..");
-		  if($(this)[0].report.count > 0)
+		  pauseloadinginterval = true;
+		  if($(this)[0].report.count == 'loading...'){
+			  blockUI("Loading execution details..");
+			  pauseloadinginterval = true;
+			  var reportsInputData = {};
+			  reportsInputData.scenarioid = $(this)[0].report.scenarioId;
+			  reportsInputData.cycleid = $scope.cycleNames;
+			  reportsInputData.type = "latestreport";
+			  reportsInputData.report_loaded_idx = $(this)[0].report.idx-1;
+			  reportService.getReportsData_ICE(reportsInputData).then(function (result_res_scenarioData, response_scenarioData) {
+				  $scope.result_reportData[result_res_scenarioData.report_loaded_idx].count = result_res_scenarioData.count;
+				  $scope.result_reportData[result_res_scenarioData.report_loaded_idx].latestStatus = result_res_scenarioData.status;
+				  $scope.result_reportData[result_res_scenarioData.report_loaded_idx].executedon = result_res_scenarioData.executedtime;
+				  $scope.result_reportData[result_res_scenarioData.report_loaded_idx].reportid = result_res_scenarioData.reportid;
+				  $scope.result_reportData[result_res_scenarioData.report_loaded_idx].executionid =result_res_scenarioData.executionid;										
+				  $timeout(function(){
+					$('[report-idx="'+parseInt(result_res_scenarioData.report_loaded_idx+1)+'"]>.executionCount').trigger("click");
+				  },100);
+			  });				  
+		  }
+		  else if($(this)[0].report.count > 0)
 		  {
+			unblockUI();
+			blockUI("Loading reports..please wait..");
 			var scenarioId = $(this)[0].report.scenarioId;
 			var reportsInputData = {};
 			reportsInputData.scenarioid = scenarioId;
@@ -212,6 +301,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 											});
 			$("#reportScenarioDataTable").show();
 			unblockUI();
+			pauseloadinginterval = false;
 			});
 		  }
 		  else{
@@ -535,95 +625,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 			return dateArray;
 		})
 	}
-	//Date sorting
-	//Service call to get scenario status
-	/**********SUITE TIME CLICK ****************/
-	$(document).off('click.suiteTimeClick', '.scenariostatusreport');
-	$(document).on({
-		'click.suiteTimeClick': scenariostatusreport
-	}, '.scenariostatusreport');
-	function scenariostatusreport(e) {
-		//$(document).on('click', '.scenariostatusreport', function(e){
-		$(this).addClass('scenariostatusreportselect');
-		$(this).siblings().removeClass('scenariostatusreportselect');
-		executionId = $(this).attr('data-executionid');
-		var testsuiteid = $(".reportboxselected").attr('data-suiteid');
-		$('.formatpdfbrwsrexport').remove();
-		reportService.reportStatusScenarios_ICE(executionId, testsuiteid)
-			.then(function (data) {
-				if (data == "Invalid Session") {
-					$rootScope.redirectPage();
-				}
-				if (data != "fail") {
-					var scenarioContainer = $('#scenarioReportsTable');
-					if (Object.prototype.toString.call(data) === '[object Array]') {
-						var pass = fail = terminated = incomplete = P = F = T = I = 0;
-						var total = data.length;
-						scenarioContainer.find('tbody').empty();
-						var browserIcon, brow = "";
-						var styleColor, exeDate, exeDat, exeTime;
-						for (i = 0; i < data.length; i++) {
-							browserIcon = ""; brow = "";
-							if (data[i].browser.toLowerCase() == "chrome") browserIcon = "ic-reports-chrome.png";
-							else if (data[i].browser.toLowerCase() == "firefox") browserIcon = "ic-reports-firefox.png";
-							else if (data[i].browser.toLowerCase() == "internet explorer") browserIcon = "ic-reports-ie.png";
-							else if (data[i].browser.toLowerCase() == "safari") browserIcon = "ic-reports-safari.png";
-							if (browserIcon) brow = "imgs/" + browserIcon;
-							else brow = "imgs/no_img1.png"
-							if (data[i].status == "Pass") { pass++; styleColor = "style='color: #009444 !important; text-decoration-line: none;'"; }
-							else if (data[i].status == "Fail") { fail++; styleColor = "style='color: #b31f2d !important; text-decoration-line: none;'"; }
-							else if (data[i].status == "Terminate") { terminated++; styleColor = "style='color: #faa536 !important; text-decoration-line: none;'"; }
-							else if (data[i].status == "Incomplete") { incomplete++; styleColor = "style='color: #58595b !important; text-decoration-line: none;'"; }
-							// exeDate = data[i].executedtime.split(" ")[0].split("-");
-							// exeDat = ("0" + exeDate[0]).slice(-2) +"-"+ ("0" + exeDate[1]).slice(-2) +"-"+ exeDate[2];
-							// var fst = data[i].executedtime.split(" ")[1].split(":");
-							// exeTime = ("0" + fst[0]).slice(-2) +":"+ ("0" + fst[1]).slice(-2);
-
-							scenarioContainer.find('tbody').append("<tr><td title='" + data[i].testscenarioname + "'>" + data[i].testscenarioname + "</td><td><span style='margin-right: 28px;'>" + data[i].executedtime.trim() + "</span></td><td><img class='sap' alt='-' src='" + brow + "'></td><td class='openReports' data-reportid='" + data[i].reportid + "'><a class='openreportstatus' " + styleColor + ">" + data[i].status + "</a></td><td data-reportid='" + data[i].reportid + "'><img alt='Select format' class='selectFormat' src='imgs/ic-export-json.png' style='cursor: pointer;' title='Select format'></td></tr>");
-						}
-						if (data.length > 2) {
-							$("#scenarioReportsTable #dateDESC").show();
-						}
-						else {
-							$("#scenarioReportsTable #dateDESC").hide();
-							$("#scenarioReportsTable #dateASC").hide();
-						}
-						$("#scenarioReportsTable").find("#dateASC").hide();
-						var dateArray = $('tbody.scrollbar-inner-scenarioreports').children('tr');
-						dateASC(dateArray);
-						$("tbody.scrollbar-inner-scenarioreports").empty();
-						for (i = 0; i < dateArray.length; i++) {
-							//dateArray[i].firstChild.innerText = i+1;
-							$("tbody.scrollbar-inner-scenarioreports").append(dateArray[i]);
-						}
-						if (data.length > 0) {
-							P = parseFloat((pass / total) * 100).toFixed();
-							F = parseFloat((fail / total) * 100).toFixed();
-							T = parseFloat((terminated / total) * 100).toFixed();
-							I = parseFloat((incomplete / total) * 100).toFixed();
-							$('.progress-bar-success').css('width', P + "%"); $('.passPercent').text(P + " %");
-							$('.progress-bar-danger').css('width', F + "%"); $('.failPercent').text(F + " %");
-							$('.progress-bar-warning').css('width', T + "%"); $('.terminatePercent').text(T + " %");
-							$('.progress-bar-norun').css('width', I + "%"); $('.incompletePercent').text(I + " %");
-						}
-						else {
-							$('.progress-bar-success, .progress-bar-danger, .progress-bar-warning, .progress-bar-norun').css('width', '0%');
-							$('.passPercent, .failPercent, .terminatePercent, .incompletePercent').text('');
-						}
-					}
-				}
-				else console.log("Failed to get scenario status");
-			},
-			function (error) {
-				console.log("Error-------" + error);
-			})
-		//Transaction Activity for SuiteDrillDownClick
-		// var labelArr = [];
-		// var infoArr = [];
-		// labelArr.push(txnHistory.codesDict['SuiteDrillDownClick']);
-		// txnHistory.log(event.type,labelArr,infoArr,window.location.pathname); 
-		//});
-	}
 
 	/********** SELECT REPORT FORMAT CLICK ****************/
 	$(document).off('click.reportFormat', '.selectFormat');
@@ -755,17 +756,19 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 	/********** HTML REPORT CLICK ****************/
 	$(document).off('click.htmlRepClick', '.openreportstatus');
 	$(document).on({
-		'click.htmlRepClick': htlmReportClick
+		'click.htmlRepClick': htmlReportClick
 	}, '.openreportstatus');
 
 	//$(document).on('click', '.openreportstatus', function(e){
-	function htlmReportClick(e) {
-		console.log($scope.result_reportData);
+	function htmlReportClick(e) {
 		var reportType = $(this).attr('data-getrep');
+		var executionId = '';
 		if($(this)[0].classList.contains('archivedreport')){
 			var idx = $scope.reportIdx-1;
+			executionId = $scope.result_res_scenarioData[$(this).attr('data-reportidx')].executionid;
 		} else{
 			var idx =$(this).attr('data-reportidx')-1;
+			executionId = $scope.result_reportData[idx].executionid;
 		}
 		var reportID = $(this).attr('data-reportid');
 		var testsuiteId =$scope.result_reportData[idx].testsuiteid;
@@ -795,7 +798,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 				"time": "",
 				"pass": "",
 				"fail": "",
-				"terminate": ""
+				"terminate": "",
+				"reportId":"",
+				"executionId":""
 			}],
 			rows: []
 		};
@@ -813,6 +818,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 						finalReports.overallstatus[0].releaseName = data[0].releasename
 						finalReports.overallstatus[0].cycleName = data[0].cyclename
 						finalReports.overallstatus[0].scenarioName = data[0].testscenarioname
+						finalReports.overallstatus[0].reportId=reportID;
+						finalReports.overallstatus[0].executionId=executionId;
 
 						var obj2 = JSON.parse(data[1].reportdata);
 						//console.log("Remarks", obj2);
@@ -899,7 +906,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 						finalReports.overallstatus[0].terminate = (parseFloat((terminated / total) * 100).toFixed(2)) > 0 ? parseFloat((terminated / total) * 100).toFixed(2) : parseInt(0);
 						finalReports.remarksLength = remarksLength;
 						finalReports.commentsLength = commentsLength;
-						console.log('finalReportsa',finalReports);
+
 					}
 					if (reportType == "html") {
 						//Service call to get Html reports
@@ -934,6 +941,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 						// labelArr.push(txnHistory.codesDict['HTMLReportClick']);
 						// txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
 					}
+					else if(reportType == 'json'){
+						blockUI("Generating Report..please wait..");
+						exportJSONReport(finalReports);
+					}
 					else {
 						//Service call to get screenshots for Pdf reports
 						reportService.getScreenshotDataURL_ICE(scrShot.paths).then(
@@ -942,6 +953,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 								else dataURIs.forEach(function (d, i) { finalReports.rows[scrShot.idx[i]].screenshot_dataURI = d; });
 								//Service call to get Pdf reports
 								blockUI("Generating report..please wait..");
+                                var isIE = /*@cc_on!@*/ false || !!document.documentMode;
 								reportService.renderReport_ICE(finalReports, reportType).then(
 									function (data1) {
 										unblockUI();
@@ -951,6 +963,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 											openWindow = 0;
 											if (openWindow == 0) {
 												var file = new Blob([data1], { type: 'application/pdf' });
+                                                if (isIE) {
+                                                    navigator.msSaveOrOpenBlob(file);
+                                                }else{
 												var fileURL = URL.createObjectURL(file);
 												var a = document.createElement('a');
 												a.href = fileURL;
@@ -961,6 +976,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 												document.body.removeChild(a);
 												//$window.open(fileURL, '_blank');
 												URL.revokeObjectURL(fileURL);
+                                                }
 											}
 											openWindow++;
 											//Transaction Activity for PDFReportClick
@@ -995,109 +1011,82 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 	//Export To JSON
 	//Service call to get start and end details of suites
 	/************ EXPORT JSON CLICK *****************/
-	$(document).off('click.exportReportJSON', '.exportToJSON');
-	$(document).on({
-		'click.exportReportJSON': exportJSONReport
-	}, '.exportToJSON')
-	function exportJSONReport(e) {
-		//$(document).on('click', '.exportToJSON', function(e){
-		var repId = $(this).attr('data-reportid');
-		blockUI("Downloading json report.. please wait");
-		reportService.exportToJson_ICE(repId)
-			.then(function (response) {
-				unblockUI();
-				if (response == "Invalid Session") {
-					$rootScope.redirectPage();
+	// $(document).off('click.exportReportJSON', '.exportToJSON');
+	// $(document).on({
+	// 	'click.exportReportJSON': exportJSONReport
+	// }, '.exportToJSON')
+	function exportJSONReport(response) {
+		filename = response.overallstatus[0].scenarioName + ".json";
+		var responseData = JSON.stringify(response, undefined, 2);
+		var objAgent = $window.navigator.userAgent;
+		var objbrowserName = navigator.appName;
+		var objfullVersion = '' + parseFloat(navigator.appVersion);
+		var objBrMajorVersion = parseInt(navigator.appVersion, 10);
+		var objOffsetName, objOffsetVersion, ix;
+		// In Chrome
+		if ((objOffsetVersion = objAgent.indexOf("Chrome")) != -1) {
+			objbrowserName = "Chrome";
+			objfullVersion = objAgent.substring(objOffsetVersion + 7);
+		}
+		// In Microsoft internet explorer
+		else if ((objOffsetVersion = objAgent.indexOf("MSIE")) != -1) {
+			objbrowserName = "Microsoft Internet Explorer";
+			objfullVersion = objAgent.substring(objOffsetVersion + 5);
+		}
+		// In Firefox
+		else if ((objOffsetVersion = objAgent.indexOf("Firefox")) != -1) {
+			objbrowserName = "Firefox";
+		}
+		// In Safari
+		else if ((objOffsetVersion = objAgent.indexOf("Safari")) != -1) {
+			objbrowserName = "Safari";
+			objfullVersion = objAgent.substring(objOffsetVersion + 7);
+			if ((objOffsetVersion = objAgent.indexOf("Version")) != -1)
+				objfullVersion = objAgent.substring(objOffsetVersion + 8);
+		}
+		// For other browser "name/version" is at the end of userAgent
+		else if ((objOffsetName = objAgent.lastIndexOf(' ') + 1) < (objOffsetVersion = objAgent.lastIndexOf('/'))) {
+			objbrowserName = objAgent.substring(objOffsetName, objOffsetVersion);
+			objfullVersion = objAgent.substring(objOffsetVersion + 1);
+			if (objbrowserName.toLowerCase() == objbrowserName.toUpperCase()) {
+				objbrowserName = navigator.appName;
+			}
+		}
+		// trimming the fullVersion string at semicolon/space if present
+		if ((ix = objfullVersion.indexOf(";")) != -1) objfullVersion = objfullVersion.substring(0, ix);
+		if ((ix = objfullVersion.indexOf(" ")) != -1) objfullVersion = objfullVersion.substring(0, ix);
+		objBrMajorVersion = parseInt('' + objfullVersion, 10);
+		if (isNaN(objBrMajorVersion)) {
+			objfullVersion = '' + parseFloat(navigator.appVersion);
+			objBrMajorVersion = parseInt(navigator.appVersion, 10);
+		}
+		if (objBrMajorVersion == "9") {
+			if (objbrowserName == "Microsoft Internet Explorer") {
+				window.navigator.msSaveOrOpenBlob(new Blob([responseData], { type: "text/json;charset=utf-8" }), filename);
+			}
+		} else {
+			var blob = new Blob([responseData], { type: 'text/json' }),
+				e = document.createEvent('MouseEvents'),
+				a = document.createElement('a');
+			a.download = filename;
+			if (objbrowserName == "Microsoft Internet Explorer" || objbrowserName == "Netscape") {
+				window.navigator.msSaveOrOpenBlob(new Blob([responseData], { type: "text/json;charset=utf-8" }), filename);
+				//saveAs(blob, filename);
+			} else {
+				a.href = window.URL.createObjectURL(blob);
+				a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+				e.initMouseEvent('click', true, true, window,
+					0, 0, 0, 0, 0, false, false, false, false, 0, null);
+				/*if(counter == 0)
+				{
+					a.dispatchEvent(e);
 				}
-				if (response != "fail") {
-					if (typeof response === 'object') {
-						var temp = JSON.parse(response.reportdata);
-						var responseData = JSON.stringify(temp, undefined, 2);
-					}
-					filename = response.scenarioname + ".json";
-					var objAgent = $window.navigator.userAgent;
-					var objbrowserName = navigator.appName;
-					var objfullVersion = '' + parseFloat(navigator.appVersion);
-					var objBrMajorVersion = parseInt(navigator.appVersion, 10);
-					var objOffsetName, objOffsetVersion, ix;
-					// In Chrome
-					if ((objOffsetVersion = objAgent.indexOf("Chrome")) != -1) {
-						objbrowserName = "Chrome";
-						objfullVersion = objAgent.substring(objOffsetVersion + 7);
-					}
-					// In Microsoft internet explorer
-					else if ((objOffsetVersion = objAgent.indexOf("MSIE")) != -1) {
-						objbrowserName = "Microsoft Internet Explorer";
-						objfullVersion = objAgent.substring(objOffsetVersion + 5);
-					}
-					// In Firefox
-					else if ((objOffsetVersion = objAgent.indexOf("Firefox")) != -1) {
-						objbrowserName = "Firefox";
-					}
-					// In Safari
-					else if ((objOffsetVersion = objAgent.indexOf("Safari")) != -1) {
-						objbrowserName = "Safari";
-						objfullVersion = objAgent.substring(objOffsetVersion + 7);
-						if ((objOffsetVersion = objAgent.indexOf("Version")) != -1)
-							objfullVersion = objAgent.substring(objOffsetVersion + 8);
-					}
-					// For other browser "name/version" is at the end of userAgent
-					else if ((objOffsetName = objAgent.lastIndexOf(' ') + 1) < (objOffsetVersion = objAgent.lastIndexOf('/'))) {
-						objbrowserName = objAgent.substring(objOffsetName, objOffsetVersion);
-						objfullVersion = objAgent.substring(objOffsetVersion + 1);
-						if (objbrowserName.toLowerCase() == objbrowserName.toUpperCase()) {
-							objbrowserName = navigator.appName;
-						}
-					}
-					// trimming the fullVersion string at semicolon/space if present
-					if ((ix = objfullVersion.indexOf(";")) != -1) objfullVersion = objfullVersion.substring(0, ix);
-					if ((ix = objfullVersion.indexOf(" ")) != -1) objfullVersion = objfullVersion.substring(0, ix);
-					objBrMajorVersion = parseInt('' + objfullVersion, 10);
-					if (isNaN(objBrMajorVersion)) {
-						objfullVersion = '' + parseFloat(navigator.appVersion);
-						objBrMajorVersion = parseInt(navigator.appVersion, 10);
-					}
-					if (objBrMajorVersion == "9") {
-						if (objbrowserName == "Microsoft Internet Explorer") {
-							window.navigator.msSaveOrOpenBlob(new Blob([responseData], { type: "text/json;charset=utf-8" }), filename);
-						}
-					} else {
-						var blob = new Blob([responseData], { type: 'text/json' }),
-							e = document.createEvent('MouseEvents'),
-							a = document.createElement('a');
-						a.download = filename;
-						if (objbrowserName == "Microsoft Internet Explorer" || objbrowserName == "Netscape") {
-							window.navigator.msSaveOrOpenBlob(new Blob([responseData], { type: "text/json;charset=utf-8" }), filename);
-							//saveAs(blob, filename);
-						} else {
-							a.href = window.URL.createObjectURL(blob);
-							a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
-							e.initMouseEvent('click', true, true, window,
-								0, 0, 0, 0, 0, false, false, false, false, 0, null);
-							/*if(counter == 0)
-							{
-								a.dispatchEvent(e);
-							}
-							counter++;*/
-							a.dispatchEvent(e);
-						}
-					}
-				}
-				else console.log("Error while exporting JSON.\n");
-				//Transaction Activity for ExportToJSONClick
-				// var labelArr = [];
-				// var infoArr = [];
-				// labelArr.push(txnHistory.codesDict['ExportToJSONClick']);
-				// txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
-			},
-			function (error) {
-				unblockUI();
-				console.log("Error while exportsing JSON.\n " + (error.data));
-			});
-		$('.formatpdfbrwsrexport').remove();
-		//})
-	}
-
+				counter++;*/
+				a.dispatchEvent(e);
+			}
+		}
+		unblockUI();
+	};
 	
 	
 }]);

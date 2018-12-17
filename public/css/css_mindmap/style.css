@@ -43,6 +43,7 @@
      transform: translateX(50%) translateY(50%);
      -moz-transform: translateX(50%) translateY(50%);
      -webkit-transform: translateX(-50%) translateY(-50%);
+     -ms-transform: translateX(-45%) translateY(-45%);
      background-color: #e6e7e9;
      width: 496px;
      height: 200px;
@@ -571,6 +572,18 @@
  .ct-project-tab{
     height:30px ;
     overflow:hidden
+}
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none){
+    #ct-moduleBox {
+        width:100%;
+        left:none;
+        margin-left:-11.5%;
+    } 
+    #ct-AssignBox{
+        width:100%;
+        left:none;
+        margin-left:-11.5%;
+    }   
 }
  .ct-nodeBox .ct-node{
     position:relative;
@@ -1472,7 +1485,7 @@
     padding: 2px;    
 }
 #search-canvas-icon{
-    width: 27px;
+    /*width: 27px;*/
     height: 25px;
     left: 3px;
     top: 9px;
