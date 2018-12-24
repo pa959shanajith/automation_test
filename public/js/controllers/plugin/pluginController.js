@@ -2,17 +2,60 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	$('.scrollbar-inner').scrollbar();
 	window.onbeforeunload = null;
 	localStorage.setItem("navigateEnable", true);
-	document.getElementById("currentYear").innerHTML = new Date().getFullYear()
+	document.getElementById("currentYear").innerHTML = new Date().getFullYear();
 	var userInfo = JSON.parse(window.localStorage['_UI']);
 	var availablePlugins = userInfo.pluginsInfo;
-	$scope.filterData = {'relval':'Select Release','cycval':'Select Cycle','apptype':{},'tasktype':{}};
+	$scope.filterData = {'prjval':'Select Project','relval':'Select Release','cycval':'Select Cycle','apptype':{},'tasktype':{}};
 	$("#plugin-container").empty().hide();
 	$("body").css("background", "#fff");
 	if(window.localStorage['navigateScreen'] != "plugin"){
 		$rootScope.redirectPage();
 		return;
 	}
-
+	if (!Array.prototype.fill) {
+		Object.defineProperty(Array.prototype, 'fill', {
+		  value: function(value) {
+	  
+			// Steps 1-2.
+			if (this == null) {
+			  throw new TypeError('this is null or not defined');
+			}
+	  
+			var O = Object(this);
+	  
+			// Steps 3-5.
+			var len = O.length >>> 0;
+	  
+			// Steps 6-7.
+			var start = arguments[1];
+			var relativeStart = start >> 0;
+	  
+			// Step 8.
+			var k = relativeStart < 0 ?
+			  Math.max(len + relativeStart, 0) :
+			  Math.min(relativeStart, len);
+	  
+			// Steps 9-10.
+			var end = arguments[2];
+			var relativeEnd = end === undefined ?
+			  len : end >> 0;
+	  
+			// Step 11.
+			var final = relativeEnd < 0 ?
+			  Math.max(len + relativeEnd, 0) :
+			  Math.min(relativeEnd, len);
+	  
+			// Step 12.
+			while (k < final) {
+			  O[k] = value;
+			  k++;
+			}
+	  
+			// Step 13.
+			return O;
+		  }
+		});
+	}
 	$rootScope.plugins = [];
 	for(i=0; i<availablePlugins.length; i++){
 		if(availablePlugins[i].pluginValue != false){
@@ -85,9 +128,9 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 						* Another dict for releaseid and cyclelist out of task json
 						* List of apptype and tasktype
 						*/
-					    $scope.filterDat = {'releaseids':[],'cycleids':[],'relcycmap':{},'apptypes':[],'tasktypes':['Design','Execution'],'idnamemaprel':{},'idnamemapcyc':{}};
-						$(".plugin-taks-listing").empty().hide()
-						var counter = 1;
+					    $scope.filterDat = {'projectids':[],'releaseids':[],'cycleids':[],'prjrelmap':{},'relcycmap':{},'apptypes':[],'tasktypes':['Design','Execution'],'idnamemapprj':{},'idnamemaprel':{},'idnamemapcyc':{}};
+						$(".plugin-taks-listing:visible").empty().hide()
+						var counter = 1,countertodo = 1,counterreview = 1;
 						for(i=0; i<tasksJson.length; i++){
 							var classIndex = i<100 ? "tasks-l-s": i<1000? "tasks-l-m" : "tasks-l-l";
 							for(j=0; j<tasksJson[i].taskDetails.length; j++){
@@ -96,8 +139,23 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 								if(tasksJson[i].taskDetails[j].taskType == "Execution"){
 									taskTypeIcon = "imgs/ic-taskType-blue-plus.png";
 								}
-									$(".plugin-taks-listing").append('<div class="panel panel-default" panel-id="'+i+'"><div class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse'+counter+'"><h4 class="taskNo '+classIndex+'" style="margin-top: -1px; padding-right: 6px;">'+ counter +'</h4><span class="assignedTask" data-testsuitedetails='+testSuiteDetails+' data-scenarioflag='+tasksJson[i].scenarioFlag+' data-apptype="'+tasksJson[i].appType+'" data-projectid="'+tasksJson[i].projectId+'" data-screenid="'+tasksJson[i].screenId+'" data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" data-scenarioid="'+tasksJson[i].scenarioId+'" data-taskname="'+tasksJson[i].taskDetails[j].taskName+'" data-taskdes="'+tasksJson[i].taskDetails[j].taskDescription+'" data-tasktype="'+tasksJson[i].taskDetails[j].taskType+'" data-subtask="'+tasksJson[i].taskDetails[j].subTaskType+'" data-subtaskid="'+tasksJson[i].taskDetails[j].subTaskId+'"  data-assignedtestscenarioids="'+tasksJson[i].assignedTestScenarioIds+'" data-assignedto="'+tasksJson[i].taskDetails[j].assignedTo+'" data-startdate="'+tasksJson[i].taskDetails[j].startDate+'" data-exenddate="'+tasksJson[i].taskDetails[j].expectedEndDate+'" data-status="'+tasksJson[i].taskDetails[j].status+'" data-versionnumber="'+tasksJson[i].versionnumber+'" data-batchTaskIDs="'+tasksJson[i].taskDetails[j].batchTaskIDs+'" data-releaseid="'+tasksJson[i].taskDetails[j].releaseid+'" data-cycleid="'+tasksJson[i].taskDetails[j].cycleid+'" data-reuse="'+tasksJson[i].taskDetails[j].reuse+'" onclick="taskRedirection(this.dataset.testsuitedetails,this.dataset.scenarioflag,this.dataset.assignedtestscenarioids,this.dataset.subtask,this.dataset.subtaskid,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.scenarioid,this.dataset.versionnumber,this.dataset.status,this.dataset.batchtaskids,this.dataset.releaseid,this.dataset.cycleid,this.dataset.reuse,event)">'+tasksJson[i].taskDetails[j].taskName+'</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;" src="'+taskTypeIcon+'"/><button class="panel-head-tasktype">'+tasksJson[i].taskDetails[j].taskType+'</button></div><!--Addition--></div></div></div>').fadeIn()
-								
+									if(tasksJson[i].taskDetails[0].status == 'review'){
+										$(".plugin-taks-listing.review").append('<div class="panel panel-default" panel-id="'+i+'"><div id="panelBlock_'+i+'" class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse'+counter+'"><h4 class="taskNo '+classIndex+'" style="margin-top: -1px; padding-right: 6px;">'+ counterreview +'</h4><span class="assignedTask" data-testsuitedetails='+testSuiteDetails+' data-scenarioflag='+tasksJson[i].scenarioFlag+' data-apptype="'+tasksJson[i].appType+'" data-projectid="'+tasksJson[i].projectId+'" data-screenid="'+tasksJson[i].screenId+'" data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" data-scenarioid="'+tasksJson[i].scenarioId+'" data-taskname="'+tasksJson[i].taskDetails[j].taskName+'" data-taskdes="'+tasksJson[i].taskDetails[j].taskDescription+'" data-tasktype="'+tasksJson[i].taskDetails[j].taskType+'" data-subtask="'+tasksJson[i].taskDetails[j].subTaskType+'" data-subtaskid="'+tasksJson[i].taskDetails[j].subTaskId+'"  data-assignedtestscenarioids="'+tasksJson[i].assignedTestScenarioIds+'" data-assignedto="'+tasksJson[i].taskDetails[j].assignedTo+'" data-startdate="'+tasksJson[i].taskDetails[j].startDate+'" data-exenddate="'+tasksJson[i].taskDetails[j].expectedEndDate+'" data-status="'+tasksJson[i].taskDetails[j].status+'" data-versionnumber="'+tasksJson[i].versionnumber+'" data-batchTaskIDs="'+tasksJson[i].taskDetails[j].batchTaskIDs+'" data-releaseid="'+tasksJson[i].taskDetails[j].releaseid+'" data-cycleid="'+tasksJson[i].taskDetails[j].cycleid+'" data-reuse="'+tasksJson[i].taskDetails[j].reuse+'" onclick="taskRedirection(this.dataset.testsuitedetails,this.dataset.scenarioflag,this.dataset.assignedtestscenarioids,this.dataset.subtask,this.dataset.subtaskid,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.scenarioid,this.dataset.versionnumber,this.dataset.status,this.dataset.batchtaskids,this.dataset.releaseid,this.dataset.cycleid,this.dataset.reuse,event)">'+tasksJson[i].taskDetails[j].taskName+'</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;" src="'+taskTypeIcon+'"/><button class="panel-head-tasktype">'+tasksJson[i].taskDetails[j].taskType+'</button></div><!--Addition--></div></div></div>').fadeIn()
+										counterreview++;
+									}
+									else{
+										$(".plugin-taks-listing.todo").append('<div class="panel panel-default" panel-id="'+i+'"><div id="panelBlock_'+i+'" class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse'+counter+'"><h4 class="taskNo '+classIndex+'" style="margin-top: -1px; padding-right: 6px;">'+ countertodo +'</h4><span class="assignedTask" data-testsuitedetails='+testSuiteDetails+' data-scenarioflag='+tasksJson[i].scenarioFlag+' data-apptype="'+tasksJson[i].appType+'" data-projectid="'+tasksJson[i].projectId+'" data-screenid="'+tasksJson[i].screenId+'" data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" data-scenarioid="'+tasksJson[i].scenarioId+'" data-taskname="'+tasksJson[i].taskDetails[j].taskName+'" data-taskdes="'+tasksJson[i].taskDetails[j].taskDescription+'" data-tasktype="'+tasksJson[i].taskDetails[j].taskType+'" data-subtask="'+tasksJson[i].taskDetails[j].subTaskType+'" data-subtaskid="'+tasksJson[i].taskDetails[j].subTaskId+'"  data-assignedtestscenarioids="'+tasksJson[i].assignedTestScenarioIds+'" data-assignedto="'+tasksJson[i].taskDetails[j].assignedTo+'" data-startdate="'+tasksJson[i].taskDetails[j].startDate+'" data-exenddate="'+tasksJson[i].taskDetails[j].expectedEndDate+'" data-status="'+tasksJson[i].taskDetails[j].status+'" data-versionnumber="'+tasksJson[i].versionnumber+'" data-batchTaskIDs="'+tasksJson[i].taskDetails[j].batchTaskIDs+'" data-releaseid="'+tasksJson[i].taskDetails[j].releaseid+'" data-cycleid="'+tasksJson[i].taskDetails[j].cycleid+'" data-reuse="'+tasksJson[i].taskDetails[j].reuse+'" onclick="taskRedirection(this.dataset.testsuitedetails,this.dataset.scenarioflag,this.dataset.assignedtestscenarioids,this.dataset.subtask,this.dataset.subtaskid,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.scenarioid,this.dataset.versionnumber,this.dataset.status,this.dataset.batchtaskids,this.dataset.releaseid,this.dataset.cycleid,this.dataset.reuse,event)">'+tasksJson[i].taskDetails[j].taskName+'</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;" src="'+taskTypeIcon+'"/><button class="panel-head-tasktype">'+tasksJson[i].taskDetails[j].taskType+'</button></div><!--Addition--></div></div></div>').fadeIn()										
+										countertodo++;
+									}									
+									 var limit = 45;
+									 var chars = $("#panelBlock_"+i+"").children().find('span.assignedTask').text();
+									if (chars.length > limit) {
+										var visiblePart = chars.substr(0, limit-1);
+										var dots = $("<span class='dots'>...</span>");
+										var hiddenPart = chars.substr(limit-1);
+										var assignedTaskText = visiblePart + hiddenPart;
+										$("#panelBlock_"+i+"").children().find('span.assignedTask').text(visiblePart).attr('title',assignedTaskText).append(dots);
+									 }
 								counter++;
 								fillFilterValues(tasksJson[i],j);
 							}
@@ -108,23 +166,34 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 							$("span.filterIcon").removeClass('disableFilter');
 					}
 
-					PluginService.getNames_ICE($scope.filterDat.releaseids,Array($scope.filterDat.releaseids.length).fill('releases'))
+					PluginService.getNames_ICE($scope.filterDat.projectids,Array($scope.filterDat.projectids.length).fill('projects'))
 					.then(function (response) {
 						if(response == "Invalid Session"){
 							$rootScope.redirectPage();
 						} else {
 							response.respnames.forEach(function(name,i){
-								$scope.filterDat.idnamemaprel[response.requestedids[i]] = name;
+								$scope.filterDat.idnamemapprj[response.requestedids[i]] = name;
 							});
-							PluginService.getNames_ICE($scope.filterDat.cycleids,Array($scope.filterDat.cycleids.length).fill('cycles'))
+							PluginService.getNames_ICE($scope.filterDat.releaseids,Array($scope.filterDat.releaseids.length).fill('releases'))
 							.then(function (response) {
 								if(response == "Invalid Session"){
 									$rootScope.redirectPage();
 								}
 								else{
 									response.respnames.forEach(function(name,i){
-										$scope.filterDat.idnamemapcyc[response.requestedids[i]] = name;
+										$scope.filterDat.idnamemaprel[response.requestedids[i]] = name;
 									});
+									PluginService.getNames_ICE($scope.filterDat.cycleids,Array($scope.filterDat.cycleids.length).fill('cycles'))
+									.then(function (response) {
+										if(response == "Invalid Session"){
+											$rootScope.redirectPage();
+										}
+										else{
+											response.respnames.forEach(function(name,i){
+												$scope.filterDat.idnamemapcyc[response.requestedids[i]] = name;
+											});
+										}
+									}, function (error) { console.log("Error:::::::::::::", error) })									
 								}
 							}, function (error) { console.log("Error:::::::::::::", error) })
 						}
@@ -163,18 +232,30 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	})
 
 	//Search form filter
-	$('.searchInput').keyup(function(e) {
+	$('.searchInput').keyup(function(event) {
 		filter(this,event); 
-		e.stopImmediatePropagation();
+		event.stopImmediatePropagation();
 	});
 
 	function filter(element,event) {
 		var value = $(element).val();
-		$(".panel-default span.assignedTask").each(function () {
-			if ($(this).text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
-				$(this).parents(".panel-default").show();
-			} else {
-				$(this).parents(".panel-default").hide();
+		$(".panel-default span.assignedTask").each(function () { 
+			var title = $(this).attr('title');
+			if(title == undefined)
+			{
+				if ($(this).text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
+					$(this).parents(".panel-default").show();
+				} else {
+					$(this).parents(".panel-default").hide();
+				}
+			}
+			else{
+				console.log(title);
+				if (title.toLowerCase().indexOf(value.toLowerCase()) > -1) {
+					$(this).parents(".panel-default").show();
+				} else {
+					$(this).parents(".panel-default").hide();
+				}
 			}
 		});
 		//Transaction Activity for Task Search 
@@ -317,15 +398,17 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	}
 
 	function passFilterTest(node,tidx){
-		var rflag = false,cflag = false,aflag = false,tflag = false;
+		var pflag = false, rflag = false,cflag = false,aflag = false,tflag = false;
 		console.log("filter params: ",$scope.filterData);
 		console.log("node: ",node);
+		if($scope.filterData['prjval']=='Select Project' || $scope.filterData['prjval']==node.projectId) pflag = true;
+		if($scope.filterData['relval']=='Select Release' || $scope.filterData['relval']==node.taskDetails[tidx].releaseid) rflag = true;
 		if($scope.filterData['relval']=='Select Release' || $scope.filterData['relval']==node.taskDetails[tidx].releaseid) rflag = true;
 		if($scope.filterData['cycval']=='Select Cycle' || $scope.filterData['cycval']==node.taskDetails[tidx].cycleid) cflag = true;
-		if(Object.values($scope.filterData['tasktype']).indexOf(true) == -1 || $scope.filterData.tasktype[node.taskDetails[tidx].taskType]) tflag = true;
-		if(Object.values($scope.filterData['apptype']).indexOf(true) == -1 || $scope.filterData.apptype[node.appType]) aflag = true;		
+		if(Object.keys($scope.filterData['tasktype']).map(function(itm) { return $scope.filterData['tasktype'][itm]; }).indexOf(true) == -1 || $scope.filterData.tasktype[node.taskDetails[tidx].taskType]) tflag = true;
+		if(Object.keys($scope.filterData['apptype']).map(function(itm) { return $scope.filterData['apptype'][itm]; }).indexOf(true) == -1 || $scope.filterData.apptype[node.appType]) aflag = true;		
 		
-		if(rflag && cflag && aflag && tflag) return true;
+		if(pflag && rflag && cflag && aflag && tflag) return true;
 		else return false;
 	}
 	$scope.filterTasks = function($event){
@@ -334,7 +417,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		console.log("Task Filtered");
 		window.localStorage['_TJ'] = angular.toJson(tasksJson);
 		$(".plugin-taks-listing").empty();
-		var counter = 1;
+		var counter =1,countertodo = 1,counterreview = 1;
 		var taskTypeIcon = "";
 		for(i=0; i<tasksJson.length; i++){
 			var classIndex = i<100 ? "tasks-l-s": i<1000? "tasks-l-m" : "tasks-l-l";
@@ -343,27 +426,29 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 				//console.log("TASKJSONDETAILS",tasksJson[i].taskDetails);
 				if(tasksJson[i].taskDetails[j].taskType == "Design"){
 					taskTypeIcon = "imgs/ic-taskType-yellow-plus.png";
-					var testSuiteDetails = JSON.stringify(tasksJson[i].testSuiteDetails);
-					if(passFilterTest(tasksJson[i],j)){
-						$(".plugin-taks-listing").append('<div class="panel panel-default" panel-id="'+i+'"><div class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse'+counter+'"><h4 class="taskNo '+classIndex+'" style="margin-top: -1px; padding-right: 6px;">'+ counter +'</h4><span class="assignedTask" data-testsuitedetails='+testSuiteDetails+' data-scenarioflag='+tasksJson[i].scenarioFlag+' data-apptype="'+tasksJson[i].appType+'" data-projectid="'+tasksJson[i].projectId+'" data-screenid="'+tasksJson[i].screenId+'" data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" data-scenarioid="'+tasksJson[i].scenarioId+'" data-taskname="'+tasksJson[i].taskDetails[j].taskName+'" data-taskdes="'+tasksJson[i].taskDetails[j].taskDescription+'" data-tasktype="'+tasksJson[i].taskDetails[j].taskType+'" data-subtask="'+tasksJson[i].taskDetails[j].subTaskType+'" data-subtaskid="'+tasksJson[i].taskDetails[j].subTaskId+'"  data-assignedtestscenarioids="'+tasksJson[i].assignedTestScenarioIds+'" data-assignedto="'+tasksJson[i].taskDetails[j].assignedTo+'" data-startdate="'+tasksJson[i].taskDetails[j].startDate+'" data-exenddate="'+tasksJson[i].taskDetails[j].expectedEndDate+'" data-status="'+tasksJson[i].taskDetails[j].status+'" data-versionnumber="'+tasksJson[i].versionnumber+'" data-batchTaskIDs="'+tasksJson[i].taskDetails[j].batchTaskIDs+'" data-releaseid="'+tasksJson[i].taskDetails[j].releaseid+'" data-cycleid="'+tasksJson[i].taskDetails[j].cycleid+'" data-reuse="'+tasksJson[i].taskDetails[j].reuse+'" onclick="taskRedirection(this.dataset.testsuitedetails,this.dataset.scenarioflag,this.dataset.assignedtestscenarioids,this.dataset.subtask,this.dataset.subtaskid,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.scenarioid,this.dataset.versionnumber,this.dataset.status,this.dataset.batchtaskids,this.dataset.releaseid,this.dataset.cycleid,this.dataset.reuse,event)">'+tasksJson[i].taskDetails[j].taskName+'</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;" src="'+taskTypeIcon+'"/><button class="panel-head-tasktype">'+tasksJson[i].taskDetails[j].taskType+'</button></div><!--Addition--></div></div></div>').fadeIn()
-						counter++;
-					}
 				} 
 				else if(tasksJson[i].taskDetails[j].taskType == "Execution"){
 					taskTypeIcon = "imgs/ic-taskType-blue-plus.png";
 					//console.log("test",tasksJson[i].assignedTestScenarioIds);
-					var testSuiteDetails = JSON.stringify(tasksJson[i].testSuiteDetails);
-					//console.log(i,testSuiteDetails);
-					if(passFilterTest(tasksJson[i],0)){
-						$(".plugin-taks-listing").append('<div class="panel panel-default" panel-id="'+i+'"><div class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse'+counter+'"><h4 class="taskNo '+classIndex+'" style="margin-top: -1px; padding-right: 6px;">'+ counter +'</h4><span class="assignedTask" data-testsuitedetails='+testSuiteDetails+' data-scenarioflag='+tasksJson[i].scenarioFlag+' data-apptype="'+tasksJson[i].appType+'" data-projectid="'+tasksJson[i].projectId+'" data-screenid="'+tasksJson[i].screenId+'" data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" data-scenarioid="'+tasksJson[i].scenarioId+'" data-taskname="'+tasksJson[i].taskDetails[j].taskName+'" data-taskdes="'+tasksJson[i].taskDetails[j].taskDescription+'" data-tasktype="'+tasksJson[i].taskDetails[j].taskType+'" data-subtask="'+tasksJson[i].taskDetails[j].subTaskType+'" data-subtaskid="'+tasksJson[i].taskDetails[j].subTaskId+'"  data-assignedtestscenarioids="'+tasksJson[i].assignedTestScenarioIds+'" data-assignedto="'+tasksJson[i].taskDetails[j].assignedTo+'" data-startdate="'+tasksJson[i].taskDetails[j].startDate+'" data-exenddate="'+tasksJson[i].taskDetails[j].expectedEndDate+'" data-status="'+tasksJson[i].taskDetails[j].status+'" data-versionnumber="'+tasksJson[i].versionnumber+'" data-batchTaskIDs="'+tasksJson[i].taskDetails[j].batchTaskIDs+'" data-releaseid="'+tasksJson[i].taskDetails[j].releaseid+'" data-cycleid="'+tasksJson[i].taskDetails[j].cycleid+'" data-reuse="'+tasksJson[i].taskDetails[j].reuse+'" onclick="taskRedirection(this.dataset.testsuitedetails,this.dataset.scenarioflag,this.dataset.assignedtestscenarioids,this.dataset.subtask,this.dataset.subtaskid,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.scenarioid,this.dataset.versionnumber,this.dataset.status,this.dataset.batchtaskids,this.dataset.releaseid,this.dataset.cycleid,this.dataset.reuse,event)">'+tasksJson[i].taskDetails[j].taskName+'</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;" src="'+taskTypeIcon+'"/><button class="panel-head-tasktype">'+tasksJson[i].taskDetails[j].taskType+'</button></div><!--Addition--></div></div></div>').fadeIn()
-						counter++;
-					}
+
 				}
-				
+				var testSuiteDetails = JSON.stringify(tasksJson[i].testSuiteDetails);
+				//console.log(i,testSuiteDetails);
+				if(passFilterTest(tasksJson[i],0)){
+					if(tasksJson[i].taskDetails[0].status == 'review'){
+						$(".plugin-taks-listing.review").append('<div class="panel panel-default" panel-id="'+i+'"><div class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse'+counter+'"><h4 class="taskNo '+classIndex+'" style="margin-top: -1px; padding-right: 6px;">'+ counterreview +'</h4><span class="assignedTask" data-testsuitedetails='+testSuiteDetails+' data-scenarioflag='+tasksJson[i].scenarioFlag+' data-apptype="'+tasksJson[i].appType+'" data-projectid="'+tasksJson[i].projectId+'" data-screenid="'+tasksJson[i].screenId+'" data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" data-scenarioid="'+tasksJson[i].scenarioId+'" data-taskname="'+tasksJson[i].taskDetails[j].taskName+'" data-taskdes="'+tasksJson[i].taskDetails[j].taskDescription+'" data-tasktype="'+tasksJson[i].taskDetails[j].taskType+'" data-subtask="'+tasksJson[i].taskDetails[j].subTaskType+'" data-subtaskid="'+tasksJson[i].taskDetails[j].subTaskId+'"  data-assignedtestscenarioids="'+tasksJson[i].assignedTestScenarioIds+'" data-assignedto="'+tasksJson[i].taskDetails[j].assignedTo+'" data-startdate="'+tasksJson[i].taskDetails[j].startDate+'" data-exenddate="'+tasksJson[i].taskDetails[j].expectedEndDate+'" data-status="'+tasksJson[i].taskDetails[j].status+'" data-versionnumber="'+tasksJson[i].versionnumber+'" data-batchTaskIDs="'+tasksJson[i].taskDetails[j].batchTaskIDs+'" data-releaseid="'+tasksJson[i].taskDetails[j].releaseid+'" data-cycleid="'+tasksJson[i].taskDetails[j].cycleid+'" data-reuse="'+tasksJson[i].taskDetails[j].reuse+'" onclick="taskRedirection(this.dataset.testsuitedetails,this.dataset.scenarioflag,this.dataset.assignedtestscenarioids,this.dataset.subtask,this.dataset.subtaskid,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.scenarioid,this.dataset.versionnumber,this.dataset.status,this.dataset.batchtaskids,this.dataset.releaseid,this.dataset.cycleid,this.dataset.reuse,event)">'+tasksJson[i].taskDetails[j].taskName+'</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;" src="'+taskTypeIcon+'"/><button class="panel-head-tasktype">'+tasksJson[i].taskDetails[j].taskType+'</button></div><!--Addition--></div></div></div>').fadeIn()
+						counterreview++;
+					}
+					else{
+						$(".plugin-taks-listing.todo").append('<div class="panel panel-default" panel-id="'+i+'"><div class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse'+counter+'"><h4 class="taskNo '+classIndex+'" style="margin-top: -1px; padding-right: 6px;">'+ countertodo +'</h4><span class="assignedTask" data-testsuitedetails='+testSuiteDetails+' data-scenarioflag='+tasksJson[i].scenarioFlag+' data-apptype="'+tasksJson[i].appType+'" data-projectid="'+tasksJson[i].projectId+'" data-screenid="'+tasksJson[i].screenId+'" data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" data-scenarioid="'+tasksJson[i].scenarioId+'" data-taskname="'+tasksJson[i].taskDetails[j].taskName+'" data-taskdes="'+tasksJson[i].taskDetails[j].taskDescription+'" data-tasktype="'+tasksJson[i].taskDetails[j].taskType+'" data-subtask="'+tasksJson[i].taskDetails[j].subTaskType+'" data-subtaskid="'+tasksJson[i].taskDetails[j].subTaskId+'"  data-assignedtestscenarioids="'+tasksJson[i].assignedTestScenarioIds+'" data-assignedto="'+tasksJson[i].taskDetails[j].assignedTo+'" data-startdate="'+tasksJson[i].taskDetails[j].startDate+'" data-exenddate="'+tasksJson[i].taskDetails[j].expectedEndDate+'" data-status="'+tasksJson[i].taskDetails[j].status+'" data-versionnumber="'+tasksJson[i].versionnumber+'" data-batchTaskIDs="'+tasksJson[i].taskDetails[j].batchTaskIDs+'" data-releaseid="'+tasksJson[i].taskDetails[j].releaseid+'" data-cycleid="'+tasksJson[i].taskDetails[j].cycleid+'" data-reuse="'+tasksJson[i].taskDetails[j].reuse+'" onclick="taskRedirection(this.dataset.testsuitedetails,this.dataset.scenarioflag,this.dataset.assignedtestscenarioids,this.dataset.subtask,this.dataset.subtaskid,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.scenarioid,this.dataset.versionnumber,this.dataset.status,this.dataset.batchtaskids,this.dataset.releaseid,this.dataset.cycleid,this.dataset.reuse,event)">'+tasksJson[i].taskDetails[j].taskName+'</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;" src="'+taskTypeIcon+'"/><button class="panel-head-tasktype">'+tasksJson[i].taskDetails[j].taskType+'</button></div><!--Addition--></div></div></div>').fadeIn()
+						countertodo++;
+					}
+					counter++;
+				}				
 			}
 		}
 
-		if($scope.filterData['relval']=='Select Release' && $scope.filterData['cycval']=='Select Cycle' && !(Object.values($scope.filterData['tasktype']).includes(true) || Object.values($scope.filterData['apptype']).includes(true))){
+		if($scope.filterData['prjval']=='Select Project' && $scope.filterData['relval']=='Select Release' && $scope.filterData['cycval']=='Select Cycle' && !(Object.values($scope.filterData['tasktype']).includes(true) || Object.values($scope.filterData['apptype']).includes(true))){
 			$scope.filterEnable = false;
 			$('.filterIcon').css('background','white');
 		}
@@ -377,13 +462,36 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		// var infoArr = [];
 		// labelArr.push(txnHistory.codesDict['FilterTaskByParams']);
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
-		
+		$(".panel-additional-details").off("click");
+		$(".panel-additional-details").click(function(e){
+			console.log($scope.filterDat);
+			var tdes = this.parentElement.children[1].getAttribute('data-taskdes');
+			if($(".description-container").length>0)
+				var olddescriptionid = $(".description-container")[0].getAttribute("description-id");
+			else
+				var olddescriptionid = "null"
+			$(".description-container").remove();
+			$(".active-task").removeClass("active-task");
+			var clickedtask = this.parentElement.parentElement.parentElement.getAttribute('panel-id');
+			if(clickedtask == olddescriptionid){
+				$(".description-container").remove();
+				$(".active-task").removeClass("active-task");
+				return;
+			} 
+			if($scope.taskJson[clickedtask].taskDetails[0].taskType == 'Design')
+				var adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+$scope.filterDat.idnamemaprel[$scope.taskJson[clickedtask].releaseid]+'">Release: '+$scope.filterDat.idnamemaprel[$scope.taskJson[clickedtask].releaseid]+'</li><li class="description-item" title="Cycle: '+$scope.filterDat.idnamemapcyc[$scope.taskJson[clickedtask].cycleid]+'">Cycle: '+$scope.filterDat.idnamemapcyc[$scope.taskJson[clickedtask].cycleid]+'</li><li class="description-item" title="Apptype: '+$scope.taskJson[clickedtask].appType+'">Apptype: '+$scope.taskJson[clickedtask].appType+'</li></div>';
+			else
+				var adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+$scope.filterDat.idnamemaprel[$scope.taskJson[clickedtask].testSuiteDetails[0].releaseid]+'">Release: '+$scope.filterDat.idnamemaprel[$scope.taskJson[clickedtask].testSuiteDetails[0].releaseid]+'</li><li class="description-item" title="Cycle: '+$scope.filterDat.idnamemapcyc[$scope.taskJson[clickedtask].testSuiteDetails[0].cycleid]+'">Cycle: '+$scope.filterDat.idnamemapcyc[$scope.taskJson[clickedtask].testSuiteDetails[0].cycleid]+'</li><li class="description-item" title="Apptype: '+$scope.taskJson[clickedtask].appType+'">Apptype: '+$scope.taskJson[clickedtask].appType+'</li></div>';
+			$(adddetailhtml).insertAfter("[panel-id="+clickedtask+"]");
+			$("[panel-id="+clickedtask+"]").addClass("active-task");
+		});		
 	}
 
 	$scope.clearFilter = function(){
 		$("#cycle-filter-list option:disabled").removeAttr('disabled');
 		$scope.filterData['relval']='Select Release';
 		$scope.filterData['cycval']='Select Cycle'; 
+		$scope.filterData['prjval']='Select Project'; 
 		
 		Object.keys($scope.filterData.tasktype).forEach(function(key) {
 			$scope.filterData.tasktype[key] = false;
@@ -394,7 +502,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	}
 	function validID(id){
 		// Checks if neo4j id for relase and cycle in task is valid
-		if(id == 'null' || id == 'undefined' || id == null || id == undefined || id == 'Select Release' || id == 'Select Cycle') return false;
+		if(id == 'null' || id == 'undefined' || id == null || id == undefined || id == 'Select Release' || id == 'Select Cycle' || id == '') return false;
 		return true;
 	}
 
@@ -403,14 +511,22 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		* Another dict for releaseid and cyclelist out of task json
 		* List of apptype and tasktype
 		*/
-		if(!validID(obj.taskDetails[tidx].releaseid)) return;
-		if(!validID(obj.taskDetails[tidx].cycleid)) return;
+		// if(!validID(obj.projectId)) return;
+		// if(!validID(obj.taskDetails[tidx].releaseid)) return;
+		// if(!validID(obj.taskDetails[tidx].cycleid)) return;
 
-		if($scope.filterDat.releaseids.indexOf(obj.taskDetails[tidx].releaseid) == -1){
+		if(validID(obj.projectId) && $scope.filterDat.projectids.indexOf(obj.projectId) == -1){
+			$scope.filterDat.projectids.push(obj.projectId);
+			$scope.filterDat.prjrelmap[obj.projectId] = [obj.taskDetails[tidx].releaseid];
+		}
+		if(validID(obj.taskDetails[tidx].releaseid) && $scope.filterDat.releaseids.indexOf(obj.taskDetails[tidx].releaseid) == -1){
 			$scope.filterDat.releaseids.push(obj.taskDetails[tidx].releaseid);
+			if(validID(obj.projectId) && $scope.filterDat.prjrelmap[obj.projectId].indexOf(obj.taskDetails[tidx].releaseid) == -1){
+				$scope.filterDat.prjrelmap[obj.projectId].push(obj.taskDetails[tidx].releaseid);
+			}
 			$scope.filterDat.relcycmap[obj.taskDetails[tidx].releaseid] = [obj.taskDetails[tidx].cycleid];
 		}
-		if($scope.filterDat.cycleids.indexOf(obj.taskDetails[tidx].cycleid) == -1){
+		if(validID(obj.taskDetails[tidx].cycleid) && $scope.filterDat.cycleids.indexOf(obj.taskDetails[tidx].cycleid) == -1){
 			$scope.filterDat.cycleids.push(obj.taskDetails[tidx].cycleid);
 			$scope.filterDat.relcycmap[obj.taskDetails[tidx].releaseid].push(obj.taskDetails[tidx].cycleid);			
 		}
@@ -427,19 +543,35 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			else
 				var olddescriptionid = "null"
 			$(".description-container").remove();
+			$(".active-task").removeClass("active-task");
 			var clickedtask = this.parentElement.parentElement.parentElement.getAttribute('panel-id');
 			if(clickedtask == olddescriptionid){
 				$(".description-container").remove();
+				$(".active-task").removeClass("active-task");
 				return;
 			} 
 			if($scope.taskJson[clickedtask].taskDetails[0].taskType == 'Design')
-				var adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+$scope.filterDat.idnamemaprel[$scope.taskJson[clickedtask].releaseid]+'">Release: '+$scope.filterDat.idnamemaprel[$scope.taskJson[clickedtask].releaseid]+'</li><li class="description-item" title="Cycle: '+$scope.filterDat.idnamemapcyc[$scope.taskJson[clickedtask].cycleid]+'">Cycle: '+$scope.filterDat.idnamemapcyc[$scope.taskJson[clickedtask].cycleid]+'</li><li class="description-item" title="Apptype: '+$scope.taskJson[0].appType+'">Apptype: '+$scope.taskJson[0].appType+'</li></div>';
+				var adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+$scope.filterDat.idnamemaprel[$scope.taskJson[clickedtask].releaseid]+'">Release: '+$scope.filterDat.idnamemaprel[$scope.taskJson[clickedtask].releaseid]+'</li><li class="description-item" title="Cycle: '+$scope.filterDat.idnamemapcyc[$scope.taskJson[clickedtask].cycleid]+'">Cycle: '+$scope.filterDat.idnamemapcyc[$scope.taskJson[clickedtask].cycleid]+'</li><li class="description-item" title="Apptype: '+$scope.taskJson[clickedtask].appType+'">Apptype: '+$scope.taskJson[clickedtask].appType+'</li></div>';
 			else
-				var adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+$scope.filterDat.idnamemaprel[$scope.taskJson[clickedtask].testSuiteDetails[0].releaseid]+'">Release: '+$scope.filterDat.idnamemaprel[$scope.taskJson[clickedtask].testSuiteDetails[0].releaseid]+'</li><li class="description-item" title="Cycle: '+$scope.filterDat.idnamemapcyc[$scope.taskJson[clickedtask].testSuiteDetails[0].cycleid]+'">Cycle: '+$scope.filterDat.idnamemapcyc[$scope.taskJson[clickedtask].testSuiteDetails[0].cycleid]+'</li><li class="description-item" title="Apptype: '+$scope.taskJson[0].appType+'">Apptype: '+$scope.taskJson[0].appType+'</li></div>';
-			$(adddetailhtml).insertAfter("[panel-id="+clickedtask+"]",1000).hide().show('slow');
+				var adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+$scope.filterDat.idnamemaprel[$scope.taskJson[clickedtask].testSuiteDetails[0].releaseid]+'">Release: '+$scope.filterDat.idnamemaprel[$scope.taskJson[clickedtask].testSuiteDetails[0].releaseid]+'</li><li class="description-item" title="Cycle: '+$scope.filterDat.idnamemapcyc[$scope.taskJson[clickedtask].testSuiteDetails[0].cycleid]+'">Cycle: '+$scope.filterDat.idnamemapcyc[$scope.taskJson[clickedtask].testSuiteDetails[0].cycleid]+'</li><li class="description-item" title="Apptype: '+$scope.taskJson[clickedtask].appType+'">Apptype: '+$scope.taskJson[clickedtask].appType+'</li></div>';
+			$(adddetailhtml).insertAfter("[panel-id="+clickedtask+"]");
+			$("[panel-id="+clickedtask+"]").addClass("active-task");
 		});
 	}
 
+	$('#project-filter-list').change(function(){
+		$('#release-filter-list').val('Select Release');
+		$scope.filterDat.releaseids.forEach(function(cval,i){
+			$('[value='+cval+']').attr('disabled','disabled');
+		});		
+		$scope.filterDat.cycleids.forEach(function(cval,i){
+			$('[value='+cval+']').attr('disabled','disabled');
+		});
+		$scope.filterDat.prjrelmap[$('#project-filter-list').val()].forEach(function(cval,i){
+			$('[value='+cval+']').removeAttr("disabled");
+		});
+	});
+	
 	$('#release-filter-list').change(function(){
 		$('#cycle-filter-list').val('Select Cycle');
 		$scope.filterDat.cycleids.forEach(function(cval,i){
@@ -487,6 +619,10 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	  });
 	});	
 
+	$(".task-catagory").click(function(e){
+		if($(".active.task-catagory")[0].getAttribute("tasks") == this.getAttribute("tasks")) return;
+
+	});
 
 }]);
 

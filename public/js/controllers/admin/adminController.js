@@ -1,4 +1,4 @@
-var domainId, DOMAINID, releaseName, cycleName, count=0,delCount=0,editReleaseId='',editCycleId='',deleteReleaseId='',deleteRelid,deleteCycleId='',deleteCycId,taskName;var releaseNamesArr =[];
+var domainId, DOMAINID, releaseName, cycleName, count=0,delCount=0,editReleaseId='',editCycleId='',deleteReleaseId='',deleteRelid,deleteCycleId='',deleteCycId,taskName,unAssignedFlag=false;var releaseNamesArr =[];
 var createprojectObj = {}; var projectDetails = [];var flag;var projectExists;var updateProjectDetails = [];
 var editedProjectDetails = [];
 var deletedProjectDetails = [];
@@ -183,7 +183,17 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	};
 
 	//	Assign Projects Button Click
-	$scope.assignProjects = function ($event) {
+	$scope.assignProjects = function($event){
+		if(unAssignedFlag == true)
+		{
+			$("#assignProjectModal").modal("show");
+		}
+		else{
+			$scope.assignProjects1();
+		}
+	}
+	$scope.assignProjects1 = function ($event) {
+		$("#assignProjectModal").modal("hide");
 		unAssignedProjects = [];
 		assignedProjects = [];
 		$("#selAssignUser,#selAssignProject").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
@@ -1607,7 +1617,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		event.stopImmediatePropagation();
 	});
 
-	$scope.userConf.click = function() {
+	$scope.userConf.click = function(query) {
 		$(".selectedIcon").removeClass("selectedIcon");
 		$("button.userTypeBtnActive").removeClass('userTypeBtnActive');
 		$("#userTab").find("img").addClass("selectedIcon");
@@ -1624,15 +1634,17 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		this.nocreate = false;
 		this.getUserRoles();
 		this.ciActive = false;
-		if (!this.ldapActive) {
-			this.ldapActive = false;
-			this.ldap = {server: '', fetch: "map", user: '', expired: false};
-		} else {
-			this.ldapActive = true;
-			$scope.userConf.activateLDAP();
+		if (query != "retainldap") {
+			if (!this.ldapActive) {
+				this.ldapActive = false;
+				this.ldap = {server: '', fetch: "map", user: '', expired: false};
+			} else {
+				this.ldapActive = true;
+				$scope.userConf.activateLDAP();
+			}
+			this.ldapAllServerList=[];
+			this.ldapAllUserList=[];
 		}
-		this.ldapAllServerList=[];
-		this.ldapAllUserList=[];
 		this.query0 = '';
 		this.query1 = '';
 	};
@@ -2214,18 +2226,22 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	}
 
 	$scope.moveItems.leftgo = function (to,from) {
+		unAssignedFlag = true;
 		moveItems(to,from);
 	};
 
 	$scope.moveItems.rightgo = function (from,to) {
+		unAssignedFlag = false;
 		moveItems(from,to);
 	};
 
 	$scope.moveItems.leftall = function (to,from) {
+		unAssignedFlag = true;
 		moveAllItems(to,from);
 	};
 
 	$scope.moveItems.rightall = function (from,to) {
+		unAssignedFlag = false;
 		moveAllItems(from,to);
 	};
 

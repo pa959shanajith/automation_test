@@ -52,7 +52,7 @@
             <img alt="Import from Excel" class="" src="images_mindmap/ic-importfromexcel-mindmap.png">
             </label>
             <label>Import from Excel</label>
-            <input id="file-input" on-read-file="showContent($fileContent)" type="file" name="xlsfile" accept=".xls,.xlsx" required="" autofocus="" style="display:none"/>
+            <input id="file-input" on-read-file="getSheetName($fileContent)" type="file" name="xlsfile" accept=".xls,.xlsx" required="" autofocus="" style="display:none"/>
          </div>
       </div>
    </div>
@@ -152,11 +152,11 @@
          <svg id="ct-actionBox">
             <g>
                <g id="ct-saveAction" class="ct-actionButton" ng-click = "actionEvent_W($event)">
-                  <rect x="0" y="0" rx="12" ry="12" width="80px" height="50px"></rect>
+                  <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
                   <text x="23" y="18">Save</text>
                </g>
                <g id="ct-createAction" class="ct-actionButton disableButton" ng-click = "actionEvent_W($event)">
-                  <rect x="100" y="0" rx="12" ry="12" width="80px" height="50px"></rect>
+                  <rect x="100" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
                   <text x="114" y="18">Create</text>
                </g>
             </g>
@@ -289,7 +289,7 @@
          <svg id="ct-actionBox">
             <g>
                <g id="ct-saveAction" class="ct-actionButton" ng-click = "actionEvent($event)">
-                  <rect x="0" y="0" rx="12" ry="12" width="80px" height="50px"></rect>
+                  <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
                   <text x="23" y="18">Save</text>
                </g>
                <!-- <g id="ct-createAction" class="ct-actionButton disableButton" ng-click = "actionEvent($event)">
@@ -365,11 +365,11 @@
          <svg id="ct-actionBox">
             <g>
                <g id="ct-saveAction" class="ct-actionButton" ng-click = "actionEvent($event)">
-                  <rect x="0" y="0" rx="12" ry="12" width="80px" height="50px"></rect>
+                  <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
                   <text x="23" y="18">Save</text>
                </g>
                <g id="ct-createAction" class="ct-actionButton disableButton" ng-click = "actionEvent($event)">
-                  <rect x="100" y="0" rx="12" ry="12" width="80px" height="50px"></rect>
+                  <rect x="100" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
                   <text x="114" y="18">Create</text>
                </g>
             </g>
@@ -397,6 +397,7 @@
                   <!--Modal Content-->
                </div>
                <div class="modal-footer">
+                  <span class="view-msg"></span>
                   <button ng-click="clearNodes()" type="button" id="resetObjRow" class="btn btn-default">Reset</button>
                   <button ng-click="createNodes($event)" type="button" id="rubmitObjRow" class="btn btn-default">Create</button>
                </div>
@@ -654,3 +655,24 @@
       </div>
    </div>
 </div>
+
+<!-- MIndmaps excel sheetname confirmation dialog-->
+<div class="modal fade" id="SheetInput" role="dialog" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog modal-sm">
+       <div class="modal-content">
+          <div class="modal-header">
+             <button type="button" class="close" data-dismiss="modal">&times;</button>
+             <h4 class="modal-title">Select a Sheet</h4>
+          </div>
+          <div class="modal-body">
+             <select class="sheet-list" ng-model="sheetname">
+                <option value="" disabled selected>Please Select Sheet</option>
+                <option ng-repeat="sheet in sheetnames" value='{{sheet}}'>{{sheet}}</option>
+             </select>
+          </div>
+          <div class="modal-footer">
+             <button type="button" class="btn btn-default" ng-click="showContent(sheetname)">OK</button>
+          </div>
+       </div>
+    </div>
+ </div>

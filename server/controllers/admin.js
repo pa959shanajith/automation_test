@@ -145,9 +145,27 @@ exports.manageUserDetails = function(req, res){
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occured in admin/manageUserDetails Error Code : ERRNDAC");
-					res.status(500).send("fail");
+					res.status(500).send("fail");					
 				} else {
-					return res.send(result.rows);
+					if(action == 'delete'){
+						qList.push({"statement":"match p = (m)-[FNTT]-(t:TASKS{assignedTo:'"+reqData.userid+"'}) where t.status = 'assigned' or t.status = 'inprogress' or t.status = 'reassign' detach delete t;"});
+						qList.push({"statement":"match p = (m)-[FNTT]-(t:TASKS{reviewer:'"+reqData.userid+"'}) where t.status = 'review' detach delete t;"});
+						qList.push({"statement":"match p = (m)-[FNTT]-(t:TASKS{assignedTo:'"+reqData.userid+"'}) set m.assignedTo = '' "});
+						qList.push({"statement":"match p = (m)-[FNTT]-(t:TASKS{reviewer:'"+reqData.userid+"'}) set m.reviewer = '' "});
+					}
+
+					logger.info("Calling neo4jAPI execute queries for manageUserDetails");
+					neo4jAPI.executeQueries(qList,function(status1,result1){
+						if(status1!=200){
+							logger.error("Error in neo4jAPI execute queries with status for manageUserDetails: %d",status1,"\n response for manageUserDetails:%s",result1);
+							return res.send(result.rows);
+						}
+						else{
+							logger.info('neo4jAPI execute queries for manageUserDetails executed successfully');
+							return res.send(result.rows);
+						}
+					});					
+					
 				}
 			});
 		} else {
@@ -2138,7 +2156,7 @@ exports.manageSessionData = function (req, res) {
 										username: e.username,
 										id: Buffer.from(e.uniqueId).toString("base64"),
 										role: e.activeRole,
-										loggedin: (new Date(e.cookie.expires)).toLocaleString(),
+										loggedin: (new Date(e.loggedin)).toLocaleString(),
 										ip: e.ip
 									});
 								}

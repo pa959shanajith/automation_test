@@ -357,11 +357,14 @@
                 var label = $("#jLabel").val().split(" ");
                 var attachment = $("#scrnShotPath").val();
                 var pissue = $("#jpIssueid").val();
+				var reportId=$('.reportId').text();
+				var executionId=$('.executionId').text();
+				var slno=$('#inputSlno').val();
                 if (!projectid) $("#jProjects").css('border-color', 'red');
                 else if (!issuetype || issuetype == "Select Issue") $("#jIssuetype").css('border-color', 'red');
                 else if (!summary) $("#jSummary").css('border-color', 'red');
                 //else if(!description) $("#jDescription").css('border-color','red');
-                else if (!priority || priority == "Select Priority") $("#jPriority").css('border-color', 'red');
+                //else if (!priority || priority == "Select Priority") $("#jPriority").css('border-color', 'red');
                 //else if(!label) $("#jLabel").css('border-color','red');
                 //else if(!attachment) $("#jAttachment").css('border-color','red');
                 else {
@@ -378,7 +381,10 @@
                             'url': url,
                             'username': userName,
                             'password': pwd,
-                            'parentissue': ''
+                            'parentissue': '',
+							'reportId':reportId,
+							'slno':slno,
+							'executionId':executionId
                         },
                         "action": "createIssueInJira"
                     }
@@ -411,7 +417,7 @@
                                 $(".statusWindow").show();
                                 $("#showStatus").text("Invalid Session. Login again");
                             } else {
-                                getRows[parseInt($("#inputSlno").val()) - 1].children[7].innerText = data;
+                                getRows[parseInt($("#inputSlno").val()) - 1].children[9].innerText = data;
                                 $(".createIssueWindow").hide();
                                 $(".statusWindow").show();
                                 $("#showStatus").text("Issue bearing ID " + data + " created successfully.");
@@ -668,7 +674,7 @@
         }
          .rDActualRes {
             width: 12.3%;
-            word-break: break-word;
+            word-break: break-all;
         }
         .reportsDetails th:nth-child(9) {
             width: 6.1%;
@@ -685,7 +691,8 @@
             display: table-cell;
             border-bottom: 1px solid #ececec;
             border-right: 1px solid #ececec;
-            word-wrap: break-word
+            word-wrap: break-word;
+            word-break: break-all
         }
 
         .reportsDetail {
@@ -1265,7 +1272,7 @@
         }		
 
         .scroll-table-container {    /* border: 2px solid green; */
-            height: 92%;
+            height: 90%;
             width: 100%;
             overflow-y: scroll;
             box-sizing: border-box;
@@ -1381,6 +1388,8 @@
                 <label>Domain :</label><span>{{domainName}}</span>
                 <label>Browser Type :</label><span>{{browserType}}</span>
                 <label>Browser Version :</label><span>{{browserVersion}}</span>
+				<span style='visibility:hidden' class="reportId">{{reportId}}</span>
+				<span style='visibility:hidden' class="executionId">{{executionId}}</span>
             </div>
             <div id="rightSummaryFunc" class="rightSummaryFunc">
                 <div class="reportStatus">
@@ -1448,7 +1457,7 @@
                     <th>Expected Result</th>
                     <th>Actual Result</th>
                     <th style="display:none">Status</th>
-                    <th>Defect ID</th>
+                    <th>JIRA Defect ID</th>
                     {{!--
                     <th>Expected Result</th> --}}
                 </thead>
@@ -1457,7 +1466,7 @@
                 <table class="scroll-table">
                     <tbody class="reportsDetail">
                         {{#each rows}}
-                        <tr style="width: 100%;" class="reportdetailsrow" data-id={{id}} data-parentid={{parentId}}>
+                        <tr style="width: 100%;" class="reportdetailsrow" data-id="{{id}}" data-parentid="{{parentId}}">
                             <td class="rDid tabCont">{{slno}}</td>
                             <td class="rDstep tabCont">{{Step}}</td>
                             <td class="{{getClass StepDescription}}" style="display:none; padding-left: 10px; font-weight:{{getStyle StepDescription}}">{{StepDescription}}</td>
@@ -1484,7 +1493,7 @@
                             <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}},<text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text></td>
                             {{/ifnotEquals}} {{/ifEquals}}
                             <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}}; display:none" data-screenshot="{{screenshot_path}}">{{status}}</td>
-                            <td class="rjira tabCont"><span class="opendescpopup" title="Create Issue"></span></td>
+                            <td class="rjira tabCont"><span class="opendescpopup" title="Create Issue">{{jira_defect_id}}</span></td>
                             <td class='hide hideStep'>{{hidestep}}</td>
                         </tr>
                         {{/each}}
@@ -1518,7 +1527,7 @@
                 <p id='parentIssue'><label>Parent Issue Id<span class="mandatory">*</span></label><input type="text" class="jirapopupinput" id="jpIssueid" /></p>
                 <p><label>Summary<span class="mandatory">*</span></label><input type="text" class="jirapopupinput" id="jSummary" maxlength="255" title="Maximum 255 characters accepted." /></p>
                 <p><label>Description</label><textarea class="jirapopupinput" id="jDescription"></textarea></p>
-                <p><label>Priority<span class="mandatory">*</span></label><select class="jirapopupinput" id="jPriority"><option value="" selected disabled>Select Priority</option></select></p>
+                <p><label>Priority</label><select class="jirapopupinput" id="jPriority"><option value="" selected disabled>Select Priority</option></select></p>
                 <p><label>Label</label><textarea class="jirapopupinput" id="jLabel"></textarea></p>
                 <p><label>Attachment Path</label><input type="text" id="scrnShotPath" class="jirapopupinput" /></p>
                 <p><span class="error-msg"></span><button type="button" class="cancelIssues">Cancel</button><button type="button" class="createIssues">Create</button></p>

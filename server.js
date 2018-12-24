@@ -82,10 +82,10 @@ if (cluster.isMaster) {
         module.exports.httpsServer = httpsServer;
         var io = require('./server/lib/socket');
 
-        //Caching static files for One Day
-        var oneDay = 86400000; // in milliseconds
+        //Caching static files for thirtyDays 
+        var thirtyDays = 2592000; // in milliseconds
         app.use(express.static(__dirname + "/public/", {
-            maxage: oneDay
+            maxage: thirtyDays
         }));
 
         //serve all asset files from necessary directories
@@ -139,17 +139,36 @@ if (cluster.isMaster) {
             return next();
         });
 
-        app.use(helmet());
-        app.use(lusca.p3p('ABCDEF'));
-        app.use(helmet.referrerPolicy({
-            policy: 'same-origin'
-        }));
-        var ninetyDaysInSeconds = 7776000;
-        app.use(helmet.hpkp({
-            maxAge: ninetyDaysInSeconds,
-            sha256s: ['AbCdEf123=', 'ZyXwVu456=']
-        }));
-        app.use(helmet.noCache());
+        //Based on NGINX Config Security Headers are configured
+        if(process.env.NGINX_ON == "FALSE"){
+            app.use(helmet());
+            app.use(lusca.p3p('/w3c/p3p.xml", CP="IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT'));
+            app.use(helmet.referrerPolicy({
+                policy: 'same-origin'
+            }));
+            var ninetyDaysInSeconds = 7776000;
+            app.use(helmet.hpkp({
+                maxAge: ninetyDaysInSeconds,
+                sha256s: ['base64+primary==', 'base64+backup==']
+            }));
+            app.use(helmet.contentSecurityPolicy({
+                directives: {
+                    imgSrc: ["'self'", 'data:'],
+                    //   fontSrc: ["'self'"],
+                    objectSrc: ["'none'"],
+                    mediaSrc: ["'self'"],
+                    frameSrc: ["data:"]
+                }
+            }));
+            //CORS
+            app.all('*', function(req, res, next) {
+                var origin = req.get('host');
+                res.setHeader('Access-Control-Allow-Origin', origin);
+                res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+                next();
+            });
+        // app.use(helmet.noCache());
+        }
 
         app.post('/restartService', function(req, res) {
             logger.info("Inside UI Service: restartService");
@@ -261,23 +280,7 @@ if (cluster.isMaster) {
                 logger.error("Please run the Service API and Restart the Server");
             });
         });
-        //CORS
-        app.all('*', function(req, res, next) {
-            var origin = req.get('host');
-            res.setHeader('Access-Control-Allow-Origin', origin);
-            res.header('Access-Control-Allow-Headers', 'X-Requested-With');
-            next();
-        });
-        //Content Security Policy Enabled for Images and Fonts.
-        app.use(helmet.contentSecurityPolicy({
-            directives: {
-                imgSrc: ["'self'", 'data:'],
-                //   fontSrc: ["'self'"],
-                objectSrc: ["'none'"],
-                mediaSrc: ["'self'"],
-                frameSrc: ["data:"]
-            }
-        }));
+    
 
         app.get('/', function(req, res) {
             res.clearCookie('connect.sid');
@@ -438,6 +441,9 @@ if (cluster.isMaster) {
         } catch (Ex) {
             process.env.projectVersioning = "disabled";
             logger.warn('Versioning is disabled');
+            app.post('/getProjectsNeo', function(req,res){
+                res.send("false");
+            });
         }
 
         // Route Mapping
@@ -456,6 +462,8 @@ if (cluster.isMaster) {
         app.post('/excelToMindmap', mindmap.excelToMindmap);
         app.post('/getScreens',mindmap.getScreens);
         app.post('/exportToExcel',mindmap.exportToExcel);
+        app.post('/getDomain',mindmap.getDomain);
+        
         //Login Routes
         app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
         app.post('/loadUserInfo_Nineteen68', login.loadUserInfo_Nineteen68);
@@ -547,7 +555,7 @@ if (cluster.isMaster) {
         app.post('/APG_OpenFileInEditor', flowGraph.APG_OpenFileInEditor);
         app.post('/APG_createAPGProject', flowGraph.APG_createAPGProject);
         //-------------SERVER START------------//
-        var hostFamilyType = '0.0.0.0';
+        var hostFamilyType = process.env.NGINX_ON == "TRUE" ? '127.0.0.1' : '0.0.0.0';
         var portNumber = process.env.serverPort;
         httpsServer.listen(portNumber, hostFamilyType); //Https Server
         try {

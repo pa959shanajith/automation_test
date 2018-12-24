@@ -30,7 +30,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 	socket.on('ICEnotAvailable', function () {
 		unblockUI();
-		openDialogExe("Execute Test Suite", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+		openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
 	});
 	/*var taskAuth;
 	if(window.localStorage['_CT'] == "")
@@ -438,6 +438,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			// 	$("#parentExecute").prop("checked", false);
 			// }
 			//}
+			var suiteidsexecution = [];
+			$(".parentSuiteChk:checked").each(function(i,e){suiteidsexecution.push(e.getAttribute('id').split('_')[1])});
+			window.localStorage.setItem("executionidxreport", JSON.stringify({"idxlist":suiteidsexecution}));			
 		},
 		function(error) {
 			console.log("Error")
@@ -526,6 +529,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		var batchDetails = {};
 		//updateTestSuite
 		var loopingtimes=0;
+		var suiteidsexecution = [];
+		$(".parentSuiteChk:checked").each(function(i,e){suiteidsexecution.push(e.getAttribute('id').split('_')[1])});
+		window.localStorage.setItem("executionidxreport", JSON.stringify({"idxlist":suiteidsexecution}));
 		$.each($(".parentSuiteChk"), function(){
 			var suiteInfo = {};
 			var suiteDetails = {};
@@ -774,12 +780,18 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				}
 			});
 		}
-		console.log("moduleInfo:::" + $scope.moduleInfo)
+		//console.log("moduleInfo:::" + $scope.moduleInfo)
 		//moduleInfo.push(suiteInfo);
 		//Getting each row data as an object
-		if((appType != "SAP" && appType != "Mainframe") && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select a browser")
+		if((appType == "Web" ) && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select a browser")
+		else if(appType == "Webservice" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select Web Services option")
+		else if(appType == "MobileApp" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select Mobile Apps option")
+		else if(appType == "Desktop" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select Desktop Apps option")
+		else if(appType == "Mainframe" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select Mainframe option")
+		else if(appType == "DesktopJava" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select OEBS Apps option")
 		else if(appType == "SAP" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select SAP Apps option")
-
+		else if(appType == "MobileWeb" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select Mobile Web option")
+		else if(browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select "+appType+" option")
 		else if($(".exe-ExecuteStatus input:checked").length == 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute")
 		else{
 			//if(appType == "SAP") browserTypeExe = ["1"];
@@ -794,7 +806,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					$('#executionTerminated').find('.btn-default').focus();
 				}
 				else if(data == "unavailableLocalServer"){
-					openDialogExe("Execute Test Suite", "ICE Engine is not available. Please run the batch file and connect to the Server.")
+					openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg)
 					//$('#executionserverunavailable').modal('show');
 				}
 				else if(data == "scheduleModeOn")

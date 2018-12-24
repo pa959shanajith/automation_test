@@ -43,6 +43,7 @@
      transform: translateX(50%) translateY(50%);
      -moz-transform: translateX(50%) translateY(50%);
      -webkit-transform: translateX(-50%) translateY(-50%);
+     -ms-transform: translateX(-45%) translateY(-45%);
      background-color: #e6e7e9;
      width: 496px;
      height: 200px;
@@ -459,7 +460,7 @@
     padding:0 10px;
     top:0px;
     z-index:100;
-    height:34px;
+    height:40px;
     width:83%;
     background-color:#e6e7e9;
     border:1px solid#e6e7e9;
@@ -508,7 +509,7 @@
  #ct-expand-left.ct-rev{
     position:relative;
     left:160px;
-    z-index:9999;
+    z-index:9999
 }
  #ct-expand-left.ct-rev::after{
     left:-5px;
@@ -522,7 +523,7 @@
  #ct-expand-right.ct-rev{
     position:relative;
     right:84px;
-    z-index:9999;
+    z-index:9999
 }
  #ct-expand-right.ct-expand::after{
     left:-5px;
@@ -571,6 +572,18 @@
  .ct-project-tab{
     height:30px ;
     overflow:hidden
+}
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none){
+    #ct-moduleBox {
+        width:100%;
+        left:none;
+        margin-left:-11.5%;
+    } 
+    #ct-AssignBox{
+        width:100%;
+        left:none;
+        margin-left:-11.5%;
+    }   
 }
  .ct-nodeBox .ct-node{
     position:relative;
@@ -1279,6 +1292,8 @@
 }
  #ctExpandCreate img, #ctExpandAssign img {
      vertical-align: bottom;
+     position: absolute;
+     top: -8px;
 }
  .searchbox-assign, .searchbox-create{
      margin-left:6.5%;
@@ -1470,7 +1485,7 @@
     padding: 2px;    
 }
 #search-canvas-icon{
-    width: 27px;
+    /*width: 27px;*/
     height: 25px;
     left: 3px;
     top: 9px;
@@ -1552,4 +1567,15 @@
   }
   .my-btn:hover{
   background: #643693;
+}
+.view-msg{
+    float: left;
+    text-align: left;
+    color: red;
+}
+.modal-body p{
+    word-wrap: break-word;
+}
+#export-excel{
+    padding-left: 15px;
 }

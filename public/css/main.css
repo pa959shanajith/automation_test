@@ -540,7 +540,8 @@ input[type="radio"]{
 }
 
 .task-heading {
-    font-family: LatoWeb
+    font-family: LatoWeb;
+    -moz-margin-start: -13px;
 }
 
 .list-inline-right {
@@ -700,7 +701,7 @@ input[type="radio"]{
     font-size: 14px;
     border-radius: 20px;
     height: 25px;
-    width: 75px;
+    width: 80px;
     background: #a08ab7;
     color: white;
     font-weight: lighter;
@@ -786,6 +787,16 @@ input[type="radio"]{
     white-space: nowrap; 
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.task-switch{
+    color: #633693!important;
+}
+.active-task{
+    border: none!important;
+    background: #dad8d8!important;
+    padding: 1px!important; 
+    margin-top: 0px !important;   
 }
 /*****************Plugin CSS*****************/
 
@@ -950,7 +961,8 @@ input[type="radio"]{
 	transition: opacity .2s;
 	-webkit-transition: opacity .2s;
 	transition-timing-function: ease-out;
-	-webkit-transition-timing-function: ease-out;
+    -webkit-transition-timing-function: ease-out;
+    pointer-events: none;
 }
 
 #left-top-section ul li a.disableActions:hover, #left-top-section ul li a.disableActions:hover span img{
@@ -2416,6 +2428,8 @@ input[disabled]{
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-align: center;
+    vertical-align: middle;
 }
 .designDataTable tbody tr, .ui-widget-content{cursor: pointer;}
 .executionDataTable th, .executionDataTable td, .scheduleDataHeader span, .scheduleDataBodyRow div, .designDataTable th, .designDataTable td{
@@ -2528,9 +2542,19 @@ input[disabled]{
 	border: 1px solid #5e636b;
     border-radius: 4px;
 }
-.scenarioBody tr td:first-child{text-align: left;}
-.scenarioBody tr td:first-child span{margin-right: 10px; margin-left: 4px; position: relative; bottom: 5px;}
-.scenarioBody tr td:first-child input{position: relative;top: 2px;}
+.scenarioBody tr td:first-child{text-align: left; float: left; width: 100%;}
+.scenarioBody tr td:first-child span{/*margin-right: 10px; margin-left: 4px; position: relative; bottom: 5px;*/
+    float: left;
+    width: 50%;
+    margin-top: 5%;
+}
+.scenarioBody tr td:first-child input{
+    position: relative;
+    top: 2px;  
+    left: 0px;  
+    float: left;
+    width: auto;
+}
 
 .selectBrowser, .selectBrowserSc{
 	cursor: pointer;
@@ -4461,6 +4485,11 @@ select:-webkit-autofill:focus {
     left: 61px;
     margin: 3px;
 }
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    .filterIcon{
+        left: 28px;
+        }
+    }
 .searchInput{
 	  border-radius: 7px 0px 0px 7px;
     border: none;
@@ -4506,6 +4535,11 @@ select:-webkit-autofill:focus {
     border: 1px solid #461F6E;
     outline: none !important;
     padding: 10px !important;
+}
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    .reports-search{
+        padding: 5px !important;
+       }
 }
 .search-reports{
     float: right;
@@ -5734,8 +5768,11 @@ ul.browserInlineIcons
 }
 .reportDataTable tr,.reportScenarioDataTable tr
 {
-    width: 100%;
+    /* width: 80%; */
     font-family: Latoweb;
+    float: left;
+    width: 100%;
+    display: table;
 }
 
 .reportDataTable th:nth-child(1),.reportDataTable td:nth-child(1){width: 4%;  word-break: break-word; }
@@ -5972,4 +6009,8 @@ ul.browserInlineIcons
 .colorStatusYellow
 {
     color: #333;
+}
+.colorStatusBlue
+{
+    color: blue;
 }

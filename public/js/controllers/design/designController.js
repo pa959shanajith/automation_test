@@ -17,7 +17,7 @@ var gsElement = [];
 window.localStorage['selectRowStepNo'] = '';
 window.localStorage['_modified'] = "";
 var getWSTemplateData = {} //Contains Webservice saved data
-var appType, projectId, projectDetails, screenName, testCaseName, subTaskType,subTask,draggedEle,getDraggedEle,allTasks;
+var appType, projectId, projectDetails, screenName, testCaseName, subTaskType, subTask, draggedEle, getDraggedEle, allTasks;
 var updatedViewString = {};
 var allScreenNames = [];
 var reusedScreens = [];
@@ -37,14 +37,13 @@ var getIndexOfDeletedObjects = [];
 var newScrapedData;
 var saveScrapeDataFlag = false;
 window.localStorage['disableEditing'] = "false";
-mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$location', '$timeout', 'DesignServices', 'mindmapServices','cfpLoadingBar', '$window', 'socket', function($scope, $rootScope, $http, $location, $timeout, DesignServices, mindmapServices,cfpLoadingBar, $window, socket) 
-{
+mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$location', '$timeout', 'DesignServices', 'mindmapServices', 'cfpLoadingBar', '$window', 'socket', function ($scope, $rootScope, $http, $location, $timeout, DesignServices, mindmapServices, cfpLoadingBar, $window, socket) {
     $rootScope.compareFlag = false;
     $("body").css("background", "#eee");
     $("#tableActionButtons, .designTableDnd").delay(500).animate({
         opacity: "1"
     }, 500);
-    $timeout(function() {
+    $timeout(function () {
         $('.scrollbar-inner').scrollbar();
         $('.scrollbar-macosx').scrollbar();
         document.getElementById("currentYear").innerHTML = new Date().getFullYear()
@@ -77,7 +76,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         return;
     }
     //Default Function to reset all input, select
-    $scope.resetTextFields = function() {
+    $scope.resetTextFields = function () {
         $("input").val('');
         $("select").prop('selectedIndex', 0);
         $(".addObj-row").find("input").removeClass('inputErrorBorder')
@@ -87,9 +86,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     //Default Function to reset all input, select
     socket.on('ICEnotAvailable', function () {
         unblockUI();
-		openDialog("Debug Testcase", "ICE Engine is not available. Please run the batch file and connect to the Server.");
-	});
-    var current_task=JSON.parse(window.localStorage['_CT']);
+        openDialog("Debug Testcase", $rootScope.unavailableLocalServer_msg);
+    });
+    var current_task = JSON.parse(window.localStorage['_CT']);
     var getTaskName = current_task.taskName;
     appType = current_task.appType;
     screenName = current_task.screenName;
@@ -97,10 +96,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     subTaskType = current_task.subTaskType;
     subTask = current_task.subtask;
     status = current_task.status;
-	if(status=='review'){
-				$('.submitTaskBtn').text('Approve');
-				$('.reassignTaskBtn').show();
-	}
+    if (status == 'review') {
+        $('.submitTaskBtn').text('Approve');
+        $('.reassignTaskBtn').show();
+    }
 
     $("#page-taskName").empty().append('<span class="taskname">' + getTaskName + '</span>');
     $(".projectInfoWrap").empty()
@@ -117,7 +116,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     $scope.getScreenView = appType
     //Getting Apptype orScreen Type
     cfpLoadingBar.start()
-    $timeout(function() {
+    $timeout(function () {
         if (window.location.href.split("/")[3] == "designTestCase" || $scope.getScreenView == "Webservice" && window.location.href.split("/")[3] == "designTestCase") {
             angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
         } else if (window.location.href.split("/")[3] == "design" && $scope.getScreenView != "Webservice") {
@@ -130,7 +129,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     }, 1500)
 
 
-    $timeout(function() {
+    $timeout(function () {
         projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
         releaseName = angular.element(document.getElementById("left-nav-section")).scope().releaseDetails;
         cycleName = angular.element(document.getElementById("left-nav-section")).scope().cycleDetails;
@@ -148,7 +147,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
     }, 3000)
 
-//console.log("screenName:", screenName);
+    //console.log("screenName:", screenName);
     // if (window.localStorage['_TJ']) {
     //     allTasks = JSON.parse(window.localStorage['_TJ']);
     //     if(allTasks.length > 0)
@@ -220,17 +219,16 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     var keywordValArr = [];
     var proceed = false;
 
-//Submit Task Screen
-	$scope.submitTasksScreen = function(action){
-		$("#submitTasksScreen").modal("show")
-		if(action=='reassign'){
+    //Submit Task Screen
+    $scope.submitTasksScreen = function (action) {
+        $("#submitTasksScreen").modal("show")
+        if (action == 'reassign') {
             $scope.stask = 'reassign';
             $("#submitTasksScreen").find('.modal-title').text('Reassign Task');
-			$("#submitTasksScreen").find('.modal-body p').text('Are you sure you want to reassign the task ?')
-			//$("#submitTasksScreen").find('.modal-footer button')[0].setAttribute('ng-click',"submit_task('reassign')")
+            $("#submitTasksScreen").find('.modal-body p').text('Are you sure you want to reassign the task ?')
+            //$("#submitTasksScreen").find('.modal-footer button')[0].setAttribute('ng-click',"submit_task('reassign')")
         }
-        if(action == 'submit'  &&  $(".submitTaskBtn:visible").text() == 'Approve' )
-        {
+        if (action == 'submit' && $(".submitTaskBtn:visible").text() == 'Approve') {
             $scope.stask = 'approve';
             $("#submitTasksScreen").find('.modal-title').text('Approve Task');
             $("#submitTasksScreen").find('.modal-body p').text('Are you sure you want to approve the task ?')
@@ -239,21 +237,21 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         //     $("#submitTasksScreen").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('"+action+"')")
         // }
 
-	}
-	//Submit Task Screen
+    }
+    //Submit Task Screen
 
-	//Submit Tast Test Case
-	$scope.submitTasksTestCase = function(action){
-		
-		$("#submitTasksTestCase").modal("show")
-		if(action=='reassign'){
-            $scope.stask='reassign';
+    //Submit Tast Test Case
+    $scope.submitTasksTestCase = function (action) {
+
+        $("#submitTasksTestCase").modal("show")
+        if (action == 'reassign') {
+            $scope.stask = 'reassign';
             $("#submitTasksTestCase").find('.modal-title').text('Reassign Task');
-			$("#submitTasksTestCase").find('.modal-body p').text('Are you sure you want to reassign the task ?')
-			//$("#submitTasksTestCase").find('.modal-footer button')[0].setAttribute('ng-click',"submit_task('reassign')")
+            $("#submitTasksTestCase").find('.modal-body p').text('Are you sure you want to reassign the task ?')
+            //$("#submitTasksTestCase").find('.modal-footer button')[0].setAttribute('ng-click',"submit_task('reassign')")
         }
-        if(action == 'submit' &&  $(".submitTaskBtn:visible").text() == 'Approve')
-        {   $scope.stask='approve';
+        if (action == 'submit' && $(".submitTaskBtn:visible").text() == 'Approve') {
+            $scope.stask = 'approve';
             $("#submitTasksTestCase").find('.modal-title').text('Approve Task');
             $("#submitTasksTestCase").find('.modal-body p').text('Are you sure you want to approve the task ?')
         }
@@ -261,145 +259,145 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         //     $("#submitTasksTestCase").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('"+action+"')")
         // }
 
-	}
-	//Submit task Test Case
+    }
+    //Submit task Test Case
 
-    $scope.readTestCase_ICE = function() {
+    $scope.readTestCase_ICE = function () {
         var taskInfo = JSON.parse(window.localStorage['_CT']);
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
         var testCaseName = taskInfo.testCaseName;
-		var versionnumber = taskInfo.versionnumber;
+        var versionnumber = taskInfo.versionnumber;
         appType = taskInfo.appType;
         enabledEdit = "false";
         blockUI("Loading...");
         // service call # 1 - getTestScriptData service call
         DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
-            .then(function(data) {
-                    if (data == "Invalid Session") {
-                        $rootScope.redirectPage();
-                        return;
-                    }
-                    //console.log(data);
-                    var appType = taskInfo.appType;
-                    $('#jqGrid').removeClass('visibility-hide').addClass('visibility-show');
-                    // removing the down arrow from grid header columns - disabling the grid menu pop-up
-                    $('.ui-grid-icon-angle-down').removeClass('ui-grid-icon-angle-down');
-                    $("#jqGrid").jqGrid('clearGridData');
-                    /*if(itemLabelName == "Runtime_Settings"){
-                    }else {
-                    }*/
-                    $('#jqGrid').show();
-                    // service call # 2 - objectType service call
-                    DesignServices.getScrapeDataScreenLevel_ICE(screenId)
-                        .then(function(data2) {
-                                if (data2 == "Invalid Session") {
+            .then(function (data) {
+                if (data == "Invalid Session") {
+                    $rootScope.redirectPage();
+                    return;
+                }
+                //console.log(data);
+                var appType = taskInfo.appType;
+                $('#jqGrid').removeClass('visibility-hide').addClass('visibility-show');
+                // removing the down arrow from grid header columns - disabling the grid menu pop-up
+                $('.ui-grid-icon-angle-down').removeClass('ui-grid-icon-angle-down');
+                $("#jqGrid").jqGrid('clearGridData');
+                /*if(itemLabelName == "Runtime_Settings"){
+                }else {
+                }*/
+                $('#jqGrid').show();
+                // service call # 2 - objectType service call
+                DesignServices.getScrapeDataScreenLevel_ICE(screenId)
+                    .then(function (data2) {
+                        if (data2 == "Invalid Session") {
+                            $rootScope.redirectPage();
+                        }
+                        if (appType == "Webservice") {
+                            if (data2 != "") dataFormat12 = data2.header[0].split("##").join("\n");
+                        }
+                        custnameArr.length = 0;
+                        // counter to append the items @ correct indexes of custnameArr
+                        var indexCounter = '';
+                        //window.localStorage['newTestScriptDataList'] = data2.view;
+                        $scope.newTestScriptDataLS = data2.view;
+                        getScrapeDataforCustomObj = data2.view;
+                        $("#window-scrape-screenshotTs .popupContent").empty()
+                        if (data2.mirror == undefined)
+                            $("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS">No Screenshot Available</div>')
+                        else
+                            $("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror + '" /></div>')
+
+                        // service call # 3 -objectType service call
+                        DesignServices.getKeywordDetails_ICE(appType)
+                            .then(function (data3) {
+                                if (data3 == "Invalid Session") {
                                     $rootScope.redirectPage();
                                 }
-                                if (appType == "Webservice") {
-                                    if (data2 != "") dataFormat12 = data2.header[0].split("##").join("\n");
-                                }
-                                custnameArr.length = 0;
-                                // counter to append the items @ correct indexes of custnameArr
-                                var indexCounter = '';
-                                //window.localStorage['newTestScriptDataList'] = data2.view;
-                                $scope.newTestScriptDataLS = data2.view;
-                                getScrapeDataforCustomObj = data2.view;
-                                $("#window-scrape-screenshotTs .popupContent").empty()
-                                if (data2.mirror == undefined)
-                                    $("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS">No Screenshot Available</div>')
-                                else
-                                    $("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror + '" /></div>')
-
-                                // service call # 3 -objectType service call
-                                DesignServices.getKeywordDetails_ICE(appType)
-                                    .then(function(data3) {
-                                            if (data3 == "Invalid Session") {
-                                                $rootScope.redirectPage();
-                                            }
-                                            keywordValArr.length = 0;
-                                            keywordListData = angular.toJson(data3);
-                                            var emptyStr = "{}";
-                                            var len = data.testcase.length;
-                                            if (data == "" || data == null || data == emptyStr || data == "[]" || data.testcase.toString() == "" || data.testcase == "[]" || len == 1) {
-                                                var appTypeLocal1 = "Generic";
-                                                var datalist = [{
-                                                    "stepNo": "1",
-                                                    "custname": "",
-                                                    "objectName": "",
-                                                    "keywordVal": "",
-                                                    "inputVal": "",
-                                                    "outputVal": "",
-                                                    "url": "",
-                                                    "_id_": "",
-                                                    "appType": appTypeLocal1,
-                                                    "remarksStatus": "",
-                                                    "remarks": "",
-                                                    "addTestCaseDetails":"",
-                                                    "addTestCaseDetailsInfo":""
-                                                }];
-                                                readTestCaseData = JSON.stringify(datalist);
-                                                $("#jqGrid").jqGrid('GridUnload');
-                                                $("#jqGrid").trigger("reloadGrid");
-                                                contentTable(data2.view);
-                                                $('.cbox').prop('disabled', false);
-                                                $('.cbox').parent().removeClass('disable_a_href');
-                                                return;
-                                            } else {
-                                                var testcase = JSON.parse(data.testcase);
-                                                var testcaseArray = [];
-                                                for (var i = 0; i < testcase.length; i++) {
-                                                    if ("comments" in testcase[i]) {
-                                                        delete testcase[i];
-                                                        testcase = testcase.filter(function(n) {
-                                                            return n != null
-                                                        });
-                                                    } else {
-                                                        if (appType == "Webservice") {
-                                                            if (testcase[i].keywordVal == "setHeader" || testcase[i].keywordVal == "setHeaderTemplate") {
-                                                                testcase[i].inputVal[0] = testcase[i].inputVal[0].split("##").join("\n")
-                                                            }
-                                                        }
-                                                        testcase[i].stepNo = (i + 1).toString();
-                                                        testcaseArray.push(testcase[i]);
-                                                    }
+                                keywordValArr.length = 0;
+                                keywordListData = angular.toJson(data3);
+                                var emptyStr = "{}";
+                                var len = data.testcase.length;
+                                if (data == "" || data == null || data == emptyStr || data == "[]" || data.testcase.toString() == "" || data.testcase == "[]" || len == 1) {
+                                    var appTypeLocal1 = "Generic";
+                                    var datalist = [{
+                                        "stepNo": "1",
+                                        "custname": "",
+                                        "objectName": "",
+                                        "keywordVal": "",
+                                        "inputVal": "",
+                                        "outputVal": "",
+                                        "url": "",
+                                        "_id_": "",
+                                        "appType": appTypeLocal1,
+                                        "remarksStatus": "",
+                                        "remarks": "",
+                                        "addTestCaseDetails": "",
+                                        "addTestCaseDetailsInfo": ""
+                                    }];
+                                    readTestCaseData = JSON.stringify(datalist);
+                                    $("#jqGrid").jqGrid('GridUnload');
+                                    $("#jqGrid").trigger("reloadGrid");
+                                    contentTable(data2.view);
+                                    $('.cbox').prop('disabled', false);
+                                    $('.cbox').parent().removeClass('disable_a_href');
+                                    return;
+                                } else {
+                                    var testcase = JSON.parse(data.testcase);
+                                    var testcaseArray = [];
+                                    for (var i = 0; i < testcase.length; i++) {
+                                        if ("comments" in testcase[i]) {
+                                            delete testcase[i];
+                                            testcase = testcase.filter(function (n) {
+                                                return n != null
+                                            });
+                                        } else {
+                                            if (appType == "Webservice") {
+                                                if (testcase[i].keywordVal == "setHeader" || testcase[i].keywordVal == "setHeaderTemplate") {
+                                                    testcase[i].inputVal[0] = testcase[i].inputVal[0].split("##").join("\n")
                                                 }
-                                              //  console.log("readTestCase:::", testcaseArray)
-
-                                                readTestCaseData = JSON.stringify(testcaseArray)
-                                                $("#jqGrid_addNewTestScript").jqGrid('clearGridData');
-                                                $("#jqGrid").jqGrid('GridUnload');
-                                                $("#jqGrid").trigger("reloadGrid");
-                                                contentTable(data2.view);
-                                                $('.cbox').prop('disabled', false);
-                                                $('.cbox').parent().removeClass('disable_a_href');
-                                                return;
                                             }
-                                        },
-                                        function(error) {
-                                            console.log("Error in designController.js file getObjectType method! \r\n " + (error.data));
-                                        }); //	getObjectType end
-                                unblockUI();
+                                            testcase[i].stepNo = (i + 1).toString();
+                                            testcaseArray.push(testcase[i]);
+                                        }
+                                    }
+                                    //  console.log("readTestCase:::", testcaseArray)
+
+                                    readTestCaseData = JSON.stringify(testcaseArray)
+                                    $("#jqGrid_addNewTestScript").jqGrid('clearGridData');
+                                    $("#jqGrid").jqGrid('GridUnload');
+                                    $("#jqGrid").trigger("reloadGrid");
+                                    contentTable(data2.view);
+                                    $('.cbox').prop('disabled', false);
+                                    $('.cbox').parent().removeClass('disable_a_href');
+                                    return;
+                                }
                             },
-                            function(error) {
+                            function (error) {
                                 console.log("Error in designController.js file getObjectType method! \r\n " + (error.data));
-                            }); //	getScrapeData end
-                },
-                function(error) {
-                    console.log("Error in designController.js file getTestScriptData method! \r\n " + (error.data));
-                });
+                            }); //	getObjectType end
+                        unblockUI();
+                    },
+                    function (error) {
+                        console.log("Error in designController.js file getObjectType method! \r\n " + (error.data));
+                    }); //	getScrapeData end
+            },
+            function (error) {
+                console.log("Error in designController.js file getTestScriptData method! \r\n " + (error.data));
+            });
 
     }; //	getTestScriptData end
 
     // browser icon clicked
-    $scope.debugTestCase_ICE = function(selectedBrowserType,e) {
+    $scope.debugTestCase_ICE = function (selectedBrowserType, e) {
         var taskInfo = JSON.parse(window.localStorage['_CT']);
         var testcaseID = [];
         var browserType = [];
         browserType.push(selectedBrowserType)
         if (appType == "MobileWeb" || appType == "Mainframe") browserType = [];
         globalSelectedBrowserType = selectedBrowserType;
-        
+
         if (dependentTestCaseFlag == true) {
             testcaseID = checkedTestcases;
         } else {
@@ -409,51 +407,51 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         var blockMsg = 'Debug in Progress. Please Wait...';
         blockUI(blockMsg);
         DesignServices.debugTestCase_ICE(browserType, testcaseID, appType)
-        .then(function(data) {
-            if (data == "Invalid Session") {
-                $rootScope.redirectPage();
-            }
-            if (data == "unavailableLocalServer") {
-                unblockUI();
-                openDialog("Debug Testcase", "ICE Engine is not available. Please run the batch file and connect to the Server.")
-            } else if (data == "success") {
-                unblockUI();
-                openDialog("Debug Testcase", "Debug completed successfully.")
-            } else if (data == "fail") {
-                unblockUI();
-                openDialog("Debug Testcase", "Failed to debug.")
-            } else if (data == "Terminate") {
-                unblockUI();
-                openDialog("Debug Testcase", "Debug Terminated")
-            } else if (data == "browserUnavailable") {
-                unblockUI();
-                openDialog("Debug Testcase", "Browser is not available")
-            } else if (data == "scheduleModeOn") {
-                unblockUI();
-                openDialog("Debug Testcase", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
-            }
+            .then(function (data) {
+                if (data == "Invalid Session") {
+                    $rootScope.redirectPage();
+                }
+                if (data == "unavailableLocalServer") {
+                    unblockUI();
+                    openDialog("Debug Testcase", $rootScope.unavailableLocalServer_msg)
+                } else if (data == "success") {
+                    unblockUI();
+                    openDialog("Debug Testcase", "Debug completed successfully.")
+                } else if (data == "fail") {
+                    unblockUI();
+                    openDialog("Debug Testcase", "Failed to debug.")
+                } else if (data == "Terminate") {
+                    unblockUI();
+                    openDialog("Debug Testcase", "Debug Terminated")
+                } else if (data == "browserUnavailable") {
+                    unblockUI();
+                    openDialog("Debug Testcase", "Browser is not available")
+                } else if (data == "scheduleModeOn") {
+                    unblockUI();
+                    openDialog("Debug Testcase", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
+                }
 
-			//Transaction Activity for DebugTestCase
-            // var labelArr = [];
-            // var infoArr = [];
-            // infoArr.push({"appType" : appType});
-            // infoArr.push({"status" : data});
-            // labelArr.push(txnHistory.codesDict['DebugTestCase']);
-            // txnHistory.log(e.type,labelArr,infoArr,$location.$$path); 										
+                //Transaction Activity for DebugTestCase
+                // var labelArr = [];
+                // var infoArr = [];
+                // infoArr.push({"appType" : appType});
+                // infoArr.push({"status" : data});
+                // labelArr.push(txnHistory.codesDict['DebugTestCase']);
+                // txnHistory.log(e.type,labelArr,infoArr,$location.$$path); 										
 
-        },function(error) {
-            console.log("Error while traversing while executing debugTestcase method!! \r\n " + (error.data));
-        });
+            }, function (error) {
+                console.log("Error while traversing while executing debugTestcase method!! \r\n " + (error.data));
+            });
     }; // browser invocation ends
 
     //Import Test case
-    $scope.importTestCase = function($event) {
+    $scope.importTestCase = function ($event) {
         var counter1 = 0;
         var userInfo = JSON.parse(window.localStorage['_UI']);
         var taskInfo = JSON.parse(window.localStorage['_CT']);
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
-		var versionnumber = taskInfo.versionnumber;
+        var versionnumber = taskInfo.versionnumber;
         var testCaseName = taskInfo.testCaseName;
         var appType = taskInfo.appType;
         var flag = false;
@@ -461,18 +459,20 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         if (readTestCaseData == defaultTestScript) {
             $("#importTestCaseFile").attr("type", "file");
             $("#importTestCaseFile").trigger("click");
-            importTestCaseFile.addEventListener('change', function(e) {
+            importTestCaseFile.addEventListener('change', function (e) {
                 if (counter1 == 0) {
                     // Put the rest of the demo code here.
                     var file = importTestCaseFile.files[0];
                     var textType = /json.*/;
                     var reader = new FileReader();
-                    reader.onload = function(e) {
+                    reader.onload = function (e) {
                         if ((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase() == "json") {
                             var resultString = JSON.parse(reader.result);
                             //var resultString = reader.result;
                             for (i = 0; i < resultString.length; i++) {
-                                if (resultString[i].appType == appType || resultString[i].appType.toLowerCase() == "generic") {
+                                if (resultString[i].appType.toLowerCase() == "generic") {
+                                    flag = true;
+                                } else if (resultString[i].appType == appType) {
                                     flag = true;
                                     break;
                                 } else {
@@ -484,14 +484,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
                             } else {
                                 DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
-                                    .then(function(data) {
+                                    .then(function (data) {
                                         if (data == "Invalid Session") {
                                             $rootScope.redirectPage();
                                         }
                                         if (data == "success") {
                                             angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
                                             openDialog("Import Testcase", "TestCase Json imported successfully.");
-											//Transaction Activity for Import Testcase Button Action
+                                            //Transaction Activity for Import Testcase Button Action
                                             // var labelArr = [];
                                             // var infoArr = [];
                                             // labelArr.push(txnHistory.codesDict['ImportTestCase']);
@@ -499,7 +499,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                         } else {
                                             openDialog("Import Testcase", "Please Check the file format you have uploaded!")
                                         }
-                                    }, function(error) {});
+                                    }, function (error) { });
                             }
                         } else {
                             openDialog("Import Testcase", "Please Check the file format you have uploaded!")
@@ -520,7 +520,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         }
     }
 
-    $(document).on('click', '#btnImportEmptyErrorYes', function() {
+    $(document).on('click', '#btnImportEmptyErrorYes', function () {
         $("#globalModalYesNo").modal("hide");
         var counter2 = 0;
         var userInfo = JSON.parse(window.localStorage['_UI']);
@@ -528,21 +528,23 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
         var testCaseName = taskInfo.testCaseName;
-		var versionnumber = taskInfo.versionnumber;
+        var versionnumber = taskInfo.versionnumber;
         var appType = taskInfo.appType;
         var flag = false;
         $("#overWriteJson").trigger("click");
-        overWriteJson.addEventListener('change', function(e) {
+        overWriteJson.addEventListener('change', function (e) {
             if (counter2 == 0) {
                 // Put the rest of the demo code here.
                 var file = overWriteJson.files[0];
                 var textType = /json.*/;
                 var reader = new FileReader();
-                reader.onload = function(e) {                    
+                reader.onload = function (e) {
                     if ((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase() == "json") {
                         var resultString = JSON.parse(reader.result);
                         for (i = 0; i < resultString.length; i++) {
-                            if (resultString[i].appType == appType || resultString[i].appType.toLowerCase() == "generic") {
+                            if (resultString[i].appType.toLowerCase() == "generic") {
+                                flag = true;
+                            } else if (resultString[i].appType == appType) {
                                 flag = true;
                                 break;
                             } else {
@@ -554,8 +556,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
                         } else {
                             DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
-                                .then(function(data) {
-                                   // console.log("hello");
+                                .then(function (data) {
+                                    // console.log("hello");
                                     if (data == "Invalid Session") {
                                         $rootScope.redirectPage();
                                     }
@@ -565,7 +567,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                     } else {
                                         openDialog("Import Testcase", "Please Check the file format you have uploaded!")
                                     }
-                                }, function(error) {});
+                                }, function (error) { });
                         }
                     } else {
                         openDialog("Import Testcase", "Please Check the file format you have uploaded!")
@@ -579,31 +581,34 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         });
     })
 
-    $("#overWriteJson").on("click", function(e) {
+    $("#overWriteJson").on("click", function (e) {
         angular.element(document.getElementById("left-bottom-section")).scope().importTestCase1(e);
     })
     //Import Testcase1
-    $scope.importTestCase1 = function($event) {
+    $scope.importTestCase1 = function ($event) {
         var counter = 0;
         var userInfo = JSON.parse(window.localStorage['_UI']);
         var taskInfo = JSON.parse(window.localStorage['_CT']);
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
         var testCaseName = taskInfo.testCaseName;
-		var versionnumber = taskInfo.versionnumber;
+        var versionnumber = taskInfo.versionnumber;
         var appType = taskInfo.appType;
         var flag = false;
-        overWriteJson.addEventListener('change', function(e) {
+        overWriteJson.addEventListener('change', function (e) {
             if (counter == 0) {
                 // Put the rest of the demo code here.
                 var file = overWriteJson.files[0];
                 var textType = /json.*/;
                 var reader = new FileReader();
                 if ((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase() == "json") {
-                    reader.onload = function(e) {
+                    reader.onload = function (e) {
                         var resultString = JSON.parse(reader.result);
                         for (i = 0; i < resultString.length; i++) {
-                            if (resultString[i].appType == appType || resultString[i].appType.toLowerCase() == "generic") {
+                            if (resultString[i].appType.toLowerCase() == "generic") {
+                                flag = true;
+                            }
+                            else if (resultString[i].appType == appType) {
                                 flag = true;
                                 break;
                             } else {
@@ -615,14 +620,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
                         } else {
                             DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
-                                .then(function(data) {
+                                .then(function (data) {
                                     if (data == "Invalid Session") {
                                         $rootScope.redirectPage();
                                     }
                                     if (data == "success") {
                                         angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
                                         openDialog("Import Testcase", "TestCase Json imported successfully.");
-										//Transaction Activity for Import Testcase Button Action
+                                        //Transaction Activity for Import Testcase Button Action
                                         // var labelArr = [];
                                         // var infoArr = [];
                                         // labelArr.push(txnHistory.codesDict['ImportTestCase']);
@@ -630,7 +635,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                     } else {
                                         openDialog("Import Testcase", "Please Check the file format you have uploaded!")
                                     }
-                                }, function(error) {});
+                                }, function (error) { });
                         }
                     }
                     reader.readAsText(file);
@@ -645,105 +650,105 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     //Import Test case
 
     //Export Test case
-    $scope.exportTestCase = function($event) {
+    $scope.exportTestCase = function ($event) {
         var taskInfo = JSON.parse(window.localStorage['_CT']);
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
         var testCaseName = taskInfo.testCaseName;
         var versionnumber = taskInfo.versionnumber;
         DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
-            .then(function(response) {
-                    if (response == "Invalid Session") {
-                        $rootScope.redirectPage();
-                    }
-                    var temp, responseData;
-                    if (typeof response === 'object') {
-                        temp = JSON.parse(response.testcase);
-                        responseData = JSON.stringify(temp, undefined, 2);
-                    }
-                    filename = testCaseName + ".json";
-                    var objAgent = $window.navigator.userAgent;
-                    var objbrowserName = navigator.appName;
-                    var objfullVersion = '' + parseFloat(navigator.appVersion);
-                    var objBrMajorVersion = parseInt(navigator.appVersion, 10);
-                    var objOffsetName, objOffsetVersion, ix;
-                    // In Chrome
-                    if ((objOffsetVersion = objAgent.indexOf("Chrome")) != -1) {
-                        objbrowserName = "Chrome";
-                        objfullVersion = objAgent.substring(objOffsetVersion + 7);
-                    }
-                    // In Microsoft internet explorer
-                    else if ((objOffsetVersion = objAgent.indexOf("MSIE")) != -1) {
-                        objbrowserName = "Microsoft Internet Explorer";
-                        objfullVersion = objAgent.substring(objOffsetVersion + 5);
-                    }
-                    // In Firefox
-                    else if ((objOffsetVersion = objAgent.indexOf("Firefox")) != -1) {
-                        objbrowserName = "Firefox";
+            .then(function (response) {
+                if (response == "Invalid Session") {
+                    $rootScope.redirectPage();
+                }
+                var temp, responseData;
+                if (typeof response === 'object') {
+                    temp = JSON.parse(response.testcase);
+                    responseData = JSON.stringify(temp, undefined, 2);
+                }
+                filename = testCaseName + ".json";
+                var objAgent = $window.navigator.userAgent;
+                var objbrowserName = navigator.appName;
+                var objfullVersion = '' + parseFloat(navigator.appVersion);
+                var objBrMajorVersion = parseInt(navigator.appVersion, 10);
+                var objOffsetName, objOffsetVersion, ix;
+                // In Chrome
+                if ((objOffsetVersion = objAgent.indexOf("Chrome")) != -1) {
+                    objbrowserName = "Chrome";
+                    objfullVersion = objAgent.substring(objOffsetVersion + 7);
+                }
+                // In Microsoft internet explorer
+                else if ((objOffsetVersion = objAgent.indexOf("MSIE")) != -1) {
+                    objbrowserName = "Microsoft Internet Explorer";
+                    objfullVersion = objAgent.substring(objOffsetVersion + 5);
+                }
+                // In Firefox
+                else if ((objOffsetVersion = objAgent.indexOf("Firefox")) != -1) {
+                    objbrowserName = "Firefox";
 
+                }
+                // In Safari
+                else if ((objOffsetVersion = objAgent.indexOf("Safari")) != -1) {
+                    objbrowserName = "Safari";
+                    objfullVersion = objAgent.substring(objOffsetVersion + 7);
+                    if ((objOffsetVersion = objAgent.indexOf("Version")) != -1)
+                        objfullVersion = objAgent.substring(objOffsetVersion + 8);
+                }
+                // For other browser "name/version" is at the end of userAgent
+                else if ((objOffsetName = objAgent.lastIndexOf(' ') + 1) < (objOffsetVersion = objAgent.lastIndexOf('/'))) {
+                    objbrowserName = objAgent.substring(objOffsetName, objOffsetVersion);
+                    objfullVersion = objAgent.substring(objOffsetVersion + 1);
+                    if (objbrowserName.toLowerCase() == objbrowserName.toUpperCase()) {
+                        objbrowserName = navigator.appName;
                     }
-                    // In Safari
-                    else if ((objOffsetVersion = objAgent.indexOf("Safari")) != -1) {
-                        objbrowserName = "Safari";
-                        objfullVersion = objAgent.substring(objOffsetVersion + 7);
-                        if ((objOffsetVersion = objAgent.indexOf("Version")) != -1)
-                            objfullVersion = objAgent.substring(objOffsetVersion + 8);
+                }
+                // trimming the fullVersion string at semicolon/space if present
+                if ((ix = objfullVersion.indexOf(";")) != -1) objfullVersion = objfullVersion.substring(0, ix);
+                if ((ix = objfullVersion.indexOf(" ")) != -1) objfullVersion = objfullVersion.substring(0, ix);
+                objBrMajorVersion = parseInt('' + objfullVersion, 10);
+                if (isNaN(objBrMajorVersion)) {
+                    objfullVersion = '' + parseFloat(navigator.appVersion);
+                    objBrMajorVersion = parseInt(navigator.appVersion, 10);
+                }
+                if (objBrMajorVersion == "9") {
+                    if (objbrowserName == "Microsoft Internet Explorer") {
+                        window.navigator.msSaveOrOpenBlob(new Blob([responseData], {
+                            type: "text/json;charset=utf-8"
+                        }), filename);
                     }
-                    // For other browser "name/version" is at the end of userAgent
-                    else if ((objOffsetName = objAgent.lastIndexOf(' ') + 1) < (objOffsetVersion = objAgent.lastIndexOf('/'))) {
-                        objbrowserName = objAgent.substring(objOffsetName, objOffsetVersion);
-                        objfullVersion = objAgent.substring(objOffsetVersion + 1);
-                        if (objbrowserName.toLowerCase() == objbrowserName.toUpperCase()) {
-                            objbrowserName = navigator.appName;
-                        }
-                    }
-                    // trimming the fullVersion string at semicolon/space if present
-                    if ((ix = objfullVersion.indexOf(";")) != -1) objfullVersion = objfullVersion.substring(0, ix);
-                    if ((ix = objfullVersion.indexOf(" ")) != -1) objfullVersion = objfullVersion.substring(0, ix);
-                    objBrMajorVersion = parseInt('' + objfullVersion, 10);
-                    if (isNaN(objBrMajorVersion)) {
-                        objfullVersion = '' + parseFloat(navigator.appVersion);
-                        objBrMajorVersion = parseInt(navigator.appVersion, 10);
-                    }
-                    if (objBrMajorVersion == "9") {
-                        if (objbrowserName == "Microsoft Internet Explorer") {
-                            window.navigator.msSaveOrOpenBlob(new Blob([responseData], {
-                                type: "text/json;charset=utf-8"
-                            }), filename);
-                        }
+                } else {
+                    var blob = new Blob([responseData], {
+                        type: 'text/json'
+                    }),
+                        e = document.createEvent('MouseEvents'),
+                        a = document.createElement('a');
+                    a.download = filename;
+                    if (objbrowserName == "Microsoft Internet Explorer" || objbrowserName == "Netscape") {
+                        window.navigator.msSaveOrOpenBlob(new Blob([responseData], {
+                            type: "text/json;charset=utf-8"
+                        }), filename);
                     } else {
-                        var blob = new Blob([responseData], {
-                                type: 'text/json'
-                            }),
-                            e = document.createEvent('MouseEvents'),
-                            a = document.createElement('a');
-                        a.download = filename;
-                        if (objbrowserName == "Microsoft Internet Explorer" || objbrowserName == "Netscape") {
-                            window.navigator.msSaveOrOpenBlob(new Blob([responseData], {
-                                type: "text/json;charset=utf-8"
-                            }), filename);
-                        } else {
-                            a.href = window.URL.createObjectURL(blob);
-                            a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
-                            e.initMouseEvent('click', true, true, window,
-                                0, 0, 0, 0, 0, false, false, false, false, 0, null);
-                            a.dispatchEvent(e);
-                        }
+                        a.href = window.URL.createObjectURL(blob);
+                        a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+                        e.initMouseEvent('click', true, true, window,
+                            0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                        a.dispatchEvent(e);
                     }
-					//Transaction Activity for Export Testcase Button Action
-                    //  var labelArr = [];
-                    //  var infoArr = [];
-                    //  labelArr.push(txnHistory.codesDict['ExportTestCase']);
-                    //  txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
-                },
-                function(error) {});
+                }
+                //Transaction Activity for Export Testcase Button Action
+                //  var labelArr = [];
+                //  var infoArr = [];
+                //  labelArr.push(txnHistory.codesDict['ExportTestCase']);
+                //  txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
+            },
+            function (error) { });
     }
     //Export Test Case
 
     //Enable Append Checkbox (if after checking the, browser doesn't enables)
-    $(document).on("click", "#enableAppend", function() {
+    $(document).on("click", "#enableAppend", function () {
         if ($(this).is(":checked") == true) {
-            $.each($(this).parents("ul").children("li"), function() {
+            $.each($(this).parents("ul").children("li"), function () {
                 if ($(this).find("a").hasClass("disableActions") == true) {
                     $(this).find("a").addClass("enableActions").removeClass("disableActions")
                 }
@@ -751,148 +756,147 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         }
     })
     //Enable Append Checkbox (if after checking the, browser doesn't enables)
-   
+
     //Populating Saved Scrape Data
-    $scope.getScrapeData = function() {
+    $scope.getScrapeData = function () {
         blockUI("Loading...");
         $('.scrollbar-compare').hide();
-		//window.localStorage['_modified'] = "";
-		modifiednames = [];
+        //window.localStorage['_modified'] = "";
+        modifiednames = [];
         $("#enableAppend").prop("checked", false)
         window.localStorage['checkEditWorking'] = "false";
         if ($("#finalScrap").find("#scrapTree").length == 0) {
             $(".disableActions").addClass("enableActions").removeClass("disableActions");
             $("#enableAppend").prop("disabled", true).css('cursor', 'no-drop')
         } else {
-            $(".enableActions").addClass("disableActions").removeClass("enableActions");
+            $(".enableActions").addClass("disableActions").removeClass("enableActions").parent('li').css('cursor', 'not-allowed');
             $("#enableAppend").prop("disabled", false).css('cursor', 'pointer')
         }
         //enableScreenShotHighlight = true;
         DesignServices.getScrapeDataScreenLevel_ICE()
-            .then(function(data) {   
-                    if (data == "Invalid Session") {
-                        $rootScope.redirectPage();
-                    }
-                    gsElement = [];
-                    $(".popupWrap").animate({
-                        opacity: 0,
-                        right: "70px"
-                    }, 100).css({
-                        'z-index': '0',
-                        'pointer-events': 'none'
-                    });
-                    $(".filterObjects").removeClass("popupContent-filter-active").addClass("popupContent-default");
-                    $(".thumb-ic").removeClass("thumb-ic-highlight");
-                
-                    if (data != null && data != "getScrapeData Fail." && data != "" && data != " ") {
-                        
-                        viewString = data;
+            .then(function (data) {
+                if (data == "Invalid Session") {
+                    $rootScope.redirectPage();
+                }
+                gsElement = [];
+                $(".popupWrap").animate({
+                    opacity: 0,
+                    right: "70px"
+                }, 100).css({
+                    'z-index': '0',
+                    'pointer-events': 'none'
+                });
+                $(".filterObjects").removeClass("popupContent-filter-active").addClass("popupContent-default");
+                $(".thumb-ic").removeClass("thumb-ic-highlight");
 
-                        newScrapedList = viewString
-                        $("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
-                        $("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
-                        $("#finalScrap").empty()
-                        if (jQuery.isEmptyObject(viewString)) {
-                            console.log("Data is Empty");
+                if (data != null && data != "getScrapeData Fail." && data != "" && data != " ") {
+
+                    viewString = data;
+
+                    newScrapedList = viewString
+                    $("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
+                    $("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
+                    $("#finalScrap").empty()
+                    if (jQuery.isEmptyObject(viewString)) {
+                        console.log("Data is Empty");
+                        $(".disableActions").addClass("enableActions").removeClass("disableActions");
+                        $("#enableAppend").prop("disabled", true).css('cursor', 'no-drop');
+                        $("#screenShotScrape").text("No Screenshot Available");
+                        unblockUI();
+
+                        //return;
+                    } else {
+
+                        console.log("Data There");
+                        $(".enableActions").addClass("disableActions").removeClass("enableActions").parent('li').css('cursor', 'not-allowed');
+                        $("#enableAppend").prop("disabled", false).css('cursor', 'pointer')
+                    }
+                    //console.log("response data: ", viewString);
+                    $("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px' data-toggle='tooltip' title='Save Objects'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' data-toggle='tooltip' title='Delete Objects' disabled>Delete</button></span><span class='searchScrapEle'><img src='imgs/ic-search-icon.png'></input></span><span><input type='text' class='searchScrapInput'></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
+                    $("#saveObjects").attr('disabled', true);
+                    var custN;
+                    var imgTag, addcusOb;
+                    var scrapTree = $("#finalScrap").children('#scrapTree');
+                    var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
+
+                    if (viewString.view != undefined) {
+                        for (var i = 0; i < viewString.view.length; i++) {
+                            // if(viewString.scrapetype == 'caa'){
+                            // var li = "<li  class='item select_all'><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+viewString.view[i].custname+"' class='ellipsis'>"+viewString.view[i].custname+"</span></a></li>";
+                            // }
+                            // else{
+                            var path = viewString.view[i].xpath;
+                            var ob = viewString.view[i];
+                            addcusOb = '';
+                            ob.tempId = i;
+                            custN = ob.custname.replace(/[<>]/g, '').trim();
+                            var tag = ob.tag;
+                            if (tag == "dropdown") {
+                                imgTag = "select"
+                            } else if (tag == "textbox/textarea") {
+                                imgTag = "input"
+                            } else imgTag = tag;
+                            if (path == "") addcusOb = 'addCustObj';
+                            // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
+                            //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                            // } 
+                            // else {
+                            if (ob.cord && ob.cord != '') {  //in case of iris object
+                                addcusOb = ""
+                                ob.hiddentag = "No",
+                                    tag = "iris",
+                                    ob.url = "",
+                                    ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
+                            }
+                            var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                            // }                                       
+                            // }
+                            angular.element(innerUL).append(li);
+                        }
+                        $(".checkStylebox, .checkall").prop("disabled", false);
+                        if (viewString.view.length == 0) {
                             $(".disableActions").addClass("enableActions").removeClass("disableActions");
                             $("#enableAppend").prop("disabled", true).css('cursor', 'no-drop');
-                            $("#screenShotScrape").text("No Screenshot Available");
-                            unblockUI();
-
-                            //return;
-                        } else {
-
-                            console.log("Data There");
-                            $(".enableActions").addClass("disableActions").removeClass("enableActions");
-                            $("#enableAppend").prop("disabled", false).css('cursor', 'pointer')
-                        }
-                        //console.log("response data: ", viewString);
-                        $("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px' data-toggle='tooltip' title='Save Objects'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' data-toggle='tooltip' title='Delete Objects' disabled>Delete</button></span><span class='searchScrapEle'><img src='imgs/ic-search-icon.png'></input></span><span><input type='text' class='searchScrapInput'></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
-                        $("#saveObjects").attr('disabled', true);
-                        var custN;
-                        var imgTag, addcusOb;
-                        var scrapTree = $("#finalScrap").children('#scrapTree');
-                        var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
-
-                        if (viewString.view != undefined) {
-                            for (var i = 0; i < viewString.view.length; i++) {
-                                // if(viewString.scrapetype == 'caa'){
-                                    // var li = "<li  class='item select_all'><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+viewString.view[i].custname+"' class='ellipsis'>"+viewString.view[i].custname+"</span></a></li>";
-                                // }
-                                // else{
-                                    var path = viewString.view[i].xpath;
-                                    var ob = viewString.view[i];
-                                    addcusOb = '';
-                                    ob.tempId = i;
-                                    custN = ob.custname;
-                                    var tag = ob.tag;
-                                    if (tag == "dropdown") {
-                                        imgTag = "select"
-                                    } else if (tag == "textbox/textarea") {
-                                        imgTag = "input"
-                                    } else imgTag = tag;
-                                    if (path == "") addcusOb = 'addCustObj';
-                                    // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
-                                    //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                    // } 
-                                    // else {
-                                        if(ob.cord && ob.cord != ''){  //in case of iris object
-                                            addcusOb = ""
-                                            ob.hiddentag = "No",
-                                            tag = "iris",
-                                            ob.url = "",
-                                            ob.xpath = "iris;"+ob.custname+";"+ob.left+";"+ob.top+";"+(ob.width+ob.left)+";"+(ob.height+ob.top)+";"+ob.tag
-										}                                  
-                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                    // }                                       
-                                // }
-                                angular.element(innerUL).append(li);                        
-                            }
-                            $(".checkStylebox, .checkall").prop("disabled", false);
-                            if (viewString.view.length == 0) {
-                                $(".disableActions").addClass("enableActions").removeClass("disableActions");
-                                $("#enableAppend").prop("disabled", true).css('cursor', 'no-drop');
-                                $(document).find(".checkStylebox").prop("disabled", true);
-                            }
-                        }
-
-                        $(document).find('#scrapTree').scrapTree({
-                            multipleSelection: {
-                                //checkbox : checked,
-                                classes: ['.item']
-                            },
-                            editable: true,
-                            radio: true
-                        });
-
-                        if (appType == 'Web') {
-                            if ($(".ellipsis").length > 0) {
-                                $("li.compareObjects").removeClass('disableActions compareObjectDisable').addClass('enableActions');
-                                $("li.generateObj").removeClass('disableActions addObjectDisable').addClass('enableActions');
-                                
-                            } else {
-                                $("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');
-                                $("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');                                
-                            }
-                        } else {
-                            $("li.compareObjects").hide();
+                            $(document).find(".checkStylebox").prop("disabled", true);
                         }
                     }
-                    if($(".ellipsis:visible").length == 0)
-                    {
-                       $(".checkStylebox").prop("disabled",true);
+
+                    $(document).find('#scrapTree').scrapTree({
+                        multipleSelection: {
+                            //checkbox : checked,
+                            classes: ['.item']
+                        },
+                        editable: true,
+                        radio: true
+                    });
+
+                    if (appType == 'Web') {
+                        if ($(".ellipsis").length > 0) {
+                            $("li.compareObjects").removeClass('disableActions compareObjectDisable').addClass('enableActions');
+                            $("li.generateObj").removeClass('disableActions addObjectDisable').addClass('enableActions');
+
+                        } else {
+                            $("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');
+                            $("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');
+                        }
+                    } else {
+                        $("li.compareObjects").hide();
                     }
-                    unblockUI();
-                },
-                function(error) {
-                    console.log("error");
-                })
+                }
+                if ($(".ellipsis:visible").length == 0) {
+                    $(".checkStylebox").prop("disabled", true);
+                }
+                unblockUI();
+            },
+            function (error) {
+                console.log("error");
+            })
     }
     //Populating Saved Scrape Data
 
     //Disabling Filter
-    $("a[title='Filter']").mouseover(function() {
-      
+    $("a[title='Filter']").mouseover(function () {
+
         if (viewString == "") {
             $(this).children("img").addClass("thumb-ic-disabled").removeClass("thumb-ic");
             $(this).parent().css("cursor", "no-drop");
@@ -903,14 +907,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             $(this).children("img").addClass("thumb-ic").removeClass("thumb-ic-disabled");
             $(this).parent().css("cursor", "pointer");
         }
-        if($("#viewscrapedObjects").is(":visible") == true)
-        {
+        if ($("#viewscrapedObjects").is(":visible") == true) {
             $(this).parent().addClass('disableFilter');
         }
     })
 
     //Initialization for apptype(Desktop, Mobility, OEBS) to redirect on initScraping function
-    $scope.initScrape = function(e) {
+    $scope.initScrape = function (e) {
         if (e.currentTarget.className == "disableActions") return false
         else {
             $(document).find("#desktopPath").removeClass("inputErrorBorder")
@@ -947,21 +950,21 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     $(".wsdlRqstWrap").show();
     $("#showWsdlRequest").addClass("wsButtonActive")
 
-    $scope.showWsdlRequest = function() {
+    $scope.showWsdlRequest = function () {
         $(".wsdlRqstWrap").show();
         $(".wsdlRspnsWrap").hide();
         $("#showWsdlRequest").addClass("wsButtonActive")
         $("#showWsdlResponse").removeClass("wsButtonActive")
     }
 
-    $scope.showWsdlResponse = function() {
+    $scope.showWsdlResponse = function () {
         $(".wsdlRspnsWrap").show();
         $(".wsdlRqstWrap").hide();
         $("#showWsdlResponse").addClass("wsButtonActive")
         $("#showWsdlRequest").removeClass("wsButtonActive")
     }
 
-    $scope.getWSData = function() {
+    $scope.getWSData = function () {
         /*if($("#wsdlRequestHeader, #wsdlRequestBody").val().length > 0){
         	$(".saveWS").prop("disabled", true);
         	$("#enbledWS").prop("disabled", false);
@@ -975,66 +978,66 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         	$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody").prop("disabled", false)
         }*/
         DesignServices.getScrapeDataScreenLevel_ICE()
-            .then(function(data) {
-                    if (data == "Invalid Session") {
-                        $rootScope.redirectPage();
-                    }
-                    if (typeof data === "object") {
-                        //Printing the Save data in UI
-                        $("#endPointURL").val(data.endPointURL);
-                        $("#wsdlMethods option").each(function() {
-                            if ($(this).val() == data.method) {
-                                $(this).prop("selected", true)
-                            }
-                        })
-                        $("#wsdlOperation").val(data.operations)
-                        //Printing Request Data
-                        $("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
-                        if (data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0) {
-                            var jsonStr = data.body;
-                            var jsonObj = JSON.parse(jsonStr);
-                            var jsonPretty = JSON.stringify(jsonObj, null, '\t');
-                            xml_neat2 = jsonPretty;
-                            $("#wsdlRequestBody").val(jsonPretty)
-                        } else {
-                            var getXML = formatXml(data.body[0].replace(/>\s+</g, '><'));
-                            $("#wsdlRequestBody").val(getXML)
+            .then(function (data) {
+                if (data == "Invalid Session") {
+                    $rootScope.redirectPage();
+                }
+                if (typeof data === "object") {
+                    //Printing the Save data in UI
+                    $("#endPointURL").val(data.endPointURL);
+                    $("#wsdlMethods option").each(function () {
+                        if ($(this).val() == data.method) {
+                            $(this).prop("selected", true)
                         }
-
-                        //Printing Response Data
-                        $("#wsdlResponseHeader").val(data.responseHeader[0].split("##").join("\n"));
-                        if (data.responseBody[0].indexOf("{") == 0 || data.responseBody[0].indexOf("[") == 0) {
-                            var jsonStr = data.responseBody;
-                            var jsonObj = JSON.parse(jsonStr);
-                            var jsonPretty = JSON.stringify(jsonObj, null, '\t');
-                            xml_neat2 = jsonPretty;
-                            $("#wsdlResponseBody").val(jsonPretty)
-                        } else {
-                            var getXML = formatXml(data.responseBody[0].replace(/>\s+</g, '><'));
-                            $("#wsdlResponseBody").val(getXML)
-                        }
-
-                        //Printing the Save data in UI
-                        if ($("#wsdlRequestHeader, #wsdlRequestBody").val().length > 0) {
-                            $(".saveWS").prop("disabled", true);
-                            $("#enbledWS").prop("disabled", false)
-                            $(".enableActionsWS").addClass("disableActionsWS").removeClass("enableActionsWS")
-                            $("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody, #wsdlResponseHeader, #wsdlResponseBody").prop("disabled", true)
-                        } else {
-                            $(".saveWS").prop("disabled", false);
-                            $("#enbledWS").prop("disabled", true)
-                            $(".disableActionsWS").addClass("enableActionsWS").removeClass("disableActionsWS")
-                        }
+                    })
+                    $("#wsdlOperation").val(data.operations)
+                    //Printing Request Data
+                    $("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
+                    if (data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0) {
+                        var jsonStr = data.body;
+                        var jsonObj = JSON.parse(jsonStr);
+                        var jsonPretty = JSON.stringify(jsonObj, null, '\t');
+                        xml_neat2 = jsonPretty;
+                        $("#wsdlRequestBody").val(jsonPretty)
                     } else {
-                        $("#wsdlMethods").prop("selectedIndex", 0)
+                        var getXML = formatXml(data.body[0].replace(/>\s+</g, '><'));
+                        $("#wsdlRequestBody").val(getXML)
+                    }
+
+                    //Printing Response Data
+                    $("#wsdlResponseHeader").val(data.responseHeader[0].split("##").join("\n"));
+                    if (data.responseBody[0].indexOf("{") == 0 || data.responseBody[0].indexOf("[") == 0) {
+                        var jsonStr = data.responseBody;
+                        var jsonObj = JSON.parse(jsonStr);
+                        var jsonPretty = JSON.stringify(jsonObj, null, '\t');
+                        xml_neat2 = jsonPretty;
+                        $("#wsdlResponseBody").val(jsonPretty)
+                    } else {
+                        var getXML = formatXml(data.responseBody[0].replace(/>\s+</g, '><'));
+                        $("#wsdlResponseBody").val(getXML)
+                    }
+
+                    //Printing the Save data in UI
+                    if ($("#wsdlRequestHeader, #wsdlRequestBody").val().length > 0) {
+                        $(".saveWS").prop("disabled", true);
+                        $("#enbledWS").prop("disabled", false)
+                        $(".enableActionsWS").addClass("disableActionsWS").removeClass("enableActionsWS")
+                        $("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody, #wsdlResponseHeader, #wsdlResponseBody").prop("disabled", true)
+                    } else {
                         $(".saveWS").prop("disabled", false);
                         $("#enbledWS").prop("disabled", true)
                         $(".disableActionsWS").addClass("enableActionsWS").removeClass("disableActionsWS")
                     }
-                },
-                function(error) {
-                    console.log(error)
-                })
+                } else {
+                    $("#wsdlMethods").prop("selectedIndex", 0)
+                    $(".saveWS").prop("disabled", false);
+                    $("#enbledWS").prop("disabled", true)
+                    $(".disableActionsWS").addClass("enableActionsWS").removeClass("disableActionsWS")
+                }
+            },
+            function (error) {
+                console.log(error)
+            })
         /*if($("#wsdlRequestHeader, #wsdlRequestBody").val().length > 0){
         	$(".saveWS").prop("disabled", true);
         	$("#enbledWS").prop("disabled", false)
@@ -1049,7 +1052,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     //Get Webservice Data
 
     //Save Webservice Data
-    $scope.saveWS = function() {
+    $scope.saveWS = function () {
         $("#endPointURL, #wsdlMethods, #wsdlRequestHeader").removeClass("inputErrorBorderFull").removeClass("selectErrorBorder")
         var tasks = JSON.parse(window.localStorage['_CT']);
         var endPointURL = $("#endPointURL").val();
@@ -1086,9 +1089,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             scrapeObject.screenId = screenId;
             scrapeObject.screenName = screenName;
             scrapeObject.userinfo = userinfo;
-			scrapeObject.versionnumber = tasks.versionnumber;
+            scrapeObject.versionnumber = tasks.versionnumber;
             DesignServices.updateScreen_ICE(scrapeObject)
-                .then(function(data) {
+                .then(function (data) {
                     if (data == "Invalid Session") {
                         $rootScope.redirectPage();
                     }
@@ -1101,7 +1104,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         openDialog("Save WebService Template", "Failed to save WebService Template.");
                         //$("#WSSaveFail").modal("show")
                     }
-                }, function(error) {
+                }, function (error) {
                     console.log("Error")
                 })
         }
@@ -1109,12 +1112,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     //Save Webservice Data
 
     //Enable Save WS Button
-    $(document).on("click", "#enbledWS", function() {
+    $(document).on("click", "#enbledWS", function () {
         if ($(this).is(":checked") == true) {
             $(".saveWS").prop("disabled", false)
             $("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody").prop("disabled", false)
             //Additional to enable the web service icon
-            $.each($(this).parents("ul").children("li"), function() {
+            $.each($(this).parents("ul").children("li"), function () {
                 if ($(this).find("a").hasClass("disableActionsWS") == true) {
                     $(this).find("a").addClass("enableActionsWS").removeClass("disableActionsWS")
                 }
@@ -1127,7 +1130,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     })
 
     //Init Webservice
-    $scope.initScrapeWS = function(e) {
+    $scope.initScrapeWS = function (e) {
         $("#endPointURL, #wsdlMethods, #wsdlRequestHeader, #wsdlOperation, #wsdlRequestBody").removeClass("inputErrorBorderFull").removeClass("selectErrorBorder")
         var initWSJson = {}
         var testCaseWS = []
@@ -1176,8 +1179,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         "url": "",
                         "custname": "",
                         "remarks": [""],
-                        "addTestCaseDetails":"",
-                        "addTestCaseDetailsInfo":""
+                        "addTestCaseDetails": "",
+                        "addTestCaseDetailsInfo": ""
                     })
                 }
             }
@@ -1191,20 +1194,20 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 "url": "",
                 "custname": "",
                 "remarks": [""],
-                "addTestCaseDetails":"",
-                "addTestCaseDetailsInfo":""
+                "addTestCaseDetails": "",
+                "addTestCaseDetailsInfo": ""
             })
             initWSJson.testcasename = "",
-            initWSJson.apptype = "Webservice",
-            initWSJson.testcase = testCaseWS
+                initWSJson.apptype = "Webservice",
+                initWSJson.testcase = testCaseWS
             DesignServices.initScrapeWS_ICE(initWSJson)
-                .then(function(data) {
+                .then(function (data) {
                     if (data == "Invalid Session") {
                         $rootScope.redirectPage();
                     }
                     if (data == "unavailableLocalServer") {
                         unblockUI();
-                        openDialog("Web Service Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+                        openDialog("Web Service Screen", $rootScope.unavailableLocalServer_msg);
                         return false
                     }
                     if (data == "scheduleModeOn") {
@@ -1231,7 +1234,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         openDialog("Debug Web Service", "Debug Terminated.");
                         //$("#webserviceDeubgFail").modal("show")
                     }
-                }, function(error) {
+                }, function (error) {
                     console.log("Error")
                 });
         }
@@ -1239,50 +1242,51 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     //Init Webservice
 
     //Launch WSDL Functionality
-    $scope.launchWSDLGo = function() {
+    $scope.launchWSDLGo = function () {
         var blockMsg = 'Please Wait...';
         $("#wsldInput").removeClass("inputErrorBorderFull")
         var wsdlUrl = $("#wsldInput").val();
         if (!wsdlUrl) openDialog("Launch WSDL", "Invalid WSDL url."); //$("#wsldInput").addClass("inputErrorBorderFull")
-        else if (wsdlUrl.toLowerCase().indexOf(".svc?wsdl") === -1 && wsdlUrl.toLowerCase().indexOf(".asmx?wsdl") === -1) openDialog("Launch WSDL", "Invalid WSDL url."); //$("#wsldInput").addClass("inputErrorBorderFull")
+       //else if (wsdlUrl.toLowerCase().indexOf(".svc?wsdl") === -1 && wsdlUrl.toLowerCase().indexOf(".asmx?wsdl") === -1) openDialog("Launch WSDL", "Invalid WSDL url."); //$("#wsldInput").addClass("inputErrorBorderFull")
         else {
             blockUI(blockMsg);
             DesignServices.launchWSDLGo(wsdlUrl)
-                .then(function(data) {
-                        if (data == "Invalid Session") {
-                            $rootScope.redirectPage();
-                        }
-                        if (data == "fail") {
-                            unblockUI();
-                            openDialog("WSDL-Scrape Screen", "Invalid WSDL url.");
-                            return false
-                        }
-                        if (data == "unavailableLocalServer") {
-                            unblockUI();
-                            openDialog("WSDL-Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
-                            return false
-                        }
-                        if (data == "scheduleModeOn") {
-                            unblockUI();
-                            openDialog("WSDL-Scrape Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
-                            return false
-                        }
-                      //  console.log(data)
-                        $("#wsldSelect").empty().append('<option value selected disabled>Select Operation</option>')
-                        for (i = 0; i < data.listofoperations.length; i++) {
-                            $("#wsldSelect").append('<option value="' + data.listofoperations[i] + '">' + data.listofoperations[i] + '</option>')
-                        }
-                        unblockUI()
-                    },
-                    function(error) {
-                        console.log("Error")
-                    });
+                .then(function (data) {
+                    if (data == "Invalid Session") {
+                        $rootScope.redirectPage();
+                    }
+                    if (data == "fail") {
+                        unblockUI();
+                        openDialog("WSDL-Scrape Screen", "Invalid WSDL url.");
+                        return false
+                    }
+                    if (data == "unavailableLocalServer") {
+                        unblockUI();
+                        openDialog("WSDL-Scrape Screen", $rootScope.unavailableLocalServer_msg);
+                        return false
+                    }
+                    if (data == "scheduleModeOn") {
+                        unblockUI();
+                        openDialog("WSDL-Scrape Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
+                        return false
+                    }
+                    //  console.log(data)
+                    document.getElementById("wsldInput").value = wsdlUrl.trim()
+                    $("#wsldSelect").empty().append('<option value selected disabled>Select Operation</option>')
+                    for (i = 0; i < data.listofoperations.length; i++) {
+                        $("#wsldSelect").append('<option value="' + data.listofoperations[i] + '">' + data.listofoperations[i] + '</option>')
+                    }
+                    unblockUI()
+                },
+                function (error) {
+                    console.log("Error")
+                });
         }
     }
     //Launch WSDL Functionality
 
     //WSDL Add Functionality
-    $scope.wsdlAdd = function() {
+    $scope.wsdlAdd = function () {
         $("#endPointURL, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody, #wsdlResponseHeader, #wsdlResponseBody").val("");
         $("#wsdlMethods").prop('selectedIndex', 0);
         $("#wsldInput").removeClass("inputErrorBorderFull");
@@ -1293,53 +1297,52 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         else if (!wsdlSelectedMethod) $("#wsldSelect").addClass("selectErrorBorder");
         else {
             DesignServices.wsdlAdd(wsdlUrl, wsdlSelectedMethod)
-                .then(function(data) {
-                        if (data == "Invalid Session") {
-                            $rootScope.redirectPage();
-                        }
-                        if (data == "unavailableLocalServer") {
-                            unblockUI();
-                            openDialog("WSDL Add-Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
-                            return false
-                        }
-                        if (data == "scheduleModeOn") {
-                            unblockUI();
-                            openDialog("WSDL Add-Scrape Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
-                            return false
-                        }
-                        if (typeof data === "object") {
-                            //Printing the Save data in UI
-                            $("#endPointURL").val(data.endPointURL);
-                            $("#wsdlMethods option").each(function() {
-                                if ($(this).val() == data.method) {
-                                    $(this).prop("selected", true)
-                                }
-                            })
-                            $("#wsdlOperation").val(data.operations)
-                            //Printing Request Data
-                            $("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
-                            if (data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0) {
-                                var jsonStr = data.body;
-                                var jsonObj = JSON.parse(jsonStr);
-                                var jsonPretty = JSON.stringify(jsonObj, null, '\t');
-                                xml_neat2 = jsonPretty;
-                                $("#wsdlRequestBody").val(jsonPretty)
-                            } else {
-                                var getXML = formatXml(data.body[0].replace(/>\s+</g, '><'));
-                                $("#wsdlRequestBody").val(getXML)
+                .then(function (data) {
+                    if (data == "Invalid Session") {
+                        $rootScope.redirectPage();
+                    }
+                    if (data == "unavailableLocalServer") {
+                        unblockUI();
+                        openDialog("WSDL Add-Scrape Screen", $rootScope.unavailableLocalServer_msg);
+                        return false
+                    }
+                    if (data == "scheduleModeOn") {
+                        unblockUI();
+                        openDialog("WSDL Add-Scrape Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
+                        return false
+                    }
+                    if (typeof data === "object") {
+                        //Printing the Save data in UI
+                        $("#endPointURL").val(data.endPointURL);
+                        $("#wsdlMethods option").each(function () {
+                            if ($(this).val() == data.method) {
+                                $(this).prop("selected", true)
                             }
-                            $(".saveWS").prop("disabled", false)
+                        })
+                        $("#wsdlOperation").val(data.operations)
+                        //Printing Request Data
+                        $("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
+                        if (data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0) {
+                            var jsonStr = data.body;
+                            var jsonObj = JSON.parse(jsonStr);
+                            var jsonPretty = JSON.stringify(jsonObj, null, '\t');
+                            xml_neat2 = jsonPretty;
+                            $("#wsdlRequestBody").val(jsonPretty)
+                        } else {
+                            var getXML = formatXml(data.body[0].replace(/>\s+</g, '><'));
+                            $("#wsdlRequestBody").val(getXML)
                         }
-                    },
-                    function(error) {
-                        console.log("Error")
-                    });
+                        $(".saveWS").prop("disabled", false)
+                    }
+                },
+                function (error) {
+                    console.log("Error")
+                });
         }
     }
     //WSDL Add Functionality
-	$("#deviceName, #versionNumber, #bundleId, #ipAddress").hide();
 
-
+    $("#deviceName, #versionNumber, #bundleId, #ipAddress").hide();
     //Mobile Serial Number Keyup Function
     $("#mobilityAPKPath").on("keyup", function() {
         if ($(this).val().toLowerCase().indexOf(".apk") >= 0) {
@@ -1374,48 +1377,48 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     })
     //Mobile Serial Number Keyup Function
 
-//toggling radio buttons in desktop app launch modal
-    
-$('#radio_check1').click(function() {
-    var isChecked = $('#radio_check2').is(':checked');
-    if(isChecked==true){
-        //$('input[type="radio"]').not(':checked').prop("checked", true);
-        $('#radio_check1').attr('checked',true);
-        $('#radio_check2').attr('checked',false);
-    }
-    else{
-         $('#radio_check1').attr('checked',true);
-         $('#radio_check2').attr('checked',false);   
-        //$('input[type="radio"]:not(.checked').prop("checked", true);
-    }
-    
-});
+    //toggling radio buttons in desktop app launch modal
 
-$('#radio_check2').click(function() {
-    var isChecked = $('#radio_check1').is(':checked');
-    if(isChecked==true){
-        //$('input[type="radio"]').not(':checked').prop("checked", true);
-        $('#radio_check2').attr('checked',true);
-        $('#radio_check1').attr('checked',false);
-    }
-    else{
-         $('#radio_check2').attr('checked',true);
-         $('#radio_check1').attr('checked',false);   
-        //$('input[type="radio"]:not(.checked').prop("checked", true);
-    }
-    
-});
-//toggling radio buttons in desktop app launch modal
+    $('#radio_check1').click(function () {
+        var isChecked = $('#radio_check2').is(':checked');
+        if (isChecked == true) {
+            //$('input[type="radio"]').not(':checked').prop("checked", true);
+            $('#radio_check1').attr('checked', true);
+            $('#radio_check2').attr('checked', false);
+        }
+        else {
+            $('#radio_check1').attr('checked', true);
+            $('#radio_check2').attr('checked', false);
+            //$('input[type="radio"]:not(.checked').prop("checked", true);
+        }
 
-// Number filter in desktop application lauch modal
-$(document).on('keypress', '#app_pid', function(e) {
-    if ((e.charCode >= 48 && e.charCode <= 57) || e.charCode == 59) return true;
-    else return false;
-    }) 
+    });
+
+    $('#radio_check2').click(function () {
+        var isChecked = $('#radio_check1').is(':checked');
+        if (isChecked == true) {
+            //$('input[type="radio"]').not(':checked').prop("checked", true);
+            $('#radio_check2').attr('checked', true);
+            $('#radio_check1').attr('checked', false);
+        }
+        else {
+            $('#radio_check2').attr('checked', true);
+            $('#radio_check1').attr('checked', false);
+            //$('input[type="radio"]:not(.checked').prop("checked", true);
+        }
+
+    });
+    //toggling radio buttons in desktop app launch modal
+
+    // Number filter in desktop application lauch modal
+    $(document).on('keypress', '#app_pid', function (e) {
+        if ((e.charCode >= 48 && e.charCode <= 57) || e.charCode == 59) return true;
+        else return false;
+    })
 
 
     //Initiating Scraping
-    $scope.initScraping = function(e, browserType) {
+    $scope.initScraping = function (e, browserType) {
         $('#compareObjectModal').modal('hide');
         $(".addObject span img").removeClass("left-bottom-selection");
         $(".compareObject span img").removeClass("left-bottom-selection");
@@ -1431,8 +1434,8 @@ $(document).on('keypress', '#app_pid', function(e) {
             $(document).find("#OEBSPath").removeClass("inputErrorBorder");
             $(document).find("#mobilityAPKPath, #mobilitySerialPath, #mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").removeClass("inputErrorBorder");
             $(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion").removeClass("inputErrorBorder");
-			
-			//Transaction Activity for InitCompareAndUpdate/initScraping Button Action
+
+            //Transaction Activity for InitCompareAndUpdate/initScraping Button Action
             // var labelArr = [];
             // var infoArr = [];
             // if($rootScope.compareFlag == true)
@@ -1441,24 +1444,24 @@ $(document).on('keypress', '#app_pid', function(e) {
             //     labelArr.push(txnHistory.codesDict['InitScraping']);
             // infoArr.push($scope.getScreenView);
             // txnHistory.log(e.type,labelArr,infoArr,$location.$$path); 
-			
+
             //For Desktop
             if ($scope.getScreenView == "Desktop") {
-                if ($(document).find("#desktopPath").val() == "" && $(document).find("#app_pid").val()=="") {
+                if ($(document).find("#desktopPath").val() == "" && $(document).find("#app_pid").val() == "") {
                     $(document).find("#desktopPath").addClass("inputErrorBorder")
                     return false
                 } else {
                     $(document).find("#desktopPath").removeClass("inputErrorBorder")
-                        screenViewObject.appType = $scope.getScreenView,
+                    screenViewObject.appType = $scope.getScreenView,
                         screenViewObject.applicationPath = $(document).find("#desktopPath").val();
-                        screenViewObject.processID = $(document).find("#app_pid").val();
-                        screenViewObject.scrapeMethod = $("input[name='first']:checked").val();
+                    screenViewObject.processID = $(document).find("#app_pid").val();
+                    screenViewObject.scrapeMethod = $("input[name='first']:checked").val();
                     $("#launchDesktopApps").modal("hide");
-                    if( $rootScope.compareFlag == true){
+                    if ($rootScope.compareFlag == true) {
                         blockUI(blockMsg2);
                         e.stopImmediatePropagation();
                     }
-                    else{
+                    else {
                         blockUI(blockMsg);
                         e.stopImmediatePropagation();
                     }
@@ -1476,11 +1479,11 @@ $(document).on('keypress', '#app_pid', function(e) {
                         screenViewObject.applicationPath = $(document).find("#SAPPath").val();
                     $("#launchSAPApps").modal("hide");
                     //blockUI(blockMsg);
-                    if( $rootScope.compareFlag == true){
+                    if ($rootScope.compareFlag == true) {
                         blockUI(blockMsg2);
                         e.stopImmediatePropagation();
                     }
-                    else{
+                    else {
                         blockUI(blockMsg);
                         e.stopImmediatePropagation();
                     }
@@ -1489,10 +1492,10 @@ $(document).on('keypress', '#app_pid', function(e) {
 
             //For Mobility
             else if ($scope.getScreenView == "MobileApp") {
-                /*if (!$("#mobilityAPKPath").val()) {
+                if (!$("#mobilityAPKPath").val()) {
                     $(document).find("#mobilityAPKPath").addClass("inputErrorBorder")
                     return false
-                } else */  if ($("#mobilityAPKPath").val().toLowerCase().indexOf(".apk") >= 0) {
+                } else if ($("#mobilityAPKPath").val().toLowerCase().indexOf(".apk") >= 0) {
                     if ($(document).find("#mobilityAPKPath").val() == "") {
                         $(document).find("#mobilityAPKPath").addClass("inputErrorBorder")
                         return false
@@ -1506,76 +1509,76 @@ $(document).on('keypress', '#app_pid', function(e) {
                         screenViewObject.mobileSerial = $(document).find("#mobilitySerialPath").val();
                         $("#launchMobilityApps").modal("hide");
                         // blockUI(blockMsg);
-                        if( $rootScope.compareFlag == true){
-                        blockUI(blockMsg2);
-                        e.stopImmediatePropagation();
+                        if ($rootScope.compareFlag == true) {
+                            blockUI(blockMsg2);
+                            e.stopImmediatePropagation();
+                        }
+                        else {
+                            blockUI(blockMsg);
+                            e.stopImmediatePropagation();
+                        }
                     }
-                    else{
-                        blockUI(blockMsg);
-                        e.stopImmediatePropagation();
+                } // else if ($("#mobilityAPKPath").val().toLowerCase().indexOf(".ipa") >= 0 || $("#mobilityAPKPath").val().toLowerCase().indexOf(".app") >= 0) {
+                    //     if ($(document).find("#mobilityAPKPath").val() == "") {
+                    //         $(document).find("#mobilityAPKPath").addClass("inputErrorBorder")
+                    //         return false
+    
+                    //     } else if ($(document).find("#mobilityDeviceName").val() == "") {
+                    //         $(document).find("#mobilityDeviceName").addClass("inputErrorBorder")
+                    //         return false
+    
+                    //     } else if ($(document).find("#mobilityiOSVersion").val() == "") {
+                    //         $(document).find("#mobilityiOSVersion").addClass("inputErrorBorder")
+                    //         return false
+    
+                    //     } else if ($(document).find("#mobilityUDID").val() == "" && $("#mobilityAPKPath").val().toLowerCase().indexOf(".ipa") >= 0) {
+                    //         $(document).find("#mobilityUDID").addClass("inputErrorBorder")
+                    //         return false
+                    //     }
+                    
+                    else if ($("#mobilityAPKPath").val().toLowerCase().indexOf(".ios") >= 0) {
+                                  screenViewObject.appType = $scope.getScreenView;
+                                  screenViewObject.deviceName = $('#deviceName').val();
+                                  screenViewObject.versionNumber = $('#versionNumber').val();
+                                  screenViewObject.bundleId = $('#bundleId').val();
+                                  screenViewObject.ipAddress =  $('#ipAddress').val();
+                                  screenViewObject.param = 'ios';
+                                  $('#launchMobilityApps').modal("hide");
+                                  if( $rootScope.compareFlag == true){
+                                    blockUI(blockMsg2);
+                                    e.stopImmediatePropagation();
+                                }
+                                else{
+                                    blockUI(blockMsg);
+                                    e.stopImmediatePropagation();
+                                }
                     }
-                    }
-                }// else if ($("#mobilityAPKPath").val().toLowerCase().indexOf(".ipa") >= 0 || $("#mobilityAPKPath").val().toLowerCase().indexOf(".app") >= 0) {
-                //     if ($(document).find("#mobilityAPKPath").val() == "") {
-                //         $(document).find("#mobilityAPKPath").addClass("inputErrorBorder")
-                //         return false
-
-                //     } else if ($(document).find("#mobilityDeviceName").val() == "") {
-                //         $(document).find("#mobilityDeviceName").addClass("inputErrorBorder")
-                //         return false
-
-                //     } else if ($(document).find("#mobilityiOSVersion").val() == "") {
-                //         $(document).find("#mobilityiOSVersion").addClass("inputErrorBorder")
-                //         return false
-
-                //     } else if ($(document).find("#mobilityUDID").val() == "" && $("#mobilityAPKPath").val().toLowerCase().indexOf(".ipa") >= 0) {
-                //         $(document).find("#mobilityUDID").addClass("inputErrorBorder")
-                //         return false
-                //     }
-				
-				else if ($("#mobilityAPKPath").val().toLowerCase().indexOf(".ios") >= 0) {
-							  screenViewObject.appType = $scope.getScreenView;
-							  screenViewObject.deviceName = $('#deviceName').val();
-							  screenViewObject.versionNumber = $('#versionNumber').val();
-							  screenViewObject.bundleId = $('#bundleId').val();
-                              screenViewObject.ipAddress =  $('#ipAddress').val();
-                              screenViewObject.param = 'ios';
-                              $('#launchMobilityApps').modal("hide");
-                              if( $rootScope.compareFlag == true){
-                                blockUI(blockMsg2);
-                                e.stopImmediatePropagation();
+                    else {
+                            $(document).find("#mobilityAPKPath,#mobilityDeviceName,#mobilityiOSVersion,#mobilityUDID").removeClass("inputErrorBorder")
+                            screenViewObject.appType = $scope.getScreenView,
+                                screenViewObject.apkPath = $(document).find("#mobilityAPKPath").val();
+                            screenViewObject.mobileDeviceName = $(document).find("#mobilityDeviceName").val();
+                            screenViewObject.mobileIosVersion = $(document).find("#mobilityiOSVersion").val();
+                            screenViewObject.mobileUDID = $(document).find("#mobilityUDID").val();
+                            $("#launchMobilityApps").modal("hide");
+                            // blockUI(blockMsg);
+                            if( $rootScope.compareFlag == true){
+                            blockUI(blockMsg2);
+                            e.stopImmediatePropagation();
                             }
                             else{
                                 blockUI(blockMsg);
                                 e.stopImmediatePropagation();
+                                
+                                
+                                
+                                
+                                
+                                
                             }
+                        }
+                    
                 }
-                else {
-                        $(document).find("#mobilityAPKPath,#mobilityDeviceName,#mobilityiOSVersion,#mobilityUDID").removeClass("inputErrorBorder")
-                        screenViewObject.appType = $scope.getScreenView,
-                            screenViewObject.apkPath = $(document).find("#mobilityAPKPath").val();
-                        screenViewObject.mobileDeviceName = $(document).find("#mobilityDeviceName").val();
-                        screenViewObject.mobileIosVersion = $(document).find("#mobilityiOSVersion").val();
-                        screenViewObject.mobileUDID = $(document).find("#mobilityUDID").val();
-                        $("#launchMobilityApps").modal("hide");
-                        // blockUI(blockMsg);
-                        if( $rootScope.compareFlag == true){
-                        blockUI(blockMsg2);
-                        e.stopImmediatePropagation();
-                        }
-                        else{
-                            blockUI(blockMsg);
-                            e.stopImmediatePropagation();
-							
-							
-							
-							
-							
-							
-                        }
-                    }
-                
-            }
             //For Mobility
 
             //For Mobility Web
@@ -1589,15 +1592,15 @@ $(document).on('keypress', '#app_pid', function(e) {
                 } else {
                     $(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion").removeClass("inputErrorBorder")
                     screenViewObject.appType = $scope.getScreenView,
-                    screenViewObject.mobileSerial = $(document).find("#mobilityWebSerialNo").val();
+                        screenViewObject.mobileSerial = $(document).find("#mobilityWebSerialNo").val();
                     screenViewObject.androidVersion = $(document).find("#mobilityAndroidVersion").val();
                     $("#launchMobilityWeb").modal("hide");
                     // blockUI(blockMsg);
-                    if( $rootScope.compareFlag == true){
+                    if ($rootScope.compareFlag == true) {
                         blockUI(blockMsg2);
                         e.stopImmediatePropagation();
                     }
-                    else{
+                    else {
                         blockUI(blockMsg);
                         e.stopImmediatePropagation();
                     }
@@ -1616,11 +1619,11 @@ $(document).on('keypress', '#app_pid', function(e) {
                         screenViewObject.applicationPath = $(document).find("#OEBSPath").val();
                     $("#launchOEBSApps").modal("hide");
                     // blockUI(blockMsg);
-                    if( $rootScope.compareFlag == true){
+                    if ($rootScope.compareFlag == true) {
                         blockUI(blockMsg2);
                         e.stopImmediatePropagation();
                     }
-                    else{
+                    else {
                         blockUI(blockMsg);
                         e.stopImmediatePropagation();
                     }
@@ -1630,26 +1633,26 @@ $(document).on('keypress', '#app_pid', function(e) {
 
             //For Web
             else {
-                if ( $rootScope.compareFlag == true) {
+                if ($rootScope.compareFlag == true) {
                     screenViewObject.viewString = viewString;
                     screenViewObject.action = "compare";
                 }
                 screenViewObject.browserType = browserType
                 // blockUI(blockMsg);
-                if( $rootScope.compareFlag == true){
-                        blockUI(blockMsg2);
-                        e.stopImmediatePropagation();
-                    }
-                    else{
-                        blockUI(blockMsg);
-                        e.stopImmediatePropagation();
-                    }
+                if ($rootScope.compareFlag == true) {
+                    blockUI(blockMsg2);
+                    e.stopImmediatePropagation();
+                }
+                else {
+                    blockUI(blockMsg);
+                    e.stopImmediatePropagation();
+                }
             }
             //For Web
             DesignServices.initScraping_ICE(screenViewObject)
-                .then(function(data) {
+                .then(function (data) {
                     //console.log("UI", data);
-                    
+
                     unblockUI();
                     //window.localStorage['disableEditing'] = "true";
                     if (data == "Invalid Session") {
@@ -1657,35 +1660,35 @@ $(document).on('keypress', '#app_pid', function(e) {
                     } else if (data == "Response Body exceeds max. Limit.") {
                         openDialog("Scrape Screen", "Scraped data exceeds max. Limit.");
                         return false
-                    } else if(data == 'scheduleModeOn') {
+                    } else if (data == 'scheduleModeOn') {
                         eaCheckbox = false;
                         var scrapedObjectsLen = $("span.ellipsis").length;
-                        if(scrapedObjectsLen > 0) {
-                           $(".enableActions").removeClass("enableActions").addClass("disableActions");
+                        if (scrapedObjectsLen > 0) {
+                            $(".enableActions").removeClass("enableActions").addClass("disableActions").parent('li').css('cursor', 'not-allowed');
                         } else {
-                           $(".disableActions").removeClass("disableActions").addClass("enableActions");
+                            $(".disableActions").removeClass("disableActions").addClass("enableActions");
                         }
-                        $("#enableAppend").prop('checked',false);
+                        $("#enableAppend").prop('checked', false);
                         openDialog("Scrape Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
                         return false
                     } else if (data == "unavailableLocalServer") {
                         eaCheckbox = false;
                         var scrapedObjectsLen = $("span.ellipsis").length;
-                        if(scrapedObjectsLen > 0) {
-							$(".enableActions").removeClass("enableActions").addClass("disableActions");
+                        if (scrapedObjectsLen > 0) {
+                            $(".enableActions").removeClass("enableActions").addClass("disableActions").parent('li').css('cursor', 'not-allowed');
                         } else {
                             $(".disableActions").removeClass("disableActions").addClass("enableActions");
                         }
-                        $("#enableAppend").prop('checked',false);
-                        openDialog("Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+                        $("#enableAppend").prop('checked', false);
+                        openDialog("Scrape Screen", $rootScope.unavailableLocalServer_msg);
                         return false
                     } else if (data == "fail") {
                         openDialog("Scrape", "Failed to scrape.")
                         //$("#scrapeFailModal").modal("show");
                         return false
-					} else if (data == "Terminate") {
-						unblockUI();
-						openDialog("Scrape Screen", "Scrape Terminated")
+                    } else if (data == "Terminate") {
+                        unblockUI();
+                        openDialog("Scrape Screen", "Scrape Terminated")
                         return false
                     } else if (data == "wrongWindowName") {
                         openDialog("Scrape", "Wrong window name.")
@@ -1693,12 +1696,11 @@ $(document).on('keypress', '#app_pid', function(e) {
                     //COMPARE & UPDATE SCRAPE OPERATION
                     if (data.action == "compare") {
                         unblockUI();
-                        if(data.status == 'SUCCESS')
-                        {
+                        if (data.status == 'SUCCESS') {
                             $('.scrollbar-compare, .saveCompareDiv').show();
                             updatedViewString = data;
                             $("#changedOrdList li,#compareUnchangedObjectsBox li ,#compareNotFoundObjectsBox li").empty();
-                           $("#viewscrapedObjects").show();
+                            $("#viewscrapedObjects").show();
                             //Hide Scrape Objects
                             $("#scrapTree,.fsScroll").hide();
                             if (data.view[0].changedobject.length > 0) {
@@ -1738,7 +1740,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                             }
                             if (data.view[1].notchangedobject.length > 0) {
                                 $("#compareUnchangedObjectsBox").show();
-    
+
                                 //unchanged objects list
                                 for (var j = 0; j < data.view[1].notchangedobject.length; j++) {
                                     var innerUL = $('.unchangedObjOrdList');
@@ -1763,7 +1765,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                                 }
                                 $(document).find('#unchangedOrdList').scrapTree({
                                     multipleSelection: {
-                                       // checkbox : checked,
+                                        // checkbox : checked,
                                         classes: ['.item .treeUnChangedObjects']
                                     },
                                     editable: false,
@@ -1772,7 +1774,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                             } else {
                                 $("#compareUnchangedObjectsBox").hide();
                             }
-                           // console.log("nf", data.view[2].notfoundobject);
+                            // console.log("nf", data.view[2].notfoundobject);
                             if (data.view[2].notfoundobject.length > 0) {
                                 $("#compareNotFoundObjectsBox, #saveComparedObjects").show();
                                 // //Objects not found
@@ -1809,10 +1811,10 @@ $(document).on('keypress', '#app_pid', function(e) {
                                 $("#compareNotFoundObjectsBox").hide();
                             }
                         }
-                        else{
-                            openDialog("Compare Objects","Failed to compare objects");
+                        else {
+                            openDialog("Compare Objects", "Failed to compare objects");
                             $rootScope.compareFlag = false;
-                            setTimeout(() => {
+                            setTimeout(function() {
                                 $(".close:visible, .btn-default:visible").addClass('navigateToDesign');
                                 $(document).on('click','.navigateToDesign',function() {
                                     $(".scrollbar-compare,.saveCompareDiv").hide(); //Hide Compare Div
@@ -1820,9 +1822,9 @@ $(document).on('keypress', '#app_pid', function(e) {
                                     $("#scrapTree,.fsScroll").show(); //Show Scraped Objects
                                 });
                             }, 200);
-                            
+
                         }
-                       
+
                     } else {
                         saveScrapeDataFlag = false;
                         $('.scrollbar-compare').hide();
@@ -1842,7 +1844,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                         $("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'/><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span class='searchScrapEle'><img src='imgs/ic-search-icon.png'></input></span><span><input type='text' class='searchScrapInput'></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
                         var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
 
-                       // console.log("data", viewString);
+                        // console.log("data", viewString);
                         //If enable append is active
                         if (eaCheckbox) {
                             //Getting the Existing Scrape Data
@@ -1851,32 +1853,41 @@ $(document).on('keypress', '#app_pid', function(e) {
                                 //     var li = "<li  class='item select_all'><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+newScrapedList.view[i].custname+"'>"+newScrapedList.view[i].custname+"</span></a></li>";
                                 // }
                                 // else{
-                                    var path = newScrapedList.view[i].xpath;
-                                    var ob = newScrapedList.view[i];
-                                    ob.tempId = i;
-                                    custN = ob.custname;
-                                    var tag = ob.tag;
-                                    if (tag == "dropdown") {
-                                        imgTag = "select"
-                                    } else if (tag == "textbox/textarea") {
-                                        imgTag = "input"
-                                    } else imgTag = tag;
+                                var path = newScrapedList.view[i].xpath;
+                                var ob = newScrapedList.view[i];
+                                ob.tempId = i;
+                                if (appType == "DesktopJava" || appType == "Desktop") {
+                                    custN = ob.custname.replace('/\s/g', ' ').replace('\n', ' ').replace(/[<>]/g, '');
+                                }
+                                else {
+                                    custN = ob.custname.replace(/[<>]/g, '');
+                                }
+                                var tag = ob.tag;
+                                if (tag == "dropdown") {
+                                    imgTag = "select"
+                                } else if (tag == "textbox/textarea") {
+                                    imgTag = "input"
+                                } else imgTag = tag;
 
-                                    if(ob.cord && ob.cord != ''){  //in case of iris object
-										addcusOb = ""
-                                        ob.hiddentag = "No",
+                                if (ob.cord && ob.cord != '') {  //in case of iris object
+                                    addcusOb = ""
+                                    ob.hiddentag = "No",
                                         tag = "iris",
                                         ob.url = "",
-                                        ob.xpath = "iris;"+ob.custname+";"+ob.left+";"+ob.top+";"+(ob.width+ob.left)+";"+(ob.height+ob.top)+";"+ob.tag
-									}        
+                                        ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
+                                }
 
-                                    // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
-                                    //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                    // } else {
-                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                    // }
+                                // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
+                                //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                // } else {
+                                // }
                                 // }                                
-
+                                if (appType == "DesktopJava" || appType == "Desktop") {
+                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                }
+                                else {
+                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                }
                                 angular.element(innerUL).append(li);
                             }
                             //Getting the Existing Scrape Data
@@ -1891,30 +1902,40 @@ $(document).on('keypress', '#app_pid', function(e) {
                                     //     var li = "<li  class='item select_all'><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+viewString.view[i].custname+"'>"+viewString.view[i].custname+"</span></a></li>";
                                     // }
                                     // else{
-                                        tempId++
-                                        var path = viewString.view[i].xpath;
-                                        var ob = viewString.view[i];
+                                    tempId++
+                                    var path = viewString.view[i].xpath;
+                                    var ob = viewString.view[i];
+                                    if (appType == "DesktopJava" || appType == "Desktop") {
+                                        var custN = ob.custname.replace('/\s/g', ' ').replace('\n', ' ').replace(/[<>]/g, '');
+                                    }
+                                    else {
                                         var custN = ob.custname.replace(/[<>]/g, '').trim();
-                                        var tag = ob.tag;
-                                        if (tag == "dropdown") {
-                                            imgTag = "select"
-                                        } else if (tag == "textbox/textarea") {
-                                            imgTag = "input"
-                                        } else imgTag = tag;
-    
-                                        // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
-                                        //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                        // } else {
-                                            if(ob.cord && ob.cord != ''){  //in case of iris object
-                                                addcusOb = ""
-                                                ob.hiddentag = "No",
-                                                tag = "iris",
-                                                ob.url = "",
-                                                ob.xpath = "iris;"+ob.custname+";"+ob.left+";"+ob.top+";"+(ob.width+ob.left)+";"+(ob.height+ob.top)+";"+ob.tag
-											}
-                                            var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                        // }    
-                                  
+                                    }
+                                    var tag = ob.tag;
+                                    if (tag == "dropdown") {
+                                        imgTag = "select"
+                                    } else if (tag == "textbox/textarea") {
+                                        imgTag = "input"
+                                    } else imgTag = tag;
+
+                                    // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
+                                    //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                    // } else {
+                                    if (ob.cord && ob.cord != '') {  //in case of iris object
+                                        addcusOb = ""
+                                        ob.hiddentag = "No",
+                                            tag = "iris",
+                                            ob.url = "",
+                                            ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
+                                    }
+                                    if (appType == "DesktopJava" || appType == "Desktop") {
+                                        var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                    }
+                                    else {
+                                        var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                    }
+                                    // }    
+
                                     // }                                    
                                     angular.element(innerUL).append(li)
                                     //newScrapedList.view.push(viewString.view[i]);
@@ -1937,36 +1958,46 @@ $(document).on('keypress', '#app_pid', function(e) {
                                 //     var li = "<li  class='item select_all'><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+viewString.view[i].custname+"'>"+viewString.view[i].custname+"</span></a></li>";
                                 // }
                                 // else{
-                                    var path = viewString.view[i].xpath;
-                                    var ob = viewString.view[i];
-                                    ob.tempId = i;
+                                var path = viewString.view[i].xpath;
+                                var ob = viewString.view[i];
+                                ob.tempId = i;
+                                if (appType == "DesktopJava" || appType == "Desktop") {
+                                    var custN = ob.custname.replace('/\s/g', ' ').replace('\n', ' ').replace(/[<>]/g, '');
+                                }
+                                else {
                                     var custN = ob.custname.replace(/[<>]/g, '').trim();
-                                    var tag = ob.tag;
-                                    if (tag == "dropdown") {
-                                        imgTag = "select"
-                                    } else if (tag == "textbox/textarea") {
-                                        imgTag = "input"
-                                    } else imgTag = tag;
-                                    // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
-                                    //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                    // } else {
-                                        if(ob.cord && ob.cord != ''){  //in case of iris object
-                                            addcusOb = ""
-                                            ob.hiddentag = "No",
-                                            tag = "iris",
-                                            ob.url = "",
-                                            ob.xpath = "iris;"+ob.custname+";"+ob.left+";"+ob.top+";"+(ob.width+ob.left)+";"+(ob.height+ob.top)+";"+ob.tag
-										}                                      
-                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                    // }
+                                }
+                                var tag = ob.tag;
+                                if (tag == "dropdown") {
+                                    imgTag = "select"
+                                } else if (tag == "textbox/textarea") {
+                                    imgTag = "input"
+                                } else imgTag = tag;
+                                // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
+                                //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                // } else {
+                                if (ob.cord && ob.cord != '') {  //in case of iris object
+                                    addcusOb = ""
+                                    ob.hiddentag = "No",
+                                        tag = "iris",
+                                        ob.url = "",
+                                        ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
+                                }
                                 // }
+                                // }
+                                if (appType == "DesktopJava" || appType == "Desktop") {
+                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                }
+                                else {
+                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                }
                                 angular.element(innerUL).append(li);
 
 
                             }
                             //Before Saving the Scrape JSON to the Database
                         }
-						$("li.item:visible").each(function() {
+                        $("li.item:visible").each(function () {
                             if ($(this).attr('data-xpath') == "" && $(this).attr('data-tag') != "iris") {
                                 $(this).children().find('span.ellipsis').addClass('customObject');
                             }
@@ -1990,25 +2021,23 @@ $(document).on('keypress', '#app_pid', function(e) {
                         } else $("#saveObjects").addClass('hide');
                     }
 
-                    if($("#compareChangedObjectsBox").is(":visible") == true || $("#compareNotFoundObjectsBox").is(":visible") == true)
-                    {
+                    if ($("#compareChangedObjectsBox").is(":visible") == true || $("#compareNotFoundObjectsBox").is(":visible") == true) {
                         $("#saveComparedObjects").show();
                     }
-                    else{
+                    else {
                         $("#saveComparedObjects").hide();
                     }
 
-                    if($("#compareChangedObjectsBox").is(":visible") == true || $("#compareNotFoundObjectsBox").is(":visible") == true || $("#compareUnchangedObjectsBox").is(":visible") == true)
-                    {
+                    if ($("#compareChangedObjectsBox").is(":visible") == true || $("#compareNotFoundObjectsBox").is(":visible") == true || $("#compareUnchangedObjectsBox").is(":visible") == true) {
                         $("#viewscrapedObjects").show();
                         $("#left-top-section,#left-bottom-section").addClass('disableClick');
-                      //  $("a[title='Filter']").parent().removeAttr( 'style' ).css("cursor", "no-drop");
+                        //  $("a[title='Filter']").parent().removeAttr( 'style' ).css("cursor", "no-drop");
                     }
-                    else{
+                    else {
                         $("#viewscrapedObjects").hide();
                     }
 
-                    $(document).on('click','#viewscrapedObjects',function() {
+                    $(document).on('click', '#viewscrapedObjects', function () {
                         $(".scrollbar-compare,.saveCompareDiv").hide(); //Hide Compare Div
                         angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
                         $("#scrapTree,.fsScroll").show(); //Show Scraped Objects
@@ -2016,20 +2045,20 @@ $(document).on('keypress', '#app_pid', function(e) {
                         $("#left-top-section,#left-bottom-section").removeClass('disableClick');
                     });
 
-                }, function(error) {
+                }, function (error) {
                     console.log("Fail to Load design_ICE")
                 });
         }
     }
-    $scope.updateComparedObjects = function(event) {
+    $scope.updateComparedObjects = function (event) {
         var tasks = JSON.parse(window.localStorage['_CT']);
         var userinfo = JSON.parse(window.localStorage['_UI']);
         var scrapeObject = {};
         var updatedSelection = [];
         scrapeObject.param = 'updateComparedObjects';
         $("#changedOrdList").find("input[type='checkbox'].checkCompareAll:checked").each(function () {
-          var id= parseInt($(this).parent().attr('id').split('_')[1]);
-          updatedSelection.push( updatedViewString.view[0].changedobject[id]);
+            var id = parseInt($(this).parent().attr('id').split('_')[1]);
+            updatedSelection.push(updatedViewString.view[0].changedobject[id]);
         });
         updatedViewString.view[0].changedobject = updatedSelection;
         scrapeObject.updatedViewString = updatedViewString;
@@ -2038,9 +2067,9 @@ $(document).on('keypress', '#app_pid', function(e) {
         scrapeObject.screenName = tasks.screenName;
         scrapeObject.projectId = tasks.projectId;
         scrapeObject.appType = tasks.app
-		scrapeObject.versionnumber = tasks.versionnumber;
+        scrapeObject.versionnumber = tasks.versionnumber;
         DesignServices.updateScreen_ICE(scrapeObject)
-            .then(function(data) {
+            .then(function (data) {
                 //console.log("out", data);
                 if (data == "Invalid Session") {
                     $rootScope.redirectPage();
@@ -2049,120 +2078,115 @@ $(document).on('keypress', '#app_pid', function(e) {
                     //openDialog("Compared Objects", "Scraped data updated successfully.");
                     $("#compareBox").modal("show");
                     $("#compareBox .modal-body p").text("Scraped data updated successfully.");
-                    $(document).on('click', '#btnNavDesign', function() {
-                          $(".scrollbar-compare,.saveCompareDiv").hide(); //Hide Compare Div
-                          angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
-                          $("#scrapTree,.fsScroll").show(); //Show Scraped Objects
-                          $rootScope.compareFlag = false;
-                          $("#left-top-section,#left-bottom-section").removeClass('disableClick');
-                          $("#changedOrdList li,#compareUnchangedObjectsBox li ,#compareNotFoundObjectsBox li").empty();
-                       //window.location.href = "/design";
+                    $(document).on('click', '#btnNavDesign', function () {
+                        $(".scrollbar-compare,.saveCompareDiv").hide(); //Hide Compare Div
+                        angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
+                        $("#scrapTree,.fsScroll").show(); //Show Scraped Objects
+                        $rootScope.compareFlag = false;
+                        $("#left-top-section,#left-bottom-section").removeClass('disableClick');
+                        $("#changedOrdList li,#compareUnchangedObjectsBox li ,#compareNotFoundObjectsBox li").empty();
+                        //window.location.href = "/design";
                     });
                 } else {
                     openDialog("Compared Objects", "Failed to update objects");
                     $("#changedOrdList li,#compareUnchangedObjectsBox li ,#compareNotFoundObjectsBox li").empty();
                 }
-            }, function(error) {
+            }, function (error) {
 
             });
     }
 
     //Show compared objects
-    $(document).on('click', '#comparedObjects', function() {
+    $(document).on('click', '#comparedObjects', function () {
         $("#scrapTree,.fsScroll").hide();
         $("#compareChangedObjectsBox,#compareUnchangedObjectsBox,#compareNotFoundObjectsBox").show();
         //$("#viewScrapedObjects").show();
     });
-    $(document).on('shown.bs.modal', '#deleteObjectsModal', function() {
-        var task=JSON.parse(window.localStorage['_CT'])
-       if (task.reuse == 'True') {
+    $(document).on('shown.bs.modal', '#deleteObjectsModal', function () {
+        var task = JSON.parse(window.localStorage['_CT'])
+        if (task.reuse == 'True') {
             $("#deleteObjectsModal").find('.modal-body p').text("Screen is been reused. Are you sure you want to delete objects?").css('color', 'black');
-        } else 
-        {
+        } else {
             $("#deleteObjectsModal").find('.modal-body p').text("Are you sure you want to delete objects?").css('color', 'black');
         }
     });
 
     //Delete Scraped Objects
-    function deleteScrapedObjects(e)
-    {
+    function deleteScrapedObjects(e) {
         var totalElements = $(".ellipsis").length;
         var selectedElements = $("input[type=checkbox].checkall:checked:visible").length;
-       // var currentElements = $(".ellipsis:visible").length
+        // var currentElements = $(".ellipsis:visible").length
         var filterActiveLen = $(".popupContent-filter-active").length;
         //Delete All Elements
-        if(totalElements == selectedElements)
-        {
+        if (totalElements == selectedElements) {
             $("#scraplist").empty();
             var currentElements = $(".ellipsis:visible").length;
             $("a.disableActions").removeClass("disableActions");
             $("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');
             $("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');
-            
+
             getIndexOfDeletedObjects = []
             viewString = {};
-            if(newScrapedList != undefined){
+            if (newScrapedList != undefined) {
                 newScrapedList.view = [];
                 newScrapedList.mirror = "";
             }
-                if(currentElements > 0)
-                {
-                    $("#deleteObjects,#saveObjects").prop("disabled", false);
-                    $(".checkStylebox").prop("checked", false);
-                }
-                else{
-                    $("#deleteObjects,.checkStylebox").prop("disabled", true);
-                    $(".checkStylebox").prop("checked", false);
-                    $(".popupContent-filter-active").trigger('click');
-                    $("#saveObjects").prop("disabled", false);
-                }
+            if (currentElements > 0) {
+                $("#deleteObjects,#saveObjects").prop("disabled", false);
+                $(".checkStylebox").prop("checked", false);
             }
-      else{
+            else {
+                $("#deleteObjects,.checkStylebox").prop("disabled", true);
+                $(".checkStylebox").prop("checked", false);
+                $(".popupContent-filter-active").trigger('click');
+                $("#saveObjects").prop("disabled", false);
+            }
+        }
+        else {
             //Delete Selected Elements
-          $.each($("input[type=checkbox].checkall:checked"), function() {
-             $(this).parents("li.select_all").remove();
-             var json ={
-                "xpath": $(this).closest("li").attr('data-xpath'),
-                "url": $(this).closest("li").attr('data-xpath'),
-                "top":  $(this).closest("li").attr('data-top'),
-                "hiddentag":  $(this).closest("li").attr('data-hiddentag'),
-                "height":  $(this).closest("li").attr('data-height'),
-                "custname":  $(this).parent().next("span.ellipsis").text(),
-                "width":  $(this).closest("li").attr('data-width'),
-                "tag":  $(this).closest("li").attr('data-tag'),
-                "left":  $(this).closest("li").attr('data-left'),
-                "tempId":  parseInt($(this).closest("li").attr('val'))
-            };
+            $.each($("input[type=checkbox].checkall:checked"), function () {
+                $(this).parents("li.select_all").remove();
+                var json = {
+                    "xpath": $(this).closest("li").attr('data-xpath'),
+                    "url": $(this).closest("li").attr('data-xpath'),
+                    "top": $(this).closest("li").attr('data-top'),
+                    "hiddentag": $(this).closest("li").attr('data-hiddentag'),
+                    "height": $(this).closest("li").attr('data-height'),
+                    "custname": $(this).parent().next("span.ellipsis").text(),
+                    "width": $(this).closest("li").attr('data-width'),
+                    "tag": $(this).closest("li").attr('data-tag'),
+                    "left": $(this).closest("li").attr('data-left'),
+                    "tempId": parseInt($(this).closest("li").attr('val'))
+                };
 
-              getIndexOfDeletedObjects.push(json);
-          })
-           var currentElements = $(".ellipsis:visible").length;
-          if(currentElements > 0)
-          {
-              $("#saveObjects").prop("disabled", false);
-              $(".checkStylebox").prop("checked", false);
-              $("#deleteObjects").prop("disabled", true);
-          }
-          else{
-              $("#deleteObjects,.checkStylebox").prop("disabled", true);
-              $(".checkStylebox").prop("checked", false);
-              $(".popupContent-filter-active").trigger('click');
-              $("#saveObjects").prop("disabled", false);
-          }
-      }
+                getIndexOfDeletedObjects.push(json);
+            })
+            var currentElements = $(".ellipsis:visible").length;
+            if (currentElements > 0) {
+                $("#saveObjects").prop("disabled", false);
+                $(".checkStylebox").prop("checked", false);
+                $("#deleteObjects").prop("disabled", true);
+            }
+            else {
+                $("#deleteObjects,.checkStylebox").prop("disabled", true);
+                $(".checkStylebox").prop("checked", false);
+                $(".popupContent-filter-active").trigger('click');
+                $("#saveObjects").prop("disabled", false);
+            }
+        }
 
-	  //Transaction Activity for Delete Scraped Objects Button Action
-    //   var labelArr = [];
-    //   var infoArr = [];
-    //   labelArr.push(txnHistory.codesDict['DeleteScrapedObjects']);
-    //   txnHistory.log(e.type,labelArr,infoArr,$location.$$path);					
-     
+        //Transaction Activity for Delete Scraped Objects Button Action
+        //   var labelArr = [];
+        //   var infoArr = [];
+        //   labelArr.push(txnHistory.codesDict['DeleteScrapedObjects']);
+        //   txnHistory.log(e.type,labelArr,infoArr,$location.$$path);					
+
     }
 
     //To delete Scrape Objects
-    $scope.del_Objects = function(e) {
+    $scope.del_Objects = function (e) {
         $("#deleteObjectsModal").modal("hide");
-       
+
         if (deleteScrapeDataservice) {
             var userinfo = JSON.parse(window.localStorage['_UI']);
             //var tasks = JSON.parse(window.localStorage['_TJ']);
@@ -2174,22 +2198,20 @@ $(document).on('keypress', '#app_pid', function(e) {
 
             var checkCondLen = $("#scraplist li").children('a').find('input[type=checkbox].checkall:checked:visible').length;
             if (checkCondLen > 0) {
-                $('input[type=checkbox].checkall:checked:visible').each(function() {
+                $('input[type=checkbox].checkall:checked:visible').each(function () {
                     var id = $(this).parent().attr('id').split("_");
                     id = id[1];
-                    if(eaCheckbox == false && Object.keys(viewString.view).length != 0)
-                    {
+                    if (eaCheckbox == false && Object.keys(viewString.view).length != 0) {
                         deletedCustNames.push(viewString.view[id].custname);
                         deletedCustPath.push(viewString.view[id].xpath);
                         deletedIndex.push(id);
                     }
-                    else if(eaCheckbox == true && Object.keys(viewString.view).length == 0)
-                    {
+                    else if (eaCheckbox == true && Object.keys(viewString.view).length == 0) {
                         deletedCustNames.push(newScrapedList.view[id].custname);
                         deletedCustPath.push(newScrapedList.view[id].xpath);
                         deletedIndex.push(id);
                     }
-                 
+
                     //deletedIndex.push()
                     // console.log(viewString.view[id])
                 });
@@ -2201,34 +2223,34 @@ $(document).on('keypress', '#app_pid', function(e) {
 
             //updating renamed objects
             var tempModifiednames;
-            if(window.localStorage['_modified']){
+            if (window.localStorage['_modified']) {
                 modifiednames = JSON.parse(window.localStorage['_modified']);
                 tempModifiednames = JSON.parse(window.localStorage['_modified']);
             }
             if (eaCheckbox) {
-                if(copiedViewstring != true){
+                if (copiedViewstring != true) {
                     for (var j = 0; j < viewString.view.length; j++) {
                         newScrapedList.view.push(viewString.view[j]);
                     }
                     copiedViewstring = true;
                 }
             }
-            if(modifiednames.length > 0){
+            if (modifiednames.length > 0) {
                 var mdName;
-                for(var i=0; i<modifiednames.length; i++){
+                for (var i = 0; i < modifiednames.length; i++) {
                     mdName = modifiednames[i].split("^^");
-                    if (eaCheckbox){
-                        if(mdName[1] != undefined){
-                            if(newScrapedList.view[mdName[1]])
+                    if (eaCheckbox) {
+                        if (mdName[1] != undefined) {
+                            if (newScrapedList.view[mdName[1]])
                                 newScrapedList.view[mdName[1]].custname = mdName[0];
                             tempModifiednames[i] = mdName[0];
                             //tempModifiednames = tempModifiednames.filter(function(n) {return n != null});
                             window.localStorage['_modified'] = JSON.stringify(tempModifiednames)
                         }
                     }
-                    else{
-                        if(mdName[1] != undefined){
-                            if(viewString.view[mdName[1]])                         
+                    else {
+                        if (mdName[1] != undefined) {
+                            if (viewString.view[mdName[1]])
                                 viewString.view[mdName[1]].custname = mdName[0];
                             tempModifiednames[i] = mdName[0];
                             //tempModifiednames = tempModifiednames.filter(function(n) {return n != null});
@@ -2237,38 +2259,38 @@ $(document).on('keypress', '#app_pid', function(e) {
                     }
                 }
             }
-              //Delete all objects ------------------------------------------
-              deleteScrapedObjects(e);
-              $("#saveObjects").trigger('click');
+            //Delete all objects ------------------------------------------
+            deleteScrapedObjects(e);
+            $("#saveObjects").trigger('click');
         } else {
             var tempModifiednames;
-            if(window.localStorage['_modified']){
+            if (window.localStorage['_modified']) {
                 modifiednames = JSON.parse(window.localStorage['_modified']);
                 tempModifiednames = JSON.parse(window.localStorage['_modified']);
             }
             if (eaCheckbox) {
-                if(copiedViewstring != true){
+                if (copiedViewstring != true) {
                     for (var j = 0; j < viewString.view.length; j++) {
                         newScrapedList.view.push(viewString.view[j]);
                     }
                     copiedViewstring = true;
                 }
-            }            
-            if(modifiednames.length > 0){
+            }
+            if (modifiednames.length > 0) {
                 var mdName;
-                for(var i=0; i<modifiednames.length; i++){
+                for (var i = 0; i < modifiednames.length; i++) {
                     mdName = modifiednames[i].split("^^");
-                    if (eaCheckbox){
-                        if(mdName[1] != undefined){
-                            if(newScrapedList.view[mdName[1]])
+                    if (eaCheckbox) {
+                        if (mdName[1] != undefined) {
+                            if (newScrapedList.view[mdName[1]])
                                 newScrapedList.view[mdName[1]].custname = mdName[0];
                             tempModifiednames[i] = mdName[0];
                             window.localStorage['_modified'] = JSON.stringify(tempModifiednames)
                         }
                     }
-                    else{
-                        if(mdName[1] != undefined){
-                            if(viewString.view[mdName[1]])                           
+                    else {
+                        if (mdName[1] != undefined) {
+                            if (viewString.view[mdName[1]])
                                 viewString.view[mdName[1]].custname = mdName[0];
                             tempModifiednames[i] = mdName[0];
                             window.localStorage['_modified'] = JSON.stringify(tempModifiednames)
@@ -2279,95 +2301,113 @@ $(document).on('keypress', '#app_pid', function(e) {
             if ($(".parentObjContainer").find(".checkStylebox").is(":checked") && saveScrapeDataFlag == true) {
                 viewString.view = [];
                 viewString.mirror = "";
-                if(newScrapedList != undefined){
+                if (newScrapedList != undefined) {
                     newScrapedList.view = [];
                     newScrapedList.mirror = "";
                 }
                 var totalElements = $(".ellipsis").length;
                 var selectedElements = $(".ellipsis:visible").length;
-                if(totalElements == selectedElements)
-                {
+                if (totalElements == selectedElements) {
                     $("#scraplist").empty();
                 }
-                else{
+                else {
                     $("#scraplist").children("li:visible").empty();
                 }
                 var currentElements = $(".ellipsis:visible").length;
-                if(currentElements > 0)
-                {
+                if (currentElements > 0) {
                     $("#deleteObjects,#saveObjects").prop("disabled", false);
                     $(".checkStylebox").prop("checked", false);
                 }
-                else{
+                else {
                     $("#deleteObjects,.checkStylebox").prop("disabled", true);
                     $(".checkStylebox").prop("checked", false);
-                  
+
                 }
             } else if (!$("input[type=checkbox].checkall").is(":checked")) {
                 openDialog("Delete Scrape data", "Please select objects to delete.")
             } else {
-                if (eaCheckbox){
+                if (eaCheckbox) {
                     var totalElements = $(".ellipsis").length;
                     var selectedElements = $("input[type=checkbox].checkall:checked:visible").length;
-                    if(totalElements == selectedElements)
-                    {
+                    if (totalElements == selectedElements) {
                         $("#scraplist").empty();
                         var currentElements = $(".ellipsis:visible").length;
                         $("a.disableActions").removeClass("disableActions");
                         $("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');
                         $("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');
-                        
+
                         getIndexOfDeletedObjects = []
                         viewString = {};
-                        if(newScrapedList != undefined){
+                        if (newScrapedList != undefined) {
                             newScrapedList.view = [];
                             newScrapedList.mirror = "";
                         }
                     }
-                    else{
+                    else {
                         var dontChkViewString = 0;
-                        $.each($("input[type=checkbox].checkall:checked"), function() {  
+                        $.each($("input[type=checkbox].checkall:checked"), function () {
                             for (var i = 0; i < newScrapedList.view.length; i++) {
-                                if ($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == newScrapedList.view[i].custname.trim()) {
-                                    if(!(isInArray(newScrapedList.view.indexOf(newScrapedList.view[i]), getIndexOfDeletedObjects))){
-                                        getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
-                                        $(this).parents("li.select_all").remove();
-                                        dontChkViewString++;
-                                        break;
+                                if (appType == 'DesktopJava'|| appType == 'Desktop') {
+                                    if ($(this).parents("li").data("xpath").replace(/[\"]/g, "\'") == newScrapedList.view[i].xpath.replace(/\n/g," ") && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim()).replace(/[<>]/g, '').replace('\n', ' ') == newScrapedList.view[i].custname.trim().replace(/[<>]/g, '').replace('/\s/g', ' ').replace(/  +/g, ' ').replace('\n', ' ')) {
+                                        if (!(isInArray(newScrapedList.view.indexOf(newScrapedList.view[i]), getIndexOfDeletedObjects))) {
+                                            getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
+                                            $(this).parents("li.select_all").remove();
+                                            dontChkViewString++;
+                                            break;
+                                        }
+                                    }
+                                }
+                                else {
+                                    if ($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == newScrapedList.view[i].custname.trim().replace(/[<>]/g, '')) {
+                                        if (!(isInArray(newScrapedList.view.indexOf(newScrapedList.view[i]), getIndexOfDeletedObjects))) {
+                                            getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
+                                            $(this).parents("li.select_all").remove();
+                                            dontChkViewString++;
+                                            break;
+                                        }
                                     }
                                 }
                             }
                         })
-                        if($("input[type=checkbox].checkall:checked").length != dontChkViewString){ 
-                            $.each($("input[type=checkbox].checkall:checked"), function() {
+                        if ($("input[type=checkbox].checkall:checked").length != dontChkViewString) {
+                            $.each($("input[type=checkbox].checkall:checked"), function () {
                                 for (var i = 0; i < viewString.view.length; i++) {
-                                    if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == viewString.view[i].custname.trim()) {
-                                        if(!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))){
-                                            getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
-                                            $(this).parents("li.select_all").remove();
-                                            break;
+                                    if (appType == 'DesktopJava') {
+                                        if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ').replace(/[<>]/g, '') == viewString.view[i].custname.trim().replace(/[<>]/g, '').replace('/\s/g', ' ').replace(/  +/g, ' ').replace('\n', ' ')) {
+                                            if (!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))) {
+                                                getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
+                                                $(this).parents("li.select_all").remove();
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ').replace(/[<>]/g, '') == viewString.view[i].custname.trim().replace(/[<>]/g, '')) {
+                                            if (!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))) {
+                                                getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
+                                                $(this).parents("li.select_all").remove();
+                                                break;
+                                            }
                                         }
                                     }
                                 }
                             })
                         }
                     }
-					  $("#saveObjects").trigger('click');
+                    $("#saveObjects").trigger('click');
                 }
-                else{
-                        deleteScrapedObjects(e);  
+                else {
+                    deleteScrapedObjects(e);
                 }
                 $("#deleteObjects").prop("disabled", true);
             }
         }
-        if($(".ellipsis").length == 0)
-        {
-           $(".checkStylebox").prop('disabled', true);
-           if(saveScrapeDataFlag == false)
-           {
-             $("#saveObjects").prop("disabled", true);
-           }
-          
+        if ($(".ellipsis").length == 0) {
+            $(".checkStylebox").prop('disabled', true);
+            if (saveScrapeDataFlag == false) {
+                $("#saveObjects").prop("disabled", true);
+            }
+
         }
     }
 
@@ -2377,7 +2417,7 @@ $(document).on('keypress', '#app_pid', function(e) {
 
     var showSearchBox = true;
     //Search scraped objects
-    $(document).on("click", ".searchScrapEle", function() {
+    $(document).on("click", ".searchScrapEle", function () {
         if (showSearchBox) {
             $(".searchScrapInput").show();
             showSearchBox = false;
@@ -2389,12 +2429,12 @@ $(document).on('keypress', '#app_pid', function(e) {
     })
 
     //Search Scrape objects filter
-    $(document).on('keyup', '.searchScrapInput', function() {
+    $(document).on('keyup', '.searchScrapInput', function () {
         var count = 0;
         var numberOfElems = 0;
         var value = $(this).val();
-        
-        $(".select_all").each(function() {
+
+        $(".select_all").each(function () {
             if ($(this).find("span.ellipsis").text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
                 numberOfElems++;
                 $(this).show();
@@ -2409,35 +2449,33 @@ $(document).on('keypress', '#app_pid', function(e) {
 
         if (numberOfElems == 0) {
             $("#deleteObjects,.checkStylebox").prop("disabled", true);
-         } 
+        }
         else {
             $("#deleteObjects,.checkStylebox").prop("disabled", false);
         }
-      //  var checkedLen = $(".ellipsis:checked").length;
+        //  var checkedLen = $(".ellipsis:checked").length;
         var checkedLen = $("#scraplist li").children('a').find('input[type=checkbox].checkall:checked:visible').length;
-        if(checkedLen == 0)
-        {
+        if (checkedLen == 0) {
             $("#deleteObjects").prop("disabled", true);
         }
         if (numberOfElems == 0 && count == 0) {
             $('.checkStylebox').prop("checked", false);
         }
         if (numberOfElems != 0 && count == 0) {
-            if($("#scraplist li").children('a').find('input[type=checkbox].checkall:checked:visible').length > 0)
-            {
+            if ($("#scraplist li").children('a').find('input[type=checkbox].checkall:checked:visible').length > 0) {
                 $('.checkStylebox').prop("checked", true);
             }
-            else{
+            else {
                 $('.checkStylebox').prop("checked", false);
             }
-           
+
         } else {
             $('.checkStylebox').prop("checked", false);
         }
     });
 
     //Highlight Element on browser
-    $scope.highlightScrapElement = function(xpath, url) {
+    $scope.highlightScrapElement = function (xpath, url) {
         var appType = $scope.getScreenView;
         //if(enableScreenShotHighlight == true){
         console.log("Init ScreenShot Highlight")
@@ -2450,40 +2488,39 @@ $(document).on('keypress', '#app_pid', function(e) {
         }
         //console.log(data)
         var rect, type, ref, name, id, value, label, visible, l10n, source;
-        if (appType == "MobileWeb" ) {
-            if(parseInt(viewString.mirrorwidth) > 500)
-            {
-                x = (parseInt(data.rslt.obj.data("left") * 490)/ parseInt(viewString.mirrorwidth))
-                y = (parseInt(data.rslt.obj.data("top") * 761)/ parseInt(viewString.mirrorheight))
-                w = (parseInt(data.rslt.obj.data("width") * 490)/ parseInt(viewString.mirrorwidth))
-                h = (parseInt(data.rslt.obj.data("height") * 761)/ parseInt(viewString.mirrorheight))
-                  rect = {
-                            x: x.toString(),
-                            y: y.toString(),
-                            w: w.toString(),
-                            h: h.toString()
-                        }
-
-            }
-             else{
-             rect = {
-                        x: data.rslt.obj.data("left"),
-                        y: data.rslt.obj.data("top"),
-                        w: data.rslt.obj.data("width"),
-                        h: data.rslt.obj.data("height")
-                    }
+        if (appType == "MobileWeb") {
+            if (parseInt(viewString.mirrorwidth) > 500) {
+                x = (parseInt(data.rslt.obj.data("left") * 490) / parseInt(viewString.mirrorwidth))
+                y = (parseInt(data.rslt.obj.data("top") * 761) / parseInt(viewString.mirrorheight))
+                w = (parseInt(data.rslt.obj.data("width") * 490) / parseInt(viewString.mirrorwidth))
+                h = (parseInt(data.rslt.obj.data("height") * 761) / parseInt(viewString.mirrorheight))
+                rect = {
+                    x: x.toString(),
+                    y: y.toString(),
+                    w: w.toString(),
+                    h: h.toString()
                 }
 
+            }
+            else {
+                rect = {
+                    x: data.rslt.obj.data("left"),
+                    y: data.rslt.obj.data("top"),
+                    w: data.rslt.obj.data("width"),
+                    h: data.rslt.obj.data("height")
+                }
+            }
+
         }
-        else{
-             rect = {
-                        x: data.rslt.obj.data("left"),
-                        y: data.rslt.obj.data("top"),
-                        w: data.rslt.obj.data("width"),
-                        h: data.rslt.obj.data("height")
-                    }
+        else {
+            rect = {
+                x: data.rslt.obj.data("left"),
+                y: data.rslt.obj.data("top"),
+                w: data.rslt.obj.data("width"),
+                h: data.rslt.obj.data("height")
+            }
         }
-       
+
 
         type = data.rslt.obj.data("tag");
         ref = data.rslt.obj.data("reference");
@@ -2533,20 +2570,19 @@ $(document).on('keypress', '#app_pid', function(e) {
                     d.css('height', rect.h + 'px');
                     d.css('width', rect.w + 'px');
                 } else {
-                     if(parseInt(viewString.mirrorwidth) > 500)
-                     {
-                            d.css('left', (rect.x) + 'px');
-                            d.css('top', (rect.y) + 'px');
-                            d.css('height', rect.h + 'px');
-                            d.css('width', rect.w + 'px');
-                     }
-                     else{
-                            d.css('left', (rect.x - 2) + 'px');
-                            d.css('top', (rect.y - 6) + 'px');
-                            d.css('height', rect.h + 'px');
-                            d.css('width', rect.w + 'px');
-                     }
-                   
+                    if (parseInt(viewString.mirrorwidth) > 500) {
+                        d.css('left', (rect.x) + 'px');
+                        d.css('top', (rect.y) + 'px');
+                        d.css('height', rect.h + 'px');
+                        d.css('width', rect.w + 'px');
+                    }
+                    else {
+                        d.css('left', (rect.x - 2) + 'px');
+                        d.css('top', (rect.y - 6) + 'px');
+                        d.css('height', rect.h + 'px');
+                        d.css('width', rect.w + 'px');
+                    }
+
                 }
             } else if (appType == "SAP") {
                 d.css('left', (Math.round(rect.x) * scale_highlight) + 3 + 'px');
@@ -2564,12 +2600,12 @@ $(document).on('keypress', '#app_pid', function(e) {
             d.css('z-index', '3');
             d.css('opacity', '0.7');
             getTopValue = Math.round(rect.y) * scale_highlight + 'px';
-            getTopValueios = Math.round(rect.y) * scale_highlight +100+ 'px'
+            getTopValueios = Math.round(rect.y) * scale_highlight + 100 + 'px'
             if (appType == "MobileApp")
-                if(navigator.appVersion.indexOf("Mac") != -1) $(".scroll-wrapper > .scrollbar-screenshot").animate({scrollTop: parseInt(getTopValueios)}, 500);
-                else $(".scroll-wrapper > .scrollbar-screenshot").animate({scrollTop: parseInt(Math.round(rect.y) - 600) + 'px'}, 500);
+                if (navigator.appVersion.indexOf("Mac") != -1) $(".scroll-wrapper > .scrollbar-screenshot").animate({ scrollTop: parseInt(getTopValueios) }, 500);
+                else $(".scroll-wrapper > .scrollbar-screenshot").animate({ scrollTop: parseInt(Math.round(rect.y) - 600) + 'px' }, 500);
             else
-                $(".scroll-wrapper > .scrollbar-screenshot").animate({scrollTop: parseInt(getTopValue)}, 500);
+                $(".scroll-wrapper > .scrollbar-screenshot").animate({ scrollTop: parseInt(getTopValue) }, 500);
             //$('.scroll-wrapper > .scrollbar-screenshot').scrollTo(d.offset().top);
             var color;
             if (translationFound) {
@@ -2584,7 +2620,7 @@ $(document).on('keypress', '#app_pid', function(e) {
         //}
         //	else{
         DesignServices.highlightScrapElement_ICE(xpath, url, appType)
-            .then(function(data) {
+            .then(function (data) {
                 if (data == "Invalid Session") {
                     $rootScope.redirectPage();
                 }
@@ -2592,14 +2628,14 @@ $(document).on('keypress', '#app_pid', function(e) {
                     openDialog("Fail", "Failed to highlight")
                 }
                 console.log("success!::::" + data);
-            }, function(error) {});
+            }, function (error) { });
         //	}
     };
     //Highlight Element on browser
 
     //Highlight compared and updated objects
     //Highlight Element on browser
-    $scope.highlightComparedScrapElements = function(xpath, url, uid) {
+    $scope.highlightComparedScrapElements = function (xpath, url, uid) {
         var appType = $scope.getScreenView;
         //console.log("uid",uid);
         //if(enableScreenShotHighlight == true){
@@ -2611,7 +2647,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                 obj: $("#" + uid).find(".focus-highlight").closest("li")
             }
         }
-       // console.log(data)
+        // console.log(data)
         var rect, type, ref, name, id, value, label, visible, l10n, source;
         rect = {
             x: data.rslt.obj.data("left"),
@@ -2685,21 +2721,21 @@ $(document).on('keypress', '#app_pid', function(e) {
             $(".hightlight").remove();
         }
         DesignServices.highlightScrapElement_ICE(xpath, url, appType)
-        .then(function(data) {
-            if (data == "Invalid Session") {
-                $rootScope.redirectPage();
-            }
-            if (data == "fail") {
-                openDialog("Fail", "Failed to highlight")
-            }
-            console.log("success!::::" + data);
-        }, function(error) {});
+            .then(function (data) {
+                if (data == "Invalid Session") {
+                    $rootScope.redirectPage();
+                }
+                if (data == "fail") {
+                    openDialog("Fail", "Failed to highlight")
+                }
+                console.log("success!::::" + data);
+            }, function (error) { });
         //}
     };
     //Highlight compared and updated objects
 
     //Add Object Functionality
-    $scope.addObj = function() {
+    $scope.addObj = function () {
 
         $(".generateObj span img").removeClass("left-bottom-selection");
         $(".compareObject span img").removeClass("left-bottom-selection");
@@ -2710,20 +2746,20 @@ $(document).on('keypress', '#app_pid', function(e) {
         $("#addObjContainer").empty()
         if ($(".addObj-row").length > 1) $(".addObj-row").remove()
         $("#addObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a">Link</option><option value="input">Textbox/Textarea</option><option value="table">Table</option><option value="list">List</option><option value="select">Dropdown</option><option value="img">Image</option><option value="button">Button</option><option value="radiobutton">Radiobutton</option><option value="checkbox">Checkbox</option><option value="Element">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /></div>')
-        
-        $scope.removeAddObjectSelection = function(){
+
+        $scope.removeAddObjectSelection = function () {
             $("img.left-bottom-selection").removeClass('left-bottom-selection');
         };
     };
     //Add Object Functionality
 
     //Delete Custom Object Row
-    $(document).on("click", ".deleteAddObjRow", function() {
+    $(document).on("click", ".deleteAddObjRow", function () {
         $(this).parent(".addObj-row").remove();
     });
 
     //Add More Object Functionality
-    $scope.addMoreObject = function() {
+    $scope.addMoreObject = function () {
         $("#addObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a">Link</option><option value="input">Textbox/Textarea</option><option value="table">Table</option><option value="list">List</option><option value="select">Dropdown</option><option value="img">Image</option><option value="button">Button</option><option value="radiobutton">Radiobutton</option><option value="checkbox">Checkbox</option><option value="Element">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /></div>')
     };
     //Add More Object Functionality
@@ -2733,7 +2769,7 @@ $(document).on('keypress', '#app_pid', function(e) {
     //WSDL Functionality
 
     //Submit Custom Object Functionality
-    $scope.submitCustomObject = function(e) {
+    $scope.submitCustomObject = function (e) {
         var err = "false";
         $('input.inputErrorBorderBottom').removeClass('inputErrorBorderBottom');
         $scope.errorMessage = "";
@@ -2744,8 +2780,8 @@ $(document).on('keypress', '#app_pid', function(e) {
         $(".addObj-row").find("select").removeClass('selectErrorBorder');
         var custObjNames = [];
         var dupCustObjNames = [];
-        $('input.form-control-custom').each(function() {
-            custObjNames.push( $.trim($(this).val()));
+        $('input.form-control-custom').each(function () {
+            custObjNames.push($.trim($(this).val()));
         });
         var sorted_custObjNames = custObjNames.slice().sort();
         for (var i = 0; i < custObjNames.length - 1; i++) {
@@ -2753,22 +2789,19 @@ $(document).on('keypress', '#app_pid', function(e) {
                 dupCustObjNames.push(sorted_custObjNames[i]);
             }
         }
-        if(dupCustObjNames.length > 0)
-        {
+        if (dupCustObjNames.length > 0) {
             openDialog("Add Object", "Duplicate custom names");
-            $('input.form-control-custom').each(function() {
-                for(var j=0;j<dupCustObjNames.length;j++)
-                {
-                    if ($.trim($(this).val()) == $.trim(dupCustObjNames[j]))
-                    {
+            $('input.form-control-custom').each(function () {
+                for (var j = 0; j < dupCustObjNames.length; j++) {
+                    if ($.trim($(this).val()) == $.trim(dupCustObjNames[j])) {
                         $(this).addClass('inputErrorBorderBottom');
-                    } 
+                    }
                 }
-                    
+
             });
             return false;
         }
-        $.each($(".addObj-row"), function() {
+        $.each($(".addObj-row"), function () {
             if ($(this).find("input").val() == "") {
                 //$scope.errorMessage = "Please enter object name";
                 //$(".addObjTopWrap").find(".error-msg-abs").text("Please enter object name");
@@ -2782,17 +2815,17 @@ $(document).on('keypress', '#app_pid', function(e) {
                 flag = "false";
                 return false
             } else {
-				// if(window.localStorage['_modified']){
-				// 	modifiednames = JSON.parse(window.localStorage['_modified']);
-				// }
-				// if(modifiednames.length > 0){
-				// 	var mdName;
-				// 	for(var i=0; i<modifiednames.length; i++){
-				// 		mdName = modifiednames[i].split("^^");
-				// 		if (eaCheckbox)	newScrapedList.view[mdName[1]].custname = mdName[0];
-				// 		else viewString.view[mdName[1]].custname = mdName[0];
-				// 	}
-				// }
+                // if(window.localStorage['_modified']){
+                // 	modifiednames = JSON.parse(window.localStorage['_modified']);
+                // }
+                // if(modifiednames.length > 0){
+                // 	var mdName;
+                // 	for(var i=0; i<modifiednames.length; i++){
+                // 		mdName = modifiednames[i].split("^^");
+                // 		if (eaCheckbox)	newScrapedList.view[mdName[1]].custname = mdName[0];
+                // 		else viewString.view[mdName[1]].custname = mdName[0];
+                // 	}
+                // }
                 // if (Object.keys(viewString.view).length > 0) {
                 //     for (var i = 0; i < viewString.view.length; i++) {
                 //         if ($(this).find("input").val() == viewString.view[i].custname) {
@@ -2802,25 +2835,22 @@ $(document).on('keypress', '#app_pid', function(e) {
                 //         }
                 //     }
                 // }find("span.ellipsis").text()
-                if(viewString.view != undefined && viewString.view.length !=undefined)
-                {
-                      for (var i = 0; i < viewString.view.length; i++) {
-                         
-						if ( $.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname) || $.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname).split("_")[0]) {
-							//$("#dialog-addObject").modal("hide");
+                if (viewString.view != undefined && viewString.view.length != undefined) {
+                    for (var i = 0; i < viewString.view.length; i++) {
+
+                        if ($.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname) || $.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname).split("_")[0]) {
+                            //$("#dialog-addObject").modal("hide");
                             openDialog("Add Object", "Object characterstics are same for " + $(this).find("input").val() + "");
                             $(this).find("input").addClass('inputErrorBorderBottom');
                             err = "true";
-						}
+                        }
                     }
                 }
-                if(err == "true")
-                {
+                if (err == "true") {
                     flag = "false";
                     return false;
                 }
-                else
-                {
+                else {
                     //If no field is empty, proceed to service call
                     flag = "true";
                     $scope.errorMessage = "";
@@ -2833,10 +2863,10 @@ $(document).on('keypress', '#app_pid', function(e) {
             var customObj = [];
             //window.localStorage['disableEditing'] = "true";
             //Pushing custom object in array
-            $.each($(".addObj-row"), function() {
+            $.each($(".addObj-row"), function () {
                 var typeOfElement;
                 var eleType = $(this).find("select option:selected").val();
-                switch(eleType){
+                switch (eleType) {
                     case "button":
                         typeOfElement = "btn";
                         break;
@@ -2871,7 +2901,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                         break;
                 }
                 customObj.push({
-                    custname: $(this).find("input").val()+"_"+typeOfElement,
+                    custname: $(this).find("input").val() + "_" + typeOfElement,
                     tag: eleType,
 
                     xpath: ''
@@ -2913,7 +2943,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                 }
                 angular.element(innerUL).append(li);
             }
-			$("li.item:visible").each(function() {
+            $("li.item:visible").each(function () {
                 if ($(this).attr('data-xpath') == "") {
                     $(this).children().find('span.ellipsis').addClass('customObject');
                 }
@@ -2928,7 +2958,7 @@ $(document).on('keypress', '#app_pid', function(e) {
             //$("#addObjectSuccess").modal("show")
             $("#saveObjects").prop("disabled", false)
             flag = "false";
-			//Transaction Activity for Submit Custom Objects Action
+            //Transaction Activity for Submit Custom Objects Action
             // var labelArr = [];
             // var infoArr = [];
             // labelArr.push(txnHistory.codesDict['SubmitCustomObject']);
@@ -2948,7 +2978,7 @@ $(document).on('keypress', '#app_pid', function(e) {
     //Submit Custom Object Functionality
 
     //Map Object Drag and Drop Functionality
-    $scope.generateMapObj = function() {
+    $scope.generateMapObj = function () {
 
         $(".addObject span img").removeClass("left-bottom-selection");
         $(".compareObject span img").removeClass("left-bottom-selection");
@@ -2959,7 +2989,7 @@ $(document).on('keypress', '#app_pid', function(e) {
         $('#scrapedObjforMap, #customObjforMap').empty();
 
         // if viewstring.view has scraped objects, then populate these in map object popup 
-        if(viewString.view){
+        if (viewString.view) {
             for (i = 0; i < viewString.view.length; i++) {
                 var path = viewString.view[i].xpath;
                 var ob = viewString.view[i];
@@ -2982,7 +3012,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                     $('#customObjforMap').append('<div class="accd-Obj"><div class="accd-Obj-head">' + tag + '</div><div class="accd-Obj-body">' + li + '</div></div>')
 
                     /****Filtering same object type in one container****/
-                    $(".accd-Obj .accd-Obj-head").each(function() {
+                    $(".accd-Obj .accd-Obj-head").each(function () {
                         if ($(this).text() == $(li).data("tag") && $(this).siblings().text() != $(li).children("span").text()) {
                             $(this).parent().children(".accd-Obj-body").append(li);
                         }
@@ -2994,7 +3024,7 @@ $(document).on('keypress', '#app_pid', function(e) {
 
         /****Removing same objects type for custom objects****/
         var seen = {};
-        $('.accd-Obj .accd-Obj-head').each(function() {
+        $('.accd-Obj .accd-Obj-head').each(function () {
             var txt = $(this).text();
             if (seen[txt]) $(this).remove();
             else seen[txt] = true;
@@ -3004,7 +3034,7 @@ $(document).on('keypress', '#app_pid', function(e) {
         $(".accd-Obj-head").append('<span class="showactiveArrow"></span>');
         $(".accd-Obj-body li").append('<span class="showPreviousVal" title="Show Previous Text"></span>');
 
-        $(document).on('shown.bs.modal', '#dialog-mapObject', function() {
+        $(document).on('shown.bs.modal', '#dialog-mapObject', function () {
             $(".unlinkButton").attr("disabled", true);
             if ($("#scrapedObjforMap").find(".ellipsis:visible").length > 0) {
                 $(".showAllObjects,#submitMapObj").attr("disabled", false);
@@ -3018,14 +3048,14 @@ $(document).on('keypress', '#app_pid', function(e) {
             }
         });
 
-        $scope.removeMapObjectSelection = function()
-        {   $('#scrapedObjforMap, #customObjforMap').empty();
+        $scope.removeMapObjectSelection = function () {
+            $('#scrapedObjforMap, #customObjforMap').empty();
             $("img.left-bottom-selection").removeClass('left-bottom-selection');
         };
     }
     $rootScope.compareFlag = false;
     //Compare Objects
-    $scope.compareObj = function() {
+    $scope.compareObj = function () {
 
         $(".generateObj span img").removeClass("left-bottom-selection");
         $(".addObject span img").removeClass("left-bottom-selection");
@@ -3033,24 +3063,23 @@ $(document).on('keypress', '#app_pid', function(e) {
 
         //openDialog("Compare Object", "");
         $rootScope.compareFlag = true;
-        if ( $rootScope.compareFlag == true) {      
-           $("#compareObjectModal").modal("show");    
-           $timeout(function() {
-            if (navigator.appVersion.indexOf("Mac") != -1) {
-                $(".safariBrowser").show();
-            }
-        }, 300)         
+        if ($rootScope.compareFlag == true) {
+            $("#compareObjectModal").modal("show");
+            $timeout(function () {
+                if (navigator.appVersion.indexOf("Mac") != -1) {
+                    $(".safariBrowser").show();
+                }
+            }, 300)
         }
-        $scope.removeCompareSelection = function()
-        {
+        $scope.removeCompareSelection = function () {
             $rootScope.compareFlag = false;
             $("img.left-bottom-selection").removeClass('left-bottom-selection');
         };
     };
 
-    $(document).on("click", ".showAllObjects", function() {
+    $(document).on("click", ".showAllObjects", function () {
         //console.log("hello");
-        $('#scrapedObjforMap li').each(function() {
+        $('#scrapedObjforMap li').each(function () {
             $(this).show();
             $(".accd-Obj-body").slideUp("fast");
             $(".accd-Obj-head").find(".showactiveArrow").fadeOut("fast");
@@ -3059,9 +3088,9 @@ $(document).on('keypress', '#app_pid', function(e) {
     })
 
     /****Custom object Accoridan****/
-    $(document).on("click", ".accd-Obj-head", function() {
+    $(document).on("click", ".accd-Obj-head", function () {
         var clickElem = $(this).text().trim();
-        $('#scrapedObjforMap li').each(function() {
+        $('#scrapedObjforMap li').each(function () {
             if ($(this).data("tag").trim() != clickElem && clickElem != "Element") {
                 $(this).hide();
             } else if (clickElem == "Element") {
@@ -3086,7 +3115,7 @@ $(document).on('keypress', '#app_pid', function(e) {
         // 	}
         // 	//console.log(viewString.view[i].tag);
         // }
-        $(this).siblings(".accd-Obj-body").slideToggle("fast", function() {
+        $(this).siblings(".accd-Obj-body").slideToggle("fast", function () {
             $(this).siblings(".accd-Obj-head").find(".showactiveArrow").fadeIn("fast");
             if ($(this).parent().siblings().children(".accd-Obj-body").is(":visible") == true) {
                 $(this).parent().siblings().children(".accd-Obj-body").slideUp("fast");
@@ -3100,7 +3129,7 @@ $(document).on('keypress', '#app_pid', function(e) {
     /****Custom object Accoridan****/
 
     /***Un-link Functonality***/
-    $(document).on("click", ".valueMerged", function() {
+    $(document).on("click", ".valueMerged", function () {
         $(this).toggleClass("valueMergedSelected")
 
         //Enable-Disable Unlink button based on the valueMergedSelected Class
@@ -3108,11 +3137,11 @@ $(document).on('keypress', '#app_pid', function(e) {
         else $(".unlinkButton").prop("disabled", true)
     });
 
-    $scope.unlinkMapObj = function() {
+    $scope.unlinkMapObj = function () {
         $(".submitObjectWarning, .objectExistMap").hide();
         var mergedObj = $(".valueMergedSelected");
         var sXpath;
-        $.each(mergedObj, function() {
+        $.each(mergedObj, function () {
             sXpath = $(this).children(".fromMergeObj").data("xpath")
             $(this).children(".showPreviousVal").hide();
             $(this).children(".fromMergeObj").remove();
@@ -3120,7 +3149,7 @@ $(document).on('keypress', '#app_pid', function(e) {
             $(this).removeClass("valueMerged valueMergedSelected");
 
             /***Reseting Selected Dragged Object for Left Scrapped Tree***/
-            $.each($("#scrapedObjforMap li"), function() {
+            $.each($("#scrapedObjforMap li"), function () {
                 if ($(this).data("xpath") == sXpath) {
                     $(this).attr("draggable", true)
                     $(this).children(".ellipsis").css({
@@ -3136,7 +3165,7 @@ $(document).on('keypress', '#app_pid', function(e) {
     /***Un-link Functonality***/
 
     /****Show prev value functionality for map object****/
-    $(document).on("click", function(e) {
+    $(document).on("click", function (e) {
         if (e.target.className == "showPreviousVal") {
             $(e.target).siblings(".fromMergeObj").hide();
             $(e.target).siblings(".toMergeObj").show();
@@ -3148,7 +3177,7 @@ $(document).on('keypress', '#app_pid', function(e) {
     /****Show prev value functionality for map object****/
 
     /****Submit Map Object Functionality****/
-    $scope.submitMapObject = function(e) {
+    $scope.submitMapObject = function (e) {
         $(".submitObjectWarning, .objectExistMap, .noObjectToMap").hide()
         if ($("#customObjforMap").text() == "") {
             $(".noObjectToMap").show()
@@ -3178,7 +3207,7 @@ $(document).on('keypress', '#app_pid', function(e) {
 
                 //Filtering the Object which has been mapped
                 var valueToMap = $(".valueMerged")
-                $.each(valueToMap, function() {
+                $.each(valueToMap, function () {
                     scrapeObject.editedListmodifiedCustNames.push($(this).children(".fromMergeObj").text());
                     scrapeObject.editedListoldCustName.push($(this).children(".toMergeObj").text());
                     scrapeObject.editedListoldXpath.push($(this).children(".toMergeObj").data("xpath"));
@@ -3194,26 +3223,26 @@ $(document).on('keypress', '#app_pid', function(e) {
                 //Filtering the Object which has been mapped
 
                 DesignServices.mapScrapeData_ICE(scrapeObject)
-                    .then(function(data) {
-                            if (data == "Invalid Session") {
-                                $rootScope.redirectPage();
-                            }
-                            $("#dialog-mapObject").modal("hide");
-                            if (data == "success") {
-                                openDialog("Map Object", "Objects have been mapped successfully."); //$("#mapObjSuccess").modal("show");
-                                //Transaction Activity for Submit Map Objects Action
-                                // var labelArr = [];
-                                // var infoArr = [];
-                                // labelArr.push(txnHistory.codesDict['SubmitMapObject']);
-                                // txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
-                            }
-                            else if (data == "TagMissMatch") openDialog("Map Object", "Failed to map objects."); //$("#mapObjTagMissMatch").modal("show");
-                            else if (typeof data == "object") openDialog("Map Object", "Failed to map objects."); //$("mapObjSameObject").modal("show");
-                            angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
-                        },
-                        function(error) {
-                            console.log("Error::::", error)
-                        })
+                    .then(function (data) {
+                        if (data == "Invalid Session") {
+                            $rootScope.redirectPage();
+                        }
+                        $("#dialog-mapObject").modal("hide");
+                        if (data == "success") {
+                            openDialog("Map Object", "Objects have been mapped successfully."); //$("#mapObjSuccess").modal("show");
+                            //Transaction Activity for Submit Map Objects Action
+                            // var labelArr = [];
+                            // var infoArr = [];
+                            // labelArr.push(txnHistory.codesDict['SubmitMapObject']);
+                            // txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
+                        }
+                        else if (data == "TagMissMatch") openDialog("Map Object", "Failed to map objects."); //$("#mapObjTagMissMatch").modal("show");
+                        else if (typeof data == "object") openDialog("Map Object", "Failed to map objects."); //$("mapObjSameObject").modal("show");
+                        angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
+                    },
+                    function (error) {
+                        console.log("Error::::", error)
+                    })
                 $("#scrapedObjforMap li").attr("draggable", true);
                 $("#scrapedObjforMap li").children(".ellipsis").css({
                     'background': '',
@@ -3225,10 +3254,10 @@ $(document).on('keypress', '#app_pid', function(e) {
 
 
     //Save Scrape Objects
-    $(document).on('click', "#saveObjects", function(e) {
+    $(document).on('click', "#saveObjects", function (e) {
         //console.log("reused", reusedScreenNames);
         //console.log("reusedT", reusedScreenTestcaseNames);
-        var task=JSON.parse(window.localStorage['_CT'])
+        var task = JSON.parse(window.localStorage['_CT'])
         if (task.reuse == 'True') {
             $("#reUsedObjectsModal").find('.modal-title').text("Save Scraped data");
             $("#reUsedObjectsModal").find('.modal-body p').text("Screen is been reused. Are you sure you want to save objects?").css('color', 'black');
@@ -3238,56 +3267,49 @@ $(document).on('keypress', '#app_pid', function(e) {
         saveScrapedObjects(e);
     })
 
-    $scope.saveScrapedObjects = function() {
+    $scope.saveScrapedObjects = function () {
         $("#reUsedObjectsModal").modal("hide");
         noSave = "false";
         saveScrapedObjects();
     };
 
-    $scope.noSaveScrapedObjects = function() {
+    $scope.noSaveScrapedObjects = function () {
         $("#reUsedObjectsModal").modal("hide");
         noSave = "true";
         return false;
     };
 
-  
+
     function saveScrapedObjects(e) {
         if (noSave = "false") {
             var xpath;
             var duplicateCustnames = [];
+            var duplicateXpath = [];
             var duplicateXpathElements = {};
             var duplicateCustnamesElements = {};
             var isDuplicateCustNames = false;
             var isDuplicateXpath = false;
             //validateDuplicateObjects
             if ($("#scraplist .ellipsis").length > 0) {
-                $.each($("#scraplist span.ellipsis"), function() {
+                $.each($("#scraplist span.ellipsis"), function () {
+                    $(this).removeClass('duplicateCustname duplicateXpath');
                     var count = 0;
                     if ($(this).parent().parent().attr("data-xpath") != "" && $(this).parent().parent().attr("data-xpath") != undefined) {
                         xpath = $(this).parent().parent().attr("data-xpath");
-						if(appType == 'Web'){
-							xpath = xpath.split(";")[1];
-						}else if(appType == 'MobileWeb'){
-							xpath = xpath.split(";")[2];
-						}
-						else{
-							xpath = xpath;
-						}
-                        if (!duplicateXpathElements.hasOwnProperty(xpath)) {
-                            duplicateXpathElements[xpath] = $(this).text();
-                        } else {
-                            $(this).css('color','red');
-                            duplicateCustnames.push($(this).text());
-                            isDuplicateXpath = true;    
-                            count = 1;
+                        if (appType == 'MobileWeb') {
+                            xpath = xpath.split(";")[2];
+                        }
+                        else {
+                            xpath = xpath;
                         }
                         if (count == 0 && !duplicateCustnamesElements.hasOwnProperty($(this).text())) {
                             duplicateCustnamesElements[$(this).text()] = xpath;
-                        } else if ( duplicateCustnamesElements.hasOwnProperty($(this).text())) {
-                            if(count == 0)
+                        } else if (duplicateCustnamesElements.hasOwnProperty($(this).text())) {
+                            if (count == 0) {
                                 duplicateCustnames.push($(this).text());
-                            isDuplicateCustNames = true;
-                            $(this).css('color','red');
+                                isDuplicateCustNames = true;
+                                $(this).addClass('duplicateCustname').css('color', 'red');
+                            }
                         }
                     } else {
                         xpath = "";
@@ -3295,43 +3317,67 @@ $(document).on('keypress', '#app_pid', function(e) {
                             duplicateCustnamesElements[$(this).text()] = xpath;
                         } else {
                             duplicateCustnames.push($(this).text());
-                            isDuplicateCustNames= true;
-                            $(this).css('color','red');
+                            isDuplicateCustNames = true;
+                            $(this).addClass('duplicateCustname').css('color', 'red');
                         }
                     }
-
                 });
-                 if(isDuplicateCustNames) {
+                if (!isDuplicateCustNames) {
+                    var count = 0;
+                    $.each($("#scraplist span.ellipsis"), function () {
+                        xpath = $(this).parent().parent().attr("data-xpath");
+                        if ($(this).parent().parent().attr("data-xpath") != "" && $(this).parent().parent().attr("data-xpath") != undefined) {
+                            if (appType == 'MobileWeb') {
+                                xpath = xpath.split(";")[2];
+                            }
+                            else {
+                                xpath = xpath;
+                            }
+                            if (!duplicateXpathElements.hasOwnProperty(xpath)) {
+                                duplicateXpathElements[xpath] = $(this).text();
+                            } else {
+                                $(this).addClass('duplicateXpath').css('color', 'red');
+                                duplicateCustnames.push($(this).text());
+                                isDuplicateXpath = true;
+                                count = 1;
+                            }
+                        }
+                    });
+                }
+
+                if (isDuplicateCustNames) {
                     openDialog("Save Scrape data", "");
                     $("#globalModal").find('.modal-body p').html("<span><strong>Please rename/delete duplicate scraped objects</strong></span><br /><br /><strong>Object characterstics are same for:</strong>").css("color", "#000").append("<ul class='custList'></ul>");
                     for (var j = 0; j < duplicateCustnames.length; j++) {
                         $("#globalModal").find('.modal-body p ul').append("<li>" + duplicateCustnames[j] + "</li>");
                     }
                     return false;
-                }else if(isDuplicateXpath){
-                    $("#saveConfirmObjects").modal('show');
-                    $("#saveConfirmObjects").find('.modal-body p').html("<strong>Are you sure you want to save objects ?  <br /><br/ >Object characterstics are still same for:").css("color", "#000").append("<ul class='custList'></ul>");
-                    for (var j = 0; j < duplicateCustnames.length; j++) {
-                        $("#saveConfirmObjects").find('.modal-body p ul').append("<li>" + duplicateCustnames[j] + "</li>");
-                    }
-                    return false;
                 }
-
+                else {
+                    if (isDuplicateXpath) {
+                        $("#saveConfirmObjects").modal('show');
+                        $("#saveConfirmObjects").find('.modal-body p').html("<strong>Object characteristics are same for the below list of objects:").css("color", "#000").append("<ul class='custList'></ul><br /> Do you still want to continue?");
+                        for (var j = 0; j < duplicateCustnames.length; j++) {
+                            $("#saveConfirmObjects").find('.modal-body p ul').append("<li>" + duplicateCustnames[j] + "</li>");
+                        }
+                        return false;
+                    }
+                }
             }
             renameScrapedObjects(e);
         }
     }
 
-	$(document).on('click', '#saveElements', function(e) {
+    $(document).on('click', '#saveElements', function (e) {
         $("#saveConfirmObjects").modal('hide');
         renameScrapedObjects(e);
     });
-    $(document).on('click', '#noSaveElements', function(e) {
+    $(document).on('click', '#noSaveElements', function (e) {
         $("#saveConfirmObjects").modal('hide');
         return false;
     });
 
-	function renameScrapedObjects(e) {
+    function renameScrapedObjects(e) {
         var custnames = [];
         var viewStringXpath = [];
         var modifiedCustXpath = [];
@@ -3340,69 +3386,68 @@ $(document).on('keypress', '#app_pid', function(e) {
         var modifiedCustObj = [];
         var modifiedCustObjName = '';
         var tempId = '';
-		if(window.localStorage['_modified']){
-			modifiednames = JSON.parse(window.localStorage['_modified']);
-		}
-		if (eaCheckbox) {
-            if(!copiedViewstring){
+        if (window.localStorage['_modified']) {
+            modifiednames = JSON.parse(window.localStorage['_modified']);
+        }
+        if (eaCheckbox) {
+            if (!copiedViewstring) {
                 for (var j = 0; j < viewString.view.length; j++) {
                     newScrapedList.view.push(viewString.view[j]);
                 }
             }
             newScrapedList.mirror = viewString.mirror;
-            if(appType == "MobileApp" || appType == "MobileWeb"){
+            if (appType == "MobileApp" || appType == "MobileWeb") {
                 newScrapedList.mirrorheight = viewString.mirrorheight;
                 newScrapedList.mirrorwidth = viewString.mirrorwidth;
             }
-		}
-		
-		if(modifiednames.length > 0){
-			var mdName;
-			for(var i=0; i<modifiednames.length; i++){
-				mdName = modifiednames[i].split("^^");
-				if (eaCheckbox){
-                    if(mdName[1]){
-                        if(newScrapedList.view[mdName[1]])
+        }
+
+        if (modifiednames.length > 0) {
+            var mdName;
+            for (var i = 0; i < modifiednames.length; i++) {
+                mdName = modifiednames[i].split("^^");
+                if (eaCheckbox) {
+                    if (mdName[1]) {
+                        if (newScrapedList.view[mdName[1]])
                             newScrapedList.view[mdName[1]].custname = mdName[0];
                     }
                 }
-				else{
-                    if(mdName[1]){
-                        if(viewString.view[mdName[1]])
+                else {
+                    if (mdName[1]) {
+                        if (viewString.view[mdName[1]])
                             viewString.view[mdName[1]].custname = mdName[0];
                     }
                 }
-			}
-		}
+            }
+        }
         //End of Filter Duplicate Values in ViewString based on custname
         window.localStorage['disableEditing'] = "false";
         //var tasks = JSON.parse(window.localStorage['_TJ']);
         var tasks = JSON.parse(window.localStorage['_CT']);
         var getScrapeData;
-        if (eaCheckbox){
-            for(var i=0; i<getIndexOfDeletedObjects.length;i++){
-                   //delete newScrapedList.view[getIndexOfDeletedObjects[i].tempId];
-                   if(getIndexOfDeletedObjects[i].hasOwnProperty("tempId")) { 
-                        delete newScrapedList.view[getIndexOfDeletedObjects[i].tempId];
-                    }
-                   else{
-                        delete newScrapedList.view[getIndexOfDeletedObjects[i]];
-                   }
-                    
+        if (eaCheckbox) {
+            for (var i = 0; i < getIndexOfDeletedObjects.length; i++) {
+                //delete newScrapedList.view[getIndexOfDeletedObjects[i].tempId];
+                if (getIndexOfDeletedObjects[i].hasOwnProperty("tempId")) {
+                    delete newScrapedList.view[getIndexOfDeletedObjects[i].tempId];
+                }
+                else {
+                    delete newScrapedList.view[getIndexOfDeletedObjects[i]];
+                }
+
                 //newScrapedList.view.splice(getIndexOfDeletedObjects[i], 1);
             }
-            newScrapedList.view =  newScrapedList.view.filter(function(n){ return n != null });
+            newScrapedList.view = newScrapedList.view.filter(function (n) { return n != null });
             getScrapeData = JSON.stringify(newScrapedList);
             //console.log(newScrapedList.view)
         }
-        else{
-            if(getIndexOfDeletedObjects.length > 0)
-            {
-                for(var i=0; i<getIndexOfDeletedObjects.length;i++){
+        else {
+            if (getIndexOfDeletedObjects.length > 0) {
+                for (var i = 0; i < getIndexOfDeletedObjects.length; i++) {
                     delete viewString.view[getIndexOfDeletedObjects[i].tempId];
                     //viewString.view.splice(getIndexOfDeletedObjects[i], 1);
                 }
-                viewString.view =  viewString.view.filter(function(n){ return n != null });
+                viewString.view = viewString.view.filter(function (n) { return n != null });
             }
             getScrapeData = JSON.stringify(viewString);
             //console.log(viewString.view)
@@ -3419,28 +3464,28 @@ $(document).on('keypress', '#app_pid', function(e) {
         scrapeObject.userinfo = userinfo;
         scrapeObject.param = "updateScrapeData_ICE";
         scrapeObject.appType = tasks.appType;
-		scrapeObject.versionnumber = tasks.versionnumber;
+        scrapeObject.versionnumber = tasks.versionnumber;
         //Update Service to Save Scrape Objects
         DesignServices.updateScreen_ICE(scrapeObject)
-            .then(function(data) {
+            .then(function (data) {
                 if (data == "Invalid Session") {
                     $rootScope.redirectPage();
                 }
                 if (data == "success") {
-					eaCheckbox = false;
+                    eaCheckbox = false;
                     //window.localStorage['_modified'] = "";
-					modifiednames = [];
+                    modifiednames = [];
                     getIndexOfDeletedObjects = [];
                     copiedViewstring = false;
                     //enableScreenShotHighlight = true;
                     localStorage.removeItem("_modified");
                     saveScrapeDataFlag = true;
                     openDialog("Save Scraped data", "Scraped data saved successfully.")
-                    $("a.browserIcon").removeClass("enableActions").addClass("disableActions");
+                    $("a.browserIcon").removeClass("enableActions").addClass("disableActions").parent('li').css('cursor', 'not-allowed');
                     angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
                     $("#saveObjects").attr('disabled', true);
                     deleteScrapeDataservice = true;
-					//Transaction Activity for Save Scraped Objects Button Action
+                    //Transaction Activity for Save Scraped Objects Button Action
                     // var labelArr = [];
                     // var infoArr = [];
                     // labelArr.push(txnHistory.codesDict['SaveScrapedObjects']);
@@ -3450,11 +3495,11 @@ $(document).on('keypress', '#app_pid', function(e) {
                     //enableScreenShotHighlight = false;
                     openDialog("Save Scraped data", "Failed to save")
                 }
-            }, function(error) {})
+            }, function (error) { })
 
         if ($("#window-filter").is(":visible")) {
             var filters = $(".popupContent-filter .filterObjects");
-            $.each(filters, function() {
+            $.each(filters, function () {
                 if ($(this).hasClass('popupContent-filter-active')) {
                     $(this).removeClass('popupContent-filter-active').addClass("popupContent-default");
                 }
@@ -3465,7 +3510,7 @@ $(document).on('keypress', '#app_pid', function(e) {
         }
     }
     //To Select and unSelect all objects
-    $(document).on("click", ".checkStylebox", function() {
+    $(document).on("click", ".checkStylebox", function () {
         if ($(this).is(":checked")) {
             $("#scraplist li").find('input[name="selectAllListItems"]:visible').prop("checked", true).addClass('checked');
             $("#deleteObjects").prop("disabled", false)
@@ -3476,7 +3521,7 @@ $(document).on('keypress', '#app_pid', function(e) {
     })
 
     //Triggered When each checkbox objects are clicked 
-    $(document).on('click', "input[name='selectAllListItems']", function() {
+    $(document).on('click', "input[name='selectAllListItems']", function () {
         if ($(this).is(":checked")) {
             $(this).addClass('checked');
         } else {
@@ -3497,8 +3542,8 @@ $(document).on('keypress', '#app_pid', function(e) {
     });
 
 
-      //To Select and unSelect all objects in compare and update screen
-      $(document).on("click", ".checkStyleComparebox", function() {
+    //To Select and unSelect all objects in compare and update screen
+    $(document).on("click", ".checkStyleComparebox", function () {
         if ($(this).is(":checked")) {
             $("#changedOrdList li").find('input[name="selectAllChangedItems"]').prop("checked", true).addClass('checked');
         } else {
@@ -3507,7 +3552,7 @@ $(document).on('keypress', '#app_pid', function(e) {
     })
 
     //Triggered When each checkbox objects are clicked in comapre & update screen
-    $(document).on('click', "input[name='selectAllChangedItems']", function() {
+    $(document).on('click', "input[name='selectAllChangedItems']", function () {
         if ($(this).is(":checked")) {
             $(this).addClass('checked');
         } else {
@@ -3524,9 +3569,9 @@ $(document).on('keypress', '#app_pid', function(e) {
     $(document).find('#load_jqGrid').prop('display', 'none !important');
 
     //save button clicked - save the testcase steps
-    $scope.updateTestCase_ICE = function(e) {
-        var task=JSON.parse(window.localStorage['_CT'])
-       if (task.reuse == 'True') {
+    $scope.updateTestCase_ICE = function (e) {
+        var task = JSON.parse(window.localStorage['_CT'])
+        if (task.reuse == 'True') {
             //$("#reUsedTestcaseModal").find('.modal-title').text("");
             $("#reUsedTestcaseModal").find('.modal-body p').text("Testcase is been reused. Are you sure you want to save ?").css('color', 'black');
             $("#reUsedTestcaseModal").modal("show");
@@ -3535,22 +3580,21 @@ $(document).on('keypress', '#app_pid', function(e) {
         updateTestCase(e);
     };
 
-    $scope.saveTestcase = function(e) {
+    $scope.saveTestcase = function (e) {
         $("#reUsedTestcaseModal").modal("hide");
         noSaveTestcase = "false";
         updateTestCase(e);
     };
 
-    $scope.noSaveTestcaseFn = function() {
+    $scope.noSaveTestcaseFn = function () {
         $("#reUsedTestcaseModal").modal("hide");
         noSaveTestcase = "true";
         return false;
     };
-    if($rootScope.compareFlag == true)
-    {
+    if ($rootScope.compareFlag == true) {
         $('.submitTaskBtn').hide();
     }
-    
+
 
     function updateTestCase(e) {
         if (noSaveTestcase == "false") {
@@ -3574,64 +3618,64 @@ $(document).on('keypress', '#app_pid', function(e) {
                     var mydata = $("#jqGrid").jqGrid('getGridParam', 'data');
                     var getTR = $("#jqGrid tbody tr:visible td:nth-child(10)");
                     for (var i = 0; i < mydata.length; i++) {
-//                        if (mydata[i].hasOwnProperty("_id_")) {
-//                            if (mydata[i]._id_.indexOf('jpg') !== -1 || mydata[i]._id_.indexOf('jqg') !== -1) {
-//                                var index = mydata.indexOf(mydata[i]);
-//                                mydata.splice(index, 1);
-//                            } else {
-                                mydata[i].stepNo = i + 1;
-                                if (mydata[i].custname == undefined || mydata[i].custname == "") {
-                                    var stepNoPos = parseInt(mydata[i].stepNo);
-                                    openDialog("Save Testcase", "Please select Object Name at Step No. " + stepNoPos)
-                                    serviceCallFlag = true;
-                                    break;
-                                } else {
-                                    //check - keyword column should be mandatorily populated by User
-                                    mydata[i].custname = mydata[i].custname.trim();
-                                    if (mydata[i].keywordVal == undefined || mydata[i].keywordVal == "") {
-                                        var stepNoPos = parseInt(mydata[i].stepNo);
-                                        openDialog("Save Testcase", "Please select keyword at Step No. " + stepNoPos)
-                                        serviceCallFlag = true;
-                                        break;
-                                    } else if (mydata[i].keywordVal == 'SwitchToFrame') {
-                                        if ($scope.newTestScriptDataLS != "undefined" || $scope.newTestScriptDataLS != undefined) {
-                                            var testScriptTableData = $scope.newTestScriptDataLS;
-                                            for (j = 0; j < testScriptTableData.length; j++) {
-                                                if (testScriptTableData[j].custname != '@Browser' && testScriptTableData[j].custname != '@Oebs' && testScriptTableData[j].custname != '@Window' && testScriptTableData[j].custname != '@Generic' && testScriptTableData[j].custname != '@Custom') {
-                                                    if (testScriptTableData[j].url != "") {
-                                                        mydata[i].url = testScriptTableData[j].url;
-                                                        break;
-                                                    }
-                                                }
+                        //                        if (mydata[i].hasOwnProperty("_id_")) {
+                        //                            if (mydata[i]._id_.indexOf('jpg') !== -1 || mydata[i]._id_.indexOf('jqg') !== -1) {
+                        //                                var index = mydata.indexOf(mydata[i]);
+                        //                                mydata.splice(index, 1);
+                        //                            } else {
+                        mydata[i].stepNo = i + 1;
+                        if (mydata[i].custname == undefined || mydata[i].custname == "") {
+                            var stepNoPos = parseInt(mydata[i].stepNo);
+                            openDialog("Save Testcase", "Please select Object Name at Step No. " + stepNoPos)
+                            serviceCallFlag = true;
+                            break;
+                        } else {
+                            //check - keyword column should be mandatorily populated by User
+                            mydata[i].custname = mydata[i].custname.trim();
+                            if (mydata[i].keywordVal == undefined || mydata[i].keywordVal == "") {
+                                var stepNoPos = parseInt(mydata[i].stepNo);
+                                openDialog("Save Testcase", "Please select keyword at Step No. " + stepNoPos)
+                                serviceCallFlag = true;
+                                break;
+                            } else if (mydata[i].keywordVal == 'SwitchToFrame') {
+                                if ($scope.newTestScriptDataLS != "undefined" || $scope.newTestScriptDataLS != undefined) {
+                                    var testScriptTableData = $scope.newTestScriptDataLS;
+                                    for (j = 0; j < testScriptTableData.length; j++) {
+                                        if (testScriptTableData[j].custname != '@Browser' && testScriptTableData[j].custname != '@Oebs' && testScriptTableData[j].custname != '@Window' && testScriptTableData[j].custname != '@Generic' && testScriptTableData[j].custname != '@Custom') {
+                                            if (testScriptTableData[j].url != "") {
+                                                mydata[i].url = testScriptTableData[j].url;
+                                                break;
                                             }
                                         }
                                     }
-                                    if (mydata[i].keywordVal == "setHeader" || mydata[i].keywordVal == "setHeaderTemplate") {
-                                        if (typeof(mydata[i].inputVal) === "string") {
-                                            mydata[i].inputVal = mydata[i].inputVal.replace(/[\n\r]/g, '##');
-                                        } else mydata[i].inputVal[0] = mydata[i].inputVal[0].replace(/[\n\r]/g, '##');
-                                    }
-                                    //console.log("updateTestCase:::", mydata)
                                 }
-                                if (mydata[i].url == undefined) {
-                                    mydata[i].url = "";
-                                }
-								if (mydata[i].cord == null) {
-                                    mydata[i].cord = "";
-                                }
-                                if (mydata[i].remarks != undefined) {
-                                    if (mydata[i].remarks != getTR[i].textContent && getTR[i].textContent.trim().length > 0) {
-                                        if (mydata[i].remarks.length > 0) {
-                                            mydata[i].remarks = mydata[i].remarks.concat(" ; " + getTR[i].textContent);
-                                        } else {
-                                            mydata[i].remarks = getTR[i].textContent;
-                                        }
-                                    }
+                            }
+                            if (mydata[i].keywordVal == "setHeader" || mydata[i].keywordVal == "setHeaderTemplate") {
+                                if (typeof (mydata[i].inputVal) === "string") {
+                                    mydata[i].inputVal = mydata[i].inputVal.replace(/[\n\r]/g, '##');
+                                } else mydata[i].inputVal[0] = mydata[i].inputVal[0].replace(/[\n\r]/g, '##');
+                            }
+                            //console.log("updateTestCase:::", mydata)
+                        }
+                        if (mydata[i].url == undefined) {
+                            mydata[i].url = "";
+                        }
+                        if (mydata[i].cord == null) {
+                            mydata[i].cord = "";
+                        }
+                        if (mydata[i].remarks != undefined) {
+                            if (mydata[i].remarks != getTR[i].textContent && getTR[i].textContent.trim().length > 0) {
+                                if (mydata[i].remarks.length > 0) {
+                                    mydata[i].remarks = mydata[i].remarks.concat(" ; " + getTR[i].textContent);
                                 } else {
                                     mydata[i].remarks = getTR[i].textContent;
                                 }
-//                            }
-//                        }
+                            }
+                        } else {
+                            mydata[i].remarks = getTR[i].textContent;
+                        }
+                        //                            }
+                        //                        }
                         /*else{
                         	if(mydata[i].remarks != undefined){
                         		if(mydata[i].remarks != getTR[i].textContent  && getTR[i].textContent.trim().length > 0 )	{
@@ -3652,40 +3696,40 @@ $(document).on('keypress', '#app_pid', function(e) {
                         console.log("no service call being made");
                     } else {
                         DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, mydata, userInfo, versionnumber)
-                            .then(function(data) {
-                                    if (data == "Invalid Session") {
-                                        $rootScope.redirectPage();
-                                    }
-                                    if (data == "success") {
-                                        /*if(window.localStorage['UITSCrtd'] == "true") window.localStorage['UITSCrtd'] = "false"
-		        			else{
-		        				$("#tabs,#tabo2,#tabo1").tabs("destroy");
-		        				showDialogMesgsBtn("Save Test Script", "Test Script saved successfully", "btnSave");
-		        				selectRowStepNoFlag = true;
-			        			$("#tabs,#tabo2,#tabo1").tabs();
-		        			}*/
-                                        angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
-                                        openDialog("Save Testcase", "Testcase saved successfully")
-										//Transaction Activity for SaveTestcase Button Action
-                                        // var labelArr = [];
-                                        // var infoArr = [];
-                                        // labelArr.push(txnHistory.codesDict['SaveTestcase']);
-                                        // txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
-                                        /*if(deleteStep == false){
-                                        	selectRowStepNoFlag = true;
+                            .then(function (data) {
+                                if (data == "Invalid Session") {
+                                    $rootScope.redirectPage();
+                                }
+                                if (data == "success") {
+                                    /*if(window.localStorage['UITSCrtd'] == "true") window.localStorage['UITSCrtd'] = "false"
+                        else{
+                            $("#tabs,#tabo2,#tabo1").tabs("destroy");
+                            showDialogMesgsBtn("Save Test Script", "Test Script saved successfully", "btnSave");
+                            selectRowStepNoFlag = true;
+                            $("#tabs,#tabo2,#tabo1").tabs();
+                        }*/
+                                    angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
+                                    openDialog("Save Testcase", "Testcase saved successfully")
+                                    //Transaction Activity for SaveTestcase Button Action
+                                    // var labelArr = [];
+                                    // var infoArr = [];
+                                    // labelArr.push(txnHistory.codesDict['SaveTestcase']);
+                                    // txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
+                                    /*if(deleteStep == false){
+                                        selectRowStepNoFlag = true;
 
-                                        }
-                                        else{
-                                        	$("#globalModal").find('.modal-title').text("Delete Testcase step");
-                                        	$("#globalModal").find('.modal-body p').text("Successfully deleted the steps").css('color','black');
-                                        	$("#globalModal").modal("show");
-                                        	deleteStep = false;
-                                        }*/
-                                    } else {
-                                        openDialog("Save Testcase", "Failed to save Testcase")
                                     }
-                                },
-                                function(error) {});
+                                    else{
+                                        $("#globalModal").find('.modal-title').text("Delete Testcase step");
+                                        $("#globalModal").find('.modal-body p').text("Successfully deleted the steps").css('color','black');
+                                        $("#globalModal").modal("show");
+                                        deleteStep = false;
+                                    }*/
+                                } else {
+                                    openDialog("Save Testcase", "Failed to save Testcase")
+                                }
+                            },
+                            function (error) { });
                         serviceCallFlag = false;
                     }
                 } else {
@@ -3698,37 +3742,37 @@ $(document).on('keypress', '#app_pid', function(e) {
     }
 
     //Filter Scrape Objects
-    $(document).on("click", ".checkStyleboxFilter", function() {
+    $(document).on("click", ".checkStyleboxFilter", function () {
         cfpLoadingBar.start();
         blockUI("Filtering in progress. Please Wait...")
         $("html").css({
             'cursor': 'wait'
         });
         gsElement = []
-        $(".popupContent-filter-active").each(function() {
+        $(".popupContent-filter-active").each(function () {
             gsElement.push($(this).data("tag"))
         })
-        $timeout(function() {
+        $timeout(function () {
             filter()
             unblockUI();
         }, 500);
     })
-    $(document).on("click", ".selectAllTxt", function() {
+    $(document).on("click", ".selectAllTxt", function () {
         cfpLoadingBar.start();
         blockUI("Filtering in progress. Please Wait...")
         $("html").css({
             'cursor': 'wait'
         });
         gsElement = []
-        $(".popupContent-filter-active").each(function() {
+        $(".popupContent-filter-active").each(function () {
             gsElement.push($(this).data("tag"))
         })
-        $timeout(function() {
+        $timeout(function () {
             filter()
             unblockUI();
         }, 500);
     })
-    $(document).on("click", ".filterObjects", function() {
+    $(document).on("click", ".filterObjects", function () {
         cfpLoadingBar.start();
         blockUI('Filtering in progress. Please Wait...');
         $(".checkStylebox").prop("checked", false);
@@ -3740,22 +3784,20 @@ $(document).on('keypress', '#app_pid', function(e) {
             var getSpliceIndex = gsElement.indexOf($(this).data("tag"))
             gsElement.splice(getSpliceIndex, 1)
         } else gsElement.push($(this).data("tag"))
-        $timeout(function() {
+        $timeout(function () {
             filter()
             if (($("#scraplist li").find('input[name="selectAllListItems"]:checked').length == $("#scraplist li").find('input[name="selectAllListItems"]:visible').length) && $("#scraplist li").find('input[name="selectAllListItems"]:visible').length != 0) {
                 $(".checkStylebox").prop("checked", true);
             } else $(".checkStylebox").prop("checked", false);
             $(".checkStylebox,.checkall").prop("checked", false);
-            if($("#scraplist li").children('a').find('input[type=checkbox].checkall:checked:visible').length == 0)
-            {
-              $(".checkStylebox").prop("checked", false);
+            if ($("#scraplist li").children('a').find('input[type=checkbox].checkall:checked:visible').length == 0) {
+                $(".checkStylebox").prop("checked", false);
             }
-            if($("#scraplist li").children('a').find('input[type=checkbox]:visible').length == 0)
-            {
-                $(".checkStylebox").attr("disabled",true);
+            if ($("#scraplist li").children('a').find('input[type=checkbox]:visible').length == 0) {
+                $(".checkStylebox").attr("disabled", true);
             }
-            else{
-                $(".checkStylebox").attr("disabled",false);
+            else {
+                $(".checkStylebox").attr("disabled", false);
             }
             // var currentElements = $("span.ellipsis:visible").length;
             // if(currentElements == 0)
@@ -3769,11 +3811,11 @@ $(document).on('keypress', '#app_pid', function(e) {
         }, 500);
     })
 
-    function filter() { 
+    function filter() {
         if (gsElement.length > 0) {
             for (var i = 0; i < gsElement.length; i++) {
                 if (gsElement[i] == "others") {
-                    $.each($("#scraplist li"), function() {
+                    $.each($("#scraplist li"), function () {
                         if ($(this).data("tag") != "button" &&
                             $(this).data("tag") != "checkbox" &&
                             $(this).data("tag") != "select" &&
@@ -3804,114 +3846,108 @@ $(document).on('keypress', '#app_pid', function(e) {
                     });
                 }
                 /*** Filtering Duplicate Objects ***/
-                else if  (gsElement[i] == "duplicateCustnames") {
+                else if (gsElement[i] == "duplicateCustnames") {
                     var allCustnames = [];
                     var duplicateCustnames = [];
-                        if(window.localStorage['_modified']){
-                            modifiednames = JSON.parse(window.localStorage['_modified']);
-                        }                 
-                        //if object names are modified
-                        if(modifiednames.length > 0){
+                    if (window.localStorage['_modified']) {
+                        modifiednames = JSON.parse(window.localStorage['_modified']);
+                    }
+                    //if object names are modified
+                    if (modifiednames.length > 0) {
+                        var mdName;
+                        for (var j = 0; j < modifiednames.length; j++) {
+                            mdName = modifiednames[j].split("^^");
+                            if (eaCheckbox) {
+                                if (mdName[1]) {
+                                    if (newScrapedList.view[mdName[1]])
+                                        newScrapedList.view[mdName[1]].custname = mdName[0];
+                                }
+                            }
+                            else {
+                                if (mdName[1]) {
+                                    if (viewString.view[mdName[1]])
+                                        viewString.view[mdName[1]].custname = mdName[0];
+                                }
+                            }
+                        }
+                    }
+                    //If Enable Append checkbox is true
+                    if (eaCheckbox) {
+                        //If Enable Append checkbox is true and object names are modified
+                        if (modifiednames.length > 0) {
                             var mdName;
-                            for(var j=0; j<modifiednames.length; j++){
-                                mdName = modifiednames[j].split("^^");
-                                if (eaCheckbox){
-                                    if(mdName[1]){
-                                        if(newScrapedList.view[mdName[1]])
+                            for (var k = 0; k < modifiednames.length; k++) {
+                                mdName = modifiednames[k].split("^^");
+                                if (eaCheckbox) {
+                                    if (mdName[1]) {
+                                        if (newScrapedList.view[mdName[1]])
                                             newScrapedList.view[mdName[1]].custname = mdName[0];
                                     }
                                 }
-                                else{
-                                    if(mdName[1]){
-                                        if(viewString.view[mdName[1]])
+                                else {
+                                    if (mdName[1]) {
+                                        if (viewString.view[mdName[1]])
                                             viewString.view[mdName[1]].custname = mdName[0];
                                     }
                                 }
                             }
                         }
-                        //If Enable Append checkbox is true
-                        if (eaCheckbox){
-                            //If Enable Append checkbox is true and object names are modified
-                            if(modifiednames.length > 0){
-                                var mdName;
-                                for(var k=0; k<modifiednames.length; k++){
-                                    mdName = modifiednames[k].split("^^");
-                                    if (eaCheckbox){
-                                        if(mdName[1]){
-                                            if(newScrapedList.view[mdName[1]])
-                                                newScrapedList.view[mdName[1]].custname = mdName[0];
-                                        }
-                                    }
-                                    else{
-                                        if(mdName[1]){
-                                            if(viewString.view[mdName[1]])
-                                                viewString.view[mdName[1]].custname = mdName[0];
-                                        }
-                                    }
-                                }
-                            }
-                            if('view' in newScrapedList)
-                            {
-                                for(var l=0;l<newScrapedList.view.length;l++)
-                                {
-                                    allCustnames.push(newScrapedList.view[l].custname);       //get all custnames
-                                }
-                            }
-                            if('view' in viewString)
-                            {
-                                for(var m=0;m<viewString.view.length;m++)
-                                {
-                                    allCustnames.push(viewString.view[m].custname);           //get all custnames
-                                }
-                            }
-                           
-                        }
-                        //If Enable Append checkbox is false
-                        else{
-                            if('view' in viewString)
-                            {
-                                for(var n=0;n<viewString.view.length;n++)
-                                {
-                                    allCustnames.push(viewString.view[n].custname);           //get all custnames
-                                }
+                        if ('view' in newScrapedList) {
+                            for (var l = 0; l < newScrapedList.view.length; l++) {
+                                allCustnames.push($.trim(newScrapedList.view[l].custname).replace(/[<>]/g, ''));       //get all custnames
                             }
                         }
-                        var custnameIndices = {};
-									  
-                        for(var p=0;p<allCustnames.length;p++)
-                        {
-                            if(!custnameIndices.hasOwnProperty(allCustnames[p]))
-                            {
-                                //custnameIndices[allCustnames[p]] = custnameIndices[allCustnames[p]] + 1;
-                                custnameIndices[allCustnames[p]] = [];
+                        if ('view' in viewString) {
+                            for (var m = 0; m < viewString.view.length; m++) {
+                                allCustnames.push($.trim(viewString.view[m].custname).replace(/[<>]/g, ''));           //get all custnames
                             }
-                                custnameIndices[allCustnames[p]].push(p);
                         }
-                        var custnameIndices = Object.values(custnameIndices);
-								
-                        for(var q=0;q<custnameIndices.length;q++)
-                        {
-                            if(custnameIndices[q].length > 1)
-                            {
-                                $.each($("#scraplist li"), function() {
-                                    for(var r=0;r<custnameIndices[q].length -1;r++)
+
+                    }
+                    //If Enable Append checkbox is false
+                    else {
+                        if ('view' in viewString) {
+                            for (var n = 0; n < viewString.view.length; n++) {
+                                allCustnames.push($.trim(viewString.view[n].custname).replace(/[<>]/g, ''));           //get all custnames
+                            }
+                        }
+                    }
+                    var custnameIndices = {};
+
+                    for (var p = 0; p < allCustnames.length; p++) {
+                        if (!custnameIndices.hasOwnProperty(allCustnames[p])) {
+                            //custnameIndices[allCustnames[p]] = custnameIndices[allCustnames[p]] + 1;
+                            custnameIndices[allCustnames[p]] = [];
+                        }
+                        custnameIndices[allCustnames[p]].push(p);
+                    }
+                    var custnameIndices = Object.values(custnameIndices);
+
+                    for (var q = 0; q < custnameIndices.length; q++) {
+                        if (custnameIndices[q].length > 1) {
+                            $.each($("#scraplist li"), function () {
+                                for (var r = 0; r < custnameIndices[q].length - 1; r++) {
+                                    if ($.trim(parseInt($(this)[0].getAttribute("val"))) == $.trim(parseInt(custnameIndices[q][r])))                                   // if($.trim($(this)[0].childNodes[0].childNodes[2].innerHTML) == $.trim(duplicateCustnamesLen[q]))
                                     {
-                                        if(parseInt($(this)[0].getAttribute("val")) == parseInt(custnameIndices[q][r]))                                   // if($.trim($(this)[0].childNodes[0].childNodes[2].innerHTML) == $.trim(duplicateCustnamesLen[q]))
-                                        {
-                                            $(this)[0].style.display = 'block';               //Display duplicate custnames only
-                                        }
+                                        $(this)[0].style.display = 'block';                     //Display duplicate custnames only
+                                        $(this)[0].children[0].children[2].style.color = 'red'; //Display duplicate custnames in red color
                                     }
-								 
-                                });
-                            }
+                                }
+
+                            });
                         }
+                        // else if(custnameIndices[q].length == 1)
+                        // {
+                        //   console.log('QQQQQ',custnameIndices[q]);
+                        // }
+                    }
                 }
-                else{
-                    $.each($("#scraplist li"), function() {
+                else {
+                    $.each($("#scraplist li"), function () {
                         if (gsElement[i] == $(this).data("tag") || ($(this).data("tag").toLowerCase().indexOf(gsElement[i].toLowerCase()) >= 0 && gsElement[i] != "a" && $(this).data("tag").toLowerCase() != "radio button" && $(this).data("tag").toLowerCase() != "radiobutton" && $(this).data("tag").toLowerCase().indexOf("listview") < 0 && $(this).data("tag").toLowerCase().indexOf("tablecell") < 0) ||
                             (gsElement[i] == "input" && ($(this).data("tag").indexOf("edit") >= 0 || $(this).data("tag").indexOf("Edit Box") >= 0 || $(this).data("tag").indexOf("text") >= 0 || $(this).data("tag").indexOf("EditText") >= 0 || $(this).data("tag").indexOf("TextField") >= 0)) ||
                             (gsElement[i] == "select" && $(this).data("tag").indexOf("combo box") >= 0) ||
-                            (gsElement[i] == "a" && ($(this).data("tag").indexOf("hyperlink") >= 0 /* || $(this).data("tag").indexOf("Static") >= 0*/ )) ||
+                            (gsElement[i] == "a" && ($(this).data("tag").indexOf("hyperlink") >= 0 /* || $(this).data("tag").indexOf("Static") >= 0*/)) ||
                             (gsElement[i] == "checkbox" && $(this).data("tag").indexOf("check box") >= 0) ||
                             (gsElement[i] == "radiobutton" && $(this).data("tag").indexOf("radio button") >= 0)
                             /*|| (gsElement[i] == "others" && $(this).data("tag").indexOf("scroll bar") >= 0)
@@ -3936,17 +3972,18 @@ $(document).on('keypress', '#app_pid', function(e) {
             }
 
         } else {
-            $("#scraplist li").show()
+            $("#scraplist li").show();
+            $("#scraplist li").find("span.ellipsis:visible").css('color', '#33363B');
         }
         $("html").css({
             'cursor': 'auto'
         });
         cfpLoadingBar.complete()
-      
+
     }
 
     //Click on add dependent testcase
-    $(document).on("click", "#addDependent", function() {
+    $(document).on("click", "#addDependent", function () {
         if (!$(this).is(":checked")) {
             $("input[type=checkbox]:checked").prop("checked", false);
             dependentTestCaseFlag = false;
@@ -3958,44 +3995,44 @@ $(document).on('keypress', '#app_pid', function(e) {
             var testScenarioId = ctj.scenarioId;
             //var screenId = ctj.screenId;
             DesignServices.getTestcasesByScenarioId_ICE(testScenarioId)
-                .then(function(data) {
+                .then(function (data) {
                     if (data == "Invalid Session") {
                         $rootScope.redirectPage();
                     }
                     $("#dependentTestCasesContent").empty();
                     //data = data.sort();
                     for (var i = 0; i < data.length; i++) {
-                        $("#dependentTestCasesContent").append("<span class='testcaseListItem'><input data-attr = " + data[i].testcaseId + " class='checkTestCase' type='checkbox' id='dependentTestCase_" + i + "' /><label title=" + data[i].testcaseName + " class='dependentTestcases' for='dependentTestCase_" + i + "'>" + data[i].testcaseName + "</label></span><span class='viewReadOnlyTC'  data-id = " + data[i].testcaseId + " data-name = "+ data[i].testcaseName +"><button type='button' class='btn btn-link'>View</button></span><br />");
+                        $("#dependentTestCasesContent").append("<span class='testcaseListItem'><input data-attr = " + data[i].testcaseId + " class='checkTestCase' type='checkbox' id='dependentTestCase_" + i + "' /><label title=" + data[i].testcaseName + " class='dependentTestcases' for='dependentTestCase_" + i + "'>" + data[i].testcaseName + "</label></span><span class='viewReadOnlyTC'  data-id = " + data[i].testcaseId + " data-name = " + data[i].testcaseName + "><button type='button' class='btn btn-link'>View</button></span><br />");
                     }
-                    $( ".viewReadOnlyTC" ).click(function() {
+                    $(".viewReadOnlyTC").click(function () {
                         var testCaseName = this.getAttribute('data-name'),
-                        testCaseId = this.getAttribute('data-id');
+                            testCaseId = this.getAttribute('data-id');
                         DesignServices.readTestCase_ICE(undefined, testCaseId, testCaseName, 0)
-                        .then(function(response) {
+                            .then(function (response) {
                                 if (response == "Invalid Session") {
                                     $rootScope.redirectPage();
                                 }
                                 var source = $("#handlebar-template-testcase").html();
                                 var template = Handlebars.compile(source);
-                                try{
+                                try {
                                     JSON.parse(response.testcasesteps);
                                 }
-                                catch(err){
+                                catch (err) {
                                     response.testcasesteps = '[]';
-                                }                                
-                                var dat = template({name:[{testcasename:response.testcasename}],rows:JSON.parse(response.testcasesteps)});
+                                }
+                                var dat = template({ name: [{ testcasename: response.testcasename }], rows: JSON.parse(response.testcasesteps) });
                                 var newWindow = window.open();
                                 newWindow.document.write(dat);
                             },
-                            function(error) {});
-                            //alert( "Handler for .click() called." );
-                      });
+                            function (error) { });
+                        //alert( "Handler for .click() called." );
+                    });
                     //$(document).on('shown.bs.modal','#dialog-addDependentTestCase', function () {
                     if (checkedTestcases.length > 0)
                         $("input[type=checkbox].checkTestCase").prop("checked", false);
                     else $("input[type=checkbox].checkTestCase").prop("checked", true);
                     var currentTestCase = JSON.parse(window.localStorage['_CT']).testCaseName;
-                    $("span.testcaseListItem").each(function() {
+                    $("span.testcaseListItem").each(function () {
                         if (currentTestCase == $(this).children("label").text()) {
                             $(this).children('input.checkTestCase').attr("disabled", true)
                             //$(".checkTestCase[disabled=disabled]").prop('checked',false);
@@ -4012,7 +4049,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                     //Display testcase in the modal
                     $("#dialog-addDependentTestCase").modal("show");
 
-                    $(document).on('click', '#debugOn', function(e) {
+                    $(document).on('click', '#debugOn', function (e) {
                         var checkedLength = $(".checkTestCase:checked").length;
                         checkedTestcases = [];
                         if (checkedLength == 0) {
@@ -4020,7 +4057,7 @@ $(document).on('keypress', '#app_pid', function(e) {
                             return false;
                         } else {
                             $("span.errTestCase").addClass("hide");
-                            $("input[type=checkbox].checkTestCase:checked").each(function() {
+                            $("input[type=checkbox].checkTestCase:checked").each(function () {
                                 checkedTestcases.push($(this).attr("data-attr"));
                             });
                             if (checkedTestcases.length > 0) {
@@ -4036,58 +4073,57 @@ $(document).on('keypress', '#app_pid', function(e) {
                                 $("#globalModal").find('.modal-body p').html("Failed to save dependent testcases");
                                 $("#globalModal").modal("show");
                             }
-							//Transaction Activity for AddDependentTestCase Button Action
+                            //Transaction Activity for AddDependentTestCase Button Action
                             // var labelArr = [];
                             // var infoArr = [];
                             // labelArr.push(txnHistory.codesDict['AddDependentTestCase']);
                             // txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);						
                         }
                     });
-                }, function(error) {});
+                }, function (error) { });
         }
     });
 
-    
+
 
     // Details Icon Click
-    $(document).on('click', '.detailsIcon', function(e) {
+    $(document).on('click', '.detailsIcon', function (e) {
         modalId = '';
         modalId = e.target.id;
         modalId = parseInt(modalId.split("_")[1]);
-        if(e.target.className.includes('inActiveDetails')){
-            openModalFormDialog('Add Test Step Details','');
+        if (e.target.className.includes('inActiveDetails')) {
+            openModalFormDialog('Add Test Step Details', '');
             $(".stepDetailsContainer").empty()
             $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div>")
-            
+
         }
-        else{
+        else {
             var taskInfo = JSON.parse(window.localStorage['_CT']);
             var screenId = taskInfo.screenId;
             var testCaseId = taskInfo.testCaseId;
             var testCaseName = taskInfo.testCaseName;
             var versionnumber = taskInfo.versionnumber;
             DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
-            .then(function(response) {
+                .then(function (response) {
                     if (response == "Invalid Session") {
                         $rootScope.redirectPage();
-                    }    
-                    var testcaseSteps  = JSON.parse(response.testcase);
-                    if(typeof(testcaseSteps[modalId -1].addTestCaseDetailsInfo) == "object")
-                    {
-                        var details = testcaseSteps[modalId -1].addTestCaseDetailsInfo;
                     }
-                    else{
-                        var details = JSON.parse(testcaseSteps[modalId -1].addTestCaseDetailsInfo);
+                    var testcaseSteps = JSON.parse(response.testcase);
+                    if (typeof (testcaseSteps[modalId - 1].addTestCaseDetailsInfo) == "object") {
+                        var details = testcaseSteps[modalId - 1].addTestCaseDetailsInfo;
                     }
-                   
-                    openModalFormDialog('Add Test Step Details','');
-                     $(".stepDetailsContainer").empty()
-                     $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div>");
-                     $("#testDetails_"+modalId+"").val(details.testcaseDetails);
-                     //$("#pass_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_pass);
-                     $("#pass_"+modalId+"").find("#actualResult_"+modalId+"").val(details.actualResult_pass);
+                    else {
+                        var details = JSON.parse(testcaseSteps[modalId - 1].addTestCaseDetailsInfo);
+                    }
+
+                    openModalFormDialog('Add Test Step Details', '');
+                    $(".stepDetailsContainer").empty()
+                    $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div>");
+                    $("#testDetails_" + modalId + "").val(details.testcaseDetails);
+                    //$("#pass_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_pass);
+                    $("#pass_" + modalId + "").find("#actualResult_" + modalId + "").val(details.actualResult_pass);
                     // $("#fail_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_fail);
-                     $("#fail_"+modalId+"").find("#actualResult_"+modalId+"").val(details.actualResult_fail);
+                    $("#fail_" + modalId + "").find("#actualResult_" + modalId + "").val(details.actualResult_fail);
                     // var currentTestStep = testcaseSteps[modalId -1];
                     // console.log('currentTeststep', currentTestStep);
                     // if('hideTestcaseDetails' in currentTestStep)
@@ -4101,46 +4137,46 @@ $(document).on('keypress', '#app_pid', function(e) {
                     //     }
                     // }
                 },
-                function(error) {});
+                function (error) { });
         }
         e.stopImmediatePropagation();
     });;
 
 
-      $scope.submit_task=function(action,e) {
+    $scope.submit_task = function (action, e) {
         var taskinfo = JSON.parse(window.localStorage['_CT']);
         var taskid = taskinfo.subTaskId;
         var taskstatus = taskinfo.status;
         var version = taskinfo.versionnumber;
         var batchTaskIDs = taskinfo.batchTaskIDs;
-        var projectId=taskinfo.projectId;
+        var projectId = taskinfo.projectId;
         if (action != undefined && action == 'reassign') {
             taskstatus = action;
         }
-		//Transaction Activity for Task Submit/Approve/Reassign Button Action
+        //Transaction Activity for Task Submit/Approve/Reassign Button Action
         // var labelArr = [];
         // var infoArr = [];
-	  
-        mindmapServices.reviewTask(projectId,taskid,taskstatus,version,batchTaskIDs).then(function(result){
-        if (result == 'fail') {
-                    openDialog("Task Submission Error", "Reviewer is not assigned !",true)
-                } else if (taskstatus == 'reassign') {
-                    openDialog("Task Reassignment Success", "Task Reassigned successfully!",true)
-                    // labelArr.push(txnHistory.codesDict['TaskReassign']);
-                } else if (taskstatus == 'review') {
-                    openDialog("Task Completion Success", "Task Approved successfully!",true)
-                    // labelArr.push(txnHistory.codesDict['TaskApprove']);
-                } else {
-                    openDialog("Task Submission Success", "Task Submitted successfully!",true)
-                    // labelArr.push(txnHistory.codesDict['TaskSubmit']);
-                }
 
-                //txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
-                $timeout(function() {
-                    $(".close:visible").addClass('globalSubmit');
-                },200)
-              
-        },function(error){
+        mindmapServices.reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs).then(function (result) {
+            if (result == 'fail') {
+                openDialog("Task Submission Error", "Reviewer is not assigned !", true)
+            } else if (taskstatus == 'reassign') {
+                openDialog("Task Reassignment Success", "Task Reassigned successfully!", true)
+                // labelArr.push(txnHistory.codesDict['TaskReassign']);
+            } else if (taskstatus == 'review') {
+                openDialog("Task Completion Success", "Task Approved successfully!", true)
+                // labelArr.push(txnHistory.codesDict['TaskApprove']);
+            } else {
+                openDialog("Task Submission Success", "Task Submitted successfully!", true)
+                // labelArr.push(txnHistory.codesDict['TaskSubmit']);
+            }
+
+            //txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
+            $timeout(function () {
+                $(".close:visible").addClass('globalSubmit');
+            }, 200)
+
+        }, function (error) {
             console.log(error);
         })
     }
@@ -4168,218 +4204,210 @@ function contentTable(newTestScriptDataLS) {
         scrappedData = newTestScriptData;
     }
     $("#jqGrid").jqGrid({
-            datastr: obj,
-            datatype: "jsonstring",
-            editUrl: 'obj',
-            page: 1,
-            scroll: 1,
-            colModel: [
-				{label: 'Step No', name: 'stepNo', key: true, editable: false, sortable: false, resizable: false, hidden: true},
-                {name: 'objectName', editable: false, sortable: false, resizable: false, hidden: true},
-                {label: 'Object Name', name: 'custname', editable: true, resizable: false, sortable: false,
-                    edittype: 'select',
-                    editoptions: {
-                        value: getTags(scrappedData),
-                        dataEvents: [{
-                            type: 'change',
-                            'fn': editCell
-                        }]
-                    }
-                },
-                {label: 'Keyword', name: 'keywordVal', editable: true, resizable: false, sortable: false,
-                    edittype: 'select',
-                    editoptions: {
-                        value: getKeywordList(keywordArrayList),
-                        dataEvents: [{
-                            type: 'change',
-                            'fn': editkeyWord
-                        }]
-                    }
-                },
-                {label: 'Input', name: 'inputVal', editable: true, resizable: false, sortable: false},
-                {label: 'Output', name: 'outputVal', editable: true, resizable: false, sortable: false},
-                {label: 'Remarks', name: 'remarksStatus', editable: false, resizable: false, sortable: false},
-                {label: 'Remarks', name: 'remarks', editable: false, resizable: false, sortable: false, hidden: true},
-                {label: 'URL', name: 'url', editable: false, resizable: false, hidden: true},
-                {label: 'appType', name: 'appType', editable: false, resizable: false, hidden: true},
-                {label: 'Details', name: 'addTestCaseDetails', editable: false, resizable: false, sortable: false},
-                {label: 'Details', name: 'addTestCaseDetailsInfo', editable: false, resizable: false, sortable: false,hidden: true},
-                {label: 'cord', name: 'cord', editable: false, resizable: false, hidden: true}
-            ],
-            loadonce: false,
-            viewrecords: false,
-            onSelectRow: editRow,
-            autowidth: true,
-            shrinkToFit: true,
-            multiselect: true, //Appends Checkbox for multiRowSelection
-            multiboxonly: true, //Selects single row
-            beforeSelectRow: function(rowid, e) {
-                if ($(e.target).closest("tr.jqgrow").hasClass("state-disabled")) {
-                    return false; // doesnot allow to select the row
-                }
-                return true; // allows to select the row
-            },
-            //width:950,
-            drag: true,
-            height: 'auto',
-            rowList: [],
-            rowNum: 1000,
-            rownumbers: true,
-            toppager: true,
-            autoencode: true,
-            scrollrows: true,
-            loadComplete: function(data) {
-                loadedGridData = JSON.parse(JSON.stringify(data));
-                $("#jqGrid tr[id^='jqg']").remove();
-                var v=1;
-
-                $("#jqGrid tr:visible").each(function() {
-
-                    if ($(this).find("td:nth-child(10)").text().trim().length <= 0) {
-                        $(this).find("td:nth-child(9)").text('');
-                        $(this).find("td:nth-child(9)").append('<img src="imgs/ic-remarks-inactive.png" class="remarksIcon"/>');
-                    } else {
-                        $(this).find("td:nth-child(9)").text('');
-                        $(this).find("td:nth-child(9)").append('<img src="imgs/ic-remarks-active.png" class="remarksIcon"/>');
-                    }
-                   
-                    var rowId = parseInt($(this).children("td[aria-describedby='jqGrid_stepNo']").text());
-                    if('rows' in data)
-                    {
-                        if(typeof (data.rows[rowId -1].addTestCaseDetailsInfo) == 'object')
-                        {
-                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', angular.toJson(data.rows[rowId -1].addTestCaseDetailsInfo));
-                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', angular.toJson(data.rows[rowId -1].addTestCaseDetails));
-                        }
-                        else{
-                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', data.rows[rowId -1].addTestCaseDetailsInfo);
-                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', data.rows[rowId -1].addTestCaseDetails);
-                        }
-                        var str = typeof(data.rows[rowId -1].addTestCaseDetailsInfo);
-                        
-                    }
-                    else{
-                        
-                        if(typeof (data[rowId -1].addTestCaseDetailsInfo) == 'object')
-                        {
-                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', angular.toJson(data[rowId -1].addTestCaseDetailsInfo));
-                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', angular.toJson(data[rowId -1].addTestCaseDetails));
-                        }
-                        else{
-                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', data[rowId -1].addTestCaseDetailsInfo);
-                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', data[rowId -1].addTestCaseDetails);
-                        }
-                        var str = typeof(data[rowId -1].addTestCaseDetailsInfo);
-                    }
-
-                    
-               
-                    var getRowData = $('#jqGrid').jqGrid ('getRowData', rowId);
-                    
-                    if(str == "string" && 'rows' in data)
-                    {
-                        if(data.rows[rowId -1].addTestCaseDetailsInfo.length > 0)
-                        {
-                            $(this).find("td:nth-child(13)").text('');
-                            $(this).find("td:nth-child(13)").append('<img alt="activeDetails" title="" id="details_'+v+'" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
-                        }
-                        else if(data.rows[rowId -1].addTestCaseDetails.length == 0){
-                            $(this).find("td:nth-child(13)").text('');
-                            $(this).find("td:nth-child(13)").append('<img alt="inActiveDetails"  title="" id="details_'+v+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
-                        }
-                        else{
-                            $(this).find("td:nth-child(13)").text('');
-                            $(this).find("td:nth-child(13)").append('<img  alt="inActiveDetails" title="" id="details_'+v+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
-                        }
-                    }
-                    else if(str == "string")
-                    {
-                        if(data[rowId -1].addTestCaseDetailsInfo.length > 0)
-                        {
-                            $(this).find("td:nth-child(13)").text('');
-                            $(this).find("td:nth-child(13)").append('<img  alt="activeDetails"  title="" id="details_'+v+'" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
-                        }
-                        else if(data[rowId -1].addTestCaseDetails.length == 0){
-                            $(this).find("td:nth-child(13)").text('');
-                            $(this).find("td:nth-child(13)").append('<img alt="inActiveDetails" title="" id="details_'+v+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
-                        }
-                        else{
-                            $(this).find("td:nth-child(13)").text('');
-                            $(this).find("td:nth-child(13)").append('<img alt="inActiveDetails"  title="" id="details_'+v+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
-                        }
-                    }
-
-                    if(str != "string")
-                    {
-                        if( str != "" && str != "undefined" && str !=undefined )
-                        {
-                            $(this).find("td:nth-child(13)").text('');
-                            $(this).find("td:nth-child(13)").append('<img  alt="activeDetails" title="" id="details_'+v+'" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
-                        }
-                        else{
-                            $(this).find("td:nth-child(13)").text('');
-                            $(this).find("td:nth-child(13)").append('<img  alt="inActiveDetails" title="" id="details_'+v+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
-                        }
-                    }
-                    v++;
-                })
-                //$("#cb_jqGrid").on('click', function() {
-                /*var cboxParent =  $(this).is(":checked");
-		        		   var editableLen = $(".editable").length;
-		        		   if (cboxParent == true && editableLen == 0){
-		        			   $(".commentIcon,.unCommentIcon,.deleteIcon").show();
-		        		   }
-		        		   else{
-		        			   $(".commentIcon,.unCommentIcon,.deleteIcon").hide();
-		        		   }
-		        		   window.localStorage['selectRowStepNo']='';*/
-                //});
-                /*$("#jqGrid tr").children("td[aria-describedby='jqGrid_outputVal']").each(function(){
-		        		   if($(this).text().trim() == "##" || $(this).is(":contains(';##')")){
-		        			   if($(this).parent('tr:nth-child(odd)').length > 0){
-		        				   $(this).parent().css("background","linear-gradient(90deg, red 0.6%, #e8e6ff 0)").focus();
-		        			   }
-		        			   else{
-			        			   $(this).parent().css("background","linear-gradient(90deg, red 0.6%, white 0)").focus();
-		        			   }
-		        			   $(this).css('color','red');
-		        		   }background: linear-gradient(to right, #d41e2d, #b31f2d) !important;
-		        	   });*/
-                var gridArrayData = $("#jqGrid").jqGrid('getRowData');
-                for (i = 0; i < gridArrayData.length; i++) {
-                    if (gridArrayData[i].outputVal.indexOf('##') !== -1 || gridArrayData[i].outputVal.indexOf(';##') !== -1) {
-                        $(this).find('tr.jqgrow')[i].style.borderLeft = "5px solid red";
-                        $(this).find('tr.jqgrow')[i].childNodes[0].style.paddingRight = "7px"
-                        $(this).find('tr.jqgrow')[i].childNodes[1].childNodes[0].style.marginLeft = "-4px";
-                        $(this).find('tr.jqgrow')[i].childNodes[7].style.color = "red";
-                    } else {
-                        //$(this).find('tr.jqgrow')[i].style.borderLeft = "5px solid transparent";
-                        //$(this).find('tr.jqgrow')[i].childNodes[0].style.marginLeft = "-4px"
-                        $(this).find('tr.jqgrow')[i].childNodes[7].style.color = "";
-                    }
-                }
-                hideOtherFuncOnEdit();
-                $("#jqGrid").parent('div').css('height', 'auto');
-                if (getScrapeDataforCustomObj != "" && getScrapeDataforCustomObj != undefined) {
-                    for (i = 0; i < getScrapeDataforCustomObj.length; i++) {
-                        if (getScrapeDataforCustomObj[i].xpath == "" && !getScrapeDataforCustomObj[i].cord) {
-                            var testGridData = $("#jqGrid tbody tr:not(.jqgfirstrow)");
-                            $.each(testGridData, function() {
-                                debugger;
-                                if ($(this).find("td[aria-describedby='jqGrid_custname']").text() == scrappedData[i].custname) {
-                                    $(this).find("td[aria-describedby='jqGrid_custname']").addClass("addCustObj");
-
-                                }
-                            })
-                        }
-                    }
+        datastr: obj,
+        datatype: "jsonstring",
+        editUrl: 'obj',
+        page: 1,
+        scroll: 1,
+        colModel: [
+            { label: 'Step No', name: 'stepNo', key: true, editable: false, sortable: false, resizable: false, hidden: true },
+            { name: 'objectName', editable: false, sortable: false, resizable: false, hidden: true },
+            {
+                label: 'Object Name', name: 'custname', editable: true, resizable: false, sortable: false,
+                edittype: 'select',
+                editoptions: {
+                    value: getTags(scrappedData),
+                    dataEvents: [{
+                        type: 'change',
+                        'fn': editCell
+                    }]
                 }
             },
-        })
+            {
+                label: 'Keyword', name: 'keywordVal', editable: true, resizable: false, sortable: false,
+                edittype: 'select',
+                editoptions: {
+                    value: getKeywordList(keywordArrayList),
+                    dataEvents: [{
+                        type: 'change',
+                        'fn': editkeyWord
+                    }]
+                }
+            },
+            { label: 'Input', name: 'inputVal', editable: true, resizable: false, sortable: false },
+            { label: 'Output', name: 'outputVal', editable: true, resizable: false, sortable: false },
+            { label: 'Remarks', name: 'remarksStatus', editable: false, resizable: false, sortable: false },
+            { label: 'Remarks', name: 'remarks', editable: false, resizable: false, sortable: false, hidden: true },
+            { label: 'URL', name: 'url', editable: false, resizable: false, hidden: true },
+            { label: 'appType', name: 'appType', editable: false, resizable: false, hidden: true },
+            { label: 'Details', name: 'addTestCaseDetails', editable: false, resizable: false, sortable: false },
+            { label: 'Details', name: 'addTestCaseDetailsInfo', editable: false, resizable: false, sortable: false, hidden: true },
+            { label: 'cord', name: 'cord', editable: false, resizable: false, hidden: true }
+        ],
+        loadonce: false,
+        viewrecords: false,
+        onSelectRow: editRow,
+        autowidth: true,
+        shrinkToFit: true,
+        multiselect: true, //Appends Checkbox for multiRowSelection
+        multiboxonly: true, //Selects single row
+        beforeSelectRow: function (rowid, e) {
+            if ($(e.target).closest("tr.jqgrow").hasClass("state-disabled")) {
+                return false; // doesnot allow to select the row
+            }
+            return true; // allows to select the row
+        },
+        //width:950,
+        drag: true,
+        height: 'auto',
+        rowList: [],
+        rowNum: 1000,
+        rownumbers: true,
+        toppager: true,
+        autoencode: true,
+        scrollrows: true,
+        loadComplete: function (data) {
+            loadedGridData = JSON.parse(JSON.stringify(data));
+            $("#jqGrid tr[id^='jqg']").remove();
+            var v = 1;
+
+            $("#jqGrid tr:visible").each(function () {
+
+                if ($(this).find("td:nth-child(10)").text().trim().length <= 0) {
+                    $(this).find("td:nth-child(9)").text('');
+                    $(this).find("td:nth-child(9)").append('<img src="imgs/ic-remarks-inactive.png" class="remarksIcon"/>');
+                } else {
+                    $(this).find("td:nth-child(9)").text('');
+                    $(this).find("td:nth-child(9)").append('<img src="imgs/ic-remarks-active.png" class="remarksIcon"/>');
+                }
+
+                var rowId = parseInt($(this).children("td[aria-describedby='jqGrid_stepNo']").text());
+                if ('rows' in data) {
+                    if (typeof (data.rows[rowId - 1].addTestCaseDetailsInfo) == 'object') {
+                        $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', angular.toJson(data.rows[rowId - 1].addTestCaseDetailsInfo));
+                        $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', angular.toJson(data.rows[rowId - 1].addTestCaseDetails));
+                    }
+                    else {
+                        $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', data.rows[rowId - 1].addTestCaseDetailsInfo);
+                        $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', data.rows[rowId - 1].addTestCaseDetails);
+                    }
+                    var str = typeof (data.rows[rowId - 1].addTestCaseDetailsInfo);
+
+                }
+                else {
+
+                    if (typeof (data[rowId - 1].addTestCaseDetailsInfo) == 'object') {
+                        $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', angular.toJson(data[rowId - 1].addTestCaseDetailsInfo));
+                        $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', angular.toJson(data[rowId - 1].addTestCaseDetails));
+                    }
+                    else {
+                        $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', data[rowId - 1].addTestCaseDetailsInfo);
+                        $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', data[rowId - 1].addTestCaseDetails);
+                    }
+                    var str = typeof (data[rowId - 1].addTestCaseDetailsInfo);
+                }
+
+
+
+                var getRowData = $('#jqGrid').jqGrid('getRowData', rowId);
+
+                if (str == "string" && 'rows' in data) {
+                    if (data.rows[rowId - 1].addTestCaseDetailsInfo.length > 0) {
+                        $(this).find("td:nth-child(13)").text('');
+                        $(this).find("td:nth-child(13)").append('<img alt="activeDetails" title="" id="details_' + v + '" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+                    }
+                    else if (data.rows[rowId - 1].addTestCaseDetails.length == 0) {
+                        $(this).find("td:nth-child(13)").text('');
+                        $(this).find("td:nth-child(13)").append('<img alt="inActiveDetails"  title="" id="details_' + v + '" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                    }
+                    else {
+                        $(this).find("td:nth-child(13)").text('');
+                        $(this).find("td:nth-child(13)").append('<img  alt="inActiveDetails" title="" id="details_' + v + '" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                    }
+                }
+                else if (str == "string") {
+                    if (data[rowId - 1].addTestCaseDetailsInfo.length > 0) {
+                        $(this).find("td:nth-child(13)").text('');
+                        $(this).find("td:nth-child(13)").append('<img  alt="activeDetails"  title="" id="details_' + v + '" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+                    }
+                    else if (data[rowId - 1].addTestCaseDetails.length == 0) {
+                        $(this).find("td:nth-child(13)").text('');
+                        $(this).find("td:nth-child(13)").append('<img alt="inActiveDetails" title="" id="details_' + v + '" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                    }
+                    else {
+                        $(this).find("td:nth-child(13)").text('');
+                        $(this).find("td:nth-child(13)").append('<img alt="inActiveDetails"  title="" id="details_' + v + '" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                    }
+                }
+
+                if (str != "string") {
+                    if (str != "" && str != "undefined" && str != undefined) {
+                        $(this).find("td:nth-child(13)").text('');
+                        $(this).find("td:nth-child(13)").append('<img  alt="activeDetails" title="" id="details_' + v + '" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+                    }
+                    else {
+                        $(this).find("td:nth-child(13)").text('');
+                        $(this).find("td:nth-child(13)").append('<img  alt="inActiveDetails" title="" id="details_' + v + '" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                    }
+                }
+                v++;
+            })
+            //$("#cb_jqGrid").on('click', function() {
+            /*var cboxParent =  $(this).is(":checked");
+                       var editableLen = $(".editable").length;
+                       if (cboxParent == true && editableLen == 0){
+                           $(".commentIcon,.unCommentIcon,.deleteIcon").show();
+                       }
+                       else{
+                           $(".commentIcon,.unCommentIcon,.deleteIcon").hide();
+                       }
+                       window.localStorage['selectRowStepNo']='';*/
+            //});
+            /*$("#jqGrid tr").children("td[aria-describedby='jqGrid_outputVal']").each(function(){
+                       if($(this).text().trim() == "##" || $(this).is(":contains(';##')")){
+                           if($(this).parent('tr:nth-child(odd)').length > 0){
+                               $(this).parent().css("background","linear-gradient(90deg, red 0.6%, #e8e6ff 0)").focus();
+                           }
+                           else{
+                               $(this).parent().css("background","linear-gradient(90deg, red 0.6%, white 0)").focus();
+                           }
+                           $(this).css('color','red');
+                       }background: linear-gradient(to right, #d41e2d, #b31f2d) !important;
+                   });*/
+            var gridArrayData = $("#jqGrid").jqGrid('getRowData');
+            for (i = 0; i < gridArrayData.length; i++) {
+                if (gridArrayData[i].outputVal.indexOf('##') !== -1 || gridArrayData[i].outputVal.indexOf(';##') !== -1) {
+                    $(this).find('tr.jqgrow')[i].style.borderLeft = "5px solid red";
+                    $(this).find('tr.jqgrow')[i].childNodes[0].style.paddingRight = "7px"
+                    $(this).find('tr.jqgrow')[i].childNodes[1].childNodes[0].style.marginLeft = "-4px";
+                    $(this).find('tr.jqgrow')[i].childNodes[7].style.color = "red";
+                } else {
+                    //$(this).find('tr.jqgrow')[i].style.borderLeft = "5px solid transparent";
+                    //$(this).find('tr.jqgrow')[i].childNodes[0].style.marginLeft = "-4px"
+                    $(this).find('tr.jqgrow')[i].childNodes[7].style.color = "";
+                }
+            }
+            hideOtherFuncOnEdit();
+            $("#jqGrid").parent('div').css('height', 'auto');
+            if (getScrapeDataforCustomObj != "" && getScrapeDataforCustomObj != undefined) {
+                for (i = 0; i < getScrapeDataforCustomObj.length; i++) {
+                    if (getScrapeDataforCustomObj[i].xpath == "" && !getScrapeDataforCustomObj[i].cord) {
+                        var testGridData = $("#jqGrid tbody tr:not(.jqgfirstrow)");
+                        $.each(testGridData, function () {
+                            if ($(this).find("td[aria-describedby='jqGrid_custname']").text() == scrappedData[i].custname) {
+                                $(this).find("td[aria-describedby='jqGrid_custname']").addClass("addCustObj");
+
+                            }
+                        })
+                    }
+                }
+            }
+        },
+    })
 
         //commented the sorting of rows (drag and drop) on purpose - Dated: 5/12/2015
         .jqGrid('sortableRows', {
-            update: function(ev, ui) {
+            update: function (ev, ui) {
                 var item = ui.item[0],
                     ri = item.rowIndex,
                     itemId = item.id,
@@ -4402,7 +4430,7 @@ function contentTable(newTestScriptDataLS) {
     //Focus JqGrid onLoad
     $("#jqGrid").focus().css("outline", "none");
 
-    $(document).on('click', "[name='inputVal'],[name='custname'],[name='keywordVal'],[name='outputVal']", function() {
+    $(document).on('click', "[name='inputVal'],[name='custname'],[name='keywordVal'],[name='outputVal']", function () {
         if ($("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "getBody" ||
             $("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "setHeader" ||
             $("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "setWholeBody" ||
@@ -4415,7 +4443,7 @@ function contentTable(newTestScriptDataLS) {
             }
         }
     });
-    $(document).on('focus', "[name='inputVal'],[name='custname'],[name='keywordVal'],[name='outputVal']", function(e) {
+    $(document).on('focus', "[name='inputVal'],[name='custname'],[name='keywordVal'],[name='outputVal']", function (e) {
         if ($("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "getBody" ||
             $("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "setHeader" ||
             $("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "setWholeBody" ||
@@ -4488,7 +4516,7 @@ function contentTable(newTestScriptDataLS) {
     });
     $("#jqGrid").resetSelection();
 
-    $(document).on('click', '.remarksIcon', function() {
+    $(document).on('click', '.remarksIcon', function () {
         $('td[aria-describedby="jqGrid_remarks"]').removeClass('selectedRemarkCell');
         $(this).parent('td').next('td[aria-describedby="jqGrid_remarks"]').addClass('selectedRemarkCell');
         var historyDetails = $(this).parent('td').next('td[aria-describedby="jqGrid_remarks"]').text().trim();
@@ -4517,7 +4545,7 @@ function contentTable(newTestScriptDataLS) {
         $("#modalDialogRemarks").modal("show");
     })
 
-    $(document).on('click', '#btnaddRemarks', function(e) {
+    $(document).on('click', '#btnaddRemarks', function (e) {
         //var oldRemarks = $("#jqGrid tbody tr td.selectedRemarkCell").text().trim();
         if (!$("#getremarksData").val().trim()) {
             $("#getremarksData").addClass("inputErrorBorderFull");
@@ -4533,7 +4561,7 @@ function contentTable(newTestScriptDataLS) {
                 $("#jqGrid tbody tr td.selectedRemarkCell").removeClass('selectedRemarkCell');
                 $(this).parent(".modal-footer").parent(".modal-content").find(".close").trigger('click');
             }
-			//Transaction Activity for AddRemarksTestStep Button Action
+            //Transaction Activity for AddRemarksTestStep Button Action
             // var labelArr = [];
             // var infoArr = [];
             // labelArr.push(txnHistory.codesDict['AddRemarksTestStep']);
@@ -4541,91 +4569,87 @@ function contentTable(newTestScriptDataLS) {
         }
     })
 
-        //Save teststep details
-        $(document).on('click', '#saveTestStepDetails', function(e) {
-            var $grid =  $('#jqGrid');
-            getTestStepDetailsRowData = $grid.jqGrid ('getRowData', modalId);
-            getTestStepDetailsRowData.addTestCaseDetailsInfo = {};
-            var testDetails = $.trim($('#testDetails_'+modalId+'').val());
-          //  var expectedResult_pass = $.trim($('#pass_'+modalId+'').find('#expectedResult_'+modalId+'').val());
-            var actualResult_pass =  $.trim($('#pass_'+modalId+'').find('#actualResult_'+modalId+'').val());
-          //  var expectedResult_fail = $.trim($('#fail_'+modalId+'').find('#expectedResult_'+modalId+'').val());
-            var actualResult_fail =  $.trim($('#fail_'+modalId+'').find('#actualResult_'+modalId+'').val());
-    
-           if(testDetails == '' && actualResult_pass == '' && actualResult_fail == '')
-           {
-                $('#globalModalForm').modal('hide');
-                openDialog('Add Test Step Details','Please enter atleast one field to save test step details');
-           }
-           else{
+    //Save teststep details
+    $(document).on('click', '#saveTestStepDetails', function (e) {
+        var $grid = $('#jqGrid');
+        getTestStepDetailsRowData = $grid.jqGrid('getRowData', modalId);
+        getTestStepDetailsRowData.addTestCaseDetailsInfo = {};
+        var testDetails = $.trim($('#testDetails_' + modalId + '').val());
+        //  var expectedResult_pass = $.trim($('#pass_'+modalId+'').find('#expectedResult_'+modalId+'').val());
+        var actualResult_pass = $.trim($('#pass_' + modalId + '').find('#actualResult_' + modalId + '').val());
+        //  var expectedResult_fail = $.trim($('#fail_'+modalId+'').find('#expectedResult_'+modalId+'').val());
+        var actualResult_fail = $.trim($('#fail_' + modalId + '').find('#actualResult_' + modalId + '').val());
 
-            if(testDetails == ''  && actualResult_pass == ''  && actualResult_fail == '')
-            {
-                getTestStepDetailsRowData.addTestCaseDetails ='';
+        if (testDetails == '' && actualResult_pass == '' && actualResult_fail == '') {
+            $('#globalModalForm').modal('hide');
+            openDialog('Add Test Step Details', 'Please enter atleast one field to save test step details');
+        }
+        else {
+
+            if (testDetails == '' && actualResult_pass == '' && actualResult_fail == '') {
+                getTestStepDetailsRowData.addTestCaseDetails = '';
                 getTestStepDetailsRowData.addTestCaseDetailsInfo = {
                     "testcaseDetails": "",
                     "actualResult_pass": "",
                     "actualResult_fail": "",
                 };
             }
-          
-                 getTestStepDetailsRowData.addTestCaseDetailsInfo = {
-                    "testcaseDetails": testDetails,
-                    "actualResult_pass": actualResult_pass,
-                    "actualResult_fail": actualResult_fail,
-                };
-                var hideDetails = $('#hideDetailsCheck_'+modalId+'').is(':checked');
-                //getTestStepDetailsRowData.hideTestcaseDetails = hideDetails;
-                $grid.jqGrid('setCell', modalId, 'addTestCaseDetailsInfo',JSON.stringify(getTestStepDetailsRowData.addTestCaseDetailsInfo));
-                //$grid.jqGrid('setCell', modalId, 'hideTestcaseDetails', getTestStepDetailsRowData.hideTestcaseDetails);
-                var gridData =  $grid.jqGrid('getGridParam','data');
-                for(let i=0;i<gridData.length;i++)
-                {
-                    if(gridData[i].stepNo === getTestStepDetailsRowData.stepNo)
-                    {
-                        gridData[i] = getTestStepDetailsRowData;
-                    }
-                    // if('addTestCaseDetailsInfo' in  gridData[i])
-                    // {
-                    //     if(gridData[i].addTestCaseDetailsInfo != "undefined")
-                    //     {
-                    //         $("tr#"+modalId).find("td:nth-child(13)").text('');
-                    //         $("tr#"+modalId).find("td:nth-child(13)").append('<img id="details_'+modalId+'" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
-                    //     }
-                    //     else{
-                    //         $("tr#"+modalId).find("td:nth-child(13)").text('');
-                    //         $("tr#"+modalId).find("td:nth-child(13)").append('<img id="details_'+modalId+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
-                    //     }
-                    // }
-                    // else{
-                    //     $("tr#"+modalId).find("td:nth-child(13)").text('');
-                    //     $("tr#"+modalId).find("td:nth-child(13)").append('<img id="details_'+modalId+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
-                    // }
+
+            getTestStepDetailsRowData.addTestCaseDetailsInfo = {
+                "testcaseDetails": testDetails,
+                "actualResult_pass": actualResult_pass,
+                "actualResult_fail": actualResult_fail,
+            };
+            var hideDetails = $('#hideDetailsCheck_' + modalId + '').is(':checked');
+            //getTestStepDetailsRowData.hideTestcaseDetails = hideDetails;
+            $grid.jqGrid('setCell', modalId, 'addTestCaseDetailsInfo', JSON.stringify(getTestStepDetailsRowData.addTestCaseDetailsInfo));
+            //$grid.jqGrid('setCell', modalId, 'hideTestcaseDetails', getTestStepDetailsRowData.hideTestcaseDetails);
+            var gridData = $grid.jqGrid('getGridParam', 'data');
+            for (let i = 0; i < gridData.length; i++) {
+                if (gridData[i].stepNo === getTestStepDetailsRowData.stepNo) {
+                    gridData[i] = getTestStepDetailsRowData;
                 }
-             
-                $(".close:visible").trigger('click'); 
-				//Transaction Activity for Filter Button Action
-                // var labelArr = [];
-                // var infoArr = [];
-                // labelArr.push(txnHistory.codesDict['SaveTestStepDetails']);
-                // txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);					 
-           }  
-        });
+                // if('addTestCaseDetailsInfo' in  gridData[i])
+                // {
+                //     if(gridData[i].addTestCaseDetailsInfo != "undefined")
+                //     {
+                //         $("tr#"+modalId).find("td:nth-child(13)").text('');
+                //         $("tr#"+modalId).find("td:nth-child(13)").append('<img id="details_'+modalId+'" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+                //     }
+                //     else{
+                //         $("tr#"+modalId).find("td:nth-child(13)").text('');
+                //         $("tr#"+modalId).find("td:nth-child(13)").append('<img id="details_'+modalId+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                //     }
+                // }
+                // else{
+                //     $("tr#"+modalId).find("td:nth-child(13)").text('');
+                //     $("tr#"+modalId).find("td:nth-child(13)").append('<img id="details_'+modalId+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                // }
+            }
+
+            $(".close:visible").trigger('click');
+            //Transaction Activity for Filter Button Action
+            // var labelArr = [];
+            // var infoArr = [];
+            // labelArr.push(txnHistory.codesDict['SaveTestStepDetails']);
+            // txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);					 
+        }
+    });
 
     //Reset test step details
-    $(document).on('click', '#resetTestStepDetails', function(e) {
+    $(document).on('click', '#resetTestStepDetails', function (e) {
         $('input:visible').val('');
     });
 
     function hideOtherFuncOnEdit() {
-        $("#jqGrid").each(function() {
+        $("#jqGrid").each(function () {
             var cboxCheckedLen = $(".cbox:not(#cb_jqGrid):checked").length;
             var cboxLen = $(".cbox:not(#cb_jqGrid)").length;
             var editableLen = $(".editable").length;
             var cboxParentCheckedLen = $('#cb_jqGrid:checked').length;
             var rowHighlightLen = $("tr.rowHighlight").length;
             var rowSelectedLen = $("tr.ui-state-highlight").length;
-            $("tr.rowHighlight").each(function() {
+            $("tr.rowHighlight").each(function () {
                 if (rowSelectedLen > 0) {
                     $("tr.rowHighlight").removeClass("rowHighlight");
                 }
@@ -4638,8 +4662,8 @@ function contentTable(newTestScriptDataLS) {
             }
         });
 
-        $(".cbox:not(#cb_jqGrid)").each(function() {
-            $(this).on('click', function(e) {
+        $(".cbox:not(#cb_jqGrid)").each(function () {
+            $(this).on('click', function (e) {
                 var isCboxChecked = $(this).is(":checked");
                 var checkedLen = $(".cbox:checked").length;
                 if (isCboxChecked == true) {
@@ -4648,8 +4672,8 @@ function contentTable(newTestScriptDataLS) {
             });
         });
 
-        $("tr.jqgrow").each(function() {
-            $(this).on('click', function(e) {
+        $("tr.jqgrow").each(function () {
+            $(this).on('click', function (e) {
                 var rowId = $(this).attr("id");
                 if (rowId == (e.target.parentElement.id || e.target.parentElement.parentElement.id)) {
                     $(".cbox:not(:checked):not(#cb_jqGrid)").parent().parent("tr.ui-state-highlight").removeClass('ui-state-highlight');
@@ -4657,7 +4681,7 @@ function contentTable(newTestScriptDataLS) {
             });
         });
 
-        $(".cbox:checked:not(#cb_jqGrid)").parent().parent().siblings("tr.jqgrow").each(function() {
+        $(".cbox:checked:not(#cb_jqGrid)").parent().parent().siblings("tr.jqgrow").each(function () {
             var checkedBoxLen = $(".cbox:checked").length;
             if ($(this).hasClass('ui-state-highlight') && checkedBoxLen == 1) {
                 $(this).removeClass('ui-state-highlight');
@@ -4675,7 +4699,7 @@ function contentTable(newTestScriptDataLS) {
     }
 
     //Enable/disable Functions on start/end of editing
-    $("#jqGrid").bind("jqGridInlineEditRow jqGridInlineAfterSaveRow jqGridInlineAfterRestoreRow", function(e) {
+    $("#jqGrid").bind("jqGridInlineEditRow jqGridInlineAfterSaveRow jqGridInlineAfterRestoreRow", function (e) {
         var $self = $(this),
             savedRows = $self.jqGrid("getGridParam", "savedRow");
         if (savedRows.length > 0) {
@@ -4711,18 +4735,17 @@ function contentTable(newTestScriptDataLS) {
         //get Input and Output Syntax for selected Keyword
         var keywordArrayList1 = keywordListData;
         var keywordArrayList = JSON.parse(keywordArrayList1);
-        $.each(keywordArrayList, function(index, value) {
+        $.each(keywordArrayList, function (index, value) {
             keywordArrayKey = index;
             keywordArrayValue = value; //JSON.parse(value);
             if (selectedKeywordList == keywordArrayKey) {
-                $.each(keywordArrayValue, function(k, v) {
+                $.each(keywordArrayValue, function (k, v) {
                     if (selectedKeyword == k) {
-                        if(v != "")
-                        {
+                        if (v != "") {
                             inputSyntax = JSON.parse(v).inputVal;
                             outputSyntax = JSON.parse(v).outputVal;
                         }
-                        else{
+                        else {
                             inputSyntax = v;
                             outputSyntax = v;
                         }
@@ -4739,6 +4762,7 @@ function contentTable(newTestScriptDataLS) {
         var keywordArrayList = JSON.parse(keywordArrayList1);
         var taskInfo = JSON.parse(window.localStorage['_CT']);
         var appTypeLocal = taskInfo.appType; //window.localStorage['appTypeScreen'];
+        var cord = null;
         if (selectedText == "") {
             selectedText = "@Generic"
         }
@@ -4784,13 +4808,14 @@ function contentTable(newTestScriptDataLS) {
                 $grid.jqGrid('setCell', rowId, 'appType', "Generic");
                 $grid.jqGrid('setCell', rowId, 'url', url);
                 $grid.jqGrid('setCell', rowId, 'objectName', objName);
+                $grid.jqGrid('setCell', rowId, 'cord', cord);
             }
         }
-        else if(selectedText=="@System"){
+        else if (selectedText == "@System") {
             var sc = Object.keys(keywordArrayList.system);
             selectedKeywordList = "getOsInfo";
             objName = " ";
-            url=" ";
+            url = " ";
             for (var i = 0; i < sc.length; i++) {
                 if (selectedKeyword == sc[i]) {
                     res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
@@ -4824,6 +4849,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
             $grid.jqGrid('setCell', rowId, 'url', url);
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         } else if (selectedText == "@BrowserPopUp") {
             objName = " ";
             url = " ";
@@ -4843,6 +4869,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
             $grid.jqGrid('setCell', rowId, 'url', url);
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         }
         /**
          * To Handle custom objects mapping @custom to element keywords
@@ -4891,10 +4918,11 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
             $grid.jqGrid('setCell', rowId, 'url', url);
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         }
         //ends here
-		//Object
-		else if (selectedText == "@Object") {
+        //Object
+        else if (selectedText == "@Object") {
             var sc = Object.keys(keywordArrayList.object);
             selectedKeywordList = "object";
             objName = "@Object";
@@ -4902,8 +4930,8 @@ function contentTable(newTestScriptDataLS) {
             var sc;
             var res = '';
             if (appTypeLocal == 'Web') {
-														  
-											   
+
+
                 var newTSDataLS = angular.element(document.getElementById('jqGrid')).scope().newTestScriptDataLS;
                 if (newTSDataLS) {
                     if (newTSDataLS != "undefined") {
@@ -4935,6 +4963,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
             $grid.jqGrid('setCell', rowId, 'url', url);
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         }
         //ends here
         else if (selectedText == "WebService List") {
@@ -4988,6 +5017,7 @@ function contentTable(newTestScriptDataLS) {
             $("select#" + rowId + "_keywordVal", row[0]).html(res);
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         } else if (selectedText == "@Window") {
             objName = " ";
             url = " ";
@@ -5007,6 +5037,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
             $grid.jqGrid('setCell', rowId, 'url', url);
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         } else if (selectedText == "@Oebs") {
             objName = "";
             url = "";
@@ -5026,6 +5057,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
             $grid.jqGrid('setCell', rowId, 'url', url);
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         } else if (selectedText == "@Mobile") {
             objName = " ";
             url = " ";
@@ -5055,7 +5087,7 @@ function contentTable(newTestScriptDataLS) {
                         '" selected>' + sc[i] + '</option>';
                 } else
                     res += '<option role="option" value="' + sc[i] + '">' +
-                    sc[i] + '</option>';
+                        sc[i] + '</option>';
             }
             var row = $(e.target).closest('tr.jqgrow');
             var rowId = row.attr('id');
@@ -5064,6 +5096,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
             $grid.jqGrid('setCell', rowId, 'url', url);
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         } else if (selectedText == "@MobileiOS") {
             objName = " ";
             url = " ";
@@ -5098,6 +5131,7 @@ function contentTable(newTestScriptDataLS) {
             $("select#" + rowId + "_keywordVal", row[0]).html(res);
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         }
         //Adding @Excel to the objectName dropdown
         else if (selectedText == "@Excel") {
@@ -5118,6 +5152,7 @@ function contentTable(newTestScriptDataLS) {
             $("select#" + rowId + "_keywordVal", row[0]).html(res);
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', 'Generic');
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         } //Adding @Word to the objectName dropdown
         else if (selectedText == "@Word") {
             objName = " ";
@@ -5137,17 +5172,19 @@ function contentTable(newTestScriptDataLS) {
             $("select#" + rowId + "_keywordVal", row[0]).html(res);
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', 'Generic');
+            $grid.jqGrid('setCell', rowId, 'cord', cord);
         }
         else {
-
+            var scrappedDataCustnames = [];
             selectedText = replaceHtmlEntites(selectedText.trim());
             for (var i = 0; i < scrappedData.length; i++) {
                 var ob = scrappedData[i];
                 var custname1;
                 var custval = ob.custname;
                 custname1 = $('<input>').html(custval).text().trim();
-                if ((custname1.replace(/\s/g, ' ') == (selectedText.replace('/\s/g', ' ')).replace('\n', ' ')) ) {
-					var isIos = scrappedData[i].text;
+                scrappedDataCustnames.push(custval);
+                if ((custname1.replace(/\s/g, ' ') == (selectedText.replace('/\s/g', ' ')).replace('\n', ' '))) {
+                    var isIos = scrappedData[i].text;
                     if(isIos == 'ios')
                     {
                         objName = ob.xpath;
@@ -5155,11 +5192,10 @@ function contentTable(newTestScriptDataLS) {
                     else{
 					    objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
 					}
-					var cord = null;
-					url = ob.url;
-					var obType = ob.tag;
-					var listType = ob.canselectmultiple;
-					if (ob.cord){
+                    url = ob.url;
+                    var obType = ob.tag;
+                    var listType = ob.canselectmultiple;
+                    if (ob.cord) {
                         selectedKeywordList = 'iris';
                         cord = ob.cord;
                         obType = "iris";
@@ -5185,7 +5221,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-						$grid.jqGrid('setCell', rowId, 'cord',cord);
+                        $grid.jqGrid('setCell', rowId, 'cord', cord);
                         break;
                     } else if (obType == 'elementWS') {
                         var sc = Object.keys(keywordArrayList.elementWS);
@@ -5205,8 +5241,8 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
                         break;
-                    } else if (appTypeLocal == 'Desktop' && (obType == 'button' || obType == 'input' || obType == 'select' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType =='treeview'|| obType=='TreeView' || obType=='tree' ||
-                            obType == 'list' || obType == 'edit' || obType == null || obType == 'checkbox' || obType == 'radiobutton' || obType == 'tab' || obType == 'datepicker' || obType == 'table' || obType != undefined)) {
+                    } else if (appTypeLocal == 'Desktop' && (obType == 'button' || obType == 'input' || obType == 'select' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType == 'treeview' || obType == 'TreeView' || obType == 'tree' ||
+                        obType == 'list' || obType == 'edit' || obType == null || obType == 'checkbox' || obType == 'radiobutton' || obType == 'tab' || obType == 'datepicker' || obType == 'table' || obType != undefined)) {
                         var res = '';
                         var sc;
                         var listType = ob.canselectmultiple;
@@ -5245,16 +5281,16 @@ function contentTable(newTestScriptDataLS) {
                         } else if (obType == 'hyperlink' || obType == 'lbl') {
                             sc = Object.keys(keywordArrayList.link);
                             selectedKeywordList = "link";
-                        } else if(obType =='treeview'|| obType=='TreeView' || obType=='tree'){
+                        } else if (obType == 'treeview' || obType == 'TreeView' || obType == 'tree') {
                             sc = Object.keys(keywordArrayList.tree);
                             selectedKeywordList = "tree";
-                        } else if(obType =='iris'){
+                        } else if (obType == 'iris') {
                             sc = Object.keys(keywordArrayList.iris);
                             selectedKeywordList = "iris";
                         } else if (obType == 'table') {
                             sc = Object.keys(keywordArrayList.table);
                             selectedKeywordList = "table";
-                        }else {
+                        } else {
                             sc = Object.keys(keywordArrayList.element);
                             selectedKeywordList = "element";
                         }
@@ -5271,10 +5307,10 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-						$grid.jqGrid('setCell', rowId, 'cord',cord);
+                        $grid.jqGrid('setCell', rowId, 'cord', cord);
                         break;
-                    } else if (appTypeLocal == 'Desktop' && (!(obType == 'push_button' || obType == 'text' || obType == 'combo_box' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType =='treeview'|| obType=='TreeView' || obType=='tree' ||
-                            obType == 'list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box' || obType == 'radio_button' || obType == 'tab' || obType == 'datepicker' || obType == 'table'))) {
+                    } else if (appTypeLocal == 'Desktop' && (!(obType == 'push_button' || obType == 'text' || obType == 'combo_box' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType == 'treeview' || obType == 'TreeView' || obType == 'tree' ||
+                        obType == 'list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box' || obType == 'radio_button' || obType == 'tab' || obType == 'datepicker' || obType == 'table'))) {
                         var res = '';
                         var sc = Object.keys(keywordArrayList.element);
                         selectedKeywordList = "element";
@@ -5291,15 +5327,15 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-						$grid.jqGrid('setCell', rowId, 'cord',cord);
+                        $grid.jqGrid('setCell', rowId, 'cord', cord);
                         break;
                     }
                     //adding for SAP
                     else if (appTypeLocal == 'SAP' && (obType == 'GuiTextField' || obType == 'GuiTitlebar' || obType == 'GuiButton' || obType == 'GuiUserArea' || obType == 'GuiRadioButton' ||
-                            obType == 'GuiLabel' || obType == 'GuiBox' || obType == 'GuiSimpleContainer' || obType == 'GuiPasswordField' || obType == 'GuiComboBox' || obType == 'GuiCheckBox' ||
-                            obType == 'GuiStatusbar' || obType == 'GuiStatusPane' || obType == 'text' || obType == 'combo_box' || obType == 'list_item' || obType == 'GuiCTextField' ||
-                            obType == 'hyperlink' || obType == 'lbl' || obType == 'list' || obType == 'edit' || obType == null || obType == 'check_box' || obType == 'GuiTableControl' ||
-                            obType == 'radio_button' || obType == 'button' || obType == 'checkbox' || obType == 'radiobutton' || obType == 'table' || obType == 'a' || obType == 'input' || obType == 'GuiScrollContainer' || obType == 'GuiTab' || obType == 'scroll' || obType != undefined)) {
+                        obType == 'GuiLabel' || obType == 'GuiBox' || obType == 'GuiSimpleContainer' || obType == 'GuiPasswordField' || obType == 'GuiComboBox' || obType == 'GuiCheckBox' ||
+                        obType == 'GuiStatusbar' || obType == 'GuiStatusPane' || obType == 'text' || obType == 'combo_box' || obType == 'list_item' || obType == 'GuiCTextField' ||
+                        obType == 'hyperlink' || obType == 'lbl' || obType == 'list' || obType == 'edit' || obType == null || obType == 'check_box' || obType == 'GuiTableControl' ||
+                        obType == 'radio_button' || obType == 'button' || obType == 'checkbox' || obType == 'radiobutton' || obType == 'table' || obType == 'a' || obType == 'input' || obType == 'GuiScrollContainer' || obType == 'GuiTab' || obType == 'scroll' || obType != undefined)) {
                         var res = '';
                         var sc;
                         var listType = '';
@@ -5350,7 +5386,7 @@ function contentTable(newTestScriptDataLS) {
                         } else if (obType == 'hyperlink' || obType == 'a') {
                             sc = Object.keys(keywordArrayList.link);
                             selectedKeywordList = "link";
-                        } else if(obType =='iris'){
+                        } else if (obType == 'iris') {
                             sc = Object.keys(keywordArrayList.iris);
                             selectedKeywordList = "iris";
                         } else {
@@ -5370,7 +5406,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-						$grid.jqGrid('setCell', rowId, 'cord',cord);
+                        $grid.jqGrid('setCell', rowId, 'cord', cord);
                         break;
                     } else if (appTypeLocal == 'MobileApp' &&
                         (obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0 ||
@@ -5437,7 +5473,7 @@ function contentTable(newTestScriptDataLS) {
                                     '" selected>' + sc[i] + '</option>';
                             } else
                                 res += '<option role="option" value="' + sc[i] +
-                                '">' + sc[i] + '</option>';
+                                    '">' + sc[i] + '</option>';
                         }
                         var row = $(e.target).closest('tr.jqgrow');
                         var rowId = row.attr('id');
@@ -5448,9 +5484,9 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
                         break;
                     } else if (appTypeLocal == 'MobileApp' && (!(obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0 ||
-                            obType.indexOf("Switch") >= 0 || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0 ||
-                            obType.indexOf("android.widget.NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("android.widget.SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 ||
-                            obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >= 0 || obType.indexOf("android.widget.TimePicker") >= 0 || obType.indexOf("android.widget.DatePicker") >= 0))) {
+                        obType.indexOf("Switch") >= 0 || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0 ||
+                        obType.indexOf("android.widget.NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("android.widget.SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 ||
+                        obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >= 0 || obType.indexOf("android.widget.TimePicker") >= 0 || obType.indexOf("android.widget.DatePicker") >= 0))) {
                         var res = '';
                         var sc = Object.keys(keywordArrayList.element);
                         selectedKeywordList = "element";
@@ -5460,7 +5496,7 @@ function contentTable(newTestScriptDataLS) {
                                     '" selected>' + sc[i] + '</option>';
                             } else
                                 res += '<option role="option" value="' + sc[i] +
-                                '">' + sc[i] + '</option>';
+                                    '">' + sc[i] + '</option>';
                         }
                         var row = $(e.target).closest('tr.jqgrow');
                         var rowId = row.attr('id');
@@ -5528,7 +5564,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
                         break;
                     } else if (appTypeLocal == 'DesktopJava' && (obType == 'push button' || obType == 'text' || obType == 'combo box' || obType == 'list item' || obType == 'hyperlink' || obType == 'label' || obType == 'scroll bar' || obType == 'toggle button' || obType == 'menu' ||
-                            obType == 'list' || obType == 'edit' || obType == 'Edit Box' || obType == null || obType == 'Static' || obType == 'check box' || obType == 'radio button' || obType == 'panel' || obType != undefined || obType == 'table') || obType == 'password text') {
+                        obType == 'list' || obType == 'edit' || obType == 'Edit Box' || obType == null || obType == 'Static' || obType == 'check box' || obType == 'radio button' || obType == 'panel' || obType != undefined || obType == 'table') || obType == 'password text') {
                         var sc;
                         if (obType == 'push button' || obType == 'toggle button') {
                             sc = Object.keys(keywordArrayList.button);
@@ -5560,7 +5596,7 @@ function contentTable(newTestScriptDataLS) {
                         } else if (obType == 'internal frame') {
                             sc = Object.keys(keywordArrayList.internalframe);
                             selectedKeywordList = "internalframe";
-                        } else if(obType =='iris'){
+                        } else if (obType == 'iris') {
                             sc = Object.keys(keywordArrayList.iris);
                             selectedKeywordList = "iris";
                         } else {
@@ -5581,7 +5617,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-						$grid.jqGrid('setCell', rowId, 'cord',cord);
+                        $grid.jqGrid('setCell', rowId, 'cord', cord);
                         break;
                     } else {
                         var sc = Object.keys(keywordArrayList[obType]);
@@ -5600,10 +5636,22 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-						$grid.jqGrid('setCell', rowId, 'cord',cord);
+                        $grid.jqGrid('setCell', rowId, 'cord', cord);
                         break;
                     }
                 }
+            }
+            if ($.inArray(selectedText, scrappedDataCustnames) == '-1' && ($(e.target).parents('tr').children('td').find('.editable').length > 0 || $(e.target).children('td').find('select.editable').length > 0)) {
+                console.log(scrappedData);
+                var mydata = $grid.jqGrid('getRowData');
+                console.log('mydata', mydata);
+                var row = $(e.target).closest('tr.jqgrow');
+                var rowId = row.attr('id');
+                $("select#" + rowId + "_keywordVal", row[0]).html(res);
+                selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
+                $grid.jqGrid('setCell', rowId, 'objectName', ' ');
+                $grid.jqGrid('setCell', rowId, 'url', ' ');
+                $grid.jqGrid('setCell', rowId, 'appType', 'Generic');
             }
         }
     }
@@ -5645,11 +5693,11 @@ function contentTable(newTestScriptDataLS) {
         $(selId).parent().next().find('input').val('');
         $(selId).parent().next().next().find('input').val('');
         //get Input and Output Syntax for selected Keyword
-        $.each(keywordArrayList, function(index, value) {
+        $.each(keywordArrayList, function (index, value) {
             keywordArrayKey = index;
             keywordArrayValue = value; //JSON.parse(value);
             if (selectedKeywordList == keywordArrayKey) {
-                $.each(keywordArrayValue, function(k, v) {
+                $.each(keywordArrayValue, function (k, v) {
                     if (selectedText == k) {
                         inputSyntax = JSON.parse(v).inputVal;
                         outputSyntax = JSON.parse(v).outputVal;
@@ -5687,11 +5735,11 @@ function contentTable(newTestScriptDataLS) {
         // }
 
         //get Input and Output Syntax for selected Keyword
-        $.each(keywordArrayList, function(index, value) {
+        $.each(keywordArrayList, function (index, value) {
             keywordArrayKey = index;
             keywordArrayValue = value; //JSON.parse(value);
             if (selectedKeywordList == keywordArrayKey) {
-                $.each(keywordArrayValue, function(k, v) {
+                $.each(keywordArrayValue, function (k, v) {
                     if (selectedKey == k) {
                         inputSyntax = JSON.parse(v).inputVal;
                         outputSyntax = JSON.parse(v).outputVal;
@@ -5715,11 +5763,10 @@ function deleteTestScriptRow(e) {
     } else {
         if ($(document).find("#cb_jqGrid:checked").length > 0 || $("#jqGrid").find(".cbox:checked").length > 0) {
             $("#globalModalYesNo").find('.modal-title').text("Delete Test Step");
-            var task=JSON.parse(window.localStorage['_CT'])
+            var task = JSON.parse(window.localStorage['_CT'])
             if (task.reuse == 'True') {
                 $("#globalModalYesNo").find('.modal-body p').text("Testcase is been reused. Are you sure, you want to delete?").css('color', 'black');
-            } else 
-            {
+            } else {
                 $("#globalModalYesNo").find('.modal-body p').text("Are you sure, you want to delete?").css('color', 'black');
             }
             $("#globalModalYesNo").find('.modal-footer button:nth-child(1)').attr("id", "btnDeleteStepYes")
@@ -5731,13 +5778,13 @@ function deleteTestScriptRow(e) {
     }
 }
 
-$(document).on('click', '#btnDeleteStepYes', function(e) {
+$(document).on('click', '#btnDeleteStepYes', function (e) {
     var selectedRowIds = []; //$("#jqGrid").jqGrid('getGridParam','selarrrow').map(Number);
-    $.each($(".ui-state-highlight"), function() {
+    $.each($(".ui-state-highlight"), function () {
         selectedRowIds.push($(this).attr("id"));
     })
     var gridArrayData = $("#jqGrid").jqGrid('getRowData');
-   // console.log("array data test ***** " + JSON.stringify(gridArrayData));
+    // console.log("array data test ***** " + JSON.stringify(gridArrayData));
     for (var i = 0; i < selectedRowIds.length; i++) {
         $("#jqGrid").delRowData(selectedRowIds[i]);
     }
@@ -5753,7 +5800,7 @@ $(document).on('click', '#btnDeleteStepYes', function(e) {
     $("#jqGrid").trigger("reloadGrid");
     $('.modal-header:visible').find('.close').trigger('click')
     //deleteStep = true;
-	//Transaction Activity for DeleteTestScriptRow Button Action
+    //Transaction Activity for DeleteTestScriptRow Button Action
     // var labelArr = [];
     // var infoArr = [];
     // labelArr.push(txnHistory.codesDict['DeleteTestScriptRow']);
@@ -5789,7 +5836,7 @@ function addTestScriptRow(e) {
             "addTestCaseDetailsInfo": ""
         };
 
-        $("#jqGrid tr").each(function() {
+        $("#jqGrid tr").each(function () {
             if ($(this).find("td:nth-child(9)").find(".remarksIcon").length > 0) {
                 $(this).find("td:nth-child(9)").find(".remarksIcon").remove();
             }
@@ -5814,7 +5861,7 @@ function addTestScriptRow(e) {
                         gridArrayData[i].stepNo = i + 1;
                     }
                 }
-                var allRowsInGrid = $('#jqGrid').jqGrid('getGridParam','data');
+                var allRowsInGrid = $('#jqGrid').jqGrid('getGridParam', 'data');
             } else {
                 gridArrayData.splice(arrayLength, 0, emptyRowData);
                 gridArrayData[arrayLength].stepNo = parseInt(gridArrayData[arrayLength - 1].stepNo) + 1;
@@ -5833,7 +5880,7 @@ function addTestScriptRow(e) {
 
         $("#jqGrid tr:last").focus();
         if (flagClass == "true") {
-            $("#jqGrid tr").each(function() {
+            $("#jqGrid tr").each(function () {
                 if ($(this).children("td:nth-child(1)").text() == window.localStorage['selectedRowStepNo']) {
                     $(this).siblings().removeClass("ui-state-highlight")
                     $(this).next().addClass("ui-state-highlight").focus();
@@ -5842,8 +5889,8 @@ function addTestScriptRow(e) {
             flagClass == "false"
         }
     }
-	
-	//Transaction Activity for AddTestScriptRow Button Action
+
+    //Transaction Activity for AddTestScriptRow Button Action
     // var labelArr = [];
     // var infoArr = [];
     // labelArr.push(txnHistory.codesDict['AddTestScriptRow']);
@@ -5892,7 +5939,7 @@ function rearrangeTestScriptRow(e) {
     $("#jqGrid").find(">tbody").sortable("enable");
     enabledEdit = "false";
 
-	//Transaction Activity for RearrangeTestScriptRow Button Action
+    //Transaction Activity for RearrangeTestScriptRow Button Action
     // var labelArr = [];
     // var infoArr = [];
     // labelArr.push(txnHistory.codesDict['RearrangeTestScriptRow']);
@@ -5947,14 +5994,14 @@ function editTestCaseRow(e) {
         });
         $("#jqGrid").resetSelection();
         $("#jqGrid").trigger("reloadGrid");
-        $("#jqGrid tr").each(function() {
+        $("#jqGrid tr").each(function () {
             $(this).attr("id", $(this).index());
             $(this).children("td[aria-describedby='jqGrid_stepNo']").attr("title", $(this).index()).text($(this).index());
             $(this).children("td[aria-describedby='jqGrid_cb']").children("input").attr("id", "jqg_jqGrid_" + $(this).index()).attr("name", "jqg_jqGrid_" + $(this).index());
         })
         $("#jqGrid").find(">tbody").sortable("disable");
         $(this).focus();
-        $("#jqGrid tr").each(function() {
+        $("#jqGrid tr").each(function () {
             if (rowSelect == $(this).children("td:nth-child(1)").text() && rowIsChecked == true) {
                 $(this).focus().addClass("rowHighlight");
                 $("tr.rowHighlight").trigger('click');
@@ -5968,7 +6015,7 @@ function editTestCaseRow(e) {
             $("tr:nth-child(" + editSelRow + ")").focus().trigger('click'); //Focus row on checkbox selection
         }
         //Trigger Focus on selected row when multiple rows are checked and unchecked and is not editable
-        $("tr.ui-state-highlight").each(function() {
+        $("tr.ui-state-highlight").each(function () {
             var checkedLen = $(".cbox:checked").length;
             var editableLen = $(".editable").length;
             if (checkedLen == 1 && editableLen == 0) {
@@ -5976,7 +6023,7 @@ function editTestCaseRow(e) {
             }
         });
 
-		//Transaction Activity for EditTestCaseRow Button Action
+        //Transaction Activity for EditTestCaseRow Button Action
         // var labelArr = [];
         // var infoArr = [];
         // labelArr.push(txnHistory.codesDict['EditTestCaseRow']);
@@ -5996,7 +6043,7 @@ function copyTestStep(e) {
         getSelectedRowData = [];
         getRowJsonCopy = [];
         getSelectedRowData = $(document).find(".cbox:checked").parent().parent("tr.ui-state-highlight")
-        $.each(getSelectedRowData, function() {
+        $.each(getSelectedRowData, function () {
             if ($(this).children(":nth-child(5)").html() == "&nbsp;") {
                 window.localStorage['emptyTestStep'] = "true";
                 openDialog("Copy Test Step", "The operation cannot be performed as the steps contains invalid/blank object references")
@@ -6004,8 +6051,8 @@ function copyTestStep(e) {
                 getRowJsonCopy = [];
                 return false
             } else {
-                var rowId =  parseInt($(this).children("td:nth-child(1)").text());
-                var getRowData = $('#jqGrid').jqGrid ('getRowData', rowId);
+                var rowId = parseInt($(this).children("td:nth-child(1)").text());
+                var getRowData = $('#jqGrid').jqGrid('getRowData', rowId);
                 getRowJsonCopy.push({
                     "objectName": $(this).children("td:nth-child(4)").text().trim(),
                     "custname": $(this).children("td:nth-child(5)").text(),
@@ -6018,7 +6065,8 @@ function copyTestStep(e) {
                     "url": $(this).children("td:nth-child(11)").text().trim(),
                     "appType": $(this).children("td:nth-child(12)").text(),
                     "addTestCaseDetails": $(this).children("td:nth-child(13)").children('img')[0].outerHTML,
-                    "addTestCaseDetailsInfo": getRowData.addTestCaseDetailsInfo
+                    "addTestCaseDetailsInfo": getRowData.addTestCaseDetailsInfo,
+					"cord": getRowData.cord
                 });
             }
         });
@@ -6065,7 +6113,7 @@ function copyTestStep(e) {
         $("#jqGrid").find(">tbody").sortable("enable");
         window.localStorage['anotherScriptId'] = JSON.parse(window.localStorage['_CT']).testCaseId; //window.localStorage['testScriptIdVal'];
         window.localStorage['getAppTypeForPaste'] = taskInfo.appType; //window.localStorage['appTypeScreen']
-		//Transaction Activity for CopyTestStep Button Action
+        //Transaction Activity for CopyTestStep Button Action
         // var labelArr = [];
         // var infoArr = [];
         // labelArr.push(txnHistory.codesDict['CopyTestStep']);
@@ -6124,12 +6172,12 @@ function pasteTestStep(e) {
     }
 }
 // TO Clear Input Val on Close of Bootstrap Modal Dialog
-$(document).on('hide.bs.modal', '#modalDialog-inputField', function() {
+$(document).on('hide.bs.modal', '#modalDialog-inputField', function () {
     $("#getInputData").val('')
 });
 
 
-$(document).on("click", "#btnPasteTestStepYes", function() {
+$(document).on("click", "#btnPasteTestStepYes", function () {
     $("#globalModalYesNo").find('.modal-footer button:nth-child(2)').trigger("click");
     if ($("#jqGrid tr.ui-widget-content td:nth-child(5)").html() == "&nbsp;" && $("#jqGrid tr.ui-widget-content").length == 1) {
         pasteInGrid()
@@ -6150,7 +6198,7 @@ $(document).on("click", "#btnPasteTestStepYes", function() {
     }
 })
 
-$(document).on("click", "#btnPasteTestStep", function(e) {
+$(document).on("click", "#btnPasteTestStep", function (e) {
     var chkNo;
     var selectedStepNo = [];
     var proceed = true;
@@ -6191,11 +6239,11 @@ $(document).on("click", "#btnPasteTestStep", function(e) {
     }
 })
 
-$(document).on('keypress', '.copyPasteValidation', function(e) {
+$(document).on('keypress', '.copyPasteValidation', function (e) {
     if ((e.charCode >= 48 && e.charCode <= 57) || e.charCode == 59) return true;
     else return false;
 })
-$(document).on('focusout', '.copyPasteValidation', function() {
+$(document).on('focusout', '.copyPasteValidation', function () {
     var reg = /^[0-9;]+$/;
     if (reg.test($(this).val())) {
         return true;
@@ -6205,7 +6253,7 @@ $(document).on('focusout', '.copyPasteValidation', function() {
         return false;
     }
 })
-$(document).on('focus', '.copyPasteValidation', function() {
+$(document).on('focus', '.copyPasteValidation', function () {
     $('#errorMsgs1, #errorMsgs2, #errorMsgs3').hide();
 })
 
@@ -6283,7 +6331,7 @@ function pasteInGrid(e) {
                 })*/
             }
         }
-        $.each($("#jqGrid tr"), function() {
+        $.each($("#jqGrid tr"), function () {
             for (j = 0; j < highlightPasted.length; j++) {
                 if (parseInt($(this).children("td:nth-child(1)").text()) == highlightPasted[j]) {
                     //$(this).find("input.cbox").prop("checked",true);
@@ -6297,7 +6345,7 @@ function pasteInGrid(e) {
             $(this).children("td[aria-describedby='jqGrid_cb']").children("input").attr("id", "jqg_jqGrid_" + $(this).index()).attr("name", "jqg_jqGrid_" + $(this).index());
         })
     }
-	//Transaction Activity for PasteTestStep Button Action
+    //Transaction Activity for PasteTestStep Button Action
     // var labelArr = [];
     // var infoArr = [];
     // labelArr.push(txnHistory.codesDict['PasteTestStep']);
@@ -6402,7 +6450,7 @@ function commentStep(e) {
     }*/
     else if ($(document).find(".ui-state-highlight").length > 0) {
         var myData = $("#jqGrid").jqGrid('getGridParam', 'data')
-        $(document).find(".ui-state-highlight").each(function() {
+        $(document).find(".ui-state-highlight").each(function () {
             for (i = 0; i < myData.length; i++) {
                 if (myData[i].stepNo == parseInt($(this).attr("id").trim())) {
                     //Check whether output coloumn is empty
@@ -6434,8 +6482,8 @@ function commentStep(e) {
             }
         });
         $("#jqGrid").trigger("reloadGrid");
-		
-		//Transaction Activity for CommentStep Button Action
+
+        //Transaction Activity for CommentStep Button Action
         // var labelArr = [];
         // var infoArr = [];
         // labelArr.push(txnHistory.codesDict['CommentStep']);
@@ -6448,7 +6496,7 @@ function commentStep(e) {
 function shortString() {
     var shorts = document.querySelectorAll('.ellipsisText');
     if (shorts) {
-        Array.prototype.forEach.call(shorts, function(ele) {
+        Array.prototype.forEach.call(shorts, function (ele) {
             var str = ele.innerText,
                 indt = '...';
 
@@ -6471,23 +6519,23 @@ function getTags(data) {
     var obnames = [];
     var appTypeLocal = JSON.parse(window.localStorage['_CT']).appType;
     if (appTypeLocal == "Web") {
-        obnames = ["@Generic","@Excel","@Custom","@Browser","@BrowserPopUp","@Object","@Word"];
+        obnames = ["@Generic", "@Excel", "@Custom", "@Browser", "@BrowserPopUp", "@Object", "@Word"];
     } else if (appTypeLocal == "Webservice") {
-        obnames = ["@Generic","@Excel","WebService List","@Word"];
+        obnames = ["@Generic", "@Excel", "WebService List", "@Word"];
     } else if (appTypeLocal == "Mainframe") {
-        obnames = ["@Generic","@Excel","Mainframe List","@Word"];
+        obnames = ["@Generic", "@Excel", "Mainframe List", "@Word"];
     } else if (appTypeLocal == "Desktop") {
-        obnames = ["@Generic","@Excel","@Window","@Custom","@Email","@Word"];
+        obnames = ["@Generic", "@Excel", "@Window", "@Custom", "@Email", "@Word"];
     } else if (appTypeLocal == "DesktopJava") {
-        obnames = ["@Generic","@Excel","@Oebs","@Custom","@Word"];
+        obnames = ["@Generic", "@Excel", "@Oebs", "@Custom", "@Word"];
     } else if (appTypeLocal == "MobileApp") {
-        obnames = ["@Generic","@Mobile","@Action"];
+        obnames = ["@Generic", "@Mobile", "@Action"];
     } else if (appTypeLocal == "MobileWeb") {
-        obnames = ["@Generic","@Browser","@BrowserPopUp","@Action"];
+        obnames = ["@Generic", "@Browser", "@BrowserPopUp", "@Action"];
     } else if (appTypeLocal == "SAP") {
-        obnames = ["@Generic", "@Sap", "@Custom","@Word"]
-    } else if(appTypeLocal="System"){
-        obnames=["@Generic","@Excel","@System","@Word"];
+        obnames = ["@Generic", "@Sap", "@Custom", "@Word"]
+    } else if (appTypeLocal = "System") {
+        obnames = ["@Generic", "@Excel", "@System", "@Word"];
     }
     for (var i = 0; i < data.length; i++) {
         obnames.push(data[i].custname);
@@ -6531,7 +6579,6 @@ function drop(ev) {
         $(".objectExistMap").show();
         return false
     } else {
-        debugger;
         $(".objectExistMap").hide()
         getDraggedEle = ev.dataTransfer.getData("text/plain").trim()
         getDraggedEle = $(getDraggedEle)[0];
@@ -6542,13 +6589,13 @@ function drop(ev) {
         $(ev.target).parent("li").append(getDraggedEle);
     }
     ev.preventDefault();
-    if($(ev.target).parent("li").find(".ellipsis").hide().hasClass("toMergeObj") == true){
-    //Enable-Disable dragged element based on drop event
-    draggedEle.setAttribute("draggable", false)
-    draggedEle.childNodes[1].style.background = "#e0e0e0";
-    draggedEle.childNodes[1].style.cursor = "no-drop";
-    $(".modal-body:visible").trigger('click');
-    //Enable-Disable dragged element based on drop event
+    if ($(ev.target).parent("li").find(".ellipsis").hide().hasClass("toMergeObj") == true) {
+        //Enable-Disable dragged element based on drop event
+        draggedEle.setAttribute("draggable", false)
+        draggedEle.childNodes[1].style.background = "#e0e0e0";
+        draggedEle.childNodes[1].style.cursor = "no-drop";
+        $(".modal-body:visible").trigger('click');
+        //Enable-Disable dragged element based on drop event
     }
 }
 //Map Object Drag nad Drop Functionality
@@ -6559,7 +6606,7 @@ function formatXml(xml) {
     var reg = /(>)(<)(\/*)/g;
     xml = xml.replace(reg, '$1\r\n$2$3');
     var pad = 0;
-    jQuery.each(xml.split('\r\n'), function(index, node) {
+    jQuery.each(xml.split('\r\n'), function (index, node) {
         var indent = 0;
         if (node.match(/.+<\/\w[^>]*>$/)) {
             indent = 0;
@@ -6582,29 +6629,28 @@ function formatXml(xml) {
     return formatted;
 }
 
-function openDialog(title, body,submitflag) {
-    if(submitflag==undefined){
-         $("#globalModal").find('.modal-title').text(title);
+function openDialog(title, body, submitflag) {
+    if (submitflag == undefined) {
+        $("#globalModal").find('.modal-title').text(title);
         $("#globalModal").find('.modal-body p').text(body).css('color', 'black');
         $("#globalModal").modal("show");
-        setTimeout(function() {
+        setTimeout(function () {
             $("#globalModal").find('.btn-default').focus();
         }, 300);
-    }else{
+    } else {
         $("#globalTaskSubmit").find('.modal-title').text(title);
-            $("#globalTaskSubmit").find('.modal-body p').text(body);
-            $("#globalTaskSubmit").modal("show");
+        $("#globalTaskSubmit").find('.modal-body p').text(body);
+        $("#globalTaskSubmit").modal("show");
     }
-   
+
 }
 
-function openModalFormDialog(title, body)
-{
-            $("#globalModalForm").find('.modal-title').text(title);
-            $("#globalModalForm").next('.modal-sm').removeClass('modal-');
-            $("#globalModalForm").find('.modal-body p').text(body).css('color', 'black');
-            $("#globalModalForm").modal("show");
-            setTimeout(function() {
-                $("#globalModalForm").find('.btn-default').focus();
-            }, 300);
+function openModalFormDialog(title, body) {
+    $("#globalModalForm").find('.modal-title').text(title);
+    $("#globalModalForm").next('.modal-sm').removeClass('modal-');
+    $("#globalModalForm").find('.modal-body p').text(body).css('color', 'black');
+    $("#globalModalForm").modal("show");
+    setTimeout(function () {
+        $("#globalModalForm").find('.btn-default').focus();
+    }, 300);
 }

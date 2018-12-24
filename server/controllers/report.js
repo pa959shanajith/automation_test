@@ -1189,6 +1189,7 @@ exports.connectJira_ICE = function (req, res) {
 											clearInterval(updateSessionExpiry);
 											if (resultData != "Fail") {
 												if(count == 0){
+													var updateStatus= updateDbReportData(createObj.reportId,createObj.executionId,createObj.slno,resultData);
 													logger.info('Jira: Issue created successfully.');
 													res.send(resultData);
 													count++;
@@ -1235,6 +1236,31 @@ exports.connectJira_ICE = function (req, res) {
 		res.send("Fail");
 	}
 };
+
+function updateDbReportData(reportId,executionId,slno,defectId){
+	var inputs = {
+		"reportid":reportId,
+		"slno":slno,
+		"defectid":defectId,
+		"executionid":executionId
+	};
+	var args = {
+		data: inputs,
+		headers: {
+			"Content-Type": "application/json"
+		}
+	};
+	logger.info("Calling NDAC Service from connectJira_ICE for updateDbReportData: reports/updateReportData");
+	client.post(epurl + "reports/updateReportData", args,
+	function (reportdata, response) {
+		if (response.statusCode != 200 || reportdata.rows == "fail") {
+			logger.error("Error occured in reports/updateReportData from updateDbReportData Error Code : ERRNDAC");
+			return false;
+		} else {
+			return true;
+		}
+	});
+}
 
 function latestReport(reportObjList){
 	if(reportObjList.length == 0) return null;
@@ -1311,49 +1337,58 @@ exports.getReportsData_ICE = function (req, res) {
 							res.send("fail");
 						} else {
 							//res.send(result);
-							async.forEachSeries(Object.keys(result2), function (scenarioid, scenariomapcb) {
+							async.forEachSeries(eachtestsuite.testscenarioids, function (scenarioid, scenariomapcb) {
 							//for (var scenarioid in result2){
 	
-								var inputs = {
-									"query": "allreports",
-									"scenarioid": scenarioid,
-									"cycleid": req.body.reportsInputData.cycleId									
-								};	
-								var args = {
-									data: inputs,
-									headers: {
-										"Content-Type": "application/json"
-									}
-								};						
-								client.post(epurl + "reports/reportStatusScenarios_ICE", args,
-									function (result3, response3) {
-									if (response3.statusCode != 200 || result3.rows == "fail") {
-										logger.error("Error occured in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
-										res.send("fail");
-									} else {
-										if(result3.rows.length==0){
-											var robj = {};
-											robj['varmap'] = {};
-											robj['status'] = '';
-											robj['executedtime']='';
-											robj['reportid'] = '';
-										}
-										else{
-											var robj = latestReport(result3.rows);
-										}
-										reportScenarioObj.push({
-											scenarioid:scenarioid,
-											scenarioname:result2[scenarioid],
-											count:result3.rows.length,
-											description: robj['varmap'],
-											latestStatus: robj['status'],
-											executedon: robj['executedtime'],
-											reportid: robj['reportid']
-										});	
-										scenariomapcb();
-									}
-								});	
-	
+								// var inputs = {
+								// 	"query": "latestreport",
+								// 	"scenarioid": scenarioid,
+								// 	"cycleid": req.body.reportsInputData.cycleId									
+								// };	
+								// var args = {
+								// 	data: inputs,
+								// 	headers: {
+								// 		"Content-Type": "application/json"
+								// 	}
+								// };						
+								// client.post(epurl + "reports/reportStatusScenarios_ICE", args,
+								// 	function (result3, response3) {
+								// 	if (response3.statusCode != 200 || result3.rows == "fail") {
+								// 		logger.error("Error occured in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
+								// 		res.send("fail");
+								// 	} else {
+								// 		if(result3.rows.length==0){
+								// 			var robj = {};
+								// 			robj['varmap'] = {};
+								// 			robj['status'] = '';
+								// 			robj['executedtime']='';
+								// 			robj['reportid'] = '';
+								// 		}
+								// 		else{
+								// 			var robj = result3.rows;
+								// 		}
+								// 		reportScenarioObj.push({
+								// 			scenarioid:scenarioid,
+								// 			scenarioname:result2[scenarioid],
+								// 			count:robj['count'],
+								// 			description: robj['varmap'],
+								// 			latestStatus: robj['status'],
+								// 			executedon: robj['executedtime'],
+								// 			reportid: robj['reportid']
+								// 		});	
+								// 		scenariomapcb();
+								// 	}
+								// });	
+								reportScenarioObj.push({
+									scenarioid:scenarioid,
+									scenarioname:result2[scenarioid],
+									count:'loading...',
+									description: 'loading...',
+									latestStatus: 'loading...',
+									executedon: 'loading...',
+									reportid: 'loading...'
+								});		
+								scenariomapcb();
 							//}							
 							},function(){
 								suObj.push({
@@ -1377,6 +1412,40 @@ exports.getReportsData_ICE = function (req, res) {
 				});
 			}
 		});
+	}
+	else if(req.body.reportsInputData.type == "latestreport"){
+		var inputs = {
+			"query": "latestreport",
+			"scenarioid": req.body.reportsInputData.scenarioid,
+			"cycleid": req.body.reportsInputData.cycleid									
+		};	
+		var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};						
+		client.post(epurl + "reports/reportStatusScenarios_ICE", args,
+			function (result3, response3) {
+			if (response3.statusCode != 200 || result3.rows == "fail") {
+				logger.error("Error occured in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
+				res.send("fail");
+			} else {
+				if(result3.rows.length==0){
+					var robj = {};
+					robj['varmap'] = {};
+					robj['status'] = '-';
+					robj['executedtime']='-';
+					robj['reportid'] = '';
+					robj['count'] = 0;
+				}
+				else{
+					var robj = result3.rows;
+				}
+				robj.report_loaded_idx = req.body.reportsInputData.report_loaded_idx;
+				res.send(robj);
+			}		
+		})
 	}
 
 };
