@@ -1,7 +1,7 @@
 var async = require('async');
 var logger = require('../../logger');
 var myserver = require('../../server');
-var redisServer = require('../lib/redisSocketHandler');
+var redisServer = require('./redisSocketHandler');
 
 module.exports.allSess = function (cb){
 	myserver.redisSessionStore.all(cb);

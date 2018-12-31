@@ -8,9 +8,14 @@ try {
 	parsed.password = Buffer.from(parsed.password, "base64").toString();
 	parsed.certificate.key = fs.readFileSync(parsed.certificate.key, 'utf-8');
 	parsed.certificate.cert = fs.readFileSync(parsed.certificate.cert, 'utf-8');
-	if (process.env.ENABLE_SSO.toLowerCase() == "true") {
-		if (parsed.sso_config.identitity_provider_url.trim()=='' || parsed.sso_config.client_id.trim()=='' || parsed.sso_config.client_secret.trim()=='') {
-			throw "Invalid values in SSO configuration options";
+	var ssoEnabled = process.env.ENABLE_SSO.toLowerCase()=="true";
+	if (ssoEnabled) {
+		var strategy = process.env.SSO_PROTOCOL.toLowerCase().trim();
+		var conf = parsed[strategy];
+		if (strategy=='oidc' && (conf.identitityProviderURL.trim()=='' || conf.clientId.trim()=='' || conf.clientSecret.trim()=='' || conf.redirectURI.trim()=='')) {
+			throw "Invalid values in SSO configuration";
+		} else if (strategy=='saml' && (conf.acsURL.trim()=='' || conf.cert.trim()=='' || !fs.existsSync(conf.cert) || conf.redirectURI.trim()=='')) {
+			throw "Invalid values in SSO configuration";
 		}
 	}
 } catch (e) {

@@ -19,9 +19,8 @@ var expressWinston = require('express-winston');
 var winston = require('winston');
 var epurl = "http://" + process.env.NDAC_IP + ":" + process.env.NDAC_PORT + "/";
 var logger = require('./logger');
-var nginxEnabled = process.env.NGINX_ON.toLowerCase() == "true";
-var ssoEnabled = process.env.ENABLE_SSO.toLowerCase() == "true";
-var ssoClient = process.env.SSO_CLIENT.toLowerCase();
+var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
+var ssoEnabled = process.env.ENABLE_SSO.toLowerCase().trim() == "true";
 
 if (cluster.isMaster) {
     cluster.fork();
@@ -145,28 +144,14 @@ if (cluster.isMaster) {
             next();
         });
 
-        const { ExpressOIDC } = require('@okta/oidc-middleware');
-        var oidc = undefined;
-        if (ssoEnabled) {
-            if (ssoClient == 'okta') {
-                oidc = new ExpressOIDC({
-                    issuer: uiConfig.sso_config.identitity_provider_url,
-                    client_id: uiConfig.sso_config.client_id,
-                    client_secret: uiConfig.sso_config.client_secret,
-                    redirect_uri: uiConfig.sso_config.redirect_uri,
-                    routes: { callback: { defaultRedirect: "/", failureRedirect: "/error?e=403" } },
-                    scope: 'openid profile email'
-                });
-                app.use(oidc.router);  // ExpressOIDC will attach handlers for the /login and /authorization-code/callback routes
-                oidc.on('error', err => {
-                    console.log('Unable to configure ExpressOIDC', err);
-                });
-            }
-        }
+        // For Selecting proper authentication mechanism
+        var auth = require("./server/lib/auth");
+        var authVars = auth(app, {user: "userContext", route: {login: "/login", success: "/", failure: "/error?e=403"}});
+        var ssoStrategy = authVars[0];
 
         app.use('*', function(req, res, next) {
             if (req.session === undefined) {
-                return res.status(500).send("<html><body><p>[ECODE 600] Internal Server Error Occured!</p></body></html>");
+                return next(new Error("redisnotavailable"));
             }
             return next();
         });
@@ -263,7 +248,8 @@ if (cluster.isMaster) {
             var emsg=req.query.e;
             if (emsg) {
                 req.session.uniqueId = req.session.id
-                if (emsg == "401") emsg = "invalid_session";
+                if (req.session.messages) emsg = req.session.messages[0];
+                else if (emsg == "401") emsg = "invalid_session";
                 else if (emsg == "403") emsg = "unauthorized";
                 else if (emsg == "sessexists") {
                     emsg = "userLogged";
@@ -275,13 +261,13 @@ if (cluster.isMaster) {
         });
 
         app.get('/', function(req, res, next) {
-            if (req.url != '/') return next();
+            if (!(req.url == '/' || req.url.startsWith("/?"))) return next();
             var userLogged = req.session.logged;
-            var usrCtx = (ssoClient=="okta")? req.userContext : undefined;
+            var usrCtx = req.userContext;
             if (userLogged) req.session.emsg = req.session.emsg || "userLogged";
             else if (!req.session.emsg && req.session.username==undefined) {
                 if (ssoEnabled && usrCtx) {
-                    var username = usrCtx.userinfo.nineteen68_username;
+                    var username = (usrCtx.userinfo)? usrCtx.userinfo.nineteen68_username:usrCtx.nineteen68_username;
                     if (username == undefined) {
                         req.session.emsg = "invalid_username";
                     } else {
@@ -326,13 +312,6 @@ if (cluster.isMaster) {
             req.session.logged = true;
             return res.sendFile("app.html", { root: __dirname + "/public/" });
         });
-
-        if (!ssoEnabled) {
-            app.get('/login', function(req, res) {
-                req.clearSession();
-                return res.sendFile("app.html", { root: __dirname + "/public/" });
-            });
-        }
 
         //Only Admin have access
         app.get('/admin', function(req, res) {
@@ -575,43 +554,47 @@ if (cluster.isMaster) {
         app.post('/flowGraphResults', flowGraph.flowGraphResults);
         app.post('/APG_OpenFileInEditor', flowGraph.APG_OpenFileInEditor);
         app.post('/APG_createAPGProject', flowGraph.APG_createAPGProject);
+
         //-------------SERVER START------------//
-        var hostFamilyType = (nginxEnabled) ? '127.0.0.1' : '0.0.0.0';
-        var portNumber = process.env.serverPort;
-        if (!ssoEnabled) {
+        function initServer(httpsServer,suite,logger,epurl,apiclient){
             httpsServer.listen(portNumber, hostFamilyType); //Https Server
-        } else {
-            if (ssoClient == 'okta') {
-                oidc.on('ready', () => {
-                    httpsServer.listen(portNumber, hostFamilyType); //Https Server
-                });
-            }
-        }
-        try {
-            var apireq = apiclient.post(epurl + "server", function(data, response) {
-                try {
-                    if (response.statusCode != 200) {
+            try {
+                var apireq = apiclient.post(epurl + "server", function(data, response) {
+                    try {
+                        if (response.statusCode != 200) {
+                            httpsServer.close();
+                            logger.error("Please run the Service API and Restart the Server");
+                        } else {
+                            suite.reScheduleTestsuite();
+                            console.info("Nineteen68 Server Ready...\n");
+                        }
+                    } catch (exception) {
                         httpsServer.close();
                         logger.error("Please run the Service API and Restart the Server");
-                    } else {
-                        suite.reScheduleTestsuite();
-                        console.info("Nineteen68 Server Ready...\n");
                     }
-                } catch (exception) {
+                });
+                apireq.on('error', function(err) {
                     httpsServer.close();
                     logger.error("Please run the Service API and Restart the Server");
-                }
-            });
-            apireq.on('error', function(err) {
+                });
+            } catch (exception) {
                 httpsServer.close();
-                logger.error("Please run the Service API and Restart the Server");
-            });
-        } catch (exception) {
-            httpsServer.close();
-            logger.error("Please run the Service API");
+                logger.error("Please run the Service API");
+            }
         }
 
-        //To prevent can't send header response
+        var hostFamilyType = (nginxEnabled) ? '127.0.0.1' : '0.0.0.0';
+        var portNumber = process.env.serverPort;
+        if (ssoEnabled && ssoStrategy=='okta-oidc') {
+            authVars[2].on('ready', () => {
+                initServer(httpsServer,suite,logger,epurl,apiclient);
+            });
+        } else {
+            initServer(httpsServer,suite,logger,epurl,apiclient);
+        }
+        //-------------SERVER END------------//
+
+        // To prevent can't send header response
         app.use(function(req, res, next) {
             var _send = res.send;
             var sent = false;
@@ -623,13 +606,21 @@ if (cluster.isMaster) {
             next();
         });
 
+        // To catch unknown routes
         app.get('*', function(req, res) {
             res.status(404).send("<html><body><p>The page could not be found or you don't have permission to view it.</p></body></html>");
         });
 
+        // To catch all errors
         app.use(function(err, req, res, next) {
+            var ecode = "601";
+            var emsg = err.message;
+            if (err.message == "redisnotavailable") {
+                ecode = "600";
+                emsg = "Redis Database unavailable";
+            }
             logger.error(err.message);
-            res.status(500).send("<html><body><p>[ECODE 601] Intenal Server Error Occured!</p></body></html>");
+            res.status(500).send("<html><body><p>[ECODE "+ecode+"] Internal Server Error Occurred!</p></body></html>");
         });
     } catch (e) {
         logger.error(e);

@@ -6,11 +6,17 @@
     "host": "localhost:7474",
     "username": "bmVvNGo=",
     "password": "bG9jYWw3NDc0",
-    "sso_config": {
-        "identitity_provider_url": "",
-        "client_id": "",
-        "client_secret": "",
-        "redirect_uri": ""
+    "oidc": {
+        "identitityProviderURL": "",
+        "clientId": "",
+        "clientSecret": "",
+        "redirectURI": ""
+    },
+    "saml": {
+        "issuer": "SLK Nineteen68 Webserver",
+        "acsURL": "",
+        "cert": "",
+        "redirectURI": ""
     },
     "screenShotPath": {
         "default": "",

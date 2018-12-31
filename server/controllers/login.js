@@ -316,7 +316,7 @@ exports.checkUserState_Nineteen68 = function (req, res) {
 					}
 				}
 			}, function (emsg) {
-				if (emsg == "ok") res.cookie('maintain.sid',uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed:true});
+				if (emsg == "ok") res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed:true});
 				else if (!req.session.dndSess) req.clearSession();
 				return res.send(emsg);
 			});
