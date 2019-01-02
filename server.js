@@ -20,7 +20,6 @@ var winston = require('winston');
 var epurl = "http://" + process.env.NDAC_IP + ":" + process.env.NDAC_PORT + "/";
 var logger = require('./logger');
 var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
-var ssoEnabled = process.env.ENABLE_SSO.toLowerCase().trim() == "true";
 
 if (cluster.isMaster) {
     cluster.fork();
@@ -145,9 +144,10 @@ if (cluster.isMaster) {
         });
 
         // For Selecting proper authentication mechanism
-        var auth = require("./server/lib/auth");
-        var authVars = auth(app, {user: "userContext", route: {login: "/login", success: "/", failure: "/error?e=403"}});
-        var ssoStrategy = authVars[0];
+        var authlib = require("./server/lib/auth");
+        var auth = authlib(app, {user: "userContext", route: {login: "/login", success: "/", failure: "/error?e=403"}});
+        var authStrategy = auth[0];
+        var auth = auth[1];
 
         app.use('*', function(req, res, next) {
             if (req.session === undefined) {
@@ -247,7 +247,6 @@ if (cluster.isMaster) {
         app.get('/error', function(req, res, next) {
             var emsg=req.query.e;
             if (emsg) {
-                req.session.uniqueId = req.session.id
                 if (req.session.messages) emsg = req.session.messages[0];
                 else if (emsg == "401") emsg = "invalid_session";
                 else if (emsg == "403") emsg = "unauthorized";
@@ -266,7 +265,7 @@ if (cluster.isMaster) {
             var usrCtx = req.userContext;
             if (userLogged) req.session.emsg = req.session.emsg || "userLogged";
             else if (!req.session.emsg && req.session.username==undefined) {
-                if (ssoEnabled && usrCtx) {
+                if (usrCtx) {
                     var username = (usrCtx.userinfo)? usrCtx.userinfo.nineteen68_username:usrCtx.nineteen68_username;
                     if (username == undefined) {
                         req.session.emsg = "invalid_username";
@@ -409,6 +408,10 @@ if (cluster.isMaster) {
                 httpsServer.close();
                 logger.error("Please run the Service API and Restart the Server");
             });
+        });
+
+        app.post('/designTestCase', function(req, res) {
+            return res.sendFile("app.html", { root: __dirname + "/public/" });
         });
 
         //Route Directories
@@ -585,8 +588,8 @@ if (cluster.isMaster) {
 
         var hostFamilyType = (nginxEnabled) ? '127.0.0.1' : '0.0.0.0';
         var portNumber = process.env.serverPort;
-        if (ssoEnabled && ssoStrategy=='okta-oidc') {
-            authVars[2].on('ready', () => {
+        if (authStrategy=='oidc') {
+            auth.on('ready', () => {
                 initServer(httpsServer,suite,logger,epurl,apiclient);
             });
         } else {

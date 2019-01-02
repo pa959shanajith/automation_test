@@ -289,13 +289,14 @@ function ldapCheck(ldapdata, cb) {
 exports.checkUserState_Nineteen68 = function (req, res) {
 	try {
 		logger.info("Inside UI Service: checkUserState_Nineteen68");
-		if (req.session && req.sessionID==req.session.uniqueId) {
+		var sess = req.session;
+		if (sess && (sess.emsg || sess.username)) {
 			var emsg = req.session.emsg || "ok";
 			async.series({
 				checkProjects_ifOK: function(callback) {
 					if (emsg != "ok") callback(emsg);
 					else {
-						var username = req.session.username;
+						var username = sess.username;
 						checkAssignedProjects(username, function (err, assignedProjects, userid, role) {
 							if(err) {
 								logger.error("Error occurred in checkUserState_Nineteen68. Cause: "+ err);
@@ -317,7 +318,7 @@ exports.checkUserState_Nineteen68 = function (req, res) {
 				}
 			}, function (emsg) {
 				if (emsg == "ok") res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed:true});
-				else if (!req.session.dndSess) req.clearSession();
+				else if (!sess.dndSess) req.clearSession();
 				return res.send(emsg);
 			});
 		} else {
