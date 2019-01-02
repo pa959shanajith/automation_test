@@ -686,6 +686,12 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					logger.info("Sending socket request for executeTestSuite to redis");
 					dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					var notifySocMap = myserver.socketMapNotify;
+					var resSent = false;
+					if(notifySocMap && notifySocMap[name]) {
+						resSent = true;
+						res.end('begin');
+					}
 					var updateSessionExpiry = utils.resetSession(req.session);
 					function executeTestSuite_listener(channel,message) {
 						data = JSON.parse(message);
@@ -694,15 +700,11 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 								clearInterval(updateSessionExpiry);
 								redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
 								logger.error("Error occurred in ExecuteTestSuite_ICE: Socket Disconnected");
-								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-									var soc = myserver.socketMapNotify[name];
-									soc.emit("ICEnotAvailable");
-								}
+								if (notifySocMap[name]) notifySocMap[name].emit("ICEnotAvailable");
+								else if (!resSent) res.send("unavailableLocalServer");
 							} else if (data.onAction == "result_executeTestSuite") {
 								var resultData = data.value;
 								if (resultData != "success" && resultData != "Terminate") {
-									// completedSceCount++;
-									// scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length;
 									try {
 										completedSceCount++;
 										scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length * executionRequest.suitedetails[testsuitecount].browserType.length;
@@ -750,30 +752,6 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 													flag = "success";
 												}
 											});
-											var inputs = {
-												"reportid": reportId,
-												"reportmap": JSON.stringify(executionRequest.suitedetails[testsuitecount].scenariodescriptionobject[scenarioid]),
-												"query": "insertmapquery",
-												"executionid": executionid,
-											};
-											var args = {
-												data: inputs,
-												headers: {
-													"Content-Type": "application/json"
-												}
-											};
-											logger.info("Calling NDAC Service from executionFunction: suite/ExecuteTestSuite_ICE");
-											client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
-												function (result, response) {
-												if (response.statusCode != 200 || result.rows == "fail") {
-													logger.error("Error occurred in suite/ExecuteTestSuite_ICE from executionFunction Error Code : ERRNDAC");
-													flag = "fail";
-												} else {
-													logger.info("Successfully inserted report data");
-													flag = "success";
-												}
-											});
-
 											if (completedSceCount == scenarioCount) {
 												if (statusPass == scenarioCount) {
 													suiteStatus = "Pass";
@@ -805,7 +783,8 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 									redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
 									try {
 										logger.info("Sending execution status from function executionFunction");
-										res.send(resultData);
+										if (notifySocMap[name]) notifySocMap[name].emit("result_ExecutionDataInfo", resultData);
+										else if (!resSent) res.send(resultData);
 									} catch (ex) {
 										logger.error("Exception While sending execution status from the function executionFunction: %s", ex);
 									}
