@@ -210,6 +210,8 @@ exports.initScraping_ICE = function (req, res) {
 								data.task = "OPEN BROWSER IE";
 							} else if (browserType == "mozilla") {
 								data.task = "OPEN BROWSER FX";
+							} else if (browserType == "safari"){
+								data.task = "OPEN BROWSER SF"
 							}
 						} else {
 							data.action = "scrape";
@@ -219,6 +221,8 @@ exports.initScraping_ICE = function (req, res) {
 								data.task = "OPEN BROWSER IE";
 							} else if (browserType == "mozilla") {
 								data.task = "OPEN BROWSER FX";
+							} else if (browserType == "safari"){
+								data.task = "OPEN BROWSER SF"
 							}
 						}
 						logger.info("Sending socket request for webscrape to redis");
