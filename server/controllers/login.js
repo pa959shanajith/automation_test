@@ -1,125 +1,10 @@
 var async = require('async');
-var bcrypt = require('bcrypt');
 var uidsafe = require('uid-safe');
-var validator = require('validator');
-var activeDirectory = require('activedirectory');
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var logger = require('../../logger');
 var utils = require('../lib/utils');
-
-//Authenticate User - Nineteen68
-exports.authenticateUser_Nineteen68 = function (req, res) {
-	try {
-		logger.info("Inside UI service: authenticateUser_Nineteen68");
-		var username = req.body.username.toLowerCase();
-		var password = req.body.password;
-		var sessId = req.session.id;
-
-		// Credentials for service user that can restart services
-		if (username == "restartservice" && password == "r3Start@3") return res.send("restart");
-
-		var valid_username = validator.isLength(username, 1, 100);
-		var valid_password = validator.isLength(password, 1, 100);
-		if (valid_username && valid_password) {
-			var flag = 'inValidCredential';
-			var userLogged = false;
-			var validUser = false;
-			var userid = '';
-
-			async.waterfall([
-				function checkUserLoggedIn(callback) {
-					// Implementation for Concurrent login
-					utils.allSess(function (err, allKeys) {
-						if (err) {
-							logger.info("User Authentication failed");
-							callback("fail");
-						} else {
-							for (var ki = 0; ki < allKeys.length; ki++) {
-								if (username == allKeys[ki].username) {
-									userLogged=true;
-									break;
-								}
-							}
-							callback(null);
-						}
-					});
-				}, function authenticate(callback) {
-					checkldapuser(username, function (data) {
-						logger.info("Inside call function of checkldapuser");
-						if (data) {
-							// LDAP Authentication
-							userid = data.userid;
-							data.password = password;
-							ldapCheck(data, function (ldapdata) {
-								logger.info("Inside call function of ldapCheck: LDAP User");
-								if (ldapdata == "empty") callback("inValidLDAPServer");
-								else if (ldapdata == "pass") {
-									validUser = true;
-									callback(null);
-								}
-							});
-						} else {
-							// In-House Authentication
-							var args = {
-								data: { "username": username },
-								headers: { "Content-Type": "application/json" }
-							};
-							logger.info("Calling NDAC Service: authenticateUser_Nineteen68");
-							client.post(epurl + "login/authenticateUser_Nineteen68", args,
-								function (result, response) {
-								if (response.statusCode != 200 || result.rows == "fail") {
-									logger.error("Error occurred in authenticateUser_Nineteen68 Error Code : ERRNDAC");
-									callback("fail");
-								} else {
-									try {
-										if (result.rows.length !== 0) {
-											var dbHashedPassword = result.rows[0].password;
-											userid = result.rows[0].userid;
-											validUser = bcrypt.compareSync(password, dbHashedPassword); // true
-											callback(null);
-										}
-									} catch (exception) {
-										logger.error(exception.message);
-										callback("fail");
-									}
-								}
-							});
-						}
-					});
-				}
-			], function(err) {
-				if (err) flag = err;
-				if (!validUser) logger.info("User Authentication failed");
-				else {
-					req.session.username = username;
-					req.session.uniqueId = sessId;
-					req.session.userid = userid;
-					flag = 'validCredential';
-					if (userLogged) {
-						req.session.emsg = "userLogged";
-						logger.info("User already logged in");
-					} else {
-						logger.info("User Authenticated successfully");
-						logger.rewriters[0]=function(level, msg, meta) {
-							meta.username = username;
-							meta.userid = userid;
-							meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
-							return meta;
-						};
-					}
-				}
-				return res.send(flag);
-			});
-		} else {
-			res.send("invalid_username_password");
-		}
-	} catch (exception) {
-		logger.error(exception.message);
-		res.send("fail");
-	}
-};
 
 /**
  * @see : function to check whether projects are assigned for user
@@ -204,84 +89,6 @@ function checkAssignedProjects(username, main_callback) {
 		},
 	], function (err, assignedProjects, userid, rolename) {
 		main_callback(err, assignedProjects, userid, rolename);
-	});
-}
-
-/**
- * @see : function to check whether existing user is ldap user or not
- * @author : shree.p
- */
-function checkldapuser(username, callback) {
-	logger.info("Inside function checkldapuser");
-	var flag = false;
-	var inputs = {
-		"username": username
-	};
-	var args = {
-		data: inputs,
-		headers: {
-			"Content-Type": "application/json"
-		}
-	};
-	logger.info("Calling NDAC Service : authenticateUser_Nineteen68/ldap");
-	client.post(epurl + "login/authenticateUser_Nineteen68/ldap", args,
-		function (result, response) {
-		if (response.statusCode != 200 || result.rows == "fail") {
-			logger.error("Error occurred in authenticateUser_Nineteen68_ldap Error Code : ERRNDAC");
-			callback(flag);
-		} else if (result.rows.length === 0) {
-			callback(flag);
-		} else {
-			if (result.rows[0].ldapuser != '{}') {
-				flag = JSON.parse(result.rows[0].ldapuser);
-				flag.userid = result.rows[0].userid;
-			}
-			callback(flag);
-		}
-	});
-}
-
-function ldapCheck(ldapdata, cb) {
-	logger.info("Inside ldapCheck function");
-	var username = ldapdata.user;
-	var password = ldapdata.password;
-	var inputs = {
-		name: ldapdata.server
-	};
-	var args = {
-		data: inputs,
-		headers: {
-			"Content-Type": "application/json"
-		}
-	};
-	client.post(epurl + "admin/getLDAPConfig", args,
-		function (result, response) {
-		if (response.statusCode != 200 || result.rows == "fail") {
-			logger.error("Error occurred in admin/getLDAPConfig Error Code : ERRNDAC");
-			cb("fail");
-		} else if (result.rows.length === 0) {
-			cb("empty");
-		} else {
-			result = result.rows[0];
-			var ad_config = {
-				url: result.url,
-				baseDN: result.base_dn,
-			};
-			if (result.authtype == "simple") {
-				ad_config.bindDN = result.bind_dn;
-				ad_config.bindCredentials = result.bind_credentials;
-			}
-			var ad = new activeDirectory(ad_config);
-			ad.authenticate(username, password, function (err, auth) {
-				if (err) {
-					logger.error("Error occurred in ldap authentication");
-					logger.debug("Error occurred in ldap authentication : " + JSON.stringify(err));
-					cb("fail");
-				}
-				else if (auth) cb("pass");
-				else cb("fail");
-			});
-		}
 	});
 }
 
@@ -497,6 +304,7 @@ exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
 exports.logoutUser_Nineteen68 = function (req, res) {
 	logger.info("Inside UI Service: logoutUser_Nineteen68");
 	logger.info("%s logged out successfully", req.session.username);
+	req.logOut();
 	req.clearSession();
 	res.send('Session Expired');
 };

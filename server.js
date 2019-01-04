@@ -16,7 +16,6 @@ try {
 // Module Dependencies
 var cluster = require('cluster');
 var expressWinston = require('express-winston');
-var winston = require('winston');
 var epurl = "http://" + process.env.NDAC_IP + ":" + process.env.NDAC_PORT + "/";
 var logger = require('./logger');
 var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
@@ -39,7 +38,7 @@ if (cluster.isMaster) {
         var app = express();
         var bodyParser = require('body-parser');
         var sessions = require('express-session');
-        var cookieParser = require('cookie-parser')
+        var cookieParser = require('cookie-parser');
         var helmet = require('helmet');
         var lusca = require('lusca');
         var consts = require('constants');
@@ -82,7 +81,6 @@ if (cluster.isMaster) {
         module.exports = app;
         module.exports.redisSessionStore = redisSessionStore;
         module.exports.httpsServer = httpsServer;
-        var io = require('./server/lib/socket');
 
         //Caching static files for thirtyDays 
         var thirtyDays = 2592000; // in milliseconds
@@ -139,15 +137,23 @@ if (cluster.isMaster) {
                 res.clearCookie('connect.sid');
                 res.clearCookie('maintain.sid');
                 req.session.destroy();
-            }
+            };
             next();
         });
 
-        // For Selecting proper authentication mechanism
+        // For Selecting Authentication Strategy and adding required routes
+        var authParams = {
+            username: "nineteen68_username",
+            userinfo: "userContext",
+            route: {
+                login: "/login", success: "/", failure: "/error?e=403"
+            }
+        };
         var authlib = require("./server/lib/auth");
-        var auth = authlib(app, {user: "userContext", route: {login: "/login", success: "/", failure: "/error?e=403"}});
-        var authStrategy = auth[0];
-        var auth = auth[1];
+        var auth = authlib(authParams);
+        var authStrategy = auth.strategy;
+        app.use(auth.router);
+        auth = auth.util;
 
         app.use('*', function(req, res, next) {
             if (req.session === undefined) {
@@ -198,10 +204,10 @@ if (cluster.isMaster) {
             var svcStopPending = "STOP_PENDING";
             var svc = req.body.id;
             var batFile = require.resolve("./assets/svc.bat");
+			var execCmd = batFile + " ";
             try {
                 if (svc == "query") {
                     var svcStatus = [];
-                    var execCmd = batFile + " ";
                     childProcess.exec(execCmd + "0 QUERY", function(error, stdout, stderr) {
                         if (stdout && stdout.indexOf(svcNA) == -1) svcStatus.push(true);
                         else svcStatus.push(false);
@@ -216,7 +222,7 @@ if (cluster.isMaster) {
                         });
                     });
                 } else {
-                    var execCmd = batFile + " " + svc.toString() + " ";
+                    execCmd = execCmd + svc.toString() + " ";
                     childProcess.exec(execCmd + "QUERY", function(error, stdout, stderr) {
                         if (stdout) {
                             if (stdout.indexOf(svcNA) > 0) {
@@ -262,11 +268,11 @@ if (cluster.isMaster) {
         app.get('/', function(req, res, next) {
             if (!(req.url == '/' || req.url.startsWith("/?"))) return next();
             var userLogged = req.session.logged;
-            var usrCtx = req.userContext;
+            var usrCtx = req[authParams.userinfo];
             if (userLogged) req.session.emsg = req.session.emsg || "userLogged";
             else if (!req.session.emsg && req.session.username==undefined) {
                 if (usrCtx) {
-                    var username = (usrCtx.userinfo)? usrCtx.userinfo.nineteen68_username:usrCtx.nineteen68_username;
+                    var username = (usrCtx.userinfo)? usrCtx.userinfo.username:usrCtx.username;
                     if (username == undefined) {
                         req.session.emsg = "invalid_username";
                     } else {
@@ -382,16 +388,16 @@ if (cluster.isMaster) {
                     } else {
                         if (result.rows == "True") {
                             logger.rewriters.push[0]=function(level, msg, meta) {
-                                 if (req.session && req.session.uniqueId) {
-                                     meta.username = req.session.username;
-                                     meta.userid = req.session.userid;
-                                     meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
-                                     return meta;
-                                 } else {
-                                     meta.username = null;
-                                     meta.userid = null;
-                                     return meta;
-                                 }
+                                if (req.session && req.session.uniqueId) {
+                                    meta.username = req.session.username;
+                                    meta.userid = req.session.userid;
+                                    meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
+                                    return meta;
+                                } else {
+                                    meta.username = null;
+                                    meta.userid = null;
+                                    return meta;
+                                }
                             };
                             return next();
                         } else {
@@ -431,6 +437,7 @@ if (cluster.isMaster) {
         var taskbuilder = require('./server/controllers/taskJson');
         var flowGraph = require('./server/controllers/flowGraph');
 
+        //-------------Route Mapping-------------//
         // Mindmap Routes
         try {
             throw "Disable Versioning";
@@ -448,7 +455,6 @@ if (cluster.isMaster) {
             });
         }
 
-        // Route Mapping
         app.post('/populateProjects', mindmap.populateProjects);
         app.post('/populateUsers', mindmap.populateUsers);
         app.post('/checkReuse', mindmap.checkReuse);
@@ -467,7 +473,7 @@ if (cluster.isMaster) {
         app.post('/getDomain',mindmap.getDomain);
 
         //Login Routes
-        app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
+        //app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
         app.post('/checkUserState_Nineteen68', login.checkUserState_Nineteen68);
         app.post('/loadUserInfo_Nineteen68', login.loadUserInfo_Nineteen68);
         app.post('/getRoleNameByRoleId_Nineteen68', login.getRoleNameByRoleId_Nineteen68);
@@ -557,45 +563,7 @@ if (cluster.isMaster) {
         app.post('/flowGraphResults', flowGraph.flowGraphResults);
         app.post('/APG_OpenFileInEditor', flowGraph.APG_OpenFileInEditor);
         app.post('/APG_createAPGProject', flowGraph.APG_createAPGProject);
-
-        //-------------SERVER START------------//
-        function initServer(httpsServer,suite,logger,epurl,apiclient){
-            httpsServer.listen(portNumber, hostFamilyType); //Https Server
-            try {
-                var apireq = apiclient.post(epurl + "server", function(data, response) {
-                    try {
-                        if (response.statusCode != 200) {
-                            httpsServer.close();
-                            logger.error("Please run the Service API and Restart the Server");
-                        } else {
-                            suite.reScheduleTestsuite();
-                            console.info("Nineteen68 Server Ready...\n");
-                        }
-                    } catch (exception) {
-                        httpsServer.close();
-                        logger.error("Please run the Service API and Restart the Server");
-                    }
-                });
-                apireq.on('error', function(err) {
-                    httpsServer.close();
-                    logger.error("Please run the Service API and Restart the Server");
-                });
-            } catch (exception) {
-                httpsServer.close();
-                logger.error("Please run the Service API");
-            }
-        }
-
-        var hostFamilyType = (nginxEnabled) ? '127.0.0.1' : '0.0.0.0';
-        var portNumber = process.env.serverPort;
-        if (authStrategy=='oidc') {
-            auth.on('ready', () => {
-                initServer(httpsServer,suite,logger,epurl,apiclient);
-            });
-        } else {
-            initServer(httpsServer,suite,logger,epurl,apiclient);
-        }
-        //-------------SERVER END------------//
+        //-------------Route Mapping-------------//
 
         // To prevent can't send header response
         app.use(function(req, res, next) {
@@ -625,6 +593,42 @@ if (cluster.isMaster) {
             logger.error(err.message);
             res.status(500).send("<html><body><p>[ECODE "+ecode+"] Internal Server Error Occurred!</p></body></html>");
         });
+
+        //-------------SERVER START------------//
+        var initServer = function initServer(httpsServer,suite,logger,epurl,apiclient){
+            httpsServer.listen(portNumber, hostFamilyType); //Https Server
+            try {
+                var apireq = apiclient.post(epurl + "server", function(data, response) {
+                    try {
+                        if (response.statusCode != 200) {
+                            httpsServer.close();
+                            logger.error("Please run the Service API and Restart the Server");
+                        } else {
+                            suite.reScheduleTestsuite();
+                            console.info("Nineteen68 Server Ready...\n");
+                        }
+                    } catch (exception) {
+                        httpsServer.close();
+                        logger.error("Please run the Service API and Restart the Server");
+                    }
+                });
+                apireq.on('error', function(err) {
+                    httpsServer.close();
+                    logger.error("Please run the Service API and Restart the Server");
+                });
+            } catch (exception) {
+                httpsServer.close();
+                logger.error("Please run the Service API");
+            }
+        };
+
+        var hostFamilyType = (nginxEnabled) ? '127.0.0.1' : '0.0.0.0';
+        var portNumber = process.env.serverPort;
+        if (auth.isReady) initServer(httpsServer,suite,logger,epurl,apiclient);
+        else {
+            auth.onReadyCallback = function () { initServer(httpsServer,suite,logger,epurl,apiclient); };
+        }
+        //-------------SERVER END------------//
     } catch (e) {
         logger.error(e);
         setTimeout(function() {
