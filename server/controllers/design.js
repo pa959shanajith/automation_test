@@ -30,7 +30,7 @@ exports.initScraping_ICE = function (req, res) {
 	var dataToIce={};
 	logger.info("Inside UI service: initScraping_ICE");
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			name = req.session.username;
 			redisServer.redisSubServer.subscribe('ICE2_' + name);	
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -56,7 +56,7 @@ exports.initScraping_ICE = function (req, res) {
 								value = data.value;
 								redisServer.redisSubServer.removeListener('message', LAUNCH_DESKTOP_listener);
 								if (data.onAction == "unavailableLocalServer") {
-									logger.error("Error occured in initScraping_ICE: Socket Disconnected");
+									logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
 									if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
 										var soc = myserver.socketMapNotify[name];
 										soc.emit("ICEnotAvailable");
@@ -82,7 +82,7 @@ exports.initScraping_ICE = function (req, res) {
 								value = data.value;
 								redisServer.redisSubServer.removeListener('message', LAUNCH_SAP_listener);
 								if (data.onAction == "unavailableLocalServer") {
-									logger.error("Error occured in initScraping_ICE: Socket Disconnected");
+									logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
 									if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
 										var soc = myserver.socketMapNotify[name];
 										soc.emit("ICEnotAvailable");
@@ -109,7 +109,7 @@ exports.initScraping_ICE = function (req, res) {
 								value = data.value;
 								redisServer.redisSubServer.removeListener('message', LAUNCH_OEBS_listener);
 								if (data.onAction == "unavailableLocalServer") {
-									logger.error("Error occured in initScraping_ICE: Socket Disconnected");
+									logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
 									if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
 										var soc = myserver.socketMapNotify[name];
 										soc.emit("ICEnotAvailable");
@@ -141,7 +141,7 @@ exports.initScraping_ICE = function (req, res) {
 								value = data.value;
 								redisServer.redisSubServer.removeListener('message', LAUNCH_MOBILE_listener);
 								if (data.onAction == "unavailableLocalServer") {
-									logger.error("Error occured in initScraping_ICE: Socket Disconnected");
+									logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
 									if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
 										var soc = myserver.socketMapNotify[name];
 										soc.emit("ICEnotAvailable");
@@ -168,7 +168,7 @@ exports.initScraping_ICE = function (req, res) {
 							if (name == data.username) {
 								redisServer.redisSubServer.removeListener('message', LAUNCH_MOBILE_WEB_listener);
 								if (data.onAction == "unavailableLocalServer") {
-									logger.error("Error occured in initScraping_ICE: Socket Disconnected");
+									logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
 									if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
 										var soc = myserver.socketMapNotify[name];
 										soc.emit("ICEnotAvailable");
@@ -217,7 +217,7 @@ exports.initScraping_ICE = function (req, res) {
 							if (name == data.username) {
 								redisServer.redisSubServer.removeListener('message', webscrape_listener);
 								if (data.onAction == "unavailableLocalServer") {
-									logger.error("Error occured in initScraping_ICE: Socket Disconnected");
+									logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
 									if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
 										var soc = myserver.socketMapNotify[name];
 										soc.emit("ICEnotAvailable");
@@ -233,7 +233,7 @@ exports.initScraping_ICE = function (req, res) {
 						redisServer.redisSubServer.on("message",webscrape_listener);
 					}
 				} else {
-					logger.error("Error occured in the service initScraping_ICE: Socket not Available");
+					logger.error("Error occurred in the service initScraping_ICE: Socket not Available");
 					try {
 						utils.getChannelNum('ICE1_scheduling_' + name, function(found){
 							var flag="";
@@ -247,7 +247,7 @@ exports.initScraping_ICE = function (req, res) {
 				}
 			});
 		} else {
-			logger.error("Error occured in the service initScraping_ICE: Invalid Session");
+			logger.error("Error occurred in the service initScraping_ICE: Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
@@ -269,7 +269,7 @@ exports.initScraping_ICE = function (req, res) {
 exports.highlightScrapElement_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: highlightScrapElement_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var name = req.session.username;
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			var focusParam = req.body.elementXpath;
@@ -286,7 +286,7 @@ exports.highlightScrapElement_ICE = function (req, res) {
 			logger.info("Successfully highlighted selected object");
 			res.send(flag);
 		} else {
-			logger.error("Error occured in the service highlightScrapElement_ICE: Invalid Session");
+			logger.error("Error occurred in the service highlightScrapElement_ICE: Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
@@ -302,7 +302,7 @@ exports.highlightScrapElement_ICE = function (req, res) {
 exports.getScrapeDataScreenLevel_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: getScrapeDataScreenLevel_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var inputs = {
 				"screenid": req.body.screenId,
 				"projectid": req.body.projectId,
@@ -318,7 +318,7 @@ exports.getScrapeDataScreenLevel_ICE = function (req, res) {
 				}
 			});
 		} else {
-			logger.error("Error occured in the service getScrapeDataScreenLevel_ICE: Invalid Session");
+			logger.error("Error occurred in the service getScrapeDataScreenLevel_ICE: Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
@@ -345,7 +345,7 @@ function fetchScrapedData(inputs, fetchScrapedDatacallback) {
 			function (getScrapeDataQueryresult, response) {
 				try {
 					if (response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail") {
-						logger.error("Error occured in design/getScrapeDataScreenLevel_ICE from fetchScrapedData Error Code : ERRNDAC");
+						logger.error("Error occurred in design/getScrapeDataScreenLevel_ICE from fetchScrapedData Error Code : ERRNDAC");
 						fetchScrapedDatacallback("getScrapeData Fail", null);
 					} else {
 						for (var i = 0; i < getScrapeDataQueryresult.rows.length; i++) {
@@ -371,7 +371,7 @@ function fetchScrapedData(inputs, fetchScrapedDatacallback) {
 exports.updateScreen_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: updateScreen_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var updateData = req.body.scrapeObject;
 			var projectID = updateData.projectId;
 			var screenID = updateData.screenId;
@@ -565,7 +565,7 @@ exports.updateScreen_ICE = function (req, res) {
 															if (elementschanged < newCustNamesList.length) {
 																if ((viewString[scrapedobjectindex].xpath.replace(/\s/g, ' ').replace('&nbsp;', ' ') == xpathListofCustName[elementsindex].replace(/\s/g, ' ').replace('&nbsp;', ' ')) && (viewString[scrapedobjectindex].custname.replace(/\s/g, ' ').replace('&nbsp;', ' ').trim() == oldCustNamesList[elementsindex].replace(/\s/g, ' ').replace('&nbsp;', ' ').trim())) {
 																	viewString[scrapedobjectindex].custname = newCustNamesList[elementsindex];
-																	//elementschanged increments only when edit has occured
+																	//elementschanged increments only when edit has occurred
 																	elementschanged = elementschanged + 1;
 																}
 															}
@@ -600,11 +600,11 @@ exports.updateScreen_ICE = function (req, res) {
 													}
 												}
 											} else {
-												statusFlag = "Error occured in updateScreenData : Fail";
+												statusFlag = "Error occurred in updateScreenData : Fail";
 												try {
 													res.send(statusFlag);
 												} catch (exception) {
-													logger.error("Exception while sending status from the service updateScreen_ICE - Error occured in updateScreenData: %s",exception);
+													logger.error("Exception while sending status from the service updateScreen_ICE - Error occurred in updateScreenData: %s",exception);
 												}
 											}
 										} catch (exception) {
@@ -717,11 +717,11 @@ exports.updateScreen_ICE = function (req, res) {
 													}
 												}
 											} else {
-												statusFlag = "Error occured in updateScreenData : Fail";
+												statusFlag = "Error occurred in updateScreenData : Fail";
 												try {
 													res.send(statusFlag);
 												} catch (exception) {
-													logger.error("Exception from the service updateScreen_ICE - deleteScrapeData_ICE: Error occured in updateScreenData: %s",exception);
+													logger.error("Exception from the service updateScreen_ICE - deleteScrapeData_ICE: Error occurred in updateScreenData: %s",exception);
 												}
 											}
 										} catch (exception) {
@@ -942,19 +942,19 @@ exports.updateScreen_ICE = function (req, res) {
 												}
 											}
 										} else {
-											statusFlag = "Error occured in mapScreenData : Fail";
+											statusFlag = "Error occurred in mapScreenData : Fail";
 											try {
 												res.send(statusFlag);
 											} catch (exception) {
-												logger.error("Exception while sending response from the function fetchScrapedData in the service updateScreen_ICE - mapScrapeData_ICE: Error occured in mapScreenData: %s",exception);
+												logger.error("Exception while sending response from the function fetchScrapedData in the service updateScreen_ICE - mapScrapeData_ICE: Error occurred in mapScreenData: %s",exception);
 											}
 										}
 									} else {
-										statusFlag = "Error occured in updateScreenData : Fail";
+										statusFlag = "Error occurred in updateScreenData : Fail";
 										try {
 											res.send(statusFlag);
 										} catch (exception) {
-											logger.error("Exception while sending response from the function fetchScrapedData in the service updateScreen_ICE - mapScrapeData_ICE: Error occured in updateScreenData: %s",exception);
+											logger.error("Exception while sending response from the function fetchScrapedData in the service updateScreen_ICE - mapScrapeData_ICE: Error occurred in updateScreenData: %s",exception);
 										}
 									}
 								} catch (exception) {
@@ -1059,11 +1059,11 @@ exports.updateScreen_ICE = function (req, res) {
 													}
 												}
 											} else {
-												statusFlag = "Error occured in updateScreenData : Fail";
+												statusFlag = "Error occurred in updateScreenData : Fail";
 												try {
 													res.send(statusFlag);
 												} catch (exception) {
-													logger.error("Exception while sending response from the function fetchScrapedData: updateScreen_ICE - updateComparedObjects: Error occured in updateScreenData: %s", exception);
+													logger.error("Exception while sending response from the function fetchScrapedData: updateScreen_ICE - updateComparedObjects: Error occurred in updateScreenData: %s", exception);
 												}
 											}
 										} catch (exception) {
@@ -1100,8 +1100,8 @@ exports.updateScreen_ICE = function (req, res) {
 							function (result, response) {
 							try {
 								if (response.statusCode != 200 || result.rows == "fail") {
-									statusFlag = "Error occured in updateScreenData : Fail";
-									logger.error("Error occured in design/updateScreen_ICE from finalFunction Error Code : ERRNDAC");
+									statusFlag = "Error occurred in updateScreenData : Fail";
+									logger.error("Error occurred in design/updateScreen_ICE from finalFunction Error Code : ERRNDAC");
 									try {
 										res.send(statusFlag);
 									} catch (exception) {
@@ -1142,8 +1142,8 @@ exports.updateScreen_ICE = function (req, res) {
 														client.post(epurl + "design/readTestCase_ICE", args,
 															function (testcaseDataQueryresult, response) {
 															if (response.statusCode != 200 || testcaseDataQueryresult.rows == "fail") {
-																statusFlag = "Error occured in testcaseDataQuery : Fail";
-																logger.error("Error occured in design/readTestCase_ICE from finalFunction Error Code : ERRNDAC");
+																statusFlag = "Error occurred in testcaseDataQuery : Fail";
+																logger.error("Error occurred in design/readTestCase_ICE from finalFunction Error Code : ERRNDAC");
 																try {
 																	res.send(statusFlag);
 																} catch (exception) {
@@ -1311,7 +1311,7 @@ exports.updateScreen_ICE = function (req, res) {
 				}
 			}
 		} else {
-			logger.error("Error occured in the finalFunction: Invalid Session");
+			logger.error("Error occurred in the finalFunction: Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
@@ -1438,8 +1438,8 @@ function uploadTestCaseData(inputs, uploadTestCaseDatacallback) {
 		client.post(epurl + "design/updateTestCase_ICE", args,
 			function (result, response) {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				logger.error("Error occured in design/updateTestCase_ICE from uploadTestCaseData Error Code : ERRNDAC");
-				statusFlag = "Error occured in updateTestCaseQuery : Fail";
+				logger.error("Error occurred in design/updateTestCase_ICE from uploadTestCaseData Error Code : ERRNDAC");
+				statusFlag = "Error occurred in updateTestCaseQuery : Fail";
 				uploadTestCaseDatacallback(statusFlag, null);
 			} else {
 				statusFlag = "success";
@@ -1459,7 +1459,7 @@ function uploadTestCaseData(inputs, uploadTestCaseDatacallback) {
 exports.readTestCase_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: readTestCase_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			//base output elements
 			var testcasesteps = "";
 			var testcasename = "";
@@ -1499,7 +1499,7 @@ exports.readTestCase_ICE = function (req, res) {
 				try {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						var flag = "Error in readTestCase_ICE : Fail";
-						logger.error("Error occured in design/readTestCase_ICE: service readTestCase_ICE, Error Code : ERRNDAC");
+						logger.error("Error occurred in design/readTestCase_ICE: service readTestCase_ICE, Error Code : ERRNDAC");
 						try {
 							res.send(flag);
 						} catch (exception) {
@@ -1600,7 +1600,7 @@ exports.readTestCase_ICE = function (req, res) {
 exports.updateTestCase_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: updateTestCase_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var hasrow = false;
 			//base request elements
 			var requestedscreenid = req.body.screenid;
@@ -1630,7 +1630,7 @@ exports.updateTestCase_ICE = function (req, res) {
 				try {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						var flag = "Error in Query 1 testcaseexist: Fail";
-						logger.error("Error occured in design/updateTestCase_ICE from updateTestCase_ICE Error Code : ERRNDAC");
+						logger.error("Error occurred in design/updateTestCase_ICE from updateTestCase_ICE Error Code : ERRNDAC");
 						try {
 							res.send(flag);
 						} catch (exception) {
@@ -1700,7 +1700,7 @@ exports.debugTestCase_ICE = function (req, res) {
 	var name;
 	try {
 		logger.info("Inside UI service: debugTestCase_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			name = req.session.username;
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -1740,7 +1740,7 @@ exports.debugTestCase_ICE = function (req, res) {
 										try {
 											if (response.statusCode != 200 || testcasedataresult.rows == "fail") {
 												flag = "Error in getProjectTestcasedata : Fail";
-												logger.error("Error occured in design/readTestCase_ICE from the service debugTestCase_ICE Error Code : ERRNDAC");
+												logger.error("Error occurred in design/readTestCase_ICE from the service debugTestCase_ICE Error Code : ERRNDAC");
 												try {
 													res.send(flag);
 												} catch (exception) {
@@ -1788,7 +1788,7 @@ exports.debugTestCase_ICE = function (req, res) {
 																	if (name == data.username) {
 																		redisServer.redisSubServer.removeListener('message', result_debugTestCase_listener);
 																		if (data.onAction == "unavailableLocalServer") {
-																			logger.error("Error occured in debugTestCase_ICE: Socket Disconnected");
+																			logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
 																			if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
 																				var soc = myserver.socketMapNotify[name];
 																				soc.emit("ICEnotAvailable");
@@ -1834,7 +1834,7 @@ exports.debugTestCase_ICE = function (req, res) {
 										if (data.username == name) {
 											redisServer.redisSubServer.removeListener('message', result_debugTestCaseWS_listener);
 											if (data.onAction == "unavailableLocalServer") {
-												logger.error("Error occured in debugTestCase_ICE: Socket Disconnected");
+												logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
 												if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
 													var soc = myserver.socketMapNotify[name];
 													soc.emit("ICEnotAvailable");
@@ -1914,7 +1914,7 @@ exports.debugTestCase_ICE = function (req, res) {
 										if (data.username == name) {
 											redisServer.redisSubServer.removeListener('message', result_wsdl_listOfOperation_listener);
 											if (data.onAction == "unavailableLocalServer") {
-												logger.error("Error occured in debugTestCase_ICE: Socket Disconnected");
+												logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
 												if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
 													var soc = myserver.socketMapNotify[name];
 													soc.emit("ICEnotAvailable");
@@ -1984,7 +1984,7 @@ exports.debugTestCase_ICE = function (req, res) {
 									if (data.username == name) {
 										redisServer.redisSubServer.removeListener('message', result_wsdl_ServiceGenerator_listener);
 										if (data.onAction == "unavailableLocalServer") {
-											logger.error("Error occured in debugTestCase_ICE: Socket Disconnected");
+											logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
 											if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
 												var soc = myserver.socketMapNotify[name];
 												soc.emit("ICEnotAvailable");
@@ -2083,7 +2083,7 @@ exports.debugTestCase_ICE = function (req, res) {
 exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 	try {
 		logger.info("Inside UI service: getKeywordDetails_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var requestedprojecttypename = req.body.projecttypename;
 			// Query 1 fetching the objecttype,keywords basked on projecttypename
 			var individualsyntax = {};
@@ -2099,7 +2099,7 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 					try {
 						if (response.statusCode != 200 || projectBasedKeywordsresult.rows == "fail") {
 							try {
-								logger.error("Error occured in design/getKeywordDetails_ICE from getKeywordDetails_ICE, Error Code : ERRNDAC");
+								logger.error("Error occurred in design/getKeywordDetails_ICE from getKeywordDetails_ICE, Error Code : ERRNDAC");
 								res.send("Server data rendering failed: Fail");
 							} catch (exception) {
 								logger.error("Exception in the service getKeywordDetails_ICE: %s", exception);
@@ -2122,7 +2122,7 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 					}
 				});
 		} else {
-			logger.error("Error occured in the service getKeywordDetails_ICE: Invalid Session");
+			logger.error("Error occurred in the service getKeywordDetails_ICE: Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
@@ -2134,7 +2134,7 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req, res) {
 	try {
 		logger.info("Inside UI service: getTestcasesByScenarioId_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var testcasesArr = [];
 			var testScenarioId = req.body.testScenarioId;
 			var inputs = {
@@ -2217,7 +2217,7 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 				}
 			});
 		} else {
-			logger.error("Error occured in the service getTestcasesByScenarioId_ICE: Invalid Session");
+			logger.error("Error occurred in the service getTestcasesByScenarioId_ICE: Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {

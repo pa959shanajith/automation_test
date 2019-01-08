@@ -5,7 +5,7 @@ var utils = require('../lib/utils');
 
 exports.updateTaskstatus_mindmaps = function (req, res) {
 	logger.info("Inside UI service: updateTaskstatus_mindmaps");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		try {
 			var obj=req.body.obj;
 			var qlist_query = [{'statement': "MATCH (n:TASKS{taskID:'"+obj+"'}) set n.status='inprogress'"}];
@@ -18,7 +18,7 @@ exports.updateTaskstatus_mindmaps = function (req, res) {
 				}
 			});
 		} catch (error) {
-			logger.error("exception occured in updateTaskstatus_mindmaps",error);
+			logger.error("exception occurred in updateTaskstatus_mindmaps",error);
 		}
 	} else {
 		res.send("Invalid Session");
@@ -28,7 +28,7 @@ exports.updateTaskstatus_mindmaps = function (req, res) {
 
 exports.getTaskJson_mindmaps = function (req, res) {
 	logger.info("Inside UI service: getTaskJson_mindmaps");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		try {
 			//MATCH (b{assignedTo:'60f6ad0b-ce14-4cad-8345-b09c0739f3e2'})<-[r:FNTT]-(a) with b,collect (a) as set return set,b
 			var userid = req.session.userid;
@@ -45,7 +45,7 @@ exports.getTaskJson_mindmaps = function (req, res) {
 					};
 					next_function(resultobj, function (err, data) {
 						if (err) {
-							logger.error('error occured in getTaskJson_mindmaps',err);
+							logger.error('error occurred in getTaskJson_mindmaps',err);
 							res.send('fail');
 						} else {
 							res.send(data);

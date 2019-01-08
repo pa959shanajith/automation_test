@@ -9,10 +9,10 @@
                <div id="left-top-section" class="mindmap-left-section" style="top: 150px !important;">
                   <ul>
                      <li>
-                        <a id='createImg1' ng-click="tab = 'mindmapCreateOption'; createMapsCall()" href="#" title="Create"><span ><img id='createImg' class="highlightImg highlightImg1" src="images_mindmap/create.png" alt="Create"></span>Create</a>
+                        <a id='createImg1' ng-click="tab = 'mindmapCreateOption'; createMapsCall()" href="#" title="Create"><span ><img id='createImg' class="highlightImg highlightImg1" src="imgs/create.png" alt="Create"></span>Create</a>
                      </li>
                      <li>
-                        <a id='assignImg1' ng-click="createMap('tabAssign'); createMapsCall();" href="#" title="Assign"><span><img id='assignImg' class="highlightImg highlightImg1" src="images_mindmap/assign.png" alt="Assign"></span>Assign</a>
+                        <a id='assignImg1' ng-click="createMap('tabAssign'); createMapsCall();" href="#" title="Assign"><span><img id='assignImg' class="highlightImg highlightImg1" src="imgs/assign.png" alt="Assign"></span>Assign</a>
                      </li>
                   </ul>
                </div>
@@ -40,16 +40,16 @@
    <div class="createFirstContainer" ng-show="tab == 'mindmapCreateOption'">
       <div class="createOptionContainer">
          <div ng-click="createMap('tabCreate'); tab = 'tabCreate'; createMapsCall()" title="Create New">
-            <img alt="Create New" class="" src="images_mindmap/ic-create-newMindmap.png">
+            <img alt="Create New" class="" src="imgs/ic-create-newMindmap.png">
             <label>Create New</label>
          </div>
          <div ng-click="createMap('mindmapEndtoEndModules'); tab = 'mindmapEndtoEndModules'; createMapsCall()" title="End to End flow">
-            <img alt="End to End flow" class="" src="images_mindmap/ic-endtoendFlow.png">
+            <img alt="End to End flow" class="" src="imgs/ic-endtoendFlow.png">
             <label>End to End Flow</label>
          </div>
          <div title="Import from Excel">
             <label for="file-input">
-            <img alt="Import from Excel" class="" src="images_mindmap/ic-importfromexcel-mindmap.png">
+            <img alt="Import from Excel" class="" src="imgs/ic-importfromexcel-mindmap.png">
             </label>
             <label>Import from Excel</label>
             <input id="file-input" on-read-file="getSheetName($fileContent)" type="file" name="xlsfile" accept=".xls,.xlsx" required="" autofocus="" style="display:none"/>
@@ -68,7 +68,7 @@
             </div>
             <div class="scrollbar-inner endtoend-modules-left-lower makeElementFloatleft" style="overflow-y:hidden !important" id="etemModuleContainer">
                 <span class="moduleContainer" ng-repeat="map in allMMaps" ng-click="loadEndToEnd($index,map.type,map.name)" data-mapid="{{$index}}" title="{{map.name}}">
-                    <img class="ct-nodeIcon eteMbox" src="images_mindmap/node-{{map.type}}.png" alt="Module" aria-hidden="true">
+                    <img class="ct-nodeIcon eteMbox" src="imgs/node-{{map.type}}.png" alt="Module" aria-hidden="true">
                     <span class="ct-nodeLabel ct-node-e2e" style="width: 120px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 20px;">{{map.name}}</span>
                 </span>                 
             </div>
@@ -192,7 +192,7 @@
          <!-- versioning -->
          <div class="ct-nodeBox">
             <div ng-repeat="map in allMMaps" ng-click="loadMap($index)" class="ct-node fl-left" data-mapid="{{$index}}" title="{{map.name}}" style="width: 139px;">
-               <img class="ct-nodeIcon" src="images_mindmap/node-modules.png" alt="Module" aria-hidden="true">
+               <img class="ct-nodeIcon" src="imgs/node-modules.png" alt="Module" aria-hidden="true">
                <span class="ct-nodeLabel" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">{{map.name}}</span>
             </div>
          </div>
@@ -222,7 +222,7 @@
          </div>
          <div class="ct-nodeBox">
             <div ng-repeat="map in allMMaps" ng-click="loadMap($index)" class="ct-node fl-left" data-mapid="{{$index}}" title="{{map.name}}" style="width: 139px;">
-               <img class="ct-nodeIcon" src="images_mindmap/node-{{map.type}}.png" alt="Module" aria-hidden="true">
+               <img class="ct-nodeIcon" src="imgs/node-{{map.type}}.png" alt="Module" aria-hidden="true">
                <span class="ct-nodeLabel" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">{{map.name}}</span>
             </div>
          </div>
@@ -246,7 +246,7 @@
                 <path ng-repeat="(id,link) in linkDisplay" ng-model="link" id="{{id}}" class="ct-link" d="{{link.d}}"></path>           
                 <g ng-repeat="(id, node) in nodeDisplay" ng-model="dispnode" id="ct-node-{{id}}" class="ct-node" data-nodetype="{{node.type}}" transform="{{node.transform}}">
                     <image height="40px" width="40px" class="ct-nodeIcon" xlink:href={{node.img_src}} style="opacity:{{node.opacity}};" ng-click="nodeUniversalClick(id)"></image>
-                    <image ng-if="node.task == true" class="ct-nodeTask" width="21px" height="21px" xlink:href="images_mindmap/node-task-assigned.png" style="opacity:{{node.taskOpacity}}" x="29" y="-10"></image>                    
+                    <image ng-if="node.task == true" class="ct-nodeTask" width="21px" height="21px" xlink:href="imgs/node-task-assigned.png" style="opacity:{{node.taskOpacity}}" x="29" y="-10"></image>                    
                     <text class="ct-nodeLabel" text-anchor="middle" x="20" title="{{node.title}}" y="50">{{node.name}}</text>
                     <title>{{node.title}}</title>
                     <circle ng-if="(node.type=='scenarios' && modType == 'generic') || node.type=='screens' || node.type=='modules' || node.type=='modules_endtoend'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="{{verticalLayout ? 20 : 44}}" cy="{{verticalLayout ? 55 : 20}}" r="4" ng-click="toggleNode(id)"></circle>

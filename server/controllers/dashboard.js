@@ -11,7 +11,7 @@ var utils = require('../lib/utils');
   exports.loadDashboard = function(req, res){
     logger.info("Inside UI service: loadDashboard")
     try {
-      if(utils.isSessionActive(req.session)){
+      if(utils.isSessionActive(req)){
         logger.info("Connecting to jsreport client from loadDashboard");
         var jsrclient = jsreportClient("https://" + req.headers.host + "/reportServer/");
         jsrclient.render({
@@ -224,7 +224,7 @@ var utils = require('../lib/utils');
     logger.info("Inside UI service: loadDashboardData")  
     try {
       var projJson = {}
-      if (utils.isSessionActive(req.session)) {
+      if (utils.isSessionActive(req)) {
         var user_id = req.body.userid;
         var jsonData;
         inputs = { "userid":user_id, "query":"allflag"};
@@ -271,7 +271,7 @@ var utils = require('../lib/utils');
   exports.loadDashboard_2 = function(req, res){
     logger.info("Inside UI service: loadDashboard_2");
     try {
-      if(utils.isSessionActive(req.session)){
+      if(utils.isSessionActive(req)){
         logger.info("Connecting to jsreport client from loadDashboard_2");
         var jsrclient = jsreportClient("https://" + req.headers.host + "/reportServer/");
         jsrclient.render({

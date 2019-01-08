@@ -38,6 +38,15 @@ mySPA.factory('LoginService', ['$http', '$q', function ($http, $q) {
 				function (response) {
 				return $q.reject(response.data);
 			});
+		},
+		checkUserState_Nineteen68: function () {
+			return $http.post('/checkUserState_Nineteen68')
+			.then(function (response) {
+				return response.data;
+			},
+				function (response) {
+				return $q.reject(response.data);
+			});
 		}
 	}
 }]);

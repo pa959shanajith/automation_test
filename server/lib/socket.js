@@ -15,7 +15,7 @@ var Client = require("node-rest-client").Client;
 var apiclient = new Client();
 
 var uiConfig = require('./../config/options');
-var screenShotPath = uiConfig.storageConfig.screenShotPath;
+var screenShotPath = uiConfig.screenShotPath;
 
 io.on('connection', function (socket) {
 	logger.info("Inside Socket connection");

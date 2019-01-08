@@ -16,9 +16,9 @@ try {
 // Module Dependencies
 var cluster = require('cluster');
 var expressWinston = require('express-winston');
-var winston = require('winston');
 var epurl = "http://" + process.env.NDAC_IP + ":" + process.env.NDAC_PORT + "/";
 var logger = require('./logger');
+var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 
 if (cluster.isMaster) {
     cluster.fork();
@@ -38,6 +38,7 @@ if (cluster.isMaster) {
         var app = express();
         var bodyParser = require('body-parser');
         var sessions = require('express-session');
+        var cookieParser = require('cookie-parser');
         var helmet = require('helmet');
         var lusca = require('lusca');
         var consts = require('constants');
@@ -64,8 +65,8 @@ if (cluster.isMaster) {
 
         //HTTPS Configuration
         var uiConfig = require('./server/config/options');
-        var certificate = uiConfig.storageConfig.certificate.cert;
-        var privateKey = uiConfig.storageConfig.certificate.key;
+        var certificate = uiConfig.certificate.cert;
+        var privateKey = uiConfig.certificate.key;
         var credentials = {
             key: privateKey,
             cert: certificate,
@@ -80,7 +81,6 @@ if (cluster.isMaster) {
         module.exports = app;
         module.exports.redisSessionStore = redisSessionStore;
         module.exports.httpsServer = httpsServer;
-        var io = require('./server/lib/socket');
 
         //Caching static files for thirtyDays 
         var thirtyDays = 2592000; // in milliseconds
@@ -95,7 +95,6 @@ if (cluster.isMaster) {
         app.use("/images_mindmap", express.static(__dirname + "/public/images_mindmap"));
         app.use("/css", express.static(__dirname + "/public/css"));
         app.use("/fonts", express.static(__dirname + "/public/fonts"));
-
 
         app.use(bodyParser.json({
             limit: '50mb'
@@ -118,6 +117,7 @@ if (cluster.isMaster) {
         process.env.SESSION_AGE = 30 * 60 * 1000;
         process.env.SESSION_INTERVAL = 20 * 60 * 1000;
 
+        app.use(cookieParser("$^%EDE%^tfd65e7ufyCYDR^%IU"));
         app.use(sessions({
             cookie: {
                 path: '/',
@@ -132,15 +132,38 @@ if (cluster.isMaster) {
             store: redisSessionStore
         }));
 
+        app.use(function(req, res, next) {
+            req.clearSession = function clearSession() {
+                res.clearCookie('connect.sid');
+                res.clearCookie('maintain.sid');
+                req.session.destroy();
+            };
+            next();
+        });
+
+        // For Selecting Authentication Strategy and adding required routes
+        var authParams = {
+            username: "nineteen68_username",
+            userinfo: "userContext",
+            route: {
+                login: "/login", success: "/", failure: "/error?e=403"
+            }
+        };
+        var authlib = require("./server/lib/auth");
+        var auth = authlib(authParams);
+        var authStrategy = auth.strategy;
+        app.use(auth.router);
+        auth = auth.util;
+
         app.use('*', function(req, res, next) {
             if (req.session === undefined) {
-                return res.status(500).send("<html><body><p>[ECODE 600] Internal Server Error Occured!</p></body></html>");
+                return next(new Error("redisnotavailable"));
             }
             return next();
         });
 
         //Based on NGINX Config Security Headers are configured
-        if(process.env.NGINX_ON == "FALSE"){
+        if(!nginxEnabled){
             app.use(helmet());
             app.use(lusca.p3p('/w3c/p3p.xml", CP="IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT'));
             app.use(helmet.referrerPolicy({
@@ -181,10 +204,10 @@ if (cluster.isMaster) {
             var svcStopPending = "STOP_PENDING";
             var svc = req.body.id;
             var batFile = require.resolve("./assets/svc.bat");
+			var execCmd = batFile + " ";
             try {
                 if (svc == "query") {
                     var svcStatus = [];
-                    var execCmd = batFile + " ";
                     childProcess.exec(execCmd + "0 QUERY", function(error, stdout, stderr) {
                         if (stdout && stdout.indexOf(svcNA) == -1) svcStatus.push(true);
                         else svcStatus.push(false);
@@ -199,7 +222,7 @@ if (cluster.isMaster) {
                         });
                     });
                 } else {
-                    var execCmd = batFile + " " + svc.toString() + " ";
+                    execCmd = execCmd + svc.toString() + " ";
                     childProcess.exec(execCmd + "QUERY", function(error, stdout, stderr) {
                         if (stdout) {
                             if (stdout.indexOf(svcNA) > 0) {
@@ -227,9 +250,121 @@ if (cluster.isMaster) {
             }
         });
 
+        app.get('/error', function(req, res, next) {
+            var emsg=req.query.e;
+            if (emsg) {
+                if (req.session.messages) emsg = req.session.messages[0];
+                else if (emsg == "401") emsg = "invalid_session";
+                else if (emsg == "403") emsg = "unauthorized";
+                else if (emsg == "sessexists") {
+                    emsg = "userLogged";
+                    req.session.dndSess = true;
+                }
+                req.session.emsg = emsg;
+            }
+            res.redirect('/');
+        });
+
+        app.get('/', function(req, res, next) {
+            if (!(req.url == '/' || req.url.startsWith("/?"))) return next();
+            var userLogged = req.session.logged;
+            var usrCtx = req[authParams.userinfo];
+            if (userLogged) req.session.emsg = req.session.emsg || "userLogged";
+            else if (!req.session.emsg && req.session.username==undefined) {
+                if (usrCtx) {
+                    var username = (usrCtx.userinfo)? usrCtx.userinfo.username:usrCtx.username;
+                    if (username == undefined) {
+                        req.session.emsg = "invalid_username";
+                    } else {
+                        username = username.toLowerCase();
+                        redisSessionStore.all(function (err, allKeys) {
+                            if (err) {
+                                logger.info("User Authentication failed");
+                                req.session.emsg = "fail";
+                            } else {
+                                for (var ki = 0; ki < allKeys.length; ki++) {
+                                    if (username == allKeys[ki].username) {
+                                        userLogged=true;
+                                        break;
+                                    }
+                                }
+                                if (userLogged) {
+                                    req.session.emsg = "userLogged";
+                                } else {
+                                    req.session.username = username;
+                                    req.session.uniqueId = req.session.id;
+                                    logger.rewriters[0]=function(level, msg, meta) {
+                                        meta.username = username;
+                                        meta.userid = null;
+                                        meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
+                                        return meta;
+                                    };
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    logger.rewriters[0]=function(level, msg, meta) {
+                        meta.username = null;
+                        meta.userid = null;
+                        meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
+                        return meta;
+                    };
+                    req.clearSession();
+                    return res.redirect('login');
+                }
+            }
+            req.session.logged = true;
+            return res.sendFile("app.html", { root: __dirname + "/public/" });
+        });
+
+        //Only Admin have access
+        app.get('/admin', function(req, res) {
+            var roles = ["Admin"];   //Allowed roles
+            sessionCheck(req, res, roles);
+        });
+
+        //Only Test Engineer and Test Lead have access
+        app.get(/^\/(design|designTestCase|execute|scheduling)$/, function(req, res) {
+            var roles = ["Test Lead", "Test Engineer"];   //Allowed roles
+            sessionCheck(req, res, roles);
+        });
+
+        //Test Engineer,Test Lead and Test Manager can access
+        app.get(/^\/(specificreports|mindmap|p_Utility|p_Reports|plugin)$/, function(req, res) {
+            var roles = ["Test Manager", "Test Lead", "Test Engineer"];   //Allowed roles
+            sessionCheck(req, res, roles);
+        });
+
+        //Test Lead and Test Manager can access
+        app.get(/^\/(p_Webocular|neuronGraphs|p_ALM|p_Dashboard|p_APG)$/, function(req, res) {
+            var roles = ["Test Manager", "Test Lead"];   //Allowed roles
+            sessionCheck(req, res, roles);
+        });
+
+        function sessionCheck(req, res, roles) {
+            logger.info("Inside sessioncheck for URL : %s", req.url);
+            var sess  = req.session;
+            logger.rewriters[0]=function(level, msg, meta) {
+                meta.username = (sess && sess.username)? sess.username:null;
+                meta.userid = (sess && sess.userid)? sess.userid:null;
+                meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
+                return meta;
+            };
+
+            var sessChk = sess.uniqueId && sess.activeRole && (roles.indexOf(sess.activeRole) != -1);
+            var maintCookie = req.signedCookies["maintain.sid"];
+            if (sessChk) {
+                return (maintCookie)? res.sendFile("app.html", { root: __dirname + "/public/" }) : res.redirect("/error?e=sessexists");
+            } else {
+                req.clearSession();
+                return res.redirect("/error?e=401");
+            }
+        }
+
         //Role Based User Access to services
         app.post('*', function(req, res, next) {
-            var roleId = req.session.activeRoleId;
+            var roleId = (req.session)? req.session.activeRoleId : undefined;
             var updateinp = {
                 roleid: roleId || "ignore",
                 servicename: req.url.replace("/", "")
@@ -241,7 +376,7 @@ if (cluster.isMaster) {
                 }
             };
             var apireq = apiclient.post(epurl + "utility/userAccess_Nineteen68", args, function(result, response) {
-                if (req.session && roleId) {
+                if (roleId) {
                     if (response.statusCode != 200 || result.rows == "fail") {
                         logger.error("Error occured in userAccess_Nineteen68");
                         res.send("Invalid Session");
@@ -253,21 +388,21 @@ if (cluster.isMaster) {
                     } else {
                         if (result.rows == "True") {
                             logger.rewriters.push[0]=function(level, msg, meta) {
-                                 if (req.session && req.session.uniqueId) {
-                                     meta.username = req.session.username;
-                                     meta.userid = req.session.userid;
-                                     meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
-                                     return meta;
-                                 } else {
-                                     meta.username = null;
-                                     meta.userid = null;
-                                     return meta;
-                                 }
+                                if (req.session && req.session.uniqueId) {
+                                    meta.username = req.session.username;
+                                    meta.userid = req.session.userid;
+                                    meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
+                                    return meta;
+                                } else {
+                                    meta.username = null;
+                                    meta.userid = null;
+                                    return meta;
+                                }
                             };
                             return next();
                         } else {
-                            req.session.destroy();
-                            res.status(401).redirect('/');
+                            req.clearSession();
+                            return res.send("Invalid Session");
                         }
                     }
                 } else {
@@ -280,136 +415,9 @@ if (cluster.isMaster) {
                 logger.error("Please run the Service API and Restart the Server");
             });
         });
-    
-
-        app.get('/', function(req, res) {
-            res.clearCookie('connect.sid');
-            res.clearCookie('io');
-            res.clearCookie('mm_pid');
-            req.session.destroy();
-            logger.rewriters[0]=function(level, msg, meta) {
-                meta.username = null;
-                meta.userid = null;
-                meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
-                return meta;
-            };
-            res.sendFile("index.html", {
-                root: __dirname + "/public/"
-            });
-        });
-
-        app.get('/login', function(req, res) {
-            res.clearCookie('connect.sid');
-            req.session.destroy();
-            res.sendFile("index.html", {
-                root: __dirname + "/public/"
-            });
-        });
-
-        app.get('/admin', function(req, res) {
-            if (!req.session.defaultRole || req.session.defaultRole != 'Admin') {
-                req.session.destroy();
-                res.status(401).redirect('/');
-            } else {
-                if (req.session.uniqueId != undefined) {
-                    res.sendFile("index.html", {
-                        root: __dirname + "/public/"
-                    });
-                } else {
-                    req.session.destroy();
-                    res.status(401).redirect('/login');
-                }
-            }
-        });
-
-        //Only Test Engineer and Test Lead have access
-        app.get(/^\/(design|designTestCase|execute|scheduling)$/, function(req, res) {
-            //Denied roles
-            var roles = ["Admin", "Business Analyst", "Tech Lead", "Test Manager"];
-            sessionCheck(req, res, roles);
-        });
-
-        //Test Engineer,Test Lead and Test Manager can access
-        app.get(/^\/(specificreports|mindmap|p_Utility|p_Reports|plugin)$/, function(req, res) {
-            //Denied roles
-            var roles = ["Admin", "Business Analyst", "Tech Lead"];
-            sessionCheck(req, res, roles);
-        });
-
-        //Test Lead and Test Manager can access Webocular Plugin
-        app.get(/^\/(p_Webocular|neuronGraphs|p_ALM|p_Dashboard|p_APG)$/, function(req, res) {
-            //Denied roles
-            var roles = ["Admin", "Business Analyst", "Tech Lead", "Test Engineer"];
-            sessionCheck(req, res, roles);
-        });
-
-        function sessionCheck(req, res, roles) {
-            logger.info("Inside sessioncheck for URL : %s", req.url);
-            logger.rewriters[0]=function(level, msg, meta) {
-                if (req.session != undefined && req.session.userid != undefined) {
-                    meta.username = req.session.username;
-                    meta.userid = req.session.userid;
-                    meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
-                    return meta;
-                } else {
-                    meta.username = null;
-                    meta.userid = null;
-                   return meta;
-                }
-            };
-
-            if (req.session.activeRoleId == req.session.defaultRoleId) {
-                if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >= 0) {
-                    req.session.destroy();
-                    res.status(401).redirect('/');
-                } else {
-                    if (req.session.uniqueId != undefined) {
-                        res.sendFile("index.html", {
-                            root: __dirname + "/public/"
-                        });
-                    } else {
-                        req.session.destroy();
-                        res.status(401).redirect('/login');
-                    }
-                }
-            } else {
-                if (req.session.uniqueId != undefined) {
-                    res.sendFile("index.html", {
-                        root: __dirname + "/public/"
-                    });
-                } else {
-                    req.session.destroy();
-                    res.status(401).redirect('/login');
-                }
-            }
-        }
-
-        app.get('/favicon.ico', function(req, res) {
-            if (req.session.uniqueId != undefined) {
-                res.sendFile("index.html", {
-                    root: __dirname + "/public/"
-                });
-            } else {
-                req.session.destroy();
-                res.status(401).redirect('/login');
-            }
-        });
-
-        app.get('/css/fonts/Lato/Lato-Regular.ttf', function(req, res) {
-            if (req.session.uniqueId != undefined) {
-                res.sendFile("index.html", {
-                    root: __dirname + "/public/"
-                });
-            } else {
-                req.session.destroy();
-                res.status(401).redirect('/login');
-            }
-        });
 
         app.post('/designTestCase', function(req, res) {
-            res.sendFile("index.html", {
-                root: __dirname + "/public/"
-            });
+            return res.sendFile("app.html", { root: __dirname + "/public/" });
         });
 
         //Route Directories
@@ -429,6 +437,7 @@ if (cluster.isMaster) {
         var taskbuilder = require('./server/controllers/taskJson');
         var flowGraph = require('./server/controllers/flowGraph');
 
+        //-------------Route Mapping-------------//
         // Mindmap Routes
         try {
             throw "Disable Versioning";
@@ -446,7 +455,6 @@ if (cluster.isMaster) {
             });
         }
 
-        // Route Mapping
         app.post('/populateProjects', mindmap.populateProjects);
         app.post('/populateUsers', mindmap.populateUsers);
         app.post('/checkReuse', mindmap.checkReuse);
@@ -463,9 +471,10 @@ if (cluster.isMaster) {
         app.post('/getScreens',mindmap.getScreens);
         app.post('/exportToExcel',mindmap.exportToExcel);
         app.post('/getDomain',mindmap.getDomain);
-        
+
         //Login Routes
-        app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
+        //app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
+        app.post('/checkUserState_Nineteen68', login.checkUserState_Nineteen68);
         app.post('/loadUserInfo_Nineteen68', login.loadUserInfo_Nineteen68);
         app.post('/getRoleNameByRoleId_Nineteen68', login.getRoleNameByRoleId_Nineteen68);
         app.post('/logoutUser_Nineteen68', login.logoutUser_Nineteen68);
@@ -554,37 +563,9 @@ if (cluster.isMaster) {
         app.post('/flowGraphResults', flowGraph.flowGraphResults);
         app.post('/APG_OpenFileInEditor', flowGraph.APG_OpenFileInEditor);
         app.post('/APG_createAPGProject', flowGraph.APG_createAPGProject);
-        //-------------SERVER START------------//
-        var hostFamilyType = process.env.NGINX_ON == "TRUE" ? '127.0.0.1' : '0.0.0.0';
-        var portNumber = process.env.serverPort;
-        httpsServer.listen(portNumber, hostFamilyType); //Https Server
-        try {
-            var apireq = apiclient.post(epurl + "server", function(data, response) {
-                try {
-                    if (response.statusCode != 200) {
-                        httpsServer.close();
-                        logger.error("Please run the Service API and Restart the Server");
-                    } else {
-                        suite.reScheduleTestsuite();
-                        console.info("Nineteen68 Server Ready...");
-                    }
-                } catch (exception) {
-                    httpsServer.close();
-                    logger.error("Please run the Service API and Restart the Server");
-                }
-            });
-            apireq.on('error', function(err) {
-                httpsServer.close();
-                logger.error("Please run the Service API and Restart the Server");
-            });
-        } catch (exception) {
-            httpsServer.close();
-            logger.error("Please run the Service API");
-        }
+        //-------------Route Mapping-------------//
 
-      
-
-        //To prevent can't send header response
+        // To prevent can't send header response
         app.use(function(req, res, next) {
             var _send = res.send;
             var sent = false;
@@ -596,14 +577,58 @@ if (cluster.isMaster) {
             next();
         });
 
+        // To catch unknown routes
         app.get('*', function(req, res) {
             res.status(404).send("<html><body><p>The page could not be found or you don't have permission to view it.</p></body></html>");
         });
 
+        // To catch all errors
         app.use(function(err, req, res, next) {
+            var ecode = "601";
+            var emsg = err.message;
+            if (err.message == "redisnotavailable") {
+                ecode = "600";
+                emsg = "Redis Database unavailable";
+            }
             logger.error(err.message);
-            res.status(500).send("<html><body><p>[ECODE 601] Intenal Server Error Occured!</p></body></html>");
+            res.status(500).send("<html><body><p>[ECODE "+ecode+"] Internal Server Error Occurred!</p></body></html>");
         });
+
+        //-------------SERVER START------------//
+        var initServer = function initServer(httpsServer,suite,logger,epurl,apiclient){
+            httpsServer.listen(portNumber, hostFamilyType); //Https Server
+            try {
+                var apireq = apiclient.post(epurl + "server", function(data, response) {
+                    try {
+                        if (response.statusCode != 200) {
+                            httpsServer.close();
+                            logger.error("Please run the Service API and Restart the Server");
+                        } else {
+                            suite.reScheduleTestsuite();
+                            console.info("Nineteen68 Server Ready...\n");
+                        }
+                    } catch (exception) {
+                        httpsServer.close();
+                        logger.error("Please run the Service API and Restart the Server");
+                    }
+                });
+                apireq.on('error', function(err) {
+                    httpsServer.close();
+                    logger.error("Please run the Service API and Restart the Server");
+                });
+            } catch (exception) {
+                httpsServer.close();
+                logger.error("Please run the Service API");
+            }
+        };
+
+        var hostFamilyType = (nginxEnabled) ? '127.0.0.1' : '0.0.0.0';
+        var portNumber = process.env.serverPort;
+        if (auth.isReady) initServer(httpsServer,suite,logger,epurl,apiclient);
+        else {
+            auth.onReadyCallback = function () { initServer(httpsServer,suite,logger,epurl,apiclient); };
+        }
+        //-------------SERVER END------------//
     } catch (e) {
         logger.error(e);
         setTimeout(function() {

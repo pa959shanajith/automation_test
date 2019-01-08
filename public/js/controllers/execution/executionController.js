@@ -5,6 +5,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	var userinfo = {} //Contains Userinfo
 	var browserTypeExe = []; // Contains selected browser id for execution
 	var scenarioIdQC;
+	var executionActive = false;
 	$scope.moduleInfo = [];
 	$scope.somevar = {};
 	$("body").css("background","#eee");
@@ -16,7 +17,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			$(".safariBrowser").show();
 		}
 	
-	}, 500)
+	}, 500);
 
 	//Set Modal Title 
 	$('div.modal').on('shown.bs.modal', function() {
@@ -96,7 +97,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	}, 1000)
 
 	$scope.readTestSuite_ICE = function(){
-        $('.checkStylebox').attr("disabled", true); 
+		$('.checkStylebox').attr("disabled", true); 
 		$('#excSaveBtn').attr("disabled", true);
 		//blockUI("Loading in Progress. Please Wait");
 		ExecutionService.readTestSuite_ICE(readTestSuite, "execute")
@@ -104,7 +105,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			//unblockUI();
 			if(data == "Invalid Session"){
 					$rootScope.redirectPage();
-			 }
+			}
 			if(data == ""){
 				// $('.checkStylebox').attr("disabled", true); 
 				// $('#excSaveBtn').attr("disabled", true);
@@ -112,8 +113,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				// $('#excSaveBtn').hide();
 			}
 			else{
-                $('.checkStylebox').attr("disabled", false); 
-			    $('#excSaveBtn').attr("disabled", false);
+				$('.checkStylebox').attr("disabled", false); 
+				$('#excSaveBtn').attr("disabled", false);
 				$(".executionTableDnd").empty()
 				cfpLoadingBar.complete();
 				var dataLen = Object.keys(data).length;
@@ -128,7 +129,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					$("#batch_"+m+"").append("<div class='suiteNameTxt' id='page-taskName_"+m+"'><span title="+rowData.testsuitename+" class='taskname'><input id='parentSuite_"+m+"' class='parentSuiteChk' type='checkbox' name='' />"+rowData.testsuitename+"</span></div><div id='exeData_"+m+"' class='exeDataTable testSuiteBatch'><table id='executionDataTable_"+m+"' class='executionDataTable' cellspacing='0' cellpadding='0'><thead><tr><th style='width: 4%' id='contextmenu'></th><th style='width: 3%; padding: 5px 0px'><i class='fa fa-ban' title='Do Not Execute' aria-hidden='true' style='font-size: 14px;'></i><input id='parentExecute_"+m+"' class='d-execute' type='checkbox' /></th>	<th style='width: 20%; text-align:left; border-right: 1px solid #fff;'>Scenario Name</th><th style='width: 24%; border-right: 1px solid #fff'>Data Parameterization</th>	<th style='width: 18%; border-right: 1px solid #fff'>Condition</th><th style='width: 24%;'>Project Name</th></tr><input type='hidden' value='"+rowData.testsuiteid+"'/></thead><tbody class='scrollbar-inner testScenarioScroll'></tbody></table></div>");//<th style='width: 8%; text-align: center;'>ALM</th>
 					//<img class='expandTable' src='imgs/icon-minus.png'>
 
-				    var row = $("#executionDataTable_"+m+"").find('tbody');
+					var row = $("#executionDataTable_"+m+"").find('tbody');
 					console.log("row",row);
 					var count = 1
 
@@ -235,12 +236,12 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 				//Input only number on Keypress Event for Account Number
 				$(document).on('keypress','.scenarioDescVal' , function(e) {
-						if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
-							return false;
-					   }
-					  });
+					if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+						return false;
+					}
+				});
 				//Input only number on Paste Event for Account Number
-			    $(document).on('input','.scenarioDescVal' , function(e) {
+				$(document).on('input','.scenarioDescVal' , function(e) {
 					e.target.value = e.target.value.replace(/[^0-9]/g,'')
 				});
 						
@@ -327,16 +328,16 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					else{
 						$("#parentExecute").prop("checked", false);
 					}
-				 }
-				 if(dataLen >= 2){
-					 $(".executionDataTable tbody").prop("style","max-height: 100px !important;");
-				 }
-				 if(dataLen == $(".parentSuiteChk:checked").length){
-					 $(".checkStylebox").prop("checked", true);
-				 }
-				 else{
-					 $(".checkStylebox").prop("checked", false);
-				 }
+				}
+				if(dataLen >= 2){
+					$(".executionDataTable tbody").prop("style","max-height: 100px !important;");
+				}
+				if(dataLen == $(".parentSuiteChk:checked").length){
+					$(".checkStylebox").prop("checked", true);
+				}
+				else{
+					$(".checkStylebox").prop("checked", false);
+				}
 
 				$('[id^=parentExecute_]').on('click',function(e){
 						if($(this).is(":checked") == true)
@@ -395,32 +396,26 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					else{
 						$(this).parents('.suiteNameTxt').next().children().find('input[type=checkbox]').prop('checked', false);
 					}
-					 var checkedLen = $('[id^=parentSuite_]:checked').length;
-					 var totalLen = $('[id^=parentSuite_]').length;
-					 if(checkedLen == totalLen)
-					 {
+					var checkedLen = $('[id^=parentSuite_]:checked').length;
+					var totalLen = $('[id^=parentSuite_]').length;
+					if(checkedLen == totalLen) {
 						$("input[type='checkbox'].checkStylebox").prop('checked', true);
-					 }
-					 else
-					 {
-						 $("input[type='checkbox'].checkStylebox").prop('checked', false);
-					 }
+					} else {
+						$("input[type='checkbox'].checkStylebox").prop('checked', false);
+					}
 				});
 
 				$("input[type='checkbox'].checkStylebox").on('click',function(e){
-						if($(this).is(":checked") == true)
-						{
-							$('[id^=parentSuite_]').prop('checked', true);
-							$('[id^=parentExecute_]').prop('checked', true);
-							$("tbody").find('input[type=checkbox]').prop('checked', true);
-						}
-						else{
-							$('[id^=parentSuite_]').prop('checked', false);
-							$('[id^=parentExecute_]').prop('checked', false);
-							$("tbody").find('input[type=checkbox]').prop('checked', false);
-						}
+					if($(this).is(":checked") == true) {
+						$('[id^=parentSuite_]').prop('checked', true);
+						$('[id^=parentExecute_]').prop('checked', true);
+						$("tbody").find('input[type=checkbox]').prop('checked', true);
+					} else {
+						$('[id^=parentSuite_]').prop('checked', false);
+						$('[id^=parentExecute_]').prop('checked', false);
+						$("tbody").find('input[type=checkbox]').prop('checked', false);
+					}
 				});
-
 			}
 
 			if(getTaskName.indexOf("Execute Batch") < 0){
@@ -485,7 +480,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		.then(function(data) {
 			if(data == "Invalid Session"){
 					$rootScope.redirectPage();
-			 }
+			}
 			for(i=0; i<data.projectnames.length && data.testcasenames.length && data.screennames.length; i++){
 				//document.getElementById("scenarioDetailsContent").innerHTML += '<div class="sDInnerContentsWrap"><div class="sDInnerContents">'+data.testcasenames[i]+'</div><div class="sDInnerContents">'+data.screennames[i]+'</div><div class="sDInnerContents">'+data.projectnames[i]+'</div></div>'
 				$("#scenarioDetailsContent").append('<div class="sDInnerContentsWrap"><div class="sDInnerContents viewReadOnlyTC" data-name='+data.testcasenames[i]+' data-id='+data.testcaseids[i]+'>'+data.testcasenames[i]+'</div><div class="sDInnerContents">'+data.screennames[i]+'</div><div class="sDInnerContents">'+data.projectnames[i]+'</div></div>')
@@ -495,24 +490,24 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				testCaseId = this.getAttribute('data-id');
 				DesignServices.readTestCase_ICE(undefined, testCaseId, testCaseName, 0)
 				.then(function(response) {
-						if (response == "Invalid Session") {
-							$rootScope.redirectPage();
-						}
-						var source = $("#handlebar-template-testcase").html();
-						var template = Handlebars.compile(source);
-						try{
-							JSON.parse(response.testcasesteps);
-						}
-						catch(err){
-							response.testcasesteps = '[]';
-						}
-						var dat = template({name:[{testcasename:response.testcasename}],rows:JSON.parse(response.testcasesteps)});
-						var newWindow = window.open();
-						newWindow.document.write(dat);
-					},
-					function(error) {});
-					//alert( "Handler for .click() called." );
-			  });	
+					if (response == "Invalid Session") {
+						$rootScope.redirectPage();
+					}
+					var source = $("#handlebar-template-testcase").html();
+					var template = Handlebars.compile(source);
+					try{
+						JSON.parse(response.testcasesteps);
+					}
+					catch(err){
+						response.testcasesteps = '[]';
+					}
+					var dat = template({name:[{testcasename:response.testcasename}],rows:JSON.parse(response.testcasesteps)});
+					var newWindow = window.open();
+					newWindow.document.write(dat);
+				},
+				function(error) {});
+				//alert( "Handler for .click() called." );
+			});	
 	
 		},
 		function(error){
@@ -795,29 +790,18 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		else if($(".exe-ExecuteStatus input:checked").length == 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute")
 		else{
 			//if(appType == "SAP") browserTypeExe = ["1"];
-			blockUI("Execution in progress. Please Wait...")
+			blockUI("Execution in progress. Please Wait...");
+			executionActive = true;
 			ExecutionService.ExecuteTestSuite_ICE($scope.moduleInfo)
 			.then(function(data){
-				if(data == "Invalid Session"){
+				if (data == "begin") return false;
+				executionActive = false;
+				if (data == "Invalid Session") {
 					$rootScope.redirectPage();
-				}
-				if(data == "Terminate"){
-					$('#executionTerminated').modal('show');
-					$('#executionTerminated').find('.btn-default').focus();
-				}
-				else if(data == "unavailableLocalServer"){
+				} else if(data == "unavailableLocalServer"){
 					openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg)
-					//$('#executionserverunavailable').modal('show');
-				}
-				else if(data == "scheduleModeOn")
-				{
+				} else if(data == "scheduleModeOn") {
 					openDialogExe("Execute Test Suite", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
-				}
-				else{
-					$('#executionCompleted').modal('show');
-					setTimeout(function(){
-						$("#executionCompleted").find('.btn-default').focus();
-					}, 300);
 				}
 				unblockUI()
 				$(".selectBrowser").find("img").removeClass("sb");
@@ -832,11 +816,11 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				// infoArr.push({"status" : data});
 				// labelArr.push(txnHistory.codesDict['ExecuteTestSuite']);
 				// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
-
 			},
 			function(error){
 				unblockUI()
 				openDialogExe("Execute Failed", "Failed to execute.")
+				executionActive = false;
 				//$('#executionFailed').modal('show');
 				$(".selectBrowser").find("img").removeClass("sb");
 				browserTypeExe = [];
@@ -846,8 +830,28 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			})
 		}
 	}
-	//Execute TestSuite Functionality
 
+	socket.on('result_ExecutionDataInfo', function (data) {
+		if (!executionActive) return false;
+		if(data == "Terminate"){
+			$('#executionTerminated').modal('show');
+			$('#executionTerminated').find('.btn-default').focus();
+		} else if(data == "unavailableLocalServer"){
+			openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg)
+		} else{
+			$('#executionCompleted').modal('show');
+			setTimeout(function(){
+				$("#executionCompleted").find('.btn-default').focus();
+			}, 300);
+		}
+		unblockUI()
+		$(".selectBrowser").find("img").removeClass("sb");
+		browserTypeExe = [];
+		angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
+		$scope.moduleInfo = [];
+		$("#syncScenario").prop("disabled",true);
+	});
+	//Execute TestSuite Functionality
 
 	//ALM Functionality
 	$(document).on("click", "#syncScenario", function(){
@@ -870,39 +874,39 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	// }
 	// //Submit Task Function
 
-	 $scope.submit_task=function(action,e) {
-        var taskinfo = JSON.parse(window.localStorage['_CT']);
-        var taskid = taskinfo.subTaskId;
-        var taskstatus = taskinfo.status;
-        var version = taskinfo.versionnumber;
-        var batchTaskIDs = taskinfo.batchTaskIDs;
+	$scope.submit_task=function(action,e) {
+		var taskinfo = JSON.parse(window.localStorage['_CT']);
+		var taskid = taskinfo.subTaskId;
+		var taskstatus = taskinfo.status;
+		var version = taskinfo.versionnumber;
+		var batchTaskIDs = taskinfo.batchTaskIDs;
 		var projectId=taskinfo.projectId;
-        if (action != undefined && action == 'reassign') {
-            taskstatus = action;
+		if (action != undefined && action == 'reassign') {
+			taskstatus = action;
 		}
 		
 		//Transaction Activity for Task Submit/Approve/Reassign Button Action
-        // var labelArr = [];
+		// var labelArr = [];
 		// var infoArr = [];
 		
-        mindmapServices.reviewTask(projectId,taskid,taskstatus,version,batchTaskIDs).then(function(result){
-        		if (result == 'fail') {
-                    openDialogExe("Task Submission Error", "Reviewer is not assigned !",true)
-                } else if (taskstatus == 'reassign') {
+		mindmapServices.reviewTask(projectId,taskid,taskstatus,version,batchTaskIDs).then(function(result){
+				if (result == 'fail') {
+					openDialogExe("Task Submission Error", "Reviewer is not assigned !",true)
+				} else if (taskstatus == 'reassign') {
 					openDialogExe("Task Reassignment Success", "Task Reassigned scucessfully!",true);
 					//labelArr.push(txnHistory.codesDict['TaskReassign']);
-                } else if (taskstatus == 'review') {
+				} else if (taskstatus == 'review') {
 					openDialogExe("Task Completion Success", "Task Approved scucessfully!",true);
 					//labelArr.push(txnHistory.codesDict['TaskApprove']);
-                } else {
+				} else {
 					openDialogExe("Task Submission Success", "Task Submitted scucessfully!",true);
 					//labelArr.push(txnHistory.codesDict['TaskSubmit']);
 				}
 				//txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
-        },function(error){
-            console.log(error);
-        })
-    }
+		},function(error){
+			console.log(error);
+		})
+	}
 
 	$scope.submitTaskExecution = function(action){
 		$("#submitTasksExecution").modal("show")
@@ -914,7 +918,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			//$("#submitTasksExecution").find('.modal-footer button')[0].setAttribute('ng-click',"submit_task('reassign')")
 		}
 		else
-        {	$scope.stask = 'approve';
+		{	$scope.stask = 'approve';
 			if($(".submitTaskBtn:visible").text() == 'Approve')
 			{
 				$("#submitTasksExecution").find('.modal-title').text('Approve Task');
@@ -924,7 +928,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				$("#submitTasksExecution").find('.modal-body p').text('Are you sure you want to submit the task ?')
 			}
 			
-        }
+		}
 	}
 
 
@@ -959,10 +963,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		else $("#syncScenario").prop("disabled",true);
 	})
 	//Select Browser Function
-
 	$("#tableActionButtons, .executionTableDnd").delay(500).animate({opacity:"1"}, 500)
-
-	 
 }]);
 
 function loadLocationDetails(scenarioName, scenarioId){
@@ -979,9 +980,9 @@ function openDialogExe(title, body,submitflag){
 		}, 300);
 	}
 	else{
-		 $("#globalTaskSubmit").find('.modal-title').text(title);
-            $("#globalTaskSubmit").find('.modal-body p').text(body);
-            $("#globalTaskSubmit").modal("show");
+		$("#globalTaskSubmit").find('.modal-title').text(title);
+			$("#globalTaskSubmit").find('.modal-body p').text(body);
+			$("#globalTaskSubmit").modal("show");
 	}
 }
 

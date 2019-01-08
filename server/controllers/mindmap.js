@@ -26,7 +26,7 @@ var xlsToCSV = function(workbook,sheetname) {
 
 exports.populateProjects=function(req,res){
 	logger.info("Inside UI service: populateProjects");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		//var d=req.body;
 		var datatosend ='';
 			var reqData={
@@ -52,7 +52,7 @@ exports.populateProjects=function(req,res){
 }
 exports.populateScenarios=function(req,res){
 	logger.info("Inside UI service: populateScenarios");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var moduleId=req.body.moduleId;
 			//var taskID=d.taskId;
 			query={'statement':"MATCH (a{moduleID:'"+moduleId+"'})-[:FMTTS]->(b) RETURN b ORDER BY b.childIndex"};
@@ -84,7 +84,7 @@ exports.populateScenarios=function(req,res){
 
 exports.getProjectTypeMM_Nineteen68=function(req,res){
 	logger.info("Inside UI service: getProjectTypeMM_Nineteen68");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 			var inputs = req.body.projectId;
 			create_ice.getProjectType_Nineteen68(inputs,function(err,result){
 				if(err){
@@ -105,7 +105,7 @@ exports.getProjectTypeMM_Nineteen68=function(req,res){
 
 exports.populateUsers=function(req,res){
 	logger.info("Inside UI service: populateUsers");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var d=req.body;
 		var datatosend ='';
 			admin.getUsers_Nineteen68({prjId:d.projectId},function(err,data){
@@ -128,7 +128,7 @@ exports.populateUsers=function(req,res){
 
 exports.populateReleases=function(req,res){
 	logger.info("Inside UI service: populateReleases");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 			var datatosend ='';
 			var d=req.body;
 			var project_id={projectId: d.projectId};
@@ -152,7 +152,7 @@ exports.populateReleases=function(req,res){
 
 exports.populateCycles=function(req,res){
 	logger.info("Inside UI service: populateCycles");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var datatosend ='';
 			var rel_id={relId : req.body.releaseId};
 			create_ice.getCycleIDs_Nineteen68(rel_id,function(err,data){
@@ -176,7 +176,7 @@ exports.populateCycles=function(req,res){
 
 exports.getCRId=function(req,res){
 	logger.info("Inside UI service: getCRId");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var inputs = { "projectid": req.body.projectid};
 		suite.getCRId(inputs, function (status, result) {
 				res.setHeader('Content-Type', 'application/json');
@@ -195,7 +195,7 @@ exports.getCRId=function(req,res){
 
 exports.checkReuse=function(req,res){
 	logger.info("Inside UI service: checkReuse");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 			var d=req.body;
 			var qData = d.parsedata;
 			var qListReuse = getQueries(qData);
@@ -254,7 +254,7 @@ exports.checkReuse=function(req,res){
 
 exports.getModules=function(req,res){
 	logger.info("Inside UI service: getModules");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var nData=[],qList=[],idDict={};
 		var urlData=req.get('host').split(':');
 		var d=req.body;
@@ -480,7 +480,7 @@ exports.getModules=function(req,res){
 
 exports.reviewTask=function(req,res){
 	logger.info("Inside UI service: reviewTask");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 			var inputs=req.body;
 			var taskID=inputs.taskId;
 			var batchIds=inputs.batchIds;
@@ -618,7 +618,7 @@ function getRenameQueries(map,prjId){
 }
 exports.saveData=function(req,res){
 	logger.info("Inside UI service: saveData");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var tasks =[];
 		var nameDict = {};
 		var nData=[],qList=[],idDict={};
@@ -766,7 +766,7 @@ exports.saveData=function(req,res){
 				if(status!=200){
 					//res.setHeader('Content-Type', 'text');
 					logger.debug(result[0]);
-					logger.error('Error occured in saveData Query');
+					logger.error('Error occurred in saveData Query');
 					result=JSON.stringify(result)
 					if(result.indexOf('Schema.ConstraintValidationFailed')>-1){
 						result='DuplicateModules';
@@ -1036,7 +1036,7 @@ exports.saveData=function(req,res){
 				if(status!=200){
 					//res.setHeader('Content-Type', 'text');
 					logger.debug(result[0]);
-					logger.error('Error occured in saveData Query');
+					logger.error('Error occurred in saveData Query');
 					result=JSON.stringify(result)
 					if(result.indexOf('Schema.ConstraintValidationFailed')>-1){
 						result='DuplicateModules';
@@ -1114,7 +1114,7 @@ exports.saveData=function(req,res){
 
 exports.saveEndtoEndData=function(req,res){
 	logger.info("Inside UI service: saveEndtoEndData");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var nData=[],qList=[],idDict={};
 		var urlData=req.get('host').split(':');
 		var inputs=req.body; 
@@ -1504,7 +1504,7 @@ exports.excelToMindmap = function(req,res){
 
 exports.getScreens=function(req,res){
 	logger.info("Inside UI service: populateScenarios");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var d=req.body;
 		var prjId=d.projectId;
 		var screenList = [];
@@ -1543,117 +1543,84 @@ exports.getScreens=function(req,res){
 
 }
 
-exports.exportToExcel = function(req,res){
+exports.exportToExcel = function (req, res) {
 	logger.info("Writing  Module structure to Excel");
-	if(utils.isSessionActive(req.session)){
-		
+	if (utils.isSessionActive(req)) {
 		var d = req.body;
 		var excelMap = d.excelMap;
 		var dir = './../../excel';
-		var filepath1 = path.join(__dirname,'../../excel');
-		var filePath = path.join(__dirname,'../../excel','samp234.xlsx');
-
-        try {
-			//to remove the created files
-			fs.unlinkSync(path.join(filePath));
-		} catch(e){
-            logger.error("Error in loading excel ",e);
+		var filepath1 = path.join(__dirname, '../../excel');
+		var filePath = path.join(__dirname, '../../excel', 'samp234.xlsx');
+		try {
+			fs.unlinkSync(path.join(filePath)); //to remove the created files
+		} catch (e) {
+			logger.error("Error in loading excel ", e);
 		}
-		try{
-			if (!fs.existsSync(filepath1)){
+		try {
+			if (!fs.existsSync(filepath1)) {
 				console.log("inside directory");
-    				fs.mkdirSync(filepath1);
-					//console.log("created"+dir);
+				fs.mkdirSync(filepath1);
 			}
+		} catch (e) {
+			logger.error("exception in mindmapService: ", ex);
 		}
-		catch(e){
-			logger.error("exception in mindmapService: ",ex);
-		}
-		
-		//create a new workbook file in current working directory
-		var workbook = excelbuilder.createWorkbook("./excel","samp234.xlsx");
-		
-		console.log(excelMap.name);
-		
-		
+
+		var workbook = excelbuilder.createWorkbook("./excel", "samp234.xlsx"); //create a new workbook file in current working directory
+		logger.debug(excelMap.name);
+
 		//create the new worksheet with 10 coloumns and 20 rows
-		var sheet1 = workbook.createSheet('sheet1',10,20);
+		var sheet1 = workbook.createSheet('sheet1', 10, 20);
 		//var dNodes = [];
 		var curr = {};
 		//var dNodes = [];
 		curr = excelMap;
-		
 
-	var sce_row_count = 2;
-	var scr_row_count = 2;
-	var tes_row_count = 2;
+		var sce_row_count = 2;
+		var scr_row_count = 2;
+		var tes_row_count = 2;
 
-	
-	
-	//To fill some data
-
-    sheet1.width(1, 40);sheet1.height(1, 20);sheet1.width(2, 40);sheet1.height(2, 20);
-    sheet1.width(3, 40);sheet1.height(3, 20);sheet1.width(4, 40);sheet1.height(4, 20);
-    sheet1.set(1,1,'Module');sheet1.set(2,1,'Scenario');
-    sheet1.set(3,1,'Screen');sheet1.set(4,1,'Script');
-	var min_tc_idx = 100000;
-	var min_scr_idx = 100000;
-	 sheet1.set(1,2,curr.name);
-	 try{
-     //loop to iterate through number of scenarios
-     for(i=0 ; i<curr.children.length; i++){
-		min_scr_idx = 100000;
-         //loop to iterate through number of screens
-        for(j=0 ; j<curr.children[i].children.length; j++){
-			min_tc_idx = 100000;
-            //loop through number of test cases
-            for(k=0 ; k<curr.children[i].children[j].children.length ; k++){
-				sheet1.set(4,1+parseInt(curr.children[i].children[j].children[k].childIndex),curr.children[i].children[j].children[k].name);
-				if(parseInt(curr.children[i].children[j].children[k].childIndex)<parseInt(min_tc_idx)){
-					min_tc_idx = curr.children[i].children[j].children[k].childIndex;
+		//To fill some data
+		sheet1.width(1, 40);sheet1.height(1, 20);sheet1.width(2, 40);sheet1.height(2, 20);
+		sheet1.width(3, 40);sheet1.height(3, 20);sheet1.width(4, 40);sheet1.height(4, 20);
+		sheet1.set(1, 1, 'Module');sheet1.set(2, 1, 'Scenario');
+		sheet1.set(3, 1, 'Screen');sheet1.set(4, 1, 'Script');
+		var min_tc_idx = 100000;
+		var min_scr_idx = 100000;
+		sheet1.set(1, 2, curr.name);
+		try {
+			//loop to iterate through number of scenarios
+			for (i = 0; i < curr.children.length; i++) {
+				min_scr_idx = 100000;
+				//loop to iterate through number of screens
+				for (j = 0; j < curr.children[i].children.length; j++) {
+					min_tc_idx = 100000;
+					//loop through number of test cases
+					for (k = 0; k < curr.children[i].children[j].children.length; k++) {
+						sheet1.set(4, 1 + parseInt(curr.children[i].children[j].children[k].childIndex), curr.children[i].children[j].children[k].name);
+						if (parseInt(curr.children[i].children[j].children[k].childIndex) < parseInt(min_tc_idx)) {
+							min_tc_idx = curr.children[i].children[j].children[k].childIndex;
+						}
+					}
+					sheet1.set(3, 1 + parseInt(min_tc_idx), curr.children[i].children[j].name);
+					if (parseInt(min_tc_idx) < parseInt(min_scr_idx)) {
+						min_scr_idx = min_tc_idx;
+					}
 				}
+				sheet1.set(2, 1 + parseInt(min_scr_idx), curr.children[i].name);
 			}
-            sheet1.set(3,1+parseInt(min_tc_idx),curr.children[i].children[j].name);			
-			if(parseInt(min_tc_idx)<parseInt(min_scr_idx)){
-				min_scr_idx = min_tc_idx;
-			}
-		}
-		
-		sheet1.set(2,1+parseInt(min_scr_idx),curr.children[i].name);
-	}
-
-
-
-//save it 
-    workbook.save(function(ok){
-        //if(!ok)
-           // workbook.cancel();
-        //else
-			//console.log("workbook created");
-			
-    
-			console.log(__dirname);
-			
-			res.writeHead(200, {
-				'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-				
+			//save it
+			workbook.save(function (ok) {
+				logger.debug(__dirname);
+				res.writeHead(200, {
+					'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+				});
+				var rstream = fs.createReadStream(filePath);
+				rstream.pipe(res);
 			});
-			var rstream = fs.createReadStream(filePath);
-			rstream.pipe(res);
-			
-	});
-	
-
-	
-	
-	  
-}catch(ex){
-	logger.error("exception in mindmapService: ",ex);
-	
-}
-	
-	}
-	else{
+		} catch (ex) {
+			logger.error("exception in mindmapService: ", ex);
+		}
+	} else {
 		logger.error("Invalid session");
 		res.send("Invalid Session");
 	}
