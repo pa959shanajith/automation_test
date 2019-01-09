@@ -12,7 +12,7 @@ var utils = require('../lib/utils');
 exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 	try {
 		logger.info("Inside UI service: Encrypt_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var methodSelected = req.body.encryptionType;
 			var encrytData = req.body.encryptionValue;
 			var encryptedValue,check_encryptionType;
@@ -73,7 +73,7 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 							function (results, response) {
 							// if (err){
 								if(response.statusCode != 200){
-								logger.error("Error occured in encrypt_ICE Error Code : ERRNDAC");
+								logger.error("Error occurred in encrypt_ICE Error Code : ERRNDAC");
 								res.send("fail");
 							}else{
 									// results is an array consisting of messages collected during execution
@@ -133,7 +133,7 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 };
 
 /*exports.pairwise_ICE = function (req, res) {
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var abc = {}
 		abc.key = req.body.dataObj;
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;

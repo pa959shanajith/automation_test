@@ -7,7 +7,7 @@ var utils = require('../lib/utils');
 exports.getCrawlResults = function (req, res) {
 	try {
 		logger.info("Inside UI service: getCrawlResults");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var name = req.session.username;
 			redisServer.redisSubServer.subscribe('ICE2_' + name ,1);
 			var input_url = req.body.url;
@@ -45,7 +45,7 @@ exports.getCrawlResults = function (req, res) {
 								var value = data.value;
 								if (data.onAction == "unavailableLocalServer") {
 									redisServer.redisSubServer.removeListener('message',webCrawlerGo_listener);	
-									logger.error("Error occured in getCrawlResults: Socket Disconnected");
+									logger.error("Error occurred in getCrawlResults: Socket Disconnected");
 									res.send("unavailableLocalServer");
 								} else if (data.onAction == "result_web_crawler") {
 									try {
@@ -90,7 +90,7 @@ exports.getCrawlResults = function (req, res) {
 				});
 			}
 		} else {
-			logger.info("Error occured in the service getCrawlResults: Invalid Session");
+			logger.info("Error occurred in the service getCrawlResults: Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {

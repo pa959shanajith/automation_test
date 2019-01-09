@@ -18,12 +18,12 @@ var utils = require('../lib/utils');
 exports.getUserRoles_Nineteen68 = function (req, res) {
 	try {
 		logger.info("Inside UI service: getUserRoles_Nineteen68");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			logger.info("Calling NDAC Service: getUserRoles_Nineteen68");
 			client.post(epurl + "admin/getUserRoles_Nineteen68",
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in getUserRoles_Nineteen68 Error Code : ERRNDAC");
+					logger.error("Error occurred in getUserRoles_Nineteen68 Error Code : ERRNDAC");
 					res.status(500).send("fail");
 				} else {
 					var rolesList = [];
@@ -35,7 +35,7 @@ exports.getUserRoles_Nineteen68 = function (req, res) {
 				}
 			});
 		} else {
-			logger.error("Error occured in getUserRoles_Nineteen68: Invalid Session");
+			logger.error("Error occurred in getUserRoles_Nineteen68: Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
@@ -48,7 +48,7 @@ exports.getUserRoles_Nineteen68 = function (req, res) {
 exports.manageUserDetails = function(req, res){
 	logger.info("Inside UI Service: manageUserDetails");
 	try{
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var flag = ['2','0','0','0','0','0','0','0','0','0','0'];
 			var salt = bcrypt.genSaltSync(10);
 			var reqData = req.body.user;
@@ -63,23 +63,23 @@ exports.manageUserDetails = function(req, res){
 			inputs.password = (reqData.password || "").trim();
 
 			if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
-				logger.error("Error occured in admin/manageUserDetails: Invalid action.");
+				logger.error("Error occurred in admin/manageUserDetails: Invalid action.");
 				flag[1]='1';
 			}
 			if (!validator.isLength(inputs.username,1,100)) {
-				logger.error("Error occured in admin/manageUserDetails: Invalid User name.");
+				logger.error("Error occurred in admin/manageUserDetails: Invalid User name.");
 				flag[2]='1';
 			}
 			if (action != "create") {
 				inputs.userid = (reqData.userid || "").trim();
 				if (!validator.isUUID(inputs.userid)) {
-					logger.error("Error occured in admin/manageUserDetails: Invalid User ID.");
+					logger.error("Error occurred in admin/manageUserDetails: Invalid User ID.");
 					flag[2]='1';
 				}
 			}
 			if (!inputs.ldapuser && action == "create") {
 				if (validator.isEmpty(inputs.password) && !(inputs.ciuser || validator.isLength(inputs.password,1,12))) {
-					logger.error("Error occured in admin/manageUserDetails: Invalid Password.");
+					logger.error("Error occurred in admin/manageUserDetails: Invalid Password.");
 					flag[5]='1';
 				}
 			}
@@ -92,26 +92,26 @@ exports.manageUserDetails = function(req, res){
 				inputs.defaultrole = (reqData.role || "").trim();
 
 				if (!validator.isLength(inputs.firstname,1,100)) {
-					logger.error("Error occured in admin/manageUserDetails: Invalid First name.");
+					logger.error("Error occurred in admin/manageUserDetails: Invalid First name.");
 					flag[3]='1';
 				}
 				if (!validator.isLength(inputs.lastname,1,100)) {
-					logger.error("Error occured in admin/manageUserDetails: Invalid Last name.");
+					logger.error("Error occurred in admin/manageUserDetails: Invalid Last name.");
 					flag[4]='1';
 				}
 				if (!validator.isLength(inputs.emailid,1,100)) {
-					logger.error("Error occured in admin/manageUserDetails: Email cannot be empty.");
+					logger.error("Error occurred in admin/manageUserDetails: Email cannot be empty.");
 					flag[6]='1';
 				}
 				if (!validator.isUUID(inputs.defaultrole)) {
-					logger.error("Error occured in admin/manageUserDetails: Invalid Primary Role.");
+					logger.error("Error occurred in admin/manageUserDetails: Invalid Primary Role.");
 					flag[7]='1';
 				}
 				if (action == "update") {
 					inputs.additionalroles = reqData.addRole || [];
 					inputs.additionalroles.every(function(e) {
 						if (!validator.isUUID(e)) {
-							logger.error("Error occured in admin/manageUserDetails: Invalid Additional Role.");
+							logger.error("Error occurred in admin/manageUserDetails: Invalid Additional Role.");
 							flag[8]='1';
 							return false;
 						}
@@ -120,11 +120,11 @@ exports.manageUserDetails = function(req, res){
 				if (inputs.ldapuser) {
 					inputs.ldapuser = reqData.ldap || {};
 					if (!inputs.ldapuser.server || validator.isEmpty(inputs.ldapuser.server)) {
-						logger.error("Error occured in admin/manageUserDetails: Invalid LDAP Server.");
+						logger.error("Error occurred in admin/manageUserDetails: Invalid LDAP Server.");
 						flag[9]='1';
 					}
 					if (validator.isEmpty(inputs.ldapuser.user)) {
-						logger.error("Error occured in admin/manageUserDetails: Invalid User Domain Name.");
+						logger.error("Error occurred in admin/manageUserDetails: Invalid User Domain Name.");
 						flag[10]='1';
 					}
 					inputs.ldapuser = JSON.stringify({server:inputs.ldapuser.server,user:inputs.ldapuser.user});
@@ -144,7 +144,7 @@ exports.manageUserDetails = function(req, res){
 			client.post(epurl + "admin/manageUserDetails", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in admin/manageUserDetails Error Code : ERRNDAC");
+					logger.error("Error occurred in admin/manageUserDetails Error Code : ERRNDAC");
 					res.status(500).send("fail");					
 				} else {
 					if(action == 'delete'){
@@ -172,7 +172,7 @@ exports.manageUserDetails = function(req, res){
 			res.send("Invalid Session");
 		}
 	} catch (exception){
-		logger.error("Error occured in admin/manageUserDetails", exception);
+		logger.error("Error occurred in admin/manageUserDetails", exception);
 		res.status(500).send("fail");
 	}
 };
@@ -181,7 +181,7 @@ exports.manageUserDetails = function(req, res){
 exports.getUserDetails = function (req, res) {
 	logger.info("Inside UI Service: getUserDetails");
 	try{
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var action = req.body.action;
 			var userid = req.body.args;
 			logger.info("Calling NDAC Service: getUserDetails");
@@ -196,7 +196,7 @@ exports.getUserDetails = function (req, res) {
 			client.post(epurl + "admin/getUserDetails", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in admin/getUserDetails Error Code : ERRNDAC");
+					logger.error("Error occurred in admin/getUserDetails Error Code : ERRNDAC");
 					res.status(500).send("fail");
 				} else if (result.rows.length == 0) {
 					res.send("empty");
@@ -233,7 +233,7 @@ exports.getUserDetails = function (req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception){
-		logger.error("Error occured in admin/getUserDetails", exception);
+		logger.error("Error occurred in admin/getUserDetails", exception);
 		res.status(500).send("fail");
 	}
 };
@@ -251,7 +251,7 @@ exports.getUsers_Nineteen68 = function (req, res) {
 	client.post(epurl + "admin/getUserRoles_Nineteen68", args,
 		function (userrolesresult, userrolesresponse) {
 		if (userrolesresponse.statusCode != 200 || userrolesresult.rows == "fail") {
-			logger.error("Error occured in getUsers_Nineteen68 Error Code : ERRNDAC");
+			logger.error("Error occurred in getUsers_Nineteen68 Error Code : ERRNDAC");
 			res(null, "fail");
 		} else {
 			var inputs = {
@@ -268,7 +268,7 @@ exports.getUsers_Nineteen68 = function (req, res) {
 			client.post(epurl + "admin/getUsers_Nineteen68", args,
 				function (getUsers, response) {
 				if (response.statusCode != 200 || getUsers.rows == "fail") {
-					logger.error("Error occured in getUsers_Nineteen68 Error Code : ERRNDAC");
+					logger.error("Error occurred in getUsers_Nineteen68 Error Code : ERRNDAC");
 					res(null, "fail");
 				} else {
 					logger.info("Users fetched successfully");
@@ -283,7 +283,7 @@ exports.getUsers_Nineteen68 = function (req, res) {
 exports.getDomains_ICE = function getDomains_ICE(req, res) {
 	logger.info("Inside UI service: getDomains_ICE");
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var responsedata = [];
 			var args = {
 				headers: {
@@ -295,7 +295,7 @@ exports.getDomains_ICE = function getDomains_ICE(req, res) {
 				function (result, response) {
 				try {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in getDomains_ICE Error Code : ERRNDAC");
+						logger.error("Error occurred in getDomains_ICE Error Code : ERRNDAC");
 						res.send("fail");
 					} else {
 						async.forEachSeries(result.rows, function (eachdomain, domainscallback) {
@@ -335,7 +335,7 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
     //qList = [];
 	try {
 		logger.info("Inside UI service: createProject_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var createProjectObj = req.body.createProjectObj;
 			var userinfo = req.body.userDetails;
 			var requestedskucode = "skucodetestcase";
@@ -385,7 +385,7 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 								function (projectTypeData, response) {
 								try {
 									if (response.statusCode != 200 || projectTypeData.rows == "fail") {
-										logger.error("Error occured in createProject_ICE Error Code : ERRNDAC");
+										logger.error("Error occurred in createProject_ICE Error Code : ERRNDAC");
 									}
 									else {
 										projectTypeId = projectTypeData.rows[0].projecttypeid;
@@ -421,7 +421,7 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 							client.post(epurl + "admin/createProject_ICE", args,
 								function (insertProjectData, response) {
 								if (response.statusCode != 200 || insertProjectData.rows == "fail") {
-									logger.error("Error occured in createProject_ICE from createproject Error Code : ERRNDAC");
+									logger.error("Error occurred in createProject_ICE from createproject Error Code : ERRNDAC");
 								} else {
                                     newProjectID = insertProjectData.rows[0].projectid;
                                     //Execute neo4j query!!
@@ -467,7 +467,7 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 									client.post(epurl + "admin/createProject_ICE", args,
 										function (data, response) {
 										if (response.statusCode != 200 || data.rows == "fail") {
-											logger.error("Error occured in createProject_ICE Error Code : ERRNDAC");
+											logger.error("Error occurred in createProject_ICE Error Code : ERRNDAC");
 										} else {
 											newReleaseID = data.rows[0].releaseid;
                                             //Execute neo4j query!! createrelease
@@ -569,8 +569,8 @@ function createCycle(args, createCycleCallback) {
 		function (result, response) {
 		try {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				statusFlag = "Error occured in createCycle of createProject_ICE : Fail";
-				logger.error("Error occured in createProject_ICE from createCycle Error Code : ERRNDAC");
+				statusFlag = "Error occurred in createCycle of createProject_ICE : Fail";
+				logger.error("Error occurred in createProject_ICE from createCycle Error Code : ERRNDAC");
 				createCycleCallback(statusFlag, null);
 			} else {
 				var newCycleID  = result.rows[0].cycleid;
@@ -603,7 +603,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 	qList=[];
 	try {
 		logger.info("Inside UI Service: updateProject_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var updateProjectDetails = req.body.updateProjectObj;
 			var userinfo = req.body.userDetails;
 			var flag = "";
@@ -1127,7 +1127,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 					}
 				}, function (error, response) {
 					if (error) {
-						logger.error("Error occured in function newProjectDetails");
+						logger.error("Error occurred in function newProjectDetails");
 						res.send("fail");
 					} else {
 						logger.info("Calling neo4jAPI execute queries for updateProject_ICE");
@@ -1166,7 +1166,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 exports.getNames_ICE = function (req, res) {
 	logger.info("Inside UI service: getNames_ICE");
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var requestedidslist = req.body.requestedids;
 			var idtypes = req.body.idtype;
 			var index = 0;
@@ -1290,8 +1290,8 @@ exports.getNames_ICE = function (req, res) {
 					function (queryStringresult, response) {
 					try {
 						if (response.statusCode != 200 || queryStringresult.rows == "fail") {
-							var statusFlag = "Error occured in namesfetcher : Fail";
-							logger.error("Error occured in admin/getNames_ICE from namesfetcher Error Code : ERRNDAC");
+							var statusFlag = "Error occurred in namesfetcher : Fail";
+							logger.error("Error occurred in admin/getNames_ICE from namesfetcher Error Code : ERRNDAC");
 							namesfetchercallback(statusFlag, null);
 						} else {
 							index = index + 1;
@@ -1324,7 +1324,7 @@ exports.getDetails_ICE = function (req, res) {
 	var checkresBody = validator.isJSON(JSON.stringify(req.body));
 	if (checkresBody == true) {
 		try {
-			if (utils.isSessionActive(req.session)) {
+			if (utils.isSessionActive(req)) {
 				var requestedidslist = req.body.requestedids;
 				var idtypes = req.body.idtype;
 				var responsedata = {};
@@ -1345,7 +1345,7 @@ exports.getDetails_ICE = function (req, res) {
 									queryExecutor(requestedid, "domaindetails", "subquery", function (error, response) {
 										if (error) {
 											try {
-												logger.error("Error occured in getDetails_ICE_domaindetails");
+												logger.error("Error occurred in getDetails_ICE_domaindetails");
 												res.send("Error in getDetails_ICE_domaindetails : Fail");
 											} catch (exception) {
 												logger.error(exception.message);
@@ -1501,7 +1501,7 @@ exports.getDetails_ICE = function (req, res) {
 									function (error, response) {
 									if (error) {
 										try {
-											logger.error("Error occured in getDetails_ICE_cycledetails");
+											logger.error("Error occurred in getDetails_ICE_cycledetails");
 											res.send("Error in getDetails_ICE_cycledetails : Fail");
 										} catch (exception) {
 											logger.error(exception.message);
@@ -1556,8 +1556,8 @@ exports.getDetails_ICE = function (req, res) {
 						function (queryStringresult, response) {
 						try {
 							if (response.statusCode != 200 || queryStringresult.rows == "fail") {
-								var statusFlag = "Error occured in queryExecutor : Fail";
-								logger.error("Error occured in getDetails_ICE Error Code : ERRNDAC");
+								var statusFlag = "Error occurred in queryExecutor : Fail";
+								logger.error("Error occurred in getDetails_ICE Error Code : ERRNDAC");
 								queryExecutorcallback(statusFlag, null);
 							} else {
 								index = index + 1;
@@ -1592,7 +1592,7 @@ exports.getDetails_ICE = function (req, res) {
 exports.assignProjects_ICE = function (req, res) {
 	logger.info("Inside UI Service: assignProjects_ICE");
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var assignProjectsDetails = req.body.assignProjectsObj;
 			var projectDetails = assignProjectsDetails.assignedProjects;
 			var projectIds = [];
@@ -1707,7 +1707,7 @@ exports.assignProjects_ICE = function (req, res) {
 exports.getAssignedProjects_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: getAssignedProjects_ICE");
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var requestDetails = req.body.getAssignProj;
 			var assignedProjectIds = [];
 			var assignedProjObj = [];
@@ -1795,7 +1795,7 @@ exports.getAssignedProjects_ICE = function (req, res) {
 exports.getAvailablePlugins = function (req, res) {
 	logger.info("Inside UI service: getAvailablePlugins");
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			client.post(epurl + "admin/getAvailablePlugins",
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
@@ -1816,7 +1816,7 @@ exports.getAvailablePlugins = function (req, res) {
 exports.generateCItoken = function (req, res) {
 	logger.info("Inside UI service: generateCItoken");
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var user_info = {
 				user_name: "ci_user",
 				token: uuid()
@@ -1834,14 +1834,14 @@ exports.generateCItoken = function (req, res) {
 exports.testLDAPConnection = function(req, res){
 	logger.info("Inside UI Service: testLDAPConnection");
 	try{
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var reqData = req.body;
 			var ldapURL = (reqData.ldapURL || "").trim();
 			if (ldapURL.slice(0,8) == "ldaps://") {
-				logger.error("Error occured in admin/testLDAPConnection: 'ldaps' protocol is not supported.");
+				logger.error("Error occurred in admin/testLDAPConnection: 'ldaps' protocol is not supported.");
 				res.send("invalid_url_protocol");
 			} else if (ldapURL.slice(0,7) != "ldap://") {
-				logger.error("Error occured in admin/testLDAPConnection: Invalid URL provided for connection test.");
+				logger.error("Error occurred in admin/testLDAPConnection: Invalid URL provided for connection test.");
 				res.send("invalid_url");
 			}
 			var baseDN = (reqData.baseDN || "").trim();
@@ -1878,7 +1878,7 @@ exports.testLDAPConnection = function(req, res){
 						else if (err.lde_message.indexOf("DSID-031007DB") > -1) flag = "invalid_basedn";
 					}
 					else flag = "fail";
-					logger.debug("Error occured in admin/testLDAPConnection: " + JSON.stringify(err));
+					logger.debug("Error occurred in admin/testLDAPConnection: " + JSON.stringify(err));
 				}
 				if (flag == "success") {
 					logger.info('LDAP Connection test passed!');
@@ -1895,7 +1895,7 @@ exports.testLDAPConnection = function(req, res){
 			res.send("invalid_basedn");
 			logger.error('LDAP Connection test failed!');
 		} else {
-			logger.error("Error occured in admin/testLDAPConnection", exception);
+			logger.error("Error occurred in admin/testLDAPConnection", exception);
 			res.status(500).send("fail");
 		}
 	}
@@ -1904,7 +1904,7 @@ exports.testLDAPConnection = function(req, res){
 exports.manageLDAPConfig = function(req, res){
 	logger.info("Inside UI Service: manageLDAPConfig");
 	try{
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var flag = ['1','0','0','0','0','0','0','0','0'];
 			var reqData = req.body.conf;
 			var action = req.body.action;
@@ -1912,11 +1912,11 @@ exports.manageLDAPConfig = function(req, res){
 			inputs.action = action;
 			inputs.name = (reqData.name || "").trim();
 			if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
-				logger.error("Error occured in admin/manageLDAPConfig: Invalid action.");
+				logger.error("Error occurred in admin/manageLDAPConfig: Invalid action.");
 				flag[1] = '1';
 			}
 			if (validator.isEmpty(inputs.name)) {
-				logger.error("Error occured in admin/manageLDAPConfig: LDAP Server Name cannot be empty.");
+				logger.error("Error occurred in admin/manageLDAPConfig: LDAP Server Name cannot be empty.");
 				flag[2] = '1';
 			}
 			if  (action != "delete") {
@@ -1925,33 +1925,33 @@ exports.manageLDAPConfig = function(req, res){
 				inputs.authType = reqData.authType;
 				inputs.fieldMap = reqData.fieldMap || {};
 				if (validator.isEmpty(inputs.ldapURL)) {
-					logger.error("Error occured in admin/manageLDAPConfig: LDAP Server URL cannot be empty.");
+					logger.error("Error occurred in admin/manageLDAPConfig: LDAP Server URL cannot be empty.");
 					flag[3] = '1';
 				} else if (inputs.ldapURL.slice(0,8) == "ldaps://") {
-					logger.error("Error occured in admin/manageLDAPConfig: 'ldaps' protocol is not supported.");
+					logger.error("Error occurred in admin/manageLDAPConfig: 'ldaps' protocol is not supported.");
 					flag[3] = '2';
 				} else if (inputs.ldapURL.slice(0,7) != "ldap://") {
-					logger.error("Error occured in admin/manageLDAPConfig: Invalid URL provided for connection test.");
+					logger.error("Error occurred in admin/manageLDAPConfig: Invalid URL provided for connection test.");
 					flag[3] = '3';
 				}
 				if (validator.isEmpty(inputs.baseDN)) {
-					logger.error("Error occured in admin/manageLDAPConfig: Invalid Base Domain Name.");
+					logger.error("Error occurred in admin/manageLDAPConfig: Invalid Base Domain Name.");
 					flag[4] = '1';
 				}
 				if (validator.isEmpty(inputs.authType)) {
-					logger.error("Error occured in admin/manageLDAPConfig: Invalid Authentication Protocol.");
+					logger.error("Error occurred in admin/manageLDAPConfig: Invalid Authentication Protocol.");
 					flag[5] = '1';
 				}
 				if (inputs.authType == "simple") {
 					inputs.authUser = (reqData.authUser || "").trim();
 					inputs.authKey = (reqData.authKey || "").trim();
 					if (validator.isEmpty(inputs.authUser)) {
-						logger.error("Error occured in admin/manageLDAPConfig: Invalid Bind Domain Name.");
+						logger.error("Error occurred in admin/manageLDAPConfig: Invalid Bind Domain Name.");
 						flag[6] = '1';
 					}
 					if (validator.isEmpty(inputs.authKey)) {
 						if (action == "create") {
-							logger.error("Error occured in admin/manageLDAPConfig: Invalid Bind Credentials.");
+							logger.error("Error occurred in admin/manageLDAPConfig: Invalid Bind Credentials.");
 							flag[7] = '1';
 						} else {
 							delete inputs.authKey;
@@ -1959,7 +1959,7 @@ exports.manageLDAPConfig = function(req, res){
 					}
 				}
 				if (!inputs.fieldMap.uName || !inputs.fieldMap.fName || !inputs.fieldMap.lName || !inputs.fieldMap.email) {
-					logger.error("Error occured in admin/manageLDAPConfig: Invalid Field Map.");
+					logger.error("Error occurred in admin/manageLDAPConfig: Invalid Field Map.");
 					flag[8] = '1';
 				} else inputs.fieldMap = JSON.stringify(inputs.fieldMap);
 			}
@@ -1977,7 +1977,7 @@ exports.manageLDAPConfig = function(req, res){
 			client.post(epurl + "admin/manageLDAPConfig", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in admin/manageLDAPConfig Error Code : ERRNDAC");
+					logger.error("Error occurred in admin/manageLDAPConfig Error Code : ERRNDAC");
 					res.status(500).send("fail");
 				} else {
 					return res.send(result.rows);
@@ -1987,7 +1987,7 @@ exports.manageLDAPConfig = function(req, res){
 			res.send("Invalid Session");
 		}
 	} catch (exception){
-		logger.error("Error occured in admin/manageLDAPConfig", exception);
+		logger.error("Error occurred in admin/manageLDAPConfig", exception);
 		res.status(500).send("fail");
 	}
 };
@@ -1995,7 +1995,7 @@ exports.manageLDAPConfig = function(req, res){
 exports.getLDAPConfig = function(req, res){
 	logger.info("Inside UI Service: getLDAPConfig");
 	try{
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var action = req.body.action;
 			var name = req.body.args;
 			var opts = (req.body.opts || "").trim();
@@ -2011,7 +2011,7 @@ exports.getLDAPConfig = function(req, res){
 			client.post(epurl + "admin/getLDAPConfig", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in admin/getLDAPConfig Error Code : ERRNDAC");
+					logger.error("Error occurred in admin/getLDAPConfig Error Code : ERRNDAC");
 					res.status(500).send("fail");
 				} else if (result.rows.length == 0) {
 					res.send("empty");
@@ -2048,10 +2048,10 @@ exports.getLDAPConfig = function(req, res){
 									resSent = !resSent;
 									if (err) {
 										if (err.lde_message.indexOf("DSID-031522C9") > -1) {
-											logger.error("Error occured in admin/getLDAPConfig: Fetch User Details: Insufficient Access");
+											logger.error("Error occurred in admin/getLDAPConfig: Fetch User Details: Insufficient Access");
 											data = "insufficient_access";
 										} else {
-											logger.error("Error occured in admin/getLDAPConfig: Fetch User Details:", err.lde_message);
+											logger.error("Error occurred in admin/getLDAPConfig: Fetch User Details:", err.lde_message);
 											logger.debug("ERROR: " + JSON.stringify(err));
 											data = "server_error";
 										}
@@ -2065,7 +2065,7 @@ exports.getLDAPConfig = function(req, res){
 											ldapname: result.dn
 										};
 									} else {
-										logger.error("Error occured in admin/getLDAPConfig: Fetch User Details: User not Found");
+										logger.error("Error occurred in admin/getLDAPConfig: Fetch User Details: User not Found");
 										data = "empty";
 									}
 									return res.send(data);
@@ -2077,10 +2077,10 @@ exports.getLDAPConfig = function(req, res){
 									resSent = !resSent;
 									if (err) {
 										if (err.lde_message.indexOf("DSID-031522C9") > -1) {
-											logger.error("Error occured in admin/getLDAPConfig: Fetch Users: Insufficient Access");
+											logger.error("Error occurred in admin/getLDAPConfig: Fetch Users: Insufficient Access");
 											data = "insufficient_access";
 										} else {
-											logger.error("Error occured in admin/getLDAPConfig: Fetch Users:", err.lde_message);
+											logger.error("Error occurred in admin/getLDAPConfig: Fetch Users:", err.lde_message);
 											logger.debug("ERROR: " + JSON.stringify(err));
 											data = "server_error";
 										}
@@ -2100,7 +2100,7 @@ exports.getLDAPConfig = function(req, res){
 											data.push([users[i].cn, users[i].dn]);
 										}
 									} else {
-										logger.error("Error occured in admin/getLDAPConfig: Fetch Users: No users Found");
+										logger.error("Error occurred in admin/getLDAPConfig: Fetch Users: No users Found");
 										data = "empty";
 									}
 									return res.send(data);
@@ -2121,7 +2121,7 @@ exports.getLDAPConfig = function(req, res){
 			res.send("Invalid Session");
 		}
 	} catch (exception){
-		logger.error("Error occured in admin/getLDAPConfig", exception);
+		logger.error("Error occurred in admin/getLDAPConfig", exception);
 		res.status(500).send("fail");
 	}
 };
@@ -2129,7 +2129,7 @@ exports.getLDAPConfig = function(req, res){
 exports.manageSessionData = function (req, res) {
 	logger.info("Inside UI service: manageSessionData");
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var currUser = req.session.username;
 			var action = req.body.action;
 			var user = req.body.user;

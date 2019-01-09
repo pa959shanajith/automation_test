@@ -5,7 +5,7 @@ var utils = require('../lib/utils');
 //getProjectIds
 exports.getProjectIDs_Nineteen68 = function (req, res) {
 	logger.info("Inside UI service: getProjectIDs_Nineteen68");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		logger.info("Calling UI Service getProjectIDs_Nineteen68 from create_ice");
 		var obj = req.body;
 		obj.userid = req.session.userid;

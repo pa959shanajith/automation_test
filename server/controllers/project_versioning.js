@@ -10,7 +10,7 @@ var utils = require('../lib/utils');
 
 exports.getVersions=function(req,res){
 	logger.info("Inside UI service: getVersions");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var prjId = req.body.projectId;
 		var urlData = req.get('host').split(':');
 		logger.info('Inside the getVersion task of UI Service versioning ');
@@ -18,7 +18,7 @@ exports.getVersions=function(req,res){
 		logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
 				neo4jAPI.executeQueries(qList, function (status, result) {
 				if (status != 200) {
-					logger.error("Error occured in project_versioning/versioning: versioning service",status);
+					logger.error("Error occurred in project_versioning/versioning: versioning service",status);
 					res.status(status).send(result);
 				}
 				else {
@@ -30,7 +30,7 @@ exports.getVersions=function(req,res){
 						logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
 						neo4jAPI.executeQueries(qList, function (status, result) {
 							if (status != 200){
-								logger.error("Error occured in project_versioning/versioning: versioning service",status);
+								logger.error("Error occurred in project_versioning/versioning: versioning service",status);
 								res.status(status).send(result);
 							}
 							else {
@@ -58,7 +58,7 @@ exports.getVersions=function(req,res){
 
 exports.getModulesVersioning=function(req,res){
 	logger.info("Inside UI service: getModulesVersioning");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 			logger.info('Inside the getModules task of UI Service versioning ')
 			var nData = [], qList = [], idDict = {};
 			var inputs=req.body;
@@ -73,7 +73,7 @@ exports.getModulesVersioning=function(req,res){
 			neo4jAPI.executeQueries(qList, function (status, result) {
 				res.setHeader('Content-Type', 'application/json');
 				if (status != 200){
-					logger.error("Error occured in project_versioning/versioning: versioning service",status);
+					logger.error("Error occurred in project_versioning/versioning: versioning service",status);
 					res.status(status).send(result);
 				}
 				else {
@@ -100,7 +100,7 @@ exports.getModulesVersioning=function(req,res){
 										nData.push({ id: n.id_n, oid: n.id, task: n.t, batchName: n.bn, assignedTo: n.at, reviewer: n.rw, startDate: n.sd, endDate: n.ed,re_estimation: n.re_estimation, release: n.re, cycle: n.cy, details: n.det, nodeID: n.pid, parent: n.anc.slice(1, -1).split(','), vn: n.taskvn ,cx:n.cx});
 									}
 									catch (ex) {
-										logger.error("Error occured in project_versioning/versioning: versioning service",ex);
+										logger.error("Error occurred in project_versioning/versioning: versioning service",ex);
 									}
 								}
 								else {
@@ -160,7 +160,7 @@ exports.getModulesVersioning=function(req,res){
 
 exports.createVersion=function(req,res){
 	logger.info("Inside UI service: createVersion");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 			var nData = [];
 			var inputs=req.body;
 			var prjId = inputs.srcprojectId;
@@ -186,7 +186,7 @@ exports.createVersion=function(req,res){
 			neo4jAPI.executeQueries(qList, function (status, result) {
 				res.setHeader('Content-Type', 'application/json');
 				if (status != 200) {
-					logger.error("Error occured in project_versioning/versioning: versioning service",status);
+					logger.error("Error occurred in project_versioning/versioning: versioning service",status);
 					res.status(status).send(result);
 				}else {
 					var k = 0, rIndex, lbl, neoIdDict = {};
@@ -301,7 +301,7 @@ exports.createVersion=function(req,res){
 					neo4jAPI.executeQueries(qList, function (status, result) {
 						res.setHeader('Content-Type', 'application/json');
 						if (status != 200) {
-							logger.error("Error occured in project_versioning/versioning: versioning service",status);
+							logger.error("Error occurred in project_versioning/versioning: versioning service",status);
 							res.status(status).send(result);
 						}else {
 							var qObj = { "projectId": prjId,"oldprojectId":tmpprjId,"action":true, "testsuiteDetails": [], userRole: userRole, from_version: parseFloat(vn_from), new_version: vn_to };
@@ -349,7 +349,7 @@ exports.createVersion=function(req,res){
 									logger.info("Calling createStructure_Nineteen68 node Service from versioning: project_versioning/versioning");
 									create_ice.createStructure_Nineteen68(qObj, function (err, data) {
 										if (err){
-											logger.error("Error occured in project_versioning/versioning: versioning service",err);
+											logger.error("Error occurred in project_versioning/versioning: versioning service",err);
 											res.status(500).send(err);
 										}else {
 											datatosend = data;
@@ -359,7 +359,7 @@ exports.createVersion=function(req,res){
 										logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
 										neo4jAPI.executeQueries(parsing_result[0], function (status, result) {
 											if (status != 200) {
-											logger.error("Error occured in project_versioning/versioning: versioning service",status);
+											logger.error("Error occurred in project_versioning/versioning: versioning service",status);
 											res.status(status).send(result);
 										}maincallback();
 										});
@@ -392,14 +392,14 @@ exports.createVersion=function(req,res){
 }
 exports.getProjectsNeo=function(req,res){
 	logger.info("Inside UI service: getProjectsNeo");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var qList = [];
 		qList.push({ "statement": "MATCH (n:MODULES) return distinct n.projectID" });
 		logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
 		neo4jAPI.executeQueries(qList, function (status, result) {
 			res.setHeader('Content-Type', 'application/json');
 			if (status != 200){
-				logger.error("Error occured in project_versioning/versioning: versioning service",result);
+				logger.error("Error occurred in project_versioning/versioning: versioning service",result);
 				res.status(status).send('Fail');
 			}else {
 				res.status(status).send(result);
@@ -433,7 +433,7 @@ function getRenameQueries(map,prjId,vn_from,createdOn){
 }
 exports.saveDataVersioning=function(req,res){
 	logger.info("Inside UI service: saveDataVersioning");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		logger.info('Inside the UI Service saveDataVersioning')
 			var tasks =[];
 			var nameDict = {};
@@ -648,7 +648,7 @@ exports.saveDataVersioning=function(req,res){
 				neo4jAPI.executeQueries(qList, function (status, result) {
 					res.setHeader('Content-Type', 'application/json');
 					if (status != 200) {
-						logger.error("Error occured in project_versioning/versioning: versioning service",status);
+						logger.error("Error occurred in project_versioning/versioning: versioning service",status);
 						res.status(status).send(result);
 					}
 					else {
@@ -732,7 +732,7 @@ exports.saveDataVersioning=function(req,res){
 				logger.info("Calling createStructure_Nineteen68 node Service from versioning: project_versioning/versioning");
 				create_ice.createStructure_Nineteen68(qObj, function (err, data) {
 					if (err){
-						logger.error("Error occured in project_versioning/versioning: versioning service",err);
+						logger.error("Error occurred in project_versioning/versioning: versioning service",err);
 						res.status(500).send(err);
 					}else {
 						datatosend = data;
@@ -743,7 +743,7 @@ exports.saveDataVersioning=function(req,res){
 					logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
 					neo4jAPI.executeQueries(parsing_result[0], function (status, result) {
 						if (status != 200){
-							logger.error("Error occured in project_versioning/versioning: versioning service",status);
+							logger.error("Error occurred in project_versioning/versioning: versioning service",status);
 							res.status(status).send(result);
 						}
 						else res.status(200).send(parsing_result[1]);
@@ -846,7 +846,7 @@ var parsing = function (d, module_type, vn, flag) {
 
 		});
 	} catch (ex) {
-		logger.error("Error occured in parsing function:",ex);
+		logger.error("Error occurred in parsing function:",ex);
 	}
 
 	updateJson.push(cassandraId_dict);

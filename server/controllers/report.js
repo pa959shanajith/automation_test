@@ -68,7 +68,7 @@ Handlebars.registerHelper('getDataURI', function(uri) {
 // exports.getMainReport_ICE = function (req, res) {
 // 	logger.info("Inside UI service: getMainReport_ICE");
 // 	try {
-// 		if (utils.isSessionActive(req.session)) {
+// 		if (utils.isSessionActive(req)) {
 // 			var jsrclient = jsreportClient("https://" + req.headers.host + "/reportServer/");
 // 			jsrclient.render({
 // 				template: {
@@ -78,7 +78,7 @@ Handlebars.registerHelper('getDataURI', function(uri) {
 // 				}
 // 			}, function (err, response) {
 // 				if (err) {
-// 					logger.error('Error occured in getMainReport_ICE when trying to render report: %s', err);
+// 					logger.error('Error occurred in getMainReport_ICE when trying to render report: %s', err);
 // 					res.send("fail");
 // 				} else {
 // 					try {
@@ -122,7 +122,7 @@ exports.openScreenShot = function (req, res) {
 					if(name == data.username){
 						redisServer.redisSubServer.removeListener('message',render_screenshot_listener);
 						if (data.onAction == "unavailableLocalServer") {
-							logger.error("Error occured in openScreenShot: Socket Disconnected");
+							logger.error("Error occurred in openScreenShot: Socket Disconnected");
 							if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 								var soc = myserver.socketMapNotify[name];
 								soc.emit("ICEnotAvailable");
@@ -161,7 +161,7 @@ exports.openScreenShot = function (req, res) {
 // exports.renderReport_ICE = function (req, res) {
 // 	logger.info("Inside UI service: renderReport_ICE");
 // 	try {
-// 		if (utils.isSessionActive(req.session)) {
+// 		if (utils.isSessionActive(req)) {
 // 			var finalReports = req.body.finalreports;
 // 			var reportType = req.body.reporttype;
 // 			var shortId = "rkE973-5l";
@@ -182,14 +182,14 @@ exports.openScreenShot = function (req, res) {
 // 				}
 // 			}, function (err, response) {
 // 				if (err) {
-// 					logger.error("Error occured in renderReport_ICE when trying to render report: %s",err);
+// 					logger.error("Error occurred in renderReport_ICE when trying to render report: %s",err);
 // 					res.send("fail");
 // 				} else {
 // 					try {
 // 						logger.info('Reports rendered successfully');
 // 						response.pipe(res);
 // 					} catch (exception) {
-// 						logger.error("Exception occured in renderReport_ICE when trying to render report: %s",exception);
+// 						logger.error("Exception occurred in renderReport_ICE when trying to render report: %s",exception);
 // 						res.send("fail");
 // 					}
 // 				}
@@ -199,14 +199,14 @@ exports.openScreenShot = function (req, res) {
 // 			res.send("Invalid Session");
 // 		}
 // 	} catch (exception) {
-// 		logger.error("Exception occured in renderReport_ICE when trying to render report: %s",exception);
+// 		logger.error("Exception occurred in renderReport_ICE when trying to render report: %s",exception);
 // 		res.send("fail");
 // 	}
 // };
 exports.renderReport_ICE = function (req, res) {
 	logger.info("Inside UI service: renderReport_ICE");
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var finalReports = req.body.finalreports;
 			var reportType = req.body.reporttype;
 			var data = {
@@ -236,13 +236,13 @@ exports.renderReport_ICE = function (req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error("Exception occured in renderReport_ICE when trying to render report: %s",exception);
+		logger.error("Exception occurred in renderReport_ICE when trying to render report: %s",exception);
 		res.send("fail");
 	}
 };
 exports.getAllSuites_ICE = function (req, res) {
 	logger.info("Inside UI service: getAllSuites_ICE");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		//the code below is commented as per the new requirement
 		//ALM #460 - Reports - HTML report takes very long time to open/ hangs when report size is 5MB above
 		// author - vishvas.a modified date:27-Sep-2017
@@ -254,7 +254,7 @@ exports.getAllSuites_ICE = function (req, res) {
 				getprojectdetails(userid, function (getprojectdetailserror, getprojectdetailsresponse) {
 					try {
 						if (getprojectdetailserror) {
-							logger.error("Error occured in the function getprojectdetails: getAllSuites_ICE: Projects");
+							logger.error("Error occurred in the function getprojectdetails: getAllSuites_ICE: Projects");
 							res.send("fail");
 						} else {
 							logger.info("Sending project details from getprojectdetails function of getAllSuites_ICE:Projects");
@@ -276,7 +276,7 @@ exports.getAllSuites_ICE = function (req, res) {
 				getsuitedetails(projectid, function (getsuitedetailserror, getsuitedetailsresponse) {
 					try {
 						if (getsuitedetailserror) {
-							logger.error("Error occured in the function getsuitedetails: getAllSuites_ICE: reports");
+							logger.error("Error occurred in the function getsuitedetails: getAllSuites_ICE: reports");
 							res.send("fail");
 						} else {
 							logger.info("Sending Suite details from getsuitedetails: getAllSuites_ICE: reports");
@@ -321,7 +321,7 @@ exports.getAllSuites_ICE = function (req, res) {
 			client.post(epurl + "reports/getAllSuites_ICE", args,
 				function (allprojectids, response) {
 				if (response.statusCode != 200 || allprojectids.rows == "fail") {
-					logger.error("Error occured in reports/getAllSuites_ICE from getprojectdetails Error Code : ERRNDAC");
+					logger.error("Error occurred in reports/getAllSuites_ICE from getprojectdetails Error Code : ERRNDAC");
 					getprojectdetailscallback("fail", null);
 				} else {
 					try {
@@ -343,7 +343,7 @@ exports.getAllSuites_ICE = function (req, res) {
 								client.post(epurl + "admin/getNames_ICE", args,
 									function (eachprojectdata, response) {
 									if (response.statusCode != 200 || eachprojectdata.rows == "fail") {
-										logger.error("Error occured in admin/getNames_ICE from getprojectdetails Error Code : ERRNDAC");
+										logger.error("Error occurred in admin/getNames_ICE from getprojectdetails Error Code : ERRNDAC");
 										getprojectdetailscallback("fail", null);
 									} else {
 										try {
@@ -402,7 +402,7 @@ exports.getAllSuites_ICE = function (req, res) {
 			client.post(epurl + "reports/getAllSuites_ICE", args,
 				function (allreleaseids, releaseidresponse) {
 				if (releaseidresponse.statusCode != 200 || allreleaseids.rows == "fail") {
-					logger.error("Error occured in reports/getAllSuites_ICE: releases from getsuitedetails Error Code : ERRNDAC");
+					logger.error("Error occurred in reports/getAllSuites_ICE: releases from getsuitedetails Error Code : ERRNDAC");
 					getsuitedetailscallback("fail", null);
 				} else {
 					try {
@@ -425,7 +425,7 @@ exports.getAllSuites_ICE = function (req, res) {
 								client.post(epurl + "reports/getAllSuites_ICE", args,
 									function (allcycleids, cycleidresponse) {
 									if (cycleidresponse.statusCode != 200 || allcycleids.rows == "fail") {
-										logger.error("Error occured in reports/getAllSuites_ICE: cycles from getsuitedetails Error Code : ERRNDAC");
+										logger.error("Error occurred in reports/getAllSuites_ICE: cycles from getsuitedetails Error Code : ERRNDAC");
 										getsuitedetailscallback("fail", null);
 									} else {
 										try {
@@ -449,7 +449,7 @@ exports.getAllSuites_ICE = function (req, res) {
 														client.post(epurl + "admin/getDetails_ICE", args,
 															function (allsuitesdata, allsuitesresponse) {
 															if (allsuitesresponse.statusCode != 200 || allsuitesdata.rows == "fail") {
-																logger.error("Error occured in reports/getAllSuites_ICE: cycledetails from getsuitedetails Error Code : ERRNDAC");
+																logger.error("Error occurred in reports/getAllSuites_ICE: cycledetails from getsuitedetails Error Code : ERRNDAC");
 																getsuitedetailscallback("fail", null);
 															} else {
 																try {
@@ -521,7 +521,7 @@ exports.getAllSuites_ICE = function (req, res) {
 exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 	logger.info("Inside UI service: getSuiteDetailsInExecution_ICE");
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var req_testsuiteId = req.body.testsuiteid;
 			var startTime, endTime, starttime, endtime;
 			var executionDetailsJSON = [];
@@ -539,7 +539,7 @@ exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 				function (executionData, response) {
 				try {
 					if (response.statusCode != 200 || executionData.rows == "fail") {
-						logger.error("Error occured in the service getSuiteDetailsInExecution_ICE: reports/getSuiteDetailsInExecution_ICE");
+						logger.error("Error occurred in the service getSuiteDetailsInExecution_ICE: reports/getSuiteDetailsInExecution_ICE");
 						res.send("fail");
 					} else {
 						for (var i = 0; i < executionData.rows.length; i++) {
@@ -577,7 +577,7 @@ exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 exports.reportStatusScenarios_ICE = function (req, res) {
 	logger.info("Inside UI service: reportStatusScenarios_ICE");
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var req_executionId = req.body.executionId;
 			var req_testsuiteId = req.body.testsuiteId;
 			var reportList = [];
@@ -599,7 +599,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 					client.post(epurl + "reports/reportStatusScenarios_ICE", args,
 						function (result, response) {
 						if (response.statusCode != 200 || result.rows == "fail") {
-							logger.error("Error occured in the service reportStatusScenarios_ICE - executiondetails: reports/reportStatusScenarios_ICE");
+							logger.error("Error occurred in the service reportStatusScenarios_ICE - executiondetails: reports/reportStatusScenarios_ICE");
 							var flag = "fail";
 							res.send(flag);
 						} else {
@@ -630,7 +630,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 									client.post(epurl + "reports/reportStatusScenarios_ICE", args,
 										function (scenarioNameDetails, response) {
 										if (response.statusCode != 200 || scenarioNameDetails.rows == "fail") {
-											logger.error("Error occured in the service reportStatusScenarios_ICE - scenarioname: reports/reportStatusScenarios_ICE");
+											logger.error("Error occurred in the service reportStatusScenarios_ICE - scenarioname: reports/reportStatusScenarios_ICE");
 											var flag = "fail";
 											res.send(flag);
 										} else {
@@ -664,7 +664,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 			},
 			function (err, results) {
 				if (err) {
-					logger.error("Error occured in the service reportStatusScenarios_ICE: final function: %s", err);
+					logger.error("Error occurred in the service reportStatusScenarios_ICE: final function: %s", err);
 					res.send("fail");
 				} else {
 					if (report.length > 0) {
@@ -706,7 +706,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 exports.getReport_Nineteen68 = function (req, res) {
 	logger.info("Inside UI service: getReport_Nineteen68");
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var reportId = req.body.reportId;
 			var testsuiteId = req.body.testsuiteId;
 			var testsuitename = req.body.testsuitename;
@@ -730,7 +730,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 						function (reportResult, response) {
 						if (response.statusCode != 200 || reportResult.rows == "fail") {
 							flag = "fail";
-							logger.error("Error occured in the service getReport_Nineteen68 - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports. Error Code : ERRNDAC");
+							logger.error("Error occurred in the service getReport_Nineteen68 - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports. Error Code : ERRNDAC");
 							res.send(flag);
 						} else {
 							var reportres = reportResult.rows.length;
@@ -757,7 +757,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 									client.post(epurl + "reports/getReport_Nineteen68", args,
 										function (scenarioResult, response) {
 										if (response.statusCode != 200 || scenarioResult.rows == "fail") {
-											logger.error("Error occured in the service getReport_Nineteen68 - scenariodetails: Failed to get scenario name and projectId from scenarios.");
+											logger.error("Error occurred in the service getReport_Nineteen68 - scenariodetails: Failed to get scenario name and projectId from scenarios.");
 										} else {
 											async.forEachSeries(scenarioResult.rows, function (sceiditr, callback2) {
 												try {
@@ -779,7 +779,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 													client.post(epurl + "reports/getReport_Nineteen68", args,
 														function (suiteResult, response) {
 														if (response.statusCode != 200 || suiteResult.rows == "fail") {
-															logger.error("Error occured in the service getReport_Nineteen68 - cycleid: Failed to get cycle Ids from test suites.");
+															logger.error("Error occurred in the service getReport_Nineteen68 - cycleid: Failed to get cycle Ids from test suites.");
 														} else {
 															async.forEachSeries(suiteResult.rows, function (suiteiditr, callback3) {
 																try {
@@ -812,7 +812,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 																	client.post(epurl + "reports/getReport_Nineteen68", args,
 																		function (cycleResult, response) {
 																		if (response.statusCode != 200 || cycleResult.rows == "fail") {
-																			logger.error("Error occured in the service getReport_Nineteen68 - cycledetails: Failed to get cycle name and releaseId from cycles.");
+																			logger.error("Error occurred in the service getReport_Nineteen68 - cycledetails: Failed to get cycle name and releaseId from cycles.");
 																		} else {
 																			async.forEachSeries(cycleResult.rows, function (cycleiditr, callback4) {
 																				try {
@@ -835,7 +835,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 																					client.post(epurl + "reports/getReport_Nineteen68", args,
 																						function (releaseResult, response) {
 																						if (response.statusCode != 200 || releaseResult.rows == "fail") {
-																							logger.error("Error occured in the service getReport_Nineteen68 - releasedetails: Failed to get release name and projectsId from releases.");
+																							logger.error("Error occurred in the service getReport_Nineteen68 - releasedetails: Failed to get release name and projectsId from releases.");
 																						} else {
 																							async.forEachSeries(releaseResult.rows, function (reliditr, callback5) {
 																								try {
@@ -858,7 +858,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 																									client.post(epurl + "reports/getReport_Nineteen68", args,
 																										function (projectResult, response) {
 																										if (response.statusCode != 200 || projectResult.rows == "fail") {
-																											logger.error("Error occured in the service getReport_Nineteen68 - projectdetails: Failed to get project name and domainId from projects.");
+																											logger.error("Error occurred in the service getReport_Nineteen68 - projectdetails: Failed to get project name and domainId from projects.");
 																										} else {
 																											async.forEachSeries(projectResult.rows, function (proiditr, callback6) {
 																												try {
@@ -880,7 +880,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 																													client.post(epurl + "reports/getReport_Nineteen68", args,
 																														function (domainResult, response) {
 																														if (response.statusCode != 200 || domainResult.rows == "fail") {
-																															logger.error("Error occured in the service getReport_Nineteen68 - domaindetails: Failed to get domain name from domains.");
+																															logger.error("Error occurred in the service getReport_Nineteen68 - domaindetails: Failed to get domain name from domains.");
 																														} else {
 																															async.forEachSeries(domainResult.rows, function (domainiditr, callback7) {
 																																try {
@@ -941,7 +941,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 			},
 				function (err, results) {
 				if (err) {
-					logger.error("Error occured in the service getReport_Nineteen68: final function: %s",err);
+					logger.error("Error occurred in the service getReport_Nineteen68: final function: %s",err);
 					cb(err);
 					res.send("fail");
 				} else {
@@ -957,7 +957,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error("Exception occured in the service getReport_Nineteen68: %s",exception);
+		logger.error("Exception occurred in the service getReport_Nineteen68: %s",exception);
 		res.send("fail");
 	}
 };
@@ -965,7 +965,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 exports.exportToJson_ICE = function (req, res) {
 	logger.info("Inside UI service: exportToJson_ICE");
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var reportId = req.body.reportId;
 			var reportInfoObj = {};
 			async.series({
@@ -1086,7 +1086,7 @@ exports.exportToJson_ICE = function (req, res) {
 exports.connectJira_ICE = function (req, res) {
 	logger.info("Inside UI service: connectJira_ICE");
 	try{
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var name = req.session.username;
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			if(req.body.action == 'loginToJira'){ //Login to Jira for creating issues
@@ -1115,7 +1115,7 @@ exports.connectJira_ICE = function (req, res) {
 									if(name == data.username){
 										redisServer.redisSubServer.removeListener("message",jira_login_1_listener);
 										if (data.onAction == "unavailableLocalServer") {
-											logger.error("Error occured in connectJira_ICE - loginToJira: Socket Disconnected");
+											logger.error("Error occurred in connectJira_ICE - loginToJira: Socket Disconnected");
 											if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 												var soc = myserver.socketMapNotify[name];
 												soc.emit("ICEnotAvailable");
@@ -1146,7 +1146,7 @@ exports.connectJira_ICE = function (req, res) {
 									if (found) flag = "scheduleModeOn";
 									else {
 										flag = "unavailableLocalServer";
-										logger.error("Error occured in the service connectJira_ICE - loginToJira: Socket not Available");
+										logger.error("Error occurred in the service connectJira_ICE - loginToJira: Socket not Available");
 									}
 									res.send(flag);
 								});
@@ -1157,7 +1157,7 @@ exports.connectJira_ICE = function (req, res) {
 					}
 				}
 				else{
-					logger.error("Error occured in the service connectJira_ICE - loginToJira: Invalid inputs");
+					logger.error("Error occurred in the service connectJira_ICE - loginToJira: Invalid inputs");
 					res.send("Fail");
 				}
 			}
@@ -1179,7 +1179,7 @@ exports.connectJira_ICE = function (req, res) {
 									if(name == data.username){
 										redisServer.redisSubServer.removeListener("message",jira_login_2_listener);
 										if (data.onAction == "unavailableLocalServer") {
-											logger.error("Error occured in connectJira_ICE - createIssueInJira: Socket Disconnected");
+											logger.error("Error occurred in connectJira_ICE - createIssueInJira: Socket Disconnected");
 											if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 												var soc = myserver.socketMapNotify[name];
 												soc.emit("ICEnotAvailable");
@@ -1211,7 +1211,7 @@ exports.connectJira_ICE = function (req, res) {
 									if (found) flag = "scheduleModeOn";
 									else {
 										flag = "unavailableLocalServer";
-										logger.error("Error occured in the service connectJira_ICE - createIssueInJira: Socket not Available");
+										logger.error("Error occurred in the service connectJira_ICE - createIssueInJira: Socket not Available");
 									}
 									res.send(flag);
 								});
@@ -1222,12 +1222,12 @@ exports.connectJira_ICE = function (req, res) {
 					}
 				}
 				else{
-					logger.error("Error occured in the service connectJira_ICE - createIssueInJira: Invalid inputs");
+					logger.error("Error occurred in the service connectJira_ICE - createIssueInJira: Invalid inputs");
 					res.send("Fail");
 				}
 			}
 		} else {
-			logger.error("Error occured in the service connectJira_ICE - createIssueInJira: Invalid Session");
+			logger.error("Error occurred in the service connectJira_ICE - createIssueInJira: Invalid Session");
 			res.send("Invalid Session");
 		}
 	}
@@ -1254,7 +1254,7 @@ function updateDbReportData(reportId,executionId,slno,defectId){
 	client.post(epurl + "reports/updateReportData", args,
 	function (reportdata, response) {
 		if (response.statusCode != 200 || reportdata.rows == "fail") {
-			logger.error("Error occured in reports/updateReportData from updateDbReportData Error Code : ERRNDAC");
+			logger.error("Error occurred in reports/updateReportData from updateDbReportData Error Code : ERRNDAC");
 			return false;
 		} else {
 			return true;
@@ -1290,7 +1290,7 @@ exports.getReportsData_ICE = function (req, res) {
 		client.post(epurl + "reports/reportStatusScenarios_ICE", args,
 			function (result3, response3) {
 			if (response3.statusCode != 200 || result3.rows == "fail") {
-				logger.error("Error occured in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
+				logger.error("Error occurred in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
 				res.send("fail");
 			} else {
 				res.send(result3);
@@ -1312,7 +1312,7 @@ exports.getReportsData_ICE = function (req, res) {
 		client.post(epurl + "reports/getAllSuites_ICE", args,
 			function (result1, response1) {
 			if (response1.statusCode != 200 || result1.rows == "fail") {
-				logger.error("Error occured in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
+				logger.error("Error occurred in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
 				res.send("fail");
 			} else {
 				//res.send(result);
@@ -1333,13 +1333,12 @@ exports.getReportsData_ICE = function (req, res) {
 					client.post(epurl + "reports/reportStatusScenarios_ICE", args,
 					function (result2, response2) {
 						if (response2.statusCode != 200 || result2.rows == "fail") {
-							logger.error("Error occured in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
+							logger.error("Error occurred in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
 							res.send("fail");
 						} else {
 							//res.send(result);
 							async.forEachSeries(eachtestsuite.testscenarioids, function (scenarioid, scenariomapcb) {
 							//for (var scenarioid in result2){
-	
 								// var inputs = {
 								// 	"query": "latestreport",
 								// 	"scenarioid": scenarioid,
@@ -1354,7 +1353,7 @@ exports.getReportsData_ICE = function (req, res) {
 								// client.post(epurl + "reports/reportStatusScenarios_ICE", args,
 								// 	function (result3, response3) {
 								// 	if (response3.statusCode != 200 || result3.rows == "fail") {
-								// 		logger.error("Error occured in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
+								// 		logger.error("Error occurred in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
 								// 		res.send("fail");
 								// 	} else {
 								// 		if(result3.rows.length==0){
@@ -1428,7 +1427,7 @@ exports.getReportsData_ICE = function (req, res) {
 		client.post(epurl + "reports/reportStatusScenarios_ICE", args,
 			function (result3, response3) {
 			if (response3.statusCode != 200 || result3.rows == "fail") {
-				logger.error("Error occured in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
+				logger.error("Error occurred in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
 				res.send("fail");
 			} else {
 				if(result3.rows.length==0){

@@ -6,7 +6,7 @@ var utils = require('../lib/utils');
 
 exports.getTopMatches_ProfJ = function getTopMatches(req, res) {
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var query= req.body.userQuery;
 			try{
                     var args = {
@@ -18,7 +18,7 @@ exports.getTopMatches_ProfJ = function getTopMatches(req, res) {
                         function (results, response) {
                         // if (err){
                             if(response.statusCode != 200){
-                            console.log("error occured : ",err);
+                            console.log("error occurred : ",err);
                             res.send("fail");
                         }else{
                                 // results is an array consisting of messages collected during execution 
@@ -50,7 +50,7 @@ exports.getTopMatches_ProfJ = function getTopMatches(req, res) {
 
 exports.updateFrequency_ProfJ = function(req, res) {
 	try {
-		if (utils.isSessionActive(req.session)) {
+		if (utils.isSessionActive(req)) {
 			var qid= req.body.qid;
 			try{
                     var args = {
@@ -63,7 +63,7 @@ exports.updateFrequency_ProfJ = function(req, res) {
                         function (results, response) {
                         // if (err){
                             if(response.statusCode != 200){
-                            console.log("error occured : ",err);
+                            console.log("error occurred : ",err);
                             res.send("fail");
                         }else{
                                 // results is an array consisting of messages collected during execution 
