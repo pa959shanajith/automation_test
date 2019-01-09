@@ -1342,26 +1342,37 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     }
     //WSDL Add Functionality
 
-
+    $("#deviceName, #versionNumber, #bundleId, #ipAddress").hide();
     //Mobile Serial Number Keyup Function
-    $("#mobilityAPKPath").on("keyup", function () {
+    $("#mobilityAPKPath").on("keyup", function() {
         if ($(this).val().toLowerCase().indexOf(".apk") >= 0) {
+			$("#deviceName, #versionNumber, #bundleId, #ipAddress").hide();
             $("#mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").hide();
             $("#mobilitySerialPath").show();
             $(".rightAlign").prop("style", "top: 20px;");
             $("#launchMobilityApps").find(".androidIcon").prop("style", "background: url('../imgs/ic-andrd-active.png') left top no-repeat !important;");
-        } else if ($(this).val().toLowerCase().indexOf(".ipa") >= 0 || $(this).val().toLowerCase().indexOf(".app") >= 0) {
-            if ($(this).val().toLowerCase().indexOf(".app") >= 0) {
-                $("#mobilitySerialPath, #mobilityUDID").hide();
-                $("#mobilityDeviceName, #mobilityiOSVersion").show();
-                $(".rightAlign").prop("style", "top: 20px;");
-            } else if ($(this).val().toLowerCase().indexOf(".ipa") >= 0) {
-                $("#mobilitySerialPath").hide();
-                $("#mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").show();
-                $(".rightAlign").prop("style", "top: -10px;");
-            }
+        } 
+        //  else if ($(this).val().toLowerCase().indexOf(".ipa") >= 0 || $(this).val().toLowerCase().indexOf(".app") >= 0) {
+        //     if ($(this).val().toLowerCase().indexOf(".app") >= 0) {
+        //         $("#mobilitySerialPath, #mobilityUDID").hide();
+        //         $("#mobilityDeviceName, #mobilityiOSVersion").show();
+        //         $(".rightAlign").prop("style", "top: 20px;");
+        //     } else if ($(this).val().toLowerCase().indexOf(".ipa") >= 0) {
+		// 		$("#deviceName, #versionNumber, #bundleId, #ipAddress").hide();
+        //         $("#mobilitySerialPath").hide();
+        //         $("#mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").show();
+        //         $(".rightAlign").prop("style", "top: -10px;");
+        //     }
+		// 	$("#deviceName, #versionNumber, #bundleId, #ipAddress").hide();
+        //     $("#launchMobilityApps").find(".androidIcon").prop("style", "background: url('../imgs/ic-ios-active.png') left top no-repeat !important;");
+        // }
+		else if ($(this).val().toLowerCase().indexOf(".ios") >= 0 ) {
+			$("#deviceName, #versionNumber, #bundleId, #ipAddress").show();
+            $("#mobilitySerialPath").hide();
+
             $("#launchMobilityApps").find(".androidIcon").prop("style", "background: url('../imgs/ic-ios-active.png') left top no-repeat !important;");
-        } else
+		}
+		else
             $("#launchMobilityApps").find(".androidIcon").prop("style", "background: ''");
     })
     //Mobile Serial Number Keyup Function
@@ -1507,39 +1518,67 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             e.stopImmediatePropagation();
                         }
                     }
-                } else if ($("#mobilityAPKPath").val().toLowerCase().indexOf(".ipa") >= 0 || $("#mobilityAPKPath").val().toLowerCase().indexOf(".app") >= 0) {
-                    if ($(document).find("#mobilityAPKPath").val() == "") {
-                        $(document).find("#mobilityAPKPath").addClass("inputErrorBorder")
-                        return false
-                    } else if ($(document).find("#mobilityDeviceName").val() == "") {
-                        $(document).find("#mobilityDeviceName").addClass("inputErrorBorder")
-                        return false
-                    } else if ($(document).find("#mobilityiOSVersion").val() == "") {
-                        $(document).find("#mobilityiOSVersion").addClass("inputErrorBorder")
-                        return false
-                    } else if ($(document).find("#mobilityUDID").val() == "" && $("#mobilityAPKPath").val().toLowerCase().indexOf(".ipa") >= 0) {
-                        $(document).find("#mobilityUDID").addClass("inputErrorBorder")
-                        return false
-                    } else {
-                        $(document).find("#mobilityAPKPath,#mobilityDeviceName,#mobilityiOSVersion,#mobilityUDID").removeClass("inputErrorBorder")
-                        screenViewObject.appType = $scope.getScreenView,
-                            screenViewObject.apkPath = $(document).find("#mobilityAPKPath").val();
-                        screenViewObject.mobileDeviceName = $(document).find("#mobilityDeviceName").val();
-                        screenViewObject.mobileIosVersion = $(document).find("#mobilityiOSVersion").val();
-                        screenViewObject.mobileUDID = $(document).find("#mobilityUDID").val();
-                        $("#launchMobilityApps").modal("hide");
-                        // blockUI(blockMsg);
-                        if ($rootScope.compareFlag == true) {
+                } // else if ($("#mobilityAPKPath").val().toLowerCase().indexOf(".ipa") >= 0 || $("#mobilityAPKPath").val().toLowerCase().indexOf(".app") >= 0) {
+                    //     if ($(document).find("#mobilityAPKPath").val() == "") {
+                    //         $(document).find("#mobilityAPKPath").addClass("inputErrorBorder")
+                    //         return false
+    
+                    //     } else if ($(document).find("#mobilityDeviceName").val() == "") {
+                    //         $(document).find("#mobilityDeviceName").addClass("inputErrorBorder")
+                    //         return false
+    
+                    //     } else if ($(document).find("#mobilityiOSVersion").val() == "") {
+                    //         $(document).find("#mobilityiOSVersion").addClass("inputErrorBorder")
+                    //         return false
+    
+                    //     } else if ($(document).find("#mobilityUDID").val() == "" && $("#mobilityAPKPath").val().toLowerCase().indexOf(".ipa") >= 0) {
+                    //         $(document).find("#mobilityUDID").addClass("inputErrorBorder")
+                    //         return false
+                    //     }
+                    
+                    else if ($("#mobilityAPKPath").val().toLowerCase().indexOf(".ios") >= 0) {
+                                  screenViewObject.appType = $scope.getScreenView;
+                                  screenViewObject.deviceName = $('#deviceName').val();
+                                  screenViewObject.versionNumber = $('#versionNumber').val();
+                                  screenViewObject.bundleId = $('#bundleId').val();
+                                  screenViewObject.ipAddress =  $('#ipAddress').val();
+                                  screenViewObject.param = 'ios';
+                                  $('#launchMobilityApps').modal("hide");
+                                  if( $rootScope.compareFlag == true){
+                                    blockUI(blockMsg2);
+                                    e.stopImmediatePropagation();
+                                }
+                                else{
+                                    blockUI(blockMsg);
+                                    e.stopImmediatePropagation();
+                                }
+                    }
+                    else {
+                            $(document).find("#mobilityAPKPath,#mobilityDeviceName,#mobilityiOSVersion,#mobilityUDID").removeClass("inputErrorBorder")
+                            screenViewObject.appType = $scope.getScreenView,
+                                screenViewObject.apkPath = $(document).find("#mobilityAPKPath").val();
+                            screenViewObject.mobileDeviceName = $(document).find("#mobilityDeviceName").val();
+                            screenViewObject.mobileIosVersion = $(document).find("#mobilityiOSVersion").val();
+                            screenViewObject.mobileUDID = $(document).find("#mobilityUDID").val();
+                            $("#launchMobilityApps").modal("hide");
+                            // blockUI(blockMsg);
+                            if( $rootScope.compareFlag == true){
                             blockUI(blockMsg2);
                             e.stopImmediatePropagation();
+                            }
+                            else{
+                                blockUI(blockMsg);
+                                e.stopImmediatePropagation();
+                                
+                                
+                                
+                                
+                                
+                                
+                            }
                         }
-                        else {
-                            blockUI(blockMsg);
-                            e.stopImmediatePropagation();
-                        }
-                    }
+                    
                 }
-            }
             //For Mobility
 
             //For Mobility Web
@@ -2519,11 +2558,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     d.css('height', (rect.h * scale_highlight) + 'px');
                     d.css('width', (rect.w * scale_highlight) + 'px');
                 } else if (navigator.appVersion.indexOf("Mac") != -1) {
-                    d.css('left', rect.x + 'px');
-                    if (rect.y > 450) d.css('top', (rect.y - 12) + 'px');
-                    else d.css('top', rect.y + 'px');
-                    d.css('height', rect.h + 'px');
-                    d.css('width', rect.w + 'px');
+					d.css('left', (rect.x * scale_highlight) + 'px');
+                    d.css('top', (rect.y * scale_highlight) + 'px');
+                    d.css('height', (rect.h * scale_highlight) + 'px');
+                    d.css('width', (rect.w * scale_highlight) + 'px');
                 }
             } else if (appType == "MobileWeb") {
                 if (navigator.appVersion.indexOf("Mac") != -1) {
@@ -5146,7 +5184,14 @@ function contentTable(newTestScriptDataLS) {
                 custname1 = $('<input>').html(custval).text().trim();
                 scrappedDataCustnames.push(custval);
                 if ((custname1.replace(/\s/g, ' ') == (selectedText.replace('/\s/g', ' ')).replace('\n', ' '))) {
-                    objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
+                    var isIos = scrappedData[i].text;
+                    if(isIos == 'ios')
+                    {
+                        objName = ob.xpath;
+                    }
+                    else{
+					    objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
+					}
                     url = ob.url;
                     var obType = ob.tag;
                     var listType = ob.canselectmultiple;

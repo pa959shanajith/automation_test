@@ -36,7 +36,13 @@ default_sub.on("message", function (channel, message) {
 		break;
 
 	case "LAUNCH_MOBILE":
-		mySocket.emit("LAUNCH_MOBILE", data.apkPath, data.serial, data.mobileDeviceName, data.mobileIosVersion, data.mobileUDID);
+		if(data.param == "ios")
+		{
+			mySocket.emit("LAUNCH_MOBILE", data.deviceName, data.versionNumber, data.bundleId, data.ipAddress, data.param);
+		}
+		else{
+			mySocket.emit("LAUNCH_MOBILE", data.apkPath, data.serial, data.mobileDeviceName, data.mobileIosVersion, data.mobileUDID);
+		}
 		break;
 
 	case "LAUNCH_MOBILE_WEB":
