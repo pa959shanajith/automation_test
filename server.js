@@ -204,7 +204,7 @@ if (cluster.isMaster) {
             var svcStopPending = "STOP_PENDING";
             var svc = req.body.id;
             var batFile = require.resolve("./assets/svc.bat");
-			var execCmd = batFile + " ";
+            var execCmd = batFile + " ";
             try {
                 if (svc == "query") {
                     var svcStatus = [];
