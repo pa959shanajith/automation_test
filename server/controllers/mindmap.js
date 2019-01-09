@@ -26,9 +26,7 @@ var xlsToCSV = function (workbook, sheetname) {
 
 exports.populateProjects = function (req, res) {
 	logger.info("Inside UI service: populateProjects");
-	if (utils.isSessionActive(req.session)) {
-		//var d=req.body;
-		var datatosend = '';
+	if (utils.isSessionActive(req)) {
 		var reqData = {
 			"userid": req.session.userid,
 			"allflag": true
@@ -36,23 +34,21 @@ exports.populateProjects = function (req, res) {
 		create_ice.getProjectIDs_Nineteen68(reqData, function (err, data) {
 			res.setHeader('Content-Type', 'application/json');
 			if (err)
-				res.status(500).send('Fail')
+				res.status(500).send('Fail');
 			else {
-				datatosend = data;
+				res.status(200).send(data);
 			}
-
-			res.status(200).send(datatosend);
 		});
 	}
 	else {
 		logger.error("Invalid Session");
 		res.send("Invalid Session");
 	}
+};
 
-}
 exports.populateScenarios = function (req, res) {
 	logger.info("Inside UI service: populateScenarios");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var moduleId = req.body.moduleId;
 		//var taskID=d.taskId;
 		query = { 'statement': "MATCH (a{moduleID:'" + moduleId + "'})-[:FMTTS]->(b) RETURN b ORDER BY b.childIndex" };
@@ -65,7 +61,7 @@ exports.populateScenarios = function (req, res) {
 				try {
 					res_data = result;
 					res_data[0].data.forEach(function (row) {
-						scenarioList.push(row.row[0])
+						scenarioList.push(row.row[0]);
 					});
 					res.status(200).send(scenarioList);
 				} catch (ex) {
@@ -79,12 +75,11 @@ exports.populateScenarios = function (req, res) {
 		logger.error("Invalid Session");
 		res.send("Invalid Session");
 	}
-
-}
+};
 
 exports.getProjectTypeMM_Nineteen68 = function (req, res) {
 	logger.info("Inside UI service: getProjectTypeMM_Nineteen68");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var inputs = req.body.projectId;
 		create_ice.getProjectType_Nineteen68(inputs, function (err, result) {
 			if (err) {
@@ -99,24 +94,19 @@ exports.getProjectTypeMM_Nineteen68 = function (req, res) {
 		logger.error("Invalid Session");
 		res.send("Invalid Session");
 	}
-
-}
-
+};
 
 exports.populateUsers = function (req, res) {
 	logger.info("Inside UI service: populateUsers");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var d = req.body;
-		var datatosend = '';
 		admin.getUsers_Nineteen68({ prjId: d.projectId }, function (err, data) {
 			res.setHeader('Content-Type', 'application/json');
 			if (err)
-				res.status(500).send('Fail')
+				res.status(500).send('Fail');
 			else {
-				datatosend = data;
+				res.status(200).send(data);
 			}
-
-			res.status(200).send(datatosend);
 		});
 	}
 	else {
@@ -124,59 +114,50 @@ exports.populateUsers = function (req, res) {
 		res.send("Invalid Session");
 	}
 
-}
+};
 
 exports.populateReleases = function (req, res) {
 	logger.info("Inside UI service: populateReleases");
-	if (utils.isSessionActive(req.session)) {
-		var datatosend = '';
+	if (utils.isSessionActive(req)) {
 		var d = req.body;
 		var project_id = { projectId: d.projectId };
 		create_ice.getReleaseIDs_Nineteen68(project_id, function (err, data) {
 			res.setHeader('Content-Type', 'application/json');
 			if (err)
-				res.status(500).send('Fail')
+				res.status(500).send('Fail');
 			else {
-				datatosend = data
+				res.status(200).send(data);
 			}
-
-			res.status(200).send(datatosend);
 		});
 	}
 	else {
 		logger.error("Invalid Session");
 		res.send("Invalid Session");
 	}
-
-}
+};
 
 exports.populateCycles = function (req, res) {
 	logger.info("Inside UI service: populateCycles");
-	if (utils.isSessionActive(req.session)) {
-		var datatosend = '';
+	if (utils.isSessionActive(req)) {
 		var rel_id = { relId: req.body.releaseId };
 		create_ice.getCycleIDs_Nineteen68(rel_id, function (err, data) {
 			res.setHeader('Content-Type', 'application/json');
 			if (err)
-				res.status(500).send(err)
+				res.status(500).send(err);
 			else {
-				datatosend = data;
+				res.status(200).send(data);
 			}
-
-			res.status(200).send(datatosend);
 		});
-
 	}
 	else {
 		logger.error("Invalid Session");
 		res.send("Invalid Session");
 	}
-
-}
+};
 
 exports.getCRId = function (req, res) {
 	logger.info("Inside UI service: getCRId");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var inputs = { "projectid": req.body.projectid };
 		suite.getCRId(inputs, function (status, result) {
 			res.setHeader('Content-Type', 'application/json');
@@ -190,12 +171,11 @@ exports.getCRId = function (req, res) {
 		logger.error("Invalid Session");
 		res.send("Invalid Session");
 	}
-
-}
+};
 
 exports.checkReuse = function (req, res) {
 	logger.info("Inside UI service: checkReuse");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var d = req.body;
 		var qData = d.parsedata;
 		var qListReuse = getQueries(qData);
@@ -206,7 +186,6 @@ exports.checkReuse = function (req, res) {
 				res.status(500).send('Fail');
 			}
 			else {
-
 				if (qData.gettestcases) {
 					res.status(200).send(result[0].data[0].row[0]);
 				}
@@ -240,7 +219,6 @@ exports.checkReuse = function (req, res) {
 							k = k + 1;
 						}
 					}
-
 					res.status(status).send(qData);
 				}
 			}
@@ -250,11 +228,11 @@ exports.checkReuse = function (req, res) {
 		logger.error("Invalid Session");
 		res.send("Invalid Session");
 	}
-}
+};
 
 exports.getModules = function (req, res) {
 	logger.info("Inside UI service: getModules");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var nData = [], qList = [], idDict = {};
 		var urlData = req.get('host').split(':');
 		var d = req.body;
@@ -263,12 +241,11 @@ exports.getModules = function (req, res) {
 		var modName = d.modName;
 		var relId = d.relId;
 		var cycId = d.cycId;
-		var qmod = ''
+		var qmod = '';
 		if (modName == 'fetch all') {
 			if (d.tab == 'tabAssign' || d.tab == 'endToend') {
 				qList.push({ "statement": "MATCH path=(n:MODULES_ENDTOEND{projectID:'" + prjId + "'})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] });
 				qList.push({ "statement": "MATCH path=(n:MODULES_ENDTOEND{projectID:'" + prjId + "'}) WHERE NOT (n)-[:FMTTS]->() RETURN n", "resultDataContents": ["graph"] });
-
 			}
 			qList.push({ "statement": " MATCH path=(n:MODULES{projectID:'" + prjId + "'})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] });
 			qList.push({ "statement": "MATCH path=(n:MODULES{projectID:'" + prjId + "'}) WHERE NOT (n)-[:FMTTS]->() RETURN n", "resultDataContents": ["graph"] });
@@ -281,12 +258,9 @@ exports.getModules = function (req, res) {
 					var k = 0, rIndex = [], lbl, neoIdDict = {}, maps = [], tList = [];
 					var attrDict = { "modules_endtoend": { "childIndex": "childIndex", "projectID": "projectID", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "modules": { "childIndex": "childIndex", "projectID": "projectID", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "scenarios": { "projectID": "projectID", "childIndex": "childIndex", "moduleID": "pid_n", "testScenarioName": "name", "testScenarioID": "id_n", "testScenarioID_c": "id_c" }, "screens": { "projectID": "projectID", "childIndex": "childIndex", "testScenarioID": "pid_n", "screenName": "name", "screenID": "id_n", "screenID_c": "id_c", "taskexists": "taskexists" }, "testcases": { "projectID": "projectID", "childIndex": "childIndex", "screenID": "pid_n", "testCaseName": "name", "testCaseID": "id_n", "testCaseID_c": "id_c", "taskexists": "taskexists" }, "tasks": { "taskID": "id_n", "task": "t", "batchName": "bn", "assignedTo": "at", "reviewer": "rw", "startDate": "sd", "endDate": "ed", "re_estimation": "re_estimation", "release": "re", "cycle": "cy", "details": "det", "nodeID": "pid", "parent": "anc", "cx": "cx" } };
 					var jsonData = result;
-
 					var all_modules = jsonData[0].data;
-
 					if (d.tab == 'tabAssign' || d.tab == 'endToend') {
 						all_modules = jsonData[0].data.concat(jsonData[1].data).concat(jsonData[2].data).concat(jsonData[3].data);
-
 					} else {
 						all_modules = jsonData[0].data.concat(jsonData[1].data);
 					}
@@ -304,7 +278,6 @@ exports.getModules = function (req, res) {
 										nData.push({ id: n.id_n, oid: n.id, task: n.t, batchName: n.bn, assignedTo: n.at, reviewer: n.rw, startDate: n.sd, endDate: n.ed, re_estimation: n.re_estimation, release: n.re, cycle: n.cy, details: n.det, nodeID: n.pid, parent: n.anc.slice(1, -1).split(','), cx: n.cx });
 									}
 									catch (ex) {
-
 										logger.error("exception in mindmapService: ", ex);
 									}
 								}
@@ -328,7 +301,6 @@ exports.getModules = function (req, res) {
 									} else if (nData[srcIndex].type == 'testcases' || nData[srcIndex].type == 'screens') {
 										nData[srcIndex].taskexists = nData[tgtIndex];
 									}
-
 								}
 								else if (nData[srcIndex].children.indexOf(nData[tgtIndex]) == -1) {
 									nData[srcIndex].children.push(nData[tgtIndex]);
@@ -359,7 +331,6 @@ exports.getModules = function (req, res) {
 			if (d.tab == 'tabAssign' || d.tab == 'endToend') {
 				qList.push({ "statement": "MATCH path=(n:MODULES_ENDTOEND{projectID:'" + prjId + "' " + qmod + "})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] });
 				qList.push({ "statement": "MATCH path=(n:MODULES_ENDTOEND{projectID:'" + prjId + "' " + qmod + "}) WHERE NOT (n)-[:FMTTS]->() RETURN n", "resultDataContents": ["graph"] });
-
 			}
 			qList.push({ "statement": " MATCH path=(n:MODULES{projectID:'" + prjId + "' " + qmod + "})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] });
 			qList.push({ "statement": "MATCH path=(n:MODULES{projectID:'" + prjId + "' " + qmod + "}) WHERE NOT (n)-[:FMTTS]->() RETURN n", "resultDataContents": ["graph"] });
@@ -372,12 +343,9 @@ exports.getModules = function (req, res) {
 					var k = 0, rIndex = [], lbl, neoIdDict = {}, maps = [], tList = [];
 					var attrDict = { "modules_endtoend": { "childIndex": "childIndex", "projectID": "projectID", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "modules": { "childIndex": "childIndex", "projectID": "projectID", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "scenarios": { "projectID": "projectID", "childIndex": "childIndex", "moduleID": "pid_n", "testScenarioName": "name", "testScenarioID": "id_n", "testScenarioID_c": "id_c" }, "screens": { "projectID": "projectID", "childIndex": "childIndex", "testScenarioID": "pid_n", "screenName": "name", "screenID": "id_n", "screenID_c": "id_c", "taskexists": "taskexists" }, "testcases": { "projectID": "projectID", "childIndex": "childIndex", "screenID": "pid_n", "testCaseName": "name", "testCaseID": "id_n", "testCaseID_c": "id_c", "taskexists": "taskexists" }, "tasks": { "taskID": "id_n", "task": "t", "batchName": "bn", "assignedTo": "at", "reviewer": "rw", "startDate": "sd", "endDate": "ed", "re_estimation": "re_estimation", "release": "re", "cycle": "cy", "details": "det", "nodeID": "pid", "parent": "anc", "cx": "cx" } };
 					var jsonData = result;
-
 					var all_modules = jsonData[0].data;
-
 					if (d.tab == 'tabAssign' || d.tab == 'endToend') {
 						all_modules = jsonData[0].data.concat(jsonData[1].data).concat(jsonData[2].data).concat(jsonData[3].data);
-
 					} else {
 						all_modules = jsonData[0].data.concat(jsonData[1].data);
 					}
@@ -395,7 +363,6 @@ exports.getModules = function (req, res) {
 										nData.push({ id: n.id_n, oid: n.id, task: n.t, batchName: n.bn, assignedTo: n.at, reviewer: n.rw, startDate: n.sd, endDate: n.ed, re_estimation: n.re_estimation, release: n.re, cycle: n.cy, details: n.det, nodeID: n.pid, parent: n.anc.slice(1, -1).split(','), cx: n.cx });
 									}
 									catch (ex) {
-
 										logger.error("exception in mindmapService: ", ex);
 									}
 								}
@@ -419,7 +386,6 @@ exports.getModules = function (req, res) {
 									} else if (nData[srcIndex].type == 'testcases' || nData[srcIndex].type == 'screens') {
 										nData[srcIndex].taskexists = nData[tgtIndex];
 									}
-
 								}
 								else if (nData[srcIndex].children.indexOf(nData[tgtIndex]) == -1) {
 									nData[srcIndex].children.push(nData[tgtIndex]);
@@ -428,7 +394,6 @@ exports.getModules = function (req, res) {
 									}
 								}
 							} catch (ex) {
-
 								logger.error("exception in mindmapService: ", ex);
 							}
 						});
@@ -456,7 +421,6 @@ exports.getModules = function (req, res) {
 				res.setHeader('Content-Type', 'application/json');
 				if (status != 200) res.status(status).send(result);
 				else {
-
 					if (result[1]) {
 						result[1].data.forEach(function (e, i) {
 							modulenames.push({ name: e.row[0], type: 'modules_endtoend', id_n: e.row[1] });
@@ -466,7 +430,6 @@ exports.getModules = function (req, res) {
 						modulenames.push({ name: e.row[0], type: 'modules', id_n: e.row[1] });
 					});
 					res.status(status).send(modulenames);
-
 				}
 			});
 		}
@@ -475,12 +438,11 @@ exports.getModules = function (req, res) {
 		logger.error("Invalid Session");
 		res.send("Invalid Session");
 	}
-
-}
+};
 
 exports.reviewTask = function (req, res) {
 	logger.info("Inside UI service: reviewTask");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var inputs = req.body;
 		var taskID = inputs.taskId;
 		var batchIds = inputs.batchIds;
@@ -498,7 +460,6 @@ exports.reviewTask = function (req, res) {
 			query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID='" + taskID + "' and n.reviewer='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
 		}
 
-
 		var qlist_query = [query];
 		var new_queries = [];
 		var task_flag = false;
@@ -508,9 +469,7 @@ exports.reviewTask = function (req, res) {
 			} else {
 				try {
 					var res_data = result;
-
 					if (res_data[0].data.length != 0 && res_data[0].data[0]['graph']['nodes'] != null) {
-
 						var task = '';
 						var task_relation = '';
 						if (res_data[0].data[0]['graph']['nodes'][0].labels[0] == 'TASKS') {
@@ -527,12 +486,10 @@ exports.reviewTask = function (req, res) {
 							if (neo_taskHistory == undefined || neo_taskHistory == '') {
 								neo_taskHistory = [taskHistory];
 							} else {
-								neo_taskHistory = JSON.parse(neo_taskHistory)
+								neo_taskHistory = JSON.parse(neo_taskHistory);
 								neo_taskHistory.push(taskHistory);
-
 							}
 							neo_taskHistory = JSON.stringify(neo_taskHistory);
-
 							query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID='" + taskID + "' and n.assignedTo='" + userId + "' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review',n.taskHistory='" + neo_taskHistory + "' RETURN n" };
 							new_queries.push(query);
 							task_flag = true;
@@ -544,7 +501,6 @@ exports.reviewTask = function (req, res) {
 							} else {
 								neo_taskHistory = JSON.parse(neo_taskHistory)
 								neo_taskHistory.push(taskHistory);
-
 							}
 							neo_taskHistory = JSON.stringify(neo_taskHistory);
 							query = { 'statement': "MATCH (m)-[r]-(n:TASKS) WHERE n.taskID='" + taskID + "' and n.reviewer='" + userId + "' set n.assignedTo='',n.status='complete',n.taskHistory='" + neo_taskHistory + "' DELETE r RETURN n" };
@@ -555,9 +511,8 @@ exports.reviewTask = function (req, res) {
 							if (neo_taskHistory == undefined || neo_taskHistory == '') {
 								neo_taskHistory = [taskHistory];
 							} else {
-								neo_taskHistory = JSON.parse(neo_taskHistory)
+								neo_taskHistory = JSON.parse(neo_taskHistory);
 								neo_taskHistory.push(taskHistory);
-
 							}
 							neo_taskHistory = JSON.stringify(neo_taskHistory);
 							query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID='" + taskID + "' and n.reviewer='" + userId + "' set n.reviewer=n.assignedTo,n.assignedTo=n.task_owner,n.status='reassigned',n.taskHistory='" + neo_taskHistory + "' RETURN n" };
@@ -565,13 +520,6 @@ exports.reviewTask = function (req, res) {
 							task_flag = true;
 						}
 						if (task_flag) {
-							inputs = {
-								'status': taskHistory.status,
-								'taskdetails': task_relation,
-								'user': username,
-								'versionnumber': versionnumber
-							}
-
 							neo4jAPI.executeQueries(new_queries, function (status, result) {
 								if (status != 200) res.status(status).send(result);
 								else res.status(200).send('success');
@@ -580,7 +528,6 @@ exports.reviewTask = function (req, res) {
 						} else {
 							res.status(200).send('fail');
 						}
-
 					}
 					else {
 						res.status(200).send('fail');
@@ -596,8 +543,7 @@ exports.reviewTask = function (req, res) {
 		logger.error("Invalid Session");
 		res.send("Invalid Session");
 	}
-
-}
+};
 
 function getRenameQueries(map, prjId) {
 	var rnmQList = [];
@@ -616,9 +562,10 @@ function getRenameQueries(map, prjId) {
 	});
 	return rnmQList;
 }
+
 exports.saveData = function (req, res) {
 	logger.info("Inside UI service: saveData");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var tasks = [];
 		var nameDict = {};
 		var nData = [], qList = [], idDict = {};
@@ -639,7 +586,7 @@ exports.saveData = function (req, res) {
 		var idxDict = [];
 		//Assigned Tasks Notification
 		var assignedObj = {};
-		for (let k = 0; k < data.length; k++) {
+		for (var k = 0; k < data.length; k++) {
 			var task = data[k].task;
 			if (task != null) {
 				if ('assignedToName' in task) {
@@ -800,7 +747,7 @@ exports.saveData = function (req, res) {
 				if (status != 200) {
 					//res.setHeader('Content-Type', 'text');
 					logger.debug(result[0]);
-					logger.error('Error occured in saveData Query');
+					logger.error('Error occurred in saveData Query');
 					result = JSON.stringify(result)
 					if (result.indexOf('Schema.ConstraintValidationFailed') > -1) {
 						result = 'DuplicateModules';
@@ -1070,7 +1017,7 @@ exports.saveData = function (req, res) {
 				if (status != 200) {
 					//res.setHeader('Content-Type', 'text');
 					logger.debug(result[0]);
-					logger.error('Error occured in saveData Query');
+					logger.error('Error occurred in saveData Query');
 					result = JSON.stringify(result)
 					if (result.indexOf('Schema.ConstraintValidationFailed') > -1) {
 						result = 'DuplicateModules';
@@ -1148,7 +1095,7 @@ exports.saveData = function (req, res) {
 
 exports.saveEndtoEndData = function (req, res) {
 	logger.info("Inside UI service: saveEndtoEndData");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var nData = [], qList = [], idDict = {};
 		var urlData = req.get('host').split(':');
 		var inputs = req.body;
@@ -1332,7 +1279,7 @@ exports.saveEndtoEndData = function (req, res) {
 		logger.error("Invalid Session");
 		res.send("Invalid Session");
 	}
-}
+};
 
 function getQueries(qdata) {
 	var qList_reuse = [];
@@ -1372,7 +1319,6 @@ function getQueries(qdata) {
 
 		}
 	}
-
 	return qList_reuse;
 }
 
@@ -1426,7 +1372,6 @@ var update_cassandraID = function (d, urlData, module_type, idn_v_idc = null) {
 						//qList_new.push({"statement":"MATCH p=(a:SCREENS{screenID_c:'"+screenId_c_json+"'})-[r]-(b:TASKS),(q:SCREENS{screenID_c:'"+screenId_c_json+"'}) MERGE (q)-[s:FNTT{id:q.screenID}]-(b)"});
 						// reg ex query
 						qList_new.push({ "statement": "MATCH (c:TASKS) ,(d:SCREENS{screenID:'" + scr.screenId + "'}) where c.parent=~('.*,'+d.screenID_c+']') MERGE (d)-[t:FNTT{id:d.screenID}]-(c)" });
-
 						//qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenName='"+screenname_json+"' and a.projectID='"+data.projectId+"' SET a.screenID_c='"+screenId_c_json+"'"});
 						//updateJson.push({screenId_json:screenId_c_json});	
 					}
@@ -1456,89 +1401,89 @@ var update_cassandraID = function (d, urlData, module_type, idn_v_idc = null) {
 	} catch (ex) {
 		logger.error('exception in update_cassandraID', ex);
 	}
-
 	updateJson.push(cassandraId_dict);
-
 	return [qList_new, updateJson];
 };
 
 exports.excelToMindmap = function (req, res) {
-	var wb1 = xlsx.read(req.body.data.content, { type: 'binary' });
-	if (req.body.data.flag == 'sheetname') {
-		res.status(200).send(wb1.SheetNames);
-		return;
-	}
+	logger.info("Inside UI service: excelToMindmap");
 	try {
-		var myCSV = xlsToCSV(wb1, req.body.data.sheetname);
-	}
-	catch (exc) {
-		console.log(exc);
-	}
-	var numSheets = myCSV.length / 2;
-	var qObj = [];
-	var err;
-	for (var k = 0; k < numSheets; k++) {
-		var cSheet = myCSV[k * 2 + 1];
-		var cSheetRow = cSheet.split('\n');
-		var scoIdx = -1, scrIdx = -1, sctIdx = -1;
-		var uniqueIndex = 0;
-		cSheetRow[0].split(',').forEach(function (e, i) {
-			if (/module/i.test(e)) modIdx = i;
-			if (/scenario/i.test(e)) scoIdx = i;
-			if (/screen/i.test(e)) scrIdx = i;
-			if (/script/i.test(e)) sctIdx = i;
-		});
-		if (modIdx == -1 || scoIdx == -1 || scrIdx == -1 || sctIdx == -1 || cSheetRow.length < 2) {
-			err = true;
-			break;
-		}
-		var e, lastSco = -1, lastScr = -1, nodeDict = {}, scrDict = {};
-		for (var i = 1; i < cSheetRow.length; i++) {
-			var row = cSheetRow[i].split(',');
-			if (row.length < 3) continue;
-			if (row[modIdx] !== '') {
-				e = { id: uuidV4(), name: row[modIdx], type: 0 };
-				qObj.push(e);
+		if (utils.isSessionActive(req)) {
+			var wb1 = xlsx.read(req.body.data.content, { type: 'binary' });
+			if (req.body.data.flag == 'sheetname') {
+				return res.status(200).send(wb1.SheetNames);
 			}
-			if (row[scoIdx] !== '') {
-				lastSco = uniqueIndex; lastScr = -1; scrDict = {};
-				e = { id: uuidV4(), name: row[scoIdx], type: 1 };
-				qObj.push(e);
-				nodeDict[e.id] = uniqueIndex;
-				uniqueIndex++;
-			}
-			if (row[scrIdx] !== '' && lastSco != -1) {
-				var tName = row[scrIdx];
-				var lScr = qObj[lastScr];
-				if (lScr === undefined || (lScr && lScr.name !== tName)) {
-					if (scrDict[tName] === undefined) scrDict[tName] = uuidV4();
-					lastScr = uniqueIndex;
-					e = { id: scrDict[tName], name: tName, type: 2, uidx: lastScr };
-					qObj.push(e);
-					nodeDict[e.id] = uniqueIndex;
-					uniqueIndex++;
+			var myCSV = xlsToCSV(wb1, req.body.data.sheetname);
+			var numSheets = myCSV.length / 2;
+			var qObj = [];
+			var err;
+			for (var k = 0; k < numSheets; k++) {
+				var cSheet = myCSV[k * 2 + 1];
+				var cSheetRow = cSheet.split('\n');
+				var scoIdx = -1, scrIdx = -1, sctIdx = -1;
+				var uniqueIndex = 0;
+				cSheetRow[0].split(',').forEach(function (e, i) {
+					if (/module/i.test(e)) modIdx = i;
+					if (/scenario/i.test(e)) scoIdx = i;
+					if (/screen/i.test(e)) scrIdx = i;
+					if (/script/i.test(e)) sctIdx = i;
+				});
+				if (modIdx == -1 || scoIdx == -1 || scrIdx == -1 || sctIdx == -1 || cSheetRow.length < 2) {
+					err = true;
+					break;
+				}
+				var e, lastSco = -1, lastScr = -1, nodeDict = {}, scrDict = {};
+				for (var i = 1; i < cSheetRow.length; i++) {
+					var row = cSheetRow[i].split(',');
+					if (row.length < 3) continue;
+					if (row[modIdx] !== '') {
+						e = { id: uuidV4(), name: row[modIdx], type: 0 };
+						qObj.push(e);
+					}
+					if (row[scoIdx] !== '') {
+						lastSco = uniqueIndex; lastScr = -1; scrDict = {};
+						e = { id: uuidV4(), name: row[scoIdx], type: 1 };
+						qObj.push(e);
+						nodeDict[e.id] = uniqueIndex;
+						uniqueIndex++;
+					}
+					if (row[scrIdx] !== '' && lastSco != -1) {
+						var tName = row[scrIdx];
+						var lScr = qObj[lastScr];
+						if (lScr === undefined || (lScr && lScr.name !== tName)) {
+							if (scrDict[tName] === undefined) scrDict[tName] = uuidV4();
+							lastScr = uniqueIndex;
+							e = { id: scrDict[tName], name: tName, type: 2, uidx: lastScr };
+							qObj.push(e);
+							nodeDict[e.id] = uniqueIndex;
+							uniqueIndex++;
+						}
+					}
+					if (row[sctIdx] !== '' && lastScr != -1) {
+						e = { id: uuidV4(), name: row[sctIdx], type: 3, uidx: lastScr };
+						qObj.push(e);
+						nodeDict[e.id] = uniqueIndex;
+						uniqueIndex++;
+					}
 				}
 			}
-			if (row[sctIdx] !== '' && lastScr != -1) {
-				e = { id: uuidV4(), name: row[sctIdx], type: 3, uidx: lastScr };
-				qObj.push(e);
-				nodeDict[e.id] = uniqueIndex;
-				uniqueIndex++;
-			}
+			if (err) res.status(200).send('fail');
+			else res.status(200).send(qObj);
+		}
+		else {
+			logger.error("Invalid Session");
+			res.send("Invalid Session");
 		}
 	}
-	var tSt, qList = [];
-	if (err) {
-		res.status(200).send('fail');
+	catch (exc) {
+		logger.error(exc.message);
+		return res.send('fail')
 	}
-	else
-		res.status(200).send(qObj);
-
-}
+};
 
 exports.getScreens = function (req, res) {
 	logger.info("Inside UI service: populateScenarios");
-	if (utils.isSessionActive(req.session)) {
+	if (utils.isSessionActive(req)) {
 		var d = req.body;
 		var prjId = d.projectId;
 		var screenList = [];
@@ -1574,13 +1519,11 @@ exports.getScreens = function (req, res) {
 		logger.error("Invalid Session");
 		res.send("Invalid Session");
 	}
-
-}
+};
 
 exports.exportToExcel = function (req, res) {
 	logger.info("Writing  Module structure to Excel");
-	if (utils.isSessionActive(req.session)) {
-
+	if (utils.isSessionActive(req)) {
 		var d = req.body;
 		var excelMap = d.excelMap;
 		var dir = './../../excel';
@@ -1595,37 +1538,25 @@ exports.exportToExcel = function (req, res) {
 		}
 		try {
 			if (!fs.existsSync(filepath1)) {
-				console.log("inside directory");
+				logger.debug("inside directory");
 				fs.mkdirSync(filepath1);
 				//console.log("created"+dir);
 			}
-		}
-		catch (e) {
+		} catch (e) {
 			logger.error("exception in mindmapService: ", ex);
 		}
 
 		//create a new workbook file in current working directory
 		var workbook = excelbuilder.createWorkbook("./excel", "samp234.xlsx");
-
-		console.log(excelMap.name);
-
-
+		logger.debug(excelMap.name);
 		//create the new worksheet with 10 coloumns and 20 rows
 		var sheet1 = workbook.createSheet('sheet1', 10, 20);
-		//var dNodes = [];
-		var curr = {};
-		//var dNodes = [];
-		curr = excelMap;
-
-
+		var curr = excelMap;
 		var sce_row_count = 2;
 		var scr_row_count = 2;
 		var tes_row_count = 2;
 
-
-
 		//To fill some data
-
 		sheet1.width(1, 40); sheet1.height(1, 20); sheet1.width(2, 40); sheet1.height(2, 20);
 		sheet1.width(3, 40); sheet1.height(3, 20); sheet1.width(4, 40); sheet1.height(4, 20);
 		sheet1.set(1, 1, 'Module'); sheet1.set(2, 1, 'Scenario');
@@ -1652,47 +1583,23 @@ exports.exportToExcel = function (req, res) {
 						min_scr_idx = min_tc_idx;
 					}
 				}
-
 				sheet1.set(2, 1 + parseInt(min_scr_idx), curr.children[i].name);
 			}
-
-
-
-			//save it 
+			//save it
 			workbook.save(function (ok) {
-				//if(!ok)
-				// workbook.cancel();
-				//else
-				//console.log("workbook created");
-
-
-				console.log(__dirname);
-
-				res.writeHead(200, {
-					'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-
-				});
+				res.writeHead(200, {'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 				var rstream = fs.createReadStream(filePath);
 				rstream.pipe(res);
-
 			});
-
-
-
-
-
 		} catch (ex) {
 			logger.error("exception in mindmapService: ", ex);
-
 		}
-
-	}
-	else {
+	} else {
 		logger.error("Invalid session");
 		res.send("Invalid Session");
 	}
-}
+};
 
 exports.getDomain = function (req, res) {
 	admin.getDomains_ICE(req, res);
-}
+};

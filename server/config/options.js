@@ -8,8 +8,18 @@ try {
 	parsed.password = Buffer.from(parsed.password, "base64").toString();
 	parsed.certificate.key = fs.readFileSync(parsed.certificate.key, 'utf-8');
 	parsed.certificate.cert = fs.readFileSync(parsed.certificate.cert, 'utf-8');
+	var ssoEnabled = process.env.ENABLE_SSO.toLowerCase()=="true";
+	if (ssoEnabled) {
+		var strategy = process.env.SSO_PROTOCOL.toLowerCase().trim();
+		var conf = parsed[strategy];
+		if (strategy=='oidc' && (conf.identitityProviderURL.trim()=='' || conf.clientId.trim()=='' || conf.clientSecret.trim()=='' || conf.redirectURI.trim()=='')) {
+			throw "Invalid values in SSO configuration";
+		} else if (strategy=='saml' && (conf.acsURL.trim()=='' || conf.cert.trim()=='' || !fs.existsSync(conf.cert) || conf.redirectURI.trim()=='')) {
+			throw "Invalid values in SSO configuration";
+		}
+	}
 } catch (e) {
 	logger.error(e);
 	throw "Please provide valid values in config.json file";
 }
-exports.storageConfig = parsed;
+module.exports = parsed;

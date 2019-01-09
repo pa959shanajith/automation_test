@@ -1,13 +1,25 @@
 {
     "certificate": {
-    	"key": "./server/https/server.key",
-    	"cert": "./server/https/server.crt"
+        "key": "./server/https/server.key",
+        "cert": "./server/https/server.crt"
     },
     "host": "localhost:7474",
     "username": "bmVvNGo=",
     "password": "bG9jYWw3NDc0",
+    "oidc": {
+        "identitityProviderURL": "",
+        "clientId": "",
+        "clientSecret": "",
+        "redirectURI": ""
+    },
+    "saml": {
+        "issuer": "SLK Nineteen68 Webserver",
+        "acsURL": "",
+        "cert": "",
+        "redirectURI": ""
+    },
     "screenShotPath": {
-    	"default": "",
-    	"mac": ""
+        "default": "",
+        "mac": ""
     }
 }

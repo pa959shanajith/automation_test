@@ -32,7 +32,7 @@ function get_moduleName(moduleId, cb, data) {
 	client.post(epurl+"create_ice/getNames_Nineteen68", args,
 		function (modulename, response) {
 		if (response.statusCode != 200 || modulename.rows == "fail") {
-			logger.error("Error occured in create_ice/getNames_Nineteen68: get_moduleName, Error Code : ERRNDAC");
+			logger.error("Error occurred in create_ice/getNames_Nineteen68: get_moduleName, Error Code : ERRNDAC");
 			cb(null, modulename.rows);
 		} else {
 			if (modulename.rows.length != 0) {
@@ -65,7 +65,7 @@ function get_screenName(screenId, cb, data) {
 	client.post(epurl+"create_ice/getNames_Nineteen68", args,
 		function (screenname, response) {
 		if (response.statusCode != 200 || screenname.rows == "fail") {
-			logger.error("Error occured in create_ice/getNames_Nineteen68: get_screenName, Error Code : ERRNDAC");
+			logger.error("Error occurred in create_ice/getNames_Nineteen68: get_screenName, Error Code : ERRNDAC");
 			cb(null, screenname.rows);
 		} else {
 			if (screenname.rows.length != 0) {
@@ -97,7 +97,7 @@ function get_scenarioName(testscenarioId, cb, data) {
 	client.post(epurl+"create_ice/getNames_Nineteen68", args,
 		function (testscenarioname, response) {
 		if (response.statusCode != 200 || testscenarioname.rows == "fail") {
-			logger.error("Error occured in create_ice/getNames_Nineteen68: get_scenarioName, Error Code : ERRNDAC");
+			logger.error("Error occurred in create_ice/getNames_Nineteen68: get_scenarioName, Error Code : ERRNDAC");
 			cb(null, testscenarioname.rows);
 		} else {
 			if (testscenarioname.rows.length != 0) {
@@ -129,7 +129,7 @@ function get_testcaseName(testcaseId, cb, data) {
 	client.post(epurl+"create_ice/getNames_Nineteen68", args,
 		function (testcasename, response) {
 		if (response.statusCode != 200 || testcasename.rows == "fail") {
-			logger.error("Error occured in create_ice/getNames_Nineteen68: get_testcaseName, Error Code : ERRNDAC");
+			logger.error("Error occurred in create_ice/getNames_Nineteen68: get_testcaseName, Error Code : ERRNDAC");
 			cb(null, testcasename.rows);
 		} else {
 			if (testcasename.rows.length != 0) {
@@ -157,7 +157,7 @@ exports.getAllNames = function (parent, cb, data) {
 			logger.info("Calling function get_moduleName from the service getAllNames");
 			get_moduleName(parent[1], function (err, data) {
 				if (err) {
-					logger.error("Error occured in the function modulename: service getAllNames: %s",err);
+					logger.error("Error occurred in the function modulename: service getAllNames: %s",err);
 				}
 				else {
 					allNames.modulename = data.modulename;
@@ -172,7 +172,7 @@ exports.getAllNames = function (parent, cb, data) {
 				logger.info("Calling function get_scenarioName from the service getAllNames");
 				get_scenarioName(parent[2], function (err, data2) {
 					if (err) {
-						logger.info("Error occured in the function scenarioname: service getAllNames: ",err);
+						logger.info("Error occurred in the function scenarioname: service getAllNames: ",err);
 					}
 					else {
 						allNames.scenarioname = data2.testscenarioname;
@@ -189,7 +189,7 @@ exports.getAllNames = function (parent, cb, data) {
 				logger.info("Calling function get_screenName from the service getAllNames");
 				get_screenName(parent[3], function (err, data2) {
 					if (err) {
-						logger.error("Error occured in the function screenname: service getAllNames: %s",err);
+						logger.error("Error occurred in the function screenname: service getAllNames: %s",err);
 					}
 					else {
 						allNames.screenname = data2.screenname;
@@ -206,7 +206,7 @@ exports.getAllNames = function (parent, cb, data) {
 				logger.info("Calling function get_testcaseName from the service getAllNames");
 				get_testcaseName(parent[4], function (err, data3) {
 					if (err) {
-						logger.error("Error occured in the function testcasename: service getAllNames: %s",err);
+						logger.error("Error occurred in the function testcasename: service getAllNames: %s",err);
 					}
 					else {
 						allNames.testcasename = data3.testcasename;
@@ -270,7 +270,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 				"newversionnumber": newversionnumber
 			}, function (err, data) {
 				if (err) {
-					logger.error("Error occured in the function projectsUnderDomain: createStructure_Nineteen68: %s",err);
+					logger.error("Error occurred in the function projectsUnderDomain: createStructure_Nineteen68: %s",err);
 				} else {
 					suiteflag = data.flag;
 					suiteidTemp = data.suiteid;
@@ -317,7 +317,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 				client.post(epurl+"create_ice/insertInSuite_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in create_ice/insertInSuite_ICE: projectsUnderDomain, Error Code : ERRNDAC");
+						logger.error("Error occurred in create_ice/insertInSuite_ICE: projectsUnderDomain, Error Code : ERRNDAC");
 					} else {
 						scenario = suitedetails.testscenarioDetails;
 						var scenariosarray = [];
@@ -342,7 +342,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 								"newversionnumber": newversionnumber
 							}, function (err, scenariodata) {
 								if (err) {
-									logger.error("Error occured in the function projectsUnderDomain: createStructure_Nineteen68: %s",err);
+									logger.error("Error occurred in the function projectsUnderDomain: createStructure_Nineteen68: %s",err);
 								} else {
 									scenarioflag = scenariodata.flag;
 									scenarioidTemp = scenariodata.scenarioid;
@@ -390,7 +390,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 								client.post(epurl+"create_ice/insertInScenarios_ICE", args,
 									function (result, response) {
 									if (response.statusCode != 200 || result.rows == "fail") {
-										logger.error("Error occured in create_ice/insertInSuite_ICE: projectsUnderDomain, Error Code : ERRNDAC");
+										logger.error("Error occurred in create_ice/insertInSuite_ICE: projectsUnderDomain, Error Code : ERRNDAC");
 									} else {
 										//Execute neo4j query!!
 										//if(scenario_query=='notflagscenarios'){
@@ -426,7 +426,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 												"newversionnumber": newversionnumber
 											}, function (err, screendata) {
 												if (err) {
-													logger.error("Error occured in the function projectsUnderDomain: createStructure_Nineteen68: %s",err);
+													logger.error("Error occurred in the function projectsUnderDomain: createStructure_Nineteen68: %s",err);
 												} else {
 													screenflag = screendata.flag;
 													screenidTemp = screendata.screenid;
@@ -474,7 +474,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 												client.post(epurl+"create_ice/insertInScreen_ICE", args,
 													function (result, response) {
 													if (response.statusCode != 200 || result.rows == "fail") {
-														logger.error("Error occured in create_ice/insertInScreen_ICE: createStructure_Nineteen68");
+														logger.error("Error occurred in create_ice/insertInScreen_ICE: createStructure_Nineteen68");
 													} else {
                                                         //Execute neo4j query!!
                                                         //if(screen_query=='notflagscreen'){
@@ -504,7 +504,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																"newversionnumber": newversionnumber
 															}, function (err, testcasedata) {
 																if (err) {
-																	logger.error("Error occured in the function projectsUnderDomain: createStructure_Nineteen68 service: %s",err);
+																	logger.error("Error occurred in the function projectsUnderDomain: createStructure_Nineteen68 service: %s",err);
 																} else {
 																	testcaseflag = testcasedata.flag;
 																	testcaseidTemp = testcasedata.testcaseid;
@@ -553,7 +553,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																client.post(epurl+"create_ice/insertInTestcase_ICE", args,
 																	function (result, response) {
 																	if (response.statusCode != 200 || result.rows == "fail") {
-																		logger.error("Error occured in create_ice/insertInTestcase_ICE: createStructure_Nineteen68 service");
+																		logger.error("Error occurred in create_ice/insertInTestcase_ICE: createStructure_Nineteen68 service");
 																	}
 																	else {
 																		//if(testcase_query=='notflagtestcase'){
@@ -585,7 +585,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																		client.post(epurl+"create_ice/updateTestScenario_ICE", args,
 																			function (result, response) {
 																			if (response.statusCode != 200 || result.rows == "fail") {
-																				logger.error("Error occured in create_ice/updateTestScenario_ICE: createStructure_Nineteen68 service");
+																				logger.error("Error occurred in create_ice/updateTestScenario_ICE: createStructure_Nineteen68 service");
 																			}
 																			else {
 																				logger.info("Successfully updated testscenarios");
@@ -640,7 +640,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 			client.post(epurl+"create_ice/updateModule_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.info("Error occured in create_ice/updateModule_ICE: createStructure_Nineteen68 service");
+					logger.info("Error occurred in create_ice/updateModule_ICE: createStructure_Nineteen68 service");
 				} else {
 					logger.info("Successfully updated Modules");
 				}
@@ -652,7 +652,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 		function (err, results) {
 			logger.info("Inside final function");
 			if (err) {
-				logger.error("Error occured in final funtion: createStructure_Nineteen68 service: %s", err);
+				logger.error("Error occurred in final funtion: createStructure_Nineteen68 service: %s", err);
 				res(null, err);
 			} else {
 				var returnJsonmindmap = {
@@ -665,7 +665,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 				logger.info("Calling funtion neo4jAPI.executeQueries: createStructure_Nineteen68 service");
 				neo4jAPI.executeQueries(qList,function(status,result){
 					if(err){
-						logger.error("Error occured in the function neo4jAPI.executeQueries: createStructure_Nineteen68: %s", err);
+						logger.error("Error occurred in the function neo4jAPI.executeQueries: createStructure_Nineteen68: %s", err);
 					} else{
 						res(null, returnJsonmindmap);
 					}
@@ -702,7 +702,7 @@ function testsuiteid_exists(moduledetails, cb, data) {
 			client.post(epurl+"create_ice/testsuiteid_exists_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in create_ice/testsuiteid_exists_ICE: testsuiteid_exists - modulename, Error Code : ERRNDAC");
+					logger.error("Error occurred in create_ice/testsuiteid_exists_ICE: testsuiteid_exists - modulename, Error Code : ERRNDAC");
 					cb(null, obj);
 				} else {
 					if (result.rows.length != 0) {
@@ -737,7 +737,7 @@ function testsuiteid_exists(moduledetails, cb, data) {
 				client.post(epurl+"create_ice/testsuiteid_exists_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in create_ice/testsuiteid_exists_ICE: testsuiteid_exists - moduledetails, Error Code : ERRNDAC");
+						logger.error("Error occurred in create_ice/testsuiteid_exists_ICE: testsuiteid_exists - moduledetails, Error Code : ERRNDAC");
 						cb(null, obj);
 					} else {
 						if (result.rows.length != 0) {
@@ -803,7 +803,7 @@ function updatetestsuitename(moduledetails, cb, data) {
 			client.post(epurl+"create_ice/get_node_details_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in create_ice/get_node_details_ICE: updatetestsuitename Error Code : ERRNDAC");
+					logger.error("Error occurred in create_ice/get_node_details_ICE: updatetestsuitename Error Code : ERRNDAC");
 				} else {
 					if (result.rows.length != 0) {
 						flagtocheckifexists = true;
@@ -833,7 +833,7 @@ function updatetestsuitename(moduledetails, cb, data) {
 				client.post(epurl+"create_ice/delete_node_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in create_ice/delete_node_ICE: updatetestsuitename Error Code : ERRNDAC");
+						logger.error("Error occurred in create_ice/delete_node_ICE: updatetestsuitename Error Code : ERRNDAC");
 					} else {
 						flagtocheckifdeleted = true;
 					}
@@ -872,7 +872,7 @@ function updatetestsuitename(moduledetails, cb, data) {
 				client.post(epurl+"create_ice/updateModulename_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in create_ice/updateModulename_ICE: updatetestsuitename Error Code : ERRNDAC");
+						logger.error("Error occurred in create_ice/updateModulename_ICE: updatetestsuitename Error Code : ERRNDAC");
 					} else {
 						logger.info('Succesfully renamed module name');
 					}
@@ -915,7 +915,7 @@ function testscenariosid_exists(testscenariodetails, cb, data) {
 			client.post(epurl+"create_ice/testscenariosid_exists_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in create_ice/testscenariosid_exists_ICE: testscenariosid_exists Error Code : ERRNDAC");
+					logger.error("Error occurred in create_ice/testscenariosid_exists_ICE: testscenariosid_exists Error Code : ERRNDAC");
 					cb(null, obj);
 				} else {
 					if (result.rows.length != 0) {
@@ -948,7 +948,7 @@ function testscenariosid_exists(testscenariodetails, cb, data) {
 				client.post(epurl+"create_ice/testscenariosid_exists_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in create_ice/testscenariosid_exists_ICE: testscenariosid_exists - scenariodetails Error Code : ERRNDAC");
+						logger.error("Error occurred in create_ice/testscenariosid_exists_ICE: testscenariosid_exists - scenariodetails Error Code : ERRNDAC");
 						cb(null, obj);
 					} else {
 						if (result.rows.length != 0) {
@@ -969,7 +969,7 @@ function testscenariosid_exists(testscenariodetails, cb, data) {
 				logger.info("Calling function updatetestscenarioname from scenarioupdate function");
 				updatetestscenarioname(testscenariodetails, function (err, data) {
 					if (err) {
-						logger.error("Error occured in the function scenarioupdate: testscenariosid_exists - scenarioupdate: %s",err);
+						logger.error("Error occurred in the function scenarioupdate: testscenariosid_exists - scenarioupdate: %s",err);
 					} else {
 						if (data == "success") {
 							obj.flag = true;
@@ -1012,7 +1012,7 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 			client.post(epurl+"create_ice/get_node_details_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in create_ice/get_node_details_ICE: updatetestscenarioname - select, Error Code : ERRNDAC");
+					logger.error("Error occurred in create_ice/get_node_details_ICE: updatetestscenarioname - select, Error Code : ERRNDAC");
 				} else {
 					if (result.rows.length != 0) {
 						flagtocheckifexists = true;
@@ -1042,7 +1042,7 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 				client.post(epurl+"create_ice/delete_node_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in create_ice/delete_node_ICE: updatetestscenarioname - delete, Error Code : ERRNDAC");
+						logger.error("Error occurred in create_ice/delete_node_ICE: updatetestscenarioname - delete, Error Code : ERRNDAC");
 					} else {
 						//Execute neo4j query!!
 						//qList.push({"statement":"MATCH (n: TESTSCENARIOS_NG { testscenarioname: '"+inputs.node_name+"',testscenarioid: '"+inputs.id+"' }) detach delete n"});
@@ -1085,7 +1085,7 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 				client.post(epurl+"create_ice/updateTestscenarioname_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in create_ice/updateTestscenarioname_ICE: updatetestscenarioname - update, Error Code : ERRNDAC");
+						logger.error("Error occurred in create_ice/updateTestscenarioname_ICE: updatetestscenarioname - update, Error Code : ERRNDAC");
 					} else {
 	                    //Execute neo4j query!!
 	                    //qList.push({"statement":"MATCH(n:TESTSCENARIOS_NG{testScenarioid:'"+inputs.testscenarioid+"'}) SET n.testscenarioname='"+inputs.testscenarioname+"'"+",n.projectid='"+inputs.projectid+"' return n"});
@@ -1129,7 +1129,7 @@ function testscreen_exists(testscreendetails, cb, data) {
 			client.post(epurl+"create_ice/testscreenid_exists_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in create_ice/testscreenid_exists_ICE: testscreen_exists - screenname, Error Code : ERRNDAC");
+					logger.error("Error occurred in create_ice/testscreenid_exists_ICE: testscreen_exists - screenname, Error Code : ERRNDAC");
 					cb(null, obj);
 				} else {
 					if (result.rows.length != 0) {
@@ -1162,7 +1162,7 @@ function testscreen_exists(testscreendetails, cb, data) {
 				client.post(epurl+"create_ice/testscreenid_exists_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in create_ice/testscreenid_exists_ICE: testscreen_exists - screendetails, Error Code : ERRNDAC");
+						logger.error("Error occurred in create_ice/testscreenid_exists_ICE: testscreen_exists - screendetails, Error Code : ERRNDAC");
 						cb(null, obj);
 					} else {
 						if (result.rows.length != 0) {
@@ -1183,7 +1183,7 @@ function testscreen_exists(testscreendetails, cb, data) {
 				logger.info("Calling function updatetestscreenname from screenupdate of testscreen_exists function");
 				updatetestscreenname(testscreendetails, function (err, data) {
 					if (err) {
-						logger.error("Error occured in the function updatetestscreenname: screenupdate of testscreen_exists function: %s", err);
+						logger.error("Error occurred in the function updatetestscreenname: screenupdate of testscreen_exists function: %s", err);
 					} else {
 						if (data == "success") {
 							obj.flag = true;
@@ -1226,7 +1226,7 @@ function updatetestscreenname(testscreendetails, cb, data) {
 			client.post(epurl+"create_ice/get_node_details_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in create_ice/get_node_details_ICE: updatetestscreenname, Error Code : ERRNDAC");
+					logger.error("Error occurred in create_ice/get_node_details_ICE: updatetestscreenname, Error Code : ERRNDAC");
 				} else {
 					if (result.rows.length != 0) {
 						flagtocheckifexists = true;
@@ -1256,7 +1256,7 @@ function updatetestscreenname(testscreendetails, cb, data) {
 				client.post(epurl+"create_ice/delete_node_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in create_ice/delete_node_ICE: updatetestscreenname, Error Code : ERRNDAC");
+						logger.error("Error occurred in create_ice/delete_node_ICE: updatetestscreenname, Error Code : ERRNDAC");
 					} else {
 						// if(deleted.rows != undefined && deleted.rows.length!=0){
 						flagtocheckifdeleted = true;
@@ -1301,7 +1301,7 @@ function updatetestscreenname(testscreendetails, cb, data) {
 				client.post(epurl+"create_ice/updateScreenname_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in create_ice/updateScreenname_ICE: updatetestscreenname, Error Code : ERRNDAC");
+						logger.error("Error occurred in create_ice/updateScreenname_ICE: updatetestscreenname, Error Code : ERRNDAC");
 					} else {
 						logger.info('Succesfully renamed Screen name');
 						//Execute neo4j query!!
@@ -1345,7 +1345,7 @@ function testcase_exists(testcasedetails, cb, data) {
 			client.post(epurl+"create_ice/testcaseid_exists_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in create_ice/testcaseid_exists_ICE: testcase_exists, Error Code : ERRNDAC");
+					logger.error("Error occurred in create_ice/testcaseid_exists_ICE: testcase_exists, Error Code : ERRNDAC");
 					cb(null, obj);
 				} else {
 					if (result.rows.length != 0) {
@@ -1378,7 +1378,7 @@ function testcase_exists(testcasedetails, cb, data) {
 				client.post(epurl+"create_ice/testcaseid_exists_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in create_ice/testcaseid_exists_ICE: testcase_exists - testcasedetails, Error Code : ERRNDAC");
+						logger.error("Error occurred in create_ice/testcaseid_exists_ICE: testcase_exists - testcasedetails, Error Code : ERRNDAC");
 						cb(null, obj);
 					} else {
 						if (result.rows.length != 0) {
@@ -1399,7 +1399,7 @@ function testcase_exists(testcasedetails, cb, data) {
 				logger.info("Calling updatetestcasename function from testcaseupdate of testcase_exists function");
 				updatetestcasename(testcasedetails, function (err, data) {
 					if (err) {
-						logger.error("Error occured in the function testcaseupdate of testcase_exists function");
+						logger.error("Error occurred in the function testcaseupdate of testcase_exists function");
 					} else {
 						if (data == "success") {
 							obj.flag = true;
@@ -1442,7 +1442,7 @@ function updatetestcasename(testcasedetails, cb, data) {
 			client.post(epurl+"create_ice/get_node_details_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in create_ice/get_node_details_ICE: updatetestcasename - select, Error Code : ERRNDAC");
+					logger.error("Error occurred in create_ice/get_node_details_ICE: updatetestcasename - select, Error Code : ERRNDAC");
 				} else {
 					if (result.rows.length != 0) {
 						flagtocheckifexists = true;
@@ -1472,7 +1472,7 @@ function updatetestcasename(testcasedetails, cb, data) {
 				client.post(epurl+"create_ice/delete_node_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in create_ice/delete_node_ICE: updatetestcasename - delete, Error Code : ERRNDAC");
+						logger.error("Error occurred in create_ice/delete_node_ICE: updatetestcasename - delete, Error Code : ERRNDAC");
 					} else {
 						// if(deleted.rows != undefined && deleted.rows.length!=0){
 						flagtocheckifdeleted = true;
@@ -1518,7 +1518,7 @@ function updatetestcasename(testcasedetails, cb, data) {
 				client.post(epurl+"create_ice/updateTestcasename_ICE  ", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in create_ice/updateTestcasename_ICE: updatetestcasename - update, Error Code : ERRNDAC");
+						logger.error("Error occurred in create_ice/updateTestcasename_ICE: updatetestcasename - update, Error Code : ERRNDAC");
 					} else {
 						logger.info('Succesfully renamed Testcase name');
 						//Execute neo4j query!!
@@ -1558,7 +1558,7 @@ exports.getReleaseIDs_Nineteen68 = function (req, res) {
 		function (result, response) {
 			try {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in create_ice/getReleaseIDs_Nineteen68: getReleaseIDs_Nineteen68, Error Code : ERRNDAC");
+					logger.error("Error occurred in create_ice/getReleaseIDs_Nineteen68: getReleaseIDs_Nineteen68, Error Code : ERRNDAC");
 					res(null, result.rows);
 				} else {
 					async.forEachSeries(result.rows, function (iterator, callback1) {
@@ -1599,7 +1599,7 @@ exports.getCycleIDs_Nineteen68 = function (req, res) {
 		function (result, response) {
 			try {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in create_ice/getCycleIDs_Nineteen68: getCycleIDs_Nineteen68, Error Code : ERRNDAC");
+					logger.error("Error occurred in create_ice/getCycleIDs_Nineteen68: getCycleIDs_Nineteen68, Error Code : ERRNDAC");
 					res(null, result.rows);
 				} else {
 					async.forEachSeries(result.rows, function (iterator, callback1) {
@@ -1644,7 +1644,7 @@ exports.getProjectIDs_Nineteen68 = function (req, res) {
 			client.post(epurl+"create_ice/getProjectIDs_Nineteen68", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in create_ice/getProjectIDs_Nineteen68: getProjectIDs_Nineteen68, Error Code : ERRNDAC");
+					logger.error("Error occurred in create_ice/getProjectIDs_Nineteen68: getProjectIDs_Nineteen68, Error Code : ERRNDAC");
 					res(null, result.rows);
 				} else {
 					projectdetails=result.rows;
@@ -1682,7 +1682,7 @@ exports.getProjectType_Nineteen68 = function (req, res) {
 		function (result, response) {
 		try {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				logger.error("Error occured in create_ice/getProjectType_Nineteen68: getProjectType_Nineteen68, Error Code : ERRNDAC");
+				logger.error("Error occurred in create_ice/getProjectType_Nineteen68: getProjectType_Nineteen68, Error Code : ERRNDAC");
 				res(null, result.rows);
 			} else {
 				if (result.rows.length != 0) {
@@ -1736,7 +1736,7 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 				"newversionnumber": versionnumber
 			}, function (err, data) {
 				if (err) {
-					logger.error("Error occured in projectsUnderDomain: createE2E_Structure_Nineteen68: %s",err);
+					logger.error("Error occurred in projectsUnderDomain: createE2E_Structure_Nineteen68: %s",err);
 				} else {
 					suiteflag = data.flag;
 					suiteidTemp = data.suiteid;
@@ -1778,7 +1778,7 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 				client.post(epurl+"create_ice/insertInSuite_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in create_ice/insertInSuite_ICE: projectsUnderDomain: createE2E_Structure_Nineteen68, Error Code : ERRNDAC");
+						logger.error("Error occurred in create_ice/insertInSuite_ICE: projectsUnderDomain: createE2E_Structure_Nineteen68, Error Code : ERRNDAC");
 					} else {
 						scenario = suitedetails.testscenarioDetails;
 						var scenariosarray = [];
@@ -1803,7 +1803,7 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 								"newversionnumber": versionnumber
 							}, function (err, scenariodata) {
 								if (err) {
-									logger.error("Error occured in projectsUnderDomain: createE2E_Structure_Nineteen68: create_ice/insertInSuite_ICE %s",err);
+									logger.error("Error occurred in projectsUnderDomain: createE2E_Structure_Nineteen68: create_ice/insertInSuite_ICE %s",err);
 									cb(null, err);
 								} else {
 									scenarioflag = scenariodata.flag;
@@ -1853,7 +1853,7 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 			client.post(epurl+"create_ice/updateModule_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in create_ice/updateModule_ICE: updatescenarioids: createE2E_Structure_Nineteen68, Error Code : ERRNDAC");
+					logger.error("Error occurred in create_ice/updateModule_ICE: updatescenarioids: createE2E_Structure_Nineteen68, Error Code : ERRNDAC");
 				} else {
 					logger.info("Successfully updated Modules");
 				}
@@ -1863,7 +1863,7 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 	},
 	function (err, results) {
 		if (err) {
-			logger.error("Error occured in createE2E_Structure_Nineteen68: %s",err);
+			logger.error("Error occurred in createE2E_Structure_Nineteen68: %s",err);
 			res(null, err);
 		} else {
 			var returnJsonmindmap = {
@@ -1900,7 +1900,7 @@ exports.submitTask = function (req, res) {
 		function (result, response) {
 			try {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in create_ice/submitTask: submitTask, Error Code : ERRNDAC");
+					logger.error("Error occurred in create_ice/submitTask: submitTask, Error Code : ERRNDAC");
 					res(null, result.rows);
 				} else {
 					logger.info("Task submitted successfully");

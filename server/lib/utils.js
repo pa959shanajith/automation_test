@@ -1,7 +1,7 @@
 var async = require('async');
 var logger = require('../../logger');
 var myserver = require('../../server');
-var redisServer = require('../lib/redisSocketHandler');
+var redisServer = require('./redisSocketHandler');
 
 module.exports.allSess = function (cb){
 	myserver.redisSessionStore.all(cb);
@@ -71,7 +71,10 @@ module.exports.resetSession = function(session) {
 	return updateSessionExpiry;
 };
 
-module.exports.isSessionActive = function (session){
-	var sessionToken = session.uniqueId;
-    return sessionToken != undefined && session.id == sessionToken;
+module.exports.isSessionActive = function (req){
+	var sessionToken = (req.session)? req.session.uniqueId:undefined;
+	var sessionCheck = (sessionToken!==undefined) && (req.sessionID==sessionToken);
+	var cookies = req.signedCookies;
+	var cookieCheck = (cookies["connect.sid"]!==undefined) && (cookies["maintain.sid"]!==undefined);
+	return sessionCheck && cookieCheck;
 };

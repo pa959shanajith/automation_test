@@ -305,6 +305,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		// labelArr.push(txnHistory.codesDict['Logout']);
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 		window.sessionStorage.clear();
+		window.sessionStorage["checkLoggedOut"] = true;
 		$rootScope.redirectPage();
 	};
 });
