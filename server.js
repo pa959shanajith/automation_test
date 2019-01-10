@@ -81,6 +81,7 @@ if (cluster.isMaster) {
         module.exports = app;
         module.exports.redisSessionStore = redisSessionStore;
         module.exports.httpsServer = httpsServer;
+		var io = require('./server/lib/socket');
 
         //Caching static files for thirtyDays 
         var thirtyDays = 2592000; // in milliseconds
