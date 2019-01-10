@@ -76,9 +76,9 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 				return;
 			}
 		}
-		if(isDuplicateNotificationMsg != true)
+		if(isDuplicateNotificationMsg != true )
 		{
-			if(value.count == 0){
+			if(value.count == 0 && 'notifyMsg' in value){
 				var dateTime = new Date().toLocaleString();
 				if (value.to.indexOf($location.$$path) >= 0) {
 					$('.top-left').notify({

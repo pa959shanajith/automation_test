@@ -2254,14 +2254,17 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		this.bindDN = "";
 		this.bindCredentials = "";
 		this.baseDN = "";
-		this.fieldMap = {uName: "", fName: "", lName: "", email: ""};
+		this.fieldMap = {uName: "None", fName: "None", lName: "None", email: "None"};
+		this.fieldMapOpts = ["None"];
 		if (action == "edit") this.authType = "";
+		this.testStatus = "false";
 		this.switchAuthType();
 	};
 
 	$scope.ldapConf.validate = function(action) {
 		var flag = true;
-		$("#ldapServerURL,#bindDN,#bindCredentials,#ldapBaseDN,#ldapfieldMap").removeClass("inputErrorBorder");
+		$("#ldapServerURL,#bindDN,#bindCredentials,#ldapBaseDN").removeClass("inputErrorBorder");
+		$("#ldapFMapUname,#ldapFMapFname,#ldapFMapLname,#ldapFMapEmail").removeClass("selectErrorBorder");
 		var nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
 		$("#ldapServerName").removeClass(nameErrorClass);
 		regExURL = /^ldap:\/\/[A-Za-z0-9._-]+:\d+$/;
@@ -2291,19 +2294,19 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		}
 		if (action != "test") {
 			if (this.fieldMap.uName == "") {
-				$("#ldapFMapUname").addClass("inputErrorBorder");
+				$("#ldapFMapUname").addClass("selectErrorBorder");
 				flag = false;
 			}
 			if (this.fieldMap.fName == "") {
-				$("#ldapFMapFname").addClass("inputErrorBorder");
+				$("#ldapFMapFname").addClass("selectErrorBorder");
 				flag = false;
 			}
 			if (this.fieldMap.lName == "") {
-				$("#ldapFMapLname").addClass("inputErrorBorder");
+				$("#ldapFMapLname").addClass("selectErrorBorder");
 				flag = false;
 			}
 			if (this.fieldMap.email == "") {
-				$("#ldapFMapEmail").addClass("inputErrorBorder");
+				$("#ldapFMapEmail").addClass("selectErrorBorder");
 				flag = false;
 			}
 		}
@@ -2454,12 +2457,15 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		adminServices.testLDAPConnection(auth, url, base_dn, bind_dn, bind_auth)
 		.then(function(data){
 			unblockUI();
+			var fields = (typeof data=="string")? [] : (data.fields || []);
+			if (typeof data!="string") data = data.flag;
+			$scope.ldapConf.testStatus = data;
 			if(data == "Invalid Session"){
 				$rootScope.redirectPage();
 				$(".modal-backdrop").remove();
 			} else if(data == "success"){
-				$scope.ldapConf.testStatus = "success";
 				openModalPopup("Test Connection", "Test Connection Successful!");
+				$scope.ldapConf.fieldMapOpts = fields.concat("None").sort();
 			} else if(data == "fail"){
 				openModalPopup("Test Connection", "Test Connection Failed!");
 			} else if(data == "invalid_addr"){
@@ -2469,7 +2475,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			} else if(data == "invalid_url"){
 				openModalPopup("Test Connection", "Test Connection Failed! Invalid URL. It must start with 'ldap://'");
 			} else if(data == "invalid_auth"){
-				$scope.ldapConf.testStatus = "success";
 				openModalPopup("Test Connection", "Test Connection Success! Anonymous access is not allowed for this server.");
 			} else if(data == "invalid_credentials"){
 				openModalPopup("Test Connection", "Test Connection Failed! Credentials provided for Authentication are invalid.");

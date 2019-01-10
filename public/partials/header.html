@@ -42,7 +42,7 @@
             <div id='notifyBox' class="dropdown-menu dropdown-menu-right notify-div" aria-labelledby="dropdownMenuButton">
                 <div ng-repeat ="item in notifications| orderBy:-'$index':true " class='dropdown-item notifyMsgDiv'> 
                     <div class='messageNotify'>
-                        <span class='txtNotify'>Recieved on: {{item.dateTime}}</span><br /><span class='txtNotify'>{{item.notifyMsg}}</span> 
+                        <span class='txtNotify'>Received on: {{item.dateTime}}</span><br /><span class='txtNotify'>{{item.notifyMsg}}</span> 
                         <span style='display:none' class='indexCount'>{{$index}}</span>
                     </div>
                     <div class="divider"></div>
