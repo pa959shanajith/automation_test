@@ -82,6 +82,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		if(userRole == "Test Manager") {
 			$(".task-content").hide();
 		}
+		blockUI("Loading Tasks..Please wait...");
 		var userid = userInfo.user_id;
 		PluginService.getProjectIDs_Nineteen68()
 		.then(function (data) {
@@ -94,35 +95,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 					} else {
 						var tasksJson = data;
 						$scope.taskJson = data;
-						//window.localStorage['_TJ'] = angular.toJson(tasksJson);
-						// 	var tasksJson = [{
-						// 	"appType": "Web",
-						// 	"projectId": "5122b95c-84ad-40fd-9f10-e29988323fb5",
-						// 	"releaseId": "7f71b58f-ad8c-46ac-80f5-5c4145585c08",
-						// 	"cycleId": "472b2499-761c-4e5d-bf8b-19d85e377bc4",
-						// 	"screenId": "",
-						// 	"screenName": "",
-						// 	"testCaseId": "",
-						// 	"testCaseName": "",
-						// 	"scenarioId": "",
-						// 	"scenarioName": "",
-						// 	"assignedTestScenarioIds": ["4c1142f8-7851-477c-b25b-6504c86fe6b4"],
-						// 	"testSuiteId": "476a4674-380b-49a6-8449-4d91ff3755e1",
-						// 	"testSuiteName": "Web_Suite_Vidya",
-						// 	"scenarioFlag": "True",
-						// 	"taskDetails": [{
-						// 		"taskName": "Task1",
-						// 		"taskDescription": "null",
-						// 		"taskType": "Execution",
-						// 		"subTaskType": "TestSuite",
-						// 		"subTaskId": "6299a0b0-7488-480f-835a-d769fa2092ae",
-						// 		"assignedTo": "5829afa9-d661-477e-ba75-42163c728e2d",
-						// 		"startDate": "",
-						// 		"expectedEndDate": "",
-						// 		"status": "assigned"
-						// 	}]
-						// }]
-
 					 	window.localStorage['_TJ'] = angular.toJson(tasksJson);
 						/*	Build a list of releaseids and cycleids
 						* Another dict for releaseid and cyclelist out of task json
@@ -185,6 +157,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 									});
 									PluginService.getNames_ICE($scope.filterDat.cycleids,Array($scope.filterDat.cycleids.length).fill('cycles'))
 									.then(function (response) {
+										unblockUI();
 										if(response == "Invalid Session"){
 											$rootScope.redirectPage();
 										}
