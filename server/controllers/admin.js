@@ -1862,6 +1862,7 @@ exports.testLDAPConnection = function(req, res){
 				if (resSent) return;
 				resSent = !resSent;
 				var flag = "success";
+				var data = {fields:{}};
 				if (err) {
 					if (err.errno == "EADDRNOTAVAIL" || err.errno == "ECONNREFUSED" || err.errno == "ETIMEDOUT") flag = "invalid_addr";
 					else if (err.errno == "INSUFFICIENT_ACCESS_RIGHTS") {
@@ -1882,10 +1883,12 @@ exports.testLDAPConnection = function(req, res){
 				}
 				if (flag == "success") {
 					logger.info('LDAP Connection test passed!');
+					if (result && result.users && result.users.length>0) data.fields = Object.keys(result.users[0]);
 				} else {
 					logger.error('LDAP Connection test failed!');
 				}
-				return res.send(flag);
+				data.flag = flag;
+				return res.send(data);
 			});
 		} else {
 			res.send("Invalid Session");

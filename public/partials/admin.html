@@ -437,16 +437,24 @@
 				</div>
 				<br><br><br><h4>Data Mapping Settings</h4>
 				<div class='adminControl'><div>
-					<span>Username</span><input type="text" autocomplete="off" id="ldapFMapUname" name="ldapFMapUname" ng-model="ldapConf.fieldMap.uName" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="CN / UID / sAMAccountName / etc..."/>
+					<span class="leftControl">Username</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.uName" id="ldapFMapUname" class="form-control rightControl selectControl">
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.uName">{{field}}</option>
+					</select>
 				</div></div>
 				<div class='adminControl'><div>
-					<span>Firstname</span><input type="text" autocomplete="off" id="ldapFMapFname" name="ldapFMapFname" ng-model="ldapConf.fieldMap.fName" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create"/>
+					<span class="leftControl">Firstname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.fName" id="ldapFMapFname" class="form-control rightControl selectControl">
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.fName">{{field}}</option>
+					</select>
 				</div></div>
 				<div class='adminControl'><div>
-					<span>Lastname</span><input type="text" autocomplete="off" id="ldapFMapLname" name="ldapFMapLname" ng-model="ldapConf.fieldMap.lName" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create"/>
+					<span class="leftControl">Lastname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.lName" id="ldapFMapLname" class="form-control rightControl selectControl">
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.lName">{{field}}</option>
+					</select>
 				</div></div>
 				<div class='adminControl'><div>
-					<span>Email</span><input type="text" autocomplete="off" id="ldapFMapEmail" name="ldapFMapEmail" ng-model="ldapConf.fieldMap.email" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create"/>
+					<span class="leftControl">Email</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.email" id="ldapFMapEmail" class="form-control rightControl selectControl">
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.email">{{field}}</option>
+					</select>
 				</div></div>
 			</div>
 			<!-- Create Configuration Form -->
@@ -497,16 +505,28 @@
 				</div>
 				<br><br><br><h4>Data Mapping Settings</h4>
 				<div class='adminControl'><div>
-					<span>Username</span><input type="text" autocomplete="off" id="ldapFMapUname" name="ldapFMapUname" ng-model="ldapConf.fieldMap.uName" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="CN / UID / sAMAccountName / etc..."/>
+					<span class="leftControl">Username</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.uName" id="ldapFMapUname" class="form-control rightControl selectControl">
+						<option value="{{ldapConf.fieldMap.uName}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldMap.uName)==-1" ng-selected="true">{{ldapConf.fieldMap.uName}}</option>
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.uName">{{field}}</option>
+					</select>
 				</div></div>
 				<div class='adminControl'><div>
-					<span>Firstname</span><input type="text" autocomplete="off" id="ldapFMapFname" name="ldapFMapFname" ng-model="ldapConf.fieldMap.fName" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create"/>
+					<span class="leftControl">Firstname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.fName" id="ldapFMapFname" class="form-control rightControl selectControl">
+						<option value="{{ldapConf.fieldMap.fName}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldMap.fName)==-1" ng-selected="true">{{ldapConf.fieldMap.fName}}</option>
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.fName">{{field}}</option>
+					</select>
 				</div></div>
 				<div class='adminControl'><div>
-					<span>Lastname</span><input type="text" autocomplete="off" id="ldapFMapLname" name="ldapFMapLname" ng-model="ldapConf.fieldMap.lName" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create"/>
+					<span class="leftControl">Lastname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.lName" id="ldapFMapLname" class="form-control rightControl selectControl">
+						<option value="{{ldapConf.fieldMap.lName}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldMap.lName)==-1" ng-selected="true">{{ldapConf.fieldMap.lName}}</option>
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.lName">{{field}}</option>
+					</select>
 				</div></div>
 				<div class='adminControl'><div>
-					<span>Email</span><input type="text" autocomplete="off" id="ldapFMapEmail" name="ldapFMapEmail" ng-model="ldapConf.fieldMap.email" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create"/>
+					<span class="leftControl">Email</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.email" id="ldapFMapEmail" class="form-control rightControl selectControl">
+						<option value="{{ldapConf.fieldMap.email}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldMap.email)==-1" ng-selected="true">{{ldapConf.fieldMap.email}}</option>
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.email">{{field}}</option>
+					</select>
 				</div></div>
 			</div>
 			<!-- Edit Configuration Form -->
