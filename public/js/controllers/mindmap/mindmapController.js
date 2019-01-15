@@ -1478,6 +1478,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 v.append('span').attr('class', 'ct-assignItem fl-left').html('Batch Name');
 
                 var d = v.append('input').attr('type', 'text').attr('id', 'ct-executeBatch');
+                $('#ct-executeBatch').attr('maxlength', '255');
                 $('#ct-executeBatch').attr('value', tObj.bn);
                 if (tObj.t != 'Execute Batch') {
                     $('#ct-executeBatch').attr('disabled', 'true')
