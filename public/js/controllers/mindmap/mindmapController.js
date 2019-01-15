@@ -637,6 +637,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     $scope.loadMap = function(idx) {
+        $("#expCreate").attr('src','imgs/ic-collapse.png');
         $scope.functionTBE = 'loadMapPopupConfirmed';
         excelFlag = 1;
         $('#createNewConfirmationPopup').attr('mapid', $scope.allMMaps[idx].name);
@@ -4666,6 +4667,7 @@ Purpose : displaying pop up for replication of project
     }
 
     $scope.createMap = function(option) {
+        $('#expAssign').attr('src','imgs/ic-collapse.png');
         $scope.tab = option;
         unloadMindmapData();
         dNodes = [];
