@@ -1612,14 +1612,20 @@ input[disabled]{
 /*** Web service Screen **/
 
 #middle-content-section {
-    width: calc(100% - 270px);
+   width: calc(100% - 270px); /* Required when sidebars added */
+    /* width: 100%; */
     height: 100%;
     background: #fff;
     padding: 20px;
     box-sizing: border-box;
     position: absolute;
-    left: 173px;
+    left: 173px;           /* Required when sidebars added */
     top: 0;
+}
+.reports-middle-content
+{
+    width: 100% !important;
+    left: 0px !important;
 }
 .middle-content-section-reports{
     visibility: hidden;
@@ -5709,7 +5715,8 @@ ul.browserInlineIcons
 }
 .reportScenarioDataTable
 {
-    margin-top: calc(100% - 650px) !important;
+    margin-top: calc(100% - 900px) !important;
+    /* margin-top: calc(100% - 650px) !important; */
 }
 /* .report-table-body{
     overflow: auto;
@@ -5803,6 +5810,7 @@ ul.browserInlineIcons
     position: absolute;
     top: 11px;
     left: 173px;
+    -moz-margin-start: 12px;
 }
 
 /* Start of CSS for collapsible left navigation bar */
@@ -6013,4 +6021,35 @@ ul.browserInlineIcons
 .colorStatusBlue
 {
     color: blue;
+}
+
+h4.titleBadge
+{
+    float: left !important;
+}
+
+.badge-reports
+{
+ line-height: 1.3 !important;
+ background-color: #fff !important;
+ font-weight: normal !important;
+ width: auto !important;
+ display: inline-block !important;
+ background: #331d4e !important;
+ font-size: 18px !important;
+ color: #fff !important;
+ font-family: 'LatoWebLight' !important;
+ padding: 2px 14px 1px !important ;
+ border-radius: 5px !important;
+ -moz-border-radius: 5px !important;
+ -webkit-border-radius: 5px !important;
+ margin-bottom: 1% !important;
+} 
+
+.report-container
+{
+    float: left;
+    width: 100%;
+    overflow: hidden;
+    height: calc(100% - 75px);
 }

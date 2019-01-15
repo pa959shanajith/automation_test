@@ -9,7 +9,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 	var pauseloadinginterval = false;
 	var clearIntervalList = [];
 	$scope.reportIdx = ''; // for execution count click
-	$("#page-taskName").empty().append('<span>Reports</span>')
+	$("#page-taskName").empty().append('Reports');
 
 	cfpLoadingBar.start()
 	$timeout(function () {
