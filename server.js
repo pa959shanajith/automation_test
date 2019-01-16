@@ -338,7 +338,7 @@ if (cluster.isMaster) {
         });
 
         //Test Lead and Test Manager can access
-        app.get(/^\/(p_Webocular|neuronGraphs|p_ALM|p_Dashboard|p_APG)$/, function(req, res) {
+        app.get(/^\/(p_Webocular|neuronGraphs|p_ALM|p_APG)$/, function(req, res) {
             var roles = ["Test Manager", "Test Lead"];   //Allowed roles
             sessionCheck(req, res, roles);
         });
@@ -434,7 +434,6 @@ if (cluster.isMaster) {
         var webocular = require('./server/controllers/webocular');
         var chatbot = require('./server/controllers/chatbot');
         var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
-        var dashboard = require('./server/controllers/dashboard');
         var taskbuilder = require('./server/controllers/taskJson');
         var flowGraph = require('./server/controllers/flowGraph');
 
@@ -555,10 +554,6 @@ if (cluster.isMaster) {
         app.post('/qcFolderDetails_ICE', qc.qcFolderDetails_ICE);
         app.post('/saveQcDetails_ICE', qc.saveQcDetails_ICE);
         app.post('/viewQcMappedList_ICE', qc.viewQcMappedList_ICE);
-        // Dashboard Routes
-        app.post('/loadDashboard', dashboard.loadDashboard);
-        app.post('/loadDashboardData', dashboard.loadDashboardData);
-        app.post('/loadDashboard_2', dashboard.loadDashboard_2);
         //app.post('/manualTestcaseDetails_ICE', qc.manualTestcaseDetails_ICE);
         // Automated Path Generator Routes
         app.post('/flowGraphResults', flowGraph.flowGraphResults);

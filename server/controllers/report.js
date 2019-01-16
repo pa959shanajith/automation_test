@@ -15,13 +15,13 @@ var Handlebars = require('../lib/handlebar.js');
 var wkhtmltopdf = require('wkhtmltopdf');
 var fs = require('fs');
 wkhtmltopdf.command = process.cwd() +"\\assets\\wkhtmltox\\bin\\wkhtmltopdf.exe"
-var reportpath = "../../data/templates";
+var reportpath = "../../assets/templates";
 var templatepdf = '', templateweb = '';
-fs.readFile('data/templates/pdfReport/content.handlebars', 'utf8', function(err, data) {
+fs.readFile('assets/templates/pdfReport/content.handlebars', 'utf8', function(err, data) {
 	templatepdf = data;
 });
 
-fs.readFile('data/templates/specificReport/content.handlebars', 'utf8', function(err, data) {
+fs.readFile('assets/templates/specificReport/content.handlebars', 'utf8', function(err, data) {
 	templateweb = data;
 });
 
