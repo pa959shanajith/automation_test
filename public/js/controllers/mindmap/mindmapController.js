@@ -2037,6 +2037,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     });
 
     $scope.createNodes = function($event) {
+        if(!$event.originalEvent) return;
         blockUI('Validating names..');
         var nodeNames = [];
         $('.errBorder').removeClass('errBorder');
@@ -3992,7 +3993,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         });
     };
 
-    $scope.addScenariosete = function(e) {
+    $scope.addScenariosete = function($event) {
+        if (!$event.originalEvent) return;
         SaveCreateED('#ct-createAction', 1, 0);
         //// #817 To select multiple scenarios in e2e (Himanshu)
         $('.selectScenariobg').each(function(i, obj) {
