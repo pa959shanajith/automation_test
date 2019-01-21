@@ -2515,9 +2515,6 @@ input[disabled]{
     color: #fff;
     font-size: 15px;
     font-family: 'LatoWebLight';
-    /* position: fixed;
-    width: 95%;
-    margin-top: -2%; */
 }
 
 .scenarioHeaders tr{width: 100%;}
@@ -5729,6 +5726,7 @@ ul.browserInlineIcons
     float: left;
     height: 50%;
     overflow-x: hidden;
+    overflow-y: hidden;
 }
 .reportScenarioDataTable
 {
@@ -5761,7 +5759,6 @@ ul.browserInlineIcons
     width: 99%;
     float:left;
     height: 90%;
-    /* margin-left: 2% !important; */
 }
 .getScenarioTestCaseDetails td,.reportHeaders thead tr th,.executionTimeDetails td
 {
