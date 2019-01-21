@@ -5758,7 +5758,7 @@ ul.browserInlineIcons
 {
     width: 99%;
     float:left;
-    height: 90%;
+    /* height: 90%; */
 }
 .getScenarioTestCaseDetails td,.reportHeaders thead tr th,.executionTimeDetails td
 {
