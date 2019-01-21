@@ -42,119 +42,102 @@
 <!-- Report Header -->
 <h4 class='titleBadge'><span id="page-taskName" class="badge badge-secondary badge-reports">Reports</span></h4>
 <!-- Report Header -->
-<!-- Dropdown Div -->
-        <div class='filterReport'>
-        <form class="form-inline filterReports"> 
-            <div class='col-sm-3'>   
-                <div class="form-group rpSelectProjects">
-                    <label for="projects">Projects:</label>
-                    <select id='selectProjects' class="rpProjects" ng-model="projectNames" ng-change='selProjectsFilter()'></select>
-                </div>
-            </div>
-            <div class='col-sm-3'>
-                <div class="form-group rpSelectProjects">
-                        <label for="projects">Releases:</label>
-                        <select id='selectReleases' class="rpReleases" ng-model="releaseNames" ng-change='selReleasesFilter()'><option>Select Releases</option></select>
-                </div>
-            </div>
-            <div class='col-sm-3'>
-                <div class="form-group rpSelectProjects">
-                        <label for="projects">Cycles:</label>
-                        <select id='selectCycles' class="rpCycles"  ng-model="cycleNames" ng-change='selCyclesFilter()'><option>Select Cycles</option></select>
-                </div>
-            </div>
-            <div class='col-sm-3'>
-                <div class="form-group rpSearch">
-                        <input class="reports-search" type="text" placeholder="Search" aria-label="Search">
-                        <img alt="Search Icon" class="searchReports" src="imgs/ic-search-icon.png">
-                </div>
-            </div>            
-        </form>
-        </div>
-<!-- Dropdown Div -->
-
-<!-- Module Table Div -->
-<div class='report-container'>
-<img class="no-reports" src="imgs/nothing-here.svg" style="display: none;margin-left: auto;margin-right: auto; width: 50%;position: relative; top: 76px;">
-
-  <div class="table-responsive reportDataTable" id='reportDataTable'>
-        <table class="table table-striped tblstruct">
-          <thead class='reportHeaders'>
-            <tr>
-              <th scope="col">Sl.No</th>
-              <th scope="col">Module Name</th>
-              <th scope="col">Scenario Name</th>
-              <th scope="col">Execution Count</th>
-              <th scope="col">Last Execution Status</th>
-              <th scope="col">Executed On</th>
-              <th scope="col">View Report</th>
-            </tr>
-          </thead>
-          <tbody class='reportBody report-table-body scrollbar-inner'  style = "font-size: 12.5px;">
-                <tr class='getScenarioTestCaseDetails' ng-repeat="report in result_reportData"  report-idx="{{$index+1}}" style= "word-break: break-all;">
-                        <td scope="row">{{report.id}}</td>
-                        <td class="reptable-modulename">{{report.ModuleName }}</td>
-                        <td class="reptable-scenarioname">{{report.ScenarioName}}</td>
-                        <td class='executionCount' ng-click='getscenarioDetails($event)'>{{report.count}}</td>
-                        <td ng-if="report.latestStatus == 'Fail'" class="colorStatusRed">{{report.latestStatus}}</td>
-                        <td ng-if="report.latestStatus == 'Pass'" class="colorStatusGreen">{{report.latestStatus}}</td>
-                        <td ng-if="report.latestStatus == 'Terminate'" class="colorStatusOrnage">{{report.latestStatus}}</td>
-                        <td ng-if="report.latestStatus == 'Incomplete'" class="colorStatusYellow">{{report.latestStatus}}</td>
-                        <td ng-if="report.latestStatus == 'Skipped'" class="colorStatusBlue">{{report.latestStatus}}</td>
-                        <td ng-if="report.latestStatus != 'Skipped' && report.latestStatus != 'Fail' && report.latestStatus != 'Pass' && report.latestStatus != 'Terminate' && report.latestStatus != 'Incomplete'" class="">{{report.latestStatus}}</td>
-                        <td>{{report.executedon}}</td>
-                        <td>
-                            <div ng-hide="report.count==0" >
-                              <img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'>
-                              <img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'>
-                              <img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'>
-                            </div>
-                          </td>
-                </tr>
-          </tbody>
-        </table>
-      </div>
-      
-  <!-- Module Table Div -->
-
-    <!-- Scenario Table Div -->
-    <div class="table-responsive reportScenarioDataTable" id='reportScenarioDataTable'>
-            <table id="rowspan" class="table table-striped tblstruct tablesorter">
-                <thead class='reportHeaders'>
-                    <tr>
-                      <th scope="col">Sl.No</th>
-                      <th scope="col">Execution Time (Start Time)</th>
-                      <th scope="col">Execution Time (End Time)</th>
-                      <th scope="col">Executed On</th>
-                      <th scope="col">Execution Status</th>
-                      <th scope="col">View Report</th>
-                    </tr>
-                  </thead>
-                  <tbody class='reportBody report-scenario-body scrollbar-inner' style = "font-size: 12.5px;">
-                     <tr class='executionTimeDetails' ng-repeat="scenario in result_res_scenarioData">
-                      <td scope="row" >{{$index+1}}</td>
-                      <td>{{scenario.executedtime }}</td>
-                      <td>{{scenario.executedtime}}</td>
-                      <td>{{scenario.browser}}</td>
-                      <td ng-if="scenario.status == 'Fail'" class="colorStatusRed">{{scenario.status}}</td>
-                      <td ng-if="scenario.status == 'Pass'" class="colorStatusGreen">{{scenario.status}}</td>
-                      <td ng-if="scenario.status == 'Terminate'" class="colorStatusOrnage">{{scenario.status}}</td>
-                      <td ng-if="scenario.status == 'Incomplete'" class="colorStatusYellow">{{scenario.status}}</td>
-                      <td ng-if="scenario.status == 'Skipped'" class="colorStatusBlue">{{scenario.status}}</td>
-                      <td>
-                            <img alt='Pdf Icon' class='archivedreport getSpecificReportBrowser openreportstatus reportFormat' data-reportidx='{{$index}}' data-getrep='wkhtmltopdf' data-reportid='{{scenario.reportid}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'>
-                            <img alt='-' class='archivedreport getSpecificReportBrowser openreportstatus reportFormat' data-reportidx='{{$index}}' data-getrep='html' data-reportid='{{scenario.reportid}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'>
-                            <img alt='Export JSON' class='archivedreport exportToJSON openreportstatus reportFormat' data-reportidx='{{$index}}' data-getrep='json' data-reportid='{{scenario.reportid}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'>
-                    </td>
-                    </tr>
-                  </tbody>
-            </table>
-        </div>
-    </div>
-    <!-- Scenario Table Div -->
 
 
+
+<!--Bootstrap Dropdown Div -->
+<div class='report-box'>
+        <form class="form-inline">
+            <label for="projects">Projects:</label>
+            <select id='selectProjects' class="rpProjects" ng-model="projectNames" ng-change='selProjectsFilter()'></select>            
+            <label for="releases">Releases:</label>
+            <select id='selectReleases' class="rpReleases" ng-model="releaseNames" ng-change='selReleasesFilter()'><option>Select Releases</option></select>
+            <label for="Cycles">Cycles:</label>
+            <select id='selectCycles' class="rpCycles"  ng-model="cycleNames" ng-change='selCyclesFilter()'><option>Select Cycles</option></select>
+            <label style='visibility:hidden' for="search">Search:</label>
+            <input class="reports-search" type="text" placeholder="Search" aria-label="Search">
+            <img alt="Search Icon" class="reportsSearchIcon" src="imgs/ic-search-icon.png">
+          </form>
 </div>
+<!--Bootstrap Dropdown Div -->
+<!-- <img class="no-reports" src="imgs/nothing-here.svg" style="display: none;margin-left: auto;margin-right: auto; width: 50%;position: relative; top: 76px;"> -->
+
+<!-- Module Table -->
+<div class='report-container'>
+        <!-- Table1 -->
+        <div class="table-responsive reportDataTable" id='reportDataTable'>
+                <table class="table table-striped tblstruct col-xs-12">
+                        <thead class='reportHeaders'>
+                                <tr>
+                                    <th class="col-xs-1">Sl.No</th>
+                                    <th class="col-xs-2" scope="col">Module Name</th>
+                                    <th class="col-xs-2" scope="col">Scenario Name</th>
+                                    <th class="col-xs-2" scope="col">Execution Count</th>
+                                    <th class="col-xs-2" scope="col">Last Execution Status</th>
+                                    <th class="col-xs-2" scope="col">Executed On</th>
+                                    <th class="col-xs-2" scope="col">View Report</th>
+                                </tr>
+                        </thead>
+                        <tbody class='reportBody report-table-body col-xs-12 scrollbar-inner'  style = "font-size: 12.5px;float:none;">
+                                <tr class='getScenarioTestCaseDetails' ng-repeat="report in result_reportData"  report-idx="{{$index+1}}" style= "word-break: break-all;">
+                                        <td class="col-xs-1" scope="row">{{report.id}}</td>
+                                        <td class="reptable-modulename col-xs-2">{{report.ModuleName }}</td>
+                                        <td class="reptable-scenarioname col-xs-2">{{report.ScenarioName}}</td>
+                                        <td class='executionCount col-xs-2' ng-click='getscenarioDetails($event)'>{{report.count}}</td>
+                                        <td ng-if="report.latestStatus == 'Fail'" class="colorStatusRed col-xs-2">{{report.latestStatus}}</td>
+                                        <td ng-if="report.latestStatus == 'Pass'" class="colorStatusGreen col-xs-2">{{report.latestStatus}}</td>
+                                        <td ng-if="report.latestStatus == 'Terminate'" class="colorStatusOrnage col-xs-2">{{report.latestStatus}}</td>
+                                        <td ng-if="report.latestStatus == 'Incomplete'" class="colorStatusYellow col-xs-2">{{report.latestStatus}}</td>
+                                        <td ng-if="report.latestStatus == 'Skipped'" class="colorStatusBlue col-xs-2">{{report.latestStatus}}</td>
+                                        <td ng-if="report.latestStatus != 'Skipped' && report.latestStatus != 'Fail' && report.latestStatus != 'Pass' && report.latestStatus != 'Terminate' && report.latestStatus != 'Incomplete'" class="col-xs-2">{{report.latestStatus}}</td>
+                                        <td class="col-xs-2">{{report.executedon}}</td>
+                                        <td class="col-xs-2">
+                                            <div ng-hide="report.count==0" >
+                                              <img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'>
+                                              <img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'>
+                                              <img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'>
+                                            </div>
+                                          </td>
+                                </tr>
+                        </tbody>
+                      </table>
+        </div>
+
+        <!-- Table2 -->
+        <div class="table-responsive reportScenarioDataTable" id='reportScenarioDataTable'>
+                <table id="rowspan" class="table table-striped tblstruct col-xs-12">
+                        <thead class='reportHeaders'>
+                                <tr>
+                                    <th class="col-xs-1" scope="col">Sl.No</th>
+                                    <th class="col-xs-2" scope="col">Execution Time (Start Time)</th>
+                                    <th class="col-xs-2" scope="col">Execution Time (End Time)</th>
+                                    <th class="col-xs-2" scope="col">Executed On</th>
+                                    <th class="col-xs-2" scope="col">Execution Status</th>
+                                    <th class="col-xs-2" scope="col">View Report</th>
+                                </tr>
+                          </thead>
+                          <tbody class='reportBody report-scenario-body col-xs-12 scrollbar-inner' style = "font-size: 12.5px;float:none;">
+                                <tr class='executionTimeDetails' ng-repeat="scenario in result_res_scenarioData">
+                                        <td class="col-xs-1" scope="row" >{{$index+1}}</td>
+                                        <td class="col-xs-2">{{scenario.executedtime }}</td>
+                                        <td class="col-xs-2">{{scenario.executedtime}}</td>
+                                        <td class="col-xs-2">{{scenario.browser}}</td>
+                                        <td ng-if="scenario.status == 'Fail'" class="colorStatusRed col-xs-2">{{scenario.status}}</td>
+                                        <td ng-if="scenario.status == 'Pass'" class="colorStatusGreen col-xs-2">{{scenario.status}}</td>
+                                        <td ng-if="scenario.status == 'Terminate'" class="colorStatusOrnage col-xs-2">{{scenario.status}}</td>
+                                        <td ng-if="scenario.status == 'Incomplete'" class="colorStatusYellow col-xs-2">{{scenario.status}}</td>
+                                        <td ng-if="scenario.status == 'Skipped'" class="colorStatusBlue col-xs-2">{{scenario.status}}</td>
+                                        <td class="col-xs-2">
+                                              <img alt='Pdf Icon' class='archivedreport getSpecificReportBrowser openreportstatus reportFormat' data-reportidx='{{$index}}' data-getrep='wkhtmltopdf' data-reportid='{{scenario.reportid}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'>
+                                              <img alt='-' class='archivedreport getSpecificReportBrowser openreportstatus reportFormat' data-reportidx='{{$index}}' data-getrep='html' data-reportid='{{scenario.reportid}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'>
+                                              <img alt='Export JSON' class='archivedreport exportToJSON openreportstatus reportFormat' data-reportidx='{{$index}}' data-getrep='json' data-reportid='{{scenario.reportid}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'>
+                                      </td>
+                                </tr>
+                          </tbody>
+                    </table>
+        </div>
+</div>
+<!-- Module Table -->
 <!--Middle Panel-->
 
    <!-- Right Section --> 

@@ -137,13 +137,13 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		unreadNotifications();
 	}, 500);
 
-	$scope.dropdownMenuButton = function(){
+	$scope.dropdownMenuButton = function($event){
 		if(window.localStorage.notification)
 		{
 			$scope.notifications = JSON.parse(window.localStorage.notification);
 		}
 		if (!window.localStorage.notification) {
-			$("#notifyBox").removeClass('dropdown-menu');
+			$("#notifyBox").hide();
 			return;
 		}
 

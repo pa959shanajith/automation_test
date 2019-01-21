@@ -1,4 +1,12 @@
 <div ng-controller='headerController' class="container-fluid container-fluid-spacing">
+        <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                  <span class="sr-only">Toggle navigation</span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                </button>
+        </div>
     <!--left Logo-->
     <div class="logoPart">
         <img width="160" src="imgs/logo.png" style="cursor: pointer;" id='naviPg' ng-click="naviPg($event)" />
@@ -10,31 +18,8 @@
 
     <!--Right Navigation-->
     <div class="dropdown dropdown-userPart">
-        <div class="col-md-6" id='sRole' ng-click="switchRole()">
-            <button class="btn dropdown-toggle dropdown-userrole" type="button" data-toggle="dropdown">
-                <span><img class="header-ic" src="imgs/ic-switch-user.png" /></span>
-                <span class='userInfo'>Switch Role</span>
-            </button>
-            <ul class="dropdown-menu" id="switchRoles"></ul>
-        </div>
-
-        <div class="col-md-6">
-            <button class="btn dropdown-toggle dropdown-userinfo" type="button" data-toggle="dropdown"><span id='displayUsername' class='userInfo'></span> 
-                <span class="ic-caret"><img class="header-ic" src="imgs/ic-user-nav.png" /></span>
-            </button>
-            <ul class="dropdown-menu">
-                <li><a href="#" class='userRole'>Test Manager</a></li>
-                <li class="divider"></li>
-                <li><a href="#" ng-click ="$event.preventDefault(); logout($event);">Logout</a></li>
-            </ul>
-        </div>
-        <!--<div class="col-sm-2 bell-icon-div" ng-click="showNotifications()">
-            <span class="count animated ng-binding" id="notifications-count">1</span>
-            <span class='glyphicon glyphicon-bell bell-icon'></span>
-        </div>-->
-
-        <div class="dropdown col-sm-2 bell-icon-div">
-            <button class="btn btn-secondary dropdown-toggle notify-btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" ng-click="dropdownMenuButton()" aria-expanded="false" >
+        <div class="dropdown col-xs-2 bell-icon-div">
+            <button class="btn btn-secondary dropdown-toggle notify-btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" ng-click="dropdownMenuButton($event)" aria-expanded="false" >
                 <span class="count animated ng-binding" id="notifications-count" ng-bind=""></span>
                 <span class='glyphicon glyphicon-bell bell-icon'></span>
             </button>
@@ -49,6 +34,23 @@
                 </div>
             </div>
         </div>
+        <div class="col-xs-2" id='sRole' ng-click="switchRole()">
+                <button class="btn dropdown-toggle dropdown-userrole" type="button" data-toggle="dropdown">
+                    <span><img class="header-ic" src="imgs/ic-switch-user.png" /></span>
+                    <span class='userInfo'>Switch Role</span>
+                </button>
+             <ul class="dropdown-menu" id="switchRoles"></ul>
+        </div>
+        <div class="col-xs-2 usernameDropdown">
+                <button class="btn dropdown-toggle dropdown-userinfo" type="button" data-toggle="dropdown"><span id='displayUsername' class='userInfo'></span> 
+                    <span class="ic-caret"><img class="header-ic" src="imgs/ic-user-nav.png" /></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class='userRole'>Test Manager</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#" ng-click ="$event.preventDefault(); logout($event);">Logout</a></li>
+                </ul>
+            </div>
     </div>
     <!--Right Navigation-->
 
