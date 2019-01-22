@@ -32,6 +32,12 @@
         setTimeout((function () {
             return function () {
                 loadReports();
+                try {
+                      window.stop();
+                   } 
+                catch (exception) {
+                    document.execCommand('Stop');
+                }
                 //window.stop();
             };
         })(), 400);
