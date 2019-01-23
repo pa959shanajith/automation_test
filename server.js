@@ -16,7 +16,8 @@ try {
 // Module Dependencies
 var cluster = require('cluster');
 var expressWinston = require('express-winston');
-var epurl = "http://" + process.env.NDAC_IP + ":" + process.env.NDAC_PORT + "/";
+var epurl = "http://" + (process.env.NDAC_IP || "127.0.0.1") + ":" + (process.env.NDAC_PORT || "1990") + "/";
+process.env.NDAC_URL = epurl;
 var logger = require('./logger');
 var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 
@@ -77,7 +78,7 @@ if (cluster.isMaster) {
             honorCipherOrder: true
         };
         var httpsServer = require('https').createServer(credentials, app);
-        if (!process.env.serverPort) process.env.serverPort = 8443;
+        var serverPort = process.env.SERVER_PORT || 8443;
         module.exports = app;
         module.exports.redisSessionStore = redisSessionStore;
         module.exports.httpsServer = httpsServer;
@@ -591,8 +592,9 @@ if (cluster.isMaster) {
         });
 
         //-------------SERVER START------------//
+        var hostFamilyType = (nginxEnabled) ? '127.0.0.1' : '0.0.0.0';
         var initServer = function initServer(httpsServer,suite,logger,epurl,apiclient){
-            httpsServer.listen(portNumber, hostFamilyType); //Https Server
+            httpsServer.listen(serverPort, hostFamilyType); //Https Server
             try {
                 var apireq = apiclient.post(epurl + "server", function(data, response) {
                     try {
@@ -617,9 +619,6 @@ if (cluster.isMaster) {
                 logger.error("Please run the Service API");
             }
         };
-
-        var hostFamilyType = (nginxEnabled) ? '127.0.0.1' : '0.0.0.0';
-        var portNumber = process.env.serverPort;
         if (auth.isReady) initServer(httpsServer,suite,logger,epurl,apiclient);
         else {
             auth.onReadyCallback = function () { initServer(httpsServer,suite,logger,epurl,apiclient); };

@@ -10,7 +10,7 @@ var myserver = require('./../../server');
 var httpsServer = myserver.httpsServer;
 var io = require('socket.io').listen(httpsServer, { cookie: false });
 var notificationMsg = require('./../notifications/notifyMessages');
-var epurl = "http://" + process.env.NDAC_IP + ":" + process.env.NDAC_PORT + "/";
+var epurl = process.env.NDAC_URL;
 var Client = require("node-rest-client").Client;
 var apiclient = new Client();
 

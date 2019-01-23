@@ -6,7 +6,7 @@ var async = require('async');
 var parse = require('xml-parser');
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
+var epurl = process.env.NDAC_URL;
 var logger = require('../../logger');
 //base RequestElement
 //var baseRequestBody = {};

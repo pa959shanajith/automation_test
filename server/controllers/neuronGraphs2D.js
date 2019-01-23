@@ -3,7 +3,7 @@ var neo4jAPI = require('../controllers/neo4jAPI');
 var logger = require('../../logger');
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
+var epurl = process.env.NDAC_URL;
 var utils = require('../lib/utils');
 
 var parseData = function(data){

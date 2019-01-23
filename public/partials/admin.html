@@ -579,14 +579,14 @@
 						<table class = "table table-hover sessionTable">
 							<tr>
 								<th> Username </th>
-								<th> Mode </th>
-								<th> IP </th>
+								<th> Connection Mode </th>
+								<th ng-if="false"> IP </th>
 								<th><button class="btn" style="visibility:hidden"> Disconnect </button></th>
 							</tr>
 							<tr ng-repeat="user in sessionConf.clients">
 								<td> {{user.username}} </td>
 								<td> {{user.mode}} </td>
-								<td> {{user.ip}} </td>
+								<td ng-if="false"> {{user.ip}} </td>
 								<td><button class="btn" data-id="{{$index}}" ng-click="sessionConf.kill($event)" > Disconnect </button></td>
 							</tr>
 						</table>
