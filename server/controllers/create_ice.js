@@ -8,7 +8,7 @@ var Client = require("node-rest-client").Client;
 var client = new Client();
 var neo4jAPI = require('../controllers/neo4jAPI');
 var logger = require('../../logger');
-var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
+var epurl = process.env.NDAC_URL;
 var qList=[]; //For neurongraphs
 
 function get_moduleName(moduleId, cb, data) {

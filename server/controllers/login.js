@@ -1,6 +1,6 @@
 var async = require('async');
 var uidsafe = require('uid-safe');
-var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
+var epurl = process.env.NDAC_URL;
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var logger = require('../../logger');

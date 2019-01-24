@@ -9,7 +9,7 @@ var Negotiator = require('negotiator');
 var fs = require("fs");
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
+var epurl = process.env.NDAC_URL;
 var logger = require("../../logger");
 var ssoEnabled = process.env.ENABLE_SSO.toLowerCase().trim() == "true";
 var strategy = (ssoEnabled)? process.env.SSO_PROTOCOL.toLowerCase().trim():"inhouse";

@@ -16,7 +16,8 @@ try {
 // Module Dependencies
 var cluster = require('cluster');
 var expressWinston = require('express-winston');
-var epurl = "http://" + process.env.NDAC_IP + ":" + process.env.NDAC_PORT + "/";
+var epurl = "http://" + (process.env.NDAC_IP || "127.0.0.1") + ":" + (process.env.NDAC_PORT || "1990") + "/";
+process.env.NDAC_URL = epurl;
 var logger = require('./logger');
 var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 
@@ -77,7 +78,7 @@ if (cluster.isMaster) {
             honorCipherOrder: true
         };
         var httpsServer = require('https').createServer(credentials, app);
-        if (!process.env.serverPort) process.env.serverPort = 8443;
+        var serverPort = process.env.SERVER_PORT || 8443;
         module.exports = app;
         module.exports.redisSessionStore = redisSessionStore;
         module.exports.httpsServer = httpsServer;
@@ -338,7 +339,7 @@ if (cluster.isMaster) {
         });
 
         //Test Lead and Test Manager can access
-        app.get(/^\/(p_Webocular|neuronGraphs|p_ALM|p_Dashboard|p_APG)$/, function(req, res) {
+        app.get(/^\/(p_Webocular|neuronGraphs|p_ALM|p_APG)$/, function(req, res) {
             var roles = ["Test Manager", "Test Lead"];   //Allowed roles
             sessionCheck(req, res, roles);
         });
@@ -434,7 +435,6 @@ if (cluster.isMaster) {
         var webocular = require('./server/controllers/webocular');
         var chatbot = require('./server/controllers/chatbot');
         var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
-        var dashboard = require('./server/controllers/dashboard');
         var taskbuilder = require('./server/controllers/taskJson');
         var flowGraph = require('./server/controllers/flowGraph');
 
@@ -555,10 +555,6 @@ if (cluster.isMaster) {
         app.post('/qcFolderDetails_ICE', qc.qcFolderDetails_ICE);
         app.post('/saveQcDetails_ICE', qc.saveQcDetails_ICE);
         app.post('/viewQcMappedList_ICE', qc.viewQcMappedList_ICE);
-        // Dashboard Routes
-        app.post('/loadDashboard', dashboard.loadDashboard);
-        app.post('/loadDashboardData', dashboard.loadDashboardData);
-        app.post('/loadDashboard_2', dashboard.loadDashboard_2);
         //app.post('/manualTestcaseDetails_ICE', qc.manualTestcaseDetails_ICE);
         // Automated Path Generator Routes
         app.post('/flowGraphResults', flowGraph.flowGraphResults);
@@ -596,8 +592,9 @@ if (cluster.isMaster) {
         });
 
         //-------------SERVER START------------//
+        var hostFamilyType = (nginxEnabled) ? '127.0.0.1' : '0.0.0.0';
         var initServer = function initServer(httpsServer,suite,logger,epurl,apiclient){
-            httpsServer.listen(portNumber, hostFamilyType); //Https Server
+            httpsServer.listen(serverPort, hostFamilyType); //Https Server
             try {
                 var apireq = apiclient.post(epurl + "server", function(data, response) {
                     try {
@@ -622,9 +619,6 @@ if (cluster.isMaster) {
                 logger.error("Please run the Service API");
             }
         };
-
-        var hostFamilyType = (nginxEnabled) ? '127.0.0.1' : '0.0.0.0';
-        var portNumber = process.env.serverPort;
         if (auth.isReady) initServer(httpsServer,suite,logger,epurl,apiclient);
         else {
             auth.onReadyCallback = function () { initServer(httpsServer,suite,logger,epurl,apiclient); };
