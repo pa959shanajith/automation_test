@@ -1,21 +1,7 @@
 var async = require('async');
-var logger = require('../../logger');
+//var logger = require('../../logger');
 var myserver = require('../../server');
 var redisServer = require('./redisSocketHandler');
-
-module.exports.allSess = function (cb){
-	myserver.redisSessionStore.all(cb);
-};
-
-module.exports.delSession = function (data, cb){
-	if (data.action == "disconnect") {
-		redisServer.redisPubICE.publish("ICE1_"+data.key+"_"+data.user, JSON.stringify({"emitAction":"killSession","username":data.user,"cmdBy":data.cmdBy}));
-		cb();
-	} else {
-		redisServer.redisPubICE.publish("UI_notify_"+data.user, JSON.stringify({"emitAction":"killSession","username":data.user}));
-		myserver.redisSessionStore.destroy(data.key, cb);
-	}
-};
 
 module.exports.getChannelNum = function(channel,cb) {
 	redisServer.redisPubICE.pubsub('numsub', channel,function(err,redisres){
@@ -60,6 +46,31 @@ module.exports.getSocketList = function(toFetch, cb) {
 			cb(connectusers);
 		});
 	}
+};
+
+module.exports.allSess = function (cb){
+	myserver.redisSessionStore.all(cb);
+};
+
+module.exports.delSession = function (data, cb){
+	if (data.action == "disconnect") {
+		redisServer.redisPubICE.publish("ICE1_"+data.key+"_"+data.user, JSON.stringify({"emitAction":"killSession","username":data.user,"cmdBy":data.cmdBy}));
+		cb();
+	} else {
+		redisServer.redisPubICE.publish("UI_notify_"+data.user, JSON.stringify({"emitAction":"killSession","username":data.user}));
+		myserver.redisSessionStore.destroy(data.key, cb);
+	}
+};
+
+module.exports.cloneSession = function (req, cb){
+	var sessid = "sess:" + req.session.id;
+	var sessClient = myserver.redisSessionStore.client;
+	sessClient.ttl(sessid, function(err, ttl) {
+		if (err) return cb(err);
+		var args = [sessid,JSON.stringify(req.session),'EX',ttl];
+		req.clearSession();
+		sessClient.set(args, function(err) { return cb(err); });
+	});
 };
 
 module.exports.resetSession = function(session) {

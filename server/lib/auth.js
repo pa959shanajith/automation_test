@@ -11,6 +11,7 @@ var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl = process.env.NDAC_URL;
 var logger = require("../../logger");
+var utils = require('./utils');
 var ssoEnabled = process.env.ENABLE_SSO.toLowerCase().trim() == "true";
 var strategy = (ssoEnabled)? process.env.SSO_PROTOCOL.toLowerCase().trim():"inhouse";
 var config = require("../config/config.json");
@@ -197,8 +198,10 @@ var strategyUtil = {
 var routeUtil = {
 	"inhouse": function inhouse(opts){
 		authRouter.get(opts.route.login, function(req, res) {
-			req.clearSession();
-			return res.sendFile("app.html", { root: __dirname + "/../../public/" });
+			if (req.session.uniqueId) utils.cloneSession(req, function(err){
+				return res.sendFile("app.html", { root: __dirname + "/../../public/" });
+			});
+			else return res.sendFile("app.html", { root: __dirname + "/../../public/" });
 		});
 		authRouter.post("/authenticateUser_Nineteen68", function (req, res, next){
 			logger.info("Inside UI service: authenticateUser_Nineteen68");
