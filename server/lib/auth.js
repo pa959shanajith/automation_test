@@ -210,7 +210,8 @@ var routeUtil = {
 			return passport.authenticate("local", {
 				successRedirect: opts.route.success, failureRedirect: opts.route.failure, failureMessage: true
 			}, function(err, user, info){
-				req.logIn(user, opts, function(err) {
+				if (!user) res.send(info);
+				else req.logIn(user, opts, function(err) {
 					if (err) return next(err);
 					return res.send(info);
 				});
