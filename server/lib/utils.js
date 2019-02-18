@@ -32,7 +32,6 @@ module.exports.getSocketList = function(toFetch, cb) {
 					}
 					innerCB();
 				}
-				console.log("sent",e);
 				redisServer.redisSubServer.on("message",fetchIP);
 			}, function () {
 				cb(connectusers);
