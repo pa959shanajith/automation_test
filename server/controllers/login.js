@@ -124,14 +124,17 @@ exports.checkUserState_Nineteen68 = function (req, res) {
 					}
 				}
 			}, function (emsg) {
-				if (emsg == "ok") res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed:true});
-				else if (!sess.dndSess) req.clearSession();
-				return res.send(emsg);
+				if (sess.dndSess) utils.cloneSession(req, function(err){ return res.send("reload"); });
+				else {
+					if (emsg == "ok") res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed:true});
+					else req.clearSession();
+					return res.send(emsg);
+				}
 			});
 		} else {
 			logger.info("Invalid Session");
 			req.clearSession();
-			res.send("invalid_session");
+			res.send("Invalid Session");
 		}
 	} catch (exception) {
 		logger.error(exception.message);

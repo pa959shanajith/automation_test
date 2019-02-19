@@ -82,7 +82,7 @@ if (cluster.isMaster) {
         module.exports = app;
         module.exports.redisSessionStore = redisSessionStore;
         module.exports.httpsServer = httpsServer;
-		var io = require('./server/lib/socket');
+        var io = require('./server/lib/socket');
 
         //Caching static files for thirtyDays 
         var thirtyDays = 2592000; // in milliseconds
@@ -134,6 +134,13 @@ if (cluster.isMaster) {
             store: redisSessionStore
         }));
 
+        app.use('*', function(req, res, next) {
+            if (req.session === undefined) {
+                return next(new Error("redisnotavailable"));
+            }
+            return next();
+        });
+
         app.use(function(req, res, next) {
             req.clearSession = function clearSession() {
                 res.clearCookie('connect.sid');
@@ -156,13 +163,6 @@ if (cluster.isMaster) {
         var authStrategy = auth.strategy;
         app.use(auth.router);
         auth = auth.util;
-
-        app.use('*', function(req, res, next) {
-            if (req.session === undefined) {
-                return next(new Error("redisnotavailable"));
-            }
-            return next();
-        });
 
         //Based on NGINX Config Security Headers are configured
         if(!nginxEnabled){
@@ -256,7 +256,8 @@ if (cluster.isMaster) {
             var emsg=req.query.e;
             if (emsg) {
                 if (req.session.messages) emsg = req.session.messages[0];
-                else if (emsg == "401") emsg = "invalid_session";
+                else if (emsg == "400") emsg = "badrequest";
+                else if (emsg == "401") emsg = "Invalid Session";
                 else if (emsg == "403") emsg = "unauthorized";
                 else if (emsg == "sessexists") {
                     emsg = "userLogged";
@@ -271,8 +272,10 @@ if (cluster.isMaster) {
             if (!(req.url == '/' || req.url.startsWith("/?"))) return next();
             var userLogged = req.session.logged;
             var usrCtx = req[authParams.userinfo];
-            if (userLogged) req.session.emsg = req.session.emsg || "userLogged";
-            else if (!req.session.emsg && req.session.username==undefined) {
+            if (userLogged && !req.session.emsg) {
+                req.session.emsg = "userLogged";
+                req.session.dndSess = true;
+            } else if (!req.session.emsg && req.session.username==undefined) {
                 if (usrCtx) {
                     var username = (usrCtx.userinfo)? usrCtx.userinfo.username:usrCtx.username;
                     if (username == undefined) {
@@ -354,13 +357,14 @@ if (cluster.isMaster) {
                 return meta;
             };
 
-            var sessChk = sess.uniqueId && sess.activeRole && (roles.indexOf(sess.activeRole) != -1);
+            var sessChk = sess.uniqueId && sess.activeRole;
+            var roleChk = (roles.indexOf(sess.activeRole) != -1);
             var maintCookie = req.signedCookies["maintain.sid"];
-            if (sessChk) {
-                return (maintCookie)? res.sendFile("app.html", { root: __dirname + "/public/" }) : res.redirect("/error?e=sessexists");
-            } else {
+            if (sessChk && !maintCookie) return res.redirect("/error?e=sessexists");
+            if (sessChk && roleChk) return res.sendFile("app.html", { root: __dirname + "/public/" });
+            else {
                 req.clearSession();
-                return res.redirect("/error?e=401");
+                return res.redirect("/error?e="+((sessChk)? "400":"401"));
             }
         }
 
