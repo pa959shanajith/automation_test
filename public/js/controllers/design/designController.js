@@ -2069,7 +2069,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			if(e.target.parentNode.parentNode.attributes['data-tag'].value != 'iris') return false;
 			obj_xpath = e.target.parentNode.parentNode.attributes['data-xpath'].value;
 			var objType = String(e.target.parentNode.parentNode.attributes['data-xpath'].value).split(';');
-			objType = objType[objType.length-1].toUpperCase();
+			objType = objType[objType.length-1];
 			$(".generateObj span img").removeClass("left-bottom-selection");
 			$(".compareObject span img").removeClass("left-bottom-selection");
 			$(".addObject span img").addClass("left-bottom-selection");
