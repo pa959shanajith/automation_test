@@ -2060,7 +2060,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     }
 	
 	$(document).on("click", ".ellipsis", function(e) {
-		if(e.target.parentNode.parentNode.attributes['data-tag'].value == 'iris'){
+		if(this.clicks === undefined) this.clicks=0;
+		this.clicks++;
+		setTimeout(function(){
+			var clicks = e.target.clicks;
+			e.target.clicks = 0;
+			if(clicks != 1) return false;
+			if(e.target.parentNode.parentNode.attributes['data-tag'].value != 'iris') return false;
 			obj_xpath = e.target.parentNode.parentNode.attributes['data-xpath'].value;
 			var objType = String(e.target.parentNode.parentNode.attributes['data-xpath'].value).split(';');
 			objType = objType[objType.length-1].toUpperCase();
@@ -2077,7 +2083,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			$scope.removeAddObjectSelection = function () {
 				$("img.left-bottom-selection").removeClass('left-bottom-selection');
 			};
-		}
+		}, 500);
     });
 	
 	$scope.submitIrisObjectType = function (e) {
