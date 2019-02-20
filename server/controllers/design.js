@@ -263,6 +263,8 @@ exports.updateScreen_ICE = function (req, res) {
 			var inputs = {};
 			var inputstestcase = {};
 			var statusFlag = "";
+			newData = updateData.newData;
+			type = updateData.type;
 			if (param == "updateScrapeData_ICE") {
 				try {
 					scrapedObjects = updateData.getScrapeData;
@@ -1163,11 +1165,66 @@ exports.updateScreen_ICE = function (req, res) {
 												}
 											]);
 									} else {
-										statusFlag = "success";
-										try {
-											res.send(statusFlag);
-										} catch (exception) {
-											logger.error("Exception while sending response in the finalFunction: %s", exception);
+										var check_for_duplicate_images = false;
+										if(type=='save' && newData['view'] != undefined){
+											for(var i=0;i<newData['view'].length;i++){
+												if(newData['view'][i]['cord']!=null && newData['view'][i]['cord']!=''){
+													check_for_duplicate_images = true;
+													if(newData['view'][i]['tag']=='constant'){
+														check_for_duplicate_images = false;
+														break
+													}
+												}
+											}
+										}
+										if(!check_for_duplicate_images){
+											res.send("success");
+										}
+										else{
+											name = req.session.username;
+											redisServer.redisSubServer.subscribe('ICE2_' + name);
+											logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+											logger.debug("ICE Socket requesting Address: %s" , name);
+											redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+												if (redisres[1]>0){
+													var scrapedata = newData;
+													logger.info("Sending socket request for checkIrisDuplicate_ICE to redis");
+													dataToIce = {"emitAction" : "irisOperations","username" : name, "image_data":scrapedata, "param":"checkDuplicate"};
+													redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+													var updateSessionExpiry = utils.resetSession(req.session);
+													function checkIrisDuplicate_listener(channel,message) {
+														var data = JSON.parse(message);
+														if(name == data.username){
+															clearInterval(updateSessionExpiry);
+															redisServer.redisSubServer.removeListener('message',checkIrisDuplicate_listener);
+															if (data.onAction == "unavailableLocalServer") {
+																logger.error("Error occurred in checkIrisDuplicate_ICE: Socket Disconnected");
+																if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+																	var soc = myserver.socketMapNotify[name];
+																	soc.emit("ICEnotAvailable");
+																}
+															} else if (data.onAction == "iris_operations_result") {
+																if(data.value.length==0)
+																	res.send("success");
+																else
+																	res.send(data.value);
+															}
+														}
+													}
+													redisServer.redisSubServer.on("message",checkIrisDuplicate_listener);
+												}
+												else {
+													utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+														var flag="";
+														if (found) flag = "scheduleModeOn";
+														else {
+															flag = "unavailableLocalServer";
+															logger.info("ICE Socket not Available");
+														}
+														res.send(flag);
+													});
+												}
+											});
 										}
 									}
 								}
@@ -2095,3 +2152,56 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 		logger.error("Exception in the service getTestcasesByScenarioId_ICE: %s", exception);
 	}
 };
+
+exports.updateIrisDataset = function updateIrisDataset(req, res) {
+	try{
+		logger.info("Inside UI service: updateIrisDataset");
+		if (utils.isSessionActive(req)) {
+			name = req.session.username;
+			image_data = req.body.data;
+			redisServer.redisSubServer.subscribe('ICE2_' + name);
+			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+			logger.debug("ICE Socket requesting Address: %s" , name);
+			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+				if (redisres[1]>0) {
+					logger.info("Sending socket request for updateIrisDataset to redis");
+					dataToIce = {"emitAction" : "irisOperations","username" : name, "image_data":image_data, "param":"updateDataset"};
+					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					var updateSessionExpiry = utils.resetSession(req.session);
+					function updateIrisDataset_listener(channel,message) {
+						var data = JSON.parse(message);
+						if(name == data.username){
+							clearInterval(updateSessionExpiry);
+							redisServer.redisSubServer.removeListener('message',updateIrisDataset_listener);
+							if (data.onAction == "unavailableLocalServer") {
+								logger.error("Error occurred in updateIrisDataset: Socket Disconnected");
+								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+									var soc = myserver.socketMapNotify[name];
+									soc.emit("ICEnotAvailable");
+								}
+							} else if (data.onAction == "iris_operations_result") {
+								res.send(data.value);
+							}
+						}
+					}
+					redisServer.redisSubServer.on("message",updateIrisDataset_listener);
+				} else {
+					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+						var flag="";
+						if (found) flag = "scheduleModeOn";
+						else {
+							flag = "unavailableLocalServer";
+							logger.info("ICE Socket not Available");
+						}
+						res.send(flag);
+					});
+				}
+			});
+		} else {
+			logger.error("Error occurred in the service updateIrisDataset: Invalid Session");
+			res.send("Invalid Session");
+		}
+	} catch(exception){
+		logger.error("Exception in the service updateIrisDataset: %s", exception);
+	}
+}

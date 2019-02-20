@@ -690,6 +690,29 @@
 		</div>
 	</div>
 	<!-- Compare Object Modal  -->
+	
+	<!-- Iris Object Prediction Modal -->
+	<div id="dialog-irisObject" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog" style="width: 700px">
+			<!-- Modal content-->
+			<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="removeAddObjectSelection()" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Iris Object Type</h4>
+			</div>
+			<div class="modal-body modal-body-add_obj">
+
+				<!--Modal Content-->
+				<form class="form-inline scrollbar-inner addObjectScroll" id="addIrisObjContainer"></form>
+				<!--Modal Content-->
+			</div>
+			<div class="modal-footer">
+				<button ng-click="submitIrisObjectType($event)" type="button" id="rubmitObjRow" class="btn btn-default">Submit</button>
+			</div>
+			</div>
+		</div>
+	</div>
+	<!-- Iris Object Prediction Modal -->
 
 <!--Bootstrap Popup-->
 <testcasetemplate testcasetemplate></testcasetemplate>

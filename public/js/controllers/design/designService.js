@@ -180,6 +180,16 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http,$q)   {
 			},function(response){
 				return $q.reject(response.data)
 			})
-	 }
+		},
+		updateIrisDataset : function(data){
+			return $http.post('/updateIrisDataset',{
+				data : data
+			})
+			.then(function(response)  { 
+				return response.data
+			},function(response){
+				return $q.reject(response.data)
+			})
+		}
 	}
 }]);
