@@ -5137,8 +5137,14 @@ function contentTable(newTestScriptDataLS) {
         } else if (selectedText == "@Mobile") {
             objName = " ";
             url = " ";
-            var sc = Object.keys(keywordArrayList.generic);
-            selectedKeywordList = "generic";
+            if (navigator.appVersion.indexOf("Mac") != -1){
+                var sc = Object.keys(keywordArrayList.genericIos);
+                selectedKeywordList = "genericIos";
+            }
+            else{
+                var sc = Object.keys(keywordArrayList.generic);
+                selectedKeywordList = "generic";
+            }
             var res = '';
             for (var i = 0; i < sc.length; i++) {
                 if (selectedKeyword == sc[i]) {
@@ -5497,6 +5503,9 @@ function contentTable(newTestScriptDataLS) {
                         } else if (obType.indexOf("EditText") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeSecureTextField") >= 0) {
                             sc = Object.keys(keywordArrayList.input);
                             selectedKeywordList = "input";
+                        }else if (obType.indexOf("iOSEditText") >= 0 || obType.indexOf("iOSXCUIElementTypeSearchField") >= 0 || obType.indexOf("iOSXCUIElementTypeSecureTextField") >= 0){
+                            sc = Object.keys(keywordArrayList.inputIos);
+                            selectedKeywordList = "inputIos";
                         } else if (obType.indexOf("XCUIElementTypePickerWheel") >= 0) {
                             sc = Object.keys(keywordArrayList.pickerwheel);
                             selectedKeywordList = "pickerwheel";
@@ -6604,8 +6613,10 @@ function getTags(data) {
         obnames = ["@Generic", "@Excel", "@Window", "@Custom", "@Email", "@Word"];
     } else if (appTypeLocal == "DesktopJava") {
         obnames = ["@Generic", "@Excel", "@Oebs", "@Custom", "@Word"];
-    } else if (appTypeLocal == "MobileApp") {
+    } else if (appTypeLocal == "MobileApp" && navigator.appVersion.indexOf("Mac") == -1) {
         obnames = ["@Generic", "@Mobile", "@Action"];
+    } else if (appTypeLocal == "MobileApp" && navigator.appVersion.indexOf("Mac") != -1) {
+        obnames = ["@Generic", "@Mobile"];
     } else if (appTypeLocal == "MobileWeb") {
         obnames = ["@Generic", "@Browser", "@BrowserPopUp", "@Action"];
     } else if (appTypeLocal == "SAP") {
