@@ -279,7 +279,7 @@ if (cluster.isMaster) {
                 if (usrCtx) {
                     var username = (usrCtx.userinfo)? usrCtx.userinfo.username:usrCtx.username;
                     if (username == undefined) {
-                        req.session.emsg = "invalid_username";
+                        req.session.emsg = "invalid_username_password";
                     } else {
                         username = username.toLowerCase();
                         redisSessionStore.all(function (err, allKeys) {

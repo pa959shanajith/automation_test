@@ -81,6 +81,7 @@ var strategyUtil = {
 					logger.info("Calling NDAC Service : authenticateUser_Nineteen68/ldap");
 					client.post(epurl + "login/authenticateUser_Nineteen68/ldap", args, function (result, response) {
 						if (response.statusCode != 200 || result.rows == "fail") logger.error("Error occurred in authenticateUser_Nineteen68/ldap Error Code : ERRNDAC");
+						else if (result.rows.length == 0) return callback("invalid_username_password");
 						else if (result.rows[0].ldapuser != '{}') flag = JSON.parse(result.rows[0].ldapuser);
 						callback(null, flag);
 					});
@@ -159,7 +160,7 @@ var strategyUtil = {
 					userinfo.username = userinfo[opts.username];
 					return done(null, userinfo);
 				}
-				else return done(null, false, "invalid_username");
+				else return done(null, false, "invalid_username_password");
 			});
 
 			passport.use("oidc", oidcStrategy);
@@ -187,7 +188,7 @@ var strategyUtil = {
 				profile.username = profile[opts.username];
 				return done(null, profile);
 			}
-			else return done(null, null, "invalid_username");
+			else return done(null, null, "invalid_username_password");
 		});
 		passport.use("saml", samlStrategy);
 		passport.isReady = true;
