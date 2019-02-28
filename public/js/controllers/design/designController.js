@@ -4847,7 +4847,7 @@ function contentTable(newTestScriptDataLS) {
             url = " ";
             if (appTypeLocal == "MobileApp") {
                 var sc = Object.keys(keywordArrayList.defaultListMobility);
-                selectedKeywordList = "defaultListMobilityiOS";
+                selectedKeywordList = "defaultListMobility";
                 var res = '';
                 for (var i = 0; i < sc.length; i++) {
                     if (selectedKeyword == sc[i]) {
