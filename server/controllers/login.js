@@ -36,7 +36,7 @@ function checkAssignedProjects(username, main_callback) {
 					var userid = result.rows[0].userid;
 					var roleid = result.rows[0].defaultrole;
 					callback(null, userid, roleid);
-				} else callback("invalid_username");
+				} else callback("invalid_username_password");
 			});
 		},
 		function getUserRole(userid, roleid, callback) {
