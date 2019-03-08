@@ -1,4 +1,4 @@
-mySPA.controller('headerController', function($scope, $rootScope, $timeout, $http, $location, headerServices, LoginService, cfpLoadingBar, socket) {
+mySPA.controller('respHeaderController', function($scope, $rootScope, $timeout, $http, $location, respHeaderServices, LoginService, cfpLoadingBar, socket) {
 	var userDetails,username,userRole,task;
 	var selectedRoleID, selectedRoleName, redirectPath;
 	var projectId = [];
@@ -48,7 +48,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		$(".bell-icon-div").hide();
 	}
 
-	if ($location.$$path == "/plugin" || $location.$$path == "/p_Webocular") {
+	if ($location.$$path == "/plugin" || $location.$$path == "/p_Webocular" || $location.$$path == "/p_Dashboard") {
 		$("button.notify-btn").addClass('notify-btn-white');
 
 	}
@@ -138,13 +138,17 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	}, 500);
 
 	$scope.dropdownMenuButton = function($event){
+		$("#notifyBox").hide().addClass('hide');
 		if(window.localStorage.notification)
 		{
 			$scope.notifications = JSON.parse(window.localStorage.notification);
 		}
-		if (!window.localStorage.notification) {
-			$("#notifyBox").hide();
+		if (!window.localStorage.notification || window.localStorage.notification == 'undefined') {
+			$("#notifyBox").hide().addClass('hide');
 			return;
+		}
+		else{
+			$("#notifyBox").hide().removeClass('hide');
 		}
 
 		$("#notifyBox").removeClass('dropdown-menu').addClass('dropdown-menu');
@@ -181,7 +185,8 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			// labelArr.push(txnHistory.codesDict['Nineteen68Logo']);
 			// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 			$timeout(function () {
-				$location.path('/plugin');
+				//$location.path('/plugin');
+				window.location.href = '/plugin';
 		   	}, 100);
 		}
 	};
@@ -204,8 +209,10 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		var roleasarray = userDetails.additionalrole;
 		if (roleasarray.length == 0) {
 			$("#switchRoles").hide();
+			$("#switchRoles").addClass('hide');
 			openModelPopup("switchRoleStatus", "Switch Role", "There are no roles to switch");
 		} else {
+			$("#switchRoles").removeClass('hide');
 			LoginService.getRoleNameByRoleId_Nineteen68(roleasarray)
 			.then(function (data) {
 				if (data == "Invalid Session") {
@@ -261,7 +268,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 
 	if (window.localStorage['_CT']) {
 		projectId.push(JSON.parse(window.localStorage['_CT']).projectId);
-		headerServices.getNames_ICE(projectId,['projects']) 
+		respHeaderServices.getNames_ICE(projectId,['projects']) 
 		.then(function(data){
 			if(data == "Invalid Session"){
 				$rootScope.redirectPage();
@@ -271,14 +278,14 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 
 			releaseId.push(task.releaseid);
 			screenId.push(task.screenId);
-			headerServices.getNames_ICE(releaseId, ['releases']) 
+			respHeaderServices.getNames_ICE(releaseId, ['releases']) 
 			.then(function(data){
 				if(data == "Invalid Session"){
 				  $rootScope.redirectPage();
 				}
 				$scope.releaseDetails = data.respnames[0];
 				cycleId.push(task.cycleid);
-				headerServices.getNames_ICE(cycleId, ['cycles'])
+				respHeaderServices.getNames_ICE(cycleId, ['cycles'])
 				.then(function(data){
 					if(data == "Invalid Session"){
 				  		$rootScope.redirectPage();
@@ -287,7 +294,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 
 				}, function(error) {	console.log("Failed to get cycle name")});
 			}, function(error) {	console.log("Failed to get release name")});
-			headerServices.getNames_ICE(screenId,['screens']) 
+			respHeaderServices.getNames_ICE(screenId,['screens']) 
 		.then(function(data){
 			if(data == "Invalid Session"){
 				$rootScope.redirectPage();

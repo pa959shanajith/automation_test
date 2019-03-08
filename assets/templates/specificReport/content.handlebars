@@ -3,17 +3,18 @@
 <head>
     <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
     <title>SLK Nineteen68</title>
-	<style>
-		.no-disp{
-			display:none!important;
-		}
-        .unexpand,.expand
-        {
+    <style>
+        .no-disp {
+            display: none!important;
+        }
+
+        .unexpand,
+        .expand {
             cursor: pointer;
         }
-	</style>	
+    </style>
     <link rel="stylesheet" type="text/css" href="fonts/latofonts.css" />
-     <link rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.css" />
+    <link rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.css" />
     <script type="text/javascript" src="js/plugins/jquery.min.js"></script>
     <script>
         var url, userName, pwd;
@@ -26,43 +27,55 @@
         function unblockUI() {
             $("#overlayContainer").fadeOut(300).remove()
         }
-        setTimeout(function() {
-             var remarksLength = parseInt($('.remarksLength').text());
-             var commentsLength = parseInt($('.commentsLength').text());
-             if(remarksLength == 0)
-             {
+
+        //Anonymous function(for IE)
+        setTimeout((function () {
+            return function () {
+                loadReports();
+                try {
+                      window.stop();
+                   } 
+                catch (exception) {
+                    document.execCommand('Stop');
+                }
+                //window.stop();
+            };
+        })(), 400);
+
+        function loadReports() {
+            var remarksLength = parseInt($('.remarksLength').text());
+            var commentsLength = parseInt($('.commentsLength').text());
+            if (remarksLength == 0) {
                 $('.toggleRemarks').hide();
                 $('.rDremarks').hide();
-             }
-             else{
+            }
+            else {
                 $('.toggleRemarks').show();
                 $('.rDremarks').show();
-             }
-             if(commentsLength == 0)
-             {
+            }
+            if (commentsLength == 0) {
                 $('.toggleComments').hide();
                 $('.rDcomments').hide();
-             }
-             else{
+            }
+            else {
                 $('.toggleComments').show();
                 $('.rDcomments').show();
-             }
-                //Hide Testcase details if checkbox in test step details is checked to true(Expected Result & Actual Result)
-             $('.hideStep').each(function (){
-                 var hideStepTxt = $(this).text();
-                 if(hideStepTxt == "true")
-                 {
-                     $(this).siblings('td.rDExpectedRes:visible').parent('tr').hide();
-                     $(this).siblings('td.rDActualRes:visible').parent('tr').hide();
-                 }
-             });
-             // Display Testcase name in test step number
-              $(".txtStepDescription:visible").each(function() {
-                  var StepDescription = $(this).text();
-                  $(this).siblings('.rDstep').append(StepDescription).addClass('collapsible-tc demo1');
-                  $(this).empty();
-                  $(this).removeClass('collapsible-tc demo1');
-              });
+            }
+            //Hide Testcase details if checkbox in test step details is checked to true(Expected Result & Actual Result)
+            $('.hideStep').each(function () {
+                var hideStepTxt = $(this).text();
+                if (hideStepTxt == "true") {
+                    $(this).siblings('td.rDExpectedRes:visible').parent('tr').hide();
+                    $(this).siblings('td.rDActualRes:visible').parent('tr').hide();
+                }
+            });
+            // Display Testcase name in test step number
+            $(".txtStepDescription:visible").each(function () {
+                var StepDescription = $(this).text();
+                $(this).siblings('.rDstep').append(StepDescription).addClass('collapsible-tc demo1');
+                $(this).empty();
+                $(this).removeClass('collapsible-tc demo1');
+            });
             var getRows = $('.reportdetailsrow');
             for (i = 0; i < getRows.length; i++) {
                 var getRowId = parseInt(getRows[i].getAttribute('data-id'));
@@ -73,7 +86,7 @@
                     getRows[i].children[8].classList.remove("openscreenshot");
                 }
                 if (name.indexOf("Testscriptname") >= 0 || name.indexOf("TestCase Name") >= 0) {
-                   // getRows[i].children[9].children[0].remove();
+                    // getRows[i].children[9].children[0].remove();
                 }
                 for (j = i; j < getRows.length; j++) {
                     if (parseInt(getRows[j].getAttribute('data-parentid')).length == NaN) getParentId = parseInt(getRows[j].getAttribute('data-parentid').split(",")[1]);
@@ -91,31 +104,31 @@
                     rowCount = 0;
                 }
             }
-            if($('.rDstatus:contains("Fail")').length>0){
-                var offset = $($('.rDstatus:contains("Fail"):visible')[0]).offset().top-$('.scroll-table-container').offset().top;  
-                $('.scroll-table-container')[0].scrollTo(0,offset); 
+            if ($('.rDstatus:contains("Fail")').length > 0) {
+                var offset = $($('.rDstatus:contains("Fail"):visible')[0]).offset().top - $('.scroll-table-container').offset().top;
+                $('.scroll-table-container')[0].scrollTo(0, offset);
             }
 
-            window.stop();
+            //window.stop();
 
-            $(document).on('click', '.unexpand', function() {
+            $(document).on('click', '.unexpand', function () {
                 var getID = $(this).parents('.reportdetailsrow').attr('data-id');
                 $(this).removeClass('unexpand').addClass('expand');
                 $(this).removeClass('fa-caret-down').addClass('fa-caret-right');
-                $.each(getRows, function() {
+                $.each(getRows, function () {
                     if ($(this).attr('data-parentid') == getID) {
                         $(this).hide();
                     }
                 })
             })
 
-            $(".rDstatus").each(function() {
+            $(".rDstatus").each(function () {
                 if ($.trim($(this).text()) == "") {
                     $(this).css("pointer-events", "none");
                 }
             });
 
-            $(document).on('click', '.openscreenshot', function() {
+            $(document).on('click', '.openscreenshot', function () {
                 var path = $(this).attr("data-screenshot");
                 var hostName = window.location.host;
                 console.log(path + "-----" + hostName);
@@ -127,7 +140,7 @@
                         data: {
                             "absPath": [path]
                         },
-                        success: function(data) {
+                        success: function (data) {
                             if (data == "unavailableLocalServer") {
                                 alert("ICE Engine is not available. Please run the batch file and connect to the Server.");
                             } else if (data == 'scheduleModeOn') {
@@ -146,50 +159,49 @@
                     });
                 }
             })
-		   $(document).on('click','.collapsible',function(){
-                 if($(this).hasClass('active') == true)
-                 {
+            $(document).on('click', '.collapsible', function () {
+                if ($(this).hasClass('active') == true) {
                     $(this).children('span').children('span.arrow-down').removeClass('arrow-down').addClass('arrow-up');
-                     $('.mainTabCont:visible').addClass('mainTabContCollapsed');
-                 }
-                 else{
+                    $('.mainTabCont:visible').addClass('mainTabContCollapsed');
+                }
+                else {
                     $(this).children('span').children('span.arrow-up').removeClass('arrow-up').addClass('arrow-down');
                     $('.mainTabCont:visible').removeClass('mainTabContCollapsed');
-                 }
-             });
-             $('.collapsible-tc').append('<span class="arrow-down-sm"></span>');
-         $(document).on('click','.collapsible-tc',function(){
-         var abc = this.parentElement.getAttribute("data-id");
-         var len = $('.reportdetailsrow').length;
-                 if($(this).hasClass('collapse-active') == false)
-                 {
-                     $(this).addClass('collapse-active');
-                     $(this).children('span.arrow-down-sm').removeClass('arrow-down-sm').addClass('arrow-up-sm');
-                 }
-                 else{
-                      $(this).removeClass('collapse-active');
-                      $(this).children('span.arrow-up-sm').removeClass('arrow-up-sm').addClass('arrow-down-sm');
-                 }
-         while(len--){
-         abc = parseInt(abc) +1;
-         if($($("[data-id="+abc+"]")[0]).find('.collapsible-tc').length !=0)
-         break;
-         else
-         $("[data-id="+abc+"]").toggleClass("no-disp");
-         }
-         });
-            $(document).on('click', '.expand', function() {
+                }
+            });
+            $('.collapsible-tc').append('<span class="arrow-down-sm"></span>');
+
+            $(document).on('click', '.collapsible-tc', function () {
+                var abc = this.parentElement.getAttribute("data-id");
+                var len = $('.reportdetailsrow').length;
+                if ($(this).hasClass('collapse-active') == false) {
+                    $(this).addClass('collapse-active');
+                    $(this).children('span.arrow-down-sm').removeClass('arrow-down-sm').addClass('arrow-up-sm');
+                }
+                else {
+                    $(this).removeClass('collapse-active');
+                    $(this).children('span.arrow-up-sm').removeClass('arrow-up-sm').addClass('arrow-down-sm');
+                }
+                while (len--) {
+                    abc = parseInt(abc) + 1;
+                    if ($($("[data-id=" + abc + "]")[0]).find('.collapsible-tc').length != 0)
+                        break;
+                    else
+                        $("[data-id=" + abc + "]").toggleClass("no-disp");
+                }
+            });
+            $(document).on('click', '.expand', function () {
                 var getID = $(this).parents('.reportdetailsrow').attr('data-id');
                 $(this).removeClass('expand').addClass('unexpand');
                 $(this).removeClass('fa-caret-right').addClass('fa-caret-down');
-                $.each(getRows, function() {
+                $.each(getRows, function () {
                     if ($(this).attr('data-parentid') == getID) {
                         $(this).show();
                     }
                 })
             })
 
-            $(document).on('click', '.logintojira', function() {
+            $(document).on('click', '.logintojira', function () {
                 $(".jiraWindow").show();
                 clearData();
                 $('#overlay').css('display', 'block');
@@ -201,12 +213,12 @@
             })*/
 
             //Login to Jira
-            $(document).on('click', '.resetJiraCredentials', function() {
+            $(document).on('click', '.resetJiraCredentials', function () {
                 $("#jiraURL").val('');
                 $("#jiraUserName").val('');
                 $("#jiraPassword").val('');
             });
-            $(document).on('click', '.loginJiraCredentials', function(e) {
+            $(document).on('click', '.loginJiraCredentials', function (e) {
                 $("#jiraURL, #jiraUserName, #jiraPassword").css('border-color', '#bbb');
                 url = $("#jiraURL").val().trim();
                 userName = $("#jiraUserName").val();
@@ -230,7 +242,7 @@
                             "password": pwd,
                             "action": "loginToJira"
                         },
-                        success: function(data) {
+                        success: function (data) {
                             if (data == "Fail") {
                                 $(".error-msg").text("Failed to login");
                             } else if (data == 'Invalid Url') {
@@ -263,7 +275,7 @@
                 }
             })
             //Login to Jira
-            $("#jIssuetype").change(function() {
+            $("#jIssuetype").change(function () {
                 var on_change_data = $('option:selected', this).text();
                 if (on_change_data == 'Sub-task') {
                     $('.createIssueWindow p:nth-child(11)').height(68 + "px");
@@ -274,7 +286,7 @@
                 }
             });
             //Open create issue popup and get details of mentioned row
-            $(document).on('click', '.opendescpopup', function() {
+            $(document).on('click', '.opendescpopup', function () {
                 var slno = parseInt($("#inputSlno").val())
                 $('#parentIssue').hide();
                 if (slno > getRows.length) {
@@ -303,7 +315,7 @@
                             path = getRows[i].children[3].dataset.screenshot;
                             currentDataid = parseInt(getRows[i].dataset.id);
                             for (var j = 0; j < currentDataid; j++) {
-                                if (getRows[j].children[2].textContent.indexOf("Testscriptname") >= 0 || getRows[j].children[2].textContent.indexOf("TestCase Name") >= 0) {} else description = description + getRows[j].children[1].textContent + ": " + getRows[j].children[2].textContent.trim() + "\n\n";
+                                if (getRows[j].children[2].textContent.indexOf("Testscriptname") >= 0 || getRows[j].children[2].textContent.indexOf("TestCase Name") >= 0) { } else description = description + getRows[j].children[1].textContent + ": " + getRows[j].children[2].textContent.trim() + "\n\n";
                             }
                             break;
                         }
@@ -333,20 +345,20 @@
                 console.log("scrnShotPath----"+$("#scrnShotPath").val());
             }*/
             //function to close popup window
-            $(document).on('click', '.closeWindow', function() {
+            $(document).on('click', '.closeWindow', function () {
                 $(".jiraWindow, .createIssueWindow, .statusWindow").hide();
                 $('#overlay').css('display', 'none');
                 $(".error-msg").text('');
             })
 
-            $(document).on('click', '.cancelIssues', function() {
+            $(document).on('click', '.cancelIssues', function () {
                 $(".createIssueWindow").hide();
                 $('#overlay').css('display', 'none');
             })
             //function to close popup window
 
             //Create Issues in Jira
-            $(document).on('click', '.createIssues', function() {
+            $(document).on('click', '.createIssues', function () {
                 $("#jProjects, #jIssuetype, #jSummary, #jPriority").css('border-color', '#bbb');
                 var issue_dict = {};
                 var projectid = $("#jProjects option:selected").val();
@@ -357,9 +369,9 @@
                 var label = $("#jLabel").val().split(" ");
                 var attachment = $("#scrnShotPath").val();
                 var pissue = $("#jpIssueid").val();
-				var reportId=$('.reportId').text();
-				var executionId=$('.executionId').text();
-				var slno=$('#inputSlno').val();
+                var reportId = $('.reportId').text();
+                var executionId = $('.executionId').text();
+                var slno = $('#inputSlno').val();
                 if (!projectid) $("#jProjects").css('border-color', 'red');
                 else if (!issuetype || issuetype == "Select Issue") $("#jIssuetype").css('border-color', 'red');
                 else if (!summary) $("#jSummary").css('border-color', 'red');
@@ -382,9 +394,9 @@
                             'username': userName,
                             'password': pwd,
                             'parentissue': '',
-							'reportId':reportId,
-							'slno':slno,
-							'executionId':executionId
+                            'reportId': reportId,
+                            'slno': slno,
+                            'executionId': executionId
                         },
                         "action": "createIssueInJira"
                     }
@@ -399,7 +411,7 @@
                         url: posturl,
                         responseType: 'arraybuffer',
                         data: issue_dict,
-                        success: function(data) {
+                        success: function (data) {
                             if (data == "Fail") {
                                 $(".createIssueWindow").hide();
                                 $(".statusWindow").show();
@@ -430,30 +442,30 @@
                 }
             })
             //Create Issues in Jira
-			var coll = document.getElementsByClassName("collapsible");
-			var i;
+            var coll = document.getElementsByClassName("collapsible");
+            var i;
 
-			for (i = 0; i < coll.length; i++) {
-				coll[i].addEventListener("click", function() {
-					this.classList.toggle("active");
-					var content = this.nextElementSibling;
-					if (content.style.display != "none") {
-							content.style.display = "none";
-						} else {
-							content.style.display = "block";
-						}
-					var content = this.nextElementSibling.nextElementSibling;
-					if (content.style.display != "none") {
-							content.style.display = "none";
-						} else {
-							content.style.display = "block";
-						}                      
-				});
-			}
+            for (i = 0; i < coll.length; i++) {
+                coll[i].addEventListener("click", function () {
+                    this.classList.toggle("active");
+                    var content = this.nextElementSibling;
+                    if (content.style.display != "none") {
+                        content.style.display = "none";
+                    } else {
+                        content.style.display = "block";
+                    }
+                    var content = this.nextElementSibling.nextElementSibling;
+                    if (content.style.display != "none") {
+                        content.style.display = "none";
+                    } else {
+                        content.style.display = "block";
+                    }
+                });
+            }
             function clearData() {
                 $("#jiraURL, #jiraUserName, #jiraPassword").val("");
             }
-        }, 400);
+        }
     </script>
     <style>
         body {
@@ -587,7 +599,7 @@
             height: 32px;
         }
 
-         .reportsDetails th:nth-child(1) {
+        .reportsDetails th:nth-child(1) {
             width: 3.2%;
         }
 
@@ -597,8 +609,8 @@
         }
 
         .reportsDetails th:nth-child(2) {
-           /* width: 6.4%;*/
-           width: 16%;
+            /* width: 6.4%;*/
+            width: 16%;
         }
 
         .rDstep {
@@ -617,7 +629,8 @@
 
         .reportsDetails th:nth-child(4) {
             width: 9.6%;
-        } 
+        }
+
         .rDellaps {
             width: 10% !important;
             word-break: break-word;
@@ -628,22 +641,22 @@
             word-break: break-word;
         }
 
-        .reportsDetails th:nth-child(5)
-        {
-           width: 12.7%;
-           word-break: break-word;
+        .reportsDetails th:nth-child(5) {
+            width: 12.7%;
+            word-break: break-word;
 
         }
+
         .rDcomments {
             width: 13%;
             word-break: break-word;
         }
 
-        .reportsDetails th:nth-child(6)
-        {
+        .reportsDetails th:nth-child(6) {
             width: 14.5%;
-            
+
         }
+
         .rDremarks {
             width: 14.9%;
             word-break: break-word;
@@ -651,17 +664,19 @@
 
         .reportsDetails th:nth-child(10) {
             width: 5%;
-            
+
         }
-         .rjira {
+
+        .rjira {
             width: 4.4%;
             word-break: break-word;
         }
 
-        .reportsDetails th:nth-child(7){
+        .reportsDetails th:nth-child(7) {
             width: 14.5%;
-            
+
         }
+
         .rDExpectedRes {
             width: 14.9%;
             word-break: break-word;
@@ -670,12 +685,14 @@
 
         .reportsDetails th:nth-child(8) {
             width: 12%;
-           
+
         }
-         .rDActualRes {
+
+        .rDActualRes {
             width: 12.3%;
             word-break: break-all;
         }
+
         .reportsDetails th:nth-child(9) {
             width: 6.1%;
         }
@@ -1239,84 +1256,97 @@
             text-align: left !important;
             padding: 2px;
         }
-		.collapsible {
-			
-			color: black;
-			cursor: pointer;
-			
-			width: 100%;
-			border: 1px solid #cfcfcf;
-			text-align: left;
-			outline: none;
-			font-size: 15px;
-			border-radius: 5px;
-			height: 40px;
-			background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
-		}
 
-		.active, .collapsible:hover {
-			background-color: #555;
-			
-			background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
-		}
+        .collapsible {
 
-		.content {
-			padding: 0 18px;
-			display: block;
-			overflow: hidden;
-			transition: max-height 0.2s ease-out;
-			background-color: #f1f1f1;
-		}
-        .hide{
-            display:none;
-        }		
+            color: black;
+            cursor: pointer;
 
-        .scroll-table-container {    /* border: 2px solid green; */
+            width: 100%;
+            border: 1px solid #cfcfcf;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            border-radius: 5px;
+            height: 40px;
+            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+        }
+
+        .active,
+        .collapsible:hover {
+            background-color: #555;
+
+            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+        }
+
+        .content {
+            padding: 0 18px;
+            display: block;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+            background-color: #f1f1f1;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .scroll-table-container {
+            /* border: 2px solid green; */
             height: 89%;
             width: 100%;
             overflow-y: scroll;
             box-sizing: border-box;
-            
+
             border: 1px solid #dcdcdc;
         }
-		.scroll-table{border-collapse:collapse;width: 100%;}
-            
-			
-			/* width */
+
+        .scroll-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+
+        /* width */
+
         ::-webkit-scrollbar {
             width: 10px;
-        }
-        // style for scroll bar
+        } // style for scroll bar
         /* Track */
+
         ::-webkit-scrollbar-track {
-            box-shadow: inset 0 0 5px grey; 
+            box-shadow: inset 0 0 5px grey;
             border-radius: 10px;
         }
-        
+
         /* Handle */
+
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); 
+            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
             border-radius: 10px;
         }
 
         /* Handle on hover */
+
         ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); 
+            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
         }
-          .arrow-down {
-         height: 0px;
-         width: 0px;
-         border: none;
-         border-top: 7px solid #000000;
-         border-left: 6px solid rgba(0,0,0,0);
-         border-right: 6px solid rgba(0,0,0,0);
-         float: left;
-         position: absolute;
-         left: -20px;
-         top: 4px;
-         cursor: pointer;
-         }
-         .arrow-up {
+
+        .arrow-down {
+            height: 0px;
+            width: 0px;
+            border: none;
+            border-top: 7px solid #000000;
+            border-left: 6px solid rgba(0, 0, 0, 0);
+            border-right: 6px solid rgba(0, 0, 0, 0);
+            float: left;
+            position: absolute;
+            left: -20px;
+            top: 4px;
+            cursor: pointer;
+        }
+
+        .arrow-up {
             width: 0;
             height: 0;
             border-top: 5px solid transparent;
@@ -1329,20 +1359,21 @@
             cursor: pointer;
         }
 
-         .arrow-down-sm {
-         display: inline;
-         height: 0px;
-         width: 0px;
-         border: none;
-         border-top: 5px solid #000000;
-         border-left: 5px solid rgba(0,0,0,0);
-         border-right: 5px solid rgba(0,0,0,0);
-         position: relative;
-         left: -2px;
-         top: 9px;
-         float: left;
-         cursor: pointer;
-         }
+        .arrow-down-sm {
+            display: inline;
+            height: 0px;
+            width: 0px;
+            border: none;
+            border-top: 5px solid #000000;
+            border-left: 5px solid rgba(0, 0, 0, 0);
+            border-right: 5px solid rgba(0, 0, 0, 0);
+            position: relative;
+            left: -2px;
+            top: 9px;
+            float: left;
+            cursor: pointer;
+        }
+
         .arrow-up-sm {
             width: 0;
             height: 0;
@@ -1355,41 +1386,54 @@
             left: 0px;
             cursor: pointer;
         }
+
         .maintabContCollapsed {
             height: calc(100% - 75px);
-        } 
+        }
     </style>
 </head>
 
 <body>
-   
+
     <div class="mainContainer">
-         <span class='hide remarksLength'>{{remarksLength}}</span>
-         <span class='hide commentsLength'>{{commentsLength}}</span>
+        <span class='hide remarksLength'>{{remarksLength}}</span>
+        <span class='hide commentsLength'>{{commentsLength}}</span>
         {{#each overallstatus}}
         <div class="hearderCon">
             <div class="headerRepDetails">
-                <label>Report Generated Date : </label><span>{{date}}</span>
+                <label>Report Generated Date : </label>
+                <span>{{date}}</span>
             </div>
             <div class="headerRepDetails">
-                <label>Report Generated Time : </label><span>{{time}}</span>
+                <label>Report Generated Time : </label>
+                <span>{{time}}</span>
             </div>
             <div class="h2Header">
                 <h4>SLK Nineteen68 Execution Report</h4>
             </div>
         </div>
-        <button class="collapsible"><span style="left: 40px;position: relative"><span class="arrow-down"></span>Result Summary</span></button>
+        <button class="collapsible">
+            <span style="left: 40px;position: relative">
+                <span class="arrow-down"></span>Result Summary</span>
+        </button>
         <div style="width: 100%;">
             <div class="leftSummary">
-                <label>Scenario :</label><span>{{scenarioName}}</span>
-                <label>Cycle :</label><span>{{cycleName}}</span>
-                <label>Release :</label><span>{{releaseName}}</span>
-                <label>Project :</label><span>{{projectName}}</span>
-                <label>Domain :</label><span>{{domainName}}</span>
-                <label>Browser Type :</label><span>{{browserType}}</span>
-                <label>Browser Version :</label><span>{{browserVersion}}</span>
-				<span style='visibility:hidden' class="reportId">{{reportId}}</span>
-				<span style='visibility:hidden' class="executionId">{{executionId}}</span>
+                <label>Scenario :</label>
+                <span>{{scenarioName}}</span>
+                <label>Cycle :</label>
+                <span>{{cycleName}}</span>
+                <label>Release :</label>
+                <span>{{releaseName}}</span>
+                <label>Project :</label>
+                <span>{{projectName}}</span>
+                <label>Domain :</label>
+                <span>{{domainName}}</span>
+                <label>Browser Type :</label>
+                <span>{{browserType}}</span>
+                <label>Browser Version :</label>
+                <span>{{browserVersion}}</span>
+                <span style='visibility:hidden' class="reportId">{{reportId}}</span>
+                <span style='visibility:hidden' class="executionId">{{executionId}}</span>
             </div>
             <div id="rightSummaryFunc" class="rightSummaryFunc">
                 <div class="reportStatus">
@@ -1422,23 +1466,41 @@
                 <tbody>
                     <tr>
                         <td>
-                            <label>Start Date and Time :</label><span id="startTime"><b>{{StartTime}}</b></span>
+                            <label>Start Date and Time :</label>
+                            <span id="startTime">
+                                <b>{{StartTime}}</b>
+                            </span>
                         </td>
                         <td rowspan="2">
-                            <label>Status :</label><span id="overAllStat" style="color:{{getColor overAllStatus}}"><span></span><b>{{overAllStatus}}</b></span>
+                            <label>Status :</label>
+                            <span id="overAllStat" style="color:{{getColor overAllStatus}}">
+                                <span></span>
+                                <b>{{overAllStatus}}</b>
+                            </span>
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <label>End Date and Time :</label><span id="endTime"><b>{{EndTime}}</b></span>
+                            <label>End Date and Time :</label>
+                            <span id="endTime">
+                                <b>{{EndTime}}</b>
+                            </span>
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <label>Elapsed Time :</label><span id="elapsedTime"><b>{{EllapsedTime}}</b></span>
+                            <label>Elapsed Time :</label>
+                            <span id="elapsedTime">
+                                <b>{{EllapsedTime}}</b>
+                            </span>
                         </td>
                         <td>
-                            <button class="logintojira" title="Login to Jira">Jira Login</button><button class="disconnectJira" title="Disconnect from Jira">Disconnect</button><label class="Llogdefect">Log Defect</label><input type="text" id="inputSlno" placeholder="Enter SL No." maxlength="5" /><button class="go_defectlog opendescpopup">Go</button>
+                            <button class="logintojira" title="Login to Jira">Jira Login</button>
+                            <button class="disconnectJira" title="Disconnect from Jira">Disconnect</button>
+                            <label class="Llogdefect">Log Defect</label>
+                            <input type="text" id="inputSlno" placeholder="Enter SL No." maxlength="5"
+                            />
+                            <button class="go_defectlog opendescpopup">Go</button>
                         </td>
                     </tr>
                 </tbody>
@@ -1478,22 +1540,35 @@
                             {{/ifEquals}} {{#ifEquals testcase_details.testcaseDetails ""}}
                             <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
                             {{/ifEquals}} {{#ifnotEquals testcase_details.testcaseDetails ""}} {{#ifnotEquals testcase_details undefined}}
-                            <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}} <br/>Expected Result is: {{testcase_details.testcaseDetails}}</td>
+                            <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}
+                                <br/>Expected Result is: {{testcase_details.testcaseDetails}}</td>
                             {{/ifnotEquals}} {{/ifnotEquals}} {{#ifEquals status undefined}}
                             <td class="rDActualRes tabCont"></td>
                             {{/ifEquals}} {{#ifEquals status ""}}
                             <td class="rDActualRes tabCont"></td>
                             {{/ifEquals}} {{#ifEquals status "Pass"}} {{#ifEquals testcase_details.actualResult_pass ""}}
-                            <td class="rDActualRes tabCont" style="padding-left: 10px;"><text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text></td>
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;">
+                                <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text>
+                            </td>
                             {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_pass ""}}
-                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}},<text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text></td>
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}},
+                                <text class="rDstatus openscreenshot" style="color:{{getColor status}};"
+                                    data-screenshot="{{screenshot_path}}">{{status}}</text>
+                            </td>
                             {{/ifnotEquals}} {{/ifEquals}} {{#ifEquals status "Fail"}} {{#ifEquals testcase_details.actualResult_fail ""}}
-                            <td class="rDActualRes tabCont" style="padding-left: 10px;"><text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text></td>
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;">
+                                <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text>
+                            </td>
                             {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_fail ""}}
-                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}},<text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text></td>
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}},
+                                <text class="rDstatus openscreenshot" style="color:{{getColor status}};"
+                                    data-screenshot="{{screenshot_path}}">{{status}}</text>
+                            </td>
                             {{/ifnotEquals}} {{/ifEquals}}
                             <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}}; display:none" data-screenshot="{{screenshot_path}}">{{status}}</td>
-                            <td class="rjira tabCont"><span class="opendescpopup" title="Create Issue">{{jira_defect_id}}</span></td>
+                            <td class="rjira tabCont">
+                                <span class="opendescpopup" title="Create Issue">{{jira_defect_id}}</span>
+                            </td>
                             <td class='hide hideStep'>{{hidestep}}</td>
                         </tr>
                         {{/each}}
@@ -1501,48 +1576,95 @@
                 </table>
             </div>
         </div>
-            <div id="overlay"></div>
-            <!-- Jira login window popup-->
-            <div class="jiraWindow" style="display: none;">
-                <div class="popupheader">
-                    <label>Login to Jira</label>
-                    <span class="closeWindow">X</span>
-                </div>
-                <input type="text" class="jirapopupinput" placeholder="Enter Url" id="jiraURL" />
-                <input type="text" class="jirapopupinput" placeholder="Enter User Name" id="jiraUserName" />
-                <input type="password" class="jirapopupinput" placeholder="Enter Password" id="jiraPassword" />
-                <button type="button" class="resetJiraCredentials">Reset</button>
-                <button type="button" class="loginJiraCredentials">Connect</button>
-                <span class="error-msg"></span>
+        <div id="overlay"></div>
+        <!-- Jira login window popup-->
+        <div class="jiraWindow" style="display: none;">
+            <div class="popupheader">
+                <label>Login to Jira</label>
+                <span class="closeWindow">X</span>
             </div>
-
-            <!-- Jira description window popup-->
-            <div class="createIssueWindow" style="display: none;">
-                <div class="popupheader">
-                    <label>Create Issue</label>
-                    <span class="closeWindow">X</span>
-                </div>
-                <p><label>Projects<span class="mandatory">*</span></label><select class="jirapopupinput" id="jProjects"><option value="" selected disabled>Select Projects</option></select></p>
-                <p><label>Issue Type<span class="mandatory">*</span></label><select class="jirapopupinput" id="jIssuetype"><option value="" selected disabled>Select Issue</option></select></p>
-                <p id='parentIssue'><label>Parent Issue Id<span class="mandatory">*</span></label><input type="text" class="jirapopupinput" id="jpIssueid" /></p>
-                <p><label>Summary<span class="mandatory">*</span></label><input type="text" class="jirapopupinput" id="jSummary" maxlength="255" title="Maximum 255 characters accepted." /></p>
-                <p><label>Description</label><textarea class="jirapopupinput" id="jDescription"></textarea></p>
-                <p><label>Priority</label><select class="jirapopupinput" id="jPriority"><option value="" selected disabled>Select Priority</option></select></p>
-                <p><label>Label</label><textarea class="jirapopupinput" id="jLabel"></textarea></p>
-                <p><label>Attachment Path</label><input type="text" id="scrnShotPath" class="jirapopupinput" /></p>
-                <p><span class="error-msg"></span><button type="button" class="cancelIssues">Cancel</button><button type="button" class="createIssues">Create</button></p>
-            </div>
-
-            <!-- Ststus popup window -->
-            <div class="statusWindow" style="display: none;">
-                <div class="popupheader">
-                    <label>Create Issue</label>
-                    <span class="closeWindow">X</span>
-                </div>
-                <p><label id="showStatus"></label></p>
-                <p><button type="button" class="closeWindow">Ok</button></p>
-            </div>
+            <input type="text" class="jirapopupinput" placeholder="Enter Url" id="jiraURL" />
+            <input type="text" class="jirapopupinput" placeholder="Enter User Name" id="jiraUserName" />
+            <input type="password" class="jirapopupinput" placeholder="Enter Password" id="jiraPassword" />
+            <button type="button" class="resetJiraCredentials">Reset</button>
+            <button type="button" class="loginJiraCredentials">Connect</button>
+            <span class="error-msg"></span>
         </div>
+
+        <!-- Jira description window popup-->
+        <div class="createIssueWindow" style="display: none;">
+            <div class="popupheader">
+                <label>Create Issue</label>
+                <span class="closeWindow">X</span>
+            </div>
+            <p>
+                <label>Projects
+                    <span class="mandatory">*</span>
+                </label>
+                <select class="jirapopupinput" id="jProjects">
+                    <option value="" selected disabled>Select Projects</option>
+                </select>
+            </p>
+            <p>
+                <label>Issue Type
+                    <span class="mandatory">*</span>
+                </label>
+                <select class="jirapopupinput" id="jIssuetype">
+                    <option value="" selected disabled>Select Issue</option>
+                </select>
+            </p>
+            <p id='parentIssue'>
+                <label>Parent Issue Id
+                    <span class="mandatory">*</span>
+                </label>
+                <input type="text" class="jirapopupinput" id="jpIssueid" />
+            </p>
+            <p>
+                <label>Summary
+                    <span class="mandatory">*</span>
+                </label>
+                <input type="text" class="jirapopupinput" id="jSummary" maxlength="255" title="Maximum 255 characters accepted."
+                />
+            </p>
+            <p>
+                <label>Description</label>
+                <textarea class="jirapopupinput" id="jDescription"></textarea>
+            </p>
+            <p>
+                <label>Priority</label>
+                <select class="jirapopupinput" id="jPriority">
+                    <option value="" selected disabled>Select Priority</option>
+                </select>
+            </p>
+            <p>
+                <label>Label</label>
+                <textarea class="jirapopupinput" id="jLabel"></textarea>
+            </p>
+            <p>
+                <label>Attachment Path</label>
+                <input type="text" id="scrnShotPath" class="jirapopupinput" />
+            </p>
+            <p>
+                <span class="error-msg"></span>
+                <button type="button" class="cancelIssues">Cancel</button>
+                <button type="button" class="createIssues">Create</button>
+            </p>
+        </div>
+
+        <!-- Ststus popup window -->
+        <div class="statusWindow" style="display: none;">
+            <div class="popupheader">
+                <label>Create Issue</label>
+                <span class="closeWindow">X</span>
+            </div>
+            <p>
+                <label id="showStatus"></label>
+            </p>
+            <p>
+                <button type="button" class="closeWindow">Ok</button>
+            </p>
+        </div>
+    </div>
     </div>
 </body>
 

@@ -10,6 +10,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
+						'js/directives/headerDirective.js',				
 						'js/controllers/login/baseController.js',
 						'js/controllers/login/loginService.js'
                     ]);
@@ -23,6 +24,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
+						'js/directives/headerDirective.js',	
 						'js/controllers/login/loginController.js',
 						'js/controllers/login/loginService.js',
 						'js/controllers/admin/adminService.js'
@@ -37,6 +39,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
+						'js/directives/headerDirective.js',	
 						'js/factories/socketFactory.js',
 						'js/controllers/login/loginService.js',
 						'js/controllers/header/headerController.js',
@@ -54,6 +57,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
 						'css/bootstrap/bootstrap-datepicker.min.css',
+						'js/directives/headerDirective.js',	
 						'js/factories/socketFactory.js',
 						'js/plugins/bootstrap/bootstrap-datepicker.min.js',	
 						//'js/plugins/jquery-ui.min.js',
@@ -76,6 +80,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
+						'js/directives/headerDirective.js',	
 						'js/factories/socketFactory.js',
 						'js/plugins/apg/class-diagram.js',
 						'js/plugins/apg/multiline-text.js',
@@ -97,6 +102,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
+						'js/directives/headerDirective.js',	
 						'js/factories/socketFactory.js',
 						'js/controllers/chatbot/chatbotController.js',
 						'js/controllers/chatbot/chatbotService.js',
@@ -115,6 +121,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
+						'js/directives/headerDirective.js',	
 						'js/factories/socketFactory.js',
 						'js/plugins/jquery.jqGrid.min.js',
 						'js/i18n/grid.locale-en.js',
@@ -139,6 +146,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
+						'js/directives/headerDirective.js',	
 						'js/factories/socketFactory.js',
 						'js/plugins/jquery.jqGrid.min.js',
 						'js/i18n/grid.locale-en.js',
@@ -164,6 +172,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
+						'js/directives/headerDirective.js',	
 						'js/plugins/handlebar.js',
 						'js/factories/socketFactory.js',
 						'js/controllers/chatbot/chatbotController.js',
@@ -185,6 +194,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
+						'js/directives/headerDirective.js',	
 						'css/bootstrap/bootstrap-slider.css',
 						'js/factories/socketFactory.js',
 						'js/plugins/bootstrap/bootstrap-slider.js',
@@ -206,6 +216,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
+						'js/directives/headerDirective.js',	
 						'css/css_QC/qcStyle.css',
 						'js/factories/socketFactory.js',
 						'js/controllers/chatbot/chatbotController.js',
@@ -225,6 +236,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
+						'js/directives/headerDirective.js',	
 						'js/factories/socketFactory.js',
 						'js/controllers/chatbot/chatbotController.js',
 						'js/controllers/chatbot/chatbotService.js',
@@ -246,8 +258,10 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/factories/socketFactory.js',
 						'js/controllers/chatbot/chatbotController.js',
 						'js/controllers/chatbot/chatbotService.js',
-						'js/controllers/login/loginService.js',						
-						'js/controllers/header/headerController.js',
+						'js/controllers/login/loginService.js',				
+						'js/controllers/respHeader/respHeaderController.js',
+						'js/controllers/respHeader/respHeaderServices.js',
+						//'js/controllers/header/headerController.js',
 						'js/controllers/mindmap/mindmapService.js',
 						'js/controllers/Reports/reportsController.js',
 						'js/controllers/Reports/reportService.js'
@@ -264,6 +278,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                     return $ocLazyLoad.load([
 						'css/bootstrap/bootstrap-datepicker.min.css',
 						'css/bootstrap/bootstrap-timepicker.min.css',
+						'js/directives/headerDirective.js',	
 						'js/factories/socketFactory.js',
 						'js/plugins/bootstrap/bootstrap-datepicker.min.js',
 						'js/plugins/bootstrap/bootstrap-timepicker.min.js',
@@ -287,6 +302,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						//'js/plugins/libs_ng/TrackballControls.js',
 						//'js/plugins/libs_ng/three.js',
 						//'js/plugins/css3drenderer.min.js',
+						'js/directives/headerDirective.js',	
 						'js/plugins/d3.v3.min.js',
 						//'js/plugins/three.min.js',
 						'js/plugins/Tween.js',
@@ -312,7 +328,19 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 		window.localStorage.clear();
 		headerServices.logoutUser_Nineteen68()
 		.then(function(data){
-			$location.path('/');
+			//$location.path('/');
+			var parts = document.location.href.split('://')[1].split('/');
+			var protocol = document.location.href.split('://')[0];
+			var host = parts[0];
+			var pathName = parts.slice(1).join('/');
+			if(pathName == 'p_Reports')
+			{
+				window.location.href = '/';
+			}
+			else{
+				$location.path('/');
+			}
+			
 		}, function(error) {
 			console.log("Failed to Logout");
 		});

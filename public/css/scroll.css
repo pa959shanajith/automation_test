@@ -603,7 +603,7 @@
     padding: 0;
     position: absolute !important;
     top: 0;
-    width: 100% !important;
+    /* width: 100% !important; */       /* to hide firefox/IE default scrollbars */
     overflow-x: hidden !important;
 	margin-bottom: 0px;
     margin-right: 0px;
@@ -611,12 +611,12 @@
 }
 
 .report-table-body.scroll-wrapper {
-    overflow-y: auto !important;
+    /* overflow-y: auto !important; */
     padding: 0 !important;
     position: absolute !important;
     float: left;
-    width: 93%;
-    height: 100%;
+    width: 100%;
+    height: 300px !important;
     max-height: 300px !important;
     overflow-x: hidden;
 }
@@ -630,7 +630,7 @@
     padding: 0;
     position: absolute !important;
     top: 0;
-    width: 100% !important;
+    /* width: 100% !important; */       /* to hide firefox/IE default scrollbars */
     overflow-x: hidden !important;
 	margin-bottom: 0px;
     margin-right: 0px;
@@ -642,9 +642,9 @@
     padding: 0 !important;
     position: absolute !important;
     float: left;
-    width: 93%;
-    height: 100%;
-    max-height: 225px !important;
+    width: 100%;
+    height: 212px !important;
+    max-height: 212px !important;
     overflow-x: hidden;
 }
 .reportTblWidth

@@ -449,7 +449,6 @@ input[type="radio"]{
 .dropdown-userPart{
     float: right;
     width: auto;
-    margin: 8px -20px 8px 0;
 }
 
 .dropdown-userPart .dropdown-toggle:active:focus {
@@ -467,7 +466,7 @@ input[type="radio"]{
 }
 
 .dropdown-userPart .dropdown-menu {
-    right: 0;
+    /* right: 0; */
     margin-top: 10px
 }
 
@@ -1612,14 +1611,21 @@ input[disabled]{
 /*** Web service Screen **/
 
 #middle-content-section {
-    width: calc(100% - 270px);
+   width: calc(100% - 270px); /* Required when sidebars added */
+    /* width: 100%; */
     height: 100%;
     background: #fff;
     padding: 20px;
     box-sizing: border-box;
     position: absolute;
-    left: 173px;
+    left: 173px;           /* Required when sidebars added */
     top: 0;
+}
+.reports-middle-content
+{
+    width: 100% !important;
+    left: 0px !important;
+    /* padding-top: 5% !important; */
 }
 .middle-content-section-reports{
     visibility: hidden;
@@ -2390,11 +2396,11 @@ input[disabled]{
 	display: block;
 	float: left;
 }
-.executionDataTable tbody tr:nth-child(odd), .designDataTable tbody tr:nth-child(odd),.reportDataTable tbody tr:nth-child(odd),.reportScenarioDataTable tbody tr:nth-child(odd){
+.executionDataTable tbody tr:nth-child(odd), .designDataTable tbody tr:nth-child(odd){
 	/*background:#e8e6ff;	*/
     background: #e8e6fe;
 }
-.designDataTable tbody tr:nth-child(even),.reportDataTable tbody tr:nth-child(even),.reportScenarioDataTable tbody tr:nth-child(even){
+.designDataTable tbody tr:nth-child(even){
     background: #fff;
 }
 .executionDataTable tbody, .designDataTable tbody {
@@ -4423,7 +4429,9 @@ select:-webkit-autofill:focus {
     	-moz-transform: translateX(-99%) translateY(-50%);
     	-ms-transform: translateX(-99%) translateY(-50%);
 		/*padding: 20px 5px;*/
-	}
+    }
+    
+    
 }
 
 @media screen and (min-device-width: 1440px) and (max-device-height: 900px) {
@@ -4520,21 +4528,20 @@ select:-webkit-autofill:focus {
     margin-top: 5%;
     outline: none;
 }
-.rpReleases, .rpCycles{
-    width: 145px;
+.rpReleases, .rpCycles,.rpProjects{
+    /* width: 15%; */
     height: 24px;
     border-radius: 4px;
     border-color: #633693;
-    margin-top: 5%;
     outline: none;
 }
 .reports-search{
     height: 26px;
-    margin-top: 9px;
-    border-radius: 7px;
+    border-radius: 4px;
     border: 1px solid #461F6E;
     outline: none !important;
     padding: 10px !important;
+    /* width: 15%; */
 }
 @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
     .reports-search{
@@ -5681,21 +5688,35 @@ ul.browserInlineIcons
 {
     pointer-events: none;
 }
-.filterReports,.reportDataTable,.reportScenarioDataTable
+.filterReports
 {
     float:left;
     width: 100%;
 }
-.reportDataTable,.reportScenarioDataTable
+/* #reportDataTable
+{
+    margin-bottom: 2%;
+} */
+/* #reportDataTable,#reportScenarioDataTable
+{
+    float:left;
+    width:100%;
+} */
+/* .reportDataTable,.reportScenarioDataTable
 {
     margin-top: 3%;
-    /* overflow: auto; */
     display: none;
     width: 100% !important;
-}
+    float: left;
+    height: 50%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+} */
 .reportScenarioDataTable
 {
-    margin-top: calc(100% - 650px) !important;
+     height: 40% !important;
+    /* margin-top: calc(100% - 900px) !important; */
+    /* margin-top: calc(100% - 650px) !important; */
 }
 /* .report-table-body{
     overflow: auto;
@@ -5719,7 +5740,9 @@ ul.browserInlineIcons
 } */
 .tblstruct
 {
-    width: 97%;
+    width: 99%;
+    float:left;
+    /* height: 90%; */
 }
 .getScenarioTestCaseDetails td,.reportHeaders thead tr th,.executionTimeDetails td
 {
@@ -5752,30 +5775,29 @@ ul.browserInlineIcons
     float: left;
     width: 100%;
 }
-.reportDataTable tr,.reportScenarioDataTable tr
+/* .reportDataTable tr,.reportScenarioDataTable tr
 {
-    /* width: 80%; */
     font-family: Latoweb;
     float: left;
     width: 100%;
     display: table;
-}
+} */
 
-.reportDataTable th:nth-child(1),.reportDataTable td:nth-child(1){width: 4%;  word-break: break-word; }
-.reportDataTable th:nth-child(2),.reportDataTable td:nth-child(2){width: 8%;  word-break: break-word;}
-.reportDataTable th:nth-child(3),.reportDataTable td:nth-child(3){width: 9%; word-break: break-word; text-align:left}
-.reportDataTable th:nth-child(4),.reportDataTable td:nth-child(4){width: 11%; word-break: break-word; text-align:left}
-.reportDataTable th:nth-child(5),.reportDataTable td:nth-child(5){width: 9%; word-break: break-word; text-align:left}
-.reportDataTable th:nth-child(6),.reportDataTable td:nth-child(6){width: 12%; word-break: break-word; text-align:left}
-.reportDataTable th:nth-child(7),.reportDataTable td:nth-child(7){width: 8%; word-break: break-word; text-align:left}
-.reportDataTable th:nth-child(8),.reportDataTable td:nth-child(8){width: 7%; word-break: break-word; text-align:left}
+/* .reportDataTable th:nth-child(1),.reportDataTable td:nth-child(1){ word-break: break-word; }
+.reportDataTable th:nth-child(2),.reportDataTable td:nth-child(2){ word-break: break-word;}
+.reportDataTable th:nth-child(3),.reportDataTable td:nth-child(3){ word-break: break-word;}
+.reportDataTable th:nth-child(4),.reportDataTable td:nth-child(4){ word-break: break-word; }
+.reportDataTable th:nth-child(5),.reportDataTable td:nth-child(5){ word-break: break-word; }
+.reportDataTable th:nth-child(6),.reportDataTable td:nth-child(6){ word-break: break-word; }
+.reportDataTable th:nth-child(7),.reportDataTable td:nth-child(7){ word-break: break-word;}
+.reportDataTable th:nth-child(8),.reportDataTable td:nth-child(8){ word-break: break-word; }
 
-.reportScenarioDataTable th:nth-child(1),.reportScenarioDataTable td:nth-child(1){width: 3%;  word-break: break-word; }
-.reportScenarioDataTable th:nth-child(2),.reportScenarioDataTable td:nth-child(2){width: 10%;  word-break: break-word;}
-.reportScenarioDataTable th:nth-child(3),.reportScenarioDataTable td:nth-child(3){width: 10%; word-break: break-word; text-align:left}
-.reportScenarioDataTable th:nth-child(4),.reportScenarioDataTable td:nth-child(4){width: 5%; word-break: break-word; text-align:left}
-.reportScenarioDataTable th:nth-child(5),.reportScenarioDataTable td:nth-child(5){width: 6.5%; word-break: break-word; text-align:left}
-.reportScenarioDataTable th:nth-child(6),.reportScenarioDataTable td:nth-child(6){width: 5%; word-break: break-word; text-align:left}
+.reportScenarioDataTable th:nth-child(1),.reportScenarioDataTable td:nth-child(1){ word-break: break-word;}
+.reportScenarioDataTable th:nth-child(2),.reportScenarioDataTable td:nth-child(2){ word-break: break-word;}
+.reportScenarioDataTable th:nth-child(3),.reportScenarioDataTable td:nth-child(3){ word-break: break-word;}
+.reportScenarioDataTable th:nth-child(4),.reportScenarioDataTable td:nth-child(4){ word-break: break-word;}
+.reportScenarioDataTable th:nth-child(5),.reportScenarioDataTable td:nth-child(5){ word-break: break-word;}
+.reportScenarioDataTable th:nth-child(6),.reportScenarioDataTable td:nth-child(6){ word-break: break-word;} */
 
 .reportFormat
 {
@@ -5789,6 +5811,7 @@ ul.browserInlineIcons
     position: absolute;
     top: 11px;
     left: 173px;
+    -moz-margin-start: 12px;
 }
 
 /* Start of CSS for collapsible left navigation bar */
@@ -6000,3 +6023,114 @@ ul.browserInlineIcons
 {
     color: blue;
 }
+
+h4.titleBadge
+{
+    float: left !important;
+}
+
+.badge-reports
+{
+ line-height: 1.3 !important;
+ background-color: #fff !important;
+ font-weight: normal !important;
+ width: auto !important;
+ display: inline-block !important;
+ background: #331d4e !important;
+ font-size: 18px !important;
+ color: #fff !important;
+ font-family: 'LatoWebLight' !important;
+ padding: 2px 14px 1px !important ;
+ border-radius: 5px !important;
+ -moz-border-radius: 5px !important;
+ -webkit-border-radius: 5px !important;
+ margin-bottom: 1% !important;
+} 
+
+/* .report-container
+{
+    float: left;
+    width: 100%;
+    overflow: hidden;
+    height: calc(100% - 75px);
+} */
+
+/*** Bootstrap Reports ***/
+.report-box{
+    float: left;
+    width: 100%;
+}
+/* Style the form - display items horizontally */
+.report-box .form-inline { 
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+  }
+  
+  /* Add some margins for each label */
+.report-box  .form-inline label {
+    margin: 5px 10px 5px 0;
+    padding-left: 1%;
+  }
+  
+  /* Style the input fields */
+.report-box .form-inline input {
+    vertical-align: middle;
+    margin: 5px 10px 5px 0;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+  }
+  
+  /* Style the submit button */
+.report-box .form-inline button {
+    margin: 0px -5px;
+    background-color: #fff;
+    color: white;
+    z-index: 9;
+    border: none;
+    outline: none;
+    width: 4%;
+  }
+  
+/* .report-box  .form-inline button:hover {
+    background-color: royalblue;
+  } */
+  
+  /* Add responsiveness - display the form controls vertically instead of horizontally on screens that are less than 800px wide */
+  @media (max-width: 800px) {
+.report-box  .form-inline input {
+      margin: 10px 0;
+    }
+  
+.report-box .form-inline {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+.search-container {
+    float: right;
+  }
+  
+.search-container button {
+    float: right;
+    padding: 6px 10px;
+    margin-top: 8px;
+    margin-right: 16px;
+    background: #ddd;
+    font-size: 17px;
+    border: none;
+    cursor: pointer;
+  }
+.search-container button:hover {
+    background: #ccc;
+  }
+.reportsSearchIcon
+{
+    height: 19px;
+    width: 19px;
+    position: relative;
+    left: -30px;
+}
+/*** Bootstrap Reports ***/

@@ -1,195 +1,235 @@
-<!--Header-->
-<header header></header>
-<!--Header-->
-
-<!--Content Area-->
-<section class="container-fluid container-fluid-inner" id="reportSection">
-<!--Left Panel-->
-<div class="ct-side fl-left" id="ct-lSide">
-<div id="left-nav-section" class='left-sec-mindmap lsSlide'>
-        <div class="scroll-wrapper scrollbar-macosx" style="position: relative;">
-                <div class="scroll-wrapper scrollbar-macosx scroll-content" style="position: relative;">
-                        <div class="scrollbar-macosx scroll-content" style="height: auto; margin-bottom: 0px; margin-right: 0px; max-height: 780px;">
-                            <div class="clear-both"></div>
-                            <div id="left-top-section" class="reports-left-section">
-                                    <ul>
-                                        <li><span><a class="scrapeOnTxt">Reports</a></span></li>
-                                    </ul>
-                            </div>
-                        </div>
-                        <div class="scroll-element scroll-x">
-                            <div class="scroll-element_outer">
-                                <div class="scroll-element_size"></div>
-                                <div class="scroll-element_track"></div>
-                                <div class="scroll-bar" style="width: 96px;"></div>
-                            </div>
-                        </div>
-                        <div class="scroll-element scroll-y">
-                            <div class="scroll-element_outer">
-                                <div class="scroll-element_size"></div>
-                                <div class="scroll-element_track"></div>
-                                <div class="scroll-bar" style="height: 96px;"></div>
-                            </div>
-                        </div>
+<div ng-controller='respHeaderController' class="">
+        <div class="topnav " id="myTopnav">
+           <a href="#" class=""><img width="160" src="imgs/logo.png" style="cursor: pointer;" id='naviPg' ng-click="naviPg($event)" /></a>
+           <a href="#" class="icon hamburger">
+           <span class="glyphicon glyphicon-menu-hamburger" ng-click=responsiveMenu()></span>
+           </a>
+           <div class="container-fluid">
+              <div class="row">
+                 <div class="col d-flex flex-row-reverse positionRightMenu">
+                    <!-- User Information Dropdown --> 
+                    <div class="dropdown userInformation">
+                       <button class="btn dropdown-toggle dropdown-userinfo" type="button" data-toggle="dropdown"><span id='displayUsername' class='userInfo'></span> 
+                       <span class="ic-caret"><img class="header-ic" src="imgs/ic-user-nav.png" /></span>
+                       </button>
+                       <ul class="dropdown-menu userinformationList">
+                          <li><a href="#" class='userRole roleName userRoleInfo'>Test Manager</a></li>
+                          <li class="divider"></li>
+                          <li><a href="#" class="userRoleInfo" ng-click ="$event.preventDefault(); logout($event);">Logout</a></li>
+                       </ul>
                     </div>
-        </div>
-</div>
-<div id="ct-expand-left" class="ct-expand ct-rev" style='z-index:10 !important;'></div>
-</div>
-<!--Left Panel-->
-<!--Middle Panel-->
-<div id="middle-content-section" class="middle-content-section-reports">
-<!-- Report Header -->
-<div id="page-taskName">
-        <span>Reports</span>	
-    </div>
-<!-- Report Header -->
-<!-- Dropdown Div -->
-        <div class='filterReport'>
-        <form class="form-inline filterReports"> 
-            <div class='col-sm-3'>   
-                <div class="form-group rpSelectProjects">
-                    <label for="projects">Projects:</label>
-                    <select id='selectProjects' class="rpProjects" ng-model="projectNames" ng-change='selProjectsFilter()'></select>
-                </div>
-            </div>
-            <div class='col-sm-3'>
-                <div class="form-group rpSelectProjects">
-                        <label for="projects">Releases:</label>
-                        <select id='selectReleases' class="rpReleases" ng-model="releaseNames" ng-change='selReleasesFilter()'><option>Select Releases</option></select>
-                </div>
-            </div>
-            <div class='col-sm-3'>
-                <div class="form-group rpSelectProjects">
-                        <label for="projects">Cycles:</label>
-                        <select id='selectCycles' class="rpCycles"  ng-model="cycleNames" ng-change='selCyclesFilter()'><option>Select Cycles</option></select>
-                </div>
-            </div>
-            <div class='col-sm-3'>
-                <div class="form-group rpSearch">
-                        <input class="reports-search" type="text" placeholder="Search" aria-label="Search">
-                        <img alt="Search Icon" class="searchReports" src="imgs/ic-search-icon.png">
-                </div>
-            </div>            
-        </form>
-        </div>
-<!-- Dropdown Div -->
-<!-- Module Table Div -->
-<img class="no-reports" src="imgs/nothing-here.svg" style="display: none;margin-left: auto;margin-right: auto; width: 50%;position: relative; top: 76px;">
-<div class="table-responsive reportDataTable" id='reportDataTable'>
-    <table class="table table-striped tblstruct">
-        <thead class='reportHeaders'>
-            <tr>
-              <th scope="col">Sl.No</th>
-              <th scope="col">Module Name</th>
-              <th scope="col">Scenario Name</th>
-              <!-- <th scope="col">Scenario Description</th> -->
-              <th scope="col">Execution Count</th>
-              <th scope="col">Last Execution Status</th>
-              <th scope="col">Executed On</th>
-              <th scope="col">View Report</th>
-            </tr>
-          </thead>
-          <tbody class='reportBody report-table-body scrollbar-inner' style = "font-size: 12.5px;">
-            <tr class='getScenarioTestCaseDetails' ng-repeat="report in result_reportData"  report-idx="{{$index+1}}" style= "word-break: break-all;">
-              <td scope="row">{{report.id}}</td>
-              <td class="reptable-modulename">{{report.ModuleName }}</td>
-              <td class="reptable-scenarioname">{{report.ScenarioName}}</td>
-              <!-- <td>{{report.description}}</td> -->
-              <td class='executionCount' ng-click='getscenarioDetails($event)'>{{report.count}}</td>
-              <td ng-if="report.latestStatus == 'Fail'" class="colorStatusRed">{{report.latestStatus}}</td>
-              <td ng-if="report.latestStatus == 'Pass'" class="colorStatusGreen">{{report.latestStatus}}</td>
-              <td ng-if="report.latestStatus == 'Terminate'" class="colorStatusOrnage">{{report.latestStatus}}</td>
-              <td ng-if="report.latestStatus == 'Incomplete'" class="colorStatusYellow">{{report.latestStatus}}</td>
-              <td ng-if="report.latestStatus == 'Skipped'" class="colorStatusBlue">{{report.latestStatus}}</td>
-              <td ng-if="report.latestStatus != 'Skipped' && report.latestStatus != 'Fail' && report.latestStatus != 'Pass' && report.latestStatus != 'Terminate' && report.latestStatus != 'Incomplete'" class="">{{report.latestStatus}}</td>
-              <td>{{report.executedon}}</td>
-              <td>
-                  <div ng-hide="report.count==0" >
-                    <img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'>
-                    <img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'>
-                    <img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid='{{report.reportid}}' data-reportidx='{{report.idx}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'>
-                  </div>
-                    <!-- <span><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{report.reportid}}' src='imgs/ic-pdf.png' title='PDF Report'></span>
-                    <span><img alt='Browser Icon' class='reportFormat getSpecificReportBrowser' data-reportid='{{report.reportid}}' src='imgs/ic-web.png' title='Browser Report'></span>
-                    <span><img alt='Export JSON' class='reportFormat exportToJSON' data-reportid='{{report.reportid}}' src='imgs/ic-export-json.png' title='Select format' /></span> -->
-                </td>
-            </tr>
-          </tbody>
-    </table>
-  </div>
-  <!-- Module Table Div -->
-
-  <!-- Scenario Table Div -->
-    <div class="table-responsive reportScenarioDataTable" id='reportScenarioDataTable'>
-        <table id="rowspan" class="table table-striped tblstruct tablesorter">
-            <thead class='reportHeaders'>
-                <tr>
-                  <th scope="col">Sl.No</th>
-                  <th scope="col">Execution Time (Start Time)</th>
-                  <th scope="col">Execution Time (End Time)</th>
-                  <th scope="col">Executed On</th>
-                  <th scope="col">Execution Status</th>
-                  <th scope="col">View Report</th>
-                </tr>
-              </thead>
-              <tbody class='reportBody report-scenario-body scrollbar-inner' style = "font-size: 12.5px;">
-                 <tr class='executionTimeDetails' ng-repeat="scenario in result_res_scenarioData">
-                  <td scope="row" >{{$index+1}}</td>
-                  <td>{{scenario.executedtime }}</td>
-                  <td>{{scenario.executedtime}}</td>
-                  <td>{{scenario.browser}}</td>
-                  <td ng-if="scenario.status == 'Fail'" class="colorStatusRed">{{scenario.status}}</td>
-                  <td ng-if="scenario.status == 'Pass'" class="colorStatusGreen">{{scenario.status}}</td>
-                  <td ng-if="scenario.status == 'Terminate'" class="colorStatusOrnage">{{scenario.status}}</td>
-                  <td ng-if="scenario.status == 'Incomplete'" class="colorStatusYellow">{{scenario.status}}</td>
-				  <td ng-if="scenario.status == 'Skipped'" class="colorStatusBlue">{{scenario.status}}</td>
-                  <td>
-                        <img alt='Pdf Icon' class='archivedreport getSpecificReportBrowser openreportstatus reportFormat' data-reportidx='{{$index}}' data-getrep='wkhtmltopdf' data-reportid='{{scenario.reportid}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'>
-                        <img alt='-' class='archivedreport getSpecificReportBrowser openreportstatus reportFormat' data-reportidx='{{$index}}' data-getrep='html' data-reportid='{{scenario.reportid}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'>
-                        <img alt='Export JSON' class='archivedreport exportToJSON openreportstatus reportFormat' data-reportidx='{{$index}}' data-getrep='json' data-reportid='{{scenario.reportid}}' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'>
-
-                    <!-- <span><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid='{{scenario.reportid}}' src='imgs/ic-pdf.png' title='PDF Report'></span>
-                    <span><img alt='Browser Icon' class='reportFormat getSpecificReportBrowser' data-reportid='{{scenario.reportid}}' src='imgs/ic-web.png' title='Browser Report'></span>
-                    <span><img alt='Export JSON' class='reportFormat exportToJSON' data-reportid='{{scenario.reportid}}' src='imgs/ic-export-json.png' title='Select format' /></span> -->
-                </td>
-                </tr>
-              </tbody>
-        </table>
-    </div>
-      <!-- Module Table Div -->
-</div>
-<!--Middle Panel-->
-
-   <!-- Right Section --> 
-   <div class="ct-side fl-right" id="ct-rSide">
-        <div id="right-dependencies-section" class="rsSlide">
-           <!--Images Blocks-->  		
-           <div class="thumbnail thumbnail-custom">
-              <a class="slidePopup" title="Info">
-                 <img class="thumb-ic" src="imgs/ic-info.png" alt="Project Info">
-                 <div class="caption">
-                    <p>Info</p>
-                 </div>
-              </a>
-              <!--Popup-->
-              <div tabindex="0" id="window-pi" class="popupWrap">
-                 <h4 class="h4-custom closePopup">Information <img class="closePopup pull-right" src="imgs/ic-arrow.png"></h4>
-                 <div class="popupContent projectInfoWrap">
-                    <p class="proj-info-wrap"></p>
+                    <!-- User Information Dropdown --> 
+                    <!-- Switch Role Dropdown -->
+                    <div class="dropdown switchLnk">
+                       <div class="">
+                          <button class="btn dropdown-toggle dropdown-userrole" type="button" data-toggle="dropdown" id='sRole' ng-click="switchRole()">
+                          <span><img class="header-ic switchUserImg" src="imgs/ic-switch-user.png" /></span>
+                          <span class='userInfo lnkSwitchRole'>Switch Role</span>
+                          </button>
+                          <ul class="dropdown-menu" id="switchRoles"></ul>
+                       </div>
+                    </div>
+                    <!-- Switch Role Dropdown -->
+                    <!-- Bell Notification Icon -->
+                    <div class="dropdown bellDropdown">
+                       <button type="button" class="btn dropdown-toggle bellLnk" data-toggle="dropdown">
+                       <span class="count animated ng-binding" id="notifications-count" ng-bind=""></span>
+                       <span class='glyphicon glyphicon-bell bell-icon' ng-click="dropdownMenuButton()"></span>
+                       </button>
+                       <div id='notifyBox' class="dropdown-menu dropdown-menu-right notify-div" aria-labelledby="dropdownMenuButton">
+                          <div ng-repeat ="item in notifications| orderBy:-'$index':true " class='dropdown-item notifyMsgDiv'>
+                             <div class='messageNotify'>
+                                <span class='txtNotify'>Received on: {{item.dateTime}}</span><br /><span class='txtNotify'>{{item.notifyMsg}}</span> 
+                                <span style='display:none' class='indexCount'>{{$index}}</span>
+                             </div>
+                             <div class="divider"></div>
+                          </div>
+                       </div>
+                    </div>
+                    <!-- Bell Notification Icon -->
                  </div>
               </div>
-              <!--Popup-->
            </div>
-           <chatbot chatbot></chatbot>
-           <!--Images Blocks-->
         </div>
-        <div id='ct-expand-right' class="ct-expand ct-rev" style='z-index:10 !important;'></div>
+        <!-- Header -->
+        <!-- Section -->
+        <section id="reportSection" class=''>
+           <div class="wrapper">
+              <!--Left Sidebar  -->
+              <nav id="sidebarLeft" class='leftBar'>
+                 <div class="sidebar-header">
+                    <h3></h3>
+                    <strong></strong>
+                 </div>
+              </nav>
+              <div class="ct-side fl-left" id="ct-lSide">
+                 <div id="ct-expand-left" class="ct-expand ct-rev ct-expand-left"></div>
+              </div>
+              <!--Left Sidebar  -->
+              <!-- Mid Page Content  -->
+              <div id="content">
+                 <!-- Page Header -->
+                 <div class="container-fluid pageTitle">
+                    <h2><span id="reports-taskName" class="label label-default">Reports</span></h2>
+                 </div>
+                 <!-- Page Header -->
+                 <!-- Module Box -->
+                 <div class='container-fluid module-box'>
+                    <div class="d-flex flex-column">
+                       <div class="p-2 filterBox">
+                          <div class="well well-sm">
+                             <div class="container-fluid">
+                                <div class="row">
+                                   <div class="col">
+                                      <div class="form-group inline-form-control">
+                                         <label>Project: </label>
+                                         <select id="selectProjects" class="project-list ng-pristine ng-valid ng-touched" ng-model='projectNames' ng-change='selProjectsFilter()'>
+                                            <option class="" selected="selected">Web</option>
+                                         </select>
+                                      </div>
+                                   </div>
+                                   <div class="col">
+                                      <div class="form-group inline-form-control">
+                                         <label>Release: </label>
+                                         <select  id="selectReleases" class="release-list ng-pristine ng-valid ng-touched" ng-model="releaseNames" ng-change='selReleasesFilter()'>
+                                            <option class="ng-binding ng-scope" selected="selected">Release</option>
+                                         </select>
+                                      </div>
+                                   </div>
+                                   <div class="col">
+                                      <div class="form-group inline-form-control">
+                                         <label>Cycle: </label>
+                                         <select id="selectCycles" class="cycle-list ng-pristine ng-valid ng-touched"  ng-model="cycleNames" ng-change='selCyclesFilter()'>
+                                            <option class="ng-binding ng-scope" selected="selected">Cycle</option>
+                                         </select>
+                                      </div>
+                                   </div>
+                                   <div class="col d-flex flex-row-reverse ">
+                                      <input id='searchModule' class="reports-search" type="text" placeholder="Search Module" aria-label="Search">
+                                      <img alt="Search Icon" class="searchReportsImg" src="imgs/ic-search-icon.png">
+                                   </div>
+                                </div>
+                                <div class="container-fluid moduleBox">
+                                   <div id='nodeBox' class="row ct-nodeBox">
+                                      <!-- Nodes -->
+                                   </div>
+                                </div>
+                                <div class="col"> 
+                                   <span id="ctExpandAssign" class=""><img alt="Collapse Icon" id="expAssign" class="iconSpaceArrow show-form" src="imgs/ic-collapse.png"></span>
+                                </div>
+                             </div>
+                          </div>
+                       </div>
+                    </div>
+                 </div>
+                 <!-- Module Box -->
+                 <!-- Module Accordion -->
+                 <div class="panel-group" id="accordion">
+                    <div class="panel panel-default">
+                       <div class="panel-heading moduleHeader">
+                          <h4 class="panel-title" id='panelTitle'>
+                             <a id='moduleNameHeader' data-toggle="" data-parent="#accordion" href="#">
+                                <!-- Module Header -->
+                             </a>
+                             <input type='text' name='search' class='reportSearchBox' placeholder="Search Scenario" autocomplete="off" />
+                          </h4>
+                       </div>
+                       <div class='container-fluid dataTableReports'>
+                          <table id="reportsTable" class='display' style='width:100%'>
+                             <thead>
+                                <tr>
+                                   <th></th>
+                                   <th>Scenario Name</th>
+                                   <th>Executed On</th>
+                                   <th>Status</th>
+                                   <th>View Report</th>
+                                </tr>
+                             </thead>
+                             <tbody>
+                             </tbody>
+                          </table>
+                       </div>
+                       <div id="collapseOne" class="panel-collapse collapse in">
+                          <div class="panel-body">
+                             <!-- Report Datatable -->
+                          </div>
+                       </div>
+                    </div>
+                 </div>
+              </div>
+              <!-- Module Accordion -->
+              <!-- Right Side Bar  -->
+              <nav id="sidebarRight" class='rightBar'>
+                 <div class="sidebar-header">
+                    <h3></h3>
+                    <strong></strong>
+                 </div>
+              </nav>
+              <div class="ct-side fl-left ct-side-right" id="ct-lSide">
+                 <div id="ct-expand-left" class="ct-expand ct-rev ct-expand-right"></div>
+              </div>
+              <!-- Right Side Bar  -->
+           </div>
      </div>
-     <!-- Right Section -->  
-</section>
-<!--Content Area-->
-
-<!--Footer-->
-<footer footer id="footer" class="footer-global"></footer>
-<!--Footer-->
+     <!-- No Modules Modal -->
+     <div class="modal" id="noModulesModal" role="dialog" data-keyboard="false" data-backdrop="static">
+     <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+     <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal">&times;</button>
+     <h4 class="modal-title">Modules</h4>
+     </div>
+     <div class="modal-body">
+     <p class="align-center">No Modules Found</p>
+     </div>
+     </div>
+     </div>
+     </div>
+     <!-- No Modules Modal -->
+     <!-- SwitchRole Modal -->
+     <div class="modal" id="switchRoleModal" role="dialog" data-keyboard="false" data-backdrop="static">
+     <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+     <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal">&times;</button>
+     <h4 class="modal-title">Switch Role</h4>
+     </div>
+     <div class="modal-body">
+     <p></p>
+     </div>
+     <div class="modal-footer">
+     <button type="button" class="btn btn-default" ng-click="switchedRole($event)">Yes</button>
+     <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+     </div>
+     </div>
+     </div>
+     </div>
+     <!-- SwitchRole Modal -->
+     <!-- Popup for Role change -->
+     <div class="modal" id="switchRoleStatus" role="dialog" data-keyboard="false" data-backdrop="static">
+     <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+     <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal">&times;</button>
+     <h4 class="modal-title">Switch Role</h4>
+     </div>
+     <div class="modal-body">
+     <p>There are no roles to switch</p>
+     </div>
+     <div class="modal-footer">
+     <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+     </div>
+     </div>
+     </div>
+     </div>
+     <!-- Popup for Role change -->
+     </section>
+     <!--Section-->
+     <!-- Footer  -->
+     <footer class="footer">
+        <div class="card-header text-white d-flex card-footer">
+           <a href="#" class="text-white leftFooterTxt"><i class="fa-th"></i>&copy; SLK Software Services Pvt. Ltd. All Rights Reserved. Patent Pending</a>
+           <a href="#" class="text-white ml-auto rightFooterTxt">Powered By <img class="f-logo" src="imgs/ftr-slk-logo.png" /></a>
+        </div>
+     </footer>
+     <!-- Footer  -->
