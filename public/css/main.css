@@ -2396,11 +2396,11 @@ input[disabled]{
 	display: block;
 	float: left;
 }
-.executionDataTable tbody tr:nth-child(odd), .designDataTable tbody tr:nth-child(odd),.reportDataTable tbody tr:nth-child(odd),.reportScenarioDataTable tbody tr:nth-child(odd){
+.executionDataTable tbody tr:nth-child(odd), .designDataTable tbody tr:nth-child(odd){
 	/*background:#e8e6ff;	*/
     background: #e8e6fe;
 }
-.designDataTable tbody tr:nth-child(even),.reportDataTable tbody tr:nth-child(even),.reportScenarioDataTable tbody tr:nth-child(even){
+.designDataTable tbody tr:nth-child(even){
     background: #fff;
 }
 .executionDataTable tbody, .designDataTable tbody {
@@ -4529,7 +4529,7 @@ select:-webkit-autofill:focus {
     outline: none;
 }
 .rpReleases, .rpCycles,.rpProjects{
-    width: 15%;
+    /* width: 15%; */
     height: 24px;
     border-radius: 4px;
     border-color: #633693;
@@ -4541,7 +4541,7 @@ select:-webkit-autofill:focus {
     border: 1px solid #461F6E;
     outline: none !important;
     padding: 10px !important;
-    width: 15%;
+    /* width: 15%; */
 }
 @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
     .reports-search{
@@ -5702,7 +5702,7 @@ ul.browserInlineIcons
 {
     pointer-events: none;
 }
-.filterReports,.reportDataTable,.reportScenarioDataTable
+.filterReports
 {
     float:left;
     width: 100%;
@@ -5711,23 +5711,21 @@ ul.browserInlineIcons
 {
     margin-bottom: 2%;
 } */
-#reportDataTable,#reportScenarioDataTable
+/* #reportDataTable,#reportScenarioDataTable
 {
-    /* height:50% !important; */
     float:left;
     width:100%;
-}
-.reportDataTable,.reportScenarioDataTable
+} */
+/* .reportDataTable,.reportScenarioDataTable
 {
     margin-top: 3%;
-    /* overflow: auto; */
     display: none;
     width: 100% !important;
     float: left;
     height: 50%;
     overflow-x: hidden;
     overflow-y: hidden;
-}
+} */
 .reportScenarioDataTable
 {
      height: 40% !important;
@@ -5791,16 +5789,15 @@ ul.browserInlineIcons
     float: left;
     width: 100%;
 }
-.reportDataTable tr,.reportScenarioDataTable tr
+/* .reportDataTable tr,.reportScenarioDataTable tr
 {
-    /* width: 80%; */
     font-family: Latoweb;
     float: left;
     width: 100%;
     display: table;
-}
+} */
 
-.reportDataTable th:nth-child(1),.reportDataTable td:nth-child(1){ word-break: break-word; }
+/* .reportDataTable th:nth-child(1),.reportDataTable td:nth-child(1){ word-break: break-word; }
 .reportDataTable th:nth-child(2),.reportDataTable td:nth-child(2){ word-break: break-word;}
 .reportDataTable th:nth-child(3),.reportDataTable td:nth-child(3){ word-break: break-word;}
 .reportDataTable th:nth-child(4),.reportDataTable td:nth-child(4){ word-break: break-word; }
@@ -5814,7 +5811,7 @@ ul.browserInlineIcons
 .reportScenarioDataTable th:nth-child(3),.reportScenarioDataTable td:nth-child(3){ word-break: break-word;}
 .reportScenarioDataTable th:nth-child(4),.reportScenarioDataTable td:nth-child(4){ word-break: break-word;}
 .reportScenarioDataTable th:nth-child(5),.reportScenarioDataTable td:nth-child(5){ word-break: break-word;}
-.reportScenarioDataTable th:nth-child(6),.reportScenarioDataTable td:nth-child(6){ word-break: break-word;}
+.reportScenarioDataTable th:nth-child(6),.reportScenarioDataTable td:nth-child(6){ word-break: break-word;} */
 
 .reportFormat
 {
@@ -6064,13 +6061,13 @@ h4.titleBadge
  margin-bottom: 1% !important;
 } 
 
-.report-container
+/* .report-container
 {
     float: left;
     width: 100%;
     overflow: hidden;
     height: calc(100% - 75px);
-}
+} */
 
 /*** Bootstrap Reports ***/
 .report-box{
@@ -6151,17 +6148,3 @@ h4.titleBadge
     left: -30px;
 }
 /*** Bootstrap Reports ***/
-
-/*** Header CSS Bootstrap ***/
-/* .navbar
-{
-    min-height: 62px;
-}
-#naviPg
-{
-    cursor: pointer;
-    position: absolute;
-    top: 11px;
-    left: 20px;
-} */
-/*** Header CSS Bootstrap ***/

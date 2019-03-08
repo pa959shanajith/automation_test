@@ -252,7 +252,13 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		else if(name == "p_NeuronGraphs3D") name = 'neuronGraphs3D';
 		window.localStorage['navigateScreen'] = name;
 		$timeout(function () {
-			$location.path('/'+ name);
+			if(name == 'p_Reports')
+			{
+				window.location.href = "/"+ name;
+			}
+			else{
+				$location.path('/'+ name);
+			}
 			//Transaction Activity for Plugin Navigation
 			// var labelArr = [];
 			// var infoArr = [];
