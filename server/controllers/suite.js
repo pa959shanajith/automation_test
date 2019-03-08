@@ -5,7 +5,7 @@ var async = require('async');
 var myserver = require('../lib/socket');
 var uuid = require('uuid-random');
 var bcrypt = require('bcrypt');
-var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
+var epurl = process.env.NDAC_URL;
 var Client = require("node-rest-client").Client;
 var neo4jAPI = require('../controllers/neo4jAPI');
 var client = new Client();
@@ -462,7 +462,6 @@ exports.updateTestSuite_ICE = function (req, res) {
                         });
                     },
                     saveSuite : function(savecallback){
-                        console.log("ui order",testscenarioids);
                         var scenarioidindex=0;
                         async.forEachSeries(testscenarioids,function(scenario,scenariocall){
                             var inputs2 = {
@@ -487,7 +486,6 @@ exports.updateTestSuite_ICE = function (req, res) {
                                     "Content-Type": "application/json"
                                 }
                             };
-                            console.log("scenario id ----- ",scenario);
                             client.post(epurl + "suite/updateTestSuite_ICE", args,
                                 function (data, response) {
                                 if (response.statusCode != 200 || data.rows == "fail") {
@@ -509,7 +507,6 @@ exports.updateTestSuite_ICE = function (req, res) {
                 })
             
         },function(){
-            console.log(overallstatusflag);
             res.send(overallstatusflag);
         });
     } else {
@@ -2178,8 +2175,6 @@ function updatescenariodetailsinsuite(req, cb, data) {
 			} else {
 				scenarioidstocheck = [];
 			}
-			console.log("scenarioidstocheck",scenarioidstocheck);
-			console.log("verifyscenarioid",verifyscenarioid);
 			index_map={};
 			/*Code has been modified by Sushma.p to fix issue Nineteen68#1028*/
 			for (var i = 0; i < verifyscenarioid.length; i++) {
@@ -2728,7 +2723,6 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 															}
 														});
 														//res.send(resultData);
-														//console.log(resultData);
 													} catch (ex) {
 														logger.error("Exception occurred in the updateStatus function of scheduleFunction: %s", ex);
 													}

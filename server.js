@@ -16,7 +16,8 @@ try {
 // Module Dependencies
 var cluster = require('cluster');
 var expressWinston = require('express-winston');
-var epurl = "http://" + process.env.NDAC_IP + ":" + process.env.NDAC_PORT + "/";
+var epurl = "http://" + (process.env.NDAC_IP || "127.0.0.1") + ":" + (process.env.NDAC_PORT || "1990") + "/";
+process.env.NDAC_URL = epurl;
 var logger = require('./logger');
 var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 
@@ -77,11 +78,11 @@ if (cluster.isMaster) {
             honorCipherOrder: true
         };
         var httpsServer = require('https').createServer(credentials, app);
-        if (!process.env.serverPort) process.env.serverPort = 8443;
+        var serverPort = process.env.SERVER_PORT || 8443;
         module.exports = app;
         module.exports.redisSessionStore = redisSessionStore;
         module.exports.httpsServer = httpsServer;
-		var io = require('./server/lib/socket');
+        var io = require('./server/lib/socket');
 
         //Caching static files for thirtyDays 
         var thirtyDays = 2592000; // in milliseconds
@@ -133,6 +134,13 @@ if (cluster.isMaster) {
             store: redisSessionStore
         }));
 
+        app.use('*', function(req, res, next) {
+            if (req.session === undefined) {
+                return next(new Error("redisnotavailable"));
+            }
+            return next();
+        });
+
         app.use(function(req, res, next) {
             req.clearSession = function clearSession() {
                 res.clearCookie('connect.sid');
@@ -155,13 +163,6 @@ if (cluster.isMaster) {
         var authStrategy = auth.strategy;
         app.use(auth.router);
         auth = auth.util;
-
-        app.use('*', function(req, res, next) {
-            if (req.session === undefined) {
-                return next(new Error("redisnotavailable"));
-            }
-            return next();
-        });
 
         //Based on NGINX Config Security Headers are configured
         if(!nginxEnabled){
@@ -255,7 +256,8 @@ if (cluster.isMaster) {
             var emsg=req.query.e;
             if (emsg) {
                 if (req.session.messages) emsg = req.session.messages[0];
-                else if (emsg == "401") emsg = "invalid_session";
+                else if (emsg == "400") emsg = "badrequest";
+                else if (emsg == "401") emsg = "Invalid Session";
                 else if (emsg == "403") emsg = "unauthorized";
                 else if (emsg == "sessexists") {
                     emsg = "userLogged";
@@ -270,12 +272,14 @@ if (cluster.isMaster) {
             if (!(req.url == '/' || req.url.startsWith("/?"))) return next();
             var userLogged = req.session.logged;
             var usrCtx = req[authParams.userinfo];
-            if (userLogged) req.session.emsg = req.session.emsg || "userLogged";
-            else if (!req.session.emsg && req.session.username==undefined) {
+            if (userLogged && !req.session.emsg) {
+                req.session.emsg = "userLogged";
+                req.session.dndSess = true;
+            } else if (!req.session.emsg && req.session.username==undefined) {
                 if (usrCtx) {
                     var username = (usrCtx.userinfo)? usrCtx.userinfo.username:usrCtx.username;
                     if (username == undefined) {
-                        req.session.emsg = "invalid_username";
+                        req.session.emsg = "invalid_username_password";
                     } else {
                         username = username.toLowerCase();
                         redisSessionStore.all(function (err, allKeys) {
@@ -338,7 +342,7 @@ if (cluster.isMaster) {
         });
 
         //Test Lead and Test Manager can access
-        app.get(/^\/(p_Webocular|neuronGraphs|p_ALM|p_Dashboard|p_APG)$/, function(req, res) {
+        app.get(/^\/(p_Webocular|neuronGraphs|p_ALM|p_APG)$/, function(req, res) {
             var roles = ["Test Manager", "Test Lead"];   //Allowed roles
             sessionCheck(req, res, roles);
         });
@@ -353,13 +357,14 @@ if (cluster.isMaster) {
                 return meta;
             };
 
-            var sessChk = sess.uniqueId && sess.activeRole && (roles.indexOf(sess.activeRole) != -1);
+            var sessChk = sess.uniqueId && sess.activeRole;
+            var roleChk = (roles.indexOf(sess.activeRole) != -1);
             var maintCookie = req.signedCookies["maintain.sid"];
-            if (sessChk) {
-                return (maintCookie)? res.sendFile("app.html", { root: __dirname + "/public/" }) : res.redirect("/error?e=sessexists");
-            } else {
+            if (sessChk && !maintCookie) return res.redirect("/error?e=sessexists");
+            if (sessChk && roleChk) return res.sendFile("app.html", { root: __dirname + "/public/" });
+            else {
                 req.clearSession();
-                return res.redirect("/error?e=401");
+                return res.redirect("/error?e="+((sessChk)? "400":"401"));
             }
         }
 
@@ -434,7 +439,6 @@ if (cluster.isMaster) {
         var webocular = require('./server/controllers/webocular');
         var chatbot = require('./server/controllers/chatbot');
         var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
-        var dashboard = require('./server/controllers/dashboard');
         var taskbuilder = require('./server/controllers/taskJson');
         var flowGraph = require('./server/controllers/flowGraph');
 
@@ -502,6 +506,7 @@ if (cluster.isMaster) {
         app.post('/highlightScrapElement_ICE', design.highlightScrapElement_ICE);
         app.post('/getScrapeDataScreenLevel_ICE', design.getScrapeDataScreenLevel_ICE);
         app.post('/updateScreen_ICE', design.updateScreen_ICE);
+		app.post('/updateIrisDataset', design.updateIrisDataset);
         //Design TestCase Routes
         app.post('/readTestCase_ICE', design.readTestCase_ICE);
         app.post('/updateTestCase_ICE', design.updateTestCase_ICE);
@@ -555,10 +560,6 @@ if (cluster.isMaster) {
         app.post('/qcFolderDetails_ICE', qc.qcFolderDetails_ICE);
         app.post('/saveQcDetails_ICE', qc.saveQcDetails_ICE);
         app.post('/viewQcMappedList_ICE', qc.viewQcMappedList_ICE);
-        // Dashboard Routes
-        app.post('/loadDashboard', dashboard.loadDashboard);
-        app.post('/loadDashboardData', dashboard.loadDashboardData);
-        app.post('/loadDashboard_2', dashboard.loadDashboard_2);
         //app.post('/manualTestcaseDetails_ICE', qc.manualTestcaseDetails_ICE);
         // Automated Path Generator Routes
         app.post('/flowGraphResults', flowGraph.flowGraphResults);
@@ -596,8 +597,9 @@ if (cluster.isMaster) {
         });
 
         //-------------SERVER START------------//
+        var hostFamilyType = (nginxEnabled) ? '127.0.0.1' : '0.0.0.0';
         var initServer = function initServer(httpsServer,suite,logger,epurl,apiclient){
-            httpsServer.listen(portNumber, hostFamilyType); //Https Server
+            httpsServer.listen(serverPort, hostFamilyType); //Https Server
             try {
                 var apireq = apiclient.post(epurl + "server", function(data, response) {
                     try {
@@ -622,9 +624,6 @@ if (cluster.isMaster) {
                 logger.error("Please run the Service API");
             }
         };
-
-        var hostFamilyType = (nginxEnabled) ? '127.0.0.1' : '0.0.0.0';
-        var portNumber = process.env.serverPort;
         if (auth.isReady) initServer(httpsServer,suite,logger,epurl,apiclient);
         else {
             auth.onReadyCallback = function () { initServer(httpsServer,suite,logger,epurl,apiclient); };

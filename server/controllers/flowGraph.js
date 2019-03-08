@@ -3,7 +3,7 @@ var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
+var epurl = process.env.NDAC_URL;
 //var fs = require('fs');
 
 function isSessionActive(req){

@@ -36,6 +36,7 @@ var copiedViewstring = false;
 var getIndexOfDeletedObjects = [];
 var newScrapedData;
 var saveScrapeDataFlag = false;
+var deleteObjectsFlag = false;
 window.localStorage['disableEditing'] = "false";
 mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$location', '$timeout', 'DesignServices', 'mindmapServices', 'cfpLoadingBar', '$window', 'socket', function ($scope, $rootScope, $http, $location, $timeout, DesignServices, mindmapServices, cfpLoadingBar, $window, socket) {
     $rootScope.compareFlag = false;
@@ -306,9 +307,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         $("#window-scrape-screenshotTs .popupContent").empty()
                         if (data2.mirror == undefined)
                             $("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS">No Screenshot Available</div>')
-                        else
-                            $("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror + '" /></div>')
-
+                        else{
+							if(data2.scrapetype=='caa')
+								$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror.substring(2,data2.mirror.length-1) + '" /></div>')
+							else
+								$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror + '" /></div>')
+						}	
                         // service call # 3 -objectType service call
                         DesignServices.getKeywordDetails_ICE(appType)
                             .then(function (data3) {
@@ -795,7 +799,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
                     newScrapedList = viewString
                     $("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
-                    $("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
+					if(viewString.scrapetype=='caa')
+						$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror.substring(2,viewString.mirror.length-1) + '" /></div>')
+					else
+						$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
                     $("#finalScrap").empty()
                     if (jQuery.isEmptyObject(viewString)) {
                         console.log("Data is Empty");
@@ -806,8 +813,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
                         //return;
                     } else {
-
-                        console.log("Data There");
                         $(".enableActions").addClass("disableActions").removeClass("enableActions").parent('li').css('cursor', 'not-allowed');
                         $("#enableAppend").prop("disabled", false).css('cursor', 'pointer')
                     }
@@ -846,7 +851,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 ob.hiddentag = "No",
                                     tag = "iris",
                                     ob.url = "",
-                                    ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
+                                    ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag + ";" + ob.objectType
                             }
                             var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                             // }                                       
@@ -1839,7 +1844,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         //mirrorObj = scrapeJson[1];
                         //scrapeTypeObj = scrapeJson[2];
                         $("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
-                        $("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
+						if(viewString.scrapetype=='caa')
+								$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror.substring(2,viewString.mirror.length-1) + '" /></div>')
+						else	
+							$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
                         $("#finalScrap").empty()
                         $("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'/><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span class='searchScrapEle'><img src='imgs/ic-search-icon.png'></input></span><span><input type='text' class='searchScrapInput'></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
                         var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
@@ -1874,7 +1882,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                     ob.hiddentag = "No",
                                         tag = "iris",
                                         ob.url = "",
-                                        ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
+                                        ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag + ";" + ob.objectType
                                 }
 
                                 // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
@@ -1926,7 +1934,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                         ob.hiddentag = "No",
                                             tag = "iris",
                                             ob.url = "",
-                                            ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
+                                            ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag + ";" + ob.objectType
                                     }
                                     if (appType == "DesktopJava" || appType == "Desktop") {
                                         var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
@@ -1981,7 +1989,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                     ob.hiddentag = "No",
                                         tag = "iris",
                                         ob.url = "",
-                                        ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
+                                        ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag + ";" + ob.objectType
                                 }
                                 // }
                                 // }
@@ -2050,6 +2058,54 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 });
         }
     }
+	
+	$(document).on("click", ".ellipsis", function(e) {
+		if(this.clicks === undefined) this.clicks=0;
+		this.clicks++;
+		setTimeout(function(){
+			var clicks = e.target.clicks;
+			e.target.clicks = 0;
+			if(clicks != 1) return false;
+			if(e.target.parentNode.parentNode.attributes['data-tag'].value != 'iris') return false;
+			obj_xpath = e.target.parentNode.parentNode.attributes['data-xpath'].value;
+			var objType = String(e.target.parentNode.parentNode.attributes['data-xpath'].value).split(';');
+			objType = objType[objType.length-1];
+			$(".generateObj span img").removeClass("left-bottom-selection");
+			$(".compareObject span img").removeClass("left-bottom-selection");
+			$(".addObject span img").addClass("left-bottom-selection");
+
+			$scope.errorMessage = "";
+			$("#dialog-irisObject").modal("show");
+			$("#addIrisObjContainer").empty()
+			if ($(".addObj-row").length > 1) $(".addObj-row").remove()
+			$("#addIrisObjContainer").append('<div class = "row row-modal addObj-row">  	 	<div class = "form-group">  		 		<span><strong>Object Detected as:	'+objType+'</strong></span>  	 	</div>  	 	<br><br> 	 	<span style="float:left"><strong>User input: </strong></span> 	 	<div class = "form-group form-group-2" style="float:left; margin-left:10px;"> 		 		<select class = "form-control form-control-custom" id="objectType">  			 			<option selected disabled > Select Object Type </option> 			 			<option value = "textbox" > Textbox / Textarea </option>  			 			<option value = "table" > Table </option>  			 			<option value = "dropdown" > Dropdown </option> 			 			<option value = "button" > Button </option>  			 			<option value = "radiobutton" > Radiobutton </option>  			 			<option value = "checkbox" > Checkbox </option>  		 		</select>  	 	</div> </div>');
+		
+			$scope.removeAddObjectSelection = function () {
+				$("img.left-bottom-selection").removeClass('left-bottom-selection');
+			};
+		}, 500);
+    });
+	
+	$scope.submitIrisObjectType = function (e) {
+		var obj_cord = '';
+		for(var i=0;i<viewString.view.length;i++){
+			if(viewString.view[i].xpath == obj_xpath){
+				obj_cord = viewString.view[i].cord;
+			}
+		}
+		var data = {"cord":obj_cord,"type":$('#objectType').val()}; 
+		DesignServices.updateIrisDataset(data)
+			.then(function (val) {
+				$('.close').click();
+				if(val)
+					openDialog("Iris Object Type","Submitted Successfully.");
+				else
+					openDialog("Iris Object Type","Failed.");
+			}, function (error) {
+				
+			});
+	}
+	
     $scope.updateComparedObjects = function (event) {
         var tasks = JSON.parse(window.localStorage['_CT']);
         var userinfo = JSON.parse(window.localStorage['_UI']);
@@ -2104,6 +2160,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     });
     $(document).on('shown.bs.modal', '#deleteObjectsModal', function () {
         var task = JSON.parse(window.localStorage['_CT'])
+		deleteObjectsFlag = true;
         if (task.reuse == 'True') {
             $("#deleteObjectsModal").find('.modal-body p').text("Screen is been reused. Are you sure you want to delete objects?").css('color', 'black');
         } else {
@@ -3378,6 +3435,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     });
 
     function renameScrapedObjects(e) {
+		blockUI("Saving in progress. Please wait...");
         var custnames = [];
         var viewStringXpath = [];
         var modifiedCustXpath = [];
@@ -3465,13 +3523,31 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         scrapeObject.param = "updateScrapeData_ICE";
         scrapeObject.appType = tasks.appType;
         scrapeObject.versionnumber = tasks.versionnumber;
+		scrapeObject.newData = viewString;
+		if(modifiednames.length>0)
+			scrapeObject.type = "rename";
+		else if(deleteObjectsFlag==true){
+			scrapeObject.type = "delete";
+			deleteObjectsFlag = false;
+		}
+		else
+			scrapeObject.type = "save";
         //Update Service to Save Scrape Objects
         DesignServices.updateScreen_ICE(scrapeObject)
             .then(function (data) {
                 if (data == "Invalid Session") {
                     $rootScope.redirectPage();
                 }
-                if (data == "success") {
+				if(typeof(data)=="object" && data.length>0){
+					unblockUI();
+					openDialog("Save Scrape data", "");
+                    $("#globalModal").find('.modal-body p').html("<span><strong>Scraped data saved successfully. <br> Warning: Please scrape an IRIS reference object.</strong></span><br /><br /><strong>Matching objects found for:</strong>").css("color", "#000").append("<ul class='custList'></ul>");
+                    for (var j = 0; j < data.length; j++) {
+                        $("#globalModal").find('.modal-body p ul').append("<li>" + data[j] + "</li>");
+                    }
+				}
+                else if (data == "success") {
+					unblockUI();
                     eaCheckbox = false;
                     //window.localStorage['_modified'] = "";
                     modifiednames = [];
@@ -3493,7 +3569,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     // txnHistory.log(e.type,labelArr,infoArr,$location.$$path); 			   
                 } else {
                     //enableScreenShotHighlight = false;
-                    openDialog("Save Scraped data", "Failed to save")
+                    openDialog("Save Scraped data", "Failed to save");
                 }
             }, function (error) { })
 
@@ -4771,7 +4847,7 @@ function contentTable(newTestScriptDataLS) {
             url = " ";
             if (appTypeLocal == "MobileApp") {
                 var sc = Object.keys(keywordArrayList.defaultListMobility);
-                selectedKeywordList = "defaultListMobilityiOS";
+                selectedKeywordList = "defaultListMobility";
                 var res = '';
                 for (var i = 0; i < sc.length; i++) {
                     if (selectedKeyword == sc[i]) {
@@ -5061,8 +5137,14 @@ function contentTable(newTestScriptDataLS) {
         } else if (selectedText == "@Mobile") {
             objName = " ";
             url = " ";
-            var sc = Object.keys(keywordArrayList.generic);
-            selectedKeywordList = "generic";
+            if (navigator.appVersion.indexOf("Mac") != -1){
+                var sc = Object.keys(keywordArrayList.genericIos);
+                selectedKeywordList = "genericIos";
+            }
+            else{
+                var sc = Object.keys(keywordArrayList.generic);
+                selectedKeywordList = "generic";
+            }
             var res = '';
             for (var i = 0; i < sc.length; i++) {
                 if (selectedKeyword == sc[i]) {
@@ -5421,6 +5503,9 @@ function contentTable(newTestScriptDataLS) {
                         } else if (obType.indexOf("EditText") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeSecureTextField") >= 0) {
                             sc = Object.keys(keywordArrayList.input);
                             selectedKeywordList = "input";
+                        }else if (obType.indexOf("iOSEditText") >= 0 || obType.indexOf("iOSXCUIElementTypeSearchField") >= 0 || obType.indexOf("iOSXCUIElementTypeSecureTextField") >= 0){
+                            sc = Object.keys(keywordArrayList.inputIos);
+                            selectedKeywordList = "inputIos";
                         } else if (obType.indexOf("XCUIElementTypePickerWheel") >= 0) {
                             sc = Object.keys(keywordArrayList.pickerwheel);
                             selectedKeywordList = "pickerwheel";
@@ -6528,8 +6613,10 @@ function getTags(data) {
         obnames = ["@Generic", "@Excel", "@Window", "@Custom", "@Email", "@Word"];
     } else if (appTypeLocal == "DesktopJava") {
         obnames = ["@Generic", "@Excel", "@Oebs", "@Custom", "@Word"];
-    } else if (appTypeLocal == "MobileApp") {
+    } else if (appTypeLocal == "MobileApp" && navigator.appVersion.indexOf("Mac") == -1) {
         obnames = ["@Generic", "@Mobile", "@Action"];
+    } else if (appTypeLocal == "MobileApp" && navigator.appVersion.indexOf("Mac") != -1) {
+        obnames = ["@Generic", "@Mobile"];
     } else if (appTypeLocal == "MobileWeb") {
         obnames = ["@Generic", "@Browser", "@BrowserPopUp", "@Action"];
     } else if (appTypeLocal == "SAP") {

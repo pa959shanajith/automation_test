@@ -637,6 +637,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     $scope.loadMap = function(idx) {
+        $("#expCreate").attr('src','imgs/ic-collapse.png');
         $scope.functionTBE = 'loadMapPopupConfirmed';
         excelFlag = 1;
         $('#createNewConfirmationPopup').attr('mapid', $scope.allMMaps[idx].name);
@@ -1477,6 +1478,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 v.append('span').attr('class', 'ct-assignItem fl-left').html('Batch Name');
 
                 var d = v.append('input').attr('type', 'text').attr('id', 'ct-executeBatch');
+                $('#ct-executeBatch').attr('maxlength', '255');
                 $('#ct-executeBatch').attr('value', tObj.bn);
                 if (tObj.t != 'Execute Batch') {
                     $('#ct-executeBatch').attr('disabled', 'true')
@@ -2035,6 +2037,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     });
 
     $scope.createNodes = function($event) {
+        if(!$event.originalEvent) return;
         blockUI('Validating names..');
         var nodeNames = [];
         $('.errBorder').removeClass('errBorder');
@@ -3990,7 +3993,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         });
     };
 
-    $scope.addScenariosete = function(e) {
+    $scope.addScenariosete = function($event) {
+        if (!$event.originalEvent) return;
         SaveCreateED('#ct-createAction', 1, 0);
         //// #817 To select multiple scenarios in e2e (Himanshu)
         $('.selectScenariobg').each(function(i, obj) {
@@ -4666,6 +4670,7 @@ Purpose : displaying pop up for replication of project
     }
 
     $scope.createMap = function(option) {
+        $('#expAssign').attr('src','imgs/ic-collapse.png');
         $scope.tab = option;
         unloadMindmapData();
         dNodes = [];

@@ -209,26 +209,6 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                 }]
             }
 		})
-		.state('dashboard', {
-            url: '/p_Dashboard',
-            templateUrl: 'partials/dashboard.html',
-            controller: 'dashboardController',
-            resolve: {
-                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-						'js/directives/headerDirective.js',	
-						'js/factories/socketFactory.js',
-						'js/plugins/Chart.min.js',
-						'js/controllers/chatbot/chatbotController.js',
-						'js/controllers/chatbot/chatbotService.js',
-						'js/controllers/login/loginService.js',						
-						'js/controllers/header/headerController.js',
-						'js/controllers/dashboard/dashboardController.js',
-						'js/controllers/dashboard/dashboardService.js'
-                    ]);
-                }]
-            }
-		})
 		.state('alm', {
             url: '/p_ALM',
             templateUrl: 'partials/qualityCenter.html',

@@ -86,16 +86,17 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		var userid = userInfo.user_id;
 		PluginService.getProjectIDs_Nineteen68()
 		.then(function (data) {
-			if(data != "Fail" && data != "Invalid Session") {
-				var obj=data;
-				PluginService.getTaskJson_mindmaps(obj)
+			if(data == "Fail" || data == "Invalid Session") $rootScope.redirectPage();
+			else {
+				PluginService.getTaskJson_mindmaps(data)
 				.then(function (data) {
-					if(data == "Invalid Session"){
+					if(data == "Invalid Session") {
 						$rootScope.redirectPage();
 					} else {
 						var tasksJson = data;
 						$scope.taskJson = data;
 					 	window.localStorage['_TJ'] = angular.toJson(tasksJson);
+						if (tasksJson.length == 0) unblockUI();
 						/*	Build a list of releaseids and cycleids
 						* Another dict for releaseid and cyclelist out of task json
 						* List of apptype and tasktype
@@ -132,10 +133,10 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 								fillFilterValues(tasksJson[i],j);
 							}
 						}
-						  	//prevent mouseclick before loading tasks
-							  $("span.toggleClick").removeClass('toggleClick');
-							// Enable Filter
-							$("span.filterIcon").removeClass('disableFilter');
+						//prevent mouseclick before loading tasks
+						$("span.toggleClick").removeClass('toggleClick');
+						// Enable Filter
+						$("span.filterIcon").removeClass('disableFilter');
 					}
 
 					PluginService.getNames_ICE($scope.filterDat.projectids,Array($scope.filterDat.projectids.length).fill('projects'))
@@ -150,36 +151,48 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 							.then(function (response) {
 								if(response == "Invalid Session"){
 									$rootScope.redirectPage();
-								}
-								else{
+								} else{
 									response.respnames.forEach(function(name,i){
 										$scope.filterDat.idnamemaprel[response.requestedids[i]] = name;
 									});
 									PluginService.getNames_ICE($scope.filterDat.cycleids,Array($scope.filterDat.cycleids.length).fill('cycles'))
 									.then(function (response) {
-										unblockUI();
 										if(response == "Invalid Session"){
 											$rootScope.redirectPage();
-										}
-										else{
+										} else{
+											unblockUI();
 											response.respnames.forEach(function(name,i){
 												$scope.filterDat.idnamemapcyc[response.requestedids[i]] = name;
 											});
 										}
-									}, function (error) { console.log("Error:::::::::::::", error) })									
+									}, function (error) {
+										unblockUI();
+										console.log("Error:::::::::::::", error)
+									});
 								}
-							}, function (error) { console.log("Error:::::::::::::", error) })
+							}, function (error) {
+								unblockUI();
+								console.log("Error:::::::::::::", error)
+							});
 						}
-					}, function (error) { console.log("Error:::::::::::::", error) })					
+					}, function (error) {
+						unblockUI();
+						console.log("Error:::::::::::::", error)
+					});
 					//$("#plugin-container").removeClass("inactiveLink");
-				}, function (error) { 
+				}, function (error) {
+					unblockUI();
+					blockUI("Fail to load tasks!");
+					setTimeout(function(){ unblockUI(); }, 3000);
 					console.log("Error:::::::::::::", error);
-				})
-			}	
-			else{
-				$rootScope.redirectPage();
+				});
 			}
-		}, function (error) { console.log("Error:::::::::::::", error) })
+		}, function (error) {
+			unblockUI();
+			blockUI("Fail to load Projects!");
+			setTimeout(function(){ unblockUI(); }, 3000);
+			console.log("Error:::::::::::::", error);
+		});
 	}
 
 	//Search form

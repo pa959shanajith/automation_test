@@ -1,6 +1,6 @@
 var async = require('async');
 var uidsafe = require('uid-safe');
-var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
+var epurl = process.env.NDAC_URL;
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var logger = require('../../logger');
@@ -36,7 +36,7 @@ function checkAssignedProjects(username, main_callback) {
 					var userid = result.rows[0].userid;
 					var roleid = result.rows[0].defaultrole;
 					callback(null, userid, roleid);
-				} else callback("invalid_username");
+				} else callback("invalid_username_password");
 			});
 		},
 		function getUserRole(userid, roleid, callback) {
@@ -124,14 +124,17 @@ exports.checkUserState_Nineteen68 = function (req, res) {
 					}
 				}
 			}, function (emsg) {
-				if (emsg == "ok") res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed:true});
-				else if (!sess.dndSess) req.clearSession();
-				return res.send(emsg);
+				if (sess.dndSess) utils.cloneSession(req, function(err){ return res.send("reload"); });
+				else {
+					if (emsg == "ok") res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed:true});
+					else req.clearSession();
+					return res.send(emsg);
+				}
 			});
 		} else {
 			logger.info("Invalid Session");
 			req.clearSession();
-			res.send("invalid_session");
+			res.send("Invalid Session");
 		}
 	} catch (exception) {
 		logger.error(exception.message);

@@ -6,7 +6,7 @@ var async = require('async');
 var parse = require('xml-parser');
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
+var epurl = process.env.NDAC_URL;
 var logger = require('../../logger');
 //base RequestElement
 //var baseRequestBody = {};
@@ -36,232 +36,94 @@ exports.initScraping_ICE = function (req, res) {
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
-			//check on redis whether the ice socket is connected to any of the servers
 			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 				if (redisres[1]>0) {
-					var reqScrapJson = {};
-					reqScrapJson.action = "SCRAPE";
-					if (req.body.screenViewObject.appType == "Desktop") {
-						var applicationPath = req.body.screenViewObject.applicationPath;
-						var processID = req.body.screenViewObject.processID;
-						var scrapeMethod = req.body.screenViewObject.scrapeMethod;
-						logger.info("Sending socket request for LAUNCH_DESKTOP to redis");
-						dataToIce = {"emitAction" : "LAUNCH_DESKTOP","username" : name, "applicationPath":applicationPath, "processID":processID, "scrapeMethod": scrapeMethod};
-						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = utils.resetSession(req.session);
-						function LAUNCH_DESKTOP_listener(channel, message) {
-							var data = JSON.parse(message);
-							//LB: make sure to send recieved data to corresponding user
-							if (name == data.username) {
-								value = data.value;
-								redisServer.redisSubServer.removeListener('message', LAUNCH_DESKTOP_listener);
-								if (data.onAction == "unavailableLocalServer") {
-									logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
-									if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
-										var soc = myserver.socketMapNotify[name];
-										soc.emit("ICEnotAvailable");
-									}
-								} else {
-									clearInterval(updateSessionExpiry);
-									logger.info("Sending desktop scraped objects from initScraping_ICE");
-									res.send(value);
-								}
-							}
-						}
-						redisServer.redisSubServer.on("message",LAUNCH_DESKTOP_listener);
-					} else if (req.body.screenViewObject.appType == "SAP") {
-						var applicationPath = req.body.screenViewObject.applicationPath;
-						logger.info("Sending socket request for LAUNCH_SAP to redis");
-						dataToIce = {"emitAction" : "LAUNCH_SAP","username" : name, "applicationPath":applicationPath};
-						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = utils.resetSession(req.session);
-						function LAUNCH_SAP_listener(channel, message) {
-							var data = JSON.parse(message);
-							//LB: make sure to send recieved data to corresponding user
-							if (name == data.username) {
-								value = data.value;
-								redisServer.redisSubServer.removeListener('message', LAUNCH_SAP_listener);
-								if (data.onAction == "unavailableLocalServer") {
-									logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
-									if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
-										var soc = myserver.socketMapNotify[name];
-										soc.emit("ICEnotAvailable");
-									}
-								} else {
-									clearInterval(updateSessionExpiry);
-									logger.info("Sending SAP scraped objects from initScraping_ICE");
-									res.send(value);
-								}
-							}
-						}
-						redisServer.redisSubServer.on("message",LAUNCH_SAP_listener);
-					} else if (req.body.screenViewObject.appType == "DesktopJava") {
-						var applicationPath = req.body.screenViewObject.applicationPath;
-						logger.info("Sending socket request for LAUNCH_OEBS to redis");
-						dataToIce = {"emitAction" : "LAUNCH_OEBS","username" :name,
-									 "applicationPath":applicationPath};
-						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = utils.resetSession(req.session);
-						function LAUNCH_OEBS_listener(channel, message) {
-							var data = JSON.parse(message);
-							//LB: make sure to send recieved data to corresponding user
-							if (name == data.username) {
-								value = data.value;
-								redisServer.redisSubServer.removeListener('message', LAUNCH_OEBS_listener);
-								if (data.onAction == "unavailableLocalServer") {
-									logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
-									if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
-										var soc = myserver.socketMapNotify[name];
-										soc.emit("ICEnotAvailable");
-									}
-								} else {
-									clearInterval(updateSessionExpiry);
-									logger.info("Sending OEBS scraped objects from initScraping_ICE");
-									res.send(value);
-								}
-							}
-						}
-						redisServer.redisSubServer.on("message",LAUNCH_OEBS_listener);
-					} else if (req.body.screenViewObject.appType == "MobileApp") {
-						var apkPath = req.body.screenViewObject.apkPath;
-						var serial = req.body.screenViewObject.mobileSerial;
-						var mobileDeviceName = req.body.screenViewObject.mobileDeviceName;
-						var mobileIosVersion = req.body.screenViewObject.mobileIosVersion;
-						var mobileUDID = req.body.screenViewObject.mobileUDID;
-						var deviceName = req.body.screenViewObject.deviceName;
-						var versionNumber = req.body.screenViewObject.versionNumber;
-						var bundleId = req.body.screenViewObject.bundleId;
-						var ipAddress = req.body.screenViewObject.ipAddress;
-						var data = "LAUNCH_MOBILE";
-						logger.info("Sending socket request for LAUNCH_MOBILE to redis");
-						if(req.body.screenViewObject.param == 'ios')
-						{
-							dataToIce = {"emitAction" : "LAUNCH_MOBILE","username" : name,
-							"deviceName":deviceName,"versionNumber":versionNumber,"bundleId":bundleId,
-							"ipAddress":ipAddress,"param":"ios"};
-						}
-						else{
-							dataToIce = {"emitAction" : "LAUNCH_MOBILE","username" : name,
-							"apkPath":apkPath,"serial":serial,"mobileDeviceName":mobileDeviceName,
-							"mobileIosVersion":mobileIosVersion,"mobileUDID":mobileUDID};
-						}
-						
-						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = utils.resetSession(req.session);
-						function LAUNCH_MOBILE_listener(channel, message) {
-							var data = JSON.parse(message);
-							//LB: make sure to send recieved data to corresponding user
-							if (name == data.username) {
-								value = data.value;
-								redisServer.redisSubServer.removeListener('message', LAUNCH_MOBILE_listener);
-								if (data.onAction == "unavailableLocalServer") {
-									logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
-									if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
-										var soc = myserver.socketMapNotify[name];
-										soc.emit("ICEnotAvailable");
-									}
-								} else {
-									clearInterval(updateSessionExpiry);
-									logger.info("Sending MOBILE scraped objects from initScraping_ICE");
-									res.send(value);
-								}
-							}
-						}
-						redisServer.redisSubServer.on("message",LAUNCH_MOBILE_listener);
-					} else if (req.body.screenViewObject.appType == "MobileWeb") {
-						var mobileSerial = req.body.screenViewObject.mobileSerial;
-						var androidVersion = req.body.screenViewObject.androidVersion;
-						logger.info("Sending socket request for LAUNCH_MOBILE_WEB to redis");
-						dataToIce = {"emitAction" : "LAUNCH_MOBILE_WEB","username" : name,
-									 "mobileSerial":mobileSerial,"androidVersion":androidVersion};
-						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = utils.resetSession(req.session);
-						function LAUNCH_MOBILE_WEB_listener(channel, message) {
-							var data = JSON.parse(message);
-							//LB: make sure to send recieved data to corresponding user
-							if (name == data.username) {
-								redisServer.redisSubServer.removeListener('message', LAUNCH_MOBILE_WEB_listener);
-								if (data.onAction == "unavailableLocalServer") {
-									logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
-									if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
-										var soc = myserver.socketMapNotify[name];
-										soc.emit("ICEnotAvailable");
-									}
-								} else {
-									value = data.value;
-									clearInterval(updateSessionExpiry);
-									logger.info("Sending MOBILE_WEB scraped objects from initScraping_ICE");
-									res.send(value);
-								}
-							}
-						}
-						redisServer.redisSubServer.on("message",LAUNCH_MOBILE_WEB_listener);
-					} else {
-						//Web Scrape
-						var data = {};
-						var browserType = req.body.screenViewObject.browserType;
-						if (req.body.screenViewObject.action == 'compare') {
-							data.viewString = req.body.screenViewObject.viewString.view;
-							data.scrapedurl = req.body.screenViewObject.viewString.scrapedurl;
-							data.action = req.body.screenViewObject.action;
-							if (browserType == "chrome") {
-								data.task = "OPEN BROWSER CH";
-							} else if (browserType == "ie") {
-								data.task = "OPEN BROWSER IE";
-							} else if (browserType == "mozilla") {
-								data.task = "OPEN BROWSER FX";
-							} else if (browserType == "safari"){
-								data.task = "OPEN BROWSER SF"
-							}
+					var reqAction = "";
+					var reqBody = req.body.screenViewObject;
+					if (reqBody.appType == "Desktop") {
+						var applicationPath = reqBody.applicationPath;
+						var processID = reqBody.processID;
+						var scrapeMethod = reqBody.scrapeMethod;
+						reqAction = "desktop";
+						dataToIce = {"emitAction": "LAUNCH_DESKTOP", "username": name, "applicationPath": applicationPath,
+							"processID": processID, "scrapeMethod": scrapeMethod};
+					} else if (reqBody.appType == "SAP") {
+						var applicationPath = reqBody.applicationPath;
+						reqAction = "SAP";
+						dataToIce = {"emitAction": "LAUNCH_SAP", "username": name, "applicationPath": applicationPath};
+					} else if (reqBody.appType == "DesktopJava") {
+						var applicationPath = reqBody.applicationPath;
+						reqAction = "OEBS";
+						dataToIce = {"emitAction": "LAUNCH_OEBS", "username": name, "applicationPath": applicationPath};
+					} else if (reqBody.appType == "MobileApp") {
+						var apkPath = reqBody.apkPath;
+						var serial = reqBody.mobileSerial;
+						var mobileDeviceName = reqBody.mobileDeviceName;
+						var mobileIosVersion = reqBody.mobileIosVersion;
+						var mobileUDID = reqBody.mobileUDID;
+						var deviceName = reqBody.deviceName;
+						var versionNumber = reqBody.versionNumber;
+						var bundleId = reqBody.bundleId;
+						var ipAddress = reqBody.ipAddress;
+						reqAction = "mobile";
+						if(reqBody.param == 'ios') {
+							dataToIce = {"emitAction": "LAUNCH_MOBILE", "username" : name, "deviceName": deviceName,
+								"versionNumber": versionNumber, "bundleId":bundleId, "ipAddress": ipAddress, "param": "ios"};
 						} else {
-							data.action = "scrape";
-							if (browserType == "chrome") {
-								data.task = "OPEN BROWSER CH";
-							} else if (browserType == "ie") {
-								data.task = "OPEN BROWSER IE";
-							} else if (browserType == "mozilla") {
-								data.task = "OPEN BROWSER FX";
-							} else if (browserType == "safari"){
-								data.task = "OPEN BROWSER SF"
-							}
+							dataToIce = {"emitAction" : "LAUNCH_MOBILE", "username" : name, "apkPath": apkPath, "serial": serial,
+								"mobileDeviceName": mobileDeviceName, "mobileIosVersion": mobileIosVersion, "mobileUDID": mobileUDID};
 						}
-						logger.info("Sending socket request for webscrape to redis");
-						dataToIce = {"emitAction" : "webscrape","username" : name, "data":data};
-						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = utils.resetSession(req.session);
-						function webscrape_listener(channel, message) {
-							data = JSON.parse(message);
-							//LB: make sure to send recieved data to corresponding user
-							if (name == data.username) {
-								redisServer.redisSubServer.removeListener('message', webscrape_listener);
-								if (data.onAction == "unavailableLocalServer") {
-									logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
-									if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
-										var soc = myserver.socketMapNotify[name];
-										soc.emit("ICEnotAvailable");
-									}
-								} else {
-									value = data.value;
-									clearInterval(updateSessionExpiry);
-									logger.info("Sending WEB scraped objects from initScraping_ICE");
-									res.send(value);
-								}
-							}
+					} else if (reqBody.appType == "MobileWeb") {
+						var mobileSerial = reqBody.mobileSerial;
+						var androidVersion = reqBody.androidVersion;
+						reqAction = "mobile web";
+						dataToIce = {"emitAction": "LAUNCH_MOBILE_WEB", "username" : name,
+							"mobileSerial": mobileSerial, "androidVersion": androidVersion};
+					} else {  //Web Scrape
+						var data = {action: "scrape"};
+						var browserType = reqBody.browserType;
+						if (reqBody.action == 'compare') {
+							data.viewString = reqBody.viewString.view;
+							data.scrapedurl = reqBody.viewString.scrapedurl;
+							data.action = reqBody.action;
 						}
-						redisServer.redisSubServer.on("message",webscrape_listener);
+						if (browserType == "chrome") data.task = "OPEN BROWSER CH";
+						else if (browserType == "ie") data.task = "OPEN BROWSER IE";
+						else if (browserType == "mozilla") data.task = "OPEN BROWSER FX";
+						else if (browserType == "safari") data.task = "OPEN BROWSER SF"
+						reqAction = "web";
+						dataToIce = {"emitAction": "webscrape", "username" : name, "data": data};
 					}
+					dataToIce.username = name;
+					logger.info("Sending socket request for "+dataToIce.emitAction+" to redis");
+					redisServer.redisPubICE.publish('ICE1_normal_' + name, JSON.stringify(dataToIce));
+					var updateSessionExpiry = utils.resetSession(req.session);
+					function scrape_listener(channel, message) {
+						var data = JSON.parse(message);
+						//LB: make sure to send recieved data to corresponding user
+						if (name == data.username) {
+							redisServer.redisSubServer.removeListener('message', scrape_listener);
+							if (data.onAction == "unavailableLocalServer") {
+								logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
+								if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
+									var soc = myserver.socketMapNotify[name];
+									soc.emit("ICEnotAvailable");
+								}
+							} else {
+								value = data.value;
+								clearInterval(updateSessionExpiry);
+								logger.info("Sending "+reqAction+" scraped objects from initScraping_ICE");
+								res.send(value);
+							}
+						}
+					}
+					redisServer.redisSubServer.on("message",scrape_listener);
 				} else {
 					logger.error("Error occurred in the service initScraping_ICE: Socket not Available");
-					try {
-						utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-							var flag="";
-							if (found) flag = "scheduleModeOn";
-							else flag = "unavailableLocalServer";
-							res.send(flag);
-						});
-					} catch (exception) {
-						logger.error("Exception in the service initScraping_ICE: %s",exception);
-					}
+					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+						var flag = (found)? "scheduleModeOn" : "unavailableLocalServer";
+						res.send(flag);
+					});
 				}
 			});
 		} else {
@@ -270,12 +132,7 @@ exports.initScraping_ICE = function (req, res) {
 		}
 	} catch (exception) {
 		logger.error("Exception in the service initScraping_ICE: %s",exception);
-		utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-			var flag="";
-			if (found) flag = "scheduleModeOn";
-			else flag = "unavailableLocalServer";
-			res.send(flag);
-		});
+		res.send("fail");
 	}
 };
 
@@ -297,18 +154,17 @@ exports.highlightScrapElement_ICE = function (req, res) {
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
 			logger.info("Sending socket request for focus to redis");
-			var dataToIce = {"emitAction" : "focus","username" : name,
-						 "focusParam":focusParam,"elementURL":elementURL,"appType":appType};
+			var dataToIce = {"emitAction": "focus", "username": name, "focusParam": focusParam, "elementURL": elementURL, "appType": appType};
 			redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-			var flag = 'success';
 			logger.info("Successfully highlighted selected object");
-			res.send(flag);
+			res.send('success');
 		} else {
 			logger.error("Error occurred in the service highlightScrapElement_ICE: Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
 		logger.error("Exception in the service highlightScrapElement_ICE: %s",exception);
+		res.send("fail");
 	}
 };
 
@@ -328,12 +184,8 @@ exports.getScrapeDataScreenLevel_ICE = function (req, res) {
 			};
 			logger.info("Calling function fetchScrapedData from getScrapeDataScreenLevel_ICE service");
 			fetchScrapedData(inputs, function (err, getScrapeDataQueryresponse) {
-				try {
-					logger.info("Scraped Data sent successfully from getScrapeDataScreenLevel_ICE service");
-					res.send(getScrapeDataQueryresponse);
-				} catch (exception) {
-					logger.error("Exception while sending scraped data from getScrapeDataScreenLevel_ICE service: %s",exception);
-				}
+				logger.info("Scraped Data sent successfully from getScrapeDataScreenLevel_ICE service");
+				res.send(getScrapeDataQueryresponse);
 			});
 		} else {
 			logger.error("Error occurred in the service getScrapeDataScreenLevel_ICE: Invalid Session");
@@ -341,6 +193,7 @@ exports.getScrapeDataScreenLevel_ICE = function (req, res) {
 		}
 	} catch (exception) {
 		logger.error("Exception in the service getScrapeDataScreenLevel_ICE: %s",exception);
+		res.send("fail");
 	}
 };
 
@@ -410,6 +263,8 @@ exports.updateScreen_ICE = function (req, res) {
 			var inputs = {};
 			var inputstestcase = {};
 			var statusFlag = "";
+			newData = updateData.newData;
+			type = updateData.type;
 			if (param == "updateScrapeData_ICE") {
 				try {
 					scrapedObjects = updateData.getScrapeData;
@@ -1310,11 +1165,66 @@ exports.updateScreen_ICE = function (req, res) {
 												}
 											]);
 									} else {
-										statusFlag = "success";
-										try {
-											res.send(statusFlag);
-										} catch (exception) {
-											logger.error("Exception while sending response in the finalFunction: %s", exception);
+										var check_for_duplicate_images = false;
+										if(type=='save' && newData['view'] != undefined){
+											for(var i=0;i<newData['view'].length;i++){
+												if(newData['view'][i]['cord']!=null && newData['view'][i]['cord']!=''){
+													check_for_duplicate_images = true;
+													if(newData['view'][i]['tag']=='constant'){
+														check_for_duplicate_images = false;
+														break
+													}
+												}
+											}
+										}
+										if(!check_for_duplicate_images){
+											res.send("success");
+										}
+										else{
+											name = req.session.username;
+											redisServer.redisSubServer.subscribe('ICE2_' + name);
+											logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+											logger.debug("ICE Socket requesting Address: %s" , name);
+											redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+												if (redisres[1]>0){
+													var scrapedata = newData;
+													logger.info("Sending socket request for checkIrisDuplicate_ICE to redis");
+													dataToIce = {"emitAction" : "irisOperations","username" : name, "image_data":scrapedata, "param":"checkDuplicate"};
+													redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+													var updateSessionExpiry = utils.resetSession(req.session);
+													function checkIrisDuplicate_listener(channel,message) {
+														var data = JSON.parse(message);
+														if(name == data.username){
+															clearInterval(updateSessionExpiry);
+															redisServer.redisSubServer.removeListener('message',checkIrisDuplicate_listener);
+															if (data.onAction == "unavailableLocalServer") {
+																logger.error("Error occurred in checkIrisDuplicate_ICE: Socket Disconnected");
+																if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+																	var soc = myserver.socketMapNotify[name];
+																	soc.emit("ICEnotAvailable");
+																}
+															} else if (data.onAction == "iris_operations_result") {
+																if(data.value.length==0)
+																	res.send("success");
+																else
+																	res.send(data.value);
+															}
+														}
+													}
+													redisServer.redisSubServer.on("message",checkIrisDuplicate_listener);
+												}
+												else {
+													utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+														var flag="";
+														if (found) flag = "scheduleModeOn";
+														else {
+															flag = "unavailableLocalServer";
+															logger.info("ICE Socket not Available");
+														}
+														res.send(flag);
+													});
+												}
+											});
 										}
 									}
 								}
@@ -2242,3 +2152,56 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 		logger.error("Exception in the service getTestcasesByScenarioId_ICE: %s", exception);
 	}
 };
+
+exports.updateIrisDataset = function updateIrisDataset(req, res) {
+	try{
+		logger.info("Inside UI service: updateIrisDataset");
+		if (utils.isSessionActive(req)) {
+			name = req.session.username;
+			image_data = req.body.data;
+			redisServer.redisSubServer.subscribe('ICE2_' + name);
+			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+			logger.debug("ICE Socket requesting Address: %s" , name);
+			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+				if (redisres[1]>0) {
+					logger.info("Sending socket request for updateIrisDataset to redis");
+					dataToIce = {"emitAction" : "irisOperations","username" : name, "image_data":image_data, "param":"updateDataset"};
+					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					var updateSessionExpiry = utils.resetSession(req.session);
+					function updateIrisDataset_listener(channel,message) {
+						var data = JSON.parse(message);
+						if(name == data.username){
+							clearInterval(updateSessionExpiry);
+							redisServer.redisSubServer.removeListener('message',updateIrisDataset_listener);
+							if (data.onAction == "unavailableLocalServer") {
+								logger.error("Error occurred in updateIrisDataset: Socket Disconnected");
+								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+									var soc = myserver.socketMapNotify[name];
+									soc.emit("ICEnotAvailable");
+								}
+							} else if (data.onAction == "iris_operations_result") {
+								res.send(data.value);
+							}
+						}
+					}
+					redisServer.redisSubServer.on("message",updateIrisDataset_listener);
+				} else {
+					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+						var flag="";
+						if (found) flag = "scheduleModeOn";
+						else {
+							flag = "unavailableLocalServer";
+							logger.info("ICE Socket not Available");
+						}
+						res.send(flag);
+					});
+				}
+			});
+		} else {
+			logger.error("Error occurred in the service updateIrisDataset: Invalid Session");
+			res.send("Invalid Session");
+		}
+	} catch(exception){
+		logger.error("Exception in the service updateIrisDataset: %s", exception);
+	}
+}

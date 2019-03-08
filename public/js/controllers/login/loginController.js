@@ -4,13 +4,7 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 	$scope.ud = {};
 	$scope.serverList = [{"name": "License Server", "active": false}, {"name": "NDAC Server", "active": false}, {"name": "Web Server", "active": false}];
 	$scope.restartForm = false;
-	window.localStorage.clear();
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear();
-	//if checkLoggedIn was true, means, user was logged in but now the session is expired
-	if (window.sessionStorage.getItem('checkLoggedIn')) {
-		$scope.loginValidation = "Your session has expired, Please login again";
-		window.sessionStorage.clear();
-	}
 
 	$scope.check_credentials = function (path, $event) {
 		cfpLoadingBar.start();

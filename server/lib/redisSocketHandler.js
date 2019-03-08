@@ -102,7 +102,11 @@ default_sub.on("message", function (channel, message) {
 	case "killSession":
 		mySocket.emit("killSession", data.cmdBy);
 		break;
-
+	
+	case "irisOperations":
+		mySocket.emit("irisOperations", data.image_data, data.param);
+		break
+		
 	default:
 		var dataToNode = JSON.stringify({"username": data.username, "onAction": "fail", "value": "fail"});
 		server_pub.publish("ICE2_" + data.username, dataToNode);
@@ -213,4 +217,8 @@ module.exports.initListeners = function(mySocket){
 		server_pub.publish('ICE2_' + username, dataToNode);
 	});
 
+	mySocket.on('iris_operations_result', function (value) {
+		var dataToNode = JSON.stringify({"type" : "res","username" : username,"onAction" : "iris_operations_result","value":JSON.parse(value)});
+		server_pub.publish('ICE2_' + username, dataToNode);
+	});
 };

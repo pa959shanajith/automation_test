@@ -6,7 +6,7 @@ var myserver = require('../lib/socket');
 // var jsreportClient = require("jsreport-client");
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
+var epurl = process.env.NDAC_URL;
 var validator =  require('validator');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
@@ -15,13 +15,13 @@ var Handlebars = require('../lib/handlebar.js');
 var wkhtmltopdf = require('wkhtmltopdf');
 var fs = require('fs');
 wkhtmltopdf.command = process.cwd() +"\\assets\\wkhtmltox\\bin\\wkhtmltopdf.exe"
-var reportpath = "../../data/templates";
+var reportpath = "../../assets/templates";
 var templatepdf = '', templateweb = '';
-fs.readFile('data/templates/pdfReport/content.handlebars', 'utf8', function(err, data) {
+fs.readFile('assets/templates/pdfReport/content.handlebars', 'utf8', function(err, data) {
 	templatepdf = data;
 });
 
-fs.readFile('data/templates/specificReport/content.handlebars', 'utf8', function(err, data) {
+fs.readFile('assets/templates/specificReport/content.handlebars', 'utf8', function(err, data) {
 	templateweb = data;
 });
 

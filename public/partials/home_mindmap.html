@@ -82,7 +82,7 @@
             <div class="endtoend-modules-right-lower makeElementFloatleft">
                <div class="scrollbar-inner endtoend-modules-rightfirst-lower makeElementFloatleft" id="eteScenarioContainer"></div>
                <button class="createNew-ete" ng-click="createNewMap_W($event)">CreateNew</button>
-               <button class="addScenarios-ete" ng-click ="addScenariosete()" >Add</button>
+               <button class="addScenarios-ete" ng-click ="addScenariosete($event)" >Add</button>
             </div>
          </div>
          <span class="suitedropdownicon"><img alt="Collapse Icon" class="iconSpace collapseEte" src="imgs/ic-collapse.png" ng-click = "collapseETE()"></span>
@@ -196,7 +196,7 @@
                <span class="ct-nodeLabel" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">{{map.name}}</span>
             </div>
          </div>
-         <span id='ctExpandCreate' class=''><img alt="Collapse Icon" class="iconSpaceArrow" src="imgs/ic-collapse.png"></span>
+         <span id='ctExpandCreate' class=''><img alt="Collapse Icon" id="expCreate" class="iconSpaceArrow" src="imgs/ic-collapse.png"></span>
          <!--<div id="ctExpandCreate" class="ct-expand"></div>-->
       </div>
       <div ng-show="tab == 'tabAssign'" id="ct-AssignBox" class="ct-moduleBoxOptional tabAssign">
@@ -226,7 +226,7 @@
                <span class="ct-nodeLabel" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">{{map.name}}</span>
             </div>
          </div>
-         <span id='ctExpandAssign' class=''><img alt="Collapse Icon" class="iconSpaceArrow" src="imgs/ic-collapse.png"></span>
+         <span id='ctExpandAssign' class=''><img alt="Collapse Icon" id="expAssign" class="iconSpaceArrow" src="imgs/ic-collapse.png"></span>
          <!--<div id="ctExpandAssign" class="ct-expand"></div>-->
       </div>
       <div ng-if="tab == 'tabAssign'" id="ct-canvasforAssign" class="tabAssign">
