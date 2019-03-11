@@ -115,7 +115,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     }
     //console.log(appType);
     $scope.getScreenView = appType
-	$scope.isMac =  navigator.userAgent.indexOf('Mac');
+    $scope.isMac =  navigator.userAgent.indexOf('Mac');
     //Getting Apptype orScreen Type
     cfpLoadingBar.start()
     $timeout(function () {
