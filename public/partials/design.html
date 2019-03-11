@@ -240,7 +240,47 @@
           		</div>
         	</a>
 			<!--Popup-->
-			<div tabindex="0" id="window-filter" class="popupWrap popupWrap-filter">
+			<!--filter for iOS-->
+			<div ng-if="(getScreenView == 'MobileApp' && isMac != -1)" tabindex="0" id="window-filter" class="popupWrap popupWrap-filter">
+				<h4 class="h4-custom closePopup">Filters <img class="closePopup pull-right" src="imgs/ic-arrow.png" /></h4>
+				<div class="popupContent popupContent-filter">
+				<div id ='selectAllFilters'><label><input title="Select all" type="checkbox" class="checkStyleboxFilter"><span class='selectAllTxt'>Select all</span></label></div>
+					<div><span class='popupContent-default filterObjects' data-tag="Button">Button</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="links">links</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="statictexts">statictexts</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="image">image</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="RadioButton">RadioButton</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="XCUIElementTypeSlider">Slider</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="Datepicker">Datepicker</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="iOSXCUIElementTypeSecureTextField">SecureTextField</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="iOSEditText">TextField</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="otherElements">OtherElements</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="iOSXCUIElementTypeSearchField">SearchField</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="XCUIElementTypePickerWheel">PickerWheel</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="textViews">textView</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="cells">cells</span></div>
+					<div style='width:auto;'><span class='popupContent-default filterObjects' data-tag="duplicateCustnames">Duplicate Custnames</span></div>
+				</div>
+			</div>
+			<!--filter for Android-->
+			<div ng-if="getScreenView == 'MobileApp' && isMac == -1" tabindex="0" id="window-filter" class="popupWrap popupWrap-filter">
+				<h4 class="h4-custom closePopup">Filters <img class="closePopup pull-right" src="imgs/ic-arrow.png" /></h4>
+				<div class="popupContent popupContent-filter">
+				<div id ='selectAllFilters'><label><input title="Select all" type="checkbox" class="checkStyleboxFilter"><span class='selectAllTxt'>Select all</span></label></div>
+					<div><span class='popupContent-default filterObjects' data-tag="button">Button</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="checkbox">Checkbox</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="select">Dropdown</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="img">Image</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="a">Link</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="radiobutton">Radio Button</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="input">Text Box</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="list">List Box</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="table">Table</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="others">Others</span></div>
+					<div style='width:auto;'><span class='popupContent-default filterObjects' data-tag="duplicateCustnames">Duplicate Custnames</span></div>
+				</div>
+			</div>
+			<div ng-if="getScreenView != 'MobileApp'" tabindex="0" id="window-filter" class="popupWrap popupWrap-filter">
 				<h4 class="h4-custom closePopup">Filters <img class="closePopup pull-right" src="imgs/ic-arrow.png" /></h4>
 				<div class="popupContent popupContent-filter">
 				<div id ='selectAllFilters'><label><input title="Select all" type="checkbox" class="checkStyleboxFilter"><span class='selectAllTxt'>Select all</span></label></div>
