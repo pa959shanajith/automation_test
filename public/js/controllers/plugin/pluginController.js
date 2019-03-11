@@ -227,6 +227,10 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		var value = $(element).val();
 		$(".panel-default span.assignedTask").each(function () { 
 			var title = $(this).attr('title');
+			if($('.active-task').is(":visible"))
+			{
+				$('.active-task').children().children('div').children('div').children('img').click();
+			}
 			if(title == undefined)
 			{
 				if ($(this).text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
