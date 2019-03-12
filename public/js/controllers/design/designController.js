@@ -850,9 +850,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             if (ob.cord && ob.cord != '') {  //in case of iris object
                                 addcusOb = ""
                                 ob.hiddentag = "No",
-                                    tag = "iris",
-                                    ob.url = "",
-                                    ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag + ";" + ob.objectType
+                                    tag = "iris;" + ob.objectType,
+									ob.url = "",
+									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
                             }
                             var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                             // }                                       
@@ -1881,9 +1881,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 if (ob.cord && ob.cord != '') {  //in case of iris object
                                     addcusOb = ""
                                     ob.hiddentag = "No",
-                                        tag = "iris",
+                                        tag = "iris;" + ob.objectType,
                                         ob.url = "",
-                                        ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag + ";" + ob.objectType
+                                        ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
                                 }
 
                                 // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
@@ -1933,9 +1933,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                     if (ob.cord && ob.cord != '') {  //in case of iris object
                                         addcusOb = ""
                                         ob.hiddentag = "No",
-                                            tag = "iris",
-                                            ob.url = "",
-                                            ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag + ";" + ob.objectType
+										tag = "iris;" + ob.objectType,
+                                        ob.url = "",
+                                        ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
                                     }
                                     if (appType == "DesktopJava" || appType == "Desktop") {
                                         var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
@@ -1988,9 +1988,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 if (ob.cord && ob.cord != '') {  //in case of iris object
                                     addcusOb = ""
                                     ob.hiddentag = "No",
-                                        tag = "iris",
+                                        tag = "iris;" + ob.objectType,
                                         ob.url = "",
-                                        ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag + ";" + ob.objectType
+                                        ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
                                 }
                                 // }
                                 // }
@@ -2067,10 +2067,16 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			var clicks = e.target.clicks;
 			e.target.clicks = 0;
 			if(clicks != 1) return false;
-			if(e.target.parentNode.parentNode.attributes['data-tag'].value != 'iris') return false;
+			if(!e.target.parentNode.parentNode.attributes['data-tag'].value.startsWith('iris')) return false;
 			obj_xpath = e.target.parentNode.parentNode.attributes['data-xpath'].value;
-			var objType = String(e.target.parentNode.parentNode.attributes['data-xpath'].value).split(';');
-			objType = objType[objType.length-1];
+			objType = '';
+			for(var i=0;i<viewString.view.length;i++){
+				if(obj_xpath == viewString.view[i].xpath && viewString.view[i].objectType != ''){
+					objType = viewString.view[i].objectType[0].toUpperCase() + viewString.view[i].objectType.slice(1,);
+					break;
+				}  
+			}
+			
 			$(".generateObj span img").removeClass("left-bottom-selection");
 			$(".compareObject span img").removeClass("left-bottom-selection");
 			$(".addObject span img").addClass("left-bottom-selection");
@@ -2079,7 +2085,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			$("#dialog-irisObject").modal("show");
 			$("#addIrisObjContainer").empty()
 			if ($(".addObj-row").length > 1) $(".addObj-row").remove()
-			$("#addIrisObjContainer").append('<div class = "row row-modal addObj-row">  	 	<div class = "form-group">  		 		<span><strong>Object Detected as:	'+objType+'</strong></span>  	 	</div>  	 	<br><br> 	 	<span style="float:left"><strong>User input: </strong></span> 	 	<div class = "form-group form-group-2" style="float:left; margin-left:10px;"> 		 		<select class = "form-control form-control-custom" id="objectType">  			 			<option selected disabled > Select Object Type </option> 			 			<option value = "textbox" > Textbox / Textarea </option>  			 			<option value = "table" > Table </option>  			 			<option value = "dropdown" > Dropdown </option> 			 			<option value = "button" > Button </option>  			 			<option value = "radiobutton" > Radiobutton </option>  			 			<option value = "checkbox" > Checkbox </option>  		 		</select>  	 	</div> </div>');
+			$("#addIrisObjContainer").append('<div class = "row row-modal addObj-row"><div class = "form-group"><span><strong>Object Detected as:	'+objType+'</strong></span></div><br><br><span style="float:left"><strong>User input: </strong></span><div class = "form-group form-group-2" style="float:left; margin-left:10px;"><select class = "form-control form-control-custom" id="objectType"><option selected disabled > Select Object Type </option><option value = "textbox" > Textbox / Textarea </option><option value = "table" > Table </option><option value = "dropdown" > Dropdown </option><option value = "button" > Button </option><option value = "radiobutton" > Radiobutton </option><option value = "checkbox" > Checkbox </option><option value = "others" > Others </option></select></div> </div>');
 		
 			$scope.removeAddObjectSelection = function () {
 				$("img.left-bottom-selection").removeClass('left-bottom-selection');
@@ -2089,22 +2095,37 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	
 	$scope.submitIrisObjectType = function (e) {
 		var obj_cord = '';
-		for(var i=0;i<viewString.view.length;i++){
-			if(viewString.view[i].xpath == obj_xpath){
-				obj_cord = viewString.view[i].cord;
+		var task = JSON.parse(window.localStorage['_CT']);
+		var identified_obj_type = objType.toLowerCase();
+		var user_obj_type = $('#objectType').val();
+		if(user_obj_type!=null && user_obj_type != identified_obj_type){
+			for(var i=0;i<viewString.view.length;i++){
+				if(viewString.view[i].xpath == obj_xpath){
+					obj_cord = viewString.view[i].cord;
+					viewString.view[i].objectType = user_obj_type;
+					break;
+				}
 			}
+			var data = {"cord":obj_cord,"type":user_obj_type,"projectid":task.projectId,"screenid":task.screenId,
+			"screenname":task.screenName,"versionnumber":task.versionnumber,"xpath":obj_xpath};
+			DesignServices.updateIrisDataset(data)
+				.then(function (val) {
+					$('.close').click();
+					if(val=='unavailableLocalServer')  openDialog("Iris Object Type", $rootScope.unavailableLocalServer_msg);
+					else{
+						if(val)
+							openDialog("Iris Object Type","Submitted Successfully.");
+						else
+							openDialog("Iris Object Type","Failed.");
+					}
+				}, function (error) {
+					
+				});
 		}
-		var data = {"cord":obj_cord,"type":$('#objectType').val()}; 
-		DesignServices.updateIrisDataset(data)
-			.then(function (val) {
-				$('.close').click();
-				if(val)
-					openDialog("Iris Object Type","Submitted Successfully.");
-				else
-					openDialog("Iris Object Type","Failed.");
-			}, function (error) {
-				
-			});
+		else{
+			$('.close').click();
+			openDialog("Iris Object Type","Submitted Successfully.");
+		}
 	}
 	
     $scope.updateComparedObjects = function (event) {
@@ -2677,17 +2698,18 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         }
         //}
         //	else{
-        DesignServices.highlightScrapElement_ICE(xpath, url, appType)
-            .then(function (data) {
-                if (data == "Invalid Session") {
-                    $rootScope.redirectPage();
-                }
-                if (data == "fail") {
-                    openDialog("Fail", "Failed to highlight")
-                }
-                console.log("success!::::" + data);
-            }, function (error) { });
-        //	}
+		if(!xpath.startsWith('iris')){
+			DesignServices.highlightScrapElement_ICE(xpath, url, appType)
+				.then(function (data) {
+					if (data == "Invalid Session") {
+						$rootScope.redirectPage();
+					}
+					if (data == "fail") {
+						openDialog("Fail", "Failed to highlight")
+					}
+					console.log("success!::::" + data);
+				}, function (error) { });
+        }
     };
     //Highlight Element on browser
 
@@ -2778,17 +2800,18 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         } else {
             $(".hightlight").remove();
         }
-        DesignServices.highlightScrapElement_ICE(xpath, url, appType)
-            .then(function (data) {
-                if (data == "Invalid Session") {
-                    $rootScope.redirectPage();
-                }
-                if (data == "fail") {
-                    openDialog("Fail", "Failed to highlight")
-                }
-                console.log("success!::::" + data);
-            }, function (error) { });
-        //}
+		if(!xpath.startsWith('iris')){
+			DesignServices.highlightScrapElement_ICE(xpath, url, appType)
+				.then(function (data) {
+					if (data == "Invalid Session") {
+						$rootScope.redirectPage();
+					}
+					if (data == "fail") {
+						openDialog("Fail", "Failed to highlight")
+					}
+					console.log("success!::::" + data);
+				}, function (error) { });
+        }
     };
     //Highlight compared and updated objects
 
@@ -3525,9 +3548,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         scrapeObject.appType = tasks.appType;
         scrapeObject.versionnumber = tasks.versionnumber;
 		scrapeObject.newData = viewString;
-		if(modifiednames.length>0)
-			scrapeObject.type = "rename";
-		else if(deleteObjectsFlag==true){
+		if(deleteObjectsFlag==true){
 			scrapeObject.type = "delete";
 			deleteObjectsFlag = false;
 		}
@@ -3536,42 +3557,41 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         //Update Service to Save Scrape Objects
         DesignServices.updateScreen_ICE(scrapeObject)
             .then(function (data) {
+                unblockUI();
                 if (data == "Invalid Session") {
                     $rootScope.redirectPage();
                 }
-				if(typeof(data)=="object" && data.length>0){
-					unblockUI();
-					openDialog("Save Scrape data", "");
-                    $("#globalModal").find('.modal-body p').html("<span><strong>Scraped data saved successfully. <br> Warning: Please scrape an IRIS reference object.</strong></span><br /><br /><strong>Matching objects found for:</strong>").css("color", "#000").append("<ul class='custList'></ul>");
-                    for (var j = 0; j < data.length; j++) {
-                        $("#globalModal").find('.modal-body p ul').append("<li>" + data[j] + "</li>");
-                    }
+				if(typeof(data)=="object" || data=="success"){
+					eaCheckbox = false;
+					//window.localStorage['_modified'] = "";
+					modifiednames = [];
+					getIndexOfDeletedObjects = [];
+					copiedViewstring = false;
+					//enableScreenShotHighlight = true;
+					localStorage.removeItem("_modified");
+					saveScrapeDataFlag = true;
+					if(typeof(data)=="object" && data.length>0){
+						openDialog("Save Scrape data", "");
+						$("#globalModal").find('.modal-body p').html("<span>Scraped data saved successfully. <br><br> <strong>Warning: Please scrape an IRIS reference object.</strong></span><br/><br/>Matching objects found for:").css("color", "#000").append("<ul class='custList'></ul>");
+						for (var j = 0; j < data.length; j++) {
+							$("#globalModal").find('.modal-body p ul').append("<li>" + data[j] + "</li>");
+						}
+					}
+					else  openDialog("Save Scraped data", "Scraped data saved successfully.")
+					$("a.browserIcon").removeClass("enableActions").addClass("disableActions").parent('li').css('cursor', 'not-allowed');
+					angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
+					$("#saveObjects").attr('disabled', true);
+					deleteScrapeDataservice = true;
+					//Transaction Activity for Save Scraped Objects Button Action
+					// var labelArr = [];
+					// var infoArr = [];
+					// labelArr.push(txnHistory.codesDict['SaveScrapedObjects']);
+					// infoArr.push(scrapeObject.appType)
+					// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
+				}else {
+					//enableScreenShotHighlight = false;
+					openDialog("Save Scraped data", "Failed to save");
 				}
-                else if (data == "success") {
-					unblockUI();
-                    eaCheckbox = false;
-                    //window.localStorage['_modified'] = "";
-                    modifiednames = [];
-                    getIndexOfDeletedObjects = [];
-                    copiedViewstring = false;
-                    //enableScreenShotHighlight = true;
-                    localStorage.removeItem("_modified");
-                    saveScrapeDataFlag = true;
-                    openDialog("Save Scraped data", "Scraped data saved successfully.")
-                    $("a.browserIcon").removeClass("enableActions").addClass("disableActions").parent('li').css('cursor', 'not-allowed');
-                    angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
-                    $("#saveObjects").attr('disabled', true);
-                    deleteScrapeDataservice = true;
-                    //Transaction Activity for Save Scraped Objects Button Action
-                    // var labelArr = [];
-                    // var infoArr = [];
-                    // labelArr.push(txnHistory.codesDict['SaveScrapedObjects']);
-                    // infoArr.push(scrapeObject.appType)
-                    // txnHistory.log(e.type,labelArr,infoArr,$location.$$path); 			   
-                } else {
-                    //enableScreenShotHighlight = false;
-                    openDialog("Save Scraped data", "Failed to save");
-                }
             }, function (error) { })
 
         if ($("#window-filter").is(":visible")) {
