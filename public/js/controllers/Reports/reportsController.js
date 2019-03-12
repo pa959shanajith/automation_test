@@ -122,7 +122,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             });
             $("input[type=search]").attr('placeholder', 'Search Scenario').addClass('scenarioSearch');
         }, 1000);
-
+        redirected = false;
         $('#accordion').show();
         $('.panel-body').append(oTable);
         $('#reportsTable').show();
@@ -229,6 +229,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 
     //Project Filter Change
     $scope.selProjectsFilter = function() {
+        debugger;
         var projectId = $('.project-list option:selected').val();
         blockUI("Loading releases.. please wait..");
         mindmapServices.populateReleases(projectId).then(function(result) {
