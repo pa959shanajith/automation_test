@@ -51,7 +51,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     });
 
     $(document).on('click', '.ct-nodeIcon', function(e) {
-        blockUI('Loading reports...')
+        blockUI('Loading reports...');
         $('img.highlight-module').removeClass('highlight-module');
         $('span.highlight-moduleName').removeClass('highlight-moduleName');
         $(this).addClass('highlight-module').next('span').addClass('highlight-moduleName');
@@ -229,7 +229,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 
     //Project Filter Change
     $scope.selProjectsFilter = function() {
-        debugger;
         var projectId = $('.project-list option:selected').val();
         blockUI("Loading releases.. please wait..");
         mindmapServices.populateReleases(projectId).then(function(result) {
