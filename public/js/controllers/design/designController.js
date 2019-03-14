@@ -115,6 +115,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     }
     //console.log(appType);
     $scope.getScreenView = appType
+    $scope.isMac =  navigator.userAgent.indexOf('Mac');
     //Getting Apptype orScreen Type
     cfpLoadingBar.start()
     $timeout(function () {
@@ -5506,12 +5507,12 @@ function contentTable(newTestScriptDataLS) {
                         if (obType.indexOf("RadioButton") >= 0) {
                             sc = Object.keys(keywordArrayList.radiobutton);
                             selectedKeywordList = "radiobutton";
+                        } else if (obType.indexOf("iOSEditText") >= 0 || obType.indexOf("iOSXCUIElementTypeSearchField") >= 0 || obType.indexOf("iOSXCUIElementTypeSecureTextField") >= 0){
+                            sc = Object.keys(keywordArrayList.inputIos);
+                            selectedKeywordList = "inputIos";
                         } else if (obType.indexOf("EditText") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeSecureTextField") >= 0) {
                             sc = Object.keys(keywordArrayList.input);
                             selectedKeywordList = "input";
-                        }else if (obType.indexOf("iOSEditText") >= 0 || obType.indexOf("iOSXCUIElementTypeSearchField") >= 0 || obType.indexOf("iOSXCUIElementTypeSecureTextField") >= 0){
-                            sc = Object.keys(keywordArrayList.inputIos);
-                            selectedKeywordList = "inputIos";
                         } else if (obType.indexOf("XCUIElementTypePickerWheel") >= 0) {
                             sc = Object.keys(keywordArrayList.pickerwheel);
                             selectedKeywordList = "pickerwheel";
