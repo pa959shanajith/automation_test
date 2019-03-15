@@ -449,6 +449,7 @@ exports.updateScreen_ICE = function (req, res) {
 												scrapedObjects.mirror = scrapedobjects.mirror;
 												scrapedObjects.scrapedin = scrapedobjects.scrapedin;
 												scrapedObjects.scrapetype = scrapedobjects.scrapetype;
+												scrapedObjects.scrapedurl = scrapedobjects.scrapedurl;
 												//the query here will be called only if ALL objects are identified.
 												if (elementschanged <= newCustNamesList.length) {
 													scrapedObjects = JSON.stringify(scrapedObjects);
@@ -566,6 +567,7 @@ exports.updateScreen_ICE = function (req, res) {
 												scrapedObjects.mirrorwidth = scrapedobjects.mirrorwidth;
 												scrapedObjects.scrapedin = scrapedobjects.scrapedin;
 												scrapedObjects.scrapetype = scrapedobjects.scrapetype;
+												scrapedObjects.scrapedurl = scrapedobjects.scrapedurl;
 												//this query will be called only if ALL objects are identified.
 												if (elementschanged <= deleteXpathNames.length) {
 													scrapedObjects = JSON.stringify(scrapedObjects);
@@ -795,6 +797,7 @@ exports.updateScreen_ICE = function (req, res) {
 														scrapedObjects.mirror = scrapedobjects.mirror;
 														scrapedObjects.scrapedin = scrapedobjects.scrapedin;
 														scrapedObjects.scrapetype = scrapedobjects.scrapetype;
+														scrapedObjects.scrapedurl = scrapedobjects.scrapedurl;
 														scrapedObjects = JSON.stringify(scrapedObjects);
 														scrapedObjects = scrapedObjects.replace(/'+/g, "''");
 														inputs = {
