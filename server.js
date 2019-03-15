@@ -276,11 +276,15 @@ if (cluster.isMaster) {
             if (userLogged && !req.session.emsg) {
                 req.session.emsg = "userLogged";
                 req.session.dndSess = true;
+                req.session.logged = true;
+                return res.sendFile("app.html", { root: __dirname + "/public/" });
             } else if (!req.session.emsg && req.session.username==undefined) {
                 if (usrCtx) {
                     var username = (usrCtx.userinfo)? usrCtx.userinfo.username:usrCtx.username;
                     if (username == undefined) {
                         req.session.emsg = "invalid_username_password";
+                        req.session.logged = true;
+                        return res.sendFile("app.html", { root: __dirname + "/public/" });
                     } else {
                         username = username.toLowerCase();
                         redisSessionStore.all(function (err, allKeys) {
@@ -307,6 +311,8 @@ if (cluster.isMaster) {
                                     };
                                 }
                             }
+                            req.session.logged = true;
+                            return res.sendFile("app.html", { root: __dirname + "/public/" });
                         });
                     }
                 } else {
@@ -320,8 +326,6 @@ if (cluster.isMaster) {
                     return res.redirect('login');
                 }
             }
-            req.session.logged = true;
-            return res.sendFile("app.html", { root: __dirname + "/public/" });
         });
 
         //Only Admin have access
