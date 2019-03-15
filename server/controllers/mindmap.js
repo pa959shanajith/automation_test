@@ -1450,7 +1450,7 @@ exports.excelToMindmap = function (req, res) {
 					if (row[scrIdx] !== '' && lastSco != -1) {
 						var tName = row[scrIdx];
 						var lScr = qObj[lastScr];
-						if (lScr === undefined || (lScr && lScr.name !== tName)) {
+						if (lScr === undefined || (lScr)) {
 							if (scrDict[tName] === undefined) scrDict[tName] = uuidV4();
 							lastScr = uniqueIndex;
 							e = { id: scrDict[tName], name: tName, type: 2, uidx: lastScr };

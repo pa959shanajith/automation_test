@@ -783,6 +783,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 if (data == "Invalid Session") {
                     $rootScope.redirectPage();
                 }
+                var objectsLength = $("ellipsis:visible").length;
+                if(objectsLength == 0)
+                {
+                    $("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');
+                    $("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');
+                }
                 gsElement = [];
                 $(".popupWrap").animate({
                     opacity: 0,

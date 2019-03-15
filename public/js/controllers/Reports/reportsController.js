@@ -51,7 +51,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     });
 
     $(document).on('click', '.ct-nodeIcon', function(e) {
-        blockUI('Loading reports...')
+        blockUI('Loading reports...');
         $('img.highlight-module').removeClass('highlight-module');
         $('span.highlight-moduleName').removeClass('highlight-moduleName');
         $(this).addClass('highlight-module').next('span').addClass('highlight-moduleName');
@@ -122,7 +122,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             });
             $("input[type=search]").attr('placeholder', 'Search Scenario').addClass('scenarioSearch');
         }, 1000);
-
+        redirected = false;
         $('#accordion').show();
         $('.panel-body').append(oTable);
         $('#reportsTable').show();
@@ -790,8 +790,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                     pass++;
                                 } else if (finalReports.rows[k].status == "Fail") {
                                     fail++;
-                                } else if (finalReports.rows[k].status == "Terminate") {
-                                    terminated++;
+                                } else if (finalReports.rows[k].hasOwnProperty("Step") && finalReports.rows[k].Step == "Terminated") {
+                                    terminated = total;
+                                    pass = 0;
+                                    fail = 0;
                                 }
                                 if (reportType != "html" && !(finalReports.rows[k].screenshot_path == undefined)) {
                                     scrShot.idx.push(k);

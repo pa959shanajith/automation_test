@@ -2658,7 +2658,7 @@ input[disabled]{
     margin-right: 10px;
 }
 .scheduleSuite .timePicContainer{
-	position: relative; display: inline-block;
+	position: absolute; display: inline-block;
 }
 .datePicContainer input, .timePicContainer input{margin-top: 2px; height: 27px;}
 .selectScheduleSuite{float: left; margin: 10px 6px 0 6px !important;}
@@ -6134,3 +6134,11 @@ h4.titleBadge
     left: -30px;
 }
 /*** Bootstrap Reports ***/
+.displayRow
+{
+    display:table-cell !important;
+}
+.displayBgTransparent
+{
+    background: transparent !important;
+}
