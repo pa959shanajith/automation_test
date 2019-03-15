@@ -397,7 +397,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		var pflag = false, rflag = false,cflag = false,aflag = false,tflag = false;
 		console.log("filter params: ",$scope.filterData);
 		console.log("node: ",node);
-		if($scope.filterData['prjval']=='Select Project' || $scope.filterData['prjval']==node.projectId) pflag = true;
+		if($scope.filterData['prjval']=='Select Project' || $scope.filterData['prjval']==node.testSuiteDetails[tidx].projectidts) pflag = true;
 		if($scope.filterData['relval']=='Select Release' || $scope.filterData['relval']==node.taskDetails[tidx].releaseid) rflag = true;
 		if($scope.filterData['relval']=='Select Release' || $scope.filterData['relval']==node.taskDetails[tidx].releaseid) rflag = true;
 		if($scope.filterData['cycval']=='Select Cycle' || $scope.filterData['cycval']==node.taskDetails[tidx].cycleid) cflag = true;
