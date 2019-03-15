@@ -253,9 +253,10 @@ if (cluster.isMaster) {
         });
 
         app.get('/error', function(req, res, next) {
-            var emsg=req.query.e;
+            var emsg = req.query.e;
+            var errsess = (req.session.messages)? req.session.messages[0]:undefined;
             if (emsg) {
-                if (req.session.messages) emsg = req.session.messages[0];
+                if (errsess) emsg = (errsess.indexOf("access_denied") != -1)? "unauthorized" : errsess;
                 else if (emsg == "400") emsg = "badrequest";
                 else if (emsg == "401") emsg = "Invalid Session";
                 else if (emsg == "403") emsg = "unauthorized";
@@ -506,7 +507,7 @@ if (cluster.isMaster) {
         app.post('/highlightScrapElement_ICE', design.highlightScrapElement_ICE);
         app.post('/getScrapeDataScreenLevel_ICE', design.getScrapeDataScreenLevel_ICE);
         app.post('/updateScreen_ICE', design.updateScreen_ICE);
-		app.post('/updateIrisDataset', design.updateIrisDataset);
+        app.post('/updateIrisDataset', design.updateIrisDataset);
         //Design TestCase Routes
         app.post('/readTestCase_ICE', design.readTestCase_ICE);
         app.post('/updateTestCase_ICE', design.updateTestCase_ICE);
