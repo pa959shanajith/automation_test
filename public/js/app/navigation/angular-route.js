@@ -328,19 +328,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 		window.localStorage.clear();
 		headerServices.logoutUser_Nineteen68()
 		.then(function(data){
-			//$location.path('/');
-			var parts = document.location.href.split('://')[1].split('/');
-			var protocol = document.location.href.split('://')[0];
-			var host = parts[0];
-			var pathName = parts.slice(1).join('/');
-			if(pathName == 'p_Reports')
-			{
-				window.location.href = '/';
-			}
-			else{
-				$location.path('/');
-			}
-			
+			$location.path('/');
 		}, function(error) {
 			console.log("Failed to Logout");
 		});

@@ -5,6 +5,8 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 	var chkLogOut = window.sessionStorage.getItem('checkLoggedOut');
 	window.localStorage.clear();
 	window.sessionStorage.clear();
+	$('.row').addClass('displayRow');
+	$('.jumbotron').addClass('displayBgTransparent');
 	//if chkLogOut was true, then user logged out manually else if chkLogIn was true, then user was logged in but now the session is expired
 	if (chkLogOut) {
 		$scope.loginValidation = "You Have Successfully Logged Out!";

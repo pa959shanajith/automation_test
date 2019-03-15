@@ -492,7 +492,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         uLix = 0;
         dNodes = [];
         dLinks = [];
-        nCount = [0, 0, 0, 0];
+        nCount = [1, 1, 1, 1];
         scrList = [];
         tcList = [];
         cSpan = [0, 0];
@@ -2370,10 +2370,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function validNodeDetails(value) {
+        $('#ct-inpAct').removeClass('errorClass');
         var nName, flag = !0;
         nName = value;
         var regex = /^[a-zA-Z0-9_]*$/;;
-        if (nName.length == 0 || nName.length > 255 || nName.indexOf('_') < 0 || !(regex.test(nName))) {
+        if (nName.length == 0 || nName.length > 255 || nName.indexOf('_') < 0 || !(regex.test(nName)) || nName== 'Screen_0' || nName == 'Scenario_0' || nName == 'Testcase_0') {
             $('#ct-inpAct').addClass('errorClass');
             flag = !1;
         }
@@ -2492,6 +2493,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $scope.inpText = angular.element("#ct-inpBox").scope().inpText;
         //To fix issue with suggestions
         var p = d3.select(activeNode);
+        inp = d3.select('#ct-inpAct');
+        var val = inp.property('value');
+        if(!validNodeDetails(val)) { return; }
         //var p=d3.select(activeNode);
         var iul = d3.select('#ct-inpSugg');
         if (keyCode == 13) {
@@ -4026,7 +4030,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         uLix = 0;
         dNodes = [];
         dLinks = [];
-        nCount = [0, 0, 0, 0];
+        nCount = [1, 1, 1, 1];
         cSpan = [0, 0];
         cScale = 1;
         mapSaved = !1;
