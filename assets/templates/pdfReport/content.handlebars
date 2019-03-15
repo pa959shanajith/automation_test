@@ -255,12 +255,7 @@
                  {{#ifnotEquals hidestep "true"}}
                 <tr id="report-slno{{slno}}" style="width: 100%;" class="reportdetailsrow">
                     <td class="rDid tabCont">{{slno}}</td>
-                    {{#ifnotEquals testcase_details.testcaseDetails undefined}}
-                        <td class="rDstep tabCont">{{Step}}</td>
-                    {{/ifnotEquals}}
-                    {{#ifEquals testcase_details.testcaseDetails undefined}}
-                      <td class="rDstep tabCont">{{StepDescription}}</td>
-                    {{/ifEquals}}
+                    <td class="rDstep tabCont">{{Step}}</td>
                     <td style="display:none" class="rDstepDes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
                     <td class="rDellaps tabCont">{{EllapsedTime}}</td>
                     {{#ifnotEquals  ../commentsLength 0}}
@@ -272,7 +267,7 @@
                     <!-- If Hide Test Details is False -->
                       {{#ifnotEquals hidestep "true"}}
                      {{#ifEquals testcase_details.testcaseDetails undefined}}
-                      <td class="rDExpectedRes tabCont"></td>
+                      <td class="rDExpectedRes tabCont {{getClass StepDescription}}">{{StepDescription}}</td>
                      {{/ifEquals}}
                     {{#ifEquals testcase_details.testcaseDetails ""}}
                         <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
