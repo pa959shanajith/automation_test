@@ -62,10 +62,12 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             if ($.trim(e.target.id) == $.trim(value.testsuiteid)) {
                 angular.forEach(value.scenarios, function(val, key) {
                     var scenarioId = val.scenarioid;
+                    var testSId = value.testsuiteid;
                     var reportsInputData = {};
                     reportsInputData.scenarioid = scenarioId;
                     reportsInputData.cycleid = $('.cycle-list option:selected').val();
                     reportsInputData.type = "latestreport";
+                    reportsInputData.testSId = testSId;
                     reportService.getReportsData_ICE(reportsInputData).then(function(result_res_scenarioData, response_scenarioData) {
                         $rootScope.scenarioInfo = result_res_scenarioData;
                         var scenarioInfo = $rootScope.scenarioInfo;
@@ -146,11 +148,13 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             }
 
             var nTr = $(this).parent('tr');
+            var testSId = $(this).parent('tr').attr('id');
             var scenarioId = $(this).children('span').attr('id');
             var reportsInputData = {};
             reportsInputData.scenarioid = scenarioId;
             reportsInputData.cycleid = $('.cycle-list option:selected').val();
             reportsInputData.type = "scenarioreports";
+            reportsInputData.testSId = testSId;
             reportService.getReportsData_ICE(reportsInputData).then(function(data) {
                 $scope.result_res_scenarioData = data.rows;
                 $scope.result_res_scenarioData = $scope.result_res_scenarioData.sort(function(a, b) {
