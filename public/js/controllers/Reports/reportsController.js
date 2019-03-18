@@ -79,56 +79,61 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         });
 
 
-        //Initialse DataTables, with no sorting on the 'details' column
+
         setTimeout(function() {
-            var oTable = $('#reportsTable').dataTable({
-                "bDestroy": true,
-                "responsive": true,
-                "bRetrieve": true,
-                "bPaginate": false,
-                "bSort": false,
-                "bFilter": false,
-                "bLengthChange": false,
-                "bInfo": false,
-                "scrollY": "200px",
-                "scrollCollapse": true,
-                "scrollX": true,
-                "paging": false,
-                "oLanguage": {
-                    "sSearch": ""
+        //Initialse DataTables, with no sorting on the 'details' column
+        var oTable = $('#reportsTable').dataTable({
+            "bDestroy": true,
+            "responsive": true,
+            "bRetrieve": true,
+            "bPaginate": false,
+            "bSort": false,
+            "bFilter": false,
+            "bLengthChange": false,
+            "bInfo": false,
+            "scrollY": "200px",
+            "scrollCollapse": true,
+            "scrollX": true,
+            "paging": false,
+            "oLanguage": {
+                "sSearch": ""
+            },
+            "deferRender": true,
+            "columns": [{
+                    "width": "5%",
+                    "targets": 0
                 },
-                "deferRender": true,
-                "columns": [{
-                        "width": "5%",
-                        "targets": 0
-                    },
-                    {
-                        "width": "15%",
-                        "targets": 1
-                    },
-                    {
-                        "width": "25%",
-                        "targets": 2
-                    },
-                    {
-                        "width": "20%",
-                        "targets": 3
-                    },
-                    {
-                        "width": "18%",
-                        "targets": 4
-                    },
-                ]
-            });
+                {
+                    "width": "15%",
+                    "targets": 1
+                },
+                {
+                    "width": "25%",
+                    "targets": 2
+                },
+                {
+                    "width": "20%",
+                    "targets": 3
+                },
+                {
+                    "width": "18%",
+                    "targets": 4
+                },
+            ],
+            "fnInitComplete": function(oSettings, json) {
+                    unblockUI();
+              }
+        });
+              unblockUI();
             $("input[type=search]").attr('placeholder', 'Search Scenario').addClass('scenarioSearch');
-        }, 1000);
+        }, 700);
         redirected = false;
         $('#accordion').show();
         $('.panel-body').append(oTable);
         $('#reportsTable').show();
 
         $('#moduleNameHeader').html('<span id="moduleTxt" title=' + moduleName + '>' + moduleName + '</span>');
-        unblockUI();
+        //unblockUI();
         $(document).on('click', '.reportsTbl', function(e) {
             $(this).addClass('tblRowHighlight').siblings('tr').removeClass('tblRowHighlight');
         });
@@ -157,9 +162,16 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                     return new Date(b.executedtime) - new Date(a.executedtime);
                 });
                 var executionData = $scope.result_res_scenarioData;
-                for (var k = 0; k < executionData.length; k++) {
-                    $("<tr class='details'><td></td><td></td><td>" + executionData[k].executedtime + "</td><td class='status'>" + executionData[k].status + "</td><td><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'></td></tr>").insertAfter(nTr);
-                }
+               if(executionData.length == 0)
+               {
+                $("<tr class='details'><td class='noExecutions' colspan=5>No Executions Found</td></tr>").insertAfter(nTr);                
+               }
+               else{
+                    for (var k = 0; k < executionData.length; k++) {
+                        $("<tr class='details'><td></td><td></td><td>" + executionData[k].executedtime + "</td><td class='status'>" + executionData[k].status + "</td><td><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'></td></tr>").insertAfter(nTr);
+                    }
+               }
+              
                 setStatusColor();
             });
             e.stopImmediatePropagation();
@@ -177,7 +189,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             } else if ($.trim($(this).text()) == 'Fail') {
                 $(this).css('color', '#ff0000');
             } else if ($.trim($(this).text()) == 'Terminate') {
-                $(this).css('color', "#ff4000");
+                $(this).css('color', "#ff8c00");
             } else {
                 $(this).css('color', '#000');
             }

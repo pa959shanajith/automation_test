@@ -409,6 +409,10 @@ body {
                 {
                     text-align: center;
                 }
+                .noExecutions
+                {
+                    text-align:center !important;
+                }
                  /************* Reports CSS ***********************/
 
 /************* Media Queries ************************/
