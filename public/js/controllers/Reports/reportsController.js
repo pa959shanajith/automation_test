@@ -755,6 +755,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                     var remarksLength = [];
                     var commentsLength = [];
                     if (data != "fail") {
+                        blockUI("Generating Report..please wait..");
                         if (data.length > 0) {
                             finalReports.overallstatus[0].domainName = data[0].domainname
                             finalReports.overallstatus[0].projectName = data[0].projectname
@@ -850,7 +851,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         }
                         if (reportType == "html") {
                             //Service call to get Html reports
-                            blockUI("Generating Report..please wait..");
+                            //blockUI("Generating Report..please wait..");
                             reportService.renderReport_ICE(finalReports, reportType).then(
                                 function(data1) {
                                     unblockUI();
@@ -881,7 +882,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             // labelArr.push(txnHistory.codesDict['HTMLReportClick']);
                             // txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
                         } else if (reportType == 'json') {
-                            blockUI("Generating Report..please wait..");
+                            //blockUI("Generating Report..please wait..");
                             exportJSONReport(finalReports);
                         } else {
                             //Service call to get screenshots for Pdf reports
@@ -894,7 +895,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                         finalReports.rows[scrShot.idx[i]].screenshot_dataURI = d;
                                     });
                                     //Service call to get Pdf reports
-                                    blockUI("Generating report..please wait..");
+                                    //blockUI("Generating report..please wait..");
                                     var isIE = /*@cc_on!@*/ false || !!document.documentMode;
                                     reportService.renderReport_ICE(finalReports, reportType).then(
                                         function(data1) {
