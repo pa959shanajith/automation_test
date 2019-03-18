@@ -122,6 +122,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             ],
             "fnInitComplete": function(oSettings, json) {
                     unblockUI();
+                    
               }
         });
               unblockUI();
