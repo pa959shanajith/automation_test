@@ -127,7 +127,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         });
               unblockUI();
             $("input[type=search]").attr('placeholder', 'Search Scenario').addClass('scenarioSearch');
-        }, 700);
+        }, 1000);
         redirected = false;
         $('#accordion').show();
         $('.panel-body').append(oTable);
