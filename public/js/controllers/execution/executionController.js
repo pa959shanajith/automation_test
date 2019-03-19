@@ -1,4 +1,4 @@
-var appType;var releaseName;var cycleName;var testSuiteName;var rowId;var scenarioDescription;
+var appType;var releaseName;var cycleName;var testSuiteName;var rowId;var scenarioDescription;var exc_action = "serial";
 mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeout','$location','ExecutionService','mindmapServices','DesignServices','cfpLoadingBar', 'socket', function ($scope, $rootScope, $http, $timeout, $location, ExecutionService, mindmapServices,DesignServices,cfpLoadingBar,socket) {
 	cfpLoadingBar.start();
 	var getEachScenario = [] //Contains Each RowData of Scenarios
@@ -788,11 +788,12 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		else if(appType == "MobileWeb" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select Mobile Web option")
 		else if(browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select "+appType+" option")
 		else if($(".exe-ExecuteStatus input:checked").length == 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute")
+		else if((appType == "Web" ) && browserTypeExe.length == 1 && exc_action == "parallel" ) openDialogExe("Execute Test Suite","Please select multiple browsers")
 		else{
 			//if(appType == "SAP") browserTypeExe = ["1"];
 			blockUI("Execution in progress. Please Wait...");
 			executionActive = true;
-			ExecutionService.ExecuteTestSuite_ICE($scope.moduleInfo)
+			ExecutionService.ExecuteTestSuite_ICE($scope.moduleInfo,exc_action)
 			.then(function(data){
 				if (data == "begin") return false;
 				executionActive = false;
@@ -945,6 +946,16 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	})
 	//Conditiion Check Function
 
+	//select parallel execution
+	$(document).on("click", ".selectParallel", function(){
+		$(this).find("span.glyphicon-sort").toggleClass("sb");
+		if($("span.glyphicon-sort").hasClass('sb') == true){
+			exc_action="parallel";
+		}
+		else{
+			exc_action="serial"
+		}	
+	});
 
 	//Select Browser Function
 	$(document).on("click", ".selectBrowser", function(){

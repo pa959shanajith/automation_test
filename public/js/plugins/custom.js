@@ -103,25 +103,10 @@ window.addEventListener('popstate', function () {
 $(document).ready(function() {
 	//prevent special characters(such as <,>,',"",-) for all the Inputs except for password field, testcase grid inputs and edit on scrapedobjects.
 	$(document).on("keydown","input[type='text']:not([type=password]):not(.editObjectName):not(.editable):not(#userName):not(#firstName):not(#lastName):not(.launchPopupInput), textarea:not(.editable):not(.wsdlTextAreaBody)", function(e) {
-		if(e.target.className == 'searchScrapInput' )
-		{
-			if(e.keyCode === 222)
-			{
-				return true;
-			}
-		}
-		if(e.shiftKey && e.keyCode == 189)
-		{
+		if ((e.target.className == 'searchScrapInput' && e.keyCode === 222) || (e.shiftKey && e.keyCode == 189) || ($(this).attr("id") == "mobilitySerialPath" && e.keyCode == 189))
 			return true;
-		}
-		else if($(this).attr("id") == "mobilitySerialPath" && e.keyCode == 189)
-		{
-			return true;
-		}
 		else if(e.keyCode == 222 || e.shiftKey && e.keyCode == 222 || e.shiftKey && e.keyCode == 188 || e.shiftKey && e.keyCode == 190 || (e.currentTarget.getAttribute("id") == "getremarksData" && e.keyCode == 186 && !e.shiftKey))
-		{
 			return false;
-		}
 	});
 	//Prevent special characters(such as <,>,',"",-) for all the Inputs except for password field, testcase grid inputs and edit on scrapedobjects on cut copy paste
 	$(document).on("cut copy paste","input[type='text']:not([type=password]):not(.editObjectName):not(.editable), textarea:not(.editable)", function(e){
@@ -180,9 +165,9 @@ $(document).ready(function() {
 				$(".searchInputMyTask").focus();
 			} 
 		}
-		if(window.localStorage['_CT'])
-		{
-			var subTaskID = JSON.parse(window.localStorage['_CT']).subTaskId;
+		var subTaskID = {};
+		if(window.localStorage['_CT']) {
+			subTaskID = JSON.parse(window.localStorage['_CT']).subTaskId;
 		}
 		if(window.location.pathname != "/scheduling"){
 			var selectedTask = $("#window-task").find("#accordion").find(".assignedTaskInner");
@@ -203,31 +188,28 @@ $(document).ready(function() {
 				})    		
 			}, 200)
 		}
-		if(window.localStorage['_CT'])
-		{
-			if(JSON.parse(window.localStorage['_CT']).appType == "MobileWeb" && navigator.appVersion.indexOf("Win")!=-1){
-				if(typeof(viewString) == "undefined")
-				{
-					viewString = {};
-					viewString.mirrorwidth = '';
-					viewString.mirrorheight = '';
-				}
-				if(parseInt(viewString.mirrorwidth) > 800)
-				{}
-				else{
-					$("#window-scrape-screenshot").css({"width":""+viewString.mirrorwidth+"px", /*"height": ""+viewString.mirrorheight+"px",*/ "max-height":""+viewString.mirrorheight+"px !important"});        	 
+		if(window.localStorage['_CT']) {
+			var appType = JSON.parse(window.localStorage['_CT']).appType;
+			var appVersion = navigator.appVersion;
+			if((appType == "MobileWeb" || appType == "MobileApp") && typeof(viewString) == "undefined") {
+				viewString = {};
+				viewString.mirrorwidth = '';
+				viewString.mirrorheight = '';
+			}
+			if(appType == "MobileWeb" && appVersion.indexOf("Win")!=-1) {
+				if(parseInt(viewString.mirrorwidth) <= 800) {
+					$("#window-scrape-screenshot").css({"width":""+viewString.mirrorwidth+"px", "max-height":""+viewString.mirrorheight+"px !important"});
 					$("#window-scrape-screenshot .popupContent").css({"width":""+viewString.mirrorwidth+"px", "height": ""+viewString.mirrorheight+"px"});
 				}
 			}
-			else 
-			if(JSON.parse(window.localStorage['_CT']).appType == "MobileApp"){
-				if(navigator.appVersion.indexOf("Win")!=-1){
-					$("#window-scrape-screenshot").css({"width":""+(parseInt(viewString.mirrorwidth)/3)+"px", /*"height": ""+viewString.mirrorheight+"px",*/ "max-height":""+(parseInt(viewString.mirrorheight)/3)+"px !important"});        	 
-					$("#window-scrape-screenshot .popupContent").css({"width":""+(parseInt(viewString.mirrorwidth)/3)+"px", "height": ""+(parseInt(viewString.mirrorheight)/3)+"px"});        		 
+			else if(appType == "MobileApp") {
+				if(appVersion.indexOf("Win")!=-1) {
+					$("#window-scrape-screenshot").css({"width":""+(parseInt(viewString.mirrorwidth)/3)+"px", "max-height":""+(parseInt(viewString.mirrorheight)/3)+"px !important"});
+					$("#window-scrape-screenshot .popupContent").css({"width":""+(parseInt(viewString.mirrorwidth)/3)+"px", "height": ""+(parseInt(viewString.mirrorheight)/3)+"px"});
 				}
-				else if(navigator.appVersion.indexOf("Mac")!=-1){
-					$("#window-scrape-screenshot").css({"width":""+viewString.mirrorwidth+"px", /*"height": ""+viewString.mirrorheight+"px",*/ "max-height":""+viewString.mirrorheight+"px !important"});        	 
-					$("#window-scrape-screenshot .popupContent").css({"width":""+viewString.mirrorwidth+"px", "height": ""+viewString.mirrorheight+"px"});        		 
+				else if(appVersion.indexOf("Mac")!=-1) {
+					$("#window-scrape-screenshot").css({"width":""+viewString.mirrorwidth+"px", "max-height":""+viewString.mirrorheight+"px !important"});
+					$("#window-scrape-screenshot .popupContent").css({"width":""+viewString.mirrorwidth+"px", "height": ""+viewString.mirrorheight+"px"});
 				}
 			}
 		}

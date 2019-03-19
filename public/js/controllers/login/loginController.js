@@ -53,7 +53,7 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 					$(".ic-username, .ic-password").parent().removeClass("input-border-error");
 					$scope.loginButtonValidation = "";
 					window.location = '/';
-				} else if (data == 'inValidCredential') {
+				} else if (data == 'inValidCredential' || data == "invalid_username_password") {
 					$(".ic-username").children().attr("src", "imgs/ic-username-error.png");
 					$(".ic-password").children().attr("src", "imgs/ic-password-error.png");
 					$(".ic-password").parent().addClass("input-border-error");
@@ -62,8 +62,6 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 					$scope.loginValidation = "User is already logged in! Please logout from the previous session.";
 				} else if (data == "inValidLDAPServer") {
 					$scope.loginValidation = "LDAP Server Configuration is invalid!";
-				} else if (data == 'invalid_username_password') {
-					$scope.loginValidation = "The username or password you entered isn't correct. Please try again.";
 				} else {
 					$scope.loginValidation = "Failed to Login.";
 				}

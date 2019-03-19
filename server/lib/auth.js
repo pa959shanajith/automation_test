@@ -73,17 +73,17 @@ var strategyUtil = {
 			async.waterfall([
 				function checkldapuser(callback) {
 					logger.info("Inside function checkldapuser");
-					var flag = false;
 					var args = {
 						data: { "username": username },
 						headers: { "Content-Type": "application/json" }
 					};
 					logger.info("Calling NDAC Service : authenticateUser_Nineteen68/ldap");
 					client.post(epurl + "login/authenticateUser_Nineteen68/ldap", args, function (result, response) {
+						var resp = false;
 						if (response.statusCode != 200 || result.rows == "fail") logger.error("Error occurred in authenticateUser_Nineteen68/ldap Error Code : ERRNDAC");
 						else if (result.rows.length == 0) return callback("invalid_username_password");
-						else if (result.rows[0].ldapuser != '{}') flag = JSON.parse(result.rows[0].ldapuser);
-						callback(null, flag);
+						else if (result.rows[0].ldapuser != '{}') resp = JSON.parse(result.rows[0].ldapuser);
+						callback(null, resp);
 					});
 				},
 				function authenticate(data, callback) {

@@ -1279,7 +1279,8 @@ exports.getReportsData_ICE = function (req, res) {
 		var inputs = {
 			"query": "allreports",
 			"scenarioid": req.body.reportsInputData.scenarioid,
-			"cycleid": req.body.reportsInputData.cycleid			
+			"cycleid": req.body.reportsInputData.cycleid,
+			"suiteid": req.body.reportsInputData.testSId			
 		};	
 		var args = {
 			data: inputs,
@@ -1416,7 +1417,8 @@ exports.getReportsData_ICE = function (req, res) {
 		var inputs = {
 			"query": "latestreport",
 			"scenarioid": req.body.reportsInputData.scenarioid,
-			"cycleid": req.body.reportsInputData.cycleid									
+			"cycleid": req.body.reportsInputData.cycleid,
+			"suiteid": req.body.reportsInputData.testSId									
 		};	
 		var args = {
 			data: inputs,

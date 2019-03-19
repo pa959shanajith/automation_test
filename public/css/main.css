@@ -6029,6 +6029,19 @@ h4.titleBadge
     float: left !important;
 }
 
+/*Parallel Execution*/
+.parallelexec
+{
+    font-size: 30px;
+    height: 40px;
+    width: 65px;
+}
+
+.selectParallel
+{
+    width:75px !important;
+}
+
 .badge-reports
 {
  line-height: 1.3 !important;
