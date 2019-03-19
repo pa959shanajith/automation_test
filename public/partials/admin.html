@@ -436,6 +436,7 @@
 					<input type="password" autocomplete="off" name="bindCredentials" id="bindCredentials" ng-disabled="ldapConf.authType != 'simple'" ng-model="ldapConf.bindCredentials" class="form-control form-control-custom create" placeholder="Authentication Credentials" autocomplete="off"/>
 				</div>
 				<br><br><br><h4>Data Mapping Settings</h4>
+				<h5>Mapping options are populates on click of <i>Test</i> with connection successful.</h5>
 				<div class='adminControl'><div>
 					<span class="leftControl">Username</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.uName" id="ldapFMapUname" class="form-control rightControl selectControl">
 						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.uName">{{field}}</option>
@@ -504,6 +505,7 @@
 					<input type="password" autocomplete="off" name="bindCredentials" id="bindCredentials" ng-disabled="ldapConf.authType != 'simple'" ng-model="ldapConf.bindCredentials" class="form-control form-control-custom create" placeholder="Authentication Credentials" autocomplete="off"/>
 				</div>
 				<br><br><br><h4>Data Mapping Settings</h4>
+				<h5>All Mapping options are populates on click of <i>Test</i> with connection successful.</h5>
 				<div class='adminControl'><div>
 					<span class="leftControl">Username</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.uName" id="ldapFMapUname" class="form-control rightControl selectControl">
 						<option value="{{ldapConf.fieldMap.uName}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldMap.uName)==-1" ng-selected="true">{{ldapConf.fieldMap.uName}}</option>

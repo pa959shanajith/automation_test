@@ -449,6 +449,7 @@ exports.updateScreen_ICE = function (req, res) {
 												scrapedObjects.mirror = scrapedobjects.mirror;
 												scrapedObjects.scrapedin = scrapedobjects.scrapedin;
 												scrapedObjects.scrapetype = scrapedobjects.scrapetype;
+												scrapedObjects.scrapedurl = scrapedobjects.scrapedurl;
 												//the query here will be called only if ALL objects are identified.
 												if (elementschanged <= newCustNamesList.length) {
 													scrapedObjects = JSON.stringify(scrapedObjects);
@@ -566,6 +567,7 @@ exports.updateScreen_ICE = function (req, res) {
 												scrapedObjects.mirrorwidth = scrapedobjects.mirrorwidth;
 												scrapedObjects.scrapedin = scrapedobjects.scrapedin;
 												scrapedObjects.scrapetype = scrapedobjects.scrapetype;
+												scrapedObjects.scrapedurl = scrapedobjects.scrapedurl;
 												//this query will be called only if ALL objects are identified.
 												if (elementschanged <= deleteXpathNames.length) {
 													scrapedObjects = JSON.stringify(scrapedObjects);
@@ -795,6 +797,7 @@ exports.updateScreen_ICE = function (req, res) {
 														scrapedObjects.mirror = scrapedobjects.mirror;
 														scrapedObjects.scrapedin = scrapedobjects.scrapedin;
 														scrapedObjects.scrapetype = scrapedobjects.scrapetype;
+														scrapedObjects.scrapedurl = scrapedobjects.scrapedurl;
 														scrapedObjects = JSON.stringify(scrapedObjects);
 														scrapedObjects = scrapedObjects.replace(/'+/g, "''");
 														inputs = {
@@ -1172,8 +1175,12 @@ exports.updateScreen_ICE = function (req, res) {
 													check_for_duplicate_images = true;
 													if(newData['view'][i]['tag']=='constant'){
 														check_for_duplicate_images = false;
-														break
+														break;
 													}
+												}
+												else{
+													check_for_duplicate_images = false;
+													break;
 												}
 											}
 										}
@@ -1213,17 +1220,7 @@ exports.updateScreen_ICE = function (req, res) {
 													}
 													redisServer.redisSubServer.on("message",checkIrisDuplicate_listener);
 												}
-												else {
-													utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-														var flag="";
-														if (found) flag = "scheduleModeOn";
-														else {
-															flag = "unavailableLocalServer";
-															logger.info("ICE Socket not Available");
-														}
-														res.send(flag);
-													});
-												}
+												else res.send("success");
 											});
 										}
 									}
@@ -2149,7 +2146,7 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error("Exception in the service getTestcasesByScenarioId_ICE: %s", exception);
+		logger.error("Exception in the service getTestcasesByScenarioId_ICE: %s", exception);                  
 	}
 };
 
@@ -2180,7 +2177,26 @@ exports.updateIrisDataset = function updateIrisDataset(req, res) {
 									soc.emit("ICEnotAvailable");
 								}
 							} else if (data.onAction == "iris_operations_result") {
-								res.send(data.value);
+								if(data.value==true){
+									var args = {
+										data: image_data,
+										headers: {
+											"Content-Type": "application/json"
+										}
+									};
+									logger.info("Calling NDAC Service from updateIrisDataset: design/updateIrisObjectType");
+									client.post(epurl + "design/updateIrisObjectType", args,
+										function (result, response) {
+										try {
+											if (response.statusCode != 200 || result.rows == "fail") res.send(false);
+											else res.send(true);
+										} catch (exception) {
+											logger.error("Exception in the service updateIrisObjectType: %s", exception);
+											res.send(false);
+										}
+									});
+								}
+								else  res.send(data.value);
 							}
 						}
 					}
