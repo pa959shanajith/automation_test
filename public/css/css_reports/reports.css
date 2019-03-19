@@ -226,10 +226,13 @@ body {
                     max-height: 40vh; 
                     padding: 0 !important;
                  }
+                 .dataTables_scrollHead
+                 {
+                    background: #e1dde4 !important;
+                 }
                  .display thead
                  {
                     /* background: rgb(94, 98, 107) !important; */
-                    background: #e1dde4 !important;
                     font-size: 14px;
                     color: #331d4e !important;
                     font-family: Latoweb !important;
@@ -355,10 +358,10 @@ body {
                     padding-right: 0px;
                     padding-left: 0px;
                 }
-                table.display.dataTable.no-footer
+                /* table.display.dataTable.no-footer
                 {
                     width: 1192px !important;
-                }
+                } */
                 .dataTables_scrollBody
                 {
                     max-height: 300px !important;
@@ -408,6 +411,10 @@ body {
                 .align-center
                 {
                     text-align: center;
+                }
+                .noExecutions
+                {
+                    text-align:center !important;
                 }
                  /************* Reports CSS ***********************/
 

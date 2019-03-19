@@ -62,12 +62,11 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             if ($.trim(e.target.id) == $.trim(value.testsuiteid)) {
                 angular.forEach(value.scenarios, function(val, key) {
                     var scenarioId = val.scenarioid;
-                    var testSId = value.testsuiteid;
                     var reportsInputData = {};
                     reportsInputData.scenarioid = scenarioId;
                     reportsInputData.cycleid = $('.cycle-list option:selected').val();
                     reportsInputData.type = "latestreport";
-                    reportsInputData.testSId = testSId;
+                    reportsInputData.testSId = value.testsuiteid;
                     reportService.getReportsData_ICE(reportsInputData).then(function(result_res_scenarioData, response_scenarioData) {
                         $rootScope.scenarioInfo = result_res_scenarioData;
                         var scenarioInfo = $rootScope.scenarioInfo;
@@ -81,47 +80,53 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         });
 
 
-        //Initialse DataTables, with no sorting on the 'details' column
+
         setTimeout(function() {
-            var oTable = $('#reportsTable').dataTable({
-                "bDestroy": true,
-                "responsive": true,
-                "bRetrieve": true,
-                "bPaginate": false,
-                "bSort": false,
-                "bFilter": false,
-                "bLengthChange": false,
-                "bInfo": false,
-                "scrollY": "200px",
-                "scrollCollapse": true,
-                "scrollX": true,
-                "paging": false,
-                "oLanguage": {
-                    "sSearch": ""
+        //Initialse DataTables, with no sorting on the 'details' column
+        var oTable = $('#reportsTable').dataTable({
+            "bDestroy": true,
+            "responsive": true,
+            "bRetrieve": true,
+            "bPaginate": false,
+            "bSort": false,
+            "bFilter": false,
+            "bLengthChange": false,
+            "bInfo": false,
+            "scrollY": "200px",
+            "scrollCollapse": true,
+            "scrollX": true,
+            "paging": false,
+            "oLanguage": {
+                "sSearch": ""
+            },
+            "deferRender": true,
+            "columns": [{
+                    "width": "5%",
+                    "targets": 0
                 },
-                "deferRender": true,
-                "columns": [{
-                        "width": "5%",
-                        "targets": 0
-                    },
-                    {
-                        "width": "15%",
-                        "targets": 1
-                    },
-                    {
-                        "width": "25%",
-                        "targets": 2
-                    },
-                    {
-                        "width": "20%",
-                        "targets": 3
-                    },
-                    {
-                        "width": "18%",
-                        "targets": 4
-                    },
-                ]
-            });
+                {
+                    "width": "15%",
+                    "targets": 1
+                },
+                {
+                    "width": "25%",
+                    "targets": 2
+                },
+                {
+                    "width": "20%",
+                    "targets": 3
+                },
+                {
+                    "width": "18%",
+                    "targets": 4
+                },
+            ],
+            "fnInitComplete": function(oSettings, json) {
+                    unblockUI();
+                    
+              }
+        });
+              unblockUI();
             $("input[type=search]").attr('placeholder', 'Search Scenario').addClass('scenarioSearch');
         }, 1000);
         redirected = false;
@@ -130,7 +135,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         $('#reportsTable').show();
 
         $('#moduleNameHeader').html('<span id="moduleTxt" title=' + moduleName + '>' + moduleName + '</span>');
-        unblockUI();
+        //unblockUI();
         $(document).on('click', '.reportsTbl', function(e) {
             $(this).addClass('tblRowHighlight').siblings('tr').removeClass('tblRowHighlight');
         });
@@ -161,9 +166,16 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                     return new Date(b.executedtime) - new Date(a.executedtime);
                 });
                 var executionData = $scope.result_res_scenarioData;
-                for (var k = 0; k < executionData.length; k++) {
-                    $("<tr class='details'><td></td><td></td><td>" + executionData[k].executedtime + "</td><td class='status'>" + executionData[k].status + "</td><td><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'></td></tr>").insertAfter(nTr);
-                }
+               if(executionData.length == 0)
+               {
+                $("<tr class='details'><td class='noExecutions' colspan=5>No Executions Found</td></tr>").insertAfter(nTr);                
+               }
+               else{
+                    for (var k = 0; k < executionData.length; k++) {
+                        $("<tr class='details'><td></td><td></td><td>" + executionData[k].executedtime + "</td><td class='status'>" + executionData[k].status + "</td><td><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'></td></tr>").insertAfter(nTr);
+                    }
+               }
+              
                 setStatusColor();
             });
             e.stopImmediatePropagation();
@@ -181,7 +193,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             } else if ($.trim($(this).text()) == 'Fail') {
                 $(this).css('color', '#ff0000');
             } else if ($.trim($(this).text()) == 'Terminate') {
-                $(this).css('color', "#ff4000");
+                $(this).css('color', "#ff8c00");
             } else {
                 $(this).css('color', '#000');
             }
@@ -746,6 +758,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                     var remarksLength = [];
                     var commentsLength = [];
                     if (data != "fail") {
+                        blockUI("Generating Report..please wait..");
                         if (data.length > 0) {
                             finalReports.overallstatus[0].domainName = data[0].domainname
                             finalReports.overallstatus[0].projectName = data[0].projectname
@@ -841,7 +854,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         }
                         if (reportType == "html") {
                             //Service call to get Html reports
-                            blockUI("Generating Report..please wait..");
+                            //blockUI("Generating Report..please wait..");
                             reportService.renderReport_ICE(finalReports, reportType).then(
                                 function(data1) {
                                     unblockUI();
@@ -872,7 +885,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             // labelArr.push(txnHistory.codesDict['HTMLReportClick']);
                             // txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
                         } else if (reportType == 'json') {
-                            blockUI("Generating Report..please wait..");
+                            //blockUI("Generating Report..please wait..");
                             exportJSONReport(finalReports);
                         } else {
                             //Service call to get screenshots for Pdf reports
@@ -885,7 +898,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                         finalReports.rows[scrShot.idx[i]].screenshot_dataURI = d;
                                     });
                                     //Service call to get Pdf reports
-                                    blockUI("Generating report..please wait..");
+                                    //blockUI("Generating report..please wait..");
                                     var isIE = /*@cc_on!@*/ false || !!document.documentMode;
                                     reportService.renderReport_ICE(finalReports, reportType).then(
                                         function(data1) {
