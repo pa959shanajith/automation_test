@@ -12,7 +12,7 @@
 					<li><span><a class='scrapeOnTxt'>Create</a></span></li>
 					<li><a id='userTab' ng-click="tab = 'tabUser';userConf.click()" title="Manage Users" class="selectBrowser" data-name="3">
 						<span><img class='selectedIcon' src='imgs/user.png' alt='User'/></span>User</a></li>
-					<li><a id='projectTab' ng-click="tab = 'tabProject'" title="Create/Update Project" class="selectBrowser" data-name="1">
+					<li class='userDivider'><a id='projectTab' ng-click="tab = 'tabProject'" title="Create/Update Project" class="selectBrowser" data-name="1">
 						<span><img src='imgs/project.png' alt='Project'/></span>Project</a></li>
 					<li><a id='assignProjectTab' ng-click="tab='tabAssignProject';assignProj.click()" title="Assign Project" class="selectBrowser" data-name="1">
 						<span><img src='imgs/project.png' alt='Project'/></span>Assign Projects</a></li>
@@ -22,6 +22,8 @@
 						<span><img src='imgs/session.png' alt='Session' /></span>Session Management</a></li>
 					<li style="margin-bottom: 30px"><a id='preferencesTab' title="Preferences" ng-click="tab='tabPreferences';preferences.click()" class="selectBrowser" data-name="2">
 						<span><img src='imgs/preferences.png' alt='Preferences' /></span>Preferences</a></li>
+					<li><a id='tokenTab' ng-click="tab = 'tabToken';tokens.click()" title="Manage Tokens" class="selectBrowser" data-name="1">
+						<span class="glyphicon glyphicon-tags"></span>Tokens</a></li>																										   																
 				</ul>
 			</div>
 			<div class='clear-both'></div>
@@ -734,6 +736,70 @@
 			</div>
 		</div>
 		<!-- Preferences -->
+		<!-- Assign Tokens -->
+		<div class="containerWrap" ng-if="tab == 'tabToken'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Token Management</span>
+			</div>
+			<div class="adminActionBtn">
+				<button title="Generate New Token" class="btn btn-md pull-right adminBtn" ng-click="generateCIusertokens($event)" style="margin-right:10px">Generate</button>
+			</div>
+			<div class="col-xs-9 form-group" style="width: 83%">
+				<div class='userForm projectForm' style="display: inline-block;">
+					<label class='domainTxt' style="width: 11%;">User</label>
+					<select class="adminSelect form-control selectDomain" style="width: 71%" id="selAssignUser1">
+						<option value="" disabled selected>Please Select User</option>
+					</select>
+					<span ng-show="userNameRequired" class="error-msg ng-cloak errorlbl">{{userNameRequired}}</span>
+				</div>	
+				<div class='userForm projectForm' style="display: inline-block;">
+					<div class="tokeninfo">
+						<label class='domainTxt' style="width: 11%;">Token name</label>
+						<input type="text" id="tokenName" name="tokenName" placeholder="Enter token name" >
+						<div class="tokenSuite" style="width:20%;display: inline;position: absolute;margin-left: 5%;">
+							<span class="datePicContainer">
+								<input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly="">
+								<img class="datepickerIconToken" src="../imgs/ic-datepicker.png">
+							</span>
+						</div>	
+					</div>
+				</div>
+				<div class='userForm projectForm'>
+					<label class='domainTxt' style="width: 11%;">Token  </label>
+					<input type="text" id="generateNewToken" name="projectName" readonly="readonly" style="width: 71%">
+					<!--<div class='domainTxt'>Domain</div>
+					<select class="adminSelect form-control selectDomain" style="width: 91%" id="selAssignProject">
+						<option value="" disabled selected>Please Select Your Domain</option>
+					</select> -->
+
+					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
+				</div>
+			</div>
+			<div class="col-xs-9 form-group adminForm" style="height:90%">
+				<div class="containerWrap sessionItemWrap">
+					<div class="sessionHeading" data-toggle="collapse" data-target="#activeUsersToken-x">
+						<h4>Active Token</h4>
+					</div>
+					<div id="activeUsersToken" class="wrap scrollbar-inner">
+						<table class = "table table-hover sessionTable" id="tokensDetail">
+							<tr>
+								<th> Token Name </th>
+								<th> Status </th>
+								<th> Action </th>
+							</tr>
+							<tr ng-repeat="tokens in tokens.users">
+								<td> {{tokens.tokenname}} </td>
+								<td> {{tokens.deactivated}} </td>
+								<td ng-if="tokens.deactivated == 'active'"><button class="btn" data-id="{{$index}}" ng-click="deactivate($event)" style="margin-left:-10%"> Deactivate </button></td>
+								<td ng-if="tokens.deactivated != 'active'"></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Assign Tokens -->			
 	</div>
 	<!--Middle Panel-->
 

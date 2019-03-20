@@ -909,57 +909,83 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 	var testsuite_creation_data = {};
 	var result_to_send = { "execution_status": [] };
 	async.eachSeries(req.body.execution_data, function (uservalidation_iterator, cb_validation) {
-		uservalidation_iterator.userInfo.ice_username = uservalidation_iterator.userInfo.ice_username.toLowerCase();
 		uservalidation_iterator.userInfo.username = uservalidation_iterator.userInfo.username.toLowerCase();
+		uservalidation_iterator.userInfo.tokenname = uservalidation_iterator.userInfo.tokenname;
+		uservalidation_iterator.userInfo.tokenhash = uservalidation_iterator.userInfo.tokenhash;
 		result_status = {
 			"userName": uservalidation_iterator.userInfo.username,
-			"ice_userName": uservalidation_iterator.userInfo.ice_username,
+			"tokenname": uservalidation_iterator.userInfo.tokenname,
 			"moduleInfo": [],
 			"tokenValidation": "failed"
 		};
 		args_validation = {
-			data: { 'username': result_status.userName },
+			data: { 'username': result_status.userName, 'tokenname': result_status.tokenname },
 			headers: {
 				"Content-Type": "application/json"
 			}
 		};
-		logger.info("Calling NDAC Service from ExecuteTestSuite_ICE_SVN: login/authenticateUser_Nineteen68");
-		client.post(epurl + "login/authenticateUser_Nineteen68", args_validation, function (result, response) {
+		logger.info("Calling NDAC Service from ExecuteTestSuite_ICE_SVN: login/authenticateUser_Nineteen68_CI");
+		client.post(epurl + "login/authenticateUser_Nineteen68_CI", args_validation, function (result, response) {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service from login/authenticateUser_Nineteen68 Error Code : ERRNDAC");
+				logger.error("Error occured in ExecuteTestSuite_ICE_SVN service from login/authenticateUser_Nineteen68_CI Error Code : ERRNDAC");
 				cb_validation('err');
 			} else {
 				var validUser = false;
-				for (var i = 0; i < result.rows.length; i++) {
-					validUser = bcrypt.compareSync(uservalidation_iterator.userInfo.token_id, result.rows[i].password);
-					if (validUser) {
-						uservalidation_iterator.userInfo.user_id = result.rows[i].userid;
-						uservalidation_iterator.userInfo.userrole = "CI";  // Since it's a CI_User, so it has execute only permissions. Hence role is CI.
-						break;
-					}
-				}
+				validUser = bcrypt.compareSync(uservalidation_iterator.userInfo.tokenhash,result.rows[0].tokenhash);
 				if (validUser) {
+					uservalidation_iterator.userInfo.user_id = result.rows[0].userid;
+					uservalidation_iterator.userInfo.userrole = "CI";  // Since it's a CI_User, so it has execute only permissions. Hence role is CI.
 					valid_userdata.push(uservalidation_iterator);
 					result_status.tokenValidation = "passed";
-					final_data[uservalidation_iterator.userInfo.ice_username] = result_status;
+					//console.log('result_status',result_status)
+					final_data[uservalidation_iterator.userInfo.username] = result_status;
+					//console.log('final_data',final_data[uservalidation_iterator.userInfo.username])
+					console.log(result.rows)
+					if(result.rows[0].deactivated=="active")
+					{
+						result_status.tokenValidation = "passed";
+						final_data[uservalidation_iterator.userInfo.username] = result_status;
+					}
+					else if(result.rows[0].deactivated=="expired")
+					{
+						result_status.tokenValidation = "expired";
+						result_to_send.execution_status.push(final_data);
+						logger.error("Inside UI service: ExecuteTestSuite_ICE_SVN Token is expired for username:",uservalidation_iterator.userInfo.username);
+					}
+					else if(result.rows[0].deactivated=="deactivated")
+					{
+						result_status.tokenValidation = "deactivated";
+						result_to_send.execution_status.push(final_data);
+						logger.error("Inside UI service: ExecuteTestSuite_ICE_SVN Token is deactivated for username:",uservalidation_iterator.userInfo.username);
+					}
+					
 				}
 				else {
-					final_data[uservalidation_iterator.userInfo.ice_username] = result_status;
+					final_data[uservalidation_iterator.userInfo.username] = result_status;
 					result_to_send.execution_status.push(final_data);
-					logger.info("Inside UI service: ExecuteTestSuite_ICE_SVN Token authentication failed for username:",uservalidation_iterator.userInfo.ice_username);
+					logger.info("Inside UI service: ExecuteTestSuite_ICE_SVN Token authentication failed for username:",uservalidation_iterator.userInfo.username);
 				}
+			}
+			if(final_data[uservalidation_iterator.userInfo.username].tokenValidation=='passed'){
+				console.log('passed')
 				cb_validation();
+			}
+			else{
+				console.log('failed')
+				cb_validation(final_data[uservalidation_iterator.userInfo.username].tokenValidation)
 			}
 		});
 	}, function (err) {
 		if (err || valid_userdata.length == 0){
-			logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service token validation");
+			logger.error("Error occured in ExecuteTestSuite_ICE_SVN service token validation");
 			res.send('failed in validation');
+			//console.log(result_status)
 		}
 		else {
+			//console.log(valid_userdata)
 			async.each(valid_userdata, function (userdata_iterator, cb) {
-				module_data[userdata_iterator.userInfo.ice_username] = [];
-				testsuite_creation_data[userdata_iterator.userInfo.ice_username] = { "fromFlag": "", "param": "readTestSuite", "readTestSuite": [] };
+				module_data[userdata_iterator.userInfo.username] = [];
+				testsuite_creation_data[userdata_iterator.userInfo.username] = { "fromFlag": "", "param": "readTestSuite", "readTestSuite": [] };
 				for (var i = 0; i < userdata_iterator.moduleInfo.length; i++) {
 					module_info_data = {
 						"browserType": userdata_iterator.browserType,
@@ -968,7 +994,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 						"testsuitename": userdata_iterator.moduleInfo[i].moduleName,
 						"appType": userdata_iterator.moduleInfo[i].appType
 					};
-					module_data[userdata_iterator.userInfo.ice_username].push(module_info_data);
+					module_data[userdata_iterator.userInfo.username].push(module_info_data);
 
 				}
 				async.eachSeries(userdata_iterator.moduleInfo, function (moduleinfo_iterator, cb1) {
@@ -985,7 +1011,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 					client.post(epurl + "suite/readTestSuite_ICE", testsuite_args,
 						function (result_details, response) {
 							if (response.statusCode != 200 || result_details.rows == "fail") {
-								logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service from suite/readTestSuite_ICE Error Code : ERRNDAC");
+								logger.error("Error occured in ExecuteTestSuite_ICE_SVN service from suite/readTestSuite_ICE Error Code : ERRNDAC");
 							}
 							else {
 								var module_index = userdata_iterator.moduleInfo.indexOf(moduleinfo_iterator);
@@ -1012,30 +1038,32 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 									}
 									testsuite_data["scenarioids"] = moduleinfo_iterator.suiteDetails[j].scenarios_id;
 									sc_map[testsuite_data["scenarioids"]] = moduleinfo_iterator.suiteDetails[j].scenarios_name;
-									module_data[userdata_iterator.userInfo.ice_username][module_index].suiteDetails.push(testsuite_data);
+									module_data[userdata_iterator.userInfo.username][module_index].suiteDetails.push(testsuite_data);
 								}
-								testsuite_creation_data[userdata_iterator.userInfo.ice_username].readTestSuite.push(readTestSuite);
+								testsuite_creation_data[userdata_iterator.userInfo.username].readTestSuite.push(readTestSuite);
 								moduleResult.moduleName = moduleinfo_iterator.moduleName;
 								moduleResult.moduleId = moduleinfo_iterator.moduleId;
-								final_data[userdata_iterator.userInfo.ice_username].moduleInfo.push(moduleResult);
+								final_data[userdata_iterator.userInfo.username].moduleInfo.push(moduleResult);
+								//console.log(final_data)
 							}
 							cb1();
 						});
 				}, function (err) {
 					if (err) {
-						logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service:",err);
+						logger.error("Error occured in ExecuteTestSuite_ICE_SVN service:",err);
 						cb();
 					}
 					else {
-						data_to_send = { "data": testsuite_creation_data[userdata_iterator.userInfo.ice_username] };
+						data_to_send = { "data": testsuite_creation_data[userdata_iterator.userInfo.username] };
 						readTestSuite_ICE_SVN(data_to_send, function (suite_status) {
 							if (!suite_status) {
-								logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service in creating testsuites");
+								logger.error("Error occured in ExecuteTestSuite_ICE_SVN service in creating testsuites");
 								res.send('Secnarios creation failed');
 							}
 							else {
-								var batchExecutionData = module_data[userdata_iterator.userInfo.ice_username];
+								var batchExecutionData = module_data[userdata_iterator.userInfo.username];
 								var userInfo = userdata_iterator.userInfo;
+								//console.log('userInfo',userInfo)
 								var testsuitedetailslist = [];
 								var testsuiteIds = [];
 								var executionRequest = {
@@ -1063,7 +1091,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 								client.post(epurl + "utility/dataUpdator_ICE", args,
 									function (result, response) {
 										if (response.statusCode != 200 || result.rows == "fail") {
-											logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service from utility/dataUpdator_ICE Error Code : ERRNDAC");
+											logger.error("Error occured in ExecuteTestSuite_ICE_SVN service from utility/dataUpdator_ICE Error Code : ERRNDAC");
 										} else {
 											logger.info("Inside ExecuteTestSuite_ICE_SVN service from utility/dataUpdator_ICE:Data updator Success");
 										}
@@ -1097,7 +1125,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 										TestCaseDetails_Suite_ICE(currentscenarioid, userInfo.user_id, function (currentscenarioidError, currentscenarioidResponse) {
 											var scenariotestcaseobj = {};
 											if (currentscenarioidError) {
-												logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service");
+												logger.error("Error occured in ExecuteTestSuite_ICE_SVN service");
 											} else {
 												if (currentscenarioidResponse != null || currentscenarioidResponse != undefined) {
 													scenariotestcaseobj[currentscenarioid] = currentscenarioidResponse.listoftestcasedata;
@@ -1110,7 +1138,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 													updateData();
 													batchExecutionDataCallback();
 													if (testsuitedetailslist.length == batchExecutionData.length) {
-														var a = executionFunction(executionRequest, userInfo.ice_username);
+														var a = executionFunction(executionRequest, userInfo.username);
 													}
 												}
 											}
@@ -1141,6 +1169,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 								function executionFunction(executionRequest, username) {
 									// var name = req.session.username;
 									var name = username;
+									console.log(username)
 									redisServer.redisSubServer.subscribe('ICE2_' + name);
 									var scenarioCount = executionRequest.suitedetails[0].scenarioIds.length;
 									var completedSceCount = 0;
@@ -1158,7 +1187,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 													if (data.onAction == "unavailableLocalServer") {
 														// clearInterval(updateSessionExpiry);
 														redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
-														logger.error("Error occurred in ExecuteTestSuite_ICE_SVN: Socket Disconnected");
+														logger.error("Error occured in ExecuteTestSuite_ICE_SVN: Socket Disconnected");
 														if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 															var soc = myserver.socketMapNotify[name];
 															soc.emit("ICEnotAvailable");
@@ -1210,7 +1239,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 																	client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 																		function (result, response) {
 																			if (response.statusCode != 200 || result.rows == "fail") {
-																				logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service from suite/ExecuteTestSuite_ICE Error Code : ERRNDAC");
+																				logger.error("Error occured in ExecuteTestSuite_ICE_SVN service from suite/ExecuteTestSuite_ICE Error Code : ERRNDAC");
 																				flag = "fail";
 																			} else {
 																				flag = "success";
@@ -1231,7 +1260,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 																	}
 																}
 															} catch (ex) {
-																logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service:",ex);
+																logger.error("Error occured in ExecuteTestSuite_ICE_SVN service:",ex);
 															}
 														}
 														if (resultData == "success" || resultData == "Terminate") {
@@ -1242,7 +1271,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 																cb();
 															} catch (ex) {
 																//	cb();
-																logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service:",ex);
+																logger.error("Error occured in ExecuteTestSuite_ICE_SVN service:",ex);
 															}
 
 														}
@@ -1256,7 +1285,8 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 												if (found) flag = "scheduleModeOn";
 												else {
 													flag = "unavailableLocalServer";
-													logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service: Socket not Available");
+													console.log('error here')
+													logger.error("Error occured in ExecuteTestSuite_ICE_SVN service: Socket not Available");
 												}
 												res.send(flag);
 											});
@@ -1270,7 +1300,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 			}, function (err) {
 				if (err) {
 					res.send('failed');
-					logger.error("Error occurred in ExecuteTestSuite_ICE_SVN service:",err);
+					logger.error("Error occured in ExecuteTestSuite_ICE_SVN service:",err);
 				}
 				else {
 					res.send(result_to_send);
