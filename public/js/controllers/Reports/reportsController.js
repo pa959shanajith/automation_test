@@ -130,6 +130,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             $("input[type=search]").attr('placeholder', 'Search Scenario').addClass('scenarioSearch');
         }, 1000);
         redirected = false;
+        localStorage.removeItem('fromExecution');
         $('#accordion').show();
         $('.panel-body').append(oTable);
         $('#reportsTable').show();
@@ -225,12 +226,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 
     if (window.localStorage['redirectedReportObj'] && window.localStorage['redirectedReportObj'] != '') {
 
-        var parts = document.referrer.split('://')[1].split('/');
-        var protocol = document.referrer.split('://')[0];
-        var host = parts[0];
-        var pathName = parts.slice(1).join('/');
-
-        if ($.trim(pathName) == "execute") {
+      var redirection = window.localStorage['fromExecution'];
+        if (redirection == "true") {
             blockUI("loading report ...");
             redirected = true;
             robj = JSON.parse(window.localStorage['redirectedReportObj']);
