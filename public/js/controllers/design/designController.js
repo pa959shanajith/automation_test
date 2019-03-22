@@ -780,15 +780,18 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         //enableScreenShotHighlight = true;
         DesignServices.getScrapeDataScreenLevel_ICE()
             .then(function (data) {
+               
                 if (data == "Invalid Session") {
                     $rootScope.redirectPage();
                 }
                 var objectsLength = $("ellipsis:visible").length;
+            
                 if(objectsLength == 0)
                 {
                     $("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');
                     $("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');
                 }
+               
                 gsElement = [];
                 $(".popupWrap").animate({
                     opacity: 0,
@@ -820,6 +823,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
                         //return;
                     } else {
+                       
                         $(".enableActions").addClass("disableActions").removeClass("enableActions").parent('li').css('cursor', 'not-allowed');
                         $("#enableAppend").prop("disabled", false).css('cursor', 'pointer')
                     }
@@ -881,6 +885,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         editable: true,
                         radio: true
                     });
+                   
 
                     if (appType == 'Web') {
                         if ($(".ellipsis").length > 0) {
@@ -898,6 +903,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 if ($(".ellipsis:visible").length == 0) {
                     $(".checkStylebox").prop("disabled", true);
                 }
+              var customObjLength =  $('.addCustObj').length;
+              var objectsLength = $(".ellipsis:visible").length;
+             if(customObjLength == objectsLength)
+             {
+                $("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');
+                $("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');
+             }
                 unblockUI();
             },
             function (error) {
