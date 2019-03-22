@@ -1920,7 +1920,40 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             //Getting the Existing Scrape Data
 
                             generateScrape()
+                            
+                            
+                            //Autocomplete feature for scrape input fields
+                            $(function(){
+                                var device_Name = screenViewObject.deviceName
+                                var version_Number = screenViewObject.versionNumber
+                                var bundle_Id = screenViewObject.bundleId
+                                var ip_Address = screenViewObject.ipAddress
+                                var apk = screenViewObject.apkPath 
+                                var serial = screenViewObject.mobileSerial
 
+                                $("#deviceName").autocomplete({
+                                    source: device_Name
+                                });
+                                $("#versionNumber").autocomplete({
+                                    source: version_Number
+                                });
+                                $("#bundleId").autocomplete({
+                                    source: bundle_Id
+                                });
+                                $("#ipAddress").autocomplete({
+                                    source: ip_Address
+                                });
+                                $("#mobilityAPKPath").autocomplete({
+                                    source: apk
+                                });
+                                $("#mobilitySerialPath").autocomplete({
+                                    source: serial
+                                });
+
+                            });
+
+                            
+                            
                             //Getting appended scraped object irrespective to the dynamic value
                             function generateScrape() {
                                 var tempId = newScrapedList.view.length - 1;
@@ -2444,7 +2477,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         var dontChkViewString = 0;
                         $.each($("input[type=checkbox].checkall:checked"), function () {
                             for (var i = 0; i < newScrapedList.view.length; i++) {
-                                if (appType == 'DesktopJava'|| appType == 'Desktop') {
+                                if (appType == 'DesktopJava'|| appType == 'Desktop' || appType == 'MobileApp') {
                                     if ($(this).parents("li").data("xpath").replace(/[\"]/g, "\'") == newScrapedList.view[i].xpath.replace(/\n/g," ") && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim()).replace(/[<>]/g, '').replace('\n', ' ') == newScrapedList.view[i].custname.trim().replace(/[<>]/g, '').replace('/\s/g', ' ').replace(/  +/g, ' ').replace('\n', ' ')) {
                                         if (!(isInArray(newScrapedList.view.indexOf(newScrapedList.view[i]), getIndexOfDeletedObjects))) {
                                             getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
@@ -2469,7 +2502,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         if ($("input[type=checkbox].checkall:checked").length != dontChkViewString) {
                             $.each($("input[type=checkbox].checkall:checked"), function () {
                                 for (var i = 0; i < viewString.view.length; i++) {
-                                    if (appType == 'DesktopJava') {
+                                    if (appType == 'DesktopJava' || appType == 'MobileApp') {
                                         if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ').replace(/[<>]/g, '') == viewString.view[i].custname.trim().replace(/[<>]/g, '').replace('/\s/g', ' ').replace(/  +/g, ' ').replace('\n', ' ')) {
                                             if (!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))) {
                                                 getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
