@@ -25,7 +25,16 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     $('#expAssign').on('click', function(e) {
-        $(".moduleBox").slideToggle('slow');
+        $(".moduleBox").slideToggle('slow',function() {
+            $(this).toggleClass('slideOpen');
+            if($('.slideOpen').is(":visible") == true)
+            {
+               $("#expAssign").attr('src','imgs/ic-collapseup.png');
+            }
+            else{
+                $("#expAssign").attr('src','imgs/ic-collapse.png');
+            }
+        });
     });
     detailsTableHtml = $("#detailsTable").html();
     //Search Modules
