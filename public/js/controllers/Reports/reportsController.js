@@ -45,8 +45,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     //Search Scenarios
     $(".reportSearchBox").on("keyup", function() {
         var value = $(this).val().toLowerCase();
-        $("#reportsTable tr").filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        $("#reportsTable tbody tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
         });
     });
 
@@ -103,7 +103,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             "oLanguage": {
                 "sSearch": ""
             },
-            "deferRender": true,
+             "deferRender": true,
             "columns": [{
                     "width": "5%",
                     "targets": 0
