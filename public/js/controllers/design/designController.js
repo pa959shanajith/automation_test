@@ -2144,20 +2144,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					break;
 				}  
 			}
-			
-			$(".generateObj span img").removeClass("left-bottom-selection");
-			$(".compareObject span img").removeClass("left-bottom-selection");
-			$(".addObject span img").addClass("left-bottom-selection");
-
-			$scope.errorMessage = "";
 			$("#dialog-irisObject").modal("show");
 			$("#addIrisObjContainer").empty()
 			if ($(".addObj-row").length > 1) $(".addObj-row").remove()
 			$("#addIrisObjContainer").append('<div class = "row row-modal addObj-row"><div class = "form-group"><span><strong>Object Detected as:	'+objType+'</strong></span></div><br><br><span style="float:left"><strong>User input: </strong></span><div class = "form-group form-group-2" style="float:left; margin-left:10px;"><select class = "form-control form-control-custom" id="objectType"><option selected disabled > Select Object Type </option><option value = "textbox" > Textbox / Textarea </option><option value = "table" > Table </option><option value = "dropdown" > Dropdown </option><option value = "button" > Button </option><option value = "radiobutton" > Radiobutton </option><option value = "checkbox" > Checkbox </option><option value = "others" > Others </option></select></div> </div>');
-		
-			$scope.removeAddObjectSelection = function () {
-				$("img.left-bottom-selection").removeClass('left-bottom-selection');
-			};
 		}, 500);
     });
 	
@@ -2170,7 +2160,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			for(var i=0;i<viewString.view.length;i++){
 				if(viewString.view[i].xpath == obj_xpath){
 					obj_cord = viewString.view[i].cord;
-					viewString.view[i].objectType = user_obj_type;
 					break;
 				}
 			}
@@ -2180,9 +2169,17 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				.then(function (val) {
 					$('.close').click();
 					if(val=='unavailableLocalServer')  openDialog("Iris Object Type", $rootScope.unavailableLocalServer_msg);
+					else if(val=='unsavedObject') openDialog("Iris Object Type","Please save the object first.");
 					else{
-						if(val)
+						if(val){
 							openDialog("Iris Object Type","Submitted Successfully.");
+							for(var i=0;i<viewString.view.length;i++){
+								if(viewString.view[i].xpath == obj_xpath){
+									viewString.view[i].objectType = user_obj_type;
+									break;
+								}
+							}
+						}
 						else
 							openDialog("Iris Object Type","Failed.");
 					}
