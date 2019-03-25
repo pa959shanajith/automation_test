@@ -758,6 +758,17 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     $(this).find("a").addClass("enableActions").removeClass("disableActions")
                 }
             })
+        $("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');            
+        }
+        else{
+            var objectsLength = $('span.ellipsis').length;
+            if(objectsLength == 0)
+            {
+                $("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');                                                     
+            }
+            else{
+                $("li.compareObjects").removeClass('disableActions').addClass('enableActions compareObjectDisable');                                                                     
+            }
         }
     })
     //Enable Append Checkbox (if after checking the, browser doesn't enables)
@@ -777,6 +788,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             $(".enableActions").addClass("disableActions").removeClass("enableActions").parent('li').css('cursor', 'not-allowed');
             $("#enableAppend").prop("disabled", false).css('cursor', 'pointer')
         }
+      
         //enableScreenShotHighlight = true;
         DesignServices.getScrapeDataScreenLevel_ICE()
             .then(function (data) {
@@ -1878,6 +1890,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         // console.log("data", viewString);
                         //If enable append is active
                         if (eaCheckbox) {
+                          
                             //Getting the Existing Scrape Data
                             for (var i = 0; i < newScrapedList.view.length; i++) {
                                 // if(newScrapedList.scrapetype == 'caa'){
