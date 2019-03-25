@@ -910,6 +910,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 $("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');
                 $("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');
              }
+            if(customObjLength == 0)
+            {
+                $("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');
+            }
                 unblockUI();
             },
             function (error) {
