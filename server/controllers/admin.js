@@ -1847,7 +1847,6 @@ exports.generateCIusertokens = function (req, res) {
 				tokenname: requestDetails.tokenname,
 				token: bcrypt.hashSync(token, salt)
 			};
-			console.log(inputs)
 			var args = {
 				data: inputs,
 				headers: {
