@@ -641,6 +641,10 @@
             word-break: break-word;
         }
 
+        .rDstatusLnk {
+            text-decoration: none !important;
+        }
+
         .reportsDetails th:nth-child(5) {
             width: 12.7%;
             word-break: break-word;
@@ -1537,34 +1541,70 @@
                             <td class="rDremarks tabCont toggleRemarks" style="padding-left: 10px;">{{Remark}}</td>
                             {{#ifEquals testcase_details.testcaseDetails undefined}}
                             <td class="rDExpectedRes tabCont {{getClass StepDescription}}">{{StepDescription}}</td>
-                            {{/ifEquals}} {{#ifEquals testcase_details.testcaseDetails ""}}
+                            {{/ifEquals}}
+                            {{#ifEquals testcase_details.testcaseDetails ""}}
                             <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
-                            {{/ifEquals}} {{#ifnotEquals testcase_details.testcaseDetails ""}} {{#ifnotEquals testcase_details undefined}}
-                            <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}
-                                <br/>Expected Result is: {{testcase_details.testcaseDetails}}</td>
-                            {{/ifnotEquals}} {{/ifnotEquals}} {{#ifEquals status undefined}}
+                            {{/ifEquals}}
+                            {{#ifnotEquals testcase_details.testcaseDetails ""}}
+                                {{#ifnotEquals testcase_details undefined}}
+                                <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}
+                                    <br/>Expected Result is: {{testcase_details.testcaseDetails}}</td>
+                                {{/ifnotEquals}}
+                            {{/ifnotEquals}}
+                            {{#ifEquals status undefined}}
                             <td class="rDActualRes tabCont"></td>
-                            {{/ifEquals}} {{#ifEquals status ""}}
+                            {{/ifEquals}}
+                            {{#ifEquals status ""}}
                             <td class="rDActualRes tabCont"></td>
-                            {{/ifEquals}} {{#ifEquals status "Pass"}} {{#ifEquals testcase_details.actualResult_pass ""}}
-                            <td class="rDActualRes tabCont" style="padding-left: 10px;">
-                                <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text>
-                            </td>
-                            {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_pass ""}}
-                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}},
-                                <text class="rDstatus openscreenshot" style="color:{{getColor status}};"
-                                    data-screenshot="{{screenshot_path}}">{{status}}</text>
-                            </td>
-                            {{/ifnotEquals}} {{/ifEquals}} {{#ifEquals status "Fail"}} {{#ifEquals testcase_details.actualResult_fail ""}}
-                            <td class="rDActualRes tabCont" style="padding-left: 10px;">
-                                <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text>
-                            </td>
-                            {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_fail ""}}
-                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}},
-                                <text class="rDstatus openscreenshot" style="color:{{getColor status}};"
-                                    data-screenshot="{{screenshot_path}}">{{status}}</text>
-                            </td>
-                            {{/ifnotEquals}} {{/ifEquals}}
+                            {{/ifEquals}}
+                            {{#ifEquals status "Pass"}}
+                                {{#ifEquals testcase_details.actualResult_pass ""}}
+                                    <td class="rDActualRes tabCont" style="padding-left: 10px;">
+                                        {{#ifEquals screenshot_path undefined}}
+                                            <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};" >{{status}}</text>
+                                        {{/ifEquals}}
+                                        {{#ifnotEquals screenshot_path undefined}}
+                                            <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}"
+                                                >{{status}}</text>
+                                        {{/ifnotEquals}}
+                                    </td>
+                                {{/ifEquals}}
+                                {{#ifnotEquals testcase_details.actualResult_pass ""}}
+                                    <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}},
+                                        {{#ifEquals screenshot_path undefined}}
+                                            <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};" >{{status}}</text>
+                                        {{/ifEquals}}
+                                        {{#ifnotEquals screenshot_path undefined}}
+                                            <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}"
+                                                >{{status}}</text>
+                                        {{/ifnotEquals}}
+                                    </td>
+                                {{/ifnotEquals}}
+                            {{/ifEquals}}
+                            {{#ifEquals status "Fail"}}
+                                {{#ifEquals testcase_details.actualResult_fail ""}}
+                                    <td class="rDActualRes tabCont" style="padding-left: 10px;">
+                                        {{#ifEquals screenshot_path undefined}}
+                                            <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};" >{{status}}</text>
+                                        {{/ifEquals}}
+                                        {{#ifnotEquals screenshot_path undefined}}
+                                            <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}"
+                                                >{{status}}</text>
+                                        {{/ifnotEquals}}
+                                    </td>
+                                {{/ifEquals}}
+                                {{#ifnotEquals testcase_details.actualResult_fail ""}}
+                                    <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}},
+                                        {{#ifEquals screenshot_path undefined}}
+                                            <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};" >{{status}}</text>
+                                        {{/ifEquals}}
+                                        {{#ifnotEquals screenshot_path undefined}}
+                                            <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}"
+                                                >{{status}}</text>
+                                        {{/ifnotEquals}}
+                                    </td>
+                                {{/ifnotEquals}}
+                            {{/ifEquals}}
                             <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}}; display:none" data-screenshot="{{screenshot_path}}">{{status}}</td>
                             <td class="rjira tabCont">
                                 <span class="opendescpopup" title="Create Issue">{{jira_defect_id}}</span>
