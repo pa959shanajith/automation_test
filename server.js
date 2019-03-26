@@ -577,6 +577,7 @@ if (cluster.isMaster) {
         app.post('/flowGraphResults', flowGraph.flowGraphResults);
         app.post('/APG_OpenFileInEditor', flowGraph.APG_OpenFileInEditor);
         app.post('/APG_createAPGProject', flowGraph.APG_createAPGProject);
+		app.post('/APG_runDeadcodeIdentifier', flowGraph.APG_runDeadcodeIdentifier);
         //-------------Route Mapping-------------//
 
         // To prevent can't send header response

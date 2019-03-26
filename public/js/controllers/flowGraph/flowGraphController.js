@@ -11,6 +11,8 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 	 $scope.enableGenerate = false;
 	 $scope.ComplexityScreenView = false;
 	 $scope.wmcList=[];
+	 var version, path = null;
+	 $scope.ClassDiagramView = false;
 	 $scope.expandSidebars = function(){
 		$("#middle-content-section").css({
 			left: '173px',
@@ -58,6 +60,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			//$scope.enableFilter = true;
 			$("#apg-cd-canvas").show();
 			$scope.collapseSidebars();
+			$scope.ClassDiagramView = true;
 		}else if($("#apg-cd-canvas").is(':visible')){
 			//$scope.enableFilter = false;
 			$scope.enableToggleSidebars = false;
@@ -72,6 +75,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			document.getElementById('path').value = '';
 			$scope.obj = {};
 			$scope.hideBaseContent = { message: 'false' };
+			$scope.ClassDiagramView = false;
 		}else if($("#apg-dfd-canvas").is(':visible')){
 			$scope.enableToggleSidebars = true;
 			//$scope.enableFilter = true;
@@ -80,7 +84,8 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			$scope.collapseSidebars();
 			$('#page-taskName span').animate({
 				left : '0px'
-			})
+			});
+			$scope.ClassDiagramView = true;
 		}
 		$scope.ComplexityScreenView = false;									  
 }
@@ -168,8 +173,8 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		var param={check:true,username:userName};
 		var socket = io('', { forceNew: true, reconnect: true, query: param});
 		
-		var version = document.getElementById("version").value;
-		var path = document.getElementById("path").value;
+		version = document.getElementById("version").value;
+		path = document.getElementById("path").value;
 		flowGraphServices.getResults(version,path) .then(function(data) {
 			if (data == "unavailableLocalServer") {
 				$scope.hideBaseContent = { message: 'false' };
@@ -200,6 +205,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				$scope.collapseSidebars();
 				$scope.generateClassDiagram(obj);
 				$scope.enableGenerate = true;
+				$scope.ClassDiagramView = true;
 				//$scope.createAPGProject(obj);
 			}else if(obj.result == "fail"){
 				$('#progress-canvas').fadeOut(800, function(){
@@ -566,8 +572,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				.attr("width", width)
 				.attr("height", height);
 
-		var inner = svg.append('g');	
-
+		var inner = svg.append('g');
 		var zoom = d3.behavior.zoom()
 				.translate([0, 0])
 				.scale(1)
@@ -787,7 +792,8 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				$scope.$apply();
 				d = classes[d];
 				$scope.expandSidebars();
-
+				$scope.ClassDiagramView = false;
+				
 				//Transaction Activity for viewComplexity button Action
 				// var labelArr = [];
 				// var infoArr = [];
@@ -928,6 +934,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 	$scope.generateDataFlowDiagram = function(i,$event){
 
 		$scope.enableDataflow = false;
+		$scope.ClassDiagramView = false;
 		//$scope.enableFilter = false;
 		$scope.enableToggleSidebars = true;
 		$(".projectInfoWrap").empty();
@@ -1360,7 +1367,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 	 $scope.fullScreen = function() {
 		// remove highlight from fullscreen icon
 		$timeout(function(){$('#fullscr img').removeClass('thumb-ic-highlight')},500);
-		// for two canvas - pass the id of the canvas to be full-screened
+		// for two canvas - pass the id of the canvas to be full-screened    
 		var elemId = $("#apg-cd-canvas").is(':visible') ? "#apg-cd-canvas" : "#apg-dfd-canvas";
         var elt = document.querySelector(elemId);
 		$(elemId).css({
@@ -1559,5 +1566,35 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			.attr('style','stroke:#fff; stroke-width:0.5');
 		}
     }
+	
+	$scope.runDeadcodeIdentifier = function(e){
+		$timeout(function(){$('.browserIcon img').removeClass('thumb-ic-highlight')},500);
+		$scope.collapseSidebars();
+		blockUI('Deadcode identification in progress..');
+		
+		flowGraphServices.APG_runDeadcodeIdentifier(version,path).then(function(data) {
+			unblockUI();
+			if (data == "unavailableLocalServer") {
+				$scope.hideBaseContent = { message: 'false' };
+				$('#progress-canvas').hide();
+				document.getElementById('path').value = '';
+				openDialog("Flowgraph Generator", $rootScope.unavailableLocalServer_msg);
+				return false;
+			}else if(data == "Invalid Session"){
+				document.getElementById('path').value = '';
+				$rootScope.redirectPage();
+			}
+			else if(data == false){
+				openDialog("Deadcode Identifier", 'Report generation failed');
+				return false;
+			}
+			else if(data == true){
+				openDialog("Deadcode Identifier", 'Report generated successfully.');
+				return true;
+			}
+		}, function(err){
+			console.log("Error :", err);
+		});
+	}
 	
 }]);

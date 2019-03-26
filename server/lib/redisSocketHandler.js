@@ -87,12 +87,16 @@ default_sub.on("message", function (channel, message) {
 	
 	case "apgOpenFileInEditor":
 		mySocket.emit("apgOpenFileInEditor", data.editorName, data.filePath, data.lineNumber);
-	break;
+		break;
 
 	case "generateFlowGraph":
 		mySocket.emit("generateFlowGraph", data.version, data.path);
 		break;
-
+	
+	case "runDeadcodeIdentifier":
+		mySocket.emit("runDeadcodeIdentifier", data.version, data.path);
+		break;
+		
 	case "getSocketInfo":
 		var data_packet = {"username": data.username, "value": "fail"};
 		if (mySocket) data_packet.value = mySocket.handshake.address;
@@ -217,6 +221,11 @@ module.exports.initListeners = function(mySocket){
 		server_pub.publish('ICE2_' + username, dataToNode);
 	});
 
+	mySocket.on('deadcode_identifier', function (value) {
+		var dataToNode = JSON.stringify({"type" : "res","username" : username,"onAction" : "deadcode_identifier","value":value});
+		server_pub.publish('ICE2_' + username, dataToNode);
+	});
+	
 	mySocket.on('iris_operations_result', function (value) {
 		var dataToNode = JSON.stringify({"type" : "res","username" : username,"onAction" : "iris_operations_result","value":JSON.parse(value)});
 		server_pub.publish('ICE2_' + username, dataToNode);
