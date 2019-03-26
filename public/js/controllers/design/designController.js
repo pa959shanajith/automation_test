@@ -758,6 +758,17 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     $(this).find("a").addClass("enableActions").removeClass("disableActions")
                 }
             })
+        $("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');            
+        }
+        else{
+            var objectsLength = $('span.ellipsis').length;
+            if(objectsLength == 0)
+            {
+                $("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');                                                     
+            }
+            else{
+                $("li.compareObjects").removeClass('disableActions').addClass('enableActions compareObjectDisable');                                                                     
+            }
         }
     })
     //Enable Append Checkbox (if after checking the, browser doesn't enables)
@@ -777,18 +788,22 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             $(".enableActions").addClass("disableActions").removeClass("enableActions").parent('li').css('cursor', 'not-allowed');
             $("#enableAppend").prop("disabled", false).css('cursor', 'pointer')
         }
+      
         //enableScreenShotHighlight = true;
         DesignServices.getScrapeDataScreenLevel_ICE()
             .then(function (data) {
+               
                 if (data == "Invalid Session") {
                     $rootScope.redirectPage();
                 }
                 var objectsLength = $("ellipsis:visible").length;
+            
                 if(objectsLength == 0)
                 {
                     $("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');
                     $("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');
                 }
+               
                 gsElement = [];
                 $(".popupWrap").animate({
                     opacity: 0,
@@ -820,6 +835,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
                         //return;
                     } else {
+                       
                         $(".enableActions").addClass("disableActions").removeClass("enableActions").parent('li').css('cursor', 'not-allowed');
                         $("#enableAppend").prop("disabled", false).css('cursor', 'pointer')
                     }
@@ -881,6 +897,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         editable: true,
                         radio: true
                     });
+                   
 
                     if (appType == 'Web') {
                         if ($(".ellipsis").length > 0) {
@@ -898,6 +915,17 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 if ($(".ellipsis:visible").length == 0) {
                     $(".checkStylebox").prop("disabled", true);
                 }
+              var customObjLength =  $('.addCustObj').length;
+              var objectsLength = $(".ellipsis:visible").length;
+             if(customObjLength == objectsLength)
+             {
+                $("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');
+                $("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');
+             }
+            if(customObjLength == 0)
+            {
+                $("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');
+            }
                 unblockUI();
             },
             function (error) {
@@ -1862,6 +1890,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         // console.log("data", viewString);
                         //If enable append is active
                         if (eaCheckbox) {
+                          
                             //Getting the Existing Scrape Data
                             for (var i = 0; i < newScrapedList.view.length; i++) {
                                 // if(newScrapedList.scrapetype == 'caa'){
@@ -1908,7 +1937,40 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             //Getting the Existing Scrape Data
 
                             generateScrape()
+                            
+                            
+                            //Autocomplete feature for scrape input fields
+                            $(function(){
+                                var device_Name = screenViewObject.deviceName
+                                var version_Number = screenViewObject.versionNumber
+                                var bundle_Id = screenViewObject.bundleId
+                                var ip_Address = screenViewObject.ipAddress
+                                var apk = screenViewObject.apkPath 
+                                var serial = screenViewObject.mobileSerial
 
+                                $("#deviceName").autocomplete({
+                                    source: device_Name
+                                });
+                                $("#versionNumber").autocomplete({
+                                    source: version_Number
+                                });
+                                $("#bundleId").autocomplete({
+                                    source: bundle_Id
+                                });
+                                $("#ipAddress").autocomplete({
+                                    source: ip_Address
+                                });
+                                $("#mobilityAPKPath").autocomplete({
+                                    source: apk
+                                });
+                                $("#mobilitySerialPath").autocomplete({
+                                    source: serial
+                                });
+
+                            });
+
+                            
+                            
                             //Getting appended scraped object irrespective to the dynamic value
                             function generateScrape() {
                                 var tempId = newScrapedList.view.length - 1;
@@ -2082,20 +2144,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					break;
 				}  
 			}
-			
-			$(".generateObj span img").removeClass("left-bottom-selection");
-			$(".compareObject span img").removeClass("left-bottom-selection");
-			$(".addObject span img").addClass("left-bottom-selection");
-
-			$scope.errorMessage = "";
 			$("#dialog-irisObject").modal("show");
 			$("#addIrisObjContainer").empty()
 			if ($(".addObj-row").length > 1) $(".addObj-row").remove()
 			$("#addIrisObjContainer").append('<div class = "row row-modal addObj-row"><div class = "form-group"><span><strong>Object Detected as:	'+objType+'</strong></span></div><br><br><span style="float:left"><strong>User input: </strong></span><div class = "form-group form-group-2" style="float:left; margin-left:10px;"><select class = "form-control form-control-custom" id="objectType"><option selected disabled > Select Object Type </option><option value = "textbox" > Textbox / Textarea </option><option value = "table" > Table </option><option value = "dropdown" > Dropdown </option><option value = "button" > Button </option><option value = "radiobutton" > Radiobutton </option><option value = "checkbox" > Checkbox </option><option value = "others" > Others </option></select></div> </div>');
-		
-			$scope.removeAddObjectSelection = function () {
-				$("img.left-bottom-selection").removeClass('left-bottom-selection');
-			};
 		}, 500);
     });
 	
@@ -2108,7 +2160,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			for(var i=0;i<viewString.view.length;i++){
 				if(viewString.view[i].xpath == obj_xpath){
 					obj_cord = viewString.view[i].cord;
-					viewString.view[i].objectType = user_obj_type;
 					break;
 				}
 			}
@@ -2118,9 +2169,17 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				.then(function (val) {
 					$('.close').click();
 					if(val=='unavailableLocalServer')  openDialog("Iris Object Type", $rootScope.unavailableLocalServer_msg);
+					else if(val=='unsavedObject') openDialog("Iris Object Type","Please save the object first.");
 					else{
-						if(val)
+						if(val){
 							openDialog("Iris Object Type","Submitted Successfully.");
+							for(var i=0;i<viewString.view.length;i++){
+								if(viewString.view[i].xpath == obj_xpath){
+									viewString.view[i].objectType = user_obj_type;
+									break;
+								}
+							}
+						}
 						else
 							openDialog("Iris Object Type","Failed.");
 					}
@@ -2432,7 +2491,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         var dontChkViewString = 0;
                         $.each($("input[type=checkbox].checkall:checked"), function () {
                             for (var i = 0; i < newScrapedList.view.length; i++) {
-                                if (appType == 'DesktopJava'|| appType == 'Desktop') {
+                                if (appType == 'DesktopJava'|| appType == 'Desktop' || appType == 'MobileApp') {
                                     if ($(this).parents("li").data("xpath").replace(/[\"]/g, "\'") == newScrapedList.view[i].xpath.replace(/\n/g," ") && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim()).replace(/[<>]/g, '').replace('\n', ' ') == newScrapedList.view[i].custname.trim().replace(/[<>]/g, '').replace('/\s/g', ' ').replace(/  +/g, ' ').replace('\n', ' ')) {
                                         if (!(isInArray(newScrapedList.view.indexOf(newScrapedList.view[i]), getIndexOfDeletedObjects))) {
                                             getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
@@ -2457,7 +2516,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         if ($("input[type=checkbox].checkall:checked").length != dontChkViewString) {
                             $.each($("input[type=checkbox].checkall:checked"), function () {
                                 for (var i = 0; i < viewString.view.length; i++) {
-                                    if (appType == 'DesktopJava') {
+                                    if (appType == 'DesktopJava' || appType == 'MobileApp') {
                                         if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ').replace(/[<>]/g, '') == viewString.view[i].custname.trim().replace(/[<>]/g, '').replace('/\s/g', ' ').replace(/  +/g, ' ').replace('\n', ' ')) {
                                             if (!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))) {
                                                 getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))

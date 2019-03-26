@@ -25,7 +25,16 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     $('#expAssign').on('click', function(e) {
-        $(".moduleBox").slideToggle('slow');
+        $(".moduleBox").slideToggle('slow',function() {
+            $(this).toggleClass('slideOpen');
+            if($('.slideOpen').is(":visible") == true)
+            {
+               $("#expAssign").attr('src','imgs/ic-collapseup.png');
+            }
+            else{
+                $("#expAssign").attr('src','imgs/ic-collapse.png');
+            }
+        });
     });
     detailsTableHtml = $("#detailsTable").html();
     //Search Modules
@@ -45,8 +54,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     //Search Scenarios
     $(".reportSearchBox").on("keyup", function() {
         var value = $(this).val().toLowerCase();
-        $("#reportsTable tr").filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        $("#reportsTable tbody tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
         });
     });
 
@@ -70,7 +79,11 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                     reportService.getReportsData_ICE(reportsInputData).then(function(result_res_scenarioData, response_scenarioData) {
                         $rootScope.scenarioInfo = result_res_scenarioData;
                         var scenarioInfo = $rootScope.scenarioInfo;
-                        $('#reportsTable tbody').append('<tr class="reportsTbl" data-executionid=' + scenarioInfo.executionid + ' id=' + value.testsuiteid + '><td class="center scenarioExecutionTime"><span id=' + val.scenarioid + ' class="glyphicon glyphicon-menu-right"></span></td><td class="scenarioName">' + val.scenarioname + '</td><td>' + scenarioInfo.executedtime + '</td><td class="status">' + scenarioInfo.status + '</td><td><img alt="Pdf Icon" class="getSpecificReportBrowser openreportstatus reportFormat" data-getrep="wkhtmltopdf" data-reportid=' + scenarioInfo.reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-pdf.png" title="PDF Report"><img alt="-" class="getSpecificReportBrowser openreportstatus reportFormat" data-getrep="html" data-reportid=' + scenarioInfo.reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-web.png" title="Browser Report"><img alt="Export JSON" class="exportToJSON openreportstatus reportFormat" data-getrep="json" data-reportid=' + scenarioInfo.reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-export-to-json.png" title="Export to Json"></td></tr>');
+                        $('#reportsTable tbody').append('<tr class="reportsTbl" data-executionid=' + scenarioInfo.executionid + ' id=' + value.testsuiteid + '><td class="center scenarioExecutionTime"><span id=' + val.scenarioid + ' class="glyphicon glyphicon-menu-right"></span></td><td class="scenarioName">' + val.scenarioname + '</td><td>' + scenarioInfo.executedtime + '</td><td class="status">' + scenarioInfo.status + '</td><td class="viewReports"><img alt="Pdf Icon" class="getSpecificReportBrowser openreportstatus reportFormat" data-getrep="wkhtmltopdf" data-reportid=' + scenarioInfo.reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-pdf.png" title="PDF Report"><img alt="-" class="getSpecificReportBrowser openreportstatus reportFormat" data-getrep="html" data-reportid=' + scenarioInfo.reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-web.png" title="Browser Report"><img alt="Export JSON" class="exportToJSON openreportstatus reportFormat" data-getrep="json" data-reportid=' + scenarioInfo.reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-export-to-json.png" title="Export to Json"></td></tr>');
+                        if(scenarioInfo.count == 0)
+                        {
+                            $("td.viewReports").text('-');
+                        }
                         $("tr.reportsTbl:even").addClass('even');
                         $("tr.reportsTbl:odd").addClass('odd');
                         setStatusColor();
@@ -99,7 +112,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             "oLanguage": {
                 "sSearch": ""
             },
-            "deferRender": true,
+             "deferRender": true,
             "columns": [{
                     "width": "5%",
                     "targets": 0
@@ -130,6 +143,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             $("input[type=search]").attr('placeholder', 'Search Scenario').addClass('scenarioSearch');
         }, 1000);
         redirected = false;
+        localStorage.removeItem('fromExecution');
         $('#accordion').show();
         $('.panel-body').append(oTable);
         $('#reportsTable').show();
@@ -225,12 +239,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 
     if (window.localStorage['redirectedReportObj'] && window.localStorage['redirectedReportObj'] != '') {
 
-        var parts = document.referrer.split('://')[1].split('/');
-        var protocol = document.referrer.split('://')[0];
-        var host = parts[0];
-        var pathName = parts.slice(1).join('/');
-
-        if ($.trim(pathName) == "execute") {
+      var redirection = window.localStorage['fromExecution'];
+        if (redirection == "true") {
             blockUI("loading report ...");
             redirected = true;
             robj = JSON.parse(window.localStorage['redirectedReportObj']);
