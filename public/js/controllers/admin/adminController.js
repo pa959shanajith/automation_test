@@ -298,7 +298,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 						else if(a.deactivated > b.deactivated) return 1;
 						else return 0
 					 });
-					$scope.tokens.users=data
+					$scope.tokens.users=data;
+					$('#tokenName').val('');
+					$('.fc-datePicker').val('');
+					$('#generateNewToken').val('');
 				}
 			}, function (error) {
 				unblockUI();
