@@ -1862,6 +1862,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         // console.log("data", viewString);
                         //If enable append is active
                         if (eaCheckbox) {
+                            if (viewString.view.length != 0){
                             //Getting the Existing Scrape Data
                             for (var i = 0; i < newScrapedList.view.length; i++) {
                                 // if(newScrapedList.scrapetype == 'caa'){
@@ -1905,6 +1906,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 }
                                 angular.element(innerUL).append(li);
                             }
+                        }else{
+                            //when viewsstring.view is empty after click and add
+                            $("#saveObjects").removeClass('hide');
+                            $("#saveObjects").trigger('click');
+                            return;
+                        }
                             //Getting the Existing Scrape Data
 
                             generateScrape()
