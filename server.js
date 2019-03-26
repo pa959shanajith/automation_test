@@ -270,30 +270,30 @@ if (cluster.isMaster) {
 
         app.get('/', function(req, res, next) {
             if (!(req.url == '/' || req.url.startsWith("/?"))) return next();
-			authRedirecter(req, req.user, function(redirect){
-				if (redirect) {
-					req.clearSession();
+            authRedirecter(req, req.user, function(redirect){
+                if (redirect) {
+                    req.clearSession();
                     return res.redirect('login');
-				} else {
-					req.session.logged = true;
-					return res.sendFile("app.html", { root: __dirname + "/public/" });
-				}
-			});
-		});
+                } else {
+                    req.session.logged = true;
+                    return res.sendFile("app.html", { root: __dirname + "/public/" });
+                }
+            });
+        });
 
         function authRedirecter(req, user, cb) {
-			var redirect = !1;
+            var redirect = !1;
             var userLogged = req.session.logged;
             if (userLogged && !req.session.emsg) {
                 req.session.emsg = "userLogged";
                 req.session.dndSess = true;
-				cb(redirect);
+                cb(redirect);
             } else if (!req.session.emsg && req.session.username==undefined) {
                 if (user) {
                     var username = user.username;
                     if (username == undefined) {
                         req.session.emsg = "invalid_username_password";
-						cb(redirect);
+                        cb(redirect);
                     } else {
                         username = username.toLowerCase();
                         redisSessionStore.all(function (err, allKeys) {
@@ -320,7 +320,7 @@ if (cluster.isMaster) {
                                     };
                                 }
                             }
-							cb(redirect);
+                            cb(redirect);
                         });
                     }
                 } else {
@@ -330,7 +330,7 @@ if (cluster.isMaster) {
                         meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
                         return meta;
                     };
-					cb(!redirect);
+                    cb(!redirect);
                 }
             } else cb(redirect);
         };
@@ -577,7 +577,7 @@ if (cluster.isMaster) {
         app.post('/flowGraphResults', flowGraph.flowGraphResults);
         app.post('/APG_OpenFileInEditor', flowGraph.APG_OpenFileInEditor);
         app.post('/APG_createAPGProject', flowGraph.APG_createAPGProject);
-		app.post('/APG_runDeadcodeIdentifier', flowGraph.APG_runDeadcodeIdentifier);
+        app.post('/APG_runDeadcodeIdentifier', flowGraph.APG_runDeadcodeIdentifier);
         //-------------Route Mapping-------------//
 
         // To prevent can't send header response
