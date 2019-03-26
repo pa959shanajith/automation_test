@@ -212,7 +212,7 @@ var routeUtil = {
 				successRedirect: opts.route.success, failureRedirect: opts.route.failure, failureMessage: true
 			}, function(err, user, info){
 				if (!user) res.send(info);
-				else req.logIn(user, opts, function(err) {
+				else req.logIn(user, function(err) {
 					if (err) return next(err);
 					return res.send(info);
 				});
@@ -248,7 +248,7 @@ module.exports = function auth(options){
 	};
 	passport.deserializeUser(function(user, done) {done(null, user);});
 	passport = strategyUtil[strategy](options);
-	authRouter.use(passport.initialize({ userProperty: options.userinfo }));
+	authRouter.use(passport.initialize({ userProperty: "user" }));
 	authRouter.use(passport.session());
 	authRouter = routeUtil[strategy](options);
 	authRouter.use(function(err, req, res, next){
