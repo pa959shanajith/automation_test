@@ -112,17 +112,21 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 			$(this).parent().siblings(".scenarioSchdCon").find(".selectToSched").attr("disabled",false).prop("checked", true);
 		}
 		else
-			$(this).parent().siblings(".scenarioSchdCon").find(".selectToSched").attr("disabled",true).prop("checked", false);
+			$(this).parent().siblings(".scenarioSchdCon").find(".selectToSched").prop("checked", false);
 	})
 
 	$(document).on("change", '.selectToSched', function(){
-		// var getRowCount = $(this).parents(".scenarioBody").children("tr").length;
+		 var allCount = $(".selectToSched").length;
+		 if(selectedCount == 0)
+		 	$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", false);
 		var selectedCount = $(this).parents(".scenarioBody").children("tr").find(".selectToSched:checked").length
-		// if(getRowCount == selectedCount){
+		 if(allCount == selectedCount){
 			$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", true);
-		//}
-		if(selectedCount == 0)
+		}
+		else{
 			$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", false);
+		}
+	
 	});
 
 	//Function to get scheduled details on interval

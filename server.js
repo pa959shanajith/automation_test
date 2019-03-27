@@ -153,7 +153,6 @@ if (cluster.isMaster) {
         // For Selecting Authentication Strategy and adding required routes
         var authParams = {
             username: "nineteen68_username",
-            userinfo: "userContext",
             route: {
                 login: "/login", success: "/", failure: "/error?e=403"
             }
@@ -271,20 +270,30 @@ if (cluster.isMaster) {
 
         app.get('/', function(req, res, next) {
             if (!(req.url == '/' || req.url.startsWith("/?"))) return next();
+            authRedirecter(req, req.user, function(redirect){
+                if (redirect) {
+                    req.clearSession();
+                    return res.redirect('login');
+                } else {
+                    req.session.logged = true;
+                    return res.sendFile("app.html", { root: __dirname + "/public/" });
+                }
+            });
+        });
+
+        function authRedirecter(req, user, cb) {
+            var redirect = !1;
             var userLogged = req.session.logged;
-            var usrCtx = req[authParams.userinfo];
             if (userLogged && !req.session.emsg) {
                 req.session.emsg = "userLogged";
                 req.session.dndSess = true;
-                req.session.logged = true;
-                return res.sendFile("app.html", { root: __dirname + "/public/" });
+                cb(redirect);
             } else if (!req.session.emsg && req.session.username==undefined) {
-                if (usrCtx) {
-                    var username = (usrCtx.userinfo)? usrCtx.userinfo.username:usrCtx.username;
+                if (user) {
+                    var username = user.username;
                     if (username == undefined) {
                         req.session.emsg = "invalid_username_password";
-                        req.session.logged = true;
-                        return res.sendFile("app.html", { root: __dirname + "/public/" });
+                        cb(redirect);
                     } else {
                         username = username.toLowerCase();
                         redisSessionStore.all(function (err, allKeys) {
@@ -311,8 +320,7 @@ if (cluster.isMaster) {
                                     };
                                 }
                             }
-                            req.session.logged = true;
-                            return res.sendFile("app.html", { root: __dirname + "/public/" });
+                            cb(redirect);
                         });
                     }
                 } else {
@@ -322,11 +330,10 @@ if (cluster.isMaster) {
                         meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
                         return meta;
                     };
-                    req.clearSession();
-                    return res.redirect('login');
+                    cb(!redirect);
                 }
-            }
-        });
+            } else cb(redirect);
+        };
 
         //Only Admin have access
         app.get('/admin', function(req, res) {
@@ -398,7 +405,7 @@ if (cluster.isMaster) {
                         logger.error("Please run the Service API and Restart the Server");
                     } else {
                         if (result.rows == "True") {
-                            logger.rewriters.push[0]=function(level, msg, meta) {
+                            logger.rewriters[0]=function(level, msg, meta) {
                                 if (req.session && req.session.uniqueId) {
                                     meta.username = req.session.username;
                                     meta.userid = req.session.userid;
@@ -570,6 +577,7 @@ if (cluster.isMaster) {
         app.post('/flowGraphResults', flowGraph.flowGraphResults);
         app.post('/APG_OpenFileInEditor', flowGraph.APG_OpenFileInEditor);
         app.post('/APG_createAPGProject', flowGraph.APG_createAPGProject);
+        app.post('/APG_runDeadcodeIdentifier', flowGraph.APG_runDeadcodeIdentifier);
         //-------------Route Mapping-------------//
 
         // To prevent can't send header response

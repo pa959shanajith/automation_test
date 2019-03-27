@@ -16,6 +16,11 @@
 					<li><a href='#'  title="Notepad++"  data-toggle="modal" ng-click="openFileInEditor($event,'notepad++'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-desktop.png' alt='Notepad++' /></span>Notepad++</a></li>
 				</ul>
 			</div>
+			<div id="left-top-section" ng-if="ClassDiagramView == true" class="ComplexityScreenView">
+				<ul>
+					<li><a class='browserIcon' href='#' title="Deadcode Identifier" ng-click="runDeadcodeIdentifier($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-desktop.png' alt='Deadcode Identifier' /></span>Deadcode Identifier</a></li>
+				</ul>
+			</div>
 		</div>
      </div>
      <div  ng-show="enableToggleSidebars"  id='ct-expand-left-apg' class="ct-expand ct-rev" ng-click="toggleLeftSidebar()"></div>
@@ -73,6 +78,7 @@
 			<p>Class Complexity : {{cc}}</p>
 			<p>No. of Method : {{cmethod}}</p> 
 			<p> Weighted Method Class Complexity : {{wmcc}} </p>
+			<br>
 			<h4 class="heading-bold">Method Level Complexity Info:  
 			</h4>
 			<div >

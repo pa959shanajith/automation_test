@@ -181,3 +181,45 @@ exports.APG_createAPGProject = function(req,res){
 		logger.error("Error occurred in APG_createAPGProject");
 	}
 };
+
+exports.APG_runDeadcodeIdentifier = function(req,res){
+	try{
+			logger.info("Inside UI service: APG_runDeadcodeIdentifier");
+			if(isSessionActive(req)){
+				var name = req.session.username;
+				redisServer.redisSubServer.subscribe('ICE2_' + name);
+				redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+					if (redisres[1]>0) {
+						var version = req.body.version;
+						var path = req.body.path;
+						logger.info("ICE Socket requesting Address: %s" , name);
+						logger.info("Sending socket request for runDeadcodeIdentifier to redis");
+						var dataToIce = {"emitAction" : "runDeadcodeIdentifier","username" : name,
+									"version":version,"path":path};
+						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+						function apgRunDeadcodeIdentifier_listener(channel,message) {
+							data = JSON.parse(message);
+							if(name == data.username){
+								if (data.onAction == "unavailableLocalServer") {	
+									logger.error("Error occurred in APG_runDeadcodeIdentifier: Socket Disconnected");
+									res.send('unavailableLocalServer');
+								} else if (data.onAction == "deadcode_identifier")  res.send(data.value);
+								redisServer.redisSubServer.removeListener('message',apgRunDeadcodeIdentifier_listener);
+							}
+						};
+						redisServer.redisSubServer.on("message",apgRunDeadcodeIdentifier_listener);
+					} else {
+						logger.info("ICE socket not available for Address : %s", name);
+						res.send("unavailableLocalServer");
+					}
+				});
+			}else {
+				logger.error("Error occurred in the service APG_runDeadcodeIdentifier: Invalid Session");
+				res.send("Invalid Session");
+			}
+	}
+	catch(exception){
+		logger.error(exception.message);
+		logger.error("Error occurred in APG_runDeadcodeIdentifier");
+	}
+};
