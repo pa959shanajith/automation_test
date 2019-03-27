@@ -288,7 +288,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (data == "Invalid Session") {
 					$rootScope.redirectPage();
 				}
-				if (data == 'fail') {
+				else if (data == 'fail') {
 						openModalPopup("Token Management", "Failed to fetch user data");
 						resetAssignProjectForm();
 				} else {
@@ -376,7 +376,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (data == "Invalid Session") {
 					$rootScope.redirectPage();
 				}
-				if (data == 'fail') {
+				else if (data == 'fail') {
 					openModalPopup("Token Management", "Failed to generate token");
 				} 
 				else if (data == 'duplicate') {
@@ -390,7 +390,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 						if (data == "Invalid Session") {
 							$rootScope.redirectPage();
 						}
-						if (data == 'fail') {
+						else if (data == 'fail') {
 							openModalPopup("Token Management", "Failed to fetch user data");
 							resetAssignProjectForm();
 						} else {
@@ -424,7 +424,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (data == "Invalid Session") {
 					$rootScope.redirectPage();
 				}
-				if (data == 'fail') {
+				else if (data == 'fail') {
 					openModalPopup("Token Management", "Failed to deactivate token");
 				}  
 				else {
