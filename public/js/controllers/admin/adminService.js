@@ -82,6 +82,27 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
+		generateCIusertokens: function (generatetoken) {
+			return $http.post('/generateCIusertokens', {
+				generatetoken: generatetoken
+			})
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		getCIUsersDetails: function (generatetoken) {
+			return $http.post('/getCIUsersDetails',{
+				generatetoken: generatetoken
+			})
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		deactivateCIUser: function (CIUser) {
+			return $http.post('/deactivateCIUser',{
+				CIUser: CIUser
+			})
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
 		manageSessionData: function (action, user, key) {
 			return $http.post('/manageSessionData', {
 				action: action,

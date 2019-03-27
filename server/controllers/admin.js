@@ -3,6 +3,7 @@
  */
 var bcrypt = require('bcrypt');
 var uuid = require('uuid-random');
+var TokenGenerator = require('uuid-token-generator')
 var async = require('async');
 var activeDirectory = require('activedirectory');
 var Client = require("node-rest-client").Client;
@@ -1827,6 +1828,115 @@ exports.generateCItoken = function (req, res) {
 		}
 	} catch (exception) {
 		logger.error("Error occurred in admin/generateCItoken:", exception);
+		res.status(500).send("fail");
+	}
+};
+
+//GEnerate Token for CI User
+exports.generateCIusertokens = function (req, res) {
+	logger.info("Inside UI service: generateCIusertokens");
+	try {
+		if (utils.isSessionActive(req)) {
+			var requestDetails = req.body.generatetoken;
+			const tokgen2 = new TokenGenerator(256, TokenGenerator.BASE62);
+			var token=tokgen2.generate()
+			var salt = bcrypt.genSaltSync(10);
+			var inputs = {
+				user_id: requestDetails.userId,
+				expiry: requestDetails.expiry,
+				tokenname: requestDetails.tokenname,
+				token: bcrypt.hashSync(token, salt)
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			logger.info("Calling NDAC Service : admin/generateCIusertokens");
+			client.post(epurl + "admin/generateCIusertokens",args,
+				function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					res.send("fail");
+				} else if (response.statusCode != 200 || result.rows == "duplicate"){
+					res.send("duplicate")
+				}else {
+					res.send(token);
+				}
+			});
+		} else {
+			res.send("Invalid Session");
+		}
+	} catch (exception) {
+		logger.error("Error occurred in admin/generateCIusertokens:", exception);
+		res.status(500).send("fail");
+	}
+};
+
+//Fetch CI User details
+exports.getCIUsersDetails = function(req,res){
+	logger.info("Inside UI Service: getCIUsersDetails");
+	try {
+		if (utils.isSessionActive(req)) {
+			var requestDetails = req.body.generatetoken;
+			var inputs = {
+				user_id: requestDetails.userId
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			logger.info("Calling NDAC Service : admin/getCIUsersDetails");
+			client.post(epurl + "admin/getCIUsersDetails",args,
+				function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					res.send("fail");
+				} else {
+					res.send(result.rows);
+				}
+			});
+		} else {
+			res.send("Invalid Session");
+		}
+	} catch (exception) {
+		logger.error("Error occurred in admin/getCIUsersDetails:", exception);
+		res.status(500).send("fail");
+	}
+};
+
+//Deactivate CI User Token 
+exports.deactivateCIUser = function (req,res){
+	logger.info("Inside UI Service: deactivateCIUser");
+	try {
+		if (utils.isSessionActive(req)) {
+			var requestDetails = req.body.CIUser;
+			var inputs = {
+				user_id: requestDetails.userId,
+				tokenname: requestDetails.tokenName
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			logger.info("Calling NDAC Service : admin/deactivateCIUser");
+			client.post(epurl + "admin/deactivateCIUser",args,
+				function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					res.send("fail");
+				}
+				else {
+					res.send(result.rows);
+				}
+			});
+		} else {
+			res.send("Invalid Session");
+		}
+	} catch (exception) {
+		logger.error("Error occurred in admin/getCIUsersDetails:", exception);
 		res.status(500).send("fail");
 	}
 };

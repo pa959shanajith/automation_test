@@ -19,6 +19,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.assignProj = {};
 	$scope.preferences = {};
 	$scope.sessionConf = {};
+	$scope.tokens = {};
 	$('.dropdown').on('hide.bs.dropdown', function (e) {
 		$(this).find('.dropdown-menu').first().stop(true, true).slideUp(300);
 	});
@@ -272,6 +273,186 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		});
 	};
 
+	$(document).on('click', '#tokenTab', function () {
+	});
+	$(document).on('change', '#selAssignUser1', function (e) {
+		blockUI("Fetchin Token data. Please wait...")
+		var userId = $("#selAssignUser1 option:selected").attr("data-id");
+		var generatetoken = {};
+		generatetoken.userId = userId;
+		
+		$scope.tokens.users={}
+		adminServices.getCIUsersDetails(generatetoken)
+		.then(function (data) {
+				unblockUI();
+				if (data == "Invalid Session") {
+					$rootScope.redirectPage();
+				}
+				else if (data == 'fail') {
+						openModalPopup("Token Management", "Failed to fetch user data");
+						resetAssignProjectForm();
+				} else {
+					openModalPopup("Token Management", "Fetch Token details successful");
+					data.sort(function(a,b) { 
+						if (a.deactivated < b.deactivated) return -1;
+						else if(a.deactivated > b.deactivated) return 1;
+						else return 0
+					 });
+					$scope.tokens.users=data;
+					$('#tokenName').val('');
+					$('.fc-datePicker').val('');
+					$('#generateNewToken').val('');
+				}
+			}, function (error) {
+				unblockUI();
+				console.log("Error:::::::::::::", error);
+			});
+	});
+	$scope.tokens.click = function () {
+		$scope.tokens.users=[]
+		$(".selectedIcon").removeClass("selectedIcon");
+		$("#tokenTab").find('img').addClass('selectedIcon');
+		taskName = $("#page-taskName").children("span").text();
+		adminServices.getUserDetails("user")
+		.then(function(data){
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "fail") {
+				openModalPopup("Token Management", "Failed to fetch users.");
+			} else if(data == "empty") {
+				openModalPopup("Token Management", "There are no users present.");
+			} else {
+				data.sort(function(a,b){ return a[0] > b[0]; });
+				var selectBox = $("#selAssignUser1");
+				selectBox.empty();
+				selectBox.append('<option data-id="" value disabled selected>Select User</option>');
+				for(i=0; i<data.length; i++){
+					if(data[i][2] != "b5e9cb4a-5299-4806-b7d7-544c30593a6e"){
+						selectBox.append('<option data-id="'+data[i][1]+'" value="'+data[i][0]+'">'+data[i][0]+'</option>');
+					}
+				}
+				selectBox.prop('selectedIndex', 0);
+			}
+		}, function (error) {
+			console.log("Error:::::::::::::", error);
+		});
+	};
+	//	Generate CI user Token
+	$scope.generateCIusertokens = function ($event) {
+		$("#GenerateNewTkenModal").modal("hide");
+		$("#selAssignUser1").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
+		$("#tokenName").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
+		$(".tokeninfo .tokenSuite .datePicContainer .fc-datePicker").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
+		if ($('#selAssignUser1 option:selected').val() == "") {
+			$("#selAssignUser1").css('border', '').addClass("selectErrorBorder");
+			return false;
+		} 
+		else if ($('#tokenName').val() == "") {
+			$("#tokenName").css('border', '').addClass("selectErrorBorder");
+			return false;
+		}
+		else if ($('.tokeninfo .tokenSuite .datePicContainer .fc-datePicker').val() == "") {
+			$(".tokeninfo .tokenSuite .datePicContainer .fc-datePicker").css('border', '').addClass("selectErrorBorder");
+			return false;
+		}
+		else{
+			var userDetails = JSON.parse(window.localStorage['_UI']);
+			var userId = $("#selAssignUser1 option:selected").attr("data-id");
+			var generatetoken = {};
+			$(".scheduleSuiteTable").append('<div class="tokenSuite"><span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIconToken" src="../imgs/ic-datepicker.png" /></span><span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>');
+			var expdate=$(".tokeninfo .tokenSuite .datePicContainer .fc-datePicker").val()
+			//console.log(expdate)
+			var tokenname=$('#tokenName').val()
+			//console.log(tokenname)
+			generatetoken.userId = userId;
+			generatetoken.expiry = expdate;
+			generatetoken.tokenname = tokenname;
+			blockUI('Generating Token. Please Wait...');
+			//console.log('generateCIusertokens',generatetoken)
+			adminServices.generateCIusertokens(generatetoken)
+			.then(function (data) {
+				unblockUI();
+				//console.log(data)
+				if (data == "Invalid Session") {
+					$rootScope.redirectPage();
+				}
+				else if (data == 'fail') {
+					openModalPopup("Token Management", "Failed to generate token");
+				} 
+				else if (data == 'duplicate') {
+					openModalPopup("Token Management", "Failed to generate token, Token Name already exist");
+				} 
+				else {
+					$("#generateNewToken").val(data);
+					adminServices.getCIUsersDetails(generatetoken)
+					.then(function (data) {
+						unblockUI();
+						if (data == "Invalid Session") {
+							$rootScope.redirectPage();
+						}
+						else if (data == 'fail') {
+							openModalPopup("Token Management", "Failed to fetch user data");
+							resetAssignProjectForm();
+						} else {
+							openModalPopup("Token Management", "Token generated successfully");
+							data.sort(function(a,b) { 
+							if (a.deactivated < b.deactivated) return -1;
+								else if(a.deactivated > b.deactivated) return 1;
+								else return 0
+							});
+							$scope.tokens.users=data
+						}
+					}, function (error) {
+							unblockUI();
+							console.log("Error:::::::::::::", error);
+						});	
+				}
+			}, function (error) {
+				unblockUI();
+				console.log("Error:::::::::::::", error);
+			});
+		}		
+	};
+	$scope.deactivate = function ($event) {
+		var CIUser={}
+		CIUser.userId = $("#selAssignUser1 option:selected").attr("data-id");
+		CIUser.tokenName = $.trim($event.target.parentElement.parentElement.firstElementChild.textContent);
+		adminServices.deactivateCIUser(CIUser)
+		.then(function (data) {
+				unblockUI();
+				// console.log(data)
+				if (data == "Invalid Session") {
+					$rootScope.redirectPage();
+				}
+				else if (data == 'fail') {
+					openModalPopup("Token Management", "Failed to deactivate token");
+				}  
+				else {
+					openModalPopup("Token Management", "Token '"+CIUser.tokenName+"' has been Deactivated");
+					data.sort(function(a,b) { 
+						if (a.deactivated < b.deactivated) return -1;
+							else if(a.deactivated > b.deactivated) return 1;
+							else return 0
+						});
+					$scope.tokens.users=data
+				}
+			}, function (error) {
+				unblockUI();
+				console.log("Error:::::::::::::", error);
+			});
+	};
+	$(document).on('focus', '.fc-datePicker', function(){
+		$(this).datepicker({
+			autoclose:"true",
+			format:"dd-mm-yyyy",
+			todayHighlight: true,
+			startDate: new Date()
+		})
+	})
+	$(document).on('click', ".datepickerIconToken", function(){
+		$(this).siblings(".fc-datePicker").focus()
+	})
+	
 	$(document).on('click', '#projectTab', function () {
 		resetForm();
 		projectDetails = [];
