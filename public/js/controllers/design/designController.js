@@ -1890,7 +1890,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         // console.log("data", viewString);
                         //If enable append is active
                         if (eaCheckbox) {
-                          
+                            if (viewString.view.length != 0){
                             //Getting the Existing Scrape Data
                             for (var i = 0; i < newScrapedList.view.length; i++) {
                                 // if(newScrapedList.scrapetype == 'caa'){
@@ -1934,6 +1934,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 }
                                 angular.element(innerUL).append(li);
                             }
+                        }else{
+                            //when viewsstring.view is empty after click and add
+                            $("#saveObjects").removeClass('hide');
+                            $("#saveObjects").trigger('click');
+                            return;
+                        }
                             //Getting the Existing Scrape Data
 
                             generateScrape()
@@ -5265,6 +5271,23 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
             $grid.jqGrid('setCell', rowId, 'url', url);
             $grid.jqGrid('setCell', rowId, 'cord', cord);
+		} else if (selectedText == "@CustomiOS") {
+            objName = " ";
+            url = " ";
+            var sc = Object.keys(keywordArrayList.CustomiOS);
+            selectedKeywordList = "CustomiOS";
+            var res = '';
+            for (var i = 0; i < sc.length; i++) {
+                if (selectedKeyword == sc[i]) {
+                    res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
+                } else
+                    res += '<option role="option" value="' + sc[i] + '">' + sc[i] + '</option>';
+            }
+            var row = $(e.target).closest('tr.jqgrow');
+            var rowId = row.attr('id');
+            $("select#" + rowId + "_keywordVal", row[0]).html(res);
+            selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
+            $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
         } else if (selectedText == "@MobileiOS") {
             objName = " ";
             url = " ";
@@ -6702,7 +6725,7 @@ function getTags(data) {
     } else if (appTypeLocal == "MobileApp" && navigator.appVersion.indexOf("Mac") == -1) {
         obnames = ["@Generic", "@Mobile", "@Action"];
     } else if (appTypeLocal == "MobileApp" && navigator.appVersion.indexOf("Mac") != -1) {
-        obnames = ["@Generic", "@Mobile"];
+        obnames = ["@Generic", "@Mobile", "@CustomiOS"];
     } else if (appTypeLocal == "MobileWeb") {
         obnames = ["@Generic", "@Browser", "@BrowserPopUp", "@Action"];
     } else if (appTypeLocal == "SAP") {
