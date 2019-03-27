@@ -554,6 +554,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		var name = req.session.username;
 		redisServer.redisSubServer.subscribe('ICE2_' + name);
 		var batchExecutionData = req.body.moduleInfo;
+		var exc_action  = req.body.action;
 		var userInfo = {"user_id": req.session.userid, "role": req.session.activeRole};
 		var testsuitedetailslist = [],testsuiteidcycmap = {};
 		var scenariodescriptionobject = {};
@@ -562,7 +563,8 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 			"executionId": "",
 			"suitedetails": [],
 			"testsuiteIds": [],
-			"apptype": ""
+			"apptype": "",
+			"exec_mode":exc_action
 		};
 		var executionId = uuid();
 		var starttime = new Date().getTime();

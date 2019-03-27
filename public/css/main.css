@@ -5497,9 +5497,11 @@ border-radius: 6px;
 
 #ct-expand-left-apg {
     left: 160px;
+	z-index: 1000
 }
 #ct-expand-right-apg {
     right: 84px;
+	z-index: 1000
 }
  .ct-expand::after{
     position:absolute;
