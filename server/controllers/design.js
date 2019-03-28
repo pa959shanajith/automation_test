@@ -2189,6 +2189,7 @@ exports.updateIrisDataset = function updateIrisDataset(req, res) {
 										function (result, response) {
 										try {
 											if (response.statusCode != 200 || result.rows == "fail") res.send(false);
+											else if (result.rows == "unsavedObject") res.send("unsavedObject");
 											else res.send(true);
 										} catch (exception) {
 											logger.error("Exception in the service updateIrisObjectType: %s", exception);
