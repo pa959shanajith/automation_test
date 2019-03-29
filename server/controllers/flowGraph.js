@@ -4,6 +4,7 @@ var redisServer = require('../lib/redisSocketHandler');
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl = process.env.NDAC_URL;
+var utils = require('../lib/utils');
 //var fs = require('fs');
 
 function isSessionActive(req){
@@ -35,6 +36,7 @@ exports.flowGraphResults = function(req, res){
 					logger.info("Sending socket request for generateFlowGraph to redis");
 					var dataToIce = {"emitAction" : "generateFlowGraph","username" : name, "version":version, "path" : path};
 					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					var updateSessionExpiry = utils.resetSession(req.session);
 					function generateFlowGraph_listener(channel,message) {
 						data = JSON.parse(message);
 						if(name == data.username){
@@ -56,6 +58,7 @@ exports.flowGraphResults = function(req, res){
 							} else if (data.onAction == "result_flow_graph_finished") {
 								redisServer.redisSubServer.removeListener('message',generateFlowGraph_listener);	
 								try {
+									clearInterval(updateSessionExpiry);
 									var mySocketUI = myserver.allSocketsMapUI[name];
 									mySocketUI.emit("endData", value);
 									res.status(200).json({success: true});
@@ -197,14 +200,18 @@ exports.APG_runDeadcodeIdentifier = function(req,res){
 						var dataToIce = {"emitAction" : "runDeadcodeIdentifier","username" : name,
 									"version":version,"path":path};
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+						var updateSessionExpiry = utils.resetSession(req.session);
 						function apgRunDeadcodeIdentifier_listener(channel,message) {
 							data = JSON.parse(message);
 							if(name == data.username){
+								redisServer.redisSubServer.removeListener('message',apgRunDeadcodeIdentifier_listener);
 								if (data.onAction == "unavailableLocalServer") {	
 									logger.error("Error occurred in APG_runDeadcodeIdentifier: Socket Disconnected");
 									res.send('unavailableLocalServer');
-								} else if (data.onAction == "deadcode_identifier")  res.send(data.value);
-								redisServer.redisSubServer.removeListener('message',apgRunDeadcodeIdentifier_listener);
+								} else if (data.onAction == "deadcode_identifier")  {
+									clearInterval(updateSessionExpiry);
+									res.send(data.value);
+								}
 							}
 						};
 						redisServer.redisSubServer.on("message",apgRunDeadcodeIdentifier_listener);

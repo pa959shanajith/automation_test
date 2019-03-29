@@ -1570,6 +1570,9 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 	$scope.runDeadcodeIdentifier = function(e){
 		$timeout(function(){$('.browserIcon img').removeClass('thumb-ic-highlight')},500);
 		$scope.collapseSidebars();
+		$("#page-taskName span").animate({
+			left: '0px'
+		});
 		blockUI('Deadcode identification in progress..');
 		
 		flowGraphServices.APG_runDeadcodeIdentifier(version,path).then(function(data) {

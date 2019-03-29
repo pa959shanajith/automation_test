@@ -3561,14 +3561,30 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 mdName = modifiednames[i].split("^^");
                 if (eaCheckbox) {
                     if (mdName[1]) {
-                        if (newScrapedList.view[mdName[1]])
+                        if (newScrapedList.view[mdName[1]]){
                             newScrapedList.view[mdName[1]].custname = mdName[0];
+							if(newScrapedList.view[mdName[1]].cord != undefined && newScrapedList.view[mdName[1]].cord != ''){
+								var newxpath = newScrapedList.view[mdName[1]].xpath;
+								var ind = newxpath.indexOf(';');
+								var s_ind = newxpath.indexOf(';',ind);
+								newxpath = newxpath.slice(0,ind+1)+mdName[0]+newxpath.slice(newxpath.indexOf(';',ind+s_ind),newxpath.length);
+								newScrapedList.view[mdName[1]].xpath = newxpath;
+							}
+						}
                     }
                 }
                 else {
                     if (mdName[1]) {
-                        if (viewString.view[mdName[1]])
+                        if (viewString.view[mdName[1]]){
                             viewString.view[mdName[1]].custname = mdName[0];
+							if(viewString.view[mdName[1]].cord != undefined && viewString.view[mdName[1]].cord != ''){
+								var newxpath = viewString.view[mdName[1]].xpath;
+								var ind = newxpath.indexOf(';');
+								var s_ind = newxpath.indexOf(';',ind);
+								newxpath = newxpath.slice(0,ind+1)+mdName[0]+newxpath.slice(newxpath.indexOf(';',ind+s_ind),newxpath.length);
+								viewString.view[mdName[1]].xpath = newxpath;
+							}
+						}	
                     }
                 }
             }
