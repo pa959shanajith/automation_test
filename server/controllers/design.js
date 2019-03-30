@@ -1887,6 +1887,7 @@ exports.debugTestCase_ICE = function (req, res) {
 							try {
 								var wsdlurl = req.body.wsdlurl;
 								var operations = req.body.method;
+                                var certificate = req.body.resultFile;
 								var soapVersion = '0';
 								if (operations.indexOf('SOAP1.2') !== -1) {
 									soapVersion = '1';
@@ -1897,7 +1898,8 @@ exports.debugTestCase_ICE = function (req, res) {
 								var serviceGenRequest = {
 									wsdlurl: wsdlurl,
 									operations: operations,
-									soapVersion: soapVersion
+									soapVersion: soapVersion,
+                                    serverCertificate:certificate
 								};
 								logger.info("Sending socket request for debugTestCase to redis");
 								dataToIce = {"emitAction" : "wsdl_ServiceGenerator","username" : name, "serviceGenRequest":serviceGenRequest};
