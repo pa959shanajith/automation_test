@@ -37,6 +37,7 @@ var getIndexOfDeletedObjects = [];
 var newScrapedData;
 var saveScrapeDataFlag = false;
 var deleteObjectsFlag = false;
+var certObj={};
 window.localStorage['disableEditing'] = "false";
 mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$location', '$timeout', 'DesignServices', 'mindmapServices', 'cfpLoadingBar', '$window', 'socket', function ($scope, $rootScope, $http, $location, $timeout, DesignServices, mindmapServices, cfpLoadingBar, $window, socket) {
     $rootScope.compareFlag = false;
@@ -448,7 +449,36 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 console.log("Error while traversing while executing debugTestcase method!! \r\n " + (error.data));
             });
     }; // browser invocation ends
-
+    
+    //Submit cert data WS
+    $scope.showWSAuthPopup = function(){
+        $('#WSglobalModal').modal('show');
+    }
+    
+    $scope.submitCertObject = function($event) {
+        certObj.certsDetails = $("#importCertificate").val()+";;"+$('#getPassData').val();
+        certObj.authDetails =  $('#getAuthUserName').val()+";"+$('#getAuthUserPassword').val();    
+       // $("#WSglobalModal").modal('hide');
+       //$('.validateCert').removeClass('validateCert');
+        $(document).on('shown.bs.modal', '#WSglobalModal', function () {
+            $('.validateCert').removeClass('validateCert');
+        });
+        var impCert = $("#importCertificate").val();
+        if(impCert == "")
+        {
+            $('#importCertificate').addClass('validateCert');
+            $('#WSglobalModal').modal('show')
+            return false;
+        }
+        
+        /*if(certObj.certsDetails == ""){
+            certObj = '';
+            openDialog("Certificate", "Failed to save certificate");
+        }else{
+            openDialog("Certificate", "Certificate Saved successfully");
+        }*/
+    }
+    //Submit cert data WS End
     //Import Test case
     $scope.importTestCase = function ($event) {
         var counter1 = 0;
@@ -1175,6 +1205,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         var initWSJson = {}
         var testCaseWS = []
         var proceed = false;
+        var auth_cert = false;
+        var keywordVal;
         var appType = $scope.getScreenView;
         var wsdlInputs = []
         wsdlInputs.push($("#endPointURL").val());
@@ -1182,15 +1214,26 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         wsdlInputs.push($("#wsdlOperation").val());
         wsdlInputs.push($("#wsdlRequestHeader").val().replace(/[\n\r]/g, '##').replace(/"/g, '\"'));
         wsdlInputs.push($("#wsdlRequestBody").val().replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"'));
-        //var endPointURL = $("#endPointURL").val();
-        //var wsdlMethods = $("#wsdlMethods").val();
-        //var wsdlOperation = $("#wsdlOperation").val();
+        var cert_data =$("#importCertificate").val();
+        if (cert_data.length!=0){
+            wsdlInputs.push($("#importCertificate").val()+";;"+$('#getPassData').val()+";");
+            wsdlInputs.push($('#getAuthUserName').val()+";"+$('#getAuthUserPassword').val());
+        }
+        var endPointURLCert = $("#endPointURL").val();
+        var cert_url = endPointURLCert.indexOf('https')
+        if (cert_url==0){
+            initWSJson.res = certObj;
+        }
         var param = 'debugTestCaseWS_ICE';
         //var wsdlRequestHeader = $("#wsdlRequestHeader").val().replace(/[\n\r]/g,'##').replace(/"/g, '\"');
         //var wsdlRequestBody = $("#wsdlRequestBody").val().replace(/[\n\r]/g,'').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
         if (e.currentTarget.className == "disableActionsWS") return false
         else if (!wsdlInputs[0]) $("#endPointURL").addClass("inputErrorBorderFull")
         else if (!$scope.wsdlMethods && !wsdlInputs[1]) $("#wsdlMethods").addClass("selectErrorBorder")
+        else if (wsdlInputs[5]){
+            auth_cert = true;
+            proceed = true;
+        }
         else {
             if (wsdlInputs[1] == "GET" || wsdlInputs[1] == "HEAD" || wsdlInputs[1] == "PUT" || wsdlInputs[1] == "DELETE") {
                 if (wsdlInputs[3]) {
@@ -1204,7 +1247,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             }
         }
         if (proceed) {
-            var keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"]
+            if (auth_cert){
+                keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody","addClientCertificate","setBasicAuth"]
+            }else{
+                keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"]
+            }
             var blockMsg = "Fetching Response Header & Body..."
             blockUI(blockMsg);
             for (i = 0; i < wsdlInputs.length; i++) {
@@ -1245,17 +1292,15 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     if (data == "Invalid Session") {
                         $rootScope.redirectPage();
                     }
+                    unblockUI();
                     if (data == "unavailableLocalServer") {
-                        unblockUI();
                         openDialog("Web Service Screen", $rootScope.unavailableLocalServer_msg);
                         return false
                     }
                     if (data == "scheduleModeOn") {
-                        unblockUI();
                         openDialog("Web Service Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
                         return false
                     }
-                    unblockUI();
                     if (typeof data == "object") {
                         openDialog("Data Retrieve", "Web Service response received successfully");
                         //$("#webserviceDeubgSuccess").modal("show")
@@ -1295,18 +1340,16 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     if (data == "Invalid Session") {
                         $rootScope.redirectPage();
                     }
+                    unblockUI();
                     if (data == "fail") {
-                        unblockUI();
                         openDialog("WSDL-Scrape Screen", "Invalid WSDL url.");
                         return false
                     }
                     if (data == "unavailableLocalServer") {
-                        unblockUI();
                         openDialog("WSDL-Scrape Screen", $rootScope.unavailableLocalServer_msg);
                         return false
                     }
                     if (data == "scheduleModeOn") {
-                        unblockUI();
                         openDialog("WSDL-Scrape Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
                         return false
                     }
@@ -1316,7 +1359,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     for (i = 0; i < data.listofoperations.length; i++) {
                         $("#wsldSelect").append('<option value="' + data.listofoperations[i] + '">' + data.listofoperations[i] + '</option>')
                     }
-                    unblockUI()
                 },
                 function (error) {
                     console.log("Error")
@@ -1327,6 +1369,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
     //WSDL Add Functionality
     $scope.wsdlAdd = function () {
+    if (Object.keys(certObj).length==0){
+            resutFile='';
+        }else{
+            resutFile=certObj;
+        }
         $("#endPointURL, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody, #wsdlResponseHeader, #wsdlResponseBody").val("");
         $("#wsdlMethods").prop('selectedIndex', 0);
         $("#wsldInput").removeClass("inputErrorBorderFull");
@@ -1336,18 +1383,17 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         if (!wsdlUrl) $("#wsldInput").addClass("inputErrorBorderFull");
         else if (!wsdlSelectedMethod) $("#wsldSelect").addClass("selectErrorBorder");
         else {
-            DesignServices.wsdlAdd(wsdlUrl, wsdlSelectedMethod)
+            DesignServices.wsdlAdd(wsdlUrl, wsdlSelectedMethod,resutFile)
                 .then(function (data) {
                     if (data == "Invalid Session") {
                         $rootScope.redirectPage();
                     }
+                    unblockUI();
                     if (data == "unavailableLocalServer") {
-                        unblockUI();
                         openDialog("WSDL Add-Scrape Screen", $rootScope.unavailableLocalServer_msg);
                         return false
                     }
                     if (data == "scheduleModeOn") {
-                        unblockUI();
                         openDialog("WSDL Add-Scrape Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
                         return false
                     }
@@ -3561,14 +3607,30 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 mdName = modifiednames[i].split("^^");
                 if (eaCheckbox) {
                     if (mdName[1]) {
-                        if (newScrapedList.view[mdName[1]])
+                        if (newScrapedList.view[mdName[1]]){
                             newScrapedList.view[mdName[1]].custname = mdName[0];
+							if(newScrapedList.view[mdName[1]].cord != undefined && newScrapedList.view[mdName[1]].cord != ''){
+								var newxpath = newScrapedList.view[mdName[1]].xpath;
+								var ind = newxpath.indexOf(';');
+								var s_ind = newxpath.indexOf(';',ind);
+								newxpath = newxpath.slice(0,ind+1)+mdName[0]+newxpath.slice(newxpath.indexOf(';',ind+s_ind),newxpath.length);
+								newScrapedList.view[mdName[1]].xpath = newxpath;
+							}
+						}
                     }
                 }
                 else {
                     if (mdName[1]) {
-                        if (viewString.view[mdName[1]])
+                        if (viewString.view[mdName[1]]){
                             viewString.view[mdName[1]].custname = mdName[0];
+							if(viewString.view[mdName[1]].cord != undefined && viewString.view[mdName[1]].cord != ''){
+								var newxpath = viewString.view[mdName[1]].xpath;
+								var ind = newxpath.indexOf(';');
+								var s_ind = newxpath.indexOf(';',ind);
+								newxpath = newxpath.slice(0,ind+1)+mdName[0]+newxpath.slice(newxpath.indexOf(';',ind+s_ind),newxpath.length);
+								viewString.view[mdName[1]].xpath = newxpath;
+							}
+						}	
                     }
                 }
             }

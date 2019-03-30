@@ -158,11 +158,12 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http,$q)   {
 			})
 		},
 		
-		wsdlAdd : function(wsdlUrl, wsdlSelectedMethod){
+		wsdlAdd : function(wsdlUrl, wsdlSelectedMethod,resultFile){
 			return $http.post('/debugTestCase_ICE',{
 				param : 'wsdlServiceGenerator_ICE',
 				wsdlurl: wsdlUrl,
-                method : wsdlSelectedMethod
+                method : wsdlSelectedMethod,
+                resultFile:resultFile
 			})
 			.then(function(response)  { 
 				return response.data
