@@ -4075,6 +4075,36 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         }
                     });
                 }
+                else if (gsElement[i] == "othersAndroid"){
+                    $.each($("#scraplist li"), function () {
+                        if ($(this).data("tag") != "android.widget.Button" &&
+                            $(this).data("tag") != "android.widget.CheckBox" &&
+                            $(this).data("tag") != "android.widget.NumberPicker" &&
+                            $(this).data("tag") != "android.widget.TimePicker" &&
+                            $(this).data("tag") != "android.widget.DatePicker" &&
+                            $(this).data("tag") != "android.widget.RadioButton" &&
+                            $(this).data("tag") != "android.widget.EditText" &&
+                            $(this).data("tag") != "android.widget.ListView" &&
+                            $(this).data("tag") != "android.widget.Spinner" &&
+                            $(this).data("tag") != "android.widget.Switch" &&
+                            $(this).data("tag") != "android.widget.ImageButton" &&
+                            $(this).data("tag") != "android.widget.SeekBar" &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.Button") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.CheckBox") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.NumberPicker") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.TimePicker") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.DatePicker") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.RadioButton") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.EditText") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.ListView") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.Spinner") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.Switch") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.ImageButton") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.SeekBar") == -1){
+                                $(this).show();
+                            }
+                    });
+                }
                 /*** Filtering Duplicate Objects ***/
                 else if (gsElement[i] == "duplicateCustnames") {
                     var allCustnames = [];
