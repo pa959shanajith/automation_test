@@ -4089,18 +4089,18 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             $(this).data("tag") != "android.widget.Switch" &&
                             $(this).data("tag") != "android.widget.ImageButton" &&
                             $(this).data("tag") != "android.widget.SeekBar" &&
-                            $(this).data("tag").toLowerCase().indexOf("android.widget.Button") == -1 &&
-                            $(this).data("tag").toLowerCase().indexOf("android.widget.CheckBox") == -1 &&
-                            $(this).data("tag").toLowerCase().indexOf("android.widget.NumberPicker") == -1 &&
-                            $(this).data("tag").toLowerCase().indexOf("android.widget.TimePicker") == -1 &&
-                            $(this).data("tag").toLowerCase().indexOf("android.widget.DatePicker") == -1 &&
-                            $(this).data("tag").toLowerCase().indexOf("android.widget.RadioButton") == -1 &&
-                            $(this).data("tag").toLowerCase().indexOf("android.widget.EditText") == -1 &&
-                            $(this).data("tag").toLowerCase().indexOf("android.widget.ListView") == -1 &&
-                            $(this).data("tag").toLowerCase().indexOf("android.widget.Spinner") == -1 &&
-                            $(this).data("tag").toLowerCase().indexOf("android.widget.Switch") == -1 &&
-                            $(this).data("tag").toLowerCase().indexOf("android.widget.ImageButton") == -1 &&
-                            $(this).data("tag").toLowerCase().indexOf("android.widget.SeekBar") == -1){
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.button") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.checkbox") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.numberpicker") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.timepicker") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.datepicker") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.radiobutton") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.edittext") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.listview") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.spinner") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.switch") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.imagebutton") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("android.widget.seekbar") == -1){
                                 $(this).show();
                             }
                     });
