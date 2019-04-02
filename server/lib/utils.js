@@ -77,8 +77,7 @@ module.exports.resetSession = function(req) {
 	var sessAge = parseInt(process.env.SESSION_AGE);
 	var updateSessionExpiry = setInterval(function (req) {
 		req.session.maxAge = sessAge;
-		logger.warn('Resetting Session');
-		logger.debug(req.session);
+		// myserver.redisSessionStore.touch(req.sessionID, req.session)
 	}, intr, req);
 	return updateSessionExpiry;
 };
