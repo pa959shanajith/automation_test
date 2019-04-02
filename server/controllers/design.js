@@ -97,7 +97,7 @@ exports.initScraping_ICE = function (req, res) {
 					dataToIce.username = name;
 					logger.info("Sending socket request for "+dataToIce.emitAction+" to redis");
 					redisServer.redisPubICE.publish('ICE1_normal_' + name, JSON.stringify(dataToIce));
-					var updateSessionExpiry = utils.resetSession(req.session);
+					var updateSessionExpiry = utils.resetSession(req);
 					function scrape_listener(channel, message) {
 						var data = JSON.parse(message);
 						//LB: make sure to send recieved data to corresponding user
@@ -1198,7 +1198,7 @@ exports.updateScreen_ICE = function (req, res) {
 													logger.info("Sending socket request for checkIrisDuplicate_ICE to redis");
 													dataToIce = {"emitAction" : "irisOperations","username" : name, "image_data":scrapedata, "param":"checkDuplicate"};
 													redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-													var updateSessionExpiry = utils.resetSession(req.session);
+													var updateSessionExpiry = utils.resetSession(req);
 													function checkIrisDuplicate_listener(channel,message) {
 														var data = JSON.parse(message);
 														if(name == data.username){
@@ -1706,7 +1706,7 @@ exports.debugTestCase_ICE = function (req, res) {
 																logger.info("Sending socket request for debugTestCase to redis");
 																dataToIce = {"emitAction" : "debugTestCase","username" : name, "responsedata":responsedata};
 																redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-																var updateSessionExpiry = utils.resetSession(req.session);
+																var updateSessionExpiry = utils.resetSession(req);
 																function result_debugTestCase_listener(channel, message) {
 																	data = JSON.parse(message);
 																	//LB: make sure to send recieved data to corresponding user
@@ -1752,7 +1752,7 @@ exports.debugTestCase_ICE = function (req, res) {
 								logger.info("Sending socket request for debugTestCaseWS_ICE to redis");
 								dataToIce = {"emitAction" : "debugTestCase","username" : name, "responsedata":testcaseWS};
 								redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-								var updateSessionExpiry = utils.resetSession(req.session);
+								var updateSessionExpiry = utils.resetSession(req);
 									function result_debugTestCaseWS_listener(channel, message) {
 										data = JSON.parse(message);
 										//LB: make sure to send recieved data to corresponding user
@@ -1832,7 +1832,7 @@ exports.debugTestCase_ICE = function (req, res) {
 								logger.info("Sending socket request for debugTestCase to redis");
 								dataToIce = {"emitAction" : "wsdl_listOfOperation","username" : name, "wsdlurl":wsdlurl};
 								redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));	
-								var updateSessionExpiry = utils.resetSession(req.session);
+								var updateSessionExpiry = utils.resetSession(req);
 									function result_wsdl_listOfOperation_listener(channel, message) {
 										data = JSON.parse(message);
 										//LB: make sure to send recieved data to corresponding user
@@ -1904,7 +1904,7 @@ exports.debugTestCase_ICE = function (req, res) {
 								logger.info("Sending socket request for debugTestCase to redis");
 								dataToIce = {"emitAction" : "wsdl_ServiceGenerator","username" : name, "serviceGenRequest":serviceGenRequest};
 								redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-								var updateSessionExpiry = utils.resetSession(req.session);
+								var updateSessionExpiry = utils.resetSession(req);
 								function result_wsdl_ServiceGenerator_listener(channel, message) {
 									data = JSON.parse(message);
 									//LB: make sure to send recieved data to corresponding user
@@ -2166,7 +2166,7 @@ exports.updateIrisDataset = function updateIrisDataset(req, res) {
 					logger.info("Sending socket request for updateIrisDataset to redis");
 					dataToIce = {"emitAction" : "irisOperations","username" : name, "image_data":image_data, "param":"updateDataset"};
 					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-					var updateSessionExpiry = utils.resetSession(req.session);
+					var updateSessionExpiry = utils.resetSession(req);
 					function updateIrisDataset_listener(channel,message) {
 						var data = JSON.parse(message);
 						if(name == data.username){

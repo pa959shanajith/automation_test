@@ -145,7 +145,7 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 			mySocket._events.pairwise = [];
 			//mySocket.send(dataObj);
 			mySocket.emit("pairwise", abc); //Sending
-			var updateSessionExpiry = utils.resetSession(req.session);
+			var updateSessionExpiry = utils.resetSession(req);
 			//Receiving
 			mySocket.on('result_pairs', function (data) {
 				//req.session.cookie.expires = sessionExtend;

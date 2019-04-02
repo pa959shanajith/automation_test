@@ -36,7 +36,7 @@ exports.flowGraphResults = function(req, res){
 					logger.info("Sending socket request for generateFlowGraph to redis");
 					var dataToIce = {"emitAction" : "generateFlowGraph","username" : name, "version":version, "path" : path};
 					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-					var updateSessionExpiry = utils.resetSession(req.session);
+					var updateSessionExpiry = utils.resetSession(req);
 					function generateFlowGraph_listener(channel,message) {
 						data = JSON.parse(message);
 						if(name == data.username){
@@ -200,7 +200,7 @@ exports.APG_runDeadcodeIdentifier = function(req,res){
 						var dataToIce = {"emitAction" : "runDeadcodeIdentifier","username" : name,
 									"version":version,"path":path};
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = utils.resetSession(req.session);
+						var updateSessionExpiry = utils.resetSession(req);
 						function apgRunDeadcodeIdentifier_listener(channel,message) {
 							data = JSON.parse(message);
 							if(name == data.username){

@@ -33,13 +33,20 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		unblockUI();
 		openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
 	});
+	/*socket.on('disconnect', function () {
+		unblockUI();
+		openDialogExe("Execute Test Suite", "Failed to execute.");
+	});
+	socket.on('reconnect', function () {
+		unblockUI();
+		openDialogExe("Execute Test Suite", "Connect Restored. Reports may or may not be generated.");
+	});*/
 	/*var taskAuth;
 	if(window.localStorage['_CT'] == "")
 	{
 		taskAuth = false;
 	}*/
-	if(window.localStorage['navigateScreen'] != "TestSuite")
-	{
+	if(window.localStorage['navigateScreen'] != "TestSuite") {
 		$rootScope.redirectPage();
 	}
 	var current_task=JSON.parse(window.localStorage['_CT']);

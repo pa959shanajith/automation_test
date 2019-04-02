@@ -1,5 +1,5 @@
 var async = require('async');
-//var logger = require('../../logger');
+var logger = require('../../logger');
 var myserver = require('../../server');
 var redisServer = require('./redisSocketHandler');
 
@@ -72,12 +72,14 @@ module.exports.cloneSession = function (req, cb){
 	});
 };
 
-module.exports.resetSession = function(session) {
+module.exports.resetSession = function(req) {
 	var intr = parseInt(process.env.SESSION_INTERVAL);
 	var sessAge = parseInt(process.env.SESSION_AGE);
-	var updateSessionExpiry = setInterval(function () {
-		session.maxAge = sessAge;
-	}, intr);
+	var updateSessionExpiry = setInterval(function (req) {
+		req.session.maxAge = sessAge;
+		logger.warn('Resetting Session');
+		logger.debug(req.session);
+	}, intr, req);
 	return updateSessionExpiry;
 };
 

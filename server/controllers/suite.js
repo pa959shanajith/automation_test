@@ -691,7 +691,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 						resSent = true;
 						res.end('begin');
 					}
-					var updateSessionExpiry = utils.resetSession(req.session);
+					var updateSessionExpiry = utils.resetSession(req);
 					function executeTestSuite_listener(channel,message) {
 						data = JSON.parse(message);
 						if(name == data.username){
@@ -1182,7 +1182,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 											logger.info("Sending socket request for executeTestSuite to redis");
 											dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 											redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-											// var updateSessionExpiry = utils.resetSession(req.session);
+											// var updateSessionExpiry = utils.resetSession(req);
 											function executeTestSuite_listener(channel,message) {
 												data = JSON.parse(message);
 												if(name == data.username){
@@ -1448,7 +1448,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 					logger.info("Sending socket request for executeTestSuite to redis");
 					dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-					var updateSessionExpiry = utils.resetSession(req.session);
+					var updateSessionExpiry = utils.resetSession(req);
 					function executeTestSuite_listener(channel,message) {
 						data = JSON.parse(message);
 						if(name == data.username){
@@ -2635,7 +2635,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 									dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 									redisServer.redisPubICE.publish('ICE1_scheduling_' + name,JSON.stringify(dataToIce));
 									var starttime = new Date().getTime();
-									var updateSessionExpiry = utils.resetSession(req.session);
+									var updateSessionExpiry = utils.resetSession(req);
 									function executeTestSuite_listener(channel,message) {
 										data = JSON.parse(message);
 										if(name == data.username){
