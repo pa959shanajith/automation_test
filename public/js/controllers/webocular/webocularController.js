@@ -109,7 +109,6 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 			if (window.sessionStorage.activeCrawlRequest) return;
 			window.sessionStorage.activeCrawlRequest = true;
 			webocularServices.getResults($scope.url, $scope.level, $scope.selectedAgent).then(function(data){
-				socket.disconnect('', { query: "check=true" });
 				console.log("Data from service", data);
 				if (data == "unavailableLocalServer") {
 					$scope.hideBaseContent = { message: 'false' };
@@ -177,6 +176,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 			$scope.enableGenerate = true;
 			$scope.check= false;
 			$scope.$apply();
+			socket.disconnect('', { query: "check=true" });
 		});
 		//Transaction Activity for WebocularGoClick
 		// var labelArr = [];
