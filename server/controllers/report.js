@@ -116,7 +116,7 @@ exports.openScreenShot = function (req, res) {
 				logger.info("Sending socket request for render_screenshot to redis");
 				var dataToIce = {"emitAction" : "render_screenshot","username" : name, "path":path};
 				redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-				var updateSessionExpiry = utils.resetSession(req.session);
+				var updateSessionExpiry = utils.resetSession(req);
 				function render_screenshot_listener(channel,message) {
 					var data = JSON.parse(message);
 					if(name == data.username){
@@ -1108,7 +1108,7 @@ exports.connectJira_ICE = function (req, res) {
 								logger.info("Sending socket request for jira_login to redis");
 								var dataToIce = {"emitAction": "jiralogin", "username": name, "action": req.body.action, "inputs": inputs};
 								redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-								var updateSessionExpiry = utils.resetSession(req.session);
+								var updateSessionExpiry = utils.resetSession(req);
 								var count = 0;
 								function jira_login_1_listener(channel,message) {
 									var data = JSON.parse(message);
@@ -1172,7 +1172,7 @@ exports.connectJira_ICE = function (req, res) {
 								logger.info("Sending socket request for jira_login to redis");
 								dataToIce = {"emitAction": "jiralogin", "username": name, "action": req.body.action, "inputs": createObj};
 								redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-								var updateSessionExpiry = utils.resetSession(req.session);
+								var updateSessionExpiry = utils.resetSession(req);
 								var count = 0;
 								function jira_login_2_listener(channel,message) {
 									var data = JSON.parse(message);

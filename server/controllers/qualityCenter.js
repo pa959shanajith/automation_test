@@ -51,7 +51,7 @@ exports.loginQCServer_ICE = function (req, res) {
 						logger.info("Sending socket request for qclogin to redis");
 						dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = utils.resetSession(req.session);
+						var updateSessionExpiry = utils.resetSession(req);
 						function qclogin_listener(channel,message) {
 							var data = JSON.parse(message);
 							if(name == data.username){
@@ -130,7 +130,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 						logger.info("Sending socket request for qclogin to redis");
 						dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = utils.resetSession(req.session);
+						var updateSessionExpiry = utils.resetSession(req);
 						function qclogin_listener(channel,message) {
 							var data = JSON.parse(message);
 							if(name == data.username){
@@ -324,7 +324,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 					logger.info("Sending socket request for qclogin to redis");
 					dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
 					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-					var updateSessionExpiry = utils.resetSession(req.session);
+					var updateSessionExpiry = utils.resetSession(req);
 					function qclogin_listener(channel,message) {
 						var data = JSON.parse(message);
 						if(name == data.username){
@@ -430,7 +430,7 @@ exports.saveQcDetails_ICE = function (req, res) {
 							"qcaction": "qcquit"
 						};
 						mySocket.emit("qclogin", qcDetails);
-						var updateSessionExpiry = utils.resetSession(req.session);
+						var updateSessionExpiry = utils.resetSession(req);
 						mySocket.on('qcresponse', function (data) {
 							clearInterval(updateSessionExpiry);
 							res.send("success");
