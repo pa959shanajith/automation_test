@@ -417,24 +417,21 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 if (data == "Invalid Session") {
                     $rootScope.redirectPage();
                 }
+                unblockUI();
                 if (data == "unavailableLocalServer") {
-                    unblockUI();
                     openDialog("Debug Testcase", $rootScope.unavailableLocalServer_msg)
                 } else if (data == "success") {
-                    unblockUI();
                     openDialog("Debug Testcase", "Debug completed successfully.")
                 } else if (data == "fail") {
-                    unblockUI();
                     openDialog("Debug Testcase", "Failed to debug.")
                 } else if (data == "Terminate") {
-                    unblockUI();
                     openDialog("Debug Testcase", "Debug Terminated")
                 } else if (data == "browserUnavailable") {
-                    unblockUI();
                     openDialog("Debug Testcase", "Browser is not available")
                 } else if (data == "scheduleModeOn") {
-                    unblockUI();
                     openDialog("Debug Testcase", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
+                } else if (data == "ExecutionOnlyAllowed") {
+                    openDialog("Debug Testcase", "Execution Only Allowed")   
                 }
 
                 //Transaction Activity for DebugTestCase
@@ -1296,9 +1293,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     if (data == "unavailableLocalServer") {
                         openDialog("Web Service Screen", $rootScope.unavailableLocalServer_msg);
                         return false
-                    }
-                    if (data == "scheduleModeOn") {
+                    }else if (data == "scheduleModeOn") {
                         openDialog("Web Service Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
+                        return false
+                    }else if (data == "ExecutionOnlyAllowed" || data["responseHeader"] == "ExecutionOnlyAllowed"){
+                        openDialog("WSDL-Scrape Screen", "Execution Only Allowed")
                         return false
                     }
                     if (typeof data == "object") {
@@ -1344,13 +1343,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     if (data == "fail") {
                         openDialog("WSDL-Scrape Screen", "Invalid WSDL url.");
                         return false
-                    }
-                    if (data == "unavailableLocalServer") {
+                    }else if (data == "unavailableLocalServer") {
                         openDialog("WSDL-Scrape Screen", $rootScope.unavailableLocalServer_msg);
                         return false
-                    }
-                    if (data == "scheduleModeOn") {
+                    }else if (data == "scheduleModeOn") {
                         openDialog("WSDL-Scrape Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
+                        return false
+                    }else if (data == "ExecutionOnlyAllowed"){
+                        openDialog("WSDL-Scrape Screen", "Execution Only Allowed")
                         return false
                     }
                     //  console.log(data)
@@ -1778,6 +1778,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         return false
                     } else if (data == "wrongWindowName") {
                         openDialog("Scrape", "Wrong window name.")
+                    } else if (data == "ExecutionOnlyAllowed"){
+                        openDialog("Scrape Screen", "Execution Only Allowed")
+                        return false
                     }
                     //COMPARE & UPDATE SCRAPE OPERATION
                     if (data.action == "compare") {

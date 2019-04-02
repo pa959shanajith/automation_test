@@ -1768,7 +1768,7 @@ exports.debugTestCase_ICE = function (req, res) {
 												clearInterval(updateSessionExpiry);
 												var value = data.value;
 												try {
-													if (value.toUpperCase() === 'TERMINATE') {
+													if (value.toUpperCase() === 'TERMINATE' || value === 'ExecutionOnlyAllowed') {
 														try {
 															res.send(value);
 														} catch (exception) {
@@ -1848,7 +1848,7 @@ exports.debugTestCase_ICE = function (req, res) {
 												clearInterval(updateSessionExpiry);
 												var listGenResponse = data.value;
 												try {
-													if (listGenResponse.toUpperCase() === 'TERMINATE') {
+													if (listGenResponse.toUpperCase() === 'TERMINATE' || listGenResponse === "ExecutionOnlyAllowed") {
 														try {
 															res.send(listGenResponse);
 														} catch (exception) {
@@ -1919,7 +1919,7 @@ exports.debugTestCase_ICE = function (req, res) {
 										} else if (data.onAction == "result_wsdl_ServiceGenerator") {
 											clearInterval(updateSessionExpiry);
 											try {
-												if (data.value.toUpperCase() === 'TERMINATE') {
+												if (data.value.toUpperCase() === 'TERMINATE' || data.value === "ExecutionOnlyAllowed") {
 													try {
 														res.send(data.value);
 													} catch (exception) {
