@@ -12,18 +12,18 @@
 					<li><span><a class='scrapeOnTxt'>Create</a></span></li>
 					<li><a id='userTab' ng-click="tab = 'tabUser';userConf.click()" title="Manage Users" class="selectBrowser" data-name="3">
 						<span><img class='selectedIcon' src='imgs/user.png' alt='User'/></span>User</a></li>
-					<li class='userDivider'><a id='projectTab' ng-click="tab = 'tabProject'" title="Create/Update Project" class="selectBrowser" data-name="1">
+					<li><a id='tokenTab' ng-click="tab = 'tabToken';tokens.click()" title="Manage Tokens" class="selectBrowser" data-name="1">
+						<span><img src='imgs/ic-tokens.png' alt='Tokens' /></span>Tokens</a></li>
+					<li><a id='projectTab' ng-click="tab = 'tabProject'" title="Create/Update Project" class="selectBrowser" data-name="1">
 						<span><img src='imgs/project.png' alt='Project'/></span>Project</a></li>
-					<li><a id='assignProjectTab' ng-click="tab='tabAssignProject';assignProj.click()" title="Assign Project" class="selectBrowser" data-name="1">
+					<li class='userDivider'><a id='assignProjectTab' ng-click="tab='tabAssignProject';assignProj.click()" title="Assign Project" class="selectBrowser" data-name="1">
 						<span><img src='imgs/project.png' alt='Project'/></span>Assign Projects</a></li>
 					<li><a id='ldapConfigTab' title="Manage LDAP Configuration" ng-click="tab = 'tabldapConfig';ldapConf.click()" class="selectBrowser" data-name="4">
 						<span><img src='imgs/ldap-config.png' alt='LDAP Configuration'/></span>LDAP Configuration</a></li>
 					<li><a id='sessionTab' title="Session Management" ng-click="tab = 'tabSession';sessionConf.click()" class="selectBrowser" data-name="5">
 						<span><img src='imgs/session.png' alt='Session' /></span>Session Management</a></li>
 					<li style="margin-bottom: 30px"><a id='preferencesTab' title="Preferences" ng-click="tab='tabPreferences';preferences.click()" class="selectBrowser" data-name="2">
-						<span><img src='imgs/preferences.png' alt='Preferences' /></span>Preferences</a></li>
-					<li><a id='tokenTab' ng-click="tab = 'tabToken';tokens.click()" title="Manage Tokens" class="selectBrowser" data-name="1">
-						<span class="glyphicon glyphicon-tags"></span>Tokens</a></li>																										   																
+						<span><img src='imgs/preferences.png' alt='Preferences' /></span>Preferences</a></li>																										   																
 				</ul>
 			</div>
 			<div class='clear-both'></div>
