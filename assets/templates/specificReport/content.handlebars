@@ -1,18 +1,7 @@
 <html style="height: 100%;">
-
 <head>
     <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
     <title>SLK Nineteen68</title>
-    <style>
-        .no-disp {
-            display: none!important;
-        }
-
-        .unexpand,
-        .expand {
-            cursor: pointer;
-        }
-    </style>
     <link rel="stylesheet" type="text/css" href="fonts/latofonts.css" />
     <link rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.css" />
     <script type="text/javascript" src="js/plugins/jquery.min.js"></script>
@@ -33,8 +22,8 @@
             return function () {
                 loadReports();
                 try {
-                      window.stop();
-                   } 
+                    window.stop();
+                }
                 catch (exception) {
                     document.execCommand('Stop');
                 }
@@ -88,20 +77,8 @@
                 if (name.indexOf("Testscriptname") >= 0 || name.indexOf("TestCase Name") >= 0) {
                     // getRows[i].children[9].children[0].remove();
                 }
-                for (j = i; j < getRows.length; j++) {
-                    if (parseInt(getRows[j].getAttribute('data-parentid')).length == NaN) getParentId = parseInt(getRows[j].getAttribute('data-parentid').split(",")[1]);
-                    else getParentId = parseInt(getRows[j].getAttribute('data-parentid'));
-                    if (getParentId == getRowId && name.indexOf('TestCase Name') === -1) rowCount++;
-                }
-                if (rowCount > 0) {
-                    if (getRows[i].children[1].innerText.indexOf("Step") >= 0) {
-                        getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -58px;"></i>';
-                    } else if (getRows[i].children[1].innerText.trim() == "") {
-                        //#499 //getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -54px;"></i>';
-                    } else {
-                        getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -97px;"></i>';
-                    }
-                    rowCount = 0;
+                if (getRows[i].children[1].innerHTML.indexOf('Start iteration') >= 0) {
+                    getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -100px;"></i>';
                 }
             }
             if ($('.rDstatus:contains("Fail")').length > 0) {
@@ -468,6 +445,14 @@
         }
     </script>
     <style>
+        .no-disp {
+            display: none!important;
+        }
+
+        .unexpand,
+        .expand {
+            cursor: pointer;
+        }
         body {
             font-family: LatoWeb;
             height: 98%;
@@ -1502,8 +1487,7 @@
                             <button class="logintojira" title="Login to Jira">Jira Login</button>
                             <button class="disconnectJira" title="Disconnect from Jira">Disconnect</button>
                             <label class="Llogdefect">Log Defect</label>
-                            <input type="text" id="inputSlno" placeholder="Enter SL No." maxlength="5"
-                            />
+                            <input type="text" id="inputSlno" placeholder="Enter SL No." maxlength="5" />
                             <button class="go_defectlog opendescpopup">Go</button>
                         </td>
                     </tr>
@@ -1541,70 +1525,46 @@
                             <td class="rDremarks tabCont toggleRemarks" style="padding-left: 10px;">{{Remark}}</td>
                             {{#ifEquals testcase_details.testcaseDetails undefined}}
                             <td class="rDExpectedRes tabCont {{getClass StepDescription}}">{{StepDescription}}</td>
-                            {{/ifEquals}}
-                            {{#ifEquals testcase_details.testcaseDetails ""}}
+                            {{/ifEquals}} {{#ifEquals testcase_details.testcaseDetails ""}}
                             <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
-                            {{/ifEquals}}
-                            {{#ifnotEquals testcase_details.testcaseDetails ""}}
-                                {{#ifnotEquals testcase_details undefined}}
-                                <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}
-                                    <br/>Expected Result is: {{testcase_details.testcaseDetails}}</td>
-                                {{/ifnotEquals}}
-                            {{/ifnotEquals}}
-                            {{#ifEquals status undefined}}
+                            {{/ifEquals}} {{#ifnotEquals testcase_details.testcaseDetails ""}} {{#ifnotEquals testcase_details undefined}}
+                            <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}
+                                <br/>Expected Result is: {{testcase_details.testcaseDetails}}</td>
+                            {{/ifnotEquals}} {{/ifnotEquals}} {{#ifEquals status undefined}}
                             <td class="rDActualRes tabCont"></td>
-                            {{/ifEquals}}
-                            {{#ifEquals status ""}}
+                            {{/ifEquals}} {{#ifEquals status ""}}
                             <td class="rDActualRes tabCont"></td>
-                            {{/ifEquals}}
-                            {{#ifEquals status "Pass"}}
-                                {{#ifEquals testcase_details.actualResult_pass ""}}
-                                    <td class="rDActualRes tabCont" style="padding-left: 10px;">
-                                        {{#ifEquals screenshot_path undefined}}
-                                            <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};" >{{status}}</text>
-                                        {{/ifEquals}}
-                                        {{#ifnotEquals screenshot_path undefined}}
-                                            <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}"
-                                                >{{status}}</text>
-                                        {{/ifnotEquals}}
-                                    </td>
-                                {{/ifEquals}}
-                                {{#ifnotEquals testcase_details.actualResult_pass ""}}
-                                    <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}},
-                                        {{#ifEquals screenshot_path undefined}}
-                                            <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};" >{{status}}</text>
-                                        {{/ifEquals}}
-                                        {{#ifnotEquals screenshot_path undefined}}
-                                            <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}"
-                                                >{{status}}</text>
-                                        {{/ifnotEquals}}
-                                    </td>
+                            {{/ifEquals}} {{#ifEquals status "Pass"}} {{#ifEquals testcase_details.actualResult_pass ""}}
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;">
+                                {{#ifEquals screenshot_path undefined}}
+                                <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};">{{status}}</text>
+                                {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
+                                <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text>
                                 {{/ifnotEquals}}
-                            {{/ifEquals}}
-                            {{#ifEquals status "Fail"}}
-                                {{#ifEquals testcase_details.actualResult_fail ""}}
-                                    <td class="rDActualRes tabCont" style="padding-left: 10px;">
-                                        {{#ifEquals screenshot_path undefined}}
-                                            <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};" >{{status}}</text>
-                                        {{/ifEquals}}
-                                        {{#ifnotEquals screenshot_path undefined}}
-                                            <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}"
-                                                >{{status}}</text>
-                                        {{/ifnotEquals}}
-                                    </td>
-                                {{/ifEquals}}
-                                {{#ifnotEquals testcase_details.actualResult_fail ""}}
-                                    <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}},
-                                        {{#ifEquals screenshot_path undefined}}
-                                            <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};" >{{status}}</text>
-                                        {{/ifEquals}}
-                                        {{#ifnotEquals screenshot_path undefined}}
-                                            <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}"
-                                                >{{status}}</text>
-                                        {{/ifnotEquals}}
-                                    </td>
+                            </td>
+                            {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_pass ""}}
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}}, {{#ifEquals screenshot_path undefined}}
+                                <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};">{{status}}</text>
+                                {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
+                                <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text>
                                 {{/ifnotEquals}}
-                            {{/ifEquals}}
+                            </td>
+                            {{/ifnotEquals}} {{/ifEquals}} {{#ifEquals status "Fail"}} {{#ifEquals testcase_details.actualResult_fail ""}}
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;">
+                                {{#ifEquals screenshot_path undefined}}
+                                <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};">{{status}}</text>
+                                {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
+                                <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text>
+                                {{/ifnotEquals}}
+                            </td>
+                            {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_fail ""}}
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}, {{#ifEquals screenshot_path undefined}}
+                                <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};">{{status}}</text>
+                                {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
+                                <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text>
+                                {{/ifnotEquals}}
+                            </td>
+                            {{/ifnotEquals}} {{/ifEquals}}
                             <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}}; display:none" data-screenshot="{{screenshot_path}}">{{status}}</td>
                             <td class="rjira tabCont">
                                 <span class="opendescpopup" title="Create Issue">{{jira_defect_id}}</span>
@@ -1663,8 +1623,7 @@
                 <label>Summary
                     <span class="mandatory">*</span>
                 </label>
-                <input type="text" class="jirapopupinput" id="jSummary" maxlength="255" title="Maximum 255 characters accepted."
-                />
+                <input type="text" class="jirapopupinput" id="jSummary" maxlength="255" title="Maximum 255 characters accepted." />
             </p>
             <p>
                 <label>Description</label>
