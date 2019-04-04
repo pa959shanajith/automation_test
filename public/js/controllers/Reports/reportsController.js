@@ -1,8 +1,8 @@
-var oTable;
 mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$location', '$timeout', '$window', 'reportService', 'mindmapServices', 'cfpLoadingBar', '$sce', function($scope, $rootScope, $http, $location, $timeout, $window, reportService, mindmapServices, cfpLoadingBar, $sce) {
     $("head").append('<link rel="stylesheet" href="css/css_reports/bootstrap/bootstrap.min.css"> <link rel="stylesheet" type="text/css" href="css/css_reports/datatables/dataTables.css"><link rel="stylesheet" type="text/css" href="css/css_reports/header.css"><link rel="stylesheet" type="text/css" href="css/css_reports/footer.css"><link rel="stylesheet" type="text/css" href="css/css_reports/leftSideBar.css"><link rel="stylesheet" type="text/css" href="css/css_reports/rightSideBar.css"><link rel="stylesheet" type="text/css" href="css/css_reports/reports.css"><script src="js/plugins/reports/bootstrap/popper.js"></script><script src="js/plugins/reports/bootstrap/bootstrap.min.js"></script><script src="js/plugins/reports/datatables/datatables.min.js"></script>');
     var getUserInfo = JSON.parse(window.localStorage['_UI']);
     var userID = getUserInfo.user_id;
+    var oTable;
     var openArrow = 0;
     var openWindow = 0;
     var executionId, testsuiteId;
@@ -233,7 +233,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         $('#ct-expand-left,#ct-expand-right').css('pointerEvents', 'none');
     }, 100)
     if (window.localStorage['navigateScreen'] != "p_Reports") {
-        $rootScope.redirectPage();
+        return $rootScope.redirectPage();
     }
 
 
@@ -260,7 +260,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         mindmapServices.populateReleases(projectId).then(function(result) {
             unblockUI();
             if (result == "Invalid Session") {
-                $rootScope.redirectPage();
+                return $rootScope.redirectPage();
             }
             $('.release-list').empty();
             $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
@@ -284,7 +284,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             mindmapServices.populateCycles(releaseId).then(function(result_cycles) {
                 unblockUI();
                 if (result_cycles == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 }
                 $('.cycle-list').empty();
                 $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
@@ -349,7 +349,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         reportService.getAllSuites_ICE(ID, type)
             .then(function(data) {
                 if (data == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 }
                 if (type == "projects") {
                     if (data != "fail" && data.projectids.length != 0) {
@@ -458,7 +458,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         reportService.getSuiteDetailsInExecution_ICE(testsuiteId)
             .then(function(data) {
                     if (data == "Invalid Session") {
-                        $rootScope.redirectPage();
+                        return $rootScope.redirectPage();
                     }
                     if (data != "fail") {
                         var tableContainer = $('#testSuitesTimeTable');
@@ -763,7 +763,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             .then(function(data) {
                     console.log("data", data);
                     if (data == "Invalid Session") {
-                        $rootScope.redirectPage();
+                        return $rootScope.redirectPage();
                     }
                     var remarksLength = [];
                     var commentsLength = [];
@@ -868,7 +868,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             reportService.renderReport_ICE(finalReports, reportType).then(
                                 function(data1) {
                                     unblockUI();
-                                    if (data1 == "Invalid Session") $rootScope.redirectPage();
+                                    if (data1 == "Invalid Session") return $rootScope.redirectPage();
                                     else if (data1 == "fail") console.log("Failed to render reports.");
                                     else {
                                         openWindow = 0;
@@ -913,7 +913,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                     reportService.renderReport_ICE(finalReports, reportType).then(
                                         function(data1) {
                                             unblockUI();
-                                            if (data1 == "Invalid Session") $rootScope.redirectPage();
+                                            if (data1 == "Invalid Session") return $rootScope.redirectPage();
                                             else if (data1 == "fail") console.log("Failed to render reports.");
                                             else {
                                                 openWindow = 0;

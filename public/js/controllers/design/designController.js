@@ -74,8 +74,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         window.localStorage['navigateScrape'] = false;
     }
     if (taskAuth == false) {
-        $rootScope.redirectPage();
-        return;
+        return $rootScope.redirectPage();
     }
     //Default Function to reset all input, select
     $scope.resetTextFields = function () {
@@ -278,8 +277,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
             .then(function (data) {
                 if (data == "Invalid Session") {
-                    $rootScope.redirectPage();
-                    return;
+                    return $rootScope.redirectPage();
                 }
                 //console.log(data);
                 var appType = taskInfo.appType;
@@ -295,7 +293,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 DesignServices.getScrapeDataScreenLevel_ICE(screenId)
                     .then(function (data2) {
                         if (data2 == "Invalid Session") {
-                            $rootScope.redirectPage();
+                            return $rootScope.redirectPage();
                         }
                         if (appType == "Webservice") {
                             if (data2 != "") dataFormat12 = data2.header[0].split("##").join("\n");
@@ -319,7 +317,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         DesignServices.getKeywordDetails_ICE(appType)
                             .then(function (data3) {
                                 if (data3 == "Invalid Session") {
-                                    $rootScope.redirectPage();
+                                    return $rootScope.redirectPage();
                                 }
                                 keywordValArr.length = 0;
                                 keywordListData = angular.toJson(data3);
@@ -415,7 +413,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         DesignServices.debugTestCase_ICE(browserType, testcaseID, appType)
             .then(function (data) {
                 if (data == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 }
                 unblockUI();
                 if (data == "unavailableLocalServer") {
@@ -518,7 +516,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
                                     .then(function (data) {
                                         if (data == "Invalid Session") {
-                                            $rootScope.redirectPage();
+                                            return $rootScope.redirectPage();
                                         }
                                         if (data == "success") {
                                             angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
@@ -591,7 +589,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 .then(function (data) {
                                     // console.log("hello");
                                     if (data == "Invalid Session") {
-                                        $rootScope.redirectPage();
+                                        return $rootScope.redirectPage();
                                     }
                                     if (data == "success") {
                                         angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
@@ -654,7 +652,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
                                 .then(function (data) {
                                     if (data == "Invalid Session") {
-                                        $rootScope.redirectPage();
+                                        return $rootScope.redirectPage();
                                     }
                                     if (data == "success") {
                                         angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
@@ -691,7 +689,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
             .then(function (response) {
                 if (response == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 }
                 var temp, responseData;
                 if (typeof response === 'object') {
@@ -821,7 +819,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             .then(function (data) {
                
                 if (data == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 }
                 var objectsLength = $("ellipsis:visible").length;
             
@@ -1047,7 +1045,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         DesignServices.getScrapeDataScreenLevel_ICE()
             .then(function (data) {
                 if (data == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 }
                 if (typeof data === "object") {
                     //Printing the Save data in UI
@@ -1160,7 +1158,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             DesignServices.updateScreen_ICE(scrapeObject)
                 .then(function (data) {
                     if (data == "Invalid Session") {
-                        $rootScope.redirectPage();
+                        return $rootScope.redirectPage();
                     }
                     if (data == "success") {
                         openDialog("Save WebService Template", "WebService Template saved successfully.");
@@ -1287,7 +1285,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             DesignServices.initScrapeWS_ICE(initWSJson)
                 .then(function (data) {
                     if (data == "Invalid Session") {
-                        $rootScope.redirectPage();
+                        return $rootScope.redirectPage();
                     }
                     unblockUI();
                     if (data == "unavailableLocalServer") {
@@ -1337,7 +1335,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             DesignServices.launchWSDLGo(wsdlUrl)
                 .then(function (data) {
                     if (data == "Invalid Session") {
-                        $rootScope.redirectPage();
+                        return $rootScope.redirectPage();
                     }
                     unblockUI();
                     if (data == "fail") {
@@ -1386,7 +1384,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             DesignServices.wsdlAdd(wsdlUrl, wsdlSelectedMethod,resutFile)
                 .then(function (data) {
                     if (data == "Invalid Session") {
-                        $rootScope.redirectPage();
+                        return $rootScope.redirectPage();
                     }
                     unblockUI();
                     if (data == "unavailableLocalServer") {
@@ -1742,7 +1740,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     unblockUI();
                     //window.localStorage['disableEditing'] = "true";
                     if (data == "Invalid Session") {
-                        $rootScope.redirectPage();
+                        return $rootScope.redirectPage();
                     } else if (data == "Response Body exceeds max. Limit.") {
                         openDialog("Scrape Screen", "Scraped data exceeds max. Limit.");
                         return false
@@ -2270,7 +2268,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             .then(function (data) {
                 //console.log("out", data);
                 if (data == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 }
                 if (data == 'success') {
                     //openDialog("Compared Objects", "Scraped data updated successfully.");
@@ -2822,7 +2820,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			DesignServices.highlightScrapElement_ICE(xpath, url, appType)
 				.then(function (data) {
 					if (data == "Invalid Session") {
-						$rootScope.redirectPage();
+						return $rootScope.redirectPage();
 					}
 					if (data == "fail") {
 						openDialog("Fail", "Failed to highlight")
@@ -2924,7 +2922,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			DesignServices.highlightScrapElement_ICE(xpath, url, appType)
 				.then(function (data) {
 					if (data == "Invalid Session") {
-						$rootScope.redirectPage();
+						return $rootScope.redirectPage();
 					}
 					if (data == "fail") {
 						openDialog("Fail", "Failed to highlight")
@@ -3426,7 +3424,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 DesignServices.mapScrapeData_ICE(scrapeObject)
                     .then(function (data) {
                         if (data == "Invalid Session") {
-                            $rootScope.redirectPage();
+                            return $rootScope.redirectPage();
                         }
                         $("#dialog-mapObject").modal("hide");
                         if (data == "success") {
@@ -3695,7 +3693,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             .then(function (data) {
                 unblockUI();
                 if (data == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 }
 				if(typeof(data)=="object" || data=="success"){
 					eaCheckbox = false;
@@ -3931,7 +3929,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, mydata, userInfo, versionnumber)
                             .then(function (data) {
                                 if (data == "Invalid Session") {
-                                    $rootScope.redirectPage();
+                                    return $rootScope.redirectPage();
                                 }
                                 if (data == "success") {
                                     /*if(window.localStorage['UITSCrtd'] == "true") window.localStorage['UITSCrtd'] = "false"
@@ -4260,7 +4258,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             DesignServices.getTestcasesByScenarioId_ICE(testScenarioId)
                 .then(function (data) {
                     if (data == "Invalid Session") {
-                        $rootScope.redirectPage();
+                        return $rootScope.redirectPage();
                     }
                     $("#dependentTestCasesContent").empty();
                     //data = data.sort();
@@ -4273,7 +4271,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         DesignServices.readTestCase_ICE(undefined, testCaseId, testCaseName, 0)
                             .then(function (response) {
                                 if (response == "Invalid Session") {
-                                    $rootScope.redirectPage();
+                                    return $rootScope.redirectPage();
                                 }
                                 var source = $("#handlebar-template-testcase").html();
                                 var template = Handlebars.compile(source);
@@ -4369,7 +4367,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
                 .then(function (response) {
                     if (response == "Invalid Session") {
-                        $rootScope.redirectPage();
+                        return $rootScope.redirectPage();
                     }
                     var testcaseSteps = JSON.parse(response.testcase);
                     if (typeof (testcaseSteps[modalId - 1].addTestCaseDetailsInfo) == "object") {

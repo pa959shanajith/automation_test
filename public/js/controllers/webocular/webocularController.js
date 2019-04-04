@@ -2,10 +2,10 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 	$timeout(function() {
 		$('.scrollbar-inner').scrollbar();
 		$('.scrollbar-macosx').scrollbar();
-		document.getElementById("currentYear").innerHTML = new Date().getFullYear()
-		cfpLoadingBar.complete()
+		document.getElementById("currentYear").innerHTML = new Date().getFullYear();
+		cfpLoadingBar.complete();
 		$("#utilityEncrytpion").trigger("click");
-	}, 500)
+	}, 500);
 	$timeout(function () {
 	// Without JQuery
 		var slider = new Slider('#level-slider', {
@@ -19,7 +19,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 	}
 	localStorage.setItem("navigateEnable", true);
 	//Task Listing
-	loadUserTasks()
+	loadUserTasks();
 	window.onbeforeunload = function() {
 		return "Data will be lost if you leave the page, are you sure?";
 	};
@@ -61,7 +61,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		if(!$scope.reportGenerated){
 			$scope.check = true;
 		}
-	}
+	};
 
 	$scope.executeGo = function($event){
 		localStorage.setItem("navigateEnable", false);
@@ -116,7 +116,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 					$('#progress-canvas').hide();
 					openDialog("Webocular Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
 				} else if(data == "Invalid Session") {
-					$rootScope.redirectPage();
+					return $rootScope.redirectPage();
 				} else if( data == "localServerInterrupted") {
 					$scope.hideBaseContent = { message: 'false' };
 					// Display the progress canvas after clearing all dots.
@@ -133,7 +133,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 				$('#progress-canvas').hide();
 				openDialog("Webocular Screen", "Error while crawling.");
 				console.log("Error :", err);
-				socket.disconnect('', { query: "check=true" })
+				socket.disconnect('', { query: "check=true" });
 			});
 		});
 
@@ -183,7 +183,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		// var infoArr = [];
 		// labelArr.push(txnHistory.codesDict['WebocularGoClick']);
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
-	}
+	};
 
 	$scope.addDomainDot = function(){
 		var parentElem = document.createElement("div");
@@ -194,13 +194,13 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		var text = document.createElement("p");
 		var t = document.createTextNode($scope.domain);
 		text.appendChild(t);
-		text.setAttribute("class", "dotText")
+		text.setAttribute("class", "dotText");
 		parentElem.appendChild(elem);
 		parentElem.appendChild(text);
-		document.getElementById("progress-canvas").appendChild(parentElem);;
+		document.getElementById("progress-canvas").appendChild(parentElem);
 		var w = document.getElementById('domain').offsetWidth;
 		parentElem.setAttribute("style", "visibility: hidden; position:absolute; text-align:center; top:80%; bottom: -20px");
-	}
+	};
 
 	var dotsPosition = [
 		{x : "25%", y : "25%"},
@@ -243,7 +243,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		{x : "42%", y : "27%"},
 		{x : "82%", y : "77%"},
 		{x : "22%", y : "6%"}
-	]
+	];
 
 	var removeIndex = 2; // 0 and 1 index is for slider and domain dot. We don't have to remove that
 	var maxDots =	dotsPosition.length-1;
@@ -261,13 +261,13 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		var y = dotsPosition[currentDot].y;
 		currentDot++;
 		$scope.createDot(x, y, obj);
-	}
+	};
 
 	$scope.removeDot = function(){
 		var child = document.getElementById("progress-canvas").children[removeIndex];
 		var parent = child.parentNode;
 		parent.removeChild(child);
-	}
+	};
 
 	$scope.createDot = function (x, y, obj){
 		var parentElem = document.createElement("div");
@@ -282,7 +282,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 
 		parentElem.setAttribute("style", "left:"+x+"; top:"+y+"; position:absolute;");
 		var text = document.createElement("p");
-		text.setAttribute("class", "dotText")
+		text.setAttribute("class", "dotText");
 		var t = document.createTextNode(obj.name);
 		if (obj.status != '200') {
 			elem.style.background = "red";
@@ -305,7 +305,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 			e.target.nextSibling.style.visibility = "hidden";
 		}
 		return elem;
-	}
+	};
 	/*
 	* Create an object which will contains all the elements level-wise(level = key of the object)
 	*/
@@ -324,16 +324,16 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 					"parent" : arr[i].name,
 					"level" : arr[i].level,
 					"status" : arr[i].status
-				}
+				};
 
 				if (!modified[arr[i].level]) {
-					modified[arr[i].level] = []
+					modified[arr[i].level] = [];
 				}
-				modified[arr[i].level].push(json)
+				modified[arr[i].level].push(json);
 			}
 
 			if (!modified[arr[i].level]) {
-				modified[arr[i].level] = []
+				modified[arr[i].level] = [];
 			}
 			modified[arr[i].level].push(arr[i]);
 		}
@@ -351,7 +351,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 
 			for(var k = 0; k < levelObjects.length; k++){
 				if (i>=1) {
-					obj[i][k].collapse = 1
+					obj[i][k].collapse = 1;
 				}
 
 				var thisNode = levelObjects[k];
@@ -423,7 +423,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 	$scope.generateGraph = function($event){
 		$("#result-canvas").show();
 		$scope.showInfo = true;
-		$scope.hideBaseContent = { message: 'true' };;
+		$scope.hideBaseContent = { message: 'true' };
 		if ($scope.check) {
 			return;
 		}
@@ -443,10 +443,8 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 			zoomReset = false;
 			trans=d3.event.translate;
 			scale=d3.event.scale;
-			svg.attr("transform",
-			"translate(" + trans + ")"
-			+ " scale(" + scale + ")");
-		}
+			svg.attr("transform", "translate(" + trans + ")" + " scale(" + scale + ")");
+		};
 
 		var zoom = d3.behavior.zoom().scale(scale1).translate(trans1).scaleExtent([0.2, 7.5]).on("zoom", rescale);
 		var zoomReset = false;
@@ -454,13 +452,11 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		.attr("width", "100%")
 		.attr("height", "100%")
 		.attr("pointer-events", "all").call(zoom).on("dblclick.zoom", null);
-
-		console.log("Number of Crawled Links ", $scope.crawledLinks.length)
-
+		console.log("Number of Crawled Links ", $scope.crawledLinks.length);
 		var root = parseRelations(createLevelObject($scope.crawledLinks));
 		console.log(root);
 
-		var init = []
+		var init = [];
 		root = addParents(root, init);
 		for (var i = 0; i < root.length; i++) {
 			if(root[i].type != "redirected"){
@@ -473,24 +469,21 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 			parent : root.parent,
 			level : 0,
 			status : root.status
-		}
+		};
 
-		var width = window.innerWidth,
-		height = window.innerHeight,
-		nodes,
-		links
+		var width = window.innerWidth, height = window.innerHeight, nodes, links;
 		nodeFocus = false;
 		var count11= 0;
 		var activeD = [];
 		var force = d3.layout.force()
-		.linkDistance(function(d){	return 180})
+		.linkDistance(function(d){	return 180; })
 		.linkStrength(function(d){ if(d.reverse)return 0;	return 2; })
 		.charge(-1200)
 		.friction(0.9)
 		.size([width, height])
 		.on("tick", tick);
 
-		var svg = d3.select("#base-svg").append("g").attr("id", "parent-g").attr("transform", "translate(-130,-30)")
+		var svg = d3.select("#base-svg").append("g").attr("id", "parent-g").attr("transform", "translate(-130,-30)");
 
 		var canvSize=getElementDimm(d3.select("#base-svg"));
 		var x = canvSize[1] - 40 ;
@@ -514,7 +507,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 				.style('stroke-width', e.strokeWidth ? e.strokeWidth : 0)
 				.attr('cx', offset)
 				.attr('cy',0)
-				.attr('r',6)
+				.attr('r',6);
 				t.append('text')
 				.attr('class','ct-nodeLabel')
 				.attr('x', offset + 15)
@@ -544,7 +537,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 				.attr('width', '12px')
 				.attr('height', '12px')
 				.attr('rx',3)
-				.attr('ry', 3)
+				.attr('ry', 3);
 				t.append('text')
 				.attr('class','ct-nodeLabel')
 				.attr('x',offset+25)
@@ -586,7 +579,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 				d = links[i];
 				var isFound = true;
 				if(d.target.type == "duplicate"|| d.target.type == "reverse"){
-					var j = 0
+					var j = 0;
 					for(j = 0; j< links.length; j++){
 						if(links[j].source.name == d.target.name){
 							isFound =false;
@@ -595,24 +588,24 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 								d.target.type = "reverse";
 								json = addJson( d.source, links[j].source, "reverse_T");
 								links.splice(i--, 1);
-								links.push(json)
+								links.push(json);
 								break;
 							}else{
 								json = addJson(d.source, links[j].source, "duplicate");
 								links.splice(i--, 1);
-								links.push(json)
+								links.push(json);
 								break;
 							}
 						}else if(links[j].target.name == d.target.name && (links[j].target.type == "page" || links[j].target.type == "subdomain") && (links[j].target.isTerminal || links[j].target.nodeOpen == false)){
 							isFound =false;
-							json = addJson(d.source, links[j].target, "duplicate")
+							json = addJson(d.source, links[j].target, "duplicate");
 							links.splice(i--, 1);
 							links.push(json);
 							break;
 						}
 					}
 					if (isFound) {
-						d.target.type = "page"
+						d.target.type = "page";
 					}
 				}
 			}
@@ -622,29 +615,29 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		function addStylesToNode(d) {
 			// for root node
 			if(d.parent == "None/")
-				return "imgs/wc-p-sq.png"
+				return "imgs/wc-p-sq.png";
 			if(d.redirected != undefined && d.redirected != "no")
-				return "imgs/circle-outline-256.png"
+				return "imgs/circle-outline-256.png";
 			if (d.status!=200) {
 				if(d.type == "subdomain" || d.type == "redirectedSubdomain"){
-					return "imgs/wc-red-sq.png"
+					return "imgs/wc-red-sq.png";
 				}else if(d.type == "reverse"){
-					return "imgs/ic-cycle.png"
+					return "imgs/ic-cycle.png";
 				}
-				return "imgs/circle-128.png"
+				return "imgs/circle-128.png";
 			}
 
 			if(d.isTerminal == true){
 				if (d.status != 200) {
 					if(d.type == "subdomain" || d.type == "redirectedSubdomain"){
-						return "imgs/wc-red-sq.png"
+						return "imgs/wc-red-sq.png";
 					}else if(d.type == "reverse"){
-						return "imgs/ic-cycle.png"
+						return "imgs/ic-cycle.png";
 					}
-					return "imgs/circle-128.png"
+					return "imgs/circle-128.png";
 				}else{
 					if(d.type == "subdomain" || d.type == "redirectedSubdomain"){
-						return "imgs/wc-sq.png"
+						return "imgs/wc-sq.png";
 					}
 					return "imgs/wc-cr.png"; // terminal node
 				}
@@ -654,9 +647,9 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 				return "imgs/wc-p-cr.png"; // collapsed node
 			}else if (!d.children && !d._children) {
 				if( d.type == "redirectedSubdomain"){
-					return "imgs/wc-sq.png"
+					return "imgs/wc-sq.png";
 				}
-				return "imgs/wc-cr.png"
+				return "imgs/wc-cr.png";
 			}else{
 				if(d.containsDeadLink)
 					return "imgs/wc-m-ContainsDeadlink.png";
@@ -678,7 +671,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 			link.exit().remove();
 
 			link.enter().insert("line", ".node")
-			.attr("class", function(d){	return "link "+ d.reverse})
+			.attr("class", function(d){	return "link "+ d.reverse; });
 			//.attr("class", "link");
 
 			// Update nodes.
@@ -704,7 +697,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 			.text(function(d){return	d.name;});
 
 			node.select("image")
-			.attr("xlink:href", addStylesToNode)
+			.attr("xlink:href", addStylesToNode);
 
 		if(count11 == 0){
 				count11++;
@@ -720,9 +713,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		document.getElementById("result-canvas").addEventListener("dblclick", function(){
 			zoomReset = true;
 			svgMain.call(d3.behavior.zoom().scale(1).translate([positionNode.x,positionNode.y]).scaleExtent([0.5, 7.5]).on("zoom", rescale)).on("dblclick.zoom", null);
-			svg.attr("transform",
-			"translate(" + [positionNode.x,positionNode.y] + ")"
-			+ " scale(" + 1 + ")");
+			svg.attr("transform", "translate(" + [positionNode.x,positionNode.y] + ")" + " scale(" + 1 + ")");
 		});
 
 		function highlightNeighbors(d,i) {
@@ -732,22 +723,22 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 				d3.select(this).select("image")
 				.style("opacity", isNeighbor > -1 ? 1 : .25)
 				.style("stroke-width", isNeighbor > -1 ? 3 : 1)
-				.style("stroke", isNeighbor > -1 ? "blue" : "white")
-			})
+				.style("stroke", isNeighbor > -1 ? "blue" : "white");
+			});
 
 			d3.selectAll("line.link")
-			.style("stroke-width", function (d) {return nodeNeighbors.links.indexOf(d) > -1 ? 2 : 1})
-			.style("opacity", function (d) {return nodeNeighbors.links.indexOf(d) > -1 ? 1 : .25})
+			.style("stroke-width", function (d) {return nodeNeighbors.links.indexOf(d) > -1 ? 2 : 1;})
+			.style("opacity", function (d) {return nodeNeighbors.links.indexOf(d) > -1 ? 1 : .25;});
 		}
 
 		function findNeighbors(d,i) {
 			neighborArray = [d];
 			var linkArray = [];
-			var linksArray = d3.selectAll("line.link").filter(function(p) {return p.source == d || p.target == d}).each(function(p) {
+			var linksArray = d3.selectAll("line.link").filter(function(p) {return p.source == d || p.target == d;}).each(function(p) {
 				neighborArray.indexOf(p.source) == -1 ? neighborArray.push(p.source) : null;
 				neighborArray.indexOf(p.target) == -1 ? neighborArray.push(p.target) : null;
 				linkArray.push(p);
-			})
+			});
 			return {nodes: neighborArray, links: linkArray};
 		}
 
@@ -799,7 +790,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 	
 		function getElementDimm(s) {
 			return [parseFloat(s.style("width")), parseFloat(s.style("height"))];
-	};
+		}
 
 		function tick() {
 			link.transition().ease('linear').duration(150)
@@ -842,7 +833,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 				parent : d.parent,
 				level : d.level,
 				status : d.status
-			}
+			};
 	
 			$scope.$apply();
 			// if (d3.event.defaultPrevented) return; // ignore drag
@@ -889,11 +880,11 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		// var infoArr = [];
 		// labelArr.push(txnHistory.codesDict['generateGraphClick']);
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
-	}
+	};
 
 	/* function to show a table report*/
 	$scope.showReport = function($event){
-		$scope.hideBaseContent = { message: 'true' };;
+		$scope.hideBaseContent = { message: 'true' };
 		var myNode = document.getElementById("report-canvas");
 		while (myNode.firstChild) {
 				myNode.removeChild(myNode.firstChild);
@@ -919,9 +910,9 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		var headrow = document.createElement('tr');
 		var headData = {0: 'S.No.', 1 : 'Level', 2 : 'URL', 3: 'Parent URL', 4 : 'Redirected', 5:	'Status', 6 : 'Title'};
 		for (var i=0; i<7; i++){
-			 var th = document.createElement('th');
-			 th.appendChild(document.createTextNode(headData[i]));
-			 headrow.appendChild(th)
+			var th = document.createElement('th');
+			th.appendChild(document.createTextNode(headData[i]));
+			headrow.appendChild(th);
 		}
 		
 		headrow.childNodes[0].setAttribute('style','width : 55px');
@@ -942,7 +933,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 				//7 is the number of attributes from Level to title
 				for(j=0 ; j<6; j++){
 					var data = document.createElement('td');
-					text = $scope.crawledLinks[i][jsonStruct[j]]
+					text = $scope.crawledLinks[i][jsonStruct[j]];
 					
 					if(text == undefined)
 						text = "-";
@@ -960,5 +951,5 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		// var infoArr = [];
 		// labelArr.push(txnHistory.codesDict['showReportClick']);
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
-	}
+	};
 }]);

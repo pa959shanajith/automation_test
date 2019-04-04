@@ -19,7 +19,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 		taskAuth = false;
 	}*/
 	if(window.localStorage['navigateScreen'] != "scheduling"){
-		$rootScope.redirectPage();
+		return $rootScope.redirectPage();
 	}
 	
 	if(window.localStorage['_CT']){
@@ -62,7 +62,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 		ScheduleService.readTestSuite_ICE(readTestSuite, "schedule")
 		.then(function(result) {
 			if(result == "Invalid Session"){
-				$rootScope.redirectPage();
+				return $rootScope.redirectPage();
 			}else if(result.testSuiteDetails){
 				var data = result.testSuiteDetails;
 				//Populating Data in Scheduling Table

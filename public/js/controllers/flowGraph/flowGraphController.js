@@ -184,7 +184,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				return false;
 			}else if(data == "Invalid Session"){
 				document.getElementById('path').value = '';
-				$rootScope.redirectPage();
+				return $rootScope.redirectPage();
 			}
 		}, function(err){
 			console.log("Error :", err);
@@ -1348,7 +1348,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 					return false;
 				}else if(data == "Invalid Session"){
 					document.getElementById('path').value = '';
-					$rootScope.redirectPage();
+					return $rootScope.redirectPage();
 				}
 				else if(data.status == "fail"){
 					openDialog("Open File", data.message);
@@ -1425,7 +1425,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				return false;
 			}else if(data == "Invalid Session"){
 				document.getElementById('path').value = '';
-				$rootScope.redirectPage();
+				return $rootScope.redirectPage();
 			}
 		}, function(err){
 			console.log("Error :", err);
@@ -1585,7 +1585,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				return false;
 			}else if(data == "Invalid Session"){
 				document.getElementById('path').value = '';
-				$rootScope.redirectPage();
+				return $rootScope.redirectPage();
 			}
 			else if(data == false){
 				openDialog("Deadcode Identifier", 'Report generation failed');

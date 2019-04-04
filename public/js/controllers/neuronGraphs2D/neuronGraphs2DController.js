@@ -1,4 +1,4 @@
-mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$timeout', 'neuronGraphs2DService', 'ExecutionService', 'reportService', 'cfpLoadingBar', '$window', function($scope, $http, $location, $timeout, neuronGraphs2DService, ExecutionService, reportService, cfpLoadingBar, $window) {
+mySPA.controller('neuronGraphs2DController', ['$scope', '$rootScope', '$http', '$location', '$timeout', 'neuronGraphs2DService', 'ExecutionService', 'reportService', 'cfpLoadingBar', '$window', function($scope, $rootScope, $http, $location, $timeout, neuronGraphs2DService, ExecutionService, reportService, cfpLoadingBar, $window) {
     $("head").append('<link id="nGraphsCSS" rel="stylesheet" type="text/css" href="css/nGraphs.css" />')
     if (window.localStorage['navigateScreen'] != "neuronGraphs") window.location.href = "/";
 
@@ -457,7 +457,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
             var userid = userInfo.user_id;
             neuronGraphs2DService.getGraphData(userid).then(function(data) {
                 //console.log('DATA SIZE::: ',roughSizeOfObject(data));
-                if (data.err && data.ecode == "INVALID_SESSION") window.location.href = "/";
+                if (data.err && data.ecode == "INVALID_SESSION") return $rootScope.redirectPage();
                 else if (data.err) {
                     unblockUI();
                     blockUI(data.msg);
@@ -1460,7 +1460,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
         ExecutionService.ExecuteTestSuite_ICE(globalobj['jsondata']).then(function(data) {
                 executeFlag = true;
                 if (data == "Invalid Session") {
-                    window.location.href = "/";
+                    return $rootScope.redirectPage();
                 }
                 if (data == "Terminate") {
                     openDialog("Terminate", "execution Terminated")
