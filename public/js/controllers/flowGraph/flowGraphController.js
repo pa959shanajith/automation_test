@@ -326,6 +326,11 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				.text(e.text);
 			}
 		});
+		if (($('#middle-content-section').width() - 700) > 0)  var x = ($('#middle-content-section').width() - 700)/2;
+		else  var x = 10;
+		$('#legend-box').css({
+			left: x
+		});
 	}
 	
 	var dotsPosition = [
