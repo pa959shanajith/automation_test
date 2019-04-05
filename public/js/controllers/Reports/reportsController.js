@@ -67,6 +67,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         var reportInfo = $rootScope.reportData.testsuites;
         var moduleName = $('#' + e.target.id).parent().children('span.ct-nodeLabel').text();
         $('#reportsTable tbody').empty();
+        var count = 0;
         angular.forEach(reportInfo, function(value, index) {
             if ($.trim(e.target.id) == $.trim(value.testsuiteid)) {
                 angular.forEach(value.scenarios, function(val, key) {
@@ -79,7 +80,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                     reportService.getReportsData_ICE(reportsInputData).then(function(result_res_scenarioData, response_scenarioData) {
                         $rootScope.scenarioInfo = result_res_scenarioData;
                         var scenarioInfo = $rootScope.scenarioInfo;
-                        $('#reportsTable tbody').append('<tr class="reportsTbl" data-executionid=' + scenarioInfo.executionid + ' id=' + value.testsuiteid + '><td class="center scenarioExecutionTime"><span id=' + val.scenarioid + ' class="glyphicon glyphicon-menu-right"></span></td><td class="scenarioName">' + val.scenarioname + '</td><td>' + scenarioInfo.executedtime + '</td><td class="status">' + scenarioInfo.status + '</td><td class="viewReports"><img alt="Pdf Icon" class="getSpecificReportBrowser openreportstatus reportFormat" data-getrep="wkhtmltopdf" data-reportid=' + scenarioInfo.reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-pdf.png" title="PDF Report"><img alt="-" class="getSpecificReportBrowser openreportstatus reportFormat" data-getrep="html" data-reportid=' + scenarioInfo.reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-web.png" title="Browser Report"><img alt="Export JSON" class="exportToJSON openreportstatus reportFormat" data-getrep="json" data-reportid=' + scenarioInfo.reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-export-to-json.png" title="Export to Json"></td></tr>');
+                        $('#reportsTable tbody').append('<tr data-id='+count+' class="reportsTbl" data-executionid=' + scenarioInfo.executionid + ' id=' + value.testsuiteid + '><td class="center scenarioExecutionTime"><span id=' + val.scenarioid + ' class="glyphicon glyphicon-menu-right"></span></td><td class="scenarioName">' + val.scenarioname + '</td><td>' + scenarioInfo.executedtime + '</td><td class="status">' + scenarioInfo.status + '</td><td class="viewReports"><img alt="Pdf Icon" class="getSpecificReportBrowser openreportstatus reportFormat" data-getrep="wkhtmltopdf" data-reportid=' + scenarioInfo.reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-pdf.png" title="PDF Report"><img alt="-" class="getSpecificReportBrowser openreportstatus reportFormat" data-getrep="html" data-reportid=' + scenarioInfo.reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-web.png" title="Browser Report"><img alt="Export JSON" class="exportToJSON openreportstatus reportFormat" data-getrep="json" data-reportid=' + scenarioInfo.reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-export-to-json.png" title="Export to Json"></td></tr>');
+                        count++;
                         if(scenarioInfo.count == 0)
                         {
                             $("td.viewReports").text('-');
@@ -161,12 +163,14 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 $(this).children('span').removeClass('glyphicon-menu-right').addClass('glyphicon-menu-down');
             } else {
                 $(this).children('span').removeClass('glyphicon-menu-down').addClass('glyphicon-menu-right');
-                $(this).children('span').parents('tr').siblings('tr.details').remove();
+                var dataId = $(this).parent('tr').attr('data-id');
+                $("tr.details[data-mapid="+dataId+"]").remove();
                 e.stopImmediatePropagation();
                 return;
             }
 
             var nTr = $(this).parent('tr');
+            var mappingId = $(nTr).attr('data-id');
             var testSId = $(this).parent('tr').attr('id');
             var scenarioId = $(this).children('span').attr('id');
             var reportsInputData = {};
@@ -182,11 +186,11 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 var executionData = $scope.result_res_scenarioData;
                if(executionData.length == 0)
                {
-                $("<tr class='details'><td class='noExecutions' colspan=5>No Executions Found</td></tr>").insertAfter(nTr);                
+                $("<tr data-mapid="+mappingId+" class='details'><td class='noExecutions' colspan=5>No Executions Found</td></tr>").insertAfter(nTr);                
                }
                else{
                     for (var k = 0; k < executionData.length; k++) {
-                        $("<tr class='details'><td></td><td></td><td>" + executionData[k].executedtime + "</td><td class='status'>" + executionData[k].status + "</td><td><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'></td></tr>").insertAfter(nTr);
+                        $("<tr data-mapid="+mappingId+" class='details'><td></td><td></td><td>" + executionData[k].executedtime + "</td><td class='status'>" + executionData[k].status + "</td><td><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'></td></tr>").insertAfter(nTr);
                     }
                }
               

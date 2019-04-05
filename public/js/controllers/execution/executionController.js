@@ -48,6 +48,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	var getTaskName = current_task.taskName;
 	var versionnumber = current_task.versionnumber;
 	var appType = current_task.appType;
+
 	//Task Name Commented
 	//$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
 	$(".projectInfoWrap").empty();
@@ -716,6 +717,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				else if (data == "scheduleModeOn")
 					openDialogExe("Execute Test Suite", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
 				$(".selectBrowser").find("img").removeClass("sb");
+				$(".selectParallel").find("img").removeClass("sb");
 				browserTypeExe = [];
 				$scope.moduleInfo = [];
 				$scope.readTestSuite_ICE();
@@ -733,6 +735,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				executionActive = false;
 				//$('#executionFailed').modal('show');
 				$(".selectBrowser").find("img").removeClass("sb");
+				$(".selectParallel").find("img").removeClass("sb");
 				browserTypeExe = [];
 				$scope.moduleInfo = [];
 				$scope.readTestSuite_ICE();
@@ -757,6 +760,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		}
 		unblockUI();
 		$(".selectBrowser").find("img").removeClass("sb");
+		$(".selectParallel").find("img").removeClass("sb");
 		browserTypeExe = [];
 		$scope.moduleInfo = [];
 		$scope.readTestSuite_ICE();
@@ -856,13 +860,15 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 	//select parallel execution
 	$(document).on("click", ".selectParallel", function () {
-		$(this).find("span.glyphicon-sort").toggleClass("sb");
-		if ($("span.glyphicon-sort").hasClass('sb') == true) {
+		$(this).find("img").toggleClass("sb");
+		if ($("img").hasClass('sb') == true) {
 			exc_action = "parallel";
 		} else {
 			exc_action = "serial";
 		}
 	});
+
+
 
 	//Select Browser Function
 	$(document).on("click", ".selectBrowser", function () {
