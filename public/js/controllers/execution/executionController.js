@@ -807,13 +807,13 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			if (result == 'fail') {
 				openDialogExe("Task Submission Error", "Reviewer is not assigned !", true);
 			} else if (taskstatus == 'reassign') {
-				openDialogExe("Task Reassignment Success", "Task Reassigned scucessfully!", true);
+				openDialogExe("Task Reassignment Success", "Task Reassigned successfully!", true);
 				//labelArr.push(txnHistory.codesDict['TaskReassign']);
 			} else if (taskstatus == 'review') {
-				openDialogExe("Task Completion Success", "Task Approved scucessfully!", true);
+				openDialogExe("Task Completion Success", "Task Approved successfully!", true);
 				//labelArr.push(txnHistory.codesDict['TaskApprove']);
 			} else {
-				openDialogExe("Task Submission Success", "Task Submitted scucessfully!", true);
+				openDialogExe("Task Submission Success", "Task Submitted successfully!", true);
 				//labelArr.push(txnHistory.codesDict['TaskSubmit']);
 			}
 			//txnHistory.log(e.type,labelArr,infoArr,$location.$$path);

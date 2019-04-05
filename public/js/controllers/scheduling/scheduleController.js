@@ -21,7 +21,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 	if(window.localStorage['navigateScreen'] != "scheduling"){
 		return $rootScope.redirectPage();
 	}
-	
+	$('.submitTaskBtn').hide();
 	if(window.localStorage['_CT']){
 		var window_ct=JSON.parse(window.localStorage['_CT']);
 		var readTestSuite = window_ct.testSuiteDetails;
