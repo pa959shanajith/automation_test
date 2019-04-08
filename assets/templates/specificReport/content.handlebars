@@ -170,15 +170,6 @@
                 {
                     $(this).parent().nextUntil('.parentTestcase').toggleClass('no-disp');
                 }
-              
-               // var getAllSelectedTestcaseRows = $(this).nextUntil(('.collapsible-tc:visible');
-                /*while (len--) {
-                    abc = parseInt(abc) + 1;
-                    if ($($("[data-id=" + abc + "]")[0]).find('.collapsible-tc').length != 0)
-                        break;
-                    else
-                        $("[data-id=" + abc + "]").toggleClass("no-disp");
-                }*/
             });
             $(document).on('click', '.expand', function () {
                 var getID = $(this).parents('.reportdetailsrow').attr('data-id');
