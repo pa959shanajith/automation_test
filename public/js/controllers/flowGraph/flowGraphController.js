@@ -875,13 +875,19 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
 			var listWeight=$("[id^=weightage_]");
 			var ccData = $(".ccvalue");
-			var weightedSum = 0; 
+			var weightedSum = 0;
+			var sum = 0;
 			for(var i=0;i<listWeight.length;i++){
-				$scope.wmcList[i] = parseInt(listWeight[i].innerText);
-				weightedSum+=(parseInt(ccData[i].innerText)*($scope.wmcList[i]*0.01));
+				sum = sum + parseInt(listWeight[i].innerText);
 			}
-			$scope.wmcc = Math.ceil(weightedSum); 
-			$scope.apply();
+			if(sum == 100){
+				for(var i=0;i<listWeight.length;i++){
+					$scope.wmcList[i] = parseInt(listWeight[i].innerText);
+					weightedSum+=(parseInt(ccData[i].innerText)*($scope.wmcList[i]*0.01));
+				}
+				$scope.wmcc = Math.ceil(weightedSum);
+				$scope.apply();
+			} else   openDialog('APG', "Please check the weightages given.");
 		}	
 
 		nodeGroup.append('image')
@@ -1341,15 +1347,16 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		// var infoArr = [];
 		// labelArr.push(txnHistory.codesDict['OpenFileInEditor']);
 		// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
-		var e = $("tr.hightlight_Complexity_row")[0]
+		var e = $("tr.hightlight_Complexity_row")[0];
 		if(e != undefined){
-			lineNumber = (e.getAttribute('name')).split('_')[1];
+			var lineNumber = (e.getAttribute('name')).split('_');
+			lineNumber = lineNumber[lineNumber.length - 1];
 			flowGraphServices.APG_OpenFileInEditor(editorName,$scope.filePath,lineNumber) .then(function(data) {
 				if (data == "unavailableLocalServer") {
 					$scope.hideBaseContent = { message: 'false' };
 					$('#progress-canvas').hide();
 					document.getElementById('path').value = '';
-					openDialog("Flowgraph Generator", $rootScope.unavailableLocalServer_msg);
+					openDialog("APG", $rootScope.unavailableLocalServer_msg);
 					return false;
 				}else if(data == "Invalid Session"){
 					document.getElementById('path').value = '';
@@ -1586,7 +1593,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				$scope.hideBaseContent = { message: 'false' };
 				$('#progress-canvas').hide();
 				document.getElementById('path').value = '';
-				openDialog("Flowgraph Generator", $rootScope.unavailableLocalServer_msg);
+				openDialog("APG", $rootScope.unavailableLocalServer_msg);
 				return false;
 			}else if(data == "Invalid Session"){
 				document.getElementById('path').value = '';
