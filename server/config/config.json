@@ -21,5 +21,8 @@
     "screenShotPath": {
         "default": "",
         "mac": ""
-    }
+    },
+	"token":{
+		"default": "720"
+	}
 }

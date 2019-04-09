@@ -82,6 +82,11 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
+		getTokendetails: function () {
+			return $http.post('/getTokendetails')
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
 		generateCIusertokens: function (generatetoken) {
 			return $http.post('/generateCIusertokens', {
 				generatetoken: generatetoken

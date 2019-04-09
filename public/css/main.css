@@ -4076,6 +4076,9 @@ select[multiple]:-internal-list-box option:checked {
     margin-bottom: 0px;
 }
 .tokenSuite {
+	display: inline;
+    position: absolute;
+    margin-left: 1%;
     width: 100%;
     padding: 2px;
     height: 35px;
@@ -4087,12 +4090,18 @@ select[multiple]:-internal-list-box option:checked {
     float: left;
     margin-right: 10px;
 }
+.tokenSuite .timePicContainer{
+	position: relative;
+    float: left;
+    margin-right: 10px;
+}
 
 .tokenname{
 	width: 20%;
 	background-color: #fff ;
 }
 .tokenSuite .datePicContainer input{margin-top: -2px; height: 27px;}
+.tokenSuite .timePicContainer input{margin-top: -2px; height: 27px;}
 .datepickerIconToken{
 	top: -1px;
     position: absolute;
@@ -4102,6 +4111,18 @@ select[multiple]:-internal-list-box option:checked {
     border-radius: 0px 4px 4px 0px;
     -moz-border-radius: 0px 4px 4px 0px;
     -webkit-border-radius: 0px 4px 4px 0px;
+    cursor:pointer;
+}
+
+.timepickerIconToken{
+	top: -1px;
+    position: absolute;
+    right: 1px;
+    background: #643693;
+    padding: 4px 5px;
+    border-radius: 0px 4px 2px 0px;
+    -moz-border-radius: 0px 4px 2px 0px;
+    -webkit-border-radius: 0px 4px 2px 0px;
     cursor:pointer;
 }
 /******************Admin CSS***************************/

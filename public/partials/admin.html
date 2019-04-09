@@ -757,10 +757,14 @@
 					<div class="tokeninfo">
 						<label class='domainTxt' style="width: 11%;">Token name</label>
 						<input type="text" id="tokenName" name="tokenName" placeholder="Enter token name" >
-						<div class="tokenSuite" style="width:20%;display: inline;position: absolute;margin-left: 5%;">
+						<div class="tokenSuite" >
 							<span class="datePicContainer">
 								<input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly="">
 								<img class="datepickerIconToken" src="../imgs/ic-datepicker.png">
+							</span>
+							<span class="timePicContainer">
+								<input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/>
+								<img class="timepickerIconToken" src="../imgs/ic-timepicker.png" />
 							</span>
 						</div>	
 					</div>
@@ -786,12 +790,14 @@
 							<tr>
 								<th> Token Name </th>
 								<th> Status </th>
+								<th> Expiry </th>
 								<th> Action </th>
 							</tr>
 							<tr ng-repeat="tokens in tokens.users">
 								<td> {{tokens.tokenname}} </td>
 								<td> {{tokens.deactivated}} </td>
-								<td ng-if="tokens.deactivated == 'active'"><button class="btn" data-id="{{$index}}" ng-click="deactivate($event)" style="margin-left:-10%"> Deactivate </button></td>
+								<td> {{tokens.expiry }} </td>
+								<td ng-if="tokens.deactivated == 'active'"><button class="btn" data-id="{{$index}}" ng-click="deactivate($event)" style="margin-left:-21%"> Deactivate </button></td>
 								<td ng-if="tokens.deactivated != 'active'"></td>
 							</tr>
 						</table>
