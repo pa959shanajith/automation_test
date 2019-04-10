@@ -36,7 +36,6 @@ exports.flowGraphResults = function(req, res){
 					logger.info("Sending socket request for generateFlowGraph to redis");
 					var dataToIce = {"emitAction" : "generateFlowGraph","username" : name, "version":version, "path" : path};
 					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-					var updateSessionExpiry = utils.resetSession(req);
 					function generateFlowGraph_listener(channel,message) {
 						data = JSON.parse(message);
 						if(name == data.username){
@@ -58,7 +57,6 @@ exports.flowGraphResults = function(req, res){
 							} else if (data.onAction == "result_flow_graph_finished") {
 								redisServer.redisSubServer.removeListener('message',generateFlowGraph_listener);	
 								try {
-									clearInterval(updateSessionExpiry);
 									var mySocketUI = myserver.allSocketsMapUI[name];
 									mySocketUI.emit("endData", value);
 									res.status(200).json({success: true});
@@ -200,7 +198,6 @@ exports.APG_runDeadcodeIdentifier = function(req,res){
 						var dataToIce = {"emitAction" : "runDeadcodeIdentifier","username" : name,
 									"version":version,"path":path};
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = utils.resetSession(req);
 						function apgRunDeadcodeIdentifier_listener(channel,message) {
 							data = JSON.parse(message);
 							if(name == data.username){
@@ -209,7 +206,6 @@ exports.APG_runDeadcodeIdentifier = function(req,res){
 									logger.error("Error occurred in APG_runDeadcodeIdentifier: Socket Disconnected");
 									res.send('unavailableLocalServer');
 								} else if (data.onAction == "deadcode_identifier")  {
-									clearInterval(updateSessionExpiry);
 									res.send(data.value);
 								}
 							}

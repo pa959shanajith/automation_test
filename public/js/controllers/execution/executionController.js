@@ -704,11 +704,13 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		else {
 			blockUI("Execution in progress. Please Wait...");
 			executionActive = true;
+			$rootScope.resetSession.start();
 			ExecutionService.ExecuteTestSuite_ICE($scope.moduleInfo, exc_action)
 			.then(function (data) {
 				if (data == "begin")
 					return false;
 				unblockUI();
+				$rootScope.resetSession.end();
 				executionActive = false;
 				if (data == "Invalid Session")
 					return $rootScope.redirectPage();
@@ -731,6 +733,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 			}, function (error) {
 				unblockUI();
+				$rootScope.resetSession.end();
 				openDialogExe("Execute Failed", "Failed to execute.");
 				executionActive = false;
 				//$('#executionFailed').modal('show');
@@ -759,6 +762,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			}, 300);
 		}
 		unblockUI();
+		$rootScope.resetSession.end();
 		$(".selectBrowser").find("img").removeClass("sb");
 		$(".selectParallel").find("img").removeClass("sb");
 		browserTypeExe = [];

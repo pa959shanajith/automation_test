@@ -322,17 +322,36 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                     ]);
                 }]
             }
-		})
+		});
 }])
 .run(function($rootScope, $location, headerServices){
 	$rootScope.redirectPage = function(){
 		unblockUI();
+		$(".btn-accept").click();
+		$(".modal-backdrop.fade.in").remove();
 		window.localStorage.clear();
 		headerServices.logoutUser_Nineteen68()
 		.then(function(data){
 			$location.path('/');
 		}, function(error) {
-			console.log("Failed to Logout");
+			console.error("Failed to logout user\nCause:", error);
 		});
-	}
+	};
+	$rootScope.resetSession = {
+		poll: function pollingCall() {
+			headerServices.keepSessionAlive_Nineteen68()
+			.then(function(data){
+				console.debug("User Session Extended");
+			}, function(error) {
+				console.error("Failed to extend User Session.\nCause:", error);
+			});
+		},
+		start: function startInterval() {
+			this.eventid = setInterval(function(pollCall){ pollCall(); }, 1500000, this.poll);
+		},
+		end: function endInterval() {
+			clearInterval(this.eventid);
+			this.poll();
+		}
+	};
 });

@@ -38,7 +38,6 @@ exports.getCrawlResults = function (req, res) {
 						logger.info("Sending socket request for webCrawlerGo to redis");
 						dataToIce = {"emitAction" : "webCrawlerGo","username" : name, "input_url":input_url, "level" : level, "agent" :agent};
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = utils.resetSession(req);
 						function webCrawlerGo_listener(channel,message) {
 							var data = JSON.parse(message);
 							if(name == data.username){
@@ -57,7 +56,6 @@ exports.getCrawlResults = function (req, res) {
 								} else if (data.onAction == "result_web_crawler_finished") {
 									redisServer.redisSubServer.removeListener('message',webCrawlerGo_listener);	
 									try {
-										clearInterval(updateSessionExpiry);
 										var mySocketUI = myserver.allSocketsMapUI[name];
 										mySocketUI.emit("endData", value);
 										logger.info("Crawl completed successfully!");

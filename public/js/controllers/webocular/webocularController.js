@@ -102,13 +102,15 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		// socket connection ....
 		var userName=JSON.parse(window.localStorage['_UI']).username;
 		var param={check:true,username:userName};
-		var socket = io('', { forceNew: true, reconnect: true, query: param});
+		var socketUI = io('', { forceNew: true, reconnect: true, query: param});
 
 		// fired when the connection acknowledgment is received from the server
-		socket.on('connectionAck', function(value){
+		socketUI.on('connectionAck', function(value){
 			if (window.sessionStorage.activeCrawlRequest) return;
 			window.sessionStorage.activeCrawlRequest = true;
+			$rootScope.resetSession.start();
 			webocularServices.getResults($scope.url, $scope.level, $scope.selectedAgent).then(function(data){
+				$rootScope.resetSession.end();
 				console.log("Data from service", data);
 				if (data == "unavailableLocalServer") {
 					$scope.hideBaseContent = { message: 'false' };
@@ -127,32 +129,33 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 					$('#progress-canvas').hide();
 					openDialog("Webocular Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
 				} else delete window.sessionStorage.activeCrawlRequest;
-			}, function(err){
+			}, function(err) {
+				$rootScope.resetSession.end();
 				$scope.hideBaseContent = { message: 'false' };
 				// Display the progress canvas after clearing all dots.
 				$('#progress-canvas').hide();
 				openDialog("Webocular Screen", "Error while crawling.");
 				console.log("Error :", err);
-				socket.disconnect('', { query: "check=true" });
+				socketUI.disconnect('', { query: "check=true" });
 			});
 		});
 
 		// fired when the socket attempts to reconnect
-		socket.on('reconnecting', function(attemptNumber){
+		socketUI.on('reconnecting', function(attemptNumber){
 			console.log(attemptNumber);
 		});
 
 		// fired on socket connection timeout
-		socket.on('connect_timeout', function(timeout) {
+		socketUI.on('connect_timeout', function(timeout) {
 			console.log("timeout" , timeout);
 		});
 
 		// fired on socket error
-		socket.on('error', function(error) {
+		socketUI.on('error', function(error) {
 			console.log("error", error);
 		});
 
-		socket.on('newdata', function(obj){
+		socketUI.on('newdata', function(obj){
 			var name = obj.name;
 			var parent = obj.parent;
 
@@ -164,7 +167,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 			$scope.$apply();
 		});
 
-		socket.on('endData', function(obj){
+		socketUI.on('endData', function(obj){
 			var reverseLinks = obj.sdata.links;
 			$scope.crawledLinks = $scope.crawledLinks.concat(reverseLinks);
 			$scope.otherLinks = obj.notParsedURLs;
@@ -176,7 +179,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 			$scope.enableGenerate = true;
 			$scope.check= false;
 			$scope.$apply();
-			socket.disconnect('', { query: "check=true" });
+			socketUI.disconnect('', { query: "check=true" });
 		});
 		//Transaction Activity for WebocularGoClick
 		// var labelArr = [];

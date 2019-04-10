@@ -4,68 +4,36 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	localStorage.setItem("navigateEnable", true);
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear();
 	var userInfo = JSON.parse(window.localStorage['_UI']);
-	var availablePlugins = userInfo.pluginsInfo;
 	$scope.filterData = {'prjval':'Select Project','relval':'Select Release','cycval':'Select Cycle','apptype':{},'tasktype':{}};
 	$("#plugin-container").empty().hide();
 	$("body").css("background", "#fff");
 	if(window.localStorage['navigateScreen'] != "plugin"){
 		return $rootScope.redirectPage();
 	}
-	if (!Array.prototype.fill) {
+
+	if (!Array.prototype.fill) {  // For IE Support
 		Object.defineProperty(Array.prototype, 'fill', {
-		  value: function(value) {
-	  
-			// Steps 1-2.
-			if (this == null) {
-			  throw new TypeError('this is null or not defined');
+			value: function (value) {
+				if (this == null) {
+					throw new TypeError('this is null or not defined');
+				}
+				var O = Object(this);
+				var len = O.length >>> 0;
+				var start = arguments[1];
+				var relativeStart = start >> 0;
+				var k = relativeStart < 0 ? Math.max(len + relativeStart, 0) : Math.min(relativeStart, len);
+				var end = arguments[2];
+				var relativeEnd = end === undefined ? len : end >> 0;
+				var final = relativeEnd < 0 ? Math.max(len + relativeEnd, 0) : Math.min(relativeEnd, len);
+				while (k < final) {
+					O[k] = value;
+					k++;
+				}
+				return O;
 			}
-	  
-			var O = Object(this);
-	  
-			// Steps 3-5.
-			var len = O.length >>> 0;
-	  
-			// Steps 6-7.
-			var start = arguments[1];
-			var relativeStart = start >> 0;
-	  
-			// Step 8.
-			var k = relativeStart < 0 ?
-			  Math.max(len + relativeStart, 0) :
-			  Math.min(relativeStart, len);
-	  
-			// Steps 9-10.
-			var end = arguments[2];
-			var relativeEnd = end === undefined ?
-			  len : end >> 0;
-	  
-			// Step 11.
-			var final = relativeEnd < 0 ?
-			  Math.max(len + relativeEnd, 0) :
-			  Math.min(relativeEnd, len);
-	  
-			// Step 12.
-			while (k < final) {
-			  O[k] = value;
-			  k++;
-			}
-	  
-			// Step 13.
-			return O;
-		  }
 		});
 	}
-	$rootScope.plugins = [];
-	for(i=0; i<availablePlugins.length; i++){
-		if(availablePlugins[i].pluginValue != false){
-			var pluginName = availablePlugins[i].pluginName;
-			var pluginTxt = availablePlugins[i].pluginName.replace(/\s/g,''); 
-			var dataName = Encrypt.encode("p_"+pluginTxt);
-			$rootScope.plugins.push("p_"+pluginName);
-			$("#plugin-container").append('<div class="col-md-4 plugin-block"><span ng-click="pluginBox()" class="toggleClick pluginBox" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+pluginName+'</span><input class="plugins" type="hidden" id="'+availablePlugins[i].pluginName+"_"+dataName+'"  title="'+pluginTxt+"_"+dataName+'"></div>').fadeIn();
-		}
-	}
-
+	
 	//Integration with Mindmaps
 	$(".plugin-block span").each(function() {
 		if($(this).text() == "RAID")
@@ -75,6 +43,17 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	});
 	//$("#plugin-container").addClass("inactiveLink");
 	if(userInfo) {
+		$rootScope.plugins = [];
+		var availablePlugins = userInfo.pluginsInfo;
+		for(i=0; i<availablePlugins.length; i++){
+			if(availablePlugins[i].pluginValue != false){
+				var pluginName = availablePlugins[i].pluginName;
+				var pluginTxt = availablePlugins[i].pluginName.replace(/\s/g,'');
+				var dataName = Encrypt.encode("p_"+pluginTxt);
+				$rootScope.plugins.push("p_"+pluginName);
+				$("#plugin-container").append('<div class="col-md-4 plugin-block"><span ng-click="pluginBox()" class="toggleClick pluginBox" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+pluginName+'</span><input class="plugins" type="hidden" id="'+availablePlugins[i].pluginName+"_"+dataName+'"  title="'+pluginTxt+"_"+dataName+'"></div>').fadeIn();
+			}
+		}
 		var userRole = window.localStorage['_SR'];
 		if(userRole == "Test Manager") {
 			$(".task-content").hide();
@@ -202,10 +181,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			$(this).css("border-radius","0px 7px 7px 0px");
 			isOpen = true;
 			$(".searchInput").focus();
-		}
-
-		else
-		{
+		} else {
 			$(this).parents('.list-inline').children("li:first-child").show();
 			$(this).parents('.list-inline').children("li:nth-child(2)").show();
 			$(this).parent().find("input").hide();
@@ -222,21 +198,18 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 
 	function filter(element,event) {
 		var value = $(element).val();
-		$(".panel-default span.assignedTask").each(function () { 
+		$(".panel-default span.assignedTask").each(function () {
 			var title = $(this).attr('title');
-			if($('.active-task').is(":visible"))
-			{
+			if ($('.active-task').is(":visible")) {
 				$('.active-task').children().children('div').children('div').children('img').click();
 			}
-			if(title == undefined)
-			{
+			if (title == undefined) {
 				if ($(this).text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
 					$(this).parents(".panel-default").show();
 				} else {
 					$(this).parents(".panel-default").hide();
 				}
-			}
-			else{
+			} else {
 				if (title.toLowerCase().indexOf(value.toLowerCase()) > -1) {
 					$(this).parents(".panel-default").show();
 				} else {
@@ -258,18 +231,15 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 
 	//Plugin click event 
 	$scope.pluginFunction = function(name,event){
-		if(name == "p_Mindmap"){
-			name = 'mindmap';
-		}
+		if(name == "p_Mindmap") name = 'mindmap';
 		else if(name == "p_NeuronGraphs") name = 'neuronGraphs';
-		else if(name == "p_NeuronGraphs3D") name = 'neuronGraphs3D';
+		else if(name == "p_PerformanceTesting") name = 'performancetesting';
+		else if(name == "p_Dashboard") name = 'dashboard';
 		window.localStorage['navigateScreen'] = name;
 		$timeout(function () {
-			if(name == 'p_Reports')
-			{
+			if (['p_Reports', 'performancetesting', 'dashboard'].indexOf(name) > -1) {
 				window.location.href = "/"+ name;
-			}
-			else{
+			} else{
 				$location.path('/'+ name);
 			}
 			//Transaction Activity for Plugin Navigation
@@ -283,40 +253,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 
 	window.localStorage['_TJ'] = "";
 	window.localStorage['_CT'] = "";
-	//Task Function
-	/*$scope.getTask = function(){
-    	$("#fileInputJson").attr("type","file");
-    	$("#fileInputJson").trigger('click');
-    	fileInputJson.addEventListener('change', function(e) {
-				// Put the rest of the demo code here.
-				var file = fileInputJson.files[0];
-				var textType = /json./;
-				var reader = new FileReader();
-				reader.onload = function(e) {
-					if((file.name.split('.')[file.name.split('.').length-1]).toLowerCase() == "json"){
-						var tasksJson = JSON.parse(reader.result);
-						window.localStorage['_TJ'] = angular.toJson(tasksJson);
-						$(".plugin-taks-listing").empty().hide()
-						var counter = 1;
-						for(i=0; i<tasksJson.length; i++){
-							for(j=0; j<tasksJson[i].taskDetails.length; j++){
-								if(tasksJson[i].taskDetails[j].taskType == "Design"){
-									$(".plugin-taks-listing").append('<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title"><div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse'+counter+'"><span class="taskNo">Task '+ counter +'</span><!--Addition--><div class="panel-additional-details"><span class="panel-head-tasktype">'+tasksJson[i].taskDetails[j].taskType+'</span><span class="panel-head-details details-design-task">Details <span class="caret caret-absolute"></span></span></div><!--Addition--></div></h4></div><div id="collapse'+counter+'" class="panel-collapse collapse"><div class="panel-body"><span class="assignedTask" data-apptype="'+tasksJson[i].appType+'" data-projectname="'+tasksJson[i].projectId+'" data-releaseid="'+tasksJson[i].releaseId+'" data-cycleid="'+tasksJson[i].cycleId+'" data-screenid="'+tasksJson[i].screenId+'"  data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" data-testsuiteid="'+tasksJson[i].testSuiteId+'" data-testsuitename="'+tasksJson[i].testSuiteName+'" data-taskname="'+tasksJson[i].taskDetails[j].taskName+'" data-taskDes="'+tasksJson[i].taskDetails[j].taskDescription+'" data-tasktype="'+tasksJson[i].taskDetails[j].taskType+'" data-subtask="'+tasksJson[i].taskDetails[j].subTaskType+'" data-subtaskid="'+tasksJson[i].taskDetails[j].subTaskId+'" data-assignedto="'+tasksJson[i].taskDetails[j].assignedTo+'" data-startdate="'+tasksJson[i].taskDetails[j].startDate+'" data-exenddate="'+tasksJson[i].taskDetails[j].expectedEndDate+'" data-status="'+tasksJson[i].taskDetails[j].status+'" onclick="taskRedirection(this.dataset.subtask,this.dataset.screenid,this.dataset.screenname,this.dataset.projectname,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.releaseid,this.dataset.cycleid,this.dataset.testsuiteid,this.dataset.testsuitename)">'+tasksJson[i].taskDetails[j].taskName+'</span></div></div></div>').fadeIn()
-								} 
-								else if(tasksJson[i].taskDetails[j].taskType == "Execution"){
-									$(".plugin-taks-listing").append('<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title"><div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse'+counter+'"><span class="taskNo">Task '+ counter +'</span><!--Addition--><div class="panel-additional-details"><span class="panel-head-tasktype">'+tasksJson[i].taskDetails[j].taskType+'</span><span class="panel-head-details details-execute-task">Details <span class="caret caret-absolute"></span></span></div><!--Addition--></div></h4></div><div id="collapse'+counter+'" class="panel-collapse collapse"><div class="panel-body"><span class="assignedTask" data-apptype="'+tasksJson[i].appType+'" data-projectname="'+tasksJson[i].projectId+'" data-releaseid="'+tasksJson[i].releaseId+'" data-cycleid="'+tasksJson[i].cycleId+'" data-screenid="'+tasksJson[i].screenId+'"  data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" data-testsuiteid="'+tasksJson[i].testSuiteId+'" data-testsuitename="'+tasksJson[i].testSuiteName+'" data-taskname="'+tasksJson[i].taskDetails[j].taskName+'" data-taskDes="'+tasksJson[i].taskDetails[j].taskDescription+'" data-tasktype="'+tasksJson[i].taskDetails[j].taskType+'" data-subtask="'+tasksJson[i].taskDetails[j].subTaskType+'" data-subtaskid="'+tasksJson[i].taskDetails[j].subTaskId+'" data-assignedto="'+tasksJson[i].taskDetails[j].assignedTo+'" data-startdate="'+tasksJson[i].taskDetails[j].startDate+'" data-exenddate="'+tasksJson[i].taskDetails[j].expectedEndDate+'" data-status="'+tasksJson[i].taskDetails[j].status+'" onclick="taskRedirection(this.dataset.subtask,this.dataset.screenid,this.dataset.screenname,this.dataset.projectname,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.releaseid,this.dataset.cycleid,this.dataset.testsuiteid,this.dataset.testsuitename)">'+tasksJson[i].taskDetails[j].taskName+'</span></div></div></div>').fadeIn()
-								}
-								counter++
-							}
-						}
-					}
-					else{
-						alert("Upload only JSON file");
-					}
-				}
-				reader.readAsText(file);
-		});
-    }*/
 
 	$scope.taskRedirection = function(testsuitedetails,scenarioflag,assignedtestscenarioids,subtask,subtaskid,screenid,screenname,projectid,taskname,testcaseid,testcasename,apptype,scenarioid,versionnumber,status,batchTaskIDs,releaseid,cycleid,reuse,event){
 		//Transaction Activity for Task Navigation
@@ -337,7 +273,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 							console.log("Error updating task status " + (error.data));
 						});
 		}
-		//taskObj.projectidts = projectIdTS;
 		taskObj.testSuiteDetails = JSON.parse(testsuitedetails);
 		taskObj.scenarioFlag = scenarioflag;
 		taskObj.assignedTestScenarioIds = assignedtestscenarioids;
@@ -350,19 +285,13 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		taskObj.testCaseName = testcasename;
 		taskObj.appType = apptype;
 		taskObj.status=status;
-	//	taskObj.releaseId = releaseid;
-	//	taskObj.cycleId = cycleid;
-	//	taskObj.testSuiteId = testsuiteid;
 		taskObj.scenarioId = scenarioid;
 		taskObj.batchTaskIDs=batchTaskIDs;
-	//	taskObj.testSuiteName = testsuitename;
 		taskObj.subTask = subtask; 
 		taskObj.subTaskId=subtaskid;
 		taskObj.releaseid = releaseid;
 		taskObj.cycleid = cycleid;
 		taskObj.reuse = reuse;
-	//	taskObj.assignedTestScenarioIds = assignedtestscenarioids;
-	//	taskObj.scenarioFlag = scenarioflag;
 	
 		window.localStorage['_CT'] = JSON.stringify(taskObj);
 		if(subtask == "Scrape"){
@@ -498,9 +427,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		* Another dict for releaseid and cyclelist out of task json
 		* List of apptype and tasktype
 		*/
-		// if(!validID(obj.projectId)) return;
-		// if(!validID(obj.taskDetails[tidx].releaseid)) return;
-		// if(!validID(obj.taskDetails[tidx].cycleid)) return;
 
 		if(validID(obj.projectId) && $scope.filterDat.projectids.indexOf(obj.projectId) == -1){
 			$scope.filterDat.projectids.push(obj.projectId);

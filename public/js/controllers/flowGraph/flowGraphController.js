@@ -171,32 +171,36 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		// socket connection ....
 		var userName=JSON.parse(window.localStorage['_UI']).username;
 		var param={check:true,username:userName};
-		var socket = io('', { forceNew: true, reconnect: true, query: param});
+		var socketUI = io('', { forceNew: true, reconnect: true, query: param});
 		
 		version = document.getElementById("version").value;
 		path = document.getElementById("path").value;
-		flowGraphServices.getResults(version,path) .then(function(data) {
+		$rootScope.resetSession.start();
+		flowGraphServices.getResults(version,path).then(function(data) {
+			$rootScope.resetSession.end();
 			if (data == "unavailableLocalServer") {
 				$scope.hideBaseContent = { message: 'false' };
 				$('#progress-canvas').hide();
 				document.getElementById('path').value = '';
 				openDialog("APG", $rootScope.unavailableLocalServer_msg);
 				return false;
-			}else if(data == "Invalid Session"){
+			} else if(data == "Invalid Session"){
 				document.getElementById('path').value = '';
 				return $rootScope.redirectPage();
 			}
 		}, function(err){
+			$rootScope.resetSession.end();
+			openDialog("APG", "Failed to generate graph.");
 			console.log("Error :", err);
 		});
 		
-		socket.on('newdata', function(obj){
+		socketUI.on('newdata', function(obj){
 			$scope.addClass(obj);
 			$scope.$apply();
 			classes.push(obj);
 		});
-		
-		socket.on('endData', function(obj){
+
+		socketUI.on('endData', function(obj) {
 			if(obj.result == "success"){
 				$('#progress-canvas').fadeOut(800, function(){
 					$scope.hideBaseContent = { message: 'true' };
@@ -207,7 +211,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				$scope.enableGenerate = true;
 				$scope.ClassDiagramView = true;
 				//$scope.createAPGProject(obj);
-			}else if(obj.result == "fail"){
+			} else if(obj.result == "fail") {
 				$('#progress-canvas').fadeOut(800, function(){
 					$scope.hideBaseContent = { message: 'false' };
 					$scope.$apply();
@@ -215,8 +219,9 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				document.getElementById('path').value = '';
 				openDialog("APG", "Failed to generate graph.");
 			}
+			socketUI.disconnect('', { query: "check=true" });
 		});
-		
+
 		var canv =   d3.select("#progress-canvas").append('svg').attr('id','legend-box');
 		var u = canv.append('g').attr("transform", "translate(10,10)");	
 		var legends=[{text:'Public'},{text:'Private'},{text:'Protected'},{text:'Default'},{text:'Abstract'}];
@@ -1353,7 +1358,9 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		if(e != undefined){
 			var lineNumber = (e.getAttribute('name')).split('_');
 			lineNumber = lineNumber[lineNumber.length - 1];
+			$rootScope.resetSession.start();
 			flowGraphServices.APG_OpenFileInEditor(editorName,$scope.filePath,lineNumber) .then(function(data) {
+				$rootScope.resetSession.end();
 				if (data == "unavailableLocalServer") {
 					$scope.hideBaseContent = { message: 'false' };
 					$('#progress-canvas').hide();
@@ -1369,15 +1376,17 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 					return false;
 				}
 			}, function(err){
+				$rootScope.resetSession.end();
+				openDialog("Open File", "Operation Fail.");
 				console.log("Error :", err);
 			});
 		}
-		else{
+		else {
 			openDialog("Open File", "Please select one of the methods.");
 			return false;
 		}
 	}
-	
+
 	 $scope.fullScreen = function() {
 		// remove highlight from fullscreen icon
 		$timeout(function(){$('#fullscr img').removeClass('thumb-ic-highlight')},500);

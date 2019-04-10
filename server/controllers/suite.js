@@ -691,12 +691,10 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 						resSent = true;
 						res.end('begin');
 					}
-					var updateSessionExpiry = utils.resetSession(req);
 					function executeTestSuite_listener(channel,message) {
 						data = JSON.parse(message);
 						if(name == data.username){
 							if (data.onAction == "unavailableLocalServer") {
-								clearInterval(updateSessionExpiry);
 								redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
 								logger.error("Error occurred in ExecuteTestSuite_ICE: Socket Disconnected");
 								if (notifySocMap[name]) notifySocMap[name].emit("ICEnotAvailable");
@@ -778,7 +776,6 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 									}
 								}
 								if (resultData == "success" || resultData == "Terminate") {
-									clearInterval(updateSessionExpiry);
 									redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
 									try {
 										logger.info("Sending execution status from function executionFunction");
@@ -1182,12 +1179,10 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 											logger.info("Sending socket request for executeTestSuite to redis");
 											dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 											redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-											// var updateSessionExpiry = utils.resetSession(req);
 											function executeTestSuite_listener(channel,message) {
 												data = JSON.parse(message);
 												if(name == data.username){
 													if (data.onAction == "unavailableLocalServer") {
-														// clearInterval(updateSessionExpiry);
 														redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
 														logger.error("Error occured in ExecuteTestSuite_ICE_SVN: Socket Disconnected");
 														if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -1266,7 +1261,6 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 															}
 														}
 														if (resultData == "success" || resultData == "Terminate") {
-															// clearInterval(updateSessionExpiry);
 															redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
 															try {
 																result_to_send.execution_status.push(final_data[username]);
@@ -1448,12 +1442,10 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 					logger.info("Sending socket request for executeTestSuite to redis");
 					dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-					var updateSessionExpiry = utils.resetSession(req);
 					function executeTestSuite_listener(channel,message) {
 						data = JSON.parse(message);
 						if(name == data.username){
 							if (data.onAction == "unavailableLocalServer") {
-								clearInterval(updateSessionExpiry);
 								redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
 								logger.error("Error occurred in ExecuteTestSuite_ICE_CI: Socket Disconnected");
 								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -1533,7 +1525,6 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 									}
 								}
 								if (resultData == "success" || resultData == "Terminate") {
-									clearInterval(updateSessionExpiry);
 									redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
 									try {
 										logger.info("Sending execution status from function executionFunction in ExecuteTestSuite_ICE_CI");
@@ -2635,7 +2626,6 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 									dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 									redisServer.redisPubICE.publish('ICE1_scheduling_' + name,JSON.stringify(dataToIce));
 									var starttime = new Date().getTime();
-									var updateSessionExpiry = utils.resetSession(req);
 									function executeTestSuite_listener(channel,message) {
 										data = JSON.parse(message);
 										if(name == data.username){
@@ -2739,7 +2729,6 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 												}
 												else if (resultData) {
 													if (typeof(resultData) == "string") {
-														clearInterval(updateSessionExpiry);
 														redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
 														scheduleStatus = resultData == "success" ? "Completed" : resultData;
 													} 

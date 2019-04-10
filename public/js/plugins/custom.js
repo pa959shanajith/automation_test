@@ -1,76 +1,61 @@
 //Window Load Function
 function loadBody(){
-	$("body").delay(400).animate({opacity:"1"})
+	$("body").delay(400).animate({opacity:"1"});
 }
 window.onload = loadBody;
 //Window Load Function
 
 var Encrypt = {
-		_keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
-		encode: function(input) {
-			var output = "";
-			var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
-			var i = 0;
-	
-			input = Encrypt._utf8_encode(input);
-	
-			while (i < input.length) {
-	
-				chr1 = input.charCodeAt(i++);
-				chr2 = input.charCodeAt(i++);
-				chr3 = input.charCodeAt(i++);
-	
-				enc1 = chr1 >> 2;
-				enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
-				enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
-				enc4 = chr3 & 63;
-	
-				if (isNaN(chr2)) {
-					enc3 = enc4 = 64;
-				} else if (isNaN(chr3)) {
-					enc4 = 64;
-				}
-	
-				output = output + this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) + this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
-	
+	_keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+	encode: function(input) {
+		var output = "";
+		var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+		var i = 0;
+		input = Encrypt._utf8_encode(input);
+		while (i < input.length) {
+			chr1 = input.charCodeAt(i++);
+			chr2 = input.charCodeAt(i++);
+			chr3 = input.charCodeAt(i++);
+			enc1 = chr1 >> 2;
+			enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+			enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+			enc4 = chr3 & 63;
+			if (isNaN(chr2)) {
+				enc3 = enc4 = 64;
+			} else if (isNaN(chr3)) {
+				enc4 = 64;
 			}
-	
-			return output;
-		},
-	
-		_utf8_encode: function(string) {
-			string = string.replace(/\r\n/g, "\n");
-			var utftext = "";
-	
-			for (var n = 0; n < string.length; n++) {
-	
-				var c = string.charCodeAt(n);
-	
-				if (c < 128) {
-					utftext += String.fromCharCode(c);
-				}
-				else if ((c > 127) && (c < 2048)) {
-					utftext += String.fromCharCode((c >> 6) | 192);
-					utftext += String.fromCharCode((c & 63) | 128);
-				}
-				else {
-					utftext += String.fromCharCode((c >> 12) | 224);
-					utftext += String.fromCharCode(((c >> 6) & 63) | 128);
-					utftext += String.fromCharCode((c & 63) | 128);
-				}
-	
+			output = output + this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) + this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
+		}
+		return output;
+	},
+
+	_utf8_encode: function(string) {
+		string = string.replace(/\r\n/g, "\n");
+		var utftext = "";
+		for (var n = 0; n < string.length; n++) {
+			var c = string.charCodeAt(n);
+			if (c < 128) {
+				utftext += String.fromCharCode(c);
 			}
-	
-			return utftext;
-		},
-	
+			else if ((c > 127) && (c < 2048)) {
+				utftext += String.fromCharCode((c >> 6) | 192);
+				utftext += String.fromCharCode((c & 63) | 128);
+			}
+			else {
+				utftext += String.fromCharCode((c >> 12) | 224);
+				utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+				utftext += String.fromCharCode((c & 63) | 128);
+			}
+		}
+		return utftext;
 	}
-		
+};
 
 setTimeout(function(){
 	//For bootstrap tool tip
 	$('[data-toggle="tooltip"]').tooltip();
-}, 500)
+}, 500);
 
 //To prevent Back Button in browser
 history.pushState(null, null, document.URL);
@@ -79,10 +64,10 @@ window.addEventListener('popstate', function () {
 	history.pushState(null, null, currentURL);
 });
 //   /**
-//    * 'XSRF-TOKEN',
-//    * 'X-XSRF-TOKEN' name changed
-//    * @author - sushma.p
-//    */
+//	* 'XSRF-TOKEN',
+//	* 'X-XSRF-TOKEN' name changed
+//	* @author - sushma.p
+//	*/
 // $.extend($.jgrid.defaults, {
 // 	ajaxRowOptions : {
 // 		beforeSend : function(jqXHR) {
@@ -93,10 +78,10 @@ window.addEventListener('popstate', function () {
 // })
 
 // $(document).ajaxSend(function(elm, xhr, s){
-//     if (s.type == "POST") {
-//         s.data += s.data?"&":"";
-//         s.data += "_token=" + $('#csrf-token').val();
-//     }
+//	 if (s.type == "POST") {
+//		 s.data += s.data?"&":"";
+//		 s.data += "_token=" + $('#csrf-token').val();
+//	 }
 // });
 
 //Document Ready Function
@@ -120,76 +105,75 @@ $(document).ready(function() {
 			}, 5); //html5 min is 4ms.			
 		}
 	});
-	
+
 	//Task Function - Plugin Page
 	$(document).on("click", ".task-content .collapse-head", function(){
-		$(".caret-absolute").hide()
-		$(".panel-heading").css({'background':''})
-		$(this).parents(".panel-heading").css({'background':'#efefef'})
+		$(".caret-absolute").hide();
+		$(".panel-heading").css({'background':''});
+		$(this).parents(".panel-heading").css({'background':'#efefef'});
 		if($(this).hasClass("collapsed")) {
-			$(".panel-heading").css({'background':''})
-			$(this).find(".caret-absolute").fadeOut()
+			$(".panel-heading").css({'background':''});
+			$(this).find(".caret-absolute").fadeOut();
 		} 
 		else{
 			$(this).find(".caret-absolute").fadeIn(function(){
 				$(this).css({
-					'border-top': '4px solid ' + $(this).parent().css("background-color")                    
-				})
-			})
+					'border-top': '4px solid ' + $(this).parent().css("background-color")					
+				});
+			});
 		}
-	})  
+	});  
 
 	//Task Function - Design Page
 	$(document).on("click", ".task-content-inner .collapse-head", function(){
-		$(".caret-absolute").hide()
-		if($(this).hasClass("collapsed")) $(this).find(".caret-absolute").fadeOut()
+		$(".caret-absolute").hide();
+		if($(this).hasClass("collapsed")) $(this).find(".caret-absolute").fadeOut();
 		else{
 			$(this).find(".caret-absolute").fadeIn(function(){
 				$(this).css({
-					'border-top': '4px solid ' + $(this).parent().css("background-color")                    
-				})
-			})
+					'border-top': '4px solid ' + $(this).parent().css("background-color")					
+				});
+			});
 		}
-	}) 
+	}); 
 
 	//Popup Function - Screen Level (Screenshot, Filter, Tasks, Project Info)
 	$(document).on("click", ".slidePopup", function(e){
 		if(!($(this).attr('title') == "Filter" && (window.localStorage['navigateScreen'] == "Scrape" && $('#scraplist li').length <= 0))){
-			$(".thumb-ic").removeClass("thumb-ic-highlight")
-			$(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'})
-			$(this).children(".thumb-ic").addClass("thumb-ic-highlight")
+			$(".thumb-ic").removeClass("thumb-ic-highlight");
+			$(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'});
+			$(this).children(".thumb-ic").addClass("thumb-ic-highlight");
 			if($(this).siblings(".popupWrap").attr("id") == "window-scrape-screenshot" || $(this).siblings(".popupWrap").attr("id") == "window-scrape-screenshotTs"){
-				$(this).siblings(".popupWrap").animate({ opacity: 1, right: "97px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus()
+				$(this).siblings(".popupWrap").animate({ opacity: 1, right: "97px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus();
 			} else{
-				$(this).siblings(".popupWrap").animate({ opacity: 1, right: "92px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus()
+				$(this).siblings(".popupWrap").animate({ opacity: 1, right: "92px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus();
 				$(".searchInputMyTask").focus();
 			} 
 		}
-		var subTaskID = {};
 		if(window.localStorage['_CT']) {
-			subTaskID = JSON.parse(window.localStorage['_CT']).subTaskId;
-		}
-		if(window.location.pathname != "/scheduling"){
-			var selectedTask = $("#window-task").find("#accordion").find(".assignedTaskInner");
-			$.each(selectedTask, function(){
-				if($(this)[0].dataset.subtaskid == subTaskID){
-					$(this).parents(".panel-default").addClass("disableActions");
-					$(this)[0].setAttribute("onclick","");
-					$(this).css("cursor","default");
-					return false;
-				}
-			})
-			setTimeout(function(){
-				$(".assignedTaskInner").each(function(){
+			var ct = JSON.parse(window.localStorage['_CT']);
+			var subTaskID = ct.subTaskId;
+			if(window.location.pathname != "/scheduling"){
+				var selectedTask = $("#window-task").find("#accordion").find(".assignedTaskInner");
+				$.each(selectedTask, function(){
 					if($(this)[0].dataset.subtaskid == subTaskID){
-						$(this).trigger("click");
+						$(this).parents(".panel-default").addClass("disableActions");
+						$(this)[0].setAttribute("onclick","");
+						$(this).css("cursor","default");
 						return false;
 					}
-				})    		
-			}, 200)
-		}
-		if(window.localStorage['_CT']) {
-			var appType = JSON.parse(window.localStorage['_CT']).appType;
+				});
+				setTimeout(function(){
+					$(".assignedTaskInner").each(function(){
+						if($(this)[0].dataset.subtaskid == subTaskID){
+							$(this).trigger("click");
+							return false;
+						}
+					});			
+				}, 200);
+			}
+
+			var appType = ct.appType;
 			var appVersion = navigator.appVersion;
 			if((appType == "MobileWeb" || appType == "MobileApp") && typeof(viewString) == "undefined") {
 				viewString = {};
@@ -220,126 +204,92 @@ $(document).ready(function() {
 		});
 		function filterMyTasks(element,e) {
 			setTimeout(function () {
-			var value = $(element).val();
-			$(".panel-default span.assignedTaskInner").each(function () {
-				var title = $(this).attr('title');
-				if(title == undefined)
-				{
-					if ($(this).text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
-						$(this).parents(".panel-default").show();
-					} else {
-						$(this).parents(".panel-default").hide();
+				var value = $(element).val();
+				$(".panel-default span.assignedTaskInner").each(function () {
+					var title = $(this).attr('title');
+					if(title == undefined)
+					{
+						if ($(this).text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
+							$(this).parents(".panel-default").show();
+						} else {
+							$(this).parents(".panel-default").hide();
+						}
 					}
-				}
-				else{
-					console.log(title);
-					if (title.toLowerCase().indexOf(value.toLowerCase()) > -1) {
-						$(this).parents(".panel-default").show();
-					} else {
-						$(this).parents(".panel-default").hide();
+					else{
+						console.log(title);
+						if (title.toLowerCase().indexOf(value.toLowerCase()) > -1) {
+							$(this).parents(".panel-default").show();
+						} else {
+							$(this).parents(".panel-default").hide();
+						}
 					}
-				}
-			});
-			var counter=1;
-			$(".panel-default h4:visible").each(function () {
-				$(this).text(counter) 
-				counter++;
-			});
-		},5);
+				});
+				var counter=1;
+				$(".panel-default h4:visible").each(function () {
+					$(this).text(counter); 
+					counter++;
+				});
+			},5);
 		} 
 	})
 	.on("click", ".closePopup", function(){
-		$(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'})
+		$(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'});
 		$(".thumb-ic").removeClass("thumb-ic-highlight");
-	})
+	});
 
 	//Filter Function - Screen Level
 	$(document).on("click", ".popupContent-default", function(){
 		$(this).removeClass("popupContent-default").addClass("popupContent-filter-active"); 
-	})
+	});
 
 	$(document).on("click", ".popupContent-filter-active", function(){
 		$(this).removeClass("popupContent-filter-active").addClass("popupContent-default"); 
-	})
+	});
 
 	//To Select All Element Filters
 	$(document).on('click', ".checkStyleboxFilter", function(){
-		if($(this).is(":checked"))
-		{
+		if($(this).is(":checked")) {
 			$('.popupContent-filter div span:not(.selectAllTxt)').addClass('popupContent-filter-active').removeClass('popupContent-default');
-		}
-		else{
+		} else {
 			$('.popupContent-filter div span:not(.selectAllTxt)').removeClass('popupContent-filter-active').addClass('popupContent-default');
-		} 
-	})
+		}
+	});
 
 	//If all filters get selected then parent select all get selected
 	$(document).on('click', ".popupContent-filter div span", function(){
 		var defaultFilterLen = $('.popupContent-filter div span:not(.selectAllTxt)').length;
 		var activefilterLen =  $('.popupContent-filter-active').length;
-		if(defaultFilterLen == activefilterLen)
-		{
+		if(defaultFilterLen == activefilterLen) {
 			$(".checkStyleboxFilter").prop('checked', true);
-		}
-		else{
+		} else{
 			$(".checkStyleboxFilter").prop('checked', false);
 		}
-	})
+	});
 
 	//Assist functionality
 	$(document).on("click", ".animateAssistUp", function(){
-		$(this).attr("src","imgs/ic-down.png").attr("class","animateAssistDown")
-		$(".assistContent").fadeIn()
-	})
+		$(this).attr("src","imgs/ic-down.png").attr("class","animateAssistDown");
+		$(".assistContent").fadeIn();
+	});
 
 	$(document).on("click", ".animateAssistDown", function(){
-		$(this).attr("src","imgs/ic-up.png").attr("class","animateAssistUp")
-		$(".assistContent").fadeOut(100)
-	})
+		$(this).attr("src","imgs/ic-up.png").attr("class","animateAssistUp");
+		$(".assistContent").fadeOut(100);
+	});
 
 	$(document).on("click", ".animateAssistClose", function(){
-		$(".assistWrap").fadeOut(100)
-	})
+		$(".assistWrap").fadeOut(100);
+	});
 
 	$(document).on("click", ".slide_assist", function(){
-		$(".assistWrap").fadeIn(100)
-	})
+		$(".assistWrap").fadeIn(100);
+	});
 
 	$(document).on("click", ".globalSubmit", function(){
-		window.localStorage['navigateScreen'] = "plugin"
+		window.localStorage['navigateScreen'] = "plugin";
 		window.location.href = "/plugin";
 	});
 
-	//Special character validation
-	/*$(document).on('keypress','.forValidation', function(e){	
-    	var targetName = e.target.parentElement.firstChild.textContent.trim();
-    	var targetClass = e.target.className.split(" ")[0];
-    	var className = e.target.className;
-    	if (className == "datagrid-editable-input"){
-    		if(e.charCode == 32){
-    			return true;
-    	    }
-    	}
-    	if((targetName == "TestScript Name:" || targetName == "Screen Name:" || targetName == "Scenario Name:" || targetName == "Test Suite Name:") || e.target.parentElement.firstElementChild.textContent.trim() == "UI Test Script name:" || (targetClass == "dynamicInputBoxStyle" || "dynamicInputBoxStyleTS" || "dynamicInputBoxStyleScenario" || "dynamicInputBoxStyleSuite")){
-    		if(e.charCode >= 189 || e.charCode == 46) return true;
-    	    else if((e.charCode < 95 || e.charCode > 122) && (e.charCode < 48 || e.charCode > 57) && (e.charCode < 65 || e.charCode > 90) && (e.charCode != 45) || e.charCode == 96 || e.charCode == 32) return false;
-    	}else{
-    		if(e.charCode >= 189 || e.charCode == 32 || e.charCode == 46) return true;
-    	    else if((e.charCode < 95 || e.charCode > 122) && (e.charCode < 48 || e.charCode > 57) && (e.charCode < 65 || e.charCode > 90) && (e.charCode != 45) || e.charCode == 96) return false;		
-    	}
-    }).blur(function(){
-    	var reg = /^[a-zA-Z0-9\s\.\-\_]+$/
-    		  if(reg.test($(this).val())){
-    			  return true;
-    		  }
-    		  else if($(this).val() == ''){
-    		  }
-    		  else{
-    			  //showDialogMesgsBtn("Incorrect Inputs","Cannot contain special characters other than ._- and space","btnSCV3");
-    			  $(this).val('');
-    			  return false;
-    		  }
-      });*/
 });
 //Document Ready Function
 
@@ -347,15 +297,14 @@ $(document).ready(function() {
 //Innerpages Tasks Implementation
 function loadUserTasks(){
 	if(window.location.pathname != '/mindmap'){
-		$("#mindmapCSS1, #mindmapCSS2").remove()
+		$("#mindmapCSS1, #mindmapCSS2").remove();
+	} else if(window.location.pathname != "/neuronGraphs") {
+		$("#nGraphsCSS").remove();
 	}
-	else if(window.location.pathname != "/neuronGraphs"){
-		$("#nGraphsCSS").remove()
-	}
-	var tasksJson = JSON.parse(window.localStorage['_TJ'])
-	$(".task-content-inner").empty().hide()
+	var tasksJson = JSON.parse(window.localStorage['_TJ']);
+	$(".task-content-inner").empty().hide();
 	var counter = 1;
-	for(i=0; i<tasksJson.length; i++){
+	for(i=0; i<tasksJson.length; i++) {
 		var classIndex = i<100 ? "tasks-l-s": i<1000? "tasks-l-m" : "tasks-l-l";
 		for(j=0;j<tasksJson[i].taskDetails.length;j++){
 			var testSuiteDetails = JSON.stringify(tasksJson[i].testSuiteDetails);
@@ -365,17 +314,17 @@ function loadUserTasks(){
 				taskTypeIcon = "imgs/ic-taskType-blue-plus.png";
 			}
 
-			$(".task-content-inner").append('<div class="panel panel-default"><div id="panelBlock_'+i+'" class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse' + counter + '"><h4 class="taskNo-Inner-Pgs '+classIndex+'" style="margin-top: -1px;">' + counter + '</h4><span class="assignedTask-Inner-Pgs assignedTaskInner" data-testsuitedetails='+testSuiteDetails+' data-scenarioflag='+tasksJson[i].scenarioFlag+'  data-apptype="' + tasksJson[i].appType + '" data-projectid="' + tasksJson[i].projectId + '" data-screenid="' + tasksJson[i].screenId + '"  data-screenname="' + tasksJson[i].screenName + '" data-testcaseid="' + tasksJson[i].testCaseId + '" data-testcasename="' + tasksJson[i].testCaseName + '"  data-scenarioid="' + tasksJson[i].scenarioId + '" data-taskname="' + tasksJson[i].taskDetails[j].taskName + '" data-taskdes="' + tasksJson[i].taskDetails[j].taskDescription + '" data-tasktype="' + tasksJson[i].taskDetails[j].taskType + '" data-subtasktype="' + tasksJson[i].taskDetails[j].subTaskType + '" data-subtaskid="' + tasksJson[i].taskDetails[j].subTaskId + '"  data-assignedtestscenarioids='+tasksJson[i].assignedTestScenarioIds+' data-assignedto="' + tasksJson[i].taskDetails[j].assignedTo + '" data-startdate="' + tasksJson[i].taskDetails[j].startDate + '" data-exenddate="' + tasksJson[i].taskDetails[j].expectedEndDate + '" data-status="' + tasksJson[i].taskDetails[j].status+'" data-versionnumber='+tasksJson[i].versionnumber+' data-batchTaskIDs="'+tasksJson[i].taskDetails[j].batchTaskIDs+'" data-releaseid="'+tasksJson[i].taskDetails[j].releaseid+'" data-cycleid="'+tasksJson[i].taskDetails[j].cycleid+'" data-reuse="'+tasksJson[i].taskDetails[j].reuse+'" onclick="taskRedirectionInner(this.dataset.testsuitedetails,this.dataset.scenarioflag,this.dataset.assignedtestscenarioids,this.dataset.subtasktype,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.scenarioid,this.dataset.subtaskid,this.dataset.versionnumber,this.dataset.status,this.dataset.batchtaskids,this.dataset.releaseid,this.dataset.cycleid,this.dataset.reuse)">' + tasksJson[i].taskDetails[j].taskName + '</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;opacity: 0.7;" src="'+taskTypeIcon+'"/><button class="panel-head-tasktype-Inner-Pgs">' + tasksJson[i].taskDetails[j].taskType + '</button></div><!--Addition--></div></div></div>').fadeIn()
+			$(".task-content-inner").append('<div class="panel panel-default"><div id="panelBlock_'+i+'" class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse' + counter + '"><h4 class="taskNo-Inner-Pgs '+classIndex+'" style="margin-top: -1px;">' + counter + '</h4><span class="assignedTask-Inner-Pgs assignedTaskInner" data-testsuitedetails='+testSuiteDetails+' data-scenarioflag='+tasksJson[i].scenarioFlag+'  data-apptype="' + tasksJson[i].appType + '" data-projectid="' + tasksJson[i].projectId + '" data-screenid="' + tasksJson[i].screenId + '"  data-screenname="' + tasksJson[i].screenName + '" data-testcaseid="' + tasksJson[i].testCaseId + '" data-testcasename="' + tasksJson[i].testCaseName + '"  data-scenarioid="' + tasksJson[i].scenarioId + '" data-taskname="' + tasksJson[i].taskDetails[j].taskName + '" data-taskdes="' + tasksJson[i].taskDetails[j].taskDescription + '" data-tasktype="' + tasksJson[i].taskDetails[j].taskType + '" data-subtasktype="' + tasksJson[i].taskDetails[j].subTaskType + '" data-subtaskid="' + tasksJson[i].taskDetails[j].subTaskId + '"  data-assignedtestscenarioids='+tasksJson[i].assignedTestScenarioIds+' data-assignedto="' + tasksJson[i].taskDetails[j].assignedTo + '" data-startdate="' + tasksJson[i].taskDetails[j].startDate + '" data-exenddate="' + tasksJson[i].taskDetails[j].expectedEndDate + '" data-status="' + tasksJson[i].taskDetails[j].status+'" data-versionnumber='+tasksJson[i].versionnumber+' data-batchTaskIDs="'+tasksJson[i].taskDetails[j].batchTaskIDs+'" data-releaseid="'+tasksJson[i].taskDetails[j].releaseid+'" data-cycleid="'+tasksJson[i].taskDetails[j].cycleid+'" data-reuse="'+tasksJson[i].taskDetails[j].reuse+'" onclick="taskRedirectionInner(this.dataset.testsuitedetails,this.dataset.scenarioflag,this.dataset.assignedtestscenarioids,this.dataset.subtasktype,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.scenarioid,this.dataset.subtaskid,this.dataset.versionnumber,this.dataset.status,this.dataset.batchtaskids,this.dataset.releaseid,this.dataset.cycleid,this.dataset.reuse)">' + tasksJson[i].taskDetails[j].taskName + '</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;opacity: 0.7;" src="'+taskTypeIcon+'"/><button class="panel-head-tasktype-Inner-Pgs">' + tasksJson[i].taskDetails[j].taskType + '</button></div><!--Addition--></div></div></div>').fadeIn();
 			var limit = 45;
 			var chars = $("#panelBlock_"+i+"").children().find('span.assignedTaskInner').text();
-		    if (chars.length > limit) {
+			if (chars.length > limit) {
 			   var visiblePart = chars.substr(0, limit-1);
 			   var dots = $("<span class='dots'>...</span>");
 			   var hiddenPart = chars.substr(limit-1);
 			   var assignedTaskText = visiblePart + hiddenPart;
 			   $("#panelBlock_"+i+"").children().find('span.assignedTaskInner').text(visiblePart).attr('title',assignedTaskText).append(dots);
 			}
-			counter++
+			counter++;
 		}
 	}
 }
@@ -393,12 +342,8 @@ function taskRedirectionInner(testsuitedetails,scenarioflag,assignedtestscenario
 	taskObj.taskName = taskname;
 	taskObj.testCaseId = testcaseid;
 	taskObj.testCaseName = testcasename;
-	//	taskObj.releaseId = releaseid;
-	//	taskObj.cycleId = cycleid;
-	//	taskObj.testSuiteId = testsuiteid;
 	taskObj.scenarioId = scenarioid;
 	taskObj.status = status;
-	//	taskObj.testSuiteName = testsuitename;
 	taskObj.appType = apptype;
 	taskObj.subTaskType = subtasktype;
 	taskObj.subTaskId=subtaskid;
@@ -412,20 +357,20 @@ function taskRedirectionInner(testsuitedetails,scenarioflag,assignedtestscenario
 	if(subtasktype == "Scrape"){
 		window.localStorage['navigateScreen'] = "Scrape";
 		window.localStorage['navigateScrape'] = true;
-		window.location.pathname = "/design"
+		window.location.pathname = "/design";
 	}
 	else if(subtasktype == "TestCase"){
 		window.localStorage['navigateScreen'] = "TestCase";
 		window.localStorage['navigateTestcase'] = true;
-		window.location.pathname = "/designTestCase"
+		window.location.pathname = "/designTestCase";
 	}
 	else if(subtasktype == "TestSuite"){
 		window.localStorage['navigateScreen'] = "TestSuite";
-		window.location.pathname = "/execute"
+		window.location.pathname = "/execute";
 	}
 	else if(subtasktype == "Scheduling"){
 		window.localStorage['navigateScreen'] = "scheduling";
-		window.location.pathname = "/scheduling"
+		window.location.pathname = "/scheduling";
 	}
 }
 //Innerpages Tasks Implementation
@@ -437,7 +382,7 @@ function blockUI(content){
 }
 
 function unblockUI(){
-	$("#overlayContainer").fadeOut(300).remove()
+	$("#overlayContainer").fadeOut(300).remove();
 }
 //Function to Block UI
 
@@ -456,7 +401,7 @@ function replaceHtmlEntites(selectedText) {
 	return ( selectedText.replace(translate_re, function(match, entity) {
 		return translate[entity];
 	}) );
-};
+}
 
 $(document).on('keypress', '.singleInvitedComma', function(e){
 	if(e.charCode == 39) return false;
@@ -469,21 +414,21 @@ $(document).on('keypress', '.singleInvitedComma', function(e){
 		$(this).val('');
 		return true;
 	}
-})
+});
 
 function getCookie(cname) {
-    var name = cname + "=";
-    var ca = document.cookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
+	var name = cname + "=";
+	var ca = document.cookie.split(';');
+	for (var i = 0; i < ca.length; i++) {
+		var c = ca[i];
+		while (c.charAt(0) == ' ') {
+			c = c.substring(1);
+		}
+		if (c.indexOf(name) == 0) {
+			return c.substring(name.length, c.length);
+		}
+	}
+	return "";
 }
 
 var txnHistory = {
@@ -495,129 +440,118 @@ var txnHistory = {
 	4. url: the current url when action was performed
 	*/
 
-    log: function(action,labelArr,infoArr,url) {
-
-		var data = {};
+	log: function(action,labelArr,infoArr,url) {
 		var timeStampInMs = window.performance && window.performance.now && window.performance.timing && window.performance.timing.navigationStart ? window.performance.now() + window.performance.timing.navigationStart : Date.now();
-		        data.username = JSON.parse(window.localStorage['_UI']).username;
-				data.timestamp = timeStampInMs
-		        data.action = action;
-				data.labels = labelArr;
-				data.category = "UI";
-				data.infoArr  = infoArr;
-				data.elapsedTime = '';
-				data.url = url;
-				data.role = window.localStorage['_SR'];
-        var idbSupported = false;
-        var db;
+		var data = {};
+		data.username = JSON.parse(window.localStorage['_UI']).username;
+		data.timestamp = timeStampInMs;
+		data.action = action;
+		data.labels = labelArr;
+		data.category = "UI";
+		data.infoArr  = infoArr;
+		data.elapsedTime = '';
+		data.url = url;
+		data.role = window.localStorage['_SR'];
+		var idbSupported = false;
+		var db;
 
-        //Check Indexed DB Support
-        if (window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB) {
-            idbSupported = true;
-        }
+		//Check Indexed DB Support
+		if (window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB) {
+			idbSupported = true;
+		}
 
-        //IFF Indexed DB is supported
-        if (idbSupported) {
-            var openRequest = indexedDB.open("transactionHistorydb", 1);       //Indexed DB instantiated
-            //Indexed DB on Upgrade
-            openRequest.onupgradeneeded = function(e) {
-                console.log("Upgrading idb...");
-                db = e.target.result;
-                if (!db.objectStoreNames.contains("transactionHistory")) {
-                    db.createObjectStore("transactionHistory", {
-                        keyPath: "transactionId",
-                        autoIncrement: true
-                    });
-                }
-            }
-            //Indexed DB on Success DB connection
-            openRequest.onsuccess = function(e) {
-                db = e.target.result;
+		//IFF Indexed DB is supported
+		if (idbSupported) {
+			var openRequest = indexedDB.open("transactionHistorydb", 1);	   //Indexed DB instantiated
+			//Indexed DB on Upgrade
+			openRequest.onupgradeneeded = function(e) {
+				console.log("Upgrading idb...");
+				db = e.target.result;
+				if (!db.objectStoreNames.contains("transactionHistory")) {
+					db.createObjectStore("transactionHistory", {
+						keyPath: "transactionId",
+						autoIncrement: true
+					});
+				}
+			};
+			//Indexed DB on Success DB connection
+			openRequest.onsuccess = function(e) {
+				db = e.target.result;
 				saveTransactionHistory(); 										// Save Transaction History function being called
-            }
-            //Indexed DB on Error DB connection
-            openRequest.onerror = function(e) {
-                console.log("Error in opening idb");
-			}
-			
-        }
+			};
+			//Indexed DB on Error DB connection
+			openRequest.onerror = function(e) {
+				console.log("Error in opening idb");
+			};
+		}
+
 		// Save a Transaction
-        function saveTransactionHistory() {
-            var transaction = db.transaction(["transactionHistory"], "readwrite");
-            var objectStore = transaction.objectStore("transactionHistory");
-            var request = objectStore.put(data); //Saves a transaction in the idb
-            request.onsuccess = function(event) {
+		function saveTransactionHistory() {
+			var transaction = db.transaction(["transactionHistory"], "readwrite");
+			var objectStore = transaction.objectStore("transactionHistory");
+			var request = objectStore.put(data); //Saves a transaction in the idb
+			request.onsuccess = function(event) {
 				if(labelArr.indexOf("100") > -1 || labelArr.indexOf("104") > -1){
 					//commenting sending part as of now
 					// console.log("sending from idb!");
 					// var data = sendAllTransactions();
 					}
-			}
+			};
 
 			request.onerror = function(e) {
 				console.log("Error in saving txn");
-			}
-
-	}
+			};
+		}
 		
 		//Send All Transactions
 		function sendAllTransactions(){
-			
-			 var transaction = db.transaction(["transactionHistory"]);          //Create Transaction
-                var objectStore = transaction.objectStore("transactionHistory");   //Get ObjectStore
-				
-				//To get all objects from the db
-				var request = objectStore.getAll();								   
-                request.onerror = function(event) {								  // Handle errors!
-                    console.log("Error in fetching all txn data");
-               };
-                request.onsuccess = function(event) {
-					var hostName = window.location.host;
-					var host = hostName.split(':')[0];
-					apiurl = 'https://'+host+':4242/addTransactions'					
-					data = {"transactionsData":request.result};
-					$.ajax({
-						type: 'POST',
-						url: apiurl,
-						data: JSON.stringify(data),
-				        contentType: 'application/json',
-						success: function(data){
-							console.log(data);
-							deleteAllData();
-						},
-						error: function (xhr, ajaxOptions, thrownError) {
-							console.log("Error while sending txn data");
-						  }
+			var transaction = db.transaction(["transactionHistory"]); //Create Transaction
+			var objectStore = transaction.objectStore("transactionHistory"); //Get ObjectStore
+
+			//To get all objects from the db
+			var request = objectStore.getAll();
+			request.onerror = function (event) { // Handle errors!
+				console.log("Error in fetching all txn data");
+			};
+			request.onsuccess = function (event) {
+				var hostName = window.location.host;
+				var host = hostName.split(':')[0];
+				var apiurl = 'https://' + host + ':4242/addTransactions';
+				data = {
+					"transactionsData": request.result
+				};
+				$.ajax({
+					type: 'POST',
+					url: apiurl,
+					data: JSON.stringify(data),
+					contentType: 'application/json',
+					success: function (data) {
+						console.log(data);
+						deleteAllData();
+					},
+					error: function (xhr, ajaxOptions, thrownError) {
+						console.log("Error while sending txn data");
+					}
 				});
-					return request.result;
-               };
+				return request.result;
+			};
 		}
 
 		//Delete all the data from the object store and then delete the object store
 		function deleteAllData(){
-			
-			var transaction = db.transaction(["transactionHistory"],"readwrite");          //access the Transaction
+			var transaction = db.transaction(["transactionHistory"],"readwrite");		  //access the Transaction
 			var objectStore = transaction.objectStore("transactionHistory");   //Get ObjectStore
-			
 			//Now, delete the object store
 			//db.deleteObjectStore("transactionHistory");
-			
-
-			
-			
 			//Clear the object store
 			var request = objectStore.clear();
-			
 			request.onerror = function(event) {								  // Handle errors!
 				console.log("Error in delete txn data");
 		   	};
-		   request.onsuccess = function(event) {	
-			   
-			   console.log("deleted from idb!");							 
-
+			request.onsuccess = function(event) {	
+				console.log("deleted from idb!");							 
 	   		};
 		}
-
 	},
 
 	codesDict : {
@@ -684,19 +618,6 @@ var txnHistory = {
 		"SaveTestSuite" : "1601",
 		"SaveQcCredentialsExecution" : "1602",
 		"ExecuteTestSuite" : "1603",
-		"InitSchedule" : "1701",
-
-
-
-
-
-
-
-
-
-
-
-		
-		
+		"InitSchedule" : "1701"
 	}
-}
+};

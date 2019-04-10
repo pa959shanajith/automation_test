@@ -72,16 +72,6 @@ module.exports.cloneSession = function (req, cb){
 	});
 };
 
-module.exports.resetSession = function(req) {
-	var intr = parseInt(process.env.SESSION_INTERVAL);
-	var sessAge = parseInt(process.env.SESSION_AGE);
-	var updateSessionExpiry = setInterval(function (req) {
-		req.session.maxAge = sessAge;
-		// myserver.redisSessionStore.touch(req.sessionID, req.session)
-	}, intr, req);
-	return updateSessionExpiry;
-};
-
 module.exports.isSessionActive = function (req){
 	var sessionToken = (req.session)? req.session.uniqueId:undefined;
 	var sessionCheck = (sessionToken!==undefined) && (req.sessionID==sessionToken);

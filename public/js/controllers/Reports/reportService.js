@@ -54,7 +54,6 @@ mySPA.factory('reportService', ['$http','$q', function ($http,$q)   {
 				return $q.reject(response.data)
 			})
 		},
-		
 		//Get Testsuites start end details
 		getSuiteDetailsInExecution_ICE : function(testsuiteId){
 			return $http.post('/getSuiteDetailsInExecution_ICE',{
@@ -68,7 +67,6 @@ mySPA.factory('reportService', ['$http','$q', function ($http,$q)   {
 				return $q.reject(response.data)
 			})
 		},
-		
 		//Get Testsuites start end details
 		reportStatusScenarios_ICE : function(executionid, testsuiteid){
 			return $http.post('/reportStatusScenarios_ICE',{
@@ -83,7 +81,6 @@ mySPA.factory('reportService', ['$http','$q', function ($http,$q)   {
 				return $q.reject(response.data)
 			})
 		},
-		
 		//Get Final Reports
 		getReport_Nineteen68 : function(reportID, testsuiteId, testsuitename){
 			return $http.post('/getReport_Nineteen68',{
@@ -99,7 +96,6 @@ mySPA.factory('reportService', ['$http','$q', function ($http,$q)   {
 				return $q.reject(response.data)
 			})
 		},
-		
 		//Export To JSON Reports
 		exportToJson_ICE : function(repId){
 			return $http.post('/exportToJson_ICE',{
@@ -113,7 +109,6 @@ mySPA.factory('reportService', ['$http','$q', function ($http,$q)   {
 				return $q.reject(response.data)
 			})
 		},
-		
 		//Get screenshots dataURLs
 		getScreenshotDataURL_ICE : function(paths){
 			return $http.post('/openScreenShot',{
@@ -138,6 +133,6 @@ mySPA.factory('reportService', ['$http','$q', function ($http,$q)   {
 			function(response){
 				return $q.reject(response.data)
 			})
-		},
+		}
 	}
 }]);
