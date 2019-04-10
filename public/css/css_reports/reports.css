@@ -584,4 +584,8 @@ body {
 {
     background: #f1f1f1 !important;
 }
+img
+{
+    cursor: pointer;
+}
   /************ Modal Popup *************/
