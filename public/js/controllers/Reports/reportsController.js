@@ -25,14 +25,12 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     $('#expAssign').on('click', function(e) {
-        $(".moduleBox").slideToggle('slow',function() {
+        $(".moduleBox").slideToggle('slow', function() {
             $(this).toggleClass('slideOpen');
-            if($('.slideOpen').is(":visible") == true)
-            {
-               $("#expAssign").attr('src','imgs/ic-collapseup.png');
-            }
-            else{
-                $("#expAssign").attr('src','imgs/ic-collapse.png');
+            if ($('.slideOpen').is(":visible") == true) {
+                $("#expAssign").attr('src', 'imgs/ic-collapseup.png');
+            } else {
+                $("#expAssign").attr('src', 'imgs/ic-collapse.png');
             }
         });
     });
@@ -58,92 +56,91 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
         });
     });
-
+    //Module click
     $(document).on('click', '.ct-nodeIcon', function(e) {
         blockUI('Loading reports...');
         $('img.highlight-module').removeClass('highlight-module');
         $('span.highlight-moduleName').removeClass('highlight-moduleName');
         $(this).addClass('highlight-module').next('span').addClass('highlight-moduleName');
-        var reportInfo = $rootScope.reportData.testsuites;
         var moduleName = $('#' + e.target.id).parent().children('span.ct-nodeLabel').text();
         $('#reportsTable tbody').empty();
         var count = 0;
-        angular.forEach(reportInfo, function(value, index) {
-            if ($.trim(e.target.id) == $.trim(value.testsuiteid)) {
-                angular.forEach(value.scenarios, function(val, key) {
-                    var scenarioId = val.scenarioid;
-                    var reportsInputData = {};
-                    reportsInputData.scenarioid = scenarioId;
-                    reportsInputData.cycleid = $('.cycle-list option:selected').val();
-                    reportsInputData.type = "latestreport";
-                    reportsInputData.testSId = value.testsuiteid;
-                    reportService.getReportsData_ICE(reportsInputData).then(function(result_res_scenarioData, response_scenarioData) {
-                        $rootScope.scenarioInfo = result_res_scenarioData;
-                        var scenarioInfo = $rootScope.scenarioInfo;
-                        $('#reportsTable tbody').append('<tr data-id='+count+' class="reportsTbl" data-executionid=' + scenarioInfo.executionid + ' id=' + value.testsuiteid + '><td class="center scenarioExecutionTime"><span id=' + val.scenarioid + ' class="glyphicon glyphicon-menu-right"></span></td><td class="scenarioName">' + val.scenarioname + '</td><td>' + scenarioInfo.executedtime + '</td><td class="status">' + scenarioInfo.status + '</td><td class="viewReports"><img alt="Pdf Icon" class="getSpecificReportBrowser openreportstatus reportFormat" data-getrep="wkhtmltopdf" data-reportid=' + scenarioInfo.reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-pdf.png" title="PDF Report"><img alt="-" class="getSpecificReportBrowser openreportstatus reportFormat" data-getrep="html" data-reportid=' + scenarioInfo.reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-web.png" title="Browser Report"><img alt="Export JSON" class="exportToJSON openreportstatus reportFormat" data-getrep="json" data-reportid=' + scenarioInfo.reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-export-to-json.png" title="Export to Json"></td></tr>');
-                        count++;
-                        if(scenarioInfo.count == 0)
+        var reportsInputData = {};
+        reportsInputData.type = "scenariosPerTestSuite";
+        reportsInputData.cycleId = $("#selectCycles option:selected").val();
+        reportsInputData.testSId = e.target.id;
+        //Fetching scenarios per testsuite
+        reportService.getReportsData_ICE(reportsInputData).then(function(result_res_reportData) {
+            unblockUI();
+            if (result_res_reportData == "Fail") {
+                $("#reportsModal").modal('show');
+            } else {
+                $rootScope.scenarioData = result_res_reportData;
+                for (var i = 0; i < result_res_reportData.length; i++) {
+                    $('#reportsTable tbody').append('<tr data-id=' + count + ' class="reportsTbl" data-executionid=' + result_res_reportData[i].executionid + ' id=' + e.target.id + '><td class="center scenarioExecutionTime"><span id=' + result_res_reportData[i].scenarioid + ' class="glyphicon glyphicon-menu-right"></span></td><td class="scenarioName">' + result_res_reportData[i].scenarioname + '</td><td>' + result_res_reportData[i].executedtime + '</td><td class="status">' + result_res_reportData[i].status + '</td><td class="viewReports"><img alt="Pdf Icon" class="getSpecificReportBrowser openreportstatus reportFormat" data-getrep="wkhtmltopdf" data-reportid=' + result_res_reportData[i].reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-pdf.png" title="PDF Report"><img alt="-" class="getSpecificReportBrowser openreportstatus reportFormat" data-getrep="html" data-reportid=' + result_res_reportData[i].reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-web.png" title="Browser Report"><img alt="Export JSON" class="exportToJSON openreportstatus reportFormat" data-getrep="json" data-reportid=' + result_res_reportData[i].reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-export-to-json.png" title="Export to Json"></td></tr>');
+                    count++;
+                    if (result_res_reportData[i].count == 0) {
+                        $("td.viewReports").text('-');
+                    }
+                }
+                $("tr.reportsTbl:even").addClass('even');
+                $("tr.reportsTbl:odd").addClass('odd');
+                setStatusColor();
+            }
+        }, function(error) {
+            unblockUI();
+            console.log("Error in service getReportsData_ICE while fetching scenarios");
+        });
+        //Initialse DataTables, with no sorting on the 'details' column
+        setTimeout(function() {
+            if ($rootScope.scenarioData.length > 0) {
+                var oTable = $('#reportsTable').dataTable({
+                    "bDestroy": true,
+                    "responsive": true,
+                    "bRetrieve": true,
+                    "bPaginate": false,
+                    "bSort": false,
+                    "bFilter": false,
+                    "bLengthChange": false,
+                    "bInfo": false,
+                    "scrollY": "200px",
+                    "scrollCollapse": true,
+                    "scrollX": true,
+                    "paging": false,
+                    "oLanguage": {
+                        "sSearch": ""
+                    },
+                    "deferRender": true,
+                    "columns": [{
+                            "width": "5%",
+                            "targets": 0
+                        },
                         {
-                            $("td.viewReports").text('-');
-                        }
-                        $("tr.reportsTbl:even").addClass('even');
-                        $("tr.reportsTbl:odd").addClass('odd');
-                        setStatusColor();
-                    });
+                            "width": "15%",
+                            "targets": 1
+                        },
+                        {
+                            "width": "25%",
+                            "targets": 2
+                        },
+                        {
+                            "width": "20%",
+                            "targets": 3
+                        },
+                        {
+                            "width": "18%",
+                            "targets": 4
+                        },
+                    ],
+                    "fnInitComplete": function(oSettings, json) {
+                        unblockUI();
+
+                    }
                 });
             }
-        });
-
-
-
-        setTimeout(function() {
-        //Initialse DataTables, with no sorting on the 'details' column
-        var oTable = $('#reportsTable').dataTable({
-            "bDestroy": true,
-            "responsive": true,
-            "bRetrieve": true,
-            "bPaginate": false,
-            "bSort": false,
-            "bFilter": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "scrollY": "200px",
-            "scrollCollapse": true,
-            "scrollX": true,
-            "paging": false,
-            "oLanguage": {
-                "sSearch": ""
-            },
-             "deferRender": true,
-            "columns": [{
-                    "width": "5%",
-                    "targets": 0
-                },
-                {
-                    "width": "15%",
-                    "targets": 1
-                },
-                {
-                    "width": "25%",
-                    "targets": 2
-                },
-                {
-                    "width": "20%",
-                    "targets": 3
-                },
-                {
-                    "width": "18%",
-                    "targets": 4
-                },
-            ],
-            "fnInitComplete": function(oSettings, json) {
-                    unblockUI();
-                    
-              }
-        });
-              unblockUI();
+            unblockUI();
             $("input[type=search]").attr('placeholder', 'Search Scenario').addClass('scenarioSearch');
-        }, 1000);
+        }, 700);
         redirected = false;
         localStorage.removeItem('fromExecution');
         $('#accordion').show();
@@ -156,7 +153,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             $(this).addClass('tblRowHighlight').siblings('tr').removeClass('tblRowHighlight');
         });
 
-        //Nested Table click
+        //Display Executions Per Scenario
         $(document).on('click', '.scenarioExecutionTime', function(e) {
             $(this).parent('tr.reportsTbl').trigger('click');
             if ($(this).children('span').hasClass('glyphicon-menu-right') == true) {
@@ -164,11 +161,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             } else {
                 $(this).children('span').removeClass('glyphicon-menu-down').addClass('glyphicon-menu-right');
                 var dataId = $(this).parent('tr').attr('data-id');
-                $("tr.details[data-mapid="+dataId+"]").remove();
+                $("tr.details[data-mapid=" + dataId + "]").remove();
                 e.stopImmediatePropagation();
                 return;
             }
-
             var nTr = $(this).parent('tr');
             var mappingId = $(nTr).attr('data-id');
             var testSId = $(this).parent('tr').attr('id');
@@ -179,22 +175,26 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             reportsInputData.type = "scenarioreports";
             reportsInputData.testSId = testSId;
             reportService.getReportsData_ICE(reportsInputData).then(function(data) {
-                $scope.result_res_scenarioData = data.rows;
-                $scope.result_res_scenarioData = $scope.result_res_scenarioData.sort(function(a, b) {
-                    return new Date(b.executedtime) - new Date(a.executedtime);
-                });
-                var executionData = $scope.result_res_scenarioData;
-               if(executionData.length == 0)
-               {
-                $("<tr data-mapid="+mappingId+" class='details'><td class='noExecutions' colspan=5>No Executions Found</td></tr>").insertAfter(nTr);                
-               }
-               else{
-                    for (var k = 0; k < executionData.length; k++) {
-                        $("<tr data-mapid="+mappingId+" class='details'><td></td><td></td><td>" + executionData[k].executedtime + "</td><td class='status'>" + executionData[k].status + "</td><td><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'></td></tr>").insertAfter(nTr);
+                if (data == "Fail") {
+                    $("#reportsModal").modal('show');
+                } else {
+                    $scope.result_res_scenarioData = data.rows;
+                    $scope.result_res_scenarioData = $scope.result_res_scenarioData.sort(function(a, b) {
+                        return new Date(b.executedtime) - new Date(a.executedtime);
+                    });
+                    var executionData = $scope.result_res_scenarioData;
+                    if (executionData.length == 0) {
+                        $("<tr data-mapid=" + mappingId + " class='details'><td class='noExecutions' colspan=5>No Executions Found</td></tr>").insertAfter(nTr);
+                    } else {
+                        for (var k = 0; k < executionData.length; k++) {
+                            $("<tr data-mapid=" + mappingId + " class='details'><td></td><td></td><td>" + executionData[k].executedtime + "</td><td class='status'>" + executionData[k].status + "</td><td><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'></td></tr>").insertAfter(nTr);
+                        }
                     }
-               }
-              
-                setStatusColor();
+                    setStatusColor();
+                }
+            }, function(error) {
+                unblockUI();
+                console.log("Error in calling service getReportsData_ICE while fetching executions");
             });
             e.stopImmediatePropagation();
         });
@@ -243,7 +243,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 
     if (window.localStorage['redirectedReportObj'] && window.localStorage['redirectedReportObj'] != '') {
 
-      var redirection = window.localStorage['fromExecution'];
+        var redirection = window.localStorage['fromExecution'];
         if (redirection == "true") {
             blockUI("loading report ...");
             redirected = true;
@@ -311,40 +311,49 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             reportsInputData.projectId = $.trim($('.project-list option:selected').val());
             reportsInputData.releaseId = $.trim($('.release-list option:selected').val());
             reportsInputData.cycleId = $.trim(cycleId);
-            reportsInputData.type = 'allreports';
+            reportsInputData.type = 'allmodules';
             var counter = 0;
             blockUI("Loading modules.. please wait..");
             $("#accordion").hide();
             $('#nodeBox').empty();
-            reportService.getReportsData_ICE(reportsInputData).then(function(result_res_reportData, response_reportData) {
+            //Fetching Modules under cycle
+            reportService.getReportsData_ICE(reportsInputData).then(function(result_res_reportData) {
                 unblockUI();
-                if (Object.keys(result_res_reportData.testsuites).length == 0) {
-                    //No Modules Found
-                    $("#noModulesModal").modal('show');
-                    $('#searchModule').attr('disabled', 'disabled');
+                if (result_res_reportData == "Fail") {
+                    $("#reportsModal").modal('show');
                 } else {
-                    $('#searchModule').removeAttr('disabled', 'disabled');
-                    if ($('.moduleBox').is(':visible') == true) {
-
+                    if (result_res_reportData.rows.length == 0) {
+                        //No Modules Found
+                        $("#noModulesModal").modal('show');
+                        $('#searchModule').attr('disabled', 'disabled');
                     } else {
-                        $('#expAssign').trigger('click');
-                    }
-                    $rootScope.reportData = result_res_reportData;
-                    angular.forEach(result_res_reportData.testsuites, function(value, index) {
-                        $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value.testsuiteid + '  title=' + value.testsuitename + ' style="width: 139px;"><img class="ct-nodeIcon" id=' + value.testsuiteid + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.testsuitename + '</span></div>')
-                        $('.reports-search').removeAttr('disabled', 'disabled');
-                    });
+                        //Modules Display
+                        $('#searchModule').removeAttr('disabled', 'disabled');
+                        if ($('.moduleBox').is(':visible') == true) {
 
+                        } else {
+                            $('#expAssign').trigger('click');
+                        }
+                        $rootScope.reportData = result_res_reportData.rows;
+                        angular.forEach(result_res_reportData.rows, function(value, index) {
+                            $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value.testsuiteid + '  title=' + value.testsuitename + ' style="width: 139px;"><img class="ct-nodeIcon" id=' + value.testsuiteid + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.testsuitename + '</span></div>')
+                            $('.reports-search').removeAttr('disabled', 'disabled');
+                        });
+
+                    }
+                    if (redirected) {
+                        $timeout(function() {
+                            $("div.ct-node").each(function() {
+                                if ($.trim($(this).text()) == $.trim(robj.testSuiteDetails[0].testsuitename)) {
+                                    $(this).children('img').trigger('click');
+                                }
+                            })
+                        }, 700);
+                    }
                 }
-                if (redirected) {
-                    $timeout(function() {
-                        $("div.ct-node").each(function() {
-                            if ($.trim($(this).text()) == $.trim(robj.testSuiteDetails[0].testsuitename)) {
-                                $(this).children('img').trigger('click');
-                            }
-                        })
-                    }, 700);
-                }
+            }, function(error) {
+                unblockUI();
+                console.log("Error in service getReportsData_ICE while fetching modules");
             });
         };
     };
@@ -765,7 +774,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         };
         reportService.getReport_Nineteen68(reportID, testsuiteId, testsuitename)
             .then(function(data) {
-                    console.log("data", data);
                     if (data == "Invalid Session") {
                         return $rootScope.redirectPage();
                     }
