@@ -464,6 +464,20 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				"complexity":obj[i].complexity
 			});
 		}
+		
+		if(links.length != 0){
+			for (var i=0; i < links.length; i++){
+				if(class_map[links[i].source] != undefined && class_map[links[i].target] != undefined){
+					var link = {
+						"source": class_map[links[i].source],
+						"target": class_map[links[i].target],
+						"type": "association"
+					};
+					graph_json["links"].push(link);
+				}
+			}
+		}
+		
 		for (var i=0; i<obj.length; i++){
 
 			if (obj[i].extends != null) {
@@ -547,17 +561,6 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 						size++;
 					}
 				}
-			}
-		}
-		
-		if(links.length != 0){
-			for (var i=0; i < links.length; i++){
-				var link = {
-					"source": class_map[links[i].source],
-					"target": class_map[links[i].target],
-					"type": "association"
-				};
-				graph_json["links"].push(link);
 			}
 		}
 		return graph_json;
@@ -970,16 +973,15 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			openDialog('APG', "Data flow can't be generated for this class.");
 		}
 		else{
-			var selected_class = classes[i].name;
-			var data_flow_classes = new Set([]);
-			data_flow_classes.add(selected_class);
-			for (var j=0; j < links.length; j++){
-				if(links[j].source == selected_class){
-					selected_class = links[j].target;
-					data_flow_classes.add(links[j].target);
-					j = -1;
+			var selected_class = [classes[i].name];
+			for (var k=0;k<selected_class.length;k++){
+				for (var j=0; j < links.length; j++){
+					if(links[j].source == selected_class[k]){
+						selected_class.push(links[j].target);
+					}
 				}
 			}
+			var data_flow_classes = new Set(selected_class);
 			for (var k=0; k<obj.data_flow.length; k++){
 				if(data_flow_classes.has((obj.data_flow[k].class).split('(')[0])){
 					if(obj.data_flow[k].text == 'Start' || obj.data_flow[k].text == 'End'){
