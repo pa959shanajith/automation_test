@@ -97,7 +97,6 @@ exports.initScraping_ICE = function (req, res) {
 					dataToIce.username = name;
 					logger.info("Sending socket request for "+dataToIce.emitAction+" to redis");
 					redisServer.redisPubICE.publish('ICE1_normal_' + name, JSON.stringify(dataToIce));
-					var updateSessionExpiry = utils.resetSession(req);
 					function scrape_listener(channel, message) {
 						var data = JSON.parse(message);
 						//LB: make sure to send recieved data to corresponding user
@@ -111,7 +110,6 @@ exports.initScraping_ICE = function (req, res) {
 								}
 							} else {
 								value = data.value;
-								clearInterval(updateSessionExpiry);
 								logger.info("Sending "+reqAction+" scraped objects from initScraping_ICE");
 								res.send(value);
 							}
@@ -1198,11 +1196,9 @@ exports.updateScreen_ICE = function (req, res) {
 													logger.info("Sending socket request for checkIrisDuplicate_ICE to redis");
 													dataToIce = {"emitAction" : "irisOperations","username" : name, "image_data":scrapedata, "param":"checkDuplicate"};
 													redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-													var updateSessionExpiry = utils.resetSession(req);
 													function checkIrisDuplicate_listener(channel,message) {
 														var data = JSON.parse(message);
 														if(name == data.username){
-															clearInterval(updateSessionExpiry);
 															redisServer.redisSubServer.removeListener('message',checkIrisDuplicate_listener);
 															if (data.onAction == "unavailableLocalServer") {
 																logger.error("Error occurred in checkIrisDuplicate_ICE: Socket Disconnected");
@@ -1706,7 +1702,6 @@ exports.debugTestCase_ICE = function (req, res) {
 																logger.info("Sending socket request for debugTestCase to redis");
 																dataToIce = {"emitAction" : "debugTestCase","username" : name, "responsedata":responsedata};
 																redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-																var updateSessionExpiry = utils.resetSession(req);
 																function result_debugTestCase_listener(channel, message) {
 																	data = JSON.parse(message);
 																	//LB: make sure to send recieved data to corresponding user
@@ -1719,7 +1714,6 @@ exports.debugTestCase_ICE = function (req, res) {
 																				soc.emit("ICEnotAvailable");
 																			}
 																		} else if (data.onAction == "result_debugTestCase") {
-																			clearInterval(updateSessionExpiry);
 																			try {
 																				res.send(data.value);
 																			} catch (exception) {
@@ -1752,77 +1746,75 @@ exports.debugTestCase_ICE = function (req, res) {
 								logger.info("Sending socket request for debugTestCaseWS_ICE to redis");
 								dataToIce = {"emitAction" : "debugTestCase","username" : name, "responsedata":testcaseWS};
 								redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-								var updateSessionExpiry = utils.resetSession(req);
-									function result_debugTestCaseWS_listener(channel, message) {
-										data = JSON.parse(message);
-										//LB: make sure to send recieved data to corresponding user
-										if (data.username == name) {
-											redisServer.redisSubServer.removeListener('message', result_debugTestCaseWS_listener);
-											if (data.onAction == "unavailableLocalServer") {
-												logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
-												if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
-													var soc = myserver.socketMapNotify[name];
-													soc.emit("ICEnotAvailable");
-												}
-											} else {
-												clearInterval(updateSessionExpiry);
-												var value = data.value;
-												try {
-													if (value.toUpperCase() === 'TERMINATE' || value === 'ExecutionOnlyAllowed') {
-														try {
-															res.send(value);
-														} catch (exception) {
-															logger.error("Exception while sending response in the service debugTestCase_ICE - result_debugTestCaseWS: %s", exception);
-														}
-													} else {
-														var responsedata = {
-															responseHeader: [],
-															responseBody: []
-														};
-														if (value != "fail" && value != undefined && value != "") {
-															var response = value.split('rEsPONseBOdY:');
-															if (response.length == 2) {
-																responsedata.responseHeader.push(response[0]);
-																responsedata.responseBody.push(response[1].replace("&gt;", ">").replace("&lt;", "<"));
-																try {
-																	res.send(responsedata);
-																} catch (exception) {
-																	logger.error("Exception while sending response data in the service debugTestCase_ICE - result_debugTestCaseWS: %s", exception);
-																}
-															} else if (response.length == 1) {
-																responsedata.responseHeader.push(response[0]);
-																responsedata.responseBody.push("");
-																try {
-																	res.send(responsedata);
-																} catch (exception) {
-																	logger.error("Exception while sending response data in the service debugTestCase_ICE - result_debugTestCaseWS: %s", exception);
-																}
-															} else {
-																responsedata.responseHeader.push("");
-																responsedata.responseBody.push("");
-																try {
-																	res.send(responsedata);
-																} catch (exception) {
-																	logger.error("Exception while sending response data in the service debugTestCase_ICE - result_debugTestCaseWS: %s", exception);
-																}
+								function result_debugTestCaseWS_listener(channel, message) {
+									data = JSON.parse(message);
+									//LB: make sure to send recieved data to corresponding user
+									if (data.username == name) {
+										redisServer.redisSubServer.removeListener('message', result_debugTestCaseWS_listener);
+										if (data.onAction == "unavailableLocalServer") {
+											logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
+											if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
+												var soc = myserver.socketMapNotify[name];
+												soc.emit("ICEnotAvailable");
+											}
+										} else {
+											var value = data.value;
+											try {
+												if (value.toUpperCase() === 'TERMINATE' || value === 'ExecutionOnlyAllowed') {
+													try {
+														res.send(value);
+													} catch (exception) {
+														logger.error("Exception while sending response in the service debugTestCase_ICE - result_debugTestCaseWS: %s", exception);
+													}
+												} else {
+													var responsedata = {
+														responseHeader: [],
+														responseBody: []
+													};
+													if (value != "fail" && value != undefined && value != "") {
+														var response = value.split('rEsPONseBOdY:');
+														if (response.length == 2) {
+															responsedata.responseHeader.push(response[0]);
+															responsedata.responseBody.push(response[1].replace("&gt;", ">").replace("&lt;", "<"));
+															try {
+																res.send(responsedata);
+															} catch (exception) {
+																logger.error("Exception while sending response data in the service debugTestCase_ICE - result_debugTestCaseWS: %s", exception);
+															}
+														} else if (response.length == 1) {
+															responsedata.responseHeader.push(response[0]);
+															responsedata.responseBody.push("");
+															try {
+																res.send(responsedata);
+															} catch (exception) {
+																logger.error("Exception while sending response data in the service debugTestCase_ICE - result_debugTestCaseWS: %s", exception);
 															}
 														} else {
-															responsedata.responseHeader.push("Response Header - Fail");
-															responsedata.responseBody.push("Response Body - Fail");
+															responsedata.responseHeader.push("");
+															responsedata.responseBody.push("");
 															try {
 																res.send(responsedata);
 															} catch (exception) {
 																logger.error("Exception while sending response data in the service debugTestCase_ICE - result_debugTestCaseWS: %s", exception);
 															}
 														}
+													} else {
+														responsedata.responseHeader.push("Response Header - Fail");
+														responsedata.responseBody.push("Response Body - Fail");
+														try {
+															res.send(responsedata);
+														} catch (exception) {
+															logger.error("Exception while sending response data in the service debugTestCase_ICE - result_debugTestCaseWS: %s", exception);
+														}
 													}
-												} catch (exception) {
-													logger.error("Exception in the service debugTestCase_ICE - result_debugTestCaseWS: %s", exception);
 												}
+											} catch (exception) {
+												logger.error("Exception in the service debugTestCase_ICE - result_debugTestCaseWS: %s", exception);
 											}
 										}
 									}
-									redisServer.redisSubServer.on("message",result_debugTestCaseWS_listener);
+								}
+								redisServer.redisSubServer.on("message",result_debugTestCaseWS_listener);
 							} catch (exception) {
 								logger.error("Exception in the service debugTestCase_ICE - debugTestCaseWS_ICE: %s", exception);
 							}
@@ -1832,7 +1824,6 @@ exports.debugTestCase_ICE = function (req, res) {
 								logger.info("Sending socket request for debugTestCase to redis");
 								dataToIce = {"emitAction" : "wsdl_listOfOperation","username" : name, "wsdlurl":wsdlurl};
 								redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));	
-								var updateSessionExpiry = utils.resetSession(req);
 									function result_wsdl_listOfOperation_listener(channel, message) {
 										data = JSON.parse(message);
 										//LB: make sure to send recieved data to corresponding user
@@ -1845,7 +1836,6 @@ exports.debugTestCase_ICE = function (req, res) {
 													soc.emit("ICEnotAvailable");
 												}
 											} else if (data.onAction == "result_wsdl_listOfOperation") {
-												clearInterval(updateSessionExpiry);
 												var listGenResponse = data.value;
 												try {
 													if (listGenResponse.toUpperCase() === 'TERMINATE' || listGenResponse === "ExecutionOnlyAllowed") {
@@ -1904,7 +1894,6 @@ exports.debugTestCase_ICE = function (req, res) {
 								logger.info("Sending socket request for debugTestCase to redis");
 								dataToIce = {"emitAction" : "wsdl_ServiceGenerator","username" : name, "serviceGenRequest":serviceGenRequest};
 								redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-								var updateSessionExpiry = utils.resetSession(req);
 								function result_wsdl_ServiceGenerator_listener(channel, message) {
 									data = JSON.parse(message);
 									//LB: make sure to send recieved data to corresponding user
@@ -1917,7 +1906,6 @@ exports.debugTestCase_ICE = function (req, res) {
 												soc.emit("ICEnotAvailable");
 											}
 										} else if (data.onAction == "result_wsdl_ServiceGenerator") {
-											clearInterval(updateSessionExpiry);
 											try {
 												if (data.value.toUpperCase() === 'TERMINATE' || data.value === "ExecutionOnlyAllowed") {
 													try {
@@ -2166,11 +2154,9 @@ exports.updateIrisDataset = function updateIrisDataset(req, res) {
 					logger.info("Sending socket request for updateIrisDataset to redis");
 					dataToIce = {"emitAction" : "irisOperations","username" : name, "image_data":image_data, "param":"updateDataset"};
 					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-					var updateSessionExpiry = utils.resetSession(req);
 					function updateIrisDataset_listener(channel,message) {
 						var data = JSON.parse(message);
 						if(name == data.username){
-							clearInterval(updateSessionExpiry);
 							redisServer.redisSubServer.removeListener('message',updateIrisDataset_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occurred in updateIrisDataset: Socket Disconnected");

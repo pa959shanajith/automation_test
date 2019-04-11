@@ -51,11 +51,9 @@ exports.loginQCServer_ICE = function (req, res) {
 						logger.info("Sending socket request for qclogin to redis");
 						dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = utils.resetSession(req);
 						function qclogin_listener(channel,message) {
 							var data = JSON.parse(message);
 							if(name == data.username){
-								clearInterval(updateSessionExpiry);
 								redisServer.redisSubServer.removeListener('message',qclogin_listener);
 								if (data.onAction == "unavailableLocalServer") {
 									logger.error("Error occurred in loginQCServer_ICE: Socket Disconnected");
@@ -130,11 +128,9 @@ exports.qcProjectDetails_ICE = function (req, res) {
 						logger.info("Sending socket request for qclogin to redis");
 						dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = utils.resetSession(req);
 						function qclogin_listener(channel,message) {
 							var data = JSON.parse(message);
 							if(name == data.username){
-								clearInterval(updateSessionExpiry);
 								redisServer.redisSubServer.removeListener('message',qclogin_listener);
 								if (data.onAction == "unavailableLocalServer") {
 									logger.error("Error occurred in qcProjectDetails_ICE: Socket Disconnected");
@@ -324,11 +320,9 @@ exports.qcFolderDetails_ICE = function (req, res) {
 					logger.info("Sending socket request for qclogin to redis");
 					dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
 					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-					var updateSessionExpiry = utils.resetSession(req);
 					function qclogin_listener(channel,message) {
 						var data = JSON.parse(message);
 						if(name == data.username){
-							clearInterval(updateSessionExpiry);
 							redisServer.redisSubServer.removeListener('message',qclogin_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occurred in qcFolderDetails_ICE: Socket Disconnected");
@@ -421,28 +415,6 @@ exports.saveQcDetails_ICE = function (req, res) {
 		if (flag) {
 			try {
 				if (utils.isSessionActive(req)) {
-					/*var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-					console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", ip);
-					var mySocket = myserver.allSocketsMap[ip];
-					if ('allSocketsMap' in myserver && ip in myserver.allSocketsMap) {
-						mySocket._events.qcresponse = [];
-						var qcDetails = {
-							"qcaction": "qcquit"
-						};
-						mySocket.emit("qclogin", qcDetails);
-						var updateSessionExpiry = utils.resetSession(req);
-						mySocket.on('qcresponse', function (data) {
-							clearInterval(updateSessionExpiry);
-							res.send("success");
-						});
-					} else {
-						console.log("Socket not Available");
-						try {
-							res.send("unavailableLocalServer");
-						} catch (exception) {
-							console.log(exception);
-						}
-					}*/
 					res.send("success");
 				} else {
 					logger.info("Invalid Session");

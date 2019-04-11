@@ -1,41 +1,40 @@
-mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$location','$timeout','qcServices','cfpLoadingBar', 'socket', function($scope, rootScope, $window,$http,$location,$timeout,qcServices,cfpLoadingBar,socket) {
+mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$location','$timeout','qcServices','cfpLoadingBar', 'socket', function($scope, $rootScope, $window,$http,$location,$timeout,qcServices,cfpLoadingBar,socket) {
 	$('.scrollbar-inner').scrollbar();
 	var nineteen68_projects_details;
-	$scope.domainData;
 	$timeout(function(){
 		$('.scrollbar-inner').scrollbar();
 		$('.scrollbar-macosx').scrollbar();
 		document.getElementById("currentYear").innerText = new Date().getFullYear();
 		$("#testPlanTab").trigger("click");
 		$("#loginToQCpop").modal("show");
-	}, 500)
+	}, 500);
 	var mappedList = [];
 	if(window.localStorage['navigateScreen'] != "p_ALM"){
-		$rootScope.redirectPage();
+		return $rootScope.redirectPage();
 	}
 
 	$(".selectBrowser").click(function(){
 		$(".selectBrowser").find("img").removeClass("selectedIcon");
 		$(this).find("img").addClass("selectedIcon");
-	})
+	});
 	$scope.loadDomains = function(){
 		var domainData = $scope.domainData;
 		if(domainData){
 			$timeout(function(){
 				if((domainData != undefined || domainData != "") && domainData.domain.length > 0){
 					$(".qcSelectDomain").empty();
-					$(".qcSelectDomain").append("<option selected disabled>Select Domain</option>")
+					$(".qcSelectDomain").append("<option selected disabled>Select Domain</option>");
 					for(var i=0;i<domainData.domain.length;i++){
 						$(".qcSelectDomain").append("<option value='"+domainData.domain[i]+"'>"+domainData.domain[i]+"</option>");
 					}
 				}
-			}, 500)
+			}, 500);
 		}
-	}
+	};
 
 	socket.on('ICEnotAvailable', function () {
 		unblockUI();
-		openModelPopup("ALM Connection", "ICE Engine is not available, Please run the batch file and connect to the Server.")
+		openModelPopup("ALM Connection", "ICE Engine is not available, Please run the batch file and connect to the Server.");
 	});
 
 	//login to QC
@@ -70,12 +69,12 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				if(data == "unavailableLocalServer"){
 					$("#qcErrorMsg").text("ICE Engine is not available,Please run the batch file and connect to the Server.");
 				}
-				else if(data == "scheduleModeOn")
-				{
+				else if(data == "scheduleModeOn") {
 					$("#qcErrorMsg").text("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
 				}
 				else if(data == "Invalid Session"){
-					$("#qcErrorMsg").text("Invalid Session");
+					//$("#qcErrorMsg").text("Invalid Session");
+					return $rootScope.redirectPage();
 				}
 				else if(data == "invalidcredentials"){
 					$("#qcErrorMsg").text("Invalid Credentials");
@@ -91,12 +90,12 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				}
 				else if(data){
 					$(".qcSelectDomain").empty();
-					$(".qcSelectDomain").append("<option selected disabled>Select Domain</option>")
+					$(".qcSelectDomain").append("<option selected disabled>Select Domain</option>");
 					for(var i=0;i<data.domain.length;i++){
 						$(".qcSelectDomain").append("<option value='"+data.domain[i]+"'>"+data.domain[i]+"</option>");
 					}
 					$("#loginToQCpop").modal("hide");
-					$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">User Name :</span><span class="content">'+qcUserName+'</span></p>')
+					$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">User Name :</span><span class="content">'+qcUserName+'</span></p>');
 					//Transaction Activity for ALMLogin Submit Button Action
 					// var labelArr = [];
 					// var infoArr = [];
@@ -107,7 +106,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
 			});
 		}
-	} 
+	}; 
 
 	$scope.goBacktoPlugin = function($event){
 		//Transaction Activity for ALMLogin Cancel Button Action
@@ -117,14 +116,14 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 		window.localStorage['navigateScreen'] = "plugin";
 		window.location.assign('plugin');
-	}
+	};
 
 	$scope.hideMappedFilesTab = function(){
 		$scope.testLabGenerator = false;
 		$(".mappedFiles, .mappedFilesLabel").hide();
 		$("#page-taskName span").text("ALM Integration");
 		$(".qcActionBtn, .leftQcStructure, .rightQcStructure").show();
-	}
+	};
 
 	//Select Domains
 	$(document).on('change', ".qcSelectDomain", function(){
@@ -136,14 +135,14 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			.then(function(data){
 				nineteen68_projects_details = data.nineteen68_projects;
 				if(data == "unavailableLocalServer"){
-					openModelPopup("ALM Connection", "ICE Engine is not available, Please run the batch file and connect to the Server.")
+					openModelPopup("ALM Connection", "ICE Engine is not available, Please run the batch file and connect to the Server.");
 				}	
-				else if(data == "scheduleModeOn")
-				{
-					openModelPopup("ALM Connection", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
+				else if(data == "scheduleModeOn") {
+					openModelPopup("ALM Connection", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
 				}
 				else if(data == "Invalid Session"){
-					openModelPopup("ALM Connection", "Invalid Session")
+					//openModelPopup("ALM Connection", "Invalid Session");
+					return $rootScope.redirectPage();
 				}
 				else if(data){
 					$(".qcSelectProject").empty();
@@ -164,7 +163,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			function(error) {	unblockUI(); 
 				console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
 			});
-	})
+	});
 
 	//Select QC projects
 	$(document).on("change", ".qcSelectProject", function(){
@@ -175,18 +174,18 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			.then(function(data){
 				var structContainer = $(".qcTreeContainer");
 				structContainer.empty();
-				structContainer.append("<ul class='root scrollbar-inner'><li class='testfolder_'><img class='qcCollapse' title='expand' style='height: 16px;' src='imgs/ic-qcCollapse.png'><label title='Root'>Root</label></li></ul>")
+				structContainer.append("<ul class='root scrollbar-inner'><li class='testfolder_'><img class='qcCollapse' title='expand' style='height: 16px;' src='imgs/ic-qcCollapse.png'><label title='Root'>Root</label></li></ul>");
 				if("testfolder" in data[0] && data[0].testfolder.length > 0){
 					for(var i=0; i<data[0].testfolder.length; i++){
 						if(i == 0){				
-							structContainer.find(".root").append("<ul></ul>")
+							structContainer.find(".root").append("<ul></ul>");
 						}
-						structContainer.find(".root ul").append("<li class='Tfolnode' testfolder_"+(i+1)+" data-folderpath='"+data[0].testfolder[i].folderpath+"'><img class='qcExpand qcExpandFolder selectedQcNode' title='expand' style='height: 16px;' src='imgs/ic-qcExpand.png'><label title='"+data[0].testfolder[i].foldername+"'>"+data[0].testfolder[i].foldername+"</label></li>")
+						structContainer.find(".root ul").append("<li class='Tfolnode' testfolder_"+(i+1)+" data-folderpath='"+data[0].testfolder[i].folderpath+"'><img class='qcExpand qcExpandFolder selectedQcNode' title='expand' style='height: 16px;' src='imgs/ic-qcExpand.png'><label title='"+data[0].testfolder[i].foldername+"'>"+data[0].testfolder[i].foldername+"</label></li>");
 					}
 				}
 				if("TestSet" in data[1] && data[1].TestSet.length > 0){
 					for(var j=0; j<data[1].TestSet.length; j++){
-						structContainer.find(".root ul").append("<li class='Tsetnode testSet_"+(j+1)+"' data-testsetpath='"+data[1].TestSet[j].testsetpath+"' data-testsetid='"+data[1].TestSet[j].testsetid+"'><img class='qcExpand qcExpandTestset selectedQcNode' title='expand' style='height: 16px;' src='imgs/ic-taskType-blue-plus.png'><label title='"+data[1].TestSet[j].testset+"'>"+data[1].TestSet[j].testset+"</label></li>")
+						structContainer.find(".root ul").append("<li class='Tsetnode testSet_"+(j+1)+"' data-testsetpath='"+data[1].TestSet[j].testsetpath+"' data-testsetid='"+data[1].TestSet[j].testsetid+"'><img class='qcExpand qcExpandTestset selectedQcNode' title='expand' style='height: 16px;' src='imgs/ic-taskType-blue-plus.png'><label title='"+data[1].TestSet[j].testset+"'>"+data[1].TestSet[j].testset+"</label></li>");
 					}
 				}
 				unblockUI();				
@@ -203,10 +202,10 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			if(getProject == nineteen68_projects_details[i].project_id){
 				var N68Container = $(".qcN68TreeContainer");
 				N68Container.empty();
-				N68Container.append("<ul class='scrollbar-inner'></ul>")
+				N68Container.append("<ul class='scrollbar-inner'></ul>");
 				if(nineteen68_projects_details[i].scenario_details.length >0){
 					for(var j=0; j<nineteen68_projects_details[i].scenario_details.length; j++){
-						N68Container.find("ul").append("<li class='testSet testScenariolink' data-scenarioid='"+nineteen68_projects_details[i].scenario_details[j].testscenarioid+"'><label title='"+nineteen68_projects_details[i].scenario_details[j].testscenarioname+"'>"+nineteen68_projects_details[i].scenario_details[j].testscenarioname+"</label></li>")
+						N68Container.find("ul").append("<li class='testSet testScenariolink' data-scenarioid='"+nineteen68_projects_details[i].scenario_details[j].testscenarioid+"'><label title='"+nineteen68_projects_details[i].scenario_details[j].testscenarioname+"'>"+nineteen68_projects_details[i].scenario_details[j].testscenarioname+"</label></li>");
 					}
 					//if(nineteen68_projects_details[i].scenario_details.length >= 25)
 					$('.scrollbar-inner').scrollbar();
@@ -232,7 +231,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			flgTog = 1;
 		}
 		filter($(this).siblings("input"));
-	})
+	});
 
 	$(document).on('keyup', '.searchScenarioQC', function() {
 		filter(this);
@@ -301,12 +300,12 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 								else if(getObject.hasClass("Tfolnode")){
 									if("testfolder" in data[a] && data[a].testfolder.length > 0){
 										for(var i=0; i<data[a].testfolder.length; i++){
-											getObject.next("ul").append("<li class='Tfolnode' data-folderpath='"+data[a].testfolder[i].folderpath+"'><img class='qcExpand qcExpandFolder selectedQcNode' title='expand' style='height: 16px;' src='imgs/ic-qcExpand.png'><label title='"+data[a].testfolder[i].foldername+"'>"+data[a].testfolder[i].foldername+"</label></li>")
+											getObject.next("ul").append("<li class='Tfolnode' data-folderpath='"+data[a].testfolder[i].folderpath+"'><img class='qcExpand qcExpandFolder selectedQcNode' title='expand' style='height: 16px;' src='imgs/ic-qcExpand.png'><label title='"+data[a].testfolder[i].foldername+"'>"+data[a].testfolder[i].foldername+"</label></li>");
 										}
 									}
 									else if("TestSet" in data[a] && data[a].TestSet.length > 0){
 										for(var j=0; j<data[a].TestSet.length; j++){
-											getObject.next("ul").append("<li class='Tsetnode testSet_' data-testsetpath='"+data[a].TestSet[j].testsetpath+"' data-testsetid='"+data[a].TestSet[j].testsetid+"'><img class='qcExpand qcExpandTestset selectedQcNode' title='expand' style='height: 16px;' src='imgs/ic-taskType-blue-plus.png'><label title='"+data[a].TestSet[j].testset+"'>"+data[a].TestSet[j].testset+"</label></li>")
+											getObject.next("ul").append("<li class='Tsetnode testSet_' data-testsetpath='"+data[a].TestSet[j].testsetpath+"' data-testsetid='"+data[a].TestSet[j].testsetid+"'><img class='qcExpand qcExpandTestset selectedQcNode' title='expand' style='height: 16px;' src='imgs/ic-taskType-blue-plus.png'><label title='"+data[a].TestSet[j].testset+"'>"+data[a].TestSet[j].testset+"</label></li>");
 										}
 									}
 								}
@@ -324,7 +323,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		//if(($(".qcTreeContainer ul").length + $(".qcTreeContainer li").length) >= 25){
 		$('.scrollbar-inner').scrollbar();
 		//}
-	})
+	});
 	
 	//Select testset
 	$(document).on('click','.testcaselink', function(){
@@ -334,7 +333,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		$(this).addClass("selectedToMap");
 		$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
 		$(this).find(".qcSyncronise, .qcUndoSyncronise").show();
-	})
+	});
 	$(document).on('click','.testScenariolink', function(){
 		
 		$('.selectedToMap').prop("style","background-color:none;border-radius:0px;");
@@ -343,7 +342,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		$(this).addClass("selectedToMap");
 		$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
 		
-	})
+	});
 
 	//Undo Mapping
 	$(document).on('click', ".qcUndoSyncronise", function(){
@@ -352,7 +351,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		for(var i=0;i<mappedList.length;i++){
 			if(qcTestcaseName == mappedList[i].testcase && qcTestsetName == mappedList[i].testset){
 				delete mappedList[i];
-				mappedList =  mappedList.filter(function(n){ return n != null });
+				mappedList =  mappedList.filter(function(n){ return n != null; });
 				$('.testScenariolink').removeClass("selectedToMap");
 				$('.testScenariolink').prop("style","background-color:none;border-radius:0px;");
 				$(this).parent().css({"background-color":"rgb(225, 202, 255)"});
@@ -360,7 +359,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				break;
 			}
 		}
-	})
+	});
 
 	// Mapping
 	$(document).on('click', ".qcSyncronise", function(event){
@@ -383,12 +382,12 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				'testset': qcTestsetName,
 				'folderpath': qcFolderPath,
 				'scenarioId': N68ScenarioId,
-			})
+			});
 			$(this).parent().css({"background-color":"#ddd"});
 			$(this).hide();
 			event.stopPropagation();
 		}
-	})
+	});
 
 	//Submit mapped details
 	$scope.mapTestcaseToN68 = function(){
@@ -416,10 +415,10 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			});
 		}
 		else 	openModelPopup("Save Mapped Testcase", "Map Testcases before save");
-	}
+	};
 
 	$scope.displayMappedFilesTab = function(){
-		blockUI("Loading...")
+		blockUI("Loading...");
 		var userid = JSON.parse(window.localStorage['_UI']).user_id;
 		qcServices.viewQcMappedList_ICE(userid)
 		.then(function(data){
@@ -428,7 +427,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				if (a.qctestcase > b.qctestcase) return 1;
 			    else if (a.qctestcase < b.qctestcase) return -1;
 			    else return 0;
-			})
+			});
 			if(data.length > 0){
 				$(".qcActionBtn, .leftQcStructure, .rightQcStructure").hide();
 				$("#page-taskName span").text("Mapped Files");	
@@ -437,32 +436,32 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				$('.mappedFiles').removeClass('scroll-wrapper');
 				$(".mappedFilesLabel").show();
 				for(var i=0;i<data.length;i++){
-					$(".mappedFiles").append('<div class="linkedTestset"><label data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" data-qctestset="'+data[i].qctestset+'">'+data[i].qctestcase+'</label><span class="linkedLine"></span><label data-scenarioid="'+data[i].testscenarioid+'">'+data[i].testscenarioname+'</label></div>')
+					$(".mappedFiles").append('<div class="linkedTestset"><label data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" data-qctestset="'+data[i].qctestset+'">'+data[i].qctestcase+'</label><span class="linkedLine"></span><label data-scenarioid="'+data[i].testscenarioid+'">'+data[i].testscenarioname+'</label></div>');
 				}	
 
 				$('.scrollbar-inner').scrollbar();
 			}
 			else{
-				openModelPopup("Mapped Testcase", "No mapped details")
+				openModelPopup("Mapped Testcase", "No mapped details");
 			}
-			unblockUI()
+			unblockUI();
 		},
 		function(error) {	console.log("Error in qcController.js file viewQcMappedList_ICE method! \r\n "+(error.data));
 		});		
-	}
+	};
 
 	$scope.exitQcConnection = function(){
 		var dataAction = "qcquit";
 		qcServices.qcFolderDetails_ICE(dataAction,"","","","")
 		.then(function(data){
 			if(data == "closedqc"){
-				window.localStorage['navigateScreen'] = "plugin"
+				window.localStorage['navigateScreen'] = "plugin";
 				window.location.href = "/plugin";
 			}		
 		},
 		function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
 		});
-	}
+	};
 
 	/*****************Manual Test Case Generator*******************/
 	//Get all project details for Manual Testcase Generator
@@ -484,7 +483,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		},
 		function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
 		});
-	}
+	};
 
 	//Load Modules
 	$(document).on('change', '.mtgProjects', function(){
@@ -501,7 +500,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				break;
 			}
 		}
-	})
+	});
 
 	//Load Scenarios
 	$(document).on('change', '.mtgModules', function(){
@@ -518,7 +517,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				break;
 			}
 		}
-	})
+	});
 
 	//Load Test Case
 	$(document).on('change', '.mtgScenarios', function(){
@@ -536,19 +535,19 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		if($(".mtgScenarioList").find("li").length > 11){
 			$('.scrollbar-inner').scrollbar();
 		}
-	})
+	});
 
 	//Adding selection class for Testcase option(right upper section of Test Lab)
 	$(document).on('click', '.mtgScenarioList li', function(){
 		$(this).siblings().removeClass("selectTestcaseMTG");
 		$(this).addClass("selectTestcaseMTG");
-	})
+	});
 
 	//Adding selection class for Fields required option(left bottom section of Test Lab)
 	$(document).on('click', '.almfieldsList ul li', function(){
 		$(this).siblings().removeClass("selectfieldsList");
 		$(this).addClass("selectfieldsList");
-	})
+	});
 
 	//Adding selection class for ALM Fileds option(right bottom section of Test Lab)
 	$(document).on('click', '.almFieldExcel li', function(){
@@ -556,7 +555,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			$(this).siblings().removeClass("selectALMExcel");
 			$(this).addClass("selectALMExcel");
 		}
-	})
+	});
 
 	//Move to Fields required list(left bottom section of Test Lab)
 	$scope.addToAlmFields = function(){
@@ -583,7 +582,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		if($(".almFieldExcel").find("li").length > 7){
 			$('.scrollbar-inner').scrollbar();
 		}
-	}
+	};
 
 	//Remove from ALM Field(right bottom section of Test Lab)
 	$scope.removeFromAlmField = function(){
@@ -595,9 +594,9 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 					$(this).show();
 					$(this).removeClass("selectfieldsListAdded");
 				}
-			})
+			});
 		}
-	}
+	};
 
 	//Generate Manual Testcase details
 	$scope.saveTestlabdetails = function(){
@@ -612,9 +611,9 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			var key = $(this).children("label").text();
 			var value = $(this).find("span input").val();
 			testLabdetails[key] = value;
-		})
+		});
 		testcasedetails["testLabdetails"] = testLabdetails;
-	}
+	};
 	//Global moded popup
 	function openModelPopup(title, body){
 		$("#globalModal").find('.modal-title').text(title);

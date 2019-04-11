@@ -5483,7 +5483,6 @@ border-radius: 6px;
     height: 20px;
     width: 700px;
     top: calc(100% - 2px);
-    left: 120px;
 }
 
 #legend-box-data-flow {
@@ -6087,13 +6086,12 @@ h4.titleBadge
 .parallelexec
 {
     font-size: 30px;
-    height: 40px;
-    width: 65px;
 }
 
 .selectParallel
 {
-    width:75px !important;
+    width: 100px !important;
+    cursor: pointer;
 }
 
 .badge-reports

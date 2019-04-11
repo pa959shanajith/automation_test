@@ -12,7 +12,7 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
     loadUserTasks()
 
     if (window.localStorage['navigateScreen'] != "p_Utility") {
-        $rootScope.redirectPage();
+        return $rootScope.redirectPage();
     }
     cfpLoadingBar.start()
 
@@ -276,7 +276,7 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
             utilityService.Encrypt(methodSelected, encryptionVal)
                 .then(function(data) {
                     if (data == "Invalid Session") {
-                        $rootScope.redirectPage();
+                        return $rootScope.redirectPage();
                     } else if (data != "fail") {
                         $("#encryptedData").val(data);
                         //Transaction Activity for Encryption

@@ -1,5 +1,5 @@
 mySPA.factory('headerServices', ['$http','$q', function ($http,$q){
-    return{
+    return {
 		logoutUser_Nineteen68 : function(){	
 			return $http.post('/logoutUser_Nineteen68',{
 				param : 'logoutUser_Nineteen68',
@@ -15,6 +15,11 @@ mySPA.factory('headerServices', ['$http','$q', function ($http,$q){
 			})
 			.then(function(response) { return response.data},
 			function(response) {return $q.reject(response.data)})
-	    }
+	    },
+		keepSessionAlive_Nineteen68 : function(){	
+			return $http.post('/keepSessionAlive_Nineteen68')
+			.then(function(response) { return response.data},
+			function(response) {return $q.reject(response.data)})
+		}
     }
 }]);

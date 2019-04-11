@@ -171,32 +171,36 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		// socket connection ....
 		var userName=JSON.parse(window.localStorage['_UI']).username;
 		var param={check:true,username:userName};
-		var socket = io('', { forceNew: true, reconnect: true, query: param});
+		var socketUI = io('', { forceNew: true, reconnect: true, query: param});
 		
 		version = document.getElementById("version").value;
 		path = document.getElementById("path").value;
-		flowGraphServices.getResults(version,path) .then(function(data) {
+		$rootScope.resetSession.start();
+		flowGraphServices.getResults(version,path).then(function(data) {
+			$rootScope.resetSession.end();
 			if (data == "unavailableLocalServer") {
 				$scope.hideBaseContent = { message: 'false' };
 				$('#progress-canvas').hide();
 				document.getElementById('path').value = '';
 				openDialog("APG", $rootScope.unavailableLocalServer_msg);
 				return false;
-			}else if(data == "Invalid Session"){
+			} else if(data == "Invalid Session"){
 				document.getElementById('path').value = '';
-				$rootScope.redirectPage();
+				return $rootScope.redirectPage();
 			}
 		}, function(err){
+			$rootScope.resetSession.end();
+			openDialog("APG", "Failed to generate graph.");
 			console.log("Error :", err);
 		});
 		
-		socket.on('newdata', function(obj){
+		socketUI.on('newdata', function(obj){
 			$scope.addClass(obj);
 			$scope.$apply();
 			classes.push(obj);
 		});
-		
-		socket.on('endData', function(obj){
+
+		socketUI.on('endData', function(obj) {
 			if(obj.result == "success"){
 				$('#progress-canvas').fadeOut(800, function(){
 					$scope.hideBaseContent = { message: 'true' };
@@ -207,7 +211,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				$scope.enableGenerate = true;
 				$scope.ClassDiagramView = true;
 				//$scope.createAPGProject(obj);
-			}else if(obj.result == "fail"){
+			} else if(obj.result == "fail") {
 				$('#progress-canvas').fadeOut(800, function(){
 					$scope.hideBaseContent = { message: 'false' };
 					$scope.$apply();
@@ -215,8 +219,9 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				document.getElementById('path').value = '';
 				openDialog("APG", "Failed to generate graph.");
 			}
+			socketUI.disconnect('', { query: "check=true" });
 		});
-		
+
 		var canv =   d3.select("#progress-canvas").append('svg').attr('id','legend-box');
 		var u = canv.append('g').attr("transform", "translate(10,10)");	
 		var legends=[{text:'Public'},{text:'Private'},{text:'Protected'},{text:'Default'},{text:'Abstract'}];
@@ -325,6 +330,11 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				.attr('y',3)
 				.text(e.text);
 			}
+		});
+		if (($('#middle-content-section').width() - 700) > 0)  var x = ($('#middle-content-section').width() - 700)/2;
+		else  var x = 10;
+		$('#legend-box').css({
+			left: x
 		});
 	}
 	
@@ -459,6 +469,20 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				"complexity":obj[i].complexity
 			});
 		}
+		
+		if(links.length != 0){
+			for (var i=0; i < links.length; i++){
+				if(class_map[links[i].source] != undefined && class_map[links[i].target] != undefined){
+					var link = {
+						"source": class_map[links[i].source],
+						"target": class_map[links[i].target],
+						"type": "association"
+					};
+					graph_json["links"].push(link);
+				}
+			}
+		}
+		
 		for (var i=0; i<obj.length; i++){
 
 			if (obj[i].extends != null) {
@@ -542,17 +566,6 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 						size++;
 					}
 				}
-			}
-		}
-		
-		if(links.length != 0){
-			for (var i=0; i < links.length; i++){
-				var link = {
-					"source": class_map[links[i].source],
-					"target": class_map[links[i].target],
-					"type": "association"
-				};
-				graph_json["links"].push(link);
 			}
 		}
 		return graph_json;
@@ -870,13 +883,19 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
 			var listWeight=$("[id^=weightage_]");
 			var ccData = $(".ccvalue");
-			var weightedSum = 0; 
+			var weightedSum = 0;
+			var sum = 0;
 			for(var i=0;i<listWeight.length;i++){
-				$scope.wmcList[i] = parseInt(listWeight[i].innerText);
-				weightedSum+=(parseInt(ccData[i].innerText)*($scope.wmcList[i]*0.01));
+				sum = sum + parseInt(listWeight[i].innerText);
 			}
-			$scope.wmcc = Math.ceil(weightedSum); 
-			$scope.apply();
+			if(sum == 100){
+				for(var i=0;i<listWeight.length;i++){
+					$scope.wmcList[i] = parseInt(listWeight[i].innerText);
+					weightedSum+=(parseInt(ccData[i].innerText)*($scope.wmcList[i]*0.01));
+				}
+				$scope.wmcc = Math.ceil(weightedSum);
+				$scope.apply();
+			} else   openDialog('APG', "Please check the weightages given.");
 		}	
 
 		nodeGroup.append('image')
@@ -959,16 +978,15 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			openDialog('APG', "Data flow can't be generated for this class.");
 		}
 		else{
-			var selected_class = classes[i].name;
-			var data_flow_classes = new Set([]);
-			data_flow_classes.add(selected_class);
-			for (var j=0; j < links.length; j++){
-				if(links[j].source == selected_class){
-					selected_class = links[j].target;
-					data_flow_classes.add(links[j].target);
-					j = -1;
+			var selected_class = [classes[i].name];
+			for (var k=0;k<selected_class.length;k++){
+				for (var j=0; j < links.length; j++){
+					if(links[j].source == selected_class[k]){
+						selected_class.push(links[j].target);
+					}
 				}
 			}
+			var data_flow_classes = new Set(selected_class);
 			for (var k=0; k<obj.data_flow.length; k++){
 				if(data_flow_classes.has((obj.data_flow[k].class).split('(')[0])){
 					if(obj.data_flow[k].text == 'Start' || obj.data_flow[k].text == 'End'){
@@ -1336,34 +1354,39 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		// var infoArr = [];
 		// labelArr.push(txnHistory.codesDict['OpenFileInEditor']);
 		// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
-		var e = $("tr.hightlight_Complexity_row")[0]
+		var e = $("tr.hightlight_Complexity_row")[0];
 		if(e != undefined){
-			lineNumber = (e.getAttribute('name')).split('_')[1];
+			var lineNumber = (e.getAttribute('name')).split('_');
+			lineNumber = lineNumber[lineNumber.length - 1];
+			$rootScope.resetSession.start();
 			flowGraphServices.APG_OpenFileInEditor(editorName,$scope.filePath,lineNumber) .then(function(data) {
+				$rootScope.resetSession.end();
 				if (data == "unavailableLocalServer") {
 					$scope.hideBaseContent = { message: 'false' };
 					$('#progress-canvas').hide();
 					document.getElementById('path').value = '';
-					openDialog("Flowgraph Generator", $rootScope.unavailableLocalServer_msg);
+					openDialog("APG", $rootScope.unavailableLocalServer_msg);
 					return false;
 				}else if(data == "Invalid Session"){
 					document.getElementById('path').value = '';
-					$rootScope.redirectPage();
+					return $rootScope.redirectPage();
 				}
 				else if(data.status == "fail"){
 					openDialog("Open File", data.message);
 					return false;
 				}
 			}, function(err){
+				$rootScope.resetSession.end();
+				openDialog("Open File", "Operation Fail.");
 				console.log("Error :", err);
 			});
 		}
-		else{
+		else {
 			openDialog("Open File", "Please select one of the methods.");
 			return false;
 		}
 	}
-	
+
 	 $scope.fullScreen = function() {
 		// remove highlight from fullscreen icon
 		$timeout(function(){$('#fullscr img').removeClass('thumb-ic-highlight')},500);
@@ -1425,7 +1448,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				return false;
 			}else if(data == "Invalid Session"){
 				document.getElementById('path').value = '';
-				$rootScope.redirectPage();
+				return $rootScope.redirectPage();
 			}
 		}, function(err){
 			console.log("Error :", err);
@@ -1581,11 +1604,11 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				$scope.hideBaseContent = { message: 'false' };
 				$('#progress-canvas').hide();
 				document.getElementById('path').value = '';
-				openDialog("Flowgraph Generator", $rootScope.unavailableLocalServer_msg);
+				openDialog("APG", $rootScope.unavailableLocalServer_msg);
 				return false;
 			}else if(data == "Invalid Session"){
 				document.getElementById('path').value = '';
-				$rootScope.redirectPage();
+				return $rootScope.redirectPage();
 			}
 			else if(data == false){
 				openDialog("Deadcode Identifier", 'Report generation failed');
