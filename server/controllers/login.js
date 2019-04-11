@@ -241,7 +241,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 								callback("fail");
 							} else {
 								var pluginsArr = [];
-								var key = ["ALM", "APG", "Dashboard", "Dead Code Identifier", "Mindmap", "Neuron Graphs", "Oxbow Code Identifier", "Reports", "Utility", "Webocular"];
+								var key = ["ALM", "APG", "Dashboard", "Dead Code Identifier", "Mindmap", "Neuron Graphs", "Oxbow Code Identifier", "Performance Testing", "Reports", "Utility", "Webocular"];
 								var vals = Object.values(pluginResult.rows[0]);
 								for(var i=0; i < key.length; i++){
 									pluginsArr.push({
