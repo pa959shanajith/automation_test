@@ -360,22 +360,16 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			var userId = $("#selAssignUser1 option:selected").attr("data-id");
 			var generatetoken = {};
 			$(".scheduleSuiteTable").append('<div class="tokenSuite"><span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIconToken" src="../imgs/ic-datepicker.png" /></span><span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>');
-			adminServices.getTokendetails()
-			.then(function (data) {
-				if (data == "Invalid Session") {
-					$rootScope.redirectPage();
-				}
-				else{
 					//console.log(expdate)
 					var expdate=$(".tokeninfo .tokenSuite .datePicContainer .fc-datePicker").val()
 					var exptime=$(".tokeninfo .tokenSuite .timePicContainer .fc-timePicker").val()
-					var tokendetails=data;
+					var tokendetails=userDetails.token;
 					var tokenname=$('#tokenName').val()
 					var today = new Date()
 					var td = new Date()
 					var expiry=""
 					if(expdate == ""){
-						td.setHours(today.getHours()+parseInt(tokendetails.default));
+						td.setHours(today.getHours()+parseInt(tokendetails));
 						var expdate=""+td.getDate()+"-"+(td.getMonth()+1)+"-"+td.getFullYear()
 						$('.fc-datePicker').val(expdate);
 					}
@@ -397,10 +391,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 						var sltime_2 = exptime.split(":");
 						expiry=expdate+" "+exptime;
 						var now = new Date(sldate_2[2],sldate_2[1]-1,sldate_2[0],sltime_2[0],sltime_2[1]);
+						td=today;
 						td.setHours(today.getHours()+8);
-						console.log("now",now);
-						console.log("today",today);
-						console.log("td",td);
 						if(now < today){
 							openModalPopup("Token Management", "Expiry time should be 8 hours more than current time");
 							return false;
@@ -410,7 +402,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 							return false;
 						}
 						else{
-							console.log("expiry",expiry);
+							//console.log("expiry",expiry);
 							//console.log(tokenname)
 							generatetoken.userId = userId;
 							generatetoken.expiry = expiry;
@@ -464,12 +456,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 							});
 						}
 					}
-				}
-			}, function (error) {
-				unblockUI();
-				console.log("Error:::::::::::::", error);
-			});
-		}		
+			}		
 	};
 	$scope.deactivate = function ($event) {
 		var CIUser={}

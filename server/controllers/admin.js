@@ -14,8 +14,7 @@ var qList = [];
 var neo4jAPI = require('../controllers/neo4jAPI');
 var logger = require('../../logger');
 var utils = require('../lib/utils');
-var configpath= require('../config/options.js')
-var fs = require('fs');
+
 
 //GetUserRoles
 exports.getUserRoles_Nineteen68 = function (req, res) {
@@ -1834,23 +1833,6 @@ exports.generateCItoken = function (req, res) {
 	}
 };
 
-exports.getTokendetails = function (req, res) {
-	logger.info("Inside UI service: getTokendetails");
-	try {
-		if (utils.isSessionActive(req)) {
-			var token_details = {
-				default : configpath.token.default,
-				min : configpath.token.min
-			};
-			res.send(token_details);
-		} else {
-			res.send("Invalid Session");
-		}
-	} catch (exception) {
-		logger.error("Error occurred in admin/getTokendetails:", exception);
-		res.status(500).send("fail");
-	}
-};
 
 //GEnerate Token for CI User
 exports.generateCIusertokens = function (req, res) {

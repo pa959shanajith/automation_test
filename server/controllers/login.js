@@ -5,6 +5,8 @@ var Client = require("node-rest-client").Client;
 var client = new Client();
 var logger = require('../../logger');
 var utils = require('../lib/utils');
+var configpath= require('../config/options.js')
+var fs = require('fs');
 
 /**
  * @see : function to check whether projects are assigned for user
@@ -151,6 +153,8 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 			var selectedRole = req.body.selRole;
 			var userName = req.session.username;
 			var jsonService = {};
+			console.log(configpath.token.default)
+			jsonService.token = configpath.token.default;
 			async.waterfall([
 				function userInfo(callback) {
 					var inputs = {
