@@ -25,7 +25,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		}
 	});
 
-	$("#displayUsername").text(userDetails.firstname + ' ' + userDetails.lastname)
+	$("#displayUsername").text(userDetails.firstname + ' ' + userDetails.lastname);
 	$(".heading-center-light").text('Welcome  ' + userDetails.firstname + ' ' + userDetails.lastname + '!');
 	$(".userRole").text(userRole);
 	if (userRole == 'Admin') {
@@ -56,29 +56,24 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 
 
 	socket.on('killSession', function (value) {
-		$rootScope.redirectPage();
+		return $rootScope.redirectPage();
 	});
 
 	socket.on('notify', function (value) {
 		var isDuplicateNotificationMsg;
-		if(window.localStorage.notification)
-		{
+		if (window.localStorage.notification) {
 			var notificationArrList = JSON.parse(window.localStorage.notification);
-			for(let i=0;i<notificationArrList.length;i++)
-			{
-				if(value.notifyMsg == notificationArrList[i].notifyMsg)
-				{
+			for (var i = 0; i < notificationArrList.length; i++) {
+				if (value.notifyMsg == notificationArrList[i].notifyMsg) {
 					isDuplicateNotificationMsg = true;
 				}
 			}
-			if(isDuplicateNotificationMsg == true)
-			{
+			if (isDuplicateNotificationMsg == true) {
 				return;
 			}
 		}
-		if(isDuplicateNotificationMsg != true )
-		{
-			if(value.count == 0 && 'notifyMsg' in value){
+		if (isDuplicateNotificationMsg != true) {
+			if (value.count == 0 && 'notifyMsg' in value) {
 				var dateTime = new Date().toLocaleString();
 				if (value.to.indexOf($location.$$path) >= 0) {
 					$('.top-left').notify({
@@ -90,31 +85,30 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 							exit: 'animated fadeOutRight'
 						}
 					}).show();
-			}
-				
-					value.count = value.count + 1;
-					if (window.localStorage.notification) {
-						var notificationArr = window.localStorage.notification;
-						notificationArr = JSON.parse(notificationArr);
-						value.dateTime = dateTime;
-						notificationArr.push(value);
-						notificationArr = JSON.stringify(notificationArr);
-						window.localStorage.notification = notificationArr;
-						$scope.notifications = JSON.parse(window.localStorage.notification);
-						$scope.$apply();
-					}else {
-						var notificationArr = [];
-						value.dateTime = dateTime;
-						notificationArr.push(value);
-						notificationArr = JSON.stringify(notificationArr)
-						window.localStorage.notification = notificationArr;
-						$scope.notifications = JSON.parse(window.localStorage.notification);
-						$scope.$apply();
-					}
-					unreadNotifications();
-					}
-		}
+				}
 
+				value.count = value.count + 1;
+				if (window.localStorage.notification) {
+					var notificationArr = window.localStorage.notification;
+					notificationArr = JSON.parse(notificationArr);
+					value.dateTime = dateTime;
+					notificationArr.push(value);
+					notificationArr = JSON.stringify(notificationArr);
+					window.localStorage.notification = notificationArr;
+					$scope.notifications = JSON.parse(window.localStorage.notification);
+					$scope.$apply();
+				} else {
+					var notificationArr = [];
+					value.dateTime = dateTime;
+					notificationArr.push(value);
+					notificationArr = JSON.stringify(notificationArr);
+					window.localStorage.notification = notificationArr;
+					$scope.notifications = JSON.parse(window.localStorage.notification);
+					$scope.$apply();
+				}
+				unreadNotifications();
+			}
+		}
 	});
 
 	function unreadNotifications() {
@@ -168,9 +162,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 				}
 			}
 		}, 10);
-		
-	
-	}
+	};
 
 	$scope.naviPg = function($event){
 		if (localStorage.getItem("navigateEnable") == "true") {
@@ -209,7 +201,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			LoginService.getRoleNameByRoleId_Nineteen68(roleasarray)
 			.then(function (data) {
 				if (data == "Invalid Session") {
-					$rootScope.redirectPage();
+					return $rootScope.redirectPage();
 				} else {
 					var rolesList = $('#switchRoles');
 					rolesList.empty();
@@ -264,7 +256,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		headerServices.getNames_ICE(projectId,['projects']) 
 		.then(function(data){
 			if(data == "Invalid Session"){
-				$rootScope.redirectPage();
+				return $rootScope.redirectPage();
 			}
 			$scope.projectDetails = data;
 			task = JSON.parse(window.localStorage['_CT']);
@@ -274,28 +266,27 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			headerServices.getNames_ICE(releaseId, ['releases']) 
 			.then(function(data){
 				if(data == "Invalid Session"){
-				  $rootScope.redirectPage();
+					return $rootScope.redirectPage();
 				}
 				$scope.releaseDetails = data.respnames[0];
 				cycleId.push(task.cycleid);
 				headerServices.getNames_ICE(cycleId, ['cycles'])
 				.then(function(data){
 					if(data == "Invalid Session"){
-				  		$rootScope.redirectPage();
+				  		return $rootScope.redirectPage();
 					}
 					$scope.cycleDetails = data.respnames[0];
 
-				}, function(error) {	console.log("Failed to get cycle name")});
-			}, function(error) {	console.log("Failed to get release name")});
-			headerServices.getNames_ICE(screenId,['screens']) 
-		.then(function(data){
-			if(data == "Invalid Session"){
-				$rootScope.redirectPage();
-			}
-			$scope.screenName = data.respnames[0];
-		}, 
-		function(error) {	console.log("Failed to fetch info")});
-		}, function(error) {	console.log("Failed to fetch projectInfo")});
+				}, function(error) { console.log("Failed to get cycle name");});
+			}, function(error) { console.log("Failed to get release name");});
+			headerServices.getNames_ICE(screenId,['screens'])
+			.then(function(data){
+				if(data == "Invalid Session"){
+					return $rootScope.redirectPage();
+				}
+				$scope.screenName = data.respnames[0];
+			}, function(error) { console.log("Failed to fetch info");});
+		}, function(error) { console.log("Failed to fetch projectInfo");});
 	}
 
 	$scope.logout = function($event){

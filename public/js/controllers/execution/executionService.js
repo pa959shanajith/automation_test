@@ -24,9 +24,6 @@ mySPA.factory('ExecutionService', ['$http','$q', function ($http,$q)   {
 				param : 'ExecuteTestSuite_ICE',
 				moduleInfo: moduleInfo,
 				action: exc_action
-			//	jsonData : JSON.stringify(selectedRowData),
-			//	browserType : browserTypeExe,
-			//	testsuiteId : testSuiteId
 			})
 			.then(function(response)  { return response.data},
 			function(response)        {return $q.reject(response.data)})

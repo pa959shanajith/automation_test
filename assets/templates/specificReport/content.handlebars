@@ -148,6 +148,10 @@
             });
             $('.collapsible-tc').append('<span class="arrow-down-sm"></span>');
 
+            $(".collapsible-tc:visible").each(function() {
+                $(this).parent("tr").addClass('parentTestcase');
+            });
+
             $(document).on('click', '.collapsible-tc', function () {
                 var abc = this.parentElement.getAttribute("data-id");
                 var len = $('.reportdetailsrow').length;
@@ -159,12 +163,12 @@
                     $(this).removeClass('collapse-active');
                     $(this).children('span.arrow-up-sm').removeClass('arrow-up-sm').addClass('arrow-down-sm');
                 }
-                while (len--) {
-                    abc = parseInt(abc) + 1;
-                    if ($($("[data-id=" + abc + "]")[0]).find('.collapsible-tc').length != 0)
-                        break;
-                    else
-                        $("[data-id=" + abc + "]").toggleClass("no-disp");
+                var testcasesLen = $('.collapsible-tc:visible').length;
+                var clickedTestcaseRow = $(this).parent('tr');
+                var getAllSelectedTestcaseRows = $(this).parent().nextUntil('.parentTestcase');
+                if(getAllSelectedTestcaseRows.length != 0)
+                {
+                    $(this).parent().nextUntil('.parentTestcase').toggleClass('no-disp');
                 }
             });
             $(document).on('click', '.expand', function () {

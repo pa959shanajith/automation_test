@@ -146,7 +146,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         "edit": "fa-pencil-square-o",
         "delete": "fa-trash-o"
     };
-    
+
+    if (window.localStorage['navigateScreen'] != "mindmap") {
+        return $rootScope.redirectPage();
+    }
     //------------------Createmap.js---------------------//
 
     function unloadMindmapData() {
@@ -168,12 +171,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $('#searchModule-assign').val('');
         mindmapServices.populateProjects().then(function(res) {
             if (res == "Invalid Session") {
-                $rootScope.redirectPage();
+                return $rootScope.redirectPage();
             }
-            
-            // Fetch apptype and domain
-    
 
+            // Fetch apptype and domain
             if (res.projectId.length > 0) {
                 $scope.projectList = [];
                 for (i = 0; i < (res.projectId.length && res.projectName.length); i++) {
@@ -192,7 +193,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 }
                 mindmapServices.getDomain().then(function(result) {
                     if (result == "Invalid Session") {
-                        $rootScope.redirectPage();
+                        return $rootScope.redirectPage();
                     } else {
                         $scope.domaininfo = result;
                         mindmapServices.getProjectTypeMM_Nineteen68($scope.projectNameO).then(function(res1){
@@ -210,7 +211,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     $("#ctExpandAssign .iconSpaceArrow").trigger('click');
                     mindmapServices.populateReleases($scope.projectNameO).then(function(result) {
                         if (result == "Invalid Session") {
-                            $rootScope.redirectPage();
+                            return $rootScope.redirectPage();
                         }
                         //releaseResult = result;
                         $('.release-list').empty();
@@ -239,7 +240,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             unloadMindmapData();
                             mindmapServices.populateCycles($('.release-list').val()).then(function(result_cycles) {
                                 if (result_cycles == "Invalid Session") {
-                                    $rootScope.redirectPage();
+                                    return $rootScope.redirectPage();
                                 }
                                 var result2 = result_cycles;
                                 $('.cycle-list').empty();
@@ -325,7 +326,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             unloadMindmapData();
             mindmapServices.populateReleases($scope.projectNameO).then(function(result) {
                 if (result == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 }
                 //releaseResult = result;
                 default_releaseid = '';
@@ -355,7 +356,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     unloadMindmapData();
                     mindmapServices.populateCycles($('.release-list').val()).then(function(result_cycles) {
                         if (result_cycles == "Invalid Session") {
-                            $rootScope.redirectPage();
+                            return $rootScope.redirectPage();
                         }
                         var result2 = result_cycles;
                         $('.cycle-list').empty();
@@ -383,7 +384,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             mindmapServices.getVersions($scope.projectNameO).then(
                 function(res) {
                     if (res == "Invalid Session") {
-                        $rootScope.redirectPage();
+                        return $rootScope.redirectPage();
                     }
                     addVersioning(res);
                 },
@@ -544,9 +545,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         unloadMindmapData();
         mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO || $scope.projectList[0].id, parseFloat(version_num), $('.release-list').val(), $('.cycle-list').val())
             .then(function(res) {
-                
                 if (res == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 }
                 var nodeBox = d3.select('.ct-nodeBox');
                 $scope.allMMaps = res;
@@ -753,7 +753,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             initiate();
             clearSvg();
             if (result == "Invalid Session") {
-                $rootScope.redirectPage();
+                return $rootScope.redirectPage();
             }
             currMap = result[0];
             excelMap = JSON.parse(JSON.stringify(currMap));
@@ -1494,7 +1494,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 mindmapServices.populateUsers($scope.projectNameO)
                     .then(function(res) {
                         if (res == "Invalid Session") {
-                            $rootScope.redirectPage();
+                            return $rootScope.redirectPage();
                         }
                         $('#ct-assignedTo').empty().append("<option value='select user' >Select User</option>");
                         for (i = 0; i < res.userRoles.length && res.r_ids.length; i++) {
@@ -1517,7 +1517,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 mindmapServices.populateUsers($scope.projectNameO)
                     .then(function(res) {
                         if (res == "Invalid Session") {
-                            $rootScope.redirectPage();
+                            return $rootScope.redirectPage();
                         }
                         $('#ct-assignRevw').empty();
                         $('#ct-assignRevw').append("<option value='select reviewer' select=selected>" + "Select Reviewer" + "</option>");
@@ -2239,7 +2239,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         blockUI("Deleting testcase! Please wait..");
         mindmapServices.checkReuse(dataReuse).then(function(result) {
             if (result == "Invalid Session") {
-                $rootScope.redirectPage();
+                return $rootScope.redirectPage();
             }
             result = result.toString().split(',');
             deletednode.push.apply(deletednode, result);
@@ -2446,7 +2446,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             $('#renamingConfirmationPopup').attr('node', pi);
             mindmapServices.checkReuse(dataReuse).then(function(result) {
                 if (result == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 }
                 result['screen'].forEach(function(e, i) {
                     if (e.count > 0) {
@@ -2677,7 +2677,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
         mindmapServices.checkReuse(restrict_scenario_reuse).then(function(result_reuse) {
             if (result_reuse == "Invalid Session") {
-                $rootScope.redirectPage();
+                return $rootScope.redirectPage();
             }
             var reuse = [];
             if (selectedTab != 'tabAssign') {
@@ -2746,7 +2746,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             mindmapServices.saveData(versioning_enabled, assignedTo, flag, from_v, to_v, cur_module, mapData, deletednode, unassignTask,
                 $('.project-list').val(), $('.release-list').val(), $('.cycle-list').val(), selectedTab).then(function(result) {
                 if (result == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 }
                 unblockUI();
                 if (flag == 10 || flag == 30) {
@@ -2782,7 +2782,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         from_v = to_v = $('.version-list').val()
                     mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, parseFloat(from_v), $('.release-list').val(), $('.cycle-list').val()).then(function(result) {
                         if (result == "Invalid Session") {
-                            $rootScope.redirectPage();
+                            return $rootScope.redirectPage();
                         }
                         var nodeBox = d3.select('.ct-nodeBox');
                         // $(nodeBox[0]).empty();
@@ -2966,7 +2966,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
         mindmapServices.saveEndtoEndData(username, flag, from_v, to_v, 'endToend', mapData, deletednode, unassignTask, selectedProject, $('#ct-assignRel').val(), $('#ct-assignCyc').val()).then(function(result) {
             if (result == "Invalid Session") {
-                $rootScope.redirectPage();
+                return $rootScope.redirectPage();
             }
             unblockUI();
             var res = result;
@@ -3002,7 +3002,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 mindmapServices.getModules(versioning_enabled, 'endToend', $scope.projectNameO, '', $('.release-list').val(), $('.cycle-list').val())
                     .then(function(result) {
                         if (result == "Invalid Session") {
-                            $rootScope.redirectPage();
+                            return $rootScope.redirectPage();
                         }
                         var nodeBox = d3.select('#etemModuleContainer');
                         // $(nodeBox[0]).empty();
@@ -3129,7 +3129,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     function populateDynamicInputList() {
         mindmapServices.getScreens($('.project-list').val()).then(function(result) {
             if (result == "Invalid Session") {
-                $rootScope.redirectPage();
+                return $rootScope.redirectPage();
             } else {
                 scrList = result.screenList;
                 tcList = result.testCaseList;
@@ -3269,7 +3269,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
         mindmapServices.checkReuse(reusedata).then(function(result) {
             if (result == "Invalid Session") {
-                $rootScope.redirectPage();
+                return $rootScope.redirectPage();
             }
             result['screen'].forEach(function(e, i) {
                 dNodes[e.idx].reuse = e.reuse;
@@ -3399,7 +3399,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, parseFloat(version_num), $('.release-list').val(), $('.cycle-list').val(), "fetch all").then(
             function(result) {
                 if (result == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 }
                 result_details = result;
                 flag = 0;
@@ -3441,13 +3441,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     mindmapServices.getProjectTypeMM_Nineteen68($scope.projectNameO).then(
                         function(project_type) {
                             if (project_type == "Invalid Session") {
-                                $rootScope.redirectPage();
+                                return $rootScope.redirectPage();
                             }
                             parsed_project_data = project_type;
                             mindmapServices.getCRId($scope.projectNameO).then(
                                 function(rel_cycle_data) {
                                     if (rel_cycle_data == "Invalid Session") {
-                                        $rootScope.redirectPage();
+                                        return $rootScope.redirectPage();
                                     }
                                     ci_parsed_details = rel_cycle_data;
                                     for (var i = 0; i < data.moduleInfo.length; i++) {
@@ -3652,7 +3652,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         d3.select('#ct-assignBox').classed('no-disp', !0);
         mindmapServices.getModules(versioning_enabled, 'endToend', $scope.projectNameO, $('.release-list').val(), $('.cycle-list').val()).then(function(result) {
             if (result == "Invalid Session") {
-                $rootScope.redirectPage();
+                return $rootScope.redirectPage();
             }
             var nodeBox = d3.select('#etemModuleContainer');
             // $(nodeBox[0]).empty();
@@ -3762,7 +3762,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         mindmapServices.getModules(versioning_enabled, 'endToend', $scope.projectNameO, '', $('.release-list').val(), $('.cycle-list').val(), modName)
             .then(function(result) {
                 if (result == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 }
                 currMap = result[0];
                 treeBuilder_W(currMap);
@@ -3802,7 +3802,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         blockUI("Loading module.. Please wait..");
         mindmapServices.populateScenarios(moduleid).then(function(result) {
             if (result == "Invalid Session") {
-                $rootScope.redirectPage();
+                return $rootScope.redirectPage();
             }
             container.empty();
             result.forEach(function(row) {
@@ -4128,12 +4128,12 @@ Purpose : displaying pop up for replication of project
         blockUI('Loading....')
         mindmapServices.populateProjects().then(function(result) {
             if (result == "Invalid Session") {
-                $rootScope.redirectPage();
+                return $rootScope.redirectPage();
             }
             var project_type = $('.project-list').find(':selected').attr('app-type')
             mindmapServices.getProjectsNeo().then(function(res) {
                 if (res == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 }
                 var parse_data = res;
                 var flag = 0;
@@ -4212,7 +4212,7 @@ Purpose : displaying pop up for replication of project
         mindmapServices.createVersion('project_replicate', $scope.projectNameO, pid, from_v, to_v, 10).then(
             function(res) {
                 if (res == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 }
                 //$('.version-list').val(to_v);
                 unblockUI();
@@ -4324,7 +4324,7 @@ Purpose : displaying pop up for replication of project
         mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, parseFloat(active_version), $('.release-list').val(), $('.cycle-list').val()).then(
             function(res) {
                 if (res == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 }
                 var nodeBox = d3.select('.ct-nodeBox');
                 // $(nodeBox[0]).empty();
@@ -4367,7 +4367,7 @@ Purpose : displaying pop up for replication of project
         mindmapServices.createVersion('', $scope.projectNameO, '', from_v, to_v, 10).then(
             function(res) {
                 if (res == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 }
                 $('.version-list').val(to_v);
                 unblockUI();
@@ -4423,7 +4423,7 @@ Purpose : displaying pop up for replication of project
         mindmapServices.getVersions($scope.projectNameO).then(
             function(res) {
                 if (res == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 }
                 maxVersionNumber = res[res.length - 1];
                 $('#versionNumInputPopUp').modal("show");
@@ -4451,7 +4451,7 @@ Purpose : displaying pop up for replication of project
         mindmapServices.getVersions($scope.projectNameO).then(
             function(result) {
                 if (result == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 }
                 maxVersionNumber = result[result.length - 1];
                 if (inputVersion > parseFloat(maxVersionNumber)) {
@@ -4514,9 +4514,6 @@ Purpose : displaying pop up for replication of project
     //--------------------Controller logic-------------------------//
     $("body").css("background", "#eee");
     $("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" /><link id="mindmapCSS3" rel="stylesheet" type="text/css" href="css/css_mindmap/jquery-ui.css" />');
-    if (window.localStorage['navigateScreen'] != "mindmap") {
-        $rootScope.redirectPage();
-    }
     var versioningEnabled = false;
     $timeout(function() {
         $('.scrollbar-inner').scrollbar();
@@ -4607,7 +4604,7 @@ Purpose : displaying pop up for replication of project
     $scope.createMapsCall = function(e) {
         mindmapServices.getProjectsNeo().then(function(res) {
             if (res == "Invalid Session") {
-                $rootScope.redirectPage();
+                return $rootScope.redirectPage();
             } else {
                 if (res == "true") versioningEnabled = true;
                 load_tab();
@@ -4946,15 +4943,12 @@ Purpose : displaying pop up for replication of project
 
     $scope.exportToExcel = function() {
         //var excelMap = {};
-
         if (excelFlag != 1) {
             openDialogMindmap("Fail", "Select the Module to export to excel");
-
         } else {
-
             mindmapServices.exportToExcel(excelMap).then(function(result) {
                 if (result == "Invalid Session") {
-                    $rootScope.redirectPage();
+                    return $rootScope.redirectPage();
                 } else {
                     openWindow = 0;
                     if (openWindow == 0) {
@@ -4975,23 +4969,16 @@ Purpose : displaying pop up for replication of project
                         }
                     }
                     openWindow++;
-
-
-
                 }
-
-
             });
-
         }
-
     }
 
     $scope.getSheetName = function($fileContent) {
         $scope.content = $fileContent;
         mindmapServices.excelToMindmap({'content':$scope.content,'flag':'sheetname'}).then(function(result) {
             if (result == "Invalid Session") {
-                $rootScope.redirectPage();
+                return $rootScope.redirectPage();
             } else if (result == 'fail') {
                 openDialogMindmap('Error', 'error fetching sheet names');
             } else {
@@ -5008,7 +4995,7 @@ Purpose : displaying pop up for replication of project
         var validate = true;
         mindmapServices.excelToMindmap({'content':$scope.content,'flag':'data','sheetname':sheetname}).then(function(result) {
             if (result == "Invalid Session") {
-                $rootScope.redirectPage();
+                return $rootScope.redirectPage();
             } else if (result == 'fail') {
                 openDialogMindmap('Error', 'Some column names are invalid');
             } else {

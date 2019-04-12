@@ -56,7 +56,7 @@ mySPA.controller('respHeaderController', function($scope, $rootScope, $timeout, 
 
 
 	socket.on('killSession', function (value) {
-		$rootScope.redirectPage();
+		return $rootScope.redirectPage();
 	});
 
 	socket.on('notify', function (value) {
@@ -216,7 +216,7 @@ mySPA.controller('respHeaderController', function($scope, $rootScope, $timeout, 
 			LoginService.getRoleNameByRoleId_Nineteen68(roleasarray)
 			.then(function (data) {
 				if (data == "Invalid Session") {
-					$rootScope.redirectPage();
+					return $rootScope.redirectPage();
 				} else {
 					var rolesList = $('#switchRoles');
 					rolesList.empty();
@@ -271,7 +271,7 @@ mySPA.controller('respHeaderController', function($scope, $rootScope, $timeout, 
 		respHeaderServices.getNames_ICE(projectId,['projects']) 
 		.then(function(data){
 			if(data == "Invalid Session"){
-				$rootScope.redirectPage();
+				return $rootScope.redirectPage();
 			}
 			$scope.projectDetails = data;
 			task = JSON.parse(window.localStorage['_CT']);
@@ -281,14 +281,14 @@ mySPA.controller('respHeaderController', function($scope, $rootScope, $timeout, 
 			respHeaderServices.getNames_ICE(releaseId, ['releases']) 
 			.then(function(data){
 				if(data == "Invalid Session"){
-				  $rootScope.redirectPage();
+					return $rootScope.redirectPage();
 				}
 				$scope.releaseDetails = data.respnames[0];
 				cycleId.push(task.cycleid);
 				respHeaderServices.getNames_ICE(cycleId, ['cycles'])
 				.then(function(data){
 					if(data == "Invalid Session"){
-				  		$rootScope.redirectPage();
+				  		return $rootScope.redirectPage();
 					}
 					$scope.cycleDetails = data.respnames[0];
 
@@ -297,7 +297,7 @@ mySPA.controller('respHeaderController', function($scope, $rootScope, $timeout, 
 			respHeaderServices.getNames_ICE(screenId,['screens']) 
 		.then(function(data){
 			if(data == "Invalid Session"){
-				$rootScope.redirectPage();
+				return $rootScope.redirectPage();
 			}
 			$scope.screenName = data.respnames[0];
 		}, 
