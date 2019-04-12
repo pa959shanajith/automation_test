@@ -21,5 +21,6 @@
     "screenShotPath": {
         "default": "",
         "mac": ""
-    }
+    },	
+	"taskworkflow" : "strict"
 }

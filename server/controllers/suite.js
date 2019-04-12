@@ -554,6 +554,42 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		var name = req.session.username;
 		redisServer.redisSubServer.subscribe('ICE2_' + name);
 		var batchExecutionData = req.body.moduleInfo;
+		//if (taskflow.taskworkflow.toString().toLowerCase()=='strict')
+		if(true){
+				async.forEachSeries(batchExecutionData,function(eachmoduledata,callback){
+					var qlist=[];
+					var projid= eachmoduledata.projectid;
+					var modname= eachmoduledata.testsuitename;
+					var exe_result='';
+					var status='';
+					qlist.push({'statement':"MATCH (n:MODULES) where n.projectID='"+projid+"' and n.moduleName='"+modname+"' MATCH (t:TASKS) where t.parent starts with ('['+n.projectID+','+n.moduleID_c+',') and (t.task='Scrape' or t.task='Design') and not t.status='complete' return count(t)"});
+					neo4jAPI.executeQueries(qlist,function(status_res,result){
+							//res.setHeader('Content-Type', 'application/json');
+							if(status_res!=200){ status=status_res;
+								exe_result=result;
+							}
+							else {
+								try {
+								  	if(result[0].data[0].row[0]!=0){
+										logger.info("All its dependent tasks (design, scrape) are not approved");
+										//exflag=false;
+										status=status_res;
+										exe_result='NotApproved';
+										//res.status(status).send('NotApproved');		
+									}else{
+										callback();
+									}
+								}catch(ex){
+									logger.error("exception in function ValidateIfApproved() of Suitejs: ",ex);
+									status=200;
+									exe_result='fail';
+								}
+							}
+				});
+			},function (){
+				res.status(status).send(exe_result);
+			});
+		}
 		var exc_action  = req.body.action;
 		var userInfo = {"user_id": req.session.userid, "role": req.session.activeRole};
 		var testsuitedetailslist = [],testsuiteidcycmap = {};
