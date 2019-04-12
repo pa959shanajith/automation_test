@@ -516,8 +516,7 @@ if (cluster.isMaster) {
 		app.post('/generateCItoken', admin.generateCItoken);
 		app.post('/generateCIusertokens',admin.generateCIusertokens)
 		app.post('/getCIUsersDetails', admin.getCIUsersDetails);
-		app.post('/deactivateCIUser', admin.deactivateCIUser);
-		app.post('/getTokendetails', admin.getTokendetails);											  
+		app.post('/deactivateCIUser', admin.deactivateCIUser);											  
 
 		//Design Screen Routes
 		app.post('/initScraping_ICE', design.initScraping_ICE);
