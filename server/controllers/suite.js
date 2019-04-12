@@ -14,6 +14,7 @@ var scheduleStatus = "";
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
+var taskflow = require('../config/options');
 var qList = [];
 
 /**
