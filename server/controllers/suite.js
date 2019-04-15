@@ -556,49 +556,33 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		var name = req.session.username;
 		redisServer.redisSubServer.subscribe('ICE2_' + name);
 		var batchExecutionData = req.body.moduleInfo;
-		//if (taskflow.taskworkflow.toString().toLowerCase()=='strict')
 		var approvedStatus=true;
 		async.series({
 			approval_check:function(callback_E){
+				if (taskflow.taskworkflow.toLowerCase()!='strict') return callback_E();
 				async.forEachSeries(batchExecutionData,function(eachmoduledata,callback){
 					var qlist=[];
 					var projid= eachmoduledata.projectid;
 					var modname= eachmoduledata.testsuitename;
-					var exe_result='';
-					var status='';
-					//console.log("MATCH (n:MODULES) where n.projectID='"+projid+"' and n.moduleName='"+modname+"' MATCH (t:TASKS) where t.parent starts with ('['+n.projectID+','+n.moduleID_c+',') and (t.task='Scrape' or t.task='Design') and not t.status='complete' return count(t)");
 					qlist.push({'statement':"MATCH (n:MODULES) where n.projectID='"+projid+"' and n.moduleName='"+modname+"' MATCH (t:TASKS) where t.parent starts with ('['+n.projectID+','+n.moduleID_c+',') and (t.task='Scrape' or t.task='Design') and not t.status='complete' return count(t)"});
 					qlist.push({'statement':"MATCH (n:MODULES_ENDTOEND) where n.projectID='"+projid+"' and n.moduleName='"+modname+"' MATCH (t:TASKS) where t.parent starts with ('['+n.projectID+','+n.moduleID_c+',') and (t.task='Scrape' or t.task='Design') and not t.status='complete' return count(t)"});
 					neo4jAPI.executeQueries(qlist,function(status_res,result){
-							//res.setHeader('Content-Type', 'application/json');
-							if(status_res!=200){ status=status_res;
-								exe_result=result;
+						if(status_res!=200) return callback({res:'fail',status:status_res});
+						try {
+							var err = null;
+							if(result[0].data[0].row[0]!=0 || result[1].data[0].row[0]!=0){
+								logger.info("All its dependent tasks (design, scrape) are not approved");
+								err = {res:'NotApproved',status:status_res};
 							}
-							else {
-								try {
-								  	if(result[0].data[0].row[0]!=0 || result[1].data[0].row[0]!=0){
-										logger.info("All its dependent tasks (design, scrape) are not approved");
-										//exflag=false;
-										status=status_res;
-										exe_result='NotApproved';
-										approvedStatus=false;
-										res.status(status).send('NotApproved');		
-									}else{
-										callback();
-									}
-								}catch(ex){
-									logger.error("exception in function ValidateIfApproved() of Suitejs: ",ex);
-									status=200;
-									exe_result='fail';
-								}
-							}
+							callback(err);
+						} catch(ex) {
+							logger.error("exception in function ValidateIfApproved() of Suitejs: ",ex);
+							callback({res:'fail',status:502});
+						}
 					});
-				},function (err,data){
-					if(approvedStatus){
-						callback_E();
-					}else{
-						res.status(status).send(exe_result);
-					}	
+				}, function (err,data){
+					if (err) res.status(err.status).send(err.res);
+					else callback_E();
 				});
 			},
 			suite_execution:function(callback_E){
@@ -851,7 +835,6 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					});
 				}
 			}
-
 		});
 		
 
