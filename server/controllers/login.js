@@ -243,17 +243,8 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 								logger.info("User plugins not found");
 								callback("fail");
 							} else {
-								var pluginsArr = [];
-								var key = ["ALM", "APG", "Dashboard", "Dead Code Identifier", "Mindmap", "Neuron Graphs", "Oxbow Code Identifier", "Performance Testing", "Reports", "Utility", "Webocular"];
-								var vals = Object.values(pluginResult.rows[0]);
-								for(var i=0; i < key.length; i++){
-									pluginsArr.push({
-										"pluginName" : key[i],
-										"pluginValue" : vals[i]
-									});
-								}
-								jsonService.pluginsInfo = pluginsArr;
-								callback(null);
+								jsonService.pluginsInfo = pluginResult.rows;
+								callback();
 							}
 						}
 					});
