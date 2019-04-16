@@ -349,7 +349,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 			});
 		},
 		start: function startInterval() {
-			this.eventid = setInterval(function(pollCall){ pollCall(); }, 1500000, this.poll);
+			this.eventid = setInterval(function(pollCall){ pollCall(); }, 1200000, this.poll);
 		},
 		end: function endInterval() {
 			clearInterval(this.eventid);

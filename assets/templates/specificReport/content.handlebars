@@ -105,10 +105,10 @@
                 }
             });
 
+            //Open Screenshot for specific reports
             $(document).on('click', '.openscreenshot', function () {
                 var path = $(this).attr("data-screenshot");
                 var hostName = window.location.host;
-                console.log(path + "-----" + hostName);
                 if ($.trim(path) != "") {
                     $.ajax({
                         type: 'POST',
@@ -132,6 +132,9 @@
                                 var strHtml = "<html>\n<head>\n</head>\n<body style='margin: 2px' >\n<img style='border: 1px solid #ccc' src='" + imageUrl + "'/>\n</body>\n</html>";
                                 WindowObject.document.writeln(strHtml);
                             }
+                        },
+                        error: function (jqXHR, exception) {
+                            console.log("Error in opening screenshot:"+jqXHR);
                         }
                     });
                 }
