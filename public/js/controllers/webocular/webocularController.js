@@ -66,6 +66,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		$scope.crawledLinks = [];
 		$scope.arr = [];
 		crawlActive = false;
+		var initCrawl = true;
 
 		start = false; // Flag to start the removal of dots from the dom
 		currentDot = 0;
@@ -103,8 +104,9 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 
 		// fired when the connection acknowledgment is received from the server
 		socketUI.on('connectionAck', function(value){
-			if (crawlActive) return;
+			if (!initCrawl) return;
 			crawlActive = true;
+			initCrawl = false;
 			$rootScope.resetSession.start();
 			webocularServices.getResults($scope.url, $scope.level, $scope.selectedAgent).then(function(data){
 				if (data == "begin") return false;

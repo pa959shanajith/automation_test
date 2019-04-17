@@ -10,12 +10,13 @@ exports.getCrawlResults = function (req, res) {
 		if (utils.isSessionActive(req)) {
 			var name = req.session.username;
 			redisServer.redisSubServer.subscribe('ICE2_' + name ,1);
-			var input_url = req.body.url;
+			var url = req.body.url;
 			var level = req.body.level;
 			var agent = req.body.agent;
-			var validate_url = validator.isURL(req.body.url);
-			var validate_level = !(validator.isEmpty(req.body.level.toString()));
-			var validate_agent = validator.isAlpha(req.body.agent);
+			var validate_agent = validator.isAlpha(agent);
+			var validate_level = !(validator.isEmpty(level.toString()));
+			//var validate_url = validator.isURL(req.body.url);
+			var validate_url = url.toLowerCase().startsWith("http://")? (url.length>7): (url.toLowerCase().startsWith("https://") && url.length>8);
 			if (!(validate_url && validate_level && validate_agent)) {
 				logger.error("Error occurred in the service getCrawlResults: Invalid URL or Agent");
 				return res.send("invalidParams");
@@ -24,7 +25,7 @@ exports.getCrawlResults = function (req, res) {
 			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres) {
 				if (redisres[1]>0) {
 					logger.info("Sending socket request for webCrawlerGo to redis");
-					var dataToIce = {"emitAction" : "webCrawlerGo","username" : name, "input_url":input_url, "level" : level, "agent" :agent};
+					var dataToIce = {"emitAction" : "webCrawlerGo","username" : name, "input_url":url, "level" : level, "agent" :agent};
 					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					var notifySocMap = myserver.socketMapNotify;
 					var mySocketUIMap = myserver.allSocketsMapUI;
