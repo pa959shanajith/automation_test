@@ -13,6 +13,12 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 	 $scope.wmcList=[];
 	 var version, path = null;
 	 $scope.ClassDiagramView = false;
+	 
+	 if(window.localStorage['navigateScreen'] != "p_APG"){
+		window.location.href = "/";
+	 }
+	 localStorage.setItem("navigateEnable", true);
+	 
 	 $scope.expandSidebars = function(){
 		$("#middle-content-section").css({
 			left: '173px',
@@ -76,6 +82,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			$scope.obj = {};
 			$scope.hideBaseContent = { message: 'false' };
 			$scope.ClassDiagramView = false;
+			$('#generateBtn').prop('disabled', true);
 		}else if($("#apg-dfd-canvas").is(':visible')){
 			$scope.enableToggleSidebars = true;
 			//$scope.enableFilter = true;
@@ -87,7 +94,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			});
 			$scope.ClassDiagramView = true;
 		}
-		$scope.ComplexityScreenView = false;									  
+		$scope.ComplexityScreenView = false;
 }
 	$scope.toggleLeftSidebar = function(){
 		if($("#ct-expand-left-apg").hasClass('ct-rev')){
@@ -155,7 +162,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		// var infoArr = [];
 		// labelArr.push(txnHistory.codesDict['Generate']);
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
-
+		localStorage.setItem("navigateEnable", false);
 		$scope.obj = {};
 		$scope.enableGenerate = false;
 		currentDot = 0;
@@ -178,11 +185,13 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		$rootScope.resetSession.start();
 		flowGraphServices.getResults(version,path).then(function(data) {
 			$rootScope.resetSession.end();
-			if (data == "unavailableLocalServer") {
+			if (data == "unavailableLocalServer" || data == "invalidPath") {
 				$scope.hideBaseContent = { message: 'false' };
 				$('#progress-canvas').hide();
 				document.getElementById('path').value = '';
-				openDialog("APG", $rootScope.unavailableLocalServer_msg);
+				$('#generateBtn').prop('disabled', true);
+				if (data == 'invalidPath') openDialog("APG","The given path does not exists.");
+				else  openDialog("APG", $rootScope.unavailableLocalServer_msg);
 				return false;
 			} else if(data == "Invalid Session"){
 				document.getElementById('path').value = '';
@@ -201,6 +210,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		});
 
 		socketUI.on('endData', function(obj) {
+			localStorage.setItem("navigateEnable", true);
 			if(obj.result == "success"){
 				$('#progress-canvas').fadeOut(800, function(){
 					$scope.hideBaseContent = { message: 'true' };
@@ -857,7 +867,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 						var id = e.target.id.split("_")[1];
 						var previousValue=$('#weightage_'+id).text();
 						$('#weightage_'+id).text('');
-						$("#"+e.target.id).parent().append("<input id='txtWeightage_"+id+"' type='text' name='' value="+previousValue+">")
+						$("#"+e.target.id).parent().append("<input id='txtWeightage_"+id+"' type='text' maxlength=3 onkeydown='return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57' value="+previousValue+">")
 						$(this).hide();
 						$("[id^=txtWeightage_]").on('keydown',function(event) {
 							//event.preventDefault();

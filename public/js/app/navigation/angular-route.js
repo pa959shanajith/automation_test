@@ -103,7 +103,9 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
 						'css/bootstrap/bootstrap-datepicker.min.css',
+						'css/bootstrap/bootstrap-timepicker.min.css',
 						'js/plugins/bootstrap/bootstrap-datepicker.min.js',
+						'js/plugins/bootstrap/bootstrap-timepicker.min.js',
 						'js/directives/headerDirective.js',	
 						'js/factories/socketFactory.js',
 						'js/controllers/chatbot/chatbotController.js',
@@ -347,7 +349,8 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 			});
 		},
 		start: function startInterval() {
-			this.eventid = setInterval(function(pollCall){ pollCall(); }, 1500000, this.poll);
+			this.poll();
+			this.eventid = setInterval(function(pollCall){ pollCall(); }, 1200000, this.poll);
 		},
 		end: function endInterval() {
 			clearInterval(this.eventid);

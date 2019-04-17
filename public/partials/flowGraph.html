@@ -52,9 +52,9 @@
 				<br>
 				<br>
 				<span><b>Path:</b></span>
-				<input name="pathInput" type="text" ng-model="text" class="pathInput" id="path" placeholder="Enter Path of Folder/Zip/File" required> 
+				<input name="pathInput" type="text" ng-model="pathinput" class="pathInput" id="path" placeholder="Enter Path of Folder/Zip/File" onkeydown = "$('#generateBtn').prop('disabled', false);" required> 
 				<button ng-if="flowgraph_form.pathInput.$invalid" disabled class="btn btn-md pull-right pairwise-GenBtn" ng-click="executeGenerate($event)">Generate</button>
-				<button ng-if="flowgraph_form.pathInput.$valid" class="btn btn-md pull-right pairwise-GenBtn" ng-click="executeGenerate($event)">Generate</button>
+				<button id="generateBtn" ng-if="flowgraph_form.pathInput.$valid" class="btn btn-md pull-right pairwise-GenBtn" ng-click="executeGenerate($event)">Generate</button>
 			</form>
 			</div>
 			

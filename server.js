@@ -153,7 +153,9 @@ if (cluster.isMaster) {
 		var authParams = {
 			username: "nineteen68_username",
 			route: {
-				login: "/login", success: "/", failure: "/error?e=403"
+				login: "/login",
+				success: "/",
+				failure: "/error?e=403"
 			}
 		};
 		var authlib = require("./server/lib/auth");
@@ -163,7 +165,7 @@ if (cluster.isMaster) {
 		auth = auth.util;
 
 		//Based on NGINX Config Security Headers are configured
-		if(!nginxEnabled){
+		if (!nginxEnabled) {
 			app.use(helmet());
 			app.use(lusca.p3p('/w3c/p3p.xml", CP="IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT'));
 			app.use(helmet.referrerPolicy({
@@ -252,9 +254,9 @@ if (cluster.isMaster) {
 
 		app.get('/error', function(req, res, next) {
 			var emsg = req.query.e;
-			var errsess = (req.session.messages)? req.session.messages[0]:undefined;
+			var errsess = (req.session.messages) ? req.session.messages[0] : undefined;
 			if (emsg) {
-				if (errsess) emsg = (errsess.indexOf("access_denied") != -1)? "unauthorized" : errsess;
+				if (errsess) emsg = (errsess.indexOf("access_denied") != -1) ? "unauthorized" : errsess;
 				else if (emsg == "400") emsg = "badrequest";
 				else if (emsg == "401") emsg = "Invalid Session";
 				else if (emsg == "403") emsg = "unauthorized";
@@ -269,7 +271,7 @@ if (cluster.isMaster) {
 
 		app.get('/', function(req, res, next) {
 			if (!(req.url == '/' || req.url.startsWith("/?"))) return next();
-			authRedirecter(req, req.user, function(redirect){
+			authRedirecter(req, req.user, function(redirect) {
 				if (redirect) {
 					req.clearSession();
 					return res.redirect('login');
@@ -287,7 +289,7 @@ if (cluster.isMaster) {
 				req.session.emsg = "userLogged";
 				req.session.dndSess = true;
 				cb(redirect);
-			} else if (!req.session.emsg && req.session.username==undefined) {
+			} else if (!req.session.emsg && req.session.username == undefined) {
 				if (user) {
 					var username = user.username;
 					if (username == undefined) {
@@ -295,14 +297,14 @@ if (cluster.isMaster) {
 						cb(redirect);
 					} else {
 						username = username.toLowerCase();
-						redisSessionStore.all(function (err, allKeys) {
+						redisSessionStore.all(function(err, allKeys) {
 							if (err) {
 								logger.info("User Authentication failed");
 								req.session.emsg = "fail";
 							} else {
 								for (var ki = 0; ki < allKeys.length; ki++) {
 									if (username == allKeys[ki].username) {
-										userLogged=true;
+										userLogged = true;
 										break;
 									}
 								}
@@ -311,7 +313,7 @@ if (cluster.isMaster) {
 								} else {
 									req.session.username = username;
 									req.session.uniqueId = req.session.id;
-									logger.rewriters[0]=function(level, msg, meta) {
+									logger.rewriters[0] = function(level, msg, meta) {
 										meta.username = username;
 										meta.userid = null;
 										meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
@@ -323,7 +325,7 @@ if (cluster.isMaster) {
 						});
 					}
 				} else {
-					logger.rewriters[0]=function(level, msg, meta) {
+					logger.rewriters[0] = function(level, msg, meta) {
 						meta.username = null;
 						meta.userid = null;
 						meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
@@ -339,34 +341,34 @@ if (cluster.isMaster) {
 
 		//Only Admin have access
 		app.get('/admin', function(req, res) {
-			var roles = ["Admin"];   //Allowed roles
+			var roles = ["Admin"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
 		//Only Test Engineer and Test Lead have access
 		app.get(/^\/(design|designTestCase|execute|scheduling)$/, function(req, res) {
-			var roles = ["Test Lead", "Test Engineer"];   //Allowed roles
+			var roles = ["Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
 		//Test Engineer,Test Lead and Test Manager can access
 		app.get(/^\/(specificreports|mindmap|p_Utility|p_Reports|plugin)$/, function(req, res) {
-			var roles = ["Test Manager", "Test Lead", "Test Engineer"];   //Allowed roles
+			var roles = ["Test Manager", "Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
 		//Test Lead and Test Manager can access
 		app.get(/^\/(p_Webocular|neuronGraphs|p_ALM|p_APG)$/, function(req, res) {
-			var roles = ["Test Manager", "Test Lead"];   //Allowed roles
+			var roles = ["Test Manager", "Test Lead"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
 		function sessionCheck(req, res, roles) {
 			logger.info("Inside sessioncheck for URL : %s", req.url);
-			var sess  = req.session;
-			logger.rewriters[0]=function(level, msg, meta) {
-				meta.username = (sess && sess.username)? sess.username:null;
-				meta.userid = (sess && sess.userid)? sess.userid:null;
+			var sess = req.session;
+			logger.rewriters[0] = function(level, msg, meta) {
+				meta.username = (sess && sess.username) ? sess.username : null;
+				meta.userid = (sess && sess.userid) ? sess.userid : null;
 				meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
 				return meta;
 			};
@@ -378,13 +380,13 @@ if (cluster.isMaster) {
 			if (sessChk && roleChk) return res.sendFile("app.html", { root: __dirname + "/public/" });
 			else {
 				req.clearSession();
-				return res.redirect("/error?e="+((sessChk)? "400":"401"));
+				return res.redirect("/error?e=" + ((sessChk) ? "400" : "401"));
 			}
 		}
 
 		//Role Based User Access to services
 		app.post('*', function(req, res, next) {
-			var roleId = (req.session)? req.session.activeRoleId : undefined;
+			var roleId = (req.session) ? req.session.activeRoleId : undefined;
 			var updateinp = {
 				roleid: roleId || "ignore",
 				servicename: req.url.replace("/", "")
@@ -407,7 +409,7 @@ if (cluster.isMaster) {
 						logger.error("Please run the Service API and Restart the Server");
 					} else {
 						if (result.rows == "True") {
-							logger.rewriters[0]=function(level, msg, meta) {
+							logger.rewriters[0] = function(level, msg, meta) {
 								if (req.session && req.session.uniqueId) {
 									meta.username = req.session.username;
 									meta.userid = req.session.userid;
@@ -469,7 +471,7 @@ if (cluster.isMaster) {
 		} catch (Ex) {
 			process.env.projectVersioning = "disabled";
 			logger.warn('Versioning is disabled');
-			app.post('/getProjectsNeo', function(req,res){
+			app.post('/getProjectsNeo', function(req, res) {
 				res.send("false");
 			});
 		}
@@ -487,9 +489,9 @@ if (cluster.isMaster) {
 		app.post('/saveData', mindmap.saveData);
 		app.post('/saveEndtoEndData', mindmap.saveEndtoEndData);
 		app.post('/excelToMindmap', mindmap.excelToMindmap);
-		app.post('/getScreens',mindmap.getScreens);
-		app.post('/exportToExcel',mindmap.exportToExcel);
-		app.post('/getDomain',mindmap.getDomain);
+		app.post('/getScreens', mindmap.getScreens);
+		app.post('/exportToExcel', mindmap.exportToExcel);
+		app.post('/getDomain', mindmap.getDomain);
 
 		//Login Routes
 		//app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
@@ -513,8 +515,7 @@ if (cluster.isMaster) {
 		app.post('/testLDAPConnection', admin.testLDAPConnection);
 		app.post('/getLDAPConfig', admin.getLDAPConfig);
 		app.post('/manageLDAPConfig', admin.manageLDAPConfig);
-		app.post('/generateCItoken', admin.generateCItoken);
-		app.post('/generateCIusertokens',admin.generateCIusertokens)
+		app.post('/generateCIusertokens', admin.generateCIusertokens)
 		app.post('/getCIUsersDetails', admin.getCIUsersDetails);
 		app.post('/deactivateCIUser', admin.deactivateCIUser);
 
@@ -611,12 +612,12 @@ if (cluster.isMaster) {
 				emsg = "Redis Database unavailable";
 			}
 			logger.error(err.message);
-			res.status(500).send("<html><body><p>[ECODE "+ecode+"] Internal Server Error Occurred!</p></body></html>");
+			res.status(500).send("<html><body><p>[ECODE " + ecode + "] Internal Server Error Occurred!</p></body></html>");
 		});
 
 		//-------------SERVER START------------//
 		var hostFamilyType = (nginxEnabled) ? '127.0.0.1' : '0.0.0.0';
-		var initServer = function initServer(httpsServer,suite,logger,epurl,apiclient){
+		var initServer = function initServer(httpsServer, suite, logger, epurl, apiclient) {
 			httpsServer.listen(serverPort, hostFamilyType); //Https Server
 			try {
 				var apireq = apiclient.post(epurl + "server", function(data, response) {
@@ -642,9 +643,11 @@ if (cluster.isMaster) {
 				logger.error("Please run the Service API");
 			}
 		};
-		if (auth.isReady) initServer(httpsServer,suite,logger,epurl,apiclient);
+		if (auth.isReady) initServer(httpsServer, suite, logger, epurl, apiclient);
 		else {
-			auth.onReadyCallback = function () { initServer(httpsServer,suite,logger,epurl,apiclient); };
+			auth.onReadyCallback = function() {
+				initServer(httpsServer, suite, logger, epurl, apiclient);
+			};
 		}
 		//-------------SERVER END------------//
 	} catch (e) {
