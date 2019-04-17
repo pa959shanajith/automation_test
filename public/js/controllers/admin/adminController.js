@@ -1881,7 +1881,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		this.addRole = {};
 		this.nocreate = false;
 		this.getUserRoles();
-		this.ciActive = false;
 		if (query != "retainldap") {
 			if (!this.ldapActive) {
 				this.ldapActive = false;
@@ -1929,7 +1928,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		var emailRegEx = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 		//var regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,16}$/;
 		var regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,16}$/;
-		if(this.ciActive) return flag;
 		var popupOpen = false;
 		if (this.userName == "") {
 			var nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
@@ -2034,7 +2032,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			email: userConf.email,
 			role: userConf.role,
 			addRole: addRole,
-			ciUser: userConf.ciActive,
 			ldapUser: userConf.ldapActive
 		};
 		if (userConf.ldapActive) {
@@ -2210,37 +2207,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		});
 	};
 
-	//Generate CI Token
-	$scope.userConf.activateCI = function($event){
-		this.ciActive = !this.ciActive;
-		var target = $("button.citokenBtn");
-		if(this.ciActive){
-			target.addClass("userTypeBtnActive");
-			blockUI("Fetching Token...");
-			adminServices.generateCItoken()
-			.then(function (data) {
-				unblockUI();
-				if (data == "Invalid Session") {
-					$rootScope.redirectPage();
-				} else {
-					$scope.userConf.userName = data.user_name;
-					$scope.userConf.passWord = data.token;
-				}
-			}, function (error) {
-				unblockUI();
-				console.log("Error:::::::::::::", error);
-				openModalPopup("Create User", "Something Went Wrong");
-			});
-		} else {
-			target.removeClass("userTypeBtnActive");
-			$scope.userConf.click();
-		}
-	};
-
 	//Load Users for Edit
 	$scope.userConf.edit = function() {
 		this.ldapActive = false;
-		this.ciActive = false;
 		this.click();
 		$scope.tab = "editUser";
 		blockUI("Fetching users...");

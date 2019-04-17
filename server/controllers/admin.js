@@ -60,7 +60,6 @@ exports.manageUserDetails = function(req, res){
 			inputs.createdby = req.session.username;
 			inputs.createdbyrole = req.session.activeRole;
 			inputs.username = (reqData.username || "").trim();
-			inputs.ciuser = reqData.ciUser || false;
 			inputs.ldapuser = reqData.ldapUser;
 			inputs.password = (reqData.password || "").trim();
 
@@ -80,14 +79,14 @@ exports.manageUserDetails = function(req, res){
 				}
 			}
 			if (!inputs.ldapuser && action == "create") {
-				if (validator.isEmpty(inputs.password) && !(inputs.ciuser || validator.isLength(inputs.password,1,12))) {
+				if (validator.isEmpty(inputs.password) && !(validator.isLength(inputs.password,1,12))) {
 					logger.error("Error occurred in admin/manageUserDetails: Invalid Password.");
 					flag[5]='1';
 				}
 			}
 			if (inputs.password == '') delete inputs.password;
 			else inputs.password = bcrypt.hashSync(inputs.password, salt);
-			if (!inputs.ciuser && action != "delete") {
+			if (action != "delete") {
 				inputs.firstname = (reqData.firstname || "").trim();
 				inputs.lastname = (reqData.lastname || "").trim();
 				inputs.emailid = (reqData.email || "").trim();
@@ -1688,8 +1687,6 @@ exports.assignProjects_ICE = function (req, res) {
                                 res.send("success");
                             }
                         });
-
-//						res.send("success");
 					}
 				});
 			} else {
@@ -1815,26 +1812,7 @@ exports.getAvailablePlugins = function (req, res) {
 	}
 };
 
-exports.generateCItoken = function (req, res) {
-	logger.info("Inside UI service: generateCItoken");
-	try {
-		if (utils.isSessionActive(req)) {
-			var user_info = {
-				user_name: "ci_user",
-				token: uuid()
-			};
-			res.send(user_info);
-		} else {
-			res.send("Invalid Session");
-		}
-	} catch (exception) {
-		logger.error("Error occurred in admin/generateCItoken:", exception);
-		res.status(500).send("fail");
-	}
-};
-
-
-//GEnerate Token for CI User
+//Generate Token for CI User
 exports.generateCIusertokens = function (req, res) {
 	logger.info("Inside UI service: generateCIusertokens");
 	try {

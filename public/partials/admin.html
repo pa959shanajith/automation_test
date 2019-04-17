@@ -49,9 +49,8 @@
 			<!-- Action area -->
 			<div class="col-xs-9 form-group adminForm">
 				<div class='userForm adminControl'>
-					<button title="LDAP" class="btn btn-xs userTypeBtn ldapBtn" ng-disabled="userConf.ciActive" ng-click="userConf.ldapActive=!userConf.ldapActive;userConf.activateLDAP()">LDAP</button>
-					<!-- <button title="Generate CI Token" class="btn btn-xs userTypeBtn citokenBtn" ng-disabled="userConf.ldapActive" ng-click="userConf.activateCI()">CI User</button> -->
-					<input type="text" autocomplete="off" id="userName" name="userName" ng-model="userConf.userName" ng-disabled="userConf.ciActive" style="padding-right:175px" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="User Name"/>
+					<button title="LDAP" class="btn btn-xs userTypeBtn ldapBtn" ng-click="userConf.ldapActive=!userConf.ldapActive;userConf.activateLDAP()">LDAP</button>
+					<input type="text" autocomplete="off" id="userName" name="userName" ng-model="userConf.userName" style="padding-right:175px" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="User Name"/>
 				</div>
 				<div class="userLDAPFetch" ng-if="userConf.ldapActive">
 					<div class="userForm adminControl">
@@ -75,15 +74,13 @@
 
 				</div>
 
-				<div ng-if="!userConf.ciActive">
-					<div class='leftControl adminControl'>
-						<input type="text" autocomplete="off" name="firstName" id="firstName" ng-model="userConf.firstName" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="First Name"/>
-					</div>
-					<div class='rightControl adminControl'>
-						<input type="text" autocomplete="off" name="lastName" id="lastName" ng-model="userConf.lastName" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Last Name"/>
-					</div>
+				<div class='leftControl adminControl'>
+					<input type="text" autocomplete="off" name="firstName" id="firstName" ng-model="userConf.firstName" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="First Name"/>
 				</div>
-				<div ng-if="!userConf.ldapActive && !userConf.ciActive">
+				<div class='rightControl adminControl'>
+					<input type="text" autocomplete="off" name="lastName" id="lastName" ng-model="userConf.lastName" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Last Name"/>
+				</div>
+				<div ng-if="!userConf.ldapActive">
 					<div class='leftControl adminControl'>
 						<input type="password" autocomplete="off" name="passWord" id="password" ng-model="userConf.passWord" maxlength="100" class="form-control form-control-custom create" placeholder="Password" autocomplete="off"/>
 					</div>
@@ -91,20 +88,15 @@
 						<input type="password" autocomplete="off" name='confirmPassword' id='confirmPassword' ng-model="userConf.confirmPassword" maxlength="100" class="form-control form-control-custom create" placeholder="Confirm Password" autocomplete="off"/>
 					</div>
 				</div>
-				<div ng-if="!userConf.ciActive">
-					<div class='adminControl'>
-						<input type="email" autocomplete="off" name="email" id="email" ng-model="userConf.email" maxlength="100" class="form-control form-control-custom create" placeholder="Email Id"/>
-					</div>
-					<div class="col-xs-6 selectRole">
-						<label class="leftControl primaryRole">Primary Role</label>
-						<select class='adminSelect form-control' ng-model="userConf.role" id="userRoles" class="form-control rightControl selectControl">
-							<option value="" disabled selected>Select User Role</option>
-							<option ng-repeat="rid in userConf.allRoles" value="{{rid[1]}}">{{rid[0]}}</option>
-						</select>
-					</div>
+				<div class='adminControl'>
+					<input type="email" autocomplete="off" name="email" id="email" ng-model="userConf.email" maxlength="100" class="form-control form-control-custom create" placeholder="Email Id"/>
 				</div>
-				<div class="adminControl" ng-if="userConf.ciActive">
-					<input type="text" autocomplete="off" name="passWord" id="password" ng-model="userConf.passWord" class="form-control form-control-custom create" placeholder="CI Token" readonly/>
+				<div class="col-xs-6 selectRole">
+					<label class="leftControl primaryRole">Primary Role</label>
+					<select class='adminSelect form-control' ng-model="userConf.role" id="userRoles" class="form-control rightControl selectControl">
+						<option value="" disabled selected>Select User Role</option>
+						<option ng-repeat="rid in userConf.allRoles" value="{{rid[1]}}">{{rid[0]}}</option>
+					</select>
 				</div>
 			</div>
 			<!-- Action area -->
@@ -145,43 +137,38 @@
 						<input type="text" autocomplete="off" id="ldapDirectory" name="ldapDirectory" ng-model="userConf.ldap.user" style="padding-right:90px" class="form-control form-control-custom create" placeholder="User Domain Name">
 					</div>
 				</div>
-				<div ng-if="!userConf.ciActive">
+				<div class='leftControl adminControl'>
+					<input type="text" autocomplete="off" name="firstName" id="firstName" ng-model="userConf.firstName" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="First Name">
+				</div>
+				<div class='rightControl adminControl'>
+					<input type="text" autocomplete="off" name="lastName" id="lastName" ng-model="userConf.lastName" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Last Name">
+				</div>
+				<div ng-if="!userConf.ldapActive">
 					<div class='leftControl adminControl'>
-						<input type="text" autocomplete="off" name="firstName" id="firstName" ng-model="userConf.firstName" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="First Name">
+						<input type="password" autocomplete="off" name="passWord" id="password" ng-model="userConf.passWord" maxlength="100" class="form-control form-control-custom create" placeholder="Password" autocomplete="off">
 					</div>
 					<div class='rightControl adminControl'>
-						<input type="text" autocomplete="off" name="lastName" id="lastName" ng-model="userConf.lastName" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Last Name">
-					</div>
-					<div ng-if="!userConf.ldapActive">
-						<div class='leftControl adminControl'>
-							<input type="password" autocomplete="off" name="passWord" id="password" ng-model="userConf.passWord" maxlength="100" class="form-control form-control-custom create" placeholder="Password" autocomplete="off">
-						</div>
-						<div class='rightControl adminControl'>
-							<input type="password" autocomplete="off" name='confirmPassword' id='confirmPassword' ng-model="userConf.confirmPassword" maxlength="100" class="form-control form-control-custom create" placeholder="Confirm Password" autocomplete="off">
-						</div>
-					</div>
-					<div class='adminControl'>
-						<input type="email" autocomplete="off" name="email" id="email" ng-model="userConf.email" maxlength="100" class="form-control form-control-custom create" placeholder="Email Id">
-					</div>
-					<div class="col-xs-6 selectRole">
-						<label class="leftControl primaryRole">Primary Role</label>
-						<select class='adminSelect form-control' ng-model="userConf.role" id="userRoles" class="form-control rightControl selectControl" disabled>
-							<option value="" disabled selected>Select User Role</option>
-							<option ng-repeat="rid in userConf.allRoles" value="{{rid[1]}}">{{rid[0]}}</option>
-						</select>
-					</div>
-					<div class="col-xs-6 selectRole" ng-if="userConf.userIdName && userConf.role!='b5e9cb4a-5299-4806-b7d7-544c30593a6e'">
-						<label class="leftControl secondaryRole" id="additionalRoleTxt">Additional Role: </label>
-						<label class="chooseRole dropdown-toggle" id="additionalRole_options" data-toggle="dropdown" ng-click="userConf.toggleAddRoles()"> Select Additional Role</label>
-						<ul class="dropdown-menu-multiselect" id="additionalRoles">
-							<li class='RolesCheck' ng-repeat="arid in userConf.allAddRoles" ng-if="arid[1]!=userConf.role" ng-click="userConf.addRole[arid[1]]= !userConf.addRole[arid[1]]">
-								<span class='rolesSpan'><input class='addcheckBox' name="additionalRole" type='checkbox' value="{{arid[1]}}" ng-model="userConf.addRole[arid[1]]" ng-click="userConf.addRole[arid[1]]= !userConf.addRole[arid[1]]"/><label class='rolesChecklabel'>{{arid[0]}}</label></span>
-							</li>
-						</ul>
+						<input type="password" autocomplete="off" name='confirmPassword' id='confirmPassword' ng-model="userConf.confirmPassword" maxlength="100" class="form-control form-control-custom create" placeholder="Confirm Password" autocomplete="off">
 					</div>
 				</div>
-				<div class="adminControl" ng-if="userConf.ciActive">
-					<input type="text" autocomplete="off" name="passWord" id="password" ng-model="userConf.passWord" class="form-control form-control-custom create" placeholder="CI Token" readonly>
+				<div class='adminControl'>
+					<input type="email" autocomplete="off" name="email" id="email" ng-model="userConf.email" maxlength="100" class="form-control form-control-custom create" placeholder="Email Id">
+				</div>
+				<div class="col-xs-6 selectRole">
+					<label class="leftControl primaryRole">Primary Role</label>
+					<select class='adminSelect form-control' ng-model="userConf.role" id="userRoles" class="form-control rightControl selectControl" disabled>
+						<option value="" disabled selected>Select User Role</option>
+						<option ng-repeat="rid in userConf.allRoles" value="{{rid[1]}}">{{rid[0]}}</option>
+					</select>
+				</div>
+				<div class="col-xs-6 selectRole" ng-if="userConf.userIdName && userConf.role!='b5e9cb4a-5299-4806-b7d7-544c30593a6e'">
+					<label class="leftControl secondaryRole" id="additionalRoleTxt">Additional Role: </label>
+					<label class="chooseRole dropdown-toggle" id="additionalRole_options" data-toggle="dropdown" ng-click="userConf.toggleAddRoles()"> Select Additional Role</label>
+					<ul class="dropdown-menu-multiselect" id="additionalRoles">
+						<li class='RolesCheck' ng-repeat="arid in userConf.allAddRoles" ng-if="arid[1]!=userConf.role" ng-click="userConf.addRole[arid[1]]= !userConf.addRole[arid[1]]">
+							<span class='rolesSpan'><input class='addcheckBox' name="additionalRole" type='checkbox' value="{{arid[1]}}" ng-model="userConf.addRole[arid[1]]" ng-click="userConf.addRole[arid[1]]= !userConf.addRole[arid[1]]"/><label class='rolesChecklabel'>{{arid[0]}}</label></span>
+						</li>
+					</ul>
 				</div>
 			</div>
 			<!-- Edit User Form -->

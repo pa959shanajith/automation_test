@@ -153,7 +153,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 			var selectedRole = req.body.selRole;
 			var userName = req.session.username;
 			var jsonService = {};
-			jsonService.token = configpath.token.default;
+			jsonService.token = configpath.defaultTokenExpiry;
 			async.waterfall([
 				function userInfo(callback) {
 					var inputs = {
