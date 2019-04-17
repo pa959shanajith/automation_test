@@ -867,7 +867,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 						var id = e.target.id.split("_")[1];
 						var previousValue=$('#weightage_'+id).text();
 						$('#weightage_'+id).text('');
-						$("#"+e.target.id).parent().append("<input id='txtWeightage_"+id+"' type='text' maxlength=3 onkeypress='return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57' value="+previousValue+">")
+						$("#"+e.target.id).parent().append("<input id='txtWeightage_"+id+"' type='text' maxlength=3 onkeydown='return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57' value="+previousValue+">")
 						$(this).hide();
 						$("[id^=txtWeightage_]").on('keydown',function(event) {
 							//event.preventDefault();
