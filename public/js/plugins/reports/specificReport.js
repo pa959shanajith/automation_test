@@ -149,7 +149,6 @@
                 else {
                     var hostName = window.location.host;
                     var posturl = 'https://' + hostName + '/connectJira_ICE';
-                    console.log("---" + posturl);
                     blockUI('Loading....');
                     $.ajax({
                         type: 'POST',
@@ -220,9 +219,7 @@
                     $("#jProjects, #jIssuetype, #jPriority").prop('selectedIndex', 0);
                     $(".createIssueWindow").show();
                     var jsonData = localStorage.getItem("jiraLoginDetails");
-                    console.log(jsonData);
                     jsonData = JSON.parse(jsonData);
-                    console.log(jsonData.projects);
                     fillSelector(jsonData.projects, "jProjects");
                     fillSelector(jsonData.issuetype, "jIssuetype");
                     fillSelector(jsonData.priority, "jPriority");
@@ -253,16 +250,6 @@
                         $("#" + selector).append("<option value=" + dataArray[i].id + ">" + dataArray[i].name + "</option>");
                 }
             }
-            /*
-            function ele(id){return document.getElementById(id);}
-            ele("jAttachment").addEventListener("change", updateFilePath, false);
-            function updateFilePath(){
-                console.log("jAttachment----"+$("#jAttachment").val());
-                console.log("scrnShotPath----"+$("#scrnShotPath").val());
-                $("#scrnShotPath").val($("#jAttachment").val());
-                console.log("jAttachment----"+$("#jAttachment").val());
-                console.log("scrnShotPath----"+$("#scrnShotPath").val());
-            }*/
             //function to close popup window
             $(document).on('click', '.closeWindow', function () {
                 $(".jiraWindow, .createIssueWindow, .statusWindow").hide();
