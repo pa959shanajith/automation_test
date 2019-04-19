@@ -885,18 +885,11 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                     } else if (data1 == "fail") {
                                         console.log("Failed to render reports.");
                                     } else {
-                                        // openWindow = 0;
-                                        // if (openWindow == 0) {
                                         var myWindow;
                                         myWindow = window.open();
                                         myWindow.document.write(data1);
-                                        // setTimeout(function() {
-                                        //     //myWindow.stop();
-                                        // }, 5000);
                                     }
-                                    //  openWindow++;
-                                    //e.stopImmediatePropagation();
-                                    // }
+                                    e.stopImmediatePropagation();
                                 },
                                 function(error) {
                                     unblockUI();
