@@ -140,7 +140,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             }
             unblockUI();
             $("input[type=search]").attr('placeholder', 'Search Scenario').addClass('scenarioSearch');
-        }, 700);
+        }, 1000);
         redirected = false;
         localStorage.removeItem('fromExecution');
         $('#accordion').show();
@@ -880,21 +880,23 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             reportService.renderReport_ICE(finalReports, reportType).then(
                                 function(data1) {
                                     unblockUI();
-                                    if (data1 == "Invalid Session") return $rootScope.redirectPage();
-                                    else if (data1 == "fail") console.log("Failed to render reports.");
-                                    else {
-                                        openWindow = 0;
-                                        if (openWindow == 0) {
-                                            var myWindow;
-                                            myWindow = window.open();
-                                            myWindow.document.write(data1);
-                                            setTimeout(function() {
-                                                //myWindow.stop();
-                                            }, 5000);
-                                        }
-                                        openWindow++;
-                                        e.stopImmediatePropagation();
+                                    if (data1 == "Invalid Session") {
+                                        return $rootScope.redirectPage();
+                                    } else if (data1 == "fail") {
+                                        console.log("Failed to render reports.");
+                                    } else {
+                                        // openWindow = 0;
+                                        // if (openWindow == 0) {
+                                        var myWindow;
+                                        myWindow = window.open();
+                                        myWindow.document.write(data1);
+                                        // setTimeout(function() {
+                                        //     //myWindow.stop();
+                                        // }, 5000);
                                     }
+                                    //  openWindow++;
+                                    //e.stopImmediatePropagation();
+                                    // }
                                 },
                                 function(error) {
                                     unblockUI();
