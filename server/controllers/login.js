@@ -5,8 +5,8 @@ var Client = require("node-rest-client").Client;
 var client = new Client();
 var logger = require('../../logger');
 var utils = require('../lib/utils');
-var configpath= require('../config/options.js')
-var fs = require('fs');
+var configpath= require('../config/options');
+var taskflow = configpath.strictTaskWorkflow;
 
 /**
  * @see : function to check whether projects are assigned for user
@@ -180,6 +180,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 							jsonService.firstname = service.firstname;
 							jsonService.lastname = service.lastname;
 							jsonService.role = service.defaultrole;
+							jsonService.taskwflow = taskflow;
 							jsonService.username = service.username.toLowerCase();
 							selectedRole = selectedRole||jsonService.role;
 							req.session.userid = service.userid;

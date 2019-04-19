@@ -1,12 +1,13 @@
 {
-    "certificate": {
-        "key": "./server/https/server.key",
-        "cert": "./server/https/server.crt"
-    },
     "host": "localhost:7474",
     "username": "bmVvNGo=",
     "password": "bG9jYWw3NDc0",
     "defaultTokenExpiry": "720",
+    "strictTaskWorkflow": false,
+    "certificate": {
+        "key": "./server/https/server.key",
+        "cert": "./server/https/server.crt"
+    },
     "oidc": {
         "identitityProviderURL": "",
         "clientId": "",
@@ -22,5 +23,5 @@
     "screenShotPath": {
         "default": "",
         "mac": ""
-    }
+    }	
 }
