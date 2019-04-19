@@ -14,7 +14,7 @@ var scheduleStatus = "";
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
-var taskflow = require('../config/options').taskworkflow.toLowerCase();
+var taskflow = require('../config/options').strictTaskWorkflow;
 var qList = [];
 
 /**
@@ -559,7 +559,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		var approvedStatus=true;
 		async.series({
 			approval_check:function(callback_E){
-				if (taskflow!='strict') return callback_E();
+				if (!taskflow) return callback_E();
 				async.forEachSeries(batchExecutionData,function(eachmoduledata,callback){
 					var qlist=[];
 					var projid= eachmoduledata.projectid;

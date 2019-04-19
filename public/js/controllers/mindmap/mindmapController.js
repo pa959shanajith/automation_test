@@ -911,8 +911,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     function assignBoxValidator() {
         var uinfo = JSON.parse(window.localStorage['_UI']);
-        var twf= uinfo.taskwflow.toLowerCase();
-        if(twf=='strict'){
+        var twf= uinfo.taskwflow;
+        if(twf){
             if($("#ct-assignedTo option:selected").val()==$("#ct-assignRevw option:selected").val()){
                 $("#ct-assignRevw").css('border', '').addClass("inputErrorBorderFull");
                 $("#ct-assignedTo").css('border', '').addClass("inputErrorBorderFull");

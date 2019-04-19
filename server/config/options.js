@@ -18,10 +18,6 @@ try {
 			throw "Invalid values in SSO configuration";
 		}
 	}
-	var taskwflow=parsed.taskworkflow.toString().toLowerCase();
-	if( !(taskwflow=='default' || taskwflow =='strict')){
-		throw "taskworkflow field must have default or strict as value";
-	}
 } catch (e) {
 	logger.error(e);
 	throw "Please provide valid values in config.json file";
