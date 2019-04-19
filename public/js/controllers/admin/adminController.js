@@ -298,9 +298,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 						else if(a.deactivated > b.deactivated) return 1;
 						else return 0
 					 });
+					for (i=0;i<data.length;i++){
+						data[i].expiry=new Date(data[i].expiry).toString().slice(0,-22);
+					}
 					$scope.tokens.users=data;
 					$('#tokenName').val('');
 					$('.fc-datePicker').val('');
+					$('.fc-timePicker').val('');
 					$('#generateNewToken').val('');
 				}
 			}, function (error) {
@@ -351,67 +355,108 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			$("#tokenName").css('border', '').addClass("selectErrorBorder");
 			return false;
 		}
-		else if ($('.tokeninfo .tokenSuite .datePicContainer .fc-datePicker').val() == "") {
-			$(".tokeninfo .tokenSuite .datePicContainer .fc-datePicker").css('border', '').addClass("selectErrorBorder");
-			return false;
-		}
 		else{
 			var userDetails = JSON.parse(window.localStorage['_UI']);
 			var userId = $("#selAssignUser1 option:selected").attr("data-id");
 			var generatetoken = {};
 			$(".scheduleSuiteTable").append('<div class="tokenSuite"><span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIconToken" src="../imgs/ic-datepicker.png" /></span><span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>');
-			var expdate=$(".tokeninfo .tokenSuite .datePicContainer .fc-datePicker").val()
-			//console.log(expdate)
-			var tokenname=$('#tokenName').val()
-			//console.log(tokenname)
-			generatetoken.userId = userId;
-			generatetoken.expiry = expdate;
-			generatetoken.tokenname = tokenname;
-			blockUI('Generating Token. Please Wait...');
-			//console.log('generateCIusertokens',generatetoken)
-			adminServices.generateCIusertokens(generatetoken)
-			.then(function (data) {
-				unblockUI();
-				//console.log(data)
-				if (data == "Invalid Session") {
-					$rootScope.redirectPage();
-				}
-				else if (data == 'fail') {
-					openModalPopup("Token Management", "Failed to generate token");
-				} 
-				else if (data == 'duplicate') {
-					openModalPopup("Token Management", "Failed to generate token, Token Name already exist");
-				} 
-				else {
-					$("#generateNewToken").val(data);
-					adminServices.getCIUsersDetails(generatetoken)
-					.then(function (data) {
-						unblockUI();
-						if (data == "Invalid Session") {
-							$rootScope.redirectPage();
+					//console.log(expdate)
+					var expdate=$(".tokeninfo .tokenSuite .datePicContainer .fc-datePicker").val()
+					var exptime=$(".tokeninfo .tokenSuite .timePicContainer .fc-timePicker").val()
+					var tokendetails=userDetails.token;
+					var tokenname=$('#tokenName').val()
+					var today = new Date()
+					var td = new Date()
+					var expiry=""
+					if(expdate == ""){
+						td.setHours(today.getHours()+parseInt(tokendetails));
+						var expdate=""+td.getDate()+"-"+(td.getMonth()+1)+"-"+td.getFullYear()
+						$('.fc-datePicker').val(expdate);
+					}
+					if(exptime == ""){
+						var sldate = $(".tokeninfo .tokenSuite .datePicContainer .fc-datePicker").val()
+						var sldate_2 = sldate.split("-");
+						if(parseInt(sldate_2[0])==today.getDate() && (parseInt(sldate_2[1]))==today.getMonth()+1 && parseInt(sldate_2[2])==today.getFullYear()){
+							td.setHours(today.getHours()+8);
+							var exptime=""+td.getHours()+":"+td.getMinutes
+							$('.fc-timePicker').val(exptime);
 						}
-						else if (data == 'fail') {
-							openModalPopup("Token Management", "Failed to fetch user data");
-							resetAssignProjectForm();
-						} else {
-							openModalPopup("Token Management", "Token generated successfully");
-							data.sort(function(a,b) { 
-							if (a.deactivated < b.deactivated) return -1;
-								else if(a.deactivated > b.deactivated) return 1;
-								else return 0
+						else{
+							var exptime=""+today.getHours()+":"+today.getMinutes()
+							$('.fc-timePicker').val(exptime);
+						}	
+					}
+					if (expdate != "" && exptime != ""){
+						var sldate_2 = expdate.split("-");
+						var sltime_2 = exptime.split(":");
+						expiry=expdate+" "+exptime;
+						var now = new Date(sldate_2[2],sldate_2[1]-1,sldate_2[0],sltime_2[0],sltime_2[1]);
+						td=today;
+						td.setHours(today.getHours()+8);
+						if(now < today){
+							openModalPopup("Token Management", "Expiry time should be 8 hours more than current time");
+							return false;
+						}
+						else if(now >= today && now < td){
+							openModalPopup("Token Management", "Expiry time should be 8 hours more than current time");
+							return false;
+						}
+						else{
+							//console.log("expiry",expiry);
+							//console.log(tokenname)
+							generatetoken.userId = userId;
+							generatetoken.expiry = expiry;
+							generatetoken.tokenname = tokenname;
+							blockUI('Generating Token. Please Wait...');
+							//console.log('generateCIusertokens',generatetoken)
+							adminServices.generateCIusertokens(generatetoken)
+							.then(function (data) {
+								unblockUI();
+								//console.log(data)
+								if (data == "Invalid Session") {
+									$rootScope.redirectPage();
+								}
+								else if (data == 'fail') {
+									openModalPopup("Token Management", "Failed to generate token");
+								} 
+								else if (data == 'duplicate') {
+									openModalPopup("Token Management", "Failed to generate token, Token Name already exist");
+								} 
+								else {
+									$("#generateNewToken").val(data);
+									adminServices.getCIUsersDetails(generatetoken)
+									.then(function (data) {
+										unblockUI();
+										if (data == "Invalid Session") {
+											$rootScope.redirectPage();
+										}
+										else if (data == 'fail') {
+											openModalPopup("Token Management", "Failed to fetch user data");
+											resetAssignProjectForm();
+										} else {
+											openModalPopup("Token Management", "Token generated successfully");
+											data.sort(function(a,b) { 
+											if (a.deactivated < b.deactivated) return -1;
+												else if(a.deactivated > b.deactivated) return 1;
+												else return 0
+											});
+											for (i=0;i<data.length;i++){
+												data[i].expiry=new Date(data[i].expiry).toString().slice(0,-22);
+											}
+											$scope.tokens.users=data
+										}
+									}, function (error) {
+											unblockUI();
+											console.log("Error:::::::::::::", error);
+										});	
+								}
+							}, function (error) {
+								unblockUI();
+								console.log("Error:::::::::::::", error);
 							});
-							$scope.tokens.users=data
 						}
-					}, function (error) {
-							unblockUI();
-							console.log("Error:::::::::::::", error);
-						});	
-				}
-			}, function (error) {
-				unblockUI();
-				console.log("Error:::::::::::::", error);
-			});
-		}		
+					}
+			}		
 	};
 	$scope.deactivate = function ($event) {
 		var CIUser={}
@@ -447,10 +492,32 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			format:"dd-mm-yyyy",
 			todayHighlight: true,
 			startDate: new Date()
+		}).on('hide.datepicker', function(e){
+			if($(this).val().length > 0){
+				$(this).parent().siblings('span').find('.fc-timePicker').prop('disabled',false).css('background-color','white');
+			}
+			$(this).parent().siblings('.timePicContainer').find('.fc-timePicker').timepicker({
+				minTime: new Date().getHours() + ':' + (parseInt(new Date().getMinutes()+5)),
+				minuteStep: 1,
+				showMeridian: false
+			})
 		})
 	})
+	$(document).on('focus', '.fc-timePicker', function(){
+		$(this).timepicker({
+			minTime: new Date().getHours() + ':' + (parseInt(new Date().getMinutes()+5)),
+			minuteStep: 1,
+			showMeridian: false
+			//minTime: (new Date().getHours() + ':' + ((new Date().getMinutes())+05))
+		})
+	})
+	
 	$(document).on('click', ".datepickerIconToken", function(){
 		$(this).siblings(".fc-datePicker").focus()
+	})
+	.on('click', ".timepickerIconToken", function(){
+		//$(".bootstrap-timepicker-hour, .bootstrap-timepicker-minute").val("");
+		$(this).siblings(".fc-timePicker").focus()
 	})
 	
 	$(document).on('click', '#projectTab', function () {
@@ -1814,7 +1881,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		this.addRole = {};
 		this.nocreate = false;
 		this.getUserRoles();
-		this.ciActive = false;
 		if (query != "retainldap") {
 			if (!this.ldapActive) {
 				this.ldapActive = false;
@@ -1862,7 +1928,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		var emailRegEx = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 		//var regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,16}$/;
 		var regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,16}$/;
-		if(this.ciActive) return flag;
 		var popupOpen = false;
 		if (this.userName == "") {
 			var nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
@@ -1967,7 +2032,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			email: userConf.email,
 			role: userConf.role,
 			addRole: addRole,
-			ciUser: userConf.ciActive,
 			ldapUser: userConf.ldapActive
 		};
 		if (userConf.ldapActive) {
@@ -2143,37 +2207,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		});
 	};
 
-	//Generate CI Token
-	$scope.userConf.activateCI = function($event){
-		this.ciActive = !this.ciActive;
-		var target = $("button.citokenBtn");
-		if(this.ciActive){
-			target.addClass("userTypeBtnActive");
-			blockUI("Fetching Token...");
-			adminServices.generateCItoken()
-			.then(function (data) {
-				unblockUI();
-				if (data == "Invalid Session") {
-					$rootScope.redirectPage();
-				} else {
-					$scope.userConf.userName = data.user_name;
-					$scope.userConf.passWord = data.token;
-				}
-			}, function (error) {
-				unblockUI();
-				console.log("Error:::::::::::::", error);
-				openModalPopup("Create User", "Something Went Wrong");
-			});
-		} else {
-			target.removeClass("userTypeBtnActive");
-			$scope.userConf.click();
-		}
-	};
-
 	//Load Users for Edit
 	$scope.userConf.edit = function() {
 		this.ldapActive = false;
-		this.ciActive = false;
 		this.click();
 		$scope.tab = "editUser";
 		blockUI("Fetching users...");

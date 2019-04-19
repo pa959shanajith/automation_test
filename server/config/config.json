@@ -6,6 +6,7 @@
     "host": "localhost:7474",
     "username": "bmVvNGo=",
     "password": "bG9jYWw3NDc0",
+    "defaultTokenExpiry": "720",
     "oidc": {
         "identitityProviderURL": "",
         "clientId": "",

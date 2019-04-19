@@ -709,8 +709,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			$rootScope.resetSession.start();
 			ExecutionService.ExecuteTestSuite_ICE($scope.moduleInfo, exc_action)
 			.then(function (data) {
-				if (data == "begin")
-					return false;
+				if (data == "begin") return false;
 				unblockUI();
 				$rootScope.resetSession.end();
 				executionActive = false;

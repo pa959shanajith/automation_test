@@ -3396,9 +3396,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     }]
                 }],
                 "userInfo": {
-                    "token_id": "",
-                    "username": "",
-                    "ice_username": ""
+                    "tokenhash": "",
+                    "tokenname": "",
+                    "username": ""
                 }
             }]
         };
