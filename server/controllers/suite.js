@@ -972,41 +972,28 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 					uservalidation_iterator.userInfo.userrole = "CI";  // Since it's a CI_User, so it has execute only permissions. Hence role is CI.
 					valid_userdata.push(uservalidation_iterator);
 					result_status.tokenValidation = "passed";
-					//console.log('result_status',result_status)
 					final_data[uservalidation_iterator.userInfo.username] = result_status;
-					//console.log('final_data',final_data[uservalidation_iterator.userInfo.username])
-					console.log(result.rows)
-					if(result.rows[0].deactivated=="active")
-					{
+					if(result.rows[0].deactivated=="active") {
 						result_status.tokenValidation = "passed";
 						final_data[uservalidation_iterator.userInfo.username] = result_status;
-					}
-					else if(result.rows[0].deactivated=="expired")
-					{
+					} else if(result.rows[0].deactivated=="expired") {
 						result_status.tokenValidation = "expired";
 						result_to_send.execution_status.push(final_data);
 						logger.error("Inside UI service: ExecuteTestSuite_ICE_SVN Token is expired for username:",uservalidation_iterator.userInfo.username);
-					}
-					else if(result.rows[0].deactivated=="deactivated")
-					{
+					} else if(result.rows[0].deactivated=="deactivated") {
 						result_status.tokenValidation = "deactivated";
 						result_to_send.execution_status.push(final_data);
 						logger.error("Inside UI service: ExecuteTestSuite_ICE_SVN Token is deactivated for username:",uservalidation_iterator.userInfo.username);
 					}
-					
-				}
-				else {
+				} else {
 					final_data[uservalidation_iterator.userInfo.username] = result_status;
 					result_to_send.execution_status.push(final_data);
 					logger.info("Inside UI service: ExecuteTestSuite_ICE_SVN Token authentication failed for username:",uservalidation_iterator.userInfo.username);
 				}
 			}
 			if(final_data[uservalidation_iterator.userInfo.username].tokenValidation=='passed'){
-				console.log('passed')
 				cb_validation();
-			}
-			else{
-				console.log('failed')
+			} else {
 				cb_validation(final_data[uservalidation_iterator.userInfo.username].tokenValidation)
 			}
 		});
@@ -1014,10 +1001,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 		if (err || valid_userdata.length == 0){
 			logger.error("Error occured in ExecuteTestSuite_ICE_SVN service token validation");
 			res.send('failed in validation');
-			//console.log(result_status)
-		}
-		else {
-			//console.log(valid_userdata)
+		} else {
 			async.each(valid_userdata, function (userdata_iterator, cb) {
 				module_data[userdata_iterator.userInfo.username] = [];
 				testsuite_creation_data[userdata_iterator.userInfo.username] = { "fromFlag": "", "param": "readTestSuite", "readTestSuite": [] };
@@ -1079,7 +1063,6 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 								moduleResult.moduleName = moduleinfo_iterator.moduleName;
 								moduleResult.moduleId = moduleinfo_iterator.moduleId;
 								final_data[userdata_iterator.userInfo.username].moduleInfo.push(moduleResult);
-								//console.log(final_data)
 							}
 							cb1();
 						});
@@ -1094,11 +1077,9 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 							if (!suite_status) {
 								logger.error("Error occured in ExecuteTestSuite_ICE_SVN service in creating testsuites");
 								res.send('Secnarios creation failed');
-							}
-							else {
+							} else {
 								var batchExecutionData = module_data[userdata_iterator.userInfo.username];
 								var userInfo = userdata_iterator.userInfo;
-								//console.log('userInfo',userInfo)
 								var testsuitedetailslist = [];
 								var testsuiteIds = [];
 								var executionRequest = {
@@ -1202,9 +1183,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 								}
 
 								function executionFunction(executionRequest, username) {
-									// var name = req.session.username;
 									var name = username;
-									console.log(username)
 									redisServer.redisSubServer.subscribe('ICE2_' + name);
 									var scenarioCount = executionRequest.suitedetails[0].scenarioIds.length;
 									var completedSceCount = 0;
@@ -1317,7 +1296,6 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 												if (found) flag = "scheduleModeOn";
 												else {
 													flag = "unavailableLocalServer";
-													console.log('error here')
 													logger.error("Error occured in ExecuteTestSuite_ICE_SVN service: Socket not Available");
 												}
 												res.send(flag);
