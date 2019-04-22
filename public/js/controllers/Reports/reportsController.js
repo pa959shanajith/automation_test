@@ -91,52 +91,55 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             unblockUI();
             console.log("Error in service getReportsData_ICE while fetching scenarios");
         });
-        //Initialse DataTables, with no sorting on the 'details' column
-        setTimeout(function() {
-            if ($rootScope.scenarioData.length > 0) {
-                var oTable = $('#reportsTable').dataTable({
-                    "bDestroy": true,
-                    "responsive": true,
-                    "bRetrieve": true,
-                    "bPaginate": false,
-                    "bSort": false,
-                    "bFilter": false,
-                    "bLengthChange": false,
-                    "bInfo": false,
-                    "scrollY": "200px",
-                    "scrollCollapse": true,
-                    "scrollX": true,
-                    "paging": false,
-                    "oLanguage": {
-                        "sSearch": ""
-                    },
-                    "deferRender": true,
-                    "columns": [{
-                            "width": "5%",
-                            "targets": 0
+     //Initialse DataTables, with no sorting on the 'details' column
+         $timeout(function() {
+            if('scenarioData' in $rootScope)
+            {
+                if ($rootScope.scenarioData.length > 0) {
+                    var oTable = $('#reportsTable').dataTable({
+                        "bDestroy": true,
+                        "responsive": true,
+                        "bRetrieve": true,
+                        "bPaginate": false,
+                        "bSort": false,
+                        "bFilter": false,
+                        "bLengthChange": false,
+                        "bInfo": false,
+                        "scrollY": "200px",
+                        "scrollCollapse": true,
+                        "scrollX": true,
+                        "paging": false,
+                        "oLanguage": {
+                            "sSearch": ""
                         },
-                        {
-                            "width": "15%",
-                            "targets": 1
-                        },
-                        {
-                            "width": "25%",
-                            "targets": 2
-                        },
-                        {
-                            "width": "20%",
-                            "targets": 3
-                        },
-                        {
-                            "width": "18%",
-                            "targets": 4
-                        },
-                    ],
-                    "fnInitComplete": function(oSettings, json) {
-                        unblockUI();
-
-                    }
-                });
+                        "deferRender": true,
+                        "columns": [{
+                                "width": "5%",
+                                "targets": 0
+                            },
+                            {
+                                "width": "15%",
+                                "targets": 1
+                            },
+                            {
+                                "width": "25%",
+                                "targets": 2
+                            },
+                            {
+                                "width": "20%",
+                                "targets": 3
+                            },
+                            {
+                                "width": "18%",
+                                "targets": 4
+                            },
+                        ],
+                        "fnInitComplete": function(oSettings, json) {
+                            unblockUI();
+    
+                        }
+                    });
+                }
             }
             unblockUI();
             $("input[type=search]").attr('placeholder', 'Search Scenario').addClass('scenarioSearch');
