@@ -564,15 +564,27 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					var qlist=[];
 					var projid= eachmoduledata.projectid;
 					var modname= eachmoduledata.testsuitename;
-					qlist.push({'statement':"MATCH (n:MODULES) where n.projectID='"+projid+"' and n.moduleName='"+modname+"' MATCH (t:TASKS) where t.parent starts with ('['+n.projectID+','+n.moduleID_c+',') and (t.task='Scrape' or t.task='Design') and not t.status='complete' return count(t)"});
-					qlist.push({'statement':"MATCH (n:MODULES_ENDTOEND) where n.projectID='"+projid+"' and n.moduleName='"+modname+"' MATCH (t:TASKS) where t.parent starts with ('['+n.projectID+','+n.moduleID_c+',') and (t.task='Scrape' or t.task='Design') and not t.status='complete' return count(t)"});
+					var modid= eachmoduledata.testsuiteid;
+					var scenario_list=[];
+					var arr=eachmoduledata.suiteDetails;
+					for (i=0;i<arr.length;i++){
+						scenario_list.push(arr[i].scenarioids);
+					}
+					qlist.push({'statement':"MATCH (ts:TESTSCENARIOS)-[r]->(s:SCREENS)-[]->(tc:TESTCASES) where ts.testScenarioID_c in "+JSON.stringify(scenario_list)+" return count(DISTINCT s)+count(DISTINCT tc)"});
+					//qlist.push({'statement':"MATCH (n:MODULES{ n.projectID='"+projid+"' and n.moduleName='"+modname+"' and n.moduleID_c='"+modid+"'}) -[]->(ts:TESTSCENARIOS) with ts,n MATCH (ts1:TESTSCENARIOS{testScenarioID_c:ts.testScenarioID_c})-[r]->(s:SCREENS)-[]->(tc:TESTCASES) return count(DISTINCT s)+count(DISTINCT tc)"});
+					qlist.push({'statement':"MATCH (n:MODULES{projectID:'"+projid+"',moduleName:'"+modname+"', moduleID_c:'"+modid+"'}) MATCH (t:TASKS) where t.parent starts with ('['+n.projectID+','+n.moduleID_c+',') and (t.task='Scrape' or t.task='Design') and t.status='complete' return count(DISTINCT t.parent)"});
+					qlist.push({'statement':"MATCH (n:MODULES_ENDTOEND{projectID:'"+projid+"', moduleName:'"+modname+"', moduleID_c:'"+modid+"'}) MATCH (t:TASKS) where t.parent starts with ('['+n.projectID+','+n.moduleID_c+',') and (t.task='Scrape' or t.task='Design') and t.status='complete' return count(DISTINCT t.parent)"});
+					//qlist.push({'statement':"MATCH (n:MODULES_ENDTOEND) where n.projectID='"+projid+"' and n.moduleName='"+modname+"' MATCH (t:TASKS) where t.parent starts with ('['+n.projectID+','+n.moduleID_c+',') and (t.task='Scrape' or t.task='Design') and not t.status='complete' return count(t)"});
 					neo4jAPI.executeQueries(qlist,function(status_res,result){
 						if(status_res!=200) return callback({res:'fail',status:status_res});
 						try {
 							var err = null;
-							if(result[0].data[0].row[0]!=0 || result[1].data[0].row[0]!=0){
-								logger.info("All its dependent tasks (design, scrape) are not approved");
-								err = {res:'NotApproved',status:status_res};
+							logger.debug("Screens and testcases count",result[0].data[0].row[0]);
+							logger.debug("Module task count",result[1].data[0].row[0]);
+							logger.debug("E2E modules task count",result[2].data[0].row[0]);
+							if(!(result[0].data[0].row[0]==result[1].data[0].row[0] || result[0].data[0].row[0]==result[2].data[0].row[0])){
+									logger.info("All its dependent tasks (design, scrape) are not approved");
+									err = {res:'NotApproved',status:status_res};
 							}
 							callback(err);
 						} catch(ex) {
