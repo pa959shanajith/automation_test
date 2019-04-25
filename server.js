@@ -187,8 +187,7 @@ if (cluster.isMaster) {
 			}));
 			//CORS
 			app.all('*', function(req, res, next) {
-				var origin = req.get('host');
-				res.setHeader('Access-Control-Allow-Origin', origin);
+				res.setHeader('Access-Control-Allow-Origin', req.hostname);
 				res.header('Access-Control-Allow-Headers', 'X-Requested-With');
 				next();
 			});
