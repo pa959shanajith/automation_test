@@ -581,8 +581,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 							var err = null;
 							logger.debug("Screens and testcases count",result[0].data[0].row[0]);
 							logger.debug("Module task count",result[1].data[0].row[0]);
-							logger.debug("E2E modules task count",result[2].data[0].row[0]);
-							if(!(result[0].data[0].row[0]==result[1].data[0].row[0] || result[0].data[0].row[0]==result[2].data[0].row[0])){
+							if(!(result[0].data[0].row[0]==result[1].data[0].row[0])){
 									logger.info("All its dependent tasks (design, scrape) are not approved");
 									err = {res:'NotApproved',status:status_res};
 							}
