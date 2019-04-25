@@ -564,15 +564,26 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					var qlist=[];
 					var projid= eachmoduledata.projectid;
 					var modname= eachmoduledata.testsuitename;
-					qlist.push({'statement':"MATCH (n:MODULES) where n.projectID='"+projid+"' and n.moduleName='"+modname+"' MATCH (t:TASKS) where t.parent starts with ('['+n.projectID+','+n.moduleID_c+',') and (t.task='Scrape' or t.task='Design') and not t.status='complete' return count(t)"});
-					qlist.push({'statement':"MATCH (n:MODULES_ENDTOEND) where n.projectID='"+projid+"' and n.moduleName='"+modname+"' MATCH (t:TASKS) where t.parent starts with ('['+n.projectID+','+n.moduleID_c+',') and (t.task='Scrape' or t.task='Design') and not t.status='complete' return count(t)"});
+					var modid= eachmoduledata.testsuiteid;
+					var scenario_list=[];
+					var arr=eachmoduledata.suiteDetails;
+					for (i=0;i<arr.length;i++){
+						scenario_list.push(arr[i].scenarioids);
+					}
+					qlist.push({'statement':"MATCH (ts:TESTSCENARIOS)-[r]->(s:SCREENS)-[]->(tc:TESTCASES) where ts.testScenarioID_c in "+JSON.stringify(scenario_list)+" return count(DISTINCT s)+count(DISTINCT tc)"});
+					qlist.push({'statement':"MATCH (ts:TESTSCENARIOS) where ts.testScenarioID_c in "+JSON.stringify(scenario_list)+" MATCH (t:TASKS) where t.parent starts with ('["+projid+","+modid+",'+ts.testScenarioID_c+',') and (t.task='Scrape' or t.task='Design') and t.status='complete' return count(DISTINCT t.parent)"});
 					neo4jAPI.executeQueries(qlist,function(status_res,result){
-						if(status_res!=200) return callback({res:'fail',status:status_res});
+						if(status_res!=200) {
+							logger.error("Error in ExecuteTestSuite_ICE: Neo4j query to find the number of tasks approved");
+							return callback({res:'fail',status:status_res});
+						}
 						try {
 							var err = null;
-							if(result[0].data[0].row[0]!=0 || result[1].data[0].row[0]!=0){
-								logger.info("All its dependent tasks (design, scrape) are not approved");
-								err = {res:'NotApproved',status:status_res};
+							logger.debug("Screens and testcases count",result[0].data[0].row[0]);
+							logger.debug("Module task count",result[1].data[0].row[0]);
+							if(!(result[0].data[0].row[0]==result[1].data[0].row[0])){
+									logger.info("All its dependent tasks (design, scrape) are not approved");
+									err = {res:'NotApproved',status:status_res};
 							}
 							callback(err);
 						} catch(ex) {
