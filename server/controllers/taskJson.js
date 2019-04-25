@@ -137,6 +137,7 @@ function next_function(resultobj, cb, data) {
 				'cycleid':''
 			};
 			var testSuiteDetails_obj = {
+				"assignedTime":"",
 				"releaseid": "",
 				"cycleid": "",
 				"testsuiteid": "",
@@ -226,6 +227,7 @@ function next_function(resultobj, cb, data) {
 							task_json.projectId = "";
 							taskDetails.taskName = t.task + versioningCheck() + t.batchName;
 							testSuiteDetails_obj.testsuitename = m.moduleName;
+							testSuiteDetails_obj.assignedTime = t.assignedTime;
 							if (batch_dict[t.batchName+'_'+t.cycle] == undefined) {
 								batch_dict[t.batchName+'_'+t.cycle] = user_task_json.length;
 							} else {
@@ -305,6 +307,14 @@ function next_function(resultobj, cb, data) {
 				}
 			}
 		}, function (maincallback) {
+			user_task_json.forEach(function calb(objs){
+				if(objs.taskDetails[0].taskName.indexOf("Execute Batch")==0){
+					var batchmodules=objs.testSuiteDetails.sort(function(a,b){
+						return a.assignedTime-b.assignedTime;
+					});
+					objs.testSuiteDetails = batchmodules;
+				}
+			});
 			cb(null, user_task_json);
 		});
 	} catch (ex) {
