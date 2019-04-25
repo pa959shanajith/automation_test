@@ -117,7 +117,8 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 
 					PluginService.getNames_ICE($scope.filterDat.projectids,Array($scope.filterDat.projectids.length).fill('projects'))
 					.then(function (response) {
-						if(response == "Invalid Session"){
+						if(response== "fail"){ unblockUI(); }
+						else if(response == "Invalid Session"){
 							return $rootScope.redirectPage();
 						} else {
 							response.respnames.forEach(function(name,i){

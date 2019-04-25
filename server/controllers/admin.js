@@ -1176,7 +1176,7 @@ exports.getNames_ICE = function (req, res) {
 				respnames: [],
 				idtypes: []
 			};
-			if (requestedidslist.length == idtypes.length) {
+			if (requestedidslist.length == idtypes.length && requestedidslist.length > 0) {
 				for (var eachid = 0; eachid < requestedidslist.length; eachid++) {
 					if (requestedidslist[eachid] != null && requestedidslist[eachid] != undefined && requestedidslist[eachid].trim() != '') {
 						//in this block all projects under the domain is the response.
