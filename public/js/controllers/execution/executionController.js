@@ -56,13 +56,13 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		$(".parentBatchContainer").parent().hide();
 		$(".btnPanel").css("left", "0");
 		$("#page-taskName span").text("Suite Execution");
-		var status = current_task.status;
-		if (status == 'review') {
-			$('.submitTaskBtn').text('Approve');
-			$('.reassignTaskBtn').show();
-		}
 	} else
 		$("#page-taskName span").text("Batch Execution");
+	var status = current_task.status;
+	if (status == 'review') {
+		$('.submitTaskBtn').text('Approve');
+		$('.reassignTaskBtn').show();
+	}
 
 	var assignedTestScenarioId = current_task.assignedTestScenarioIds;
 	var readTestSuite = current_task.testSuiteDetails;

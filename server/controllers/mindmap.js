@@ -451,13 +451,19 @@ exports.reviewTask = function (req, res) {
 		var date = new Date();
 		var status = inputs.status;
 		var versionnumber = inputs.versionnumber;
+		if (batchIds.indexOf(',')>-1){
+			var batch_tasks=batchIds.split(',');
+			taskID=JSON.stringify(batch_tasks);
+		}else{
+			taskID=JSON.stringify([batchIds]);
+		}
 
 		var cur_date = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + ',' + date.toLocaleTimeString();
 		var taskHistory = { "userid": userId, "status": "", "modifiedBy": username, "modifiedOn": cur_date };
 		if (status == 'inprogress' || status == 'assigned' || status == 'reassigned' || status == 'reassign') {
-			query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID='" + taskID + "' and n.assignedTo='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
+			query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.assignedTo='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
 		} else if (status == 'review') {
-			query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID='" + taskID + "' and n.reviewer='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
+			query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.reviewer='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
 		}
 
 		var qlist_query = [query];
@@ -490,7 +496,7 @@ exports.reviewTask = function (req, res) {
 								neo_taskHistory.push(taskHistory);
 							}
 							neo_taskHistory = JSON.stringify(neo_taskHistory);
-							query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID='" + taskID + "' and n.assignedTo='" + userId + "' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review',n.taskHistory='" + neo_taskHistory + "' RETURN n" };
+							query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.assignedTo='" + userId + "' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review',n.taskHistory='" + neo_taskHistory + "' RETURN n" };
 							new_queries.push(query);
 							task_flag = true;
 
@@ -503,7 +509,7 @@ exports.reviewTask = function (req, res) {
 								neo_taskHistory.push(taskHistory);
 							}
 							neo_taskHistory = JSON.stringify(neo_taskHistory);
-							query = { 'statement': "MATCH (m)-[r]-(n:TASKS) WHERE n.taskID='" + taskID + "' and n.reviewer='" + userId + "' set n.assignedTo='',n.status='complete',n.taskHistory='" + neo_taskHistory + "' DELETE r RETURN n" };
+							query = { 'statement': "MATCH (m)-[r]-(n:TASKS) WHERE n.taskID in " + taskID + " and n.reviewer='" + userId + "' set n.assignedTo='',n.status='complete',n.taskHistory='" + neo_taskHistory + "' DELETE r RETURN n" };
 							new_queries.push(query);
 							task_flag = true;
 						} else if (status == 'reassign') {
@@ -515,7 +521,7 @@ exports.reviewTask = function (req, res) {
 								neo_taskHistory.push(taskHistory);
 							}
 							neo_taskHistory = JSON.stringify(neo_taskHistory);
-							query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID='" + taskID + "' and n.reviewer='" + userId + "' set n.reviewer=n.assignedTo,n.assignedTo=n.task_owner,n.status='reassigned',n.taskHistory='" + neo_taskHistory + "' RETURN n" };
+							query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.reviewer='" + userId + "' set n.reviewer=n.assignedTo,n.assignedTo=n.task_owner,n.status='reassigned',n.taskHistory='" + neo_taskHistory + "' RETURN n" };
 							new_queries.push(query);
 							task_flag = true;
 						}
