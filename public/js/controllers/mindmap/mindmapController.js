@@ -887,14 +887,28 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
     //To Unassign the task of a particular node
     $scope.removeTask = function(e, tidx) {
+        var uinfo = JSON.parse(window.localStorage['_UI']);
+        var twf= uinfo.taskwflow; 
+        var pi=null;
+        var p = d3.select(activeNode);
         if (tidx == 0 || tidx == undefined) {
             if ($("#ct-unassignButton a").attr('class') == 'disableButton') return;
-            var p = d3.select(activeNode);
-            p.select('.ct-nodeTask').classed('no-disp', !0);
-            var pi = parseInt(p.attr('id').split('-')[2]);
-            var nType = p.attr('data-nodetype');
+            pi = parseInt(p.attr('id').split('-')[2]);
         } else pi = tidx;
+        var nType=dNodes[pi].type;
+        $('#unassignmentConfirmationPopup').attr('node', pi);
+        if (twf && (nType=="screens" || nType=="testcases")) $('#unassignmentConfirmationPopup').modal("show");
+        else task_unassignment(pi,p);
+    }
 
+    $('#unassignTask').click(function() {
+        var pi = $('#unassignmentConfirmationPopup').attr('node');
+        var p = d3.select(activeNode);
+        task_unassignment(pi,p);
+           
+    });
+    function task_unassignment(pi,p){
+        p.select('.ct-nodeTask').classed('no-disp', !0);
         if (dNodes[pi].oid != undefined && dNodes[pi].task != null) {
             dNodes[pi].task.tstatus = 'unassigned'; //tstatus and assignedtoname are solely for notification
             unassignTask.push(dNodes[pi].oid);
@@ -909,9 +923,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
     }
 
+
     function assignBoxValidator() {
         var uinfo = JSON.parse(window.localStorage['_UI']);
-        var twf= uinfo.taskwflow;
+        var twf= uinfo.taskwflow; 
         if(twf){
             if($("#ct-assignedTo option:selected").val()==$("#ct-assignRevw option:selected").val()){
                 $("#ct-assignRevw").css('border', '').addClass("inputErrorBorderFull");
@@ -3840,7 +3855,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         })
     }
 
-    //To Unassign the task of a particular node
     function createScenario_Node(text, scenario_prjId) {
         if (text == '') return;
         //If module is in edit mode, then return do not add any node
