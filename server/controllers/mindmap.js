@@ -1550,8 +1550,21 @@ exports.exportToExcel = function (req, res) {
 		//create a new workbook file in current working directory
 		var workbook = excelbuilder.createWorkbook("./excel", "samp234.xlsx");
 		logger.debug(excelMap.name);
-		//create the new worksheet with 10 coloumns and 20 rows
-		var sheet1 = workbook.createSheet('sheet1', 10, 20);
+
+		//Find the number of testcases
+		var nt=0;
+		for (let i = 0; i < excelMap.children.length; i++) {
+			//loop to iterate through number of screens
+			for (let j = 0; j < excelMap.children[i].children.length; j++) {
+				//loop through number of test cases
+				for (let k = 0; k < excelMap.children[i].children[j].children.length; k++) {
+					nt=nt+1;
+				}
+			}
+		}
+
+		//create the new worksheet with 10 coloumns and rows equal to number of testcases
+		var sheet1 = workbook.createSheet('sheet1', 10, nt+1);
 		var curr = excelMap;
 		var sce_row_count = 2;
 		var scr_row_count = 2;

@@ -5003,6 +5003,11 @@ Purpose : displaying pop up for replication of project
     }
 
     $scope.showContent = function(sheetname) {
+        if ($("#selectid option:selected").text()== "Please Select Sheet"){
+            $("#SheetInput").modal("hide");
+            openDialogMindmap('Error', 'Cannot proceed without selecting a Sheet');
+            return;
+        }
         $("#SheetInput").modal("hide");
         var validate = true;
         mindmapServices.excelToMindmap({'content':$scope.content,'flag':'data','sheetname':sheetname}).then(function(result) {
