@@ -401,6 +401,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 							openModalPopup("Token Management", "Expiry time should be 8 hours more than current time");
 							return false;
 						}
+						else if($('td:contains("active")').length>=10){
+							openModalPopup("Token Management", "User can have max 10 active tokens. Please Deactivate old tokens");
+							return false;
+						}
 						else{
 							//console.log("expiry",expiry);
 							//console.log(tokenname)
