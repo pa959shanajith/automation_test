@@ -185,13 +185,12 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		$rootScope.resetSession.start();
 		flowGraphServices.getResults(version,path).then(function(data) {
 			$rootScope.resetSession.end();
-			if (data == "unavailableLocalServer" || data == "invalidPath") {
+			if (data == "unavailableLocalServer") {
 				$scope.hideBaseContent = { message: 'false' };
 				$('#progress-canvas').hide();
 				document.getElementById('path').value = '';
 				$('#generateBtn').prop('disabled', true);
-				if (data == 'invalidPath') openDialog("APG","The given path does not exists.");
-				else  openDialog("APG", $rootScope.unavailableLocalServer_msg);
+				openDialog("APG", $rootScope.unavailableLocalServer_msg);
 				return false;
 			} else if(data == "Invalid Session"){
 				document.getElementById('path').value = '';
@@ -210,7 +209,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		});
 
 		socketUI.on('endData', function(obj) {
-			localStorage.setItem("navigateEnable", true);
+			localStorage.setItem("navigateEnable", true); 
 			if(obj.result == "success"){
 				$('#progress-canvas').fadeOut(800, function(){
 					$scope.hideBaseContent = { message: 'true' };
@@ -221,13 +220,13 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				$scope.enableGenerate = true;
 				$scope.ClassDiagramView = true;
 				//$scope.createAPGProject(obj);
-			} else if(obj.result == "fail") {
-				$('#progress-canvas').fadeOut(800, function(){
-					$scope.hideBaseContent = { message: 'false' };
-					$scope.$apply();
-				});
+			} else if(obj.result == "fail" || obj.result == "invalidPath") {
+				$scope.hideBaseContent = { message: 'false' };
+				$('#progress-canvas').hide();
 				document.getElementById('path').value = '';
-				openDialog("APG", "Failed to generate graph.");
+				$('#generateBtn').prop('disabled', true);
+				if (obj.result == "invalidPath")  openDialog("APG", "The given path does not exists.");
+				else  openDialog("APG", "Failed to generate graph.");
 			}
 			socketUI.disconnect('', { query: "check=true" });
 		});
@@ -867,7 +866,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 						var id = e.target.id.split("_")[1];
 						var previousValue=$('#weightage_'+id).text();
 						$('#weightage_'+id).text('');
-						$("#"+e.target.id).parent().append("<input id='txtWeightage_"+id+"' type='text' maxlength=3 onkeydown='return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57' value="+previousValue+">")
+						$("#"+e.target.id).parent().append("<input id='txtWeightage_"+id+"' type='text' maxlength=3 onkeydown='return (event.keyCode == 8 || event.keyCode == 0 || event.keyCode == 13 || event.keyCode == 16) ? null : event.keyCode >= 48 && event.keyCode <= 57' value="+previousValue+">");
 						$(this).hide();
 						$("[id^=txtWeightage_]").on('keydown',function(event) {
 							//event.preventDefault();
@@ -905,7 +904,10 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				}
 				$scope.wmcc = Math.ceil(weightedSum);
 				$scope.apply();
-			} else   openDialog('APG', "Please check the weightages given.");
+			} else{
+				$("[id^=weightage_]").text('');
+				openDialog('APG', "Please check the weightages given.");
+			}
 		}	
 
 		nodeGroup.append('image')
@@ -934,8 +936,10 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		});
 		
 		zoom.translate([(svg.attr('width') - g.graph().width * initialScale) / 2, 10]).scale(1).event(svg);
-		var coord= $('.nodes').children()[0].getAttribute("transform").split("(")[1].split(")")[0].split(",");
-		zoom.translate([ Number(-coord[0]+width/2),  Number(-coord[1]+height/2)]).scale(1).event(svg);
+		if(nodes.length > 0){
+			var coord= $('.nodes').children()[0].getAttribute("transform").split("(")[1].split(")")[0].split(",");
+			zoom.translate([ Number(-coord[0]+width/2),  Number(-coord[1]+height/2)]).scale(1).event(svg);
+		}
 		
 		nodeDrag.call(svg.selectAll("g.node"));
 		edgeDrag.call(svg.selectAll("g.edgePath"));
