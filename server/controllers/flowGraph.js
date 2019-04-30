@@ -5,7 +5,6 @@ var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl = process.env.NDAC_URL;
 var utils = require('../lib/utils');
-var fs = require('fs');
 
 function isSessionActive(req){
 	var sessionToken = req.session.uniqueId;
@@ -19,55 +18,49 @@ exports.flowGraphResults = function(req, res){
 			var name = req.session.username;
 			var version = req.body.version;
 			var path = req.body.path;
-			var valid = fs.existsSync(path);
-			if(valid){
-				redisServer.redisSubServer.subscribe('ICE2_' + name ,1);
-				redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-					if (redisres[1]>0) {
-						logger.info("Sending socket request for generateFlowGraph to redis");
-						var dataToIce = {"emitAction" : "generateFlowGraph","username" : name, "version":version, "path" : path};
-						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						function generateFlowGraph_listener(channel,message) {
-							data = JSON.parse(message);
-							if(name == data.username){
-								var value = data.value;
-								if (data.onAction == "unavailableLocalServer") {
-									redisServer.redisSubServer.removeListener('message',generateFlowGraph_listener);	
-									logger.error("Error occurred in flowGraphResults: Socket Disconnected");
-									if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-										var soc = myserver.socketMapNotify[name];
-										soc.emit("ICEnotAvailable");
-									}
-								} else if (data.onAction == "flowgraph_result") {
-									try {
-										var mySocketUI = myserver.allSocketsMapUI[name];
-										mySocketUI.emit("newdata", value);
-									} catch (exception) {
-										logger.error(exception.message);
-									}
-								} else if (data.onAction == "result_flow_graph_finished") {
-									redisServer.redisSubServer.removeListener('message',generateFlowGraph_listener);	
-									try {
-										var mySocketUI = myserver.allSocketsMapUI[name];
-										mySocketUI.emit("endData", value);
-										res.status(200).json({success: true});
-									} catch (exception) {
-										logger.error(exception.message);
-										res.status(500).json({success: false, data: exception});
-									}
+			redisServer.redisSubServer.subscribe('ICE2_' + name ,1);
+			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+				if (redisres[1]>0) {
+					logger.info("Sending socket request for generateFlowGraph to redis");
+					var dataToIce = {"emitAction" : "generateFlowGraph","username" : name, "version":version, "path" : path};
+					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					function generateFlowGraph_listener(channel,message) {
+						data = JSON.parse(message);
+						if(name == data.username){
+							var value = data.value;
+							if (data.onAction == "unavailableLocalServer") {
+								redisServer.redisSubServer.removeListener('message',generateFlowGraph_listener);	
+								logger.error("Error occurred in flowGraphResults: Socket Disconnected");
+								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+									var soc = myserver.socketMapNotify[name];
+									soc.emit("ICEnotAvailable");
+								}
+							} else if (data.onAction == "flowgraph_result") {
+								try {
+									var mySocketUI = myserver.allSocketsMapUI[name];
+									mySocketUI.emit("newdata", value);
+								} catch (exception) {
+									logger.error(exception.message);
+								}
+							} else if (data.onAction == "result_flow_graph_finished") {
+								redisServer.redisSubServer.removeListener('message',generateFlowGraph_listener);	
+								try {
+									var mySocketUI = myserver.allSocketsMapUI[name];
+									mySocketUI.emit("endData", value);
+									res.status(200).json({success: true});
+								} catch (exception) {
+									logger.error(exception.message);
+									res.status(500).json({success: false, data: exception});
 								}
 							}
-						};
-						redisServer.redisSubServer.on("message",generateFlowGraph_listener);
-					} else {
-						logger.info("ICE socket not available for Address : %s", name);
-						res.send("unavailableLocalServer");
-					}
-				});
-			} else{
-				logger.info("The given path does not exists.");
-				res.send("invalidPath");
-			}
+						}
+					};
+					redisServer.redisSubServer.on("message",generateFlowGraph_listener);
+				} else {
+					logger.info("ICE socket not available for Address : %s", name);
+					res.send("unavailableLocalServer");
+				}
+			});
 		}
 		else{
 			logger.info("Error occurred in the service flowGraphResults: Invalid Session");

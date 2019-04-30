@@ -18,10 +18,11 @@ module.exports.getSocketList = function(toFetch, cb) {
 	else if (toFetch == "schedule") fetchQuery = "ICE1_scheduling_*";
 	else if (toFetch == "notify") fetchQuery = "notify_*";
 	if (toFetch == "ICE") {
-		redisServer.redisPubICE.pubsub('channels', fetchQuery, function(err,redisres){
+		redisServer.redisPubICE.pubsub('channels', fetchQuery, function(err,redisres) {
 			async.eachSeries(redisres, function(e, innerCB){
-				var user = e.split('_')[2];
-				var mode = e.split('_')[1];
+				e = e.split('_');
+				var mode = e[1];
+				var user = e.slice(2).join('_');
 				redisServer.redisSubServer.subscribe('ICE2_' + user ,1);
 				redisServer.redisPubICE.publish(e, JSON.stringify({"emitAction":"getSocketInfo","username":user}));
 				function fetchIP(channel, message) {
