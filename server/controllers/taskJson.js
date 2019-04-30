@@ -237,6 +237,7 @@ function next_function(resultobj, cb, data) {
 								testSuiteDetails_obj.subTaskId = t.taskID;
 								batch_task.testSuiteDetails.push(testSuiteDetails_obj);
 								batch_flag = true;
+								batch_indx = Object.values(batch_dict);
 							}
 						} else if (t.task == 'Execute Scenario') {
 							task_json.scenarioFlag = 'True';
@@ -307,14 +308,15 @@ function next_function(resultobj, cb, data) {
 				}
 			}
 		}, function (maincallback) {
-			user_task_json.forEach(function calb(objs){
-				if(objs.taskDetails[0].taskName.indexOf("Execute Batch")==0){
-					var batchmodules=objs.testSuiteDetails.sort(function(a,b){
-						return a.assignedTime-b.assignedTime;
-					});
-					objs.testSuiteDetails = batchmodules;
+			if(batch_indx.length>0){
+				for(i=0;i<batch_indx.length;i++){
+					var indx=batch_indx[i];
+					var batchmodules=user_task_json[indx].testSuiteDetails.sort(function(a,b){
+							return a.assignedTime-b.assignedTime;
+						});
+					user_task_json[indx].testSuiteDetails=batchmodules;
 				}
-			});
+			}
 			cb(null, user_task_json);
 		});
 	} catch (ex) {
