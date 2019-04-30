@@ -2758,6 +2758,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             var username = userInfo.username;
             var assignedTo = assignedObj;
 
+            var currTime = new Date();
+            var utcTime = currTime.getTime();
+
             if ($('.project-list').val() == null) {
                 unblockUI();
                 openDialogMindmap('Error', 'No projects is assigned to User');
@@ -2768,7 +2771,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 from_v = to_v = $('.version-list').val();
 
             mindmapServices.saveData(versioning_enabled, assignedTo, flag, from_v, to_v, cur_module, mapData, deletednode, unassignTask,
-                $('.project-list').val(), $('.release-list').val(), $('.cycle-list').val(), selectedTab).then(function(result) {
+                $('.project-list').val(), $('.release-list').val(), $('.cycle-list').val(), selectedTab, utcTime).then(function(result) {
                 if (result == "Invalid Session") {
                     return $rootScope.redirectPage();
                 }
@@ -5014,6 +5017,11 @@ Purpose : displaying pop up for replication of project
     }
 
     $scope.showContent = function(sheetname) {
+        if ($("#selectid option:selected").text()== "Please Select Sheet"){
+            $("#SheetInput").modal("hide");
+            openDialogMindmap('Error', 'Cannot proceed without selecting a Sheet');
+            return;
+        }
         $("#SheetInput").modal("hide");
         var validate = true;
         mindmapServices.excelToMindmap({'content':$scope.content,'flag':'data','sheetname':sheetname}).then(function(result) {

@@ -84,7 +84,7 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
-		saveData: function (versioning_enabled,assignedTo,writeFlag,from_v,to_v,cur_module,mapData,deletednode,unassignTask,prjId,relId,cycId,selectedTab){
+		saveData: function (versioning_enabled,assignedTo,writeFlag,from_v,to_v,cur_module,mapData,deletednode,unassignTask,prjId,relId,cycId,selectedTab,utcTime){
 			var param = "/saveData";
 			if (versioning_enabled==1){
 				param = "/saveDataVersioning";
@@ -102,7 +102,8 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 					prjId: prjId,
 					relId: relId,
 					cycId: cycId,
-					selectedTab:selectedTab
+					selectedTab:selectedTab,
+					UtcTime: utcTime
 			})
 			.then(function (response) { return response.data; },
 					function (response) { return $q.reject(response.data); });

@@ -683,7 +683,7 @@
              <h4 class="modal-title">Select a Sheet</h4>
           </div>
           <div class="modal-body">
-             <select class="sheet-list" ng-model="sheetname">
+             <select id="selectid" class="sheet-list" ng-model="sheetname">
                 <option value="" disabled selected>Please Select Sheet</option>
                 <option ng-repeat="sheet in sheetnames" value='{{sheet}}'>{{sheet}}</option>
              </select>
