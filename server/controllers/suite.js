@@ -16,6 +16,7 @@ var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
 var taskflow = require('../config/options').strictTaskWorkflow;
 var qList = [];
+require('follow-redirects').maxBodyLength = 50*1024*1024;
 
 /**
  * @author vishvas.a
