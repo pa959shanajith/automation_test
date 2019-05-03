@@ -99,6 +99,7 @@ function next_function(resultobj, cb, data) {
 		var jsonData = result;
 		var alltasks = jsonData[0].data;
 		var user_task_json = [];
+		var batch_indx = [];
 		var taskDetails = {};
 		var batch_dict = {};
 		async.forEachSeries(alltasks, function (a, maincallback) {

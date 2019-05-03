@@ -94,7 +94,6 @@ if (cluster.isMaster) {
 		app.use('/partials', express.static(__dirname + "/public/partials"));
 		app.use("/js", express.static(__dirname + "/public/js"));
 		app.use("/imgs", express.static(__dirname + "/public/imgs"));
-		app.use("/images_mindmap", express.static(__dirname + "/public/images_mindmap"));
 		app.use("/css", express.static(__dirname + "/public/css"));
 		app.use("/fonts", express.static(__dirname + "/public/fonts"));
 
@@ -610,7 +609,7 @@ if (cluster.isMaster) {
 				ecode = "600";
 				emsg = "Redis Database unavailable";
 			}
-			logger.error(err.message);
+			logger.error(emsg);
 			res.status(500).send("<html><body><p>[ECODE " + ecode + "] Internal Server Error Occurred!</p></body></html>");
 		});
 
