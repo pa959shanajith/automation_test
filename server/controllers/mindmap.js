@@ -1529,33 +1529,24 @@ exports.getScreens = function (req, res) {
 };
 
 exports.exportToExcel = function (req, res) {
-	logger.info("Writing  Module structure to Excel");
+	logger.info("Writing Module structure to Excel");
 	if (utils.isSessionActive(req)) {
 		var d = req.body;
 		var excelMap = d.excelMap;
 		var dir = './../../excel';
-		var filepath1 = path.join(__dirname, '../../excel');
-		var filePath = path.join(__dirname, '../../excel', 'samp234.xlsx');
+		var excelDirPath = path.join(__dirname, dir);
+		var filePath = path.join(excelDirPath, 'samp234.xlsx');
+		console.log(filePath);
 
 		try {
-			//to remove the created files
-			fs.unlinkSync(path.join(filePath));
+			if (!fs.existsSync(excelDirPath)) fs.mkdirSync(excelDirPath); // To create directory for storing excel files if DNE.
+			if (fs.existsSync(filePath)) fs.unlinkSync(path.join(filePath)); // To remove the created files
 		} catch (e) {
-			logger.error("Error in loading excel ", e);
-		}
-		try {
-			if (!fs.existsSync(filepath1)) {
-				logger.debug("inside directory");
-				fs.mkdirSync(filepath1);
-				//console.log("created"+dir);
-			}
-		} catch (e) {
-			logger.error("exception in mindmapService: ", ex);
+			logger.error("Exception in mindmapService: exportToExcel: Create Directory/Remove file", e);
 		}
 
 		//create a new workbook file in current working directory
 		var workbook = excelbuilder.createWorkbook("./excel", "samp234.xlsx");
-		logger.debug(excelMap.name);
 
 		//Find the number of testcases
 		var nt=0;
@@ -1606,13 +1597,14 @@ exports.exportToExcel = function (req, res) {
 				sheet1.set(2, 1 + parseInt(min_scr_idx), curr.children[i].name);
 			}
 			//save it
-			workbook.save(function (ok) {
+			workbook.save(function (err) {
+				if (err) return res.send('fail');
 				res.writeHead(200, {'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 				var rstream = fs.createReadStream(filePath);
 				rstream.pipe(res);
 			});
 		} catch (ex) {
-			logger.error("exception in mindmapService: ", ex);
+			logger.error("Exception in mindmapService: exportToExcel: ", ex);
 		}
 	} else {
 		logger.error("Invalid session");
