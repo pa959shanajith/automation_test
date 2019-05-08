@@ -163,6 +163,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		// labelArr.push(txnHistory.codesDict['Generate']);
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 		localStorage.setItem("navigateEnable", false);
+		$('#tasks_div').addClass('disableActions');
 		$scope.obj = {};
 		$scope.enableGenerate = false;
 		currentDot = 0;
@@ -209,7 +210,8 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		});
 
 		socketUI.on('endData', function(obj) {
-			localStorage.setItem("navigateEnable", true); 
+			localStorage.setItem("navigateEnable", true);
+			$('#tasks_div').removeClass('disableActions');
 			if(obj.result == "success"){
 				$('#progress-canvas').fadeOut(800, function(){
 					$scope.hideBaseContent = { message: 'true' };
@@ -866,10 +868,21 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 						var id = e.target.id.split("_")[1];
 						var previousValue=$('#weightage_'+id).text();
 						$('#weightage_'+id).text('');
-						$("#"+e.target.id).parent().append("<input id='txtWeightage_"+id+"' type='text' maxlength=3 onkeydown='return (event.keyCode == 8 || event.keyCode == 0 || event.keyCode == 13 || event.keyCode == 16) ? null : event.keyCode >= 48 && event.keyCode <= 57' value="+previousValue+">");
+						$("#"+e.target.id).parent().append("<input id='txtWeightage_"+id+"' type='text' maxlength=3 value="+previousValue+">");
 						$(this).hide();
 						$("[id^=txtWeightage_]").on('keydown',function(event) {
-							//event.preventDefault();
+							// Allow: backspace, delete, tab, escape, enter and .
+							if ($.inArray(event.keyCode, [46, 8, 9, 27, 110, 190]) !== -1 ||
+							  // Allow: Ctrl+A,Ctrl+C,Ctrl+V, Command+A
+							  ((event.keyCode == 65 || event.keyCode == 86 || event.keyCode == 67) && (event.ctrlKey === true || event.metaKey === true)) ||
+							  // Allow: home, end, left, right, down, up
+							  (event.keyCode >= 35 && event.keyCode <= 40)) {
+							  return;
+							}
+							// Ensure that it is a number and stop the keypress
+							if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && (event.keyCode < 96 || event.keyCode > 105)) {
+							  event.preventDefault();
+							}
 							if(event.keyCode == "13")
 							{
 								var id = event.target.id.split("_")[1];
@@ -879,7 +892,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 								$("#editWeightage_"+id).show();
 							}
 						});
-					});	
+					});
 				}
 			}).append('title').text('Complexity');
 		

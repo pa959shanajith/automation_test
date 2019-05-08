@@ -24,7 +24,6 @@
     "express": "^4.16.2",
     "express-session": "^1.15.6",
     "express-winston": "^2.4.0",
-    "fs": "0.0.1-security",
     "helmet": "^3.9.0",
     "https": "^1.0.0",
     "lusca": "^1.5.2",

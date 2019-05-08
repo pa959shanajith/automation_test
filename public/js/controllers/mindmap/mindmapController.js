@@ -4973,9 +4973,9 @@ Purpose : displaying pop up for replication of project
             openDialogMindmap("Fail", "Select the Module to export to excel");
         } else {
             mindmapServices.exportToExcel(excelMap).then(function(result) {
-                if (result == "Invalid Session") {
-                    return $rootScope.redirectPage();
-                } else {
+                if (result == "Invalid Session") return $rootScope.redirectPage();
+                else if (result == "fail") openDialogMindmap("Fail", "Error while exporting to excel");
+                else {
                     openWindow = 0;
                     if (openWindow == 0) {
                         var file = new Blob([result], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });

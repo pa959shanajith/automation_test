@@ -267,6 +267,8 @@ exports.updateScreen_ICE = function (req, res) {
 				try {
 					scrapedObjects = updateData.getScrapeData;
 					var parsedScrapedObj = JSON.parse(scrapedObjects);
+					parsedScrapedObj.scrapedurl = newData.scrapedurl;
+					scrapedObjects = JSON.stringify(parsedScrapedObj);
 					if (appType.toUpperCase() === 'WEBSERVICE') {
 						if ('body' in parsedScrapedObj) {
 							parsedScrapedObj.body[0] = parsedScrapedObj.body[0].replace(/'+/g, "\"");

@@ -20,9 +20,9 @@ module.exports.getSocketList = function(toFetch, cb) {
 	if (toFetch == "ICE") {
 		redisServer.redisPubICE.pubsub('channels', fetchQuery, function(err,redisres) {
 			async.eachSeries(redisres, function(e, innerCB){
-				e = e.split('_');
-				var mode = e[1];
-				var user = e.slice(2).join('_');
+				var ed = e.split('_');
+				var mode = ed[1];
+				var user = ed.slice(2).join('_');
 				redisServer.redisSubServer.subscribe('ICE2_' + user ,1);
 				redisServer.redisPubICE.publish(e, JSON.stringify({"emitAction":"getSocketInfo","username":user}));
 				function fetchIP(channel, message) {

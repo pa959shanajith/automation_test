@@ -1904,15 +1904,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						else {
 							openDialog("Compare Objects", "Failed to compare objects");
 							$rootScope.compareFlag = false;
-							setTimeout(function() {
-								$(".close:visible, .btn-default:visible").addClass('navigateToDesign');
-								$(document).on('click','.navigateToDesign',function() {
-									$(".scrollbar-compare,.saveCompareDiv").hide(); //Hide Compare Div
-									angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
-									$("#scrapTree,.fsScroll").show(); //Show Scraped Objects
-								});
-							}, 200);
-
+							return;
 						}
 
 					} else {
@@ -4608,7 +4600,7 @@ function contentTable(newTestScriptDataLS) {
 				}
 
 				if (str != "string") {
-					if (str != "" && str != "undefined" && str != undefined) {
+					if (str != "" && str != "undefined" && str != undefined && (data[rowId - 1].addTestCaseDetailsInfo.testcaseDetails!= "" || data[rowId - 1].addTestCaseDetailsInfo.actualResult_pass!= ""||data[rowId - 1].addTestCaseDetailsInfo.actualResult_fail!= "") ){
 						$(this).find("td:nth-child(13)").text('');
 						$(this).find("td:nth-child(13)").append('<img  alt="activeDetails" title="" id="details_' + v + '" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
 					}
@@ -4847,11 +4839,11 @@ function contentTable(newTestScriptDataLS) {
 		//  var expectedResult_fail = $.trim($('#fail_'+modalId+'').find('#expectedResult_'+modalId+'').val());
 		var actualResult_fail = $.trim($('#fail_' + modalId + '').find('#actualResult_' + modalId + '').val());
 
-		if (testDetails == '' && actualResult_pass == '' && actualResult_fail == '') {
-			$('#globalModalForm').modal('hide');
-			openDialog('Add Test Step Details', 'Please enter atleast one field to save test step details');
-		}
-		else {
+		//if (testDetails == '' && actualResult_pass == '' && actualResult_fail == '') {
+		//	$('#globalModalForm').modal('hide');
+		//	openDialog('Add Test Step Details', 'Please enter atleast one field to save test step details');
+		//}
+		//else {
 
 			if (testDetails == '' && actualResult_pass == '' && actualResult_fail == '') {
 				getTestStepDetailsRowData.addTestCaseDetails = '';
@@ -4900,7 +4892,7 @@ function contentTable(newTestScriptDataLS) {
 			// var infoArr = [];
 			// labelArr.push(txnHistory.codesDict['SaveTestStepDetails']);
 			// txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);					 
-		}
+		//}
 	});
 
 	//Reset test step details
@@ -5370,6 +5362,23 @@ function contentTable(newTestScriptDataLS) {
 			$grid.jqGrid('setCell', rowId, 'objectName', objName);
 			$grid.jqGrid('setCell', rowId, 'url', url);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
+		} else if (selectedText == "@Android_Custom"){
+            objName = " ";
+            url = " ";
+            var sc = Object.keys(keywordArrayList.Android_Custom);
+            selectedKeywordList = "Android_Custom";
+            var res = '';
+            for (var i = 0; i < sc.length; i++) {
+                if (selectedKeyword == sc[i]) {
+                    res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
+                } else
+                    res += '<option role="option" value="' + sc[i] + '">' + sc[i] + '</option>';
+            }
+            var row = $(e.target).closest('tr.jqgrow');
+            var rowId = row.attr('id');
+            $("select#" + rowId + "_keywordVal", row[0]).html(res);
+            selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
+            $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 		} else if (selectedText == "@CustomiOS") {
 			objName = " ";
 			url = " ";
@@ -6822,7 +6831,7 @@ function getTags(data) {
 	} else if (appTypeLocal == "DesktopJava") {
 		obnames = ["@Generic", "@Excel", "@Oebs", "@Custom", "@Word"];
 	} else if (appTypeLocal == "MobileApp" && navigator.appVersion.indexOf("Mac") == -1) {
-		obnames = ["@Generic", "@Mobile", "@Action"];
+		obnames = ["@Generic", "@Mobile", "@Android_Custom", "@Action"];
 	} else if (appTypeLocal == "MobileApp" && navigator.appVersion.indexOf("Mac") != -1) {
 		obnames = ["@Generic", "@Mobile", "@CustomiOS"];
 	} else if (appTypeLocal == "MobileWeb") {

@@ -1029,6 +1029,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 
 				}
 				async.eachSeries(userdata_iterator.moduleInfo, function (moduleinfo_iterator, cb1) {
+					cycleId1=moduleinfo_iterator.cycleId;
 					testsuite_args = {
 						data: {
 							"query": 'testsuitecheck',
@@ -1248,6 +1249,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 																		"executionid": executionid,
 																		"testsuiteid": testsuiteid,
 																		"testscenarioid": scenarioid,
+																		"cycleid": cycleId1,
 																		"browser": req_browser,
 																		"status": resultData.reportData.overallstatus[0].overallstatus,
 																		"report": JSON.stringify(reportdata),
