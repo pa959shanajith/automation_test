@@ -15,15 +15,8 @@ var wkhtmltopdf = require('wkhtmltopdf');
 var fs = require('fs');
 wkhtmltopdf.command = process.cwd() + "\\assets\\wkhtmltox\\bin\\wkhtmltopdf.exe"
 var reportpath = "../../assets/templates";
-var templatepdf = '',
-    templateweb = '';
-fs.readFile('assets/templates/pdfReport/content.handlebars', 'utf8', function(err, data) {
-    templatepdf = data;
-});
-
-fs.readFile('assets/templates/specificReport/content.handlebars', 'utf8', function(err, data) {
-    templateweb = data;
-});
+var templatepdf = '';
+var templateweb = '';
 
 Handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
     return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
@@ -65,6 +58,14 @@ Handlebars.registerHelper('getDataURI', function(uri) {
     else return f + uri;
 });
 
+fs.readFile('assets/templates/pdfReport/content.handlebars', 'utf8', function(err, data) {
+    templatepdf = Handlebars.compile(data);
+});
+
+fs.readFile('assets/templates/specificReport/content.handlebars', 'utf8', function(err, data) {
+    templateweb = Handlebars.compile(data);
+});
+
 //to open screen shot
 function openScreenShot(req, path, cb) {
     try {
@@ -95,11 +96,11 @@ function openScreenShot(req, path, cb) {
                             }
                         } else if (data.onAction == "render_screenshot") {
                             var resultData = data.value;
-                            if (resultData == "fail") { // In case of fail
+                            if (resultData === "fail") { // In case of fail
                                 redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
                                 logger.error('Screenshot status: ', resultData);
                                 cb('fail');
-                            } else if (resultData == "finished") { //Get final status of screenshots
+                            } else if (resultData === "finished") { //Get final status of screenshots
                                 redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
                                 logger.debug("screenshots processed successfully");
                                 cb(null, sreenshotsArr);
@@ -160,24 +161,31 @@ exports.renderReport_ICE = function(req, res) {
                 openScreenShot(req, scrShot.paths, function(err, dataURIs) {
                     if (err) logger.warn("Error while loading screenshots %s", err);
                     else {
-                        if (dataURIs == "fail" || dataURIs == "unavailableLocalServer") scrShot.paths.forEach(function(d, i) {
+                        if (dataURIs === "fail" || dataURIs === "unavailableLocalServer") scrShot.paths.forEach(function(d, i) {
                             data.rows[scrShot.idx[i]].screenshot_dataURI = dataURIs;
                         });
                         else dataURIs.forEach(function(d, i) {
                             data.rows[scrShot.idx[i]].screenshot_dataURI = d;
                         });
                     }
-                    var source = templatepdf;
-                    var template = Handlebars.compile(source);
-                    var html = template(data);
-                    wkhtmltopdf(html).pipe(res);
+					try {
+						var pdf = templatepdf(data);
+						wkhtmltopdf(pdf).pipe(res);
+					} catch (exception) {
+						var emsg = exception.message;
+						var flag = "fail";
+						if ((exception instanceof RangeError) && emsg === "Invalid string length") {
+							emsg = "Report Size too large";
+							flag = "limitExceeded";
+						}
+						logger.error("Exception occurred in renderReport_ICE when trying to render report: %s", emsg);
+						return res.send(flag);
+					}
                 });
             }
             //HTML Reports
             else {
-                var source = templateweb;
-                var template = Handlebars.compile(source);
-                var html = template(data);
+                var html = templateweb(data);
                 res.send(html);
             }
 

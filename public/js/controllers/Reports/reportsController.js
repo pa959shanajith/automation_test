@@ -56,6 +56,18 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
         });
     });
+
+	//Global modal popup
+	function openModalPopup(title, body) {
+		var mainModal = $("#reportsModal");
+		mainModal.find('.modal-title').text(title);
+		mainModal.find('.modal-body p').text(body);
+		mainModal.modal("show");
+		setTimeout(function () {
+			$("#reportsModal").find('.btn-default').focus();
+		}, 300);
+	}
+
     //Module click
     $(document).on('click', '.ct-nodeIcon', function(e) {
         blockUI('Loading reports...');
@@ -73,7 +85,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         reportService.getReportsData_ICE(reportsInputData).then(function(result_res_reportData) {
             unblockUI();
             if (result_res_reportData == "Fail") {
-                $("#reportsModal").modal('show');
+                openModalPopup("Reports", "Failed to load Reports");
             } else {
                 $rootScope.scenarioData = result_res_reportData;
                 for (var i = 0; i < result_res_reportData.length; i++) {
@@ -180,7 +192,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             reportsInputData.testSId = testSId;
             reportService.getReportsData_ICE(reportsInputData).then(function(data) {
                 if (data == "Fail") {
-                    $("#reportsModal").modal('show');
+                    openModalPopup("Reports", "Failed to load Reports");
                 } else {
                     $scope.result_res_scenarioData = data.rows;
                     $scope.result_res_scenarioData = $scope.result_res_scenarioData.sort(function(a, b) {
@@ -324,11 +336,11 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             reportService.getReportsData_ICE(reportsInputData).then(function(result_res_reportData) {
                 unblockUI();
                 if (result_res_reportData == "Fail") {
-                    $("#reportsModal").modal('show');
+                    openModalPopup("Reports", "Failed to load Reports");
                 } else {
                     if (result_res_reportData.rows.length == 0) {
                         //No Modules Found
-                        $("#noModulesModal").modal('show');
+                        openModalPopup("Modules", "No Modules Found");
                         $('#searchModule').attr('disabled', 'disabled');
                     } else {
                         //Modules Display
@@ -915,14 +927,20 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                 function(data1) {
                                     unblockUI();
                                     $rootScope.resetSession.end();
-                                    if (data1 == "Invalid Session") return $rootScope.redirectPage();
-                                    else if (data1 == "fail") console.log("Failed to render reports.");
-                                    else {
+									var strData = String.fromCharCode.apply(null, new Uint8Array(data1.slice(0,20)));
+                                    if (strData == "Invalid Session") return $rootScope.redirectPage();
+                                    else if (strData === "fail") {
+										var msg = "Fail to load PDF Report";
+										openModalPopup("Reports", msg);
+										console.error(msg);
+                                    } else if (strData === "limitExceeded") {
+										var msg = "Fail to load PDF Report. Report Limit size exceeded. Generate PDF Report using Nineteen68 PDF utility.";
+										openModalPopup("Reports", msg);
+										console.error(msg);
+                                    } else {
                                         openWindow = 0;
                                         if (openWindow == 0) {
-                                            var file = new Blob([data1], {
-                                                type: 'application/pdf'
-                                            });
+                                            var file = new Blob([data1], { type: 'application/pdf' });
                                             if (isIE) {
                                                 navigator.msSaveOrOpenBlob(file);
                                             } else {

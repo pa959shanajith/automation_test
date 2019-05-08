@@ -41,6 +41,7 @@ if (cluster.isMaster) {
 		var sessions = require('express-session');
 		var cookieParser = require('cookie-parser');
 		var helmet = require('helmet');
+		var hpkp = require('hpkp');
 		var lusca = require('lusca');
 		var consts = require('constants');
 		var redis = require("redis");
@@ -167,11 +168,9 @@ if (cluster.isMaster) {
 		if (!nginxEnabled) {
 			app.use(helmet());
 			app.use(lusca.p3p('/w3c/p3p.xml", CP="IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT'));
-			app.use(helmet.referrerPolicy({
-				policy: 'same-origin'
-			}));
+			app.use(helmet.referrerPolicy({ policy: 'same-origin' }));
 			var ninetyDaysInSeconds = 7776000;
-			app.use(helmet.hpkp({
+			app.use(hpkp({
 				maxAge: ninetyDaysInSeconds,
 				sha256s: ['base64+primary==', 'base64+backup==']
 			}));
