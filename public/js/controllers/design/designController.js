@@ -5362,6 +5362,23 @@ function contentTable(newTestScriptDataLS) {
 			$grid.jqGrid('setCell', rowId, 'objectName', objName);
 			$grid.jqGrid('setCell', rowId, 'url', url);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
+		} else if (selectedText == "@Android_Custom"){
+            objName = " ";
+            url = " ";
+            var sc = Object.keys(keywordArrayList.Android_Custom);
+            selectedKeywordList = "Android_Custom";
+            var res = '';
+            for (var i = 0; i < sc.length; i++) {
+                if (selectedKeyword == sc[i]) {
+                    res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
+                } else
+                    res += '<option role="option" value="' + sc[i] + '">' + sc[i] + '</option>';
+            }
+            var row = $(e.target).closest('tr.jqgrow');
+            var rowId = row.attr('id');
+            $("select#" + rowId + "_keywordVal", row[0]).html(res);
+            selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
+            $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 		} else if (selectedText == "@CustomiOS") {
 			objName = " ";
 			url = " ";
@@ -6814,7 +6831,7 @@ function getTags(data) {
 	} else if (appTypeLocal == "DesktopJava") {
 		obnames = ["@Generic", "@Excel", "@Oebs", "@Custom", "@Word"];
 	} else if (appTypeLocal == "MobileApp" && navigator.appVersion.indexOf("Mac") == -1) {
-		obnames = ["@Generic", "@Mobile", "@Action"];
+		obnames = ["@Generic", "@Mobile", "@Android_Custom", "@Action"];
 	} else if (appTypeLocal == "MobileApp" && navigator.appVersion.indexOf("Mac") != -1) {
 		obnames = ["@Generic", "@Mobile", "@CustomiOS"];
 	} else if (appTypeLocal == "MobileWeb") {
