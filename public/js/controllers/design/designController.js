@@ -1904,14 +1904,15 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						else {
 							openDialog("Compare Objects", "Failed to compare objects");
 							$rootScope.compareFlag = false;
-							setTimeout(function() {
-								$(".close:visible, .btn-default:visible").addClass('navigateToDesign');
-								$(document).on('click','.navigateToDesign',function() {
-									$(".scrollbar-compare,.saveCompareDiv").hide(); //Hide Compare Div
-									angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
-									$("#scrapTree,.fsScroll").show(); //Show Scraped Objects
-								});
-							}, 200);
+							return;
+							//setTimeout(function() {
+							//	$(".close:visible, .btn-default:visible").addClass('navigateToDesign');
+							//	$(document).on('click','.navigateToDesign',function() {
+							//		$(".scrollbar-compare,.saveCompareDiv").hide(); //Hide Compare Div
+							//		angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
+							//		$("#scrapTree,.fsScroll").show(); //Show Scraped Objects
+							//	});
+							//}, 200);
 
 						}
 
