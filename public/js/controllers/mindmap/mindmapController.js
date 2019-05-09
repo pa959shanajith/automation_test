@@ -638,6 +638,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     $scope.loadMap = function(idx) {
         $("#expCreate").attr('src','imgs/ic-collapse.png');
+        $(".search-canvas").val('');
         $scope.functionTBE = 'loadMapPopupConfirmed';
         excelFlag = 1;
         $('#createNewConfirmationPopup').attr('mapid', $scope.allMMaps[idx].name);
@@ -3752,6 +3753,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     function loadScenarios(title) {
         $scope.functionTBE = 'loadScenariosPopupConfirmed';
+        $(".search-canvas").val('');
         $('#createNewConfirmationPopup').attr('mapid', title);
         if (Object.keys($scope.nodeDisplay).length != 0) {
             $('#createNewConfirmationPopup').modal('show');
