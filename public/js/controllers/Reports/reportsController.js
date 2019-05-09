@@ -13,241 +13,11 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     $("#reportDataTableDiv").hide();
     $('.reports-search').attr('disabled', 'disabled');
 
-    //Responsive Header Menu
-    $scope.responsiveMenu = function() {
-        var x = document.getElementById("myTopnav");
-        if ($.trim(x.className) === "topnav") {
-            x.className += " responsive";
-            $("#notifyBox").hide();
-        } else {
-            x.className = "topnav";
-        }
-    };
-
-    $('#expAssign').on('click', function(e) {
-        $(".moduleBox").slideToggle('slow', function() {
-            $(this).toggleClass('slideOpen');
-            if ($('.slideOpen').is(":visible") == true) {
-                $("#expAssign").attr('src', 'imgs/ic-collapseup.png');
-            } else {
-                $("#expAssign").attr('src', 'imgs/ic-collapse.png');
-            }
-        });
-    });
-    detailsTableHtml = $("#detailsTable").html();
-    //Search Modules
-    $(document).on('keyup', '.reports-search', function(e) {
-        input = document.getElementById("searchModule");
-        filter = input.value.toUpperCase();
-        elems = $('.nodeDiv');
-        for (i = 0; i < elems.length; i++) {
-            if (elems[i].textContent.toUpperCase().indexOf(filter) > -1) {
-                elems[i].style.display = "";
-            } else {
-                elems[i].style.display = "none";
-            }
-        }
-        e.stopImmediatePropagation();
-    });
-    //Search Scenarios
-    $(".reportSearchBox").on("keyup", function() {
-        var value = $(this).val().toLowerCase();
-        $("#reportsTable tbody tr").filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-        });
-    });
-
-	//Global modal popup
-	function openModalPopup(title, body) {
-		var mainModal = $("#reportsModal");
-		mainModal.find('.modal-title').text(title);
-		mainModal.find('.modal-body p').text(body);
-		mainModal.modal("show");
-		setTimeout(function () {
-			$("#reportsModal").find('.btn-default').focus();
-		}, 300);
-	}
-
-    //Module click
-    $(document).on('click', '.ct-nodeIcon', function(e) {
-        blockUI('Loading reports...');
-        $('img.highlight-module').removeClass('highlight-module');
-        $('span.highlight-moduleName').removeClass('highlight-moduleName');
-        $(this).addClass('highlight-module').next('span').addClass('highlight-moduleName');
-        var moduleName = $('#' + e.target.id).parent().children('span.ct-nodeLabel').text();
-        $('#reportsTable tbody').empty();
-        var count = 0;
-        var reportsInputData = {};
-        reportsInputData.type = "scenariosPerTestSuite";
-        reportsInputData.cycleId = $("#selectCycles option:selected").val();
-        reportsInputData.testSId = e.target.id;
-        //Fetching scenarios per testsuite
-        reportService.getReportsData_ICE(reportsInputData).then(function(result_res_reportData) {
-            unblockUI();
-            if (result_res_reportData == "Fail") {
-                openModalPopup("Reports", "Failed to load Reports");
-            } else {
-                $rootScope.scenarioData = result_res_reportData;
-                for (var i = 0; i < result_res_reportData.length; i++) {
-                    $('#reportsTable tbody').append('<tr data-id=' + count + ' class="reportsTbl" data-executionid=' + result_res_reportData[i].executionid + ' id=' + e.target.id + '><td class="center scenarioExecutionTime"><span id=' + result_res_reportData[i].scenarioid + ' class="glyphicon glyphicon-menu-right"></span></td><td class="scenarioName">' + result_res_reportData[i].scenarioname + '</td><td>' + result_res_reportData[i].executedtime + '</td><td class="status">' + result_res_reportData[i].status + '</td><td class="viewReports"><img alt="Pdf Icon" class="getSpecificReportBrowser openreportstatus reportFormat" data-getrep="wkhtmltopdf" data-reportid=' + result_res_reportData[i].reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-pdf.png" title="PDF Report"><img alt="-" class="getSpecificReportBrowser openreportstatus reportFormat" data-getrep="html" data-reportid=' + result_res_reportData[i].reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-web.png" title="Browser Report"><img alt="Export JSON" class="exportToJSON openreportstatus reportFormat" data-getrep="json" data-reportid=' + result_res_reportData[i].reportid + ' data-reportidx="" style="cursor: pointer; width: 21px;height: 22px;" src="imgs/ic-export-to-json.png" title="Export to Json"></td></tr>');
-                    count++;
-                    if (result_res_reportData[i].count == 0) {
-                        $("td.viewReports").text('-');
-                    }
-                }
-                $("tr.reportsTbl:even").addClass('even');
-                $("tr.reportsTbl:odd").addClass('odd');
-                setStatusColor();
-        if('scenarioData' in $rootScope)
-          {
-            if ($rootScope.scenarioData.length > 0) {
-                //Initialse DataTables
-                $timeout(function() {
-                            var oTable = $('#reportsTable').dataTable({
-                                "bDestroy": true,
-                                "responsive": true,
-                                "bRetrieve": true,
-                                "bPaginate": false,
-                                "bSort": false,
-                                "bFilter": false,
-                                "bLengthChange": false,
-                                "bInfo": false,
-                                "scrollY": "200px",
-                                "scrollCollapse": true,
-                                "scrollX": true,
-                                "paging": false,
-                                "oLanguage": {
-                                    "sSearch": ""
-                                },
-                                "deferRender": true,
-                                "columns": [{
-                                        "width": "5%",
-                                        "targets": 0
-                                    },
-                                    {
-                                        "width": "15%",
-                                        "targets": 1
-                                    },
-                                    {
-                                        "width": "25%",
-                                        "targets": 2
-                                    },
-                                    {
-                                        "width": "20%",
-                                        "targets": 3
-                                    },
-                                    {
-                                        "width": "18%",
-                                        "targets": 4
-                                    },
-                                ],
-                                "fnInitComplete": function(oSettings, json) {
-                                    unblockUI();
-            
-                                }
-                            });
-            unblockUI();
-            $("input[type=search]").attr('placeholder', 'Search Scenario').addClass('scenarioSearch');
-        }, 1000);
-    }
-    redirected = false;
-    localStorage.removeItem('fromExecution');
-    $('#accordion').show();
-    $('.panel-body').append(oTable);
-    $('#reportsTable').show();
-    $('#moduleNameHeader').html('<span id="moduleTxt" title=' + moduleName + '>' + moduleName + '</span>');
-}
-         
-            }
-        }, function(error) {
-            unblockUI();
-            console.log("Error in service getReportsData_ICE while fetching scenarios");
-        });
-
-        //unblockUI();
-        $(document).on('click', '.reportsTbl', function(e) {
-            $(this).addClass('tblRowHighlight').siblings('tr').removeClass('tblRowHighlight');
-        });
-
-        //Display Executions Per Scenario
-        $(document).on('click', '.scenarioExecutionTime', function(e) {
-            $(this).parent('tr.reportsTbl').trigger('click');
-            if ($(this).children('span').hasClass('glyphicon-menu-right') == true) {
-                $(this).children('span').removeClass('glyphicon-menu-right').addClass('glyphicon-menu-down');
-            } else {
-                $(this).children('span').removeClass('glyphicon-menu-down').addClass('glyphicon-menu-right');
-                var dataId = $(this).parent('tr').attr('data-id');
-                $("tr.details[data-mapid=" + dataId + "]").remove();
-                e.stopImmediatePropagation();
-                return;
-            }
-            var nTr = $(this).parent('tr');
-            var mappingId = $(nTr).attr('data-id');
-            var testSId = $(this).parent('tr').attr('id');
-            var scenarioId = $(this).children('span').attr('id');
-            var reportsInputData = {};
-            reportsInputData.scenarioid = scenarioId;
-            reportsInputData.cycleid = $('.cycle-list option:selected').val();
-            reportsInputData.type = "scenarioreports";
-            reportsInputData.testSId = testSId;
-            reportService.getReportsData_ICE(reportsInputData).then(function(data) {
-                if (data == "Fail") {
-                    openModalPopup("Reports", "Failed to load Reports");
-                } else {
-                    $scope.result_res_scenarioData = data.rows;
-                    $scope.result_res_scenarioData = $scope.result_res_scenarioData.sort(function(a, b) {
-                        return new Date(b.executedtime) - new Date(a.executedtime);
-                    });
-                    var executionData = $scope.result_res_scenarioData;
-                    if (executionData.length == 0) {
-                        $("<tr data-mapid=" + mappingId + " class='details'><td class='noExecutions' colspan=5>No Executions Found</td></tr>").insertAfter(nTr);
-                    } else {
-                        for (var k = 0; k < executionData.length; k++) {
-                            $("<tr data-mapid=" + mappingId + " class='details'><td></td><td></td><td>" + executionData[k].executedtime + "</td><td class='status'>" + executionData[k].status + "</td><td><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid=" + executionData[k].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'></td></tr>").insertAfter(nTr);
-                        }
-                    }
-                    setStatusColor();
-                }
-            }, function(error) {
-                unblockUI();
-                console.log("Error in calling service getReportsData_ICE while fetching executions");
-            });
-            e.stopImmediatePropagation();
-        });
-        //Table Row Highlight
-        $(document).on('click', '.detailsTbl', function(e) {
-            $(this).addClass('tblRowHighlight').siblings('tr').removeClass('tblRowHighlight');
-        });
-    });
-
-    function setStatusColor() {
-        $(".status").each(function() {
-            if ($.trim($(this).text()) == 'Pass') {
-                $(this).css('color', '#009900');
-            } else if ($.trim($(this).text()) == 'Fail') {
-                $(this).css('color', '#ff0000');
-            } else if ($.trim($(this).text()) == 'Terminate') {
-                $(this).css('color', "#ff8c00");
-            } else {
-                $(this).css('color', '#000');
-            }
-        });
-    }
-    //collapsible Module accordion Header Click
-    $('.moduleHeader').on('click', function() {
-        $('.panel-body,.datatable').toggle();
-        if ($('.panel-body').is(':visible') == true) {
-            $('span.collapseDown').removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-down');
-        } else {
-            $('span.collapseDown').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-right');
-        }
-    });
-
     cfpLoadingBar.start()
+
     $timeout(function() {
         $('.scrollbar-inner').scrollbar();
         $('.scrollbar-macosx').scrollbar();
-        /*document.getElementById("currentYear").innerHTML = new Date().getFullYear()*/
         angular.element(document.getElementById("reportSection")).scope().getReports_ICE();
         $('#ct-expand-left,#ct-expand-right').trigger('click');
         $('#ct-expand-left,#ct-expand-right').css('pointerEvents', 'none');
@@ -256,123 +26,12 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         return $rootScope.redirectPage();
     }
 
-
-    if (window.localStorage['redirectedReportObj'] && window.localStorage['redirectedReportObj'] != '') {
-
-        var redirection = window.localStorage['fromExecution'];
-        if (redirection == "true") {
-            blockUI("loading report ...");
-            redirected = true;
-            robj = JSON.parse(window.localStorage['redirectedReportObj']);
-        } else {
-            redirected = false;
-        }
-    }
+    //Bind Projects in project dropdown on load
     $scope.getReports_ICE = function() {
         $("#middle-content-section").css('visibility', 'visible');
         getProjectsAndSuites(userID, "projects");
     }
 
-    //Project Filter Change
-    $scope.selProjectsFilter = function() {
-        var projectId = $('.project-list option:selected').val();
-        blockUI("Loading releases.. please wait..");
-        mindmapServices.populateReleases(projectId).then(function(result) {
-            unblockUI();
-            if (result == "Invalid Session") {
-                return $rootScope.redirectPage();
-            }
-            $('.release-list').empty();
-            $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-            $('.cycle-list').empty();
-            $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-            for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
-                $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
-            }
-            if (redirected) {
-                $timeout(function() {
-                    $('#selectReleases').val(robj.testSuiteDetails[0].releaseid);
-                    $('#selectReleases').trigger('change');
-                }, 500);
-            }
-        });
-
-        //Release Filter Change
-        $scope.selReleasesFilter = function() {
-            var releaseId = $('.release-list option:selected').val();
-            blockUI("Loading cycles.. please wait..");
-            mindmapServices.populateCycles(releaseId).then(function(result_cycles) {
-                unblockUI();
-                if (result_cycles == "Invalid Session") {
-                    return $rootScope.redirectPage();
-                }
-                $('.cycle-list').empty();
-                $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-                for (i = 0; i < result_cycles.c_ids.length && result_cycles.cyc.length; i++) {
-                    $('.cycle-list').append("<option data-id='" + result_cycles.cyc[i] + "' value='" + result_cycles.c_ids[i] + "'>" + result_cycles.cyc[i] + "</option>");
-                }
-                if (redirected) {
-                    $timeout(function() {
-                        $('#selectCycles').val(robj.testSuiteDetails[0].cycleid);
-                        unblockUI();
-                        $('#selectCycles').trigger('change');
-                    }, 500);
-                }
-            });
-        };
-        //Cycle Filter Change
-        $scope.selCyclesFilter = function() {
-            var cycleId = $('.cycle-list option:selected').val();
-            var reportsInputData = {};
-            reportsInputData.projectId = $.trim($('.project-list option:selected').val());
-            reportsInputData.releaseId = $.trim($('.release-list option:selected').val());
-            reportsInputData.cycleId = $.trim(cycleId);
-            reportsInputData.type = 'allmodules';
-            var counter = 0;
-            blockUI("Loading modules.. please wait..");
-            $("#accordion").hide();
-            $('#nodeBox').empty();
-            //Fetching Modules under cycle
-            reportService.getReportsData_ICE(reportsInputData).then(function(result_res_reportData) {
-                unblockUI();
-                if (result_res_reportData == "Fail") {
-                    openModalPopup("Reports", "Failed to load Reports");
-                } else {
-                    if (result_res_reportData.rows.length == 0) {
-                        //No Modules Found
-                        openModalPopup("Modules", "No Modules Found");
-                        $('#searchModule').attr('disabled', 'disabled');
-                    } else {
-                        //Modules Display
-                        $('#searchModule').removeAttr('disabled', 'disabled');
-                        if ($('.moduleBox').is(':visible') == true) {
-
-                        } else {
-                            $('#expAssign').trigger('click');
-                        }
-                        $rootScope.reportData = result_res_reportData.rows;
-                        angular.forEach(result_res_reportData.rows, function(value, index) {
-                            $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value.testsuiteid + '  title=' + value.testsuitename + ' style="width: 139px;"><img class="ct-nodeIcon" id=' + value.testsuiteid + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.testsuitename + '</span></div>')
-                            $('.reports-search').removeAttr('disabled', 'disabled');
-                        });
-
-                    }
-                    if (redirected) {
-                        $timeout(function() {
-                            $("div.ct-node").each(function() {
-                                if ($.trim($(this).text()) == $.trim(robj.testSuiteDetails[0].testsuitename)) {
-                                    $(this).children('img').trigger('click');
-                                }
-                            })
-                        }, 700);
-                    }
-                }
-            }, function(error) {
-                unblockUI();
-                console.log("Error in service getReportsData_ICE while fetching modules");
-            });
-        };
-    };
     //getAllSuites_ICE function call
     function getProjectsAndSuites(ID, type) {
         reportService.getAllSuites_ICE(ID, type)
@@ -427,34 +86,150 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                     cfpLoadingBar.complete();
                 }
             }, function(error) {
-                console.log("Error-------" + error);
+                console.log("Error in service getAllSuites_ICE -" + error);
                 return "fail";
             })
     }
 
-    var showSearchBox = true;
-    /************ SEARCH *****************/
-    $(document).off('click.filterSuites', '.searchScrapEle');
-    $(document).on({
-        'click.filterSuites': searchScrapeElement
-    }, '.searchScrapEle')
+    //Bind releases on Projects Filter Change
+    $scope.selProjectsFilter = function() {
+        var projectId = $('.project-list option:selected').val();
+        blockUI("Loading releases.. please wait..");
+        mindmapServices.populateReleases(projectId).then(function(result) {
+            unblockUI();
+            if (result == "Invalid Session") {
+                return $rootScope.redirectPage();
+            }
+            $('.release-list').empty();
+            $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+            $('.cycle-list').empty();
+            $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+            for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
+                $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
+            }
+            if (redirected) {
+                $timeout(function() {
+                    $('#selectReleases').val(robj.testSuiteDetails[0].releaseid);
+                    $('#selectReleases').trigger('change');
+                }, 500);
+            }
+        }, function(error) {
+            unblockUI();
+            console.log("Error in service populateReleases while fetching projects -" + error);
+        });
 
-    function searchScrapeElement(e) {
-        if (showSearchBox) {
-            $(".searchScrapInput").show();
-            $(".searchScrapEle").addClass('positionInputSerachBox');
-            showSearchBox = false;
-            $(".searchScrapInput").focus();
+         //Bind cycles on releases Filter Change
+        $scope.selReleasesFilter = function() {
+            var releaseId = $('.release-list option:selected').val();
+            blockUI("Loading cycles.. please wait..");
+            mindmapServices.populateCycles(releaseId).then(function(result_cycles) {
+                unblockUI();
+                if (result_cycles == "Invalid Session") {
+                    return $rootScope.redirectPage();
+                }
+                $('.cycle-list').empty();
+                $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                for (i = 0; i < result_cycles.c_ids.length && result_cycles.cyc.length; i++) {
+                    $('.cycle-list').append("<option data-id='" + result_cycles.cyc[i] + "' value='" + result_cycles.c_ids[i] + "'>" + result_cycles.cyc[i] + "</option>");
+                }
+                if (redirected) {
+                    $timeout(function() {
+                        $('#selectCycles').val(robj.testSuiteDetails[0].cycleid);
+                        unblockUI();
+                        $('#selectCycles').trigger('change');
+                    }, 500);
+                }
+            }, function(error) {
+                unblockUI();
+                console.log("Error in service populateCycles while fetching releases -"+error);
+            });
+        };
+
+        //Load modules on cycles filter change
+        $scope.selCyclesFilter = function() {
+            var cycleId = $('.cycle-list option:selected').val();
+            var reportsInputData = {};
+            reportsInputData.projectId = $.trim($('.project-list option:selected').val());
+            reportsInputData.releaseId = $.trim($('.release-list option:selected').val());
+            reportsInputData.cycleId = $.trim(cycleId);
+            reportsInputData.type = 'allmodules';
+            var counter = 0;
+            blockUI("Loading modules.. please wait..");
+            $("#accordion").hide();
+            $('#nodeBox').empty();
+            //Fetching Modules under cycle
+            reportService.getReportsData_ICE(reportsInputData).then(function(result_res_reportData) {
+                unblockUI();
+                if (result_res_reportData == "Fail") {
+                    openModalPopup("Reports", "Failed to load Reports");
+                } else {
+                    $(".mid-report-section").hide();
+                    if (result_res_reportData.rows.length == 0) {
+                        //No Modules Found
+                        openModalPopup("Modules", "No Modules Found");
+                        $(".mid-report-section").hide();
+                        $('#searchModule').attr('disabled', 'disabled');
+                    } else {
+                        //Modules Display
+                        $('#searchModule').removeAttr('disabled', 'disabled');
+                        if ($('.moduleBox').is(':visible') == true) {
+
+                        } else {
+                            $('#expAssign').trigger('click');
+                        }
+                        $rootScope.reportData = result_res_reportData.rows;
+                        angular.forEach(result_res_reportData.rows, function(value, index) {
+                            $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value.testsuiteid + '  title=' + value.testsuitename + ' style="width: 139px;"><img class="ct-nodeIcon" id=' + value.testsuiteid + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.testsuitename + '</span></div>')
+                            $('.reports-search').removeAttr('disabled', 'disabled');
+                        });
+
+                    }
+                    if (redirected) {
+                        $timeout(function() {
+                            $("div.ct-node").each(function() {
+                                if ($.trim($(this).text()) == $.trim(robj.testSuiteDetails[0].testsuitename)) {
+                                    $(this).children('img').trigger('click');
+                                }
+                            })
+                        }, 700);
+                    }
+                }
+            }, function(error) {
+                unblockUI();
+                console.log("Error in service getReportsData_ICE while fetching modules-"+error);
+            });
+        };
+    };
+
+
+    //Responsive Header Menu
+    $scope.responsiveMenu = function() {
+        var x = document.getElementById("myTopnav");
+        if ($.trim(x.className) === "topnav") {
+            x.className += " responsive";
+            $("#notifyBox").hide();
         } else {
-            $(".searchScrapEle").removeClass('positionInputSerachBox');
-            $(".searchScrapInput").hide();
-            showSearchBox = true;
+            x.className = "topnav";
         }
-    }
-    $(document).on('keyup', '#searchModule', function(e) {
+    };
+
+    //Toggle(Show/Hide) Module Div
+    $('#expAssign').on('click', function(e) {
+        $(".moduleBox").slideToggle('slow', function() {
+            $(this).toggleClass('slideOpen');
+            if ($('.slideOpen').is(":visible") == true) {
+                $("#expAssign").attr('src', 'imgs/ic-collapseup.png');
+            } else {
+                $("#expAssign").attr('src', 'imgs/ic-collapse.png');
+            }
+        });
+    });
+
+    //Search Modules
+    $(document).on('keyup', '.reports-search', function(e) {
         input = document.getElementById("searchModule");
         filter = input.value.toUpperCase();
-        elems = $('.dynamicTestsuiteContainer .suiteContainer');
+        elems = $('.nodeDiv');
         for (i = 0; i < elems.length; i++) {
             if (elems[i].textContent.toUpperCase().indexOf(filter) > -1) {
                 elems[i].style.display = "";
@@ -464,142 +239,339 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         }
         e.stopImmediatePropagation();
     });
+    //Search Scenarios
+    $(".reportSearchBox").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#reportsTable tbody tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        });
+    });
 
-    //Service call to get start and end details of suites
-    /************ SUITE CLICK *****************/
-    $(document).off('click.suiteContainerClick', '.suiteContainer');
-    $(document).on({
-        'click.suiteContainerClick': suiteContainerClick
-    }, '.suiteContainer')
-
-    function suiteContainerClick(e) {
-        $('.formatpdfbrwsrexport').remove();
-        $(this).find('.reportbox').parent().addClass('reportboxselected');
-        if ($(this).parent().hasClass('staticTestsuiteContainer')) {
-            $(this).siblings().find('.reportbox').parent().removeClass('reportboxselected');
-            $('.dynamicTestsuiteContainer').find('.reportbox').parent().removeClass('reportboxselected');
-        } else if ($(this).parent().hasClass('dynamicTestsuiteContainer')) {
-            $(this).siblings().find('.reportbox').parent().removeClass('reportboxselected');
-            $('.staticTestsuiteContainer').find('.reportbox').parent().removeClass('reportboxselected');
-        }
-        testsuiteId = $(this).attr('data-suiteId');
-        $('#scenarioReportsTable').find('tbody').empty();
-        reportService.getSuiteDetailsInExecution_ICE(testsuiteId)
-            .then(function(data) {
-                    if (data == "Invalid Session") {
-                        return $rootScope.redirectPage();
-                    }
-                    if (data != "fail") {
-                        var tableContainer = $('#testSuitesTimeTable');
-                        if (Object.prototype.toString.call(data) === '[object Array]') {
-                            if (data.length > 0) {
-                                tableContainer.find('tbody').empty();
-                                var startDat, startTym, endDat, endTym, sD, sT, eD, eT;
-                                for (i = 0; i < data.length; i++) {
-                                    startDat = (data[i].start_time.split(' ')[0]).split("-")
-                                    startTym = (data[i].start_time.split(' ')[1]).split(":")
-                                    endDat = (data[i].end_time.split(' ')[0]).split("-")
-                                    endTym = (data[i].end_time.split(' ')[1]).split(":")
-                                    sD = ("0" + startDat[0]).slice(-2) + "-" + ("0" + startDat[1]).slice(-2) + "-" + startDat[2];
-                                    sT = ("0" + startTym[0]).slice(-2) + ":" + ("0" + startTym[1]).slice(-2);
-                                    eD = ("0" + endDat[0]).slice(-2) + "-" + ("0" + endDat[1]).slice(-2) + "-" + endDat[2];
-                                    eT = ("0" + endTym[0]).slice(-2) + ":" + ("0" + endTym[1]).slice(-2);
-                                    tableContainer.find('tbody').append("<tr class='scenariostatusreport' data-executionid='" + data[i].execution_id + "'><td>" + (i + 1) + "</td><td>" + sD + "</td><td>" + sT + "</td><td>" + eD + "</td><td>" + eT + "</td></tr>");
-                                }
-                                if (data.length > 2) {
-                                    $("#dateDESC").show();
-                                } else $("#dateDESC, #dateASC").hide();
-                                var dateArray = $('tbody.scrollbar-inner-scenariostatus').children('.scenariostatusreport');
-                                dateASC(dateArray);
-                                $("tbody.scrollbar-inner-scenariostatus").empty();
-                                for (i = 0; i < dateArray.length; i++) {
-                                    dateArray[i].firstChild.innerText = i + 1;
-                                    $("tbody.scrollbar-inner-scenariostatus").append(dateArray[i]);
-                                }
-                            } else {
-                                tableContainer.find('tbody').empty();
-                                $("#dateDESC").hide();
-                                $("#dateASC").hide();
-                            }
-                        }
-                        $('.progress-bar-success, .progress-bar-danger, .progress-bar-warning, .progress-bar-norun').css('width', '0%');
-                        $('.passPercent, .failPercent, .terminatePercent, .incompletePercent').text('');
-                    } else console.log("Unable to load Test suite details in execution.")
-                },
-                function(error) {
-                    console.log("Error-------" + error);
-                })
-        if ($('.dynamicTestsuiteContainer').is(':Visible')) {
-            $('.iconSpace-reports').trigger('click');
-        }
-        //Transaction Activity for SuiteNodeClick
-        // var labelArr = [];
-        // var infoArr = [];
-        // labelArr.push(txnHistory.codesDict['SuiteNodeClick']);
-        // txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
-        e.stopImmediatePropagation();
+    //Global modal popup
+    function openModalPopup(title, body) {
+        var mainModal = $("#reportsModal");
+        mainModal.find('.modal-title').text(title);
+        mainModal.find('.modal-body p').text(body);
+        mainModal.modal("show");
+        setTimeout(function() {
+            $("#reportsModal").find('.btn-default').focus();
+        }, 300);
     }
 
-    //Date sorting
+    //Module node click to fetch module start/end date & time execution entries
+    $(document).on('click', '.ct-nodeIcon', function(e) {
+        blockUI('Loading.. Please wait..')
+        $('.mid-report-section').removeClass('hide');
+        $('img.highlight-module').removeClass('highlight-module');
+        $('span.highlight-moduleName').removeClass('highlight-moduleName');
+        $(this).addClass('highlight-module').next('span').addClass('highlight-moduleName');
+        $('#reportsModuleTable tbody').empty();
+        testsuiteId = e.target.id;
+        reportService.getSuiteDetailsInExecution_ICE(testsuiteId)
+            .then(function(data) {
+                    $(".mid-report-section").show();
+                    $('#overallStatus,#accordion,.scenarioStatus').hide();
+                    if (data == "Invalid Session") {
+                        $rootScope.redirectPage();
+                    }
+                    if (data != "fail") {
+                        var tableContainer = $('.mid-report-section tbody');
+                        if (data.length > 0) {
+                            tableContainer.empty();
+                            var startDat, startTym, endDat, endTym, sD, sT, eD, eT;
+                            for (i = 0; i < data.length; i++) {
+                                startDat = (data[i].start_time.split(' ')[0]).split("-")
+                                startTym = (data[i].start_time.split(' ')[1]).split(":")
+                                endDat = (data[i].end_time.split(' ')[0]).split("-")
+                                endTym = (data[i].end_time.split(' ')[1]).split(":")
+                                sD = ("0" + startDat[0]).slice(-2) + "-" + ("0" + startDat[1]).slice(-2) + "-" + startDat[2];
+                                sT = ("0" + startTym[0]).slice(-2) + ":" + ("0" + startTym[1]).slice(-2);
+                                eD = ("0" + endDat[0]).slice(-2) + "-" + ("0" + endDat[1]).slice(-2) + "-" + endDat[2];
+                                eT = ("0" + endTym[0]).slice(-2) + ":" + ("0" + endTym[1]).slice(-2);
+                                tableContainer.append("<tr class='scenariostatusreport' data-executionid='" + data[i].execution_id + "'><td class='executionNo'>" + (i + 1) + "</td><td>" + sD + " " + sT + "</td><td>" + eD + " " + eT + "</td></tr>");
+                            }
+                            $('.modTbl,#accordionTblExecutions').show();
+                            var executionsNameHeader = $('.highlight-module').next('span.ct-nodeLabel').text() + " - Executions";
+                            $("#executionNameHeader").html(executionsNameHeader);
+                            if ($('.scenariostatusreport').length > 0) {
+                                $("tr.scenariostatusreport:even").removeClass('even').addClass('even');
+                                $("tr.scenariostatusreport:odd").removeClass('odd').addClass('odd');
+                                //Initialse Module DataTable
+                                $timeout(function() {
+                                    var oTable1 = $('#reportsModuleTable').DataTable({
+                                        "bDestroy": true,
+                                        "responsive": true,
+                                        "bRetrieve": true,
+                                        "bPaginate": false,
+                                        "bSort": false,
+                                        "bFilter": false,
+                                        "bLengthChange": false,
+                                        "bInfo": false,
+                                        "scrollY": "200px",
+                                        "scrollCollapse": true,
+                                        "scrollX": true,
+                                        "paging": false,
+                                        "oLanguage": {
+                                            "sSearch": ""
+                                        },
+                                        "deferRender": true,
+                                        "fnInitComplete": function(oSettings, json) {
+                                            $('#reportsModuleTable').show();
+                                            unblockUI()
+                                        }
+                                    });
+                                    unblockUI()
+                                }, 1000);
+                            }
+                            if (data.length > 2) {
+                                $("#dateDESC").show();
+                            } else {
+                                $("#dateDESC, #dateASC").hide();
+                            }
+                            var dateArray = $('.mid-report-section tbody').children('.scenariostatusreport');
+                            dateASC(dateArray);
+                            sortExecutions(dateArray);
+                        } else if (data == "Fail") {
+                            unblockUI();
+                            openModalPopup("Reports", "Failed to load Reports");
+                        } else {
+                            tableContainer.empty();
+                            var executionsNameHeader = $('.highlight-module').next('span.ct-nodeLabel').text() + " - Executions";
+                            $("#executionNameHeader").text(executionsNameHeader);
+                            $('.modTbl,#accordionTblExecutions').show();
+                            $(".mid-report-section tbody").empty();
+                            $("#reportsModuleTable th").addClass('no-data');
+                            $(".mid-report-section tbody").append("<tr><td class='align-center emptyRecords' colspan=3>No record(s) found</td></tr>");
+                            $("#dateDESC, #dateASC").hide();
+                            unblockUI();
+                        }
+                    }
+
+                },
+                function(error) {
+                    unblockUI();
+                    console.log("Error in service getSuiteDetailsInExecution_ICE" + error);
+                })
+    });
+
+    //Set status color for report status
+    function setStatusColor() {
+        $(".status").each(function() {
+            if ($.trim($(this).text()) == 'Pass') {
+                $(this).css('color', '#009900');
+            } else if ($.trim($(this).text()) == 'Fail') {
+                $(this).css('color', '#ff0000');
+            } else if ($.trim($(this).text()) == 'Terminate') {
+                $(this).css('color', "#ff8c00");
+            } else {
+                $(this).css('color', '#000');
+            }
+        });
+    }
+
+    //sort start date & time executions
+    function sortExecutions(dateArray) {
+        $(".mid-report-section tbody").empty();
+        for (var i = dateArray.length - 1; i >= 0; i--) {
+            dateArray[i].firstChild.innerHTML = "E<sub>" + parseInt(i + 1) + "</sub>";
+            $(".mid-report-section tbody").append(dateArray[i]);
+        }
+    }
+
+    //Load scenarios table on click of Module start & end time 
+    $(document).on('click', '.scenariostatusreport', function(e) {
+        blockUI('Loading scenarios.. please wait..');
+        executionId = $(this).attr('data-executionid');
+        var testsuiteid = $(".highlight-module").attr('id');
+        $(this).addClass('tblRowHighlight').siblings('tr').removeClass('tblRowHighlight');
+        reportService.reportStatusScenarios_ICE(executionId, testsuiteid)
+            .then(function(data) {
+                    if (data == "Invalid Session") {
+                        $rootScope.redirectPage();
+                    }
+                    if (data != "fail" && data.length > 0) {
+                        var scenarioContainer = $('#reportsTable tbody');
+                        var pass = fail = terminated = incomplete = P = F = T = I = 0;
+                        var total = data.length;
+                        scenarioContainer.empty();
+                        var browserIcon, brow = "";
+                        var styleColor, exeDate, exeDat, exeTime;
+                        $("#accordion").show();
+                        var scenarioDetails = $('.tblRowHighlight').children('td.executionNo').html() + "   Scenario Details";
+                        $('#moduleNameHeader').html('<span id="moduleTxt" title=' + moduleName + '>' + scenarioDetails + '</span>');
+                        for (i = 0; i < data.length; i++) {
+                            browserIcon = "";
+                            brow = "";
+                            if (data[i].browser.toLowerCase() == "chrome") browserIcon = "ic-reports-chrome.png";
+                            else if (data[i].browser.toLowerCase() == "firefox") browserIcon = "ic-reports-firefox.png";
+                            else if (data[i].browser.toLowerCase() == "internet explorer") browserIcon = "ic-reports-ie.png";
+                            else if (data[i].browser.toLowerCase() == "safari") browserIcon = "ic-reports-safari.png";
+                            if (browserIcon) brow = "imgs/" + browserIcon;
+                            else brow = "imgs/no_img1.png"
+                            if (data[i].status == "Pass") {
+                                pass++;
+                                styleColor = "style='color: #28a745 !important; text-decoration-line: none;'";
+                            } else if (data[i].status == "Fail") {
+                                fail++;
+                                styleColor = "style='color: #dc3545 !important; text-decoration-line: none;'";
+                            } else if (data[i].status == "Terminate") {
+                                terminated++;
+                                styleColor = "style='color: #ffc107 !important; text-decoration-line: none;'";
+                            } else if (data[i].status == "Incomplete") {
+                                incomplete++;
+                                styleColor = "style='color: #343a40 !important; text-decoration-line: none;'";
+                            }
+                            scenarioContainer.append("<tr class='scenarioTblReport'><td title='" + data[i].testscenarioname + "'>" + data[i].testscenarioname + "</td><td><span>" + data[i].executedtime.trim() + "</span></td></td><td class='openReports' data-reportid='" + data[i].reportid + "'><a class='openreportstatus' " + styleColor + ">" + data[i].status + "</a></td><td class='viewReports'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'></td></tr>");
+                        }
+                        if ($('.scenarioTblReport').length > 0) {
+                            $("tr.scenarioTblReport:even").removeClass('even').addClass('even');
+                            $("tr.scenarioTblReport:odd").removeClass('odd').addClass('odd');
+                            $timeout(function() {
+                                var oTable2 = $('#reportsTable').DataTable({
+                                    "bDestroy": true,
+                                    "responsive": true,
+                                    "bRetrieve": true,
+                                    "bPaginate": false,
+                                    "bSort": false,
+                                    "bFilter": false,
+                                    "bLengthChange": false,
+                                    "bInfo": false,
+                                    "scrollY": "200px",
+                                    "autoWidth": "false",
+                                    "scrollCollapse": true,
+                                    "scrollX": true,
+                                    "paging": false,
+                                    "oLanguage": {
+                                        "sSearch": ""
+                                    },
+                                    "deferRender": true,
+                                    "columns": [{
+                                            "width": "25%",
+                                            "targets": 0
+                                        },
+                                        {
+                                            "width": "25%",
+                                            "targets": 1
+                                        },
+                                        {
+                                            "width": "25%",
+                                            "targets": 2
+                                        },
+                                        {
+                                            "width": "25%",
+                                            "targets": 3
+                                        },
+                                    ],
+                                    "fnInitComplete": function(oSettings, json) {
+                                        unblockUI();
+                                    }
+                                });
+                                unblockUI();
+                            }, 1000);
+                        }
+
+                        redirected = false;
+                        localStorage.removeItem('fromExecution');
+                        var executionDetails = $('.tblRowHighlight').children('td.executionNo').html() + " - Scenario Status";
+                        $(".overallScenarioStatus").html(executionDetails);
+                        //Set overall Status progress bars
+                        if (data.length > 0) {
+                            $('#overallStatus,.scenarioStatus').show();
+                            P = parseFloat((pass / total) * 100).toFixed();
+                            F = parseFloat((fail / total) * 100).toFixed();
+                            T = parseFloat((terminated / total) * 100).toFixed();
+                            I = parseFloat((incomplete / total) * 100).toFixed();
+                            $('.bg-success').css('width', P + "%");
+                            $('.passPercent').text(P + " %");
+                            $('.bg-danger').css('width', F + "%");
+                            $('.failPercent').text(F + " %");
+                            $('.bg-warning').css('width', T + "%");
+                            $('.terminatePercent').text(T + " %");
+                            $('.bg-dark').css('width', I + "%");
+                            $('.incompletePercent').text(I + " %");
+                        } else {
+                            $('#overallStatus,.scenarioStatus').show();
+                            $('.progress-bar-success, .progress-bar-danger, .progress-bar-warning, .progress-bar-norun').css('width', '0%');
+                            $('.passPercent, .failPercent, .terminatePercent, .incompletePercent').text('');
+                        }
+                        //Highlight table row on click
+                        $(document).on('click', '.scenarioTblReport', function() {
+                            $(this).addClass('tblRowHighlight').siblings('tr').removeClass('tblRowHighlight');
+                        });
+                    } else if (data == "Fail") {
+                        unblockUI();
+                        openModalPopup("Reports", "Failed to load Reports");
+                    } else {
+                        $('#reportsTable tbody').empty();
+                        var moduleName = $('.highlight-module').next('span.ct-nodeLabel').text();
+                        var scenarioDetails = $('.tblRowHighlight').children('td.executionNo').html() + "  Scenario Details";
+                        $('#moduleNameHeader').html('<span id="moduleTxt" title=' + moduleName + '>' + moduleName + "  " + scenarioDetails + '</span>');
+                        $("#accordion").show();
+                        $("#reportsTable th").addClass('no-data');
+                        $("#reportsTable tbody").append("<tr><td class='align-center emptyRecords' colspan=5>No record(s) found</td></tr>");
+                        unblockUI();
+                    }
+                },
+                function(error) {
+                    unblockUI();
+                    console.log("Error in reportStatusScenarios_ICE-" + error);
+                })
+    });
+
+    //collapsible Module accordion Header Click
+    $('.moduleHeader').on('click', function() {
+        $('.panel-body,.datatable').toggle();
+        if ($('.panel-body').is(':visible') == true) {
+            $('span.collapseDown').removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-down');
+        } else {
+            $('span.collapseDown').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-right');
+        }
+    });
+
+    //Redirect to specific module in Reports Page after execution
+    if (window.localStorage['redirectedReportObj'] && window.localStorage['redirectedReportObj'] != '') {
+
+        var redirection = window.localStorage['fromExecution'];
+        if (redirection == "true") {
+            blockUI("loading reports.. please wait..");
+            redirected = true;
+            robj = JSON.parse(window.localStorage['redirectedReportObj']);
+        } else {
+            redirected = false;
+        }
+    }
+
+    //Sort Date and time to ascending order on click
     $(document).on('click', '#dateDESC', function(e) {
         $(this).hide();
         var dateArray;
-        if ($(this).parents('table').attr("id") == "testSuitesTimeTable") {
-            $('#dateASC').show();
-            dateArray = $('tbody.scrollbar-inner-scenariostatus').children('.scenariostatusreport');
-            dateDESC(dateArray);
-            $("tbody.scrollbar-inner-scenariostatus").empty();
-            for (i = 0; i < dateArray.length; i++) {
-                dateArray[i].firstChild.innerText = i + 1;
-                $("tbody.scrollbar-inner-scenariostatus").append(dateArray[i]);
-            }
-        } else if ($(this).parents('table').attr("id") == "scenarioReportsTable") {
-            $("#scenarioReportsTable #dateASC").show();
-            dateArray = $('tbody.scrollbar-inner-scenarioreports').children('tr');
-            dateDESC(dateArray);
-            $("tbody.scrollbar-inner-scenarioreports").empty();
-            for (i = 0; i < dateArray.length; i++) {
-                $("tbody.scrollbar-inner-scenarioreports").append(dateArray[i]);
-            }
-        }
+        $('#dateASC').show();
+        var dateArray = $('.mid-report-section tbody').children('.scenariostatusreport');
+        dateDESC(dateArray);
+        sortExecutions(dateArray);
         e.stopImmediatePropagation();
     });
+    //Sort Date and time to descending order on click
     $(document).on('click', '#dateASC', function(e) {
         $(this).hide();
-        if ($(this).parents('table').attr("id") == "testSuitesTimeTable") {
-            $('#dateDESC').show();
-            var dateArray = $('tbody.scrollbar-inner-scenariostatus').children('.scenariostatusreport');
-            dateASC(dateArray);
-            $("tbody.scrollbar-inner-scenariostatus").empty();
-            for (i = 0; i < dateArray.length; i++) {
-                dateArray[i].firstChild.innerText = i + 1;
-                $("tbody.scrollbar-inner-scenariostatus").append(dateArray[i]);
-            }
-        } else if ($(this).parents('table').attr("id") == "scenarioReportsTable") {
-            $("#scenarioReportsTable #dateDESC").show();
-            var dateArray = $('tbody.scrollbar-inner-scenarioreports').children('tr');
-            dateASC(dateArray);
-            $("tbody.scrollbar-inner-scenarioreports").empty();
-            for (i = 0; i < dateArray.length; i++) {
-                $("tbody.scrollbar-inner-scenarioreports").append(dateArray[i]);
-            }
-        }
+        $('#dateDESC').show();
+        var dateArray = $('.mid-report-section tbody').children('.scenariostatusreport');
+        dateASC(dateArray);
+        sortExecutions(dateArray);
         e.stopImmediatePropagation();
     });
 
+    //Sort Date and time to descending order
     function dateDESC(dateArray) {
         dateArray.sort(function(a, b) {
             var dateA, timeA, dateB, timeB;
             if (a.children.item(1).children.length == 0) {
-                dateA = a.children.item(1).innerText;
-                timeA = a.children.item(2).innerText;
-                dateB = b.children.item(1).innerText;
-                timeB = b.children.item(2).innerText;
-            } else {
-                dateA = a.children.item(1).children.item(0).innerText.split(" ")[0];
-                timeA = a.children.item(1).children.item(0).innerText.split(" ")[1];
-                dateB = b.children.item(1).children.item(0).innerText.split(" ")[0];
-                timeB = b.children.item(1).children.item(0).innerText.split(" ")[1];
+                var dateTimeA = a.children.item(1).innerText.split(" ");
+                dateA = dateTimeA[0];
+                timeA = dateTimeA[1];
+                var dateTimeB = b.children.item(1).innerText.split(" ");
+                dateB = dateTimeB[0];
+                timeB = dateTimeB[1];
             }
             var fDate = dateA.split("-");
             var lDate = dateB.split("-");
@@ -610,20 +582,17 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             return dateArray;
         })
     }
-
+    //Sort Date and time to ascending order
     function dateASC(dateArray) {
         dateArray.sort(function(a, b) {
             var aA, timeA, bB, timeB;
             if (a.children.item(1).children.length == 0) {
-                aA = a.children.item(1).innerText;
-                timeA = a.children.item(2).innerText;
-                bB = b.children.item(1).innerText;
-                timeB = b.children.item(2).innerText;
-            } else {
-                aA = a.children.item(1).children.item(0).innerText.split(" ")[0];
-                timeA = a.children.item(1).children.item(0).innerText.split(" ")[1];
-                bB = b.children.item(1).children.item(0).innerText.split(" ")[0];
-                timeB = b.children.item(1).children.item(0).innerText.split(" ")[1];
+                var dateTimeA = a.children.item(1).innerText.split(" ");
+                aA = dateTimeA[0];
+                timeA = dateTimeA[1];
+                var dateTimeB = b.children.item(1).innerText.split(" ");
+                bB = dateTimeB[0];
+                timeB = dateTimeB[1];
             }
             var fDate = aA.split("-");
             var lDate = bB.split("-");
@@ -634,77 +603,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             return dateArray;
         })
     }
-
-    /********** SELECT REPORT FORMAT CLICK ****************/
-    $(document).off('click.reportFormat', '.selectFormat');
-    $(document).on({
-        'click.reportFormat': selectReportFormatClick
-    }, '.selectFormat');
-
-    function selectReportFormatClick(e) {
-        $('.formatpdfbrwsrexport').remove();
-        var repID = $(this).parent().attr("data-reportid");
-        $(this).parent().append("<span class='formatpdfbrwsrexport'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus' data-getrep='wkhtmltopdf' data-reportid='" + repID + "' style='cursor: pointer; margin-right: 10px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus' data-getrep='html' data-reportid='" + repID + "' style='cursor: pointer; margin-right: 10px; width: 23px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON' data-reportid='" + repID + "' style='cursor: pointer;' src='imgs/ic-export-to-json.png' title='Export to Json'></span>")
-        $('.formatpdfbrwsrexport').focus();
-        //Transaction Activity for selectReportFormatClick
-        // var labelArr = [];
-        // var infoArr = [];
-        // labelArr.push(txnHistory.codesDict['selectReportFormatClick']);
-        // txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
-    }
-
-
-    $('span.formatpdfbrwsrexport').focusout(function() {
-        $('.formatpdfbrwsrexport').remove();
-    })
-
-    function onIconSpaceClick(e) {
-        e.preventDefault()
-        $elem = $(this);
-        if (openArrow == 0) {
-            //getting the next element
-            $content = $elem.parent().parent().next();
-            //open up the content needed - toggle the slide- if visible, slide up, if not slidedown.
-            if ($(".scroll-content").parent(".upper-collapsible-section").find(".suitedropdownicon").length > 0) {
-                $(".scroll-content").parent(".upper-collapsible-section").find(".suitedropdownicon").remove();
-            }
-            $(".scroll-content").parent(".upper-collapsible-section").append($elem.parent());
-            $(".suitedropdownicon").children(".iconSpace-reports").attr("src", "imgs/ic-collapseup.png")
-            $content.slideDown(200, function() {
-                //execute this after slideToggle is done
-                //change text of header based on visibility of content div
-                $('.scrollbar-inner').scrollbar();
-                $('.scrollbar-macosx').scrollbar();
-            });
-            $('.searchScrapEle').css('display', '');
-            openArrow = 1;
-            e.stopImmediatePropagation();
-        } else {
-            $content = $elem.parent().parent();
-            $content.slideUp(200, function() {
-                //execute this after slideToggle is done
-                //change text of header based on visibility of content div
-                if ($(".scroll-content").parent(".upper-collapsible-section").find(".suitedropdownicon").length > 0) {
-                    $(".scroll-content").parent(".upper-collapsible-section").find(".suitedropdownicon").remove();
-                }
-                $(".upper-section-testsuites").append($elem.parent());
-                $(".suitedropdownicon").children(".iconSpace-reports").attr("src", "imgs/ic-collapse.png")
-            });
-
-            $('.searchScrapEle').css('display', 'none');
-            $(".searchScrapInput").hide();
-            showSearchBox = true;
-            openArrow = 0;
-            e.stopImmediatePropagation();
-        }
-        e.stopImmediatePropagation();
-    }
-
-    $(document).off('click.as', '.iconSpace-reports');
-    $(document).on({
-        'click.as': onIconSpaceClick
-    }, '.iconSpace-reports');
-
     //Left Navigation Bar Expand/Collapse
     $("#ct-expand-left").click(function(e) {
         $('.leftBar').toggleClass('active');
@@ -750,7 +648,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         'click.htmlRepClick': htmlReportClick
     }, '.openreportstatus');
 
-    //$(document).on('click', '.openreportstatus', function(e){
     function htmlReportClick(e) {
         var reportType = $(this).attr('data-getrep');
         var executionId = '';
@@ -796,7 +693,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                     var remarksLength = [];
                     var commentsLength = [];
                     if (data != "fail") {
-                        blockUI("Generating Report..please wait..");
+                        blockUI("Generating Report.. please wait..");
                         if (data.length > 0) {
                             finalReports.overallstatus[0].domainName = data[0].domainname
                             finalReports.overallstatus[0].projectName = data[0].projectname
@@ -892,7 +789,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         }
                         if (reportType == "html") {
                             //Service call to get Html reports
-                            //blockUI("Generating Report..please wait..");
                             reportService.renderReport_ICE(finalReports, reportType).then(
                                 function(data1) {
                                     unblockUI();
@@ -911,7 +807,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                     unblockUI();
                                     console.log("Error in service renderReport_ICE" + error);
                                 });
-
                             //Transaction Activity for HTMLReportClick
                             // var labelArr = [];
                             // var infoArr = [];
@@ -927,20 +822,22 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                 function(data1) {
                                     unblockUI();
                                     $rootScope.resetSession.end();
-									var strData = String.fromCharCode.apply(null, new Uint8Array(data1.slice(0,20)));
+                                    var strData = String.fromCharCode.apply(null, new Uint8Array(data1.slice(0, 20)));
                                     if (strData == "Invalid Session") return $rootScope.redirectPage();
                                     else if (strData === "fail") {
-										var msg = "Fail to load PDF Report";
-										openModalPopup("Reports", msg);
-										console.error(msg);
+                                        var msg = "Fail to load PDF Report";
+                                        openModalPopup("Reports", msg);
+                                        console.error(msg);
                                     } else if (strData === "limitExceeded") {
-										var msg = "Fail to load PDF Report. Report Limit size exceeded. Generate PDF Report using Nineteen68 PDF utility.";
-										openModalPopup("Reports", msg);
-										console.error(msg);
+                                        var msg = "Fail to load PDF Report. Report Limit size exceeded. Generate PDF Report using Nineteen68 PDF utility.";
+                                        openModalPopup("Reports", msg);
+                                        console.error(msg);
                                     } else {
                                         openWindow = 0;
                                         if (openWindow == 0) {
-                                            var file = new Blob([data1], { type: 'application/pdf' });
+                                            var file = new Blob([data1], {
+                                                type: 'application/pdf'
+                                            });
                                             if (isIE) {
                                                 navigator.msSaveOrOpenBlob(file);
                                             } else {
@@ -975,12 +872,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                     } else console.log("Failed to get reports details");
                 },
                 function(error) {
-                    console.log("Error-------" + error);
+                    console.log("Error in service renderReport_ICE " + error);
                 });
     }
-    //});
-
-
     //Export To JSON
     //Service call to get start and end details of suites
     /************ EXPORT JSON CLICK *****************/
@@ -1053,11 +947,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
                 e.initMouseEvent('click', true, true, window,
                     0, 0, 0, 0, 0, false, false, false, false, 0, null);
-                /*if(counter == 0)
-                {
-                	a.dispatchEvent(e);
-                }
-                counter++;*/
                 a.dispatchEvent(e);
             }
         }

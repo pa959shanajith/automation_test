@@ -46,12 +46,9 @@ body {
     #content {
     width: 100%;
     padding: 20px;
-    /* min-height: 100vh; */
     transition: all 0.3s;
     overflow: auto;
     height: calc(100vh - 100px);
-    /* max-height: 125vh; */
-    /* max-height: 105vh; */
     }
                  /************* Reports CSS ***********************/
                  .container-fluid
@@ -123,8 +120,6 @@ body {
                  {
                  width: 100px;
                  font-size: 10px;
-                 /* margin-left: 10px;
-                 margin-right: 10px; */
                  }
                  .ct-nodeLabel
                  {
@@ -143,7 +138,7 @@ body {
                  .ct-nodeBox
                  {
                  overflow: auto;
-                 max-height: 250px;
+                 max-height: 100px;
                  overflow-x: hidden;
                  } 
                  .nodeDiv
@@ -151,15 +146,12 @@ body {
                  padding-bottom: 15px;
                  margin-left: 1%;
                  margin-bottom: 1%;
-                    /* padding-right: 0 !important; */
-                 /* padding-bottom: 20px;
-                 padding-right: 0 !important; */
                  }  
                  #exampleTable,#accordion
                  {
                  display:none;
                  }
-                 .panel-default>.panel-heading
+                 .panel-default>.panel-heading,.overallScenarioStatus
                  {
                  color: #fff;
                  background: #331d4e;
@@ -168,7 +160,7 @@ body {
                  {
                  padding-right: 15px;
                  padding-left: 15px;
-                
+                 margin-top: 1%;
                  }
                  .panel-title
                  {
@@ -182,19 +174,6 @@ body {
                  #reportDataTable_info, #reportDataTable_paginate,#reportDataTable_length, #scenarioTable_info, #scenarioTable_paginate,#scenarioTable_length
                  {
                  display:none;
-                 }
-                 table.dataTable thead .sorting:after {
-                 opacity: 0.2;
-                 content: "" !important;
-                 pointer-events: none !important;
-                 }
-                 table.dataTable thead .sorting_asc:after{
-                 content: "" !important;
-                 pointer-events: none !important;
-                 }
-                 table.dataTable thead .sorting_desc:after {
-                 content: "" !important;
-                 pointer-events: none !important;
                  }
                  .datatable
                  {
@@ -232,11 +211,9 @@ body {
                  }
                  .display thead
                  {
-                    /* background: rgb(94, 98, 107) !important; */
                     font-size: 14px;
                     color: #331d4e !important;
                     font-family: Latoweb !important;
-                    pointer-events: none !important;
                     white-space: nowrap;
                  }
                  .dataTables_length
@@ -262,11 +239,7 @@ body {
                     border: 1px solid #633691 !important;
                     outline: none !important;
                     font-family: LatowebMedium;
-                    /* height: 18px; */
                 }
-                /* #reportsTable tbody tr:nth-child(odd) {
-                    background-color: #E2E4FF !important;
-                } */
                 .execTbl thead tr {
                     color: #000 !important;
                     background: lightgrey !important;
@@ -281,22 +254,18 @@ body {
                     position: relative;
                     left: 5%;
                 }
-                 /* tr.reportsTbl:nth-child(odd)
-                {
-                    background-color: #E2E4FF;
-                }  */
                #reportsTable tbody td
                 {
                     word-wrap: break-word;
                     font-family: Latowebmedium;
-                    /* width: 15%; */
+                    word-break: break-all;
                 }
-                #moduleTxt
+                #moduleTxt,#executionNameHeader,#overallScenarioStatus
                 {
                     overflow: hidden;
                     white-space: nowrap;
                     text-overflow: ellipsis;
-                    width: 25%;
+                    width: 80%;
                     font-size: 15px;
                     font-family: LatowebBold;
                     display: inline-block;
@@ -308,7 +277,6 @@ body {
                 }
                 table.dataTable thead th {
                     font-family: LatowebBold;
-                    /* font-weight: normal; */
                 }
                 table.dataTable td {
                     padding: 5px 10px;
@@ -337,12 +305,6 @@ body {
                 {
                     background-color: #e3caff !important;
                 }
-                /* [id^=details_]
-                {
-                    max-height: 200px;
-                    overflow-x: hidden;
-                    overflow-y: auto;
-                } */
                 .dataTables_wrapper .dataTables_filter
                 {
                     position: relative;
@@ -358,14 +320,9 @@ body {
                     padding-right: 0px;
                     padding-left: 0px;
                 }
-                /* table.display.dataTable.no-footer
-                {
-                    width: 1192px !important;
-                } */
                 .dataTables_scrollBody
                 {
-                    max-height: 300px !important;
-                    /* max-height: calc(93vh - 510px) !important; */
+                    max-height: 125px !important;
                     overflow-x: hidden !important;
                 }
                 .reportSearchBox
@@ -415,6 +372,60 @@ body {
                 .noExecutions
                 {
                     text-align:center !important;
+                }
+                #overallStatus
+                {
+                    position: relative;
+                    float: none;
+                    top: 0px;
+                    padding-top: 15px;
+                    padding-bottom: 15px;
+                }
+                .progress
+                {
+                    border-radius: 1rem !important;
+                }
+                #reportsModuleTable_wrapper .dataTables_scrollBody
+                {
+                    max-height: 192px !important;
+                }
+                .scenarioTblReport
+                {
+                    cursor: pointer;
+                }
+                [class^="sorting"],[class^="sorting"]:hover
+                {
+                    background: transparent !important;
+                }
+                .glyphicon-triangle-bottom,.glyphicon-triangle-top
+                {
+                    position: relative;
+                    top: 2px;
+                    left: 2px;
+                    font-size: 12px !important;
+                    cursor: pointer;
+                }
+                .modTbl
+                {
+                    border: none !important;
+                }
+                .no-records
+                {
+                    position: relative;
+                    left: 10%;
+                }
+                table.dataTable.no-footer
+                {
+                    border-bottom: 1px solid #e5e5e5 !important;
+                }
+                .no-data
+                {
+                    background: #e5e5e5;
+                    padding: 5px 10px;
+                }
+                .emptyRecords
+                {
+                    padding: 5px 10px;
                 }
                  /************* Reports CSS ***********************/
 
