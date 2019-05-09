@@ -557,22 +557,18 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		var name = req.session.username;
 		redisServer.redisSubServer.subscribe('ICE2_' + name);
 		var batchExecutionData = req.body.moduleInfo;
-		var approvedStatus=true;
 		async.series({
 			approval_check:function(callback_E){
 				if (!taskflow) return callback_E();
 				async.forEachSeries(batchExecutionData,function(eachmoduledata,callback){
 					var qlist=[];
-					var projid= eachmoduledata.projectid;
-					var modname= eachmoduledata.testsuitename;
-					var modid= eachmoduledata.testsuiteid;
 					var scenario_list=[];
 					var arr=eachmoduledata.suiteDetails;
 					for (i=0;i<arr.length;i++){
 						scenario_list.push(arr[i].scenarioids);
 					}
-					qlist.push({'statement':"MATCH (ts:TESTSCENARIOS)-[r]->(s:SCREENS)-[]->(tc:TESTCASES) where ts.testScenarioID_c in "+JSON.stringify(scenario_list)+" return count(DISTINCT s)+count(DISTINCT tc)"});
-					qlist.push({'statement':"MATCH (ts:TESTSCENARIOS) where ts.testScenarioID_c in "+JSON.stringify(scenario_list)+" MATCH (t:TASKS) where t.parent starts with ('["+projid+","+modid+",'+ts.testScenarioID_c+',') and (t.task='Scrape' or t.task='Design') and t.status='complete' return count(DISTINCT t.parent)"});
+					qlist.push({'statement':"MATCH (ts:TESTSCENARIOS)-[r]->(s:SCREENS)-[]->(tc:TESTCASES) where ts.testScenarioID_c in "+JSON.stringify(scenario_list)+"  with '.*'+s.screenID_c+']' as r1,s MATCH (t:TASKS),(t1:TASKS{status:'complete'}) where t.parent=~r1 and t1.parent=~r1 return count(DISTINCT t.status)=1 and count(DISTINCT substring(t.parent,112))=count(DISTINCT s.screenID_c) and count(DISTINCT substring(t1.parent,112))=count(DISTINCT s.screenID_c)"});
+					qlist.push({'statement':"MATCH (ts:TESTSCENARIOS)-[r]->(s:SCREENS)-[]->(tc:TESTCASES) where ts.testScenarioID_c in "+JSON.stringify(scenario_list)+"  with '.*'+tc.testCaseID_c+']' as r1,tc  MATCH (t:TASKS),(t1:TASKS{status:'complete'}) where t.parent=~r1 and t1.parent=~r1 return count(DISTINCT t.status)=1 and count(DISTINCT substring(t.parent,149))=count(DISTINCT tc.testCaseID_c) and count(DISTINCT substring(t1.parent,149))=count(DISTINCT tc.testCaseID_c)"});
 					neo4jAPI.executeQueries(qlist,function(status_res,result){
 						if(status_res!=200) {
 							logger.error("Error in ExecuteTestSuite_ICE: Neo4j query to find the number of tasks approved");
@@ -580,9 +576,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 						}
 						try {
 							var err = null;
-							logger.debug("Screens and testcases count",result[0].data[0].row[0]);
-							logger.debug("Module task count",result[1].data[0].row[0]);
-							if(!(result[0].data[0].row[0]==result[1].data[0].row[0])){
+							if(!(result[0].data[0].row[0] && result[1].data[0].row[0] )){
 									logger.info("All its dependent tasks (design, scrape) are not approved");
 									err = {res:'NotApproved',status:status_res};
 							}
