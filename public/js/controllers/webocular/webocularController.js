@@ -15,6 +15,9 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		return $rootScope.redirectPage();
 	}
 	localStorage.setItem("navigateEnable", true);
+
+	$("body").css("background", "#eee");
+	
 	//Task Listing
 	loadUserTasks();
 	window.onbeforeunload = function() {

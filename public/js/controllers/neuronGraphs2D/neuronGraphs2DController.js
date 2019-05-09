@@ -74,6 +74,8 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$rootScope', '$http', '
     }, 500);
     $scope.level = 10;
 
+    $("body").css("background", "#eee");
+
     $scope.assignTab = function(option) {
         console.log('assign tab')
         $scope.tab = option;

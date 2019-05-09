@@ -47,6 +47,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			width: '100%'
 		});
 	}
+	$("body").css("background", "#eee");
 	 
 	$scope.showFlowGraphHome = function($event){
 
