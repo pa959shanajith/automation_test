@@ -372,9 +372,11 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     //sort start date & time executions
     function sortExecutions(dateArray) {
         $(".mid-report-section tbody").empty();
-        for (var i = dateArray.length - 1; i >= 0; i--) {
-            dateArray[i].firstChild.innerHTML = "E<sub>" + parseInt(i + 1) + "</sub>";
+        var j=dateArray.length;
+        for (var i =0; i < dateArray.length; i++) {
+            dateArray[i].firstChild.innerHTML = "E<sub>" + parseInt(j) + "</sub>";
             $(".mid-report-section tbody").append(dateArray[i]);
+            j--;
         }
     }
 
