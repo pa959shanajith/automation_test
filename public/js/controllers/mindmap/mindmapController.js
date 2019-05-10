@@ -2158,6 +2158,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 temp = temp / 2;
                 cSpanX = cSpanX - temp;
             }
+            zoom.translate([cSpanX, cSpanY]);
+            zoom.event(d3.select('#ct-mindMap'));
+            //d3.select('#ct-mindMap').attr('transform', "translate(" + cSpanX + "," + cSpanY + ")scale(" + cScale + ")");
+            //cSpan[0]=cSpan[0]-l[0]/2 //after edit mindmap doesn't move to orignal position
+            l = p.attr('transform').slice(10, -1).split(split_char);
+            l = [(parseFloat(l[0]) - 20) * cScale + cSpanX, (parseFloat(l[1]) + 42) * cScale + cSpanY];
         }
 
         d3.select('#ct-inpBox').style('top', l[1] + 'px').style('left', l[0] + 'px').classed('no-disp', !1);
