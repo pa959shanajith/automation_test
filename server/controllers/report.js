@@ -1213,10 +1213,9 @@ function latestReport(reportObjList) {
     });
     return lrobj;
 }
-
+//Fetch all modules on change of projects,release & cycle
 exports.getReportsData_ICE = function(req, res) {
     try {
-        //Fetch all modules on change of projects,release & cycle
         if (req.body.reportsInputData.type == 'allmodules') {
             logger.info("Inside UI service: getReportsData_ICE - allmodules");
             var inputs = {
@@ -1236,119 +1235,6 @@ exports.getReportsData_ICE = function(req, res) {
                         res.send("fail");
                     } else {
                         res.send(result1);
-                    }
-                });
-        }
-        //Fetch all scenarios per testsuite
-        else if (req.body.reportsInputData.type == 'scenariosPerTestSuite') {
-            logger.info("Inside UI service: getReportsData_ICE - scenariosPerTestSuite");
-            var inputs = {
-                "query": "getScenariosPertestSuite",
-                "cycleId": req.body.reportsInputData.cycleId,
-                "testsuiteId": req.body.reportsInputData.testSId,
-            };
-            var args = {
-                data: inputs,
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            };
-            client.post(epurl + "reports/getAllSuites_ICE", args,
-                function(result1, response1) {
-                    if (response1.statusCode != 200 || result1.rows == "fail") {
-                        logger.error("Error occurred in reports/getReportsData_ICE: getScenariosPertestSuite from getAllSuites_ICE Error Code : ERRNDAC");
-                        res.send("fail");
-                    } else {
-                        var testscenarioids = result1.rows[0].testscenarioids;
-                        //Bind Scenarioname for each scenario for testsuite
-                        var reportScenarioObj = [];
-                        var inputs = {
-                            "query": "scenarionamemap",
-                            "scenarioid": testscenarioids
-                        };
-                        var args = {
-                            data: inputs,
-                            headers: {
-                                "Content-Type": "application/json"
-                            }
-                        };
-                        client.post(epurl + "reports/reportStatusScenarios_ICE", args,
-                            function(result1, response1) {
-                                if (response1.statusCode != 200 || result1.rows == "fail") {
-                                    logger.error("Error occurred in reports/reportStatusScenarios_ICE: getScenaraioName Error Code : ERRNDAC");
-                                } else {
-                                    async.forEachOfSeries(result1, function(item, key, callback) {
-                                        var inputs = {
-                                            "query": "latestreport",
-                                            "scenarioid": key,
-                                            "cycleid": req.body.reportsInputData.cycleId,
-                                            "suiteid": req.body.reportsInputData.testSId
-                                        };
-                                        var args = {
-                                            data: inputs,
-                                            headers: {
-                                                "Content-Type": "application/json"
-                                            }
-                                        };
-                                        client.post(epurl + "reports/reportStatusScenarios_ICE", args,
-                                            function(result3, response3) {
-                                                if (response3.statusCode != 200 || result3.rows == "fail") {
-                                                    logger.error("Error occurred in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
-                                                    res.send("fail");
-                                                } else {
-                                                    if (result3.rows.length == 0) {
-                                                        var robj = {};
-                                                        robj['scenarioname'] = item;
-                                                        robj['scenarioid'] = key;
-                                                        robj['varmap'] = {};
-                                                        robj['status'] = '-';
-                                                        robj['executedtime'] = '-';
-                                                        robj['reportid'] = '';
-                                                        robj['count'] = 0;
-                                                        reportScenarioObj.push(robj);
-                                                    } else {
-                                                        var robj = result3.rows;
-                                                        robj['scenarioname'] = item;
-                                                        robj['scenarioid'] = key;
-                                                        reportScenarioObj.push(robj);
-                                                    }
-                                                    callback();
-                                                }
-                                            });
-                                    }, function(err) {
-                                        if (err) {
-                                            console.log(err);
-                                            callback(err);
-                                        } else {
-                                            res.send(reportScenarioObj);
-                                        }
-                                    });
-                                }
-                            });
-                    }
-                });
-        }
-        //Fetch all executions per scenario
-        else if (req.body.reportsInputData.type == 'scenarioreports') {
-            var inputs = {
-                "query": "allreports",
-                "scenarioid": req.body.reportsInputData.scenarioid,
-                "cycleid": req.body.reportsInputData.cycleid,
-                "suiteid": req.body.reportsInputData.testSId
-            };
-            var args = {
-                data: inputs,
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            };
-            client.post(epurl + "reports/reportStatusScenarios_ICE", args,
-                function(result3, response3) {
-                    if (response3.statusCode != 200 || result3.rows == "fail") {
-                        logger.error("Error occurred in reports/getReportsData_ICE: scenariodetails from getAllSuites_ICE Error Code : ERRNDAC");
-                        res.send("fail");
-                    } else {
-                        res.send(result3);
                     }
                 });
         }
