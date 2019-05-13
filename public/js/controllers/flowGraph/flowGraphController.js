@@ -872,8 +872,8 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 						$("#"+e.target.id).parent().append("<input id='txtWeightage_"+id+"' type='text' maxlength=3 value="+previousValue+">");
 						$(this).hide();
 						$("[id^=txtWeightage_]").on('keydown',function(event) {
-							// Allow: backspace, delete, tab, escape, enter and .
-							if ($.inArray(event.keyCode, [46, 8, 9, 27, 110, 190]) !== -1 ||
+							// Allow: backspace, delete, tab, escape and enter
+							if ($.inArray(event.keyCode, [46, 8, 9, 27, 110]) !== -1 ||
 							  // Allow: Ctrl+A,Ctrl+C,Ctrl+V, Command+A
 							  ((event.keyCode == 65 || event.keyCode == 86 || event.keyCode == 67) && (event.ctrlKey === true || event.metaKey === true)) ||
 							  // Allow: home, end, left, right, down, up
