@@ -14,6 +14,7 @@
                <li><a class='browserIcon' href='#'  title="Launch Google Chrome" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'chrome'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
                <li class="safariBrowser browserIcon" style="display: none;"><a href='#'  title="Launch Safari" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'safari'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-safari.png' alt='Safari' /></span>Safari</a></li>
                <li><a class='browserIcon' href='#'  title="Launch Mozilla Firefox" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'mozilla'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
+               <li><a class='pdfIcon' href='#'  title="Launch PDF utility" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'pdf'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-pdf_scrape.png' alt='pdf' /></span>PDF Utility</a></li>
                <li class="last"  title="Enable Append"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
             </ul>
          </div>
@@ -23,6 +24,7 @@
             <ul>
                <li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
                <li><a class='browserIcon' href='#'  title="Desktop Apps" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-desktop.png' alt='Desktop Apps' /></span>Desktop Apps</a></li>
+               <li><a class='pdfIcon' href='#'  title="Launch PDF utility" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'pdf'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-pdf_scrape.png' alt='pdf' /></span>PDF Utility</a></li>
                <li class="last"  title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
             </ul>
          </div>
@@ -32,6 +34,7 @@
             <ul>
                <li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
                <li><a class='browserIcon' href='#'  title="SAP Apps" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-desktop.png' alt='SAP Apps' /></span>SAP Apps</a></li>
+               <li><a class='pdfIcon' href='#'  title="Launch PDF utility" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'pdf'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-pdf_scrape.png' alt='pdf' /></span>PDF Utility</a></li>
                <li class="last"  title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
             </ul>
          </div>
@@ -41,6 +44,7 @@
             <ul>
                <li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
                <li><a class='browserIcon' href='#'  title="OEBS Apps" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-desktop.png' alt='OEBS Apps' /></span>OEBS Apps</a></li>
+               <li><a class='pdfIcon' href='#'  title="Launch PDF utility" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'pdf'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-pdf_scrape.png' alt='pdf' /></span>PDF Utility</a></li>
                <li class="last"  title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
             </ul>
          </div>
@@ -50,6 +54,7 @@
             <ul>
                <li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
                <li><a class='browserIcon' href='#'  title="Android Apps" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-mobility.png' alt='Mobile Apps' /></span>Mobile Apps</a></li>
+               <li><a class='pdfIcon' href='#'  title="Launch PDF utility" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'pdf'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-pdf_scrape.png' alt='pdf' /></span>PDF Utility</a></li>
                <li class="last"  title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
             </ul>
          </div>
@@ -59,6 +64,7 @@
             <ul>
                <li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
                <li><a class='browserIcon' href='#'  title="Android Web" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-mobility.png' alt='Mobile Web' /></span>Mobile Web</a></li>
+               <li><a class='pdfIcon' href='#'  title="Launch PDF utility" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'pdf'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-pdf_scrape.png' alt='pdf' /></span>PDF Utility</a></li>
                <li class="last"  title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
             </ul>
          </div>
