@@ -79,6 +79,11 @@ exports.initScraping_ICE = function (req, res) {
 						reqAction = "mobile web";
 						dataToIce = {"emitAction": "LAUNCH_MOBILE_WEB", "username" : name,
 							"mobileSerial": mobileSerial, "androidVersion": androidVersion};
+					} else if (req.body.screenViewObject.appType == "pdf"){
+						var data = {};
+						var browserType = req.body.screenViewObject.appType;
+						data.browsertype = browserType;
+						dataToIce = {"emitAction" : "PDF_SCRAPE","username" : name, "data":data,"browsertype":browserType};
 					} else {  //Web Scrape
 						var data = {action: "scrape"};
 						var browserType = reqBody.browserType;

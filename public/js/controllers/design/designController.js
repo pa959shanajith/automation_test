@@ -1008,7 +1008,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				$(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion, #mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").val('')
 				$(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion, #mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").removeClass("inputErrorBorder");
 				$(".androidIcon").removeClass("androidIconActive")
-			}
+			} else if ($scope.getScreenView == "pdf") {
+                $("#launchMobilityWeb").modal("show")
+                $(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion, #mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").val('')
+                $(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion, #mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").removeClass("inputErrorBorder");
+                $(".androidIcon").removeClass("androidIconActive")
+            }
 		}
 	}
 	//Initialization for apptype(Desktop, Mobility, OEBS) to redirect on initScraping function
@@ -1536,9 +1541,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 			//For Desktop
 			if ($scope.getScreenView == "Desktop") {
-				if ($(document).find("#desktopPath").val() == "" && $(document).find("#app_pid").val() == "") {
+				if ($(document).find("#desktopPath").val() == "" && $(document).find("#app_pid").val() == "" && browserType != 'pdf') {
 					$(document).find("#desktopPath").addClass("inputErrorBorder")
 					return false
+				} else if (browserType == 'pdf'){
+					screenViewObject.appType = browserType
 				} else {
 					$(document).find("#desktopPath").removeClass("inputErrorBorder")
 					screenViewObject.appType = $scope.getScreenView,
@@ -1559,9 +1566,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			//For Desktop
 			//For SAP
 			else if ($scope.getScreenView == "SAP") {
-				if ($(document).find("#SAPPath").val() == "") {
+				if ($(document).find("#SAPPath").val() == "" && browserType != 'pdf') {
 					$(document).find("#SAPPath").addClass("inputErrorBorder")
 					return false
+				} else if (browserType == 'pdf'){
+					screenViewObject.appType = browserType
 				} else {
 					$(document).find("#SAPPath").removeClass("inputErrorBorder")
 					screenViewObject.appType = $scope.getScreenView,
@@ -1672,13 +1681,16 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 			//For Mobility Web
 			else if ($scope.getScreenView == "MobileWeb") {
-				if ($(document).find("#mobilityWebSerialNo").val() == "") {
-					$(document).find("#mobilityWebSerialNo").addClass("inputErrorBorder")
+				if ($(document).find("#mobilityWebSerialNo").val() == "" && browserType != 'pdf') {
+					$(document).find("#mobilityWebSerialNo").addClass("inputErrorBorder" && browserType != 'pdf')
 					return false
 				} else if ($(document).find("#mobilityAndroidVersion").val() == "") {
 					$(document).find("#mobilityAndroidVersion").addClass("inputErrorBorder")
 					return false
-				} else {
+				} else if (browserType == 'pdf'){
+					screenViewObject.appType = browserType
+				} 
+				else {
 					$(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion").removeClass("inputErrorBorder")
 					screenViewObject.appType = $scope.getScreenView,
 						screenViewObject.mobileSerial = $(document).find("#mobilityWebSerialNo").val();
@@ -1699,10 +1711,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 			//For OEBS
 			else if ($scope.getScreenView == "DesktopJava") {
-				if ($(document).find("#OEBSPath").val() == "") {
+				if ($(document).find("#OEBSPath").val() == "" && browserType != 'pdf' ) {
 					$(document).find("#OEBSPath").addClass("inputErrorBorder")
 					return false
-				} else {
+				} else if (browserType == 'pdf'){
+					screenViewObject.appType = browserType
+				} 
+				else {
 					$(document).find("#OEBSPath").removeClass("inputErrorBorder")
 					screenViewObject.appType = $scope.getScreenView,
 						screenViewObject.applicationPath = $(document).find("#OEBSPath").val();
@@ -1718,8 +1733,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					}
 				}
 			}
-			//For OEBS
-
+			//For PDF
+			else if(browserType == "pdf"){
+				screenViewObject.appType = browserType;
+			}
 			//For Web
 			else {
 				if ($rootScope.compareFlag == true) {
@@ -2057,7 +2074,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 										var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 									}
 									else {
-										var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+										if (typeof(ob.xpath) == 'String'){
+											var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+										}else{
+											var li = "<li data-xpath='" + ob.xpath + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+										}
+										
 									}
 									// }	
 
@@ -5473,6 +5495,55 @@ function contentTable(newTestScriptDataLS) {
 			$grid.jqGrid('setCell', rowId, 'appType', 'Generic');
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
 		}
+		// else if (selectedText.startsWith("@PDF")) {
+		// 	var scrappedDataCustnames = [];
+		// 	selectedText = replaceHtmlEntites(selectedText.trim());
+		// 	for (var i = 0; i < scrappedData.length; i++) {
+		// 		var ob = scrappedData[i];
+		// 		var custname1;
+		// 		var custval = ob.custname;
+		// 		custname1 = $('<input>').html(custval).text().trim();
+		// 		scrappedDataCustnames.push(custval);
+		// 		if ((custname1.replace(/\s/g, ' ') == (selectedText.replace('/\s/g', ' ')).replace('\n', ' '))) {
+		// 			var isIos = scrappedData[i].text;
+		// 			if(isIos == 'ios')
+		// 			{
+		// 				objName = ob.xpath;
+		// 			}
+		// 			else{
+		// 				objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
+		// 			}
+		// 			url = ob.url;
+		// 			var obType = ob.tag;
+		// 			var listType = ob.canselectmultiple;
+		// 			if (ob.cord) {
+		// 				selectedKeywordList = 'iris';
+		// 				cord = ob.cord;
+		// 				obType = "iris";
+		// 				url = "";
+		// 			}
+		// 			//new
+		// 			var sc = Object.keys(keywordArrayList.pdfList);
+		// 			selectedKeywordList = "pdfList";
+		// 			var res = '';
+		// 			for (var i = 0; i < sc.length; i++) {
+		// 				if (selectedKeyword == sc[i]) {
+		// 					res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
+		// 				} else
+		// 					res += '<option role="option" value="' + sc[i] + '">' + sc[i] + '</option>';
+		// 			}
+		// 			var row = $(e.target).closest('tr.jqgrow');
+		// 			var rowId = row.attr('id');
+		// 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
+		// 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
+		// 			$grid.jqGrid('setCell', rowId, 'appType', 'pdf');
+		// 			$grid.jqGrid('setCell', rowId, 'cord', cord);
+		// 			$grid.jqGrid('setCell', rowId, 'objectName', objName);
+		// 			break;
+		// 		}
+		// 	}
+			
+		// }
 		else {
 			var scrappedDataCustnames = [];
 			selectedText = replaceHtmlEntites(selectedText.trim());
@@ -5503,7 +5574,7 @@ function contentTable(newTestScriptDataLS) {
 
 					//changes from wasim
 					if (obType != 'a' && obType != 'select' && obType != 'radiobutton' && obType != 'checkbox' && obType != 'input' && obType != 'list' &&
-						obType != 'tablecell' && obType != 'table' && obType != 'img' && obType != 'button' && obType != 'iris' && (appTypeLocal == 'Web' || appTypeLocal == 'MobileWeb')) {
+						obType != 'tablecell' && obType != 'table' && obType != 'img' && obType != 'button' && obType != 'iris' && (appTypeLocal == 'Web' || appTypeLocal == 'MobileWeb') && !ob.tag.startsWith('@PDF')) {
 						var sc = Object.keys(keywordArrayList.element);
 						selectedKeywordList = "element";
 						var res = '';
@@ -5521,6 +5592,25 @@ function contentTable(newTestScriptDataLS) {
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						$grid.jqGrid('setCell', rowId, 'cord', cord);
+						break;
+					} else if (ob.tag.startsWith("@PDF")) {
+						//new
+						var sc = Object.keys(keywordArrayList.pdfList);
+						selectedKeywordList = "pdfList";
+						var res = '';
+						for (var i = 0; i < sc.length; i++) {
+							if (selectedKeyword == sc[i]) {
+								res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
+							} else
+								res += '<option role="option" value="' + sc[i] + '">' + sc[i] + '</option>';
+						}
+						var row = $(e.target).closest('tr.jqgrow');
+						var rowId = row.attr('id');
+						$("select#" + rowId + "_keywordVal", row[0]).html(res);
+						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
+						$grid.jqGrid('setCell', rowId, 'appType', 'pdf');
+						$grid.jqGrid('setCell', rowId, 'cord', cord);
+						$grid.jqGrid('setCell', rowId, 'objectName', objName);
 						break;
 					} else if (obType == 'elementWS') {
 						var sc = Object.keys(keywordArrayList.elementWS);
