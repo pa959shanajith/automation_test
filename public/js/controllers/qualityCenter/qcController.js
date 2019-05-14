@@ -13,6 +13,8 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		return $rootScope.redirectPage();
 	}
 
+	$("body").css("background", "#eee");
+	
 	$(".selectBrowser").click(function(){
 		$(".selectBrowser").find("img").removeClass("selectedIcon");
 		$(this).find("img").addClass("selectedIcon");
