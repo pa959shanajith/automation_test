@@ -4595,7 +4595,7 @@ function contentTable(newTestScriptDataLS) {
 				if (str == "string" && 'rows' in data) {
 					if (data.rows[rowId - 1].addTestCaseDetailsInfo.length > 0) {
 						$(this).find("td:nth-child(13)").text('');
-						$(this).find("td:nth-child(13)").append('<img alt="activeDetails" title="" id="details_' + v + '" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+						$(this).find("td:nth-child(13)").append('<img alt="activeDetails" title="" id="details_' + v + '" src="imgs/ic-details-inactive.png" class="detailsIcon activeDetails"/>');
 					}
 					else if (data.rows[rowId - 1].addTestCaseDetails.length == 0) {
 						$(this).find("td:nth-child(13)").text('');
@@ -4609,7 +4609,7 @@ function contentTable(newTestScriptDataLS) {
 				else if (str == "string") {
 					if (data[rowId - 1].addTestCaseDetailsInfo.length > 0) {
 						$(this).find("td:nth-child(13)").text('');
-						$(this).find("td:nth-child(13)").append('<img  alt="activeDetails"  title="" id="details_' + v + '" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+						$(this).find("td:nth-child(13)").append('<img  alt="activeDetails"  title="" id="details_' + v + '" src="imgs/ic-details-inactive.png" class="detailsIcon activeDetails"/>');
 					}
 					else if (data[rowId - 1].addTestCaseDetails.length == 0) {
 						$(this).find("td:nth-child(13)").text('');
