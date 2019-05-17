@@ -117,14 +117,14 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 
 	$(document).on("change", '.selectToSched', function(){
 		 var allCount = $(".selectToSched").length;
+		 var selectedCount = $(this).parents(".scenarioBody").children("tr").find(".selectToSched:checked").length
 		 if(selectedCount == 0)
 		 	$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", false);
-		var selectedCount = $(this).parents(".scenarioBody").children("tr").find(".selectToSched:checked").length
-		 if(allCount == selectedCount){
+		 else if(allCount == selectedCount){
 			$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", true);
 		}
 		else{
-			$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", false);
+			$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", true);
 		}
 	
 	});
