@@ -48,7 +48,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		$(".bell-icon-div").hide();
 	}
 
-	if ($location.$$path == "/plugin" || $location.$$path == "/p_Webocular") {
+	if ($location.$$path == "/plugin") {
 		$("button.notify-btn").addClass('notify-btn-white');
 
 	}
