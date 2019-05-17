@@ -6664,6 +6664,7 @@ function pasteInGrid(e) {
 		if (gridData.length == 1 && gridData[0].custname == "") {
 			gridData.splice(gridData[0], 1)
 			for (k = 0; k < getRowJsonToPaste.length; k++) {
+				getRowJsonToPaste[k].stepNo=k+1
 				gridData.push(getRowJsonToPaste[k])
 			}
 		} else {
