@@ -1918,8 +1918,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								$("#compareNotFoundObjectsBox").hide();
 							}
 						}
+						
 						else {
-							openDialog("Compare Objects", "Failed to compare objects");
+							if (data.status =="EMPTY_OBJECT"){
+								openDialog("Compare Objects", "Failed to compare objects - Unmapped object(s) found");
+							}
+							else{
+								openDialog("Compare Objects", "Failed to compare objects");
+							}
 							$rootScope.compareFlag = false;
 							return;
 						}
