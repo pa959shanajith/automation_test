@@ -95,6 +95,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     $scope.selProjectsFilter = function() {
         var projectId = $('.project-list option:selected').val();
         blockUI("Loading releases.. please wait..");
+        $(".moduleBox,.mid-report-section,#accordion").hide();
         mindmapServices.populateReleases(projectId).then(function(result) {
             unblockUI();
             if (result == "Invalid Session") {
@@ -122,6 +123,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         $scope.selReleasesFilter = function() {
             var releaseId = $('.release-list option:selected').val();
             blockUI("Loading cycles.. please wait..");
+            $(".moduleBox,.mid-report-section,#accordion").hide();
             mindmapServices.populateCycles(releaseId).then(function(result_cycles) {
                 unblockUI();
                 if (result_cycles == "Invalid Session") {
