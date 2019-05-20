@@ -352,9 +352,17 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 	$scope.initSchedule = function($event){
 		var moduleInfo = [];
 		var doNotSchedule = false;
-		if(appType != "SAP" && browserTypeExe.length == 0)	openModelPopup("Schedule Test Suite", "Please select a browser");
-		else if($(".selectScheduleSuite:checked").length == 0) openModelPopup("Schedule Test Suite", "Please select atleast one Suite(s) to schedule");
+		if($(".selectScheduleSuite:checked").length == 0) openModelPopup("Schedule Test Suite", "Please select atleast one Suite(s) to schedule");
 		else if($('.selectToSched:checked').length == 0) openModelPopup("Schedule Test Suite", "Please select atleast one scenario to schedule");
+		else if(appType == "SAP" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select SAP Apps option");
+		else if(appType == "MobileApp" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select Mobile Apps option");
+		else if(appType == "MobileWeb" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select Mobile Web option");
+		else if(appType == "Desktop" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select Desktop Apps option");
+		else if(appType == "Web" && browserTypeExe.length == 0)	openModelPopup("Schedule Test Suite", "Please select a browser");
+		else if(appType == "Webservice" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select Web Services option");
+		else if (appType == "Mainframe" && browserTypeExe.length === 0) openModelPopup("Schedule Test Suite", "Please select Mainframe option");
+		else if (appType == "DesktopJava" && browserTypeExe.length === 0) openDialogExe("Schedule Test Suite", "Please select OEBS Apps option");
+		else if (browserTypeExe.length === 0) openDialogExe("Schedule Test Suite", "Please select " + appType + " option");
 		else{
 			if(appType == "SAP") browserTypeExe = ["1"];
 			$.each($(".batchSuite"), function(){
