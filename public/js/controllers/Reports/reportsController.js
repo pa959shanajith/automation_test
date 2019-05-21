@@ -348,7 +348,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             unblockUI();
                         }
                     }
-
+                    redirected = false;
+                    localStorage.removeItem('fromExecution');
                 },
                 function(error) {
                     unblockUI();
@@ -374,12 +375,22 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     //sort start date & time executions
     function sortExecutions(dateArray) {
         $(".mid-report-section tbody").empty();
-        var j=dateArray.length;
-        for (var i =0; i < dateArray.length; i++) {
-            dateArray[i].firstChild.innerHTML = "E<sub>" + parseInt(j) + "</sub>";
-            $(".mid-report-section tbody").append(dateArray[i]);
-            j--;
+        if($('#dateDESC').is(":visible") == true)
+        {
+            var j=dateArray.length;
+            for (var i =0; i < dateArray.length; i++) {
+                dateArray[i].firstChild.innerHTML = "E<sub>" + parseInt(j) + "</sub>";
+                $(".mid-report-section tbody").append(dateArray[i]);
+                j--;
+            }
         }
+        else{
+            for (var k =0; k < dateArray.length; k++) {
+                dateArray[k].firstChild.innerHTML = "E<sub>" + parseInt(k + 1) + "</sub>";
+                $(".mid-report-section tbody").append(dateArray[k]);
+            }
+        }
+       
     }
 
     //Load scenarios table on click of Module start & end time 
@@ -430,6 +441,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         if ($('.scenarioTblReport').length > 0) {
                             $("tr.scenarioTblReport:even").removeClass('even').addClass('even');
                             $("tr.scenarioTblReport:odd").removeClass('odd').addClass('odd');
+                          
                             $timeout(function() {
                                 var oTable2 = $('#reportsTable').DataTable({
                                     "bDestroy": true,
@@ -470,12 +482,11 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                         unblockUI();
                                     }
                                 });
+                              
                                 unblockUI();
                             }, 1000);
                         }
-
-                        redirected = false;
-                        localStorage.removeItem('fromExecution');
+                      
                         var executionDetails = $('.tblRowHighlight').children('td.executionNo').html() + " - Scenario Status";
                         $(".overallScenarioStatus").html(executionDetails);
                         //Set overall Status progress bars
