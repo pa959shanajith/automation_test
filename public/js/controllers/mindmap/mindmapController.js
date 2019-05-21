@@ -887,28 +887,35 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //var l = d3.select('#ct-mindMap').insert('path', 'g').attr('id', 'ct-link-' + r).attr('class', 'ct-link').attr('d', d);
     };
     //To Unassign the task of a particular node
-    $scope.removeTask = function(e, tidx) {
+    $scope.removeTask = function(e, tidx,twf) {
         var uinfo = JSON.parse(window.localStorage['_UI']);
-        var twf= uinfo.taskwflow; 
-        var pi=null;
-        var p = d3.select(activeNode);
+		//Fetching the config value for strictTaskWorkflow for the first time, hence the check
+		if (twf !== false) twf= uinfo.taskwflow;  
+        var pi,p=null;
+		if (tidx==undefined){
+			p = d3.select(activeNode);
+		}else{
+			p = d3.select('#ct-node-' + tidx);
+		}
         if (tidx == 0 || tidx == undefined) {
             if ($("#ct-unassignButton a").attr('class') == 'disableButton') return;
             pi = parseInt(p.attr('id').split('-')[2]);
         } else pi = tidx;
-        var nType=dNodes[pi].type;
-        $('#unassignmentConfirmationPopup').attr('node', pi);
-        if (twf && (nType=="screens" || nType=="testcases")) $('#unassignmentConfirmationPopup').modal("show");
-        else task_unassignment(pi,p);
+		task_unassignment(pi,twf);
     }
 
     $('#unassignTask').click(function() {
-        var pi = $('#unassignmentConfirmationPopup').attr('node');
-        var p = d3.select(activeNode);
-        task_unassignment(pi,p);
-           
+		var p = d3.select(activeNode);
+		var pi = parseInt(p.attr('id').split('-')[2]);
+        task_unassignment(pi,false);
     });
-    function task_unassignment(pi,p){
+	
+    function task_unassignment(pi,twf){
+		if (twf && (dNodes[pi].type=="screens" || dNodes[pi].type=="testcases")){
+			$('#unassignmentConfirmationPopup').modal("show");
+			return;
+		} 
+		var p = d3.select('#ct-node-' + pi);
         p.select('.ct-nodeTask').classed('no-disp', !0);
         if (dNodes[pi].oid != undefined && dNodes[pi].task != null) {
             dNodes[pi].task.tstatus = 'unassigned'; //tstatus and assignedtoname are solely for notification
@@ -917,9 +924,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         d3.select('#ct-assignBox').classed('no-disp', !0);
         if (dNodes[pi].children && $('.pg-checkbox')[0].checked) {
             dNodes[pi].children.forEach(function(e, i) {
-                var p = d3.select('#ct-node-' + e.id);
-                p.select('.ct-nodeTask').classed('no-disp', !0);
-                $scope.removeTask('something', e.id);
+                $scope.removeTask('something', e.id,twf);
             });
         }
     }
