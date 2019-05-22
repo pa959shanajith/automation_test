@@ -5001,6 +5001,7 @@ Purpose : displaying pop up for replication of project
                             //$window.open(fileURL, '_blank');
                             URL.revokeObjectURL(fileURL);
                         }
+                        openDialogMindmap("Success", "Successfully exported to Excel");
                     }
                     openWindow++;
                 }
