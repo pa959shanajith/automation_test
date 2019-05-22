@@ -3808,7 +3808,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		}
 	})
 
-	//Triggered When each checkbox objects are clicked in comapre & update screen
+	//Triggered When each checkbox objects are clicked in compare & update screen
 	$(document).on('click', "input[name='selectAllChangedItems']", function () {
 		if ($(this).is(":checked")) {
 			$(this).addClass('checked');

@@ -89,6 +89,12 @@ exports.initScraping_ICE = function (req, res) {
 						var browserType = reqBody.browserType;
 						if (reqBody.action == 'compare') {
 							data.viewString = reqBody.viewString.view;
+							if ("scrapedurl" in reqBody.viewString){
+								data.scrapedurl = reqBody.viewString.scrapedurl;
+							}
+							else{
+								data.scrapedurl = "";
+							}
 							data.scrapedurl = reqBody.viewString.scrapedurl;
 							data.action = reqBody.action;
 						}
@@ -272,7 +278,9 @@ exports.updateScreen_ICE = function (req, res) {
 				try {
 					scrapedObjects = updateData.getScrapeData;
 					var parsedScrapedObj = JSON.parse(scrapedObjects);
-					parsedScrapedObj.scrapedurl = newData.scrapedurl;
+					if ("scrapedurl" in newData){
+						parsedScrapedObj.scrapedurl = newData.scrapedurl
+					}
 					scrapedObjects = JSON.stringify(parsedScrapedObj);
 					if (appType.toUpperCase() === 'WEBSERVICE') {
 						if ('body' in parsedScrapedObj) {
