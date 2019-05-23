@@ -98,14 +98,7 @@
             <!-- <p class="ct-ctrl fa fa-hand-peace-o" ng-click="createMultipleNode()"><span class="ct-tooltiptext">Create Multiple Scenarios</span></p> -->
             <p class="ct-ctrl fa fa-pencil-square-o" ng-click="editNode($event)"><span class="ct-tooltiptext">Edit Module</span></p>
             <p class="ct-ctrl fa fa-trash-o ct-ctrl-inactive" ng-click="deleteNode($event)"><span class="ct-tooltiptext"></span></p>
-         </div>        
-
-
-
-
-
-
-
+         </div>
          <svg id="ct-mapSvg" style="width: 100%; height: 100%;">
             <g id="ct-mindMap">
                 <path ng-repeat="(id,link) in linkDisplay" ng-model="link" id="{{id}}" class="ct-link" d="{{link.d}}"></path>           
@@ -313,12 +306,6 @@
             <p class="ct-ctrl fa fa-pencil-square-o" ng-click="editNode($event)"><span class="ct-tooltiptext">Edit Module</span></p>
             <p class="ct-ctrl fa fa-trash-o ct-ctrl-inactive" ng-click="deleteNode($event)"><span class="ct-tooltiptext"></span></p>
          </div>
-
-
-
-
-
-
          <svg id="ct-mapSvg" style="width: 100%; height: 100%;">
             <g id="ct-mindMap">
                 <path ng-repeat="(id,link) in linkDisplay" ng-model="link" id="{{id}}" class="ct-link" d="{{link.d}}"></path>           
