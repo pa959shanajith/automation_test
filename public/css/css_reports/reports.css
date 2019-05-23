@@ -270,6 +270,10 @@ body {
                     font-family: LatowebBold;
                     display: inline-block;
                 }
+                .colReportsWidth
+                {
+                    width: 50% !important;
+                }
                 .glyphicon
                 {
                         font-size: 17px;
