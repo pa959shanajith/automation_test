@@ -2174,6 +2174,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						} else $("#saveObjects").addClass('hide');
 					}
 
+					if('view' in  data)
+					{
+						if(data.view.length == 0)
+						{
+							$(".checkStylebox").prop('disabled', true);
+						}
+					}
+
 					if ($("#compareChangedObjectsBox").is(":visible") == true || $("#compareNotFoundObjectsBox").is(":visible") == true) {
 						$("#saveComparedObjects").show();
 					}

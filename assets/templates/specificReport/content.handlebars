@@ -1,1149 +1,1017 @@
 <html style="height: 100%;">
-<head>
-    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-    <title>SLK Nineteen68</title>
-    <link rel="stylesheet" type="text/css" href="fonts/latofonts.css" />
-    <link rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.css" />
-    <script type="text/javascript" src="js/plugins/jquery.min.js"></script>
-    <script type="text/javascript" src="js/plugins/reports/specificReport.js"></script>
-    <style>
-        .no-disp {
-            display: none!important;
-        }
-
-        .unexpand,
-        .expand {
-            cursor: pointer;
-        }
-        body {
-            font-family: LatoWeb;
-            height: 98%;
-            overflow: hidden;
-        }
-
-        .mainContainer {
-            border: 1px solid #B5AAAA;
-            margin: 4px;
-            float: left;
-            padding: 14px;
-            width: 97%;
-            height: calc(100% - 30px);
-        }
-
-        .hearderCon {
-            position: relative;
-            width: 100%;
-            float: left;
-            border: 1px solid #cfcfcf;
-            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
-            height: 50px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            font-size: 16px;
-            padding-top: 7px;
-        }
-
-        .headerRepDetails {
-            width: 50%;
-            padding: 3px 40px;
-        }
-
-        .headerRepDetails label {
-            text-align: right;
-            width: 29%;
-            font-size: 13px;
-        }
-
-        .headerRepDetails span {
-            width: 64%;
-            padding-bottom: 5px;
-            font-weight: bold;
-            font-size: 13px;
-        }
-
-        .h2Header {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        .leftSummary {
-            width: 50%;
-            float: left;
-            padding: 25px 0;
-            font-size: 14px;
-        }
-
-        .leftSummary label {
-            text-align: right;
-            float: left;
-            width: 29%;
-            padding-right: 5px;
-            padding-bottom: 5px;
-        }
-
-        .leftSummary span {
-            float: left;
-            width: 64%;
-            padding-bottom: 5px;
-            font-weight: bold;
-            word-break: break-all;
-        }
-
-        .summaryCon {
-            position: relative;
-            float: left;
-            width: 100%;
-            border: 1px solid #cfcfcf;
-            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
-            height: 38px;
-            border-radius: 5px;
-        }
-
-        .summaryCon span {
-            position: absolute;
-            top: 10px;
-            left: 40px;
-        }
-
-        .midSection {
-            float: left;
-            width: 100%;
-        }
-
-        .midContainer {
-            border-collapse: collapse;
-            border: 1px solid #cfcfcf;
-            width: 100%;
-            font: 14px cabin_Regular;
-            float: left;
-            margin: 0 0 1% 0;
-            font-family: LatoWeb;
-            font-size: 14px;
-        }
-
-        .midContainer td {
-            padding-top: 5px;
-            border: 1px solid #cfcfcf;
-        }
-
-        .midContainer td label {
-            text-align: right;
-            float: left;
-            width: 29%;
-            padding-right: 5px;
-            padding-bottom: 5px;
-        }
-
-        .reportsDetails {
-            border: 1px solid #cfcfcf;
-            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
-            font-size: 15px;
-        }
-
-        .reportsDetails tr {
-            height: 32px;
-        }
-
-        .reportsDetails th:nth-child(1) {
-            width: 3.2%;
-        }
-
-        .rDid {
-            width: 3.3% !important;
-            word-break: break-word;
-        }
-
-        .reportsDetails th:nth-child(2) {
-            /* width: 6.4%;*/
-            width: 16%;
-        }
-
-        .rDstep {
-            width: 16.5% !important;
-            word-break: break-word;
-        }
-
-        .reportsDetails th:nth-child(3) {
-            width: 15%;
-        }
-
-        .rDstepDes {
-            width: 15.5% !important;
-            word-break: break-word;
-        }
-
-        .reportsDetails th:nth-child(4) {
-            width: 9.6%;
-        }
-
-        .rDellaps {
-            width: 10% !important;
-            word-break: break-word;
-        }
-
-        .rDstatus {
-            width: 6.1% !important;
-            word-break: break-word;
-        }
-
-        .rDstatusLnk {
-            text-decoration: none !important;
-        }
-
-        .reportsDetails th:nth-child(5) {
-            width: 12.7%;
-            word-break: break-word;
-
-        }
-
-        .rDcomments {
-            width: 13%;
-            word-break: break-word;
-        }
-
-        .reportsDetails th:nth-child(6) {
-            width: 14.5%;
-
-        }
-
-        .rDremarks {
-            width: 14.9%;
-            word-break: break-word;
-        }
-
-        .reportsDetails th:nth-child(10) {
-            width: 5%;
-
-        }
-
-        .rjira {
-            width: 4.4%;
-            word-break: break-word;
-        }
-
-        .reportsDetails th:nth-child(7) {
-            width: 14.5%;
-
-        }
-
-        .rDExpectedRes {
-            width: 14.9%;
-            word-break: break-word;
-        }
-
-
-        .reportsDetails th:nth-child(8) {
-            width: 12%;
-
-        }
-
-        .rDActualRes {
-            width: 12.3%;
-            word-break: break-all;
-        }
-
-        .reportsDetails th:nth-child(9) {
-            width: 6.1%;
-        }
-
-        .maintabCont {
-            float: left;
-            width: 100%;
-            border: 1px solid #dcdcdc;
-            height: 50%;
-        }
-
-        .tabCont {
-            display: table-cell;
-            border-bottom: 1px solid #ececec;
-            border-right: 1px solid #ececec;
-            word-wrap: break-word;
-            word-break: break-all
-        }
-
-        .reportsDetail {
-            line-height: 2;
-            height: calc(100% - 35px);
-            overflow: auto;
-            font-size: 14px;
-        }
-
-        .openscreenshot {
-            cursor: pointer;
-        }
-
-        .openscreenshot:hover {
-            text-decoration: underline;
-        }
-
-        .progress {
-            margin-bottom: 20px;
-            overflow: hidden;
-            box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
-        }
-
-        .progress-bar {
-            float: left;
-            height: 100%;
-            font-size: 12px;
-            line-height: 20px;
-            color: #fff;
-            text-align: center;
-            box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .15);
-            transition: width .6s ease;
-        }
-
-        .reportStatusBlk {
-            float: left;
-            width: 100%;
-        }
-
-        .progresslabel {
-            float: left;
-            display: inline-block;
-            width: 15%;
-            padding-left: 14px;
-        }
-
-        .customprogress {
-            float: left;
-            width: 45% !important;
-            height: 12px;
-            border-radius: 8px;
-            margin-top: 3px;
-            background-color: #e0e0e0;
-        }
-
-        .customprogress .progress-bar {
-            border-radius: 20px;
-        }
-
-        .progress-bar-success {
-            background: linear-gradient(to right, #39b54a, #009444) !important;
-        }
-
-        .progress-bar-danger {
-            background: linear-gradient(to right, #d41e2d, #b31f2d) !important;
-        }
-
-        .progresspercentage {
-            margin-left: 20px;
-        }
-
-        .rightSummaryFunc {
-            width: 50%;
-            float: left;
-            margin-top: 80px;
-            font-size: 14px;
-        }
-
-        .progress-bar-warning {
-            background: linear-gradient(to right, #f7b91e, #faa536) !important;
-        }
-
-        .reportsDetail div.reportdetailsrow:nth-child(even) {
-            background: #f9f9f9;
-        }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            border-radius: 10px;
-            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
-        }
-
-        .logintojira,
-        .disconnectJira {
-            cursor: pointer;
-            float: left;
-            position: relative;
-            left: 134px;
-            border-radius: 3px;
-        }
-
-        .logintojira {
-            left: 34px;
-        }
-
-        .disconnectJira {
-            display: none;
-        }
-
-        .jiraWindow,
-        .createIssueWindow,
-        .statusWindow {
-            position: absolute;
-            width: 300px;
-            height: 200px;
-            display: inline-block;
-            top: 40%;
-            left: 38%;
-            border: 1px solid black;
-            background-color: white;
-            text-align: center;
-            z-index: 1001;
-            border-radius: 6px;
-        }
-
-        .jiraWindow {
-            width: 497px;
-            height: 240px;
-            left: 31%;
-        }
-
-        .jiraWindow .popupheader label {
-            position: relative;
-            top: 7px;
-            left: 10px;
-        }
-
-        .loginJiraCredentials,
-        .resetJiraCredentials {
-            width: 85px;
-            float: right;
-            margin-right: 28px;
-        }
-
-        .jiraWindow .error-msg {
-            float: left;
-            margin-left: 28px;
-            font-size: 14px;
-            color: red;
-        }
-
-        .statusWindow {
-            height: 130px;
-        }
-
-        .createIssueWindow {
-            width: 700px;
-            height: 630px;
-            top: 15%;
-            left: 22%;
-        }
-
-        .createIssueWindow p {
-            width: calc(100% - 43px);
-            float: left;
-            padding: 0 0 0 42px;
-            margin-top: 6px;
-            margin-bottom: 6px;
-        }
-
-        .createIssueWindow p:nth-child(2) {
-            margin-top: 12px;
-        }
-
-        .createIssueWindow p:nth-child(3) {
-            margin-bottom: 0;
-            padding-bottom: 6px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .createIssueWindow p:nth-child(4) {
-            margin-top: 6px;
-        }
-
-        .createIssueWindow p:nth-child(11) {
-            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 50%);
-            border-radius: 5px;
-            border-top: 1px solid #ccc;
-            height: 117px;
-            margin-bottom: 0;
-            position: relative;
-            bottom: calc(100% - 620px);
-        }
-
-        .createIssueWindow p label {
-            width: 112px;
-            text-align: right;
-            font-size: 15px;
-            position: relative;
-            right: 24px;
-        }
-
-        .createIssueWindow p label,
-        .createIssueWindow p select,
-        .createIssueWindow p textarea,
-        .createIssueWindow p input {
-            float: left;
-        }
-
-        .jirapopupinput {
-            width: 250px;
-            height: 28px;
-            border-radius: 4px;
-            border-style: groove;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        .jiraWindow .jirapopupinput {
-            width: calc(100% - 55px);
-            height: 28px;
-            border-radius: 4px;
-            border-style: groove;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        .popupheader {
-            width: 100%;
-            height: 30px;
-            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 60%);
-            ;
-            margin-bottom: 14px;
-            border-radius: 5px;
-        }
-
-        .createIssueWindow .popupheader {
-            height: 42px;
-            border-bottom: 1px solid #ccc;
-            margin-bottom: 12px;
-            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
-            border-radius: 5px;
-        }
-
-        .createIssueWindow .popupheader label {
-            float: left;
-            margin: 13px 0 0 18px;
-        }
-
-        .createIssueWindow .popupheader .closeWindow {
-            margin-top: 13px;
-            margin-right: 15px;
-        }
-
-        .closeWindow {
-            cursor: pointer;
-        }
-
-        .popupheader span {
-            float: right;
-            margin-top: 6px;
-            margin-right: 12px;
-        }
-
-        .statusWindow .popupheader label {
-            float: left;
-            margin: 6px 0 0 20px;
-        }
-
-        #jSummary,
-        #jDescription,
-        #jlabel {
-            width: 500px;
-            text-align: left;
-        }
-
-        /*#jAttachment{width: 95px;}*/
-
-        .createIssueWindow #scrnShotPath {
-            width: 406px;
-        }
-
-        #jDescription {
-            height: 130px;
-        }
-
-        #jDeadline {
-            text-align: left;
-        }
-
-        .createIssues,
-        .cancelIssues {
-            float: right;
-            margin-right: 45px;
-            width: 88px;
-            height: 26px;
-            margin-top: 14px;
-            border-radius: 5px;
-        }
-
-        .createIssues:hover,
-        .cancelIssues:hover {
-            color: white;
-            background-color: #3b73af;
-            border-style: none;
-        }
-
-        #overlay {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1000;
-            background-color: #333;
-            opacity: .80;
-        }
-
-        .mandatory {
-            color: red;
-            font-size: 17px;
-        }
-
-        .Llogdefect {
-            position: relative;
-            top: 5px;
-            left: 70px;
-            display: none;
-            z-index: -1;
-        }
-
-        #inputSlno {
-            border-radius: 3px;
-            border-style: groove;
-            width: 100px;
-            position: relative;
-            left: 72px;
-            display: none;
-        }
-
-        .go_defectlog {
-            position: relative;
-            left: 82px;
-            border-radius: 3px;
-            cursor: pointer;
-            bottom: 1px;
-            display: none;
-        }
-
-        @media screen and (max-height: 680px) {
-            .reportsDetail {
-                height: 174px;
-            }
-            .hearderCon {
-                height: 40px;
-            }
-            .headerRepDetails {
-                padding: 1px 40px;
-            }
-            .summaryCon {
-                height: 30px;
-            }
-            .summaryCon span {
-                top: 6px;
-            }
-            .leftSummary {
-                padding: 15px 0 6px 0;
-            }
-            .rightSummaryFunc {
-                margin-top: 74px;
-            }
-            .maintabCont {
-                height: 33%;
-            }
-            .reportsDetail {
-                height: 148px;
-            }
-        }
-
-        @media screen and (min-device-width: 1440px) and (max-device-height: 900px) {
-            .hearderCon {
-                height: 38px;
-            }
-            .summaryCon {
-                height: 30px;
-            }
-            .leftSummary {
-                padding: 15px 0;
-            }
-            .rightSummaryFunc {
-                margin-top: 72px;
-            }
-            .maintabCont {
-                height: 325px;
-            }
-            .headerRepDetails {
-                padding: 1px 40px;
-            }
-            .summaryCon span {
-                top: 6px;
-            }
-        }
-
-        @media screen and (min-height: 1000px) {
-            .hearderCon {
-                height: 35px !important;
-            }
-            .headerRepDetails {
-                padding: 0px 40px;
-            }
-            .summaryCon {
-                height: 28px;
-            }
-            .summaryCon span {
-                top: 5px;
-            }
-            .leftSummary {
-                padding: 18px 0;
-            }
-            .rightSummaryFunc {
-                margin-top: 76px;
-            }
-            .mainContainer>div:nth-child(4) {
-                margin-top: 258px !important;
-            }
-            .midContainer {
-                margin: -10px 0 6px 0;
-            }
-            .midContainer td {
-                padding-top: 3px;
-                padding-bottom: 0px;
-            }
-            .maintabCont {
-                height: 207px;
-            }
-            .reportsDetail {
-                height: 172px;
-            }
-        }
-
-        @media only screen and (height:768px) {
-            .hearderCon {
-                height: 40px !important;
-            }
-            .headerRepDetails {
-                padding: 1px 40px;
-            }
-            .summaryCon {
-                height: 28px;
-            }
-            .summaryCon span {
-                top: 5px;
-            }
-            .leftSummary {
-                padding: 18px 0;
-            }
-            .rightSummaryFunc {
-                margin-top: 76px;
-            }
-            .midContainer {
-                margin: -10px 0 6px 0;
-            }
-            .midContainer td {
-                padding-top: 3px;
-                padding-bottom: 0px;
-            }
-            .maintabCont {
-                height: 353px;
-            }
-            .reportsDetail {
-                height: 317px;
-            }
-        }
-
-        @media only screen and (height:790px) {
-            .reportStatus {
-                margin-top: 52px;
-            }
-            .hearderCon {
-                height: 35px;
-            }
-            .headerRepDetails {
-                padding: 0px 40px;
-            }
-            .summaryCon {
-                height: 28px !important;
-            }
-            .summaryCon span {
-                top: 5px !important;
-            }
-            .leftSummary {
-                padding: 12px 0 !important;
-            }
-            .rightSummaryFunc {
-                margin-top: 20px !important;
-            }
-            .midContainer {
-                margin: 0 0 7px 0 !important;
-            }
-        }
-
-        #overlayContainer {
-            position: fixed;
-            background-color: rgba(0, 0, 0, 0.85);
-            -moz-background-color: rgba(0, 0, 0, 0.85);
-            -webkit-background-color: rgba(0, 0, 0, 0.85);
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            cursor: wait;
-            z-index: 10001;
-            display: none
-        }
-
-        .contentOverlay {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translateX(-50%) translateY(-50%);
-            -moz-transform: translateX(-50%) translateY(-50%);
-            -webkit-transform: translateX(-50%) translateY(-50%);
-            background: #fff;
-            padding: 10px 20px;
-            border-radius: 5px;
-            -moz-border-radius: 5px;
-            -webkit-border-radius: 5px;
-            cursor: auto;
-            color: #461F6E;
-            font-family: LatoWebBold;
-        }
-
-        .reportsDetails th,
-        .reportdetailsrow div {
-            text-align: left !important;
-            padding: 2px;
-        }
-
-        .collapsible {
-
-            color: black;
-            cursor: pointer;
-
-            width: 100%;
-            border: 1px solid #cfcfcf;
-            text-align: left;
-            outline: none;
-            font-size: 15px;
-            border-radius: 5px;
-            height: 40px;
-            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
-        }
-
-        .active,
-        .collapsible:hover {
-            background-color: #555;
-
-            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
-        }
-
-        .content {
-            padding: 0 18px;
-            display: block;
-            overflow: hidden;
-            transition: max-height 0.2s ease-out;
-            background-color: #f1f1f1;
-        }
-
-        .hide {
-            display: none;
-        }
-
-        .scroll-table-container {
-            /* border: 2px solid green; */
-            height: 89%;
-            width: 100%;
-            overflow-y: scroll;
-            box-sizing: border-box;
-
-            border: 1px solid #dcdcdc;
-        }
-
-        .scroll-table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-
-        /* width */
-
-        ::-webkit-scrollbar {
-            width: 10px;
-        } // style for scroll bar
-        /* Track */
-
-        ::-webkit-scrollbar-track {
-            box-shadow: inset 0 0 5px grey;
-            border-radius: 10px;
-        }
-
-        /* Handle */
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
-            border-radius: 10px;
-        }
-
-        /* Handle on hover */
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
-        }
-
-        .arrow-down {
-            height: 0px;
-            width: 0px;
-            border: none;
-            border-top: 7px solid #000000;
-            border-left: 6px solid rgba(0, 0, 0, 0);
-            border-right: 6px solid rgba(0, 0, 0, 0);
-            float: left;
-            position: absolute;
-            left: -20px;
-            top: 4px;
-            cursor: pointer;
-        }
-
-        .arrow-up {
-            width: 0;
-            height: 0;
-            border-top: 5px solid transparent;
-            border-bottom: 7px solid transparent;
-            border-left: 9px solid #000;
-            float: left;
-            position: absolute;
-            left: -16px;
-            top: 3px;
-            cursor: pointer;
-        }
-
-        .arrow-down-sm {
-            display: inline;
-            height: 0px;
-            width: 0px;
-            border: none;
-            border-top: 5px solid #000000;
-            border-left: 5px solid rgba(0, 0, 0, 0);
-            border-right: 5px solid rgba(0, 0, 0, 0);
-            position: relative;
-            left: -2px;
-            top: 9px;
-            float: left;
-            cursor: pointer;
-        }
-
-        .arrow-up-sm {
-            width: 0;
-            height: 0;
-            border-top: 5px solid transparent;
-            border-bottom: 5px solid transparent;
-            border-left: 5px solid #000;
-            float: left;
-            position: relative;
-            top: 8px;
-            left: 0px;
-            cursor: pointer;
-        }
-
-        .maintabContCollapsed {
-            height: calc(100% - 75px);
-        }
-    </style>
-</head>
-
-<body>
-
-    <div class="mainContainer">
-        <span class='hide remarksLength'>{{remarksLength}}</span>
-        <span class='hide commentsLength'>{{commentsLength}}</span>
-        {{#each overallstatus}}
-        <div class="hearderCon">
+   <head>
+      <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+      <title>SLK Nineteen68</title>
+      <link rel="stylesheet" type="text/css" href="fonts/latofonts.css" />
+      <link rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.css" />
+      <script type="text/javascript" src="js/plugins/jquery.min.js"></script>
+      <script type="text/javascript" src="js/plugins/reports/specificReport.js"></script>
+      <style>
+         .no-disp {
+         display: none!important;
+         }
+         .unexpand,
+         .expand {
+         cursor: pointer;
+         }
+         body {
+         font-family: LatoWeb;
+         height: 98%;
+         overflow: hidden;
+         }
+         .mainContainer {
+         border: 1px solid #B5AAAA;
+         margin: 4px;
+         float: left;
+         padding: 14px;
+         width: 97%;
+         height: calc(100% - 30px);
+         }
+         .hearderCon {
+         position: relative;
+         width: 100%;
+         float: left;
+         border: 1px solid #cfcfcf;
+         background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+         height: 50px;
+         margin-bottom: 10px;
+         border-radius: 5px;
+         font-size: 16px;
+         padding-top: 7px;
+         }
+         .headerRepDetails {
+         width: 50%;
+         padding: 3px 40px;
+         }
+         .headerRepDetails label {
+         text-align: right;
+         width: 29%;
+         font-size: 13px;
+         }
+         .headerRepDetails span {
+         width: 64%;
+         padding-bottom: 5px;
+         font-weight: bold;
+         font-size: 13px;
+         }
+         .h2Header {
+         position: absolute;
+         top: 50%;
+         left: 50%;
+         transform: translate(-50%, -50%);
+         }
+         .leftSummary {
+         width: 50%;
+         float: left;
+         padding: 25px 0;
+         font-size: 14px;
+         }
+         .leftSummary label {
+         text-align: right;
+         float: left;
+         width: 29%;
+         padding-right: 5px;
+         padding-bottom: 5px;
+         }
+         .leftSummary span {
+         float: left;
+         width: 64%;
+         padding-bottom: 5px;
+         font-weight: bold;
+         word-break: break-all;
+         }
+         .summaryCon {
+         position: relative;
+         float: left;
+         width: 100%;
+         border: 1px solid #cfcfcf;
+         background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+         height: 38px;
+         border-radius: 5px;
+         }
+         .summaryCon span {
+         position: absolute;
+         top: 10px;
+         left: 40px;
+         }
+         .midSection {
+         float: left;
+         width: 100%;
+         }
+         .midContainer {
+         border-collapse: collapse;
+         border: 1px solid #cfcfcf;
+         width: 100%;
+         font: 14px cabin_Regular;
+         float: left;
+         margin: 0 0 1% 0;
+         font-family: LatoWeb;
+         font-size: 14px;
+         }
+         .midContainer td {
+         padding-top: 5px;
+         border: 1px solid #cfcfcf;
+         }
+         .midContainer td label {
+         text-align: right;
+         float: left;
+         width: 29%;
+         padding-right: 5px;
+         padding-bottom: 5px;
+         }
+         .reportsDetails {
+         border: 1px solid #cfcfcf;
+         background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+         font-size: 15px;
+         }
+         .reportsDetails tr {
+         height: 32px;
+         }
+         .reportsDetails th:nth-child(1) {
+         width: 3.2%;
+         }
+         .rDid {
+         width: 3.3% !important;
+         word-break: break-word;
+         }
+         .reportsDetails th:nth-child(2) {
+         width: 16%;
+         }
+         .rDstep {
+         width: 16.5% !important;
+         word-break: break-word;
+         }
+         .reportsDetails th:nth-child(3) {
+         width: 15%;
+         }
+         .rDstepDes {
+         width: 15.5% !important;
+         word-break: break-word;
+         }
+         .reportsDetails th:nth-child(4) {
+         width: 9.6%;
+         }
+         .rDellaps {
+         width: 10% !important;
+         word-break: break-word;
+         }
+         .rDstatus {
+         width: 6.1% !important;
+         word-break: break-word;
+         }
+         .rDstatusLnk {
+         text-decoration: none !important;
+         }
+         .reportsDetails th:nth-child(5) {
+         width: 12.7%;
+         word-break: break-word;
+         }
+         .rDcomments {
+         width: 13%;
+         word-break: break-word;
+         }
+         .reportsDetails th:nth-child(6) {
+         width: 14.5%;
+         }
+         .rDremarks {
+         width: 14.9%;
+         word-break: break-word;
+         }
+         .reportsDetails th:nth-child(10) {
+         width: 5%;
+         }
+         .rjira {
+         width: 4.4%;
+         word-break: break-word;
+         }
+         .reportsDetails th:nth-child(7) {
+         width: 14.5%;
+         }
+         .rDExpectedRes {
+         width: 14.9%;
+         word-break: break-word;
+         }
+         .reportsDetails th:nth-child(8) {
+         width: 12%;
+         }
+         .rDActualRes {
+         width: 12.3%;
+         word-break: break-all;
+         }
+         .reportsDetails th:nth-child(9) {
+         width: 6.1%;
+         }
+         .maintabCont {
+         float: left;
+         width: 100%;
+         border: 1px solid #dcdcdc;
+         height: 50%;
+         }
+         .tabCont {
+         display: table-cell;
+         border-bottom: 1px solid #ececec;
+         border-right: 1px solid #ececec;
+         word-wrap: break-word;
+         word-break: break-all
+         }
+         .reportsDetail {
+         line-height: 2;
+         height: calc(100% - 35px);
+         overflow: auto;
+         font-size: 14px;
+         }
+         .openscreenshot {
+         cursor: pointer;
+         }
+         .openscreenshot:hover {
+         text-decoration: underline;
+         }
+         .progress {
+         margin-bottom: 20px;
+         overflow: hidden;
+         box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+         }
+         .progress-bar {
+         float: left;
+         height: 100%;
+         font-size: 12px;
+         line-height: 20px;
+         color: #fff;
+         text-align: center;
+         box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .15);
+         transition: width .6s ease;
+         }
+         .reportStatusBlk {
+         float: left;
+         width: 100%;
+         }
+         .progresslabel {
+         float: left;
+         display: inline-block;
+         width: 15%;
+         padding-left: 14px;
+         }
+         .customprogress {
+         float: left;
+         width: 45% !important;
+         height: 12px;
+         border-radius: 8px;
+         margin-top: 3px;
+         background-color: #e0e0e0;
+         }
+         .customprogress .progress-bar {
+         border-radius: 20px;
+         }
+         .progress-bar-success {
+         background: linear-gradient(to right, #39b54a, #009444) !important;
+         }
+         .progress-bar-danger {
+         background: linear-gradient(to right, #d41e2d, #b31f2d) !important;
+         }
+         .progresspercentage {
+         margin-left: 20px;
+         }
+         .rightSummaryFunc {
+         width: 50%;
+         float: left;
+         margin-top: 80px;
+         font-size: 14px;
+         }
+         .progress-bar-warning {
+         background: linear-gradient(to right, #f7b91e, #faa536) !important;
+         }
+         .reportsDetail div.reportdetailsrow:nth-child(even) {
+         background: #f9f9f9;
+         }
+         ::-webkit-scrollbar {
+         width: 8px;
+         }
+         ::-webkit-scrollbar-track {
+         -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+         border-radius: 4px;
+         }
+         ::-webkit-scrollbar-thumb {
+         border-radius: 10px;
+         -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+         }
+         .logintojira,
+         .disconnectJira {
+         cursor: pointer;
+         float: left;
+         position: relative;
+         left: 134px;
+         border-radius: 3px;
+         }
+         .logintojira {
+         left: 34px;
+         }
+         .disconnectJira {
+         display: none;
+         }
+         .jiraWindow,
+         .createIssueWindow,
+         .statusWindow {
+         position: absolute;
+         width: 300px;
+         height: 200px;
+         display: inline-block;
+         top: 40%;
+         left: 38%;
+         border: 1px solid black;
+         background-color: white;
+         text-align: center;
+         z-index: 1001;
+         border-radius: 6px;
+         }
+         .jiraWindow {
+         width: 497px;
+         height: 240px;
+         left: 31%;
+         }
+         .jiraWindow .popupheader label {
+         position: relative;
+         top: 7px;
+         left: 10px;
+         }
+         .loginJiraCredentials,
+         .resetJiraCredentials {
+         width: 85px;
+         float: right;
+         margin-right: 28px;
+         }
+         .jiraWindow .error-msg {
+         float: left;
+         margin-left: 28px;
+         font-size: 14px;
+         color: red;
+         }
+         .statusWindow {
+         height: 130px;
+         }
+         .createIssueWindow {
+         width: 700px;
+         height: 630px;
+         top: 15%;
+         left: 22%;
+         }
+         .createIssueWindow p {
+         width: calc(100% - 43px);
+         float: left;
+         padding: 0 0 0 42px;
+         margin-top: 6px;
+         margin-bottom: 6px;
+         }
+         .createIssueWindow p:nth-child(2) {
+         margin-top: 12px;
+         }
+         .createIssueWindow p:nth-child(3) {
+         margin-bottom: 0;
+         padding-bottom: 6px;
+         border-bottom: 1px solid #ddd;
+         }
+         .createIssueWindow p:nth-child(4) {
+         margin-top: 6px;
+         }
+         .createIssueWindow p:nth-child(11) {
+         background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 50%);
+         border-radius: 5px;
+         border-top: 1px solid #ccc;
+         height: 117px;
+         margin-bottom: 0;
+         position: relative;
+         bottom: calc(100% - 620px);
+         }
+         .createIssueWindow p label {
+         width: 112px;
+         text-align: right;
+         font-size: 15px;
+         position: relative;
+         right: 24px;
+         }
+         .createIssueWindow p label,
+         .createIssueWindow p select,
+         .createIssueWindow p textarea,
+         .createIssueWindow p input {
+         float: left;
+         }
+         .jirapopupinput {
+         width: 250px;
+         height: 28px;
+         border-radius: 4px;
+         border-style: groove;
+         text-align: center;
+         margin-bottom: 10px;
+         }
+         .jiraWindow .jirapopupinput {
+         width: calc(100% - 55px);
+         height: 28px;
+         border-radius: 4px;
+         border-style: groove;
+         text-align: center;
+         margin-bottom: 15px;
+         }
+         .popupheader {
+         width: 100%;
+         height: 30px;
+         background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 60%);
+         ;
+         margin-bottom: 14px;
+         border-radius: 5px;
+         }
+         .createIssueWindow .popupheader {
+         height: 42px;
+         border-bottom: 1px solid #ccc;
+         margin-bottom: 12px;
+         background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+         border-radius: 5px;
+         }
+         .createIssueWindow .popupheader label {
+         float: left;
+         margin: 13px 0 0 18px;
+         }
+         .createIssueWindow .popupheader .closeWindow {
+         margin-top: 13px;
+         margin-right: 15px;
+         }
+         .closeWindow {
+         cursor: pointer;
+         }
+         .popupheader span {
+         float: right;
+         margin-top: 6px;
+         margin-right: 12px;
+         }
+         .statusWindow .popupheader label {
+         float: left;
+         margin: 6px 0 0 20px;
+         }
+         #jSummary,
+         #jDescription,
+         #jlabel {
+         width: 500px;
+         text-align: left;
+         }
+         .createIssueWindow #scrnShotPath {
+         width: 406px;
+         }
+         #jDescription {
+         height: 130px;
+         }
+         #jDeadline {
+         text-align: left;
+         }
+         .createIssues,
+         .cancelIssues {
+         float: right;
+         margin-right: 45px;
+         width: 88px;
+         height: 26px;
+         margin-top: 14px;
+         border-radius: 5px;
+         }
+         .createIssues:hover,
+         .cancelIssues:hover {
+         color: white;
+         background-color: #3b73af;
+         border-style: none;
+         }
+         #overlay {
+         display: none;
+         position: absolute;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;
+         z-index: 1000;
+         background-color: #333;
+         opacity: .80;
+         }
+         .mandatory {
+         color: red;
+         font-size: 17px;
+         }
+         .Llogdefect {
+         position: relative;
+         top: 5px;
+         left: 70px;
+         display: none;
+         z-index: -1;
+         }
+         #inputSlno {
+         border-radius: 3px;
+         border-style: groove;
+         width: 100px;
+         position: relative;
+         left: 72px;
+         display: none;
+         }
+         .go_defectlog {
+         position: relative;
+         left: 82px;
+         border-radius: 3px;
+         cursor: pointer;
+         bottom: 1px;
+         display: none;
+         }
+         @media screen and (max-height: 680px) {
+         .reportsDetail {
+         height: 174px;
+         }
+         .hearderCon {
+         height: 40px;
+         }
+         .headerRepDetails {
+         padding: 1px 40px;
+         }
+         .summaryCon {
+         height: 30px;
+         }
+         .summaryCon span {
+         top: 6px;
+         }
+         .leftSummary {
+         padding: 15px 0 6px 0;
+         }
+         .rightSummaryFunc {
+         margin-top: 74px;
+         }
+         .maintabCont {
+         height: 33%;
+         }
+         .reportsDetail {
+         height: 148px;
+         }
+         }
+         @media screen and (min-device-width: 1440px) and (max-device-height: 900px) {
+         .hearderCon {
+         height: 38px;
+         }
+         .summaryCon {
+         height: 30px;
+         }
+         .leftSummary {
+         padding: 15px 0;
+         }
+         .rightSummaryFunc {
+         margin-top: 72px;
+         }
+         .maintabCont {
+         height: 325px;
+         }
+         .headerRepDetails {
+         padding: 1px 40px;
+         }
+         .summaryCon span {
+         top: 6px;
+         }
+         }
+         @media screen and (min-height: 1000px) {
+         .hearderCon {
+         height: 35px !important;
+         }
+         .headerRepDetails {
+         padding: 0px 40px;
+         }
+         .summaryCon {
+         height: 28px;
+         }
+         .summaryCon span {
+         top: 5px;
+         }
+         .leftSummary {
+         padding: 18px 0;
+         }
+         .rightSummaryFunc {
+         margin-top: 76px;
+         }
+         .mainContainer>div:nth-child(4) {
+         margin-top: 258px !important;
+         }
+         .midContainer {
+         margin: -10px 0 6px 0;
+         }
+         .midContainer td {
+         padding-top: 3px;
+         padding-bottom: 0px;
+         }
+         .maintabCont {
+         height: 207px;
+         }
+         .reportsDetail {
+         height: 172px;
+         }
+         }
+         @media only screen and (height:768px) {
+         .hearderCon {
+         height: 40px !important;
+         }
+         .headerRepDetails {
+         padding: 1px 40px;
+         }
+         .summaryCon {
+         height: 28px;
+         }
+         .summaryCon span {
+         top: 5px;
+         }
+         .leftSummary {
+         padding: 18px 0;
+         }
+         .rightSummaryFunc {
+         margin-top: 76px;
+         }
+         .midContainer {
+         margin: -10px 0 6px 0;
+         }
+         .midContainer td {
+         padding-top: 3px;
+         padding-bottom: 0px;
+         }
+         .maintabCont {
+         height: 353px;
+         }
+         .reportsDetail {
+         height: 317px;
+         }
+         }
+         @media only screen and (height:790px) {
+         .reportStatus {
+         margin-top: 52px;
+         }
+         .hearderCon {
+         height: 35px;
+         }
+         .headerRepDetails {
+         padding: 0px 40px;
+         }
+         .summaryCon {
+         height: 28px !important;
+         }
+         .summaryCon span {
+         top: 5px !important;
+         }
+         .leftSummary {
+         padding: 12px 0 !important;
+         }
+         .rightSummaryFunc {
+         margin-top: 20px !important;
+         }
+         .midContainer {
+         margin: 0 0 7px 0 !important;
+         }
+         }
+         #overlayContainer {
+         position: fixed;
+         background-color: rgba(0, 0, 0, 0.85);
+         -moz-background-color: rgba(0, 0, 0, 0.85);
+         -webkit-background-color: rgba(0, 0, 0, 0.85);
+         width: 100%;
+         height: 100%;
+         top: 0;
+         left: 0;
+         cursor: wait;
+         z-index: 10001;
+         display: none
+         }
+         .contentOverlay {
+         position: absolute;
+         left: 50%;
+         top: 50%;
+         transform: translateX(-50%) translateY(-50%);
+         -moz-transform: translateX(-50%) translateY(-50%);
+         -webkit-transform: translateX(-50%) translateY(-50%);
+         background: #fff;
+         padding: 10px 20px;
+         border-radius: 5px;
+         -moz-border-radius: 5px;
+         -webkit-border-radius: 5px;
+         cursor: auto;
+         color: #461F6E;
+         font-family: LatoWebBold;
+         }
+         .reportsDetails th,
+         .reportdetailsrow div {
+         text-align: left !important;
+         padding: 2px;
+         }
+         .collapsible {
+         color: black;
+         cursor: pointer;
+         width: 100%;
+         border: 1px solid #cfcfcf;
+         text-align: left;
+         outline: none;
+         font-size: 15px;
+         border-radius: 5px;
+         height: 40px;
+         background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+         }
+         .active,
+         .collapsible:hover {
+         background-color: #555;
+         background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+         }
+         .content {
+         padding: 0 18px;
+         display: block;
+         overflow: hidden;
+         transition: max-height 0.2s ease-out;
+         background-color: #f1f1f1;
+         }
+         .hide {
+         display: none;
+         }
+         .scroll-table-container {
+         height: 89%;
+         width: 100%;
+         overflow-y: scroll;
+         box-sizing: border-box;
+         border: 1px solid #dcdcdc;
+         }
+         .scroll-table {
+         border-collapse: collapse;
+         width: 100%;
+         }
+         /* width */
+         ::-webkit-scrollbar {
+         width: 10px;
+         } // style for scroll bar
+         /* Track */
+         ::-webkit-scrollbar-track {
+         box-shadow: inset 0 0 5px grey;
+         border-radius: 10px;
+         }
+         /* Handle */
+         ::-webkit-scrollbar-thumb {
+         background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+         border-radius: 10px;
+         }
+         /* Handle on hover */
+         ::-webkit-scrollbar-thumb:hover {
+         background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+         }
+         .arrow-down {
+         height: 0px;
+         width: 0px;
+         border: none;
+         border-top: 7px solid #000000;
+         border-left: 6px solid rgba(0, 0, 0, 0);
+         border-right: 6px solid rgba(0, 0, 0, 0);
+         float: left;
+         position: absolute;
+         left: -20px;
+         top: 4px;
+         cursor: pointer;
+         }
+         .arrow-up {
+         width: 0;
+         height: 0;
+         border-top: 5px solid transparent;
+         border-bottom: 7px solid transparent;
+         border-left: 9px solid #000;
+         float: left;
+         position: absolute;
+         left: -16px;
+         top: 3px;
+         cursor: pointer;
+         }
+         .arrow-down-sm {
+         display: inline;
+         height: 0px;
+         width: 0px;
+         border: none;
+         border-top: 5px solid #000000;
+         border-left: 5px solid rgba(0, 0, 0, 0);
+         border-right: 5px solid rgba(0, 0, 0, 0);
+         position: relative;
+         left: -2px;
+         top: 9px;
+         float: left;
+         cursor: pointer;
+         }
+         .arrow-up-sm {
+         width: 0;
+         height: 0;
+         border-top: 5px solid transparent;
+         border-bottom: 5px solid transparent;
+         border-left: 5px solid #000;
+         float: left;
+         position: relative;
+         top: 8px;
+         left: 0px;
+         cursor: pointer;
+         }
+         .maintabContCollapsed {
+         height: calc(100% - 75px);
+         }
+      </style>
+   </head>
+   <body>
+      <div class="mainContainer">
+         <span class='hide remarksLength'>{{remarksLength}}</span>
+         <span class='hide commentsLength'>{{commentsLength}}</span>
+         {{#each overallstatus}}
+         <div class="hearderCon">
             <div class="headerRepDetails">
-                <label>Report Generated Date : </label>
-                <span>{{date}}</span>
+               <label>Report Generated Date : </label>
+               <span>{{date}}</span>
             </div>
             <div class="headerRepDetails">
-                <label>Report Generated Time : </label>
-                <span>{{time}}</span>
+               <label>Report Generated Time : </label>
+               <span>{{time}}</span>
             </div>
             <div class="h2Header">
-                <h4>SLK Nineteen68 Execution Report</h4>
+               <h4>SLK Nineteen68 Execution Report</h4>
             </div>
-        </div>
-        <button class="collapsible">
-            <span style="left: 40px;position: relative">
-                <span class="arrow-down"></span>Result Summary</span>
-        </button>
-        <div style="width: 100%;">
+         </div>
+         <button class="collapsible">
+         <span style="left: 40px;position: relative">
+         <span class="arrow-down"></span>Result Summary</span>
+         </button>
+         <div style="width: 100%;">
             <div class="leftSummary">
-                <label>Scenario :</label>
-                <span>{{scenarioName}}</span>
-                <label>Cycle :</label>
-                <span>{{cycleName}}</span>
-                <label>Release :</label>
-                <span>{{releaseName}}</span>
-                <label>Project :</label>
-                <span>{{projectName}}</span>
-                <label>Domain :</label>
-                <span>{{domainName}}</span>
-                <label>Browser Type :</label>
-                <span>{{browserType}}</span>
-                <label>Browser Version :</label>
-                <span>{{browserVersion}}</span>
-                <span style='visibility:hidden' class="reportId">{{reportId}}</span>
-                <span style='visibility:hidden' class="executionId">{{executionId}}</span>
+               <label>Scenario :</label>
+               <span>{{scenarioName}}</span>
+               <label>Cycle :</label>
+               <span>{{cycleName}}</span>
+               <label>Release :</label>
+               <span>{{releaseName}}</span>
+               <label>Project :</label>
+               <span>{{projectName}}</span>
+               <label>Domain :</label>
+               <span>{{domainName}}</span>
+               <label>Browser Type :</label>
+               <span>{{browserType}}</span>
+               <label>Browser Version :</label>
+               <span>{{browserVersion}}</span>
+               <span style='visibility:hidden' class="reportId">{{reportId}}</span>
+               <span style='visibility:hidden' class="executionId">{{executionId}}</span>
             </div>
             <div id="rightSummaryFunc" class="rightSummaryFunc">
-                <div class="reportStatus">
-                    <div class="reportStatusBlk">
-                        <span class="progresslabel">Pass</span>
-                        <div class="progress customprogress">
-                            <span class="progress-bar progress-bar-success" style="width: {{pass}}%" role="progressbar"></span>
-                        </div>
-                        <span class="progresspercentage">{{pass}} %</span>
-                    </div>
-                    <div class="reportStatusBlk">
-                        <span class="progresslabel">Fail</span>
-                        <div class="progress customprogress">
-                            <span class="progress-bar progress-bar-danger" style="width: {{fail}}%" role="progressbar"></span>
-                        </div>
-                        <span class="progresspercentage">{{fail}} %</span>
-                    </div>
-                    <div class="reportStatusBlk">
-                        <span class="progresslabel">Terminated</span>
-                        <div class="progress customprogress">
-                            <span class="progress-bar progress-bar-warning" style="width: {{terminate}}%" role="progressbar"></span>
-                        </div>
-                        <span class="progresspercentage">{{terminate}} %</span>
-                    </div>
-                </div>
+               <div class="reportStatus">
+                  <div class="reportStatusBlk">
+                     <span class="progresslabel">Pass</span>
+                     <div class="progress customprogress">
+                        <span class="progress-bar progress-bar-success" style="width: {{pass}}%" role="progressbar"></span>
+                     </div>
+                     <span class="progresspercentage">{{pass}} %</span>
+                  </div>
+                  <div class="reportStatusBlk">
+                     <span class="progresslabel">Fail</span>
+                     <div class="progress customprogress">
+                        <span class="progress-bar progress-bar-danger" style="width: {{fail}}%" role="progressbar"></span>
+                     </div>
+                     <span class="progresspercentage">{{fail}} %</span>
+                  </div>
+                  <div class="reportStatusBlk">
+                     <span class="progresslabel">Terminated</span>
+                     <div class="progress customprogress">
+                        <span class="progress-bar progress-bar-warning" style="width: {{terminate}}%" role="progressbar"></span>
+                     </div>
+                     <span class="progresspercentage">{{terminate}} %</span>
+                  </div>
+               </div>
             </div>
-        </div>
-        <div class="midSection">
+         </div>
+         <div class="midSection">
             <table cellpadding="3" cellspacing="0" class="midContainer" id="staustable">
-                <tbody>
-                    <tr>
-                        <td>
-                            <label>Start Date and Time :</label>
-                            <span id="startTime">
-                                <b>{{StartTime}}</b>
-                            </span>
-                        </td>
-                        <td rowspan="2">
-                            <label>Status :</label>
-                            <span id="overAllStat" style="color:{{getColor overAllStatus}}">
-                                <span></span>
-                                <b>{{overAllStatus}}</b>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label>End Date and Time :</label>
-                            <span id="endTime">
-                                <b>{{EndTime}}</b>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label>Elapsed Time :</label>
-                            <span id="elapsedTime">
-                                <b>{{EllapsedTime}}</b>
-                            </span>
-                        </td>
-                        <td>
-                            <button class="logintojira" title="Login to Jira">Jira Login</button>
-                            <button class="disconnectJira" title="Disconnect from Jira">Disconnect</button>
-                            <label class="Llogdefect">Log Defect</label>
-                            <input type="text" id="inputSlno" placeholder="Enter SL No." maxlength="5" />
-                            <button class="go_defectlog opendescpopup">Go</button>
-                        </td>
-                    </tr>
-                </tbody>
+               <tbody>
+                  <tr>
+                     <td>
+                        <label>Start Date and Time :</label>
+                        <span id="startTime">
+                        <b>{{StartTime}}</b>
+                        </span>
+                     </td>
+                     <td rowspan="2">
+                        <label>Status :</label>
+                        <span id="overAllStat" style="color:{{getColor overAllStatus}}">
+                        <span></span>
+                        <b>{{overAllStatus}}</b>
+                        </span>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td>
+                        <label>End Date and Time :</label>
+                        <span id="endTime">
+                        <b>{{EndTime}}</b>
+                        </span>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td>
+                        <label>Elapsed Time :</label>
+                        <span id="elapsedTime">
+                        <b>{{EllapsedTime}}</b>
+                        </span>
+                     </td>
+                     <td>
+                        <button class="logintojira" title="Login to Jira">Jira Login</button>
+                        <button class="disconnectJira" title="Disconnect from Jira">Disconnect</button>
+                        <label class="Llogdefect">Log Defect</label>
+                        <input type="text" id="inputSlno" placeholder="Enter SL No." maxlength="5" />
+                        <button class="go_defectlog opendescpopup">Go</button>
+                     </td>
+                  </tr>
+               </tbody>
             </table>
-        </div>
-        {{/each}}
-        <div class="maintabCont" style='height:45%'>
+         </div>
+         {{/each}}
+         <div class="maintabCont" style='height:45%'>
             <table style="width: 100%;table-layout: fixed;">
-                <thead class="reportsDetails">
-                    <th>Sl No.</th>
-                    <th>Test Step No.</th>
-                    <th style="display:none">Test Step Description</th>
-                    <th>Elapsed Time</th>
-                    <th class='toggleComments'>Comments</th>
-                    <th class='toggleRemarks'>Remarks</th>
-                    <th>Expected Result</th>
-                    <th>Actual Result</th>
-                    <th style="display:none">Status</th>
-                    <th>JIRA Defect ID</th>
-                    {{!--
-                    <th>Expected Result</th> --}}
-                </thead>
+               <thead class="reportsDetails">
+                  <th>Sl No.</th>
+                  <th>Test Step No.</th>
+                  <th style="display:none">Test Step Description</th>
+                  <th>Elapsed Time</th>
+                  <th class='toggleComments'>Comments</th>
+                  <th class='toggleRemarks'>Remarks</th>
+                  <th>Expected Result</th>
+                  <th>Actual Result</th>
+                  <th style="display:none">Status</th>
+                  <th>JIRA Defect ID</th>
+                  {{!--
+                  <th>Expected Result</th>
+                  --}}
+               </thead>
             </table>
             <div class="scroll-table-container">
-                <table class="scroll-table">
-                    <tbody class="reportsDetail">
-                        {{#each rows}}
-                        <tr style="width: 100%;" class="reportdetailsrow" data-id="{{id}}" data-parentid="{{parentId}}">
-                            <td class="rDid tabCont">{{slno}}</td>
-                            <td class="rDstep tabCont iteration">{{Step}}</td>
-                            <td class="{{getClass StepDescription}}" style="display:none; padding-left: 10px; font-weight:{{getStyle StepDescription}}">{{StepDescription}}</td>
-                            <td class="rDellaps tabCont">{{EllapsedTime}}</td>
-                            <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td>
-                            <td class="rDremarks tabCont toggleRemarks" style="padding-left: 10px;">{{Remark}}</td>
-                            {{#ifEquals testcase_details.testcaseDetails undefined}}
-                            <td class="rDExpectedRes tabCont {{getClass StepDescription}}">{{StepDescription}}</td>
-                            {{/ifEquals}} {{#ifEquals testcase_details.testcaseDetails ""}}
-                            <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
-                            {{/ifEquals}} {{#ifnotEquals testcase_details.testcaseDetails ""}} {{#ifnotEquals testcase_details undefined}}
-                            <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}
-                                <br/>Expected Result is: {{testcase_details.testcaseDetails}}</td>
-                            {{/ifnotEquals}} {{/ifnotEquals}} {{#ifEquals status undefined}}
-                            <td class="rDActualRes tabCont"></td>
-                            {{/ifEquals}} {{#ifEquals status ""}}
-                            <td class="rDActualRes tabCont"></td>
-                            {{/ifEquals}} {{#ifEquals status "Pass"}} {{#ifEquals testcase_details.actualResult_pass ""}}
-                            <td class="rDActualRes tabCont" style="padding-left: 10px;">
-                                {{#ifEquals screenshot_path undefined}}
-                                <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};">{{status}}</text>
-                                {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
-                                <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text>
-                                {{/ifnotEquals}}
-                            </td>
-                            {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_pass ""}}
-                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}}, {{#ifEquals screenshot_path undefined}}
-                                <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};">{{status}}</text>
-                                {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
-                                <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text>
-                                {{/ifnotEquals}}
-                            </td>
-                            {{/ifnotEquals}} {{/ifEquals}} {{#ifEquals status "Fail"}} {{#ifEquals testcase_details.actualResult_fail ""}}
-                            <td class="rDActualRes tabCont" style="padding-left: 10px;">
-                                {{#ifEquals screenshot_path undefined}}
-                                <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};">{{status}}</text>
-                                {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
-                                <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text>
-                                {{/ifnotEquals}}
-                            </td>
-                            {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_fail ""}}
-                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}, {{#ifEquals screenshot_path undefined}}
-                                <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};">{{status}}</text>
-                                {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
-                                <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text>
-                                {{/ifnotEquals}}
-                            </td>
-                            {{/ifnotEquals}} {{/ifEquals}}
-                            <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}}; display:none" data-screenshot="{{screenshot_path}}">{{status}}</td>
-                            <td class="rjira tabCont">
-                                <span class="opendescpopup" title="Create Issue">{{jira_defect_id}}</span>
-                            </td>
-                            <td class='hide hideStep'>{{hidestep}}</td>
-                        </tr>
-                        {{/each}}
-                    </tbody>
-                </table>
+               <table class="scroll-table">
+                  <tbody class="reportsDetail">
+                     {{#each rows}}
+                     <tr style="width: 100%;" class="reportdetailsrow" data-id="{{id}}" data-parentid="{{parentId}}">
+                        <td class="rDid tabCont">{{slno}}</td>
+                        <td class="rDstep tabCont iteration">{{Step}}</td>
+                        <td class="{{getClass StepDescription}}" style="display:none; padding-left: 10px; font-weight:{{getStyle StepDescription}}">{{StepDescription}}</td>
+                        <td class="rDellaps tabCont">{{EllapsedTime}}</td>
+                        <td class="rDcomments tabCont" >{{Comments}}</td>
+                        <td class="rDremarks tabCont toggleRemarks" >{{Remark}}</td>
+                        {{#ifEquals testcase_details.testcaseDetails undefined}}
+                        <td class="rDExpectedRes tabCont {{getClass StepDescription}}">{{StepDescription}}</td>
+                        {{/ifEquals}} {{#ifEquals testcase_details.testcaseDetails ""}}
+                        <td class="rDExpectedRes tabCont" >{{StepDescription}}</td>
+                        {{/ifEquals}} {{#ifnotEquals testcase_details.testcaseDetails ""}} {{#ifnotEquals testcase_details undefined}}
+                        <td class="rDExpectedRes tabCont" >{{StepDescription}}
+                           <br/>Expected Result is: {{testcase_details.testcaseDetails}}
+                        </td>
+                        {{/ifnotEquals}} {{/ifnotEquals}} {{#ifEquals status undefined}}
+                        <td class="rDActualRes tabCont"></td>
+                        {{/ifEquals}} {{#ifEquals status ""}}
+                        <td class="rDActualRes tabCont"></td>
+                        {{/ifEquals}} {{#ifEquals status "Pass"}} {{#ifEquals testcase_details.actualResult_pass ""}}
+                        <td class="rDActualRes tabCont" >
+                           {{#ifEquals screenshot_path undefined}}
+                           <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};">{{status}}</text>
+                           {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
+                           <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text>
+                           {{/ifnotEquals}}
+                        </td>
+                        {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_pass ""}}
+                        <td class="rDActualRes tabCont" >
+                           {{testcase_details.actualResult_pass}}, {{#ifEquals screenshot_path undefined}}
+                           <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};">{{status}}</text>
+                           {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
+                           <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text>
+                           {{/ifnotEquals}}
+                        </td>
+                        {{/ifnotEquals}} {{/ifEquals}} {{#ifEquals status "Fail"}} {{#ifEquals testcase_details.actualResult_fail ""}}
+                        <td class="rDActualRes tabCont" >
+                           {{#ifEquals screenshot_path undefined}}
+                           <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};">{{status}}</text>
+                           {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
+                           <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text>
+                           {{/ifnotEquals}}
+                        </td>
+                        {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_fail ""}}
+                        <td class="rDActualRes tabCont" >
+                           {{testcase_details.actualResult_fail}}, {{#ifEquals screenshot_path undefined}}
+                           <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};">{{status}}</text>
+                           {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
+                           <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text>
+                           {{/ifnotEquals}}
+                        </td>
+                        {{/ifnotEquals}} {{/ifEquals}}
+                        {{#ifEquals status "Terminate"}} 
+                        <td class="rDActualRes tabCont">{{StepDescription}}</td>
+                        {{/ifEquals}}
+                        <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}}; display:none" data-screenshot="{{screenshot_path}}">{{status}}</td>
+                        <td class="rjira tabCont">
+                           <span class="opendescpopup" title="Create Issue">{{jira_defect_id}}</span>
+                        </td>
+                        <td class='hide hideStep'>{{hidestep}}</td>
+                     </tr>
+                     {{/each}}
+                  </tbody>
+               </table>
             </div>
-        </div>
-        <div id="overlay"></div>
-        <!-- Jira login window popup-->
-        <div class="jiraWindow" style="display: none;">
+         </div>
+         <div id="overlay"></div>
+         <!-- Jira login window popup-->
+         <div class="jiraWindow" style="display: none;">
             <div class="popupheader">
-                <label>Login to Jira</label>
-                <span class="closeWindow">X</span>
+               <label>Login to Jira</label>
+               <span class="closeWindow">X</span>
             </div>
             <input type="text" class="jirapopupinput" placeholder="Enter Url" id="jiraURL" />
             <input type="text" class="jirapopupinput" placeholder="Enter User Name" id="jiraUserName" />
@@ -1151,82 +1019,79 @@
             <button type="button" class="resetJiraCredentials">Reset</button>
             <button type="button" class="loginJiraCredentials">Connect</button>
             <span class="error-msg"></span>
-        </div>
-
-        <!-- Jira description window popup-->
-        <div class="createIssueWindow" style="display: none;">
+         </div>
+         <!-- Jira description window popup-->
+         <div class="createIssueWindow" style="display: none;">
             <div class="popupheader">
-                <label>Create Issue</label>
-                <span class="closeWindow">X</span>
+               <label>Create Issue</label>
+               <span class="closeWindow">X</span>
             </div>
             <p>
-                <label>Projects
-                    <span class="mandatory">*</span>
-                </label>
-                <select class="jirapopupinput" id="jProjects">
-                    <option value="" selected disabled>Select Projects</option>
-                </select>
+               <label>Projects
+               <span class="mandatory">*</span>
+               </label>
+               <select class="jirapopupinput" id="jProjects">
+                  <option value="" selected disabled>Select Projects</option>
+               </select>
             </p>
             <p>
-                <label>Issue Type
-                    <span class="mandatory">*</span>
-                </label>
-                <select class="jirapopupinput" id="jIssuetype">
-                    <option value="" selected disabled>Select Issue</option>
-                </select>
+               <label>Issue Type
+               <span class="mandatory">*</span>
+               </label>
+               <select class="jirapopupinput" id="jIssuetype">
+                  <option value="" selected disabled>Select Issue</option>
+               </select>
             </p>
             <p id='parentIssue'>
-                <label>Parent Issue Id
-                    <span class="mandatory">*</span>
-                </label>
-                <input type="text" class="jirapopupinput" id="jpIssueid" />
+               <label>Parent Issue Id
+               <span class="mandatory">*</span>
+               </label>
+               <input type="text" class="jirapopupinput" id="jpIssueid" />
             </p>
             <p>
-                <label>Summary
-                    <span class="mandatory">*</span>
-                </label>
-                <input type="text" class="jirapopupinput" id="jSummary" maxlength="255" title="Maximum 255 characters accepted." />
+               <label>Summary
+               <span class="mandatory">*</span>
+               </label>
+               <input type="text" class="jirapopupinput" id="jSummary" maxlength="255" title="Maximum 255 characters accepted." />
             </p>
             <p>
-                <label>Description</label>
-                <textarea class="jirapopupinput" id="jDescription"></textarea>
+               <label>Description</label>
+               <textarea class="jirapopupinput" id="jDescription"></textarea>
             </p>
             <p>
-                <label>Priority</label>
-                <select class="jirapopupinput" id="jPriority">
-                    <option value="" selected disabled>Select Priority</option>
-                </select>
+               <label>Priority</label>
+               <select class="jirapopupinput" id="jPriority">
+                  <option value="" selected disabled>Select Priority</option>
+               </select>
             </p>
             <p>
-                <label>Label</label>
-                <textarea class="jirapopupinput" id="jLabel"></textarea>
+               <label>Label</label>
+               <textarea class="jirapopupinput" id="jLabel"></textarea>
             </p>
             <p>
-                <label>Attachment Path</label>
-                <input type="text" id="scrnShotPath" class="jirapopupinput" />
+               <label>Attachment Path</label>
+               <input type="text" id="scrnShotPath" class="jirapopupinput" />
             </p>
             <p>
-                <span class="error-msg"></span>
-                <button type="button" class="cancelIssues">Cancel</button>
-                <button type="button" class="createIssues">Create</button>
+               <span class="error-msg"></span>
+               <button type="button" class="cancelIssues">Cancel</button>
+               <button type="button" class="createIssues">Create</button>
             </p>
-        </div>
-
-        <!-- Ststus popup window -->
-        <div class="statusWindow" style="display: none;">
+         </div>
+         <!-- Ststus popup window -->
+         <div class="statusWindow" style="display: none;">
             <div class="popupheader">
-                <label>Create Issue</label>
-                <span class="closeWindow">X</span>
+               <label>Create Issue</label>
+               <span class="closeWindow">X</span>
             </div>
             <p>
-                <label id="showStatus"></label>
+               <label id="showStatus"></label>
             </p>
             <p>
-                <button type="button" class="closeWindow">Ok</button>
+               <button type="button" class="closeWindow">Ok</button>
             </p>
-        </div>
-    </div>
-    </div>
-</body>
-
+         </div>
+      </div>
+      </div>
+   </body>
 </html>
