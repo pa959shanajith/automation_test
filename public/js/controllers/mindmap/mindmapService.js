@@ -127,7 +127,7 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
-		reviewTask: function (projectId,taskId,taskstatus,version,batchTaskIDs){
+		reviewTask: function (projectId,taskId,taskstatus,version,batchTaskIDs,module_info){
     		var param = "reviewTask";
     		return $http.post('/reviewTask', {
     			action: param,
@@ -135,7 +135,8 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 				taskId:taskId,
 				status:taskstatus,
 				versionnumber:version,
-				batchIds:batchTaskIDs
+				batchIds:batchTaskIDs,
+				module_info:module_info
 				
     		})
     		.then(function (response) { return response.data; },

@@ -1918,8 +1918,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								$("#compareNotFoundObjectsBox").hide();
 							}
 						}
+						
 						else {
-							openDialog("Compare Objects", "Failed to compare objects");
+							if (data.status =="EMPTY_OBJECT"){
+								openDialog("Compare Objects", "Failed to compare objects - Unmapped object(s) found");
+							}
+							else{
+								openDialog("Compare Objects", "Failed to compare objects");
+							}
 							$rootScope.compareFlag = false;
 							return;
 						}
@@ -3810,7 +3816,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		}
 	})
 
-	//Triggered When each checkbox objects are clicked in comapre & update screen
+	//Triggered When each checkbox objects are clicked in compare & update screen
 	$(document).on('click', "input[name='selectAllChangedItems']", function () {
 		if ($(this).is(":checked")) {
 			$(this).addClass('checked');
@@ -4446,7 +4452,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		// var labelArr = [];
 		// var infoArr = [];
 
-		mindmapServices.reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs).then(function (result) {
+		mindmapServices.reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs,false).then(function (result) {
 			if (result == 'fail') {
 				openDialog("Task Submission Error", "Reviewer is not assigned !", true)
 			} else if (taskstatus == 'reassign') {
