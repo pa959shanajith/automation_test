@@ -6233,3 +6233,16 @@ h4.titleBadge
 	border-bottom: 2px solid #461F6E;
     padding-bottom: 12px;
 }
+
+/***task redirection***/
+.taskDirection
+{
+    margin-top: 9px;
+    min-height: 40px;
+    margin-top: 15px;
+}
+.taskRedir
+{
+    margin-top: -1px;
+    padding-right: 6px;
+}
