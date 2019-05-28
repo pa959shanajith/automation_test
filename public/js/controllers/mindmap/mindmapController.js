@@ -2,7 +2,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     //------------------Global Variables---------------------------//
     //Createmap//
-    var activeNode, childNode, node, link, dNodes_c, dLinks_c, allMMaps, temp, rootIndex, faRef, nCount, scrList, tcList, mapSaved, taskAssign, releaseResult, selectedProject;
+    var activeNode, nCount2, childNode, node, link, dNodes_c, dLinks_c, allMMaps, temp, rootIndex, faRef, nCount, scrList, tcList, mapSaved, taskAssign, releaseResult, selectedProject;
     //unassignTask is an array to store whose task to be deleted
     var deletednode = [],
         unassignTask = [],
@@ -2021,6 +2021,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (d3.select('.fa-hand-peace-o').classed('ct-ctrl-inactive')) return;
         $scope.errorMessage = "";
         $("#dialog-addObject").modal("show");
+        nCount2= nCount.slice(); //taking the clone of nCount to avoid duplicate updation, issue 2405.
         //Add two nodes 
         $scope.addMoreNode();
         $scope.addMoreNode();
@@ -2037,7 +2038,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 'Testcase': 3
             }
             var idxAddNode = 1 + $('.row.row-modal.addObj-row').length;
-            $("#addObjContainer").append("<div class='row row-modal addObj-row'><form class='form-horizontal' role='form' onSubmit='return false;'><div class='col-sm-2 addNode-label'><label>" + idxAddNode + "</label></div><div class='col-sm-6'><input type='text' class='form-control form-control-custom' placeholder='Enter node name' maxlength='255' value=" + $scope.addedntype + "_"+ (nCount[nodeId[$scope.addedntype]]++) + "></div><div class='col-sm-2 deleteAddObjRow'><img src='imgs/ic-delete.png' /></div></form></div>");
+            $("#addObjContainer").append("<div class='row row-modal addObj-row'><form class='form-horizontal' role='form' onSubmit='return false;'><div class='col-sm-2 addNode-label'><label>" + idxAddNode + "</label></div><div class='col-sm-6'><input type='text' class='form-control form-control-custom' placeholder='Enter node name' maxlength='255' value=" + $scope.addedntype + "_"+ (nCount2[nodeId[$scope.addedntype]]++) + "></div><div class='col-sm-2 deleteAddObjRow'><img src='imgs/ic-delete.png' /></div></form></div>");
         } else {
             openDialogMindmap('Error', 'At a time only 10 nodes can be added');
         }
