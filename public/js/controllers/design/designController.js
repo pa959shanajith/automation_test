@@ -2246,7 +2246,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			"screenname":task.screenName,"versionnumber":task.versionnumber,"xpath":obj_xpath};
 			DesignServices.updateIrisDataset(data)
 				.then(function (val) {
-					$('.close').click();
+					$("#dialog-irisObject").find("button.close").click();
 					if(val=='unavailableLocalServer')  openDialog("Iris Object Type", $rootScope.unavailableLocalServer_msg);
 					else if(val=='unsavedObject') openDialog("Iris Object Type","Please save the object first.");
 					else{
@@ -2267,7 +2267,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				});
 		}
 		else{
-			$('.close').click();
+			$("#dialog-irisObject").find("button.close").click();
 			openDialog("Iris Object Type","Submitted Successfully.");
 		}
 	}
@@ -5806,23 +5806,23 @@ function contentTable(newTestScriptDataLS) {
 					} else if (appTypeLocal == 'MobileApp' &&
 						(obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0 ||
 							obType.indexOf("Switch") >= 0 || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0 ||
-							obType.indexOf("android.widget.NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("android.widget.SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 ||
-							obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >= 0 || obType.indexOf("android.widget.TimePicker") >= 0 || obType.indexOf("android.widget.DatePicker") >= 0 || obType.indexOf("XCUIElementTypeSecureTextField") >= 0)) {
+							obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("iOSEditText") >= 0 ||
+							obType.indexOf("PickerWheel") >= 0 || obType.indexOf("Slider") >= 0 || obType.indexOf("SearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >= 0 || obType.indexOf("SecureTextField") >= 0)) {
 						var res = '';
 						var sc;
 						if (obType.indexOf("RadioButton") >= 0) {
 							sc = Object.keys(keywordArrayList.radiobutton);
 							selectedKeywordList = "radiobutton";
-						} else if (obType.indexOf("iOSEditText") >= 0 || obType.indexOf("iOSXCUIElementTypeSearchField") >= 0 || obType.indexOf("iOSXCUIElementTypeSecureTextField") >= 0){
+						} else if (obType.indexOf("iOSEditText") >= 0 || obType.indexOf("SearchField") >= 0 || obType.indexOf("SecureTextField") >= 0){
 							sc = Object.keys(keywordArrayList.inputIos);
 							selectedKeywordList = "inputIos";
-						} else if (obType.indexOf("EditText") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeSecureTextField") >= 0) {
+						} else if (obType.indexOf("EditText") >= 0) {
 							sc = Object.keys(keywordArrayList.input);
 							selectedKeywordList = "input";
-						} else if (obType.indexOf("XCUIElementTypePickerWheel") >= 0) {
+						} else if (obType.indexOf("PickerWheel") >= 0) {
 							sc = Object.keys(keywordArrayList.pickerwheel);
 							selectedKeywordList = "pickerwheel";
-						} else if (obType.indexOf("XCUIElementTypeSlider") >= 0) {
+						} else if (obType.indexOf("Slider") >= 0) {
 							sc = Object.keys(keywordArrayList.slider);
 							selectedKeywordList = "slider";
 						} else if (obType.indexOf("Switch") >= 0) {
@@ -5837,25 +5837,25 @@ function contentTable(newTestScriptDataLS) {
 						} else if (obType.indexOf("CheckBox") >= 0) {
 							sc = Object.keys(keywordArrayList.checkbox);
 							selectedKeywordList = "checkbox";
-						} else if (obType.indexOf("android.widget.TimePicker") >= 0) {
+						} else if (obType.indexOf("TimePicker") >= 0) {
 							sc = Object.keys(keywordArrayList.timepicker);
 							selectedKeywordList = "timepicker";
-						} else if (obType.indexOf("android.widget.DatePicker") >= 0) {
+						} else if (obType.indexOf("DatePicker") >= 0) {
 							sc = Object.keys(keywordArrayList.datepicker);
 							selectedKeywordList = "datepicker";
-						} else if (obType.indexOf("TimePicker") >= 0) {
+						} else if (obType.indexOf("Time") >= 0) {
 							sc = Object.keys(keywordArrayList.time);
 							selectedKeywordList = "time";
-						} else if (obType.indexOf("DatePicker") >= 0) {
+						} else if (obType.indexOf("Date") >= 0) {
 							sc = Object.keys(keywordArrayList.date);
 							selectedKeywordList = "date";
-						} else if (obType.indexOf("android.widget.NumberPicker") >= 0) {
+						} else if (obType.indexOf("NumberPicker") >= 0) {
 							sc = Object.keys(keywordArrayList.numberpicker);
 							selectedKeywordList = "numberpicker";
 						} else if (obType.indexOf("RangeSeekBar") >= 0) {
 							sc = Object.keys(keywordArrayList.rangeseekbar);
 							selectedKeywordList = "rangeseekbar";
-						} else if (obType.indexOf("android.widget.SeekBar") >= 0) {
+						} else if (obType.indexOf("SeekBar") >= 0) {
 							sc = Object.keys(keywordArrayList.seekbar);
 							selectedKeywordList = "seekbar";
 						} else if (obType.indexOf("ListView") >= 0) {
@@ -5895,63 +5895,6 @@ function contentTable(newTestScriptDataLS) {
 							} else
 								res += '<option role="option" value="' + sc[i] +
 									'">' + sc[i] + '</option>';
-						}
-						var row = $(e.target).closest('tr.jqgrow');
-						var rowId = row.attr('id');
-						$("select#" + rowId + "_keywordVal", row[0]).html(res);
-						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
-						$grid.jqGrid('setCell', rowId, 'url', url);
-						$grid.jqGrid('setCell', rowId, 'objectName', objName);
-						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-						break;
-					} else if (appTypeLocal == 'MobileApp' && ((obType == 'UIATableView' || obType == 'UIASecureTextField' || obType == 'UIATextField' || obType == 'UIASwitch' || obType == 'UIAButton' || obType == 'UIASearchBar' || obType == 'UIASlider' || obType == 'UIAPickerWheel'))) {
-						var res = '';
-						var sc;
-						if (obType == 'UIASecureTextField' || obType == 'UIATextField' || obType == 'UIASearchBar') {
-							sc = Object.keys(keywordArrayList.text);
-							selectedKeywordList = "text";
-						} else if (obType == 'UIASwitch') {
-							sc = Object.keys(keywordArrayList.Switch);
-							selectedKeywordList = "Switch";
-						} else if (obType == 'UIAButton') {
-							sc = Object.keys(keywordArrayList.button);
-							selectedKeywordList = "button";
-						} else if (obType == 'UIASlider') {
-							sc = Object.keys(keywordArrayList.slider);
-							selectedKeywordList = "slider";
-						} else if (obType == 'UIAPickerWheel') {
-							sc = Object.keys(keywordArrayList.picker);
-							selectedKeywordList = "picker";
-						} else if (obType == 'UIATableView') {
-							sc = Object.keys(keywordArrayList.table);
-							selectedKeywordList = "table";
-						} else {
-							sc = Object.keys(keywordArrayList.generic);
-							selectedKeywordList = "generic";
-						}
-						for (var i = 0; i < sc.length; i++) {
-							if (selectedKeyword == sc[i]) {
-								res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
-							} else
-								res += '<option role="option" value="' + sc[i] + '">' + sc[i] + '</option>';
-						}
-						var row = $(e.target).closest('tr.jqgrow');
-						var rowId = row.attr('id');
-						$("select#" + rowId + "_keywordVal", row[0]).html(res);
-						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
-						$grid.jqGrid('setCell', rowId, 'url', url);
-						$grid.jqGrid('setCell', rowId, 'objectName', objName);
-						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-						break;
-					} else if (appTypeLocal == 'MobileApp' && (!(obType == 'UIATableView' || obType == 'UIASecureTextField' || obType == 'UIATextField' || obType == 'UIASwitch' || obType == 'UIAButton' || obType == 'UIASearchBar' || obType == 'UIASlider' || obType == 'UIAPickerWheel'))) {
-						var res = '';
-						var sc = Object.keys(keywordArrayList.element);
-						selectedKeywordList = "element";
-						for (var i = 0; i < sc.length; i++) {
-							if (selectedKeyword == sc[i]) {
-								res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
-							} else
-								res += '<option role="option" value="' + sc[i] + '">' + sc[i] + '</option>';
 						}
 						var row = $(e.target).closest('tr.jqgrow');
 						var rowId = row.attr('id');
