@@ -638,7 +638,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     $scope.loadMap = function(idx) {
-		$("#ct-saveAction").removeClass("disableButton")
+        $("#ct-saveAction").removeClass("disableButton")
         $("#expCreate").attr('src','imgs/ic-collapse.png');
         $(".search-canvas").val('');
         $scope.functionTBE = 'loadMapPopupConfirmed';
@@ -3719,7 +3719,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         initiate();
         clearSvg();
         var s = getElementDimm(d3.select("#ct-mapSvg"));
-		$("#ct-saveAction").removeClass("disableButton")
+        $("#ct-saveAction").removeClass("disableButton")
         //X and y changed to implement layout change
         // switch-layout feature
         if ($scope.verticalLayout) {
@@ -4824,7 +4824,7 @@ Purpose : displaying pop up for replication of project
 
     $scope.createNewMapModal = function(moduleName) {
         $scope.functionTBE = 'createNewMap';
-		$("#ct-saveAction").removeClass("disableButton")
+        $("#ct-saveAction").removeClass("disableButton")
         if (Object.keys($scope.nodeDisplay).length != 0)
             $('#createNewConfirmationPopup').modal('show');
         else
