@@ -477,11 +477,14 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 						}
 						//var curDate = new Date(Date.UTC(sldate_2[2],sldate_2[1]-1,sldate_2[0],sltime_2[0],sltime_2[1],0));
 						var chktype = "checkexist"
-						ScheduleService.testSuitesScheduler_ICE(chktype,details)
+						ScheduleService.testSuitesScheduler_ICE(chktype,details,moduleInfo)
 						.then(function(data){
 							counter++;
 							if(data == "fail"){
 								doNotSchedule = true;
+							}else if(data=="NotApproved"){
+								doNotSchedule = true;
+								openModelPopup("Schedule Test Suite", "All the dependent tasks (design, scrape) needs to be approved before execution");
 							}
 							else if(data.length > 0){
 								doNotSchedule = true;
@@ -502,7 +505,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 			function proceedScheduling(){
 				if(doNotSchedule == false){
 					var chktype = "schedule";
-					ScheduleService.testSuitesScheduler_ICE(chktype,moduleInfo)
+					ScheduleService.testSuitesScheduler_ICE(chktype,'',moduleInfo)
 					.then(function(data){
 						if(data == "success"){
 							openModelPopup("Schedule Test Suite", "Successfully scheduled.");
