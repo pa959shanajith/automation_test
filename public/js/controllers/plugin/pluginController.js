@@ -45,13 +45,14 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	if(userInfo) {
 		$rootScope.plugins = [];
 		var availablePlugins = userInfo.pluginsInfo;
-		for(i=0; i<availablePlugins.length; i++){
+		var pluginsLength = availablePlugins.length;
+		for(i=0; i<pluginsLength; i++){
 			if(availablePlugins[i].pluginValue != false){
 				var pluginName = availablePlugins[i].pluginName;
-				var pluginTxt = availablePlugins[i].pluginName.replace(/\s/g,'');
+				var pluginTxt = pluginName.replace(/\s/g,'');
 				var dataName = Encrypt.encode("p_"+pluginTxt);
 				$rootScope.plugins.push("p_"+pluginName);
-				$("#plugin-container").append('<div class="col-md-4 plugin-block"><span ng-click="pluginBox()" class="toggleClick pluginBox" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+pluginName+'</span><input class="plugins" type="hidden" id="'+availablePlugins[i].pluginName+"_"+dataName+'"  title="'+pluginTxt+"_"+dataName+'"></div>').fadeIn();
+				$("#plugin-container").append('<div class="col-md-4 plugin-block"><span ng-click="pluginBox()" class="toggleClick pluginBox" data-name="p_'+pluginTxt+'" id="'+pluginName+'" title="'+pluginName+'">'+pluginName+'</span><input class="plugins" type="hidden" id="'+pluginName+"_"+dataName+'"  title="'+pluginTxt+"_"+dataName+'"></div>').fadeIn();
 			}
 		}
 		var userRole = window.localStorage['_SR'];
@@ -59,7 +60,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			$(".task-content").hide();
 		}
 		blockUI("Loading Tasks..Please wait...");
-		var userid = userInfo.user_id;
+		//var userid = userInfo.user_id;
 		PluginService.getProjectIDs_Nineteen68()
 		.then(function (data) {
 			if(data == "Fail" || data == "Invalid Session") return $rootScope.redirectPage();
