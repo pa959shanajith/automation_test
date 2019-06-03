@@ -15,8 +15,8 @@ var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
 var taskflow = require('../config/options').strictTaskWorkflow;
+if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT)*1024*1024;
 var qList = [];
-require('follow-redirects').maxBodyLength = 50*1024*1024;
 
 /**
  * @author vishvas.a
@@ -546,7 +546,6 @@ function updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus)
 	});
 }
 
-
 /**
  * @author shree.p
  * @author vishvas.a changes on 21/June/2017 with regard to Batch Execution
@@ -560,35 +559,9 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		async.series({
 			approval_check:function(callback_E){
 				if (!taskflow) return callback_E();
-				async.forEachSeries(batchExecutionData,function(eachmoduledata,callback){
-					var qlist=[];
-					var scenario_list=[];
-					var arr=eachmoduledata.suiteDetails;
-					for (i=0;i<arr.length;i++){
-						scenario_list.push(arr[i].scenarioids);
-					}
-					qlist.push({'statement':"MATCH (ts:TESTSCENARIOS)-[r]->(s:SCREENS)-[]->(tc:TESTCASES) where ts.testScenarioID_c in "+JSON.stringify(scenario_list)+"  with '.*'+s.screenID_c+']' as r1,s MATCH (t:TASKS),(t1:TASKS{status:'complete'}) where t.parent=~r1 and t1.parent=~r1 return count(DISTINCT t.status)=1 and count(DISTINCT substring(t.parent,112))=count(DISTINCT s.screenID_c) and count(DISTINCT substring(t1.parent,112))=count(DISTINCT s.screenID_c)"});
-					qlist.push({'statement':"MATCH (ts:TESTSCENARIOS)-[r]->(s:SCREENS)-[]->(tc:TESTCASES) where ts.testScenarioID_c in "+JSON.stringify(scenario_list)+"  with '.*'+tc.testCaseID_c+']' as r1,tc  MATCH (t:TASKS),(t1:TASKS{status:'complete'}) where t.parent=~r1 and t1.parent=~r1 return count(DISTINCT t.status)=1 and count(DISTINCT substring(t.parent,149))=count(DISTINCT tc.testCaseID_c) and count(DISTINCT substring(t1.parent,149))=count(DISTINCT tc.testCaseID_c)"});
-					neo4jAPI.executeQueries(qlist,function(status_res,result){
-						if(status_res!=200) {
-							logger.error("Error in ExecuteTestSuite_ICE: Neo4j query to find the number of tasks approved");
-							return callback({res:'fail',status:status_res});
-						}
-						try {
-							var err = null;
-							if(!(result[0].data[0].row[0] && result[1].data[0].row[0] )){
-									logger.info("All its dependent tasks (design, scrape) are not approved");
-									err = {res:'NotApproved',status:status_res};
-							}
-							callback(err);
-						} catch(ex) {
-							logger.error("exception in function ValidateIfApproved() of Suitejs: ",ex);
-							callback({res:'fail',status:502});
-						}
-					});
-				}, function (err,data){
-					if (err) res.status(err.status).send(err.res);
-					else callback_E();
+				utils.approval_status_check(batchExecutionData, function (err, approved_status) {
+					if (approved_status) callback_E();
+					else res.status(err.status).send(err.res);
 				});
 			},
 			suite_execution:function(callback_E){
@@ -2356,47 +2329,61 @@ function updatescenariodetailsinsuite(req, cb, data) {
 exports.testSuitesScheduler_ICE = function (req, res) {
 	logger.info("Inside UI service testSuitesScheduler_ICE");
 	if (utils.isSessionActive(req)) {
-		if(req.body.chkType == "schedule"){			
-			var modInfo = req.body.moduleInfo;
-			logger.info("Calling function scheduleTestSuite from testSuitesScheduler_ICE");
-			scheduleTestSuite(modInfo, req, function (err, schedulecallback) {
-				try {
-					logger.info("TestSuite Scheduled successfully");
-					res.send(schedulecallback);
-				} catch (exception) {
-					logger.error("Exception in the service testSuitesScheduler_ICE: %s",exception);
-					res.send("fail");
+		var ExecutionData=req.body.moduleInfo;
+		if(taskflow){
+			utils.approval_status_check(ExecutionData, function (err, approved) {
+				if (approved) testSuitesScheduler_ICE_cb(req,res);
+				else {
+					res.status(err.status).send(err.res);
 				}
 			});
-		}
-		else{
-			var data = req.body.moduleInfo;
-			var inputs = {
-				"scheduledatetime": data.curDate,
-				"clientipaddress": data.clientipaddress,
-				"scheduledetails": "checkscheduleddetails",
-				"query": "getallscheduledetails"
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling NDAC Service from testSuitesScheduler_ICE: suite/ScheduleTestSuite_ICE");
-			client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
-				function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in suite/ScheduleTestSuite_ICE from testSuitesScheduler_ICE service, Error Code : ERRNDAC");
-						res.send("fail");
-					} else {
-						res.send(result.rows);
-					}
-			});
+		}else{
+			testSuitesScheduler_ICE_cb(req,res);
 		}
 	} else {
 		logger.error("Error in the service testSuitesScheduler_ICE: Invalid Session");
 		res.send("Invalid Session");
+	}
+};
+		
+function testSuitesScheduler_ICE_cb (req, res) {
+	if(req.body.chkType == "schedule"){			
+		var modInfo = req.body.moduleInfo;
+		logger.info("Calling function scheduleTestSuite from testSuitesScheduler_ICE");
+		scheduleTestSuite(modInfo, req, function (err, schedulecallback) {
+			try {
+				logger.info("TestSuite Scheduled successfully");
+				res.send(schedulecallback);
+			} catch (exception) {
+				logger.error("Exception in the service testSuitesScheduler_ICE: %s",exception);
+				res.send("fail");
+			}
+		});
+	}
+	else{
+		var data = req.body.details;
+		var inputs = {
+			"scheduledatetime": data.curDate,
+			"clientipaddress": data.clientipaddress,
+			"scheduledetails": "checkscheduleddetails",
+			"query": "getallscheduledetails"
+		};
+		var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
+		logger.info("Calling NDAC Service from testSuitesScheduler_ICE: suite/ScheduleTestSuite_ICE");
+		client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
+			function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.error("Error occurred in suite/ScheduleTestSuite_ICE from testSuitesScheduler_ICE service, Error Code : ERRNDAC");
+					res.send("fail");
+				} else {
+					res.send(result.rows);
+				}
+		});
 	}
 };
 
