@@ -650,178 +650,189 @@ exports.saveData = function (req, res) {
 		}
 
 		if (flag == 10) {
-			var uidx = 0, t, lts, rnmList = [];
-			deletednodes.forEach(function (t, i) {
-				// Delete task if single connection
-				qList.push({ "statement": "MATCH (N) WHERE ID(N)=" + t + " MATCH (N)-[r:FNTT]->(b) with b as b MATCH(b)<-[s:FNTT]-(M) WITH count(M) as rel_cnt,b as b  WHERE rel_cnt=1 DETACH DELETE b" });
-				// Else delete just connection					
-				qList.push({ "statement": "MATCH (N) WHERE ID(N)=" + t + " MATCH (N)-[r:FNTT]-(b) DELETE r" });
-				// delete nodes in case renamed a reused node
-				qList.push({ "statement": "MATCH (N) WHERE ID(N)=" + t + " DETACH DELETE N" });
-			});
-			//TO support task deletion
-			removeTask.forEach(function (t, i) {
-				//Issue 1685 Release and cycle Id filters are given for task to delete the task only from that release and cycle attached to that node
-				qList.push({ "statement": "MATCH (N) WHERE ID(N)=" + t + " MATCH (N)-[r:FNTT]-(b:TASKS{release:'" + relId + "',cycle:'" + cycId + "'}) DETACH DELETE b" });
-			});
+			qpush=[]
+			qpush.push({ "statement": "MATCH(n:MODULES_ENDTOEND{projectID:'" + prjId + "',moduleName:'" + data[0].name + "'}) RETURN n.moduleName" });
+			neo4jAPI.executeQueries(qpush, function (status, result){
+			if (result[0].data.length != 0){
+				result = 'DuplicateModules';
+				status = 500
+				res.status(status).send(result);
+			}
+			else{
+				var uidx = 0, t, lts, rnmList = [];
+				deletednodes.forEach(function (t, i) {
+					// Delete task if single connection
+					qList.push({ "statement": "MATCH (N) WHERE ID(N)=" + t + " MATCH (N)-[r:FNTT]->(b) with b as b MATCH(b)<-[s:FNTT]-(M) WITH count(M) as rel_cnt,b as b  WHERE rel_cnt=1 DETACH DELETE b" });
+					// Else delete just connection					
+					qList.push({ "statement": "MATCH (N) WHERE ID(N)=" + t + " MATCH (N)-[r:FNTT]-(b) DELETE r" });
+					// delete nodes in case renamed a reused node
+					qList.push({ "statement": "MATCH (N) WHERE ID(N)=" + t + " DETACH DELETE N" });
+				});
+				//TO support task deletion
+				removeTask.forEach(function (t, i) {
+					//Issue 1685 Release and cycle Id filters are given for task to delete the task only from that release and cycle attached to that node
+					qList.push({ "statement": "MATCH (N) WHERE ID(N)=" + t + " MATCH (N)-[r:FNTT]-(b:TASKS{release:'" + relId + "',cycle:'" + cycId + "'}) DETACH DELETE b" });
+				});
 
-			data.forEach(function (e, i) {
-				idxDict[e.id] = i;
-			})
+				data.forEach(function (e, i) {
+					idxDict[e.id] = i;
+				})
 
-			data.forEach(function (e, i) {
-				idDict[e.id] = (e.id_n) ? e.id_n : uuidV4();
-				e.id = idDict[e.id];
-				t = e.task;
-				nameDict[e.id] = e.name;
-				var taskstatus = 'assigned';
-				// if(e.type=='modules_endtoend'){
-				// 	if(e.oid!=null){
-				// 		//qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS) DETACH DELETE r,o"});
-				// 		if(e.renamed) qList.push({"statement":"MATCH(n:MODULES_ENDTOEND{moduleID:'"+e.id+"'}) SET n.moduleName='"+e.name+"'"+",n.unique_property='["+e.name+','+prjId+"]'"});
-				// 	}
-				// 	else qList.push({"statement":"MERGE(n:MODULES_ENDTOEND{projectID:'"+prjId+"',moduleName:'"+e.name+"',moduleID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',moduleID_c:'"+e.id_c+"',unique_property:'["+e.name+','+prjId+"]'}) SET n.childIndex='"+e.childIndex+"'"});
-				// }
-				if (e.type == 'modules') {
-					if (e.oid != null) {
-						//Added new queries to allow saving of incomplete structure
-						//qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS)-[s]->(p:SCREENS)-[t]->(q:TESTCASES) DETACH DELETE r,s,t,o,p,q"});
-						// qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS)-[s]->(p:SCREENS)-[t]->(q:TESTCASES) DETACH DELETE t,q"});
-						// qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS)-[s]->(p:SCREENS) DETACH DELETE s,p"});
-						// qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS) DETACH DELETE r,o"});
-
-						if (e.renamed) qList.push({ "statement": "MATCH(n:MODULES{moduleID:'" + e.id + "'}) SET n.moduleName='" + e.name + "'" + ",n.unique_property='[" + e.name + ',' + prjId + "]'" });
-					}
-					else qList.push({ "statement": "MERGE(n:MODULES{projectID:'" + prjId + "',moduleName:'" + e.name + "',moduleID:'" + e.id + "',createdBy:'" + user + "',createdOn:'null',moduleID_c:'" + e.id_c + "',unique_property:'[" + e.name + ',' + prjId + "]'}) SET n.childIndex='" + e.childIndex + "'" });
-				}
-				else if (e.type == 'scenarios') {
-					//Part of Issue 1685, take projectid from the scenarios in case of end to end modules
-					var temp_prjID = prjId;
-
-					// if (tab=='end_to_end'){
-					// 	temp_prjID=e.projectID;
+				data.forEach(function (e, i) {
+					idDict[e.id] = (e.id_n) ? e.id_n : uuidV4();
+					e.id = idDict[e.id];
+					t = e.task;
+					nameDict[e.id] = e.name;
+					var taskstatus = 'assigned';
+					// if(e.type=='modules_endtoend'){
+					// 	if(e.oid!=null){
+					// 		//qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS) DETACH DELETE r,o"});
+					// 		if(e.renamed) qList.push({"statement":"MATCH(n:MODULES_ENDTOEND{moduleID:'"+e.id+"'}) SET n.moduleName='"+e.name+"'"+",n.unique_property='["+e.name+','+prjId+"]'"});
+					// 	}
+					// 	else qList.push({"statement":"MERGE(n:MODULES_ENDTOEND{projectID:'"+prjId+"',moduleName:'"+e.name+"',moduleID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',moduleID_c:'"+e.id_c+"',unique_property:'["+e.name+','+prjId+"]'}) SET n.childIndex='"+e.childIndex+"'"});
 					// }
-					if (e.state == 'created') {
-						qList.push({ "statement": "MERGE(n:TESTSCENARIOS{projectID:'" + temp_prjID + "',moduleID:'" + idDict[e.pid] + "',testScenarioName:'" + e.name + "',testScenarioID:'" + e.id + "',createdBy:'" + user + "',createdOn:'null',testScenarioID_c:'" + e.id_c + "'}) SET n.childIndex='" + e.childIndex + "'" });
-						// if(tab!='end_to_end'){
-						// 	qList.push({"statement":"MATCH (a:MODULES{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
-						// }
-						// else{
-						qList.push({ "statement": "MATCH (a:MODULES{moduleID:'" + idDict[e.pid] + "'}),(b:TESTSCENARIOS{moduleID:'" + idDict[e.pid] + "'}) MERGE (a)-[r:FMTTS {id:'" + idDict[e.pid] + "'}]-(b)" });
-						// }	
-					}
-				}
-				else if (e.type == 'screens') {
-					uidx++; lts = idDict[e.pid];
-					if (e.state == 'created') {
-						qList.push({ "statement": "MERGE(n:SCREENS{projectID:'" + prjId + "',testScenarioID:'" + idDict[e.pid] + "',screenName:'" + e.name + "',screenID:'" + e.id + "',createdBy:'" + user + "',createdOn:'null',uid:'" + uidx + "',screenID_c:'" + e.id_c + "'})SET n.childIndex='" + e.childIndex + "'" });
-						qList.push({ "statement": "MATCH (a:TESTSCENARIOS{testScenarioID:'" + idDict[e.pid] + "'}),(b:SCREENS{testScenarioID:'" + idDict[e.pid] + "'}) MERGE (a)-[r:FTSTS {id:'" + idDict[e.pid] + "'}]-(b)" });
-					}
-				}
-				else if (e.type == 'testcases' && e.state == 'created') {
-					if (e.pid_c != 'null' && e.pid_c != undefined) {
-						qList.push({ "statement": "MERGE(n:TESTCASES{screenID:'" + idDict[e.pid] + "',screenName:'" + nameDict[idDict[e.pid]] + "',projectID:'" + prjId + "',testScenarioID:'" + lts + "',testCaseName:'" + e.name + "',testCaseID:'" + e.id + "',createdBy:'" + user + "',createdOn:'null',uid:'" + uidx + "',testCaseID_c:'" + e.id_c + "'}) SET n.screenID_c='" + e.pid_c + "',n.childIndex='" + e.childIndex + "'" });
-					} else {
-						qList.push({ "statement": "MERGE(n:TESTCASES{screenID:'" + idDict[e.pid] + "',screenName:'" + nameDict[idDict[e.pid]] + "',projectID:'" + prjId + "',testScenarioID:'" + lts + "',testCaseName:'" + e.name + "',testCaseID:'" + e.id + "',createdBy:'" + user + "',createdOn:'null',uid:'" + uidx + "',testCaseID_c:'" + e.id_c + "'}) SET n.childIndex='" + e.childIndex + "'" });
-					}
-					qList.push({ "statement": "MATCH (a:SCREENS{screenID:'" + idDict[e.pid] + "'}),(b:TESTCASES{screenID:'" + idDict[e.pid] + "'}) MERGE (a)-[r:FSTTS {id:'" + idDict[e.pid] + "'}]-(b)" });
-				}
-			});
-			rnmList = getRenameQueries(data, prjId);
-			data.forEach(function (e, i) {
-				var nodetype = { 'modules': 'moduleID', 'modules_endtoend': 'moduleID', 'scenarios': 'testScenarioID', 'screens': 'screenID', 'testcases': 'testCaseID' }
-				var ntype = e.type.toUpperCase();
-				if (ntype == 'SCENARIOS') ntype = 'TESTSCENARIOS';
-				if (e.cidxch) {
-					qList.push({ "statement": "MATCH (n:" + ntype + "{" + nodetype[e.type.toLowerCase()] + ":'" + e.id + "'}) SET n.childIndex='" + e.childIndex + "'" });
-				}
-			})
-			// if(tab!='end_to_end'){
+					if (e.type == 'modules') {
+						if (e.oid != null) {
+							//Added new queries to allow saving of incomplete structure
+							//qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS)-[s]->(p:SCREENS)-[t]->(q:TESTCASES) DETACH DELETE r,s,t,o,p,q"});
+							// qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS)-[s]->(p:SCREENS)-[t]->(q:TESTCASES) DETACH DELETE t,q"});
+							// qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS)-[s]->(p:SCREENS) DETACH DELETE s,p"});
+							// qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS) DETACH DELETE r,o"});
 
-			qList.push({ "statement": "MATCH (a) remove a.uid" });
-			qList = qList.concat(rnmList);
-			qList.push({ "statement": "MATCH path=(n:MODULES{moduleID:'" + data[0].id + "'}) WHERE NOT (n)-[:FMTTS]->() RETURN n", "resultDataContents": ["graph"] });
-			qList.push({ "statement": "MATCH path=(n:MODULES{moduleID:'" + data[0].id + "'})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] });
-			// }else{
-
-			// qList.push({"statement":"MATCH (a) remove a.uid"});
-			// qList=qList.concat(rnmList);
-			// qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{moduleID:'"+data[0].id+"'}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
-			// qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{moduleID:'"+data[0].id+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
-			// }
-
-			neo4jAPI.executeQueries(qList, function (status, result) {
-				if (status != 200) {
-					//res.setHeader('Content-Type', 'text');
-					logger.debug(result[0]);
-					logger.error('Error occurred in saveData Query');
-					result = JSON.stringify(result)
-					if (result.indexOf('Schema.ConstraintValidationFailed') > -1) {
-						result = 'DuplicateModules';
-					} else {
-						result = 'fail';
-					}
-					res.status(status).send(result);
-				}
-				else {
-					res.setHeader('Content-Type', 'application/json');
-					var k = 0, rIndex, lbl, neoIdDict = {};
-					idDict = {};
-
-					var attrDict = { "modules_endtoend": { "childIndex": "childIndex", "projectID": "projectID", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "modules": { "childIndex": "childIndex", "projectID": "projectID", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "scenarios": { "projectID": "projectID", "childIndex": "childIndex", "moduleID": "pid_n", "testScenarioName": "name", "testScenarioID": "id_n", "testScenarioID_c": "id_c" }, "screens": { "projectID": "projectID", "childIndex": "childIndex", "testScenarioID": "pid_n", "screenName": "name", "screenID": "id_n", "screenID_c": "id_c", "taskexists": "taskexists" }, "testcases": { "projectID": "projectID", "childIndex": "childIndex", "screenID": "pid_n", "testCaseName": "name", "testCaseID": "id_n", "testCaseID_c": "id_c", "taskexists": "taskexists" }, "tasks": { "taskID": "id_n", "task": "t", "batchName": "bn", "assignedTo": "at", "reviewer": "rw", "startDate": "sd", "endDate": "ed", "re_estimation": "re_estimation", "release": "re", "cycle": "cy", "details": "det", "nodeID": "pid", "parent": "anc", "cx": "cx" } };
-					var jsonData = result;
-
-					var new_res = jsonData[jsonData.length - 1].data;
-					if (new_res.length == 0) {
-						new_res = jsonData[jsonData.length - 2].data;
-					}
-					new_res.forEach(function (row) {
-						row.graph.nodes.forEach(function (n) {
-							if (idDict[n.id] === undefined) {
-								lbl = n.labels[0].toLowerCase();
-								if (lbl == 'testscenarios') lbl = 'scenarios';
-								for (var attrs in n.properties) {
-									if (attrDict[lbl][attrs] !== undefined) n[attrDict[lbl][attrs]] = n.properties[attrs];
-									delete n.properties[attrs];
-								}
-								if (lbl == "tasks") nData.push({ id: n.id_n, oid: n.id, task: n.t, batchName: n.bn, assignedTo: n.at, reviewer: n.rw, startDate: n.sd, endDate: n.ed, re_estimation: n.re_estimation, release: n.re, cycle: n.cy, details: n.det, nodeID: n.pid, parent: n.anc.slice(1, -1).split(','), cx: n.cx });
-								else {
-									if (lbl == "modules" || lbl == "modules_endtoend") n.childIndex = 0;
-									nData.push({ projectID: n.projectID, childIndex: n.childIndex, id: n.id, "type": lbl, name: n.name, id_n: n.id_n, pid_n: n.pid_n, id_c: n.id_c, children: [], task: null });
-								}
-								if (lbl == "modules" || lbl == "modules_endtoend") rIndex = k;
-								idDict[n.id] = k; neoIdDict[n.id_n] = k;
-								k++;
-							}
-						});
-						row.graph.relationships.forEach(function (r) {
-							var srcIndex = idDict[r.startNode.toString()];
-							var tgtIndex = idDict[r.endNode.toString()];
-							//if(nData[tgtIndex].children===undefined) nData[srcIndex].task=nData[tgtIndex];
-							//Part of Issue 1685, after saving of data proper task should be written since multiple tasks are conencte dto single node
-							if (nData[tgtIndex].children === undefined) {
-								if ((selectedTab == 'tabAssign' && nData[tgtIndex].release == relId && nData[tgtIndex].cycle == cycId) || tab == 'tabCreate' || tab == 'endToend') {
-									nData[srcIndex].task = nData[tgtIndex];
-								} else if (nData[srcIndex].type == 'testcases' || nData[srcIndex].type == 'screens') {
-									nData[srcIndex].taskexists = nData[tgtIndex];
-								}
-
-							}
-							else if (nData[srcIndex].children.indexOf(nData[tgtIndex]) == -1) {
-								nData[srcIndex].children.push(nData[tgtIndex]);
-								if (nData[tgtIndex].childIndex == undefined) nData[tgtIndex].childIndex = nData[srcIndex].children.length;
-							}
-						});
-					});
-					nData.forEach(function (e) {
-						if (e.pid_n) {
-							if (neoIdDict[e.pid_n] !== undefined) e.pid_n = nData[neoIdDict[e.pid_n]].id;
-							else e.pid_n = null;
+							if (e.renamed) qList.push({ "statement": "MATCH(n:MODULES{moduleID:'" + e.id + "'}) SET n.moduleName='" + e.name + "'" + ",n.unique_property='[" + e.name + ',' + prjId + "]'" });
 						}
-					});
-					res.status(status).send(nData[rIndex]);
-				}
-			});
+						else qList.push({ "statement": "MERGE(n:MODULES{projectID:'" + prjId + "',moduleName:'" + e.name + "',moduleID:'" + e.id + "',createdBy:'" + user + "',createdOn:'null',moduleID_c:'" + e.id_c + "',unique_property:'[" + e.name + ',' + prjId + "]'}) SET n.childIndex='" + e.childIndex + "'" });
+					}
+					else if (e.type == 'scenarios') {
+						//Part of Issue 1685, take projectid from the scenarios in case of end to end modules
+						var temp_prjID = prjId;
+
+						// if (tab=='end_to_end'){
+						// 	temp_prjID=e.projectID;
+						// }
+						if (e.state == 'created') {
+							qList.push({ "statement": "MERGE(n:TESTSCENARIOS{projectID:'" + temp_prjID + "',moduleID:'" + idDict[e.pid] + "',testScenarioName:'" + e.name + "',testScenarioID:'" + e.id + "',createdBy:'" + user + "',createdOn:'null',testScenarioID_c:'" + e.id_c + "'}) SET n.childIndex='" + e.childIndex + "'" });
+							// if(tab!='end_to_end'){
+							// 	qList.push({"statement":"MATCH (a:MODULES{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
+							// }
+							// else{
+							qList.push({ "statement": "MATCH (a:MODULES{moduleID:'" + idDict[e.pid] + "'}),(b:TESTSCENARIOS{moduleID:'" + idDict[e.pid] + "'}) MERGE (a)-[r:FMTTS {id:'" + idDict[e.pid] + "'}]-(b)" });
+							// }	
+						}
+					}
+					else if (e.type == 'screens') {
+						uidx++; lts = idDict[e.pid];
+						if (e.state == 'created') {
+							qList.push({ "statement": "MERGE(n:SCREENS{projectID:'" + prjId + "',testScenarioID:'" + idDict[e.pid] + "',screenName:'" + e.name + "',screenID:'" + e.id + "',createdBy:'" + user + "',createdOn:'null',uid:'" + uidx + "',screenID_c:'" + e.id_c + "'})SET n.childIndex='" + e.childIndex + "'" });
+							qList.push({ "statement": "MATCH (a:TESTSCENARIOS{testScenarioID:'" + idDict[e.pid] + "'}),(b:SCREENS{testScenarioID:'" + idDict[e.pid] + "'}) MERGE (a)-[r:FTSTS {id:'" + idDict[e.pid] + "'}]-(b)" });
+						}
+					}
+					else if (e.type == 'testcases' && e.state == 'created') {
+						if (e.pid_c != 'null' && e.pid_c != undefined) {
+							qList.push({ "statement": "MERGE(n:TESTCASES{screenID:'" + idDict[e.pid] + "',screenName:'" + nameDict[idDict[e.pid]] + "',projectID:'" + prjId + "',testScenarioID:'" + lts + "',testCaseName:'" + e.name + "',testCaseID:'" + e.id + "',createdBy:'" + user + "',createdOn:'null',uid:'" + uidx + "',testCaseID_c:'" + e.id_c + "'}) SET n.screenID_c='" + e.pid_c + "',n.childIndex='" + e.childIndex + "'" });
+						} else {
+							qList.push({ "statement": "MERGE(n:TESTCASES{screenID:'" + idDict[e.pid] + "',screenName:'" + nameDict[idDict[e.pid]] + "',projectID:'" + prjId + "',testScenarioID:'" + lts + "',testCaseName:'" + e.name + "',testCaseID:'" + e.id + "',createdBy:'" + user + "',createdOn:'null',uid:'" + uidx + "',testCaseID_c:'" + e.id_c + "'}) SET n.childIndex='" + e.childIndex + "'" });
+						}
+						qList.push({ "statement": "MATCH (a:SCREENS{screenID:'" + idDict[e.pid] + "'}),(b:TESTCASES{screenID:'" + idDict[e.pid] + "'}) MERGE (a)-[r:FSTTS {id:'" + idDict[e.pid] + "'}]-(b)" });
+					}
+				});
+				rnmList = getRenameQueries(data, prjId);
+				data.forEach(function (e, i) {
+					var nodetype = { 'modules': 'moduleID', 'modules_endtoend': 'moduleID', 'scenarios': 'testScenarioID', 'screens': 'screenID', 'testcases': 'testCaseID' }
+					var ntype = e.type.toUpperCase();
+					if (ntype == 'SCENARIOS') ntype = 'TESTSCENARIOS';
+					if (e.cidxch) {
+						qList.push({ "statement": "MATCH (n:" + ntype + "{" + nodetype[e.type.toLowerCase()] + ":'" + e.id + "'}) SET n.childIndex='" + e.childIndex + "'" });
+					}
+				})
+				// if(tab!='end_to_end'){
+
+				qList.push({ "statement": "MATCH (a) remove a.uid" });
+				qList = qList.concat(rnmList);
+				qList.push({ "statement": "MATCH path=(n:MODULES{moduleID:'" + data[0].id + "'}) WHERE NOT (n)-[:FMTTS]->() RETURN n", "resultDataContents": ["graph"] });
+				qList.push({ "statement": "MATCH path=(n:MODULES{moduleID:'" + data[0].id + "'})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] });
+				// }else{
+
+				// qList.push({"statement":"MATCH (a) remove a.uid"});
+				// qList=qList.concat(rnmList);
+				// qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{moduleID:'"+data[0].id+"'}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
+				// qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{moduleID:'"+data[0].id+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
+				// }
+
+				neo4jAPI.executeQueries(qList, function (status, result) {
+					if (status != 200) {
+						//res.setHeader('Content-Type', 'text');
+						logger.debug(result[0]);
+						logger.error('Error occurred in saveData Query');
+						result = JSON.stringify(result)
+						if (result.indexOf('Schema.ConstraintValidationFailed') > -1) {
+							result = 'DuplicateModules';
+						} else {
+							result = 'fail';
+						}
+						res.status(status).send(result);
+					}
+					else {
+						res.setHeader('Content-Type', 'application/json');
+						var k = 0, rIndex, lbl, neoIdDict = {};
+						idDict = {};
+
+						var attrDict = { "modules_endtoend": { "childIndex": "childIndex", "projectID": "projectID", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "modules": { "childIndex": "childIndex", "projectID": "projectID", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "scenarios": { "projectID": "projectID", "childIndex": "childIndex", "moduleID": "pid_n", "testScenarioName": "name", "testScenarioID": "id_n", "testScenarioID_c": "id_c" }, "screens": { "projectID": "projectID", "childIndex": "childIndex", "testScenarioID": "pid_n", "screenName": "name", "screenID": "id_n", "screenID_c": "id_c", "taskexists": "taskexists" }, "testcases": { "projectID": "projectID", "childIndex": "childIndex", "screenID": "pid_n", "testCaseName": "name", "testCaseID": "id_n", "testCaseID_c": "id_c", "taskexists": "taskexists" }, "tasks": { "taskID": "id_n", "task": "t", "batchName": "bn", "assignedTo": "at", "reviewer": "rw", "startDate": "sd", "endDate": "ed", "re_estimation": "re_estimation", "release": "re", "cycle": "cy", "details": "det", "nodeID": "pid", "parent": "anc", "cx": "cx" } };
+						var jsonData = result;
+
+						var new_res = jsonData[jsonData.length - 1].data;
+						if (new_res.length == 0) {
+							new_res = jsonData[jsonData.length - 2].data;
+						}
+						new_res.forEach(function (row) {
+							row.graph.nodes.forEach(function (n) {
+								if (idDict[n.id] === undefined) {
+									lbl = n.labels[0].toLowerCase();
+									if (lbl == 'testscenarios') lbl = 'scenarios';
+									for (var attrs in n.properties) {
+										if (attrDict[lbl][attrs] !== undefined) n[attrDict[lbl][attrs]] = n.properties[attrs];
+										delete n.properties[attrs];
+									}
+									if (lbl == "tasks") nData.push({ id: n.id_n, oid: n.id, task: n.t, batchName: n.bn, assignedTo: n.at, reviewer: n.rw, startDate: n.sd, endDate: n.ed, re_estimation: n.re_estimation, release: n.re, cycle: n.cy, details: n.det, nodeID: n.pid, parent: n.anc.slice(1, -1).split(','), cx: n.cx });
+									else {
+										if (lbl == "modules" || lbl == "modules_endtoend") n.childIndex = 0;
+										nData.push({ projectID: n.projectID, childIndex: n.childIndex, id: n.id, "type": lbl, name: n.name, id_n: n.id_n, pid_n: n.pid_n, id_c: n.id_c, children: [], task: null });
+									}
+									if (lbl == "modules" || lbl == "modules_endtoend") rIndex = k;
+									idDict[n.id] = k; neoIdDict[n.id_n] = k;
+									k++;
+								}
+							});
+							row.graph.relationships.forEach(function (r) {
+								var srcIndex = idDict[r.startNode.toString()];
+								var tgtIndex = idDict[r.endNode.toString()];
+								//if(nData[tgtIndex].children===undefined) nData[srcIndex].task=nData[tgtIndex];
+								//Part of Issue 1685, after saving of data proper task should be written since multiple tasks are conencte dto single node
+								if (nData[tgtIndex].children === undefined) {
+									if ((selectedTab == 'tabAssign' && nData[tgtIndex].release == relId && nData[tgtIndex].cycle == cycId) || tab == 'tabCreate' || tab == 'endToend') {
+										nData[srcIndex].task = nData[tgtIndex];
+									} else if (nData[srcIndex].type == 'testcases' || nData[srcIndex].type == 'screens') {
+										nData[srcIndex].taskexists = nData[tgtIndex];
+									}
+
+								}
+								else if (nData[srcIndex].children.indexOf(nData[tgtIndex]) == -1) {
+									nData[srcIndex].children.push(nData[tgtIndex]);
+									if (nData[tgtIndex].childIndex == undefined) nData[tgtIndex].childIndex = nData[srcIndex].children.length;
+								}
+							});
+						});
+						nData.forEach(function (e) {
+							if (e.pid_n) {
+								if (neoIdDict[e.pid_n] !== undefined) e.pid_n = nData[neoIdDict[e.pid_n]].id;
+								else e.pid_n = null;
+							}
+						});
+						res.status(status).send(nData[rIndex]);
+					}
+				});
+			}
+		});
 		}
 		else if (flag == 20) {
 			var uidx = 0, rIndex;
@@ -1117,131 +1128,142 @@ exports.saveEndtoEndData = function (req, res) {
 		//TO support task deletion
 		var removeTask = inputs.unassignTask;
 		if (flag == 10) {
-			var uidx = 0, t, lts, rnmList = [];
-			deletednodes.forEach(function (t, i) {
-				// Delete task if single connection
-				qList.push({ "statement": "MATCH (N) WHERE ID(N)=" + t + " MATCH (N)-[r:FNTT]->(b) with b as b MATCH(b)<-[s:FNTT]-(M) WITH count(M) as rel_cnt,b as b  WHERE rel_cnt=1 DETACH DELETE b" });
-				// Else delete just connection					
-				qList.push({ "statement": "MATCH (N) WHERE ID(N)=" + t + " MATCH (N)-[r:FNTT]-(b) DELETE r" });
-			});
-			//TO support task deletion
-			removeTask.forEach(function (t, i) {
-				qList.push({ "statement": "MATCH (N) WHERE ID(N)=" + t + " MATCH (N)-[r:FNTT]-(b) DETACH DELETE b" });
-			});
+			qpush=[]
+			qpush.push({ "statement": "MATCH(n:MODULES{projectID:'" + data[0].projectID + "',moduleName:'" + data[0].name + "'}) RETURN n.moduleName" });
+			neo4jAPI.executeQueries(qpush, function (status, result){
+			if (result[0].data.length != 0){
+				status= 500
+				error_msg = 'DuplicateModules';
+				res.status(status).send(error_msg);
+			}
+			else{		
+				var uidx = 0, t, lts, rnmList = [];
+				deletednodes.forEach(function (t, i) {
+					// Delete task if single connection
+					qList.push({ "statement": "MATCH (N) WHERE ID(N)=" + t + " MATCH (N)-[r:FNTT]->(b) with b as b MATCH(b)<-[s:FNTT]-(M) WITH count(M) as rel_cnt,b as b  WHERE rel_cnt=1 DETACH DELETE b" });
+					// Else delete just connection					
+					qList.push({ "statement": "MATCH (N) WHERE ID(N)=" + t + " MATCH (N)-[r:FNTT]-(b) DELETE r" });
+				});
+				//TO support task deletion
+				removeTask.forEach(function (t, i) {
+					qList.push({ "statement": "MATCH (N) WHERE ID(N)=" + t + " MATCH (N)-[r:FNTT]-(b) DETACH DELETE b" });
+				});
 
-			data.forEach(function (e, i) {
-				idDict[e.id] = (e.id_n) ? e.id_n : uuidV4();
-				e.id = idDict[e.id];
-				t = e.task;
-				var taskstatus = 'assigned';
-				if (e.type == 'modules_endtoend') {
-					if (e.oid != null) {
-						qList.push({ "statement": "MATCH (n)-[r:FMTTS{id:'" + e.id + "'}]->(o:TESTSCENARIOS) DETACH DELETE r,o;" });
-						if (e.renamed) qList.push({ "statement": "MATCH(n:MODULES_ENDTOEND{moduleID:'" + e.id + "'}) SET n.moduleName='" + e.name + "'" + ",n.unique_property='[" + e.name + ',' + e.projectID + "]'" });
-					}
-					else qList.push({ "statement": "MERGE(n:MODULES_ENDTOEND{projectID:'" + e.projectID + "',moduleName:'" + e.name + "',moduleID:'" + e.id + "',createdBy:'" + user + "',createdOn:'null',moduleID_c:'" + e.id_c + "',unique_property:'[" + e.name + ',' + e.projectID + "]'}) SET n.childIndex='" + e.childIndex + "'" });
-					if (t != null && e.id_c != null) {
-						t.parent = [prjId].concat(e.id_c);
-						t.id = (t.id != null) ? t.id : uuidV4();
-						if (t.oid != null) {
-							if (t.updatedParent != undefined) {
-								qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]',release:'" + t.release + "',cycle:'" + t.cycle + "'}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + ",n.status='" + taskstatus + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]'" });
-							} else {
-								qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]',release:'" + t.release + "',cycle:'" + t.cycle + "'}) SET n.task='" + t.task + "',n.status='" + taskstatus + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "'" });
-							}
+				data.forEach(function (e, i) {
+					idDict[e.id] = (e.id_n) ? e.id_n : uuidV4();
+					e.id = idDict[e.id];
+					t = e.task;
+					var taskstatus = 'assigned';
+					if (e.type == 'modules_endtoend') {
+						if (e.oid != null) {
+							qList.push({ "statement": "MATCH (n)-[r:FMTTS{id:'" + e.id + "'}]->(o:TESTSCENARIOS) DETACH DELETE r,o;" });
+							if (e.renamed) qList.push({ "statement": "MATCH(n:MODULES_ENDTOEND{moduleID:'" + e.id + "'}) SET n.moduleName='" + e.name + "'" + ",n.unique_property='[" + e.name + ',' + e.projectID + "]'" });
 						}
-						else qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',status:'" + taskstatus + "',reviewer:'" + t.reviewer + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',release:'" + relId + "',cycle:'" + cycId + "',details:'" + t.details + "',parent:'[" + t.parent + "]'})" });
-					}
-				}
-				else if (e.type == 'scenarios') {
-					if (e.renamed && e.id_n) rnmList.push({ "statement": "MATCH(n:TESTSCENARIOS{testScenarioID:'" + e.id + "'}) SET n.testScenarioName='" + e.name + "'" + ",n.projectID='" + prjId + "'" });
-					qList.push({ "statement": "MERGE(n:TESTSCENARIOS{projectID:'" + e.projectID + "',moduleID:'" + idDict[e.pid] + "',testScenarioName:'" + e.name + "',testScenarioID:'" + e.id + "',createdBy:'" + user + "',createdOn:'null',testScenarioID_c:'" + e.id_c + "'}) SET n.childIndex='" + e.childIndex + "'" });
-					//Scenario query-------yashi
-					//Relating scenario with moduleId
-					//Yashi
-					qList.push({ "statement": "MATCH (a:MODULES_ENDTOEND{moduleID:'" + idDict[e.pid] + "'}),(b:TESTSCENARIOS{moduleID:'" + idDict[e.pid] + "'}) MERGE (a)-[r:FMTTS {id:'" + idDict[e.pid] + "'}]-(b)" });
-					//Supporting task assignmnet for scenarios
-					if (t != null && e.id_c != null) {
-						t.parent = [prjId].concat(e.pid_c, e.id_c);
-						t.id = (t.id != null) ? t.id : uuidV4();
-						if (t.oid != null) {
-							if (t.updatedParent != undefined) {
-								qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]',release:'" + relId + "',cycle:'" + cycId + "'}) SET n.task='" + t.task + "',n.status='" + taskstatus + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]'" });
-							} else {
-								qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]',release:'" + relId + "',cycle:'" + cycId + "'}) SET n.task='" + t.task + "',n.status='" + taskstatus + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "'" });
+						else qList.push({ "statement": "MERGE(n:MODULES_ENDTOEND{projectID:'" + e.projectID + "',moduleName:'" + e.name + "',moduleID:'" + e.id + "',createdBy:'" + user + "',createdOn:'null',moduleID_c:'" + e.id_c + "',unique_property:'[" + e.name + ',' + e.projectID + "]'}) SET n.childIndex='" + e.childIndex + "'" });
+						if (t != null && e.id_c != null) {
+							t.parent = [prjId].concat(e.id_c);
+							t.id = (t.id != null) ? t.id : uuidV4();
+							if (t.oid != null) {
+								if (t.updatedParent != undefined) {
+									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]',release:'" + t.release + "',cycle:'" + t.cycle + "'}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + ",n.status='" + taskstatus + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]'" });
+								} else {
+									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]',release:'" + t.release + "',cycle:'" + t.cycle + "'}) SET n.task='" + t.task + "',n.status='" + taskstatus + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "'" });
+								}
 							}
+							else qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',status:'" + taskstatus + "',reviewer:'" + t.reviewer + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',release:'" + relId + "',cycle:'" + cycId + "',details:'" + t.details + "',parent:'[" + t.parent + "]'})" });
 						}
-						else qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',release:'" + relId + "',cycle:'" + cycId + "',details:'" + t.details + "',parent:'[" + t.parent + "]'})" });
-						qList.push({ "statement": "MATCH (a:TESTSCENARIOS{projectID:'" + e.projectID + "',testScenarioName:'" + e.name + "'}),(b:TASKS{taskID:'" + t.id + "'}) MERGE (a)-[r:FNTT {id:a.testScenarioID}]-(b)" });
 					}
-					qList.push({ "statement": "MATCH (m:MODULES_ENDTOEND)-[mt]-(c:TESTSCENARIOS{projectID:'" + prjId + "',testScenarioName:'" + e.name + "',testScenarioID:'" + e.id + "'}) ,(a:TASKS) where not c.testScenarioID_c='null' and a.parent=~('.*'+m.moduleID_c+','+c.testScenarioID_c+']') MERGE (c)-[rel:FNTT {id:c.testScenarioID}]-(a)" });
-					// else if(e.id_n==null){ // In case added first time to end to end then connect to all task if exist
-					// 	qList.push({"statement":"MATCH (a:TASKS)<-[r]-(b:TESTSCENARIOS{projectID:'"+prjId+"',testScenarioName:'"+e.name+"'}),(c:TESTSCENARIOS{projectID:'"+e.projectID+"',testScenarioName:'"+e.name+"'}) MERGE (c)-[rel:FNTT {id:c.testScenarioID}]-(a)"});							
-					// }
-				}
-			});
-
-			qList.push({ "statement": "MATCH (a) remove a.uid" });
-			qList = qList.concat(rnmList);
-			qList.push({ "statement": "MATCH path=(n:MODULES_ENDTOEND{moduleID:'" + data[0].id + "'}) WHERE NOT (n)-[:FMTTS]->() RETURN n", "resultDataContents": ["graph"] });
-			qList.push({ "statement": "MATCH path=(n:MODULES_ENDTOEND{moduleID:'" + data[0].id + "'})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] });
-
-			neo4jAPI.executeQueries(qList, function (status, result) {
-				if (status != 200) {
-					var error_msg = 'Fail';
-					result = JSON.stringify(result)
-					if (result.indexOf('Schema.ConstraintValidationFailed') > -1) {
-						error_msg = 'DuplicateModules';
-					}
-					res.status(status).send(error_msg);
-				} else {
-					res.setHeader('Content-Type', 'application/json');
-					var k = 0, rIndex, lbl, neoIdDict = {};
-					idDict = {};
-					var attrDict = { "modules_endtoend": { "childIndex": "childIndex", "projectID": "projectID", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "modules": { "childIndex": "childIndex", "projectID": "projectID", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "scenarios": { "projectID": "projectID", "childIndex": "childIndex", "moduleID": "pid_n", "testScenarioName": "name", "testScenarioID": "id_n", "testScenarioID_c": "id_c" }, "screens": { "projectID": "projectID", "childIndex": "childIndex", "testScenarioID": "pid_n", "screenName": "name", "screenID": "id_n", "screenID_c": "id_c", "taskexists": "taskexists" }, "testcases": { "projectID": "projectID", "childIndex": "childIndex", "screenID": "pid_n", "testCaseName": "name", "testCaseID": "id_n", "testCaseID_c": "id_c", "taskexists": "taskexists" }, "tasks": { "taskID": "id_n", "task": "t", "batchName": "bn", "assignedTo": "at", "reviewer": "rw", "startDate": "sd", "endDate": "ed", "re_estimation": "re_estimation", "release": "re", "cycle": "cy", "details": "det", "nodeID": "pid", "parent": "anc", "cx": "cx" } };
-					var jsonData = result;
-					var new_res = jsonData[jsonData.length - 1].data;
-					if (new_res.length == 0) {
-						new_res = jsonData[jsonData.length - 2].data
-					}
-					new_res.forEach(function (row) {
-						row.graph.nodes.forEach(function (n) {
-							if (idDict[n.id] === undefined) {
-								lbl = n.labels[0].toLowerCase();
-								if (lbl == 'testscenarios') lbl = 'scenarios';
-								for (var attrs in n.properties) {
-									if (attrDict[lbl][attrs] !== undefined) n[attrDict[lbl][attrs]] = n.properties[attrs];
-									delete n.properties[attrs];
+					else if (e.type == 'scenarios') {
+						if (e.renamed && e.id_n) rnmList.push({ "statement": "MATCH(n:TESTSCENARIOS{testScenarioID:'" + e.id + "'}) SET n.testScenarioName='" + e.name + "'" + ",n.projectID='" + prjId + "'" });
+						qList.push({ "statement": "MERGE(n:TESTSCENARIOS{projectID:'" + e.projectID + "',moduleID:'" + idDict[e.pid] + "',testScenarioName:'" + e.name + "',testScenarioID:'" + e.id + "',createdBy:'" + user + "',createdOn:'null',testScenarioID_c:'" + e.id_c + "'}) SET n.childIndex='" + e.childIndex + "'" });
+						//Scenario query-------yashi
+						//Relating scenario with moduleId
+						//Yashi
+						qList.push({ "statement": "MATCH (a:MODULES_ENDTOEND{moduleID:'" + idDict[e.pid] + "'}),(b:TESTSCENARIOS{moduleID:'" + idDict[e.pid] + "'}) MERGE (a)-[r:FMTTS {id:'" + idDict[e.pid] + "'}]-(b)" });
+						//Supporting task assignmnet for scenarios
+						if (t != null && e.id_c != null) {
+							t.parent = [prjId].concat(e.pid_c, e.id_c);
+							t.id = (t.id != null) ? t.id : uuidV4();
+							if (t.oid != null) {
+								if (t.updatedParent != undefined) {
+									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]',release:'" + relId + "',cycle:'" + cycId + "'}) SET n.task='" + t.task + "',n.status='" + taskstatus + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]'" });
+								} else {
+									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]',release:'" + relId + "',cycle:'" + cycId + "'}) SET n.task='" + t.task + "',n.status='" + taskstatus + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "'" });
 								}
-								if (lbl == "tasks") nData.push({ id: n.id_n, oid: n.id, task: n.t, assignedTo: n.at, reviewer: n.rw, startDate: n.sd, endDate: n.ed, re_estimation: n.re_estimation, release: n.re, cycle: n.cy, details: n.det, nodeID: n.pid, parent: n.anc.slice(1, -1).split(',') });
-								else {
-									if (lbl == "modules_endtoend") n.childIndex = 0;
-									nData.push({ projectID: n.projectID, childIndex: n.childIndex, id: n.id, "type": lbl, name: n.name, id_n: n.id_n, pid_n: n.pid_n, id_c: n.id_c, children: [], task: null });
+							}
+							else qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',release:'" + relId + "',cycle:'" + cycId + "',details:'" + t.details + "',parent:'[" + t.parent + "]'})" });
+							qList.push({ "statement": "MATCH (a:TESTSCENARIOS{projectID:'" + e.projectID + "',testScenarioName:'" + e.name + "'}),(b:TASKS{taskID:'" + t.id + "'}) MERGE (a)-[r:FNTT {id:a.testScenarioID}]-(b)" });
+						}
+						qList.push({ "statement": "MATCH (m:MODULES_ENDTOEND)-[mt]-(c:TESTSCENARIOS{projectID:'" + prjId + "',testScenarioName:'" + e.name + "',testScenarioID:'" + e.id + "'}) ,(a:TASKS) where not c.testScenarioID_c='null' and a.parent=~('.*'+m.moduleID_c+','+c.testScenarioID_c+']') MERGE (c)-[rel:FNTT {id:c.testScenarioID}]-(a)" });
+						// else if(e.id_n==null){ // In case added first time to end to end then connect to all task if exist
+						// 	qList.push({"statement":"MATCH (a:TASKS)<-[r]-(b:TESTSCENARIOS{projectID:'"+prjId+"',testScenarioName:'"+e.name+"'}),(c:TESTSCENARIOS{projectID:'"+e.projectID+"',testScenarioName:'"+e.name+"'}) MERGE (c)-[rel:FNTT {id:c.testScenarioID}]-(a)"});							
+						// }
+					}
+				});
+
+				qList.push({ "statement": "MATCH (a) remove a.uid" });
+				qList = qList.concat(rnmList);
+				qList.push({ "statement": "MATCH path=(n:MODULES_ENDTOEND{moduleID:'" + data[0].id + "'}) WHERE NOT (n)-[:FMTTS]->() RETURN n", "resultDataContents": ["graph"] });
+				qList.push({ "statement": "MATCH path=(n:MODULES_ENDTOEND{moduleID:'" + data[0].id + "'})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] });
+
+				neo4jAPI.executeQueries(qList, function (status, result) {
+					if (status != 200) {
+						var error_msg = 'Fail';
+						result = JSON.stringify(result)
+						if (result.indexOf('Schema.ConstraintValidationFailed') > -1) {
+							error_msg = 'DuplicateModules';
+						}
+						res.status(status).send(error_msg);
+					} else {
+						res.setHeader('Content-Type', 'application/json');
+						var k = 0, rIndex, lbl, neoIdDict = {};
+						idDict = {};
+						var attrDict = { "modules_endtoend": { "childIndex": "childIndex", "projectID": "projectID", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "modules": { "childIndex": "childIndex", "projectID": "projectID", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "scenarios": { "projectID": "projectID", "childIndex": "childIndex", "moduleID": "pid_n", "testScenarioName": "name", "testScenarioID": "id_n", "testScenarioID_c": "id_c" }, "screens": { "projectID": "projectID", "childIndex": "childIndex", "testScenarioID": "pid_n", "screenName": "name", "screenID": "id_n", "screenID_c": "id_c", "taskexists": "taskexists" }, "testcases": { "projectID": "projectID", "childIndex": "childIndex", "screenID": "pid_n", "testCaseName": "name", "testCaseID": "id_n", "testCaseID_c": "id_c", "taskexists": "taskexists" }, "tasks": { "taskID": "id_n", "task": "t", "batchName": "bn", "assignedTo": "at", "reviewer": "rw", "startDate": "sd", "endDate": "ed", "re_estimation": "re_estimation", "release": "re", "cycle": "cy", "details": "det", "nodeID": "pid", "parent": "anc", "cx": "cx" } };
+						var jsonData = result;
+						var new_res = jsonData[jsonData.length - 1].data;
+						if (new_res.length == 0) {
+							new_res = jsonData[jsonData.length - 2].data
+						}
+						new_res.forEach(function (row) {
+							row.graph.nodes.forEach(function (n) {
+								if (idDict[n.id] === undefined) {
+									lbl = n.labels[0].toLowerCase();
+									if (lbl == 'testscenarios') lbl = 'scenarios';
+									for (var attrs in n.properties) {
+										if (attrDict[lbl][attrs] !== undefined) n[attrDict[lbl][attrs]] = n.properties[attrs];
+										delete n.properties[attrs];
+									}
+									if (lbl == "tasks") nData.push({ id: n.id_n, oid: n.id, task: n.t, assignedTo: n.at, reviewer: n.rw, startDate: n.sd, endDate: n.ed, re_estimation: n.re_estimation, release: n.re, cycle: n.cy, details: n.det, nodeID: n.pid, parent: n.anc.slice(1, -1).split(',') });
+									else {
+										if (lbl == "modules_endtoend") n.childIndex = 0;
+										nData.push({ projectID: n.projectID, childIndex: n.childIndex, id: n.id, "type": lbl, name: n.name, id_n: n.id_n, pid_n: n.pid_n, id_c: n.id_c, children: [], task: null });
+									}
+									if (lbl == "modules_endtoend") rIndex = k;
+									idDict[n.id] = k; neoIdDict[n.id_n] = k;
+									k++;
 								}
-								if (lbl == "modules_endtoend") rIndex = k;
-								idDict[n.id] = k; neoIdDict[n.id_n] = k;
-								k++;
+							});
+							row.graph.relationships.forEach(function (r) {
+								var srcIndex = idDict[r.startNode.toString()];
+								var tgtIndex = idDict[r.endNode.toString()];
+								if (nData[tgtIndex].children === undefined) nData[srcIndex].task = nData[tgtIndex];
+								else if (nData[srcIndex].children.indexOf(nData[tgtIndex]) == -1) {
+									nData[srcIndex].children.push(nData[tgtIndex]);
+									if (nData[tgtIndex].childIndex == undefined) nData[tgtIndex].childIndex = nData[srcIndex].children.length;
+								}
+							});
+						});
+						nData.forEach(function (e) {
+							if (e.pid_n) {
+								if (neoIdDict[e.pid_n] !== undefined) e.pid_n = nData[neoIdDict[e.pid_n]].id;
+								else e.pid_n = null;
 							}
 						});
-						row.graph.relationships.forEach(function (r) {
-							var srcIndex = idDict[r.startNode.toString()];
-							var tgtIndex = idDict[r.endNode.toString()];
-							if (nData[tgtIndex].children === undefined) nData[srcIndex].task = nData[tgtIndex];
-							else if (nData[srcIndex].children.indexOf(nData[tgtIndex]) == -1) {
-								nData[srcIndex].children.push(nData[tgtIndex]);
-								if (nData[tgtIndex].childIndex == undefined) nData[tgtIndex].childIndex = nData[srcIndex].children.length;
-							}
-						});
-					});
-					nData.forEach(function (e) {
-						if (e.pid_n) {
-							if (neoIdDict[e.pid_n] !== undefined) e.pid_n = nData[neoIdDict[e.pid_n]].id;
-							else e.pid_n = null;
-						}
-					});
-					res.status(status).send(nData[rIndex]);
-				}
-			});
+						res.status(status).send(nData[rIndex]);
+					}
+				});
+			}
+		});
 		} else if (flag == 20) {
 			var uidx = 0, rIndex;
 			var vn_from = inputs.vn_from;
