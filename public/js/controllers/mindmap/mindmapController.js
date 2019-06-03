@@ -42,6 +42,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     var currMap = {};
     var excelMap = {};
     var excelFlag = 0;
+    var versionFlag = 0;
     var dragsearch = false;
     $scope.allMMaps = [];
     var split_char = ',';
@@ -641,6 +642,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $(".search-canvas").val('');
         $scope.functionTBE = 'loadMapPopupConfirmed';
         excelFlag = 1;
+        versionFlag = 1;
         $('#createNewConfirmationPopup').attr('mapid', $scope.allMMaps[idx].name);
         if (Object.keys($scope.nodeDisplay).length != 0) {
             $('#createNewConfirmationPopup').modal('show');
@@ -758,6 +760,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
             currMap = result[0];
             excelMap = JSON.parse(JSON.stringify(currMap));
+            loadedmodule = excelMap.name;
             $('div[title=' + modName + ']').addClass('nodeBoxSelected');
             if ($scope.tab == 'tabCreate')
                 populateDynamicInputList();
@@ -3398,6 +3401,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     */
 
     $scope.exportData = function(versioning_status) {
+        if (versionFlag != 1) {
+            openDialogMindmap("Fail", "Select the Module to export to excel");
+            return;
+        }
         var data_not_exported = [];
         var vs_n = 0;
         var version_num = "0.0";
@@ -3410,6 +3417,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         data = {
             "moduleInfo": []
         };
+        var loadedModule= loadedmodule;
         execution_data = {
             "execution_data": [{
                 "browserType": ["1"],
@@ -3444,6 +3452,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 result_details = result;
                 flag = 0;
                 for (var i = 0; i < result_details.length; i++) {
+                    if(result_details[i].name== loadedModule){
                     var module_info = {
                         "appType": "",
                         "projectId": $scope.projectNameO,
@@ -3476,6 +3485,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         data_not_exported.push(result_details[i].id_n);
                         console.log('Not exported : ', result_details[i].name);
                     }
+                }
                 }
                 if (flag) {
                     mindmapServices.getProjectTypeMM_Nineteen68($scope.projectNameO).then(
