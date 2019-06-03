@@ -3402,7 +3402,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     $scope.exportData = function(versioning_status) {
         if (versionFlag != 1) {
-            openDialogMindmap("Fail", "Select the Module to export to excel");
+            openDialogMindmap("Fail", "Please select a module first");
             return;
         }
         var data_not_exported = [];
