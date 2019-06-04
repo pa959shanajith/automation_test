@@ -1918,8 +1918,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								$("#compareNotFoundObjectsBox").hide();
 							}
 						}
+						
 						else {
-							openDialog("Compare Objects", "Failed to compare objects");
+							if (data.status =="EMPTY_OBJECT"){
+								openDialog("Compare Objects", "Failed to compare objects - Unmapped object(s) found");
+							}
+							else{
+								openDialog("Compare Objects", "Failed to compare objects");
+							}
 							$rootScope.compareFlag = false;
 							return;
 						}
@@ -2166,6 +2172,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							//$("#deleteObjects").prop("disabled", false);
 							deleteScrapeDataservice = false;
 						} else $("#saveObjects").addClass('hide');
+					}
+
+					if('view' in  data)
+					{
+						if(data.view.length == 0)
+						{
+							$(".checkStylebox").prop('disabled', true);
+						}
 					}
 
 					if ($("#compareChangedObjectsBox").is(":visible") == true || $("#compareNotFoundObjectsBox").is(":visible") == true) {
@@ -3802,7 +3816,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		}
 	})
 
-	//Triggered When each checkbox objects are clicked in comapre & update screen
+	//Triggered When each checkbox objects are clicked in compare & update screen
 	$(document).on('click', "input[name='selectAllChangedItems']", function () {
 		if ($(this).is(":checked")) {
 			$(this).addClass('checked');
@@ -4438,7 +4452,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		// var labelArr = [];
 		// var infoArr = [];
 
-		mindmapServices.reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs).then(function (result) {
+		mindmapServices.reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs,false).then(function (result) {
 			if (result == 'fail') {
 				openDialog("Task Submission Error", "Reviewer is not assigned !", true)
 			} else if (taskstatus == 'reassign') {
@@ -4595,7 +4609,7 @@ function contentTable(newTestScriptDataLS) {
 				if (str == "string" && 'rows' in data) {
 					if (data.rows[rowId - 1].addTestCaseDetailsInfo.length > 0) {
 						$(this).find("td:nth-child(13)").text('');
-						$(this).find("td:nth-child(13)").append('<img alt="activeDetails" title="" id="details_' + v + '" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+						$(this).find("td:nth-child(13)").append('<img alt="activeDetails" title="" id="details_' + v + '" src="imgs/ic-details-inactive.png" class="detailsIcon activeDetails"/>');
 					}
 					else if (data.rows[rowId - 1].addTestCaseDetails.length == 0) {
 						$(this).find("td:nth-child(13)").text('');
@@ -4609,7 +4623,7 @@ function contentTable(newTestScriptDataLS) {
 				else if (str == "string") {
 					if (data[rowId - 1].addTestCaseDetailsInfo.length > 0) {
 						$(this).find("td:nth-child(13)").text('');
-						$(this).find("td:nth-child(13)").append('<img  alt="activeDetails"  title="" id="details_' + v + '" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+						$(this).find("td:nth-child(13)").append('<img  alt="activeDetails"  title="" id="details_' + v + '" src="imgs/ic-details-inactive.png" class="detailsIcon activeDetails"/>');
 					}
 					else if (data[rowId - 1].addTestCaseDetails.length == 0) {
 						$(this).find("td:nth-child(13)").text('');
@@ -6664,6 +6678,7 @@ function pasteInGrid(e) {
 		if (gridData.length == 1 && gridData[0].custname == "") {
 			gridData.splice(gridData[0], 1)
 			for (k = 0; k < getRowJsonToPaste.length; k++) {
+				getRowJsonToPaste[k].stepNo=k+1
 				gridData.push(getRowJsonToPaste[k])
 			}
 		} else {

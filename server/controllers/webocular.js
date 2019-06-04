@@ -13,19 +13,21 @@ exports.getCrawlResults = function (req, res) {
 			var url = req.body.url;
 			var level = req.body.level;
 			var agent = req.body.agent;
+			var proxy = req.body.proxy;
 			var validate_agent = validator.isAlpha(agent);
 			var validate_level = !(validator.isEmpty(level.toString()));
 			//var validate_url = validator.isURL(req.body.url);
+			var validate_proxy = (!proxy.enable)? true : validator.isURL(proxy.url) && ((proxy.username.length==0 && proxy.password.length==0) || (proxy.username.length>0 && proxy.password.length>0));
 			var validate_url = url.toLowerCase().startsWith("http://")? (url.length>7): (url.toLowerCase().startsWith("https://") && url.length>8);
-			if (!(validate_url && validate_level && validate_agent)) {
-				logger.error("Error occurred in the service getCrawlResults: Invalid URL or Agent");
+			if (!(validate_url && validate_level && validate_agent && validate_proxy)) {
+				logger.error("Error occurred in the service getCrawlResults: Invalid URL or Agent or Proxy");
 				return res.send("invalidParams");
 			}
 			logger.info("ICE Socket requesting Address: %s", name);
 			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres) {
 				if (redisres[1]>0) {
 					logger.info("Sending socket request for webCrawlerGo to redis");
-					var dataToIce = {"emitAction" : "webCrawlerGo","username" : name, "input_url":url, "level" : level, "agent" :agent};
+					var dataToIce = {"emitAction": "webCrawlerGo", "username": name, "input_url": url, "level": level, "agent":agent, "proxy": proxy};
 					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					var notifySocMap = myserver.socketMapNotify;
 					var mySocketUIMap = myserver.allSocketsMapUI;
@@ -52,9 +54,14 @@ exports.getCrawlResults = function (req, res) {
 							} else if (data.onAction == "result_web_crawler_finished") {
 								redisServer.redisSubServer.removeListener('message',webCrawlerGo_listener);	
 								try {
-									mySocketUIMap[name].emit("endData", value);
-									logger.info("Crawl completed successfully!");
-									var resultData = {success: true};
+									var resultData = null;
+									if (value.progress == "fail") {
+										resultData = {success: false, data: "Error While Crawling"}										
+									} else {
+										resultData = {success: true};
+										mySocketUIMap[name].emit("endData", value);
+										logger.info("Crawl completed successfully!");
+									}
 									if (notifySocMap[name]) notifySocMap[name].emit("result_WebcrawlerFinished", resultData);
 									else if (!resSent) res.json(resultData);
 								} catch (exception) {

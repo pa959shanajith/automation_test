@@ -2,6 +2,8 @@ var async = require('async');
 var logger = require('../../logger');
 var myserver = require('../../server');
 var redisServer = require('./redisSocketHandler');
+var neo4jAPI = require('../controllers/neo4jAPI');
+
 
 module.exports.getChannelNum = function(channel,cb) {
 	redisServer.redisPubICE.pubsub('numsub', channel,function(err,redisres){
@@ -80,3 +82,37 @@ module.exports.isSessionActive = function (req){
 	var cookieCheck = (cookies["connect.sid"]!==undefined) && (cookies["maintain.sid"]!==undefined);
 	return sessionCheck && cookieCheck;
 };
+
+module.exports.approval_status_check=function(ExecutionData,approval_callback){
+	async.forEachSeries(ExecutionData,function(eachmoduledata,callback){
+		var qlist=[];
+		var scenario_list=[];
+		var arr=eachmoduledata.suiteDetails;
+		for (i=0;i<arr.length;i++){
+			scenario_list.push(arr[i].scenarioids);
+		}
+		qlist.push({'statement':"MATCH (ts:TESTSCENARIOS)-[r]->(s:SCREENS)-[]->(tc:TESTCASES) where ts.testScenarioID_c in "+JSON.stringify(scenario_list)+"  with '.*'+s.screenID_c+']' as r1,s MATCH (t:TASKS),(t1:TASKS{status:'complete'}) where t.parent=~r1 and t1.parent=~r1 return count(DISTINCT t.status)=1 and count(DISTINCT substring(t.parent,112))=count(DISTINCT s.screenID_c) and count(DISTINCT substring(t1.parent,112))=count(DISTINCT s.screenID_c)"});
+		qlist.push({'statement':"MATCH (ts:TESTSCENARIOS)-[r]->(s:SCREENS)-[]->(tc:TESTCASES) where ts.testScenarioID_c in "+JSON.stringify(scenario_list)+"  with '.*'+tc.testCaseID_c+']' as r1,tc  MATCH (t:TASKS),(t1:TASKS{status:'complete'}) where t.parent=~r1 and t1.parent=~r1 return count(DISTINCT t.status)=1 and count(DISTINCT substring(t.parent,149))=count(DISTINCT tc.testCaseID_c) and count(DISTINCT substring(t1.parent,149))=count(DISTINCT tc.testCaseID_c)"});
+		neo4jAPI.executeQueries(qlist,function(status_res,result){
+			if(status_res!=200) {
+				logger.error("Error in ExecuteTestSuite_ICE: Neo4j query to find the number of tasks approved");
+				return callback({res:'fail',status:status_res});
+			}
+			try {
+				var err = null;
+				if(!(result[0].data[0].row[0] && result[1].data[0].row[0] )){
+						logger.info("All its dependent tasks (design, scrape) are not approved");
+						err = {res:'NotApproved',status:status_res};
+				}
+				callback(err);
+			} catch(ex) {
+				logger.error("exception in function ValidateIfApproved() of Suitejs: ",ex);
+				callback({res:'fail',status:502});
+			}
+		});
+	}, function (err,data){
+		console.log(err);
+		if (err) approval_callback(err,false)
+		else approval_callback(null,true)
+	});
+}

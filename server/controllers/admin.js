@@ -2,7 +2,6 @@
  * Dependencies.
  */
 var bcrypt = require('bcrypt');
-var uuid = require('uuid-random');
 var TokenGenerator = require('uuid-token-generator')
 var async = require('async');
 var activeDirectory = require('activedirectory');
@@ -2246,7 +2245,7 @@ exports.manageSessionData = function (req, res) {
 							logger.debug(err);
 						} else {
 							sessions.forEach(function(e) {
-								if (currUser != e.username) {
+								if (e.uniqueId && currUser != e.username) {
 									data.sessionData.push({
 										username: e.username,
 										id: Buffer.from(e.uniqueId).toString("base64"),

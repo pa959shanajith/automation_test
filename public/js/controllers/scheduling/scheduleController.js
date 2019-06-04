@@ -117,14 +117,14 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 
 	$(document).on("change", '.selectToSched', function(){
 		 var allCount = $(".selectToSched").length;
+		 var selectedCount = $(this).parents(".scenarioBody").children("tr").find(".selectToSched:checked").length
 		 if(selectedCount == 0)
 		 	$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", false);
-		var selectedCount = $(this).parents(".scenarioBody").children("tr").find(".selectToSched:checked").length
-		 if(allCount == selectedCount){
+		 else if(allCount == selectedCount){
 			$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", true);
 		}
 		else{
-			$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", false);
+			$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", true);
 		}
 	
 	});
@@ -352,9 +352,17 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 	$scope.initSchedule = function($event){
 		var moduleInfo = [];
 		var doNotSchedule = false;
-		if(appType != "SAP" && browserTypeExe.length == 0)	openModelPopup("Schedule Test Suite", "Please select a browser");
-		else if($(".selectScheduleSuite:checked").length == 0) openModelPopup("Schedule Test Suite", "Please select atleast one Suite(s) to schedule");
+		if($(".selectScheduleSuite:checked").length == 0) openModelPopup("Schedule Test Suite", "Please select atleast one Suite(s) to schedule");
 		else if($('.selectToSched:checked').length == 0) openModelPopup("Schedule Test Suite", "Please select atleast one scenario to schedule");
+		else if(appType == "SAP" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select SAP Apps option");
+		else if(appType == "MobileApp" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select Mobile Apps option");
+		else if(appType == "MobileWeb" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select Mobile Web option");
+		else if(appType == "Desktop" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select Desktop Apps option");
+		else if(appType == "Web" && browserTypeExe.length == 0)	openModelPopup("Schedule Test Suite", "Please select a browser");
+		else if(appType == "Webservice" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select Web Services option");
+		else if (appType == "Mainframe" && browserTypeExe.length === 0) openModelPopup("Schedule Test Suite", "Please select Mainframe option");
+		else if (appType == "DesktopJava" && browserTypeExe.length === 0) openDialogExe("Schedule Test Suite", "Please select OEBS Apps option");
+		else if (browserTypeExe.length === 0) openDialogExe("Schedule Test Suite", "Please select " + appType + " option");
 		else{
 			if(appType == "SAP") browserTypeExe = ["1"];
 			$.each($(".batchSuite"), function(){
@@ -387,7 +395,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 						doNotSchedule = true;
 						return false;
 					}
-					else if((new Date(sldate_2[2],(sldate_2[1]-1),sldate_2[0],sltime_2[0],sltime_2[1]) > new Date()) && (parseInt(sltime_2[0]) == new Date().getHours()) && (parseInt(sltime_2[1]) <= new Date().getMinutes()+5)){
+					else if((new Date(sldate_2[2],(sldate_2[1]-1),sldate_2[0],sltime_2[0],sltime_2[1]) > new Date()) && (parseInt(sldate_2[0]) == new Date().getDate()) && (parseInt(sltime_2[0]) == new Date().getHours()) && (parseInt(sltime_2[1]) <= new Date().getMinutes()+5)){
 						$(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").prop("style","border: 2px solid red;");
 						openModelPopup("Schedule Test Suite", "Schedule time must be 5 mins more than current time.");
 						doNotSchedule = true;
@@ -469,11 +477,14 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 						}
 						//var curDate = new Date(Date.UTC(sldate_2[2],sldate_2[1]-1,sldate_2[0],sltime_2[0],sltime_2[1],0));
 						var chktype = "checkexist"
-						ScheduleService.testSuitesScheduler_ICE(chktype,details)
+						ScheduleService.testSuitesScheduler_ICE(chktype,details,moduleInfo)
 						.then(function(data){
 							counter++;
 							if(data == "fail"){
 								doNotSchedule = true;
+							}else if(data=="NotApproved"){
+								doNotSchedule = true;
+								openModelPopup("Schedule Test Suite", "All the dependent tasks (design, scrape) needs to be approved before execution");
 							}
 							else if(data.length > 0){
 								doNotSchedule = true;
@@ -494,7 +505,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 			function proceedScheduling(){
 				if(doNotSchedule == false){
 					var chktype = "schedule";
-					ScheduleService.testSuitesScheduler_ICE(chktype,moduleInfo)
+					ScheduleService.testSuitesScheduler_ICE(chktype,'',moduleInfo)
 					.then(function(data){
 						if(data == "success"){
 							openModelPopup("Schedule Test Suite", "Successfully scheduled.");

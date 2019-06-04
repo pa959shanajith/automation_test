@@ -788,14 +788,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	});
 	//ALM Functionality
 
-
-	// //Submit Task Function
-	// $scope.submitTaskExecution = function(){
-	// 	$("#submitTasksExecution").modal("show")
-	// 	$('#submitTasksExecution').find('.btn-default-yes').focus();
-	// }
-	// //Submit Task Function
-
 	$scope.submit_task = function (action, e) {
 		var taskid = current_task.subTaskId;
 		var taskstatus = current_task.status;
@@ -805,15 +797,44 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		if (action != undefined && action == 'reassign') {
 			taskstatus = action;
 		}
+		if ($scope.moduleInfo.length <= 0) {
+			$.each($(".parentSuiteChk"), function () {
+				var suiteInfo = {};
+				var selectedRowData = [];
+				//suiteInfo.suiteDetails = [];
+				var relidreport = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].releaseid;
+				var cycidreport = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].cycleid;
+				var projectidreport = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].projectidts;
+				if ($(this).is(":checked") == true) {
+					$(this).parent().parent().next().find('tbody input[type=checkbox]:checked').each(function () {
+						selectedRowData.push({
+							scenarioids: $(this).parent().siblings(".exe-scenarioIds").attr("sId"),
+						});
+					});
+					//console.log("selectedRowData:::" + selectedRowData)
+					suiteInfo.suiteDetails = selectedRowData;
+					suiteInfo.testsuitename = $(this).parents('span.taskname').text();
+					suiteInfo.testsuiteid = $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
+					suiteInfo.releaseid = relidreport;
+					suiteInfo.cycleid = cycidreport;
+					suiteInfo.projectid = projectidreport;
+					//console.log("suiteInfo:::" + suiteInfo)
+					$scope.moduleInfo.push(suiteInfo);
+				}
+			});
+		}
 
 		//Transaction Activity for Task Submit/Approve/Reassign Button Action
 		// var labelArr = [];
 		// var infoArr = [];
 
-		mindmapServices.reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs).then(function (result) {
+		mindmapServices.reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs,$scope.moduleInfo).then(function (result) {
 			if (result == 'fail') {
 				openDialogExe("Task Submission Error", "Reviewer is not assigned !", true);
-			} else if (taskstatus == 'reassign') {
+			}else if(result =='NotApproved'){
+				openDialogExe("Task Submission Error", "All the dependent tasks (design, scrape) needs to be approved before Submission", true);
+			} 
+			else if (taskstatus == 'reassign') {
 				openDialogExe("Task Reassignment Success", "Task Reassigned successfully!", true);
 				//labelArr.push(txnHistory.codesDict['TaskReassign']);
 			} else if (taskstatus == 'review') {

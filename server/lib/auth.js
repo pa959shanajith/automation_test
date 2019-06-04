@@ -211,7 +211,7 @@ var routeUtil = {
 			return passport.authenticate("local", {
 				successRedirect: opts.route.success, failureRedirect: opts.route.failure, failureMessage: true
 			}, function(err, user, info){
-				if (!user) res.send(info);
+				if (!user || req.body.query == "api") res.send(info);
 				else req.logIn(user, function(err) {
 					if (err) return next(err);
 					return res.send(info);

@@ -20,7 +20,7 @@ default_sub.on("message", function (channel, message) {
 		mySocket = sockets.allSocketsMap[data.username];
 	switch (data.emitAction) {
 	case "webCrawlerGo":
-		mySocket.emit("webCrawlerGo", data.input_url, data.level, data.agent);
+		mySocket.emit("webCrawlerGo", data.input_url, data.level, data.agent, data.proxy);
 		break;
 
 	case "LAUNCH_DESKTOP":
@@ -144,7 +144,7 @@ module.exports.initListeners = function(mySocket){
 	});
 
 	mySocket.on("result_web_crawler", function (value) {
-		var dataToNode = JSON.stringify({"username" : username,"onAction" : "result_web_crawler","value":JSON.parse(value)});
+		var dataToNode = JSON.stringify({"username": username, "onAction": "result_web_crawler", "value": JSON.parse(value)});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 

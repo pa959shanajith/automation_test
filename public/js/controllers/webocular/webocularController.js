@@ -17,12 +17,8 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 	localStorage.setItem("navigateEnable", true);
 
 	$("body").css("background", "#eee");
-	
 	//Task Listing
 	loadUserTasks();
-	window.onbeforeunload = function() {
-		return "Data will be lost if you leave the page, are you sure?";
-	};
 	function openDialog(title, body){
 		$("#WebocularGlobalModal").find('.modal-title').text(title);
 		$("#WebocularGlobalModal").find('.modal-body p').text(body).css('color','black');
@@ -39,7 +35,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 
 	var start = false;  // Flag to start the removal of dots from the dom
 	var currentDot = 0; // used to store the count of dots displayed in progess canvas
-	var crawlActive = false; // Flag to avoid duplicate/invalid requests
+	$scope.crawlActive = false; // Flag to avoid duplicate/invalid requests
 	$scope.hideBaseContent = { message: 'false' };
 	$scope.level = 4;
 	$scope.arr = [];
@@ -47,6 +43,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 	$scope.enableGenerate = false;
 	$scope.selectedAgent = "chrome";
 	$scope.url = "http://";
+	$scope.proxy = $scope.tprxy = {enable: false, url: "", username: "", password: ""};
 	$scope.showWebocularHome = function(){
 		if (!$scope.enableGenerate) return;
 		var myNode = document.getElementById("report-canvas");
@@ -63,12 +60,28 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		}
 	};
 
+	$scope.setProxy = function(args, $event){
+		if ($scope.crawlActive) return;
+		if (args == "show") {
+			$(".setProxy span img").addClass("left-bottom-selection");
+			$("#dialog-setProxy").modal("show");
+			$scope.tprxy = JSON.parse(JSON.stringify($scope.proxy));
+		} else if (args == "hide") {
+            $("img.left-bottom-selection").removeClass('left-bottom-selection');
+		} else if (args == "reset") {
+			$scope.tprxy = {enable: false, url: "", username: "", password: ""};
+		} else if (args == "save") {
+			$scope.proxy = $scope.tprxy;
+            $("img.left-bottom-selection").removeClass('left-bottom-selection');
+		}
+	};
+
 	$scope.executeGo = function($event){
 		localStorage.setItem("navigateEnable", false);
 		$scope.enableGenerate = false;
 		$scope.crawledLinks = [];
 		$scope.arr = [];
-		crawlActive = false;
+		$scope.crawlActive = false;
 		var initCrawl = true;
 
 		start = false; // Flag to start the removal of dots from the dom
@@ -108,13 +121,14 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		// fired when the connection acknowledgment is received from the server
 		socketUI.on('connectionAck', function(value){
 			if (!initCrawl) return;
-			crawlActive = true;
+			$scope.crawlActive = true;
 			initCrawl = false;
 			$rootScope.resetSession.start();
-			webocularServices.getResults($scope.url, $scope.level, $scope.selectedAgent).then(function(data){
+			webocularServices.getResults($scope.url, $scope.level, $scope.selectedAgent, $scope.proxy).then(function(data){
 				if (data == "begin") return false;
 				$rootScope.resetSession.end();
-				crawlActive = false;
+				$scope.crawlActive = false;
+				localStorage.setItem("navigateEnable", true);
 				console.log("Data from service", data);
 				if(data == "Invalid Session") {
 					return $rootScope.redirectPage();
@@ -123,17 +137,19 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 					$('#progress-canvas').hide();
 					if (data == "unavailableLocalServer") openDialog("Webocular Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
 					else if(data == "scheduleModeOn") openDialog("Webocular Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
-					else if(data == "invalidParams") openDialog("Webocular Screen", "Invalid URL or Agent or Level.");
+					else if(data == "invalidParams") openDialog("Webocular Screen", "Invalid URL or Agent or Level or Proxy.");
+					else if (!data.success) openDialog("Webocular Screen", "Error while crawling. Fail to Crawl.");
 				}
 			}, function(err) {
 				$rootScope.resetSession.end();
 				$scope.hideBaseContent = { message: 'false' };
+				localStorage.setItem("navigateEnable", true);
 				// Display the progress canvas after clearing all dots.
 				$('#progress-canvas').hide();
 				openDialog("Webocular Screen", "Error while crawling.");
 				console.error("Error :", err);
 				socketUI.disconnect('', { query: "check=true" });
-				crawlActive = false;
+				$scope.crawlActive = false;
 			});
 		});
 
@@ -175,9 +191,13 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 	};
 
 	socket.on('result_WebcrawlerFinished', function (data) {
-		if (!crawlActive) return false;
+		if (!$scope.crawlActive) return false;
 		$rootScope.resetSession.end();
+		$scope.crawlActive = false;
 		if (!data.success) {
+			localStorage.setItem("navigateEnable", true);
+			$scope.hideBaseContent = { message: 'false' };
+			$('#progress-canvas').hide();
 			console.error(data.data);
 			openDialog("Webocular Screen", "Error while crawling. Fail to Crawl.");
 		}
