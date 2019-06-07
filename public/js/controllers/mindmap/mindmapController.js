@@ -2689,18 +2689,20 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             });
         }
 
-
-        var counter = {
-            'scenarios': 1,
-            'screens': 1,
-            'testcases': 1
-        };
+        var counter = {};
         temp_data.forEach(function(e, i) {
-            if (dNodes[e.idx].childIndex != counter[e.type]) {
-                dNodes[e.idx].childIndex = counter[e.type];
+            var key_1=dNodes[e.idx].pid_n;
+            if(key_1==undefined){
+                if(dNodes[e.idx].parent==null) return;
+                key_1=(dNodes[e.idx].parent.oid==undefined) ? dNodes[e.idx].parent.id : dNodes[e.idx].parent.oid
+            }
+            var key=e.type+'_'+key_1;
+            if(counter[key]==undefined)  counter[key]=1;
+            if (dNodes[e.idx].childIndex != counter[key]) {
+                dNodes[e.idx].childIndex = counter[key];
                 dNodes[e.idx].cidxch = 'true'; // child index updated
             }
-            counter[e.type] = counter[e.type] + 1;
+            counter[key] = counter[key] + 1;
         })
         var restrict_scenario_reuse = parseDataReuse(true);
         if (selectedTab != 'tabAssign') {
