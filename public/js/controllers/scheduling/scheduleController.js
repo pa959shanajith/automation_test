@@ -187,9 +187,15 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 	}
 
 	$scope.browImg = function(brow){
-		if(parseInt(brow) == 1)	return './imgs/ic-ch-schedule.png';
-		else if(parseInt(brow) == 2)	return './imgs/ic-ff-schedule.png';
-		else if(parseInt(brow) == 3)	return './imgs/ic-ie-schedule.png';
+		if (brow == "Web") return './imgs/web.png';
+		else if(brow == "Webservice") return './imgs/webservice.png';
+		else if(brow == "MobileApp") return './imgs/mobileApps.png';
+		else if(brow == "System") return './imgs/desktop.png';
+		else if(brow == "Desktop") return './imgs/desktop.png';
+		else if(brow == "SAP") return './imgs/sapApps.png';
+		else if(brow == "Mainframe") return './imgs/mainframe.png';
+		else if(brow == "DesktopJava") return './imgs/oracleApps.png';
+		else if(brow == "MobileWeb") return './imgs/MobileWeb.png';
 	}
 	/*//Populating Data in Scheduling Table	
 	$("#scheduleDataBody").empty()
@@ -361,8 +367,8 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 		else if(appType == "Web" && browserTypeExe.length == 0)	openModelPopup("Schedule Test Suite", "Please select a browser");
 		else if(appType == "Webservice" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select Web Services option");
 		else if (appType == "Mainframe" && browserTypeExe.length === 0) openModelPopup("Schedule Test Suite", "Please select Mainframe option");
-		else if (appType == "DesktopJava" && browserTypeExe.length === 0) openDialogExe("Schedule Test Suite", "Please select OEBS Apps option");
-		else if (browserTypeExe.length === 0) openDialogExe("Schedule Test Suite", "Please select " + appType + " option");
+		else if (appType == "DesktopJava" && browserTypeExe.length === 0) openModelPopup("Schedule Test Suite", "Please select OEBS Apps option");
+		else if (browserTypeExe.length === 0) openModelPopup("Schedule Test Suite", "Please select " + appType + " option");
 		else{
 			if(appType == "SAP") browserTypeExe = ["1"];
 			$.each($(".batchSuite"), function(){
