@@ -317,12 +317,17 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 
 	$scope.showTaskFilterPopup = function(){
 		$('#dialog-taskFilter').modal('show');
+		if ($scope.filterData['prjval']=='Select Project'){
+			$('#release-filter-list').attr('disabled',true);
+			$('#cycle-filter-list').attr('disabled',true);
+		}
+		else if ($scope.filterData['relval']=='Select Release')
+			$('#cycle-filter-list').attr('disabled',true);
 	};
 
 	function passFilterTest(node,tidx){
 		var pflag = false, rflag = false,cflag = false,aflag = false,tflag = false;
 		if($scope.filterData['prjval']=='Select Project' || $scope.filterData['prjval']==node.testSuiteDetails[tidx].projectidts) pflag = true;
-		if($scope.filterData['relval']=='Select Release' || $scope.filterData['relval']==node.taskDetails[tidx].releaseid) rflag = true;
 		if($scope.filterData['relval']=='Select Release' || $scope.filterData['relval']==node.taskDetails[tidx].releaseid) rflag = true;
 		if($scope.filterData['cycval']=='Select Cycle' || $scope.filterData['cycval']==node.taskDetails[tidx].cycleid) cflag = true;
 		if(Object.keys($scope.filterData['tasktype']).map(function(itm) { return $scope.filterData['tasktype'][itm]; }).indexOf(true) == -1 || $scope.filterData.tasktype[node.taskDetails[tidx].taskType]) tflag = true;
@@ -405,11 +410,13 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	};
 
 	$scope.clearFilter = function(){
-		$("#cycle-filter-list option:disabled").removeAttr('disabled');
+		//$("#cycle-filter-list option:disabled").removeAttr('disabled');
 		$scope.filterData['relval']='Select Release';
 		$scope.filterData['cycval']='Select Cycle'; 
 		$scope.filterData['prjval']='Select Project'; 
-		
+		$('#release-filter-list').attr('disabled',true);
+		$('#cycle-filter-list').attr('disabled',true);
+
 		Object.keys($scope.filterData.tasktype).forEach(function(key) {
 			$scope.filterData.tasktype[key] = false;
 		});
@@ -473,7 +480,11 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	}
 
 	$('#project-filter-list').change(function(){
-		$('#release-filter-list').val('Select Release');
+		//$('#release-filter-list').val('Select Release');
+		$('#release-filter-list').attr('disabled',false);
+		$('#cycle-filter-list').attr('disabled',true);
+		$scope.filterData['relval']='Select Release';
+		$scope.filterData['cycval']='Select Cycle';
 		$scope.filterDat.releaseids.forEach(function(cval,i){
 			$('[value='+cval+']').attr('disabled','disabled');
 		});		
@@ -486,7 +497,9 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	});
 	
 	$('#release-filter-list').change(function(){
-		$('#cycle-filter-list').val('Select Cycle');
+		//$('#cycle-filter-list').val('Select Cycle');
+		$('#cycle-filter-list').attr('disabled',false);
+		$scope.filterData['cycval']='Select Cycle';
 		$scope.filterDat.cycleids.forEach(function(cval,i){
 			$('[value='+cval+']').attr('disabled','disabled');
 		});
