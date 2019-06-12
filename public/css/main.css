@@ -816,6 +816,9 @@ input[type="radio"]{
     padding: 1px!important; 
     margin-top: 0px !important;   
 }
+.remove-bg{
+    background: none!important;
+}
 /*****************Plugin CSS*****************/
 
 
