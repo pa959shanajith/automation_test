@@ -3012,8 +3012,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		}else if(param=='decrypt'){
 			//$scope.errorMessage = "";
 			$('.errorMessage').val('');
-			$("#dialog-userObject").modal("show");
-			$("#userObjContainer").empty()
 			custObjProps=[]
 			custObjProps.push('decrypt')
 			custObjProps.push($(e.target.parentElement.parentElement).attr('data-xpath'))
@@ -3021,7 +3019,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			custObjProps.push($(e.target.parentElement.parentElement).attr('data-tag'))
 			DesignServices.userObjectElement_ICE(custObjProps)
 			.then(function (data) {
-				if (data == "Invalid Session") {
+				if (data == "unavailableLocalServer") {
+					openDialog("Fail", "Failed to create object ICE not available")
+				}
+				else if (data == "Invalid Session") {
 					return $rootScope.redirectPage();
 				}
 				else if (data == "fail") {
@@ -3030,6 +3031,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				else{
 					console.log("success!::::" + data);
 					obj=JSON.stringify(data)
+					$("#dialog-userObject").modal("show");
+					$("#userObjContainer").empty()
 					$("#addMoreObject").attr("style","display:none");
 					$("#userObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name" value='+e.currentTarget.parentElement.children[0].children[2].textContent.split("_")[0]+'></div><div class="form-group form-group-2"><select class="form-control form-control-custom" ><option selected disabled>Select Object Type</option><option value="a">Link</option><option value="input">Textbox/Textarea</option><option value="table">Table</option><option value="list">List</option><option value="select">Dropdown</option><option value="img">Image</option><option value="button">Button</option><option value="radiobutton">Radiobutton</option><option value="checkbox">Checkbox</option><option value="Element">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /><div class="propertiesTab"><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter URL" id="url"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter name" id="name"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Relative xpath" id="rpath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Absolute xpath" id="apath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter class name" id="classname"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter ID"  id="id"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Query Selector"  id="selector"><button class="btn btn-defaultsave" id="saveProperties" ng-click="saveProp()">Save</button></div></div><img class="editAddObjRow" src="imgs/ic-jq-editstep.png" /></div>')
 					$('.form-group-2 select').val(data.tag)
@@ -3101,7 +3104,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			obj={}
 			DesignServices.userObjectElement_ICE(custObjProps)
 			.then(function (data) {
-				if (data == "Invalid Session") {
+				if (data == "unavailableLocalServer") {
+					openDialog("Fail", "Failed to create object ICE not available")
+				}
+				else if (data == "Invalid Session") {
 					return $rootScope.redirectPage();
 				}
 				else if (data == "fail") {
