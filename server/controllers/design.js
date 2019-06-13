@@ -2225,3 +2225,69 @@ exports.updateIrisDataset = function updateIrisDataset(req, res) {
 		logger.error("Exception in the service updateIrisDataset: %s", exception);
 	}
 }
+
+exports.userObjectElement_ICE = function (req, res) {
+	try {
+		logger.info("Inside UI service: userObjectElement_ICE");
+		if (utils.isSessionActive(req)) {
+			var name = req.session.username;
+			redisServer.redisSubServer.subscribe('ICE2_' + name);
+			var operation = req.body.object[0];
+			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+			logger.info("ICE Socket requesting Address: %s" , name);
+			logger.info("Sending socket request for focus to redis");
+			if(operation=='encrypt'){
+				props={
+					action:"userobject",
+					url:req.body.object[1],
+					name:req.body.object[2],
+					rpath:req.body.object[3],
+					apath:req.body.object[4],
+					classname:req.body.object[5],
+					id:req.body.object[6],
+					selector:req.body.object[7],
+					tagname:req.body.object[8],
+					operation:operation
+				}
+			}
+			else if(operation=='decrypt'){
+				props={
+					action:"userobject",
+					xpath:req.body.object[1],
+					url:req.body.object[2],
+					tag:req.body.object[3],
+					operation:operation
+				}
+			}
+			dataToIce = {"emitAction": "webscrape", "username" : name, "data": props};
+			redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+			function userObjectElement_ICE_listener(channel, message) {
+				var data = JSON.parse(message);
+				//LB: make sure to send recieved data to corresponding user
+				if (name == data.username) {
+					redisServer.redisSubServer.removeListener('message', userObjectElement_ICE_listener);
+					if (data.onAction == "unavailableLocalServer") {
+						logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
+						if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
+							var soc = myserver.socketMapNotify[name];
+							soc.emit("ICEnotAvailable");
+						}
+					} else {
+						value = data.value;
+						logger.info("Sending objects");
+						res.send(value);
+					}
+				}
+			}
+			redisServer.redisSubServer.on("message",userObjectElement_ICE_listener);
+			logger.info("Successfully updated userdefined object");
+		} else {
+			logger.error("Error occurred in the service userObjectElement_ICE: Invalid Session");
+			res.send("Invalid Session");
+		}
+	} catch (exception) {
+		logger.error("Exception in the service userObjectElement_ICE: %s",exception);
+		res.send("fail");
+	}
+};

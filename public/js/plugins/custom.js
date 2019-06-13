@@ -314,7 +314,7 @@ function loadUserTasks(){
 				taskTypeIcon = "imgs/ic-taskType-blue-plus.png";
 			}
 
-			$(".task-content-inner").append('<div class="panel panel-default"><div id="panelBlock_'+i+'" class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse' + counter + '"><h4 class="taskNo-Inner-Pgs '+classIndex+'" style="margin-top: -1px;">' + counter + '</h4><span class="assignedTask-Inner-Pgs assignedTaskInner" data-testsuitedetails='+testSuiteDetails+' data-scenarioflag='+tasksJson[i].scenarioFlag+'  data-apptype="' + tasksJson[i].appType + '" data-projectid="' + tasksJson[i].projectId + '" data-screenid="' + tasksJson[i].screenId + '"  data-screenname="' + tasksJson[i].screenName + '" data-testcaseid="' + tasksJson[i].testCaseId + '" data-testcasename="' + tasksJson[i].testCaseName + '"  data-scenarioid="' + tasksJson[i].scenarioId + '" data-taskname="' + tasksJson[i].taskDetails[j].taskName + '" data-taskdes="' + tasksJson[i].taskDetails[j].taskDescription + '" data-tasktype="' + tasksJson[i].taskDetails[j].taskType + '" data-subtasktype="' + tasksJson[i].taskDetails[j].subTaskType + '" data-subtaskid="' + tasksJson[i].taskDetails[j].subTaskId + '"  data-assignedtestscenarioids='+tasksJson[i].assignedTestScenarioIds+' data-assignedto="' + tasksJson[i].taskDetails[j].assignedTo + '" data-startdate="' + tasksJson[i].taskDetails[j].startDate + '" data-exenddate="' + tasksJson[i].taskDetails[j].expectedEndDate + '" data-status="' + tasksJson[i].taskDetails[j].status+'" data-versionnumber='+tasksJson[i].versionnumber+' data-batchTaskIDs="'+tasksJson[i].taskDetails[j].batchTaskIDs+'" data-releaseid="'+tasksJson[i].taskDetails[j].releaseid+'" data-cycleid="'+tasksJson[i].taskDetails[j].cycleid+'" data-reuse="'+tasksJson[i].taskDetails[j].reuse+'" onclick="taskRedirectionInner(this.dataset.testsuitedetails,this.dataset.scenarioflag,this.dataset.assignedtestscenarioids,this.dataset.subtasktype,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.scenarioid,this.dataset.subtaskid,this.dataset.versionnumber,this.dataset.status,this.dataset.batchtaskids,this.dataset.releaseid,this.dataset.cycleid,this.dataset.reuse)">' + tasksJson[i].taskDetails[j].taskName + '</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;opacity: 0.7;" src="'+taskTypeIcon+'"/><button class="panel-head-tasktype-Inner-Pgs">' + tasksJson[i].taskDetails[j].taskType + '</button></div><!--Addition--></div></div></div>').fadeIn();
+			$(".task-content-inner").append('<div class="panel panel-default" panel-id="'+i+'"><div id="panelBlock_'+i+'" class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse' + counter + '"><h4 class="taskNo-Inner-Pgs '+classIndex+'" style="margin-top: -1px;">' + counter + '</h4><span class="assignedTask-Inner-Pgs assignedTaskInner" data-testsuitedetails='+testSuiteDetails+' data-scenarioflag='+tasksJson[i].scenarioFlag+'  data-apptype="' + tasksJson[i].appType + '" data-projectid="' + tasksJson[i].projectId + '" data-screenid="' + tasksJson[i].screenId + '"  data-screenname="' + tasksJson[i].screenName + '" data-testcaseid="' + tasksJson[i].testCaseId + '" data-testcasename="' + tasksJson[i].testCaseName + '"  data-scenarioid="' + tasksJson[i].scenarioId + '" data-taskname="' + tasksJson[i].taskDetails[j].taskName + '" data-taskdes="' + tasksJson[i].taskDetails[j].taskDescription + '" data-tasktype="' + tasksJson[i].taskDetails[j].taskType + '" data-subtasktype="' + tasksJson[i].taskDetails[j].subTaskType + '" data-subtaskid="' + tasksJson[i].taskDetails[j].subTaskId + '"  data-assignedtestscenarioids='+tasksJson[i].assignedTestScenarioIds+' data-assignedto="' + tasksJson[i].taskDetails[j].assignedTo + '" data-startdate="' + tasksJson[i].taskDetails[j].startDate + '" data-exenddate="' + tasksJson[i].taskDetails[j].expectedEndDate + '" data-status="' + tasksJson[i].taskDetails[j].status+'" data-versionnumber='+tasksJson[i].versionnumber+' data-batchTaskIDs="'+tasksJson[i].taskDetails[j].batchTaskIDs+'" data-releaseid="'+tasksJson[i].taskDetails[j].releaseid+'" data-cycleid="'+tasksJson[i].taskDetails[j].cycleid+'" data-reuse="'+tasksJson[i].taskDetails[j].reuse+'" onclick="taskRedirectionInner(this.dataset.testsuitedetails,this.dataset.scenarioflag,this.dataset.assignedtestscenarioids,this.dataset.subtasktype,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.scenarioid,this.dataset.subtaskid,this.dataset.versionnumber,this.dataset.status,this.dataset.batchtaskids,this.dataset.releaseid,this.dataset.cycleid,this.dataset.reuse)">' + tasksJson[i].taskDetails[j].taskName + '</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;opacity: 0.9;" src="'+taskTypeIcon+'"/><button class="panel-head-tasktype-Inner-Pgs">' + tasksJson[i].taskDetails[j].taskType + '</button></div><!--Addition--></div></div></div>').fadeIn();
 			var limit = 45;
 			var chars = $("#panelBlock_"+i+"").children().find('span.assignedTaskInner').text();
 			if (chars.length > limit) {
@@ -326,6 +326,35 @@ function loadUserTasks(){
 			}
 			counter++;
 		}
+	}
+	var taskJson = JSON.parse(window.localStorage['_TJ'])
+	if (window.location.pathname != '/plugin'){
+	$(".panel-additional-details").off("click");
+	$(".panel-additional-details").click(function(e){
+		var tdes = this.parentElement.children[1].getAttribute('data-taskdes');
+		var olddescriptionid = "null";
+		if($(".description-container").length>0)
+			olddescriptionid = $(".description-container")[0].getAttribute("description-id");
+		$(".description-container").remove();
+		$(".remove-bg").removeClass("remove-bg")
+		$(".active-task").removeClass("active-task");
+		var clickedtask = this.parentElement.parentElement.parentElement.getAttribute('panel-id');
+		if(clickedtask == olddescriptionid){
+			$(".description-container").remove();
+			$(".remove-bg").removeClass("remove-bg")
+			$(".active-task").removeClass("active-task");
+			return;
+		}
+		var clktask = taskJson[clickedtask];
+		var maintask = clktask
+		var filterDat = JSON.parse(window.localStorage['_FD'])
+		if(clktask.taskDetails[0].taskType != 'Design')
+			clktask = clktask.testSuiteDetails[0];
+		adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+filterDat.idnamemaprel[clktask.releaseid]+'">Release: '+filterDat.idnamemaprel[clktask.releaseid]+'</li><li class="description-item" title="Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'">Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'</li><li class="description-item" title="Apptype: '+maintask.appType+'">Apptype: '+maintask.appType+'</li></div>';
+		$(adddetailhtml).insertAfter("[panel-id="+clickedtask+"]");
+		$("[panel-id="+clickedtask+"]").addClass("active-task");
+		$(".active-task").addClass("remove-bg")
+	});
 	}
 }
 
