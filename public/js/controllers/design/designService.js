@@ -34,6 +34,19 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http,$q)   {
 			.then (function(response){return response.data;	},
 					function(response){	return $q.reject(response.data);});	
 		},
+		
+		userObjectElement_ICE: function(custObjProps) {
+			return $http.post('/userObjectElement_ICE',
+					{"action":"userObjectElement_ICE","object":custObjProps}
+			).then(function(response) {
+				console.log("create object...", response.data);
+				//promise fulfilled
+				return response.data;
+			}, function(response) {
+				// something went wrong
+				return $q.reject(response.data);
+			});
+		},
 
 		updateScreen_ICE : function(scrapeObject){
 			return $http.post('/updateScreen_ICE',{

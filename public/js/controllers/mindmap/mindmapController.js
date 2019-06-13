@@ -500,6 +500,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         cSpan = [0, 0];
         cScale = 1;
         mapSaved = !1;
+        $("#ct-saveAction").addClass("disableButton")
         //Adding task to scenario
         taskAssign = {
             "modules_endtoend": {
@@ -638,6 +639,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     $scope.loadMap = function(idx) {
+        $("#ct-saveAction").removeClass("disableButton")
         $("#expCreate").attr('src','imgs/ic-collapse.png');
         $(".search-canvas").val('');
         $scope.functionTBE = 'loadMapPopupConfirmed';
@@ -3666,7 +3668,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $('#eteScenarioContainer').empty();
         d3.select('.addScenarios-ete').classed('disableButton', !0);
         //$('#ct-saveAction_W').removeClass('no-access');
-        SaveCreateED('#ct-saveAction', 0, 0);
+        SaveCreateED('#ct-saveAction', 1, 0);
         //uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];scrList=[];tcList=[];cSpan=[0,0];cScale=1;mapSaved=!1;
         taskAssign = {
             "modules_endtoend": {
@@ -3730,6 +3732,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         initiate();
         clearSvg();
         var s = getElementDimm(d3.select("#ct-mapSvg"));
+        $("#ct-saveAction").removeClass("disableButton")
         //X and y changed to implement layout change
         // switch-layout feature
         if ($scope.verticalLayout) {
@@ -3841,7 +3844,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             $('.endtoend-modules-right-upper label').attr('title', '')
             $('.endtoend-modules-right-upper label').text('Scenarios');
         }
-
+        $("#ct-saveAction").removeClass("disableButton")
         // #894: Add button disabled by default
         $('.addScenarios-ete').addClass('disableButton');
         //#821 UI issues in e2e
@@ -4669,6 +4672,7 @@ Purpose : displaying pop up for replication of project
             function selectOpt(tab) {
                 $("img.selectedIcon").removeClass("selectedIcon");
                 $('#' + tab).addClass('selectedIcon');
+				$("#ct-saveAction").addClass("disableButton")
             }
             if ($scope.tab == 'tabRequirement') {
                 $('.selectProject').hide();
@@ -4833,6 +4837,7 @@ Purpose : displaying pop up for replication of project
 
     $scope.createNewMapModal = function(moduleName) {
         $scope.functionTBE = 'createNewMap';
+        $("#ct-saveAction").removeClass("disableButton")
         if (Object.keys($scope.nodeDisplay).length != 0)
             $('#createNewConfirmationPopup').modal('show');
         else
