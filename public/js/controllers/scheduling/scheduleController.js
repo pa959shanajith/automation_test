@@ -186,16 +186,20 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 		});		
 	}
 
-	$scope.browImg = function(brow){
-		if (brow == "Web") return './imgs/web.png';
-		else if(brow == "Webservice") return './imgs/webservice.png';
-		else if(brow == "MobileApp") return './imgs/mobileApps.png';
-		else if(brow == "System") return './imgs/desktop.png';
-		else if(brow == "Desktop") return './imgs/desktop.png';
-		else if(brow == "SAP") return './imgs/sapApps.png';
-		else if(brow == "Mainframe") return './imgs/mainframe.png';
-		else if(brow == "DesktopJava") return './imgs/oracleApps.png';
-		else if(brow == "MobileWeb") return './imgs/MobileWeb.png';
+	$scope.browImg = function(brow,appType){
+		if (appType == "Web"){
+			if(parseInt(brow) == 1)	return './imgs/ic-ch-schedule.png';
+			else if(parseInt(brow) == 2)	return './imgs/ic-ff-schedule.png';
+			else if(parseInt(brow) == 3)	return './imgs/ic-ie-schedule.png';
+		} 
+		else if(appType == "Webservice") return './imgs/webservice.png';
+		else if(appType == "MobileApp") return './imgs/mobileApps.png';
+		else if(appType == "System") return './imgs/desktop.png';
+		else if(appType == "Desktop") return './imgs/desktop.png';
+		else if(appType == "SAP") return './imgs/sapApps.png';
+		else if(appType == "Mainframe") return './imgs/mainframe.png';
+		else if(appType == "DesktopJava") return './imgs/oracleApps.png';
+		else if(appType == "MobileWeb") return './imgs/MobileWeb.png';
 	}
 	/*//Populating Data in Scheduling Table	
 	$("#scheduleDataBody").empty()
