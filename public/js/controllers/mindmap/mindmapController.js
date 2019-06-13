@@ -3865,8 +3865,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 container.append("<span class='eteScenrios' data-scenarioId='" + row.testScenarioID_c + "' title='" + row.testScenarioName + "'>" + row.testScenarioName + "</span>")
             });
             // #817 To select multiple scenarios in e2e (Himanshu)
+            var nCounter=0;
             $('.eteScenrios').click(function() {
                 $(this).toggleClass('selectScenariobg');
+                if($(this).hasClass('selectScenariobg')) {
+                    $(this).attr('data-position', ++nCounter);
+                }
+                else{
+                    $(this).attr('data-position',null);
+                } 
                 var classflag = false;
                 d3.select('.addScenarios-ete').classed('disableButton', !0);
                 $.each($('.eteScenrios'), function() {
@@ -4056,8 +4063,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $scope.addScenariosete = function($event) {
         if (!$event.originalEvent) return;
         SaveCreateED('#ct-createAction', 1, 0);
+        var spanArray = $("#eteScenarioContainer").find("span").filter(".selectScenariobg");
+        // sort based on data position attribute
+        var sortedSpanArray = spanArray.sort(function (a, b) {
+            return +a.getAttribute('data-position') - +b.getAttribute('data-position');
+        });
         //// #817 To select multiple scenarios in e2e (Himanshu)
-        $('.selectScenariobg').each(function(i, obj) {
+        sortedSpanArray.each(function(i, obj) {
             var text = $(obj).text();
             if ($(obj).attr('data-scenarioId') != 'null') {
                 createScenario_Node(text, $('#selectProjectEtem').val());
