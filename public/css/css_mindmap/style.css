@@ -566,7 +566,7 @@
  .ct-nodeBox{
     position:relative;
     margin:0 20px;
-    height:calc(100% - 30px);
+    height:calc(100% - 45px);
     overflow:hidden
 }
  .ct-project-tab{

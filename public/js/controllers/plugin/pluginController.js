@@ -45,13 +45,14 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	if(userInfo) {
 		$rootScope.plugins = [];
 		var availablePlugins = userInfo.pluginsInfo;
-		for(i=0; i<availablePlugins.length; i++){
+		var pluginsLength = availablePlugins.length;
+		for(i=0; i<pluginsLength; i++){
 			if(availablePlugins[i].pluginValue != false){
 				var pluginName = availablePlugins[i].pluginName;
-				var pluginTxt = availablePlugins[i].pluginName.replace(/\s/g,'');
+				var pluginTxt = pluginName.replace(/\s/g,'');
 				var dataName = Encrypt.encode("p_"+pluginTxt);
 				$rootScope.plugins.push("p_"+pluginName);
-				$("#plugin-container").append('<div class="col-md-4 plugin-block"><span ng-click="pluginBox()" class="toggleClick pluginBox" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+pluginName+'</span><input class="plugins" type="hidden" id="'+availablePlugins[i].pluginName+"_"+dataName+'"  title="'+pluginTxt+"_"+dataName+'"></div>').fadeIn();
+				$("#plugin-container").append('<div class="col-md-4 plugin-block"><span ng-click="pluginBox()" class="toggleClick pluginBox" data-name="p_'+pluginTxt+'" id="'+pluginName+'" title="'+pluginName+'">'+pluginName+'</span><input class="plugins" type="hidden" id="'+pluginName+"_"+dataName+'"  title="'+pluginTxt+"_"+dataName+'"></div>').fadeIn();
 			}
 		}
 		var userRole = window.localStorage['_SR'];
@@ -59,7 +60,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			$(".task-content").hide();
 		}
 		blockUI("Loading Tasks..Please wait...");
-		var userid = userInfo.user_id;
+		//var userid = userInfo.user_id;
 		PluginService.getProjectIDs_Nineteen68()
 		.then(function (data) {
 			if(data == "Fail" || data == "Invalid Session") return $rootScope.redirectPage();
@@ -80,20 +81,51 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 					    $scope.filterDat = {'projectids':[],'releaseids':[],'cycleids':[],'prjrelmap':{},'relcycmap':{},'apptypes':[],'tasktypes':['Design','Execution'],'idnamemapprj':{},'idnamemaprel':{},'idnamemapcyc':{}};
 						$(".plugin-taks-listing:visible").empty().hide();
 						var counter = 1,countertodo = 1,counterreview = 1;
-						for(i=0; i<tasksJson.length; i++){
+						var length_tasksJson = tasksJson.length;
+						for(i=0; i<length_tasksJson; i++){
 							var classIndex = i<100 ? "tasks-l-s": i<1000? "tasks-l-m" : "tasks-l-l";
-							for(j=0; j<tasksJson[i].taskDetails.length; j++){
+							var length_taskdetails = tasksJson[i].taskDetails.length;
+							for(j=0; j<length_taskdetails; j++){
 								var taskTypeIcon = "imgs/ic-taskType-yellow-plus.png";
 								var testSuiteDetails = JSON.stringify(tasksJson[i].testSuiteDetails);
-								if(tasksJson[i].taskDetails[j].taskType == "Execution"){
+								var taskname = tasksJson[i].taskDetails[j].taskName;
+								var tasktype = tasksJson[i].taskDetails[j].taskType;
+								var status = tasksJson[i].taskDetails[0].status;
+								if(tasktype == "Execution"){
 									taskTypeIcon = "imgs/ic-taskType-blue-plus.png";
 								}
-									if(tasksJson[i].taskDetails[0].status == 'review'){
-										$(".plugin-taks-listing.review").append('<div class="panel panel-default" panel-id="'+i+'"><div id="panelBlock_'+i+'" class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse'+counter+'"><h4 class="taskNo '+classIndex+'" style="margin-top: -1px; padding-right: 6px;">'+ counterreview +'</h4><span class="assignedTask" data-testsuitedetails='+testSuiteDetails+' data-scenarioflag='+tasksJson[i].scenarioFlag+' data-apptype="'+tasksJson[i].appType+'" data-projectid="'+tasksJson[i].projectId+'" data-screenid="'+tasksJson[i].screenId+'" data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" data-scenarioid="'+tasksJson[i].scenarioId+'" data-taskname="'+tasksJson[i].taskDetails[j].taskName+'" data-taskdes="'+tasksJson[i].taskDetails[j].taskDescription+'" data-tasktype="'+tasksJson[i].taskDetails[j].taskType+'" data-subtask="'+tasksJson[i].taskDetails[j].subTaskType+'" data-subtaskid="'+tasksJson[i].taskDetails[j].subTaskId+'"  data-assignedtestscenarioids="'+tasksJson[i].assignedTestScenarioIds+'" data-assignedto="'+tasksJson[i].taskDetails[j].assignedTo+'" data-startdate="'+tasksJson[i].taskDetails[j].startDate+'" data-exenddate="'+tasksJson[i].taskDetails[j].expectedEndDate+'" data-status="'+tasksJson[i].taskDetails[j].status+'" data-versionnumber="'+tasksJson[i].versionnumber+'" data-batchTaskIDs="'+tasksJson[i].taskDetails[j].batchTaskIDs+'" data-releaseid="'+tasksJson[i].taskDetails[j].releaseid+'" data-cycleid="'+tasksJson[i].taskDetails[j].cycleid+'" data-reuse="'+tasksJson[i].taskDetails[j].reuse+'" onclick="taskRedirection(this.dataset.testsuitedetails,this.dataset.scenarioflag,this.dataset.assignedtestscenarioids,this.dataset.subtask,this.dataset.subtaskid,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.scenarioid,this.dataset.versionnumber,this.dataset.status,this.dataset.batchtaskids,this.dataset.releaseid,this.dataset.cycleid,this.dataset.reuse,event)">'+tasksJson[i].taskDetails[j].taskName+'</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;" src="'+taskTypeIcon+'"/><button class="panel-head-tasktype">'+tasksJson[i].taskDetails[j].taskType+'</button></div><!--Addition--></div></div></div>').fadeIn();
+								var dataobj={
+									'scenarioflag':tasksJson[i].scenarioFlag,
+									'apptype':tasksJson[i].appType,
+									'projectid':tasksJson[i].projectId,
+									'screenid':tasksJson[i].screenId,
+									'screenname':tasksJson[i].screenName,
+									'testcaseid':tasksJson[i].testCaseId,
+									'testcasename':tasksJson[i].testCaseName,
+									'taskname':taskname,
+									'scenarioid':tasksJson[i].scenarioId,
+									'taskdes':tasksJson[i].taskDetails[j].taskDescription,
+									'tasktype':tasktype,
+									'subtask':tasksJson[i].taskDetails[j].subTaskType,
+									'subtaskid':tasksJson[i].taskDetails[j].subTaskId,
+									'assignedtestscenarioids':tasksJson[i].assignedTestScenarioIds,
+									'assignedto':tasksJson[i].taskDetails[j].assignedTo,
+									'startdate':tasksJson[i].taskDetails[j].startDate,
+									'exenddate':tasksJson[i].taskDetails[j].expectedEndDate,
+									'status':status,
+									'versionnumber':tasksJson[i].versionnumber,
+									'batchTaskIDs':tasksJson[i].taskDetails[j].batchTaskIDs,
+									'releaseid':tasksJson[i].taskDetails[j].releaseid,
+									'cycleid':tasksJson[i].taskDetails[j].cycleid,
+									'reuse':tasksJson[i].taskDetails[j].reuse
+									}
+								dataobj = JSON.stringify(dataobj);
+									if(status == 'review'){
+										$('.plugin-taks-listing.review').append("<div class='panel panel-default' panel-id='"+i+"'><div id='panelBlock_"+i+"' class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+" taskRedir'>"+ counterreview +"</h4><span class='assignedTask' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><img style='height: 20px;' src='"+taskTypeIcon+"'/><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
 										counterreview++;
 									}
 									else{
-										$(".plugin-taks-listing.todo").append('<div class="panel panel-default" panel-id="'+i+'"><div id="panelBlock_'+i+'" class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse'+counter+'"><h4 class="taskNo '+classIndex+'" style="margin-top: -1px; padding-right: 6px;">'+ countertodo +'</h4><span class="assignedTask" data-testsuitedetails='+testSuiteDetails+' data-scenarioflag='+tasksJson[i].scenarioFlag+' data-apptype="'+tasksJson[i].appType+'" data-projectid="'+tasksJson[i].projectId+'" data-screenid="'+tasksJson[i].screenId+'" data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" data-scenarioid="'+tasksJson[i].scenarioId+'" data-taskname="'+tasksJson[i].taskDetails[j].taskName+'" data-taskdes="'+tasksJson[i].taskDetails[j].taskDescription+'" data-tasktype="'+tasksJson[i].taskDetails[j].taskType+'" data-subtask="'+tasksJson[i].taskDetails[j].subTaskType+'" data-subtaskid="'+tasksJson[i].taskDetails[j].subTaskId+'"  data-assignedtestscenarioids="'+tasksJson[i].assignedTestScenarioIds+'" data-assignedto="'+tasksJson[i].taskDetails[j].assignedTo+'" data-startdate="'+tasksJson[i].taskDetails[j].startDate+'" data-exenddate="'+tasksJson[i].taskDetails[j].expectedEndDate+'" data-status="'+tasksJson[i].taskDetails[j].status+'" data-versionnumber="'+tasksJson[i].versionnumber+'" data-batchTaskIDs="'+tasksJson[i].taskDetails[j].batchTaskIDs+'" data-releaseid="'+tasksJson[i].taskDetails[j].releaseid+'" data-cycleid="'+tasksJson[i].taskDetails[j].cycleid+'" data-reuse="'+tasksJson[i].taskDetails[j].reuse+'" onclick="taskRedirection(this.dataset.testsuitedetails,this.dataset.scenarioflag,this.dataset.assignedtestscenarioids,this.dataset.subtask,this.dataset.subtaskid,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.scenarioid,this.dataset.versionnumber,this.dataset.status,this.dataset.batchtaskids,this.dataset.releaseid,this.dataset.cycleid,this.dataset.reuse,event)">'+tasksJson[i].taskDetails[j].taskName+'</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;" src="'+taskTypeIcon+'"/><button class="panel-head-tasktype">'+tasksJson[i].taskDetails[j].taskType+'</button></div><!--Addition--></div></div></div>').fadeIn();										
+										$('.plugin-taks-listing.todo').append("<div class='panel panel-default' panel-id='"+i+"'><div id='panelBlock_"+i+"' class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+" taskRedir'>"+ countertodo +"</h4><span class='assignedTask' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><img style='height: 20px;' src='"+taskTypeIcon+"'/><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();										
 										countertodo++;
 									}									
 									 var limit = 45;
@@ -256,61 +288,61 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	window.localStorage['_TJ'] = "";
 	window.localStorage['_CT'] = "";
 
-	$scope.taskRedirection = function(testsuitedetails,scenarioflag,assignedtestscenarioids,subtask,subtaskid,screenid,screenname,projectid,taskname,testcaseid,testcasename,apptype,scenarioid,versionnumber,status,batchTaskIDs,releaseid,cycleid,reuse,event){
+	$scope.taskRedirection = function(testsuitedetails,dataobj,event){
 		//Transaction Activity for Task Navigation
 		// var labelArr = [];
 		// var infoArr = [];
 		// infoArr.push({taskName : event.target.outerText });
 		// labelArr.push(txnHistory.codesDict['TaskNavigation']);
 		// txnHistory.log(event.type,labelArr,infoArr,$location.$$path); 
-		
+		var dataobj_json=JSON.parse(dataobj)
 		var taskObj = {};
-		if(status=='assigned'){
-			status='inprogress';
-			PluginService.updateTaskStatus(subtaskid)
+		if(dataobj_json.status=='assigned'){
+			dataobj_json.status='inprogress';
+			PluginService.updateTaskStatus(dataobj_json.subtaskid)
 					.then(function(data) {
-							status=data;
+						dataobj_json.status=data;
 						},
 						function(error) {
 							console.log("Error updating task status " + (error.data));
 						});
 		}
 		taskObj.testSuiteDetails = JSON.parse(testsuitedetails);
-		taskObj.scenarioFlag = scenarioflag;
-		taskObj.assignedTestScenarioIds = assignedtestscenarioids;
-		taskObj.screenId = screenid;
-		taskObj.screenName = screenname;
-		taskObj.projectId = projectid;
-		taskObj.taskName = taskname;
-		taskObj.versionnumber = versionnumber;
-		taskObj.testCaseId = testcaseid;
-		taskObj.testCaseName = testcasename;
-		taskObj.appType = apptype;
-		taskObj.status=status;
-		taskObj.scenarioId = scenarioid;
-		taskObj.batchTaskIDs=batchTaskIDs;
-		taskObj.subTask = subtask; 
-		taskObj.subTaskId=subtaskid;
-		taskObj.releaseid = releaseid;
-		taskObj.cycleid = cycleid;
-		taskObj.reuse = reuse;
+		taskObj.scenarioFlag = dataobj_json.scenarioflag;
+		taskObj.assignedTestScenarioIds = dataobj_json.assignedtestscenarioids;
+		taskObj.screenId = dataobj_json.screenid;
+		taskObj.screenName = dataobj_json.screenname;
+		taskObj.projectId = dataobj_json.projectid;
+		taskObj.taskName = dataobj_json.taskname;
+		taskObj.versionnumber = dataobj_json.versionnumber;
+		taskObj.testCaseId = dataobj_json.testcaseid;
+		taskObj.testCaseName = dataobj_json.testcasename;
+		taskObj.appType = dataobj_json.apptype;
+		taskObj.status=dataobj_json.status;
+		taskObj.scenarioId = dataobj_json.scenarioid;
+		taskObj.batchTaskIDs=dataobj_json.batchTaskIDs;
+		taskObj.subTask = dataobj_json.subtask; 
+		taskObj.subTaskId=dataobj_json.subtaskid;
+		taskObj.releaseid = dataobj_json.releaseid;
+		taskObj.cycleid = dataobj_json.cycleid;
+		taskObj.reuse = dataobj_json.reuse;
 	
 		window.localStorage['_CT'] = JSON.stringify(taskObj);
-		if(subtask == "Scrape"){
+		if(dataobj_json.subtask == "Scrape"){
 			window.localStorage['navigateScreen'] = "Scrape";
 			window.localStorage['navigateScrape'] = true;
 			$window.location.assign("/design");
 		}
-		else if(subtask == "TestCase"){
+		else if(dataobj_json.subtask == "TestCase"){
 			window.localStorage['navigateScreen'] = "TestCase";
 			window.localStorage['navigateTestcase'] = true;
 			$window.location.assign("/designTestCase");
 		}
-		else if(subtask == "TestSuite"){
+		else if(dataobj_json.subtask == "TestSuite"){
 			window.localStorage['navigateScreen'] = "TestSuite";
 			$window.location.assign("/execute");
 		}
-		else if(subtask == "Scheduling"){
+		else if(dataobj_json.subtask == "Scheduling"){
 			window.localStorage['navigateScreen'] = "scheduling";
 			$window.location.assign("/scheduling");
 		}
@@ -339,28 +371,59 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		$(".plugin-taks-listing").empty();
 		var counter =1,countertodo = 1,counterreview = 1;
 		var taskTypeIcon = "";
-		for(i=0; i<tasksJson.length; i++){
+		var length_tasksJson = tasksJson.length;
+		for(i=0; i<length_tasksJson; i++){
 			var classIndex = i<100 ? "tasks-l-s": i<1000? "tasks-l-m" : "tasks-l-l";
+			var length_taskdetails = tasksJson[i].taskDetails.length;
 			//console.log("taskJson", tasksJson[i]);
-			for(j=0; j<tasksJson[i].taskDetails.length; j++){
+			for(j=0; j<length_taskdetails; j++){
+				var taskname = tasksJson[i].taskDetails[j].taskName;
+				var tasktype = tasksJson[i].taskDetails[j].taskType;
+				var status = tasksJson[i].taskDetails[0].status;
 				//console.log("TASKJSONDETAILS",tasksJson[i].taskDetails);
-				if(tasksJson[i].taskDetails[j].taskType == "Design"){
+				if(tasktype == "Design"){
 					taskTypeIcon = "imgs/ic-taskType-yellow-plus.png";
 				} 
-				else if(tasksJson[i].taskDetails[j].taskType == "Execution"){
+				else if(tasktype == "Execution"){
 					taskTypeIcon = "imgs/ic-taskType-blue-plus.png";
 					//console.log("test",tasksJson[i].assignedTestScenarioIds);
 
 				}
 				var testSuiteDetails = JSON.stringify(tasksJson[i].testSuiteDetails);
 				//console.log(i,testSuiteDetails);
+				var dataobj={
+					'scenarioflag':tasksJson[i].scenarioFlag,
+					'apptype':tasksJson[i].appType,
+					'projectid':tasksJson[i].projectId,
+					'screenid':tasksJson[i].screenId,
+					'screenname':tasksJson[i].screenName,
+					'testcaseid':tasksJson[i].testCaseId,
+					'testcasename':tasksJson[i].testCaseName,
+					'taskname':taskname,
+					'scenarioid':tasksJson[i].scenarioId,
+					'taskdes':tasksJson[i].taskDetails[j].taskDescription,
+					'tasktype':tasktype,
+					'subtask':tasksJson[i].taskDetails[j].subTaskType,
+					'subtaskid':tasksJson[i].taskDetails[j].subTaskId,
+					'assignedtestscenarioids':tasksJson[i].assignedTestScenarioIds,
+					'assignedto':tasksJson[i].taskDetails[j].assignedTo,
+					'startdate':tasksJson[i].taskDetails[j].startDate,
+					'exenddate':tasksJson[i].taskDetails[j].expectedEndDate,
+					'status':status,
+					'versionnumber':tasksJson[i].versionnumber,
+					'batchTaskIDs':tasksJson[i].taskDetails[j].batchTaskIDs,
+					'releaseid':tasksJson[i].taskDetails[j].releaseid,
+					'cycleid':tasksJson[i].taskDetails[j].cycleid,
+					'reuse':tasksJson[i].taskDetails[j].reuse
+					}
+				dataobj = JSON.stringify(dataobj);
 				if(passFilterTest(tasksJson[i],0)){
-					if(tasksJson[i].taskDetails[0].status == 'review'){
-						$(".plugin-taks-listing.review").append('<div class="panel panel-default" panel-id="'+i+'"><div class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse'+counter+'"><h4 class="taskNo '+classIndex+'" style="margin-top: -1px; padding-right: 6px;">'+ counterreview +'</h4><span class="assignedTask" data-testsuitedetails='+testSuiteDetails+' data-scenarioflag='+tasksJson[i].scenarioFlag+' data-apptype="'+tasksJson[i].appType+'" data-projectid="'+tasksJson[i].projectId+'" data-screenid="'+tasksJson[i].screenId+'" data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" data-scenarioid="'+tasksJson[i].scenarioId+'" data-taskname="'+tasksJson[i].taskDetails[j].taskName+'" data-taskdes="'+tasksJson[i].taskDetails[j].taskDescription+'" data-tasktype="'+tasksJson[i].taskDetails[j].taskType+'" data-subtask="'+tasksJson[i].taskDetails[j].subTaskType+'" data-subtaskid="'+tasksJson[i].taskDetails[j].subTaskId+'"  data-assignedtestscenarioids="'+tasksJson[i].assignedTestScenarioIds+'" data-assignedto="'+tasksJson[i].taskDetails[j].assignedTo+'" data-startdate="'+tasksJson[i].taskDetails[j].startDate+'" data-exenddate="'+tasksJson[i].taskDetails[j].expectedEndDate+'" data-status="'+tasksJson[i].taskDetails[j].status+'" data-versionnumber="'+tasksJson[i].versionnumber+'" data-batchTaskIDs="'+tasksJson[i].taskDetails[j].batchTaskIDs+'" data-releaseid="'+tasksJson[i].taskDetails[j].releaseid+'" data-cycleid="'+tasksJson[i].taskDetails[j].cycleid+'" data-reuse="'+tasksJson[i].taskDetails[j].reuse+'" onclick="taskRedirection(this.dataset.testsuitedetails,this.dataset.scenarioflag,this.dataset.assignedtestscenarioids,this.dataset.subtask,this.dataset.subtaskid,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.scenarioid,this.dataset.versionnumber,this.dataset.status,this.dataset.batchtaskids,this.dataset.releaseid,this.dataset.cycleid,this.dataset.reuse,event)">'+tasksJson[i].taskDetails[j].taskName+'</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;" src="'+taskTypeIcon+'"/><button class="panel-head-tasktype">'+tasksJson[i].taskDetails[j].taskType+'</button></div><!--Addition--></div></div></div>').fadeIn();
+					if(status == 'review'){
+						$('.plugin-taks-listing.review').append("<div class='panel panel-default' panel-id='"+i+"'><div class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+"' class='taskRedir'>"+ counterreview +"</h4><span class='assignedTask' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><img style='height: 20px;' src='"+taskTypeIcon+"'/><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
 						counterreview++;
 					}
 					else{
-						$(".plugin-taks-listing.todo").append('<div class="panel panel-default" panel-id="'+i+'"><div class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse'+counter+'"><h4 class="taskNo '+classIndex+'" style="margin-top: -1px; padding-right: 6px;">'+ countertodo +'</h4><span class="assignedTask" data-testsuitedetails='+testSuiteDetails+' data-scenarioflag='+tasksJson[i].scenarioFlag+' data-apptype="'+tasksJson[i].appType+'" data-projectid="'+tasksJson[i].projectId+'" data-screenid="'+tasksJson[i].screenId+'" data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" data-scenarioid="'+tasksJson[i].scenarioId+'" data-taskname="'+tasksJson[i].taskDetails[j].taskName+'" data-taskdes="'+tasksJson[i].taskDetails[j].taskDescription+'" data-tasktype="'+tasksJson[i].taskDetails[j].taskType+'" data-subtask="'+tasksJson[i].taskDetails[j].subTaskType+'" data-subtaskid="'+tasksJson[i].taskDetails[j].subTaskId+'"  data-assignedtestscenarioids="'+tasksJson[i].assignedTestScenarioIds+'" data-assignedto="'+tasksJson[i].taskDetails[j].assignedTo+'" data-startdate="'+tasksJson[i].taskDetails[j].startDate+'" data-exenddate="'+tasksJson[i].taskDetails[j].expectedEndDate+'" data-status="'+tasksJson[i].taskDetails[j].status+'" data-versionnumber="'+tasksJson[i].versionnumber+'" data-batchTaskIDs="'+tasksJson[i].taskDetails[j].batchTaskIDs+'" data-releaseid="'+tasksJson[i].taskDetails[j].releaseid+'" data-cycleid="'+tasksJson[i].taskDetails[j].cycleid+'" data-reuse="'+tasksJson[i].taskDetails[j].reuse+'" onclick="taskRedirection(this.dataset.testsuitedetails,this.dataset.scenarioflag,this.dataset.assignedtestscenarioids,this.dataset.subtask,this.dataset.subtaskid,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.scenarioid,this.dataset.versionnumber,this.dataset.status,this.dataset.batchtaskids,this.dataset.releaseid,this.dataset.cycleid,this.dataset.reuse,event)">'+tasksJson[i].taskDetails[j].taskName+'</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;" src="'+taskTypeIcon+'"/><button class="panel-head-tasktype">'+tasksJson[i].taskDetails[j].taskType+'</button></div><!--Addition--></div></div></div>').fadeIn();
+						$('.plugin-taks-listing.todo').append("<div class='panel panel-default' panel-id='"+i+"'><div class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+"' class='taskRedir'>"+ countertodo +"</h4><span class='assignedTask' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><img style='height: 20px;' src='"+taskTypeIcon+"'/><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
 						countertodo++;
 					}
 					counter++;
@@ -541,6 +604,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 
 }]);
 
-function taskRedirection(testsuitedetails,scenarioflag,assignedtestscenarioids,subtask,subtaskid,screenid,screenname,projectid,taskname,testcaseid,testcasename,apptype,scenarioid,versionnumber,status,batchTaskIDs,releaseid,cycleid,reuse,event){
-	angular.element(document.getElementsByClassName("assignedTask")).scope().taskRedirection(testsuitedetails,scenarioflag,assignedtestscenarioids,subtask,subtaskid,screenid,screenname,projectid,taskname,testcaseid,testcasename,apptype,scenarioid,versionnumber,status,batchTaskIDs,releaseid,cycleid,reuse,event);
+function taskRedirection(testsuitedetails,dataobj,event){
+	angular.element(document.getElementsByClassName("assignedTask")).scope().taskRedirection(testsuitedetails,dataobj,event);
 }
