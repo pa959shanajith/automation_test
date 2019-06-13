@@ -1594,9 +1594,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 			//For Mobility
 			else if ($scope.getScreenView == "MobileApp") {
-				if (!$("#mobilityAPKPath").val()) {
+				if (!$("#mobilityAPKPath").val() && browserType != 'pdf') {
 					$(document).find("#mobilityAPKPath").addClass("inputErrorBorder")
 					return false
+				} else if (browserType == 'pdf'){
+					screenViewObject.appType = browserType
 				} else if ($("#mobilityAPKPath").val().toLowerCase().indexOf(".apk") >= 0) {
 					if ($(document).find("#mobilityAPKPath").val() == "") {
 						$(document).find("#mobilityAPKPath").addClass("inputErrorBorder")
@@ -1688,7 +1690,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				if ($(document).find("#mobilityWebSerialNo").val() == "" && browserType != 'pdf') {
 					$(document).find("#mobilityWebSerialNo").addClass("inputErrorBorder" && browserType != 'pdf')
 					return false
-				} else if ($(document).find("#mobilityAndroidVersion").val() == "") {
+				} else if ($(document).find("#mobilityAndroidVersion").val() == "" && browserType != 'pdf') {
 					$(document).find("#mobilityAndroidVersion").addClass("inputErrorBorder")
 					return false
 				} else if (browserType == 'pdf'){
