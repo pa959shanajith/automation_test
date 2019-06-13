@@ -499,6 +499,16 @@
        float: none;
        height:160px !important
 }
+.scroll-wrapper > .userObjectScroll{
+    padding: 0px;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: 100% !important;
+}
+.scroll-wrapper.userObjectScroll {
+    float: none;
+    height:160px !important
+}
 .scroll-wrapper.scenarioObjectScroll {
     float: none;
     height:100px !important

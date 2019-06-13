@@ -342,7 +342,7 @@ function loadUserTasks(){
 				'reuse':tasksJson[i].taskDetails[j].reuse
 			}
 			dataobj = JSON.stringify(dataobj)
-			$('.task-content-inner').append("<div class='panel panel-default'><div id='panelBlock_"+i+"' class='panel-heading'><div class='taskDirection' href='#collapse" + counter + "'><h4 class='taskNo-Inner-Pgs "+classIndex+" taskRedir'>" + counter + "</h4><span class='assignedTask-Inner-Pgs assignedTaskInner' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirectionInner(this.dataset.testsuitedetails,this.dataset.dataobj)'>" + taskname + "</span><!--Addition--><div class='panel-additional-details'><img style='height: 20px;opacity: 0.7;' src='"+taskTypeIcon+"'/><button class='panel-head-tasktype-Inner-Pgs'>" + tasktype + "</button></div><!--Addition--></div></div></div>").fadeIn();
+			$('.task-content-inner').append("<div class='panel panel-default' panel-id='"+i+"'><div id='panelBlock_"+i+"' class='panel-heading'><div class='taskDirection' href='#collapse" + counter + "'><h4 class='taskNo-Inner-Pgs "+classIndex+" taskRedir'>" + counter + "</h4><span class='assignedTask-Inner-Pgs assignedTaskInner' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirectionInner(this.dataset.testsuitedetails,this.dataset.dataobj)'>" + taskname + "</span><!--Addition--><div class='panel-additional-details'><img style='height: 20px;opacity: 0.7;' src='"+taskTypeIcon+"'/><button class='panel-head-tasktype-Inner-Pgs'>" + tasktype + "</button></div><!--Addition--></div></div></div>").fadeIn();
 			var limit = 45;
 			var chars = $("#panelBlock_"+i+"").children().find('span.assignedTaskInner').text();
 			if (chars.length > limit) {
@@ -354,6 +354,35 @@ function loadUserTasks(){
 			}
 			counter++;
 		}
+	}
+	var taskJson = JSON.parse(window.localStorage['_TJ'])
+	if (window.location.pathname != '/plugin'){
+	$(".panel-additional-details").off("click");
+	$(".panel-additional-details").click(function(e){
+		var tdes = this.parentElement.children[1].getAttribute('data-taskdes');
+		var olddescriptionid = "null";
+		if($(".description-container").length>0)
+			olddescriptionid = $(".description-container")[0].getAttribute("description-id");
+		$(".description-container").remove();
+		$(".remove-bg").removeClass("remove-bg")
+		$(".active-task").removeClass("active-task");
+		var clickedtask = this.parentElement.parentElement.parentElement.getAttribute('panel-id');
+		if(clickedtask == olddescriptionid){
+			$(".description-container").remove();
+			$(".remove-bg").removeClass("remove-bg")
+			$(".active-task").removeClass("active-task");
+			return;
+		}
+		var clktask = taskJson[clickedtask];
+		var maintask = clktask
+		var filterDat = JSON.parse(window.localStorage['_FD'])
+		if(clktask.taskDetails[0].taskType != 'Design')
+			clktask = clktask.testSuiteDetails[0];
+		adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+filterDat.idnamemaprel[clktask.releaseid]+'">Release: '+filterDat.idnamemaprel[clktask.releaseid]+'</li><li class="description-item" title="Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'">Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'</li><li class="description-item" title="Apptype: '+maintask.appType+'">Apptype: '+maintask.appType+'</li></div>';
+		$(adddetailhtml).insertAfter("[panel-id="+clickedtask+"]");
+		$("[panel-id="+clickedtask+"]").addClass("active-task");
+		$(".active-task").addClass("remove-bg")
+	});
 	}
 }
 

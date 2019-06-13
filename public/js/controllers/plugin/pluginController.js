@@ -172,6 +172,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 											unblockUI();
 											response.respnames.forEach(function(name,i){
 												$scope.filterDat.idnamemapcyc[response.requestedids[i]] = name;
+												window.localStorage['_FD'] = angular.toJson($scope.filterDat);
 											});
 										}
 									}, function (error) {
@@ -510,7 +511,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 
 		if($scope.filterDat.apptypes.indexOf(obj.appType)==-1)
 			$scope.filterDat.apptypes.push(obj.appType);
-		
+		window.localStorage['_FD'] = angular.toJson($scope.filterDat);
 		$(".panel-additional-details").off("click");
 		$(".panel-additional-details").click(function(e){
 			var tdes = this.parentElement.children[1].getAttribute('data-taskdes');
@@ -526,10 +527,11 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 				return;
 			}
 			var clktask = $scope.taskJson[clickedtask];
+			var maintask = clktask
 			var filterDat = $scope.filterDat;
 			if(clktask.taskDetails[0].taskType != 'Design')
 				clktask = clktask.testSuiteDetails[0];
-			adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+filterDat.idnamemaprel[clktask.releaseid]+'">Release: '+filterDat.idnamemaprel[clktask.releaseid]+'</li><li class="description-item" title="Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'">Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'</li><li class="description-item" title="Apptype: '+clktask.appType+'">Apptype: '+clktask.appType+'</li></div>';
+			adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+filterDat.idnamemaprel[clktask.releaseid]+'">Release: '+filterDat.idnamemaprel[clktask.releaseid]+'</li><li class="description-item" title="Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'">Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'</li><li class="description-item" title="Apptype: '+maintask.appType+'">Apptype: '+maintask.appType+'</li></div>';
 			$(adddetailhtml).insertAfter("[panel-id="+clickedtask+"]");
 			$("[panel-id="+clickedtask+"]").addClass("active-task");
 		});

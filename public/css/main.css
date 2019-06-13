@@ -142,6 +142,25 @@ body {
     outline: 0;
 }
 
+.btn-defaultsave {
+    color: #fff;
+    border: 0;
+    border-radius: 20px;
+    padding: 5px 20px;
+    font-size: 16px;
+    background: #643693;
+    position: absolute;
+    right: 25px;
+}
+
+.btn-defaultsave.focus,
+.btn-defaultsave:focus,
+.btn-defaultsave:hover {
+    background: #643693;
+    color: #fff;
+    outline: 0;
+}
+
 .btn-xs.focus,
 .btn-xs,
 .btn-xs:active:focus,
@@ -816,6 +835,9 @@ input[type="radio"]{
     padding: 1px!important; 
     margin-top: 0px !important;   
 }
+.remove-bg{
+    background: none!important;
+}
 /*****************Plugin CSS*****************/
 
 
@@ -857,7 +879,7 @@ input[type="radio"]{
 	border-bottom: none !important;
 }
 #left-bottom-section {
-    min-height: 39%;
+    min-height: 45%;
     float: left;
     width: 100%;
     position: relative;
@@ -2815,6 +2837,15 @@ input[disabled]{
     position: relative;
 }
 
+.userObjTopWrap{
+	margin: 0;
+    float: left;
+    margin-left: -15px;
+    margin-bottom: 30px;
+    width: 100%;
+    position: relative;
+}
+
 .errorHandling{
 	float:left;
 	width:100%;
@@ -2989,6 +3020,20 @@ input[disabled]{
     box-shadow: none !important;
 }
 
+.modal-body .row-modal .form-control-custom-prop, .form-control-custom-prop{
+	border: 1px solid #656565 !important;
+	border-left:0 !important;
+	border-right:0 !important;
+	border-top:0 !important;
+	border-radius:0;
+	box-shadow: none;
+	color:#333;
+}
+
+.modal-body .row-modal .form-control-custom-prop:focus, .form-control-custom-prop:focus {
+    box-shadow: none !important;
+}
+
 .modal-body .row-modal .form-group-2{
 	width: 28%;
 }
@@ -3016,8 +3061,15 @@ input[disabled]{
 
 .deleteAddObjRow{
 	position: absolute;
-    right: 30px;
+    right: 50px;
     top: 5px;
+    cursor: pointer;
+}
+
+.editAddObjRow{
+	position: absolute;
+    right: 19px;
+    top: 7px;
     cursor: pointer;
 }
 
@@ -4293,7 +4345,16 @@ select:-webkit-autofill:focus {
     color: #333;
 }
 
-
+.modal-body .row-modal .form-control-custom-prop.inputErrorBorderBottom, .form-control-custom-prop.inputErrorBorderBottom
+{
+    border: 2px solid #d33c3c !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+    color: #333;
+}
 
 /**************** SAP reports Icon CSS ***************************/
 .sap[src='imgs/desktop.png']
