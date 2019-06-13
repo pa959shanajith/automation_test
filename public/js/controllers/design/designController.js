@@ -873,7 +873,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					var imgTag, addcusOb;
 					var scrapTree = $("#finalScrap").children('#scrapTree');
 					var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
-
+					localStorage['_cust']=JSON.stringify({})
 					if (viewString.view != undefined) {
 						for (var i = 0; i < viewString.view.length; i++) {
 							// if(viewString.scrapetype == 'caa'){
@@ -903,7 +903,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									ob.url = "",
 									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
 							}
-							var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+							if(ob.hasOwnProperty('editable')){
+								var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><a id='decrypt' href='#' class='userObject'><img src='imgs/ic-jq-editstep.png'></a></li>";
+							}else{
+								var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+							}
 							// }									   
 							// }
 							angular.element(innerUL).append(li);
@@ -2256,7 +2260,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			"screenname":task.screenName,"versionnumber":task.versionnumber,"xpath":obj_xpath};
 			DesignServices.updateIrisDataset(data)
 				.then(function (val) {
-					$('.close').click();
+					$("#dialog-irisObject").find("button.close").click();
 					if(val=='unavailableLocalServer')  openDialog("Iris Object Type", $rootScope.unavailableLocalServer_msg);
 					else if(val=='unsavedObject') openDialog("Iris Object Type","Please save the object first.");
 					else{
@@ -2277,7 +2281,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				});
 		}
 		else{
-			$('.close').click();
+			$("#dialog-irisObject").find("button.close").click();
 			openDialog("Iris Object Type","Submitted Successfully.");
 		}
 	}
@@ -2987,18 +2991,158 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		};
 	};
 	//Add Object Functionality
+	
+	//User Object Functionality
+	$(document).on('click', '.userObject', function(e) {
+		// alert(e.target.id);
+		var param =e.currentTarget.id;
+		$(".generateObj span img").removeClass("left-bottom-selection");
+		$(".compareObject span img").removeClass("left-bottom-selection");
+		$(".addObject span img").removeClass("left-bottom-selection");
+		$(".userObject span img").addClass("left-bottom-selection");
+		if(param=='encrypt'){
+			//$scope.errorMessage = "";
+			$('.errorMessage').val('');
+			$("#dialog-userObject").modal("show");
+			$("#userObjContainer").empty()
+			$("#addMoreObject").attr("style","display:block");
+			if ($(".addObj-row").length > 1) $(".addObj-row").remove()
+			$("#userObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a">Link</option><option value="input">Textbox/Textarea</option><option value="table">Table</option><option value="list">List</option><option value="select">Dropdown</option><option value="img">Image</option><option value="button">Button</option><option value="radiobutton">Radiobutton</option><option value="checkbox">Checkbox</option><option value="Element">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /><div class="propertiesTab"><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter URL"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter name"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Relative xpath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Absolute xpath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter class name"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter ID"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Query Selector"><button class="btn btn-defaultsave" id="saveProperties" ng-click="saveProp()">Save</button></div></div><img class="editAddObjRow" src="imgs/ic-jq-editstep.png" /></div>')
+		
+		}else if(param=='decrypt'){
+			//$scope.errorMessage = "";
+			$('.errorMessage').val('');
+			$("#dialog-userObject").modal("show");
+			$("#userObjContainer").empty()
+			custObjProps=[]
+			custObjProps.push('decrypt')
+			custObjProps.push($(e.target.parentElement.parentElement).attr('data-xpath'))
+			custObjProps.push($(e.target.parentElement.parentElement).attr('data-url'))
+			custObjProps.push($(e.target.parentElement.parentElement).attr('data-tag'))
+			DesignServices.userObjectElement_ICE(custObjProps)
+			.then(function (data) {
+				if (data == "Invalid Session") {
+					return $rootScope.redirectPage();
+				}
+				else if (data == "fail") {
+					openDialog("Fail", "Failed to create object")
+				}
+				else{
+					console.log("success!::::" + data);
+					obj=JSON.stringify(data)
+					$("#addMoreObject").attr("style","display:none");
+					$("#userObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name" value='+e.currentTarget.parentElement.children[0].children[2].textContent.split("_")[0]+'></div><div class="form-group form-group-2"><select class="form-control form-control-custom" ><option selected disabled>Select Object Type</option><option value="a">Link</option><option value="input">Textbox/Textarea</option><option value="table">Table</option><option value="list">List</option><option value="select">Dropdown</option><option value="img">Image</option><option value="button">Button</option><option value="radiobutton">Radiobutton</option><option value="checkbox">Checkbox</option><option value="Element">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /><div class="propertiesTab"><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter URL" id="url"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter name" id="name"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Relative xpath" id="rpath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Absolute xpath" id="apath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter class name" id="classname"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter ID"  id="id"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Query Selector"  id="selector"><button class="btn btn-defaultsave" id="saveProperties" ng-click="saveProp()">Save</button></div></div><img class="editAddObjRow" src="imgs/ic-jq-editstep.png" /></div>')
+					$('.form-group-2 select').val(data.tag)
+					$('#url').val(data.url)
+					$('#name').val(data.name)
+					$('#rpath').val(data.rpath)
+					$('#apath').val(data.apath)
+					$('#id').val(data.id)
+					$('#classname').val(data.classname)
+					$('#selector').val(data.selector)
+				}
+				// angular.element(document.getElementById("tableActionButtons")).scope().removeAddObjectSelection();
+			}, function (error) { });
+		}
+		$scope.removeAddObjectSelection = function () {
+			$("img.left-bottom-selection").removeClass('left-bottom-selection');
+		};
+		angular.element(document.getElementById("tableActionButtons")).scope().removeAddObjectSelection();
+	});
+	//User Object Functionality
+	
+	//Save User Object
+	$(document).on("click", ".btn-defaultsave", function () {
+			$(".propertiesTab").hide();
+			custObjProps=[]
+			custObjNames=[]
+			custObjProps.push('encrypt')
+			ele=$(this).parent().parent().parent()
+			ele.find('input.form-control-custom-prop').each(function () {
+				custObjProps.push($.trim($(this).val()));
+			});
+			var typeOfElement;
+			var eleType = ele.find('select.form-control.form-control-custom')[0].value
+			switch (eleType) {
+				case "button":
+					typeOfElement = "btn";
+					break;
+				case "checkbox":
+					typeOfElement = "chkbox";
+					break;
+				case "select":
+					typeOfElement = "select";
+					break;
+				case "img":
+					typeOfElement = "img";
+					break;
+				case "a":
+					typeOfElement = "lnk";
+					break;
+				case "radiobutton":
+					typeOfElement = "radiobtn";
+					break;
+				case "input":
+					typeOfElement = "txtbox";
+					break;
+				case "list":
+					typeOfElement = "lst";
+					break;
+				case "table":
+					typeOfElement = "tbl";
+					break;
+				case "Element":
+					typeOfElement = "elmnt";
+					break;
+				default:
+					break;
+			}
+			custObjProps.push(typeOfElement)
+			obj={}
+			DesignServices.userObjectElement_ICE(custObjProps)
+			.then(function (data) {
+				if (data == "Invalid Session") {
+					return $rootScope.redirectPage();
+				}
+				else if (data == "fail") {
+					openDialog("Fail", "Failed to create object")
+				}
+				else{
+					console.log("success!::::" + data);
 
+					ele.find('input.form-control-custom').each(function () {
+						custObjNames.push($.trim($(this).val()));
+					});
+					obj=JSON.parse(localStorage['_cust'])
+					obj[custObjNames]={url:data.url,xpath:data.xpath}
+					localStorage["_cust"]=JSON.stringify(obj)
+				}
+			}, function (error) { });
+		});
+	//Save User Object
+	
 	//Delete Custom Object Row
 	$(document).on("click", ".deleteAddObjRow", function () {
 		$(this).parent(".addObj-row").remove();
 	});
-
+	
+	//Edit User Object Row
+	$(document).on("click", ".editAddObjRow", function () {
+		$(".propertiesTab").show();
+	});
+	
 	//Add More Object Functionality
 	$scope.addMoreObject = function () {
 		$("#addObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a">Link</option><option value="input">Textbox/Textarea</option><option value="table">Table</option><option value="list">List</option><option value="select">Dropdown</option><option value="img">Image</option><option value="button">Button</option><option value="radiobutton">Radiobutton</option><option value="checkbox">Checkbox</option><option value="Element">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /></div>')
 	};
 	//Add More Object Functionality
-
+	
+	//Add More User Object Functionality
+	$scope.addMoreUserObject = function () {
+		$("#userObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a">Link</option><option value="input">Textbox/Textarea</option><option value="table">Table</option><option value="list">List</option><option value="select">Dropdown</option><option value="img">Image</option><option value="button">Button</option><option value="radiobutton">Radiobutton</option><option value="checkbox">Checkbox</option><option value="Element">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /><div class="propertiesTab"><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter URL"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter name"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Relative xpath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Absolute xpath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter class name"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter ID"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Query Selector"><button class="btn btn-defaultsave" id="saveProperties" ng-click="saveProp()">Save</button></div></div><img class="editAddObjRow" src="imgs/ic-jq-editstep.png" /></div>')
+	};
+	//Add More User Object Functionality
+	
 	//WSDL Functionality
 	$scope.selectedWsdlTab = "requestWrap"
 	//WSDL Functionality
@@ -3135,12 +3279,22 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					default:
 						break;
 				}
-				customObj.push({
-					custname: $(this).find("input").val() + "_" + typeOfElement,
-					tag: eleType,
-
-					xpath: ''
-				})
+				if($('.editAddObjRow').is(':visible')){
+					obj=JSON.parse(localStorage['_cust'])[$(this).find("input").val()]
+					customObj.push({
+						custname: $(this).find("input").val() + "_" + typeOfElement,
+						tag: eleType,
+						url: obj.url,
+						xpath: obj.xpath,
+						editable: "yes"
+					})
+				}else{
+					customObj.push({
+						custname: $(this).find("input").val() + "_" + typeOfElement,
+						tag: eleType,
+						xpath: ''
+					})
+				}
 			})
 
 			if (viewString == "" || viewString.view == undefined) {
@@ -3171,8 +3325,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				} else imgTag = tag;
 				var tag1 = tag.replace(/ /g, "_");
 				var tag2;
-				if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
-					var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+				if ((tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") && ob.hasOwnProperty('editable')) {
+					var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><a href='#' id='decrypt' class='userObject'><img src='imgs/ic-jq-editstep.png' ></a></li>";
 				} else {
 					var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 				}
@@ -3189,6 +3343,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			//$("#saveObjects").trigger("click");
 			//},500)
 			$("#dialog-addObject").modal("hide");
+			$("#dialog-userObject").modal("hide");
+			$(".addObject span img").removeClass("left-bottom-selection");
+			$(".userObject span img").removeClass("left-bottom-selection");
 			openDialog("Add Object", "Objects has been added successfully.")
 			//$("#addObjectSuccess").modal("show")
 			$("#saveObjects").prop("disabled", false)
@@ -3209,6 +3366,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			editable: true,
 			radio: true
 		});
+		$("img.left-bottom-selection").removeClass('left-bottom-selection');
 	};
 	//Submit Custom Object Functionality
 
@@ -5816,23 +5974,23 @@ function contentTable(newTestScriptDataLS) {
 					} else if (appTypeLocal == 'MobileApp' &&
 						(obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0 ||
 							obType.indexOf("Switch") >= 0 || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0 ||
-							obType.indexOf("android.widget.NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("android.widget.SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 ||
-							obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >= 0 || obType.indexOf("android.widget.TimePicker") >= 0 || obType.indexOf("android.widget.DatePicker") >= 0 || obType.indexOf("XCUIElementTypeSecureTextField") >= 0)) {
+							obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("iOSEditText") >= 0 ||
+							obType.indexOf("PickerWheel") >= 0 || obType.indexOf("Slider") >= 0 || obType.indexOf("SearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >= 0 || obType.indexOf("SecureTextField") >= 0)) {
 						var res = '';
 						var sc;
 						if (obType.indexOf("RadioButton") >= 0) {
 							sc = Object.keys(keywordArrayList.radiobutton);
 							selectedKeywordList = "radiobutton";
-						} else if (obType.indexOf("iOSEditText") >= 0 || obType.indexOf("iOSXCUIElementTypeSearchField") >= 0 || obType.indexOf("iOSXCUIElementTypeSecureTextField") >= 0){
+						} else if (obType.indexOf("iOSEditText") >= 0 || obType.indexOf("SearchField") >= 0 || obType.indexOf("SecureTextField") >= 0){
 							sc = Object.keys(keywordArrayList.inputIos);
 							selectedKeywordList = "inputIos";
-						} else if (obType.indexOf("EditText") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeSecureTextField") >= 0) {
+						} else if (obType.indexOf("EditText") >= 0) {
 							sc = Object.keys(keywordArrayList.input);
 							selectedKeywordList = "input";
-						} else if (obType.indexOf("XCUIElementTypePickerWheel") >= 0) {
+						} else if (obType.indexOf("PickerWheel") >= 0) {
 							sc = Object.keys(keywordArrayList.pickerwheel);
 							selectedKeywordList = "pickerwheel";
-						} else if (obType.indexOf("XCUIElementTypeSlider") >= 0) {
+						} else if (obType.indexOf("Slider") >= 0) {
 							sc = Object.keys(keywordArrayList.slider);
 							selectedKeywordList = "slider";
 						} else if (obType.indexOf("Switch") >= 0) {
@@ -5847,25 +6005,25 @@ function contentTable(newTestScriptDataLS) {
 						} else if (obType.indexOf("CheckBox") >= 0) {
 							sc = Object.keys(keywordArrayList.checkbox);
 							selectedKeywordList = "checkbox";
-						} else if (obType.indexOf("android.widget.TimePicker") >= 0) {
+						} else if (obType.indexOf("TimePicker") >= 0) {
 							sc = Object.keys(keywordArrayList.timepicker);
 							selectedKeywordList = "timepicker";
-						} else if (obType.indexOf("android.widget.DatePicker") >= 0) {
+						} else if (obType.indexOf("DatePicker") >= 0) {
 							sc = Object.keys(keywordArrayList.datepicker);
 							selectedKeywordList = "datepicker";
-						} else if (obType.indexOf("TimePicker") >= 0) {
+						} else if (obType.indexOf("Time") >= 0) {
 							sc = Object.keys(keywordArrayList.time);
 							selectedKeywordList = "time";
-						} else if (obType.indexOf("DatePicker") >= 0) {
+						} else if (obType.indexOf("Date") >= 0) {
 							sc = Object.keys(keywordArrayList.date);
 							selectedKeywordList = "date";
-						} else if (obType.indexOf("android.widget.NumberPicker") >= 0) {
+						} else if (obType.indexOf("NumberPicker") >= 0) {
 							sc = Object.keys(keywordArrayList.numberpicker);
 							selectedKeywordList = "numberpicker";
 						} else if (obType.indexOf("RangeSeekBar") >= 0) {
 							sc = Object.keys(keywordArrayList.rangeseekbar);
 							selectedKeywordList = "rangeseekbar";
-						} else if (obType.indexOf("android.widget.SeekBar") >= 0) {
+						} else if (obType.indexOf("SeekBar") >= 0) {
 							sc = Object.keys(keywordArrayList.seekbar);
 							selectedKeywordList = "seekbar";
 						} else if (obType.indexOf("ListView") >= 0) {
@@ -5905,63 +6063,6 @@ function contentTable(newTestScriptDataLS) {
 							} else
 								res += '<option role="option" value="' + sc[i] +
 									'">' + sc[i] + '</option>';
-						}
-						var row = $(e.target).closest('tr.jqgrow');
-						var rowId = row.attr('id');
-						$("select#" + rowId + "_keywordVal", row[0]).html(res);
-						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
-						$grid.jqGrid('setCell', rowId, 'url', url);
-						$grid.jqGrid('setCell', rowId, 'objectName', objName);
-						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-						break;
-					} else if (appTypeLocal == 'MobileApp' && ((obType == 'UIATableView' || obType == 'UIASecureTextField' || obType == 'UIATextField' || obType == 'UIASwitch' || obType == 'UIAButton' || obType == 'UIASearchBar' || obType == 'UIASlider' || obType == 'UIAPickerWheel'))) {
-						var res = '';
-						var sc;
-						if (obType == 'UIASecureTextField' || obType == 'UIATextField' || obType == 'UIASearchBar') {
-							sc = Object.keys(keywordArrayList.text);
-							selectedKeywordList = "text";
-						} else if (obType == 'UIASwitch') {
-							sc = Object.keys(keywordArrayList.Switch);
-							selectedKeywordList = "Switch";
-						} else if (obType == 'UIAButton') {
-							sc = Object.keys(keywordArrayList.button);
-							selectedKeywordList = "button";
-						} else if (obType == 'UIASlider') {
-							sc = Object.keys(keywordArrayList.slider);
-							selectedKeywordList = "slider";
-						} else if (obType == 'UIAPickerWheel') {
-							sc = Object.keys(keywordArrayList.picker);
-							selectedKeywordList = "picker";
-						} else if (obType == 'UIATableView') {
-							sc = Object.keys(keywordArrayList.table);
-							selectedKeywordList = "table";
-						} else {
-							sc = Object.keys(keywordArrayList.generic);
-							selectedKeywordList = "generic";
-						}
-						for (var i = 0; i < sc.length; i++) {
-							if (selectedKeyword == sc[i]) {
-								res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
-							} else
-								res += '<option role="option" value="' + sc[i] + '">' + sc[i] + '</option>';
-						}
-						var row = $(e.target).closest('tr.jqgrow');
-						var rowId = row.attr('id');
-						$("select#" + rowId + "_keywordVal", row[0]).html(res);
-						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
-						$grid.jqGrid('setCell', rowId, 'url', url);
-						$grid.jqGrid('setCell', rowId, 'objectName', objName);
-						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-						break;
-					} else if (appTypeLocal == 'MobileApp' && (!(obType == 'UIATableView' || obType == 'UIASecureTextField' || obType == 'UIATextField' || obType == 'UIASwitch' || obType == 'UIAButton' || obType == 'UIASearchBar' || obType == 'UIASlider' || obType == 'UIAPickerWheel'))) {
-						var res = '';
-						var sc = Object.keys(keywordArrayList.element);
-						selectedKeywordList = "element";
-						for (var i = 0; i < sc.length; i++) {
-							if (selectedKeyword == sc[i]) {
-								res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
-							} else
-								res += '<option role="option" value="' + sc[i] + '">' + sc[i] + '</option>';
 						}
 						var row = $(e.target).closest('tr.jqgrow');
 						var rowId = row.attr('id');
