@@ -82,10 +82,14 @@ function loadReports() {
         $(document).on('click', '.collapsible', function() {
             if ($(this).hasClass('active') == true) {
                 $(this).children('span').children('span.arrow-down').removeClass('arrow-down').addClass('arrow-up');
-                $('.mainTabCont:visible').addClass('mainTabContCollapsed');
+                $('.maintabCont_collapse:visible').addClass('mainTabContCollapsed');
+                $('.maintabCont_collapse').addClass('responsiveHeight_collapsed');
+                $('.maintabCont_collapse').removeClass('responsiveHeight');
             } else {
+                $('.maintabCont_collapse').addClass('responsiveHeight');
+                $('.maintabCont_collapse').removeClass('responsiveHeight_collapsed');
                 $(this).children('span').children('span.arrow-up').removeClass('arrow-up').addClass('arrow-down');
-                $('.mainTabCont:visible').removeClass('mainTabContCollapsed');
+                $('.maintabCont_collapse:visible').removeClass('mainTabContCollapsed');
             }
         });
         $('.collapsible-tc').append('<span class="arrow-down-sm"></span>');

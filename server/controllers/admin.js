@@ -1175,8 +1175,9 @@ exports.getNames_ICE = function (req, res) {
 				respnames: [],
 				idtypes: []
 			};
-			if (requestedidslist.length == idtypes.length && requestedidslist.length > 0) {
-				for (var eachid = 0; eachid < requestedidslist.length; eachid++) {
+			var reqIdsListLength = requestedidslist.length;
+			if (reqIdsListLength == idtypes.length && reqIdsListLength > 0) {
+				for (var eachid = 0; eachid < reqIdsListLength; eachid++) {
 					if (requestedidslist[eachid] != null && requestedidslist[eachid] != undefined && requestedidslist[eachid].trim() != '') {
 						//in this block all projects under the domain is the response.
 						if (idtypes[eachid] == 'domainsall') {
@@ -1186,14 +1187,15 @@ exports.getNames_ICE = function (req, res) {
 							};
 							namesfetcher(requestedidslist[eachid], "domainsall", function (error, response) {
 								try {
-									if (response.length <= 0) {
+									respLength = response.length
+									if (respLength <= 0) {
 										logger.info('No projects found');
 										res.send("No Projects");
 									} else {
-										for (var i = 0; i < response.length; i++) {
+										for (var i = 0; i < respLength; i++) {
 											responsedata.projectIds.push(response[i].projectid);
 											responsedata.projectNames.push(response[i].projectname);
-											if (i == response.length - 1) {
+											if (i == respLength - 1) {
 												logger.info('Project details fetched successfully');
 												res.send(responsedata);
 											}
@@ -1209,7 +1211,7 @@ exports.getNames_ICE = function (req, res) {
 									responsedata.idtypes.push('projects');
 									responsedata.requestedids.push(response[0].projectid);
 									responsedata.respnames.push(response[0].projectname);
-									if (index == requestedidslist.length) {
+									if (index == reqIdsListLength) {
 										logger.info('Project details fetched successfully');
 										res.send(responsedata);
 									}
@@ -1224,7 +1226,7 @@ exports.getNames_ICE = function (req, res) {
 									responsedata.idtypes.push('releases');
 									responsedata.requestedids.push(response[0].releaseid);
 									responsedata.respnames.push(response[0].releasename);
-									if (index == requestedidslist.length) {
+									if (index == reqIdsListLength) {
 										logger.info('Release details fetched successfully');
 										res.send(responsedata);
 									}
@@ -1239,7 +1241,7 @@ exports.getNames_ICE = function (req, res) {
 									responsedata.idtypes.push('cycles');
 									responsedata.requestedids.push(response[0].cycleid);
 									responsedata.respnames.push(response[0].cyclename);
-									if (index == requestedidslist.length) {
+									if (index == reqIdsListLength) {
 										logger.info('Cycle details fetched successfully');
 										res.send(responsedata);
 									}
@@ -1253,7 +1255,7 @@ exports.getNames_ICE = function (req, res) {
 									responsedata.idtypes.push('screens');
 									responsedata.requestedids.push(response[0].screenid);
 									responsedata.respnames.push(response[0].screenname);
-									if (index == requestedidslist.length) {
+									if (index == reqIdsListLength) {
 										logger.info('Screen details fetched successfully');
 										res.send(responsedata);
 									}

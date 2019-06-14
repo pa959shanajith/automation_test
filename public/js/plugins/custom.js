@@ -304,17 +304,45 @@ function loadUserTasks(){
 	var tasksJson = JSON.parse(window.localStorage['_TJ']);
 	$(".task-content-inner").empty().hide();
 	var counter = 1;
-	for(i=0; i<tasksJson.length; i++) {
+	var lenght_tasksJson=tasksJson.length;
+	for(i=0; i<lenght_tasksJson; i++) {
 		var classIndex = i<100 ? "tasks-l-s": i<1000? "tasks-l-m" : "tasks-l-l";
-		for(j=0;j<tasksJson[i].taskDetails.length;j++){
+		var lenght_taskDetails=tasksJson[i].taskDetails.length;
+		for(j=0;j<lenght_taskDetails;j++){
 			var testSuiteDetails = JSON.stringify(tasksJson[i].testSuiteDetails);
 			var taskTypeIcon = "imgs/ic-taskType-yellow-plus.png";
-
-			if(tasksJson[i].taskDetails[j].taskType == "Execution"){
+			var tasktype = tasksJson[i].taskDetails[j].taskType;
+			var taskname = tasksJson[i].taskDetails[j].taskName;
+			if(tasktype == "Execution"){
 				taskTypeIcon = "imgs/ic-taskType-blue-plus.png";
 			}
-
-			$(".task-content-inner").append('<div class="panel panel-default" panel-id="'+i+'"><div id="panelBlock_'+i+'" class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse' + counter + '"><h4 class="taskNo-Inner-Pgs '+classIndex+'" style="margin-top: -1px;">' + counter + '</h4><span class="assignedTask-Inner-Pgs assignedTaskInner" data-testsuitedetails='+testSuiteDetails+' data-scenarioflag='+tasksJson[i].scenarioFlag+'  data-apptype="' + tasksJson[i].appType + '" data-projectid="' + tasksJson[i].projectId + '" data-screenid="' + tasksJson[i].screenId + '"  data-screenname="' + tasksJson[i].screenName + '" data-testcaseid="' + tasksJson[i].testCaseId + '" data-testcasename="' + tasksJson[i].testCaseName + '"  data-scenarioid="' + tasksJson[i].scenarioId + '" data-taskname="' + tasksJson[i].taskDetails[j].taskName + '" data-taskdes="' + tasksJson[i].taskDetails[j].taskDescription + '" data-tasktype="' + tasksJson[i].taskDetails[j].taskType + '" data-subtasktype="' + tasksJson[i].taskDetails[j].subTaskType + '" data-subtaskid="' + tasksJson[i].taskDetails[j].subTaskId + '"  data-assignedtestscenarioids='+tasksJson[i].assignedTestScenarioIds+' data-assignedto="' + tasksJson[i].taskDetails[j].assignedTo + '" data-startdate="' + tasksJson[i].taskDetails[j].startDate + '" data-exenddate="' + tasksJson[i].taskDetails[j].expectedEndDate + '" data-status="' + tasksJson[i].taskDetails[j].status+'" data-versionnumber='+tasksJson[i].versionnumber+' data-batchTaskIDs="'+tasksJson[i].taskDetails[j].batchTaskIDs+'" data-releaseid="'+tasksJson[i].taskDetails[j].releaseid+'" data-cycleid="'+tasksJson[i].taskDetails[j].cycleid+'" data-reuse="'+tasksJson[i].taskDetails[j].reuse+'" onclick="taskRedirectionInner(this.dataset.testsuitedetails,this.dataset.scenarioflag,this.dataset.assignedtestscenarioids,this.dataset.subtasktype,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.scenarioid,this.dataset.subtaskid,this.dataset.versionnumber,this.dataset.status,this.dataset.batchtaskids,this.dataset.releaseid,this.dataset.cycleid,this.dataset.reuse)">' + tasksJson[i].taskDetails[j].taskName + '</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;opacity: 0.9;" src="'+taskTypeIcon+'"/><button class="panel-head-tasktype-Inner-Pgs">' + tasksJson[i].taskDetails[j].taskType + '</button></div><!--Addition--></div></div></div>').fadeIn();
+			var dataobj = {
+				'scenarioflag':tasksJson[i].scenarioFlag,
+				'apptype':tasksJson[i].appType,
+				'projectid':tasksJson[i].projectId,
+				'screenid':tasksJson[i].screenId,
+				'screenname':tasksJson[i].screenName,
+				'testcaseid':tasksJson[i].testCaseId,
+				'testcasename':tasksJson[i].testCaseName,
+				'scenarioid':tasksJson[i].scenarioId,
+				'taskname':taskname,
+				'taskdes':tasksJson[i].taskDetails[j].taskDescription,
+				'tasktype':tasksJson[i].taskDetails[j].taskType,
+				'subtasktype':tasksJson[i].taskDetails[j].subTaskType,
+				'subtaskid':tasksJson[i].taskDetails[j].subTaskId,
+				'assignedtestscenarioids':tasksJson[i].assignedTestScenarioIds,
+				'assignedto':tasksJson[i].taskDetails[j].assignedTo,
+				'startdate':tasksJson[i].taskDetails[j].startDate,
+				'exenddate':tasksJson[i].taskDetails[j].expectedEndDate,
+				'status':tasksJson[i].taskDetails[j].status,
+				'versionnumber':tasksJson[i].versionnumber,
+				'batchTaskIDs':tasksJson[i].taskDetails[j].batchTaskIDs,
+				'releaseid':tasksJson[i].taskDetails[j].releaseid,
+				'cycleid':tasksJson[i].taskDetails[j].cycleid,
+				'reuse':tasksJson[i].taskDetails[j].reuse
+			}
+			dataobj = JSON.stringify(dataobj)
+			$('.task-content-inner').append("<div class='panel panel-default' panel-id='"+i+"'><div id='panelBlock_"+i+"' class='panel-heading'><div class='taskDirection' href='#collapse" + counter + "'><h4 class='taskNo-Inner-Pgs "+classIndex+" taskRedir'>" + counter + "</h4><span class='assignedTask-Inner-Pgs assignedTaskInner' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirectionInner(this.dataset.testsuitedetails,this.dataset.dataobj)'>" + taskname + "</span><!--Addition--><div class='panel-additional-details'><img style='height: 20px;opacity: 0.7;' src='"+taskTypeIcon+"'/><button class='panel-head-tasktype-Inner-Pgs'>" + tasktype + "</button></div><!--Addition--></div></div></div>").fadeIn();
 			var limit = 45;
 			var chars = $("#panelBlock_"+i+"").children().find('span.assignedTaskInner').text();
 			if (chars.length > limit) {
@@ -358,46 +386,47 @@ function loadUserTasks(){
 	}
 }
 
-function taskRedirectionInner(testsuitedetails,scenarioflag,assignedtestscenarioids,subtasktype,screenid,screenname,projectid,taskname,testcaseid,testcasename,apptype,scenarioid,subtaskid,versionnumber,status,batchTaskIDs,releaseid,cycleid,reuse){
+function taskRedirectionInner(testsuitedetails,dataobj){
 	var taskObj = {};
-	if(status=='assigned'){
-		status='inprogress';
+	var dataobj_json=JSON.parse(dataobj);
+	if(dataobj_json.status=='assigned'){
+		dataobj_json.status='inprogress';
 	}
-	taskObj.scenarioFlag = scenarioflag;
-	taskObj.assignedTestScenarioIds = assignedtestscenarioids;
-	taskObj.screenId = screenid;
-	taskObj.screenName = screenname;
-	taskObj.projectId = projectid;
-	taskObj.taskName = taskname;
-	taskObj.testCaseId = testcaseid;
-	taskObj.testCaseName = testcasename;
-	taskObj.scenarioId = scenarioid;
-	taskObj.status = status;
-	taskObj.appType = apptype;
-	taskObj.subTaskType = subtasktype;
-	taskObj.subTaskId=subtaskid;
-	taskObj.versionnumber=versionnumber;
-	taskObj.batchTaskIDs=batchTaskIDs;
-	taskObj.releaseid = releaseid;
-	taskObj.cycleid = cycleid;
-	taskObj.reuse=reuse;
+	taskObj.scenarioFlag = dataobj_json.scenarioflag;
+	taskObj.assignedTestScenarioIds = dataobj_json.assignedtestscenarioids;
+	taskObj.screenId = dataobj_json.screenid;
+	taskObj.screenName = dataobj_json.screenname;
+	taskObj.projectId = dataobj_json.projectid;
+	taskObj.taskName = dataobj_json.taskname;
+	taskObj.testCaseId = dataobj_json.testcaseid;
+	taskObj.testCaseName = dataobj_json.testcasename;
+	taskObj.scenarioId = dataobj_json.scenarioid;
+	taskObj.status = dataobj_json.status;
+	taskObj.appType = dataobj_json.apptype;
+	taskObj.subTaskType = dataobj_json.subtasktype;
+	taskObj.subTaskId=dataobj_json.subtaskid;
+	taskObj.versionnumber=dataobj_json.versionnumber;
+	taskObj.batchTaskIDs=dataobj_json.batchTaskIDs;
+	taskObj.releaseid = dataobj_json.releaseid;
+	taskObj.cycleid = dataobj_json.cycleid;
+	taskObj.reuse=dataobj_json.reuse;
 	taskObj.testSuiteDetails = JSON.parse(testsuitedetails);
 	window.localStorage['_CT'] = JSON.stringify(taskObj);
-	if(subtasktype == "Scrape"){
+	if(dataobj_json.subtasktype == "Scrape"){
 		window.localStorage['navigateScreen'] = "Scrape";
 		window.localStorage['navigateScrape'] = true;
 		window.location.pathname = "/design";
 	}
-	else if(subtasktype == "TestCase"){
+	else if(dataobj_json.subtasktype == "TestCase"){
 		window.localStorage['navigateScreen'] = "TestCase";
 		window.localStorage['navigateTestcase'] = true;
 		window.location.pathname = "/designTestCase";
 	}
-	else if(subtasktype == "TestSuite"){
+	else if(dataobj_json.subtasktype == "TestSuite"){
 		window.localStorage['navigateScreen'] = "TestSuite";
 		window.location.pathname = "/execute";
 	}
-	else if(subtasktype == "Scheduling"){
+	else if(dataobj_json.subtasktype == "Scheduling"){
 		window.localStorage['navigateScreen'] = "scheduling";
 		window.location.pathname = "/scheduling";
 	}

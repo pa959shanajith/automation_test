@@ -2237,51 +2237,58 @@ exports.userObjectElement_ICE = function (req, res) {
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
 			logger.info("Sending socket request for focus to redis");
-			if(operation=='encrypt'){
-				props={
-					action:"userobject",
-					url:req.body.object[1],
-					name:req.body.object[2],
-					rpath:req.body.object[3],
-					apath:req.body.object[4],
-					classname:req.body.object[5],
-					id:req.body.object[6],
-					selector:req.body.object[7],
-					tagname:req.body.object[8],
-					operation:operation
-				}
-			}
-			else if(operation=='decrypt'){
-				props={
-					action:"userobject",
-					xpath:req.body.object[1],
-					url:req.body.object[2],
-					tag:req.body.object[3],
-					operation:operation
-				}
-			}
-			dataToIce = {"emitAction": "webscrape", "username" : name, "data": props};
-			redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-			function userObjectElement_ICE_listener(channel, message) {
-				var data = JSON.parse(message);
-				//LB: make sure to send recieved data to corresponding user
-				if (name == data.username) {
-					redisServer.redisSubServer.removeListener('message', userObjectElement_ICE_listener);
-					if (data.onAction == "unavailableLocalServer") {
-						logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
-						if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
-							var soc = myserver.socketMapNotify[name];
-							soc.emit("ICEnotAvailable");
+			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+				if (redisres[1]>0) {
+					if(operation=='encrypt'){
+						props={
+							action:"userobject",
+							url:req.body.object[1],
+							name:req.body.object[2],
+							rpath:req.body.object[3],
+							apath:req.body.object[4],
+							classname:req.body.object[5],
+							id:req.body.object[6],
+							selector:req.body.object[7],
+							tagname:req.body.object[8],
+							operation:operation
 						}
-					} else {
-						value = data.value;
-						logger.info("Sending objects");
-						res.send(value);
 					}
+					else if(operation=='decrypt'){
+						props={
+							action:"userobject",
+							xpath:req.body.object[1],
+							url:req.body.object[2],
+							tag:req.body.object[3],
+							operation:operation
+						}
+					}
+					dataToIce = {"emitAction": "webscrape", "username" : name, "data": props};
+					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					function userObjectElement_ICE_listener(channel, message) {
+						var data = JSON.parse(message);
+						//LB: make sure to send recieved data to corresponding user
+						if (name == data.username) {
+							redisServer.redisSubServer.removeListener('message', userObjectElement_ICE_listener);
+							if (data.onAction == "unavailableLocalServer") {
+								logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
+								if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
+									var soc = myserver.socketMapNotify[name];
+									soc.emit("ICEnotAvailable");
+								}
+							} else {
+								value = data.value;
+								logger.info("Sending objects");
+								res.send(value);
+							}
+						}
+					}
+					redisServer.redisSubServer.on("message",userObjectElement_ICE_listener);
+					logger.info("Successfully updated userdefined object");
+				} else {
+					logger.error("Error occurred in the service initScraping_ICE: Socket not Available");
+					res.send("unavailableLocalServer")
 				}
-			}
-			redisServer.redisSubServer.on("message",userObjectElement_ICE_listener);
-			logger.info("Successfully updated userdefined object");
+			})
 		} else {
 			logger.error("Error occurred in the service userObjectElement_ICE: Invalid Session");
 			res.send("Invalid Session");
