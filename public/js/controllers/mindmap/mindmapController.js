@@ -4901,6 +4901,10 @@ Purpose : displaying pop up for replication of project
     }
 
     $scope.copyMindMap = function() {
+        if ($('.fa.fa-clipboard.fa-lg.plus-icon').hasClass('active-map')) {
+            openDialogMindmap('Error', 'Cannot copy when the Paste-map icon is active!');
+            return;
+        }
         if (dNodes_c.length == 0) {
             openDialogMindmap('Warning', 'Nothing is copied');
             return;
