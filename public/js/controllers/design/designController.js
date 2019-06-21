@@ -819,7 +819,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		//enableScreenShotHighlight = true;
 		DesignServices.getScrapeDataScreenLevel_ICE()
 			.then(function (data) {
-			   
+			    localStorage['_cust']=JSON.stringify({})
 				if (data == "Invalid Session") {
 					return $rootScope.redirectPage();
 				}
@@ -904,7 +904,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
 							}
 							if(ob.hasOwnProperty('editable')){
-								var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><a id='decrypt' href='#' class='userObject'><img src='imgs/ic-jq-editstep.png'></a></li>";
+								var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><span id='decrypt' href='#' class='userObject'><img src='imgs/ic-jq-editstep.png'></span></li>";
 							}else{
 								var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 							}
@@ -3156,6 +3156,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	//Submit Custom Object Functionality
 	$scope.submitCustomObject = function (e) {
 		var err = "false";
+		var custflag = "false";
 		$('input.inputErrorBorderBottom').removeClass('inputErrorBorderBottom');
 		$scope.errorMessage = "";
 		$(".addObjTopWrap").find(".error-msg-abs").text("");
@@ -3225,9 +3226,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 						if ($.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname) || $.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname).split("_")[0]) {
 							//$("#dialog-addObject").modal("hide");
-							openDialog("Add Object", "Object characterstics are same for " + $(this).find("input").val() + "");
-							$(this).find("input").addClass('inputErrorBorderBottom');
-							err = "true";
+							if($('#addMoreObject').is(':visible') == false && 'editable' in viewString.view[i]){
+								custflag=i
+							}else{
+								openDialog("Add Object", "Object characterstics are same for " + $(this).find("input").val() + "");
+								$(this).find("input").addClass('inputErrorBorderBottom');
+								err = "true";
+							}
 						}
 					}
 				}
@@ -3310,7 +3315,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			}
 			//Pushing custom object array in viewString.view
 			for (i = 0; i < customObj.length; i++) {
-				viewString.view.push(customObj[i])
+				if (custflag!="false"){
+					viewString.view[custflag]=customObj[i]
+				}else{
+					viewString.view.push(customObj[i])
+				}
 			}
 
 			//Reloading List Items
@@ -3332,7 +3341,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				var tag1 = tag.replace(/ /g, "_");
 				var tag2;
 				if ((tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") && ob.hasOwnProperty('editable')) {
-					var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><a href='#' id='decrypt' class='userObject'><img src='imgs/ic-jq-editstep.png' ></a></li>";
+					var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><span href='#' id='decrypt' class='userObject'><img src='imgs/ic-jq-editstep.png' ></span></li>";
 				} else {
 					var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 				}

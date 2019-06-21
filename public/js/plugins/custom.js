@@ -87,14 +87,14 @@ window.addEventListener('popstate', function () {
 //Document Ready Function
 $(document).ready(function() {
 	//prevent special characters(such as <,>,',"",-) for all the Inputs except for password field, testcase grid inputs and edit on scrapedobjects.
-	$(document).on("keydown","input[type='text']:not([type=password]):not(.editObjectName):not(.editable):not(#userName):not(#firstName):not(#lastName):not(.launchPopupInput), textarea:not(.editable):not(.wsdlTextAreaBody)", function(e) {
+	$(document).on("keydown","input[type='text']:not([type=password]):not(.editObjectName):not(.editable):not(#userName):not(#firstName):not(#lastName):not(.launchPopupInput):not(.form-control.form-control-custom-prop), textarea:not(.editable):not(.wsdlTextAreaBody)", function(e) {
 		if ((e.target.className == 'searchScrapInput' && e.keyCode === 222) || (e.shiftKey && e.keyCode == 189) || ($(this).attr("id") == "mobilitySerialPath" && e.keyCode == 189))
 			return true;
 		else if(e.keyCode == 222 || e.shiftKey && e.keyCode == 222 || e.shiftKey && e.keyCode == 188 || e.shiftKey && e.keyCode == 190 || (e.currentTarget.getAttribute("id") == "getremarksData" && e.keyCode == 186 && !e.shiftKey))
 			return false;
 	});
 	//Prevent special characters(such as <,>,',"",-) for all the Inputs except for password field, testcase grid inputs and edit on scrapedobjects on cut copy paste
-	$(document).on("cut copy paste","input[type='text']:not([type=password]):not(.editObjectName):not(.editable), textarea:not(.editable)", function(e){
+	$(document).on("cut copy paste","input[type='text']:not([type=password]):not(.editObjectName):not(.editable):not(.form-control.form-control-custom-prop), textarea:not(.editable)", function(e){
 		if(e.target.className != "wsdlTextAreaBody"){
 			var element = this;
 			setTimeout(function () {
