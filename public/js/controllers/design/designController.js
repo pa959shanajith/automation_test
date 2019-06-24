@@ -502,7 +502,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							var resultString = JSON.parse(reader.result);
 							//var resultString = reader.result;
 							for (i = 0; i < resultString.length; i++) {
-								if (resultString[i].appType.toLowerCase() == "generic") {
+								if (resultString[i].appType.toLowerCase() == "generic" || resultString[i].appType.toLowerCase() == "pdf") {
 									flag = true;
 								} else if (resultString[i].appType == appType) {
 									flag = true;
@@ -637,7 +637,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					reader.onload = function (e) {
 						var resultString = JSON.parse(reader.result);
 						for (i = 0; i < resultString.length; i++) {
-							if (resultString[i].appType.toLowerCase() == "generic") {
+							if (resultString[i].appType.toLowerCase() == "generic" || resultString[i].appType.toLowerCase() == "pdf") {
 								flag = true;
 							}
 							else if (resultString[i].appType == appType) {
