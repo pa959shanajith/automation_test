@@ -1442,10 +1442,10 @@ exports.excelToMindmap = function (req, res) {
 				var scoIdx = -1, scrIdx = -1, sctIdx = -1;
 				var uniqueIndex = 0;
 				cSheetRow[0].split(',').forEach(function (e, i) {
-					if (/module/i.test(e)) modIdx = i;
-					if (/scenario/i.test(e)) scoIdx = i;
-					if (/screen/i.test(e)) scrIdx = i;
-					if (/script/i.test(e)) sctIdx = i;
+					if(i== 0 && e.toLowerCase()=="module") modIdx = i;
+					if(i== 1 && e.toLowerCase()=="scenario") scoIdx = i;
+					if(i== 2 && e.toLowerCase()=="screen") scrIdx = i;
+					if(i== 3 && e.toLowerCase()=="script") sctIdx = i;
 				});
 				if (modIdx == -1 || scoIdx == -1 || scrIdx == -1 || sctIdx == -1 || cSheetRow.length < 2) {
 					err = true;
