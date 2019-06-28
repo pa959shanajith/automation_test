@@ -12,6 +12,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     $scope.reportIdx = ''; // for execution count click
     $("#reportDataTableDiv").hide();
     $('.reports-search').attr('disabled', 'disabled');
+    $('#ctExpandAssign').css('pointer-events','none');
 
     cfpLoadingBar.start()
 
@@ -98,6 +99,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         $(".moduleBox,.mid-report-section,#accordion").hide();
         $('#nodeBox').empty();
         $('#ctExpandAssign').css('pointer-events','none');
+        $("#expAssign").attr('src', 'imgs/ic-collapse.png');
+        $('#searchModule').attr('disabled', 'disabled');
         mindmapServices.populateReleases(projectId).then(function(result) {
             unblockUI();
             if (result == "Invalid Session") {
