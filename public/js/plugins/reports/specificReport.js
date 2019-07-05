@@ -9,10 +9,11 @@ function unblockUI() {
     $("#overlayContainer").fadeOut(300).remove()
 }
 
-//         //Anonymous function(for IE)
+//Anonymous function(for IE)
 setTimeout((function() {
     return function() {
         loadReports();
+
         try {
             window.stop();
         } catch (exception) {
@@ -26,15 +27,10 @@ function loadReports() {
 
 
     setTimeout(function() {
+
         var remarksLength = parseInt($('.remarksLength').text());
         var commentsLength = parseInt($('.commentsLength').text());
-        if (remarksLength == 0) {
-            $('.toggleRemarks').hide();
-            $('.rDremarks').hide();
-        } else {
-            $('.toggleRemarks').show();
-            $('.rDremarks').show();
-        }
+        $('.toggleRemarks, .rDremarks').hide();
         if (commentsLength == 0) {
             $('.toggleComments').hide();
             $('.rDcomments').hide();
@@ -42,9 +38,6 @@ function loadReports() {
             $('.toggleComments').show();
             $('.rDcomments').show();
         }
-
-
-
         //Open Screenshot for specific reports
         $(document).on('click', '.openscreenshot', function() {
             var path = $(this).attr("data-screenshot");
@@ -92,7 +85,8 @@ function loadReports() {
                 $('.maintabCont_collapse:visible').removeClass('mainTabContCollapsed');
             }
         });
-        $('.collapsible-tc').append('<span class="arrow-down-sm"></span>');
+
+        $('.collapsible-tc').append('<span class="arrow-down-sm collapsible-testcase"></span>');
 
         $(".collapsible-tc:visible").each(function() {
             $(this).parent("tr").addClass('parentTestcase');
@@ -116,17 +110,30 @@ function loadReports() {
             }
         });
 
+        $(document).on('click', '.collapsible-testcase', function() {
+            var abc = $(this).parents('tr.reportdetailsrow').attr("data-id");
+            var len = $('.reportdetailsrow').length;
+            if ($(this).hasClass('collapse-active') == false) {
+                $(this).addClass('collapse-active');
+                $(this).removeClass('arrow-down-sm').addClass('arrow-up-sm');
+            } else {
+                $(this).removeClass('collapse-active');
+                $(this).removeClass('arrow-up-sm').addClass('arrow-down-sm');
+            }
+            var testcasesLen = $('.collapsible-testcase:visible').length;
+            var clickedTestcaseRow = $(this).parents('tr');
+            var getAllSelectedTestcaseRows = $(this).parents('tr').nextUntil('.parentTestcase');
+            if (getAllSelectedTestcaseRows.length != 0) {
+                $(this).parents('tr').nextUntil('tr.parentTestcase').toggleClass('no-disp');
+            }
+        });
+
 
         $(document).on('click', '.logintojira', function() {
             $(".jiraWindow").show();
             clearData();
             $('#overlay').css('display', 'block');
-        })
-
-        /*$(document).on('click', '.disconnectJira', function(){
-            $(".logintojira").show();
-            $(".disconnectJira, .Llogdefect, #inputSlno, .go_defectlog").hide();
-        })*/
+        });
 
         //Login to Jira
         $(document).on('click', '.resetJiraCredentials', function() {
@@ -171,7 +178,6 @@ function loadReports() {
                         } else if (data == 'scheduleModeOn') {
                             $(".error-msg").text("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
                         } else {
-                            //if(data === [object Object])
                             localStorage.setItem("jiraLoginDetails", JSON.stringify(data));
                             clearData();
                             $(".error-msg").text('');
