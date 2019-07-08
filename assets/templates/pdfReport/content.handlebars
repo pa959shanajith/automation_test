@@ -241,8 +241,8 @@
                {{/ifnotEquals}}
                <th>Expected Result</th>
                <th>Actual Result</th>
+               <th>Status</th>
                <th>Jira Defect ID</th>
-               <th style="display:none">Status</th>
             </tr>
          </thead>
          <tbody class="reportsDetail" >
@@ -276,7 +276,7 @@
                {{/ifEquals}}
                {{#ifnotEquals testcase_details.testcaseDetails ""}}
                {{#ifnotEquals testcase_details undefined}}
-               <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}<br/> Expected Result is: {{testcase_details.testcaseDetails}}</td>
+               <td class="rDExpectedRes tabCont" style="padding-left: 10px;">Expected Result is: {{testcase_details.testcaseDetails}}</td>
                {{/ifnotEquals}}
                {{/ifnotEquals}} 
                {{#ifEquals status undefined}}
@@ -287,10 +287,10 @@
                {{/ifEquals}}
                {{#ifEquals status "Pass"}}
                {{#ifEquals testcase_details.actualResult_pass ""}}
-               <td class="rDActualRes tabCont" style="padding-left: 10px;"><a style="color: {{getColor status}};text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
+               <td class="rDActualRes tabCont" style="padding-left: 10px;">As Expected</td>
                {{/ifEquals}}
                {{#ifnotEquals testcase_details.actualResult_pass ""}}
-               <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}},<a style="color: {{getColor status}};text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
+               <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}}</a></td>
                {{/ifnotEquals}}
                {{/ifEquals}}
                {{#ifEquals status "Fail"}}
@@ -298,7 +298,7 @@
                <td class="rDActualRes tabCont" style="padding-left: 10px;"><a style="color: {{getColor status}};text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
                {{/ifEquals}}
                {{#ifnotEquals testcase_details.actualResult_fail ""}}
-               <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}},<a style="color: {{getColor status}};text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
+               <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}>{{status}}</a></td>
                {{/ifnotEquals}}
                {{/ifEquals}}
                {{#ifEquals status "Terminate"}}
@@ -306,7 +306,7 @@
                {{/ifEquals}}
                {{/ifnotEquals}} 
                <!-- If Hide Test Details is False -->
-               <td class="rDstatus tabCont" style="display:none; padding-left: 10px; color: {{getColor status}}"><a style="color:inherit;text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
+               <td class="rDstatus tabCont" style="padding-left: 10px; color: {{getColor status}}"><a style="color:inherit;text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
                <td class="rjira tabCont" style="padding-left: 10px;">{{jira_defect_id}}</td>
             </tr>
             {{/ifnotEquals}}

@@ -12,6 +12,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     $scope.reportIdx = ''; // for execution count click
     $("#reportDataTableDiv").hide();
     $('.reports-search').attr('disabled', 'disabled');
+    $('#ctExpandAssign').css('pointer-events','none');
 
     cfpLoadingBar.start()
 
@@ -96,6 +97,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         var projectId = $('.project-list option:selected').val();
         blockUI("Loading releases.. please wait..");
         $(".moduleBox,.mid-report-section,#accordion").hide();
+        $('#nodeBox').empty();
+        $('#ctExpandAssign').css('pointer-events','none');
+        $("#expAssign").attr('src', 'imgs/ic-collapse.png');
+        $('#searchModule').attr('disabled', 'disabled');
         mindmapServices.populateReleases(projectId).then(function(result) {
             unblockUI();
             if (result == "Invalid Session") {
@@ -184,8 +189,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value.testsuiteid + '  title=' + value.testsuitename + ' style="width: 139px;"><img class="ct-nodeIcon" id=' + value.testsuiteid + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.testsuitename + '</span></div>')
                             $('.reports-search').removeAttr('disabled', 'disabled');
                         });
-
                     }
+                    $('#ctExpandAssign').css('pointer-events','auto')
                     if (redirected) {
                         $timeout(function() {
                             $("div.ct-node").each(function() {

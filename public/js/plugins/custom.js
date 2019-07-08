@@ -359,7 +359,9 @@ function loadUserTasks(){
 	if (window.location.pathname != '/plugin'){
 	$(".panel-additional-details").off("click");
 	$(".panel-additional-details").click(function(e){
-		var tdes = this.parentElement.children[1].getAttribute('data-taskdes');
+		var data_object = this.parentElement.children[1].getAttribute('data-dataobj');
+		data_object=JSON.parse(data_object)
+		var tdes = data_object['taskdes']
 		var olddescriptionid = "null";
 		if($(".description-container").length>0)
 			olddescriptionid = $(".description-container")[0].getAttribute("description-id");

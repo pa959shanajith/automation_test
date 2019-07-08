@@ -452,7 +452,9 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 		$(".panel-additional-details").off("click");
 		$(".panel-additional-details").click(function(e){
-			var tdes = this.parentElement.children[1].getAttribute('data-taskdes');
+			var data_object = this.parentElement.children[1].getAttribute('data-dataobj');
+			data_object=JSON.parse(data_object)
+			var tdes = data_object['taskdes']
 			var olddescriptionid = "null";
 			if($(".description-container").length>0) olddescriptionid = $(".description-container")[0].getAttribute("description-id");
 			$(".description-container").remove();
@@ -521,7 +523,9 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		window.localStorage['_FD'] = angular.toJson($scope.filterDat);
 		$(".panel-additional-details").off("click");
 		$(".panel-additional-details").click(function(e){
-			var tdes = this.parentElement.children[1].getAttribute('data-taskdes');
+			var data_object = this.parentElement.children[1].getAttribute('data-dataobj');
+			data_object=JSON.parse(data_object)
+			var tdes = data_object['taskdes']
 			var olddescriptionid = "null";
 			if($(".description-container").length>0)
 				olddescriptionid = $(".description-container")[0].getAttribute("description-id");

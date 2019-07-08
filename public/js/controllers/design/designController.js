@@ -5019,7 +5019,7 @@ function contentTable(newTestScriptDataLS) {
 	$(document).on('click', '#btnaddRemarks', function (e) {
 		//var oldRemarks = $("#jqGrid tbody tr td.selectedRemarkCell").text().trim();
 		if (!$("#getremarksData").val().trim()) {
-			$("#getremarksData").addClass("inputErrorBorderFull");
+			$("#getremarksData").addClass("errorClass");
 		} else {
 			var userinfo = JSON.parse(window.localStorage['_UI']);
 			var d = new Date();
@@ -5038,6 +5038,13 @@ function contentTable(newTestScriptDataLS) {
 			// labelArr.push(txnHistory.codesDict['AddRemarksTestStep']);
 			// txnHistory.log(e.type,labelArr,infoArr,window.location.pathname);				   
 		}
+	})
+	$("#getremarksData").change(function() {
+		$("#getremarksData").removeClass('errorClass');
+	});
+
+	$(document).on('click', '.close', function (e) {
+		$("#getremarksData").removeClass('errorClass');
 	})
 
 	//Save teststep details
