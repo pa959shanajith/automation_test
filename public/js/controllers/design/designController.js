@@ -502,7 +502,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							var resultString = JSON.parse(reader.result);
 							//var resultString = reader.result;
 							for (i = 0; i < resultString.length; i++) {
-								if (resultString[i].appType.toLowerCase() == "generic") {
+								if (resultString[i].appType.toLowerCase() == "generic" || resultString[i].appType.toLowerCase() == "pdf") {
 									flag = true;
 								} else if (resultString[i].appType == appType) {
 									flag = true;
@@ -637,7 +637,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					reader.onload = function (e) {
 						var resultString = JSON.parse(reader.result);
 						for (i = 0; i < resultString.length; i++) {
-							if (resultString[i].appType.toLowerCase() == "generic") {
+							if (resultString[i].appType.toLowerCase() == "generic" || resultString[i].appType.toLowerCase() == "pdf") {
 								flag = true;
 							}
 							else if (resultString[i].appType == appType) {
@@ -1549,7 +1549,16 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					$(document).find("#desktopPath").addClass("inputErrorBorder")
 					return false
 				} else if (browserType == 'pdf'){
-					screenViewObject.appType = browserType
+					screenViewObject.appType = browserType;
+					// blockUI(blockMsg);
+					if ($rootScope.compareFlag == true) {
+						blockUI(blockMsg2);
+						e.stopImmediatePropagation();
+					}
+					else {
+						blockUI(blockMsg);
+						e.stopImmediatePropagation();
+					}
 				} else {
 					$(document).find("#desktopPath").removeClass("inputErrorBorder")
 					screenViewObject.appType = $scope.getScreenView,
@@ -1574,7 +1583,16 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					$(document).find("#SAPPath").addClass("inputErrorBorder")
 					return false
 				} else if (browserType == 'pdf'){
-					screenViewObject.appType = browserType
+					screenViewObject.appType = browserType;
+					// blockUI(blockMsg);
+					if ($rootScope.compareFlag == true) {
+						blockUI(blockMsg2);
+						e.stopImmediatePropagation();
+					}
+					else {
+						blockUI(blockMsg);
+						e.stopImmediatePropagation();
+					}
 				} else {
 					$(document).find("#SAPPath").removeClass("inputErrorBorder")
 					screenViewObject.appType = $scope.getScreenView,
@@ -1598,7 +1616,16 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					$(document).find("#mobilityAPKPath").addClass("inputErrorBorder")
 					return false
 				} else if (browserType == 'pdf'){
-					screenViewObject.appType = browserType
+					screenViewObject.appType = browserType;
+					// blockUI(blockMsg);
+					if ($rootScope.compareFlag == true) {
+						blockUI(blockMsg2);
+						e.stopImmediatePropagation();
+					}
+					else {
+						blockUI(blockMsg);
+						e.stopImmediatePropagation();
+					}
 				} else if ($("#mobilityAPKPath").val().toLowerCase().indexOf(".apk") >= 0) {
 					if ($(document).find("#mobilityAPKPath").val() == "") {
 						$(document).find("#mobilityAPKPath").addClass("inputErrorBorder")
@@ -1694,7 +1721,16 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					$(document).find("#mobilityAndroidVersion").addClass("inputErrorBorder")
 					return false
 				} else if (browserType == 'pdf'){
-					screenViewObject.appType = browserType
+					screenViewObject.appType = browserType;
+					// blockUI(blockMsg);
+					if ($rootScope.compareFlag == true) {
+						blockUI(blockMsg2);
+						e.stopImmediatePropagation();
+					}
+					else {
+						blockUI(blockMsg);
+						e.stopImmediatePropagation();
+					}
 				} 
 				else {
 					$(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion").removeClass("inputErrorBorder")
@@ -1721,7 +1757,16 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					$(document).find("#OEBSPath").addClass("inputErrorBorder")
 					return false
 				} else if (browserType == 'pdf'){
-					screenViewObject.appType = browserType
+					screenViewObject.appType = browserType;
+					// blockUI(blockMsg);
+					if ($rootScope.compareFlag == true) {
+						blockUI(blockMsg2);
+						e.stopImmediatePropagation();
+					}
+					else {
+						blockUI(blockMsg);
+						e.stopImmediatePropagation();
+					}
 				} 
 				else {
 					$(document).find("#OEBSPath").removeClass("inputErrorBorder")
@@ -1742,6 +1787,15 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			//For PDF
 			else if(browserType == "pdf"){
 				screenViewObject.appType = browserType;
+				// blockUI(blockMsg);
+				if ($rootScope.compareFlag == true) {
+					blockUI(blockMsg2);
+					e.stopImmediatePropagation();
+				}
+				else {
+					blockUI(blockMsg);
+					e.stopImmediatePropagation();
+				}
 			}
 			//For Web
 			else {
