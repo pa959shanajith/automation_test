@@ -1,17 +1,21 @@
+<!DOCTYPE html> 
 <html style="height: 100%;">
-
 <head>
    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <title>SLK Nineteen68</title>
    <link rel="stylesheet" type="text/css" href="fonts/latofonts.css" />
    <link rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.css" />
+   <link rel="stylesheet" type="text/css" href="css/css_reports/datatables/dataTables.css">
+
    <script type="text/javascript" src="js/plugins/jquery.min.js"></script>
    <script type="text/javascript" src="js/plugins/reports/specificReport.js"></script>
+   <script src="js/plugins/reports/datatables/datatables.min.js"></script>
+
    <style>
       .no-disp {
          display: none !important;
       }
-
       .unexpand,
       .expand {
          cursor: pointer;
@@ -152,7 +156,12 @@
          width: 0px !important;
       }
 
-      .reportsDetails th:nth-child(1) {
+      table.dataTable thead th, table.dataTable thead td
+      {
+         text-align: left !important;
+      }
+
+     /* .reportsDetails th:nth-child(1) {
          width: 3.2%;
       }
 
@@ -245,7 +254,7 @@
 
       .reportsDetails th:nth-child(9) {
          width: 6.1%;
-      }
+      }*/
 
       .maintabCont {
          float: left;
@@ -876,13 +885,13 @@
          display: none;
       }
 
-      .scroll-table-container {
+      /*.scroll-table-container {
          height: 89%;
          width: 100%;
          overflow-y: scroll;
          box-sizing: border-box;
          border: 1px solid #dcdcdc;
-      }
+      }*/
 
       .scroll-table {
          border-collapse: collapse;
@@ -949,7 +958,7 @@
          border-right: 5px solid rgba(0, 0, 0, 0);
          position: relative;
          left: -2px;
-         top: 9px;
+         top: 4px;
          float: left;
          cursor: pointer;
       }
@@ -971,24 +980,49 @@
          height: calc(100% - 75px);
       }
 
-      .responsiveHeight {
+      /*.responsiveHeight {
          height: calc(100% - 55%) !important;
-      }
+      }*/
 
       .responsiveHeight_collapsed {
          height: calc(100% - 11%) !important;
       }
-
-      tr.odd:first-child {
-         display: none !important;
+      table.dataTable.nowrap th, table.dataTable.nowrap td
+      {
+         text-align: left !important;
+      }
+      table.datatable
+      {
+         table-layout: fixed !important;
+      }
+      table.dataTable thead th
+      {
+         text-align: left !important;
+         background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+         font-size: 15px;
+         font-family: Latoweb;
+      }
+      .dataTables_scrollHead{
+         background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+      }
+      .dataTables_scrollBody
+      {
+         border: 1px solid #e5e5e5;
+        /* max-height: 380px !important;*/
+      }
+      .dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody>table>tbody>tr>td
+      {
+         font-family: Latoweb;
+         font-size: 14px !important;
       }
    </style>
 </head>
 
 <body>
-   <div class="mainContainer">
       <span class='hide remarksLength'>{{remarksLength}}</span>
       <span class='hide commentsLength'>{{commentsLength}}</span>
+      <div class="mainContainer">
+
       {{#each overallstatus}}
       <div class="hearderCon">
          <div class="headerRepDetails">
@@ -1098,92 +1132,81 @@
          </table>
       </div>
       {{/each}}
-      <!-- Reports Table -->
-      <div class="maintabCont_collapse" style='height:45%'>
-         <table class="maintabCont table" style="width: 100%;">
-            <thead class="reportsDetails">
-               <th>Sl No.</th>
-               <th>Test Step No.</th>
-               <th style="display:none">Test Step Description</th>
-               <th>Elapsed Time</th>
-               <th class='toggleComments'>Comments</th>
-               <th class='toggleRemarks'>Remarks</th>
-               <th>Expected Result</th>
-               <th>Actual Result</th>
-               <th>Status</th>
-               <th>JIRA Defect ID</th>
+        <!-- Reports Table -->
+        <div class="maintabCont_collapse">
+           <table id="specificReportDataTable" class="display responsive wrap" style="width:100%">
+            <thead>
+               <tr>
+                  <th>Sl No.</th>
+                  <th>Test Step No.</th>
+                  <th style="display:none">Test Step Description</th>
+                  <th>Expected Result</th>
+                  <th>Actual Result</th>
+                  <th>Status</th>
+                  <th>Elapsed Time</th>
+                  <th class='toggleCommentsCol'>Comments</th>
+                  <th>JIRA Defect ID</th>
+               </tr>
             </thead>
-         </table>
-         <div class="scroll-table-container">
-            <table class="scroll-table">
-               <tbody class="reportsDetail">
-                  {{#each rows}}
+            <tbody>
+               {{#each rows}}
                   <tr style="width: 100%;" class="reportdetailsrow" data-id="{{id}}" data-parentid="{{parentId}}">
                      <td class="rDid tabCont">{{slno}}</td>
                      <td class="rDstep tabCont iteration">{{Step}}</td>
                      <td class="{{getClass StepDescription}}"
-                        style="display:none; padding-left: 10px; font-weight:{{getStyle StepDescription}}">
-                        {{StepDescription}}</td>
-                     <td class="rDellaps tabCont">{{EllapsedTime}}</td>
-                     <td class="rDcomments tabCont">{{Comments}}</td>
-                     <td class="rDremarks tabCont toggleRemarks">{{Remark}}</td>
-                     {{#ifEquals testcase_details.testcaseDetails undefined}}
-                     <td class="rDExpectedRes tabCont {{getClass StepDescription}}">{{StepDescription}}</td>
-                     {{/ifEquals}} {{#ifEquals testcase_details.testcaseDetails ""}}
-                     <td class="rDExpectedRes tabCont">{{StepDescription}}</td>
-                     {{/ifEquals}} {{#ifnotEquals testcase_details.testcaseDetails ""}}
-                     {{#ifnotEquals testcase_details undefined}}
-                     <td class="rDExpectedRes tabCont">
-                        Expected Result is: {{testcase_details.testcaseDetails}}
+                        style="display:none;width:0px; padding-left: 10px; font-weight:{{getStyle StepDescription}}">
+                        {{StepDescription}}
                      </td>
-                     {{/ifnotEquals}} {{/ifnotEquals}} {{#ifEquals status undefined}}
-                     <td class="rDActualRes tabCont"></td>
-                     {{/ifEquals}} {{#ifEquals status ""}}
-                     <td class="rDActualRes tabCont"></td>
-                     {{/ifEquals}} {{#ifEquals status "Pass"}} {{#ifEquals testcase_details.actualResult_pass ""}}
-                     <td class="rDActualRes tabCont">
-                        {{#ifEquals screenshot_path undefined}}
-                        <text class="rDstatus rDstatusLnk">As Expected</text>
-                        {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
-                        <text class="rDstatus openscreenshot" data-screenshot="{{screenshot_path}}">As Expected</text>
-                        {{/ifnotEquals}}
-                     </td>
-                     {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_pass ""}}
-                     <td class="rDActualRes tabCont">
-                        {{testcase_details.actualResult_pass}}
-                     </td>
-                     {{/ifnotEquals}} {{/ifEquals}} {{#ifEquals status "Fail"}}
-                     {{#ifEquals testcase_details.actualResult_fail ""}}
-                     <td class="rDActualRes tabCont">
-                        {{#ifEquals screenshot_path undefined}}
-                        <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};">{{status}}</text>
-                        {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
-                        <text class="rDstatus openscreenshot" style="color:{{getColor status}};"
-                           data-screenshot="{{screenshot_path}}">{{status}}</text>
-                        {{/ifnotEquals}}
-                     </td>
-                     {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_fail ""}}
-                     <td class="rDActualRes tabCont">
-                        {{testcase_details.actualResult_fail}}
-                     </td>
-                     {{/ifnotEquals}} {{/ifEquals}}
-                     {{#ifEquals status "Terminate"}}
-                     <td class="rDActualRes tabCont">{{StepDescription}}</td>
-                     {{/ifEquals}}
-                     <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}};"
-                        data-screenshot="{{screenshot_path}}">{{status}}</td>
-                     <td class="rjira tabCont">
-                        <span class="opendescpopup" title="Create Issue">{{jira_defect_id}}</span>
-                     </td>
-                     <td class='hide hideStep'>{{hidestep}}</td>
+                       {{#ifEquals testcase_details.testcaseDetails undefined}}
+                        <td class="rDExpectedRes tabCont {{getClass StepDescription}}">{{StepDescription}}</td>
+                        {{/ifEquals}} {{#ifEquals testcase_details.testcaseDetails ""}}
+                        <td class="rDExpectedRes tabCont" >{{StepDescription}}</td>
+                        {{/ifEquals}} {{#ifnotEquals testcase_details.testcaseDetails ""}} {{#ifnotEquals testcase_details undefined}}
+                        <td class="rDExpectedRes tabCont" >
+                           Expected Result is: {{testcase_details.testcaseDetails}}
+                        </td>
+                        {{/ifnotEquals}} {{/ifnotEquals}} {{#ifEquals status undefined}}
+                        <td class="rDActualRes tabCont"></td>
+                        {{/ifEquals}} {{#ifEquals status ""}}
+                        <td class="rDActualRes tabCont"></td>
+                        {{/ifEquals}} {{#ifEquals status "Pass"}} {{#ifEquals testcase_details.actualResult_pass ""}}
+                        <td class="rDActualRes tabCont" >
+                           {{#ifEquals screenshot_path undefined}}
+                           <text class="rDstatus rDstatusLnk">As Expected</text>
+                           {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
+                           <text class="rDstatus openscreenshot" data-screenshot="{{screenshot_path}}">As Expected</text>
+                           {{/ifnotEquals}}
+                        </td>
+                        {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_pass ""}}
+                        <td class="rDActualRes tabCont" >
+                           {{testcase_details.actualResult_pass}}
+                        </td>
+                        {{/ifnotEquals}} {{/ifEquals}} {{#ifEquals status "Fail"}} {{#ifEquals testcase_details.actualResult_fail ""}}
+                        <td class="rDActualRes tabCont" >
+                           {{#ifEquals screenshot_path undefined}}
+                           <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};">{{status}}</text>
+                           {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
+                           <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text>
+                           {{/ifnotEquals}}
+                        </td>
+                        {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_fail ""}}
+                        <td class="rDActualRes tabCont" >
+                           {{testcase_details.actualResult_fail}}
+                        </td>
+                        {{/ifnotEquals}} {{/ifEquals}}
+                        <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</td>
+                        <td class="rDellaps tabCont">{{EllapsedTime}}</td>
+                        <td style='display:none !important' class="rDcomments tabCont">{{Comments}}</td>
+                          <td class="rjira tabCont">
+                           <span class="opendescpopup" title="Create Issue">{{jira_defect_id}}</span>
+                        </td>
                   </tr>
-                  {{/each}}
-               </tbody>
-            </table>
-         </div>
+               {{/each}}
+            </tbody>
+           </table>
+        </div>
+          <!-- Reports Table -->
       </div>
-      <!-- Reports Table -->
-
       <div id="overlay"></div>
       <!-- Jira login window popup-->
       <div class="jiraWindow" style="display: none;">
@@ -1270,8 +1293,5 @@
             <button type="button" class="closeWindow">Ok</button>
          </p>
       </div>
-   </div>
-   </div>
 </body>
-
 </html>

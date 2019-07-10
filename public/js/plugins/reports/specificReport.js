@@ -13,7 +13,6 @@ function unblockUI() {
 setTimeout((function() {
     return function() {
         loadReports();
-
         try {
             window.stop();
         } catch (exception) {
@@ -24,19 +23,82 @@ setTimeout((function() {
 })(), 400);
 
 function loadReports() {
-
-
     setTimeout(function() {
-
+            var calcDataTableHeight = function() {
+                if($('button.collapsible').hasClass('active') == true)
+                {
+                    return $(window).height() - 300;
+                }
+                else{
+                    console.log("inactive", $(window).height()/2.5)
+                    return $(window).height() /2.5;
+                }
+              };  
+              
+              $(window).resize(function() {
+                var oSettings = oTable.fnSettings();
+                oSettings.oScroll.sY = calcDataTableHeight(); 
+                oTable.fnDraw();
+              });
+    
+        //Datatable
+         var oTable =  $('#specificReportDataTable').DataTable({
+                "bDestroy": true,
+                "responsive": true,
+                "bRetrieve": true,
+                "bPaginate": false,
+                "bSort": false,
+                "bFilter": false,
+                "bLengthChange": false,
+                "bInfo": false,
+                "scrollY": calcDataTableHeight(),
+                "scrollCollapse": true,
+                "scrollX": true,
+                "paging": false,
+                "oLanguage": {
+                    "sSearch": ""
+                },
+                "aoColumns": [
+                    { "sWidth": "5%" }, // 1st column width 
+                    { "sWidth": "10%" }, // 2nd column width 
+                    { "sWidth": "15%" }, // 3rd column width
+                    { "sWidth": "15%" }, // 4th column width 
+                    { "sWidth": "10%" }, // 5th column width 
+                    { "sWidth": "10%" }, // 6th column width
+                    { "sWidth": "10%" }, // 7th column width 
+                    { "sWidth": "10%" }, // 8th column width
+                    { "sWidth": "10%" }, // 9th column width 
+                    ],
+                "deferRender": true,
+                "fnInitComplete": function(oSettings, json) {
+                    getRows = $('.reportdetailsrow');
+                    for (let i = 0; i < getRows.length; i++) {
+                        var name = getRows[i].children[2].innerHTML;
+                        var rowCount = 0;
+                        var getParentId;
+                        if($(getRows[i]).children().children().hasClass('openscreenshot') == true)
+                        {
+                            var screenshot =  $(getRows[i]).children().find('.openscreenshot').attr('data-screenshot');
+                        }
+                        if(screenshot && screenshot.length <= 0 && screenshot.toLowerCase().indexOf(".png") == -1) 
+                        {
+                            $(getRows[i]).children().children().removeClass('openscreenshot');
+                        }
+                        if (getRows[i].children[1].innerHTML.indexOf('Start iteration') >= 0) {
+                            getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -110px;"></i>';
+                        }
+                    }
+                }
+            });    
         var remarksLength = parseInt($('.remarksLength').text());
         var commentsLength = parseInt($('.commentsLength').text());
         $('.toggleRemarks, .rDremarks').hide();
-        if (commentsLength == 0) {
-            $('.toggleComments').hide();
-            $('.rDcomments').hide();
-        } else {
-            $('.toggleComments').show();
-            $('.rDcomments').show();
+        if(commentsLength == 0)
+        {
+            $('.toggleCommentsCol,.rDcomments').hide();
+        }
+        else{
+            $('.toggleCommentsCol,.rDcomments').show();
         }
         //Open Screenshot for specific reports
         $(document).on('click', '.openscreenshot', function() {
@@ -74,6 +136,7 @@ function loadReports() {
         })
         $(document).on('click', '.collapsible', function() {
             if ($(this).hasClass('active') == true) {
+                debugger;
                 $(this).children('span').children('span.arrow-down').removeClass('arrow-down').addClass('arrow-up');
                 $('.maintabCont_collapse:visible').addClass('mainTabContCollapsed');
                 $('.maintabCont_collapse').addClass('responsiveHeight_collapsed');
@@ -83,10 +146,10 @@ function loadReports() {
                 $('.maintabCont_collapse').removeClass('responsiveHeight_collapsed');
                 $(this).children('span').children('span.arrow-up').removeClass('arrow-up').addClass('arrow-down');
                 $('.maintabCont_collapse:visible').removeClass('mainTabContCollapsed');
-            }
+            }   
         });
 
-        $('.collapsible-tc').append('<span class="arrow-down-sm collapsible-testcase"></span>');
+        $('.collapsible-tc').prepend('<span class="arrow-down-sm collapsible-testcase"></span>');
 
         $(".collapsible-tc:visible").each(function() {
             $(this).parent("tr").addClass('parentTestcase');
@@ -385,8 +448,8 @@ function loadReports() {
             }
         });
         if ($('.rDstatus:contains("Fail")').length > 0) {
-            var offset = $($('.rDstatus:contains("Fail"):visible')[0]).offset().top - $('.scroll-table-container').offset().top;
-            $('.scroll-table-container')[0].scrollTo(0, offset);
+            var offset = $($('.rDstatus:contains("Fail"):visible')[0]).offset().top - $('.dataTables_scrollBody').offset().top;
+            $('.dataTables_scrollBody')[0].scrollTo(0, offset);
         }
         $('.rDExpectedRes:visible:contains("TestCase Name")').each(function() {
             var StepDescription = $(this).html();
@@ -394,20 +457,7 @@ function loadReports() {
             $(this).html('');
         });
         $('.rDExpectedRes:visible:contains("Scenario cannot be executed")').html('');
-        var getRows = $('.reportdetailsrow');
-        for (i = 0; i < getRows.length; i++) {
-            var getRowId = parseInt(getRows[i].getAttribute('data-id'));
-            var name = getRows[i].children[2].innerHTML;
-            var rowCount = 0;
-            var getParentId;
-            if (getRows[i].children[8].getAttribute("data-screenshot") && (getRows[i].children[8].getAttribute("data-screenshot").length <= 0 || getRows[i].children[8].getAttribute("data-screenshot").toLowerCase().indexOf(".png") == -1)) {
-                getRows[i].children[8].classList.remove("openscreenshot");
-            }
-            if (getRows[i].children[1].innerHTML.indexOf('Start iteration') >= 0) {
-                getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -100px;"></i>';
-            }
-
-        }
+       
         $(document).on('click', '.unexpand', function() {
             var getID = $(this).parents('.reportdetailsrow').attr('data-id');
             $(this).removeClass('unexpand').addClass('expand');

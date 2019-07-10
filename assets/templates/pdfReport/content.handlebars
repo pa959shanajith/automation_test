@@ -232,16 +232,16 @@
                <th>Sl No.</th>
                <th>Test Step No.</th>
                <th style="display:none">Test Step Description</th>
-               <th>Elapsed Time</th>
-               {{#ifnotEquals commentsLength 0}}
-               <th>Comments</th>
-               {{/ifnotEquals}}
                {{#ifnotEquals remarksLength 0}}
-               <th>Remarks</th>
+               {{!-- <th>Remarks</th> --}}
                {{/ifnotEquals}}
                <th>Expected Result</th>
                <th>Actual Result</th>
                <th>Status</th>
+               <th>Elapsed Time</th>
+               {{#ifnotEquals commentsLength 0}}
+               <th>Comments</th>
+               {{/ifnotEquals}}
                <th>Jira Defect ID</th>
             </tr>
          </thead>
@@ -257,13 +257,9 @@
                <td class="rDstep tabCont">{{StepDescription}}</td>
                {{/ifEquals}}
                <td style="display:none" class="rDstepDes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
-               <td class="rDellaps tabCont">{{EllapsedTime}}</td>
-               {{#ifnotEquals  ../commentsLength 0}}
-               <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td>
-               {{/ifnotEquals}}
-               {{#ifnotEquals  ../remarksLength 0}}
+               {{!-- {{#ifnotEquals  ../remarksLength 0}}
                <td class="rDremarks tabCont" style="padding-left: 10px;">{{Remark}}</td>
-               {{/ifnotEquals}}
+               {{/ifnotEquals}} --}}
                <!-- If Hide Test Details is False -->
                {{#ifnotEquals hidestep "true"}}
                {{#ifEquals testcase_details.testcaseDetails undefined}}
@@ -307,6 +303,10 @@
                {{/ifnotEquals}} 
                <!-- If Hide Test Details is False -->
                <td class="rDstatus tabCont" style="padding-left: 10px; color: {{getColor status}}"><a style="color:inherit;text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
+               <td class="rDellaps tabCont">{{EllapsedTime}}</td>
+               {{#ifnotEquals  ../commentsLength 0}}
+               <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td>
+               {{/ifnotEquals}}
                <td class="rjira tabCont" style="padding-left: 10px;">{{jira_defect_id}}</td>
             </tr>
             {{/ifnotEquals}}
