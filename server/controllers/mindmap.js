@@ -1442,10 +1442,10 @@ exports.excelToMindmap = function (req, res) {
 				var scoIdx = -1, scrIdx = -1, sctIdx = -1;
 				var uniqueIndex = 0;
 				cSheetRow[0].split(',').forEach(function (e, i) {
-					if (/module/i.test(e)) modIdx = i;
-					if (/scenario/i.test(e)) scoIdx = i;
-					if (/screen/i.test(e)) scrIdx = i;
-					if (/script/i.test(e)) sctIdx = i;
+					if(i== 0 && e.toLowerCase()=="module") modIdx = i;
+					if(i== 1 && e.toLowerCase()=="scenario") scoIdx = i;
+					if(i== 2 && e.toLowerCase()=="screen") scrIdx = i;
+					if(i== 3 && e.toLowerCase()=="script") sctIdx = i;
 				});
 				if (modIdx == -1 || scoIdx == -1 || scrIdx == -1 || sctIdx == -1 || cSheetRow.length < 2) {
 					err = true;
@@ -1565,7 +1565,22 @@ exports.exportToExcel = function (req, res) {
 		//create the new worksheet with 10 coloumns and rows equal to number of testcases
 		var curr = excelMap;
 
-		//To fill some data
+		//Sorting the positions of the child nodes according to their childindex
+		for (i = 0; i < curr.children.length; i++) {
+			for (j = 0; j < curr.children[i].children.length; j++) {
+				//sort the testcases based on childindex
+				curr.children[i].children[j].children.sort(function(a,b){
+					return parseInt(a.childIndex)-parseInt(b.childIndex)});
+			}
+			//sort the screens based on childindex
+			curr.children[i].children.sort(function(a,b){
+				return parseInt(a.childIndex)-parseInt(b.childIndex)});
+		}
+		//sort the scenarios based on childindex
+		curr.children.sort(function(a,b){
+		return parseInt(a.childIndex)-parseInt(b.childIndex)});
+
+		//Set some width for first 4 columns
 		ws.column(1).setWidth(40);
  		ws.column(2).setWidth(40);
   		ws.column(3).setWidth(40);
@@ -1595,29 +1610,23 @@ exports.exportToExcel = function (req, res) {
 			  .string('Script')
 			  .style(style);
 
-		var min_tc_idx = 100000;
-		var min_scr_idx = 100000;
+		var min_scen_idx = 1;
+		var min_scr_idx = 1;
 		ws.cell(2,1).string(curr.name);
 		try {
-			//loop to iterate through number of scenarios
+			var tc_count=0;
 			for (i = 0; i < curr.children.length; i++) {
-				min_scr_idx = 100000;
-				//loop to iterate through number of screens
 				for (j = 0; j < curr.children[i].children.length; j++) {
-					min_tc_idx = 100000;
-					//loop through number of test cases
 					for (k = 0; k < curr.children[i].children[j].children.length; k++) {
-						ws.cell(1 + parseInt(curr.children[i].children[j].children[k].childIndex),4).string(curr.children[i].children[j].children[k].name);
-						if (parseInt(curr.children[i].children[j].children[k].childIndex) < parseInt(min_tc_idx)) {
-							min_tc_idx = curr.children[i].children[j].children[k].childIndex;
-						}
+						tc_count++;
+						ws.cell(1 + tc_count,4).string(curr.children[i].children[j].children[k].name);
 					}
-					ws.cell(1 + parseInt(min_tc_idx),3).string(curr.children[i].children[j].name);
-					if (parseInt(min_tc_idx) < parseInt(min_scr_idx)) {
-						min_scr_idx = min_tc_idx;
-					}
+					
+					ws.cell(1 + min_scr_idx,3).string(curr.children[i].children[j].name);
+					min_scr_idx= tc_count+1;
 				}
-				ws.cell( 1 + parseInt(min_scr_idx),2).string(curr.children[i].name);
+				ws.cell( 1 + min_scen_idx,2).string(curr.children[i].name);
+				min_scen_idx=tc_count+1;
 			}
 			//save it
 			wb.write('./excel/samp234.xlsx',function (err) {

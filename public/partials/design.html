@@ -133,10 +133,10 @@
             <div class="wsdlUrlMethod">
                <label>WSDL</label>
                <span class="wsdlInputButton">
-               <input type="text" class="form-control wsldInput" placeholder="Enter WSDL Url" ng-model="wsldInput" id="wsldInput" />
-               <button ng-click="launchWSDLGo()" class="btn btn-md launchWSDL">Go</button>
+               <input type="text" class="form-control wsldInput" style="width: 80%;" placeholder="Enter WSDL Url" ng-model="wsldInput" id="wsldInput" />
                </span>
-               <span class="wsdlInputButton wsdlSelectButton">
+               <span><button ng-click="launchWSDLGo()" class="btn btn-md launchWSDL">Go</button></span>
+               <span class="wsdlInputButton wsdlSelectButton" style = "left: -36px;">
                   <select class="form-control wsldSelect" id="wsldSelect">
                      <option value disabled selected>Select Operation</option>
                   </select>

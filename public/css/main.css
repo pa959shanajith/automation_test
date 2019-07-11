@@ -1193,7 +1193,7 @@ input[disabled]{
 .wsdlUrlMethod{
 	background: #e6e7e9;
     float: left;
-    width: 87%;
+    width: 79%;
     padding: 10px 15px;
 }
 
@@ -1261,11 +1261,11 @@ input[disabled]{
 .launchWSDL:focus,
 .launchWSDL:hover {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 10px;
+    right: 515px;
     border-radius: 0px 5px 5px 0px;
     font-size: 14px;
-    padding: 2px 25px;
+    padding: 2px 15px;
 }
 
 /* utility plugins */
