@@ -467,7 +467,7 @@ exports.reviewTask = function (req, res) {
 			var batch_tasks=batchIds.split(',');
 			taskID=JSON.stringify(batch_tasks);
 		}else{
-			taskID=JSON.stringify([batchIds]);
+			taskID=JSON.stringify(batchIds);
 		}
 		var ExecutionData=inputs.module_info;
 		check_status(ExecutionData, function (err, check_status_result) {

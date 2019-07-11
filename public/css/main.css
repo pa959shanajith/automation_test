@@ -879,7 +879,7 @@ input[type="radio"]{
 	border-bottom: none !important;
 }
 #left-bottom-section {
-    min-height: 45%;
+    min-height: 60%;
     float: left;
     width: 100%;
     position: relative;
@@ -2982,7 +2982,7 @@ input[disabled]{
 
 .modal-body .row-modal .form-group {
     width: 52%;
-    margin-right: 6%;
+    margin-right: 4%;
     float: left;
 }
 
@@ -2997,6 +2997,11 @@ input[disabled]{
 
 .modal-body .row-modal .form-control {
     border: 1px solid #311d4e !important;
+    width: 100%
+}
+
+.modal-body .row-modal .errorClass {
+    border: 1px solid red !important;
     width: 100%
 }
 
@@ -3059,16 +3064,29 @@ input[disabled]{
 	border:1px solid #311d4e;
 }
 
+.addMoreObject{
+    position: absolute;
+    right: 30px;
+    top: 3px;
+    cursor: pointer;
+}
 .deleteAddObjRow{
 	position: absolute;
-    right: 50px;
+    right: 76px;
     top: 5px;
+    cursor: pointer;
+}
+
+.addMoreObjRow{
+	position: absolute;
+    right: 10px;
+    top: 3px;
     cursor: pointer;
 }
 
 .editAddObjRow{
 	position: absolute;
-    right: 19px;
+    right: 45px;
     top: 7px;
     cursor: pointer;
 }
