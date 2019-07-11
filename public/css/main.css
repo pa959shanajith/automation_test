@@ -879,7 +879,7 @@ input[type="radio"]{
 	border-bottom: none !important;
 }
 #left-bottom-section {
-    min-height: 45%;
+    min-height: 60%;
     float: left;
     width: 100%;
     position: relative;
@@ -1193,7 +1193,7 @@ input[disabled]{
 .wsdlUrlMethod{
 	background: #e6e7e9;
     float: left;
-    width: 87%;
+    width: 79%;
     padding: 10px 15px;
 }
 
@@ -1261,11 +1261,11 @@ input[disabled]{
 .launchWSDL:focus,
 .launchWSDL:hover {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 10px;
+    right: 515px;
     border-radius: 0px 5px 5px 0px;
     font-size: 14px;
-    padding: 2px 25px;
+    padding: 2px 15px;
 }
 
 /* utility plugins */
@@ -2982,7 +2982,7 @@ input[disabled]{
 
 .modal-body .row-modal .form-group {
     width: 52%;
-    margin-right: 6%;
+    margin-right: 4%;
     float: left;
 }
 
@@ -3064,16 +3064,29 @@ input[disabled]{
 	border:1px solid #311d4e;
 }
 
+.addMoreObject{
+    position: absolute;
+    right: 30px;
+    top: 3px;
+    cursor: pointer;
+}
 .deleteAddObjRow{
 	position: absolute;
-    right: 50px;
+    right: 76px;
     top: 5px;
+    cursor: pointer;
+}
+
+.addMoreObjRow{
+	position: absolute;
+    right: 10px;
+    top: 3px;
     cursor: pointer;
 }
 
 .editAddObjRow{
 	position: absolute;
-    right: 19px;
+    right: 45px;
     top: 7px;
     cursor: pointer;
 }

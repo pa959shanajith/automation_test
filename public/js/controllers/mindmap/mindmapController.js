@@ -2,7 +2,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     //------------------Global Variables---------------------------//
     //Createmap//
-    var activeNode, childNode, node, link, dNodes_c, dLinks_c, allMMaps, temp, rootIndex, faRef, nCount, scrList, tcList, mapSaved, taskAssign, releaseResult, selectedProject;
+    var activeNode, nCount2, childNode, node, link, dNodes_c, dLinks_c, allMMaps, temp, rootIndex, faRef, nCount, scrList, tcList, mapSaved, taskAssign, releaseResult, selectedProject;
     //unassignTask is an array to store whose task to be deleted
     var deletednode = [],
         unassignTask = [],
@@ -42,6 +42,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     var currMap = {};
     var excelMap = {};
     var excelFlag = 0;
+    var versionFlag = 0;
     var dragsearch = false;
     $scope.allMMaps = [];
     var split_char = ',';
@@ -643,6 +644,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $(".search-canvas").val('');
         $scope.functionTBE = 'loadMapPopupConfirmed';
         excelFlag = 1;
+        versionFlag = 1;
         $('#createNewConfirmationPopup').attr('mapid', $scope.allMMaps[idx].name);
         if (Object.keys($scope.nodeDisplay).length != 0) {
             $('#createNewConfirmationPopup').modal('show');
@@ -760,6 +762,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
             currMap = result[0];
             excelMap = JSON.parse(JSON.stringify(currMap));
+            loadedmodule = excelMap.name;
             $('div[title=' + modName + ']').addClass('nodeBoxSelected');
             if ($scope.tab == 'tabCreate')
                 populateDynamicInputList();
@@ -2028,6 +2031,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (d3.select('.fa-hand-peace-o').classed('ct-ctrl-inactive')) return;
         $scope.errorMessage = "";
         $("#dialog-addObject").modal("show");
+        nCount2= nCount.slice(); //taking the clone of nCount to avoid duplicate updation, issue 2405.
         //Add two nodes 
         $scope.addMoreNode();
         $scope.addMoreNode();
@@ -2044,7 +2048,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 'Testcase': 3
             }
             var idxAddNode = 1 + $('.row.row-modal.addObj-row').length;
-            $("#addObjContainer").append("<div class='row row-modal addObj-row'><form class='form-horizontal' role='form' onSubmit='return false;'><div class='col-sm-2 addNode-label'><label>" + idxAddNode + "</label></div><div class='col-sm-6'><input type='text' class='form-control form-control-custom' placeholder='Enter node name' maxlength='255' value=" + $scope.addedntype + "_"+ (nCount[nodeId[$scope.addedntype]]++) + "></div><div class='col-sm-2 deleteAddObjRow'><img src='imgs/ic-delete.png' /></div></form></div>");
+            $("#addObjContainer").append("<div class='row row-modal addObj-row'><form class='form-horizontal' role='form' onSubmit='return false;'><div class='col-sm-2 addNode-label'><label>" + idxAddNode + "</label></div><div class='col-sm-6'><input type='text' class='form-control form-control-custom' placeholder='Enter node name' maxlength='255' value=" + $scope.addedntype + "_"+ (nCount2[nodeId[$scope.addedntype]]++) + "></div><div class='col-sm-2 deleteAddObjRow'><img src='imgs/ic-delete.png' /></div></form></div>");
         } else {
             openDialogMindmap('Error', 'At a time only 10 nodes can be added');
         }
@@ -2687,18 +2691,20 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             });
         }
 
-
-        var counter = {
-            'scenarios': 1,
-            'screens': 1,
-            'testcases': 1
-        };
+        var counter = {};
         temp_data.forEach(function(e, i) {
-            if (dNodes[e.idx].childIndex != counter[e.type]) {
-                dNodes[e.idx].childIndex = counter[e.type];
+            var key_1=dNodes[e.idx].pid_n;
+            if(key_1==undefined){
+                if(dNodes[e.idx].parent==null) return;
+                key_1=(dNodes[e.idx].parent.oid==undefined) ? dNodes[e.idx].parent.id : dNodes[e.idx].parent.oid
+            }
+            var key=e.type+'_'+key_1;
+            if(counter[key]==undefined)  counter[key]=1;
+            if (dNodes[e.idx].childIndex != counter[key]) {
+                dNodes[e.idx].childIndex = counter[key];
                 dNodes[e.idx].cidxch = 'true'; // child index updated
             }
-            counter[e.type] = counter[e.type] + 1;
+            counter[key] = counter[key] + 1;
         })
         var restrict_scenario_reuse = parseDataReuse(true);
         if (selectedTab != 'tabAssign') {
@@ -3399,6 +3405,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     */
 
     $scope.exportData = function(versioning_status) {
+        if (versionFlag != 1) {
+            openDialogMindmap("Fail", "Please select a module first");
+            return;
+        }
         var data_not_exported = [];
         var vs_n = 0;
         var version_num = "0.0";
@@ -3411,6 +3421,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         data = {
             "moduleInfo": []
         };
+        var loadedModule= loadedmodule;
         execution_data = {
             "execution_data": [{
                 "browserType": ["1"],
@@ -3445,6 +3456,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 result_details = result;
                 flag = 0;
                 for (var i = 0; i < result_details.length; i++) {
+                    if(result_details[i].name== loadedModule){
                     var module_info = {
                         "appType": "",
                         "projectId": $scope.projectNameO,
@@ -3477,6 +3489,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         data_not_exported.push(result_details[i].id_n);
                         console.log('Not exported : ', result_details[i].name);
                     }
+                }
                 }
                 if (flag) {
                     mindmapServices.getProjectTypeMM_Nineteen68($scope.projectNameO).then(
@@ -3852,8 +3865,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 container.append("<span class='eteScenrios' data-scenarioId='" + row.testScenarioID_c + "' title='" + row.testScenarioName + "'>" + row.testScenarioName + "</span>")
             });
             // #817 To select multiple scenarios in e2e (Himanshu)
+            var nCounter=0;
             $('.eteScenrios').click(function() {
                 $(this).toggleClass('selectScenariobg');
+                if($(this).hasClass('selectScenariobg')) {
+                    $(this).attr('data-position', ++nCounter);
+                }
+                else{
+                    $(this).attr('data-position',null);
+                } 
                 var classflag = false;
                 d3.select('.addScenarios-ete').classed('disableButton', !0);
                 $.each($('.eteScenrios'), function() {
@@ -4043,8 +4063,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $scope.addScenariosete = function($event) {
         if (!$event.originalEvent) return;
         SaveCreateED('#ct-createAction', 1, 0);
+        var spanArray = $("#eteScenarioContainer").find("span").filter(".selectScenariobg");
+        // sort based on data position attribute
+        var sortedSpanArray = spanArray.sort(function (a, b) {
+            return +a.getAttribute('data-position') - +b.getAttribute('data-position');
+        });
         //// #817 To select multiple scenarios in e2e (Himanshu)
-        $('.selectScenariobg').each(function(i, obj) {
+        sortedSpanArray.each(function(i, obj) {
             var text = $(obj).text();
             if ($(obj).attr('data-scenarioId') != 'null') {
                 createScenario_Node(text, $('#selectProjectEtem').val());
@@ -4876,6 +4901,10 @@ Purpose : displaying pop up for replication of project
     }
 
     $scope.copyMindMap = function() {
+        if ($('.fa.fa-clipboard.fa-lg.plus-icon').hasClass('active-map')) {
+            openDialogMindmap('Error', 'Cannot copy when the Paste-map icon is active!');
+            return;
+        }
         if (dNodes_c.length == 0) {
             openDialogMindmap('Warning', 'Nothing is copied');
             return;
@@ -5011,6 +5040,7 @@ Purpose : displaying pop up for replication of project
                             //$window.open(fileURL, '_blank');
                             URL.revokeObjectURL(fileURL);
                         }
+                        openDialogMindmap("Success", "Successfully exported to Excel");
                     }
                     openWindow++;
                 }
