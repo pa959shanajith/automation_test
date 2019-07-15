@@ -294,6 +294,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     $scope.projectListChange = function(prjName) {
+        versionFlag = 0;
+        excelFlag = 0;
         $scope.projectNameO = prjName;
         $scope.projectName4 = $scope.projectNameO;
         $scope.projectName3 = $scope.projectNameO;
@@ -3406,7 +3408,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     $scope.exportData = function(versioning_status) {
         if (versionFlag != 1) {
-            openDialogMindmap("Fail", "Please select a module first");
+            openDialogMindmap("Fail", "Please select a module to proceed");
             return;
         }
         var data_not_exported = [];
