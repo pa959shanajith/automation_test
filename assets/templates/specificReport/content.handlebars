@@ -40,18 +40,19 @@
          position: relative;
          width: 100%;
          float: left;
-         border: 1px solid #cfcfcf;
-         background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+         background: #F3F3F3;
          height: 50px;
          margin-bottom: 10px;
          border-radius: 5px;
          font-size: 16px;
          padding-top: 7px;
+         color: #5A5A5A;;
       }
 
       .headerRepDetails {
          width: 50%;
          padding: 3px 40px;
+         font-family: Latowebmedium;
       }
 
       .headerRepDetails label {
@@ -63,8 +64,8 @@
       .headerRepDetails span {
          width: 64%;
          padding-bottom: 5px;
-         font-weight: bold;
          font-size: 13px;
+         font-family: Latowebmedium;
       }
 
       .h2Header {
@@ -74,27 +75,32 @@
          transform: translate(-50%, -50%);
       }
 
-      .leftSummary {
-         width: 50%;
+      .leftSummary
+      {
+         width: 40%;
          float: left;
-         padding: 25px 0;
+         padding: 10px 0;
          font-size: 14px;
+         position: relative;
+         left: 4%;
       }
 
       .leftSummary label {
-         text-align: right;
+         text-align: left;
          float: left;
          width: 29%;
          padding-right: 5px;
          padding-bottom: 5px;
+         color: #1A1A1A !important;
       }
 
       .leftSummary span {
          float: left;
-         width: 64%;
+         width: 50%;
          padding-bottom: 5px;
          font-weight: bold;
          word-break: break-all;
+         font-family: latowebbold !important;
       }
 
       .summaryCon {
@@ -287,9 +293,7 @@
       }
 
       .progress {
-         margin-bottom: 20px;
          overflow: hidden;
-         box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
       }
 
       .progress-bar {
@@ -301,6 +305,9 @@
          text-align: center;
          box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .15);
          transition: width .6s ease;
+      }
+      .progress-bar{
+         height: 10px !important;
       }
 
       .reportStatusBlk {
@@ -317,15 +324,11 @@
 
       .customprogress {
          float: left;
-         width: 45% !important;
-         height: 12px;
+         width: 53% !important;
+         height: 8px !important;
          border-radius: 8px;
          margin-top: 3px;
-         background-color: #e0e0e0;
-      }
-
-      .customprogress .progress-bar {
-         border-radius: 20px;
+         background-color: #fff;
       }
 
       .progress-bar-success {
@@ -858,19 +861,15 @@
          color: black;
          cursor: pointer;
          width: 100%;
-         border: 1px solid #cfcfcf;
+         border: 0px solid #cfcfcf;
          text-align: left;
          outline: none;
          font-size: 15px;
          border-radius: 5px;
          height: 40px;
-         background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
-      }
-
-      .active,
-      .collapsible:hover {
-         background-color: #555;
-         background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+         background: none;
+         font-family: latowebbold;
+         font-weight: 500;
       }
 
       .content {
@@ -931,7 +930,7 @@
          float: left;
          position: absolute;
          left: -20px;
-         top: 4px;
+         top: 2px;
          cursor: pointer;
       }
 
@@ -944,7 +943,7 @@
          float: left;
          position: absolute;
          left: -16px;
-         top: 3px;
+         top: 0px;
          cursor: pointer;
       }
 
@@ -1015,6 +1014,39 @@
          font-family: Latoweb;
          font-size: 14px !important;
       }
+      .rightBox {
+         float: right !important;
+         width: 50% !important;
+         position: relative;
+         left: 0% !important;
+      }
+      .moduleEllipsis{
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+      }
+      .progVal{
+         padding-right: 12px;
+         padding-left: 2px;
+         position: relative;
+         text-align: center;
+      }
+      .progressPercentBox
+      {
+         font-family:Latowebbold;
+         text-align: left;
+         left: 8px;
+         position: relative;
+         padding-bottom: 2% !important;
+      }
+      .resultSummary{
+         font-weight: bold;
+      }
+      .resultSummaryBox
+      {
+         float: left;
+      }
+      }
    </style>
 </head>
 
@@ -1026,41 +1058,69 @@
       {{#each overallstatus}}
       <div class="hearderCon">
          <div class="headerRepDetails">
-            <label>Report Generated Date : </label>
-            <span>{{date}}</span>
+            <label>Date Generated: </label>
+            <span>{{date}} {{time}}</span>
          </div>
          <div class="headerRepDetails">
-            <label>Report Generated Time : </label>
-            <span>{{time}}</span>
+            <label>Module Name: </label>
+            <span class='moduleEllipsis' title={{moduleName}}>{{moduleName}}</span>
          </div>
          <div class="h2Header">
-            <h4>SLK Nineteen68 Execution Report</h4>
+            <h4>Execution Report | Scenario</h4>
          </div>
       </div>
       <button class="collapsible">
          <span style="left: 40px;position: relative">
-            <span class="arrow-down"></span>Result Summary</span>
+            <span class="arrow-down"></span><span class='resultSummary'>Result Summary</span></span>
       </button>
-      <div style="width: 100%;">
+      <div class='resultSummaryBox' style="width: 100%;">
          <div class="leftSummary">
-            <label>Scenario :</label>
-            <span>{{scenarioName}}</span>
-            <label>Cycle :</label>
-            <span>{{cycleName}}</span>
-            <label>Release :</label>
-            <span>{{releaseName}}</span>
-            <label>Project :</label>
-            <span>{{projectName}}</span>
-            <label>Domain :</label>
-            <span>{{domainName}}</span>
-            <label>Browser Type :</label>
-            <span>{{browserType}}</span>
-            <label>Browser Version :</label>
-            <span>{{browserVersion}}</span>
+            <label>Scenario</label>
+            <span>: {{scenarioName}}</span>
+            <label>Cycle</label>
+            <span>: {{cycleName}}</span>
+            <label>Release</label>
+            <span>: {{releaseName}}</span>
+            <label>Project</label>
+            <span>: {{projectName}}</span>
+            <label>Domain</label>
+            <span>: {{domainName}}</span>
+            <label>Browser Type</label>
+            <span>: {{browserType}}</span>
+            <label>Browser Version</label>
+            <span>: {{browserVersion}}</span>
             <span style='visibility:hidden' class="reportId">{{reportId}}</span>
             <span style='visibility:hidden' class="executionId">{{executionId}}</span>
          </div>
-         <div id="rightSummaryFunc" class="rightSummaryFunc">
+          <div class="leftSummary rightBox">
+            <label>Overall Status</label>
+            <span style="color:{{getColor overAllStatus}}">: {{overAllStatus}}</span>
+            <label>Testcase Status: </label>
+              <span class="progress customprogress">
+                  <span class="progress-bar" role="progressbar" style="background-color:#28a745;width:{{pass}}%">
+                    {{!-- <span class='progVal'>Pass: {{pass}}%</span> --}}
+                  </span>
+                   <span class="progress-bar" role="progressbar" style="background-color:#dc3545;width: {{fail}}%">
+                    {{!-- <span class='progVal'>Fail: {{pass}}%</span> --}}
+                  </span>
+                  <span class="progress-bar" role="progressbar" style="background-color:#ffc107;width: {{terminate}}%">
+                    {{!-- <span class='progVal'>Terminated: {{terminate}}%</span> --}}
+                  </span>
+               </span>
+             <label></label>
+               <span class="progressPercentBox">
+                    <text style="color:#28a745;" class='progVal'>Pass: {{pass}}%</text>
+                    <text style="color:#dc3545;" class='progVal'>Fail: {{fail}}%</text>
+                    <text style="color:#ffc107;" class='progVal'>Terminated: {{terminate}}%</text>
+               </span>
+            <label>Start Date and Time </label>
+            <span>: {{StartTime}}</span>
+            <label>End Date and Time </label>
+            <span>: {{EndTime}}</span>
+            <label>Time Elapsed </label>
+            <span>: {{EllapsedTime}}</span>
+         </div>
+         {{!-- <div id="rightSummaryFunc" class="rightSummaryFunc">
             <div class="reportStatus">
                <div class="reportStatusBlk">
                   <span class="progresslabel">Pass</span>
@@ -1085,9 +1145,9 @@
                   <span class="progresspercentage">{{terminate}} %</span>
                </div>
             </div>
-         </div>
+         </div> --}}
       </div>
-      <div class="midSection">
+      {{!-- <div class="midSection">
          <table cellpadding="3" cellspacing="0" class="midContainer" id="staustable">
             <tbody>
                <tr>
@@ -1130,7 +1190,7 @@
                </tr>
             </tbody>
          </table>
-      </div>
+      </div> --}}
       {{/each}}
         <!-- Reports Table -->
         <div class="maintabCont_collapse">

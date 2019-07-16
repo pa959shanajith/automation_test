@@ -701,7 +701,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 "fail": "",
                 "terminate": "",
                 "reportId": "",
-                "executionId": ""
+                "executionId": "",
+                "moduleName": ""
             }],
             rows: []
         };
@@ -722,6 +723,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             finalReports.overallstatus[0].scenarioName = data[0].testscenarioname
                             finalReports.overallstatus[0].reportId = reportID;
                             finalReports.overallstatus[0].executionId = executionId;
+                            finalReports.overallstatus[0].moduleName = $(".highlight-moduleName").text(); 
 
                             var obj2 = JSON.parse(data[1].reportdata);
                             var elapTym;
@@ -805,7 +807,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             finalReports.overallstatus[0].terminate = (parseFloat((terminated / total) * 100).toFixed(2)) > 0 ? parseFloat((terminated / total) * 100).toFixed(2) : parseInt(0);
                             finalReports.remarksLength = remarksLength;
                             finalReports.commentsLength = commentsLength;
-
                         }
                         if (reportType == "html") {
                             //Service call to get Html reports
