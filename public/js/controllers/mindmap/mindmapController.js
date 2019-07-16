@@ -2651,6 +2651,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     $scope.actionEvent = function($event) {
         $("#searchModule-assign").val("");
+        $("#pasteImg1").removeClass("active-map");
         e = $event;
         var selectedNodeTitle = $('.nodeBoxSelected').attr('title');
         if(isIE){
