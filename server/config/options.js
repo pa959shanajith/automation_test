@@ -18,6 +18,12 @@ try {
 			throw "Invalid values in SSO configuration";
 		}
 	}
+	var numCheck = /^\d+$/;
+	if (!numCheck.test(parsed.socketio.pingTimeout) || !numCheck.test(parsed.socketio.pingInterval)) throw "SocketIO config values should be Integer";
+	else {
+		parsed.socketio.pingTimeout = parseInt(parsed.socketio.pingTimeout);
+		parsed.socketio.pingInterval = parseInt(parsed.socketio.pingInterval);
+	}
 } catch (e) {
 	logger.error(e);
 	throw "Please provide valid values in config.json file";

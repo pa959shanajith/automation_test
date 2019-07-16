@@ -6,16 +6,15 @@ var socketMapUI = {};
 var socketMapScheduling = {};
 var socketMapNotify = {};
 
+var uiConfig = require('./../config/options');
+var screenShotPath = uiConfig.screenShotPath;
 var myserver = require('./../../server');
 var httpsServer = myserver.httpsServer;
-var io = require('socket.io').listen(httpsServer, { cookie: false });
+var io = require('socket.io').listen(httpsServer, { cookie: false, pingInterval: uiConfig.socketio.pingInterval, pingTimeout: uiConfig.socketio.pingTimeout });
 var notificationMsg = require('./../notifications/notifyMessages');
 var epurl = process.env.NDAC_URL;
 var Client = require("node-rest-client").Client;
 var apiclient = new Client();
-
-var uiConfig = require('./../config/options');
-var screenShotPath = uiConfig.screenShotPath;
 
 io.on('connection', function (socket) {
 	logger.info("Inside Socket connection");
@@ -111,7 +110,7 @@ io.on('connection', function (socket) {
 			address = socket.handshake.query.username;
 			if (socketMap[address] != undefined) {
 				connect_flag = true;
-				logger.info('Disconnecting from ICE socket : %s', address);
+				logger.info('Disconnecting from ICE socket (%s) : %s', reason, address);
 				redisServer.redisSubClient.unsubscribe('ICE1_normal_' + address);
 				delete socketMap[address];
 				module.exports.allSocketsMap = socketMap;
