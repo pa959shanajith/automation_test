@@ -1,4 +1,5 @@
 var redis = require("redis");
+var validator =  require('validator');
 var logger = require("../../logger");
 var redisConfig = {"host": process.env.REDIS_IP, "port": parseInt(process.env.REDIS_PORT),"password" : process.env.REDIS_AUTH};
 var default_sub = redis.createClient(redisConfig);
@@ -46,7 +47,7 @@ default_sub.on("message", function (channel, message) {
 	case "LAUNCH_MOBILE_WEB":
 		mySocket.emit("LAUNCH_MOBILE_WEB", data.mobileSerial, data.androidVersion);
 		break;
-	
+
 	case "PDF_SCRAPE":
 		mySocket.emit("PDF_SCRAPE", data.browsertype);
 		break;
@@ -137,6 +138,50 @@ module.exports.redisSubServer = server_sub;
 module.exports.initListeners = function(mySocket){
 	var username = mySocket.handshake.query.username;
 	logger.debug("Initializing ICE Engine connection for %s",username);
+	/*mySocket.evdata = {};
+
+	mySocket.use(function paginator(args, cb) {
+		var ev = args[0];
+		var data = args[1];
+		if (!(ev == "render_screenshot" || ev == "message")) return cb();
+		if (typeof(data) !== "string") return cb();
+		var comps = data.split(';');
+		var id = comps.shift();
+		var index = comps.shift();
+		var payload = comps.join(';');
+		var ev_data = mySocket.evdata[ev];
+		if (index == "p@gIn8" && comps.length == 3) {
+			var d2p = [parseInt(comps[0])].concat(Array.apply(null, Array(parseInt(comps[1]))));
+			mySocket.evdata[ev] = {id: id, data: d2p, jsonify: comps[2] === "True"};
+			mySocket.emit("data_nack", id, "all");
+		} else if (ev_data && ev_data.id == id) {
+			if (index == 'eof') {
+				var nack = ev_data.data.reduce(function(a,e,i) { return (e===undefined)? a.concat(i):a }, []);
+				if (nack.length !== 0) mySocket.emit("data_nack", id, nack);
+				else {
+					var payloadlength = mySocket.evdata[ev].data.shift();
+					payload = mySocket.evdata[ev].data.join('');
+					if (payload.length != payloadlength) {
+						mySocket.emit("data_nack", id, "all");
+						var blocks = mySocket.evdata[ev].data.length;
+						delete mySocket.evdata[ev].data;
+						mySocket.evdata[ev].data = [payloadlength].concat(Array.apply(null, Array(blocks)));
+					} else {
+						mySocket.emit("data_ack", id);
+						if (ev_data.jsonify) args[1] = JSON.parse(payload);
+						else args[1] = payload;
+						delete mySocket.evdata[ev]
+						cb();
+					}
+				}
+			} else {
+				console.log("packet #"+index+" received");
+				mySocket.evdata[ev].data[parseInt(index)] = payload;
+			}
+		} else if (!validator.isUUID(id)) cb();
+	});*/
+
+	mySocket.on("message", function (value) { console.log("\n\n\nOn Message:",value); });
 
 	mySocket.on("unavailableLocalServer", function (value) {
 		var dataToNode = JSON.stringify({"username": username, "onAction": "unavailableLocalServer", "value": value});
@@ -149,7 +194,7 @@ module.exports.initListeners = function(mySocket){
 	});
 
 	mySocket.on("result_web_crawler_finished", function (value) {
-		var dataToNode = JSON.stringify({"type" : "res","username" : username,"onAction" : "result_web_crawler_finished","value":JSON.parse(value)});
+		var dataToNode = JSON.stringify({"username" : username,"onAction" : "result_web_crawler_finished","value":JSON.parse(value)});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 
@@ -209,27 +254,27 @@ module.exports.initListeners = function(mySocket){
 	});
 
 	mySocket.on('open_file_in_editor_result', function (value) {
-		var dataToNode = JSON.stringify({"type" : "res","username" : username,"onAction" : "open_file_in_editor_result","value":JSON.parse(value)});
+		var dataToNode = JSON.stringify({"username" : username,"onAction" : "open_file_in_editor_result","value":JSON.parse(value)});
 		server_pub.publish('ICE2_' + username, dataToNode);
 	});
-	
+
 	mySocket.on('flowgraph_result', function (value) {
 		var dataToNode = JSON.stringify({"username" : username,"onAction" : "flowgraph_result","value":JSON.parse(value)});
 		server_pub.publish('ICE2_' + username, dataToNode);
 	});
 
 	mySocket.on('result_flow_graph_finished', function (value) {
-		var dataToNode = JSON.stringify({"type" : "res","username" : username,"onAction" : "result_flow_graph_finished","value":JSON.parse(value)});
+		var dataToNode = JSON.stringify({"username" : username,"onAction" : "result_flow_graph_finished","value":JSON.parse(value)});
 		server_pub.publish('ICE2_' + username, dataToNode);
 	});
 
 	mySocket.on('deadcode_identifier', function (value) {
-		var dataToNode = JSON.stringify({"type" : "res","username" : username,"onAction" : "deadcode_identifier","value":value});
+		var dataToNode = JSON.stringify({"username" : username,"onAction" : "deadcode_identifier","value":value});
 		server_pub.publish('ICE2_' + username, dataToNode);
 	});
-	
+
 	mySocket.on('iris_operations_result', function (value) {
-		var dataToNode = JSON.stringify({"type" : "res","username" : username,"onAction" : "iris_operations_result","value":JSON.parse(value)});
+		var dataToNode = JSON.stringify({"username" : username,"onAction" : "iris_operations_result","value":JSON.parse(value)});
 		server_pub.publish('ICE2_' + username, dataToNode);
 	});
 };

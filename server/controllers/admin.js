@@ -1,7 +1,7 @@
 /**
  * Dependencies.
  */
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcryptjs');
 var TokenGenerator = require('uuid-token-generator')
 var async = require('async');
 var activeDirectory = require('activedirectory');

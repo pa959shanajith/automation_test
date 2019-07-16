@@ -61,7 +61,7 @@ function authenticateLDAP(ldapdata, cb) {
 var strategyUtil = {
 	"inhouse": function inhouse(opts){
 		var async = require('async');
-		var bcrypt = require('bcrypt');
+		var bcrypt = require('bcryptjs');
 		var validator = require('validator');
 
 		var localStrategy = new LocalStrategy(function (username, password, done) {
