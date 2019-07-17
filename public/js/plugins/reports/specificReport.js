@@ -30,16 +30,10 @@ function loadReports() {
                     return $(window).height() - 300;
                 }
                 else{
-                    console.log("inactive", $(window).height()/2.5)
-                    return $(window).height() /2.5;
+                    return $(window).height() /2;
                 }
               };  
               
-              $(window).resize(function() {
-                var oSettings = oTable.fnSettings();
-                oSettings.oScroll.sY = calcDataTableHeight(); 
-                oTable.fnDraw();
-              });
     
         //Datatable
          var oTable =  $('#specificReportDataTable').DataTable({
@@ -136,17 +130,20 @@ function loadReports() {
         })
         $(document).on('click', '.collapsible', function() {
             if ($(this).hasClass('active') == true) {
-                debugger;
                 $(this).children('span').children('span.arrow-down').removeClass('arrow-down').addClass('arrow-up');
-                $('.maintabCont_collapse:visible').addClass('mainTabContCollapsed');
-                $('.maintabCont_collapse').addClass('responsiveHeight_collapsed');
-                $('.maintabCont_collapse').removeClass('responsiveHeight');
+                // $('.maintabCont_collapse:visible').addClass('mainTabContCollapsed');
+                // $('.maintabCont_collapse').addClass('responsiveHeight_collapsed');
+                // $('.maintabCont_collapse').removeClass('responsiveHeight');
+                $(".resultSummaryBox").addClass('hide');
+               
             } else {
-                $('.maintabCont_collapse').addClass('responsiveHeight');
-                $('.maintabCont_collapse').removeClass('responsiveHeight_collapsed');
+                // $('.maintabCont_collapse').addClass('responsiveHeight');
+                // $('.maintabCont_collapse').removeClass('responsiveHeight_collapsed');
                 $(this).children('span').children('span.arrow-up').removeClass('arrow-up').addClass('arrow-down');
-                $('.maintabCont_collapse:visible').removeClass('mainTabContCollapsed');
+                $(".resultSummaryBox").removeClass('hide');
+                // $('.maintabCont_collapse:visible').removeClass('mainTabContCollapsed');
             }   
+            $('.maintabCont_collapse').css('display','block');
         });
 
         $('.collapsible-tc').prepend('<span class="arrow-down-sm collapsible-testcase"></span>');

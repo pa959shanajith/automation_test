@@ -1,5 +1,6 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html style="height: 100%;">
+
 <head>
    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -16,6 +17,7 @@
       .no-disp {
          display: none !important;
       }
+
       .unexpand,
       .expand {
          cursor: pointer;
@@ -40,18 +42,20 @@
          position: relative;
          width: 100%;
          float: left;
-         border: 1px solid #cfcfcf;
-         background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+         background: #F3F3F3;
          height: 50px;
          margin-bottom: 10px;
          border-radius: 5px;
          font-size: 16px;
          padding-top: 7px;
+         color: #5A5A5A;
+         ;
       }
 
       .headerRepDetails {
          width: 50%;
          padding: 3px 40px;
+         font-family: Latowebmedium;
       }
 
       .headerRepDetails label {
@@ -63,8 +67,8 @@
       .headerRepDetails span {
          width: 64%;
          padding-bottom: 5px;
-         font-weight: bold;
          font-size: 13px;
+         font-family: Latowebmedium;
       }
 
       .h2Header {
@@ -75,26 +79,30 @@
       }
 
       .leftSummary {
-         width: 50%;
+         width: 40%;
          float: left;
-         padding: 25px 0;
+         padding: 10px 0;
          font-size: 14px;
+         position: relative;
+         left: 4%;
       }
 
       .leftSummary label {
-         text-align: right;
+         text-align: left;
          float: left;
          width: 29%;
          padding-right: 5px;
          padding-bottom: 5px;
+         color: #1A1A1A !important;
       }
 
       .leftSummary span {
          float: left;
-         width: 64%;
+         width: 50%;
          padding-bottom: 5px;
          font-weight: bold;
          word-break: break-all;
+         font-family: latowebbold !important;
       }
 
       .summaryCon {
@@ -156,105 +164,10 @@
          width: 0px !important;
       }
 
-      table.dataTable thead th, table.dataTable thead td
-      {
+      table.dataTable thead th,
+      table.dataTable thead td {
          text-align: left !important;
       }
-
-     /* .reportsDetails th:nth-child(1) {
-         width: 3.2%;
-      }
-
-      .rDid {
-         width: 3.3% !important;
-         word-break: break-word;
-      }
-
-      .reportsDetails th:nth-child(2) {
-         width: 16%;
-      }
-
-      .rDstep {
-         width: 16.5% !important;
-         word-break: break-word;
-      }
-
-      .reportsDetails th:nth-child(3) {
-         width: 15%;
-      }
-
-      .rDstepDes {
-         width: 15.5% !important;
-         word-break: break-word;
-      }
-
-      .reportsDetails th:nth-child(4) {
-         width: 9.6%;
-      }
-
-      .rDellaps {
-         width: 10% !important;
-         word-break: break-word;
-      }
-
-      .rDstatus {
-         width: 6.1% !important;
-         word-break: break-word;
-      }
-
-      .rDstatusLnk {
-         text-decoration: none !important;
-      }
-
-      .reportsDetails th:nth-child(5) {
-         width: 12.7%;
-         word-break: break-word;
-      }
-
-      .rDcomments {
-         width: 13%;
-         word-break: break-word;
-      }
-
-      .reportsDetails th:nth-child(6) {
-         width: 14.5%;
-      }
-
-      .rDremarks {
-         width: 14.9%;
-         word-break: break-word;
-      }
-
-      .reportsDetails th:nth-child(10) {
-         width: 5%;
-      }
-
-      .rjira {
-         width: 4.4%;
-         word-break: break-word;
-      }
-
-      .reportsDetails th:nth-child(7) {
-         width: 14.5%;
-      }
-
-      .rDExpectedRes {
-         width: 14.9%;
-         word-break: break-word;
-      }
-
-      .reportsDetails th:nth-child(8) {
-         width: 12%;
-      }
-
-      .rDActualRes {
-         width: 12.3%;
-         word-break: break-all;
-      }
-
-      .reportsDetails th:nth-child(9) {
-         width: 6.1%;
-      }*/
 
       .maintabCont {
          float: left;
@@ -287,9 +200,7 @@
       }
 
       .progress {
-         margin-bottom: 20px;
          overflow: hidden;
-         box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
       }
 
       .progress-bar {
@@ -301,6 +212,10 @@
          text-align: center;
          box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .15);
          transition: width .6s ease;
+      }
+
+      .progress-bar {
+         height: 10px !important;
       }
 
       .reportStatusBlk {
@@ -317,15 +232,11 @@
 
       .customprogress {
          float: left;
-         width: 45% !important;
-         height: 12px;
+         width: 53% !important;
+         height: 8px !important;
          border-radius: 8px;
          margin-top: 3px;
-         background-color: #e0e0e0;
-      }
-
-      .customprogress .progress-bar {
-         border-radius: 20px;
+         background-color: #fff;
       }
 
       .progress-bar-success {
@@ -858,19 +769,15 @@
          color: black;
          cursor: pointer;
          width: 100%;
-         border: 1px solid #cfcfcf;
+         border: 0px solid #cfcfcf;
          text-align: left;
          outline: none;
          font-size: 15px;
          border-radius: 5px;
          height: 40px;
-         background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
-      }
-
-      .active,
-      .collapsible:hover {
-         background-color: #555;
-         background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+         background: none;
+         font-family: latowebbold;
+         font-weight: 500;
       }
 
       .content {
@@ -931,7 +838,7 @@
          float: left;
          position: absolute;
          left: -20px;
-         top: 4px;
+         top: 2px;
          cursor: pointer;
       }
 
@@ -944,7 +851,7 @@
          float: left;
          position: absolute;
          left: -16px;
-         top: 3px;
+         top: 0px;
          cursor: pointer;
       }
 
@@ -987,154 +894,148 @@
       .responsiveHeight_collapsed {
          height: calc(100% - 11%) !important;
       }
-      table.dataTable.nowrap th, table.dataTable.nowrap td
-      {
+
+      table.dataTable.nowrap th,
+      table.dataTable.nowrap td {
          text-align: left !important;
       }
-      table.datatable
-      {
+
+      table.datatable {
          table-layout: fixed !important;
       }
-      table.dataTable thead th
-      {
+
+      table.dataTable thead th {
          text-align: left !important;
          background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
          font-size: 15px;
          font-family: Latoweb;
       }
-      .dataTables_scrollHead{
+
+      .dataTables_scrollHead {
          background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
       }
-      .dataTables_scrollBody
-      {
+
+      .dataTables_scrollBody {
          border: 1px solid #e5e5e5;
-        /* max-height: 380px !important;*/
+         /* max-height: 380px !important;*/
       }
-      .dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody>table>tbody>tr>td
-      {
+
+      .dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody>table>tbody>tr>td {
          font-family: Latoweb;
          font-size: 14px !important;
+      }
+
+      .rightBox {
+         float: right !important;
+         width: 50% !important;
+         position: relative;
+         left: 0% !important;
+      }
+
+      .moduleEllipsis {
+         white-space: nowrap;
+         overflow: hidden;
+         text-overflow: ellipsis;
+      }
+
+      .progVal {
+         padding-right: 12px;
+         padding-left: 2px;
+         position: relative;
+         text-align: center;
+      }
+
+      .progressPercentBox {
+         font-family: Latowebbold;
+         text-align: left;
+         left: 8px;
+         position: relative;
+         padding-bottom: 2% !important;
+      }
+
+      .resultSummary {
+         font-weight: bold;
+      }
+
+      .resultSummaryBox {
+         float: left;
+      }
       }
    </style>
 </head>
 
 <body>
-      <span class='hide remarksLength'>{{remarksLength}}</span>
-      <span class='hide commentsLength'>{{commentsLength}}</span>
-      <div class="mainContainer">
+   <span class='hide remarksLength'>{{remarksLength}}</span>
+   <span class='hide commentsLength'>{{commentsLength}}</span>
+   <div class="mainContainer">
 
       {{#each overallstatus}}
       <div class="hearderCon">
          <div class="headerRepDetails">
-            <label>Report Generated Date : </label>
-            <span>{{date}}</span>
+            <label>Date Generated: </label>
+            <span>{{date}} {{time}}</span>
          </div>
          <div class="headerRepDetails">
-            <label>Report Generated Time : </label>
-            <span>{{time}}</span>
+            <label>Module Name: </label>
+            <span class='moduleEllipsis' title={{moduleName}}>{{moduleName}}</span>
          </div>
          <div class="h2Header">
-            <h4>SLK Nineteen68 Execution Report</h4>
+            <h4>Execution Report | Scenario</h4>
          </div>
       </div>
       <button class="collapsible">
          <span style="left: 40px;position: relative">
-            <span class="arrow-down"></span>Result Summary</span>
+            <span class="arrow-down"></span><span class='resultSummary'>Result Summary</span></span>
       </button>
-      <div style="width: 100%;">
+      <div class='resultSummaryBox' style="width: 100%;">
          <div class="leftSummary">
-            <label>Scenario :</label>
-            <span>{{scenarioName}}</span>
-            <label>Cycle :</label>
-            <span>{{cycleName}}</span>
-            <label>Release :</label>
-            <span>{{releaseName}}</span>
-            <label>Project :</label>
-            <span>{{projectName}}</span>
-            <label>Domain :</label>
-            <span>{{domainName}}</span>
-            <label>Browser Type :</label>
-            <span>{{browserType}}</span>
-            <label>Browser Version :</label>
-            <span>{{browserVersion}}</span>
+            <label>Scenario</label>
+            <span>: {{scenarioName}}</span>
+            <label>Cycle</label>
+            <span>: {{cycleName}}</span>
+            <label>Release</label>
+            <span>: {{releaseName}}</span>
+            <label>Project</label>
+            <span>: {{projectName}}</span>
+            <label>Domain</label>
+            <span>: {{domainName}}</span>
+            <label>Browser Type</label>
+            <span>: {{browserType}}</span>
+            <label>Browser Version</label>
+            <span>: {{browserVersion}}</span>
             <span style='visibility:hidden' class="reportId">{{reportId}}</span>
             <span style='visibility:hidden' class="executionId">{{executionId}}</span>
          </div>
-         <div id="rightSummaryFunc" class="rightSummaryFunc">
-            <div class="reportStatus">
-               <div class="reportStatusBlk">
-                  <span class="progresslabel">Pass</span>
-                  <div class="progress customprogress">
-                     <span class="progress-bar progress-bar-success" style="width: {{pass}}%" role="progressbar"></span>
-                  </div>
-                  <span class="progresspercentage">{{pass}} %</span>
-               </div>
-               <div class="reportStatusBlk">
-                  <span class="progresslabel">Fail</span>
-                  <div class="progress customprogress">
-                     <span class="progress-bar progress-bar-danger" style="width: {{fail}}%" role="progressbar"></span>
-                  </div>
-                  <span class="progresspercentage">{{fail}} %</span>
-               </div>
-               <div class="reportStatusBlk">
-                  <span class="progresslabel">Terminated</span>
-                  <div class="progress customprogress">
-                     <span class="progress-bar progress-bar-warning" style="width: {{terminate}}%"
-                        role="progressbar"></span>
-                  </div>
-                  <span class="progresspercentage">{{terminate}} %</span>
-               </div>
-            </div>
+         <div class="leftSummary rightBox">
+            <label>Overall Status</label>
+            <span style="color:{{getColor overAllStatus}}">: {{overAllStatus}}</span>
+            <label>Testcase Status: </label>
+            <span class="progress customprogress">
+               <span class="progress-bar" role="progressbar" style="background-color:#28a745;width:{{pass}}%">
+               </span>
+               <span class="progress-bar" role="progressbar" style="background-color:#dc3545;width: {{fail}}%">
+               </span>
+               <span class="progress-bar" role="progressbar" style="background-color:#ffc107;width: {{terminate}}%">
+               </span>
+            </span>
+            <label></label>
+            <span class="progressPercentBox">
+               <text style="color:#28a745;" class='progVal'>Pass: {{pass}}%</text>
+               <text style="color:#dc3545;" class='progVal'>Fail: {{fail}}%</text>
+               <text style="color:#ffc107;" class='progVal'>Terminated: {{terminate}}%</text>
+            </span>
+            <label>Start Date and Time </label>
+            <span>: {{StartTime}}</span>
+            <label>End Date and Time </label>
+            <span>: {{EndTime}}</span>
+            <label>Time Elapsed </label>
+            <span>: {{EllapsedTime}}</span>
          </div>
       </div>
-      <div class="midSection">
-         <table cellpadding="3" cellspacing="0" class="midContainer" id="staustable">
-            <tbody>
-               <tr>
-                  <td>
-                     <label>Start Date and Time :</label>
-                     <span id="startTime">
-                        <b>{{StartTime}}</b>
-                     </span>
-                  </td>
-                  <td rowspan="2">
-                     <label>Status :</label>
-                     <span id="overAllStat" style="color:{{getColor overAllStatus}}">
-                        <span></span>
-                        <b>{{overAllStatus}}</b>
-                     </span>
-                  </td>
-               </tr>
-               <tr>
-                  <td>
-                     <label>End Date and Time :</label>
-                     <span id="endTime">
-                        <b>{{EndTime}}</b>
-                     </span>
-                  </td>
-               </tr>
-               <tr>
-                  <td>
-                     <label>Elapsed Time :</label>
-                     <span id="elapsedTime">
-                        <b>{{EllapsedTime}}</b>
-                     </span>
-                  </td>
-                  <td>
-                     <button class="logintojira" title="Login to Jira">Jira Login</button>
-                     <button class="disconnectJira" title="Disconnect from Jira">Disconnect</button>
-                     <label class="Llogdefect">Log Defect</label>
-                     <input type="text" id="inputSlno" placeholder="Enter SL No." maxlength="5" />
-                     <button class="go_defectlog opendescpopup">Go</button>
-                  </td>
-               </tr>
-            </tbody>
-         </table>
-      </div>
       {{/each}}
-        <!-- Reports Table -->
-        <div class="maintabCont_collapse">
-           <table id="specificReportDataTable" class="display responsive wrap" style="width:100%">
+      <!-- Reports Table -->
+      <div class="maintabCont_collapse">
+         <table id="specificReportDataTable" class="display responsive wrap" style="width:100%">
             <thead>
                <tr>
                   <th>Sl No.</th>
@@ -1150,148 +1051,153 @@
             </thead>
             <tbody>
                {{#each rows}}
-                  <tr style="width: 100%;" class="reportdetailsrow" data-id="{{id}}" data-parentid="{{parentId}}">
-                     <td class="rDid tabCont">{{slno}}</td>
-                     <td class="rDstep tabCont iteration">{{Step}}</td>
-                     <td class="{{getClass StepDescription}}"
-                        style="display:none;width:0px; padding-left: 10px; font-weight:{{getStyle StepDescription}}">
-                        {{StepDescription}}
-                     </td>
-                       {{#ifEquals testcase_details.testcaseDetails undefined}}
-                        <td class="rDExpectedRes tabCont {{getClass StepDescription}}">{{StepDescription}}</td>
-                        {{/ifEquals}} {{#ifEquals testcase_details.testcaseDetails ""}}
-                        <td class="rDExpectedRes tabCont" >{{StepDescription}}</td>
-                        {{/ifEquals}} {{#ifnotEquals testcase_details.testcaseDetails ""}} {{#ifnotEquals testcase_details undefined}}
-                        <td class="rDExpectedRes tabCont" >
-                           Expected Result is: {{testcase_details.testcaseDetails}}
-                        </td>
-                        {{/ifnotEquals}} {{/ifnotEquals}} {{#ifEquals status undefined}}
-                        <td class="rDActualRes tabCont"></td>
-                        {{/ifEquals}} {{#ifEquals status ""}}
-                        <td class="rDActualRes tabCont"></td>
-                        {{/ifEquals}} {{#ifEquals status "Pass"}} {{#ifEquals testcase_details.actualResult_pass ""}}
-                        <td class="rDActualRes tabCont" >
-                           {{#ifEquals screenshot_path undefined}}
-                           <text class="rDstatus rDstatusLnk">As Expected</text>
-                           {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
-                           <text class="rDstatus openscreenshot" data-screenshot="{{screenshot_path}}">As Expected</text>
-                           {{/ifnotEquals}}
-                        </td>
-                        {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_pass ""}}
-                        <td class="rDActualRes tabCont" >
-                           {{testcase_details.actualResult_pass}}
-                        </td>
-                        {{/ifnotEquals}} {{/ifEquals}} {{#ifEquals status "Fail"}} {{#ifEquals testcase_details.actualResult_fail ""}}
-                        <td class="rDActualRes tabCont" >
-                           {{#ifEquals screenshot_path undefined}}
-                           <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};">{{status}}</text>
-                           {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
-                           <text class="rDstatus openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</text>
-                           {{/ifnotEquals}}
-                        </td>
-                        {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_fail ""}}
-                        <td class="rDActualRes tabCont" >
-                           {{testcase_details.actualResult_fail}}
-                        </td>
-                        {{/ifnotEquals}} {{/ifEquals}}
-                        <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}};" data-screenshot="{{screenshot_path}}">{{status}}</td>
-                        <td class="rDellaps tabCont">{{EllapsedTime}}</td>
-                        <td style='display:none !important' class="rDcomments tabCont">{{Comments}}</td>
-                          <td class="rjira tabCont">
-                           <span class="opendescpopup" title="Create Issue">{{jira_defect_id}}</span>
-                        </td>
-                  </tr>
+               <tr style="width: 100%;" class="reportdetailsrow" data-id="{{id}}" data-parentid="{{parentId}}">
+                  <td class="rDid tabCont">{{slno}}</td>
+                  <td class="rDstep tabCont iteration">{{Step}}</td>
+                  <td class="{{getClass StepDescription}}"
+                     style="display:none;width:0px; padding-left: 10px; font-weight:{{getStyle StepDescription}}">
+                     {{StepDescription}}
+                  </td>
+                  {{#ifEquals testcase_details.testcaseDetails undefined}}
+                  <td class="rDExpectedRes tabCont {{getClass StepDescription}}">{{StepDescription}}</td>
+                  {{/ifEquals}} {{#ifEquals testcase_details.testcaseDetails ""}}
+                  <td class="rDExpectedRes tabCont">{{StepDescription}}</td>
+                  {{/ifEquals}} {{#ifnotEquals testcase_details.testcaseDetails ""}}
+                  {{#ifnotEquals testcase_details undefined}}
+                  <td class="rDExpectedRes tabCont">
+                     Expected Result is: {{testcase_details.testcaseDetails}}
+                  </td>
+                  {{/ifnotEquals}} {{/ifnotEquals}} {{#ifEquals status undefined}}
+                  <td class="rDActualRes tabCont"></td>
+                  {{/ifEquals}} {{#ifEquals status ""}}
+                  <td class="rDActualRes tabCont"></td>
+                  {{/ifEquals}} {{#ifEquals status "Pass"}} {{#ifEquals testcase_details.actualResult_pass ""}}
+                  <td class="rDActualRes tabCont">
+                     {{#ifEquals screenshot_path undefined}}
+                     <text class="rDstatus rDstatusLnk">As Expected</text>
+                     {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
+                     <text class="rDstatus openscreenshot" data-screenshot="{{screenshot_path}}">As Expected</text>
+                     {{/ifnotEquals}}
+                  </td>
+                  {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_pass ""}}
+                  <td class="rDActualRes tabCont">
+                     {{testcase_details.actualResult_pass}}
+                  </td>
+                  {{/ifnotEquals}} {{/ifEquals}} {{#ifEquals status "Fail"}}
+                  {{#ifEquals testcase_details.actualResult_fail ""}}
+                  <td class="rDActualRes tabCont">
+                     {{#ifEquals screenshot_path undefined}}
+                     <text class="rDstatus rDstatusLnk" style="color:{{getColor status}};">{{status}}</text>
+                     {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
+                     <text class="rDstatus openscreenshot" style="color:{{getColor status}};"
+                        data-screenshot="{{screenshot_path}}">{{status}}</text>
+                     {{/ifnotEquals}}
+                  </td>
+                  {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_fail ""}}
+                  <td class="rDActualRes tabCont">
+                     {{testcase_details.actualResult_fail}}
+                  </td>
+                  {{/ifnotEquals}} {{/ifEquals}}
+                  <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}};"
+                     data-screenshot="{{screenshot_path}}">{{status}}</td>
+                  <td class="rDellaps tabCont">{{EllapsedTime}}</td>
+                  <td style='display:none !important' class="rDcomments tabCont">{{Comments}}</td>
+                  <td class="rjira tabCont">
+                     <span class="opendescpopup" title="Create Issue">{{jira_defect_id}}</span>
+                  </td>
+               </tr>
                {{/each}}
             </tbody>
-           </table>
-        </div>
-          <!-- Reports Table -->
+         </table>
       </div>
-      <div id="overlay"></div>
-      <!-- Jira login window popup-->
-      <div class="jiraWindow" style="display: none;">
-         <div class="popupheader">
-            <label>Login to Jira</label>
-            <span class="closeWindow">X</span>
-         </div>
-         <input type="text" class="jirapopupinput" placeholder="Enter Url" id="jiraURL" />
-         <input type="text" class="jirapopupinput" placeholder="Enter User Name" id="jiraUserName" />
-         <input type="password" class="jirapopupinput" placeholder="Enter Password" id="jiraPassword" />
-         <button type="button" class="resetJiraCredentials">Reset</button>
-         <button type="button" class="loginJiraCredentials">Connect</button>
+      <!-- Reports Table -->
+   </div>
+   <div id="overlay"></div>
+   <!-- Jira login window popup-->
+   <div class="jiraWindow" style="display: none;">
+      <div class="popupheader">
+         <label>Login to Jira</label>
+         <span class="closeWindow">X</span>
+      </div>
+      <input type="text" class="jirapopupinput" placeholder="Enter Url" id="jiraURL" />
+      <input type="text" class="jirapopupinput" placeholder="Enter User Name" id="jiraUserName" />
+      <input type="password" class="jirapopupinput" placeholder="Enter Password" id="jiraPassword" />
+      <button type="button" class="resetJiraCredentials">Reset</button>
+      <button type="button" class="loginJiraCredentials">Connect</button>
+      <span class="error-msg"></span>
+   </div>
+   <!-- Jira description window popup-->
+   <div class="createIssueWindow" style="display: none;">
+      <div class="popupheader">
+         <label>Create Issue</label>
+         <span class="closeWindow">X</span>
+      </div>
+      <p>
+         <label>Projects
+            <span class="mandatory">*</span>
+         </label>
+         <select class="jirapopupinput" id="jProjects">
+            <option value="" selected disabled>Select Projects</option>
+         </select>
+      </p>
+      <p>
+         <label>Issue Type
+            <span class="mandatory">*</span>
+         </label>
+         <select class="jirapopupinput" id="jIssuetype">
+            <option value="" selected disabled>Select Issue</option>
+         </select>
+      </p>
+      <p id='parentIssue'>
+         <label>Parent Issue Id
+            <span class="mandatory">*</span>
+         </label>
+         <input type="text" class="jirapopupinput" id="jpIssueid" />
+      </p>
+      <p>
+         <label>Summary
+            <span class="mandatory">*</span>
+         </label>
+         <input type="text" class="jirapopupinput" id="jSummary" maxlength="255"
+            title="Maximum 255 characters accepted." />
+      </p>
+      <p>
+         <label>Description</label>
+         <textarea class="jirapopupinput" id="jDescription"></textarea>
+      </p>
+      <p>
+         <label>Priority</label>
+         <select class="jirapopupinput" id="jPriority">
+            <option value="" selected disabled>Select Priority</option>
+         </select>
+      </p>
+      <p>
+         <label>Label</label>
+         <textarea class="jirapopupinput" id="jLabel"></textarea>
+      </p>
+      <p>
+         <label>Attachment Path</label>
+         <input type="text" id="scrnShotPath" class="jirapopupinput" />
+      </p>
+      <p>
          <span class="error-msg"></span>
+         <button type="button" class="cancelIssues">Cancel</button>
+         <button type="button" class="createIssues">Create</button>
+      </p>
+   </div>
+   <!-- Ststus popup window -->
+   <div class="statusWindow" style="display: none;">
+      <div class="popupheader">
+         <label>Create Issue</label>
+         <span class="closeWindow">X</span>
       </div>
-      <!-- Jira description window popup-->
-      <div class="createIssueWindow" style="display: none;">
-         <div class="popupheader">
-            <label>Create Issue</label>
-            <span class="closeWindow">X</span>
-         </div>
-         <p>
-            <label>Projects
-               <span class="mandatory">*</span>
-            </label>
-            <select class="jirapopupinput" id="jProjects">
-               <option value="" selected disabled>Select Projects</option>
-            </select>
-         </p>
-         <p>
-            <label>Issue Type
-               <span class="mandatory">*</span>
-            </label>
-            <select class="jirapopupinput" id="jIssuetype">
-               <option value="" selected disabled>Select Issue</option>
-            </select>
-         </p>
-         <p id='parentIssue'>
-            <label>Parent Issue Id
-               <span class="mandatory">*</span>
-            </label>
-            <input type="text" class="jirapopupinput" id="jpIssueid" />
-         </p>
-         <p>
-            <label>Summary
-               <span class="mandatory">*</span>
-            </label>
-            <input type="text" class="jirapopupinput" id="jSummary" maxlength="255"
-               title="Maximum 255 characters accepted." />
-         </p>
-         <p>
-            <label>Description</label>
-            <textarea class="jirapopupinput" id="jDescription"></textarea>
-         </p>
-         <p>
-            <label>Priority</label>
-            <select class="jirapopupinput" id="jPriority">
-               <option value="" selected disabled>Select Priority</option>
-            </select>
-         </p>
-         <p>
-            <label>Label</label>
-            <textarea class="jirapopupinput" id="jLabel"></textarea>
-         </p>
-         <p>
-            <label>Attachment Path</label>
-            <input type="text" id="scrnShotPath" class="jirapopupinput" />
-         </p>
-         <p>
-            <span class="error-msg"></span>
-            <button type="button" class="cancelIssues">Cancel</button>
-            <button type="button" class="createIssues">Create</button>
-         </p>
-      </div>
-      <!-- Ststus popup window -->
-      <div class="statusWindow" style="display: none;">
-         <div class="popupheader">
-            <label>Create Issue</label>
-            <span class="closeWindow">X</span>
-         </div>
-         <p>
-            <label id="showStatus"></label>
-         </p>
-         <p>
-            <button type="button" class="closeWindow">Ok</button>
-         </p>
-      </div>
+      <p>
+         <label id="showStatus"></label>
+      </p>
+      <p>
+         <button type="button" class="closeWindow">Ok</button>
+      </p>
+   </div>
 </body>
+
 </html>
