@@ -279,18 +279,24 @@
          border-radius: 10px;
          -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
       }
-
+      .buttonDivBox {
+         float: right;
+         position: relative;
+         top: -4px;
+      }
       .logintojira,
       .disconnectJira {
          cursor: pointer;
-         float: left;
-         position: relative;
-         left: 134px;
-         border-radius: 3px;
-      }
-
-      .logintojira {
-         left: 34px;
+         left: -4px;
+         top: -10px;
+         background: #f3f3f3;
+         border: 1px solid #e5e5e5;
+         padding: 5px;
+         border-radius: 5px;
+         width: 100px;
+         font-family: Latowebbold;
+         color: #000;
+         outline: none;
       }
 
       .disconnectJira {
@@ -327,9 +333,18 @@
 
       .loginJiraCredentials,
       .resetJiraCredentials {
-         width: 85px;
          float: right;
          margin-right: 28px;
+         left: -4px;
+         top: -10px;
+         background: #f3f3f3;
+         border: 1px solid #e5e5e5;
+         padding: 5px;
+         border-radius: 5px;
+         width: 100px;
+         font-family: Latowebbold;
+         color: #000;
+         outline: none;
       }
 
       .jiraWindow .error-msg {
@@ -435,6 +450,7 @@
       .createIssueWindow .popupheader label {
          float: left;
          margin: 13px 0 0 18px;
+         font-family: Latowebbold;
       }
 
       .createIssueWindow .popupheader .closeWindow {
@@ -1011,7 +1027,7 @@
          </div>
          <div class="leftSummary rightBox">
             <label>Overall Status</label>
-            <span style="color:{{getColor overAllStatus}}">: {{overAllStatus}}</span>
+            <span style="color:{{getColor overAllStatus}}"><text style='color:#000; !important'>:</text> {{overAllStatus}}</span>
             <label>Testcase Status: </label>
             <span class="progress customprogress">
                <span class="progress-bar" role="progressbar" style="background-color:#28a745;width:{{pass}}%">
@@ -1036,6 +1052,13 @@
          </div>
       </div>
       {{/each}}
+      <div class='buttonDivBox'>
+         <button class="logintojira" title="Login to Jira">Jira Login</button>
+         <button class="disconnectJira" title="Disconnect from Jira">Disconnect</button>
+         <label class="Llogdefect">Log Defect</label>
+         <input type="text" id="inputSlno" placeholder="Enter SL No." maxlength="5" />
+         <button class="go_defectlog opendescpopup">Go</button>
+      </div>
       <!-- Reports Table -->
       <div class="maintabCont_collapse">
          <table id="specificReportDataTable" class="display responsive wrap" style="width:100%">
