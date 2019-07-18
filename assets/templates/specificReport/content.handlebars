@@ -960,6 +960,9 @@
       .resultSummaryBox {
          float: left;
       }
+      table.dataTable.no-footer {
+         border-bottom: none !important;
+      }
       }
    </style>
 </head>
@@ -1098,6 +1101,9 @@
                      {{testcase_details.actualResult_fail}}
                   </td>
                   {{/ifnotEquals}} {{/ifEquals}}
+                  {{#ifEquals status "Terminate"}}
+                     <td class="rDActualRes tabCont">{{StepDescription}}</td>
+                   {{/ifEquals}}
                   <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}};"
                      data-screenshot="{{screenshot_path}}">{{status}}</td>
                   <td class="rDellaps tabCont">{{EllapsedTime}}</td>
