@@ -12,6 +12,7 @@ function unblockUI() {
 //Anonymous function(for IE)
 setTimeout((function() {
     return function() {
+        blockUI('Loading Reports.. Please Wait..');
         loadReports();
         try {
             window.stop();
@@ -82,6 +83,7 @@ function loadReports() {
                             getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -110px;"></i>';
                         }
                     }
+                    unblockUI();
                 }
             });    
         var remarksLength = parseInt($('.remarksLength').text());
