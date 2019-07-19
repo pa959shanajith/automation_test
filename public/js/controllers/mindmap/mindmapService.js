@@ -215,6 +215,14 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	
-		}	
+		},
+		pdProcess : function(data){
+			return $http.post('/pdProcess',{
+				 data: data
+			})
+    		.then(function (response) { return response.data; },
+    				function (response) { return $q.reject(response.data); });
+    	
+		}
 	}
 }]);

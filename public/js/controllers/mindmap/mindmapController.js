@@ -12,6 +12,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $scope.verticalLayout = false;
     $scope.moving = false;
     $scope.apptype = '';
+	$scope.pdmode = false;
     var sections = {
         'modules': 112,
         'scenarios': 237,
@@ -148,6 +149,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         "delete": "fa-trash-o"
     };
 
+	// process discovery related
+    var parseAction = {
+        "inprogress":"Assigned",
+        "review":"Submitted for Approval",
+        "approve":"Approved by reviewer",
+        "export":"Exported"
+    }
+	
     if (window.localStorage['navigateScreen'] != "mindmap") {
         return $rootScope.redirectPage();
     }
@@ -2713,10 +2722,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 return;
             }
         }
-        if (s.attr('id') == 'ct-saveAction') {
+        if (s.attr('id') == 'ct-saveAction' || $event.target.getAttribute('id')=='ct-saveAction') {
             blockUI('Saving Flow! Please wait...');
 
-        } else if (s.attr('id') == 'ct-createAction') {
+        } else if (s.attr('id') == 'ct-createAction' || $event.target.getAttribute('id')=='ct-createAction') {
             blockUI('Creating Structure! Please wait...');
         }
         mindmapServices.checkReuse(restrict_scenario_reuse).then(function(result_reuse) {
@@ -2750,7 +2759,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 cur_module = $scope.tab;
             }
 
-            if (s.attr('id') == 'ct-saveAction') {
+            if (s.attr('id') == 'ct-saveAction'  || $event.target.getAttribute('id')=='ct-saveAction') {
                 // blockUI('Saving Flow! Please wait...');
                 flag = 10;
                 if ($scope.tab == 'tabAssign') flag = 30;
@@ -2759,7 +2768,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 //$('#ct-createAction').removeClass('disableButton');
                 SaveCreateED('#ct-createAction', 0, 0);
 
-            } else if (s.attr('id') == 'ct-createAction') {
+            } else if (s.attr('id') == 'ct-createAction' || $event.target.getAttribute('id')=='ct-createAction') {
                 if (error) {
                     unblockUI();
                     openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases")
@@ -2821,8 +2830,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     if (selectedTab == 'tabAssign') {
                         openDialogMindmap("Success", "Tasks saved successfully");
                     } else {
-                        openDialogMindmap("Success", "Data saved successfully");
-                        SaveCreateED('#ct-saveAction', 0, 0);
+						if(!$scope.pdmode){
+                            openDialogMindmap("Success", "Data saved successfully");
+                            SaveCreateED('#ct-saveAction', 0, 0);
+                        }
+                        else{
+                            $timeout(function() {
+                                angular.element('#ct-createAction').triggerHandler('click');
+                            }, 100);                            
+                        }
                     }
                     var vn = '';
                     if ($('.version-list').length != 0)
@@ -2879,8 +2895,38 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             }
 
                         });
-
-                        openDialogMindmap("Success", "Structure created successfully");
+						
+						if($scope.pdmode){
+                            console.log($scope.pdAuditData); 
+                            openDialogMindmap("Success", "Import Successful! Audit table:");
+                            $scope.pdmode = false;    
+                            $("#auditTable").remove();
+                            $timeout(function(){
+                                $('.modal-body:contains("Import Successful")').append(`<table id="auditTable" class="table table-bordered">
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Assignee</th>
+                                        <th>Reviewer</th>
+                                        <th>State</th>
+                                        <th>Time</th>
+                                    </tr>
+                                </table>`);
+                                $.each($scope.pdAuditData, function(i, item) {
+                                    var $tr = $('<tr>').append(
+                                        $('<td>').text(i+1),
+                                        $('<td>').text(item.assignee),
+                                        $('<td>').text(item.reviewer),
+                                        $('<td>').text(item.action),
+                                        $('<td>').text(String(new Date(item.time)).replace(" GMT+0530 (India Standard Time)",""))
+                                    ).appendTo('#auditTable');
+                                    //console.log($tr.wrap('<p>').html());
+                                });
+                                $("#mindmapGlobalDialog .modal-dialog").css("width","80%")
+                            },100);
+                        }
+                        else{
+                            openDialogMindmap("Success", "Structure created successfully");
+                        }
                         saveFlag = false;
                         //$('#ct-createAction').addClass('disableButton');
                         SaveCreateED('#ct-createAction', 1, 0);
@@ -3383,6 +3429,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     //Dialog used through out mindmap
     function openDialogMindmap(title, body) {
+		if(!$scope.pdmode){
+            $("#auditTable").remove();
+            $("#mindmapGlobalDialog .modal-dialog").css("width","auto")
+        }
         if (window.location.pathname == '/mindmap' || window.location.pathname == '/version') {
             $("#mindmapGlobalDialog").find('.modal-title').text(title);
             $("#mindmapGlobalDialog").find('.modal-body p').text(body).css('color', 'black');
@@ -5158,6 +5208,221 @@ Purpose : displaying pop up for replication of project
             reader.readAsArrayBuffer(fileData);
         }
     }          
+	
+	// Changes for import from process discovery
+
+    $scope.importFromPD = function(file){
+        if(!file) return;
+        $scope.pdmode = true;
+        clearSvg();
+        blockUI("Importing File.. Please Wait..");
+        mindmapServices.pdProcess({'projectid':$('.project-list').val(),'file':file}).then(function(result){
+            console.log(result);
+            unblockUI();
+            //{"success":true,"data":["Demo","Activity_0"]}
+            var orderMatrix = result.data;
+            $scope.dataJSON = [];
+            $scope.dataJSON.push({
+                name:'Module_PD_'+generateGuid(),
+                type:1
+            });
+            orderMatrix.forEach(function(orderList,orderListIdx){
+                $scope.dataJSON.push({
+                    name:'Scenario_PD_'+generateGuid(),
+                    type:2
+                });
+                orderList.forEach(function(data,i){
+                    $scope.dataJSON.push({
+                        name:"Screen_PD_"+data.label,
+                        type:3
+                    });     
+                    $scope.dataJSON.push({
+                        name:"Testcase_PD_"+data.label,
+                        type:4
+                    });                                                             
+                });    
+            });
+            if(result.history){
+                $scope.pdAuditData = JSON.parse(atob(result.history));
+            }
+            else{
+                $scope.pdAuditData = []
+            }
+            $scope.createFromJson();
+            $timeout(function() {
+                angular.element('#ct-saveAction').triggerHandler('click');
+            }, 100);
+            
+            // now save and create
+        },function(err){
+            unblockUI();
+            console.log("something went wrong!");
+            openDialogMindmap("Fail","failed to import!");
+        }
+    )
+
+    }  
+  /**
+	* converts provided xml to json
+	*/	
+	function xml2json(xml, tab) {
+		var X = {
+			toObj: function (xml) {
+				var o = {};
+				if (xml.nodeType == 1) {   // element node ..
+					if (xml.attributes.length)   // element with attributes  ..
+						for (var i = 0; i < xml.attributes.length; i++)
+							o["@" + xml.attributes[i].nodeName] = (xml.attributes[i].nodeValue || "").toString();
+					if (xml.firstChild) { // element has child nodes ..
+						var textChild = 0, cdataChild = 0, hasElementChild = false;
+						for (var n = xml.firstChild; n; n = n.nextSibling) {
+							if (n.nodeType == 1) hasElementChild = true;
+							else if (n.nodeType == 3 && n.nodeValue.match(/[^ \f\n\r\t\v]/)) textChild++; // non-whitespace text
+							else if (n.nodeType == 4) cdataChild++; // cdata section node
+						}
+						if (hasElementChild) {
+							if (textChild < 2 && cdataChild < 2) { // structured element with evtl. a single text or/and cdata node ..
+								X.removeWhite(xml);
+								for (var n = xml.firstChild; n; n = n.nextSibling) {
+									if (n.nodeType == 3)  // text node
+										o["#text"] = X.escape(n.nodeValue);
+									else if (n.nodeType == 4)  // cdata node
+										o["#cdata"] = X.escape(n.nodeValue);
+									else if (o[n.nodeName]) {  // multiple occurence of element ..
+										if (o[n.nodeName] instanceof Array)
+											o[n.nodeName][o[n.nodeName].length] = X.toObj(n);
+										else
+											o[n.nodeName] = [o[n.nodeName], X.toObj(n)];
+									}
+									else  // first occurence of element..
+										o[n.nodeName] = X.toObj(n);
+								}
+							}
+							else { // mixed content
+								if (!xml.attributes.length)
+									o = X.escape(X.innerXml(xml));
+								else
+									o["#text"] = X.escape(X.innerXml(xml));
+							}
+						}
+						else if (textChild) { // pure text
+							if (!xml.attributes.length)
+								o = X.escape(X.innerXml(xml));
+							else
+								o["#text"] = X.escape(X.innerXml(xml));
+						}
+						else if (cdataChild) { // cdata
+							if (cdataChild > 1)
+								o = X.escape(X.innerXml(xml));
+							else
+								for (var n = xml.firstChild; n; n = n.nextSibling)
+									o["#cdata"] = X.escape(n.nodeValue);
+						}
+					}
+					if (!xml.attributes.length && !xml.firstChild) o = null;
+				}
+				else if (xml.nodeType == 9) { // document.node
+					o = X.toObj(xml.documentElement);
+				}
+				else
+					alert("unhandled node type: " + xml.nodeType);
+				return o;
+			},
+			toJson: function (o, name, ind) {
+				var json = name ? ("\"" + name + "\"") : "";
+				if (o instanceof Array) {
+					for (var i = 0, n = o.length; i < n; i++)
+						o[i] = X.toJson(o[i], "", ind + "\t");
+					json += (name ? ":[" : "[") + (o.length > 1 ? ("\n" + ind + "\t" + o.join(",\n" + ind + "\t") + "\n" + ind) : o.join("")) + "]";
+				}
+				else if (o == null)
+					json += (name && ":") + "null";
+				else if (typeof (o) == "object") {
+					var arr = [];
+					for (var m in o)
+						arr[arr.length] = X.toJson(o[m], m, ind + "\t");
+					json += (name ? ":{" : "{") + (arr.length > 1 ? ("\n" + ind + "\t" + arr.join(",\n" + ind + "\t") + "\n" + ind) : arr.join("")) + "}";
+				}
+				else if (typeof (o) == "string")
+					json += (name && ":") + "\"" + o.toString() + "\"";
+				else
+					json += (name && ":") + o.toString();
+				return json;
+			},
+			innerXml: function (node) {
+				var s = ""
+				if ("innerHTML" in node)
+					s = node.innerHTML;
+				else {
+					var asXml = function (n) {
+						var s = "";
+						if (n.nodeType == 1) {
+							s += "<" + n.nodeName;
+							for (var i = 0; i < n.attributes.length; i++)
+								s += " " + n.attributes[i].nodeName + "=\"" + (n.attributes[i].nodeValue || "").toString() + "\"";
+							if (n.firstChild) {
+								s += ">";
+								for (var c = n.firstChild; c; c = c.nextSibling)
+									s += asXml(c);
+								s += "</" + n.nodeName + ">";
+							}
+							else
+								s += "/>";
+						}
+						else if (n.nodeType == 3)
+							s += n.nodeValue;
+						else if (n.nodeType == 4)
+							s += "<![CDATA[" + n.nodeValue + "]]>";
+						return s;
+					};
+					for (var c = node.firstChild; c; c = c.nextSibling)
+						s += asXml(c);
+				}
+				return s;
+			},
+			escape: function (txt) {
+				return txt.replace(/[\\]/g, "\\\\")
+					.replace(/[\"]/g, '\\"')
+					.replace(/[\n]/g, '\\n')
+					.replace(/[\r]/g, '\\r');
+			},
+			removeWhite: function (e) {
+				e.normalize();
+				for (var n = e.firstChild; n;) {
+					if (n.nodeType == 3) {  // text node
+						if (!n.nodeValue.match(/[^ \f\n\r\t\v]/)) { // pure whitespace text node
+							var nxt = n.nextSibling;
+							e.removeChild(n);
+							n = nxt;
+						}
+						else
+							n = n.nextSibling;
+					}
+					else if (n.nodeType == 1) {  // element node
+						X.removeWhite(n);
+						n = n.nextSibling;
+					}
+					else                      // any other node
+						n = n.nextSibling;
+				}
+				return e;
+			}
+		};
+		if (xml.nodeType == 9) // document node
+			xml = xml.documentElement;
+		var json = X.toJson(X.toObj(X.removeWhite(xml)), xml.nodeName, "\t");
+		return "{\n" + tab + (tab ? json.replace(/\t/g, tab) : json.replace(/\t|\n/g, "")) + "\n}";
+    }  
+    var generateGuid = function() {
+        var result, i, j;
+        result = '';
+        for(j=0; j<32; j++) {
+          i = Math.floor(Math.random()*16).toString(16).toUpperCase();
+          result = result + i;
+        }
+        return result;
+    }     
+    
 }]);
 
 mySPA.directive('onReadFile', function($parse) {

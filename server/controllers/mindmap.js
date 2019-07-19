@@ -12,7 +12,173 @@ var path = require('path');
 var fs = require('fs');
 var xl = require('excel4node');
 var taskflow = require('../config/options').strictTaskWorkflow;
+var crypto = require("crypto");
+var async = require("async");
+var design = require('../controllers/design');
+var Client = require("node-rest-client").Client;
+var DOMParser = require('xmldom').DOMParser;
+var epurl = process.env.NDAC_URL;
+var client = new Client();
+/**
+*
+*  Base64 encode / decode
+*  http://www.webtoolkit.info
+*
+**/
+var Base64 = {
 
+    // private property
+    _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
+
+    // public method for encoding
+    , encode: function (input)
+    {
+        var output = "";
+        var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+        var i = 0;
+
+        input = Base64._utf8_encode(input);
+
+        while (i < input.length)
+        {
+            chr1 = input.charCodeAt(i++);
+            chr2 = input.charCodeAt(i++);
+            chr3 = input.charCodeAt(i++);
+
+            enc1 = chr1 >> 2;
+            enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+            enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+            enc4 = chr3 & 63;
+
+            if (isNaN(chr2))
+            {
+                enc3 = enc4 = 64;
+            }
+            else if (isNaN(chr3))
+            {
+                enc4 = 64;
+            }
+
+            output = output +
+                this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) +
+                this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
+        } // Whend 
+
+        return output;
+    } // End Function encode 
+
+
+    // public method for decoding
+    ,decode: function (input)
+    {
+        var output = "";
+        var chr1, chr2, chr3;
+        var enc1, enc2, enc3, enc4;
+        var i = 0;
+
+        input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+        while (i < input.length)
+        {
+            enc1 = this._keyStr.indexOf(input.charAt(i++));
+            enc2 = this._keyStr.indexOf(input.charAt(i++));
+            enc3 = this._keyStr.indexOf(input.charAt(i++));
+            enc4 = this._keyStr.indexOf(input.charAt(i++));
+
+            chr1 = (enc1 << 2) | (enc2 >> 4);
+            chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+            chr3 = ((enc3 & 3) << 6) | enc4;
+
+            output = output + String.fromCharCode(chr1);
+
+            if (enc3 != 64)
+            {
+                output = output + String.fromCharCode(chr2);
+            }
+
+            if (enc4 != 64)
+            {
+                output = output + String.fromCharCode(chr3);
+            }
+
+        } // Whend 
+
+        output = Base64._utf8_decode(output);
+
+        return output;
+    } // End Function decode 
+
+
+    // private method for UTF-8 encoding
+    ,_utf8_encode: function (string)
+    {
+        var utftext = "";
+        string = string.replace(/\r\n/g, "\n");
+
+        for (var n = 0; n < string.length; n++)
+        {
+            var c = string.charCodeAt(n);
+
+            if (c < 128)
+            {
+                utftext += String.fromCharCode(c);
+            }
+            else if ((c > 127) && (c < 2048))
+            {
+                utftext += String.fromCharCode((c >> 6) | 192);
+                utftext += String.fromCharCode((c & 63) | 128);
+            }
+            else
+            {
+                utftext += String.fromCharCode((c >> 12) | 224);
+                utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+                utftext += String.fromCharCode((c & 63) | 128);
+            }
+
+        } // Next n 
+
+        return utftext;
+    } // End Function _utf8_encode 
+
+    // private method for UTF-8 decoding
+    ,_utf8_decode: function (utftext)
+    {
+        var string = "";
+        var i = 0;
+        var c, c1, c2, c3;
+        c = c1 = c2 = 0;
+
+        while (i < utftext.length)
+        {
+            c = utftext.charCodeAt(i);
+
+            if (c < 128)
+            {
+                string += String.fromCharCode(c);
+                i++;
+            }
+            else if ((c > 191) && (c < 224))
+            {
+                c2 = utftext.charCodeAt(i + 1);
+                string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+                i += 2;
+            }
+            else
+            {
+                c2 = utftext.charCodeAt(i + 1);
+                c3 = utftext.charCodeAt(i + 2);
+                string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+                i += 3;
+            }
+
+        } // Whend 
+
+        return string;
+    } // End Function _utf8_decode 
+
+}
+function addslashes( str ) {
+    return str;
+}
 /* Convert excel file to CSV Object. */
 var xlsToCSV = function (workbook, sheetname) {
 	var result = [];
@@ -1647,3 +1813,809 @@ exports.exportToExcel = function (req, res) {
 exports.getDomain = function (req, res) {
 	admin.getDomains_ICE(req, res);
 };
+function getElementByAttribute(attr, value, root) {
+    root = root || document.body;
+    if(root.hasAttribute(attr) && root.getAttribute(attr) == value) {
+        return root;
+    }
+    var children = root.children, 
+        element;
+    for(var i = children.length; i--; ) {
+        element = getElementByAttribute(attr, value, children[i]);
+        if(element) {
+            return element;
+        }
+    }
+    return null;
+}
+function xml2json(xml, tab) {
+	var X = {
+	   toObj: function(xml) {
+		  var o = {};
+		  if (xml.nodeType==1) {   // element node ..
+			 if (xml.attributes.length)   // element with attributes  ..
+				for (var i=0; i<xml.attributes.length; i++)
+				   o["@"+xml.attributes[i].nodeName] = (xml.attributes[i].nodeValue||"").toString();
+			 if (xml.firstChild) { // element has child nodes ..
+				var textChild=0, cdataChild=0, hasElementChild=false;
+				for (var n=xml.firstChild; n; n=n.nextSibling) {
+				   if (n.nodeType==1) hasElementChild = true;
+				   else if (n.nodeType==3 && n.nodeValue.match(/[^ \f\n\r\t\v]/)) textChild++; // non-whitespace text
+				   else if (n.nodeType==4) cdataChild++; // cdata section node
+				}
+				if (hasElementChild) {
+				   if (textChild < 2 && cdataChild < 2) { // structured element with evtl. a single text or/and cdata node ..
+					  X.removeWhite(xml);
+					  for (var n=xml.firstChild; n; n=n.nextSibling) {
+						 if (n.nodeType == 3)  // text node
+							o["#text"] = X.escape(n.nodeValue);
+						 else if (n.nodeType == 4)  // cdata node
+							o["#cdata"] = X.escape(n.nodeValue);
+						 else if (o[n.nodeName]) {  // multiple occurence of element ..
+							if (o[n.nodeName] instanceof Array)
+							   o[n.nodeName][o[n.nodeName].length] = X.toObj(n);
+							else
+							   o[n.nodeName] = [o[n.nodeName], X.toObj(n)];
+						 }
+						 else  // first occurence of element..
+							o[n.nodeName] = X.toObj(n);
+					  }
+				   }
+				   else { // mixed content
+					  if (!xml.attributes.length)
+						 o = X.escape(X.innerXml(xml));
+					  else
+						 o["#text"] = X.escape(X.innerXml(xml));
+				   }
+				}
+				else if (textChild) { // pure text
+				   if (!xml.attributes.length)
+					  o = X.escape(X.innerXml(xml));
+				   else
+					  o["#text"] = X.escape(X.innerXml(xml));
+				}
+				else if (cdataChild) { // cdata
+				   if (cdataChild > 1)
+					  o = X.escape(X.innerXml(xml));
+				   else
+					  for (var n=xml.firstChild; n; n=n.nextSibling)
+						 o["#cdata"] = X.escape(n.nodeValue);
+				}
+			 }
+			 if (!xml.attributes.length && !xml.firstChild) o = null;
+		  }
+		  else if (xml.nodeType==9) { // document.node
+			 o = X.toObj(xml.documentElement);
+		  }
+		  else
+			 console.log("unhandled node type: " + xml.nodeType);
+		  return o;
+	   },
+	   toJson: function(o, name, ind) {
+		  var json = name ? ("\""+name+"\"") : "";
+		  if (o instanceof Array) {
+			 for (var i=0,n=o.length; i<n; i++)
+				o[i] = X.toJson(o[i], "", ind+"\t");
+			 json += (name?":[":"[") + (o.length > 1 ? ("\n"+ind+"\t"+o.join(",\n"+ind+"\t")+"\n"+ind) : o.join("")) + "]";
+		  }
+		  else if (o == null)
+			 json += (name&&":") + "null";
+		  else if (typeof(o) == "object") {
+			 var arr = [];
+			 for (var m in o)
+				arr[arr.length] = X.toJson(o[m], m, ind+"\t");
+			 json += (name?":{":"{") + (arr.length > 1 ? ("\n"+ind+"\t"+arr.join(",\n"+ind+"\t")+"\n"+ind) : arr.join("")) + "}";
+		  }
+		  else if (typeof(o) == "string")
+			 json += (name&&":") + "\"" + o.toString() + "\"";
+		  else
+			 json += (name&&":") + o.toString();
+		  return json;
+	   },
+	   innerXml: function(node) {
+		  var s = ""
+		  if ("innerHTML" in node)
+			 s = node.innerHTML;
+		  else {
+			 var asXml = function(n) {
+				var s = "";
+				if (n.nodeType == 1) {
+				   s += "<" + n.nodeName;
+				   for (var i=0; i<n.attributes.length;i++)
+					  s += " " + n.attributes[i].nodeName + "=\"" + (n.attributes[i].nodeValue||"").toString() + "\"";
+				   if (n.firstChild) {
+					  s += ">";
+					  for (var c=n.firstChild; c; c=c.nextSibling)
+						 s += asXml(c);
+					  s += "</"+n.nodeName+">";
+				   }
+				   else
+					  s += "/>";
+				}
+				else if (n.nodeType == 3)
+				   s += n.nodeValue;
+				else if (n.nodeType == 4)
+				   s += "<![CDATA[" + n.nodeValue + "]]>";
+				return s;
+			 };
+			 for (var c=node.firstChild; c; c=c.nextSibling)
+				s += asXml(c);
+		  }
+		  return s;
+	   },
+	   escape: function(txt) {
+		  return txt.replace(/[\\]/g, "\\\\")
+					.replace(/[\"]/g, '\\"')
+					.replace(/[\n]/g, '\\n')
+					.replace(/[\r]/g, '\\r');
+	   },
+	   removeWhite: function(e) {
+		  e.normalize();
+		  for (var n = e.firstChild; n; ) {
+			 if (n.nodeType == 3) {  // text node
+				if (!n.nodeValue.match(/[^ \f\n\r\t\v]/)) { // pure whitespace text node
+				   var nxt = n.nextSibling;
+				   e.removeChild(n);
+				   n = nxt;
+				}
+				else
+				   n = n.nextSibling;
+			 }
+			 else if (n.nodeType == 1) {  // element node
+				X.removeWhite(n);
+				n = n.nextSibling;
+			 }
+			 else                      // any other node
+				n = n.nextSibling;
+		  }
+		  return e;
+	   }
+	};
+	if (xml.nodeType == 9) // document node
+	   xml = xml.documentElement;
+	var json = X.toJson(X.toObj(X.removeWhite(xml)), xml.nodeName, "\t");
+	return "{\n" + tab + (tab ? json.replace(/\t/g, tab) : json.replace(/\t|\n/g, "")) + "\n}";
+}
+
+var getAdjacentItems = function(activityJSON,taskidx,type){
+	// get links
+	if(type == 'task')
+		var currentTask = activityJSON["mxGraphModel"]["root"]["Task"][taskidx];
+	else if (type == 'rhombus')
+		var currentTask = activityJSON["mxGraphModel"]["root"]["Shape"][taskidx];
+
+	// get previous links
+	var previousLinks = activityJSON["mxGraphModel"]["root"]["Edge"].filter(function(eachLink){
+		return eachLink["mxCell"]["@target"] == currentTask["@id"];
+	});
+	var previousNodes;
+	// get next links
+	var nextLinks = activityJSON["mxGraphModel"]["root"]["Edge"].filter(function(eachLink){
+		return eachLink["mxCell"]["@source"] == currentTask["@id"];
+	});	
+	var previousLinksSourceList = [];	// list of id of sources
+	// get next item
+	
+	if(previousLinks.length>0){
+		// fill source list
+		previousLinks.forEach(function(eachLink,eachLinkIdx){
+			previousLinksSourceList.push(eachLink["mxCell"]["@source"]);
+		})
+
+
+		//search in shape just to check if node is connected to start node while generating scripts
+		var filteredShape = activityJSON["mxGraphModel"]["root"]["Shape"].filter(function(eachShape){
+			return previousLinksSourceList.indexOf(eachShape["@id"]) != -1;
+		});
+		if(filteredShape.length>0){previousNodes = filteredShape}
+		else{
+			//search in task
+			var filteredTask = activityJSON["mxGraphModel"]["root"]["Task"].filter(function(eachTask){
+				return previousLinksSourceList.indexOf(eachTask["@id"]) != -1;
+			});		
+			if(filteredTask.length>0){
+				previousNodes = filteredTask;
+			}
+			else{
+				return {"error":"no match found!"};
+			}
+		}
+	}
+	// was assuming only 1 end node (target) earlier but since rhombus (if block) is introduced
+	// can have multiple next links
+	if(nextLinks.length>0){	
+		//search in task
+		var nextLinksList = [];
+		nextLinks.forEach(function(eachNextLink,eachNextLinkIdx){
+			nextLinksList.push(eachNextLink["mxCell"]["@target"]);
+		})
+		var filteredTask = activityJSON["mxGraphModel"]["root"]["Task"].filter(function(eachTask){
+			return nextLinksList.indexOf(eachTask["@id"]) != -1;	//assuming only one earlier but now multiple
+		});
+		var filteredShapes = activityJSON["mxGraphModel"]["root"]["Shape"].filter(function(eachShape){
+			return nextLinksList.indexOf(eachShape["@id"]) != -1;
+		});		
+		return {"sources":previousNodes,"targets":filteredTask.concat(filteredShapes)};
+	}
+}
+
+exports.pdProcess = function (req, res) {
+	try{
+		var testcaseid = uuidV4(),screenid = uuidV4();
+
+		// orderlist contains {label:'',type:''}
+		var file = JSON.parse(req.body.data.file);
+		var sessionID = uuidV4();
+		var orderMatrix = file.order;// 2d array list of all possible paths in case of multiple start nodes to guide through the order for mindmap creation
+		// var doc = new DOMParser().parseFromString(file,'text/xml');
+
+		// cleanup
+		for(var i = 0; i < orderMatrix.length; i++) {
+			var templist = orderMatrix[i];
+			for(var j = 0; j < templist.length; j++) {
+				orderMatrix[i][j].label = templist[j].label.replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'');
+			}
+		}
+
+		// testcase and screen creation
+		var screenshotdatapertask = [],screendataobj = {},orderlist = [],nameMap = {},ordernameidlist = [],screendatamindmap=[];	
+		var doc = new DOMParser().parseFromString(file.data,'text/xml');
+		var activityJSON = JSON.parse(xml2json(doc).replace("\nundefined",""))
+		// in case single task it returns object instead of list so make it list
+		if(!activityJSON["mxGraphModel"]["root"]["Task"].length){
+			activityJSON["mxGraphModel"]["root"]["Task"] = [activityJSON["mxGraphModel"]["root"]["Task"]];
+		}
+		
+
+		// new logic
+		//	 for each "task" create screen, testcase
+		// 	 for each "if" create testcases 
+		activityJSON["mxGraphModel"]["root"]["Task"].forEach(function(eachActivity,eachActivityIdx){
+			var adjacentItems = getAdjacentItems(activityJSON,eachActivityIdx,'task');
+			screendatamindmap = [];
+			try{
+				screenshotdatapertask = JSON.parse(Base64.decode(eachActivity.mxCell["@data"]));	// list of objects
+			}
+			catch(ex){
+				console.log("empty task");
+				screenshotdatapertask = [];
+			}
+			// Encrypt for storage
+			screenshotdatapertask.forEach(function(a,i){
+				
+				if(a['xpath']){
+					a['url']= encrypt(a['url'])
+					xpath_string=a['xpath'].split(';');
+					left_part=encrypt(xpath_string.slice(0,2).join(';'));	// 0,1
+					right_part=encrypt(xpath_string.slice(3,).join(';'));	// 3,4...
+					a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part;	
+					screendatamindmap.push(a);
+				}
+			});
+			// map data with screenname
+			var tempName = eachActivity["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'');		// name id combo
+			screendataobj[tempName] = {};
+			screendataobj[tempName].data = {"mirror":"","view":screendatamindmap};
+			var scrapedObjects = JSON.stringify(screendataobj[tempName].data);
+			var parsedScrapedObj = JSON.parse(scrapedObjects);
+			scrapedObjects = JSON.stringify(parsedScrapedObj);
+			scrapedObjects = JSON.stringify(scrapedObjects);
+			scrapedObjects = scrapedObjects.replace(/'+/g, "''");
+			var newParse;
+			if (scrapedObjects != null && scrapedObjects.trim() != '' && scrapedObjects != undefined) {
+				newParse = JSON.parse(scrapedObjects);
+			} else {
+				newParse = JSON.parse("{}");
+			}
+			// scrapedObjects = newParse;		
+			scrapedObjects = JSON.parse(newParse);	
+			screendataobj[tempName].data = scrapedObjects;
+			
+			var testCaseOut = generateTestCaseMap(screenshotdatapertask,eachActivityIdx,adjacentItems,sessionID);
+			if(testCaseOut.start) orderlist.unshift({'label':tempName,'type':'task'}) // in case of first script
+			else orderlist.push({'label':tempName,'type':'task'});
+			var requestedtestcasesteps = JSON.stringify(testCaseOut.data);
+			requestedtestcasesteps = requestedtestcasesteps.replace(/'+/g, "''");
+			screendataobj[tempName].script = JSON.parse(requestedtestcasesteps);
+	
+		});
+	
+		activityJSON["mxGraphModel"]["root"]["Shape"].forEach(function(eachShape,eachActivityIdx){
+			if(eachShape.mxCell['@style']!='rhombus') return;
+			var tempName = eachShape["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'');		// name id combo
+			screendataobj[tempName] = {};
+			screendataobj[tempName].data = {"mirror":"","view":[]};
+			var adjacentItems = getAdjacentItems(activityJSON,eachActivityIdx,'rhombus');	// items adjacent to if block
+			var testCaseOut = generateTestCaseMap([],eachActivityIdx,adjacentItems,sessionID);
+			if(testCaseOut.start) orderlist.unshift({'label':tempName,'type':'rhombus'}) // in case of first script
+			else orderlist.push({'label':tempName,'type':'rhombus'});
+			screendataobj[tempName].script = testCaseOut.data;
+	
+		});
+	
+	
+		// data insertion logic
+		async.forEachSeries(orderlist, function (nodeObj, savedcallback) {
+			var name = nodeObj.label,type = nodeObj.type;
+			testcaseid = uuidV4(),screenid = uuidV4();
+			var inputs = {
+				'projectid': req.body.data.projectid,
+				'screenname': 'Screen_PD_'+name,
+				'screenid': screenid,
+				'versionnumber': 0,
+				'createdby': 'PD',
+				'createdon':new Date().getTime().toString(),
+				'createdthrough':'null1',				
+				'createdthrough': 'pd',
+				'modifiedby':'asd',
+				'modifiedbyrole':'ad',
+				'modifiedon':'ew',
+				'deleted': false,
+				'skucodescreen': 'skucodescreen',
+				'tags': 'tags',
+				'screendata': JSON.stringify(screendataobj[name].data)
+			};
+			ordernameidlist.push({'name':'Screen_PD_'+name,'type':3})
+	
+			
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			
+			client.post(epurl + "create_ice/updateScreenname_ICE", args,
+				function (getScrapeDataQueryresult, response) {
+					try {
+						if (response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail") {
+							logger.error("Error occurred in create_ice/updateScreenname_ICE from fetchScrapedData Error Code : ERRNDAC");
+						} else {
+							console.log("screen saved successfully!");
+							var inputs = {
+								'screenid': screenid,
+								'testcasename': 'Testcase_PD_'+name,
+								'testcaseid': uuidV4(),
+								'versionnumber': 0,
+								'createdby': 'pd',
+								'createdthrough': 'pd',
+								'createdon':new Date().getTime().toString(),
+								'createdthrough':'null1',
+								'modifiedby':'asd',
+								'modifiedbyrole':'ad',
+								'modifiedon':'ew',
+								'deleted': false,
+								'skucodetestcase': 'skucodetestcase',
+								'tags': 'tags',
+								'testcasesteps':JSON.stringify(screendataobj[name].script)
+							};
+							ordernameidlist.push({'name':'Testcase_PD_'+name,'type':4})
+							var args = {
+								data: inputs,
+								headers: {
+									"Content-Type": "application/json"
+								}
+							};
+							client.post(epurl + "create_ice/updateTestcasename_ICE", args,
+								function (getScrapeDataQueryresult, response) {
+									try {
+										if (response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail") {
+											logger.error("Error occurred in design/getScrapeDataScreenLevel_ICE from fetchScrapedData Error Code : ERRNDAC");
+										} else {
+											console.log("Testcase saved successfully!");
+											savedcallback();		
+										}
+									} catch (exception) {
+										logger.error("Exception: %s",exception);
+									}
+								}
+							);							
+						}
+					} catch (exception) {
+						logger.error("Exception while sending scraped data from the function fetchScrapedData: %s",exception);
+					}
+				}
+			);
+		},function(){
+			//final callback
+			res.send({"success":true,"data":orderMatrix,"history":activityJSON['mxGraphModel']['@history']});
+		});
+	
+	}
+	catch(err){
+		console.log(err)
+	}
+
+	
+};
+                                                                                                                 
+var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
+
+	var testCaseSteps = [],testcaseObj,step = 1;
+	var firstScript = false,windowId;
+	if(adjacentItems){
+	// in case is first script
+		// make orderlist global
+		// move the script to first
+
+		adjacentItems.sources.forEach(function(item,idx){
+			if(item["@label"]=="Start"){
+				firstScript = true;
+				testCaseSteps = [{
+					"stepNo": 1,
+					"objectName": " ",
+					"custname": "@Browser",
+					"keywordVal": "openBrowser",
+					"inputVal": [""],
+					"outputVal": "",
+					"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+					"remarks": "",
+					"url": " ",
+					"appType": "Web",
+					"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+					"addTestCaseDetailsInfo": "",
+					"cord": "",
+					"_id_": "1"
+				}],step = 2;			
+			}
+		});	
+	}
+
+	screendata.forEach(function(eachScrapedAction,i){
+		testcaseObj = '';
+		if(eachScrapedAction.action){
+            if(eachScrapedAction.action.windowId){
+                if(windowId && windowId!=eachScrapedAction.action.windowId) {
+                    testcaseObj = {
+                        "stepNo": step,
+                        "objectName": " ",
+                        "custname": "@Browser",
+                        "keywordVal": "switchToWindow",
+                        "inputVal": [""],
+                        "outputVal": "",
+                        "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+                        "remarks": "",
+                        "url": eachScrapedAction.url,
+                        "appType": "Web",
+                        "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+                        "addTestCaseDetailsInfo": "",
+                        "cord": "",
+                        "_id_": String(step)
+                    } 
+                    testCaseSteps.push(testcaseObj);
+                    step++;                    
+                }
+                else{
+                    windowId=eachScrapedAction.action.windowId;
+                }
+            }            
+			switch(eachScrapedAction.action.actionName){
+				case "navigate":
+					testcaseObj = {
+							"stepNo": step,
+							"objectName": " ",
+							"custname": "@Browser",
+							"keywordVal": "navigateToURL",
+							"inputVal": [eachScrapedAction.action.actionData],
+							"outputVal": "",
+							"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+							"remarks": "",
+							"url": " ",
+							"appType": "Web",
+							"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+							"addTestCaseDetailsInfo": "",
+							"cord": "",
+							"_id_": String(step)
+					}
+					break;
+				case "click":
+					testcaseObj = {
+						"stepNo": step,
+						"objectName": eachScrapedAction.xpath,
+						"custname": addslashes(eachScrapedAction.custname),
+						"keywordVal": "click",
+						"inputVal": [""],
+						"outputVal": "",
+						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+						"remarks": "",
+						"url": eachScrapedAction.url,
+						"appType": "Web",
+						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_3\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+						"addTestCaseDetailsInfo": "",
+						"cord": "",
+						"_id_": String(step)
+					}		
+					if(eachScrapedAction.custname.split('_')[eachScrapedAction.custname.split('_').length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+					break;	
+				case "inputChange":
+                    if(eachScrapedAction.action.actionData.split(";").length == 2 && eachScrapedAction.action.actionData.split(";")[1] =='byIndex'){
+                        testcaseObj = {
+                            "stepNo": step,
+                            "objectName": eachScrapedAction.xpath,
+                            "custname": addslashes(eachScrapedAction.custname),
+                            "keywordVal": "selectValueByIndex",
+                            "inputVal": [eachScrapedAction.action.actionData.split(";")[0]],
+                            "outputVal": "",
+                            "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+                            "remarks": "",
+                            "url": eachScrapedAction.url,
+                            "appType": "Web",
+                            "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+                            "addTestCaseDetailsInfo": "",
+                            "cord": "",
+                            "_id_": String(step)
+                        }                      
+					}
+					else if(eachScrapedAction.action.actionData.split(";").length == 2 && eachScrapedAction.action.actionData.split(";")[1] =='byIndexes'){
+						var selectIdxList = eachScrapedAction.value.split(";")[0].replace(/,/g,';');
+						testcaseObj = {
+							"stepNo": step,
+							"objectName": eachScrapedAction.xpath,
+							"custname": addslashes(eachScrapedAction.custname),
+							"keywordVal": "selectValueByIndex",
+							"inputVal": [selectIdxList],
+							"outputVal": "",
+							"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+							"remarks": "",
+							"url": eachScrapedAction.url,
+							"appType": "Web",
+							"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+							"addTestCaseDetailsInfo": "",
+							"cord": "",
+							"_id_": String(step)
+						}    
+						if(selectIdxList.length > 1){
+							testcaseObj.keywordVal = "selectMultipleValuesByIndexes";
+						}
+					}
+                    else{
+                        testcaseObj = {
+                            "stepNo": step,
+                            "objectName": eachScrapedAction.xpath,
+                            "custname": addslashes(eachScrapedAction.custname),
+                            "keywordVal": "setText",
+                            "inputVal": [eachScrapedAction.action.actionData],
+                            "outputVal": "",
+                            "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+                            "remarks": "",
+                            "url": eachScrapedAction.url,
+                            "appType": "Web",
+                            "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+                            "addTestCaseDetailsInfo": "",
+                            "cord": "",
+                            "_id_": String(step)
+                        }
+                        
+                    }
+					break;		
+				default:
+					console.log("no match found!");
+					break;
+			}
+			if(testcaseObj){
+				testCaseSteps.push(testcaseObj);
+				step++;
+			}
+
+		}
+		else if(eachScrapedAction.tag == "browser_navigate"){
+			testcaseObj = {
+				"stepNo": step,
+				"objectName": " ",
+				"custname": "@Browser",
+				"keywordVal": "navigateToURL",
+				"inputVal": [eachScrapedAction.url],
+				"outputVal": "",
+				"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+				"remarks": "",
+				"url": " ",
+				"appType": "Web",
+				"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+				"addTestCaseDetailsInfo": "",
+				"cord": "",
+				"_id_": String(step)
+			}			
+			testCaseSteps.push(testcaseObj);
+			step++;
+		}
+	});
+	// console.log(screendata)
+
+	if(adjacentItems){
+		console.log("adjacent:",adjacentItems);
+		// list of sources(only shapes) and targets (assuming only one)
+
+		if(adjacentItems["error"]){
+			console.log(adjacentItems["error"]);
+		}
+		else{
+
+			// old logic
+			// in case target is if
+			// 	get next items
+			// 	add if step with jumpto those scripts (***outgoing connections equal to number of cases)
+
+			// new logic
+			// in case multiple targets, current node is "if" block create if steps
+			// otherwise just jump to
+			if(adjacentItems.targets.length>1){	// I am if block
+				adjacentItems.targets.forEach(function(eachBox,eachBoxIdx){
+					  testcaseObj = {
+						"stepNo": step,
+						"objectName": " ",
+						"custname": "@Generic",
+						"keywordVal": "elseIf",
+						"inputVal": [""],
+						"outputVal": "",
+						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+						"remarks": "",
+						"url": " ",
+						"appType": "Generic",
+						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+						"addTestCaseDetailsInfo": "",
+						"cord": "",
+						"_id_": String(step)
+					}		
+					if(eachBoxIdx==0) testcaseObj["keywordVal"] = "if"; 		
+					testCaseSteps.push(testcaseObj);
+					step++;					
+					if(eachBox["@label"]=="End"){// in case of end
+						testcaseObj = {
+							"stepNo": step,
+							"objectName": " ",
+							"custname": "@Generic",
+							"keywordVal": "stop",
+							"inputVal": [""],
+							"outputVal": "",
+							"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+							"remarks": "",
+							"url": " ",
+							"appType": "Generic",
+							"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+							"addTestCaseDetailsInfo": "",
+							"cord": "",
+							"_id_": String(step)
+						}				
+						testCaseSteps.push(testcaseObj);
+						step++;
+					}
+					if(eachBox['mxCell']['@style'] == 'rhombus'){// in case of if
+						testcaseObj = {
+							"stepNo": step,
+							"objectName": " ",
+							"custname": "@Generic",
+							"keywordVal": "jumpTo",
+							"inputVal": ['Testcase_PD_'+eachBox["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],
+							"outputVal": "",
+							"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+							"remarks": "",
+							"url": " ",
+							"appType": "Generic",
+							"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+							"addTestCaseDetailsInfo": "",
+							"cord": "",
+							"_id_": String(step)
+						}				
+						testCaseSteps.push(testcaseObj);
+						step++;
+					}					
+					else if(eachBox['mxCell']['@style'] == 'task'){	// in case of task
+						testcaseObj = {
+							"stepNo": step,
+							"objectName": " ",
+							"custname": "@Generic",
+							"keywordVal": "jumpTo",
+							"inputVal": ['Testcase_PD_'+eachBox["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],
+							"outputVal": "",
+							"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+							"remarks": "",
+							"url": " ",
+							"appType": "Generic",
+							"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+							"addTestCaseDetailsInfo": "",
+							"cord": "",
+							"_id_": String(step)
+						}				
+						testCaseSteps.push(testcaseObj);
+						step++;								
+					}
+
+	
+				});
+				// end of if step
+				testcaseObj = {
+					"stepNo": step,
+					"objectName": " ",
+					"custname": "@Generic",
+					"keywordVal": "endIf",
+					"inputVal": [""],
+					"outputVal": "",
+					"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+					"remarks": "",
+					"url": " ",
+					"appType": "Generic",
+					"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+					"addTestCaseDetailsInfo": "",
+					"cord": "",
+					"_id_": String(step)
+				}				
+				testCaseSteps.push(testcaseObj);
+				step++;							
+			}
+
+
+
+			// in case target is activity
+				// add jumpto activity
+			
+			else if(adjacentItems.targets[0]){	// assuming only 1 target // I am activity
+	
+				// in case activity target is end			
+				// add end keyword
+				if(adjacentItems.targets[0]["@label"]=="End"){	// assuming only 1 target // if end
+					testcaseObj = {
+						"stepNo": step,
+						"objectName": " ",
+						"custname": "@Generic",
+						"keywordVal": "stop",
+						"inputVal": [""],
+						"outputVal": "",
+						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+						"remarks": "",
+						"url": " ",
+						"appType": "Generic",
+						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+						"addTestCaseDetailsInfo": "",
+						"cord": "",
+						"_id_": String(step)
+					}				
+					testCaseSteps.push(testcaseObj);
+					step++;			
+				}	
+				else{ // otherwise task or activity
+					testcaseObj = {
+						"stepNo": step,
+						"objectName": " ",
+						"custname": "@Generic",
+						"keywordVal": "jumpTo",
+						"inputVal": ['Testcase_PD_'+adjacentItems.targets[0]["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],
+						"outputVal": "",
+						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+						"remarks": "",
+						"url": " ",
+						"appType": "Generic",
+						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+						"addTestCaseDetailsInfo": "",
+						"cord": "",
+						"_id_": String(step)
+					}				
+					testCaseSteps.push(testcaseObj);
+					step++;													
+				}
+			}	
+
+	
+
+		}
+
+	}
+	return {"data":testCaseSteps,"start":firstScript};
+}
+
+var encrypt = function(data){
+
+	// var key = 'Nineeteen68@SecureScrapeDataPath'
+	// var ciphertext = CryptoJS.AES.encrypt(data, key,{ 
+	// 	iv: "00000000", 
+	// 	padding: CryptoJS.pad.Pkcs7,
+	// 	mode: CryptoJS.mode.CBC
+	
+	//   }).toString();
+    // var e64 = CryptoJS.enc.Base64.parse(ciphertext);
+    // var eHex = e64.toString(CryptoJS.enc.Hex);
+	// return eHex;	
+	let cipher = crypto.createCipheriv('aes-256-cbc', 'Nineeteen68@SecureScrapeDataPath', "0000000000000000");
+	let encryptedData = cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
+	// console.log('encrypted data=', encryptedData.toUpperCase());
+	return 	encryptedData.toUpperCase();
+}
