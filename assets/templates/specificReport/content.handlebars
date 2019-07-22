@@ -1109,9 +1109,9 @@
                   {{/ifEquals}} {{#ifEquals status "Pass"}} {{#ifEquals testcase_details.actualResult_pass ""}}
                   <td class="rDActualRes tabCont">
                      {{#ifEquals screenshot_path undefined}}
-                     <text class="rDstatus rDstatusLnk">As Expected</text>
+                     <text class="rDstatus rDstatusLnk" style='text-decoration:none !important;cursor:default;'>As Expected</text>
                      {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
-                     <text class="rDstatus openscreenshot" data-screenshot="{{screenshot_path}}">As Expected</text>
+                     <text class="rDstatus openscreenshot"  style='text-decoration:none !important;cursor:default;'>As Expected</text>
                      {{/ifnotEquals}}
                   </td>
                   {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_pass ""}}
