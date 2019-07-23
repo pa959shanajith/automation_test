@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html style="height: 100%;">
-
 <head>
    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,7 +10,9 @@
 
    <script type="text/javascript" src="js/plugins/jquery.min.js"></script>
    <script type="text/javascript" src="js/plugins/reports/specificReport.js"></script>
-   <script src="js/plugins/reports/datatables/datatables.min.js"></script>
+    <script type="text/javascript" src="js/plugins/jquery-ui.min.js"></script>
+   <script type="text/javascript" src="js/plugins/jquery.blockUI.js"></script>
+   <script type="text/javascript" src="js/plugins/reports/datatables/datatables.min.js"></script>
 
    <style>
       .no-disp {
@@ -85,6 +86,7 @@
          font-size: 14px;
          position: relative;
          left: 4%;
+         padding-bottom: 0px;
       }
 
       .leftSummary label {
@@ -279,18 +281,24 @@
          border-radius: 10px;
          -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
       }
-
+      .buttonDivBox {
+         float: right;
+         position: relative;
+         top: -4px;
+      }
       .logintojira,
       .disconnectJira {
          cursor: pointer;
-         float: left;
-         position: relative;
-         left: 134px;
-         border-radius: 3px;
-      }
-
-      .logintojira {
-         left: 34px;
+         left: -4px;
+         top: -10px;
+         background: #f3f3f3;
+         border: 1px solid #e5e5e5;
+         padding: 5px;
+         border-radius: 5px;
+         width: 100px;
+         font-family: Latowebbold;
+         color: #000;
+         outline: none;
       }
 
       .disconnectJira {
@@ -323,13 +331,24 @@
          position: relative;
          top: 7px;
          left: 10px;
+         font-family: Latowebbold;
       }
 
       .loginJiraCredentials,
       .resetJiraCredentials {
-         width: 85px;
          float: right;
          margin-right: 28px;
+         left: -4px;
+         top: -10px;
+         background: #f3f3f3;
+         border: 1px solid #e5e5e5;
+         padding: 5px;
+         border-radius: 5px;
+         width: 100px;
+         font-family: Latowebbold;
+         color: #000;
+         outline: none;
+         cursor: pointer;
       }
 
       .jiraWindow .error-msg {
@@ -417,9 +436,8 @@
 
       .popupheader {
          width: 100%;
-         height: 30px;
          background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 60%);
-         ;
+         height: 35px;
          margin-bottom: 14px;
          border-radius: 5px;
       }
@@ -435,6 +453,7 @@
       .createIssueWindow .popupheader label {
          float: left;
          margin: 13px 0 0 18px;
+         font-family: Latowebbold;
       }
 
       .createIssueWindow .popupheader .closeWindow {
@@ -450,6 +469,7 @@
          float: right;
          margin-top: 6px;
          margin-right: 12px;
+         margin-top: 9px;
       }
 
       .statusWindow .popupheader label {
@@ -960,6 +980,14 @@
       .resultSummaryBox {
          float: left;
       }
+      table.dataTable.no-footer {
+         border-bottom: none !important;
+      }
+      .mainTabCont_collapse
+      {
+         float: left;
+         width: 100%;
+      }
       }
    </style>
 </head>
@@ -1008,7 +1036,7 @@
          </div>
          <div class="leftSummary rightBox">
             <label>Overall Status</label>
-            <span style="color:{{getColor overAllStatus}}">: {{overAllStatus}}</span>
+            <span style="color:{{getColor overAllStatus}}"><text style='color:#000; !important'>:</text> {{overAllStatus}}</span>
             <label>Testcase Status: </label>
             <span class="progress customprogress">
                <span class="progress-bar" role="progressbar" style="background-color:#28a745;width:{{pass}}%">
@@ -1033,6 +1061,13 @@
          </div>
       </div>
       {{/each}}
+      <div class='buttonDivBox'>
+         <button class="logintojira" title="Login to Jira">Jira Login</button>
+         <button class="disconnectJira" title="Disconnect from Jira">Disconnect</button>
+         <label class="Llogdefect">Log Defect</label>
+         <input type="text" id="inputSlno" placeholder="Enter SL No." maxlength="5" />
+         <button class="go_defectlog opendescpopup">Go</button>
+      </div>
       <!-- Reports Table -->
       <div class="maintabCont_collapse">
          <table id="specificReportDataTable" class="display responsive wrap" style="width:100%">
@@ -1074,9 +1109,9 @@
                   {{/ifEquals}} {{#ifEquals status "Pass"}} {{#ifEquals testcase_details.actualResult_pass ""}}
                   <td class="rDActualRes tabCont">
                      {{#ifEquals screenshot_path undefined}}
-                     <text class="rDstatus rDstatusLnk">As Expected</text>
+                     <text class="rDstatus rDstatusLnk" style='text-decoration:none !important;cursor:default;'>As Expected</text>
                      {{/ifEquals}} {{#ifnotEquals screenshot_path undefined}}
-                     <text class="rDstatus openscreenshot" data-screenshot="{{screenshot_path}}">As Expected</text>
+                     <text class="rDstatus openscreenshot"  style='text-decoration:none !important;cursor:default;'>As Expected</text>
                      {{/ifnotEquals}}
                   </td>
                   {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_pass ""}}
@@ -1098,6 +1133,9 @@
                      {{testcase_details.actualResult_fail}}
                   </td>
                   {{/ifnotEquals}} {{/ifEquals}}
+                  {{#ifEquals status "Terminate"}}
+                     <td class="rDActualRes tabCont">{{StepDescription}}</td>
+                   {{/ifEquals}}
                   <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}};"
                      data-screenshot="{{screenshot_path}}">{{status}}</td>
                   <td class="rDellaps tabCont">{{EllapsedTime}}</td>

@@ -3718,7 +3718,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $('#eteScenarioContainer').empty();
         d3.select('.addScenarios-ete').classed('disableButton', !0);
         //$('#ct-saveAction_W').removeClass('no-access');
-        SaveCreateED('#ct-saveAction', 1, 0);
         //uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];scrList=[];tcList=[];cSpan=[0,0];cScale=1;mapSaved=!1;
         taskAssign = {
             "modules_endtoend": {
