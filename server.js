@@ -490,6 +490,7 @@ if (cluster.isMaster) {
 		app.post('/exportToExcel', mindmap.exportToExcel);
 		app.post('/getDomain', mindmap.getDomain);
 
+		app.post('/pdProcess',mindmap.pdProcess);	// process discovery service
 		//Login Routes
 		//app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
 		app.post('/checkUserState_Nineteen68', login.checkUserState_Nineteen68);

@@ -180,6 +180,10 @@
                <i class="fa fa-clipboard fa-lg plus-icon" id="pasteImg1" title="Paste map" ng-click="pasteMap()"></i>
                <i class="glyphicon glyphicon-export export-icon" ng-click="exportData(0)" title="Export Version"></i>
 			   <i class="glyphicon glyphicon-save export-excel-icon" id="export-excel" ng-click="exportToExcel()" title="Export To Excel"></i>
+			   <label for="pd-input">
+                <i class="glyphicon glyphicon-import import-pd-icon" id="import-pd" ng-click="importFromPD()" title="Import Process Discovery File"></i>
+               </label>
+               <input id="pd-input" on-read-file="importFromPD($fileContent)" type="file" name="xlsfile" accept=".pd" required="" autofocus="" style="display:none"/>
                </span>
             </span>
          </div>
