@@ -9,6 +9,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     var robj, redirected = false;
     var pauseloadinginterval = false;
     var clearIntervalList = [];
+    var slideOpen = false;
     $scope.reportIdx = ''; // for execution count click
     $("#reportDataTableDiv").hide();
     $('.reports-search').attr('disabled', 'disabled');
@@ -131,6 +132,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             var releaseId = $('.release-list option:selected').val();
             blockUI("Loading cycles.. please wait..");
             $(".moduleBox,.mid-report-section,#accordion").hide();
+            $("#expAssign").attr('src', 'imgs/ic-collapse.png');
             $('#searchModule').val('');
             $('#searchModule').attr('disabled', 'disabled');
             mindmapServices.populateCycles(releaseId).then(function(result_cycles) {
@@ -169,6 +171,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             $("#accordion").hide();
             $('#nodeBox').empty();
             $('#searchModule').val('');
+            //$("#expAssign").attr('src', 'imgs/ic-collapse.png');
             //Fetching Modules under cycle
             reportService.getReportsData_ICE(reportsInputData).then(function(result_res_reportData) {
                 unblockUI();
@@ -228,12 +231,17 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     //Toggle(Show/Hide) Module Div
     $('#expAssign').on('click', function(e) {
         $(".moduleBox").slideToggle('slow', function() {
-            $(this).toggleClass('slideOpen');
-            if ($('.slideOpen').is(":visible") == true) {
-                $("#expAssign").attr('src', 'imgs/ic-collapseup.png');
-            } else {
-                $("#expAssign").attr('src', 'imgs/ic-collapse.png');
+             if($('div.moduleBox').hasClass('slideOpen') == true)
+            {
+                slideOpen = true;
+                $(this).next().children().children().attr('src', 'imgs/ic-collapse.png');
             }
+            else
+            {
+                slideOpen = false;
+                $(this).next().children().children().attr('src', 'imgs/ic-collapseup.png');
+            }  
+            $(this).toggleClass('slideOpen');
         });
     });
 
