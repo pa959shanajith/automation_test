@@ -59,6 +59,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                 unblockUI();
                                 $('#selectProjects').val(robj.testSuiteDetails[0].projectidts);
                                 $('#selectProjects').trigger('change');
+                              
                             }, 500);
 
                         }
@@ -100,6 +101,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         $('#nodeBox').empty();
         $('#ctExpandAssign').css('pointer-events','none');
         $("#expAssign").attr('src', 'imgs/ic-collapse.png');
+        $('#searchModule').val('');
         $('#searchModule').attr('disabled', 'disabled');
         mindmapServices.populateReleases(projectId).then(function(result) {
             unblockUI();
@@ -129,6 +131,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             var releaseId = $('.release-list option:selected').val();
             blockUI("Loading cycles.. please wait..");
             $(".moduleBox,.mid-report-section,#accordion").hide();
+            $('#searchModule').val('');
+            $('#searchModule').attr('disabled', 'disabled');
             mindmapServices.populateCycles(releaseId).then(function(result_cycles) {
                 unblockUI();
                 if (result_cycles == "Invalid Session") {
@@ -164,6 +168,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             blockUI("Loading modules.. please wait..");
             $("#accordion").hide();
             $('#nodeBox').empty();
+            $('#searchModule').val('');
             //Fetching Modules under cycle
             reportService.getReportsData_ICE(reportsInputData).then(function(result_res_reportData) {
                 unblockUI();
