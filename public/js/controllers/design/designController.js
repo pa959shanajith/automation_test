@@ -2023,7 +2023,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						else	
 							$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
 						$("#finalScrap").empty()
-						$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'/><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button><button data-toggle='modal' id='editObjects' data-target='#editObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' data-toggle='tooltip' title='Edit Objects' disabled>Edit</button></span><span class='searchScrapEle'><img src='imgs/ic-search-icon.png'></input></span><span><input type='text' class='searchScrapInput'></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
+						$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'/><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 10' disabled>Delete</button><button data-toggle='modal' id='editObjects' data-target='#editObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' data-toggle='tooltip' title='Edit Objects' disabled>Edit</button></span><span class='searchScrapEle'><img src='imgs/ic-search-icon.png'></input></span><span><input type='text' class='searchScrapInput'></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
 						var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
 
 						// console.log("data", viewString);
@@ -3421,7 +3421,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				if (viewString.view != undefined && viewString.view.length != undefined) {
 					for (var i = 0; i < viewString.view.length; i++) {
 
-						if ($.trim($(this).find("input").val()+"_"+typeOfElement) == $.trim(viewString.view[i].custname) ) {
+						if ($.trim($(this).find("input").val()+"_"+typeOfElement) == $.trim(viewString.view[i].custname) || $("input[type=checkbox].checkall:checked:visible").parents('span.objectNames').length>0 && $("input[type=checkbox].checkall:checked:visible").parents('span.objectNames')[0].id.split('_')[1]==i.toString() ) {
 							//$("#dialog-addObject").modal("hide");
 							if($('.addMoreObjRow').is(':visible') == false && $('.editAddObjRow').is(':visible') == true && 'editable' in viewString.view[i]){
 								custflag=i
@@ -3488,7 +3488,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						break;
 				}
 				if($('.editAddObjRow').is(':visible')){
-					obj=JSON.parse(localStorage['_cust'])[$(this).find("input").val()]
+					obj=JSON.parse(localStorage['_cust'])[$.trim($(this).find("input").val())]
 					if($(this).find("input").val()!=" "){
 						customObj.push({
 							custname: $.trim($(this).find("input").val()) + "_" + typeOfElement,
@@ -3525,7 +3525,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 			//Reloading List Items
 			$("#finalScrap").empty()
-			$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox' disabled /><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button><button data-toggle='modal' id='editObjects' data-target='#editObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' data-toggle='tooltip' title='Edit Objects' disabled>Edit</button></span><span class='searchScrapEle'><img src='imgs/ic-search-icon.png'></input></span><span><input type='text' class='searchScrapInput'></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
+			$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox' disabled /><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 10' disabled>Delete</button><button data-toggle='modal' id='editObjects' data-target='#editObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' data-toggle='tooltip' title='Edit Objects' disabled>Edit</button></span><span class='searchScrapEle'><img src='imgs/ic-search-icon.png'></input></span><span><input type='text' class='searchScrapInput'></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
 			$('#scraplist').empty()
 			for (i = 0; i < viewString.view.length; i++) {
 				var innerUL = $('#scraplist');
@@ -4362,7 +4362,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
 									openDialog("Save Testcase", "Testcase saved successfully")
 									var screenId = taskInfo.screenId;
-									var screenName = taskInfo.screenName;
+									var screenName = angular.element(document.getElementById("left-nav-section")).scope().screenName;
 									var projectId = taskInfo.projectId;
 									var userinfo = JSON.parse(window.localStorage['_UI']);
 									scrapeObject = {};
@@ -4372,7 +4372,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 											scrape_data.view[i].xpath=data1[scrape_data.view[i].custname]
 										}
 									} 
-									scrapeObject.getScrapeData = scrape_data;
+									scrapeObject.getScrapeData = JSON.stringify(scrape_data);
 									scrapeObject.projectId = projectId;
 									scrapeObject.screenId = screenId;
 									scrapeObject.screenName = screenName;
@@ -4389,17 +4389,17 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 										scrapeObject.type = "save";
 									//Update Service to Save Scrape Objects
 									DesignServices.updateScreen_ICE(scrapeObject)
-										.then(function (data) {
-											if (data == "Invalid Session") {
+										.then(function (data1) {
+											if (data1 == "Invalid Session") {
 												return $rootScope.redirectPage();
 											}
-											if (data == "success") {
-												openDialog("Save WebService Template", "WebService Template saved successfully.");
+											if (data1 == "success") {
+												openDialog("Save Testcase", "Testcase saved successfully.");
 												//$("#WSSaveSuccess").modal("show");
 												$("#enbledWS").prop("checked", false)
 												angular.element(document.getElementById("left-nav-section")).scope().getWSData();
 											} else {
-												openDialog("Save WebService Template", "Failed to save WebService Template.");
+												openDialog("Save Testcase", "Failed to save Testcase.");
 												//$("#WSSaveFail").modal("show")
 											}
 										}, function (error) {
