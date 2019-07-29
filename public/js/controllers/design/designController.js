@@ -4366,12 +4366,15 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									var projectId = taskInfo.projectId;
 									var userinfo = JSON.parse(window.localStorage['_UI']);
 									scrapeObject = {};
-									data1=JSON.parse(localStorage['_modified'])
-									for(i=0;i<scrape_data.view.length;i++){
-										if(scrape_data.view[i].custname in data1){
-											scrape_data.view[i].xpath=data1[scrape_data.view[i].custname]
-										}
-									} 
+									if(localStorage['_modified'])
+									{
+										data1=JSON.parse(localStorage['_modified'])
+										for(i=0;i<scrape_data.view.length;i++){
+											if(scrape_data.view[i].custname in data1){
+												scrape_data.view[i].xpath=data1[scrape_data.view[i].custname]
+											}
+										} 
+									}
 									scrapeObject.getScrapeData = JSON.stringify(scrape_data);
 									scrapeObject.projectId = projectId;
 									scrapeObject.screenId = screenId;
