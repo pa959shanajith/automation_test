@@ -778,9 +778,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                 } else if (finalReports.rows[k].status == "Fail") {
                                     fail++;
                                 } else if (finalReports.rows[k].hasOwnProperty("Step") && finalReports.rows[k].Step == "Terminated") {
-                                    terminated = total;
-                                    pass = 0;
-                                    fail = 0;
+                                    terminated++
                                 }
                                 if (reportType != "html" && !(finalReports.rows[k].screenshot_path == undefined)) {
                                     scrShot.idx.push(k);

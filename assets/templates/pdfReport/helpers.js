@@ -1,7 +1,7 @@
 function getColor(overAllStatus) {
-	if(overAllStatus == "Pass") return "green";
-	else if(overAllStatus == "Fail")    return "red";
-	else if(overAllStatus == "Terminate")    return "#faa536";
+	if(overAllStatus == "Pass") return "#28a745";
+	else if(overAllStatus == "Fail")    return "#dc3545";
+	else if(overAllStatus == "Terminate")    return "#ffc107";
 }
 
 function validateImageID(path,slno){

@@ -37,7 +37,7 @@ function loadReports() {
               };  
         
         var overallStatus = $('.overallStatusVal').text();
-        if(overallStatus == 'Incomplete')
+        if(overallStatus.indexOf('Incomplete') != '-1')
         {
             $('.toggleIncompleteStatus').hide();
         }
