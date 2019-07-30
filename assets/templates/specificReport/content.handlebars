@@ -1040,9 +1040,9 @@
          </div>
          <div class="leftSummary rightBox">
             <label>Overall Status</label>
-            <span style="color:{{getColor overAllStatus}}"><text style='color:#000; !important'>:</text> {{overAllStatus}}</span>
-            <label>Testcase Status: </label>
-            <span class="progress customprogress">
+            <span style="color:{{getColor overAllStatus}}"><text class='overallStatusVal' style='color:#000; !important'>:</text> {{overAllStatus}}</span>
+            <label class='toggleIncompleteStatus'>Testcase Status: </label>
+            <span class="progress customprogress toggleIncompleteStatus">
                <span class="progress-bar" role="progressbar" style="background-color:#28a745;width:{{pass}}%">
                </span>
                <span class="progress-bar" role="progressbar" style="background-color:#dc3545;width: {{fail}}%">
@@ -1051,17 +1051,17 @@
                </span>
             </span>
             <label></label>
-            <span class="progressPercentBox">
+            <span class="progressPercentBox toggleIncompleteStatus">
                <text style="color:#28a745;" class='progVal'>Pass: {{pass}}%</text>
                <text style="color:#dc3545;" class='progVal'>Fail: {{fail}}%</text>
                <text style="color:#ffc107;" class='progVal'>Terminated: {{terminate}}%</text>
             </span>
-            <label>Start Date and Time </label>
-            <span>: {{StartTime}}</span>
-            <label>End Date and Time </label>
-            <span>: {{EndTime}}</span>
-            <label>Time Elapsed </label>
-            <span>: {{EllapsedTime}}</span>
+            <label class='toggleIncompleteStatus'>Start Date and Time </label>
+            <span class='toggleIncompleteStatus'>: {{StartTime}}</span>
+            <label class='toggleIncompleteStatus'>End Date and Time </label>
+            <span class='toggleIncompleteStatus'>: {{EndTime}}</span>
+            <label class='toggleIncompleteStatus'>Time Elapsed </label>
+            <span class='toggleIncompleteStatus'>: {{EllapsedTime}}</span>
          </div>
       </div>
       {{/each}}

@@ -35,6 +35,16 @@ function loadReports() {
             var calcDataTableHeight = function() {
                     return scrollBodyHeight - 100;
               };  
+        
+        var overallStatus = $('.overallStatusVal').text();
+        if(overallStatus == 'Incomplete')
+        {
+            $('.toggleIncompleteStatus').hide();
+        }
+        else
+        {
+            $('.toggleIncompleteStatus').show();
+        }
     
         //Datatable
          var oTable =  $('#specificReportDataTable').DataTable({
