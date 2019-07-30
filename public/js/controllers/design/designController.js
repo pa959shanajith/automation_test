@@ -6010,11 +6010,14 @@ function contentTable(newTestScriptDataLS) {
 			var scrappedDataCustnames = [];
 			selectedText = replaceHtmlEntites(selectedText.trim());
 			for (var i = 0; i < scrappedData.length; i++) {
+				debugger;
+				console.log(scrappedData[i])
 				var ob = scrappedData[i];
 				var custname1;
-				var custval = ob.custname;
+				var custval = $.trim(ob.custname);
 				custname1 = $('<input>').html(custval).text().trim();
 				scrappedDataCustnames.push(custval);
+				console.log('scrappedDataCustnames', scrappedDataCustnames);
 				if ((custname1.replace(/\s/g, ' ') == (selectedText.replace('/\s/g', ' ')).replace('\n', ' '))) {
 					var isIos = scrappedData[i].text;
 					if(isIos == 'ios')
