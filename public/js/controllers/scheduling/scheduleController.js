@@ -9,7 +9,8 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 	    //$('.scrollbar-macosx').scrollbar();
 	    document.getElementById("currentYear").innerHTML = new Date().getFullYear()
 	}, 500)
-    var browserTypeExe = [];
+	var browserTypeExe = [];
+	var exc_action = "serial";
     //Task Listing
     loadUserTasks()
 	blockUI("Loading...");
@@ -373,6 +374,8 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 		else if (appType == "Mainframe" && browserTypeExe.length === 0) openModelPopup("Schedule Test Suite", "Please select Mainframe option");
 		else if (appType == "DesktopJava" && browserTypeExe.length === 0) openModelPopup("Schedule Test Suite", "Please select OEBS Apps option");
 		else if (browserTypeExe.length === 0) openModelPopup("Schedule Test Suite", "Please select " + appType + " option");
+		else if ((appType == "Web") && browserTypeExe.length == 1 && exc_action == "parallel")
+		openModelPopup("Execute Test Suite", "Please select multiple browsers");
 		else{
 			if(appType == "SAP") browserTypeExe = ["1"];
 			$.each($(".batchSuite"), function(){
@@ -515,7 +518,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 			function proceedScheduling(){
 				if(doNotSchedule == false){
 					var chktype = "schedule";
-					ScheduleService.testSuitesScheduler_ICE(chktype,'',moduleInfo)
+					ScheduleService.testSuitesScheduler_ICE(chktype,'',moduleInfo, exc_action)
 					.then(function(data){
 						if(data == "success"){
 							openModelPopup("Schedule Test Suite", "Successfully scheduled.");
@@ -552,6 +555,15 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 		}		
 	}
 
+	//select parallel execution
+	$(document).on("click", ".selectParallel", function () {
+		$(this).find("img").toggleClass("sb");
+		if ($("img").hasClass('sb') == true) {
+			exc_action = "parallel";
+		} else {
+			exc_action = "serial";
+		}
+	});
 	//Cancel scheduled jobs
 	$scope.cancelThisJob = function($event,status){
 		var suiteDetailsObj = $event.currentTarget.parentElement.dataset;
