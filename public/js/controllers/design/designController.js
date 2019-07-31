@@ -2426,7 +2426,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					$("#userObjContainer").empty()
 					$("#addMoreObject").attr("style","display:none");
 					objname=ele.find('.ellipsis')[0].textContent
-					$("#userObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name" value='+objname.slice(0,objname.lastIndexOf("_"))+'></div><div class="form-group form-group-2"><select class="form-control form-control-custom" ><option selected disabled>Select Object Type</option><option value="a">Link</option><option value="input">Textbox/Textarea</option><option value="table">Table</option><option value="list">List</option><option value="select">Dropdown</option><option value="img">Image</option><option value="button">Button</option><option value="radiobutton">Radiobutton</option><option value="checkbox">Checkbox</option><option value="Element">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /><img class="addMoreObjRow" ng-click="addMoreUserObject()" src="imgs/ic-add.png" style="display:none"><div class="propertiesTab"><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter URL" id="url"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter name" id="name"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Relative xpath" id="rpath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Absolute xpath" id="apath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter class name" id="classname"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter ID"  id="id"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Query Selector"  id="selector"><button class="btn btn-defaultsave" id="saveProperties" ng-click="saveProp()">Save</button></div></div><img class="editAddObjRow" src="imgs/ic-jq-editstep.png" /></div>')
+					$("#userObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name" value='+objname.slice(0,objname.lastIndexOf("_"))+'></div><div class="form-group form-group-2"><select class="form-control form-control-custom" ><option selected disabled>Select Object Type</option><option value="a" typeOfElement="lnk">Link</option><option value="input" typeOfElement="txtbox">Textbox/Textarea</option><option value="table" typeOfElement="tbl">Table</option><option value="list" typeOfElement="lst">List</option><option value="select" typeOfElement="select">Dropdown</option><option value="img" typeOfElement="img">Image</option><option value="button" typeOfElement="btn";>Button</option><option value="radiobutton" typeOfElement="radiobtn">Radiobutton</option><option value="checkbox" typeOfElement="chkbox">Checkbox</option><option value="Element" typeOfElement="elmnt">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /><img class="addMoreObjRow" ng-click="addMoreUserObject()" src="imgs/ic-add.png" style="display:none"><div class="propertiesTab"><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter URL" id="url"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter name" id="name"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Relative xpath" id="rpath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Absolute xpath" id="apath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter class name" id="classname"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter ID"  id="id"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Query Selector"  id="selector"><button class="btn btn-defaultsave" id="saveProperties" ng-click="saveProp()">Save</button></div></div><img class="editAddObjRow" src="imgs/ic-jq-editstep.png" /></div>')
 					$(".deleteAddObjRow").attr("style","display:none");
 					$('.form-group-2 select').val(data.tag)
 					$('#url').val(data.url)
@@ -3093,7 +3093,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		$("#addObjContainer").empty();
 		$("#userObjContainer").empty();						
 		if ($(".addObj-row").length > 1) $(".addObj-row").remove()
-		$("#addObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a">Link</option><option value="input">Textbox/Textarea</option><option value="table">Table</option><option value="list">List</option><option value="select">Dropdown</option><option value="img">Image</option><option value="button">Button</option><option value="radiobutton">Radiobutton</option><option value="checkbox">Checkbox</option><option value="Element">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /><img class="addMoreObject" src="imgs/ic-add.png"></div>')
+		$("#addObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a" typeOfElement="lnk">Link</option><option value="input" typeOfElement="txtbox">Textbox/Textarea</option><option value="table" typeOfElement="tbl">Table</option><option value="list" typeOfElement="lst">List</option><option value="select" typeOfElement="select">Dropdown</option><option value="img" typeOfElement="img">Image</option><option value="button" typeOfElement="btn";>Button</option><option value="radiobutton" typeOfElement="radiobtn">Radiobutton</option><option value="checkbox" typeOfElement="chkbox">Checkbox</option><option value="Element" typeOfElement="elmnt">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /><img class="addMoreObject" src="imgs/ic-add.png"></div>')
 
 		$scope.removeAddObjectSelection = function () {
 			$("img.left-bottom-selection").removeClass('left-bottom-selection');
@@ -3117,7 +3117,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			$("#addObjContainer").empty();					
 			$("#addMoreObject").attr("style","display:block");
 			if ($(".addObj-row").length > 1) $(".addObj-row").remove()
-			$("#userObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a">Link</option><option value="input">Textbox/Textarea</option><option value="table">Table</option><option value="list">List</option><option value="select">Dropdown</option><option value="img">Image</option><option value="button">Button</option><option value="radiobutton">Radiobutton</option><option value="checkbox">Checkbox</option><option value="Element">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /><img class="addMoreObjRow" ng-click="addMoreUserObject()" src="imgs/ic-add.png"><div class="propertiesTab"><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter URL" id="url"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter name" id="name"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Relative xpath" id="rpath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Absolute xpath" id="apath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter class name" id="classname"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter ID" id="id"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Query Selector" id="selector"><button class="btn btn-defaultsave" id="saveProperties" ng-click="saveProp()">Save</button></div></div><img class="editAddObjRow" src="imgs/ic-jq-editstep.png" /></div>')
+			$("#userObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a" typeOfElement="lnk">Link</option><option value="input" typeOfElement="txtbox">Textbox/Textarea</option><option value="table" typeOfElement="tbl">Table</option><option value="list" typeOfElement="lst">List</option><option value="select" typeOfElement="select">Dropdown</option><option value="img" typeOfElement="img">Image</option><option value="button" typeOfElement="btn";>Button</option><option value="radiobutton" typeOfElement="radiobtn">Radiobutton</option><option value="checkbox" typeOfElement="chkbox">Checkbox</option><option value="Element" typeOfElement="elmnt">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /><img class="addMoreObjRow" ng-click="addMoreUserObject()" src="imgs/ic-add.png"><div class="propertiesTab"><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter URL" id="url"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter name" id="name"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Relative xpath" id="rpath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Absolute xpath" id="apath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter class name" id="classname"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter ID" id="id"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Query Selector" id="selector"><button class="btn btn-defaultsave" id="saveProperties" ng-click="saveProp()">Save</button></div></div><img class="editAddObjRow" src="imgs/ic-jq-editstep.png" /></div>')
 		
 		}else if(param=='decrypt'){
 			//$scope.errorMessage = "";
@@ -3144,7 +3144,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					$("#dialog-userObject").modal("show");
 					$("#userObjContainer").empty()
 					$("#addMoreObject").attr("style","display:none");
-					$("#userObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name" value='+e.currentTarget.parentElement.children[0].children[2].textContent.split("_")[0]+'></div><div class="form-group form-group-2"><select class="form-control form-control-custom" ><option selected disabled>Select Object Type</option><option value="a">Link</option><option value="input">Textbox/Textarea</option><option value="table">Table</option><option value="list">List</option><option value="select">Dropdown</option><option value="img">Image</option><option value="button">Button</option><option value="radiobutton">Radiobutton</option><option value="checkbox">Checkbox</option><option value="Element">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /><img class="addMoreObjRow" ng-click="addMoreUserObject()" src="imgs/ic-add.png"><div class="propertiesTab"><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter URL" id="url"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter name" id="name"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Relative xpath" id="rpath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Absolute xpath" id="apath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter class name" id="classname"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter ID"  id="id"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Query Selector"  id="selector"><button class="btn btn-defaultsave" id="saveProperties" ng-click="saveProp()">Save</button></div></div><img class="editAddObjRow" src="imgs/ic-jq-editstep.png" /></div>')
+					$("#userObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name" value='+e.currentTarget.parentElement.children[0].children[2].textContent.split("_")[0]+'></div><div class="form-group form-group-2"><select class="form-control form-control-custom" ><option selected disabled>Select Object Type</option><option value="a" typeOfElement="lnk">Link</option><option value="input" typeOfElement="txtbox">Textbox/Textarea</option><option value="table" typeOfElement="tbl">Table</option><option value="list" typeOfElement="lst">List</option><option value="select" typeOfElement="select">Dropdown</option><option value="img" typeOfElement="img">Image</option><option value="button" typeOfElement="btn";>Button</option><option value="radiobutton" typeOfElement="radiobtn">Radiobutton</option><option value="checkbox" typeOfElement="chkbox">Checkbox</option><option value="Element" typeOfElement="elmnt">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /><img class="addMoreObjRow" ng-click="addMoreUserObject()" src="imgs/ic-add.png"><div class="propertiesTab"><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter URL" id="url"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter name" id="name"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Relative xpath" id="rpath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Absolute xpath" id="apath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter class name" id="classname"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter ID"  id="id"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Query Selector"  id="selector"><button class="btn btn-defaultsave" id="saveProperties" ng-click="saveProp()">Save</button></div></div><img class="editAddObjRow" src="imgs/ic-jq-editstep.png" /></div>')
 					$(".deleteAddObjRow").attr("style","display:none");
 					$('.form-group-2 select').val(data.tag)
 					$('#url').val(data.url)
@@ -3174,20 +3174,20 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			$('input.form-control.form-control-custom').removeAttr("style");
 			$("select.form-control.form-control-custom").removeAttr("style");
 			$('#url').removeAttr("style");
-			ele=$(this).parent().parent().parent();
+			ele=$(this).offsetParent()
 			$('.addObj-row').each(function(){
-				if ($.trim($(this).find('input.form-control.form-control-custom').val()) == "") {
-					$(this).find('input.form-control.form-control-custom').attr("style", "border-bottom: 2px solid #d33c3c !important;").focus();
+				if ($.trim(ele.find('input.form-control.form-control-custom').val()) == "") {
+					ele.find('input.form-control.form-control-custom').attr("style", "border-bottom: 2px solid #d33c3c !important;").focus();
 					flag="true";
-				}else if ($(this).find("select option:selected").val() == "Select Object Type") {
+				}else if (ele.find("select option:selected").val() == "Select Object Type") {
 					//$scope.errorMessage = "Please select object type";
 					//$(".addObjTopWrap").find(".error-msg-abs").text("Please select object type");
-					$(this).find("select").attr("style", "border-bottom: 4px solid #d33c3c !important;").focus(); //.addClass('selectErrorBorder')
+					ele.find("select").attr("style", "border-bottom: 4px solid #d33c3c !important;").focus(); //.addClass('selectErrorBorder')
 					flag = "true";
-				}else if($.trim($(this).find('#url').val())==""){
-					$(this).find('#url').attr("style", "border-bottom: 2px solid #d33c3c !important;").focus();
+				}else if($.trim(ele.find('#url').val())==""){
+					ele.find('#url').attr("style", "border-bottom: 2px solid #d33c3c !important;").focus();
 					flag="true";
-				}else if($(this).find('#id').val()=="" && $(this).find('#classname').val()=="" && $(this).find('#rpath').val()=="" && $(this).find('#apath').val()=="" && $(this).find('#name').val()=="" && $(this).find('#selector').val()==""){
+				}else if(ele.find('#id').val()=="" && ele.find('#classname').val()=="" && ele.find('#rpath').val()=="" && ele.find('#apath').val()=="" && ele.find('#name').val()=="" && ele.find('#selector').val()==""){
 					flag="true";
 					openDialog("Warning!!","Please enter at least one property")
 				}
@@ -3198,42 +3198,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			ele.find('input.form-control-custom-prop').each(function () {
 				custObjProps.push($.trim($(this).val()));
 			});
-			var typeOfElement;
-			var eleType = ele.find('select.form-control.form-control-custom')[0].value
-			switch (eleType) {
-				case "button":
-					typeOfElement = "btn";
-					break;
-				case "checkbox":
-					typeOfElement = "chkbox";
-					break;
-				case "select":
-					typeOfElement = "select";
-					break;
-				case "img":
-					typeOfElement = "img";
-					break;
-				case "a":
-					typeOfElement = "lnk";
-					break;
-				case "radiobutton":
-					typeOfElement = "radiobtn";
-					break;
-				case "input":
-					typeOfElement = "txtbox";
-					break;
-				case "list":
-					typeOfElement = "lst";
-					break;
-				case "table":
-					typeOfElement = "tbl";
-					break;
-				case "Element":
-					typeOfElement = "elmnt";
-					break;
-				default:
-					break;
-			}
+			var typeOfElement=ele.find('select option:selected').attr('typeofelement');
 			custObjProps.push(typeOfElement)
 			obj={}
 			DesignServices.userObjectElement_ICE(custObjProps)
@@ -3256,7 +3221,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					obj=JSON.parse(localStorage['_cust'])
 					obj[custObjNames]={url:data.url,xpath:data.xpath}
 					localStorage["_cust"]=JSON.stringify(obj)
-					$(".propertiesTab").hide();			
+					ele.find(".propertiesTab").hide();			
 				}
 			}, function (error) { });
 		});
@@ -3282,7 +3247,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	
 	//Edit User Object Row
 	$(document).on("click", ".editAddObjRow", function () {
-		$(".propertiesTab").show();
+		$(this).offsetParent().find('.propertiesTab').show()
 	});
 	
 	//Add More Object Functionality
@@ -3291,7 +3256,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	// };
 	$(document).on("click",".addMoreObject", function(){
 		$(this).parent().children('.addMoreObject').hide();
-		$("#addObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a">Link</option><option value="input">Textbox/Textarea</option><option value="table">Table</option><option value="list">List</option><option value="select">Dropdown</option><option value="img">Image</option><option value="button">Button</option><option value="radiobutton">Radiobutton</option><option value="checkbox">Checkbox</option><option value="Element">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /><img class="addMoreObject" src="imgs/ic-add.png"></div>')
+		$("#addObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a" typeOfElement="lnk">Link</option><option value="input" typeOfElement="txtbox">Textbox/Textarea</option><option value="table" typeOfElement="tbl">Table</option><option value="list" typeOfElement="lst">List</option><option value="select" typeOfElement="select">Dropdown</option><option value="img" typeOfElement="img">Image</option><option value="button" typeOfElement="btn";>Button</option><option value="radiobutton" typeOfElement="radiobtn">Radiobutton</option><option value="checkbox" typeOfElement="chkbox">Checkbox</option><option value="Element" typeOfElement="elmnt">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /><img class="addMoreObject" src="imgs/ic-add.png"></div>')
 	});
 	//Add More Object Functionality
 	
@@ -3301,7 +3266,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	// };
 	$(document).on("click",".addMoreObjRow", function(){
 		$(this).parent().children('.addMoreObjRow').hide();
-		$("#userObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a">Link</option><option value="input">Textbox/Textarea</option><option value="table">Table</option><option value="list">List</option><option value="select">Dropdown</option><option value="img">Image</option><option value="button">Button</option><option value="radiobutton">Radiobutton</option><option value="checkbox">Checkbox</option><option value="Element">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /><div class="propertiesTab"><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter URL" id="url"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter name" id="name"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Relative xpath" id="rpath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Absolute xpath" id="apath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter class name" id="classname"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter ID" id="id"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Query Selector" id="selector"><button class="btn btn-defaultsave" id="saveProperties" ng-click="saveProp()">Save</button></div></div><img class="editAddObjRow" src="imgs/ic-jq-editstep.png" /><img class="addMoreObjRow" ng-click="addMoreObject()" src="imgs/ic-add.png"></div>')
+		$("#userObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a" typeOfElement="lnk">Link</option><option value="input" typeOfElement="txtbox">Textbox/Textarea</option><option value="table" typeOfElement="tbl">Table</option><option value="list" typeOfElement="lst">List</option><option value="select" typeOfElement="select">Dropdown</option><option value="img" typeOfElement="img">Image</option><option value="button" typeOfElement="btn";>Button</option><option value="radiobutton" typeOfElement="radiobtn">Radiobutton</option><option value="checkbox" typeOfElement="chkbox">Checkbox</option><option value="Element" typeOfElement="elmnt">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /><div class="propertiesTab"><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter URL" id="url"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter name" id="name"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Relative xpath" id="rpath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Absolute xpath" id="apath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter class name" id="classname"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter ID" id="id"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Query Selector" id="selector"><button class="btn btn-defaultsave" id="saveProperties" ng-click="saveProp()">Save</button></div></div><img class="editAddObjRow" src="imgs/ic-jq-editstep.png" /><img class="addMoreObjRow" ng-click="addMoreObject()" src="imgs/ic-add.png"></div>')
 	});
 	//Add More User Object Functionality
 	
@@ -3323,11 +3288,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		var custObjNames = [];
 		var dupCustObjNames = [];
 		$('input.form-control-custom').each(function () {
+			var typeOfElement=$(this).offsetParent().find('select option:selected').attr('typeofelement');
 			if($.trim($(this).val())==""){
 				$(this).addClass('inputErrorBorderBottom');
 				flag = 'true';
 			}
-			custObjNames.push($.trim($(this).val()));
+			custObjNames.push($.trim($(this).val())+"_"+typeOfElement);
 		});
 		if(flag=='true'){ return false; }
 		var sorted_custObjNames = custObjNames.slice().sort();
@@ -3340,7 +3306,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			openDialog("Add Object", "Duplicate custom names");
 			$('input.form-control-custom').each(function () {
 				for (var j = 0; j < dupCustObjNames.length; j++) {
-					if ($.trim($(this).val()) == $.trim(dupCustObjNames[j])) {
+					if ($.trim($(this).val()+"_"+$(this).offsetParent().find('select option:selected').attr('typeofelement')) == $.trim(dupCustObjNames[j])) {
 						$(this).addClass('inputErrorBorderBottom');
 					}
 				}
@@ -3382,48 +3348,17 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				//		 }
 				//	 }
 				// }find("span.ellipsis").text()
-				var typeOfElement;
-				var eleType = $(this).find("select option:selected").val();
-				switch (eleType) {
-					case "button":
-						typeOfElement = "btn";
-						break;
-					case "checkbox":
-						typeOfElement = "chkbox";
-						break;
-					case "select":
-						typeOfElement = "select";
-						break;
-					case "img":
-						typeOfElement = "img";
-						break;
-					case "a":
-						typeOfElement = "lnk";
-						break;
-					case "radiobutton":
-						typeOfElement = "radiobtn";
-						break;
-					case "input":
-						typeOfElement = "txtbox";
-						break;
-					case "list":
-						typeOfElement = "lst";
-						break;
-					case "table":
-						typeOfElement = "tbl";
-						break;
-					case "Element":
-						typeOfElement = "elmnt";
-						break;
-					default:
-						break;
+				var typeOfElement=$(this).offsetParent().find('select option:selected').attr('typeofelement');
 				}
 				if (viewString.view != undefined && viewString.view.length != undefined) {
+					scrapeObjList={}
 					for (var i = 0; i < viewString.view.length; i++) {
-
+						scrapeObjList[$.trim(viewString.view[i].custname)]=i.toString();
+					}
+					for (var i = 0; i < viewString.view.length; i++) {
 						if ($.trim($(this).find("input").val()+"_"+typeOfElement) == $.trim(viewString.view[i].custname) || $("input[type=checkbox].checkall:checked:visible").parents('span.objectNames').length>0 && $("input[type=checkbox].checkall:checked:visible").parents('span.objectNames')[0].id.split('_')[1]==i.toString() ) {
 							//$("#dialog-addObject").modal("hide");
-							if($('.addMoreObjRow').is(':visible') == false && $('.editAddObjRow').is(':visible') == true && 'editable' in viewString.view[i]){
+							if($('.addMoreObjRow').is(':visible') == false && $('.editAddObjRow').is(':visible') == true && 'editable' in viewString.view[i] && scrapeObjList[$.trim($(this).find("input").val()+"_"+typeOfElement)]!=i.toString() ){
 								custflag=i
 							}else{
 								openDialog("Add Object", "Object characterstics are same for " + $(this).find("input").val() + "");
@@ -3451,41 +3386,51 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			//window.localStorage['disableEditing'] = "true";
 			//Pushing custom object in array
 			$.each($(".addObj-row"), function () {
-				var typeOfElement;
+				var typeOfElement=$(this).find('select option:selected').attr('typeofelement');
 				var eleType = $(this).find("select option:selected").val();
-				switch (eleType) {
-					case "button":
-						typeOfElement = "btn";
-						break;
-					case "checkbox":
-						typeOfElement = "chkbox";
-						break;
-					case "select":
-						typeOfElement = "select";
-						break;
-					case "img":
-						typeOfElement = "img";
-						break;
-					case "a":
-						typeOfElement = "lnk";
-						break;
-					case "radiobutton":
-						typeOfElement = "radiobtn";
-						break;
-					case "input":
-						typeOfElement = "txtbox";
-						break;
-					case "list":
-						typeOfElement = "lst";
-						break;
-					case "table":
-						typeOfElement = "tbl";
-						break;
-					case "Element":
-						typeOfElement = "elmnt";
-						break;
-					default:
-						break;
+				// switch (eleType) {
+				// 	case "button":
+				// 		typeOfElement = "btn";
+				// 		break;
+				// 	case "checkbox":
+				// 		typeOfElement = "chkbox";
+				// 		break;
+				// 	case "select":
+				// 		typeOfElement = "select";
+				// 		break;
+				// 	case "img":
+				// 		typeOfElement = "img";
+				// 		break;
+				// 	case "a":
+				// 		typeOfElement = "lnk";
+				// 		break;
+				// 	case "radiobutton":
+				// 		typeOfElement = "radiobtn";
+				// 		break;
+				// 	case "input":
+				// 		typeOfElement = "txtbox";
+				// 		break;
+				// 	case "list":
+				// 		typeOfElement = "lst";
+				// 		break;
+				// 	case "table":
+				// 		typeOfElement = "tbl";
+				// 		break;
+				// 	case "Element":
+				// 		typeOfElement = "elmnt";
+				// 		break;
+				// 	default:
+				// 		break;
+				// }
+				if($('.editAddObjRow').is(':visible')){
+					if($.trim($(this).find("input").val()) in JSON.parse(localStorage['_cust'])){
+						obj=JSON.parse(localStorage['_cust'])[$.trim($(this).find("input").val())];
+					}
+					else{
+						openDialog("Add Object","This element has been modified, please save the object.")
+						$(this).find("input.form-control.form-control-custom").addClass('inputErrorBorderBottom');
+						flag = "false";
+						return false;
 				}
 				if($('.editAddObjRow').is(':visible')){
 					obj=JSON.parse(localStorage['_cust'])[$.trim($(this).find("input").val())]
@@ -3508,7 +3453,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					}
 				}
 			})
-
+			if(flag=='false'){ return false; }
 			if (viewString == "" || viewString.view == undefined) {
 				viewString = {
 					view: []
@@ -4400,7 +4345,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 												openDialog("Save Testcase", "Testcase saved successfully.");
 												//$("#WSSaveSuccess").modal("show");
 												$("#enbledWS").prop("checked", false)
-												angular.element(document.getElementById("left-nav-section")).scope().getWSData();
+												angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
 											} else {
 												openDialog("Save Testcase", "Failed to save Testcase.");
 												//$("#WSSaveFail").modal("show")
