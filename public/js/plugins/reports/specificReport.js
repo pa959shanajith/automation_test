@@ -35,6 +35,16 @@ function loadReports() {
             var calcDataTableHeight = function() {
                     return scrollBodyHeight - 100;
               };  
+        
+        var overallStatus = $('.overallStatusVal').text();
+        if(overallStatus.indexOf('Incomplete') != '-1')
+        {
+            $('.toggleIncompleteStatus').hide();
+        }
+        else
+        {
+            $('.toggleIncompleteStatus').show();
+        }
     
         //Datatable
          var oTable =  $('#specificReportDataTable').DataTable({
@@ -71,6 +81,10 @@ function loadReports() {
                         var name = getRows[i].children[2].innerHTML;
                         var rowCount = 0;
                         var getParentId;
+                        if($(getRows[i]).children('td.rDstatus.tabCont.openscreenshot').attr('data-screenshot') == '')
+                        {
+                            $(getRows[i]).children('td.rDstatus.tabCont.openscreenshot').css('text-decoration','none').addClass('noScreenshot');
+                        }
                         if($(getRows[i]).children().children().hasClass('openscreenshot') == true)
                         {
                             var screenshot =  $(getRows[i]).children().find('.openscreenshot').attr('data-screenshot');
