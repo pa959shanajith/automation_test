@@ -9,6 +9,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     var robj, redirected = false;
     var pauseloadinginterval = false;
     var clearIntervalList = [];
+    var slideOpen = false;
     $scope.reportIdx = ''; // for execution count click
     $("#reportDataTableDiv").hide();
     $('.reports-search').attr('disabled', 'disabled');
@@ -59,6 +60,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                 unblockUI();
                                 $('#selectProjects').val(robj.testSuiteDetails[0].projectidts);
                                 $('#selectProjects').trigger('change');
+                              
                             }, 500);
 
                         }
@@ -100,6 +102,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         $('#nodeBox').empty();
         $('#ctExpandAssign').css('pointer-events','none');
         $("#expAssign").attr('src', 'imgs/ic-collapse.png');
+        $('#searchModule').val('');
         $('#searchModule').attr('disabled', 'disabled');
         mindmapServices.populateReleases(projectId).then(function(result) {
             unblockUI();
@@ -129,6 +132,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             var releaseId = $('.release-list option:selected').val();
             blockUI("Loading cycles.. please wait..");
             $(".moduleBox,.mid-report-section,#accordion").hide();
+            $("#expAssign").attr('src', 'imgs/ic-collapse.png');
+            $('#searchModule').val('');
+            $('#searchModule').attr('disabled', 'disabled');
             mindmapServices.populateCycles(releaseId).then(function(result_cycles) {
                 unblockUI();
                 if (result_cycles == "Invalid Session") {
@@ -164,6 +170,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             blockUI("Loading modules.. please wait..");
             $("#accordion").hide();
             $('#nodeBox').empty();
+            $('#searchModule').val('');
+            //$("#expAssign").attr('src', 'imgs/ic-collapse.png');
             //Fetching Modules under cycle
             reportService.getReportsData_ICE(reportsInputData).then(function(result_res_reportData) {
                 unblockUI();
@@ -223,12 +231,17 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     //Toggle(Show/Hide) Module Div
     $('#expAssign').on('click', function(e) {
         $(".moduleBox").slideToggle('slow', function() {
-            $(this).toggleClass('slideOpen');
-            if ($('.slideOpen').is(":visible") == true) {
-                $("#expAssign").attr('src', 'imgs/ic-collapseup.png');
-            } else {
-                $("#expAssign").attr('src', 'imgs/ic-collapse.png');
+             if($('div.moduleBox').hasClass('slideOpen') == true)
+            {
+                slideOpen = true;
+                $(this).next().children().children().attr('src', 'imgs/ic-collapse.png');
             }
+            else
+            {
+                slideOpen = false;
+                $(this).next().children().children().attr('src', 'imgs/ic-collapseup.png');
+            }  
+            $(this).toggleClass('slideOpen');
         });
     });
 
@@ -765,9 +778,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                 } else if (finalReports.rows[k].status == "Fail") {
                                     fail++;
                                 } else if (finalReports.rows[k].hasOwnProperty("Step") && finalReports.rows[k].Step == "Terminated") {
-                                    terminated = total;
-                                    pass = 0;
-                                    fail = 0;
+                                    terminated++
                                 }
                                 if (reportType != "html" && !(finalReports.rows[k].screenshot_path == undefined)) {
                                     scrShot.idx.push(k);
