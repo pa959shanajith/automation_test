@@ -3349,7 +3349,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				//	 }
 				// }find("span.ellipsis").text()
 				var typeOfElement=$(this).offsetParent().find('select option:selected').attr('typeofelement');
-				}
 				if (viewString.view != undefined && viewString.view.length != undefined) {
 					scrapeObjList={}
 					for (var i = 0; i < viewString.view.length; i++) {
@@ -3358,7 +3357,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					for (var i = 0; i < viewString.view.length; i++) {
 						if ($.trim($(this).find("input").val()+"_"+typeOfElement) == $.trim(viewString.view[i].custname) || $("input[type=checkbox].checkall:checked:visible").parents('span.objectNames').length>0 && $("input[type=checkbox].checkall:checked:visible").parents('span.objectNames')[0].id.split('_')[1]==i.toString() ) {
 							//$("#dialog-addObject").modal("hide");
-							if($('.addMoreObjRow').is(':visible') == false && $('.editAddObjRow').is(':visible') == true && 'editable' in viewString.view[i] && scrapeObjList[$.trim($(this).find("input").val()+"_"+typeOfElement)]!=i.toString() ){
+							if($('.addMoreObjRow').is(':visible') == false && $('.editAddObjRow').is(':visible') == true && 'editable' in viewString.view[i] && (!($.trim($(this).find("input").val()+"_"+typeOfElement) in scrapeObjList) || scrapeObjList[$.trim($(this).find("input").val()+"_"+typeOfElement)]==i.toString()) ){
 								custflag=i
 							}else{
 								openDialog("Add Object", "Object characterstics are same for " + $(this).find("input").val() + "");
@@ -3431,9 +3430,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						$(this).find("input.form-control.form-control-custom").addClass('inputErrorBorderBottom');
 						flag = "false";
 						return false;
-				}
-				if($('.editAddObjRow').is(':visible')){
-					obj=JSON.parse(localStorage['_cust'])[$.trim($(this).find("input").val())]
+					}
 					if($(this).find("input").val()!=" "){
 						customObj.push({
 							custname: $.trim($(this).find("input").val()) + "_" + typeOfElement,
