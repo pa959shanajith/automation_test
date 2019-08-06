@@ -81,13 +81,12 @@ function openScreenShot(req, path, cb) {
                     "path": path
                 };
                 redisServer.redisPubICE.publish('ICE1_normal_' + name, JSON.stringify(dataToIce));
-                var sreenshotsArr = [];
 
                 function render_screenshot_listener(channel, message) {
                     var data = JSON.parse(message);
                     if (name == data.username) {
+						redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
                         if (data.onAction == "unavailableLocalServer") {
-                            redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
                             logger.error("Error occurred in openScreenShot: Socket Disconnected");
                             if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
                                 var soc = myserver.socketMapNotify[name];
@@ -96,17 +95,12 @@ function openScreenShot(req, path, cb) {
                             }
                         } else if (data.onAction == "render_screenshot") {
                             var resultData = data.value;
-                            if (resultData === "fail") { // In case of fail
-                                redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
+                            if (resultData === "fail") {
                                 logger.error('Screenshot status: ', resultData);
                                 cb('fail');
-                            } else if (resultData === "finished") { //Get final status of screenshots
-                                redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
-                                logger.debug("screenshots processed successfully");
-                                cb(null, sreenshotsArr);
-                            } else { //Get Screenshots by chunks
-                                sreenshotsArr = sreenshotsArr.concat(resultData);
-                                logger.debug("Screenshots block received");
+                            } else {
+                                logger.debug("Screenshots processed successfully");
+                                cb(null, resultData);
                             }
                         }
                     }

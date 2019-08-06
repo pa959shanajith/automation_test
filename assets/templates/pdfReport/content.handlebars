@@ -83,7 +83,7 @@
       height: 8px !important;
       border-radius: 10px;
       margin-top: 3px;
-      background-color: #fff;
+      background-color: #e0e0e0;
       position: relative;
       left: 15px !important;
    }
@@ -302,6 +302,16 @@
    .progressLabelVal {
       font-weight: bold !important;
    }
+   .progressBox{
+      width:315px !important;
+      float:right !important;
+      position:relative !important;
+      left:33px !important;
+      top:-15px !important;
+      font-size:12px !important;
+      margin-left:22px !important;
+      text-align:center !important;
+   }
 </style>
 <div class="mainContainer">
    {{#each overallstatus}}
@@ -327,7 +337,8 @@
       <div class="reportStatus">
          <span class="progresslabel" style='width:35%'>Overall Status</span>
          <span class="progresslabel progressLabelVal"
-            style="width:35%; color:{{getColor overAllStatus}}">:{{overAllStatus}}</span>
+            style="width:35%; color:{{getColor overAllStatus}}"><text style='color:#000; !important'>:</text> {{overAllStatus}}</span>
+        {{#ifnotEquals overAllStatus "Incomplete"}}
          <span class="progresslabel" style='width:35%'>Tescase Status</span>
          <span class="progress customprogress  progressLabelVal" style='width:53%'>
             <span class="progress-bar" role="progressbar" style="background-color:#28a745;width:{{pass}}%">
@@ -338,8 +349,7 @@
             </span>
          </span>
          <span class="progresslabel" style='width:120px;visibility:hidden;margin-left:20px;'>Progress</span>
-         <span class="progresslabel  progressLabelVal"
-            style="width:315px;float:right;position:relative;left:30px;top:-15px;font-size:12px;margin-left:20px;text-align:center !important;"><span
+         <span class="progresslabel  progressLabelVal progressBox"><span
                style="color:#28a745;" class='progVal'>Pass: {{pass}}%</span>&nbsp;&nbsp;<span style="color:#dc3545;"
                class='progVal'>Fail: {{fail}}%</span>&nbsp;&nbsp;<span style="color:#ffc107;"
                class='progVal'>Terminated: {{terminate}}%</span></span>
@@ -349,6 +359,7 @@
          <span class="progresslabel  progressLabelVal" style="width:35%;">: {{EndTime}}</span>
          <span class="progresslabel" style='width:35%'>Elapsed Time</span>
          <span class="progresslabel  progressLabelVal" style="width:35%;">: {{EllapsedTime}}</span>
+         {{/ifnotEquals}}
       </div>
    </div>
    {{/each}}
