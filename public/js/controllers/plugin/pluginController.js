@@ -209,15 +209,11 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	var isOpen = false;
 	$(document).on('click',".searchIcon", function(){
 		if(isOpen == false){
-			$(this).parents('.list-inline').children("li:first-child").hide();
-			$(this).parents('.list-inline').children("li:nth-child(2)").hide();
-			$(this).parent().find("input").show();
+		    $(this).parent().find("input").show();
 			$(this).css("border-radius","0px 7px 7px 0px");
 			isOpen = true;
 			$(".searchInput").focus();
 		} else {
-			$(this).parents('.list-inline').children("li:first-child").show();
-			$(this).parents('.list-inline').children("li:nth-child(2)").show();
 			$(this).parent().find("input").hide();
 			$(this).css("border-radius","7px 7px 7px 7px");
 			isOpen = false;
