@@ -310,6 +310,7 @@ input[type="radio"]{
 .heading-center-light {
     text-align: center;
     font-family: 'LatoWebLight';
+    text-transform: capitalize;
 }
 
 .heading-light {
@@ -3316,6 +3317,7 @@ li.select_all .addCustObj{
     width: 110px;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-transform: capitalize;
 }
 
 
