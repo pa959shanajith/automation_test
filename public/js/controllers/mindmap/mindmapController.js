@@ -303,6 +303,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     $scope.projectListChange = function(prjName) {
+        versionFlag = 0;
+        excelFlag = 0;
         $scope.projectNameO = prjName;
         $scope.projectName4 = $scope.projectNameO;
         $scope.projectName3 = $scope.projectNameO;
@@ -2565,6 +2567,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         else if (t == 'testcases') list = tcList;
         else return;
         iul.selectAll('li').remove();
+
+        var list = list.reduce((unique, o) => {
+            if(!unique.some(obj => obj.name === o.name)) {
+              unique.push(o);
+            }
+            return unique;
+        },[]);
+
         list.forEach(function(d, i) {
             var s = d.name.toLowerCase();
             if (s.lastIndexOf($scope.inpText.toLowerCase(), 0) === 0) {
@@ -2658,6 +2668,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     $scope.actionEvent = function($event) {
         $("#searchModule-assign").val("");
+        $("#pasteImg1").removeClass("active-map");
         e = $event;
         var selectedNodeTitle = $('.nodeBoxSelected').attr('title');
         if(isIE){
@@ -3456,7 +3467,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     $scope.exportData = function(versioning_status) {
         if (versionFlag != 1) {
-            openDialogMindmap("Fail", "Please select a module first");
+            openDialogMindmap("Fail", "Please select a module to proceed");
             return;
         }
         var data_not_exported = [];
