@@ -2567,6 +2567,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         else if (t == 'testcases') list = tcList;
         else return;
         iul.selectAll('li').remove();
+
+        var list = list.reduce((unique, o) => {
+            if(!unique.some(obj => obj.name === o.name)) {
+              unique.push(o);
+            }
+            return unique;
+        },[]);
+
         list.forEach(function(d, i) {
             var s = d.name.toLowerCase();
             if (s.lastIndexOf($scope.inpText.toLowerCase(), 0) === 0) {
