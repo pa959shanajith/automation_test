@@ -310,7 +310,6 @@ input[type="radio"]{
 .heading-center-light {
     text-align: center;
     font-family: 'LatoWebLight';
-    text-transform: capitalize;
 }
 
 .heading-light {
@@ -3317,7 +3316,6 @@ li.select_all .addCustObj{
     width: 110px;
     overflow: hidden;
     text-overflow: ellipsis;
-    text-transform: capitalize;
 }
 
 
@@ -6326,4 +6324,11 @@ h4.titleBadge
 {
     margin-top: -1px;
     padding-right: 6px;
+}
+
+.headerDrop{
+    margin-left: 18px;
+    text-decoration: none;
+    color: #333;
+    pointer-events: none;
 }
