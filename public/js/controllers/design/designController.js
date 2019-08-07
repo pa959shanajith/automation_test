@@ -4159,6 +4159,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	//save button clicked - save the testcase steps
 	$scope.updateTestCase_ICE = function (e) {
 		var task = JSON.parse(window.localStorage['_CT'])
+		localStorage['debug']=true;
 		if (task.reuse == 'True') {
 			//$("#reUsedTestcaseModal").find('.modal-title').text("");
 			$("#reUsedTestcaseModal").find('.modal-body p').text("Testcase is been reused. Are you sure you want to save ?").css('color', 'black');
@@ -4303,53 +4304,56 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						}*/
 									angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
 									openDialog("Save Testcase", "Testcase saved successfully")
-									var screenId = taskInfo.screenId;
-									var screenName = angular.element(document.getElementById("left-nav-section")).scope().screenName;
-									var projectId = taskInfo.projectId;
-									var userinfo = JSON.parse(window.localStorage['_UI']);
-									scrapeObject = {};
-									if(localStorage['_modified'])
-									{
-										data1=JSON.parse(localStorage['_modified'])
-										for(i=0;i<scrape_data.view.length;i++){
-											if(scrape_data.view[i].custname in data1){
-												scrape_data.view[i].xpath=data1[scrape_data.view[i].custname]
-											}
-										} 
+									if(taskInfo.appType.toLowerCase()=="web" && 'debug' in localStorage && localStorage['debug'] == "true"){
+										var screenId = taskInfo.screenId;
+										var screenName = angular.element(document.getElementById("left-nav-section")).scope().screenName;
+										var projectId = taskInfo.projectId;
+										var userinfo = JSON.parse(window.localStorage['_UI']);
+										scrapeObject = {};
+										if(localStorage['_modified'])
+										{
+											data1=JSON.parse(localStorage['_modified'])
+											for(i=0;i<scrape_data.view.length;i++){
+												if(scrape_data.view[i].custname in data1){
+													scrape_data.view[i].xpath=data1[scrape_data.view[i].custname]
+												}
+											} 
+										}
+										scrapeObject.getScrapeData = JSON.stringify(scrape_data);
+										scrapeObject.projectId = projectId;
+										scrapeObject.screenId = screenId;
+										scrapeObject.screenName = screenName;
+										scrapeObject.userinfo = userinfo;
+										scrapeObject.param = "updateScrapeData_ICE";
+										scrapeObject.appType = taskInfo.appType;
+										scrapeObject.versionnumber = taskInfo.versionnumber;
+										scrapeObject.newData = viewString;
+										if(deleteObjectsFlag==true){
+											scrapeObject.type = "delete";
+											deleteObjectsFlag = false;
+										}
+										else
+											scrapeObject.type = "save";
+										//Update Service to Save Scrape Objects
+										DesignServices.updateScreen_ICE(scrapeObject)
+											.then(function (data1) {
+												if (data1 == "Invalid Session") {
+													return $rootScope.redirectPage();
+												}
+												if (data1 == "success") {
+													openDialog("Save Testcase", "Testcase saved successfully.");
+													localStorage.removeItem('debug');
+													//$("#WSSaveSuccess").modal("show");
+													$("#enbledWS").prop("checked", false)
+													angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
+												} else {
+													openDialog("Save Testcase", "Failed to save Testcase.");
+													//$("#WSSaveFail").modal("show")
+												}
+											}, function (error) {
+												console.log("Error")
+											})
 									}
-									scrapeObject.getScrapeData = JSON.stringify(scrape_data);
-									scrapeObject.projectId = projectId;
-									scrapeObject.screenId = screenId;
-									scrapeObject.screenName = screenName;
-									scrapeObject.userinfo = userinfo;
-									scrapeObject.param = "updateScrapeData_ICE";
-									scrapeObject.appType = taskInfo.appType;
-									scrapeObject.versionnumber = taskInfo.versionnumber;
-									scrapeObject.newData = viewString;
-									if(deleteObjectsFlag==true){
-										scrapeObject.type = "delete";
-										deleteObjectsFlag = false;
-									}
-									else
-										scrapeObject.type = "save";
-									//Update Service to Save Scrape Objects
-									DesignServices.updateScreen_ICE(scrapeObject)
-										.then(function (data1) {
-											if (data1 == "Invalid Session") {
-												return $rootScope.redirectPage();
-											}
-											if (data1 == "success") {
-												openDialog("Save Testcase", "Testcase saved successfully.");
-												//$("#WSSaveSuccess").modal("show");
-												$("#enbledWS").prop("checked", false)
-												angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
-											} else {
-												openDialog("Save Testcase", "Failed to save Testcase.");
-												//$("#WSSaveFail").modal("show")
-											}
-										}, function (error) {
-											console.log("Error")
-										})
 									//Transaction Activity for SaveTestcase Button Action
 									// var labelArr = [];
 									// var infoArr = [];
