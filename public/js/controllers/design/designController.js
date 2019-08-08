@@ -3116,6 +3116,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			$("#userObjContainer").empty();
 			$("#addObjContainer").empty();					
 			$("#addMoreObject").attr("style","display:block");
+			$("#dialog-userObject").find("#rubmitObjRow").attr("disabled","disabled")
 			if ($(".addObj-row").length > 1) $(".addObj-row").remove()
 			$("#userObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a" typeOfElement="lnk">Link</option><option value="input" typeOfElement="txtbox">Textbox/Textarea</option><option value="table" typeOfElement="tbl">Table</option><option value="list" typeOfElement="lst">List</option><option value="select" typeOfElement="select">Dropdown</option><option value="img" typeOfElement="img">Image</option><option value="button" typeOfElement="btn";>Button</option><option value="radiobutton" typeOfElement="radiobtn">Radiobutton</option><option value="checkbox" typeOfElement="chkbox">Checkbox</option><option value="Element" typeOfElement="elmnt">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /><img class="addMoreObjRow" ng-click="addMoreUserObject()" src="imgs/ic-add.png"><div class="propertiesTab"><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter URL" id="url"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter name" id="name"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Relative xpath" id="rpath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Absolute xpath" id="apath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter class name" id="classname"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter ID" id="id"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Query Selector" id="selector"><button class="btn btn-defaultsave" id="saveProperties" ng-click="saveProp()">Save</button></div></div><img class="editAddObjRow" src="imgs/ic-jq-editstep.png" /></div>')
 		
@@ -3221,7 +3222,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					obj=JSON.parse(localStorage['_cust'])
 					obj[custObjNames]={url:data.url,xpath:data.xpath}
 					localStorage["_cust"]=JSON.stringify(obj)
-					ele.find(".propertiesTab").hide();			
+					ele.find(".propertiesTab").hide();
+					if($('.btn-defaultsave').is("visible") == false)
+					{
+						$("#dialog-userObject").find("#rubmitObjRow").removeAttr("disabled")
+					}
 				}
 			}, function (error) { });
 		});
@@ -3267,6 +3272,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	$(document).on("click",".addMoreObjRow", function(){
 		$(this).parent().children('.addMoreObjRow').hide();
 		$("#userObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a" typeOfElement="lnk">Link</option><option value="input" typeOfElement="txtbox">Textbox/Textarea</option><option value="table" typeOfElement="tbl">Table</option><option value="list" typeOfElement="lst">List</option><option value="select" typeOfElement="select">Dropdown</option><option value="img" typeOfElement="img">Image</option><option value="button" typeOfElement="btn";>Button</option><option value="radiobutton" typeOfElement="radiobtn">Radiobutton</option><option value="checkbox" typeOfElement="chkbox">Checkbox</option><option value="Element" typeOfElement="elmnt">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /><div class="propertiesTab"><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter URL" id="url"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter name" id="name"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Relative xpath" id="rpath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Absolute xpath" id="apath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter class name" id="classname"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter ID" id="id"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Query Selector" id="selector"><button class="btn btn-defaultsave" id="saveProperties" ng-click="saveProp()">Save</button></div></div><img class="editAddObjRow" src="imgs/ic-jq-editstep.png" /><img class="addMoreObjRow" ng-click="addMoreObject()" src="imgs/ic-add.png"></div>')
+		$("#dialog-userObject").find("#rubmitObjRow").attr("disabled","disabled")
 	});
 	//Add More User Object Functionality
 	
@@ -3348,7 +3354,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				//		 }
 				//	 }
 				// }find("span.ellipsis").text()
-				var typeOfElement=$(this).offsetParent().find('select option:selected').attr('typeofelement');
+				var typeOfElement=$(this).find('select option:selected').attr('typeofelement');
 				if (viewString.view != undefined && viewString.view.length != undefined) {
 					scrapeObjList={}
 					for (var i = 0; i < viewString.view.length; i++) {
@@ -4303,53 +4309,55 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						}*/
 									angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
 									openDialog("Save Testcase", "Testcase saved successfully")
-									var screenId = taskInfo.screenId;
-									var screenName = angular.element(document.getElementById("left-nav-section")).scope().screenName;
-									var projectId = taskInfo.projectId;
-									var userinfo = JSON.parse(window.localStorage['_UI']);
-									scrapeObject = {};
-									if(localStorage['_modified'])
-									{
-										data1=JSON.parse(localStorage['_modified'])
-										for(i=0;i<scrape_data.view.length;i++){
-											if(scrape_data.view[i].custname in data1){
-												scrape_data.view[i].xpath=data1[scrape_data.view[i].custname]
-											}
-										} 
+									if(taskInfo.appType.toLowerCase()=="web" && '_modified' in localStorage && localStorage['_modified'] != ""){
+										var screenId = taskInfo.screenId;
+										var screenName = angular.element(document.getElementById("left-nav-section")).scope().screenName;
+										var projectId = taskInfo.projectId;
+										var userinfo = JSON.parse(window.localStorage['_UI']);
+										scrapeObject = {};
+										if(localStorage['_modified'])
+										{
+											data1=JSON.parse(localStorage['_modified'])
+											for(i=0;i<scrape_data.view.length;i++){
+												if(scrape_data.view[i].custname in data1){
+													scrape_data.view[i].xpath=data1[scrape_data.view[i].custname]
+												}
+											} 
+										}
+										scrapeObject.getScrapeData = JSON.stringify(scrape_data);
+										scrapeObject.projectId = projectId;
+										scrapeObject.screenId = screenId;
+										scrapeObject.screenName = screenName;
+										scrapeObject.userinfo = userinfo;
+										scrapeObject.param = "updateScrapeData_ICE";
+										scrapeObject.appType = taskInfo.appType;
+										scrapeObject.versionnumber = taskInfo.versionnumber;
+										scrapeObject.newData = viewString;
+										if(deleteObjectsFlag==true){
+											scrapeObject.type = "delete";
+											deleteObjectsFlag = false;
+										}
+										else
+											scrapeObject.type = "save";
+										//Update Service to Save Scrape Objects
+										DesignServices.updateScreen_ICE(scrapeObject)
+											.then(function (data1) {
+												if (data1 == "Invalid Session") {
+													return $rootScope.redirectPage();
+												}
+												if (data1 == "success") {
+													openDialog("Save Testcase", "Testcase saved successfully.");
+													//$("#WSSaveSuccess").modal("show");
+													$("#enbledWS").prop("checked", false)
+													angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
+												} else {
+													openDialog("Save Testcase", "Failed to save Testcase.");
+													//$("#WSSaveFail").modal("show")
+												}
+											}, function (error) {
+												console.log("Error")
+											})
 									}
-									scrapeObject.getScrapeData = JSON.stringify(scrape_data);
-									scrapeObject.projectId = projectId;
-									scrapeObject.screenId = screenId;
-									scrapeObject.screenName = screenName;
-									scrapeObject.userinfo = userinfo;
-									scrapeObject.param = "updateScrapeData_ICE";
-									scrapeObject.appType = taskInfo.appType;
-									scrapeObject.versionnumber = taskInfo.versionnumber;
-									scrapeObject.newData = viewString;
-									if(deleteObjectsFlag==true){
-										scrapeObject.type = "delete";
-										deleteObjectsFlag = false;
-									}
-									else
-										scrapeObject.type = "save";
-									//Update Service to Save Scrape Objects
-									DesignServices.updateScreen_ICE(scrapeObject)
-										.then(function (data1) {
-											if (data1 == "Invalid Session") {
-												return $rootScope.redirectPage();
-											}
-											if (data1 == "success") {
-												openDialog("Save Testcase", "Testcase saved successfully.");
-												//$("#WSSaveSuccess").modal("show");
-												$("#enbledWS").prop("checked", false)
-												angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
-											} else {
-												openDialog("Save Testcase", "Failed to save Testcase.");
-												//$("#WSSaveFail").modal("show")
-											}
-										}, function (error) {
-											console.log("Error")
-										})
 									//Transaction Activity for SaveTestcase Button Action
 									// var labelArr = [];
 									// var infoArr = [];
