@@ -121,11 +121,11 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 									}
 								dataobj = JSON.stringify(dataobj);
 									if(status == 'review'){
-										$('.plugin-taks-listing.review').append("<div class='panel panel-default' panel-id='"+i+"'><div id='panelBlock_"+i+"' class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+" taskRedir'>"+ counterreview +"</h4><span class='assignedTask' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><img style='height: 20px;' src='"+taskTypeIcon+"'/><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
+										$('.plugin-taks-listing.review').append("<div class='panel panel-default' panel-id='"+i+"'><div id='panelBlock_"+i+"' class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+" taskRedir'>"+ counterreview +"</h4><span class='assignedTask' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
 										counterreview++;
 									}
 									else{
-										$('.plugin-taks-listing.todo').append("<div class='panel panel-default' panel-id='"+i+"'><div id='panelBlock_"+i+"' class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+" taskRedir'>"+ countertodo +"</h4><span class='assignedTask' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><img style='height: 20px;' src='"+taskTypeIcon+"'/><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();										
+										$('.plugin-taks-listing.todo').append("<div class='panel panel-default' panel-id='"+i+"'><div id='panelBlock_"+i+"' class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+" taskRedir'>"+ countertodo +"</h4><span class='assignedTask' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
 										countertodo++;
 									}									
 									 var limit = 45;
@@ -209,15 +209,11 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	var isOpen = false;
 	$(document).on('click',".searchIcon", function(){
 		if(isOpen == false){
-			$(this).parents('.list-inline').children("li:first-child").hide();
-			$(this).parents('.list-inline').children("li:nth-child(2)").hide();
-			$(this).parent().find("input").show();
+		    $(this).parent().find("input").show();
 			$(this).css("border-radius","0px 7px 7px 0px");
 			isOpen = true;
 			$(".searchInput").focus();
 		} else {
-			$(this).parents('.list-inline').children("li:first-child").show();
-			$(this).parents('.list-inline').children("li:nth-child(2)").show();
 			$(this).parent().find("input").hide();
 			$(this).css("border-radius","7px 7px 7px 7px");
 			isOpen = false;
@@ -424,11 +420,11 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 				dataobj = JSON.stringify(dataobj);
 				if(passFilterTest(tasksJson[i],0)){
 					if(status == 'review'){
-						$('.plugin-taks-listing.review').append("<div class='panel panel-default' panel-id='"+i+"'><div class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+"' class='taskRedir'>"+ counterreview +"</h4><span class='assignedTask' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><img style='height: 20px;' src='"+taskTypeIcon+"'/><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
+						$('.plugin-taks-listing.review').append("<div class='panel panel-default' panel-id='"+i+"'><div class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+"' class='taskRedir'>"+ counterreview +"</h4><span class='assignedTask' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
 						counterreview++;
 					}
 					else{
-						$('.plugin-taks-listing.todo').append("<div class='panel panel-default' panel-id='"+i+"'><div class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+"' class='taskRedir'>"+ countertodo +"</h4><span class='assignedTask' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><img style='height: 20px;' src='"+taskTypeIcon+"'/><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
+						$('.plugin-taks-listing.todo').append("<div class='panel panel-default' panel-id='"+i+"'><div class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+"' class='taskRedir'>"+ countertodo +"</h4><span class='assignedTask' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
 						countertodo++;
 					}
 					counter++;
