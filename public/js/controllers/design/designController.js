@@ -3116,6 +3116,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			$("#userObjContainer").empty();
 			$("#addObjContainer").empty();					
 			$("#addMoreObject").attr("style","display:block");
+			$("#dialog-userObject").find("#rubmitObjRow").attr("disabled","disabled")
 			if ($(".addObj-row").length > 1) $(".addObj-row").remove()
 			$("#userObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a" typeOfElement="lnk">Link</option><option value="input" typeOfElement="txtbox">Textbox/Textarea</option><option value="table" typeOfElement="tbl">Table</option><option value="list" typeOfElement="lst">List</option><option value="select" typeOfElement="select">Dropdown</option><option value="img" typeOfElement="img">Image</option><option value="button" typeOfElement="btn";>Button</option><option value="radiobutton" typeOfElement="radiobtn">Radiobutton</option><option value="checkbox" typeOfElement="chkbox">Checkbox</option><option value="Element" typeOfElement="elmnt">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /><img class="addMoreObjRow" ng-click="addMoreUserObject()" src="imgs/ic-add.png"><div class="propertiesTab"><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter URL" id="url"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter name" id="name"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Relative xpath" id="rpath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Absolute xpath" id="apath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter class name" id="classname"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter ID" id="id"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Query Selector" id="selector"><button class="btn btn-defaultsave" id="saveProperties" ng-click="saveProp()">Save</button></div></div><img class="editAddObjRow" src="imgs/ic-jq-editstep.png" /></div>')
 		
@@ -3221,7 +3222,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					obj=JSON.parse(localStorage['_cust'])
 					obj[custObjNames]={url:data.url,xpath:data.xpath}
 					localStorage["_cust"]=JSON.stringify(obj)
-					ele.find(".propertiesTab").hide();			
+					ele.find(".propertiesTab").hide();
+					if($('.btn-defaultsave').is("visible") == false)
+					{
+						$("#dialog-userObject").find("#rubmitObjRow").removeAttr("disabled")
+					}
 				}
 			}, function (error) { });
 		});
