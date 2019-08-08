@@ -3272,6 +3272,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	$(document).on("click",".addMoreObjRow", function(){
 		$(this).parent().children('.addMoreObjRow').hide();
 		$("#userObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a" typeOfElement="lnk">Link</option><option value="input" typeOfElement="txtbox">Textbox/Textarea</option><option value="table" typeOfElement="tbl">Table</option><option value="list" typeOfElement="lst">List</option><option value="select" typeOfElement="select">Dropdown</option><option value="img" typeOfElement="img">Image</option><option value="button" typeOfElement="btn";>Button</option><option value="radiobutton" typeOfElement="radiobtn">Radiobutton</option><option value="checkbox" typeOfElement="chkbox">Checkbox</option><option value="Element" typeOfElement="elmnt">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /><div class="propertiesTab"><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter URL" id="url"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter name" id="name"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Relative xpath" id="rpath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Absolute xpath" id="apath"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter class name" id="classname"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter ID" id="id"></div><div class="form-group"><input type="text" class="form-control form-control-custom-prop" placeholder="Enter Query Selector" id="selector"><button class="btn btn-defaultsave" id="saveProperties" ng-click="saveProp()">Save</button></div></div><img class="editAddObjRow" src="imgs/ic-jq-editstep.png" /><img class="addMoreObjRow" ng-click="addMoreObject()" src="imgs/ic-add.png"></div>')
+		$("#dialog-userObject").find("#rubmitObjRow").attr("disabled","disabled")
 	});
 	//Add More User Object Functionality
 	
@@ -4164,7 +4165,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	//save button clicked - save the testcase steps
 	$scope.updateTestCase_ICE = function (e) {
 		var task = JSON.parse(window.localStorage['_CT'])
-		localStorage['debug']=true;
 		if (task.reuse == 'True') {
 			//$("#reUsedTestcaseModal").find('.modal-title').text("");
 			$("#reUsedTestcaseModal").find('.modal-body p').text("Testcase is been reused. Are you sure you want to save ?").css('color', 'black');
@@ -4309,7 +4309,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						}*/
 									angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
 									openDialog("Save Testcase", "Testcase saved successfully")
-									if(taskInfo.appType.toLowerCase()=="web" && 'debug' in localStorage && localStorage['debug'] == "true"){
+									if(taskInfo.appType.toLowerCase()=="web" && '_modified' in localStorage && localStorage['_modified'] != ""){
 										var screenId = taskInfo.screenId;
 										var screenName = angular.element(document.getElementById("left-nav-section")).scope().screenName;
 										var projectId = taskInfo.projectId;
@@ -4347,7 +4347,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 												}
 												if (data1 == "success") {
 													openDialog("Save Testcase", "Testcase saved successfully.");
-													localStorage.removeItem('debug');
 													//$("#WSSaveSuccess").modal("show");
 													$("#enbledWS").prop("checked", false)
 													angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
