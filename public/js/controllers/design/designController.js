@@ -3348,7 +3348,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				//		 }
 				//	 }
 				// }find("span.ellipsis").text()
-				var typeOfElement=$(this).offsetParent().find('select option:selected').attr('typeofelement');
+				var typeOfElement=$(this).find('select option:selected').attr('typeofelement');
 				if (viewString.view != undefined && viewString.view.length != undefined) {
 					scrapeObjList={}
 					for (var i = 0; i < viewString.view.length; i++) {
