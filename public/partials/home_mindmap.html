@@ -66,7 +66,7 @@
                <input type="text" class="makeElementFloatleft" id="eteSearchModules"  ng-keyup = "searchModule('eteSearchModules')" placeholder="Search modules" /><img alt="Search Icon" class="searchModuleimg" src="imgs/ic-search-icon.png" >
                <span class="eteLabel makeElementFloatleft no-disp">End to End Modules</span>
             </div>
-            <div class="scrollbar-inner endtoend-modules-left-lower makeElementFloatleft" style="overflow-y:hidden !important" id="etemModuleContainer">
+            <div class="scrollbar-inner endtoend-modules-left-lower makeElementFloatleft" style="overflow-y:auto !important" id="etemModuleContainer">
                 <span class="moduleContainer" ng-repeat="map in allMMaps" ng-click="loadEndToEnd($index,map.type,map.name)" data-mapid="{{$index}}" title="{{map.name}}">
                     <img class="ct-nodeIcon eteMbox" src="imgs/node-{{map.type}}.png" alt="Module" aria-hidden="true">
                     <span class="ct-nodeLabel ct-node-e2e" style="width: 120px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 20px;">{{map.name}}</span>
