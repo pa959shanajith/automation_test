@@ -12,6 +12,7 @@ function unblockUI() {
 //Anonymous function(for IE)
 setTimeout((function() {
     return function() {
+        blockUI('Loading Reports.. Please Wait..');
         loadReports();
         try {
             window.stop();
@@ -24,16 +25,26 @@ setTimeout((function() {
 
 function loadReports() {
     setTimeout(function() {
+        var headerHeight =  $('.hearderCon').height();
+        var collapsibleHeight =  $('.collapsible').height();
+        var resultSummaryHeight = $('.resultSummary').height();
+        var resultSummaryBoxHeight = $('.resultSummaryBox').height();
+        var remainingHeight = headerHeight + collapsibleHeight  + resultSummaryHeight + resultSummaryBoxHeight;
+        var windowHeight = $( window ).height();
+        var  scrollBodyHeight = windowHeight - remainingHeight;
             var calcDataTableHeight = function() {
-                if($('button.collapsible').hasClass('active') == true)
-                {
-                    return $(window).height() - 300;
-                }
-                else{
-                    return $(window).height() /2;
-                }
+                    return scrollBodyHeight - 100;
               };  
-              
+        
+        var overallStatus = $('.overallStatusVal').text();
+        if(overallStatus.indexOf('Incomplete') != '-1')
+        {
+            $('.toggleIncompleteStatus').hide();
+        }
+        else
+        {
+            $('.toggleIncompleteStatus').show();
+        }
     
         //Datatable
          var oTable =  $('#specificReportDataTable').DataTable({
@@ -45,7 +56,7 @@ function loadReports() {
                 "bFilter": false,
                 "bLengthChange": false,
                 "bInfo": false,
-                "scrollY": calcDataTableHeight(),
+                "scrollY": calcDataTableHeight,
                 "scrollCollapse": true,
                 "scrollX": true,
                 "paging": false,
@@ -70,6 +81,10 @@ function loadReports() {
                         var name = getRows[i].children[2].innerHTML;
                         var rowCount = 0;
                         var getParentId;
+                        if($(getRows[i]).children('td.rDstatus.tabCont.openscreenshot').attr('data-screenshot') == '')
+                        {
+                            $(getRows[i]).children('td.rDstatus.tabCont.openscreenshot').css('text-decoration','none').addClass('noScreenshot');
+                        }
                         if($(getRows[i]).children().children().hasClass('openscreenshot') == true)
                         {
                             var screenshot =  $(getRows[i]).children().find('.openscreenshot').attr('data-screenshot');
@@ -82,6 +97,7 @@ function loadReports() {
                             getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -110px;"></i>';
                         }
                     }
+                    unblockUI();
                 }
             });    
         var remarksLength = parseInt($('.remarksLength').text());
@@ -128,20 +144,36 @@ function loadReports() {
                 });
             }
         })
+        function calcTableHeight(flag)
+        {
+            var windowHeight = $( window ).height();
+            var headerHeight =  $('.hearderCon').height();
+            var collapsibleHeight =  $('.collapsible').height();
+            var resultSummaryHeight = $('.resultSummary').height();
+            var resultSummaryBoxHeight = $('.resultSummaryBox').height();
+            if(flag == 'active')
+            {
+                var remainingHeight = headerHeight + collapsibleHeight  + resultSummaryHeight;
+            }
+            else{
+                var remainingHeight = headerHeight + collapsibleHeight  + resultSummaryHeight  + resultSummaryBoxHeight;
+            }
+
+            var  scrollBodyHeight = windowHeight - remainingHeight - 100;
+            $('.dataTables_scrollBody').css('max-height', scrollBodyHeight);
+        }
         $(document).on('click', '.collapsible', function() {
             if ($(this).hasClass('active') == true) {
                 $(this).children('span').children('span.arrow-down').removeClass('arrow-down').addClass('arrow-up');
-                // $('.maintabCont_collapse:visible').addClass('mainTabContCollapsed');
-                // $('.maintabCont_collapse').addClass('responsiveHeight_collapsed');
-                // $('.maintabCont_collapse').removeClass('responsiveHeight');
                 $(".resultSummaryBox").addClass('hide');
+                var flag = 'active'
+                calcTableHeight(flag);
                
             } else {
-                // $('.maintabCont_collapse').addClass('responsiveHeight');
-                // $('.maintabCont_collapse').removeClass('responsiveHeight_collapsed');
                 $(this).children('span').children('span.arrow-up').removeClass('arrow-up').addClass('arrow-down');
                 $(".resultSummaryBox").removeClass('hide');
-                // $('.maintabCont_collapse:visible').removeClass('mainTabContCollapsed');
+                var flag = 'inactive'
+                calcTableHeight(flag);
             }   
             $('.maintabCont_collapse').css('display','block');
         });

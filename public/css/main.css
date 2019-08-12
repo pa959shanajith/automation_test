@@ -1261,7 +1261,7 @@ input[disabled]{
 .launchWSDL:focus,
 .launchWSDL:hover {
     position: absolute;
-    top: 10px;
+    top: 11px;
     right: 515px;
     border-radius: 0px 5px 5px 0px;
     font-size: 14px;
@@ -6368,4 +6368,10 @@ h4.titleBadge
 {
     margin-top: -1px;
     padding-right: 6px;
+}
+
+.headerDrop{
+    text-decoration: none;
+    color: #333;
+    pointer-events: none;
 }

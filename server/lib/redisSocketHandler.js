@@ -138,7 +138,7 @@ module.exports.redisSubServer = server_sub;
 module.exports.initListeners = function(mySocket){
 	var username = mySocket.handshake.query.username;
 	logger.debug("Initializing ICE Engine connection for %s",username);
-	/*mySocket.evdata = {};
+	mySocket.evdata = {};
 
 	mySocket.use(function paginator(args, cb) {
 		var ev = args[0];
@@ -175,11 +175,10 @@ module.exports.initListeners = function(mySocket){
 					}
 				}
 			} else {
-				console.log("packet #"+index+" received");
 				mySocket.evdata[ev].data[parseInt(index)] = payload;
 			}
 		} else if (!validator.isUUID(id)) cb();
-	});*/
+	});
 
 	mySocket.on("message", function (value) { console.log("\n\n\nOn Message:",value); });
 

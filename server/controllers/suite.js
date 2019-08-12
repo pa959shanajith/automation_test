@@ -2349,8 +2349,9 @@ exports.testSuitesScheduler_ICE = function (req, res) {
 function testSuitesScheduler_ICE_cb (req, res) {
 	if(req.body.chkType == "schedule"){			
 		var modInfo = req.body.moduleInfo;
+		var exc_action = req.body.action;
 		logger.info("Calling function scheduleTestSuite from testSuitesScheduler_ICE");
-		scheduleTestSuite(modInfo, req, function (err, schedulecallback) {
+		scheduleTestSuite(modInfo,exc_action, req, function (err, schedulecallback) {
 			try {
 				logger.info("TestSuite Scheduled successfully");
 				res.send(schedulecallback);
@@ -2388,9 +2389,10 @@ function testSuitesScheduler_ICE_cb (req, res) {
 };
 
 //Schedule Testsuite normal and when server restart
-function scheduleTestSuite(modInfo, req, schedcallback) {
+function scheduleTestSuite(modInfo, exc_action, req, schedcallback) {
 	logger.info("Inside scheduleTestSuite function");
 	var schedulingData = modInfo;
+	var action = exc_action;
 	var schDate, schTime, cycleId, scheduleId, clientIp, scenarioDetails;
 	var browserList, testSuiteId, testsuitename;
 	var doneFlag = 0;
@@ -2449,7 +2451,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 						try {
 							var scheduledjob = schedule.scheduleJob(sessObj, obj, function () {
 								logger.info("Calling function executeScheduling from scheduleTestSuite");
-								executeScheduling(sessObj, schedulingData, req);
+								executeScheduling(sessObj, action, schedulingData, req);
 							});
 							counter++;
 							Callback();
@@ -2510,7 +2512,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 	});
 
 	//Executing test suites on scheduled time
-	function executeScheduling(sessObj, schedulingData, req) {
+	function executeScheduling(sessObj, action, schedulingData, req) {
 		logger.info("Inside executeScheduling function");
 		var inputs = {
 			"cycleid": sessObj.split(";")[0],
@@ -2554,6 +2556,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 						var listofscenarioandtestcases = [];
 						var appType;
 						var executionRequest = {
+							"exec_mode" : action,
 							"executionId": "",
 							"suitedetails": [],
 							"testsuiteIds": []
