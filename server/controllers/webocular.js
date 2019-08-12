@@ -14,6 +14,7 @@ exports.getCrawlResults = function (req, res) {
 			var level = req.body.level;
 			var agent = req.body.agent;
 			var proxy = req.body.proxy;
+			var searchData = req.body.searchData;
 			var validate_agent = validator.isAlpha(agent);
 			var validate_level = !(validator.isEmpty(level.toString()));
 			//var validate_url = validator.isURL(req.body.url);
@@ -27,7 +28,7 @@ exports.getCrawlResults = function (req, res) {
 			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres) {
 				if (redisres[1]>0) {
 					logger.info("Sending socket request for webCrawlerGo to redis");
-					var dataToIce = {"emitAction": "webCrawlerGo", "username": name, "input_url": url, "level": level, "agent":agent, "proxy": proxy};
+					var dataToIce = {"emitAction": "webCrawlerGo", "username": name, "input_url": url, "level": level, "agent":agent, "proxy": proxy,"searchData":searchData};
 					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					var notifySocMap = myserver.socketMapNotify;
 					var mySocketUIMap = myserver.allSocketsMapUI;

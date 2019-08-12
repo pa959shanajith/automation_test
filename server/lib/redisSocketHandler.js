@@ -21,7 +21,7 @@ default_sub.on("message", function (channel, message) {
 		mySocket = sockets.allSocketsMap[data.username];
 	switch (data.emitAction) {
 	case "webCrawlerGo":
-		mySocket.emit("webCrawlerGo", data.input_url, data.level, data.agent, data.proxy);
+		mySocket.emit("webCrawlerGo", data.input_url, data.level, data.agent, data.proxy,data.searchData);
 		break;
 
 	case "LAUNCH_DESKTOP":
