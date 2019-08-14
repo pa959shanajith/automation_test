@@ -57,7 +57,7 @@
 				<form name="webocular_form">
 					<div>
 						<span><b>Name </b> </span>
-						<input id="moduleName" type="text" class="urlInput" placeholder="Enter the Crawl name" required>
+						<input id="moduleName" ng-model="modulename" type="text" class="urlInput" placeholder="Enter the Crawl name" required>
 						<button ng-if="enableGenerate" style="padding: 2px 25px" class="btn btn-md pull-right pairwise-GenBtn" ng-click="generateGraph($event)" title="Generate">Generate</button>
 					</div>	
 					<div>

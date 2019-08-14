@@ -45,6 +45,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 	$scope.url = "http://";
 	$scope.tab = "webocularHome"
 	$scope.searchData={"text":"","image":""};
+	$scope.modulename=""
 	$scope.proxy = $scope.tprxy = {enable: false, url: "", username: "", password: ""};
 	$scope.showWebocularHome = function(){
 		$scope.tab="webocularHome";
@@ -81,7 +82,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 	};
 
 	$scope.executeGo = function($event){
-		if($('#moduleName').val() == "")
+		if($scope.modulename == "")
 		{
 			openDialog("Error", "Crawl Name cannot be empty.");
 			return;
@@ -985,8 +986,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
 	};
 	$scope.saveReport = function($event){
-		$("#moduleName").val();
-		webocularServices.saveResults($scope.url, $scope.level, $scope.selectedAgent, $scope.proxy,$scope.crawledLinks, $("#moduleName").val())
+		webocularServices.saveResults($scope.url, $scope.level, $scope.selectedAgent, $scope.proxy, $scope.crawledLinks, $scope.searchData, $scope.modulename)
 		.then(function (data) {
 			if (data == "success"){
 				openDialog("","Successfully saved the report");
