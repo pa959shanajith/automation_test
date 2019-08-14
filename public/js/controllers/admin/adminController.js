@@ -1957,7 +1957,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				$("#password").addClass("inputErrorBorder");
 				flag = false;
 			} else if (!regexPassword.test(this.passWord)) {
-				if (!popupOpen) openModalPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
+				if (!popupOpen) openModalPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 16 characters..");
 				popupOpen = true;
 				$("#password").addClass("inputErrorBorder");
 				flag = false;
@@ -1966,7 +1966,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				$("#confirmPassword").addClass("inputErrorBorder");
 				flag = false;
 			} else if (!regexPassword.test(this.confirmPassword)) {
-				if (!popupOpen) openModalPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
+				if (!popupOpen) openModalPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 16 characters..");
 				popupOpen = true;
 				$("#confirmPassword").addClass("inputErrorBorder");
 				flag = false;

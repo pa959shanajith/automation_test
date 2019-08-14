@@ -603,4 +603,8 @@ img
 {
     cursor: pointer;
 }
+#passwordValidation
+{
+    font-size: 14px;
+}
   /************ Modal Popup *************/

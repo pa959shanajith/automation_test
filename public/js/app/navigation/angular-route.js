@@ -12,7 +12,8 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                     return $ocLazyLoad.load([
 						'js/directives/headerDirective.js',				
 						'js/controllers/login/baseController.js',
-						'js/controllers/login/loginService.js'
+						'js/controllers/login/loginService.js',
+						'js/controllers/admin/adminService.js'
                     ]);
                 }]
             }
@@ -44,7 +45,8 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/controllers/login/loginService.js',
 						'js/controllers/header/headerController.js',
 						'js/controllers/plugin/pluginController.js',
-						'js/controllers/plugin/pluginService.js'
+						'js/controllers/plugin/pluginService.js',
+						'js/controllers/admin/adminService.js'
                     ]);
                 }]
             }
@@ -68,7 +70,8 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/controllers/login/loginService.js',
 						'js/controllers/header/headerController.js',
 						'js/controllers/mindmap/mindmapController.js',
-						'js/controllers/mindmap/mindmapService.js'
+						'js/controllers/mindmap/mindmapService.js',
+						'js/controllers/admin/adminService.js'
                     ]);
                 }]
             }
@@ -90,7 +93,8 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/controllers/login/loginService.js',												
 						'js/controllers/header/headerController.js',
 						'js/controllers/flowGraph/flowGraphController.js',
-						'js/controllers/flowGraph/flowGraphService.js'
+						'js/controllers/flowGraph/flowGraphService.js',
+						'js/controllers/admin/adminService.js'
                     ]);
                 }]
             }
@@ -138,7 +142,8 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/controllers/header/headerController.js',
 						'js/controllers/mindmap/mindmapService.js',						
 						'js/controllers/design/designController.js',
-						'js/controllers/design/designService.js'
+						'js/controllers/design/designService.js',
+						'js/controllers/admin/adminService.js'
                     ]);
                 }]
             }
@@ -164,7 +169,8 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/controllers/header/headerController.js',
 						'js/controllers/mindmap/mindmapService.js',
 						'js/controllers/design/designController.js',
-						'js/controllers/design/designService.js'
+						'js/controllers/design/designService.js',
+						'js/controllers/admin/adminService.js'
                     ]);
                 }]
             }
@@ -186,7 +192,8 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/controllers/mindmap/mindmapService.js',
 						'js/controllers/execution/executionController.js',
 						'js/controllers/execution/executionService.js',
-						'js/controllers/design/designService.js'
+						'js/controllers/design/designService.js',
+						'js/controllers/admin/adminService.js'
                     ]);
                 }]
             }
@@ -208,7 +215,8 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/controllers/login/loginService.js',						
 						'js/controllers/header/headerController.js',
 						'js/controllers/webocular/webocularController.js',
-						'js/controllers/webocular/webocularService.js'
+						'js/controllers/webocular/webocularService.js',
+						'js/controllers/admin/adminService.js'
                     ]);
                 }]
             }
@@ -228,7 +236,8 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/controllers/login/loginService.js',						
 						'js/controllers/header/headerController.js',
 						'js/controllers/qualityCenter/qcController.js',
-						'js/controllers/qualityCenter/qcService.js'
+						'js/controllers/qualityCenter/qcService.js',
+						'js/controllers/admin/adminService.js'
                     ]);
                 }]
             }
@@ -247,7 +256,8 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/controllers/login/loginService.js',						
 						'js/controllers/header/headerController.js',
 						'js/controllers/utility/utilityController.js',
-						'js/controllers/utility/utilityService.js'
+						'js/controllers/utility/utilityService.js',
+						'js/controllers/admin/adminService.js'
                     ]);
                 }]
             }
@@ -268,7 +278,8 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						//'js/controllers/header/headerController.js',
 						'js/controllers/mindmap/mindmapService.js',
 						'js/controllers/Reports/reportsController.js',
-						'js/controllers/Reports/reportService.js'
+						'js/controllers/Reports/reportService.js',
+						'js/controllers/admin/adminService.js'
                     ]);
                 }]
             }
@@ -291,7 +302,8 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/controllers/login/loginService.js',						
 						'js/controllers/header/headerController.js',
 						'js/controllers/scheduling/scheduleController.js',
-						'js/controllers/scheduling/scheduleService.js'
+						'js/controllers/scheduling/scheduleService.js',
+						'js/controllers/admin/adminService.js'
                     ]);
                 }]
             }
@@ -320,7 +332,8 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/controllers/execution/executionService.js',
 						'js/controllers/Reports/reportService.js',
 						'js/controllers/neuronGraphs2D/neuronGraphs2DController.js',
-						'js/controllers/neuronGraphs2D/neuronGraphs2DService.js'
+						'js/controllers/neuronGraphs2D/neuronGraphs2DService.js',
+						'js/controllers/admin/adminService.js'
                     ]);
                 }]
             }

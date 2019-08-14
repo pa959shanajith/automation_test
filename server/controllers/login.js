@@ -7,6 +7,7 @@ var logger = require('../../logger');
 var utils = require('../lib/utils');
 var configpath= require('../config/options');
 var taskflow = configpath.strictTaskWorkflow;
+var bcrypt = require('bcryptjs');
 
 /**
  * @see : function to check whether projects are assigned for user
@@ -154,6 +155,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 			var userName = req.session.username;
 			var jsonService = {};
 			jsonService.token = configpath.defaultTokenExpiry;
+			jsonService.ldapuser = req.session.ldapuser;
 			async.waterfall([
 				function userInfo(callback) {
 					var inputs = {
@@ -297,6 +299,39 @@ exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
 		logger.error(exception.message);
 		res.send("fail");
 	}
+};
+
+// Get Current password - Nineteen68
+exports.getCurrentPassword_Nineteen68 = function(req, res) {
+	logger.info("Inside UI Service: getCurrentPassword_Nineteen68");
+	var username = req.body.username;
+	var password = req.body.password;
+	var inputs = {
+		"username": username
+	};
+	var args = {
+		data: inputs,
+		headers: {
+			"Content-Type": "application/json"
+		}
+	};
+	logger.info("Calling NDAC Service: getCurrentPassword_Nineteen68");
+	client.post(epurl + "login/getCurrentPassword_Nineteen68", args,
+		function (result, response) {
+		if (response.statusCode != 200 || result.rows == "fail") {
+			logger.error("Error occurred in getCurrentPassword_Nineteen68 Error Code : ERRNDAC");
+			res.send("fail");
+		} else {
+			currpassword = result.rows[0].password;
+			validUser = bcrypt.compareSync(password, currpassword);
+			if (validUser){
+				res.send("pass");
+			}
+			else{
+				res.send("fail");
+			}
+		}
+	});
 };
 
 exports.logoutUser_Nineteen68 = function (req, res) {
