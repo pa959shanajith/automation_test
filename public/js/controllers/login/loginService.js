@@ -26,10 +26,10 @@ mySPA.factory('LoginService', ['$http', '$q', function ($http, $q) {
 				return $q.reject(response.data);
 			});
 		},
-		getCurrentPassword_Nineteen68: function (username,password) {
-			return $http.post('/getCurrentPassword_Nineteen68', {
-				username: username,
-				password: password
+		resetPassword_Nineteen68: function (newpassword,currpassword) {
+			return $http.post('/resetPassword_Nineteen68', {
+				newpassword: newpassword,
+				currpassword: currpassword
 			})
 			.then(function (response) {
 				return response.data

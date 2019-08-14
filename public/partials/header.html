@@ -48,7 +48,7 @@
                 <ul class="dropdown-menu">
                     <li><a href="#" ng-click="$event.preventDefault();" class="headerDrop">Test Manager</a></li>
                     <li class="divider"></li>
-                    <li class="resetPass"><a href="#" ng-click ="resetPassPopup()">Reset Password</a></li>
+                    <li class="resetPassEntry"><a href="#" ng-click ="resetPass()">Change Password</a></li>
                     <li><a href="#" ng-click ="$event.preventDefault(); logout($event);">Logout</a></li>
                 </ul>
             </div>
@@ -107,12 +107,12 @@
     <!-- Popup for Role change -->
 
     <!-- Popup for Reset password -->
-    <div class="modal fade" id="resetPass" role="dialog" data-keyboard="false" data-backdrop="static">
+    <div class="modal fade" id="resetPassPopup" role="dialog" data-keyboard="false" data-backdrop="static">
         <div class="modal-dialog modal-sm resetModal">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Reset Password</h4>
+                    <h4 class="modal-title">Change Password</h4>
                 </div>
                 <div class="modal-body">
                   <div class="login-wrap">
@@ -138,14 +138,14 @@
     <!-- Popup for Reset password -->
 
     <!-- Popup for successful reset of password -->
-    <div class="modal fade" id="resetSuccess" role="dialog" data-keyboard="false" data-backdrop="static">
+    <div class="modal fade" id="resetSuccessPopup" role="dialog" data-keyboard="false" data-backdrop="static">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Reset Password</h4>
+                    <h4 class="modal-title">Change Password</h4>
                 </div>
                 <div class="modal-body">
-                    <p>Password reset successfull! Please login again with new password</p>
+                    <p>Password change successfull! Please login again with new password</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" ng-click="resetSuccess($event)">OK</button>

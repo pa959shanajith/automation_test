@@ -498,7 +498,7 @@ if (cluster.isMaster) {
 		app.post('/loadUserInfo_Nineteen68', login.loadUserInfo_Nineteen68);
 		app.post('/getRoleNameByRoleId_Nineteen68', login.getRoleNameByRoleId_Nineteen68);
 		app.post('/logoutUser_Nineteen68', login.logoutUser_Nineteen68);
-		app.post('/getCurrentPassword_Nineteen68', login.getCurrentPassword_Nineteen68);
+		app.post('/resetPassword_Nineteen68', login.resetPassword_Nineteen68);
 		//Admin Routes
 		app.post('/getUserRoles_Nineteen68', admin.getUserRoles_Nineteen68);
 		app.post('/getDomains_ICE', admin.getDomains_ICE);

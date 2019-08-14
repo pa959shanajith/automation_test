@@ -1,4 +1,4 @@
-mySPA.controller('respHeaderController', function($scope, $rootScope, $timeout, $http, $location, respHeaderServices, LoginService, cfpLoadingBar, socket, adminServices) {
+mySPA.controller('respHeaderController', function($scope, $rootScope, $timeout, $http, $location, respHeaderServices, LoginService, cfpLoadingBar, socket) {
 	var userDetails,username,userRole,task;
 	var selectedRoleID, selectedRoleName, redirectPath;
 	var projectId = [];
@@ -47,11 +47,11 @@ mySPA.controller('respHeaderController', function($scope, $rootScope, $timeout, 
 
 	if ($location.$$path == '/admin') {
 		$(".bell-icon-div").hide();
-		$(".resetPass").hide();
+		$(".resetPassEntry").hide();
 	}
 
 	if (userDetails.ldapuser){
-		$(".resetPass").hide();
+		$(".resetPassEntry").hide();
 	}
 
 	if ($location.$$path == "/plugin" || $location.$$path == "/p_Webocular" || $location.$$path == "/p_Dashboard") {
@@ -278,8 +278,8 @@ mySPA.controller('respHeaderController', function($scope, $rootScope, $timeout, 
 		$rootScope.redirectPage();
 	});
 
-	$(document).on('click', ".resetPassPopup", function(){
-		openModelPopup("resetPass");
+	$(document).on('click', ".resetPass", function(){
+		openModelPopup("resetPassPopup");
 	});
 
 	$(document).on('click', ".resetFields", function(){
@@ -304,68 +304,37 @@ mySPA.controller('respHeaderController', function($scope, $rootScope, $timeout, 
 		if (!currpassword) {
 			$(".ic-currpassword").parent().addClass("input-border-error");
 			$('#passwordValidation').text("Current Password field is empty.");
+		} else if (!newpassword) {
+			$(".ic-newpassword").parent().addClass("input-border-error");
+			$('#passwordValidation').text("New Password field is empty.");
+		} else if (!regexPassword.test(newpassword)) {
+			$(".ic-newpassword").parent().addClass("input-border-error");
+			$('#passwordValidation').text("Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 16 characters..");
+		} else if (!confpassword) {
+			$(".ic-confpassword").parent().addClass("input-border-error");
+			$('#passwordValidation').text("Confirm Password field is empty.");
+		} else if (newpassword != confpassword) {
+			$(".ic-confpassword").parent().addClass("input-border-error");
+			$('#passwordValidation').text("New Password and Confirm Password do not match");
 		} else {
-			LoginService.getCurrentPassword_Nineteen68(username,currpassword)
+			LoginService.resetPassword_Nineteen68(newpassword,currpassword)
 			.then(function (data) {
-				var flag = true;
-				if (data == 'pass'){
-					if (!newpassword) {
-						$(".ic-newpassword").parent().addClass("input-border-error");
-						$('#passwordValidation').text("New Password field is empty.");
-						flag = false;
-					} else if (!regexPassword.test(newpassword)) {
-						$(".ic-newpassword").parent().addClass("input-border-error");
-						$('#passwordValidation').text("Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 16 characters..");
-						flag = false;
-					} else if (!confpassword) {
-						$(".ic-confpassword").parent().addClass("input-border-error");
-						$('#passwordValidation').text("Confirm Password field is empty.");
-						flag = false;
-					} else if (newpassword != confpassword) {
-						$(".ic-confpassword").parent().addClass("input-border-error");
-						$('#passwordValidation').text("New Password and Confirm Password do not match");
-						flag = false;
-					} else if (newpassword == currpassword) {
-						$(".ic-newpassword").parent().addClass("input-border-error");
-						$(".ic-confpassword").parent().addClass("input-border-error");
-						$('#passwordValidation').text("Sorry! You can't use the existing password again");
-						flag = false;
-					}
-				}
-				else{
+				if(data == "Invalid Session"){
+					$('#passwordValidation').text("Invalid Session");
+				} else if(data == "success") {
+					$("#resetPassPopup").modal("hide");
+					openModelPopup("resetSuccessPopup");
+				} else if(data == "same"){
+					$(".ic-newpassword").parent().addClass("input-border-error");
+					$(".ic-confpassword").parent().addClass("input-border-error");
+					$('#passwordValidation').text("Sorry! You can't use the existing password again");
+				} else if(data == "incorrect") {
 					$(".ic-currpassword").parent().addClass("input-border-error");
 					$('#passwordValidation').text("Current Password is incorrect");
-					flag = false;
-				}
-				if ( flag == true ){
-					var action = "update";
-					var userObj = {
-						userid: userDetails.user_id,
-						username: userDetails.username.toLowerCase(),
-						password: newpassword,
-						firstname: userDetails.firstname,
-						lastname: userDetails.lastname,
-						email: userDetails.email_id,
-						role: userDetails.role,
-						addRole: userDetails.additionalrole,
-						ldapUser: false
-					};
-					adminServices.manageUserDetails(action, userObj)
-					.then(function (data) {
-						if(data == "Invalid Session"){
-							$('#passwordValidation').text("Invalid Session");
-						} else if(data == "success") {
-							$("#resetPass").modal("hide");
-							openModelPopup("resetSuccessPopup");
-						} else if(data == "fail") {
-							$('#passwordValidation').text("Failed to Reset Password");
-						} else if(/^2[0-4]{10}$/.test(data)) {
-							$('#passwordValidation').text("Invalid Request");
-						}
-					}, function (error) {
-						$('#passwordValidation').text("Failed to reset password");
-					});
-					
+				} else if(data == "fail") {
+					$('#passwordValidation').text("Failed to Change Password");
+				} else if(/^2[0-4]{10}$/.test(data)) {
+					$('#passwordValidation').text("Invalid Request");
 				}
 			}, function (error) {
 				$(".ic-currpassword").parent().addClass("input-border-error");
