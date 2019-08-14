@@ -81,7 +81,12 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 	};
 
 	$scope.executeGo = function($event){
-		if($scope.tab=='crawlWithText' && $scope.searchData["text"]=="")
+		if($('#moduleName').val() == "")
+		{
+			openDialog("Error", "Crawl Name cannot be empty.");
+			return;
+		}
+		else if($scope.tab=='crawlWithText' && $scope.searchData["text"]=="")
 		{
 			openDialog("Error", "Search Text cannot be empty.");
 			return;
@@ -978,5 +983,20 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		// var infoArr = [];
 		// labelArr.push(txnHistory.codesDict['showReportClick']);
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
+	};
+	$scope.saveReport = function($event){
+		$("#moduleName").val();
+		webocularServices.saveResults($scope.url, $scope.level, $scope.selectedAgent, $scope.proxy,$scope.crawledLinks, $("#moduleName").val())
+		.then(function (data) {
+			if (data == "success"){
+				openDialog("","Successfully saved the report");
+			}else if (data== "fail"){
+				openDialog("","Failed to save the report");
+			}
+		},
+		function (error) {
+			console.log("Error in webocularController.js file saveReport method! \r\n " + (error.data));
+		}); //	getObjectType end
+	unblockUI();
 	};
 }]);

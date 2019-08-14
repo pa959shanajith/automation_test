@@ -213,6 +213,28 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 unblockUI();
                 console.log("Error in service getReportsData_ICE while fetching modules-"+error);
             });
+            reportService.getWebocularModule_ICE()
+            .then(function(result_webocular_reportData) {
+                if (result_webocular_reportData == "Fail") {
+                    openModalPopup("Reports", "Failed to load Webocular Reports");
+                } else {
+                    $(".mid-report-section").hide();
+                    if (result_webocular_reportData.rows.length == 0) {
+                        //No Modules Found
+                        openModalPopup("Modules", "No Webocular Modules Found");
+                        $(".mid-report-section").hide();
+                        $('#searchModule').attr('disabled', 'disabled');
+                    } else {
+                        angular.forEach(result_webocular_reportData.rows, function(value, index) {
+                            $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value._id.$oid + '  title=' + value.modulename + ' style="width: 139px;"><img class="ct-nodeIcon1" id=' + value._id.$oid + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.modulename + '</span></div>')
+                            $('.reports-search').removeAttr('disabled', 'disabled');
+                        });
+                    } 
+                }
+            }, function(error) {
+                unblockUI();
+                console.log("Error in service getWebocularModule_ICE while fetching modules-"+error);
+            });
         };
     };
 
@@ -281,6 +303,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     //Module node click to fetch module start/end date & time execution entries
     $(document).on('click', '.ct-nodeIcon', function(e) {
         blockUI('Loading.. Please wait..')
+        $("#report-canvas").empty();
+        $("#report-canvas").hide();
+        $("#report-header").empty();
+        $("#report-header").hide();
         $('.mid-report-section').removeClass('hide');
         $('img.highlight-module').removeClass('highlight-module');
         $('span.highlight-moduleName').removeClass('highlight-moduleName');
@@ -375,6 +401,96 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 })
     });
 
+    $(document).on('click', '.ct-nodeIcon1', function(e) {
+        $("#report-canvas").show();
+        $("#report-header").show();
+        $("#report-header").empty();
+        $("#accordion").hide();
+        $("#report-canvas").empty();
+        $scope.reportGenerated = true;
+        getWebocularInputData=e.target.id
+		reportService.getWebocularData_ICE(getWebocularInputData)
+            .then(function(result_webocular_reportData) {
+                if (result_webocular_reportData == "Fail") {
+                    openModalPopup("Reports", "Failed to load Webocular Reports");
+                } else {
+                    $(".mid-report-section").hide();
+                    if (result_webocular_reportData.rows.length == 0) {
+                        //No Modules Found
+                        openModalPopup("Modules", "No Webocular Modules Found");
+                        $(".mid-report-section").hide();
+                        $('#searchModule').attr('disabled', 'disabled');
+                    } else {
+                        $('#middle-content-section').attr('class',"webCrawler-report");
+                        if(result_webocular_reportData.rows[0].proxy.enable==="false"){
+                            proxy="Disabled";
+                        }else{
+                            proxy="Enabled";
+                        }
+                        $("#report-header").append('<div width="100%"height="100%"class="webCrawler-header"><label style="position: relative;bottom: 1px;">Webocular Report</label></div><div style="display: flex;"><div style="width:50%;"><div><label class="webCrawler-report-label">Crawl Name</label><span class="webCrawler-report-span">'+result_webocular_reportData.rows[0].modulename+'</span></div><div><label class="webCrawler-report-label">URL</label><span class="webCrawler-report-span">'+result_webocular_reportData.rows[0].url+'</span></div><div><label class="webCrawler-report-label">Agent</label><span class="webCrawler-report-span">'+result_webocular_reportData.rows[0].agent+'</span></div><div><label class="webCrawler-report-label">Level</label><span class="webCrawler-report-span">'+result_webocular_reportData.rows[0].level+'</span></div></div><div style="width:50%;"><div><label class="webCrawler-report-label">Proxy</label><span class="webCrawler-report-span">'+proxy+'</span></div><div><label class="webCrawler-report-label">Proxy URL</label><span class="webCrawler-report-span">'+result_webocular_reportData.rows[0].proxy.url+'</span></div><div><label class="webCrawler-report-label">Username</label><span class="webCrawler-report-span">'+result_webocular_reportData.rows[0].proxy.username+'</span></div></div></div>')
+                        var body = document.getElementById('report-canvas');
+                        var reportDiv = document.createElement('div');
+                        //reportDiv.setAttribute('class', 'scrollbar-inner');
+
+                        var tbl = document.createElement('table');
+                        tbl.setAttribute('width','100%');
+                        tbl.setAttribute('height','100%');
+                        tbl.setAttribute('class', 'webCrawler-report-table');
+                        // $('.scrollbar-inner').scrollbar();
+                        var tbdy = document.createElement('tbody');
+
+                        var headrow = document.createElement('tr');
+                        var headData = {0: 'S.No.', 1 : 'Level', 2 : 'URL', 3: 'Parent URL', 4 : 'Redirected', 5:	'Status', 6 : 'Title' ,7 :'Search Text Count'};
+                        for (var i=0; i<8; i++){
+                            var th = document.createElement('th');
+                            th.appendChild(document.createTextNode(headData[i]));
+                            headrow.appendChild(th);
+                        }
+                        
+                        headrow.childNodes[0].setAttribute('style','width : 55px');
+                        headrow.childNodes[1].setAttribute('style','width : 55px');
+                        headrow.childNodes[5].setAttribute('style','width : 65px');
+                        tbdy.appendChild(headrow);
+                        jsonStruct = {0 : 'level', 1 : 'name' , 2 : 'parent' , 3 : 'redirected' , 4 : 'status' , 5	:'title', 6 : 'searchTextCount'};
+                        for(i=0; i<result_webocular_reportData.rows[0].data.length; i++){
+                                var newRow = document.createElement('tr');
+                                if(result_webocular_reportData.rows[0].data[i]['type'] == "duplicate")
+                                    continue;
+                                //create SNo text node
+                                var sNo = document.createElement('td');
+                                sNo.setAttribute('style', 'width: 55px');
+                                sNo.appendChild(document.createTextNode(i+1));
+                                newRow.appendChild(sNo);
+
+                                //7 is the number of attributes from Level to title
+                                for(j=0 ; j<7; j++){
+                                    var data = document.createElement('td');
+                                    text = result_webocular_reportData.rows[0].data[i][jsonStruct[j]];
+                                    
+                                    if(text == undefined)
+                                        text = "-";
+                                    data.appendChild(document.createTextNode(text));
+                                    newRow.appendChild(data);
+                                }
+                                tbdy.appendChild(newRow);
+                                
+                        }
+                        tbl.appendChild(tbdy);
+                        reportDiv.appendChild(tbl);
+                        body.appendChild(reportDiv);
+                } 
+            }
+        }, function(error) {
+            unblockUI();
+            console.log("Error in service getWebocularData_ICE while fetching modules-"+error);
+        });
+		
+    });
+
+    $scope.toggle_webocular = function($event){
+            if($('.ct-nodeIcon1').parent().is(':hidden')){$('.ct-nodeIcon1').parent().show()}
+            else{$('.ct-nodeIcon1').parent().hide()} 
+    }
     //Set status color for report status
     function setStatusColor() {
         $(".status").each(function() {

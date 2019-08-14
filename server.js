@@ -21,20 +21,20 @@ process.env.NDAC_URL = epurl;
 var logger = require('./logger');
 var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 
-// if (cluster.isMaster) {
-// 	cluster.fork();
-// 	cluster.on('disconnect', function(worker) {
-// 		logger.error('Nineteen68 server has encountered some problems, Disconnecting!');
-// 	});
-// 	cluster.on('exit', function(worker) {
-// 		if (worker.exitedAfterDisconnect !== true) {
-// 			logger.error('Worker %d is killed!', worker.id);
-// 			cluster.fork();
-// 		}
-// 	});
-// } else
-// {
-// 	try {
+if (cluster.isMaster) {
+	cluster.fork();
+	cluster.on('disconnect', function(worker) {
+		logger.error('Nineteen68 server has encountered some problems, Disconnecting!');
+	});
+	cluster.on('exit', function(worker) {
+		if (worker.exitedAfterDisconnect !== true) {
+			logger.error('Worker %d is killed!', worker.id);
+			cluster.fork();
+		}
+	});
+} else
+{
+	try {
 		var express = require('express');
 		var app = express();
 		var bodyParser = require('body-parser');
@@ -558,6 +558,8 @@ var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 		app.post('/openScreenShot', report.openScreenShot);
 		app.post('/connectJira_ICE', report.connectJira_ICE);
 		app.post('/getReportsData_ICE', report.getReportsData_ICE);
+		app.post('/getWebocularData_ICE', report.getWebocularData_ICE);
+		app.post('/getWebocularModule_ICE', report.getWebocularModule_ICE);
 		//Plugin Routes
 		app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
 		app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
@@ -566,6 +568,7 @@ var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 		app.post('/Encrypt_ICE', utility.Encrypt_ICE);
 		// Wecoccular Plugin
 		app.post('/crawResults', webocular.getCrawlResults);
+		app.post('/saveResults', webocular.saveResults);
 		//Chatbot Routes
 		app.post('/getTopMatches_ProfJ', chatbot.getTopMatches_ProfJ);
 		app.post('/updateFrequency_ProfJ', chatbot.updateFrequency_ProfJ);
@@ -649,10 +652,10 @@ var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 			};
 		}
 		//-------------SERVER END------------//
-// 	} catch (e) {
-// 		logger.error(e);
-// 		setTimeout(function() {
-// 			cluster.worker.kill();
-// 		}, 200);
-// 	}
-// }
+	} catch (e) {
+		logger.error(e);
+		setTimeout(function() {
+			cluster.worker.kill();
+		}, 200);
+	}
+}

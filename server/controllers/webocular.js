@@ -3,6 +3,7 @@ var validator = require('validator');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
+var async = require('async');
 
 exports.getCrawlResults = function (req, res) {
 	try {
@@ -95,3 +96,37 @@ exports.getCrawlResults = function (req, res) {
 		logger.error(exception.message);
 	}
 };
+exports.saveResults = function (req, res) {
+	if (utils.isSessionActive(req)) {
+		const MongoClient = require('mongodb').MongoClient;
+		const assert = require('assert');
+		const url = 'mongodb://10.60.21.51:27017';
+		flag=false;
+		const dbName = 'webocular';
+		async.series([
+			MongoClient.connect(url, function(err, client) {
+				assert.equal(null, err);
+				if (err) throw err;
+				console.log("Database created!");
+				const dbo = client.db(dbName);
+				dbo.createCollection("reports", function(err, res) {
+					if (err) throw err;
+					console.log("Collection created!");
+					var myobj = { url: req.body.url, level: req.body.level, agent: req.body.agent, proxy: req.body.proxy, data: req.body.crawdata, modulename: req.body.modulename};
+					dbo.collection("reports").insertOne(myobj, function(err, res) {
+						if (err) throw err;
+						console.log("1 document inserted");
+						client.close();
+						flag=true;
+					});
+				});
+				
+			})
+	]);
+	if(flag){
+		res.send("Success");
+	}else{
+		res.send("Fail");
+	}
+	}
+}
