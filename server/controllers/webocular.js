@@ -98,38 +98,33 @@ exports.getCrawlResults = function (req, res) {
 };
 exports.saveResults = function (req, res) {
 	if (utils.isSessionActive(req)) {
-		const MongoClient = require('mongodb').MongoClient;
-		const assert = require('assert');
-		const url = 'mongodb://10.60.21.51:27017';
-		const dbName = 'webocular';
-		async.series({
-			connectToMongo: function (callback) {
-			MongoClient.connect(url, function(err, client) {
-				assert.equal(null, err);
-					if (err) return callback(err);
-				console.log("Database created!");
-				const dbo = client.db(dbName);
-				dbo.createCollection("reports", function(err, res) {
-						if (err) return callback(err);
-					console.log("Collection created!");
-						var myobj = { url: req.body.url, level: req.body.level, agent: req.body.agent, proxy: req.body.proxy, data: req.body.crawdata, modulename: req.body.modulename, searchData:req.body.searchData};
-					dbo.collection("reports").insertOne(myobj, function(err, res) {
-							if (err) return callback(err);
-						console.log("1 document inserted");
-						client.close();
-							return callback(null, true);
-					});
-				});
-				
-			})
+		var report ={
+			"url": req.body.url, 
+			"level": req.body.level, 
+			"agent": req.body.agent, 
+			"proxy": req.body.proxy, 
+			"data": req.body.crawdata, 
+			"modulename": req.body.modulename, 
+			"searchData":req.body.searchData
+		}
+		var inputs={ 
+			"query": "insertdata",
+			"data": report
+		};
+		var args = {
+            data: inputs,
+            headers: {
+                "Content-Type": "application/json"
 			}
-		}, function(err, result) {
-			if (err) {
+        };
+		logger.info("Calling NDAC Service from saveResults: reports/getWebocularData_ICE");
+		client.post(epurl + "reports/getWebocularData_ICE", args,
+		function(result, response) {
+			if (response.statusCode != 200 || result.rows == "fail") {
+				logger.error("Error occurred in reports/getWebocularData_ICE from saveResults Error Code : ERRNDAC");
 				res.send("Fail");
-				throw err;
-			} else if(result) {
+			} else {
 		res.send("Success");
-	}
-		});
+			}});
 	}
 }
