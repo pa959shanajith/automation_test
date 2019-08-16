@@ -98,7 +98,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		$scope.arr = [];
 		$scope.crawlActive = false;
 		var initCrawl = true;
-
+		$('#save_webocular').removeAttr("disabled")
 		start = false; // Flag to start the removal of dots from the dom
 		currentDot = 0;
 
@@ -988,10 +988,11 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 	$scope.saveReport = function($event){
 		webocularServices.saveResults($scope.url, $scope.level, $scope.selectedAgent, $scope.proxy, $scope.crawledLinks, $scope.searchData, $scope.modulename)
 		.then(function (data) {
-			if (data == "success"){
-				openDialog("","Successfully saved the report");
+			if (data == "Success"){
+				openDialog("Webocular Screen","Successfully saved the report");
+				$('#save_webocular').attr("disabled", "disabled")
 			}else if (data== "fail"){
-				openDialog("","Failed to save the report");
+				openDialog("Webocular Screen","Failed to save the report");
 			}
 		},
 		function (error) {
