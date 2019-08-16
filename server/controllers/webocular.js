@@ -3,6 +3,7 @@ var validator = require('validator');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
+var async = require('async');
 
 exports.getCrawlResults = function (req, res) {
 	try {
@@ -14,6 +15,7 @@ exports.getCrawlResults = function (req, res) {
 			var level = req.body.level;
 			var agent = req.body.agent;
 			var proxy = req.body.proxy;
+			var searchData = req.body.searchData;
 			var validate_agent = validator.isAlpha(agent);
 			var validate_level = !(validator.isEmpty(level.toString()));
 			//var validate_url = validator.isURL(req.body.url);
@@ -27,7 +29,7 @@ exports.getCrawlResults = function (req, res) {
 			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres) {
 				if (redisres[1]>0) {
 					logger.info("Sending socket request for webCrawlerGo to redis");
-					var dataToIce = {"emitAction": "webCrawlerGo", "username": name, "input_url": url, "level": level, "agent":agent, "proxy": proxy};
+					var dataToIce = {"emitAction": "webCrawlerGo", "username": name, "input_url": url, "level": level, "agent":agent, "proxy": proxy,"searchData":searchData};
 					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					var notifySocMap = myserver.socketMapNotify;
 					var mySocketUIMap = myserver.allSocketsMapUI;
@@ -94,3 +96,35 @@ exports.getCrawlResults = function (req, res) {
 		logger.error(exception.message);
 	}
 };
+exports.saveResults = function (req, res) {
+	if (utils.isSessionActive(req)) {
+		var report ={
+			"url": req.body.url, 
+			"level": req.body.level, 
+			"agent": req.body.agent, 
+			"proxy": req.body.proxy, 
+			"data": req.body.crawdata, 
+			"modulename": req.body.modulename, 
+			"searchData":req.body.searchData
+		}
+		var inputs={ 
+			"query": "insertdata",
+			"data": report
+		};
+		var args = {
+            data: inputs,
+            headers: {
+                "Content-Type": "application/json"
+			}
+        };
+		logger.info("Calling NDAC Service from saveResults: reports/getWebocularData_ICE");
+		client.post(epurl + "reports/getWebocularData_ICE", args,
+		function(result, response) {
+			if (response.statusCode != 200 || result.rows == "fail") {
+				logger.error("Error occurred in reports/getWebocularData_ICE from saveResults Error Code : ERRNDAC");
+				res.send("Fail");
+			} else {
+		res.send("Success");
+			}});
+	}
+}

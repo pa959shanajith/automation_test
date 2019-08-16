@@ -31,33 +31,66 @@
 	<div id="middle-content-section">
 		<!--Task Name-->
 			<div id="page-taskName">
-				<span style="cursor:pointer" ng-click="showWebocularHome()">Webocular</span>
+				<span style="cursor:pointer" ng-click="showWebocularHome();">Webocular</span>
 			</div>
 			<!--Task Name-->
 			<!-- Generate DIV -->
-		<div ng-hide="hideBaseContent.message == 'true'">
+
+			<div class="createFirstContainer" ng-show="tab=='webocularHome'">
+				<div class="createOptionContainer">
+				   <div ng-click="tab = 'simpleCrawl';" title="Crawl URL">
+					  <img alt="Create New" class="" src="imgs/ic-create-newMindmap.png" style="margin-left:54px;margin-bottom:10px;">
+					  <label>Crawl</label>
+				   </div>
+				   <div ng-click="tab = 'crawlWithText';" title="Crawl with Text Search">
+					  <img alt="Crawl with Text Search" class="" src="imgs/ic-endtoendFlow.png" style="margin-left:54px;margin-bottom:10px;">
+					  <label>Text Search</label>
+				   </div>
+				   <!-- <div ng-click="tab = 'crawlWithImage';" title="Crawl with Image Search">
+					  <img alt="Crawl with Image Search" class="" src="imgs/ic-importfromexcel-mindmap.png">
+					  <label>Image Search</label>
+					</div> -->
+				</div>
+			 </div>
+		<div ng-hide="tab =='webocularHome' || hideBaseContent.message == 'true'" ng-show="tab=='simpleCrawl' || tab=='crawlWithText' || tab=='crawlWithImage'">
 			<div class="url-div">
 				<form name="webocular_form">
-				<span><b>URL </b> </span>
-				<input name="urlInput" type="url" ng-model="url" class="urlInput" placeholder="Enter URL" required>
+					<div>
+						<span><b>Name </b> </span>
+						<input id="moduleName" ng-model="modulename" type="text" class="urlInput" placeholder="Enter the Crawl name" required>
+						<button ng-if="enableGenerate" style="padding: 2px 25px" class="btn btn-md pull-right pairwise-GenBtn" ng-click="generateGraph($event)" title="Generate">Generate</button>
+					</div>	
+					<div>
+						<span><b>URL </b> </span>	   
+				<input name="urlInput" type="url" ng-model="url" class="urlInput" placeholder="Enter URL" required style="width: 560px;">
+				<span><b>Level</b></span>
+				<input name="level" type="number" ng-model="level" class="urlInput" placeholder="" required style="width:65px;" min="0" max="20" step="1">
+				<button ng-if="!webocular_form.urlInput.$valid" disabled class="btn btn-sm btn-crawl theme" ng-click="executeGo($event)">Go</button>
+				<button ng-if="webocular_form.urlInput.$valid" class="btn btn-sm btn-crawl theme" ng-click="executeGo($event)">Go</button>
+						<button ng-if="enableGenerate"  class="btn btn-md pull-right pairwise-GenBtn" ng-click="showReport($event)" title="Show Report">View Report</button>
+					</div>
+					<button ng-if="enableGenerate"  class="btn btn-md pull-right pairwise-GenBtn" ng-click="saveReport($event)" title="Save Report" id="save_webocular">Save Report</button>
+				<!-- <button ng-if="enableGenerate"  class="btn btn-md pull-right pairwise-GenBtn" ng-click="showReport($event)" title="Show Report">View Report</button> -->
+				<div ng-show="tab=='crawlWithText'">
+					<br><span><b>Enter Text</b> </span>
+					<input name="searchText" type="text" ng-model="searchData.text" class="urlInput" placeholder="Enter Text to be Searched" style="width: 560px;">
+				</div>
 					<!--<span>Screen Capture</span>
 					<button  class="btn btn-sm btn-crawl theme" title=" Run for all">All</button>
 					<button  class="btn btn-sm btn-crawl " title="Run only for failed">Only Failed</button>-->
-				<button ng-if="enableGenerate" style="padding: 2px 25px" class="btn btn-md pull-right pairwise-GenBtn" ng-click="generateGraph($event)" title="Generate">Generate</button>
+					
 			</form>
 			</div>
 
 			<div>
-				<span><b>Levels</b></span>
+				<!-- <span><b>Levels</b></span>
 				<input  id="level-slider" ng-model="level" data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="20" data-slider-step="1" data-slider-value="4"/>
 				<button ng-if="!webocular_form.urlInput.$valid" disabled class="btn btn-sm btn-crawl theme" ng-click="executeGo($event)">Go</button>
-				<button ng-if="webocular_form.urlInput.$valid" class="btn btn-sm btn-crawl theme" ng-click="executeGo($event)">Go</button>
-				<button ng-if="enableGenerate"  class="btn btn-md pull-right pairwise-GenBtn" ng-click="showReport($event)" title="Show Report">View Report</button>
-
+				<button ng-if="webocular_form.urlInput.$valid" class="btn btn-sm btn-crawl theme" ng-click="executeGo($event)">Go</button> -->
+				
 			</div>
-
 			<div class="scrollbar-inner" >
-				<div class="crawl-result" >
+				<div class="crawl-result" ng-if="enableGenerate">
 					<h4 ng-if="arr.length > 0">Subdomains </h4>
 					<p ng-repeat= "a in arr track by $index">{{a}} </p>
 					<br>
