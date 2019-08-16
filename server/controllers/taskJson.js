@@ -102,6 +102,7 @@ function next_function(resultobj, cb, data) {
 		var batch_indx = [];
 		var taskDetails = {};
 		var batch_dict = {};
+		var status_dict={"inprogress":0,"assigned":0,"review":0,"complete":0}
 		async.forEachSeries(alltasks, function (a, maincallback) {
 			var task_json = {
 				'appType': '',
@@ -178,6 +179,7 @@ function next_function(resultobj, cb, data) {
 			taskDetails.cycleid = t.cycle;
 			if (t.status != undefined) {
 				taskDetails.status = t.status;
+				status_dict[t.status]++;
 			}
 			var parent = t.parent.substring(1, t.parent.length - 1).split(",");
 			var parent_length = parent.length;
