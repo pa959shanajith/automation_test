@@ -6326,8 +6326,8 @@ h4.titleBadge
     padding-right: 6px;
 }
 
-.headerDrop{
+.headerDrop_1{
     text-decoration: none;
     color: #333;
-    pointer-events: none;
+    pointer-events: none !important;
 }
