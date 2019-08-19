@@ -9,7 +9,7 @@
 				<div class="dropdown userInformation">
 				   <button class="btn dropdown-toggle dropdown-userinfo" type="button" data-toggle="dropdown"><span id='displayUsername' class='userInfo'></span><span class="ic-caret"><img class="header-ic" src="imgs/ic-user-nav.png" /></span></button>
 				   <ul class="dropdown-menu userinformationList">
-					<li><a href="#" ng-click="$event.preventDefault();" class="headerDrop">Test Manager</a></li>
+					<li><a href="#" class='headerDrop_1 roleName userRoleInfo'>Test Manager</a></li>
 					  <li class="divider"></li>
 					  <li class="resetPassEntry"><a href="#" class="resetPass">Change Password</a></li>
 					  <li><a href="#" class="userRoleInfo" ng-click="$event.preventDefault(); logout($event);">Logout</a></li>
@@ -95,6 +95,9 @@
 									 </select>
 								  </div>
 							   </div>
+								   <div>
+										<button class="webCrawler-toggle-btn" ng-click="toggle_webocular($event)" title="Save Report">Webocular</button>
+								   </div>
 							   <div class="col d-flex flex-row-reverse ">
 								  <input id='searchModule' class="reports-search" type="text" placeholder="Search Module" aria-label="Search">
 								  <img alt="Search Icon" class="searchReportsImg" src="imgs/ic-search-icon.png">
@@ -216,6 +219,10 @@
 				   </div>
 				</div>
 			 </div>
+				 <!-- Webocular Report -->
+				 <div id="report-header" style="display: none"></div>
+				 <div id="report-canvas" style="display: none"></div>
+				 <!-- Webocular Report -->
 		  </div>
 		  <!-- Module Accordion -->
 		  <!-- Right Side Bar  -->

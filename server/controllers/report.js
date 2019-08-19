@@ -1238,6 +1238,60 @@ exports.getReportsData_ICE = function(req, res) {
     }
 };
 
+exports.getWebocularModule_ICE = function(req, res) {
+    try {
+        
+        var inputs = {
+            "query": "moduledata"
+        };
+        var args = {
+            data: inputs,
+            headers: {
+                "Content-Type": "application/json"
+            }
+        };
+        client.post(epurl + "reports/getWebocularData_ICE", args,
+                function(result1, response1) {
+                    if (response1.statusCode != 200 || result1.rows == "fail") {
+                        logger.error("Error occurred in reports/getWebocularData_ICE: getAllModules from getAllSuites_ICE Error Code : ERRNDAC");
+                        res.send("fail");
+                    } else {
+                        res.send(result1);
+                    }
+                });
+    }catch (exception) {
+        logger.error(exception.message);
+        res.status(500).send("fail");
+    }
+};
+
+exports.getWebocularData_ICE = function(req, res) {
+    try {
+        var inputs = {
+            "query": "reportdata",
+            "id": req.body.getWebocularInputData
+        };
+        var args = {
+            data: inputs,
+            headers: {
+                "Content-Type": "application/json"
+            }
+        };
+        client.post(epurl + "reports/getWebocularData_ICE", args,
+                function(result1, response1) {
+                    if (response1.statusCode != 200 || result1.rows == "fail") {
+                        logger.error("Error occurred in reports/getWebocularData_ICE: getAllModules from getAllSuites_ICE Error Code : ERRNDAC");
+                        res.send("fail");
+                    } else {
+                        res.send(result1);
+                    }
+                });
+    }catch (exception) {
+        logger.error(exception.message);
+        res.status(500).send("fail");
+    }
+};
+
 function validateData(content, type) {
     logger.info("Inside function: validateData");
     switch (type) {

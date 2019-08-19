@@ -28,7 +28,7 @@ mySPA.controller('respHeaderController', function($scope, $rootScope, $timeout, 
 
 	$("#displayUsername").text(userDetails.firstname + ' ' + userDetails.lastname)
 	$(".heading-center-light").text('Welcome  ' + userDetails.firstname + ' ' + userDetails.lastname + '!');
-	$(".userRole").text(userRole);
+	$(".headerDrop_1").text(userRole);
 	if (userRole == 'Admin') {
 		$("#sRole").hide(); //naviPg
 		$("#naviPg").css("cursor", "default");

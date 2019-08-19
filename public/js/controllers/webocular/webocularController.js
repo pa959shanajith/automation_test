@@ -6,11 +6,11 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		cfpLoadingBar.complete();
 		$("#utilityEncrytpion").trigger("click");
 	}, 500);
-	$timeout(function () { // Without JQuery
-		var slider = new Slider('#level-slider', {
-			formatter: function(value) { return value; }
-		});
-	}, 10);
+	// $timeout(function () { // Without JQuery
+	// 	var slider = new Slider('#level-slider', {
+	// 		formatter: function(value) { return value; }
+	// 	});
+	// }, 10);
 	if(window.localStorage['navigateScreen'] != "p_Webocular"){
 		return $rootScope.redirectPage();
 	}
@@ -43,8 +43,12 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 	$scope.enableGenerate = false;
 	$scope.selectedAgent = "chrome";
 	$scope.url = "http://";
+	$scope.tab = "webocularHome"
+	$scope.searchData={"text":"","image":""};
+	$scope.modulename=""
 	$scope.proxy = $scope.tprxy = {enable: false, url: "", username: "", password: ""};
 	$scope.showWebocularHome = function(){
+		$scope.tab="webocularHome";
 		if (!$scope.enableGenerate) return;
 		var myNode = document.getElementById("report-canvas");
 		while (myNode.firstChild) {
@@ -58,6 +62,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		if(!$scope.reportGenerated){
 			$scope.check = true;
 		}
+		
 	};
 
 	$scope.setProxy = function(args, $event){
@@ -77,13 +82,23 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 	};
 
 	$scope.executeGo = function($event){
+		if($scope.modulename == "")
+		{
+			openDialog("Error", "Crawl Name cannot be empty.");
+			return;
+		}
+		else if($scope.tab=='crawlWithText' && $scope.searchData["text"]=="")
+		{
+			openDialog("Error", "Search Text cannot be empty.");
+			return;
+		}
 		localStorage.setItem("navigateEnable", false);
 		$scope.enableGenerate = false;
 		$scope.crawledLinks = [];
 		$scope.arr = [];
 		$scope.crawlActive = false;
 		var initCrawl = true;
-
+		$('#save_webocular').removeAttr("disabled")
 		start = false; // Flag to start the removal of dots from the dom
 		currentDot = 0;
 
@@ -124,7 +139,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 			$scope.crawlActive = true;
 			initCrawl = false;
 			$rootScope.resetSession.start();
-			webocularServices.getResults($scope.url, $scope.level, $scope.selectedAgent, $scope.proxy).then(function(data){
+			webocularServices.getResults($scope.url, $scope.level, $scope.selectedAgent, $scope.proxy,$scope.searchData).then(function(data){
 				if (data == "begin") return false;
 				$rootScope.resetSession.end();
 				$scope.crawlActive = false;
@@ -926,8 +941,8 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		var tbdy = document.createElement('tbody');
 
 		var headrow = document.createElement('tr');
-		var headData = {0: 'S.No.', 1 : 'Level', 2 : 'URL', 3: 'Parent URL', 4 : 'Redirected', 5:	'Status', 6 : 'Title'};
-		for (var i=0; i<7; i++){
+		var headData = {0: 'S.No.', 1 : 'Level', 2 : 'URL', 3: 'Parent URL', 4 : 'Redirected', 5:	'Status', 6 : 'Title' ,7 :'Search Text Count'};
+		for (var i=0; i<8; i++){
 			var th = document.createElement('th');
 			th.appendChild(document.createTextNode(headData[i]));
 			headrow.appendChild(th);
@@ -937,7 +952,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		headrow.childNodes[1].setAttribute('style','width : 55px');
 		headrow.childNodes[5].setAttribute('style','width : 65px');
 		tbdy.appendChild(headrow);
-		jsonStruct = {0 : 'level', 1 : 'name' , 2 : 'parent' , 3 : 'redirected' , 4 : 'status' , 5	:'title'};
+		jsonStruct = {0 : 'level', 1 : 'name' , 2 : 'parent' , 3 : 'redirected' , 4 : 'status' , 5	:'title', 6 : 'searchTextCount'};
 		for(i=0; i<$scope.crawledLinks.length; i++){
 				var newRow = document.createElement('tr');
 				if($scope.crawledLinks[i]['type'] == "duplicate")
@@ -949,7 +964,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 				newRow.appendChild(sNo);
 
 				//7 is the number of attributes from Level to title
-				for(j=0 ; j<6; j++){
+				for(j=0 ; j<7; j++){
 					var data = document.createElement('td');
 					text = $scope.crawledLinks[i][jsonStruct[j]];
 					
@@ -969,5 +984,20 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		// var infoArr = [];
 		// labelArr.push(txnHistory.codesDict['showReportClick']);
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
+	};
+	$scope.saveReport = function($event){
+		webocularServices.saveResults($scope.url, $scope.level, $scope.selectedAgent, $scope.proxy, $scope.crawledLinks, $scope.searchData, $scope.modulename)
+		.then(function (data) {
+			if (data == "Success"){
+				openDialog("Webocular Screen","Successfully saved the report");
+				$('#save_webocular').attr("disabled", "disabled")
+			}else if (data== "fail"){
+				openDialog("Webocular Screen","Failed to save the report");
+			}
+		},
+		function (error) {
+			console.log("Error in webocularController.js file saveReport method! \r\n " + (error.data));
+		}); //	getObjectType end
+	unblockUI();
 	};
 }]);
