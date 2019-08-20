@@ -4,7 +4,10 @@ var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
 var async = require('async');
+var Client = require("node-rest-client").Client;
+var client = new Client();
 
+var epurl = process.env.NDAC_URL;
 exports.getCrawlResults = function (req, res) {
 	try {
 		logger.info("Inside UI service: getCrawlResults");
