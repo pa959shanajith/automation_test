@@ -262,7 +262,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     //Toggle(Show/Hide) Module Div
     $('#expAssign').on('click', function(e) {
         $(".moduleBox").slideToggle('slow', function() {
-            debugger;
              if($('div.moduleBox').hasClass('slideOpen') == true)
             {
                 slideOpen = true;
