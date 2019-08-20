@@ -223,7 +223,15 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         //No Modules Found
                         openModalPopup("Modules", "No Webocular Modules Found");
                         $(".mid-report-section").hide();
-                        $('#searchModule').attr('disabled', 'disabled');
+                        var nodesLen = $('.ct-nodeIcon:visible').length;
+                        var webocularNodesLen = $('.ct-nodeIcon1').length;
+                        if(nodesLen > 0 || webocularNodesLen > 0)
+                        {
+                            $('#searchModule').removeAttr('disabled', 'disabled');
+                        }
+                        else{
+                            $('#searchModule').attr('disabled', 'disabled');
+                        }
                     } else {
                         angular.forEach(result_webocular_reportData.rows, function(value, index) {
                             $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value._id.$oid + '  title=' + value.modulename + ' style="width: 139px;"><img class="ct-nodeIcon1" id=' + value._id.$oid + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.modulename + '</span></div>')
