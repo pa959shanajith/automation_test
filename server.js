@@ -309,7 +309,8 @@ if (cluster.isMaster) {
 									req.session.emsg = "userLogged";
 								} else {
 									req.session.username = username;
-									req.session.uniqueId = req.session.id;
+									req.session.uniqueId = req.session.id;;
+									req.session.ldapuser = user.ldap_flag;
 									logger.rewriters[0] = function(level, msg, meta) {
 										meta.username = username;
 										meta.userid = null;
@@ -497,6 +498,7 @@ if (cluster.isMaster) {
 		app.post('/loadUserInfo_Nineteen68', login.loadUserInfo_Nineteen68);
 		app.post('/getRoleNameByRoleId_Nineteen68', login.getRoleNameByRoleId_Nineteen68);
 		app.post('/logoutUser_Nineteen68', login.logoutUser_Nineteen68);
+		app.post('/resetPassword_Nineteen68', login.resetPassword_Nineteen68);
 		//Admin Routes
 		app.post('/getUserRoles_Nineteen68', admin.getUserRoles_Nineteen68);
 		app.post('/getDomains_ICE', admin.getDomains_ICE);

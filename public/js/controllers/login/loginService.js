@@ -26,6 +26,18 @@ mySPA.factory('LoginService', ['$http', '$q', function ($http, $q) {
 				return $q.reject(response.data);
 			});
 		},
+		resetPassword_Nineteen68: function (newpassword,currpassword) {
+			return $http.post('/resetPassword_Nineteen68', {
+				newpassword: newpassword,
+				currpassword: currpassword
+			})
+			.then(function (response) {
+				return response.data
+			},
+				function (response) {
+				return $q.reject(response.data)
+			})
+		},
 		getRoleNameByRoleId_Nineteen68: function (roleasarray) {
 			var param = "getRoleNameByRoleId_Nineteen68";
 			return $http.post('/getRoleNameByRoleId_Nineteen68', {

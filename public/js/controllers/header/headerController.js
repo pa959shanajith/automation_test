@@ -5,6 +5,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	var releaseId = [];
 	var cycleId = [];
 	var screenId = [];
+	$scope.passwordValidation = "";
 	$rootScope.unavailableLocalServer_msg="No Intelligent Core Engine (ICE) connection found with the Nineteen68 logged in username. Please run the ICE batch file once again and connect to Server.";
 
 	if(window.localStorage['_UI']){
@@ -46,6 +47,11 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 
 	if ($location.$$path == '/admin') {
 		$(".bell-icon-div").hide();
+		$(".resetPassEntry").hide();
+	}
+
+	if (userDetails.ldapuser){
+		$(".resetPassEntry").hide();
 	}
 
 	if ($location.$$path == "/plugin") {
@@ -249,6 +255,73 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			console.log("Fail to Switch User");
 			openModelPopup("switchRoleStatus", "Switch Role", "Fail to Switch User");
 		});
+	};
+
+	$scope.resetSuccess = function(){
+		window.sessionStorage.clear();
+		window.sessionStorage["checkLoggedOut"] = true;
+		$rootScope.redirectPage();
+	};
+
+	$scope.resetPass = function(){
+		openModelPopup("resetPassPopup");
+	};
+
+	$scope.resetFields = function(){
+		$scope.currpassword = "";
+		$scope.newpassword = "";
+		$scope.confpassword = "";
+		$scope.passwordValidation = "";
+		$(".ic-currpassword, .ic-newpassword, .ic-confpassword").parent().removeClass("input-border-error");
+	};
+
+	$scope.resetPassword = function(){
+		$scope.passwordValidation = "";
+		$(".ic-currpassword, .ic-newpassword, .ic-confpassword").parent().removeClass("input-border-error");
+		var currpassword = $scope.currpassword;
+		var newpassword = $scope.newpassword;
+		var confpassword = $scope.confpassword;
+		var regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,16}$/;
+		if (!currpassword) {
+			$(".ic-currpassword").parent().addClass("input-border-error");
+			$scope.passwordValidation = "Current Password field is empty.";
+		} else if (!newpassword) {
+			$(".ic-newpassword").parent().addClass("input-border-error");
+			$scope.passwordValidation = "New Password field is empty.";
+		} else if (!regexPassword.test(newpassword)) {
+			$(".ic-newpassword").parent().addClass("input-border-error");
+			$scope.passwordValidation = "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 16 characters..";
+		} else if (!confpassword) {
+			$(".ic-confpassword").parent().addClass("input-border-error");
+			$scope.passwordValidation = "Confirm Password field is empty.";
+		} else if (newpassword != confpassword) {
+			$(".ic-confpassword").parent().addClass("input-border-error");
+			$scope.passwordValidation = "New Password and Confirm Password do not match";
+		} else {
+			LoginService.resetPassword_Nineteen68(newpassword,currpassword)
+			.then(function (data) {
+				if(data == "Invalid Session"){
+					$scope.passwordValidation = "Invalid Session";
+				} else if(data == "success") {
+					$("#resetPassPopup").modal("hide");
+					openModelPopup("resetSuccessPopup");
+				} else if(data == "same"){
+					$(".ic-newpassword").parent().addClass("input-border-error");
+					$(".ic-confpassword").parent().addClass("input-border-error");
+					$scope.passwordValidation = "Sorry! You can't use the existing password again";
+				} else if(data == "incorrect") {
+					$(".ic-currpassword").parent().addClass("input-border-error");
+					$scope.passwordValidation = "Current Password is incorrect";
+				} else if(data == "fail") {
+					$scope.passwordValidation = "Failed to Change Password";
+				} else if(/^2[0-4]{10}$/.test(data)) {
+					$scope.passwordValidation = "Invalid Request";
+				}
+			}, function (error) {
+				$(".ic-currpassword").parent().addClass("input-border-error");
+				$scope.passwordValidation = "Failed to Authenticate Current Password.";
+			});
+		}
 	};
 
 	if (window.localStorage['_CT']) {

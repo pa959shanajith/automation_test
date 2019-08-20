@@ -7,6 +7,9 @@ var logger = require('../../logger');
 var utils = require('../lib/utils');
 var configpath= require('../config/options');
 var taskflow = configpath.strictTaskWorkflow;
+var bcrypt = require('bcryptjs');
+var admin=require('../controllers/admin');
+
 
 /**
  * @see : function to check whether projects are assigned for user
@@ -154,6 +157,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 			var userName = req.session.username;
 			var jsonService = {};
 			jsonService.token = configpath.defaultTokenExpiry;
+			jsonService.ldapuser = req.session.ldapuser;
 			async.waterfall([
 				function userInfo(callback) {
 					var inputs = {
@@ -175,10 +179,10 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 						} else {
 							var service = userResult.rows[0];
 							jsonService.user_id = service.userid;
-							jsonService.email_id = service.emailid;
-							jsonService.additionalrole = service.additionalroles;
-							jsonService.firstname = service.firstname;
-							jsonService.lastname = service.lastname;
+							jsonService.email_id = req.session.emailid = service.emailid;
+							jsonService.additionalrole = req.session.additionalroles = service.additionalroles;
+							jsonService.firstname = req.session.firstname = service.firstname;
+							jsonService.lastname = req.session.lastname = service.lastname;
 							jsonService.role = service.defaultrole;
 							jsonService.taskwflow = taskflow;
 							jsonService.username = service.username.toLowerCase();
@@ -297,6 +301,56 @@ exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
 		logger.error(exception.message);
 		res.send("fail");
 	}
+};
+
+// Get Current password - Nineteen68
+exports.resetPassword_Nineteen68 = function(req, res) {
+	logger.info("Inside UI Service: resetPassword_Nineteen68");
+	var username = req.session.username;
+	var currpassword = req.body.currpassword;
+	var newpassword = req.body.newpassword;
+	var inputs = {
+		"username": username
+	};
+	var args = {
+		data: inputs,
+		headers: {
+			"Content-Type": "application/json"
+		}
+	};
+	logger.info("Calling NDAC Service: authenticateUser_Nineteen68");
+	client.post(epurl + "login/authenticateUser_Nineteen68", args,
+		function (result, response) {
+		if (response.statusCode != 200 || result.rows == "fail") {
+			logger.error("Error occurred in authenticateUser_Nineteen68 Error Code : ERRNDAC");
+			res.send("fail");
+		} else {
+			password = result.rows[0].password;
+			validUser = bcrypt.compareSync(currpassword, password);
+			if (validUser){
+				if (currpassword == newpassword){
+					res.send("same");
+				} else{
+					var action = "update";
+					var userObj = {
+						userid: req.session.userid,
+						username: req.session.username.toLowerCase(),
+						password: newpassword,
+						firstname: req.session.firstname,
+						lastname: req.session.lastname,
+						email: req.session.emailid,
+						role: req.session.activeRoleId,
+						addRole: req.session.additionalroles,
+						ldapUser: false
+					};
+					req.body = {"action": action, "user": userObj};
+					admin.manageUserDetails(req, res);
+				}
+			} else{
+				res.send("incorrect");
+			}
+		}
+	});
 };
 
 exports.logoutUser_Nineteen68 = function (req, res) {

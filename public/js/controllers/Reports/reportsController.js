@@ -216,12 +216,12 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             reportService.getWebocularModule_ICE()
             .then(function(result_webocular_reportData) {
                 if (result_webocular_reportData == "Fail") {
-                    openModalPopup("Reports", "Failed to load Webocular Reports");
+                    console.log("Reports", "Failed to load Webocular Reports");
                 } else {
                     $(".mid-report-section").hide();
                     if (result_webocular_reportData.rows.length == 0) {
                         //No Modules Found
-                        openModalPopup("Modules", "No Webocular Modules Found");
+                        console.log("Modules", "No Webocular Modules Found");
                         $(".mid-report-section").hide();
                         $('#searchModule').attr('disabled', 'disabled');
                     } else {

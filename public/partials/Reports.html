@@ -11,6 +11,7 @@
 				   <ul class="dropdown-menu userinformationList">
 					<li><a href="#" class='headerDrop_1 roleName userRoleInfo'>Test Manager</a></li>
 					  <li class="divider"></li>
+					  <li class="resetPassEntry"><a href="#" class="resetPass">Change Password</a></li>
 					  <li><a href="#" class="userRoleInfo" ng-click="$event.preventDefault(); logout($event);">Logout</a></li>
 				   </ul>
 				</div>
@@ -18,7 +19,7 @@
 				<!-- Switch Role Dropdown -->
 				<div class="dropdown switchLnk">
 				   <div class="">
-					  <button class="btn dropdown-toggle dropdown-userrole" type="button" data-toggle="dropdown" id='sRole' ng-click="switchRole()"> <span><img class="header-ic switchUserImg" src="imgs/ic-switch-user.png" /></span><span class='userInfo lnkSwitchRole'>Switch Role</span></button>
+					<button class="btn dropdown-toggle dropdown-userrole switchRole" type="button" data-toggle="dropdown" id='sRole'> <span><img class="header-ic switchUserImg" src="imgs/ic-switch-user.png" /></span><span class='userInfo lnkSwitchRole'>Switch Role</span></button>
 					  <ul class="dropdown-menu" id="switchRoles"></ul>
 				   </div>
 				</div>
@@ -251,7 +252,7 @@
 			 <p></p>
 		  </div>
 		  <div class="modal-footer">
-			 <button type="button" class="btn btn-default" ng-click="switchedRole($event)">Yes</button>
+			<button type="button" class="btn btn-default switchedRole">Yes</button>
 			 <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
 		  </div>
 	   </div>
@@ -276,6 +277,57 @@
 	</div>
  </div>
  <!-- Popup for Role change -->
+ 
+
+ <!-- Popup for Reset password -->
+ <div class="modal" id="resetPassPopup" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm resetModal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Change Password</h4>
+			</div>
+			<div class="modal-body">
+				<div class="login-wrap">
+				<div class="input-group resetModalchild">
+					<input id="currpassword" type="password" class="ic-currpassword reset-control" name="password" placeholder="Current Password" autocomplete="off">
+				</div>
+				<div class="input-group resetModalchild">
+					<input id="newpassword" type="password" class="ic-newpassword reset-control" name="password" placeholder="New Password" autocomplete="off">
+				</div>
+				<div class="input-group resetModalchild">
+					<input id="confpassword" type="password" class="ic-confpassword reset-control" name="password" placeholder="Confirm Password" autocomplete="off">
+				</div>
+				<span id="passwordValidation" class="errorMessages">{{passwordValidation}}</span>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default resetFields">Clear</button>
+				<button type="button" class="btn btn-default resetPassword">Submit</button>
+			</div>
+		</div>
+	</div>
+ </div>
+ <!-- Popup for Reset password -->
+
+ <!-- Popup for successful reset of password -->
+ <div class="modal" id="resetSuccessPopup" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Change Password</h4>
+			</div>
+			<div class="modal-body">
+				<p>Password change successfull! Please login again with new password</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default resetSuccess">OK</button>
+			</div>
+		</div>
+	</div>
+ </div>
+ <!-- Popup for successful reset of password -->
+
  <!-- Reports Modal Box -->
  <div class="modal" id="reportsModal" role="dialog" data-keyboard="false" data-backdrop="static">
 	<div class="modal-dialog modal-sm">

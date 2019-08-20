@@ -441,6 +441,22 @@ input[type="radio"]{
     font-family: LatoWebLight
 }
 
+.reset-control {
+    border: none;
+    box-shadow: none;
+    font-size: 18px;
+    width: 100%;
+    outline: none;
+}
+
+.resetModal{
+    width: 300px;
+}
+
+.resetModalchild{
+    width: 100%;
+}
+
 .input-border-error {
     border-bottom: 1px solid #d33c3c!important
 }

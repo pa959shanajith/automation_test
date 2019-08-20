@@ -70,6 +70,7 @@ var strategyUtil = {
 			if (!(valid_username && valid_password)) return done(null, null, "invalid_username_password");
 			var flag = 'inValidCredential';
 			var validUser = false;
+			var ldap_flag = false;
 			async.waterfall([
 				function checkldapuser(callback) {
 					logger.info("Inside function checkldapuser");
@@ -93,6 +94,7 @@ var strategyUtil = {
 							if (ldapdata == "empty") callback("inValidLDAPServer");
 							else if (ldapdata == "pass") {
 								validUser = true;
+								ldap_flag = true;
 								callback(null);
 							}
 						});
@@ -125,7 +127,7 @@ var strategyUtil = {
 			], function(err) {
 				if (err) flag = err;
 				if (!validUser) return done(null, null, flag);
-				else return done(null, {"username": username}, "validCredential");
+				else return done(null, {"username": username, "ldap_flag": ldap_flag}, "validCredential");
 			});
 		});
 		passport.use('local', localStrategy);
