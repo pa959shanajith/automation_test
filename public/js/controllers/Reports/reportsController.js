@@ -190,6 +190,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         if ($('.moduleBox').is(':visible') == true) {
 
                         } else {
+                            $('div.moduleBox').removeClass('slideOpen');
                             $('#expAssign').trigger('click');
                         }
                         $rootScope.reportData = result_res_reportData.rows;
@@ -257,10 +258,11 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             x.className = "topnav";
         }
     };
-
+  
     //Toggle(Show/Hide) Module Div
     $('#expAssign').on('click', function(e) {
         $(".moduleBox").slideToggle('slow', function() {
+            debugger;
              if($('div.moduleBox').hasClass('slideOpen') == true)
             {
                 slideOpen = true;
