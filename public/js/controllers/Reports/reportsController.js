@@ -225,7 +225,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         openModalPopup("Modules", "No Webocular Modules Found");
                         $(".mid-report-section").hide();
                         var nodesLen = $('.ct-nodeIcon:visible').length;
-                        var webocularNodesLen = $('.ct-nodeIcon1').length;
+                        var webocularNodesLen = $('.ct-nodeIcon1:visible').length;
                         if(nodesLen > 0 || webocularNodesLen > 0)
                         {
                             $('#searchModule').removeAttr('disabled', 'disabled');
@@ -499,6 +499,15 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     $scope.toggle_webocular = function($event){
             if($('.ct-nodeIcon1').parent().is(':hidden')){$('.ct-nodeIcon1').parent().show()}
             else{$('.ct-nodeIcon1').parent().hide()} 
+            var nodesLen = $('.ct-nodeIcon:visible').length;
+            var webocularNodesLen = $('.ct-nodeIcon1:visible').length;
+            if(nodesLen > 0 || webocularNodesLen > 0)
+            {
+                $('#searchModule').removeAttr('disabled', 'disabled');
+            }
+            else{
+                $('#searchModule').attr('disabled', 'disabled');
+            }
     }
     //Set status color for report status
     function setStatusColor() {
