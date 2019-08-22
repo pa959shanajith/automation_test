@@ -2016,7 +2016,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		}
 		var userObj = {
 			userid: userConf.userId,
-			username: userConf.userName,
+			username: userConf.userName.toLowerCase(),
 			password: userConf.passWord,
 			firstname: userConf.firstName,
 			lastname: userConf.lastName,

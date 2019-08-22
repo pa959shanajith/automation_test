@@ -226,8 +226,9 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		event.stopImmediatePropagation();
 	});
 
+	var testval = '';
 	function filter(element,event) {
-		var value = $(element).val();
+		 value = $(element).val();
 		$(".panel-default span.assignedTask").each(function () {
 			var title = $(this).attr('title');
 			if ($('.active-task').is(":visible")) {
@@ -246,6 +247,10 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 					$(this).parents(".panel-default").hide();
 				}
 			}
+			if (value != testval) {
+				$(".description-container").remove();
+			}
+			testval = value;
 		});
 		//Transaction Activity for Task Search 
 		// var labelArr = [];
