@@ -202,9 +202,10 @@ $(document).ready(function() {
 			filterMyTasks(this,e);
 			e.stopImmediatePropagation(); 
 		});
+		var testval = '';
 		function filterMyTasks(element,e) {
 			setTimeout(function () {
-				var value = $(element).val();
+				value = $(element).val();
 				$(".panel-default span.assignedTaskInner").each(function () {
 					var title = $(this).attr('title');
 					if(title == undefined)
@@ -223,6 +224,10 @@ $(document).ready(function() {
 							$(this).parents(".panel-default").hide();
 						}
 					}
+					if (value != testval) {
+						$(".description-container").remove();
+					}
+					testval = value;
 				});
 				var counter=1;
 				$(".panel-default h4:visible").each(function () {
