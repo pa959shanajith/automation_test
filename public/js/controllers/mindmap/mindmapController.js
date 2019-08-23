@@ -1361,8 +1361,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     });
                 }
                 openDialogMindmap('Success', 'Pasted successfully');
-            } else {
+            } else if ($($('.node-selected')[0]).attr('data-nodetype') == 'scenarios') {
                 openDialogMindmap('Error', 'Please select a Scenario to paste to..');
+            } else if($($('.node-selected')[0]).attr('data-nodetype') == 'modules') {
+                openDialogMindmap('Error', 'Please select a Module to paste to..');
             }
             return;
         }
