@@ -2323,25 +2323,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			}
 	});
 
-	// $(document).on("keypress", ".abcRegex", function (e) {
-	// 	if(e.keyCode == 32)
-	// 	{
-	// 		return false;
-	// 	}
-	// });
-
-	// // All Special characters prevented on cut copy paste
-	// $(document).on('cut copy paste', '.passwordRegex', function (e) {
-	// 	var element = $(this);
-	// 	setTimeout(function () {
-	// 		var userEnteredText = element.val();
-	// 		var regex;
-	// 			//regex = ;
-	// 		userEnteredText = userEnteredText.replace(/\s/g, "");
-	// 		element.val(userEnteredText);
-	// 	}, 5);
-	// });
-
 	// Prevents special characters on keydown
 	$(document).on("keydown", ".validationKeydown", function (e) {
 		if (e.target.id == "ldapServerURL" && [':', '/'].indexOf(e.key) > -1)
