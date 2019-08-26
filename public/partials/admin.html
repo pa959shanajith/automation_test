@@ -82,10 +82,10 @@
 				</div>
 				<div ng-if="!userConf.ldapActive">
 					<div class='leftControl adminControl'>
-						<input type="password" autocomplete="off" name="passWord" id="password" ng-model="userConf.passWord" maxlength="100" class="form-control form-control-custom create" placeholder="Password" autocomplete="off"/>
+						<input type="password" autocomplete="off" name="passWord" id="password" ng-model="userConf.passWord" maxlength="16" class="form-control form-control-custom create passwordRegex" placeholder="Password" autocomplete="off"/>
 					</div>
 					<div class='rightControl adminControl'>
-						<input type="password" autocomplete="off" name='confirmPassword' id='confirmPassword' ng-model="userConf.confirmPassword" maxlength="100" class="form-control form-control-custom create" placeholder="Confirm Password" autocomplete="off"/>
+						<input type="password" autocomplete="off" name='confirmPassword' id='confirmPassword' ng-model="userConf.confirmPassword" maxlength="16" class="form-control form-control-custom create passwordRegex" placeholder="Confirm Password" autocomplete="off"/>
 					</div>
 				</div>
 				<div class='adminControl'>
@@ -145,10 +145,10 @@
 				</div>
 				<div ng-if="!userConf.ldapActive">
 					<div class='leftControl adminControl'>
-						<input type="password" autocomplete="off" name="passWord" id="password" ng-model="userConf.passWord" maxlength="100" class="form-control form-control-custom create" placeholder="Password" autocomplete="off">
+						<input type="password" autocomplete="off" name="passWord" id="password" ng-model="userConf.passWord" maxlength="16" class="form-control form-control-custom create abcRegex passwordRegex" placeholder="Password" autocomplete="off">
 					</div>
 					<div class='rightControl adminControl'>
-						<input type="password" autocomplete="off" name='confirmPassword' id='confirmPassword' ng-model="userConf.confirmPassword" maxlength="100" class="form-control form-control-custom create" placeholder="Confirm Password" autocomplete="off">
+						<input type="password" autocomplete="off" name='confirmPassword' id='confirmPassword' ng-model="userConf.confirmPassword" maxlength="16" class="form-control form-control-custom create abcRegex passwordRegex" placeholder="Confirm Password" autocomplete="off">
 					</div>
 				</div>
 				<div class='adminControl'>
