@@ -278,8 +278,10 @@ exports.updateScreen_ICE = function (req, res) {
 				try {
 					scrapedObjects = updateData.getScrapeData;
 					var parsedScrapedObj = JSON.parse(scrapedObjects);
-					if ("scrapedurl" in newData){
-						parsedScrapedObj.scrapedurl = newData.scrapedurl
+					if (newData != undefined){
+						if ("scrapedurl" in newData){
+							parsedScrapedObj.scrapedurl = newData.scrapedurl
+						}
 					}
 					scrapedObjects = JSON.stringify(parsedScrapedObj);
 					if (appType.toUpperCase() === 'WEBSERVICE') {
