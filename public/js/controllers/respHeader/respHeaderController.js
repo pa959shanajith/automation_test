@@ -343,7 +343,7 @@ mySPA.controller('respHeaderController', function($scope, $rootScope, $timeout, 
 		}
 	});
 
-	$(document).on("keypress", ".abcRegex", function (e) {
+	$(document).on("keypress", ".spaceRegex", function (e) {
 		if(e.keyCode == 32)
 		{
 			return false;
