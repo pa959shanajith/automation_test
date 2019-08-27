@@ -372,7 +372,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	}
 	$scope.filterTasks = function($event){
 		var tasksJson = $scope.taskJson;
-		document.getElementById('searchTasks').value="";
+		var searchTasks = $('#searchTasks');
 		$('#dialog-taskFilter').modal('hide');
 		window.localStorage['_TJ'] = angular.toJson(tasksJson);
 		$(".plugin-taks-listing").empty();
@@ -475,6 +475,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			$(adddetailhtml).insertAfter("[panel-id="+clickedtask+"]");
 			$("[panel-id="+clickedtask+"]").addClass("active-task");
 		});		
+		filter(searchTasks);
 	};
 
 	$scope.clearFilter = function(){
