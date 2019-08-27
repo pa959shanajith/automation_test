@@ -480,14 +480,15 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			$('#importCertificate').addClass('validateCert');
 			$('#WSglobalModal').modal('show')
 			return false;
+		} else{
+			$('.close:visible').trigger('click');
 		}
-		
-		/*if(certObj.certsDetails == ""){
+		if(certObj.certsDetails == ""){
 			certObj = '';
 			openDialog("Certificate", "Failed to save certificate");
 		}else{
 			openDialog("Certificate", "Certificate Saved successfully");
-		}*/
+		}
 	}
 	//Submit cert data WS End
 	//Import Test case
