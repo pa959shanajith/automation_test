@@ -190,6 +190,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         if ($('.moduleBox').is(':visible') == true) {
 
                         } else {
+                            $('div.moduleBox').removeClass('slideOpen');
                             $('#expAssign').trigger('click');
                         }
                         $rootScope.reportData = result_res_reportData.rows;
@@ -223,7 +224,15 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         //No Modules Found
                         console.log("Modules", "No Webocular Modules Found");
                         $(".mid-report-section").hide();
-                        $('#searchModule').attr('disabled', 'disabled');
+                        var nodesLen = $('.ct-nodeIcon:visible').length;
+                        var webocularNodesLen = $('.ct-nodeIcon1:visible').length;
+                        if(nodesLen > 0 || webocularNodesLen > 0)
+                        {
+                            $('#searchModule').removeAttr('disabled', 'disabled');
+                        }
+                        else{
+                            $('#searchModule').attr('disabled', 'disabled');
+                        }
                     } else {
                         angular.forEach(result_webocular_reportData.rows, function(value, index) {
                             $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value._id.$oid + '  title=' + value.modulename + ' style="width: 139px;"><img class="ct-nodeIcon1" id=' + value._id.$oid + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.modulename + '</span></div>')
@@ -249,7 +258,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             x.className = "topnav";
         }
     };
-
+  
     //Toggle(Show/Hide) Module Div
     $('#expAssign').on('click', function(e) {
         $(".moduleBox").slideToggle('slow', function() {
@@ -490,6 +499,15 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     $scope.toggle_webocular = function($event){
             if($('.ct-nodeIcon1').parent().is(':hidden')){$('.ct-nodeIcon1').parent().show()}
             else{$('.ct-nodeIcon1').parent().hide()} 
+            var nodesLen = $('.ct-nodeIcon:visible').length;
+            var webocularNodesLen = $('.ct-nodeIcon1:visible').length;
+            if(nodesLen > 0 || webocularNodesLen > 0)
+            {
+                $('#searchModule').removeAttr('disabled', 'disabled');
+            }
+            else{
+                $('#searchModule').attr('disabled', 'disabled');
+            }
     }
     //Set status color for report status
     function setStatusColor() {
