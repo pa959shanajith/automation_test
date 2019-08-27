@@ -1102,10 +1102,10 @@ input[disabled]{
     font-size: 15px !important;
     font-family: 'LatoWebLight';
     margin-top: -3px;
-    /*text-overflow: ellipsis;
+    text-overflow: ellipsis;
     white-space: normal;
     overflow: hidden;
-    width: 135px;*/
+    width: 375px;
 }
 .errTestCase
 {

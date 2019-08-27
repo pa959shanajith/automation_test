@@ -117,13 +117,13 @@
                 <div class="modal-body">
                   <div class="login-wrap">
                     <div class="input-group resetModalchild">
-                        <input ng-model="currpassword" type="password" class="ic-currpassword reset-control" name="password" placeholder="Current Password" autocomplete="off">
+                        <input ng-model="currpassword" type="password" maxlength="16" class="ic-currpassword reset-control spaceRegex passwordRegex" name="password" placeholder="Current Password" autocomplete="off">
                     </div>
                     <div class="input-group resetModalchild">
-                        <input ng-model="newpassword" type="password" class="ic-newpassword reset-control" name="password" placeholder="New Password" autocomplete="off">
+                        <input ng-model="newpassword" type="password" maxlength="16" class="ic-newpassword reset-control spaceRegex passwordRegex" name="password" placeholder="New Password" autocomplete="off">
                     </div>
                     <div class="input-group resetModalchild">
-                        <input ng-model="confpassword" type="password" class="ic-confpassword reset-control" name="password" placeholder="Confirm Password" autocomplete="off">
+                        <input ng-model="confpassword" type="password" maxlength="16" class="ic-confpassword reset-control spaceRegex passwordRegex" name="password" placeholder="Confirm Password" autocomplete="off">
                     </div>
                     <span ng-show="passwordValidation" class="errorMessages">{{passwordValidation}}</span>
                   </div>

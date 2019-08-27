@@ -324,6 +324,25 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		}
 	};
 
+	$(document).on("keypress", ".spaceRegex", function (e) {
+		if(e.keyCode == 32)
+		{
+			return false;
+		}
+	});
+
+	// All Special characters prevented on cut copy paste
+	$(document).on('cut copy paste', '.passwordRegex', function (e) {
+		var element = $(this);
+		setTimeout(function () {
+			var userEnteredText = element.val();
+			var regex;
+				//regex = ;
+			userEnteredText = userEnteredText.replace(/\s/g, "");
+			element.val(userEnteredText);
+		}, 5);
+	});
+
 	if (window.localStorage['_CT']) {
 		projectId.push(JSON.parse(window.localStorage['_CT']).projectId);
 		headerServices.getNames_ICE(projectId,['projects']) 

@@ -180,6 +180,7 @@ function next_function(resultobj, cb, data) {
 			if (t.status != undefined) {
 				taskDetails.status = t.status;
 				status_dict[t.status]++;
+				logger.info(status_dict);
 			}
 			var parent = t.parent.substring(1, t.parent.length - 1).split(",");
 			var parent_length = parent.length;
