@@ -372,6 +372,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	}
 	$scope.filterTasks = function($event){
 		var tasksJson = $scope.taskJson;
+		$(".searchInput").remove();
 		$('#dialog-taskFilter').modal('hide');
 		window.localStorage['_TJ'] = angular.toJson(tasksJson);
 		$(".plugin-taks-listing").empty();
