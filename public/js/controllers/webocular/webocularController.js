@@ -988,7 +988,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 	$scope.saveReport = function($event){
 		webocularServices.saveResults($scope.url, $scope.level, $scope.selectedAgent, $scope.proxy, $scope.crawledLinks, $scope.searchData, $scope.modulename)
 		.then(function (data) {
-			if (data == "Success"){
+			if (data == "success"){
 				openDialog("Webocular Screen","Successfully saved the report");
 				$('#save_webocular').attr("disabled", "disabled")
 			}else if (data== "fail"){

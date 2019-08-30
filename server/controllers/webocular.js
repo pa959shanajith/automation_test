@@ -125,9 +125,9 @@ exports.saveResults = function (req, res) {
 		function(result, response) {
 			if (response.statusCode != 200 || result.rows == "fail") {
 				logger.error("Error occurred in reports/getWebocularData_ICE from saveResults Error Code : ERRNDAC");
-				res.send("Fail");
+				res.send("fail");
 			} else {
-		res.send("Success");
+		res.send("success");
 			}});
 	}
 }
