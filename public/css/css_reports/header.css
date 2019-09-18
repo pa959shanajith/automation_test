@@ -187,7 +187,9 @@ button,
 }
 
 .dropdown-menu>li>a.userRoleInfo {
-	padding: 5px 47px !important;
+	padding: 5px 20px !important;
+	width: 100%;
+	text-align: left !important;
 }
 
 .dropdown-menu .divider {
