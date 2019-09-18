@@ -184,8 +184,18 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         openModalPopup("Modules", "No Modules Found");
                         $(".mid-report-section").hide();
                         $('#searchModule').attr('disabled', 'disabled');
+                        if($('.slideOpen').is(":visible") == true)
+                        {
+                            $('div.moduleBox').removeClass('slideOpen');
+                            $('#expAssign').trigger('click');
+                        }
                     } else {
                         //Modules Display
+                        $rootScope.reportData = result_res_reportData.rows;
+                        angular.forEach(result_res_reportData.rows, function(value, index) {
+                            $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value.testsuiteid + '  title=' + value.testsuitename + ' style="width: 139px;"><img class="ct-nodeIcon" id=' + value.testsuiteid + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.testsuitename + '</span></div>')
+                            $('.reports-search').removeAttr('disabled', 'disabled');
+                        });
                         $('#searchModule').removeAttr('disabled', 'disabled');
                         if ($('.moduleBox').is(':visible') == true) {
 
@@ -193,11 +203,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             $('div.moduleBox').removeClass('slideOpen');
                             $('#expAssign').trigger('click');
                         }
-                        $rootScope.reportData = result_res_reportData.rows;
-                        angular.forEach(result_res_reportData.rows, function(value, index) {
-                            $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value.testsuiteid + '  title=' + value.testsuitename + ' style="width: 139px;"><img class="ct-nodeIcon" id=' + value.testsuiteid + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.testsuitename + '</span></div>')
-                            $('.reports-search').removeAttr('disabled', 'disabled');
-                        });
                     }
                     $('#ctExpandAssign').css('pointer-events','auto')
                     if (redirected) {
@@ -216,7 +221,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             });
             reportService.getWebocularModule_ICE()
             .then(function(result_webocular_reportData) {
-                if (result_webocular_reportData == "Fail") {
+                if (result_webocular_reportData == "fail") {
                     console.log("Reports", "Failed to load Webocular Reports");
                 } else {
                     $(".mid-report-section").hide();
@@ -261,19 +266,31 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
   
     //Toggle(Show/Hide) Module Div
     $('#expAssign').on('click', function(e) {
-        $(".moduleBox").slideToggle('slow', function() {
-             if($('div.moduleBox').hasClass('slideOpen') == true)
+        if($(".ct-nodeIcon").length == 0)
+        {
+            if($('#expAssign').attr('src') == "imgs/ic-collapseup.png")
             {
-                slideOpen = true;
-                $(this).next().children().children().attr('src', 'imgs/ic-collapse.png');
+                $(".moduleBox").slideToggle('slow', function() {
+                    $('#expAssign').css('pointer-events','none');
+                });
             }
-            else
-            {
-                slideOpen = false;
-                $(this).next().children().children().attr('src', 'imgs/ic-collapseup.png');
-            }  
-            $(this).toggleClass('slideOpen');
-        });
+        }
+        else{
+            $(".moduleBox").slideToggle('slow', function() {
+                if($('div.moduleBox').hasClass('slideOpen') == true)
+               {
+                   slideOpen = true;
+                   $(this).next().children().children().attr('src', 'imgs/ic-collapse.png');
+               }
+               else
+               {
+                   slideOpen = false;
+                   $(this).next().children().children().attr('src', 'imgs/ic-collapseup.png');
+               }  
+               $(this).toggleClass('slideOpen');
+               $('#expAssign').css('pointer-events','');
+           });
+        }
     });
 
     //Search Modules
@@ -436,6 +453,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         }else{
                             proxy="Disabled";
                         }
+                        console.log("Report Data",result_webocular_reportData);
                         $("#report-header").append('<div width="100%"height="100%"class="webCrawler-header"><label style="position: relative;bottom: 1px;">Webocular Report</label></div><div style="display: flex;"><div style="width:50%;"><div><label class="webCrawler-report-label">Crawl Name</label><span class="webCrawler-report-span">'+result_webocular_reportData.rows[0].modulename+'</span></div><div><label class="webCrawler-report-label">URL</label><span class="webCrawler-report-span">'+result_webocular_reportData.rows[0].url+'</span></div><div><label class="webCrawler-report-label">Agent</label><span class="webCrawler-report-span">'+result_webocular_reportData.rows[0].agent+'</span></div><div><label class="webCrawler-report-label">Level</label><span class="webCrawler-report-span">'+result_webocular_reportData.rows[0].level+'</span></div></div><div style="width:50%;"><div><label class="webCrawler-report-label">Proxy</label><span class="webCrawler-report-span">'+proxy+'</span></div><div><label class="webCrawler-report-label">Proxy URL</label><span class="webCrawler-report-span">'+result_webocular_reportData.rows[0].proxy.url+'</span></div><div><label class="webCrawler-report-label">Username</label><span class="webCrawler-report-span">'+result_webocular_reportData.rows[0].proxy.username+'</span></div><div><label class="webCrawler-report-label">SearchData</label><span class="webCrawler-report-span">'+result_webocular_reportData.rows[0].searchData.text+'</span></div></div></div>')
                         var body = document.getElementById('report-canvas');
                         var reportDiv = document.createElement('div');
@@ -449,45 +467,167 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         var tbdy = document.createElement('tbody');
 
                         var headrow = document.createElement('tr');
-                        var headData = {0: 'S.No.', 1 : 'Level', 2 : 'URL', 3: 'Parent URL', 4 : 'Redirected', 5:	'Status', 6 : 'Title' ,7 :'Search Text Count'};
-                        for (var i=0; i<8; i++){
-                            var th = document.createElement('th');
-                            th.appendChild(document.createTextNode(headData[i]));
-                            headrow.appendChild(th);
-                        }
-                        
-                        headrow.childNodes[0].setAttribute('style','width : 55px');
-                        headrow.childNodes[1].setAttribute('style','width : 55px');
-                        headrow.childNodes[5].setAttribute('style','width : 65px');
-                        tbdy.appendChild(headrow);
-                        jsonStruct = {0 : 'level', 1 : 'name' , 2 : 'parent' , 3 : 'redirected' , 4 : 'status' , 5	:'title', 6 : 'searchTextCount'};
-                        for(i=0; i<result_webocular_reportData.rows[0].data.length; i++){
+                        if(result_webocular_reportData.rows[0]["searchData"]["accessTest"]==true)
+                        {
+                            
+                            var headData = {0: 'S.No.', 1 : 'Level', 2 : 'URL', 3:	'Status' ,4:'A',5:'AA',6:'Section508',7:'Best-Practice'};
+                            jsonStruct = {0 : 'level', 1 : 'name' , 2 : 'status'};
+                            for(var i=0;i<8;i++)
+                            {
+                                var th = document.createElement('th');
+                                th.appendChild(document.createTextNode(headData[i]));
+                                headrow.appendChild(th);		
+                            }
+
+                            tbdy.appendChild(headrow);
+                            headrow.childNodes[0].setAttribute('style','width : 55px');
+                            headrow.childNodes[1].setAttribute('style','width : 55px');
+                            headrow.childNodes[3].setAttribute('style','width : 55px');
+                            headrow.childNodes[4].setAttribute('style','width : 85px');
+                            headrow.childNodes[5].setAttribute('style','width : 85px');
+                            headrow.childNodes[6].setAttribute('style','width : 85px');
+                            headrow.childNodes[7].setAttribute('style','width : 85px');
+
+                            // Iterating through links for Body Element
+                            for(i=0;i<result_webocular_reportData.rows[0].data.length;i++)
+                            {
                                 var newRow = document.createElement('tr');
                                 if(result_webocular_reportData.rows[0].data[i]['type'] == "duplicate")
                                     continue;
-                                //create SNo text node
+                                // Adding the SNo Element.
                                 var sNo = document.createElement('td');
                                 sNo.setAttribute('style', 'width: 55px');
                                 sNo.appendChild(document.createTextNode(i+1));
                                 newRow.appendChild(sNo);
 
-                                //7 is the number of attributes from Level to title
-                                for(j=0 ; j<7; j++){
-                                    var data = document.createElement('td');
-                                    text = result_webocular_reportData.rows[0].data[i][jsonStruct[j]];
-                                    
-                                    if(text == undefined)
-                                        text = "-";
-                                    data.appendChild(document.createTextNode(text));
-                                    newRow.appendChild(data);
+                                for(i=0;i<result_webocular_reportData.rows[0].data.length;i++)
+                                {
+                                    for(j=0 ; j<3; j++){
+                                        var data = document.createElement('td');
+                                        text = result_webocular_reportData.rows[0].data[i][jsonStruct[j]];
+                                        if(text == undefined)
+                                            text = "-";
+                                        data.appendChild(document.createTextNode(text));
+                                        newRow.appendChild(data);
+                                    }
+
+                                    // Adding if the Accessibly test passed or failed.
+                                    for(k=0;k<4;k++)
+                                    {
+                                        var node= document.createElement('td');
+                                        if(result_webocular_reportData.rows[0].data[i]["access-rules"][k]["selected"])
+                                        {
+                                            if(result_webocular_reportData.rows[0].data[i]["access-rules"][k]["pass"])
+                                            {
+                                                node.innerHTML='<div class="foo green"></div>';
+                                            }
+                                            else
+                                            {
+                                                node.innerHTML='<div class="foo red"></div>';
+                                            }
+                                        }
+                                        else
+                                        {
+                                            node.innerHTML='NA';
+                                        }
+                                        newRow.appendChild(node);
+                                    }
+
+                                    tbdy.appendChild(newRow);
+
+
                                 }
-                                tbdy.appendChild(newRow);
-                                
+                            }
+
+                            
+
+                            
+                        }
+                        else
+                        {
+                            
+                            var headData = {0: 'S.No.', 1 : 'Level', 2 : 'URL', 3: 'Parent URL', 4 : 'Redirected', 5:	'Status', 6 : 'Title' ,7 :'Search Text Count'};
+                            for (var i=0; i<8; i++)
+                            {
+                                var th = document.createElement('th');
+                                th.appendChild(document.createTextNode(headData[i]));
+                                headrow.appendChild(th);
+                            }
+                            
+                            headrow.childNodes[0].setAttribute('style','width : 55px');
+                            headrow.childNodes[1].setAttribute('style','width : 55px');
+                            headrow.childNodes[5].setAttribute('style','width : 65px');
+                            tbdy.appendChild(headrow);
+                            jsonStruct = {0 : 'level', 1 : 'name' , 2 : 'parent' , 3 : 'redirected' , 4 : 'status' , 5	:'title', 6 : 'searchTextCount'};
+                            for(i=0; i<result_webocular_reportData.rows[0].data.length; i++)
+                            {
+                                    var newRow = document.createElement('tr');
+                                    if(result_webocular_reportData.rows[0].data[i]['type'] == "duplicate")
+                                        continue;
+                                    //create SNo text node
+                                    var sNo = document.createElement('td');
+                                    sNo.setAttribute('style', 'width: 55px');
+                                    sNo.appendChild(document.createTextNode(i+1));
+                                    newRow.appendChild(sNo);
+
+                                    //7 is the number of attributes from Level to title
+                                    for(j=0 ; j<7; j++)
+                                    {
+                                        var data = document.createElement('td');
+                                        text = result_webocular_reportData.rows[0].data[i][jsonStruct[j]];
+                                        
+                                        if(text == undefined)
+                                            text = "-";
+                                        data.appendChild(document.createTextNode(text));
+                                        newRow.appendChild(data);
+                                    }
+                                    tbdy.appendChild(newRow);
+                                    
+                            }
+
                         }
                         tbl.appendChild(tbdy);
                         reportDiv.appendChild(tbl);
                         body.appendChild(reportDiv);
-                } 
+
+                        // View of Access Voilations.
+                        if(result_webocular_reportData.rows[0]["searchData"]["accessTest"]==true)
+                        {
+                            var accessDiv = document.createElement('table');
+                            accessDiv.setAttribute('width','100%');
+                            accessDiv.setAttribute('class', 'webCrawler-report-table');
+
+                            var tr1=document.createElement('tr');
+                            headers=["SNo","Description","Help","Impact"];
+                            datas=["description","help","impact"];
+                            for(i=0;i<headers.length;i++)
+                            {
+                                var th1=document.createElement('th');
+                                th1.appendChild(document.createTextNode(headers[i]));
+                                tr1.appendChild(th1);
+                            }
+
+                            accessDiv.appendChild(tr1);
+                            
+                            for(i=0;i<result_webocular_reportData.rows[0].data[0]["accessibility"]["violations"].length;i++)
+                            {
+                                var tr1=document.createElement('tr');
+                                var td1=document.createElement('td');
+                                td1.appendChild(document.createTextNode(i+1));
+                                tr1.append(td1);
+                                for(j=0;j<datas.length;j++)
+                                {
+                                    var td1=document.createElement('td');
+                                    td1.appendChild(document.createTextNode(result_webocular_reportData.rows[0].data[0]["accessibility"]["violations"][i][datas[j]]));
+                                    tr1.appendChild(td1);
+                                }
+                                accessDiv.appendChild(tr1);
+                            }
+                            body.appendChild(accessDiv);
+                        }
+                        // View of Access Voilations.
+
+                }
             }
         }, function(error) {
             unblockUI();

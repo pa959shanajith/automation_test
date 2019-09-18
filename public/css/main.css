@@ -4760,10 +4760,27 @@ select:-webkit-autofill:focus {
     -webkit-transform: translateX(-50%) translateY(-50%);
     -ms-transform: translateX(-45%) translateY(-45%);
     background-color: #e6e7e9;
-    width: 329px;
+    width: 546px;
     height: 170px;
     border-radius: 16px;
 }
+
+.foo {
+    float: left;
+    width: 20px;
+    height: 20px;
+    margin: 5px;
+    /* border: 1px solid rgba(0, 0, 0, .2); */
+    border-radius: 5px;
+  }
+  
+  .green {
+    background: #13b4ff;
+  }
+  
+  .red {
+    background: #ab3fdd;
+  }
 
 .createOptionContainer{
     padding: 28px 0px;
@@ -5288,10 +5305,11 @@ Webocular report css
 .webCrawler-header {
     font-size: 14px;
     border: 1px solid #FFF;
-    background-color: #643693;
+    background-color: #331d4e;
     color: #FFF;
     padding: 14px;
     border-radius: 10px;
+    font-family: inherit;
   }
 .webCrawler-report-span{
     font-size: 14px;
@@ -5299,11 +5317,12 @@ Webocular report css
 .webCrawler-toggle-btn{
     height: 20px;
     width: 70px;
-    background: #643693;
+    background: #331d4e;
     font-size: 12px;
     padding: 0px 6px;
     color: #f5f5f5;
     border-radius: 20px;
+    font-family: inherit;
 }
 .webCrawler-report-label{
     padding: 2px 30px;
@@ -5319,6 +5338,22 @@ Webocular report css
   border-radius: 10px;
   border: 1px solid #e8e6fe;
 }
+
+.webCrawler-report-access
+{
+    border: 1px solid #D9E4E6;
+    font-size: 14px;
+    margin: 1em 0;
+    /* width: 100%; */
+    width: 1213px;
+    overflow: hidden;
+    background: #FFF;
+    color: #024457;
+    border-radius: 10px;
+    border: 1px solid #e8e6fe;
+    display: table-cell;
+    /* text-align: center; */
+}
 .webCrawler-report-table tr {
   border: 1px solid #D9E4E6;
   font-size: 14px;
@@ -5329,9 +5364,10 @@ Webocular report css
 .webCrawler-report-table th {
   display: none;
   border: 1px solid #FFF;
-  background-color: #643693;
+  background-color: #331d4e;
   color: #FFF;
   padding: 1em;
+  font-family: inherit;
 }
 .webCrawler-report-table th:first-child {
   display: table-cell;

@@ -28,8 +28,13 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		}, 300);
 	}
 
+	function toggleTaskIcon(){
+		document.getElementById("popupSlidehide").disabled = false;
+	};
+
 	socket.on('ICEnotAvailable', function () {
 		unblockUI();
+		toggleTaskIcon();
 		openDialog("Webocular Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
 	});
 
@@ -37,18 +42,29 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 	var currentDot = 0; // used to store the count of dots displayed in progess canvas
 	$scope.crawlActive = false; // Flag to avoid duplicate/invalid requests
 	$scope.hideBaseContent = { message: 'false' };
-	$scope.level = 4;
+	$scope.level = 0;
 	$scope.arr = [];
-	$scope.crawledLinks = [];
+	var crawledLinks_var = [];
 	$scope.enableGenerate = false;
 	$scope.selectedAgent = "chrome";
 	$scope.url = "http://";
 	$scope.tab = "webocularHome"
-	$scope.searchData={"text":"","image":""};
-	$scope.modulename=""
+	$scope.accessRules=[{name:'A',selected:false,tag:"wcag2a","pass":true,"count":10},{name:'AA',selected:true,tag:"wcag2aa","pass":true,"count":0},{name:'Section 508',selected:true,tag:"section508","pass":true,"count":0},{name:'Best-Practice',selected:true,tag:"best-practice","pass":true,"count":0}];
+	$scope.searchData={"text":"","image":"","access-rules":$scope.accessRules,"accessTest":false};
+	$scope.modulename="";
 	$scope.proxy = $scope.tprxy = {enable: false, url: "", username: "", password: ""};
+	$scope.reportView=false;
 	$scope.showWebocularHome = function(){
-		$scope.tab="webocularHome";
+		if($scope.reportView && $scope.enableGenerate)
+		{
+			$scope.tab=$scope.tab;
+			$scope.reportView=false;
+		}
+		else
+		{
+			$scope.tab="webocularHome";
+		}
+		
 		if (!$scope.enableGenerate) return;
 		var myNode = document.getElementById("report-canvas");
 		while (myNode.firstChild) {
@@ -82,6 +98,10 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 	};
 
 	$scope.executeGo = function($event){
+		var ruleSelected=false;
+		$scope.accessRules.forEach(rule => {
+			ruleSelected=ruleSelected || rule.selected;
+		});
 		if($scope.modulename == "")
 		{
 			openDialog("Error", "Crawl Name cannot be empty.");
@@ -92,12 +112,24 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 			openDialog("Error", "Search Text cannot be empty.");
 			return;
 		}
+		else if($scope.tab=='accessibilityTesting' && ruleSelected==false)
+		{
+			openDialog("Error", "Atleast one rule must be selected.");
+			return;
+		}
+		if($scope.tab=="accessibilityTesting")
+		{
+			$scope.searchData.accessTest=true;
+		}
+		document.getElementById("popupSlidehide").disabled = true;
+		$("#popupSlidehide").css("cursor","auto");
 		localStorage.setItem("navigateEnable", false);
 		$scope.enableGenerate = false;
-		$scope.crawledLinks = [];
+		crawledLinks_var = [];
 		$scope.arr = [];
 		$scope.crawlActive = false;
 		var initCrawl = true;
+		$scope.searchData["access-rules"]=$scope.accessRules;
 		$('#save_webocular').removeAttr("disabled")
 		start = false; // Flag to start the removal of dots from the dom
 		currentDot = 0;
@@ -144,10 +176,10 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 				$rootScope.resetSession.end();
 				$scope.crawlActive = false;
 				localStorage.setItem("navigateEnable", true);
-				console.log("Data from service", data);
 				if(data == "Invalid Session") {
 					return $rootScope.redirectPage();
 				} else {
+					toggleTaskIcon();
 					$scope.hideBaseContent = { message: 'false' }; // Display the progress canvas after clearing all dots.
 					$('#progress-canvas').hide();
 					if (data == "unavailableLocalServer") openDialog("Webocular Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
@@ -170,15 +202,18 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 
 		socketUI.on('reconnecting', function(attemptNumber){ // fired when the socket attempts to reconnect
 			console.debug(attemptNumber);
+			toggleTaskIcon();
 		});
 		socketUI.on('connect_timeout', function(timeout) { // fired on socket connection timeout
 			console.debug("timeout" , timeout);
+			toggleTaskIcon();
 		});
 		socketUI.on('error', function(error) { // fired on socket error
 			console.error("error", error);
+			toggleTaskIcon();
 		});
 		socketUI.on('newdata', function(obj){
-			$scope.crawledLinks.push(obj);
+			crawledLinks_var.push(obj);
 			if (obj.type == "subdomain") $scope.arr.push(obj.name);
 			$scope.addDot(obj);
 			$scope.$apply();
@@ -186,7 +221,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 
 		socketUI.on('endData', function(obj){
 			var reverseLinks = obj.sdata.links;
-			$scope.crawledLinks = $scope.crawledLinks.concat(reverseLinks);
+			crawledLinks_var = crawledLinks_var.concat(reverseLinks);
 			$scope.otherLinks = obj.notParsedURLs;
 			$('#progress-canvas').fadeOut(800, function(){
 				$scope.hideBaseContent = { message: 'false' };
@@ -197,6 +232,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 			$scope.check= false;
 			$scope.$apply();
 			socketUI.disconnect('', { query: "check=true" });
+			toggleTaskIcon();
 		});
 		//Transaction Activity for WebocularGoClick
 		// var labelArr = [];
@@ -216,6 +252,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 			console.error(data.data);
 			openDialog("Webocular Screen", "Error while crawling. Fail to Crawl.");
 		}
+		toggleTaskIcon();
 	});
 
 	$scope.addDomainDot = function(){
@@ -485,10 +522,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		.attr("width", "100%")
 		.attr("height", "100%")
 		.attr("pointer-events", "all").call(zoom).on("dblclick.zoom", null);
-		console.log("Number of Crawled Links ", $scope.crawledLinks.length);
-		var root = parseRelations(createLevelObject($scope.crawledLinks));
-		console.log(root);
-
+		var root = parseRelations(createLevelObject(crawledLinks_var));
 		var init = [];
 		root = addParents(root, init);
 		for (var i = 0; i < root.length; i++) {
@@ -918,6 +952,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 	/* function to show a table report*/
 	$scope.showReport = function($event){
 		$scope.hideBaseContent = { message: 'true' };
+		$scope.reportView=true;
 		var myNode = document.getElementById("report-canvas");
 		while (myNode.firstChild) {
 				myNode.removeChild(myNode.firstChild);
@@ -939,46 +974,125 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		tbl.setAttribute('class', 'webCrawler-report-table');
 		// $('.scrollbar-inner').scrollbar();
 		var tbdy = document.createElement('tbody');
-
 		var headrow = document.createElement('tr');
-		var headData = {0: 'S.No.', 1 : 'Level', 2 : 'URL', 3: 'Parent URL', 4 : 'Redirected', 5:	'Status', 6 : 'Title' ,7 :'Search Text Count'};
-		for (var i=0; i<8; i++){
-			var th = document.createElement('th');
-			th.appendChild(document.createTextNode(headData[i]));
-			headrow.appendChild(th);
-		}
-		
-		headrow.childNodes[0].setAttribute('style','width : 55px');
-		headrow.childNodes[1].setAttribute('style','width : 55px');
-		headrow.childNodes[5].setAttribute('style','width : 65px');
-		tbdy.appendChild(headrow);
-		jsonStruct = {0 : 'level', 1 : 'name' , 2 : 'parent' , 3 : 'redirected' , 4 : 'status' , 5	:'title', 6 : 'searchTextCount'};
-		for(i=0; i<$scope.crawledLinks.length; i++){
+
+		if($scope.tab=="accessibilityTesting")
+		{
+			// Creating head elements for Accessiblity.
+			var headData = {0: 'S.No.', 1 : 'Level', 2 : 'URL', 3:	'Status' ,4:'A',5:'AA',6:'Section508',7:'Best-Practice'};
+			jsonStruct = {0 : 'level', 1 : 'name' , 2 : 'status'};
+			for(var i=0;i<8;i++)
+			{
+				var th = document.createElement('th');
+				th.appendChild(document.createTextNode(headData[i]));
+				headrow.appendChild(th);		
+			}
+
+			tbdy.appendChild(headrow);
+			headrow.childNodes[0].setAttribute('style','width : 55px');
+			headrow.childNodes[1].setAttribute('style','width : 55px');
+			headrow.childNodes[3].setAttribute('style','width : 55px');
+			headrow.childNodes[4].setAttribute('style','width : 85px');
+			headrow.childNodes[5].setAttribute('style','width : 85px');
+			headrow.childNodes[6].setAttribute('style','width : 85px');
+			headrow.childNodes[7].setAttribute('style','width : 85px');
+
+			// Iterating through links for Body Element
+			for(i=0;i<crawledLinks_var.length;i++)
+			{
 				var newRow = document.createElement('tr');
-				if($scope.crawledLinks[i]['type'] == "duplicate")
+				if(crawledLinks_var[i]['type'] == "duplicate")
 					continue;
-				//create SNo text node
+				// Adding the SNo Element.
 				var sNo = document.createElement('td');
 				sNo.setAttribute('style', 'width: 55px');
 				sNo.appendChild(document.createTextNode(i+1));
 				newRow.appendChild(sNo);
 
-				//7 is the number of attributes from Level to title
-				for(j=0 ; j<7; j++){
-					var data = document.createElement('td');
-					text = $scope.crawledLinks[i][jsonStruct[j]];
-					
-					if(text == undefined)
-						text = "-";
-					data.appendChild(document.createTextNode(text));
-					newRow.appendChild(data);
+				for(i=0;i<crawledLinks_var.length;i++)
+				{
+					for(j=0 ; j<3; j++){
+						var data = document.createElement('td');
+						text = crawledLinks_var[i][jsonStruct[j]];
+						if(text == undefined)
+							text = "-";
+						data.appendChild(document.createTextNode(text));
+						newRow.appendChild(data);
+					}
+
+					// Adding if the Accessibly test passed or failed.
+					for(k=0;k<4;k++)
+					{
+						var node= document.createElement('td');
+						if(crawledLinks_var[i]["access-rules"][k]["selected"])
+						{
+							if(crawledLinks_var[i]["access-rules"][k]["pass"])
+							{
+								node.innerHTML='<div class="foo green"></div>';
+							}
+							else
+							{
+								node.innerHTML='<div class="foo red"></div>';
+							}
+						}
+						else
+						{
+							node.innerHTML='NA';
+						}
+						newRow.appendChild(node);
+					}
+
+					tbdy.appendChild(newRow);
+
 				}
-				tbdy.appendChild(newRow);
-				
+
+			}
+		}
+		else
+		{
+			var headData = {0: 'S.No.', 1 : 'Level', 2 : 'URL', 3: 'Parent URL', 4 : 'Redirected', 5:	'Status', 6 : 'Title' ,7 :'Search Text Count',8:'Accessiblity'};
+			for (var i=0; i<8; i++){
+				var th = document.createElement('th');
+				th.appendChild(document.createTextNode(headData[i]));
+				headrow.appendChild(th);
+			}
+			
+			headrow.childNodes[0].setAttribute('style','width : 55px');
+			headrow.childNodes[1].setAttribute('style','width : 55px');
+			headrow.childNodes[5].setAttribute('style','width : 65px');
+			tbdy.appendChild(headrow);
+			
+			jsonStruct = {0 : 'level', 1 : 'name' , 2 : 'parent' , 3 : 'redirected' , 4 : 'status' , 5	:'title', 6 : 'searchTextCount'};
+			for(i=0; i<crawledLinks_var.length; i++){
+					var newRow = document.createElement('tr');
+					if(crawledLinks_var[i]['type'] == "duplicate")
+						continue;
+					//create SNo text node
+					var sNo = document.createElement('td');
+					sNo.setAttribute('style', 'width: 55px');
+					sNo.appendChild(document.createTextNode(i+1));
+					newRow.appendChild(sNo);
+
+					//7 is the number of attributes from Level to title
+					for(j=0 ; j<7; j++){
+						var data = document.createElement('td');
+						text = crawledLinks_var[i][jsonStruct[j]];
+						
+						if(text == undefined)
+							text = "-";
+						data.appendChild(document.createTextNode(text));
+						newRow.appendChild(data);
+					}
+					tbdy.appendChild(newRow);
+					
+			}
 		}
 		tbl.appendChild(tbdy);
 		reportDiv.appendChild(tbl);
 		body.appendChild(reportDiv);
+		pstext=document.createElement('p');
+		pstext.innerHTML="<strong>Note:</strong> Go to Reports plugin for more details.";
+		body.appendChild(pstext);
 		//Transaction Activity for showReportClick
 		// var labelArr = [];
 		// var infoArr = [];
@@ -986,9 +1100,9 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
 	};
 	$scope.saveReport = function($event){
-		webocularServices.saveResults($scope.url, $scope.level, $scope.selectedAgent, $scope.proxy, $scope.crawledLinks, $scope.searchData, $scope.modulename)
+		webocularServices.saveResults($scope.url, $scope.level, $scope.selectedAgent, $scope.proxy, crawledLinks_var, $scope.searchData, $scope.modulename)
 		.then(function (data) {
-			if (data == "Success"){
+			if (data == "success"){
 				openDialog("Webocular Screen","Successfully saved the report");
 				$('#save_webocular').attr("disabled", "disabled")
 			}else if (data== "fail"){

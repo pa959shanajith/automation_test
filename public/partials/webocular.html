@@ -8,7 +8,7 @@
 	<!--Left Panel-->
 	<div id="left-nav-section">
 		<div class="scrollbar-macosx">
-			<div id="left-top-section" class="ApptypeScreenView">
+			<div id="left-top-section" class="ApptypeScreenView" ng-hide="tab=='webocularHome'" ng-show="tab=='simpleCrawl' || tab=='crawlWithText' || tab=='accessibilityTesting'">
 				<ul>
 					<li><span><a class="scrapeOnTxt">Crawl On</a></span></li>
 					<li><a id='ie_img1' ng-click="hideBaseContent.message=='false' ? selectedAgent = 'ie' : selectedAgent=selectedAgent" href="#" title="Internet Explorer"><span><img id='ie_img' class="highlightImg" ng-class="{'selectedIcon': selectedAgent === 'ie'}" src="imgs/ic-ie.png" alt="Internet Explorer"></span>Internet Explorer</a></li>
@@ -18,7 +18,7 @@
 				</ul>
 			</div>
 			<div class='clear-both'></div>
-			<div class="showContainer" id="left-bottom-section">
+			<div class="showContainer" id="left-bottom-section" ng-hide="tab=='webocularHome'" ng-show="tab=='simpleCrawl' || tab=='crawlWithText' || tab=='accessibilityTesting'">
 				<ul>
 					<li><a ng-click="setProxy('show', $event)" href='#' title="Set Proxy" ng-class="crawlActive? 'disableActions':'enableActions'"><span><img src='imgs/ic-setproxy.png' alt='Set Proxy' /></span>Set Proxy</a></li>
 				</ul>
@@ -46,13 +46,13 @@
 					  <img alt="Crawl with Text Search" class="" src="imgs/ic-endtoendFlow.png" style="margin-left:54px;margin-bottom:10px;">
 					  <label>Text Search</label>
 				   </div>
-				   <!-- <div ng-click="tab = 'crawlWithImage';" title="Crawl with Image Search">
-					  <img alt="Crawl with Image Search" class="" src="imgs/ic-importfromexcel-mindmap.png">
-					  <label>Image Search</label>
-					</div> -->
+				   <div ng-click="tab = 'accessibilityTesting';" title="Accessibility Test" style="margin-left:54px;margin-bottom:10px;">
+					  <img alt="Accessibility Test a URL" class="" src="imgs/ic-importfromexcel-mindmap.png">
+					  <label style="margin-top: 9px;margin-left: -41px;">Accessibility</label>
+					</div>
 				</div>
 			 </div>
-		<div ng-hide="tab =='webocularHome' || hideBaseContent.message == 'true'" ng-show="tab=='simpleCrawl' || tab=='crawlWithText' || tab=='crawlWithImage'">
+		<div ng-hide="tab =='webocularHome' || hideBaseContent.message == 'true'" ng-show="tab=='simpleCrawl' || tab=='crawlWithText' || tab=='accessibilityTesting'">
 			<div class="url-div">
 				<form name="webocular_form">
 					<div>
@@ -63,8 +63,8 @@
 					<div>
 						<span><b>URL </b> </span>	   
 				<input name="urlInput" type="url" ng-model="url" class="urlInput" placeholder="Enter URL" required style="width: 560px;">
-				<span><b>Level</b></span>
-				<input name="level" type="number" ng-model="level" class="urlInput" placeholder="" required style="width:65px;" min="0" max="20" step="1">
+				<span ng-hide="tab=='accessibilityTesting'"><b>Level</b></span>
+				<input ng-hide="tab=='accessibilityTesting'" name="level" type="number" ng-model="level" class="urlInput" placeholder="" required style="width:65px;" min="0" max="20" step="1">
 				<button ng-if="!webocular_form.urlInput.$valid" disabled class="btn btn-sm btn-crawl theme" ng-click="executeGo($event)">Go</button>
 				<button ng-if="webocular_form.urlInput.$valid" class="btn btn-sm btn-crawl theme" ng-click="executeGo($event)">Go</button>
 						<button ng-if="enableGenerate"  class="btn btn-md pull-right pairwise-GenBtn" ng-click="showReport($event)" title="Show Report">View Report</button>
@@ -75,10 +75,19 @@
 					<br><span><b>Enter Text</b> </span>
 					<input name="searchText" type="text" ng-model="searchData.text" class="urlInput" placeholder="Enter Text to be Searched" style="width: 560px;">
 				</div>
-					<!--<span>Screen Capture</span>
-					<button  class="btn btn-sm btn-crawl theme" title=" Run for all">All</button>
-					<button  class="btn btn-sm btn-crawl " title="Run only for failed">Only Failed</button>-->
-					
+				<br>
+				<div ng-show="tab=='accessibilityTesting'">
+					<span><b>Level</b></span>
+					<!-- <button  class="btn btn-sm btn-crawl theme" title=" Run for all">All</button>
+					<button  class="btn btn-sm btn-crawl " title="Run only for failed">Only Failed</button> -->
+					<span ng-repeat="rule in accessRules" style="width:110px;">
+						<input type="checkbox" name="accessRules[]" value="{{rule.name}}" ng-model="rule.selected"> {{rule.name}}   
+					</span>
+
+					<!-- <input type="checkbox" name="searchData.access-rules[]" ng-model="searchData.access-rules.wcag2a"> A 
+					<input type="checkbox" name="searchData.access-rules[]" ng-model="searchData.access-rules.wcag2aa"> AA  -->
+					<!-- <input type="checkbox" name="levelaaa" value="Boat"> AAA  -->
+				</div>	
 			</form>
 			</div>
 
@@ -117,7 +126,7 @@
 
 		<!--Images Blocks-->
 		<div class="thumbnail thumbnail-custom">
-        	<a class="slidePopup"  title="Tasks">
+        	<a class="slidePopup" id="popupSlidehide" title="Tasks">
           		<img class="thumb-ic" src="imgs/ic-task.png" alt="Tasks">
           		<div class="caption">
             		<p>Tasks</p>
