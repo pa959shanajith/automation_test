@@ -28,8 +28,13 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		}, 300);
 	}
 
+	function toggleTaskIcon(){
+		document.getElementById("popupSlidehide").disabled = false;
+	};
+
 	socket.on('ICEnotAvailable', function () {
 		unblockUI();
+		toggleTaskIcon();
 		openDialog("Webocular Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
 	});
 
@@ -116,6 +121,8 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		{
 			$scope.searchData.accessTest=true;
 		}
+		document.getElementById("popupSlidehide").disabled = true;
+		$("#popupSlidehide").css("cursor","auto");
 		localStorage.setItem("navigateEnable", false);
 		$scope.enableGenerate = false;
 		crawledLinks_var = [];
@@ -169,10 +176,10 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 				$rootScope.resetSession.end();
 				$scope.crawlActive = false;
 				localStorage.setItem("navigateEnable", true);
-				console.log("Data from service", data);
 				if(data == "Invalid Session") {
 					return $rootScope.redirectPage();
 				} else {
+					toggleTaskIcon();
 					$scope.hideBaseContent = { message: 'false' }; // Display the progress canvas after clearing all dots.
 					$('#progress-canvas').hide();
 					if (data == "unavailableLocalServer") openDialog("Webocular Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
@@ -195,12 +202,15 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 
 		socketUI.on('reconnecting', function(attemptNumber){ // fired when the socket attempts to reconnect
 			console.debug(attemptNumber);
+			toggleTaskIcon();
 		});
 		socketUI.on('connect_timeout', function(timeout) { // fired on socket connection timeout
 			console.debug("timeout" , timeout);
+			toggleTaskIcon();
 		});
 		socketUI.on('error', function(error) { // fired on socket error
 			console.error("error", error);
+			toggleTaskIcon();
 		});
 		socketUI.on('newdata', function(obj){
 			crawledLinks_var.push(obj);
@@ -222,6 +232,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 			$scope.check= false;
 			$scope.$apply();
 			socketUI.disconnect('', { query: "check=true" });
+			toggleTaskIcon();
 		});
 		//Transaction Activity for WebocularGoClick
 		// var labelArr = [];
@@ -232,7 +243,6 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 
 	socket.on('result_WebcrawlerFinished', function (data) {
 		if (!$scope.crawlActive) return false;
-		console.log("Data is",data)
 		$rootScope.resetSession.end();
 		$scope.crawlActive = false;
 		if (!data.success) {
@@ -242,11 +252,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 			console.error(data.data);
 			openDialog("Webocular Screen", "Error while crawling. Fail to Crawl.");
 		}
-		// else
-		// {
-		// 	console.log("crawledLinks ",crawledLinks_var);
-		// 	$scope.saveReport();
-		// }
+		toggleTaskIcon();
 	});
 
 	$scope.addDomainDot = function(){
@@ -516,10 +522,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		.attr("width", "100%")
 		.attr("height", "100%")
 		.attr("pointer-events", "all").call(zoom).on("dblclick.zoom", null);
-		console.log("Number of Crawled Links ", crawledLinks_var.length);
 		var root = parseRelations(createLevelObject(crawledLinks_var));
-		console.log(root);
-
 		var init = [];
 		root = addParents(root, init);
 		for (var i = 0; i < root.length; i++) {

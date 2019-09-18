@@ -736,7 +736,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     function loadMapPopupConfirmed() {
-        blockUI("Loading module.. Please wait..");
         d3.selectAll('.zoom-btn').on('click', zoomClick);
         $('.navigate-widget').removeClass("no-disp");
         $('.navigate-widget').draggable({ containment: "#ct-mapSvg" });
@@ -764,6 +763,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         d3.select('#ct-inpBox').classed('no-disp', true);
         var modName = $('#createNewConfirmationPopup').attr('mapid');
         $scope.modType = 'e2e';
+        blockUI("Loading module.. Please wait..");
         mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, 0, $('.release-list').val(), $('.cycle-list').val(), modName).then(function(result) {
             unloadMindmapData();
             initiate();
@@ -779,6 +779,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 populateDynamicInputList();
             setModuleBoxHeight();
             treeBuilder(currMap);
+            unblockUI();
             IncompleteFlowFlag = false;
             var errTemp = false;
             if (dNodes[0].type != 'modules_endtoend') {
@@ -788,7 +789,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             if (errTemp) {
                 IncompleteFlowFlag = true;
             }
-            unblockUI();
         }, function(error) {
             unblockUI();
             openDialogMindmap("Error", "Error while loading module");
@@ -806,7 +806,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 dNodes.forEach(function(f, j) {
                     if (e.type == f.type && e.type == 'screens' && e.name == f.name && i != j)
                         dictTmp[i].push(j);
-                    else if (e.type == f.type && e.type == 'testcases' && e.name == f.name && i != j && e.parent.name == f.parent.name)
+                    else if (e.type == f.type && e.type == 'testcases' && e.name == f.name && i != j && e.parent && f.parent && e.parent.name == f.parent.name)
                         dictTmp[i].push(j);
                 })
             }

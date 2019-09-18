@@ -184,8 +184,18 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         openModalPopup("Modules", "No Modules Found");
                         $(".mid-report-section").hide();
                         $('#searchModule').attr('disabled', 'disabled');
+                        if($('.slideOpen').is(":visible") == true)
+                        {
+                            $('div.moduleBox').removeClass('slideOpen');
+                            $('#expAssign').trigger('click');
+                        }
                     } else {
                         //Modules Display
+                        $rootScope.reportData = result_res_reportData.rows;
+                        angular.forEach(result_res_reportData.rows, function(value, index) {
+                            $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value.testsuiteid + '  title=' + value.testsuitename + ' style="width: 139px;"><img class="ct-nodeIcon" id=' + value.testsuiteid + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.testsuitename + '</span></div>')
+                            $('.reports-search').removeAttr('disabled', 'disabled');
+                        });
                         $('#searchModule').removeAttr('disabled', 'disabled');
                         if ($('.moduleBox').is(':visible') == true) {
 
@@ -193,11 +203,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             $('div.moduleBox').removeClass('slideOpen');
                             $('#expAssign').trigger('click');
                         }
-                        $rootScope.reportData = result_res_reportData.rows;
-                        angular.forEach(result_res_reportData.rows, function(value, index) {
-                            $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value.testsuiteid + '  title=' + value.testsuitename + ' style="width: 139px;"><img class="ct-nodeIcon" id=' + value.testsuiteid + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.testsuitename + '</span></div>')
-                            $('.reports-search').removeAttr('disabled', 'disabled');
-                        });
                     }
                     $('#ctExpandAssign').css('pointer-events','auto')
                     if (redirected) {
@@ -216,7 +221,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             });
             reportService.getWebocularModule_ICE()
             .then(function(result_webocular_reportData) {
-                if (result_webocular_reportData == "Fail") {
+                if (result_webocular_reportData == "fail") {
                     console.log("Reports", "Failed to load Webocular Reports");
                 } else {
                     $(".mid-report-section").hide();
@@ -261,19 +266,31 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
   
     //Toggle(Show/Hide) Module Div
     $('#expAssign').on('click', function(e) {
-        $(".moduleBox").slideToggle('slow', function() {
-             if($('div.moduleBox').hasClass('slideOpen') == true)
+        if($(".ct-nodeIcon").length == 0)
+        {
+            if($('#expAssign').attr('src') == "imgs/ic-collapseup.png")
             {
-                slideOpen = true;
-                $(this).next().children().children().attr('src', 'imgs/ic-collapse.png');
+                $(".moduleBox").slideToggle('slow', function() {
+                    $('#expAssign').css('pointer-events','none');
+                });
             }
-            else
-            {
-                slideOpen = false;
-                $(this).next().children().children().attr('src', 'imgs/ic-collapseup.png');
-            }  
-            $(this).toggleClass('slideOpen');
-        });
+        }
+        else{
+            $(".moduleBox").slideToggle('slow', function() {
+                if($('div.moduleBox').hasClass('slideOpen') == true)
+               {
+                   slideOpen = true;
+                   $(this).next().children().children().attr('src', 'imgs/ic-collapse.png');
+               }
+               else
+               {
+                   slideOpen = false;
+                   $(this).next().children().children().attr('src', 'imgs/ic-collapseup.png');
+               }  
+               $(this).toggleClass('slideOpen');
+               $('#expAssign').css('pointer-events','');
+           });
+        }
     });
 
     //Search Modules

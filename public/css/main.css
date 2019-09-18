@@ -5305,10 +5305,11 @@ Webocular report css
 .webCrawler-header {
     font-size: 14px;
     border: 1px solid #FFF;
-    background-color: #643693;
+    background-color: #331d4e;
     color: #FFF;
     padding: 14px;
     border-radius: 10px;
+    font-family: inherit;
   }
 .webCrawler-report-span{
     font-size: 14px;
@@ -5316,11 +5317,12 @@ Webocular report css
 .webCrawler-toggle-btn{
     height: 20px;
     width: 70px;
-    background: #643693;
+    background: #331d4e;
     font-size: 12px;
     padding: 0px 6px;
     color: #f5f5f5;
     border-radius: 20px;
+    font-family: inherit;
 }
 .webCrawler-report-label{
     padding: 2px 30px;
@@ -5362,9 +5364,10 @@ Webocular report css
 .webCrawler-report-table th {
   display: none;
   border: 1px solid #FFF;
-  background-color: #643693;
+  background-color: #331d4e;
   color: #FFF;
   padding: 1em;
+  font-family: inherit;
 }
 .webCrawler-report-table th:first-child {
   display: table-cell;
