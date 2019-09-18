@@ -216,7 +216,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             });
             reportService.getWebocularModule_ICE()
             .then(function(result_webocular_reportData) {
-                if (result_webocular_reportData == "Fail") {
+                if (result_webocular_reportData == "fail") {
                     console.log("Reports", "Failed to load Webocular Reports");
                 } else {
                     $(".mid-report-section").hide();
