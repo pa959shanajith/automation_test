@@ -263,11 +263,10 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
 
     //Encryption
     $scope.EncryptData = function($event) {
-        //$("#encryptData").removeClass("inputErrorBorderFull");
+        $("#encryptData").removeClass("inputErrorBorderFull");
         //$("#utilityMethods").removeClass("selectErrorBorder");
         if ($("#utilityMethods option:selected").val() == "Select Method") {
             $("#utilityMethods").css('border', '').addClass("selectErrorBorder");
-            $("#encryptData").css('border', '').removeClass("inputErrorBorderFull");
             return false;
         } else if ($("#encryptData").val() == "") {
             $("#encryptData").css('border', '').addClass("inputErrorBorderFull");
@@ -275,8 +274,6 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
         } else {
             var methodSelected = $("#utilityMethods option:selected").val();
             var encryptionVal = $("#encryptData").val();
-            $("#encryptData").css('border', '').removeClass("inputErrorBorderFull");
-
             utilityService.Encrypt(methodSelected, encryptionVal)
                 .then(function(data) {
                     if (data == "Invalid Session") {
