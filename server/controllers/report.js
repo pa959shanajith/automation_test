@@ -696,6 +696,7 @@ exports.getReport_Nineteen68 = function(req, res) {
                                             reportInfoObj.reportId = reportId;
                                             reportInfoObj.executedtime = executedtime;
                                             reportInfoObj.testscenarioid = testscenarioid;
+                                            reportInfoObj.executionId = iterator.executionid;
                                             var inputs = {
                                                 "query": "scenariodetails",
                                                 "scenarioid": testscenarioid
