@@ -922,6 +922,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 	var valid_userdata = [];
 	var testsuite_creation_data = {};
 	var result_to_send = { "execution_status": [] };
+	var action = req.body.execution_data[0].exec_mode;
 	async.eachSeries(req.body.execution_data, function (uservalidation_iterator, cb_validation) {
 		uservalidation_iterator.userInfo.username = uservalidation_iterator.userInfo.username.toLowerCase();
 		uservalidation_iterator.userInfo.tokenname = uservalidation_iterator.userInfo.tokenname;
@@ -1063,6 +1064,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 								var testsuitedetailslist = [];
 								var testsuiteIds = [];
 								var executionRequest = {
+									"exec_mode": action,
 									"executionId": "",
 									"suitedetails": [],
 									"testsuiteIds": [],
