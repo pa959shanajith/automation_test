@@ -1009,7 +1009,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             finalReports.overallstatus[0].cycleName = data[0].cyclename
                             finalReports.overallstatus[0].scenarioName = data[0].testscenarioname
                             finalReports.overallstatus[0].reportId = reportID;
-                            finalReports.overallstatus[0].executionId = executionId;
+                            finalReports.overallstatus[0].executionId = data[0].executionId;;
                             finalReports.overallstatus[0].moduleName = $(".highlight-moduleName").text(); 
 
                             var obj2 = JSON.parse(data[1].reportdata);
