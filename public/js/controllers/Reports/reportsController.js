@@ -429,24 +429,30 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     });
 
     $(document).on('click', '.ct-nodeIcon1', function(e) {
+        blockUI('Loading.. Please wait..')
         $("#report-canvas").show();
         $("#report-header").show();
         $("#report-header").empty();
         $("#accordion").hide();
         $("#report-canvas").empty();
+        $('img.highlight-module').removeClass('highlight-module');
+        $('span.highlight-moduleName').removeClass('highlight-moduleName');
+        $(this).addClass('highlight-module').next('span').addClass('highlight-moduleName');
         $scope.reportGenerated = true;
         getWebocularInputData=e.target.id
 		reportService.getWebocularData_ICE(getWebocularInputData)
             .then(function(result_webocular_reportData) {
                 if (result_webocular_reportData == "Fail") {
                     openModalPopup("Reports", "Failed to load Webocular Reports");
+                    unblockUI()
                 } else {
                     $(".mid-report-section").hide();
                     if (result_webocular_reportData.rows.length == 0) {
                         //No Modules Found
-                        openModalPopup("Modules", "No Webocular Modules Found");
+                        console.log("Modules", "No Webocular Modules Found");
                         $(".mid-report-section").hide();
                         $('#searchModule').attr('disabled', 'disabled');
+                        unblockUI()
                     } else {
                         $('#middle-content-section').attr('class',"webCrawler-report");
                         if(result_webocular_reportData.rows[0].proxy.enable==="false"){
@@ -629,6 +635,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         // View of Access Voilations.
 
                 }
+                unblockUI()
             }
         }, function(error) {
             unblockUI();
