@@ -1100,18 +1100,43 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
 	};
 	$scope.saveReport = function($event){
-		webocularServices.saveResults($scope.url, $scope.level, $scope.selectedAgent, $scope.proxy, crawledLinks_var, $scope.searchData, $scope.modulename)
-		.then(function (data) {
-			if (data == "success"){
-				openDialog("Webocular Screen","Successfully saved the report");
-				$('#save_webocular').attr("disabled", "disabled")
-			}else if (data== "fail"){
-				openDialog("Webocular Screen","Failed to save the report");
+		var duplicateModuleName=false;
+		webocularServices.getWebocularModule_ICE()
+		.then(function(result_webocular_reportData) {
+			if (result_webocular_reportData == "fail") {
+				console.log("Reports", "Failed to load Webocular Reports");
+			} else {
+				if (result_webocular_reportData.rows.length == 0) {
+					console.log("Modules", "No Webocular Modules Found");
+				} else {
+					angular.forEach(result_webocular_reportData.rows, function(value, index) {
+						if(value.modulename==$scope.modulename){
+							duplicateModuleName=true;
+						}
+					});
+					if(duplicateModuleName==false){
+						webocularServices.saveResults($scope.url, $scope.level, $scope.selectedAgent, $scope.proxy, crawledLinks_var, $scope.searchData, $scope.modulename)
+						.then(function (data) {
+							if (data == "success"){
+								openDialog("Webocular Screen","Successfully saved the report");
+								$('#save_webocular').attr("disabled", "disabled")
+							}else if (data== "fail"){
+								openDialog("Webocular Screen","Failed to save the report");
+							}
+						},
+						function (error) {
+							console.log("Error in webocularController.js file saveReport method! \r\n " + (error.data));
+						}); //	getObjectType end
+					}
+					else{
+						openDialog("Webocular Screen","Module name already exist.");
+						unblockUI();
+					}
+				} 
 			}
-		},
-		function (error) {
-			console.log("Error in webocularController.js file saveReport method! \r\n " + (error.data));
-		}); //	getObjectType end
-	unblockUI();
+		}, function(error) {
+			unblockUI();
+			console.log("Error in service getWebocularModule_ICE while fetching modules-"+error);
+		});
 	};
 }]);

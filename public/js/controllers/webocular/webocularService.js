@@ -25,6 +25,17 @@ mySPA.factory('webocularServices', ['$http','$q', function ($http,$q)   {
 			}, function(response){
 				return $q.reject(response.data);
 			});
-		}
+		},
+		getWebocularModule_ICE: function(){
+            return $http.post('/getWebocularModule_ICE', {
+                param: 'getWebocularModule_ICE'
+            })
+            .then(function(response) {
+                    return response.data
+                },
+                function(response) {
+                    return $q.reject(response.data)
+                })
+        }
 	}
 }]);
