@@ -243,6 +243,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value._id.$oid + '  title=' + value.modulename + ' style="width: 139px;"><img class="ct-nodeIcon1" id=' + value._id.$oid + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.modulename + '</span></div>')
                             $('.reports-search').removeAttr('disabled', 'disabled');
                         });
+                        $('.ct-nodeIcon1').parent().hide();
                     } 
                 }
             }, function(error) {
@@ -428,24 +429,30 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     });
 
     $(document).on('click', '.ct-nodeIcon1', function(e) {
+        blockUI('Loading.. Please wait..')
         $("#report-canvas").show();
         $("#report-header").show();
         $("#report-header").empty();
         $("#accordion").hide();
         $("#report-canvas").empty();
+        $('img.highlight-module').removeClass('highlight-module');
+        $('span.highlight-moduleName').removeClass('highlight-moduleName');
+        $(this).addClass('highlight-module').next('span').addClass('highlight-moduleName');
         $scope.reportGenerated = true;
         getWebocularInputData=e.target.id
 		reportService.getWebocularData_ICE(getWebocularInputData)
             .then(function(result_webocular_reportData) {
                 if (result_webocular_reportData == "Fail") {
                     openModalPopup("Reports", "Failed to load Webocular Reports");
+                    unblockUI()
                 } else {
                     $(".mid-report-section").hide();
                     if (result_webocular_reportData.rows.length == 0) {
                         //No Modules Found
-                        openModalPopup("Modules", "No Webocular Modules Found");
+                        console.log("Modules", "No Webocular Modules Found");
                         $(".mid-report-section").hide();
                         $('#searchModule').attr('disabled', 'disabled');
+                        unblockUI()
                     } else {
                         $('#middle-content-section').attr('class',"webCrawler-report");
                         if(result_webocular_reportData.rows[0].proxy.enable==="false"){
@@ -628,6 +635,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         // View of Access Voilations.
 
                 }
+                unblockUI()
             }
         }, function(error) {
             unblockUI();
@@ -637,16 +645,25 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     });
 
     $scope.toggle_webocular = function($event){
-            if($('.ct-nodeIcon1').parent().is(':hidden')){$('.ct-nodeIcon1').parent().show()}
-            else{$('.ct-nodeIcon1').parent().hide()} 
-            var nodesLen = $('.ct-nodeIcon:visible').length;
+        if($('.ct-nodeIcon1').parent().is(':hidden'))
+            {
+                $('.ct-nodeIcon1').parent().show();
+                $('.ct-nodeIcon').parent().hide();
+                $('.webCrawler-toggle-btn').attr('style','background:#ffffff;color:#331d4e;border-color: #331d4e;')
+            }
+        else{
+                $('.ct-nodeIcon').parent().show();
+                $('.ct-nodeIcon1').parent().hide();
+                $('.webCrawler-toggle-btn').attr('style','background:#331d4e;color:#f5f5f5;border-color: #ffffff;')
+            }
+        var nodesLen = $('.ct-nodeIcon:visible').length;
             var webocularNodesLen = $('.ct-nodeIcon1:visible').length;
             if(nodesLen > 0 || webocularNodesLen > 0)
-            {
-                $('#searchModule').removeAttr('disabled', 'disabled');
-            }
-            else{
-                $('#searchModule').attr('disabled', 'disabled');
+        {
+            $('#searchModule').removeAttr('disabled', 'disabled');
+        }
+        else{
+            $('#searchModule').attr('disabled', 'disabled');
             }
     }
     //Set status color for report status
