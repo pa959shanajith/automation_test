@@ -42,6 +42,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 	var currentDot = 0; // used to store the count of dots displayed in progess canvas
 	$scope.crawlActive = false; // Flag to avoid duplicate/invalid requests
 	$scope.hideBaseContent = { message: 'false' };
+	$scope.showButtons=false;
 	$scope.level = 0;
 	$scope.arr = [];
 	var crawledLinks_var = [];
@@ -54,7 +55,12 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 	$scope.modulename="";
 	$scope.proxy = $scope.tprxy = {enable: false, url: "", username: "", password: ""};
 	$scope.reportView=false;
-	$scope.showWebocularHome = function(){
+	$scope.showWebocularHome = function()
+	{
+		if($scope.crawlActive)
+		{
+			return;
+		}
 		if($scope.reportView && $scope.enableGenerate)
 		{
 			$scope.tab=$scope.tab;
@@ -63,9 +69,21 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		else
 		{
 			$scope.tab="webocularHome";
+			$scope.hideBaseContent = { message: 'false' };
+			$scope.level = 0;
+			$scope.arr = [];
+			var crawledLinks_var = [];
+			$scope.enableGenerate = false;
+			$scope.selectedAgent = "chrome";
+			$scope.url = "http://";
+			// $scope.tab = "webocularHome"
+			$scope.showButtons=false;
+			$scope.accessRules=[{name:'A',selected:false,tag:"wcag2a","pass":true,"count":10},{name:'AA',selected:true,tag:"wcag2aa","pass":true,"count":0},{name:'Section 508',selected:true,tag:"section508","pass":true,"count":0},{name:'Best-Practice',selected:true,tag:"best-practice","pass":true,"count":0}];
+			$scope.searchData={"text":"","image":"","access-rules":$scope.accessRules,"accessTest":false};
+			$scope.modulename="";
+			$scope.proxy = $scope.tprxy = {enable: false, url: "", username: "", password: ""};
+			$scope.reportView=false;
 		}
-		
-		if (!$scope.enableGenerate) return;
 		var myNode = document.getElementById("report-canvas");
 		while (myNode.firstChild) {
 			myNode.removeChild(myNode.firstChild);
@@ -98,6 +116,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 	};
 
 	$scope.executeGo = function($event){
+		
 		var ruleSelected=false;
 		$scope.accessRules.forEach(rule => {
 			ruleSelected=ruleSelected || rule.selected;
@@ -117,6 +136,12 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 			openDialog("Error", "Atleast one rule must be selected.");
 			return;
 		}
+		var regexp = /^[a-zA-Z0-9-_]+$/;
+		if ($scope.modulename.search(regexp) == -1)
+		{
+			openDialog("Error", "Crawl name cannot contain special characters.");
+			return;
+		} 
 		if($scope.tab=="accessibilityTesting")
 		{
 			$scope.searchData.accessTest=true;
@@ -125,6 +150,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		$("#popupSlidehide").css("cursor","auto");
 		localStorage.setItem("navigateEnable", false);
 		$scope.enableGenerate = false;
+		$scope.showButtons=false;
 		crawledLinks_var = [];
 		$scope.arr = [];
 		$scope.crawlActive = false;
@@ -174,7 +200,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 			webocularServices.getResults($scope.url, $scope.level, $scope.selectedAgent, $scope.proxy,$scope.searchData).then(function(data){
 				if (data == "begin") return false;
 				$rootScope.resetSession.end();
-				$scope.crawlActive = false;
+				// $scope.crawlActive = false;
 				localStorage.setItem("navigateEnable", true);
 				if(data == "Invalid Session") {
 					return $rootScope.redirectPage();
@@ -188,6 +214,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 					else if (!data.success) openDialog("Webocular Screen", "Error while crawling. Fail to Crawl.");
 				}
 			}, function(err) {
+				initCrawl = true;
 				$rootScope.resetSession.end();
 				$scope.hideBaseContent = { message: 'false' };
 				localStorage.setItem("navigateEnable", true);
@@ -229,6 +256,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 			});
 			localStorage.setItem("navigateEnable", true);
 			$scope.enableGenerate = true;
+			$scope.showButtons=true;
 			$scope.check= false;
 			$scope.$apply();
 			socketUI.disconnect('', { query: "check=true" });
@@ -245,6 +273,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 		if (!$scope.crawlActive) return false;
 		$rootScope.resetSession.end();
 		$scope.crawlActive = false;
+		// initCrawl=true;
 		if (!data.success) {
 			localStorage.setItem("navigateEnable", true);
 			$scope.hideBaseContent = { message: 'false' };
@@ -491,6 +520,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 
 	var positionNode = {"x":0 , "y":0};
 	$scope.generateGraph = function($event){
+		$scope.reportView=true;
 		$("#result-canvas").show();
 		$scope.showInfo = true;
 		$scope.hideBaseContent = { message: 'true' };
