@@ -243,6 +243,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value._id.$oid + '  title=' + value.modulename + ' style="width: 139px;"><img class="ct-nodeIcon1" id=' + value._id.$oid + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.modulename + '</span></div>')
                             $('.reports-search').removeAttr('disabled', 'disabled');
                         });
+                        $('.ct-nodeIcon1').parent().hide();
                     } 
                 }
             }, function(error) {
@@ -637,16 +638,25 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     });
 
     $scope.toggle_webocular = function($event){
-            if($('.ct-nodeIcon1').parent().is(':hidden')){$('.ct-nodeIcon1').parent().show()}
-            else{$('.ct-nodeIcon1').parent().hide()} 
-            var nodesLen = $('.ct-nodeIcon:visible').length;
+        if($('.ct-nodeIcon1').parent().is(':hidden'))
+            {
+                $('.ct-nodeIcon1').parent().show();
+                $('.ct-nodeIcon').parent().hide();
+                $('.webCrawler-toggle-btn').attr('style','background:#ffffff;color:#331d4e;border-color: #331d4e;')
+            }
+        else{
+                $('.ct-nodeIcon').parent().show();
+                $('.ct-nodeIcon1').parent().hide();
+                $('.webCrawler-toggle-btn').attr('style','background:#331d4e;color:#f5f5f5;border-color: #ffffff;')
+            }
+        var nodesLen = $('.ct-nodeIcon:visible').length;
             var webocularNodesLen = $('.ct-nodeIcon1:visible').length;
             if(nodesLen > 0 || webocularNodesLen > 0)
-            {
-                $('#searchModule').removeAttr('disabled', 'disabled');
-            }
-            else{
-                $('#searchModule').attr('disabled', 'disabled');
+        {
+            $('#searchModule').removeAttr('disabled', 'disabled');
+        }
+        else{
+            $('#searchModule').attr('disabled', 'disabled');
             }
     }
     //Set status color for report status
