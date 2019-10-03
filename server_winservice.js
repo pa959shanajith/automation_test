@@ -6,7 +6,6 @@ var SERVER = '';
 nodewin.isAdminUser(function(isAdmin){
 	if(isAdmin){
 		// Create a new service object
-		console.log(SERVER)
 		if(process.argv.length == 4 && process.argv[3] == 'FILESERVER'){
 			 SERVER = 'FileServer'
 			var svc = new Service({
