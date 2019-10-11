@@ -86,6 +86,7 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
     $scope.resetEncrypt = function($event) {
         $('#encryptData').val('');
         $('#encryptedData').val('');
+        $("#encryptData").css('border', '').removeClass("inputErrorBorderFull");
           //Transaction Activity for Encryption
         //   var labelArr = [];
         //   var infoArr = [];
@@ -240,6 +241,7 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
     $(document).on('change', "#utilityMethods", function(e) {
         $('#encryptData').val('');
         $('#encryptedData').val('');
+        $("#encryptData").css('border', '').removeClass("inputErrorBorderFull");
         if ($("#utilityMethods option:selected").val() == "AES") {
             $("#encrypt_btn").text('Encrypt', 'value').attr('title', 'Encrypt');
             $("#encryption_btns").show();
@@ -261,7 +263,7 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
 
     //Encryption
     $scope.EncryptData = function($event) {
-        //$("#encryptData").removeClass("inputErrorBorderFull");
+        $("#encryptData").removeClass("inputErrorBorderFull");
         //$("#utilityMethods").removeClass("selectErrorBorder");
         if ($("#utilityMethods option:selected").val() == "Select Method") {
             $("#utilityMethods").css('border', '').addClass("selectErrorBorder");
@@ -272,7 +274,6 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
         } else {
             var methodSelected = $("#utilityMethods option:selected").val();
             var encryptionVal = $("#encryptData").val();
-
             utilityService.Encrypt(methodSelected, encryptionVal)
                 .then(function(data) {
                     if (data == "Invalid Session") {
