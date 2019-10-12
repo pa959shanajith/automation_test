@@ -143,7 +143,6 @@ module.exports.initListeners = function(mySocket){
 	mySocket.use(function paginator(args, cb) {
 		var ev = args[0];
 		var data = args[1];
-		if (!(ev == "render_screenshot" || ev == "message")) return cb();
 		if (typeof(data) !== "string") return cb();
 		var comps = data.split(';');
 		var id = comps.shift();
