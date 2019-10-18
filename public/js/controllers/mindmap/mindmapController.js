@@ -621,7 +621,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             x: s[0] * 0.1 * 0.9,
             children: [],
             parent: null,
-            state: 'created'
+            state: 'created',
+            _id: null
         };
         if (moduleName) node.name = moduleName;
 
@@ -636,7 +637,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             'transform': "translate(" + (node.x).toString() + "," + (node.y).toString() + ")",
             'opacity': !(node.id_c == "null" || node.id_c == null || node.id_c == undefined) ? 1 : 0.5,
             'title': node.name,
-            'name': node.display_name || node.name
+            'name': node.display_name || node.name,
+            '_id': node._id
         };
         nCount[0]++;
         uNix++;
@@ -856,13 +858,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             'opacity': !(n.id_c == "null" || n.id_c == null || n.id_c == undefined) ? 1 : 0.5,
             'title': n.name,
             'name': n.display_name,
-            'img_src': img_src
+            'img_src': img_src,
+            '_id': n._id || null
         };
         var v = '#ct-node-' + n.id;
         return v;
     };
 
     function addNode_W(n, m, pi) {
+        // n:node m : flag , pi: parentnode
         n.display_name = n.name;
         var nodeOpacity = !(n.id_c == "null" || n.id_c == null || n.id_c == undefined) ? 1 : 0.5;
         var ch = 15;
@@ -877,7 +881,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             'opacity': !(n.id_c == "null" || n.id_c == null || n.id_c == undefined) ? 1 : 0.5,
             'title': n.name,
             'name': n.display_name,
-            'img_src': img_src
+            'img_src': img_src,
+            '_id':n._id
         };
         var v = '#ct-node-' + n.id;
         return v;
@@ -1989,7 +1994,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 'transform': "translate(" + (node.x).toString() + "," + (node.y).toString() + ")",
                 'opacity': !(node.id_c == "null" || node.id_c == null || node.id_c == undefined) ? 1 : 0.5,
                 'title': node.name,
-                'name': node.display_name || node.name
+                'name': node.display_name || node.name,
+                '_id':node._id
             };
             nCount[nNext[pt][1]]++;
             dNodes[pi].children.push(dNodes[uNix]);
@@ -2616,6 +2622,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 projectID: d.projectID,
                 id: d.id,
                 childIndex: d.childIndex,
+                _id: (d._id) ? d._id : null,
                 id_c: (d.id_c) ? d.id_c : null,
                 id_n: (d.id_n) ? d.id_n : null,
                 oid: (d.oid) ? d.oid : null,
@@ -2649,6 +2656,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             childIndex: d.childIndex,
             id_c: (d.id_c) ? d.id_c : null,
             id_n: (d.id_n) ? d.id_n : null,
+            _id: (d._id) ? d._id : null,
             oid: (d.oid) ? d.oid : null,
             name: d.name,
             type: d.type,
@@ -3279,11 +3287,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
                 return;
             }
-
-
             dNodes[i].reuse = false;
             if (scenarios) {
                 dNodes.forEach(function(f, j) {
+                    // This function is for UI check in the same module we cannot have Scenario with the same name.
                     if ((e.type == 'scenarios' && e.type == f.type && e.name == f.name && i != j && deletednode_info.indexOf(e) < 0 && deletednode_info.indexOf(f) < 0)) {
                         dNodes[i].reuse = true;
                         if (dataReuse['reuseScenarios'].indexOf(e.name) < 0)
@@ -3292,6 +3299,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     }
                 })
             } else {
+                // Screen or Testcase reuse check, within the same Module, if testcase name is same then Screen name should also be the same for actual reuse.
                 dNodes.forEach(function(f, j) {
                     if ((e.type == 'screens' && e.type == f.type && e.name == f.name && i != j) || (e.type == 'testcases' && e.type == f.type && e.name == f.name && e.parent.name == f.parent.name && i != j)) {
                         dNodes[i].reuse = true;
@@ -3300,8 +3308,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 })
             }
 
-
+            // So if reuse has become true then I will return from the for-each fuction.
             if ((e.reuse == true)) return;
+
+            // If UI check for Reuse has passed we will query the MongoDB database for Project level checks.
+            // And this is used in checkReuse function in mindmap.js  
             if (!scenarios) {
                 if (e.type == 'testcases') {
                     dataReuse['testcase'].push({
@@ -3316,7 +3327,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     });
                 }
             }
-            if (e.type == 'scenarios' && scenarios) {
+            else if(e.type == 'scenarios' && scenarios) {
                 dataReuse['scenarios'].push({
                     'scenarioname': e.name,
                     'idx': i
@@ -5123,7 +5134,7 @@ Purpose : displaying pop up for replication of project
             }
         }, function(error) {
             console.log(error);
-        })        
+        });        
     }
 
     $scope.showContent = function(sheetname) {

@@ -344,7 +344,7 @@ exports.checkReuse = function (req, res) {
 	logger.info("Inside UI service: checkReuse");
 	if (utils.isSessionActive(req)) {
 		var d = req.body;
-		var qData = d.parsedata;
+		var qData = d.parsedata; // this is coming from mindmapservice which is restrict_scenario_reuse from parsedata reuse in minmapcontroller.js
 		var qListReuse = getQueries(qData);
 		neo4jAPI.executeQueries(qListReuse, function (status, result) {
 			res.setHeader('Content-Type', 'application/json');
@@ -831,9 +831,11 @@ exports.saveData = function (req, res) {
 				}
 			}
 		}
-
-		if (flag == 10) {
+		// This flag is for Save. Save and Create will now be merged.
+		if (flag == 10) 
+		{
 			qpush=[]
+			// This query is not needed
 			qpush.push({ "statement": "MATCH(n:MODULES_ENDTOEND{projectID:'" + prjId + "',moduleName:'" + data[0].name + "'}) RETURN n.moduleName" });
 			neo4jAPI.executeQueries(qpush, function (status, result){
 			if (result[0].data.length != 0){
@@ -844,6 +846,7 @@ exports.saveData = function (req, res) {
 			else{
 				var uidx = 0, t, lts, rnmList = [];
 				deletednodes.forEach(function (t, i) {
+					// My comments:  If the testcase is reused then only we will delete the associated task.Task parent list will have testcase id and I have to delete that task. Hard delete.
 					// Delete task if single connection
 					qList.push({ "statement": "MATCH (N) WHERE ID(N)=" + t + " MATCH (N)-[r:FNTT]->(b) with b as b MATCH(b)<-[s:FNTT]-(M) WITH count(M) as rel_cnt,b as b  WHERE rel_cnt=1 DETACH DELETE b" });
 					// Else delete just connection					
@@ -989,12 +992,14 @@ exports.saveData = function (req, res) {
 					});
 			}
 		});
-		}
-		else if (flag == 20) {
+		// }
+		// else if (flag == 20) {
 			var uidx = 0, rIndex;
 			var idn_v_idc = {};
 			// var relId=inputs.relId;
 			// var cycId=inputs.cycId;
+
+			// Creating the data for running the Create Structure Query
 			var qObj = { "projectId": prjId, "releaseId": relId, "cycleId": cycId, "appType": "Web", "testsuiteDetails": [], "userName": user, "userRole": userrole };
 			var nObj = [], tsList = [];
 			data.forEach(function (e, i) {
@@ -1019,6 +1024,7 @@ exports.saveData = function (req, res) {
 			});
 			qObj.testsuiteDetails = [{ "testsuiteId": nObj[rIndex].id, "testsuiteId_c": nObj[rIndex].id_c, "testsuiteName": nObj[rIndex].name, "task": nObj[rIndex].task, "testscenarioDetails": tsList }];
 
+			
 			create_ice.createStructure_Nineteen68(qObj, function (err, data) {
 				if (err) {
 					res.status(500).send(err);
@@ -1467,11 +1473,13 @@ exports.saveEndtoEndData = function (req, res) {
 };
 
 function getQueries(qdata) {
+	// This function is making queries for checking the reuse in Neo4j currently. Have to shift these to MongoDB.
 	var qList_reuse = [];
 	if (qdata.gettestcases) {	//for a reused screen fetches all the testcases
 		qList_reuse.push({ 'statement': 'Match (n:SCREENS{screenName :"' + qdata.screen[0].screenname + '",projectID :"' + qdata['projectid'] + '"})-[r]-(m:TESTCASES) return distinct collect(ID(m))' });
 	}
 	else {
+		// Currently we are not using versioning so ignore this
 		if (qdata.versionNumber != undefined) {
 			//Reuse in case of versioning
 			if (qdata.scenarios != undefined) {
