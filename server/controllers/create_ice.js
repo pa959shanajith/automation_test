@@ -221,7 +221,29 @@ exports.getAllNames = function (parent, cb, data) {
 		cb(null, allNames);
 	});
 };
-
+//Create Structure MongoDB
+exports.createStructure_Nineteen68 = function(req,res){
+	// Check the state of the module and then accordingly we will update or change the names.
+	logger.info("Inside UI service: createStructure_Nineteen68");
+	var createdthrough = 'Mindmaps Creation';
+	var RequestedJSON = req;
+	var projectid = RequestedJSON.projectId;
+	var oldprojectid = RequestedJSON.oldprojectId;
+	var cycleId = RequestedJSON.cycleId;
+	var releaseId = RequestedJSON.releaseId;
+	var appType = RequestedJSON.appType;
+	var userrole = RequestedJSON.userRole;
+	var username = RequestedJSON.userName.toLowerCase();
+	var suiteID = uuid();
+	var suitedetails = RequestedJSON.testsuiteDetails[0];
+	var testsuiteName = suitedetails.testsuiteName;
+	var moduleid_c = suitedetails.testsuiteId_c;
+	var scenarioidlist = [];
+	var scenario = [];
+	var suitedetailslist = [];
+	var versionnumber=0;
+	var newversionnumber=0;
+}
 //CreateStrcutre
 exports.createStructure_Nineteen68 = function (req, res) {
 	logger.info("Inside UI service: createStructure_Nineteen68");
@@ -676,6 +698,19 @@ exports.createStructure_Nineteen68 = function (req, res) {
 };
 
 function testsuiteid_exists(moduledetails, cb, data) {
+
+	// The details that come.
+
+	// testsuiteid_exists({
+	// 	"modulename": testsuiteName,
+	// 	"moduleid": moduleid_c,
+	// 	'modifiedby': username,
+	// 	'modifiedbyrole':userrole,
+	// 	"pid": projectid,
+	// 	"versionnumber": versionnumber,
+	// 	"newversionnumber": newversionnumber
+	// }
+
 	logger.info("Inside the function testsuiteid_exists ");
 	var flagId = false;
 	var obj = {
@@ -889,7 +924,7 @@ function updatetestsuitename(moduledetails, cb, data) {
 }
 
 function testscenariosid_exists(testscenariodetails, cb, data) {
-	logger.info("Inside teh function testscenariosid_exists ");
+	logger.info("Inside the function testscenariosid_exists ");
 	var flagId = false;
 	var obj = {
 		flag: false,
@@ -995,6 +1030,8 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 	var scenariodatatoupdate = [];
 	var flagtocheckifexists = false;
 	var flagtocheckifdeleted = false;
+	// Direct API call to updateScenarioName
+
 	async.series({
 		select: function (callback) {
 			logger.info("Inside the function select: updatetestscenarioname");
@@ -1576,6 +1613,7 @@ exports.getReleaseIDs_Nineteen68 = function (req, res) {
 		});
 };
 
+// This API is no longer there so make chenges in the UI accordingly
 exports.getCycleIDs_Nineteen68 = function (req, res) {
 	logger.info("Inside UI service: getCycleIDs_Nineteen68");
 	var cname = [];
@@ -1617,6 +1655,7 @@ exports.getCycleIDs_Nineteen68 = function (req, res) {
 		});
 };
 
+// Have to check the result object how it is coming and how we need. 
 exports.getProjectIDs_Nineteen68 = function (req, res) {
 	logger.info("Inside UI service: getProjectIDs_Nineteen68");
 	var projectdetails = {
@@ -1661,6 +1700,7 @@ exports.getProjectIDs_Nineteen68 = function (req, res) {
 	});
 };
 
+// Have to check the result object how it is coming and how we need. 
 exports.getProjectType_Nineteen68 = function (req, res) {
 	logger.info("Inside UI service: getProjectType_Nineteen68");
 	var projectDetails = {
@@ -1698,6 +1738,7 @@ exports.getProjectType_Nineteen68 = function (req, res) {
 	});
 };
 
+// Understand this
 exports.createE2E_Structure_Nineteen68 = function (req, res) {
 	logger.info("Inside UI service: createE2E_Structure_Nineteen68");
 	var createdthrough = 'Mindmaps Creation';
