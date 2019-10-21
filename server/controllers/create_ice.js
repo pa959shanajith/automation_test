@@ -222,28 +222,33 @@ exports.getAllNames = function (parent, cb, data) {
 	});
 };
 //Create Structure MongoDB
-exports.createStructure_Nineteen68 = function(req,res){
-	// Check the state of the module and then accordingly we will update or change the names.
-	logger.info("Inside UI service: createStructure_Nineteen68");
-	var createdthrough = 'Mindmaps Creation';
-	var RequestedJSON = req;
-	var projectid = RequestedJSON.projectId;
-	var oldprojectid = RequestedJSON.oldprojectId;
-	var cycleId = RequestedJSON.cycleId;
-	var releaseId = RequestedJSON.releaseId;
-	var appType = RequestedJSON.appType;
-	var userrole = RequestedJSON.userRole;
-	var username = RequestedJSON.userName.toLowerCase();
-	var suiteID = uuid();
-	var suitedetails = RequestedJSON.testsuiteDetails[0];
-	var testsuiteName = suitedetails.testsuiteName;
-	var moduleid_c = suitedetails.testsuiteId_c;
-	var scenarioidlist = [];
-	var scenario = [];
-	var suitedetailslist = [];
-	var versionnumber=0;
-	var newversionnumber=0;
-}
+// exports.createStructure_Nineteen68 = function(req,res){
+// 	// Check the state of the module and then accordingly we will update or change the names.
+// 	logger.info("Inside UI service: createStructure_Nineteen68");
+// 	var createdthrough = 'Mindmaps Creation';
+// 	var RequestedJSON = req;
+// 	var projectid = RequestedJSON.projectId;
+// 	var oldprojectid = RequestedJSON.oldprojectId;
+// 	var cycleId = RequestedJSON.cycleId;
+// 	var releaseId = RequestedJSON.releaseId;
+// 	var appType = RequestedJSON.appType;
+// 	var userrole = RequestedJSON.userRole;
+// 	var username = RequestedJSON.userName.toLowerCase();
+// 	var suiteID = uuid();
+// 	var suitedetails = RequestedJSON.testsuiteDetails[0];
+// 	var testsuiteName = suitedetails.testsuiteName;
+// 	var moduleid_c = suitedetails.testsuiteId_c;
+// 	var scenarioidlist = [];
+// 	var scenario = [];
+// 	var suitedetailslist = [];
+// 	var versionnumber=0;
+// 	var newversionnumber=0;
+
+// 	// async.series({
+// 	// 	screens:
+// 	// });
+
+// }
 //CreateStrcutre
 exports.createStructure_Nineteen68 = function (req, res) {
 	logger.info("Inside UI service: createStructure_Nineteen68");
@@ -1458,6 +1463,16 @@ function testcase_exists(testcasedetails, cb, data) {
 }
 
 function updatetestcasename(testcasedetails, cb, data) {
+
+		// modifiedby:"apurva.singh"
+		// modifiedbyrole:"Test Lead"
+		// newversionnumber:0
+		// pid:"127e1b1e-8e95-42d4-a2fd-5f5813c6ba5c"
+		// screenId:"db8ef1b6-c144-4d64-8fe8-e6c27a406131"
+		// testcaseid:"43a4561f-bdf6-4f08-b963-c86f496aeb98"
+		// testcasename:"Testcase_2456"
+		// versionnumber:0
+
 	logger.info("Inside the function updatetestcasename");
 	var testcasedatatoupdate = [];
 	var flagtocheckifexists = false;
@@ -1571,6 +1586,54 @@ function updatetestcasename(testcasedetails, cb, data) {
 		cb(null, data.update);
 	});
 }
+
+// function updatetestcasename(testcasedetails, cb, data) {
+// 	logger.info("Inside the function updatetestcasename");
+// 	var testcasedatatoupdate = [];
+// 	var flagtocheckifexists = false;
+// 	var flagtocheckifdeleted = false;
+// 	logger.info("Inside the function update: updatetestcasename");
+// 				var inputs = {
+// 					'screenid': testcasedatatoupdate.screenid,
+// 					'testcasename': testcasedetails.testcasename,
+// 					'testcaseid': testcasedetails.testcaseid,
+// 					'modifiedby': testcasedetails.modifiedby,
+// 					'modifiedbyrole': testcasedetails.modifiedbyrole,
+// 					'modifiedon': new Date().getTime().toString(),
+// 					'createdon': new Date(testcasedatatoupdate.createdon).getTime().toString(),
+// 					'createdby': testcasedatatoupdate.createdby,
+// 					'createdthrough': testcasedatatoupdate.createdthrough,
+// 					'deleted': testcasedatatoupdate.deleted.toString(),
+// 					'skucodetestcase': 'skucodetestcase',
+// 					'tags': 'tags',
+// 					'testcasesteps': testcasedatatoupdate.testcasesteps,
+// 					"versionnumber": testcasedetails.newversionnumber
+// 				};
+// 				var args = {
+// 					data: inputs,
+// 					headers: {
+// 						"Content-Type": "application/json"
+// 					}
+// 				};
+// 				logger.info("Calling NDAC Service from updatetestcasename - update: create_ice/updateTestcasename_ICE");
+// 				client.post(epurl+"create_ice/updateTestcasename_ICE  ", args,
+// 					function (result, response) {
+// 					if (response.statusCode != 200 || result.rows == "fail") {
+// 						logger.error("Error occurred in create_ice/updateTestcasename_ICE: updatetestcasename - update, Error Code : ERRNDAC");
+// 					} else {
+// 						logger.info('Succesfully renamed Testcase name');
+// 						//Execute neo4j query!!
+// 						//qList.push({"statement":"MATCH(n:TESTCASES_NG{testcaseid:'"+inputs.testcaseid+"'}) SET n.testcasename='"+inputs.testcasename+"' return n"});
+// 					}
+// 					callback(null, "success");
+// 				});
+// 			} else {
+// 				callback(null, "fail");
+// 			}
+// 	}, function (err, data) {
+// 		cb(null, data.update);
+// 	});
+// }
 
 exports.getReleaseIDs_Nineteen68 = function (req, res) {
 	logger.info("Inside UI service: getReleaseIDs_Nineteen68");
