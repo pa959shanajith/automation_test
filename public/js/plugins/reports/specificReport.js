@@ -430,7 +430,7 @@ function loadReports() {
                             $(".statusWindow").show();
                             $("#showStatus").text("Invalid Session. Login again");
                         } else {
-                            getRows[parseInt($("#inputSlno").val()) - 1].children[9].innerText = data;
+                            getRows[parseInt($("#inputSlno").val()) - 1].children[8].innerText = data;
                             $(".createIssueWindow").hide();
                             $(".statusWindow").show();
                             $("#showStatus").text("Issue bearing ID " + data + " created successfully.");
