@@ -195,7 +195,9 @@
 						<option value="" disabled selected>Please Select Your Domain</option>
 					</select> -->
 					<label class='domainTxt'>Domain :</label>
-					<input type="text" id="selDomain" name="projectName" readonly="readonly" placeholder="Domain Name">
+					<input type="text" id="selDomain" name="DomainName" placeholder="Domain Name" value="Banking">
+					<select class="adminSelect form-control" style="width: 91.5%; display: none;" id="selDomains">
+					</select>
 					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
 				</div>
 				<div class='userForm adminControl'>
@@ -260,11 +262,9 @@
 				</div>
 				<div class='userForm projectForm'>
 					<label class='domainTxt' style="margin-left: 1px;">Domain  </label>
-					<input type="text" id="selAssignProject" name="projectName" readonly="readonly" placeholder="Domain Name">
-					<!--<div class='domainTxt'>Domain</div>
-					<select class="adminSelect form-control selectDomain" style="width: 91%" id="selAssignProject">
+					<select class="adminSelect form-control selectDomain" style="width: 91%; margin-left: 8%" id="selDomains">
 						<option value="" disabled selected>Please Select Your Domain</option>
-					</select> -->
+					</select>
 
 					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
 				</div>
@@ -331,12 +331,10 @@
 			<!-- Button -->
 			<div class="col-xs-9 form-group" style="width: 83%" id='updateProjectForm'>
 				<div class='userForm projectForm'>
-					<!--<div class='domainTxt'>Domain</div>
-					<select class="adminSelect form-control" style="width: 91%" id="selDomainEdit">
+					<label class='domainTxt' style="margin-left: 1px;">Domain  </label>
+					<select class="adminSelect form-control selectDomain" style="width: 91%; margin-left: 8%;display: none;" id="selDomainEdit" name="DomainName" placeholder="Domain Name">
 						<option value="" disabled selected>Please Select Your Domain</option>
-					</select> -->
-					<label class='domainTxt' style="margin-left: -1px;">Domain  </label>
-					<input type="text" id="selDomainEdit" name="projectName" readonly="readonly" placeholder="Domain Name">
+					</select>
 					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
 				</div>
 				<div class='userForm adminControl'>
@@ -427,18 +425,18 @@
 				<br><br><br><h4>Data Mapping Settings</h4>
 				<h5>Mapping options are populates on click of <i>Test</i> with connection successful.</h5>
 				<div class='adminControl'><div>
-					<span class="leftControl">Username</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.uName" id="ldapFMapUname" class="form-control rightControl selectControl">
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.uName">{{field}}</option>
+					<span class="leftControl">Username</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.uname" id="ldapFMapUname" class="form-control rightControl selectControl">
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.uname">{{field}}</option>
 					</select>
 				</div></div>
 				<div class='adminControl'><div>
-					<span class="leftControl">Firstname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.fName" id="ldapFMapFname" class="form-control rightControl selectControl">
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.fName">{{field}}</option>
+					<span class="leftControl">Firstname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.fname" id="ldapFMapFname" class="form-control rightControl selectControl">
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.fname">{{field}}</option>
 					</select>
 				</div></div>
 				<div class='adminControl'><div>
-					<span class="leftControl">Lastname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.lName" id="ldapFMapLname" class="form-control rightControl selectControl">
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.lName">{{field}}</option>
+					<span class="leftControl">Lastname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.lname" id="ldapFMapLname" class="form-control rightControl selectControl">
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.lname">{{field}}</option>
 					</select>
 				</div></div>
 				<div class='adminControl'><div>
@@ -496,21 +494,21 @@
 				<br><br><br><h4>Data Mapping Settings</h4>
 				<h5>All Mapping options are populates on click of <i>Test</i> with connection successful.</h5>
 				<div class='adminControl'><div>
-					<span class="leftControl">Username</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.uName" id="ldapFMapUname" class="form-control rightControl selectControl">
-						<option value="{{ldapConf.fieldMap.uName}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldMap.uName)==-1" ng-selected="true">{{ldapConf.fieldMap.uName}}</option>
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.uName">{{field}}</option>
+					<span class="leftControl">Username</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.uname" id="ldapFMapUname" class="form-control rightControl selectControl">
+						<option value="{{ldapConf.fieldMap.uname}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldMap.uname)==-1" ng-selected="true">{{ldapConf.fieldMap.uname}}</option>
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.uname">{{field}}</option>
 					</select>
 				</div></div>
 				<div class='adminControl'><div>
-					<span class="leftControl">Firstname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.fName" id="ldapFMapFname" class="form-control rightControl selectControl">
-						<option value="{{ldapConf.fieldMap.fName}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldMap.fName)==-1" ng-selected="true">{{ldapConf.fieldMap.fName}}</option>
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.fName">{{field}}</option>
+					<span class="leftControl">Firstname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.fname" id="ldapFMapFname" class="form-control rightControl selectControl">
+						<option value="{{ldapConf.fieldMap.fname}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldMap.fname)==-1" ng-selected="true">{{ldapConf.fieldMap.fname}}</option>
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.fname">{{field}}</option>
 					</select>
 				</div></div>
 				<div class='adminControl'><div>
-					<span class="leftControl">Lastname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.lName" id="ldapFMapLname" class="form-control rightControl selectControl">
-						<option value="{{ldapConf.fieldMap.lName}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldMap.lName)==-1" ng-selected="true">{{ldapConf.fieldMap.lName}}</option>
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.lName">{{field}}</option>
+					<span class="leftControl">Lastname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.lname" id="ldapFMapLname" class="form-control rightControl selectControl">
+						<option value="{{ldapConf.fieldMap.lname}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldMap.lname)==-1" ng-selected="true">{{ldapConf.fieldMap.lname}}</option>
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.lname">{{field}}</option>
 					</select>
 				</div></div>
 				<div class='adminControl'><div>
@@ -790,9 +788,9 @@
 								<th> Action </th>
 							</tr>
 							<tr ng-repeat="tokens in tokens.users">
-								<td> {{tokens.tokenname}} </td>
+								<td> {{tokens.name}} </td>
 								<td> {{tokens.deactivated}} </td>
-								<td> {{tokens.expiry }} </td>
+								<td> {{tokens.expireson }} </td>
 								<td ng-if="tokens.deactivated == 'active'"><button class="btn" data-id="{{$index}}" ng-click="deactivate($event)" style="margin-left:-21%"> Deactivate </button></td>
 								<td ng-if="tokens.deactivated != 'active'"></td>
 							</tr>
