@@ -569,7 +569,7 @@ if (cluster.isMaster) {
 		//Utility plugins
 		app.post('/Encrypt_ICE', utility.Encrypt_ICE);
 		// Wecoccular Plugin
-		app.post('/crawResults', webocular.getCrawlResults);
+		app.post('/crawlResults', webocular.getCrawlResults);
 		app.post('/saveResults', webocular.saveResults);
 		//Chatbot Routes
 		app.post('/getTopMatches_ProfJ', chatbot.getTopMatches_ProfJ);

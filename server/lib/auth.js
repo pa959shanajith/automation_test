@@ -35,14 +35,14 @@ function authenticateLDAP(ldapdata, cb) {
 			logger.error("Error occurred in admin/getLDAPConfig Error Code : ERRNDAC");
 			cb("fail");
 		} else {
-			result = result.rows[0];
+			result = result.rows;
 			var ad_config = {
 				url: result.url,
-				baseDN: result.base_dn,
+				baseDN: result.basedn,
 			};
-			if (result.authtype == "simple") {
-				ad_config.bindDN = result.bind_dn;
-				ad_config.bindCredentials = result.bind_credentials;
+			if (result.auth == "simple") {
+				ad_config.bindDN = result.binddn;
+				ad_config.bindCredentials = result.bindcredentials;
 			}
 			var ad = new activeDirectory(ad_config);
 			ad.authenticate(ldapdata.user, ldapdata.password, function (err, auth) {
@@ -72,57 +72,42 @@ var strategyUtil = {
 			var validUser = false;
 			var ldap_flag = false;
 			async.waterfall([
-				function checkldapuser(callback) {
-					logger.info("Inside function checkldapuser");
+				function authenticateUser(callback){
+					logger.info("Inside function authenticateUser");
 					var args = {
-						data: { "username": username },
+						data: { "username": username ,"query":'userInfobyName' },
 						headers: { "Content-Type": "application/json" }
 					};
-					logger.info("Calling NDAC Service : authenticateUser_Nineteen68/ldap");
-					client.post(epurl + "login/authenticateUser_Nineteen68/ldap", args, function (result, response) {
-						var resp = false;
-						if (response.statusCode != 200 || result.rows == "fail") logger.error("Error occurred in authenticateUser_Nineteen68/ldap Error Code : ERRNDAC");
-						else if (result.rows.length == 0) return callback("invalid_username_password");
-						else if (result.rows[0].ldapuser != '{}') resp = JSON.parse(result.rows[0].ldapuser);
-						callback(null, resp);
-					});
-				},
-				function authenticate(data, callback) {
-					if (data) {    // LDAP Authentication
-						data.password = password;
-						authenticateLDAP(data, function (ldapdata) {
-							if (ldapdata == "empty") callback("inValidLDAPServer");
-							else if (ldapdata == "pass") {
-								validUser = true;
-								ldap_flag = true;
-								callback(null);
-							}
-						});
-					} else {    // In-House Authentication
-						var args = {
-							data: { "username": username },
-							headers: { "Content-Type": "application/json" }
-						};
-						logger.info("Calling NDAC Service: authenticateUser_Nineteen68");
-						client.post(epurl + "login/authenticateUser_Nineteen68", args,
-							function (result, response) {
-							if (response.statusCode != 200 || result.rows == "fail") {
-								logger.error("Error occurred in authenticateUser_Nineteen68 Error Code : ERRNDAC");
-								callback("fail");
-							} else {
-								try {
-									if (result.rows.length !== 0) {
-										var dbHashedPassword = result.rows[0].password;
-										validUser = bcrypt.compareSync(password, dbHashedPassword); // true
-										callback(null);
-									}
-								} catch (exception) {
-									logger.error(exception.message);
-									callback("fail");
+					logger.info("Calling NDAC Service : loadUser_Nineteen68");
+					client.post(epurl + "login/loadUser_Nineteen68", args, function (result, response) {
+						if (response.statusCode != 200 || result.rows == "fail") {
+							logger.error("Error occurred in loadUser_Nineteen68 Error Code : ERRNDAC");
+							callback('fail')
+						}else if (result.rows == null) return callback("invalid_username_password");
+						else if (result.rows.ldapuser.server != undefined) {    // LDAP Authentication
+							var resp = result.rows.ldapuser;
+							logger.info("Calling In-House Authentication");
+							resp.password = password;
+							authenticateLDAP(resp, function (ldapdata) {
+								if (ldapdata == "empty") callback("inValidLDAPServer");
+								else if (ldapdata == "pass") {
+									validUser = true;
+									ldap_flag = true;
+									callback(null);
 								}
+							});
+						} else {    // In-House Authentication
+							logger.info("Calling In-House Authentication");
+							try {
+								var dbHashedPassword = result.rows.password;
+								validUser = bcrypt.compareSync(password, dbHashedPassword); // true
+								callback(null);
+							} catch (exception) {
+								logger.error(exception.message);
+								callback("fail");
 							}
-						});
-					}
+						}
+					});
 				}
 			], function(err) {
 				if (err) flag = err;

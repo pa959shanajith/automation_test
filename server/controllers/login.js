@@ -20,10 +20,10 @@ function checkAssignedProjects(username, main_callback) {
 	var assignedProjects = false;
 	var flag = 'fail';
 	async.waterfall([
-		function getUserId(callback) {
+		function getUserInfo(callback) {
 			var inputs = {
 				"username": username,
-				"query": "getUserId"
+				"query": "userInfobyName"
 			};
 			var args = {
 				data: inputs,
@@ -31,23 +31,26 @@ function checkAssignedProjects(username, main_callback) {
 					"Content-Type": "application/json"
 				}
 			};
-			logger.info("Calling NDAC Service from getUserId :authenticateUser_Nineteen68/projassigned");
-			client.post(epurl + "login/authenticateUser_Nineteen68/projassigned", args,
+			logger.info("Calling NDAC Service from getUserInfo :loadUser_Nineteen68");
+			client.post(epurl + "login/loadUser_Nineteen68", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in authenticateUser_Nineteen68/projassigned Error Code : ERRNDAC");
+					logger.error("Error occurred in loadUser_Nineteen68 Error Code : ERRNDAC");
 					callback(flag);
 				} else if (result.rows.length !== 0) {
-					var userid = result.rows[0].userid;
-					var roleid = result.rows[0].defaultrole;
-					callback(null, userid, roleid);
+					var userid = result.rows._id;
+					var roleid = result.rows.defaultrole;
+					if (result.rows.projects != null) {
+						assignedProjects = result.rows.projects.length!==0;
+					}
+					callback(null, userid, roleid, assignedProjects);
 				} else callback("invalid_username_password");
 			});
 		},
-		function getUserRole(userid, roleid, callback) {
+		function getUserRole(userid,roleid,assignedProjects, callback) {
 			var inputs = {
 				"roleid": roleid,
-				"query": "getUserRole"
+				"query": "permissionInfoByRoleID"
 			};
 			var args = {
 				data: inputs,
@@ -55,43 +58,20 @@ function checkAssignedProjects(username, main_callback) {
 					"Content-Type": "application/json"
 				}
 			};
-			logger.info("Calling NDAC Service from getUserRole :authenticateUser_Nineteen68/projassigned");
-			client.post(epurl + "login/authenticateUser_Nineteen68/projassigned", args,
-				function (rolesResult, response) {
-				if (response.statusCode != 200 || rolesResult.rows == "fail") {
-					logger.error("Error occurred in authenticateUser_Nineteen68 Error Code : ERRNDAC");
+			logger.info("Calling NDAC Service from getUserRole :loadPermission_Nineteen68");
+			client.post(epurl + "login/loadPermission_Nineteen68", args,
+				function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.error("Error occurred in loadPermission_Nineteen68 Error Code : ERRNDAC");
 					callback(flag);
+				} else if (result.rows !== null) {
+					var rolename = result.rows.rolename;
+					callback(null,assignedProjects, userid, rolename);
 				} else {
-					var rolename = rolesResult.rows[0].rolename;
-					callback(null, userid, rolename);
+					callback("invalid_username_password");
 				}
 			});
-		},
-		function getAssignedProjects(userid, rolename, callback) {
-			var inputs = {
-				"userid": userid,
-				"query": "getAssignedProjects"
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling NDAC Service from getAssignedProjects :authenticateUser_Nineteen68/projassigned");
-			client.post(epurl + "login/authenticateUser_Nineteen68/projassigned", args,
-				function (projectsResult, response) {
-				if (response.statusCode != 200 || projectsResult.rows == "fail") {
-					logger.error("Error occurred in authenticateUser_Nineteen68 Error Code : ERRNDAC");
-					callback(flag);
-				} else {
-					if (projectsResult.rows.length > 0 && projectsResult.rows[0].projectids != null) {
-						assignedProjects = projectsResult.rows[0].projectids.length!==0;
-					}
-					callback(null, assignedProjects, userid, rolename);
-				}
-			});
-		},
+		}
 	], function (err, assignedProjects, userid, rolename) {
 		main_callback(err, assignedProjects, userid, rolename);
 	});
@@ -162,7 +142,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 				function userInfo(callback) {
 					var inputs = {
 						"username": userName,
-						"query": "userInfo"
+						"query": "userInfobyName"
 					};
 					var args = {
 						data: inputs,
@@ -170,24 +150,24 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 							"Content-Type": "application/json"
 						}
 					};
-					logger.info("Calling NDAC Service from userInfo : loadUserInfo_Nineteen68");
-					client.post(epurl + "login/loadUserInfo_Nineteen68", args,
-						function (userResult, response) {
-						if (response.statusCode != 200 || userResult.rows == "fail") {
-							logger.error("Error occurred in loadUserInfo_Nineteen68 Error Code : ERRNDAC");
+					logger.info("Calling NDAC Service from userInfo : loadUser_Nineteen68");
+					client.post(epurl2 + "login/loadUser_Nineteen68", args,
+						function (result, response) {
+						if (response.statusCode != 200 || result.rows == "fail") {
+							logger.error("Error occurred in loadUser_Nineteen68 Error Code : ERRNDAC");
 							callback("fail");
 						} else {
-							var service = userResult.rows[0];
-							jsonService.user_id = service.userid;
-							jsonService.email_id = req.session.emailid = service.emailid;
-							jsonService.additionalrole = req.session.additionalroles = service.additionalroles;
+							var service = result.rows;
+							jsonService.user_id = service._id;
+							jsonService.email_id = req.session.emailid = service.email;
+							jsonService.additionalrole = req.session.additionalroles = service.addroles;
 							jsonService.firstname = req.session.firstname = service.firstname;
 							jsonService.lastname = req.session.lastname = service.lastname;
 							jsonService.role = service.defaultrole;
 							jsonService.taskwflow = taskflow;
-							jsonService.username = service.username.toLowerCase();
+							jsonService.username = service.name.toLowerCase();
 							selectedRole = selectedRole||jsonService.role;
-							req.session.userid = service.userid;
+							req.session.userid = service._id;
 							req.session.defaultRoleId = service.defaultrole;
 							req.session.activeRoleId = selectedRole;
 							callback(null);
@@ -196,7 +176,8 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 				},
 				function loggedinRole(callback) {
 					var inputs = {
-						"roleid": [selectedRole]
+						"roleid": selectedRole,
+						"query": "permissionInfoByRoleID"
 					};
 					var args = {
 						data: inputs,
@@ -204,52 +185,29 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 							"Content-Type": "application/json"
 						}
 					};
-					logger.info("Calling NDAC Service from loggedinRole: getRoleNameByRoleId_Nineteen68");
-					client.post(epurl + "login/getRoleNameByRoleId_Nineteen68", args,
-						function (rolesResult, response) {
-						if (response.statusCode != 200 || rolesResult.rows == "fail") {
-							logger.error("Error occurred in loadUserInfo_Nineteen68 Error Code : ERRNDAC");
+					logger.info("Calling NDAC Service from loggedinRole: loadPermission_Nineteen68");
+					client.post(epurl2 + "login/loadPermission_Nineteen68", args,
+						function (result, response) {
+						if (response.statusCode != 200 || result.rows == "fail") {
+							logger.error("Error occurred in loadPermission_Nineteen68 Error Code : ERRNDAC");
 							callback("fail");
 						} else {
-							var rolename = rolesResult.rows[selectedRole];
+							var rolename = result.rows.rolename;
 							if (!rolename) {
 								logger.error("User role not found");
 								callback("fail");
 							} else {
+								if (result.rows.pluginresult.length === 0) {
+									logger.info("User plugins not found");
+									callback("fail");
+								} else {
+									jsonService.pluginsInfo = result.rows.pluginresult;
+								}
 								if (selectedRole == req.session.defaultRoleId) req.session.defaultRole = rolename;
 								req.session.activeRole = rolename;
 								jsonService.rolename = req.session.defaultRole;
 								jsonService.page = (jsonService.rolename == "Admin")? "admin":"plugin";
 								callback(null);
-							}
-						}
-					});
-				},
-				//Service call to get the plugins accessible for the user
-				function userPlugins(callback) {
-					var inputs = {
-						"roleid": selectedRole,
-						"query": "userPlugins"
-					};
-					var args = {
-						data: inputs,
-						headers: {
-							"Content-Type": "application/json"
-						}
-					};
-					logger.info("Calling NDAC Service from userPlugins: loadUserInfo_Nineteen68");
-					client.post(epurl + "login/loadUserInfo_Nineteen68", args,
-						function (pluginResult, response) {
-						if (response.statusCode != 200 || pluginResult.rows == "fail") {
-							logger.error("Error occurred in loadUserInfo_Nineteen68 Error Code : ERRNDAC");
-							callback("fail");
-						} else {
-							if (pluginResult.rows.length === 0) {
-								logger.info("User plugins not found");
-								callback("fail");
-							} else {
-								jsonService.pluginsInfo = pluginResult.rows;
-								callback();
 							}
 						}
 					});
@@ -275,7 +233,8 @@ exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
 		if (utils.isSessionActive(req)) {
 			var roleList = req.body.role;
 			var inputs = {
-				"roleid": roleList
+				"roleid": roleList,
+				"query":"nameidInfoByRoleIDList"
 			};
 			var args = {
 				data: inputs,
@@ -283,14 +242,18 @@ exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
 					"Content-Type": "application/json"
 				}
 			};
-			logger.info("Calling NDAC Service: getRoleNameByRoleId_Nineteen68");
-			client.post(epurl + "login/getRoleNameByRoleId_Nineteen68", args,
+			logger.info("Calling NDAC Service: loadPermission_Nineteen68");
+			client.post(epurl + "login/loadPermission_Nineteen68", args,
 				function (rolesResult, response) {
 				if (response.statusCode != 200 || rolesResult.rows == "fail") {
-					logger.error("Error occurred in getRoleNameByRoleId_Nineteen68 Error Code : ERRNDAC");
+					logger.error("Error occurred in loadPermission_Nineteen68 Error Code : ERRNDAC");
 					res.send("fail");
 				} else {
-					res.send(rolesResult.rows);
+					result={}
+					for(i=0;i<rolesResult.rows.length;i++){
+						result[rolesResult.rows[i]._id]=rolesResult.rows[i].name
+					}
+					res.send(result);
 				}
 			});
 		} else {
@@ -310,7 +273,8 @@ exports.resetPassword_Nineteen68 = function(req, res) {
 	var currpassword = req.body.currpassword;
 	var newpassword = req.body.newpassword;
 	var inputs = {
-		"username": username
+		"username": username,
+		"query":'userInfobyName'
 	};
 	var args = {
 		data: inputs,
@@ -318,14 +282,14 @@ exports.resetPassword_Nineteen68 = function(req, res) {
 			"Content-Type": "application/json"
 		}
 	};
-	logger.info("Calling NDAC Service: authenticateUser_Nineteen68");
-	client.post(epurl + "login/authenticateUser_Nineteen68", args,
+	logger.info("Calling NDAC Service: loadUser_Nineteen68");
+	client.post(epurl + "login/loadUser_Nineteen68", args,
 		function (result, response) {
 		if (response.statusCode != 200 || result.rows == "fail") {
-			logger.error("Error occurred in authenticateUser_Nineteen68 Error Code : ERRNDAC");
+			logger.error("Error occurred in loadUser_Nineteen68 Error Code : ERRNDAC");
 			res.send("fail");
 		} else {
-			password = result.rows[0].password;
+			password = result.rows.password;
 			validUser = bcrypt.compareSync(currpassword, password);
 			if (validUser){
 				if (currpassword == newpassword){

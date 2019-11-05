@@ -3,7 +3,7 @@ mySPA.factory('webocularServices', ['$http','$q', function ($http,$q)   {
 		getResults : function(url, level, agent, proxy,searchData){
 			console.info("Data in service", url, level, agent, proxy,searchData);
 			return  $http({
-				url: '/crawResults',
+				url: '/crawlResults',
 				method: "POST",
 				data: { "url": url , "level": level, "agent": agent, "proxy": proxy , "searchData": searchData },
 				headers: {'Content-Type': 'application/json'}
