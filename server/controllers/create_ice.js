@@ -11,217 +11,219 @@ var logger = require('../../logger');
 var epurl = process.env.NDAC_URL;
 var qList=[]; //For neurongraphs
 
-function get_moduleName(moduleId, cb, data) {
-	logger.info("Inside the function get_moduleName");
-	var obj = {
-		flag: false,
-		modulename: '',
-		testscenarioids: []
-	};
-	var inputs = {
-		"id": moduleId,
-		"name": "module"
-	};
-	var args = {
-		data: inputs,
-		headers: {
-			"Content-Type": "application/json"
-		}
-	};
-	logger.info("Calling NDAC Service from get_moduleName: create_ice/getNames_Nineteen68");
-	client.post(epurl+"create_ice/getNames_Nineteen68", args,
-		function (modulename, response) {
-		if (response.statusCode != 200 || modulename.rows == "fail") {
-			logger.error("Error occurred in create_ice/getNames_Nineteen68: get_moduleName, Error Code : ERRNDAC");
-			cb(null, modulename.rows);
-		} else {
-			if (modulename.rows.length != 0) {
-				obj.flag = true;
-				obj.modulename = modulename.rows[0].modulename;
-				obj.testscenarioids = modulename.rows[0].testscenarioids;
-			}
-			cb(null, obj);
-		}
-	});
-}
+// function get_moduleName(moduleId, cb, data) {
+// 	logger.info("Inside the function get_moduleName");
+// 	var obj = {
+// 		flag: false,
+// 		modulename: '',
+// 		testscenarioids: []
+// 	};
+// 	var inputs = {
+// 		"id": moduleId,
+// 		"name": "module"
+// 	};
+// 	var args = {
+// 		data: inputs,
+// 		headers: {
+// 			"Content-Type": "application/json"
+// 		}
+// 	};
+// 	logger.info("Calling NDAC Service from get_moduleName: create_ice/getNames_Nineteen68");
+// 	client.post(epurl+"create_ice/getNames_Nineteen68", args,
+// 		function (modulename, response) {
+// 		if (response.statusCode != 200 || modulename.rows == "fail") {
+// 			logger.error("Error occurred in create_ice/getNames_Nineteen68: get_moduleName, Error Code : ERRNDAC");
+// 			cb(null, modulename.rows);
+// 		} else {
+// 			if (modulename.rows.length != 0) {
+// 				obj.flag = true;
+// 				obj.modulename = modulename.rows[0].modulename;
+// 				obj.testscenarioids = modulename.rows[0].testscenarioids;
+// 			}
+// 			cb(null, obj);
+// 		}
+// 	});
+// }
 
-function get_screenName(screenId, cb, data) {
-	logger.info("Inside the function get_screenName ");
-	var obj2 = {
-		flag: false,
-		screenname: ''
-	};
-	var inputs = {
-		"id": screenId,
-		"name": "screen"
-	};
-	var args = {
-		data: inputs,
-		headers: {
-			"Content-Type": "application/json"
-		}
-	};
-	logger.info("Calling NDAC Service from get_screenName: create_ice/getNames_Nineteen68");
-	client.post(epurl+"create_ice/getNames_Nineteen68", args,
-		function (screenname, response) {
-		if (response.statusCode != 200 || screenname.rows == "fail") {
-			logger.error("Error occurred in create_ice/getNames_Nineteen68: get_screenName, Error Code : ERRNDAC");
-			cb(null, screenname.rows);
-		} else {
-			if (screenname.rows.length != 0) {
-				obj2.flag = true;
-				obj2.screenname = screenname.rows[0].screenname;
-			}
-			cb(null, obj2);
-		}
-	});
-}
+// function get_screenName(screenId, cb, data) {
+// 	logger.info("Inside the function get_screenName ");
+// 	var obj2 = {
+// 		flag: false,
+// 		screenname: ''
+// 	};
+// 	var inputs = {
+// 		"id": screenId,
+// 		"name": "screen"
+// 	};
+// 	var args = {
+// 		data: inputs,
+// 		headers: {
+// 			"Content-Type": "application/json"
+// 		}
+// 	};
+// 	logger.info("Calling NDAC Service from get_screenName: create_ice/getNames_Nineteen68");
+// 	client.post(epurl+"create_ice/getNames_Nineteen68", args,
+// 		function (screenname, response) {
+// 		if (response.statusCode != 200 || screenname.rows == "fail") {
+// 			logger.error("Error occurred in create_ice/getNames_Nineteen68: get_screenName, Error Code : ERRNDAC");
+// 			cb(null, screenname.rows);
+// 		} else {
+// 			if (screenname.rows.length != 0) {
+// 				obj2.flag = true;
+// 				obj2.screenname = screenname.rows[0].screenname;
+// 			}
+// 			cb(null, obj2);
+// 		}
+// 	});
+// }
 
-function get_scenarioName(testscenarioId, cb, data) {
-	logger.info("Inside the function get_scenarioName ");
-	var obj2 = {
-		flag: false,
-		testscenarioname: ''
-	};
-	var inputs = {
-		"id": testscenarioId,
-		"name": "scenario"
-	};
-	var args = {
-		data: inputs,
-		headers: {
-			"Content-Type": "application/json"
-		}
-	};
-	logger.info("Calling NDAC Service from get_scenarioName: create_ice/getNames_Nineteen68");
-	client.post(epurl+"create_ice/getNames_Nineteen68", args,
-		function (testscenarioname, response) {
-		if (response.statusCode != 200 || testscenarioname.rows == "fail") {
-			logger.error("Error occurred in create_ice/getNames_Nineteen68: get_scenarioName, Error Code : ERRNDAC");
-			cb(null, testscenarioname.rows);
-		} else {
-			if (testscenarioname.rows.length != 0) {
-				obj2.flag = true;
-				obj2.testscenarioname = testscenarioname.rows[0].testscenarioname;
-			}
-			cb(null, obj2);
-		}
-	});
-}
+// function get_scenarioName(testscenarioId, cb, data) {
+// 	logger.info("Inside the function get_scenarioName ");
+// 	var obj2 = {
+// 		flag: false,
+// 		testscenarioname: ''
+// 	};
+// 	var inputs = {
+// 		"id": testscenarioId,
+// 		"name": "scenario"
+// 	};
+// 	var args = {
+// 		data: inputs,
+// 		headers: {
+// 			"Content-Type": "application/json"
+// 		}
+// 	};
+// 	logger.info("Calling NDAC Service from get_scenarioName: create_ice/getNames_Nineteen68");
+// 	client.post(epurl+"create_ice/getNames_Nineteen68", args,
+// 		function (testscenarioname, response) {
+// 		if (response.statusCode != 200 || testscenarioname.rows == "fail") {
+// 			logger.error("Error occurred in create_ice/getNames_Nineteen68: get_scenarioName, Error Code : ERRNDAC");
+// 			cb(null, testscenarioname.rows);
+// 		} else {
+// 			if (testscenarioname.rows.length != 0) {
+// 				obj2.flag = true;
+// 				obj2.testscenarioname = testscenarioname.rows[0].testscenarioname;
+// 			}
+// 			cb(null, obj2);
+// 		}
+// 	});
+// }
 
-function get_testcaseName(testcaseId, cb, data) {
-	logger.info("Inside the function get_testcaseName ");
-	var obj3 = {
-		flag: false,
-		testcasename: ''
-	};
-	var inputs = {
-		"id": testcaseId,
-		"name": "testcase"
-	};
-	var args = {
-		data: inputs,
-		headers: {
-			"Content-Type": "application/json"
-		}
-	};
-	logger.info("Calling NDAC Service from get_testcaseName: create_ice/getNames_Nineteen68");
-	client.post(epurl+"create_ice/getNames_Nineteen68", args,
-		function (testcasename, response) {
-		if (response.statusCode != 200 || testcasename.rows == "fail") {
-			logger.error("Error occurred in create_ice/getNames_Nineteen68: get_testcaseName, Error Code : ERRNDAC");
-			cb(null, testcasename.rows);
-		} else {
-			if (testcasename.rows.length != 0) {
-				obj3.flag = true;
-				obj3.testcasename = testcasename.rows[0].testcasename;
-			}
-			cb(null, obj3);
-		}
-	});
-}
+// function get_testcaseName(testcaseId, cb, data) {
+// 	logger.info("Inside the function get_testcaseName ");
+// 	var obj3 = {
+// 		flag: false,
+// 		testcasename: ''
+// 	};
+// 	var inputs = {
+// 		"id": testcaseId,
+// 		"name": "testcase"
+// 	};
+// 	var args = {
+// 		data: inputs,
+// 		headers: {
+// 			"Content-Type": "application/json"
+// 		}
+// 	};
+// 	logger.info("Calling NDAC Service from get_testcaseName: create_ice/getNames_Nineteen68");
+// 	client.post(epurl+"create_ice/getNames_Nineteen68", args,
+// 		function (testcasename, response) {
+// 		if (response.statusCode != 200 || testcasename.rows == "fail") {
+// 			logger.error("Error occurred in create_ice/getNames_Nineteen68: get_testcaseName, Error Code : ERRNDAC");
+// 			cb(null, testcasename.rows);
+// 		} else {
+// 			if (testcasename.rows.length != 0) {
+// 				obj3.flag = true;
+// 				obj3.testcasename = testcasename.rows[0].testcasename;
+// 			}
+// 			cb(null, obj3);
+// 		}
+// 	});
+// }
 
-exports.getAllNames = function (parent, cb, data) {
-	logger.info("Inside UI service: getAllNames");
-	var parent_length = parent.length;
-	var allNames = {
-		"testsuitename": "",
-		"screenname": "",
-		"testcasename": "",
-		"scenarioname": "",
-		"testscenarioIds": []
-	};
-	async.series({
-		modulename: function (callback) {
-			logger.info("Inside the function modulename : service getAllNames");
-			logger.info("Calling function get_moduleName from the service getAllNames");
-			get_moduleName(parent[1], function (err, data) {
-				if (err) {
-					logger.error("Error occurred in the function modulename: service getAllNames: %s",err);
-				}
-				else {
-					allNames.modulename = data.modulename;
-					allNames.testscenarioIds.push(data.testscenarioids);
-					callback();
-				}
-			});
-		},
-		scenarioname: function (callback) {
-			logger.info("Inside the function scenarioname : service getAllNames");
-			if (parent_length == 5 || parent_length == 3) {
-				logger.info("Calling function get_scenarioName from the service getAllNames");
-				get_scenarioName(parent[2], function (err, data2) {
-					if (err) {
-						logger.info("Error occurred in the function scenarioname: service getAllNames: ",err);
-					}
-					else {
-						allNames.scenarioname = data2.testscenarioname;
-						callback();
-					}
-				});
-			} else {
-				callback();
-			}
-		},
-		screenname: function (callback) {
-			logger.info("Inside the function screenname: service getAllNames");
-			if (parent_length >= 4) {
-				logger.info("Calling function get_screenName from the service getAllNames");
-				get_screenName(parent[3], function (err, data2) {
-					if (err) {
-						logger.error("Error occurred in the function screenname: service getAllNames: %s",err);
-					}
-					else {
-						allNames.screenname = data2.screenname;
-						callback();
-					}
-				});
-			} else {
-				callback();
-			}
-		},
-		testcasename: function (callback) {
-			logger.info("Inside the function testcasename: getAllNames");
-			if (parent_length == 5) {
-				logger.info("Calling function get_testcaseName from the service getAllNames");
-				get_testcaseName(parent[4], function (err, data3) {
-					if (err) {
-						logger.error("Error occurred in the function testcasename: service getAllNames: %s",err);
-					}
-					else {
-						allNames.testcasename = data3.testcasename;
-						callback();
-					}
-				});
-			} else {
-				callback();
-			}
-		}
-	}, function (err, data) {
-		cb(null, allNames);
-	});
-};
-//Create Structure MongoDB
+// exports.getAllNames = function (parent, cb, data) {
+// 	logger.info("Inside UI service: getAllNames");
+// 	var parent_length = parent.length;
+// 	var allNames = {
+// 		"testsuitename": "",
+// 		"screenname": "",
+// 		"testcasename": "",
+// 		"scenarioname": "",
+// 		"testscenarioIds": []
+// 	};
+// 	async.series({
+// 		modulename: function (callback) {
+// 			logger.info("Inside the function modulename : service getAllNames");
+// 			logger.info("Calling function get_moduleName from the service getAllNames");
+// 			get_moduleName(parent[1], function (err, data) {
+// 				if (err) {
+// 					logger.error("Error occurred in the function modulename: service getAllNames: %s",err);
+// 				}
+// 				else {
+// 					allNames.modulename = data.modulename;
+// 					allNames.testscenarioIds.push(data.testscenarioids);
+// 					callback();
+// 				}
+// 			});
+// 		},
+// 		scenarioname: function (callback) {
+// 			logger.info("Inside the function scenarioname : service getAllNames");
+// 			if (parent_length == 5 || parent_length == 3) {
+// 				logger.info("Calling function get_scenarioName from the service getAllNames");
+// 				get_scenarioName(parent[2], function (err, data2) {
+// 					if (err) {
+// 						logger.info("Error occurred in the function scenarioname: service getAllNames: ",err);
+// 					}
+// 					else {
+// 						allNames.scenarioname = data2.testscenarioname;
+// 						callback();
+// 					}
+// 				});
+// 			} else {
+// 				callback();
+// 			}
+// 		},
+// 		screenname: function (callback) {
+// 			logger.info("Inside the function screenname: service getAllNames");
+// 			if (parent_length >= 4) {
+// 				logger.info("Calling function get_screenName from the service getAllNames");
+// 				get_screenName(parent[3], function (err, data2) {
+// 					if (err) {
+// 						logger.error("Error occurred in the function screenname: service getAllNames: %s",err);
+// 					}
+// 					else {
+// 						allNames.screenname = data2.screenname;
+// 						callback();
+// 					}
+// 				});
+// 			} else {
+// 				callback();
+// 			}
+// 		},
+// 		testcasename: function (callback) {
+// 			logger.info("Inside the function testcasename: getAllNames");
+// 			if (parent_length == 5) {
+// 				logger.info("Calling function get_testcaseName from the service getAllNames");
+// 				get_testcaseName(parent[4], function (err, data3) {
+// 					if (err) {
+// 						logger.error("Error occurred in the function testcasename: service getAllNames: %s",err);
+// 					}
+// 					else {
+// 						allNames.testcasename = data3.testcasename;
+// 						callback();
+// 					}
+// 				});
+// 			} else {
+// 				callback();
+// 			}
+// 		}
+// 	}, function (err, data) {
+// 		cb(null, allNames);
+// 	});
+// };
+
+
+// Create Structure MongoDB
 // exports.createStructure_Nineteen68 = function(req,res){
 // 	// Check the state of the module and then accordingly we will update or change the names.
 // 	logger.info("Inside UI service: createStructure_Nineteen68");
@@ -244,13 +246,15 @@ exports.getAllNames = function (parent, cb, data) {
 // 	var versionnumber=0;
 // 	var newversionnumber=0;
 
-// 	// async.series({
-// 	// 	screens:
-// 	// });
+// 	async.series({
+		
+// 	});
 
 // }
-//CreateStrcutre
-exports.createStructure_Nineteen68 = function (req, res) {
+
+//Create Structure
+exports.saveMindmap = function(req,res)
+{
 	logger.info("Inside UI service: createStructure_Nineteen68");
 	var createdthrough = 'Mindmaps Creation';
 	var RequestedJSON = req;
@@ -274,433 +278,485 @@ exports.createStructure_Nineteen68 = function (req, res) {
 		versionnumber = RequestedJSON.from_version;
 		newversionnumber = RequestedJSON.new_version;
 	}
+
+	var inputs = {
+		"data": RequestedJSON 
+	};
+	var args = {
+		data: inputs,
+		headers: {
+			"Content-Type": "application/json"
+		}
+	};
+
+	client.post("http://WSLK13FODC3-010.SLKSOFT.COM:1991/create_ice/saveMindmap", args,
+				function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.error("Error occurred in create_ice/saveMindmap: saveMindmap, Error Code : ERRNDAC");
+					res(null, result.rows);
+				} else {
+					projectdetails=result.rows;
+					// callback();
+					res(null, result.rows);
+				}
+			});
 	
 	var cloneflag = RequestedJSON.action;
 	var suiteflag = false;
 	qList=[]; //For neurongraphs
-	async.series({
-		projectsUnderDomain: function (callback) {
-			logger.info("Inside projectsUnderDomain function: createStructure_Nineteen68");
-			suiteflag = false;
-			var suiteidTemp = '';
-			var scenariodetailslist = [];
-			var testsuiteidneo = suitedetails.testsuiteId;
-			var tasksuite = suitedetails.task;
-			var suite_query = '';
-			testsuiteid_exists({
-				"modulename": testsuiteName,
-				"moduleid": moduleid_c,
-				'modifiedby': username,
-				'modifiedbyrole':userrole,
-				"pid": projectid,
-				"versionnumber": versionnumber,
-				"newversionnumber": newversionnumber
-			}, function (err, data) {
-				if (err) {
-					logger.error("Error occurred in the function projectsUnderDomain: createStructure_Nineteen68: %s",err);
-				} else {
-					suiteflag = data.flag;
-					suiteidTemp = data.suiteid;
-				}
-				if (!suiteflag) {
-					suite_query = 'notflagsuite';
-				}
-				else {
-					suite_query = 'selectsuite';
-					suiteID = suiteidTemp;
-				}
-				var testsuiteobj = {
-					"testsuiteId": testsuiteidneo,
-					"testsuiteId_c": suiteID,
-					"testsuiteName": testsuiteName,
-					"task": tasksuite,
-					"testscenarioDetails": scenariodetailslist
-				};
-				suitedetailslist.push(testsuiteobj);
-				var inputs = {
-					"query": suite_query,
-					'projectid': projectid,
-					'modulename': testsuiteName,
-					'moduleid': suiteID,
-					'versionnumber': newversionnumber,
-					'createdby': username,
-					'createdthrough': createdthrough,
-					'deleted': false,
-					'skucodemodule': 'skucodemodule',
-					'tags': 'tags'
-				};
-				if (cloneflag) {
-					inputs.subquery='clonenode';
-					inputs.oldversionnumber=versionnumber;
-					inputs.oldprojectid=oldprojectid;
-				}
-				var args = {
-					data: inputs,
-					headers: {
-						"Content-Type": "application/json"
-					}
-				};
-				logger.info("Calling NDAC Service from projectsUnderDomain "+suite_query+": create_ice/insertInSuite_ICE");
-				client.post(epurl+"create_ice/insertInSuite_ICE", args,
-					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in create_ice/insertInSuite_ICE: projectsUnderDomain, Error Code : ERRNDAC");
-					} else {
-						scenario = suitedetails.testscenarioDetails;
-						var scenariosarray = [];
-						var testcaseidlist = [];
-						async.forEachSeries(scenario, function (iterator, callback2) {
-							var scenarioId = uuid();
-							scenariosarray.push(scenarioId);
-							var scenarioName = iterator.testscenarioName;
-							var scenarioid_c = iterator.testscenarioId_c;
-							var scenarioflag = false;
-							var scenarioidTemp = '';
-							var screendetailslist = [];
-							var taskscenario = iterator.task;
-							var scenarioidneo = iterator.testscenarioId;
-							testscenariosid_exists({
-								"testscenarioname": scenarioName,
-								"testscenarioid": scenarioid_c,
-								"pid": projectid,
-								'modifiedby': username,
-								'modifiedbyrole':userrole,
-								"versionnumber": versionnumber,
-								"newversionnumber": newversionnumber
-							}, function (err, scenariodata) {
-								if (err) {
-									logger.error("Error occurred in the function projectsUnderDomain: createStructure_Nineteen68: %s",err);
-								} else {
-									scenarioflag = scenariodata.flag;
-									scenarioidTemp = scenariodata.scenarioid;
-								}
-								var scenario_query = '';
-								if (!scenarioflag) {
-									scenario_query = 'notflagscenarios';
-								}
-								else {
-									scenario_query = 'deletescenarios';
-									scenarioId = scenarioidTemp;
-								}
-								var scenariodetailsobj = {
-									"testscenarioId": scenarioidneo,
-									"testscenarioId_c": scenarioId,
-									"screenDetails": screendetailslist,
-									"tasks": taskscenario,
-									"testscenarioName": scenarioName
-								};
-								scenariodetailslist.push(scenariodetailsobj);
-								var inputs = {
-									"query": scenario_query,
-									'projectid': projectid,
-									'testscenarioname': scenarioName,
-									'testscenarioid': scenarioId,
-									'versionnumber': newversionnumber,
-									'createdby': username,
-									'createdthrough': createdthrough,
-									'deleted': false,
-									'skucodetestscenario': 'skucodetestscenario',
-									'tags': 'tags'
-								};
-								if (cloneflag) {
-									inputs.subquery='clonenode';
-									inputs.oldversionnumber=versionnumber;
-									inputs.oldprojectid=oldprojectid;
-								}
-								var args = {
-									data: inputs,
-									headers: {
-										"Content-Type": "application/json"
-									}
-								};
-								logger.info("Calling NDAC Service from projectsUnderDomain "+suite_query+": create_ice/insertInSuite_ICE");
-								client.post(epurl+"create_ice/insertInScenarios_ICE", args,
-									function (result, response) {
-									if (response.statusCode != 200 || result.rows == "fail") {
-										logger.error("Error occurred in create_ice/insertInSuite_ICE: projectsUnderDomain, Error Code : ERRNDAC");
-									} else {
-										//Execute neo4j query!!
-										//if(scenario_query=='notflagscenarios'){
-											//Execute neo4j query!!
-											//qList.push({"statement":"MERGE (n:TESTSCENARIOS_NG {projectid:'"+projectid+"',testscenarioname:'"+scenarioName+"',testscenarioid:'"+scenarioId+"',testcaseids:[]}) SET n.deleted='false' return n"});
-											//Add relationship between scenario and testsuite
-											//qList.push({"statement":"MATCH (a:TESTSUITES_NG),(b:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}) WHERE '"+scenarioId+"' IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:'"+scenarioId+"'}]->(b)RETURN a,b,r"});
+
+}
+// exports.createStructure_Nineteen68 = function (req, res) {
+// 	logger.info("Inside UI service: createStructure_Nineteen68");
+// 	var createdthrough = 'Mindmaps Creation';
+// 	var RequestedJSON = req;
+// 	var projectid = RequestedJSON.projectId;
+// 	var oldprojectid = RequestedJSON.oldprojectId;
+// 	var cycleId = RequestedJSON.cycleId;
+// 	var releaseId = RequestedJSON.releaseId;
+// 	var appType = RequestedJSON.appType;
+// 	var userrole = RequestedJSON.userRole;
+// 	var username = RequestedJSON.userName.toLowerCase();
+// 	var suiteID = uuid();
+// 	var suitedetails = RequestedJSON.testsuiteDetails[0];
+// 	var testsuiteName = suitedetails.testsuiteName;
+// 	var moduleid_c = suitedetails.testsuiteId_c;
+// 	var scenarioidlist = [];
+// 	var scenario = [];
+// 	var suitedetailslist = [];
+// 	var versionnumber=0;
+// 	var newversionnumber=0;
+// 	if (RequestedJSON.from_version != undefined && RequestedJSON.new_version !=undefined) {
+// 		versionnumber = RequestedJSON.from_version;
+// 		newversionnumber = RequestedJSON.new_version;
+// 	}
+	
+// 	var cloneflag = RequestedJSON.action;
+// 	var suiteflag = false;
+// 	qList=[]; //For neurongraphs
+// 	async.series({
+// 		projectsUnderDomain: function (callback) {
+// 			logger.info("Inside projectsUnderDomain function: createStructure_Nineteen68");
+// 			suiteflag = false;
+// 			var suiteidTemp = '';
+// 			var scenariodetailslist = [];
+// 			var testsuiteidneo = suitedetails.testsuiteId;
+// 			var tasksuite = suitedetails.task;
+// 			var suite_query = '';
+// 			testsuiteid_exists({
+// 				"modulename": testsuiteName,
+// 				"moduleid": moduleid_c,
+// 				'modifiedby': username,
+// 				'modifiedbyrole':userrole,
+// 				"pid": projectid,
+// 				"versionnumber": versionnumber,
+// 				"newversionnumber": newversionnumber
+// 			}, function (err, data) {
+// 				if (err) {
+// 					logger.error("Error occurred in the function projectsUnderDomain: createStructure_Nineteen68: %s",err);
+// 				} else {
+// 					suiteflag = data.flag;
+// 					suiteidTemp = data.suiteid;
+// 				}
+// 				if (!suiteflag) {
+// 					suite_query = 'notflagsuite';
+// 				}
+// 				else {
+// 					suite_query = 'selectsuite';
+// 					suiteID = suiteidTemp;
+// 				}
+// 				var testsuiteobj = {
+// 					"testsuiteId": testsuiteidneo,
+// 					"testsuiteId_c": suiteID,
+// 					"testsuiteName": testsuiteName,
+// 					"task": tasksuite,
+// 					"testscenarioDetails": scenariodetailslist
+// 				};
+// 				suitedetailslist.push(testsuiteobj);
+// 				var inputs = {
+// 					"query": suite_query,
+// 					'projectid': projectid,
+// 					'modulename': testsuiteName,
+// 					'moduleid': suiteID,
+// 					'versionnumber': newversionnumber,
+// 					'createdby': username,
+// 					'createdthrough': createdthrough,
+// 					'deleted': false,
+// 					'skucodemodule': 'skucodemodule',
+// 					'tags': 'tags'
+// 				};
+// 				if (cloneflag) {
+// 					inputs.subquery='clonenode';
+// 					inputs.oldversionnumber=versionnumber;
+// 					inputs.oldprojectid=oldprojectid;
+// 				}
+// 				var args = {
+// 					data: inputs,
+// 					headers: {
+// 						"Content-Type": "application/json"
+// 					}
+// 				};
+// 				logger.info("Calling NDAC Service from projectsUnderDomain "+suite_query+": create_ice/insertInSuite_ICE");
+// 				client.post(epurl+"create_ice/insertInSuite_ICE", args,
+// 					function (result, response) {
+// 					if (response.statusCode != 200 || result.rows == "fail") {
+// 						logger.error("Error occurred in create_ice/insertInSuite_ICE: projectsUnderDomain, Error Code : ERRNDAC");
+// 					} else {
+// 						scenario = suitedetails.testscenarioDetails;
+// 						var scenariosarray = [];
+// 						var testcaseidlist = [];
+// 						async.forEachSeries(scenario, function (iterator, callback2) {
+// 							var scenarioId = uuid();
+// 							scenariosarray.push(scenarioId);
+// 							var scenarioName = iterator.testscenarioName;
+// 							var scenarioid_c = iterator.testscenarioId_c;
+// 							var scenarioflag = false;
+// 							var scenarioidTemp = '';
+// 							var screendetailslist = [];
+// 							var taskscenario = iterator.task;
+// 							var scenarioidneo = iterator.testscenarioId;
+// 							testscenariosid_exists({
+// 								"testscenarioname": scenarioName,
+// 								"testscenarioid": scenarioid_c,
+// 								"pid": projectid,
+// 								'modifiedby': username,
+// 								'modifiedbyrole':userrole,
+// 								"versionnumber": versionnumber,
+// 								"newversionnumber": newversionnumber
+// 							}, function (err, scenariodata) {
+// 								if (err) {
+// 									logger.error("Error occurred in the function projectsUnderDomain: createStructure_Nineteen68: %s",err);
+// 								} else {
+// 									scenarioflag = scenariodata.flag;
+// 									scenarioidTemp = scenariodata.scenarioid;
+// 								}
+// 								var scenario_query = '';
+// 								if (!scenarioflag) {
+// 									scenario_query = 'notflagscenarios';
+// 								}
+// 								else {
+// 									scenario_query = 'deletescenarios';
+// 									scenarioId = scenarioidTemp;
+// 								}
+// 								var scenariodetailsobj = {
+// 									"testscenarioId": scenarioidneo,
+// 									"testscenarioId_c": scenarioId,
+// 									"screenDetails": screendetailslist,
+// 									"tasks": taskscenario,
+// 									"testscenarioName": scenarioName
+// 								};
+// 								scenariodetailslist.push(scenariodetailsobj);
+// 								var inputs = {
+// 									"query": scenario_query,
+// 									'projectid': projectid,
+// 									'testscenarioname': scenarioName,
+// 									'testscenarioid': scenarioId,
+// 									'versionnumber': newversionnumber,
+// 									'createdby': username,
+// 									'createdthrough': createdthrough,
+// 									'deleted': false,
+// 									'skucodetestscenario': 'skucodetestscenario',
+// 									'tags': 'tags'
+// 								};
+// 								if (cloneflag) {
+// 									inputs.subquery='clonenode';
+// 									inputs.oldversionnumber=versionnumber;
+// 									inputs.oldprojectid=oldprojectid;
+// 								}
+// 								var args = {
+// 									data: inputs,
+// 									headers: {
+// 										"Content-Type": "application/json"
+// 									}
+// 								};
+// 								logger.info("Calling NDAC Service from projectsUnderDomain "+suite_query+": create_ice/insertInSuite_ICE");
+// 								client.post(epurl+"create_ice/insertInScenarios_ICE", args,
+// 									function (result, response) {
+// 									if (response.statusCode != 200 || result.rows == "fail") {
+// 										logger.error("Error occurred in create_ice/insertInSuite_ICE: projectsUnderDomain, Error Code : ERRNDAC");
+// 									} else {
+// 										//Execute neo4j query!!
+// 										//if(scenario_query=='notflagscenarios'){
+// 											//Execute neo4j query!!
+// 											//qList.push({"statement":"MERGE (n:TESTSCENARIOS_NG {projectid:'"+projectid+"',testscenarioname:'"+scenarioName+"',testscenarioid:'"+scenarioId+"',testcaseids:[]}) SET n.deleted='false' return n"});
+// 											//Add relationship between scenario and testsuite
+// 											//qList.push({"statement":"MATCH (a:TESTSUITES_NG),(b:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}) WHERE '"+scenarioId+"' IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:'"+scenarioId+"'}]->(b)RETURN a,b,r"});
 											
-											//qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}),(b:TESTCASES_NG) WHERE b.testcaseid IN a.testcaseids MERGE (a)-[r:FTSCTTCE_NG{id:b.testcaseid}]->(b) RETURN a,r,b"});
-										//}
-										//else if(scenario_query=='deletescenarios')
-											//qList.push({"statement":"MATCH (n: TESTSCENARIOS_NG { testscenarioname: '"+scenarioName+"',testscenarioid: '"+scenarioId+"' }) set n.testcaseids=[]"});
+// 											//qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}),(b:TESTCASES_NG) WHERE b.testcaseid IN a.testcaseids MERGE (a)-[r:FTSCTTCE_NG{id:b.testcaseid}]->(b) RETURN a,r,b"});
+// 										//}
+// 										//else if(scenario_query=='deletescenarios')
+// 											//qList.push({"statement":"MATCH (n: TESTSCENARIOS_NG { testscenarioname: '"+scenarioName+"',testscenarioid: '"+scenarioId+"' }) set n.testcaseids=[]"});
 
-										scenarioidlist.push(scenarioId);
-										var screen = iterator.screenDetails;
-										async.forEachSeries(screen, function (screenitr, callback3) {
-											var screenId = uuid();
-											var screenDetails = screenitr;
-											var screenName = screenitr.screenName;
-											var screenid_c = screenitr.screenId_c;
-											var screenflag = false;
-											var screenidTemp = '';
-											var testcasedetailslist = [];
-											var screenidneo = screenitr.screenId;
-											var taskscreen = screenitr.task;
-											testscreen_exists({
-												"testscreenname": screenName,
-												"testscreenid": screenid_c,
-												"pid": projectid,
-												'modifiedby': username,
-												'modifiedbyrole':userrole,
-												"versionnumber": versionnumber,
-												"newversionnumber": newversionnumber
-											}, function (err, screendata) {
-												if (err) {
-													logger.error("Error occurred in the function projectsUnderDomain: createStructure_Nineteen68: %s",err);
-												} else {
-													screenflag = screendata.flag;
-													screenidTemp = screendata.screenid;
-												}
-												var screen_query = '';
-													if (!screenflag) {
-														screen_query = 'notflagscreen';
-													}
-													else {
-														screen_query = 'selectscreen';
-														screenId = screenidTemp;
-													}
-													var screendetailsobj = {
-													"testcaseDetails": testcasedetailslist,
-													"screenName": screenName,
-													"screenId_c": screenId,
-													"screenId": screenidneo,
-													"task": taskscreen
-												};
-												screendetailslist.push(screendetailsobj);
-												var inputs = {
-													"query": screen_query,
-													'projectid': projectid,
-													'screenname': screenName,
-													'screenid': screenId,
-													'versionnumber': newversionnumber,
-													'createdby': username,
-													'createdthrough': createdthrough,
-													'deleted': false,
-													'skucodescreen': 'skucodescreen',
-													'tags': 'tags'
-												};
-												if (cloneflag) {
-													inputs.subquery='clonenode';
-													inputs.oldversionnumber=versionnumber;
-													inputs.oldprojectid=oldprojectid;
-												}
-												var args = {
-													data: inputs,
-													headers: {
-														"Content-Type": "application/json"
-													}
-												};
-												logger.info("Calling NDAC Service from createStructure_Nineteen68: create_ice/insertInScreen_ICE");
-												client.post(epurl+"create_ice/insertInScreen_ICE", args,
-													function (result, response) {
-													if (response.statusCode != 200 || result.rows == "fail") {
-														logger.error("Error occurred in create_ice/insertInScreen_ICE: createStructure_Nineteen68");
-													} else {
-                                                        //Execute neo4j query!!
-                                                        //if(screen_query=='notflagscreen'){
-                                                            //qList.push({"statement":"MERGE (n:SCREENS_NG {projectid:'"+projectid+"',screenname:'"+screenName+"',screenid:'"+screenId+"'}) SET n.deleted='false' return n"});
-                                                            //relationship
-                                                           // qList.push({"statement":"MATCH (a:TESTCASES_NG{screenid:'"+screenId+"'}),(b:SCREENS_NG {projectid:'"+projectid+"',screenname:'"+screenName+"',screenid:'"+screenId+"'}) MERGE (a)-[r:FTCETSCR_NG{id:'"+screenId+"'}]->(b) RETURN a,r,b"});
-                                                            //reqToAPI(qList,urlData);
-                                                        //}
-														var testcase = screenDetails.testcaseDetails;
-														async.forEachSeries(testcase, function (testcaseitr, callback4) {
-															var testcaseID = uuid();
-															var testcaseName = testcaseitr.testcaseName;
-															var testcaseid_c = testcaseitr.testcaseId_c;
-															var testcaseflag = false;
-															var testcaseidTemp = '';
-															var testcaseidneo = testcaseitr.testcaseId;
-															var tasktestcase = testcaseitr.task;
-															var screenID_c_neo = testcaseitr.screenID_c;
-															testcase_exists({
-																"screenId": screenId,
-																"testcasename": testcaseName,
-																"testcaseid": testcaseid_c,
-																"pid": projectid,
-																'modifiedby': username,
-																'modifiedbyrole':userrole,
-																"versionnumber": versionnumber,
-																"newversionnumber": newversionnumber
-															}, function (err, testcasedata) {
-																if (err) {
-																	logger.error("Error occurred in the function projectsUnderDomain: createStructure_Nineteen68 service: %s",err);
-																} else {
-																	testcaseflag = testcasedata.flag;
-																	testcaseidTemp = testcasedata.testcaseid;
-																}
+// 										scenarioidlist.push(scenarioId);
+// 										var screen = iterator.screenDetails;
+// 										async.forEachSeries(screen, function (screenitr, callback3) {
+// 											var screenId = uuid();
+// 											var screenDetails = screenitr;
+// 											var screenName = screenitr.screenName;
+// 											var screenid_c = screenitr.screenId_c;
+// 											var screenflag = false;
+// 											var screenidTemp = '';
+// 											var testcasedetailslist = [];
+// 											var screenidneo = screenitr.screenId;
+// 											var taskscreen = screenitr.task;
+// 											testscreen_exists({
+// 												"testscreenname": screenName,
+// 												"testscreenid": screenid_c,
+// 												"pid": projectid,
+// 												'modifiedby': username,
+// 												'modifiedbyrole':userrole,
+// 												"versionnumber": versionnumber,
+// 												"newversionnumber": newversionnumber
+// 											}, function (err, screendata) {
+// 												if (err) {
+// 													logger.error("Error occurred in the function projectsUnderDomain: createStructure_Nineteen68: %s",err);
+// 												} else {
+// 													screenflag = screendata.flag;
+// 													screenidTemp = screendata.screenid;
+// 												}
+// 												var screen_query = '';
+// 													if (!screenflag) {
+// 														screen_query = 'notflagscreen';
+// 													}
+// 													else {
+// 														screen_query = 'selectscreen';
+// 														screenId = screenidTemp;
+// 													}
+// 													var screendetailsobj = {
+// 													"testcaseDetails": testcasedetailslist,
+// 													"screenName": screenName,
+// 													"screenId_c": screenId,
+// 													"screenId": screenidneo,
+// 													"task": taskscreen
+// 												};
+// 												screendetailslist.push(screendetailsobj);
+// 												var inputs = {
+// 													"query": screen_query,
+// 													'projectid': projectid,
+// 													'screenname': screenName,
+// 													'screenid': screenId,
+// 													'versionnumber': newversionnumber,
+// 													'createdby': username,
+// 													'createdthrough': createdthrough,
+// 													'deleted': false,
+// 													'skucodescreen': 'skucodescreen',
+// 													'tags': 'tags'
+// 												};
+// 												if (cloneflag) {
+// 													inputs.subquery='clonenode';
+// 													inputs.oldversionnumber=versionnumber;
+// 													inputs.oldprojectid=oldprojectid;
+// 												}
+// 												var args = {
+// 													data: inputs,
+// 													headers: {
+// 														"Content-Type": "application/json"
+// 													}
+// 												};
+// 												logger.info("Calling NDAC Service from createStructure_Nineteen68: create_ice/insertInScreen_ICE");
+// 												client.post(epurl+"create_ice/insertInScreen_ICE", args,
+// 													function (result, response) {
+// 													if (response.statusCode != 200 || result.rows == "fail") {
+// 														logger.error("Error occurred in create_ice/insertInScreen_ICE: createStructure_Nineteen68");
+// 													} else {
+//                                                         //Execute neo4j query!!
+//                                                         //if(screen_query=='notflagscreen'){
+//                                                             //qList.push({"statement":"MERGE (n:SCREENS_NG {projectid:'"+projectid+"',screenname:'"+screenName+"',screenid:'"+screenId+"'}) SET n.deleted='false' return n"});
+//                                                             //relationship
+//                                                            // qList.push({"statement":"MATCH (a:TESTCASES_NG{screenid:'"+screenId+"'}),(b:SCREENS_NG {projectid:'"+projectid+"',screenname:'"+screenName+"',screenid:'"+screenId+"'}) MERGE (a)-[r:FTCETSCR_NG{id:'"+screenId+"'}]->(b) RETURN a,r,b"});
+//                                                             //reqToAPI(qList,urlData);
+//                                                         //}
+// 														var testcase = screenDetails.testcaseDetails;
+// 														async.forEachSeries(testcase, function (testcaseitr, callback4) {
+// 															var testcaseID = uuid();
+// 															var testcaseName = testcaseitr.testcaseName;
+// 															var testcaseid_c = testcaseitr.testcaseId_c;
+// 															var testcaseflag = false;
+// 															var testcaseidTemp = '';
+// 															var testcaseidneo = testcaseitr.testcaseId;
+// 															var tasktestcase = testcaseitr.task;
+// 															var screenID_c_neo = testcaseitr.screenID_c;
+// 															testcase_exists({
+// 																"screenId": screenId,
+// 																"testcasename": testcaseName,
+// 																"testcaseid": testcaseid_c,
+// 																"pid": projectid,
+// 																'modifiedby': username,
+// 																'modifiedbyrole':userrole,
+// 																"versionnumber": versionnumber,
+// 																"newversionnumber": newversionnumber
+// 															}, function (err, testcasedata) {
+// 																if (err) {
+// 																	logger.error("Error occurred in the function projectsUnderDomain: createStructure_Nineteen68 service: %s",err);
+// 																} else {
+// 																	testcaseflag = testcasedata.flag;
+// 																	testcaseidTemp = testcasedata.testcaseid;
+// 																}
 
-																var testcase_query = '';
-																if (!testcaseflag) {
-																	testcase_query = 'notflagtestcase';
-																}
-																else {
-																	testcase_query = 'selecttestcase';
-																	testcaseID = testcaseidTemp;
-																}
-																var testcasedetailsobj = {
-																	"screenID_c": screenID_c_neo,
-																	"testcaseId": testcaseidneo,
-																	"testcaseId_c": testcaseID,
-																	"testcaseName": testcaseName,
-																	"task": tasktestcase
-																};
-																testcasedetailslist.push(testcasedetailsobj);
-																var inputs = {
-																	"query": testcase_query,
-																	'screenid': screenId,
-																	'testcasename': testcaseName,
-																	'testcaseid': testcaseID,
-																	'versionnumber': newversionnumber,
-																	'createdby': username,
-																	'createdthrough': createdthrough,
-																	'deleted': false,
-																	'skucodetestcase': 'skucodetestcase',
-																	'tags': 'tags'
-																};
-																if (cloneflag) {
-																	inputs.subquery='clonenode';
-																	inputs.oldscreenid=screenID_c_neo;
-																	inputs.oldversionnumber=versionnumber;
-																}
-																var args = {
-																	data: inputs,
-																	headers: {
-																		"Content-Type": "application/json"
-																	}
-																};
-																logger.info("Calling NDAC Service from projectsUnderDomain: create_ice/insertInTestcase_ICE");
-																client.post(epurl+"create_ice/insertInTestcase_ICE", args,
-																	function (result, response) {
-																	if (response.statusCode != 200 || result.rows == "fail") {
-																		logger.error("Error occurred in create_ice/insertInTestcase_ICE: createStructure_Nineteen68 service");
-																	}
-																	else {
-																		//if(testcase_query=='notflagtestcase'){
-																			//qList.push({"statement":"MERGE (n:TESTCASES_NG {screenid:'"+screenId+"',testcasename:'"+testcaseName+"',testcaseid:'"+testcaseID+"',versionnumber:'1'}) SET n.deleted='false' return n"});
-																			//Relationship
-																			//qList.push({"statement":"MATCH (a:TESTCASES_NG{testcaseid:'"+testcaseID+"'}),(b:SCREENS_NG {screenid:'"+screenId+"'}) MERGE (a)-[r:FTCETSCR_NG{id:'"+screenId+"'}]->(b) RETURN a,r,b"});
-																			//qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG),(b:TESTCASES_NG{testcaseid:'"+testcaseID+"'}) WHERE '"+testcaseID+"' IN a.testcaseids MERGE (a)-[r:FTSCTTCE_NG{id:'"+testcaseID+"'}]->(b)RETURN a,r,b"});
-																		// reqToAPI(qList,urlData);
-																		//}
+// 																var testcase_query = '';
+// 																if (!testcaseflag) {
+// 																	testcase_query = 'notflagtestcase';
+// 																}
+// 																else {
+// 																	testcase_query = 'selecttestcase';
+// 																	testcaseID = testcaseidTemp;
+// 																}
+// 																var testcasedetailsobj = {
+// 																	"screenID_c": screenID_c_neo,
+// 																	"testcaseId": testcaseidneo,
+// 																	"testcaseId_c": testcaseID,
+// 																	"testcaseName": testcaseName,
+// 																	"task": tasktestcase
+// 																};
+// 																testcasedetailslist.push(testcasedetailsobj);
+// 																var inputs = {
+// 																	"query": testcase_query,
+// 																	'screenid': screenId,
+// 																	'testcasename': testcaseName,
+// 																	'testcaseid': testcaseID,
+// 																	'versionnumber': newversionnumber,
+// 																	'createdby': username,
+// 																	'createdthrough': createdthrough,
+// 																	'deleted': false,
+// 																	'skucodetestcase': 'skucodetestcase',
+// 																	'tags': 'tags'
+// 																};
+// 																if (cloneflag) {
+// 																	inputs.subquery='clonenode';
+// 																	inputs.oldscreenid=screenID_c_neo;
+// 																	inputs.oldversionnumber=versionnumber;
+// 																}
+// 																var args = {
+// 																	data: inputs,
+// 																	headers: {
+// 																		"Content-Type": "application/json"
+// 																	}
+// 																};
+// 																logger.info("Calling NDAC Service from projectsUnderDomain: create_ice/insertInTestcase_ICE");
+// 																client.post(epurl+"create_ice/insertInTestcase_ICE", args,
+// 																	function (result, response) {
+// 																	if (response.statusCode != 200 || result.rows == "fail") {
+// 																		logger.error("Error occurred in create_ice/insertInTestcase_ICE: createStructure_Nineteen68 service");
+// 																	}
+// 																	else {
+// 																		//if(testcase_query=='notflagtestcase'){
+// 																			//qList.push({"statement":"MERGE (n:TESTCASES_NG {screenid:'"+screenId+"',testcasename:'"+testcaseName+"',testcaseid:'"+testcaseID+"',versionnumber:'1'}) SET n.deleted='false' return n"});
+// 																			//Relationship
+// 																			//qList.push({"statement":"MATCH (a:TESTCASES_NG{testcaseid:'"+testcaseID+"'}),(b:SCREENS_NG {screenid:'"+screenId+"'}) MERGE (a)-[r:FTCETSCR_NG{id:'"+screenId+"'}]->(b) RETURN a,r,b"});
+// 																			//qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG),(b:TESTCASES_NG{testcaseid:'"+testcaseID+"'}) WHERE '"+testcaseID+"' IN a.testcaseids MERGE (a)-[r:FTSCTTCE_NG{id:'"+testcaseID+"'}]->(b)RETURN a,r,b"});
+// 																		// reqToAPI(qList,urlData);
+// 																		//}
 																		
-																		testcaseidlist.push(testcaseID);
-																		var inputs = {
-																			'testcaseid': testcaseID,
-																			'modifiedby': username,
-																			'modifiedbyrole': userrole,
-																			'projectid': projectid,
-																			'testscenarioid': scenarioId,
-																			'modifiedflag': scenarioflag,
-																			'testscenarioname': scenarioName,
-																			'versionnumber': newversionnumber
-																		};
-																		var args = {
-																			data: inputs,
-																			headers: {
-																				"Content-Type": "application/json"
-																			}
-																		};
-																		logger.info("Calling NDAC Service from projectsUnderDomain: create_ice/updateTestScenario_ICE");
-																		client.post(epurl+"create_ice/updateTestScenario_ICE", args,
-																			function (result, response) {
-																			if (response.statusCode != 200 || result.rows == "fail") {
-																				logger.error("Error occurred in create_ice/updateTestScenario_ICE: createStructure_Nineteen68 service");
-																			}
-																			else {
-																				logger.info("Successfully updated testscenarios");
-																				//qList.push({"statement":"MATCH (n:TESTSCENARIOS_NG {projectid:'"+projectid+"',testscenarioname:'"+scenarioName+"',testscenarioid:'"+scenarioId+"'}) SET n.testcaseids=n.testcaseids+['"+testcaseID+"'] return n"});
-																				//Add relationship between scenario and testsuite
-																				//qListR.push({"statement":"MATCH (a:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'})-[r]->(b:TESTCASES_NG) delete r"})
-																				//qList.push({"statement":"MATCH (a:TESTSUITES_NG),(b:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}) WHERE '"+scenarioId+"' IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:'"+scenarioId+"'}]->(b)RETURN a,r,b"});
-																				//qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}),(b:TESTCASES_NG{testcaseid:'"+testcaseID+"'}) MERGE (a)-[r:FTSCTTCE_NG{id:'"+testcaseID+"'}]->(b)RETURN a,r,b"});
-																				callback4();
-																			}
-																		});
-																	}
+// 																		testcaseidlist.push(testcaseID);
+// 																		var inputs = {
+// 																			'testcaseid': testcaseID,
+// 																			'modifiedby': username,
+// 																			'modifiedbyrole': userrole,
+// 																			'projectid': projectid,
+// 																			'testscenarioid': scenarioId,
+// 																			'modifiedflag': scenarioflag,
+// 																			'testscenarioname': scenarioName,
+// 																			'versionnumber': newversionnumber
+// 																		};
+// 																		var args = {
+// 																			data: inputs,
+// 																			headers: {
+// 																				"Content-Type": "application/json"
+// 																			}
+// 																		};
+// 																		logger.info("Calling NDAC Service from projectsUnderDomain: create_ice/updateTestScenario_ICE");
+// 																		client.post(epurl+"create_ice/updateTestScenario_ICE", args,
+// 																			function (result, response) {
+// 																			if (response.statusCode != 200 || result.rows == "fail") {
+// 																				logger.error("Error occurred in create_ice/updateTestScenario_ICE: createStructure_Nineteen68 service");
+// 																			}
+// 																			else {
+// 																				logger.info("Successfully updated testscenarios");
+// 																				//qList.push({"statement":"MATCH (n:TESTSCENARIOS_NG {projectid:'"+projectid+"',testscenarioname:'"+scenarioName+"',testscenarioid:'"+scenarioId+"'}) SET n.testcaseids=n.testcaseids+['"+testcaseID+"'] return n"});
+// 																				//Add relationship between scenario and testsuite
+// 																				//qListR.push({"statement":"MATCH (a:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'})-[r]->(b:TESTCASES_NG) delete r"})
+// 																				//qList.push({"statement":"MATCH (a:TESTSUITES_NG),(b:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}) WHERE '"+scenarioId+"' IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:'"+scenarioId+"'}]->(b)RETURN a,r,b"});
+// 																				//qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}),(b:TESTCASES_NG{testcaseid:'"+testcaseID+"'}) MERGE (a)-[r:FTSCTTCE_NG{id:'"+testcaseID+"'}]->(b)RETURN a,r,b"});
+// 																				callback4();
+// 																			}
+// 																		});
+// 																	}
 																	
-																});
-															});
-														}, callback3);
-													}
-												});
-												// callback3();
-											});
-										}, callback2);
-									}
-								});
-								// callback2();
-							});
-						}, callback);
-					}
-				});
-				//callback();
-			});
+// 																});
+// 															});
+// 														}, callback3);
+// 													}
+// 												});
+// 												// callback3();
+// 											});
+// 										}, callback2);
+// 									}
+// 								});
+// 								// callback2();
+// 							});
+// 						}, callback);
+// 					}
+// 				});
+// 				//callback();
+// 			});
 
-		},
-		updatescenarioids: function (callback) {
-			logger.info("Inside the function updatescenarioids ");
-			var inputs = {
-				'testscenarioids': scenarioidlist,
-				'moduleid': suiteID,
-				'projectid': projectid,
-				'modulename': testsuiteName,
-				'modifiedflag': suiteflag,
-				'modifiedby': username,
-				'modifiedbyrole':userrole,
-				'versionnumber': newversionnumber
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling NDAC Service from updatescenarioids: create_ice/updateModule_ICE");
-			client.post(epurl+"create_ice/updateModule_ICE", args,
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.info("Error occurred in create_ice/updateModule_ICE: createStructure_Nineteen68 service");
-				} else {
-					logger.info("Successfully updated Modules");
-				}
-				callback();
+// 		},
+// 		updatescenarioids: function (callback) {
+// 			logger.info("Inside the function updatescenarioids ");
+// 			var inputs = {
+// 				'testscenarioids': scenarioidlist,
+// 				'moduleid': suiteID,
+// 				'projectid': projectid,
+// 				'modulename': testsuiteName,
+// 				'modifiedflag': suiteflag,
+// 				'modifiedby': username,
+// 				'modifiedbyrole':userrole,
+// 				'versionnumber': newversionnumber
+// 			};
+// 			var args = {
+// 				data: inputs,
+// 				headers: {
+// 					"Content-Type": "application/json"
+// 				}
+// 			};
+// 			logger.info("Calling NDAC Service from updatescenarioids: create_ice/updateModule_ICE");
+// 			client.post(epurl+"create_ice/updateModule_ICE", args,
+// 				function (result, response) {
+// 				if (response.statusCode != 200 || result.rows == "fail") {
+// 					logger.info("Error occurred in create_ice/updateModule_ICE: createStructure_Nineteen68 service");
+// 				} else {
+// 					logger.info("Successfully updated Modules");
+// 				}
+// 				callback();
 
-			});
-		}
-	},
-		function (err, results) {
-			logger.info("Inside final function");
-			if (err) {
-				logger.error("Error occurred in final funtion: createStructure_Nineteen68 service: %s", err);
-				res(null, err);
-			} else {
-				var returnJsonmindmap = {
-					"projectId": projectid,
-					"cycleId": cycleId,
-					"releaseId": releaseId,
-					"appType": appType,
-					"testsuiteDetails": suitedetailslist
-				};
-				logger.info("Calling funtion neo4jAPI.executeQueries: createStructure_Nineteen68 service");
-				neo4jAPI.executeQueries(qList,function(status,result){
-					if(err){
-						logger.error("Error occurred in the function neo4jAPI.executeQueries: createStructure_Nineteen68: %s", err);
-					} else{
-						res(null, returnJsonmindmap);
-					}
-				});
+// 			});
+// 		}
+// 	},
+// 		function (err, results) {
+// 			logger.info("Inside final function");
+// 			if (err) {
+// 				logger.error("Error occurred in final funtion: createStructure_Nineteen68 service: %s", err);
+// 				res(null, err);
+// 			} else {
+// 				var returnJsonmindmap = {
+// 					"projectId": projectid,
+// 					"cycleId": cycleId,
+// 					"releaseId": releaseId,
+// 					"appType": appType,
+// 					"testsuiteDetails": suitedetailslist
+// 				};
+// 				logger.info("Calling funtion neo4jAPI.executeQueries: createStructure_Nineteen68 service");
+// 				neo4jAPI.executeQueries(qList,function(status,result){
+// 					if(err){
+// 						logger.error("Error occurred in the function neo4jAPI.executeQueries: createStructure_Nineteen68: %s", err);
+// 					} else{
+// 						res(null, returnJsonmindmap);
+// 					}
+// 				});
 
-			}
-		});
-};
+// 			}
+// 		});
+// };
 
 function testsuiteid_exists(moduledetails, cb, data) {
 
@@ -750,6 +806,7 @@ function testsuiteid_exists(moduledetails, cb, data) {
 						flagId = true;
 						obj.suiteid = result.rows[0].moduleid;
 						statusflag = true;
+						moduledetails.moduleid=rows[0]["_id"];
 						//cb(null,obj);
 					}
 					modulecallback();
@@ -757,42 +814,42 @@ function testsuiteid_exists(moduledetails, cb, data) {
 			});
 		},
 
-		moduledetails: function (modulecallback) {
-			logger.info("Inside the function moduledetails: testsuiteid_exists");
-			if (!flagId && moduledetails.moduleid != "null") {
-				var inputs = {
-					'project_id': moduledetails.pid,
-					'module_name': moduledetails.modulename,
-					'module_id': moduledetails.moduleid,
-					'name': 'suite_check_id',
-					'versionnumber': moduledetails.newversionnumber
-				};
-				var args = {
-					data: inputs,
-					headers: {
-						"Content-Type": "application/json"
-					}
-				};
-				logger.info("Calling NDAC Service from testsuiteid_exists - moduledetails: create_ice/testsuiteid_exists_ICE");
-				client.post(epurl+"create_ice/testsuiteid_exists_ICE", args,
-					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in create_ice/testsuiteid_exists_ICE: testsuiteid_exists - moduledetails, Error Code : ERRNDAC");
-						cb(null, obj);
-					} else {
-						if (result.rows.length != 0) {
-							obj.flag = true;
-							obj.suiteid = result.rows[0].moduleid;
-							statusflag = true;
-							//cb(null,obj);
-						}
-						modulecallback();
-					}
-				});
-			} else {
-				cb(null, obj);
-			}
-		},
+		// moduledetails: function (modulecallback) {
+		// 	logger.info("Inside the function moduledetails: testsuiteid_exists");
+		// 	if (!flagId && moduledetails.moduleid != "null") {
+		// 		var inputs = {
+		// 			'project_id': moduledetails.pid,
+		// 			'module_name': moduledetails.modulename,
+		// 			'module_id': moduledetails.moduleid,
+		// 			'name': 'suite_check_id',
+		// 			'versionnumber': moduledetails.newversionnumber
+		// 		};
+		// 		var args = {
+		// 			data: inputs,
+		// 			headers: {
+		// 				"Content-Type": "application/json"
+		// 			}
+		// 		};
+		// 		logger.info("Calling NDAC Service from testsuiteid_exists - moduledetails: create_ice/testsuiteid_exists_ICE");
+		// 		client.post(epurl+"create_ice/testsuiteid_exists_ICE", args,
+		// 			function (result, response) {
+		// 			if (response.statusCode != 200 || result.rows == "fail") {
+		// 				logger.error("Error occurred in create_ice/testsuiteid_exists_ICE: testsuiteid_exists - moduledetails, Error Code : ERRNDAC");
+		// 				cb(null, obj);
+		// 			} else {
+		// 				if (result.rows.length != 0) {
+		// 					obj.flag = true;
+		// 					obj.suiteid = result.rows[0].moduleid;
+		// 					statusflag = true;
+		// 					//cb(null,obj);
+		// 				}
+		// 				modulecallback();
+		// 			}
+		// 		});
+		// 	} else {
+		// 		cb(null, obj);
+		// 	}
+		// },
 		moduleupdate: function (modulecallback) {
 			logger.info("Inside the function moduleupdate: testsuiteid_exists");
 			if (!statusflag) {
@@ -827,80 +884,80 @@ function updatetestsuitename(moduledetails, cb, data) {
 	var flagtocheckifexists = false;
 	var flagtocheckifdeleted = false;
 	async.series({
-		select: function (callback) {
-			logger.info("Inside the function select: updatetestsuitename");
-			var inputs = {
-				'name': 'module_details',
-				'id': moduledetails.moduleid
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling NDAC Service from updatetestsuitename - select: create_ice/get_node_details_ICE");
-			client.post(epurl+"create_ice/get_node_details_ICE", args,
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in create_ice/get_node_details_ICE: updatetestsuitename Error Code : ERRNDAC");
-				} else {
-					if (result.rows.length != 0) {
-						flagtocheckifexists = true;
-						suitedatatoupdate = result.rows[0];
-					}
-				}
-				callback(null, suitedatatoupdate);
-			});
-		},
-		delete : function (callback) {
-			logger.info("Inside the function delete: updatetestsuitename");
-			if (flagtocheckifexists) {
-				var inputs = {
-					'name': 'delete_module',
-					'id': moduledetails.moduleid,
-					'node_name': suitedatatoupdate.modulename,
-					'version_number': suitedatatoupdate.versionnumber,
-					'parent_node_id': suitedatatoupdate.projectid
-				};
-				var args = {
-					data: inputs,
-					headers: {
-						"Content-Type": "application/json"
-					}
-				};
-				logger.info("Calling NDAC Service from updatetestsuitename - delete: create_ice/delete_node_ICE");
-				client.post(epurl+"create_ice/delete_node_ICE", args,
-					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in create_ice/delete_node_ICE: updatetestsuitename Error Code : ERRNDAC");
-					} else {
-						flagtocheckifdeleted = true;
-					}
-					callback();
-				});
-			} else {
-				callback();
-			}
-		},
+		// select: function (callback) {
+		// 	logger.info("Inside the function select: updatetestsuitename");
+		// 	var inputs = {
+		// 		'name': 'module_details',
+		// 		'id': moduledetails.moduleid
+		// 	};
+		// 	var args = {
+		// 		data: inputs,
+		// 		headers: {
+		// 			"Content-Type": "application/json"
+		// 		}
+		// 	};
+		// 	logger.info("Calling NDAC Service from updatetestsuitename - select: create_ice/get_node_details_ICE");
+		// 	client.post(epurl+"create_ice/get_node_details_ICE", args,
+		// 		function (result, response) {
+		// 		if (response.statusCode != 200 || result.rows == "fail") {
+		// 			logger.error("Error occurred in create_ice/get_node_details_ICE: updatetestsuitename Error Code : ERRNDAC");
+		// 		} else {
+		// 			if (result.rows.length != 0) {
+		// 				flagtocheckifexists = true;
+		// 				suitedatatoupdate = result.rows[0];
+		// 			}
+		// 		}
+		// 		callback(null, suitedatatoupdate);
+		// 	});
+		// },
+		// delete : function (callback) {
+		// 	logger.info("Inside the function delete: updatetestsuitename");
+		// 	if (flagtocheckifexists) {
+		// 		var inputs = {
+		// 			'name': 'delete_module',
+		// 			'id': moduledetails.moduleid,
+		// 			'node_name': suitedatatoupdate.modulename,
+		// 			'version_number': suitedatatoupdate.versionnumber,
+		// 			'parent_node_id': suitedatatoupdate.projectid
+		// 		};
+		// 		var args = {
+		// 			data: inputs,
+		// 			headers: {
+		// 				"Content-Type": "application/json"
+		// 			}
+		// 		};
+		// 		logger.info("Calling NDAC Service from updatetestsuitename - delete: create_ice/delete_node_ICE");
+		// 		client.post(epurl+"create_ice/delete_node_ICE", args,
+		// 			function (result, response) {
+		// 			if (response.statusCode != 200 || result.rows == "fail") {
+		// 				logger.error("Error occurred in create_ice/delete_node_ICE: updatetestsuitename Error Code : ERRNDAC");
+		// 			} else {
+		// 				flagtocheckifdeleted = true;
+		// 			}
+		// 			callback();
+		// 		});
+		// 	} else {
+		// 		callback();
+		// 	}
+		// },
 		update: function (callback) {
 			logger.info("Inside theh function update: updatetestsuitename");
 			if (flagtocheckifexists && flagtocheckifdeleted) {
 				var inputs = {
-					'projectid': suitedatatoupdate.projectid,
+					'projectid': moduledetails.pid,
 					'modulename': moduledetails.modulename,
-					'moduleid': suitedatatoupdate.moduleid,
+					'moduleid': moduledetails.moduleid,
 					'versionnumber': moduledetails.newversionnumber,
 					'modifiedby': moduledetails.modifiedby,
-					'modifiedbyrole': moduledetails.modifiedbyrole,
-					'modifiedon': new Date().getTime().toString(),
-					'createdby': suitedatatoupdate.createdby,
-					'createdthrough': suitedatatoupdate.createdthrough,
-					'deleted': suitedatatoupdate.deleted.toString(),
-					'skucodemodule': 'skucodemodule',
-					'tags': 'tags',
-					'testscenarioids': suitedatatoupdate.testscenarioids,
-					'createdon': new Date(suitedatatoupdate.createdon).getTime().toString()
+					'modifiedbyrole': moduledetails.modifiedbyrole
+					// 'modifiedon': new Date().getTime().toString(),
+					// 'createdby': suitedatatoupdate.createdby,
+					// 'createdthrough': suitedatatoupdate.createdthrough,
+					// 'deleted': suitedatatoupdate.deleted.toString(),
+					// 'skucodemodule': 'skucodemodule',
+					// 'tags': 'tags',
+					// 'testscenarioids': suitedatatoupdate.testscenarioids,
+					// 'createdon': new Date(suitedatatoupdate.createdon).getTime().toString()
 				};
 				var args = {
 					data: inputs,
@@ -1038,64 +1095,64 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 	// Direct API call to updateScenarioName
 
 	async.series({
-		select: function (callback) {
-			logger.info("Inside the function select: updatetestscenarioname");
-			var inputs = {
-				'name': 'testscenario_details',
-				'id': testscenariodetails.testscenarioid
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling NDAC Service from updatetestscenarioname - select: create_ice/get_node_details_ICE");
-			client.post(epurl+"create_ice/get_node_details_ICE", args,
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in create_ice/get_node_details_ICE: updatetestscenarioname - select, Error Code : ERRNDAC");
-				} else {
-					if (result.rows.length != 0) {
-						flagtocheckifexists = true;
-						scenariodatatoupdate = result.rows[0];
-					}
-				}
-				callback(null, scenariodatatoupdate);
-			});
-		},
-		delete : function (callback) {
-			logger.info("Inside the function delete: updatetestscenarioname");
-			if (flagtocheckifexists) {
-				var inputs = {
-					'name': 'delete_testscenario',
-					'id': testscenariodetails.testscenarioid,
-					'node_name': scenariodatatoupdate.testscenarioname,
-					'version_number': scenariodatatoupdate.versionnumber,
-					'parent_node_id': scenariodatatoupdate.projectid
-				};
-				var args = {
-					data: inputs,
-					headers: {
-						"Content-Type": "application/json"
-					}
-				};
-				logger.info("Calling NDAC Service from updatetestscenarioname - delete: create_ice/delete_node_ICE");
-				client.post(epurl+"create_ice/delete_node_ICE", args,
-					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in create_ice/delete_node_ICE: updatetestscenarioname - delete, Error Code : ERRNDAC");
-					} else {
-						//Execute neo4j query!!
-						//qList.push({"statement":"MATCH (n: TESTSCENARIOS_NG { testscenarioname: '"+inputs.node_name+"',testscenarioid: '"+inputs.id+"' }) detach delete n"});
-						flagtocheckifdeleted = true;
-					}
-					callback();
-				});
-			} else {
-				callback();
-			}
-		},
+		// select: function (callback) {
+		// 	logger.info("Inside the function select: updatetestscenarioname");
+		// 	var inputs = {
+		// 		'name': 'testscenario_details',
+		// 		'id': testscenariodetails.testscenarioid
+		// 	};
+		// 	var args = {
+		// 		data: inputs,
+		// 		headers: {
+		// 			"Content-Type": "application/json"
+		// 		}
+		// 	};
+		// 	logger.info("Calling NDAC Service from updatetestscenarioname - select: create_ice/get_node_details_ICE");
+		// 	client.post(epurl+"create_ice/get_node_details_ICE", args,
+		// 		function (result, response) {
+		// 		if (response.statusCode != 200 || result.rows == "fail") {
+		// 			logger.error("Error occurred in create_ice/get_node_details_ICE: updatetestscenarioname - select, Error Code : ERRNDAC");
+		// 		} else {
+		// 			if (result.rows.length != 0) {
+		// 				flagtocheckifexists = true;
+		// 				scenariodatatoupdate = result.rows[0];
+		// 			}
+		// 		}
+		// 		callback(null, scenariodatatoupdate);
+		// 	});
+		// },
+		// delete : function (callback) {
+		// 	logger.info("Inside the function delete: updatetestscenarioname");
+		// 	if (flagtocheckifexists) {
+		// 		var inputs = {
+		// 			'name': 'delete_testscenario',
+		// 			'id': testscenariodetails.testscenarioid,
+		// 			'node_name': scenariodatatoupdate.testscenarioname,
+		// 			'version_number': scenariodatatoupdate.versionnumber,
+		// 			'parent_node_id': scenariodatatoupdate.projectid
+		// 		};
+		// 		var args = {
+		// 			data: inputs,
+		// 			headers: {
+		// 				"Content-Type": "application/json"
+		// 			}
+		// 		};
+		// 		logger.info("Calling NDAC Service from updatetestscenarioname - delete: create_ice/delete_node_ICE");
+		// 		client.post(epurl+"create_ice/delete_node_ICE", args,
+		// 			function (result, response) {
+		// 			if (response.statusCode != 200 || result.rows == "fail") {
+		// 				logger.error("Error occurred in create_ice/delete_node_ICE: updatetestscenarioname - delete, Error Code : ERRNDAC");
+		// 			} else {
+		// 				//Execute neo4j query!!
+		// 				//qList.push({"statement":"MATCH (n: TESTSCENARIOS_NG { testscenarioname: '"+inputs.node_name+"',testscenarioid: '"+inputs.id+"' }) detach delete n"});
+		// 				flagtocheckifdeleted = true;
+		// 			}
+		// 			callback();
+		// 		});
+		// 	} else {
+		// 		callback();
+		// 	}
+		// },
 		update: function (callback) {
 			logger.info("Inside the function update: updatetestscenarioname");
 			if (flagtocheckifexists && flagtocheckifdeleted) {
@@ -1108,14 +1165,14 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 					'testscenarioid': testscenariodetails.testscenarioid,
 					'versionnumber': testscenariodetails.newversionnumber,
 					'modifiedby': testscenariodetails.modifiedby,
-					'modifiedbyrole': testscenariodetails.modifiedbyrole,
-					'modifiedon': new Date().getTime().toString(),
-					'createdon': new Date(scenariodatatoupdate.createdon).getTime().toString(),
-					'createdby': scenariodatatoupdate.createdby,
-					'deleted': scenariodatatoupdate.deleted.toString(),
-					'skucodetestscenario': 'skucodetestscenario',
-					'tags': 'tags',
-					'testcaseids': scenariodatatoupdate.testcaseids
+					'modifiedbyrole': testscenariodetails.modifiedbyrole
+					// 'modifiedon': new Date().getTime().toString(),
+					// 'createdon': new Date(scenariodatatoupdate.createdon).getTime().toString(),
+					// 'createdby': scenariodatatoupdate.createdby,
+					// 'deleted': scenariodatatoupdate.deleted.toString(),
+					// 'skucodetestscenario': 'skucodetestscenario',
+					// 'tags': 'tags',
+					// 'testcaseids': scenariodatatoupdate.testcaseids
 				};
 				var args = {
 					data: inputs,
@@ -1252,65 +1309,65 @@ function updatetestscreenname(testscreendetails, cb, data) {
 	var flagtocheckifexists = false;
 	var flagtocheckifdeleted = false;
 	async.series({
-		select: function (callback) {
-			logger.info("Inside the function select: updatetestscreenname");
-			var inputs = {
-				'name': 'screen_details',
-				'id': testscreendetails.testscreenid
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling NDAC Service from updatetestscreenname - select: create_ice/get_node_details_ICE");
-			client.post(epurl+"create_ice/get_node_details_ICE", args,
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in create_ice/get_node_details_ICE: updatetestscreenname, Error Code : ERRNDAC");
-				} else {
-					if (result.rows.length != 0) {
-						flagtocheckifexists = true;
-						screendatatoupdate = result.rows[0];
-					}
-				}
-				callback(null, screendatatoupdate);
-			});
-		},
-		delete : function (callback) {
-			logger.info("Inside the function delete: updatetestscreenname");
-			if (flagtocheckifexists) {
-				var inputs = {
-					'name': 'delete_screen',
-					'id': testscreendetails.testscreenid,
-					'node_name': screendatatoupdate.screenname,
-					'version_number': screendatatoupdate.versionnumber,
-					'parent_node_id': screendatatoupdate.projectid
-				};
-				var args = {
-					data: inputs,
-					headers: {
-						"Content-Type": "application/json"
-					}
-				};
-				logger.info("Calling NDAC Service from updatetestscreenname - delete: create_ice/delete_node_ICE");
-				client.post(epurl+"create_ice/delete_node_ICE", args,
-					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in create_ice/delete_node_ICE: updatetestscreenname, Error Code : ERRNDAC");
-					} else {
-						// if(deleted.rows != undefined && deleted.rows.length!=0){
-						flagtocheckifdeleted = true;
-						//Execute neo4j query!!
-						//qList.push({"statement":"MATCH (n: SCREENS_NG { screenname: '"+inputs.node_name+"',screenid: '"+inputs.id+"',versionnumber:'"+inputs.version_number+"' }) detach delete n"});
-					}
-					callback();
-				});
-			} else {
-				callback();
-			}
-		},
+		// select: function (callback) {
+		// 	logger.info("Inside the function select: updatetestscreenname");
+		// 	var inputs = {
+		// 		'name': 'screen_details',
+		// 		'id': testscreendetails.testscreenid
+		// 	};
+		// 	var args = {
+		// 		data: inputs,
+		// 		headers: {
+		// 			"Content-Type": "application/json"
+		// 		}
+		// 	};
+		// 	logger.info("Calling NDAC Service from updatetestscreenname - select: create_ice/get_node_details_ICE");
+		// 	client.post(epurl+"create_ice/get_node_details_ICE", args,
+		// 		function (result, response) {
+		// 		if (response.statusCode != 200 || result.rows == "fail") {
+		// 			logger.error("Error occurred in create_ice/get_node_details_ICE: updatetestscreenname, Error Code : ERRNDAC");
+		// 		} else {
+		// 			if (result.rows.length != 0) {
+		// 				flagtocheckifexists = true;
+		// 				screendatatoupdate = result.rows[0];
+		// 			}
+		// 		}
+		// 		callback(null, screendatatoupdate);
+		// 	});
+		// },
+		// delete : function (callback) {
+		// 	logger.info("Inside the function delete: updatetestscreenname");
+		// 	if (flagtocheckifexists) {
+		// 		var inputs = {
+		// 			'name': 'delete_screen',
+		// 			'id': testscreendetails.testscreenid,
+		// 			'node_name': screendatatoupdate.screenname,
+		// 			'version_number': screendatatoupdate.versionnumber,
+		// 			'parent_node_id': screendatatoupdate.projectid
+		// 		};
+		// 		var args = {
+		// 			data: inputs,
+		// 			headers: {
+		// 				"Content-Type": "application/json"
+		// 			}
+		// 		};
+		// 		logger.info("Calling NDAC Service from updatetestscreenname - delete: create_ice/delete_node_ICE");
+		// 		client.post(epurl+"create_ice/delete_node_ICE", args,
+		// 			function (result, response) {
+		// 			if (response.statusCode != 200 || result.rows == "fail") {
+		// 				logger.error("Error occurred in create_ice/delete_node_ICE: updatetestscreenname, Error Code : ERRNDAC");
+		// 			} else {
+		// 				// if(deleted.rows != undefined && deleted.rows.length!=0){
+		// 				flagtocheckifdeleted = true;
+		// 				//Execute neo4j query!!
+		// 				//qList.push({"statement":"MATCH (n: SCREENS_NG { screenname: '"+inputs.node_name+"',screenid: '"+inputs.id+"',versionnumber:'"+inputs.version_number+"' }) detach delete n"});
+		// 			}
+		// 			callback();
+		// 		});
+		// 	} else {
+		// 		callback();
+		// 	}
+		// },
 		update: function (callback) {
 			logger.info("Inside the function update: updatetestscreenname");
 			if (flagtocheckifexists) {
@@ -1318,19 +1375,19 @@ function updatetestscreenname(testscreendetails, cb, data) {
 					screendatatoupdate.screendata = '';
 				}
 				var inputs = {
-					'projectid': screendatatoupdate.projectid,
+					'projectid': testscreendetails.projectid,
 					'screenname': testscreendetails.testscreenname,
-					'screenid': screendatatoupdate.screenid,
+					'screenid': testscreendetails.screenid,
 					'modifiedby': testscreendetails.modifiedby,
 					'modifiedbyrole': testscreendetails.modifiedbyrole,
-					'modifiedon': new Date().getTime().toString(),
-					'createdon': new Date(screendatatoupdate.createdon).getTime().toString(),
-					'createdby': screendatatoupdate.createdby,
-					'createdthrough': screendatatoupdate.createdthrough,
-					'deleted': screendatatoupdate.deleted.toString(),
-					'skucodescreen': 'skucodescreen',
-					'tags': 'tags',
-					'screendata': screendatatoupdate.screendata,
+					// 'modifiedon': new Date().getTime().toString(),
+					// 'createdon': new Date(screendatatoupdate.createdon).getTime().toString(),
+					// 'createdby': screendatatoupdate.createdby,
+					// 'createdthrough': screendatatoupdate.createdthrough,
+					// 'deleted': screendatatoupdate.deleted.toString(),
+					// 'skucodescreen': 'skucodescreen',
+					// 'tags': 'tags',
+					// 'screendata': screendatatoupdate.screendata,
 					'versionnumber': testscreendetails.newversionnumber
 				};
 				var args = {
@@ -1478,66 +1535,66 @@ function updatetestcasename(testcasedetails, cb, data) {
 	var flagtocheckifexists = false;
 	var flagtocheckifdeleted = false;
 	async.series({
-		select: function (callback) {
-			logger.info("Inside the function select: updatetestcasename");
-			var inputs = {
-				'name': 'testcase_details',
-				'id': testcasedetails.testcaseid
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling NDAC Service from updatetestcasename - select: create_ice/get_node_details_ICE");
-			client.post(epurl+"create_ice/get_node_details_ICE", args,
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in create_ice/get_node_details_ICE: updatetestcasename - select, Error Code : ERRNDAC");
-				} else {
-					if (result.rows.length != 0) {
-						flagtocheckifexists = true;
-						testcasedatatoupdate = result.rows[0];
-					}
-				}
-				callback(null, testcasedatatoupdate);
-			});
-		},
-		delete : function (callback) {
-			logger.info("Inside the function delete: updatetestcasename");
-			if (flagtocheckifexists) {
-				var inputs = {
-					'name': 'delete_testcase',
-					'id': testcasedetails.testcaseid,
-					'node_name': testcasedatatoupdate.testcasename,
-					'version_number': testcasedatatoupdate.versionnumber,
-					'parent_node_id': testcasedatatoupdate.screenid
-				};
-				var args = {
-					data: inputs,
-					headers: {
-						"Content-Type": "application/json"
-					}
-				};
-				logger.info("Calling NDAC Service from updatetestcasename - delete: create_ice/delete_node_ICE");
-				client.post(epurl+"create_ice/delete_node_ICE", args,
-					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in create_ice/delete_node_ICE: updatetestcasename - delete, Error Code : ERRNDAC");
-					} else {
-						// if(deleted.rows != undefined && deleted.rows.length!=0){
-						flagtocheckifdeleted = true;
-                        //Execute neo4j query!!
-                        //qList.push({"statement":"MATCH (n: TESTCASES_NG { testCaseName: '"+inputs.node_name+"',testCaseID: '"+inputs.id+"',versionnumber:'"+inputs.version_number+"' }) detach delete n"});
-					// }
-					}
-					callback();
-				});
-			} else {
-				callback();
-			}
-		},
+		// select: function (callback) {
+		// 	logger.info("Inside the function select: updatetestcasename");
+		// 	var inputs = {
+		// 		'name': 'testcase_details',
+		// 		'id': testcasedetails.testcaseid
+		// 	};
+		// 	var args = {
+		// 		data: inputs,
+		// 		headers: {
+		// 			"Content-Type": "application/json"
+		// 		}
+		// 	};
+		// 	logger.info("Calling NDAC Service from updatetestcasename - select: create_ice/get_node_details_ICE");
+		// 	client.post(epurl+"create_ice/get_node_details_ICE", args,
+		// 		function (result, response) {
+		// 		if (response.statusCode != 200 || result.rows == "fail") {
+		// 			logger.error("Error occurred in create_ice/get_node_details_ICE: updatetestcasename - select, Error Code : ERRNDAC");
+		// 		} else {
+		// 			if (result.rows.length != 0) {
+		// 				flagtocheckifexists = true;
+		// 				testcasedatatoupdate = result.rows[0];
+		// 			}
+		// 		}
+		// 		callback(null, testcasedatatoupdate);
+		// 	});
+		// },
+		// delete : function (callback) {
+		// 	logger.info("Inside the function delete: updatetestcasename");
+		// 	if (flagtocheckifexists) {
+		// 		var inputs = {
+		// 			'name': 'delete_testcase',
+		// 			'id': testcasedetails.testcaseid,
+		// 			'node_name': testcasedatatoupdate.testcasename,
+		// 			'version_number': testcasedatatoupdate.versionnumber,
+		// 			'parent_node_id': testcasedatatoupdate.screenid
+		// 		};
+		// 		var args = {
+		// 			data: inputs,
+		// 			headers: {
+		// 				"Content-Type": "application/json"
+		// 			}
+		// 		};
+		// 		logger.info("Calling NDAC Service from updatetestcasename - delete: create_ice/delete_node_ICE");
+		// 		client.post(epurl+"create_ice/delete_node_ICE", args,
+		// 			function (result, response) {
+		// 			if (response.statusCode != 200 || result.rows == "fail") {
+		// 				logger.error("Error occurred in create_ice/delete_node_ICE: updatetestcasename - delete, Error Code : ERRNDAC");
+		// 			} else {
+		// 				// if(deleted.rows != undefined && deleted.rows.length!=0){
+		// 				flagtocheckifdeleted = true;
+        //                 //Execute neo4j query!!
+        //                 //qList.push({"statement":"MATCH (n: TESTCASES_NG { testCaseName: '"+inputs.node_name+"',testCaseID: '"+inputs.id+"',versionnumber:'"+inputs.version_number+"' }) detach delete n"});
+		// 			// }
+		// 			}
+		// 			callback();
+		// 		});
+		// 	} else {
+		// 		callback();
+		// 	}
+		// },
 		update: function (callback) {
 			logger.info("Inside the function update: updatetestcasename");
 			if (flagtocheckifexists && flagtocheckifdeleted) {
@@ -1545,19 +1602,19 @@ function updatetestcasename(testcasedetails, cb, data) {
 					testcasedatatoupdate.testcasesteps = '';
 				}
 				var inputs = {
-					'screenid': testcasedatatoupdate.screenid,
+					'screenid': testcasedetails.screenid,
 					'testcasename': testcasedetails.testcasename,
 					'testcaseid': testcasedetails.testcaseid,
 					'modifiedby': testcasedetails.modifiedby,
 					'modifiedbyrole': testcasedetails.modifiedbyrole,
-					'modifiedon': new Date().getTime().toString(),
-					'createdon': new Date(testcasedatatoupdate.createdon).getTime().toString(),
-					'createdby': testcasedatatoupdate.createdby,
-					'createdthrough': testcasedatatoupdate.createdthrough,
-					'deleted': testcasedatatoupdate.deleted.toString(),
-					'skucodetestcase': 'skucodetestcase',
-					'tags': 'tags',
-					'testcasesteps': testcasedatatoupdate.testcasesteps,
+					// 'modifiedon': new Date().getTime().toString(),
+					// 'createdon': new Date(testcasedatatoupdate.createdon).getTime().toString(),
+					// 'createdby': testcasedatatoupdate.createdby,
+					// 'createdthrough': testcasedatatoupdate.createdthrough,
+					// 'deleted': testcasedatatoupdate.deleted.toString(),
+					// 'skucodetestcase': 'skucodetestcase',
+					// 'tags': 'tags',
+					// 'testcasesteps': testcasedatatoupdate.testcasesteps,
 					"versionnumber": testcasedetails.newversionnumber
 				};
 				var args = {
@@ -1743,7 +1800,8 @@ exports.getProjectIDs_Nineteen68 = function (req, res) {
 	async.series({
 		function (callback) {
 			logger.info("Calling NDAC Service from getProjectIDs_Nineteen68: create_ice/getProjectIDs_Nineteen68");
-			client.post(epurl+"create_ice/getProjectIDs_Nineteen68", args,
+			// client.post(epurl+"create_ice/getProjectIDs_Nineteen68", args,
+			client.post("http://WSLK13FODC3-010.SLKSOFT.COM:1991/create_ice/getProjectIDs_Nineteen68", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occurred in create_ice/getProjectIDs_Nineteen68: getProjectIDs_Nineteen68, Error Code : ERRNDAC");
@@ -1781,7 +1839,7 @@ exports.getProjectType_Nineteen68 = function (req, res) {
 		}
 	};
 	logger.info("Calling NDAC Service from getProjectType_Nineteen68: create_ice/getProjectType_Nineteen68");
-	client.post(epurl+"create_ice/getProjectType_Nineteen68", args,
+	client.post("http://WSLK13FODC3-010.SLKSOFT.COM:1991/create_ice/getProjectType_Nineteen68", args,
 		function (result, response) {
 		try {
 			if (response.statusCode != 200 || result.rows == "fail") {
@@ -1789,9 +1847,12 @@ exports.getProjectType_Nineteen68 = function (req, res) {
 				res(null, result.rows);
 			} else {
 				if (result.rows.length != 0) {
-					projectDetails.projectType = result.rows[0].projecttypeid;
-					projectDetails.project_id = req;
-					projectDetails.project_typename = result.projecttype[0].projecttypename;
+					// projectDetails.projectType = result.rows[0].projecttypeid;
+					// projectDetails.project_id = req;
+					// projectDetails.project_typename = result.projecttype[0].projecttypename;
+					projectDetails.projectType=result.rows[0]["type"]["_id"];
+					projectDetails.projectid=result.rows[0]["_id"];
+					projectDetails.project_typename=result.projecttype[0].name;
 				}
 				res(null, projectDetails);
 			}

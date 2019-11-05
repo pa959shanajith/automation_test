@@ -120,7 +120,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 									'reuse':tasksJson[i].taskDetails[j].reuse
 									}
 								dataobj = JSON.stringify(dataobj);
-									if(status == 'review'){
+									if(status == 'underReview'){
 										$('.plugin-taks-listing.review').append("<div class='panel panel-default' panel-id='"+i+"'><div id='panelBlock_"+i+"' class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+" taskRedir'>"+ counterreview +"</h4><span class='assignedTask' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
 										counterreview++;
 									}
@@ -141,54 +141,57 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 								fillFilterValues(tasksJson[i],j);
 							}
 						}
+						unblockUI();
 						//prevent mouseclick before loading tasks
 						$("span.toggleClick").removeClass('toggleClick');
 						// Enable Filter
 						$("span.filterIcon").removeClass('disableFilter');
 					}
 
-					PluginService.getNames_ICE($scope.filterDat.projectids,Array($scope.filterDat.projectids.length).fill('projects'))
-					.then(function (response) {
-						if(response== "fail"){ unblockUI(); }
-						else if(response == "Invalid Session"){
-							return $rootScope.redirectPage();
-						} else {
-							response.respnames.forEach(function(name,i){
-								$scope.filterDat.idnamemapprj[response.requestedids[i]] = name;
-							});
-							PluginService.getNames_ICE($scope.filterDat.releaseids,Array($scope.filterDat.releaseids.length).fill('releases'))
-							.then(function (response) {
-								if(response == "Invalid Session"){
-									return $rootScope.redirectPage();
-								} else{
-									response.respnames.forEach(function(name,i){
-										$scope.filterDat.idnamemaprel[response.requestedids[i]] = name;
-									});
-									PluginService.getNames_ICE($scope.filterDat.cycleids,Array($scope.filterDat.cycleids.length).fill('cycles'))
-									.then(function (response) {
-										if(response == "Invalid Session"){
-											return $rootScope.redirectPage();
-										} else{
-											unblockUI();
-											response.respnames.forEach(function(name,i){
-												$scope.filterDat.idnamemapcyc[response.requestedids[i]] = name;
-												window.localStorage['_FD'] = angular.toJson($scope.filterDat);
-											});
-										}
-									}, function (error) {
-										unblockUI();
-										console.log("Error:::::::::::::", error);
-									});
-								}
-							}, function (error) {
-								unblockUI();
-								console.log("Error:::::::::::::", error);
-							});
-						}
-					}, function (error) {
-						unblockUI();
-						console.log("Error:::::::::::::", error);
-					});
+					// PluginService.getNames_ICE($scope.filterDat.projectids,Array($scope.filterDat.projectids.length).fill('projects'))
+					// .then(function (response) {
+					// 	if(response== "fail"){ unblockUI(); }
+					// 	else if(response == "Invalid Session"){
+					// 		return $rootScope.redirectPage();
+					// 	} else {
+					// 		response.respnames.forEach(function(name,i){
+					// 			$scope.filterDat.idnamemapprj[response.requestedids[i]] = name;
+					// 		});
+					// 		PluginService.getNames_ICE($scope.filterDat.releaseids,Array($scope.filterDat.releaseids.length).fill('releases'))
+					// 		.then(function (response) {
+					// 			if(response == "Invalid Session"){
+					// 				return $rootScope.redirectPage();
+					// 			} else{
+					// 				response.respnames.forEach(function(name,i){
+					// 					$scope.filterDat.idnamemaprel[response.requestedids[i]] = name;
+					// 				});
+					// 				PluginService.getNames_ICE($scope.filterDat.cycleids,Array($scope.filterDat.cycleids.length).fill('cycles'))
+					// 				.then(function (response) {
+					// 					if(response == "Invalid Session"){
+					// 						return $rootScope.redirectPage();
+					// 					} else{
+					// 						unblockUI();
+					// 						response.respnames.forEach(function(name,i){
+					// 							$scope.filterDat.idnamemapcyc[response.requestedids[i]] = name;
+					// 							window.localStorage['_FD'] = angular.toJson($scope.filterDat);
+					// 						});
+					// 					}
+					// 				}, function (error) {
+					// 					unblockUI();
+					// 					console.log("Error:::::::::::::", error);
+					// 				});
+					// 			}
+					// 		}, function (error) {
+					// 			unblockUI();
+					// 			console.log("Error:::::::::::::", error);
+					// 		});
+					// 	}
+					// }, function (error) {
+					// 	unblockUI();
+					// 	console.log("Error:::::::::::::", error);
+					// }); // end of getnames call//
+
+					
 					//$("#plugin-container").removeClass("inactiveLink");
 				}, function (error) {
 					unblockUI();

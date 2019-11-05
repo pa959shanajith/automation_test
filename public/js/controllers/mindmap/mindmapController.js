@@ -218,6 +218,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     }
                 });                
                 if ($scope.tab == 'tabAssign') {
+                    // change logic of release and cycle populating.
                     $("#ctExpandAssign .iconSpaceArrow").trigger('click');
                     mindmapServices.populateReleases($scope.projectNameO).then(function(result) {
                         if (result == "Invalid Session") {
@@ -556,7 +557,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             version_num = $('.version-list').val();
         }
         unloadMindmapData();
-        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO || $scope.projectList[0].id, parseFloat(version_num), $('.release-list').val(), $('.cycle-list').val())
+        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO || $scope.projectList[0].id, parseFloat(version_num), $('.cycle-list').val(),null,null)
             .then(function(res) {
                 if (res == "Invalid Session") {
                     return $rootScope.redirectPage();
@@ -638,7 +639,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             'opacity': !(node.id_c == "null" || node.id_c == null || node.id_c == undefined) ? 1 : 0.5,
             'title': node.name,
             'name': node.display_name || node.name,
-            '_id': node._id
+            '_id': node._id || null
         };
         nCount[0]++;
         uNix++;
@@ -658,7 +659,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $scope.functionTBE = 'loadMapPopupConfirmed';
         excelFlag = 1;
         versionFlag = 1;
-        $('#createNewConfirmationPopup').attr('mapid', $scope.allMMaps[idx].name);
+        // $('#createNewConfirmationPopup').attr('mapid', $scope.allMMaps[idx].name);
+        $('#createNewConfirmationPopup').attr('mapid', $scope.allMMaps[idx]._id);
+        // $('#createNewConfirmationPopup').attr('_id',$scope.allMaps[idx]._id);
         if (Object.keys($scope.nodeDisplay).length != 0) {
             $('#createNewConfirmationPopup').modal('show');
         } else
@@ -763,17 +766,21 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $("div.nodeBoxSelected").removeClass("nodeBoxSelected");
         $('[title=' + $('#createNewConfirmationPopup').attr('mapid') + ']').addClass("nodeBoxSelected");
         d3.select('#ct-inpBox').classed('no-disp', true);
-        var modName = $('#createNewConfirmationPopup').attr('mapid');
+        // var modName = $('#createNewConfirmationPopup').attr('mapid');
+        // var moduleid =$('#createNewConfirmationPopup').attr('_id');
+        var modName = $('#createNewConfirmationPopup').attr('_id') || null;
+        var moduleid =$('#createNewConfirmationPopup').attr('mapid');
         $scope.modType = 'e2e';
         blockUI("Loading module.. Please wait..");
-        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, 0, $('.release-list').val(), $('.cycle-list').val(), modName).then(function(result) {
+        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, 0, $('.cycle-list').val(), modName,moduleid).then(function(result) {
             unloadMindmapData();
             initiate();
             clearSvg();
             if (result == "Invalid Session") {
                 return $rootScope.redirectPage();
             }
-            currMap = result[0];
+            // currMap = result[0];
+            currMap=result;
             excelMap = JSON.parse(JSON.stringify(currMap));
             loadedmodule = excelMap.name;
             $('div[title=' + modName + ']').addClass('nodeBoxSelected');
@@ -855,11 +862,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $scope.nodeDisplay[n.id] = {
             'type': n.type,
             'transform': "translate(" + (n.x).toString() + "," + (n.y).toString() + ")",
-            'opacity': !(n.id_c == "null" || n.id_c == null || n.id_c == undefined) ? 1 : 0.5,
+            'opacity': !( n._id == null || n._id == undefined) ? 1 : 0.5,
             'title': n.name,
             'name': n.display_name,
             'img_src': img_src,
-            '_id': n._id || null
+            '_id': n._id || null,
+            'state':n.state || "created",
+            'reuse':n.reuse || false
         };
         var v = '#ct-node-' + n.id;
         return v;
@@ -878,11 +887,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $scope.nodeDisplay[n.id] = {
             'type': n.type,
             'transform': "translate(" + (n.x).toString() + "," + (n.y).toString() + ")",
-            'opacity': !(n.id_c == "null" || n.id_c == null || n.id_c == undefined) ? 1 : 0.5,
+            'opacity': !( n._id == null || n._id == undefined) ? 1 : 0.5,
             'title': n.name,
             'name': n.display_name,
             'img_src': img_src,
-            '_id':n._id
+            '_id':n._id,
+            'state':n.state || "created",
+            'reuse':n.reuse || false
         };
         var v = '#ct-node-' + n.id;
         return v;
@@ -1995,7 +2006,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 'opacity': !(node.id_c == "null" || node.id_c == null || node.id_c == undefined) ? 1 : 0.5,
                 'title': node.name,
                 'name': node.display_name || node.name,
-                '_id':node._id
+                '_id':node._id || null
             };
             nCount[nNext[pt][1]]++;
             dNodes[pi].children.push(dNodes[uNix]);
@@ -2623,8 +2634,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 id: d.id,
                 childIndex: d.childIndex,
                 _id: (d._id) ? d._id : null,
-                id_c: (d.id_c) ? d.id_c : null,
-                id_n: (d.id_n) ? d.id_n : null,
+                // id_c: (d.id_c) ? d.id_c : null,
+                // id_n: (d.id_n) ? d.id_n : null,
                 oid: (d.oid) ? d.oid : null,
                 name: d.name,
                 type: d.type,
@@ -2654,8 +2665,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             projectID: d.projectID,
             id: d.id,
             childIndex: d.childIndex,
-            id_c: (d.id_c) ? d.id_c : null,
-            id_n: (d.id_n) ? d.id_n : null,
+            // id_c: (d.id_c) ? d.id_c : null,
+            // id_n: (d.id_n) ? d.id_n : null,
             _id: (d._id) ? d._id : null,
             oid: (d.oid) ? d.oid : null,
             name: d.name,
@@ -2675,6 +2686,307 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //else if(d.type!='testcases') return !0;
         return e;
     };
+
+    // $scope.actionEvent = function($event) {
+    //     $("#searchModule-assign").val("");
+    //     $("#pasteImg1").removeClass("active-map");
+    //     e = $event;
+    //     var selectedNodeTitle = $('.nodeBoxSelected').attr('title');
+    //     if(isIE){
+    //         if ($(e.target.parentNode).hasClass('disableButton') || $(e.target.parentNode).hasClass('no-access')) return;
+    //             var selectedTab = window.localStorage['tabMindMap'];
+    //             var s = d3.select(e.target.parentNode);
+    //     }else{
+    //         if ($(e.target.parentElement).hasClass('disableButton') || $(e.target.parentElement).hasClass('no-access')) return;
+    //             var selectedTab = window.localStorage['tabMindMap'];
+    //             var s = d3.select(e.target.parentElement);
+    //     }
+    //     var selectedTab = window.localStorage['tabMindMap'];
+    //     var s = d3.select(e.target.parentNode);
+    //     var cur_module = null;
+    //     var error = !1,
+    //         mapData = [],
+    //         flag = 0,
+    //         alertMsg;
+    //     var temp_data = [];
+    //     dNodes.forEach(function(e, i) {
+    //         if (i == 0) return;
+    //         temp_data[i] = {
+    //             idx: i,
+    //             x: e.x,
+    //             y: e.y,
+    //             type: e.type
+    //         };
+    //     });
+
+    //     var layout_vertical = $scope.verticalLayout;
+    //     if (layout_vertical) {
+
+    //         temp_data.sort(function(a, b) {
+    //             return a.x - b.x;
+    //         });
+    //     } else {
+
+    //         temp_data.sort(function(a, b) {
+    //             return a.y - b.y;
+    //         });
+    //     }
+
+    //     var counter = {};
+    //     temp_data.forEach(function(e, i) {
+    //         var key_1=dNodes[e.idx].pid_n;
+    //         if(key_1==undefined){
+    //             if(dNodes[e.idx].parent==null) return;
+    //             key_1=(dNodes[e.idx].parent.oid==undefined) ? dNodes[e.idx].parent.id : dNodes[e.idx].parent.oid
+    //         }
+    //         var key=e.type+'_'+key_1;
+    //         if(counter[key]==undefined)  counter[key]=1;
+    //         if (dNodes[e.idx].childIndex != counter[key]) {
+    //             dNodes[e.idx].childIndex = counter[key];
+    //             dNodes[e.idx].cidxch = 'true'; // child index updated
+    //         }
+    //         counter[key] = counter[key] + 1;
+    //     })
+    //     var restrict_scenario_reuse = parseDataReuse(true);
+    //     if (selectedTab != 'tabAssign') {
+    //         if (restrict_scenario_reuse['reuseScenarios'].length > 0) {
+    //             openDialogMindmap('Error', "Scenario names cannot be reused, please rename the following: " + restrict_scenario_reuse['reuseScenarios'].join());
+    //             return;
+    //         }
+    //     }
+    //     if (s.attr('id') == 'ct-saveAction' || $event.target.getAttribute('id')=='ct-saveAction') {
+    //         blockUI('Saving Flow! Please wait...');
+
+    //     } else if (s.attr('id') == 'ct-createAction' || $event.target.getAttribute('id')=='ct-createAction') {
+    //         blockUI('Creating Structure! Please wait...');
+    //     }
+    //     mindmapServices.checkReuse(restrict_scenario_reuse).then(function(result_reuse) {
+    //         if (result_reuse == "Invalid Session") {
+    //             return $rootScope.redirectPage();
+    //         }
+    //         var reuse = [];
+    //         if (selectedTab != 'tabAssign') {
+    //             result_reuse['scenarios'].forEach(function(e, i) {
+
+    //                 if (e.reuse && deletednode_info.indexOf(dNodes[e.idx]) < 0) {
+    //                     reuse.push(e.scenarioname);
+
+    //                 }
+
+    //             })
+    //             if (reuse.length > 0) {
+    //                 unblockUI();
+    //                 openDialogMindmap('Error', "Scenario names cannot be reused, please rename the following: '" + reuse.join() + "'");
+    //                 return;
+    //             }
+    //         }
+
+
+    //         error = treeIterator(mapData, dNodes[0], error);
+    //         if (dNodes[0].type == 'modules_endtoend') {
+    //             cur_module = 'end_to_end';
+    //             error = false;
+    //         } else {
+    //             //Part of Issue 1685
+    //             cur_module = $scope.tab;
+    //         }
+
+    //         if (s.attr('id') == 'ct-saveAction'  || $event.target.getAttribute('id')=='ct-saveAction') {
+    //             // blockUI('Saving Flow! Please wait...');
+    //             flag = 10;
+    //             if ($scope.tab == 'tabAssign') flag = 30;
+    //             d3.select('#ct-inpBox').classed('no-disp', !0);
+    //             saveFlag = true;
+    //             //$('#ct-createAction').removeClass('disableButton');
+    //             SaveCreateED('#ct-createAction', 0, 0);
+
+    //         } else if (s.attr('id') == 'ct-createAction' || $event.target.getAttribute('id')=='ct-createAction') {
+    //             if (error) {
+    //                 unblockUI();
+    //                 openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases")
+    //                     //$('#Mindmap_error').modal('show');
+    //                 return;
+    //             }
+    //             flag = 20;
+    //             // blockUI('Creating Structure! Please wait...');
+    //             d3.select('#ct-inpBox').classed('no-disp', !0);
+
+    //         }
+    //         if (flag == 0) return;
+    //         if (s.classed('no-access')) return;
+    //         //s.classed('no-access', !0);
+    //         var userInfo = JSON.parse(window.localStorage['_UI']);
+    //         var username = userInfo.username;
+    //         var assignedTo = assignedObj;
+
+    //         var currTime = new Date();
+    //         var utcTime = currTime.getTime();
+
+    //         if ($('.project-list').val() == null) {
+    //             unblockUI();
+    //             openDialogMindmap('Error', 'No projects is assigned to User');
+    //             return !1;
+    //         }
+    //         var from_v = to_v = 0;
+    //         if ($('.version-list').length != 0)
+    //             from_v = to_v = $('.version-list').val();
+
+    //         mindmapServices.saveData(versioning_enabled, assignedTo, flag, from_v, to_v, cur_module, mapData, deletednode, unassignTask,
+    //             $('.project-list').val(), $('.release-list').val(), $('.cycle-list').val(), selectedTab, utcTime).then(function(result) {
+    //             if (result == "Invalid Session") {
+    //                 return $rootScope.redirectPage();
+    //             }
+    //             unblockUI();
+    //             if (flag == 10 || flag == 30) {
+    //                 var res = result;
+    //                 mapSaved = !0;
+    //                 var mid, sts = $scope.allMMaps.some(function(m, i) {
+    //                     if (m.id_n == res.id_n) {
+    //                         mid = i;
+    //                         $scope.allMMaps[i] = res;
+    //                         return !0;
+    //                     }
+    //                     return !1;
+    //                 });
+    //                 if (!sts) {
+    //                     mid = $scope.allMMaps.length;
+    //                     $scope.allMMaps.push(res);
+    //                 }
+    //                 setModuleBoxHeight();
+    //                 if (selectedTab == 'tabCreate') populateDynamicInputList();
+
+    //                 clearSvg();
+    //                 treeBuilder(res);
+    //                 unassignTask = [];
+
+    //                 if (selectedTab == 'tabAssign') {
+    //                     openDialogMindmap("Success", "Tasks saved successfully");
+    //                 } else {
+	// 					if(!$scope.pdmode){
+    //                         openDialogMindmap("Success", "Data saved successfully");
+    //                         SaveCreateED('#ct-saveAction', 0, 0);
+    //                     }
+    //                     else{
+    //                         $timeout(function() {
+    //                             angular.element('#ct-createAction').triggerHandler('click');
+    //                         }, 100);                            
+    //                     }
+    //                 }
+    //                 var vn = '';
+    //                 if ($('.version-list').length != 0)
+    //                     from_v = to_v = $('.version-list').val()
+    //                 mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, parseFloat(from_v), $('.cycle-list').val(),null,null).then(function(result) {
+    //                     if (result == "Invalid Session") {
+    //                         return $rootScope.redirectPage();
+    //                     }
+    //                     var nodeBox = d3.select('.ct-nodeBox');
+    //                     // $(nodeBox[0]).empty();
+    //                     $scope.allMMaps = result;
+    //                     currMap = res;
+    //                     $('div[title=' + selectedNodeTitle + ']').addClass('nodeBoxSelected');
+    //                     if (selectedTab == 'tabCreate')
+    //                         populateDynamicInputList();
+    //                     setModuleBoxHeight();
+    //                 }, function(error) {
+    //                     console.log(error);
+    //                 })
+
+    //             }
+    //             if (flag == 20) {
+    //                 if (!saveFlag) return;
+    //                 var res = result[0];
+    //                 //res = res[0];
+    //                 var mid, resMap = Object.keys(res);
+    //                 $scope.allMMaps.some(function(m, i) {
+    //                     if (m.id_n == resMap[0]) {
+    //                         mid = i;
+    //                         return !0;
+    //                     }
+    //                     //return !1;
+    //                 });
+    //                 //263-'Mindmap- Module: Currently allowing to create 2 modules with same name- Error msg is given on click of Create button
+    //                 if ($scope.allMMaps[mid] != undefined) {
+    //                     currMap.id_c = res[resMap[0]];
+    //                     currMap.children.forEach(function(tsc) {
+    //                         tsc.id_c = res[tsc.id_n];
+    //                         tsc.children.forEach(function(scr) {
+    //                             scr.id_c = res[scr.id_n];
+    //                             scr.children.forEach(function(tc) {
+    //                                 if (res[tc.id_n] != 'null') {
+    //                                     tc.id_c = res[tc.id_n];
+    //                                 }
+    //                             });
+    //                         });
+    //                     });
+    //                     //To update cassandra_ids (id_c) of nodes in dNodes variable
+    //                     dNodes.forEach(function(d) {
+    //                         if (d.type == 'modules') d.id_c = res[resMap[0]];
+    //                         else d.id_c = res[d.id_n];
+    //                         if (!(d.id_c == null || d.id_c == 'null' || d.id_c == undefined)) {
+    //                             d3.select('#ct-node-' + d.id + '>image').attr('style', 'opacity:1;');
+    //                         }
+
+    //                     });
+						
+	// 					if($scope.pdmode){
+    //                         console.log($scope.pdAuditData); 
+    //                         openDialogMindmap("Success", "Import Successful! Audit table:");
+    //                         $scope.pdmode = false;    
+    //                         $("#auditTable").remove();
+    //                         $timeout(function(){
+    //                             $('.modal-body:contains("Import Successful")').append(`<table id="auditTable" class="table table-bordered">
+    //                                 <tr>
+    //                                     <th>Id</th>
+    //                                     <th>Assignee</th>
+    //                                     <th>Reviewer</th>
+    //                                     <th>State</th>
+    //                                     <th>Time</th>
+    //                                 </tr>
+    //                             </table>`);
+    //                             $.each($scope.pdAuditData, function(i, item) {
+    //                                 var $tr = $('<tr>').append(
+    //                                     $('<td>').text(i+1),
+    //                                     $('<td>').text(item.assignee),
+    //                                     $('<td>').text(item.reviewer),
+    //                                     $('<td>').text(item.action),
+    //                                     $('<td>').text(String(new Date(item.time)).replace(" GMT+0530 (India Standard Time)",""))
+    //                                 ).appendTo('#auditTable');
+    //                                 //console.log($tr.wrap('<p>').html());
+    //                             });
+    //                             $("#mindmapGlobalDialog .modal-dialog").css("width","80%")
+    //                         },100);
+    //                     }
+    //                     else{
+    //                         openDialogMindmap("Success", "Structure created successfully");
+    //                     }
+    //                     saveFlag = false;
+    //                     //$('#ct-createAction').addClass('disableButton');
+    //                     SaveCreateED('#ct-createAction', 1, 0);
+    //                 } else {
+    //                     saveFlag = false;
+    //                     openDialogMindmap("Success", "Failed to create structure");
+    //                 }
+
+
+    //                 //$('#Mindmap_create').modal('show');
+    //             }
+    //         }, function(error) {
+    //             unblockUI();
+    //             console.log(error);
+    //             //$('#ct-createAction').addClass('disableButton')
+    //             SaveCreateED('#ct-createAction', 1, 0);
+    //             if (error == 'DuplicateModules') {
+    //                 openDialogMindmap('Save error', 'Module names cannot be duplicate');
+    //             } else {
+    //                 openDialogMindmap('Save error', 'Failed to save data');
+    //             }
+    //         })
+    //     }, function(error) {
+    //         progressFlag = false;
+    //         console.log("Error: checkReuse service")
+    //     })
+    // };
+
 
     $scope.actionEvent = function($event) {
         $("#searchModule-assign").val("");
@@ -2746,29 +3058,31 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (s.attr('id') == 'ct-saveAction' || $event.target.getAttribute('id')=='ct-saveAction') {
             blockUI('Saving Flow! Please wait...');
 
-        } else if (s.attr('id') == 'ct-createAction' || $event.target.getAttribute('id')=='ct-createAction') {
-            blockUI('Creating Structure! Please wait...');
-        }
-        mindmapServices.checkReuse(restrict_scenario_reuse).then(function(result_reuse) {
-            if (result_reuse == "Invalid Session") {
-                return $rootScope.redirectPage();
-            }
-            var reuse = [];
-            if (selectedTab != 'tabAssign') {
-                result_reuse['scenarios'].forEach(function(e, i) {
+        } 
+        // else if (s.attr('id') == 'ct-createAction' || $event.target.getAttribute('id')=='ct-createAction') {
+        //     blockUI('Creating Structure! Please wait...');
+        // }
 
-                    if (e.reuse && deletednode_info.indexOf(dNodes[e.idx]) < 0) {
-                        reuse.push(e.scenarioname);
+        // mindmapServices.checkReuse(restrict_scenario_reuse).then(function(result_reuse) {
+            // if (result_reuse == "Invalid Session") {
+            //     return $rootScope.redirectPage();
+            // }
+            // var reuse = [];
+            // if (selectedTab != 'tabAssign') {
+            //     result_reuse['scenarios'].forEach(function(e, i) {
 
-                    }
+            //         if (e.reuse && deletednode_info.indexOf(dNodes[e.idx]) < 0) {
+            //             reuse.push(e.scenarioname);
 
-                })
-                if (reuse.length > 0) {
-                    unblockUI();
-                    openDialogMindmap('Error', "Scenario names cannot be reused, please rename the following: '" + reuse.join() + "'");
-                    return;
-                }
-            }
+            //         }
+
+            //     })
+            //     if (reuse.length > 0) {
+            //         unblockUI();
+            //         openDialogMindmap('Error', "Scenario names cannot be reused, please rename the following: '" + reuse.join() + "'");
+            //         return;
+            //     }
+            // }
 
 
             error = treeIterator(mapData, dNodes[0], error);
@@ -2821,31 +3135,31 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 from_v = to_v = $('.version-list').val();
 
             mindmapServices.saveData(versioning_enabled, assignedTo, flag, from_v, to_v, cur_module, mapData, deletednode, unassignTask,
-                $('.project-list').val(), $('.release-list').val(), $('.cycle-list').val(), selectedTab, utcTime).then(function(result) {
+                $('.project-list').val(), $('.cycle-list').val(), selectedTab, utcTime).then(function(result) {
                 if (result == "Invalid Session") {
                     return $rootScope.redirectPage();
                 }
                 unblockUI();
-                if (flag == 10 || flag == 30) {
-                    var res = result;
-                    mapSaved = !0;
-                    var mid, sts = $scope.allMMaps.some(function(m, i) {
-                        if (m.id_n == res.id_n) {
-                            mid = i;
-                            $scope.allMMaps[i] = res;
-                            return !0;
-                        }
-                        return !1;
-                    });
-                    if (!sts) {
-                        mid = $scope.allMMaps.length;
-                        $scope.allMMaps.push(res);
-                    }
+                // if (flag == 10 || flag == 30) {
+                    var moduleid = result;
+                    // mapSaved = !0;
+                    // var mid, sts = $scope.allMMaps.some(function(m, i) {
+                    //     if (m.id_n == res.id_n) {
+                    //         mid = i;
+                    //         $scope.allMMaps[i] = res;
+                    //         return !0;
+                    //     }
+                    //     return !1;
+                    // });
+                    // if (!sts) {
+                    //     mid = $scope.allMMaps.length;
+                    //     $scope.allMMaps.push(res);
+                    // }
                     setModuleBoxHeight();
                     if (selectedTab == 'tabCreate') populateDynamicInputList();
 
                     clearSvg();
-                    treeBuilder(res);
+                    // treeBuilder(res);
                     unassignTask = [];
 
                     if (selectedTab == 'tabAssign') {
@@ -2864,23 +3178,41 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     var vn = '';
                     if ($('.version-list').length != 0)
                         from_v = to_v = $('.version-list').val()
-                    mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, parseFloat(from_v), $('.release-list').val(), $('.cycle-list').val()).then(function(result) {
+                    mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, parseFloat(from_v), $('.cycle-list').val(),null,moduleid).then(function(result) {
                         if (result == "Invalid Session") {
                             return $rootScope.redirectPage();
                         }
-                        var nodeBox = d3.select('.ct-nodeBox');
-                        // $(nodeBox[0]).empty();
-                        $scope.allMMaps = result;
-                        currMap = res;
-                        $('div[title=' + selectedNodeTitle + ']').addClass('nodeBoxSelected');
-                        if (selectedTab == 'tabCreate')
+                        // var nodeBox = d3.select('.ct-nodeBox');
+                        // // $(nodeBox[0]).empty();
+                        // $scope.allMMaps = result;
+                        // currMap = res;
+                        // $('div[title=' + selectedNodeTitle + ']').addClass('nodeBoxSelected');
+                        // if (selectedTab == 'tabCreate')
+                        //     populateDynamicInputList();
+                        // setModuleBoxHeight();
+                        currMap=result;
+                        excelMap = JSON.parse(JSON.stringify(currMap));
+                        loadedmodule = excelMap.name;
+                        $('div[title=' + loadedmodule + ']').addClass('nodeBoxSelected');
+                        if ($scope.tab == 'tabCreate')
                             populateDynamicInputList();
                         setModuleBoxHeight();
+                        treeBuilder(currMap);
+                        unblockUI();
+                        IncompleteFlowFlag = false;
+                        var errTemp = false;
+                        if (dNodes[0].type != 'modules_endtoend') {
+                            errTemp = treeIterator(undefined, dNodes[0], false);
+                            $scope.modType = 'generic';
+                        }
+                        if (errTemp) {
+                            IncompleteFlowFlag = true;
+                        }
                     }, function(error) {
                         console.log(error);
                     })
 
-                }
+                // }
                 if (flag == 20) {
                     if (!saveFlag) return;
                     var res = result[0];
@@ -2969,11 +3301,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 } else {
                     openDialogMindmap('Save error', 'Failed to save data');
                 }
-            })
-        }, function(error) {
-            progressFlag = false;
-            console.log("Error: checkReuse service")
-        })
+            });
+        // }, function(error) {
+        //     progressFlag = false;
+        //     console.log("Error: checkReuse service")
+        // })
     };
 
     $scope.actionEvent_W = function($event) {
@@ -3113,7 +3445,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 //$('#ct-createAction_W').removeClass('disableButton').removeClass('no-access');
                 SaveCreateED('#ct-createAction', 0, 0);
                 //alert(window.localStorage['tabMindMap']);
-                mindmapServices.getModules(versioning_enabled, 'endToend', $scope.projectNameO, '', $('.release-list').val(), $('.cycle-list').val())
+                mindmapServices.getModules(versioning_enabled, 'endToend', $scope.projectNameO, 0, $('.cycle-list').val(),null,null)
                     .then(function(result) {
                         if (result == "Invalid Session") {
                             return $rootScope.redirectPage();
@@ -3378,22 +3710,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //dLinks=d3Tree.links(dNodes);
 
 
-        var reusedata = parseDataReuse(false);
+        // var reusedata = parseDataReuse(false);
 
         // Now call the service and assign reuse property to all other nodes
         var userInfo = JSON.parse(window.localStorage['_UI']);
         var user_id = userInfo.user_id;
 
-        mindmapServices.checkReuse(reusedata).then(function(result) {
-            if (result == "Invalid Session") {
-                return $rootScope.redirectPage();
-            }
-            result['screen'].forEach(function(e, i) {
-                dNodes[e.idx].reuse = e.reuse;
-            })
-            result['testcase'].forEach(function(e, i) {
-                dNodes[e.idx].reuse = e.reuse;
-            })
             dNodes.forEach(function(d) {
                 // switch-layout feature
                 if ($scope.verticalLayout) {
@@ -3405,7 +3727,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     d.x = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
                     sections[d.type] = d.x;
                 }
-                if (d.oid === undefined) d.oid = d.id;
+                // if (d.oid === undefined) d.oid = d.id;
                 d.id = uNix++;
                 addNode(d, !0, d.parent);
                 $scope.nodeDisplay[d.id].task = false;
@@ -3443,12 +3765,73 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             zoom.event(d3.select('#ct-mapSvg'));
             progressFlag = false;
 
-            reuseDict = getReuseDetails();
 
-        }, function(error) {
-            progressFlag = false;
-            console.log("Error: checkReuse service")
-        })
+
+        // mindmapServices.checkReuse(reusedata).then(function(result) {
+        //     if (result == "Invalid Session") {
+        //         return $rootScope.redirectPage();
+        //     }
+        //     result['screen'].forEach(function(e, i) {
+        //         dNodes[e.idx].reuse = e.reuse;
+        //     })
+        //     result['testcase'].forEach(function(e, i) {
+        //         dNodes[e.idx].reuse = e.reuse;
+        //     })
+        //     dNodes.forEach(function(d) {
+        //         // switch-layout feature
+        //         if ($scope.verticalLayout) {
+        //             d.y = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
+        //             sections[d.type] = d.y;
+        //         } else {
+        //             d.y = d.x;
+        //             //Logic to change the layout and to reduce the length of the links
+        //             d.x = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
+        //             sections[d.type] = d.x;
+        //         }
+        //         if (d.oid === undefined) d.oid = d.id;
+        //         d.id = uNix++;
+        //         addNode(d, !0, d.parent);
+        //         $scope.nodeDisplay[d.id].task = false;
+        //         if (d.task != null && $scope.tab != 'tabCreate') {
+        //             if (d.task.release == $('.release-list').val() && d.task.cycle == $('.cycle-list').val()) {
+        //                 //d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10);
+        //                 $scope.nodeDisplay[d.id].task = true;
+        //                 $scope.nodeDisplay[d.id].taskOpacity = 1;
+        //             }
+        //         }
+        //         //Enhancement : Part of Issue 1685 showing the task assigned icon little transperent to indicate that task originally do not belongs to this release and cycle but task exists in some other release and cycle
+        //         else if (d.taskexists && $scope.tab != 'tabCreate') {
+        //             //d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('style', 'opacity:0.6').attr('x', 29).attr('y', -10);
+        //             $scope.nodeDisplay[d.id].task = true;
+        //             $scope.nodeDisplay[d.id].taskOpacity = 0.6;
+        //         }
+        //     });
+        //     dLinks = d3Tree.links(dNodes);
+        //     dLinks.forEach(function(d) {
+        //         d.id = uLix++;
+        //         addLink(d.id, d.source, d.target);
+        //     });
+        //     $timeout(function(){
+        //         dLinks.forEach(function(d) {
+        //             $("#link-"+d.source.id+"-"+d.target.id).attr("d",$scope.linkDisplay["link-"+d.source.id+"-"+d.target.id].d);
+        //             //addLink(d.id, d.source, d.target);
+        //         });
+        //     },200);
+        //     // switch-layout feature
+        //     if ($scope.verticalLayout)
+        //         zoom.translate([(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]);
+        //     else
+        //         zoom.translate([(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]);
+        //     //zoom.translate([(cSize[0]/2),(cSize[1]/2)]);
+        //     zoom.event(d3.select('#ct-mapSvg'));
+        //     progressFlag = false;
+
+        //     reuseDict = getReuseDetails();
+
+        // }, function(error) {
+        //     progressFlag = false;
+        //     console.log("Error: checkReuse service")
+        // })
     };
 
     //Dialog used through out mindmap
@@ -3522,7 +3905,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         blockUI('Loading UI');
         var userInfo = JSON.parse(window.localStorage['_UI']);
         var user_id = userInfo.user_id;
-        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, parseFloat(version_num), $('.release-list').val(), $('.cycle-list').val(), "fetch all").then(
+        var modName = $('#createNewConfirmationPopup').attr('mapid');
+        var moduleid =$('#createNewConfirmationPopup').attr('_id');
+        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, parseFloat(version_num), $('.cycle-list').val(), modName,moduleid).then(
             function(result) {
                 if (result == "Invalid Session") {
                     return $rootScope.redirectPage();
@@ -3777,7 +4162,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         });
 
         d3.select('#ct-assignBox').classed('no-disp', !0);
-        mindmapServices.getModules(versioning_enabled, 'endToend', $scope.projectNameO, $('.release-list').val(), $('.cycle-list').val()).then(function(result) {
+        mindmapServices.getModules(versioning_enabled, 'endToend', $scope.projectNameO, $('.cycle-list').val(),null,null).then(function(result) {
             if (result == "Invalid Session") {
                 return $rootScope.redirectPage();
             }
@@ -3841,7 +4226,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             'transform': "translate(" + (node.x).toString() + "," + (node.y).toString() + ")",
             'opacity': !(node.id_c == "null" || node.id_c == null || node.id_c == undefined) ? 1 : 0.5,
             'title': node.name,
-            'name': node.display_name || node.name
+            'name': node.display_name || node.name,
+            '_id':node._id || null
         };
         nCount[0]++;
         uNix++;
@@ -3888,7 +4274,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         initiate();
         clearSvg();
         var modName = $('#createNewConfirmationPopup').attr('mapid');
-        mindmapServices.getModules(versioning_enabled, 'endToend', $scope.projectNameO, '', $('.release-list').val(), $('.cycle-list').val(), modName)
+        var moduleid =$('#createNewConfirmationPopup').attr('_id');
+        mindmapServices.getModules(versioning_enabled, 'endToend', $scope.projectNameO, 0, $('.cycle-list').val(), modName,moduleid)
             .then(function(result) {
                 if (result == "Invalid Session") {
                     return $rootScope.redirectPage();
@@ -4024,7 +4411,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 'transform': "translate(" + (node.x).toString() + "," + (node.y).toString() + ")",
                 'opacity': !(node.id_c == "null" || node.id_c == null || node.id_c == undefined) ? 1 : 0.5,
                 'title': node.name,
-                'name': node.display_name || node.name
+                'name': node.display_name || node.name,
+                '_id': node._id || null
             };
             dNodes[pi].children.push(dNodes[uNix]);
             dNodes[uNix].childIndex = dNodes[pi].children.length
@@ -4261,73 +4649,73 @@ function replicationHandler()
 Purpose : displaying pop up for replication of project
 */
 
-    function replicationHandler() {
-        console.log('Inside..')
-        var userInfo = JSON.parse(window.localStorage['_UI']);
-        var user_id = userInfo.user_id;
-        blockUI('Loading....')
-        mindmapServices.populateProjects().then(function(result) {
-            if (result == "Invalid Session") {
-                return $rootScope.redirectPage();
-            }
-            var project_type = $('.project-list').find(':selected').attr('app-type')
-            mindmapServices.getProjectsNeo().then(function(res) {
-                if (res == "Invalid Session") {
-                    return $rootScope.redirectPage();
-                }
-                var parse_data = res;
-                var flag = 0;
-                $('.versioningOption').remove()
-                var parsed_project_id = [];
-                for (var i = 0; i < parse_data[0].data.length; i++) {
-                    parsed_project_id.push(parse_data[0].data[i].row[0])
-                }
+    // function replicationHandler() {
+    //     console.log('Inside..')
+    //     var userInfo = JSON.parse(window.localStorage['_UI']);
+    //     var user_id = userInfo.user_id;
+    //     blockUI('Loading....')
+    //     mindmapServices.populateProjects().then(function(result) {
+    //         if (result == "Invalid Session") {
+    //             return $rootScope.redirectPage();
+    //         }
+    //         var project_type = $('.project-list').find(':selected').attr('app-type')
+    //         mindmapServices.getProjectsNeo().then(function(res) {
+    //             if (res == "Invalid Session") {
+    //                 return $rootScope.redirectPage();
+    //             }
+    //             var parse_data = res;
+    //             var flag = 0;
+    //             $('.versioningOption').remove()
+    //             var parsed_project_id = [];
+    //             for (var i = 0; i < parse_data[0].data.length; i++) {
+    //                 parsed_project_id.push(parse_data[0].data[i].row[0])
+    //             }
 
-                var new_projectsList = {
-                    projectId: [],
-                    projectName: [],
-                    appType: []
-                };
-                for (var i = 0; i < result['projectName'].length; i++) {
-                    if (project_type == result['appType'][i]) {
-                        new_projectsList.projectId.push(result['projectId'][i]);
-                        new_projectsList.projectName.push(result['projectName'][i]);
-                        new_projectsList.appType.push(result['appType'][i]);
-                    }
+    //             var new_projectsList = {
+    //                 projectId: [],
+    //                 projectName: [],
+    //                 appType: []
+    //             };
+    //             for (var i = 0; i < result['projectName'].length; i++) {
+    //                 if (project_type == result['appType'][i]) {
+    //                     new_projectsList.projectId.push(result['projectId'][i]);
+    //                     new_projectsList.projectName.push(result['projectName'][i]);
+    //                     new_projectsList.appType.push(result['appType'][i]);
+    //                 }
 
-                }
-                if (parsed_project_id.indexOf($('.project-list').val()) != -1) {
-                    for (var i = 0; i < new_projectsList['projectName'].length; i++) {
-                        if (parsed_project_id.indexOf(new_projectsList['projectId'][i]) != -1) {
-                            console.log('Available in Neo4j')
-                        } else {
-                            flag = 1;
-                            $('#destProjects').append($('<option>').attr({
-                                value: new_projectsList['projectId'][i],
-                                class: 'versioningOption'
-                            }).text(new_projectsList['projectName'][i]));
-                        }
-                    }
-                    $('#ProjectReplicationPopUp').modal("show");
-                    $('#replicateVersionButton').removeClass('disableButton').removeAttr('disabled', 'disabled');
-                    if (!flag)
-                        $('#replicateVersionButton').addClass('disableButton').attr('disabled', 'disabled');
-                } else {
-                    openDialogMindmap('Mindmap', "Empty Projects cannot be replicated.")
-                }
-                unblockUI();
+    //             }
+    //             if (parsed_project_id.indexOf($('.project-list').val()) != -1) {
+    //                 for (var i = 0; i < new_projectsList['projectName'].length; i++) {
+    //                     if (parsed_project_id.indexOf(new_projectsList['projectId'][i]) != -1) {
+    //                         console.log('Available in Neo4j')
+    //                     } else {
+    //                         flag = 1;
+    //                         $('#destProjects').append($('<option>').attr({
+    //                             value: new_projectsList['projectId'][i],
+    //                             class: 'versioningOption'
+    //                         }).text(new_projectsList['projectName'][i]));
+    //                     }
+    //                 }
+    //                 $('#ProjectReplicationPopUp').modal("show");
+    //                 $('#replicateVersionButton').removeClass('disableButton').removeAttr('disabled', 'disabled');
+    //                 if (!flag)
+    //                     $('#replicateVersionButton').addClass('disableButton').attr('disabled', 'disabled');
+    //             } else {
+    //                 openDialogMindmap('Mindmap', "Empty Projects cannot be replicated.")
+    //             }
+    //             unblockUI();
 
-            }, function(err) {
-                console.log('Error in fetching projects list');
-                unblockUI();
-            })
-        }, function(err) {
-            console.log('Error in fetching projects list');
-            unblockUI();
-        })
+    //         }, function(err) {
+    //             console.log('Error in fetching projects list');
+    //             unblockUI();
+    //         })
+    //     }, function(err) {
+    //         console.log('Error in fetching projects list');
+    //         unblockUI();
+    //     })
 
 
-    }
+    // }
 
     /*
       function replicationController()
@@ -4461,7 +4849,7 @@ Purpose : displaying pop up for replication of project
             title: active_version
         });
         blockUI('Loading...');
-        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, parseFloat(active_version), $('.release-list').val(), $('.cycle-list').val()).then(
+        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, parseFloat(active_version), $('.cycle-list').val(),null,null).then(
             function(res) {
                 if (res == "Invalid Session") {
                     return $rootScope.redirectPage();
