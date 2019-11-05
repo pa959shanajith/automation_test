@@ -445,6 +445,7 @@ if (cluster.isMaster) {
 		var login = require('./server/controllers/login');
 		var admin = require('./server/controllers/admin');
 		var design = require('./server/controllers/design');
+		var new_design = require('./server/controllers/new_design');
 		var suite = require('./server/controllers/suite');
 		var report = require('./server/controllers/report');
 		var plugin = require('./server/controllers/plugin');
@@ -520,12 +521,12 @@ if (cluster.isMaster) {
 		app.post('/deactivateCIUser', admin.deactivateCIUser);
 
 		//Design Screen Routes
-		app.post('/initScraping_ICE', design.initScraping_ICE);
-		app.post('/highlightScrapElement_ICE', design.highlightScrapElement_ICE);
-		app.post('/getScrapeDataScreenLevel_ICE', design.getScrapeDataScreenLevel_ICE);
-		app.post('/updateScreen_ICE', design.updateScreen_ICE);
-		app.post('/updateIrisDataset', design.updateIrisDataset);
-		app.post('/userObjectElement_ICE', design.userObjectElement_ICE);
+		app.post('/initScraping_ICE', new_design.initScraping_ICE);
+		app.post('/highlightScrapElement_ICE', new_design.highlightScrapElement_ICE);
+		app.post('/getScrapeDataScreenLevel_ICE', new_design.getScrapeDataScreenLevel_ICE);
+		app.post('/updateScreen_ICE', new_design.updateScreen_ICE);
+		app.post('/updateIrisDataset', new_design.updateIrisDataset);
+		app.post('/userObjectElement_ICE', new_design.userObjectElement_ICE);
 		//Design TestCase Routes
 		app.post('/readTestCase_ICE', design.readTestCase_ICE);
 		app.post('/updateTestCase_ICE', design.updateTestCase_ICE);
