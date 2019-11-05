@@ -555,9 +555,7 @@ if (cluster.isMaster) {
 		app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
 		app.post('/reportStatusScenarios_ICE', report.reportStatusScenarios_ICE);
 		app.post('/renderReport_ICE', report.renderReport_ICE);
-		// app.post('/getMainReport_ICE', report.getMainReport_ICE);
 		app.post('/getReport_Nineteen68', report.getReport_Nineteen68);
-		app.post('/exportToJson_ICE', report.exportToJson_ICE);
 		app.post('/openScreenShot', report.openScreenShot);
 		app.post('/connectJira_ICE', report.connectJira_ICE);
 		app.post('/getReportsData_ICE', report.getReportsData_ICE);
@@ -570,7 +568,7 @@ if (cluster.isMaster) {
 		//Utility plugins
 		app.post('/Encrypt_ICE', utility.Encrypt_ICE);
 		// Wecoccular Plugin
-		app.post('/crawResults', webocular.getCrawlResults);
+		app.post('/crawlResults', webocular.getCrawlResults);
 		app.post('/saveResults', webocular.saveResults);
 		//Chatbot Routes
 		app.post('/getTopMatches_ProfJ', chatbot.getTopMatches_ProfJ);

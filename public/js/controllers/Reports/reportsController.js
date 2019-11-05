@@ -11,6 +11,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     var clearIntervalList = [];
     var slideOpen = false;
     $scope.reportIdx = ''; // for execution count click
+    $scope.releases="";
+    $rootScope.reportData = "";
     $("#reportDataTableDiv").hide();
     $('.reports-search').attr('disabled', 'disabled');
     $('#ctExpandAssign').css('pointer-events','none');
@@ -40,21 +42,19 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             .then(function(data) {
                 if (data == "Invalid Session") {
                     return $rootScope.redirectPage();
-                }
-                if (type == "projects") {
-                    if (data != "fail" && data.projectids.length != 0) {
+                }  
+                window.localStorage['project']=JSON.stringify(data)           
+                if (type == "projects" ) {
+                    if(data != "fail"){
                         $(".project-list").empty();
                         $(".project-list").append("<option selected disabled>Select Project</option>");
-                        for (i = 0; i < data.projectids.length; i++) {
-                            $(".project-list").append("<option value='" + data.projectids[i] + "'>" + data.projectnames[i] + "</option>");
+                        for (i = 0; i < data.length; i++) {
+                            $(".project-list").append("<option value='" + data[i]._id + "'>" + data[i].name + "</option>");
                         }
-                        var proId;
                         $('.release-list').empty()
                         $('.release-list').append("<option data-id='Select' value='Select' selected>Select</option>");
                         $('.cycle-list').empty();
                         $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-                        proId = data.projectids[0];
-                        getProjectsAndSuites(proId, "reports");
                         if (redirected) {
                             $timeout(function() {
                                 unblockUI();
@@ -65,22 +65,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 
                         }
                     } else console.log("Unable to load test suites.");
-                } else if (type == "reports") {
-                    $('.scrollbar-inner').scrollbar();
-                    $('.scrollbar-macosx').scrollbar();
-                    var container = $('.staticTestsuiteContainer');
-                    $('.suiteContainer').remove();
-                    if (Object.prototype.toString.call(data) === '[object Object]') {
-                        if (data.suiteids.length > 0) {
-                            for (i = 0; i < data.suiteids.length; i++) {
-                                if (container.find('.suiteContainer').length >= 6) {
-                                    $('.dynamicTestsuiteContainer').append("<span class='suiteContainer' data-suiteId='" + data.suiteids[i] + "'><img alt='Test suite icon' class='reportbox' src='imgs/ic-reportbox.png' title='" + data.suitenames[i] + "'><br/><span class='repsuitename' title='" + data.suitenames[i] + "'>" + data.suitenames[i] + "</span></span>");
-                                } else {
-                                    container.append("<span class='suiteContainer' data-suiteId='" + data.suiteids[i] + "'><img alt='Test suite icon' class='reportbox' src='imgs/ic-reportbox.png' title='" + data.suitenames[i] + "'><br/><span class='repsuitename' title='" + data.suitenames[i] + "'>" + data.suitenames[i] + "</span></span>");
-                                }
-                            }
-                        }
-                    }
                     $('.searchScrapEle').css('display', 'none');
                     if ($('.dynamicTestsuiteContainer').find('.suiteContainer').length <= 0) {
                         $('.suitedropdownicon, .dynamicTestsuiteContainer').hide();
@@ -104,58 +88,64 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         $("#expAssign").attr('src', 'imgs/ic-collapse.png');
         $('#searchModule').val('');
         $('#searchModule').attr('disabled', 'disabled');
-        mindmapServices.populateReleases(projectId).then(function(result) {
-            unblockUI();
-            if (result == "Invalid Session") {
-                return $rootScope.redirectPage();
-            }
-            $('.release-list').empty();
-            $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-            $('.cycle-list').empty();
-            $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-            for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
-                $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
-            }
-            if (redirected) {
-                $timeout(function() {
-                    $('#selectReleases').val(robj.testSuiteDetails[0].releaseid);
-                    $('#selectReleases').trigger('change');
-                }, 500);
-            }
-        }, function(error) {
+        data = JSON.parse(window.localStorage['project'])
+        try{ 
+            for (i=0; i< data.length; i++){
+                if(projectId == data[i]._id){
+                    unblockUI();           
+                    $('.release-list').empty();
+                    $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                    $('.cycle-list').empty();
+                    $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                    for (j = 0; j < data[i].releases.length; j++) {
+                        $('.release-list').append("<option data-id='" + data[i].releases[j].name + "' value='" + data[i].releases[j].name + "'>" + data[i].releases[j].name + "</option>");
+                    }
+                    $scope.releases =  data[i].releases
+                    if (redirected) {
+                        $timeout(function() {
+                            $('#selectReleases').val(robj.testSuiteDetails[0].releaseid);
+                            $('#selectReleases').trigger('change');
+                        }, 500);
+                    }
+                }
+        }
+     } catch(exception){
             unblockUI();
             console.log("Error in service populateReleases while fetching projects -" + error);
-        });
+        }
+    };
 
          //Bind cycles on releases Filter Change
         $scope.selReleasesFilter = function() {
-            var releaseId = $('.release-list option:selected').val();
+            var releaseName= $('.release-list option:selected').val();
             blockUI("Loading cycles.. please wait..");
             $(".moduleBox,.mid-report-section,#accordion").hide();
             $("#expAssign").attr('src', 'imgs/ic-collapse.png');
             $('#searchModule').val('');
             $('#searchModule').attr('disabled', 'disabled');
-            mindmapServices.populateCycles(releaseId).then(function(result_cycles) {
-                unblockUI();
-                if (result_cycles == "Invalid Session") {
-                    return $rootScope.redirectPage();
-                }
-                $('.cycle-list').empty();
-                $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-                for (i = 0; i < result_cycles.c_ids.length && result_cycles.cyc.length; i++) {
-                    $('.cycle-list').append("<option data-id='" + result_cycles.cyc[i] + "' value='" + result_cycles.c_ids[i] + "'>" + result_cycles.cyc[i] + "</option>");
-                }
-                if (redirected) {
-                    $timeout(function() {
-                        $('#selectCycles').val(robj.testSuiteDetails[0].cycleid);
+            result = $scope.releases;
+            try{ 
+                for (i=0;i< result.length;i++){
+                    if(releaseName == result[i].name){
                         unblockUI();
-                        $('#selectCycles').trigger('change');
-                    }, 500);
+                        $('.cycle-list').empty();
+                        $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                        for (j = 0; j < result[i].cycles.length; j++) {
+                            $('.cycle-list').append("<option data-id='" +result[i].cycles[j]._id+ "' value='" + result[i].cycles[j]._id + "'>" + result[i].cycles[j].name + "</option>");
+                        }
+                        if (redirected) {
+                            $timeout(function() {
+                                $('#selectCycles').val(robj.testSuiteDetails[0].cycleid);
+                                unblockUI();
+                                $('#selectCycles').trigger('change');
+                            }, 500);
+                        }
+                    }
                 }
-            }, function(error) {
+            } catch(exception){
                 unblockUI();
-                console.log("Error in service populateCycles while fetching releases -"+error);
-            });
+                console.log("Error in service populateReleases while fetching projects -" + error);
+            }
         };
 
         //Load modules on cycles filter change
@@ -163,10 +153,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             var cycleId = $('.cycle-list option:selected').val();
             var reportsInputData = {};
             reportsInputData.projectId = $.trim($('.project-list option:selected').val());
-            reportsInputData.releaseId = $.trim($('.release-list option:selected').val());
+            reportsInputData.releaseName = $.trim($('.release-list option:selected').val());
             reportsInputData.cycleId = $.trim(cycleId);
             reportsInputData.type = 'allmodules';
-            var counter = 0;
             blockUI("Loading modules.. please wait..");
             $("#accordion").hide();
             $('#nodeBox').empty();
@@ -193,7 +182,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         //Modules Display
                         $rootScope.reportData = result_res_reportData.rows;
                         angular.forEach(result_res_reportData.rows, function(value, index) {
-                            $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value.testsuiteid + '  title=' + value.testsuitename + ' style="width: 139px;"><img class="ct-nodeIcon" id=' + value.testsuiteid + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.testsuitename + '</span></div>')
+                            $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value._id + '  title=' + value.name + ' style="width: 139px;"><img class="ct-nodeIcon" id=' + value._id + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.name + '</span></div>')
                             $('.reports-search').removeAttr('disabled', 'disabled');
                         });
                         $('#searchModule').removeAttr('disabled', 'disabled');
@@ -240,7 +229,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         }
                     } else {
                         angular.forEach(result_webocular_reportData.rows, function(value, index) {
-                            $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value._id.$oid + '  title=' + value.modulename + ' style="width: 139px;"><img class="ct-nodeIcon1" id=' + value._id.$oid + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.modulename + '</span></div>')
+                            $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value._id + '  title=' + value.modulename + ' style="width: 139px;"><img class="ct-nodeIcon1" id=' + value._id + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.modulename + '</span></div>')
                             $('.reports-search').removeAttr('disabled', 'disabled');
                         });
                         $('.ct-nodeIcon1').parent().hide();
@@ -251,7 +240,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 console.log("Error in service getWebocularModule_ICE while fetching modules-"+error);
             });
         };
-    };
 
 
     //Responsive Header Menu
@@ -1027,9 +1015,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             finalReports.overallstatus[0].scenarioName = data[0].testscenarioname
                             finalReports.overallstatus[0].reportId = reportID;
                             finalReports.overallstatus[0].executionId = data[0].executionId;;
-                            finalReports.overallstatus[0].moduleName = $(".highlight-moduleName").text(); 
-
-                            var obj2 = JSON.parse(data[1].reportdata);
+                            finalReports.overallstatus[0].moduleName = $(".highlight-moduleName").text();
+                            
+                            var obj2 = data[1].reportdata;
                             var elapTym;
                             for (j = 0; j < obj2.overallstatus.length; j++) {
                                 finalReports.overallstatus[0].browserVersion = (obj2.overallstatus[j].browserVersion) == "" ? "-" : obj2.overallstatus[j].browserVersion;
