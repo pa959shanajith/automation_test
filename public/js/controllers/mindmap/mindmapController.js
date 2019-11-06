@@ -1117,9 +1117,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             });
             //if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','imgs/node-task-assigned.png').attr('x',29).attr('y',-10);
             if (nType == "modules" || nType == "modules_endtoend") {
-                if (dNodes[pi].id_c != "null") {
+                if (dNodes[pi]._id != "null") {
 
-                    addTask_11(dNodes[pi].id, tObj, 0);
+                    addTask_11(pi, tObj, 0);
                 }
                 //Logic to add tasks for the scenario
                 if (dNodes[pi].children && $('.pg-checkbox')[0].checked) dNodes[pi].children.forEach(function(tSc) {
@@ -1179,53 +1179,53 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (qid == 9)
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 9,
-                        parent: (tObj.parent != null) ? tObj.parent : validate[1]
+                        parent: (tObj.parent != null) ? tObj.parent : dnodes[pi].parent.parent._id
                     });
                 else if (qid == 7)
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 7,
-                        parent: (tObj.parent != null) ? tObj.parent : validate[1]
+                        parent: (tObj.parent != null) ? tObj.parent : dNodes[pi].projectID
                     });
                 else if (qid == 8 && taskUndef) {
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 8,
-                        parent: validate[1],
+                        parent: dnodes[pi].parent.parent._id,
                         ctask: cTask
                     });
                 } else if (qid == 5 && taskUndef) {
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 5,
-                        parent: validate[1]
+                        parent: dNodes[pi].projectID
                     });
                 } else if (qid == 6 && taskUndef) {
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 6,
-                        parent: validate[1]
+                        parent: dnodes[pi].parent.parent._id
                     });
                 } else if (qid == 4) {
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 4,
-                        parent: (tObj.parent != null) ? tObj.parent : validate[1]
+                        parent: (tObj.parent != null) ? tObj.parent : dNodes[pi].parent._id
                     })
                 } else if (qid == 3 && taskUndef) {
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 3,
-                        parent: validate[1]
+                        parent: dodes[pi].parent.parent._id
                     });
                 } else if (qid == 2 && taskUndef) {
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 2,
-                        parent: validate[1]
+                        parent: dNodes[pi].projectID
                     });
                 } else if (qid == 1 && taskUndef) {
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 1,
-                        parent: validate[1]
+                        parent: dNodes[pi].parent._id
                     });
                 } else if (qid == 0) {
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 0,
-                        parent: (tObj.parent != null) ? tObj.parent : validate[1]
+                        parent: (tObj.parent != null) ? tObj.parent : ""
                     });
                 }
                 if ((!taskUndef && !origTask) || origTask) {
@@ -1264,7 +1264,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     dNodes[pi].task.copied = false;
                 }
 
-                replicateTask(pi);
+                // replicateTask(pi);
             }
         }
 
@@ -1566,8 +1566,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             return $rootScope.redirectPage();
                         }
                         $('#ct-assignedTo').empty().append("<option value='select user' >Select User</option>");
-                        for (i = 0; i < res.userRoles.length && res.r_ids.length; i++) {
-                            $('#ct-assignedTo').append("<option data-id='" + res.userRoles[i] + "' value='" + res.r_ids[i] + "'>" + res.userRoles[i] + "</option>");
+                        res=res.rows
+                        for (i = 0; i < res.length; i++) {
+                            $('#ct-assignedTo').append("<option data-id='" + res[i]["name"] + "' value='" + res[i]["_id"] + "'>" + res[i]["name"] + "</option>");
                         }
                         $("#ct-assignedTo option[value='" + tObj.at + "']").attr('selected', 'selected');
                         if ($("#ct-assignedTo").val() != "select user" && nt.oid != null) {
@@ -1590,8 +1591,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         }
                         $('#ct-assignRevw').empty();
                         $('#ct-assignRevw').append("<option value='select reviewer' select=selected>" + "Select Reviewer" + "</option>");
-                        for (i = 0; i < res.userRoles.length && res.r_ids.length; i++) {
-                            $('#ct-assignRevw').append("<option data-id='" + res.userRoles[i] + "' value='" + res.r_ids[i] + "'>" + res.userRoles[i] + "</option>");
+                        res=res.rows
+                        for (i = 0; i < res.length; i++) {
+                            $('#ct-assignRevw').append("<option data-id='" + res[i]["name"] + "' value='" + res[i]["_id"] + "'>" + res[i]["name"] + "</option>");
                         }
                         $("#ct-assignRevw option[value='" + tObj.rw + "']").attr('selected', 'selected');
 
@@ -3053,7 +3055,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
             counter[key] = counter[key] + 1;
         })
-        var restrict_scenario_reuse = parseDataReuse(true);
+        // var restrict_scenario_reuse = parseDataReuse(true);
         if (selectedTab != 'tabAssign') {
             if (restrict_scenario_reuse['reuseScenarios'].length > 0) {
                 openDialogMindmap('Error', "Scenario names cannot be reused, please rename the following: " + restrict_scenario_reuse['reuseScenarios'].join());
