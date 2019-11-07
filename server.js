@@ -21,18 +21,18 @@ process.env.NDAC_URL = epurl;
 var logger = require('./logger');
 var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 
-// if (cluster.isMaster) {
-// 	cluster.fork();
-// 	cluster.on('disconnect', function(worker) {
-// 		logger.error('Nineteen68 server has encountered some problems, Disconnecting!');
-// 	});
-// 	cluster.on('exit', function(worker) {
-// 		if (worker.exitedAfterDisconnect !== true) {
-// 			logger.error('Worker %d is killed!', worker.id);
-// 			cluster.fork();
-// 		}
-// 	});
-// } else
+if (cluster.isMaster) {
+	cluster.fork();
+	cluster.on('disconnect', function(worker) {
+		logger.error('Nineteen68 server has encountered some problems, Disconnecting!');
+	});
+	cluster.on('exit', function(worker) {
+		if (worker.exitedAfterDisconnect !== true) {
+			logger.error('Worker %d is killed!', worker.id);
+			cluster.fork();
+		}
+	});
+} else
 {
 	try {
 		var express = require('express');
@@ -517,9 +517,9 @@ var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 		app.post('/testLDAPConnection', admin.testLDAPConnection);
 		app.post('/getLDAPConfig', admin.getLDAPConfig);
 		app.post('/manageLDAPConfig', admin.manageLDAPConfig);
-		app.post('/generateCIusertokens', admin.generateCIusertokens)
+		app.post('/manageCIUsers', admin.manageCIUsers)
 		app.post('/getCIUsersDetails', admin.getCIUsersDetails);
-		app.post('/deactivateCIUser', admin.deactivateCIUser);
+		// app.post('/deactivateCIUser', admin.deactivateCIUser);
 
 		//Design Screen Routes
 		app.post('/initScraping_ICE', new_design.initScraping_ICE);

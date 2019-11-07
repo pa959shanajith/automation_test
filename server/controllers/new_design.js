@@ -372,8 +372,8 @@ exports.updateScreen_ICE = function (req, res) {
 					};
 					logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE");
 					finalFunction(scrapedObjects);
-				}catch{
-					console.log("boom")
+				}catch (exception) {
+					logger.error("Exception in the mapScrapeData_ICE: %s", exception);
 				}
 			} else if (param == 'updateComparedObjects') {
 				//Update changed objects
@@ -415,8 +415,8 @@ exports.updateScreen_ICE = function (req, res) {
 					logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE");
 					finalFunction(scrapedObjects);
 				}
-				catch{
-
+				catch (exception) {
+					logger.error("Exception in the edit_updateScrapeData_ICE: %s", exception);
 				}
 
 			} else if (param == "delete_updateScrapeData_ICE"){
