@@ -383,58 +383,59 @@ if (cluster.isMaster) {
 		}
 
 		//Role Based User Access to services
-		app.post('*', function(req, res, next) {
-			var roleId = (req.session) ? req.session.activeRoleId : undefined;
-			var updateinp = {
-				roleid: roleId || "ignore",
-				servicename: req.url.replace("/", "")
-			};
-			var args = {
-				data: updateinp,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			var apireq = apiclient.post(epurl + "utility/userAccess_Nineteen68", args, function(result, response) {
-				if (roleId) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in userAccess_Nineteen68");
-						res.send("Invalid Session");
-					} else if (result.rows == "off") {
-						res.status(500).send("fail");
-						httpsServer.close();
-						logger.error("License Expired!!");
-						logger.error("Please run the Service API and Restart the Server");
-					} else {
-						if (result.rows == "True") {
-							logger.rewriters[0] = function(level, msg, meta) {
-								if (req.session && req.session.uniqueId) {
-									meta.username = req.session.username;
-									meta.userid = req.session.userid;
-									meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
-									return meta;
-								} else {
-									meta.username = null;
-									meta.userid = null;
-									return meta;
-								}
-							};
-							return next();
-						} else {
-							req.clearSession();
-							return res.send("Invalid Session");
-						}
-					}
-				} else {
-					return next();
-				}
-			});
-			apireq.on('error', function(err) {
-				res.status(500).send("fail");
-				httpsServer.close();
-				logger.error("Please run the Service API and Restart the Server");
-			});
-		});
+		
+		// app.post('*', function(req, res, next) {
+		// 	var roleId = (req.session) ? req.session.activeRoleId : undefined;
+		// 	var updateinp = {
+		// 		roleid: roleId || "ignore",
+		// 		servicename: req.url.replace("/", "")
+		// 	};
+		// 	var args = {
+		// 		data: updateinp,
+		// 		headers: {
+		// 			"Content-Type": "application/json"
+		// 		}
+		// 	};
+		// 	var apireq = apiclient.post(epurl + "utility/userAccess_Nineteen68", args, function(result, response) {
+		// 		if (roleId) {
+		// 			if (response.statusCode != 200 || result.rows == "fail") {
+		// 				logger.error("Error occured in userAccess_Nineteen68");
+		// 				res.send("Invalid Session");
+		// 			} else if (result.rows == "off") {
+		// 				res.status(500).send("fail");
+		// 				httpsServer.close();
+		// 				logger.error("License Expired!!");
+		// 				logger.error("Please run the Service API and Restart the Server");
+		// 			} else {
+		// 				if (result.rows == "True") {
+		// 					logger.rewriters[0] = function(level, msg, meta) {
+		// 						if (req.session && req.session.uniqueId) {
+		// 							meta.username = req.session.username;
+		// 							meta.userid = req.session.userid;
+		// 							meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
+		// 							return meta;
+		// 						} else {
+		// 							meta.username = null;
+		// 							meta.userid = null;
+		// 							return meta;
+		// 						}
+		// 					};
+		// 					return next();
+		// 				} else {
+		// 					req.clearSession();
+		// 					return res.send("Invalid Session");
+		// 				}
+		// 			}
+		// 		} else {
+		// 			return next();
+		// 		}
+		// 	});
+		// 	apireq.on('error', function(err) {
+		// 		res.status(500).send("fail");
+		// 		httpsServer.close();
+		// 		logger.error("Please run the Service API and Restart the Server");
+		// 	});
+		// });
 
 		app.post('/designTestCase', function(req, res) {
 			return res.sendFile("app.html", { root: __dirname + "/public/" });
@@ -516,7 +517,6 @@ if (cluster.isMaster) {
 		app.post('/testLDAPConnection', admin.testLDAPConnection);
 		app.post('/getLDAPConfig', admin.getLDAPConfig);
 		app.post('/manageLDAPConfig', admin.manageLDAPConfig);
-		// app.post('/generateCIusertokens', admin.generateCIusertokens)
 		app.post('/getCIUsersDetails', admin.getCIUsersDetails);
 		app.post('/manageCIUsers ', admin.manageCIUsers );
 

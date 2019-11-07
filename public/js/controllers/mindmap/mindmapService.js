@@ -67,7 +67,7 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
-		getModules: function (versioning_enabled,usertab,prjId,version,relId,cycId,modName){
+		getModules: function (versioning_enabled,usertab,projectid,version,cycId,modName,moduleid){
 					
     		var param = "/getModules";
 			if (versioning_enabled==1){
@@ -75,11 +75,12 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 			}
     		return $http.post(param, {
 				tab:usertab,
-                prjId: prjId,
+                projectid: projectid,
                 version:version,
-				relId: relId,
+				// relId: relId,
 				cycId: cycId,
 				modName:modName,
+				moduleid:moduleid
     		})
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
@@ -100,7 +101,7 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 					deletednode: deletednode,
 					unassignTask: unassignTask,
 					prjId: prjId,
-					relId: relId,
+					// relId: relId,
 					cycId: cycId,
 					selectedTab:selectedTab,
 					UtcTime: utcTime
@@ -121,7 +122,7 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 				deletednode: deletednode,
 				unassignTask: unassignTask,
 				prjId: prjId,
-				relId: relId,
+				relId: relId || null,
 				cycId: cycId
     		})
     		.then(function (response) { return response.data; },
