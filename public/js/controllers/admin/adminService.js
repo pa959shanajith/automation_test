@@ -82,22 +82,16 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
-		generateCIusertokens: function (generatetoken) {
-			return $http.post('/generateCIusertokens', {
-				generatetoken: generatetoken
+		manageCIUsers: function (action,CIUser) {
+			return $http.post('/manageCIUsers', {
+				action: action,
+				CIUser: CIUser
 			})
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
-		getCIUsersDetails: function (generatetoken) {
+		getCIUsersDetails: function (CIUser) {
 			return $http.post('/getCIUsersDetails',{
-				generatetoken: generatetoken
-			})
-			.then(function(response) { return response.data },
-			function(response) { return $q.reject(response.data) });
-		},
-		deactivateCIUser: function (CIUser) {
-			return $http.post('/deactivateCIUser',{
 				CIUser: CIUser
 			})
 			.then(function(response) { return response.data },

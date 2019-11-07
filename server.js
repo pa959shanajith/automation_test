@@ -446,6 +446,7 @@ var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 		var login = require('./server/controllers/login');
 		var admin = require('./server/controllers/admin');
 		var design = require('./server/controllers/design');
+		var new_design = require('./server/controllers/new_design');
 		var suite = require('./server/controllers/suite');
 		var report = require('./server/controllers/report');
 		var plugin = require('./server/controllers/plugin');
@@ -521,12 +522,12 @@ var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 		app.post('/deactivateCIUser', admin.deactivateCIUser);
 
 		//Design Screen Routes
-		app.post('/initScraping_ICE', design.initScraping_ICE);
-		app.post('/highlightScrapElement_ICE', design.highlightScrapElement_ICE);
-		app.post('/getScrapeDataScreenLevel_ICE', design.getScrapeDataScreenLevel_ICE);
-		app.post('/updateScreen_ICE', design.updateScreen_ICE);
-		app.post('/updateIrisDataset', design.updateIrisDataset);
-		app.post('/userObjectElement_ICE', design.userObjectElement_ICE);
+		app.post('/initScraping_ICE', new_design.initScraping_ICE);
+		app.post('/highlightScrapElement_ICE', new_design.highlightScrapElement_ICE);
+		app.post('/getScrapeDataScreenLevel_ICE', new_design.getScrapeDataScreenLevel_ICE);
+		app.post('/updateScreen_ICE', new_design.updateScreen_ICE);
+		app.post('/updateIrisDataset', new_design.updateIrisDataset);
+		app.post('/userObjectElement_ICE', new_design.userObjectElement_ICE);
 		//Design TestCase Routes
 		app.post('/readTestCase_ICE', design.readTestCase_ICE);
 		app.post('/updateTestCase_ICE', design.updateTestCase_ICE);
@@ -541,23 +542,18 @@ var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 		app.post('/getTestcaseDetailsForScenario_ICE', suite.getTestcaseDetailsForScenario_ICE);
 		app.post('/ExecuteTestSuite_ICE_CI', suite.ExecuteTestSuite_ICE_CI);
 		//app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
-
-		//SVN execution routes
-		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_SVN);
 		// app.post('/getListofScheduledSocketMap',suite.getListofScheduledSocketMap);
 
 		//Scheduling Screen Routes
-		app.post('/testSuitesScheduler_ICE', suite.testSuitesScheduler_ICE);
-		app.post('/getScheduledDetails_ICE', suite.getScheduledDetails_ICE);
-		app.post('/cancelScheduledJob_ICE', suite.cancelScheduledJob_ICE);
+		// app.post('/testSuitesScheduler_ICE', suite.testSuitesScheduler_ICE);
+		// app.post('/getScheduledDetails_ICE', suite.getScheduledDetails_ICE);
+		// app.post('/cancelScheduledJob_ICE', suite.cancelScheduledJob_ICE);
 		//Report Screen Routes
 		app.post('/getAllSuites_ICE', report.getAllSuites_ICE);
 		app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
 		app.post('/reportStatusScenarios_ICE', report.reportStatusScenarios_ICE);
 		app.post('/renderReport_ICE', report.renderReport_ICE);
-		// app.post('/getMainReport_ICE', report.getMainReport_ICE);
 		app.post('/getReport_Nineteen68', report.getReport_Nineteen68);
-		app.post('/exportToJson_ICE', report.exportToJson_ICE);
 		app.post('/openScreenShot', report.openScreenShot);
 		app.post('/connectJira_ICE', report.connectJira_ICE);
 		app.post('/getReportsData_ICE', report.getReportsData_ICE);
@@ -570,7 +566,7 @@ var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 		//Utility plugins
 		app.post('/Encrypt_ICE', utility.Encrypt_ICE);
 		// Wecoccular Plugin
-		app.post('/crawResults', webocular.getCrawlResults);
+		app.post('/crawlResults', webocular.getCrawlResults);
 		app.post('/saveResults', webocular.saveResults);
 		//Chatbot Routes
 		app.post('/getTopMatches_ProfJ', chatbot.getTopMatches_ProfJ);

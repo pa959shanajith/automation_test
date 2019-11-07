@@ -323,13 +323,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								keywordValArr.length = 0;
 								keywordListData = angular.toJson(data3);
 								var emptyStr = "{}";
-								var len = data.testcase.length;
-								if (data == "" || data == null || data == emptyStr || data == "[]" || data.testcase.toString() == "" || data.testcase == "[]" || len == 1) {
+								if (data == "" || data == null || data == emptyStr || data == "[]" || data.testcase.toString() == "" || data.testcase == "[]") {
 									var appTypeLocal1 = "Generic";
 									var datalist = [{
 										"stepNo": "1",
 										"custname": "",
 										"objectName": "",
+										"dataObject": "",
 										"keywordVal": "",
 										"inputVal": "",
 										"outputVal": "",
@@ -349,7 +349,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									$('.cbox').parent().removeClass('disable_a_href');
 									return;
 								} else {
-									var testcase = JSON.parse(data.testcase);
+									var testcase = data.testcase;//JSON.parse(data.testcase);
 									var testcaseArray = [];
 									for (var i = 0; i < testcase.length; i++) {
 										if ("comments" in testcase[i]) {
@@ -501,8 +501,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		var versionnumber = taskInfo.versionnumber;
 		var testCaseName = taskInfo.testCaseName;
 		var appType = taskInfo.appType;
+		var import_status = true;
 		var flag = false;
-		var defaultTestScript = '[{"stepNo":"1","custname":"","objectName":"","keywordVal":"","inputVal":"","outputVal":"","url":"","_id_":"","appType":"Generic"}]';
+		var defaultTestScript = '[{"stepNo":"1","custname":"","objectName":"","dataObject":"","keywordVal":"","inputVal":"","outputVal":"","url":"","_id_":"","appType":"Generic"}]';
 		if (readTestCaseData == defaultTestScript) {
 			$("#importTestCaseFile").attr("type", "file");
 			$("#importTestCaseFile").trigger("click");
@@ -530,7 +531,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							if (flag == false) {
 								openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
 							} else {
-								DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
+								DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
 									.then(function (data) {
 										if (data == "Invalid Session") {
 											return $rootScope.redirectPage();
@@ -577,6 +578,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		var testCaseName = taskInfo.testCaseName;
 		var versionnumber = taskInfo.versionnumber;
 		var appType = taskInfo.appType;
+		var import_status = true;
 		var flag = false;
 		$("#overWriteJson").trigger("click");
 		overWriteJson.addEventListener('change', function (e) {
@@ -602,7 +604,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						if (flag == false) {
 							openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
 						} else {
-							DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
+							DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
 								.then(function (data) {
 									// console.log("hello");
 									if (data == "Invalid Session") {
@@ -641,6 +643,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		var testCaseName = taskInfo.testCaseName;
 		var versionnumber = taskInfo.versionnumber;
 		var appType = taskInfo.appType;
+		var import_status = true;
 		var flag = false;
 		overWriteJson.addEventListener('change', function (e) {
 			if (counter == 0) {
@@ -666,7 +669,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						if (flag == false) {
 							openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
 						} else {
-							DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
+							DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
 								.then(function (data) {
 									if (data == "Invalid Session") {
 										return $rootScope.redirectPage();
@@ -710,7 +713,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				}
 				var temp, responseData;
 				if (typeof response === 'object') {
-					temp = JSON.parse(response.testcase);
+					temp = response.testcase;//JSON.parse(response.testcase);
 					responseData = JSON.stringify(temp, undefined, 2);
 				}
 				filename = testCaseName + ".json";
@@ -897,6 +900,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							// else{
 							var path = viewString.view[i].xpath;
 							var ob = viewString.view[i];
+							var objId = viewString.view[i]._id
 							addcusOb = '';
 							ob.tempId = i;
 							custN = ob.custname.replace(/[<>]/g, '').trim();
@@ -919,9 +923,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
 							}
 							if(ob.hasOwnProperty('editable')){
-								var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><span id='decrypt' href='#' class='userObject'><img src='imgs/ic-jq-editstep.png' style='display:none'></span></li>";
+								var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><span id='decrypt' href='#' class='userObject'><img src='imgs/ic-jq-editstep.png' style='display:none'></span></li>";
 							}else{
-								var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+								var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 							}
 							// }									   
 							// }
@@ -1068,12 +1072,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			$(".disableActionsWS").addClass("enableActionsWS").removeClass("disableActionsWS")
 			$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody").prop("disabled", false)
 		}*/
-		DesignServices.getScrapeDataScreenLevel_ICE()
+		var type = "WS_screen"
+		DesignServices.getScrapeDataScreenLevel_ICE(type)
 			.then(function (data) {
 				if (data == "Invalid Session") {
 					return $rootScope.redirectPage();
 				}
 				if (typeof data === "object") {
+					data = data[0]
 					//Printing the Save data in UI
 					$("#endPointURL").val(data.endPointURL);
 					$("#wsdlMethods option").each(function () {
@@ -1282,6 +1288,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						"stepNo": i + 1,
 						"appType": appType,
 						"objectName": "",
+						"dataObject": "",
 						"inputVal": [wsdlInputs[i]],
 						"keywordVal": keywordVal[i],
 						"outputVal": "",
@@ -1297,6 +1304,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				"stepNo": testCaseWS.length + 1,
 				"appType": appType,
 				"objectName": "",
+				"dataObject": "",
 				"inputVal": [""],
 				"keywordVal": "executeRequest",
 				"outputVal": "",
@@ -2315,6 +2323,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	
 	$scope.submitIrisObjectType = function (e) {
 		var obj_cord = '';
+		var obj_id = '';
 		var task = JSON.parse(window.localStorage['_CT']);
 		var identified_obj_type = objType.toLowerCase();
 		var user_obj_type = $('#objectType').val();
@@ -2322,10 +2331,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			for(var i=0;i<viewString.view.length;i++){
 				if(viewString.view[i].xpath == obj_xpath){
 					obj_cord = viewString.view[i].cord;
+					if("_id" in viewString.view[i]){obj_id = viewString.view[i]._id;}
 					break;
 				}
 			}
-			var data = {"cord":obj_cord,"type":user_obj_type,"projectid":task.projectId,"screenid":task.screenId,
+			var data = {"_id":obj_id,"cord":obj_cord,"type":user_obj_type,"projectid":task.projectId,"screenid":task.screenId,
 			"screenname":task.screenName,"versionnumber":task.versionnumber,"xpath":obj_xpath};
 			DesignServices.updateIrisDataset(data)
 				.then(function (val) {
@@ -2363,6 +2373,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		scrapeObject.param = 'updateComparedObjects';
 		$("#changedOrdList").find("input[type='checkbox'].checkCompareAll:checked").each(function () {
 			var id = parseInt($(this).parent().attr('id').split('_')[1]);
+			updatedViewString.view[0].changedobject[id]._id = viewString.view[updatedViewString.changedobjectskeys[id]]._id
 			updatedSelection.push(updatedViewString.view[0].changedobject[id]);
 		});
 		updatedViewString.view[0].changedobject = updatedSelection;
@@ -2464,6 +2475,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		// var currentElements = $(".ellipsis:visible").length
 		var filterActiveLen = $(".popupContent-filter-active").length;
 		//Delete All Elements
+		getIndexOfDeletedObjects = []
 		if (totalElements == selectedElements) {
 			$("#scraplist").empty();
 			var currentElements = $(".ellipsis:visible").length;
@@ -2487,50 +2499,156 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				$(".popupContent-filter-active").trigger('click');
 				$("#saveObjects").prop("disabled", false);
 			}
+			getIndexOfDeletedObjects = ["deleteAll"]
 		}
 		else {
-			//Delete Selected Elements
-			$.each($("input[type=checkbox].checkall:checked"), function () {
-				$(this).parents("li.select_all").remove();
-				var json = {
-					"xpath": $(this).closest("li").attr('data-xpath'),
-					"url": $(this).closest("li").attr('data-xpath'),
-					"top": $(this).closest("li").attr('data-top'),
-					"hiddentag": $(this).closest("li").attr('data-hiddentag'),
-					"height": $(this).closest("li").attr('data-height'),
-					"custname": $(this).parent().next("span.ellipsis").text(),
-					"width": $(this).closest("li").attr('data-width'),
-					"tag": $(this).closest("li").attr('data-tag'),
-					"left": $(this).closest("li").attr('data-left'),
-					"tempId": parseInt($(this).closest("li").attr('val'))
-				};
-
-				getIndexOfDeletedObjects.push(json);
-			})
-			var currentElements = $(".ellipsis:visible").length;
-			if (currentElements > 0) {
-				$("#saveObjects").prop("disabled", false);
-				$(".checkStylebox").prop("checked", false);
-				$("#deleteObjects").prop("disabled", true);
-			}
-			else {
-				$("#deleteObjects,.checkStylebox").prop("disabled", true);
-				$(".checkStylebox").prop("checked", false);
-				$(".popupContent-filter-active").trigger('click');
-				$("#saveObjects").prop("disabled", false);
-			}
+					$.each($("input[type=checkbox].checkall:checked"), function (index) {
+						$(this).parents("li.select_all").remove();
+						var deleteObjId = $(this)[0].parentElement.id.split('_')[1];
+						var deleteObject = viewString.view[deleteObjId]; 
+						getIndexOfDeletedObjects.push(deleteObject);	})
+					
 		}
+		var isduplicate = duplicateCheck();
+		if (isduplicate == false) {
+			unblockUI();
+			return;
+		}
+		var tasks = JSON.parse(window.localStorage['_CT']);
+		var screenId = tasks.screenId;
+		var screenName = tasks.screenName;
+		var projectId = tasks.projectId;
+		var userinfo = JSON.parse(window.localStorage['_UI']);
+		scrapeObject = {};
+		scrapeObject.getScrapeData =JSON.stringify(getIndexOfDeletedObjects);
+		scrapeObject.projectId = projectId;
+		scrapeObject.screenId = screenId;
+		scrapeObject.screenName = screenName;
+		scrapeObject.userinfo = userinfo;
+		scrapeObject.param = "delete_updateScrapeData_ICE";
+		scrapeObject.appType = tasks.appType;
+		scrapeObject.versionnumber = tasks.versionnumber;
+		scrapeObject.newData = viewString;
+		if(deleteObjectsFlag==true){
+			scrapeObject.type = "delete";
+			deleteObjectsFlag = false;
+		}
+		else
+			scrapeObject.type = "save";
+		//Update Service to Save Scrape Objects
+		DesignServices.updateScreen_ICE(scrapeObject)
+			.then(function (data) {
+				angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
+				unblockUI()
+				//add popoup for error and saved 
+			}, function (error) {unblockUI() })
+		
+		var currentElements = $(".ellipsis:visible").length;
+		if (currentElements > 0) {
+			$("#saveObjects").prop("disabled", false);
+			$(".checkStylebox").prop("checked", false);
+			$("#deleteObjects").prop("disabled", true);
+		}
+		else {
+			$("#deleteObjects,.checkStylebox").prop("disabled", true);
+			$(".checkStylebox").prop("checked", false);
+			$(".popupContent-filter-active").trigger('click');
+			$("#saveObjects").prop("disabled", false);
+		}
+	}
 
-		//Transaction Activity for Delete Scraped Objects Button Action
-		//   var labelArr = [];
-		//   var infoArr = [];
-		//   labelArr.push(txnHistory.codesDict['DeleteScrapedObjects']);
-		//   txnHistory.log(e.type,labelArr,infoArr,$location.$$path);					
+	//Validtion for Duplicate Scraped Objects
+	function duplicateCheck()
+	{
+		var xpath;
+		var duplicateCustnames = [];
+		var duplicateXpath = [];
+		var duplicateXpathElements = {};
+		var duplicateCustnamesElements = {};
+		var isDuplicateCustNames = false;
+		var isDuplicateXpath = false;
+		//validateDuplicateObjects
+		if ($("#scraplist .ellipsis").length > 0) {
+			$.each($("#scraplist span.ellipsis"), function () {
+				$(this).removeClass('duplicateCustname duplicateXpath');
+				var count = 0;
+				if ($(this).parent().parent().attr("data-xpath") != "" && $(this).parent().parent().attr("data-xpath") != undefined) {
+					xpath = $(this).parent().parent().attr("data-xpath");
+					if (appType == 'MobileWeb') {
+						xpath = xpath.split(";")[2];
+					}
+					else {
+						xpath = xpath;
+					}
+					if (count == 0 && !duplicateCustnamesElements.hasOwnProperty($(this).text())) {
+						duplicateCustnamesElements[$(this).text()] = xpath;
+					} else if (duplicateCustnamesElements.hasOwnProperty($(this).text())) {
+						if (count == 0) {
+							duplicateCustnames.push($(this).text());
+							isDuplicateCustNames = true;
+							$(this).addClass('duplicateCustname').css('color', 'red');
+						}
+					}
+				} else {
+					xpath = "";
+					if (!duplicateCustnamesElements.hasOwnProperty($(this).text())) {
+						duplicateCustnamesElements[$(this).text()] = xpath;
+					} else {
+						duplicateCustnames.push($(this).text());
+						isDuplicateCustNames = true;
+						$(this).addClass('duplicateCustname').css('color', 'red');
+					}
+				}
+			});
+			if (!isDuplicateCustNames) {
+				var count = 0;
+				$.each($("#scraplist span.ellipsis"), function () {
+					xpath = $(this).parent().parent().attr("data-xpath");
+					if ($(this).parent().parent().attr("data-xpath") != "" && $(this).parent().parent().attr("data-xpath") != undefined) {
+						if (appType == 'MobileWeb') {
+							xpath = xpath.split(";")[2];
+						}
+						else {
+							xpath = xpath;
+						}
+						if (!duplicateXpathElements.hasOwnProperty(xpath)) {
+							duplicateXpathElements[xpath] = $(this).text();
+						} else {
+							$(this).addClass('duplicateXpath').css('color', 'red');
+							duplicateCustnames.push($(this).text());
+							isDuplicateXpath = true;
+							count = 1;
+						}
+					}
+				});
+			}
 
+			if (isDuplicateCustNames) {
+				openDialog("Save Scrape data", "");
+				$("#globalModal").find('.modal-body p').html("<span><strong>Please rename/delete duplicate scraped objects</strong></span><br /><br /><strong>Object characterstics are same for:</strong>").css("color", "#000").append("<ul class='custList'></ul>");
+				for (var j = 0; j < duplicateCustnames.length; j++) {
+					$("#globalModal").find('.modal-body p ul').append("<li>" + duplicateCustnames[j] + "</li>");
+				}
+				return false;
+			}
+			//for delete if there are multiple xpath goes to save
+			/*
+			else {
+				if (isDuplicateXpath) {
+					$("#saveConfirmObjects").modal('show');
+					$("#saveConfirmObjects").find('.modal-body p').html("<strong>Object characteristics are same for the below list of objects:").css("color", "#000").append("<ul class='custList'></ul><br /> Do you still want to continue?");
+					for (var j = 0; j < duplicateCustnames.length; j++) {
+						$("#saveConfirmObjects").find('.modal-body p ul').append("<li>" + duplicateCustnames[j] + "</li>");
+					}
+					return false;
+				}
+			}*/
+		}
 	}
 
 	//To delete Scrape Objects
 	$scope.del_Objects = function (e) {
+		blockUI('Deleting objects..please wait..')
 		$("#deleteObjectsModal").modal("hide");
 
 		if (deleteScrapeDataservice) {
@@ -2607,7 +2725,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			}
 			//Delete all objects ------------------------------------------
 			deleteScrapedObjects(e);
-			$("#saveObjects").trigger('click');
+			//$("#saveObjects").trigger('click');
 		} else {
 			var tempModifiednames;
 			if (window.localStorage['_modified']) {
@@ -2690,7 +2808,52 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						}
 					}
 					else {
+						var temp_scrapedlist = JSON.stringify(newScrapedList)
 						var dontChkViewString = 0;
+						$.each($("input[type=checkbox].checkall:checked"), function () {
+							var delId = $(this).parent().attr('id').split('_')[1];
+							$(this).parents("li.select_all").remove();
+							delete newScrapedList.view[delId];
+						});						
+						var isduplicate = duplicateCheck();
+						if (isduplicate == false) {
+							unblockUI();
+							//newScrapedList.view = JSON.parse(temp_scrapedlist).view
+							return;
+						}
+						newScrapedList.view = newScrapedList.view.filter(function (n) {
+							return n != null;
+						})
+						var tasks = JSON.parse(window.localStorage['_CT']);
+						var screenId = tasks.screenId;
+						var screenName = tasks.screenName;
+						var projectId = tasks.projectId;
+						var userinfo = JSON.parse(window.localStorage['_UI']);
+						scrapeObject = {};
+						scrapeObject.getScrapeData =JSON.stringify(newScrapedList);
+						scrapeObject.projectId = projectId;
+						scrapeObject.screenId = screenId;
+						scrapeObject.screenName = screenName;
+						scrapeObject.userinfo = userinfo;
+						scrapeObject.param = "updateScrapeData_ICE";
+						scrapeObject.appType = tasks.appType;
+						scrapeObject.versionnumber = tasks.versionnumber;
+						scrapeObject.newData = viewString;
+						if(deleteObjectsFlag==true){
+							scrapeObject.type = "delete";
+							deleteObjectsFlag = false;
+						}
+						else
+							scrapeObject.type = "save";
+						//Update Service to Save Scrape Objects
+						DesignServices.updateScreen_ICE(scrapeObject)
+							.then(function (data) {
+								angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
+								unblockUI()
+								//add popoup for error and saved 
+							}, function (error) {unblockUI()  })
+							return;
+/*	
 						$.each($("input[type=checkbox].checkall:checked"), function () {
 							for (var i = 0; i < newScrapedList.view.length; i++) {
 								if (appType == 'DesktopJava'|| appType == 'Desktop' || appType == 'MobileApp') {
@@ -2738,12 +2901,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									}
 								}
 							})
-						}
+						}*/
 					}
-					$("#saveObjects").trigger('click');
+					deleteScrapedObjects(e)
+					//$("#saveObjects").trigger('click');
 				}
 				else {
 					deleteScrapedObjects(e);
+					$("#saveObjects").trigger('click');
 				}
 				$("#deleteObjects").prop("disabled", true);
 			}
@@ -3466,7 +3631,18 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			//Pushing custom object array in viewString.view
 			for (i = 0; i < customObj.length; i++) {
 				if (custflag!="false"){
+					customObj[i]._id = viewString.view[custflag]._id
 					viewString.view[custflag]=customObj[i]
+					if(window.localStorage['_modified'])
+					{
+						modifiednames = JSON.parse(window.localStorage['_modified']);
+						modifiednames.push("editObj"+JSON.stringify(viewString.view[custflag]))
+						window.localStorage['_modified'] = JSON.stringify(modifiednames)
+					}
+					else{
+						window.localStorage['_modified'] = JSON.stringify(["editObj"+JSON.stringify(viewString.view[custflag])])
+					}
+					window.localStorage['checkEditWorking'] = "true";
 				}else{
 					viewString.view.push(customObj[i])
 				}
@@ -3552,6 +3728,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				var path = viewString.view[i].xpath;
 				var ob = viewString.view[i];
 				ob.tempId = i;
+				var objId = viewString.view[i]._id;
 				var custN = ob.custname.replace(/[<>]/g, '').trim();
 				var tag = ob.tag;
 				if (tag == "dropdown") {
@@ -3563,10 +3740,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				var tag2;
 				if (path != "") {
 					var innerUL = $('#scrapedObjforMap');
-					var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + " draggable='true' ondragstart='drag(event)'> <span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' data-xpath='" + ob.xpath + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></li>";
+					var li = "<li data-id="+objId+"  data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + " draggable='true' ondragstart='drag(event)'> <span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' data-xpath='" + ob.xpath + "' data-id="+objId+" class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></li>";
 					angular.element(innerUL).append(li);
 				} else {
-					var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-tag='" + tag + "' class='item select_all " + tag + "x' dropzone='move s:text/plain' ondrop='drop(event)' ondragover='allowDrop(event)'><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></li>";
+					var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-tag='" + tag + "' class='item select_all " + tag + "x' dropzone='move s:text/plain' ondrop='drop(event)' ondragover='allowDrop(event)'><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' class='ellipsis' data-id="+objId+">" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></li>";
 					$('#customObjforMap').append('<div class="accd-Obj"><div class="accd-Obj-head">' + tag + '</div><div class="accd-Obj-body">' + li + '</div></div>')
 
 					/****Filtering same object type in one container****/
@@ -3761,6 +3938,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				scrapeObject.editedListoldCustName = [];
 				scrapeObject.editedListoldXpath = [];
 				scrapeObject.editedListmodifiedXpaths = [];
+				scrapeObject.fromMerge = [];//update custname
+				scrapeObject.toMerge = [];//delete list
 				scrapeObject.versionnumber = tasks.versionnumber;
 
 				//Filtering the Object which has been mapped
@@ -3770,7 +3949,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					scrapeObject.editedListoldCustName.push($(this).children(".toMergeObj").text());
 					scrapeObject.editedListoldXpath.push($(this).children(".toMergeObj").data("xpath"));
 					scrapeObject.editedListmodifiedXpaths.push($(this).children(".fromMergeObj").data("xpath"));
-
+					scrapeObject.fromMerge.push([$(this).children(".fromMergeObj").data("id"),$(this).children(".toMergeObj").text()])
+					scrapeObject.toMerge.push($(this).children(".toMergeObj").data("id"))
 					/***Resetting Values to Default***/
 					$(this).children(".showPreviousVal").hide();
 					$(this).children(".fromMergeObj").remove();
@@ -3932,11 +4112,16 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	});
 	$(document).on('click', '#noSaveElements', function (e) {
 		$("#saveConfirmObjects").modal('hide');
+		unblockUI()
 		return false;
 	});
 
 	function renameScrapedObjects(e) {
 		blockUI("Saving in progress. Please wait...");
+		var edit = [];
+		var propedit = [];
+		var propeditFlag =  false
+		var unsavedObj = [];
 		var custnames = [];
 		var viewStringXpath = [];
 		var modifiedCustXpath = [];
@@ -3960,11 +4145,16 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				newScrapedList.mirrorwidth = viewString.mirrorwidth;
 			}
 		}
-
+		var modifiedobj = [];
 		if (modifiednames.length > 0) {
 			var mdName;
 			for (var i = 0; i < modifiednames.length; i++) {
 				mdName = modifiednames[i].split("^^");
+				editName = modifiednames[i].split("editObj");
+				if (editName[1]) {
+					propedit.push(JSON.parse(editName[1]))
+					propeditFlag = true
+				}
 				if (eaCheckbox) {
 					if (mdName[1]) {
 						if (newScrapedList.view[mdName[1]]){
@@ -3976,23 +4166,35 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								newxpath = newxpath.slice(0,ind+1)+mdName[0]+newxpath.slice(newxpath.indexOf(';',ind+s_ind),newxpath.length);
 								newScrapedList.view[mdName[1]].xpath = newxpath;
 							}
+							if ("_id" in newScrapedList.view[mdName[1]]){
+								modifiedobj.push([newScrapedList.view[mdName[1]]._id,mdName[0]])
+							}
 						}
 					}
 				}
 				else {
 					if (mdName[1]) {
 						if (viewString.view[mdName[1]]){
-							viewString.view[mdName[1]].custname = mdName[0];
+							if (viewString.view[mdName[1]]._id == undefined){
+								viewString.view[mdName[1]].custname = mdName[0];
+							}
+							else{
+								edit.push([viewString.view[mdName[1]]._id,mdName[0]]);
+							}
+							/*
 							if(viewString.view[mdName[1]].cord != undefined && viewString.view[mdName[1]].cord != ''){
 								var newxpath = viewString.view[mdName[1]].xpath;
 								var ind = newxpath.indexOf(';');
 								var s_ind = newxpath.indexOf(';',ind);
 								newxpath = newxpath.slice(0,ind+1)+mdName[0]+newxpath.slice(newxpath.indexOf(';',ind+s_ind),newxpath.length);
 								viewString.view[mdName[1]].xpath = newxpath;
-							}
+							}*/
 						}	
 					}
 				}
+			}
+			if (edit.length > 0){
+				window.localStorage['_modified'] = JSON.stringify(edit)
 			}
 		}
 		//End of Filter Duplicate Values in ViewString based on custname
@@ -4013,6 +4215,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				//newScrapedList.view.splice(getIndexOfDeletedObjects[i], 1);
 			}
 			newScrapedList.view = newScrapedList.view.filter(function (n) { return n != null });
+			if (modifiedobj.length > 0){
+				newScrapedList.modobj = modifiedobj
+			}
 			getScrapeData = JSON.stringify(newScrapedList);
 			//console.log(newScrapedList.view)
 		}
@@ -4038,6 +4243,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		scrapeObject.screenName = screenName;
 		scrapeObject.userinfo = userinfo;
 		scrapeObject.param = "updateScrapeData_ICE";
+		if (propeditFlag){
+			scrapeObject.propedit = propedit 
+		}
+		if (!eaCheckbox && window.localStorage['_modified'] != "" && edit.length > 0){
+			scrapeObject.param = "edit_updateScrapeData_ICE";
+			scrapeObject.getScrapeData = window.localStorage['_modified'];
+			scrapeObject.scrapedobj = viewString.view
+		}
 		scrapeObject.appType = tasks.appType;
 		scrapeObject.versionnumber = tasks.versionnumber;
 		scrapeObject.newData = viewString;
@@ -4207,6 +4420,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				var testCaseId = taskInfo.testCaseId;
 				var testCaseName = taskInfo.testCaseName;
 				var versionnumber = taskInfo.versionnumber;
+				var import_status = false;
 				if ((screenId != undefined) && (screenId != "undefined") && (testCaseId != undefined) && (testCaseId != "undefined")) {
 					//#D5E7FF  DBF5DF
 					var serviceCallFlag = false;
@@ -4295,7 +4509,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								getScrapeData=res
 								scrape_data = JSON.parse(JSON.stringify(getScrapeData));
 							});
-						DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, mydata, userInfo, versionnumber)
+							DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, mydata, userInfo, versionnumber, import_status)
 							.then(function (data) {
 								if (data == "Invalid Session") {
 									return $rootScope.redirectPage();
@@ -4701,13 +4915,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								}
 								var source = $("#handlebar-template-testcase").html();
 								var template = Handlebars.compile(source);
-								try {
-									JSON.parse(response.testcasesteps);
-								}
-								catch (err) {
-									response.testcasesteps = '[]';
-								}
-								var dat = template({ name: [{ testcasename: response.testcasename }], rows: JSON.parse(response.testcasesteps) });
+								// try {
+								// 	JSON.parse(response.testcasesteps);
+								// }
+								// catch (err) {
+								// 	response.testcasesteps = '[]';
+								// }
+								var dat = template({ name: [{ testcasename: response.testcasename }], rows: response.testcase });
 								var newWindow = window.open();
 								newWindow.document.write(dat);
 							},
@@ -4795,7 +5009,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					if (response == "Invalid Session") {
 						return $rootScope.redirectPage();
 					}
-					var testcaseSteps = JSON.parse(response.testcase);
+					var testcaseSteps = response.testcase;//JSON.parse(response.testcase);
 					if (typeof (testcaseSteps[modalId - 1].addTestCaseDetailsInfo) == "object") {
 						var details = testcaseSteps[modalId - 1].addTestCaseDetailsInfo;
 					}
@@ -4929,7 +5143,8 @@ function contentTable(newTestScriptDataLS) {
 			{ label: 'appType', name: 'appType', editable: false, resizable: false, hidden: true },
 			{ label: 'Details', name: 'addTestCaseDetails', editable: false, resizable: false, sortable: false },
 			{ label: 'Details', name: 'addTestCaseDetailsInfo', editable: false, resizable: false, sortable: false, hidden: true },
-			{ label: 'cord', name: 'cord', editable: false, resizable: false, hidden: true }
+			{ label: 'cord', name: 'cord', editable: false, resizable: false, hidden: true },
+			{ name: 'dataObject', editable: false, resizable: false, hidden: true }
 		],
 		loadonce: false,
 		viewrecords: false,
@@ -5175,6 +5390,9 @@ function contentTable(newTestScriptDataLS) {
 		editable: false
 	});
 	$("#jqGrid").jqGrid("setColProp", "objectName", {
+		editable: false
+	});
+	$("#jqGrid").jqGrid("setColProp", "dataObject", {
 		editable: false
 	});
 	$("#jqGrid").jqGrid("setColProp", "custname", {
@@ -5436,8 +5654,8 @@ function contentTable(newTestScriptDataLS) {
 				$.each(keywordArrayValue, function (k, v) {
 					if (selectedKeyword == k) {
 						if (v != "") {
-							inputSyntax = JSON.parse(v).inputVal;
-							outputSyntax = JSON.parse(v).outputVal;
+							inputSyntax = v.inputval;//JSON.parse(v).inputVal;
+							outputSyntax = v.outputval;//JSON.parse(v).outputVal;
 						}
 						else {
 							inputSyntax = v;
@@ -5463,6 +5681,7 @@ function contentTable(newTestScriptDataLS) {
 		if (selectedText == "@Generic" || selectedText == undefined) {
 			objName = " ";
 			url = " ";
+			dataObject = "";
 			if (appTypeLocal == "MobileApp") {
 				var sc = Object.keys(keywordArrayList.defaultListMobility);
 				selectedKeywordList = "defaultListMobility";
@@ -5480,6 +5699,7 @@ function contentTable(newTestScriptDataLS) {
 				$grid.jqGrid('setCell', rowId, 'appType', "Generic");
 				$grid.jqGrid('setCell', rowId, 'url', url);
 				$grid.jqGrid('setCell', rowId, 'objectName', objName);
+				$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			} else {
 				if (appTypeLocal == 'MobileApp') {
 					var sc = Object.keys(keywordArrayList.defaultListMobility);
@@ -5502,6 +5722,7 @@ function contentTable(newTestScriptDataLS) {
 				$grid.jqGrid('setCell', rowId, 'appType', "Generic");
 				$grid.jqGrid('setCell', rowId, 'url', url);
 				$grid.jqGrid('setCell', rowId, 'objectName', objName);
+				$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 				$grid.jqGrid('setCell', rowId, 'cord', cord);
 			}
 		}
@@ -5523,6 +5744,8 @@ function contentTable(newTestScriptDataLS) {
 			$grid.jqGrid('setCell', rowId, 'appType', "System");
 			$grid.jqGrid('setCell', rowId, 'url', url);
 			$grid.jqGrid('setCell', rowId, 'objectName', objName);
+			dataObject = "";
+			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 		}
 		else if (selectedText == "@Browser") {
 			objName = " ";
@@ -5543,6 +5766,8 @@ function contentTable(newTestScriptDataLS) {
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 			$grid.jqGrid('setCell', rowId, 'url', url);
 			$grid.jqGrid('setCell', rowId, 'objectName', objName);
+			dataObject = "";
+			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
 		} else if (selectedText == "@BrowserPopUp") {
 			objName = " ";
@@ -5563,6 +5788,8 @@ function contentTable(newTestScriptDataLS) {
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 			$grid.jqGrid('setCell', rowId, 'url', url);
 			$grid.jqGrid('setCell', rowId, 'objectName', objName);
+			dataObject = "";
+			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
 		}
 		/**
@@ -5610,6 +5837,8 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'objectName', objName);
+			dataObject = "";
+			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'url', url);
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
@@ -5655,6 +5884,8 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'objectName', objName);
+			dataObject = "";
+			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'url', url);
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
@@ -5677,6 +5908,8 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+			dataObject = "";
+			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 		} else if (selectedText == "Mainframe List") {
 			objName = " ";
 			url = " ";
@@ -5694,6 +5927,8 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+			dataObject = "";
+			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 		} else if (selectedText == "@Email") {
 			objName = " ";
 			url = " ";
@@ -5711,6 +5946,8 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+			dataObject = "";
+			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
 		} else if (selectedText == "@Window") {
 			objName = " ";
@@ -5731,6 +5968,8 @@ function contentTable(newTestScriptDataLS) {
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 			$grid.jqGrid('setCell', rowId, 'url', url);
 			$grid.jqGrid('setCell', rowId, 'objectName', objName);
+			dataObject = "";
+			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
 		} else if (selectedText == "@Oebs") {
 			objName = "";
@@ -5750,6 +5989,8 @@ function contentTable(newTestScriptDataLS) {
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 			$grid.jqGrid('setCell', rowId, 'objectName', objName);
+			dataObject = "";
+			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'url', url);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
 		} else if (selectedText == "@Mobile") {
@@ -5775,6 +6016,8 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+			dataObject = "";
+			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 		} else if (selectedText == "@Action") {
 			objName = " ";
 			url = " ";
@@ -5795,6 +6038,8 @@ function contentTable(newTestScriptDataLS) {
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 			$grid.jqGrid('setCell', rowId, 'objectName', objName);
+			dataObject = "";
+			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'url', url);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
 		} else if (selectedText == "@Android_Custom"){
@@ -5814,6 +6059,8 @@ function contentTable(newTestScriptDataLS) {
             $("select#" + rowId + "_keywordVal", row[0]).html(res);
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+			dataObject = "";
+			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 		} else if (selectedText == "@CustomiOS") {
 			objName = " ";
 			url = " ";
@@ -5831,6 +6078,8 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+			dataObject = "";
+			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 		} else if (selectedText == "@MobileiOS") {
 			objName = " ";
 			url = " ";
@@ -5848,6 +6097,8 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+			dataObject = "";
+			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 		} else if (selectedText == "@Sap") {
 			objName = " ";
 			url = " ";
@@ -5865,6 +6116,8 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+			dataObject = "";
+			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
 		}
 		//Adding @Excel to the objectName dropdown
@@ -5886,6 +6139,8 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', 'Generic');
+			dataObject = "";
+			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
 		} //Adding @Word to the objectName dropdown
 		else if (selectedText == "@Word") {
@@ -5906,6 +6161,8 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', 'Generic');
+			dataObject = "";
+			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
 		}
 		// else if (selectedText.startsWith("@PDF")) {
@@ -5979,6 +6236,7 @@ function contentTable(newTestScriptDataLS) {
 						objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
 					}
 					url = ob.url;
+					dataObject = ob._id;
 					var obType = ob.tag;
 					var listType = ob.canselectmultiple;
 					if (ob.cord) {
@@ -6006,6 +6264,7 @@ function contentTable(newTestScriptDataLS) {
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
+						$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						$grid.jqGrid('setCell', rowId, 'cord', cord);
 						break;
@@ -6027,6 +6286,7 @@ function contentTable(newTestScriptDataLS) {
 						$grid.jqGrid('setCell', rowId, 'appType', 'pdf');
 						$grid.jqGrid('setCell', rowId, 'cord', cord);
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
+						$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 						break;
 					} else if (obType == 'elementWS') {
 						var sc = Object.keys(keywordArrayList.elementWS);
@@ -6044,6 +6304,7 @@ function contentTable(newTestScriptDataLS) {
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
+						$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
 					} else if (appTypeLocal == 'Desktop' && (obType == 'button' || obType == 'input' || obType == 'select' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType == 'treeview' || obType == 'TreeView' || obType == 'tree' ||
@@ -6111,6 +6372,7 @@ function contentTable(newTestScriptDataLS) {
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
+						$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						$grid.jqGrid('setCell', rowId, 'cord', cord);
 						break;
@@ -6131,6 +6393,7 @@ function contentTable(newTestScriptDataLS) {
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
+						$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						$grid.jqGrid('setCell', rowId, 'cord', cord);
 						break;
@@ -6210,6 +6473,7 @@ function contentTable(newTestScriptDataLS) {
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
+						$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						$grid.jqGrid('setCell', rowId, 'cord', cord);
 						break;
@@ -6289,6 +6553,7 @@ function contentTable(newTestScriptDataLS) {
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
+						$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
 					} else if (appTypeLocal == 'MobileApp' && (!(obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0 ||
@@ -6312,6 +6577,7 @@ function contentTable(newTestScriptDataLS) {
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
+						$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
 					} else if (appTypeLocal == 'DesktopJava' && (obType == 'push button' || obType == 'text' || obType == 'combo box' || obType == 'list item' || obType == 'hyperlink' || obType == 'label' || obType == 'scroll bar' || obType == 'toggle button' || obType == 'menu' ||
@@ -6367,6 +6633,7 @@ function contentTable(newTestScriptDataLS) {
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
+						$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						$grid.jqGrid('setCell', rowId, 'cord', cord);
 						break;
@@ -6386,6 +6653,7 @@ function contentTable(newTestScriptDataLS) {
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
+						$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						$grid.jqGrid('setCell', rowId, 'cord', cord);
 						break;
@@ -6395,12 +6663,14 @@ function contentTable(newTestScriptDataLS) {
 			if ($.inArray(selectedText, scrappedDataCustnames) == '-1' && ($(e.target).parents('tr').children('td').find('.editable').length > 0 || $(e.target).children('td').find('select.editable').length > 0)) {
 				console.log(scrappedData);
 				var mydata = $grid.jqGrid('getRowData');
+				dataObject = "";
 				console.log('mydata', mydata);
 				var row = $(e.target).closest('tr.jqgrow');
 				var rowId = row.attr('id');
 				$("select#" + rowId + "_keywordVal", row[0]).html(res);
 				selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 				$grid.jqGrid('setCell', rowId, 'objectName', ' ');
+				$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 				$grid.jqGrid('setCell', rowId, 'url', ' ');
 				$grid.jqGrid('setCell', rowId, 'appType', 'Generic');
 			}
@@ -6450,8 +6720,8 @@ function contentTable(newTestScriptDataLS) {
 			if (selectedKeywordList == keywordArrayKey) {
 				$.each(keywordArrayValue, function (k, v) {
 					if (selectedText == k) {
-						inputSyntax = JSON.parse(v).inputVal;
-						outputSyntax = JSON.parse(v).outputVal;
+						inputSyntax = v.inputval;//JSON.parse(v).inputVal;
+						outputSyntax = v.outputval;//JSON.parse(v).outputVal;
 						$grid.find("td[aria-describedby = jqGrid_inputVal]:visible").find('input').attr("placeholder", inputSyntax).attr("title", inputSyntax);
 						$grid.find("td[aria-describedby = jqGrid_outputVal]:visible").find('input').attr("placeholder", outputSyntax).attr("title", outputSyntax);
 					}
@@ -6472,11 +6742,13 @@ function contentTable(newTestScriptDataLS) {
 		var selectedText = $(selId + ' option:selected').val();
 		var url = " ";
 		var objName = " ";
+		var dataObject = "";
 		setKeyword(e, selectedText, $grid, "empty");
 		//uncomment below two sections to verify change in URL
 		//set the URL to the cell 'url'
 		if (selectedText == "@Generic" || selectedText == undefined || selectedText == "@Browser" || selectedText == "@Excel" || selectedText == "@BrowserPopUp") {
 			$grid.jqGrid('setCell', currRowId, 'objectName', objName);
+			$grid.jqGrid('setCell', currRowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', currRowId, 'url', url);
 		}
 		// else{
@@ -6492,8 +6764,8 @@ function contentTable(newTestScriptDataLS) {
 			if (selectedKeywordList == keywordArrayKey) {
 				$.each(keywordArrayValue, function (k, v) {
 					if (selectedKey == k) {
-						inputSyntax = JSON.parse(v).inputVal;
-						outputSyntax = JSON.parse(v).outputVal;
+						inputSyntax = v.inputval;//JSON.parse(v).inputVal;
+						outputSyntax = v.outputval;//JSON.parse(v).outputVal;
 						$grid.find("td[aria-describedby = jqGrid_inputVal]:visible").find('input').attr("placeholder", inputSyntax).attr("title", inputSyntax);
 						$grid.find("td[aria-describedby = jqGrid_outputVal]:visible").find('input').attr("placeholder", outputSyntax).attr("title", outputSyntax);
 					}
@@ -6573,6 +6845,7 @@ function addTestScriptRow(e) {
 		appTypeLocal = JSON.parse(window.localStorage['_CT']).appType;
 		var emptyRowData = {
 			"objectName": "",
+			"dataObject": "",
 			"custname": "",
 			"keywordVal": "",
 			"inputVal": [""],
@@ -6656,6 +6929,9 @@ function rearrangeTestScriptRow(e) {
 	$("#jqGrid").jqGrid("setColProp", "objectName", {
 		editable: false
 	});
+	$("#jqGrid").jqGrid("setColProp", "dataObject", {
+		editable: false
+	});
 	$("#jqGrid").jqGrid("setColProp", "custname", {
 		editable: false
 	});
@@ -6717,6 +6993,9 @@ function editTestCaseRow(e) {
 			editable: false
 		});
 		$("#jqGrid").jqGrid("setColProp", "objectName", {
+			editable: false
+		});
+		$("#jqGrid").jqGrid("setColProp", "dataObject", {
 			editable: false
 		});
 		$("#jqGrid").jqGrid("setColProp", "custname", {
@@ -6806,16 +7085,17 @@ function copyTestStep(e) {
 				var getRowData = $('#jqGrid').jqGrid('getRowData', rowId);
 				getRowJsonCopy.push({
 					"objectName": $(this).children("td:nth-child(4)").text().trim(),
-					"custname": $(this).children("td:nth-child(5)").text(),
-					"keywordVal": $(this).children("td:nth-child(6)").text(),
-					"inputVal": $(this).children("td:nth-child(7)").text(),
-					"outputVal": $(this).children("td:nth-child(8)").text().trim(),
+					"dataObject": $(this).children("td:nth-child(5)").text().trim(),
+					"custname": $(this).children("td:nth-child(6)").text(),
+					"keywordVal": $(this).children("td:nth-child(7)").text(),
+					"inputVal": $(this).children("td:nth-child(8)").text(),
+					"outputVal": $(this).children("td:nth-child(9)").text().trim(),
 					"stepNo": parseInt($(this).children("td:nth-child(1)").text()),
-					"remarksIcon": $(this).children("td:nth-child(9)").text(),
-					"remarks": $(this).children("td:nth-child(10)").text(),
-					"url": $(this).children("td:nth-child(11)").text().trim(),
-					"appType": $(this).children("td:nth-child(12)").text(),
-					"addTestCaseDetails": $(this).children("td:nth-child(13)").children('img')[0].outerHTML,
+					"remarksIcon": $(this).children("td:nth-child(10)").text(),
+					"remarks": $(this).children("td:nth-child(11)").text(),
+					"url": $(this).children("td:nth-child(12)").text().trim(),
+					"appType": $(this).children("td:nth-child(13)").text(),
+					"addTestCaseDetails": $(this).children("td:nth-child(14)").children('img')[0].outerHTML,
 					"addTestCaseDetailsInfo": getRowData.addTestCaseDetailsInfo,
 					"cord": getRowData.cord
 				});
@@ -6828,6 +7108,9 @@ function copyTestStep(e) {
 			editable: false
 		});
 		$("#jqGrid").jqGrid("setColProp", "objectName", {
+			editable: false
+		});
+		$("#jqGrid").jqGrid("setColProp", "dataObject", {
 			editable: false
 		});
 		$("#jqGrid").jqGrid("setColProp", "custname", {
@@ -7345,6 +7628,7 @@ function drop(ev) {
 	ev.preventDefault();
 	if ($(ev.target).parent("li").find(".ellipsis").hide().hasClass("toMergeObj") == true) {
 		//Enable-Disable dragged element based on drop event
+		$('.fromMergeObj[draggable=true]').attr("data-id",draggedEle.childNodes[1].getAttribute("data-id"))
 		draggedEle.setAttribute("draggable", false)
 		draggedEle.childNodes[1].style.background = "#e0e0e0";
 		draggedEle.childNodes[1].style.cursor = "no-drop";

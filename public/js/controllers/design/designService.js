@@ -22,13 +22,14 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http,$q)   {
 			});
 		},
 
-		getScrapeDataScreenLevel_ICE: function()	{
+		getScrapeDataScreenLevel_ICE: function(type)	{
 			var screenId = JSON.parse(window.localStorage['_CT']).screenId;
 			var projectId = JSON.parse(window.localStorage['_CT']).projectId;
 			return $http.post('/getScrapeDataScreenLevel_ICE',{
 				param : 'getScrapeDataScreenLevel_ICE',
 				screenId : screenId,
-				projectId : projectId
+				projectId : projectId,
+				type:type
 			})
 
 			.then (function(response){return response.data;	},
@@ -87,7 +88,7 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http,$q)   {
 			})
 		},
 
-		updateTestCase_ICE : function(screenId,testCaseId,testCaseName,mydata,userInfo,versionnumber){
+		updateTestCase_ICE : function(screenId,testCaseId,testCaseName,mydata,userInfo,versionnumber,import_status){
 			var modifiedData = JSON.parse(JSON.stringify(mydata));
 			for(i=0;i<modifiedData.length;i++){
 				if(modifiedData[i].inputVal == undefined){
@@ -110,7 +111,8 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http,$q)   {
 				userinfo: userInfo,
 				skucodetestcase : "skucodetestcase",
 				tags: "tags",
-				versionnumber: versionnumber
+				versionnumber: versionnumber,
+				import_status: import_status
 			})
 			.then(function(response)  { 
 				return response.data
