@@ -255,25 +255,26 @@ var qList=[]; //For neurongraphs
 //Create Structure
 exports.saveMindmap = function(req,res)
 {
-	logger.info("Inside UI service: createStructure_Nineteen68");
+	logger.info("Inside UI service: saveMindmap");
 	var createdthrough = 'Mindmaps Creation';
 	var RequestedJSON = req;
-	var projectid = RequestedJSON.projectId;
-	var oldprojectid = RequestedJSON.oldprojectId;
-	var cycleId = RequestedJSON.cycleId;
-	var releaseId = RequestedJSON.releaseId;
-	var appType = RequestedJSON.appType;
-	var userrole = RequestedJSON.userRole;
-	var username = RequestedJSON.userName.toLowerCase();
-	var suiteID = uuid();
-	var suitedetails = RequestedJSON.testsuiteDetails[0];
-	var testsuiteName = suitedetails.testsuiteName;
-	var moduleid_c = suitedetails.testsuiteId_c;
-	var scenarioidlist = [];
-	var scenario = [];
-	var suitedetailslist = [];
-	var versionnumber=0;
-	var newversionnumber=0;
+	// RequestedJSON["createdthrough"]
+	// var projectid = RequestedJSON.projectId;
+	// var oldprojectid = RequestedJSON.oldprojectId;
+	// var cycleId = RequestedJSON.cycleId;
+	// var releaseId = RequestedJSON.releaseId;
+	// var appType = RequestedJSON.appType;
+	// var userrole = RequestedJSON.userRole;
+	// var username = RequestedJSON.userName.toLowerCase();
+	// var suiteID = uuid();
+	// var suitedetails = RequestedJSON.testsuiteDetails[0];
+	// var testsuiteName = suitedetails.testsuiteName;
+	// var moduleid_c = suitedetails.testsuiteId_c;
+	// var scenarioidlist = [];
+	// var scenario = [];
+	// var suitedetailslist = [];
+	// var versionnumber=0;
+	// var newversionnumber=0;
 	if (RequestedJSON.from_version != undefined && RequestedJSON.new_version !=undefined) {
 		versionnumber = RequestedJSON.from_version;
 		newversionnumber = RequestedJSON.new_version;
@@ -293,6 +294,61 @@ exports.saveMindmap = function(req,res)
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occurred in create_ice/saveMindmap: saveMindmap, Error Code : ERRNDAC");
+					res(null, result.rows);
+				} else {
+					projectdetails=result.rows;
+					// callback();
+					res(null, result.rows);
+				}
+			});
+	
+	var cloneflag = RequestedJSON.action;
+	var suiteflag = false;
+	qList=[]; //For neurongraphs
+
+}
+
+exports.saveMindmapE2E = function(req,res)
+{
+	logger.info("Inside UI service: saveMindmapE2E");
+	var createdthrough = 'Mindmaps Creation';
+	var RequestedJSON = req;
+	// RequestedJSON["createdthrough"]
+	// var projectid = RequestedJSON.projectId;
+	// var oldprojectid = RequestedJSON.oldprojectId;
+	// var cycleId = RequestedJSON.cycleId;
+	// var releaseId = RequestedJSON.releaseId;
+	// var appType = RequestedJSON.appType;
+	// var userrole = RequestedJSON.userRole;
+	// var username = RequestedJSON.userName.toLowerCase();
+	// var suiteID = uuid();
+	// var suitedetails = RequestedJSON.testsuiteDetails[0];
+	// var testsuiteName = suitedetails.testsuiteName;
+	// var moduleid_c = suitedetails.testsuiteId_c;
+	// var scenarioidlist = [];
+	// var scenario = [];
+	// var suitedetailslist = [];
+	// var versionnumber=0;
+	// var newversionnumber=0;
+	if (RequestedJSON.from_version != undefined && RequestedJSON.new_version !=undefined) {
+		versionnumber = RequestedJSON.from_version;
+		newversionnumber = RequestedJSON.new_version;
+	}
+
+	var inputs = {
+		"data": RequestedJSON 
+	};
+	var args = {
+		data: inputs,
+		headers: {
+			"Content-Type": "application/json"
+		}
+	};
+
+	client.post("http://WSLK13FODC3-010.SLKSOFT.COM:1991/create_ice/saveMindmapE2E", args,
+				function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.error("Error occurred in create_ice/saveMindmapE2E: saveMindmapE2E, Error Code : ERRNDAC");
 					res(null, result.rows);
 				} else {
 					projectdetails=result.rows;

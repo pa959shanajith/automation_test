@@ -278,7 +278,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 }
 
                 // $(".project-list").val(selectedProject);
-                selectedProject = undefined;
+                // selectedProject = undefined;
 
                 if ($scope.param == 0 && $scope.tab == 'tabCreate') {
                     loadMindmapData1();
@@ -520,7 +520,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $("#ct-saveAction").addClass("disableButton")
         //Adding task to scenario
         taskAssign = {
-            "modules_endtoend": {
+            "endtoend": {
                 "task": ["Execute", "Execute Batch"],
                 "attributes": ["bn", "at", "rw", "sd", "ed", "re_estimation", "pg"]
             },
@@ -796,7 +796,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             unblockUI();
             IncompleteFlowFlag = false;
             var errTemp = false;
-            if (dNodes[0].type != 'modules_endtoend') {
+            if (dNodes[0].type != 'endtoend') {
                 errTemp = treeIterator(undefined, dNodes[0], false);
                 $scope.modType = 'generic';
             }
@@ -1116,7 +1116,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (tObj[k] === undefined) tObj[k] = null;
             });
             //if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','imgs/node-task-assigned.png').attr('x',29).attr('y',-10);
-            if (nType == "modules" || nType == "modules_endtoend") {
+            if (nType == "modules" || nType == "endtoend") {
                 if (dNodes[pi]._id != "null") {
 
                     addTask_11(pi, tObj, 0);
@@ -1271,7 +1271,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         function checkAndUpdate(nObj, parentlist) {
             parentlist.unshift(nObj.id_c);
             if (nObj.id_c == "null") return [false, []];
-            if (nObj.type == 'modules' || nObj.type == 'modules_endtoend') {
+            if (nObj.type == 'modules' || nObj.type == 'endtoend') {
                 return [true, parentlist];
             }
             if (nObj.parent) {
@@ -1401,7 +1401,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !1);
         c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !1);
         if ($scope.tab == 'mindmapEndtoEndModules') {
-            if (t == 'modules_endtoend') {
+            if (t == 'endtoend') {
                 c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !0);
                 c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Module');
                 //513-'Mindmap: When we delete an existing Module and create another module in the same work space  then a new Module instance is being appended .
@@ -1471,7 +1471,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var t = p.attr('data-nodetype');
         var flag = true;
         var apptype = $('.project-list option:selected').attr('app-type')
-        if (t == 'scenarios' && dNodes[pi].parent.type == 'modules_endtoend') {
+        if (t == 'scenarios' && dNodes[pi].parent.type == 'endtoend') {
             flag = false;
         } else if (t == 'screens' && (apptype == "258afbfd-088c-445f-b270-5014e61ba4e2" || apptype == "7a6820f1-2817-4d57-adaf-53734dd2354b")) {
             if (apptype == "7a6820f1-2817-4d57-adaf-53734dd2354b")
@@ -1569,7 +1569,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         res=res.rows
                         for (i = 0; i < res.length; i++) {
                             $('#ct-assignedTo').append("<option data-id='" + res[i]["name"] + "' value='" + res[i]["_id"] + "'>" + res[i]["name"] + "</option>");
-                        }
+						}
                         $("#ct-assignedTo option[value='" + tObj.at + "']").attr('selected', 'selected');
                         if ($("#ct-assignedTo").val() != "select user" && nt.oid != null) {
                             $('#ct-assignedTo').attr('disabled', 'disabled');
@@ -1690,7 +1690,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //var cSize=getElementDimm(c);
         // Removed assgin box overflow (Himanshu)
         var cSize = [268, 386];
-        if (t == 'modules' || t == 'modules_endtoend') cSize = [268, 452];
+        if (t == 'modules' || t == 'endtoend') cSize = [268, 452];
         //var cSize1=[270,386];
         var canvSize = getElementDimm(d3.select("#ct-mapSvg"));
         var split_char = ',';
@@ -2051,7 +2051,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $scope.createMultipleNode = function() {
         $(".view-msg").empty();
         switch (d3.select(activeNode).attr('data-nodetype')) {
-            case 'modules_endtoend':
+            case 'endtoend':
                 $scope.addedntype = 'Scenario';
                 break;
             case 'modules':
@@ -2652,7 +2652,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 renamed: (d.rnm) ? d.rnm : !1,
                 orig_name: (d.original_name) ? d.original_name : null,
                 taskexists: (d.taskexists) ? d.taskexists : null,
-                state: (d.state) ? d.state : null,
+                state: (d.state) ? d.state : "created",
                 cidxch: (d.cidxch) ? d.cidxch : null // childindex changed
             });
             if (d.type == 'testcases') c[c.length - 1].screenname = d.parent.name; // **Impact check**
@@ -2682,7 +2682,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             pid_c: (d.parent) ? d.parent.id_c : null,
             task: (d.task) ? d.task : null,
             renamed: (d.rnm) ? d.rnm : !1,
-            orig_name: (d.original_name) ? d.original_name : null
+            orig_name: (d.original_name) ? d.original_name : null,
+            state : (d.state) ? d.state : "created"
         });
         if (d.children && d.children.length > 0) d.children.forEach(function(t) {
             e = treeIterator_W(c, t, e);
@@ -3055,7 +3056,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
             counter[key] = counter[key] + 1;
         })
-        // var restrict_scenario_reuse = parseDataReuse(true);
+        //var restrict_scenario_reuse = parseDataReuse(true);
         if (selectedTab != 'tabAssign') {
             if (restrict_scenario_reuse['reuseScenarios'].length > 0) {
                 openDialogMindmap('Error', "Scenario names cannot be reused, please rename the following: " + restrict_scenario_reuse['reuseScenarios'].join());
@@ -3093,7 +3094,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
 
             error = treeIterator(mapData, dNodes[0], error);
-            if (dNodes[0].type == 'modules_endtoend') {
+            if (dNodes[0].type == 'endtoend') {
                 cur_module = 'end_to_end';
                 error = false;
             } else {
@@ -3208,7 +3209,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         unblockUI();
                         IncompleteFlowFlag = false;
                         var errTemp = false;
-                        if (dNodes[0].type != 'modules_endtoend') {
+                        if (dNodes[0].type != 'endtoend') {
                             errTemp = treeIterator(undefined, dNodes[0], false);
                             $scope.modType = 'generic';
                         }
@@ -3367,22 +3368,18 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         error = treeIterator_W(mapData, dNodes[0], error);
 
         if (s.attr('id') == 'ct-saveAction') {
+            if (error) {
+                openDialogMindmap("Error", "Mindmap flow must be complete! End to End Module -> Scenarios");
+                return;
+            }
             blockUI('Saving flow! Please wait...');
             flag = 10;
             d3.select('#ct-inpBox').classed('no-disp', !0);
-
-
-        } else if (s.attr('id') == 'ct-createAction') {
-            flag = 20;
-            if (error) {
-                openDialogMindmap("Error", "Mindmap flow must be complete! End to End Module -> Scenarios");
-                //$('#Mindmap_error').modal('show');
-                return;
-            }
-            blockUI('Creating structure! Please wait...');
+            // flag = 20;
+            // blockUI('Creating structure! Please wait...');
             d3.select('#ct-inpBox').classed('no-disp', !0);
 
-        }
+        // }
         if (flag == 0) return;
         if (s.classed('no-access')) return;
         //s.classed('no-access', !0);
@@ -3394,10 +3391,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             return !1;
         }
         var cur_project = $('#selectProjectEtem').val();
-        var selectedProject = '';
+        // var selectedProject = '';
 
         mapData.forEach(function(d) {
-            if (d.type == 'modules_endtoend') {
+            if (d.type == 'endtoend') {
                 selectedProject = d.projectID;
                 return;
             }
@@ -3525,9 +3522,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         })
 
     };
-
-    $scope.loadEndToEnd = function(mapid, type, name) {
-        if (type == 'modules_endtoend') loadScenarios(name);
+    }
+    
+    $scope.loadEndToEnd = function(mapid, type, name,modid) {
+        if (type == 'endtoend') loadScenarios(modid);
         loadEndtoEndModule(name, mapid, type);
     }
 
@@ -3688,7 +3686,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             cSize = getElementDimm(d3.select("#ct-mapSvg"));
         var typeNum = {
             'modules': 0,
-            'modules_endtoend': 0,
+            'endtoend': 0,
             'scenarios': 1,
             'screens': 2,
             'testcases': 3
@@ -4136,7 +4134,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //$('#ct-saveAction_W').removeClass('no-access');
         //uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];scrList=[];tcList=[];cSpan=[0,0];cScale=1;mapSaved=!1;
         taskAssign = {
-            "modules_endtoend": {
+            "endtoend": {
                 "task": ["Execute"],
                 "attributes": ["at", "rw", "sd", "ed"]
             },
@@ -4206,7 +4204,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 id: uNix,
                 childIndex: 0,
                 name: 'Module_0',
-                type: 'modules_endtoend',
+                type: 'endtoend',
                 y: s[0] * 0.2,
                 x: s[1] * 0.4,
                 children: [],
@@ -4218,7 +4216,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 id: uNix,
                 childIndex: 0,
                 name: 'Module_0',
-                type: 'modules_endtoend',
+                type: 'endtoend',
                 y: s[1] * 0.4,
                 x: s[0] * 0.2,
                 children: [],
@@ -4280,14 +4278,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         cur_module = $('[data-mapid=' + $('#createNewConfirmationPopup').attr('mapid') + ']');
         initiate();
         clearSvg();
-        var modName = $('#createNewConfirmationPopup').attr('mapid');
-        var moduleid =$('#createNewConfirmationPopup').attr('_id');
-        mindmapServices.getModules(versioning_enabled, 'endToend', $scope.projectNameO, 0, $('.cycle-list').val(), modName,moduleid)
+        var moduleid = $('#createNewConfirmationPopup').attr('mapid');
+        // var moduleid =$('#createNewConfirmationPopup').attr('_id');
+        mindmapServices.getModules(versioning_enabled, 'endToend', $scope.projectNameO, 0, $('.cycle-list').val(), null,moduleid)
             .then(function(result) {
                 if (result == "Invalid Session") {
                     return $rootScope.redirectPage();
                 }
-                currMap = result[0];
+                currMap = result;
                 treeBuilder_W(currMap);
             }, function(error) {
                 console.log(error);
@@ -4296,7 +4294,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     function loadEndtoEndModule(name, mapid, type) {
-        if (type != 'modules_endtoend') {
+        if (type != 'endtoend') {
             if (Object.keys($scope.nodeDisplay).length == 0) { // if no map is loaded 
                 openDialogMindmap('Error', 'First, Please select an end to end module or create a new one!');
                 return;
@@ -4318,8 +4316,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $('#eteSearchScenarios').val("");
         var container = $("#eteScenarioContainer");
         container.empty();
-        var moduleid = allMaps_info[mapid].id_n;
-        if (allMaps_info[mapid].type == "modules_endtoend") {
+        var moduleid = allMaps_info[mapid]._id;
+        if (allMaps_info[mapid].type == "endtoend") {
             return;
         }
         blockUI("Loading module.. Please wait..");
@@ -4329,7 +4327,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
             container.empty();
             result.forEach(function(row) {
-                container.append("<span class='eteScenrios' data-scenarioId='" + row.testScenarioID + "' title='" + row.testScenarioName + "'>" + row.testScenarioName + "</span>")
+                container.append("<span class='eteScenrios' data-scenarioId='" + row._id + "' title='" + row.name + "'>" + row.name + "</span>")
             });
             // #817 To select multiple scenarios in e2e (Himanshu)
             var nCounter=0;
@@ -4353,12 +4351,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             unblockUI();
         }, function(error) {
             unblockUI();
-            openDialogMindmap("error", "error occured while loading module");
+            openDialogMindmap("Error", "Error occured while loading Module");
             console.log(error);
         })
     }
 
-    function createScenario_Node(text, scenario_prjId) {
+    function createScenario_Node(text, scenario_prjId,scrid) {
         if (text == '') return;
         //If module is in edit mode, then return do not add any node
         if (d3.select('#ct-inpBox').attr('class') == "") return;
@@ -4384,7 +4382,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 x: 90 + 30 * Math.floor(Math.random() * (Math.floor((w - 150) / 80))),
                 children: [],
                 parent: dNodes[pi],
-                state: 'created'
+                state: 'created',
+                _id:scrid
             };
             //TO fix issue with random positions of newly created nodes
             if (dNodes[pi].children.length > 0) {
@@ -4539,8 +4538,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //// #817 To select multiple scenarios in e2e (Himanshu)
         sortedSpanArray.each(function(i, obj) {
             var text = $(obj).text();
-            if ($(obj).attr('data-scenarioId') != 'null') {
-                createScenario_Node(text, $('#selectProjectEtem').val());
+            var scrid = $(obj).attr('data-scenarioId')
+            if (scrid!= 'null') {
+                createScenario_Node(text, $('#selectProjectEtem').val(),scrid);
             } else {
                 openDialogMindmap('Error', 'Scenario is not created');
             }
@@ -4588,7 +4588,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             levelCount = [1],
             cSize = getElementDimm(d3.select("#ct-mapSvg"));
         var typeNum = {
-            'modules_endtoend': 0,
+            'endtoend': 0,
             'scenarios': 1,
             'screens': 2,
             'testcases': 3
@@ -4864,15 +4864,15 @@ Purpose : displaying pop up for replication of project
                 var nodeBox = d3.select('.ct-nodeBox');
                 // $(nodeBox[0]).empty();
                 $scope.allMMaps = res;
-                // $scope.allMMaps.forEach(function (e, i) {
-                //     var t = $.trim(e.name);
-                //     var img_src = 'imgs/node-modules-no.png';
-                //     if (e.type == 'modules_endtoend') img_src = 'imgs/MM5.png';
-                //     var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
-                //     node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
-                //     if(t.length>20) t = t.substring(0, 20)+'...';
-                //     node.append('span').attr('class', 'ct-nodeLabel').html(t);
-                // });
+                $scope.allMMaps.forEach(function (e, i) {
+                    var t = $.trim(e.name);
+                    var img_src = 'imgs/node-modules-no.png';
+                    if (e.type == 'endtoend') img_src = 'imgs/MM5.png';
+                    var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
+                    node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
+                    if(t.length>20) t = t.substring(0, 20)+'...';
+                    node.append('span').attr('class', 'ct-nodeLabel').html(t);
+                });
                 populateDynamicInputList();
                 setModuleBoxHeight();
                 unblockUI();

@@ -122,7 +122,7 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 				deletednode: deletednode,
 				unassignTask: unassignTask,
 				prjId: prjId,
-				relId: relId,
+				relId: relId || null,
 				cycId: cycId
     		})
     		.then(function (response) { return response.data; },

@@ -67,7 +67,7 @@
                <span class="eteLabel makeElementFloatleft no-disp">End to End Modules</span>
             </div>
             <div class="scrollbar-inner endtoend-modules-left-lower makeElementFloatleft" style="overflow-y:auto !important" id="etemModuleContainer">
-                <span class="moduleContainer" ng-repeat="map in allMMaps" ng-click="loadEndToEnd($index,map.type,map.name)" data-mapid="{{$index}}" title="{{map.name}}">
+                <span class="moduleContainer" ng-repeat="map in allMMaps" ng-click="loadEndToEnd($index,map.type,map.name,map._id)" data-mapid="{{$index}}" title="{{map.name}}">
                     <img class="ct-nodeIcon eteMbox" src="imgs/node-{{map.type}}.png" alt="Module" aria-hidden="true">
                     <span class="ct-nodeLabel ct-node-e2e" style="width: 120px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 20px;">{{map.name}}</span>
                 </span>                 
@@ -205,9 +205,9 @@
             </span>
             <span class="selectProject">
                <label class="selectProjectLabel">Project:</label>
-               <!-- <select class="project-list" ng-change="projectListChange(projectName3,$index)" ng-model="projectName3"> -->
-                <select class="project-list" ng-model="projectName3">
-                    <option ng-repeat="project in projectList" ng-selected="projectNameO == project.id" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}' ng-click="projectListChange(project.id,$index)">{{project.name}}</option>
+               <select class="project-list" ng-change="projectListChange(projectName3,$index)" ng-model="projectName3">
+                <!-- <select class="project-list" ng-model="projectName3"> -->
+                    <option ng-repeat="project in projectList" ng-selected="projectNameO == project.id" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}' >{{project.name}}</option>
                </select>
             </span>
             <span class="selectRelease selectProjectPosition"> 
