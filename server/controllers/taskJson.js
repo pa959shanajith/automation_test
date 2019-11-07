@@ -80,7 +80,7 @@ exports.getTaskJson_mindmaps = function (req, res) {
 				}
 			};
 
-			client.post("http://WSLK13FODC3-010.SLKSOFT.COM:1991/plugins/getTasksJSON", args,
+			client.post(epurl+"plugins/getTasksJSON", args,
 			function (result, response) {
 				try {
 					if (response.statusCode != 200 || result.rows == "fail") {

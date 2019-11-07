@@ -290,7 +290,7 @@ exports.saveMindmap = function(req,res)
 		}
 	};
 
-	client.post("http://WSLK13FODC3-010.SLKSOFT.COM:1991/create_ice/saveMindmap", args,
+	client.post(epurl+"create_ice/saveMindmap", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occurred in create_ice/saveMindmap: saveMindmap, Error Code : ERRNDAC");
@@ -345,7 +345,7 @@ exports.saveMindmapE2E = function(req,res)
 		}
 	};
 
-	client.post("http://WSLK13FODC3-010.SLKSOFT.COM:1991/create_ice/saveMindmapE2E", args,
+	client.post(epurl+"create_ice/saveMindmapE2E", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occurred in create_ice/saveMindmapE2E: saveMindmapE2E, Error Code : ERRNDAC");
@@ -1857,7 +1857,7 @@ exports.getProjectIDs_Nineteen68 = function (req, res) {
 		function (callback) {
 			logger.info("Calling NDAC Service from getProjectIDs_Nineteen68: create_ice/getProjectIDs_Nineteen68");
 			// client.post(epurl+"create_ice/getProjectIDs_Nineteen68", args,
-			client.post("http://WSLK13FODC3-010.SLKSOFT.COM:1991/create_ice/getProjectIDs_Nineteen68", args,
+			client.post(epurl+"create_ice/getProjectIDs_Nineteen68", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occurred in create_ice/getProjectIDs_Nineteen68: getProjectIDs_Nineteen68, Error Code : ERRNDAC");
@@ -1895,7 +1895,7 @@ exports.getProjectType_Nineteen68 = function (req, res) {
 		}
 	};
 	logger.info("Calling NDAC Service from getProjectType_Nineteen68: create_ice/getProjectType_Nineteen68");
-	client.post("http://WSLK13FODC3-010.SLKSOFT.COM:1991/create_ice/getProjectType_Nineteen68", args,
+	client.post(epurl+"create_ice/getProjectType_Nineteen68", args,
 		function (result, response) {
 		try {
 			if (response.statusCode != 200 || result.rows == "fail") {
