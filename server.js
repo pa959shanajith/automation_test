@@ -516,9 +516,9 @@ if (cluster.isMaster) {
 		app.post('/testLDAPConnection', admin.testLDAPConnection);
 		app.post('/getLDAPConfig', admin.getLDAPConfig);
 		app.post('/manageLDAPConfig', admin.manageLDAPConfig);
-		app.post('/generateCIusertokens', admin.generateCIusertokens)
+		// app.post('/generateCIusertokens', admin.generateCIusertokens)
 		app.post('/getCIUsersDetails', admin.getCIUsersDetails);
-		app.post('/deactivateCIUser', admin.deactivateCIUser);
+		app.post('/manageCIUsers ', admin.manageCIUsers );
 
 		//Design Screen Routes
 		app.post('/initScraping_ICE', new_design.initScraping_ICE);
