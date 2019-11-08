@@ -1044,10 +1044,7 @@ exports.getAssignedProjects_ICE = function (req, res) {
 											logger.error("Error occurred in admin/getAssignedProjects_ICE inside async function Error Code : ERRNDAC");
 											res.send("fail");
 										} else {
-											if (result.rows.length > 0) {
-												res.send(result.rows)
-											}
-											// assignProjectCallback();
+											res.send(result.rows)
 										}
 									} catch (exception) {
 										logger.error(exception.message);

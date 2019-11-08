@@ -227,11 +227,11 @@ exports.populateScenarios = function (req, res) {
 			}
 		};
 
-		client.post("http://WSLK13FODC3-010.SLKSOFT.COM:1991/mindmap/getScenarios", args,
+		client.post(epurl+"mindmap/getScenarios", args,
 		function (result, response) {
 			try {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in mindmaps/getModules: getModules, Error Code : ERRNDAC");
+					logger.error("Error occurred in mindmap/getScenarios: getScenarios, Error Code : ERRNDAC");
 					res.send("fail");
 				} else {
 					res.send(result.rows);
@@ -476,7 +476,7 @@ exports.getModules = function (req, res) {
 			}
 		};
 
-		client.post("http://WSLK13FODC3-010.SLKSOFT.COM:1991/mindmap/getModules", args,
+		client.post(epurl+"mindmap/getModules", args,
 		function (result, response) {
 			try {
 				if (response.statusCode != 200 || result.rows == "fail") {
@@ -856,6 +856,8 @@ exports.saveData = function (req, res) {
 		var urlData = req.get('host').split(':');
 		var inputs = req.body;
 		var data = inputs.map;
+		var vn_from="0.0";
+		var vn_to="0.0";
 		var tab = inputs.tab;
 		var assignedAt = inputs.UtcTime;
 		var selectedTab = inputs.selectedTab;
@@ -863,14 +865,15 @@ exports.saveData = function (req, res) {
 		var deletednodes = inputs.deletednode;
 		var user = req.session.username;
 		var userrole = req.session.activeRole;
-		var userid = req.session.user_id;
-		var userroleid = req.session.role;
+		var userid = req.session.userid;
+		var userroleid = req.session.activeRoleId;
 		var flag = inputs.write;
 		var removeTask = inputs.unassignTask;
 		var sendNotify = inputs.sendNotify;
 		var relId = inputs.relId;
 		var cycId = inputs.cycId;
 		var idxDict = [];
+		var createdthrough='Web'
 		//Assigned Tasks Notification
 		var assignedObj = {};
 		for (var k = 0; k < data.length; k++) {
@@ -1097,7 +1100,7 @@ exports.saveData = function (req, res) {
 			var cycId=inputs.cycId;
 
 			// Creating the data for running the Create Structure Query
-			var qObj = { "projectid": prjId, "cycleId": cycId, "appType": "Web", "testsuiteDetails": [], "userName": user, "userRole": userrole,"userid":userid,"roleid":userroleid };
+			var qObj = { "projectid": prjId, "cycleId": cycId, "appType": "Web", "testsuiteDetails": [], "versionnumber": parseFloat(vn_from), "newversionnumber":  parseFloat(vn_to) ,"username": user, "userrole": userrole,"userid":userid,"userroleid":userroleid,"createdthrough":createdthrough };
 			var nObj = [], tsList = [];
 			data.forEach(function (e, i) {
 				if (e.type == "modules") rIndex = uidx;
@@ -1348,7 +1351,7 @@ exports.saveData = function (req, res) {
 				}
 			}
 			logger.info("Calling NDAC Service from newProjectDetails : admin/createProject_ICE");
-			client.post("http://127.0.0.1:1991/mindmap/manageTaskDetails", args,
+			client.post(epurl+"mindmap/manageTaskDetails", args,
 				function (data, response) {
 					if (response.statusCode != 200 || data.rows == "fail") {
 						logger.error("Error occurred in mindmap/manageTaskDetails from newProjectDetails Error Code : ERRNDAC");
@@ -1907,8 +1910,8 @@ exports.saveEndtoEndData = function (req, res) {
 		var deletednodes = inputs.deletednode;
 		var user = req.session.username;
 		var userrole = req.session.activeRole;
-		var userid = req.session.user_id;
-		var userroleid = req.session.role;
+		var userid = req.session.userid;
+		var userroleid = req.session.activeRoleId;
 		var flag = inputs.write;
 		var relId = inputs.relId;
 		var cycId = inputs.cycId;
@@ -2058,7 +2061,7 @@ exports.saveEndtoEndData = function (req, res) {
 			var vn_to = inputs.vn_from;
 			var idn_v_idc = {};
 
-			var qObj = { "projectId": prjId, "testsuiteDetails": [], "userName": user, "userRole": userrole, "from_version": parseFloat(vn_from), "new_version": vn_to , "userRole": userrole,"userid":userid,"roleid":userroleid };
+			var qObj = { "projectid": prjId, "testsuiteDetails": [], "username": user, "userrole": userrole, "versionnumber": parseFloat(vn_from), "newversionnumber": vn_to , "userid":userid,"userroleid":userroleid };
 			var nObj = [], tsList = [];
 			data.forEach(function (e, i) {
 				if (e.type == "endtoend") rIndex = uidx;
@@ -2068,7 +2071,7 @@ exports.saveEndtoEndData = function (req, res) {
 				idDict[e.id] = uidx++;
 			});
 
-			// var qObj = { "projectid": prjId, "cycleId": cycId, "appType": "Web", "testsuiteDetails": [], "userName": user, "userRole": userrole,"userid":userid,"roleid":userroleid };
+			// var qObj = { "projectid": prjId, "cycleId": cycId, "appType": "Web", "testsuiteDetails": [], "userName": user, "userRole": userrole,"userid":userid,"roleid": };
 			// var nObj = [], tsList = [];
 			// data.forEach(function (e, i) {
 			// 	if (e.type == "modules") rIndex = uidx;

@@ -506,26 +506,36 @@ function next_function(resultobj,projectid)
 					// 	task_json.testCaseId = parent[4];
 					// 	//task_json.scenarioId=parent[2];
 					// }
-
-					if(t.nodetype=="testscenarios")
+					if(t.nodetype=="testsuites")
+					{
+						testSuiteDetails_obj.testsuiteid=t.nodeid;
+						testSuiteDetails_obj.testsuitename = t.name;
+						
+					}
+					else if(t.nodetype=="testscenarios")
 					{
 						testSuiteDetails_obj.testsuiteid=t.parent|| null;
+						task_json.scenarioId = t.nodeid;
+						task_json.scenarioName=t.name;
 					}
 					else if(t.nodetype=="screens")
 					{
 						task_json.projectId=t.parent|| null;
+						task_json.screenId=t.nodeid;
+						task_json.screenName = t.name;
 					}
 					else if(t.nodetypes=="testcases")
 					{
 						task_json.scenarioId=t.parent|| null;
+						task_json.testCaseId=t.nodeid;
+						task_json.testCaseName = t.name;
 					}
-					testSuiteDetails_obj.testsuitename = 'modulename';
+					
 					// testSuiteDetails_obj.projectidts = parent[0];
 					testSuiteDetails_obj.assignedTestScenarioIds = '';
 					
-					task_json.screenName = 'screenname';
-					task_json.scenarioName = 'scenarioname';
-					task_json.testCaseName = 'testcasename';
+					
+					
 					//Check if versioning exists
 					function versioningCheck() {
 						versioningEnabled = ' ';

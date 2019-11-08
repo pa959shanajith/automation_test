@@ -3057,12 +3057,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             counter[key] = counter[key] + 1;
         })
         //var restrict_scenario_reuse = parseDataReuse(true);
-        if (selectedTab != 'tabAssign') {
-            if (restrict_scenario_reuse['reuseScenarios'].length > 0) {
-                openDialogMindmap('Error', "Scenario names cannot be reused, please rename the following: " + restrict_scenario_reuse['reuseScenarios'].join());
-                return;
-            }
-        }
+        // if (selectedTab != 'tabAssign') {
+        //     if (restrict_scenario_reuse['reuseScenarios'].length > 0) {
+        //         openDialogMindmap('Error', "Scenario names cannot be reused, please rename the following: " + restrict_scenario_reuse['reuseScenarios'].join());
+        //         return;
+        //     }
+        // }
         if (s.attr('id') == 'ct-saveAction' || $event.target.getAttribute('id')=='ct-saveAction') {
             blockUI('Saving Flow! Please wait...');
 
@@ -3578,14 +3578,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function populateDynamicInputList() {
-        mindmapServices.getScreens($('.project-list').val()).then(function(result) {
-            if (result == "Invalid Session") {
-                return $rootScope.redirectPage();
-            } else {
-                scrList = result.screenList;
-                tcList = result.testCaseList;
-            }
-        })
+        // mindmapServices.getScreens($('.project-list').val()).then(function(result) {
+        //     if (result == "Invalid Session") {
+        //         return $rootScope.redirectPage();
+        //     } else {
+        //         scrList = result.screenList;
+        //         tcList = result.testCaseList;
+        //     }
+        // })
     };
 
     //FUnction is tagged to every click on 'cnavas' element to validate the names of nodes when created
