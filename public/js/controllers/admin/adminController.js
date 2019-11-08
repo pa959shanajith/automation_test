@@ -151,6 +151,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				$rootScope.redirectPage();
 			} else {
 				$("#selDomains").empty()
+				$("#selDomains").append('<option> Select Domain </option>')
 				for (var i=0;i<data.length;i++){
 					$("#selDomains").append('<option value="'+data[i]+'">'+data[i]+'</option>')
 				}

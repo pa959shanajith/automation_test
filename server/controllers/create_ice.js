@@ -6,7 +6,6 @@ var uuid = require('uuid-random');
 var async = require('async');
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var neo4jAPI = require('../controllers/neo4jAPI');
 var logger = require('../../logger');
 var epurl = process.env.NDAC_URL;
 var qList=[]; //For neurongraphs

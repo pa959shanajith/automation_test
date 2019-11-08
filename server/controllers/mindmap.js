@@ -1,5 +1,4 @@
 var uuidV4 = require('uuid-random');
-var neo4jAPI = require('../controllers/neo4jAPI');
 var admin = require('../controllers/admin');
 var suite = require('../controllers/suite');
 var create_ice = require('../controllers/create_ice');
@@ -348,52 +347,56 @@ exports.checkReuse = function (req, res) {
 	logger.info("Inside UI service: checkReuse");
 	if (utils.isSessionActive(req)) {
 		var d = req.body;
-		var qData = d.parsedata; // this is coming from mindmapservice which is restrict_scenario_reuse from parsedata reuse in minmapcontroller.js
-		var qListReuse = getQueries(qData);
-		neo4jAPI.executeQueries(qListReuse, function (status, result) {
-			res.setHeader('Content-Type', 'application/json');
-			if (status != 200) {
-				logger.error('Error in checkReuse mindmap service');
-				res.status(500).send('Fail');
-			}
-			else {
-				if (qData.gettestcases) {
-					res.status(200).send(result[0].data[0].row[0]);
-				}
-				else {
-					var i = 0;
-					while (i < qData['screen'].length) {
-						if (result[i].data[0].row[0] > 1)
-							qData['screen'][i].reuse = true;
-						else
-							qData['screen'][i].reuse = false;
-						qData['screen'][i].count = result[i].data[0].row[0];
-						i = i + 1;
-					}
-					var j = 0;
-					while (j < qData['testcase'].length) {
-						if (result[i + j].data[0].row[0].length > 1) {
-							qData['testcase'][j].reuse = true;
-							qData['testcase'][j].oidlist = result[i + j].data[0].row[0];
-						}
-						else
-							qData['testcase'][j].reuse = false;
-						j = j + 1;
-					}
-					var k = 0;
-					if (qData['scenarios']) {
-						while (k < qData['scenarios'].length) {
-							if (result[k].data.length > 0 && (result[k].data[0].row[0] > 1 || (result[k].data[0].row[0] == 1 && qData['modules'] != result[k].data[0].row[1])))
-								qData['scenarios'][k].reuse = true;
-							else
-								qData['scenarios'][k].reuse = false;
-							k = k + 1;
-						}
-					}
-					res.status(status).send(qData);
-				}
-			}
-		});
+		var qData = d.parsedata; 
+		/* 
+		 	Check Reuse LOgic goes here
+		*/
+		// this is coming from mindmapservice which is restrict_scenario_reuse from parsedata reuse in minmapcontroller.js
+		//var qListReuse = getQueries(qData);
+		// neo4jAPI.executeQueries(qListReuse, function (status, result) {
+		// 	res.setHeader('Content-Type', 'application/json');
+		// 	if (status != 200) {
+		// 		logger.error('Error in checkReuse mindmap service');
+		// 		res.status(500).send('Fail');
+		// 	}
+		// 	else {
+		// 		if (qData.gettestcases) {
+		// 			res.status(200).send(result[0].data[0].row[0]);
+		// 		}
+		// 		else {
+		// 			var i = 0;
+		// 			while (i < qData['screen'].length) {
+		// 				if (result[i].data[0].row[0] > 1)
+		// 					qData['screen'][i].reuse = true;
+		// 				else
+		// 					qData['screen'][i].reuse = false;
+		// 				qData['screen'][i].count = result[i].data[0].row[0];
+		// 				i = i + 1;
+		// 			}
+		// 			var j = 0;
+		// 			while (j < qData['testcase'].length) {
+		// 				if (result[i + j].data[0].row[0].length > 1) {
+		// 					qData['testcase'][j].reuse = true;
+		// 					qData['testcase'][j].oidlist = result[i + j].data[0].row[0];
+		// 				}
+		// 				else
+		// 					qData['testcase'][j].reuse = false;
+		// 				j = j + 1;
+		// 			}
+		// 			var k = 0;
+		// 			if (qData['scenarios']) {
+		// 				while (k < qData['scenarios'].length) {
+		// 					if (result[k].data.length > 0 && (result[k].data[0].row[0] > 1 || (result[k].data[0].row[0] == 1 && qData['modules'] != result[k].data[0].row[1])))
+		// 						qData['scenarios'][k].reuse = true;
+		// 					else
+		// 						qData['scenarios'][k].reuse = false;
+		// 					k = k + 1;
+		// 				}
+		// 			}
+		// 			res.status(status).send(qData);
+		// 		}
+		// 	}
+		// });
 	}
 	else {
 		logger.error("Invalid Session");
@@ -695,16 +698,16 @@ exports.getModules = function (req, res) {
 	}
 };
 
-function check_status(ExecutionData,check_callback){
-	if(ExecutionData && taskflow){
-		utils.approval_status_check(ExecutionData, function (err, approved) {
-			check_callback(err,approved)
-		});
-	}else{
-		check_callback(null,true);
-	}
+// function check_status(ExecutionData,check_callback){
+// 	if(ExecutionData && taskflow){
+// 		utils.approval_status_check(ExecutionData, function (err, approved) {
+// 			check_callback(err,approved)
+// 		});
+// 	}else{
+// 		check_callback(null,true);
+// 	}
 	
-}
+// }
 
 exports.reviewTask = function (req, res) {
 	logger.info("Inside UI service: reviewTask");
@@ -724,97 +727,101 @@ exports.reviewTask = function (req, res) {
 			taskID=JSON.stringify(batchIds);
 		}
 		var ExecutionData=inputs.module_info;
-		check_status(ExecutionData, function (err, check_status_result) {
-			if (check_status_result){
-				var cur_date = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + ',' +date.toLocaleTimeString();
-				var taskHistory = { "userid": userId, "status": "", "modifiedBy": username, "modifiedOn": cur_date };
-				if (status == 'inprogress' || status == 'assigned' || status == 'reassigned' || status == 'reassign') {
-					query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.assignedTo='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
-				} else if (status == 'review') {
-					query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.reviewer='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
-				}
+		res.status(200).send('success');
+		/** 
+		 * New logic needs to be implemented for Review task and Strict WOrkflow
+		 * */ 
+		// check_status(ExecutionData, function (err, check_status_result) {
+		// 	if (check_status_result){
+		// 		var cur_date = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + ',' +date.toLocaleTimeString();
+		// 		var taskHistory = { "userid": userId, "status": "", "modifiedBy": username, "modifiedOn": cur_date };
+		// 		if (status == 'inprogress' || status == 'assigned' || status == 'reassigned' || status == 'reassign') {
+		// 			query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.assignedTo='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
+		// 		} else if (status == 'review') {
+		// 			query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.reviewer='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
+		// 		}
 
-				var qlist_query = [query];
-				var new_queries = [];
-				var task_flag = false;
-				neo4jAPI.executeQueries(qlist_query, function (status_code, result) {
-					if (status_code != 200) {
-						res.status(status_code).send(result);
-					} else {
-						try {
-							var res_data = result;
-							if (res_data[0].data.length != 0 && res_data[0].data[0]['graph']['nodes'] != null) {
-								var task = '';
-								var task_relation = '';
-								if (res_data[0].data[0]['graph']['nodes'][0].labels[0] == 'TASKS') {
-									task = res_data[0].data[0]['graph']['nodes'][0];
-									task_relation = res_data[0].data[0]['graph']['nodes'][1];
-								}
-								else {
-									task = res_data[0].data[0]['graph']['nodes'][1];
-									task_relation = res_data[0].data[0]['graph']['nodes'][0];
-								}
-								var neo_taskHistory = task.taskHistory;
-								if ((status == 'inprogress' || status == 'assigned' || status == 'reassigned') && task.reviewer != 'select reviewer') {
-									taskHistory.status = 'review';
-									if (neo_taskHistory == undefined || neo_taskHistory == '') {
-										neo_taskHistory = [taskHistory];
-									} else {
-										neo_taskHistory = JSON.parse(neo_taskHistory);
-										neo_taskHistory.push(taskHistory);
-									}
-									neo_taskHistory = JSON.stringify(neo_taskHistory);
-									query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.assignedTo='" + userId + "' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review',n.taskHistory='" + neo_taskHistory + "' RETURN n" };
-									new_queries.push(query);
-									task_flag = true;
+		// 		var qlist_query = [query];
+		// 		var new_queries = [];
+		// 		var task_flag = false;
+		// 		neo4jAPI.executeQueries(qlist_query, function (status_code, result) {
+		// 			if (status_code != 200) {
+		// 				res.status(status_code).send(result);
+		// 			} else {
+		// 				try {
+		// 					var res_data = result;
+		// 					if (res_data[0].data.length != 0 && res_data[0].data[0]['graph']['nodes'] != null) {
+		// 						var task = '';
+		// 						var task_relation = '';
+		// 						if (res_data[0].data[0]['graph']['nodes'][0].labels[0] == 'TASKS') {
+		// 							task = res_data[0].data[0]['graph']['nodes'][0];
+		// 							task_relation = res_data[0].data[0]['graph']['nodes'][1];
+		// 						}
+		// 						else {
+		// 							task = res_data[0].data[0]['graph']['nodes'][1];
+		// 							task_relation = res_data[0].data[0]['graph']['nodes'][0];
+		// 						}
+		// 						var neo_taskHistory = task.taskHistory;
+		// 						if ((status == 'inprogress' || status == 'assigned' || status == 'reassigned') && task.reviewer != 'select reviewer') {
+		// 							taskHistory.status = 'review';
+		// 							if (neo_taskHistory == undefined || neo_taskHistory == '') {
+		// 								neo_taskHistory = [taskHistory];
+		// 							} else {
+		// 								neo_taskHistory = JSON.parse(neo_taskHistory);
+		// 								neo_taskHistory.push(taskHistory);
+		// 							}
+		// 							neo_taskHistory = JSON.stringify(neo_taskHistory);
+		// 							query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.assignedTo='" + userId + "' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review',n.taskHistory='" + neo_taskHistory + "' RETURN n" };
+		// 							new_queries.push(query);
+		// 							task_flag = true;
 
-								} else if (status == 'review') {
-									taskHistory.status = 'complete';
-									if (neo_taskHistory == undefined || neo_taskHistory == '') {
-										neo_taskHistory = [taskHistory];
-									} else {
-										neo_taskHistory = JSON.parse(neo_taskHistory)
-										neo_taskHistory.push(taskHistory);
-									}
-									neo_taskHistory = JSON.stringify(neo_taskHistory);
-									query = { 'statement': "MATCH (m)-[r]-(n:TASKS) WHERE n.taskID in " + taskID + " and n.reviewer='" + userId + "' set n.assignedTo='',n.status='complete',n.taskHistory='" + neo_taskHistory + "' DELETE r RETURN n" };
-									new_queries.push(query);
-									task_flag = true;
-								} else if (status == 'reassign') {
-									taskHistory.status = 'reassigned';
-									if (neo_taskHistory == undefined || neo_taskHistory == '') {
-										neo_taskHistory = [taskHistory];
-									} else {
-										neo_taskHistory = JSON.parse(neo_taskHistory);
-										neo_taskHistory.push(taskHistory);
-									}
-									neo_taskHistory = JSON.stringify(neo_taskHistory);
-									query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.reviewer='" + userId + "' set n.reviewer=n.assignedTo,n.assignedTo=n.task_owner,n.status='reassigned',n.taskHistory='" + neo_taskHistory + "' RETURN n" };
-									new_queries.push(query);
-									task_flag = true;
-								}
-								if (task_flag) {
-									neo4jAPI.executeQueries(new_queries, function (status, result) {
-										if (status != 200) res.status(status).send(result);
-										else res.status(200).send('success');
+		// 						} else if (status == 'review') {
+		// 							taskHistory.status = 'complete';
+		// 							if (neo_taskHistory == undefined || neo_taskHistory == '') {
+		// 								neo_taskHistory = [taskHistory];
+		// 							} else {
+		// 								neo_taskHistory = JSON.parse(neo_taskHistory)
+		// 								neo_taskHistory.push(taskHistory);
+		// 							}
+		// 							neo_taskHistory = JSON.stringify(neo_taskHistory);
+		// 							query = { 'statement': "MATCH (m)-[r]-(n:TASKS) WHERE n.taskID in " + taskID + " and n.reviewer='" + userId + "' set n.assignedTo='',n.status='complete',n.taskHistory='" + neo_taskHistory + "' DELETE r RETURN n" };
+		// 							new_queries.push(query);
+		// 							task_flag = true;
+		// 						} else if (status == 'reassign') {
+		// 							taskHistory.status = 'reassigned';
+		// 							if (neo_taskHistory == undefined || neo_taskHistory == '') {
+		// 								neo_taskHistory = [taskHistory];
+		// 							} else {
+		// 								neo_taskHistory = JSON.parse(neo_taskHistory);
+		// 								neo_taskHistory.push(taskHistory);
+		// 							}
+		// 							neo_taskHistory = JSON.stringify(neo_taskHistory);
+		// 							query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.reviewer='" + userId + "' set n.reviewer=n.assignedTo,n.assignedTo=n.task_owner,n.status='reassigned',n.taskHistory='" + neo_taskHistory + "' RETURN n" };
+		// 							new_queries.push(query);
+		// 							task_flag = true;
+		// 						}
+		// 						if (task_flag) {
+		// 							neo4jAPI.executeQueries(new_queries, function (status, result) {
+		// 								if (status != 200) res.status(status).send(result);
+		// 								else res.status(200).send('success');
 
-									});
-								} else {
-									res.status(200).send('fail');
-								}
-							}
-							else {
-								res.status(200).send('fail');
-							}
-						} catch (ex) {
-							logger.error("exception in mindmapService: ", ex);
-							res.status(200).send('fail');
-						}
-					}
-				});
-			}
-			else res.status(err.status).send(err.res);
-		});
+		// 							});
+		// 						} else {
+		// 							res.status(200).send('fail');
+		// 						}
+		// 					}
+		// 					else {
+		// 						res.status(200).send('fail');
+		// 					}
+		// 				} catch (ex) {
+		// 					logger.error("exception in mindmapService: ", ex);
+		// 					res.status(200).send('fail');
+		// 				}
+		// 			}
+		// 		});
+		// 	}
+		// 	else res.status(err.status).send(err.res);
+		// });
 	}
 	else {
 		logger.error("Invalid Session");

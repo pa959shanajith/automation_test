@@ -7,7 +7,6 @@ var uuid = require('uuid-random');
 var bcrypt = require('bcryptjs');
 var epurl = process.env.NDAC_URL;
 var Client = require("node-rest-client").Client;
-var neo4jAPI = require('../controllers/neo4jAPI');
 var client = new Client();
 var schedule = require('node-schedule');	
 var scheduleStatus = "";
@@ -16,7 +15,6 @@ var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
 var taskflow = require('../config/options').strictTaskWorkflow;
 if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT)*1024*1024;
-var qList = [];
 
 /**
  * @author vishvas.a
@@ -27,7 +25,6 @@ var qList = [];
  */
 exports.readTestSuite_ICE = function (req, res) {
 	logger.info("Inside UI service: readTestSuite_ICE");
-	qList = [];
 	 if (utils.isSessionActive(req)) {
 		var requiredreadTestSuite = req.body.readTestSuite;
 		var fromFlg = req.body.fromFlag;
@@ -165,16 +162,7 @@ exports.readTestSuite_ICE = function (req, res) {
 		},function(){
 			logger.info("Inside final function of the service readTestSuite_ICE");
 			logger.info("Calling function executeQueries from final function of the service readTestSuite_ICE");
-			neo4jAPI.executeQueries(qList,function(status,result){
-				if(status!=200){
-					logger.error("Status:",status,"\nResponse: ",result);
-				}
-				else{
-					logger.info('Success');
-				}
-				logger.info("Sending Testsuite details from the service readTestSuite_ICE");
-				res.send(responsedata);
-			});
+			res.send(responsedata);
 		});
 	} 
 	else {
@@ -367,7 +355,6 @@ function Projectnametestcasename_ICE(req, cb, data) {
 
 exports.updateTestSuite_ICE = function (req, res) {
     logger.info("Inside UI service: updateTestSuite_ICE");
-    qList = [];
     if (utils.isSessionActive(req)) {
         var userinfo = {"username": req.session.username, "role": req.session.activeRole};
         var batchDetails = req.body.batchDetails.suiteDetails;

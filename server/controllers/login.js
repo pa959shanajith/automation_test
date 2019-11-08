@@ -95,7 +95,7 @@ exports.checkUserState_Nineteen68 = function (req, res) {
 								emsg = err;
 							} else {
 								logger.info("Inside function call of checkAssignedProjects");
-								if (role != "Admin" && !assignedProjects) {
+								if (role != "admin" && !assignedProjects) {
 									emsg = "noProjectsAssigned";
 									logger.info("User has not been assigned any projects");
 								} else {
@@ -151,7 +151,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 						}
 					};
 					logger.info("Calling NDAC Service from userInfo : loadUser_Nineteen68");
-					client.post(epurl2 + "login/loadUser_Nineteen68", args,
+					client.post(epurl + "login/loadUser_Nineteen68", args,
 						function (result, response) {
 						if (response.statusCode != 200 || result.rows == "fail") {
 							logger.error("Error occurred in loadUser_Nineteen68 Error Code : ERRNDAC");
@@ -186,7 +186,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 						}
 					};
 					logger.info("Calling NDAC Service from loggedinRole: loadPermission_Nineteen68");
-					client.post(epurl2 + "login/loadPermission_Nineteen68", args,
+					client.post(epurl+ "login/loadPermission_Nineteen68", args,
 						function (result, response) {
 						if (response.statusCode != 200 || result.rows == "fail") {
 							logger.error("Error occurred in loadPermission_Nineteen68 Error Code : ERRNDAC");
@@ -206,7 +206,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 								if (selectedRole == req.session.defaultRoleId) req.session.defaultRole = rolename;
 								req.session.activeRole = rolename;
 								jsonService.rolename = req.session.defaultRole;
-								jsonService.page = (jsonService.rolename == "Admin")? "admin":"plugin";
+								jsonService.page = (jsonService.rolename == "admin")? "admin":"plugin";
 								callback(null);
 							}
 						}

@@ -1614,21 +1614,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 					if (error) {
 						logger.error("Error occurred in function newProjectDetails");
 						res.send("fail");
-					} else {
-						logger.info("Calling neo4jAPI execute queries for updateProject_ICE");
-                        neo4jAPI.executeQueries(qList,function(status,result){
-                           // res.setHeader('Content-Type', 'application/json');
-                            if(status!=200){
-                              logger.info("Error in neo4jAPI execute queries with status for updateProject_ICE: %d",status,"\n response for updateProject_ICE: %s",result);
-                            }
-                            else{
-                               logger.info('neo4jAPI execute queries for updateProject_ICE executed successfully');
-                               res.send("success");
-                            }
-                        });
-						 logger.info('neo4jAPI execute queries for updateProject_ICE executed successfully');
-						//res.send("success");
-					}
+					} 
 				});
 			} else {
 				res.send('fail');

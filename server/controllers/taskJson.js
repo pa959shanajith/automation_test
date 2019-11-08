@@ -1,24 +1,17 @@
 var async = require('async');
-var neo4jAPI = require('../controllers/neo4jAPI');
 var logger = require('../../logger');
 var utils = require('../lib/utils');
 var Client = require("node-rest-client").Client;
 var client = new Client();
+var epurl = process.env.NDAC_URL;
 
 exports.updateTaskstatus_mindmaps = function (req, res) {
 	logger.info("Inside UI service: updateTaskstatus_mindmaps");
 	if (utils.isSessionActive(req)) {
 		try {
 			var obj=req.body.obj;
-			var qlist_query = [{'statement': "MATCH (n:TASKS{taskID:'"+obj+"'}) set n.status='inprogress'"}];
-			neo4jAPI.executeQueries(qlist_query,function(status,result){
-				if(status!=200) {
-					logger.info(result);
-				}
-				else {
-					res.send('inprogress');
-				}
-			});
+			//Mongo query needs to be written to change the task status
+			res.send('inprogress');
 		} catch (error) {
 			logger.error("exception occurred in updateTaskstatus_mindmaps",error);
 		}

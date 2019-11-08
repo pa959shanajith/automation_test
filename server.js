@@ -454,7 +454,7 @@ if (cluster.isMaster) {
 		var qc = require('./server/controllers/qualityCenter');
 		var webocular = require('./server/controllers/webocular');
 		var chatbot = require('./server/controllers/chatbot');
-		var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
+		//var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
 		var taskbuilder = require('./server/controllers/taskJson');
 		var flowGraph = require('./server/controllers/flowGraph');
 
@@ -571,7 +571,7 @@ if (cluster.isMaster) {
 		app.post('/getTopMatches_ProfJ', chatbot.getTopMatches_ProfJ);
 		app.post('/updateFrequency_ProfJ', chatbot.updateFrequency_ProfJ);
 		//NeuronGraphs Plugin Routes
-		app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
+		//app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
 		//QC Plugin
 		app.post('/loginQCServer_ICE', qc.loginQCServer_ICE);
 		app.post('/qcProjectDetails_ICE', qc.qcProjectDetails_ICE);
@@ -626,7 +626,7 @@ if (cluster.isMaster) {
 							httpsServer.close();
 							logger.error("Please run the Service API and Restart the Server");
 						} else {
-							suite.reScheduleTestsuite();
+							//suite.reScheduleTestsuite();
 							console.info("Nineteen68 Server Ready...\n");
 						}
 					} catch (exception) {
