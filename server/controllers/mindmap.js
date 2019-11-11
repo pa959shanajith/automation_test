@@ -1168,11 +1168,11 @@ exports.saveData = function (req, res) {
 						tsk.parent=""
 						tsk.createdon=""
 						tsk.assignedtime=""
-						tsk.startdate=t.startDate
-						tsk.enddate=t.endDate
-						tsk.assignedto=t.assignedTo
+						tsk.startdate=t.startdate
+						tsk.enddate=t.enddate
+						tsk.assignedto=t.assignedto
 						tsk.reviewer=t.reviewer
-						tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedTo
+						tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
 						tsk.batchname=t.batchName
 						tsk.status=t.tstatus
 						tsk.details=t.details
@@ -1180,6 +1180,7 @@ exports.saveData = function (req, res) {
 						tsk.complexity=""
 						tsk.history=[]
 						tsk.id=t.oid
+						tsk.projectid=prjId
 						if (tsk.id!=null){
 							tasks_update.push(tsk)
 						}
@@ -1198,11 +1199,11 @@ exports.saveData = function (req, res) {
 						tsk.parent=""
 						tsk.createdon=""
 						tsk.assignedtime=""
-						tsk.startdate=t.startDate
-						tsk.enddate=t.endDate
-						tsk.assignedto=t.assignedTo
+						tsk.startdate=t.startdate
+						tsk.enddate=t.enddate
+						tsk.assignedto=t.assignedto
 						tsk.reviewer=t.reviewer
-						tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedTo
+						tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
 						tsk.batchname=t.batchName
 						tsk.status=t.tstatus
 						tsk.details=t.details
@@ -1210,6 +1211,7 @@ exports.saveData = function (req, res) {
 						tsk.complexity=""
 						tsk.history=[]
 						tsk.id=t.oid
+						tsk.projectid=prjId
 						if (tsk.id!=null){
 							tasks_update.push(tsk)
 						}
@@ -1230,11 +1232,11 @@ exports.saveData = function (req, res) {
 						tsk.parent=t.parent
 						tsk.createdon=""
 						tsk.assignedtime=""
-						tsk.startdate=t.startDate
-						tsk.enddate=t.endDate
-						tsk.assignedto=t.assignedTo
+						tsk.startdate=t.startdate
+						tsk.enddate=t.enddate
+						tsk.assignedto=t.assignedto
 						tsk.reviewer=t.reviewer
-						tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedTo
+						tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
 						tsk.batchname=""
 						tsk.status=t.tstatus
 						tsk.details=t.details
@@ -1242,6 +1244,7 @@ exports.saveData = function (req, res) {
 						tsk.complexity=""
 						tsk.history=[]
 						tsk.id=t.oid
+						tsk.projectid=prjId
 						if (tsk.id!=null){
 							tasks_update.push(tsk)
 						}
@@ -1262,11 +1265,11 @@ exports.saveData = function (req, res) {
 						tsk.parent=prjId
 						tsk.createdon=""
 						tsk.assignedtime=""
-						tsk.startdate=t.startDate
-						tsk.enddate=t.endDate
-						tsk.assignedto=t.assignedTo
+						tsk.startdate=t.startdate
+						tsk.enddate=t.enddate
+						tsk.assignedto=t.assignedto
 						tsk.reviewer=t.reviewer
-						tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedTo
+						tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
 						tsk.batchname=""
 						tsk.status=t.tstatus
 						tsk.details=t.details
@@ -1274,6 +1277,7 @@ exports.saveData = function (req, res) {
 						tsk.complexity=""
 						tsk.history=[]
 						tsk.id=t.oid
+						tsk.projectid=prjId
 						if (tsk.id != null) {
 							if (cycId == t.cycle) {
 								tasks_update.push(tsk)
@@ -1306,11 +1310,11 @@ exports.saveData = function (req, res) {
 						tsk.parent=t.parent
 						tsk.createdon=""
 						tsk.assignedtime=""
-						tsk.startdate=t.startDate
-						tsk.enddate=t.endDate
-						tsk.assignedto=t.assignedTo
+						tsk.startdate=t.startdate
+						tsk.enddate=t.enddate
+						tsk.assignedto=t.assignedto
 						tsk.reviewer=t.reviewer
-						tsk.owner=null
+						tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
 						tsk.batchname=""
 						tsk.status=t.tstatus
 						tsk.details=t.details
@@ -1318,6 +1322,7 @@ exports.saveData = function (req, res) {
 						tsk.complexity=""
 						tsk.history=[]
 						tsk.id=t.oid
+						tsk.projectid=prjId
 						if (tsk.id != null) {
 							if (cycId == t.cycle) {
 								tasks_update.push(tsk)
@@ -1342,7 +1347,7 @@ exports.saveData = function (req, res) {
 			var inputs={
 				"update": tasks_update,
 				"insert": tasks_insert,
-				"action": "modify"
+				"action": "modify",
 			}
 			var args={
 				data: inputs,
@@ -1352,12 +1357,16 @@ exports.saveData = function (req, res) {
 			}
 			logger.info("Calling NDAC Service from newProjectDetails : admin/createProject_ICE");
 			client.post(epurl+"mindmap/manageTaskDetails", args,
-				function (data, response) {
-					if (response.statusCode != 200 || data.rows == "fail") {
+				function (data_var, response) {
+					if (response.statusCode != 200 || data_var.rows == "fail") {
 						logger.error("Error occurred in mindmap/manageTaskDetails from newProjectDetails Error Code : ERRNDAC");
 						res.send("fail");
 					} else {
-						res.send(result.rows);
+						var modid='fail'
+						if (data_var.rows == "success"){
+							modid=data[0]._id
+						}
+						res.send(modid);
 					}
 			});
 			// if (tab != 'end_to_end') {

@@ -275,7 +275,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		enabledEdit = "false";
 		blockUI("Loading...");
 		// service call # 1 - getTestScriptData service call
-		DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
+		DesignServices.readTestCase_ICE(testCaseId, testCaseName, versionnumber)
 			.then(function (data) {
 				if (data == "Invalid Session") {
 					return $rootScope.redirectPage();
@@ -531,7 +531,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							if (flag == false) {
 								openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
 							} else {
-								DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
+								DesignServices.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
 									.then(function (data) {
 										if (data == "Invalid Session") {
 											return $rootScope.redirectPage();
@@ -604,7 +604,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						if (flag == false) {
 							openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
 						} else {
-							DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
+							DesignServices.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
 								.then(function (data) {
 									// console.log("hello");
 									if (data == "Invalid Session") {
@@ -669,7 +669,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						if (flag == false) {
 							openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
 						} else {
-							DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
+							DesignServices.updateTestCase_ICE( testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
 								.then(function (data) {
 									if (data == "Invalid Session") {
 										return $rootScope.redirectPage();
@@ -706,7 +706,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		var testCaseId = taskInfo.testCaseId;
 		var testCaseName = taskInfo.testCaseName;
 		var versionnumber = taskInfo.versionnumber;
-		DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
+		DesignServices.readTestCase_ICE(testCaseId, testCaseName, versionnumber)
 			.then(function (response) {
 				if (response == "Invalid Session") {
 					return $rootScope.redirectPage();
@@ -4509,7 +4509,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								getScrapeData=res
 								scrape_data = JSON.parse(JSON.stringify(getScrapeData));
 							});
-							DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, mydata, userInfo, versionnumber, import_status)
+							DesignServices.updateTestCase_ICE(testCaseId, testCaseName, mydata, userInfo, versionnumber, import_status)
 							.then(function (data) {
 								if (data == "Invalid Session") {
 									return $rootScope.redirectPage();
@@ -4908,7 +4908,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					$(".viewReadOnlyTC").click(function () {
 						var testCaseName = this.getAttribute('data-name'),
 							testCaseId = this.getAttribute('data-id');
-						DesignServices.readTestCase_ICE(undefined, testCaseId, testCaseName, 0)
+						DesignServices.readTestCase_ICE(testCaseId, testCaseName, 0)
 							.then(function (response) {
 								if (response == "Invalid Session") {
 									return $rootScope.redirectPage();
@@ -5004,7 +5004,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			var testCaseId = taskInfo.testCaseId;
 			var testCaseName = taskInfo.testCaseName;
 			var versionnumber = taskInfo.versionnumber;
-			DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
+			DesignServices.readTestCase_ICE(testCaseId, testCaseName, versionnumber)
 				.then(function (response) {
 					if (response == "Invalid Session") {
 						return $rootScope.redirectPage();

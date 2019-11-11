@@ -73,10 +73,9 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http,$q)   {
 			})
 		},
 
-		readTestCase_ICE : function(screenId,testCaseId,testCaseName,versionnumber){
+		readTestCase_ICE : function(testCaseId,testCaseName,versionnumber){
 			return $http.post('/readTestCase_ICE',{
 				param : 'readTestCase_ICE',
-				screenid: screenId,
 				testcaseid: testCaseId,
 				testcasename: testCaseName,
 				versionnumber: versionnumber
@@ -88,7 +87,7 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http,$q)   {
 			})
 		},
 
-		updateTestCase_ICE : function(screenId,testCaseId,testCaseName,mydata,userInfo,versionnumber,import_status){
+		updateTestCase_ICE : function(testCaseId,testCaseName,mydata,userInfo,versionnumber,import_status){
 			var modifiedData = JSON.parse(JSON.stringify(mydata));
 			for(i=0;i<modifiedData.length;i++){
 				if(modifiedData[i].inputVal == undefined){
@@ -104,7 +103,6 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http,$q)   {
 			}
 			return $http.post('/updateTestCase_ICE',{
 				param : 'updateTestCase_ICE',
-				screenid: screenId,
 				testcaseid: testCaseId,
 				testcasename: testCaseName,
 				testcasesteps: JSON.stringify(modifiedData),
