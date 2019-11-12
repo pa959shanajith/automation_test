@@ -192,8 +192,8 @@ var routeUtil = {
 			});
 			else return res.sendFile("app.html", { root: __dirname + "/../../public/" });
 		});
-		authRouter.post("/authenticateUser_Nineteen68", function (req, res, next){
-			logger.info("Inside UI service: authenticateUser_Nineteen68");
+		authRouter.post(opts.route.login, function (req, res, next){
+			logger.info("Inside UI service: login");
 			// Credentials for service user that can restart services
 			if (req.body.username == "restartservice" && req.body.password == "r3Start@3") return res.send("restart");
 			return passport.authenticate("local", {
