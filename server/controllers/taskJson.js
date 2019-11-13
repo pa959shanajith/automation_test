@@ -133,17 +133,18 @@ var tasktypes = {
 	'Map': ['Scrape', 'Design', 'Create Screen']
 };
 
+//This dict has to be buit run time . Query Projecttypekeywords to build this dict for one time
 var projectTypes = {
-	'41e1c61b-fb17-4eda-a3a7-e1d7578ea166': 'Desktop',
-	'3e7d1a83-3add-4ed1-86f4-9ca80fea5758': 'Webservice',
-	'396d8a74-aeb3-41a7-a943-4bfe8b915c6f': 'MobileApp',
-	'f7d09f53-4c11-4e14-a37c-5001d8b4042d': 'DesktopJava',
-	'e9ed5428-64e4-45e0-b4f1-77e1803ab4fe': 'Web',
-	'b2a208a5-8c9d-4a7f-b522-0df14993dbd2': 'MobileWeb',
-	'07181740-f420-4ea1-bf2b-5219d6535fb5': 'Generic',
-	'258afbfd-088c-445f-b270-5014e61ba4e2': 'Mainframe',
-	'1fd77879-4dbb-416a-a46d-126d27fee2c7': 'SAP',
-	'7a6820f1-2817-4d57-adaf-53734dd2354b':'System'
+	'5da0d5d2f87fdec084ae4954': 'Desktop',
+	'5da0d5d2f87fdec084ae495c': 'Webservice',
+	'5da0d5d2f87fdec084ae4956': 'MobileApp',
+	'5da0d5d2f87fdec084ae4958': 'OEBS',
+	'5da0d5d2f87fdec084ae495b': 'Web',
+	'5da0d5d2f87fdec084ae4957': 'MobileWeb',
+	'5da0d5d1f87fdec084ae4953': 'Generic',
+	'5da0d5d2f87fdec084ae4955': 'Mainframe',
+	'5da0d5d2f87fdec084ae4959': 'SAP',
+	'5da0d5d2f87fdec084ae495a':'System'
 };
 
 var screen_tasks=['scrape','append','compare','add','map'];
@@ -391,8 +392,8 @@ function next_function(resultobj,projectid)
 {
 	logger.info("Inside function: next_function ");
 	var result = resultobj;
-	// var prjId = projectid.projectId;
-	// var appTypes = projectid.appType;
+	var prjId = projectid.projectId;
+	var appTypes = projectid.appType;
 	var jsonData = result;
 	var alltasks = jsonData;
 	var user_task_json = [];
@@ -456,10 +457,10 @@ function next_function(resultobj,projectid)
 		var batch_flag = false;
 		//To support the task assignmnet in scenario
 		if (t.tasktype == 'Execute' || t.tasktype == 'Execute Scenario' || t.tasktype == 'Execute Batch') {
-			testSuiteDetails_obj.releaseid = t.release || ' ';
+			testSuiteDetails_obj.releaseid = t.release || '';
 			testSuiteDetails_obj.cycleid = t.cycle;
 		}else{
-			task_json.releaseid=t.release || ' ';
+			task_json.releaseid=t.release || '';
 			task_json.cycleid=t.cycle;
 		}
 		if (t.taskvn !== undefined) {
@@ -483,7 +484,13 @@ function next_function(resultobj,projectid)
 		}
 		// var parent = t.parent.substring(1, t.parent.length - 1).split(",");
 		// var parent_length = parent.length;
-		task_json.projectId = projectid;
+		task_json.projectId = t.projectid;
+		var index = prjId.indexOf(t.projectid);
+		var apptype=projectTypes[appTypes[index]];
+		task_json.appType=apptype;
+		
+				// if(!(screen_tasks.indexOf(t.tasktype.toLowerCase())>-1 && apptype=='Mainframe')){
+				// 	task_json.appType = apptype;
 		// parent_length=1;
 		// if (parent_length >= 2) {
 			//Checking if the user is assigned to that project before showing the task to the user
@@ -524,7 +531,7 @@ function next_function(resultobj,projectid)
 						task_json.screenId=t.nodeid;
 						task_json.screenName = t.name;
 					}
-					else if(t.nodetypes=="testcases")
+					else if(t.nodetype=="testcases")
 					{
 						task_json.scenarioId=t.parent|| null;
 						task_json.testCaseId=t.nodeid;
