@@ -203,7 +203,7 @@ exports.debugTestCase_ICE = function (req, res) {
 								};
 								var flag = "";
 								var inputs = {
-									"query": "testcaseid",
+									"query": "testcaseids",
 									"testcaseid": requestedtestcaseids,
 									"userid": req.body.userInfo.user_id
 								};
