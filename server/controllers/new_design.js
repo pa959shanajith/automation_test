@@ -151,6 +151,10 @@ exports.getScrapeDataScreenLevel_ICE = function (req, res) {
 			if (req.body.type == "WS_screen"){
 				inputs.query = "getWSscrapedata";
 			}
+			else if (req.body.testCaseId){
+				inputs.testcaseid = req.body.testCaseId;//Send versionnumber also if needed
+				delete inputs['screenid'];
+			}
 			logger.info("Calling function fetchScrapedData from getScrapeDataScreenLevel_ICE service");
 			fetchScrapedData(inputs, function (err, getScrapeDataQueryresponse) {
 				logger.info("Scraped Data sent successfully from getScrapeDataScreenLevel_ICE service");
