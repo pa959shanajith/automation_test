@@ -538,7 +538,7 @@ function next_function(resultobj,projectid)
 						task_json.testCaseName = t.name;
 					}
 					
-					// testSuiteDetails_obj.projectidts = parent[0];
+					testSuiteDetails_obj.projectidts = t.projectid;
 					testSuiteDetails_obj.assignedTestScenarioIds = '';
 					
 					
