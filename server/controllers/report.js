@@ -293,7 +293,7 @@ exports.getSuiteDetailsInExecution_ICE = function(req, res) {
                             for (var i = 0; i < executionData.rows.length; i++) {
                                 startTime = new Date(executionData.rows[i].starttime);
                                 endTime = new Date(executionData.rows[i].endtime);
-                                starttime = startTime.getDate() + "-" + (startTime.getMonth() + 1) + "-" + startTime.getFullYear() + " " + startTime.getHours() + ":" + startTime.getMinutes();
+                                starttime = startTime.getUTCDate() + "-" + (startTime.getUTCMonth() + 1) + "-" + startTime.getUTCFullYear() + " " + startTime.getUTCHours() + ":" + startTime.getUTCMinutes();
                                 endtime = endTime.getUTCDate() + "-" + (endTime.getUTCMonth() + 1) + "-" + endTime.getUTCFullYear() + " " + (endTime.getUTCHours()) + ":" + (+endTime.getUTCMinutes());
                                 executionDetailsJSON.push({
                                     execution_id: executionData.rows[i]._id,
@@ -479,7 +479,7 @@ exports.getReport_Nineteen68 = function(req, res) {
                                             var reportdata = iterator.report;
                                             var executedtime = iterator.executedtime;
                                             var testscenarioid = iterator.testscenarioid;
-											var cycleid = iterator.cycle;
+											var cycleid = iterator.cycleid;
 											var executionId = iterator.executionid;
                                             reportjson.reportdata = reportdata;
                                             reportInfoObj.reportId = reportId;

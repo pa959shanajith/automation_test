@@ -296,8 +296,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						if (data2 == "Invalid Session") {
 							return $rootScope.redirectPage();
 						}
-						if (appType == "Webservice") {
-							if (data2 != "") dataFormat12 = data2.header[0].split("##").join("\n");
+						if (appType == "Webservice"){
+							if (data2.view.length > 0) dataFormat12 = data2.view[0].header[0].split("##").join("\n");
 						}
 						custnameArr.length = 0;
 						// counter to append the items @ correct indexes of custnameArr

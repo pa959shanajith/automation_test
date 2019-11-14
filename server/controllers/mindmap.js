@@ -450,7 +450,7 @@ exports.getModules = function (req, res) {
 	if (utils.isSessionActive(req)) {
 		// var nData = [], qList = [], idDict = {};
 		// var urlData = req.get('host').split(':');
-		console.log(req);
+		//console.log(req);
 		var d = req.body;
 		// var tab = d.tab;
 		// var prjId = d.prjId;
