@@ -293,7 +293,7 @@ exports.getSuiteDetailsInExecution_ICE = function(req, res) {
                             for (var i = 0; i < executionData.rows.length; i++) {
                                 startTime = new Date(executionData.rows[i].starttime);
                                 endTime = new Date(executionData.rows[i].endtime);
-                                starttime = startTime.getDate() + "-" + (startTime.getMonth() + 1) + "-" + startTime.getFullYear() + " " + startTime.getHours() + ":" + startTime.getMinutes();
+                                starttime = startTime.getUTCDate() + "-" + (startTime.getUTCMonth() + 1) + "-" + startTime.getUTCFullYear() + " " + startTime.getUTCHours() + ":" + startTime.getUTCMinutes();
                                 endtime = endTime.getUTCDate() + "-" + (endTime.getUTCMonth() + 1) + "-" + endTime.getUTCFullYear() + " " + (endTime.getUTCHours()) + ":" + (+endTime.getUTCMinutes());
                                 executionDetailsJSON.push({
                                     execution_id: executionData.rows[i]._id,
