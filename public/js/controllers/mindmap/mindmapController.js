@@ -1014,8 +1014,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         tvn = 0;
         var estimationCount = 0;
         if (dNodes[pi].task != undefined || dNodes[pi].task != null) {
-            if (dNodes[pi].task.endDate != "" || dNodes[pi].task.endDate != undefined || dNodes[pi].task.endDate != " ") {
-                var nodeDateSplit = dNodes[pi].task.endDate.split("/");
+            if (dNodes[pi].task.enddate != "" || dNodes[pi].task.enddate != undefined || dNodes[pi].task.enddate != " ") {
+                var nodeDateSplit = dNodes[pi].task.enddate.split("/");
                 var modDateSplit = $('#endDate').val().split("/");
                 if (new Date(nodeDateSplit[2], (nodeDateSplit[1] - 1), nodeDateSplit[0]) != new Date(modDateSplit[2], (modDateSplit[1] - 1), modDateSplit[0])) {
                     estimationCount = parseInt(dNodes[pi].task.re_estimation) + 1;
@@ -1061,11 +1061,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             oid: tObj.oid,
             batchName: tObj.bn,
             task: tObj.t,
-            assignedTo: tObj.at,
+            assignedto: tObj.at,
             assignedToName: $('[value="' + tObj.at + '"]').attr('data-id'),
             reviewer: tObj.rw,
-            startDate: tObj.sd,
-            endDate: tObj.ed,
+            startdate: tObj.sd,
+            enddate: tObj.ed,
             re_estimation: tObj.re_estimation,
             release: $('.release-list').val(),
             cycle: $('.cycle-list').val(),
@@ -1169,8 +1169,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             if (validate[0]) {
                 taskflag = true;
                 if (taskUndef) {
-                    tObj.id = null;
-                    tObj.oid = null;
                     d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
                 }
                 // If task already exists then set it to true
@@ -1179,7 +1177,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (qid == 9)
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 9,
-                        parent: (tObj.parent != null) ? tObj.parent : dnodes[pi].parent.parent._id
+                        parent: (tObj.parent != null) ? tObj.parent : dNodes[pi].parent.parent._id
                     });
                 else if (qid == 7)
                     dNodes[pi].task = updateTaskObject(tObj, {
@@ -1189,7 +1187,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 else if (qid == 8 && taskUndef) {
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 8,
-                        parent: dnodes[pi].parent.parent._id,
+                        parent: dNodes[pi].parent.parent._id,
                         ctask: cTask
                     });
                 } else if (qid == 5 && taskUndef) {
@@ -1200,7 +1198,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 } else if (qid == 6 && taskUndef) {
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 6,
-                        parent: dnodes[pi].parent.parent._id
+                        parent: dNodes[pi].parent.parent._id
                     });
                 } else if (qid == 4) {
                     dNodes[pi].task = updateTaskObject(tObj, {
@@ -1210,7 +1208,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 } else if (qid == 3 && taskUndef) {
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 3,
-                        parent: dodes[pi].parent.parent._id
+                        parent: dNodes[pi].parent.parent._id
                     });
                 } else if (qid == 2 && taskUndef) {
                     dNodes[pi].task = updateTaskObject(tObj, {
@@ -1243,7 +1241,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 }                
                 if(!taskUndef && !origTask){
                     dNodes[pi].task.reviewer = tObj.rw;
-                    dNodes[pi].task.endDate = tObj.ed;
+                    dNodes[pi].task.enddate = tObj.ed;
                 }
                 dNodes[pi].task.tstatus = taskStatus;
               
@@ -1493,14 +1491,23 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
 
         //if(t=='scenarios') return;
+        var cycleid=$('.cycle-list').val();
         var nt = (dNodes[pi].task !== undefined || dNodes[pi].task != null) ? dNodes[pi].task : !1;
+        if (nt !== null && nt.length !== undefined){
+            nt.forEach(function(t,i){
+                if(t.cycle==cycleid){
+                    nt=dNodes[pi].task=t;
+                }
+            })
+        }
+        
         var tObj = {
-            t: (nt) ? nt.task : '',
+            t: (nt) ? nt.tasktype : '',
             bn: (nt) ? nt.batchName : '',
-            at: (nt) ? nt.assignedTo : '',
+            at: (nt) ? nt.assignedto : '',
             rw: (nt && nt.reviewer != null) ? nt.reviewer : '',
-            sd: (nt) ? nt.startDate : '',
-            ed: (nt) ? nt.endDate : '',
+            sd: (nt) ? nt.startdate : '',
+            ed: (nt) ? nt.enddate : '',
             re: (nt && nt.release != null) ? nt.release : '',
             cy: (nt && nt.cycle != null) ? nt.cycle : '',
             det: (nt) ? nt.details : '',
@@ -1623,7 +1630,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     $("#startDate").datepicker("show");
                 });
                 f = w.append('ul').attr('class', 'ct-asValCalBox dropdown-menu'); //.on('click',$('.ct-asValBoxIcon.ct-asItemCal.btn.dropdown-toggle').datepicker());
-                if (tObj.sd != '' && nt.oid != null) {
+                if (tObj.sd != '') {
+                    var d=new Date(tObj.sd);
+                    tObj.sd=d.getDate()+"/"+d.getMonth()+"/"+d.getFullYear();
                     $("#startDate").attr('disabled', 'disabled');
                 }
                 $("#startDate").val(tObj.sd);
@@ -1643,6 +1652,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $('#dateIconEndDate').click(function() {
                     $("#endDate").datepicker("show");
                 });
+                if (tObj.ed != '') {
+                    var d=new Date(tObj.ed);
+                    tObj.ed=d.getDate()+"/"+d.getMonth()+"/"+d.getFullYear();
+                }
                 f = w.append('ul').attr('class', 'ct-asValCalBox dropdown-menu'); //.on('click',$('.ct-asValBoxIcon.ct-asItemCal.btn.dropdown-toggle').datepicker());
                 $("#endDate").val(tObj.ed);
 
