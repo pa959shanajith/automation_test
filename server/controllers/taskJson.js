@@ -145,7 +145,7 @@ var projectTypes = {
 	'5da865d4f87fdec084ae4983': 'Mainframe',
 	'5da865d4f87fdec084ae4987': 'SAP',
 	'5da865d4f87fdec084ae4988':'System'
-}
+};
 
 var screen_tasks=['scrape','append','compare','add','map'];
 
@@ -394,6 +394,7 @@ function next_function(resultobj,projectid)
 	var result = resultobj;
 	var prjId = projectid.projectId;
 	var appTypes = projectid.appType;
+	var cycles=projectid.cycles;
 	var jsonData = result;
 	var alltasks = jsonData;
 	var user_task_json = [];
@@ -450,6 +451,7 @@ function next_function(resultobj,projectid)
 
 		/*t refers to task node, and m refers to its respective node */
 		var t = resultobj[ti];
+		var relName=cycles[t.cycle][1];
 		var reuseflag='False';
 		// var m = a.row[0][0];
 		// if(a.row[0].length>1) reuseflag='True';
@@ -457,7 +459,7 @@ function next_function(resultobj,projectid)
 		var batch_flag = false;
 		//To support the task assignmnet in scenario
 		if (t.tasktype == 'Execute' || t.tasktype == 'Execute Scenario' || t.tasktype == 'Execute Batch') {
-			testSuiteDetails_obj.releaseid = t.release || '';
+			testSuiteDetails_obj.releaseid = t.release || relName;
 			testSuiteDetails_obj.cycleid = t.cycle;
 		}else{
 			task_json.releaseid=t.release || '';
@@ -475,7 +477,7 @@ function next_function(resultobj,projectid)
 		taskDetails.reviewer = t.reviewer;
 		taskDetails.subTaskId = t._id;
 		taskDetails.taskDescription = t.details;
-		taskDetails.releaseid = t.release||' ';
+		taskDetails.releaseid = t.release||relName;
 		taskDetails.cycleid = t.cycle;
 		if (t.status != undefined) {
 			taskDetails.status = t.status;

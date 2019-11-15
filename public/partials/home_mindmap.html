@@ -205,7 +205,7 @@
             </span>
             <span class="selectProject">
                <label class="selectProjectLabel">Project:</label>
-               <select class="project-list" ng-change="projectListChange(projectName3,$index)" ng-model="projectName3">
+               <select class="project-list" ng-change="projectListChange(projectName3)" ng-model="projectName3">
                 <!-- <select class="project-list" ng-model="projectName3"> -->
                     <option ng-repeat="project in projectList" ng-selected="projectNameO == project.id" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}' >{{project.name}}</option>
                </select>
