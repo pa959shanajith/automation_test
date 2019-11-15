@@ -348,7 +348,7 @@ exports.saveMindmapE2E = function(req,res)
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occurred in create_ice/saveMindmapE2E: saveMindmapE2E, Error Code : ERRNDAC");
-					res(null, result.rows);
+					res(null, result);
 				} else {
 					projectdetails=result.rows;
 					// callback();

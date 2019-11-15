@@ -785,30 +785,38 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $scope.modType = 'e2e';
         blockUI("Loading module.. Please wait..");
         mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, 0, $('.cycle-list').val(), modName,moduleid).then(function(result) {
-            unloadMindmapData();
-            initiate();
-            clearSvg();
-            if (result == "Invalid Session") {
-                return $rootScope.redirectPage();
+            progressFlag=false;
+            if($scope.tab=="tabAssign" && result["completeFlow"]==false)
+            {
+                unblockUI();
+                openDialogMindmap("Error", "Please select a complete flow to assign tasks.");
             }
-            // currMap = result[0];
-            currMap=result;
-            excelMap = JSON.parse(JSON.stringify(currMap));
-            loadedmodule = excelMap.name;
-            $('div[title=' + modName + ']').addClass('nodeBoxSelected');
-            if ($scope.tab == 'tabCreate')
-                populateDynamicInputList();
-            setModuleBoxHeight();
-            treeBuilder(currMap);
-            unblockUI();
-            IncompleteFlowFlag = false;
-            var errTemp = false;
-            if (dNodes[0].type != 'endtoend') {
-                errTemp = treeIterator(undefined, dNodes[0], false);
-                $scope.modType = 'generic';
-            }
-            if (errTemp) {
-                IncompleteFlowFlag = true;
+            else
+            {
+                unloadMindmapData();
+                initiate();
+                clearSvg();
+                if (result == "Invalid Session") {
+                    return $rootScope.redirectPage();
+                }
+                currMap=result;
+                excelMap = JSON.parse(JSON.stringify(currMap));
+                loadedmodule = excelMap.name;
+                $('div[title=' + modName + ']').addClass('nodeBoxSelected');
+                if ($scope.tab == 'tabCreate')
+                    populateDynamicInputList();
+                setModuleBoxHeight();
+                treeBuilder(currMap);
+                unblockUI();
+                IncompleteFlowFlag = false;
+                var errTemp = false;
+                if (dNodes[0].type != 'endtoend') {
+                    errTemp = treeIterator(undefined, dNodes[0], false);
+                    $scope.modType = 'generic';
+                }
+                if (errTemp) {
+                    IncompleteFlowFlag = true;
+                }
             }
         }, function(error) {
             unblockUI();
@@ -889,7 +897,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     function addNode_W(n, m, pi) {
         // n:node m : flag , pi: parentnode
         n.display_name = n.name;
-        var nodeOpacity = !(n.id_c == "null" || n.id_c == null || n.id_c == undefined) ? 1 : 0.5;
+        var nodeOpacity = n._id ? 1 : 0.5;
         var ch = 15;
         img_src = "imgs/node-" + n.type + ".png";
         if (n.name.length > ch) {
@@ -899,7 +907,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $scope.nodeDisplay[n.id] = {
             'type': n.type,
             'transform': "translate(" + (n.x).toString() + "," + (n.y).toString() + ")",
-            'opacity': !( n._id == null || n._id == undefined) ? 1 : 0.5,
+            'opacity': nodeOpacity,
             'title': n.name,
             'name': n.display_name,
             'img_src': img_src,
@@ -2360,10 +2368,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         // d3.select('#ct-node-' + d.id).remove();
         delete $scope.nodeDisplay[d.id];
         deletednode_info.push(d);
-        if (d.oid != undefined) {
-            deletednode.push(d.oid);
-            dNodes[d.id].state = 'deleted';
+        if (d.task != null) {
+        
+            openDialogMindmap('Error', "Cannot delete node if task is assigned. Please unassign task first.");
+            
         }
+        // deletednode.push(d.oid);
+        dNodes[d.id].state = 'deleted';
         var temp = dLinks;
         if (tab == 'mindmapEndtoEndModules') {
             temp = dLinks;
@@ -3167,22 +3178,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (result == "Invalid Session") {
                     return $rootScope.redirectPage();
                 }
+                else if(result=='fail')
+                {
+                    unblockUI();
+                    openDialogMindmap("Error", "Failed to save structure");
+                    return;
+                }
                 unblockUI();
                 // if (flag == 10 || flag == 30) {
                     var moduleid = result;
-                    // mapSaved = !0;
-                    // var mid, sts = $scope.allMMaps.some(function(m, i) {
-                    //     if (m.id_n == res.id_n) {
-                    //         mid = i;
-                    //         $scope.allMMaps[i] = res;
-                    //         return !0;
-                    //     }
-                    //     return !1;
-                    // });
-                    // if (!sts) {
-                    //     mid = $scope.allMMaps.length;
-                    //     $scope.allMMaps.push(res);
-                    // }
                     setModuleBoxHeight();
                     if (selectedTab == 'tabCreate') populateDynamicInputList();
 
@@ -3210,14 +3214,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         if (result == "Invalid Session") {
                             return $rootScope.redirectPage();
                         }
-                        // var nodeBox = d3.select('.ct-nodeBox');
-                        // // $(nodeBox[0]).empty();
-                        // $scope.allMMaps = result;
-                        // currMap = res;
-                        // $('div[title=' + selectedNodeTitle + ']').addClass('nodeBoxSelected');
-                        // if (selectedTab == 'tabCreate')
-                        //     populateDynamicInputList();
-                        // setModuleBoxHeight();
                         currMap=result;
                         excelMap = JSON.parse(JSON.stringify(currMap));
                         loadedmodule = excelMap.name;
@@ -3238,87 +3234,100 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         }
                     }, function(error) {
                         console.log(error);
-                    })
+                    });
+                    blockUI('Loading...');
+                    mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, parseFloat(from_v), $('.cycle-list').val(),null,null).then(function(result) {
+                    if (result == "Invalid Session") {
+                        return $rootScope.redirectPage();
+                    }
+                    $scope.allMMaps = result;
+                    setModuleBoxHeight();
+                    unblockUI();
+                    if (selectedTab == 'tabCreate')
+                        populateDynamicInputList();
+                    }, function(error) {
+                        console.log(error);
+                    });
 
                 // }
-                if (flag == 20) {
-                    if (!saveFlag) return;
-                    var res = result[0];
-                    //res = res[0];
-                    var mid, resMap = Object.keys(res);
-                    $scope.allMMaps.some(function(m, i) {
-                        if (m.id_n == resMap[0]) {
-                            mid = i;
-                            return !0;
-                        }
-                        //return !1;
-                    });
-                    //263-'Mindmap- Module: Currently allowing to create 2 modules with same name- Error msg is given on click of Create button
-                    if ($scope.allMMaps[mid] != undefined) {
-                        currMap.id_c = res[resMap[0]];
-                        currMap.children.forEach(function(tsc) {
-                            tsc.id_c = res[tsc.id_n];
-                            tsc.children.forEach(function(scr) {
-                                scr.id_c = res[scr.id_n];
-                                scr.children.forEach(function(tc) {
-                                    if (res[tc.id_n] != 'null') {
-                                        tc.id_c = res[tc.id_n];
-                                    }
-                                });
-                            });
-                        });
-                        //To update cassandra_ids (id_c) of nodes in dNodes variable
-                        dNodes.forEach(function(d) {
-                            if (d.type == 'modules') d.id_c = res[resMap[0]];
-                            else d.id_c = res[d.id_n];
-                            if (!(d.id_c == null || d.id_c == 'null' || d.id_c == undefined)) {
-                                d3.select('#ct-node-' + d.id + '>image').attr('style', 'opacity:1;');
-                            }
+                // if (flag == 20) {
+                //     if (!saveFlag) return;
+                //     var res = result[0];
+                //     //res = res[0];
+                //     var mid, resMap = Object.keys(res);
+                //     $scope.allMMaps.some(function(m, i) {
+                //         if (m.id_n == resMap[0]) {
+                //             mid = i;
+                //             return !0;
+                //         }
+                //         //return !1;
+                //     });
+                //     //263-'Mindmap- Module: Currently allowing to create 2 modules with same name- Error msg is given on click of Create button
+                //     if ($scope.allMMaps[mid] != undefined) {
+                //         currMap.id_c = res[resMap[0]];
+                //         currMap.children.forEach(function(tsc) {
+                //             tsc.id_c = res[tsc.id_n];
+                //             tsc.children.forEach(function(scr) {
+                //                 scr.id_c = res[scr.id_n];
+                //                 scr.children.forEach(function(tc) {
+                //                     if (res[tc.id_n] != 'null') {
+                //                         tc.id_c = res[tc.id_n];
+                //                     }
+                //                 });
+                //             });
+                //         });
+                //         //To update cassandra_ids (id_c) of nodes in dNodes variable
+                //         dNodes.forEach(function(d) {
+                //             if (d.type == 'modules') d.id_c = res[resMap[0]];
+                //             else d.id_c = res[d.id_n];
+                //             if (!(d.id_c == null || d.id_c == 'null' || d.id_c == undefined)) {
+                //                 d3.select('#ct-node-' + d.id + '>image').attr('style', 'opacity:1;');
+                //             }
 
-                        });
+                //         });
 						
-						if($scope.pdmode){
-                            console.log($scope.pdAuditData); 
-                            openDialogMindmap("Success", "Import Successful! Audit table:");
-                            $scope.pdmode = false;    
-                            $("#auditTable").remove();
-                            $timeout(function(){
-                                $('.modal-body:contains("Import Successful")').append(`<table id="auditTable" class="table table-bordered">
-                                    <tr>
-                                        <th>Id</th>
-                                        <th>Assignee</th>
-                                        <th>Reviewer</th>
-                                        <th>State</th>
-                                        <th>Time</th>
-                                    </tr>
-                                </table>`);
-                                $.each($scope.pdAuditData, function(i, item) {
-                                    var $tr = $('<tr>').append(
-                                        $('<td>').text(i+1),
-                                        $('<td>').text(item.assignee),
-                                        $('<td>').text(item.reviewer),
-                                        $('<td>').text(item.action),
-                                        $('<td>').text(String(new Date(item.time)).replace(" GMT+0530 (India Standard Time)",""))
-                                    ).appendTo('#auditTable');
-                                    //console.log($tr.wrap('<p>').html());
-                                });
-                                $("#mindmapGlobalDialog .modal-dialog").css("width","80%")
-                            },100);
-                        }
-                        else{
-                            openDialogMindmap("Success", "Structure created successfully");
-                        }
-                        saveFlag = false;
-                        //$('#ct-createAction').addClass('disableButton');
-                        SaveCreateED('#ct-createAction', 1, 0);
-                    } else {
-                        saveFlag = false;
-                        openDialogMindmap("Success", "Failed to create structure");
-                    }
+				// 		if($scope.pdmode){
+                //             console.log($scope.pdAuditData); 
+                //             openDialogMindmap("Success", "Import Successful! Audit table:");
+                //             $scope.pdmode = false;    
+                //             $("#auditTable").remove();
+                //             $timeout(function(){
+                //                 $('.modal-body:contains("Import Successful")').append(`<table id="auditTable" class="table table-bordered">
+                //                     <tr>
+                //                         <th>Id</th>
+                //                         <th>Assignee</th>
+                //                         <th>Reviewer</th>
+                //                         <th>State</th>
+                //                         <th>Time</th>
+                //                     </tr>
+                //                 </table>`);
+                //                 $.each($scope.pdAuditData, function(i, item) {
+                //                     var $tr = $('<tr>').append(
+                //                         $('<td>').text(i+1),
+                //                         $('<td>').text(item.assignee),
+                //                         $('<td>').text(item.reviewer),
+                //                         $('<td>').text(item.action),
+                //                         $('<td>').text(String(new Date(item.time)).replace(" GMT+0530 (India Standard Time)",""))
+                //                     ).appendTo('#auditTable');
+                //                     //console.log($tr.wrap('<p>').html());
+                //                 });
+                //                 $("#mindmapGlobalDialog .modal-dialog").css("width","80%")
+                //             },100);
+                //         }
+                //         else{
+                //             openDialogMindmap("Success", "Structure created successfully");
+                //         }
+                //         saveFlag = false;
+                //         //$('#ct-createAction').addClass('disableButton');
+                //         SaveCreateED('#ct-createAction', 1, 0);
+                //     } else {
+                //         saveFlag = false;
+                //         openDialogMindmap("Success", "Failed to create structure");
+                //     }
 
 
-                    //$('#Mindmap_create').modal('show');
-                }
+                //     //$('#Mindmap_create').modal('show');
+                // }
             }, function(error) {
                 unblockUI();
                 console.log(error);
@@ -3438,51 +3447,90 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             if (result == "Invalid Session") {
                 return $rootScope.redirectPage();
             }
+            else if(result.rows=='fail')
+            {
+                unblockUI();
+                openDialogMindmap("Error", result.error);
+                flag=-1;
+            }
             unblockUI();
             var res = result;
             if (flag == 10) {
 
-                mapSaved = !0;
-                var mid, sts = allMaps_info.some(function(m, i) {
-                    if (m.id_n == res.id_n) {
-                        mid = i;
-                        allMaps_info[i] = res;
-                        return !0;
-                    }
-                    return !1;
-                });
-                if (!sts) {
-                    mid = allMaps_info.length;
-                    allMaps_info.push(res);
-                    $scope.allMMaps.push(res);
-                }
-                setModuleBoxHeight_W();
-                clearSvg();
-                currMap = res;
-                treeBuilder_W(res);
-                unassignTask = [];
+                // mapSaved = !0;
+                // var mid, sts = allMaps_info.some(function(m, i) {
+                //     if (m.id_n == res.id_n) {
+                //         mid = i;
+                //         allMaps_info[i] = res;
+                //         return !0;
+                //     }
+                //     return !1;
+                // });
+                // if (!sts) {
+                //     mid = allMaps_info.length;
+                //     allMaps_info.push(res);
+                //     $scope.allMMaps.push(res);
+                // }
+                // setModuleBoxHeight_W();
+                // clearSvg();
+                // currMap = res;
+                // treeBuilder_W(res);
+                // unassignTask = [];
                 //var selectedTab = window.localStorage['tabMindMap']
                 unblockUI();
                 openDialogMindmap("Success", "Data saved successfully");
+                clearSvg();
                 // fix for 1046:  "Create" does not work when we add scenarios from different projects
                 saveFlag_W = true;
                 //$('#ct-createAction_W').removeClass('disableButton').removeClass('no-access');
                 SaveCreateED('#ct-createAction', 0, 0);
                 //alert(window.localStorage['tabMindMap']);
-                mindmapServices.getModules(versioning_enabled, 'endToend', $scope.projectNameO, 0, $('.cycle-list').val(),null,null)
+                mindmapServices.getModules(versioning_enabled, 'endToend', $scope.projectNameO, 0, $('.cycle-list').val(),null,res)
                     .then(function(result) {
                         if (result == "Invalid Session") {
                             return $rootScope.redirectPage();
                         }
-                        var nodeBox = d3.select('#etemModuleContainer');
-                        // $(nodeBox[0]).empty();
-                        $scope.allMMaps = allMaps_info = result;
-                        $('span[title=' + selectedNodeTitle + ']').addClass('nodeBoxSelected');
+                        // var nodeBox = d3.select('#etemModuleContainer');
+                        // // $(nodeBox[0]).empty();
+                        // $scope.allMMaps = allMaps_info = result;
+                        // $('span[title=' + selectedNodeTitle + ']').addClass('nodeBoxSelected');
                         initScroller();
-                        setModuleBoxHeight_W();
+                        // setModuleBoxHeight_W();
+                        currMap=result;
+                        excelMap = JSON.parse(JSON.stringify(currMap));
+                        loadedmodule = excelMap.name;
+                        $('div[title=' + loadedmodule + ']').addClass('nodeBoxSelected');
+                        if ($scope.tab == 'tabCreate')
+                            populateDynamicInputList();
+                        setModuleBoxHeight();
+                        treeBuilder_W(currMap);
+                        unblockUI();
+                        IncompleteFlowFlag = false;
+                        var errTemp = false;
+                        if (dNodes[0].type != 'endtoend') {
+                            errTemp = treeIterator(excelMap, dNodes[0], false);
+                            $scope.modType = 'generic';
+                        }
+                        if (errTemp) {
+                            IncompleteFlowFlag = true;
+                        }
                     }, function(error) {
                         console.log(error);
-                    })
+                    });
+                mindmapServices.getModules(versioning_enabled, 'endToend', $scope.projectNameO, 0, $('.cycle-list').val(),null,null)
+                .then(function(result) {
+                    if (result == "Invalid Session") {
+                        return $rootScope.redirectPage();
+                    }
+                    var nodeBox = d3.select('#etemModuleContainer');
+                    // $(nodeBox[0]).empty();
+                    $scope.allMMaps = allMaps_info = result;
+                    $('span[title=' + selectedNodeTitle + ']').addClass('nodeBoxSelected');
+                    initScroller();
+                    setModuleBoxHeight_W();
+                }, function(error) {
+                    console.log(error);
+                });
             }
             if (flag == 20) {
                 if (!saveFlag_W) return;
@@ -3546,7 +3594,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     
     $scope.loadEndToEnd = function(mapid, type, name,modid) {
         if (type == 'endtoend') loadScenarios(modid);
-        loadEndtoEndModule(name, mapid, type);
+        loadEndtoEndModule(name, mapid, type,modid);
     }
 
     function toggleExpand(e, tab) {
@@ -3598,17 +3646,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function populateDynamicInputList() {
-        // mindmapServices.getScreens($('.project-list').val()).then(function(result) {
-        //     if (result == "Invalid Session") {
-        //         return $rootScope.redirectPage();
-        //     } else {
-        //         scrList = result.screenList;
-        //         tcList = result.testCaseList;
-        //     }
-        // })
+        mindmapServices.getScreens($('.project-list').val()).then(function(result) {
+            if (result == "Invalid Session") {
+                return $rootScope.redirectPage();
+            } else {
+                scrList = result.screenList;
+                tcList = result.testCaseList;
+            }
+        })
     };
 
-    //FUnction is tagged to every click on 'cnavas' element to validate the names of nodes when created
+    //Function is tagged to every click on 'canvas' element to validate the names of nodes when created
     function callme() {
         if (Object.keys($scope.nodeDisplay).length > 0) return;
         if (childNode != null && (childNode.text() == 'Module_0' || childNode.text() == 'Screen_0' || childNode.text() == 'Scenario_0' || childNode.text() == 'Testcase_0')) {
@@ -4313,7 +4361,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     }
 
-    function loadEndtoEndModule(name, mapid, type) {
+    function loadEndtoEndModule(name, mapid, type,modid) {
         if (type != 'endtoend') {
             if (Object.keys($scope.nodeDisplay).length == 0) { // if no map is loaded 
                 openDialogMindmap('Error', 'First, Please select an end to end module or create a new one!');
@@ -4336,7 +4384,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $('#eteSearchScenarios').val("");
         var container = $("#eteScenarioContainer");
         container.empty();
-        var moduleid = allMaps_info[mapid]._id;
+        var moduleid = modid;
         if (allMaps_info[mapid].type == "endtoend") {
             return;
         }
@@ -4609,6 +4657,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             cSize = getElementDimm(d3.select("#ct-mapSvg"));
         var typeNum = {
             'endtoend': 0,
+            'modules':0,
             'scenarios': 1,
             'screens': 2,
             'testcases': 3

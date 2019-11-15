@@ -4,6 +4,7 @@ var utils = require('../lib/utils');
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl = process.env.NDAC_URL;
+var projectTypes = {};
 
 exports.updateTaskstatus_mindmaps = function (req, res) {
 	logger.info("Inside UI service: updateTaskstatus_mindmaps");
@@ -62,7 +63,7 @@ exports.getTaskJson_mindmaps = function (req, res) {
 		try {
 			var userid = req.session.userid;
 			var prjId=req.body.obj;
-
+			projectTypes=req.body.obj.projectTypeNames;
 			var inputs= {
 				"userid":userid
 			}
@@ -134,18 +135,18 @@ var tasktypes = {
 };
 
 //This dict has to be buit run time . Query Projecttypekeywords to build this dict for one time
-var projectTypes = {
-	'5da865d4f87fdec084ae4982': 'Desktop',
-	'5da865d4f87fdec084ae498a': 'Webservice',
-	'5da865d4f87fdec084ae4984': 'MobileApp',
-	'5da865d4f87fdec084ae4986': 'OEBS',
-	'5da865d4f87fdec084ae4989': 'Web',
-	'5da865d4f87fdec084ae4985': 'MobileWeb',
-	'5da865d4f87fdec084ae4981': 'Generic',
-	'5da865d4f87fdec084ae4983': 'Mainframe',
-	'5da865d4f87fdec084ae4987': 'SAP',
-	'5da865d4f87fdec084ae4988':'System'
-};
+// var projectTypes = {
+// 	'5da865d4f87fdec084ae4982': 'Desktop',
+// 	'5da865d4f87fdec084ae498a': 'Webservice',
+// 	'5da865d4f87fdec084ae4984': 'MobileApp',
+// 	'5da865d4f87fdec084ae4986': 'OEBS',
+// 	'5da865d4f87fdec084ae4989': 'Web',
+// 	'5da865d4f87fdec084ae4985': 'MobileWeb',
+// 	'5da865d4f87fdec084ae4981': 'Generic',
+// 	'5da865d4f87fdec084ae4983': 'Mainframe',
+// 	'5da865d4f87fdec084ae4987': 'SAP',
+// 	'5da865d4f87fdec084ae4988':'System'
+// };
 
 var screen_tasks=['scrape','append','compare','add','map'];
 
