@@ -135,17 +135,17 @@ var tasktypes = {
 
 //This dict has to be buit run time . Query Projecttypekeywords to build this dict for one time
 var projectTypes = {
-	'5da0d5d2f87fdec084ae4954': 'Desktop',
-	'5da0d5d2f87fdec084ae495c': 'Webservice',
-	'5da0d5d2f87fdec084ae4956': 'MobileApp',
-	'5da0d5d2f87fdec084ae4958': 'OEBS',
-	'5da0d5d2f87fdec084ae495b': 'Web',
-	'5da0d5d2f87fdec084ae4957': 'MobileWeb',
-	'5da0d5d1f87fdec084ae4953': 'Generic',
-	'5da0d5d2f87fdec084ae4955': 'Mainframe',
-	'5da0d5d2f87fdec084ae4959': 'SAP',
-	'5da0d5d2f87fdec084ae495a':'System'
-};
+	'5da865d4f87fdec084ae4982': 'Desktop',
+	'5da865d4f87fdec084ae498a': 'Webservice',
+	'5da865d4f87fdec084ae4984': 'MobileApp',
+	'5da865d4f87fdec084ae4986': 'OEBS',
+	'5da865d4f87fdec084ae4989': 'Web',
+	'5da865d4f87fdec084ae4985': 'MobileWeb',
+	'5da865d4f87fdec084ae4981': 'Generic',
+	'5da865d4f87fdec084ae4983': 'Mainframe',
+	'5da865d4f87fdec084ae4987': 'SAP',
+	'5da865d4f87fdec084ae4988':'System'
+}
 
 var screen_tasks=['scrape','append','compare','add','map'];
 
