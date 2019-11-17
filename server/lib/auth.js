@@ -80,7 +80,6 @@ var strategyUtil = {
 					};
 					logger.info("Calling NDAC Service : loadUser_Nineteen68");
 					client.post(epurl + "login/loadUser_Nineteen68", args, function (result, response) {
-						logger.error(result.rows)
 						if (response.statusCode != 200 || result.rows == "fail") {
 							logger.error("Error occurred in loadUser_Nineteen68 Error Code : ERRNDAC");
 							callback('fail')

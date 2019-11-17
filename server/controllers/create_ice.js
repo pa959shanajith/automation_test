@@ -1918,185 +1918,185 @@ exports.getProjectType_Nineteen68 = function (req, res) {
 };
 
 // Understand this
-exports.createE2E_Structure_Nineteen68 = function (req, res) {
-	logger.info("Inside UI service: createE2E_Structure_Nineteen68");
-	var createdthrough = 'Mindmaps Creation';
-	var RequestedJSON = req;
-	var projectid = RequestedJSON.projectId;
-	var cycleId = RequestedJSON.cycleId;
-	var releaseId = RequestedJSON.releaseId;
-	var appType = RequestedJSON.appType;
-	var username = RequestedJSON.userName;
-	var userrole = RequestedJSON.userRole;
-	var suiteID = uuid();
-	var suitedetails = RequestedJSON.testsuiteDetails[0];
-	var testsuiteName = suitedetails.testsuiteName;
-	var moduleid_c = suitedetails.testsuiteId_c;
-	var scenarioidlist = [];
-	var scenario = [];
-	var suitedetailslist = [];
-	var versionnumber = 0;
-	var suiteflag = false;
-	async.series({
-		projectsUnderDomain: function (callback) {
-			logger.info("Inside the function projectsUnderDomain: createE2E_Structure_Nineteen68");
-			suiteflag = false;
-			var suiteidTemp = '';
-			var scenariodetailslist = [];
-			var testsuiteidneo = suitedetails.testsuiteId;
-			var tasksuite = suitedetails.task;
-			projectid = suitedetails.projectID;
-			testsuiteid_exists({
-				"modulename": testsuiteName,
-				"moduleid": moduleid_c,
-				'modifiedby': username,
-				'modifiedbyrole':userrole,
-				"pid": projectid,
-				"versionnumber": versionnumber,
-				"newversionnumber": versionnumber
-			}, function (err, data) {
-				if (err) {
-					logger.error("Error occurred in projectsUnderDomain: createE2E_Structure_Nineteen68: %s",err);
-				} else {
-					suiteflag = data.flag;
-					suiteidTemp = data.suiteid;
-				}
-				var query_name;
-				if (!suiteflag) {
-					query_name = 'notflagsuite';
-				} else {
-					query_name = 'selectsuite';
-					suiteID = suiteidTemp;
-				}
-				var testsuiteobj = {
-					"testsuiteId": testsuiteidneo,
-					"testsuiteId_c": suiteID,
-					"testsuiteName": testsuiteName,
-					"task": tasksuite,
-					"testscenarioDetails": scenariodetailslist
-				};
-				suitedetailslist.push(testsuiteobj);
-				var inputs = {
-					"query": query_name,
-					'projectid': projectid,
-					'modulename': testsuiteName,
-					'moduleid': suiteID,
-					'versionnumber': versionnumber,
-					'createdby': username,
-					'createdthrough': createdthrough,
-					'deleted': false,
-					'skucodemodule': 'skucodemodule',
-					'tags': 'tags'
-				};
-				var args = {
-					data: inputs,
-					headers: {
-						"Content-Type": "application/json"
-					}
-				};
-				logger.info("Calling NDAC Service from projectsUnderDomain: createE2E_Structure_Nineteen68: create_ice/insertInSuite_ICE");
-				client.post(epurl+"create_ice/insertInSuite_ICE", args,
-					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in create_ice/insertInSuite_ICE: projectsUnderDomain: createE2E_Structure_Nineteen68, Error Code : ERRNDAC");
-					} else {
-						scenario = suitedetails.testscenarioDetails;
-						var scenariosarray = [];
-						async.forEachSeries(scenario, function (iterator, callback2) {
-							var scenarioId = uuid();
-							scenariosarray.push(scenarioId);
-							var scenarioName = iterator.testscenarioName;
-							var scenarioid_c = iterator.testscenarioId_c;
-							var scenarioflag = false;
-							var scenarioidTemp = '';
-							var screendetailslist = [];
-							var taskscenario = iterator.task;
-							var scenarioidneo = iterator.testscenarioId;
-							var prjID = iterator.projectID;
-							testscenariosid_exists({
-								"testscenarioname": scenarioName,
-								"testscenarioid": scenarioid_c,
-								'modifiedby': username,
-								'modifiedbyrole':userrole,
-								"pid": prjID,
-								"versionnumber": versionnumber,
-								"newversionnumber": versionnumber
-							}, function (err, scenariodata) {
-								if (err) {
-									logger.error("Error occurred in projectsUnderDomain: createE2E_Structure_Nineteen68: create_ice/insertInSuite_ICE %s",err);
-									cb(null, err);
-								} else {
-									scenarioflag = scenariodata.flag;
-									scenarioidTemp = scenariodata.scenarioid;
-								}
-								if (!scenarioflag) {
-									logger.info("Scenario does not exists");
-								} else {
-									scenarioId = scenarioidTemp;
-									scenarioidlist.push(scenarioId);
-									var scenariodetailsobj = {
-										"scenario_PrjId": prjID,
-										"testscenarioId": scenarioidneo,
-										"testscenarioId_c": scenarioId,
-										"screenDetails": screendetailslist,
-										"tasks": taskscenario,
-										"testscenarioName": scenarioName
-									};
-									scenariodetailslist.push(scenariodetailsobj);
-								}
-								callback2();
-							});
-						}, callback);
-					}
-				});
-			});
-		},
-		updatescenarioids: function (callback) {
-			logger.info("Inside the function updatescenarioids: createE2E_Structure_Nineteen68");
-			var inputs = {
-				'testscenarioids': scenarioidlist,
-				'moduleid': suiteID,
-				'projectid': projectid,
-				'modulename': testsuiteName,
-				'modifiedflag': suiteflag,
-				'modifiedby': username,
-				'modifiedbyrole':userrole,
-				'versionnumber': versionnumber
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling NDAC Service from updatescenarioids: createE2E_Structure_Nineteen68: create_ice/updateModule_ICE");
-			client.post(epurl+"create_ice/updateModule_ICE", args,
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in create_ice/updateModule_ICE: updatescenarioids: createE2E_Structure_Nineteen68, Error Code : ERRNDAC");
-				} else {
-					logger.info("Successfully updated Modules");
-				}
-				callback();
-			});
-		}
-	},
-	function (err, results) {
-		if (err) {
-			logger.error("Error occurred in createE2E_Structure_Nineteen68: %s",err);
-			res(null, err);
-		} else {
-			var returnJsonmindmap = {
-				"projectId": projectid,
-				"cycleId": cycleId,
-				"releaseId": releaseId,
-				"appType": appType,
-				"testsuiteDetails": suitedetailslist
-			};
-			res(null,returnJsonmindmap);
-		}
-	});
-};
+// exports.createE2E_Structure_Nineteen68 = function (req, res) {
+// 	logger.info("Inside UI service: createE2E_Structure_Nineteen68");
+// 	var createdthrough = 'Mindmaps Creation';
+// 	var RequestedJSON = req;
+// 	var projectid = RequestedJSON.projectId;
+// 	var cycleId = RequestedJSON.cycleId;
+// 	var releaseId = RequestedJSON.releaseId;
+// 	var appType = RequestedJSON.appType;
+// 	var username = RequestedJSON.userName;
+// 	var userrole = RequestedJSON.userRole;
+// 	var suiteID = uuid();
+// 	var suitedetails = RequestedJSON.testsuiteDetails[0];
+// 	var testsuiteName = suitedetails.testsuiteName;
+// 	var moduleid_c = suitedetails.testsuiteId_c;
+// 	var scenarioidlist = [];
+// 	var scenario = [];
+// 	var suitedetailslist = [];
+// 	var versionnumber = 0;
+// 	var suiteflag = false;
+// 	async.series({
+// 		projectsUnderDomain: function (callback) {
+// 			logger.info("Inside the function projectsUnderDomain: createE2E_Structure_Nineteen68");
+// 			suiteflag = false;
+// 			var suiteidTemp = '';
+// 			var scenariodetailslist = [];
+// 			var testsuiteidneo = suitedetails.testsuiteId;
+// 			var tasksuite = suitedetails.task;
+// 			projectid = suitedetails.projectID;
+// 			testsuiteid_exists({
+// 				"modulename": testsuiteName,
+// 				"moduleid": moduleid_c,
+// 				'modifiedby': username,
+// 				'modifiedbyrole':userrole,
+// 				"pid": projectid,
+// 				"versionnumber": versionnumber,
+// 				"newversionnumber": versionnumber
+// 			}, function (err, data) {
+// 				if (err) {
+// 					logger.error("Error occurred in projectsUnderDomain: createE2E_Structure_Nineteen68: %s",err);
+// 				} else {
+// 					suiteflag = data.flag;
+// 					suiteidTemp = data.suiteid;
+// 				}
+// 				var query_name;
+// 				if (!suiteflag) {
+// 					query_name = 'notflagsuite';
+// 				} else {
+// 					query_name = 'selectsuite';
+// 					suiteID = suiteidTemp;
+// 				}
+// 				var testsuiteobj = {
+// 					"testsuiteId": testsuiteidneo,
+// 					"testsuiteId_c": suiteID,
+// 					"testsuiteName": testsuiteName,
+// 					"task": tasksuite,
+// 					"testscenarioDetails": scenariodetailslist
+// 				};
+// 				suitedetailslist.push(testsuiteobj);
+// 				var inputs = {
+// 					"query": query_name,
+// 					'projectid': projectid,
+// 					'modulename': testsuiteName,
+// 					'moduleid': suiteID,
+// 					'versionnumber': versionnumber,
+// 					'createdby': username,
+// 					'createdthrough': createdthrough,
+// 					'deleted': false,
+// 					'skucodemodule': 'skucodemodule',
+// 					'tags': 'tags'
+// 				};
+// 				var args = {
+// 					data: inputs,
+// 					headers: {
+// 						"Content-Type": "application/json"
+// 					}
+// 				};
+// 				logger.info("Calling NDAC Service from projectsUnderDomain: createE2E_Structure_Nineteen68: create_ice/insertInSuite_ICE");
+// 				client.post(epurl+"create_ice/insertInSuite_ICE", args,
+// 					function (result, response) {
+// 					if (response.statusCode != 200 || result.rows == "fail") {
+// 						logger.error("Error occurred in create_ice/insertInSuite_ICE: projectsUnderDomain: createE2E_Structure_Nineteen68, Error Code : ERRNDAC");
+// 					} else {
+// 						scenario = suitedetails.testscenarioDetails;
+// 						var scenariosarray = [];
+// 						async.forEachSeries(scenario, function (iterator, callback2) {
+// 							var scenarioId = uuid();
+// 							scenariosarray.push(scenarioId);
+// 							var scenarioName = iterator.testscenarioName;
+// 							var scenarioid_c = iterator.testscenarioId_c;
+// 							var scenarioflag = false;
+// 							var scenarioidTemp = '';
+// 							var screendetailslist = [];
+// 							var taskscenario = iterator.task;
+// 							var scenarioidneo = iterator.testscenarioId;
+// 							var prjID = iterator.projectID;
+// 							testscenariosid_exists({
+// 								"testscenarioname": scenarioName,
+// 								"testscenarioid": scenarioid_c,
+// 								'modifiedby': username,
+// 								'modifiedbyrole':userrole,
+// 								"pid": prjID,
+// 								"versionnumber": versionnumber,
+// 								"newversionnumber": versionnumber
+// 							}, function (err, scenariodata) {
+// 								if (err) {
+// 									logger.error("Error occurred in projectsUnderDomain: createE2E_Structure_Nineteen68: create_ice/insertInSuite_ICE %s",err);
+// 									cb(null, err);
+// 								} else {
+// 									scenarioflag = scenariodata.flag;
+// 									scenarioidTemp = scenariodata.scenarioid;
+// 								}
+// 								if (!scenarioflag) {
+// 									logger.info("Scenario does not exists");
+// 								} else {
+// 									scenarioId = scenarioidTemp;
+// 									scenarioidlist.push(scenarioId);
+// 									var scenariodetailsobj = {
+// 										"scenario_PrjId": prjID,
+// 										"testscenarioId": scenarioidneo,
+// 										"testscenarioId_c": scenarioId,
+// 										"screenDetails": screendetailslist,
+// 										"tasks": taskscenario,
+// 										"testscenarioName": scenarioName
+// 									};
+// 									scenariodetailslist.push(scenariodetailsobj);
+// 								}
+// 								callback2();
+// 							});
+// 						}, callback);
+// 					}
+// 				});
+// 			});
+// 		},
+// 		updatescenarioids: function (callback) {
+// 			logger.info("Inside the function updatescenarioids: createE2E_Structure_Nineteen68");
+// 			var inputs = {
+// 				'testscenarioids': scenarioidlist,
+// 				'moduleid': suiteID,
+// 				'projectid': projectid,
+// 				'modulename': testsuiteName,
+// 				'modifiedflag': suiteflag,
+// 				'modifiedby': username,
+// 				'modifiedbyrole':userrole,
+// 				'versionnumber': versionnumber
+// 			};
+// 			var args = {
+// 				data: inputs,
+// 				headers: {
+// 					"Content-Type": "application/json"
+// 				}
+// 			};
+// 			logger.info("Calling NDAC Service from updatescenarioids: createE2E_Structure_Nineteen68: create_ice/updateModule_ICE");
+// 			client.post(epurl+"create_ice/updateModule_ICE", args,
+// 				function (result, response) {
+// 				if (response.statusCode != 200 || result.rows == "fail") {
+// 					logger.error("Error occurred in create_ice/updateModule_ICE: updatescenarioids: createE2E_Structure_Nineteen68, Error Code : ERRNDAC");
+// 				} else {
+// 					logger.info("Successfully updated Modules");
+// 				}
+// 				callback();
+// 			});
+// 		}
+// 	},
+// 	function (err, results) {
+// 		if (err) {
+// 			logger.error("Error occurred in createE2E_Structure_Nineteen68: %s",err);
+// 			res(null, err);
+// 		} else {
+// 			var returnJsonmindmap = {
+// 				"projectId": projectid,
+// 				"cycleId": cycleId,
+// 				"releaseId": releaseId,
+// 				"appType": appType,
+// 				"testsuiteDetails": suitedetailslist
+// 			};
+// 			res(null,returnJsonmindmap);
+// 		}
+// 	});
+// };
 
 
 exports.submitTask = function (req, res) {

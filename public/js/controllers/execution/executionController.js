@@ -437,7 +437,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			$(".viewReadOnlyTC").click(function () {
 				var testCaseName = this.getAttribute('data-name'),
 				testCaseId = this.getAttribute('data-id');
-				DesignServices.readTestCase_ICE(undefined, testCaseId, testCaseName, 0)
+				DesignServices.readTestCase_ICE(testCaseId, testCaseName, 0)
 				.then(function (response) {
 					if (response == "Invalid Session") {
 						return $rootScope.redirectPage();
@@ -445,16 +445,16 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					var source = $("#handlebar-template-testcase").html();
 					var template = Handlebars.compile(source);
 					try {
-						JSON.parse(response.testcasesteps);
+						JSON.stringify(response.testcase);
 					} catch (err) {
-						response.testcasesteps = '[]';
+						response.testcase = '[]';
 					}
 					var dat = template({
 							name: [{
 									testcasename: response.testcasename
 								}
 							],
-							rows: JSON.parse(response.testcasesteps)
+							rows: response.testcase
 						});
 					var newWindow = window.open();
 					newWindow.document.write(dat);

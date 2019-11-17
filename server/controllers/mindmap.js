@@ -973,17 +973,9 @@ exports.saveData = function (req, res) {
 		}
 		else if (flag == 30) { 
 			//Assign
-			
-			// removeTask.forEach(function (t, i) {
-			// 	// n68session.tasks.delete({"_id":ObjectId(requestdata["taskid"]),"cycle":ObjectId(requestdata["cycleid"])})
-			// 	//Issue 1685 Release and cycle Id filters are given for task to delete the task only from that release and cycle attached to that node
-			// 	qList.push({ "statement": "MATCH (N) WHERE ID(N)=" + t + " MATCH (N)-[r:FNTT]-(b:TASKS{release:'" + relId + "',cycle:'" + cycId + "'}) DETACH DELETE b" });
-			// });
-			// data.forEach(function (e, i) {
-			// 	idxDict[e.id] = i;
-			// })
 			var tasks_insert=[];
 			var tasks_update=[];
+			var tasks_remove=removeTask;
 			data.forEach(function (e, i) {
 				idDict[e._id] = (e._id) || null;
 				e._id = idDict[e._id];
@@ -995,7 +987,7 @@ exports.saveData = function (req, res) {
 						tsk.nodetype="testsuites"
 						tsk.name=e.name
 						tsk.nodeid=e._id
-						tsk.cycle=t.cycle
+						tsk.cycleid=t.cycleid
 						tsk.parent=""
 						tsk.createdon=""
 						tsk.assignedtime=""
@@ -1026,7 +1018,7 @@ exports.saveData = function (req, res) {
 						tsk.nodetype="testsuites"
 						tsk.name=e.name
 						tsk.nodeid=e._id
-						tsk.cycle=t.cycle
+						tsk.cycleid=t.cycleid
 						tsk.parent=""
 						tsk.createdon=""
 						tsk.assignedtime=""
@@ -1059,7 +1051,7 @@ exports.saveData = function (req, res) {
 						tsk.nodetype="testscenarios"
 						tsk.name=e.name
 						tsk.nodeid=e._id
-						tsk.cycle=t.cycle
+						tsk.cycleid=t.cycleid
 						tsk.parent=t.parent
 						tsk.createdon=""
 						tsk.assignedtime=""
@@ -1092,7 +1084,7 @@ exports.saveData = function (req, res) {
 						tsk.nodetype=e.type
 						tsk.name=e.name
 						tsk.nodeid=e._id
-						tsk.cycle=t.cycle
+						tsk.cycleid=t.cycleid
 						tsk.parent=prjId
 						tsk.createdon=""
 						tsk.assignedtime=""
@@ -1110,7 +1102,7 @@ exports.saveData = function (req, res) {
 						tsk.id=t.oid
 						tsk.projectid=prjId
 						if (tsk.id != null) {
-							if (cycId == t.cycle) {
+							if (cycId == t.cycleid) {
 								tasks_update.push(tsk)
 								// if (t.updatedParent != undefined) {
 								// 	qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]'}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.status='" + taskstatus + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]',n.cx='" + t.cx + "'" });
@@ -1137,7 +1129,7 @@ exports.saveData = function (req, res) {
 						tsk.nodetype=e.type
 						tsk.name=e.name
 						tsk.nodeid=e._id
-						tsk.cycle=t.cycle
+						tsk.cycleid=t.cycleid
 						tsk.parent=t.parent
 						tsk.createdon=""
 						tsk.assignedtime=""
@@ -1155,7 +1147,7 @@ exports.saveData = function (req, res) {
 						tsk.id=t.oid
 						tsk.projectid=prjId
 						if (tsk.id != null) {
-							if (cycId == t.cycle) {
+							if (cycId == t.cycleid) {
 								tasks_update.push(tsk)
 								// if (t.updatedParent != undefined) {
 								// 	qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]'}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.status='" + taskstatus + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]',n.cx='" + t.cx + "'" });
@@ -1178,6 +1170,7 @@ exports.saveData = function (req, res) {
 			var inputs={
 				"update": tasks_update,
 				"insert": tasks_insert,
+				"delete": tasks_remove,
 				"action": "modify",
 			}
 			var args={
@@ -1200,17 +1193,7 @@ exports.saveData = function (req, res) {
 						res.send(modid);
 					}
 			});
-			// if (tab != 'end_to_end') {
-			// 	qList.push({ "statement": "MATCH (a) remove a.uid" });
-			// 	//qList=qList.concat(rnmList);
-			// 	qList.push({ "statement": "MATCH path=(n:MODULES{moduleID:'" + data[0].id + "'}) WHERE NOT (n)-[:FMTTS]->() RETURN n", "resultDataContents": ["graph"] });
-			// 	qList.push({ "statement": "MATCH path=(n:MODULES{moduleID:'" + data[0].id + "'})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] });
-			// } else {
-			// 	qList.push({ "statement": "MATCH (a) remove a.uid" });
-			// 	//qList=qList.concat(rnmList);
-			// 	qList.push({ "statement": "MATCH path=(n:MODULES_ENDTOEND{moduleID:'" + data[0].id + "'}) WHERE NOT (n)-[:FMTTS]->() RETURN n", "resultDataContents": ["graph"] });
-			// 	qList.push({ "statement": "MATCH path=(n:MODULES_ENDTOEND{moduleID:'" + data[0].id + "'})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] });
-			// }
+			
 		}
 	} else {
 		logger.error("Invalid Session");

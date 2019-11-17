@@ -358,7 +358,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			releaseId.push(task.releaseid);
 			screenId.push(task.screenId);
 //			$scope.releaseDetails = data.respnames[0];
-			$scope.releaseDetails = data.taskName;
+			$scope.releaseDetails = task.releaseid;
 			$scope.cycleDetails = data.cycleid;
 			$scope.screenName = data.taskName;
 

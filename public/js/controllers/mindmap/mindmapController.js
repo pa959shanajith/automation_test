@@ -220,13 +220,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     }
                 });                
                 if ($scope.tab == 'tabAssign') {
-                    // change logic of release and cycle populating.
-                    // $("#ctExpandAssign .iconSpaceArrow").trigger('click');
-                    // mindmapServices.populateReleases($scope.projectNameO).then(function(result) {
-                    //     if (result == "Invalid Session") {
-                    //         return $rootScope.redirectPage();
-                    //     }
-                        //releaseResult = result;
                         result=$scope.projectList[selectedProjectIndex].releases
                         $('.release-list').empty();
                         $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
@@ -238,9 +231,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         for (i = 0; i < result.length; i++) {
 
                             $('.release-list').append("<option data-id='" + result[i].name + "' value='" + i + "'>" + result[i].name + "</option>");
-                            // reldata[result.r_ids[i]] = result[i].name
+                           
                         }
-                        default_releaseid = $('.release-list').val() ? $('.release-list').val() : 0;
                         $('.cycle-list').change(function() {
                             $('.cycle-list').removeClass('errorClass');
                             loadMindmapData1();
@@ -252,33 +244,21 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             }
                             $('#ctExpandAssign').unbind('click');
                             unloadMindmapData();
-                            // mindmapServices.populateCycles($('.release-list').val()).then(function(result_cycles) {
-                            //     if (result_cycles == "Invalid Session") {
-                            //         return $rootScope.redirectPage();
-                            //     }
+							default_releaseid = $('.release-list').val() ? $('.release-list').val() : 0;
                                 var result2 = $scope.projectList[selectedProjectIndex]["releases"][default_releaseid]["cycles"];
                                 $('.cycle-list').empty();
                                 $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
                                 $('.cycle-list').addClass('errorClass');
-                                // cycdata = {};
+                                cycdata = {};
                                 for (i = 0; i < result2.length; i++) {
                                     $('.cycle-list').append("<option data-id='" + result2[i]["name"] + "' value='" + result2[i]["_id"] + "'>" + result2[i]["name"] + "</option>");
-                                    // cycdata[result2.c_ids[i]] = result2.cyc[i];
+                                    cycdata[result2[i]["_id"]] = result2[i]["name"];
                                 }
-                                //loadMindmapData1(param);
-                            // }, function(error) {
-                            //     console.log("Error in populating Cycles");
-                            // })
+                           
                         });
 
-                        //display assign box after populating data
-                    // }, function(error) {
-                    //     console.log("Error in populating Releases");
-                    // })
                 }
 
-                // $(".project-list").val(selectedProject);
-                // selectedProject = undefined;
 
                 if ($scope.param == 0 && $scope.tab == 'tabCreate') {
                     loadMindmapData1();
@@ -369,7 +349,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     // reldata[result.r_ids[i]] = result[i].name
                 }
                 
-                default_releaseid = $('.release-list').val() ? $('.release-list').val() : 0;
+                
                 $('.release-list').change(function() {
                     $('.release-list').removeClass('errorClass');
                     $('.cycle-list').addClass('errorClass');
@@ -378,10 +358,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     }
                     $('#ctExpandAssign').unbind('click');
                     unloadMindmapData();
-                    // mindmapServices.populateCycles($('.release-list').val()).then(function(result_cycles) {
-                    //     if (result_cycles == "Invalid Session") {
-                    //         return $rootScope.redirectPage();
-                    //     }
+					default_releaseid = $('.release-list').val() ? $('.release-list').val() : 0;
                     var result2 = $scope.projectList[selectedProjectIndex]["releases"][default_releaseid]["cycles"];
                     $('.cycle-list').empty();
                     $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
@@ -391,15 +368,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         $('.cycle-list').append("<option data-id='" + result2[i]["name"] + "' value='" + result2[i]["_id"] + "'>" + result2[i]["name"] + "</option>");
                         cycdata[result2[i]["_id"]] = result2[i]["name"];
                     }
-                        //loadMindmapData1($scope.param);
-                    // }, function(error) {
-                    //     console.log("Error in populating Cycles");
-                    // })
+                   
                 });
-                //display assign box after populating data
-            // }, function(error) {
-            //     console.log("Error in populating Releases");
-            // })
+              
         }
 
         if ($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop")) {
@@ -788,8 +759,24 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             progressFlag=false;
             if($scope.tab=="tabAssign" && result["completeFlow"]==false)
             {
+											  
+												 
+			 
+								   
+						   
+																						
+										 
+																		
+										  
+										   
+								 
+								 
                 unblockUI();
                 openDialogMindmap("Error", "Please select a complete flow to assign tasks.");
+								
+											   
+																	
+										   
             }
             else
             {
@@ -969,9 +956,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 		} 
 		var p = d3.select('#ct-node-' + pi);
         p.select('.ct-nodeTask').classed('no-disp', !0);
-        if (dNodes[pi].oid != undefined && dNodes[pi].task != null) {
+        if (dNodes[pi].task != null) {
             dNodes[pi].task.tstatus = 'unassigned'; //tstatus and assignedtoname are solely for notification
-            unassignTask.push(dNodes[pi].oid);
+            unassignTask.push(dNodes[pi]._id);
         }
         d3.select('#ct-assignBox').classed('no-disp', !0);
         if (dNodes[pi].children && $('.pg-checkbox')[0].checked) {
@@ -1083,7 +1070,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             enddate: tObj.ed,
             re_estimation: tObj.re_estimation,
             release: $('.release-list').val(),
-            cycle: $('.cycle-list').val(),
+            cycleid: $('.cycle-list').val(),
             details: tObj.det,
             parent: data.parent,
             cx: clist != undefined ? clist.toString() : undefined
@@ -1130,7 +1117,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             Object.keys(tObj).forEach(function(k) {
                 if (tObj[k] === undefined) tObj[k] = null;
             });
-            //if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','imgs/node-task-assigned.png').attr('x',29).attr('y',-10);
+            if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','imgs/node-task-assigned.png').attr('x',29).attr('y',-10);
             if (nType == "modules" || nType == "endtoend") {
                 if (dNodes[pi]._id != "null") {
 
@@ -1469,7 +1456,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 attributes: {
                     'Task': dNodes[pi].taskexists.task,
                     'Release': reldata[dNodes[pi].taskexists.release],
-                    'Cycle': cycdata[dNodes[pi].taskexists.cycle],
+                    'Cycle': cycdata[dNodes[pi].taskexists.cycleid],
                     'Domain': $scope.domaininfo[0].domainName,
                     'Apptype':$scope.apptype
                 }
@@ -1508,13 +1495,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //if(t=='scenarios') return;
         var cycleid=$('.cycle-list').val();
         var nt = (dNodes[pi].task !== undefined || dNodes[pi].task != null) ? dNodes[pi].task : !1;
-        if (nt !== null && nt.length !== undefined){
-            nt.forEach(function(t,i){
-                if(t.cycle==cycleid){
-                    nt=dNodes[pi].task=t;
-                }
-            })
-        }
         
         var tObj = {
             t: (nt) ? nt.tasktype : '',
@@ -1524,7 +1504,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             sd: (nt) ? nt.startdate : '',
             ed: (nt) ? nt.enddate : '',
             re: (nt && nt.release != null) ? nt.release : '',
-            cy: (nt && nt.cycle != null) ? nt.cycle : '',
+            cy: (nt && nt.cycleid != null) ? nt.cycleid : '',
             det: (nt) ? nt.details : '',
             cx: (nt) ? nt.cx : undefined
         };
@@ -1645,7 +1625,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     $("#startDate").datepicker("show");
                 });
                 f = w.append('ul').attr('class', 'ct-asValCalBox dropdown-menu'); //.on('click',$('.ct-asValBoxIcon.ct-asItemCal.btn.dropdown-toggle').datepicker());
-                if (tObj.sd != '') {
+                if (tObj.sd != '' && tObj.sd.indexOf('/')==-1) {
                     var d=new Date(tObj.sd);
                     tObj.sd=d.getDate()+"/"+d.getMonth()+"/"+d.getFullYear();
                     $("#startDate").attr('disabled', 'disabled');
@@ -1667,7 +1647,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $('#dateIconEndDate').click(function() {
                     $("#endDate").datepicker("show");
                 });
-                if (tObj.ed != '') {
+                if (tObj.ed != '' && tObj.ed.indexOf('/')==-1) {
                     var d=new Date(tObj.ed);
                     tObj.ed=d.getDate()+"/"+d.getMonth()+"/"+d.getFullYear();
                 }
@@ -1743,7 +1723,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //condition to disable unassign task button
         setTimeout(function() {
             $('#ct-unassignButton a').addClass("disableButton");
-            if (dNodes[pi].task != null && dNodes[pi].task != undefined && dNodes[pi].task.oid != null) {
+            if (dNodes[pi].task != null && dNodes[pi].task != undefined) {
                 $('#ct-unassignButton a').removeClass("disableButton");
             }
         }, 30);
@@ -3187,6 +3167,19 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 unblockUI();
                 // if (flag == 10 || flag == 30) {
                     var moduleid = result;
+									 
+																		   
+													
+									   
+														
+										 
+							
+									 
+						  
+								  
+														
+													 
+						
                     setModuleBoxHeight();
                     if (selectedTab == 'tabCreate') populateDynamicInputList();
 
@@ -3214,6 +3207,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         if (result == "Invalid Session") {
                             return $rootScope.redirectPage();
                         }
+																  
+													
+													
+										 
+																																 
+																					   
+																					   
+												
                         currMap=result;
                         excelMap = JSON.parse(JSON.stringify(currMap));
                         loadedmodule = excelMap.name;
@@ -3805,15 +3806,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 addNode(d, !0, d.parent);
                 $scope.nodeDisplay[d.id].task = false;
                 if (d.task != null && $scope.tab != 'tabCreate') {
-                    if (d.task.release == $('.release-list').val() && d.task.cycle == $('.cycle-list').val()) {
-                        //d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10);
+                    if (d.task.cycleid == $('.cycle-list').val()) {
+                        d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10);
                         $scope.nodeDisplay[d.id].task = true;
                         $scope.nodeDisplay[d.id].taskOpacity = 1;
                     }
                 }
                 //Enhancement : Part of Issue 1685 showing the task assigned icon little transperent to indicate that task originally do not belongs to this release and cycle but task exists in some other release and cycle
                 else if (d.taskexists && $scope.tab != 'tabCreate') {
-                    //d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('style', 'opacity:0.6').attr('x', 29).attr('y', -10);
+                    d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('style', 'opacity:0.6').attr('x', 29).attr('y', -10);
                     $scope.nodeDisplay[d.id].task = true;
                     $scope.nodeDisplay[d.id].taskOpacity = 0.6;
                 }
@@ -3838,73 +3839,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             zoom.event(d3.select('#ct-mapSvg'));
             progressFlag = false;
 
-
-
-        // mindmapServices.checkReuse(reusedata).then(function(result) {
-        //     if (result == "Invalid Session") {
-        //         return $rootScope.redirectPage();
-        //     }
-        //     result['screen'].forEach(function(e, i) {
-        //         dNodes[e.idx].reuse = e.reuse;
-        //     })
-        //     result['testcase'].forEach(function(e, i) {
-        //         dNodes[e.idx].reuse = e.reuse;
-        //     })
-        //     dNodes.forEach(function(d) {
-        //         // switch-layout feature
-        //         if ($scope.verticalLayout) {
-        //             d.y = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
-        //             sections[d.type] = d.y;
-        //         } else {
-        //             d.y = d.x;
-        //             //Logic to change the layout and to reduce the length of the links
-        //             d.x = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
-        //             sections[d.type] = d.x;
-        //         }
-        //         if (d.oid === undefined) d.oid = d.id;
-        //         d.id = uNix++;
-        //         addNode(d, !0, d.parent);
-        //         $scope.nodeDisplay[d.id].task = false;
-        //         if (d.task != null && $scope.tab != 'tabCreate') {
-        //             if (d.task.release == $('.release-list').val() && d.task.cycle == $('.cycle-list').val()) {
-        //                 //d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10);
-        //                 $scope.nodeDisplay[d.id].task = true;
-        //                 $scope.nodeDisplay[d.id].taskOpacity = 1;
-        //             }
-        //         }
-        //         //Enhancement : Part of Issue 1685 showing the task assigned icon little transperent to indicate that task originally do not belongs to this release and cycle but task exists in some other release and cycle
-        //         else if (d.taskexists && $scope.tab != 'tabCreate') {
-        //             //d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('style', 'opacity:0.6').attr('x', 29).attr('y', -10);
-        //             $scope.nodeDisplay[d.id].task = true;
-        //             $scope.nodeDisplay[d.id].taskOpacity = 0.6;
-        //         }
-        //     });
-        //     dLinks = d3Tree.links(dNodes);
-        //     dLinks.forEach(function(d) {
-        //         d.id = uLix++;
-        //         addLink(d.id, d.source, d.target);
-        //     });
-        //     $timeout(function(){
-        //         dLinks.forEach(function(d) {
-        //             $("#link-"+d.source.id+"-"+d.target.id).attr("d",$scope.linkDisplay["link-"+d.source.id+"-"+d.target.id].d);
-        //             //addLink(d.id, d.source, d.target);
-        //         });
-        //     },200);
-        //     // switch-layout feature
-        //     if ($scope.verticalLayout)
-        //         zoom.translate([(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]);
-        //     else
-        //         zoom.translate([(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]);
-        //     //zoom.translate([(cSize[0]/2),(cSize[1]/2)]);
-        //     zoom.event(d3.select('#ct-mapSvg'));
-        //     progressFlag = false;
-
-        //     reuseDict = getReuseDetails();
-
-        // }, function(error) {
-        //     progressFlag = false;
-        //     console.log("Error: checkReuse service")
-        // })
     };
 
     //Dialog used through out mindmap

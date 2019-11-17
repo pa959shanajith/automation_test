@@ -47,7 +47,7 @@ exports.readTestSuite_ICE = function (req, res) {
 				} else {
 					var inputs = {
 						"id": eachSuite.testsuiteid,
-						"cycle": eachSuite.cycleid,
+						"cycleid": eachSuite.cycleid,
 						"testsuitename": eachSuite.testsuitename,
 						"versionnumber": eachSuite.versionnumber,
 						"query": "readTestSuite_ICE"
@@ -182,7 +182,7 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 		testsuitecheck: function (callback) {
 			var inputs = {
 				"id": requiredtestsuiteid,
-				"cycle": requiredcycleid,
+				"cycleid": requiredcycleid,
 				"query": "testsuitecheck"
 			};
 			var args = {
@@ -207,7 +207,7 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 		testcasesteps: function (callback) {
 			if (!flag) {
 				var inputs = {
-					"cycle": requiredcycleid,
+					"cycleid": requiredcycleid,
 					"name": requiredtestsuitename,
 					"id": requiredtestsuiteid,
 					"createdby": userInfo.userid,
@@ -263,7 +263,7 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 function updatescenariodetailsinsuite(req, cb, data) {
 	logger.info("Inside updatescenariodetailsinsuite function");
 	var inputs = {
-		"cycle": req.cycleid,
+		"cycleid": req.cycleid,
 		"name": req.testsuitename,
 		"id": req.testsuiteid,
 		"modifiedby": req.userInfo.userid,
@@ -606,7 +606,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                                                     "testsuiteid": testsuiteid,
                                                     "testscenarioid": scenarioid,
                                                     "browser": req_browser,
-                                                    "cycle": testsuiteidcycmap[testsuiteid],
+                                                    "cycleid": testsuiteidcycmap[testsuiteid],
                                                     "status": resultData.reportData.overallstatus[0].overallstatus,
                                                     "report": JSON.stringify(reportdata),
 													"query": "insertreportquery",
@@ -889,7 +889,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
                                                     "testsuiteid": testsuiteid,
                                                     "testscenarioid": scenarioid,
                                                     "browser": req_browser,
-                                                    "cycle": testsuiteidcycmap[testsuiteid],
+                                                    "cycleid": testsuiteidcycmap[testsuiteid],
                                                     "status": resultData.reportData.overallstatus[0].overallstatus,
                                                     "report": JSON.stringify(reportdata),
 													"query": "insertreportquery",
