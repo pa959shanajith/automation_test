@@ -9,9 +9,31 @@ exports.updateTaskstatus_mindmaps = function (req, res) {
 	logger.info("Inside UI service: updateTaskstatus_mindmaps");
 	if (utils.isSessionActive(req)) {
 		try {
-			var obj=req.body.obj;
+			var taskid=req.body.obj;
 			//Mongo query needs to be written to change the task status
-			res.send('inprogress');
+			var inputs= {
+				"id":taskid,
+				"action":"updatestatus",
+				"status":"inprogress"
+			}
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+
+			client.post(epurl+"mindmap/manageTask", args,
+			function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.error("Error occurred in mindmap/manageTask: updateTaskstatus_mindmaps, Error Code : ERRNDAC");
+					res.send("fail");
+				} else {
+					res.send('inprogress');
+				}
+
+			})
+			
 		} catch (error) {
 			logger.error("exception occurred in updateTaskstatus_mindmaps",error);
 		}
@@ -83,7 +105,7 @@ exports.getTaskJson_mindmaps = function (req, res) {
 							taskJSON=next_function(result.rows,prjId);
 							// console.log("came here");
 							res.send(taskJSON);
-							}
+					}
 						// res.send(result.rows);
 					
 				} catch (ex) {

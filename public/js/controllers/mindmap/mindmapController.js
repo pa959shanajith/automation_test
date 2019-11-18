@@ -500,23 +500,23 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         taskAssign = {
             "endtoend": {
                 "task": ["Execute", "Execute Batch"],
-                "attributes": ["bn", "at", "rw", "sd", "ed", "re_estimation", "pg"]
+                "attributes": ["bn", "at", "rw", "sd", "ed", "reestimation", "pg"]
             },
             "modules": {
                 "task": ["Execute", "Execute Batch"],
-                "attributes": ["bn", "at", "rw", "sd", "ed", "re_estimation", "pg"]
+                "attributes": ["bn", "at", "rw", "sd", "ed", "reestimation", "pg"]
             },
             "scenarios": {
                 "task": ["Execute Scenario"],
-                "attributes": ["at", "rw", "sd", "ed", "re_estimation", "pg", "cx"]
+                "attributes": ["at", "rw", "sd", "ed", "reestimation", "pg", "cx"]
             },
             "screens": {
                 "task": ["Scrape", "Append", "Compare", "Add", "Map"],
-                "attributes": ["at", "rw", "sd", "ed", "re_estimation", "pg", "cx"]
+                "attributes": ["at", "rw", "sd", "ed", "reestimation", "pg", "cx"]
             },
             "testcases": {
                 "task": ["Design", "Update"],
-                "attributes": ["at", "rw", "sd", "ed", "re_estimation", "cx"]
+                "attributes": ["at", "rw", "sd", "ed", "reestimation", "cx"]
             }
         };
         zoom = d3.behavior.zoom().scaleExtent([0.1, 3]).on("zoom", zoomed);
@@ -957,7 +957,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 		var p = d3.select('#ct-node-' + pi);
         p.select('.ct-nodeTask').classed('no-disp', !0);
         if (dNodes[pi].task != null) {
-            dNodes[pi].task.tstatus = 'unassigned'; //tstatus and assignedtoname are solely for notification
+            dNodes[pi].task.status = 'unassigned'; //status and assignedtoname are solely for notification
             unassignTask.push(dNodes[pi]._id);
         }
         d3.select('#ct-assignBox').classed('no-disp', !0);
@@ -1020,7 +1020,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 var nodeDateSplit = dNodes[pi].task.enddate.split("/");
                 var modDateSplit = $('#endDate').val().split("/");
                 if (new Date(nodeDateSplit[2], (nodeDateSplit[1] - 1), nodeDateSplit[0]) != new Date(modDateSplit[2], (modDateSplit[1] - 1), modDateSplit[0])) {
-                    estimationCount = parseInt(dNodes[pi].task.re_estimation) + 1;
+                    estimationCount = parseInt(dNodes[pi].task.reestimation) + 1;
                 }
             }
         }
@@ -1034,7 +1034,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             rw: /*(d3.select('#ct-assignRevw')[0][0])?*/ $('#ct-assignRevw').val() /*:null*/ ,
             sd: $('#startDate').val(),
             ed: $('#endDate').val(),
-            re_estimation: estimationCount,
+            reestimation: estimationCount,
             re: $('.release-list').val(),
             cy: $('.cycle-list').val(),
             det: d3.select('#ct-assignDetails').property('value'),
@@ -1042,12 +1042,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         };
         //console.log(tObj);
         if (dNodes[pi].task) {
-            tObj.id = dNodes[pi].task.id;
-            tObj.oid = dNodes[pi].task.oid;
+            tObj.id = dNodes[pi].task._id;
             tObj.parent = dNodes[pi].task.parent;
         } else {
             tObj.id = null;
-            tObj.oid = null;
             tObj.parent = null;
         }
 
@@ -1059,8 +1057,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
         var t = {
             taskvn: tObj.tvn,
-            id: tObj.id,
-            oid: tObj.oid,
+            id: tObj._id != undefined ? tObj._id : tObj.id,
             batchName: tObj.bn,
             task: tObj.t,
             assignedto: tObj.at,
@@ -1068,7 +1065,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             reviewer: tObj.rw,
             startdate: tObj.sd,
             enddate: tObj.ed,
-            re_estimation: tObj.re_estimation,
+            reestimation: tObj.reestimation,
             release: $('.release-list').val(),
             cycleid: $('.cycle-list').val(),
             details: tObj.det,
@@ -1175,7 +1172,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 }
                 // If task already exists then set it to true
                 if (dNodes[pi].task) taskStatus = 'updated';
-                else taskStatus = 'created';
+                else taskStatus = 'assigned';
                 if (qid == 9)
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 9,
@@ -1245,7 +1242,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     dNodes[pi].task.reviewer = tObj.rw;
                     dNodes[pi].task.enddate = tObj.ed;
                 }
-                dNodes[pi].task.tstatus = taskStatus;
+                dNodes[pi].task.status = taskStatus;
               
 
                 function replicateTask(pi) {
@@ -1293,7 +1290,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             openDialogMindmap("Task Assignment Error", "Please select Release/Cycle")
         }
         for (var i = 0; i < taskidArr.length; i++) {
-            if (taskidArr[i].id == dNodes[pi].task.id) {
+            if (taskidArr[i].id == dNodes[pi].task._id) {
                 if (dNodes[pi].task.task == "Execute" || dNodes[pi].task.task == "Execute Batch") {
                     assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
                 } else if (dNodes[pi].task.task == "Execute Scenario") {
@@ -1506,7 +1503,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             re: (nt && nt.release != null) ? nt.release : '',
             cy: (nt && nt.cycleid != null) ? nt.cycleid : '',
             det: (nt) ? nt.details : '',
-            cx: (nt) ? nt.cx : undefined
+            cx: (nt) ? nt.cx : undefined,
+            id:(nt)? nt._id:null
         };
 
         c.classed('no-disp', !1);
@@ -1543,7 +1541,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
         var default_releaseid = '';
         taskAssign[t].attributes.forEach(function(tk) {
-            v = tk != 're_estimation' ? u.append('li') : v;
+            v = tk != 'reestimation' ? u.append('li') : v;
             //v=u.append('li');
             if (tk == "bn") {
                 v.append('span').attr('class', 'ct-assignItem fl-left').html('Batch Name');
@@ -1573,7 +1571,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             $('#ct-assignedTo').append("<option data-id='" + res[i]["name"] + "' value='" + res[i]["_id"] + "'>" + res[i]["name"] + "</option>");
 						}
                         $("#ct-assignedTo option[value='" + tObj.at + "']").attr('selected', 'selected');
-                        if ($("#ct-assignedTo").val() != "select user" && nt.oid != null) {
+                        if ($("#ct-assignedTo").val() != "select user" && nt._id != null) {
                             $('#ct-assignedTo').attr('disabled', 'disabled');
                             $('#ct-assignedTo').css('background', '#ebebe4');
                         }
@@ -1727,9 +1725,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $('#ct-unassignButton a').removeClass("disableButton");
             }
         }, 30);
-        if (dNodes[pi].task && dNodes[pi].task.id) {
+        if (dNodes[pi].task && dNodes[pi].task._id) {
             var nodeClik = {};
-            nodeClik.id = dNodes[pi].task.id;
+            nodeClik.id = dNodes[pi].task._id;
             taskidArr.push(nodeClik);
         }
     };

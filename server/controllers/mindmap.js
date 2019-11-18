@@ -881,7 +881,7 @@ exports.saveData = function (req, res) {
 				if ('assignedToName' in task) {
 					var assignedTo = task.assignedToName;
 					if (assignedTo != null && assignedTo != undefined) {
-						if ('tstatus' in task) {
+						if ('status' in task) {
 							assignedObj[task.details] = assignedTo;
 						}
 					}
@@ -982,7 +982,7 @@ exports.saveData = function (req, res) {
 				t = e.task;
 				var tsk={}
 				if (e.type == 'endtoend') {
-					if (t != null && e._id != null && (t.tstatus == 'created' || t.tstatus == 'updated')) {
+					if (t != null && e._id != null) {
 						tsk.tasktype=t.task
 						tsk.nodetype="testsuites"
 						tsk.name=e.name
@@ -997,12 +997,12 @@ exports.saveData = function (req, res) {
 						tsk.reviewer=t.reviewer
 						tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
 						tsk.batchname=t.batchName
-						tsk.status=t.tstatus
+						tsk.status=t.status
 						tsk.details=t.details
-						tsk.reestimation=t.re_estimation
+						tsk.reestimation=t.reestimation
 						tsk.complexity=""
 						tsk.history=[]
-						tsk.id=t.oid
+						tsk.id=t._id!== undefined ? t._id: t.id
 						tsk.projectid=prjId
 						if (tsk.id!=null){
 							tasks_update.push(tsk)
@@ -1013,7 +1013,7 @@ exports.saveData = function (req, res) {
 					}
 				}
 				else if (e.type == 'modules') {
-					if (t != null && e._id != null && (t.tstatus == 'created' || t.tstatus == 'updated')) {
+					if (t != null && e._id != null) {
 						tsk.tasktype=t.task
 						tsk.nodetype="testsuites"
 						tsk.name=e.name
@@ -1028,12 +1028,12 @@ exports.saveData = function (req, res) {
 						tsk.reviewer=t.reviewer
 						tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
 						tsk.batchname=t.batchName
-						tsk.status=t.tstatus
+						tsk.status=t.status
 						tsk.details=t.details
-						tsk.reestimation=t.re_estimation
+						tsk.reestimation=t.reestimation
 						tsk.complexity=""
 						tsk.history=[]
-						tsk.id=t.oid
+						tsk.id=t._id!== undefined ? t._id: t.id
 						tsk.projectid=prjId
 						if (tsk.id!=null){
 							tasks_update.push(tsk)
@@ -1046,7 +1046,7 @@ exports.saveData = function (req, res) {
 				}
 				else if (e.type == 'scenarios') {
 					//Part of Issue 1685, take projectid from the scenarios in case of end to end modules
-					if (t != null && e._id != null && (t.tstatus == 'created' || t.tstatus == 'updated')) {
+					if (t != null && e._id != null) {
 						tsk.tasktype="Execute"
 						tsk.nodetype="testscenarios"
 						tsk.name=e.name
@@ -1061,12 +1061,12 @@ exports.saveData = function (req, res) {
 						tsk.reviewer=t.reviewer
 						tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
 						tsk.batchname=""
-						tsk.status=t.tstatus
+						tsk.status=t.status
 						tsk.details=t.details
-						tsk.reestimation=t.re_estimation
+						tsk.reestimation=t.reestimation
 						tsk.complexity=""
 						tsk.history=[]
-						tsk.id=t.oid
+						tsk.id=t._id!== undefined ? t._id: t.id
 						tsk.projectid=prjId
 						if (tsk.id!=null){
 							tasks_update.push(tsk)
@@ -1079,7 +1079,7 @@ exports.saveData = function (req, res) {
 				else if (e.type == 'screens') {
 					uidx++; lts = idDict[e.pid];
 
-					if (t != null && e._id != null && (t.tstatus == 'created' || t.tstatus == 'updated')) {
+					if (t != null && e._id != null) {
 						tsk.tasktype=t.task
 						tsk.nodetype=e.type
 						tsk.name=e.name
@@ -1094,12 +1094,12 @@ exports.saveData = function (req, res) {
 						tsk.reviewer=t.reviewer
 						tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
 						tsk.batchname=""
-						tsk.status=t.tstatus
+						tsk.status=t.status
 						tsk.details=t.details
-						tsk.reestimation=t.re_estimation
+						tsk.reestimation=t.reestimation
 						tsk.complexity=""
 						tsk.history=[]
-						tsk.id=t.oid
+						tsk.id=t._id!== undefined ? t._id: t.id
 						tsk.projectid=prjId
 						if (tsk.id != null) {
 							if (cycId == t.cycleid) {
@@ -1124,7 +1124,7 @@ exports.saveData = function (req, res) {
 				else if (e.type == 'testcases') {
 					var screenid_c = 'null';
 
-					if (t != null && e.id != null && (t.tstatus == 'created' || t.tstatus == 'updated')) {
+					if (t != null && e.id != null) {
 						tsk.tasktype=t.task
 						tsk.nodetype=e.type
 						tsk.name=e.name
@@ -1139,12 +1139,12 @@ exports.saveData = function (req, res) {
 						tsk.reviewer=t.reviewer
 						tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
 						tsk.batchname=""
-						tsk.status=t.tstatus
+						tsk.status=t.status
 						tsk.details=t.details
 						tsk.reestimation=t.re_estimation
 						tsk.complexity=""
 						tsk.history=[]
-						tsk.id=t.oid
+						tsk.id=t._id!== undefined ? t._id: t.id
 						tsk.projectid=prjId
 						if (tsk.id != null) {
 							if (cycId == t.cycleid) {
@@ -1179,11 +1179,11 @@ exports.saveData = function (req, res) {
 					"Content-Type": "application/json"
 				}
 			}
-			logger.info("Calling NDAC Service from newProjectDetails : admin/createProject_ICE");
-			client.post(epurl+"mindmap/manageTaskDetails", args,
+			logger.info("Calling NDAC Service from saveData : admin/createProject_ICE");
+			client.post(epurl+"mindmap/manageTask", args,
 				function (data_var, response) {
 					if (response.statusCode != 200 || data_var.rows == "fail") {
-						logger.error("Error occurred in mindmap/manageTaskDetails from newProjectDetails Error Code : ERRNDAC");
+						logger.error("Error occurred in mindmap/manageTask from saveData Error Code : ERRNDAC");
 						res.send("fail");
 					} else {
 						var modid='fail'
