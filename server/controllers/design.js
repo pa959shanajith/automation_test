@@ -145,7 +145,8 @@ exports.updateTestCase_ICE = function (req, res) {
 			var inputs = {
 				"screenid": requestedscreenid,
 				"query": "updatetestcasedata",
-				"modifiedby": userinfo.username.toLowerCase(),
+				"modifiedby": userinfo.user_id,
+				"modifiedbyrole": userinfo.role,
 				"testcasesteps": requestedtestcasesteps,
 				"versionnumber": requestedversionnumber,
 				"testcaseid": requestedtestcaseid,
