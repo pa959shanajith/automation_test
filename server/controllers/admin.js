@@ -1077,6 +1077,28 @@ exports.getAssignedProjects_ICE = function (req, res) {
 	}
 };
 
+function createCycle(args, createCycleCallback) {
+	logger.info("Inside function createCycle");
+	var statusFlag = "";
+	logger.info("Calling NDAC Service from createCycle:createProject_ICE");
+	client.post(epurl + "admin/updateProject_ICE", args,
+		function (result, response) {
+		try {
+			if (response.statusCode != 200 || result.rows == "fail") {
+				statusFlag = "Error occurred in createCycle of createProject_ICE : Fail";
+				logger.error("Error occurred in createProject_ICE from createCycle Error Code : ERRNDAC");
+				createCycleCallback(statusFlag, null);
+			} else {
+				var newCycleID  = result.rows[0].cycleid;
+				createCycleCallback(null, result.rows[0]);
+				logger.info("Cycle created for project successfully");
+			}
+		} catch (exception) {
+			logger.error(exception.message);
+		}
+	});
+}
+
 /**
  * this service is used to create/update/delete projects/releases/cycles
  * from a particular domain
@@ -1095,7 +1117,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 			function validateUpdateProject() {
 				logger.info("Inside function validateUpdateProject");
 				var check_project = validator.isEmpty(updateProjectDetails.projectName);
-				var check_projectId = validator.isUUID(updateProjectDetails.projectId);
+				var check_projectId = validator.isMongoId(updateProjectDetails.projectId);
 				var check_projectLen = validator.isLength(updateProjectDetails.projectName, 1, 50);
 				if (check_project == false && check_projectLen == true && check_projectId == true) {
 					valid_projectName = true;
@@ -1117,7 +1139,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 							try {
 								var releaseCreateStatus = eachprojectDetail.newStatus;
 								var releaseDetails = eachprojectDetail;
-								var cycleDetails = releaseDetails.cycleDetails;
+								var cycles = releaseDetails.cycles;
 								if (releaseCreateStatus) {
 									try {
 										var releaseName = releaseDetails.releaseName;
@@ -1164,7 +1186,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
                                                                 "',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:b.cycleid}]->(b) return a,r,b"});*/
                                                     // reqToAPI(qList,urlData);
 
-													async.forEachSeries(cycleDetails, function (eachCycleDetail, cycleNamescallback) {
+													async.forEachSeries(cycles, function (eachCycleDetail, cycleNamescallback) {
 														try {
 															var eachCycleName = eachCycleDetail.cycleName;
 															var inputs = {
@@ -1210,7 +1232,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 										//this piece of code runs when only cycles needs to be created
 										//in a specified release
 										var releaseId = releaseDetails.releaseId;
-										async.forEachSeries(cycleDetails, function (eachCycleDetail, cycleNamescallback) {
+										async.forEachSeries(cycles, function (eachCycleDetail, cycleNamescallback) {
 											try {
 												var eachCycleName = eachCycleDetail.cycleName;
 												var inputs = {
@@ -1285,7 +1307,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
                                                                 "',releaseid:'"+inputs.releaseid+"',releasename:'"+
                                                                 inputs.releasename+"'}) detach delete n"});*/
                                                     //reqToAPI(qList,urlData);
-													var cyclesOfRelease = eachprojectDetail.cycleDetails;
+													var cyclesOfRelease = eachprojectDetail.cycles;
 													async.forEachSeries(cyclesOfRelease, function (eachCycleDetail, eachCycleCallback) {
 														try {
 															var inputs = {
@@ -1328,8 +1350,8 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 										});
 									} else if (!deleteStatus) {
 										try {
-											var cycleDetails = eachprojectDetail.cycleDetails;
-											async.forEachSeries(cycleDetails, function (eachCycleDetail, eachCycleCallback) {
+											var cycles = eachprojectDetail.cycles;
+											async.forEachSeries(cycles, function (eachCycleDetail, eachCycleCallback) {
 												try {
 													var deleteStatusCycles = eachCycleDetail.deleteStatus;
 													if (deleteStatusCycles) {
@@ -1439,10 +1461,10 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																	res.send(flag);
 																} else {
 																	try {
-																		var cycleDetails = eachprojectDetail.cycleDetails;
+																		var cycles = eachprojectDetail.cycles;
 																		var newCycleName = "";
 																		var cycleId = "";
-																		async.forEachSeries(cycleDetails, function (eachCycleDetail, eachCycleCallback) {
+																		async.forEachSeries(cycles, function (eachCycleDetail, eachCycleCallback) {
 																			try {
 																				var editedStatusCycles = eachCycleDetail.editStatus;
 																				if (editedStatusCycles) {
@@ -1526,10 +1548,10 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 										}
 									} else {
 										try {
-											var cycleDetails = eachprojectDetail.cycleDetails;
+											var cycles = eachprojectDetail.cycles;
 											var newCycleName = "";
 											var cycleId = "";
-											async.forEachSeries(cycleDetails, function (eachCycleDetail, eachCycleCallback) {
+											async.forEachSeries(cycles, function (eachCycleDetail, eachCycleCallback) {
 												try {
 													var editedStatusCycles = eachCycleDetail.editStatus;
 													if (editedStatusCycles) {

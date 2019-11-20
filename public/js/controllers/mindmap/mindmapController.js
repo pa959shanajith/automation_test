@@ -1042,10 +1042,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         };
         //console.log(tObj);
         if (dNodes[pi].task) {
-            tObj.id = dNodes[pi].task._id;
+            tObj._id = dNodes[pi].task._id;
             tObj.parent = dNodes[pi].task.parent;
         } else {
-            tObj.id = null;
+            tObj._id = null;
             tObj.parent = null;
         }
 
@@ -1057,7 +1057,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
         var t = {
             taskvn: tObj.tvn,
-            id: tObj._id != undefined ? tObj._id : tObj.id,
+            _id: tObj._id != undefined ? tObj._id : null,
             batchName: tObj.bn,
             task: tObj.t,
             assignedto: tObj.at,
@@ -1290,7 +1290,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             openDialogMindmap("Task Assignment Error", "Please select Release/Cycle")
         }
         for (var i = 0; i < taskidArr.length; i++) {
-            if (taskidArr[i].id == dNodes[pi].task._id) {
+            if (taskidArr[i]._id == dNodes[pi].task._id) {
                 if (dNodes[pi].task.task == "Execute" || dNodes[pi].task.task == "Execute Batch") {
                     assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
                 } else if (dNodes[pi].task.task == "Execute Scenario") {
@@ -1504,7 +1504,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             cy: (nt && nt.cycleid != null) ? nt.cycleid : '',
             det: (nt) ? nt.details : '',
             cx: (nt) ? nt.cx : undefined,
-            id:(nt)? nt._id:null
+            _id:(nt)? nt._id:null
         };
 
         c.classed('no-disp', !1);
@@ -1727,7 +1727,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }, 30);
         if (dNodes[pi].task && dNodes[pi].task._id) {
             var nodeClik = {};
-            nodeClik.id = dNodes[pi].task._id;
+            nodeClik._id = dNodes[pi].task._id;
             taskidArr.push(nodeClik);
         }
     };

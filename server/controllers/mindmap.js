@@ -869,7 +869,7 @@ exports.saveData = function (req, res) {
 		var flag = inputs.write;
 		var removeTask = inputs.unassignTask;
 		var sendNotify = inputs.sendNotify;
-		var relId = inputs.relId;
+		//var relId = inputs.relId;
 		var cycId = inputs.cycId;
 		var idxDict = [];
 		var createdthrough='Web'
@@ -983,6 +983,7 @@ exports.saveData = function (req, res) {
 				var tsk={}
 				if (e.type == 'endtoend') {
 					if (t != null && e._id != null) {
+						if (t._id!=null && !(removeTask.includes(tsk._id))) return;
 						tsk.tasktype=t.task
 						tsk.nodetype="testsuites"
 						tsk.name=e.name
@@ -1002,9 +1003,9 @@ exports.saveData = function (req, res) {
 						tsk.reestimation=t.reestimation
 						tsk.complexity=""
 						tsk.history=[]
-						tsk.id=t._id!== undefined ? t._id: t.id
+						tsk._id=t._id!== null ? t._id: null
 						tsk.projectid=prjId
-						if (tsk.id!=null){
+						if (tsk._id!=null){
 							tasks_update.push(tsk)
 						}
 						else{
@@ -1014,6 +1015,8 @@ exports.saveData = function (req, res) {
 				}
 				else if (e.type == 'modules') {
 					if (t != null && e._id != null) {
+						if (t._id!=null && !(removeTask.includes(tsk._id))) return;
+						
 						tsk.tasktype=t.task
 						tsk.nodetype="testsuites"
 						tsk.name=e.name
@@ -1033,9 +1036,11 @@ exports.saveData = function (req, res) {
 						tsk.reestimation=t.reestimation
 						tsk.complexity=""
 						tsk.history=[]
-						tsk.id=t._id!== undefined ? t._id: t.id
 						tsk.projectid=prjId
-						if (tsk.id!=null){
+						
+						
+						if (t._id!=null){
+							tsk._id=t._id
 							tasks_update.push(tsk)
 						}
 						else{
@@ -1047,6 +1052,7 @@ exports.saveData = function (req, res) {
 				else if (e.type == 'scenarios') {
 					//Part of Issue 1685, take projectid from the scenarios in case of end to end modules
 					if (t != null && e._id != null) {
+						if (t._id!=null && !(removeTask.includes(tsk._id))) return;
 						tsk.tasktype="Execute"
 						tsk.nodetype="testscenarios"
 						tsk.name=e.name
@@ -1060,15 +1066,15 @@ exports.saveData = function (req, res) {
 						tsk.assignedto=t.assignedto
 						tsk.reviewer=t.reviewer
 						tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
-						tsk.batchname=""
 						tsk.status=t.status
 						tsk.details=t.details
 						tsk.reestimation=t.reestimation
 						tsk.complexity=""
 						tsk.history=[]
-						tsk.id=t._id!== undefined ? t._id: t.id
 						tsk.projectid=prjId
-						if (tsk.id!=null){
+						
+						if (t._id!=null){
+							tsk._id=t._id
 							tasks_update.push(tsk)
 						}
 						else{
@@ -1080,6 +1086,7 @@ exports.saveData = function (req, res) {
 					uidx++; lts = idDict[e.pid];
 
 					if (t != null && e._id != null) {
+						if (t._id!=null && !(removeTask.includes(tsk._id))) return;
 						tsk.tasktype=t.task
 						tsk.nodetype=e.type
 						tsk.name=e.name
@@ -1093,31 +1100,30 @@ exports.saveData = function (req, res) {
 						tsk.assignedto=t.assignedto
 						tsk.reviewer=t.reviewer
 						tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
-						tsk.batchname=""
 						tsk.status=t.status
 						tsk.details=t.details
 						tsk.reestimation=t.reestimation
 						tsk.complexity=""
 						tsk.history=[]
-						tsk.id=t._id!== undefined ? t._id: t.id
 						tsk.projectid=prjId
-						if (tsk.id != null) {
+						if (t._id != null) {
 							if (cycId == t.cycleid) {
+								tsk.projectid=prjId
+								tsk._id=t._id
 								tasks_update.push(tsk)
-								// if (t.updatedParent != undefined) {
-								// 	qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]'}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.status='" + taskstatus + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]',n.cx='" + t.cx + "'" });
-								// } else {
-								// 	qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]'}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.status='" + taskstatus + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "',n.cx='" + t.cx + "'" });
-								// }
+								
 							}
 
-						}
-						else if (!t.copied) {
-							// If reused 
-							// t.parent = [prjId].concat(t.parent);
+						}else{
 							tasks_insert.push(tsk)
-							// qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',release:'" + t.release + "',cycle:'" + t.cycle + "',re_estimation:'" + t.re_estimation + "',details:'" + t.details + "',parent:'[" + t.parent + "]',uid:'" + uidx + "',cx:'" + t.cx + "'})" });
+
 						}
+						// else if (!t.copied) {
+						// 	// If reused 
+						// 	// t.parent = [prjId].concat(t.parent);
+						// 	tasks_insert.push(tsk)
+						// 	// qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',release:'" + t.release + "',cycle:'" + t.cycle + "',re_estimation:'" + t.re_estimation + "',details:'" + t.details + "',parent:'[" + t.parent + "]',uid:'" + uidx + "',cx:'" + t.cx + "'})" });
+						// }
 						// qList.push({ "statement": "MATCH (a:SCREENS{screenID_c:'" + e.id_c + "'}),(b:TASKS{taskID:'" + t.id + "'}) MERGE (a)-[r:FNTT {id:a.screenID}]-(b)" });
 					}
 				}
@@ -1125,6 +1131,7 @@ exports.saveData = function (req, res) {
 					var screenid_c = 'null';
 
 					if (t != null && e.id != null) {
+						if (t._id!=null && !(removeTask.includes(tsk._id))) return;
 						tsk.tasktype=t.task
 						tsk.nodetype=e.type
 						tsk.name=e.name
@@ -1138,16 +1145,15 @@ exports.saveData = function (req, res) {
 						tsk.assignedto=t.assignedto
 						tsk.reviewer=t.reviewer
 						tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
-						tsk.batchname=""
 						tsk.status=t.status
 						tsk.details=t.details
-						tsk.reestimation=t.re_estimation
+						tsk.reestimation=t.reestimation
 						tsk.complexity=""
 						tsk.history=[]
-						tsk.id=t._id!== undefined ? t._id: t.id
 						tsk.projectid=prjId
-						if (tsk.id != null) {
+						if (t._id != null) {
 							if (cycId == t.cycleid) {
+								tsk._id=t._id
 								tasks_update.push(tsk)
 								// if (t.updatedParent != undefined) {
 								// 	qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]'}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.status='" + taskstatus + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]',n.cx='" + t.cx + "'" });
@@ -1156,13 +1162,15 @@ exports.saveData = function (req, res) {
 								// }
 							}
 
-						}
-						else if (!t.copied) {
-							// If reused 
-							// t.parent = [prjId].concat(t.parent);
+						}else{
 							tasks_insert.push(tsk)
-							// qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',release:'" + t.release + "',cycle:'" + t.cycle + "',re_estimation:'" + t.re_estimation + "',details:'" + t.details + "',parent:'[" + t.parent + "]',uid:'" + uidx + "',cx:'" + t.cx + "'})" });
 						}
+						// else if (!t.copied) {
+						// 	// If reused 
+						// 	// t.parent = [prjId].concat(t.parent);
+						// 	tasks_insert.push(tsk)
+						// 	// qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',release:'" + t.release + "',cycle:'" + t.cycle + "',re_estimation:'" + t.re_estimation + "',details:'" + t.details + "',parent:'[" + t.parent + "]',uid:'" + uidx + "',cx:'" + t.cx + "'})" });
+						// }
 						// qList.push({ "statement": "MATCH (a:SCREENS{screenID_c:'" + e.id_c + "'}),(b:TASKS{taskID:'" + t.id + "'}) MERGE (a)-[r:FNTT {id:a.screenID}]-(b)" });
 					}
 				}
