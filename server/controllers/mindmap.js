@@ -983,7 +983,7 @@ exports.saveData = function (req, res) {
 				var tsk={}
 				if (e.type == 'endtoend') {
 					if (t != null && e._id != null) {
-						if (t._id!=null && !(removeTask.includes(tsk._id))) return;
+						if (t._id!=null && (removeTask.includes(t._id))) return;
 						tsk.tasktype=t.task
 						tsk.nodetype="testsuites"
 						tsk.name=e.name
@@ -1015,7 +1015,7 @@ exports.saveData = function (req, res) {
 				}
 				else if (e.type == 'modules') {
 					if (t != null && e._id != null) {
-						if (t._id!=null && !(removeTask.includes(tsk._id))) return;
+						if (t._id!=null && (removeTask.includes(t._id))) return;
 						
 						tsk.tasktype=t.task
 						tsk.nodetype="testsuites"
@@ -1052,7 +1052,7 @@ exports.saveData = function (req, res) {
 				else if (e.type == 'scenarios') {
 					//Part of Issue 1685, take projectid from the scenarios in case of end to end modules
 					if (t != null && e._id != null) {
-						if (t._id!=null && !(removeTask.includes(tsk._id))) return;
+						if (t._id!=null && (removeTask.includes(t._id))) return;
 						tsk.tasktype="Execute"
 						tsk.nodetype="testscenarios"
 						tsk.name=e.name
@@ -1086,7 +1086,7 @@ exports.saveData = function (req, res) {
 					uidx++; lts = idDict[e.pid];
 
 					if (t != null && e._id != null) {
-						if (t._id!=null && !(removeTask.includes(tsk._id))) return;
+						if (t._id!=null && (removeTask.includes(t._id))) return;
 						tsk.tasktype=t.task
 						tsk.nodetype=e.type
 						tsk.name=e.name
@@ -1131,7 +1131,7 @@ exports.saveData = function (req, res) {
 					var screenid_c = 'null';
 
 					if (t != null && e.id != null) {
-						if (t._id!=null && !(removeTask.includes(tsk._id))) return;
+						if (t._id!=null && (removeTask.includes(t._id))) return;
 						tsk.tasktype=t.task
 						tsk.nodetype=e.type
 						tsk.name=e.name
