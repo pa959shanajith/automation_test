@@ -1148,7 +1148,9 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 											"query": "createrelease",
 											"projectid": requestedprojectid,
 											"releasename": releaseName,
-											"createdby": userinfo.username.toLowerCase(),
+											"cycles":cycles,
+											"createdby": userinfo.user_id,
+											"createdbyrole":userinfo.role,
 											"skucoderelease": "skucoderelease",
 											"tags": "tags"
 										};
@@ -1159,66 +1161,33 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 											}
 										};
 										logger.info("Calling NDAC Service from newProjectDetails : admin/createProject_ICE");
-										client.post(epurl + "admin/createProject_ICE", args,
+										client.post(epurl + "admin/updateProject_ICE", args,
 											function (data, response) {
 
 											try {
 												if (response.statusCode != 200 || data.rows == "fail") {
 												logger.error("Error occurred in admin/createProject_ICE from newProjectDetails Error Code : ERRNDAC");
 												} else {
-													newReleaseID = data.rows[0].releaseid;
-                                                    //Execute neo4j query!! createrelease
-                                                    /*qList.push({"statement":"MERGE (n:RELEASES_NG {releaseid:'"+newReleaseID+
-                                                                "',projectid:'"+inputs.projectid+"',releasename:'"+
-                                                                inputs.releasename+"',deleted:'"+false+"'}) return n"});*/
-                                                    //reqToAPI(qList,urlData);
-                                                    //Relationships
-                                                   /* qList.push({"statement":"MATCH (a:PROJECTS_NG{projectid:'"+inputs.projectid+"'}),(b:RELEASES_NG {releaseid:'"+newReleaseID+
-                                                                "',projectid:'"+inputs.projectid+"',releasename:'"+
-                                                                inputs.releasename+"',deleted:'"+false+"'}) MERGE(a)-[r:FPRJTREL_NG{id:'"+newReleaseID+
-                                                                "'}]->(b) return a,r,b"});*/
+													//newReleaseID = data.rows[0].releaseid;
+                                                  
 
-                                                    //qList.push({"statement":"MATCH (c:RELEASES_NG{releaseid:'"+newReleaseID+"'}) return c"})
-                                                    //qList.push({"statement":"MATCH (c:CYCLES_NG{releaseid:'"+newReleaseID+"'}) return c"})
-
-                                                   /* qList.push({"statement":"MATCH (a:RELEASES_NG{releaseid:'"+newReleaseID+
-                                                                "'}),(b:CYCLES_NG {releaseid:'"+newReleaseID+
-                                                                "',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:b.cycleid}]->(b) return a,r,b"});*/
-                                                    // reqToAPI(qList,urlData);
-
-													async.forEachSeries(cycles, function (eachCycleDetail, cycleNamescallback) {
-														try {
-															var eachCycleName = eachCycleDetail.cycleName;
-															var inputs = {
-																"query": "createcycle",
-																"releaseid": newReleaseID,
-																"cyclename": eachCycleName,
-																"createdby": userinfo.username.toLowerCase(),
-																"skucodecycle": "skucodecycle",
-																"tags": "tags"
-															};
-															var args = {
-																data: inputs,
-																headers: {
-																	"Content-Type": "application/json"
-																}
-															};
-															createCycle(args, function (error, response) {
-																if (error) {
-																	logger.error(error);
-																	res.send(error);
-																} else {
-																	try {
-																		cycleNamescallback();
-																	} catch (exception) {
-																		logger.error(exception.message);
-																	}
-																}
-															});
-														} catch (exception) {
-															logger.error(exception.message);
-														}
-													}, eachprojectDetailcallback);
+													// async.forEachSeries(cycles, function (eachCycleDetail, cycleNamescallback) {
+													// 	try {
+													// 		var eachCycleName = eachCycleDetail.cycleName;
+													// 		var inputs = {
+													// 			"query": "createcycle",
+													// 			"releaseid": newReleaseID,
+													// 			"cyclename": eachCycleName,
+													// 			"createdby": userinfo.username.toLowerCase(),
+													// 			"skucodecycle": "skucodecycle",
+													// 			"tags": "tags"
+													// 		};
+															
+															
+													// 	} catch (exception) {
+													// 		logger.error(exception.message);
+													// 	}
+													// }, eachprojectDetailcallback);
 												}
 											} catch (exception) {
 											logger.error(exception.message);
@@ -1237,9 +1206,11 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 												var eachCycleName = eachCycleDetail.cycleName;
 												var inputs = {
 													"query": "createcycle",
+													"projectid":requestedprojectid,
+													"createdbyrole":userinfo.role,
 													"releaseid": releaseId,
 													"cyclename": eachCycleName,
-													"createdby": userinfo.username.toLowerCase(),
+													"createdby": userinfo.user_id,
 													"skucodecycle": "skucodecycle",
 													"tags": "tags"
 												};
@@ -1633,7 +1604,9 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 					if (error) {
 						logger.error("Error occurred in function newProjectDetails");
 						res.send("fail");
-					} 
+					} else{
+						res.send("success");
+					}
 				});
 			} else {
 				res.send('fail');
