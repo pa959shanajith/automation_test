@@ -1003,9 +1003,9 @@ exports.saveData = function (req, res) {
 						tsk.reestimation=t.reestimation
 						tsk.complexity=""
 						tsk.history=[]
-						tsk._id=t._id!== null ? t._id: null
 						tsk.projectid=prjId
-						if (tsk._id!=null){
+						if (t._id!=null){
+							tsk._id=t._id
 							tasks_update.push(tsk)
 						}
 						else{

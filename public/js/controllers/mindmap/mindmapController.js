@@ -294,8 +294,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $scope.projectName3 = $scope.projectNameO;
         $scope.projectName2 = $scope.projectNameO;
         $scope.projectName1 = $scope.projectNameO;
+
+        selectedProject = $scope.projectNameO;
+        selectedProjectIndex=0;
+        $scope.projectList.forEach(function(p,i){
+            if ((p.id)==selectedProject) selectedProjectIndex=i;
+        })
         if ($scope.tab == 'mindmapEndtoEndModules') {
             selectedProject = $("#selectProjectEtem").val();
+            $scope.projectList.forEach(function(p,i){
+                if ((p.id)==selectedProject) selectedProjectIndex=i;
+            })
             //alert($scope.projectName);
             $('#eteSearchModules').val('');
             if ($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop")) {
@@ -312,12 +321,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $('.fa.fa-clipboard.fa-lg.plus-icon').removeClass('active-map');
         $('#searchModule-create').val('');
         $('#searchModule-assign').val('');
-        selectedProject = $scope.projectNameO;
-
-        selectedProjectIndex=0;
-        $scope.projectList.forEach(function(p,i){
-            if ((p.id)==selectedProject) selectedProjectIndex=i;
-        })
+        
 
         if ($scope.tab == 'tabAssign') {
             if ($("#ct-AssignBox").hasClass("ct-open") == true) {
@@ -3811,7 +3815,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     }
                 }
                 //Enhancement : Part of Issue 1685 showing the task assigned icon little transperent to indicate that task originally do not belongs to this release and cycle but task exists in some other release and cycle
-                else if (d.taskexists && $scope.tab != 'tabCreate') {
+                else if (d.taskexists && $scope.tab != 'tabCreate' && d.type !="modules" && d.type !="scenarios") {
                     d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('style', 'opacity:0.6').attr('x', 29).attr('y', -10);
                     $scope.nodeDisplay[d.id].task = true;
                     $scope.nodeDisplay[d.id].taskOpacity = 0.6;
