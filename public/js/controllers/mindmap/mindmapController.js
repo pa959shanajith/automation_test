@@ -1057,11 +1057,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     }
 
-    function updateTaskObject(tObj, data) {
+    function updateTaskObject(tObj, data,taskUndef) {
 
         var t = {
             taskvn: tObj.tvn,
-            _id: tObj._id != undefined ? tObj._id : null,
+            _id:null,
             batchName: tObj.bn,
             task: tObj.t,
             assignedto: tObj.at,
@@ -1076,6 +1076,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             parent: data.parent,
             cx: clist != undefined ? clist.toString() : undefined
         };
+        if (!taskUndef) t._id = tObj._id != undefined ? tObj._id : null
+        
         if (data.id == 0) return t;
         else delete t.batchName;
         if (data.id == 1) {
@@ -1181,53 +1183,53 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 9,
                         parent: (tObj.parent != null) ? tObj.parent : dNodes[pi].parent.parent._id
-                    });
+                    },taskUndef);
                 else if (qid == 7)
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 7,
                         parent: (tObj.parent != null) ? tObj.parent : dNodes[pi].projectID
-                    });
+                    },taskUndef);
                 else if (qid == 8 && taskUndef) {
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 8,
                         parent: dNodes[pi].parent.parent._id,
                         ctask: cTask
-                    });
+                    },taskUndef);
                 } else if (qid == 5 && taskUndef) {
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 5,
                         parent: dNodes[pi].projectID
-                    });
+                    },taskUndef);
                 } else if (qid == 6 && taskUndef) {
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 6,
                         parent: dNodes[pi].parent.parent._id
-                    });
+                    },taskUndef);
                 } else if (qid == 4) {
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 4,
                         parent: (tObj.parent != null) ? tObj.parent : dNodes[pi].parent._id
-                    })
+                    },taskUndef)
                 } else if (qid == 3 && taskUndef) {
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 3,
                         parent: dNodes[pi].parent.parent._id
-                    });
+                    },taskUndef);
                 } else if (qid == 2 && taskUndef) {
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 2,
                         parent: dNodes[pi].projectID
-                    });
+                    },taskUndef);
                 } else if (qid == 1 && taskUndef) {
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 1,
                         parent: dNodes[pi].parent._id
-                    });
+                    },taskUndef);
                 } else if (qid == 0) {
                     dNodes[pi].task = updateTaskObject(tObj, {
                         id: 0,
                         parent: (tObj.parent != null) ? tObj.parent : ""
-                    });
+                    },taskUndef);
                 }
                 if ((!taskUndef && !origTask) || origTask) {
                     //update parent
