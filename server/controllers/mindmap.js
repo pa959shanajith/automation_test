@@ -935,16 +935,16 @@ exports.saveData = function (req, res) {
 		{
 			qpush=[]
 			var uidx = 0, rIndex;
-			var idn_v_idc = {};
+			// var idn_v_idc = {};
 			var cycId=inputs.cycId;
 
 			// Creating the data for running the Create Structure Query
-			var qObj = { "projectid": prjId, "cycleId": cycId, "appType": "Web", "testsuiteDetails": [], "versionnumber": parseFloat(vn_from), "newversionnumber":  parseFloat(vn_to) ,"username": user, "userrole": userrole,"userid":userid,"userroleid":userroleid,"createdthrough":createdthrough };
+			var qObj = { "projectid": prjId, "cycleId": cycId, "appType": "Web", "testsuiteDetails": [], "versionnumber": parseFloat(vn_from), "newversionnumber":  parseFloat(vn_to) ,"username": user, "userrole": userrole,"userid":userid,"userroleid":userroleid,"createdthrough":createdthrough ,"deletednodes":deletednodes };
 			var nObj = [], tsList = [];
 			data.forEach(function (e, i) {
 				if (e.type == "modules") rIndex = uidx;
 				if (e.task != null) delete e.task.oid;
-				idn_v_idc[e.id_n] = e.id_c;
+				// idn_v_idc[e.id_n] = e.id_c;
 				nObj.push({ _id:e._id||null, name: e.name,state: e.state, task: e.task, children: [] });
 				if (e.type == "testcases") nObj[nObj.length - 1]['pid_c'] = e._id||null;
 				if (idDict[e.pid] !== undefined) nObj[idDict[e.pid]].children.push(nObj[uidx]);
@@ -1233,7 +1233,7 @@ exports.saveEndtoEndData = function (req, res) {
 			var uidx = 0, rIndex;
 			var vn_from = inputs.vn_from;
 			var vn_to = inputs.vn_from;
-			var idn_v_idc = {};
+			// var idn_v_idc = {};
 
 			var qObj = { "projectid": prjId, "testsuiteDetails": [], "username": user, "userrole": userrole, "versionnumber": parseFloat(vn_from)|| 0, "newversionnumber": parseFloat(vn_to) || 0 , "userid":userid,"userroleid":userroleid ,"createdthrough":createdthrough};
 			var nObj = [], tsList = [];

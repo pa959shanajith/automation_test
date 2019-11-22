@@ -2169,11 +2169,16 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
         var pi = p.attr('id').split('-')[2];
         var t = p.attr('data-nodetype');
+        if(dNodes[pi]["taskexists"]!=null)
+        {
+            openDialogMindmap('Rename Error',"Unassign the task to rename");
+            return;
+        }
         var split_char = ',';
         if (isIE) split_char = ' ';
         var l = p.attr('transform').slice(10, -1).split(split_char);
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
-        if (p && dNodes[p.attr('id').split('-')[2]].task) {
+        if (p && dNodes[p.attr('id').split('-')[2]].taskexists) {
             var msg = 'Unassign the task to rename';
             if (t == 'screens') {
                 msg = 'Unassign the task to rename. And unassign the corresponding testcases tasks';
@@ -2243,7 +2248,26 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var t = s.attr('data-nodetype');
         if (t == 'modules') return;
         var sid = s.attr('id').split('-')[2];
-        var p = dNodes[sid].parent;
+
+        // If this node has an existing task then cannot allow to delte the node.
+        if(dNodes[sid]['taskexists']!=null)
+        {
+            openDialogMindmap('Error', "Cannot delete node if task is assigned. Please unassign task first.");
+            return; 
+        }
+
+        // If any of the parent node has a task assigned to it cannot delete the node.
+        var parenttempnode=dNodes[sid];
+        while(parenttempnode.hasOwnProperty("parent"))
+        {
+            if (parenttempnode.taskexists!=null)
+            {
+                openDialogMindmap('Error', "Cannot delete node parent "+parenttempnode["name"]+" has a task assigned. Please unassign task first.");
+                return; 
+            }
+            parenttempnode=parenttempnode.parent;
+        }
+
         recurseDelChild(dNodes[sid], $scope.tab);
         for (j = dLinks.length - 1; j >= 0; j--) {
             if (dLinks[j].target.id == sid) {
@@ -2271,8 +2295,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 d.task = null;
                 d3.select('#ct-node-' + d.id).remove();
                 deletednode_info.push(d);
-                if (d.oid != undefined && d.oid != '' ) {
-                    deletednode.push(d.oid);
+                if (d._id) {
+                    deletednode.push([d._id,d.type]);
                     delete $scope.nodeDisplay[d.id];
                     dNodes[d.id].state = 'deleted';
                 }
@@ -2299,7 +2323,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         d3.select('#ct-node-' + d.id).remove();
                         deletednode_info.push(d);
                         if (d.oid != undefined && d.oid != '') {
-                            deletednode.push(d.oid);
+                            deletednode.push([d._id,d.type]);
                             delete $scope.nodeDisplay[d.id];
                             dNodes[d.id].state = 'deleted';
                         }
@@ -2327,22 +2351,28 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             'modules': '',
             'gettestcases': true // if true will fetch all the testcase ids under given screen including reused ones         
         };
-        blockUI("Deleting testcase! Please wait..");
-        mindmapServices.checkReuse(dataReuse).then(function(result) {
-            if (result == "Invalid Session") {
-                return $rootScope.redirectPage();
-            }
-            result = result.toString().split(',');
-            deletednode.push.apply(deletednode, result);
-            unblockUI();
-        }, function(error) {
-            unblockUI();
-            console.log("Error: checkReuse service 1");
-        });
+        // blockUI("Deleting testcase! Please wait..");
+        // mindmapServices.checkReuse(dataReuse).then(function(result) {
+        //     if (result == "Invalid Session") {
+        //         return $rootScope.redirectPage();
+        //     }
+        //     result = result.toString().split(',');
+        //     deletednode.push.apply(deletednode, result);
+        //     unblockUI();
+        // }, function(error) {
+        //     unblockUI();
+        //     console.log("Error: checkReuse service 1");
+        // });
         //if (!dNodes[pi].children || dNodes[pi].children.length == 0) d3.select('#ct-node-' + pi).select('.ct-cRight').remove();
     }
 
     function recurseDelChild(d, tab) {
+        if (d.taskexists != null) {
+        
+            openDialogMindmap('Error', "Cannot delete node if task is assigned. Please unassign task first.");
+            return;
+            
+        }
         if (d.children) d.children.forEach(function(e) {
             recurseDelChild(e, tab);
         });
@@ -2352,12 +2382,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         // d3.select('#ct-node-' + d.id).remove();
         delete $scope.nodeDisplay[d.id];
         deletednode_info.push(d);
-        if (d.task != null) {
-        
-            openDialogMindmap('Error', "Cannot delete node if task is assigned. Please unassign task first.");
-            
-        }
-        // deletednode.push(d.oid);
+        if(d._id)
+            deletednode.push([d._id,d.type]);
         dNodes[d.id].state = 'deleted';
         var temp = dLinks;
         if (tab == 'mindmapEndtoEndModules') {
@@ -3162,10 +3188,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (result == "Invalid Session") {
                     return $rootScope.redirectPage();
                 }
-                else if(result=='fail')
+                else if(result.rows=='fail')
                 {
                     unblockUI();
-                    openDialogMindmap("Error", "Failed to save structure");
+                    openDialogMindmap("Error", result.error);
+                    flag=-1;
+                    // openDialogMindmap("Error", "Failed to save structure");
                     return;
                 }
                 unblockUI();
@@ -3675,83 +3703,83 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     /* 
      *  Logic for adding reuse property 
      */
-    function parseDataReuse(scenarios) {
-        var dataReuse = {
-            'screen': [],
-            'testcase': [],
-            'projectid': '',
-            'modules': ''
+    // function parseDataReuse(scenarios) {
+    //     var dataReuse = {
+    //         'screen': [],
+    //         'testcase': [],
+    //         'projectid': '',
+    //         'modules': ''
 
-        };
-        if (scenarios) {
-            dataReuse['scenarios'] = [];
-            dataReuse['reuseScenarios'] = [];
-        }
-        dNodes.forEach(function(e, i) {
-            if (e.type == 'modules') {
-                if (e.original_name) {
-                    dataReuse['modules'] = e.original_name;
-                } else {
-                    dataReuse['modules'] = e.name;
-                }
+    //     };
+    //     if (scenarios) {
+    //         dataReuse['scenarios'] = [];
+    //         dataReuse['reuseScenarios'] = [];
+    //     }
+    //     dNodes.forEach(function(e, i) {
+    //         if (e.type == 'modules') {
+    //             if (e.original_name) {
+    //                 dataReuse['modules'] = e.original_name;
+    //             } else {
+    //                 dataReuse['modules'] = e.name;
+    //             }
 
-                return;
-            }
-            dNodes[i].reuse = false;
-            if (scenarios) {
-                dNodes.forEach(function(f, j) {
-                    // This function is for UI check in the same module we cannot have Scenario with the same name.
-                    if ((e.type == 'scenarios' && e.type == f.type && e.name == f.name && i != j && deletednode_info.indexOf(e) < 0 && deletednode_info.indexOf(f) < 0)) {
-                        dNodes[i].reuse = true;
-                        if (dataReuse['reuseScenarios'].indexOf(e.name) < 0)
-                            dataReuse['reuseScenarios'].push(e.name);
-                        // console.log(e.type,' ',e.name,' reused')
-                    }
-                })
-            } else {
-                // Screen or Testcase reuse check, within the same Module, if testcase name is same then Screen name should also be the same for actual reuse.
-                dNodes.forEach(function(f, j) {
-                    if ((e.type == 'screens' && e.type == f.type && e.name == f.name && i != j) || (e.type == 'testcases' && e.type == f.type && e.name == f.name && e.parent.name == f.parent.name && i != j)) {
-                        dNodes[i].reuse = true;
-                        // console.log(e.type,' ',e.name,' reused')
-                    }
-                })
-            }
+    //             return;
+    //         }
+    //         dNodes[i].reuse = false;
+    //         if (scenarios) {
+    //             dNodes.forEach(function(f, j) {
+    //                 // This function is for UI check in the same module we cannot have Scenario with the same name.
+    //                 if ((e.type == 'scenarios' && e.type == f.type && e.name == f.name && i != j && deletednode_info.indexOf(e) < 0 && deletednode_info.indexOf(f) < 0)) {
+    //                     dNodes[i].reuse = true;
+    //                     if (dataReuse['reuseScenarios'].indexOf(e.name) < 0)
+    //                         dataReuse['reuseScenarios'].push(e.name);
+    //                     // console.log(e.type,' ',e.name,' reused')
+    //                 }
+    //             })
+    //         } else {
+    //             // Screen or Testcase reuse check, within the same Module, if testcase name is same then Screen name should also be the same for actual reuse.
+    //             dNodes.forEach(function(f, j) {
+    //                 if ((e.type == 'screens' && e.type == f.type && e.name == f.name && i != j) || (e.type == 'testcases' && e.type == f.type && e.name == f.name && e.parent.name == f.parent.name && i != j)) {
+    //                     dNodes[i].reuse = true;
+    //                     // console.log(e.type,' ',e.name,' reused')
+    //                 }
+    //             })
+    //         }
 
-            // So if reuse has become true then I will return from the for-each fuction.
-            if ((e.reuse == true)) return;
+    //         // So if reuse has become true then I will return from the for-each fuction.
+    //         if ((e.reuse == true)) return;
 
-            // If UI check for Reuse has passed we will query the MongoDB database for Project level checks.
-            // And this is used in checkReuse function in mindmap.js  
-            if (!scenarios) {
-                if (e.type == 'testcases') {
-                    dataReuse['testcase'].push({
-                        'testcasename': e.name,
-                        'screenname': e.parent.name,
-                        'idx': i
-                    });
-                } else if (e.type == 'screens') {
-                    dataReuse['screen'].push({
-                        'screenname': e.name,
-                        'idx': i
-                    });
-                }
-            }
-            else if(e.type == 'scenarios' && scenarios) {
-                dataReuse['scenarios'].push({
-                    'scenarioname': e.name,
-                    'idx': i
-                });
-            }
+    //         // If UI check for Reuse has passed we will query the MongoDB database for Project level checks.
+    //         // And this is used in checkReuse function in mindmap.js  
+    //         if (!scenarios) {
+    //             if (e.type == 'testcases') {
+    //                 dataReuse['testcase'].push({
+    //                     'testcasename': e.name,
+    //                     'screenname': e.parent.name,
+    //                     'idx': i
+    //                 });
+    //             } else if (e.type == 'screens') {
+    //                 dataReuse['screen'].push({
+    //                     'screenname': e.name,
+    //                     'idx': i
+    //                 });
+    //             }
+    //         }
+    //         else if(e.type == 'scenarios' && scenarios) {
+    //             dataReuse['scenarios'].push({
+    //                 'scenarioname': e.name,
+    //                 'idx': i
+    //             });
+    //         }
 
-        })
-        dataReuse['projectid'] = $scope.projectNameO;
-        if (versioningEnabled) {
-            // Add version number
-            dataReuse['versionNumber'] = $('.version-list').val();
-        }
-        return dataReuse;
-    }
+    //     })
+    //     dataReuse['projectid'] = $scope.projectNameO;
+    //     if (versioningEnabled) {
+    //         // Add version number
+    //         dataReuse['versionNumber'] = $('.version-list').val();
+    //     }
+    //     return dataReuse;
+    // }
 
     function treeBuilder(tree) { // Async
         var pidx = 0,
