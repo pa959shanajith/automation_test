@@ -2258,14 +2258,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
         // If any of the parent node has a task assigned to it cannot delete the node.
         var parenttempnode=dNodes[sid];
-        while(parenttempnode.hasOwnProperty("parent"))
+        while(parenttempnode!=null && parenttempnode.hasOwnProperty("parent"))
         {
             if (parenttempnode.taskexists!=null)
             {
                 openDialogMindmap('Error', "Cannot delete node parent "+parenttempnode["name"]+" has a task assigned. Please unassign task first.");
                 return; 
             }
-            parenttempnode=parenttempnode.parent;
+            parenttempnode=parenttempnode.parent || null;
         }
 
         recurseDelChild(dNodes[sid], $scope.tab);
