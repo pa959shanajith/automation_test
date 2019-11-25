@@ -1235,7 +1235,7 @@ exports.saveEndtoEndData = function (req, res) {
 			var vn_to = inputs.vn_from;
 			// var idn_v_idc = {};
 
-			var qObj = { "projectid": prjId, "testsuiteDetails": [], "username": user, "userrole": userrole, "versionnumber": parseFloat(vn_from)|| 0, "newversionnumber": parseFloat(vn_to) || 0 , "userid":userid,"userroleid":userroleid ,"createdthrough":createdthrough};
+			var qObj = { "projectid": prjId, "testsuiteDetails": [], "username": user, "userrole": userrole, "versionnumber": parseFloat(vn_from)|| 0, "newversionnumber": parseFloat(vn_to) || 0 , "userid":userid,"userroleid":userroleid ,"createdthrough":createdthrough,"deletednodes":deletednodes};
 			var nObj = [], tsList = [];
 			data.forEach(function (e, i) {
 				if (e.type == "endtoend") rIndex = uidx; // check for normal modules

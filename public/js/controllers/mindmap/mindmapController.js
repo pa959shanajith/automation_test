@@ -2376,14 +2376,21 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (d.children) d.children.forEach(function(e) {
             recurseDelChild(e, tab);
         });
+        if(d.state=="deleted")
+        {
+            return;
+        }
+        // d3.select('#ct-node-' + d.id).remove();
+        if(d._id)
+        {  
+            var parentid=dNodes[d.parent.id]._id;
+            deletednode.push([d._id,d.type,parentid]);
+        }
         d.parent = null;
         d.children = null;
         d.task = null;
-        // d3.select('#ct-node-' + d.id).remove();
         delete $scope.nodeDisplay[d.id];
         deletednode_info.push(d);
-        if(d._id)
-            deletednode.push([d._id,d.type]);
         dNodes[d.id].state = 'deleted';
         var temp = dLinks;
         if (tab == 'mindmapEndtoEndModules') {
