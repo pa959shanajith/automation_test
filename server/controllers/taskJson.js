@@ -244,7 +244,7 @@ function next_function(resultobj,projectid)
 		} else {
 			task_json.versionnumber = 0;
 		}
-		taskDetails.taskName = abc[2]+" "+t.name;
+		taskDetails.taskName = t.tasktype+" "+t.name;
 		taskDetails.subTaskType = abc[0];
 		taskDetails.taskType = abc[1];
 		taskDetails.assignedTo = t.assignedto;

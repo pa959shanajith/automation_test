@@ -1053,7 +1053,7 @@ exports.saveData = function (req, res) {
 					//Part of Issue 1685, take projectid from the scenarios in case of end to end modules
 					if (t != null && e._id != null) {
 						if (t._id!=null && (removeTask.includes(t._id))) return;
-						tsk.tasktype="Execute"
+						tsk.tasktype=t.task
 						tsk.nodetype="testscenarios"
 						tsk.name=e.name
 						tsk.nodeid=e._id
