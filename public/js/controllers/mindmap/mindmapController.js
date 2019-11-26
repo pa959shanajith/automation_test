@@ -3192,6 +3192,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
             mindmapServices.saveData(versioning_enabled, assignedTo, flag, from_v, to_v, cur_module, mapData, deletednode, unassignTask,
                 $('.project-list').val(), $('.cycle-list').val(), selectedTab, utcTime).then(function(result) {
+
+                deletednode = [],
+                deletednode_info = [];
                 if (result == "Invalid Session") {
                     return $rootScope.redirectPage();
                 }
@@ -3484,6 +3487,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
 
         mindmapServices.saveEndtoEndData(username, flag, from_v, to_v, 'endToend', mapData, deletednode, unassignTask, selectedProject, $('#ct-assignRel').val(), $('#ct-assignCyc').val()).then(function(result) {
+
+            deletednode = [],
+            deletednode_info = [];
+
             if (result == "Invalid Session") {
                 return $rootScope.redirectPage();
             }
