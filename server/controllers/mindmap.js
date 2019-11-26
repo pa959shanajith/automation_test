@@ -945,7 +945,7 @@ exports.saveData = function (req, res) {
 				if (e.type == "modules") rIndex = uidx;
 				if (e.task != null) delete e.task.oid;
 				// idn_v_idc[e.id_n] = e.id_c;
-				nObj.push({ _id:e._id||null, name: e.name,state: e.state, task: e.task, children: [] });
+				nObj.push({ _id:e._id||null, name: e.name,state: e.state, task: e.task, children: [],childIndex:e.childIndex });
 				if (e.type == "testcases") nObj[nObj.length - 1]['pid_c'] = e._id||null;
 				if (idDict[e.pid] !== undefined) nObj[idDict[e.pid]].children.push(nObj[uidx]);
 				idDict[e.id] = uidx++;
@@ -955,12 +955,18 @@ exports.saveData = function (req, res) {
 				ts.children.forEach(function (s, i) {
 					var tcList = [];
 					s.children.forEach(function (tc, i) {
-						tcList.push({ "screenid": s._id||null, "testcaseid": tc._id||null, "testcaseName": tc.name, "task": tc.task,"state":tc.state });
+						tcList.push({ "screenid": s._id||null, "testcaseid": tc._id||null, "testcaseName": tc.name, "task": tc.task,"state":tc.state ,"childIndex":parseInt(tc.childIndex)});
+						
 					});
-					sList.push({ "screenid": s._id||null, "screenName": s.name, "task": s.task, "testcaseDetails": tcList,"state":s.state });
+					tcList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
+					sList.push({ "screenid": s._id||null, "screenName": s.name, "task": s.task, "testcaseDetails": tcList,"state":s.state,"childIndex":parseInt(s.childIndex) });
+					
 				});
-				tsList.push({ "testscenarioid": ts._id||null, "testscenarioName": ts.name, "tasks": ts.task, "screenDetails": sList,"state":ts.state });
+				sList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
+				tsList.push({ "testscenarioid": ts._id||null, "testscenarioName": ts.name, "tasks": ts.task, "screenDetails": sList,"state":ts.state, "childIndex":parseInt(ts.childIndex) });
+				
 			});
+			tsList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
 			qObj.testsuiteDetails = [{ "testsuiteId": nObj[rIndex]._id||null, "testsuiteName": nObj[rIndex].name, "task": nObj[rIndex].task, "testscenarioDetails": tsList,"state":nObj[rIndex].state}];
 			create_ice.saveMindmap(qObj, function (err, data) {
 				if (err) {
@@ -1240,15 +1246,17 @@ exports.saveEndtoEndData = function (req, res) {
 			data.forEach(function (e, i) {
 				if (e.type == "endtoend") rIndex = uidx; // check for normal modules
 				if (e.task != null) delete e.task.oid;
-				nObj.push({ projectID: e.projectID, _id: e._id || null, name: e.name, task: e.task, children: [] ,state: e.state});
+				nObj.push({ projectID: e.projectID, _id: e._id || null, name: e.name, task: e.task, children: [] ,state: e.state, childIndex:e.childIndex});
 				if (idDict[e.pid] !== undefined) nObj[idDict[e.pid]].children.push(nObj[uidx]);
 				idDict[e.id] = uidx++;
 			});
 
 			nObj[rIndex].children.forEach(function (ts, i) {
 				var sList = [];
-				tsList.push({ "testscenarioid": ts._id||null, "testscenarioName": ts.name, "tasks": ts.task,"state":ts.state });
+				tsList.push({ "testscenarioid": ts._id||null, "testscenarioName": ts.name, "tasks": ts.task,"state":ts.state,"childIndex":parseInt(ts.childIndex)});
+				
 			});
+			tsList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1)
 			qObj.testsuiteDetails = [{ "testsuiteId": nObj[rIndex]._id||null, "testsuiteName": nObj[rIndex].name, "task": nObj[rIndex].task, "testscenarioDetails": tsList,"state":nObj[rIndex].state}];
 			
 			create_ice.saveMindmapE2E(qObj, function (err, data) {
