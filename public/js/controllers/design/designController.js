@@ -2538,6 +2538,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		//Update Service to Save Scrape Objects
 		DesignServices.updateScreen_ICE(scrapeObject)
 			.then(function (data) {
+				getIndexOfDeletedObjects = [];
 				angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
 				unblockUI()
 				//add popoup for error and saved 
@@ -7095,7 +7096,7 @@ function copyTestStep(e) {
 					"remarks": $(this).children("td:nth-child(11)").text(),
 					"url": $(this).children("td:nth-child(12)").text().trim(),
 					"appType": $(this).children("td:nth-child(13)").text(),
-					"addTestCaseDetails": $(this).children("td:nth-child(14)").children('img')[0].outerHTML,
+					"addTestCaseDetails": getRowData.addTestCaseDetails,
 					"addTestCaseDetailsInfo": getRowData.addTestCaseDetailsInfo,
 					"cord": getRowData.cord
 				});
