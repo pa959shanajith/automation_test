@@ -15,6 +15,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.ldapConf = {};
 	$scope.userConf = {};
+	$scope.domainConf = {};
 	$scope.moveItems = {};
 	$scope.assignProj = {};
 	$scope.preferences = {};
@@ -178,7 +179,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				selectBox.empty();
 				selectBox.append('<option data-id="" value disabled selected>Select User</option>');
 				for(i=0; i<data.length; i++){
-					if(data[i][2] != "b5e9cb4a-5299-4806-b7d7-544c30593a6e"){
+					if(data[i][3] != "Admin"){
 						selectBox.append('<option data-id="'+data[i][1]+'" value="'+data[i][0]+'">'+data[i][0]+'</option>');
 					}
 				}
@@ -337,7 +338,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				selectBox.empty();
 				selectBox.append('<option data-id="" value disabled selected>Select User</option>');
 				for(i=0; i<data.length; i++){
-					if(data[i][2] != "b5e9cb4a-5299-4806-b7d7-544c30593a6e"){
+					if(data[i][3] != "Admin"){
 						selectBox.append('<option data-id="'+data[i][1]+'" value="'+data[i][0]+'">'+data[i][0]+'</option>');
 					}
 				}
@@ -519,6 +520,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$(this).siblings(".fc-timePicker").focus()
 	})
 	
+	$scope.domainConf.click = function(query) {
+		$(".selectedIcon").removeClass("selectedIcon");
+		$("button.userTypeBtnActive").removeClass('userTypeBtnActive');
+		$("#projectTab").find("img").addClass("selectedIcon");
+		this.query0 = '';
+		this.query1 = '';
+	}
+
 	$(document).on('click', '#projectTab', function () {
 		resetForm();
 		projectDetails = [];
@@ -541,12 +550,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (data == "Invalid Session") {
 					$rootScope.redirectPage();
 				} else {
-					$('#selDomains').show()
+					$scope.domainConf.alldomains=data;
+					/* $('#selDomains').show()
 					$('#selDomain').hide()
 					for (var i = 0; i < data.length; i++) {
 					// if(data.length!=0){
 						$('#selDomains').append($("<option value=" + data[i] + "></option>").text(data[i]));
-					}
+					} */
 					var details = {
 						"web":{"data":"Web","title":"Web","img":"web"},
 						"webservice":{"data":"Webservice","title":"Web Service","img":"webservice"},
@@ -601,8 +611,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$("#selDomain").removeClass("inputErrorBorder");
 		$("#projectName").removeClass("inputErrorBorder");
 
-		if ($('#selDomains').val() == "") {
-			$("#selDomains").addClass("inputErrorBorder");
+		if ($('#selDomain').val() == "") {
+			$("#selDomain").addClass("inputErrorBorder");
 		} else if ($("#projectName").val() == "") {
 			$("#projectName").addClass("inputErrorBorder");
 		} else if ($(".projectTypeSelected").length == 0) {
@@ -641,6 +651,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					// labelArr.push(txnHistory.codesDict['CreateProject']);
 					// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 					if ($('#selDomain').val() != "") {
+						$('#selDomain').val($('#selDomain').val()[0].toUpperCase()+$('#selDomain').val().slice(1))
 						requestedids.push($('#selDomain').val());
 						idtype.push('domainsall');
 						var proceeed = false;
@@ -845,9 +856,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	function resetForm() {
 		//$("#selDomain").prop('selectedIndex', 0);
+		$("#selDomain").val("")
 		$("#projectName").val("");
 		$("div.projectTypeSelected").removeClass("projectTypeSelected");
 		$("#releaseList li, #cycleList li").remove();
+		$("#selDomain").empty()
+		$('#releaseList').empty()
+		$('#cycleList').empty()
 		toggleCycleClick();
 	}
 
@@ -997,13 +1012,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 				if (taskName == "Update Project") {
 					var createNewRelCyc = {
-						"releaseName": "",
+						"name": "",
 						"releaseId": "",
 						"newStatus": false,
 						"cycles": []
 					};
 					var createCyc = {
-						"cycleName": "",
+						"name": "",
 						"newStatus": true
 					};
 					delCount = (delCount + 1) * 3;
@@ -1014,14 +1029,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					if (newProjectDetails.length <= 0) {
 						createNewRelCyc.name = relName;
 						createNewRelCyc.releaseId = RelID;
-						createCyc.cycleName = cycleName;
+						createCyc.name = cycleName;
 						createNewRelCyc.cycles.push(createCyc);
 						newProjectDetails.push(createNewRelCyc);
 					} else {
 						var chk = true;
 						for (j = 0; j < newProjectDetails.length; j++) {
-							if (newProjectDetails[j].releaseName == relName && newProjectDetails[j].releaseId == RelID) {
-								createCyc.cycleName = cycleName;
+							if (newProjectDetails[j].name == relName && newProjectDetails[j].releaseId == RelID) {
+								createCyc.name = cycleName;
 								newProjectDetails[j].cycles.push(createCyc);
 								chk = false;
 								break;
@@ -1030,7 +1045,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 						if (chk == true) {
 							createNewRelCyc.name = relName;
 							createNewRelCyc.releaseId = RelID;
-							createCyc.cycleName = cycleName;
+							createCyc.name = cycleName;
 							createNewRelCyc.cycles.push(createCyc);
 							newProjectDetails.push(createNewRelCyc);
 						}
@@ -1063,7 +1078,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				for (var i = 0; i < projectDetails.length; i++) {
 					if (projectDetails[i].name == releaseName && 'cycles' in projectDetails[i]) {
 						for (var j = 0; j < projectDetails[i].cycles.length; j++) {
-							$("#cycleList").append("<li><img src='imgs/ic-cycle.png' /><span title=" + projectDetails[i].cycles[j] + " class='cycleName'>" + projectDetails[i].cycles[j] + "</span><span class='actionOnHover'><img id=editCycleName_" + j + " title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_" + j + " title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
+							$("#cycleList").append("<li><img src='imgs/ic-cycle.png' /><span title=" + projectDetails[i].cycles[j].name + " class='cycleName'>" + projectDetails[i].cycles[j].name + "</span><span class='actionOnHover'><img id=editCycleName_" + j + " title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_" + j + " title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
 						}
 					}
 				}
@@ -1080,7 +1095,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 						for (var j = 0; j < updateProjectDetails[i].cycles.length; j++) {
 							var objectType = typeof(updateProjectDetails[i].cycles[j]);
 							if (objectType == "object") {
-								$("#cycleList").append("<li class='updateCycle'><img src='imgs/ic-cycle.png' /><span title=" + updateProjectDetails[i].cycles[j].name + " data-cycleid=" + updateProjectDetails[i].cycles[j].cycleId + " class='cycleName'>" + updateProjectDetails[i].cycles[j].name + "</span><span class='actionOnHover'><img id=editCycleName_" + j + " title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_" + j + " title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
+								$("#cycleList").append("<li class='updateCycle'><img src='imgs/ic-cycle.png' /><span title=" + updateProjectDetails[i].cycles[j].name + " data-cycleid=" + updateProjectDetails[i].cycles[j]._id + " class='cycleName'>" + updateProjectDetails[i].cycles[j].name + "</span><span class='actionOnHover'><img id=editCycleName_" + j + " title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_" + j + " title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
 							} else if (objectType == "string") {
 								$("#cycleList").append("<li class='updateCycle'><img src='imgs/ic-cycle.png' /><span title=" + updateProjectDetails[i].cycles[j] + "  class='cycleName'>" + updateProjectDetails[i].cycles[j] + "</span><span class='actionOnHover'><img id=editCycleName_" + j + " title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_" + j + " title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
 							}
@@ -1101,7 +1116,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 						for (var j = 0; j < newProjectDetails[i].cycles.length; j++) {
 							var objectType = typeof(newProjectDetails[i].cycles[j]);
 							if (objectType == "object") {
-								$("#cycleList").append("<li class='updateCycle'><img src='imgs/ic-cycle.png' /><span title=" + newProjectDetails[i].cycles[j].cycleName + " data-cycleid=" + newProjectDetails[i].cycles[j].cycleId + " class='cycleName'>" + newProjectDetails[i].cycles[j].cycleName + "</span><span class='actionOnHover'><img id=editCycleName_" + j + " title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_" + j + " title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
+								$("#cycleList").append("<li class='updateCycle'><img src='imgs/ic-cycle.png' /><span title=" + newProjectDetails[i].cycles[j].name + " data-cycleid=" + newProjectDetails[i].cycles[j].cycleId + " class='cycleName'>" + newProjectDetails[i].cycles[j].name + "</span><span class='actionOnHover'><img id=editCycleName_" + j + " title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_" + j + " title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
 							} else if (objectType == "string") {
 								$("#cycleList").append("<li class='updateCycle'><img src='imgs/ic-cycle.png' /><span title=" + newProjectDetails[i].cycles[j] + "  class='cycleName'>" + newProjectDetails[i].cycles[j] + "</span><span class='actionOnHover'><img id=editCycleName_" + j + " title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_" + j + " title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
 							}
@@ -1372,9 +1387,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				} else {
 					var relID = $("li.active").children('span.releaseName').data("releaseid");
 					for (i = 0; i < updateProjectDetails.length; i++) {
-						if (relID == updateProjectDetails[i].releaseId) {
+						if (relID == updateProjectDetails[i].name) {
 							for (j = 0; j < updateProjectDetails[i].cycles.length; j++) {
-								if ($("#cycleName").val().trim() == updateProjectDetails[i].cycles[j].cycleName) {
+								if ($("#cycleName").val().trim() == updateProjectDetails[i].cycles[j].name) {
 									$(".close:visible").trigger('click');
 									openModalPopup("Edit Cycle Name", "Cycle Name already exists");
 									return false;
@@ -1412,22 +1427,22 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 							if (updateProjectDetails[i].name == $("li.active").children('span.releaseName').text()) {
 								for (var j = 0; j < updateProjectDetails[i].cycles.length; j++) {
 									var objectType = typeof(updateProjectDetails[i].cycles[j]);
-									if (objectType == "object" && j == cycleIndex && (updateProjectDetails[i].name == $("li.active").children('span.releaseName').text()) && (updateProjectDetails[i].cycles[j].cycleId == editCycId)) {
+									if (objectType == "object" && j == cycleIndex && (updateProjectDetails[i].name == $("li.active").children('span.releaseName').text()) && (updateProjectDetails[i].cycles[j]._id == editCycId)) {
 										var editRelCyc = {
 											"releaseId": "",
-											"releaseName": "",
+											"name": "",
 											"oldreleaseName": "",
 											"cycles": [],
 											"editStatus": false
 										};
 										var editCycle = {
 											"oldCycleName": "",
-											"cycleName": "",
-											"cycleId": "",
+											"name": "",
+											"_id": "",
 											"editStatus": false
 										};
 										//console.log("objectType", typeof(updateProjectDetails[i].cycles[j]))
-										updateProjectDetails[i].cycles[j].cycleName = $("#cycleName").val();
+										updateProjectDetails[i].cycles[j].name = $("#cycleName").val();
 
 										//For update project json
 										if (editedProjectDetails.length <= 0) {
@@ -1436,8 +1451,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 											editRelCyc.name = $("li.active").children('span.releaseName').text(); //updateProjectDetails[i].releaseName;
 											//building cycle details with release
 											editCycle.oldCycleName = oldCycText;
-											editCycle.cycleName = $("#cycleName").val(); //updateProjectDetails[i].cycles[j].cycleName;
-											editCycle.cycleId = editCycId; //updateProjectDetails[i].cycles[j].cycleId;
+											editCycle.cyclename = $("#cycleName").val(); //updateProjectDetails[i].cycles[j].cycleName;
+											editCycle._id = editCycId; //updateProjectDetails[i].cycles[j].cycleId;
 											editCycle.editStatus = true;
 											editRelCyc.cycles.push(editCycle);
 											//pushing all data to an array
@@ -1445,7 +1460,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 										} else {
 											var chkRelPresent = true;
 											for (m = 0; m < editedProjectDetails.length; m++) {
-												if (editedProjectDetails[m].releaseId == relID /*updateProjectDetails[i].releaseId*/) {
+												if (editedProjectDetails[m].name == relID /*updateProjectDetails[i].releaseId*/) {
 													var chkcycinrel = true;
 													for (n = 0; n < editedProjectDetails[m].cycles.length; n++) {
 														if (editedProjectDetails[m].cycles[n].cycleId == editCycId /*updateProjectDetails[i].cycles[j].cycleId*/) {
@@ -1845,8 +1860,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		this.userId = '';
 		this.userName = '';
 		this.userIdName = '';
-		this.firstName = '';
-		this.lastName = '';
+		this.firstname = '';
+		this.lastname = '';
 		this.passWord = '';
 		this.confirmPassword = '';
 		this.email = '';
@@ -1896,7 +1911,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.userConf.validate = function(action) {
 		var flag = true;
-		$("#userName,#firstName,#lastName,#password,#confirmPassword,#email,#ldapDirectory").removeClass("inputErrorBorder");
+		$("#userName,#firstname,#lastname,#password,#confirmPassword,#email,#ldapDirectory").removeClass("inputErrorBorder");
 		$("#userIdName,#userRoles,#ldapServer,#ldapDirectory").removeClass("selectErrorBorder");
 		var emailRegEx = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 		//var regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,16}$/;
@@ -1911,12 +1926,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			$("#userIdName").addClass("selectErrorBorder");
 			flag = false;
 		}
-		if (this.firstName == "") {
-			$("#firstName").addClass("inputErrorBorder");
+		if (this.firstname == "") {
+			$("#firstname").addClass("inputErrorBorder");
 			flag = false;
 		}
-		if (this.lastName == "") {
-			$("#lastName").addClass("inputErrorBorder");
+		if (this.lastname == "") {
+			$("#lastname").addClass("inputErrorBorder");
 			flag = false;
 		}
 		if (this.ldapActive) {
@@ -2001,8 +2016,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			userid: userConf.userId,
 			username: userConf.userName.toLowerCase(),
 			password: userConf.passWord,
-			firstname: userConf.firstName,
-			lastname: userConf.lastName,
+			firstname: userConf.firstname,
+			lastname: userConf.lastname,
 			email: userConf.email,
 			role: userConf.role,
 			addRole: addRole,
@@ -2094,8 +2109,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.userConf.ldapSetServer = function() {
 		this.userName = '';
-		this.firstName = '';
-		this.lastName = '';
+		this.firstname = '';
+		this.lastname = '';
 		this.email = '';
 		this.ldap.user = '';
 		this.ldap.fetch = 'map';
@@ -2135,8 +2150,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		} else {
 			this.ldap.user = '';
 			this.userName = '';
-			this.firstName = '';
-			this.lastName = '';
+			this.firstname = '';
+			this.lastname = '';
 			this.email = '';
 		}
 	};
@@ -2147,8 +2162,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		var ldapServer = this.ldap.server;
 		this.nocreate = true;
 		this.userName = '';
-		this.firstName = '';
-		this.lastName = '';
+		this.firstname = '';
+		this.lastname = '';
 		this.email = '';
 		if (this.ldap.user == '') {
 			$("#ldapDirectory").addClass("inputErrorBorder");
@@ -2170,8 +2185,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			} else {
 				userConf.nocreate = false;
 				userConf.userName = data.username;
-				userConf.firstName = data.firstname;
-				userConf.lastName = data.lastname;
+				userConf.firstname = data.firstname;
+				userConf.lastname = data.lastname;
 				userConf.email = data.email;
 				userConf.ldap.user = data.ldapname;
 			}
@@ -2227,8 +2242,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				userConf.userName = data.username;
 				userConf.userIdName = data.userid+";"+data.username;
 				userConf.passWord = data.password;
-				userConf.firstName = data.firstname;
-				userConf.lastName = data.lastname;
+				userConf.firstname = data.firstname;
+				userConf.lastname = data.lastname;
 				userConf.email = data.email;
 				userConf.role = data.role;
 				userConf.addRole = {};
@@ -2320,7 +2335,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		/*if (([59,61,106,107,109,111,173,186,187,188,191,192,219,220,221,222].indexOf(e.keyCode) > -1) || !e.shiftKey && e.keyCode == 189 || e.shiftKey && (e.keyCode >= 48 && e.keyCode <= 57 || e.keyCode == 190)) return false;
 		else {
 		if (e.target.id == "userName" && e.keyCode == 32) return false;
-		if ((e.target.id == "firstName" || e.target.id == "lastName") && (([32,110,189,190].indexOf(e.keyCode) > -1) || e.keyCode >= 48 && e.keyCode <= 57 || e.keyCode >= 96 && e.keyCode <= 105)) return false;
+		if ((e.target.id == "firstname" || e.target.id == "lastname") && (([32,110,189,190].indexOf(e.keyCode) > -1) || e.keyCode >= 48 && e.keyCode <= 57 || e.keyCode >= 96 && e.keyCode <= 105)) return false;
 		return true;
 		}*/
 	});
@@ -2442,20 +2457,20 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$("#ldapConfigTab").find("img").addClass("selectedIcon");
 		this.serverName = "";
 		this.url = "";
-		this.authType = "anonymous";
-		this.bindDN = "";
+		this.auth = "anonymous";
+		this.binddn = "";
 		this.bindCredentials = "";
-		this.baseDN = "";
-		this.fieldMap = {uname: "None", fname: "None", lname: "None", email: "None"};
+		this.basedn = "";
+		this.fieldmap = {uname: "None", fname: "None", lname: "None", email: "None"};
 		this.fieldMapOpts = ["None"];
-		if (action == "edit") this.authType = "";
+		if (action == "edit") this.auth = "";
 		this.testStatus = "false";
 		this.switchAuthType();
 	};
 
 	$scope.ldapConf.validate = function(action) {
 		var flag = true;
-		$("#ldapServerURL,#bindDN,#bindCredentials,#ldapBaseDN").removeClass("inputErrorBorder");
+		$("#ldapServerURL,#binddn,#bindCredentials,#ldapBaseDN").removeClass("inputErrorBorder");
 		$("#ldapFMapUname,#ldapFMapFname,#ldapFMapLname,#ldapFMapEmail").removeClass("selectErrorBorder");
 		var nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
 		$("#ldapServerName").removeClass(nameErrorClass);
@@ -2472,32 +2487,32 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			openModalPopup("Error", "Invalid URL provided! URL must start with ldap:// followed by either an IP or a well defined domain name has to be provided along with a port number.");
 			flag = false;
 		}
-		if (this.baseDN == "") {
+		if (this.basedn == "") {
 			$("#ldapBaseDN").addClass("inputErrorBorder");
 			flag = false;
 		}
-		if (this.bindDN == "" && this.authType == "simple") {
-			$("#bindDN").addClass("inputErrorBorder");
+		if (this.binddn == "" && this.auth == "simple") {
+			$("#binddn").addClass("inputErrorBorder");
 			flag = false;
 		}
-		if (this.bindCredentials == "" && this.authType == "simple" && action == "create") {
+		if (this.bindCredentials == "" && this.auth == "simple" && action == "create") {
 			$("#bindCredentials").addClass("inputErrorBorder");
 			flag = false;
 		}
 		if (action != "test") {
-			if (this.fieldMap.uname == "") {
+			if (this.fieldmap.uname == "") {
 				$("#ldapFMapUname").addClass("selectErrorBorder");
 				flag = false;
 			}
-			if (this.fieldMap.fname == "") {
+			if (this.fieldmap.fname == "") {
 				$("#ldapFMapFname").addClass("selectErrorBorder");
 				flag = false;
 			}
-			if (this.fieldMap.lname == "") {
+			if (this.fieldmap.lname == "") {
 				$("#ldapFMapLname").addClass("selectErrorBorder");
 				flag = false;
 			}
-			if (this.fieldMap.email == "") {
+			if (this.fieldmap.email == "") {
 				$("#ldapFMapEmail").addClass("selectErrorBorder");
 				flag = false;
 			}
@@ -2512,11 +2527,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		var confObj = {
 			name: ldapConf.serverName,
 			url: ldapConf.url,
-			basedn: ldapConf.baseDN,
-			auth: ldapConf.authType,
-			binddn: ldapConf.bindDN,
+			basedn: ldapConf.basedn,
+			auth: ldapConf.auth,
+			binddn: ldapConf.binddn,
 			bindcredentials: ldapConf.bindCredentials,
-			fieldMap: ldapConf.fieldMap
+			fieldmap: ldapConf.fieldmap
 		};
 		blockUI(bAction.slice(0,-1)+"ing configuration...");
 		//Transaction Activity for Create/ Update/ Delete LDAP conf button Action
@@ -2621,11 +2636,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				openModalPopup("Edit Configuration", failMsg);
 			} else {
 				ldapConf.url = data.url;
-				ldapConf.baseDN = data.baseDN;
-				ldapConf.authType = data.authType;
-				ldapConf.bindDN = data.bindDN;
+				ldapConf.basedn = data.basedn;
+				ldapConf.auth = data.auth;
+				ldapConf.binddn = data.binddn;
 				ldapConf.bindCredentials = data.bindCredentials;
-				ldapConf.fieldMap = data.fieldMap;
+				ldapConf.fieldmap = data.fieldmap;
 			}
 		}, function (error) {
 			unblockUI();
@@ -2641,10 +2656,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		// labelArr.push(txnHistory.codesDict['LdapConftest']);
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 		var url = this.url;
-		var base_dn = this.baseDN;
-		var bind_dn = this.bindDN;
+		var base_dn = this.basedn;
+		var bind_dn = this.binddn;
 		var bind_auth = this.bindCredentials;
-		var auth = this.authType;
+		var auth = this.auth;
 		blockUI("Testing Connection...");
 		adminServices.testLDAPConnection(auth, url, base_dn, bind_dn, bind_auth)
 		.then(function(data){
@@ -2682,8 +2697,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	};
 
 	$scope.ldapConf.switchAuthType = function(){
-		if($scope.ldapConf.authType == "anonymous"){
-			$("#bindDN").val('');
+		if($scope.ldapConf.auth == "anonymous"){
+			$("#binddn").val('');
 			$("#bindCredentials").val('');
 		}
 	};

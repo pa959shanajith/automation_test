@@ -100,7 +100,7 @@ exports.checkUserState_Nineteen68 = function (req, res) {
 									logger.info("User has not been assigned any projects");
 								} else {
 									req.session.userid = userid;
-									req.session.ip = req.headers['x-forwarded-for'];
+									req.session.ip = req.ip;
 									req.session.loggedin = (new Date()).toISOString();
 								}
 							}

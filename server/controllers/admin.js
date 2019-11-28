@@ -82,7 +82,7 @@ exports.manageUserDetails = function(req, res){
 			if (action != "delete") {
 				inputs.firstname = (reqData.firstname || "").trim();
 				inputs.lastname = (reqData.lastname || "").trim();
-				inputs.emailid = (reqData.email || "").trim();
+				inputs.email = (reqData.email || "").trim();
 				inputs.defaultrole = (reqData.role || "").trim();
 
 				if (!validator.isLength(inputs.firstname,1,100)) {
@@ -93,7 +93,7 @@ exports.manageUserDetails = function(req, res){
 					logger.error("Error occurred in admin/manageUserDetails: Invalid Last name.");
 					flag[4]='1';
 				}
-				if (!validator.isLength(inputs.emailid,1,100)) {
+				if (!validator.isLength(inputs.email,1,100)) {
 					logger.error("Error occurred in admin/manageUserDetails: Email cannot be empty.");
 					flag[6]='1';
 				}
@@ -197,7 +197,7 @@ exports.getUserDetails = function (req, res) {
 							password: '',
 							firstname: result.firstname,
 							lastname: result.lastname,
-							email: result.emailid,
+							email: result.email,
 							role: result.defaultrole,
 							addrole: result.addroles,
 							ldapuser: result.ldapuser,
@@ -209,7 +209,7 @@ exports.getUserDetails = function (req, res) {
 						data = [];
 						var result = result.rows;
 						for(var i = 0; i < result.length; i++) {
-							data.push([result[i].name,result[i]._id,result[i].defaultrole]);
+							data.push([result[i].name,result[i]._id,result[i].defaultrole,result[i].rolename]);
 						}
 						return res.send(data);
 					}
@@ -624,7 +624,7 @@ exports.getLDAPConfig = function(req, res){
 							auth: result.auth,
 							binddn: result.binddn,
 							bindCredentials: '',
-							fieldMap: result.fieldMap
+							fieldmap: result.fieldmap
 						};
 						if (action == "config") return res.send(data);
 						if (action == "user") {
@@ -636,7 +636,7 @@ exports.getLDAPConfig = function(req, res){
 								adConfig.bindDN = data.binddn;
 								adConfig.bindCredentials = bindCredentials;
 							}
-							var dataMaps = data.fieldMap;
+							var dataMaps = data.fieldmap;
 							var filter = dataMaps.uname;
 							var ad = new activeDirectory(adConfig);
 							if (opts.length > 0) {
@@ -746,7 +746,7 @@ exports.manageLDAPConfig = function(req, res){
 				inputs.url = (reqData.url || "").trim();
 				inputs.basedn = (reqData.basedn || "").trim();
 				inputs.auth = reqData.auth;
-				inputs.fieldMap = reqData.fieldMap || {};
+				inputs.fieldmap = reqData.fieldmap || {};
 				if (validator.isEmpty(inputs.url)) {
 					logger.error("Error occurred in admin/manageLDAPConfig: LDAP Server URL cannot be empty.");
 					flag[3] = '1';
@@ -781,10 +781,10 @@ exports.manageLDAPConfig = function(req, res){
 						}
 					}
 				}
-				if (!inputs.fieldMap.uname || !inputs.fieldMap.fname || !inputs.fieldMap.lname || !inputs.fieldMap.email) {
+				if (!inputs.fieldmap.uname || !inputs.fieldmap.fname || !inputs.fieldmap.lname || !inputs.fieldmap.email) {
 					logger.error("Error occurred in admin/manageLDAPConfig: Invalid Field Map.");
 					flag[8] = '1';
-				} else inputs.fieldMap = JSON.stringify(inputs.fieldMap);
+				} else inputs.fieldmap = JSON.stringify(inputs.fieldmap);
 			}
 			flag = flag.join('');
 			if (flag != "100000000") {
@@ -1142,7 +1142,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 								var cycles = releaseDetails.cycles;
 								if (releaseCreateStatus) {
 									try {
-										var releaseName = releaseDetails.releaseName;
+										var releaseName = releaseDetails.name;
 										var newReleaseID = "";
 										var inputs = {
 											"query": "createrelease",
@@ -1150,9 +1150,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 											"releasename": releaseName,
 											"cycles":cycles,
 											"createdby": userinfo.user_id,
-											"createdbyrole":userinfo.role,
-											"skucoderelease": "skucoderelease",
-											"tags": "tags"
+											"createdbyrole":userinfo.role
 										};
 										var args = {
 											data: inputs,
@@ -1169,7 +1167,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 												logger.error("Error occurred in admin/createProject_ICE from newProjectDetails Error Code : ERRNDAC");
 												} else {
 													//newReleaseID = data.rows[0].releaseid;
-                                                  
+                                                  res.send("success")
 
 													// async.forEachSeries(cycles, function (eachCycleDetail, cycleNamescallback) {
 													// 	try {
@@ -1203,16 +1201,14 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 										var releaseId = releaseDetails.releaseId;
 										async.forEachSeries(cycles, function (eachCycleDetail, cycleNamescallback) {
 											try {
-												var eachCycleName = eachCycleDetail.cycleName;
+												var eachCycleName = eachCycleDetail.name;
 												var inputs = {
 													"query": "createcycle",
 													"projectid":requestedprojectid,
 													"createdbyrole":userinfo.role,
 													"releaseid": releaseId,
 													"cyclename": eachCycleName,
-													"createdby": userinfo.user_id,
-													"skucodecycle": "skucodecycle",
-													"tags": "tags"
+													"createdby": userinfo.user_id
 												};
 												var args = {
 													data: inputs,
@@ -1468,9 +1464,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																										"releaseid": releaseId,
 																										"cycleid": cycleId,
 																										"cyclename": newCycleName,
-																										"createdby": userinfo.username.toLowerCase(),
-																										"skucodecycle": "skucodecycle",
-																										"tags": "tags"
+																										"createdby": userinfo.username.toLowerCase()
 																									};
 																									var args = {
 																										data: inputs,
@@ -1555,9 +1549,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																			"releaseid": releaseId,
 																			"cycleid": cycleId,
 																			"cyclename": newCycleName,
-																			"createdby": userinfo.username.toLowerCase(),
-																			"skucodecycle": "skucodecycle",
-																			"tags": "tags"
+																			"createdby": userinfo.username.toLowerCase()
 																		};
 																		var args = {
 																			data: inputs,

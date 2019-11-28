@@ -75,10 +75,10 @@
 				</div>
 
 				<div class='leftControl adminControl'>
-					<input type="text" autocomplete="off" name="firstName" id="firstName" ng-model="userConf.firstName" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="First Name"/>
+					<input type="text" autocomplete="off" name="firstname" id="firstname" ng-model="userConf.firstname" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="First Name"/>
 				</div>
 				<div class='rightControl adminControl'>
-					<input type="text" autocomplete="off" name="lastName" id="lastName" ng-model="userConf.lastName" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Last Name"/>
+					<input type="text" autocomplete="off" name="lastname" id="lastname" ng-model="userConf.lastname" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Last Name"/>
 				</div>
 				<div ng-if="!userConf.ldapActive">
 					<div class='leftControl adminControl'>
@@ -138,10 +138,10 @@
 					</div>
 				</div>
 				<div class='leftControl adminControl'>
-					<input type="text" autocomplete="off" name="firstName" id="firstName" ng-model="userConf.firstName" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="First Name">
+					<input type="text" autocomplete="off" name="firstname" id="firstname" ng-model="userConf.firstname" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="First Name">
 				</div>
 				<div class='rightControl adminControl'>
-					<input type="text" autocomplete="off" name="lastName" id="lastName" ng-model="userConf.lastName" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Last Name">
+					<input type="text" autocomplete="off" name="lastname" id="lastname" ng-model="userConf.lastname" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Last Name">
 				</div>
 				<div ng-if="!userConf.ldapActive">
 					<div class='leftControl adminControl'>
@@ -195,9 +195,13 @@
 						<option value="" disabled selected>Please Select Your Domain</option>
 					</select> -->
 					<label class='domainTxt'>Domain :</label>
-					<input type="text" id="selDomain" name="DomainName" placeholder="Domain Name" value="Banking">
+					<!-- <input type="text" id="selDomain" name="DomainName" placeholder="Domain Name" value="Banking">
 					<select class="adminSelect form-control" style="width: 91.5%; display: none;" id="selDomains">
-					</select>
+					</select> -->
+					<input class="btn btn-domains domains-edit dropdown-toggle" type="text" autocomplete="off" id="selDomain" data-toggle="dropdown" ng-model="domainConf.query1" placeholder="Search Domain.." ng-click = "domainConf.click()">
+					<ul class="dropdown-menu dropdown-menu-domains domains-edit" role="menu" aria-labelledby="selDomain">
+						<li role="presentation" ng-repeat='did in domainConf.alldomains | filter:domainConf.query1' ng-click="domainConf.selDomain=did ;domainConf.query1=did; domainConf.getUserData()" value="{{did}}"> {{did}}</li>
+					</ul>
 					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
 				</div>
 				<div class='userForm adminControl'>
@@ -407,41 +411,41 @@
 					class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Directory Provider URL (Eg: ldap://example.com:389)"/>
 				</div>
 				<div class='adminControl'>
-					<input type="text" autocomplete="off" id="ldapBaseDN" name="ldapBaseDN" ng-model="ldapConf.baseDN" class="form-control form-control-custom create" placeholder="Base Domain Name"/>
+					<input type="text" autocomplete="off" id="ldapBaseDN" name="ldapBaseDN" ng-model="ldapConf.basedn" class="form-control form-control-custom create" placeholder="Base Domain Name"/>
 				</div>
 				<br><br><br><br><br><br><br><br><h4>Authentication Type</h4>
 				<div>
-					<label><input type="radio" ng-model="ldapConf.authType" value="anonymous" name="optradio" ng-change='ldapConf.switchAuthType()'/> Anonymous</label>
+					<label><input type="radio" ng-model="ldapConf.auth" value="anonymous" name="optradio" ng-change='ldapConf.switchAuthType()'/> Anonymous</label>
 				</div>
 				<div>
-					<label><input type="radio" ng-model="ldapConf.authType" value="simple" name="optradio" ng-change='ldapConf.switchAuthType()'/> Simple</label>
+					<label><input type="radio" ng-model="ldapConf.auth" value="simple" name="optradio" ng-change='ldapConf.switchAuthType()'/> Simple</label>
 				</div>
 				<div class='leftControl adminControl'>
-					<input type="text" autocomplete="off" name="bindDN" id="bindDN" ng-disabled="ldapConf.authType != 'simple'" ng-model="ldapConf.bindDN" class="form-control form-control-custom create" placeholder="Authentication Principal" autocomplete="off"/>
+					<input type="text" autocomplete="off" name="binddn" id="binddn" ng-disabled="ldapConf.auth != 'simple'" ng-model="ldapConf.binddn" class="form-control form-control-custom create" placeholder="Authentication Principal" autocomplete="off"/>
 				</div>
 				<div class='rightControl adminControl'>
-					<input type="password" autocomplete="off" name="bindCredentials" id="bindCredentials" ng-disabled="ldapConf.authType != 'simple'" ng-model="ldapConf.bindCredentials" class="form-control form-control-custom create" placeholder="Authentication Credentials" autocomplete="off"/>
+					<input type="password" autocomplete="off" name="bindCredentials" id="bindCredentials" ng-disabled="ldapConf.auth != 'simple'" ng-model="ldapConf.bindCredentials" class="form-control form-control-custom create" placeholder="Authentication Credentials" autocomplete="off"/>
 				</div>
 				<br><br><br><h4>Data Mapping Settings</h4>
 				<h5>Mapping options are populates on click of <i>Test</i> with connection successful.</h5>
 				<div class='adminControl'><div>
-					<span class="leftControl">Username</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.uname" id="ldapFMapUname" class="form-control rightControl selectControl">
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.uname">{{field}}</option>
+					<span class="leftControl">Username</span><select class='adminSelect form-control' ng-model="ldapConf.fieldmap.uname" id="ldapFMapUname" class="form-control rightControl selectControl">
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldmap.uname">{{field}}</option>
 					</select>
 				</div></div>
 				<div class='adminControl'><div>
-					<span class="leftControl">Firstname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.fname" id="ldapFMapFname" class="form-control rightControl selectControl">
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.fname">{{field}}</option>
+					<span class="leftControl">Firstname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldmap.fname" id="ldapFMapFname" class="form-control rightControl selectControl">
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldmap.fname">{{field}}</option>
 					</select>
 				</div></div>
 				<div class='adminControl'><div>
-					<span class="leftControl">Lastname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.lname" id="ldapFMapLname" class="form-control rightControl selectControl">
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.lname">{{field}}</option>
+					<span class="leftControl">Lastname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldmap.lname" id="ldapFMapLname" class="form-control rightControl selectControl">
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldmap.lname">{{field}}</option>
 					</select>
 				</div></div>
 				<div class='adminControl'><div>
-					<span class="leftControl">Email</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.email" id="ldapFMapEmail" class="form-control rightControl selectControl">
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.email">{{field}}</option>
+					<span class="leftControl">Email</span><select class='adminSelect form-control' ng-model="ldapConf.fieldmap.email" id="ldapFMapEmail" class="form-control rightControl selectControl">
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldmap.email">{{field}}</option>
 					</select>
 				</div></div>
 			</div>
@@ -476,45 +480,45 @@
 					class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Directory Provider URL (Eg: ldap://example.com:389)"/>
 				</div>
 				<div class='adminControl'>
-					<input type="text" autocomplete="off" id="ldapBaseDN" name="ldapBaseDN" ng-model="ldapConf.baseDN" class="form-control form-control-custom create" placeholder="Base Domain Name"/>
+					<input type="text" autocomplete="off" id="ldapBaseDN" name="ldapBaseDN" ng-model="ldapConf.basedn" class="form-control form-control-custom create" placeholder="Base Domain Name"/>
 				</div>
 				<br><br><br><br><br><br><br><br><h4>Authentication Type</h4>
 				<div>
-					<label><input type="radio" ng-model="ldapConf.authType" value="anonymous" name="optradio" ng-change='ldapConf.switchAuthType()'/> Anonymous</label>
+					<label><input type="radio" ng-model="ldapConf.auth" value="anonymous" name="optradio" ng-change='ldapConf.switchAuthType()'/> Anonymous</label>
 				</div>
 				<div>
-					<label><input type="radio" ng-model="ldapConf.authType" value="simple" name="optradio" ng-change='ldapConf.switchAuthType()'/> Simple</label>
+					<label><input type="radio" ng-model="ldapConf.auth" value="simple" name="optradio" ng-change='ldapConf.switchAuthType()'/> Simple</label>
 				</div>
 				<div class='leftControl adminControl'>
-					<input type="text" autocomplete="off" name="bindDN" id="bindDN" ng-disabled="ldapConf.authType != 'simple'" ng-model="ldapConf.bindDN" class="form-control form-control-custom create" placeholder="Authentication Principal" autocomplete="off"/>
+					<input type="text" autocomplete="off" name="binddn" id="binddn" ng-disabled="ldapConf.auth != 'simple'" ng-model="ldapConf.binddn" class="form-control form-control-custom create" placeholder="Authentication Principal" autocomplete="off"/>
 				</div>
 				<div class='rightControl adminControl'>
-					<input type="password" autocomplete="off" name="bindCredentials" id="bindCredentials" ng-disabled="ldapConf.authType != 'simple'" ng-model="ldapConf.bindCredentials" class="form-control form-control-custom create" placeholder="Authentication Credentials" autocomplete="off"/>
+					<input type="password" autocomplete="off" name="bindCredentials" id="bindCredentials" ng-disabled="ldapConf.auth != 'simple'" ng-model="ldapConf.bindCredentials" class="form-control form-control-custom create" placeholder="Authentication Credentials" autocomplete="off"/>
 				</div>
 				<br><br><br><h4>Data Mapping Settings</h4>
 				<h5>All Mapping options are populates on click of <i>Test</i> with connection successful.</h5>
 				<div class='adminControl'><div>
-					<span class="leftControl">Username</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.uname" id="ldapFMapUname" class="form-control rightControl selectControl">
-						<option value="{{ldapConf.fieldMap.uname}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldMap.uname)==-1" ng-selected="true">{{ldapConf.fieldMap.uname}}</option>
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.uname">{{field}}</option>
+					<span class="leftControl">Username</span><select class='adminSelect form-control' ng-model="ldapConf.fieldmap.uname" id="ldapFMapUname" class="form-control rightControl selectControl">
+						<option value="{{ldapConf.fieldmap.uname}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldmap.uname)==-1" ng-selected="true">{{ldapConf.fieldmap.uname}}</option>
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldmap.uname">{{field}}</option>
 					</select>
 				</div></div>
 				<div class='adminControl'><div>
-					<span class="leftControl">Firstname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.fname" id="ldapFMapFname" class="form-control rightControl selectControl">
-						<option value="{{ldapConf.fieldMap.fname}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldMap.fname)==-1" ng-selected="true">{{ldapConf.fieldMap.fname}}</option>
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.fname">{{field}}</option>
+					<span class="leftControl">Firstname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldmap.fname" id="ldapFMapFname" class="form-control rightControl selectControl">
+						<option value="{{ldapConf.fieldmap.fname}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldmap.fname)==-1" ng-selected="true">{{ldapConf.fieldmap.fname}}</option>
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldmap.fname">{{field}}</option>
 					</select>
 				</div></div>
 				<div class='adminControl'><div>
-					<span class="leftControl">Lastname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.lname" id="ldapFMapLname" class="form-control rightControl selectControl">
-						<option value="{{ldapConf.fieldMap.lname}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldMap.lname)==-1" ng-selected="true">{{ldapConf.fieldMap.lname}}</option>
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.lname">{{field}}</option>
+					<span class="leftControl">Lastname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldmap.lname" id="ldapFMapLname" class="form-control rightControl selectControl">
+						<option value="{{ldapConf.fieldmap.lname}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldmap.lname)==-1" ng-selected="true">{{ldapConf.fieldmap.lname}}</option>
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldmap.lname">{{field}}</option>
 					</select>
 				</div></div>
 				<div class='adminControl'><div>
-					<span class="leftControl">Email</span><select class='adminSelect form-control' ng-model="ldapConf.fieldMap.email" id="ldapFMapEmail" class="form-control rightControl selectControl">
-						<option value="{{ldapConf.fieldMap.email}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldMap.email)==-1" ng-selected="true">{{ldapConf.fieldMap.email}}</option>
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldMap.email">{{field}}</option>
+					<span class="leftControl">Email</span><select class='adminSelect form-control' ng-model="ldapConf.fieldmap.email" id="ldapFMapEmail" class="form-control rightControl selectControl">
+						<option value="{{ldapConf.fieldmap.email}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldmap.email)==-1" ng-selected="true">{{ldapConf.fieldmap.email}}</option>
+						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldmap.email">{{field}}</option>
 					</select>
 				</div></div>
 			</div>
@@ -569,13 +573,13 @@
 							<tr>
 								<th> Username </th>
 								<th> Connection Mode </th>
-								<th ng-if="false"> IP </th>
+								<th ng-if="true"> IP </th>
 								<th><button class="btn" style="visibility:hidden"> Disconnect </button></th>
 							</tr>
 							<tr ng-repeat="user in sessionConf.clients">
 								<td> {{user.username}} </td>
 								<td> {{user.mode}} </td>
-								<td ng-if="false"> {{user.ip}} </td>
+								<td ng-if="true"> {{user.ip}} </td>
 								<td><button class="btn" data-id="{{$index}}" ng-click="sessionConf.kill($event)" > Disconnect </button></td>
 							</tr>
 						</table>

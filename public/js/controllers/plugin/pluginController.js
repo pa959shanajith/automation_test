@@ -66,12 +66,12 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			if(data == "Fail" || data == "Invalid Session") return $rootScope.redirectPage();
 			else {
 				PluginService.getTaskJson_mindmaps(data)
-				.then(function (data) {
-					if(data == "Invalid Session") {
+				.then(function (data1) {
+					if(data1 == "Invalid Session") {
 						return $rootScope.redirectPage();
 					} else {
-						var tasksJson = data;
-						$scope.taskJson = data;
+						var tasksJson = data1;
+						$scope.taskJson = data1;
 					 	window.localStorage['_TJ'] = angular.toJson(tasksJson);
 						if (tasksJson.length == 0) unblockUI();
 						/*	Build a list of releaseids and cycleids
@@ -147,7 +147,19 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 						// Enable Filter
 						$("span.filterIcon").removeClass('disableFilter');
 					}
-
+					for(i=0;i<data.projectId.length;i++){
+						$scope.filterDat.apptypes[data.projectId[i]]=data.appType[i]
+						$scope.filterDat.idnamemapprj[data.projectId[i]] = data.projectName[i];
+						releases=data.releases[i];
+						for(j=0;j<releases.length;j++){
+							$scope.filterDat.idnamemaprel[releases[j].name] = releases[j].name;
+							cycles=releases[j].cycles
+							for(k=0;k<cycles.length;k++){
+								$scope.filterDat.idnamemapcyc[cycles[k]._id] = cycles[k].name;
+							}
+						}
+					}
+					window.localStorage['_FD'] = angular.toJson($scope.filterDat);
 					// PluginService.getNames_ICE($scope.filterDat.projectids,Array($scope.filterDat.projectids.length).fill('projects'))
 					// .then(function (response) {
 					// 	if(response== "fail"){ unblockUI(); }
@@ -474,7 +486,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			var filterDat = $scope.filterDat;
 			if(clktask.taskDetails[0].taskType != 'Design')
 				clktask = clktask.testSuiteDetails[0];
-			var adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+filterDat.idnamemaprel[clktask.releaseid]+'">Release: '+filterDat.idnamemaprel[clktask.releaseid]+'</li><li class="description-item" title="Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'">Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'</li><li class="description-item" title="Apptype: '+clktask.appType+'">Apptype: '+clktask.appType+'</li></div>';
+			var adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+filterDat.idnamemaprel[clktask.releaseid]+'">Release: '+filterDat.idnamemaprel[clktask.releaseid]+'</li><li class="description-item" title="Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'">Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'</li><li class="description-item" title="Apptype: '+filterDat.apptypes[clktask.projectId]+'">Apptype: '+filterDat.apptypes[clktask.projectId]+'</li></div>';
 			$(adddetailhtml).insertAfter("[panel-id="+clickedtask+"]");
 			$("[panel-id="+clickedtask+"]").addClass("active-task");
 		});		
@@ -524,8 +536,8 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			$scope.filterDat.relcycmap[obj.taskDetails[tidx].releaseid].push(obj.taskDetails[tidx].cycleid);			
 		}
 
-		if($scope.filterDat.apptypes.indexOf(obj.appType)==-1)
-			$scope.filterDat.apptypes.push(obj.appType);
+		// if($scope.filterDat.apptypes.indexOf(obj.appType)==-1)
+		// 	$scope.filterDat.apptypes.push(obj.appType);
 		window.localStorage['_FD'] = angular.toJson($scope.filterDat);
 		$(".panel-additional-details").off("click");
 		$(".panel-additional-details").click(function(e){
@@ -548,7 +560,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			var filterDat = $scope.filterDat;
 			if(clktask.taskDetails[0].taskType != 'Design')
 				clktask = clktask.testSuiteDetails[0];
-			adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+filterDat.idnamemaprel[clktask.releaseid]+'">Release: '+filterDat.idnamemaprel[clktask.releaseid]+'</li><li class="description-item" title="Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'">Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'</li><li class="description-item" title="Apptype: '+maintask.appType+'">Apptype: '+maintask.appType+'</li></div>';
+			adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+filterDat.idnamemaprel[clktask.releaseid]+'">Release: '+filterDat.idnamemaprel[clktask.releaseid]+'</li><li class="description-item" title="Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'">Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'</li><li class="description-item" title="Apptype: '+filterDat.apptypes[maintask.projectId]+'">Apptype: '+filterDat.apptypes[maintask.projectId]+'</li></div>';
 			$(adddetailhtml).insertAfter("[panel-id="+clickedtask+"]");
 			$("[panel-id="+clickedtask+"]").addClass("active-task");
 		});
