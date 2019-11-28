@@ -2376,14 +2376,21 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (d.children) d.children.forEach(function(e) {
             recurseDelChild(e, tab);
         });
+        if(d.state=="deleted")
+        {
+            return;
+        }
+        // d3.select('#ct-node-' + d.id).remove();
+        if(d._id)
+        {  
+            var parentid=dNodes[d.parent.id]._id;
+            deletednode.push([d._id,d.type,parentid]);
+        }
         d.parent = null;
         d.children = null;
         d.task = null;
-        // d3.select('#ct-node-' + d.id).remove();
         delete $scope.nodeDisplay[d.id];
         deletednode_info.push(d);
-        if(d._id)
-            deletednode.push([d._id,d.type]);
         dNodes[d.id].state = 'deleted';
         var temp = dLinks;
         if (tab == 'mindmapEndtoEndModules') {
@@ -3084,7 +3091,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
         var counter = {};
         temp_data.forEach(function(e, i) {
-            var key_1=dNodes[e.idx].pid_n;
+            var key_1=dNodes[e.idx].parent._id;
             if(key_1==undefined){
                 if(dNodes[e.idx].parent==null) return;
                 key_1=(dNodes[e.idx].parent.oid==undefined) ? dNodes[e.idx].parent.id : dNodes[e.idx].parent.oid
@@ -3185,6 +3192,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
             mindmapServices.saveData(versioning_enabled, assignedTo, flag, from_v, to_v, cur_module, mapData, deletednode, unassignTask,
                 $('.project-list').val(), $('.cycle-list').val(), selectedTab, utcTime).then(function(result) {
+
+                deletednode = [],
+                deletednode_info = [];
                 if (result == "Invalid Session") {
                     return $rootScope.redirectPage();
                 }
@@ -3477,6 +3487,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
 
         mindmapServices.saveEndtoEndData(username, flag, from_v, to_v, 'endToend', mapData, deletednode, unassignTask, selectedProject, $('#ct-assignRel').val(), $('#ct-assignCyc').val()).then(function(result) {
+
+            deletednode = [],
+            deletednode_info = [];
+
             if (result == "Invalid Session") {
                 return $rootScope.redirectPage();
             }
@@ -3805,15 +3819,19 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         childCounter(1, tree);
         var newHeight = d3.max(levelCount) * 90;
         var d3Tree = d3.layout.tree().size([newHeight * 2, cSize[0]]);
-        // if(tree.oid===undefined) d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
-        // else d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
+        if(tree.oid===undefined) d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
+        else d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
 
         d3Tree.sort(function(a, b) {
             return a.childIndex - b.childIndex;
         });
 
         dNodes = d3Tree.nodes(tree);
-        //dLinks=d3Tree.links(dNodes);
+        dLinks=d3Tree.links(dNodes);
+
+        dNodes.sort(function(a, b) {
+            return a.childIndex - b.childIndex;
+        });  
 
 
         // var reusedata = parseDataReuse(false);
@@ -4640,19 +4658,19 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         childCounter(1, tree);
         var newHeight = d3.max(levelCount) * 90;
         var d3Tree = d3.layout.tree().size([newHeight, cSize[0]]);
-        // if(tree.oid===undefined) d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
-        // else d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
+        if(tree.oid===undefined) d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
+        else d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
         if (tree.childIndex === undefined) d3Tree.sort(function(a, b) {
             return a.childIndex - b.childIndex;
         });
         else d3Tree.sort(function(a, b) {
             return a.childIndex - b.childIndex;
         });
-        // dNodes.sort(function(a, b) {
-        //     return a.childIndex - b.childIndex;
-        // });        
+        dNodes.sort(function(a, b) {
+            return a.childIndex - b.childIndex;
+        });        
         dNodes = d3Tree.nodes(tree);
-        //dLinks=d3Tree.links(dNodes);
+        dLinks=d3Tree.links(dNodes);
         dNodes.forEach(function(d) {
 
             // switch-layout feature
