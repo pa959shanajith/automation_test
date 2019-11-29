@@ -623,7 +623,7 @@ exports.getLDAPConfig = function(req, res){
 							basedn: result.basedn,
 							auth: result.auth,
 							binddn: result.binddn,
-							bindCredentials: '',
+							bindcredentials: '',
 							fieldmap: result.fieldmap
 						};
 						if (action == "config") return res.send(data);

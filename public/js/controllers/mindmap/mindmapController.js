@@ -2237,6 +2237,40 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         d3.select('#ct-inpSugg').classed('no-disp', !0);
     };
 
+    function checkparenttask(parenttempnode,parent_flag)
+    {
+       
+        if (parent_flag) return parent_flag;
+        
+        if(parenttempnode!=null)
+        {
+            if (parenttempnode.taskexists!=null)
+            {
+                parent_flag=true;
+                
+            }
+            parenttempnode=parenttempnode.parent || null;
+            parent_flag=checkparenttask(parenttempnode,parent_flag);
+            
+        }
+        return parent_flag;
+    }
+
+    function checkchildrentask(d,children_flag)
+    {
+        if(children_flag) return children_flag;
+        if (d.taskexists != null) {
+        
+            children_flag=true;
+            return children_flag;
+            
+        }
+        if (d.children) d.children.forEach(function(e) {
+            children_flag=checkchildrentask(e, children_flag);
+        });
+        return children_flag;
+    }
+
     $scope.deleteNode = function($event) {
         //If module is in edit mode, then return do not add any node
         if (d3.select('#ct-inpBox').attr('class') == "") return;
@@ -2258,17 +2292,21 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
         // If any of the parent node has a task assigned to it cannot delete the node.
         var parenttempnode=dNodes[sid];
-        while(parenttempnode!=null && parenttempnode.hasOwnProperty("parent"))
-        {
-            if (parenttempnode.taskexists!=null)
-            {
-                openDialogMindmap('Error', "Cannot delete node parent "+parenttempnode["name"]+" has a task assigned. Please unassign task first.");
-                return; 
-            }
-            parenttempnode=parenttempnode.parent || null;
-        }
+        var flag=checkparenttask(parenttempnode,false);
+        if(flag){
+            openDialogMindmap('Error', "Cannot delete node if parent task is assigned. Please unassign task first.");
+            return;
+        } 
 
+        var flag_error=checkchildrentask(dNodes[sid],false);
+        if(flag_error)
+        {
+            openDialogMindmap('Error', "Cannot delete node if children task is assigned. Please unassign task first.");
+            return;
+        }
+        
         recurseDelChild(dNodes[sid], $scope.tab);
+
         for (j = dLinks.length - 1; j >= 0; j--) {
             if (dLinks[j].target.id == sid) {
                 // d3.select('#ct-link-' + dLinks[j].id).remove();
@@ -2367,12 +2405,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     function recurseDelChild(d, tab) {
-        if (d.taskexists != null) {
-        
-            openDialogMindmap('Error', "Cannot delete node if task is assigned. Please unassign task first.");
-            return;
-            
-        }
         if (d.children) d.children.forEach(function(e) {
             recurseDelChild(e, tab);
         });
@@ -3091,11 +3123,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
         var counter = {};
         temp_data.forEach(function(e, i) {
-            var key_1=dNodes[e.idx].parent._id;
-            if(key_1==undefined){
-                if(dNodes[e.idx].parent==null) return;
-                key_1=(dNodes[e.idx].parent.oid==undefined) ? dNodes[e.idx].parent.id : dNodes[e.idx].parent.oid
-            }
+            var key_1=undefined;
+            if(dNodes[e.idx].parent==null) return;
+            // key_1=dNodes[e.idx].parent._id;
+            // if(key_1==undefined){
+            key_1= dNodes[e.idx].parent.id;
+            // }
             var key=e.type+'_'+key_1;
             if(counter[key]==undefined)  counter[key]=1;
             if (dNodes[e.idx].childIndex != counter[key]) {
