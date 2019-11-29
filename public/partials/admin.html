@@ -161,7 +161,7 @@
 						<option ng-repeat="rid in userConf.allRoles" value="{{rid[1]}}">{{rid[0]}}</option>
 					</select>
 				</div>
-				<div class="col-xs-6 selectRole" ng-if="userConf.userIdName && userConf.role!='b5e9cb4a-5299-4806-b7d7-544c30593a6e'">
+				<div class="col-xs-6 selectRole" ng-if="userConf.userIdName && userConf.rolename!='Admin'">
 					<label class="leftControl secondaryRole" id="additionalRoleTxt">Additional Role: </label>
 					<label class="chooseRole dropdown-toggle" id="additionalRole_options" data-toggle="dropdown" ng-click="userConf.toggleAddRoles()"> Select Additional Role</label>
 					<ul class="dropdown-menu-multiselect" id="additionalRoles">

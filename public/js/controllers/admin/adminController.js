@@ -357,7 +357,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		if ($('#selAssignUser1 option:selected').val() == "") {
 			$("#selAssignUser1").css('border', '').addClass("selectErrorBorder");
 			return false;
-		} else if ($('#tokenName').val() == "") {
+		} else if ($('#tokenName').val().trim() == "") {
 			$("#tokenName").css('border', '').addClass("selectErrorBorder");
 			return false;
 		} else{
@@ -872,6 +872,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$scope.assignProj.assignedProjectAP = [];        
 		$("#selAssignProject").empty();
 		$("#selAssignProject").append('<option data-id="" value disabled selected>Please Select your domain</option>');
+		$("#selDomains").empty();
+		$("#selDomains").append('<option data-id="" value disabled selected>Please Select your domain</option>');
 	}
 
 	//Add Release Name Functionality
@@ -889,7 +891,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		var reg = /^[a-zA-Z0-9\s\.\-\_]+$/;
 			$(document).on('click', "#addReleaseName", function (e) {
 				e.preventDefault();
-				if ($("#releaseTxt").val() == "") {
+				if ($("#releaseTxt").val().trim() == "") {
 					$("#releaseTxt").addClass('inputErrorBorder');
 					return false;
 				} else if (!reg.test($("#releaseTxt").val())) {
@@ -974,7 +976,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			var relName = $("#releaseList li.active .releaseName").text();
 			e.preventDefault();
 			$("#cycleTxt").removeClass("inputErrorBorder");
-			if ($("#cycleTxt").val() == "") {
+			if ($("#cycleTxt").val().trim() == "") {
 				$("#cycleTxt").addClass('inputErrorBorder');
 				return false;
 			} else if (!reg.test($("#cycleTxt").val())) {
@@ -1855,6 +1857,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.userConf.click = function(query) {
 		$(".selectedIcon").removeClass("selectedIcon");
+		$scope.userConf.ldapActive=false
 		$("button.userTypeBtnActive").removeClass('userTypeBtnActive');
 		$("#userTab").find("img").addClass("selectedIcon");
 		this.userId = '';
@@ -1896,7 +1899,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					$scope.userConf.allRoles = rolesRes;
 					$scope.userConf.allAddRoles = rolesRes.slice(0);
 					rolesRes.some(function(e,i) {
-						if (e[0].toLowerCase()=="Admin") {
+						if (e[0].toLowerCase()=="admin") {
 							$scope.userConf.allAddRoles.splice(i,1);
 							return true;
 						}
@@ -2246,6 +2249,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				userConf.lastname = data.lastname;
 				userConf.email = data.email;
 				userConf.role = data.role;
+				userConf.rolename = data.rolename;
 				userConf.addRole = {};
 				data.addrole.forEach(function(e){
 					userConf.addRole[e] = true;
@@ -2348,7 +2352,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			var regex;
 			if (e.target.id == 'userName')
 				regex = /[\\[\]\~`!@#$%^&*()+={}|;:"',<>?/\s]/g;
-			if (e.target.id == 'ldapServerURL')
+			else if (e.target.id == 'ldapServerURL')
 				regex = /[\\[\]\~`!@#$%^&*()+={}|;"',<>?\s]/g;
 			else if (e.target.id == 'projectName' || e.target.id == 'releaseTxt' || e.target.id == 'cycleTxt' || e.target.id == 'releaseName' || e.target.id == 'cycleName')
 				regex = /[-\\[\]\~`!@#$%^&*()+={}|;:"',.<>?/\s]/g;

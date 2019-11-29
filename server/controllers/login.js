@@ -95,7 +95,7 @@ exports.checkUserState_Nineteen68 = function (req, res) {
 								emsg = err;
 							} else {
 								logger.info("Inside function call of checkAssignedProjects");
-								if (role != "admin" && !assignedProjects) {
+								if (role != "Admin" && !assignedProjects) {
 									emsg = "noProjectsAssigned";
 									logger.info("User has not been assigned any projects");
 								} else {
@@ -206,7 +206,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 								if (selectedRole == req.session.defaultRoleId) req.session.defaultRole = rolename;
 								req.session.activeRole = rolename;
 								jsonService.rolename = req.session.defaultRole;
-								jsonService.page = (jsonService.rolename == "admin")? "admin":"plugin";
+								jsonService.page = (jsonService.rolename == "Admin")? "admin":"plugin";
 								callback(null);
 							}
 						}

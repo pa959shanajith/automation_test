@@ -189,7 +189,7 @@ exports.getUserDetails = function (req, res) {
 				} else {
 					var data;
 					if (action != "user") {
-						result = result.rows[0];
+						result = result.rows;
 						//var password = result.password;
 						data = {
 							userid: userid,
@@ -199,6 +199,7 @@ exports.getUserDetails = function (req, res) {
 							lastname: result.lastname,
 							email: result.email,
 							role: result.defaultrole,
+							rolename: result.rolename,
 							addrole: result.addroles,
 							ldapuser: result.ldapuser,
 						};
@@ -623,7 +624,7 @@ exports.getLDAPConfig = function(req, res){
 							basedn: result.basedn,
 							auth: result.auth,
 							binddn: result.binddn,
-							bindcredentials: '',
+							bindCredentials: '',
 							fieldmap: result.fieldmap
 						};
 						if (action == "config") return res.send(data);
@@ -1006,7 +1007,6 @@ exports.getAssignedProjects_ICE = function (req, res) {
 			var assignedProjObj = [];
 			var inputs = {
 				"query": "projectid",
-				"domain": requestDetails.domainname,
 				"userid": requestDetails.userId
 			};
 			var args = {
@@ -1028,6 +1028,7 @@ exports.getAssignedProjects_ICE = function (req, res) {
 							try {
 								var inputs = {
 									"query": "projectname",
+									"domain": requestDetails.domainname,
 									"projectid": assignedProjectIds
 								};
 								var args = {
@@ -1207,7 +1208,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 													"projectid":requestedprojectid,
 													"createdbyrole":userinfo.role,
 													"releaseid": releaseId,
-													"cyclename": eachCycleName,
+													"name": eachCycleName,
 													"createdby": userinfo.user_id
 												};
 												var args = {
@@ -1279,7 +1280,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 														try {
 															var inputs = {
 																"query": "deletecycle",
-																"cyclename": eachCycleDetail.cycleName,
+																"name": eachCycleDetail.cycleName,
 																"releaseid": eachprojectDetail.releaseId,
 																"cycleid": eachCycleDetail.cycleId
 															};
@@ -1378,15 +1379,18 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 							async.forEachSeries(projectDetails, function (eachprojectDetail, eachprojectDetailcallback) {
 								try {
 									var editedStatus = eachprojectDetail.editStatus;
-									var newReleaseName = eachprojectDetail.releaseName;
+									var newReleaseName = eachprojectDetail.name;
 									var releaseId = eachprojectDetail.releaseId;
 									if (editedStatus) {
 										try {
 											var inputs = {
-												"query": "deleterelease",
+												"query": "editrelease",
 												"releasename": eachprojectDetail.oldreleaseName,
+												"newreleasename": newReleaseName,
 												"projectid": requestedprojectid,
-												"releaseid": releaseId
+												"releaseid": releaseId,
+												"modifiedby":userinfo.user_id,
+												"modifiedbyrole":userinfo.role
 											};
 											var args = {
 												data: inputs,
@@ -1404,102 +1408,57 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 														res.send(flag);
 													} else {
 														try {
-															var inputs = {
-																"query": "createrelease",
-																"projectid": requestedprojectid,
-																"releaseid": releaseId,
-																"releasename": newReleaseName,
-																"createdby": userinfo.username.toLowerCase(),
-																"skucoderelease": "skucoderelease",
-																"tags": "tags"
-															};
-															var args = {
-																data: inputs,
-																headers: {
-																	"Content-Type": "application/json"
-																}
-															};
-															logger.info("Calling NDAC Service from editedProjectDetails :admin/createProject_ICE");
-															client.post(epurl + "admin/createProject_ICE", args,
-																function (data, response) {
-																if (response.statusCode != 200 || data.rows == "fail") {
-																	logger.error("Error occurred in admin/createProject_ICE from editedProjectDetails Error Code : ERRNDAC");
-																	flag = "Error in update-Release(true)-updateProject_ICE : Fail";
-																	res.send(flag);
-																} else {
-																	try {
-																		var cycles = eachprojectDetail.cycles;
-																		var newCycleName = "";
-																		var cycleId = "";
-																		async.forEachSeries(cycles, function (eachCycleDetail, eachCycleCallback) {
-																			try {
-																				var editedStatusCycles = eachCycleDetail.editStatus;
-																				if (editedStatusCycles) {
+															var cycles = eachprojectDetail.cycles;
+															var newCycleName = "";
+															var cycleId = "";
+															async.forEachSeries(cycles, function (eachCycleDetail, eachCycleCallback) {
+																try {
+																	var editedStatusCycles = eachCycleDetail.editStatus;
+																	if (editedStatusCycles) {
+																		try {
+																			newCycleName = eachCycleDetail.cyclename;
+																			cycleId = eachCycleDetail._id;
+																			var inputs = {
+																				"query": "editcycle",
+																				"cyclename": eachCycleDetail.oldCycleName,
+																				"releaseid": releaseId,
+																				"cycleid": cycleId,
+																				"projectid": requestedprojectid,
+																				"newcyclename": newCycleName,
+																				"modifiedby":userinfo.user_id,
+																				"modifiedbyrole":userinfo.role
+																			};
+																			var args = {
+																				data: inputs,
+																				headers: {
+																					"Content-Type": "application/json"
+																				}
+																			};
+																			logger.info("Calling NDAC Service from editedProjectDetails :admin/updateProject_ICE");
+																			client.post(epurl + "admin/updateProject_ICE", args,
+																				function (result, response) {
+																				if (response.statusCode != 200 || result.rows == "fail") {
+																					logger.error("Error occurred in admin/updateProject_ICE from editedProjectDetails Error Code : ERRNDAC");
+																					flag = "Error in delete-Cycle(true)-updateProject_ICE : Fail";
+																					res.send(flag);
+																				} else {
 																					try {
-																						newCycleName = eachCycleDetail.cycleName;
-																						cycleId = eachCycleDetail.cycleId;
-																						var inputs = {
-																							"query": "deletecycle",
-																							"cyclename": eachCycleDetail.oldCycleName,
-																							"releaseid": releaseId,
-																							"cycleid": cycleId
-																						};
-																						var args = {
-																							data: inputs,
-																							headers: {
-																								"Content-Type": "application/json"
-																							}
-																						};
-																						logger.info("Calling NDAC Service from editedProjectDetails :admin/updateProject_ICE");
-																						client.post(epurl + "admin/updateProject_ICE", args,
-																							function (result, response) {
-																							if (response.statusCode != 200 || result.rows == "fail") {
-																								logger.error("Error occurred in admin/updateProject_ICE from editedProjectDetails Error Code : ERRNDAC");
-																								flag = "Error in delete-Cycle(true)-updateProject_ICE : Fail";
-																								res.send(flag);
-																							} else {
-																								try {
-																									var inputs = {
-																										"query": "createcycle",
-																										"releaseid": releaseId,
-																										"cycleid": cycleId,
-																										"cyclename": newCycleName,
-																										"createdby": userinfo.username.toLowerCase()
-																									};
-																									var args = {
-																										data: inputs,
-																										headers: {
-																											"Content-Type": "application/json"
-																										}
-																									};
-																									createCycle(args, function (error, response) {
-																										if (error) {
-																											logger.error(error);
-																											res.send(error);
-																										} else {
-																											eachCycleCallback();
-																										}
-																									});
-																								} catch (exception) {
-																									logger.error(exception.message);
-																								}
-																							}
-																						});
+																						res.send(result.rows)
 																					} catch (exception) {
 																						logger.error(exception.message);
 																					}
-																				} else {
-																					eachCycleCallback();
 																				}
-																			} catch (exception) {
-																				logger.error(exception.message);
-																			}
-																		}, eachprojectDetailcallback);
-																	} catch (exception) {
-																		logger.error(exception.message);
+																			});
+																		} catch (exception) {
+																			logger.error(exception.message);
+																		}
+																	} else {
+																		eachCycleCallback();
 																	}
+																} catch (exception) {
+																	logger.error(exception.message);
 																}
-															});
+															}, eachprojectDetailcallback);
 														} catch (exception) {
 																logger.error(exception.message);
 														}
@@ -1521,13 +1480,17 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 													var editedStatusCycles = eachCycleDetail.editStatus;
 													if (editedStatusCycles) {
 														try {
-															newCycleName = eachCycleDetail.cycleName;
-															cycleId = eachCycleDetail.cycleId;
+															newCycleName = eachCycleDetail.cyclename ? eachCycleDetail.cyclename : eachCycleDetail.cycleName;
+															cycleId = eachCycleDetail._id ? eachCycleDetail._id : eachCycleDetail.cycleId;
 															var inputs = {
-																"query": "deletecycle",
+																"query": "editcycle",
 																"cyclename": eachCycleDetail.oldCycleName,
-																"releaseid": releaseId,
-																"cycleid": cycleId
+																"newcyclename": newCycleName,
+																"releaseid": eachprojectDetail.name,
+																"cycleid": cycleId,
+																"projectid": requestedprojectid,
+																"modifiedby":userinfo.user_id,
+																"modifiedbyrole":userinfo.role
 															};
 															var args = {
 																data: inputs,
@@ -1544,27 +1507,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																	res.send(flag);
 																} else {
 																	try {
-																		var inputs = {
-																			"query": "createcycle",
-																			"releaseid": releaseId,
-																			"cycleid": cycleId,
-																			"cyclename": newCycleName,
-																			"createdby": userinfo.username.toLowerCase()
-																		};
-																		var args = {
-																			data: inputs,
-																			headers: {
-																				"Content-Type": "application/json"
-																			}
-																		};
-																		createCycle(args, function (error, response) {
-																			if (error) {
-																				logger.error(error);
-																				res.send(error);
-																			} else {
-																				eachCycleCallback();
-																			}
-																		});
+																		res.send(result.rows)
 																	} catch (exception) {
 																			logger.error(exception.message);
 																	}
