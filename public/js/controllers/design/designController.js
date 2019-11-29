@@ -329,7 +329,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 										"stepNo": "1",
 										"custname": "",
 										"objectName": "",
-										"dataObject": "",
 										"keywordVal": "",
 										"inputVal": "",
 										"outputVal": "",
@@ -503,7 +502,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		var appType = taskInfo.appType;
 		var import_status = true;
 		var flag = false;
-		var defaultTestScript = '[{"stepNo":"1","custname":"","objectName":"","dataObject":"","keywordVal":"","inputVal":"","outputVal":"","url":"","_id_":"","appType":"Generic"}]';
+		var defaultTestScript = '[{"stepNo":"1","custname":"","objectName":"","keywordVal":"","inputVal":"","outputVal":"","url":"","_id_":"","appType":"Generic"}]';
 		if (readTestCaseData == defaultTestScript) {
 			$("#importTestCaseFile").attr("type", "file");
 			$("#importTestCaseFile").trigger("click");
@@ -1288,7 +1287,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						"stepNo": i + 1,
 						"appType": appType,
 						"objectName": "",
-						"dataObject": "",
 						"inputVal": [wsdlInputs[i]],
 						"keywordVal": keywordVal[i],
 						"outputVal": "",
@@ -1304,7 +1302,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				"stepNo": testCaseWS.length + 1,
 				"appType": appType,
 				"objectName": "",
-				"dataObject": "",
 				"inputVal": [""],
 				"keywordVal": "executeRequest",
 				"outputVal": "",
@@ -2801,7 +2798,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						$("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');
 						$("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');
 
-						getIndexOfDeletedObjects = []
+						getIndexOfDeletedObjects = [];
 						viewString = {};
 						if (newScrapedList != undefined) {
 							newScrapedList.view = [];
@@ -2849,6 +2846,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						//Update Service to Save Scrape Objects
 						DesignServices.updateScreen_ICE(scrapeObject)
 							.then(function (data) {
+								getIndexOfDeletedObjects = [];
 								angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
 								unblockUI()
 								//add popoup for error and saved 
@@ -5144,8 +5142,7 @@ function contentTable(newTestScriptDataLS) {
 			{ label: 'appType', name: 'appType', editable: false, resizable: false, hidden: true },
 			{ label: 'Details', name: 'addTestCaseDetails', editable: false, resizable: false, sortable: false },
 			{ label: 'Details', name: 'addTestCaseDetailsInfo', editable: false, resizable: false, sortable: false, hidden: true },
-			{ label: 'cord', name: 'cord', editable: false, resizable: false, hidden: true },
-			{ name: 'dataObject', editable: false, resizable: false, hidden: true }
+			{ label: 'cord', name: 'cord', editable: false, resizable: false, hidden: true }
 		],
 		loadonce: false,
 		viewrecords: false,
@@ -5391,9 +5388,6 @@ function contentTable(newTestScriptDataLS) {
 		editable: false
 	});
 	$("#jqGrid").jqGrid("setColProp", "objectName", {
-		editable: false
-	});
-	$("#jqGrid").jqGrid("setColProp", "dataObject", {
 		editable: false
 	});
 	$("#jqGrid").jqGrid("setColProp", "custname", {
@@ -5682,7 +5676,6 @@ function contentTable(newTestScriptDataLS) {
 		if (selectedText == "@Generic" || selectedText == undefined) {
 			objName = " ";
 			url = " ";
-			dataObject = "";
 			if (appTypeLocal == "MobileApp") {
 				var sc = Object.keys(keywordArrayList.defaultListMobility);
 				selectedKeywordList = "defaultListMobility";
@@ -5700,7 +5693,6 @@ function contentTable(newTestScriptDataLS) {
 				$grid.jqGrid('setCell', rowId, 'appType', "Generic");
 				$grid.jqGrid('setCell', rowId, 'url', url);
 				$grid.jqGrid('setCell', rowId, 'objectName', objName);
-				$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			} else {
 				if (appTypeLocal == 'MobileApp') {
 					var sc = Object.keys(keywordArrayList.defaultListMobility);
@@ -5723,7 +5715,6 @@ function contentTable(newTestScriptDataLS) {
 				$grid.jqGrid('setCell', rowId, 'appType', "Generic");
 				$grid.jqGrid('setCell', rowId, 'url', url);
 				$grid.jqGrid('setCell', rowId, 'objectName', objName);
-				$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 				$grid.jqGrid('setCell', rowId, 'cord', cord);
 			}
 		}
@@ -5745,8 +5736,6 @@ function contentTable(newTestScriptDataLS) {
 			$grid.jqGrid('setCell', rowId, 'appType', "System");
 			$grid.jqGrid('setCell', rowId, 'url', url);
 			$grid.jqGrid('setCell', rowId, 'objectName', objName);
-			dataObject = "";
-			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 		}
 		else if (selectedText == "@Browser") {
 			objName = " ";
@@ -5767,8 +5756,6 @@ function contentTable(newTestScriptDataLS) {
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 			$grid.jqGrid('setCell', rowId, 'url', url);
 			$grid.jqGrid('setCell', rowId, 'objectName', objName);
-			dataObject = "";
-			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
 		} else if (selectedText == "@BrowserPopUp") {
 			objName = " ";
@@ -5789,8 +5776,6 @@ function contentTable(newTestScriptDataLS) {
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 			$grid.jqGrid('setCell', rowId, 'url', url);
 			$grid.jqGrid('setCell', rowId, 'objectName', objName);
-			dataObject = "";
-			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
 		}
 		/**
@@ -5838,8 +5823,6 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'objectName', objName);
-			dataObject = "";
-			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'url', url);
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
@@ -5885,8 +5868,6 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'objectName', objName);
-			dataObject = "";
-			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'url', url);
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
@@ -5909,8 +5890,6 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-			dataObject = "";
-			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 		} else if (selectedText == "Mainframe List") {
 			objName = " ";
 			url = " ";
@@ -5928,8 +5907,6 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-			dataObject = "";
-			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 		} else if (selectedText == "@Email") {
 			objName = " ";
 			url = " ";
@@ -5947,8 +5924,6 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-			dataObject = "";
-			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
 		} else if (selectedText == "@Window") {
 			objName = " ";
@@ -5969,8 +5944,6 @@ function contentTable(newTestScriptDataLS) {
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 			$grid.jqGrid('setCell', rowId, 'url', url);
 			$grid.jqGrid('setCell', rowId, 'objectName', objName);
-			dataObject = "";
-			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
 		} else if (selectedText == "@Oebs") {
 			objName = "";
@@ -5990,8 +5963,6 @@ function contentTable(newTestScriptDataLS) {
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 			$grid.jqGrid('setCell', rowId, 'objectName', objName);
-			dataObject = "";
-			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'url', url);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
 		} else if (selectedText == "@Mobile") {
@@ -6017,8 +5988,6 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-			dataObject = "";
-			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 		} else if (selectedText == "@Action") {
 			objName = " ";
 			url = " ";
@@ -6039,8 +6008,6 @@ function contentTable(newTestScriptDataLS) {
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 			$grid.jqGrid('setCell', rowId, 'objectName', objName);
-			dataObject = "";
-			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'url', url);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
 		} else if (selectedText == "@Android_Custom"){
@@ -6060,8 +6027,6 @@ function contentTable(newTestScriptDataLS) {
             $("select#" + rowId + "_keywordVal", row[0]).html(res);
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-			dataObject = "";
-			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 		} else if (selectedText == "@CustomiOS") {
 			objName = " ";
 			url = " ";
@@ -6079,8 +6044,6 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-			dataObject = "";
-			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 		} else if (selectedText == "@MobileiOS") {
 			objName = " ";
 			url = " ";
@@ -6098,8 +6061,6 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-			dataObject = "";
-			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 		} else if (selectedText == "@Sap") {
 			objName = " ";
 			url = " ";
@@ -6117,8 +6078,6 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-			dataObject = "";
-			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
 		}
 		//Adding @Excel to the objectName dropdown
@@ -6140,8 +6099,6 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', 'Generic');
-			dataObject = "";
-			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
 		} //Adding @Word to the objectName dropdown
 		else if (selectedText == "@Word") {
@@ -6162,8 +6119,6 @@ function contentTable(newTestScriptDataLS) {
 			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', 'Generic');
-			dataObject = "";
-			$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', rowId, 'cord', cord);
 		}
 		// else if (selectedText.startsWith("@PDF")) {
@@ -6237,7 +6192,6 @@ function contentTable(newTestScriptDataLS) {
 						objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
 					}
 					url = ob.url;
-					dataObject = ob._id;
 					var obType = ob.tag;
 					var listType = ob.canselectmultiple;
 					if (ob.cord) {
@@ -6265,7 +6219,6 @@ function contentTable(newTestScriptDataLS) {
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
-						$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						$grid.jqGrid('setCell', rowId, 'cord', cord);
 						break;
@@ -6287,7 +6240,6 @@ function contentTable(newTestScriptDataLS) {
 						$grid.jqGrid('setCell', rowId, 'appType', 'pdf');
 						$grid.jqGrid('setCell', rowId, 'cord', cord);
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
-						$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 						break;
 					} else if (obType == 'elementWS') {
 						var sc = Object.keys(keywordArrayList.elementWS);
@@ -6305,7 +6257,6 @@ function contentTable(newTestScriptDataLS) {
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
-						$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
 					} else if (appTypeLocal == 'Desktop' && (obType == 'button' || obType == 'input' || obType == 'select' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType == 'treeview' || obType == 'TreeView' || obType == 'tree' ||
@@ -6373,7 +6324,6 @@ function contentTable(newTestScriptDataLS) {
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
-						$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						$grid.jqGrid('setCell', rowId, 'cord', cord);
 						break;
@@ -6394,7 +6344,6 @@ function contentTable(newTestScriptDataLS) {
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
-						$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						$grid.jqGrid('setCell', rowId, 'cord', cord);
 						break;
@@ -6474,7 +6423,6 @@ function contentTable(newTestScriptDataLS) {
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
-						$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						$grid.jqGrid('setCell', rowId, 'cord', cord);
 						break;
@@ -6554,7 +6502,6 @@ function contentTable(newTestScriptDataLS) {
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
-						$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
 					} else if (appTypeLocal == 'MobileApp' && (!(obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0 ||
@@ -6578,7 +6525,6 @@ function contentTable(newTestScriptDataLS) {
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
-						$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
 					} else if (appTypeLocal == 'DesktopJava' && (obType == 'push button' || obType == 'text' || obType == 'combo box' || obType == 'list item' || obType == 'hyperlink' || obType == 'label' || obType == 'scroll bar' || obType == 'toggle button' || obType == 'menu' ||
@@ -6634,7 +6580,6 @@ function contentTable(newTestScriptDataLS) {
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
-						$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						$grid.jqGrid('setCell', rowId, 'cord', cord);
 						break;
@@ -6654,7 +6599,6 @@ function contentTable(newTestScriptDataLS) {
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
-						$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						$grid.jqGrid('setCell', rowId, 'cord', cord);
 						break;
@@ -6671,7 +6615,6 @@ function contentTable(newTestScriptDataLS) {
 				$("select#" + rowId + "_keywordVal", row[0]).html(res);
 				selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 				$grid.jqGrid('setCell', rowId, 'objectName', ' ');
-				$grid.jqGrid('setCell', rowId, 'dataObject', dataObject);
 				$grid.jqGrid('setCell', rowId, 'url', ' ');
 				$grid.jqGrid('setCell', rowId, 'appType', 'Generic');
 			}
@@ -6743,13 +6686,11 @@ function contentTable(newTestScriptDataLS) {
 		var selectedText = $(selId + ' option:selected').val();
 		var url = " ";
 		var objName = " ";
-		var dataObject = "";
 		setKeyword(e, selectedText, $grid, "empty");
 		//uncomment below two sections to verify change in URL
 		//set the URL to the cell 'url'
 		if (selectedText == "@Generic" || selectedText == undefined || selectedText == "@Browser" || selectedText == "@Excel" || selectedText == "@BrowserPopUp") {
 			$grid.jqGrid('setCell', currRowId, 'objectName', objName);
-			$grid.jqGrid('setCell', currRowId, 'dataObject', dataObject);
 			$grid.jqGrid('setCell', currRowId, 'url', url);
 		}
 		// else{
@@ -6846,7 +6787,6 @@ function addTestScriptRow(e) {
 		appTypeLocal = JSON.parse(window.localStorage['_CT']).appType;
 		var emptyRowData = {
 			"objectName": "",
-			"dataObject": "",
 			"custname": "",
 			"keywordVal": "",
 			"inputVal": [""],
@@ -6930,9 +6870,6 @@ function rearrangeTestScriptRow(e) {
 	$("#jqGrid").jqGrid("setColProp", "objectName", {
 		editable: false
 	});
-	$("#jqGrid").jqGrid("setColProp", "dataObject", {
-		editable: false
-	});
 	$("#jqGrid").jqGrid("setColProp", "custname", {
 		editable: false
 	});
@@ -6994,9 +6931,6 @@ function editTestCaseRow(e) {
 			editable: false
 		});
 		$("#jqGrid").jqGrid("setColProp", "objectName", {
-			editable: false
-		});
-		$("#jqGrid").jqGrid("setColProp", "dataObject", {
 			editable: false
 		});
 		$("#jqGrid").jqGrid("setColProp", "custname", {
@@ -7086,16 +7020,15 @@ function copyTestStep(e) {
 				var getRowData = $('#jqGrid').jqGrid('getRowData', rowId);
 				getRowJsonCopy.push({
 					"objectName": $(this).children("td:nth-child(4)").text().trim(),
-					"dataObject": $(this).children("td:nth-child(5)").text().trim(),
-					"custname": $(this).children("td:nth-child(6)").text(),
-					"keywordVal": $(this).children("td:nth-child(7)").text(),
-					"inputVal": $(this).children("td:nth-child(8)").text(),
-					"outputVal": $(this).children("td:nth-child(9)").text().trim(),
+					"custname": $(this).children("td:nth-child(5)").text(),
+					"keywordVal": $(this).children("td:nth-child(6)").text(),
+					"inputVal": $(this).children("td:nth-child(7)").text(),
+					"outputVal": $(this).children("td:nth-child(8)").text().trim(),
 					"stepNo": parseInt($(this).children("td:nth-child(1)").text()),
-					"remarksIcon": $(this).children("td:nth-child(10)").text(),
-					"remarks": $(this).children("td:nth-child(11)").text(),
-					"url": $(this).children("td:nth-child(12)").text().trim(),
-					"appType": $(this).children("td:nth-child(13)").text(),
+					"remarksIcon": $(this).children("td:nth-child(9)").text(),
+					"remarks": $(this).children("td:nth-child(10)").text(),
+					"url": $(this).children("td:nth-child(11)").text().trim(),
+					"appType": $(this).children("td:nth-child(12)").text(),
 					"addTestCaseDetails": getRowData.addTestCaseDetails,
 					"addTestCaseDetailsInfo": getRowData.addTestCaseDetailsInfo,
 					"cord": getRowData.cord
@@ -7109,9 +7042,6 @@ function copyTestStep(e) {
 			editable: false
 		});
 		$("#jqGrid").jqGrid("setColProp", "objectName", {
-			editable: false
-		});
-		$("#jqGrid").jqGrid("setColProp", "dataObject", {
 			editable: false
 		});
 		$("#jqGrid").jqGrid("setColProp", "custname", {
