@@ -550,13 +550,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (data == "Invalid Session") {
 					$rootScope.redirectPage();
 				} else {
-					$scope.domainConf.alldomains=data;
-					/* $('#selDomains').show()
-					$('#selDomain').hide()
+					// $scope.domainConf.alldomains=data;
+					$('#selDomain').show()
+					$('#selDomains').hide()
+					$('#selDomain').empty()
 					for (var i = 0; i < data.length; i++) {
 					// if(data.length!=0){
-						$('#selDomains').append($("<option value=" + data[i] + "></option>").text(data[i]));
-					} */
+						$('#selDomain').append($("<option value=" + data[i] + "></option>").text(data[i]));
+					}
 					var details = {
 						"web":{"data":"Web","title":"Web","img":"web"},
 						"webservice":{"data":"Webservice","title":"Web Service","img":"webservice"},
