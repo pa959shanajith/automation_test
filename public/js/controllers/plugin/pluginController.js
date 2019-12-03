@@ -148,7 +148,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 						$("span.filterIcon").removeClass('disableFilter');
 					}
 					for(i=0;i<data.projectId.length;i++){
-						$scope.filterDat.apptypes[data.projectId[i]]=data.appType[i]
+						$scope.filterDat.apptypes[data.projectId[i]]=data.appTypeName[i]
 						$scope.filterDat.idnamemapprj[data.projectId[i]] = data.projectName[i];
 						releases=data.releases[i];
 						for(j=0;j<releases.length;j++){
