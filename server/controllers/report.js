@@ -448,7 +448,7 @@ exports.getReport_Nineteen68 = function(req, res) {
     try {
         if (utils.isSessionActive(req)) {
             var reportId = req.body.reportId;
-            var reportInfoObj = {};
+            var reportInfoObj = [];
             var reportjson = {};
             var flag = "";
 			var finalReport = [];
@@ -515,16 +515,20 @@ exports.getReport_Nineteen68 = function(req, res) {
                                                         logger.error("Error occurred in the service getReport_Nineteen68 - cycleid: Failed to get cycle Ids from test suites.");
                                                     } else {
                                                         try {
-                                                            var cyclename = cycleResult.rows[0].releases.cycles.name;
-                                                            var releasename = cycleResult.rows[0].releases.name;
-                                                            var projectname = cycleResult.rows[0].name;
-                                                            var domainname = cycleResult.rows[0].domain;
-                                                            reportInfoObj.cyclename = cyclename;
-                                                            reportInfoObj.releasename = releasename;
-                                                            reportInfoObj.projectname = projectname;
-                                                            reportInfoObj.domainname = domainname;
-                                                            finalReport.push(reportInfoObj);
-                                                            finalReport.push(reportjson);
+                                                            for(var i=0; i<cycleResult.rows.length;i++){
+                                                                var cyclename = cycleResult.rows[i].releases.cycles.name;
+                                                                var releasename = cycleResult.rows[i].releases.name;
+                                                                var projectname = cycleResult.rows[i].name;
+                                                                var domainname = cycleResult.rows[i].domain;
+                                                                reportInfoObj.push({
+                                                                    cyclename : cyclename,
+                                                                    releasename : releasename,
+                                                                    projectname : projectname,
+                                                                    domainname : domainname
+                                                                });
+                                                                finalReport.push(reportInfoObj);
+                                                                finalReport.push(reportjson);
+                                                            }
                                                             logger.info("Sending reports in the service getReport_Nineteen68: final function");
                                                             res.send(finalReport);
                                                         } catch (exception) {
