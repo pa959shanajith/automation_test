@@ -828,6 +828,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         dictTmp[i].push(j);
                     else if (e.type == f.type && e.type == 'testcases' && e.name == f.name && i != j && e.parent && f.parent && e.parent.name == f.parent.name)
                         dictTmp[i].push(j);
+                    else if (e.type == f.type && e.type== 'scenarios' && e.name==f.name && i!=j)
+                        dictTmp[i].push(j);
                 })
             }
         })
@@ -932,6 +934,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     //To Unassign the task of a particular node
     $scope.removeTask = function(e, tidx,twf) {
         var uinfo = JSON.parse(window.localStorage['_UI']);
+        reuseDict = getReuseDetails();
 		//Fetching the config value for strictTaskWorkflow for the first time, hence the check
 		if (twf !== false) twf= uinfo.taskwflow;  
         var pi,p=null;
@@ -944,7 +947,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             if ($("#ct-unassignButton a").attr('class') == 'disableButton') return;
             pi = parseInt(p.attr('id').split('-')[2]);
         } else pi = tidx;
-		task_unassignment(pi,twf);
+        task_unassignment(pi,twf);
+        
+        if (reuseDict[pi].length > 0) {
+            reuseDict[pi].forEach(function(e, i) {
+                task_unassignment(e,twf);
+            });
+        }
     }
 
     $('#unassignTask').click(function() {
@@ -1098,6 +1107,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     $scope.addTask = function(e) {
+        reuseDict = getReuseDetails();
         var validateStatus = assignBoxValidator();
         if (validateStatus === false) return false;
         d3.select('#ct-assignBox').classed('no-disp', !0);
@@ -1267,7 +1277,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     dNodes[pi].task.copied = false;
                 }
 
-                // replicateTask(pi);
+                replicateTask(pi);
             }
         }
 
@@ -1452,14 +1462,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var u, v, w, f, c = d3.select('#ct-assignBox');
         var p = d3.select(activeNode);
         var pi = parseInt(p.attr('id').split('-')[2]);
-
-        if ((dNodes[pi].type == 'screens' || dNodes[pi].type == 'testcases') && dNodes[pi].taskexists) {
+        var cycleid=$('.cycle-list').val();
+        if ((dNodes[pi].type == 'screens' || dNodes[pi].type == 'testcases') && (dNodes[pi].task && dNodes[pi].task.cycleid!=cycleid)) {
             addInfo({
                 type: dNodes[pi].type,
                 attributes: {
-                    'Task': dNodes[pi].taskexists.task,
-                    'Release': reldata[dNodes[pi].taskexists.release],
-                    'Cycle': cycdata[dNodes[pi].taskexists.cycleid],
+                    'Task': dNodes[pi].task.task,
+                    'Release': reldata[dNodes[pi].task.release],
+                    'Cycle': cycdata[dNodes[pi].task.cycleid],
                     'Domain': $scope.domaininfo[0].domainName,
                     'Apptype':$scope.apptype
                 }
@@ -3297,6 +3307,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         if ($scope.tab == 'tabCreate')
                             populateDynamicInputList();
                         setModuleBoxHeight();
+                        clearSvg();
                         treeBuilder(currMap);
                         unblockUI();
                         IncompleteFlowFlag = false;
@@ -3893,6 +3904,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10);
                         $scope.nodeDisplay[d.id].task = true;
                         $scope.nodeDisplay[d.id].taskOpacity = 1;
+                    }
+                    if(d.type=="screens" || d.type=="testcases")
+                    {
+                        if (d.task.cycleid != $('.cycle-list').val()) {
+                            d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10);
+                            $scope.nodeDisplay[d.id].task = true;
+                            $scope.nodeDisplay[d.id].taskOpacity = 0.5;
+                        }
                     }
                 }
                 //Enhancement : Part of Issue 1685 showing the task assigned icon little transperent to indicate that task originally do not belongs to this release and cycle but task exists in some other release and cycle

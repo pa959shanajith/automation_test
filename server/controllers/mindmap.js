@@ -1084,7 +1084,8 @@ exports.saveData = function (req, res) {
 							tasks_update.push(tsk)
 						}
 						else{
-							tasks_insert.push(tsk)
+							if(!t.copied)
+								tasks_insert.push(tsk)
 						}
 					}
 				}
@@ -1121,8 +1122,8 @@ exports.saveData = function (req, res) {
 							}
 
 						}else{
-							tasks_insert.push(tsk)
-
+							if(!t.copied)
+								tasks_insert.push(tsk)
 						}
 						// else if (!t.copied) {
 						// 	// If reused 
@@ -1169,7 +1170,8 @@ exports.saveData = function (req, res) {
 							}
 
 						}else{
-							tasks_insert.push(tsk)
+							if(!t.copied)
+								tasks_insert.push(tsk)
 						}
 						// else if (!t.copied) {
 						// 	// If reused 
