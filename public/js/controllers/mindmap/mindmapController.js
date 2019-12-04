@@ -1187,7 +1187,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
                 }
                 // If task already exists then set it to true
-                if (dNodes[pi].task) taskStatus = 'updated';
+                if (dNodes[pi].task) taskStatus = dNodes[pi].task.status;
                 else taskStatus = 'assigned';
                 if (qid == 9)
                     dNodes[pi].task = updateTaskObject(tObj, {
@@ -2292,7 +2292,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var t = s.attr('data-nodetype');
         if (t == 'modules') return;
         var sid = s.attr('id').split('-')[2];
-
+        var p = dNodes[sid].parent;
         // If this node has an existing task then cannot allow to delte the node.
         if(dNodes[sid]['taskexists']!=null)
         {
