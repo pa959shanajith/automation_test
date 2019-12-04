@@ -2292,7 +2292,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var t = s.attr('data-nodetype');
         if (t == 'modules') return;
         var sid = s.attr('id').split('-')[2];
-
+        var p = dNodes[sid].parent;
         // If this node has an existing task then cannot allow to delte the node.
         if(dNodes[sid]['taskexists']!=null)
         {
