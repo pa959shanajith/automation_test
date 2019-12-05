@@ -46,7 +46,7 @@ exports.readTestSuite_ICE = function (req, res) {
 					logger.error("Error in the function TestSuiteDetails_Module_ICE from readTestSuite_ICE: %s",TestSuiteDetailserror);
 				} else {
 					var inputs = {
-						"id": eachSuite.testsuiteid,
+						"mindmapid": eachSuite.testsuiteid,
 						"cycleid": eachSuite.cycleid,
 						"testsuitename": eachSuite.testsuitename,
 						"versionnumber": eachSuite.versionnumber,
@@ -112,7 +112,7 @@ exports.readTestSuite_ICE = function (req, res) {
 									outdataparam = eachSuiterow.getparampaths;
 								}
 								respeachscenario.dataparam = outdataparam;
-								respeachscenario.testsuitename = eachSuite.testsuitename;
+								respeachscenario.testsuitename = eachSuiterow.name;
 								var scenarioidindex = 0;
 								responsedata[eachSuite.testsuiteid] = respeachscenario;
 								async.forEachSeries(outscenarioids, function (eachoutscenarioid, outscenarioidcallback) {
@@ -181,7 +181,7 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 	async.series({
 		testsuitecheck: function (callback) {
 			var inputs = {
-				"id": requiredtestsuiteid,
+				"mindmapid": requiredtestsuiteid,
 				"cycleid": requiredcycleid,
 				"query": "testsuitecheck"
 			};
@@ -209,7 +209,7 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 				var inputs = {
 					"cycleid": requiredcycleid,
 					"name": requiredtestsuitename,
-					"id": requiredtestsuiteid,
+					"mindmapid": requiredtestsuiteid,
 					"createdby": userInfo.userid,
 					"createdthrough": "Mindmaps Creation",
 					"deleted": false,
@@ -265,7 +265,7 @@ function updatescenariodetailsinsuite(req, cb, data) {
 	var inputs = {
 		"cycleid": req.cycleid,
 		"name": req.testsuitename,
-		"id": req.testsuiteid,
+		"mindmapid": req.testsuiteid,
 		"modifiedby": req.userInfo.userid,
 		"modifiedbyrole": req.userInfo.role,
 		"testscenarioids": req.testscenarioids,
@@ -387,7 +387,7 @@ exports.updateTestSuite_ICE = function (req, res) {
                     "modifiedby": req.session.userid,
                     "modifiedbyrole": req.session.activeRoleId,
                     "cycleid": testscycleid,
-                    "id": id,
+                    "mindmapid": id,
                     "name": requestedtestsuitename,
                     "versionnumber": versionnumber
                 };
