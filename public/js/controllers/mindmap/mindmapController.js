@@ -5315,6 +5315,7 @@ Purpose : displaying pop up for replication of project
     $scope.createMap = function(option) {
         $('#expAssign').attr('src','imgs/ic-collapse.png');
         $scope.tab = option;
+        excelFlag=0;
         unloadMindmapData();
         dNodes = [];
         dLinks = [];
