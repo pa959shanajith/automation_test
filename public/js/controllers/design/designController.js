@@ -4637,9 +4637,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	$(document).on("click", ".filterObjects", function () {
 		cfpLoadingBar.start();
 		blockUI('Filtering in progress. Please Wait...');
-		if ($(".checkStylebox").is(":checked")){
-			$(".checkStylebox").trigger('click');
-		}
 		//$(".checkStylebox").prop("checked", false);
 		$("html").css({
 			'cursor': 'wait'
@@ -4653,8 +4650,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			filter()
 			if (($("#scraplist li").find('input[name="selectAllListItems"]:checked').length == $("#scraplist li").find('input[name="selectAllListItems"]:visible').length) && $("#scraplist li").find('input[name="selectAllListItems"]:visible').length != 0) {
 				$(".checkStylebox").prop("checked", true);
-			} else $(".checkStylebox").prop("checked", false);
-			$(".checkStylebox,.checkall").prop("checked", false);
+				$("#scraplist li").find('input[name="selectAllListItems"]:visible').prop("checked", true).addClass('checked');
+				$("#deleteObjects").prop("disabled", false)
+			} else {
+				$(".checkStylebox").prop("checked", false);
+				$("#scraplist li").find('input[name="selectAllListItems"]:visible').prop("checked", false).removeClass('checked');
+				$("#deleteObjects").prop("disabled", true)
+			}
+			//$(".checkStylebox,.checkall").prop("checked", false);
 			if ($("#scraplist li").children('a').find('input[type=checkbox].checkall:checked:visible').length == 0) {
 				$(".checkStylebox").prop("checked", false);
 			}

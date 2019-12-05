@@ -347,7 +347,7 @@ function loadUserTasks(){
 				'reuse':tasksJson[i].taskDetails[j].reuse
 			}
 			dataobj = JSON.stringify(dataobj)
-			$('.task-content-inner').append("<div class='panel panel-default' panel-id='"+i+"'><div id='panelBlock_"+i+"' class='panel-heading'><div class='taskDirection' href='#collapse" + counter + "'><h4 class='taskNo-Inner-Pgs "+classIndex+" taskRedir'>" + counter + "</h4><span class='assignedTask-Inner-Pgs assignedTaskInner' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirectionInner(this.dataset.testsuitedetails,this.dataset.dataobj)'>" + taskname + "</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype-Inner-Pgs'>" + tasktype + "</button></div><!--Addition--></div></div></div>").fadeIn();
+			$('.task-content-inner').append("<div class='panel panel-default' panel-id='"+i+"'><div id='panelBlock_"+i+"' class='panel-heading'><div class='taskDirection' href='#collapse" + counter + "'><h4 class='taskNo-Inner-Pgs "+classIndex+" taskRedir'>" + counter + "</h4><span class='assignedTask-Inner-Pgs assignedTaskInner' data-testsuitedetails='"+testSuiteDetails+"' data-dataobj='"+dataobj+"' onclick='taskRedirectionInner(this.dataset.testsuitedetails,this.dataset.dataobj)'>" + taskname + "</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype-Inner-Pgs'>" + tasktype + "</button></div><!--Addition--></div></div></div>").fadeIn();
 			var limit = 45;
 			var chars = $("#panelBlock_"+i+"").children().find('span.assignedTaskInner').text();
 			if (chars.length > limit) {
