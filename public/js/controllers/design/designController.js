@@ -4637,7 +4637,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	$(document).on("click", ".filterObjects", function () {
 		cfpLoadingBar.start();
 		blockUI('Filtering in progress. Please Wait...');
-		$(".checkStylebox").prop("checked", false);
+		if ($(".checkStylebox").is(":checked")){
+			$(".checkStylebox").trigger('click');
+		}
+		//$(".checkStylebox").prop("checked", false);
 		$("html").css({
 			'cursor': 'wait'
 		});
