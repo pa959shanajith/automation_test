@@ -320,8 +320,8 @@ function next_function(resultobj,projectid)
 						} else {
 							parent_index = batch_dict[t.batchName+'_'+t.cycleid];
 							batch_task = user_task_json[parent_index];
-							batch_task.taskDetails[0].batchTaskIDs.push(t.taskID);
-							testSuiteDetails_obj.subTaskId = t.taskID;
+							batch_task.taskDetails[0].batchTaskIDs.push(t._id);
+							testSuiteDetails_obj.subTaskId = t._id;
 							batch_task.testSuiteDetails.push(testSuiteDetails_obj);
 							batch_flag = true;
 							batch_indx = Object.values(batch_dict);
@@ -339,9 +339,9 @@ function next_function(resultobj,projectid)
 					}
 					//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
 					if (!batch_flag) {
-						testSuiteDetails_obj.subTaskId = t.taskID;
+						testSuiteDetails_obj.subTaskId = t._id;
 						task_json.testSuiteDetails.push(testSuiteDetails_obj);
-						taskDetails.batchTaskIDs.push(t.taskID);
+						taskDetails.batchTaskIDs.push(t._id);
 						task_json.taskDetails.push(taskDetails);
 						user_task_json.push(task_json);
 					}

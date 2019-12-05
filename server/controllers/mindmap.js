@@ -712,7 +712,7 @@ exports.reviewTask = function (req, res) {
 	logger.info("Inside UI service: reviewTask");
 	if (utils.isSessionActive(req)) {
 		var inputs = req.body;
-		var taskID = inputs.taskId;
+		taskID = inputs.taskId;
 		var batchIds = inputs.batchIds;
 		var userId = req.session.userid;
 		var username = req.session.username;
@@ -723,23 +723,52 @@ exports.reviewTask = function (req, res) {
 			var batch_tasks=batchIds.split(',');
 			taskID=JSON.stringify(batch_tasks);
 		}else{
-			taskID=JSON.stringify(batchIds);
+			taskID=batchIds[0];
 		}
-		var ExecutionData=inputs.module_info;
-		res.status(200).send('success');
+		// var ExecutionData=inputs.module_info;
+		// res.status(200).send('success');
 		/** 
 		 * New logic needs to be implemented for Review task and Strict WOrkflow
 		 * */ 
 		// check_status(ExecutionData, function (err, check_status_result) {
 		// 	if (check_status_result){
-		// 		var cur_date = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + ',' +date.toLocaleTimeString();
-		// 		var taskHistory = { "userid": userId, "status": "", "modifiedBy": username, "modifiedOn": cur_date };
-		// 		if (status == 'inprogress' || status == 'assigned' || status == 'reassigned' || status == 'reassign') {
-		// 			query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.assignedTo='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
-		// 		} else if (status == 'review') {
-		// 			query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.reviewer='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
-		// 		}
+		var cur_date = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + ',' +date.toLocaleTimeString();
+		var taskHistory = { "userid": userId, "status": "", "modifiedBy": username, "modifiedOn": cur_date };
+		if (status == 'inprogress' || status == 'assigned' || status == 'reassigned' || status == 'reassign') {
+			var inputs= {
+				"id" : taskID,
+				"action" : "updatetaskstatus",
+				"status" : status,
+				"history" : taskHistory,
+				"assignedto" : userId
+			}
+			// query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.assignedTo='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
+		} else if (status == 'underReview') {
+			var inputs= {
+				"id" : taskID,
+				"action" : "updatetaskstatus",
+				"status" : status,
+				"history" : taskHistory,
+				"reviewer" : userId
+			}
+			// query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.reviewer='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
+		}
+		var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
+		client.post(epurl+"mindmap/manageTask", args,
+		function (result, response) {
+			if (response.statusCode != 200 || result.rows == "fail") {
+				logger.error("Error occurred in mindmap/manageTask: updateTaskstatus_mindmaps, Error Code : ERRNDAC");
+				res.send("fail");
+			} else {
+				res.send('inprogress');
+			}
 
+		})
 		// 		var qlist_query = [query];
 		// 		var new_queries = [];
 		// 		var task_flag = false;

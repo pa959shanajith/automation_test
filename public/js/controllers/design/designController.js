@@ -98,7 +98,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	subTaskType = current_task.subTaskType;
 	subTask = current_task.subtask;
 	status = current_task.status;
-	if (status == 'review') {
+	if (status == 'underReview') {
 		$('.submitTaskBtn').text('Approve');
 		$('.reassignTaskBtn').show();
 	}
@@ -5066,7 +5066,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			} else if (taskstatus == 'reassign') {
 				openDialog("Task Reassignment Success", "Task Reassigned successfully!", true)
 				// labelArr.push(txnHistory.codesDict['TaskReassign']);
-			} else if (taskstatus == 'review') {
+			} else if (taskstatus == 'underReview') {
 				openDialog("Task Completion Success", "Task Approved successfully!", true)
 				// labelArr.push(txnHistory.codesDict['TaskApprove']);
 			} else {
