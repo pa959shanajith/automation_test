@@ -279,7 +279,7 @@ function next_function(resultobj,projectid)
 					}
 					else if(t.nodetype=="screens")
 					{
-						task_json.projectId=t.parent|| null;
+						//task_json.projectId=t.parent|| null;
 						task_json.screenId=t.nodeid;
 						task_json.screenName = t.name;
 					}
