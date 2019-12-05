@@ -811,7 +811,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				$("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');													 
 			}
 			else{
-				$("li.compareObjects").removeClass('disableActions').addClass('enableActions compareObjectDisable');																	 
+				$("li.compareObjects").removeClass('disableActions compareObjectDisable').addClass('enableActions');																	 
 			}
 		}
 	})
