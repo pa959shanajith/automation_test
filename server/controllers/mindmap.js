@@ -982,6 +982,9 @@ exports.saveData = function (req, res) {
 			var tasks_insert=[];
 			var tasks_update=[];
 			var tasks_remove=removeTask;
+			var scenarioids=new Set();
+			var screenids= new Set();
+			var testcaseids = new Set();
 			data.forEach(function (e, i) {
 				idDict[e._id] = (e._id) || null;
 				e._id = idDict[e._id];
@@ -1056,7 +1059,7 @@ exports.saveData = function (req, res) {
 					tasks.push(tsk)
 				}
 				else if (e.type == 'scenarios') {
-					//Part of Issue 1685, take projectid from the scenarios in case of end to end modules
+					
 					if (t != null && e._id != null) {
 						if (t._id!=null && (removeTask.includes(t._id))) return;
 						tsk.tasktype=t.task
@@ -1084,10 +1087,13 @@ exports.saveData = function (req, res) {
 							tasks_update.push(tsk)
 						}
 						else{
-							if(!t.copied)
+							if(!scenarioids.has(tsk.nodeid))
 								tasks_insert.push(tsk)
 						}
+
+						scenarioids.add(tsk.nodeid);
 					}
+					
 				}
 				else if (e.type == 'screens') {
 					uidx++; lts = idDict[e.pid];
@@ -1122,7 +1128,7 @@ exports.saveData = function (req, res) {
 							}
 
 						}else{
-							if(!t.copied)
+							if(!screenids.has(tsk.nodeid))
 								tasks_insert.push(tsk)
 						}
 						// else if (!t.copied) {
@@ -1132,6 +1138,7 @@ exports.saveData = function (req, res) {
 						// 	// qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',release:'" + t.release + "',cycle:'" + t.cycle + "',re_estimation:'" + t.re_estimation + "',details:'" + t.details + "',parent:'[" + t.parent + "]',uid:'" + uidx + "',cx:'" + t.cx + "'})" });
 						// }
 						// qList.push({ "statement": "MATCH (a:SCREENS{screenID_c:'" + e.id_c + "'}),(b:TASKS{taskID:'" + t.id + "'}) MERGE (a)-[r:FNTT {id:a.screenID}]-(b)" });
+						screenids.add(tsk.nodeid)
 					}
 				}
 				else if (e.type == 'testcases') {
@@ -1170,9 +1177,10 @@ exports.saveData = function (req, res) {
 							}
 
 						}else{
-							if(!t.copied)
+							if(!testcaseids.has(tsk.nodeid))
 								tasks_insert.push(tsk)
 						}
+						testcaseids.add(tsk.nodeid);
 						// else if (!t.copied) {
 						// 	// If reused 
 						// 	// t.parent = [prjId].concat(t.parent);
