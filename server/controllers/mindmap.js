@@ -712,7 +712,7 @@ exports.reviewTask = function (req, res) {
 	logger.info("Inside UI service: reviewTask");
 	if (utils.isSessionActive(req)) {
 		var inputs = req.body;
-		var taskID = inputs.taskId;
+		taskID = inputs.taskId;
 		var batchIds = inputs.batchIds;
 		var userId = req.session.userid;
 		var username = req.session.username;
@@ -723,23 +723,52 @@ exports.reviewTask = function (req, res) {
 			var batch_tasks=batchIds.split(',');
 			taskID=JSON.stringify(batch_tasks);
 		}else{
-			taskID=JSON.stringify(batchIds);
+			taskID=batchIds[0];
 		}
-		var ExecutionData=inputs.module_info;
-		res.status(200).send('success');
+		// var ExecutionData=inputs.module_info;
+		// res.status(200).send('success');
 		/** 
 		 * New logic needs to be implemented for Review task and Strict WOrkflow
 		 * */ 
 		// check_status(ExecutionData, function (err, check_status_result) {
 		// 	if (check_status_result){
-		// 		var cur_date = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + ',' +date.toLocaleTimeString();
-		// 		var taskHistory = { "userid": userId, "status": "", "modifiedBy": username, "modifiedOn": cur_date };
-		// 		if (status == 'inprogress' || status == 'assigned' || status == 'reassigned' || status == 'reassign') {
-		// 			query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.assignedTo='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
-		// 		} else if (status == 'review') {
-		// 			query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.reviewer='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
-		// 		}
+		var cur_date = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + ',' +date.toLocaleTimeString();
+		var taskHistory = { "userid": userId, "status": "", "modifiedBy": username, "modifiedOn": cur_date };
+		if (status == 'inprogress' || status == 'assigned' || status == 'reassigned' || status == 'reassign') {
+			var inputs= {
+				"id" : taskID,
+				"action" : "updatetaskstatus",
+				"status" : status,
+				"history" : taskHistory,
+				"assignedto" : userId
+			}
+			// query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.assignedTo='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
+		} else if (status == 'underReview') {
+			var inputs= {
+				"id" : taskID,
+				"action" : "updatetaskstatus",
+				"status" : status,
+				"history" : taskHistory,
+				"reviewer" : userId
+			}
+			// query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.reviewer='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
+		}
+		var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
+		client.post(epurl+"mindmap/manageTask", args,
+		function (result, response) {
+			if (response.statusCode != 200 || result.rows == "fail") {
+				logger.error("Error occurred in mindmap/manageTask: updateTaskstatus_mindmaps, Error Code : ERRNDAC");
+				res.send("fail");
+			} else {
+				res.send('inprogress');
+			}
 
+		})
 		// 		var qlist_query = [query];
 		// 		var new_queries = [];
 		// 		var task_flag = false;
@@ -982,6 +1011,9 @@ exports.saveData = function (req, res) {
 			var tasks_insert=[];
 			var tasks_update=[];
 			var tasks_remove=removeTask;
+			var scenarioids=new Set();
+			var screenids= new Set();
+			var testcaseids = new Set();
 			data.forEach(function (e, i) {
 				idDict[e._id] = (e._id) || null;
 				e._id = idDict[e._id];
@@ -1056,7 +1088,7 @@ exports.saveData = function (req, res) {
 					tasks.push(tsk)
 				}
 				else if (e.type == 'scenarios') {
-					//Part of Issue 1685, take projectid from the scenarios in case of end to end modules
+					
 					if (t != null && e._id != null) {
 						if (t._id!=null && (removeTask.includes(t._id))) return;
 						tsk.tasktype=t.task
@@ -1084,10 +1116,13 @@ exports.saveData = function (req, res) {
 							tasks_update.push(tsk)
 						}
 						else{
-							if(!t.copied)
+							if(!scenarioids.has(tsk.nodeid))
 								tasks_insert.push(tsk)
 						}
+
+						scenarioids.add(tsk.nodeid);
 					}
+					
 				}
 				else if (e.type == 'screens') {
 					uidx++; lts = idDict[e.pid];
@@ -1122,7 +1157,7 @@ exports.saveData = function (req, res) {
 							}
 
 						}else{
-							if(!t.copied)
+							if(!screenids.has(tsk.nodeid))
 								tasks_insert.push(tsk)
 						}
 						// else if (!t.copied) {
@@ -1132,6 +1167,7 @@ exports.saveData = function (req, res) {
 						// 	// qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',release:'" + t.release + "',cycle:'" + t.cycle + "',re_estimation:'" + t.re_estimation + "',details:'" + t.details + "',parent:'[" + t.parent + "]',uid:'" + uidx + "',cx:'" + t.cx + "'})" });
 						// }
 						// qList.push({ "statement": "MATCH (a:SCREENS{screenID_c:'" + e.id_c + "'}),(b:TASKS{taskID:'" + t.id + "'}) MERGE (a)-[r:FNTT {id:a.screenID}]-(b)" });
+						screenids.add(tsk.nodeid)
 					}
 				}
 				else if (e.type == 'testcases') {
@@ -1170,9 +1206,10 @@ exports.saveData = function (req, res) {
 							}
 
 						}else{
-							if(!t.copied)
+							if(!testcaseids.has(tsk.nodeid))
 								tasks_insert.push(tsk)
 						}
+						testcaseids.add(tsk.nodeid);
 						// else if (!t.copied) {
 						// 	// If reused 
 						// 	// t.parent = [prjId].concat(t.parent);

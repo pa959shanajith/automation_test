@@ -152,7 +152,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 	// process discovery related
     var parseAction = {
         "inprogress":"Assigned",
-        "review":"Submitted for Approval",
+        "underReview":"Submitted for Approval",
         "approve":"Approved by reviewer",
         "export":"Exported"
     }
@@ -881,7 +881,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             'img_src': img_src,
             '_id': n._id || null,
             'state':n.state || "created",
-            'reuse':n.reuse || false
+            'reuse':n.reuse || false,
+            'status':( n.task == null || n.task == undefined) ? null : n.task.status
         };
         var v = '#ct-node-' + n.id;
         return v;
@@ -906,7 +907,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             'img_src': img_src,
             '_id':n._id,
             'state':n.state || "created",
-            'reuse':n.reuse || false
+            'reuse':n.reuse || false,
+            'status': ( n.task == null || n.task == undefined) ? null : n.task.status
         };
         var v = '#ct-node-' + n.id;
         return v;
@@ -5315,6 +5317,7 @@ Purpose : displaying pop up for replication of project
     $scope.createMap = function(option) {
         $('#expAssign').attr('src','imgs/ic-collapse.png');
         $scope.tab = option;
+        excelFlag=0;
         unloadMindmapData();
         dNodes = [];
         dLinks = [];
