@@ -50,6 +50,7 @@ exports.readTestCase_ICE = function (req, res) {
 			var requestedtestscasename = req.body.testcasename;
 			var requestedtestscaseid = req.body.testcaseid;
 			var requestedversionnumber = req.body.versionnumber;
+			var screenName = req.body.screenName;
 			// base request elements sent in request
 			inputs = {
 				"screenid": requestedscreenid,
@@ -61,6 +62,9 @@ exports.readTestCase_ICE = function (req, res) {
 			if (!requestedscreenid){ // if there is no screenid fetch just by testcase id in add dependent test cases
 				inputs.query = "testcaseid";
 				inputs.readonly = true;
+			}
+			if (screenName == ""){
+				inputs.screenName = 'fetch';
 			}
 			var args = {
 				data: inputs,
@@ -95,6 +99,9 @@ exports.readTestCase_ICE = function (req, res) {
 								testcase: testcasesteps,
 								testcasename: testcasename
 							};
+							if ('screenName' in result){
+								responsedata.screenName = result.screenName;
+							}
 							res.send(responsedata);
 						}else{
 							try {
@@ -107,6 +114,9 @@ exports.readTestCase_ICE = function (req, res) {
 									testcase: testcasesteps,
 									testcasename: testcasename
 								};
+								if ('screenName' in result){
+									responsedata.screenName = result.screenName;
+								}
 								try {
 									res.send(responsedata);
 								} catch (exception) {
