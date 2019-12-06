@@ -998,7 +998,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		if (viewString == "") {
 			$(this).children("img").addClass("thumb-ic-disabled").removeClass("thumb-ic");
 			$(this).parent().css("cursor", "no-drop");
-		} else if (Object.keys(viewString).length == 0) {
+		} else if (viewString.view.length == 0) {
 			$(this).children("img").addClass("thumb-ic-disabled").removeClass("thumb-ic");
 			$(this).parent().css("cursor", "no-drop");
 		} else {
