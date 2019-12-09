@@ -479,7 +479,7 @@ if (cluster.isMaster) {
 		app.post('/populateProjects', mindmap.populateProjects);
 		app.post('/populateUsers', mindmap.populateUsers);
 		app.post('/checkReuse', mindmap.checkReuse);
-		app.post('/getCRId', mindmap.getCRId);
+		// app.post('/getCRId', mindmap.getCRId);
 		app.post('/getProjectTypeMM_Nineteen68', mindmap.getProjectTypeMM_Nineteen68);
 		app.post('/populateScenarios', mindmap.populateScenarios);
 		app.post('/populateReleases', mindmap.populateReleases);

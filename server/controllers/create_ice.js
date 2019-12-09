@@ -1905,9 +1905,10 @@ exports.getProjectType_Nineteen68 = function (req, res) {
 					// projectDetails.projectType = result.rows[0].projecttypeid;
 					// projectDetails.project_id = req;
 					// projectDetails.project_typename = result.projecttype[0].projecttypename;
-					projectDetails.projectType=result.rows[0]["type"]["_id"];
+					projectDetails.projectType=result.rows[0]["type"];
 					projectDetails.projectid=result.rows[0]["_id"];
 					projectDetails.project_typename=result.projecttype[0].name;
+					projectDetails.releases=result.rows[0].releases;
 				}
 				res(null, projectDetails);
 			}
