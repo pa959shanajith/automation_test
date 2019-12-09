@@ -502,7 +502,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			$.each($(this).parents('.suiteNameTxt').next('div').find('.exe-scenarioIds'), function () {
 				var scenarioDescObj = [];
 				testScenarioIds.push($(this).attr("sId"));
-				getParamPaths.push("\'" + $(this).parent().find(".getParamPath").val().trim() + "\'");
+				getParamPaths.push($(this).parent().find(".getParamPath").val().trim());
 				conditionCheck.push($(this).parent().find(".conditionCheck option:selected").val());
 				if (($(this).parent().find('.getScenarioDescVal').text() !== '')) {
 					scenarioDescObj = JSON.parse($.trim($(this).parent().find('.getScenarioDescVal').text()));
