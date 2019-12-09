@@ -935,7 +935,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $scope.removeTask = function(e, tidx,twf) {
         var uinfo = JSON.parse(window.localStorage['_UI']);
         reuseDict = getReuseDetails();
-		//Fetching the config value for strictTaskWorkflow for the first time, hence the check
+        //Fetching the config value for strictTaskWorkflow for the first time, hence the check
+        var cycleid=$('.cycle-list').val();
 		if (twf !== false) twf= uinfo.taskwflow;  
         var pi,p=null;
 		if (tidx==undefined){
@@ -954,6 +955,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 task_unassignment(e,twf);
             });
         }
+        // if(dNodes[pi].type=="screens" || dNodes[pi].type=="testcases")
+        // {
+        //     if(dNodes[pi].task!=null && dNodes[pi].task.cycleid!=cycleid)
+        //     {
+        //         return;
+        //     } 
+        // }
     }
 
     $('#unassignTask').click(function() {
@@ -971,7 +979,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         p.select('.ct-nodeTask').classed('no-disp', !0);
         if (dNodes[pi].task != null) {
             dNodes[pi].task.status = 'unassigned'; //status and assignedtoname are solely for notification
-            unassignTask.push(dNodes[pi]._id);
+            if (dNodes[pi].task._id!=null)
+            {
+                unassignTask.push(dNodes[pi].task._id);
+            }
         }
         d3.select('#ct-assignBox').classed('no-disp', !0);
         if (dNodes[pi].children && $('.pg-checkbox')[0].checked) {
@@ -1107,8 +1118,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     $scope.addTask = function(e) {
+        var cycleid=$('.cycle-list').val();
         reuseDict = getReuseDetails();
         var validateStatus = assignBoxValidator();
+        // $('#ct-unassignButton').addClass("disableButton");
         if (validateStatus === false) return false;
         d3.select('#ct-assignBox').classed('no-disp', !0);
         var a, b, p = d3.select(activeNode);
@@ -1177,10 +1190,18 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
 
         function addTask_11(pi, tObj, qid, cTask) {
+            var cycleid=$('.cycle-list').val();
             var validate = checkAndUpdate(dNodes[pi], []);
             var taskUndef = (dNodes[pi].task === undefined || dNodes[pi].task == null);
             var origTask = ([0, 4, 7, 9].indexOf(qid) != -1); // Orignal tasks not cascaded  
             var taskStatus;
+            // if(dNodes[pi].type=="screens" || dNodes[pi].type=="testcases")
+            // {
+            //    if(dNodes[pi].task!=null && dNodes[pi].task.cycleid!=cycleid)
+            //    {
+            //        return;
+            //    } 
+            // }
             if (validate[0]) {
                 taskflag = true;
                 if (taskUndef) {
@@ -3241,9 +3262,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (result == "Invalid Session") {
                     return $rootScope.redirectPage();
                 }
-                else if(result.rows=='fail')
+                else if(result.rows=='fail'|| result=='fail')
                 {
                     unblockUI();
+                    if (!result.error) result.error="Error while Saving"
                     openDialogMindmap("Error", result.error);
                     flag=-1;
                     // openDialogMindmap("Error", "Failed to save structure");

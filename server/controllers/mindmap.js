@@ -1195,7 +1195,7 @@ exports.saveData = function (req, res) {
 				"update": tasks_update,
 				"insert": tasks_insert,
 				"delete": tasks_remove,
-				"action": "modify",
+				"action": "modify"
 			}
 			var args={
 				data: inputs,
