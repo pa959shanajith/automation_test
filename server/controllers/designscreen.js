@@ -210,12 +210,9 @@ exports.updateScreen_ICE = function (req, res) {
 			var screenName = updateData.screenName;
 			var userInfo = updateData.userinfo;
 			var modifiedByID = userInfo.user_id;
-			var modifiedBy = userInfo.username.toLowerCase();//user_obj_id
 			var modifiedByrole = userInfo.role;//user_role
 			var param = updateData.param;
 			var appType = updateData.appType;
-			var requestedskucodeScreens = "skucode";
-			var requestedtags = "tags";
 			var requestedversionnumber = updateData.versionnumber;
 			//xpaths required to be mapped(used only when param is mapScrapeData_ICE)
 			var requiredXpathList = [];
@@ -320,8 +317,7 @@ exports.updateScreen_ICE = function (req, res) {
 								inputs = {
 									"query": "updatescreen",
 									"scrapedata": scrapedObjects,
-									"modifiedbyID": modifiedByID,
-									"modifiedby": modifiedBy,
+									"modifiedby": modifiedByID,
 									"modifiedByrole":modifiedByrole,
 									"screenid": screenID,
 									"projectid": projectID,
@@ -331,7 +327,7 @@ exports.updateScreen_ICE = function (req, res) {
 								}
 							}
 							else{
-								inputs = buildObject(scrapedObjects, modifiedBy, requestedskucodeScreens, screenID, projectID, screenName, requestedversionnumber);
+								inputs = buildObject(scrapedObjects, modifiedByID, modifiedByrole, screenID, projectID, screenName, requestedversionnumber);
 							}
 							logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE");
 							finalFunction(scrapedObjects);
@@ -341,9 +337,8 @@ exports.updateScreen_ICE = function (req, res) {
 					} else {
 						inputs = {
 							"scrapedata": scrapedObjects,
-							"modifiedby": modifiedBy,
+							"modifiedby": modifiedByID,
 							"screenid": screenID,
-							"modifiedbyID": modifiedByID,
 							"modifiedByrole":modifiedByrole, 
 							"projectid": projectID,
 							"screenname": screenName,
@@ -366,8 +361,8 @@ exports.updateScreen_ICE = function (req, res) {
 				try{
 					inputs = {
 						"scrapedata": [deleteObj,updateObj],
-						"modifiedby": modifiedBy,
-						"skucodescreen": requestedskucodeScreens,
+						"modifiedby": modifiedByID,
+						"modifiedByrole":modifiedByrole,
 						"screenid": screenID,
 						"projectid": projectID,
 						"screenname": screenName,
@@ -393,8 +388,8 @@ exports.updateScreen_ICE = function (req, res) {
 				scrapedObjects = scrapedObjects.replace(/'+/g, "''");
 				inputs = {
 					"scrapedata": scrapedObjects,
-					"modifiedby": modifiedBy,
-					"skucodescreen": requestedskucodeScreens,
+					"modifiedby": modifiedByID,
+					"modifiedByrole":modifiedByrole,
 					"screenid": screenID,
 					"projectid": projectID,
 					"screenname": screenName,
@@ -408,8 +403,8 @@ exports.updateScreen_ICE = function (req, res) {
 					var parsedScrapedObj = JSON.parse(scrapedObjects);
 					inputs = {
 						"scrapedata": scrapedObjects,
-						"modifiedby": modifiedBy,
-						"skucodescreen": requestedskucodeScreens,
+						"modifiedby": modifiedByID,
+						"modifiedByrole":modifiedByrole,
 						"screenid": screenID,
 						"projectid": projectID,
 						"screenname": screenName,
@@ -428,8 +423,8 @@ exports.updateScreen_ICE = function (req, res) {
 				//var parsedScrapedObj = JSON.parse(scrapedObjects);
 				inputs = {
 					"scrapedata": scrapedObjects,
-					"modifiedby": modifiedBy,
-					"skucodescreen": requestedskucodeScreens,
+					"modifiedby": modifiedByID,
+					"modifiedByrole":modifiedByrole,
 					"screenid": screenID,
 					"projectid": projectID,
 					"screenname": screenName,
@@ -722,7 +717,7 @@ exports.updateIrisDataset = function updateIrisDataset(req, res) {
 	}
 }
 
-function buildObject(scrapedObjects, modifiedBy, requestedskucodeScreens, screenID, projectID, screenName, requestedversionnumber) {
+function buildObject(scrapedObjects, modifiedBy, modifiedByrole, screenID, projectID, screenName, requestedversionnumber) {
 	logger.info("Inside the function buildObject");
 	try {
 		scrapedObjects = JSON.stringify(scrapedObjects);
@@ -730,7 +725,6 @@ function buildObject(scrapedObjects, modifiedBy, requestedskucodeScreens, screen
 		inputsWS = {
 			"scrapedata": scrapedObjects,
 			"modifiedby": modifiedBy,
-			"modifiedbyID": modifiedByID,
 			"modifiedByrole":modifiedByrole,
 			"screenid": screenID,
 			"projectid": projectID,

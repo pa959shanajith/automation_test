@@ -152,7 +152,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 	// process discovery related
     var parseAction = {
         "inprogress":"Assigned",
-        "underReview":"Submitted for Approval",
+        "review":"Submitted for Approval",
         "approve":"Approved by reviewer",
         "export":"Exported"
     }
@@ -881,8 +881,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             'img_src': img_src,
             '_id': n._id || null,
             'state':n.state || "created",
-            'reuse':n.reuse || false,
-            'status':( n.task == null || n.task == undefined) ? null : n.task.status
+            'reuse':n.reuse || false
         };
         var v = '#ct-node-' + n.id;
         return v;
@@ -907,8 +906,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             'img_src': img_src,
             '_id':n._id,
             'state':n.state || "created",
-            'reuse':n.reuse || false,
-            'status': ( n.task == null || n.task == undefined) ? null : n.task.status
+            'reuse':n.reuse || false
         };
         var v = '#ct-node-' + n.id;
         return v;
@@ -937,7 +935,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $scope.removeTask = function(e, tidx,twf) {
         var uinfo = JSON.parse(window.localStorage['_UI']);
         reuseDict = getReuseDetails();
-		//Fetching the config value for strictTaskWorkflow for the first time, hence the check
+        //Fetching the config value for strictTaskWorkflow for the first time, hence the check
+        var cycleid=$('.cycle-list').val();
 		if (twf !== false) twf= uinfo.taskwflow;  
         var pi,p=null;
 		if (tidx==undefined){
@@ -956,6 +955,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 task_unassignment(e,twf);
             });
         }
+        // if(dNodes[pi].type=="screens" || dNodes[pi].type=="testcases")
+        // {
+        //     if(dNodes[pi].task!=null && dNodes[pi].task.cycleid!=cycleid)
+        //     {
+        //         return;
+        //     } 
+        // }
     }
 
     $('#unassignTask').click(function() {
@@ -973,7 +979,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         p.select('.ct-nodeTask').classed('no-disp', !0);
         if (dNodes[pi].task != null) {
             dNodes[pi].task.status = 'unassigned'; //status and assignedtoname are solely for notification
-            unassignTask.push(dNodes[pi]._id);
+            if (dNodes[pi].task._id!=null)
+            {
+                unassignTask.push(dNodes[pi].task._id);
+            }
         }
         d3.select('#ct-assignBox').classed('no-disp', !0);
         if (dNodes[pi].children && $('.pg-checkbox')[0].checked) {
@@ -1109,8 +1118,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     $scope.addTask = function(e) {
+        var cycleid=$('.cycle-list').val();
         reuseDict = getReuseDetails();
         var validateStatus = assignBoxValidator();
+        // $('#ct-unassignButton').addClass("disableButton");
         if (validateStatus === false) return false;
         d3.select('#ct-assignBox').classed('no-disp', !0);
         var a, b, p = d3.select(activeNode);
@@ -1179,10 +1190,18 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
 
         function addTask_11(pi, tObj, qid, cTask) {
+            var cycleid=$('.cycle-list').val();
             var validate = checkAndUpdate(dNodes[pi], []);
             var taskUndef = (dNodes[pi].task === undefined || dNodes[pi].task == null || (dNodes[pi].task != null && dNodes[pi].task.status== "complete"));
             var origTask = ([0, 4, 7, 9].indexOf(qid) != -1); // Orignal tasks not cascaded  
             var taskStatus;
+            // if(dNodes[pi].type=="screens" || dNodes[pi].type=="testcases")
+            // {
+            //    if(dNodes[pi].task!=null && dNodes[pi].task.cycleid!=cycleid)
+            //    {
+            //        return;
+            //    } 
+            // }
             if (validate[0]) {
                 taskflag = true;
                 if (taskUndef) {
@@ -2285,6 +2304,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     $scope.deleteNode = function($event) {
         //If module is in edit mode, then return do not add any node
+
         if (d3.select('#ct-inpBox').attr('class') == "") return;
         if ($event !== true && d3.select($event.target).classed('ct-ctrl-inactive')) return;
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
@@ -3243,9 +3263,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (result == "Invalid Session") {
                     return $rootScope.redirectPage();
                 }
-                else if(result.rows=='fail')
+                else if(result.rows=='fail'|| result=='fail')
                 {
                     unblockUI();
+                    if (!result.error) result.error="Error while Saving"
                     openDialogMindmap("Error", result.error);
                     flag=-1;
                     // openDialogMindmap("Error", "Failed to save structure");
@@ -4016,20 +4037,26 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         blockUI('Loading UI');
         var userInfo = JSON.parse(window.localStorage['_UI']);
         var user_id = userInfo.user_id;
-        var modName = $('#createNewConfirmationPopup').attr('mapid');
-        var moduleid =$('#createNewConfirmationPopup').attr('_id');
+        var moduleid = $('#createNewConfirmationPopup').attr('mapid');
+        var modName =$('#createNewConfirmationPopup').attr('_id') || null;
         mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, parseFloat(version_num), $('.cycle-list').val(), modName,moduleid).then(
             function(result) {
                 if (result == "Invalid Session") {
                     return $rootScope.redirectPage();
                 }
+                else if(result=='fail')
+                {
+                    unblockUI();
+                    openDialogMindmap('Error', "Error in export");
+                    return;
+                }
                 result_details = result;
                 flag = 0;
-                for (var i = 0; i < result_details.length; i++) {
-                    if(result_details[i].name== loadedModule){
+                // for (var i = 0; i < result_details.length; i++) {
+                    if(result_details.name== loadedModule){
                     var module_info = {
                         "appType": "",
-                        "projectId": $scope.projectNameO,
+                        "projectId": result_details.projectID,
                         "cycleId": "",
                         "moduleId": "",
                         "moduleName": "",
@@ -4037,30 +4064,32 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         "versionNumber": "",
                         "suiteDetails": []
                     };
-                    if (result_details[i].id_c != 'null' && result_details[i].id_c != '') {
-                        module_info.moduleId = result_details[i].id_c;
-                        module_info.moduleName = result_details[i].name;
+                    if (result_details._id != null) {
+                        module_info.moduleId = result_details._id;
+                        module_info.moduleName = result_details.name;
+                        if(result_details.versionnumber==0) module_info.versionNumber="0.0"
+                        else module_info.versionNumber = String(result_details.versionnumber);
                         flag = 1;
-                        for (var j = 0; j < result_details[i].children.length; j++) {
+                        for (var j = 0; j < result_details.children.length; j++) {
                             var s_data = {
                                 'scenarios_id': '',
                                 'scenarios_name': ''
                             };
-                            if (result_details[i].children[j].id_c != 'null' && result_details[i].children[j].id_c != '') {
-                                s_data.scenarios_id = result_details[i].children[j].id_c;
-                                s_data.scenarios_name = result_details[i].children[j].name;
+                            if (result_details.children[j]._id != null) {
+                                s_data.scenarios_id = result_details.children[j]._id;
+                                s_data.scenarios_name = result_details.children[j].name;
                                 module_info.suiteDetails.push(s_data);
                             } else {
-                                console.log('Not exported_S : ', result_details[i].children[j].id_n);
+                                console.log('Not exported_S : ', result_details[i].children[j].name);
                             }
                         }
                         data.moduleInfo.push(module_info);
                     } else {
-                        data_not_exported.push(result_details[i].id_n);
+                        data_not_exported.push(result_details.name);
                         console.log('Not exported : ', result_details[i].name);
                     }
                 }
-                }
+                // }
                 if (flag) {
                     mindmapServices.getProjectTypeMM_Nineteen68($scope.projectNameO).then(
                         function(project_type) {
@@ -4068,38 +4097,49 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                 return $rootScope.redirectPage();
                             }
                             parsed_project_data = project_type;
-                            mindmapServices.getCRId($scope.projectNameO).then(
-                                function(rel_cycle_data) {
-                                    if (rel_cycle_data == "Invalid Session") {
-                                        return $rootScope.redirectPage();
-                                    }
-                                    ci_parsed_details = rel_cycle_data;
-                                    for (var i = 0; i < data.moduleInfo.length; i++) {
-                                        data.moduleInfo[i].cycleId = ci_parsed_details.row.cycleid;
-                                        data.moduleInfo[i].releaseId = ci_parsed_details.row.releaseid;
-                                        if (vs_n) {
-                                            data.moduleInfo[i].versionNumber = version_num;
-                                        } else {
-                                            data.moduleInfo[i].versionNumber = "0.0";
-                                        }
-                                        data.moduleInfo[i].appType = parsed_project_data.project_typename;
-                                    }
-                                    var responseData = JSON.stringify(data);
-                                    jsonDownload('moduleinfo.json', responseData);
-                                    var response_execution_data = JSON.stringify(execution_data);
-                                    jsonDownload('execution_data.json', response_execution_data);
-                                    unblockUI();
-                                    if (data_not_exported.length != 0)
-                                        openDialogMindmap('Mindmap', "Data Exported Successfully. Note:Only Created Modules are exported.");
-                                    else
-                                        openDialogMindmap('Mindmap', "Data Exported Successfully.");
-                                },
-                                function(err) {
-                                    console.log('Error in exporting');
-                                    unblockUI();
-                                    openDialogMindmap('Error', "Error in export");
-                                }
-                            )
+                            data.moduleInfo[0].cycleId = project_type['releases'][0]["cycles"][0]["_id"];
+                            data.moduleInfo[0].releaseId = project_type['releases'][0]["name"];
+                            var responseData = JSON.stringify(data);
+                            jsonDownload('moduleinfo.json', responseData);
+                            var response_execution_data = JSON.stringify(execution_data);
+                            jsonDownload('execution_data.json', response_execution_data);
+                            unblockUI();
+                            if (data_not_exported.length != 0)
+                                openDialogMindmap('Mindmap', "Data Exported Successfully. Note:Only Created Modules are exported.");
+                            else
+                                openDialogMindmap('Mindmap', "Data Exported Successfully.");
+                            // mindmapServices.getCRId($scope.projectNameO).then(
+                            //     function(rel_cycle_data) {
+                            //         if (rel_cycle_data == "Invalid Session") {
+                            //             return $rootScope.redirectPage();
+                            //         }
+                            //         ci_parsed_details = rel_cycle_data;
+                            //         for (var i = 0; i < data.moduleInfo.length; i++) {
+                            //             data.moduleInfo[i].cycleId = ci_parsed_details.row.cycleid;
+                            //             data.moduleInfo[i].releaseId = ci_parsed_details.row.releaseid;
+                            //             if (vs_n) {
+                            //                 data.moduleInfo[i].versionNumber = version_num;
+                            //             } else {
+                            //                 data.moduleInfo[i].versionNumber = "0.0";
+                            //             }
+                            //             data.moduleInfo[i].appType = parsed_project_data.project_typename;
+                            //         }
+                            //         var responseData = JSON.stringify(data);
+                            //         jsonDownload('moduleinfo.json', responseData);
+                            //         var response_execution_data = JSON.stringify(execution_data);
+                            //         jsonDownload('execution_data.json', response_execution_data);
+                            //         unblockUI();
+                            //         if (data_not_exported.length != 0)
+                            //             openDialogMindmap('Mindmap', "Data Exported Successfully. Note:Only Created Modules are exported.");
+                            //         else
+                            //             openDialogMindmap('Mindmap', "Data Exported Successfully.");
+                            //     },
+                            //     function(err) {
+                            //         console.log('Error in exporting');
+                            //         unblockUI();
+                            //         openDialogMindmap('Error', "Error in export");
+                            //     }
+                            // )
                         },
                         function(err) {
                             console.log(err);

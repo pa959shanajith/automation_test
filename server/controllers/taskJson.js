@@ -176,182 +176,188 @@ function next_function(resultobj,projectid)
 	var taskDetails = {};
 	var batch_dict = {};
 	var status_dict={"inprogress":0,"assigned":0,"underReview":0,"complete":0}
+	suitename={}
 	for(var ti=0;ti<resultobj.length;ti++){
+		try{
 		// async.forEachSeries(alltasks, function (a, maincallback) {
-		var task_json = {
-			'appType': '',
-			'projectId': '',
-			'screenId': '',
-			'screenName': '',
-			'testCaseId': '',
-			'versionnumber': '',
-			'testCaseName': '',
-			'scenarioId': '',
-			'scenarioName': '',
-			'assignedTestScenarioIds': [],
-			'taskDetails': [],
-			'testSuiteDetails': [],
-			'scenarioFlag': 'False',
-			'releaseid':'',
-			'cycleid':''
+			var task_json = {
+				'appType': '',
+				'projectId': '',
+				'screenId': '',
+				'screenName': '',
+				'testCaseId': '',
+				'versionnumber': '',
+				'testCaseName': '',
+				'scenarioId': '',
+				'scenarioName': '',
+				'assignedTestScenarioIds': [],
+				'taskDetails': [],
+				'testSuiteDetails': [],
+				'scenarioFlag': 'False',
+				'releaseid':'',
+				'cycleid':''
 
-		};
-		taskDetails = {
-			'taskName': '',
-			'taskDescription': '',
-			'taskType': '', //module nd scenario - Execute,  screen and TC- Design
-			'subTaskType': '',
-			'subTaskId': '',
-			'assignedTo': '',
-			'reviewer': '',
-			'startDate': '',
-			'expectedEndDate': '',
-			'batchTaskIDs':[],
-			'status': 'assigned',
-			'reuse':'False',
-			'releaseid': '',
-			'cycleid':''
-		};
-		var testSuiteDetails_obj = {
-			"assignedTime":"",
-			"releaseid": "",
-			"cycleid": "",
-			"testsuiteid": "",
-			"testsuitename": "",
-			"projectidts": "",
-			"assignedTestScenarioIds": []
-			//"scenarioFlag": "True",
-		};
+			};
+			taskDetails = {
+				'taskName': '',
+				'taskDescription': '',
+				'taskType': '', //module nd scenario - Execute,  screen and TC- Design
+				'subTaskType': '',
+				'subTaskId': '',
+				'assignedTo': '',
+				'reviewer': '',
+				'startDate': '',
+				'expectedEndDate': '',
+				'batchTaskIDs':[],
+				'status': 'assigned',
+				'reuse':'False',
+				'releaseid': '',
+				'cycleid':''
+			};
+			var testSuiteDetails_obj = {
+				"assignedTime":"",
+				"releaseid": "",
+				"cycleid": "",
+				"testsuiteid": "",
+				"testsuitename": "",
+				"projectidts": "",
+				"assignedTestScenarioIds": []
+				//"scenarioFlag": "True",
+			};
 
-		/*t refers to task node, and m refers to its respective node */
-		var t = resultobj[ti];
-		var relName=cycles[t.cycleid][1];
-		var reuseflag='False';
-		// var m = a.row[0][0];
-		// if(a.row[0].length>1) reuseflag='True';
-		var abc = tasktypes[t.tasktype];
-		var batch_flag = false;
-		//To support the task assignmnet in scenario
-		if (t.tasktype == 'Execute' || t.tasktype == 'Execute Scenario' || t.tasktype == 'Execute Batch') {
-			testSuiteDetails_obj.releaseid = t.release || relName;
-			testSuiteDetails_obj.cycleid = t.cycleid;
-		}else{
-			task_json.releaseid=t.release || relName;
-			task_json.cycleid=t.cycleid;
-		}
-		if (t.taskvn !== undefined) {
-			task_json.versionnumber = t.versionnumber;
-		} else {
-			task_json.versionnumber = 0;
-		}
-		taskDetails.taskName = t.tasktype+" "+t.name;
-		taskDetails.subTaskType = abc[0];
-		taskDetails.taskType = abc[1];
-		taskDetails.assignedTo = t.assignedto;
-		taskDetails.reviewer = t.reviewer;
-		taskDetails.subTaskId = t._id;
-		taskDetails.taskDescription = t.details;
-		taskDetails.releaseid = t.release||relName;
-		taskDetails.cycleid = t.cycleid;
-		if (t.status != undefined) {
-			taskDetails.status = t.status;
-			status_dict[t.status]++;
-			logger.info(status_dict);
-		}
-		// var parent = t.parent.substring(1, t.parent.length - 1).split(",");
-		// var parent_length = parent.length;
-		task_json.projectId = t.projectid;
-		var index = prjId.indexOf(t.projectid);
-		var apptype=projectTypes[appTypes[index]];
-		task_json.appType=apptype;
-					if(t.nodetype=="testsuites")
-					{
-						testSuiteDetails_obj.testsuiteid=t.nodeid;
-						testSuiteDetails_obj.testsuitename = t.name;
-						
-					}
-					else if(t.nodetype=="testscenarios")
-					{
-						testSuiteDetails_obj.testsuiteid=t.parent|| null;
-						testSuiteDetails_obj.testsuitename = 'testsuitename';
-						task_json.scenarioId = t.nodeid;
-						task_json.scenarioName=t.name;
-					}
-					else if(t.nodetype=="screens")
-					{
-						//task_json.projectId=t.parent|| null;
-						task_json.screenId=t.nodeid;
-						task_json.screenName = t.name;
-					}
-					else if(t.nodetype=="testcases")
-					{
-						task_json.scenarioId=t.parent|| null;
-						task_json.testCaseId=t.nodeid;
-						task_json.testCaseName = t.name;
-					}
-					
-					testSuiteDetails_obj.projectidts = t.projectid;
-					testSuiteDetails_obj.assignedTestScenarioIds = '';
-					
-					
-					
-					//Check if versioning exists
-					function versioningCheck() {
-						versioningEnabled = ' ';
-						if (process.env.projectVersioning != "disabled")
-							versioningEnabled += 'version_'+ task_json.versionnumber+ ' : ';
-						return versioningEnabled;
-					}
-
-					if (t.tasktype == 'Design' || t.tasktype == 'Update') {
-						// taskDetails.taskName = t.tasktype + versioningCheck() + m.testCaseName;
-						taskDetails.reuse=reuseflag;
-						// task_json.testCaseName = m.testCaseName;
-					} else if (t.tasktype == 'Execute') {
-						// taskDetails.taskName = t.tasktype + versioningCheck()  + m.moduleName;
-						// testSuiteDetails_obj.testsuitename = m.moduleName;
-					} else if (t.tasktype == 'Execute Batch') {
-						task_json.projectId = "";
-						taskDetails.taskName = t.tasktype + versioningCheck() + t.batchname;
-						// testSuiteDetails_obj.testsuitename = m.moduleName;
-						testSuiteDetails_obj.assignedTime = t.assignedTime;
-						if (batch_dict[t.batchName+'_'+t.cycleid] == undefined) {
-							batch_dict[t.batchName+'_'+t.cycleid] = user_task_json.length;
-						} else {
-							parent_index = batch_dict[t.batchName+'_'+t.cycleid];
-							batch_task = user_task_json[parent_index];
-							batch_task.taskDetails[0].batchTaskIDs.push(t._id);
-							testSuiteDetails_obj.subTaskId = t._id;
-							batch_task.testSuiteDetails.push(testSuiteDetails_obj);
-							batch_flag = true;
-							batch_indx = Object.values(batch_dict);
+			/*t refers to task node, and m refers to its respective node */
+			var t = resultobj[ti];
+			var relName=cycles[t.cycleid][1];
+			var reuseflag='False';
+			// var m = a.row[0][0];
+			// if(a.row[0].length>1) reuseflag='True';
+			var abc = tasktypes[t.tasktype];
+			var batch_flag = false;
+			//To support the task assignmnet in scenario
+			if (t.tasktype == 'Execute' || t.tasktype == 'Execute Scenario' || t.tasktype == 'Execute Batch') {
+				testSuiteDetails_obj.releaseid = t.release || relName;
+				testSuiteDetails_obj.cycleid = t.cycleid;
+			}else{
+				task_json.releaseid=t.release || relName;
+				task_json.cycleid=t.cycleid;
+			}
+			if (t.taskvn !== undefined) {
+				task_json.versionnumber = t.versionnumber;
+			} else {
+				task_json.versionnumber = 0;
+			}
+			taskDetails.taskName = t.tasktype+" "+t.name;
+			taskDetails.subTaskType = abc[0];
+			taskDetails.taskType = abc[1];
+			taskDetails.assignedTo = t.assignedto;
+			taskDetails.reviewer = t.reviewer;
+			taskDetails.subTaskId = t._id;
+			taskDetails.taskDescription = t.details;
+			taskDetails.releaseid = t.release||relName;
+			taskDetails.cycleid = t.cycleid;
+			if (t.status != undefined) {
+				taskDetails.status = t.status;
+				status_dict[t.status]++;
+				logger.info(status_dict);
+			}
+			// var parent = t.parent.substring(1, t.parent.length - 1).split(",");
+			// var parent_length = parent.length;
+			task_json.projectId = t.projectid;
+			var index = prjId.indexOf(t.projectid);
+			var apptype=projectTypes[appTypes[index]];
+			task_json.appType=apptype;
+						if(t.nodetype=="testsuites")
+						{
+							testSuiteDetails_obj.testsuiteid=t.nodeid;
+							testSuiteDetails_obj.testsuitename = t.name;
+							suitename[t.nodeid]=t.name
 						}
-					} else if (t.tasktype == 'Execute Scenario') {
-						task_json.scenarioFlag = 'True';
-						task_json.assignedTestScenarioIds = [task_json.scenarioId];
-						// taskDetails.taskName = t.tasktype + versioningCheck() + m.testScenarioName;
-						// task_json.scenarioName = m.testScenarioName;
-						//testSuiteDetails_obj.assignedTestScenarioIds=[task_json.scenarioId];
-					} else {
-						// taskDetails.taskName = t.tasktype + versioningCheck() + m.screenName;
-						// task_json.screenName = m.screenName;
-						taskDetails.reuse=reuseflag;
-					}
-					//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
-					if (!batch_flag) {
-						testSuiteDetails_obj.subTaskId = t._id;
-						task_json.testSuiteDetails.push(testSuiteDetails_obj);
-						taskDetails.batchTaskIDs.push(t._id);
-						task_json.taskDetails.push(taskDetails);
-						user_task_json.push(task_json);
-					}
+						else if(t.nodetype=="testscenarios")
+						{
+							testSuiteDetails_obj.testsuiteid=t.parent|| null;
+							testSuiteDetails_obj.testsuitename = suitename[t.parent];
+							task_json.scenarioId = t.nodeid;
+							task_json.scenarioName=t.name;
+						}
+						else if(t.nodetype=="screens")
+						{
+							//task_json.projectId=t.parent|| null;
+							task_json.screenId=t.nodeid;
+							task_json.screenName = t.name;
+						}
+						else if(t.nodetype=="testcases")
+						{
+							task_json.scenarioId=t.parent|| null;
+							task_json.testCaseId=t.nodeid;
+							task_json.testCaseName = t.name;
+						}
+						
+						testSuiteDetails_obj.projectidts = t.projectid;
+						testSuiteDetails_obj.assignedTestScenarioIds = '';
+						
+						
+						
+						//Check if versioning exists
+						function versioningCheck() {
+							versioningEnabled = ' ';
+							if (process.env.projectVersioning != "disabled")
+								versioningEnabled += 'version_'+ task_json.versionnumber+ ' : ';
+							return versioningEnabled;
+						}
+
+						if (t.tasktype == 'Design' || t.tasktype == 'Update') {
+							// taskDetails.taskName = t.tasktype + versioningCheck() + m.testCaseName;
+							taskDetails.reuse=reuseflag;
+							// task_json.testCaseName = m.testCaseName;
+						} else if (t.tasktype == 'Execute') {
+							// taskDetails.taskName = t.tasktype + versioningCheck()  + m.moduleName;
+							// testSuiteDetails_obj.testsuitename = m.moduleName;
+						} else if (t.tasktype == 'Execute Batch') {
+							task_json.projectId = "";
+							taskDetails.taskName = t.tasktype + versioningCheck() + t.batchname;
+							// testSuiteDetails_obj.testsuitename = m.moduleName;
+							testSuiteDetails_obj.assignedTime = t.assignedTime;
+							if (batch_dict[t.batchName+'_'+t.cycleid] == undefined) {
+								batch_dict[t.batchName+'_'+t.cycleid] = user_task_json.length;
+							} else {
+								parent_index = batch_dict[t.batchName+'_'+t.cycleid];
+								batch_task = user_task_json[parent_index];
+								batch_task.taskDetails[0].batchTaskIDs.push(t._id);
+								testSuiteDetails_obj.subTaskId = t._id;
+								batch_task.testSuiteDetails.push(testSuiteDetails_obj);
+								batch_flag = true;
+								batch_indx = Object.values(batch_dict);
+							}
+						} else if (t.tasktype == 'Execute Scenario') {
+							task_json.scenarioFlag = 'True';
+							task_json.assignedTestScenarioIds = [task_json.scenarioId];
+							// taskDetails.taskName = t.tasktype + versioningCheck() + m.testScenarioName;
+							// task_json.scenarioName = m.testScenarioName;
+							//testSuiteDetails_obj.assignedTestScenarioIds=[task_json.scenarioId];
+						} else {
+							// taskDetails.taskName = t.tasktype + versioningCheck() + m.screenName;
+							// task_json.screenName = m.screenName;
+							taskDetails.reuse=reuseflag;
+						}
+						//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
+						if (!batch_flag) {
+							testSuiteDetails_obj.subTaskId = t._id;
+							task_json.testSuiteDetails.push(testSuiteDetails_obj);
+							taskDetails.batchTaskIDs.push(t._id);
+							task_json.taskDetails.push(taskDetails);
+							user_task_json.push(task_json);
+						}
+					// }	
 				// }	
-			// }	
-		// }
-		// task_json.testSuiteDetails.push(testSuiteDetails_obj);
-		// taskDetails.batchTaskIDs.push(t.taskID);
-		// task_json.taskDetails.push(taskDetails);
-		// user_task_json.push(task_json);
-	}		
+			// }
+			// task_json.testSuiteDetails.push(testSuiteDetails_obj);
+			// taskDetails.batchTaskIDs.push(t.taskID);
+			// task_json.taskDetails.push(taskDetails);
+			// user_task_json.push(task_json);
+		}
+		catch (ex) {
+			logger.error("Exception in the next_function: %s", ex);
+		}
+	}
 	return user_task_json;	
 }
