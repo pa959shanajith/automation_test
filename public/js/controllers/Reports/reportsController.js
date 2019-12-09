@@ -233,6 +233,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             $('.reports-search').removeAttr('disabled', 'disabled');
                         });
                         $('.ct-nodeIcon1').parent().hide();
+                        $('.webCrawler-toggle-btn').attr('style','background:#331d4e;color:#f5f5f5;border-color: #ffffff;')
                     } 
                 }
             }, function(error) {

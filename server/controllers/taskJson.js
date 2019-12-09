@@ -176,6 +176,7 @@ function next_function(resultobj,projectid)
 	var taskDetails = {};
 	var batch_dict = {};
 	var status_dict={"inprogress":0,"assigned":0,"underReview":0,"complete":0}
+	suitename={}
 	for(var ti=0;ti<resultobj.length;ti++){
 		try{
 		// async.forEachSeries(alltasks, function (a, maincallback) {
@@ -269,12 +270,12 @@ function next_function(resultobj,projectid)
 						{
 							testSuiteDetails_obj.testsuiteid=t.nodeid;
 							testSuiteDetails_obj.testsuitename = t.name;
-							
+							suitename[t.nodeid]=t.name
 						}
 						else if(t.nodetype=="testscenarios")
 						{
 							testSuiteDetails_obj.testsuiteid=t.parent|| null;
-							testSuiteDetails_obj.testsuitename = 'testsuitename';
+							testSuiteDetails_obj.testsuitename = suitename[t.parent];
 							task_json.scenarioId = t.nodeid;
 							task_json.scenarioName=t.name;
 						}

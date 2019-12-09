@@ -263,7 +263,7 @@ exports.getAllSuites_ICE = function(req, res) {
                 logger.error("Exception in the function getprojectdetails: %s", exception);
             }
         }
-    }
+};
 
 //To get all the executed suites
 exports.getSuiteDetailsInExecution_ICE = function(req, res) {
