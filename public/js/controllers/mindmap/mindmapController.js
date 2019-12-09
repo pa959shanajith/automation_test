@@ -1180,7 +1180,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
         function addTask_11(pi, tObj, qid, cTask) {
             var validate = checkAndUpdate(dNodes[pi], []);
-            var taskUndef = (dNodes[pi].task === undefined || dNodes[pi].task == null);
+            var taskUndef = (dNodes[pi].task === undefined || dNodes[pi].task == null || (dNodes[pi].task != null && dNodes[pi].task.status== "complete"));
             var origTask = ([0, 4, 7, 9].indexOf(qid) != -1); // Orignal tasks not cascaded  
             var taskStatus;
             if (validate[0]) {
