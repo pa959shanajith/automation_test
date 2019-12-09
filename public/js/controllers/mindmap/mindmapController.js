@@ -152,7 +152,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 	// process discovery related
     var parseAction = {
         "inprogress":"Assigned",
-        "underReview":"Submitted for Approval",
+        "review":"Submitted for Approval",
         "approve":"Approved by reviewer",
         "export":"Exported"
     }
@@ -881,8 +881,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             'img_src': img_src,
             '_id': n._id || null,
             'state':n.state || "created",
-            'reuse':n.reuse || false,
-            'status':( n.task == null || n.task == undefined) ? null : n.task.status
+            'reuse':n.reuse || false
         };
         var v = '#ct-node-' + n.id;
         return v;
@@ -907,8 +906,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             'img_src': img_src,
             '_id':n._id,
             'state':n.state || "created",
-            'reuse':n.reuse || false,
-            'status': ( n.task == null || n.task == undefined) ? null : n.task.status
+            'reuse':n.reuse || false
         };
         var v = '#ct-node-' + n.id;
         return v;
@@ -2306,6 +2304,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     $scope.deleteNode = function($event) {
         //If module is in edit mode, then return do not add any node
+
         if (d3.select('#ct-inpBox').attr('class') == "") return;
         if ($event !== true && d3.select($event.target).classed('ct-ctrl-inactive')) return;
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
@@ -4038,20 +4037,25 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         blockUI('Loading UI');
         var userInfo = JSON.parse(window.localStorage['_UI']);
         var user_id = userInfo.user_id;
-        var modName = $('#createNewConfirmationPopup').attr('mapid');
-        var moduleid =$('#createNewConfirmationPopup').attr('_id');
+        var moduleid = $('#createNewConfirmationPopup').attr('mapid');
+        var modName =$('#createNewConfirmationPopup').attr('_id') || null;
         mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, parseFloat(version_num), $('.cycle-list').val(), modName,moduleid).then(
             function(result) {
                 if (result == "Invalid Session") {
                     return $rootScope.redirectPage();
                 }
+                else if(result=='fail')
+                {
+                    unblockUI();
+                    openDialogMindmap('Error', "Error in export");
+                    return;
+                }
                 result_details = result;
                 flag = 0;
-                for (var i = 0; i < result_details.length; i++) {
-                    if(result_details[i].name== loadedModule){
+                if(result_details.name== loadedModule){
                     var module_info = {
                         "appType": "",
-                        "projectId": $scope.projectNameO,
+                        "projectId": result_details.projectID,
                         "cycleId": "",
                         "moduleId": "",
                         "moduleName": "",
@@ -4059,29 +4063,30 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         "versionNumber": "",
                         "suiteDetails": []
                     };
-                    if (result_details[i].id_c != 'null' && result_details[i].id_c != '') {
-                        module_info.moduleId = result_details[i].id_c;
-                        module_info.moduleName = result_details[i].name;
+                    if (result_details._id != null) {
+                        module_info.moduleId = result_details._id;
+                        module_info.moduleName = result_details.name;
+                        if(result_details.versionnumber==0) module_info.versionNumber="0.0"
+                        else module_info.versionNumber = String(result_details.versionnumber);
                         flag = 1;
-                        for (var j = 0; j < result_details[i].children.length; j++) {
+                        for (var j = 0; j < result_details.children.length; j++) {
                             var s_data = {
                                 'scenarios_id': '',
                                 'scenarios_name': ''
                             };
-                            if (result_details[i].children[j].id_c != 'null' && result_details[i].children[j].id_c != '') {
-                                s_data.scenarios_id = result_details[i].children[j].id_c;
-                                s_data.scenarios_name = result_details[i].children[j].name;
+                            if (result_details.children[j]._id != null) {
+                                s_data.scenarios_id = result_details.children[j]._id;
+                                s_data.scenarios_name = result_details.children[j].name;
                                 module_info.suiteDetails.push(s_data);
                             } else {
-                                console.log('Not exported_S : ', result_details[i].children[j].id_n);
+                                console.log('Not exported_S : ', result_details[i].children[j].name);
                             }
                         }
                         data.moduleInfo.push(module_info);
                     } else {
-                        data_not_exported.push(result_details[i].id_n);
+                        data_not_exported.push(result_details.name);
                         console.log('Not exported : ', result_details[i].name);
                     }
-                }
                 }
                 if (flag) {
                     mindmapServices.getProjectTypeMM_Nineteen68($scope.projectNameO).then(
@@ -4090,38 +4095,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                 return $rootScope.redirectPage();
                             }
                             parsed_project_data = project_type;
-                            mindmapServices.getCRId($scope.projectNameO).then(
-                                function(rel_cycle_data) {
-                                    if (rel_cycle_data == "Invalid Session") {
-                                        return $rootScope.redirectPage();
-                                    }
-                                    ci_parsed_details = rel_cycle_data;
-                                    for (var i = 0; i < data.moduleInfo.length; i++) {
-                                        data.moduleInfo[i].cycleId = ci_parsed_details.row.cycleid;
-                                        data.moduleInfo[i].releaseId = ci_parsed_details.row.releaseid;
-                                        if (vs_n) {
-                                            data.moduleInfo[i].versionNumber = version_num;
-                                        } else {
-                                            data.moduleInfo[i].versionNumber = "0.0";
-                                        }
-                                        data.moduleInfo[i].appType = parsed_project_data.project_typename;
-                                    }
-                                    var responseData = JSON.stringify(data);
-                                    jsonDownload('moduleinfo.json', responseData);
-                                    var response_execution_data = JSON.stringify(execution_data);
-                                    jsonDownload('execution_data.json', response_execution_data);
-                                    unblockUI();
-                                    if (data_not_exported.length != 0)
-                                        openDialogMindmap('Mindmap', "Data Exported Successfully. Note:Only Created Modules are exported.");
-                                    else
-                                        openDialogMindmap('Mindmap', "Data Exported Successfully.");
-                                },
-                                function(err) {
-                                    console.log('Error in exporting');
-                                    unblockUI();
-                                    openDialogMindmap('Error', "Error in export");
-                                }
-                            )
+                            data.moduleInfo[0].cycleId = project_type['releases'][0]["cycles"][0]["_id"];
+                            data.moduleInfo[0].releaseId = project_type['releases'][0]["name"];
+                            var responseData = JSON.stringify(data);
+                            jsonDownload('moduleinfo.json', responseData);
+                            var response_execution_data = JSON.stringify(execution_data);
+                            jsonDownload('execution_data.json', response_execution_data);
+                            unblockUI();
+                            if (data_not_exported.length != 0)
+                                openDialogMindmap('Mindmap', "Data Exported Successfully. Note:Only Created Modules are exported.");
+                            else
+                                openDialogMindmap('Mindmap', "Data Exported Successfully.");
                         },
                         function(err) {
                             console.log(err);

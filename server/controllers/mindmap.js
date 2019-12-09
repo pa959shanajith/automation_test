@@ -325,23 +325,23 @@ exports.populateCycles = function (req, res) {
 	}
 };
 
-exports.getCRId = function (req, res) {
-	logger.info("Inside UI service: getCRId");
-	if (utils.isSessionActive(req)) {
-		var inputs = { "projectid": req.body.projectid };
-		suite.getCRId(inputs, function (status, result) {
-			res.setHeader('Content-Type', 'application/json');
-			if (status != 200) res.status(status).send(result);
-			else {
-				res.status(status).send(result);
-			}
-		});
-	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
-	}
-};
+// exports.getCRId = function (req, res) {
+// 	logger.info("Inside UI service: getCRId");
+// 	if (utils.isSessionActive(req)) {
+// 		var inputs = { "projectid": req.body.projectid };
+// 		suite.getCRId(inputs, function (status, result) {
+// 			res.setHeader('Content-Type', 'application/json');
+// 			if (status != 200) res.status(status).send(result);
+// 			else {
+// 				res.status(status).send(result);
+// 			}
+// 		});
+// 	}
+// 	else {
+// 		logger.error("Invalid Session");
+// 		res.send("Invalid Session");
+// 	}
+// };
 
 exports.checkReuse = function (req, res) {
 	logger.info("Inside UI service: checkReuse");
