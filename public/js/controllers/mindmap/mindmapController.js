@@ -4052,7 +4052,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 }
                 result_details = result;
                 flag = 0;
-                if(result_details.name== loadedModule){
+                // for (var i = 0; i < result_details.length; i++) {
+                    if(result_details.name== loadedModule){
                     var module_info = {
                         "appType": "",
                         "projectId": result_details.projectID,
@@ -4088,6 +4089,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         console.log('Not exported : ', result_details[i].name);
                     }
                 }
+                // }
                 if (flag) {
                     mindmapServices.getProjectTypeMM_Nineteen68($scope.projectNameO).then(
                         function(project_type) {
@@ -4106,6 +4108,38 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                 openDialogMindmap('Mindmap', "Data Exported Successfully. Note:Only Created Modules are exported.");
                             else
                                 openDialogMindmap('Mindmap', "Data Exported Successfully.");
+                            // mindmapServices.getCRId($scope.projectNameO).then(
+                            //     function(rel_cycle_data) {
+                            //         if (rel_cycle_data == "Invalid Session") {
+                            //             return $rootScope.redirectPage();
+                            //         }
+                            //         ci_parsed_details = rel_cycle_data;
+                            //         for (var i = 0; i < data.moduleInfo.length; i++) {
+                            //             data.moduleInfo[i].cycleId = ci_parsed_details.row.cycleid;
+                            //             data.moduleInfo[i].releaseId = ci_parsed_details.row.releaseid;
+                            //             if (vs_n) {
+                            //                 data.moduleInfo[i].versionNumber = version_num;
+                            //             } else {
+                            //                 data.moduleInfo[i].versionNumber = "0.0";
+                            //             }
+                            //             data.moduleInfo[i].appType = parsed_project_data.project_typename;
+                            //         }
+                            //         var responseData = JSON.stringify(data);
+                            //         jsonDownload('moduleinfo.json', responseData);
+                            //         var response_execution_data = JSON.stringify(execution_data);
+                            //         jsonDownload('execution_data.json', response_execution_data);
+                            //         unblockUI();
+                            //         if (data_not_exported.length != 0)
+                            //             openDialogMindmap('Mindmap', "Data Exported Successfully. Note:Only Created Modules are exported.");
+                            //         else
+                            //             openDialogMindmap('Mindmap', "Data Exported Successfully.");
+                            //     },
+                            //     function(err) {
+                            //         console.log('Error in exporting');
+                            //         unblockUI();
+                            //         openDialogMindmap('Error', "Error in export");
+                            //     }
+                            // )
                         },
                         function(err) {
                             console.log(err);
