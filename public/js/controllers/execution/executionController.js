@@ -59,7 +59,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	} else
 		$("#page-taskName span").text("Batch Execution");
 	var status = current_task.status;
-	if (status == 'review') {
+	if (status == 'underReview') {
 		$('.submitTaskBtn').text('Approve');
 		$('.reassignTaskBtn').show();
 	}
@@ -837,7 +837,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			else if (taskstatus == 'reassign') {
 				openDialogExe("Task Reassignment Success", "Task Reassigned successfully!", true);
 				//labelArr.push(txnHistory.codesDict['TaskReassign']);
-			} else if (taskstatus == 'review') {
+			} else if (taskstatus == 'underReview') {
 				openDialogExe("Task Completion Success", "Task Approved successfully!", true);
 				//labelArr.push(txnHistory.codesDict['TaskApprove']);
 			} else {

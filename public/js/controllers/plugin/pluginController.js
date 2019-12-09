@@ -440,7 +440,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 					}
 				dataobj = JSON.stringify(dataobj);
 				if(passFilterTest(tasksJson[i],0)){
-					if(status == 'review'){
+					if(status == 'underReview'){
 						$('.plugin-taks-listing.review').append("<div class='panel panel-default' panel-id='"+i+"'><div class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+"' class='taskRedir'>"+ counterreview +"</h4><span class='assignedTask' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
 						counterreview++;
 					}

@@ -596,7 +596,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                                                 var req_browser = reportdata.overallstatus[0].browserType;
                                                 reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
                                                 reportdata = JSON.parse(reportdata);
-                                                var reportId = uuid();
+												var cycleid = testsuiteidcycmap[testsuiteid]
                                                 if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
                                                     statusPass++;
                                                 }
@@ -631,14 +631,14 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                                                 });
                                                 if (completedSceCount == scenarioCount) {
                                                     if (statusPass == scenarioCount) {
-                                                        suiteStatus = "Pass";
+                                                        suiteStatus = "pass";
                                                     } else {
-                                                        suiteStatus = "Fail";
+                                                        suiteStatus = "fail";
                                                     }
                                                     completedSceCount = 0;
                                                     testsuitecount++;
                                                     logger.info("Calling function updateExecutionStatus from executionFunction");
-                                                    updateExecutionStatus(testsuiteid, executionid, suiteStatus);
+                                                    updateExecutionStatus(testsuiteid, executionid, suiteStatus,cycleid);
                                                 }
                                             } else {
                                                 completedSceCount++;
@@ -646,9 +646,9 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                                                 if (completedSceCount == scenarioCount) {
                                                     completedSceCount = 0;
                                                     testsuitecount++;
-                                                    suiteStatus = "Fail";
+                                                    suiteStatus = "fail";
                                                     logger.info("Calling function updateExecutionStatus from executionFunction");
-                                                    updateExecutionStatus(testsuiteid, executionid, suiteStatus);
+                                                    updateExecutionStatus(testsuiteid, executionid, suiteStatus,cycleid);
                                                 }
                                             }
                                         } catch (ex) {
@@ -878,8 +878,8 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
                                                 reportdata.overallstatus[0].browserType = (executionRequest.apptype=="MobileApp")?"MobileApp":reportdata.overallstatus[0].browserType;
                                                 var req_browser = reportdata.overallstatus[0].browserType;
                                                 reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
-                                                reportdata = JSON.parse(reportdata);
-                                                var reportId = uuid();
+												reportdata = JSON.parse(reportdata);
+												var cycleid = testsuiteidcycmap[testsuiteid];
                                                 if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
                                                     statusPass++;
                                                 }
@@ -914,14 +914,14 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
                                                 });
                                                 if (completedSceCount == scenarioCount) {
                                                     if (statusPass == scenarioCount) {
-                                                        suiteStatus = "Pass";
+                                                        suiteStatus = "pass";
                                                     } else {
-                                                        suiteStatus = "Fail";
+                                                        suiteStatus = "fail";
                                                     }
                                                     completedSceCount = 0;
                                                     testsuitecount++;
                                                     logger.info("Calling function updateExecutionStatus from executionFunction");
-                                                    updateExecutionStatus(testsuiteid, executionid, suiteStatus);
+                                                    updateExecutionStatus(testsuiteid, executionid, suiteStatus,cycleid);
                                                 }
                                             } else {
                                                 completedSceCount++;
@@ -931,7 +931,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
                                                     testsuitecount++;
                                                     suiteStatus = "Fail";
                                                     logger.info("Calling function updateExecutionStatus from executionFunction");
-                                                    updateExecutionStatus(testsuiteid, executionid, suiteStatus);
+                                                    updateExecutionStatus(testsuiteid, executionid, suiteStatus,cycleid);
                                                 }
                                             }
                                         } catch (ex) {
@@ -979,7 +979,7 @@ function  insertExecutionStatus(executedby,callback) {
 	logger.info("Inside updateExecutionStatus function");
 	var inputs = {
 		"executedby": executedby, 
-		"status": "fail",
+		"status": "inprogress",
 		"query": "inserintotexecutionquery"
 	};
 	var args = {
@@ -1004,12 +1004,13 @@ function  insertExecutionStatus(executedby,callback) {
 }
 
 //Update execution table on completion of suite execution
-function updateExecutionStatus(testsuiteid, executionid, suiteStatus) {
+function updateExecutionStatus(testsuiteid, executionid, suiteStatus,cycleid) {
 	logger.info("Inside insertExecutionStatus function");
 	var inputs = {
 		"status": suiteStatus,
 		"testsuiteid":testsuiteid,
 		"executionid":executionid,
+		"cycleid":cycleid,
 		"query": "updateintotexecutionquery"
 	};
 	var args = {

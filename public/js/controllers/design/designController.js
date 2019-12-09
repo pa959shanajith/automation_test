@@ -98,7 +98,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	subTaskType = current_task.subTaskType;
 	subTask = current_task.subtask;
 	status = current_task.status;
-	if (status == 'review') {
+	if (status == 'underReview') {
 		$('.submitTaskBtn').text('Approve');
 		$('.reassignTaskBtn').show();
 	}
@@ -133,19 +133,21 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 
 	$timeout(function () {
-		projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
-		releaseName = angular.element(document.getElementById("left-nav-section")).scope().releaseDetails;
-		cycleName = angular.element(document.getElementById("left-nav-section")).scope().cycleDetails;
-		var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
-		appType = JSON.parse(window.localStorage['_CT']).appType;
-		screenName = angular.element(document.getElementById("left-nav-section")).scope().screenName;
-		testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
-		subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
-		subTask = JSON.parse(window.localStorage['_CT']).subTask;
-		if (subTaskType == "Scrape" || subTask == "Scrape") {
-			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">' + projectDetails.respnames[0] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">' + screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + releaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + cycleName + '</span></p>')
+		// projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
+		// releaseName = angular.element(document.getElementById("left-nav-section")).scope().releaseDetails;
+		// cycleName = angular.element(document.getElementById("left-nav-section")).scope().cycleDetails;
+		// var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
+		// appType = JSON.parse(window.localStorage['_CT']).appType;
+		// screenName = angular.element(document.getElementById("left-nav-section")).scope().screenName;
+		// testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
+		// subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
+		// subTask = JSON.parse(window.localStorage['_CT']).subTask;
+		var taskInfo = JSON.parse(window.localStorage['_CT']);
+		var filterData = JSON.parse(window.localStorage['_FD']);
+		if (taskInfo.subTaskType == "Scrape" || taskInfo.subTask == "Scrape") {
+			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">' + filterData.idnamemapprj[taskInfo.projectId] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">' + taskInfo.screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + filterData.idnamemaprel[taskInfo.releaseid] + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + filterData.idnamemapcyc[taskInfo.cycleid] + '</span></p>')
 		} else {
-			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">' + projectDetails.respnames[0] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">' + screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">TestCase: </span><span class="content">' + testCaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + releaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + cycleName + '</span></p>')
+			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">' + filterData.idnamemapprj[taskInfo.projectId] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">' + taskInfo.screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">TestCase: </span><span class="content">' + taskInfo.testCaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + filterData.idnamemaprel[taskInfo.releaseid] + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + filterData.idnamemapcyc[taskInfo.cycleid] + '</span></p>')
 		}
 
 	}, 3000)
@@ -275,11 +277,18 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		enabledEdit = "false";
 		blockUI("Loading...");
 		// service call # 1 - getTestScriptData service call
-		DesignServices.readTestCase_ICE(testCaseId, testCaseName, versionnumber)
+		DesignServices.readTestCase_ICE(testCaseId, testCaseName, versionnumber, screenName)
 			.then(function (data) {
 				if (data == "Invalid Session") {
 					return $rootScope.redirectPage();
 				}
+				if(data.screenName){
+					taskObj = JSON.parse(window.localStorage['_CT']);
+					screenName = data.screenName;
+					taskObj.screenName = data.screenName;
+					window.localStorage['_CT'] = JSON.stringify(taskObj);
+				}
+				
 				//console.log(data);
 				var appType = taskInfo.appType;
 				$('#jqGrid').removeClass('visibility-hide').addClass('visibility-show');
@@ -989,7 +998,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		if (viewString == "") {
 			$(this).children("img").addClass("thumb-ic-disabled").removeClass("thumb-ic");
 			$(this).parent().css("cursor", "no-drop");
-		} else if (Object.keys(viewString).length == 0) {
+		} else if (viewString.view.length == 0) {
 			$(this).children("img").addClass("thumb-ic-disabled").removeClass("thumb-ic");
 			$(this).parent().css("cursor", "no-drop");
 		} else {
@@ -5069,7 +5078,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			} else if (taskstatus == 'reassign') {
 				openDialog("Task Reassignment Success", "Task Reassigned successfully!", true)
 				// labelArr.push(txnHistory.codesDict['TaskReassign']);
-			} else if (taskstatus == 'review') {
+			} else if (taskstatus == 'underReview') {
 				openDialog("Task Completion Success", "Task Approved successfully!", true)
 				// labelArr.push(txnHistory.codesDict['TaskApprove']);
 			} else {

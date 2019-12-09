@@ -515,8 +515,8 @@ exports.getReport_Nineteen68 = function(req, res) {
                                                         logger.error("Error occurred in the service getReport_Nineteen68 - cycleid: Failed to get cycle Ids from test suites.");
                                                     } else {
                                                         try {
-                                                            var cyclename = cycleResult.rows[0].releases[0].cycles[0].name;
-                                                            var releasename = cycleResult.rows[0].releases[0].name;
+                                                            var cyclename = cycleResult.rows[0].releases.cycles.name;
+                                                            var releasename = cycleResult.rows[0].releases.name;
                                                             var projectname = cycleResult.rows[0].name;
                                                             var domainname = cycleResult.rows[0].domain;
                                                             reportInfoObj.cyclename = cyclename;
