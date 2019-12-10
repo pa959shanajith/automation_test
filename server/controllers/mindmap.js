@@ -901,7 +901,14 @@ exports.saveData = function (req, res) {
 		//var relId = inputs.relId;
 		var cycId = inputs.cycId;
 		var idxDict = [];
-		var createdthrough='Web'
+		if(inputs.createdthrough!="")
+		{
+			var createdthrough=inputs.createdthrough;
+		}
+		else
+		{
+			var createdthrough="Web";
+		}
 		//Assigned Tasks Notification
 		var assignedObj = {};
 		for (var k = 0; k < data.length; k++) {
@@ -1328,7 +1335,7 @@ exports.excelToMindmap = function (req, res) {
 			for (var k = 0; k < numSheets; k++) {
 				var cSheet = myCSV[k * 2 + 1];
 				var cSheetRow = cSheet.split('\n');
-				var scoIdx = -1, scrIdx = -1, sctIdx = -1;
+				var scoIdx = -1, scrIdx = -1, sctIdx = -1,modIdx=-1;
 				var uniqueIndex = 0;
 				cSheetRow[0].split(',').forEach(function (e, i) {
 					if(i== 0 && e.toLowerCase()=="module") modIdx = i;
