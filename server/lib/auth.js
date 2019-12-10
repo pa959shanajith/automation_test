@@ -89,7 +89,7 @@ var strategyUtil = {
 							logger.info("Calling In-House Authentication");
 							resp.password = password;
 							authenticateLDAP(resp, function (ldapdata) {
-								if (ldapdata == "empty") callback("inValidLDAPServer");
+								if (ldapdata == "empty" || ldapdata == "fail") callback("inValidLDAPServer");
 								else if (ldapdata == "pass") {
 									validUser = true;
 									ldap_flag = true;

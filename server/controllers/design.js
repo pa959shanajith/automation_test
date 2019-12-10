@@ -97,7 +97,8 @@ exports.readTestCase_ICE = function (req, res) {
 							responsedata = {
 								template: "",
 								testcase: testcasesteps,
-								testcasename: testcasename
+								testcasename: testcasename,
+								del_flag: result.del_flag
 							};
 							if ('screenName' in result){
 								responsedata.screenName = result.screenName;
@@ -112,7 +113,8 @@ exports.readTestCase_ICE = function (req, res) {
 								responsedata = {
 									template: "",
 									testcase: testcasesteps,
-									testcasename: testcasename
+									testcasename: testcasename,
+									del_flag: result.del_flag
 								};
 								if ('screenName' in result){
 									responsedata.screenName = result.screenName;
