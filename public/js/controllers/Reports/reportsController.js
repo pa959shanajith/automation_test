@@ -256,7 +256,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
   
     //Toggle(Show/Hide) Module Div
     $('#expAssign').on('click', function(e) {
-        if($(".ct-nodeIcon").length == 0)
+        if($(".ct-nodeIcon").length == 0 && $(".ct-nodeIcon1").length == 0)
         {
             if($('#expAssign').attr('src') == "imgs/ic-collapseup.png")
             {
@@ -652,6 +652,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             $('#searchModule').removeAttr('disabled', 'disabled');
         }
         else{
+            $('#expAssign').trigger('click');
             $('#searchModule').attr('disabled', 'disabled');
             }
     }
