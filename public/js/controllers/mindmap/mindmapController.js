@@ -12,7 +12,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $scope.verticalLayout = false;
     $scope.moving = false;
     $scope.apptype = '';
-	$scope.pdmode = false;
+    $scope.pdmode = false;
+    $scope.createdthrough="";
     var sections = {
         'modules': 112,
         'scenarios': 237,
@@ -3256,10 +3257,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 from_v = to_v = $('.version-list').val();
 
             mindmapServices.saveData(versioning_enabled, assignedTo, flag, from_v, to_v, cur_module, mapData, deletednode, unassignTask,
-                $('.project-list').val(), $('.cycle-list').val(), selectedTab, utcTime).then(function(result) {
+                $('.project-list').val(), $('.cycle-list').val(), selectedTab, utcTime,$scope.createdthrough).then(function(result) {
 
                 deletednode = [],
                 deletednode_info = [];
+                $scope.createdthrough="";
                 if (result == "Invalid Session") {
                     return $rootScope.redirectPage();
                 }
@@ -3931,7 +3933,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     if(d.type=="screens" || d.type=="testcases")
                     {
                         if (d.task.cycleid != $('.cycle-list').val()) {
-                            d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10);
+                            d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('style', 'opacity:0.5').attr('x', 29).attr('y', -10);
                             $scope.nodeDisplay[d.id].task = true;
                             $scope.nodeDisplay[d.id].taskOpacity = 0.5;
                         }
@@ -3939,9 +3941,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 }
                 //Enhancement : Part of Issue 1685 showing the task assigned icon little transperent to indicate that task originally do not belongs to this release and cycle but task exists in some other release and cycle
                 else if (d.taskexists && $scope.tab != 'tabCreate' && d.type !="modules" && d.type !="scenarios") {
-                    d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('style', 'opacity:0.6').attr('x', 29).attr('y', -10);
+                    d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('style', 'opacity:0.5').attr('x', 29).attr('y', -10);
                     $scope.nodeDisplay[d.id].task = true;
-                    $scope.nodeDisplay[d.id].taskOpacity = 0.6;
+                    $scope.nodeDisplay[d.id].taskOpacity = 0.5;
                 }
             });
             dLinks = d3Tree.links(dNodes);
@@ -4780,6 +4782,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             addNode_W(d, !0, d.parent);
             if ($scope.tab != 'mindmapEndtoEndModules') {
                 if (d.task != null) d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
+                // else
+                // {
+                //     d3.select('#ct-node-' + d.id).selectAll("img").remove();
+                // }
             }
         });
         dLinks = d3Tree.links(dNodes);
@@ -5465,6 +5471,7 @@ Purpose : displaying pop up for replication of project
 
     $scope.createNewMapModal = function(moduleName) {
         $scope.functionTBE = 'createNewMap';
+        if($scope.createdthrough=="") $scope.createdthrough="Web";
         $("#ct-saveAction").removeClass("disableButton")
         if (Object.keys($scope.nodeDisplay).length != 0)
             $('#createNewConfirmationPopup').modal('show');
@@ -5665,6 +5672,7 @@ Purpose : displaying pop up for replication of project
     }
 
     $scope.getSheetName = function($fileContent) {
+        $scope.createdthrough="Excel";
         $scope.content = $fileContent;
         mindmapServices.excelToMindmap({'content':$scope.content,'flag':'sheetname'}).then(function(result) {
             if (result == "Invalid Session") {
@@ -5780,6 +5788,7 @@ Purpose : displaying pop up for replication of project
     $scope.importFromPD = function(file){
         if(!file) return;
         $scope.pdmode = true;
+        $scope.createdthrough="PD";
         clearSvg();
         blockUI("Importing File.. Please Wait..");
         mindmapServices.pdProcess({'projectid':$('.project-list').val(),'file':file}).then(function(result){
