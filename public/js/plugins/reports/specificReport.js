@@ -229,6 +229,7 @@ function loadReports() {
 
         //Login to Jira
         $(document).on('click', '.resetJiraCredentials', function() {
+            $("#jiraURL, #jiraUserName, #jiraPassword").css('border-color', '#bbb');
             $("#jiraURL").val('');
             $("#jiraUserName").val('');
             $("#jiraPassword").val('');
