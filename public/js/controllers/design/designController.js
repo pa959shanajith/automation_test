@@ -288,7 +288,18 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					taskObj.screenName = data.screenName;
 					window.localStorage['_CT'] = JSON.stringify(taskObj);
 				}
-				
+				if(data.del_flag){
+					//pop up for presence of deleted objects
+					openDialog("Deleted objects found", "Deleted objects found in some teststeps, Please delete or modify those steps.");
+					//disable left-top-section
+					$("#left-top-section").addClass('disableActions');
+					$("a[title='Export TestCase']").addClass('disableActions');
+				}
+				else{
+					//enable left-top-section
+					$("#left-top-section").removeClass('disableActions');
+					$("a[title='Export TestCase']").removeClass('disableActions');
+				}
 				//console.log(data);
 				var appType = taskInfo.appType;
 				$('#jqGrid').removeClass('visibility-hide').addClass('visibility-show');
