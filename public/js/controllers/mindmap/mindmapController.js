@@ -624,7 +624,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $scope.nodeDisplay[node.id] = {
             'type': node.type,
             'transform': "translate(" + (node.x).toString() + "," + (node.y).toString() + ")",
-            'opacity': !(node.id_c == "null" || node.id_c == null || node.id_c == undefined) ? 1 : 0.5,
+            'opacity': !(node._id == null) ? 1 : 0.5,
             'title': node.name,
             'name': node.display_name || node.name,
             '_id': node._id || null
@@ -749,7 +749,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         progressFlag = true;
         $('.fa.fa-pencil-square-o.fa-lg.plus-icon.active-map').trigger('click') //Remove copy rectangle
         $('.fa.fa-clipboard.fa-lg.plus-icon.active-map').trigger('click') //Disable paste
-        saveFlag = false;
+        // saveFlag = false;
+        saveFlag=true;
         SaveCreateED('#ct-createAction', 1, 0);
         $("div.nodeBoxSelected").removeClass("nodeBoxSelected");
         $('[title=' + $('#createNewConfirmationPopup').attr('mapid') + ']').addClass("nodeBoxSelected");
@@ -1293,7 +1294,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             dNodes[e].task = tempTask;
                             dNodes[e].task.copied = true;
                             dNodes[e].task.copiedidx = pi;
-                            d3.select('#ct-node-' + e).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('style', 'opacity:1').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
+                            // d3.select('#ct-node-' + e).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('style', 'opacity:1').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
                         });
                     }
                     dNodes[pi].task.copied = false;
@@ -2054,7 +2055,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             $scope.nodeDisplay[node.id] = {
                 'type': node.type,
                 'transform': "translate(" + (node.x).toString() + "," + (node.y).toString() + ")",
-                'opacity': !(node.id_c == "null" || node.id_c == null || node.id_c == undefined) ? 1 : 0.5,
+                'opacity': !(node._id == null) ? 1 : 0.5,
                 'title': node.name,
                 'name': node.display_name || node.name,
                 '_id':node._id || null
@@ -2591,7 +2592,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var pt = p.select('.ct-nodeLabel');
         var t = p.attr('data-nodetype');
         if (!d3.select('#ct-inpSugg').classed('no-disp') && temp && temp.length > 0) return;
-        if (dNodes[pi].id_n) {
+        if (dNodes[pi]._id) {
             dNodes[pi].original_name = pt.attr('title');
             dNodes[pi].rnm = !0;
         }
@@ -3926,14 +3927,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $scope.nodeDisplay[d.id].task = false;
                 if (d.task != null && $scope.tab != 'tabCreate') {
                     if (d.task.cycleid == $('.cycle-list').val()) {
-                        d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10);
                         $scope.nodeDisplay[d.id].task = true;
                         $scope.nodeDisplay[d.id].taskOpacity = 1;
                     }
                     if(d.type=="screens" || d.type=="testcases")
                     {
                         if (d.task.cycleid != $('.cycle-list').val()) {
-                            d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('style', 'opacity:0.5').attr('x', 29).attr('y', -10);
                             $scope.nodeDisplay[d.id].task = true;
                             $scope.nodeDisplay[d.id].taskOpacity = 0.5;
                         }
@@ -4377,7 +4376,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $scope.nodeDisplay[node.id] = {
             'type': node.type,
             'transform': "translate(" + (node.x).toString() + "," + (node.y).toString() + ")",
-            'opacity': !(node.id_c == "null" || node.id_c == null || node.id_c == undefined) ? 1 : 0.5,
+            'opacity': !(node._id == null) ? 1 : 0.5,
             'title': node.name,
             'name': node.display_name || node.name,
             '_id':node._id || null
@@ -4563,7 +4562,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             $scope.nodeDisplay[node.id] = {
                 'type': node.type,
                 'transform': "translate(" + (node.x).toString() + "," + (node.y).toString() + ")",
-                'opacity': !(node.id_c == "null" || node.id_c == null || node.id_c == undefined) ? 1 : 0.5,
+                'opacity': !(node._id == null) ? 1 : 0.5,
                 'title': node.name,
                 'name': node.display_name || node.name,
                 '_id': node._id || null
