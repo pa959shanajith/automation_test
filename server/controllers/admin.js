@@ -571,6 +571,10 @@ exports.testLDAPConnection = function(req, res){
 				if (flag == "success") {
 					logger.info('LDAP Connection test passed!');
 					if (result && result.users && result.users.length>0) data.fields = Object.keys(result.users[0]);
+					else{ 
+						flag= "fail";
+						logger.error('LDAP Connection test failed!');
+					}
 				} else {
 					logger.error('LDAP Connection test failed!');
 				}

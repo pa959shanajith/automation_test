@@ -145,11 +145,12 @@ exports.readTestSuite_ICE = function (req, res) {
 																"testSuiteDetails": responsedata
 															};
 															responsedata=schedulingDetails;
+															outscenarioidcallback();
 														});
-													}
-												}
-											}
-											outscenarioidcallback();
+													}else outscenarioidcallback();
+												}else outscenarioidcallback();
+											}else outscenarioidcallback();
+											
 										}
 									}, eachSuitecallback);
 
@@ -692,7 +693,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
     }
 }
 
-exports.ExecuteTestSuite_ICE_CI = function (req, res) {
+exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE_CI");
 	if (req.sessionStore.sessions != undefined) {
 		session_list = req.sessionStore.sessions;

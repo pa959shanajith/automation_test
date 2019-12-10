@@ -368,7 +368,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			var expdate=$(".tokeninfo .tokenSuite .datePicContainer .fc-datePicker").val()
 			var exptime=$(".tokeninfo .tokenSuite .timePicContainer .fc-timePicker").val()
 			var tokendetails=userDetails.token;
-			var tokenname=$('#tokenName').val()
+			var tokenname=$('#tokenName').val().trim()
 			var today = new Date()
 			var td = new Date()
 			var expiry=""
@@ -857,11 +857,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	function resetForm() {
 		//$("#selDomain").prop('selectedIndex', 0);
-		$("#selDomain").val("")
+		// $("#selDomain").val("")
 		$("#projectName").val("");
 		$("div.projectTypeSelected").removeClass("projectTypeSelected");
 		$("#releaseList li, #cycleList li").remove();
-		$("#selDomain").empty()
+		// $("#selDomain").empty()
 		$('#releaseList').empty()
 		$('#cycleList').empty()
 		toggleCycleClick();
@@ -1858,7 +1858,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.userConf.click = function(query) {
 		$(".selectedIcon").removeClass("selectedIcon");
-		$scope.userConf.ldapActive=false
+		if (query != 'retainldap'){
+			$scope.userConf.ldapActive=false
+		}
 		$("button.userTypeBtnActive").removeClass('userTypeBtnActive');
 		$("#userTab").find("img").addClass("selectedIcon");
 		this.userId = '';
@@ -2646,6 +2648,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				ldapConf.binddn = data.binddn;
 				ldapConf.bindCredentials = data.bindCredentials;
 				ldapConf.fieldmap = data.fieldmap;
+				ldapConf.fieldMapOpts = []
+				ldapConf.fieldMapOpts.push(ldapConf.fieldmap.uname)
+				ldapConf.fieldMapOpts.push(ldapConf.fieldmap.fname)
+				ldapConf.fieldMapOpts.push(ldapConf.fieldmap.lname)
+				ldapConf.fieldMapOpts.push(ldapConf.fieldmap.email)
 			}
 		}, function (error) {
 			unblockUI();

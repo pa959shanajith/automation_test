@@ -539,7 +539,7 @@ if (cluster.isMaster) {
 		//app.post('/updateTestScenario_ICE', suite.updateTestScenario_ICE);
 		app.post('/ExecuteTestSuite_ICE', suite.ExecuteTestSuite_ICE);
 		app.post('/getTestcaseDetailsForScenario_ICE', suite.getTestcaseDetailsForScenario_ICE);
-		app.post('/ExecuteTestSuite_ICE_CI', suite.ExecuteTestSuite_ICE_CI);
+		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_SVN);
 		//app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
 		// app.post('/getListofScheduledSocketMap',suite.getListofScheduledSocketMap);
 

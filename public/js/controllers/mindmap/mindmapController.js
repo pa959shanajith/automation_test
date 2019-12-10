@@ -1192,7 +1192,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         function addTask_11(pi, tObj, qid, cTask) {
             var cycleid=$('.cycle-list').val();
             var validate = checkAndUpdate(dNodes[pi], []);
-            var taskUndef = (dNodes[pi].task === undefined || dNodes[pi].task == null);
+            var taskUndef = (dNodes[pi].task === undefined || dNodes[pi].task == null || (dNodes[pi].task != null && dNodes[pi].task.status== "complete"));
             var origTask = ([0, 4, 7, 9].indexOf(qid) != -1); // Orignal tasks not cascaded  
             var taskStatus;
             // if(dNodes[pi].type=="screens" || dNodes[pi].type=="testcases")
@@ -1662,7 +1662,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 f = w.append('ul').attr('class', 'ct-asValCalBox dropdown-menu'); //.on('click',$('.ct-asValBoxIcon.ct-asItemCal.btn.dropdown-toggle').datepicker());
                 if (tObj.sd != '' && tObj.sd.indexOf('/')==-1) {
                     var d=new Date(tObj.sd);
-                    tObj.sd=d.getDate()+"/"+d.getMonth()+"/"+d.getFullYear();
+                    tObj.sd=d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear();
                     $("#startDate").attr('disabled', 'disabled');
                 }
                 $("#startDate").val(tObj.sd);
@@ -1684,7 +1684,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 });
                 if (tObj.ed != '' && tObj.ed.indexOf('/')==-1) {
                     var d=new Date(tObj.ed);
-                    tObj.ed=d.getDate()+"/"+d.getMonth()+"/"+d.getFullYear();
+                    tObj.ed=d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear();
                 }
                 f = w.append('ul').attr('class', 'ct-asValCalBox dropdown-menu'); //.on('click',$('.ct-asValBoxIcon.ct-asItemCal.btn.dropdown-toggle').datepicker());
                 $("#endDate").val(tObj.ed);
