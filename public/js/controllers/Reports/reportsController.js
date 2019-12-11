@@ -726,20 +726,24 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             else if (data[i].browser.toLowerCase() == "safari") browserIcon = "ic-reports-safari.png";
                             if (browserIcon) brow = "imgs/" + browserIcon;
                             else brow = "imgs/no_img1.png"
-                            if (data[i].status == "Pass") {
+                            if (data[i].status.toLowerCase() == "pass") {
                                 pass++;
+                                status="Pass"
                                 styleColor = "style='color: #28a745 !important; text-decoration-line: none;'";
-                            } else if (data[i].status == "Fail") {
+                            } else if (data[i].status.toLowerCase() == "fail") {
                                 fail++;
+                                status="Fail"
                                 styleColor = "style='color: #dc3545 !important; text-decoration-line: none;'";
-                            } else if (data[i].status == "Terminate") {
+                            } else if (data[i].status.toLowerCase() == "terminate") {
                                 terminated++;
+                                status="Terminate"
                                 styleColor = "style='color: #ffc107 !important; text-decoration-line: none;'";
-                            } else if (data[i].status == "Incomplete") {
+                            } else if (data[i].status.toLowerCase() == "incomplete") {
                                 incomplete++;
+                                status="Incomplete"
                                 styleColor = "style='color: #343a40 !important; text-decoration-line: none;'";
                             }
-                            scenarioContainer.append("<tr class='scenarioTblReport'><td title='" + data[i].testscenarioname + "'>" + data[i].testscenarioname + "</td><td><span>" + data[i].executedtime.trim() + "</span></td></td><td class='openReports' data-reportid='" + data[i].reportid + "'><a class='openreportstatus' " + styleColor + ">" + data[i].status + "</a></td><td class='viewReports'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'></td></tr>");
+                            scenarioContainer.append("<tr class='scenarioTblReport'><td title='" + data[i].testscenarioname + "'>" + data[i].testscenarioname + "</td><td><span>" + data[i].executedtime.trim() + "</span></td></td><td class='openReports' data-reportid='" + data[i].reportid + "'><a class='openreportstatus' " + styleColor + ">" + status + "</a></td><td class='viewReports'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'></td></tr>");
                         }
                         if ($('.scenarioTblReport').length > 0) {
                             $("tr.scenarioTblReport:even").removeClass('even').addClass('even');
