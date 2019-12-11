@@ -148,7 +148,12 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 						$("span.filterIcon").removeClass('disableFilter');
 					}
 					for(i=0;i<data.projectId.length;i++){
-						$scope.filterDat.apptypes[data.projectId[i]]=data.appTypeName[i]
+
+						if($scope.filterDat.apptypes.indexOf(data.appTypeName[i])==-1)
+						{
+							// $scope.filterDat.apptypes.push(obj.appType);
+							$scope.filterDat.apptypes.push(data.appTypeName[i]);
+						}
 						$scope.filterDat.idnamemapprj[data.projectId[i]] = data.projectName[i];
 						releases=data.releases[i];
 						for(j=0;j<releases.length;j++){
@@ -483,10 +488,11 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 				return;
 			}
 			var clktask = $scope.taskJson[clickedtask];
+			var maintask = clktask;
 			var filterDat = $scope.filterDat;
 			if(clktask.taskDetails[0].taskType != 'Design')
 				clktask = clktask.testSuiteDetails[0];
-			var adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+filterDat.idnamemaprel[clktask.releaseid]+'">Release: '+filterDat.idnamemaprel[clktask.releaseid]+'</li><li class="description-item" title="Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'">Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'</li><li class="description-item" title="Apptype: '+filterDat.apptypes[clktask.projectId]+'">Apptype: '+filterDat.apptypes[clktask.projectId]+'</li></div>';
+			var adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+filterDat.idnamemaprel[clktask.releaseid]+'">Release: '+filterDat.idnamemaprel[clktask.releaseid]+'</li><li class="description-item" title="Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'">Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'</li><li class="description-item" title="Apptype: '+maintask.appType+'">Apptype: '+maintask.appType+'</li></div>';
 			$(adddetailhtml).insertAfter("[panel-id="+clickedtask+"]");
 			$("[panel-id="+clickedtask+"]").addClass("active-task");
 		});		
@@ -556,11 +562,11 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 				return;
 			}
 			var clktask = $scope.taskJson[clickedtask];
-			var maintask = clktask
+			var maintask = clktask;
 			var filterDat = $scope.filterDat;
 			if(clktask.taskDetails[0].taskType != 'Design')
 				clktask = clktask.testSuiteDetails[0];
-			adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+filterDat.idnamemaprel[clktask.releaseid]+'">Release: '+filterDat.idnamemaprel[clktask.releaseid]+'</li><li class="description-item" title="Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'">Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'</li><li class="description-item" title="Apptype: '+filterDat.apptypes[maintask.projectId]+'">Apptype: '+filterDat.apptypes[maintask.projectId]+'</li></div>';
+			adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+filterDat.idnamemaprel[clktask.releaseid]+'">Release: '+filterDat.idnamemaprel[clktask.releaseid]+'</li><li class="description-item" title="Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'">Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'</li><li class="description-item" title="Apptype: '+maintask.appType+'">Apptype: '+maintask.appType+'</li></div>';
 			$(adddetailhtml).insertAfter("[panel-id="+clickedtask+"]");
 			$("[panel-id="+clickedtask+"]").addClass("active-task");
 		});
