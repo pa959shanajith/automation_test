@@ -3971,8 +3971,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					scrapeObject.editedListoldCustName.push($(this).children(".toMergeObj").text());
 					scrapeObject.editedListoldXpath.push($(this).children(".toMergeObj").data("xpath"));
 					scrapeObject.editedListmodifiedXpaths.push($(this).children(".fromMergeObj").data("xpath"));
-					scrapeObject.fromMerge.push([$(this).children(".fromMergeObj").data("id"),$(this).children(".toMergeObj").text()])
-					scrapeObject.toMerge.push($(this).children(".toMergeObj").data("id"))
+					scrapeObject.fromMerge.push($(this).children(".fromMergeObj").data("id"))//[$(this).children(".fromMergeObj").data("id"),$(this).children(".toMergeObj").text()])
+					scrapeObject.toMerge.push([$(this).children(".toMergeObj").data("id"),$(this).children(".fromMergeObj").data("id"),$(this).children(".toMergeObj").text()])
 					/***Resetting Values to Default***/
 					$(this).children(".showPreviousVal").hide();
 					$(this).children(".fromMergeObj").remove();
