@@ -1098,41 +1098,44 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					return $rootScope.redirectPage();
 				}
 				if (typeof data === "object") {
-					data = data[0]
-					//Printing the Save data in UI
-					$("#endPointURL").val(data.endPointURL);
-					$("#wsdlMethods option").each(function () {
-						if ($(this).val() == data.method) {
-							$(this).prop("selected", true)
+					try{
+						data = data[0]
+						//Printing the Save data in UI
+						$("#endPointURL").val(data.endPointURL);
+						$("#wsdlMethods option").each(function () {
+							if ($(this).val() == data.method) {
+								$(this).prop("selected", true)
+							}
+						})
+						$("#wsdlOperation").val(data.operations)
+						//Printing Request Data
+						$("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
+						if (data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0) {
+							var jsonStr = data.body;
+							var jsonObj = JSON.parse(jsonStr);
+							var jsonPretty = JSON.stringify(jsonObj, null, '\t');
+							xml_neat2 = jsonPretty;
+							$("#wsdlRequestBody").val(jsonPretty)
+						} else {
+							var getXML = formatXml(data.body[0].replace(/>\s+</g, '><'));
+							$("#wsdlRequestBody").val(getXML)
 						}
-					})
-					$("#wsdlOperation").val(data.operations)
-					//Printing Request Data
-					$("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
-					if (data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0) {
-						var jsonStr = data.body;
-						var jsonObj = JSON.parse(jsonStr);
-						var jsonPretty = JSON.stringify(jsonObj, null, '\t');
-						xml_neat2 = jsonPretty;
-						$("#wsdlRequestBody").val(jsonPretty)
-					} else {
-						var getXML = formatXml(data.body[0].replace(/>\s+</g, '><'));
-						$("#wsdlRequestBody").val(getXML)
-					}
 
-					//Printing Response Data
-					$("#wsdlResponseHeader").val(data.responseHeader[0].split("##").join("\n"));
-					if (data.responseBody[0].indexOf("{") == 0 || data.responseBody[0].indexOf("[") == 0) {
-						var jsonStr = data.responseBody;
-						var jsonObj = JSON.parse(jsonStr);
-						var jsonPretty = JSON.stringify(jsonObj, null, '\t');
-						xml_neat2 = jsonPretty;
-						$("#wsdlResponseBody").val(jsonPretty)
-					} else {
-						var getXML = formatXml(data.responseBody[0].replace(/>\s+</g, '><'));
-						$("#wsdlResponseBody").val(getXML)
+						//Printing Response Data
+						$("#wsdlResponseHeader").val(data.responseHeader[0].split("##").join("\n"));
+						if (data.responseBody[0].indexOf("{") == 0 || data.responseBody[0].indexOf("[") == 0) {
+							var jsonStr = data.responseBody;
+							var jsonObj = JSON.parse(jsonStr);
+							var jsonPretty = JSON.stringify(jsonObj, null, '\t');
+							xml_neat2 = jsonPretty;
+							$("#wsdlResponseBody").val(jsonPretty)
+						} else {
+							var getXML = formatXml(data.responseBody[0].replace(/>\s+</g, '><'));
+							$("#wsdlResponseBody").val(getXML)
+						}
+					} catch(err) {
+						console.log(err)
 					}
-
 					//Printing the Save data in UI
 					if ($("#wsdlRequestHeader, #wsdlRequestBody").val().length > 0) {
 						$(".saveWS").prop("disabled", true);
