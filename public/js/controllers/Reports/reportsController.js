@@ -83,6 +83,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         var projectId = $('.project-list option:selected').val();
         blockUI("Loading releases.. please wait..");
         $(".moduleBox,.mid-report-section,#accordion").hide();
+        $("#report-header,#report-canvas").hide();
         $('#nodeBox').empty();
         $('#ctExpandAssign').css('pointer-events','none');
         $("#expAssign").attr('src', 'imgs/ic-collapse.png');
