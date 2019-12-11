@@ -4104,6 +4104,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             parsed_project_data = project_type;
                             data.moduleInfo[0].cycleId = project_type['releases'][0]["cycles"][0]["_id"];
                             data.moduleInfo[0].releaseId = project_type['releases'][0]["name"];
+                            data.moduleInfo[0].appType = project_type['project_typename'];
                             var responseData = JSON.stringify(data);
                             jsonDownload('moduleinfo.json', responseData);
                             var response_execution_data = JSON.stringify(execution_data);
