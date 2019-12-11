@@ -143,8 +143,8 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 			if(result == "fail"){}
 			else if(result && result.length > 0){
 				for(var k=0; k<result.length; k++){
-					result[k].browserlist = JSON.parse(result[k].browserlist);
-					result[k].scenariodetails = JSON.parse(result[k].scenariodetails);
+					result[k].browserlist = result[k].executeon;
+					result[k].scenariodetails = result[k].scenariodetails;
 					result[k].scheduledatetime = new Date(result[k].scheduledon).getFullYear()+"-"
 					+("0" + (new Date(result[k].scheduledon).getMonth()+1)).slice(-2)+"-"
 					+("0" + new Date(result[k].scheduledon).getUTCDate()).slice(-2)+" "
