@@ -1486,3 +1486,911 @@ function testcasedetails_testscenarios(req, cb) {
 		}
 	});
 }
+
+
+
+/***********************Scheduling jobs***************************/
+exports.testSuitesScheduler_ICE = function (req, res) {
+	logger.info("Inside UI service testSuitesScheduler_ICE");
+	if (utils.isSessionActive(req)) {
+		var ExecutionData=req.body.moduleInfo;
+		if(taskflow){
+			// utils.approval_status_check(ExecutionData, function (err, approved) {
+			// 	if (approved) testSuitesScheduler_ICE_cb(req,res);
+			// 	else {
+			// 		res.status(err.status).send(err.res);
+			// 	}
+			// });
+		}else{
+			testSuitesScheduler_ICE_cb(req,res);
+		}
+	} else {
+		logger.error("Error in the service testSuitesScheduler_ICE: Invalid Session");
+		res.send("Invalid Session");
+	}
+};
+		
+function testSuitesScheduler_ICE_cb (req, res) {
+	if(req.body.chkType == "schedule"){			
+		var modInfo = req.body.moduleInfo;
+		var exc_action = req.body.action;
+		logger.info("Calling function scheduleTestSuite from testSuitesScheduler_ICE");
+		scheduleTestSuite(modInfo,exc_action, req, function (err, schedulecallback) {
+			try {
+				logger.info("TestSuite Scheduled successfully");
+				res.send(schedulecallback);
+			} catch (exception) {
+				logger.error("Exception in the service testSuitesScheduler_ICE: %s",exception);
+				res.send("fail");
+			}
+		});
+	}
+	else{
+		var data = req.body.details;
+		var inputs = {
+			"scheduledatetime": data.curDate,
+			"clientipaddress": data.clientipaddress,
+			"scheduledetails": "checkscheduleddetails",
+			"query": "getallscheduledetails"
+		};
+		var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
+		logger.info("Calling NDAC Service from testSuitesScheduler_ICE: suite/ScheduleTestSuite_ICE");
+		client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
+			function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.error("Error occurred in suite/ScheduleTestSuite_ICE from testSuitesScheduler_ICE service, Error Code : ERRNDAC");
+					res.send("fail");
+				} else {
+					res.send(result.rows);
+				}
+		});
+	}
+};
+
+//Schedule Testsuite normal and when server restart
+function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
+	logger.info("Inside scheduleTestSuite function");
+	var schedulingData = modInfo;
+	var action = exc_action;
+	var schDate, schTime, cycleId, scheduleId, clientIp, scenarioDetails;
+	var browserList, testSuiteId;
+
+	var schedFlag,rescheduleflag;
+	var counter = 0;
+	async.forEachSeries(schedulingData, function (itr, Callback) {
+		schDate = itr.date;
+		schDate = schDate.split("-");
+		schTime = itr.time;
+		schTime = schTime.split(":");
+		rescheduleflag = itr.reschedule;
+		//var dateTime = rescheduleflag != true ? new Date(Date.UTC(schDate[2], (schDate[1] - 1), schDate[0], schTime[0], schTime[1], 0)) : new Date(schDate[2], (schDate[1] - 1), schDate[0], schTime[0], schTime[1], 0);
+		var dateTime = new Date(Date.UTC(schDate[2], (schDate[1] - 1), schDate[0], schTime[0], schTime[1], 0));
+		//cycleId = itr.cycleid;		
+		browserList = itr.browserType;
+		clientIp = itr.Ip;
+		scheduleStatus = "scheduled";
+		testSuiteId = itr.testsuiteid;
+		testSuitename = itr.testsuitename;
+		versionnumber = itr.versionnumber;
+		scenarioDetails = itr.suiteDetails;
+		var sessObj;
+		//Normal scheduling
+		if (rescheduleflag != true) {
+			scheduleId = uuid();
+			sessObj = cycleId + ";" + scheduleId + ";" + dateTime.valueOf().toString();
+			var inputs = {
+				//"cycleid": cycleId,
+				"scheduledatetime": dateTime.valueOf().toString(),
+				"scheduleid": scheduleId,
+				"browserlist": browserList,
+				"clientipaddress": clientIp,
+				"userid": schedulingData[0].userInfo.user_id,
+				"scenariodetails": JSON.stringify(scenarioDetails),
+				"schedulestatus": scheduleStatus,
+				"testsuiteids": [testSuiteId],
+				"testsuitename": testSuitename,
+				"query": "insertscheduledata"
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			try {
+				logger.info("Calling NDAC Service from scheduleTestSuite: suite/ScheduleTestSuite_ICE");
+				client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
+					function (result, response) {
+					if (response.statusCode != 200 || result.rows == "fail") {
+						logger.error("Error occurred in suite/ScheduleTestSuite_ICE from scheduleTestSuite Error Code : ERRNDAC");
+						schedFlag = "fail";
+						schedcallback(null, schedFlag);
+					} else {
+						var obj = new Date(schDate[2], (schDate[1] - 1), schDate[0], schTime[0], schTime[1]);
+						try {
+							var scheduledjob = schedule.scheduleJob(sessObj, obj, function () {
+								logger.info("Calling function executeScheduling from scheduleTestSuite");
+								executeScheduling(sessObj, action, schedulingData, req);
+								Callback();
+							});
+							counter++;
+							//Callback();
+						} catch (ex) {
+							logger.error("Exception in the function executeScheduling from scheduleTestSuite: %s", ex);
+							scheduleStatus = "Failed 02";
+							logger.info("Calling function updateStatus from scheduleTestSuite");
+							updateStatus(sessObj, function (err, data) {
+								if (!err) {
+									logger.info("Scheduling status updated successfully", data);
+								}
+								Callback();
+							});
+						}
+					}
+				});
+			} catch (exception) {
+				logger.error("Exception in the function executeScheduling from scheduleTestSuite: Normal scheduling: %s", exception);
+				schedFlag = "fail";
+				schedcallback(null, schedFlag);
+			}
+		} else {
+			//Rescheduling jobs on server restart
+			scheduleId = itr.scheduleid;
+			sessObj = scheduleId + ";" + dateTime.valueOf().toString();
+			var obj = new Date(schDate[2], (schDate[1] - 1), schDate[0], schTime[0], schTime[1], 0); //new Date(schDate[2], (schDate[1] - 1), schDate[0], schTime[0], schTime[1], 0);
+			try {
+				var scheduledjob = schedule.scheduleJob(sessObj, obj, function () {
+					logger.info("Calling function executeScheduling from scheduleTestSuite: reshedule");
+					executeScheduling(sessObj, schedulingData, req);
+					Callback();
+				});
+				counter++;
+			} catch (ex) {
+				logger.error("Exception in the function executeScheduling from scheduleTestSuite: reshedule: %s", ex);
+				scheduleStatus = "Failed 02";
+				updateStatus(sessObj, function (err, data) {
+					if (!err) {
+						logger.info("Scheduling status updated successfully", data);
+						
+					}
+					Callback();
+				});
+			}
+		}
+	}, function () {
+		logger.info("Inside final function of executeScheduling");
+		// if (deleteFlag != true) doneFlag = 1;
+		// if (doneFlag == 1) {
+		if (schedulingData.length == counter) {
+			schedFlag = "success";
+			schedcallback(null, schedFlag);
+		} else if (counter > 0) {
+			schedFlag = "few";
+			schedcallback(null, schedFlag);
+		} else if (counter == 0) {
+			schedFlag = "fail";
+			schedcallback(null, schedFlag);
+		}
+		// }
+	});
+
+	//Executing test suites on scheduled time
+	// function executeScheduling(sessObj, action, schedulingData, req) {
+	// 	logger.info("Inside executeScheduling function");
+	// 	var inputs = {
+	// 		"cycleid": sessObj.split(";")[0],
+	// 		"scheduledatetime": sessObj.split(";")[2],
+	// 		"scheduleid": sessObj.split(";")[1],
+	// 		"query": "getscheduledata"
+	// 	};
+	// 	var args = {
+	// 		data: inputs,
+	// 		headers: {
+	// 			"Content-Type": "application/json"
+	// 		}
+	// 	};
+	// 	var executionRequest = {
+	// 		"exec_mode" : action,
+	// 		"executionId": "",
+	// 		"suitedetails": [],
+	// 		"testsuiteIds": []
+	// 	};
+	// 	var result = ''
+	// 	async.series({
+	// 		schedule_suite:function(callback_E){
+	// 			logger.info("Calling NDAC Service from executeScheduling: suite/ScheduleTestSuite_ICE");
+	// 			client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
+	// 				function (result, response) {
+	// 				if (response.statusCode != 200 || result.rows == "fail") {
+	// 					logger.error("Error occurred in suite/ScheduleTestSuite_ICE from executeScheduling Error Code : ERRNDAC");
+	// 					scheduleStatus = "Failed 02";
+	// 					logger.info("Calling function updateStatus from executeScheduling");
+	// 					updateStatus(sessObj, function (err, data) {
+	// 						if (!err) {
+	// 							logger.info("Scheduling status updated successfully", data);
+	// 						}
+	// 					});
+	// 					// deleteFlag = true;
+	// 					// deleteScheduledData(deleteFlag, sessObj)
+						
+	// 					callback_E();
+	// 				}else{
+	// 					result = result;
+	// 					callback_E()
+	// 				}
+	// 			})
+	// 		},suite_execution:function(callback_E){
+	// 			if (result.rows[0].schedulestatus == "scheduled") {
+	// 				var suiteDetails = JSON.parse(result.rows[0].scenariodetails);
+	// 				var testsuitedetailslist = [];
+	// 				var testsuiteid = JSON.parse(JSON.stringify(result.rows[0].testsuiteids))[0];
+	// 				var testsuitenm = result.rows[0].testsuitename;
+	// 				var browserType = JSON.parse(result.rows[0].browserlist);
+	// 				var scenarioIdList = [];
+	// 				var dataparamlist = [];
+	// 				var conditionchecklist = [];
+	// 				var browserTypelist = [];
+	// 				var listofscenarioandtestcases = [];
+	// 				var appType;
+					
+	// 				async.forEachSeries(suiteDetails, function (eachsuiteDetails, eachsuiteDetailscallback) {
+	// 					var executionjson = {
+	// 						"scenarioIds": [],
+	// 						"browserType": [],
+	// 						"dataparampath": [],
+	// 						"condition": [],
+	// 						"testsuitename": ""
+	// 					};
+	// 					var currentscenarioid = "";
+	// 					scenarioIdList.push(eachsuiteDetails.scenarioids);
+	// 					dataparamlist.push(eachsuiteDetails.dataparam[0]);
+	// 					conditionchecklist.push(eachsuiteDetails.condition);
+	// 					browserTypelist = browserType;
+	// 					currentscenarioid = eachsuiteDetails.scenarioids;
+	// 					appType = eachsuiteDetails.appType;
+	// 					logger.info("Calling function TestCaseDetails_Suite_ICE from executeScheduling");
+	// 					var uid = rescheduleflag != true ? schedulingData[0].userInfo.user_id : schedulingData[0].userid;
+	// 					TestCaseDetails_Suite_ICE(currentscenarioid, uid, function (currentscenarioidError, currentscenarioidResponse) {
+	// 						var scenariotestcaseobj = {};
+	// 						if (currentscenarioidError) {
+	// 							logger.error("Error occurred in the function TestCaseDetails_Suite_ICE from executeScheduling Error Code - ERRNDAC: %s", currentscenarioidError);
+	// 						} else {
+	// 							if (currentscenarioidResponse != null || currentscenarioidResponse != undefined) {
+	// 								scenariotestcaseobj[currentscenarioid] = currentscenarioidResponse.listoftestcasedata;
+	// 								scenariotestcaseobj.qccredentials = eachsuiteDetails.qccredentials;
+	// 								scenariotestcaseobj.qcdetails = currentscenarioidResponse.qcdetails;
+	// 								listofscenarioandtestcases.push(scenariotestcaseobj);
+	// 								eachsuiteDetailscallback();
+	// 							}
+	// 							if (listofscenarioandtestcases.length == suiteDetails.length) {
+	// 								logger.info("Calling updateData function TestCaseDetails_Suite_ICE from executeScheduling");
+	// 								executionjson[testsuiteid] = listofscenarioandtestcases;
+	// 								executionjson.scenarioIds = scenarioIdList;
+	// 								executionjson.browserType = browserTypelist;
+	// 								executionjson.condition = conditionchecklist;
+	// 								executionjson.dataparampath = dataparamlist;
+	// 								executionjson.testsuiteid = testsuiteid;
+	// 								executionjson.testsuitename = testsuitenm;
+	// 								testsuitedetailslist.push(executionjson);
+	// 								executionRequest.executionId = JSON.parse(JSON.stringify(result.rows[0].scheduleid));
+	// 								executionRequest.suitedetails = testsuitedetailslist;
+	// 								executionRequest.testsuiteIds.push(testsuiteid);
+	// 								executionRequest.apptype = appType;
+	// 								//batchExecutionDataCallback();
+	// 								logger.info("Calling scheduleFunction function TestCaseDetails_Suite_ICE from executeScheduling");
+	// 								callback_E()
+	// 							}
+	// 						}
+	// 					});
+						
+	// 				});
+					
+					
+	// 			}
+
+
+	// 		},
+	// 		execution_insertion:function(callback_E){ 
+	// 			insertExecutionStatus(req.session.userid,function(res){
+	// 			   if(res == 'fail'){
+	// 				   executionId = '';
+	// 			   }else{
+	// 				   executionRequest.executionId = res;
+	// 			   }
+	// 			   callback_E();
+	// 		   });
+	// 	   },execute_function:function(callback_E){
+	// 		// function scheduleFunction(executionRequest) {
+	// 			logger.info("Inside scheduleFunction function of executeScheduling");
+	// 			var name = ipAdd;
+	// 			redisServer.redisSubServer.subscribe('ICE2_' + name);	
+	// 			//var scenarioCount_s = executionRequest.suitedetails[0].scenarioIds.length;
+	// 			var completedSceCount_s = 0;
+	// 			var testsuitecount_s = 0;
+	// 			var statusPass_s = 0;
+	// 			var suiteStatus_s;
+	// 			logger.debug("ICE Socket requesting Address: %s" , name);
+	// 			redisServer.redisPubICE.pubsub('numsub','ICE1_scheduling_' + name,function(err,redisres){
+	// 				if (redisres[1]>0) {
+	// 					logger.info("Sending socket request for executeTestSuite:scheduling to redis");
+	// 					dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
+	// 					redisServer.redisPubICE.publish('ICE1_scheduling_' + name,JSON.stringify(dataToIce));
+	// 					var starttime = new Date().getTime();
+	// 					function executeTestSuite_listener(channel,message) {
+	// 						data = JSON.parse(message);
+	// 						if(name == data.username){
+	// 							if (data.onAction == "return_status_executeTestSuite") {
+	// 								var response = data.value;
+	// 								if(response.status == "success"){
+	// 									scheduleStatus = "Inprogress";
+	// 									logger.info("Calling function updateStatus from scheduleFunction");
+	// 									updateStatus(sessObj, function (err, data) {
+	// 										if (!err) {
+	// 											logger.info("Sending response data from scheduleFunction");
+	// 										}
+	// 									});
+	// 								}
+	// 								else if(response.status == "skipped"){
+	// 									scheduleStatus = "Inprogress";
+	// 									logger.info("Calling function updateSkippedScheduleStatus from scheduleFunction");
+	// 									var sessobj_new = sessObj + ';Skipped;' +  JSON.stringify(result.rows[0]) + ';' +JSON.stringify(response.data);
+	// 									var msg = "The scenario was skippped due to conflicting schedules.";
+	// 									updateSkippedScheduleStatus(sessobj_new, msg, function (err, data){
+	// 										if(!err){
+	// 											logger.info("Sending response data from scheduleFunction");
+	// 										}
+	// 									});
+	// 								}
+	// 							} else if (data.onAction == "result_executeTestSuite") {
+	// 								var resultData = data.value;
+	// 								if (resultData != "success" && resultData != "Terminate") {
+	// 									//completedSceCount_s++;
+	// 									//scenarioCount_s = executionRequest.suitedetails[testsuitecount_s].scenarioIds.length;
+	// 									try {
+	// 										completedSceCount_s++;
+	// 										scenarioCount_s = executionRequest.suitedetails[testsuitecount_s].scenarioIds.length  * executionRequest.suitedetails[testsuitecount_s].browserType.length;
+	// 										var scenarioid = resultData.scenarioId;
+	// 										var executionid = resultData.executionId;
+	// 										var reportdata = resultData.reportData;
+	// 										var testsuiteid = resultData.testsuiteId;
+	// 										var req_report = resultData.reportdata;
+	// 										var req_reportStepsArray = reportdata.rows;
+	// 										if (reportdata.overallstatus.length != 0) {
+	// 											var req_overAllStatus = reportdata.overallstatus;
+	// 											var req_browser = reportdata.overallstatus[0].browserType;
+	// 											reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
+	// 											reportdata = JSON.parse(reportdata);
+	// 											var reportId = uuid();
+	// 											if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
+	// 												statusPass_s++;
+	// 											}
+	// 											var inputs = {
+	// 												"reportid": reportId,
+	// 												"executionid": executionid,
+	// 												"testsuiteid": testsuiteid,
+	// 												"testscenarioid": scenarioid,
+	// 												"browser": req_browser,
+	// 												"cycleid":result.rows[0].cycleid,
+	// 												"status": resultData.reportData.overallstatus[0].overallstatus,
+	// 												"report": JSON.stringify(reportdata),
+	// 												"query": "insertreportquery"
+	// 											};
+	// 											var args = {
+	// 												data: inputs,
+	// 												headers: {
+	// 													"Content-Type": "application/json"
+	// 												}
+	// 											};
+	// 											logger.info("Calling NDAC Service from scheduleFunction: suite/ExecuteTestSuite_ICE");
+	// 											client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+	// 												function (result, response) {
+	// 												if (response.statusCode != 200 || result.rows == "fail") {
+	// 													logger.error("Error occurred in suite/ExecuteTestSuite_ICE from scheduleFunction, Error Code : ERRNDAC");
+	// 													flag = "fail";
+	// 												} else {
+	// 													flag = "success";
+	// 												}
+	// 											});
+	// 											if (completedSceCount_s == scenarioCount_s) {
+	// 												if (statusPass_s == scenarioCount_s) {
+	// 													suiteStatus_s = "pass";
+	// 												} else {
+	// 													suiteStatus_s = "fail";
+	// 												}
+	// 												completedSceCount_s = 0;
+	// 												testsuitecount_s++;
+	// 												logger.info("Calling function updateSchedulingStatus from scheduleFunction");
+	// 												updateSchedulingStatus(testsuiteid, executionid, starttime, suiteStatus_s);
+	// 											}
+	// 										} else {
+	// 											completedSceCount_s++;
+	// 											scenarioCount_s = executionRequest.suitedetails[testsuitecount_s].scenarioIds.length;
+	// 											if (completedSceCount_s == scenarioCount_s) {
+	// 												suiteStatus_s = "Fail";
+	// 												completedSceCount_s = 0;
+	// 												testsuitecount_s++;
+	// 												logger.info("Calling function updateExecutionStatus from scheduleFunction");
+	// 												updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus_s);
+	// 											}
+	// 										}
+	// 									} catch (ex) {
+	// 										logger.error("Exception occurred in the scheduleFunction: %s", ex);
+	// 									}
+	// 								}
+	// 								else if (resultData) {
+	// 									if (typeof(resultData) == "string") {
+	// 										redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
+	// 										scheduleStatus = resultData == "success" ? "Completed" : resultData;
+	// 									} 
+	// 									// else if (typeof(resultData) == "object") {
+	// 									// 	var stat = resultData.reportData.overallstatus[0].overallstatus;
+	// 									// 	scheduleStatus = stat == "success" ? "Completed" : stat;
+	// 									// }
+	// 									try {
+	// 										logger.info("Calling function updateStatus from scheduleFunction");
+	// 										updateStatus(sessObj, function (err, data) {
+	// 											if (!err) {
+	// 												logger.info("Sending response data from scheduleFunction");
+	// 											}
+	// 										});
+	// 										//res.send(resultData);
+	// 									} catch (ex) {
+	// 										logger.error("Exception occurred in the updateStatus function of scheduleFunction: %s", ex);
+	// 									}
+	// 								}
+	// 							}
+	// 						}
+	// 					}
+	// 					redisServer.redisSubServer.on("message",executeTestSuite_listener);
+	// 				} else {
+	// 					logger.error("Error occurred in the function scheduleFunction: Socket not Available");
+	// 					// deleteFlag = true;
+	// 					// deleteScheduledData(deleteFlag, sessObj)
+	// 					var testsuiteid = JSON.parse(JSON.stringify(result.rows[0].testsuiteids))[0];
+	// 					var scheduleid = JSON.parse(JSON.stringify(result.rows[0].scheduleid));
+	// 					var d = {};
+	// 					d[testsuiteid]=[];
+	// 					var scenariodetails = JSON.parse(result.rows[0].scenariodetails);
+	// 					for(var i=0;i<scenariodetails.length;i++){
+	// 						(d[testsuiteid]).push(scenariodetails[i].scenarioids);
+	// 					}
+	// 					var datetime = new Date();
+	// 					datetime = datetime.getFullYear()+'-'+(datetime.getMonth()+1)+'-'+datetime.getDate()+' '+datetime.getHours()+':'+datetime.getMinutes()+':'+datetime.getSeconds()+'0';
+	// 					var data = {'scenario_ids':d,'execution_id':scheduleid,'time':String(datetime)};
+	// 					var sessobj_new = sessObj + ';Skipped;' +  JSON.stringify(result.rows[0]) + ';' +JSON.stringify(data);
+	// 					var msg = "The scenario was skipped due to unavailability of schedule mode/ICE.";
+	// 					logger.info("Calling function updateSkippedScheduleStatus from scheduleFunction");
+	// 					updateSkippedScheduleStatus(sessobj_new, msg, function (err, data) {
+	// 						if (!err) {
+	// 							logger.info("Sending response data from scheduleFunction");
+	// 						}
+	// 					});
+	// 				}
+	// 			});
+	// 		}
+	// 	//    }
+	// 	})
+	// 	try {
+			
+	// 	} catch (exception) {
+	// 		logger.error("Exception occurred in the executeScheduling function: %s", ex);
+	// 		// deleteFlag = true;
+	// 		// deleteScheduledData(deleteFlag, sessObj)
+	// 		scheduleStatus = "Failed 02";
+	// 		logger.info("Calling function updateStatus from executeScheduling");
+	// 		updateStatus(sessObj, function (err, data) {
+	// 			if (!err) {
+	// 				logger.info("Sending response data from executeScheduling");
+	// 			}
+	// 		});
+	// 	}
+	// }
+
+	//Update execution table on completion of suite execution
+	function updateSchedulingStatus(testsuiteid, executionid, starttime, suiteStatus_s) {
+		logger.info("Inside updateSchedulingStatus function");
+		var inputs = {
+			"testsuiteid": testsuiteid,
+			"executionid": executionid,
+			"starttime": starttime.toString(),
+			"status": suiteStatus_s,
+			"query": "inserintotexecutionquery"
+		};
+		var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
+		logger.info("Calling NDAC Service from updateSchedulingStatus: suite/ExecuteTestSuite_ICE");
+		client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+			function (result, response) {
+			if (response.statusCode != 200 || result.rows == "fail") {
+				logger.error("Error occurred in suite/ExecuteTestSuite_ICE from updateSchedulingStatus, Error Code : ERRNDAC");
+				flag = "fail";
+			} else {
+				flag = "success";
+			}
+		});
+	}
+}
+
+//Update status of current scheduled job
+function   updateStatus(sessObj, updateStatuscallback) {
+	logger.info("Inside updateStatus function");
+	try {
+		if (scheduleStatus != "") {
+			var inputs = {
+				//"cycleid": sessObj.split(";")[0],
+				"scheduledatetime": sessObj.split(";")[1],
+				"scheduleid": sessObj.split(";")[0],
+				"query": "getscheduledata"
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			logger.info("Calling NDAC Service from executeScheduling: suite/ScheduleTestSuite_ICE");
+			client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
+				function (result, response) {
+					if (response.statusCode != 200 || result.rows == "fail") {
+						logger.error("Error occurred in suite/ScheduleTestSuite_ICE from executeScheduling Error Code : ERRNDAC");
+					} else {
+						if (result.rows[0].status != "Skipped"){
+							var inputs = {
+								"schedulestatus": scheduleStatus,
+								//"cycleid": sessObj.split(";")[0],
+								"scheduledatetime": sessObj.split(";")[1],
+								"scheduleid": sessObj.split(";")[0],
+								"query": "updatescheduledstatus"
+							};
+							var args = {
+								data: inputs,
+								headers: {
+									"Content-Type": "application/json"
+								}
+							};
+							try {
+								logger.info("Calling NDAC Service from updateStatus: suite/ScheduleTestSuite_ICE");
+								client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
+									function (result, response) {
+									if (response.statusCode != 200 || result.rows == "fail") {
+										logger.error("Error occurred in suite/ScheduleTestSuite_ICE from updateStatus, Error Code : ERRNDAC");
+										updateStatuscallback(null, "fail");
+									} else {
+										updateStatuscallback(null, "success");
+									}
+								});
+							} catch (exception) {
+								logger.error("Exception occurred in suite/ScheduleTestSuite_ICE from updateStatus: %s",exception);
+								updateStatuscallback(null, "fail");
+							}
+						}
+					}
+				});
+		}
+	} catch (exception) {
+		logger.error("Exception occurred in updateStatus: %s",exception);
+		updateStatuscallback(null, "fail");
+	}
+}
+
+//Update status and insert report for the skipped execution.
+function updateSkippedScheduleStatus(sessObj, msg, updateStatuscallback){
+	logger.info("Inside updateSkippedScheduleStatus function");
+	try {
+		var data = JSON.parse(sessObj.split(';')[5]);
+		if(data['execution_id'] == sessObj.split(";")[1]){
+			var inputs = {
+				"schedulestatus": "Skipped",
+				"cycleid": sessObj.split(";")[0],
+				"scheduledatetime": sessObj.split(";")[2],
+				"scheduleid": sessObj.split(";")[1],
+				"query": "updatescheduledstatus"
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			try {
+				logger.info("Calling NDAC Service from updateSkippedScheduleStatus: suite/ScheduleTestSuite_ICE");
+				client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
+					function (result, response) {
+					if (response.statusCode != 200 || result.rows == "fail") {
+						logger.error("Error occurred in suite/ScheduleTestSuite_ICE from updateSkippedScheduleStatus, Error Code : ERRNDAC");
+						updateStatuscallback(null, "fail");
+					}
+				});
+				var obj = data['scenario_ids'];
+				for(var i=0;i<(Object.keys(obj)).length;i++){
+					var suite=(Object.keys(obj))[i];
+					for(var j=0;j<obj[suite].length;j++){
+						var reportId = uuid();
+						var report_data = JSON.parse(sessObj.split(';')[4]);
+						var scenario = obj[suite][j];
+						var executionid = report_data.scheduleid;
+						var testsuiteid = report_data.testsuiteids[0];
+						var req_browser = 'NA';
+						var reportData = {
+											'rows': [{
+													'status': 'Skipped',
+													'Keyword': '',
+													'Step ': 'Skipped',
+													'Comments': '',
+													'StepDescription': msg,
+													'parentId': '',
+													'id': '1'
+												}
+											],
+											'overallstatus': [{
+													'browserVersion': 'NA',
+													'EllapsedTime': '0:00:00',
+													'browserType': 'NA',
+													'StartTime': data['time'],
+													'EndTime': data['time'],
+													'overallstatus': 'Skipped'
+												}
+											]
+										}
+						var inputs = {
+							"reportid": reportId,
+							"executionid": executionid,
+							"testsuiteid": testsuiteid,
+							"testscenarioid": scenario,
+							"browser": req_browser,
+							"cycleid":sessObj.split(";")[0],
+							"status": reportData.overallstatus[0].overallstatus,
+							"report": JSON.stringify(reportData),
+							"query": "insertreportquery"
+						};
+						var args = {
+							data: inputs,
+							headers: {
+								"Content-Type": "application/json"
+							}
+						};
+						logger.info("Calling NDAC Service from scheduleFunction: suite/ExecuteTestSuite_ICE");
+						client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+							function (result, response) {
+							if (response.statusCode != 200 || result.rows == "fail") {
+								logger.error("Error occurred in suite/ExecuteTestSuite_ICE from scheduleFunction, Error Code : ERRNDAC");
+								updateStatuscallback(null, "fail");
+							} else {
+								updateStatuscallback(null, "success");
+							}
+						});
+					}
+				}
+			} catch (exception) {
+				logger.error("Exception occurred in suite/ScheduleTestSuite_ICE from updateSkippedScheduleStatus: %s",exception);
+				updateStatuscallback(null, "fail");
+			} 
+		}
+	} catch (exception) {
+		logger.error("Exception occurred in updateSkippedScheduleStatus: %s",exception);
+		updateStatuscallback(null, "fail");
+	}
+}
+
+exports.getScheduledDetails_ICE = function (req, res) {
+	logger.info("Inside UI service getScheduledDetails_ICE");
+	if (utils.isSessionActive(req)) {
+		logger.info("Calling function getScheduledDetails from getScheduledDetails_ICE");
+		getScheduledDetails("getallscheduledata", function (err, getSchedcallback) {
+			if (err) {
+				logger.error("Error occurred in getScheduledDetails from getScheduledDetails_ICE: %s",err);
+				res.send("fail");
+			} else {
+				try {
+					res.send(getSchedcallback);
+				} catch (exception) {
+					logger.error("Exception occurred while sending response getSchedcallback: %s",exception);
+					res.send("fail");
+				}
+			}
+		});
+	} else {
+		logger.error("Error occurred in getScheduledDetails_ICE: Invalid Session");
+		res.send("Invalid Session");
+	}
+};
+
+//cancel scheduled Jobs
+exports.cancelScheduledJob_ICE = function (req, res) {
+	logger.info("Inside UI service cancelScheduledJob_ICE");
+	if (utils.isSessionActive(req)) {
+		var cycleid = req.body.suiteDetails.cycleid;
+		var scheduleid = req.body.suiteDetails.scheduleid;
+		var schedStatus = req.body.schedStatus;
+		var schedHost = req.body.host;
+		var schedUserid = req.body.schedUserid;0
+		var userid = req.body.userInfo;
+		if(userid == schedUserid || schedHost == req.session.username){
+			var scheduledatetime = new Date(req.body.suiteDetails.scheduledatetime).valueOf().toString();
+			var scheduledatetimeINT = parseInt(scheduledatetime);
+			try {
+				var upDate = new Date(scheduledatetimeINT).getFullYear() + "-" + ("0" + (new Date(scheduledatetimeINT).getMonth() + 1)).slice(-2) + "-" + ("0" + new Date(scheduledatetimeINT).getDate()).slice(-2) + " " + ("0" + new Date(scheduledatetimeINT).getHours()).slice(-2) + ":" + ("0" + new Date(scheduledatetimeINT).getMinutes()).slice(-2) + ":00+0000";
+				var inputs = {
+					"scheduledatetime": scheduledatetimeINT,
+					"scheduleid": scheduleid,
+					"query": "getscheduledstatus"
+				};
+				var args = {
+					data: inputs,
+					headers: {
+						"Content-Type": "application/json"
+					}
+				};
+				logger.info("Calling NDAC Service from cancelScheduledJob_ICE: suite/ScheduleTestSuite_ICE");
+				client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
+					function (result, response) {
+					if (response.statusCode != 200 || result.rows == "fail") {
+						logger.error("Error occurred in suite/ScheduleTestSuite_ICE from cancelScheduledJob_ICE service, Error Code : ERRNDAC");
+						res.send("fail");
+					} else {
+						var status = result.rows[0].status;
+						if (status == "scheduled") {
+							var objectD =scheduleid + ";" + upDate.valueOf().toString();
+							scheduleStatus = schedStatus;
+							logger.info("Calling function updateStatus from cancelScheduledJob_ICE service");
+							updateStatus(objectD, function (err, data) {
+								if (!err) {
+									logger.info("Sending response data from cancelScheduledJob_ICE service on success");
+									res.send(data);
+								} else{
+									logger.error("Error in the function updateStatus from cancelScheduledJob_ICE service");
+									res.send(data);
+								}
+							});
+						} else {
+							logger.info("Sending response 'inprogress' from cancelScheduledJob_ICE service");
+							res.send("inprogress");
+						}
+					}
+				});
+			} catch (exception) {
+				logger.error("Exception in the service cancelScheduledJob_ICE: %s",exception);
+				res.send("fail");
+			}
+		}
+		else{
+			logger.info("Sending response 'not authorised' from cancelScheduledJob_ICE service");
+			res.send("not authorised");
+		}		
+	} else {
+		logger.error("Error in the service cancelScheduledJob_ICE: Invalid Session");
+		res.send("Invalid Session");
+	}
+};
+
+//Fetch Scheduled data
+function getScheduledDetails(dbquery, schedDetailscallback) {
+	try {
+		logger.info("Inside getScheduledDetails function");
+		var inputs = {
+			"scheduledetails": dbquery,
+			"query": "getallscheduledetails"
+		};
+		var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
+		logger.info("Calling NDAC Service from getScheduledDetails: suite/ScheduleTestSuite_ICE");
+		client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
+			function (result, response) {
+			if (response.statusCode != 200 || result.rows == "fail") {
+				logger.error("Error occurred in suite/ScheduleTestSuite_ICE from getScheduledDetails, Error Code : ERRNDAC");
+				schedDetailscallback(null, "fail");
+			} else {
+				schedDetailscallback(null, result.rows);
+			}
+		});
+	} catch (exception) {
+		logger.error("Exception in the function getScheduledDetails: %s",exception);
+		schedDetailscallback(null, "fail");
+	}
+}
+
+//Re-Scheduling the tasks
+exports.reScheduleTestsuite = function (req, res) {
+	logger.info("Inside UI service reScheduleTestsuite");
+	var getscheduleData = [];
+	try {
+		logger.info("Calling function getScheduledDetails from reScheduleTestsuite service");
+		getScheduledDetails("getallscheduleddetails", function (err, reSchedcallback) {
+			if (err) {
+				logger.error("Error occurred in getScheduledDetails from reScheduleTestsuite service: %s", err);
+			} else {
+				if (reSchedcallback != "fail") {
+					var status;
+					for (var i = 0; i < reSchedcallback.length; i++) {
+						status = reSchedcallback[i].status;
+						if (status != "success" && status != "Terminate" && status != "Inprogress") {
+							getscheduleData.push(reSchedcallback[i]);
+						}
+						if (status == "Inprogress") {
+							scheduleStatus = "Failed 01";
+							var str,dd,dt;
+							var tempDD,tempDT;
+							str = new Date(reSchedcallback[i].scheduledon).getFullYear() + "-" + ("0" + (new Date(reSchedcallback[i].scheduledon).getMonth() + 1)).slice(-2) + "-" + ("0" + new Date(reSchedcallback[i].scheduledon).getDate()).slice(-2) + " " + ("0" + new Date(reSchedcallback[i].scheduledon).getUTCHours()).slice(-2) + ":" + ("0" + new Date(reSchedcallback[i].scheduledon).getUTCMinutes()).slice(-2);
+							tempDD = str.split(" ")[0];
+							tempDT = str.split(" ")[1];
+							dd = tempDD.split("-");
+							dt = tempDT.split(":");
+							var objectD = reSchedcallback[i].cycleid.valueOf().toString() + ";" + reSchedcallback[i].scheduleid.valueOf().toString() + ";" + new Date(Date.UTC(dd[0], dd[1] - 1, dd[2], dt[0], dt[1])).valueOf().toString();
+							logger.info("Calling function updateStatus from reScheduleTestsuite service");
+							updateStatus(objectD, function (err, data) {
+								if (!err) {
+									logger.info("Sending response data from the function updateStatus of reScheduleTestsuite service");
+								}
+							});
+						}
+					}
+					if (getscheduleData.length > 0) {
+						var modInfo = {};
+						var dd,dt,str;
+						var tempDD,tempDT;
+						var modInformation = [];
+						async.forEachSeries(getscheduleData, function (itrSchData, getscheduleDataCallback) {
+							str = new Date(itrSchData.scheduledon).getFullYear() + "-" + ("0" + (new Date(itrSchData.scheduledon).getMonth() + 1)).slice(-2) + "-" + ("0" + new Date(itrSchData.scheduledon).getUTCDate()).slice(-2) + " " + ("0" + new Date(itrSchData.scheduledon).getUTCHours()).slice(-2) + ":" + ("0" + new Date(itrSchData.scheduledon).getUTCMinutes()).slice(-2);
+							tempDD = str.split(" ")[0];
+							tempDT = str.split(" ")[1];
+							dd = tempDD.split("-");
+							dt = tempDT.split(":");
+							if (new Date(dd[0], dd[1] - 1, dd[2], dt[0], dt[1]) > new Date()) {
+								modInfo.suiteDetails = itrSchData.scenariodetails;
+								modInfo.testsuitename = itrSchData.testsuitename;
+								modInfo.testsuiteid = itrSchData.testsuiteids[0].valueOf().toString();
+								modInfo.Ip = itrSchData.target;
+								modInfo.date = dd[2] + "-" + dd[1] + "-" + dd[0];
+								modInfo.time = str.split(" ")[1];
+								modInfo.browserType = itrSchData.browserlist;
+								//modInfo.cycleid = itrSchData.cycleid.valueOf().toString();
+								modInfo.reschedule = true;
+								modInfo.scheduleid = itrSchData._id.valueOf().toString();
+								modInfo.versionnumber = 1;
+								modInfo.userid = itrSchData.scheduledby;
+								modInformation.push(modInfo);
+								logger.info("Calling function scheduleTestSuite from reScheduleTestsuite service");
+								scheduleTestSuite(modInformation, req, function (err, schedulecallback) {
+									try {
+										logger.info("Status of the function scheduleTestSuite from reScheduleTestsuite service");
+									} catch (exception) {
+										logger.error("Exception in the function scheduleTestSuite from reScheduleTestsuite service: %s", exception);
+									}
+									getscheduleDataCallback();
+								});
+							} else {
+								scheduleStatus = "Failed 01";
+								var objectD = itrSchData._id.valueOf().toString() + ";" + new Date(Date.UTC(dd[0], dd[1] - 1, dd[2], dt[0], dt[1])).valueOf().toString();
+								logger.info("Calling function updateStatus from reScheduleTestsuite service");
+								updateStatus(objectD, function (err, data) {
+									if (!err) {
+										logger.info("Sending response data from the function updateStatus of reScheduleTestsuite service");
+									}
+									getscheduleDataCallback();
+								});
+							}
+							
+						});
+					}
+				} else {
+					logger.info("Status from the function reScheduleTestsuite: Jobs are not rescheduled");
+				}
+			}
+		});
+	} catch (ex) {
+		logger.error("Exception in the function reScheduleTestsuite: %s", ex);
+	}
+};
