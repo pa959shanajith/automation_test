@@ -377,6 +377,7 @@ function loadReports() {
             var slno = $('#inputSlno').val();
             if (!projectid) $("#jProjects").css('border-color', 'red');
             else if (!issuetype || issuetype == "Select Issue") $("#jIssuetype").css('border-color', 'red');
+            else if (issuetype == "Sub-task" && !pissue) $("#jpIssueid").css('border-color', 'red');
             else if (!summary) $("#jSummary").css('border-color', 'red');
             //else if(!description) $("#jDescription").css('border-color','red');
             //else if (!priority || priority == "Select Priority") $("#jPriority").css('border-color', 'red');
