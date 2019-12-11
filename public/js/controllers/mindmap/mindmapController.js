@@ -950,6 +950,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             if ($("#ct-unassignButton a").attr('class') == 'disableButton') return;
             pi = parseInt(p.attr('id').split('-')[2]);
         } else pi = tidx;
+
+        if(dNodes[pi].type=="screens" || dNodes[pi].type=="testcases")
+        {
+            if(dNodes[pi].task!=null && dNodes[pi].task.cycleid!=cycleid)
+            {
+                return;
+            } 
+        }
         task_unassignment(pi,twf);
         
         if (reuseDict[pi].length > 0) {
@@ -957,13 +965,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 task_unassignment(e,twf);
             });
         }
-        // if(dNodes[pi].type=="screens" || dNodes[pi].type=="testcases")
-        // {
-        //     if(dNodes[pi].task!=null && dNodes[pi].task.cycleid!=cycleid)
-        //     {
-        //         return;
-        //     } 
-        // }
+        
     }
 
     $('#unassignTask').click(function() {
@@ -984,6 +986,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             if (dNodes[pi].task._id!=null)
             {
                 unassignTask.push(dNodes[pi].task._id);
+                $scope.nodeDisplay[pi].task=false;
             }
         }
         d3.select('#ct-assignBox').classed('no-disp', !0);
@@ -1197,13 +1200,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             var taskUndef = (dNodes[pi].task === undefined || dNodes[pi].task == null || (dNodes[pi].task != null && dNodes[pi].task.status== "complete"));
             var origTask = ([0, 4, 7, 9].indexOf(qid) != -1); // Orignal tasks not cascaded  
             var taskStatus;
-            // if(dNodes[pi].type=="screens" || dNodes[pi].type=="testcases")
-            // {
-            //    if(dNodes[pi].task!=null && dNodes[pi].task.cycleid!=cycleid)
-            //    {
-            //        return;
-            //    } 
-            // }
+            if(dNodes[pi].type=="screens" || dNodes[pi].type=="testcases")
+            {
+               if(dNodes[pi].task!=null && dNodes[pi].task.cycleid!=cycleid)
+               {
+                   return;
+               } 
+            }
             if (validate[0]) {
                 taskflag = true;
                 if (taskUndef) {
@@ -1290,10 +1293,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     var tempTask = jQuery.extend(true, {}, dNodes[pi].task);
                     if (reuseDict[pi].length > 0) {
                         reuseDict[pi].forEach(function(e, i) {
-                            if (dNodes[e].id_c == "null") return;
+                            if (dNodes[e]._id == null) return;
                             dNodes[e].task = tempTask;
                             dNodes[e].task.copied = true;
                             dNodes[e].task.copiedidx = pi;
+                            $scope.nodeDisplay[e].task = true;
                             // d3.select('#ct-node-' + e).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('style', 'opacity:1').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
                         });
                     }
