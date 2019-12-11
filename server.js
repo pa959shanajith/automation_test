@@ -544,9 +544,9 @@ if (cluster.isMaster) {
 		// app.post('/getListofScheduledSocketMap',suite.getListofScheduledSocketMap);
 
 		//Scheduling Screen Routes
-		// app.post('/testSuitesScheduler_ICE', suite.testSuitesScheduler_ICE);
-		// app.post('/getScheduledDetails_ICE', suite.getScheduledDetails_ICE);
-		// app.post('/cancelScheduledJob_ICE', suite.cancelScheduledJob_ICE);
+		app.post('/testSuitesScheduler_ICE', suite.testSuitesScheduler_ICE);
+		app.post('/getScheduledDetails_ICE', suite.getScheduledDetails_ICE);
+		app.post('/cancelScheduledJob_ICE', suite.cancelScheduledJob_ICE);
 		//Report Screen Routes
 		app.post('/getAllSuites_ICE', report.getAllSuites_ICE);
 		app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
@@ -626,7 +626,7 @@ if (cluster.isMaster) {
 							httpsServer.close();
 							logger.error("Please run the Service API and Restart the Server");
 						} else {
-							//suite.reScheduleTestsuite();
+							suite.reScheduleTestsuite();
 							console.info("Nineteen68 Server Ready...\n");
 						}
 					} catch (exception) {
