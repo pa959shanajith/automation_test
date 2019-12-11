@@ -288,18 +288,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					taskObj.screenName = data.screenName;
 					window.localStorage['_CT'] = JSON.stringify(taskObj);
 				}
-				if(data.del_flag){
-					//pop up for presence of deleted objects
-					openDialog("Deleted objects found", "Deleted objects found in some teststeps, Please delete or modify those steps.");
-					//disable left-top-section
-					$("#left-top-section").addClass('disableActions');
-					$("a[title='Export TestCase']").addClass('disableActions');
-				}
-				else{
-					//enable left-top-section
-					$("#left-top-section").removeClass('disableActions');
-					$("a[title='Export TestCase']").removeClass('disableActions');
-				}
+				
 				//console.log(data);
 				var appType = taskInfo.appType;
 				$('#jqGrid').removeClass('visibility-hide').addClass('visibility-show');
@@ -1098,44 +1087,41 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					return $rootScope.redirectPage();
 				}
 				if (typeof data === "object") {
-					try{
-						data = data[0]
-						//Printing the Save data in UI
-						$("#endPointURL").val(data.endPointURL);
-						$("#wsdlMethods option").each(function () {
-							if ($(this).val() == data.method) {
-								$(this).prop("selected", true)
-							}
-						})
-						$("#wsdlOperation").val(data.operations)
-						//Printing Request Data
-						$("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
-						if (data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0) {
-							var jsonStr = data.body;
-							var jsonObj = JSON.parse(jsonStr);
-							var jsonPretty = JSON.stringify(jsonObj, null, '\t');
-							xml_neat2 = jsonPretty;
-							$("#wsdlRequestBody").val(jsonPretty)
-						} else {
-							var getXML = formatXml(data.body[0].replace(/>\s+</g, '><'));
-							$("#wsdlRequestBody").val(getXML)
+					data = data[0]
+					//Printing the Save data in UI
+					$("#endPointURL").val(data.endPointURL);
+					$("#wsdlMethods option").each(function () {
+						if ($(this).val() == data.method) {
+							$(this).prop("selected", true)
 						}
-
-						//Printing Response Data
-						$("#wsdlResponseHeader").val(data.responseHeader[0].split("##").join("\n"));
-						if (data.responseBody[0].indexOf("{") == 0 || data.responseBody[0].indexOf("[") == 0) {
-							var jsonStr = data.responseBody;
-							var jsonObj = JSON.parse(jsonStr);
-							var jsonPretty = JSON.stringify(jsonObj, null, '\t');
-							xml_neat2 = jsonPretty;
-							$("#wsdlResponseBody").val(jsonPretty)
-						} else {
-							var getXML = formatXml(data.responseBody[0].replace(/>\s+</g, '><'));
-							$("#wsdlResponseBody").val(getXML)
-						}
-					} catch(err) {
-						console.log(err)
+					})
+					$("#wsdlOperation").val(data.operations)
+					//Printing Request Data
+					$("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
+					if (data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0) {
+						var jsonStr = data.body;
+						var jsonObj = JSON.parse(jsonStr);
+						var jsonPretty = JSON.stringify(jsonObj, null, '\t');
+						xml_neat2 = jsonPretty;
+						$("#wsdlRequestBody").val(jsonPretty)
+					} else {
+						var getXML = formatXml(data.body[0].replace(/>\s+</g, '><'));
+						$("#wsdlRequestBody").val(getXML)
 					}
+
+					//Printing Response Data
+					$("#wsdlResponseHeader").val(data.responseHeader[0].split("##").join("\n"));
+					if (data.responseBody[0].indexOf("{") == 0 || data.responseBody[0].indexOf("[") == 0) {
+						var jsonStr = data.responseBody;
+						var jsonObj = JSON.parse(jsonStr);
+						var jsonPretty = JSON.stringify(jsonObj, null, '\t');
+						xml_neat2 = jsonPretty;
+						$("#wsdlResponseBody").val(jsonPretty)
+					} else {
+						var getXML = formatXml(data.responseBody[0].replace(/>\s+</g, '><'));
+						$("#wsdlResponseBody").val(getXML)
+					}
+
 					//Printing the Save data in UI
 					if ($("#wsdlRequestHeader, #wsdlRequestBody").val().length > 0) {
 						$(".saveWS").prop("disabled", true);
@@ -3971,8 +3957,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					scrapeObject.editedListoldCustName.push($(this).children(".toMergeObj").text());
 					scrapeObject.editedListoldXpath.push($(this).children(".toMergeObj").data("xpath"));
 					scrapeObject.editedListmodifiedXpaths.push($(this).children(".fromMergeObj").data("xpath"));
-					scrapeObject.fromMerge.push($(this).children(".fromMergeObj").data("id"))//[$(this).children(".fromMergeObj").data("id"),$(this).children(".toMergeObj").text()])
-					scrapeObject.toMerge.push([$(this).children(".toMergeObj").data("id"),$(this).children(".fromMergeObj").data("id"),$(this).children(".toMergeObj").text()])
+					scrapeObject.fromMerge.push([$(this).children(".fromMergeObj").data("id"),$(this).children(".toMergeObj").text()])
+					scrapeObject.toMerge.push($(this).children(".toMergeObj").data("id"))
 					/***Resetting Values to Default***/
 					$(this).children(".showPreviousVal").hide();
 					$(this).children(".fromMergeObj").remove();
@@ -6416,7 +6402,10 @@ function contentTable(newTestScriptDataLS) {
 						} else if (obType == 'GuiShell' || obType == 'shell') {
 							sc = Object.keys(keywordArrayList.shell);
 							selectedKeywordList = "shell";
-						} else if (obType == 'list_item' || obType == 'list') {
+						} else if (obType == 'tree') {
+							sc = Object.keys(keywordArrayList.tree);
+							selectedKeywordList = "tree";
+						}else if (obType == 'list_item' || obType == 'list') {
 							if (listType == 'true') {
 								sc = Object.keys(keywordArrayList.list);
 								selectedKeywordList = "list";
