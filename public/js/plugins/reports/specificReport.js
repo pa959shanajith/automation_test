@@ -348,6 +348,7 @@ function loadReports() {
         }
         //function to close popup window
         $(document).on('click', '.closeWindow', function() {
+            $("#jiraURL, #jiraUserName, #jiraPassword").css('border-color', '#bbb');
             $(".jiraWindow, .createIssueWindow, .statusWindow").hide();
             $('#overlay').css('display', 'none');
             $(".error-msg").text('');
