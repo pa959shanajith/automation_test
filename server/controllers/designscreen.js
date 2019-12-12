@@ -290,11 +290,7 @@ exports.updateScreen_ICE = function (req, res) {
 													var scrapedObjectsWS = {};
 													scrapedObjectsWS.xpath = allXpaths[populationindex];
 													scrapedObjectsWS.custname = allCustnames[populationindex];
-													scrapedObjectsWS.url = "";
-													scrapedObjectsWS.text = "";
-													scrapedObjectsWS.hiddentag = "";
 													scrapedObjectsWS.tag = "elementWS";
-													scrapedObjectsWS.id = "";
 													viewArray.push(scrapedObjectsWS);
 												}
 												var baseData = {};

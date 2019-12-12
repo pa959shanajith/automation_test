@@ -300,7 +300,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				}*/
 				$('#jqGrid').show();
 				// service call # 2 - objectType service call
-				DesignServices.getScrapeDataScreenLevel_ICE(screenId)
+				DesignServices.getScrapeDataScreenLevel_ICE()
 					.then(function (data2) {
 						if (data2 == "Invalid Session") {
 							return $rootScope.redirectPage();
@@ -1087,43 +1087,50 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					return $rootScope.redirectPage();
 				}
 				if (typeof data === "object") {
-					data = data[0]
-					//Printing the Save data in UI
-					$("#endPointURL").val(data.endPointURL);
-					$("#wsdlMethods option").each(function () {
-						if ($(this).val() == data.method) {
-							$(this).prop("selected", true)
+					try{
+						//data = data[0]
+						//Printing the Save data in UI
+						$("#endPointURL").val(data.endPointURL);
+						$("#wsdlMethods option").each(function () {
+							if ($(this).val() == data.method) {
+								$(this).prop("selected", true)
+							}
+						})
+						$("#wsdlOperation").val(data.operations)
+						//Printing Request Data
+						$("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
+						if (data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0) {
+							var jsonStr = data.body;
+							var jsonObj = JSON.parse(jsonStr);
+							var jsonPretty = JSON.stringify(jsonObj, null, '\t');
+							$("#wsdlRequestBody").val(jsonPretty)
+						} else {
+							var getXML = formatXml(data.body[0].replace(/>\s+</g, '><'));
+							if(getXML=='\r\n'){
+								getXML = '';
+							}
+							$("#wsdlRequestBody").val(getXML)
 						}
-					})
-					$("#wsdlOperation").val(data.operations)
-					//Printing Request Data
-					$("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
-					if (data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0) {
-						var jsonStr = data.body;
-						var jsonObj = JSON.parse(jsonStr);
-						var jsonPretty = JSON.stringify(jsonObj, null, '\t');
-						xml_neat2 = jsonPretty;
-						$("#wsdlRequestBody").val(jsonPretty)
-					} else {
-						var getXML = formatXml(data.body[0].replace(/>\s+</g, '><'));
-						$("#wsdlRequestBody").val(getXML)
-					}
-
-					//Printing Response Data
-					$("#wsdlResponseHeader").val(data.responseHeader[0].split("##").join("\n"));
-					if (data.responseBody[0].indexOf("{") == 0 || data.responseBody[0].indexOf("[") == 0) {
-						var jsonStr = data.responseBody;
-						var jsonObj = JSON.parse(jsonStr);
-						var jsonPretty = JSON.stringify(jsonObj, null, '\t');
-						xml_neat2 = jsonPretty;
-						$("#wsdlResponseBody").val(jsonPretty)
-					} else {
-						var getXML = formatXml(data.responseBody[0].replace(/>\s+</g, '><'));
-						$("#wsdlResponseBody").val(getXML)
+						//Printing Response Data
+						$("#wsdlResponseHeader").val(data.responseHeader[0].split("##").join("\n"));
+						if (data.responseBody[0].indexOf("{") == 0 || data.responseBody[0].indexOf("[") == 0) {
+							var jsonStr = data.responseBody;
+							var jsonObj = JSON.parse(jsonStr);
+							var jsonPretty = JSON.stringify(jsonObj, null, '\t');
+							$("#wsdlResponseBody").val(jsonPretty)
+						} else {
+							var getXML = formatXml(data.responseBody[0].replace(/>\s+</g, '><'));
+							if(getXML=='\r\n'){
+								getXML = '';
+							}
+							$("#wsdlResponseBody").val(getXML);
+						}
+					} catch(err) {
+						console.log(err)
 					}
 
 					//Printing the Save data in UI
-					if ($("#wsdlRequestHeader, #wsdlRequestBody").val().length > 0) {
+					if ($("#wsdlRequestHeader").val().length > 0 && $("#wsdlRequestBody").val().length > 0) {
 						$(".saveWS").prop("disabled", true);
 						$("#enbledWS").prop("disabled", false)
 						$(".enableActionsWS").addClass("disableActionsWS").removeClass("enableActionsWS")
@@ -1346,7 +1353,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							var jsonStr = data.responseBody;
 							var jsonObj = JSON.parse(jsonStr);
 							var jsonPretty = JSON.stringify(jsonObj, null, '\t');
-							xml_neat2 = jsonPretty;
 							$("#wsdlResponseBody").val(jsonPretty.replace(/\&gt;/g, '>').replace(/\&lt;/g, '<'))
 						} else {
 							var getXML = formatXml(data.responseBody[0].replace(/>\s+</g, '><'));
@@ -1451,7 +1457,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							var jsonStr = data.body;
 							var jsonObj = JSON.parse(jsonStr);
 							var jsonPretty = JSON.stringify(jsonObj, null, '\t');
-							xml_neat2 = jsonPretty;
 							$("#wsdlRequestBody").val(jsonPretty)
 						} else {
 							var getXML = formatXml(data.body[0].replace(/>\s+</g, '><'));
@@ -5291,7 +5296,8 @@ function contentTable(newTestScriptDataLS) {
 				   });*/
 			var gridArrayData = $("#jqGrid").jqGrid('getRowData');
 			for (i = 0; i < gridArrayData.length; i++) {
-				if (gridArrayData[i].outputVal.indexOf('##') !== -1 || gridArrayData[i].outputVal.indexOf(';##') !== -1) {
+				commented = gridArrayData[i].outputVal.split(';');
+				if (commented[commented.length-1]=='##') {
 					$(this).find('tr.jqgrow')[i].style.borderLeft = "5px solid red";
 					$(this).find('tr.jqgrow')[i].childNodes[0].style.paddingRight = "7px"
 					$(this).find('tr.jqgrow')[i].childNodes[1].childNodes[0].style.marginLeft = "-4px";
@@ -6405,7 +6411,7 @@ function contentTable(newTestScriptDataLS) {
 						} else if (obType == 'tree') {
 							sc = Object.keys(keywordArrayList.tree);
 							selectedKeywordList = "tree";
-						}else if (obType == 'list_item' || obType == 'list') {
+						} else if (obType == 'list_item' || obType == 'list') {
 							if (listType == 'true') {
 								sc = Object.keys(keywordArrayList.list);
 								selectedKeywordList = "list";
@@ -7445,12 +7451,13 @@ function commentStep(e) {
 						//Check whether output coloumn has some value
 						if (myData[i].outputVal != "") {
 							//If already commented but no additional value
+							commented = myData[i].outputVal.split(';');
 							if (myData[i].outputVal == "##") {
 								myData[i].outputVal = "";
 								//$("#jqGrid").trigger("reloadGrid");
 							}
 							//If already commented and contains additional value
-							else if (myData[i].outputVal.indexOf(";##") !== -1) {
+							else if (commented[commented.length-1]=='##') {
 								var lastTwo = myData[i].outputVal.substr(myData[i].outputVal.length - 3);
 								myData[i].outputVal = myData[i].outputVal.replace(lastTwo, "");
 								//$("#jqGrid").trigger("reloadGrid");
