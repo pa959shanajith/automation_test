@@ -303,7 +303,8 @@ function loadReports() {
         $(document).on('click', '.opendescpopup', function() {
             var slno = parseInt($("#inputSlno").val())
             $('#parentIssue').hide();
-            if (slno > getRows.length) {
+            if (!slno || slno == "") $("#inputSlno").css('border-color', 'red');
+            else if (slno > getRows.length) {
                 $('#overlay').css('display', 'block');
                 $(".statusWindow").show();
                 $(".statusWindow .popupheader label").text("Invalid Input")

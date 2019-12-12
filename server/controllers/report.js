@@ -470,87 +470,35 @@ exports.getReport_Nineteen68 = function(req, res) {
                         logger.error("Error occurred in the service getReport_Nineteen68 - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports. Error Code : ERRNDAC");
                         res.send(flag);
                     } else {
-                        try {
-                            var reportdata = reportResult.rows[0].report;
-                            var executedtime = reportResult.rows[0].executedtime;
-                            var testscenarioid = reportResult.rows[0].testscenarioid;
+                        try{
+                            var reportdata = reportResult.rows.report;
+                            var executedtime = reportResult.rows.executedtime;
+                            var testscenarioid = reportResult.rows.testscenarioid;
+                            var testscenarioname = reportResult.rows.name;
+                            var projectid = reportResult.rows.projectid;
+                            var domainname = reportResult.rows.domain;
                             reportjson.reportdata = reportdata;
                             reportInfoObj.executedtime = executedtime;
                             reportInfoObj.testscenarioid = testscenarioid;
-                            var inputs = {
-                                "query": "scenariodetails",
-                                "scenarioid": testscenarioid
-                            };
-                            var args = {
-                                data: inputs,
-                                headers: {
-                                    "Content-Type": "application/json"
-                                }
-                            };
-                            logger.info("Calling NDAC Service from getReport_Nineteen68 - scenariodetails: reports/getReport_Nineteen68");
-                            client.post(epurl + "reports/getReport_Nineteen68", args,
-                                function(scenarioResult, response) {
-                                    if (response.statusCode != 200 || scenarioResult.rows == "fail") {
-                                        logger.error("Error occurred in the service getReport_Nineteen68 - scenariodetails: Failed to get scenario name and projectId from scenarios.");
-                                    } else {
-                                        try {
-                                            var testscenarioname = scenarioResult.rows[0].name;
-                                            var projectid = scenarioResult.rows[0].projectid;
-                                            reportInfoObj.testscenarioname = testscenarioname;
-                                            reportInfoObj.projectid = projectid;
-                                            var inputs = {
-                                                "query": "cycledetails",
-                                                "projectid": projectid
-                                            };
-                                            var args = {
-                                                data: inputs,
-                                                headers: {
-                                                    "Content-Type": "application/json"
-                                                }
-                                            };
-                                            logger.info("Calling NDAC Service from getReport_Nineteen68 - cycleid: reports/getReport_Nineteen68");
-                                            client.post(epurl + "reports/getReport_Nineteen68", args,
-                                                function(cycleResult, response) {
-                                                    if (response.statusCode != 200 || cycleResult.rows == "fail") {
-                                                        logger.error("Error occurred in the service getReport_Nineteen68 - cycleid: Failed to get cycle Ids from test suites.");
-                                                    } else {
-                                                        try {
-                                                            var cyclename = cycleResult.rows[0].releases.cycles.name;
-                                                            var releasename = cycleResult.rows[0].releases.name;
-                                                            var projectname = cycleResult.rows[0].name;
-                                                            var domainname = cycleResult.rows[0].domain;
-                                                            reportInfoObj.cyclename = cyclename;
-                                                            reportInfoObj.releasename = releasename;
-                                                            reportInfoObj.projectname = projectname;
-                                                            reportInfoObj.domainname = domainname;
-                                                            finalReport.push(reportInfoObj);
-                                                            finalReport.push(reportjson);
-                                                            logger.info("Sending reports in the service getReport_Nineteen68: final function");
-                                                            res.send(finalReport);
-                                                        } catch (exception) {
-                                                            logger.error("Exception in the service getReport_Nineteen68 - cycleid: %s", exception);
-                                                            res.send("fail");
-                                                        }
-                                                    }
-                                                });
-                                        } catch (exception) {
-                                            logger.error("Exception in the service getReport_Nineteen68 - scenariodetails: %s", exception);
-                                            res.send("fail");
-                                        }
-                                    }
-                                });
+                            reportInfoObj.testscenarioname = testscenarioname;
+                            reportInfoObj.projectid = projectid;
+                            reportInfoObj.domainname = domainname;
+                            finalReport.push(reportInfoObj);
+                            finalReport.push(reportjson);
+                            logger.info("Sending reports in the service getReport_Nineteen68: final function");
+                            res.send(finalReport);
                         } catch (exception) {
                             logger.error("Exception in the service getReport_Nineteen68 - projectsUnderDomain: %s", exception);
                             res.send("fail");
-                        }
+                        }            
                     }
                 });
-        } else {
+            } else {
             logger.error("Invalid Session, in the service getReport_Nineteen68");
             res.send("Invalid Session");
         }
     } catch (exception) {
-        logger.error("Exception occurred in the service getReport_Nineteen68: %s", exception);
+        logger.error("Exception in the service getReport_Nineteen68 - cycleid: %s", exception);
         res.send("fail");
     }
 };
