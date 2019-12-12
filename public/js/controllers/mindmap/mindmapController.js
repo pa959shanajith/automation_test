@@ -555,6 +555,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (selectedTab == 'tabCreate')
                     populateDynamicInputList();
                 setModuleBoxHeight();
+                unassignTask=[];
                 unblockUI();
 
             }, function(error) {
@@ -793,6 +794,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     return $rootScope.redirectPage();
                 }
                 currMap=result;
+                unassignTask=[];
                 excelMap = JSON.parse(JSON.stringify(currMap));
                 loadedmodule = excelMap.name;
                 $('div[title=' + modName + ']').addClass('nodeBoxSelected');
@@ -3266,6 +3268,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
                 deletednode = [],
                 deletednode_info = [];
+                unassignTask =[];
                 $scope.createdthrough="";
                 if (result == "Invalid Session") {
                     return $rootScope.redirectPage();
@@ -3329,7 +3332,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 																																 
 																					   
 																					   
-												
+						unassignTask = [];						
                         currMap=result;
                         excelMap = JSON.parse(JSON.stringify(currMap));
                         loadedmodule = excelMap.name;
@@ -3358,6 +3361,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         return $rootScope.redirectPage();
                     }
                     $scope.allMMaps = result;
+                    unassignTask=[];
                     setModuleBoxHeight();
                     unblockUI();
                     if (selectedTab == 'tabCreate')
@@ -3616,6 +3620,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         // $scope.allMMaps = allMaps_info = result;
                         // $('span[title=' + selectedNodeTitle + ']').addClass('nodeBoxSelected');
                         initScroller();
+                        unassignTask=[];
                         // setModuleBoxHeight_W();
                         currMap=result;
                         excelMap = JSON.parse(JSON.stringify(currMap));
@@ -3645,6 +3650,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     }
                     var nodeBox = d3.select('#etemModuleContainer');
                     // $(nodeBox[0]).empty();
+                    unassignTask=[];
                     $scope.allMMaps = allMaps_info = result;
                     $('span[title=' + selectedNodeTitle + ']').addClass('nodeBoxSelected');
                     initScroller();
@@ -4057,6 +4063,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 }
                 result_details = result;
                 flag = 0;
+                unassignTask=[];
                 // for (var i = 0; i < result_details.length; i++) {
                     if(result_details.name== loadedModule){
                     var module_info = {
@@ -4326,7 +4333,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             var nodeBox = d3.select('#etemModuleContainer');
             // $(nodeBox[0]).empty();
             $scope.allMMaps = allMaps_info = result;
-
+            unassignTask=[];
             initScroller();
             setModuleBoxHeight_W();
             unblockUI();
@@ -4438,6 +4445,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     return $rootScope.redirectPage();
                 }
                 currMap = result;
+                unassignTask=[];
                 treeBuilder_W(currMap);
             }, function(error) {
                 console.log(error);
@@ -5021,6 +5029,7 @@ Purpose : displaying pop up for replication of project
                 var nodeBox = d3.select('.ct-nodeBox');
                 // $(nodeBox[0]).empty();
                 $scope.allMMaps = res;
+                unassignTask=[];
                 $scope.allMMaps.forEach(function (e, i) {
                     var t = $.trim(e.name);
                     var img_src = 'imgs/node-modules-no.png';

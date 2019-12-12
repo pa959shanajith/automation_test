@@ -356,8 +356,8 @@ exports.updateScreen_ICE = function (req, res) {
 				}
 			}else if (param == "mapScrapeData_ICE") {
 				//add double type check tag=[button,textbox..]
-				deleteObj = updateData.toMerge
-				updateObj = updateData.fromMerge
+				updateObj = updateData.toMerge
+				deleteObj = updateData.fromMerge
 				try{
 					inputs = {
 						"scrapedata": [deleteObj,updateObj],
