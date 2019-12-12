@@ -605,22 +605,26 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             }
 
                             accessDiv.appendChild(tr1);
-                            
-                            for(i=0;i<result_webocular_reportData.rows[0].data[0]["accessibility"]["violations"].length;i++)
-                            {
-                                var tr1=document.createElement('tr');
-                                var td1=document.createElement('td');
-                                td1.appendChild(document.createTextNode(i+1));
-                                tr1.append(td1);
-                                for(j=0;j<datas.length;j++)
+                            try{
+                                for(i=0;i<result_webocular_reportData.rows[0].data[0]["accessibility"]["violations"].length;i++)
                                 {
+                                    var tr1=document.createElement('tr');
                                     var td1=document.createElement('td');
-                                    td1.appendChild(document.createTextNode(result_webocular_reportData.rows[0].data[0]["accessibility"]["violations"][i][datas[j]]));
-                                    tr1.appendChild(td1);
+                                    td1.appendChild(document.createTextNode(i+1));
+                                    tr1.append(td1);
+                                    for(j=0;j<datas.length;j++)
+                                    {
+                                        var td1=document.createElement('td');
+                                        td1.appendChild(document.createTextNode(result_webocular_reportData.rows[0].data[0]["accessibility"]["violations"][i][datas[j]]));
+                                        tr1.appendChild(td1);
+                                    }
+                                    accessDiv.appendChild(tr1);
                                 }
-                                accessDiv.appendChild(tr1);
+                                body.appendChild(accessDiv);
+                            } catch(exception){
+                                unblockUI();
+                                console.log("Cannot read property 'accessibility' of undefined ");
                             }
-                            body.appendChild(accessDiv);
                         }
                         // View of Access Voilations.
 
@@ -1020,9 +1024,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         blockUI("Generating Report.. please wait..");
                         if (data.length > 0) {
                             finalReports.overallstatus[0].domainName = data[0].domainname
-                            finalReports.overallstatus[0].projectName = data[0].projectname
-                            finalReports.overallstatus[0].releaseName = data[0].releasename
-                            finalReports.overallstatus[0].cycleName = data[0].cyclename
+                            finalReports.overallstatus[0].projectName = document.getElementById('selectProjects').selectedOptions[0].text
+                            finalReports.overallstatus[0].releaseName = document.getElementById('selectReleases').selectedOptions[0].text
+                            finalReports.overallstatus[0].cycleName = document.getElementById('selectCycles').selectedOptions[0].text
                             finalReports.overallstatus[0].scenarioName = data[0].testscenarioname
                             finalReports.overallstatus[0].reportId = reportID;
                             finalReports.overallstatus[0].executionId = data[0].executionId;;
