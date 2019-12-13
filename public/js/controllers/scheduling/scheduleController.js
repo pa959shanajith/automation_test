@@ -402,19 +402,19 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 						doNotSchedule = true;
 						return false;
 					}
-					// if(new Date(sldate_2[2],(sldate_2[1]-1),sldate_2[0],sltime_2[0],sltime_2[1]) < new Date()){
-					// 	$(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").prop("style","border: 2px solid red;");
-					// 	openModelPopup("Schedule Test Suite", "Schedule time must be 5 mins more than current time.");
-					// 	doNotSchedule = true;
-					// 	return false;
-					// }
-					// else if((new Date(sldate_2[2],(sldate_2[1]-1),sldate_2[0],sltime_2[0],sltime_2[1]) > new Date()) && (parseInt(sldate_2[0]) == new Date().getDate()) && (parseInt(sltime_2[0]) == new Date().getHours()) && (parseInt(sltime_2[1]) <= new Date().getMinutes()+5)){
-					// 	$(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").prop("style","border: 2px solid red;");
-					// 	openModelPopup("Schedule Test Suite", "Schedule time must be 5 mins more than current time.");
-					// 	doNotSchedule = true;
-					// 	return false;
-					// }
-					// else{
+					if(new Date(sldate_2[2],(sldate_2[1]-1),sldate_2[0],sltime_2[0],sltime_2[1]) < new Date()){
+						$(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").prop("style","border: 2px solid red;");
+						openModelPopup("Schedule Test Suite", "Schedule time must be 5 mins more than current time.");
+						doNotSchedule = true;
+						return false;
+					}
+					else if((new Date(sldate_2[2],(sldate_2[1]-1),sldate_2[0],sltime_2[0],sltime_2[1]) > new Date()) && (parseInt(sldate_2[0]) == new Date().getDate()) && (parseInt(sltime_2[0]) == new Date().getHours()) && (parseInt(sltime_2[1]) <= new Date().getMinutes()+5)){
+						$(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").prop("style","border: 2px solid red;");
+						openModelPopup("Schedule Test Suite", "Schedule time must be 5 mins more than current time.");
+						doNotSchedule = true;
+						return false;
+					}
+					else{
 						if(sltime)
 							suiteInfo.time = $(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").val();
 						else{
@@ -422,7 +422,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 							doNotSchedule = true;
 							return false;
 						}
-					// }
+					}
 					var chkExistDT = $(".scheduleDataBodyRowChild");
 					for(i=0;i<chkExistDT.length;i++){
 						var cEd = chkExistDT[i].children[0].innerText.split(" ")[0];
