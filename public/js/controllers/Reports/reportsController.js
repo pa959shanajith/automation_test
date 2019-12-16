@@ -1064,9 +1064,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                         finalReports.rows[k].EllapsedTime = ("0" + elapTym[0]).slice(-2) + ":" + ("0" + elapTym[1]).slice(-2) + ":" + ("0" + elapTym[2]).slice(-2) + ":" + finalReports.rows[k].EllapsedTime.split(".")[1].slice(0, 3);
                                     }
                                 }
-                                if (finalReports.rows[k].hasOwnProperty("status") && finalReports.rows[k].status != "") {
-                                    total++;
-                                }
+                                // if (finalReports.rows[k].hasOwnProperty("status") && finalReports.rows[k].status != "") {
+                                //     total++;
+                                // }
                                 if (finalReports.rows[k].status == "Pass") {
                                     pass++;
                                 } else if (finalReports.rows[k].status == "Fail") {
@@ -1107,6 +1107,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                     }
                                 }
                             }
+                            total = pass+fail+terminated;
                             finalReports.overallstatus[0].pass = (parseFloat((pass / total) * 100).toFixed(2)) > 0 ? parseFloat((pass / total) * 100).toFixed(2) : parseInt(0);
                             finalReports.overallstatus[0].fail = (parseFloat((fail / total) * 100).toFixed(2)) > 0 ? parseFloat((fail / total) * 100).toFixed(2) : parseInt(0);
                             finalReports.overallstatus[0].terminate = (parseFloat((terminated / total) * 100).toFixed(2)) > 0 ? parseFloat((terminated / total) * 100).toFixed(2) : parseInt(0);
