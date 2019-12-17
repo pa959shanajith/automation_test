@@ -78,6 +78,7 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http,$q)   {
 		readTestCase_ICE : function(testCaseId,testCaseName,versionnumber,screenName){
 			return $http.post('/readTestCase_ICE',{
 				param : 'readTestCase_ICE',
+				userInfo: JSON.parse(window.localStorage['_UI']),
 				testcaseid: testCaseId,
 				testcasename: testCaseName,
 				versionnumber: versionnumber,
