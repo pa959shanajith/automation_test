@@ -1540,7 +1540,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         
         var tObj = {
             t: (nt) ? nt.tasktype : '',
-            bn: (nt) ? nt.batchName : '',
+            bn: (nt) ? nt.batchname : '',
             at: (nt) ? nt.assignedto : '',
             rw: (nt && nt.reviewer != null) ? nt.reviewer : '',
             sd: (nt) ? nt.startdate : '',
