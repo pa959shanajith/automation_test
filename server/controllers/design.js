@@ -51,12 +51,14 @@ exports.readTestCase_ICE = function (req, res) {
 			var requestedtestscaseid = req.body.testcaseid;
 			var requestedversionnumber = req.body.versionnumber;
 			var screenName = req.body.screenName;
+			var userid = req.body.userInfo.user_id;
 			// base request elements sent in request
 			inputs = {
 				"screenid": requestedscreenid,
 				"testcasename": requestedtestscasename,
 				"testcaseid": requestedtestscaseid,
 				"versionnumber": requestedversionnumber,
+				"userid": userid,
 				"query": "readtestcase"
 			};
 			if (!requestedscreenid){ // if there is no screenid fetch just by testcase id in add dependent test cases

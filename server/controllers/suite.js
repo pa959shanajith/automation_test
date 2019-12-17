@@ -1585,7 +1585,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 			//scheduleId = uuid();
 			sessObj = scheduleId + ";" + dateTime.valueOf().toString();
 			var inputs = {
-				//"cycleid": cycleId,
+				"cycleid": cycleId,
 				"scheduledatetime": dateTime.valueOf().toString(),
 				//"scheduleid": scheduleId,
 				"browserlist": browserList,
@@ -1652,7 +1652,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 					//Callback();
 				});
 				counter++;
-				Callback()
+				//Callback()
 				
 			} catch (ex) {
 				logger.error("Exception in the function executeScheduling from scheduleTestSuite: reshedule: %s", ex);
@@ -2366,8 +2366,8 @@ exports.reScheduleTestsuite = function (req, res) {
 								modInfo.Ip = itrSchData.target;
 								modInfo.date = dd[2] + "-" + dd[1] + "-" + dd[0];
 								modInfo.time = str.split(" ")[1];
-								modInfo.browserType = itrSchData.browserlist;
-								//modInfo.cycleid = itrSchData.cycleid.valueOf().toString();
+								modInfo.browserType = itrSchData.executeon;
+								modInfo.cycleid = itrSchData.cycleid.valueOf().toString();
 								modInfo.reschedule = true;
 								modInfo.scheduleid = itrSchData._id.valueOf().toString();
 								modInfo.versionnumber = 1;
