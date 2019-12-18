@@ -1621,3 +1621,24 @@ exports.getAvailablePlugins = function (req, res) {
 		res.send("fail");
 	}
 };
+
+exports.getPreferences = function (req, res) {
+	logger.info("Inside UI service: getPreferences");
+	try {
+		if (utils.isSessionActive(req)) {
+			client.post(epurl + "admin/getPreferences",
+				function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					res.send("fail");
+				} else {
+					res.send(result.rows);
+				}
+			});
+		} else {
+			res.send("Invalid Session");
+		}
+	} catch (exception) {
+		logger.error("Error occurred in admin/getPreferences:", exception);
+		res.send("fail");
+	}
+};

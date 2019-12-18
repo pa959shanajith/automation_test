@@ -518,7 +518,8 @@ if (cluster.isMaster) {
 		app.post('/getLDAPConfig', admin.getLDAPConfig);
 		app.post('/manageLDAPConfig', admin.manageLDAPConfig);
 		app.post('/getCIUsersDetails', admin.getCIUsersDetails);
-		app.post('/manageCIUsers', admin.manageCIUsers );
+		app.post('/manageCIUsers', admin.manageCIUsers);
+		app.post('/getPreferences', admin.getPreferences);
 
 		//Design Screen Routes
 		app.post('/initScraping_ICE', designscreen.initScraping_ICE);

@@ -598,12 +598,50 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	}
 
 	$scope.preferences.click = function () {
+		blockUI()
 		$(".selectedIcon").removeClass("selectedIcon");
 		$("#preferencesTab").find("img").addClass("selectedIcon");
 		setTimeout(function () {
+			adminServices.getPreferences()
+			.then(function (response) {
+				if (response == "Invalid Session") {
+					$rootScope.redirectPage();
+				}
+				else{
+					$('#pref').empty()
+					$('#pref').append("<tr><td>Admin</td><td><input type='checkbox' value='' checked='checked' class='module_admin'></td><td><input type='checkbox' value='' class='module_admin'></td><td><input type='checkbox' value='' class='module_admin'></td><td><input type='checkbox' value='' class='module_admin'></td></tr>")
+					$('#pref').append("<tr id=rows><td>ICE</td></tr>")
+					rows=["ALM","Mindmap","NeuronGraphs","Reports","Utility"];
+					for(i=0;i<response.length;i++){
+						$('#head').append("<th>"+response[i].name+"</th>");
+						if(response[i].name == 'Test Lead' || response[i].name == 'Test Engineer')
+							$('#rows').append("<td><input type='checkbox' value='' checked='checked' class='module_admin'></td>");
+						else
+							$('#rows').append("<td><input type='checkbox' value='' class='module_admin'></td>");
+					}
+					for (j=0;j<rows.length;j++){
+						$('#pref').append("<tr id="+rows[j]+"><td>"+rows[j]+"</td></tr>")
+						for(i=0;i<response.length;i++){
+							if(response[i].plugins[rows[j].toLowerCase()]==true){
+								$("#"+rows[j]).append("<td><input type='checkbox' value='' checked='checked' class='module_admin'></td>");
+							}
+							else {
+								$("#"+rows[j]).append("<td><input type='checkbox' value=''class='module_admin'></td>");
+						}
+						}
+					}
+					$("#preferencesTable").find("input[type=checkbox]").each(function () {
+						$(this).attr("disabled", "disabled");
+					});
+					console.log("Preferences fetched successfully")
+				}
+			}, function (error) {
+				console.log("Error:::::::::::::", error);
+			});
 			$("#preferencesTable").find("input[type=checkbox]:not(.switchRole)").each(function () {
 				$(this).attr("disabled", "disabled");
 			});
+			unblockUI()
 		}, 50);
 	};
 

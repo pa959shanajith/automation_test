@@ -275,7 +275,7 @@ function next_function(resultobj,projectid)
 						else if(t.nodetype=="testscenarios")
 						{
 							testSuiteDetails_obj.testsuiteid=t.parent|| null;
-							testSuiteDetails_obj.testsuitename = suitename[t.parent];
+							testSuiteDetails_obj.testsuitename = suitename[t.parent] || 'testsuitename';
 							task_json.scenarioId = t.nodeid;
 							task_json.scenarioName=t.name;
 						}
