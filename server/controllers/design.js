@@ -96,8 +96,10 @@ exports.readTestCase_ICE = function (req, res) {
 						if (!requestedscreenid){
 							testcasesteps = result.rows[0].steps;
 							testcasename = result.rows[0].name;
+							reuse= (result.rows[0].parent>1)?true:false;
 							responsedata = {
 								template: "",
+								reuse: reuse,
 								testcase: testcasesteps,
 								testcasename: testcasename,
 								del_flag: result.del_flag
@@ -111,10 +113,12 @@ exports.readTestCase_ICE = function (req, res) {
 								for (var i = 0; i < result.rows.length; i++) {
 									testcasesteps = result.rows[i].steps;
 									testcasename = result.rows[i].name;
+									reuse= (result.rows[i]>1)?true:false;
 								}
 								responsedata = {
 									template: "",
 									testcase: testcasesteps,
+									reuse: reuse,
 									testcasename: testcasename,
 									del_flag: result.del_flag
 								};
