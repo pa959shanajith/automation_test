@@ -275,7 +275,7 @@ function next_function(resultobj,projectid)
 						else if(t.nodetype=="testscenarios")
 						{
 							testSuiteDetails_obj.testsuiteid=t.parent|| null;
-							testSuiteDetails_obj.testsuitename = suitename[t.parent];
+							testSuiteDetails_obj.testsuitename = suitename[t.parent] || 'testsuitename';
 							task_json.scenarioId = t.nodeid;
 							task_json.scenarioName=t.name;
 						}
@@ -317,10 +317,10 @@ function next_function(resultobj,projectid)
 							taskDetails.taskName = t.tasktype + versioningCheck() + t.batchname;
 							// testSuiteDetails_obj.testsuitename = m.moduleName;
 							testSuiteDetails_obj.assignedTime = t.assignedTime;
-							if (batch_dict[t.batchName+'_'+t.cycleid] == undefined) {
-								batch_dict[t.batchName+'_'+t.cycleid] = user_task_json.length;
+							if (batch_dict[t.batchname+'_'+t.cycleid] == undefined) {
+								batch_dict[t.batchname+'_'+t.cycleid] = user_task_json.length;
 							} else {
-								parent_index = batch_dict[t.batchName+'_'+t.cycleid];
+								parent_index = batch_dict[t.batchname+'_'+t.cycleid];
 								batch_task = user_task_json[parent_index];
 								batch_task.taskDetails[0].batchTaskIDs.push(t._id);
 								testSuiteDetails_obj.subTaskId = t._id;

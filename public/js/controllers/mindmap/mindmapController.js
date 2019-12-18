@@ -828,11 +828,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             dictTmp[i] = [];
             if (e.reuse) {
                 dNodes.forEach(function(f, j) {
-                    if (e.type == f.type && e.type == 'screens' && e.name == f.name && i != j)
+                    if (e.type == f.type && e.type == 'screens' && e.name == f.name && i != j && f.reuse)
                         dictTmp[i].push(j);
-                    else if (e.type == f.type && e.type == 'testcases' && e.name == f.name && i != j && e.parent && f.parent && e.parent.name == f.parent.name)
+                    else if (e.type == f.type && e.type == 'testcases' && e.name == f.name && i != j && e.parent && f.parent && e.parent.name == f.parent.name && f.reuse)
                         dictTmp[i].push(j);
-                    else if (e.type == f.type && e.type== 'scenarios' && e.name==f.name && i!=j)
+                    else if (e.type == f.type && e.type== 'scenarios' && e.name==f.name && i!=j && f.reuse)
                         dictTmp[i].push(j);
                 })
             }
@@ -1101,7 +1101,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             cycleid: $('.cycle-list').val(),
             details: tObj.det,
             parent: data.parent,
-            cx: clist != undefined ? clist.toString() : undefined
+            complexity: clist != undefined ? clist.toString() : undefined
         };
         if (!taskUndef) t._id = tObj._id != undefined ? tObj._id : null
         
@@ -1276,7 +1276,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     }
                 }
                 if (!origTask) {
-                    dNodes[pi].task.cx = undefined;
+                    dNodes[pi].task.complexity = undefined;
                     dNodes[pi].task.details = '';
                 }
                 if(!origTask && taskUndef){
@@ -1540,7 +1540,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         
         var tObj = {
             t: (nt) ? nt.tasktype : '',
-            bn: (nt) ? nt.batchName : '',
+            bn: (nt) ? nt.batchname : '',
             at: (nt) ? nt.assignedto : '',
             rw: (nt && nt.reviewer != null) ? nt.reviewer : '',
             sd: (nt) ? nt.startdate : '',
@@ -1548,7 +1548,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             re: (nt && nt.release != null) ? nt.release : '',
             cy: (nt && nt.cycleid != null) ? nt.cycleid : '',
             det: (nt) ? nt.details : '',
-            cx: (nt) ? nt.cx : undefined,
+            cx: (nt) ? nt.complexity : undefined,
             _id:(nt)? nt._id:null
         };
 

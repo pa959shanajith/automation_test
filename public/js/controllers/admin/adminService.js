@@ -140,6 +140,11 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			})
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
+		},
+		getPreferences: function () {
+			return $http.post('/getPreferences')
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
 		}
 	};
 }]);
