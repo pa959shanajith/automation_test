@@ -193,7 +193,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         'apptype': res.appType[i],
                         'name': res.projectName[i],
                         'id': res.projectId[i],
-                        'releases':res.releases[i]
+                        'releases':res.releases[i],
+                        'domains':res.domains[i]
                     });
                 }
                 var default_releaseid = '';
@@ -212,8 +213,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         mindmapServices.getProjectTypeMM_Nineteen68($scope.projectNameO).then(function(res1){
                             $scope.apptypelist = res1;
                             $scope.apptype = res1.project_typename;
+                            $scope.domain = res1.domains;
                             addInfo({'attributes':{
-                                                    'Domain': $scope.domaininfo[0].domainName,
+                                                    'Domain': $scope.domain,
                                                     'Apptype':$scope.apptype
                                                 }
                                     });
@@ -228,11 +230,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         $('.cycle-list').empty();
                         $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
                         $('.cycle-list').addClass('errorClass');
-                        // reldata = {};
+                        reldata = {};
+                        cycdata = {};
                         for (i = 0; i < result.length; i++) {
-
                             $('.release-list').append("<option data-id='" + result[i].name + "' value='" + i + "'>" + result[i].name + "</option>");
-                           
+                            for(j = 0;j < result[i].cycles.length; j++){
+                                reldata[result[i].cycles[j]._id]=result[i].name;
+                                cycdata[result[i].cycles[j]._id]=result[i].cycles[j].name;
+                            }
                         }
                         $('.cycle-list').change(function() {
                             $('.cycle-list').removeClass('errorClass');
@@ -250,10 +255,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                 $('.cycle-list').empty();
                                 $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
                                 $('.cycle-list').addClass('errorClass');
-                                cycdata = {};
                                 for (i = 0; i < result2.length; i++) {
                                     $('.cycle-list').append("<option data-id='" + result2[i]["name"] + "' value='" + result2[i]["_id"] + "'>" + result2[i]["name"] + "</option>");
-                                    cycdata[result2[i]["_id"]] = result2[i]["name"];
                                 }
                            
                         });
@@ -347,11 +350,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 					$('.search-canvas').val('');
                 }
                 var result=$scope.projectList[selectedProjectIndex].releases;
-                //reldata = {};
+                $scope.domain=$scope.projectList[selectedProjectIndex].domains;
+                reldata = {};
+                cycdata = {};
                 for (i = 0; i < result.length; i++) {
-
                     $('.release-list').append("<option data-id='" + result[i].name + "' value='" + i + "'>" + result[i].name + "</option>");
-                    // reldata[result.r_ids[i]] = result[i].name
+                    for(j = 0;j < result[i].cycles.length; j++){
+                        reldata[result[i].cycles[j]._id]=result[i].name;
+                        cycdata[result[i].cycles[j]._id]=result[i].cycles[j].name;
+                    }
                 }
                 
                 
@@ -368,10 +375,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     $('.cycle-list').empty();
                     $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
                     $('.cycle-list').addClass('errorClass');
-                    cycdata = {};
                     for (i = 0; i < result2.length; i++) {
                         $('.cycle-list').append("<option data-id='" + result2[i]["name"] + "' value='" + result2[i]["_id"] + "'>" + result2[i]["name"] + "</option>");
-                        cycdata[result2[i]["_id"]] = result2[i]["name"];
                     }
                    
                 });
@@ -401,7 +406,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             $scope.apptypelist = res1;
             $scope.apptype = res1.project_typename;
             addInfo({'attributes':{
-                'Domain': $scope.domaininfo[0].domainName,
+                'Domain': $scope.domain,
                 'Apptype':$scope.apptype
                 }
             });
@@ -648,7 +653,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $scope.functionTBE = 'loadMapPopupConfirmed';
         excelFlag = 1;
         versionFlag = 1;
-        // $('#createNewConfirmationPopup').attr('mapid', $scope.allMMaps[idx].name);
+        $('#createNewConfirmationPopup').attr('mapname', $scope.allMMaps[idx].name);
         $('#createNewConfirmationPopup').attr('mapid', $scope.allMMaps[idx]._id);
         // $('#createNewConfirmationPopup').attr('_id',$scope.allMaps[idx]._id);
         if (Object.keys($scope.nodeDisplay).length != 0) {
@@ -730,6 +735,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     function loadMapPopupConfirmed() {
+        clearSvg();
         d3.selectAll('.zoom-btn').on('click', zoomClick);
         $('.navigate-widget').removeClass("no-disp");
         $('.navigate-widget').draggable({ containment: "#ct-mapSvg" });
@@ -754,36 +760,21 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         saveFlag=true;
         SaveCreateED('#ct-createAction', 1, 0);
         $("div.nodeBoxSelected").removeClass("nodeBoxSelected");
-        $('[title=' + $('#createNewConfirmationPopup').attr('mapid') + ']').addClass("nodeBoxSelected");
+        $('[title=' + $('#createNewConfirmationPopup').attr('mapname') + ']').addClass("nodeBoxSelected");
         d3.select('#ct-inpBox').classed('no-disp', true);
         // var modName = $('#createNewConfirmationPopup').attr('mapid');
         // var moduleid =$('#createNewConfirmationPopup').attr('_id');
-        var modName = $('#createNewConfirmationPopup').attr('_id') || null;
+        var modName = $('#createNewConfirmationPopup').attr('mapname');
         var moduleid =$('#createNewConfirmationPopup').attr('mapid');
         $scope.modType = 'e2e';
         blockUI("Loading module.. Please wait..");
+        // mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, 0, $('.cycle-list').val(), modName,moduleid).then(function(result) {
         mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, 0, $('.cycle-list').val(), modName,moduleid).then(function(result) {
             progressFlag=false;
             if($scope.tab=="tabAssign" && result["completeFlow"]==false)
             {
-											  
-												 
-			 
-								   
-						   
-																						
-										 
-																		
-										  
-										   
-								 
-								 
-                unblockUI();
-                openDialogMindmap("Error", "Please select a complete flow to assign tasks.");
-								
-											   
-																	
-										   
+				unblockUI();
+                openDialogMindmap("Error", "Please select a complete flow to assign tasks.");						   
             }
             else
             {
@@ -992,7 +983,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
         }
         d3.select('#ct-assignBox').classed('no-disp', !0);
-        if (dNodes[pi].children && $('.pg-checkbox')[0].checked) {
+        index=activeNode.split("-")[2]
+        if (dNodes[pi].children && $('.pg-checkbox')[0].checked && (index == pi || dNodes[index]._id==dNodes[pi].parent._id)) {
             dNodes[pi].children.forEach(function(e, i) {
                 $scope.removeTask('something', e.id,twf);
             });
@@ -1496,10 +1488,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             addInfo({
                 type: dNodes[pi].type,
                 attributes: {
-                    'Task': dNodes[pi].task.task,
-                    'Release': reldata[dNodes[pi].task.release],
+                    'Task': dNodes[pi].task.tasktype,
+                    'Release': reldata[dNodes[pi].task.cycleid],
                     'Cycle': cycdata[dNodes[pi].task.cycleid],
-                    'Domain': $scope.domaininfo[0].domainName,
+                    'Domain': $scope.domain,
                     'Apptype':$scope.apptype
                 }
             });
@@ -1719,7 +1711,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     $('#ct-compbox').click(function() {
                         showComplexityBox(t);
                     });
-                    if (!(clist == "undefined" || clist == undefined)) {
+                    if (!(clist == "undefined" || clist == undefined || clist == "")) {
                         $('#ct-cxval').text(getComplexityLevel(t, parseInt(clist[0])));
                         $('#complexity-val').text('Complexity: ' + getComplexityLevel(t, parseInt(clist[0])));
                     } else {
@@ -1782,7 +1774,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             type: dNodes[idx].type,
             attributes: {
                 'Name': dNodes[idx].name,
-                'Domain': $scope.domaininfo[0].domainName,
+                'Domain': $scope.domain,
                 'Apptype':$scope.apptype
             }
         });
@@ -2688,13 +2680,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     $scope.txtBoxKeyup = function(keyCode) {
         temp = [];
+        temp1=[];
         var t, list;
         $scope.inpText = angular.element("#ct-inpBox").scope().inpText;
         //To fix issue with suggestions
         var p = d3.select(activeNode);
         inp = d3.select('#ct-inpAct');
         var val = inp.property('value');
-        if(!validNodeDetails(val)) { return; }
+        if(!validNodeDetails(val)) { d3.select('#ct-inpSugg').selectAll('li').remove(); return; }
         //var p=d3.select(activeNode);
         var iul = d3.select('#ct-inpSugg');
         if (keyCode == 13) {
@@ -2713,14 +2706,28 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         else if (t == 'testcases') list = tcList;
         else return;
         iul.selectAll('li').remove();
-
+        if(t=='testcases'){
+            links=Object.keys($scope.linkDisplay)
+            links.forEach(function(d, i){
+                if(d.split('-')[2] === p[0][0].id.split("-")[2]) {
+                  index=d.split('-')[1];
+                }
+            },[]);
+            screenid=$scope.nodeDisplay[index]._id
+            list.forEach(function(d, i){
+                if(screenid === d.screenid) {
+                  temp1.push(d);
+                }
+            },[]);
+            list=temp1;
+            }
         var list = list.reduce((unique, o) => {
             if(!unique.some(obj => obj.name === o.name)) {
               unique.push(o);
             }
             return unique;
         },[]);
-
+        
         list.forEach(function(d, i) {
             var s = d.name.toLowerCase();
             if (s.lastIndexOf($scope.inpText.toLowerCase(), 0) === 0) {
@@ -4049,7 +4056,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var userInfo = JSON.parse(window.localStorage['_UI']);
         var user_id = userInfo.user_id;
         var moduleid = $('#createNewConfirmationPopup').attr('mapid');
-        var modName =$('#createNewConfirmationPopup').attr('_id') || null;
+        var modName =$('#createNewConfirmationPopup').attr('mapname');
         mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, parseFloat(version_num), $('.cycle-list').val(), modName,moduleid).then(
             function(result) {
                 if (result == "Invalid Session") {
@@ -5381,6 +5388,7 @@ Purpose : displaying pop up for replication of project
         dNodes = [];
         dLinks = [];
         $scope.allMMaps = [];
+        versionFlag=0;
     }
 
     $scope.collapseETE = function() {
@@ -5485,7 +5493,8 @@ Purpose : displaying pop up for replication of project
     $scope.createNewMapModal = function(moduleName) {
         $scope.functionTBE = 'createNewMap';
         if($scope.createdthrough=="") $scope.createdthrough="Web";
-        $("#ct-saveAction").removeClass("disableButton")
+        $("#ct-saveAction").removeClass("disableButton");
+        // clearSvg();
         if (Object.keys($scope.nodeDisplay).length != 0)
             $('#createNewConfirmationPopup').modal('show');
         else

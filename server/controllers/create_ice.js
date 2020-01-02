@@ -1909,6 +1909,7 @@ exports.getProjectType_Nineteen68 = function (req, res) {
 					projectDetails.projectid=result.rows[0]["_id"];
 					projectDetails.project_typename=result.projecttype[0].name;
 					projectDetails.releases=result.rows[0].releases;
+					projectDetails.domains=result.rows[0].domain;
 				}
 				res(null, projectDetails);
 			}

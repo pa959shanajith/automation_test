@@ -147,20 +147,19 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 						// Enable Filter
 						$("span.filterIcon").removeClass('disableFilter');
 					}
-					for(i=0;i<data.projectId.length;i++){
-
-						if($scope.filterDat.apptypes.indexOf(data.appTypeName[i])==-1)
-						{
-							// $scope.filterDat.apptypes.push(obj.appType);
-							$scope.filterDat.apptypes.push(data.appTypeName[i]);
-						}
-						$scope.filterDat.idnamemapprj[data.projectId[i]] = data.projectName[i];
-						releases=data.releases[i];
-						for(j=0;j<releases.length;j++){
-							$scope.filterDat.idnamemaprel[releases[j].name] = releases[j].name;
-							cycles=releases[j].cycles
-							for(k=0;k<cycles.length;k++){
-								$scope.filterDat.idnamemapcyc[cycles[k]._id] = cycles[k].name;
+					for(i=0;i<$scope.filterDat.projectids.length;i++){
+						index=data.projectId.indexOf($scope.filterDat.projectids[i]);
+						// if($scope.filterDat.apptypes.indexOf(data.appTypeName[i])==-1)
+						// {
+						// 	// $scope.filterDat.apptypes.push(obj.appType);
+						// 	$scope.filterDat.apptypes.push(data.appTypeName[index]);
+						// }
+						index=data.projectId.indexOf($scope.filterDat.projectids[i]);
+						$scope.filterDat.idnamemapprj[$scope.filterDat.projectids[i]] = data.projectName[index];
+						for(j=0;j<$scope.filterDat.releaseids.length;j++){
+							$scope.filterDat.idnamemaprel[$scope.filterDat.releaseids[j]] = $scope.filterDat.releaseids[j];
+							for(k=0;k<$scope.filterDat.cycleids.length;k++){
+								$scope.filterDat.idnamemapcyc[$scope.filterDat.cycleids[k]] = data.cycles[$scope.filterDat.cycleids[k]][2];
 							}
 						}
 					}
@@ -542,8 +541,8 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			$scope.filterDat.relcycmap[obj.taskDetails[tidx].releaseid].push(obj.taskDetails[tidx].cycleid);			
 		}
 
-		// if($scope.filterDat.apptypes.indexOf(obj.appType)==-1)
-		// 	$scope.filterDat.apptypes.push(obj.appType);
+		if($scope.filterDat.apptypes.indexOf(obj.appType)==-1)
+			$scope.filterDat.apptypes.push(obj.appType);
 		window.localStorage['_FD'] = angular.toJson($scope.filterDat);
 		$(".panel-additional-details").off("click");
 		$(".panel-additional-details").click(function(e){
