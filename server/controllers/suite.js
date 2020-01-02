@@ -437,7 +437,8 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 			"apptype": "",
 			"exec_mode":exc_action
         };				
-        var executionId = '';						
+		var executionId = '';
+		var cycleid = '';						
         async.series({
             approval_check:function(callback_E){
 				// if (!taskflow) return callback_E();
@@ -479,7 +480,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					var testsuitename = eachbatchExecutionData.testsuitename;
 					var testsuiteid = eachbatchExecutionData.testsuiteid;
 					var releaseid = eachbatchExecutionData.releaseid;
-					var cycleid = eachbatchExecutionData.cycleid;			
+					cycleid = eachbatchExecutionData.cycleid;			
 					var browserType = eachbatchExecutionData.browserType;
 					var apptype = eachbatchExecutionData.appType;
 					var listofscenarioandtestcases = [];
@@ -546,7 +547,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                 }); 
             },
             execution_insertion:function(callback_E){ 
-                 insertExecutionStatus(req.session.userid,function(res){
+                 insertExecutionStatus(req.session.userid,testsuiteIds,cycleid,function(res){
                     if(res == 'fail'){
 						executionId = '';
                     }else{
@@ -711,6 +712,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
         var testsuitedetailslist = [],testsuiteidcycmap = {};
 		var testsuitedetailslist = [];
 		var testsuiteIds = [];
+		var cycleid = '';
 		var exc_action  = req.body.action;
 		var executionRequest = {
 			"executionId": "",
@@ -762,7 +764,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 					var testsuitename = eachbatchExecutionData.testsuitename;
 					var testsuiteid = eachbatchExecutionData.testsuiteid;
 					var releaseid = eachbatchExecutionData.releaseid;
-					var cycleid = eachbatchExecutionData.cycleid;			
+					cycleid = eachbatchExecutionData.cycleid;			
 					var browserType = eachbatchExecutionData.browserType;
 					var apptype = eachbatchExecutionData.appType;
 					var listofscenarioandtestcases = [];
@@ -829,7 +831,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
                 }); 
             },
             execution_insertion:function(callback_E){
-                 insertExecutionStatus(req.session.userid,function(res){
+                 insertExecutionStatus(req.session.userid,testsuiteIds,cycleid,function(res){
                     if(res == 'fail'){
 						executionId = '';
                     }else{
@@ -976,11 +978,13 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 };
 
 
-function  insertExecutionStatus(executedby,callback) {
+function  insertExecutionStatus(executedby,testsuiteids,cycleid,callback) {
 	logger.info("Inside updateExecutionStatus function");
 	var inputs = {
 		"executedby": executedby, 
 		"status": "inprogress",
+		"testsuiteids":testsuiteids,
+		"cycleid":cycleid,
 		"query": "inserintotexecutionquery"
 	};
 	var args = {
@@ -1006,7 +1010,7 @@ function  insertExecutionStatus(executedby,callback) {
 
 //Update execution table on completion of suite execution
 function updateExecutionStatus(testsuiteid, executionid, suiteStatus,cycleid) {
-	logger.info("Inside insertExecutionStatus function");
+	logger.info("Inside updateExecutionStatus function");
 	var inputs = {
 		"status": suiteStatus,
 		"testsuiteid":testsuiteid,
@@ -1805,7 +1809,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 
 			},
 			execution_insertion:function(callback_E){ 
-				insertExecutionStatus(req.session.userid,function(res){
+				insertExecutionStatus(req.session.userid,executionRequest.testsuiteIds,cycleid,function(res){
 				   if(res == 'fail'){
 					   executionId = '';
 				   }else{

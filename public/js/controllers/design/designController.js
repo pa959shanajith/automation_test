@@ -288,6 +288,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					taskObj.screenName = data.screenName;
 					window.localStorage['_CT'] = JSON.stringify(taskObj);
 				}
+				if(data.reuse){
+					var task = JSON.parse(window.localStorage['_CT']);
+					task.reuse = "True";
+					window.localStorage['_CT'] = JSON.stringify(task);
+				}
 				if(data.del_flag){
 					//pop up for presence of deleted objects
 					openDialog("Deleted objects found", "Deleted objects found in some teststeps, Please delete or modify those steps.");
@@ -883,6 +888,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 					viewString = data;
 
+					if(viewString.reuse){
+						var task = JSON.parse(window.localStorage['_CT']);
+						task.reuse = "True";
+						window.localStorage['_CT'] = JSON.stringify(task);
+					}
 					newScrapedList = viewString
 					$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
 					if(viewString.scrapetype=='caa')
