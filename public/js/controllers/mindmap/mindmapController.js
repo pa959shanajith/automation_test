@@ -9,6 +9,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         deletednode_info = [];
     var versioning_enabled = 0;
     var idxSearch = 0;
+    var count1 = new Set();
     $scope.verticalLayout = false;
     $scope.moving = false;
     $scope.apptype = '';
@@ -952,13 +953,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             } 
         }
         task_unassignment(pi,twf);
-        
+
         if (reuseDict[pi].length > 0) {
-            reuseDict[pi].forEach(function(e, i) {
-                task_unassignment(e,twf);
-            });
+            reuseDict[pi].forEach(count1.add, count1)
         }
-        
+        count1.forEach(function(ee,indx){
+            var p = d3.select('#ct-node-' + indx);
+            p.select('.ct-nodeTask').classed('no-disp', !0);
+            count1.delete(indx);
+        });
     }
 
     $('#unassignTask').click(function() {
@@ -984,7 +987,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
         d3.select('#ct-assignBox').classed('no-disp', !0);
         index=activeNode.split("-")[2]
-        if (dNodes[pi].children && $('.pg-checkbox')[0].checked && (index == pi || dNodes[index]._id==dNodes[pi].parent._id)) {
+        if (dNodes[pi].children && $('.pg-checkbox')[0].checked && (index == pi || dNodes[index]._id==dNodes[pi].parent._id || dNodes[index].type == "modules")) {
             dNodes[pi].children.forEach(function(e, i) {
                 $scope.removeTask('something', e.id,twf);
             });
@@ -4726,6 +4729,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     function clearSvg() {
         unloadMindmapData();
+        $("#ct-node-0").children(".ng-binding").each(function(i,obj){
+            obj.innerHTML='Module_0';
+        });
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
         d3.select('#ct-assignBox').classed('no-disp', !0);
         //d3.select('#ct-mapSvg').append('g').attr('id', 'ct-mindMap');
