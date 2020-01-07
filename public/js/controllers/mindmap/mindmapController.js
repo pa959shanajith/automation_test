@@ -1275,7 +1275,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     dNodes[pi].task.details = '';
                 }
                 if(!origTask && taskUndef){
-                    dNodes[pi].task.details =  dNodes[pi].task.task + " " + dNodes[pi].type + " " + dNodes[pi].name;
+                    dNodes[pi].task.details =  dNodes[pi].task.task + " " + dNodes[pi].type.substring(0,dNodes[pi].type.length-1) + " " + dNodes[pi].name;
                 }                
                 if(!taskUndef && !origTask){
                     dNodes[pi].task.reviewer = tObj.rw;
@@ -1564,7 +1564,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $("#ct-assignTask option[value='" + tObj.t + "']").attr('selected', 'selected');
 
         if (tObj.det === null || tObj.det.trim() == "") {
-            d3.select('#ct-assignDetails').property('value', tObj.t + " " + dNodes[pi].type + " " + dNodes[pi].name);
+            d3.select('#ct-assignDetails').property('value', tObj.t + " " + dNodes[pi].type.substring(0,dNodes[pi].type.length-1) + " " + dNodes[pi].name);
         } else {
             d3.select('#ct-assignDetails').property('value', tObj.det);
         }

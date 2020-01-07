@@ -487,7 +487,11 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					var scenarioIdList = [];
 					var dataparamlist = [];
 					var conditionchecklist = [];
-                    var browserTypelist = [];
+					var browserTypelist = [];
+					var scenarioNameList = [];
+					cyclename = eachbatchExecutionData.cyclename;
+					domainname = eachbatchExecutionData.domainname;
+					projectname = eachbatchExecutionData.projectname;
                     testsuiteIds.push(testsuiteid);
                     testsuiteidcycmap[testsuiteid] = cycleid;
                     async.forEachSeries(suiteDetails, function (eachsuiteDetails, eachsuiteDetailscallback) {
@@ -500,12 +504,16 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                         };
                         var currentscenarioid = "";
 						scenarioIdList.push(eachsuiteDetails.scenarioids);
+						scenarioNameList.push(eachsuiteDetails.scenarionames)
 						dataparamlist.push(eachsuiteDetails.dataparam[0]);
 						conditionchecklist.push(eachsuiteDetails.condition);
 						browserTypelist.push(eachsuiteDetails.browserType);
 						currentscenarioid = eachsuiteDetails.scenarioids;
 						executionjson.releaseid = releaseid;
-                        executionjson.cycleid = cycleid;
+						executionjson.cycleid = cycleid;
+						executionjson.cyclename = cyclename;
+						executionjson.domainname = domainname;
+						executionjson.projectname = projectname;
                         scenariodescriptionobject[eachsuiteDetails.scenarioids] = eachsuiteDetails.scenariodescription;
                         TestCaseDetails_Suite_ICE(currentscenarioid, userInfo.userid, function (currentscenarioidError, currentscenarioidResponse) {
                             var scenariotestcaseobj = {};
@@ -522,7 +530,8 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 								if (listofscenarioandtestcases.length == suiteDetails.length) {
 									logger.info("Calling function updateData from TestCaseDetails_Suite_ICE function");
 									executionjson[testsuiteid] = listofscenarioandtestcases;
-                                    executionjson.scenarioIds = scenarioIdList;
+									executionjson.scenarioIds = scenarioIdList;
+									executionjson.scenarioNames = scenarioNameList;
                                     executionjson.browserType = browserType;
                                     executionjson.condition = conditionchecklist;
                                     executionjson.dataparampath = dataparamlist;
@@ -599,7 +608,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                                                 reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
                                                 reportdata = JSON.parse(reportdata);
 												var cycleid = testsuiteidcycmap[testsuiteid]
-                                                if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
+                                                if (resultData.reportData.overallstatus[0].overAllStatus == "Pass") {
                                                     statusPass++;
                                                 }
                                                 var inputs = {
@@ -609,7 +618,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                                                     "testscenarioid": scenarioid,
                                                     "browser": req_browser,
                                                     "cycleid": testsuiteidcycmap[testsuiteid],
-                                                    "status": resultData.reportData.overallstatus[0].overallstatus,
+                                                    "status": resultData.reportData.overallstatus[0].overAllStatus,
                                                     "report": JSON.stringify(reportdata),
 													"query": "insertreportquery",
 													"modifiedby":userInfo.userid

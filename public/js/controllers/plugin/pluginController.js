@@ -78,7 +78,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 						* Another dict for releaseid and cyclelist out of task json
 						* List of apptype and tasktype
 						*/
-					    $scope.filterDat = {'projectids':[],'releaseids':[],'cycleids':[],'prjrelmap':{},'relcycmap':{},'apptypes':[],'tasktypes':['Design','Execution'],'idnamemapprj':{},'idnamemaprel':{},'idnamemapcyc':{}};
+					    $scope.filterDat = {'projectids':[],'releaseids':[],'cycleids':[],'prjrelmap':{},'relcycmap':{},'apptypes':[],'tasktypes':['Design','Execution'],'idnamemapprj':{},'idnamemaprel':{},'idnamemapcyc':{},'idnamemapdom':{}};
 						$(".plugin-taks-listing:visible").empty().hide();
 						var counter = 1,countertodo = 1,counterreview = 1;
 						var length_tasksJson = tasksJson.length;
@@ -156,6 +156,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 						// }
 						index=data.projectId.indexOf($scope.filterDat.projectids[i]);
 						$scope.filterDat.idnamemapprj[$scope.filterDat.projectids[i]] = data.projectName[index];
+						$scope.filterDat.idnamemapdom[$scope.filterDat.projectids[i]] = data.domains[index];
 						for(j=0;j<$scope.filterDat.releaseids.length;j++){
 							$scope.filterDat.idnamemaprel[$scope.filterDat.releaseids[j]] = $scope.filterDat.releaseids[j];
 							for(k=0;k<$scope.filterDat.cycleids.length;k++){
@@ -251,7 +252,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		$(".panel-default span.assignedTask").each(function () {
 			var title = $(this).attr('title');
 			if ($('.active-task').is(":visible")) {
-				$('.active-task').children().children('div').children('div').children('img').click();
+				$('.active-task').children().children('div').children('div').children('button').click();
 			}
 			if (title == undefined) {
 				if ($(this).text().toLowerCase().indexOf(value.toLowerCase()) > -1) {

@@ -946,7 +946,7 @@ exports.saveData = function (req, res) {
 											taskAssignment = "unassigned";
 										}
 										if (taskAssignment == "unassigned") {
-											assignedTasksNotification.notifyMsg = "Task '" + taskName + "' have been unassigned by " + user + "";
+											assignedTasksNotification.notifyMsg = "Task '" + taskName + "' has been unassigned by " + user + "";
 										}
 										assignedTasksNotification.isRead = false;
 										assignedTasksNotification.count = count;
@@ -956,7 +956,7 @@ exports.saveData = function (req, res) {
 							}
 
 							if (taskAssignment == "assigned") {
-								assignedTasksNotification.notifyMsg = "New task '" + taskName + "' have been assigned by " + user + "";
+								assignedTasksNotification.notifyMsg = "New task '" + taskName + "' has been assigned by " + user + "";
 								assignedTasksNotification.isRead = false;
 								assignedTasksNotification.count = count;
 								soc.emit("notify", assignedTasksNotification);

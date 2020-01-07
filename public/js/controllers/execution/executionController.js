@@ -656,6 +656,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 							dataparam: [$(this).parent().siblings(".exe-dataParam").find("input").val().trim()],
 							executestatus: 1,
 							scenarioids: $(this).parent().siblings(".exe-scenarioIds").attr("sId"),
+							scenarionames: $(this).parent().siblings(".exe-scenarioIds")[0].innerText,
 							scenariodescription: $scope.somevar[$(this).parent().siblings(".exe-scenarioIds").attr("sId")],
 							qccredentials: {
 								qcurl: "",
@@ -664,6 +665,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 							}
 						});
 					});
+					projectdata=JSON.parse(window.localStorage["_FD"]);
 					//console.log("selectedRowData:::" + selectedRowData)
 					suiteInfo.suiteDetails = selectedRowData;
 					suiteInfo.testsuitename = $(this).parents('span.taskname').text();
@@ -673,6 +675,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					suiteInfo.releaseid = relidreport;
 					suiteInfo.cycleid = cycidreport;
 					suiteInfo.projectid = projectidreport;
+					suiteInfo.cyclename = projectdata.idnamemapcyc[cycidreport];
+					suiteInfo.projectname = projectdata.idnamemapprj[projectidreport];
+					suiteInfo.domainname = projectdata.idnamemapdom[projectidreport];
 					//console.log("suiteInfo:::" + suiteInfo)
 					$scope.moduleInfo.push(suiteInfo);
 				}
