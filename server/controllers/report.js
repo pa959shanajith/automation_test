@@ -192,14 +192,13 @@ exports.renderReport_ICE = function(req, res) {
         res.send("fail");
     }
 };
+
+//To get all the projects and their releases & cycles
 exports.getAllSuites_ICE = function(req, res) {
     logger.info("Inside UI service: getAllSuites_ICE");
     if (utils.isSessionActive(req)) {
-        //the code below is commented as per the new requirement
-        //ALM #460 - Reports - HTML report takes very long time to open/ hangs when report size is 5MB above
-        // author - vishvas.a modified date:27-Sep-2017
         var requestedaction = req.body.readme;
-        if (requestedaction == 'projects') {
+        if (requestedaction == 'projects' || requestedaction == 'reports') {
             try {
                 var userid = req.body.userId;
                 logger.info("Calling function getprojectdetails from getAllSuites_ICE: Projects");
@@ -221,29 +220,8 @@ exports.getAllSuites_ICE = function(req, res) {
                 logger.error("Exception in the service getAllSuites_ICE: Projects: %s", exception);
                 res.send("fail");
             }
-        } else if (requestedaction == 'reports') {
-            try {
-                var projectid = req.body.projectId;
-                logger.info("Calling function getprojectdetails from getAllSuites_ICE: reports");
-                getsuitedetails(projectid, function(getsuitedetailserror, getsuitedetailsresponse) {
-                    try {
-                        if (getsuitedetailserror) {
-                            logger.error("Error occurred in the function getsuitedetails: getAllSuites_ICE: reports");
-                            res.send("fail");
-                        } else {
-                            logger.info("Sending Suite details from getsuitedetails: getAllSuites_ICE: reports");
-                            res.send(getsuitedetailsresponse);
-                        }
-                    } catch (exception) {
-                        logger.error("Exception in a function getsuitedetails: getAllSuites_ICE: reports: %s", exception);
-                        res.send("fail");
-                    }
-                });
-            } catch (exception) {
-                logger.error("Exception in the service getAllSuites_ICE: reports: %s", exception);
-                res.send("fail");
-            }
-        } else {
+         }
+        else {
             logger.error("Invalid input fail");
             res.send('Invalid input fail');
         }
@@ -255,10 +233,6 @@ exports.getAllSuites_ICE = function(req, res) {
     function getprojectdetails(userid, getprojectdetailscallback) {
         logger.info("Inside UI function: getprojectdetails");
         try {
-            var responsedata = {
-                projectids: [],
-                projectnames: []
-            };
             var inputs = {
                 "query": "projects",
                 "userid": userid
@@ -271,206 +245,27 @@ exports.getAllSuites_ICE = function(req, res) {
             };
             logger.info("Calling NDAC Service from getprojectdetails: reports/getAllSuites_ICE");
             client.post(epurl + "reports/getAllSuites_ICE", args,
-                function(allprojectids, response) {
-                    if (response.statusCode != 200 || allprojectids.rows == "fail") {
+                function(projectdetails, response) {
+                    if (response.statusCode != 200 || projectdetails.rows == "fail") {
                         logger.error("Error occurred in reports/getAllSuites_ICE from getprojectdetails Error Code : ERRNDAC");
                         getprojectdetailscallback("fail", null);
-                    } else {
+                    } else {                       
                         try {
-                            var projectssize = allprojectids.rows[0].projectids.length;
-                            var index = 0;
-                            async.forEachSeries(allprojectids.rows[0].projectids, function(eachprojectid, allprojectidscallback) {
-                                try {
-                                    var inputs = {
-                                        "id": eachprojectid,
-                                        "query": "projects"
-                                    };
-                                    var args = {
-                                        data: inputs,
-                                        headers: {
-                                            "Content-Type": "application/json"
-                                        }
-                                    };
-                                    logger.info("Calling NDAC Service from getprojectdetails: admin/getNames_ICE");
-                                    client.post(epurl + "admin/getNames_ICE", args,
-                                        function(eachprojectdata, response) {
-                                            if (response.statusCode != 200 || eachprojectdata.rows == "fail") {
-                                                logger.error("Error occurred in admin/getNames_ICE from getprojectdetails Error Code : ERRNDAC");
-                                                getprojectdetailscallback("fail", null);
-                                            } else {
-                                                try {
-                                                    if (eachprojectdata.rows.length > 0) {
-                                                        responsedata.projectids.push(eachprojectdata.rows[0].projectid);
-                                                        responsedata.projectnames.push(eachprojectdata.rows[0].projectname);
-                                                        index += 1;
-                                                        allprojectidscallback();
-                                                    }
-                                                    if (projectssize == index) {
-                                                        logger.info("Sending project names from getAllSuites_ICE: projects");
-                                                        getprojectdetailscallback(null, responsedata);
-                                                    }
-                                                } catch (exception) {
-                                                    logger.error("Exception in the function getprojectdetails: admin/getNames_ICE: %s", exception);
-                                                    // getprojectdetailscallback("fail",null);
-                                                }
-                                            }
-                                        });
-                                } catch (exception) {
-                                    logger.error("Exception in the function getprojectdetails when calling admin/getNames_ICE: %s", exception);
-                                    // getprojectdetailscallback("fail",null);
-                                }
-                            });
+                            var reports = projectdetails.rows
                         } catch (exception) {
-                            logger.error("Exception in the function getprojectdetails when calling admin/getNames_ICE: %s", exception);
-                            // getprojectdetailscallback("fail",null);
+                            logger.error("Exception in the function getprojectdetails: %s", exception);
                         }
+                        logger.info("Sending project details from getAllSuites_ICE: projects");
+                        getprojectdetailscallback(null, reports);
                     }
                 });
-        } catch (exception) {
-            logger.error("Exception in the function getprojectdetails when calling reports/getAllSuites_ICE: %s", exception);
-            // getprojectdetailscallback("fail",null);
+            } catch (exception) {
+                logger.error("Exception in the function getprojectdetails: %s", exception);
+            }
         }
-    }
-
-    function getsuitedetails(projectid, getsuitedetailscallback) {
-        logger.info("Inside the function: getsuitedetails");
-        try {
-            var responsedata = {
-                suiteids: [],
-                suitenames: []
-            };
-            var inputs = {
-                "query": "suites",
-                "subquery": "releases",
-                "projectid": projectid
-            };
-            var args = {
-                data: inputs,
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            };
-            logger.info("Calling NDAC Service from getsuitedetails: reports/getAllSuites_ICE: releases");
-            client.post(epurl + "reports/getAllSuites_ICE", args,
-                function(allreleaseids, releaseidresponse) {
-                    if (releaseidresponse.statusCode != 200 || allreleaseids.rows == "fail") {
-                        logger.error("Error occurred in reports/getAllSuites_ICE: releases from getsuitedetails Error Code : ERRNDAC");
-                        getsuitedetailscallback("fail", null);
-                    } else {
-                        try {
-                            var releasessize = allreleaseids.rows.length;
-                            var releaseindex = 0;
-                            if (releasessize > 0) {
-                                async.forEachSeries(allreleaseids.rows, function(releaseid, releaseidcallback) {
-                                    var inputs = {
-                                        "query": "suites",
-                                        "subquery": "cycles",
-                                        "releaseid": releaseid.releaseid
-                                    };
-                                    var args = {
-                                        data: inputs,
-                                        headers: {
-                                            "Content-Type": "application/json"
-                                        }
-                                    };
-                                    logger.info("Calling NDAC Service from getsuitedetails: reports/getAllSuites_ICE: cycles");
-                                    client.post(epurl + "reports/getAllSuites_ICE", args,
-                                        function(allcycleids, cycleidresponse) {
-                                            if (cycleidresponse.statusCode != 200 || allcycleids.rows == "fail") {
-                                                logger.error("Error occurred in reports/getAllSuites_ICE: cycles from getsuitedetails Error Code : ERRNDAC");
-                                                getsuitedetailscallback("fail", null);
-                                            } else {
-                                                try {
-                                                    var cyclelength = allcycleids.rows.length;
-                                                    var cycleindex = 0;
-                                                    if (cyclelength > 0) {
-                                                        async.forEachSeries(allcycleids.rows, function(cycleid, cycleidcallback) {
-                                                            try {
-                                                                var inputs = {
-                                                                    "id": cycleid.cycleid,
-                                                                    "query": "cycledetails",
-                                                                    "subquery": "subquery"
-                                                                };
-                                                                var args = {
-                                                                    data: inputs,
-                                                                    headers: {
-                                                                        "Content-Type": "application/json"
-                                                                    }
-                                                                };
-                                                                logger.info("Calling NDAC Service from getsuitedetails: admin/getDetails_ICE: cycledetails");
-                                                                client.post(epurl + "admin/getDetails_ICE", args,
-                                                                    function(allsuitesdata, allsuitesresponse) {
-                                                                        if (allsuitesresponse.statusCode != 200 || allsuitesdata.rows == "fail") {
-                                                                            logger.error("Error occurred in reports/getAllSuites_ICE: cycledetails from getsuitedetails Error Code : ERRNDAC");
-                                                                            getsuitedetailscallback("fail", null);
-                                                                        } else {
-                                                                            try {
-                                                                                var suitesize = allsuitesdata.rows.length;
-                                                                                var suiteindex = 0;
-                                                                                if (suitesize > 0) {
-                                                                                    async.forEachSeries(allsuitesdata.rows, function(eachsuite, eachsuitecallback) {
-                                                                                        suiteindex += 1;
-                                                                                        responsedata.suiteids.push(eachsuite.testsuiteid);
-                                                                                        responsedata.suitenames.push(eachsuite.testsuitename);
-                                                                                        eachsuitecallback();
-                                                                                    });
-                                                                                }
-                                                                                if (suitesize == suiteindex) {
-                                                                                    cycleidcallback();
-                                                                                    cycleindex += 1;
-                                                                                }
-                                                                            } catch (exception) {
-                                                                                logger.error("Exception in the function getsuitedetails while getting suite details from admin/getDetails_ICE: %s", exception);
-                                                                                getsuitedetailscallback("fail", null);
-                                                                            }
-                                                                        }
-                                                                        if (cyclelength == cycleindex) {
-                                                                            releaseidcallback();
-                                                                            releaseindex += 1;
-                                                                        }
-
-                                                                        if (releaseindex == releasessize) {
-                                                                            logger.info("Calling final function from getsuitedetails: admin/getDetails_ICE: cycledetails");
-                                                                            finalfunction();
-                                                                        }
-                                                                    });
-                                                            } catch (exception) {
-                                                                logger.error("Exception in the function getsuitedetails while traversing cycleids: %s", exception);
-                                                                // getsuitedetailscallback("fail",null);
-                                                            }
-                                                        });
-                                                    } else {
-                                                        releaseidcallback();
-                                                        releaseindex += 1;
-                                                    }
-                                                } catch (exception) {
-                                                    logger.error("Exception in the function getsuitedetails while checking no of cycleids: %s", exception);
-                                                    // getsuitedetailscallback("fail",null);
-                                                }
-                                            }
-                                        });
-                                });
-                            } else {
-                                logger.info("Calling final function from getsuitedetails: admin/getDetails_ICE: releases");
-                                finalfunction();
-                            }
-
-                            function finalfunction() {
-                                getsuitedetailscallback(null, responsedata);
-                            }
-                        } catch (exception) {
-                            logger.error("Exception in the function getsuitedetails while checking no of releaseids: %s", exception);
-                            // getsuitedetailscallback("fail",null);
-                        }
-                    }
-                });
-        } catch (exception) {
-            logger.error("Exception while calling NDAC Service from getsuitedetails: reports/getAllSuites_ICE: releases: %s", exception);
-            // getsuitedetailscallback("fail",null);
-        }
-    }
 };
 
+//To get all the executed suites
 exports.getSuiteDetailsInExecution_ICE = function(req, res) {
     logger.info("Inside UI service: getSuiteDetailsInExecution_ICE");
     try {
@@ -498,13 +293,10 @@ exports.getSuiteDetailsInExecution_ICE = function(req, res) {
                             for (var i = 0; i < executionData.rows.length; i++) {
                                 startTime = new Date(executionData.rows[i].starttime);
                                 endTime = new Date(executionData.rows[i].endtime);
-                                starttime = startTime.getDate() + "-" + (startTime.getMonth() + 1) + "-" + startTime.getFullYear() + " " + startTime.getHours() + ":" + startTime.getMinutes();
-                                //FIx for #1232 - ICE_Reports : Incorrect end date is displayed for one of the Regression Scenario
-                                //Fetching Universal date and time since the end time is genearted from NDAC
-                                //-Sushma G.P
+                                starttime = startTime.getUTCDate() + "-" + (startTime.getUTCMonth() + 1) + "-" + startTime.getUTCFullYear() + " " + startTime.getUTCHours() + ":" + startTime.getUTCMinutes();
                                 endtime = endTime.getUTCDate() + "-" + (endTime.getUTCMonth() + 1) + "-" + endTime.getUTCFullYear() + " " + (endTime.getUTCHours()) + ":" + (+endTime.getUTCMinutes());
                                 executionDetailsJSON.push({
-                                    execution_id: executionData.rows[i].executionid,
+                                    execution_id: executionData.rows[i]._id,
                                     start_time: starttime,
                                     end_time: endtime
                                 });
@@ -527,20 +319,18 @@ exports.getSuiteDetailsInExecution_ICE = function(req, res) {
     }
 };
 
+//To get status scenarios of executed modules
 exports.reportStatusScenarios_ICE = function(req, res) {
     logger.info("Inside UI service: reportStatusScenarios_ICE");
     try {
         if (utils.isSessionActive(req)) {
             var req_executionId = req.body.executionId;
-            var req_testsuiteId = req.body.testsuiteId;
-            var reportList = [];
             var report = [];
             async.series({
                     executiondetails: function(callback) {
                         var inputs = {
                             "query": "executiondetails",
                             "executionid": req_executionId,
-                            "testsuiteid": req_testsuiteId
                         };
                         var args = {
                             data: inputs,
@@ -560,14 +350,11 @@ exports.reportStatusScenarios_ICE = function(req, res) {
                                         try {
                                             var executedtimeTemp = new Date(iterator.executedtime);
                                             if (executedtimeTemp != null) {
-                                                //#1232 - ICE_Reports : Incorrect end date is displayed for one of the Regression Scenario
-                                                //Fetching Universal date and time since the end time is genearted from NDAC
-                                                //-Sushma G.P
                                                 executedtimeTemp = executedtimeTemp.getUTCDate() + "-" + (executedtimeTemp.getUTCMonth() + 1) + "-" + executedtimeTemp.getUTCFullYear() + " " + (executedtimeTemp.getUTCHours()) + ":" + (executedtimeTemp.getUTCMinutes()) + ":" + executedtimeTemp.getSeconds();
                                             }
-                                            var browserTemp = iterator.browser;
+                                            var browserTemp = iterator.executedon;
                                             var statusTemp = iterator.status;
-                                            var reportidTemp = iterator.reportid;
+                                            var reportidTemp = iterator._id;
                                             var testscenarioidTemp = iterator.testscenarioid;
                                             var inputs = {
                                                 "query": "scenarioname",
@@ -595,7 +382,7 @@ exports.reportStatusScenarios_ICE = function(req, res) {
                                                                     status: statusTemp,
                                                                     reportid: reportidTemp,
                                                                     testscenarioid: testscenarioidTemp,
-                                                                    testscenarioname: testScenarioNameitr.testscenarioname
+                                                                    testscenarioname: testScenarioNameitr.name
                                                                 });
                                                                 callback3();
                                                             } catch (exception) {
@@ -605,7 +392,6 @@ exports.reportStatusScenarios_ICE = function(req, res) {
                                                         }, callback2);
                                                     }
                                                 });
-                                            //reportList.push(report);
                                         } catch (exception) {
                                             logger.error("Exception in the service reportStatusScenarios_ICE - executiondetails: reports/reportStatusScenarios_ICE: %s", exception);
                                             res.send("fail");
@@ -656,369 +442,63 @@ exports.reportStatusScenarios_ICE = function(req, res) {
     }
 };
 
+//To render reports
 exports.getReport_Nineteen68 = function(req, res) {
     logger.info("Inside UI service: getReport_Nineteen68");
     try {
         if (utils.isSessionActive(req)) {
             var reportId = req.body.reportId;
-            var testsuiteId = req.body.testsuiteId;
-            var testsuitename = req.body.testsuitename;
             var reportInfoObj = {};
             var reportjson = {};
             var flag = "";
-            async.series({
-                    projectsUnderDomain: function(callback) {
-                        var inputs = {
-                            "query": "projectsUnderDomain",
-                            "reportid": reportId
-                        };
-                        var args = {
-                            data: inputs,
-                            headers: {
-                                "Content-Type": "application/json"
-                            }
-                        };
-                        logger.info("Calling NDAC Service from getReport_Nineteen68 - projectsUnderDomain: reports/getReport_Nineteen68");
-                        client.post(epurl + "reports/getReport_Nineteen68", args,
-                            function(reportResult, response) {
-                                if (response.statusCode != 200 || reportResult.rows == "fail") {
-                                    flag = "fail";
-                                    logger.error("Error occurred in the service getReport_Nineteen68 - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports. Error Code : ERRNDAC");
-                                    res.send(flag);
-                                } else {
-                                    var reportres = reportResult.rows.length;
-                                    async.forEachSeries(reportResult.rows, function(iterator, callback1) {
-                                        try {
-                                            var reportdata = iterator.report;
-                                            var executedtime = iterator.executedtime;
-                                            var testscenarioid = iterator.testscenarioid;
-                                            reportjson.reportdata = reportdata;
-                                            reportInfoObj.reportId = reportId;
-                                            reportInfoObj.executedtime = executedtime;
-                                            reportInfoObj.testscenarioid = testscenarioid;
-                                            reportInfoObj.executionId = iterator.executionid;
-                                            var inputs = {
-                                                "query": "scenariodetails",
-                                                "scenarioid": testscenarioid
-                                            };
-                                            var args = {
-                                                data: inputs,
-                                                headers: {
-                                                    "Content-Type": "application/json"
-                                                }
-                                            };
-                                            logger.info("Calling NDAC Service from getReport_Nineteen68 - scenariodetails: reports/getReport_Nineteen68");
-                                            client.post(epurl + "reports/getReport_Nineteen68", args,
-                                                function(scenarioResult, response) {
-                                                    if (response.statusCode != 200 || scenarioResult.rows == "fail") {
-                                                        logger.error("Error occurred in the service getReport_Nineteen68 - scenariodetails: Failed to get scenario name and projectId from scenarios.");
-                                                    } else {
-                                                        async.forEachSeries(scenarioResult.rows, function(sceiditr, callback2) {
-                                                            try {
-                                                                var testscenarioname = sceiditr.testscenarioname;
-                                                                var projectid = sceiditr.projectid;
-                                                                reportInfoObj.testscenarioname = testscenarioname;
-                                                                reportInfoObj.projectid = projectid;
-                                                                var inputs = {
-                                                                    "query": "cycleid",
-                                                                    "reportid": reportId
-                                                                };
-                                                                var args = {
-                                                                    data: inputs,
-                                                                    headers: {
-                                                                        "Content-Type": "application/json"
-                                                                    }
-                                                                };
-                                                                logger.info("Calling NDAC Service from getReport_Nineteen68 - cycleid: reports/getReport_Nineteen68");
-                                                                client.post(epurl + "reports/getReport_Nineteen68", args,
-                                                                    function(suiteResult, response) {
-                                                                        if (response.statusCode != 200 || suiteResult.rows == "fail") {
-                                                                            logger.error("Error occurred in the service getReport_Nineteen68 - cycleid: Failed to get cycle Ids from test suites.");
-                                                                        } else {
-                                                                            async.forEachSeries(suiteResult.rows, function(suiteiditr, callback3) {
-                                                                                try {
-                                                                                    var cycleid = suiteiditr.cycleid;
-                                                                                    reportInfoObj.cycleid = cycleid;
-                                                                                    var inputs = {
-                                                                                        "query": "cycledetails",
-                                                                                        "cycleid": cycleid
-                                                                                    };
-                                                                                    var args = {
-                                                                                        data: inputs,
-                                                                                        headers: {
-                                                                                            "Content-Type": "application/json"
-                                                                                        }
-                                                                                    };
-                                                                                    logger.info("Calling NDAC Service from getReport_Nineteen68 - cycledetails: reports/getReport_Nineteen68");
-                                                                                    client.post(epurl + "reports/getReport_Nineteen68", args,
-                                                                                        function(cycleResult, response) {
-                                                                                            if (response.statusCode != 200 || cycleResult.rows == "fail") {
-                                                                                                logger.error("Error occurred in the service getReport_Nineteen68 - cycledetails: Failed to get cycle name and releaseId from cycles.");
-                                                                                            } else {
-                                                                                                async.forEachSeries(cycleResult.rows, function(cycleiditr, callback4) {
-                                                                                                    try {
-                                                                                                        var cyclename = cycleiditr.cyclename;
-                                                                                                        var releaseid = cycleiditr.releaseid;
-                                                                                                        reportInfoObj.cyclename = cyclename;
-                                                                                                        reportInfoObj.releaseid = releaseid;
-                                                                                                        // callback4();
-                                                                                                        var inputs = {
-                                                                                                            "query": "releasedetails",
-                                                                                                            "releaseid": releaseid
-                                                                                                        };
-                                                                                                        var args = {
-                                                                                                            data: inputs,
-                                                                                                            headers: {
-                                                                                                                "Content-Type": "application/json"
-                                                                                                            }
-                                                                                                        };
-                                                                                                        logger.info("Calling NDAC Service from getReport_Nineteen68 - releasedetails: reports/getReport_Nineteen68");
-                                                                                                        client.post(epurl + "reports/getReport_Nineteen68", args,
-                                                                                                            function(releaseResult, response) {
-                                                                                                                if (response.statusCode != 200 || releaseResult.rows == "fail") {
-                                                                                                                    logger.error("Error occurred in the service getReport_Nineteen68 - releasedetails: Failed to get release name and projectsId from releases.");
-                                                                                                                } else {
-                                                                                                                    async.forEachSeries(releaseResult.rows, function(reliditr, callback5) {
-                                                                                                                        try {
-                                                                                                                            var releasename = reliditr.releasename;
-                                                                                                                            var projectid = reliditr.projectid;
-                                                                                                                            reportInfoObj.releasename = releasename;
-                                                                                                                            reportInfoObj.projectid = projectid;
-                                                                                                                            //console.log('final reportInfoObj in release deatails', reportInfoObj);
-                                                                                                                            var inputs = {
-                                                                                                                                "query": "projectdetails",
-                                                                                                                                "projectid": projectid
-                                                                                                                            };
-                                                                                                                            var args = {
-                                                                                                                                data: inputs,
-                                                                                                                                headers: {
-                                                                                                                                    "Content-Type": "application/json"
-                                                                                                                                }
-                                                                                                                            };
-                                                                                                                            logger.info("Calling NDAC Service from getReport_Nineteen68 - projectdetails: reports/getReport_Nineteen68");
-                                                                                                                            client.post(epurl + "reports/getReport_Nineteen68", args,
-                                                                                                                                function(projectResult, response) {
-                                                                                                                                    if (response.statusCode != 200 || projectResult.rows == "fail") {
-                                                                                                                                        logger.error("Error occurred in the service getReport_Nineteen68 - projectdetails: Failed to get project name and domainId from projects.");
-                                                                                                                                    } else {
-                                                                                                                                        async.forEachSeries(projectResult.rows, function(proiditr, callback6) {
-                                                                                                                                            try {
-                                                                                                                                                var projectname = proiditr.projectname;
-                                                                                                                                                var domainid = proiditr.domainid;
-                                                                                                                                                reportInfoObj.projectname = projectname;
-                                                                                                                                                reportInfoObj.domainid = domainid;
-                                                                                                                                                var inputs = {
-                                                                                                                                                    "query": "domaindetails",
-                                                                                                                                                    "domainid": domainid
-                                                                                                                                                };
-                                                                                                                                                var args = {
-                                                                                                                                                    data: inputs,
-                                                                                                                                                    headers: {
-                                                                                                                                                        "Content-Type": "application/json"
-                                                                                                                                                    }
-                                                                                                                                                };
-                                                                                                                                                logger.info("Calling NDAC Service from getReport_Nineteen68 - domaindetails: reports/getReport_Nineteen68");
-                                                                                                                                                client.post(epurl + "reports/getReport_Nineteen68", args,
-                                                                                                                                                    function(domainResult, response) {
-                                                                                                                                                        if (response.statusCode != 200 || domainResult.rows == "fail") {
-                                                                                                                                                            logger.error("Error occurred in the service getReport_Nineteen68 - domaindetails: Failed to get domain name from domains.");
-                                                                                                                                                        } else {
-                                                                                                                                                            async.forEachSeries(domainResult.rows, function(domainiditr, callback7) {
-                                                                                                                                                                try {
-                                                                                                                                                                    var domainname = domainiditr.domainname;
-                                                                                                                                                                    reportInfoObj.domainname = domainname;
-                                                                                                                                                                    //console.log('final reportInfoObj in domain deatails', reportInfoObj);
-                                                                                                                                                                    callback7();
-                                                                                                                                                                } catch (exception) {
-                                                                                                                                                                    logger.error("Exception in the service getReport_Nineteen68 - domaindetails: %s", exception);
-                                                                                                                                                                    res.send("fail");
-                                                                                                                                                                }
-                                                                                                                                                            }, callback6);
-                                                                                                                                                        }
-                                                                                                                                                    });
-                                                                                                                                            } catch (exception) {
-                                                                                                                                                logger.error("Exception in the service getReport_Nineteen68 - projectdetails: %s", exception);
-                                                                                                                                                res.send("fail");
-                                                                                                                                            }
-                                                                                                                                        }, callback5);
-                                                                                                                                    }
-                                                                                                                                });
-                                                                                                                        } catch (exception) {
-                                                                                                                            logger.error("Exception in the service getReport_Nineteen68 - releasedetails: %s", exception);
-                                                                                                                            res.send("fail");
-                                                                                                                        }
-                                                                                                                    }, callback4);
-                                                                                                                }
-                                                                                                            });
-                                                                                                    } catch (exception) {
-                                                                                                        logger.error("Exception in the service getReport_Nineteen68 - cycledetails: %s", exception);
-                                                                                                        res.send("fail");
-                                                                                                    }
-                                                                                                }, callback3);
-                                                                                            }
-                                                                                        });
-                                                                                } catch (exception) {
-                                                                                    logger.error("Exception in the service getReport_Nineteen68 - cycleid: %s", exception);
-                                                                                    res.send("fail");
-                                                                                }
-                                                                            }, callback2);
-                                                                        }
-                                                                    });
-                                                            } catch (exception) {
-                                                                logger.error("Exception in the service getReport_Nineteen68 - scenariodetails: %s", exception);
-                                                                res.send("fail");
-                                                            }
-                                                        }, callback1);
-                                                    }
-                                                });
-                                        } catch (exception) {
-                                            logger.error("Exception in the service getReport_Nineteen68 - projectsUnderDomain: %s", exception);
-                                            res.send("fail");
-                                        }
-                                    }, callback);
-                                }
-                            });
-                    }
-                },
-                function(err, results) {
-                    if (err) {
-                        logger.error("Error occurred in the service getReport_Nineteen68: final function: %s", err);
-                        cb(err);
-                        res.send("fail");
+			var finalReport = [];
+            var inputs = {
+                "query": "projectsUnderDomain",
+                "reportid": reportId
+            };
+            var args = {
+                data: inputs,
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            };
+            logger.info("Calling NDAC Service from getReport_Nineteen68 - projectsUnderDomain: reports/getReport_Nineteen68");
+            client.post(epurl + "reports/getReport_Nineteen68", args,
+                function(reportResult, response) {
+                    if (response.statusCode != 200 || reportResult.rows == "fail") {
+                        flag = "fail";
+                        logger.error("Error occurred in the service getReport_Nineteen68 - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports. Error Code : ERRNDAC");
+                        res.send(flag);
                     } else {
-                        var finalReport = [];
-                        finalReport.push(reportInfoObj);
-                        finalReport.push(reportjson);
-                        logger.info("Sending reports in the service getReport_Nineteen68: final function");
-                        res.send(finalReport);
+                        try{
+                            var reportdata = reportResult.rows.report;
+                            var executedtime = reportResult.rows.executedtime;
+                            var testscenarioid = reportResult.rows.testscenarioid;
+                            var testscenarioname = reportResult.rows.name;
+                            var projectid = reportResult.rows.projectid;
+                            var domainname = reportResult.rows.domain;
+                            reportjson.reportdata = reportdata;
+                            reportInfoObj.executedtime = executedtime;
+                            reportInfoObj.testscenarioid = testscenarioid;
+                            reportInfoObj.testscenarioname = testscenarioname;
+                            reportInfoObj.projectid = projectid;
+                            reportInfoObj.domainname = domainname;
+                            finalReport.push(reportInfoObj);
+                            finalReport.push(reportjson);
+                            logger.info("Sending reports in the service getReport_Nineteen68: final function");
+                            res.send(finalReport);
+                        } catch (exception) {
+                            logger.error("Exception in the service getReport_Nineteen68 - projectsUnderDomain: %s", exception);
+                            res.send("fail");
+                        }            
                     }
                 });
-        } else {
+            } else {
             logger.error("Invalid Session, in the service getReport_Nineteen68");
             res.send("Invalid Session");
         }
     } catch (exception) {
-        logger.error("Exception occurred in the service getReport_Nineteen68: %s", exception);
-        res.send("fail");
-    }
-};
-
-exports.exportToJson_ICE = function(req, res) {
-    logger.info("Inside UI service: exportToJson_ICE");
-    try {
-        if (utils.isSessionActive(req)) {
-            var reportId = req.body.reportId;
-            var reportInfoObj = {};
-            async.series({
-                    projectsUnderDomain: function(callback) {
-                        var inputs = {
-                            "query": "reportdata",
-                            "reportid": reportId
-                        };
-                        var args = {
-                            data: inputs,
-                            headers: {
-                                "Content-Type": "application/json"
-                            }
-                        };
-                        logger.info("Calling NDAC Service from exportToJson_ICE - reportdata: reports/exportToJson_ICE");
-                        client.post(epurl + "reports/exportToJson_ICE", args,
-                            function(reportResult, response) {
-                                if (response.statusCode != 200 || reportResult.rows == "fail") {
-                                    logger.error("Error in the service exportToJson_ICE: Failed to get reports.");
-                                    res.send("fail");
-                                } else {
-                                    try {
-                                        var reportres = reportResult.rows.length;
-                                        async.forEachSeries(reportResult.rows, function(iterator, callback1) {
-                                            try {
-                                                var reportdata = iterator.report;
-                                                reportInfoObj.reportdata = reportdata;
-                                                var inputs = {
-                                                    "query": "scenarioid",
-                                                    "reportid": reportId
-                                                };
-                                                var args = {
-                                                    data: inputs,
-                                                    headers: {
-                                                        "Content-Type": "application/json"
-                                                    }
-                                                };
-                                                logger.info("Calling NDAC Service from exportToJson_ICE - scenarioid: reports/exportToJson_ICE");
-                                                client.post(epurl + "reports/exportToJson_ICE", args,
-                                                    function(scenarioResult, response) {
-                                                        if (response.statusCode != 200 || scenarioResult.rows == "fail") {
-                                                            logger.error("Error in the service exportToJson_ICE: Failed to get scenario Id from reports.");
-                                                        } else {
-                                                            var reportres = scenarioResult.rows.length;
-                                                            async.forEachSeries(scenarioResult.rows, function(sceiditr, callback2) {
-                                                                try {
-                                                                    var scenarioid = sceiditr.testscenarioid;
-                                                                    var inputs = {
-                                                                        "query": "scenarioname",
-                                                                        "scenarioid": scenarioid
-                                                                    };
-                                                                    var args = {
-                                                                        data: inputs,
-                                                                        headers: {
-                                                                            "Content-Type": "application/json"
-                                                                        }
-                                                                    };
-                                                                    logger.info("Calling NDAC Service from exportToJson_ICE - scenarioname: reports/exportToJson_ICE");
-                                                                    client.post(epurl + "reports/exportToJson_ICE", args,
-                                                                        function(scenarionameResult, response) {
-                                                                            if (response.statusCode != 200 || scenarionameResult.rows == "fail") {
-                                                                                logger.error("Error in the service exportToJson_ICE: Failed to get testscenarioname from testscenarios.");
-                                                                            } else {
-                                                                                var scenameres = scenarionameResult.rows.length;
-                                                                                async.forEachSeries(scenarionameResult.rows, function(scenameitr, callback3) {
-                                                                                    try {
-                                                                                        var scenarioname = scenameitr.testscenarioname;
-                                                                                        reportInfoObj.scenarioname = scenarioname;
-                                                                                        callback3();
-                                                                                    } catch (exception) {
-                                                                                        logger.error("Exception in the service exportToJson_ICE - scenarioname: Failed to get testscenarioname from testscenarios: %s", exception);
-                                                                                        res.send("fail");
-                                                                                    }
-                                                                                }, callback2);
-                                                                            }
-                                                                        });
-                                                                } catch (exception) {
-                                                                    logger.error("Exception in the service exportToJson_ICE - scenarioname: Failed to get testscenarioname from testscenarios: %s", exception);
-                                                                    res.send("fail");
-                                                                }
-                                                            }, callback1);
-                                                        }
-                                                    });
-                                            } catch (exception) {
-                                                logger.error("Exception in the service exportToJson_ICE - scenarioid: %s", exception);
-                                                res.send("fail");
-                                            }
-                                        }, callback);
-                                    } catch (exception) {
-                                        logger.error("Exception in the service exportToJson_ICE - scenarioid: %s", exception);
-                                        res.send("fail");
-                                    }
-                                }
-                            });
-                    }
-                },
-                function(err, results) {
-                    if (err) {
-                        logger.error("Error in the service exportToJson_ICE final function: %s", err);
-                        cb(err);
-                        res.send("fail");
-                    } else {
-                        logger.info("Sending reports information object in the service exportToJson_ICE: final function ");
-                        res.send(reportInfoObj);
-                    }
-                });
-        } else {
-            logger.error("Error in the service exportToJson_ICE: Invalid Session ");
-            res.send("Invalid Session");
-        }
-    } catch (exception) {
-        logger.error("Exception in the service exportToJson_ICE: %s", exception);
+        logger.error("Exception in the service getReport_Nineteen68 - cycleid: %s", exception);
         res.send("fail");
     }
 };
@@ -1132,7 +612,7 @@ exports.connectJira_ICE = function(req, res) {
                                             var resultData = data.value;
                                             if (count == 0) {
                                                 if (resultData != "Fail") {
-                                                    var updateStatus = updateDbReportData(createObj.reportId, createObj.executionId, createObj.slno, resultData);
+                                                    var updateStatus = updateDbReportData(createObj.reportId, createObj.slno, resultData);
                                                     logger.info('Jira: Issue created successfully.');
                                                 } else {
                                                     logger.error('Jira: Failed to create issue.');
@@ -1174,12 +654,11 @@ exports.connectJira_ICE = function(req, res) {
     }
 };
 
-function updateDbReportData(reportId, executionId, slno, defectId) {
+function updateDbReportData(reportId, slno, defectId) {
     var inputs = {
         "reportid": reportId,
         "slno": slno,
-        "defectid": defectId,
-        "executionid": executionId
+        "defectid": defectId
     };
     var args = {
         data: inputs,
@@ -1199,15 +678,6 @@ function updateDbReportData(reportId, executionId, slno, defectId) {
         });
 }
 
-function latestReport(reportObjList) {
-    if (reportObjList.length == 0) return null;
-    var lrobj = reportObjList[0];
-    reportObjList.forEach(function(e, i) {
-        if (new Date(e.executedtime) > new Date(lrobj.executedtime))
-            lrobj = reportObjList[i];
-    });
-    return lrobj;
-}
 //Fetch all modules on change of projects,release & cycle
 exports.getReportsData_ICE = function(req, res) {
     try {
@@ -1239,6 +709,7 @@ exports.getReportsData_ICE = function(req, res) {
     }
 };
 
+//Fetch all webocular modules
 exports.getWebocularModule_ICE = function(req, res) {
     try {
         

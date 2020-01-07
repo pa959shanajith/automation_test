@@ -67,7 +67,7 @@
                <span class="eteLabel makeElementFloatleft no-disp">End to End Modules</span>
             </div>
             <div class="scrollbar-inner endtoend-modules-left-lower makeElementFloatleft" style="overflow-y:auto !important" id="etemModuleContainer">
-                <span class="moduleContainer" ng-repeat="map in allMMaps" ng-click="loadEndToEnd($index,map.type,map.name)" data-mapid="{{$index}}" title="{{map.name}}">
+                <span class="moduleContainer" ng-repeat="map in allMMaps" ng-click="loadEndToEnd($index,map.type,map.name,map._id)" data-mapid="{{$index}}" title="{{map.name}}">
                     <img class="ct-nodeIcon eteMbox" src="imgs/node-{{map.type}}.png" alt="Module" aria-hidden="true">
                     <span class="ct-nodeLabel ct-node-e2e" style="width: 120px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 20px;">{{map.name}}</span>
                 </span>                 
@@ -149,10 +149,10 @@
                   <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
                   <text x="23" y="18">Save</text>
                </g>
-               <g id="ct-createAction" class="ct-actionButton disableButton" ng-click = "actionEvent_W($event)">
+               <!-- <g id="ct-createAction" class="ct-actionButton disableButton" ng-click = "actionEvent_W($event)">
                   <rect x="100" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
                   <text x="114" y="18">Create</text>
-               </g>
+               </g> -->
             </g>
          </svg>      
       </div>
@@ -206,7 +206,8 @@
             <span class="selectProject">
                <label class="selectProjectLabel">Project:</label>
                <select class="project-list" ng-change="projectListChange(projectName3)" ng-model="projectName3">
-                    <option ng-repeat="project in projectList" ng-selected="projectNameO == project.id" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}'>{{project.name}}</option>
+                <!-- <select class="project-list" ng-model="projectName3"> -->
+                    <option ng-repeat="project in projectList" ng-selected="projectNameO == project.id" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}' >{{project.name}}</option>
                </select>
             </span>
             <span class="selectRelease selectProjectPosition"> 
@@ -244,7 +245,7 @@
                 <path ng-repeat="(id,link) in linkDisplay" ng-model="link" id="{{id}}" class="ct-link" d="{{link.d}}"></path>           
                 <g ng-repeat="(id, node) in nodeDisplay" ng-model="dispnode" id="ct-node-{{id}}" class="ct-node" data-nodetype="{{node.type}}" transform="{{node.transform}}">
                     <image height="40px" width="40px" class="ct-nodeIcon" xlink:href={{node.img_src}} style="opacity:{{node.opacity}};" ng-click="nodeUniversalClick(id)"></image>
-                    <image ng-if="node.task == true" class="ct-nodeTask" width="21px" height="21px" xlink:href="imgs/node-task-assigned.png" style="opacity:{{node.taskOpacity}}" x="29" y="-10"></image>                    
+                    <image ng-if="node.task == true && node.status != 'complete'" class="ct-nodeTask" width="21px" height="21px" xlink:href="imgs/node-task-assigned.png" style="opacity:{{node.taskOpacity}}" x="29" y="-10"></image>                    
                     <text class="ct-nodeLabel" text-anchor="middle" x="20" title="{{node.title}}" y="50">{{node.name}}</text>
                     <title>{{node.title}}</title>
                     <circle ng-if="(node.type=='scenarios' && modType == 'generic') || node.type=='screens' || node.type=='modules' || node.type=='modules_endtoend'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="{{verticalLayout ? 20 : 44}}" cy="{{verticalLayout ? 55 : 20}}" r="4" ng-click="toggleNode(id)"></circle>
@@ -360,10 +361,10 @@
                   <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
                   <text x="23" y="18">Save</text>
                </g>
-               <g id="ct-createAction" class="ct-actionButton disableButton" ng-click = "actionEvent($event)">
+               <!-- <g id="ct-createAction" class="ct-actionButton disableButton" ng-click = "actionEvent($event)">
                   <rect x="100" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
                   <text x="114" y="18">Create</text>
-               </g>
+               </g> -->
             </g>
          </svg>
       </div>

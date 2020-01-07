@@ -2,1366 +2,14 @@
  * Dependencies.
  */
 var myserver = require('../lib/socket');
-var async = require('async');
-var parse = require('xml-parser');
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl = process.env.NDAC_URL;
 var logger = require('../../logger');
-//base RequestElement
-//var baseRequestBody = {};
-//xpath for view
-var allXpaths = [];
-//custname for view
-var allCustnames = [];
-var objectLevel = 1;
-var xpath = "";
-var inputsWS = {};
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
 
-/**
- * @author vinay.niranjan
- * @modified author vinay.niranjan
- * the service is used to init scraping & fetch scrape objects
- */
-exports.initScraping_ICE = function (req, res) {
-	var name,value;
-	var dataToIce={};
-	logger.info("Inside UI service: initScraping_ICE");
-	try {
-		if (utils.isSessionActive(req)) {
-			name = req.session.username;
-			redisServer.redisSubServer.subscribe('ICE2_' + name);	
-			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.info("ICE Socket requesting Address: %s" , name);
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-				if (redisres[1]>0) {
-					var reqAction = "";
-					var reqBody = req.body.screenViewObject;
-					if (reqBody.appType == "Desktop") {
-						var applicationPath = reqBody.applicationPath;
-						var processID = reqBody.processID;
-						var scrapeMethod = reqBody.scrapeMethod;
-						reqAction = "desktop";
-						dataToIce = {"emitAction": "LAUNCH_DESKTOP", "username": name, "applicationPath": applicationPath,
-							"processID": processID, "scrapeMethod": scrapeMethod};
-					} else if (reqBody.appType == "SAP") {
-						var applicationPath = reqBody.applicationPath;
-						reqAction = "SAP";
-						dataToIce = {"emitAction": "LAUNCH_SAP", "username": name, "applicationPath": applicationPath};
-					} else if (reqBody.appType == "DesktopJava") {
-						var applicationPath = reqBody.applicationPath;
-						reqAction = "OEBS";
-						dataToIce = {"emitAction": "LAUNCH_OEBS", "username": name, "applicationPath": applicationPath};
-					} else if (reqBody.appType == "MobileApp") {
-						var apkPath = reqBody.apkPath;
-						var serial = reqBody.mobileSerial;
-						var mobileDeviceName = reqBody.mobileDeviceName;
-						var mobileIosVersion = reqBody.mobileIosVersion;
-						var mobileUDID = reqBody.mobileUDID;
-						var deviceName = reqBody.deviceName;
-						var versionNumber = reqBody.versionNumber;
-						var bundleId = reqBody.bundleId;
-						var ipAddress = reqBody.ipAddress;
-						reqAction = "mobile";
-						if(reqBody.param == 'ios') {
-							dataToIce = {"emitAction": "LAUNCH_MOBILE", "username" : name, "deviceName": deviceName,
-								"versionNumber": versionNumber, "bundleId":bundleId, "ipAddress": ipAddress, "param": "ios"};
-						} else {
-							dataToIce = {"emitAction" : "LAUNCH_MOBILE", "username" : name, "apkPath": apkPath, "serial": serial,
-								"mobileDeviceName": mobileDeviceName, "mobileIosVersion": mobileIosVersion, "mobileUDID": mobileUDID};
-						}
-					} else if (reqBody.appType == "MobileWeb") {
-						var mobileSerial = reqBody.mobileSerial;
-						var androidVersion = reqBody.androidVersion;
-						reqAction = "mobile web";
-						dataToIce = {"emitAction": "LAUNCH_MOBILE_WEB", "username" : name,
-							"mobileSerial": mobileSerial, "androidVersion": androidVersion};
-					} else if (req.body.screenViewObject.appType == "pdf"){
-						var data = {};
-						var browserType = req.body.screenViewObject.appType;
-						data.browsertype = browserType;
-						dataToIce = {"emitAction" : "PDF_SCRAPE","username" : name, "data":data,"browsertype":browserType};
-					} else {  //Web Scrape
-						var data = {action: "scrape"};
-						var browserType = reqBody.browserType;
-						if (reqBody.action == 'compare') {
-							data.viewString = reqBody.viewString.view;
-							if ("scrapedurl" in reqBody.viewString){
-								data.scrapedurl = reqBody.viewString.scrapedurl;
-							}
-							else{
-								data.scrapedurl = "";
-							}
-							data.scrapedurl = reqBody.viewString.scrapedurl;
-							data.action = reqBody.action;
-						}
-						if (browserType == "chrome") data.task = "OPEN BROWSER CH";
-						else if (browserType == "ie") data.task = "OPEN BROWSER IE";
-						else if (browserType == "mozilla") data.task = "OPEN BROWSER FX";
-						else if (browserType == "safari") data.task = "OPEN BROWSER SF"
-						reqAction = "web";
-						dataToIce = {"emitAction": "webscrape", "username" : name, "data": data};
-					}
-					dataToIce.username = name;
-					logger.info("Sending socket request for "+dataToIce.emitAction+" to redis");
-					redisServer.redisPubICE.publish('ICE1_normal_' + name, JSON.stringify(dataToIce));
-					function scrape_listener(channel, message) {
-						var data = JSON.parse(message);
-						//LB: make sure to send recieved data to corresponding user
-						if (name == data.username) {
-							redisServer.redisSubServer.removeListener('message', scrape_listener);
-							if (data.onAction == "unavailableLocalServer") {
-								logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
-								if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
-									var soc = myserver.socketMapNotify[name];
-									soc.emit("ICEnotAvailable");
-								}
-							} else {
-								value = data.value;
-								logger.info("Sending "+reqAction+" scraped objects from initScraping_ICE");
-								res.send(value);
-							}
-						}
-					}
-					redisServer.redisSubServer.on("message",scrape_listener);
-				} else {
-					logger.error("Error occurred in the service initScraping_ICE: Socket not Available");
-					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-						var flag = (found)? "scheduleModeOn" : "unavailableLocalServer";
-						res.send(flag);
-					});
-				}
-			});
-		} else {
-			logger.error("Error occurred in the service initScraping_ICE: Invalid Session");
-			res.send("Invalid Session");
-		}
-	} catch (exception) {
-		logger.error("Exception in the service initScraping_ICE: %s",exception);
-		res.send("fail");
-	}
-};
 
-/**
- * @author vinay.niranjan
- * @modified author vinay.niranjan
- * the service is used to highlight scraped Objects into the browser
- */
-exports.highlightScrapElement_ICE = function (req, res) {
-	try {
-		logger.info("Inside UI service: highlightScrapElement_ICE");
-		if (utils.isSessionActive(req)) {
-			var name = req.session.username;
-			redisServer.redisSubServer.subscribe('ICE2_' + name);
-			var focusParam = req.body.elementXpath;
-			var elementURL = req.body.elementUrl;
-			var appType = req.body.appType;
-			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.info("ICE Socket requesting Address: %s" , name);
-			logger.info("Sending socket request for focus to redis");
-			var dataToIce = {"emitAction": "focus", "username": name, "focusParam": focusParam, "elementURL": elementURL, "appType": appType};
-			redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-			logger.info("Successfully highlighted selected object");
-			res.send('success');
-		} else {
-			logger.error("Error occurred in the service highlightScrapElement_ICE: Invalid Session");
-			res.send("Invalid Session");
-		}
-	} catch (exception) {
-		logger.error("Exception in the service highlightScrapElement_ICE: %s",exception);
-		res.send("fail");
-	}
-};
-
-/**
- * @author vinay.niranjan
- * @modified author vishvas.a
- * the service is used to fetch the  screen data based on the screenid and *projectid
- */
-exports.getScrapeDataScreenLevel_ICE = function (req, res) {
-	try {
-		logger.info("Inside UI service: getScrapeDataScreenLevel_ICE");
-		if (utils.isSessionActive(req)) {
-			var inputs = {
-				"screenid": req.body.screenId,
-				"projectid": req.body.projectId,
-				"query": "getscrapedata"
-			};
-			logger.info("Calling function fetchScrapedData from getScrapeDataScreenLevel_ICE service");
-			fetchScrapedData(inputs, function (err, getScrapeDataQueryresponse) {
-				logger.info("Scraped Data sent successfully from getScrapeDataScreenLevel_ICE service");
-				res.send(getScrapeDataQueryresponse);
-			});
-		} else {
-			logger.error("Error occurred in the service getScrapeDataScreenLevel_ICE: Invalid Session");
-			res.send("Invalid Session");
-		}
-	} catch (exception) {
-		logger.error("Exception in the service getScrapeDataScreenLevel_ICE: %s",exception);
-		res.send("fail");
-	}
-};
-
-/**
- * generic function for DB call to fetch the screendata
- * @author vishvas.a
- */
-function fetchScrapedData(inputs, fetchScrapedDatacallback) {
-	try {
-		logger.info("Inside the function fetchScrapedData ");
-		var responsedata;
-		var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
-			}
-		};
-		logger.info("Calling NDAC Service from fetchScrapedData: design/getScrapeDataScreenLevel_ICE");
-		client.post(epurl + "design/getScrapeDataScreenLevel_ICE", args,
-			function (getScrapeDataQueryresult, response) {
-				try {
-					if (response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail") {
-						logger.error("Error occurred in design/getScrapeDataScreenLevel_ICE from fetchScrapedData Error Code : ERRNDAC");
-						fetchScrapedDatacallback("getScrapeData Fail", null);
-					} else {
-						for (var i = 0; i < getScrapeDataQueryresult.rows.length; i++) {
-							responsedata = getScrapeDataQueryresult.rows[i].screendata;
-						}
-						fetchScrapedDatacallback(null, responsedata);
-					}
-				} catch (exception) {
-					logger.error("Exception while sending scraped data from the function fetchScrapedData: %s",exception);
-				}
-			});
-	} catch (exception) {
-		logger.error("Exception in the function fetchScrapedData: %s",exception);
-	}
-}
-
-/**
- * @author vinay.niranjan
- * @modified author vishvas.a
- * service updates the screen data in screens table
- * on user action of NEW SAVING/EDIT/UPDATE/DELETE/Mapping of Objects/Compare and Update in Design screen.
- */
-exports.updateScreen_ICE = function (req, res) {
-	try {
-		logger.info("Inside UI service: updateScreen_ICE");
-		if (utils.isSessionActive(req)) {
-			var updateData = req.body.scrapeObject;
-			var projectID = updateData.projectId;
-			var screenID = updateData.screenId;
-			var screenName = updateData.screenName;
-			var userInfo = updateData.userinfo;
-			var modifiedBy = userInfo.username.toLowerCase();
-			var param = updateData.param;
-			var appType = updateData.appType;
-			var requestedskucodeScreens = "skucode";
-			var requestedtags = "tags";
-			var requestedversionnumber = updateData.versionnumber;
-			//xpaths required to be mapped(used only when param is mapScrapeData_ICE)
-			var requiredXpathList = [];
-			//URLs required to be mapped(used only when param is mapScrapeData_ICE)
-			var requiredURLList = [];
-			var scrapedObjects = {};
-			// scrapedObjects = updateData.getScrapeData;
-			var inputs = {};
-			var inputstestcase = {};
-			var statusFlag = "";
-			newData = updateData.newData;
-			type = updateData.type;
-			if (param == "updateScrapeData_ICE") {
-				try {
-					scrapedObjects = updateData.getScrapeData;
-					var parsedScrapedObj = JSON.parse(scrapedObjects);
-					if (newData != undefined){
-						if ("scrapedurl" in newData){
-							parsedScrapedObj.scrapedurl = newData.scrapedurl
-						}
-					}
-					scrapedObjects = JSON.stringify(parsedScrapedObj);
-					if (appType.toUpperCase() === 'WEBSERVICE') {
-						if ('body' in parsedScrapedObj) {
-							parsedScrapedObj.body[0] = parsedScrapedObj.body[0].replace(/'+/g, "\"");
-							scrapedObjects = parsedScrapedObj;
-						}
-					}
-					scrapedObjects = JSON.stringify(scrapedObjects);
-					scrapedObjects = scrapedObjects.replace(/'+/g, "''");
-					var newParse;
-					if (scrapedObjects != null && scrapedObjects.trim() != '' && scrapedObjects != undefined) {
-						newParse = JSON.parse(scrapedObjects);
-					} else {
-						newParse = JSON.parse("{}");
-					}
-					scrapedObjects = newParse;
-					if (appType.toUpperCase() === 'WEBSERVICE') {
-						try {
-							var viewArray = [];
-							if ('method' in scrapedObjects &&
-								'header' in scrapedObjects &&
-								'body' in scrapedObjects) {
-								if (scrapedObjects.method == 'POST') {
-									var requestedBody = scrapedObjects.body[0];
-									var requestedHeader = scrapedObjects.header[0];
-									if (requestedBody != null &&
-										requestedBody != '' &&
-										requestedHeader.indexOf('json') === -1) {
-										if (requestedBody.indexOf('Envelope') !== -1) {
-											var obj = parse(requestedBody);
-											if ('root' in obj) {
-												var baseRequestBody = obj.root;
-												allXpaths = [];
-												allCustnames = [];
-												try {
-													logger.info("Calling function parseRequest from the service updateScreen_ICE: updateScrapeData_ICE");
-													parseRequest(baseRequestBody);
-												} catch (exception) {
-													logger.error(exception.message);
-												}
-												for (var populationindex = 0; populationindex < allXpaths.length; populationindex++) {
-													var scrapedObjectsWS = {};
-													scrapedObjectsWS.xpath = allXpaths[populationindex];
-													scrapedObjectsWS.custname = allCustnames[populationindex];
-													scrapedObjectsWS.url = "";
-													scrapedObjectsWS.text = "";
-													scrapedObjectsWS.hiddentag = "";
-													scrapedObjectsWS.tag = "elementWS";
-													scrapedObjectsWS.id = "";
-													viewArray.push(scrapedObjectsWS);
-												}
-												var baseData = {};
-												baseData.endPointURL = scrapedObjects.endPointURL;
-												baseData.method = scrapedObjects.method;
-												baseData.header = scrapedObjects.header;
-												baseData.operations = scrapedObjects.operations;
-												baseData.body = scrapedObjects.body;
-												baseData.responseHeader = scrapedObjects.responseHeader;
-												baseData.responseBody = scrapedObjects.responseBody;
-												baseData.view = viewArray;
-												scrapedObjects = baseData;
-												scrapedObjects = JSON.stringify(scrapedObjects);
-												scrapedObjects = scrapedObjects.replace(/'+/g, "''");
-												inputs = {
-													"query": "updatescreen",
-													"scrapedata": scrapedObjects,
-													"modifiedby": modifiedBy,
-													"skucodescreen": requestedskucodeScreens,
-													"screenid": screenID,
-													"projectid": projectID,
-													"screenname": screenName,
-													"versionnumber": requestedversionnumber
-												};
-												logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE");
-												finalFunction(scrapedObjects);
-											} else {
-												//JSON with view string empty
-												inputs = buildObject(scrapedObjects, modifiedBy, requestedskucodeScreens, screenID, projectID, screenName, requestedversionnumber);
-												logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE");
-												finalFunction(scrapedObjects);
-											}
-										} else {
-											//JSON with view string empty
-											inputs = buildObject(scrapedObjects, modifiedBy, requestedskucodeScreens, screenID, projectID, screenName, requestedversionnumber);
-											logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE");
-											finalFunction(scrapedObjects);
-										}
-									} else {
-										//JSON with view string empty
-										inputs = buildObject(scrapedObjects, modifiedBy, requestedskucodeScreens, screenID, projectID, screenName, requestedversionnumber);
-										logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE");
-										finalFunction(scrapedObjects);
-									}
-								} else {
-									//JSON with view string empty
-									inputs = buildObject(scrapedObjects, modifiedBy, requestedskucodeScreens, screenID, projectID, screenName, requestedversionnumber);
-									logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE");
-									finalFunction(scrapedObjects);
-								}
-							} else {
-								//JSON with view string empty
-								inputs = buildObject(scrapedObjects, modifiedBy, requestedskucodeScreens, screenID, projectID, screenName, requestedversionnumber);
-								logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE");
-								finalFunction(scrapedObjects);
-							}
-						} catch (exception) {
-							logger.error("Exception from the service updateScreen_ICE: updateScrapeData_ICE - WEBSERVICE: %s",exception);
-						}
-					} else {
-						inputs = {
-							"scrapedata": scrapedObjects,
-							"modifiedby": modifiedBy,
-							"skucodescreen": requestedskucodeScreens,
-							"screenid": screenID,
-							"projectid": projectID,
-							"screenname": screenName,
-							"versionnumber": requestedversionnumber
-						};
-						logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE");
-						finalFunction(scrapedObjects);
-					}
-				} catch (exception) {
-					logger.error("Exception from the service updateScreen_ICE: updateScrapeData_ICE: %s",exception);
-				}
-			} else if (param == "editScrapeData_ICE") {
-				try {
-					/*
-					 * @author vishvas.a
-					 * editing of the scraped data based on the changed custom names
-					 * data used : old custom names, new custom names and xpath.
-					 */
-					var oldCustNamesList = updateData.editedList.oldCustName;
-					for (i = 0; i < oldCustNamesList.length; i++) {
-						oldCustNamesList[i] = oldCustNamesList[i].replace(/&amp;/g, '&');
-					}
-					var newCustNamesList = updateData.editedList.modifiedCustNames;
-					var xpathListofCustName = updateData.editedList.xpathListofCustNames;
-					var elementschanged = 0;
-					async.series([
-							function (editcallback) {
-								try {
-									inputs = {
-										"query": "getscrapedata",
-										"screenid": screenID,
-										"projectid": projectID
-									};
-									logger.info("Calling function fetchScrapedData from the service updateScreen_ICE: editScrapeData_ICE");
-									fetchScrapedData(inputs, function (err, scrapedobjects) {
-										try {
-											if (scrapedobjects == null && scrapedobjects == '' && scrapedobjects == undefined) {
-												scrapedobjects = JSON.parse("{}");
-											}
-											if (scrapedobjects.length > 0) {
-												//this viewString is an array of scraped objects
-												var viewString;
-												scrapedobjects = JSON.parse(scrapedobjects);
-												if ('view' in scrapedobjects) {
-													viewString = scrapedobjects.view;
-												} else {
-													viewString = [];
-													scrapedobjects.mirror = '';
-													scrapedobjects.scrapedin = '';
-													scrapedobjects.scrapetype = '';
-												}
-												if (viewString.length > 0) {
-													for (var elementsindex = 0; elementsindex < xpathListofCustName.length; elementsindex++) {
-														for (var scrapedobjectindex = 0; scrapedobjectindex < viewString.length; scrapedobjectindex++) {
-															if (elementschanged < newCustNamesList.length) {
-																if ((viewString[scrapedobjectindex].xpath.replace(/\s/g, ' ').replace('&nbsp;', ' ') == xpathListofCustName[elementsindex].replace(/\s/g, ' ').replace('&nbsp;', ' ')) && (viewString[scrapedobjectindex].custname.replace(/\s/g, ' ').replace('&nbsp;', ' ').trim() == oldCustNamesList[elementsindex].replace(/\s/g, ' ').replace('&nbsp;', ' ').trim())) {
-																	viewString[scrapedobjectindex].custname = newCustNamesList[elementsindex];
-																	//elementschanged increments only when edit has occurred
-																	elementschanged = elementschanged + 1;
-																}
-															}
-														}
-													}
-												}
-												scrapedObjects.view = viewString;
-												scrapedObjects.mirror = scrapedobjects.mirror;
-												scrapedObjects.scrapedin = scrapedobjects.scrapedin;
-												scrapedObjects.scrapetype = scrapedobjects.scrapetype;
-												scrapedObjects.scrapedurl = scrapedobjects.scrapedurl;
-												//the query here will be called only if ALL objects are identified.
-												if (elementschanged <= newCustNamesList.length) {
-													scrapedObjects = JSON.stringify(scrapedObjects);
-													scrapedObjects = scrapedObjects.replace(/'+/g, "''");
-													inputs = {
-														"scrapedata": scrapedObjects,
-														"modifiedby": modifiedBy,
-														"skucodescreen": requestedskucodeScreens,
-														"screenid": screenID,
-														"projectid": projectID,
-														"screenname": screenName,
-														"versionnumber": requestedversionnumber
-													};
-													logger.info("Calling final function from the service updateScreen_ICE: editScrapeData_ICE");
-													finalFunction(scrapedObjects);
-												} else {
-													statusFlag = "All objects are not edited.";
-													try {
-														res.send(statusFlag);
-													} catch (exception) {
-														logger.error("Exception while sending status from the service updateScreen_ICE: editScrapeData_ICE: %s",exception);
-													}
-												}
-											} else {
-												statusFlag = "Error occurred in updateScreenData : Fail";
-												try {
-													res.send(statusFlag);
-												} catch (exception) {
-													logger.error("Exception while sending status from the service updateScreen_ICE - Error occurred in updateScreenData: %s",exception);
-												}
-											}
-										} catch (exception) {
-											logger.error("Exception in the function fetchScrapedData from the service updateScreen_ICE - editScrapeData_ICE: %s",exception);
-										}
-									});
-									editcallback();
-								} catch (exception) {
-									logger.error("Exception from the service updateScreen_ICE - editScrapeData_ICE: %s",exception);
-								}
-							}
-						]);
-				} catch (exception) {
-					logger.error("Exception from the service updateScreen_ICE - editScrapeData_ICE: %s",exception);
-				}
-			} else if (param == "deleteScrapeData_ICE") {
-				try {
-					/*
-					 * @author vishvas.a
-					 * deleting of the scraped data based on the custom names and xpath.
-					 */
-					var deleteCustNames,deleteXpathNames;
-					deleteCustNames = updateData.deletedList.deletedCustName;
-					deleteXpathNames = updateData.deletedList.deletedXpath;
-					var elementschanged = 0;
-					var deleteAll = false;
-					// var viewString = updateData.getScrapeData.view;
-					var deleteindex = [];
-					async.series([
-							function (deletecallback) {
-								try {
-									inputs = {
-										"query": "getscrapedata",
-										"screenid": screenID,
-										"projectid": projectID
-									};
-									logger.info("Calling function fetchScrapedData from the service updateScreen_ICE: deleteScrapeData_ICE");
-									fetchScrapedData(inputs, function (err, scrapedobjects) {
-										try {
-											if (scrapedobjects == null && scrapedobjects == '' && scrapedobjects == undefined) {
-												scrapedobjects = '{}';
-											}
-											scrapedobjects = JSON.stringify(updateData.getScrapeData);
-											if (scrapedobjects.length > 0) {
-												var viewString;
-												scrapedobjects = JSON.parse(scrapedobjects);
-												if ('view' in scrapedobjects) {
-													viewString = scrapedobjects.view;
-												} else {
-													viewString = [];
-													scrapedobjects.mirror = '';
-													scrapedobjects.scrapedin = '';
-													scrapedobjects.scrapetype = '';
-												}
-												if (viewString.length == deleteXpathNames.length) {
-													deleteAll = true;
-													viewString = [];
-													scrapedobjects.mirror = '';
-												}
-												if (!deleteAll) {
-													for (var elementsindex = 0; elementsindex < deleteXpathNames.length; elementsindex++) {
-														for (var scrapedobjectindex = 0; scrapedobjectindex < viewString.length; scrapedobjectindex++) {
-															if ((viewString[scrapedobjectindex].xpath.replace(/\s/g, ' ').replace('&nbsp;', ' ') == deleteXpathNames[elementsindex].replace(/\s/g, ' ').replace('&nbsp;', ' ')) && (viewString[scrapedobjectindex].custname.replace(/\s/g, ' ').replace('&nbsp;', ' ').trim() == deleteCustNames[elementsindex].replace(/\s/g, ' ').replace('&nbsp;', ' ').trim())) {
-																if (elementschanged < deleteCustNames.length) {
-																	if (deleteindex.indexOf(scrapedobjectindex) === -1) {
-																		deleteindex.push(scrapedobjectindex);
-																		elementschanged = elementschanged + 1;
-																	}
-																}
-															}
-														}
-													}
-													deleteindex = deleteindex.sort(sortNumber);
-													for (var deletingelementindex = 0; deletingelementindex < deleteindex.length; deletingelementindex++) {
-														delete viewString[deleteindex[deletingelementindex]];
-													}
-													// Delete is not recommended as the index stays empty after using delete on array. Hence performing the below action
-													// Removing null values from the array JSON
-													viewString = viewString.filter(function (n) {
-														return n != null;
-													});
-												}
-												scrapedObjects.view = viewString;
-												scrapedObjects.mirror = scrapedobjects.mirror;
-												scrapedObjects.mirrorheight = scrapedobjects.mirrorheight;
-												scrapedObjects.mirrorwidth = scrapedobjects.mirrorwidth;
-												scrapedObjects.scrapedin = scrapedobjects.scrapedin;
-												scrapedObjects.scrapetype = scrapedobjects.scrapetype;
-												scrapedObjects.scrapedurl = scrapedobjects.scrapedurl;
-												//this query will be called only if ALL objects are identified.
-												if (elementschanged <= deleteXpathNames.length) {
-													scrapedObjects = JSON.stringify(scrapedObjects);
-													scrapedObjects = scrapedObjects.replace(/'+/g, "''");
-													inputs = {
-														"scrapedata": scrapedObjects,
-														"modifiedby": modifiedBy,
-														"skucodescreen": requestedskucodeScreens,
-														"screenid": screenID,
-														"projectid": projectID,
-														"screenname": screenName,
-														"versionnumber": requestedversionnumber
-													};
-													logger.info("Calling final function from the service updateScreen_ICE: deleteScrapeData_ICE");
-													finalFunction(scrapedObjects);
-												} else {
-													statusFlag = "All objects are not edited.";
-													try {
-														res.send(statusFlag);
-													} catch (exception) {
-														logger.error("Exception while sending status flag from the service updateScreen_ICE - deleteScrapeData_ICE: %s",exception);
-													}
-												}
-											} else {
-												statusFlag = "Error occurred in updateScreenData : Fail";
-												try {
-													res.send(statusFlag);
-												} catch (exception) {
-													logger.error("Exception from the service updateScreen_ICE - deleteScrapeData_ICE: Error occurred in updateScreenData: %s",exception);
-												}
-											}
-										} catch (exception) {
-											logger.error("Exception in the function fetchScrapedData from the service updateScreen_ICE - deleteScrapeData_ICE: %s",exception);
-										}
-									});
-									deletecallback();
-								} catch (exception) {
-									logger.error("Exception from the service updateScreen_ICE - deleteScrapeData_ICE: %s",exception);
-								}
-							}
-						]);
-				} catch (exception) {
-					logger.error("Exception from the service updateScreen_ICE - deleteScrapeData_ICE: %s",exception);
-				}
-			} else if (param == "mapScrapeData_ICE") {
-				/*
-				 * @author vishvas.a
-				 * mapping of scraped/new objects based on the scraped data from AUT
-				 * data used : new Custom names,old custom names,old xpaths,new Xpaths(newly mapped elements)
-				 */
-				var tagMatch = "";
-				//list of custom names of objects scraped and asked to map
-				var uiElementsCustnameList = [];
-				//tag names of objects scraped(available in DB)
-				var dbElementsTagList = [];
-				//mapped custom names(has no xpath)
-				var uiUserProvidedNamesList = [];
-				//index of objects added
-				var addedObjectIndexes = [];
-				//list of base elements supported in Nineteen68(ICE)
-				var baseElementsList = ["a", "radiobutton", "checkbox", "input", "list", "select", "table", "button", "img"];
-				//location of each element to be deleted from scraped list
-				var addedObjectIndexes = [];
-				async.series({
-					function (mappingCallback) {
-						try {
-							inputs = {
-								"query": "getscrapedata",
-								"screenid": screenID,
-								"projectid": projectID
-							};
-							logger.info("Calling function fetchScrapedData from the service updateScreen_ICE: mapScrapeData_ICE");
-							fetchScrapedData(inputs, function (err, scrapedobjects) {
-								try {
-									if (scrapedobjects == null && scrapedobjects == '' && scrapedobjects == undefined) {
-										scrapedobjects = JSON.parse("{}");
-									}
-									var viewString;
-									if (scrapedobjects.length > 0) {
-										scrapedobjects = JSON.parse(scrapedobjects);
-										if ('view' in scrapedobjects) {
-											viewString = scrapedobjects.view;
-											if (viewString.length > 0) {
-												uiUserProvidedNamesList = updateData.editedListoldCustName;
-												uiElementsCustnameList = updateData.editedListmodifiedCustNames;
-												//fetching tag names
-												async.forEachSeries(uiUserProvidedNamesList, function (addedObjectCustName, addedObjectCustNameCallback) {
-													async.forEachSeries(viewString, function (eachScrapedObject, scrapedObjectCallback) {
-														try {
-															if ('custname' in eachScrapedObject) {
-																var elementCustnameDB = eachScrapedObject.custname;
-																if (elementCustnameDB.replace(/\s/g, ' ').replace('&nbsp;', ' ').trim() == addedObjectCustName.replace(/\s/g, ' ').replace('&nbsp;', ' ').trim()) {
-																	if ('tag' in eachScrapedObject) {
-																		dbElementsTagList.push(eachScrapedObject.tag);
-																	}
-																}
-															}
-															scrapedObjectCallback();
-														} catch (exception) {
-															logger.error("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: %s",exception);
-														}
-													}, addedObjectCustNameCallback);
-												});
-												/*
-												 * fetching the appropriate xpath of the actual elements.
-												 * to change the custom name
-												 */
-												var indexOfUiElement = -1;
-												async.forEachSeries(uiElementsCustnameList, function (userCustName, userCustNameCallback) {
-													indexOfUiElement = indexOfUiElement + 1;
-													async.forEachSeries(viewString, function (eachScrapedObject, scrapedObjectCallback) {
-														try {
-															if ('custname' in eachScrapedObject) {
-																var elementCustnameDB = eachScrapedObject.custname;
-																if (elementCustnameDB.replace(/\s/g, ' ').replace('&nbsp;', ' ').trim() == userCustName.replace(/\s/g, ' ').replace('&nbsp;', ' ').trim()) {
-																	if ('tag' in eachScrapedObject) {
-																		var dbTagName = eachScrapedObject.tag;
-																		/*
-																		 * checks the tag name, if matches take the xpath
-																		 * if does not match then checks if the dbElementsTagList at the index is 'element'. if 'element' then without any check, match the object.
-																		 */
-																		if (dbTagName.toLowerCase() == dbElementsTagList[indexOfUiElement]) {
-																			if ('xpath' in eachScrapedObject) {
-																				requiredXpathList.push(eachScrapedObject.xpath.replace(/\s/g, ' ').replace('&nbsp;', ' ').trim());
-																			}
-																		} else if (dbElementsTagList[indexOfUiElement].toLowerCase() == 'element' && baseElementsList.indexOf(dbTagName.toLowerCase()) === -1) {
-																			if ('xpath' in eachScrapedObject) {
-																				requiredXpathList.push(eachScrapedObject.xpath.replace(/\s/g, ' ').replace('&nbsp;', ' ').trim());
-																			}
-																		}
-																		if ('url' in eachScrapedObject) {
-																			requiredURLList.push(eachScrapedObject.url.replace(/\s/g, ' ').replace('&nbsp;', ' ').trim());
-																		}
-																	}
-																}
-															}
-															scrapedObjectCallback();
-														} catch (exception) {
-															logger.error("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: %s",exception);
-														}
-													}, userCustNameCallback);
-												});
-												/*
-												 * the method call below checks if multiple elements with same xpath are found for mapped elements.
-												 * if found true mapping of objects is stopped and user is alerted with an appropriate error message.
-												 */
-												var multipleObjectsCustnameSet = [];
-												async.forEachSeries(requiredXpathList, function (eachXpath, requiredXpathListCallback) {
-													try {
-														var custname = repeatedXpath(viewString, eachXpath);
-														if (custname != "") {
-															//maintaining the uniqueness of the multipleObjectsCustnameSet
-															if (multipleObjectsCustnameSet.indexOf(custname) === -1) {
-																multipleObjectsCustnameSet.push(custname.replace(/\s/g, ' ').replace('&nbsp;', ' ').trim());
-															}
-															tagMatch = "sAmEoBjEcTrEpeAtEd";
-														}
-														requiredXpathListCallback();
-													} catch (exception) {
-														logger.error("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: %s",exception);
-													}
-												});
-												if (tagMatch != "sAmEoBjEcTrEpeAtEd") {
-													//if the size of xpath list is same as user provided custom names list replacing the custom names of actual elements with xpath with the user provided custom names
-													if (requiredXpathList.length == uiUserProvidedNamesList.length) {
-														var xpathindex = -1;
-														async.forEachSeries(requiredXpathList, function (eachXpath, requiredXpathListCallback) {
-															try {
-																xpathindex = xpathindex + 1;
-																var objectindex = -1;
-																async.forEachSeries(viewString, function (eachScrapedObject, scrapedObjectCallback) {
-																	try {
-																		objectindex = objectindex + 1;
-																		if ('xpath' in eachScrapedObject) {
-																			var scrapedXpath = eachScrapedObject.xpath.replace(/\s/g, ' ').replace('&nbsp;', ' ').trim();
-																			if (eachXpath.replace(/\s/g, ' ').replace('&nbsp;', ' ').trim() == scrapedXpath.replace(/\s/g, ' ').replace('&nbsp;', ' ').trim()) {
-																				eachScrapedObject.custname = uiUserProvidedNamesList[xpathindex];
-																				addedObjectIndexes.push(objectindex);
-																			}
-																		}
-																		scrapedObjectCallback();
-																	} catch (exception) {
-																		logger.error("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: %s",exception);
-																	}
-																}, requiredXpathListCallback);
-															} catch (exception) {
-																logger.error("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: %s",exception);
-															}
-														});
-													} else {
-														tagMatch = "TagMissMatch";
-														res.send(tagMatch);
-													}
-													// if the tagMatch status is empty, ie., if its not TagMissMatch then remove the dummy objects
-													if (tagMatch == "") {
-														var dummyObjectsToDelete = [];
-														async.forEachSeries(uiUserProvidedNamesList, function (addedObjectCustName, addedObjectCustNameCallback) {
-															var objectindexes = -1;
-															async.forEachSeries(viewString, function (eachScrapedObject, scrapedObjectCallback) {
-																try {
-																	objectindexes = objectindexes + 1;
-																	if (addedObjectIndexes.indexOf(objectindexes) === -1) {
-																		if ((!('xpath' in eachScrapedObject) || (eachScrapedObject.xpath.trim() == "")) &&
-																			('custname' in eachScrapedObject &&
-																				uiUserProvidedNamesList.indexOf(eachScrapedObject.custname) !== -1)) {
-																			if (dummyObjectsToDelete.indexOf(objectindexes) === -1) {
-																				dummyObjectsToDelete.push(objectindexes);
-																			}
-																		}
-																	}
-																} catch (exception) {
-																	logger.error("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: %s",exception);
-																}
-																scrapedObjectCallback();
-															}, addedObjectCustNameCallback);
-														});
-														dummyObjectsToDelete = dummyObjectsToDelete.sort(sortNumber);
-														for (var deleteelementindex = 0; deleteelementindex < dummyObjectsToDelete.length; deleteelementindex++) {
-															delete viewString[dummyObjectsToDelete[deleteelementindex]];
-														}
-														//delete is not recommended as the index stays empty after using delete on array. Hence performing the below action
-														//removing null values from the array JSON
-														viewString = viewString.filter(function (n) {
-																return n != null;
-															});
-														scrapedObjects.view = viewString;
-														scrapedObjects.mirror = scrapedobjects.mirror;
-														scrapedObjects.scrapedin = scrapedobjects.scrapedin;
-														scrapedObjects.scrapetype = scrapedobjects.scrapetype;
-														scrapedObjects.scrapedurl = scrapedobjects.scrapedurl;
-														scrapedObjects = JSON.stringify(scrapedObjects);
-														scrapedObjects = scrapedObjects.replace(/'+/g, "''");
-														inputs = {
-															"scrapedata": scrapedObjects,
-															"modifiedby": modifiedBy,
-															"skucodescreen": requestedskucodeScreens,
-															"screenid": screenID,
-															"projectid": projectID,
-															"screenname": screenName,
-															"versionnumber": requestedversionnumber
-														};
-														finalFunction(scrapedObjects);
-													}
-												} else {
-													//console.log("These are the repeated objects:",multipleObjectsCustnameSet);
-													tagMatch = tagMatch + "maPinGScraPedDaTa" + multipleObjectsCustnameSet.join();
-													res.send(tagMatch);
-												}
-											}
-										} else {
-											statusFlag = "Error occurred in mapScreenData : Fail";
-											try {
-												res.send(statusFlag);
-											} catch (exception) {
-												logger.error("Exception while sending response from the function fetchScrapedData in the service updateScreen_ICE - mapScrapeData_ICE: Error occurred in mapScreenData: %s",exception);
-											}
-										}
-									} else {
-										statusFlag = "Error occurred in updateScreenData : Fail";
-										try {
-											res.send(statusFlag);
-										} catch (exception) {
-											logger.error("Exception while sending response from the function fetchScrapedData in the service updateScreen_ICE - mapScrapeData_ICE: Error occurred in updateScreenData: %s",exception);
-										}
-									}
-								} catch (exception) {
-									logger.error("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: %s",exception);
-								}
-							});
-						} catch (exception) {
-							logger.error("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: %s",exception);
-						}
-					}
-				});
-			} else if (param == 'updateComparedObjects') {
-				//Update changed objects
-				try {
-					var elementschanged = 0;
-					var updatedIndex = [];
-					async.series([
-							function (comparecallback) {
-								try {
-									inputs = {
-										"query": "getscrapedata",
-										"screenid": screenID,
-										"projectid": projectID
-									};
-									logger.info("Calling function fetchScrapedData from the service updateScreen_ICE - updateComparedObjects");
-									fetchScrapedData(inputs, function (err, scrapedobjects) {
-										try {
-											if (scrapedobjects == null && scrapedobjects == '' && scrapedobjects == undefined) {
-												scrapedobjects = '{}';
-											}
-											if (scrapedobjects.length > 0) {
-												var viewString;
-												scrapedobjects = JSON.parse(scrapedobjects);
-												if ('view' in scrapedobjects) {
-													viewString = scrapedobjects.view;
-												} else {
-													viewString = [];
-													scrapedobjects.mirror = '';
-													scrapedobjects.scrapedin = '';
-													scrapedobjects.scrapetype = '';
-													scrapedobjects.scrapedurl='';
-												}
-												//updatedViewString: New Data posted from UI
-												//viewString: Data from Database
-												var updatedViewString = updateData.updatedViewString.view[0].changedobject;
-												// for (var i = 0; i < updatedViewString.length; i++) {
-												// 	for (var j = 0; j < viewString.length; j++) {
-												// 		var updatedXpath = updatedViewString[i].xpath.replace(/\s/g, ' ').replace('&nbsp;', ' ');
-												// 		updatedXpath = updatedViewString[i].xpath.split(";");
-												// 		updatedXpath = updatedXpath[1];
-												// 		var fetchedXpath = viewString[j].xpath.replace(/\s/g, ' ').replace('&nbsp;', ' ');
-												// 		fetchedXpath = viewString[j].xpath.split(";");
-												// 		fetchedXpath = fetchedXpath[1];
-												// 		// fetchedXpath = viewString[j].xpath
-												// 		// updatedXpath = updatedViewString[i].xpath
-												// 		if (updatedXpath == fetchedXpath) {
-												// 			updatedIndex.push(j);
-												// 			viewString[j] = updatedViewString[i];
-												// 			elementschanged = elementschanged + 1;
-												// 		}
-												// 	}
-												// }
-												
-												//Update all the changed objects in the viewString
-												for(var i=0; i< updateData.updatedViewString.changedobjectskeys.length; i++){
-													indexToUpdate = updateData.updatedViewString.changedobjectskeys[i];
-													viewString[indexToUpdate] = updateData.updatedViewString.view[0].changedobject[i];
-												}
-												//Delete all the not found objects from the viewString
-												for(var i=0; i< updateData.updatedViewString.notfoundobjectskeys.length; i++){
-													indexToDelete = updateData.updatedViewString.notfoundobjectskeys[i];
-													delete viewString[indexToDelete];
-												}
-												//updatedIndex = updatedIndex.sort(sortNumber);
-												viewString = viewString.filter(function (n) {
-														return n != null;
-													});
-												scrapedObjects.view = viewString;
-												scrapedObjects.mirror = updateData.updatedViewString.mirror;
-												scrapedObjects.scrapedin = updateData.updatedViewString.scrapedin;
-												scrapedObjects.scrapetype = updateData.updatedViewString.scrapetype;
-												scrapedObjects.scrapedurl = updateData.updatedViewString.scrapedurl;
-												if ('view' in scrapedObjects) {
-													scrapedObjects = JSON.stringify(scrapedObjects);
-													scrapedObjects = scrapedObjects.replace(/'+/g, "''");
-													inputs = {
-														"scrapedata": scrapedObjects,
-														"modifiedby": modifiedBy,
-														"skucodescreen": requestedskucodeScreens,
-														"screenid": screenID,
-														"projectid": projectID,
-														"screenname": screenName,
-														"versionnumber": requestedversionnumber
-													};
-													finalFunction(scrapedObjects);
-												} else {
-													statusFlag = "No Objects to compare.";
-													try {
-														res.send(statusFlag);
-													} catch (exception) {
-														logger.error("Exception while sending response from the function fetchScrapedData: updateScreen_ICE - updateComparedObjects: No Objects to compare: %s", exception);
-													}
-												}
-											} else {
-												statusFlag = "Error occurred in updateScreenData : Fail";
-												try {
-													res.send(statusFlag);
-												} catch (exception) {
-													logger.error("Exception while sending response from the function fetchScrapedData: updateScreen_ICE - updateComparedObjects: Error occurred in updateScreenData: %s", exception);
-												}
-											}
-										} catch (exception) {
-											logger.error("Exception in the function fetchScrapedData: service updateScreen_ICE - updateComparedObjects: %s", exception);
-										}
-									}); //End of fetchScrapedData
-								} catch (exception) {
-									logger.error("Exception in the function fetchScrapedData: service updateScreen_ICE - updateComparedObjects: %s", exception);
-								}
-							} //End of Async function callback
-						]); //End of Async series
-				} catch (exception) {
-					logger.error("Exception in the function fetchScrapedData: service updateScreen_ICE - updateComparedObjects: %s", exception);
-				}
-			}
-			function sortNumber(a, b) {
-				return a - b;
-			}
-			//this code will be called only if the statusFlag is empty.
-			function finalFunction(scrapedObjects, finalcallback) {
-				logger.info("Inside the finalFunction: service updateScreen_ICE");
-				allXpaths=[];
-				allCustnames=[];
-				try {
-					if (statusFlag == "" && scrapedObjects != "scrape data error: Fail") {
-						var args = {
-							data: inputs,
-							headers: {
-								"Content-Type": "application/json"
-							}
-						};
-						logger.info("Calling NDAC Service from finalFunction: design/updateScreen_ICE");
-						client.post(epurl + "design/updateScreen_ICE", args,
-							function (result, response) {
-							try {
-								if (response.statusCode != 200 || result.rows == "fail") {
-									statusFlag = "Error occurred in updateScreenData : Fail";
-									logger.error("Error occurred in design/updateScreen_ICE from finalFunction Error Code : ERRNDAC");
-									try {
-										res.send(statusFlag);
-									} catch (exception) {
-										logger.error("Exception while sending response in design/updateScreen_ICE from the finalFunction: %s", exception);
-									}
-								} else {
-									if (param != 'updateScrapeData_ICE') {
-										async.waterfall([
-												function (testcasecallback) {
-													try {
-														inputstestcase = {
-															"query": "screenid",
-															"screenid": screenID,
-															"versionnumber": requestedversionnumber
-														};
-														var newCustnames,oldCustnames,xpathofCustnames;
-														if (param == 'editScrapeData_ICE') {
-															newCustnames = updateData.editedList.modifiedCustNames;
-															oldCustnames = updateData.editedList.oldCustName;
-															xpathofCustnames = updateData.editedList.xpathListofCustNames;
-														} else if (param == 'updateComparedObjects') {
-															//CHANGE JSON FOR COMPARED OBJECTS -- INVALID JSON FORMAT FROM CORE
-															oldCustnames = updateData.updatedViewString.view[0].changedobject;
-															logger.info("oldcustnames: %s", oldCustnames);
-														} else if (param == 'mapScrapeData_ICE') {
-															// Empty Block
-														} else {
-															oldCustnames = updateData.deletedList.deletedCustName;
-															xpathofCustnames = updateData.deletedList.deletedXpath;
-														}
-														var args = {
-															data: inputstestcase,
-															headers: {
-																"Content-Type": "application/json"
-															}
-														};
-														logger.info("Calling NDAC Service from finalFunction: design/readTestCase_ICE");
-														client.post(epurl + "design/readTestCase_ICE", args,
-															function (testcaseDataQueryresult, response) {
-															if (response.statusCode != 200 || testcaseDataQueryresult.rows == "fail") {
-																statusFlag = "Error occurred in testcaseDataQuery : Fail";
-																logger.error("Error occurred in design/readTestCase_ICE from finalFunction Error Code : ERRNDAC");
-																try {
-																	res.send(statusFlag);
-																} catch (exception) {
-																	logger.error("Exception while sending response in design/readTestCase_ICE from the finalFunction: %s", exception);
-																}
-															} else {
-																try {
-																	if (testcaseDataQueryresult.rows.length > 0) {
-																		var testcasessize = 0;
-																		async.forEachSeries(testcaseDataQueryresult.rows,
-																			function (eachTestcase, testcaserendercallback) {
-																			try {
-																				var updatingTestcaseid = eachTestcase.testcaseid;
-																				var updatingtestcasedata;
-																				if (eachTestcase.testcasesteps != null && eachTestcase.testcasesteps != '' && eachTestcase.testcasesteps != undefined) {
-																					updatingtestcasedata = JSON.parse(eachTestcase.testcasesteps);
-																				} else {
-																					updatingtestcasedata = JSON.parse("[]");
-																				}
-																				var updatingtestcasename = eachTestcase.testcasename;
-																				if (param != 'mapScrapeData_ICE') {
-																					//replacing/deleting all the custnames based on xpath and old custnames
-																					var deletingStepindex = [];
-																					if (updatingtestcasedata.length > 0) {
-																						for (var updatingindex = 0; updatingindex < oldCustnames.length; updatingindex++) {
-																							for (var eachtestcasestepindex = 0; eachtestcasestepindex < updatingtestcasedata.length; eachtestcasestepindex++) {
-																								var testcasestep = updatingtestcasedata[eachtestcasestepindex];
-																								var step = eachtestcasestepindex + 1;
-																								if ('custname' in testcasestep && 'objectName' in testcasestep) {
-																									if ((param == 'editScrapeData_ICE' || param == 'deleteScrapeData_ICE') && testcasestep.custname.trim() == oldCustnames[updatingindex].trim() && testcasestep.objectName.trim() == xpathofCustnames[updatingindex].trim()) {
-																										if (param == 'editScrapeData_ICE') {
-																											testcasestep.custname = newCustnames[updatingindex];
-																										} else if (param == 'deleteScrapeData_ICE') {
-																											testcasestep.stepNo = step;
-																											if (deletingStepindex.indexOf(eachtestcasestepindex) === -1) {
-																												deletingStepindex.push(eachtestcasestepindex);
-																											}
-																										}
-																									} else if ((param == 'updateComparedObjects') && testcasestep.custname.trim() == oldCustnames[updatingindex].custname.trim() && testcasestep.objectName.trim() != '') {
-																										testcasestep.objectName = oldCustnames[updatingindex].xpath;
-																										// console.log("custname", oldCustnames[updatingindex].custname);
-																										// console.log("xpath", oldCustnames[updatingindex].xpath);
-																									}
-																								}
-																							}
-																						}
-																					}
-																					if (param == 'deleteScrapeData_ICE') {
-																						deletingStepindex = deletingStepindex.sort(sortNumber);
-																						for (var deletingcaseindex = 0; deletingcaseindex < deletingStepindex.length; deletingcaseindex++) {
-																							delete updatingtestcasedata[deletingStepindex[deletingcaseindex]];
-																						}
-																						//removing null values from the array JSON
-																						updatingtestcasedata = updatingtestcasedata.filter(function (n) {
-																							return n != null;
-																						});
-																					}
-																					updatingtestcasedata = JSON.stringify(updatingtestcasedata);
-																					updatingtestcasedata = updatingtestcasedata.replace(/'+/g, "''");
-																				} else {
-																					try {
-																						var uiUserProvidedNamesList = updateData.editedListoldCustName;
-																						var uiElementsCustnameList = updateData.editedListmodifiedCustNames;
-																						if (updatingtestcasedata.length > 0) {
-																							var uiCustNameIndex = -1;
-																							async.forEachSeries(uiElementsCustnameList, function (userCustName, userCustNameCallback) {
-																								uiCustNameIndex = uiCustNameIndex + 1;
-																								async.forEachSeries(updatingtestcasedata, function (eachTestCaseStep, eachTestCaseStepCallback) {
-																									if ('custname' in eachTestCaseStep) {
-																										if (eachTestCaseStep.custname.replace(/\s/g, ' ').replace('&nbsp;', ' ').trim() == userCustName.replace(/\s/g, ' ').replace('&nbsp;', ' ').trim()) {
-																											eachTestCaseStep.custname = uiUserProvidedNamesList[uiCustNameIndex];
-																										}
-																									}
-																									if ('custname' in eachTestCaseStep) {
-																										if (eachTestCaseStep.custname.replace(/\s/g, ' ').replace('&nbsp;', ' ').trim() == uiUserProvidedNamesList[uiCustNameIndex].replace(/\s/g, ' ').replace('&nbsp;', ' ').trim()) {
-																											if (('objectName' in eachTestCaseStep && eachTestCaseStep.objectName.trim() == "") || !('objectName' in eachTestCaseStep)) {
-																												eachTestCaseStep.objectName = requiredXpathList[uiCustNameIndex];
-																												eachTestCaseStep.url = requiredURLList[uiCustNameIndex];
-																											}
-																										}
-																									}
-																									eachTestCaseStepCallback();
-																								}, userCustNameCallback);
-																							});
-																						}
-																						updatingtestcasedata = JSON.stringify(updatingtestcasedata);
-																						updatingtestcasedata = updatingtestcasedata.replace(/'+/g, "''");
-																					} catch (exception) {
-																						logger.error("Exception in the finalFunction: %s", exception);
-																					}
-																				}
-																				if (updatingtestcasedata == "[]") {
-																					updatingtestcasedata = "";
-																				}
-																				inputs = {
-																					"query": "updatetestcasedata",
-																					"modifiedby": userInfo.username.toLowerCase(),
-																					"skucodetestcase": "skucodetestcase",
-																					"testcaseid": updatingTestcaseid,
-																					"testcasesteps": updatingtestcasedata,
-																					"screenid": screenID,
-																					"testcasename": updatingtestcasename,
-																					"versionnumber": requestedversionnumber
-																				};
-																				logger.info("Calling function uploadTestCaseData from the finalFunction")
-																				uploadTestCaseData(inputs, function (error, response) {
-																					if (error) {
-																						try {
-																							res.send(error);
-																						} catch (exception) {
-																							logger.error("Exception in the function uploadTestCaseData from finalFunction: %s", exception);
-																						}
-																					} else {
-																						try {
-																							testcasessize = testcasessize + 1;
-																							if (testcasessize == testcaseDataQueryresult.rows.length) {
-																								res.send(response);
-																							}
-																						} catch (exception) {
-																							logger.error("Exception in the function uploadTestCaseData from finalFunction: %s", exception);
-																						}
-																					}
-																				});
-																			} catch (exception) {
-																				logger.error("Exception in the finalFunction: %s", exception);
-																			}
-																			testcaserendercallback();
-																		});
-																	} else {
-																		statusFlag = "success";
-																		try {
-																			res.send(statusFlag);
-																		} catch (exception) {
-																			logger.error("Exception while sending response in the finalFunction: %s", exception);
-																		}
-																	}
-																} catch (exception) {
-																	logger.error("Exception in the finalFunction: %s", exception);
-																}
-															}
-														});
-														testcasecallback;
-													} catch (exception) {
-														logger.error("Exception in the finalFunction: %s", exception);
-													}
-												}
-											]);
-									} else {
-										var check_for_duplicate_images = false;
-										if(type=='save' && newData['view'] != undefined){
-											for(var i=0;i<newData['view'].length;i++){
-												if(newData['view'][i]['cord']!=null && newData['view'][i]['cord']!=''){
-													check_for_duplicate_images = true;
-													if(newData['view'][i]['tag']=='constant'){
-														check_for_duplicate_images = false;
-														break;
-													}
-												}
-												else{
-													check_for_duplicate_images = false;
-													break;
-												}
-											}
-										}
-										if(!check_for_duplicate_images){
-											res.send("success");
-										}
-										else{
-											name = req.session.username;
-											redisServer.redisSubServer.subscribe('ICE2_' + name);
-											logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-											logger.debug("ICE Socket requesting Address: %s" , name);
-											redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-												if (redisres[1]>0){
-													var scrapedata = newData;
-													logger.info("Sending socket request for checkIrisDuplicate_ICE to redis");
-													dataToIce = {"emitAction" : "irisOperations","username" : name, "image_data":scrapedata, "param":"checkDuplicate"};
-													redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-													function checkIrisDuplicate_listener(channel,message) {
-														var data = JSON.parse(message);
-														if(name == data.username){
-															redisServer.redisSubServer.removeListener('message',checkIrisDuplicate_listener);
-															if (data.onAction == "unavailableLocalServer") {
-																logger.error("Error occurred in checkIrisDuplicate_ICE: Socket Disconnected");
-																if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-																	var soc = myserver.socketMapNotify[name];
-																	soc.emit("ICEnotAvailable");
-																}
-															} else if (data.onAction == "iris_operations_result") {
-																if(data.value.length==0)
-																	res.send("success");
-																else
-																	res.send(data.value);
-															}
-														}
-													}
-													redisServer.redisSubServer.on("message",checkIrisDuplicate_listener);
-												}
-												else res.send("success");
-											});
-										}
-									}
-								}
-							} catch (exception) {
-								logger.error("Exception in the finalFunction: %s", exception);
-							}
-						});
-					}
-					finalcallback;
-				} catch (exception) {
-					logger.error("Exception in the finalFunction: %s", exception);
-				}
-			}
-		} else {
-			logger.error("Error occurred in the finalFunction: Invalid Session");
-			res.send("Invalid Session");
-		}
-	} catch (exception) {
-		logger.error("Exception in the finalFunction: %s", exception);
-	}
-};
-
-function repeatedXpath(viewString, xpath) {
-	logger.info("Inside the function repeatedXpath ");
-	var xpathIndex = 0;
-	var result = "";
-	try {
-		for (eachObjectindex = 0; eachObjectindex < viewString.length; eachObjectindex++) {
-			try {
-				var eachScrapedObject = viewString[eachObjectindex];
-				if ('custname' in eachScrapedObject) {
-					if ('xpath' in eachScrapedObject) {
-						var scrapedxpath = eachScrapedObject.xpath;
-						var scrapedCustName = eachScrapedObject.custname;
-						if (scrapedxpath == xpath) {
-							xpathIndex = xpathIndex + 1;
-						}
-						if (xpathIndex > 1) {
-							result = scrapedCustName;
-							break;
-						}
-					}
-				}
-			} catch (exception) {
-				logger.error("Exception in the function repeatedXpath: %s", exception);
-			}
-		}
-		return result;
-	} catch (exception) {
-		logger.error("Exception in the function repeatedXpath: %s", exception);
-	}
-}
-
-function buildObject(scrapedObjects, modifiedBy, requestedskucodeScreens, screenID, projectID, screenName, requestedversionnumber) {
-	logger.info("Inside the function buildObject");
-	try {
-		scrapedObjects = JSON.stringify(scrapedObjects);
-		scrapedObjects = scrapedObjects.replace(/'+/g, "''");
-		inputsWS = {
-			"scrapedata": scrapedObjects,
-			"modifiedby": modifiedBy,
-			"skucodescreen": requestedskucodeScreens,
-			"screenid": screenID,
-			"projectid": projectID,
-			"screenname": screenName,
-			"versionnumber": requestedversionnumber
-		};
-		return inputsWS;
-	} catch (exception) {
-		logger.error("Exception in the function buildObject: %s", exception);
-	}
-}
-
-function parseRequest(readChild) {
-	try {
-		logger.info("Inside the function parseRequest ");
-		if ('name' in readChild) {
-			if (xpath == "") {
-				xpath = "/" + readChild.name;
-					allXpaths.push(xpath);
-				allCustnames.push(readChild.name);
-			}
-			if ('attributes' in readChild) {
-				var attrchildren = Object.keys(readChild.attributes);
-				if (attrchildren.length >= 1) {
-					var basexpath = xpath;
-					for (var attrindex = 0; attrindex < attrchildren.length; attrindex++) {
-						var newLevel = attrchildren[attrindex];
-						if (xpath == undefined) {
-							xpath = "";
-						}
-						var custname = readChild.name + "_" + newLevel;
-						xpath = xpath + "/" + newLevel;
-						allCustnames.push(custname);
-						allXpaths.push(xpath);
-						xpath = basexpath;
-					}
-				}
-			}
-			if ('children' in readChild) {
-				if (readChild.children.length >= 1) {
-					var basexpath = xpath;
-					for (var childrenindex = 0; childrenindex < readChild.children.length; childrenindex++) {
-						objectLevel = objectLevel + 1;
-						var newLevel = readChild.children[childrenindex].name;
-						if (xpath == undefined || xpath == 'undefined') {
-							xpath = "";
-						}
-						xpath = xpath + "/" + newLevel;
-						allCustnames.push(newLevel);
-						allXpaths.push(xpath);
-						parseRequest(readChild.children[childrenindex]);
-						xpath = basexpath;
-						objectLevel = objectLevel - 1;
-					}
-				}
-			}
-		}
-	} catch (exception) {
-		logger.error("Exception in the function parseRequest: %s", exception);
-	}
-}
-
-/**
- * generic function for DB to update the testcases table
- * @author vishvas.a
- */
 function uploadTestCaseData(inputs, uploadTestCaseDatacallback) {
 	try {
 		logger.info("Inside the function uploadTestCaseData ");
@@ -1389,11 +37,6 @@ function uploadTestCaseData(inputs, uploadTestCaseDatacallback) {
 	}
 }
 
-/**
- * @author vishvas.a
- * @modified author sunil.revankar
- * readTestCase_ICE service is used to fetch the testcase data
- */
 exports.readTestCase_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: readTestCase_ICE");
@@ -1407,17 +50,23 @@ exports.readTestCase_ICE = function (req, res) {
 			var requestedtestscasename = req.body.testcasename;
 			var requestedtestscaseid = req.body.testcaseid;
 			var requestedversionnumber = req.body.versionnumber;
+			var screenName = req.body.screenName;
+			var userid = req.body.userInfo.user_id;
 			// base request elements sent in request
 			inputs = {
 				"screenid": requestedscreenid,
 				"testcasename": requestedtestscasename,
 				"testcaseid": requestedtestscaseid,
 				"versionnumber": requestedversionnumber,
+				"userid": userid,
 				"query": "readtestcase"
 			};
 			if (!requestedscreenid){ // if there is no screenid fetch just by testcase id in add dependent test cases
 				inputs.query = "testcaseid";
 				inputs.readonly = true;
+			}
+			if (screenName == ""){
+				inputs.screenName = 'fetch';
 			}
 			var args = {
 				data: inputs,
@@ -1445,77 +94,46 @@ exports.readTestCase_ICE = function (req, res) {
 						}
 					} else {
 						if (!requestedscreenid){
-							res.send(result.rows[0]);
+							testcasesteps = result.rows[0].steps;
+							testcasename = result.rows[0].name;
+							reuse= (result.rows[0].parent>1)?true:false;
+							responsedata = {
+								template: "",
+								reuse: reuse,
+								testcase: testcasesteps,
+								testcasename: testcasename,
+								del_flag: result.del_flag
+							};
+							if ('screenName' in result){
+								responsedata.screenName = result.screenName;
+							}
+							res.send(responsedata);
 						}else{
 							try {
 								for (var i = 0; i < result.rows.length; i++) {
-									testcasesteps = result.rows[i].testcasesteps;
-									testcasename = result.rows[i].testcasename;
+									testcasesteps = result.rows[i].steps;
+									testcasename = result.rows[i].name;
+									reuse= (result.rows[i]>1)?true:false;
 								}
-								var inputs = {
-									"query": "debugtestcase",
-									"screenid": requestedscreenid
+								responsedata = {
+									template: "",
+									testcase: testcasesteps,
+									reuse: reuse,
+									testcasename: testcasename,
+									del_flag: result.del_flag
 								};
-								logger.info("Calling function fetchScrapedData from the service readTestCase_ICE");
-								fetchScrapedData(inputs, function (err, scrapedobjects) {
-									try {
-										if (scrapedobjects != null && scrapedobjects.trim() != '' && scrapedobjects != undefined) {
-											var newParse = JSON.parse(scrapedobjects);
-											if ('body' in newParse) {
-												template = newParse.body;
-												responsedata.template = template;
-												responsedata.testcase = testcasesteps;
-												responsedata.testcasename = testcasename;
-												try {
-													res.send(responsedata);
-												} catch (exception) {
-													logger.error("Exception while sending response data from the service readTestCase_ICE - fetchScrapedData: %s", exception);
-												}
-											} else {
-												responsedata = {
-													template: "",
-													testcase: testcasesteps,
-													testcasename: testcasename
-												};
-												try {
-													res.send(responsedata);
-												} catch (exception) {
-													logger.error("Exception while sending response data from the service readTestCase_ICE - fetchScrapedData: %s", exception);
-												}
-											}
-										} else if ((scrapedobjects == null || scrapedobjects.trim() == '' || scrapedobjects == undefined) && (testcasesteps != null && testcasesteps != '' || testcasesteps != undefined)) {
-											responsedata = {
-												template: "",
-												testcase: testcasesteps,
-												testcasename: testcasename
-											};
-											try {
-												res.send(responsedata);
-											} catch (exception) {
-												logger.error("Exception while sending response data from the service readTestCase_ICE - fetchScrapedData: %s", exception);
-											}
-										} else {
-											//this case is merely impossible in V2.0 as creation happens in MindMaps
-											responsedata = {
-												template: "",
-												testcase: "[]",
-												testcasename: ""
-											};
-											try {
-												res.send(responsedata);
-											} catch (exception) {
-												logger.error("Exception while sending response data from the service readTestCase_ICE - fetchScrapedData: %s", exception);
-											}
-										}
-									} catch (exception) {
-										logger.error("Exception in the service readTestCase_ICE - fetchScrapedData: %s", exception);
-									}
-								});
+								if ('screenName' in result){
+									responsedata.screenName = result.screenName;
+								}
+								try {
+									res.send(responsedata);
+								} catch (exception) {
+									logger.error("Exception while sending response data from the service readTestCase_ICE - fetchScrapedData: %s", exception);
+								}
 							} catch (exception) {
 								logger.error("Exception in the service readTestCase_ICE: %s", exception);
 							}
 						}
-
 					}
 				} catch (exception) {
 					logger.error("Exception in the service readTestCase_ICE: %s", exception);
@@ -1530,94 +148,43 @@ exports.readTestCase_ICE = function (req, res) {
 	}
 };
 
-/**
- * @author vishvas.a
- * @modified author sunil.revankar
- * updateTestCase_ICE service is used to save testcase data
- */
 exports.updateTestCase_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: updateTestCase_ICE");
 		if (utils.isSessionActive(req)) {
-			var hasrow = false;
 			//base request elements
 			var requestedscreenid = req.body.screenid;
 			var requestedtestcaseid = req.body.testcaseid;
 			var requestedtestcasename = req.body.testcasename;
 			var requestedversionnumber = req.body.versionnumber;
 			var requestedtestcasesteps = JSON.parse(req.body.testcasesteps);
+			var import_status = req.body.import_status;
 			var userinfo = req.body.userinfo;
-			//these value has to be modified later
-			var requestedskucodetestcase = req.body.skucodetestcase;
-			var requestedtags = req.body.tags;
-			// Query 1 checking whether the testcaseid belongs to the same screen based on requested screenid,testcasename,testcaseid and testcasesteps
 			var inputs = {
 				"screenid": requestedscreenid,
-				"query": "checktestcaseexist",
-				"versionnumber": requestedversionnumber
+				"query": "updatetestcasedata",
+				"modifiedby": userinfo.user_id,
+				"modifiedbyrole": userinfo.role,
+				"testcasesteps": requestedtestcasesteps,
+				"versionnumber": requestedversionnumber,
+				"testcaseid": requestedtestcaseid,
+				"testcasename": requestedtestcasename,
+				"import_status": import_status,
 			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling NDAC Service from updateTestCase_ICE: design/updateTestCase_ICE");
-			client.post(epurl + "design/updateTestCase_ICE", args,
-				function (result, response) {
-				try {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						var flag = "Error in Query 1 testcaseexist: Fail";
-						logger.error("Error occurred in design/updateTestCase_ICE from updateTestCase_ICE Error Code : ERRNDAC");
-						try {
-							res.send(flag);
-						} catch (exception) {
-							logger.error("Exception in the service updateTestCase_ICE: %s", exception);
-						}
-					} else {
-						for (var i = 0; i < result.rows.length; i++) {
-							if (result.rows[i].testcaseid == requestedtestcaseid) {
-								hasrow = true;
-								break;
-							}
-						}
-						if (hasrow == true) {
-							// Query 2 updating the testcasedata based on based on requested screenid,testcaseid and testcasesteps
-							requestedtestcasesteps = JSON.stringify(requestedtestcasesteps);
-							requestedtestcasesteps = requestedtestcasesteps.replace(/'+/g, "''");
-							var inputs = {
-								"screenid": requestedscreenid,
-								"query": "updatetestcasedata",
-								"modifiedby": userinfo.username.toLowerCase(),
-								"skucodetestcase": requestedskucodetestcase,
-								"testcasesteps": requestedtestcasesteps,
-								"versionnumber": requestedversionnumber,
-								"testcaseid": requestedtestcaseid,
-								"testcasename": requestedtestcasename
-							};
-							logger.info("Calling function uploadTestCaseData from updateTestCase_ICE");
-							uploadTestCaseData(inputs, function (error, response) {
-								if (error) {
-									try {
-										res.send(error);
-									} catch (exception) {
-										logger.error("Exception in the service updateTestCase_ICE - uploadTestCaseData: %s", exception);
-									}
-								} else {
-									try {
-										res.send(response);
-									} catch (exception) {
-										logger.error("Exception in the service updateTestCase_ICE - uploadTestCaseData: %s", exception);
-									}
-								}
-							});
-						} else {
-							logger.error("Error in the service updateTestCase_ICE: Fail to save testcase");
-							res.send("fail");
-						}
+			logger.info("Calling function uploadTestCaseData from updateTestCase_ICE");
+			uploadTestCaseData(inputs, function (error, response) {
+				if (error) {
+					try {
+						res.send(error);
+					} catch (exception) {
+						logger.error("Exception in the service updateTestCase_ICE - uploadTestCaseData: %s", exception);
 					}
-				} catch (exception) {
-					logger.error("Exception in the service updateTestCase_ICE: %s", exception);
+				} else {
+					try {
+						res.send(response);
+					} catch (exception) {
+						logger.error("Exception in the service updateTestCase_ICE - uploadTestCaseData: %s", exception);
+					}
 				}
 			});
 		} else {
@@ -1629,11 +196,6 @@ exports.updateTestCase_ICE = function (req, res) {
 	}
 };
 
-/**
- * @author vishvas.a
- * @modified author sunil.revankar
- * debugTestCase_ICE service is used to debug the testcase
- */
 exports.debugTestCase_ICE = function (req, res) {
 	var name;
 	try {
@@ -1655,103 +217,76 @@ exports.debugTestCase_ICE = function (req, res) {
 								var requestedtestcaseids = req.body.testcaseids;
 								var apptype = req.body.apptype;
 								var responsedata = [];
-								var counter = -1;
 								var browsertypeobject = {
 									browsertype: requestedbrowsertypes
 								};
 								var flag = "";
-								async.forEachSeries(requestedtestcaseids, function (testcaseIDs, eachTestcaseIDsCallback) {
-									var inputs = {
-										"query": "testcaseid",
-										"testcaseid": testcaseIDs,
-										"userid": req.body.userInfo.user_id
-									};
-									var args = {
-										data: inputs,
-										headers: {
-											"Content-Type": "application/json"
-										}
-									};
-									logger.info("Calling NDAC Service from debugTestCase_ICE: design/readTestCase_ICE");
-									client.post(epurl + "design/readTestCase_ICE", args,
-										function (testcasedataresult, response) {
-										try {
-											if (response.statusCode != 200 || testcasedataresult.rows == "fail") {
-												flag = "Error in getProjectTestcasedata : Fail";
-												logger.error("Error occurred in design/readTestCase_ICE from the service debugTestCase_ICE Error Code : ERRNDAC");
-												try {
-													res.send(flag);
-												} catch (exception) {
-													logger.error("Exception in the service debugTestCase_ICE: %s", exception);
-												}
-											} else {
-												async.forEachSeries(testcasedataresult.rows, function (eachTestcaseData, testcasedataCallback) {
-													var responseobject = {
-														template: "",
-														testcasename: "",
-														testcase: [],
-														apptype: ""
-													};
-													responseobject.testcase = eachTestcaseData.testcasesteps;
-													responseobject.testcasename = eachTestcaseData.testcasename;
-													responseobject.apptype = apptype;
-													responsedata.push(responseobject);
-													responsedata.push(browsertypeobject);
-													var inputs = {
-														"query": "debugtestcase",
-														"screenid": testcasedataresult.rows[0].screenid
-													};
-													logger.info("Calling the function fetchScrapedData from debugTestCase_ICE");
-													fetchScrapedData(inputs, function (err, scrapedobjects) {
-														counter++;
+								var inputs = {
+									"query": "testcaseids",
+									"testcaseid": requestedtestcaseids,
+									"userid": req.body.userInfo.user_id
+								};
+								var args = {
+									data: inputs,
+									headers: {
+										"Content-Type": "application/json"
+									}
+								};
+								logger.info("Calling NDAC Service from debugTestCase_ICE: design/readTestCase_ICE");
+								client.post(epurl + "design/readTestCase_ICE", args,
+									function (testcasedataresult, response) {
+									try {
+										if (response.statusCode != 200 || testcasedataresult.rows == "fail") {
+											flag = "Error in getProjectTestcasedata : Fail";
+											logger.error("Error occurred in design/readTestCase_ICE from the service debugTestCase_ICE Error Code : ERRNDAC");
+											try {
+												res.send(flag);
+											} catch (exception) {
+												logger.error("Exception in the service debugTestCase_ICE: %s", exception);
+											}
+										} else {
+											var testcases = testcasedataresult.rows;
+											for (i = 0; i < testcases.length; i++){
+												var responseobject = {
+													template: "",
+													testcasename: "",
+													testcase: [],
+													apptype: ""
+												};
+												responseobject.testcase = testcases[i].steps;
+												responseobject.testcasename = testcases[i].name;
+												responseobject.apptype = apptype;
+												responsedata.push(responseobject);
+											}
+											responsedata.push(browsertypeobject);
+											logger.info("Sending socket request for debugTestCase to redis");
+											dataToIce = {"emitAction" : "debugTestCase","username" : name, "responsedata":responsedata};
+											redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+											function result_debugTestCase_listener(channel, message) {
+												data = JSON.parse(message);
+												//LB: make sure to send recieved data to corresponding user
+												if (name == data.username) {
+													redisServer.redisSubServer.removeListener('message', result_debugTestCase_listener);
+													if (data.onAction == "unavailableLocalServer") {
+														logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
+														if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
+															var soc = myserver.socketMapNotify[name];
+															soc.emit("ICEnotAvailable");
+														}
+													} else if (data.onAction == "result_debugTestCase") {
 														try {
-															if (scrapedobjects != null && scrapedobjects.trim() != '' && scrapedobjects != undefined) {
-																var newParse = JSON.parse(scrapedobjects);
-																if ('body' in newParse) {
-																	var screen_obj = responsedata[counter];
-																	screen_obj.template = newParse.body[0];
-
-																}
-															}
-															// responsedata.push(responseobject);
-															// responsedata.push(browsertypeobject);
-															if (counter == requestedtestcaseids.length - 1) {
-																logger.info("Sending socket request for debugTestCase to redis");
-																dataToIce = {"emitAction" : "debugTestCase","username" : name, "responsedata":responsedata};
-																redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-																function result_debugTestCase_listener(channel, message) {
-																	data = JSON.parse(message);
-																	//LB: make sure to send recieved data to corresponding user
-																	if (name == data.username) {
-																		redisServer.redisSubServer.removeListener('message', result_debugTestCase_listener);
-																		if (data.onAction == "unavailableLocalServer") {
-																			logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
-																			if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
-																				var soc = myserver.socketMapNotify[name];
-																				soc.emit("ICEnotAvailable");
-																			}
-																		} else if (data.onAction == "result_debugTestCase") {
-																			try {
-																				res.send(data.value);
-																			} catch (exception) {
-																				logger.error("Exception in the service debugTestCase_ICE: %s", exception);
-																			}
-																		}
-																	}
-																}
-																redisServer.redisSubServer.on("message",result_debugTestCase_listener);
-															}
+															res.send(data.value);
 														} catch (exception) {
 															logger.error("Exception in the service debugTestCase_ICE: %s", exception);
 														}
-													});
-													testcasedataCallback();
-												}, eachTestcaseIDsCallback);
+													}
+												}
 											}
-										} catch (exception) {
-											logger.error("Exception in the service debugTestCase_ICE: %s", exception);
+											redisServer.redisSubServer.on("message",result_debugTestCase_listener);
 										}
-									});
+									} catch (exception) {
+										logger.error("Exception in the service debugTestCase_ICE: %s", exception);
+									}
 								});
 							} catch (exception) {
 								logger.error("Exception in the service debugTestCase_ICE: %s", exception);
@@ -2007,11 +542,6 @@ exports.debugTestCase_ICE = function (req, res) {
 	}
 };
 
-/**
- * getKeywordDetails_ICE for fetching the objects,keywords
- * based on projecttype sent by front end
- * @author vishvas.a
- */
 exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 	try {
 		logger.info("Inside UI service: getKeywordDetails_ICE");
@@ -2039,8 +569,7 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 						} else {
 							for (var objectindex = 0; objectindex < projectBasedKeywordsresult.rows.length; objectindex++) {
 								var objecttype = projectBasedKeywordsresult.rows[objectindex].objecttype;
-								// var keywords = projectBasedKeywordsresult.rows[objectindex].keywords;
-								var keywords = JSON.parse(projectBasedKeywordsresult.rows[objectindex].keywords);
+								var keywords = projectBasedKeywordsresult.rows[objectindex].keywords;
 								individualsyntax[objecttype] = keywords;
 							}
 							try {
@@ -2062,7 +591,6 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 	}
 };
 
-//getDependentTestCases by ScenarioId
 exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req, res) {
 	try {
 		logger.info("Inside UI service: getTestcasesByScenarioId_ICE");
@@ -2071,7 +599,7 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 			var testScenarioId = req.body.testScenarioId;
 			var inputs = {
 				"testscenarioid": testScenarioId,
-				"query": "gettestcaseids"
+				"query": "gettestcasedetails"
 			};
 			var args = {
 				data: inputs,
@@ -2092,60 +620,22 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 							logger.error("Exception in the service getTestcasesByScenarioId_ICE - gettestcaseids: %s", exception);
 						}
 					} else {
-						var testcaseIds = testcasesResult.rows[0].testcaseids;
-							async.forEachSeries(testcaseIds, function (eachtestcaseid, fetchtestcaseNameCallback) {
-								var testcasesObj = {};
-								try {
-									var inputs = {
-										"eachtestcaseid": eachtestcaseid,
-										"query": "gettestcasedetails"
-									};
-									var args = {
-										data: inputs,
-										headers: {
-											"Content-Type": "application/json"
-										}
-									};
-									logger.info("Calling NDAC Service from getTestcasesByScenarioId_ICE - gettestcasedetails: design/getTestcasesByScenarioId_ICE");
-									client.post(epurl + "design/getTestcasesByScenarioId_ICE", args,
-										function (testcaseNamesResult, response) {
-										try {
-											if (response.statusCode != 200 || testcaseNamesResult.rows == "fail") {
-												flag = "Error in fetching testcaseNames : Fail";
-												try {
-													logger.error("Error in fetching testcaseNames");
-													res.send(flag);
-												} catch (exception) {
-													logger.error("Exception in the service getTestcasesByScenarioId_ICE - gettestcasedetails: %s", exception);
-												}
-											} else {
-												var testcaseNames = testcaseNamesResult.rows[0];
-												testcasesObj.testcaseId = eachtestcaseid;
-												testcasesObj.testcaseName = testcaseNames.testcasename;
-												testcasesArr.push(testcasesObj);
-												fetchtestcaseNameCallback();
-											}
-										} catch (exception) {
-											logger.error("Exception in the service getTestcasesByScenarioId_ICE - gettestcasedetails: %s", exception);
-										}
-									});
-								} catch (exception) {
-									logger.error("Exception in the service getTestcasesByScenarioId_ICE: %s", exception);
-								}
-							}, finalfunction);
+						var testcases = testcasesResult.rows;
+						for (index = 0; index < testcases.length; index++){
+							var testcasesObj = {};
+							testcasesObj.testcaseId = testcases[index]._id;
+							testcasesObj.testcaseName = testcases[index].name;
+							testcasesArr.push(testcasesObj);
+						}
+						try {
+							logger.info("Sending testcase details");
+							res.send(testcasesArr);
+						} catch (exception) {
+							logger.error("Exception in sending response from the service getTestcasesByScenarioId_ICE: %s", exception);
+						}
 					}
 				} catch (exception) {
 					logger.error("Exception in the service getTestcasesByScenarioId_ICE: %s", exception);
-				}
-
-				function finalfunction() {
-					logger.info("Inside the finalfunction");
-					try {
-						logger.info("Sending testcase details");
-						res.send(testcasesArr);
-					} catch (exception) {
-						logger.error("Exception in the finalfunction from the service getTestcasesByScenarioId_ICE: %s", exception);
-					}
 				}
 			});
 		} else {
@@ -2154,149 +644,5 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 		}
 	} catch (exception) {
 		logger.error("Exception in the service getTestcasesByScenarioId_ICE: %s", exception);                  
-	}
-};
-
-exports.updateIrisDataset = function updateIrisDataset(req, res) {
-	try{
-		logger.info("Inside UI service: updateIrisDataset");
-		if (utils.isSessionActive(req)) {
-			name = req.session.username;
-			image_data = req.body.data;
-			redisServer.redisSubServer.subscribe('ICE2_' + name);
-			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.debug("ICE Socket requesting Address: %s" , name);
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-				if (redisres[1]>0) {
-					logger.info("Sending socket request for updateIrisDataset to redis");
-					dataToIce = {"emitAction" : "irisOperations","username" : name, "image_data":image_data, "param":"updateDataset"};
-					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-					function updateIrisDataset_listener(channel,message) {
-						var data = JSON.parse(message);
-						if(name == data.username){
-							redisServer.redisSubServer.removeListener('message',updateIrisDataset_listener);
-							if (data.onAction == "unavailableLocalServer") {
-								logger.error("Error occurred in updateIrisDataset: Socket Disconnected");
-								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-									var soc = myserver.socketMapNotify[name];
-									soc.emit("ICEnotAvailable");
-								}
-							} else if (data.onAction == "iris_operations_result") {
-								if(data.value==true){
-									var args = {
-										data: image_data,
-										headers: {
-											"Content-Type": "application/json"
-										}
-									};
-									logger.info("Calling NDAC Service from updateIrisDataset: design/updateIrisObjectType");
-									client.post(epurl + "design/updateIrisObjectType", args,
-										function (result, response) {
-										try {
-											if (response.statusCode != 200 || result.rows == "fail") res.send(false);
-											else if (result.rows == "unsavedObject") res.send("unsavedObject");
-											else res.send(true);
-										} catch (exception) {
-											logger.error("Exception in the service updateIrisObjectType: %s", exception);
-											res.send(false);
-										}
-									});
-								}
-								else  res.send(data.value);
-							}
-						}
-					}
-					redisServer.redisSubServer.on("message",updateIrisDataset_listener);
-				} else {
-					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-						var flag="";
-						if (found) flag = "scheduleModeOn";
-						else {
-							flag = "unavailableLocalServer";
-							logger.info("ICE Socket not Available");
-						}
-						res.send(flag);
-					});
-				}
-			});
-		} else {
-			logger.error("Error occurred in the service updateIrisDataset: Invalid Session");
-			res.send("Invalid Session");
-		}
-	} catch(exception){
-		logger.error("Exception in the service updateIrisDataset: %s", exception);
-	}
-}
-
-exports.userObjectElement_ICE = function (req, res) {
-	try {
-		logger.info("Inside UI service: userObjectElement_ICE");
-		if (utils.isSessionActive(req)) {
-			var name = req.session.username;
-			redisServer.redisSubServer.subscribe('ICE2_' + name);
-			var operation = req.body.object[0];
-			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.info("ICE Socket requesting Address: %s" , name);
-			logger.info("Sending socket request for focus to redis");
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-				if (redisres[1]>0) {
-					if(operation=='encrypt'){
-						props={
-							action:"userobject",
-							url:req.body.object[1],
-							name:req.body.object[2],
-							rpath:req.body.object[3],
-							apath:req.body.object[4],
-							classname:req.body.object[5],
-							id:req.body.object[6],
-							selector:req.body.object[7],
-							tagname:req.body.object[8],
-							operation:operation
-						}
-					}
-					else if(operation=='decrypt'){
-						props={
-							action:"userobject",
-							xpath:req.body.object[1],
-							url:req.body.object[2],
-							tag:req.body.object[3],
-							operation:operation
-						}
-					}
-					dataToIce = {"emitAction": "webscrape", "username" : name, "data": props};
-					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-					function userObjectElement_ICE_listener(channel, message) {
-						var data = JSON.parse(message);
-						//LB: make sure to send recieved data to corresponding user
-						if (name == data.username) {
-							redisServer.redisSubServer.removeListener('message', userObjectElement_ICE_listener);
-							if (data.onAction == "unavailableLocalServer") {
-								logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
-								if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
-									var soc = myserver.socketMapNotify[name];
-									soc.emit("ICEnotAvailable");
-								}
-							} else {
-								value = data.value;
-								logger.info("Sending objects");
-								res.send(value);
-							}
-						}
-					}
-					redisServer.redisSubServer.on("message",userObjectElement_ICE_listener);
-					logger.info("Successfully updated userdefined object");
-				} else {
-					logger.error("Error occurred in the service initScraping_ICE: Socket not Available");
-					res.send("unavailableLocalServer")
-				}
-			})
-		} else {
-			logger.error("Error occurred in the service userObjectElement_ICE: Invalid Session");
-			res.send("Invalid Session");
-		}
-	} catch (exception) {
-		logger.error("Exception in the service userObjectElement_ICE: %s",exception);
-		res.send("fail");
 	}
 };

@@ -22,13 +22,16 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http,$q)   {
 			});
 		},
 
-		getScrapeDataScreenLevel_ICE: function()	{
+		getScrapeDataScreenLevel_ICE: function(type)	{
 			var screenId = JSON.parse(window.localStorage['_CT']).screenId;
 			var projectId = JSON.parse(window.localStorage['_CT']).projectId;
+			var testCaseId = JSON.parse(window.localStorage['_CT']).testCaseId;
 			return $http.post('/getScrapeDataScreenLevel_ICE',{
 				param : 'getScrapeDataScreenLevel_ICE',
 				screenId : screenId,
-				projectId : projectId
+				projectId : projectId,
+				type:type,
+				testCaseId:testCaseId
 			})
 
 			.then (function(response){return response.data;	},
@@ -72,13 +75,14 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http,$q)   {
 			})
 		},
 
-		readTestCase_ICE : function(screenId,testCaseId,testCaseName,versionnumber){
+		readTestCase_ICE : function(testCaseId,testCaseName,versionnumber,screenName){
 			return $http.post('/readTestCase_ICE',{
 				param : 'readTestCase_ICE',
-				screenid: screenId,
+				userInfo: JSON.parse(window.localStorage['_UI']),
 				testcaseid: testCaseId,
 				testcasename: testCaseName,
-				versionnumber: versionnumber
+				versionnumber: versionnumber,
+				screenName : screenName
 			})
 			.then(function(response)  { 
 				return response.data
@@ -87,7 +91,7 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http,$q)   {
 			})
 		},
 
-		updateTestCase_ICE : function(screenId,testCaseId,testCaseName,mydata,userInfo,versionnumber){
+		updateTestCase_ICE : function(testCaseId,testCaseName,mydata,userInfo,versionnumber,import_status){
 			var modifiedData = JSON.parse(JSON.stringify(mydata));
 			for(i=0;i<modifiedData.length;i++){
 				if(modifiedData[i].inputVal == undefined){
@@ -103,14 +107,14 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http,$q)   {
 			}
 			return $http.post('/updateTestCase_ICE',{
 				param : 'updateTestCase_ICE',
-				screenid: screenId,
 				testcaseid: testCaseId,
 				testcasename: testCaseName,
 				testcasesteps: JSON.stringify(modifiedData),
 				userinfo: userInfo,
 				skucodetestcase : "skucodetestcase",
 				tags: "tags",
-				versionnumber: versionnumber
+				versionnumber: versionnumber,
+				import_status: import_status
 			})
 			.then(function(response)  { 
 				return response.data

@@ -383,58 +383,59 @@ if (cluster.isMaster) {
 		}
 
 		//Role Based User Access to services
-		app.post('*', function(req, res, next) {
-			var roleId = (req.session) ? req.session.activeRoleId : undefined;
-			var updateinp = {
-				roleid: roleId || "ignore",
-				servicename: req.url.replace("/", "")
-			};
-			var args = {
-				data: updateinp,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			var apireq = apiclient.post(epurl + "utility/userAccess_Nineteen68", args, function(result, response) {
-				if (roleId) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in userAccess_Nineteen68");
-						res.send("Invalid Session");
-					} else if (result.rows == "off") {
-						res.status(500).send("fail");
-						httpsServer.close();
-						logger.error("License Expired!!");
-						logger.error("Please run the Service API and Restart the Server");
-					} else {
-						if (result.rows == "True") {
-							logger.rewriters[0] = function(level, msg, meta) {
-								if (req.session && req.session.uniqueId) {
-									meta.username = req.session.username;
-									meta.userid = req.session.userid;
-									meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
-									return meta;
-								} else {
-									meta.username = null;
-									meta.userid = null;
-									return meta;
-								}
-							};
-							return next();
-						} else {
-							req.clearSession();
-							return res.send("Invalid Session");
-						}
-					}
-				} else {
-					return next();
-				}
-			});
-			apireq.on('error', function(err) {
-				res.status(500).send("fail");
-				httpsServer.close();
-				logger.error("Please run the Service API and Restart the Server");
-			});
-		});
+		
+		// app.post('*', function(req, res, next) {
+		// 	var roleId = (req.session) ? req.session.activeRoleId : undefined;
+		// 	var updateinp = {
+		// 		roleid: roleId || "ignore",
+		// 		servicename: req.url.replace("/", "")
+		// 	};
+		// 	var args = {
+		// 		data: updateinp,
+		// 		headers: {
+		// 			"Content-Type": "application/json"
+		// 		}
+		// 	};
+		// 	var apireq = apiclient.post(epurl + "utility/userAccess_Nineteen68", args, function(result, response) {
+		// 		if (roleId) {
+		// 			if (response.statusCode != 200 || result.rows == "fail") {
+		// 				logger.error("Error occured in userAccess_Nineteen68");
+		// 				res.send("Invalid Session");
+		// 			} else if (result.rows == "off") {
+		// 				res.status(500).send("fail");
+		// 				httpsServer.close();
+		// 				logger.error("License Expired!!");
+		// 				logger.error("Please run the Service API and Restart the Server");
+		// 			} else {
+		// 				if (result.rows == "True") {
+		// 					logger.rewriters[0] = function(level, msg, meta) {
+		// 						if (req.session && req.session.uniqueId) {
+		// 							meta.username = req.session.username;
+		// 							meta.userid = req.session.userid;
+		// 							meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
+		// 							return meta;
+		// 						} else {
+		// 							meta.username = null;
+		// 							meta.userid = null;
+		// 							return meta;
+		// 						}
+		// 					};
+		// 					return next();
+		// 				} else {
+		// 					req.clearSession();
+		// 					return res.send("Invalid Session");
+		// 				}
+		// 			}
+		// 		} else {
+		// 			return next();
+		// 		}
+		// 	});
+		// 	apireq.on('error', function(err) {
+		// 		res.status(500).send("fail");
+		// 		httpsServer.close();
+		// 		logger.error("Please run the Service API and Restart the Server");
+		// 	});
+		// });
 
 		app.post('/designTestCase', function(req, res) {
 			return res.sendFile("app.html", { root: __dirname + "/public/" });
@@ -445,6 +446,7 @@ if (cluster.isMaster) {
 		var login = require('./server/controllers/login');
 		var admin = require('./server/controllers/admin');
 		var design = require('./server/controllers/design');
+		var designscreen = require('./server/controllers/designscreen');
 		var suite = require('./server/controllers/suite');
 		var report = require('./server/controllers/report');
 		var plugin = require('./server/controllers/plugin');
@@ -452,7 +454,7 @@ if (cluster.isMaster) {
 		var qc = require('./server/controllers/qualityCenter');
 		var webocular = require('./server/controllers/webocular');
 		var chatbot = require('./server/controllers/chatbot');
-		var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
+		//var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
 		var taskbuilder = require('./server/controllers/taskJson');
 		var flowGraph = require('./server/controllers/flowGraph');
 
@@ -477,7 +479,7 @@ if (cluster.isMaster) {
 		app.post('/populateProjects', mindmap.populateProjects);
 		app.post('/populateUsers', mindmap.populateUsers);
 		app.post('/checkReuse', mindmap.checkReuse);
-		app.post('/getCRId', mindmap.getCRId);
+		// app.post('/getCRId', mindmap.getCRId);
 		app.post('/getProjectTypeMM_Nineteen68', mindmap.getProjectTypeMM_Nineteen68);
 		app.post('/populateScenarios', mindmap.populateScenarios);
 		app.post('/populateReleases', mindmap.populateReleases);
@@ -515,17 +517,17 @@ if (cluster.isMaster) {
 		app.post('/testLDAPConnection', admin.testLDAPConnection);
 		app.post('/getLDAPConfig', admin.getLDAPConfig);
 		app.post('/manageLDAPConfig', admin.manageLDAPConfig);
-		app.post('/generateCIusertokens', admin.generateCIusertokens)
 		app.post('/getCIUsersDetails', admin.getCIUsersDetails);
-		app.post('/deactivateCIUser', admin.deactivateCIUser);
+		app.post('/manageCIUsers', admin.manageCIUsers);
+		app.post('/getPreferences', admin.getPreferences);
 
 		//Design Screen Routes
-		app.post('/initScraping_ICE', design.initScraping_ICE);
-		app.post('/highlightScrapElement_ICE', design.highlightScrapElement_ICE);
-		app.post('/getScrapeDataScreenLevel_ICE', design.getScrapeDataScreenLevel_ICE);
-		app.post('/updateScreen_ICE', design.updateScreen_ICE);
-		app.post('/updateIrisDataset', design.updateIrisDataset);
-		app.post('/userObjectElement_ICE', design.userObjectElement_ICE);
+		app.post('/initScraping_ICE', designscreen.initScraping_ICE);
+		app.post('/highlightScrapElement_ICE', designscreen.highlightScrapElement_ICE);
+		app.post('/getScrapeDataScreenLevel_ICE', designscreen.getScrapeDataScreenLevel_ICE);
+		app.post('/updateScreen_ICE', designscreen.updateScreen_ICE);
+		app.post('/updateIrisDataset', designscreen.updateIrisDataset);
+		app.post('/userObjectElement_ICE', designscreen.userObjectElement_ICE);
 		//Design TestCase Routes
 		app.post('/readTestCase_ICE', design.readTestCase_ICE);
 		app.post('/updateTestCase_ICE', design.updateTestCase_ICE);
@@ -538,11 +540,8 @@ if (cluster.isMaster) {
 		//app.post('/updateTestScenario_ICE', suite.updateTestScenario_ICE);
 		app.post('/ExecuteTestSuite_ICE', suite.ExecuteTestSuite_ICE);
 		app.post('/getTestcaseDetailsForScenario_ICE', suite.getTestcaseDetailsForScenario_ICE);
-		app.post('/ExecuteTestSuite_ICE_CI', suite.ExecuteTestSuite_ICE_CI);
-		//app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
-
-		//SVN execution routes
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_SVN);
+		//app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
 		// app.post('/getListofScheduledSocketMap',suite.getListofScheduledSocketMap);
 
 		//Scheduling Screen Routes
@@ -554,9 +553,7 @@ if (cluster.isMaster) {
 		app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
 		app.post('/reportStatusScenarios_ICE', report.reportStatusScenarios_ICE);
 		app.post('/renderReport_ICE', report.renderReport_ICE);
-		// app.post('/getMainReport_ICE', report.getMainReport_ICE);
 		app.post('/getReport_Nineteen68', report.getReport_Nineteen68);
-		app.post('/exportToJson_ICE', report.exportToJson_ICE);
 		app.post('/openScreenShot', report.openScreenShot);
 		app.post('/connectJira_ICE', report.connectJira_ICE);
 		app.post('/getReportsData_ICE', report.getReportsData_ICE);
@@ -569,13 +566,13 @@ if (cluster.isMaster) {
 		//Utility plugins
 		app.post('/Encrypt_ICE', utility.Encrypt_ICE);
 		// Wecoccular Plugin
-		app.post('/crawResults', webocular.getCrawlResults);
+		app.post('/crawlResults', webocular.getCrawlResults);
 		app.post('/saveResults', webocular.saveResults);
 		//Chatbot Routes
 		app.post('/getTopMatches_ProfJ', chatbot.getTopMatches_ProfJ);
 		app.post('/updateFrequency_ProfJ', chatbot.updateFrequency_ProfJ);
 		//NeuronGraphs Plugin Routes
-		app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
+		//app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
 		//QC Plugin
 		app.post('/loginQCServer_ICE', qc.loginQCServer_ICE);
 		app.post('/qcProjectDetails_ICE', qc.qcProjectDetails_ICE);

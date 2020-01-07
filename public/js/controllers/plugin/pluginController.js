@@ -66,19 +66,19 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			if(data == "Fail" || data == "Invalid Session") return $rootScope.redirectPage();
 			else {
 				PluginService.getTaskJson_mindmaps(data)
-				.then(function (data) {
-					if(data == "Invalid Session") {
+				.then(function (data1) {
+					if(data1 == "Invalid Session") {
 						return $rootScope.redirectPage();
 					} else {
-						var tasksJson = data;
-						$scope.taskJson = data;
+						var tasksJson = data1;
+						$scope.taskJson = data1;
 					 	window.localStorage['_TJ'] = angular.toJson(tasksJson);
 						if (tasksJson.length == 0) unblockUI();
 						/*	Build a list of releaseids and cycleids
 						* Another dict for releaseid and cyclelist out of task json
 						* List of apptype and tasktype
 						*/
-					    $scope.filterDat = {'projectids':[],'releaseids':[],'cycleids':[],'prjrelmap':{},'relcycmap':{},'apptypes':[],'tasktypes':['Design','Execution'],'idnamemapprj':{},'idnamemaprel':{},'idnamemapcyc':{}};
+					    $scope.filterDat = {'projectids':[],'releaseids':[],'cycleids':[],'prjrelmap':{},'relcycmap':{},'apptypes':[],'tasktypes':['Design','Execution'],'idnamemapprj':{},'idnamemaprel':{},'idnamemapcyc':{},'idnamemapdom':{}};
 						$(".plugin-taks-listing:visible").empty().hide();
 						var counter = 1,countertodo = 1,counterreview = 1;
 						var length_tasksJson = tasksJson.length;
@@ -120,12 +120,12 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 									'reuse':tasksJson[i].taskDetails[j].reuse
 									}
 								dataobj = JSON.stringify(dataobj);
-									if(status == 'review'){
-										$('.plugin-taks-listing.review').append("<div class='panel panel-default' panel-id='"+i+"'><div id='panelBlock_"+i+"' class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+" taskRedir'>"+ counterreview +"</h4><span class='assignedTask' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
+									if(status == 'underReview'){
+										$('.plugin-taks-listing.review').append("<div class='panel panel-default' panel-id='"+i+"'><div id='panelBlock_"+i+"' class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+" taskRedir'>"+ counterreview +"</h4><span class='assignedTask' data-testsuitedetails='"+testSuiteDetails+"' data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
 										counterreview++;
 									}
 									else{
-										$('.plugin-taks-listing.todo').append("<div class='panel panel-default' panel-id='"+i+"'><div id='panelBlock_"+i+"' class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+" taskRedir'>"+ countertodo +"</h4><span class='assignedTask' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
+										$('.plugin-taks-listing.todo').append("<div class='panel panel-default' panel-id='"+i+"'><div id='panelBlock_"+i+"' class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+" taskRedir'>"+ countertodo +"</h4><span class='assignedTask' data-testsuitedetails='"+testSuiteDetails+"' data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
 										countertodo++;
 									}									
 									 var limit = 45;
@@ -141,54 +141,74 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 								fillFilterValues(tasksJson[i],j);
 							}
 						}
+						unblockUI();
 						//prevent mouseclick before loading tasks
 						$("span.toggleClick").removeClass('toggleClick');
 						// Enable Filter
 						$("span.filterIcon").removeClass('disableFilter');
 					}
-
-					PluginService.getNames_ICE($scope.filterDat.projectids,Array($scope.filterDat.projectids.length).fill('projects'))
-					.then(function (response) {
-						if(response== "fail"){ unblockUI(); }
-						else if(response == "Invalid Session"){
-							return $rootScope.redirectPage();
-						} else {
-							response.respnames.forEach(function(name,i){
-								$scope.filterDat.idnamemapprj[response.requestedids[i]] = name;
-							});
-							PluginService.getNames_ICE($scope.filterDat.releaseids,Array($scope.filterDat.releaseids.length).fill('releases'))
-							.then(function (response) {
-								if(response == "Invalid Session"){
-									return $rootScope.redirectPage();
-								} else{
-									response.respnames.forEach(function(name,i){
-										$scope.filterDat.idnamemaprel[response.requestedids[i]] = name;
-									});
-									PluginService.getNames_ICE($scope.filterDat.cycleids,Array($scope.filterDat.cycleids.length).fill('cycles'))
-									.then(function (response) {
-										if(response == "Invalid Session"){
-											return $rootScope.redirectPage();
-										} else{
-											unblockUI();
-											response.respnames.forEach(function(name,i){
-												$scope.filterDat.idnamemapcyc[response.requestedids[i]] = name;
-												window.localStorage['_FD'] = angular.toJson($scope.filterDat);
-											});
-										}
-									}, function (error) {
-										unblockUI();
-										console.log("Error:::::::::::::", error);
-									});
-								}
-							}, function (error) {
-								unblockUI();
-								console.log("Error:::::::::::::", error);
-							});
+					for(i=0;i<$scope.filterDat.projectids.length;i++){
+						index=data.projectId.indexOf($scope.filterDat.projectids[i]);
+						// if($scope.filterDat.apptypes.indexOf(data.appTypeName[i])==-1)
+						// {
+						// 	// $scope.filterDat.apptypes.push(obj.appType);
+						// 	$scope.filterDat.apptypes.push(data.appTypeName[index]);
+						// }
+						index=data.projectId.indexOf($scope.filterDat.projectids[i]);
+						$scope.filterDat.idnamemapprj[$scope.filterDat.projectids[i]] = data.projectName[index];
+						$scope.filterDat.idnamemapdom[$scope.filterDat.projectids[i]] = data.domains[index];
+						for(j=0;j<$scope.filterDat.releaseids.length;j++){
+							$scope.filterDat.idnamemaprel[$scope.filterDat.releaseids[j]] = $scope.filterDat.releaseids[j];
+							for(k=0;k<$scope.filterDat.cycleids.length;k++){
+								$scope.filterDat.idnamemapcyc[$scope.filterDat.cycleids[k]] = data.cycles[$scope.filterDat.cycleids[k]][2];
+							}
 						}
-					}, function (error) {
-						unblockUI();
-						console.log("Error:::::::::::::", error);
-					});
+					}
+					window.localStorage['_FD'] = angular.toJson($scope.filterDat);
+					// PluginService.getNames_ICE($scope.filterDat.projectids,Array($scope.filterDat.projectids.length).fill('projects'))
+					// .then(function (response) {
+					// 	if(response== "fail"){ unblockUI(); }
+					// 	else if(response == "Invalid Session"){
+					// 		return $rootScope.redirectPage();
+					// 	} else {
+					// 		response.respnames.forEach(function(name,i){
+					// 			$scope.filterDat.idnamemapprj[response.requestedids[i]] = name;
+					// 		});
+					// 		PluginService.getNames_ICE($scope.filterDat.releaseids,Array($scope.filterDat.releaseids.length).fill('releases'))
+					// 		.then(function (response) {
+					// 			if(response == "Invalid Session"){
+					// 				return $rootScope.redirectPage();
+					// 			} else{
+					// 				response.respnames.forEach(function(name,i){
+					// 					$scope.filterDat.idnamemaprel[response.requestedids[i]] = name;
+					// 				});
+					// 				PluginService.getNames_ICE($scope.filterDat.cycleids,Array($scope.filterDat.cycleids.length).fill('cycles'))
+					// 				.then(function (response) {
+					// 					if(response == "Invalid Session"){
+					// 						return $rootScope.redirectPage();
+					// 					} else{
+					// 						unblockUI();
+					// 						response.respnames.forEach(function(name,i){
+					// 							$scope.filterDat.idnamemapcyc[response.requestedids[i]] = name;
+					// 							window.localStorage['_FD'] = angular.toJson($scope.filterDat);
+					// 						});
+					// 					}
+					// 				}, function (error) {
+					// 					unblockUI();
+					// 					console.log("Error:::::::::::::", error);
+					// 				});
+					// 			}
+					// 		}, function (error) {
+					// 			unblockUI();
+					// 			console.log("Error:::::::::::::", error);
+					// 		});
+					// 	}
+					// }, function (error) {
+					// 	unblockUI();
+					// 	console.log("Error:::::::::::::", error);
+					// }); // end of getnames call//
+
+					
 					//$("#plugin-container").removeClass("inactiveLink");
 				}, function (error) {
 					unblockUI();
@@ -232,7 +252,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		$(".panel-default span.assignedTask").each(function () {
 			var title = $(this).attr('title');
 			if ($('.active-task').is(":visible")) {
-				$('.active-task').children().children('div').children('div').children('img').click();
+				$('.active-task').children().children('div').children('div').children('button').click();
 			}
 			if (title == undefined) {
 				if ($(this).text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
@@ -425,7 +445,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 					}
 				dataobj = JSON.stringify(dataobj);
 				if(passFilterTest(tasksJson[i],0)){
-					if(status == 'review'){
+					if(status == 'underReview'){
 						$('.plugin-taks-listing.review').append("<div class='panel panel-default' panel-id='"+i+"'><div class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+"' class='taskRedir'>"+ counterreview +"</h4><span class='assignedTask' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
 						counterreview++;
 					}
@@ -468,10 +488,11 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 				return;
 			}
 			var clktask = $scope.taskJson[clickedtask];
+			var maintask = clktask;
 			var filterDat = $scope.filterDat;
 			if(clktask.taskDetails[0].taskType != 'Design')
 				clktask = clktask.testSuiteDetails[0];
-			var adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+filterDat.idnamemaprel[clktask.releaseid]+'">Release: '+filterDat.idnamemaprel[clktask.releaseid]+'</li><li class="description-item" title="Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'">Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'</li><li class="description-item" title="Apptype: '+clktask.appType+'">Apptype: '+clktask.appType+'</li></div>';
+			var adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+filterDat.idnamemaprel[clktask.releaseid]+'">Release: '+filterDat.idnamemaprel[clktask.releaseid]+'</li><li class="description-item" title="Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'">Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'</li><li class="description-item" title="Apptype: '+maintask.appType+'">Apptype: '+maintask.appType+'</li></div>';
 			$(adddetailhtml).insertAfter("[panel-id="+clickedtask+"]");
 			$("[panel-id="+clickedtask+"]").addClass("active-task");
 		});		
@@ -541,7 +562,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 				return;
 			}
 			var clktask = $scope.taskJson[clickedtask];
-			var maintask = clktask
+			var maintask = clktask;
 			var filterDat = $scope.filterDat;
 			if(clktask.taskDetails[0].taskType != 'Design')
 				clktask = clktask.testSuiteDetails[0];

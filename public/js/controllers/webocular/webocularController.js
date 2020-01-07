@@ -1138,6 +1138,15 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 			} else {
 				if (result_webocular_reportData.rows.length == 0) {
 					console.log("Modules", "No Webocular Modules Found");
+					webocularServices.saveResults($scope.url, $scope.level, $scope.selectedAgent, $scope.proxy, crawledLinks_var, $scope.searchData, $scope.modulename)
+						.then(function (data) {
+							if (data == "success"){
+								openDialog("Webocular Screen","Successfully saved the report");
+								$('#save_webocular').attr("disabled", "disabled")
+							}else if (data== "fail"){
+								openDialog("Webocular Screen","Failed to save the report");
+							}
+						});
 				} else {
 					angular.forEach(result_webocular_reportData.rows, function(value, index) {
 						if(value.modulename==$scope.modulename){

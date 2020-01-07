@@ -229,6 +229,7 @@ function loadReports() {
 
         //Login to Jira
         $(document).on('click', '.resetJiraCredentials', function() {
+            $("#jiraURL, #jiraUserName, #jiraPassword").css('border-color', '#bbb');
             $("#jiraURL").val('');
             $("#jiraUserName").val('');
             $("#jiraPassword").val('');
@@ -302,7 +303,8 @@ function loadReports() {
         $(document).on('click', '.opendescpopup', function() {
             var slno = parseInt($("#inputSlno").val())
             $('#parentIssue').hide();
-            if (slno > getRows.length) {
+            if (!slno || slno == "") $("#inputSlno").css('border-color', 'red');
+            else if (slno > getRows.length) {
                 $('#overlay').css('display', 'block');
                 $(".statusWindow").show();
                 $(".statusWindow .popupheader label").text("Invalid Input")
@@ -347,6 +349,7 @@ function loadReports() {
         }
         //function to close popup window
         $(document).on('click', '.closeWindow', function() {
+            $("#jiraURL, #jiraUserName, #jiraPassword").css('border-color', '#bbb');
             $(".jiraWindow, .createIssueWindow, .statusWindow").hide();
             $('#overlay').css('display', 'none');
             $(".error-msg").text('');
@@ -375,6 +378,7 @@ function loadReports() {
             var slno = $('#inputSlno').val();
             if (!projectid) $("#jProjects").css('border-color', 'red');
             else if (!issuetype || issuetype == "Select Issue") $("#jIssuetype").css('border-color', 'red');
+            else if (issuetype == "Sub-task" && !pissue) $("#jpIssueid").css('border-color', 'red');
             else if (!summary) $("#jSummary").css('border-color', 'red');
             //else if(!description) $("#jDescription").css('border-color','red');
             //else if (!priority || priority == "Select Priority") $("#jPriority").css('border-color', 'red');
@@ -430,7 +434,7 @@ function loadReports() {
                             $(".statusWindow").show();
                             $("#showStatus").text("Invalid Session. Login again");
                         } else {
-                            getRows[parseInt($("#inputSlno").val()) - 1].children[9].innerText = data;
+                            getRows[parseInt($("#inputSlno").val()) - 1].children[8].innerText = data;
                             $(".createIssueWindow").hide();
                             $(".statusWindow").show();
                             $("#showStatus").text("Issue bearing ID " + data + " created successfully.");

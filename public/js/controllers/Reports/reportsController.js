@@ -11,6 +11,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     var clearIntervalList = [];
     var slideOpen = false;
     $scope.reportIdx = ''; // for execution count click
+    $scope.releases="";
+    $rootScope.reportData = "";
     $("#reportDataTableDiv").hide();
     $('.reports-search').attr('disabled', 'disabled');
     $('#ctExpandAssign').css('pointer-events','none');
@@ -40,21 +42,19 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             .then(function(data) {
                 if (data == "Invalid Session") {
                     return $rootScope.redirectPage();
-                }
-                if (type == "projects") {
-                    if (data != "fail" && data.projectids.length != 0) {
+                }  
+                window.localStorage['project']=JSON.stringify(data)           
+                if (type == "projects" ) {
+                    if(data != "fail"){
                         $(".project-list").empty();
                         $(".project-list").append("<option selected disabled>Select Project</option>");
-                        for (i = 0; i < data.projectids.length; i++) {
-                            $(".project-list").append("<option value='" + data.projectids[i] + "'>" + data.projectnames[i] + "</option>");
+                        for (i = 0; i < data.length; i++) {
+                            $(".project-list").append("<option value='" + data[i]._id + "'>" + data[i].name + "</option>");
                         }
-                        var proId;
                         $('.release-list').empty()
                         $('.release-list').append("<option data-id='Select' value='Select' selected>Select</option>");
                         $('.cycle-list').empty();
                         $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-                        proId = data.projectids[0];
-                        getProjectsAndSuites(proId, "reports");
                         if (redirected) {
                             $timeout(function() {
                                 unblockUI();
@@ -65,22 +65,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 
                         }
                     } else console.log("Unable to load test suites.");
-                } else if (type == "reports") {
-                    $('.scrollbar-inner').scrollbar();
-                    $('.scrollbar-macosx').scrollbar();
-                    var container = $('.staticTestsuiteContainer');
-                    $('.suiteContainer').remove();
-                    if (Object.prototype.toString.call(data) === '[object Object]') {
-                        if (data.suiteids.length > 0) {
-                            for (i = 0; i < data.suiteids.length; i++) {
-                                if (container.find('.suiteContainer').length >= 6) {
-                                    $('.dynamicTestsuiteContainer').append("<span class='suiteContainer' data-suiteId='" + data.suiteids[i] + "'><img alt='Test suite icon' class='reportbox' src='imgs/ic-reportbox.png' title='" + data.suitenames[i] + "'><br/><span class='repsuitename' title='" + data.suitenames[i] + "'>" + data.suitenames[i] + "</span></span>");
-                                } else {
-                                    container.append("<span class='suiteContainer' data-suiteId='" + data.suiteids[i] + "'><img alt='Test suite icon' class='reportbox' src='imgs/ic-reportbox.png' title='" + data.suitenames[i] + "'><br/><span class='repsuitename' title='" + data.suitenames[i] + "'>" + data.suitenames[i] + "</span></span>");
-                                }
-                            }
-                        }
-                    }
                     $('.searchScrapEle').css('display', 'none');
                     if ($('.dynamicTestsuiteContainer').find('.suiteContainer').length <= 0) {
                         $('.suitedropdownicon, .dynamicTestsuiteContainer').hide();
@@ -99,63 +83,70 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         var projectId = $('.project-list option:selected').val();
         blockUI("Loading releases.. please wait..");
         $(".moduleBox,.mid-report-section,#accordion").hide();
+        $("#report-header,#report-canvas").hide();
         $('#nodeBox').empty();
         $('#ctExpandAssign').css('pointer-events','none');
         $("#expAssign").attr('src', 'imgs/ic-collapse.png');
         $('#searchModule').val('');
         $('#searchModule').attr('disabled', 'disabled');
-        mindmapServices.populateReleases(projectId).then(function(result) {
-            unblockUI();
-            if (result == "Invalid Session") {
-                return $rootScope.redirectPage();
-            }
-            $('.release-list').empty();
-            $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-            $('.cycle-list').empty();
-            $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-            for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
-                $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
-            }
-            if (redirected) {
-                $timeout(function() {
-                    $('#selectReleases').val(robj.testSuiteDetails[0].releaseid);
-                    $('#selectReleases').trigger('change');
-                }, 500);
-            }
-        }, function(error) {
+        data = JSON.parse(window.localStorage['project'])
+        try{ 
+            for (i=0; i< data.length; i++){
+                if(projectId == data[i]._id){
+                    unblockUI();           
+                    $('.release-list').empty();
+                    $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                    $('.cycle-list').empty();
+                    $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                    for (j = 0; j < data[i].releases.length; j++) {
+                        $('.release-list').append("<option data-id='" + data[i].releases[j].name + "' value='" + data[i].releases[j].name + "'>" + data[i].releases[j].name + "</option>");
+                    }
+                    $scope.releases =  data[i].releases
+                    if (redirected) {
+                        $timeout(function() {
+                            $('#selectReleases').val(robj.testSuiteDetails[0].releaseid);
+                            $('#selectReleases').trigger('change');
+                        }, 500);
+                    }
+                }
+        }
+     } catch(exception){
             unblockUI();
             console.log("Error in service populateReleases while fetching projects -" + error);
-        });
+        }
+    };
 
          //Bind cycles on releases Filter Change
         $scope.selReleasesFilter = function() {
-            var releaseId = $('.release-list option:selected').val();
+            var releaseName= $('.release-list option:selected').val();
             blockUI("Loading cycles.. please wait..");
             $(".moduleBox,.mid-report-section,#accordion").hide();
             $("#expAssign").attr('src', 'imgs/ic-collapse.png');
             $('#searchModule').val('');
             $('#searchModule').attr('disabled', 'disabled');
-            mindmapServices.populateCycles(releaseId).then(function(result_cycles) {
-                unblockUI();
-                if (result_cycles == "Invalid Session") {
-                    return $rootScope.redirectPage();
-                }
-                $('.cycle-list').empty();
-                $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-                for (i = 0; i < result_cycles.c_ids.length && result_cycles.cyc.length; i++) {
-                    $('.cycle-list').append("<option data-id='" + result_cycles.cyc[i] + "' value='" + result_cycles.c_ids[i] + "'>" + result_cycles.cyc[i] + "</option>");
-                }
-                if (redirected) {
-                    $timeout(function() {
-                        $('#selectCycles').val(robj.testSuiteDetails[0].cycleid);
+            result = $scope.releases;
+            try{ 
+                for (i=0;i< result.length;i++){
+                    if(releaseName == result[i].name){
                         unblockUI();
-                        $('#selectCycles').trigger('change');
-                    }, 500);
+                        $('.cycle-list').empty();
+                        $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                        for (j = 0; j < result[i].cycles.length; j++) {
+                            $('.cycle-list').append("<option data-id='" +result[i].cycles[j]._id+ "' value='" + result[i].cycles[j]._id + "'>" + result[i].cycles[j].name + "</option>");
+                        }
+                        if (redirected) {
+                            $timeout(function() {
+                                $('#selectCycles').val(robj.testSuiteDetails[0].cycleid);
+                                unblockUI();
+                                $('#selectCycles').trigger('change');
+                            }, 500);
+                        }
+                    }
                 }
-            }, function(error) {
+            } catch(exception){
                 unblockUI();
-                console.log("Error in service populateCycles while fetching releases -"+error);
-            });
+                console.log("Error in service populateReleases while fetching projects -" + error);
+            }
         };
 
         //Load modules on cycles filter change
@@ -163,10 +154,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             var cycleId = $('.cycle-list option:selected').val();
             var reportsInputData = {};
             reportsInputData.projectId = $.trim($('.project-list option:selected').val());
-            reportsInputData.releaseId = $.trim($('.release-list option:selected').val());
+            reportsInputData.releaseName = $.trim($('.release-list option:selected').val());
             reportsInputData.cycleId = $.trim(cycleId);
             reportsInputData.type = 'allmodules';
-            var counter = 0;
             blockUI("Loading modules.. please wait..");
             $("#accordion").hide();
             $('#nodeBox').empty();
@@ -193,7 +183,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         //Modules Display
                         $rootScope.reportData = result_res_reportData.rows;
                         angular.forEach(result_res_reportData.rows, function(value, index) {
-                            $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value.testsuiteid + '  title=' + value.testsuitename + ' style="width: 139px;"><img class="ct-nodeIcon" id=' + value.testsuiteid + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.testsuitename + '</span></div>')
+                            $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value._id + '  title=' + value.name + ' style="width: 139px;"><img class="ct-nodeIcon" id=' + value._id + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.name + '</span></div>')
                             $('.reports-search').removeAttr('disabled', 'disabled');
                         });
                         $('#searchModule').removeAttr('disabled', 'disabled');
@@ -240,10 +230,11 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         }
                     } else {
                         angular.forEach(result_webocular_reportData.rows, function(value, index) {
-                            $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value._id.$oid + '  title=' + value.modulename + ' style="width: 139px;"><img class="ct-nodeIcon1" id=' + value._id.$oid + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.modulename + '</span></div>')
-                            $('.reports-search').removeAttr('disabled', 'disabled');
+                            $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope" data-moduleid=' + value._id + '  title=' + value.modulename + ' style="width: 139px;"><img class="ct-nodeIcon1" id=' + value._id + ' src="imgs/node-modules.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value.modulename + '</span></div>')
+                            //$('.reports-search').removeAttr('disabled', 'disabled');
                         });
                         $('.ct-nodeIcon1').parent().hide();
+                        $('.webCrawler-toggle-btn').attr('style','background:#331d4e;color:#f5f5f5;border-color: #ffffff;')
                     } 
                 }
             }, function(error) {
@@ -251,7 +242,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 console.log("Error in service getWebocularModule_ICE while fetching modules-"+error);
             });
         };
-    };
 
 
     //Responsive Header Menu
@@ -267,7 +257,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
   
     //Toggle(Show/Hide) Module Div
     $('#expAssign').on('click', function(e) {
-        if($(".ct-nodeIcon").length == 0)
+        if($(".ct-nodeIcon").length == 0 && $(".ct-nodeIcon1").length == 0)
         {
             if($('#expAssign').attr('src') == "imgs/ic-collapseup.png")
             {
@@ -615,22 +605,26 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             }
 
                             accessDiv.appendChild(tr1);
-                            
-                            for(i=0;i<result_webocular_reportData.rows[0].data[0]["accessibility"]["violations"].length;i++)
-                            {
-                                var tr1=document.createElement('tr');
-                                var td1=document.createElement('td');
-                                td1.appendChild(document.createTextNode(i+1));
-                                tr1.append(td1);
-                                for(j=0;j<datas.length;j++)
+                            try{
+                                for(i=0;i<result_webocular_reportData.rows[0].data[0]["accessibility"]["violations"].length;i++)
                                 {
+                                    var tr1=document.createElement('tr');
                                     var td1=document.createElement('td');
-                                    td1.appendChild(document.createTextNode(result_webocular_reportData.rows[0].data[0]["accessibility"]["violations"][i][datas[j]]));
-                                    tr1.appendChild(td1);
+                                    td1.appendChild(document.createTextNode(i+1));
+                                    tr1.append(td1);
+                                    for(j=0;j<datas.length;j++)
+                                    {
+                                        var td1=document.createElement('td');
+                                        td1.appendChild(document.createTextNode(result_webocular_reportData.rows[0].data[0]["accessibility"]["violations"][i][datas[j]]));
+                                        tr1.appendChild(td1);
+                                    }
+                                    accessDiv.appendChild(tr1);
                                 }
-                                accessDiv.appendChild(tr1);
+                                body.appendChild(accessDiv);
+                            } catch(exception){
+                                unblockUI();
+                                console.log("Cannot read property 'accessibility' of undefined ");
                             }
-                            body.appendChild(accessDiv);
                         }
                         // View of Access Voilations.
 
@@ -657,14 +651,19 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 $('.webCrawler-toggle-btn').attr('style','background:#331d4e;color:#f5f5f5;border-color: #ffffff;')
             }
         var nodesLen = $('.ct-nodeIcon:visible').length;
-            var webocularNodesLen = $('.ct-nodeIcon1:visible').length;
-            if(nodesLen > 0 || webocularNodesLen > 0)
+        var webocularNodesLen = $('.ct-nodeIcon1:visible').length;
+        var webocularLen = $('.ct-nodeIcon1:hidden').length;
+        if(nodesLen > 0 || webocularNodesLen > 0)
         {
+            $('#searchModule').removeAttr('disabled', 'disabled');
+        }
+        else if(webocularLen > 0){
+            $('#expAssign').trigger('click');
             $('#searchModule').removeAttr('disabled', 'disabled');
         }
         else{
             $('#searchModule').attr('disabled', 'disabled');
-            }
+        }
     }
     //Set status color for report status
     function setStatusColor() {
@@ -732,20 +731,24 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             else if (data[i].browser.toLowerCase() == "safari") browserIcon = "ic-reports-safari.png";
                             if (browserIcon) brow = "imgs/" + browserIcon;
                             else brow = "imgs/no_img1.png"
-                            if (data[i].status == "Pass") {
+                            if (data[i].status.toLowerCase() == "pass") {
                                 pass++;
+                                status="Pass"
                                 styleColor = "style='color: #28a745 !important; text-decoration-line: none;'";
-                            } else if (data[i].status == "Fail") {
+                            } else if (data[i].status.toLowerCase() == "fail") {
                                 fail++;
+                                status="Fail"
                                 styleColor = "style='color: #dc3545 !important; text-decoration-line: none;'";
-                            } else if (data[i].status == "Terminate") {
+                            } else if (data[i].status.toLowerCase() == "terminate") {
                                 terminated++;
+                                status="Terminate"
                                 styleColor = "style='color: #ffc107 !important; text-decoration-line: none;'";
-                            } else if (data[i].status == "Incomplete") {
+                            } else if (data[i].status.toLowerCase() == "incomplete") {
                                 incomplete++;
+                                status="Incomplete"
                                 styleColor = "style='color: #343a40 !important; text-decoration-line: none;'";
                             }
-                            scenarioContainer.append("<tr class='scenarioTblReport'><td title='" + data[i].testscenarioname + "'>" + data[i].testscenarioname + "</td><td><span>" + data[i].executedtime.trim() + "</span></td></td><td class='openReports' data-reportid='" + data[i].reportid + "'><a class='openreportstatus' " + styleColor + ">" + data[i].status + "</a></td><td class='viewReports'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'></td></tr>");
+                            scenarioContainer.append("<tr class='scenarioTblReport'><td title='" + data[i].testscenarioname + "'>" + data[i].testscenarioname + "</td><td><span>" + data[i].executedtime.trim() + "</span></td></td><td class='openReports' data-reportid='" + data[i].reportid + "'><a class='openreportstatus' " + styleColor + ">" + status + "</a></td><td class='viewReports'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'></td></tr>");
                         }
                         if ($('.scenarioTblReport').length > 0) {
                             $("tr.scenarioTblReport:even").removeClass('even').addClass('even');
@@ -1021,15 +1024,15 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         blockUI("Generating Report.. please wait..");
                         if (data.length > 0) {
                             finalReports.overallstatus[0].domainName = data[0].domainname
-                            finalReports.overallstatus[0].projectName = data[0].projectname
-                            finalReports.overallstatus[0].releaseName = data[0].releasename
-                            finalReports.overallstatus[0].cycleName = data[0].cyclename
+                            finalReports.overallstatus[0].projectName = document.getElementById('selectProjects').selectedOptions[0].text
+                            finalReports.overallstatus[0].releaseName = document.getElementById('selectReleases').selectedOptions[0].text
+                            finalReports.overallstatus[0].cycleName = document.getElementById('selectCycles').selectedOptions[0].text
                             finalReports.overallstatus[0].scenarioName = data[0].testscenarioname
                             finalReports.overallstatus[0].reportId = reportID;
                             finalReports.overallstatus[0].executionId = data[0].executionId;;
-                            finalReports.overallstatus[0].moduleName = $(".highlight-moduleName").text(); 
-
-                            var obj2 = JSON.parse(data[1].reportdata);
+                            finalReports.overallstatus[0].moduleName = $(".highlight-moduleName").text();
+                            
+                            var obj2 = data[1].reportdata;
                             var elapTym;
                             for (j = 0; j < obj2.overallstatus.length; j++) {
                                 finalReports.overallstatus[0].browserVersion = (obj2.overallstatus[j].browserVersion) == "" ? "-" : obj2.overallstatus[j].browserVersion;
@@ -1061,9 +1064,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                         finalReports.rows[k].EllapsedTime = ("0" + elapTym[0]).slice(-2) + ":" + ("0" + elapTym[1]).slice(-2) + ":" + ("0" + elapTym[2]).slice(-2) + ":" + finalReports.rows[k].EllapsedTime.split(".")[1].slice(0, 3);
                                     }
                                 }
-                                if (finalReports.rows[k].hasOwnProperty("status") && finalReports.rows[k].status != "") {
-                                    total++;
-                                }
+                                // if (finalReports.rows[k].hasOwnProperty("status") && finalReports.rows[k].status != "") {
+                                //     total++;
+                                // }
                                 if (finalReports.rows[k].status == "Pass") {
                                     pass++;
                                 } else if (finalReports.rows[k].status == "Fail") {
@@ -1104,6 +1107,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                     }
                                 }
                             }
+                            total = pass+fail+terminated;
                             finalReports.overallstatus[0].pass = (parseFloat((pass / total) * 100).toFixed(2)) > 0 ? parseFloat((pass / total) * 100).toFixed(2) : parseInt(0);
                             finalReports.overallstatus[0].fail = (parseFloat((fail / total) * 100).toFixed(2)) > 0 ? parseFloat((fail / total) * 100).toFixed(2) : parseInt(0);
                             finalReports.overallstatus[0].terminate = (parseFloat((terminated / total) * 100).toFixed(2)) > 0 ? parseFloat((terminated / total) * 100).toFixed(2) : parseInt(0);

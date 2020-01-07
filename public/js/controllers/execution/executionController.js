@@ -59,7 +59,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	} else
 		$("#page-taskName span").text("Batch Execution");
 	var status = current_task.status;
-	if (status == 'review') {
+	if (status == 'underReview') {
 		$('.submitTaskBtn').text('Approve');
 		$('.reassignTaskBtn').show();
 	}
@@ -437,7 +437,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			$(".viewReadOnlyTC").click(function () {
 				var testCaseName = this.getAttribute('data-name'),
 				testCaseId = this.getAttribute('data-id');
-				DesignServices.readTestCase_ICE(undefined, testCaseId, testCaseName, 0)
+				DesignServices.readTestCase_ICE(testCaseId, testCaseName, 0)
 				.then(function (response) {
 					if (response == "Invalid Session") {
 						return $rootScope.redirectPage();
@@ -445,16 +445,16 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					var source = $("#handlebar-template-testcase").html();
 					var template = Handlebars.compile(source);
 					try {
-						JSON.parse(response.testcasesteps);
+						JSON.stringify(response.testcase);
 					} catch (err) {
-						response.testcasesteps = '[]';
+						response.testcase = '[]';
 					}
 					var dat = template({
 							name: [{
 									testcasename: response.testcasename
 								}
 							],
-							rows: JSON.parse(response.testcasesteps)
+							rows: response.testcase
 						});
 					var newWindow = window.open();
 					newWindow.document.write(dat);
@@ -502,7 +502,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			$.each($(this).parents('.suiteNameTxt').next('div').find('.exe-scenarioIds'), function () {
 				var scenarioDescObj = [];
 				testScenarioIds.push($(this).attr("sId"));
-				getParamPaths.push("\'" + $(this).parent().find(".getParamPath").val().trim() + "\'");
+				getParamPaths.push($(this).parent().find(".getParamPath").val().trim());
 				conditionCheck.push($(this).parent().find(".conditionCheck option:selected").val());
 				if (($(this).parent().find('.getScenarioDescVal').text() !== '')) {
 					scenarioDescObj = JSON.parse($.trim($(this).parent().find('.getScenarioDescVal').text()));
@@ -656,6 +656,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 							dataparam: [$(this).parent().siblings(".exe-dataParam").find("input").val().trim()],
 							executestatus: 1,
 							scenarioids: $(this).parent().siblings(".exe-scenarioIds").attr("sId"),
+							scenarionames: $(this).parent().siblings(".exe-scenarioIds")[0].innerText,
 							scenariodescription: $scope.somevar[$(this).parent().siblings(".exe-scenarioIds").attr("sId")],
 							qccredentials: {
 								qcurl: "",
@@ -664,6 +665,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 							}
 						});
 					});
+					projectdata=JSON.parse(window.localStorage["_FD"]);
 					//console.log("selectedRowData:::" + selectedRowData)
 					suiteInfo.suiteDetails = selectedRowData;
 					suiteInfo.testsuitename = $(this).parents('span.taskname').text();
@@ -673,6 +675,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					suiteInfo.releaseid = relidreport;
 					suiteInfo.cycleid = cycidreport;
 					suiteInfo.projectid = projectidreport;
+					suiteInfo.cyclename = projectdata.idnamemapcyc[cycidreport];
+					suiteInfo.projectname = projectdata.idnamemapprj[projectidreport];
+					suiteInfo.domainname = projectdata.idnamemapdom[projectidreport];
 					//console.log("suiteInfo:::" + suiteInfo)
 					$scope.moduleInfo.push(suiteInfo);
 				}
@@ -837,7 +842,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			else if (taskstatus == 'reassign') {
 				openDialogExe("Task Reassignment Success", "Task Reassigned successfully!", true);
 				//labelArr.push(txnHistory.codesDict['TaskReassign']);
-			} else if (taskstatus == 'review') {
+			} else if (taskstatus == 'underReview') {
 				openDialogExe("Task Completion Success", "Task Approved successfully!", true);
 				//labelArr.push(txnHistory.codesDict['TaskApprove']);
 			} else {

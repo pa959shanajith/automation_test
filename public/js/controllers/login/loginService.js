@@ -2,7 +2,7 @@ mySPA.factory('LoginService', ['$http', '$q', function ($http, $q) {
 	return {
 		//Checking User Validation
 		authenticateUser_Nineteen68: function (username, password) {
-			return $http.post('/authenticateUser_Nineteen68', {
+			return $http.post('/login', {
 				username: username,
 				password: password
 			})

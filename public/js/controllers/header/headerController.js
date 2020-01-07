@@ -345,40 +345,47 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 
 	if (window.localStorage['_CT']) {
 		projectId.push(JSON.parse(window.localStorage['_CT']).projectId);
-		headerServices.getNames_ICE(projectId,['projects']) 
-		.then(function(data){
-			if(data == "Invalid Session"){
-				return $rootScope.redirectPage();
-			}
-			$scope.projectDetails = data;
+
+		// headerServices.getNames_ICE(projectId,['projects']) 
+		// .then(function(data){
+		// 	if(data == "Invalid Session"){
+		// 		return $rootScope.redirectPage();
+		// 	}
+		 var data = JSON.parse(window.localStorage['_CT'])
+			$scope.projectDetails = {"idtypes":["projects"],"requestedids":[data.projectId],"respnames":[data.taskName]};
 			task = JSON.parse(window.localStorage['_CT']);
 
 			releaseId.push(task.releaseid);
 			screenId.push(task.screenId);
-			headerServices.getNames_ICE(releaseId, ['releases']) 
-			.then(function(data){
-				if(data == "Invalid Session"){
-					return $rootScope.redirectPage();
-				}
-				$scope.releaseDetails = data.respnames[0];
-				cycleId.push(task.cycleid);
-				headerServices.getNames_ICE(cycleId, ['cycles'])
-				.then(function(data){
-					if(data == "Invalid Session"){
-				  		return $rootScope.redirectPage();
-					}
-					$scope.cycleDetails = data.respnames[0];
+//			$scope.releaseDetails = data.respnames[0];
+			$scope.releaseDetails = task.releaseid;
+			$scope.cycleDetails = data.cycleid;
+			$scope.screenName = data.taskName;
 
-				}, function(error) { console.log("Failed to get cycle name");});
-			}, function(error) { console.log("Failed to get release name");});
-			headerServices.getNames_ICE(screenId,['screens'])
-			.then(function(data){
-				if(data == "Invalid Session"){
-					return $rootScope.redirectPage();
-				}
-				$scope.screenName = data.respnames[0];
-			}, function(error) { console.log("Failed to fetch info");});
-		}, function(error) { console.log("Failed to fetch projectInfo");});
+			// headerServices.getNames_ICE(releaseId, ['releases']) 
+			// .then(function(data){
+			// 	if(data == "Invalid Session"){
+			// 		return $rootScope.redirectPage();
+			// 	}
+			// 	$scope.releaseDetails = data.respnames[0];
+			// 	cycleId.push(task.cycleid);
+			// 	headerServices.getNames_ICE(cycleId, ['cycles'])
+			// 	.then(function(data){
+			// 		if(data == "Invalid Session"){
+			// 	  		return $rootScope.redirectPage();
+			// 		}
+			// 		$scope.cycleDetails = data.respnames[0];
+
+			// 	}, function(error) { console.log("Failed to get cycle name");});
+			// }, function(error) { console.log("Failed to get release name");});
+	// 		headerServices.getNames_ICE(screenId,['screens'])
+	// 		.then(function(data){
+	// 			if(data == "Invalid Session"){
+	// 				return $rootScope.redirectPage();
+	// 			}
+	// 			$scope.screenName = data.respnames[0];
+	// 		}, function(error) { console.log("Failed to fetch info");});
+	// 	}, function(error) { console.log("Failed to fetch projectInfo");});
 	}
 
 	$scope.logout = function($event){

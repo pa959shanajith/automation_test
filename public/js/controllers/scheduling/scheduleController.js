@@ -143,13 +143,13 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 			if(result == "fail"){}
 			else if(result && result.length > 0){
 				for(var k=0; k<result.length; k++){
-					result[k].browserlist = JSON.parse(result[k].browserlist);
-					result[k].scenariodetails = JSON.parse(result[k].scenariodetails);
-					result[k].scheduledatetime = new Date(result[k].scheduledatetime).getFullYear()+"-"
-					+("0" + (new Date(result[k].scheduledatetime).getMonth()+1)).slice(-2)+"-"
-					+("0" + new Date(result[k].scheduledatetime).getUTCDate()).slice(-2)+" "
-					+("0" + new Date(result[k].scheduledatetime).getUTCHours()).slice(-2)+":"
-					+("0" + new Date(result[k].scheduledatetime).getUTCMinutes()).slice(-2)
+					result[k].browserlist = result[k].executeon;
+					result[k].scenariodetails = result[k].scenariodetails;
+					result[k].scheduledatetime = new Date(result[k].scheduledon).getFullYear()+"-"
+					+("0" + (new Date(result[k].scheduledon).getMonth()+1)).slice(-2)+"-"
+					+("0" + new Date(result[k].scheduledon).getUTCDate()).slice(-2)+" "
+					+("0" + new Date(result[k].scheduledon).getUTCHours()).slice(-2)+":"
+					+("0" + new Date(result[k].scheduledon).getUTCMinutes()).slice(-2)
 				}
 				$scope.scheduledData = result;
 				// $("#scheduledDataBody").empty();
@@ -576,7 +576,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 				$event.target.parentElement.textContent = status;
 				var tabEle = $(".scheduleDataBodyRowChild");
 				for(var i=0; i<tabEle.length; i++){
-					if(tabEle[i].children[5].dataset.scheduleid == suiteDetailsObj.scheduleid){
+					if(tabEle[i].children[5].dataset.scheduleid == suiteDetailsObj._id){
 						tabEle[i].children[5].innerText = status;
 					}
 				}

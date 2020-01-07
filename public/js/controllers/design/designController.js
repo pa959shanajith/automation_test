@@ -98,7 +98,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	subTaskType = current_task.subTaskType;
 	subTask = current_task.subtask;
 	status = current_task.status;
-	if (status == 'review') {
+	if (status == 'underReview') {
 		$('.submitTaskBtn').text('Approve');
 		$('.reassignTaskBtn').show();
 	}
@@ -133,19 +133,21 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 
 	$timeout(function () {
-		projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
-		releaseName = angular.element(document.getElementById("left-nav-section")).scope().releaseDetails;
-		cycleName = angular.element(document.getElementById("left-nav-section")).scope().cycleDetails;
-		var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
-		appType = JSON.parse(window.localStorage['_CT']).appType;
-		screenName = angular.element(document.getElementById("left-nav-section")).scope().screenName;
-		testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
-		subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
-		subTask = JSON.parse(window.localStorage['_CT']).subTask;
-		if (subTaskType == "Scrape" || subTask == "Scrape") {
-			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">' + projectDetails.respnames[0] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">' + screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + releaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + cycleName + '</span></p>')
+		// projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
+		// releaseName = angular.element(document.getElementById("left-nav-section")).scope().releaseDetails;
+		// cycleName = angular.element(document.getElementById("left-nav-section")).scope().cycleDetails;
+		// var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
+		// appType = JSON.parse(window.localStorage['_CT']).appType;
+		// screenName = angular.element(document.getElementById("left-nav-section")).scope().screenName;
+		// testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
+		// subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
+		// subTask = JSON.parse(window.localStorage['_CT']).subTask;
+		var taskInfo = JSON.parse(window.localStorage['_CT']);
+		var filterData = JSON.parse(window.localStorage['_FD']);
+		if (taskInfo.subTaskType == "Scrape" || taskInfo.subTask == "Scrape") {
+			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">' + filterData.idnamemapprj[taskInfo.projectId] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">' + taskInfo.screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + filterData.idnamemaprel[taskInfo.releaseid] + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + filterData.idnamemapcyc[taskInfo.cycleid] + '</span></p>')
 		} else {
-			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">' + projectDetails.respnames[0] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">' + screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">TestCase: </span><span class="content">' + testCaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + releaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + cycleName + '</span></p>')
+			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">' + filterData.idnamemapprj[taskInfo.projectId] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">' + taskInfo.screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">TestCase: </span><span class="content">' + taskInfo.testCaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + filterData.idnamemaprel[taskInfo.releaseid] + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + filterData.idnamemapcyc[taskInfo.cycleid] + '</span></p>')
 		}
 
 	}, 3000)
@@ -275,10 +277,33 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		enabledEdit = "false";
 		blockUI("Loading...");
 		// service call # 1 - getTestScriptData service call
-		DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
+		DesignServices.readTestCase_ICE(testCaseId, testCaseName, versionnumber, screenName)
 			.then(function (data) {
 				if (data == "Invalid Session") {
 					return $rootScope.redirectPage();
+				}
+				if(data.screenName){
+					taskObj = JSON.parse(window.localStorage['_CT']);
+					screenName = data.screenName;
+					taskObj.screenName = data.screenName;
+					window.localStorage['_CT'] = JSON.stringify(taskObj);
+				}
+				if(data.reuse){
+					var task = JSON.parse(window.localStorage['_CT']);
+					task.reuse = "True";
+					window.localStorage['_CT'] = JSON.stringify(task);
+				}
+				if(data.del_flag){
+					//pop up for presence of deleted objects
+					openDialog("Deleted objects found", "Deleted objects found in some teststeps, Please delete or modify those steps.");
+					//disable left-top-section
+					$("#left-top-section").addClass('disableActions');
+					$("a[title='Export TestCase']").addClass('disableActions');
+				}
+				else{
+					//enable left-top-section
+					$("#left-top-section").removeClass('disableActions');
+					$("a[title='Export TestCase']").removeClass('disableActions');
 				}
 				//console.log(data);
 				var appType = taskInfo.appType;
@@ -291,13 +316,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				}*/
 				$('#jqGrid').show();
 				// service call # 2 - objectType service call
-				DesignServices.getScrapeDataScreenLevel_ICE(screenId)
+				DesignServices.getScrapeDataScreenLevel_ICE()
 					.then(function (data2) {
 						if (data2 == "Invalid Session") {
 							return $rootScope.redirectPage();
 						}
-						if (appType == "Webservice") {
-							if (data2 != "") dataFormat12 = data2.header[0].split("##").join("\n");
+						if (appType == "Webservice"){
+							if (data2.view.length > 0) dataFormat12 = data2.view[0].header[0].split("##").join("\n");
 						}
 						custnameArr.length = 0;
 						// counter to append the items @ correct indexes of custnameArr
@@ -323,8 +348,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								keywordValArr.length = 0;
 								keywordListData = angular.toJson(data3);
 								var emptyStr = "{}";
-								var len = data.testcase.length;
-								if (data == "" || data == null || data == emptyStr || data == "[]" || data.testcase.toString() == "" || data.testcase == "[]" || len == 1) {
+								if (data == "" || data == null || data == emptyStr || data == "[]" || data.testcase.toString() == "" || data.testcase == "[]") {
 									var appTypeLocal1 = "Generic";
 									var datalist = [{
 										"stepNo": "1",
@@ -349,7 +373,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									$('.cbox').parent().removeClass('disable_a_href');
 									return;
 								} else {
-									var testcase = JSON.parse(data.testcase);
+									var testcase = data.testcase;//JSON.parse(data.testcase);
 									var testcaseArray = [];
 									for (var i = 0; i < testcase.length; i++) {
 										if ("comments" in testcase[i]) {
@@ -501,6 +525,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		var versionnumber = taskInfo.versionnumber;
 		var testCaseName = taskInfo.testCaseName;
 		var appType = taskInfo.appType;
+		var import_status = true;
 		var flag = false;
 		var defaultTestScript = '[{"stepNo":"1","custname":"","objectName":"","keywordVal":"","inputVal":"","outputVal":"","url":"","_id_":"","appType":"Generic"}]';
 		if (readTestCaseData == defaultTestScript) {
@@ -530,7 +555,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							if (flag == false) {
 								openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
 							} else {
-								DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
+								DesignServices.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
 									.then(function (data) {
 										if (data == "Invalid Session") {
 											return $rootScope.redirectPage();
@@ -577,6 +602,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		var testCaseName = taskInfo.testCaseName;
 		var versionnumber = taskInfo.versionnumber;
 		var appType = taskInfo.appType;
+		var import_status = true;
 		var flag = false;
 		$("#overWriteJson").trigger("click");
 		overWriteJson.addEventListener('change', function (e) {
@@ -602,7 +628,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						if (flag == false) {
 							openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
 						} else {
-							DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
+							DesignServices.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
 								.then(function (data) {
 									// console.log("hello");
 									if (data == "Invalid Session") {
@@ -641,6 +667,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		var testCaseName = taskInfo.testCaseName;
 		var versionnumber = taskInfo.versionnumber;
 		var appType = taskInfo.appType;
+		var import_status = true;
 		var flag = false;
 		overWriteJson.addEventListener('change', function (e) {
 			if (counter == 0) {
@@ -666,7 +693,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						if (flag == false) {
 							openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
 						} else {
-							DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
+							DesignServices.updateTestCase_ICE( testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
 								.then(function (data) {
 									if (data == "Invalid Session") {
 										return $rootScope.redirectPage();
@@ -703,14 +730,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		var testCaseId = taskInfo.testCaseId;
 		var testCaseName = taskInfo.testCaseName;
 		var versionnumber = taskInfo.versionnumber;
-		DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
+		DesignServices.readTestCase_ICE(testCaseId, testCaseName, versionnumber)
 			.then(function (response) {
 				if (response == "Invalid Session") {
 					return $rootScope.redirectPage();
 				}
 				var temp, responseData;
 				if (typeof response === 'object') {
-					temp = JSON.parse(response.testcase);
+					temp = response.testcase;//JSON.parse(response.testcase);
 					responseData = JSON.stringify(temp, undefined, 2);
 				}
 				filename = testCaseName + ".json";
@@ -809,7 +836,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				$("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');													 
 			}
 			else{
-				$("li.compareObjects").removeClass('disableActions').addClass('enableActions compareObjectDisable');																	 
+				$("li.compareObjects").removeClass('disableActions compareObjectDisable').addClass('enableActions');																	 
 			}
 		}
 	})
@@ -861,6 +888,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 					viewString = data;
 
+					if(viewString.reuse){
+						var task = JSON.parse(window.localStorage['_CT']);
+						task.reuse = "True";
+						window.localStorage['_CT'] = JSON.stringify(task);
+					}
 					newScrapedList = viewString
 					$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
 					if(viewString.scrapetype=='caa')
@@ -897,6 +929,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							// else{
 							var path = viewString.view[i].xpath;
 							var ob = viewString.view[i];
+							var objId = viewString.view[i]._id
 							addcusOb = '';
 							ob.tempId = i;
 							custN = ob.custname.replace(/[<>]/g, '').trim();
@@ -919,9 +952,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
 							}
 							if(ob.hasOwnProperty('editable')){
-								var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><span id='decrypt' href='#' class='userObject'><img src='imgs/ic-jq-editstep.png' style='display:none'></span></li>";
+								var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><span id='decrypt' href='#' class='userObject'><img src='imgs/ic-jq-editstep.png' style='display:none'></span></li>";
 							}else{
-								var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+								var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 							}
 							// }									   
 							// }
@@ -986,7 +1019,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		if (viewString == "") {
 			$(this).children("img").addClass("thumb-ic-disabled").removeClass("thumb-ic");
 			$(this).parent().css("cursor", "no-drop");
-		} else if (Object.keys(viewString).length == 0) {
+		} else if (viewString.view.length == 0) {
 			$(this).children("img").addClass("thumb-ic-disabled").removeClass("thumb-ic");
 			$(this).parent().css("cursor", "no-drop");
 		} else {
@@ -1068,48 +1101,57 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			$(".disableActionsWS").addClass("enableActionsWS").removeClass("disableActionsWS")
 			$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody").prop("disabled", false)
 		}*/
-		DesignServices.getScrapeDataScreenLevel_ICE()
+		var type = "WS_screen"
+		DesignServices.getScrapeDataScreenLevel_ICE(type)
 			.then(function (data) {
 				if (data == "Invalid Session") {
 					return $rootScope.redirectPage();
 				}
 				if (typeof data === "object") {
-					//Printing the Save data in UI
-					$("#endPointURL").val(data.endPointURL);
-					$("#wsdlMethods option").each(function () {
-						if ($(this).val() == data.method) {
-							$(this).prop("selected", true)
+					try{
+						//data = data[0]
+						//Printing the Save data in UI
+						$("#endPointURL").val(data.endPointURL);
+						$("#wsdlMethods option").each(function () {
+							if ($(this).val() == data.method) {
+								$(this).prop("selected", true)
+							}
+						})
+						$("#wsdlOperation").val(data.operations)
+						//Printing Request Data
+						$("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
+						if (data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0) {
+							var jsonStr = data.body;
+							var jsonObj = JSON.parse(jsonStr);
+							var jsonPretty = JSON.stringify(jsonObj, null, '\t');
+							$("#wsdlRequestBody").val(jsonPretty)
+						} else {
+							var getXML = formatXml(data.body[0].replace(/>\s+</g, '><'));
+							if(getXML=='\r\n'){
+								getXML = '';
+							}
+							$("#wsdlRequestBody").val(getXML)
 						}
-					})
-					$("#wsdlOperation").val(data.operations)
-					//Printing Request Data
-					$("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
-					if (data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0) {
-						var jsonStr = data.body;
-						var jsonObj = JSON.parse(jsonStr);
-						var jsonPretty = JSON.stringify(jsonObj, null, '\t');
-						xml_neat2 = jsonPretty;
-						$("#wsdlRequestBody").val(jsonPretty)
-					} else {
-						var getXML = formatXml(data.body[0].replace(/>\s+</g, '><'));
-						$("#wsdlRequestBody").val(getXML)
-					}
-
-					//Printing Response Data
-					$("#wsdlResponseHeader").val(data.responseHeader[0].split("##").join("\n"));
-					if (data.responseBody[0].indexOf("{") == 0 || data.responseBody[0].indexOf("[") == 0) {
-						var jsonStr = data.responseBody;
-						var jsonObj = JSON.parse(jsonStr);
-						var jsonPretty = JSON.stringify(jsonObj, null, '\t');
-						xml_neat2 = jsonPretty;
-						$("#wsdlResponseBody").val(jsonPretty)
-					} else {
-						var getXML = formatXml(data.responseBody[0].replace(/>\s+</g, '><'));
-						$("#wsdlResponseBody").val(getXML)
+						//Printing Response Data
+						$("#wsdlResponseHeader").val(data.responseHeader[0].split("##").join("\n"));
+						if (data.responseBody[0].indexOf("{") == 0 || data.responseBody[0].indexOf("[") == 0) {
+							var jsonStr = data.responseBody;
+							var jsonObj = JSON.parse(jsonStr);
+							var jsonPretty = JSON.stringify(jsonObj, null, '\t');
+							$("#wsdlResponseBody").val(jsonPretty)
+						} else {
+							var getXML = formatXml(data.responseBody[0].replace(/>\s+</g, '><'));
+							if(getXML=='\r\n'){
+								getXML = '';
+							}
+							$("#wsdlResponseBody").val(getXML);
+						}
+					} catch(err) {
+						console.log(err)
 					}
 
 					//Printing the Save data in UI
-					if ($("#wsdlRequestHeader, #wsdlRequestBody").val().length > 0) {
+					if ($("#wsdlRequestHeader").val().length > 0 && $("#wsdlRequestBody").val().length > 0) {
 						$(".saveWS").prop("disabled", true);
 						$("#enbledWS").prop("disabled", false)
 						$(".enableActionsWS").addClass("disableActionsWS").removeClass("enableActionsWS")
@@ -1332,7 +1374,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							var jsonStr = data.responseBody;
 							var jsonObj = JSON.parse(jsonStr);
 							var jsonPretty = JSON.stringify(jsonObj, null, '\t');
-							xml_neat2 = jsonPretty;
 							$("#wsdlResponseBody").val(jsonPretty.replace(/\&gt;/g, '>').replace(/\&lt;/g, '<'))
 						} else {
 							var getXML = formatXml(data.responseBody[0].replace(/>\s+</g, '><'));
@@ -1437,7 +1478,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							var jsonStr = data.body;
 							var jsonObj = JSON.parse(jsonStr);
 							var jsonPretty = JSON.stringify(jsonObj, null, '\t');
-							xml_neat2 = jsonPretty;
 							$("#wsdlRequestBody").val(jsonPretty)
 						} else {
 							var getXML = formatXml(data.body[0].replace(/>\s+</g, '><'));
@@ -2315,6 +2355,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	
 	$scope.submitIrisObjectType = function (e) {
 		var obj_cord = '';
+		var obj_id = '';
 		var task = JSON.parse(window.localStorage['_CT']);
 		var identified_obj_type = objType.toLowerCase();
 		var user_obj_type = $('#objectType').val();
@@ -2322,10 +2363,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			for(var i=0;i<viewString.view.length;i++){
 				if(viewString.view[i].xpath == obj_xpath){
 					obj_cord = viewString.view[i].cord;
+					if("_id" in viewString.view[i]){obj_id = viewString.view[i]._id;}
 					break;
 				}
 			}
-			var data = {"cord":obj_cord,"type":user_obj_type,"projectid":task.projectId,"screenid":task.screenId,
+			var data = {"_id":obj_id,"cord":obj_cord,"type":user_obj_type,"projectid":task.projectId,"screenid":task.screenId,
 			"screenname":task.screenName,"versionnumber":task.versionnumber,"xpath":obj_xpath};
 			DesignServices.updateIrisDataset(data)
 				.then(function (val) {
@@ -2363,6 +2405,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		scrapeObject.param = 'updateComparedObjects';
 		$("#changedOrdList").find("input[type='checkbox'].checkCompareAll:checked").each(function () {
 			var id = parseInt($(this).parent().attr('id').split('_')[1]);
+			updatedViewString.view[0].changedobject[id]._id = viewString.view[updatedViewString.changedobjectskeys[id]]._id
 			updatedSelection.push(updatedViewString.view[0].changedobject[id]);
 		});
 		updatedViewString.view[0].changedobject = updatedSelection;
@@ -2464,6 +2507,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		// var currentElements = $(".ellipsis:visible").length
 		var filterActiveLen = $(".popupContent-filter-active").length;
 		//Delete All Elements
+		getIndexOfDeletedObjects = []
 		if (totalElements == selectedElements) {
 			$("#scraplist").empty();
 			var currentElements = $(".ellipsis:visible").length;
@@ -2487,50 +2531,157 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				$(".popupContent-filter-active").trigger('click');
 				$("#saveObjects").prop("disabled", false);
 			}
+			getIndexOfDeletedObjects = ["deleteAll"]
 		}
 		else {
-			//Delete Selected Elements
-			$.each($("input[type=checkbox].checkall:checked"), function () {
-				$(this).parents("li.select_all").remove();
-				var json = {
-					"xpath": $(this).closest("li").attr('data-xpath'),
-					"url": $(this).closest("li").attr('data-xpath'),
-					"top": $(this).closest("li").attr('data-top'),
-					"hiddentag": $(this).closest("li").attr('data-hiddentag'),
-					"height": $(this).closest("li").attr('data-height'),
-					"custname": $(this).parent().next("span.ellipsis").text(),
-					"width": $(this).closest("li").attr('data-width'),
-					"tag": $(this).closest("li").attr('data-tag'),
-					"left": $(this).closest("li").attr('data-left'),
-					"tempId": parseInt($(this).closest("li").attr('val'))
-				};
-
-				getIndexOfDeletedObjects.push(json);
-			})
-			var currentElements = $(".ellipsis:visible").length;
-			if (currentElements > 0) {
-				$("#saveObjects").prop("disabled", false);
-				$(".checkStylebox").prop("checked", false);
-				$("#deleteObjects").prop("disabled", true);
-			}
-			else {
-				$("#deleteObjects,.checkStylebox").prop("disabled", true);
-				$(".checkStylebox").prop("checked", false);
-				$(".popupContent-filter-active").trigger('click');
-				$("#saveObjects").prop("disabled", false);
-			}
+					$.each($("input[type=checkbox].checkall:checked"), function (index) {
+						$(this).parents("li.select_all").remove();
+						var deleteObjId = $(this)[0].parentElement.id.split('_')[1];
+						var deleteObject = viewString.view[deleteObjId]; 
+						getIndexOfDeletedObjects.push(deleteObject);	})
+					
 		}
+		var isduplicate = duplicateCheck();
+		if (isduplicate == false) {
+			unblockUI();
+			return;
+		}
+		var tasks = JSON.parse(window.localStorage['_CT']);
+		var screenId = tasks.screenId;
+		var screenName = tasks.screenName;
+		var projectId = tasks.projectId;
+		var userinfo = JSON.parse(window.localStorage['_UI']);
+		scrapeObject = {};
+		scrapeObject.getScrapeData =JSON.stringify(getIndexOfDeletedObjects);
+		scrapeObject.projectId = projectId;
+		scrapeObject.screenId = screenId;
+		scrapeObject.screenName = screenName;
+		scrapeObject.userinfo = userinfo;
+		scrapeObject.param = "delete_updateScrapeData_ICE";
+		scrapeObject.appType = tasks.appType;
+		scrapeObject.versionnumber = tasks.versionnumber;
+		scrapeObject.newData = viewString;
+		if(deleteObjectsFlag==true){
+			scrapeObject.type = "delete";
+			deleteObjectsFlag = false;
+		}
+		else
+			scrapeObject.type = "save";
+		//Update Service to Save Scrape Objects
+		DesignServices.updateScreen_ICE(scrapeObject)
+			.then(function (data) {
+				getIndexOfDeletedObjects = [];
+				angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
+				unblockUI()
+				//add popoup for error and saved 
+			}, function (error) {unblockUI() })
+		
+		var currentElements = $(".ellipsis:visible").length;
+		if (currentElements > 0) {
+			$("#saveObjects").prop("disabled", false);
+			$(".checkStylebox").prop("checked", false);
+			$("#deleteObjects").prop("disabled", true);
+		}
+		else {
+			$("#deleteObjects,.checkStylebox").prop("disabled", true);
+			$(".checkStylebox").prop("checked", false);
+			$(".popupContent-filter-active").trigger('click');
+			$("#saveObjects").prop("disabled", false);
+		}
+	}
 
-		//Transaction Activity for Delete Scraped Objects Button Action
-		//   var labelArr = [];
-		//   var infoArr = [];
-		//   labelArr.push(txnHistory.codesDict['DeleteScrapedObjects']);
-		//   txnHistory.log(e.type,labelArr,infoArr,$location.$$path);					
+	//Validtion for Duplicate Scraped Objects
+	function duplicateCheck()
+	{
+		var xpath;
+		var duplicateCustnames = [];
+		var duplicateXpath = [];
+		var duplicateXpathElements = {};
+		var duplicateCustnamesElements = {};
+		var isDuplicateCustNames = false;
+		var isDuplicateXpath = false;
+		//validateDuplicateObjects
+		if ($("#scraplist .ellipsis").length > 0) {
+			$.each($("#scraplist span.ellipsis"), function () {
+				$(this).removeClass('duplicateCustname duplicateXpath');
+				var count = 0;
+				if ($(this).parent().parent().attr("data-xpath") != "" && $(this).parent().parent().attr("data-xpath") != undefined) {
+					xpath = $(this).parent().parent().attr("data-xpath");
+					if (appType == 'MobileWeb') {
+						xpath = xpath.split(";")[2];
+					}
+					else {
+						xpath = xpath;
+					}
+					if (count == 0 && !duplicateCustnamesElements.hasOwnProperty($(this).text())) {
+						duplicateCustnamesElements[$(this).text()] = xpath;
+					} else if (duplicateCustnamesElements.hasOwnProperty($(this).text())) {
+						if (count == 0) {
+							duplicateCustnames.push($(this).text());
+							isDuplicateCustNames = true;
+							$(this).addClass('duplicateCustname').css('color', 'red');
+						}
+					}
+				} else {
+					xpath = "";
+					if (!duplicateCustnamesElements.hasOwnProperty($(this).text())) {
+						duplicateCustnamesElements[$(this).text()] = xpath;
+					} else {
+						duplicateCustnames.push($(this).text());
+						isDuplicateCustNames = true;
+						$(this).addClass('duplicateCustname').css('color', 'red');
+					}
+				}
+			});
+			if (!isDuplicateCustNames) {
+				var count = 0;
+				$.each($("#scraplist span.ellipsis"), function () {
+					xpath = $(this).parent().parent().attr("data-xpath");
+					if ($(this).parent().parent().attr("data-xpath") != "" && $(this).parent().parent().attr("data-xpath") != undefined) {
+						if (appType == 'MobileWeb') {
+							xpath = xpath.split(";")[2];
+						}
+						else {
+							xpath = xpath;
+						}
+						if (!duplicateXpathElements.hasOwnProperty(xpath)) {
+							duplicateXpathElements[xpath] = $(this).text();
+						} else {
+							$(this).addClass('duplicateXpath').css('color', 'red');
+							duplicateCustnames.push($(this).text());
+							isDuplicateXpath = true;
+							count = 1;
+						}
+					}
+				});
+			}
 
+			if (isDuplicateCustNames) {
+				openDialog("Save Scrape data", "");
+				$("#globalModal").find('.modal-body p').html("<span><strong>Please rename/delete duplicate scraped objects</strong></span><br /><br /><strong>Object characterstics are same for:</strong>").css("color", "#000").append("<ul class='custList'></ul>");
+				for (var j = 0; j < duplicateCustnames.length; j++) {
+					$("#globalModal").find('.modal-body p ul').append("<li>" + duplicateCustnames[j] + "</li>");
+				}
+				return false;
+			}
+			//for delete if there are multiple xpath goes to save
+			/*
+			else {
+				if (isDuplicateXpath) {
+					$("#saveConfirmObjects").modal('show');
+					$("#saveConfirmObjects").find('.modal-body p').html("<strong>Object characteristics are same for the below list of objects:").css("color", "#000").append("<ul class='custList'></ul><br /> Do you still want to continue?");
+					for (var j = 0; j < duplicateCustnames.length; j++) {
+						$("#saveConfirmObjects").find('.modal-body p ul').append("<li>" + duplicateCustnames[j] + "</li>");
+					}
+					return false;
+				}
+			}*/
+		}
 	}
 
 	//To delete Scrape Objects
 	$scope.del_Objects = function (e) {
+		blockUI('Deleting objects..please wait..')
 		$("#deleteObjectsModal").modal("hide");
 
 		if (deleteScrapeDataservice) {
@@ -2607,7 +2758,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			}
 			//Delete all objects ------------------------------------------
 			deleteScrapedObjects(e);
-			$("#saveObjects").trigger('click');
+			//$("#saveObjects").trigger('click');
 		} else {
 			var tempModifiednames;
 			if (window.localStorage['_modified']) {
@@ -2682,7 +2833,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						$("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');
 						$("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');
 
-						getIndexOfDeletedObjects = []
+						getIndexOfDeletedObjects = [];
 						viewString = {};
 						if (newScrapedList != undefined) {
 							newScrapedList.view = [];
@@ -2690,7 +2841,53 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						}
 					}
 					else {
+						var temp_scrapedlist = JSON.stringify(newScrapedList)
 						var dontChkViewString = 0;
+						$.each($("input[type=checkbox].checkall:checked"), function () {
+							var delId = $(this).parent().attr('id').split('_')[1];
+							$(this).parents("li.select_all").remove();
+							delete newScrapedList.view[delId];
+						});						
+						var isduplicate = duplicateCheck();
+						if (isduplicate == false) {
+							unblockUI();
+							//newScrapedList.view = JSON.parse(temp_scrapedlist).view
+							return;
+						}
+						newScrapedList.view = newScrapedList.view.filter(function (n) {
+							return n != null;
+						})
+						var tasks = JSON.parse(window.localStorage['_CT']);
+						var screenId = tasks.screenId;
+						var screenName = tasks.screenName;
+						var projectId = tasks.projectId;
+						var userinfo = JSON.parse(window.localStorage['_UI']);
+						scrapeObject = {};
+						scrapeObject.getScrapeData =JSON.stringify(newScrapedList);
+						scrapeObject.projectId = projectId;
+						scrapeObject.screenId = screenId;
+						scrapeObject.screenName = screenName;
+						scrapeObject.userinfo = userinfo;
+						scrapeObject.param = "updateScrapeData_ICE";
+						scrapeObject.appType = tasks.appType;
+						scrapeObject.versionnumber = tasks.versionnumber;
+						scrapeObject.newData = viewString;
+						if(deleteObjectsFlag==true){
+							scrapeObject.type = "delete";
+							deleteObjectsFlag = false;
+						}
+						else
+							scrapeObject.type = "save";
+						//Update Service to Save Scrape Objects
+						DesignServices.updateScreen_ICE(scrapeObject)
+							.then(function (data) {
+								getIndexOfDeletedObjects = [];
+								angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
+								unblockUI()
+								//add popoup for error and saved 
+							}, function (error) {unblockUI()  })
+							return;
+/*	
 						$.each($("input[type=checkbox].checkall:checked"), function () {
 							for (var i = 0; i < newScrapedList.view.length; i++) {
 								if (appType == 'DesktopJava'|| appType == 'Desktop' || appType == 'MobileApp') {
@@ -2738,12 +2935,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									}
 								}
 							})
-						}
+						}*/
 					}
-					$("#saveObjects").trigger('click');
+					deleteScrapedObjects(e)
+					//$("#saveObjects").trigger('click');
 				}
 				else {
 					deleteScrapedObjects(e);
+					$("#saveObjects").trigger('click');
 				}
 				$("#deleteObjects").prop("disabled", true);
 			}
@@ -3466,7 +3665,18 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			//Pushing custom object array in viewString.view
 			for (i = 0; i < customObj.length; i++) {
 				if (custflag!="false"){
+					customObj[i]._id = viewString.view[custflag]._id
 					viewString.view[custflag]=customObj[i]
+					if(window.localStorage['_modified'])
+					{
+						modifiednames = JSON.parse(window.localStorage['_modified']);
+						modifiednames.push("editObj"+JSON.stringify(viewString.view[custflag]))
+						window.localStorage['_modified'] = JSON.stringify(modifiednames)
+					}
+					else{
+						window.localStorage['_modified'] = JSON.stringify(["editObj"+JSON.stringify(viewString.view[custflag])])
+					}
+					window.localStorage['checkEditWorking'] = "true";
 				}else{
 					viewString.view.push(customObj[i])
 				}
@@ -3552,6 +3762,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				var path = viewString.view[i].xpath;
 				var ob = viewString.view[i];
 				ob.tempId = i;
+				var objId = viewString.view[i]._id;
 				var custN = ob.custname.replace(/[<>]/g, '').trim();
 				var tag = ob.tag;
 				if (tag == "dropdown") {
@@ -3563,10 +3774,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				var tag2;
 				if (path != "") {
 					var innerUL = $('#scrapedObjforMap');
-					var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + " draggable='true' ondragstart='drag(event)'> <span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' data-xpath='" + ob.xpath + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></li>";
+					var li = "<li data-id="+objId+"  data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + " draggable='true' ondragstart='drag(event)'> <span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' data-xpath='" + ob.xpath + "' data-id="+objId+" class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></li>";
 					angular.element(innerUL).append(li);
 				} else {
-					var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-tag='" + tag + "' class='item select_all " + tag + "x' dropzone='move s:text/plain' ondrop='drop(event)' ondragover='allowDrop(event)'><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></li>";
+					var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-tag='" + tag + "' class='item select_all " + tag + "x' dropzone='move s:text/plain' ondrop='drop(event)' ondragover='allowDrop(event)'><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' class='ellipsis' data-id="+objId+">" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></li>";
 					$('#customObjforMap').append('<div class="accd-Obj"><div class="accd-Obj-head">' + tag + '</div><div class="accd-Obj-body">' + li + '</div></div>')
 
 					/****Filtering same object type in one container****/
@@ -3761,6 +3972,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				scrapeObject.editedListoldCustName = [];
 				scrapeObject.editedListoldXpath = [];
 				scrapeObject.editedListmodifiedXpaths = [];
+				scrapeObject.fromMerge = [];//update custname
+				scrapeObject.toMerge = [];//delete list
 				scrapeObject.versionnumber = tasks.versionnumber;
 
 				//Filtering the Object which has been mapped
@@ -3770,7 +3983,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					scrapeObject.editedListoldCustName.push($(this).children(".toMergeObj").text());
 					scrapeObject.editedListoldXpath.push($(this).children(".toMergeObj").data("xpath"));
 					scrapeObject.editedListmodifiedXpaths.push($(this).children(".fromMergeObj").data("xpath"));
-
+					scrapeObject.fromMerge.push($(this).children(".fromMergeObj").data("id"))//[$(this).children(".fromMergeObj").data("id"),$(this).children(".toMergeObj").text()])
+					scrapeObject.toMerge.push([$(this).children(".toMergeObj").data("id"),$(this).children(".fromMergeObj").data("id"),$(this).children(".toMergeObj").text()])
 					/***Resetting Values to Default***/
 					$(this).children(".showPreviousVal").hide();
 					$(this).children(".fromMergeObj").remove();
@@ -3932,11 +4146,16 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	});
 	$(document).on('click', '#noSaveElements', function (e) {
 		$("#saveConfirmObjects").modal('hide');
+		unblockUI()
 		return false;
 	});
 
 	function renameScrapedObjects(e) {
 		blockUI("Saving in progress. Please wait...");
+		var edit = [];
+		var propedit = [];
+		var propeditFlag =  false
+		var unsavedObj = [];
 		var custnames = [];
 		var viewStringXpath = [];
 		var modifiedCustXpath = [];
@@ -3960,11 +4179,16 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				newScrapedList.mirrorwidth = viewString.mirrorwidth;
 			}
 		}
-
+		var modifiedobj = [];
 		if (modifiednames.length > 0) {
 			var mdName;
 			for (var i = 0; i < modifiednames.length; i++) {
 				mdName = modifiednames[i].split("^^");
+				editName = modifiednames[i].split("editObj");
+				if (editName[1]) {
+					propedit.push(JSON.parse(editName[1]))
+					propeditFlag = true
+				}
 				if (eaCheckbox) {
 					if (mdName[1]) {
 						if (newScrapedList.view[mdName[1]]){
@@ -3976,23 +4200,35 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								newxpath = newxpath.slice(0,ind+1)+mdName[0]+newxpath.slice(newxpath.indexOf(';',ind+s_ind),newxpath.length);
 								newScrapedList.view[mdName[1]].xpath = newxpath;
 							}
+							if ("_id" in newScrapedList.view[mdName[1]]){
+								modifiedobj.push([newScrapedList.view[mdName[1]]._id,mdName[0]])
+							}
 						}
 					}
 				}
 				else {
 					if (mdName[1]) {
 						if (viewString.view[mdName[1]]){
-							viewString.view[mdName[1]].custname = mdName[0];
+							if (viewString.view[mdName[1]]._id == undefined){
+								viewString.view[mdName[1]].custname = mdName[0];
+							}
+							else{
+								edit.push([viewString.view[mdName[1]]._id,mdName[0]]);
+							}
+							/*
 							if(viewString.view[mdName[1]].cord != undefined && viewString.view[mdName[1]].cord != ''){
 								var newxpath = viewString.view[mdName[1]].xpath;
 								var ind = newxpath.indexOf(';');
 								var s_ind = newxpath.indexOf(';',ind);
 								newxpath = newxpath.slice(0,ind+1)+mdName[0]+newxpath.slice(newxpath.indexOf(';',ind+s_ind),newxpath.length);
 								viewString.view[mdName[1]].xpath = newxpath;
-							}
+							}*/
 						}	
 					}
 				}
+			}
+			if (edit.length > 0){
+				window.localStorage['_modified'] = JSON.stringify(edit)
 			}
 		}
 		//End of Filter Duplicate Values in ViewString based on custname
@@ -4013,6 +4249,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				//newScrapedList.view.splice(getIndexOfDeletedObjects[i], 1);
 			}
 			newScrapedList.view = newScrapedList.view.filter(function (n) { return n != null });
+			if (modifiedobj.length > 0){
+				newScrapedList.modobj = modifiedobj
+			}
 			getScrapeData = JSON.stringify(newScrapedList);
 			//console.log(newScrapedList.view)
 		}
@@ -4038,6 +4277,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		scrapeObject.screenName = screenName;
 		scrapeObject.userinfo = userinfo;
 		scrapeObject.param = "updateScrapeData_ICE";
+		if (propeditFlag){
+			scrapeObject.propedit = propedit 
+		}
+		if (!eaCheckbox && window.localStorage['_modified'] != "" && edit.length > 0){
+			scrapeObject.param = "edit_updateScrapeData_ICE";
+			scrapeObject.getScrapeData = window.localStorage['_modified'];
+			scrapeObject.scrapedobj = viewString.view
+		}
 		scrapeObject.appType = tasks.appType;
 		scrapeObject.versionnumber = tasks.versionnumber;
 		scrapeObject.newData = viewString;
@@ -4207,6 +4454,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				var testCaseId = taskInfo.testCaseId;
 				var testCaseName = taskInfo.testCaseName;
 				var versionnumber = taskInfo.versionnumber;
+				var import_status = false;
 				if ((screenId != undefined) && (screenId != "undefined") && (testCaseId != undefined) && (testCaseId != "undefined")) {
 					//#D5E7FF  DBF5DF
 					var serviceCallFlag = false;
@@ -4295,7 +4543,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								getScrapeData=res
 								scrape_data = JSON.parse(JSON.stringify(getScrapeData));
 							});
-						DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, mydata, userInfo, versionnumber)
+							DesignServices.updateTestCase_ICE(testCaseId, testCaseName, mydata, userInfo, versionnumber, import_status)
 							.then(function (data) {
 								if (data == "Invalid Session") {
 									return $rootScope.redirectPage();
@@ -4424,7 +4672,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	$(document).on("click", ".filterObjects", function () {
 		cfpLoadingBar.start();
 		blockUI('Filtering in progress. Please Wait...');
-		$(".checkStylebox").prop("checked", false);
+		//$(".checkStylebox").prop("checked", false);
 		$("html").css({
 			'cursor': 'wait'
 		});
@@ -4437,8 +4685,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			filter()
 			if (($("#scraplist li").find('input[name="selectAllListItems"]:checked').length == $("#scraplist li").find('input[name="selectAllListItems"]:visible').length) && $("#scraplist li").find('input[name="selectAllListItems"]:visible').length != 0) {
 				$(".checkStylebox").prop("checked", true);
-			} else $(".checkStylebox").prop("checked", false);
-			$(".checkStylebox,.checkall").prop("checked", false);
+				$("#scraplist li").find('input[name="selectAllListItems"]:visible').prop("checked", true).addClass('checked');
+				$("#deleteObjects").prop("disabled", false)
+			} else {
+				$(".checkStylebox").prop("checked", false);
+				$("#scraplist li").find('input[name="selectAllListItems"]:visible').prop("checked", false).removeClass('checked');
+				$("#deleteObjects").prop("disabled", true)
+			}
+			//$(".checkStylebox,.checkall").prop("checked", false);
 			if ($("#scraplist li").children('a').find('input[type=checkbox].checkall:checked:visible').length == 0) {
 				$(".checkStylebox").prop("checked", false);
 			}
@@ -4694,20 +4948,20 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					$(".viewReadOnlyTC").click(function () {
 						var testCaseName = this.getAttribute('data-name'),
 							testCaseId = this.getAttribute('data-id');
-						DesignServices.readTestCase_ICE(undefined, testCaseId, testCaseName, 0)
+						DesignServices.readTestCase_ICE(testCaseId, testCaseName, 0)
 							.then(function (response) {
 								if (response == "Invalid Session") {
 									return $rootScope.redirectPage();
 								}
 								var source = $("#handlebar-template-testcase").html();
 								var template = Handlebars.compile(source);
-								try {
-									JSON.parse(response.testcasesteps);
-								}
-								catch (err) {
-									response.testcasesteps = '[]';
-								}
-								var dat = template({ name: [{ testcasename: response.testcasename }], rows: JSON.parse(response.testcasesteps) });
+								// try {
+								// 	JSON.parse(response.testcasesteps);
+								// }
+								// catch (err) {
+								// 	response.testcasesteps = '[]';
+								// }
+								var dat = template({ name: [{ testcasename: response.testcasename }], rows: response.testcase });
 								var newWindow = window.open();
 								newWindow.document.write(dat);
 							},
@@ -4790,12 +5044,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			var testCaseId = taskInfo.testCaseId;
 			var testCaseName = taskInfo.testCaseName;
 			var versionnumber = taskInfo.versionnumber;
-			DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
+			DesignServices.readTestCase_ICE(testCaseId, testCaseName, versionnumber)
 				.then(function (response) {
 					if (response == "Invalid Session") {
 						return $rootScope.redirectPage();
 					}
-					var testcaseSteps = JSON.parse(response.testcase);
+					var testcaseSteps = response.testcase;//JSON.parse(response.testcase);
 					if (typeof (testcaseSteps[modalId - 1].addTestCaseDetailsInfo) == "object") {
 						var details = testcaseSteps[modalId - 1].addTestCaseDetailsInfo;
 					}
@@ -4850,7 +5104,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			} else if (taskstatus == 'reassign') {
 				openDialog("Task Reassignment Success", "Task Reassigned successfully!", true)
 				// labelArr.push(txnHistory.codesDict['TaskReassign']);
-			} else if (taskstatus == 'review') {
+			} else if (taskstatus == 'underReview') {
 				openDialog("Task Completion Success", "Task Approved successfully!", true)
 				// labelArr.push(txnHistory.codesDict['TaskApprove']);
 			} else {
@@ -5063,7 +5317,8 @@ function contentTable(newTestScriptDataLS) {
 				   });*/
 			var gridArrayData = $("#jqGrid").jqGrid('getRowData');
 			for (i = 0; i < gridArrayData.length; i++) {
-				if (gridArrayData[i].outputVal.indexOf('##') !== -1 || gridArrayData[i].outputVal.indexOf(';##') !== -1) {
+				commented = gridArrayData[i].outputVal.split(';');
+				if (commented[commented.length-1]=='##') {
 					$(this).find('tr.jqgrow')[i].style.borderLeft = "5px solid red";
 					$(this).find('tr.jqgrow')[i].childNodes[0].style.paddingRight = "7px"
 					$(this).find('tr.jqgrow')[i].childNodes[1].childNodes[0].style.marginLeft = "-4px";
@@ -5436,8 +5691,8 @@ function contentTable(newTestScriptDataLS) {
 				$.each(keywordArrayValue, function (k, v) {
 					if (selectedKeyword == k) {
 						if (v != "") {
-							inputSyntax = JSON.parse(v).inputVal;
-							outputSyntax = JSON.parse(v).outputVal;
+							inputSyntax = v.inputval;//JSON.parse(v).inputVal;
+							outputSyntax = v.outputval;//JSON.parse(v).outputVal;
 						}
 						else {
 							inputSyntax = v;
@@ -6174,6 +6429,9 @@ function contentTable(newTestScriptDataLS) {
 						} else if (obType == 'GuiShell' || obType == 'shell') {
 							sc = Object.keys(keywordArrayList.shell);
 							selectedKeywordList = "shell";
+						} else if (obType == 'tree') {
+							sc = Object.keys(keywordArrayList.tree);
+							selectedKeywordList = "tree";
 						} else if (obType == 'list_item' || obType == 'list') {
 							if (listType == 'true') {
 								sc = Object.keys(keywordArrayList.list);
@@ -6395,6 +6653,7 @@ function contentTable(newTestScriptDataLS) {
 			if ($.inArray(selectedText, scrappedDataCustnames) == '-1' && ($(e.target).parents('tr').children('td').find('.editable').length > 0 || $(e.target).children('td').find('select.editable').length > 0)) {
 				console.log(scrappedData);
 				var mydata = $grid.jqGrid('getRowData');
+				dataObject = "";
 				console.log('mydata', mydata);
 				var row = $(e.target).closest('tr.jqgrow');
 				var rowId = row.attr('id');
@@ -6450,8 +6709,8 @@ function contentTable(newTestScriptDataLS) {
 			if (selectedKeywordList == keywordArrayKey) {
 				$.each(keywordArrayValue, function (k, v) {
 					if (selectedText == k) {
-						inputSyntax = JSON.parse(v).inputVal;
-						outputSyntax = JSON.parse(v).outputVal;
+						inputSyntax = v.inputval;//JSON.parse(v).inputVal;
+						outputSyntax = v.outputval;//JSON.parse(v).outputVal;
 						$grid.find("td[aria-describedby = jqGrid_inputVal]:visible").find('input').attr("placeholder", inputSyntax).attr("title", inputSyntax);
 						$grid.find("td[aria-describedby = jqGrid_outputVal]:visible").find('input').attr("placeholder", outputSyntax).attr("title", outputSyntax);
 					}
@@ -6492,8 +6751,8 @@ function contentTable(newTestScriptDataLS) {
 			if (selectedKeywordList == keywordArrayKey) {
 				$.each(keywordArrayValue, function (k, v) {
 					if (selectedKey == k) {
-						inputSyntax = JSON.parse(v).inputVal;
-						outputSyntax = JSON.parse(v).outputVal;
+						inputSyntax = v.inputval;//JSON.parse(v).inputVal;
+						outputSyntax = v.outputval;//JSON.parse(v).outputVal;
 						$grid.find("td[aria-describedby = jqGrid_inputVal]:visible").find('input').attr("placeholder", inputSyntax).attr("title", inputSyntax);
 						$grid.find("td[aria-describedby = jqGrid_outputVal]:visible").find('input').attr("placeholder", outputSyntax).attr("title", outputSyntax);
 					}
@@ -6815,7 +7074,7 @@ function copyTestStep(e) {
 					"remarks": $(this).children("td:nth-child(10)").text(),
 					"url": $(this).children("td:nth-child(11)").text().trim(),
 					"appType": $(this).children("td:nth-child(12)").text(),
-					"addTestCaseDetails": $(this).children("td:nth-child(13)").children('img')[0].outerHTML,
+					"addTestCaseDetails": getRowData.addTestCaseDetails,
 					"addTestCaseDetailsInfo": getRowData.addTestCaseDetailsInfo,
 					"cord": getRowData.cord
 				});
@@ -7213,12 +7472,13 @@ function commentStep(e) {
 						//Check whether output coloumn has some value
 						if (myData[i].outputVal != "") {
 							//If already commented but no additional value
+							commented = myData[i].outputVal.split(';');
 							if (myData[i].outputVal == "##") {
 								myData[i].outputVal = "";
 								//$("#jqGrid").trigger("reloadGrid");
 							}
 							//If already commented and contains additional value
-							else if (myData[i].outputVal.indexOf(";##") !== -1) {
+							else if (commented[commented.length-1]=='##') {
 								var lastTwo = myData[i].outputVal.substr(myData[i].outputVal.length - 3);
 								myData[i].outputVal = myData[i].outputVal.replace(lastTwo, "");
 								//$("#jqGrid").trigger("reloadGrid");
@@ -7345,6 +7605,7 @@ function drop(ev) {
 	ev.preventDefault();
 	if ($(ev.target).parent("li").find(".ellipsis").hide().hasClass("toMergeObj") == true) {
 		//Enable-Disable dragged element based on drop event
+		$('.fromMergeObj[draggable=true]').attr("data-id",draggedEle.childNodes[1].getAttribute("data-id"))
 		draggedEle.setAttribute("draggable", false)
 		draggedEle.childNodes[1].style.background = "#e0e0e0";
 		draggedEle.childNodes[1].style.cursor = "no-drop";
