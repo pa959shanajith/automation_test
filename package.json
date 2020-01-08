@@ -46,7 +46,7 @@
     "winston-daily-rotate-file": "^1.7.2",
     "wkhtmltopdf": "^0.3.4",
     "xlsx": "^0.12.6",
-    "xmldom": "^0.1.27",
-    "xml-parser": "^1.2.1"
+    "xml-parser": "^1.2.1",
+    "xmldom": "^0.1.27"
   }
 }

@@ -13,8 +13,9 @@ var utils = require('../lib/utils');
 var Handlebars = require('../lib/handlebar.js');
 var wkhtmltopdf = require('wkhtmltopdf');
 var fs = require('fs');
-wkhtmltopdf.command = process.cwd() + "\\assets\\wkhtmltox\\bin\\wkhtmltopdf.exe"
-var reportpath = "../../assets/templates";
+const Readable = require('stream').Readable;
+var path = require('path');
+wkhtmltopdf.command = path.join(process.cwd(), 'assets', 'wkhtmltox', 'bin', 'wkhtmltopdf.exe');
 var templatepdf = '';
 var templateweb = '';
 
@@ -81,27 +82,30 @@ function openScreenShot(req, path, cb) {
                     "path": path
                 };
                 redisServer.redisPubICE.publish('ICE1_normal_' + name, JSON.stringify(dataToIce));
-
+                var scrShotData = [];
                 function render_screenshot_listener(channel, message) {
                     var data = JSON.parse(message);
                     if (name == data.username) {
-						redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
+                        var resultData = data.value;
                         if (data.onAction == "unavailableLocalServer") {
+                            redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
                             logger.error("Error occurred in openScreenShot: Socket Disconnected");
                             if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
                                 var soc = myserver.socketMapNotify[name];
                                 soc.emit("ICEnotAvailable");
                                 cb('unavailableLocalServer');
                             }
-                        } else if (data.onAction == "render_screenshot") {
-                            var resultData = data.value;
+                        } else if (data.onAction == "render_screenshot_finished") {
+                            redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
                             if (resultData === "fail") {
                                 logger.error('Screenshot status: ', resultData);
                                 cb('fail');
                             } else {
                                 logger.debug("Screenshots processed successfully");
-                                cb(null, resultData);
+                                cb(null, scrShotData);
                             }
+                        } else if (data.onAction == "render_screenshot") {
+                            scrShotData = scrShotData.concat(resultData);
                         }
                     }
                 }
@@ -149,7 +153,7 @@ exports.renderReport_ICE = function(req, res) {
                 "remarksLength": finalReports.remarksLength.length,
                 'commentsLength': finalReports.commentsLength.length
             };
-            //PDF Reports		    
+            //PDF Reports
             if (reportType != "html") {
                 var scrShot = req.body.absPath;
                 openScreenShot(req, scrShot.paths, function(err, dataURIs) {
@@ -162,19 +166,21 @@ exports.renderReport_ICE = function(req, res) {
                             data.rows[scrShot.idx[i]].screenshot_dataURI = d;
                         });
                     }
-					try {
-						var pdf = templatepdf(data);
-						wkhtmltopdf(pdf).pipe(res);
-					} catch (exception) {
-						var emsg = exception.message;
-						var flag = "fail";
-						if ((exception instanceof RangeError) && emsg === "Invalid string length") {
-							emsg = "Report Size too large";
-							flag = "limitExceeded";
-						}
-						logger.error("Exception occurred in renderReport_ICE when trying to render report: %s", emsg);
-						return res.send(flag);
-					}
+                    try {
+                        const pdf = new Readable({read: ()=>{}});
+                        pdf.push(templatepdf(data));
+                        pdf.push(null);
+                        wkhtmltopdf(pdf).pipe(res);
+                    } catch (exception) {
+                        var emsg = exception.message;
+                        var flag = "fail";
+                        if ((exception instanceof RangeError) && emsg === "Invalid string length") {
+                            emsg = "Report Size too large";
+                            flag = "limitExceeded";
+                        }
+                        logger.error("Exception occurred in renderReport_ICE when trying to render report: %s", emsg);
+                        return res.send(flag);
+                    }
                 });
             }
             //HTML Reports
@@ -451,7 +457,7 @@ exports.getReport_Nineteen68 = function(req, res) {
             var reportInfoObj = {};
             var reportjson = {};
             var flag = "";
-			var finalReport = [];
+            var finalReport = [];
             var inputs = {
                 "query": "projectsUnderDomain",
                 "reportid": reportId
