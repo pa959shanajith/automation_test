@@ -371,6 +371,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									contentTable(data2.view);
 									$('.cbox').prop('disabled', false);
 									$('.cbox').parent().removeClass('disable_a_href');
+									updateColumnStyle();
+									$("#jqGrid").focusout(()=>{
+										updateColumnStyle();
+									})
 									return;
 								} else {
 									var testcase = data.testcase;//JSON.parse(data.testcase);
@@ -400,6 +404,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									contentTable(data2.view);
 									$('.cbox').prop('disabled', false);
 									$('.cbox').parent().removeClass('disable_a_href');
+									updateColumnStyle();
+									$("#jqGrid").focusout(()=>{
+										updateColumnStyle();	
+									});				
 									return;
 								}
 							},
@@ -4412,7 +4420,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 	//save button clicked - save the testcase steps
 	$scope.updateTestCase_ICE = function (e) {
-		var task = JSON.parse(window.localStorage['_CT'])
+		var task = JSON.parse(window.localStorage['_CT']);
+		console.log(e);
 		if (task.reuse == 'True') {
 			//$("#reUsedTestcaseModal").find('.modal-title').text("");
 			$("#reUsedTestcaseModal").find('.modal-body p').text("Testcase is been reused. Are you sure you want to save ?").css('color', 'black');
@@ -4422,6 +4431,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		updateTestCase(e);
 	};
 
+
+	
 	$scope.saveTestcase = function (e) {
 		$("#reUsedTestcaseModal").modal("hide");
 		noSaveTestcase = "false";
@@ -7003,6 +7014,7 @@ function editTestCaseRow(e) {
 			editable: false
 		});
 		$("#jqGrid").resetSelection();
+		
 		$("#jqGrid").trigger("reloadGrid");
 		$("#jqGrid tr").each(function () {
 			$(this).attr("id", $(this).index());
@@ -7668,4 +7680,11 @@ function openModalFormDialog(title, body) {
 	setTimeout(function () {
 		$("#globalModalForm").find('.btn-default').focus();
 	}, 300);
+}
+
+function updateColumnStyle(){
+	var gridInnerElement =  $("#jqGrid").find("td[aria-describedby=jqGrid_inputVal]:visible").find('input').prevObject;
+	for(var i = 0; i < gridInnerElement.length ; i++){
+	gridInnerElement[i].style.whiteSpace = 'pre-wrap';
+	}	
 }
