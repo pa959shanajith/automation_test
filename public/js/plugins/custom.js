@@ -1,9 +1,50 @@
 //Window Load Function
 function loadBody(){
 	$("body").delay(400).animate({opacity:"1"});
+	register_GUID();
 }
 window.onload = loadBody;
 //Window Load Function
+function register_GUID() {
+    // detect local storage available
+    if (typeof (Storage) === "undefined") return;
+	// get (set if not) tab GUID and store in tab session
+	if (window.name == "") window.name = GUID();
+	// add eventlistener to session storage
+	window.addEventListener("storage", storage_Handler, false);
+	// set tab GUID in session storage
+	localStorage["tabGUID"] = window.name;
+	flag = true;
+}
+
+function storage_Handler(e) {
+    // if tabGUID does not match then more than one tab and GUID
+    if (e.key == 'tabGUID') {
+        if (e.oldValue != e.newValue) tab_Warning();
+    }
+}
+var flag = true;
+function GUID() {
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000)
+          .toString(16)
+          .substring(1);
+    }
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+      s4() + '-' + s4() + s4() + s4();
+}
+
+function tab_Warning() {
+	history.pushState(null, null, document.URL);
+	if(flag){
+		window.localStorage.clear();
+		window.sessionStorage.clear();
+		window.sessionStorage["checkLoggedOut"] = true;
+		angular.element(document).scope().$root.redirectPage();
+		//alert("Duplicate Tabs not allowed, Please Close the Duplicate Tab");
+		blockUI("<h5>Duplicate Tabs not allowed, Please Close the duplicate Tab and refresh.</h5>");
+	}
+}
 
 var Encrypt = {
 	_keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
