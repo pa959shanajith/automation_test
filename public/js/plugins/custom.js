@@ -21,7 +21,12 @@ function storage_Handler(e) {
     // if tabGUID does not match then more than one tab and GUID
     if (e.key == 'tabGUID') {
         if (e.oldValue != e.newValue) tab_Warning();
-    }
+    }else if(e.key == "tabValidity"){
+		window.sessionStorage.clear();
+		history.pushState(null, null, document.URL);
+		angular.element(document).scope().$root.redirectPage();
+		blockUI("<h5>Duplicate Tabs not allowed, Please Close this Tab and refresh.</h5>");
+	}
 }
 var flag = true;
 function GUID() {
@@ -36,14 +41,13 @@ function GUID() {
 
 function tab_Warning() {
 	history.pushState(null, null, document.URL);
-	angular.element(document).scope().$root.redirectPage();
 	if(flag){
 		history.pushState(null, null, document.URL);
 		window.localStorage.clear();
+		localStorage["tabValidity"] = "invalid";
 		window.sessionStorage.clear();
+		angular.element(document).scope().$root.redirectPage();
 		blockUI("<h5>Duplicate Tabs not allowed, Please Close the duplicate Tab and refresh.</h5>");
-
- 		//alert("Duplicate Tabs not allowed, Please Close the Duplicate Tab");
 	}
 }
 
