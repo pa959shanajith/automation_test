@@ -36,13 +36,14 @@ function GUID() {
 
 function tab_Warning() {
 	history.pushState(null, null, document.URL);
+	angular.element(document).scope().$root.redirectPage();
 	if(flag){
+		history.pushState(null, null, document.URL);
 		window.localStorage.clear();
 		window.sessionStorage.clear();
-		window.sessionStorage["checkLoggedOut"] = true;
-		angular.element(document).scope().$root.redirectPage();
-		//alert("Duplicate Tabs not allowed, Please Close the Duplicate Tab");
 		blockUI("<h5>Duplicate Tabs not allowed, Please Close the duplicate Tab and refresh.</h5>");
+
+ 		//alert("Duplicate Tabs not allowed, Please Close the Duplicate Tab");
 	}
 }
 
