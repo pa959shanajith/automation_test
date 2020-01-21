@@ -441,12 +441,13 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		var cycleid = '';						
         async.series({
             approval_check:function(callback_E){
-				// if (!taskflow) return callback_E();
-				// utils.approval_status_check(batchExecutionData, function (err, approved_status) {
-				// 	if (approved_status) callback_E();
-				// 	else res.status(err.status).send(err.res);
-                // });
-                callback_E();
+				if (taskflow){
+					utils.approval_status_check(batchExecutionData, function (err, approved_status) {
+					if (approved_status) callback_E();
+					else res.status(err.status).send(err.res);
+					});
+				}
+                else callback_E();
             },
 			counter_updater:function(callback_E){
 
@@ -1508,12 +1509,12 @@ exports.testSuitesScheduler_ICE = function (req, res) {
 	if (utils.isSessionActive(req)) {
 		var ExecutionData=req.body.moduleInfo;
 		if(taskflow){
-			// utils.approval_status_check(ExecutionData, function (err, approved) {
-			// 	if (approved) testSuitesScheduler_ICE_cb(req,res);
-			// 	else {
-			// 		res.status(err.status).send(err.res);
-			// 	}
-			// });
+			utils.approval_status_check(ExecutionData, function (err, approved) {
+				if (approved) testSuitesScheduler_ICE_cb(req,res);
+				else {
+					res.status(err.status).send(err.res);
+				}
+			});
 		}else{
 			testSuitesScheduler_ICE_cb(req,res);
 		}
