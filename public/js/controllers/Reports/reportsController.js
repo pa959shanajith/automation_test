@@ -386,10 +386,12 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                     unblockUI()
                                 }, 1000);
                             }
-                            if (data.length > 2) {
+                            if (data.length > 1) {
                                 $("#dateDESC").show();
+                                $("#dateDESC1").show();   
                             } else {
                                 $("#dateDESC, #dateASC").hide();
+                                $("#dateDESC1, #dateASC1").hide();  
                             }
                             var dateArray = $('.mid-report-section tbody').children('.scenariostatusreport');
                             dateASC(dateArray);
@@ -406,6 +408,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             $("#reportsModuleTable th").addClass('no-data');
                             $(".mid-report-section tbody").append("<tr><td class='align-center emptyRecords' colspan=3>No record(s) found</td></tr>");
                             $("#dateDESC, #dateASC").hide();
+                            $("#dateDESC1, #dateASC1").hide();      
                             unblockUI();
                         }
                     }
@@ -700,6 +703,26 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         }
        
     }
+     //sort start date & time executions    
+     function sortExecutions1(dateArray) {
+        $(".mid-report-section tbody").empty();
+        if($('#dateDESC1').is(":visible") == true)
+        {
+            var j=dateArray.length;
+            for (var i =0; i < dateArray.length; i++) {
+                dateArray[i].firstChild.innerHTML = "E<sub>" + parseInt(j) + "</sub>";
+                $(".mid-report-section tbody").append(dateArray[i]);
+                j--;
+            }
+        }
+        else{
+            for (var k =0; k < dateArray.length; k++) {
+                dateArray[k].firstChild.innerHTML = "E<sub>" + parseInt(k + 1) + "</sub>";
+                $(".mid-report-section tbody").append(dateArray[k]);
+            }
+        }
+       
+    }
 
     //Load scenarios table on click of Module start & end time 
     $(document).on('click', '.scenariostatusreport', function(e) {
@@ -888,6 +911,27 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         e.stopImmediatePropagation();
     });
 
+    //Sort Date and time to ascending order on click
+    $(document).on('click', '#dateDESC1', function(e) {
+        $(this).hide();
+        var dateArray;
+        $('#dateASC1').show();
+        var dateArray = $('.mid-report-section tbody').children('.scenariostatusreport');
+        dateDESC(dateArray);
+        sortExecutions1(dateArray);
+        e.stopImmediatePropagation();
+    });
+    
+    //Sort Date and time to descending order on click
+    $(document).on('click', '#dateASC1', function(e) {
+        $(this).hide();
+        $('#dateDESC1').show();
+        var dateArray = $('.mid-report-section tbody').children('.scenariostatusreport');
+        dateASC(dateArray);
+        sortExecutions1(dateArray);
+        e.stopImmediatePropagation();
+    });
+    
     //Sort Date and time to descending order
     function dateDESC(dateArray) {
         dateArray.sort(function(a, b) {
