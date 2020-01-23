@@ -112,7 +112,11 @@ module.exports.approval_status_check=function(ExecutionData,approval_callback){
 				callback(err);
 			} else {
 				logger.info("Successfully inserted report data");
-				if(result.rows!=0){
+				if(result.rows=="No task"){
+					err = {res:'Notask',status:response.statusCode};
+					callback(err);
+				}
+				else if(result.rows!=0){
 					err = {res:'NotApproved',status:response.statusCode};
 					callback(err);
 				} else callback()
