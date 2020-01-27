@@ -572,7 +572,7 @@ if (cluster.isMaster) {
 		app.post('/getTopMatches_ProfJ', chatbot.getTopMatches_ProfJ);
 		app.post('/updateFrequency_ProfJ', chatbot.updateFrequency_ProfJ);
 		//NeuronGraphs Plugin Routes
-		//app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
+		app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
 		//QC Plugin
 		app.post('/loginQCServer_ICE', qc.loginQCServer_ICE);
 		app.post('/qcProjectDetails_ICE', qc.qcProjectDetails_ICE);
