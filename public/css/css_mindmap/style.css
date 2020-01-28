@@ -939,7 +939,7 @@
     stroke-width:0
 }
  .modal-backdrop.in{
-    background-color:transparent
+   /* background-color:transparent; */
 }
  .disableButton{
     cursor: default;

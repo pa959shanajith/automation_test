@@ -895,7 +895,7 @@ input[type="radio"]{
 	border-bottom: none !important;
 }
 #left-bottom-section {
-    min-height: 60%;
+    /*height: 25%;*/
     float: left;
     width: 100%;
     position: relative;
@@ -903,7 +903,7 @@ input[type="radio"]{
 
 #left-top-section ul,
 #left-bottom-section ul {
-    float: left;
+    /* float: left; */
     width: 100%;
     padding: 0;
     margin: 0;
@@ -911,9 +911,11 @@ input[type="radio"]{
 }
 
 #left-bottom-section ul {
-    position: absolute;
-    top: 50%;
+    /*position: absolute;*/
+    position: relative;
+    /* top: 120px; */
     left: 50%;
+    margin-top: 20px;
     transform: translate(-50%, -50%);
     -moz-transform: translate(-50%, -50%);
     -webkit-transform: translate(-50%, -50%)
