@@ -1,5 +1,6 @@
 var screenshotObj, scrapedGlobJson, enableScreenShotHighlight, mirrorObj, eaCheckbox, finalViewString, scrapedData, deleteFlag, globalSelectedBrowserType, selectedKeywordList, keywordListData, dependentTestCaseFlag = false;
 checkedTestcases = [];
+
 pasteSelecteStepNo = [];
 var initScraping = {};
 var mirrorObj = {};
@@ -38,6 +39,7 @@ var newScrapedData;
 var saveScrapeDataFlag = false;
 var deleteObjectsFlag = false;
 var certObj={};
+var scrapedurl='';
 var scrape_data = '';
 window.localStorage['disableEditing'] = "false";
 mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$location', '$timeout', 'DesignServices', 'mindmapServices', 'cfpLoadingBar', '$window', 'socket', function ($scope, $rootScope, $http, $location, $timeout, DesignServices, mindmapServices, cfpLoadingBar, $window, socket) {
@@ -145,8 +147,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		var taskInfo = JSON.parse(window.localStorage['_CT']);
 		var filterData = JSON.parse(window.localStorage['_FD']);
 		if (taskInfo.subTaskType == "Scrape" || taskInfo.subTask == "Scrape") {
-			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">' + filterData.idnamemapprj[taskInfo.projectId] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">' + taskInfo.screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + filterData.idnamemaprel[taskInfo.releaseid] + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + filterData.idnamemapcyc[taskInfo.cycleid] + '</span></p>')
+			// $(".projectInfoWrap").empty()
+			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">' + filterData.idnamemapprj[taskInfo.projectId] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">' + taskInfo.screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + filterData.idnamemaprel[taskInfo.releaseid] + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + filterData.idnamemapcyc[taskInfo.cycleid] + '</span></p><p class="proj-info-wrap"><span class="content-label">URL :</span><span id="scrapedurlinfo" class="content">' +scrapedurl + '</span></p>')
 		} else {
+			// $(".projectInfoWrap").empty()
 			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">' + filterData.idnamemapprj[taskInfo.projectId] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">' + taskInfo.screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">TestCase: </span><span class="content">' + taskInfo.testCaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + filterData.idnamemaprel[taskInfo.releaseid] + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + filterData.idnamemapcyc[taskInfo.cycleid] + '</span></p>')
 		}
 
@@ -335,7 +339,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS">No Screenshot Available</div>')
 						else{
 							if(data2.scrapetype=='caa')
-								$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror.substring(2,data2.mirror.length-1) + '" /></div>')
+								$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src=",' + data2.mirror.substring(2,data2.mirror.length-1) + '" /></div>')
 							else
 								$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror + '" /></div>')
 						}	
@@ -861,7 +865,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		//enableScreenShotHighlight = true;
 		DesignServices.getScrapeDataScreenLevel_ICE()
 			.then(function (data) {
-			    localStorage['_cust']=JSON.stringify({})
+				scrapedurl=data.scrapedurl;
+				// console.log(data)
+				localStorage['_cust']=JSON.stringify({})
 				if (data == "Invalid Session") {
 					return $rootScope.redirectPage();
 				}
@@ -4303,6 +4309,34 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				}
 				if(typeof(data)=="object" || data=="success"){
 					eaCheckbox = false;
+					 scrapedurl = data.scrapedurl
+					
+					// console.log(scrapedurl)
+					// New Line
+					$timeout(function (){
+
+						// projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
+						// releaseName = angular.element(document.getElementById("left-nav-section")).scope().releaseDetails;
+						// cycleName = angular.element(document.getElementById("left-nav-section")).scope().cycleDetails;
+						// var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
+						// appType = JSON.parse(window.localStorage['_CT']).appType;
+						// screenName = angular.element(document.getElementById("left-nav-section")).scope().screenName;
+						// testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
+						// subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
+						// subTask = JSON.parse(window.localStorage['_CT']).subTask;
+						var taskInfo = JSON.parse(window.localStorage['_CT']);
+						var filterData = JSON.parse(window.localStorage['_FD']);
+						if (taskInfo.subTaskType == "Scrape" || taskInfo.subTask == "Scrape") {
+							
+							$(".projectInfoWrap").empty()
+						    $(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">' + filterData.idnamemapprj[taskInfo.projectId] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">' + taskInfo.screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + filterData.idnamemaprel[taskInfo.releaseid] + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + filterData.idnamemapcyc[taskInfo.cycleid] + '</span></p><p class="proj-info-wrap"><span class="content-label">URL :</span><span id="scrapedurlinfo" class="content">' +scrapedurl + '</span></p>')
+						} else {
+							$(".projectInfoWrap").empty()
+							$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">' + filterData.idnamemapprj[taskInfo.projectId] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">' + taskInfo.screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">TestCase: </span><span class="content">' + taskInfo.testCaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + filterData.idnamemaprel[taskInfo.releaseid] + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + filterData.idnamemapcyc[taskInfo.cycleid] + '</span></p>')
+						}
+					}, 1500);
+				
+					//END
 					//window.localStorage['_modified'] = "";
 					modifiednames = [];
 					getIndexOfDeletedObjects = [];
