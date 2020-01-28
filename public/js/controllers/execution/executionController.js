@@ -906,7 +906,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	//Select Browser Function
 	$(document).on("click", ".selectBrowser", function () {
 		$(this).find("img").toggleClass("sb");
-		if ($(this).find("img").hasClass("sb") == false) {
+		$(this).find("svg").toggleClass("sb");
+		if ($(this).find("img").hasClass("sb") == false && $(this).find("svg").hasClass("sb") == false) {
 			var getSpliceIndex = browserTypeExe.indexOf($(this).data("name").toString());
 			browserTypeExe.splice(getSpliceIndex, 1);
 		} else {
