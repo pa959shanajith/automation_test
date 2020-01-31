@@ -298,9 +298,12 @@ exports.getSuiteDetailsInExecution_ICE = function(req, res) {
                         } else {
                             for (var i = 0; i < executionData.rows.length; i++) {
                                 startTime = new Date(executionData.rows[i].starttime);
-                                endTime = new Date(executionData.rows[i].endtime);
                                 starttime = startTime.getUTCDate() + "-" + (startTime.getUTCMonth() + 1) + "-" + startTime.getUTCFullYear() + " " + startTime.getUTCHours() + ":" + startTime.getUTCMinutes();
-                                endtime = endTime.getUTCDate() + "-" + (endTime.getUTCMonth() + 1) + "-" + endTime.getUTCFullYear() + " " + (endTime.getUTCHours()) + ":" + (+endTime.getUTCMinutes());
+                                if (executionData.rows[i].endtime === null) endtime = '-';
+                                else {
+                                    endTime = new Date(executionData.rows[i].endtime);
+                                    endtime = endTime.getUTCDate() + "-" + (endTime.getUTCMonth() + 1) + "-" + endTime.getUTCFullYear() + " " + (endTime.getUTCHours()) + ":" + (+endTime.getUTCMinutes());
+                                }
                                 executionDetailsJSON.push({
                                     execution_id: executionData.rows[i]._id,
                                     start_time: starttime,
@@ -710,61 +713,6 @@ exports.getReportsData_ICE = function(req, res) {
                 });
         }
     } catch (exception) {
-        logger.error(exception.message);
-        res.status(500).send("fail");
-    }
-};
-
-//Fetch all webocular modules
-exports.getWebocularModule_ICE = function(req, res) {
-    try {
-        
-        var inputs = {
-            "query": "moduledata"
-        };
-        var args = {
-            data: inputs,
-            headers: {
-                "Content-Type": "application/json"
-            }
-        };
-        client.post(epurl + "reports/getWebocularData_ICE", args,
-                function(result1, response1) {
-                    if (response1.statusCode != 200 || result1.rows == "fail") {
-                        logger.error("Error occurred in reports/getWebocularData_ICE: getAllModules from getAllSuites_ICE Error Code : ERRNDAC");
-                        res.send("fail");
-                    } else {
-                        res.send(result1);
-                    }
-                });
-    }catch (exception) {
-        logger.error(exception.message);
-        res.status(500).send("fail");
-    }
-};
-
-exports.getWebocularData_ICE = function(req, res) {
-    try {
-        var inputs = {
-            "query": "reportdata",
-            "id": req.body.getWebocularInputData
-        };
-        var args = {
-            data: inputs,
-            headers: {
-                "Content-Type": "application/json"
-            }
-        };
-        client.post(epurl + "reports/getWebocularData_ICE", args,
-                function(result1, response1) {
-                    if (response1.statusCode != 200 || result1.rows == "fail") {
-                        logger.error("Error occurred in reports/getWebocularData_ICE: getAllModules from getAllSuites_ICE Error Code : ERRNDAC");
-                        res.send("fail");
-                    } else {
-                        res.send(result1);
-                    }
-                });
-    }catch (exception) {
         logger.error(exception.message);
         res.status(500).send("fail");
     }
