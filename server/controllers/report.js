@@ -1,6 +1,3 @@
-/**
- * Dependencies.
- */
 var async = require('async');
 var myserver = require('../lib/socket');
 var Client = require("node-rest-client").Client;
@@ -15,7 +12,7 @@ var wkhtmltopdf = require('wkhtmltopdf');
 var fs = require('fs');
 const Readable = require('stream').Readable;
 var path = require('path');
-wkhtmltopdf.command = path.join(process.cwd(), 'assets', 'wkhtmltox', 'bin', 'wkhtmltopdf.exe');
+wkhtmltopdf.command = path.join(process.cwd(), 'assets', 'wkhtmltox', 'bin', 'wkhtmltopdf'+(process.platform == "win32")? '.exe':'');
 var templatepdf = '';
 var templateweb = '';
 
