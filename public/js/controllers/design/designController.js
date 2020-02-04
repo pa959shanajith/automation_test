@@ -6432,6 +6432,15 @@ function contentTable(newTestScriptDataLS) {
 						} else if (obType == 'tree') {
 							sc = Object.keys(keywordArrayList.tree);
 							selectedKeywordList = "tree";
+						} else if (obType == 'calendar') {
+							sc = Object.keys(keywordArrayList.calendar);
+							selectedKeywordList = "calendar";
+						} else if (obType == 'gridview') {
+							sc = Object.keys(keywordArrayList.gridview);
+							selectedKeywordList = "gridview";
+						} else if (obType == 'toolbar') {
+							sc = Object.keys(keywordArrayList.toolbar);
+							selectedKeywordList = "toolbar";
 						} else if (obType == 'list_item' || obType == 'list') {
 							if (listType == 'true') {
 								sc = Object.keys(keywordArrayList.list);
