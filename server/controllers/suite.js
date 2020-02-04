@@ -735,11 +735,12 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 		var executionId = '';						
         async.series({
             approval_check:function(callback_E){
-				// if (!taskflow) return callback_E();
-				// utils.approval_status_check(batchExecutionData, function (err, approved_status) {
-				// 	if (approved_status) callback_E();
-				// 	else res.status(err.status).send(err.res);
-                // });
+				if (taskflow){
+					utils.approval_status_check(batchExecutionData, function (err, approved_status) {
+					if (approved_status) callback_E();
+					else res.status(err.status).send(err.res);
+					});
+				}
                 callback_E();
             },
 			counter_updater:function(callback_E){

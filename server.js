@@ -454,7 +454,7 @@ if (cluster.isMaster) {
 		var qc = require('./server/controllers/qualityCenter');
 		var webocular = require('./server/controllers/webocular');
 		var chatbot = require('./server/controllers/chatbot');
-		//var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
+		var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
 		var taskbuilder = require('./server/controllers/taskJson');
 		var flowGraph = require('./server/controllers/flowGraph');
 

@@ -87,13 +87,13 @@ exports.getGraphData = function(req, res){
 			// 	res.setHeader('Content-Type', 'application/json');
 				if(response.statusCode != 200 || result.rows == "fail"){
 					//console.log("Status:",status,"\nResponse: ",result);
-					res.status(status).send("Error connecting to neo4j!");
+					res.status(response.statusCode).send("Error connecting to neo4j!");
 				}
 				else{
 					// var jsonData=result;
 					// var pData=parseData(result);
 					// var pData=result
-					if(result.nodes.length==0) res.status(status).send({"err":true,"ecode":"DB_NOT_FOUND","msg":"Neuron Graphs DB not found!"});
+					if(result.nodes.length==0) res.status(response.statusCode).send({"err":true,"ecode":"DB_NOT_FOUND","msg":"Neuron Graphs DB not found!"});
 					else{
 						var rootIndex=0;
 						var nodeTypes={"DOMAINS_NG":"Domain","PROJECTS_NG":"Project","RELEASES_NG":"Release","CYCLES_NG":"Cycle","TESTSUITES_NG":"TestSuite","TESTSCENARIOS_NG":"TestScenario","TESTCASES_NG":"TestCase","SCREENS_NG":"Screen"};
