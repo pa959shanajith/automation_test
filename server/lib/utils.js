@@ -116,6 +116,10 @@ module.exports.approval_status_check=function(ExecutionData,approval_callback){
 					err = {res:'Notask',status:response.statusCode};
 					callback(err);
 				}
+				if(result.rows=="Modified"){
+					err = {res:'Modified',status:response.statusCode};
+					callback(err);
+				}
 				else if(result.rows!=0){
 					err = {res:'NotApproved',status:response.statusCode};
 					callback(err);
