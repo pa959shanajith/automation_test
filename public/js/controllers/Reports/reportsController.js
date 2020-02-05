@@ -387,15 +387,14 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                 }, 1000);
                             }
                             if (data.length > 1) {
-                                $("#dateDESC").show();
-                                $("#dateDESC1").show();   
+                                $("#dateDESC, #dateASC1").show();
+                                $("#dateDESC1, #dateASC").hide();
                             } else {
-                                $("#dateDESC, #dateASC").hide();
-                                $("#dateDESC1, #dateASC1").hide();  
+                                $("#dateDESC, #dateASC, #dateDESC1, #dateASC1").hide();  
                             }
                             var dateArray = $('.mid-report-section tbody').children('.scenariostatusreport');
                             dateASC(dateArray);
-                            sortExecutions(dateArray);
+                            sortExecutions('#dateDESC',dateArray);
                         } else if (data == "Fail") {
                             unblockUI();
                             openModalPopup("Reports", "Failed to load Reports");
@@ -684,29 +683,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     //sort start date & time executions
-    function sortExecutions(dateArray) {
+    function sortExecutions(ele, dateArray) {
         $(".mid-report-section tbody").empty();
-        if($('#dateDESC').is(":visible") == true)
-        {
-            var j=dateArray.length;
-            for (var i =0; i < dateArray.length; i++) {
-                dateArray[i].firstChild.innerHTML = "E<sub>" + parseInt(j) + "</sub>";
-                $(".mid-report-section tbody").append(dateArray[i]);
-                j--;
-            }
-        }
-        else{
-            for (var k =0; k < dateArray.length; k++) {
-                dateArray[k].firstChild.innerHTML = "E<sub>" + parseInt(k + 1) + "</sub>";
-                $(".mid-report-section tbody").append(dateArray[k]);
-            }
-        }
-       
-    }
-     //sort start date & time executions    
-     function sortExecutions1(dateArray) {
-        $(".mid-report-section tbody").empty();
-        if($('#dateDESC1').is(":visible") == true)
+        if($(ele).is(":visible") == true)
         {
             var j=dateArray.length;
             for (var i =0; i < dateArray.length; i++) {
@@ -895,19 +874,21 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     $(document).on('click', '#dateDESC', function(e) {
         $(this).hide();
         var dateArray;
-        $('#dateASC').show();
+        $('#dateASC, #dateDESC1').show();
+        $('#dateASC1').hide();
         var dateArray = $('.mid-report-section tbody').children('.scenariostatusreport');
         dateDESC(dateArray);
-        sortExecutions(dateArray);
+        sortExecutions('#dateDESC',dateArray);
         e.stopImmediatePropagation();
     });
     //Sort Date and time to descending order on click
     $(document).on('click', '#dateASC', function(e) {
         $(this).hide();
-        $('#dateDESC').show();
+        $('#dateDESC, #dateASC1').show();
+        $('#dateDESC1').hide();
         var dateArray = $('.mid-report-section tbody').children('.scenariostatusreport');
         dateASC(dateArray);
-        sortExecutions(dateArray);
+        sortExecutions('#dateDESC',dateArray);
         e.stopImmediatePropagation();
     });
 
@@ -915,23 +896,25 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     $(document).on('click', '#dateDESC1', function(e) {
         $(this).hide();
         var dateArray;
-        $('#dateASC1').show();
+        $('#dateASC1, #dateDESC').show();
+        $('#dateASC').hide();
         var dateArray = $('.mid-report-section tbody').children('.scenariostatusreport');
         dateDESC(dateArray);
-        sortExecutions1(dateArray);
+        sortExecutions('#dateDESC1',dateArray);
         e.stopImmediatePropagation();
     });
-    
     //Sort Date and time to descending order on click
     $(document).on('click', '#dateASC1', function(e) {
         $(this).hide();
-        $('#dateDESC1').show();
+        $('#dateDESC1, #dateASC').show();
+        $('#dateDESC').hide();
         var dateArray = $('.mid-report-section tbody').children('.scenariostatusreport');
         dateASC(dateArray);
-        sortExecutions1(dateArray);
+        sortExecutions('#dateDESC1',dateArray);
         e.stopImmediatePropagation();
     });
     
+
     //Sort Date and time to descending order
     function dateDESC(dateArray) {
         dateArray.sort(function(a, b) {
