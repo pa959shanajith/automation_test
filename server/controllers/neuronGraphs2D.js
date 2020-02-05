@@ -1,5 +1,5 @@
 var fs = require('fs');
-var neo4jAPI = require('../controllers/neo4jAPI');
+// var neo4jAPI = require('../controllers/neo4jAPI');
 var logger = require('../../logger');
 var Client = require("node-rest-client").Client;
 var client = new Client();
@@ -70,22 +70,37 @@ exports.getGraphData = function(req, res){
 			var userid=req.body.uid;
 			//'686d69a5-b519-4b4f-a813-8299235a2e97';'9c017f14-5a1c-4f2f-85a9-52728c86684c';
 			//qList.push({"statement":"MATCH(a:ICEPERMISSIONS_NG{userid:'"+userid+"'})-[r1]->(b:DOMAINS_NG) WITH b as d MATCH path=(d)-[r*1..]->(x) RETURN path","resultDataContents":["graph"]});
-			qList.push({"statement":"MATCH(a:ICEPERMISSIONS_NG{userid:'"+userid+"'})-[r1]->(d:DOMAINS_NG) WITH a.projectids as pids,d as d MATCH (p:PROJECTS_NG) WHERE p.projectid in pids WITH p as p,d as d MATCH path=(d)-[r2]->(p)-[r3*1..]->(x) RETURN path","resultDataContents":["graph"]});
+			// qList.push({"statement":"MATCH(a:ICEPERMISSIONS_NG{userid:'"+userid+"'})-[r1]->(d:DOMAINS_NG) WITH a.projectids as pids,d as d MATCH (p:PROJECTS_NG) WHERE p.projectid in pids WITH p as p,d as d MATCH path=(d)-[r2]->(p)-[r3*1..]->(x) RETURN path","resultDataContents":["graph"]});
 			//console.log('qList::::', qList);
-			neo4jAPI.executeQueries(qList,function(status,result){
-				res.setHeader('Content-Type', 'application/json');
-				if(status!=200){
+			var inputs={
+				"projectid":""
+			}
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			client.post(epurl + "/neurongraphs/getData", args,
+				function (result, response) {
+			// neo4jAPI.executeQueries(qList,function(status,result){
+			// 	res.setHeader('Content-Type', 'application/json');
+				if(response.statusCode != 200 || result.rows == "fail"){
 					//console.log("Status:",status,"\nResponse: ",result);
-					res.status(status).send("Error connecting to neo4j!");
+					res.status(response.statusCode).send("Error connecting to neo4j!");
 				}
 				else{
-					var jsonData=result;
-					var pData=parseData(jsonData[0].data);
-					if(pData.nodes.length==0) res.status(status).send({"err":true,"ecode":"DB_NOT_FOUND","msg":"Neuron Graphs DB not found!"});
+					// var jsonData=result;
+					// var pData=parseData(result);
+					// var pData=result
+					if(result.nodes.length==0) res.status(response.statusCode).send({"err":true,"ecode":"DB_NOT_FOUND","msg":"Neuron Graphs DB not found!"});
 					else{
-						var cData=cleanData(pData.nodes);
-						pData.err=false;
-						res.status(status).send(pData);
+						var rootIndex=0;
+						var nodeTypes={"DOMAINS_NG":"Domain","PROJECTS_NG":"Project","RELEASES_NG":"Release","CYCLES_NG":"Cycle","TESTSUITES_NG":"TestSuite","TESTSCENARIOS_NG":"TestScenario","TESTCASES_NG":"TestCase","SCREENS_NG":"Screen"};
+						// var cData=cleanData(pData.nodes);
+						// pData.err=false;
+						pData={"nodes":result.nodes,"links":result.links,"type":nodeTypes,"root":rootIndex};
+						res.status(response.statusCode).send(pData);
 					}
 				}
 			});
