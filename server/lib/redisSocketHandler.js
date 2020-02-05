@@ -144,11 +144,15 @@ module.exports.initListeners = mySocket => {
 		const pcktId = fullPcktId.split('_')[0];
 		const index = fullPcktId.split('_')[1];
 		mySocket.emit("data_ack", fullPcktId);
-		if (mySocket.pckts.indexOf(pcktId) !== -1) return null;
-		if (index === undefined) {
+		if (mySocket.pckts.indexOf(pcktId) !== -1) { // Check if packet has already been consumed by server
+			if (index == 'eof') mySocket.emit("data_ack", pcktId); // If this was EOF packet, send 2nd ACK
+			return null;  // Do nothing as packet has already been consumed
+		}
+		if (index === undefined) {  // Normal packet
 			mySocket.pckts.push(pcktId);
 			return cb();
 		}
+		/* Paginated packets processing starts */
 		const data = args[1];
 		const ev_data = mySocket.evdata[ev];
 		const comps = data.split(';');
@@ -169,7 +173,6 @@ module.exports.initListeners = mySocket => {
 				} else {
 					mySocket.pckts.push(pcktId);
 					mySocket.emit("data_ack", pcktId);
-					delete args[1];
 					args[1] = ev_data.jsonify? JSON.parse(fpayload):fpayload;
 					delete mySocket.evdata[ev]
 					cb();
