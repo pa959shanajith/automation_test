@@ -3103,10 +3103,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					d.css('height', (rect.h * scale_highlight) + 'px');
 					d.css('width', (rect.w * scale_highlight) + 'px');
 				} else if (navigator.appVersion.indexOf("Mac") != -1) {
-					d.css('left', (rect.x * scale_highlight) + 'px');
-					d.css('top', (rect.y * scale_highlight) + 'px');
-					d.css('height', (rect.h * scale_highlight) + 'px');
-					d.css('width', (rect.w * scale_highlight) + 'px');
+					d.css('left', (rect.x * (1/scale_highlight)) + 'px');
+					d.css('top', (rect.y * (1/scale_highlight)) + 'px');
+					d.css('height', (rect.h * (1/scale_highlight)) + 'px');
+					d.css('width', (rect.w * (1/scale_highlight)) + 'px');
 				}
 			} else if (appType == "MobileWeb") {
 				if (navigator.appVersion.indexOf("Mac") != -1) {
