@@ -4420,8 +4420,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 	//save button clicked - save the testcase steps
 	$scope.updateTestCase_ICE = function (e) {
-		var task = JSON.parse(window.localStorage['_CT']);
-		console.log(e);
+		var task = JSON.parse(window.localStorage['_CT'])
 		if (task.reuse == 'True') {
 			//$("#reUsedTestcaseModal").find('.modal-title').text("");
 			$("#reUsedTestcaseModal").find('.modal-body p').text("Testcase is been reused. Are you sure you want to save ?").css('color', 'black');
@@ -4430,8 +4429,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		}
 		updateTestCase(e);
 	};
-
-
 	
 	$scope.saveTestcase = function (e) {
 		$("#reUsedTestcaseModal").modal("hide");
@@ -7014,7 +7011,6 @@ function editTestCaseRow(e) {
 			editable: false
 		});
 		$("#jqGrid").resetSelection();
-		
 		$("#jqGrid").trigger("reloadGrid");
 		$("#jqGrid tr").each(function () {
 			$(this).attr("id", $(this).index());
@@ -7685,6 +7681,6 @@ function openModalFormDialog(title, body) {
 function updateColumnStyle(){
 	var gridInnerElement =  $("#jqGrid").find("td[aria-describedby=jqGrid_inputVal]:visible").find('input').prevObject;
 	for(var i = 0; i < gridInnerElement.length ; i++){
-	gridInnerElement[i].style.whiteSpace = 'pre-wrap';
+		gridInnerElement[i].style.whiteSpace = 'pre-wrap';
 	}	
 }
