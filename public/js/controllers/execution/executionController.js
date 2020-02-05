@@ -726,6 +726,10 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					openDialogExe("Execute Test Suite", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
 				else if(data == "NotApproved")
 					openDialogExe("Execute Test Suite", "All the dependent tasks (design, scrape) needs to be approved before execution");
+				else if(data == "NoTask")
+					openDialogExe("Execute Test Suite", "Task doesnot exist for child node");
+				else if(data == "Modified")
+					openDialogExe("Execute Test Suite", "Task has been modified, Please approve the task");
 				$(".selectBrowser").find("img").removeClass("sb");
 				$(".selectParallel").find("img").removeClass("sb");
 				browserTypeExe = [];
