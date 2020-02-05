@@ -31,7 +31,8 @@
 						</div>
 						<div class="input-group">
 							<span class="input-group-addon ic-password"><img src="imgs/ic-password.png" /></span>
-							<input ng-model="ud.password" type="password" class="form-control" name="password" placeholder="Password" autocomplete="off">
+							<input ng-model="ud.password" id="eye" type="{{inputType}}" class="form-control" name="password" placeholder="Password" autocomplete="off">
+							<span class="{{showHideClass}}  input-group-addon ic-password "  style="color:#a0a0a0" ng-click="showPassword()"> </span>
 						</div>
 						<span ng-show="loginValidation" class="absoluteError errorMessages">{{loginValidation}}</span>
 						<button ng-click="check_credentials('/plugin', $event)" type="submit" class="btn btn-block">Login</button>
