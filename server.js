@@ -557,8 +557,6 @@ if (cluster.isMaster) {
 		app.post('/openScreenShot', report.openScreenShot);
 		app.post('/connectJira_ICE', report.connectJira_ICE);
 		app.post('/getReportsData_ICE', report.getReportsData_ICE);
-		app.post('/getWebocularData_ICE', report.getWebocularData_ICE);
-		app.post('/getWebocularModule_ICE', report.getWebocularModule_ICE);
 		//Plugin Routes
 		app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
 		app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
