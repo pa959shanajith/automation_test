@@ -454,7 +454,7 @@ if (cluster.isMaster) {
 		var qc = require('./server/controllers/qualityCenter');
 		var webocular = require('./server/controllers/webocular');
 		var chatbot = require('./server/controllers/chatbot');
-		//var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
+		var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
 		var taskbuilder = require('./server/controllers/taskJson');
 		var flowGraph = require('./server/controllers/flowGraph');
 
@@ -557,8 +557,6 @@ if (cluster.isMaster) {
 		app.post('/openScreenShot', report.openScreenShot);
 		app.post('/connectJira_ICE', report.connectJira_ICE);
 		app.post('/getReportsData_ICE', report.getReportsData_ICE);
-		app.post('/getWebocularData_ICE', report.getWebocularData_ICE);
-		app.post('/getWebocularModule_ICE', report.getWebocularModule_ICE);
 		//Plugin Routes
 		app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
 		app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
@@ -572,7 +570,7 @@ if (cluster.isMaster) {
 		app.post('/getTopMatches_ProfJ', chatbot.getTopMatches_ProfJ);
 		app.post('/updateFrequency_ProfJ', chatbot.updateFrequency_ProfJ);
 		//NeuronGraphs Plugin Routes
-		//app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
+		app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
 		//QC Plugin
 		app.post('/loginQCServer_ICE', qc.loginQCServer_ICE);
 		app.post('/qcProjectDetails_ICE', qc.qcProjectDetails_ICE);

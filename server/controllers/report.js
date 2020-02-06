@@ -1,6 +1,3 @@
-/**
- * Dependencies.
- */
 var async = require('async');
 var myserver = require('../lib/socket');
 var Client = require("node-rest-client").Client;
@@ -13,8 +10,9 @@ var utils = require('../lib/utils');
 var Handlebars = require('../lib/handlebar.js');
 var wkhtmltopdf = require('wkhtmltopdf');
 var fs = require('fs');
-wkhtmltopdf.command = process.cwd() + "\\assets\\wkhtmltox\\bin\\wkhtmltopdf.exe"
-var reportpath = "../../assets/templates";
+const Readable = require('stream').Readable;
+var path = require('path');
+wkhtmltopdf.command = path.join(__dirname, '..', '..', 'assets', 'wkhtmltox', 'bin', 'wkhtmltopdf'+(process.platform == "win32")? '.exe':'');
 var templatepdf = '';
 var templateweb = '';
 
@@ -81,27 +79,30 @@ function openScreenShot(req, path, cb) {
                     "path": path
                 };
                 redisServer.redisPubICE.publish('ICE1_normal_' + name, JSON.stringify(dataToIce));
-
+                var scrShotData = [];
                 function render_screenshot_listener(channel, message) {
                     var data = JSON.parse(message);
                     if (name == data.username) {
-						redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
+                        var resultData = data.value;
                         if (data.onAction == "unavailableLocalServer") {
+                            redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
                             logger.error("Error occurred in openScreenShot: Socket Disconnected");
                             if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
                                 var soc = myserver.socketMapNotify[name];
                                 soc.emit("ICEnotAvailable");
                                 cb('unavailableLocalServer');
                             }
-                        } else if (data.onAction == "render_screenshot") {
-                            var resultData = data.value;
+                        } else if (data.onAction == "render_screenshot_finished") {
+                            redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
                             if (resultData === "fail") {
                                 logger.error('Screenshot status: ', resultData);
                                 cb('fail');
                             } else {
                                 logger.debug("Screenshots processed successfully");
-                                cb(null, resultData);
+                                cb(null, scrShotData);
                             }
+                        } else if (data.onAction == "render_screenshot") {
+                            scrShotData = scrShotData.concat(resultData);
                         }
                     }
                 }
@@ -149,7 +150,7 @@ exports.renderReport_ICE = function(req, res) {
                 "remarksLength": finalReports.remarksLength.length,
                 'commentsLength': finalReports.commentsLength.length
             };
-            //PDF Reports		    
+            //PDF Reports
             if (reportType != "html") {
                 var scrShot = req.body.absPath;
                 openScreenShot(req, scrShot.paths, function(err, dataURIs) {
@@ -162,19 +163,21 @@ exports.renderReport_ICE = function(req, res) {
                             data.rows[scrShot.idx[i]].screenshot_dataURI = d;
                         });
                     }
-					try {
-						var pdf = templatepdf(data);
-						wkhtmltopdf(pdf).pipe(res);
-					} catch (exception) {
-						var emsg = exception.message;
-						var flag = "fail";
-						if ((exception instanceof RangeError) && emsg === "Invalid string length") {
-							emsg = "Report Size too large";
-							flag = "limitExceeded";
-						}
-						logger.error("Exception occurred in renderReport_ICE when trying to render report: %s", emsg);
-						return res.send(flag);
-					}
+                    try {
+                        const pdf = new Readable({read: ()=>{}});
+                        pdf.push(templatepdf(data));
+                        pdf.push(null);
+                        wkhtmltopdf(pdf).pipe(res);
+                    } catch (exception) {
+                        var emsg = exception.message;
+                        var flag = "fail";
+                        if ((exception instanceof RangeError) && emsg === "Invalid string length") {
+                            emsg = "Report Size too large";
+                            flag = "limitExceeded";
+                        }
+                        logger.error("Exception occurred in renderReport_ICE when trying to render report: %s", emsg);
+                        return res.send(flag);
+                    }
                 });
             }
             //HTML Reports
@@ -292,9 +295,12 @@ exports.getSuiteDetailsInExecution_ICE = function(req, res) {
                         } else {
                             for (var i = 0; i < executionData.rows.length; i++) {
                                 startTime = new Date(executionData.rows[i].starttime);
-                                endTime = new Date(executionData.rows[i].endtime);
                                 starttime = startTime.getUTCDate() + "-" + (startTime.getUTCMonth() + 1) + "-" + startTime.getUTCFullYear() + " " + startTime.getUTCHours() + ":" + startTime.getUTCMinutes();
-                                endtime = endTime.getUTCDate() + "-" + (endTime.getUTCMonth() + 1) + "-" + endTime.getUTCFullYear() + " " + (endTime.getUTCHours()) + ":" + (+endTime.getUTCMinutes());
+                                if (executionData.rows[i].endtime === null) endtime = '-';
+                                else {
+                                    endTime = new Date(executionData.rows[i].endtime);
+                                    endtime = endTime.getUTCDate() + "-" + (endTime.getUTCMonth() + 1) + "-" + endTime.getUTCFullYear() + " " + (endTime.getUTCHours()) + ":" + (+endTime.getUTCMinutes());
+                                }
                                 executionDetailsJSON.push({
                                     execution_id: executionData.rows[i]._id,
                                     start_time: starttime,
@@ -451,7 +457,7 @@ exports.getReport_Nineteen68 = function(req, res) {
             var reportInfoObj = {};
             var reportjson = {};
             var flag = "";
-			var finalReport = [];
+            var finalReport = [];
             var inputs = {
                 "query": "projectsUnderDomain",
                 "reportid": reportId
@@ -704,61 +710,6 @@ exports.getReportsData_ICE = function(req, res) {
                 });
         }
     } catch (exception) {
-        logger.error(exception.message);
-        res.status(500).send("fail");
-    }
-};
-
-//Fetch all webocular modules
-exports.getWebocularModule_ICE = function(req, res) {
-    try {
-        
-        var inputs = {
-            "query": "moduledata"
-        };
-        var args = {
-            data: inputs,
-            headers: {
-                "Content-Type": "application/json"
-            }
-        };
-        client.post(epurl + "reports/getWebocularData_ICE", args,
-                function(result1, response1) {
-                    if (response1.statusCode != 200 || result1.rows == "fail") {
-                        logger.error("Error occurred in reports/getWebocularData_ICE: getAllModules from getAllSuites_ICE Error Code : ERRNDAC");
-                        res.send("fail");
-                    } else {
-                        res.send(result1);
-                    }
-                });
-    }catch (exception) {
-        logger.error(exception.message);
-        res.status(500).send("fail");
-    }
-};
-
-exports.getWebocularData_ICE = function(req, res) {
-    try {
-        var inputs = {
-            "query": "reportdata",
-            "id": req.body.getWebocularInputData
-        };
-        var args = {
-            data: inputs,
-            headers: {
-                "Content-Type": "application/json"
-            }
-        };
-        client.post(epurl + "reports/getWebocularData_ICE", args,
-                function(result1, response1) {
-                    if (response1.statusCode != 200 || result1.rows == "fail") {
-                        logger.error("Error occurred in reports/getWebocularData_ICE: getAllModules from getAllSuites_ICE Error Code : ERRNDAC");
-                        res.send("fail");
-                    } else {
-                        res.send(result1);
-                    }
-                });
-    }catch (exception) {
         logger.error(exception.message);
         res.status(500).send("fail");
     }

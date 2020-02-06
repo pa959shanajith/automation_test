@@ -316,7 +316,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
             }
             loadMindmapData1_W();
-            return;
         }
         //Mindmap clear search box on selecting different project
         dNodes_c = [] //Copied data should be cleared

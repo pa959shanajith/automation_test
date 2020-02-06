@@ -371,6 +371,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									contentTable(data2.view);
 									$('.cbox').prop('disabled', false);
 									$('.cbox').parent().removeClass('disable_a_href');
+									updateColumnStyle();
+									$("#jqGrid").focusout(()=>{
+										updateColumnStyle();
+									})
 									return;
 								} else {
 									var testcase = data.testcase;//JSON.parse(data.testcase);
@@ -400,6 +404,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									contentTable(data2.view);
 									$('.cbox').prop('disabled', false);
 									$('.cbox').parent().removeClass('disable_a_href');
+									updateColumnStyle();
+									$("#jqGrid").focusout(()=>{
+										updateColumnStyle();	
+									});				
 									return;
 								}
 							},
@@ -3103,10 +3111,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					d.css('height', (rect.h * scale_highlight) + 'px');
 					d.css('width', (rect.w * scale_highlight) + 'px');
 				} else if (navigator.appVersion.indexOf("Mac") != -1) {
-					d.css('left', (rect.x * scale_highlight) + 'px');
-					d.css('top', (rect.y * scale_highlight) + 'px');
-					d.css('height', (rect.h * scale_highlight) + 'px');
-					d.css('width', (rect.w * scale_highlight) + 'px');
+					d.css('left', (rect.x * (1/scale_highlight)) + 'px');
+					d.css('top', (rect.y * (1/scale_highlight)) + 'px');
+					d.css('height', (rect.h * (1/scale_highlight)) + 'px');
+					d.css('width', (rect.w * (1/scale_highlight)) + 'px');
 				}
 			} else if (appType == "MobileWeb") {
 				if (navigator.appVersion.indexOf("Mac") != -1) {
@@ -4421,7 +4429,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		}
 		updateTestCase(e);
 	};
-
+	
 	$scope.saveTestcase = function (e) {
 		$("#reUsedTestcaseModal").modal("hide");
 		noSaveTestcase = "false";
@@ -6432,6 +6440,15 @@ function contentTable(newTestScriptDataLS) {
 						} else if (obType == 'tree') {
 							sc = Object.keys(keywordArrayList.tree);
 							selectedKeywordList = "tree";
+						} else if (obType == 'calendar') {
+							sc = Object.keys(keywordArrayList.calendar);
+							selectedKeywordList = "calendar";
+						} else if (obType == 'gridview') {
+							sc = Object.keys(keywordArrayList.gridview);
+							selectedKeywordList = "gridview";
+						} else if (obType == 'toolbar') {
+							sc = Object.keys(keywordArrayList.toolbar);
+							selectedKeywordList = "toolbar";
 						} else if (obType == 'list_item' || obType == 'list') {
 							if (listType == 'true') {
 								sc = Object.keys(keywordArrayList.list);
@@ -7668,4 +7685,11 @@ function openModalFormDialog(title, body) {
 	setTimeout(function () {
 		$("#globalModalForm").find('.btn-default').focus();
 	}, 300);
+}
+
+function updateColumnStyle(){
+	var gridInnerElement =  $("#jqGrid").find("td[aria-describedby=jqGrid_inputVal]:visible").find('input').prevObject;
+	for(var i = 0; i < gridInnerElement.length ; i++){
+		gridInnerElement[i].style.whiteSpace = 'pre-wrap';
+	}	
 }

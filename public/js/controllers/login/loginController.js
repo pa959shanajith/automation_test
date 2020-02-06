@@ -2,10 +2,28 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 	$(".ic-username, .ic-password").parent().removeClass("input-border-error");
 	$scope.loginValidation = "";
 	$scope.ud = {};
+	$scope.inputType='password';
+    $scope.showHideClass='glyphicon glyphicon-eye-open';
 	$scope.serverList = [{"name": "License Server", "active": false}, {"name": "NDAC Server", "active": false}, {"name": "Web Server", "active": false}];
 	$scope.restartForm = false;
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear();
 
+    
+
+    $scope.showPassword=function() {
+		if($scope.ud.password != null){
+			if($scope.inputType=='password') {
+				$scope.inputType='text';
+				$scope.showHideClass='glyphicon glyphicon-eye-close';
+			} else {
+				$scope.inputType='password';
+				$scope.showHideClass='glyphicon glyphicon-eye-open';
+			}
+		}
+	}
+   
+    
+	
 	$scope.check_credentials = function (path, $event) {
 		cfpLoadingBar.start();
 		$scope.loginValidation = "";
@@ -24,6 +42,10 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 			$(".ic-password").parent().addClass("input-border-error");
 			$scope.loginValidation = "Please Enter Password";
 			cfpLoadingBar.complete();
+			
+
+			
+			
 		} else {
 			var username = $scope.ud.userName.toLowerCase();
 			var password = $scope.ud.password;
@@ -93,6 +115,8 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 			openModalPopup("Restart Service", errmsg);
 		});
 	};
+	
+
 
 	function openModalPopup(title, body){
 		var mainModal = $("#popupModal");
@@ -103,4 +127,6 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 			$("#popupModal").find('.btn-default').focus();
 		}, 300);
 	}
+
 });
+

@@ -494,13 +494,16 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			startDate: new Date()
 		}).on('hide.datepicker', function(e){
 			if($(this).val().length > 0){
-				$(this).parent().siblings('span').find('.fc-timePicker').prop('disabled',false).css('background-color','white');
+				$(this).parent().siblings('.timePicContainer').find('.fc-timePicker').timepicker({
+					minTime: new Date().getHours() + ':' + (parseInt(new Date().getMinutes()+5)),
+					minuteStep: 1,
+					showMeridian: false
+				})
+				$(this).parent().siblings('span').find('.fc-timePicker').prop('disabled',false).css({'cursor':'pointer', 'background-color':'white'});
 			}
-			$(this).parent().siblings('.timePicContainer').find('.fc-timePicker').timepicker({
-				minTime: new Date().getHours() + ':' + (parseInt(new Date().getMinutes()+5)),
-				minuteStep: 1,
-				showMeridian: false
-			})
+			else{
+				$(this).parent().siblings('span').find('.fc-timePicker').prop('disabled',true).css('cursor','not-allowed');
+			}
 		})
 	})
 	$(document).on('focus', '.fc-timePicker', function(){
