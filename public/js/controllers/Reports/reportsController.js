@@ -795,7 +795,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                 var getDat = getTym.split(" ")[0].split("-");
                                 finalReports.overallstatus[0].date = getDat[1] + "/" + getDat[2] + "/" + getDat[0];
                                 finalReports.overallstatus[0].time = getTym.split(" ")[1];
-                                finalReports.overallstatus[0].overAllStatus = obj2.overallstatus[j].overallstatus;
+                                finalReports.overallstatus[0].overAllStatus = obj2.overallstatus[j].overAllStatus;
                                 elapTym = (obj2.overallstatus[j].EllapsedTime.split(".")[0]).split(":");
                                 finalReports.overallstatus[0].EllapsedTime = "~" + ("0" + elapTym[0]).slice(-2) + ":" + ("0" + elapTym[1]).slice(-2) + ":" + ("0" + elapTym[2]).slice(-2)
                             }
