@@ -566,7 +566,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 						"webservice":{"data":"Webservice","title":"Web Service","img":"webservice"},
 						"mainframe":{"data":"Mainframe","title":"Mainframe","img":"mainframe"},
 						"desktop":{"data":"Desktop","title":"Desktop Apps","img":"desktop"},
-						"oebs":{"data":"DesktopJava","title":"Oracle Apps","img":"oracleApps"},
+						"oebs":{"data":"OEBS","title":"Oracle Apps","img":"oracleApps"},
 						"mobileapp":{"data":"MobileApp","title":"Mobile Apps","img":"mobileApps"},
 						"mobileweb":{"data":"MobileWeb","title":"Mobile Web","img":"mobileWeb"},
 						"sap":{"data":"SAP","title":"SAP Apps","img":"sapApps"},
@@ -1752,7 +1752,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 							"webservice":{"data":"Webservice","title":"Web Service","img":"webservice"},
 							"mainframe":{"data":"Mainframe","title":"Mainframe","img":"mainframe"},
 							"desktop":{"data":"Desktop","title":"Desktop Apps","img":"desktop"},
-							"oebs":{"data":"DesktopJava","title":"Oracle Apps","img":"oracleApps"},
+							"oebs":{"data":"OEBS","title":"Oracle Apps","img":"oracleApps"},
 							"mobileapp":{"data":"MobileApp","title":"Mobile Apps","img":"mobileApps"},
 							"mobileweb":{"data":"MobileWeb","title":"Mobile Web","img":"mobileWeb"},
 							"sap":{"data":"SAP","title":"SAP Apps","img":"sapApps"},
@@ -1835,9 +1835,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
 					$(".projectTypes[data-app='Desktop'],.projectTypes_create[data-app='Desktop']").addClass("projectTypeSelected");
 					break;
-				case "DesktopJava":
+				case "OEBS":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
-					$(".projectTypes[data-app='DesktopJava'],.projectTypes_create[data-app='DesktopJava']").addClass("projectTypeSelected");
+					$(".projectTypes[data-app='OEBS'],.projectTypes_create[data-app='OEBS']").addClass("projectTypeSelected");
 					break;
 				case "MobileApp":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");

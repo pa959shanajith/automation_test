@@ -1050,7 +1050,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				$(document).find("#desktopPath").val('')
 				$(document).find('#app_pid').val('');
 				$(document).find("#desktopPath").removeClass("inputErrorBorder");
-			} else if ($scope.getScreenView == "DesktopJava") {
+			} else if ($scope.getScreenView == "OEBS") {
 				$("#launchOEBSApps").modal("show");
 				$(document).find("#OEBSPath").val('');
 				$(document).find("#OEBSPath").removeClass("inputErrorBorder");
@@ -1815,7 +1815,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			//For Mobility Web
 
 			//For OEBS
-			else if ($scope.getScreenView == "DesktopJava") {
+			else if ($scope.getScreenView == "OEBS") {
 				if ($(document).find("#OEBSPath").val() == "" && browserType != 'pdf' ) {
 					$(document).find("#OEBSPath").addClass("inputErrorBorder")
 					return false
@@ -2088,7 +2088,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								var path = newScrapedList.view[i].xpath;
 								var ob = newScrapedList.view[i];
 								ob.tempId = i;
-								if (appType == "DesktopJava" || appType == "Desktop") {
+								if (appType == "OEBS" || appType == "Desktop") {
 									custN = ob.custname.replace('/\s/g', ' ').replace('\n', ' ').replace(/[<>]/g, '');
 								}
 								else {
@@ -2114,7 +2114,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								// } else {
 								// }
 								// }								
-								if (appType == "DesktopJava" || appType == "Desktop") {
+								if (appType == "OEBS" || appType == "Desktop") {
 									var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 								}
 								else {
@@ -2176,7 +2176,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									tempId++
 									var path = viewString.view[i].xpath;
 									var ob = viewString.view[i];
-									if (appType == "DesktopJava" || appType == "Desktop") {
+									if (appType == "OEBS" || appType == "Desktop") {
 										var custN = ob.custname.replace('/\s/g', ' ').replace('\n', ' ').replace(/[<>]/g, '');
 									}
 									else {
@@ -2199,7 +2199,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 										ob.url = "",
 										ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
 									}
-									if (appType == "DesktopJava" || appType == "Desktop") {
+									if (appType == "OEBS" || appType == "Desktop") {
 										var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 									}
 									else {
@@ -2237,7 +2237,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								var path = viewString.view[i].xpath;
 								var ob = viewString.view[i];
 								ob.tempId = i;
-								if (appType == "DesktopJava" || appType == "Desktop") {
+								if (appType == "OEBS" || appType == "Desktop") {
 									var custN = ob.custname.replace('/\s/g', ' ').replace('\n', ' ').replace(/[<>]/g, '');
 								}
 								else {
@@ -2261,7 +2261,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								}
 								// }
 								// }
-								if (appType == "DesktopJava" || appType == "Desktop") {
+								if (appType == "OEBS" || appType == "Desktop") {
 									var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 								}
 								else {
@@ -2898,7 +2898,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 /*	
 						$.each($("input[type=checkbox].checkall:checked"), function () {
 							for (var i = 0; i < newScrapedList.view.length; i++) {
-								if (appType == 'DesktopJava'|| appType == 'Desktop' || appType == 'MobileApp') {
+								if (appType == 'OEBS'|| appType == 'Desktop' || appType == 'MobileApp') {
 									if ($(this).parents("li").data("xpath").replace(/[\"]/g, "\'") == newScrapedList.view[i].xpath.replace(/\n/g," ") && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim()).replace(/[<>]/g, '').replace('\n', ' ') == newScrapedList.view[i].custname.trim().replace(/[<>]/g, '').replace('/\s/g', ' ').replace(/  +/g, ' ').replace('\n', ' ')) {
 										if (!(isInArray(newScrapedList.view.indexOf(newScrapedList.view[i]), getIndexOfDeletedObjects))) {
 											getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
@@ -2923,7 +2923,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						if ($("input[type=checkbox].checkall:checked").length != dontChkViewString) {
 							$.each($("input[type=checkbox].checkall:checked"), function () {
 								for (var i = 0; i < viewString.view.length; i++) {
-									if (appType == 'DesktopJava' || appType == 'MobileApp') {
+									if (appType == 'OEBS' || appType == 'MobileApp') {
 										if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ').replace(/[<>]/g, '') == viewString.view[i].custname.trim().replace(/[<>]/g, '').replace('/\s/g', ' ').replace(/  +/g, ' ').replace('\n', ' ')) {
 											if (!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))) {
 												getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
@@ -5841,7 +5841,7 @@ function contentTable(newTestScriptDataLS) {
 			if (appTypeLocal == 'Desktop') {
 				sc = Object.keys(keywordArrayList.customDp);
 				selectedKeywordList = "customDp";
-			} else if (appTypeLocal == 'DesktopJava') {
+			} else if (appTypeLocal == 'OEBS') {
 				sc = Object.keys(keywordArrayList.customOEBS);
 				selectedKeywordList = "customOEBS";
 				var newTSDataLS = angular.element(document.getElementById('jqGrid')).scope().newTestScriptDataLS;
@@ -6589,7 +6589,7 @@ function contentTable(newTestScriptDataLS) {
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
-					} else if (appTypeLocal == 'DesktopJava' && (obType == 'push button' || obType == 'text' || obType == 'combo box' || obType == 'list item' || obType == 'hyperlink' || obType == 'label' || obType == 'scroll bar' || obType == 'toggle button' || obType == 'menu' ||
+					} else if (appTypeLocal == 'OEBS' && (obType == 'push button' || obType == 'text' || obType == 'combo box' || obType == 'list item' || obType == 'hyperlink' || obType == 'label' || obType == 'scroll bar' || obType == 'toggle button' || obType == 'menu' ||
 						obType == 'list' || obType == 'edit' || obType == 'Edit Box' || obType == null || obType == 'Static' || obType == 'check box' || obType == 'radio button' || obType == 'panel' || obType != undefined || obType == 'table') || obType == 'password text') {
 						var sc;
 						if (obType == 'push button' || obType == 'toggle button') {
@@ -7162,7 +7162,7 @@ function pasteTestStep(e) {
 		if (window.localStorage['anotherScriptId'] != JSON.parse(window.localStorage['_CT']).testCaseId) {
 			var flg = true;
 			for (var i = 0; i < getRowJsonToPaste.length; i++) {
-				if (getRowJsonToPaste[i].appType == "Web" || getRowJsonToPaste[i].appType == "Desktop" || getRowJsonToPaste[i].appType == "Mainframe" || getRowJsonToPaste[i].appType == "DesktopJava" || getRowJsonToPaste[i].appType == "MobileApp" || getRowJsonToPaste[i].appType == "MobileWeb" || getRowJsonToPaste[i].appType == "MobileApp" || getRowJsonToPaste[i].appType == "SAP") {
+				if (getRowJsonToPaste[i].appType == "Web" || getRowJsonToPaste[i].appType == "Desktop" || getRowJsonToPaste[i].appType == "Mainframe" || getRowJsonToPaste[i].appType == "OEBS" || getRowJsonToPaste[i].appType == "MobileApp" || getRowJsonToPaste[i].appType == "MobileWeb" || getRowJsonToPaste[i].appType == "MobileApp" || getRowJsonToPaste[i].appType == "SAP") {
 					flg = false;
 					break;
 				}
@@ -7555,7 +7555,7 @@ function getTags(data) {
 		obnames = ["@Generic", "@Excel", "Mainframe List", "@Word"];
 	} else if (appTypeLocal == "Desktop") {
 		obnames = ["@Generic", "@Excel", "@Window", "@Custom", "@Email", "@Word"];
-	} else if (appTypeLocal == "DesktopJava") {
+	} else if (appTypeLocal == "OEBS") {
 		obnames = ["@Generic", "@Excel", "@Oebs", "@Custom", "@Word"];
 	} else if (appTypeLocal == "MobileApp" && navigator.appVersion.indexOf("Mac") == -1) {
 		obnames = ["@Generic", "@Mobile", "@Android_Custom", "@Action"];

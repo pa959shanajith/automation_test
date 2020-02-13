@@ -696,7 +696,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			openDialogExe("Execute Test Suite", "Please select Desktop Apps option");
 		else if (appType == "Mainframe" && browserTypeExe.length === 0)
 			openDialogExe("Execute Test Suite", "Please select Mainframe option");
-		else if (appType == "DesktopJava" && browserTypeExe.length === 0)
+		else if (appType == "OEBS" && browserTypeExe.length === 0)
 			openDialogExe("Execute Test Suite", "Please select OEBS Apps option");
 		else if (appType == "SAP" && browserTypeExe.length === 0)
 			openDialogExe("Execute Test Suite", "Please select SAP Apps option");
