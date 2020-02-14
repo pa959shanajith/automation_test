@@ -12,7 +12,7 @@ var wkhtmltopdf = require('wkhtmltopdf');
 var fs = require('fs');
 const Readable = require('stream').Readable;
 var path = require('path');
-wkhtmltopdf.command = path.join(__dirname, '..', '..', 'assets', 'wkhtmltox', 'bin', 'wkhtmltopdf'+(process.platform == "win32")? '.exe':'');
+wkhtmltopdf.command = path.join(__dirname, '..', '..', 'assets', 'wkhtmltox', 'bin', 'wkhtmltopdf'+((process.platform == "win32")? '.exe':''));
 var templatepdf = '';
 var templateweb = '';
 

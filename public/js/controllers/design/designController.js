@@ -6491,14 +6491,14 @@ function contentTable(newTestScriptDataLS) {
 					} else if (appTypeLocal == 'MobileApp' &&
 						(obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0 ||
 							obType.indexOf("Switch") >= 0 || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0 ||
-							obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("iOSEditText") >= 0 ||
+							obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("TextField") >= 0 ||
 							obType.indexOf("PickerWheel") >= 0 || obType.indexOf("Slider") >= 0 || obType.indexOf("SearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >= 0 || obType.indexOf("SecureTextField") >= 0)) {
 						var res = '';
 						var sc;
 						if (obType.indexOf("RadioButton") >= 0) {
 							sc = Object.keys(keywordArrayList.radiobutton);
 							selectedKeywordList = "radiobutton";
-						} else if (obType.indexOf("iOSEditText") >= 0 || obType.indexOf("SearchField") >= 0 || obType.indexOf("SecureTextField") >= 0){
+						} else if (obType.indexOf("TextField") >= 0 || obType.indexOf("SearchField") >= 0 || obType.indexOf("SecureTextField") >= 0){
 							sc = Object.keys(keywordArrayList.inputIos);
 							selectedKeywordList = "inputIos";
 						} else if (obType.indexOf("EditText") >= 0) {
