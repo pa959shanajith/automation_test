@@ -732,6 +732,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					openDialogExe("Execute Test Suite", "Task has been modified, Please approve the task");
 				$(".selectBrowser").find("img").removeClass("sb");
 				$(".selectParallel").find("img").removeClass("sb");
+				$(".selectBrowser").find("svg").removeClass("sb");
+				$(".selectParallel").find("svg").removeClass("sb");
 				browserTypeExe = [];
 				$scope.moduleInfo = [];
 				$scope.readTestSuite_ICE();
@@ -751,6 +753,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				//$('#executionFailed').modal('show');
 				$(".selectBrowser").find("img").removeClass("sb");
 				$(".selectParallel").find("img").removeClass("sb");
+				$(".selectBrowser").find("svg").removeClass("sb");
+				$(".selectParallel").find("svg").removeClass("sb");
 				browserTypeExe = [];
 				$scope.moduleInfo = [];
 				$scope.readTestSuite_ICE();
@@ -777,6 +781,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		$rootScope.resetSession.end();
 		$(".selectBrowser").find("img").removeClass("sb");
 		$(".selectParallel").find("img").removeClass("sb");
+		$(".selectBrowser").find("svg").removeClass("sb");
+		$(".selectParallel").find("svg").removeClass("sb");
 		browserTypeExe = [];
 		$scope.moduleInfo = [];
 		$scope.readTestSuite_ICE();
