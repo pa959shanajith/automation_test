@@ -1910,7 +1910,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 													"testscenarioid": scenarioid,
 													"browser": req_browser,
 													"cycleid":cycleid,
-													"status": resultData.reportData.overallstatus[0].overallstatus,
+													"status": resultData.reportData.overallstatus[0].overAllStatus,
 													"report": JSON.stringify(reportdata),
 													"modifiedby":userInfo.userid,
 													"query": "insertreportquery"
