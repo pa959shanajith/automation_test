@@ -1594,6 +1594,11 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 		versionnumber = itr.versionnumber;
 		scenarioDetails = itr.suiteDetails;
 		scheduleId= itr.scheduleid;
+		releaseId= itr.releaseid;
+		domainName= itr.domainname;
+		projectName= itr.projectname;
+		cycleName= itr.cyclename;
+		scenarionames= itr.scenarionames;
 		var sessObj;
 		//Normal scheduling
 		if (rescheduleflag != true) {
@@ -1800,6 +1805,11 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 									executionjson.dataparampath = dataparamlist;
 									executionjson.testsuiteid = testsuiteid;
 									executionjson.testsuitename = testsuitenm;
+									executionjson.releaseid = releaseId;
+									executionjson.cyclename = cycleName;
+									executionjson.projectname = projectName;
+									executionjson.domainname = domainName;
+									executionjson.scenarioNames = scenarionames;
 									testsuitedetailslist.push(executionjson);
 									//executionRequest.executionId = JSON.parse(JSON.stringify(result1.rows[0].scheduleid));
 									executionRequest.suitedetails = testsuitedetailslist;
@@ -1900,7 +1910,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 													"testscenarioid": scenarioid,
 													"browser": req_browser,
 													"cycleid":cycleid,
-													"status": resultData.reportData.overallstatus[0].overallstatus,
+													"status": resultData.reportData.overallstatus[0].overAllStatus,
 													"report": JSON.stringify(reportdata),
 													"modifiedby":userInfo.userid,
 													"query": "insertreportquery"
