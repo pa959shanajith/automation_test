@@ -73,7 +73,7 @@ exports.getGraphData = function(req, res){
 			// qList.push({"statement":"MATCH(a:ICEPERMISSIONS_NG{userid:'"+userid+"'})-[r1]->(d:DOMAINS_NG) WITH a.projectids as pids,d as d MATCH (p:PROJECTS_NG) WHERE p.projectid in pids WITH p as p,d as d MATCH path=(d)-[r2]->(p)-[r3*1..]->(x) RETURN path","resultDataContents":["graph"]});
 			//console.log('qList::::', qList);
 			var inputs={
-				"projectid":""
+				"user_id":userid
 			}
 			var args = {
 				data: inputs,
