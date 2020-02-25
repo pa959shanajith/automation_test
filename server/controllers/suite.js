@@ -172,6 +172,154 @@ exports.readTestSuite_ICE = function (req, res) {
 	}
 };
 
+function readTestSuite_ICE_SVN(req,callback) {
+	logger.info("Inside UI service: readTestSuite_ICE_SVN");
+	 if (req.data) {
+		var requiredreadTestSuite = req.data.readTestSuite;
+		var fromFlg = req.data.fromFlag;
+		var responsedata = {};
+		var testsuitesindex = 0;
+		async.forEachSeries(requiredreadTestSuite, function (eachSuite, readSuiteDatacallback) {
+			//internal variables
+			var outexecutestatus = [];
+			var outcondition = [];
+			var outdataparam = [];
+			var outscenarioids = [];
+			var outscenarionames = [];
+			var outprojectnames = [];
+			testsuitesindex = testsuitesindex + 1;
+			// eachSuite.userInfo = {"userid": req.session.userid, "role": req.session.activeRoleId};
+			logger.info("Calling function TestSuiteDetails_Module_ICE from readTestSuite_ICE_SVN");
+			TestSuiteDetails_Module_ICE(eachSuite, function (TestSuiteDetailserror, TestSuiteDetailsCallback) {
+				if (TestSuiteDetailserror) {
+					logger.error("Error in the function TestSuiteDetails_Module_ICE from readTestSuite_ICE_SVN: %s",TestSuiteDetailserror);
+				} else {
+					var inputs = {
+						"mindmapid": eachSuite.testsuiteid,
+						"cycleid": eachSuite.cycleid,
+						"testsuitename": eachSuite.testsuitename,
+						"versionnumber": eachSuite.versionnumber,
+						"query": "readTestSuite_ICE"
+					};
+					var args = {
+						data: inputs,
+						headers: {
+							"Content-Type": "application/json"
+						}
+					};
+					logger.info("Calling NDAC Service from readTestSuite_ICE_SVN: suite/readTestSuite_ICE");
+					client.post(epurl + "suite/readTestSuite_ICE", args,
+						function (result, response) {
+						if (response.statusCode != 200 || result.rows == "fail") {
+							logger.error("Error occurred in suite/readTestSuite_ICE from readTestSuite_ICE Error Code : ERRNDAC");
+							var flag = "Error in readTestSuite_ICE_SVN : Fail";
+							outscenarioidcallback(false)
+						} else {
+							//complete each response scenario object
+							var respeachscenario = {
+								executestatus: [],
+								condition: [],
+								dataparam: [],
+								scenarioids: [],
+								scenarionames: [],
+								projectnames: []
+							};
+							async.forEachSeries(result.rows, function (eachSuiterow, eachSuitecallback) {
+								outscenarioids = eachSuiterow.testscenarioids;
+								//for (i =0; i<eachSuiterow.testscenarioids.length;i++) {outscenarioids=[]; outscenarioids.push(eachSuiterow.testscenarioids[i].$oid);}
+								if (outscenarioids == null) {
+									outscenarioids = [];
+								}
+								respeachscenario.scenarioids = outscenarioids;
+								if (eachSuiterow.donotexecute == null) {
+									var arrTemp = [];
+									for (var i = 0; i < outscenarioids.length; i++) {
+										arrTemp.push(1);
+									}
+									outexecutestatus = arrTemp;
+								} else {
+									outexecutestatus = eachSuiterow.donotexecute;
+								}
+								respeachscenario.executestatus = outexecutestatus;
+								if (eachSuiterow.conditioncheck == null) {
+									var arrTemp = [];
+									for (var i = 0; i < outscenarioids.length; i++) {
+										arrTemp.push(0);
+									}
+									outcondition = arrTemp;
+								} else {
+									outcondition = eachSuiterow.conditioncheck;
+								}
+								respeachscenario.condition = outcondition;
+								if (eachSuiterow.getparampaths == null) {
+									var arrTemp = [];
+									for (var i = 0; i < outscenarioids.length; i++) {
+										arrTemp.push('');
+									}
+									outdataparam = arrTemp;
+								} else {
+									outdataparam = eachSuiterow.getparampaths;
+								}
+								respeachscenario.dataparam = outdataparam;
+								respeachscenario.testsuitename = eachSuiterow.name;
+								var scenarioidindex = 0;
+								responsedata[eachSuite.testsuiteid] = respeachscenario;
+								async.forEachSeries(outscenarioids, function (eachoutscenarioid, outscenarioidcallback) {
+									scenarioidindex = scenarioidindex + 1;
+									/**
+									 *  Projectnametestcasename_ICE is a function to fetch testscenario name and project name
+									 * 	modified shreeram p on 15th mar 2017
+									 * */
+									logger.info("Calling function Projectnametestcasename_ICE from readTestSuite_ICE_SVN");
+									Projectnametestcasename_ICE(eachoutscenarioid, function (eachoutscenarioiderr, eachoutscenarioiddata) {
+										if (eachoutscenarioiderr) {
+											logger.error("Error in the function Projectnametestcasename_ICE from readTestSuite_ICE_SVN: %s",eachoutscenarioiderr);
+										} else {
+											if (eachoutscenarioiddata != null || eachoutscenarioiddata != undefined) {
+												outscenarionames.push(eachoutscenarioiddata.testcasename);
+												outprojectnames.push(eachoutscenarioiddata.projectname);
+											}
+											respeachscenario.scenarionames = outscenarionames;
+											respeachscenario.projectnames = outprojectnames;
+											respeachscenario.testsuiteid = eachSuite.testsuiteid;
+											respeachscenario.versionnumber = eachSuite.versionnumber;
+											if (scenarioidindex == outscenarioids.length) {
+												responsedata[eachSuite.testsuiteid] = respeachscenario;
+												if (testsuitesindex == requiredreadTestSuite.length) {
+													if (fromFlg == "scheduling") {
+														utils.getSocketList("schedule", function(connectusers){
+															logger.debug("IP\'s connected : %s", connectusers.join());
+															var schedulingDetails = {
+																"connectedUsers": connectusers,
+																"testSuiteDetails": responsedata
+															};
+															responsedata=schedulingDetails;
+															callback(respeachscenario);
+														});
+													}else callback(respeachscenario);
+												}else outscenarioidcallback();
+											}else outscenarioidcallback();
+											
+										}
+									}, eachSuitecallback);
+
+								}, readSuiteDatacallback);
+							});
+						}
+					});
+				}
+			});
+		},function(){
+			logger.info("Inside final function of the service readTestSuite_ICE_SVN");
+			logger.info("Calling function executeQueries from final function of the service readTestSuite_ICE_SVN");
+		});
+	} 
+	else {
+		logger.error('Error in the service readTestSuite_ICE_SVN: Invalid Session');
+		outscenarioidcallback(false);
+	}
+}
+
 function TestSuiteDetails_Module_ICE(req, cb1, data) {
 	logger.info("Inside TestSuiteDetails_Module_ICE function");
 	var requiredcycleid = req.cycleid;
@@ -704,288 +852,680 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
     }
 }
 
-exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
-	logger.info("Inside UI service: ExecuteTestSuite_ICE_CI");
-	if (req.sessionStore.sessions != undefined) {
-		session_list = req.sessionStore.sessions;
-		if (Object.keys(session_list).length != 0) {
-			var sessionCookie = session_list[req.body.session_id];
-			var sessionToken = JSON.parse(sessionCookie).uniqueId;
-			sessionToken = Object.keys(session_list)[Object.keys(session_list).length - 1];
-		}
-	}
-	if (sessionToken != undefined && req.body.session_id == sessionToken) {
-		var name = req.session.username;
-		redisServer.redisSubServer.subscribe('ICE2_' + name);
-		var batchExecutionData = req.body.moduleInfo;
-        var scenariodescriptionobject = {};
-        var testsuitedetailslist = [],testsuiteidcycmap = {};
-		var testsuitedetailslist = [];
-		var testsuiteIds = [];
-		var cycleid = '';
-		var exc_action  = req.body.action;
-		var executionRequest = {
-			"executionId": "",
-			"suitedetails": [],
-			"testsuiteIds": [],
-			"apptype": "",
-			"exec_mode":exc_action
-		};
-		//updating number of executions happened
-		var executionId = '';						
-        async.series({
-            approval_check:function(callback_E){
-				if (taskflow){
-					utils.approval_status_check(batchExecutionData, function (err, approved_status) {
-					if (approved_status) callback_E();
-					else res.status(err.status).send(err.res);
-					});
-				}
-                callback_E();
-            },
-			counter_updater:function(callback_E){
+// exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
+// 	logger.info("Inside UI service: ExecuteTestSuite_ICE_CI");
+// 	if (req.sessionStore.sessions != undefined) {
+// 		session_list = req.sessionStore.sessions;
+// 		if (Object.keys(session_list).length != 0) {
+// 			var sessionCookie = session_list[req.body.session_id];
+// 			var sessionToken = JSON.parse(sessionCookie).uniqueId;
+// 			sessionToken = Object.keys(session_list)[Object.keys(session_list).length - 1];
+// 		}
+// 	}
+// 	if (sessionToken != undefined && req.body.session_id == sessionToken) {
+// 		var name = req.session.username;
+// 		redisServer.redisSubServer.subscribe('ICE2_' + name);
+// 		var batchExecutionData = req.body.moduleInfo;
+//         var scenariodescriptionobject = {};
+//         var testsuitedetailslist = [],testsuiteidcycmap = {};
+// 		var testsuitedetailslist = [];
+// 		var testsuiteIds = [];
+// 		var cycleid = '';
+// 		var exc_action  = req.body.action;
+// 		var executionRequest = {
+// 			"executionId": "",
+// 			"suitedetails": [],
+// 			"testsuiteIds": [],
+// 			"apptype": "",
+// 			"exec_mode":exc_action
+// 		};
+// 		//updating number of executions happened
+// 		var executionId = '';						
+//         async.series({
+//             approval_check:function(callback_E){
+// 				if (taskflow){
+// 					utils.approval_status_check(batchExecutionData, function (err, approved_status) {
+// 					if (approved_status) callback_E();
+// 					else res.status(err.status).send(err.res);
+// 					});
+// 				}
+//                 callback_E();
+//             },
+// 			counter_updater:function(callback_E){
 
-				//updating number of executions happened
-				var batchlength = batchExecutionData.length;
-				var updateinp = {
-					"query": "testsuites",
-					"count": batchlength,
-					"userid": userInfo.userid
-				};
-				var args = {
-					data: updateinp,
-					headers: {
-						"Content-Type": "application/json"
+// 				//updating number of executions happened
+// 				var batchlength = batchExecutionData.length;
+// 				var updateinp = {
+// 					"query": "testsuites",
+// 					"count": batchlength,
+// 					"userid": userInfo.userid
+// 				};
+// 				var args = {
+// 					data: updateinp,
+// 					headers: {
+// 						"Content-Type": "application/json"
+// 					}
+//                 };
+//                 logger.info("Calling NDAC Service: utility/dataUpdator_ICE from ExecuteTestSuite_ICE");
+// 				// client.post(epurl + "utility/dataUpdator_ICE", args,
+// 				// 	function (result, response) {
+// 				// 	if (response.statusCode != 200 || result.rows == "fail") {
+// 				// 		logger.error("Error occurred in utility/dataUpdator_ICE service from ExecuteTestSuite_ICE: Data Updator Fail");
+// 				// 	} else {
+// 				// 		logger.info("Data Updator Success");
+//                 //     }
+//                     callback_E();
+// 				// });
+//             },
+//             suite_execution:function(callback_E){
+//                 async.forEachSeries(batchExecutionData, function (eachbatchExecutionData, batchExecutionDataCallback) {
+//                     var suiteDetails = eachbatchExecutionData.suiteDetails;
+// 					var testsuitename = eachbatchExecutionData.testsuitename;
+// 					var testsuiteid = eachbatchExecutionData.testsuiteid;
+// 					var releaseid = eachbatchExecutionData.releaseid;
+// 					cycleid = eachbatchExecutionData.cycleid;			
+// 					var browserType = eachbatchExecutionData.browserType;
+// 					var apptype = eachbatchExecutionData.appType;
+// 					var listofscenarioandtestcases = [];
+// 					var scenarioIdList = [];
+// 					var dataparamlist = [];
+// 					var conditionchecklist = [];
+//                     var browserTypelist = [];
+//                     testsuiteIds.push(testsuiteid);
+//                     testsuiteidcycmap[testsuiteid] = cycleid;
+//                     async.forEachSeries(suiteDetails, function (eachsuiteDetails, eachsuiteDetailscallback) {
+//                         var executionjson = {
+// 							"scenarioIds": [],
+// 							"browserType": [],
+// 							"dataparampath": [],
+// 							"condition": [],
+// 							"testsuitename": ""
+//                         };
+//                         var currentscenarioid = "";
+// 						scenarioIdList.push(eachsuiteDetails.scenarioids);
+// 						dataparamlist.push(eachsuiteDetails.dataparam[0]);
+// 						conditionchecklist.push(eachsuiteDetails.condition);
+// 						browserTypelist.push(eachsuiteDetails.browserType);
+// 						currentscenarioid = eachsuiteDetails.scenarioids;
+// 						executionjson.releaseid = releaseid;
+//                         executionjson.cycleid = cycleid;
+//                         scenariodescriptionobject[eachsuiteDetails.scenarioids] = eachsuiteDetails.scenariodescription;
+//                         TestCaseDetails_Suite_ICE(currentscenarioid, userInfo.userid, function (currentscenarioidError, currentscenarioidResponse) {
+//                             var scenariotestcaseobj = {};
+// 							if (currentscenarioidError) {
+// 								logger.error("Error occurred in the function TestCaseDetails_Suite_ICE: %s",currentscenarioidError);
+// 							} else {
+// 								if (currentscenarioidResponse != null || currentscenarioidResponse != undefined) {
+// 									scenariotestcaseobj[currentscenarioid] = currentscenarioidResponse.listoftestcasedata;
+// 									scenariotestcaseobj.qccredentials = eachsuiteDetails.qccredentials;
+// 									scenariotestcaseobj.qcdetails = currentscenarioidResponse.qcdetails;
+// 									listofscenarioandtestcases.push(scenariotestcaseobj);
+// 									eachsuiteDetailscallback();
+// 								}
+// 								if (listofscenarioandtestcases.length == suiteDetails.length) {
+// 									logger.info("Calling function updateData from TestCaseDetails_Suite_ICE function");
+// 									executionjson[testsuiteid] = listofscenarioandtestcases;
+//                                     executionjson.scenarioIds = scenarioIdList;
+//                                     executionjson.browserType = browserType;
+//                                     executionjson.condition = conditionchecklist;
+//                                     executionjson.dataparampath = dataparamlist;
+//                                     executionjson.testsuiteid = testsuiteid;
+//                                     executionjson.testsuitename = testsuitename;
+//                                     executionjson.scenariodescriptionobject = scenariodescriptionobject;
+//                                     testsuitedetailslist.push(executionjson);
+// 									batchExecutionDataCallback();
+// 									if (testsuitedetailslist.length == batchExecutionData.length) {
+//                                         executionRequest.executionId = executionId;
+//                                         executionRequest.suitedetails = testsuitedetailslist;
+//                                         executionRequest.testsuiteIds = testsuiteIds;
+//                                         executionRequest.apptype = apptype;
+// 										logger.info("Calling function executionFunction from TestCaseDetails_Suite_ICE function");
+// 										callback_E();
+// 									}
+// 								}
+// 							}
+//                         });
+//                     });
+
+//                 }); 
+//             },
+//             execution_insertion:function(callback_E){
+//                  insertExecutionStatus(req.session.userid,testsuiteIds,cycleid,function(res){
+//                     if(res == 'fail'){
+// 						executionId = '';
+//                     }else{
+// 						executionRequest.executionId = res;
+//                     }
+//                     callback_E();
+// 				});
+//             },
+//             execute_function:function(callback_E){
+//                 logger.info("Inside executionFunction function");
+// 				var completedSceCount = 0;
+// 				var testsuitecount=0;
+// 				var statusPass = 0;
+// 				var suiteStatus;
+// 				logger.debug("ICE Socket requesting Address: %s" , name);
+				
+//                 redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+//                     if (redisres[1]>0) {
+//                         logger.info("Sending socket request for executeTestSuite to redis");
+//                         dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
+//                         redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+//                         var notifySocMap = myserver.socketMapNotify;
+//                         var resSent = false;
+//                         if(notifySocMap && notifySocMap[name]) {
+//                             resSent = true;
+//                             res.end('begin');
+//                         }
+//                         function executeTestSuite_listener(channel,message) {
+//                             data = JSON.parse(message);
+//                             if(name == data.username){
+//                                 if (data.onAction == "unavailableLocalServer") {
+//                                     redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
+//                                     logger.error("Error occurred in ExecuteTestSuite_ICE: Socket Disconnected");
+//                                     if (notifySocMap[name]) notifySocMap[name].emit("ICEnotAvailable");
+//                                     else if (!resSent) res.send("unavailableLocalServer");
+//                                 } else if (data.onAction == "result_executeTestSuite") {
+//                                     var resultData = data.value;
+//                                     if (resultData != "success" && resultData != "Terminate") {
+//                                         try {
+//                                             completedSceCount++;
+//                                             scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length * executionRequest.suitedetails[testsuitecount].browserType.length;
+//                                             var scenarioid = resultData.scenarioId;
+//                                             var executionid = resultData.executionId;
+//                                             var reportdata = resultData.reportData;
+//                                             var testsuiteid = resultData.testsuiteId;
+//                                             if (reportdata.overallstatus.length != 0) {
+//                                                 reportdata.overallstatus[0].browserType = (executionRequest.apptype=="MobileApp")?"MobileApp":reportdata.overallstatus[0].browserType;
+//                                                 var req_browser = reportdata.overallstatus[0].browserType;
+//                                                 reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
+// 												reportdata = JSON.parse(reportdata);
+// 												var cycleid = testsuiteidcycmap[testsuiteid];
+//                                                 if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
+//                                                     statusPass++;
+//                                                 }
+//                                                 var inputs = {
+//                                                     //"reportid": reportId,
+//                                                     "executionid": executionid,
+//                                                     "testsuiteid": testsuiteid,
+//                                                     "testscenarioid": scenarioid,
+//                                                     "browser": req_browser,
+//                                                     "cycleid": testsuiteidcycmap[testsuiteid],
+//                                                     "status": resultData.reportData.overallstatus[0].overallstatus,
+//                                                     "report": JSON.stringify(reportdata),
+// 													"query": "insertreportquery",
+// 													"modifiedby":userInfo.userid
+//                                                 };
+//                                                 var args = {
+//                                                     data: inputs,
+//                                                     headers: {
+//                                                         "Content-Type": "application/json"
+//                                                     }
+//                                                 };
+//                                                 logger.info("Calling NDAC Service from executionFunction: suite/ExecuteTestSuite_ICE");
+//                                                 client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+//                                                     function (result, response) {
+//                                                     if (response.statusCode != 200 || result.rows == "fail") {
+//                                                         logger.error("Error occurred in suite/ExecuteTestSuite_ICE from executionFunction Error Code : ERRNDAC");
+//                                                         flag = "fail";
+//                                                     } else {
+//                                                         logger.info("Successfully inserted report data");
+//                                                         flag = "success";
+//                                                     }
+//                                                 });
+//                                                 if (completedSceCount == scenarioCount) {
+//                                                     if (statusPass == scenarioCount) {
+//                                                         suiteStatus = "pass";
+//                                                     } else {
+//                                                         suiteStatus = "fail";
+//                                                     }
+//                                                     completedSceCount = 0;
+//                                                     testsuitecount++;
+//                                                     logger.info("Calling function updateExecutionStatus from executionFunction");
+//                                                     updateExecutionStatus(testsuiteid, executionid, suiteStatus,cycleid);
+//                                                 }
+//                                             } else {
+//                                                 completedSceCount++;
+//                                                 scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length;
+//                                                 if (completedSceCount == scenarioCount) {
+//                                                     completedSceCount = 0;
+//                                                     testsuitecount++;
+//                                                     suiteStatus = "Fail";
+//                                                     logger.info("Calling function updateExecutionStatus from executionFunction");
+//                                                     updateExecutionStatus(testsuiteid, executionid, suiteStatus,cycleid);
+//                                                 }
+//                                             }
+//                                         } catch (ex) {
+//                                             logger.error("Exception in the function executionFunction: insertreportquery: %s", ex);
+//                                         }
+//                                     }
+//                                     if (resultData == "success" || resultData == "Terminate") {
+//                                         redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
+//                                         try {
+//                                             logger.info("Sending execution status from function executionFunction");
+//                                             if (notifySocMap[name]) notifySocMap[name].emit("result_ExecutionDataInfo", resultData);
+//                                             else if (!resSent) res.send(resultData);
+//                                         } catch (ex) {
+//                                             logger.error("Exception While sending execution status from the function executionFunction: %s", ex);
+//                                         }
+//                                     }
+//                                 }
+//                             }
+//                         }
+//                         redisServer.redisSubServer.on("message",executeTestSuite_listener);
+//                     } else {
+//                         utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+//                             var flag="";
+//                             if (found) flag = "scheduleModeOn";
+//                             else {
+//                                 flag = "unavailableLocalServer";
+//                                 logger.error("Error occurred in the function executionFunction: Socket not Available");
+//                             }
+//                             res.send(flag);
+//                         });
+//                     }
+//                 });
+                    
+//             }
+
+//         });
+// 	} else {
+// 		logger.error("Error occurred in the function executionFunction in ExecuteTestSuite_ICE_CI: Invalid Session");
+// 		res.send("Invalid Session");
+// 	}
+// };
+
+exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
+	logger.info("Inside UI service: ExecuteTestSuite_ICE_SVN");
+	var final_data = {};
+	var sc_map = {};
+	var module_data = {};
+	var valid_userdata = [];
+	var testsuite_creation_data = {};
+	var result_to_send = { "execution_status": [] };
+	async.eachSeries(req.body.execution_data, function (uservalidation_iterator, cb_validation) {
+		uservalidation_iterator.userInfo.username = uservalidation_iterator.userInfo.username.toLowerCase();
+		uservalidation_iterator.userInfo.tokenname = uservalidation_iterator.userInfo.tokenname;
+		uservalidation_iterator.userInfo.tokenhash = uservalidation_iterator.userInfo.tokenhash;
+		result_status = {
+			"userName": uservalidation_iterator.userInfo.username,
+			"tokenname": uservalidation_iterator.userInfo.tokenname,
+			"moduleInfo": [],
+			"tokenValidation": "failed"
+		};
+		args_validation = {
+			data: { 'username': result_status.userName, 'tokenname': result_status.tokenname },
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
+		logger.info("Calling NDAC Service from ExecuteTestSuite_ICE_SVN: login/authenticateUser_Nineteen68_CI");
+		client.post(epurl + "login/authenticateUser_Nineteen68_CI", args_validation, function (result, response) {
+			if (response.statusCode != 200 || result.rows == "fail") {
+				logger.error("Error occured in ExecuteTestSuite_ICE_SVN service from login/authenticateUser_Nineteen68_CI Error Code : ERRNDAC");
+				cb_validation('err');
+			} else {
+				var validUser = false;
+				validUser = bcrypt.compareSync(uservalidation_iterator.userInfo.tokenhash,result.rows.hash);
+				if (validUser) {
+					uservalidation_iterator.userInfo.userid = result.rows.userid;
+					uservalidation_iterator.userInfo.role = "CI";  // Since it's a CI_User, so it has execute only permissions. Hence role is CI.
+					valid_userdata.push(uservalidation_iterator);
+					result_status.tokenValidation = "passed";
+					final_data[uservalidation_iterator.userInfo.username] = result_status;
+					if(result.rows.deactivated=="active") {
+						result_status.tokenValidation = "passed";
+						final_data[uservalidation_iterator.userInfo.username] = result_status;
+					} else if(result.rows.deactivated=="expired") {
+						result_status.tokenValidation = "expired";
+						result_to_send.execution_status.push(final_data);
+						logger.error("Inside UI service: ExecuteTestSuite_ICE_SVN Token is expired for username:",uservalidation_iterator.userInfo.username);
+					} else if(result.rows.deactivated=="deactivated") {
+						result_status.tokenValidation = "deactivated";
+						result_to_send.execution_status.push(final_data);
+						logger.error("Inside UI service: ExecuteTestSuite_ICE_SVN Token is deactivated for username:",uservalidation_iterator.userInfo.username);
 					}
-                };
-                logger.info("Calling NDAC Service: utility/dataUpdator_ICE from ExecuteTestSuite_ICE");
-				// client.post(epurl + "utility/dataUpdator_ICE", args,
-				// 	function (result, response) {
-				// 	if (response.statusCode != 200 || result.rows == "fail") {
-				// 		logger.error("Error occurred in utility/dataUpdator_ICE service from ExecuteTestSuite_ICE: Data Updator Fail");
-				// 	} else {
-				// 		logger.info("Data Updator Success");
-                //     }
-                    callback_E();
-				// });
-            },
-            suite_execution:function(callback_E){
-                async.forEachSeries(batchExecutionData, function (eachbatchExecutionData, batchExecutionDataCallback) {
-                    var suiteDetails = eachbatchExecutionData.suiteDetails;
-					var testsuitename = eachbatchExecutionData.testsuitename;
-					var testsuiteid = eachbatchExecutionData.testsuiteid;
-					var releaseid = eachbatchExecutionData.releaseid;
-					cycleid = eachbatchExecutionData.cycleid;			
-					var browserType = eachbatchExecutionData.browserType;
-					var apptype = eachbatchExecutionData.appType;
-					var listofscenarioandtestcases = [];
-					var scenarioIdList = [];
-					var dataparamlist = [];
-					var conditionchecklist = [];
-                    var browserTypelist = [];
-                    testsuiteIds.push(testsuiteid);
-                    testsuiteidcycmap[testsuiteid] = cycleid;
-                    async.forEachSeries(suiteDetails, function (eachsuiteDetails, eachsuiteDetailscallback) {
-                        var executionjson = {
-							"scenarioIds": [],
-							"browserType": [],
-							"dataparampath": [],
-							"condition": [],
-							"testsuitename": ""
-                        };
-                        var currentscenarioid = "";
-						scenarioIdList.push(eachsuiteDetails.scenarioids);
-						dataparamlist.push(eachsuiteDetails.dataparam[0]);
-						conditionchecklist.push(eachsuiteDetails.condition);
-						browserTypelist.push(eachsuiteDetails.browserType);
-						currentscenarioid = eachsuiteDetails.scenarioids;
-						executionjson.releaseid = releaseid;
-                        executionjson.cycleid = cycleid;
-                        scenariodescriptionobject[eachsuiteDetails.scenarioids] = eachsuiteDetails.scenariodescription;
-                        TestCaseDetails_Suite_ICE(currentscenarioid, userInfo.userid, function (currentscenarioidError, currentscenarioidResponse) {
-                            var scenariotestcaseobj = {};
-							if (currentscenarioidError) {
-								logger.error("Error occurred in the function TestCaseDetails_Suite_ICE: %s",currentscenarioidError);
-							} else {
-								if (currentscenarioidResponse != null || currentscenarioidResponse != undefined) {
-									scenariotestcaseobj[currentscenarioid] = currentscenarioidResponse.listoftestcasedata;
-									scenariotestcaseobj.qccredentials = eachsuiteDetails.qccredentials;
-									scenariotestcaseobj.qcdetails = currentscenarioidResponse.qcdetails;
-									listofscenarioandtestcases.push(scenariotestcaseobj);
-									eachsuiteDetailscallback();
-								}
-								if (listofscenarioandtestcases.length == suiteDetails.length) {
-									logger.info("Calling function updateData from TestCaseDetails_Suite_ICE function");
-									executionjson[testsuiteid] = listofscenarioandtestcases;
-                                    executionjson.scenarioIds = scenarioIdList;
-                                    executionjson.browserType = browserType;
-                                    executionjson.condition = conditionchecklist;
-                                    executionjson.dataparampath = dataparamlist;
-                                    executionjson.testsuiteid = testsuiteid;
-                                    executionjson.testsuitename = testsuitename;
-                                    executionjson.scenariodescriptionobject = scenariodescriptionobject;
-                                    testsuitedetailslist.push(executionjson);
-									batchExecutionDataCallback();
-									if (testsuitedetailslist.length == batchExecutionData.length) {
-                                        executionRequest.executionId = executionId;
-                                        executionRequest.suitedetails = testsuitedetailslist;
-                                        executionRequest.testsuiteIds = testsuiteIds;
-                                        executionRequest.apptype = apptype;
-										logger.info("Calling function executionFunction from TestCaseDetails_Suite_ICE function");
-										callback_E();
+				} else {
+					final_data[uservalidation_iterator.userInfo.username] = result_status;
+					result_to_send.execution_status.push(final_data);
+					logger.info("Inside UI service: ExecuteTestSuite_ICE_SVN Token authentication failed for username:",uservalidation_iterator.userInfo.username);
+				}
+			}
+			if(final_data[uservalidation_iterator.userInfo.username].tokenValidation=='passed'){
+				cb_validation();
+			} else {
+				cb_validation(final_data[uservalidation_iterator.userInfo.username].tokenValidation)
+			}
+		});
+	}, function (err) {
+		if (err || valid_userdata.length == 0){
+			logger.error("Error occured in ExecuteTestSuite_ICE_SVN service token validation");
+			res.send('failed in validation');
+		} else {
+			async.each(valid_userdata, function (userdata_iterator, cb) {
+				module_data[userdata_iterator.userInfo.username] = [];
+				testsuite_creation_data[userdata_iterator.userInfo.username] = { "fromFlag": "", "param": "readTestSuite", "readTestSuite": [] };
+				for (var i = 0; i < userdata_iterator.moduleInfo.length; i++) {
+					module_info_data = {
+						"browserType": userdata_iterator.browserType,
+						"suiteDetails": [],
+						"testsuiteid": userdata_iterator.moduleInfo[i].moduleId,
+						"testsuitename": userdata_iterator.moduleInfo[i].moduleName,
+						"appType": userdata_iterator.moduleInfo[i].appType
+					};
+					module_data[userdata_iterator.userInfo.username].push(module_info_data);
+
+				}
+				async.eachSeries(userdata_iterator.moduleInfo, function (moduleinfo_iterator, cb1) {
+					cycleId1=moduleinfo_iterator.cycleId;
+					testsuite_args = {
+						data: {
+							"query": 'testsuitecheck',
+							"cycleid": moduleinfo_iterator.cycleId,
+							"mindmapid": moduleinfo_iterator.moduleId
+						}, headers: {
+							"Content-Type": "application/json"
+						}
+					};
+					logger.info("Calling NDAC Service from ExecuteTestSuite_ICE_SVN:suite/readTestSuite_ICE");
+					client.post(epurl + "suite/readTestSuite_ICE", testsuite_args,
+						function (result_details, response) {
+							if (response.statusCode != 200 || result_details.rows == "fail") {
+								logger.error("Error occured in ExecuteTestSuite_ICE_SVN service from suite/readTestSuite_ICE Error Code : ERRNDAC");
+							}
+							else {
+								var module_index = userdata_iterator.moduleInfo.indexOf(moduleinfo_iterator);
+								var moduleResult = { "moduleName": "", "moduleId": "", "suiteDetails": [] };
+								var readTestSuite = {
+									"assignedTestScenarioIds": "",
+									"cycleid": moduleinfo_iterator.cycleId,
+									"projectidts": moduleinfo_iterator.projectId,
+									"releaseid": moduleinfo_iterator.releaseId,
+									"testsuiteid": moduleinfo_iterator.moduleId,
+									"testsuitename": moduleinfo_iterator.moduleName,
+									"versionnumber": moduleinfo_iterator.versionNumber,
+									"userInfo": userdata_iterator.userInfo
+								};
+								for (var j = 0; j < moduleinfo_iterator.suiteDetails.length; j++) {
+									var testsuite_data = {
+										"condition": "", "dataparam": "", "executestatus": "", "scenarioids":
+										"", "qccredentials": { "qcpassword": "", "qcurl": "", "qcusername": "" }
+									};
+									if (result_details.rows.length != 0) {
+										testsuite_data["condition"] = result_details.rows[0].conditioncheck;
+										testsuite_data["executestatus"] = result_details.rows[0].donotexecute;
+										testsuite_data["dataparam"] = result_details.rows[0].getparampaths;
 									}
+									testsuite_data["scenarioids"] = moduleinfo_iterator.suiteDetails[j].scenarios_id;
+									sc_map[testsuite_data["scenarioids"]] = moduleinfo_iterator.suiteDetails[j].scenarios_name;
+									module_data[userdata_iterator.userInfo.username][module_index].suiteDetails.push(testsuite_data);
+								}
+								testsuite_creation_data[userdata_iterator.userInfo.username].readTestSuite.push(readTestSuite);
+								moduleResult.moduleName = moduleinfo_iterator.moduleName;
+								moduleResult.moduleId = moduleinfo_iterator.moduleId;
+								final_data[userdata_iterator.userInfo.username].moduleInfo.push(moduleResult);
+							}
+							cb1();
+						});
+				}, function (err) {
+					if (err) {
+						logger.error("Error occured in ExecuteTestSuite_ICE_SVN service:",err);
+						cb();
+					}
+					else {
+						data_to_send = { "data": testsuite_creation_data[userdata_iterator.userInfo.username] };
+						readTestSuite_ICE_SVN(data_to_send, function (suite_status) {
+							if (!suite_status) {
+								logger.error("Error occured in ExecuteTestSuite_ICE_SVN service in creating testsuites");
+								res.send('Secnarios creation failed');
+							} else {
+								var batchExecutionData = module_data[userdata_iterator.userInfo.username];
+								var suite_status=suite_status;
+								var userInfo = userdata_iterator.userInfo;
+								var testsuitedetailslist = [];
+								var testsuiteIds = [];
+								var executionRequest = {
+									"executionId": "",
+									"suitedetails": [],
+									"testsuiteIds": [],
+									"apptype": "",
+									"exec_mode":userdata_iterator.exec_mode
+								};
+								var executionId = uuid();
+								var starttime = new Date().getTime();
+								//updating number of executions happened
+								var batchlength = batchExecutionData.length;
+								var updateinp = {
+									"query": "testsuites",
+									"count": batchlength,
+									"userid": userInfo.userid
+								};
+								var args = {
+									data: updateinp,
+									headers: {
+										"Content-Type": "application/json"
+									}
+								};
+								logger.info("Calling NDAC Service from ExecuteTestSuite_ICE_SVN:utility/dataUpdator_ICE");
+								client.post(epurl + "utility/dataUpdator_ICE", args,
+									function (result, response) {
+										if (response.statusCode != 200 || result.rows == "fail") {
+											logger.error("Error occured in ExecuteTestSuite_ICE_SVN service from utility/dataUpdator_ICE Error Code : ERRNDAC");
+										} else {
+											logger.info("Inside ExecuteTestSuite_ICE_SVN service from utility/dataUpdator_ICE:Data updator Success");
+										}
+									});
+								async.forEachSeries(batchExecutionData, function (eachbatchExecutionData, batchExecutionDataCallback) {
+									var suiteDetails = eachbatchExecutionData.suiteDetails;
+									var testsuitename = eachbatchExecutionData.testsuitename;
+									var testsuiteid = eachbatchExecutionData.testsuiteid;
+									var browserType = eachbatchExecutionData.browserType;
+									var apptype = eachbatchExecutionData.appType;
+									var listofscenarioandtestcases = [];
+									var scenarioIdList = [];
+									var dataparamlist = [];
+									var conditionchecklist = [];
+									var browserTypelist = [];
+									testsuiteIds.push(testsuiteid);
+									async.forEachSeries(suiteDetails, function (eachsuiteDetails, eachsuiteDetailscallback) {
+										var executionjson = {
+											"scenarioNames": [],
+											"scenarioIds": [],
+											"browserType": [],
+											"dataparampath": [],
+											"condition": [],
+											"testsuitename": ""
+										};
+										var currentscenarioid = "";
+										scenarioIdList.push(eachsuiteDetails.scenarioids);
+										dataparamlist.push(eachsuiteDetails.dataparam[0]);
+										conditionchecklist.push(eachsuiteDetails.condition);
+										browserTypelist.push(eachsuiteDetails.browserType);
+										currentscenarioid = eachsuiteDetails.scenarioids;
+										TestCaseDetails_Suite_ICE(currentscenarioid, userInfo.user_id, function (currentscenarioidError, currentscenarioidResponse) {
+											var scenariotestcaseobj = {};
+											if (currentscenarioidError) {
+												logger.error("Error occured in ExecuteTestSuite_ICE_SVN service");
+											} else {
+												if (currentscenarioidResponse != null || currentscenarioidResponse != undefined) {
+													scenariotestcaseobj[currentscenarioid] = currentscenarioidResponse.listoftestcasedata;
+													scenariotestcaseobj.qccredentials = eachsuiteDetails.qccredentials;
+													scenariotestcaseobj.qcdetails = currentscenarioidResponse.qcdetails;
+													listofscenarioandtestcases.push(scenariotestcaseobj);
+													eachsuiteDetailscallback();
+												}
+												if (listofscenarioandtestcases.length == suiteDetails.length) {
+													updateData();
+													batchExecutionDataCallback();
+													if (testsuitedetailslist.length == batchExecutionData.length) {
+														var a = executionFunction(executionRequest, userInfo.username);
+													}
+												}
+											}
+										});
+										function updateData() {
+											executionjson[testsuiteid] = listofscenarioandtestcases;
+											executionjson.scenarioIds = scenarioIdList;
+											executionjson.browserType = browserType;
+											executionjson.condition = conditionchecklist;
+											executionjson.dataparampath = dataparamlist;
+											executionjson.testsuiteid = testsuiteid;
+											executionjson.testsuitename = testsuitename;
+											executionjson.scenarioNames = suite_status.scenarionames;
+											testsuitedetailslist.push(executionjson);
+											if (testsuitedetailslist.length == batchExecutionData.length) {
+												excutionObjectBuilding(testsuitedetailslist, apptype);
+											}
+										}
+									});
+								});
+
+								function excutionObjectBuilding(testsuitedetailslist, apptype) {
+									executionRequest.executionId = executionId;
+									executionRequest.suitedetails = testsuitedetailslist;
+									executionRequest.testsuiteIds = testsuiteIds;
+									executionRequest.apptype = apptype;
+								}
+
+								function executionFunction(executionRequest, username) {
+									var name = username;
+									redisServer.redisSubServer.subscribe('ICE2_' + name);
+									var scenarioCount = executionRequest.suitedetails[0].scenarioIds.length;
+									var completedSceCount = 0;
+									var statusPass = 0;
+									var suiteStatus;
+									redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+										if (redisres[1]>0) {
+											logger.info("Sending socket request for executeTestSuite to redis");
+											dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
+											redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+											function executeTestSuite_listener(channel,message) {
+												data = JSON.parse(message);
+												if(name == data.username){
+													if (data.onAction == "unavailableLocalServer") {
+														redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
+														logger.error("Error occured in ExecuteTestSuite_ICE_SVN: Socket Disconnected");
+														if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+															var soc = myserver.socketMapNotify[name];
+															soc.emit("ICEnotAvailable");
+														}
+													} else if (data.onAction == "result_executeTestSuite") {
+														var resultData = data.value;
+														completedSceCount++;
+														if (resultData != "success" && resultData != "Terminate") {
+															try {
+																var scenarioid = resultData.scenarioId;
+																var executionid = resultData.executionId;
+																var reportdata = resultData.reportData;
+																var testsuiteid = resultData.testsuiteId;
+																var req_report = resultData.reportdata;
+																var req_reportStepsArray = reportdata.rows;
+																if (reportdata.overallstatus.length != 0) {
+																	var req_overAllStatus = reportdata.overallstatus;
+																	var req_browser = reportdata.overallstatus[0].browserType;
+																	reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
+																	reportdata = JSON.parse(reportdata);
+																	if (scenarioid in sc_map)
+																		reportdata.overallstatus[0]["secnarios_name"] = sc_map[scenarioid];
+																	reportdata.overallstatus[0]["secnarios_id"] = scenarioid;
+																	for (var k = 0; k < final_data[username].moduleInfo.length; k++) {
+																		if (final_data[username].moduleInfo[k].moduleId == testsuiteid)
+																			final_data[username].moduleInfo[k].suiteDetails.push(reportdata.overallstatus[0]);
+																	}
+																	var reportId = uuid();
+																	if (resultData.reportData.overallstatus[0].overAllStatus == "Pass") {
+																		statusPass++;
+																	}
+																	var inputs = {
+																		"reportid": reportId,
+																		"executionid": executionid,
+																		"testsuiteid": testsuiteid,
+																		"testscenarioid": scenarioid,
+																		"cycleid": cycleId1,
+																		"browser": req_browser,
+																		"status": resultData.reportData.overallstatus[0].overAllStatus,
+																		"report": JSON.stringify(reportdata),
+																		"query": "insertreportquery"
+																	};
+																	var args = {
+																		data: inputs,
+																		headers: {
+																			"Content-Type": "application/json"
+																		}
+																	};
+																	logger.info("Calling NDAC Service from ExecuteTestSuite_ICE_SVN:suite/ExecuteTestSuite_ICE");
+																	client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+																		function (result, response) {
+																			if (response.statusCode != 200 || result.rows == "fail") {
+																				logger.error("Error occured in ExecuteTestSuite_ICE_SVN service from suite/ExecuteTestSuite_ICE Error Code : ERRNDAC");
+																				flag = "fail";
+																			} else {
+																				flag = "success";
+																			}
+																		});
+																	if (completedSceCount == scenarioCount) {
+																		if (statusPass == scenarioCount) {
+																			suiteStatus = "Pass";
+																		} else {
+																			suiteStatus = "Fail";
+																		}
+																		updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
+																	}
+																} else {
+																	if (completedSceCount == scenarioCount) {
+																		suiteStatus = "Fail";
+																		updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
+																	}
+																}
+															} catch (ex) {
+																logger.error("Error occured in ExecuteTestSuite_ICE_SVN service:",ex);
+															}
+														}
+														if (resultData == "success" || resultData == "Terminate") {
+															redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
+															try {
+																result_to_send.execution_status.push(final_data[username]);
+																cb();
+															} catch (ex) {
+																//	cb();
+																logger.error("Error occured in ExecuteTestSuite_ICE_SVN service:",ex);
+															}
+
+														}
+													}
+												}
+											}
+											redisServer.redisSubServer.on("message",executeTestSuite_listener);
+										} else {
+											utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+												var flag="";
+												if (found) flag = "scheduleModeOn";
+												else {
+													flag = "unavailableLocalServer";
+													logger.error("Error occured in ExecuteTestSuite_ICE_SVN service: Socket not Available");
+												}
+												res.send(flag);
+											});
+										}
+									});
 								}
 							}
-                        });
-                    });
-
-                }); 
-            },
-            execution_insertion:function(callback_E){
-                 insertExecutionStatus(req.session.userid,testsuiteIds,cycleid,function(res){
-                    if(res == 'fail'){
-						executionId = '';
-                    }else{
-						executionRequest.executionId = res;
-                    }
-                    callback_E();
+						});
+					}
 				});
-            },
-            execute_function:function(callback_E){
-                logger.info("Inside executionFunction function");
-				var completedSceCount = 0;
-				var testsuitecount=0;
-				var statusPass = 0;
-				var suiteStatus;
-				logger.debug("ICE Socket requesting Address: %s" , name);
-				
-                redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-                    if (redisres[1]>0) {
-                        logger.info("Sending socket request for executeTestSuite to redis");
-                        dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
-                        redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-                        var notifySocMap = myserver.socketMapNotify;
-                        var resSent = false;
-                        if(notifySocMap && notifySocMap[name]) {
-                            resSent = true;
-                            res.end('begin');
-                        }
-                        function executeTestSuite_listener(channel,message) {
-                            data = JSON.parse(message);
-                            if(name == data.username){
-                                if (data.onAction == "unavailableLocalServer") {
-                                    redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
-                                    logger.error("Error occurred in ExecuteTestSuite_ICE: Socket Disconnected");
-                                    if (notifySocMap[name]) notifySocMap[name].emit("ICEnotAvailable");
-                                    else if (!resSent) res.send("unavailableLocalServer");
-                                } else if (data.onAction == "result_executeTestSuite") {
-                                    var resultData = data.value;
-                                    if (resultData != "success" && resultData != "Terminate") {
-                                        try {
-                                            completedSceCount++;
-                                            scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length * executionRequest.suitedetails[testsuitecount].browserType.length;
-                                            var scenarioid = resultData.scenarioId;
-                                            var executionid = resultData.executionId;
-                                            var reportdata = resultData.reportData;
-                                            var testsuiteid = resultData.testsuiteId;
-                                            if (reportdata.overallstatus.length != 0) {
-                                                reportdata.overallstatus[0].browserType = (executionRequest.apptype=="MobileApp")?"MobileApp":reportdata.overallstatus[0].browserType;
-                                                var req_browser = reportdata.overallstatus[0].browserType;
-                                                reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
-												reportdata = JSON.parse(reportdata);
-												var cycleid = testsuiteidcycmap[testsuiteid];
-                                                if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
-                                                    statusPass++;
-                                                }
-                                                var inputs = {
-                                                    //"reportid": reportId,
-                                                    "executionid": executionid,
-                                                    "testsuiteid": testsuiteid,
-                                                    "testscenarioid": scenarioid,
-                                                    "browser": req_browser,
-                                                    "cycleid": testsuiteidcycmap[testsuiteid],
-                                                    "status": resultData.reportData.overallstatus[0].overallstatus,
-                                                    "report": JSON.stringify(reportdata),
-													"query": "insertreportquery",
-													"modifiedby":userInfo.userid
-                                                };
-                                                var args = {
-                                                    data: inputs,
-                                                    headers: {
-                                                        "Content-Type": "application/json"
-                                                    }
-                                                };
-                                                logger.info("Calling NDAC Service from executionFunction: suite/ExecuteTestSuite_ICE");
-                                                client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
-                                                    function (result, response) {
-                                                    if (response.statusCode != 200 || result.rows == "fail") {
-                                                        logger.error("Error occurred in suite/ExecuteTestSuite_ICE from executionFunction Error Code : ERRNDAC");
-                                                        flag = "fail";
-                                                    } else {
-                                                        logger.info("Successfully inserted report data");
-                                                        flag = "success";
-                                                    }
-                                                });
-                                                if (completedSceCount == scenarioCount) {
-                                                    if (statusPass == scenarioCount) {
-                                                        suiteStatus = "pass";
-                                                    } else {
-                                                        suiteStatus = "fail";
-                                                    }
-                                                    completedSceCount = 0;
-                                                    testsuitecount++;
-                                                    logger.info("Calling function updateExecutionStatus from executionFunction");
-                                                    updateExecutionStatus(testsuiteid, executionid, suiteStatus,cycleid);
-                                                }
-                                            } else {
-                                                completedSceCount++;
-                                                scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length;
-                                                if (completedSceCount == scenarioCount) {
-                                                    completedSceCount = 0;
-                                                    testsuitecount++;
-                                                    suiteStatus = "Fail";
-                                                    logger.info("Calling function updateExecutionStatus from executionFunction");
-                                                    updateExecutionStatus(testsuiteid, executionid, suiteStatus,cycleid);
-                                                }
-                                            }
-                                        } catch (ex) {
-                                            logger.error("Exception in the function executionFunction: insertreportquery: %s", ex);
-                                        }
-                                    }
-                                    if (resultData == "success" || resultData == "Terminate") {
-                                        redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
-                                        try {
-                                            logger.info("Sending execution status from function executionFunction");
-                                            if (notifySocMap[name]) notifySocMap[name].emit("result_ExecutionDataInfo", resultData);
-                                            else if (!resSent) res.send(resultData);
-                                        } catch (ex) {
-                                            logger.error("Exception While sending execution status from the function executionFunction: %s", ex);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        redisServer.redisSubServer.on("message",executeTestSuite_listener);
-                    } else {
-                        utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-                            var flag="";
-                            if (found) flag = "scheduleModeOn";
-                            else {
-                                flag = "unavailableLocalServer";
-                                logger.error("Error occurred in the function executionFunction: Socket not Available");
-                            }
-                            res.send(flag);
-                        });
-                    }
-                });
-                    
-            }
-
-        });
-	} else {
-		logger.error("Error occurred in the function executionFunction in ExecuteTestSuite_ICE_CI: Invalid Session");
-		res.send("Invalid Session");
-	}
+			}, function (err) {
+				if (err) {
+					res.send('failed');
+					logger.error("Error occured in ExecuteTestSuite_ICE_SVN service:",err);
+				}
+				else {
+					res.send(result_to_send);
+					logger.info('Completed_Successfully...!!');
+				}
+			});
+		}
+	});
 };
 
 
@@ -1890,7 +2430,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 												reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
 												reportdata = JSON.parse(reportdata);
 												var reportId = uuid();
-												if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
+												if (resultData.reportData.overallstatus[0].overAllStatus == "Pass") {
 													statusPass_s++;
 												}
 												var inputs = {
@@ -1900,7 +2440,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 													"testscenarioid": scenarioid,
 													"browser": req_browser,
 													"cycleid":cycleid,
-													"status": resultData.reportData.overallstatus[0].overallstatus,
+													"status": resultData.reportData.overallstatus[0].overAllStatus,
 													"report": JSON.stringify(reportdata),
 													"modifiedby":userInfo.userid,
 													"query": "insertreportquery"
