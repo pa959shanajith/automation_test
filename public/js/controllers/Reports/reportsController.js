@@ -441,7 +441,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                     }
                     if (data != "fail" && data.length > 0) {
                         var scenarioContainer = $('#reportsTable tbody');
-                        var pass = fail = terminated = incomplete = P = F = T = I = 0;
+                        var pass = fail = terminated = incomplete = skipped = P = F = T = I = 0;
                         var total = data.length;
                         scenarioContainer.empty();
                         var browserIcon, brow = "";
@@ -473,6 +473,11 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             } else if (data[i].status.toLowerCase() == "incomplete") {
                                 incomplete++;
                                 status="Incomplete"
+                                styleColor = "style='color: #343a40 !important; text-decoration-line: none;'";
+                            }
+							else if (data[i].status.toLowerCase() == "skipped") {
+                                skipped++;
+                                status="Skipped"
                                 styleColor = "style='color: #343a40 !important; text-decoration-line: none;'";
                             }
                             scenarioContainer.append("<tr class='scenarioTblReport'><td title='" + data[i].testscenarioname + "'>" + data[i].testscenarioname + "</td><td><span>" + data[i].executedtime.trim() + "</span></td></td><td class='openReports' data-reportid='" + data[i].reportid + "'><a class='openreportstatus' " + styleColor + ">" + status + "</a></td><td class='viewReports'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'></td></tr>");

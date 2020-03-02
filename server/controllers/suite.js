@@ -1983,7 +1983,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 			"suitedetails": [],
 			"testsuiteIds": []
 		};
-		var result1 = '';
+		result1 = '';
 		var ipAdd;
 		async.series({
 			schedule_suite:function(callback_E){
@@ -2129,7 +2129,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 									else if(response.status == "skipped"){
 										scheduleStatus = "Inprogress";
 										logger.info("Calling function updateSkippedScheduleStatus from scheduleFunction");
-										var sessobj_new = sessObj + ';Skipped;' +  JSON.stringify(result.rows[0]) + ';' +JSON.stringify(response.data);
+										var sessobj_new = sessObj + ';Skipped;' +  JSON.stringify(result1.rows[0]) + ';' +JSON.stringify(response.data);
 										var msg = "The scenario was skippped due to conflicting schedules.";
 										updateSkippedScheduleStatus(sessobj_new, msg, function (err, data){
 											if(!err){
@@ -2379,13 +2379,13 @@ function   updateStatus(sessObj, updateStatuscallback) {
 function updateSkippedScheduleStatus(sessObj, msg, updateStatuscallback){
 	logger.info("Inside updateSkippedScheduleStatus function");
 	try {
-		var data = JSON.parse(sessObj.split(';')[5]);
-		if(data['execution_id'] == sessObj.split(";")[1]){
+		var data = JSON.parse(sessObj.split(';')[4]);
+		if(data['_id'] == sessObj.split(";")[0]){
 			var inputs = {
 				"schedulestatus": "Skipped",
-				"cycleid": sessObj.split(";")[0],
-				"scheduledatetime": sessObj.split(";")[2],
-				"scheduleid": sessObj.split(";")[1],
+				"cycleid": sessObj.split(";")[2],
+				"scheduledatetime": sessObj.split(";")[1],
+				"scheduleid": sessObj.split(";")[0],
 				"query": "updatescheduledstatus"
 			};
 			var args = {
@@ -2403,65 +2403,66 @@ function updateSkippedScheduleStatus(sessObj, msg, updateStatuscallback){
 						updateStatuscallback(null, "fail");
 					}
 				});
-				var obj = data['scenario_ids'];
+				var obj = data['scenariodetails'];
 				for(var i=0;i<(Object.keys(obj)).length;i++){
-					var suite=(Object.keys(obj))[i];
-					for(var j=0;j<obj[suite].length;j++){
-						var reportId = uuid();
-						var report_data = JSON.parse(sessObj.split(';')[4]);
-						var scenario = obj[suite][j];
-						var executionid = report_data.scheduleid;
-						var testsuiteid = report_data.testsuiteids[0];
-						var req_browser = 'NA';
-						var reportData = {
-											'rows': [{
-													'status': 'Skipped',
-													'Keyword': '',
-													'Step ': 'Skipped',
-													'Comments': '',
-													'StepDescription': msg,
-													'parentId': '',
-													'id': '1'
-												}
-											],
-											'overallstatus': [{
-													'browserVersion': 'NA',
-													'EllapsedTime': '0:00:00',
-													'browserType': 'NA',
-													'StartTime': data['time'],
-													'EndTime': data['time'],
-													'overallstatus': 'Skipped'
-												}
-											]
-										}
-						var inputs = {
-							"reportid": reportId,
-							"executionid": executionid,
-							"testsuiteid": testsuiteid,
-							"testscenarioid": scenario,
-							"browser": req_browser,
-							"cycleid":sessObj.split(";")[0],
-							"status": reportData.overallstatus[0].overallstatus,
-							"report": JSON.stringify(reportData),
-							"query": "insertreportquery"
-						};
-						var args = {
-							data: inputs,
-							headers: {
-								"Content-Type": "application/json"
-							}
-						};
-						logger.info("Calling NDAC Service from scheduleFunction: suite/ExecuteTestSuite_ICE");
-						client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
-							function (result, response) {
-							if (response.statusCode != 200 || result.rows == "fail") {
-								logger.error("Error occurred in suite/ExecuteTestSuite_ICE from scheduleFunction, Error Code : ERRNDAC");
-								updateStatuscallback(null, "fail");
-							} else {
-								updateStatuscallback(null, "success");
-							}
-						});
-					}
+					// var suite=(Object.keys(obj))[i];
+					// for(var j=0;j<obj[suite].length;j++){
+					var reportId = uuid();
+					var report_data = JSON.parse(sessObj.split(';')[4]);
+					var scenario = obj[i].scenarioids;
+					var executionid = JSON.parse(sessObj.split(';')[5]).execution_id;
+					var testsuiteid = report_data.testsuiteids[0];
+					var req_browser = 'NA';
+					var sheduledby = JSON.parse(sessObj.split(';')[4]).scheduledby;
+					var reportData = {
+										'rows': [{
+												'status': 'Skipped',
+												'Keyword': '',
+												'Step ': 'Skipped',
+												'Comments': '',
+												'StepDescription': msg,
+												'parentId': '',
+												'id': '1'
+											}
+										],
+										'overallstatus': [{
+												'browserVersion': 'NA',
+												'EllapsedTime': '0:00:00',
+												'browserType': 'NA',
+												'StartTime': JSON.parse(sessObj.split(';')[5]).time,
+												'EndTime': JSON.parse(sessObj.split(';')[5]).time,
+												'overallstatus': 'Skipped'
+											}
+										]
+									}
+					var inputs = {
+						"reportid": reportId,
+						"executionid": executionid,
+						"testsuiteid": testsuiteid,
+						"testscenarioid": scenario,
+						"browser": req_browser,
+						"cycleid":sessObj.split(";")[2],
+						"status": reportData.overallstatus[0].overallstatus,
+						"report": JSON.stringify(reportData),
+						"modifiedby": sheduledby,
+						"query": "insertreportquery"
+					};
+					var args = {
+						data: inputs,
+						headers: {
+							"Content-Type": "application/json"
+						}
+					};
+					logger.info("Calling NDAC Service from scheduleFunction: suite/ExecuteTestSuite_ICE");
+					client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+						function (result, response) {
+						if (response.statusCode != 200 || result.rows == "fail") {
+							logger.error("Error occurred in suite/ExecuteTestSuite_ICE from scheduleFunction, Error Code : ERRNDAC");
+							updateStatuscallback(null, "fail");
+						} else {
+							updateStatuscallback(null, "success");
+						}
+					});
 				}
 			} catch (exception) {
 				logger.error("Exception occurred in suite/ScheduleTestSuite_ICE from updateSkippedScheduleStatus: %s",exception);
