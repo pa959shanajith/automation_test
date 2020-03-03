@@ -1139,19 +1139,19 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 																// var req_report = resultData.reportdata;
 																// var req_reportStepsArray = reportdata.rows;
 																if (reportdata.overallstatus.length != 0) {
-																	// var req_overAllStatus = reportdata.overallstatus;
-																	var req_browser = reportdata.overallstatus[0].browserType;
+																	var req_overAllStatus = reportdata.overallstatus[0];
+																	var req_browser = req_overAllStatus.browserType;
 																	reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
 																	reportdata = JSON.parse(reportdata);
 																	if (scenarioid in sc_map)
-																		reportdata.overallstatus[0]["secnarios_name"] = sc_map[scenarioid];
-																	reportdata.overallstatus[0]["secnarios_id"] = scenarioid;
+																		req_overAllStatus["secnarios_name"] = sc_map[scenarioid];
+																	req_overAllStatus["secnarios_id"] = scenarioid;
 																	for (var k = 0; k < final_data[username].moduleInfo.length; k++) {
 																		if (final_data[username].moduleInfo[k].moduleId == testsuiteid)
-																			final_data[username].moduleInfo[k].suiteDetails.push(reportdata.overallstatus[0]);
+																			final_data[username].moduleInfo[k].suiteDetails.push(req_overAllStatus);
 																	}
 																	var reportId = uuid();
-																	if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
+																	if (resultData.req_overAllStatus.overallstatus == "Pass") {
 																		statusPass++;
 																	}
 																	var inputs = {
@@ -1161,7 +1161,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 																		"testscenarioid": scenarioid,
 																		"cycleid": cycleId1,
 																		"browser": req_browser,
-																		"status": resultData.reportData.overallstatus[0].overallstatus,
+																		"status": resultData.req_overAllStatus.overallstatus,
 																		"report": JSON.stringify(reportdata),
 																		"query": "insertreportquery"
 																	};
@@ -2152,12 +2152,12 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 											// var req_report = resultData.reportdata;
 											// var req_reportStepsArray = reportdata.rows;
 											if (reportdata.overallstatus.length != 0) {
-												// var req_overAllStatus = reportdata.overallstatus;
-												var req_browser = reportdata.overallstatus[0].browserType;
+												var req_overAllStatus = reportdata.overallstatus[0];
+												var req_browser = req_overAllStatus.browserType;
 												reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
 												reportdata = JSON.parse(reportdata);
 												//var reportId = uuid();
-												if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
+												if (resultData.req_overAllStatus.overallstatus == "Pass") {
 													statusPass_s++;
 												}
 												var inputs = {
@@ -2167,7 +2167,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 													"testscenarioid": scenarioid,
 													"browser": req_browser,
 													"cycleid":cycleid,
-													"status": resultData.reportData.overallstatus[0].overallstatus,
+													"status": resultData.req_overAllStatus.overallstatus,
 													"report": JSON.stringify(reportdata),
 													"modifiedby":userInfo.userid,
 													"query": "insertreportquery"
