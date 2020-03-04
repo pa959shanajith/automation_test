@@ -757,7 +757,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                                                 reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
                                                 reportdata = JSON.parse(reportdata);
 												var cycleid = testsuiteidcycmap[testsuiteid]
-                                                if (resultData.reportData.overallstatus[0].overAllStatus == "Pass") {
+                                                if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
                                                     statusPass++;
                                                 }
                                                 var inputs = {
@@ -767,7 +767,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                                                     "testscenarioid": scenarioid,
                                                     "browser": req_browser,
                                                     "cycleid": testsuiteidcycmap[testsuiteid],
-                                                    "status": resultData.reportData.overallstatus[0].overAllStatus,
+                                                    "status": resultData.reportData.overallstatus[0].overallstatus,
                                                     "report": JSON.stringify(reportdata),
 													"query": "insertreportquery",
 													"modifiedby":userInfo.userid
@@ -1136,22 +1136,22 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 																var executionid = resultData.executionId;
 																var reportdata = resultData.reportData;
 																var testsuiteid = resultData.testsuiteId;
-																var req_report = resultData.reportdata;
-																var req_reportStepsArray = reportdata.rows;
+																// var req_report = resultData.reportdata;
+																// var req_reportStepsArray = reportdata.rows;
 																if (reportdata.overallstatus.length != 0) {
-																	var req_overAllStatus = reportdata.overallstatus;
-																	var req_browser = reportdata.overallstatus[0].browserType;
+																	var req_overAllStatus = reportdata.overallstatus[0];
+																	var req_browser = req_overAllStatus.browserType;
 																	reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
 																	reportdata = JSON.parse(reportdata);
 																	if (scenarioid in sc_map)
-																		reportdata.overallstatus[0]["secnarios_name"] = sc_map[scenarioid];
-																	reportdata.overallstatus[0]["secnarios_id"] = scenarioid;
+																		req_overAllStatus["secnarios_name"] = sc_map[scenarioid];
+																	req_overAllStatus["secnarios_id"] = scenarioid;
 																	for (var k = 0; k < final_data[username].moduleInfo.length; k++) {
 																		if (final_data[username].moduleInfo[k].moduleId == testsuiteid)
-																			final_data[username].moduleInfo[k].suiteDetails.push(reportdata.overallstatus[0]);
+																			final_data[username].moduleInfo[k].suiteDetails.push(req_overAllStatus);
 																	}
 																	var reportId = uuid();
-																	if (resultData.reportData.overallstatus[0].overAllStatus == "Pass") {
+																	if (resultData.req_overAllStatus.overallstatus == "Pass") {
 																		statusPass++;
 																	}
 																	var inputs = {
@@ -1161,7 +1161,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 																		"testscenarioid": scenarioid,
 																		"cycleid": cycleId1,
 																		"browser": req_browser,
-																		"status": resultData.reportData.overallstatus[0].overAllStatus,
+																		"status": resultData.req_overAllStatus.overallstatus,
 																		"report": JSON.stringify(reportdata),
 																		"query": "insertreportquery"
 																	};
@@ -2057,7 +2057,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 									logger.info("Calling updateData function TestCaseDetails_Suite_ICE from executeScheduling");
 									executionjson[testsuiteid] = listofscenarioandtestcases;
 									executionjson.scenarioIds = scenarioIdList;
-									executionjson.browserType = JSON.parse(browserTypelist);
+									executionjson.browserType = browserTypelist.map(e => JSON.parse(e));
 									executionjson.condition = conditionchecklist;
 									executionjson.dataparampath = dataparamlist;
 									executionjson.testsuiteid = testsuiteid;
@@ -2114,7 +2114,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 						var starttime = new Date().getTime();
 						function executeTestSuite_listener(channel,message) {
 							data = JSON.parse(message);
-							if(name == data.username){
+							if(name == data.username && executionRequest.executionId == data.value.executionId){
 								if (data.onAction == "return_status_executeTestSuite") {
 									var response = data.value;
 									if(response.status == "success"){
@@ -2149,25 +2149,25 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 											var executionid = resultData.executionId;
 											var reportdata = resultData.reportData;
 											var testsuiteid = resultData.testsuiteId;
-											var req_report = resultData.reportdata;
-											var req_reportStepsArray = reportdata.rows;
+											// var req_report = resultData.reportdata;
+											// var req_reportStepsArray = reportdata.rows;
 											if (reportdata.overallstatus.length != 0) {
-												var req_overAllStatus = reportdata.overallstatus;
-												var req_browser = reportdata.overallstatus[0].browserType;
+												var req_overAllStatus = reportdata.overallstatus[0];
+												var req_browser = req_overAllStatus.browserType;
 												reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
 												reportdata = JSON.parse(reportdata);
-												var reportId = uuid();
-												if (resultData.reportData.overallstatus[0].overAllStatus == "Pass") {
+												//var reportId = uuid();
+												if (req_overAllStatus.overallstatus == "Pass") {
 													statusPass_s++;
 												}
 												var inputs = {
-													"reportid": reportId,
+													//"reportid": reportId,
 													"executionid": executionid,
 													"testsuiteid": testsuiteid,
 													"testscenarioid": scenarioid,
 													"browser": req_browser,
 													"cycleid":cycleid,
-													"status": resultData.reportData.overallstatus[0].overAllStatus,
+													"status": req_overAllStatus.overallstatus,
 													"report": JSON.stringify(reportdata),
 													"modifiedby":userInfo.userid,
 													"query": "insertreportquery"
@@ -2407,7 +2407,7 @@ function updateSkippedScheduleStatus(sessObj, msg, updateStatuscallback){
 				for(var i=0;i<(Object.keys(obj)).length;i++){
 					// var suite=(Object.keys(obj))[i];
 					// for(var j=0;j<obj[suite].length;j++){
-					var reportId = uuid();
+					//var reportId = uuid();
 					var report_data = JSON.parse(sessObj.split(';')[4]);
 					var scenario = obj[i].scenarioids;
 					var executionid = JSON.parse(sessObj.split(';')[5]).execution_id;
@@ -2436,7 +2436,7 @@ function updateSkippedScheduleStatus(sessObj, msg, updateStatuscallback){
 										]
 									}
 					var inputs = {
-						"reportid": reportId,
+						//"reportid": reportId,
 						"executionid": executionid,
 						"testsuiteid": testsuiteid,
 						"testscenarioid": scenario,

@@ -41,11 +41,23 @@ function loadReports() {
         {
             $('.toggleIncompleteStatus').hide();
         }
+        else if(overallStatus.indexOf('Skipped') != '-1'){
+            $('.toggleIncompleteStatus').show();
+            unblockUI();
+        }
         else
         {
             $('.toggleIncompleteStatus').show();
         }
-    
+        var commentsLength = parseInt($('.commentsLength').text());
+        $('.toggleRemarks, .rDremarks').hide();
+        if(commentsLength == 0)
+        {
+            $('.toggleCommentsCol,.rDcomments').hide();
+        }
+        else{
+            $('.toggleCommentsCol,.rDcomments').show();
+        }
         //Datatable
          var oTable =  $('#specificReportDataTable').DataTable({
                 "bDestroy": true,
@@ -100,16 +112,7 @@ function loadReports() {
                     unblockUI();
                 }
             });    
-        var remarksLength = parseInt($('.remarksLength').text());
-        var commentsLength = parseInt($('.commentsLength').text());
-        $('.toggleRemarks, .rDremarks').hide();
-        if(commentsLength == 0)
-        {
-            $('.toggleCommentsCol,.rDcomments').hide();
-        }
-        else{
-            $('.toggleCommentsCol,.rDcomments').show();
-        }
+        // var remarksLength = parseInt($('.remarksLength').text());
         //Open Screenshot for specific reports
         $(document).on('click', '.openscreenshot', function() {
             var path = $(this).attr("data-screenshot");
