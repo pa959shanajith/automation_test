@@ -705,14 +705,21 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                 }); 
             },
             execution_insertion:function(callback_E){ 
-                 insertExecutionStatus(req.session.userid,testsuiteIds,cycleid,function(res){
-                    if(res == 'fail'){
-						executionId = '';
-                    }else{
-						executionRequest.executionId = res;
-                    }
-                    callback_E();
-				});
+				utils.getChannelNum('ICE1_normal_' + name, function(found){
+					if found) {
+						insertExecutionStatus(req.session.userid,testsuiteIds,cycleid,function(res){
+							if(res == 'fail'){
+								executionId = '';
+							}else{
+								executionRequest.executionId = res;
+							}
+							callback_E();
+						});
+					}else{
+						callback_E();
+					}
+				})
+                 
             },
             execute_function:function(callback_E){
                 logger.info("Inside executionFunction function");
