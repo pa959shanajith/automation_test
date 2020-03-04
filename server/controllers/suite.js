@@ -2114,7 +2114,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 						var starttime = new Date().getTime();
 						function executeTestSuite_listener(channel,message) {
 							data = JSON.parse(message);
-							if(name == data.username){
+							if(name == data.username && executionRequest.executionId == data.value.executionId){
 								if (data.onAction == "return_status_executeTestSuite") {
 									var response = data.value;
 									if(response.status == "success"){
@@ -2157,7 +2157,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 												reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
 												reportdata = JSON.parse(reportdata);
 												//var reportId = uuid();
-												if (resultData.req_overAllStatus.overallstatus == "Pass") {
+												if (req_overAllStatus.overallstatus == "Pass") {
 													statusPass_s++;
 												}
 												var inputs = {
@@ -2167,7 +2167,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 													"testscenarioid": scenarioid,
 													"browser": req_browser,
 													"cycleid":cycleid,
-													"status": resultData.req_overAllStatus.overallstatus,
+													"status": req_overAllStatus.overallstatus,
 													"report": JSON.stringify(reportdata),
 													"modifiedby":userInfo.userid,
 													"query": "insertreportquery"
