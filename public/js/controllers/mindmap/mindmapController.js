@@ -4729,7 +4729,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     function clearSvg() {
         unloadMindmapData();
         $("#ct-node-0").children(".ng-binding").each(function(i,obj){
-            obj.innerHTML='Module_0';
+            //obj.innerHTML='Module_0';
         });
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
         d3.select('#ct-assignBox').classed('no-disp', !0);
