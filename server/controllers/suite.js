@@ -2057,7 +2057,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 									logger.info("Calling updateData function TestCaseDetails_Suite_ICE from executeScheduling");
 									executionjson[testsuiteid] = listofscenarioandtestcases;
 									executionjson.scenarioIds = scenarioIdList;
-									executionjson.browserType = JSON.parse(browserTypelist);
+									executionjson.browserType = browserTypelist.map(e => JSON.parse(e));
 									executionjson.condition = conditionchecklist;
 									executionjson.dataparampath = dataparamlist;
 									executionjson.testsuiteid = testsuiteid;
