@@ -334,10 +334,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						if (data2.mirror == undefined)
 							$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS">No Screenshot Available</div>')
 						else{
-							if(data2.scrapetype=='caa')
-								$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror.substring(2,data2.mirror.length-1) + '" /></div>')
-							else
-								$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror + '" /></div>')
+							$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror + '" /></div>')
 						}	
 						// service call # 3 -objectType service call
 						DesignServices.getKeywordDetails_ICE(appType)
