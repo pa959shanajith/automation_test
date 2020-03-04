@@ -706,7 +706,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
             },
             execution_insertion:function(callback_E){ 
 				utils.getChannelNum('ICE1_normal_' + name, function(found){
-					if found) {
+					if (found) {
 						insertExecutionStatus(req.session.userid,testsuiteIds,cycleid,function(res){
 							if(res == 'fail'){
 								executionId = '';
