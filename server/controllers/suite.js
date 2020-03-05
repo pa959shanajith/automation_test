@@ -2147,7 +2147,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 									if (!resultData.status) { // This block is for report data
 										try {
 											completedSceCount_s++;
-											scenarioCount_s = executionRequest.suitedetails[testsuitecount_s].scenarioIds.length  * executionRequest.suitedetails[testsuitecount_s].browserType.length;
+											var scenarioCount_s = executionRequest.suitedetails[testsuitecount_s].scenarioIds.length  * executionRequest.suitedetails[testsuitecount_s].browserType.length;
 											var scenarioid = resultData.scenarioId;
 											var executionid = resultData.executionId;
 											var reportdata = resultData.reportData;
