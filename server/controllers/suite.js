@@ -741,7 +741,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                             res.end('begin');
                         }
                         function executeTestSuite_listener(channel,message) {
-                            data = JSON.parse(message);
+                            var data = JSON.parse(message);
                             if(name == data.username){
                                 if (data.onAction == "unavailableLocalServer") {
                                     redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
@@ -749,8 +749,8 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                                     if (notifySocMap[name]) notifySocMap[name].emit("ICEnotAvailable");
                                     else if (!resSent) res.send("unavailableLocalServer");
                                 } else if (data.onAction == "result_executeTestSuite") {
-                                    var resultData = data.value;
-                                    if (resultData != "success" && resultData != "Terminate") {
+									var resultData = data.value;
+                                    if (!resultData.status) { // This block is for report data
                                         try {
                                             completedSceCount++;
                                             scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length * executionRequest.suitedetails[testsuitecount].browserType.length;
@@ -821,13 +821,12 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                                         } catch (ex) {
                                             logger.error("Exception in the function executionFunction: insertreportquery: %s", ex);
                                         }
-                                    }
-                                    if (resultData == "success" || resultData == "Terminate") {
+                                    } else { // This block will trigger when resultData.status has "success or "Terminate"
                                         redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
                                         try {
                                             logger.info("Sending execution status from function executionFunction");
-                                            if (notifySocMap[name]) notifySocMap[name].emit("result_ExecutionDataInfo", resultData);
-                                            else if (!resSent) res.send(resultData);
+                                            if (notifySocMap[name]) notifySocMap[name].emit("result_ExecutionDataInfo", resultData.status);
+                                            else if (!resSent) res.send(resultData.status);
                                         } catch (ex) {
                                             logger.error("Exception While sending execution status from the function executionFunction: %s", ex);
                                         }
@@ -1125,8 +1124,8 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 											dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 											redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 											function executeTestSuite_listener(channel,message) {
-												data = JSON.parse(message);
-												if(name == data.username){
+												var data = JSON.parse(message);
+												if(name == data.username && executionRequest.executionId == data.value.executionId){
 													if (data.onAction == "unavailableLocalServer") {
 														redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
 														logger.error("Error occured in ExecuteTestSuite_ICE_SVN: Socket Disconnected");
@@ -1137,7 +1136,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 													} else if (data.onAction == "result_executeTestSuite") {
 														var resultData = data.value;
 														completedSceCount++;
-														if (resultData != "success" && resultData != "Terminate") {
+														if (!resultData.status) { // This block is for report data
 															try {
 																var scenarioid = resultData.scenarioId;
 																var executionid = resultData.executionId;
@@ -1205,8 +1204,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 															} catch (ex) {
 																logger.error("Error occured in ExecuteTestSuite_ICE_SVN service:",ex);
 															}
-														}
-														if (resultData == "success" || resultData == "Terminate") {
+														} else { // This block will trigger when resultData.status has "success or "Terminate"
 															redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
 															try {
 																result_to_send.execution_status.push(final_data[username]);
@@ -2064,7 +2062,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 									logger.info("Calling updateData function TestCaseDetails_Suite_ICE from executeScheduling");
 									executionjson[testsuiteid] = listofscenarioandtestcases;
 									executionjson.scenarioIds = scenarioIdList;
-									executionjson.browserType = browserTypelist.map(e => JSON.parse(e));
+									executionjson.browserType = browserTypelist;
 									executionjson.condition = conditionchecklist;
 									executionjson.dataparampath = dataparamlist;
 									executionjson.testsuiteid = testsuiteid;
@@ -2120,8 +2118,8 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 						redisServer.redisPubICE.publish('ICE1_scheduling_' + name,JSON.stringify(dataToIce));
 						var starttime = new Date().getTime();
 						function executeTestSuite_listener(channel,message) {
-							data = JSON.parse(message);
-							if(name == data.username && executionRequest.executionId == data.value.executionId){
+							var data = JSON.parse(message);
+							if(name == data.username && executionRequest.executionId == data.value.executionId) {
 								if (data.onAction == "return_status_executeTestSuite") {
 									var response = data.value;
 									if(response.status == "success"){
@@ -2146,9 +2144,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 									}
 								} else if (data.onAction == "result_executeTestSuite") {
 									var resultData = data.value;
-									if (resultData != "success" && resultData != "Terminate") {
-										//completedSceCount_s++;
-										//scenarioCount_s = executionRequest.suitedetails[testsuitecount_s].scenarioIds.length;
+									if (!resultData.status) { // This block is for report data
 										try {
 											completedSceCount_s++;
 											scenarioCount_s = executionRequest.suitedetails[testsuitecount_s].scenarioIds.length  * executionRequest.suitedetails[testsuitecount_s].browserType.length;
@@ -2156,8 +2152,6 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 											var executionid = resultData.executionId;
 											var reportdata = resultData.reportData;
 											var testsuiteid = resultData.testsuiteId;
-											// var req_report = resultData.reportdata;
-											// var req_reportStepsArray = reportdata.rows;
 											if (reportdata.overallstatus.length != 0) {
 												var req_overAllStatus = reportdata.overallstatus[0];
 												var req_browser = req_overAllStatus.browserType;
@@ -2220,16 +2214,11 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 										} catch (ex) {
 											logger.error("Exception occurred in the scheduleFunction: %s", ex);
 										}
-									}
-									else if (resultData) {
-										if (typeof(resultData) == "string") {
+									} else { // This block will trigger when resultData.status has "success or "Terminate"
+										if (typeof(resultData.status) == "string") {
 											redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
-											scheduleStatus = resultData == "success" ? "Completed" : resultData;
-										} 
-										// else if (typeof(resultData) == "object") {
-										// 	var stat = resultData.reportData.overallstatus[0].overallstatus;
-										// 	scheduleStatus = stat == "success" ? "Completed" : stat;
-										// }
+											scheduleStatus = resultData.status == "success" ? "Completed" : resultData.status;
+										}
 										try {
 											logger.info("Calling function updateStatus from scheduleFunction");
 											updateStatus(sessObj, function (err, data) {
