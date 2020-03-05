@@ -2237,20 +2237,18 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 						redisServer.redisSubServer.on("message",executeTestSuite_listener);
 					} else {
 						logger.error("Error occurred in the function scheduleFunction: Socket not Available");
-						// deleteFlag = true;
-						// deleteScheduledData(deleteFlag, sessObj)
-						var testsuiteid = JSON.parse(JSON.stringify(result1.rows[0].testsuiteids))[0];
-						var scheduleid = JSON.parse(JSON.stringify(result1.rows[0].scheduleid));
+						var testsuiteid = result1.rows[0].testsuiteids[0];
+						var scheduleid = result1.rows[0]._id;
 						var d = {};
 						d[testsuiteid]=[];
-						var scenariodetails = JSON.parse(result1.rows[0].scenariodetails);
+						var scenariodetails = result1.rows[0].scenariodetails;
 						for(var i=0;i<scenariodetails.length;i++){
 							(d[testsuiteid]).push(scenariodetails[i].scenarioids);
 						}
 						var datetime = new Date();
 						datetime = datetime.getFullYear()+'-'+(datetime.getMonth()+1)+'-'+datetime.getDate()+' '+datetime.getHours()+':'+datetime.getMinutes()+':'+datetime.getSeconds()+'0';
 						var data = {'scenario_ids':d,'execution_id':scheduleid,'time':String(datetime)};
-						var sessobj_new = sessObj + ';Skipped;' +  JSON.stringify(result.rows[0]) + ';' +JSON.stringify(data);
+						var sessobj_new = sessObj + ';Skipped;' +  JSON.stringify(result1.rows[0]) + ';' +JSON.stringify(data);
 						var msg = "The scenario was skipped due to unavailability of schedule mode/ICE.";
 						logger.info("Calling function updateSkippedScheduleStatus from scheduleFunction");
 						updateSkippedScheduleStatus(sessobj_new, msg, function (err, data) {
@@ -2261,22 +2259,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 					}
 				});
 			}
-		//    }
-		})
-		try {
-			
-		} catch (exception) {
-			logger.error("Exception occurred in the executeScheduling function: %s", ex);
-			// deleteFlag = true;
-			// deleteScheduledData(deleteFlag, sessObj)
-			scheduleStatus = "Failed 02";
-			logger.info("Calling function updateStatus from executeScheduling");
-			updateStatus(sessObj, function (err, data) {
-				if (!err) {
-					logger.info("Sending response data from executeScheduling");
-				}
-			});
-		}
+		});
 	}
 
 	//Update execution table on completion of suite execution

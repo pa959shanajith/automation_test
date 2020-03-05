@@ -362,44 +362,16 @@ mySPA.controller('respHeaderController', function($scope, $rootScope, $timeout, 
 		}, 5);
 	});
 
-
 	if (window.localStorage['_CT']) {
 		projectId.push(JSON.parse(window.localStorage['_CT']).projectId);
-		respHeaderServices.getNames_ICE(projectId,['projects']) 
-		.then(function(data){
-			if(data == "Invalid Session"){
-				return $rootScope.redirectPage();
-			}
-			$scope.projectDetails = data;
+		var data = JSON.parse(window.localStorage['_CT'])
+			$scope.projectDetails = {"idtypes":["projects"],"requestedids":[data.projectId],"respnames":[data.taskName]};
 			task = JSON.parse(window.localStorage['_CT']);
-
 			releaseId.push(task.releaseid);
 			screenId.push(task.screenId);
-			respHeaderServices.getNames_ICE(releaseId, ['releases']) 
-			.then(function(data){
-				if(data == "Invalid Session"){
-					return $rootScope.redirectPage();
-				}
-				$scope.releaseDetails = data.respnames[0];
-				cycleId.push(task.cycleid);
-				respHeaderServices.getNames_ICE(cycleId, ['cycles'])
-				.then(function(data){
-					if(data == "Invalid Session"){
-				  		return $rootScope.redirectPage();
-					}
-					$scope.cycleDetails = data.respnames[0];
-
-				}, function(error) {	console.log("Failed to get cycle name")});
-			}, function(error) {	console.log("Failed to get release name")});
-			respHeaderServices.getNames_ICE(screenId,['screens']) 
-		.then(function(data){
-			if(data == "Invalid Session"){
-				return $rootScope.redirectPage();
-			}
-			$scope.screenName = data.respnames[0];
-		}, 
-		function(error) {	console.log("Failed to fetch info")});
-		}, function(error) {	console.log("Failed to fetch projectInfo")});
+			$scope.releaseDetails = task.releaseid;
+			$scope.cycleDetails = data.cycleid;
+			$scope.screenName = data.taskName;
 	}
 
 	$scope.logout = function($event){
