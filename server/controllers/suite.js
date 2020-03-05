@@ -753,7 +753,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                                     if (!resultData.status) { // This block is for report data
                                         try {
                                             completedSceCount++;
-                                            scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length * executionRequest.suitedetails[testsuitecount].browserType.length;
+                                            var scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length * executionRequest.suitedetails[testsuitecount].browserType.length;
                                             var scenarioid = resultData.scenarioId;
                                             var executionid = resultData.executionId;
                                             var reportdata = resultData.reportData;
