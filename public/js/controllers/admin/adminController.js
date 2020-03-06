@@ -557,6 +557,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					$('#selDomain').show()
 					$('#selDomains').hide()
 					$('#selDomain').empty()
+					if(data.length==0){
+						data=['Banking','Manufacturing','Finance']
+					}
 					for (var i = 0; i < data.length; i++) {
 					// if(data.length!=0){
 						$('#selDomain').append($("<option value=" + data[i] + "></option>").text(data[i]));

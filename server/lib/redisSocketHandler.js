@@ -235,6 +235,9 @@ module.exports.initListeners = mySocket => {
 				dataToNode.value = value.slice(i*500, (i+1)*500);
 				server_pub.publish("ICE2_" + username, JSON.stringify(dataToNode));
 			}
+		} else {
+			dataToNode.value = value;
+			server_pub.publish("ICE2_" + username, JSON.stringify(dataToNode));
 		}
 		dataToNode.onAction = "render_screenshot_finished";
 		dataToNode.value = (typeof(value) === "string")? value: "";

@@ -730,6 +730,17 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					openDialogExe("Execute Test Suite", "Task doesnot exist for child node");
 				else if(data == "Modified")
 					openDialogExe("Execute Test Suite", "Task has been modified, Please approve the task");
+				else if (data == "unavailableLocalServer")
+					openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
+				else if (data == "Terminate") {
+					$('#executionTerminated').modal('show');
+					$('#executionTerminated').find('.btn-default').focus();
+				} else {
+					$('#executionCompleted').modal('show');
+					setTimeout(function () {
+						$("#executionCompleted").find('.btn-default').focus();
+					}, 300);
+				}
 				$(".selectBrowser").find("img").removeClass("sb");
 				$(".selectParallel").find("img").removeClass("sb");
 				$(".selectBrowser").find("svg").removeClass("sb");
