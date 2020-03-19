@@ -4034,6 +4034,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         execution_data = {
             "execution_data": [{
                 "browserType": ["1"],
+                "exec_mode": "serial",
                 "moduleInfo": [{
                     "appType": "",
                     "projectId": "",
@@ -4088,7 +4089,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     if (result_details._id != null) {
                         module_info.moduleId = result_details._id;
                         module_info.moduleName = result_details.name;
-                        if(result_details.versionnumber==0) module_info.versionNumber="0.0"
+                        if(result_details.versionnumber==0) module_info.versionNumber="0.0";
                         else module_info.versionNumber = String(result_details.versionnumber);
                         flag = 1;
                         for (var j = 0; j < result_details.children.length; j++) {
