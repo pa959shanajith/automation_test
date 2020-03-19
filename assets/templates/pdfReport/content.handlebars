@@ -412,8 +412,7 @@
                {{/ifEquals}}
                {{#ifnotEquals testcase_details.testcaseDetails ""}}
                {{#ifnotEquals testcase_details undefined}}
-               <td class="rDExpectedRes tabCont" style="padding-left: 10px;">Expected Result is:
-                  {{testcase_details.testcaseDetails}}</td>
+               <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{testcase_details.testcaseDetails}}</td>
                {{/ifnotEquals}}
                {{/ifnotEquals}}
                {{#ifEquals status undefined}}
@@ -439,7 +438,7 @@
                {{/ifEquals}}
                {{#ifnotEquals testcase_details.actualResult_fail ""}}
                <td class="rDActualRes tabCont" style="padding-left: 10px;">
-                  {{testcase_details.actualResult_fail}}>{{status}}</a></td>
+                  {{testcase_details.actualResult_fail}}</td>
                {{/ifnotEquals}}
                {{/ifEquals}}
                {{#ifEquals status "Terminate"}}
@@ -470,7 +469,7 @@
          <img id="img-{{slno}}" src="{{getDataURI screenshot_dataURI}}" style="width:100%;display:block;"
             alt="Image for Sl No. {{slno}}">
          {{/ifnotEquals}}
-         <a href="#report-slno{{slno}}">Above Image belongs to Sl No. {{slno}}</a>
+         <a href="#report-slno{{slno}}">Above image belongs to Sl No. {{slno}}</a>
       </div>
       {{/each}}
    </div>
