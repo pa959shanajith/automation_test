@@ -314,7 +314,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 		}
 		else {
 			$(this).find("img").addClass("sb")
-			browserTypeExe.push('"'+$(this).data("name")+'"')
+			browserTypeExe.push(''+$(this).data("name"))
 		}
 		console.log(browserTypeExe)
 	})

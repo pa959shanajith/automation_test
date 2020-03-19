@@ -79,7 +79,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     //Bind releases on Projects Filter Change
-    $scope.selProjectsFilter = function() {
+    $('.project-list').change(function() {
         var projectId = $('.project-list option:selected').val();
         blockUI("Loading releases.. please wait..");
         $(".moduleBox,.mid-report-section,#accordion").hide();
@@ -114,10 +114,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             unblockUI();
             console.log("Error in service populateReleases while fetching projects -" + error);
         }
-    };
+    });
 
          //Bind cycles on releases Filter Change
-        $scope.selReleasesFilter = function() {
+         $('.release-list').change(function() {
             var releaseName= $('.release-list option:selected').val();
             blockUI("Loading cycles.. please wait..");
             $(".moduleBox,.mid-report-section,#accordion").hide();
@@ -147,10 +147,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 unblockUI();
                 console.log("Error in service populateReleases while fetching projects -" + error);
             }
-        };
+        });
 
         //Load modules on cycles filter change
-        $scope.selCyclesFilter = function() {
+        $('.cycle-list').change(function() {
             var cycleId = $('.cycle-list option:selected').val();
             var reportsInputData = {};
             reportsInputData.projectId = $.trim($('.project-list option:selected').val());
@@ -209,7 +209,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 unblockUI();
                 console.log("Error in service getReportsData_ICE while fetching modules-"+error);
             });
-        };
+        });
 
 
     //Responsive Header Menu
@@ -757,7 +757,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 "browserType": "",
                 "StartTime": "",
                 "EndTime": "",
-                "overAllStatus": "",
+                "overallstatus": "",
                 "EllapsedTime": "",
                 "date": "",
                 "time": "",
@@ -800,7 +800,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                 var getDat = getTym.split(" ")[0].split("-");
                                 finalReports.overallstatus[0].date = getDat[1] + "/" + getDat[2] + "/" + getDat[0];
                                 finalReports.overallstatus[0].time = getTym.split(" ")[1];
-                                finalReports.overallstatus[0].overAllStatus = obj2.overallstatus[j].overAllStatus;
+                                finalReports.overallstatus[0].overallstatus = obj2.overallstatus[j].overallstatus;
                                 elapTym = (obj2.overallstatus[j].EllapsedTime.split(".")[0]).split(":");
                                 finalReports.overallstatus[0].EllapsedTime = "~" + ("0" + elapTym[0]).slice(-2) + ":" + ("0" + elapTym[1]).slice(-2) + ":" + ("0" + elapTym[2]).slice(-2)
                             }

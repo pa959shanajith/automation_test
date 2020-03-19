@@ -334,10 +334,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						if (data2.mirror == undefined)
 							$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS">No Screenshot Available</div>')
 						else{
-							if(data2.scrapetype=='caa')
-								$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror.substring(2,data2.mirror.length-1) + '" /></div>')
-							else
-								$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror + '" /></div>')
+							$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror + '" /></div>')
 						}	
 						// service call # 3 -objectType service call
 						DesignServices.getKeywordDetails_ICE(appType)
@@ -903,10 +900,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					}
 					newScrapedList = viewString
 					$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
-					if(viewString.scrapetype=='caa')
-						$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror.substring(2,viewString.mirror.length-1) + '" /></div>')
-					else
-						$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
+					$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
 					$("#finalScrap").empty()
 					if (jQuery.isEmptyObject(viewString)) {
 						console.log("Data is Empty");
@@ -2067,10 +2061,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						//mirrorObj = scrapeJson[1];
 						//scrapeTypeObj = scrapeJson[2];
 						$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
-						if(viewString.scrapetype=='caa')
-								$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror.substring(2,viewString.mirror.length-1) + '" /></div>')
-						else	
-							$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
+						$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
 						$("#finalScrap").empty()
 						$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'/><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 10' disabled>Delete</button><button data-toggle='modal' id='editObjects' data-target='#editObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' data-toggle='tooltip' title='Edit Objects' disabled>Edit</button></span><span class='searchScrapEle'><img src='imgs/ic-search-icon.png'></input></span><span><input type='text' class='searchScrapInput'></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
 						var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
