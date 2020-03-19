@@ -885,15 +885,16 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 		};
 		logger.info("Calling NDAC Service from ExecuteTestSuite_ICE_SVN: login/authenticateUser_Nineteen68_CI");
 		client.post(epurl + "login/authenticateUser_Nineteen68_CI", args_validation, function (result, response) {
+			var failflag = true;
 			if (response.statusCode != 200 || result.rows == "fail") {
 				logger.error("Error occured in ExecuteTestSuite_ICE_SVN service from login/authenticateUser_Nineteen68_CI Error Code : ERRNDAC");
 				cb_validation('err');
-			} else {
-				var validUser = false;
-				validUser = bcrypt.compareSync(uservalidation_iterator.userInfo.tokenhash,result.rows.hash);
+			} else if (result.rows) {
+				var validUser = bcrypt.compareSync(uservalidation_iterator.userInfo.tokenhash, result.rows.hash);
 				if (validUser) {
+					failflag = false;
 					uservalidation_iterator.userInfo.userid = result.rows.userid;
-					uservalidation_iterator.userInfo.role = "CI";  // Since it's a CI_User, so it has execute only permissions. Hence role is CI.
+					uservalidation_iterator.userInfo.role = result.rows.role;
 					valid_userdata.push(uservalidation_iterator);
 					result_status.tokenValidation = "passed";
 					final_data[uservalidation_iterator.userInfo.username] = result_status;
@@ -909,13 +910,14 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 						result_to_send.execution_status.push(final_data);
 						logger.error("Inside UI service: ExecuteTestSuite_ICE_SVN Token is deactivated for username:",uservalidation_iterator.userInfo.username);
 					}
-				} else {
-					final_data[uservalidation_iterator.userInfo.username] = result_status;
-					result_to_send.execution_status.push(final_data);
-					logger.info("Inside UI service: ExecuteTestSuite_ICE_SVN Token authentication failed for username:",uservalidation_iterator.userInfo.username);
 				}
 			}
-			if(final_data[uservalidation_iterator.userInfo.username].tokenValidation=='passed'){
+			if (failflag) {
+				final_data[uservalidation_iterator.userInfo.username] = result_status;
+				result_to_send.execution_status.push(final_data);
+				logger.info("Inside UI service: ExecuteTestSuite_ICE_SVN Token authentication failed for username:",uservalidation_iterator.userInfo.username);
+			}
+			if(final_data[uservalidation_iterator.userInfo.username].tokenValidation == 'passed') {
 				cb_validation();
 			} else {
 				cb_validation(final_data[uservalidation_iterator.userInfo.username].tokenValidation)
@@ -956,8 +958,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 						function (result_details, response) {
 							if (response.statusCode != 200 || result_details.rows == "fail") {
 								logger.error("Error occured in ExecuteTestSuite_ICE_SVN service from suite/readTestSuite_ICE Error Code : ERRNDAC");
-							}
-							else {
+							} else {
 								var module_index = userdata_iterator.moduleInfo.indexOf(moduleinfo_iterator);
 								var moduleResult = { "moduleName": "", "moduleId": "", "suiteDetails": [] };
 								var readTestSuite = {
