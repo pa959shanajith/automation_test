@@ -933,6 +933,10 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 				testsuite_creation_data[userdata_iterator.userInfo.username] = { "fromFlag": "", "param": "readTestSuite", "readTestSuite": [] };
 				for (var i = 0; i < userdata_iterator.moduleInfo.length; i++) {
 					module_info_data = {
+						"releaseid": userdata_iterator.moduleInfo[i].releaseId,
+						"cyclename": userdata_iterator.moduleInfo[i].cycleName,
+						"domainname": userdata_iterator.moduleInfo[i].domainName,
+						"projectname": userdata_iterator.moduleInfo[i].projectName,
 						"browserType": userdata_iterator.browserType,
 						"suiteDetails": [],
 						"testsuiteid": userdata_iterator.moduleInfo[i].moduleId,
@@ -1046,6 +1050,10 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 									var testsuiteid = eachbatchExecutionData.testsuiteid;
 									var browserType = eachbatchExecutionData.browserType;
 									var apptype = eachbatchExecutionData.appType;
+									var releaseId = eachbatchExecutionData.releaseid;
+									var cycleName = eachbatchExecutionData.cyclename;
+									var projectName = eachbatchExecutionData.projectname;
+									var domainName = eachbatchExecutionData.domainname;
 									var listofscenarioandtestcases = [];
 									var scenarioIdList = [];
 									var dataparamlist = [];
@@ -1097,6 +1105,10 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 											executionjson.testsuiteid = testsuiteid;
 											executionjson.testsuitename = testsuitename;
 											executionjson.scenarioNames = suite_status.scenarionames;
+											executionjson.releaseid = releaseId;
+											executionjson.cyclename = cycleName;
+											executionjson.projectname = projectName;
+											executionjson.domainname = domainName;
 											testsuitedetailslist.push(executionjson);
 											if (testsuitedetailslist.length == batchExecutionData.length) {
 												excutionObjectBuilding(testsuitedetailslist, apptype);

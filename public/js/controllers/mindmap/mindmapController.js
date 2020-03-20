@@ -4084,7 +4084,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         "moduleName": "",
                         "releaseId": "",
                         "versionNumber": "",
-                        "suiteDetails": []
+                        "suiteDetails": [],
+                        "cycleName": "",
+                        "projectName": "",
+                        "domainName": ""
                     };
                     if (result_details._id != null) {
                         module_info.moduleId = result_details._id;
@@ -4120,7 +4123,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             }
                             parsed_project_data = project_type;
                             data.moduleInfo[0].cycleId = project_type['releases'][0]["cycles"][0]["_id"];
+                            data.moduleInfo[0].cycleName = project_type['releases'][0]["cycles"][0]["name"];
                             data.moduleInfo[0].releaseId = project_type['releases'][0]["name"];
+                            data.moduleInfo[0].domainName = project_type['domains'];
+                            data.moduleInfo[0].projectName = $("#ct-moduleBox").find('.project-list option:selected').text()
                             data.moduleInfo[0].appType = project_type['project_typename'];
                             var responseData = JSON.stringify(data);
                             jsonDownload('moduleinfo.json', responseData);
