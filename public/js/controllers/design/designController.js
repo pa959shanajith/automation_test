@@ -2433,6 +2433,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						$("#left-top-section,#left-bottom-section").removeClass('disableClick');
 						$("#changedOrdList li,#compareUnchangedObjectsBox li ,#compareNotFoundObjectsBox li").empty();
 						//window.location.href = "/design";
+						deleteScrapeDataservice = true;
 					});
 				} else {
 					openDialog("Compared Objects", "Failed to update objects");
@@ -2572,6 +2573,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				getIndexOfDeletedObjects = [];
 				angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
 				unblockUI()
+				deleteScrapeDataservice = true;
 				//add popoup for error and saved 
 			}, function (error) {unblockUI() })
 		
@@ -2883,6 +2885,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								getIndexOfDeletedObjects = [];
 								angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
 								unblockUI()
+								deleteScrapeDataservice = true;
 								//add popoup for error and saved 
 							}, function (error) {unblockUI()  })
 							return;
