@@ -406,6 +406,9 @@
                {{#ifnotEquals Keyword "TestCase Name"}}
                <td class="rDExpectedRes tabCont {{getClass StepDescription}}"></td>
                {{/ifnotEquals}}
+               {{#ifEquals Keyword "TestCase Name"}}
+               <td class="rDExpectedRes tabCont"></td>
+               {{/ifEquals}}
                {{/ifEquals}}
                {{#ifEquals testcase_details.testcaseDetails ""}}
                <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
