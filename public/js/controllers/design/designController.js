@@ -1944,7 +1944,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									} else imgTag = tag;
 									var tag1 = tag.replace(/ /g, "_");
 									var tag2;
-									if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
+									if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell" || tag=="iris") {
 										var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x'><a class='customTxtName'><span class='highlight'></span><input type='checkbox' class='checkCompareAll' name='selectAllChangedItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 									} else {
 										var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x'><a class='customTxtName'><span class='highlight'></span><input type='checkbox' class='checkCompareAll' name='selectAllChangedItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
@@ -2348,7 +2348,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			$("#dialog-irisObject").modal("show");
 			$("#addIrisObjContainer").empty()
 			if ($(".addObj-row").length > 1) $(".addObj-row").remove()
-			$("#addIrisObjContainer").append('<div class = "row row-modal addObj-row"><div class = "form-group"><span><strong>Object Detected as:	'+objType+'</strong></span></div><br><br><span style="float:left"><strong>User input: </strong></span><div class = "form-group form-group-2" style="float:left; margin-left:10px;"><select class = "form-control form-control-custom" id="objectType"><option selected disabled > Select Object Type </option><option value = "textbox" > Textbox / Textarea </option><option value = "table" > Table </option><option value = "dropdown" > Dropdown </option><option value = "button" > Button </option><option value = "radiobutton" > Radiobutton </option><option value = "checkbox" > Checkbox </option><option value = "others" > Others </option></select></div> </div>');
+			$("#addIrisObjContainer").append('<div class = "row row-modal addObj-row"><div class = "form-group"><span><strong>Object Detected as:	'+objType+'</strong></span></div><br><br><span style="float:left"><strong>User input: </strong></span><div class = "form-group form-group-2" style="float:left; margin-left:10px;"><select class = "form-control form-control-custom" id="objectType"><option selected disabled > Select Object Type </option><option value = "textbox" > Textbox / Textarea </option><option value = "table" > Table </option><option value = "dropdown" > Dropdown </option><option value = "button" > Button </option><option value = "radiobutton" > Radiobutton </option> <option value = "iris" > iris </option> <option value = "checkbox" > Checkbox </option><option value = "others" > Others </option></select></div> </div>');
 		}, 500);
 	});
 	
@@ -3702,7 +3702,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				} else imgTag = tag;
 				var tag1 = tag.replace(/ /g, "_");
 				var tag2;
-				if ((tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") && ob.hasOwnProperty('editable')) {
+				if ((tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell" || tag=="iris") && ob.hasOwnProperty('editable')) {
 					var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><span id='decrypt' class='userObject'></span></li>";
 				} else {
 					var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
@@ -3866,7 +3866,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				$(this).hide();
 			} else if (clickElem == "Element") {
 				var elem = $(this).data("tag")
-				if (elem == "a" || elem == "input" || elem == "table" || elem == "list" || elem == "select" || elem == "img" || elem == "button" || elem == "radiobutton" || elem == "checkbox") {
+				if (elem == "a" || elem == "input" || elem == "table" || elem == "list" || elem == "select" || elem == "img" || elem == "button" || elem == "radiobutton" || elem == "checkbox" || elem=="iris") {
 					$(this).hide();
 				} else {
 					$(this).show();
@@ -4725,6 +4725,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							$(this).data("tag") != "checkbox" &&
 							$(this).data("tag") != "select" &&
 							$(this).data("tag") != "img" &&
+							$(this).data("tag") != "iris" &&
 							$(this).data("tag") != "a" &&
 							$(this).data("tag") != "radiobutton" &&
 							$(this).data("tag") != "input" &&
@@ -4744,6 +4745,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							$(this).data("tag").toLowerCase().indexOf("check box") == -1 &&
 							$(this).data("tag").toLowerCase().indexOf("checkbox") == -1 &&
 							$(this).data("tag").toLowerCase().indexOf("image") == -1 &&
+							$(this).data("tag").toLowerCase().indexOf("iris") == -1 &&
 							($(this).data("tag").toLowerCase().indexOf("table") == -1 || $(this).data("tag").toLowerCase() == "tablecell") &&
 							$(this).data("tag").toLowerCase().indexOf("radio button") == -1) {
 							$(this).show();
