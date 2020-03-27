@@ -937,6 +937,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 						"cyclename": userdata_iterator.moduleInfo[i].cycleName,
 						"domainname": userdata_iterator.moduleInfo[i].domainName,
 						"projectname": userdata_iterator.moduleInfo[i].projectName,
+						"cycleid": userdata_iterator.moduleInfo[i].cycleId,
 						"browserType": userdata_iterator.browserType,
 						"suiteDetails": [],
 						"testsuiteid": userdata_iterator.moduleInfo[i].moduleId,
@@ -1020,7 +1021,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 									"apptype": "",
 									"exec_mode":userdata_iterator.exec_mode
 								};
-								var executionId = uuid();
+								// var executionId = uuid();
 								var starttime = new Date().getTime();
 								//updating number of executions happened
 								var batchlength = batchExecutionData.length;
@@ -1052,6 +1053,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 									var apptype = eachbatchExecutionData.appType;
 									var releaseId = eachbatchExecutionData.releaseid;
 									var cycleName = eachbatchExecutionData.cyclename;
+									cycleId = eachbatchExecutionData.cycleid;
 									var projectName = eachbatchExecutionData.projectname;
 									var domainName = eachbatchExecutionData.domainname;
 									var listofscenarioandtestcases = [];
@@ -1096,6 +1098,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 												}
 											}
 										});
+										
 										function updateData() {
 											executionjson[testsuiteid] = listofscenarioandtestcases;
 											executionjson.scenarioIds = scenarioIdList;
@@ -1118,12 +1121,18 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 								});
 
 								function excutionObjectBuilding(testsuitedetailslist, apptype) {
-									executionRequest.executionId = executionId;
+									// executionRequest.executionId = executionId;
 									executionRequest.suitedetails = testsuitedetailslist;
 									executionRequest.testsuiteIds = testsuiteIds;
 									executionRequest.apptype = apptype;
 								}
-
+								insertExecutionStatus(userInfo.userid,testsuiteIds,cycleId,function(res){
+									if(res == 'fail'){
+										executionRequest.executionId = '';
+									}else{
+										executionRequest.executionId = res;
+									}
+								});
 								function executionFunction(executionRequest, username) {
 									var name = username;
 									redisServer.redisSubServer.subscribe('ICE2_' + name);
@@ -1169,20 +1178,21 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 																		if (final_data[username].moduleInfo[k].moduleId == testsuiteid)
 																			final_data[username].moduleInfo[k].suiteDetails.push(req_overAllStatus);
 																	}
-																	var reportId = uuid();
-																	if (resultData.req_overAllStatus.overallstatus == "Pass") {
+																	// var reportId = uuid();
+																	if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
 																		statusPass++;
 																	}
 																	var inputs = {
-																		"reportid": reportId,
+																		// "reportid": reportId,
 																		"executionid": executionid,
 																		"testsuiteid": testsuiteid,
 																		"testscenarioid": scenarioid,
 																		"cycleid": cycleId1,
 																		"browser": req_browser,
-																		"status": resultData.req_overAllStatus.overallstatus,
+																		"status": resultData.reportData.overallstatus[0].overallstatus,
 																		"report": JSON.stringify(reportdata),
-																		"query": "insertreportquery"
+																		"query": "insertreportquery",
+																		"modifiedby": userInfo.userid
 																	};
 																	var args = {
 																		data: inputs,
