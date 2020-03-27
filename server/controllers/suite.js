@@ -2371,7 +2371,15 @@ function   updateStatus(sessObj, updateStatuscallback) {
 function updateSkippedScheduleStatus(sessObj, msg, updateStatuscallback){
 	logger.info("Inside updateSkippedScheduleStatus function");
 	try {
-		var data = JSON.parse(sessObj.split(';')[4]);
+		if (sessObj.split(';')[4].split(',')[5].replace(/"/g,"").split(':')[1]!="[]"){
+			data=JSON.parse(sessObj.split(';')[4]+';'+sessObj.split(';')[5])
+			var executionid = JSON.parse(sessObj.split(';')[6]).execution_id;
+			var time = JSON.parse(sessObj.split(';')[6]).time;
+		} else{
+			var data = JSON.parse(sessObj.split(';')[4]);
+			var executionid = JSON.parse(sessObj.split(';')[5]).execution_id;
+			var time = JSON.parse(sessObj.split(';')[5]).time
+		}
 		if(data['_id'] == sessObj.split(";")[0]){
 			var inputs = {
 				"schedulestatus": "Skipped",
@@ -2397,15 +2405,11 @@ function updateSkippedScheduleStatus(sessObj, msg, updateStatuscallback){
 				});
 				var obj = data['scenariodetails'];
 				for(var i=0;i<(Object.keys(obj)).length;i++){
-					// var suite=(Object.keys(obj))[i];
-					// for(var j=0;j<obj[suite].length;j++){
-					//var reportId = uuid();
-					var report_data = JSON.parse(sessObj.split(';')[4]);
+					var report_data = data;
 					var scenario = obj[i].scenarioids;
-					var executionid = JSON.parse(sessObj.split(';')[5]).execution_id;
 					var testsuiteid = report_data.testsuiteids[0];
 					var req_browser = 'NA';
-					var sheduledby = JSON.parse(sessObj.split(';')[4]).scheduledby;
+					var sheduledby = data.scheduledby;
 					var reportData = {
 										'rows': [{
 												'status': 'Skipped',
@@ -2421,8 +2425,8 @@ function updateSkippedScheduleStatus(sessObj, msg, updateStatuscallback){
 												'browserVersion': 'NA',
 												'EllapsedTime': '0:00:00',
 												'browserType': 'NA',
-												'StartTime': JSON.parse(sessObj.split(';')[5]).time,
-												'EndTime': JSON.parse(sessObj.split(';')[5]).time,
+												'StartTime': time,
+												'EndTime': time,
 												'overallstatus': 'Skipped'
 											}
 										]
