@@ -885,15 +885,16 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 		};
 		logger.info("Calling NDAC Service from ExecuteTestSuite_ICE_SVN: login/authenticateUser_Nineteen68_CI");
 		client.post(epurl + "login/authenticateUser_Nineteen68_CI", args_validation, function (result, response) {
+			var failflag = true;
 			if (response.statusCode != 200 || result.rows == "fail") {
 				logger.error("Error occured in ExecuteTestSuite_ICE_SVN service from login/authenticateUser_Nineteen68_CI Error Code : ERRNDAC");
 				cb_validation('err');
-			} else {
-				var validUser = false;
-				validUser = bcrypt.compareSync(uservalidation_iterator.userInfo.tokenhash,result.rows.hash);
+			} else if (result.rows) {
+				var validUser = bcrypt.compareSync(uservalidation_iterator.userInfo.tokenhash, result.rows.hash);
 				if (validUser) {
+					failflag = false;
 					uservalidation_iterator.userInfo.userid = result.rows.userid;
-					uservalidation_iterator.userInfo.role = "CI";  // Since it's a CI_User, so it has execute only permissions. Hence role is CI.
+					uservalidation_iterator.userInfo.role = result.rows.role;
 					valid_userdata.push(uservalidation_iterator);
 					result_status.tokenValidation = "passed";
 					final_data[uservalidation_iterator.userInfo.username] = result_status;
@@ -909,13 +910,14 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 						result_to_send.execution_status.push(final_data);
 						logger.error("Inside UI service: ExecuteTestSuite_ICE_SVN Token is deactivated for username:",uservalidation_iterator.userInfo.username);
 					}
-				} else {
-					final_data[uservalidation_iterator.userInfo.username] = result_status;
-					result_to_send.execution_status.push(final_data);
-					logger.info("Inside UI service: ExecuteTestSuite_ICE_SVN Token authentication failed for username:",uservalidation_iterator.userInfo.username);
 				}
 			}
-			if(final_data[uservalidation_iterator.userInfo.username].tokenValidation=='passed'){
+			if (failflag) {
+				final_data[uservalidation_iterator.userInfo.username] = result_status;
+				result_to_send.execution_status.push(final_data);
+				logger.info("Inside UI service: ExecuteTestSuite_ICE_SVN Token authentication failed for username:",uservalidation_iterator.userInfo.username);
+			}
+			if(final_data[uservalidation_iterator.userInfo.username].tokenValidation == 'passed') {
 				cb_validation();
 			} else {
 				cb_validation(final_data[uservalidation_iterator.userInfo.username].tokenValidation)
@@ -931,6 +933,11 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 				testsuite_creation_data[userdata_iterator.userInfo.username] = { "fromFlag": "", "param": "readTestSuite", "readTestSuite": [] };
 				for (var i = 0; i < userdata_iterator.moduleInfo.length; i++) {
 					module_info_data = {
+						"releaseid": userdata_iterator.moduleInfo[i].releaseId,
+						"cyclename": userdata_iterator.moduleInfo[i].cycleName,
+						"domainname": userdata_iterator.moduleInfo[i].domainName,
+						"projectname": userdata_iterator.moduleInfo[i].projectName,
+						"cycleid": userdata_iterator.moduleInfo[i].cycleId,
 						"browserType": userdata_iterator.browserType,
 						"suiteDetails": [],
 						"testsuiteid": userdata_iterator.moduleInfo[i].moduleId,
@@ -956,8 +963,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 						function (result_details, response) {
 							if (response.statusCode != 200 || result_details.rows == "fail") {
 								logger.error("Error occured in ExecuteTestSuite_ICE_SVN service from suite/readTestSuite_ICE Error Code : ERRNDAC");
-							}
-							else {
+							} else {
 								var module_index = userdata_iterator.moduleInfo.indexOf(moduleinfo_iterator);
 								var moduleResult = { "moduleName": "", "moduleId": "", "suiteDetails": [] };
 								var readTestSuite = {
@@ -1015,7 +1021,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 									"apptype": "",
 									"exec_mode":userdata_iterator.exec_mode
 								};
-								var executionId = uuid();
+								// var executionId = uuid();
 								var starttime = new Date().getTime();
 								//updating number of executions happened
 								var batchlength = batchExecutionData.length;
@@ -1045,6 +1051,11 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 									var testsuiteid = eachbatchExecutionData.testsuiteid;
 									var browserType = eachbatchExecutionData.browserType;
 									var apptype = eachbatchExecutionData.appType;
+									var releaseId = eachbatchExecutionData.releaseid;
+									var cycleName = eachbatchExecutionData.cyclename;
+									cycleId = eachbatchExecutionData.cycleid;
+									var projectName = eachbatchExecutionData.projectname;
+									var domainName = eachbatchExecutionData.domainname;
 									var listofscenarioandtestcases = [];
 									var scenarioIdList = [];
 									var dataparamlist = [];
@@ -1087,6 +1098,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 												}
 											}
 										});
+										
 										function updateData() {
 											executionjson[testsuiteid] = listofscenarioandtestcases;
 											executionjson.scenarioIds = scenarioIdList;
@@ -1096,6 +1108,10 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 											executionjson.testsuiteid = testsuiteid;
 											executionjson.testsuitename = testsuitename;
 											executionjson.scenarioNames = suite_status.scenarionames;
+											executionjson.releaseid = releaseId;
+											executionjson.cyclename = cycleName;
+											executionjson.projectname = projectName;
+											executionjson.domainname = domainName;
 											testsuitedetailslist.push(executionjson);
 											if (testsuitedetailslist.length == batchExecutionData.length) {
 												excutionObjectBuilding(testsuitedetailslist, apptype);
@@ -1105,12 +1121,18 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 								});
 
 								function excutionObjectBuilding(testsuitedetailslist, apptype) {
-									executionRequest.executionId = executionId;
+									// executionRequest.executionId = executionId;
 									executionRequest.suitedetails = testsuitedetailslist;
 									executionRequest.testsuiteIds = testsuiteIds;
 									executionRequest.apptype = apptype;
 								}
-
+								insertExecutionStatus(userInfo.userid,testsuiteIds,cycleId,function(res){
+									if(res == 'fail'){
+										executionRequest.executionId = '';
+									}else{
+										executionRequest.executionId = res;
+									}
+								});
 								function executionFunction(executionRequest, username) {
 									var name = username;
 									redisServer.redisSubServer.subscribe('ICE2_' + name);
@@ -1156,20 +1178,21 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 																		if (final_data[username].moduleInfo[k].moduleId == testsuiteid)
 																			final_data[username].moduleInfo[k].suiteDetails.push(req_overAllStatus);
 																	}
-																	var reportId = uuid();
-																	if (resultData.req_overAllStatus.overallstatus == "Pass") {
+																	// var reportId = uuid();
+																	if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
 																		statusPass++;
 																	}
 																	var inputs = {
-																		"reportid": reportId,
+																		// "reportid": reportId,
 																		"executionid": executionid,
 																		"testsuiteid": testsuiteid,
 																		"testscenarioid": scenarioid,
 																		"cycleid": cycleId1,
 																		"browser": req_browser,
-																		"status": resultData.req_overAllStatus.overallstatus,
+																		"status": resultData.reportData.overallstatus[0].overallstatus,
 																		"report": JSON.stringify(reportdata),
-																		"query": "insertreportquery"
+																		"query": "insertreportquery",
+																		"modifiedby": userInfo.userid
 																	};
 																	var args = {
 																		data: inputs,
@@ -2358,7 +2381,15 @@ function   updateStatus(sessObj, updateStatuscallback) {
 function updateSkippedScheduleStatus(sessObj, msg, updateStatuscallback){
 	logger.info("Inside updateSkippedScheduleStatus function");
 	try {
-		var data = JSON.parse(sessObj.split(';')[4]);
+		if (sessObj.split(';')[4].split(',')[5].replace(/"/g,"").split(':')[1]!="[]"){
+			data=JSON.parse(sessObj.split(';')[4]+';'+sessObj.split(';')[5])
+			var executionid = JSON.parse(sessObj.split(';')[6]).execution_id;
+			var time = JSON.parse(sessObj.split(';')[6]).time;
+		} else{
+			var data = JSON.parse(sessObj.split(';')[4]);
+			var executionid = JSON.parse(sessObj.split(';')[5]).execution_id;
+			var time = JSON.parse(sessObj.split(';')[5]).time
+		}
 		if(data['_id'] == sessObj.split(";")[0]){
 			var inputs = {
 				"schedulestatus": "Skipped",
@@ -2384,15 +2415,11 @@ function updateSkippedScheduleStatus(sessObj, msg, updateStatuscallback){
 				});
 				var obj = data['scenariodetails'];
 				for(var i=0;i<(Object.keys(obj)).length;i++){
-					// var suite=(Object.keys(obj))[i];
-					// for(var j=0;j<obj[suite].length;j++){
-					//var reportId = uuid();
-					var report_data = JSON.parse(sessObj.split(';')[4]);
+					var report_data = data;
 					var scenario = obj[i].scenarioids;
-					var executionid = JSON.parse(sessObj.split(';')[5]).execution_id;
 					var testsuiteid = report_data.testsuiteids[0];
 					var req_browser = 'NA';
-					var sheduledby = JSON.parse(sessObj.split(';')[4]).scheduledby;
+					var sheduledby = data.scheduledby;
 					var reportData = {
 										'rows': [{
 												'status': 'Skipped',
@@ -2408,8 +2435,8 @@ function updateSkippedScheduleStatus(sessObj, msg, updateStatuscallback){
 												'browserVersion': 'NA',
 												'EllapsedTime': '0:00:00',
 												'browserType': 'NA',
-												'StartTime': JSON.parse(sessObj.split(';')[5]).time,
-												'EndTime': JSON.parse(sessObj.split(';')[5]).time,
+												'StartTime': time,
+												'EndTime': time,
 												'overallstatus': 'Skipped'
 											}
 										]

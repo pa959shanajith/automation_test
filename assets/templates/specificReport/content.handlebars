@@ -1102,9 +1102,7 @@
                   <td class="rDExpectedRes tabCont">{{StepDescription}}</td>
                   {{/ifEquals}} {{#ifnotEquals testcase_details.testcaseDetails ""}}
                   {{#ifnotEquals testcase_details undefined}}
-                  <td class="rDExpectedRes tabCont">
-                     Expected Result is: {{testcase_details.testcaseDetails}}
-                  </td>
+                  <td class="rDExpectedRes tabCont">{{testcase_details.testcaseDetails}}</td>
                   {{/ifnotEquals}} {{/ifnotEquals}} {{#ifEquals status undefined}}
                   <td class="rDActualRes tabCont"></td>
                   {{/ifEquals}} {{#ifEquals status ""}}
