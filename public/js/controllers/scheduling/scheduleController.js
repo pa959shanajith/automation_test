@@ -199,7 +199,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 		else if(appType == "Desktop") return './imgs/desktop.png';
 		else if(appType == "SAP") return './imgs/sapApps.png';
 		else if(appType == "Mainframe") return './imgs/mainframe.png';
-		else if(appType == "DesktopJava") return './imgs/oracleApps.png';
+		else if(appType == "OEBS") return './imgs/oracleApps.png';
 		else if(appType == "MobileWeb") return './imgs/MobileWeb.png';
 	}
 	/*//Populating Data in Scheduling Table	
@@ -375,7 +375,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 		else if(appType == "Web" && browserTypeExe.length == 0)	openModelPopup("Schedule Test Suite", "Please select a browser");
 		else if(appType == "Webservice" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select Web Services option");
 		else if (appType == "Mainframe" && browserTypeExe.length === 0) openModelPopup("Schedule Test Suite", "Please select Mainframe option");
-		else if (appType == "DesktopJava" && browserTypeExe.length === 0) openModelPopup("Schedule Test Suite", "Please select OEBS Apps option");
+		else if (appType == "OEBS" && browserTypeExe.length === 0) openModelPopup("Schedule Test Suite", "Please select OEBS Apps option");
 		else if (browserTypeExe.length === 0) openModelPopup("Schedule Test Suite", "Please select " + appType + " option");
 		else if ((appType == "Web") && browserTypeExe.length == 1 && exc_action == "parallel")
 		openModelPopup("Execute Test Suite", "Please select multiple browsers");

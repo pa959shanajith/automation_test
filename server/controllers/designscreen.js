@@ -45,7 +45,7 @@ exports.initScraping_ICE = function (req, res) {
 						var applicationPath = reqBody.applicationPath;
 						reqAction = "SAP";
 						dataToIce = {"emitAction": "LAUNCH_SAP", "username": name, "applicationPath": applicationPath};
-					} else if (reqBody.appType == "DesktopJava") {
+					} else if (reqBody.appType == "OEBS") {
 						var applicationPath = reqBody.applicationPath;
 						reqAction = "OEBS";
 						dataToIce = {"emitAction": "LAUNCH_OEBS", "username": name, "applicationPath": applicationPath};
