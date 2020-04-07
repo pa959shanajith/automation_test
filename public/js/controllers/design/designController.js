@@ -334,10 +334,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						if (data2.mirror == undefined)
 							$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS">No Screenshot Available</div>')
 						else{
-							if(data2.scrapetype=='caa')
-								$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror.substring(2,data2.mirror.length-1) + '" /></div>')
-							else
-								$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror + '" /></div>')
+							$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror + '" /></div>')
 						}	
 						// service call # 3 -objectType service call
 						DesignServices.getKeywordDetails_ICE(appType)
@@ -903,10 +900,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					}
 					newScrapedList = viewString
 					$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
-					if(viewString.scrapetype=='caa')
-						$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror.substring(2,viewString.mirror.length-1) + '" /></div>')
-					else
-						$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
+					$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
 					$("#finalScrap").empty()
 					if (jQuery.isEmptyObject(viewString)) {
 						console.log("Data is Empty");
@@ -1950,7 +1944,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									} else imgTag = tag;
 									var tag1 = tag.replace(/ /g, "_");
 									var tag2;
-									if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
+									if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell" || tag=="iris") {
 										var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x'><a class='customTxtName'><span class='highlight'></span><input type='checkbox' class='checkCompareAll' name='selectAllChangedItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 									} else {
 										var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x'><a class='customTxtName'><span class='highlight'></span><input type='checkbox' class='checkCompareAll' name='selectAllChangedItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
@@ -2067,10 +2061,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						//mirrorObj = scrapeJson[1];
 						//scrapeTypeObj = scrapeJson[2];
 						$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
-						if(viewString.scrapetype=='caa')
-								$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror.substring(2,viewString.mirror.length-1) + '" /></div>')
-						else	
-							$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
+						$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
 						$("#finalScrap").empty()
 						$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'/><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 10' disabled>Delete</button><button data-toggle='modal' id='editObjects' data-target='#editObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' data-toggle='tooltip' title='Edit Objects' disabled>Edit</button></span><span class='searchScrapEle'><img src='imgs/ic-search-icon.png'></input></span><span><input type='text' class='searchScrapInput'></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
 						var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
@@ -2357,7 +2348,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			$("#dialog-irisObject").modal("show");
 			$("#addIrisObjContainer").empty()
 			if ($(".addObj-row").length > 1) $(".addObj-row").remove()
-			$("#addIrisObjContainer").append('<div class = "row row-modal addObj-row"><div class = "form-group"><span><strong>Object Detected as:	'+objType+'</strong></span></div><br><br><span style="float:left"><strong>User input: </strong></span><div class = "form-group form-group-2" style="float:left; margin-left:10px;"><select class = "form-control form-control-custom" id="objectType"><option selected disabled > Select Object Type </option><option value = "textbox" > Textbox / Textarea </option><option value = "table" > Table </option><option value = "dropdown" > Dropdown </option><option value = "button" > Button </option><option value = "radiobutton" > Radiobutton </option><option value = "checkbox" > Checkbox </option><option value = "others" > Others </option></select></div> </div>');
+			$("#addIrisObjContainer").append('<div class = "row row-modal addObj-row"><div class = "form-group"><span><strong>Object Detected as:	'+objType+'</strong></span></div><br><br><span style="float:left"><strong>User input: </strong></span><div class = "form-group form-group-2" style="float:left; margin-left:10px;"><select class = "form-control form-control-custom" id="objectType"><option selected disabled > Select Object Type </option><option value = "textbox" > Textbox / Textarea </option><option value = "table" > Table </option><option value = "dropdown" > Dropdown </option><option value = "button" > Button </option><option value = "radiobutton" > Radiobutton </option> <option value = "iris" > iris </option> <option value = "checkbox" > Checkbox </option><option value = "others" > Others </option></select></div> </div>');
 		}, 500);
 	});
 	
@@ -2442,6 +2433,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						$("#left-top-section,#left-bottom-section").removeClass('disableClick');
 						$("#changedOrdList li,#compareUnchangedObjectsBox li ,#compareNotFoundObjectsBox li").empty();
 						//window.location.href = "/design";
+						deleteScrapeDataservice = true;
 					});
 				} else {
 					openDialog("Compared Objects", "Failed to update objects");
@@ -2581,6 +2573,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				getIndexOfDeletedObjects = [];
 				angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
 				unblockUI()
+				deleteScrapeDataservice = true;
 				//add popoup for error and saved 
 			}, function (error) {unblockUI() })
 		
@@ -2892,6 +2885,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								getIndexOfDeletedObjects = [];
 								angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
 								unblockUI()
+								deleteScrapeDataservice = true;
 								//add popoup for error and saved 
 							}, function (error) {unblockUI()  })
 							return;
@@ -3708,7 +3702,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				} else imgTag = tag;
 				var tag1 = tag.replace(/ /g, "_");
 				var tag2;
-				if ((tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") && ob.hasOwnProperty('editable')) {
+				if ((tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell" || tag=="iris") && ob.hasOwnProperty('editable')) {
 					var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><span id='decrypt' class='userObject'></span></li>";
 				} else {
 					var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
@@ -3872,7 +3866,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				$(this).hide();
 			} else if (clickElem == "Element") {
 				var elem = $(this).data("tag")
-				if (elem == "a" || elem == "input" || elem == "table" || elem == "list" || elem == "select" || elem == "img" || elem == "button" || elem == "radiobutton" || elem == "checkbox") {
+				if (elem == "a" || elem == "input" || elem == "table" || elem == "list" || elem == "select" || elem == "img" || elem == "button" || elem == "radiobutton" || elem == "checkbox" || elem=="iris") {
 					$(this).hide();
 				} else {
 					$(this).show();
@@ -4731,6 +4725,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							$(this).data("tag") != "checkbox" &&
 							$(this).data("tag") != "select" &&
 							$(this).data("tag") != "img" &&
+							$(this).data("tag") != "iris" &&
 							$(this).data("tag") != "a" &&
 							$(this).data("tag") != "radiobutton" &&
 							$(this).data("tag") != "input" &&
@@ -4750,6 +4745,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							$(this).data("tag").toLowerCase().indexOf("check box") == -1 &&
 							$(this).data("tag").toLowerCase().indexOf("checkbox") == -1 &&
 							$(this).data("tag").toLowerCase().indexOf("image") == -1 &&
+							$(this).data("tag").toLowerCase().indexOf("iris") == -1 &&
 							($(this).data("tag").toLowerCase().indexOf("table") == -1 || $(this).data("tag").toLowerCase() == "tablecell") &&
 							$(this).data("tag").toLowerCase().indexOf("radio button") == -1) {
 							$(this).show();
@@ -5043,7 +5039,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		if (e.target.className.includes('inActiveDetails')) {
 			openModalFormDialog('Add Test Step Details', '');
 			$(".stepDetailsContainer").empty()
-			$(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div>")
+			$(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='100' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='100' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='100' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div>")
 
 		}
 		else {
@@ -5067,7 +5063,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 					openModalFormDialog('Add Test Step Details', '');
 					$(".stepDetailsContainer").empty()
-					$(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div>");
+					$(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='100' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='100' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='100' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div>");
 					$("#testDetails_" + modalId + "").val(details.testcaseDetails);
 					//$("#pass_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_pass);
 					$("#pass_" + modalId + "").find("#actualResult_" + modalId + "").val(details.actualResult_pass);

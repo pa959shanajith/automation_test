@@ -79,7 +79,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     //Bind releases on Projects Filter Change
-    $scope.selProjectsFilter = function() {
+    $('.project-list').change(function() {
         var projectId = $('.project-list option:selected').val();
         blockUI("Loading releases.. please wait..");
         $(".moduleBox,.mid-report-section,#accordion").hide();
@@ -114,10 +114,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             unblockUI();
             console.log("Error in service populateReleases while fetching projects -" + error);
         }
-    };
+    });
 
          //Bind cycles on releases Filter Change
-        $scope.selReleasesFilter = function() {
+         $('.release-list').change(function() {
             var releaseName= $('.release-list option:selected').val();
             blockUI("Loading cycles.. please wait..");
             $(".moduleBox,.mid-report-section,#accordion").hide();
@@ -147,10 +147,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 unblockUI();
                 console.log("Error in service populateReleases while fetching projects -" + error);
             }
-        };
+        });
 
         //Load modules on cycles filter change
-        $scope.selCyclesFilter = function() {
+        $('.cycle-list').change(function() {
             var cycleId = $('.cycle-list option:selected').val();
             var reportsInputData = {};
             reportsInputData.projectId = $.trim($('.project-list option:selected').val());
@@ -209,7 +209,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 unblockUI();
                 console.log("Error in service getReportsData_ICE while fetching modules-"+error);
             });
-        };
+        });
 
 
     //Responsive Header Menu
@@ -441,7 +441,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                     }
                     if (data != "fail" && data.length > 0) {
                         var scenarioContainer = $('#reportsTable tbody');
-                        var pass = fail = terminated = incomplete = P = F = T = I = 0;
+                        var pass = fail = terminated = incomplete = skipped = P = F = T = I = 0;
                         var total = data.length;
                         scenarioContainer.empty();
                         var browserIcon, brow = "";
@@ -473,6 +473,11 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             } else if (data[i].status.toLowerCase() == "incomplete") {
                                 incomplete++;
                                 status="Incomplete"
+                                styleColor = "style='color: #343a40 !important; text-decoration-line: none;'";
+                            }
+							else if (data[i].status.toLowerCase() == "skipped") {
+                                skipped++;
+                                status="Skipped"
                                 styleColor = "style='color: #343a40 !important; text-decoration-line: none;'";
                             }
                             scenarioContainer.append("<tr class='scenarioTblReport'><td title='" + data[i].testscenarioname + "'>" + data[i].testscenarioname + "</td><td><span>" + data[i].executedtime.trim() + "</span></td></td><td class='openReports' data-reportid='" + data[i].reportid + "'><a class='openreportstatus' " + styleColor + ">" + status + "</a></td><td class='viewReports'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'></td></tr>");
@@ -752,7 +757,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 "browserType": "",
                 "StartTime": "",
                 "EndTime": "",
-                "overAllStatus": "",
+                "overallstatus": "",
                 "EllapsedTime": "",
                 "date": "",
                 "time": "",
@@ -795,7 +800,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                 var getDat = getTym.split(" ")[0].split("-");
                                 finalReports.overallstatus[0].date = getDat[1] + "/" + getDat[2] + "/" + getDat[0];
                                 finalReports.overallstatus[0].time = getTym.split(" ")[1];
-                                finalReports.overallstatus[0].overAllStatus = obj2.overallstatus[j].overallstatus;
+                                finalReports.overallstatus[0].overallstatus = obj2.overallstatus[j].overallstatus;
                                 elapTym = (obj2.overallstatus[j].EllapsedTime.split(".")[0]).split(":");
                                 finalReports.overallstatus[0].EllapsedTime = "~" + ("0" + elapTym[0]).slice(-2) + ":" + ("0" + elapTym[1]).slice(-2) + ":" + ("0" + elapTym[2]).slice(-2)
                             }

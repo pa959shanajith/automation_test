@@ -1039,7 +1039,7 @@
          </div>
          <div class="leftSummary rightBox">
             <label>Overall Status</label>
-            <span class='overallStatusVal' style="color:{{getColor overAllStatus}}"><text style='color:#000; !important'>:</text> {{overAllStatus}}</span>
+            <span class='overallStatusVal' style="color:{{getColor overallstatus}}"><text style='color:#000; !important'>:</text> {{overallstatus}}</span>
             <label class='toggleIncompleteStatus'>Testcase Status: </label>
             <span class="progress customprogress toggleIncompleteStatus">
                <span class="progress-bar" role="progressbar" style="background-color:#28a745;width:{{pass}}%">
@@ -1102,9 +1102,7 @@
                   <td class="rDExpectedRes tabCont">{{StepDescription}}</td>
                   {{/ifEquals}} {{#ifnotEquals testcase_details.testcaseDetails ""}}
                   {{#ifnotEquals testcase_details undefined}}
-                  <td class="rDExpectedRes tabCont">
-                     Expected Result is: {{testcase_details.testcaseDetails}}
-                  </td>
+                  <td class="rDExpectedRes tabCont">{{testcase_details.testcaseDetails}}</td>
                   {{/ifnotEquals}} {{/ifnotEquals}} {{#ifEquals status undefined}}
                   <td class="rDActualRes tabCont"></td>
                   {{/ifEquals}} {{#ifEquals status ""}}

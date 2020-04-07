@@ -307,6 +307,7 @@ exports.manageCIUsers = function (req, res) {
 				} else if (response.statusCode != 200 || result.rows == "duplicate"){
 					res.send("duplicate")
 				}else {
+					result.rows.token = token;
 					res.send(result.rows);
 				}
 			});

@@ -620,11 +620,12 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 							logger.error("Exception in the service getTestcasesByScenarioId_ICE - gettestcaseids: %s", exception);
 						}
 					} else {
-						var testcases = testcasesResult.rows;
+						var testcases = testcasesResult.rows.testcaseids;
+						var testcasenames = testcasesResult.rows.testcasenames;
 						for (index = 0; index < testcases.length; index++){
 							var testcasesObj = {};
-							testcasesObj.testcaseId = testcases[index]._id;
-							testcasesObj.testcaseName = testcases[index].name;
+							testcasesObj.testcaseId = testcases[index];
+							testcasesObj.testcaseName = testcasenames[index];
 							testcasesArr.push(testcasesObj);
 						}
 						try {

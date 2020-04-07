@@ -314,7 +314,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 		}
 		else {
 			$(this).find("img").addClass("sb")
-			browserTypeExe.push('"'+$(this).data("name")+'"')
+			browserTypeExe.push(''+$(this).data("name"))
 		}
 		console.log(browserTypeExe)
 	})
@@ -458,11 +458,20 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 						suiteInfo.browserType = browserTypeExe;
 						suiteInfo.reschedule = false;
 						suiteInfo.scheduleid = "";
+						suiteInfo.scenarionames = [];
 						suiteInfo.userInfo = JSON.parse(window.localStorage['_UI']);
+						info = JSON.parse(window.localStorage['_FD']);
 						var scenarioDetails = JSON.parse(window.localStorage["_CT"]).testSuiteDetails;
 						for(var i=0; i<scenarioDetails.length;i++){
 							if(scenarioDetails[i].testsuiteid == suiteInfo.testsuiteid){
 								suiteInfo.cycleid = scenarioDetails[i].cycleid;
+								suiteInfo.releaseid = scenarioDetails[i].releaseid;
+								suiteInfo.cyclename = info.idnamemapcyc[scenarioDetails[i].cycleid];
+								suiteInfo.domainname = info.idnamemapdom[scenarioDetails[i].projectidts];
+								suiteInfo.projectname = info.idnamemapprj[scenarioDetails[i].projectidts];
+								for(j=0;j<suiteInfo.suiteDetails.length;j++){
+									suiteInfo.scenarionames.push(suiteInfo.suiteDetails[j].scenarioname);
+								}
 								break;
 							}
 						}
