@@ -1583,19 +1583,19 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 				}
 			};
 			logger.info("Calling NDAC Service: qualityCenter/viewQcMappedList_ICE from qcscenariodetails");
-			// client.post(epurl + "qualityCenter/viewQcMappedList_ICE", args,
-			// 	function (qcdetailsows, response) {
-			// 	if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
-			// 		logger.error("Error occurred in qualityCenter/viewQcMappedList_ICE from qcscenariodetails Error Code : ERRNDAC");
-			// 	} else {
+			client.post(epurl + "qualityCenter/viewQcMappedList_ICE", args,
+				function (qcdetailsows, response) {
+				if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
+					logger.error("Error occurred in qualityCenter/viewQcMappedList_ICE from qcscenariodetails Error Code : ERRNDAC");
+				} else {
 
-			// 		if (qcdetailsows.rows.length != 0) {
-			// 			flagtocheckifexists = true;
-			// 			qcdetails = JSON.parse(JSON.stringify(qcdetailsows.rows[0]));
-			// 		}
-			// 	}
+					if (qcdetailsows.rows.length != 0) {
+						flagtocheckifexists = true;
+						qcdetails = JSON.parse(JSON.stringify(qcdetailsows.rows[0]));
+					}
+				}
 				callback(null, qcdetails);
-			// });
+			});
 		}
 	},
 	function (err, results) {

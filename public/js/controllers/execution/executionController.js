@@ -568,10 +568,13 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		$("#almURL, #almUserName, #almPassword").removeClass('inputErrorBorder');
 		if (!$scope.almURL) {
 			$("#almURL").addClass('inputErrorBorder');
+			$(".error-msg-exeQc").text("Please Enter URL.");
 		} else if (!$scope.almUserName) {
 			$("#almUserName").addClass('inputErrorBorder');
+			$(".error-msg-exeQc").text("Please Enter User Name.");
 		} else if (!$scope.almPassword) {
 			$("#almPassword").addClass('inputErrorBorder');
+			$(".error-msg-exeQc").text("Please Enter Password.");
 		} else if (appType != "SAP" && browserTypeExe.length === 0) {
 			$("#ALMSyncWindow").find("button.close").trigger("click");
 			openDialogExe("Execute Test Suite", "Please select a browser");
@@ -579,14 +582,14 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			$("#ALMSyncWindow").find("button.close").trigger("click");
 			openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
 		} else {
-			$("#almURL,#almUserName,#almPassword,.almQclogin").prop("disabled", true);
+			//$("#almURL,#almUserName,#almPassword,.almQclogin").prop("disabled", true);
 			$("#almURL,#almUserName,#almPassword").css({
 				"background": "none"
 			});
 			$(".error-msg-exeQc").text("");
 			ExecutionService.loginQCServer_ICE($scope.almURL, $scope.almUserName, $scope.almPassword)
 			.then(function (data) {
-				$("#almURL,#almUserName,#almPassword,.almQclogin").prop("disabled", false);
+				//$("#almURL,#almUserName,#almPassword,.almQclogin").prop("disabled", false);
 				if (data == "unavailableLocalServer") {
 					$(".error-msg-exeQc").text("Unavailable LocalServer");
 				} else if (data == "Invalid Session") {
@@ -600,6 +603,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					$.each($(".parentSuiteChk"), function () {
 						var suiteInfo = {};
 						var selectedRowData = [];
+						var relidreport = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].releaseid;
+						var cycidreport = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].cycleid;
+						var projectidreport = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].projectidts;
 						//suiteInfo.suiteDetails = [];
 						if ($(this).is(":checked") == true) {
 							$(this).parent().parent().next().find('tbody input[type=checkbox]:checked').each(function () {
@@ -616,12 +622,19 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 								});
 							});
 							//console.log("selectedRowData:::" + selectedRowData)
+							projectdata=JSON.parse(window.localStorage["_FD"]);
 							suiteInfo.suiteDetails = selectedRowData;
 							suiteInfo.testsuitename = $(this).parents('span.taskname').text();
 							suiteInfo.testsuiteid = $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
 							suiteInfo.browserType = browserTypeExe;
 							suiteInfo.appType = appType;
-							//console.log("suiteInfo:::" + suiteInfo)
+							suiteInfo.releaseid = relidreport;
+							suiteInfo.cycleid = cycidreport;
+							suiteInfo.projectid = projectidreport;
+							suiteInfo.cyclename = projectdata.idnamemapcyc[cycidreport];
+							suiteInfo.projectname = projectdata.idnamemapprj[projectidreport];
+							suiteInfo.domainname = projectdata.idnamemapdom[projectidreport];
+							console.log("suiteInfo:::" + suiteInfo)
 							$scope.moduleInfo.push(suiteInfo);
 							//Transaction Activity for SaveQcCredentialsExecution Button Action
 							// var labelArr = [];
