@@ -27,31 +27,11 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
-		populateReleases: function (projectId) {
-    		var param = "populateReleases";
-    		return $http.post('/populateReleases', {
-    			action: param,
-				projectId:projectId
-
-    		})
-    		.then(function (response) { return response.data; },
-    				function (response) { return $q.reject(response.data); });
-    	},
 		populateScenarios: function (moduleId) {
     		var param = "populateScenarios";
     		return $http.post('/populateScenarios', {
     			action: param,
 				moduleId:moduleId
-
-    		})
-    		.then(function (response) { return response.data; },
-    				function (response) { return $q.reject(response.data); });
-    	},
-		populateCycles: function (releaseId) {
-    		var param = "populateCycles";
-    		return $http.post('/populateCycles', {
-    			action: param,
-				releaseId:releaseId
 
     		})
     		.then(function (response) { return response.data; },
@@ -68,7 +48,6 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     				function (response) { return $q.reject(response.data); });
     	},
 		getModules: function (versioning_enabled,usertab,projectid,version,cycId,modName,moduleid){
-					
     		var param = "/getModules";
 			if (versioning_enabled==1){
 				param = "/getModulesVersioning";
@@ -77,7 +56,6 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 				tab:usertab,
                 projectid: projectid,
                 version:version,
-				// relId: relId,
 				cycId: cycId,
 				modName:modName,
 				moduleid:moduleid
@@ -91,7 +69,6 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 				param = "/saveDataVersioning";
 			}
 			return $http.post(param, {
-				
 					action: param,
 					sendNotify:assignedTo,
 					write:writeFlag,
@@ -144,15 +121,6 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
-		// getCRId:function (projectId){
-		// 	var param = "getCRId";
-    	// 	return $http.post('/getCRId', {
-		// 		projectid:projectId
-				
-    	// 	})
-    	// 	.then(function (response) { return response.data; },
-    	// 			function (response) { return $q.reject(response.data); });
-		// },
 		getVersions:function (projectId){
 			var param = "getVersions";
     		return $http.post('/getVersions', {
@@ -204,8 +172,6 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 				 excelMap: excelMap
 				 //responseType: 'arraybuffer'
 			},{responseType:'arraybuffer'})
-			
-    		
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	
@@ -216,7 +182,6 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 			})
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
-    	
 		},
 		pdProcess : function(data){
 			return $http.post('/pdProcess',{

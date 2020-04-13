@@ -4,7 +4,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	var browserTypeExe = []; // Contains selected browser id for execution
 	var executionActive = false;
 	var rowId;
-	var exc_action = "serial";
+	var execAction = "serial";
 	$scope.moduleInfo = [];
 	$scope.somevar = {};
 	$("body").css("background", "#eee");
@@ -641,51 +641,41 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 	//Execute TestSuite Functionality
 	$scope.ExecuteTestSuite = function ($event) {
+		projectdata=JSON.parse(window.localStorage["_FD"]);
 		if ($scope.moduleInfo.length <= 0) {
 			$.each($(".parentSuiteChk"), function () {
+				var testsuiteDetails = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]];
 				var suiteInfo = {};
 				var selectedRowData = [];
-				//suiteInfo.suiteDetails = [];
-				var relidreport = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].releaseid;
-				var cycidreport = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].cycleid;
-				var projectidreport = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].projectidts;
+				var relid = testsuiteDetails.releaseid;
+				var cycid = testsuiteDetails.cycleid;
+				var projectid = testsuiteDetails.projectidts;
 				if ($(this).is(":checked") == true) {
 					$(this).parent().parent().next().find('tbody input[type=checkbox]:checked').each(function () {
 						selectedRowData.push({
 							condition: parseInt($(this).parent().siblings(".exe-conditionCheck").find("select option:selected").val()),
 							dataparam: [$(this).parent().siblings(".exe-dataParam").find("input").val().trim()],
-							executestatus: 1,
-							scenarioids: $(this).parent().siblings(".exe-scenarioIds").attr("sId"),
-							scenarionames: $(this).parent().siblings(".exe-scenarioIds")[0].innerText,
-							scenariodescription: $scope.somevar[$(this).parent().siblings(".exe-scenarioIds").attr("sId")],
-							qccredentials: {
-								qcurl: "",
-								qcusername: "",
-								qcpassword: ""
-							}
+							scenarioName: $(this).parent().siblings(".exe-scenarioIds")[0].innerText,
+							scenarioId: $(this).parent().siblings(".exe-scenarioIds").attr("sId"),
+							scenariodescription: $scope.somevar[$(this).parent().siblings(".exe-scenarioIds").attr("sId")]
 						});
 					});
-					projectdata=JSON.parse(window.localStorage["_FD"]);
-					//console.log("selectedRowData:::" + selectedRowData)
-					suiteInfo.suiteDetails = selectedRowData;
-					suiteInfo.testsuitename = $(this).parents('span.taskname').text();
-					suiteInfo.testsuiteid = $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
-					suiteInfo.browserType = browserTypeExe;
+
+					suiteInfo.moduleName = testsuiteDetails.testsuitename;
+					suiteInfo.moduleId = testsuiteDetails.testsuiteid;
+					suiteInfo.versionnumber = testsuiteDetails.versionnumber;
 					suiteInfo.appType = appType;
-					suiteInfo.releaseid = relidreport;
-					suiteInfo.cycleid = cycidreport;
-					suiteInfo.projectid = projectidreport;
-					suiteInfo.cyclename = projectdata.idnamemapcyc[cycidreport];
-					suiteInfo.projectname = projectdata.idnamemapprj[projectidreport];
-					suiteInfo.domainname = projectdata.idnamemapdom[projectidreport];
-					//console.log("suiteInfo:::" + suiteInfo)
+					suiteInfo.domainName = projectdata.idnamemapdom[projectid];
+					suiteInfo.projectName = projectdata.idnamemapprj[projectid];
+					suiteInfo.projectId = projectid;
+					suiteInfo.releaseId = relid;
+					suiteInfo.cycleName = projectdata.idnamemapcyc[cycid];
+					suiteInfo.cycleId = cycid;
+					suiteInfo.suiteDetails = selectedRowData;
 					$scope.moduleInfo.push(suiteInfo);
 				}
 			});
 		}
-		//console.log("moduleInfo:::" + $scope.moduleInfo)
-		//moduleInfo.push(suiteInfo);
-		//Getting each row data as an object
 		if ((appType == "Web") && browserTypeExe.length === 0)
 			openDialogExe("Execute Test Suite", "Please select a browser");
 		else if (appType == "Webservice" && browserTypeExe.length === 0)
@@ -706,13 +696,20 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			openDialogExe("Execute Test Suite", "Please select " + appType + " option");
 		else if ($(".exe-ExecuteStatus input:checked").length === 0)
 			openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
-		else if ((appType == "Web") && browserTypeExe.length == 1 && exc_action == "parallel")
+		else if ((appType == "Web") && browserTypeExe.length == 1 && execAction == "parallel")
 			openDialogExe("Execute Test Suite", "Please select multiple browsers");
 		else {
 			blockUI("Execution in progress. Please Wait...");
+			var executionData = {
+				source: "task",
+				exectionMode: execAction,
+				browserType: browserTypeExe,
+				qccredentials: { "qcurl": "", "qcusername": "", "qcpassword": "" },
+				moduleInfo: $scope.moduleInfo
+			};
 			executionActive = true;
 			$rootScope.resetSession.start();
-			ExecutionService.ExecuteTestSuite_ICE($scope.moduleInfo, exc_action)
+			ExecutionService.ExecuteTestSuite_ICE(executionData)
 			.then(function (data) {
 				if (data == "begin") return false;
 				unblockUI();
@@ -735,12 +732,13 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				else if (data == "Terminate") {
 					$('#executionTerminated').modal('show');
 					$('#executionTerminated').find('.btn-default').focus();
-				} else {
+				} else if (data == "success") {
 					$('#executionCompleted').modal('show');
 					setTimeout(function () {
 						$("#executionCompleted").find('.btn-default').focus();
 					}, 300);
-				}
+				} else
+					openDialogExe("Execute Test Suite", "Failed to execute.");
 				$(".selectBrowser").find("img").removeClass("sb");
 				$(".selectParallel").find("img").removeClass("sb");
 				browserTypeExe = [];
@@ -778,12 +776,13 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			$('#executionTerminated').find('.btn-default').focus();
 		} else if (data == "unavailableLocalServer") {
 			openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
-		} else {
+		} else if (data == "success") {
 			$('#executionCompleted').modal('show');
 			setTimeout(function () {
 				$("#executionCompleted").find('.btn-default').focus();
 			}, 300);
-		}
+		} else
+			openDialogExe("Execute Test Suite", "Failed to execute.");
 		unblockUI();
 		$rootScope.resetSession.end();
 		$(".selectBrowser").find("img").removeClass("sb");
@@ -822,9 +821,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				var suiteInfo = {};
 				var selectedRowData = [];
 				//suiteInfo.suiteDetails = [];
-				var relidreport = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].releaseid;
-				var cycidreport = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].cycleid;
-				var projectidreport = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].projectidts;
+				var relid = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].releaseid;
+				var cycid = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].cycleid;
+				var projectid = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].projectidts;
 				if ($(this).is(":checked") == true) {
 					$(this).parent().parent().next().find('tbody input[type=checkbox]:checked').each(function () {
 						selectedRowData.push({
@@ -835,10 +834,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					suiteInfo.suiteDetails = selectedRowData;
 					suiteInfo.testsuitename = $(this).parents('span.taskname').text();
 					suiteInfo.testsuiteid = $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
-					suiteInfo.releaseid = relidreport;
-					suiteInfo.cycleid = cycidreport;
-					suiteInfo.projectid = projectidreport;
-					//console.log("suiteInfo:::" + suiteInfo)
+					suiteInfo.releaseid = relid;
+					suiteInfo.cycleid = cycid;
+					suiteInfo.projectid = projectid;
 					$scope.moduleInfo.push(suiteInfo);
 				}
 			});
@@ -910,13 +908,11 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	$(document).on("click", ".selectParallel", function () {
 		$(this).find("img").toggleClass("sb");
 		if ($("img").hasClass('sb') == true) {
-			exc_action = "parallel";
+			execAction = "parallel";
 		} else {
-			exc_action = "serial";
+			execAction = "serial";
 		}
 	});
-
-
 
 	//Select Browser Function
 	$(document).on("click", ".selectBrowser", function () {

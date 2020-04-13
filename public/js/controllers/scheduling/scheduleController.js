@@ -377,9 +377,8 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 		else if (appType == "Mainframe" && browserTypeExe.length === 0) openModelPopup("Schedule Test Suite", "Please select Mainframe option");
 		else if (appType == "OEBS" && browserTypeExe.length === 0) openModelPopup("Schedule Test Suite", "Please select OEBS Apps option");
 		else if (browserTypeExe.length === 0) openModelPopup("Schedule Test Suite", "Please select " + appType + " option");
-		else if ((appType == "Web") && browserTypeExe.length == 1 && exc_action == "parallel")
-		openModelPopup("Execute Test Suite", "Please select multiple browsers");
-		else{
+		else if ((appType == "Web") && browserTypeExe.length == 1 && exc_action == "parallel") openModelPopup("Execute Test Suite", "Please select multiple browsers");
+		else {
 			if(appType == "SAP") browserTypeExe = ["1"];
 			$.each($(".batchSuite"), function(){
 				var suiteInfo = {};
@@ -439,7 +438,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 							break;
 						}
 					}
-					if(doNotSchedule == false){					
+					if(doNotSchedule == false){
 						$(this).find(".scenarioSchdCon tbody tr").each(function(){
 							if($(this).find(".selectToSched").is(":checked")){
 								selectedScenarioData.push({

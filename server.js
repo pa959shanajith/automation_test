@@ -479,11 +479,8 @@ if (cluster.isMaster) {
 		app.post('/populateProjects', mindmap.populateProjects);
 		app.post('/populateUsers', mindmap.populateUsers);
 		app.post('/checkReuse', mindmap.checkReuse);
-		// app.post('/getCRId', mindmap.getCRId);
 		app.post('/getProjectTypeMM_Nineteen68', mindmap.getProjectTypeMM_Nineteen68);
 		app.post('/populateScenarios', mindmap.populateScenarios);
-		app.post('/populateReleases', mindmap.populateReleases);
-		app.post('/populateCycles', mindmap.populateCycles);
 		app.post('/getModules', mindmap.getModules);
 		app.post('/reviewTask', mindmap.reviewTask);
 		app.post('/saveData', mindmap.saveData);
@@ -492,7 +489,6 @@ if (cluster.isMaster) {
 		app.post('/getScreens', mindmap.getScreens);
 		app.post('/exportToExcel', mindmap.exportToExcel);
 		app.post('/getDomain', mindmap.getDomain);
-
 		app.post('/pdProcess',mindmap.pdProcess);	// process discovery service
 		//Login Routes
 		//app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
@@ -538,7 +534,7 @@ if (cluster.isMaster) {
 		app.post('/readTestSuite_ICE', suite.readTestSuite_ICE);
 		app.post('/updateTestSuite_ICE', suite.updateTestSuite_ICE);
 		//app.post('/updateTestScenario_ICE', suite.updateTestScenario_ICE);
-		app.post('/ExecuteTestSuite_ICE', suite.ExecuteTestSuite_ICE);
+		app.post('/ExecuteTestSuite_ICE', auth.protect, suite.ExecuteTestSuite_ICE);
 		app.post('/getTestcaseDetailsForScenario_ICE', suite.getTestcaseDetailsForScenario_ICE);
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_SVN);
 		//app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
@@ -559,7 +555,7 @@ if (cluster.isMaster) {
 		app.post('/getReportsData_ICE', report.getReportsData_ICE);
 		//Plugin Routes
 		app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
-		app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
+		app.post('/getTaskJson_mindmaps', auth.protect, taskbuilder.getTaskJson_mindmaps);
 		app.post('/updateTaskstatus_mindmaps', taskbuilder.updateTaskstatus_mindmaps);
 		//Utility plugins
 		app.post('/Encrypt_ICE', utility.Encrypt_ICE);

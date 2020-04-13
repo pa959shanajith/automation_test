@@ -15,6 +15,9 @@ var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
 var taskflow = require('../config/options').strictTaskWorkflow;
 if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT)*1024*1024;
+const SOCK_NORM = "normalModeOn";
+const SOCK_SCHD = "scheduleModeOn";
+const SOCK_NA = "unavailableLocalServer";
 
 /**
  * @author vishvas.a
@@ -500,8 +503,6 @@ function Projectnametestcasename_ICE(req, cb, data) {
 	});
 }
 
-
-
 exports.updateTestSuite_ICE = function (req, res) {
     logger.info("Inside UI service: updateTestSuite_ICE");
     if (utils.isSessionActive(req)) {
@@ -566,298 +567,282 @@ exports.updateTestSuite_ICE = function (req, res) {
     }
 };
 
+const checkForICEstatus = async (user, execType) => {
+	const err = "Error occurred in the function checkForICEstatus: ";
+	logger.debug("ICE Socket requesting Address: %s" , user);
+	const sockmode = await utils.channelStatus(user);
+	if (!sockmode.schedule && !sockmode.normal) {
+		logger.error(err + "ICE is not Available.");
+		return SOCK_NA;
+	} else if (execType != "SCHEDULE" && sockmode.schedule) {
+		logger.error(err + "ICE is connected in Scheduling mode.");
+		return SOCK_SCHD;
+	} else if (execType == "SCHEDULE" && sockmode.normal) {
+		logger.error(err + "ICE is connected in Non-Scheduling mode.");
+		return SOCK_NORM;
+	} else {
+		return null;
+	}
+};
 
+const counterUpdater = async (count, userid) => {
+	const updateinp = {
+		"query": "testsuites",
+		"count": count,
+		"userid": userid
+	};
+	return utils.fetchData(updateinp, "utility/dataUpdator_ICE", "counterUpdater");
+};
 
-exports.ExecuteTestSuite_ICE = function (req, res) {
-    if (utils.isSessionActive(req)) {		
-		var userInfo = {"userid": req.session.userid, "role": req.session.activeRoleId};
-        var name = req.session.username;
-		redisServer.redisSubServer.subscribe('ICE2_' + name);
-        var batchExecutionData = req.body.moduleInfo;
-        var scenariodescriptionobject = {};
-        var testsuitedetailslist = [],testsuiteidcycmap = {};
-        var testsuiteIds = [];
-		var exc_action  = req.body.action;
-		var executionRequest = {
-			"executionId": "",
-			"suitedetails": [],
-			"testsuiteIds": [],
-			"apptype": "",
-			"exec_mode":exc_action
-        };				
-		var executionId = '';
-		var cycleid = '';						
-        async.series({
-            approval_check:function(callback_E){
-				if (taskflow){
-					utils.approval_status_check(batchExecutionData, function (err, approved_status) {
-					if (approved_status) callback_E();
-					else res.status(err.status).send(err.res);
-					});
-				}
-                else callback_E();
-            },
-			counter_updater:function(callback_E){
+const fetchScenarioDetails = async (scenarioid, suite, userid) => {
+	const fnName = "fetchScenarioDetails";
+	const scenario = {};
+	const allTestcaseSteps = [];
+	const allTestcaseObj = {};
+	var inputs = null;
 
-				//updating number of executions happened
-				var batchlength = batchExecutionData.length;
-				var updateinp = {
-					"query": "testsuites",
-					"count": batchlength,
-					"userid": userInfo.userid
-				};
-				var args = {
-					data: updateinp,
-					headers: {
-						"Content-Type": "application/json"
-					}
-                };
-                logger.info("Calling NDAC Service: utility/dataUpdator_ICE from ExecuteTestSuite_ICE");
-				// client.post(epurl + "utility/dataUpdator_ICE", args,
-				// 	function (result, response) {
-				// 	if (response.statusCode != 200 || result.rows == "fail") {
-				// 		logger.error("Error occurred in utility/dataUpdator_ICE service from ExecuteTestSuite_ICE: Data Updator Fail");
-				// 	} else {
-				// 		logger.info("Data Updator Success");
-                //     }
-                    callback_E();
-				// });
-            },
-            suite_execution:function(callback_E){
-                async.forEachSeries(batchExecutionData, function (eachbatchExecutionData, batchExecutionDataCallback) {
-                    var suiteDetails = eachbatchExecutionData.suiteDetails;
-					var testsuitename = eachbatchExecutionData.testsuitename;
-					var testsuiteid = eachbatchExecutionData.testsuiteid;
-					var releaseid = eachbatchExecutionData.releaseid;
-					cycleid = eachbatchExecutionData.cycleid;			
-					var browserType = eachbatchExecutionData.browserType;
-					var apptype = eachbatchExecutionData.appType;
-					var listofscenarioandtestcases = [];
-					var scenarioIdList = [];
-					var dataparamlist = [];
-					var conditionchecklist = [];
-					var browserTypelist = [];
-					var scenarioNameList = [];
-					cyclename = eachbatchExecutionData.cyclename;
-					domainname = eachbatchExecutionData.domainname;
-					projectname = eachbatchExecutionData.projectname;
-                    testsuiteIds.push(testsuiteid);
-                    testsuiteidcycmap[testsuiteid] = cycleid;
-                    async.forEachSeries(suiteDetails, function (eachsuiteDetails, eachsuiteDetailscallback) {
-                        var executionjson = {
-							"scenarioIds": [],
-							"browserType": [],
-							"dataparampath": [],
-							"condition": [],
-							"testsuitename": ""
-                        };
-                        var currentscenarioid = "";
-						scenarioIdList.push(eachsuiteDetails.scenarioids);
-						scenarioNameList.push(eachsuiteDetails.scenarionames)
-						dataparamlist.push(eachsuiteDetails.dataparam[0]);
-						conditionchecklist.push(eachsuiteDetails.condition);
-						browserTypelist.push(eachsuiteDetails.browserType);
-						currentscenarioid = eachsuiteDetails.scenarioids;
-						executionjson.releaseid = releaseid;
-						executionjson.cycleid = cycleid;
-						executionjson.cyclename = cyclename;
-						executionjson.domainname = domainname;
-						executionjson.projectname = projectname;
-                        scenariodescriptionobject[eachsuiteDetails.scenarioids] = eachsuiteDetails.scenariodescription;
-                        TestCaseDetails_Suite_ICE(currentscenarioid, userInfo.userid, function (currentscenarioidError, currentscenarioidResponse) {
-                            var scenariotestcaseobj = {};
-							if (currentscenarioidError) {
-								logger.error("Error occurred in the function TestCaseDetails_Suite_ICE: %s",currentscenarioidError);
-							} else {
-								if (currentscenarioidResponse != null || currentscenarioidResponse != undefined) {
-									scenariotestcaseobj[currentscenarioid] = currentscenarioidResponse.listoftestcasedata;
-									scenariotestcaseobj.qccredentials = eachsuiteDetails.qccredentials;
-									scenariotestcaseobj.qcdetails = currentscenarioidResponse.qcdetails;
-									listofscenarioandtestcases.push(scenariotestcaseobj);
-									eachsuiteDetailscallback();
-								}
-								if (listofscenarioandtestcases.length == suiteDetails.length) {
-									logger.info("Calling function updateData from TestCaseDetails_Suite_ICE function");
-									executionjson[testsuiteid] = listofscenarioandtestcases;
-									executionjson.scenarioIds = scenarioIdList;
-									executionjson.scenarioNames = scenarioNameList;
-                                    executionjson.browserType = browserType;
-                                    executionjson.condition = conditionchecklist;
-                                    executionjson.dataparampath = dataparamlist;
-                                    executionjson.testsuiteid = testsuiteid;
-                                    executionjson.testsuitename = testsuitename;
-                                    executionjson.scenariodescriptionobject = scenariodescriptionobject;
-                                    testsuitedetailslist.push(executionjson);
-									batchExecutionDataCallback();
-									if (testsuitedetailslist.length == batchExecutionData.length) {
-                                        executionRequest.executionId = executionId;
-                                        executionRequest.suitedetails = testsuitedetailslist;
-                                        executionRequest.testsuiteIds = testsuiteIds;
-                                        executionRequest.apptype = apptype;
-										logger.info("Calling function executionFunction from TestCaseDetails_Suite_ICE function");
-										callback_E();
+	// Step 1: Get Suite details
+	inputs = {
+		"query": "gettestsuite",
+		"mindmapid": suite.testsuiteid,
+		"cycleid": suite.cycleid,
+		"createdby": userid
+	};
+	/* <<Review>> fetch "condition", "dataparam" */
+	suite = await utils.fetchData(inputs, "suite/readTestSuite_ICE", fnName);
+	scenario.testsuiteid = suite._id;
+
+	// Step 2: Get Testcase details
+	inputs = {
+		"query": "testcasedetails",
+		"id": scenarioid
+	};
+	var testcases = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", fnName);
+	if (testcases == "fail") testcases = [];
+
+	// Step 3: Get Testcasesteps
+	for (let i = 0; i < testcases.length; i++) {
+		const tc = testcases[i];
+		if (allTestcaseObj[tc._id] === undefined) {
+			inputs = {
+				"testcaseid": tc._id,
+				"screenid": tc.screenid,
+				"versionnumber": tc.versionnumber,
+				"query": "readtestcase"
+			};
+			const testcasedata = await utils.fetchData(inputs, "design/readTestCase_ICE", fnName);
+			allTestcaseObj[tc._id] = testcasedata[0];
+		}
+	}
+
+	testcases.forEach(async (tc) => {
+		allTestcaseSteps.push({
+			"template": "",
+			"testcase": allTestcaseObj[tc._id].steps,
+			"testcasename": allTestcaseObj[tc._id].name
+		});
+	});
+
+	scenario.testcase = JSON.stringify(allTestcaseSteps);
+
+	// Step 4: Get qcdetails
+	inputs = {
+		"query": "qcdetails",
+		"testscenarioid": scenarioid
+	};
+	const qcdetails = await utils.fetchData(inputs, "qualityCenter/viewQcMappedList_ICE", fnName);
+	if (qcdetails.length > 0) scenario.qcdetails = JSON.parse(JSON.stringify(qcdetails[0]));
+	else scenario.qcdetails = {};
+	return scenario;
+};
+
+const prepareExecutionRequest = async (batchData, userInfo) => {
+	const execReq = {
+		"exec_mode": batchData.exectionMode,
+		"apptype": batchData.moduleInfo[0].appType,
+		"qccredentials": batchData.qccredentials,
+		"batchId": "",
+		"executionIds": [],
+		"testsuiteIds": [],
+		"suitedetails": []
+	};
+	const moduleInfo = batchData.moduleInfo;
+	for (let i = 0; i < moduleInfo.length; i++) {
+		var testsuiteid = null;
+		const suite = moduleInfo[i];
+		const scenarioList = [];
+		const suiteObj = {
+			"browserType": batchData.browserType,
+			"testsuitename": suite.moduleName,
+			"testsuiteid": suite.moduleId,  // changed below to actual id
+			"domainname": suite.domainName,
+			"projectid": suite.projectId,
+			"projectname": suite.projectName,
+			"releaseid": suite.releaseId,
+			"cyclename": suite.cycleName,
+			"cycleid": suite.cycleId,
+			"condition": [],
+			"dataparampath": [],
+			"scenarioNames": [],
+			"scenarioIds": []
+		};
+		const suiteDetails = suite.suiteDetails;
+		for (let j = 0; j < suiteDetails.length; j++) {
+			const tsco = suiteDetails[j];
+			var scenario = await fetchScenarioDetails(tsco.scenarioId, suiteObj, userInfo.userid);
+			testsuiteid = scenario.testsuiteid;
+			scenario = Object.assign(scenario, tsco);
+			suiteObj.condition.push(scenario.condition);
+			suiteObj.dataparampath.push(scenario.dataparam[0]);
+			suiteObj.scenarioNames.push(scenario.scenarioName);
+			suiteObj.scenarioIds.push(scenario.scenarioId);
+			const scenarioObj = {};
+			scenarioObj[scenario.scenarioId] = scenario.testcase;
+			scenarioObj.qcdetails = scenario.qcdetails;
+			scenarioList.push(scenarioObj);
+		}
+		suiteObj.testsuiteid = testsuiteid;
+		suiteObj[testsuiteid] = scenarioList;
+		execReq.testsuiteIds.push(testsuiteid);
+		execReq.suitedetails.push(suiteObj);
+	}
+	return execReq;
+};
+
+const generateExecutioIds = async (tsuIds, userid) => {
+	const inputs = {
+		"query": "insertintoexecution",
+		"executedby": userid,
+		"testsuiteids": tsuIds
+	};
+	const execIds = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "prepareExecutionRequest");
+	return execIds;
+};
+
+const executionRequestToICE = async (execReq, execType, userInfo) => {
+	logger.info("Inside executionRequestToICE function");
+	const name = userInfo.name;
+	var completedSceCount = 0;
+	var testsuitecount=0;
+	var statusPass = 0;
+	var suiteStatus;
+
+	logger.info("Sending request to ICE for executeTestSuite");
+	const dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": execReq};
+	redisServer.redisPubICE.publish('ICE1_normal_' + name, JSON.stringify(dataToIce));
+
+	const exePromise = async (resSent) => (new Promise((rsv, rej) => {
+		function executeTestSuite_listener(channel, message) {
+			const data = JSON.parse(message);
+			if(name == data.username && executionRequest.executionId == data.value.executionId) {
+				if (data.onAction == SOCK_NA) {
+					redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
+					logger.error("Error occurred in ExecuteTestSuite_ICE: Socket Disconnected");
+					if (resSent && notifySocMap[name]) notifySocMap[name].emit("ICEnotAvailable");
+					rsv(SOCK_NA);
+				} else if (data.onAction == "result_executeTestSuite") {
+					const resultData = data.value;
+					const status = resultData.status;
+					if (!status) { // This block is for report data
+						try {
+							completedSceCount++;
+							const testsuite = execReq.suitedetails[testsuitecount];
+							const testsuiteid = resultData.testsuiteId;
+							const executionid = resultData.executionId;
+							var scenarioCount = testsuite.scenarioIds.length * testsuite.browserType.length;
+							var reportdata = resultData.reportData;
+							if (reportdata.overallstatus.length != 0) {
+								reportdata.overallstatus[0].browserType = (execReq.apptype=="MobileApp")? "MobileApp":reportdata.overallstatus[0].browserType;
+								var req_browser = reportdata.overallstatus[0].browserType;
+								reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
+								reportdata = JSON.parse(reportdata);
+								if (resultData.reportData.overallstatus[0].overallstatus == "Pass") statusPass++;
+								const inputs = {
+									"executionid": executionid,
+									"testsuiteid": testsuiteid,
+									"testscenarioid": resultData.scenarioId,
+									"browser": req_browser,
+									"cycleid": testsuite.cycleid,
+									"status": resultData.reportData.overallstatus[0].overallstatus,
+									"report": JSON.stringify(reportdata),
+									"query": "insertreportquery",
+									"modifiedby":userInfo.userid
+								};
+								const args = {
+									data: inputs,
+									headers: {
+										"Content-Type": "application/json"
 									}
+								};
+								logger.info("Calling NDAC Service from executionFunction: suite/ExecuteTestSuite_ICE");
+								client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+									function (result, response) {
+									if (response.statusCode != 200 || result.rows == "fail") logger.error("Error occurred in suite/ExecuteTestSuite_ICE from executionFunction Error Code : ERRNDAC");
+									else logger.info("Successfully inserted report data");
+								});
+								if (completedSceCount == scenarioCount) {
+									if (statusPass == scenarioCount) suiteStatus = "pass";
+									else suiteStatus = "fail";
+									completedSceCount = 0;
+									testsuitecount++;
+									logger.info("Calling function updateExecutionStatus from executionFunction");
+									updateExecutionStatus(testsuiteid, executionid, suiteStatus,cycleid);
+								}
+							} else {
+								completedSceCount++;
+								scenarioCount = testsuite.scenarioIds.length;
+								if (completedSceCount == scenarioCount) {
+									completedSceCount = 0;
+									testsuitecount++;
+									suiteStatus = "fail";
+									logger.info("Calling function updateExecutionStatus from executionFunction");
+									updateExecutionStatus(testsuiteid, executionid, suiteStatus,cycleid);
 								}
 							}
-                        });
-                    });
-
-                }); 
-            },
-            execution_insertion:function(callback_E){ 
-				utils.getChannelNum('ICE1_normal_' + name, function(found){
-					if (found) {
-						insertExecutionStatus(req.session.userid,testsuiteIds,cycleid,function(res){
-							if(res == 'fail'){
-								executionId = '';
-							}else{
-								executionRequest.executionId = res;
-							}
-							callback_E();
-						});
-					}else{
-						callback_E();
+						} catch (ex) {
+							logger.error("Exception in the function executionFunction: insertreportquery: %s", ex);
+						}
+					} else { // This block will trigger when resultData.status has "success or "Terminate"
+						redisServer.redisSubServer.removeListener("message", executeTestSuite_listener);
+						try {
+							if (resSent && notifySocMap[name]) notifySocMap[name].emit("result_ExecutionDataInfo", status);
+							rsv(status);
+						} catch (ex) {
+							logger.error("Exception while sending execution status from the function executionFunction: %s", ex);
+							rej(ex);
+						}
 					}
-				})
-                 
-            },
-            execute_function:function(callback_E){
-                logger.info("Inside executionFunction function");
-				var completedSceCount = 0;
-				var testsuitecount=0;
-				var statusPass = 0;
-				var suiteStatus;
-				logger.debug("ICE Socket requesting Address: %s" , name);
-				
-                redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-                    if (redisres[1]>0) {
-                        logger.info("Sending socket request for executeTestSuite to redis");
-                        dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
-                        redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-                        var notifySocMap = myserver.socketMapNotify;
-                        var resSent = false;
-                        if(notifySocMap && notifySocMap[name]) {
-                            resSent = true;
-                            res.end('begin');
-                        }
-                        function executeTestSuite_listener(channel,message) {
-                            var data = JSON.parse(message);
-                            if(name == data.username){
-                                if (data.onAction == "unavailableLocalServer") {
-                                    redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
-                                    logger.error("Error occurred in ExecuteTestSuite_ICE: Socket Disconnected");
-                                    if (notifySocMap[name]) notifySocMap[name].emit("ICEnotAvailable");
-                                    else if (!resSent) res.send("unavailableLocalServer");
-                                } else if (data.onAction == "result_executeTestSuite") {
-									var resultData = data.value;
-                                    if (!resultData.status) { // This block is for report data
-                                        try {
-                                            completedSceCount++;
-                                            var scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length * executionRequest.suitedetails[testsuitecount].browserType.length;
-                                            var scenarioid = resultData.scenarioId;
-                                            var executionid = resultData.executionId;
-                                            var reportdata = resultData.reportData;
-                                            var testsuiteid = resultData.testsuiteId;
-                                            if (reportdata.overallstatus.length != 0) {
-                                                reportdata.overallstatus[0].browserType = (executionRequest.apptype=="MobileApp")?"MobileApp":reportdata.overallstatus[0].browserType;
-                                                var req_browser = reportdata.overallstatus[0].browserType;
-                                                reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
-                                                reportdata = JSON.parse(reportdata);
-												var cycleid = testsuiteidcycmap[testsuiteid]
-                                                if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
-                                                    statusPass++;
-                                                }
-                                                var inputs = {
-                                                    //"reportid": reportId,
-                                                    "executionid": executionid,
-                                                    "testsuiteid": testsuiteid,
-                                                    "testscenarioid": scenarioid,
-                                                    "browser": req_browser,
-                                                    "cycleid": testsuiteidcycmap[testsuiteid],
-                                                    "status": resultData.reportData.overallstatus[0].overallstatus,
-                                                    "report": JSON.stringify(reportdata),
-													"query": "insertreportquery",
-													"modifiedby":userInfo.userid
-                                                };
-                                                var args = {
-                                                    data: inputs,
-                                                    headers: {
-                                                        "Content-Type": "application/json"
-                                                    }
-                                                };
-                                                logger.info("Calling NDAC Service from executionFunction: suite/ExecuteTestSuite_ICE");
-                                                client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
-                                                    function (result, response) {
-                                                    if (response.statusCode != 200 || result.rows == "fail") {
-                                                        logger.error("Error occurred in suite/ExecuteTestSuite_ICE from executionFunction Error Code : ERRNDAC");
-                                                        flag = "fail";
-                                                    } else {
-                                                        logger.info("Successfully inserted report data");
-                                                        flag = "success";
-                                                    }
-                                                });
-                                                if (completedSceCount == scenarioCount) {
-                                                    if (statusPass == scenarioCount) {
-                                                        suiteStatus = "pass";
-                                                    } else {
-                                                        suiteStatus = "fail";
-                                                    }
-                                                    completedSceCount = 0;
-                                                    testsuitecount++;
-                                                    logger.info("Calling function updateExecutionStatus from executionFunction");
-                                                    updateExecutionStatus(testsuiteid, executionid, suiteStatus,cycleid);
-                                                }
-                                            } else {
-                                                completedSceCount++;
-                                                scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length;
-                                                if (completedSceCount == scenarioCount) {
-                                                    completedSceCount = 0;
-                                                    testsuitecount++;
-                                                    suiteStatus = "fail";
-                                                    logger.info("Calling function updateExecutionStatus from executionFunction");
-                                                    updateExecutionStatus(testsuiteid, executionid, suiteStatus,cycleid);
-                                                }
-                                            }
-                                        } catch (ex) {
-                                            logger.error("Exception in the function executionFunction: insertreportquery: %s", ex);
-                                        }
-                                    } else { // This block will trigger when resultData.status has "success or "Terminate"
-                                        redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
-                                        try {
-                                            logger.info("Sending execution status from function executionFunction");
-                                            if (notifySocMap[name]) notifySocMap[name].emit("result_ExecutionDataInfo", resultData.status);
-                                            else if (!resSent) res.send(resultData.status);
-                                        } catch (ex) {
-                                            logger.error("Exception While sending execution status from the function executionFunction: %s", ex);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        redisServer.redisSubServer.on("message",executeTestSuite_listener);
-                    } else {
-                        utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-                            var flag="";
-                            if (found) flag = "scheduleModeOn";
-                            else {
-                                flag = "unavailableLocalServer";
-                                logger.error("Error occurred in the function executionFunction: Socket not Available");
-                            }
-                            res.send(flag);
-                        });
-                    }
-                });
-                    
-            }
+				}
+			}
+		}
+		redisServer.redisSubServer.on("message",executeTestSuite_listener);
+	}));
 
-        });
+	const notifySocMap = myserver.socketMapNotify; 
+	if (execType == "ACTIVE" && notifySocMap && notifySocMap[name]) {
+		exePromise(true);
+		return "begin";
+	} else return await exePromise(false);
+};
 
-    } else {
-        logger.error("Error occurred in the function executionFunction: Invalid Session");
-        res.send("Invalid Session");
-    }
-}
-
+exports.ExecuteTestSuite_ICE = async (req, res) => {
+	var name = req.session.username;
+	var userInfo = {"userid": req.session.userid, "name": name, "role": req.session.activeRoleId};
+	redisServer.redisSubServer.subscribe('ICE2_' + name);
+	var batchExecutionData = req.body.executionData;
+	var execType = "ACTIVE";
+	var iceStatus = await checkForICEstatus(name, execType);
+	if (iceStatus != null) return res.send(iceStatus);
+	const taskApproval = await utils.approvalStatusCheck(batchExecutionData);
+	if (taskApproval.res !== "pass") return res.status(taskApproval.status).send(taskApproval.res);
+	/*const countStatus =*/ await counterUpdater(batchExecutionData.moduleInfo.length, userInfo.userid);
+	const executionRequest = await prepareExecutionRequest(batchExecutionData, userInfo);
+	const execIds = await generateExecutioIds(executionRequest.testsuiteIds, userInfo.userid);
+	executionRequest.batchId = execIds.batchid;
+	executionRequest.executionIds = execIds.execids;
+	const result = await executionRequestToICE(executionRequest, execType, userInfo);
+	return res.send(result);
+};
 
 exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE_SVN");
@@ -1272,7 +1257,6 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 		}
 	});
 };
-
 
 function  insertExecutionStatus(executedby,testsuiteids,cycleid,callback) {
 	logger.info("Inside updateExecutionStatus function");
@@ -2133,6 +2117,12 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 				var testsuitecount_s = 0;
 				var statusPass_s = 0;
 				var suiteStatus_s;
+				var scenarioIds = {};
+				scenarioIds[testsuiteid]=[];
+				var scnDetail = result1.rows[0].scenariodetails;
+				for(let i = 0; i < scnDetail.length; i++) {
+					scenarioIds[testsuiteid].push(scnDetail[i].scenarioids);
+				}
 				logger.debug("ICE Socket requesting Address: %s" , name);
 				redisServer.redisPubICE.pubsub('numsub','ICE1_scheduling_' + name,function(err,redisres){
 					if (redisres[1]>0) {
@@ -2157,6 +2147,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 									else if(response.status == "skipped"){
 										scheduleStatus = "Inprogress";
 										logger.info("Calling function updateSkippedScheduleStatus from scheduleFunction");
+										response.data.scenario_ids = scenarioIds;
 										var sessobj_new = sessObj + ';Skipped;' +  JSON.stringify(result1.rows[0]) + ';' +JSON.stringify(response.data);
 										var msg = "The scenario was skippped due to conflicting schedules.";
 										updateSkippedScheduleStatus(sessobj_new, msg, function (err, data){
@@ -2260,17 +2251,10 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 						redisServer.redisSubServer.on("message",executeTestSuite_listener);
 					} else {
 						logger.error("Error occurred in the function scheduleFunction: Socket not Available");
-						var testsuiteid = result1.rows[0].testsuiteids[0];
 						var scheduleid = result1.rows[0]._id;
-						var d = {};
-						d[testsuiteid]=[];
-						var scenariodetails = result1.rows[0].scenariodetails;
-						for(var i=0;i<scenariodetails.length;i++){
-							(d[testsuiteid]).push(scenariodetails[i].scenarioids);
-						}
 						var datetime = new Date();
 						datetime = datetime.getFullYear()+'-'+(datetime.getMonth()+1)+'-'+datetime.getDate()+' '+datetime.getHours()+':'+datetime.getMinutes()+':'+datetime.getSeconds()+'0';
-						var data = {'scenario_ids':d,'execution_id':scheduleid,'time':String(datetime)};
+						var data = {'scenario_ids':scenarioIds,'execution_id':scheduleid,'time':String(datetime)};
 						var sessobj_new = sessObj + ';Skipped;' +  JSON.stringify(result1.rows[0]) + ';' +JSON.stringify(data);
 						var msg = "The scenario was skipped due to unavailability of schedule mode/ICE.";
 						logger.info("Calling function updateSkippedScheduleStatus from scheduleFunction");

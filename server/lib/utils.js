@@ -1,19 +1,35 @@
-var async = require('async');
+var asynclib = require('async');
 var logger = require('../../logger');
 var myserver = require('../../server');
 var redisServer = require('./redisSocketHandler');
+var taskflow = require('../config/options').strictTaskWorkflow;
 var epurl = process.env.NDAC_URL;
 var Client = require("node-rest-client").Client;
 var client = new Client();
 //var neo4jAPI = require('../controllers/neo4jAPI');
 
 
-module.exports.getChannelNum = function(channel,cb) {
-	redisServer.redisPubICE.pubsub('numsub', channel,function(err,redisres){
-		if (redisres[1]>0) cb(true);
+const getChannelNum_cb = (channel,cb) => {
+	redisServer.redisPubICE.pubsub('numsub', channel, function(err, redisres) {
+		if (redisres[1] > 0) cb(true);
 		else cb(false);
 	});
 };
+
+const getChannelNum = async (...channel) => {
+	const redisres = await redisServer.redisPubICE.pubsubPromise('numsub', ...channel);
+	return redisres.filter((e,i) => (i%2===1));
+};
+
+module.exports.channelStatus = async (name) => {
+	var num = [0,0];
+	try {
+		num = await getChannelNum('ICE1_normal_' + name, 'ICE1_scheduling_' + name);
+	} finally {
+		return { normal: (num[0] > 0), schedule: (num[1] > 0) }
+	}
+};
+
 
 module.exports.getSocketList = function(toFetch, cb) {
 	var fetchQuery;
@@ -24,7 +40,7 @@ module.exports.getSocketList = function(toFetch, cb) {
 	else if (toFetch == "notify") fetchQuery = "notify_*";
 	if (toFetch == "ICE") {
 		redisServer.redisPubICE.pubsub('channels', fetchQuery, function(err,redisres) {
-			async.eachSeries(redisres, function(e, innerCB){
+			asynclib.eachSeries(redisres, function(e, innerCB){
 				var ed = e.split('_');
 				var mode = ed[1];
 				var user = ed.slice(2).join('_');
@@ -87,15 +103,14 @@ module.exports.isSessionActive = function (req){
 };
 
 module.exports.approval_status_check=function(ExecutionData,approval_callback){
-	async.forEachSeries(ExecutionData,function(eachmoduledata,callback){
-		var qlist=[];
+	asynclib.forEachSeries(ExecutionData,function(eachmoduledata,callback){
 		var scenario_list=[];
 		var arr=eachmoduledata.suiteDetails;
 		for (i=0;i<arr.length;i++){
-			scenario_list.push(arr[i].scenarioids);
+			scenario_list.push(arr[i].scenarioId);
 		}
 		var inputs = {
-			"scenario_ids":scenario_list
+			"scenario_ids": scenario_list
 		};
 		var args = {
 			data: inputs,
@@ -132,6 +147,52 @@ module.exports.approval_status_check=function(ExecutionData,approval_callback){
 		else approval_callback(null,true)
 	});
 };
+
+module.exports.approvalStatusCheck = async executionData => {
+	var data = {res: "pass", status: null};
+	if (!taskflow) return data
+	var scenarioList=[];
+	executionData.forEach(tsu => tsu.suiteDetails.forEach(tsco => scenarioList.push(tsco.scenarioId)));
+	const inputs = {
+		"scenario_ids": scenarioList
+	};
+	const result = fetchData(inputs, "suite/checkApproval", "approvalStatusCheck", true);
+	data.statusCode = result[1].statusCode;
+	if (result[0] == "No task") data.res = 'Notask';
+	else if (result[0] == "Modified") data.res = 'Notask';
+	else if (result[0] != 0) data.res = 'NotApproved';
+};
+
+var fetchData = async (inputs, url, from, all) => {
+	var args = {
+		data: inputs,
+		headers: {
+			"Content-Type": "application/json"
+		}
+	};
+	//from = " from " + ((from)? from : fetchData.caller.name);
+	from = (from)? " from " + from : "";
+	var query = (inputs.query)? " - " + inputs.query:"";
+	logger.info("Calling NDAC Service: " + url + from + query);
+	var promiseData = (new Promise((rsv, rej) => {
+		client.post(epurl + url, args, (result, response) => {
+			if (response.statusCode != 200 || result.rows == "fail") {
+				logger.error("Error occurred in " + url + from + query + ", Error Code : ERRNDAC");
+				//rej("fail");
+				if (all) rsv(["fail", result, response]);
+				else rsv("fail");
+			} else {
+				result = result.rows || result;
+				if (all) rsv([result, response]);
+				else rsv(result);
+			}
+		});
+	}));
+	return promiseData;
+};
+
+module.exports.getChannelNum = getChannelNum_cb;
+module.exports.fetchData = fetchData;
 
 /*module.exports.cache = {
 	get: function get(key, cb) {
