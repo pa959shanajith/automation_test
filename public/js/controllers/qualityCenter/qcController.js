@@ -186,9 +186,9 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 						structContainer.find(".root ul").append("<li class='Tfolnode' testfolder_"+(i+1)+" data-folderpath='"+data[0].testfolder[i].folderpath+"'><img class='qcExpand qcExpandFolder selectedQcNode' title='expand' style='height: 16px;' src='imgs/ic-qcExpand.png'><label title='"+data[0].testfolder[i].foldername+"'>"+data[0].testfolder[i].foldername+"</label></li>");
 					}
 				}
-				if("TestSet" in data[1] && data[1].TestSet.length > 0){
-					for(var j=0; j<data[1].TestSet.length; j++){
-						structContainer.find(".root ul").append("<li class='Tsetnode testSet_"+(j+1)+"' data-testsetpath='"+data[1].TestSet[j].testsetpath+"' data-testsetid='"+data[1].TestSet[j].testsetid+"'><img class='qcExpand qcExpandTestset selectedQcNode' title='expand' style='height: 16px;' src='imgs/ic-taskType-blue-plus.png'><label title='"+data[1].TestSet[j].testset+"'>"+data[1].TestSet[j].testset+"</label></li>");
+				if("TestSet" in data[0] && data[0].TestSet.length > 0){
+					for(var j=0; j<data[0].TestSet.length; j++){
+						structContainer.find(".root ul").append("<li class='Tsetnode testSet_"+(j+1)+"' data-testsetpath='"+data[0].TestSet[j].testsetpath+"' data-testsetid='"+data[0].TestSet[j].testsetid+"'><img class='qcExpand qcExpandTestset selectedQcNode' title='expand' style='height: 16px;' src='imgs/ic-taskType-blue-plus.png'><label title='"+data[0].TestSet[j].testset+"'>"+data[0].TestSet[j].testset+"</label></li>");
 					}
 				}
 				unblockUI();				
@@ -369,7 +369,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 	$(document).on('click', ".qcSyncronise", function(event){
 		var getDomainName = $(".qcSelectDomain option:selected").val();
 		var getProjectName = $(".qcSelectProject option:selected").val();
-		var qcTestcaseName = $(this).siblings("label").children()[0].innerText;
+		var qcTestcaseName = $(this).siblings("label").children()[1].innerText;
 		var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
 		var qcFolderPath = $(this).parent("li").parent("ul").prev("li").parent("ul").prev("li").data("folderpath");
 		var N68ScenarioId = $(".qcN68TreeContainer").find(".selectedToMap").data("scenarioid");
