@@ -51,7 +51,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 		})
 		.state('mindmap', {
             url: '/mindmap',
-            templateUrl: 'partials/home_mindmap.html',
+            templateUrl: 'partials/mindmap.html',
             controller: 'mindmapController',
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {

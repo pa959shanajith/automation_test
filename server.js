@@ -481,7 +481,7 @@ if (cluster.isMaster) {
 		app.post('/checkReuse', mindmap.checkReuse);
 		app.post('/getProjectTypeMM_Nineteen68', mindmap.getProjectTypeMM_Nineteen68);
 		app.post('/populateScenarios', mindmap.populateScenarios);
-		app.post('/getModules', mindmap.getModules);
+		app.post('/getModules', auth.protect, mindmap.getModules);
 		app.post('/reviewTask', mindmap.reviewTask);
 		app.post('/saveData', mindmap.saveData);
 		app.post('/saveEndtoEndData', mindmap.saveEndtoEndData);
@@ -531,7 +531,7 @@ if (cluster.isMaster) {
 		app.post('/getKeywordDetails_ICE', design.getKeywordDetails_ICE);
 		app.post('/getTestcasesByScenarioId_ICE', design.getTestcasesByScenarioId_ICE);
 		//Execute Screen Routes
-		app.post('/readTestSuite_ICE', suite.readTestSuite_ICE);
+		app.post('/readTestSuite_ICE', auth.protect, suite.readTestSuite_ICE);
 		app.post('/updateTestSuite_ICE', suite.updateTestSuite_ICE);
 		//app.post('/updateTestScenario_ICE', suite.updateTestScenario_ICE);
 		app.post('/ExecuteTestSuite_ICE', auth.protect, suite.ExecuteTestSuite_ICE);

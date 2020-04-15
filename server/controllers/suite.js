@@ -20,159 +20,57 @@ const SOCK_SCHD = "scheduleModeOn";
 const SOCK_NA = "unavailableLocalServer";
 
 /**
- * @author vishvas.a
- * @modifiedauthor shree.p (fetching the scenario names from the scenarios table)
- * @author vishvas.a changes on 21/June/2017 with regard to Batch Execution
- * this reads the scenario information from the testsuites
- * and testsuites table of the icetestautomation keyspace
+ * This service reads the testsuite and scenario information for the testsuites
  */
-exports.readTestSuite_ICE = function (req, res) {
+exports.readTestSuite_ICE = async (req, res) => {
 	logger.info("Inside UI service: readTestSuite_ICE");
-	 if (utils.isSessionActive(req)) {
-		var requiredreadTestSuite = req.body.readTestSuite;
-		var fromFlg = req.body.fromFlag;
-		var responsedata = {};
-		var testsuitesindex = 0;
-		async.forEachSeries(requiredreadTestSuite, function (eachSuite, readSuiteDatacallback) {
-			//internal variables
-			var outexecutestatus = [];
-			var outcondition = [];
-			var outdataparam = [];
-			var outscenarioids = [];
-			var outscenarionames = [];
-			var outprojectnames = [];
-			testsuitesindex = testsuitesindex + 1;
-			eachSuite.userInfo = {"userid": req.session.userid, "role": req.session.activeRoleId};
-			logger.info("Calling function TestSuiteDetails_Module_ICE from readTestSuite_ICE");
-			TestSuiteDetails_Module_ICE(eachSuite, function (TestSuiteDetailserror, TestSuiteDetailsCallback) {
-				if (TestSuiteDetailserror) {
-					logger.error("Error in the function TestSuiteDetails_Module_ICE from readTestSuite_ICE: %s",TestSuiteDetailserror);
-				} else {
-					var inputs = {
-						"mindmapid": eachSuite.testsuiteid,
-						"cycleid": eachSuite.cycleid,
-						"testsuitename": eachSuite.testsuitename,
-						"versionnumber": eachSuite.versionnumber,
-						"query": "readTestSuite_ICE"
-					};
-					var args = {
-						data: inputs,
-						headers: {
-							"Content-Type": "application/json"
-						}
-					};
-					logger.info("Calling NDAC Service from readTestSuite_ICE: suite/readTestSuite_ICE");
-					client.post(epurl + "suite/readTestSuite_ICE", args,
-						function (result, response) {
-						if (response.statusCode != 200 || result.rows == "fail") {
-							logger.error("Error occurred in suite/readTestSuite_ICE from readTestSuite_ICE Error Code : ERRNDAC");
-							var flag = "Error in readTestSuite_ICE : Fail";
-							res.send(flag);
-						} else {
-							//complete each response scenario object
-							var respeachscenario = {
-								executestatus: [],
-								condition: [],
-								dataparam: [],
-								scenarioids: [],
-								scenarionames: [],
-								projectnames: []
-							};
-							async.forEachSeries(result.rows, function (eachSuiterow, eachSuitecallback) {
-								outscenarioids = eachSuiterow.testscenarioids;
-								//for (i =0; i<eachSuiterow.testscenarioids.length;i++) {outscenarioids=[]; outscenarioids.push(eachSuiterow.testscenarioids[i].$oid);}
-								if (outscenarioids == null) {
-									outscenarioids = [];
-								}
-								respeachscenario.scenarioids = outscenarioids;
-								if (eachSuiterow.donotexecute == null) {
-									var arrTemp = [];
-									for (var i = 0; i < outscenarioids.length; i++) {
-										arrTemp.push(1);
-									}
-									outexecutestatus = arrTemp;
-								} else {
-									outexecutestatus = eachSuiterow.donotexecute;
-								}
-								respeachscenario.executestatus = outexecutestatus;
-								if (eachSuiterow.conditioncheck == null) {
-									var arrTemp = [];
-									for (var i = 0; i < outscenarioids.length; i++) {
-										arrTemp.push(0);
-									}
-									outcondition = arrTemp;
-								} else {
-									outcondition = eachSuiterow.conditioncheck;
-								}
-								respeachscenario.condition = outcondition;
-								if (eachSuiterow.getparampaths == null) {
-									var arrTemp = [];
-									for (var i = 0; i < outscenarioids.length; i++) {
-										arrTemp.push('');
-									}
-									outdataparam = arrTemp;
-								} else {
-									outdataparam = eachSuiterow.getparampaths;
-								}
-								respeachscenario.dataparam = outdataparam;
-								respeachscenario.testsuitename = eachSuiterow.name;
-								var scenarioidindex = 0;
-								responsedata[eachSuite.testsuiteid] = respeachscenario;
-								async.forEachSeries(outscenarioids, function (eachoutscenarioid, outscenarioidcallback) {
-									scenarioidindex = scenarioidindex + 1;
-									/**
-									 *  Projectnametestcasename_ICE is a function to fetch testscenario name and project name
-									 * 	modified shreeram p on 15th mar 2017
-									 * */
-									logger.info("Calling function Projectnametestcasename_ICE from readTestSuite_ICE");
-									Projectnametestcasename_ICE(eachoutscenarioid, function (eachoutscenarioiderr, eachoutscenarioiddata) {
-										if (eachoutscenarioiderr) {
-											logger.error("Error in the function Projectnametestcasename_ICE from readTestSuite_ICE: %s",eachoutscenarioiderr);
-										} else {
-											if (eachoutscenarioiddata != null || eachoutscenarioiddata != undefined) {
-												outscenarionames.push(eachoutscenarioiddata.testcasename);
-												outprojectnames.push(eachoutscenarioiddata.projectname);
-											}
-											respeachscenario.scenarionames = outscenarionames;
-											respeachscenario.projectnames = outprojectnames;
-											respeachscenario.testsuiteid = eachSuite.testsuiteid;
-											respeachscenario.versionnumber = eachSuite.versionnumber;
-											if (scenarioidindex == outscenarioids.length) {
-												responsedata[eachSuite.testsuiteid] = respeachscenario;
-												if (testsuitesindex == requiredreadTestSuite.length) {
-													if (fromFlg == "scheduling") {
-														utils.getSocketList("schedule", function(connectusers){
-															logger.debug("IP\'s connected : %s", connectusers.join());
-															var schedulingDetails = {
-																"connectedUsers": connectusers,
-																"testSuiteDetails": responsedata
-															};
-															responsedata=schedulingDetails;
-															outscenarioidcallback();
-														});
-													}else outscenarioidcallback();
-												}else outscenarioidcallback();
-											}else outscenarioidcallback();
-											
-										}
-									}, eachSuitecallback);
+	const batchData = req.body.readTestSuite;
+	const fromFlg = req.body.fromFlag;
+	const userInfo = {"userid": req.session.userid, "role": req.session.activeRoleId};
+	const fnName = "readTestSuite_ICE";
+	var responsedata = {};
+	var inputs = {};
 
-								}, readSuiteDatacallback);
-							});
-						}
-					});
-				}
-			});
-		},function(){
-			logger.info("Inside final function of the service readTestSuite_ICE");
-			logger.info("Calling function executeQueries from final function of the service readTestSuite_ICE");
-			res.send(responsedata);
-		});
-	} 
-	else {
-		logger.error('Error in the service readTestSuite_ICE: Invalid Session');
-		res.send("Invalid Session");
+	for (let i = 0; i < batchData.length; i++) {
+		const suite = batchData[i];
+		const moduleId = suite.testsuiteid;
+		inputs = {
+			"query": "gettestsuite",
+			"mindmapid": moduleId,
+			"cycleid": suite.cycleid,
+			"createdby": userInfo.userid,
+			"createdbyrole": userInfo.role
+		};
+		const testsuite = await utils.fetchData(inputs, "suite/readTestSuite_ICE", fnName);
+		inputs = {
+			"query": "gettestscenario",
+			"testscenarioids": testsuite.testscenarioids
+		};
+		const testscenarioDetails = await utils.fetchData(inputs, "suite/readTestSuite_ICE", fnName);
+		const finalSuite = {
+			"executestatus": testsuite.donotexecute,
+			"condition": testsuite.conditioncheck,
+			"dataparam": testsuite.getparampaths,
+			"scenarioids": testsuite.testscenarioids,
+			"scenarionames": testscenarioDetails.testscenarionames,
+			"projectnames": testscenarioDetails.projectnames,
+			"testsuitename": suite.testsuitename,
+			"testsuiteid": moduleId,
+			"actualtestsuiteid": testsuite.testsuiteid,
+			"versionnumber": suite.versionnumber
+		};
+		responsedata[moduleId] = finalSuite;
 	}
+	if (fromFlg == "scheduling") {
+		const connectusers = await utils.getSocketList("schedule");
+		logger.debug("IP\'s connected : %s", connectusers.join());
+		const schedulingDetails = {
+			"connectedUsers": connectusers,
+			"testSuiteDetails": responsedata
+		};
+		responsedata = schedulingDetails
+	}
+	res.send(responsedata);
 };
 
 function readTestSuite_ICE_SVN(req,callback) {
@@ -439,7 +337,6 @@ function updatescenariodetailsinsuite(req, cb, data) {
 			cb(null, 'Success');
 		}
 	});
-
 }
 
 function Projectnametestcasename_ICE(req, cb, data) {
@@ -709,7 +606,7 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 	return execReq;
 };
 
-const generateExecutioIds = async (tsuIds, userid) => {
+const generateExecutionIds = async (tsuIds, userid) => {
 	const inputs = {
 		"query": "insertintoexecution",
 		"executedby": userid,
@@ -717,6 +614,17 @@ const generateExecutioIds = async (tsuIds, userid) => {
 	};
 	const execIds = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "prepareExecutionRequest");
 	return execIds;
+};
+
+const updateExecutionStatus = async (execIds, status) => {
+	logger.info("Calling function updateExecutionStatus from executionFunction");
+	const inputs = {
+		"query": "updateintoexecution",
+		"executionids": execIds,
+		"status": status
+	};
+	const response = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "updateExecutionStatus");
+	return response;
 };
 
 const executionRequestToICE = async (execReq, execType, userInfo) => {
@@ -732,9 +640,9 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 	redisServer.redisPubICE.publish('ICE1_normal_' + name, JSON.stringify(dataToIce));
 
 	const exePromise = async (resSent) => (new Promise((rsv, rej) => {
-		function executeTestSuite_listener(channel, message) {
+		async function executeTestSuite_listener(channel, message) {
 			const data = JSON.parse(message);
-			if(name == data.username && executionRequest.executionId == data.value.executionId) {
+			if(name == data.username && execReq.batchId == data.value.batchId) {
 				if (data.onAction == SOCK_NA) {
 					redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
 					logger.error("Error occurred in ExecuteTestSuite_ICE: Socket Disconnected");
@@ -766,7 +674,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 									"status": resultData.reportData.overallstatus[0].overallstatus,
 									"report": JSON.stringify(reportdata),
 									"query": "insertreportquery",
-									"modifiedby":userInfo.userid
+									"modifiedby": userInfo.userid
 								};
 								const args = {
 									data: inputs,
@@ -775,7 +683,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 									}
 								};
 								logger.info("Calling NDAC Service from executionFunction: suite/ExecuteTestSuite_ICE");
-								client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+								client.post(epurl + "suite/ExecuteTestSuite_ICE1", args,
 									function (result, response) {
 									if (response.statusCode != 200 || result.rows == "fail") logger.error("Error occurred in suite/ExecuteTestSuite_ICE from executionFunction Error Code : ERRNDAC");
 									else logger.info("Successfully inserted report data");
@@ -786,7 +694,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 									completedSceCount = 0;
 									testsuitecount++;
 									logger.info("Calling function updateExecutionStatus from executionFunction");
-									updateExecutionStatus(testsuiteid, executionid, suiteStatus,cycleid);
+									await updateExecutionStatus(execReq.executionIds, suiteStatus);
 								}
 							} else {
 								completedSceCount++;
@@ -796,7 +704,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 									testsuitecount++;
 									suiteStatus = "fail";
 									logger.info("Calling function updateExecutionStatus from executionFunction");
-									updateExecutionStatus(testsuiteid, executionid, suiteStatus,cycleid);
+									await updateExecutionStatus1(execReq.executionIds, suiteStatus);
 								}
 							}
 						} catch (ex) {
@@ -837,7 +745,7 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 	if (taskApproval.res !== "pass") return res.status(taskApproval.status).send(taskApproval.res);
 	/*const countStatus =*/ await counterUpdater(batchExecutionData.moduleInfo.length, userInfo.userid);
 	const executionRequest = await prepareExecutionRequest(batchExecutionData, userInfo);
-	const execIds = await generateExecutioIds(executionRequest.testsuiteIds, userInfo.userid);
+	const execIds = await generateExecutionIds(executionRequest.testsuiteIds, userInfo.userid);
 	executionRequest.batchId = execIds.batchid;
 	executionRequest.executionIds = execIds.execids;
 	const result = await executionRequestToICE(executionRequest, execType, userInfo);
@@ -1201,12 +1109,12 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 																		} else {
 																			suiteStatus = "Fail";
 																		}
-																		updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
+																		updateExecutionStatus1(testsuiteid, executionid, starttime, suiteStatus);
 																	}
 																} else {
 																	if (completedSceCount == scenarioCount) {
 																		suiteStatus = "Fail";
-																		updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
+																		updateExecutionStatus1(testsuiteid, executionid, starttime, suiteStatus);
 																	}
 																}
 															} catch (ex) {
@@ -1289,7 +1197,7 @@ function  insertExecutionStatus(executedby,testsuiteids,cycleid,callback) {
 }
 
 //Update execution table on completion of suite execution
-function updateExecutionStatus(testsuiteid, executionid, suiteStatus,cycleid) {
+function updateExecutionStatus1(testsuiteid, executionid, suiteStatus,cycleid) {
 	logger.info("Inside updateExecutionStatus function");
 	var inputs = {
 		"status": suiteStatus,
@@ -1774,20 +1682,13 @@ function testcasedetails_testscenarios(req, cb) {
 
 
 /***********************Scheduling jobs***************************/
-exports.testSuitesScheduler_ICE = function (req, res) {
+exports.testSuitesScheduler_ICE = async function (req, res) {
 	logger.info("Inside UI service testSuitesScheduler_ICE");
 	if (utils.isSessionActive(req)) {
 		var ExecutionData=req.body.moduleInfo;
-		if(taskflow){
-			utils.approval_status_check(ExecutionData, function (err, approved) {
-				if (approved) testSuitesScheduler_ICE_cb(req,res);
-				else {
-					res.status(err.status).send(err.res);
-				}
-			});
-		}else{
-			testSuitesScheduler_ICE_cb(req,res);
-		}
+		const taskApproval = await utils.approvalStatusCheck(ExecutionData);
+		if (taskApproval.res !== "pass") return res.status(taskApproval.status).send(taskApproval.res);
+		testSuitesScheduler_ICE_cb(req,res);
 	} else {
 		logger.error("Error in the service testSuitesScheduler_ICE: Invalid Session");
 		res.send("Invalid Session");
@@ -2222,7 +2123,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 													completedSceCount_s = 0;
 													testsuitecount_s++;
 													logger.info("Calling function updateExecutionStatus from scheduleFunction");
-													updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus_s,cycleid);
+													updateExecutionStatus1(testsuiteid, executionid, starttime, suiteStatus_s,cycleid);
 												}
 											}
 										} catch (ex) {

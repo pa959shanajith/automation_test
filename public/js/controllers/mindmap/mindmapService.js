@@ -176,14 +176,23 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     				function (response) { return $q.reject(response.data); });
     	
 		},
-		getDomain : function(data){
+		getDomain: function(data){
 			return $http.post('/getDomain',{
 				 data: data
 			})
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
 		},
-		pdProcess : function(data){
+		getTestSuiteDetails: function(data){
+			return $http.post('/readTestSuite_ICE', {
+				param: 'readTestSuite_ICE',
+				readTestSuite: data,
+				fromFlag: "mindmaps"
+			})
+    		.then(function (response) { return response.data; },
+    				function (response) { return $q.reject(response.data); });
+		},
+		pdProcess: function(data){
 			return $http.post('/pdProcess',{
 				 data: data
 			})

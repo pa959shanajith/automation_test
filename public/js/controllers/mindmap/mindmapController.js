@@ -206,64 +206,54 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (!$scope.projectNameO) {
                     $scope.projectNameO = res.projectId[0];
                 }
-                mindmapServices.getDomain().then(function(result) {
-                    if (result == "Invalid Session") {
-                        return $rootScope.redirectPage();
-                    } else {
-                        $scope.domaininfo = result;
-                        mindmapServices.getProjectTypeMM_Nineteen68($scope.projectNameO).then(function(res1){
-                            $scope.apptypelist = res1;
-                            $scope.apptype = res1.project_typename;
-                            $scope.domain = res1.domains;
-                            addInfo({'attributes':{
-                                                    'Domain': $scope.domain,
-                                                    'Apptype':$scope.apptype
-                                                }
-                                    });
-                        });                   
-                    }
-                });                
-                if ($scope.tab == 'tabAssign') {
-                        result=$scope.projectList[selectedProjectIndex].releases
-                        $('.release-list').empty();
-                        $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-                        $('.release-list').addClass('errorClass');
-                        $('.cycle-list').empty();
-                        $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-                        $('.cycle-list').addClass('errorClass');
-                        reldata = {};
-                        cycdata = {};
-                        for (i = 0; i < result.length; i++) {
-                            $('.release-list').append("<option data-id='" + result[i].name + "' value='" + i + "'>" + result[i].name + "</option>");
-                            for(j = 0;j < result[i].cycles.length; j++){
-                                reldata[result[i].cycles[j]._id]=result[i].name;
-                                cycdata[result[i].cycles[j]._id]=result[i].cycles[j].name;
-                            }
+                mindmapServices.getProjectTypeMM_Nineteen68($scope.projectNameO).then(function(res1){
+                    $scope.apptypelist = res1;
+                    $scope.apptype = res1.project_typename;
+                    $scope.domain = res1.domains;
+                    addInfo({'attributes':{
+                            'Domain': $scope.domain,
+                            'Apptype':$scope.apptype
                         }
-                        $('.cycle-list').change(function() {
-                            $('.cycle-list').removeClass('errorClass');
-                            loadMindmapData1();
-                        });
-                        $('.release-list').change(function() {
-                            $('.release-list').removeClass('errorClass');
-                            if ($("#ct-AssignBox").hasClass("ct-open") == true) {
-                                $('.iconSpaceArrow').trigger('click');
+                    });
+                });                   
+                if ($scope.tab == 'tabAssign') {
+                    result=$scope.projectList[selectedProjectIndex].releases
+                    $('.release-list').empty();
+                    $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                    $('.release-list').addClass('errorClass');
+                    $('.cycle-list').empty();
+                    $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                    $('.cycle-list').addClass('errorClass');
+                    reldata = {};
+                    cycdata = {};
+                    for (i = 0; i < result.length; i++) {
+                        $('.release-list').append("<option data-id='" + result[i].name + "' value='" + i + "'>" + result[i].name + "</option>");
+                        for(j = 0;j < result[i].cycles.length; j++){
+                            reldata[result[i].cycles[j]._id]=result[i].name;
+                            cycdata[result[i].cycles[j]._id]=result[i].cycles[j].name;
+                        }
+                    }
+                    $('.cycle-list').change(function() {
+                        $('.cycle-list').removeClass('errorClass');
+                        loadMindmapData1();
+                    });
+                    $('.release-list').change(function() {
+                        $('.release-list').removeClass('errorClass');
+                        if ($("#ct-AssignBox").hasClass("ct-open") == true) {
+                            $('.iconSpaceArrow').trigger('click');
+                        }
+                        $('#ctExpandAssign').unbind('click');
+                        unloadMindmapData();
+                        default_releaseid = $('.release-list').val() ? $('.release-list').val() : 0;
+                            var result2 = $scope.projectList[selectedProjectIndex]["releases"][default_releaseid]["cycles"];
+                            $('.cycle-list').empty();
+                            $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                            $('.cycle-list').addClass('errorClass');
+                            for (i = 0; i < result2.length; i++) {
+                                $('.cycle-list').append("<option data-id='" + result2[i]["name"] + "' value='" + result2[i]["_id"] + "'>" + result2[i]["name"] + "</option>");
                             }
-                            $('#ctExpandAssign').unbind('click');
-                            unloadMindmapData();
-							default_releaseid = $('.release-list').val() ? $('.release-list').val() : 0;
-                                var result2 = $scope.projectList[selectedProjectIndex]["releases"][default_releaseid]["cycles"];
-                                $('.cycle-list').empty();
-                                $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-                                $('.cycle-list').addClass('errorClass');
-                                for (i = 0; i < result2.length; i++) {
-                                    $('.cycle-list').append("<option data-id='" + result2[i]["name"] + "' value='" + result2[i]["_id"] + "'>" + result2[i]["name"] + "</option>");
-                                }
-                           
-                        });
-
+                    });
                 }
-
 
                 if ($scope.param == 0 && $scope.tab == 'tabCreate') {
                     loadMindmapData1();
@@ -754,13 +744,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $("div.nodeBoxSelected").removeClass("nodeBoxSelected");
         $('[title=' + $('#createNewConfirmationPopup').attr('mapname') + ']').addClass("nodeBoxSelected");
         d3.select('#ct-inpBox').classed('no-disp', true);
-        // var modName = $('#createNewConfirmationPopup').attr('mapid');
-        // var moduleid =$('#createNewConfirmationPopup').attr('_id');
         var modName = $('#createNewConfirmationPopup').attr('mapname');
         var moduleid =$('#createNewConfirmationPopup').attr('mapid');
         $scope.modType = 'e2e';
         blockUI("Loading module.. Please wait..");
-        // mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, 0, $('.cycle-list').val(), modName,moduleid).then(function(result) {
         mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, 0, $('.cycle-list').val(), modName,moduleid).then(function(result) {
             progressFlag=false;
             if($scope.tab=="tabAssign" && result["completeFlow"]==false)
@@ -3461,7 +3448,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             openDialogMindmap("Fail", "Please select a module to proceed");
             return;
         }
-        var data_not_exported = [];
         var version_num = ($('.version-list').val() != undefined)? $('.version-list').val(): "0.0";
         var suiteDetailsTemplate = { "condition": 0, "dataparam": [" "], "scenarioId": "", "scenarioName": "" };
         //var suiteDetailsTemplate = { "scenarioName": "", "scenarioId": "" };
@@ -3471,8 +3457,26 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         blockUI('Loading UI');
         var moduleid = $('#createNewConfirmationPopup').attr('mapid');
         var modName = $('#createNewConfirmationPopup').attr('mapname');
-        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO, parseFloat(version_num), $('.cycle-list').val(), modName,moduleid).then(
-            function(moduleObj) {
+        const prjInfo = $("#ct-AssignBox").find('.project-list').children("option").filter(":selected");
+        const relInfo = $('.release-list').children("option").filter(":selected");
+        const cycInfo = $('.cycle-list').children("option").filter(":selected");
+        moduleData.appType = $scope.apptype;
+        moduleData.domainName = $scope.domain;
+        moduleData.projectName = prjInfo.text();
+        moduleData.projectId = prjInfo.val();
+        moduleData.releaseId = relInfo.text();
+        moduleData.cycleName = cycInfo.text();
+        moduleData.cycleId = cycInfo.val();
+        const reqObject = [{
+            "releaseid": moduleData.releaseId,
+            "cycleid": moduleData.cycleId,
+            "testsuiteid": moduleid,
+            "testsuitename": modName,
+            "projectidts": moduleData.projectId,
+            "versionnumber": parseFloat(version_num)
+        }];
+        mindmapServices.getTestSuiteDetails(reqObject).then(
+                function(moduleObj) {
                 if (moduleObj == "Invalid Session") {
                     return $rootScope.redirectPage();
                 } else if (moduleObj == 'fail') {
@@ -3480,63 +3484,31 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     openDialogMindmap('Mindmap', "Data Exported Failed");
                     return;
                 }
-                var flag = 0;
                 unassignTask=[];
-                if(moduleObj.name == loadedmodule) {
-                    if (moduleObj._id != null) {
-                        moduleData.moduleId = moduleObj._id;
-                        moduleData.moduleName = moduleObj.name;
-                        moduleData.suiteDetails = [];
-                        //moduleData.versionNumber = (moduleObj.versionnumber == 0)? "0.0" : String(moduleObj.versionnumber);
-                        moduleData.versionNumber = moduleObj.versionnumber;
-                        flag = 1;
-                        for (var j = 0; j < moduleObj.children.length; j++) {
-                            var child = moduleObj.children[j];
-                            if (child._id != null) {
-                                var s_data = JSON.parse(JSON.stringify(suiteDetailsTemplate));
-                                s_data.scenarioName = child.name;
-                                s_data.scenarioId = child._id;
-                                moduleData.suiteDetails.push(s_data);
-                            } else {
-                                console.log('Not exported_S : ', child.name);
-                            }
-                        }
-                    } else {
-                        data_not_exported.push(moduleObj.name);
-                        console.log('Not exported : ', moduleObj[i].name);
+                moduleObj = moduleObj[moduleid];
+                if(moduleObj && moduleObj.testsuitename == loadedmodule && moduleObj.actualtestsuiteid != null) {
+                    moduleData.moduleId = moduleObj.testsuiteid;
+                    moduleData.moduleName = moduleObj.testsuitename;
+                    moduleData.suiteDetails = [];
+                    moduleData.versionNumber = moduleObj.versionnumber;
+                    for (var j = 0; j < moduleObj.scenarioids.length; j++) {
+                        var s_data = JSON.parse(JSON.stringify(suiteDetailsTemplate));
+                        s_data.condition = moduleObj.condition[j];
+                        s_data.dataparam = [moduleObj.dataparam[j]];
+                        s_data.scenarioName = moduleObj.scenarionames[j];
+                        s_data.scenarioId = moduleObj.scenarioids[j];
+                        moduleData.suiteDetails.push(s_data);
                     }
-                }
-                if (flag) {
-                    mindmapServices.getProjectTypeMM_Nineteen68($scope.projectNameO).then(
-                        function(projectData) {
-                            if (projectData == "Invalid Session") {
-                                return $rootScope.redirectPage();
-                            }
-                            moduleData.appType = projectData.project_typename;
-                            moduleData.domainName = projectData.domains;
-                            moduleData.projectName = $("#ct-moduleBox").find('.project-list option:selected').text();
-                            moduleData.projectId = moduleObj.projectID;
-                            moduleData.releaseId = projectData.releases[0].name;
-                            moduleData.cycleName = projectData.releases[0].cycles[0].name;
-                            moduleData.cycleId = projectData.releases[0].cycles[0]._id;
-                            moduleInfo.moduleInfo.push(moduleData);
-                            jsonDownload('moduleinfo.json', JSON.stringify(moduleInfo));
-                            jsonDownload('executiondata.json', JSON.stringify(executionData));
-                            unblockUI();
-                            if (data_not_exported.length != 0)
-                                openDialogMindmap('Mindmap', "Data Exported Successfully. Note: Only Created Modules are exported.");
-                            else
-                                openDialogMindmap('Mindmap', "Data Exported Successfully.");
-                        },
-                        function(err) {
-                            console.log(err);
-                            unblockUI();
-                            openDialogMindmap('Mindmap', "Data Exported Failed");
-                        }
-                    );
+                    moduleInfo.moduleInfo.push(moduleData);
+                    unblockUI();
+                    jsonDownload('moduleinfo.json', JSON.stringify(moduleInfo));
+                    jsonDownload('executiondata.json', JSON.stringify(executionData));
+                    openDialogMindmap('Mindmap', "Data Exported Successfully.");
                 } else {
                     unblockUI();
                     openDialogMindmap('Mindmap', "Module is not created in ICE");
+                    // openDialogMindmap('Mindmap', "Data Exported Successfully. Note: Only Created Modules are exported.");
+                    console.log('Not exported : ', moduleObj[i].name);
                 }
             },
             function(err) {
@@ -3553,17 +3525,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     */
 
     function jsonDownload(filename, responseData) {
-        var objbrowserName = navigator.appName;
         if (isIE) {
             window.navigator.msSaveOrOpenBlob(new Blob([responseData], { type: "text/json;charset=utf-8" }), filename);
-            //saveAs(blob, filename);
-        }
-        else{
-            var blob = new Blob([responseData], {
-                type: 'text/json'
-            }),
-            e = document.createEvent('MouseEvents'),
-            a = document.createElement('a');
+        } else {
+            var blob = new Blob([responseData], { type: 'text/json' });
+            var e = document.createEvent('MouseEvents');
+            var a = document.createElement('a');
             a.download = filename;
             a.href = window.URL.createObjectURL(blob);
             a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
@@ -4592,7 +4559,7 @@ Purpose : displaying pop up for replication of project
     //--------------------End of Versioning.js---------------------//
     //--------------------Controller logic-------------------------//
     $("body").css("background", "#eee");
-    $("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" /><link id="mindmapCSS3" rel="stylesheet" type="text/css" href="css/css_mindmap/jquery-ui.css" />');
+    $("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />');
     var versioningEnabled = false;
     $timeout(function() {
         $('.scrollbar-inner').scrollbar();

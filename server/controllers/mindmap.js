@@ -12,7 +12,7 @@ var fs = require('fs');
 var xl = require('excel4node');
 var taskflow = require('../config/options').strictTaskWorkflow;
 var crypto = require("crypto");
-var async = require("async");
+var asynclib = require("async");
 var design = require('../controllers/design');
 var Client = require("node-rest-client").Client;
 var DOMParser = require('xmldom').DOMParser;
@@ -139,44 +139,19 @@ exports.checkReuse = function (req, res) {
 	}
 };
 
-exports.getModules = function (req, res) {
+exports.getModules = async (req, res) => {
 	logger.info("Inside UI service: getModules");
-	if (utils.isSessionActive(req)) {
-		var d = req.body;
-		var inputs= {
-			"tab":d.tab,
-			"projectid":d.projectid || null,
-			"modulename":d.modName,
-			"moduleid":d.moduleid,
-			// "releaseid":d.relId,
-			"cycleid":d.cycId,
-			"name":"getModules"
-		}
-		var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
-			}
-		};
-
-		client.post(epurl+"mindmap/getModules", args,
-		function (result, response) {
-			try {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in mindmaps/getModules: getModules, Error Code : ERRNDAC");
-					res.send("fail");
-				} else {
-					res.send(result.rows);
-				}
-			} catch (ex) {
-				logger.error("Exception in the service mindmaps/getModules: getModules: %s", ex);
-			}
-		});
+	const d = req.body;
+	const inputs = {
+		"tab":d.tab,
+		"projectid":d.projectid || null,
+		"modulename":d.modName,
+		"moduleid":d.moduleid,
+		"cycleid":d.cycId,
+		"name":"getModules"
 	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
-	}
+	const data = await utils.fetchData(inputs, "mindmap/getModules", "getModules");
+	res.send(data);
 };
 
 exports.reviewTask = function (req, res) {
@@ -1205,7 +1180,7 @@ exports.pdProcess = function (req, res) {
 	
 	
 		// data insertion logic
-		async.forEachSeries(orderlist, function (nodeObj, savedcallback) {
+		asynclib.forEachSeries(orderlist, function (nodeObj, savedcallback) {
 			var name = nodeObj.label,type = nodeObj.type;
 			testcaseid = uuidV4(),screenid = uuidV4();
 			var inputs = {
