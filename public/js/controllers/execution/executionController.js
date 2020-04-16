@@ -94,9 +94,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				cfpLoadingBar.complete();
 				var keys = Object.keys(data);
 				var dataLen = keys.length;
-				var eachData = keys.map(function (itm) {
-					return data[itm];
-				});
+				var eachData = keys.map(itm => data[itm]);
 				for (var m = 0; m < dataLen; m++) {
 					getEachScenario = []; // Empty scenarios for each module
 					//create header for table
@@ -475,69 +473,48 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	$scope.updateTestSuite = function (e) {
 		blockUI("Saving in progress. Please Wait...");
 		var batchInfo = [];
-		var batchDetails = {};
-		//updateTestSuite
 		var loopingtimes = 0;
 		var suiteidsexecution = [];
 		$(".parentSuiteChk:checked").each(function (i, e) {
 			suiteidsexecution.push(e.getAttribute('id').split('_')[1]);
 		});
-		window.localStorage.setItem("executionidxreport", JSON.stringify({
-			"idxlist": suiteidsexecution
-		}));
+		window.localStorage.setItem("executionidxreport", JSON.stringify({"idxlist": suiteidsexecution}));
 		$.each($(".parentSuiteChk"), function () {
-			var suiteInfo = {};
 			var suiteDetails = {};
-			var testSuiteName = "";
-			var testSuiteId = "";
 			var testScenarioIds = [];
 			var getParamPaths = [];
 			var conditionCheck = [];
 			var executeStatus = [];
-			//var scenarioDescObj = [];
 			var scenarioDescriptionText = [];
 			var scenarioAccNoMap = {};
-			//if($(this).is(":checked") == true){
-			//Getting ScenarioIds
 			$.each($(this).parents('.suiteNameTxt').next('div').find('.exe-scenarioIds'), function () {
 				var scenarioDescObj = [];
 				testScenarioIds.push($(this).attr("sId"));
 				getParamPaths.push($(this).parent().find(".getParamPath").val().trim());
 				conditionCheck.push($(this).parent().find(".conditionCheck option:selected").val());
-				if (($(this).parent().find('.getScenarioDescVal').text() !== '')) {
-					scenarioDescObj = JSON.parse($.trim($(this).parent().find('.getScenarioDescVal').text()));
-				} else {
-					scenarioDescObj = $.trim($(this).parent().find('.getScenarioDescVal').text());
-				}
-
+				scenarioDescObj = $(this).parent().find('.getScenarioDescVal').text().trim();
+				if (scenarioDescObj !== '') scenarioDescObj = JSON.parse(scenarioDescObj);
 				scenarioAccNoMap[$(this).attr("sId")] = scenarioDescObj;
 				scenarioDescriptionText.push($(this).parent().children('td.variableMap').find('.scenarioDescriptionTxt').text());
-				if ($(this).parent().find(".doNotExecuteScenario").is(":checked"))
-					executeStatus.push(1);
-				else
-					executeStatus.push(0);
+				if ($(this).parent().find(".doNotExecuteScenario").is(":checked")) executeStatus.push(1);
+				else executeStatus.push(0);
 			});
-			testSuiteName = $(this).parents('span.taskname').text();
-			testSuiteId = $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
-
-			suiteDetails.requestedtestsuiteid = testSuiteId;
-			suiteDetails.requestedtestsuitename = testSuiteName;
+			suiteDetails.testsuiteid = $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
+			suiteDetails.testsuitename = $(this).parents('span.taskname').text();
 			suiteDetails.testscenarioids = testScenarioIds;
 			suiteDetails.getparampaths = getParamPaths;
 			suiteDetails.conditioncheck = conditionCheck;
 			suiteDetails.donotexecute = executeStatus;
-			suiteDetails.versionnumber = versionnumber;
-			suiteDetails.testscycleid = current_task.testSuiteDetails[loopingtimes].cycleid;
+			// suiteDetails.versionnumber = versionnumber;
+			// suiteDetails.testscycleid = current_task.testSuiteDetails[loopingtimes].cycleid;
 			suiteDetails.scenarioAccNoMap = scenarioAccNoMap;
 			suiteDetails.scenarioDescriptions = scenarioDescriptionText;
-			suiteInfo[testSuiteName] = suiteDetails;
-			batchInfo.push(suiteInfo);
-			batchDetails.suiteDetails = batchInfo;
+			batchInfo.push(suiteDetails);
 			loopingtimes = loopingtimes + 1;
 		});
-		console.log("batchdetails", batchDetails);
+		//console.log("batchdetails", batchInfo);
 		//Getting ConditionChecks
-		ExecutionService.updateTestSuite_ICE(batchDetails)
+		ExecutionService.updateTestSuite_ICE(batchInfo)
 		.then(function (data) {
 			unblockUI();
 			if (data == "Invalid Session") {
@@ -546,7 +523,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			if (data != "fail") {
 				openDialogExe("Save Test Suite", "Test suite saved successfully.");
 				//$("#saveSuitesModal").modal("show")
-				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 				//Transaction Activity for Save Test Suite Button Action
 				// var labelArr = [];
 				// var infoArr = [];
@@ -555,13 +531,15 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			} else {
 				openDialogExe("Save Test Suite", "Failed to save test suite.");
 				//$("#saveSuitesModalFail").show();
-				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 			}
+			angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 		}, function (error) {
 			console.log(error);
 		});
 	};
 	//Save TestSuite Functionality
+
+	$scope.qccredentials = {qcurl: "", qcusername: "", qcpassword: ""};
 
 	//Save QC Details
 	$scope.saveQcCredentials = function (e) {
@@ -599,52 +577,17 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				} else if (data == "invalidurl") {
 					$(".error-msg-exeQc").text("Invalid URL");
 				} else {
-					$scope.moduleInfo = [];
-					$.each($(".parentSuiteChk"), function () {
-						var suiteInfo = {};
-						var selectedRowData = [];
-						var relidreport = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].releaseid;
-						var cycidreport = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].cycleid;
-						var projectidreport = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].projectidts;
-						//suiteInfo.suiteDetails = [];
-						if ($(this).is(":checked") == true) {
-							$(this).parent().parent().next().find('tbody input[type=checkbox]:checked').each(function () {
-								selectedRowData.push({
-									condition: parseInt($(this).parent().siblings(".exe-conditionCheck").find("select option:selected").val()),
-									dataparam: [$(this).parent().siblings(".exe-dataParam").find("input").val().trim()],
-									executestatus: 1,
-									scenarioids: $(this).parent().siblings(".exe-scenarioIds").attr("sId"),
-									qccredentials: {
-										qcurl: $("#almURL").val(),
-										qcusername: $("#almUserName").val(),
-										qcpassword: $("#almPassword").val()
-									}
-								});
-							});
-							//console.log("selectedRowData:::" + selectedRowData)
-							projectdata=JSON.parse(window.localStorage["_FD"]);
-							suiteInfo.suiteDetails = selectedRowData;
-							suiteInfo.testsuitename = $(this).parents('span.taskname').text();
-							suiteInfo.testsuiteid = $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
-							suiteInfo.browserType = browserTypeExe;
-							suiteInfo.appType = appType;
-							suiteInfo.releaseid = relidreport;
-							suiteInfo.cycleid = cycidreport;
-							suiteInfo.projectid = projectidreport;
-							suiteInfo.cyclename = projectdata.idnamemapcyc[cycidreport];
-							suiteInfo.projectname = projectdata.idnamemapprj[projectidreport];
-							suiteInfo.domainname = projectdata.idnamemapdom[projectidreport];
-							console.log("suiteInfo:::" + suiteInfo)
-							$scope.moduleInfo.push(suiteInfo);
-							//Transaction Activity for SaveQcCredentialsExecution Button Action
-							// var labelArr = [];
-							// var infoArr = [];
-							// labelArr.push(txnHistory.codesDict['SaveQcCredentialsExecution']);
-							// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
-						}
-					});
+					$scope.qccredentials = {
+						qcurl: $("#almURL").val(),
+						qcusername: $("#almUserName").val(),
+						qcpassword: $("#almPassword").val()
+					}
+					//Transaction Activity for SaveQcCredentialsExecution Button Action
+					// var labelArr = [];
+					// var infoArr = [];
+					// labelArr.push(txnHistory.codesDict['SaveQcCredentialsExecution']);
+					// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
 					$("#ALMSyncWindow").find("button.close").trigger("click");
-
 				}
 			}, function (error) {
 				console.log("Error in qcController.js file loginQCServer method! \r\n " + (error.data));
@@ -674,8 +617,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 						});
 					});
 
-					suiteInfo.moduleName = testsuiteDetails.testsuitename;
-					suiteInfo.moduleId = testsuiteDetails.testsuiteid;
+					suiteInfo.testsuiteName = $(this).parents('span.taskname').text();
+					suiteInfo.testsuiteId = $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
 					suiteInfo.versionnumber = testsuiteDetails.versionnumber;
 					suiteInfo.appType = appType;
 					suiteInfo.domainName = projectdata.idnamemapdom[projectid];
@@ -717,8 +660,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				source: "task",
 				exectionMode: execAction,
 				browserType: browserTypeExe,
-				qccredentials: { "qcurl": "", "qcusername": "", "qcpassword": "" },
-				moduleInfo: $scope.moduleInfo
+				qccredentials: $scope.qccredentials,
+				batchInfo: $scope.moduleInfo
 			};
 			executionActive = true;
 			$rootScope.resetSession.start();
@@ -829,37 +772,11 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		if (action != undefined && action == 'reassign') {
 			taskstatus = action;
 		}
-		if ($scope.moduleInfo.length <= 0) {
-			$.each($(".parentSuiteChk"), function () {
-				var suiteInfo = {};
-				var selectedRowData = [];
-				//suiteInfo.suiteDetails = [];
-				var relid = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].releaseid;
-				var cycid = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].cycleid;
-				var projectid = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]].projectidts;
-				if ($(this).is(":checked") == true) {
-					$(this).parent().parent().next().find('tbody input[type=checkbox]:checked').each(function () {
-						selectedRowData.push({
-							scenarioids: $(this).parent().siblings(".exe-scenarioIds").attr("sId"),
-						});
-					});
-					//console.log("selectedRowData:::" + selectedRowData)
-					suiteInfo.suiteDetails = selectedRowData;
-					suiteInfo.testsuitename = $(this).parents('span.taskname').text();
-					suiteInfo.testsuiteid = $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
-					suiteInfo.releaseid = relid;
-					suiteInfo.cycleid = cycid;
-					suiteInfo.projectid = projectid;
-					$scope.moduleInfo.push(suiteInfo);
-				}
-			});
-		}
-
 		//Transaction Activity for Task Submit/Approve/Reassign Button Action
 		// var labelArr = [];
 		// var infoArr = [];
 
-		mindmapServices.reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs,$scope.moduleInfo).then(function (result) {
+		mindmapServices.reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs).then(function (result) {
 			if (result == 'fail') {
 				openDialogExe("Task Submission Error", "Reviewer is not assigned !", true);
 			}else if(result =='NotApproved'){

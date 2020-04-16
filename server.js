@@ -532,13 +532,10 @@ if (cluster.isMaster) {
 		app.post('/getTestcasesByScenarioId_ICE', design.getTestcasesByScenarioId_ICE);
 		//Execute Screen Routes
 		app.post('/readTestSuite_ICE', auth.protect, suite.readTestSuite_ICE);
-		app.post('/updateTestSuite_ICE', suite.updateTestSuite_ICE);
-		//app.post('/updateTestScenario_ICE', suite.updateTestScenario_ICE);
+		app.post('/updateTestSuite_ICE', auth.protect, suite.updateTestSuite_ICE);
 		app.post('/ExecuteTestSuite_ICE', auth.protect, suite.ExecuteTestSuite_ICE);
 		app.post('/getTestcaseDetailsForScenario_ICE', suite.getTestcaseDetailsForScenario_ICE);
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_SVN);
-		//app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
-		// app.post('/getListofScheduledSocketMap',suite.getListofScheduledSocketMap);
 
 		//Scheduling Screen Routes
 		app.post('/testSuitesScheduler_ICE', suite.testSuitesScheduler_ICE);

@@ -1,4 +1,4 @@
-var asynclib = require('async');
+var bcrypt = require('bcryptjs');
 var logger = require('../../logger');
 var myserver = require('../../server');
 var redisServer = require('./redisSocketHandler');
@@ -107,7 +107,7 @@ module.exports.approvalStatusCheck = async executionData => {
 	const result = fetchData(inputs, "suite/checkApproval", "approvalStatusCheck", true);
 	data.statusCode = result[1].statusCode;
 	if (result[0] == "No task") data.res = 'Notask';
-	else if (result[0] == "Modified") data.res = 'Notask';
+	else if (result[0] == "Modified") data.res = 'Modified';
 	else if (result[0] != 0) data.res = 'NotApproved';
 };
 
@@ -141,6 +141,43 @@ var fetchData = async (inputs, url, from, all) => {
 
 module.exports.getChannelNum = getChannelNum_cb;
 module.exports.fetchData = fetchData;
+
+module.exports.tokenValidation = async (userInfo) => {
+	var validUser = false;
+	const username = userInfo.username.toLowerCase();
+	userInfo.username = username;
+	const emsg = "Inside UI service: ExecuteTestSuite_ICE_SVN ";
+	const tokenValidation = {
+		"status": "failed",
+		"msg": "Token authentication failed"
+	}
+	const inputs = {
+		'username': username,
+		'tokenname': userInfo.tokenname
+	};
+	const response = await fetchData(inputs, "login/authenticateUser_Nineteen68_CI", "tokenValidation");
+	if (response !== "err") validUser = bcrypt.compareSync(userInfo.tokenhash, response.hash);
+	if (validUser) {
+		userInfo.userid = response.userid;
+		userInfo.role = response.role;
+		if(response.deactivated == "active") {
+			tokenValidation.status = "passed";
+			tokenValidation.msg = "Token validation successful";
+		} else if(response.deactivated == "expired") {
+			tokenValidation.status = "expired";
+			tokenValidation.msg = "Token is expired";
+			logger.error(emsg + tokenValidation.msg + " for username: " + username);
+		} else if(response.deactivated == "deactivated") {
+			tokenValidation.status = "deactivated";
+			tokenValidation.msg = "Token is deactivated";
+			logger.error(emsg + tokenValidation.msg + " for username: " + username);
+		}
+	} else logger.info(emsg + "Token authentication failed for username: " + username);
+	inputs.tokenValidation = tokenValidation.status;
+	inputs.err = tokenValidation.msg;
+	userInfo.inputs = inputs;
+	return userInfo;
+};
 
 /*module.exports.cache = {
 	get: function get(key, cb) {

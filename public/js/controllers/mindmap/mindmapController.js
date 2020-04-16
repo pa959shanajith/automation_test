@@ -3450,10 +3450,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
         var version_num = ($('.version-list').val() != undefined)? $('.version-list').val(): "0.0";
         var suiteDetailsTemplate = { "condition": 0, "dataparam": [" "], "scenarioId": "", "scenarioName": "" };
-        //var suiteDetailsTemplate = { "scenarioName": "", "scenarioId": "" };
-        var moduleData = { "moduleName": "", "moduleId": "", "versionNumber": "", "appType": "", "domainName": "", "projectName": "", "projectId": "", "releaseId": "", "cycleName": "", "cycleId": "", "suiteDetails": [suiteDetailsTemplate] };
-        var executionData = { "executionData": [{ "source": "api", "exectionMode": "serial", "browserType": ["1"], "qccredentials": { "qcurl": "", "qcusername": "", "qcpassword": "" }, "moduleInfo": [JSON.parse(JSON.stringify(moduleData))], "userInfo": { "tokenhash": "", "tokenname": "", "username": "" } } ] };
-        var moduleInfo = { "moduleInfo": [] };
+        var moduleData = { "testsuiteName": "", "testsuiteId": "", "versionNumber": "", "appType": "", "domainName": "", "projectName": "", "projectId": "", "releaseId": "", "cycleName": "", "cycleId": "", "suiteDetails": [suiteDetailsTemplate] };
+        var executionData = { "executionData": [{ "source": "api", "exectionMode": "serial", "browserType": ["1"], "qccredentials": { "qcurl": "", "qcusername": "", "qcpassword": "" }, "batchInfo": [JSON.parse(JSON.stringify(moduleData))], "userInfo": { "tokenhash": "", "tokenname": "", "username": "" } } ] };
+        var moduleInfo = { "batchInfo": [] };
         blockUI('Loading UI');
         var moduleid = $('#createNewConfirmationPopup').attr('mapid');
         var modName = $('#createNewConfirmationPopup').attr('mapname');
@@ -3487,8 +3486,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 unassignTask=[];
                 moduleObj = moduleObj[moduleid];
                 if(moduleObj && moduleObj.testsuitename == loadedmodule && moduleObj.actualtestsuiteid != null) {
-                    moduleData.moduleId = moduleObj.testsuiteid;
-                    moduleData.moduleName = moduleObj.testsuitename;
+                    moduleData.testsuiteId = moduleObj.testsuiteid;
+                    moduleData.testsuiteName = moduleObj.testsuitename;
                     moduleData.suiteDetails = [];
                     moduleData.versionNumber = moduleObj.versionnumber;
                     for (var j = 0; j < moduleObj.scenarioids.length; j++) {
@@ -3499,7 +3498,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         s_data.scenarioId = moduleObj.scenarioids[j];
                         moduleData.suiteDetails.push(s_data);
                     }
-                    moduleInfo.moduleInfo.push(moduleData);
+                    moduleInfo.batchInfo.push(moduleData);
                     unblockUI();
                     jsonDownload('moduleinfo.json', JSON.stringify(moduleInfo));
                     jsonDownload('executiondata.json', JSON.stringify(executionData));

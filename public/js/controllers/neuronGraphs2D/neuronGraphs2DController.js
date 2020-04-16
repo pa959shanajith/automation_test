@@ -1418,8 +1418,8 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$rootScope', '$http', '
         var relObj = cycleObj.parent[0];
         var prjObj = relObj.parent[0];
         var jsondata11 = [{
-            "moduleName": testsuiteObj.name,
-            "moduleId": testsuiteObj.attributes.mindmapid,
+            "testsuiteName": testsuiteObj.name,
+            "testsuiteId": testsuiteObj.attributes.mindmapid,
             "versionNumber": testsuiteObj.attributes.versionnumber,
             "appType": prjObj.attributes.Type,
             "domainName": prjObj.parent[0].name,
@@ -1459,7 +1459,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$rootScope', '$http', '
             exectionMode: "serial",
             browserType: [String(browserNum)],
             qccredentials: { "qcurl": "", "qcusername": "", "qcpassword": "" },
-            moduleInfo: globalobj['jsondata']
+            batchInfo: globalobj['jsondata']
         };
         blockUI('Executing...');
         ExecutionService.ExecuteTestSuite_ICE(executionData).then(function(data) {
@@ -1473,7 +1473,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$rootScope', '$http', '
                     openDialog('Error', "Execute Test Suite,"+$rootScope.unavailableLocalServer_msg)
                 } else {
                     openDialog("Success", "Execution Successful")
-                    globalobj['module_id'] = globalobj['jsondata'][0].moduleId;
+                    //globalobj['module_id'] = globalobj['jsondata'][0].moduleId;
                     for (a in data.TCS) {
                         if (data.TCS[a] == 'Fail' || data.TCS[a] == 'fail')
                             globalobj['failed_tc_list'].push(b)

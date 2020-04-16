@@ -5102,7 +5102,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		// var labelArr = [];
 		// var infoArr = [];
 
-		mindmapServices.reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs,false).then(function (result) {
+		mindmapServices.reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs).then(function (result) {
 			if (result == 'fail') {
 				openDialog("Task Submission Error", "Reviewer is not assigned !", true)
 			} else if (taskstatus == 'reassign') {
