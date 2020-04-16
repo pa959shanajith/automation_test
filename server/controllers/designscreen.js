@@ -148,10 +148,10 @@ exports.getScrapeDataScreenLevel_ICE = function (req, res) {
 				"projectid": req.body.projectId,
 				"query": "getscrapedata"
 			};
-			if (req.body.type == "WS_screen"){
+			if (req.body.type == "WS_screen" || req.body.type== "Webservice"){
 				inputs.query = "getWSscrapedata";
 			}
-			else if (req.body.testCaseId){
+			if (req.body.testCaseId){
 				inputs.testcaseid = req.body.testCaseId;//Send versionnumber also if needed
 				delete inputs['screenid'];
 			}
