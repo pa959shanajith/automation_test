@@ -380,7 +380,7 @@ const executionFunction = async (batchExecutionData, execIds, userInfo, execType
 	const executionRequest = await prepareExecutionRequest(batchExecutionData, userInfo);
 	const currExecIds = await generateExecutionIds(execIds, executionRequest.testsuiteIds, userInfo.userid);
 	executionRequest.batchId = currExecIds.batchid;
-	executionRequest.executionIds = Object.values(currExecIds.execids);
+	executionRequest.executionIds = executionRequest.testsuiteIds.map(i => currExecIds.execids[i]);
 	const result = await executionRequestToICE(executionRequest, execType, userInfo);
 	return result;
 };
@@ -510,7 +510,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 				}
 			};
 			logger.info("Calling NDAC Service: suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcaseid");
-			client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+			client.post(epurl + "suite/ExecuteTestSuite_ICE1", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occurred in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcaseid, Error Code : ERRNDAC");
@@ -542,7 +542,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 					}
 				};
 				logger.info("Calling NDAC Service: suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasesteps");
-				client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+				client.post(epurl + "suite/ExecuteTestSuite_ICE1", args,
 					function (screenidresponse, response) {
 					if (response.statusCode != 200 || screenidresponse.rows == "fail") {
 						logger.error("Error occurred in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasesteps, Error Code : ERRNDAC");
@@ -589,7 +589,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 														}
 													};
 													logger.info("Calling NDAC Service: suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery");
-													client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+													client.post(epurl + "suite/ExecuteTestSuite_ICE1", args,
 														function (answers, response) {
 														if (response.statusCode != 200 || answers.rows == "fail") {
 															logger.error("Error occurred in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery, Error Code : ERRNDAC");
@@ -826,7 +826,7 @@ function testcasedetails_testscenarios(req, cb) {
 				}
 			};
 			logger.info("Calling NDAC Service: suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcaseid");
-			client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+			client.post(epurl + "suite/ExecuteTestSuite_ICE1", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occurred in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcaseid, Error Code : ERRNDAC");
@@ -851,7 +851,7 @@ function testcasedetails_testscenarios(req, cb) {
 					}
 				};
 				logger.info("Calling NDAC Service from testcasedetails_testscenarios - testcasetable: suite/getTestcaseDetailsForScenario_ICE");
-				client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+				client.post(epurl + "suite/ExecuteTestSuite_ICE1", args,
 					function (testcaseresult, response) {
 					if (response.statusCode != 200 || testcaseresult.rows == "fail") {
 						logger.error("Error occurred in suite/getTestcaseDetailsForScenario_ICE from testcasedetails_testscenarios - testcasesteps, Error Code : ERRNDAC");
