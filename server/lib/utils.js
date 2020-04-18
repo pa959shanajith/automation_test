@@ -130,7 +130,7 @@ var fetchData = async (inputs, url, from, all) => {
 				if (all) rsv(["fail", result, response]);
 				else rsv("fail");
 			} else {
-				result = result.rows || result;
+				result = (result.rows === undefined)? result:result.rows;
 				if (all) rsv([result, response]);
 				else rsv(result);
 			}

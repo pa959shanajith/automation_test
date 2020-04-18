@@ -7,14 +7,6 @@
 	<!--Left Panel-->
 	<div id="left-nav-section">
 		<div class="scrollbar-macosx">
-			<!--<div id="left-top-section">
-				<ul>
-					<li><span><a class='scrapeOnTxt'>Schedule On</a></span></li>
-					<li><a class="selectBrowserSc"  data-name="3" title="Schedule On IE"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
-					<li><a class="selectBrowserSc"  data-name="1" title="Schedule On Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
-					<li style="margin-bottom: 30px"><a class="selectBrowserSc"  data-name="2" title="Schedule On Firefox"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
-				</ul>
-			</div>-->
 			<!-- Web -->
 			<div id="left-top-section" ng-if="getScreenView == 'Web'">
 				<ul>
@@ -104,12 +96,6 @@
 					<li style="position:absolute;" ng-if="getScreenView == 'Web'"><a class="selectParallel" href='#' title="Parallel Execution"><span><img src='imgs/ic-parallel.png' alt='Parallel' height='55' width='57'/></span><font size="2">Parallel Execution</font></a></li>
 				</ul>
 			</div>
-
-			<!--<div id="left-bottom-section" class="lbs-single">
-				<ul>
-					<li><a href='/scheduling'  title="Scheduling"><span><img src='imgs/ic-scheduling.png' alt='Scheduling' /></span>Schedule</a></li>
-				</ul>
-			</div>-->
 		</div>
 	</div>
 	<!--Left Panel-->
@@ -194,14 +180,13 @@
 							<div class='scheduleDataBodyRow' ng-repeat="schdata in scheduledData | orderBy:predicate:reverse">
 								<div ng-repeat="data in schdata.scenariodetails" class="scheduleDataBodyRowChild">
 									<div style='width: 18%'>{{schdata.scheduledatetime}}</div><!-- {{schdata.scheduledatetime.split("T")[1].split(".")[0]}}-->
-									<div style='width: 12%' data-userid={{schdata.userid}}>{{schdata.target}}</div>
+									<div style='width: 12%' data-scheduledby={{schdata.scheduledby}}>{{schdata.target}}</div>
 									<div style='width: 20%' title={{data.scenarioname}}>{{data.scenarioname}}</div>
 									<div style='width: 20%' title={{schdata.testsuitename}}>{{schdata.testsuitename}}</div>
 									<div style='width: 15%'><img ng-repeat="brow in schdata.browserlist" ng-src={{browImg(brow,schdata.scenariodetails[0].appType)}} style="margin-right: 5px;"/></div>
-									<div style='width: 9%' data-cycleid={{schdata.cycleid}} data-scheduleid={{schdata._id}} data-scheduledatetime={{schdata.scheduledatetime.valueOf().toString()}}>{{schdata.status}} <span class="glyphicon glyphicon-remove cancelJob" ng-if="schdata.status == 'scheduled'" ng-click='cancelThisJob($event,"cancelled")' title='Cancel Job'></span>
-									<!--<span class="glyphicon glyphicon-stop cancelJob" ng-if="schdata.schedulestatus == 'scheduled'" ng-click='cancelThisJob($event,"Terminate")' title='Terminate Job'></span>-->
+									<div style='width: 9%' data-cycleid={{schdata.cycleid}} data-scheduleid={{schdata._id}} data-scheduledatetime={{schdata.scheduledatetime.valueOf().toString()}}>{{schdata.status}}
+										<span class="glyphicon glyphicon-remove cancelJob" ng-if="schdata.status == 'scheduled'" ng-click='cancelThisJob($event,"cancelled")' title='Cancel Job'></span>
 									</div> 
-									<!--<img src='imgs/ic-close.png' ng-if="schdata.schedulestatus == 'scheduled'" class='cancelJob' ng-click='cancelThisJob($event)' title='Cancel Job'/>-->
 								</div>
 							</div>
 						</div>

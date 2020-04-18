@@ -3488,8 +3488,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if(moduleObj && moduleObj.testsuitename == loadedmodule && moduleObj.actualtestsuiteid != null) {
                     moduleData.testsuiteId = moduleObj.testsuiteid;
                     moduleData.testsuiteName = moduleObj.testsuitename;
-                    moduleData.suiteDetails = [];
                     moduleData.versionNumber = moduleObj.versionnumber;
+                    moduleData.suiteDetails = [];
                     for (var j = 0; j < moduleObj.scenarioids.length; j++) {
                         var s_data = JSON.parse(JSON.stringify(suiteDetailsTemplate));
                         s_data.condition = moduleObj.condition[j];

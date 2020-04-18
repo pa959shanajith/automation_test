@@ -12,7 +12,6 @@ var scheduleStatus = "";
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
-var taskflow = require('../config/options').strictTaskWorkflow;
 if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT)*1024*1024;
 const SOCK_NORM = "normalModeOn";
 const SOCK_SCHD = "scheduleModeOn";
@@ -430,6 +429,41 @@ exports.ExecuteTestSuite_ICE_SVN = async (req, res) => {
 	return res.send({"executionStatus": executionResult});
 };
 
+// Service to fetch all the testcase,screen and project names for provided scenarioid
+exports.getTestcaseDetailsForScenario_ICE = async (req, res) => {
+	logger.info("Inside Ui service getTestcaseDetailsForScenario_ICE");
+	const fnName = "getTestcaseDetailsForScenario_ICE";
+	var inputs = {};
+	var data = {};
+	const testcasenamelist = [];
+	const testcaseidlist = [];
+	const screenidlist = [];
+
+	inputs = {
+		"query": "testcasedetails",
+		"id": req.body.testScenarioId
+	};
+	data = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", fnName);
+	if (data != "fail") for (let i = 0; i < data.length; i++) {
+		const e = data[i];
+		testcasenamelist.push(e["name"]);
+		testcaseidlist.push(e["_id"]);
+		screenidlist.push(e["screenid"]);
+	}
+	inputs = { "screenids": screenidlist };
+	data = await utils.fetchData(inputs, "suite/getTestcaseDetailsForScenario_ICE", fnName);
+	const resultdata = {
+		testcasenames: testcasenamelist,
+		testcaseids: testcaseidlist,
+		screennames: data.screennames || [],
+		screenids: screenidlist,
+		projectnames: data.projectnames || [],
+		projectids: data.projectids || []
+	};
+	res.send(resultdata);
+};
+
+
 function insertExecutionStatus(executedby,testsuiteids,cycleid,callback) {
 	logger.info("Inside updateExecutionStatus function");
 	var inputs = {
@@ -770,245 +804,43 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 	});
 }
 
-//ExecuteTestSuite Functionality
-/**
- * Service to fetch all the testcase,screen and project names for provided scenarioid
- * @author Shreeram
- */
-exports.getTestcaseDetailsForScenario_ICE = function (req, res) {
-	logger.info("Inside Ui service getTestcaseDetailsForScenario_ICE");
-	// if (utils.isSessionActive(req)) {
-		var requiredtestscenarioid={
-			"requiredtestscenarioid":req.body.testScenarioId,
-			"userid":req.session.userid
-		}
-		logger.info("Calling function testcasedetails_testscenarios from getTestcaseDetailsForScenario_ICE");
-		testcasedetails_testscenarios(requiredtestscenarioid, function (err, data) {
-			if (err) {
-				logger.error("Error occurred in the testcasedetails_testscenarios function of getTestcaseDetailsForScenario_ICE");
-				res.send("fail");
-			} else {
-				try {
-					logger.info("Sending response data from testcasedetails_testscenarios function of getTestcaseDetailsForScenario_ICE");
-					res.send(JSON.stringify(data));
-				} catch (ex) {
-					logger.error("Exception occurred in getTestcaseDetailsForScenario_ICE: %s", ex);
-				}
-			}
-		});
-	// } else {
-	// 	logger.error("Error occurred in the testcasedetails_testscenarios: Invalid Session");
-	// 	res.send("Invalid Session");
-	// }
+/***********************Scheduling jobs***************************/
+exports.testSuitesScheduleCheck_ICE = async (req, res) => {
+	logger.info("Inside UI service testSuitesScheduleCheck_ICE");
+	var batchInfo = req.body.moduleInfo;
+	const taskApproval = await utils.approvalStatusCheck(batchInfo);
+	if (taskApproval.res !== "pass") return res.send(taskApproval.res);
+	const timestamp = batchInfo.map(u => (u.date + " " + u.time));
+	const address = batchInfo.map(u => u.targetUser);
+	var inputs = {
+		"query": "checkscheduleddetails",
+		"scheduledatetime": timestamp,
+		"targetaddress": address
+	};
+	const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", "testSuitesScheduleCheck_ICE");
+	const data = (result == "fail")? "fail":((result == -1)? "available": {"status": "booked", "user": address[result]});
+	return res.send(data);
 };
 
-//Function to fetch all the testcase,screen and project names for provided scenarioid
-function testcasedetails_testscenarios(req, cb) {
-	logger.info("Inside testcasedetails_testscenarios function");
-	var userid =req.userid;
-	var testcaseids = [];
-	var screenidlist = [];
-	var testcasenamelist = [];
-	var screennamelist = [];
-	var projectidlist = [];
-	var projectnamelist = [];
-	async.series({
-		testcaseid: function (callback) {
-			var inputs = {
-				"id": req.requiredtestscenarioid,
-				"query": "testcaseid",
-				"userid": userid
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling NDAC Service: suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcaseid");
-			client.post(epurl + "suite/ExecuteTestSuite_ICE1", args,
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcaseid, Error Code : ERRNDAC");
-				} else {
-					if (result.rows.length != 0) {
-						testcaseids = JSON.parse(JSON.stringify(result.rows[0].testcaseids));
-					}
-					callback(null, testcaseids);
-				}
-			});
-		},
-		testcasetable: function (callback) {
-			async.forEachSeries(testcaseids, function (itr, callback2) {
-				var inputs = {
-					"query": "testcasesteps",
-					"id": itr
-				};
-				var args = {
-					data: inputs,
-					headers: {
-						"Content-Type": "application/json"
-					}
-				};
-				logger.info("Calling NDAC Service from testcasedetails_testscenarios - testcasetable: suite/getTestcaseDetailsForScenario_ICE");
-				client.post(epurl + "suite/ExecuteTestSuite_ICE1", args,
-					function (testcaseresult, response) {
-					if (response.statusCode != 200 || testcaseresult.rows == "fail") {
-						logger.error("Error occurred in suite/getTestcaseDetailsForScenario_ICE from testcasedetails_testscenarios - testcasesteps, Error Code : ERRNDAC");
-					} else {
-						if (testcaseresult.rows.length != 0) {
-							testcasenamelist.push(testcaseresult.rows[0].name);
-							screenidlist.push(testcaseresult.rows[0].screenid);
-						}
-					}
-					callback2();
-				});
-			}, callback);
-		},
-		screentable: function (callback) {
-			async.forEachSeries(screenidlist, function (screenitr, callback3) {
-				var inputs = {
-					"query": "screentable",
-					"screenid": screenitr
-				};
-				var args = {
-					data: inputs,
-					headers: {
-						"Content-Type": "application/json"
-					}
-				};
-				logger.info("Calling NDAC Service from testcasedetails_testscenarios - screentable: suite/getTestcaseDetailsForScenario_ICE");
-				client.post(epurl + "suite/getTestcaseDetailsForScenario_ICE", args,
-					function (screenresult, response) {
-					if (response.statusCode != 200 || screenresult.rows == "fail") {
-						logger.error("Error occurred in suite/getTestcaseDetailsForScenario_ICE from testcasedetails_testscenarios - screentable, Error Code : ERRNDAC");
-					} else {
-						if (screenresult.rows.length != 0) {
-							screennamelist.push(screenresult.rows[0].name);
-							projectidlist.push(screenresult.rows[0].projectid);
-						}
-					}
-					callback3();
-				});
-			}, callback);
-		},
-		projecttable: function (callback) {
-			async.forEachSeries(projectidlist, function (projectitr, callback4) {
-				var inputs = {
-					"query": "projecttable",
-					"projectid": projectitr
-				};
-				var args = {
-					data: inputs,
-					headers: {
-						"Content-Type": "application/json"
-					}
-				};
-				logger.info("Calling NDAC Service from testcasedetails_testscenarios - projecttable: suite/getTestcaseDetailsForScenario_ICE");
-				client.post(epurl + "suite/getTestcaseDetailsForScenario_ICE", args,
-					function (projectresult, response) {
-					if (response.statusCode != 200 || projectresult.rows == "fail") {
-						logger.error("Error occurred in suite/getTestcaseDetailsForScenario_ICE from testcasedetails_testscenarios - projecttable, Error Code : ERRNDAC");
-					} else {
-						if (projectresult.rows.length != 0)
-							projectnamelist.push(projectresult.rows[0].name);
-					}
-					callback4();
-				});
-			}, callback);
-		}
-	}, function (err) {
-		logger.info("Inside final function of testcasedetails_testscenarios");
-		if (err) {
-			logger.error("Error occurred in final function of testcasedetails_testscenarios: %s", err);
-			cb(err, "fail");
-		} else {
-			var resultdata = {
-				testcasenames: [],
-				testcaseids: [],
-				screennames: [],
-				screenids: [],
-				projectnames: [],
-				projectids: []
-			};
-			resultdata.testcasenames = testcasenamelist;
-			resultdata.testcaseids = testcaseids;
-			resultdata.screennames = screennamelist;
-			resultdata.screenids = screenidlist;
-			resultdata.projectnames = projectnamelist;
-			resultdata.projectids = projectidlist;
-			logger.info("Sending response data from final function of testcasedetails_testscenarios");
-			cb(err, resultdata);
-		}
-	});
-}
 
-
-
-/***********************Scheduling jobs***************************/
 exports.testSuitesScheduler_ICE = async function (req, res) {
 	logger.info("Inside UI service testSuitesScheduler_ICE");
-	if (utils.isSessionActive(req)) {
-		var ExecutionData=req.body.moduleInfo;
-		const taskApproval = await utils.approvalStatusCheck(ExecutionData);
-		if (taskApproval.res !== "pass") return res.status(taskApproval.status).send(taskApproval.res);
-		testSuitesScheduler_ICE_cb(req,res);
-	} else {
-		logger.error("Error in the service testSuitesScheduler_ICE: Invalid Session");
-		res.send("Invalid Session");
-	}
-};
-		
-function testSuitesScheduler_ICE_cb (req, res) {
-	if(req.body.chkType == "schedule"){			
-		var modInfo = req.body.moduleInfo;
-		var exc_action = req.body.action;
-		logger.info("Calling function scheduleTestSuite from testSuitesScheduler_ICE");
-		scheduleTestSuite(modInfo,exc_action, req, function (err, schedulecallback) {
-			try {
-				logger.info("TestSuite Scheduled successfully");
-				res.send(schedulecallback);
-			} catch (exception) {
-				logger.error("Exception in the service testSuitesScheduler_ICE: %s",exception);
-				res.send("fail");
-			}
-		});
-	}
-	else{
-		var data = req.body.details;
-		var inputs = {
-			"scheduledatetime": data.curDate,
-			"clientipaddress": data.clientipaddress,
-			"scheduledetails": "checkscheduleddetails",
-			"query": "getallscheduledetails"
-		};
-		var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
-			}
-		};
-		logger.info("Calling NDAC Service from testSuitesScheduler_ICE: suite/ScheduleTestSuite_ICE");
-		client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
-			function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in suite/ScheduleTestSuite_ICE from testSuitesScheduler_ICE service, Error Code : ERRNDAC");
-					res.send("fail");
-				} else {
-					res.send(result.rows);
-				}
-		});
-	}
+	const batchExecutionData = req.body.executionData;
+	const userInfo = {"userid": req.session.userid, "username": req.session.username, "role": req.session.activeRoleId};
+	logger.info("Calling function scheduleTestSuite from testSuitesScheduler_ICE");
+	scheduleTestSuite(batchExecutionData, exectionMode, userInfo, function (err, schedulecallback) {
+		logger.info("TestSuite Scheduled successfully");
+		res.send(schedulecallback);
+	});
 };
 
 //Schedule Testsuite normal and when server restart
-function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
+function scheduleTestSuite (modInfo, exectionMode, userInfo, schedcallback) {
 	logger.info("Inside scheduleTestSuite function");
 	var schedulingData = modInfo;
-	var action = exc_action;
+	var action = exectionMode;
 	var schDate, schTime, cycleId, scheduleId, clientIp, scenarioDetails;
 	var browserList, testSuiteId;
-
 	var schedFlag,rescheduleflag;
 	var counter = 0;
 	async.forEachSeries(schedulingData, function (itr, Callback) {
@@ -1071,7 +903,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 							sessObj = result.rows+ ";" + dateTime.valueOf().toString()+";"+cycleId;
 							var scheduledjob = schedule.scheduleJob(sessObj, obj, function () {
 								logger.info("Calling function executeScheduling from scheduleTestSuite");
-								executeScheduling(sessObj, action, schedulingData, req);
+								executeScheduling(sessObj, action, schedulingData, userInfo);
 								//Callback();
 							});
 							counter++;
@@ -1080,7 +912,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 							logger.error("Exception in the function executeScheduling from scheduleTestSuite: %s", ex);
 							scheduleStatus = "Failed 02";
 							logger.info("Calling function updateStatus from scheduleTestSuite");
-							updateStatus(sessObj, function (err, data) {
+							updateStatus1(sessObj, function (err, data) {
 								if (!err) {
 									logger.info("Scheduling status updated successfully", data);
 								}
@@ -1102,7 +934,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 			try {
 				var scheduledjob = schedule.scheduleJob(sessObj, obj, function () {
 					logger.info("Calling function executeScheduling from scheduleTestSuite: reshedule");
-					executeScheduling(sessObj, schedulingData, req);
+					executeScheduling(sessObj, schedulingData, userInfo);
 					//Callback();
 				});
 				counter++;
@@ -1111,7 +943,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 			} catch (ex) {
 				logger.error("Exception in the function executeScheduling from scheduleTestSuite: reshedule: %s", ex);
 				scheduleStatus = "Failed 02";
-				updateStatus(sessObj, function (err, data) {
+				updateStatus1(sessObj, function (err, data) {
 					if (!err) {
 						logger.info("Scheduling status updated successfully", data);
 						
@@ -1138,12 +970,12 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 	});
 
 	//Executing test suites on scheduled time
-	function executeScheduling(sessObj, action, schedulingData, req) {
-		var userInfo = {"userid": req.session.userid, "role": req.session.activeRoleId};
+	function executeScheduling(sessObj, action, schedulingData, userInfo) {
 		logger.info("Inside executeScheduling function");
 		var cycleid =  sessObj.split(";")[2];
+		//var inputs = { "query": "getscheduledata", "scheduleid": sessObj.split(";")[0] };
+		//const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", "getScheduledDetails_ICE");
 		var inputs = {
-			
 			"scheduledatetime": sessObj.split(";")[1],
 			"scheduleid": sessObj.split(";")[0],
 			"query": "getscheduledata"
@@ -1171,7 +1003,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 						logger.error("Error occurred in suite/ScheduleTestSuite_ICE from executeScheduling Error Code : ERRNDAC");
 						scheduleStatus = "Failed 02";
 						logger.info("Calling function updateStatus from executeScheduling");
-						updateStatus(sessObj, function (err, data) {
+						updateStatus1(sessObj, function (err, data) {
 							if (!err) {
 								logger.info("Scheduling status updated successfully", data);
 							}
@@ -1264,7 +1096,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 
 			},
 			execution_insertion:function(callback_E){ 
-				insertExecutionStatus(req.session.userid,executionRequest.testsuiteIds,cycleid,function(res){
+				insertExecutionStatus(userInfo.userid,executionRequest.testsuiteIds,cycleid,function(res){
 				   if(res == 'fail'){
 					   executionId = '';
 				   }else{
@@ -1303,7 +1135,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 									if(response.status == "success"){
 										scheduleStatus = "Inprogress";
 										logger.info("Calling function updateStatus from scheduleFunction");
-										updateStatus(sessObj, function (err, data) {
+										updateStatus1(sessObj, function (err, data) {
 											if (!err) {
 												logger.info("Sending response data from scheduleFunction");
 											}
@@ -1400,7 +1232,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 										}
 										try {
 											logger.info("Calling function updateStatus from scheduleFunction");
-											updateStatus(sessObj, function (err, data) {
+											updateStatus1(sessObj, function (err, data) {
 												if (!err) {
 													logger.info("Sending response data from scheduleFunction");
 												}
@@ -1465,7 +1297,7 @@ function  scheduleTestSuite  (modInfo, exc_action, req, schedcallback) {
 }
 
 //Update status of current scheduled job
-function   updateStatus(sessObj, updateStatuscallback) {
+function updateStatus1(sessObj, updateStatuscallback) {
 	logger.info("Inside updateStatus function");
 	try {
 		if (scheduleStatus != "") {
@@ -1630,215 +1462,148 @@ function updateSkippedScheduleStatus(sessObj, msg, updateStatuscallback){
 	}
 }
 
-exports.getScheduledDetails_ICE = function (req, res) {
-	logger.info("Inside UI service getScheduledDetails_ICE");
-	if (utils.isSessionActive(req)) {
-		logger.info("Calling function getScheduledDetails from getScheduledDetails_ICE");
-		getScheduledDetails("getallscheduledata", function (err, getSchedcallback) {
-			if (err) {
-				logger.error("Error occurred in getScheduledDetails from getScheduledDetails_ICE: %s",err);
-				res.send("fail");
-			} else {
-				try {
-					res.send(getSchedcallback);
-				} catch (exception) {
-					logger.error("Exception occurred while sending response getSchedcallback: %s",exception);
-					res.send("fail");
-				}
-			}
-		});
-	} else {
-		logger.error("Error occurred in getScheduledDetails_ICE: Invalid Session");
-		res.send("Invalid Session");
+//Update Schedule status of current scheduled job
+const updateScheduleStatus = async (scheduleid, newstatus, currentstatus) => {
+	logger.info("Inside updateScheduleStatus function");
+	if (currentstatus === undefined) {
+		const inputs = {
+			"query": "getscheduledata",
+			"scheduleid": scheduleid
+		};
+		const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", "getScheduledDetails_ICE");
+		if (result == "fail") return "fail";
+		currentstatus = result[0].status;
 	}
-};
-
-//cancel scheduled Jobs
-exports.cancelScheduledJob_ICE = function (req, res) {
-	logger.info("Inside UI service cancelScheduledJob_ICE");
-	if (utils.isSessionActive(req)) {
-		var cycleid = req.body.suiteDetails.cycleid;
-		var scheduleid = req.body.suiteDetails.scheduleid;
-		var schedStatus = req.body.schedStatus;
-		var schedHost = req.body.host;
-		var schedUserid = req.body.schedUserid;0
-		var userid = req.body.userInfo;
-		if(userid == schedUserid || schedHost == req.session.username){
-			var scheduledatetime = new Date(req.body.suiteDetails.scheduledatetime).valueOf().toString();
-			var scheduledatetimeINT = parseInt(scheduledatetime);
-			try {
-				var upDate = new Date(scheduledatetimeINT).getFullYear() + "-" + ("0" + (new Date(scheduledatetimeINT).getMonth() + 1)).slice(-2) + "-" + ("0" + new Date(scheduledatetimeINT).getDate()).slice(-2) + " " + ("0" + new Date(scheduledatetimeINT).getHours()).slice(-2) + ":" + ("0" + new Date(scheduledatetimeINT).getMinutes()).slice(-2) + ":00+0000";
-				var inputs = {
-					"scheduledatetime": scheduledatetimeINT,
-					"scheduleid": scheduleid,
-					"query": "getscheduledstatus"
-				};
-				var args = {
-					data: inputs,
-					headers: {
-						"Content-Type": "application/json"
-					}
-				};
-				logger.info("Calling NDAC Service from cancelScheduledJob_ICE: suite/ScheduleTestSuite_ICE");
-				client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
-					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in suite/ScheduleTestSuite_ICE from cancelScheduledJob_ICE service, Error Code : ERRNDAC");
-						res.send("fail");
-					} else {
-						var status = result.rows[0].status;
-						if (status == "scheduled") {
-							var objectD =scheduleid + ";" + upDate.valueOf().toString();
-							scheduleStatus = schedStatus;
-							logger.info("Calling function updateStatus from cancelScheduledJob_ICE service");
-							updateStatus(objectD, function (err, data) {
-								if (!err) {
-									logger.info("Sending response data from cancelScheduledJob_ICE service on success");
-									res.send(data);
-								} else{
-									logger.error("Error in the function updateStatus from cancelScheduledJob_ICE service");
-									res.send(data);
-								}
-							});
-						} else {
-							logger.info("Sending response 'inprogress' from cancelScheduledJob_ICE service");
-							res.send("inprogress");
-						}
-					}
-				});
-			} catch (exception) {
-				logger.error("Exception in the service cancelScheduledJob_ICE: %s",exception);
-				res.send("fail");
-			}
-		}
-		else{
-			logger.info("Sending response 'not authorised' from cancelScheduledJob_ICE service");
-			res.send("not authorised");
-		}		
-	} else {
-		logger.error("Error in the service cancelScheduledJob_ICE: Invalid Session");
-		res.send("Invalid Session");
-	}
-};
-
-//Fetch Scheduled data
-function getScheduledDetails(dbquery, schedDetailscallback) {
-	try {
-		logger.info("Inside getScheduledDetails function");
+	if (currentstatus != "Skipped"){
 		var inputs = {
-			"scheduledetails": dbquery,
-			"query": "getallscheduledetails"
+			"schedulestatus": newstatus,
+			"scheduleid": scheduleid,
+			"query": "updatescheduledstatus"
 		};
-		var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
-			}
-		};
-		logger.info("Calling NDAC Service from getScheduledDetails: suite/ScheduleTestSuite_ICE");
-		client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
-			function (result, response) {
-			if (response.statusCode != 200 || result.rows == "fail") {
-				logger.error("Error occurred in suite/ScheduleTestSuite_ICE from getScheduledDetails, Error Code : ERRNDAC");
-				schedDetailscallback(null, "fail");
-			} else {
-				schedDetailscallback(null, result.rows);
-			}
-		});
-	} catch (exception) {
-		logger.error("Exception in the function getScheduledDetails: %s",exception);
-		schedDetailscallback(null, "fail");
-	}
+		const result2 = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", "updateScheduleStatus");
+		return result2;
+	} else return "fail";
+};
+
+exports.getScheduledDetails_ICE = async (req, res) => {
+	logger.info("Inside UI service getScheduledDetails_ICE");
+	const inputs = { "query": "getscheduledata" };
+	const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", "getScheduledDetails_ICE");
+	return res.send(result);
 }
 
+//cancel scheduled Jobs
+exports.cancelScheduledJob_ICE = async (req, res) => {
+	logger.info("Inside UI service cancelScheduledJob_ICE");
+	const userid = req.session.userid;
+	const username = req.session.username;
+	const scheduleid = req.body.schDetails.scheduleid;
+	const schedHost = req.body.host;
+	const schedUserid = req.body.schedUserid;
+	if(!(schedUserid == userid || schedHost == username)) {
+		logger.info("Sending response 'not authorised' from cancelScheduledJob_ICE service");
+		return res.send("not authorised");
+	}
+	const inputs = {
+		"query": "getscheduledata",
+		"scheduleid": scheduleid
+	};
+	const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", "getScheduledDetails_ICE");
+	if (result == "fail") return res.send("fail");
+	const status = result[0].status;
+	if (status != "scheduled") {
+		logger.info("Sending response 'inprogress' from cancelScheduledJob_ICE service");
+		return res.send("inprogress");
+	}
+	const result2 = await updateScheduleStatus(scheduleid, "cancelled", status);
+	return res.send(result2);
+};
+
 //Re-Scheduling the tasks
-exports.reScheduleTestsuite = function (req, res) {
+exports.reScheduleTestsuite = async () => {
 	logger.info("Inside UI service reScheduleTestsuite");
-	var getscheduleData = [];
+	const fnName = "reScheduleTestsuite";
 	try {
-		logger.info("Calling function getScheduledDetails from reScheduleTestsuite service");
-		getScheduledDetails("getallscheduleddetails", function (err, reSchedcallback) {
-			if (err) {
-				logger.error("Error occurred in getScheduledDetails from reScheduleTestsuite service: %s", err);
-			} else {
-				if (reSchedcallback != "fail") {
-					var status;
-					for (var i = 0; i < reSchedcallback.length; i++) {
-						status = reSchedcallback[i].status;
-						if (status != "success" && status != "Terminate" && status != "Inprogress") {
-							getscheduleData.push(reSchedcallback[i]);
-						}
-						if (status == "Inprogress") {
-							scheduleStatus = "Failed 01";
-							var str,dd,dt;
-							var tempDD,tempDT;
-							str = new Date(reSchedcallback[i].scheduledon).getFullYear() + "-" + ("0" + (new Date(reSchedcallback[i].scheduledon).getMonth() + 1)).slice(-2) + "-" + ("0" + new Date(reSchedcallback[i].scheduledon).getDate()).slice(-2) + " " + ("0" + new Date(reSchedcallback[i].scheduledon).getUTCHours()).slice(-2) + ":" + ("0" + new Date(reSchedcallback[i].scheduledon).getUTCMinutes()).slice(-2);
-							tempDD = str.split(" ")[0];
-							tempDT = str.split(" ")[1];
-							dd = tempDD.split("-");
-							dt = tempDT.split(":");
-							var objectD = reSchedcallback[i].cycleid.valueOf().toString() + ";" + reSchedcallback[i].scheduleid.valueOf().toString() + ";" + new Date(Date.UTC(dd[0], dd[1] - 1, dd[2], dt[0], dt[1])).valueOf().toString();
-							logger.info("Calling function updateStatus from reScheduleTestsuite service");
-							updateStatus(objectD, function (err, data) {
-								if (!err) {
-									logger.info("Sending response data from the function updateStatus of reScheduleTestsuite service");
-								}
-							});
-						}
-					}
-					if (getscheduleData.length > 0) {
-						var modInfo = {};
-						var dd,dt,str;
-						var tempDD,tempDT;
-						var modInformation = [];
-						async.forEachSeries(getscheduleData, function (itrSchData, getscheduleDataCallback) {
-							str = new Date(itrSchData.scheduledon).getFullYear() + "-" + ("0" + (new Date(itrSchData.scheduledon).getMonth() + 1)).slice(-2) + "-" + ("0" + new Date(itrSchData.scheduledon).getUTCDate()).slice(-2) + " " + ("0" + new Date(itrSchData.scheduledon).getUTCHours()).slice(-2) + ":" + ("0" + new Date(itrSchData.scheduledon).getUTCMinutes()).slice(-2);
-							tempDD = str.split(" ")[0];
-							tempDT = str.split(" ")[1];
-							dd = tempDD.split("-");
-							dt = tempDT.split(":");
-							if (new Date(dd[0], dd[1] - 1, dd[2], dt[0], dt[1]) > new Date()) {
-								modInfo.suiteDetails = itrSchData.scenariodetails;
-								modInfo.testsuitename = itrSchData.testsuitename;
-								modInfo.testsuiteid = itrSchData.testsuiteids[0].valueOf().toString();
-								modInfo.Ip = itrSchData.target;
-								modInfo.date = dd[2] + "-" + dd[1] + "-" + dd[0];
-								modInfo.time = str.split(" ")[1];
-								modInfo.browserType = itrSchData.executeon;
-								modInfo.cycleid = itrSchData.cycleid.valueOf().toString();
-								modInfo.reschedule = true;
-								modInfo.scheduleid = itrSchData._id.valueOf().toString();
-								modInfo.versionnumber = 1;
-								modInfo.userid = itrSchData.scheduledby;
-								modInformation.push(modInfo);
-								logger.info("Calling function scheduleTestSuite from reScheduleTestsuite service");
-								scheduleTestSuite(modInformation, req, function (err, schedulecallback) {
-									try {
-										logger.info("Status of the function scheduleTestSuite from reScheduleTestsuite service");
-									} catch (exception) {
-										logger.error("Exception in the function scheduleTestSuite from reScheduleTestsuite service: %s", exception);
-									}
-									getscheduleDataCallback();
-								});
-							} else {
-								scheduleStatus = "Failed 01";
-								var objectD = itrSchData._id.valueOf().toString() + ";" + new Date(Date.UTC(dd[0], dd[1] - 1, dd[2], dt[0], dt[1])).valueOf().toString();
-								logger.info("Calling function updateStatus from reScheduleTestsuite service");
-								updateStatus(objectD, function (err, data) {
-									if (!err) {
-										logger.info("Sending response data from the function updateStatus of reScheduleTestsuite service");
-									}
-									getscheduleDataCallback();
-								});
-							}
-							
-						});
-					}
-				} else {
-					logger.info("Status from the function reScheduleTestsuite: Jobs are not rescheduled");
-				}
+		var inputs = {
+			"query": "getscheduledata",
+			"status": "scheduled"
+		};
+		const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
+		if (result == "fail") return logger.info("Status from the function "+fnName+": Jobs are not rescheduled");
+		return logger.warn("Status from the function "+fnName+": Jobs are not rescheduled due to WIP");
+		var getscheduleData = [];
+		var status;
+		for (var i = 0; i < result.length; i++) {
+			status = result[i].status;
+			if (status != "success" && status != "Terminate" && status != "Inprogress") {
+				getscheduleData.push(result[i]);
 			}
-		});
+			if (status == "Inprogress") {
+				scheduleStatus = "Failed 01";
+				var str,dd,dt;
+				var tempDD,tempDT;
+				str = new Date(result[i].scheduledon).getFullYear() + "-" + ("0" + (new Date(result[i].scheduledon).getMonth() + 1)).slice(-2) + "-" + ("0" + new Date(result[i].scheduledon).getDate()).slice(-2) + " " + ("0" + new Date(result[i].scheduledon).getUTCHours()).slice(-2) + ":" + ("0" + new Date(result[i].scheduledon).getUTCMinutes()).slice(-2);
+				tempDD = str.split(" ")[0];
+				tempDT = str.split(" ")[1];
+				dd = tempDD.split("-");
+				dt = tempDT.split(":");
+				var objectD = result[i].cycleid.valueOf().toString() + ";" + result[i].scheduleid.valueOf().toString() + ";" + new Date(Date.UTC(dd[0], dd[1] - 1, dd[2], dt[0], dt[1])).valueOf().toString();
+				logger.info("Calling function updateStatus from reScheduleTestsuite service");
+				updateStatus1(objectD, function (err, data) {
+					if (!err) {
+						logger.info("Sending response data from the function updateStatus of reScheduleTestsuite service");
+					}
+				});
+			}
+		}
+		if (getscheduleData.length > 0) {
+			var modInfo = {};
+			var dd,dt,str;
+			var tempDD,tempDT;
+			var modInformation = [];
+			async.forEachSeries(getscheduleData, function (itrSchData, getscheduleDataCallback) {
+				str = new Date(itrSchData.scheduledon).getFullYear() + "-" + ("0" + (new Date(itrSchData.scheduledon).getMonth() + 1)).slice(-2) + "-" + ("0" + new Date(itrSchData.scheduledon).getUTCDate()).slice(-2) + " " + ("0" + new Date(itrSchData.scheduledon).getUTCHours()).slice(-2) + ":" + ("0" + new Date(itrSchData.scheduledon).getUTCMinutes()).slice(-2);
+				tempDD = str.split(" ")[0];
+				tempDT = str.split(" ")[1];
+				dd = tempDD.split("-");
+				dt = tempDT.split(":");
+				if (new Date(dd[0], dd[1] - 1, dd[2], dt[0], dt[1]) > new Date()) {
+					modInfo.suiteDetails = itrSchData.scenariodetails;
+					modInfo.testsuitename = itrSchData.testsuitename;
+					modInfo.testsuiteid = itrSchData.testsuiteids[0].valueOf().toString();
+					modInfo.Ip = itrSchData.target;
+					modInfo.date = dd[2] + "-" + dd[1] + "-" + dd[0];
+					modInfo.time = str.split(" ")[1];
+					modInfo.browserType = itrSchData.executeon;
+					modInfo.cycleid = itrSchData.cycleid.valueOf().toString();
+					modInfo.reschedule = true;
+					modInfo.scheduleid = itrSchData._id.valueOf().toString();
+					modInfo.versionnumber = 1;
+					modInfo.userid = itrSchData.scheduledby;
+					modInformation.push(modInfo);
+					logger.info("Calling function scheduleTestSuite from reScheduleTestsuite service");
+					scheduleTestSuite(modInformation, req, function (err, schedulecallback) {
+						try {
+							logger.info("Status of the function scheduleTestSuite from reScheduleTestsuite service");
+						} catch (exception) {
+							logger.error("Exception in the function scheduleTestSuite from reScheduleTestsuite service: %s", exception);
+						}
+						getscheduleDataCallback();
+					});
+				} else {
+					scheduleStatus = "Failed 01";
+					var objectD = itrSchData._id.valueOf().toString() + ";" + new Date(Date.UTC(dd[0], dd[1] - 1, dd[2], dt[0], dt[1])).valueOf().toString();
+					logger.info("Calling function updateStatus from reScheduleTestsuite service");
+					updateStatus1(objectD, function (err, data) {
+						if (!err) {
+							logger.info("Sending response data from the function updateStatus of reScheduleTestsuite service");
+						}
+						getscheduleDataCallback();
+					});
+				}
+				
+			});
+		}
 	} catch (ex) {
 		logger.error("Exception in the function reScheduleTestsuite: %s", ex);
 	}

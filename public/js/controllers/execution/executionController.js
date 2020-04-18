@@ -35,14 +35,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		unblockUI();
 		openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
 	});
-	/*socket.on('disconnect', function () {
-		unblockUI();
-		openDialogExe("Execute Test Suite", "Failed to execute.");
-	});
-	socket.on('reconnect', function () {
-		unblockUI();
-		openDialogExe("Execute Test Suite", "Connect Restored. Reports may or may not be generated.");
-	});*/
 
 	var current_task = JSON.parse(window.localStorage['_CT']);
 	var getTaskName = current_task.taskName;
@@ -69,9 +61,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	for (var rti = 0; rti < readTestSuite.length; rti++) {
 		readTestSuite[rti].versionnumber = parseFloat(versionnumber);
 	}
-	console.log("read", readTestSuite);
 
-	//Getting Apptype or Screen Typef
+	//Getting Apptype or Screen Type
 	$scope.getScreenView = appType;
 	//Onload ServiceCall
 	$timeout(function () {
@@ -472,23 +463,22 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	//Save TestSuite Functionality
 	$scope.updateTestSuite = function (e) {
 		blockUI("Saving in progress. Please Wait...");
-		var batchInfo = [];
-		var loopingtimes = 0;
-		var suiteidsexecution = [];
+		const batchInfo = [];
+		const suiteidsexecution = [];
 		$(".parentSuiteChk:checked").each(function (i, e) {
 			suiteidsexecution.push(e.getAttribute('id').split('_')[1]);
 		});
 		window.localStorage.setItem("executionidxreport", JSON.stringify({"idxlist": suiteidsexecution}));
 		$.each($(".parentSuiteChk"), function () {
-			var suiteDetails = {};
-			var testScenarioIds = [];
-			var getParamPaths = [];
-			var conditionCheck = [];
-			var executeStatus = [];
-			var scenarioDescriptionText = [];
-			var scenarioAccNoMap = {};
+			const suiteDetails = {};
+			const testScenarioIds = [];
+			const getParamPaths = [];
+			const conditionCheck = [];
+			const executeStatus = [];
+			const scenarioDescriptionText = [];
+			const scenarioAccNoMap = {};
 			$.each($(this).parents('.suiteNameTxt').next('div').find('.exe-scenarioIds'), function () {
-				var scenarioDescObj = [];
+				const scenarioDescObj = [];
 				testScenarioIds.push($(this).attr("sId"));
 				getParamPaths.push($(this).parent().find(".getParamPath").val().trim());
 				conditionCheck.push($(this).parent().find(".conditionCheck option:selected").val());
@@ -506,11 +496,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			suiteDetails.conditioncheck = conditionCheck;
 			suiteDetails.donotexecute = executeStatus;
 			// suiteDetails.versionnumber = versionnumber;
-			// suiteDetails.testscycleid = current_task.testSuiteDetails[loopingtimes].cycleid;
 			suiteDetails.scenarioAccNoMap = scenarioAccNoMap;
 			suiteDetails.scenarioDescriptions = scenarioDescriptionText;
 			batchInfo.push(suiteDetails);
-			loopingtimes = loopingtimes + 1;
 		});
 		//console.log("batchdetails", batchInfo);
 		//Getting ConditionChecks
@@ -597,8 +585,20 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 	//Execute TestSuite Functionality
 	$scope.ExecuteTestSuite = function ($event) {
-		projectdata=JSON.parse(window.localStorage["_FD"]);
-		if ($scope.moduleInfo.length <= 0) {
+		if ($(".exe-ExecuteStatus input:checked").length === 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
+		else if ((appType == "Web") && browserTypeExe.length === 0) openDialogExe("Execute Test Suite", "Please select a browser");
+		else if (appType == "Webservice" && browserTypeExe.length === 0) openDialogExe("Execute Test Suite", "Please select Web Services option");
+		else if (appType == "MobileApp" && browserTypeExe.length === 0) openDialogExe("Execute Test Suite", "Please select Mobile Apps option");
+		else if (appType == "Desktop" && browserTypeExe.length === 0) openDialogExe("Execute Test Suite", "Please select Desktop Apps option");
+		else if (appType == "Mainframe" && browserTypeExe.length === 0) openDialogExe("Execute Test Suite", "Please select Mainframe option");
+		else if (appType == "OEBS" && browserTypeExe.length === 0) openDialogExe("Execute Test Suite", "Please select OEBS Apps option");
+		else if (appType == "SAP" && browserTypeExe.length === 0) openDialogExe("Execute Test Suite", "Please select SAP Apps option");
+		else if (appType == "MobileWeb" && browserTypeExe.length === 0) openDialogExe("Execute Test Suite", "Please select Mobile Web option");
+		else if (browserTypeExe.length === 0) openDialogExe("Execute Test Suite", "Please select " + appType + " option");
+		else if ((appType == "Web") && browserTypeExe.length == 1 && execAction == "parallel") openDialogExe("Execute Test Suite", "Please select multiple browsers");
+		else {
+			const projectdata = JSON.parse(window.localStorage["_FD"]);
+			$scope.moduleInfo = [];
 			$.each($(".parentSuiteChk"), function () {
 				var testsuiteDetails = current_task.testSuiteDetails[this.getAttribute("id").split('_')[1]];
 				var suiteInfo = {};
@@ -619,7 +619,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 					suiteInfo.testsuiteName = $(this).parents('span.taskname').text();
 					suiteInfo.testsuiteId = $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
-					suiteInfo.versionnumber = testsuiteDetails.versionnumber;
+					suiteInfo.versionNumber = testsuiteDetails.versionnumber;
 					suiteInfo.appType = appType;
 					suiteInfo.domainName = projectdata.idnamemapdom[projectid];
 					suiteInfo.projectName = projectdata.idnamemapprj[projectid];
@@ -631,30 +631,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					$scope.moduleInfo.push(suiteInfo);
 				}
 			});
-		}
-		if ((appType == "Web") && browserTypeExe.length === 0)
-			openDialogExe("Execute Test Suite", "Please select a browser");
-		else if (appType == "Webservice" && browserTypeExe.length === 0)
-			openDialogExe("Execute Test Suite", "Please select Web Services option");
-		else if (appType == "MobileApp" && browserTypeExe.length === 0)
-			openDialogExe("Execute Test Suite", "Please select Mobile Apps option");
-		else if (appType == "Desktop" && browserTypeExe.length === 0)
-			openDialogExe("Execute Test Suite", "Please select Desktop Apps option");
-		else if (appType == "Mainframe" && browserTypeExe.length === 0)
-			openDialogExe("Execute Test Suite", "Please select Mainframe option");
-		else if (appType == "OEBS" && browserTypeExe.length === 0)
-			openDialogExe("Execute Test Suite", "Please select OEBS Apps option");
-		else if (appType == "SAP" && browserTypeExe.length === 0)
-			openDialogExe("Execute Test Suite", "Please select SAP Apps option");
-		else if (appType == "MobileWeb" && browserTypeExe.length === 0)
-			openDialogExe("Execute Test Suite", "Please select Mobile Web option");
-		else if (browserTypeExe.length === 0)
-			openDialogExe("Execute Test Suite", "Please select " + appType + " option");
-		else if ($(".exe-ExecuteStatus input:checked").length === 0)
-			openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
-		else if ((appType == "Web") && browserTypeExe.length == 1 && execAction == "parallel")
-			openDialogExe("Execute Test Suite", "Please select multiple browsers");
-		else {
 			blockUI("Execution in progress. Please Wait...");
 			var executionData = {
 				source: "task",
@@ -671,20 +647,13 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				unblockUI();
 				$rootScope.resetSession.end();
 				executionActive = false;
-				if (data == "Invalid Session")
-					return $rootScope.redirectPage();
-				else if (data == "unavailableLocalServer")
-					openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
-				else if (data == "scheduleModeOn")
-					openDialogExe("Execute Test Suite", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
-				else if(data == "NotApproved")
-					openDialogExe("Execute Test Suite", "All the dependent tasks (design, scrape) needs to be approved before execution");
-				else if(data == "NoTask")
-					openDialogExe("Execute Test Suite", "Task doesnot exist for child node");
-				else if(data == "Modified")
-					openDialogExe("Execute Test Suite", "Task has been modified, Please approve the task");
-				else if (data == "unavailableLocalServer")
-					openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
+				if (data == "Invalid Session") return $rootScope.redirectPage();
+				else if (data == "unavailableLocalServer") openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
+				else if (data == "scheduleModeOn") openDialogExe("Execute Test Suite", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+				else if(data == "NotApproved") openDialogExe("Execute Test Suite", "All the dependent tasks (design, scrape) needs to be approved before execution");
+				else if(data == "NoTask") openDialogExe("Execute Test Suite", "Task does not exist for child node");
+				else if(data == "Modified") openDialogExe("Execute Test Suite", "Task has been modified, Please approve the task");
+				else if (data == "unavailableLocalServer") openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
 				else if (data == "Terminate") {
 					$('#executionTerminated').modal('show');
 					$('#executionTerminated').find('.btn-default').focus();
@@ -693,8 +662,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					setTimeout(function () {
 						$("#executionCompleted").find('.btn-default').focus();
 					}, 300);
-				} else
-					openDialogExe("Execute Test Suite", "Failed to execute.");
+				} else openDialogExe("Execute Test Suite", "Failed to execute.");
 				$(".selectBrowser").find("img").removeClass("sb");
 				$(".selectParallel").find("img").removeClass("sb");
 				browserTypeExe = [];
@@ -737,8 +705,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			setTimeout(function () {
 				$("#executionCompleted").find('.btn-default').focus();
 			}, 300);
-		} else
-			openDialogExe("Execute Test Suite", "Failed to execute.");
+		} else openDialogExe("Execute Test Suite", "Failed to execute.");
 		unblockUI();
 		$rootScope.resetSession.end();
 		$(".selectBrowser").find("img").removeClass("sb");
@@ -754,12 +721,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	$(document).on("click", "#syncScenario", function () {
 		$("#ALMSyncWindow").modal("show");
 		$(".error-msg-exeQc").text('');
-		if ($scope.moduleInfo.length > 0) {
-			$("#almURL").val($scope.moduleInfo.suiteDetails.qccredentials.qcurl);
-			$("#almUserName").val($scope.moduleInfo.suiteDetails.qccredentials.qcusername);
-			$("#almPassword").val($scope.moduleInfo.suiteDetails.qccredentials.qcpassword);
-		} else
-			$("#almURL, #almUserName, #almPassword").val('');
+		$("#almURL").val($scope.qccredentials.qcurl);
+		$("#almUserName").val($scope.qccredentials.qcusername);
+		$("#almPassword").val($scope.qccredentials.qcpassword);
 	});
 	//ALM Functionality
 
@@ -860,9 +824,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		}
 	});
 	//Select Browser Function
-	$("#tableActionButtons, .executionTableDnd").delay(500).animate({
-		opacity: "1"
-	}, 500);
+	$("#tableActionButtons, .executionTableDnd").delay(500).animate({opacity: "1"}, 500);
 }]);
 
 
