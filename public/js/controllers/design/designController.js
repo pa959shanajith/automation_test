@@ -1124,7 +1124,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						})
 						$("#wsdlOperation").val(data.operations)
 						//Printing Request Data
-						$("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
+						$("#wsdlRequestHeader").val(data.header.split("##").join("\n"));
 						if (data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0) {
 							var jsonStr = data.body;
 							var jsonObj = JSON.parse(jsonStr);
@@ -1138,14 +1138,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							$("#wsdlRequestBody").val(getXML)
 						}
 						//Printing Response Data
-						$("#wsdlResponseHeader").val(data.responseHeader[0].split("##").join("\n"));
-						if (data.responseBody[0].indexOf("{") == 0 || data.responseBody[0].indexOf("[") == 0) {
+						$("#wsdlResponseHeader").val(data.responseHeader.split("##").join("\n"));
+						if (data.responseBody.indexOf("{") == 0 || data.responseBody.indexOf("[") == 0) {
 							var jsonStr = data.responseBody;
 							var jsonObj = JSON.parse(jsonStr);
 							var jsonPretty = JSON.stringify(jsonObj, null, '\t');
 							$("#wsdlResponseBody").val(jsonPretty)
 						} else {
-							var getXML = formatXml(data.responseBody[0].replace(/>\s+</g, '><'));
+							var getXML = formatXml(data.responseBody.replace(/>\s+</g, '><'));
 							if(getXML=='\r\n'){
 								getXML = '';
 							}
@@ -1205,13 +1205,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		//else if(!wsdlRequestHeader) $("#wsdlRequestHeader").addClass("inputErrorBorderFull")
 		else {
 			var getWSData = {
-				"body": [wsdlRequestBody],
-				"operations": [wsdlOperation],
-				"responseHeader": [wsdlResponseHeader],
-				"responseBody": [wsdlResponseBody],
-				"method": [wsdlMethods],
-				"endPointURL": [endPointURL],
-				"header": [wsdlRequestHeader]
+				"body": wsdlRequestBody,
+				"operations": wsdlOperation,
+				"responseHeader": wsdlResponseHeader,
+				"responseBody": wsdlResponseBody,
+				"method": wsdlMethods,
+				"endPointURL": endPointURL,
+				"header": wsdlRequestHeader
 			};
 			var appType = $scope.getScreenView;
 			getWSTemplateData = JSON.stringify(getWSData)

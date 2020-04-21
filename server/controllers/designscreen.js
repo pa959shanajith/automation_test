@@ -268,45 +268,64 @@ exports.updateScreen_ICE = function (req, res) {
 								'header' in scrapedObjects &&
 								'body' in scrapedObjects) {
 								if (scrapedObjects.method == 'POST') {
-									var requestedBody = scrapedObjects.body[0];
-									var requestedHeader = scrapedObjects.header[0];
+									var requestedBody = scrapedObjects.body;
+									var requestedHeader = scrapedObjects.header;
 									if (requestedBody != null &&
-										requestedBody != '' &&
-										requestedHeader.indexOf('json') === -1) {
-										if (requestedBody.indexOf('Envelope') !== -1) {
-											var obj = parse(requestedBody);
-											if ('root' in obj) {
-												temp_flag = false
-												var baseRequestBody = obj.root;
-												allXpaths = [];
-												allCustnames = [];
-												try {
-													logger.info("Calling function parseRequest from the service updateScreen_ICE: updateScrapeData_ICE");
-													parseRequest(baseRequestBody);
-												} catch (exception) {
-													logger.error(exception.message);
+										requestedBody != ''){
+										if(requestedHeader.indexOf('json') === -1){
+											if (requestedBody.indexOf('Envelope') !== -1) {
+												var obj = parse(requestedBody);
+												if ('root' in obj) {
+													temp_flag = false
+													var baseRequestBody = obj.root;
+													allXpaths = [];
+													allCustnames = [];
+													try {
+														logger.info("Calling function parseRequest from the service updateScreen_ICE: updateScrapeData_ICE");
+														parseRequest(baseRequestBody);
+													} catch (exception) {
+														logger.error(exception.message);
+													}
+													for (var populationindex = 0; populationindex < allXpaths.length; populationindex++) {
+														var scrapedObjectsWS = {};
+														scrapedObjectsWS.xpath = allXpaths[populationindex];
+														scrapedObjectsWS.custname = allCustnames[populationindex];
+														scrapedObjectsWS.tag = "elementWS";
+														viewArray.push(scrapedObjectsWS);
+													}
+													var baseData = {};
+													baseData.endPointURL = scrapedObjects.endPointURL;
+													baseData.method = scrapedObjects.method;
+													baseData.header = scrapedObjects.header;
+													baseData.operations = scrapedObjects.operations;
+													baseData.body = scrapedObjects.body;
+													baseData.responseHeader = scrapedObjects.responseHeader;
+													baseData.responseBody = scrapedObjects.responseBody;
+													baseData.view = viewArray;
+													scrapedObjects = baseData;
+													scrapedObjects = JSON.stringify(scrapedObjects);
+													scrapedObjects = scrapedObjects.replace(/'+/g, "''")
 												}
-												for (var populationindex = 0; populationindex < allXpaths.length; populationindex++) {
+											}
+										}
+										else if(requestedHeader.indexOf('json') !== -1){
+											try{
+												requestedBody=JSON.parse(requestedBody)
+												
+												for (var object in requestedBody) {
 													var scrapedObjectsWS = {};
-													scrapedObjectsWS.xpath = allXpaths[populationindex];
-													scrapedObjectsWS.custname = allCustnames[populationindex];
+													scrapedObjectsWS.xpath = object;
+													scrapedObjectsWS.custname = object;
 													scrapedObjectsWS.tag = "elementWS";
 													viewArray.push(scrapedObjectsWS);
 												}
-												var baseData = {};
-												baseData.endPointURL = scrapedObjects.endPointURL;
-												baseData.method = scrapedObjects.method;
-												baseData.header = scrapedObjects.header;
-												baseData.operations = scrapedObjects.operations;
-												baseData.body = scrapedObjects.body;
-												baseData.responseHeader = scrapedObjects.responseHeader;
-												baseData.responseBody = scrapedObjects.responseBody;
-												baseData.view = viewArray;
-												scrapedObjects = baseData;
-												scrapedObjects = JSON.stringify(scrapedObjects);
-												scrapedObjects = scrapedObjects.replace(/'+/g, "''")
+												if (viewArray.length>0) scrapedObjects.view=viewArray
+
 											}
-										}
+											catch(Exception){
+												logger.error("Invalid Request body for RestAPI")
+											}
+										}						
 									}
 								}
 							}if (temp_flag == false){
