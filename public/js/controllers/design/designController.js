@@ -1125,13 +1125,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						$("#wsdlOperation").val(data.operations)
 						//Printing Request Data
 						$("#wsdlRequestHeader").val(data.header.split("##").join("\n"));
-						if (data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0) {
+						if (data.body.indexOf("{") == 0 || data.body.indexOf("[") == 0) {
 							var jsonStr = data.body;
 							var jsonObj = JSON.parse(jsonStr);
 							var jsonPretty = JSON.stringify(jsonObj, null, '\t');
 							$("#wsdlRequestBody").val(jsonPretty)
 						} else {
-							var getXML = formatXml(data.body[0].replace(/>\s+</g, '><'));
+							var getXML = formatXml(data.body.replace(/>\s+</g, '><'));
 							if(getXML=='\r\n'){
 								getXML = '';
 							}
