@@ -48,10 +48,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     var versionFlag = 0;
     var dragsearch = false;
     $scope.allMMaps = [];
-    var split_char = ',';
-    if (isIE) {
-        split_char = ' ';
-    }    
+    var split_char = (isIE)? ',':' ';
     // Complexity
     var cx_weightage = { //scale , weightage
         'Application Type': 3,
@@ -2580,32 +2577,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
         }
         replicateName(pi);
-
-        //Delete task with a warning in case a screen is renamed to a reused screen
-        if (dNodes[pi].type == 'screens' && dNodes[pi].original_name != dNodes[pi].name && dNodes[pi].id_n != null && dNodes[pi].id_n != 'null') {
-            var dataReuse = {
-                'screen': [{
-                    'screenname': dNodes[pi].name,
-                    'idx': pi
-                }],
-                'testcase': [],
-                'projectid': $('.project-list').val(),
-                'modules': ''
-            };
-            $('#renamingConfirmationPopup').attr('node', pi);
-            mindmapServices.checkReuse(dataReuse).then(function(result) {
-                if (result == "Invalid Session") {
-                    return $rootScope.redirectPage();
-                }
-                result['screen'].forEach(function(e, i) {
-                    if (e.count > 0) {
-                        $('#renamingConfirmationPopup').modal("show");
-                    }
-                })
-            }, function(error) {
-                console.log("Error: checkReuse service 1");
-            });
-        }
     };
 
     $('#deleteTestcase').click(function() {
@@ -2726,8 +2697,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 id: d.id,
                 childIndex: d.childIndex,
                 _id: (d._id) ? d._id : null,
-                // id_c: (d.id_c) ? d.id_c : null,
-                // id_n: (d.id_n) ? d.id_n : null,
                 oid: (d.oid) ? d.oid : null,
                 name: d.name,
                 type: d.type,
@@ -2757,8 +2726,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             projectID: d.projectID,
             id: d.id,
             childIndex: d.childIndex,
-            // id_c: (d.id_c) ? d.id_c : null,
-            // id_n: (d.id_n) ? d.id_n : null,
             _id: (d._id) ? d._id : null,
             oid: (d.oid) ? d.oid : null,
             name: d.name,
@@ -2862,16 +2829,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             saveFlag = true;
             //$('#ct-createAction').removeClass('disableButton');
             SaveCreateED('#ct-createAction', 0, 0);
-
-        } else if (s.attr('id') == 'ct-createAction' || $event.target.getAttribute('id')=='ct-createAction') {
-            if (error) {
-                unblockUI();
-                openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases")
-                return;
-            }
-            flag = 20;
-            d3.select('#ct-inpBox').classed('no-disp', !0);
-
         }
         if (flag == 0) return;
         if (s.classed('no-access')) return;
@@ -3045,100 +3002,61 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             blockUI('Saving flow! Please wait...');
             flag = 10;
             d3.select('#ct-inpBox').classed('no-disp', !0);
-            // flag = 20;
             // blockUI('Creating structure! Please wait...');
             d3.select('#ct-inpBox').classed('no-disp', !0);
+            if (flag == 0) return;
+            if (s.classed('no-access')) return;
+            //s.classed('no-access', !0);
+            var userInfo = JSON.parse(window.localStorage['_UI']);
+            var username = userInfo.username;
+            if ($('#selectProjectEtem').val() == null) {
+                unblockUI();
+                openDialogMindmap('Error', 'No projects is assigned to User');
+                return !1;
+            }
+            var cur_project = $('#selectProjectEtem').val();
+            // var selectedProject = '';
 
-        // }
-        if (flag == 0) return;
-        if (s.classed('no-access')) return;
-        //s.classed('no-access', !0);
-        var userInfo = JSON.parse(window.localStorage['_UI']);
-        var username = userInfo.username;
-        if ($('#selectProjectEtem').val() == null) {
-            unblockUI();
-            openDialogMindmap('Error', 'No projects is assigned to User');
-            return !1;
-        }
-        var cur_project = $('#selectProjectEtem').val();
-        // var selectedProject = '';
+            mapData.forEach(function(d) {
+                if (d.type == 'endtoend') {
+                    selectedProject = d.projectID;
+                    return;
+                }
+            });
 
-        mapData.forEach(function(d) {
-            if (d.type == 'endtoend') {
-                selectedProject = d.projectID;
+            if (selectedProject != cur_project) {
+                unblockUI();
+                openDialogMindmap('Error', "Module belongs to project: '" + $("#selectProjectEtem option[value='" + selectedProject + "']").text() + "' Please go back to the same project and Save");
                 return;
             }
-        });
+            var from_v = to_v = '';
+            mindmapServices.saveEndtoEndData(username, flag, from_v, to_v, 'endToend', mapData, deletednode, unassignTask, selectedProject, $('#ct-assignRel').val(), $('#ct-assignCyc').val()).then(function(result) {
+                deletednode = [],
+                deletednode_info = [];
 
-        if (selectedProject != cur_project) {
-            unblockUI();
-            openDialogMindmap('Error', "Module belongs to project: '" + $("#selectProjectEtem option[value='" + selectedProject + "']").text() + "' Please go back to the same project and Save");
-            return;
-        }
-        if (mapData.length <= 1 && flag == 20) {
-            unblockUI();
-            openDialogMindmap('Error', 'Incomplete flow! Modules->Scenarios flow should be present');
-            s.classed('no-access', !1);
-            return;
-        }
-        var from_v = to_v = '';
-
-
-        mindmapServices.saveEndtoEndData(username, flag, from_v, to_v, 'endToend', mapData, deletednode, unassignTask, selectedProject, $('#ct-assignRel').val(), $('#ct-assignCyc').val()).then(function(result) {
-
-            deletednode = [],
-            deletednode_info = [];
-
-            if (result == "Invalid Session") {
-                return $rootScope.redirectPage();
-            }
-            else if(result.rows=='fail')
-            {
+                if (result == "Invalid Session") {
+                    return $rootScope.redirectPage();
+                } else if(result.rows=='fail') {
+                    unblockUI();
+                    openDialogMindmap("Error", result.error);
+                    flag=-1;
+                }
                 unblockUI();
-                openDialogMindmap("Error", result.error);
-                flag=-1;
-            }
-            unblockUI();
-            var res = result;
-            if (flag == 10) {
-
-                // mapSaved = !0;
-                // var mid, sts = allMaps_info.some(function(m, i) {
-                //     if (m.id_n == res.id_n) {
-                //         mid = i;
-                //         allMaps_info[i] = res;
-                //         return !0;
-                //     }
-                //     return !1;
-                // });
-                // if (!sts) {
-                //     mid = allMaps_info.length;
-                //     allMaps_info.push(res);
-                //     $scope.allMMaps.push(res);
-                // }
-                // setModuleBoxHeight_W();
-                // clearSvg();
-                // currMap = res;
-                // treeBuilder_W(res);
-                // unassignTask = [];
-                //var selectedTab = window.localStorage['tabMindMap']
-                unblockUI();
-                openDialogMindmap("Success", "Data saved successfully");
-                clearSvg();
-                // fix for 1046:  "Create" does not work when we add scenarios from different projects
-                saveFlag_W = true;
-                //$('#ct-createAction_W').removeClass('disableButton').removeClass('no-access');
-                SaveCreateED('#ct-createAction', 0, 0);
-                //alert(window.localStorage['tabMindMap']);
-                mindmapServices.getModules(versioning_enabled, 'endToend', $scope.projectNameO, 0, $('.cycle-list').val(),null,res)
-                    .then(function(result) {
+                var res = result;
+                if (flag == 10) {
+                    unblockUI();
+                    openDialogMindmap("Success", "Data saved successfully");
+                    clearSvg();
+                    // fix for 1046:  "Create" does not work when we add scenarios from different projects
+                    saveFlag_W = true;
+                    //$('#ct-createAction_W').removeClass('disableButton').removeClass('no-access');
+                    SaveCreateED('#ct-createAction', 0, 0);
+                    //alert(window.localStorage['tabMindMap']);
+                    mindmapServices.getModules(versioning_enabled, 'endToend', $scope.projectNameO, 0, $('.cycle-list').val(),null,res)
+                        .then(function(result) {
                         if (result == "Invalid Session") {
                             return $rootScope.redirectPage();
                         }
-                        // var nodeBox = d3.select('#etemModuleContainer');
-                        // // $(nodeBox[0]).empty();
-                        // $scope.allMMaps = allMaps_info = result;
-                        // $('span[title=' + selectedNodeTitle + ']').addClass('nodeBoxSelected');
                         initScroller();
                         unassignTask=[];
                         // setModuleBoxHeight_W();
@@ -3163,81 +3081,32 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     }, function(error) {
                         console.log(error);
                     });
-                mindmapServices.getModules(versioning_enabled, 'endToend', $scope.projectNameO, 0, $('.cycle-list').val(),null,null)
-                .then(function(result) {
-                    if (result == "Invalid Session") {
-                        return $rootScope.redirectPage();
-                    }
-                    var nodeBox = d3.select('#etemModuleContainer');
-                    // $(nodeBox[0]).empty();
-                    unassignTask=[];
-                    $scope.allMMaps = allMaps_info = result;
-                    $('span[title=' + selectedNodeTitle + ']').addClass('nodeBoxSelected');
-                    initScroller();
-                    setModuleBoxHeight_W();
-                }, function(error) {
-                    console.log(error);
-                });
-            }
-            if (flag == 20) {
-                if (!saveFlag_W) return;
-                var res = result[0];
-                var mid, resMap = Object.keys(res);
-                $scope.allMMaps.some(function(m, i) {
-                    if (m.id_n == resMap[0]) {
-                        mid = i;
-                        return !0;
-                    }
-                    return !1;
-                });
-                //263-'Mindmap- Module: Currently allowing to create 2 modules with same name- Error msg is given on click of Create button
-
-                if (currMap != undefined) {
-                    currMap.id_c = res[resMap[0]];
-                    currMap.children.forEach(function(tsc) {
-                        tsc.id_c = res[tsc.id_n];
-                        //Himanshu please check the cause for scenario children is undefined here
-                        if (tsc.children) {
-                            tsc.children.forEach(function(scr) {
-                                scr.id_c = res[scr.id_n];
-                                scr.children.forEach(function(tc) {
-                                    if (res[tc.id_n] != 'null') {
-                                        tc.id_c = res[tc.id_n];
-                                    }
-                                });
-                            });
+                    mindmapServices.getModules(versioning_enabled, 'endToend', $scope.projectNameO, 0, $('.cycle-list').val(),null,null)
+                    .then(function(result) {
+                        if (result == "Invalid Session") {
+                            return $rootScope.redirectPage();
                         }
+                        var nodeBox = d3.select('#etemModuleContainer');
+                        // $(nodeBox[0]).empty();
+                        unassignTask=[];
+                        $scope.allMMaps = allMaps_info = result;
+                        $('span[title=' + selectedNodeTitle + ']').addClass('nodeBoxSelected');
+                        initScroller();
+                        setModuleBoxHeight_W();
+                    }, function(error) {
+                        console.log(error);
                     });
-                    //To update cassandra_ids (id_c) of nodes in dNodes variable
-                    dNodes.forEach(function(d) {
-                        if (d.type == 'modules') d.id_c = res[resMap[0]];
-                        else d.id_c = res[d.id_n];
-                        if (!(d.id_c == null || d.id_c == 'null' || d.id_c == undefined)) {
-                            d3.select('#ct-node-' + d.id + '>image').attr('style', 'opacity:1;');
-                        }
-
-                    });
-                    openDialogMindmap("Success", "Structure created successfully");
-                    saveFlag_W = false;
-                    //$('#ct-createAction_W').addClass('disableButton');
-                    SaveCreateED('#ct-createAction', 1, 0);
-                } else {
-                    saveFlag_W = false;
-                    openDialogMindmap("Error", "Failed to create structure");
                 }
-                //$('#Mindmap_create').modal('show');
-            }
-        }, function(error) {
-            unblockUI();
-            if (error == 'DuplicateModules') {
-                openDialogMindmap('Save error', 'Module names cannot be duplicate');
-            } else {
-                openDialogMindmap('Save error', 'Failed to save data');
-            }
-        })
-
+            }, function(error) {
+                unblockUI();
+                if (error == 'DuplicateModules') {
+                    openDialogMindmap('Save error', 'Module names cannot be duplicate');
+                } else {
+                    openDialogMindmap('Save error', 'Failed to save data');
+                }
+            })
+        }
     };
-    }
     
     $scope.loadEndToEnd = function(mapid, type, name,modid) {
         if (type == 'endtoend') loadScenarios(modid);

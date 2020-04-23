@@ -478,7 +478,6 @@ if (cluster.isMaster) {
 
 		app.post('/populateProjects', mindmap.populateProjects);
 		app.post('/populateUsers', mindmap.populateUsers);
-		app.post('/checkReuse', mindmap.checkReuse);
 		app.post('/getProjectTypeMM_Nineteen68', mindmap.getProjectTypeMM_Nineteen68);
 		app.post('/populateScenarios', mindmap.populateScenarios);
 		app.post('/getModules', auth.protect, mindmap.getModules);
@@ -488,7 +487,6 @@ if (cluster.isMaster) {
 		app.post('/excelToMindmap', mindmap.excelToMindmap);
 		app.post('/getScreens', mindmap.getScreens);
 		app.post('/exportToExcel', mindmap.exportToExcel);
-		app.post('/getDomain', mindmap.getDomain);
 		app.post('/pdProcess',mindmap.pdProcess);	// process discovery service
 		//Login Routes
 		//app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
@@ -537,7 +535,6 @@ if (cluster.isMaster) {
 		app.post('/getTestcaseDetailsForScenario_ICE', auth.protect, suite.getTestcaseDetailsForScenario_ICE);
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_SVN);
 		//Scheduling Screen Routes
-		app.post('/testSuitesScheduleCheck_ICE', auth.protect, suite.testSuitesScheduleCheck_ICE);
 		app.post('/testSuitesScheduler_ICE', auth.protect, suite.testSuitesScheduler_ICE);
 		app.post('/getScheduledDetails_ICE', auth.protect, suite.getScheduledDetails_ICE);
 		app.post('/cancelScheduledJob_ICE', auth.protect, suite.cancelScheduledJob_ICE);

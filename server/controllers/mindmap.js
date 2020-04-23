@@ -1,19 +1,15 @@
 var uuidV4 = require('uuid-random');
 var admin = require('../controllers/admin');
-var suite = require('../controllers/suite');
 var create_ice = require('../controllers/create_ice');
 var myserver = require('../lib/socket.js');
-var notificationMsg = require("../notifications/notifyMessages");
 var logger = require('../../logger');
 var utils = require('../lib/utils');
 var xlsx = require('xlsx');
 var path = require('path');
 var fs = require('fs');
 var xl = require('excel4node');
-var taskflow = require('../config/options').strictTaskWorkflow;
 var crypto = require("crypto");
 var asynclib = require("async");
-var design = require('../controllers/design');
 var Client = require("node-rest-client").Client;
 var DOMParser = require('xmldom').DOMParser;
 var epurl = process.env.NDAC_URL;
@@ -125,18 +121,6 @@ exports.populateUsers = function (req, res) {
 		res.send("Invalid Session");
 	}
 
-};
-
-exports.checkReuse = function (req, res) {
-	logger.info("Inside UI service: checkReuse");
-	if (utils.isSessionActive(req)) {
-		var d = req.body;
-		var qData = d.parsedata; 
-	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
-	}
 };
 
 exports.getModules = async (req, res) => {
@@ -348,7 +332,6 @@ exports.saveData = function (req, res) {
 				if (err) {
 					res.status(500).send(err);
 				} else {
-					// console.log(data);
 					res.status(200).send(data);
 				}
 			});
@@ -855,24 +838,6 @@ exports.exportToExcel = function (req, res) {
 	}
 };
 
-exports.getDomain = function (req, res) {
-	admin.getDomains_ICE(req, res);
-};
-function getElementByAttribute(attr, value, root) {
-    root = root || document.body;
-    if(root.hasAttribute(attr) && root.getAttribute(attr) == value) {
-        return root;
-    }
-    var children = root.children, 
-        element;
-    for(var i = children.length; i--; ) {
-        element = getElementByAttribute(attr, value, children[i]);
-        if(element) {
-            return element;
-        }
-    }
-    return null;
-}
 function xml2json(xml, tab) {
 	var X = {
 	   toObj: function(xml) {
@@ -933,7 +898,7 @@ function xml2json(xml, tab) {
 			 o = X.toObj(xml.documentElement);
 		  }
 		  else
-			 console.log("unhandled node type: " + xml.nodeType);
+			 logger.debug("unhandled node type: " + xml.nodeType);
 		  return o;
 	   },
 	   toJson: function(o, name, ind) {
@@ -1086,8 +1051,6 @@ var getAdjacentItems = function(activityJSON,taskidx,type){
 
 exports.pdProcess = function (req, res) {
 	try{
-		var testcaseid = uuidV4(),screenid = uuidV4();
-
 		// orderlist contains {label:'',type:''}
 		var file = JSON.parse(req.body.data.file);
 		var sessionID = uuidV4();
@@ -1122,7 +1085,6 @@ exports.pdProcess = function (req, res) {
 				screenshotdatapertask = JSON.parse(Buffer.from(eachActivity.mxCell["@data"], "base64").toString());	// list of objects
 			}
 			catch(ex){
-				console.log("empty task");
 				screenshotdatapertask = [];
 			}
 			// Encrypt for storage
@@ -1216,7 +1178,6 @@ exports.pdProcess = function (req, res) {
 						if (response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail") {
 							logger.error("Error occurred in create_ice/updateScreenname_ICE from fetchScrapedData Error Code : ERRNDAC");
 						} else {
-							console.log("screen saved successfully!");
 							var inputs = {
 								'screenid': screenid,
 								'testcasename': 'Testcase_PD_'+name,
@@ -1247,7 +1208,6 @@ exports.pdProcess = function (req, res) {
 										if (response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail") {
 											logger.error("Error occurred in design/getScrapeDataScreenLevel_ICE from fetchScrapedData Error Code : ERRNDAC");
 										} else {
-											console.log("Testcase saved successfully!");
 											savedcallback();		
 										}
 									} catch (exception) {
@@ -1265,17 +1225,13 @@ exports.pdProcess = function (req, res) {
 			//final callback
 			res.send({"success":true,"data":orderMatrix,"history":activityJSON['mxGraphModel']['@history']});
 		});
-	
 	}
 	catch(err){
 		console.log(err)
 	}
-
-	
 };
                                                                                                                  
 var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
-
 	var testCaseSteps = [],testcaseObj,step = 1;
 	var firstScript = false,windowId;
 	if(adjacentItems){
@@ -1467,9 +1423,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 	// console.log(screendata)
 
 	if(adjacentItems){
-		console.log("adjacent:",adjacentItems);
 		// list of sources(only shapes) and targets (assuming only one)
-
 		if(adjacentItems["error"]){
 			console.log(adjacentItems["error"]);
 		}

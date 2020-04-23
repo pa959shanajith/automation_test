@@ -189,7 +189,7 @@ module.exports.initListeners = mySocket => {
 
 	mySocket.on("message", value => {
 		if (value == "unavailableLocalServer") {
-			const dataToNode = JSON.stringify({"username": username, "onAction": value});
+			const dataToNode = JSON.stringify({"username": username, "onAction": value, "value": {}});
 			server_pub.publish("ICE2_" + username, dataToNode);
 		} else console.log("\n\nOn Message:", value);
 	});

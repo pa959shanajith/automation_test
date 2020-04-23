@@ -30,8 +30,8 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 		angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 	}, 1000)
 
-	//update scheduled table every 20 seconds
-	$interval(getScheduledDetailsInterval, 20000);
+	//update scheduled table every 60 seconds
+	$interval(getScheduledDetailsInterval, 60000);
 	
 	$scope.readTestSuite_ICE = function(){
 		ScheduleService.readTestSuite_ICE(readTestSuite, "schedule")
@@ -104,11 +104,11 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 	function getScheduledDetails(){
 		ScheduleService.getScheduledDetails_ICE()
 		.then(function(result) {
-			if(result == "fail"){}
-			else if(result && result.length > 0){
-				for(var k=0; k<result.length; k++){
+			if (result && result.length > 0 && result != "fail") {
+				for (var k=0; k < result.length; k++) {
+					if (result[k].scenariodetails[0].scenarioids !== undefined) result[k].scenariodetails = [result[k].scenariodetails];
 					result[k].browserlist = result[k].executeon;
-					result[k].scheduledatetime = new Date(result[k].scheduledon).toISOString().replace("T"," ").split(":").slice(0,-1).join(":")
+					result[k].scheduledatetime = new Date(result[k].scheduledon).toISOString().replace("T"," ").split(":").slice(0,-1).join(":");
 				}
 				$scope.scheduledData = result;
 				$timeout(function(){
@@ -125,10 +125,10 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 	}
 
 	$scope.browImg = function(brow,appType){
-		if (appType == "Web"){
-			if(parseInt(brow) == 1)	return './imgs/ic-ch-schedule.png';
-			else if(parseInt(brow) == 2)	return './imgs/ic-ff-schedule.png';
-			else if(parseInt(brow) == 3)	return './imgs/ic-ie-schedule.png';
+		if (appType == "Web") {
+			if(parseInt(brow) == 1) return './imgs/ic-ch-schedule.png';
+			else if(parseInt(brow) == 2) return './imgs/ic-ff-schedule.png';
+			else if(parseInt(brow) == 3) return './imgs/ic-ie-schedule.png';
 		} 
 		else if(appType == "Webservice") return './imgs/webservice.png';
 		else if(appType == "MobileApp") return './imgs/mobileApps.png';
@@ -326,7 +326,6 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 							});
 						}
 					});
-					suiteInfo.reschedule = false;
 					suiteInfo.testsuiteName = $(this).children('.scheduleSuite').find(".scheduleSuiteName").text();
 					suiteInfo.testsuiteId = $(this).children('.scheduleSuite').find(".scheduleSuiteName").data("testsuiteid");
 					suiteInfo.versionNumber = $(this).children('.scheduleSuite').find(".scheduleSuiteName").data("versionnumber");
@@ -348,67 +347,60 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 			const chkRepeat = {};
 			for(let i = 0; i < moduleInfo.length; i++) {
 				if (chkRepeat[moduleInfo[i].targetUser+"_"+moduleInfo[i].date+"_"+moduleInfo[i].time] !== undefined) {
-					doNotSchedule = true;
-					openModelPopup("Schedule Test Suite", "Schedule time is matching for testsuites scheduled for "+moduleInfo[i].targetUser);
+					// doNotSchedule = true;
+					// openModelPopup("Schedule Test Suite", "Schedule time is matching for testsuites scheduled for "+moduleInfo[i].targetUser);
+					console.log("Schedule time is matching for testsuites scheduled for "+moduleInfo[i].targetUser+". These will be combined and executed as a batch.");
 				}
 			}
 			if(doNotSchedule) return false;
-			ScheduleService.testSuitesScheduleCheck_ICE(moduleInfo)
+			const executionData = {
+				source: "schedule",
+				exectionMode: execAction,
+				browserType: browserTypeExe,
+				qccredentials: {"qcurl": "", "qcusername": "", "qcpassword": ""},
+				batchInfo: moduleInfo
+			};
+			blockUI("Scheduling...");
+			ScheduleService.testSuitesScheduler_ICE(executionData)
 			.then(function(data) {
+				unblockUI();
 				if (data == "Invalid Session") return $rootScope.redirectPage();
-				else if(data == "NotApproved") openModelPopup("Schedule Test Suite", "All the dependent tasks (design, scrape) needs to be approved before execution");
-				else if(data == "NoTask") openModelPopup("Schedule Test Suite", "Task does not exist for child node");
-				else if(data == "Modified") openModelPopup("Schedule Test Suite", "Task has been modified, Please approve the task");
-				else if(data == "fail") openModelPopup("Schedule Test Suite", "Failed to schedule Testsuite");
-				else if(data.status == "booked") openModelPopup("Schedule Test Suite", "Schedule time is matching for testsuites scheduled for " + data.user);
-				else if(data == "available") /* proceedScheduling(); */ openModelPopup("Schedule Test Suite", "Validation Successful! Work Under Progress!");
-				else openModelPopup("Schedule Test Suite", "Error in schedule Testsuite");
-			},
-			function(error) {
-				openModelPopup("Schedule Test Suite", "Failed to schedule Testsuite");
-				console.error("Error: ", error);
-			});
-			function proceedScheduling() {
-				var executionData = {
-					source: "schedule",
-					exectionMode: execAction,
-					browserType: browserTypeExe,
-					qccredentials: {"qcurl": "", "qcusername": "", "qcpassword": ""},
-					batchInfo: moduleInfo
-				};
-				ScheduleService.testSuitesScheduler_ICE(executionData)
-				.then(function(data){
-					if(data == "success"){
-						openModelPopup("Schedule Test Suite", "Successfully scheduled.");
-						$(".selectScheduleSuite, .selectToSched").prop("checked", false);
-						$(".selectBrowserSc").find(".sb").removeClass("sb");
-						$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;").val("");
-						getScheduledDetails();
-						//Transaction Activity for InitSchedule Button Action
-						// var labelArr = [];
-						// var infoArr = [];
-						// labelArr.push(txnHistory.codesDict['InitSchedule']);
-						// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
-					}
-					else if(data == "few"){
-						openModelPopup("Schedule Test Suite", "Few suites are failed to schedule");
-						$(".selectScheduleSuite").prop("checked", false);
-						$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;").val("");
-					}
-					else{
-						openModelPopup("Schedule Test Suite", "Failed to schedule Testsuite.");
-						$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;")
-					}
-					$(".fc-timePicker").focus()
-				},
-				function(error){
-					console.log(error);
-				})
+				else if (data == "NotApproved") openModelPopup("Schedule Test Suite", "All the dependent tasks (design, scrape) needs to be approved before execution");
+				else if (data == "NoTask") openModelPopup("Schedule Test Suite", "Task does not exist for child node");
+				else if (data == "Modified") openModelPopup("Schedule Test Suite", "Task has been modified, Please approve the task");
+				else if (data.status == "booked") openModelPopup("Schedule Test Suite", "Schedule time is matching for testsuites scheduled for " + data.user);
+				else if (data == "success") {
+					openModelPopup("Schedule Test Suite", "Successfully scheduled.");
+					$(".selectScheduleSuite, .selectToSched").prop("checked", false);
+					$(".selectBrowserSc").find(".sb").removeClass("sb");
+					$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;").val("");
+					getScheduledDetails();
+					//Transaction Activity for InitSchedule Button Action
+					// var labelArr = [];
+					// var infoArr = [];
+					// labelArr.push(txnHistory.codesDict['InitSchedule']);
+					// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+				} else if (data == "few") {
+					openModelPopup("Schedule Test Suite", "Failed to schedule few testsuites");
+					$(".selectScheduleSuite").prop("checked", false);
+					$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;").val("");
+				} else if (data == "fail") {
+					openModelPopup("Schedule Test Suite", "Failed to schedule Testsuite");
+					$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;");
+				} else {
+					openModelPopup("Schedule Test Suite", "Error in scheduling Testsuite. Scheduling failed");
+					$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;");
+				}
 				$("#scheduledDataBody>.scheduleDataBodyRow .scheduleDataBodyRowChild").show();
 				$("#scheduledSuitesFilterData").prop('selectedIndex', 0);
 				changeBackground();
 				browserTypeExe = [];
-			}
+				$(".fc-timePicker").focus()
+			}, function(error) {
+				unblockUI();
+				openModelPopup("Schedule Test Suite", "Failed to schedule Testsuite");
+				console.error("Error: ", error);
+			});
 		}		
 	}
 

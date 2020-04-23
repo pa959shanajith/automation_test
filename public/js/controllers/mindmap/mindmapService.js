@@ -8,15 +8,6 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
-		checkReuse: function (parsedata) {
-    		var param = "checkReuse";
-    		return $http.post('/checkReuse', {
-    			action: param,
-				parsedata:parsedata
-    		})
-    		.then(function (response) { return response.data; },
-    				function (response) { return $q.reject(response.data); });
-    	},
 		populateUsers: function (projectId) {
     		var param = "populateUsers";
     		return $http.post('/populateUsers', {
@@ -173,13 +164,6 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	
-		},
-		getDomain: function(data){
-			return $http.post('/getDomain',{
-				 data: data
-			})
-    		.then(function (response) { return response.data; },
-    				function (response) { return $q.reject(response.data); });
 		},
 		getTestSuiteDetails: function(data){
 			return $http.post('/readTestSuite_ICE', {

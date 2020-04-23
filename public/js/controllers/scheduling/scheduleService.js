@@ -9,14 +9,6 @@ mySPA.factory('ScheduleService', ['$http','$q', function ($http,$q) {
 			.then(function(response)  { return response.data},
 			function(response)        {return $q.reject(response.data)})
 		},
-		testSuitesScheduleCheck_ICE : function(moduleInfo) {
-			return $http.post('/testSuitesScheduleCheck_ICE', {
-				param : 'testSuitesScheduleCheck_ICE',
-				moduleInfo: moduleInfo
-			})
-			.then(function(response){	return response.data},
-			function(response){return $q.reject(response.data)})
-		},
 		testSuitesScheduler_ICE : function(executionData) {
 			return $http.post('/testSuitesScheduler_ICE',{
 				param : 'testSuitesScheduler_ICE',
