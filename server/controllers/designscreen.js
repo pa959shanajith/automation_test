@@ -311,8 +311,8 @@ exports.updateScreen_ICE = function (req, res) {
 										else if(requestedHeader.indexOf('json') !== -1){
 											try{
 												requestedBody=JSON.parse(requestedBody)
-												
-												for (var object in requestedBody) {
+												var xpaths=parseJsonRequest(requestedBody,"","");
+												for (var object of xpaths) {
 													var scrapedObjectsWS = {};
 													scrapedObjectsWS.xpath = object;
 													scrapedObjectsWS.custname = object;
@@ -801,4 +801,36 @@ function parseRequest(readChild) {
 	} catch (exception) {
 		logger.error("Exception in the function parseRequest: %s", exception);
 	}
+}
+
+
+function parseJsonRequest(requestedBody,base_key,cur_key) {
+	xpaths=[]
+	try {
+		logger.info("Inside the function parseRequest ");
+     	for (var key in requestedBody){
+			 var value=requestedBody[key];
+			 if (typeof(value)==="object" && !(Array.isArray(value))){
+				if (base_key!== "")  base_key+='/'+key;
+				else  base_key=key;
+				xpaths.push(base_key);
+				xpaths.concat(parseJsonRequest(value,base_key,key));
+				base_key=base_key.slice(0,-key.length-1);
+
+			 }else if(Array.isArray(value)){
+				for (var i=0;i<value.length;i++){
+					base_key+=key+"["+i.toString()+"]";
+					xpaths.concat(parseJsonRequest(value[i],base_key,key));
+				}
+					
+			 }else{
+				xpaths.push(base_key+'/'+key);
+			 }
+		 }
+		 base_key=base_key.slice(0,-cur_key.length);
+     	 
+	} catch (exception) {
+		logger.error("Exception in the function parseRequest: %s", exception);
+	}
+	return xpaths
 }
