@@ -549,7 +549,7 @@ if (cluster.isMaster) {
 		app.post('/getReportsData_ICE', report.getReportsData_ICE);
 		//Plugin Routes
 		app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
-		app.post('/getTaskJson_mindmaps', auth.protect, taskbuilder.getTaskJson_mindmaps);
+		app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
 		app.post('/updateTaskstatus_mindmaps', taskbuilder.updateTaskstatus_mindmaps);
 		//Utility plugins
 		app.post('/Encrypt_ICE', utility.Encrypt_ICE);

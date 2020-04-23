@@ -254,7 +254,7 @@ const insertReport = async (executionid, scenarioId, browserType, userInfo, repo
 		"testscenarioid": scenarioId,
 		"browser": browserType,
 		"status": reportData.overallstatus[0].overallstatus,
-		"report": JSON.stringify(reportdata),
+		"report": JSON.stringify(reportData),
 		"modifiedby": userInfo.userid,
 		"modifiedbyrole": userInfo.role,
 		"query": "insertreportquery"
@@ -279,7 +279,7 @@ const updateExecutionStatus = async (execIds, status) => {
 /** Function responsible for updating execution status and insert reports for the skipped scenarios. */
 const updateSkippedExecutionStatus = async (batchData, userInfo, status, msg) => {
 	const dt = new Date();
-	const currtime = dt.getFullYear()+'-'+(dt.getMonth()+1)+'-'+dt.getDate()+' '+dt.getHours()+':'+dt.getMinutes()+':'+dt.getSeconds()+'.'+t.getMilliseconds();
+	const currtime = dt.getFullYear()+'-'+(dt.getMonth()+1)+'-'+dt.getDate()+' '+dt.getHours()+':'+dt.getMinutes()+':'+dt.getSeconds()+'.'+dt.getMilliseconds();
 	//const currtime = new Date(dt.getTime()-dt.getTimezoneOffset()*60000).toISOString().replace('T',' ').replace('Z','');
 	const reportData = {
 		'rows': [{ 'id': '1', 'Keyword': '', 'parentId': '', 'status': status, 'Step ': '', 'Comments': null, 'StepDescription': msg, "screenshot_path" : null, "EllapsedTime" : "0:00:00.000000", "Remark" : "", "testcase_details" : "" } ],
@@ -287,8 +287,8 @@ const updateSkippedExecutionStatus = async (batchData, userInfo, status, msg) =>
 		'commentsLength': []
 	}
 	const executionIds = batchData.executionIds;
-	for (let i = 0; i < batchData.suiteDetails.length; i++) {
-		const suite = batchData.suiteDetails[i];
+	for (let i = 0; i < batchData.suitedetails.length; i++) {
+		const suite = batchData.suitedetails[i];
 		for (let j = 0; j < suite.scenarioIds.length; j++) {
 			await insertReport(executionIds[i], suite.scenarioIds[j], "N/A", userInfo, reportData);
 		}
@@ -301,20 +301,22 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 	const fnName = "executionRequestToICE";
 	logger.info("Inside " + fnName + " function");
 	const name = userInfo.username;
+	const channel = (execType == "SCHEDULE")? "scheduling":"normal";
 	var completedSceCount = 0;
 	var statusPass = 0;
 
 	logger.info("Sending request to ICE for executeTestSuite");
 	const dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": execReq};
-	redisServer.redisPubICE.publish('ICE1_normal_' + name, JSON.stringify(dataToIce));
+	redisServer.redisPubICE.publish('ICE1_' + channel + '_' + name, JSON.stringify(dataToIce));
 
 	const exePromise = async (resSent) => (new Promise((rsv, rej) => {
 		var d2R = {};
 		async function executeTestSuite_listener(channel, message) {
 			const data = JSON.parse(message);
-			if (!(name == data.username && (event == SOCK_NA || (event != SOCK_NA  && execReq.batchId == data.value.batchId)))) return false;
 			const event = data.onAction;
 			const resultData = data.value;
+			const batchId = (resultData)? resultData.batchId : "";
+			if (!(name == data.username && (event == SOCK_NA || (event != SOCK_NA  && execReq.batchId == batchId)))) return false;
 			const status = resultData.status;
 			if (event == SOCK_NA) {
 				redisServer.redisSubServer.removeListener("message", executeTestSuite_listener);
@@ -325,7 +327,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 				} else rsv(SOCK_NA);
 			} else if (event == "return_status_executeTestSuite") {
 				if (status == "success") {
-					if (execType == "SCHEDULE") await updateScheduleStatus(execReq.scheduleId, "Inprogress", execReq.batchId);
+					if (execType == "SCHEDULE") await updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
 				} else if (status == "skipped") {
 					const execStatus = "Skipped";
 					var errMsg = (execType == "SCHEDULE")? "due to conflicting schedules":
@@ -348,14 +350,14 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 					const testsuite = execReq.suitedetails[testsuiteIndex];
 					try {
 						completedSceCount++;
-						const reportdata = JSON.parse(JSON.stringify(resultData.reportData).replace(/'/g, "''"));
+						const reportData = JSON.parse(JSON.stringify(resultData.reportData).replace(/'/g, "''"));
 						var scenarioCount = testsuite.scenarioIds.length * testsuite.browserType.length;
 						if (execType == "API") {
 							if (d2R[testsuiteid] === undefined) d2R[testsuiteid] = {"testsuiteName": testsuite.testsuitename, "testsuiteId": testsuiteid, "scenarios": {}};
 							const scenarioIndex = testsuite.scenarioIds.indexOf(scenarioid);
 							d2R[testsuiteid].scenarios[scenarioid] = {"scenarioname": testsuite.scenarioNames[scenarioIndex], "scenarioid": scenarioid, "overallstatus": "Not Executed"};
 						}
-						if (reportdata.overallstatus.length == 0) {
+						if (reportData.overallstatus.length == 0) {
 							completedSceCount++;
 							scenarioCount = testsuite.scenarioIds.length;
 							if (completedSceCount == scenarioCount) {
@@ -364,9 +366,9 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 							}
 						} else {
 							const appTypes = ["OEBS", "MobileApp", "System", "Webservice", "Mainframe", "SAP", "Desktop"];
-							const browserType = (appTypes.indexOf(execReq.apptype) > -1)? execReq.apptype:reportdata.overallstatus[0].browserType;
-							reportdata.overallstatus[0].browserType = browserType;
-							if (execType == "API") d2R[testsuiteid].scenarios[scenarioid] = {...d2R[testsuiteid].scenarios[scenarioid], ...reportdata.overallstatus[0]};
+							const browserType = (appTypes.indexOf(execReq.apptype) > -1)? execReq.apptype:reportData.overallstatus[0].browserType;
+							reportData.overallstatus[0].browserType = browserType;
+							if (execType == "API") d2R[testsuiteid].scenarios[scenarioid] = {...d2R[testsuiteid].scenarios[scenarioid], ...reportData.overallstatus[0]};
 							if (reportData.overallstatus[0].overallstatus == "Pass") statusPass++;
 							const insRepStatus =  await insertReport(executionid, scenarioid, browserType, userInfo, reportData);
 							if (insRepStatus != "fail") logger.info("Successfully inserted report data");
@@ -536,7 +538,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 	for (let userTime in userTimeMap) {
 		const batchIdx = userTimeMap[userTime]
 		const dt = userTime.split('_').pop().replace(/-/g, ' ').replace(':', ' ').split(' ');
-		const timestamp = new Date(Date.UTC(dt[2], dt[1] - 1, dt[0], dt[3], dt[4], 0)).valueOf();
+		const timestamp = new Date(dt[2], dt[1] - 1, dt[0], dt[3], dt[4], 0).valueOf();
 		const targetUser = batchInfo[batchIdx[0]].targetUser;
 		const batchObj = JSON.parse(JSON.stringify(multiExecutionData));
 		delete batchObj.batchInfo;
@@ -576,7 +578,6 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 const scheduleTestSuite = async (multiBatchExecutionData) => {
 	const fnName = "scheduleTestSuite";
 	logger.info("Inside " + fnName + " function");
-	const execIds = {"batchid": "generate", "execid": {}};
 	const userInfoMap = {};
 	var schedFlag = "success";
 	var inputs = {};
@@ -585,12 +586,13 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
 	for (let i = 0; i < userList.length; i++) {
 		if (!userInfoMap[userList[i]]) {
 			inputs = { "username": userList[i] };
-			const profile = await utils.fetchData(inputs, "/login/loadUser_Nineteen68", fnName);
+			const profile = await utils.fetchData(inputs, "login/loadUser_Nineteen68", fnName);
 			userInfoMap[profile.name] = {"userid": profile._id, "username": profile.name, "role": profile.defaultrole};
 		}
 	}
 
 	for (let i = 0; i < multiBatchExecutionData.length; i++) {
+		const execIds = {"batchid": "generate", "execid": {}};
 		const batchExecutionData = multiBatchExecutionData[i];
 		const userInfo = userInfoMap[batchExecutionData.targetUser];
 		const scheduleTime = batchExecutionData.timestamp;
@@ -598,30 +600,30 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
 		try {
 			const scheduledjob = schedule.scheduleJob(scheduleId, scheduleTime, async function () {
 				var result = await executionFunction(batchExecutionData, execIds, userInfo, "SCHEDULE");
-				result = (result == "success")? "Completed" : ((result == "fail")? "Failed" : result);
+				result = (result == "success")? "Completed" : result;
 				var schedStatus = result;
-				if (["Completed", "Terminate", "Skipped", "Failed"].indexOf(result) == -1) {
+				if (["Completed", "Terminate", "Skipped", "fail"].indexOf(result) == -1) {
 					var msg = "This scenario was skipped ";
-					if ([SOCK_NA, SOCK_SCHD, "NotApproved", "NoTask", "Modified"].indexOf(result) > -1) {
-						schedStatus = "Skipped";
+					if ([SOCK_NA, SOCK_NORM, "NotApproved", "NoTask", "Modified"].indexOf(result) > -1) {
 						if (result == SOCK_NA) msg += "due to unavailability of ICE";
 						else if (result == SOCK_NORM) msg += "due to unavailability of ICE in schedule mode";
 						else if (result == "Skipped") msg = "due to conflicting schedules";
 						else if (result == "NotApproved") msg += "because all the dependent tasks (design, scrape) needs to be approved before execution";
 						else if (result == "NoTask") msg = "because task does not exist for child node";
 						else if (result == "Modified") msg = "because task has been modified, Please approve the task";
+						schedStatus = result = "Skipped";
 					} else {
 						schedStatus = "Failed";
 						msg = "Scenario execution failed due to an error encountered during execution";
 					}
 					const tsuIds = batchExecutionData.batchInfo.map(u => u.testsuiteId);
-					const currExecIds = generateExecutionIds(execIds, tsuIds, userInfo.userid);
+					const currExecIds = await generateExecutionIds(execIds, tsuIds, userInfo.userid);
 					const executionIds = tsuIds.map(i => currExecIds.execids[i]);
 					const batchObj = {
 						"executionIds": executionIds,
-						"suiteDetails": batchExecutionData.batchInfo
+						"suitedetails": batchExecutionData.batchInfo.map(t => ({"scenarioIds": t.suiteDetails.map(s => s.scenarioId)}))
 					};
-					await updateSkippedExecutionStatus(batchObj, userInfo, schedStatus, msg);
+					await updateSkippedExecutionStatus(batchObj, userInfo, result, msg);
 				}
 				await updateScheduleStatus(scheduleId, schedStatus, execIds.batchid);
 			});
@@ -635,30 +637,19 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
 	return schedFlag;
 }
 
-/** Update schedule status of current scheduled job and insert report for the skipped scenarios. */
-const updateScheduleStatus = async (scheduleid, status, batchData) => {
+/** Update schedule status of current scheduled job and insert report for the skipped scenarios.
+Possible status options are: "Skipped", "Terminate", "Completed", "Inprogress", "Failed", "Missed", "cancelled", "scheduled" */
+const updateScheduleStatus = async (scheduleid, status, batchid) => {
 	const fnName = "updateScheduleStatus";
 	logger.info("Inside " + fnName + " function");
 	var inputs = {};
-	/*if (currentstatus === undefined) {
-		inputs = {
-			"query": "getscheduledata",
-			"scheduleid": scheduleid
-		};
-		const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
-		if (result == "fail") return "fail";
-		currentstatus = result[0].status;
-	}*/
 	inputs = {
 		"schedulestatus": status,
 		"scheduleid": scheduleid,
 		"query": "updatescheduledstatus"
 	};
-	if (batchData && batchData.batchid) inputs.batchid = batchData.batchid;
+	if (batchid) inputs.batchid = batchid;
 	const result2 = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
-	//if (status != "Skipped") return result2;
-	if (!batchData || (batchData && !batchData.createReports)) return result2;
-
 	return result2;
 };
 

@@ -48,7 +48,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     var versionFlag = 0;
     var dragsearch = false;
     $scope.allMMaps = [];
-    var split_char = (isIE)? ',':' ';
+    var split_char = (isIE)? ' ':',';
     // Complexity
     var cx_weightage = { //scale , weightage
         'Application Type': 3,
@@ -3354,7 +3354,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 }
                 unassignTask=[];
                 moduleObj = moduleObj[moduleid];
-                if(moduleObj && moduleObj.testsuitename == loadedmodule && moduleObj.actualtestsuiteid != null) {
+                if(moduleObj && moduleObj.testsuitename == loadedmodule && moduleObj.testsuiteid != null) {
                     moduleData.testsuiteId = moduleObj.testsuiteid;
                     moduleData.testsuiteName = moduleObj.testsuitename;
                     moduleData.versionNumber = moduleObj.versionnumber;
@@ -4776,7 +4776,6 @@ Purpose : displaying pop up for replication of project
         }
     }
     $scope.pasteMap = function() {
-        console.error('bwahahaha');
         if ($('.fa.fa-pencil-square-o.fa-lg.plus-icon').hasClass('active-map')) {
             openDialogMindmap('Error', 'Please complete copy step first');
             return;
