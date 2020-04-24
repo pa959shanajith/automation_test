@@ -1770,8 +1770,6 @@ var getAdjacentItems = function(activityJSON,taskidx,type){
 
 exports.pdProcess = function (req, res) {
 	try{
-		var testcaseid = uuidV4(),screenid = uuidV4();
-
 		// orderlist contains {label:'',type:''}
 		var file = JSON.parse(req.body.data.file);
 		var sessionID = uuidV4();
@@ -1803,7 +1801,7 @@ exports.pdProcess = function (req, res) {
 			var adjacentItems = getAdjacentItems(activityJSON,eachActivityIdx,'task');
 			screendatamindmap = [];
 			try{
-				screenshotdatapertask = JSON.parse(Base64.decode(eachActivity.mxCell["@data"]));	// list of objects
+				screenshotdatapertask = JSON.parse(eachActivity["#cdata"]);	// list of objects
 			}
 			catch(ex){
 				console.log("empty task");
@@ -1866,23 +1864,22 @@ exports.pdProcess = function (req, res) {
 		// data insertion logic
 		async.forEachSeries(orderlist, function (nodeObj, savedcallback) {
 			var name = nodeObj.label,type = nodeObj.type;
-			testcaseid = uuidV4(),screenid = uuidV4();
+			var screenshotdeatils=screendataobj[name].data.view[0].screenshot.split(";")[1];
+			var screenshotdata=screenshotdeatils.split(",")[1];
 			var inputs = {
 				'projectid': req.body.data.projectid,
 				'screenname': 'Screen_PD_'+name,
-				'screenid': screenid,
 				'versionnumber': 0,
 				'createdby': 'PD',
 				'createdon':new Date().getTime().toString(),
-				'createdthrough':'null1',				
-				'createdthrough': 'pd',
+				'createdbyrole':'ad',
 				'modifiedby':'asd',
 				'modifiedbyrole':'ad',
 				'modifiedon':'ew',
 				'deleted': false,
-				'skucodescreen': 'skucodescreen',
-				'tags': 'tags',
-				'screendata': JSON.stringify(screendataobj[name].data)
+				'screenshot':screenshotdata,
+				'scrapedurl':'-',
+				'scrapedata': screendataobj[name].data
 			};
 			ordernameidlist.push({'name':'Screen_PD_'+name,'type':3})
 	
@@ -1902,21 +1899,19 @@ exports.pdProcess = function (req, res) {
 						} else {
 							console.log("screen saved successfully!");
 							var inputs = {
-								'screenid': screenid,
+								'screenid': getScrapeDataQueryresult.rows[0]['parent'][0],
 								'testcasename': 'Testcase_PD_'+name,
-								'testcaseid': uuidV4(),
 								'versionnumber': 0,
 								'createdby': 'pd',
 								'createdthrough': 'pd',
 								'createdon':new Date().getTime().toString(),
-								'createdthrough':'null1',
 								'modifiedby':'asd',
 								'modifiedbyrole':'ad',
 								'modifiedon':'ew',
 								'deleted': false,
-								'skucodetestcase': 'skucodetestcase',
-								'tags': 'tags',
-								'testcasesteps':JSON.stringify(screendataobj[name].script)
+								'parent':0,
+								'dataobjects':getScrapeDataQueryresult.rows,
+								'steps':screendataobj[name].script
 							};
 							ordernameidlist.push({'name':'Testcase_PD_'+name,'type':4})
 							var args = {
@@ -2151,7 +2146,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 	// console.log(screendata)
 
 	if(adjacentItems){
-		console.log("adjacent:",adjacentItems);
+		// console.log("adjacent:",adjacentItems);
 		// list of sources(only shapes) and targets (assuming only one)
 
 		if(adjacentItems["error"]){
