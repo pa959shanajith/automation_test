@@ -19,11 +19,11 @@ const DO_NOT_PROCESS = "do_not_process_response";
 
 /** This service reads the testsuite and scenario information for the testsuites */
 exports.readTestSuite_ICE = async (req, res) => {
-	logger.info("Inside UI service: readTestSuite_ICE");
+	const fnName = "readTestSuite_ICE";
+	logger.info("Inside UI service " + fnName);
 	const batchData = req.body.readTestSuite;
 	const fromFlg = req.body.fromFlag;
 	const userInfo = {"userid": req.session.userid, "role": req.session.activeRoleId};
-	const fnName = "readTestSuite_ICE";
 	var responsedata = {};
 	var inputs = {};
 
@@ -259,7 +259,7 @@ const insertReport = async (executionid, scenarioId, browserType, userInfo, repo
 		"modifiedbyrole": userInfo.role,
 		"query": "insertreportquery"
 	};
-	const result = utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE1", "insertReport");
+	const result = utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "insertReport");
 	return result;
 };
 
