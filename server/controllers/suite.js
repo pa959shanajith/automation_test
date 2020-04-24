@@ -1,9 +1,6 @@
-var async = require('async');
-var myserver = require('../lib/socket');
-var epurl = process.env.NDAC_URL;
-var Client = require("node-rest-client").Client;
-var client = new Client();
+var uuid = require('uuid-random');
 var schedule = require('node-schedule');
+var myserver = require('../lib/socket');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
@@ -528,6 +525,8 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 	};
 	const chkResult = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
 	if (chkResult != -1) return res.send((chkResult == "fail")? "fail": {"status": "booked", "user": addressList[chkResult]});
+	/** Add if else for smart schedule below this **/
+	// smartScheduleId = uuid(); Pass it to args as smartid
 	const userTimeMap = {};
 	const multiBatchExecutionData = [];
 	for (let i = 0; i < addressList.length; i++) {
@@ -570,6 +569,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 		else batchObj.scheduleId = insResult.id;
 		multiBatchExecutionData.push(batchObj);
 	}
+	/** Add if else for smart schedule above this **/
 	const schResult = await scheduleTestSuite(multiBatchExecutionData);
 	return res.send(schResult);
 };
@@ -579,6 +579,7 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
 	const fnName = "scheduleTestSuite";
 	logger.info("Inside " + fnName + " function");
 	const userInfoMap = {};
+	const execIdsMap = {};
 	var schedFlag = "success";
 	var inputs = {};
 
@@ -592,11 +593,16 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
 	}
 
 	for (let i = 0; i < multiBatchExecutionData.length; i++) {
-		const execIds = {"batchid": "generate", "execid": {}};
+		var execIds = {"batchid": "generate", "execid": {}};
 		const batchExecutionData = multiBatchExecutionData[i];
 		const userInfo = userInfoMap[batchExecutionData.targetUser];
 		const scheduleTime = batchExecutionData.timestamp;
 		const scheduleId = batchExecutionData.scheduleId;
+		const smartId = batchExecutionData.smartScheduleId;
+		if (smartId !== undefined) {
+			if (execIdsMap[smartId] === undefined) execIdsMap[smartId] = execIds;
+			else execIds = execIdsMap[smartId];
+		}
 		try {
 			const scheduledjob = schedule.scheduleJob(scheduleId, scheduleTime, async function () {
 				var result = await executionFunction(batchExecutionData, execIds, userInfo, "SCHEDULE");

@@ -303,18 +303,6 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 						doNotSchedule = true;
 						return false;
 					}
-					/*const chkExistDT = $(".scheduleDataBodyRowChild");  // Check if a schedule for that user alredy exists for the given timestamp
-					for(let i = 0; i < chkExistDT.length; i++) {
-						const rowChild = chkExistDT[i].children;
-						const cEDd = rowChild[0].innerText.split(" ")[0].split("-");
-						const cETt = rowChild[0].innerText.split(" ")[1].split(":");
-						const rowTime = new Date(cEDd[0], cEDd[1]-1, cEDd[2], cETt[0], cETt[1]);
-						if(rowTime.toString() == timestamp.toString() && rowChild[5].innerText.trim() == "scheduled" && rowChild[1].innerText.trim() == suiteInfo.targetUser) {
-							doNotSchedule = true;
-							openModelPopup("Schedule Test Suite", "Selected host already scheduled for given time.");
-							break;
-						}
-					}*/
 					if (doNotSchedule) return false;
 					$(this).find(".scenarioSchdCon tbody tr").each(function() {
 						if($(this).find(".selectToSched").is(":checked")) {
