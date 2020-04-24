@@ -111,8 +111,8 @@ module.exports.approvalStatusCheck = async executionData => {
 	else if (result[0] != 0) data.res = 'NotApproved';
 };
 
-var fetchData = async (inputs, url, from, all) => {
-	var args = {
+const fetchData = async (inputs, url, from, all) => {
+	const args = {
 		data: inputs,
 		headers: {
 			"Content-Type": "application/json"
@@ -120,12 +120,13 @@ var fetchData = async (inputs, url, from, all) => {
 	};
 	//from = " from " + ((from)? from : fetchData.caller.name);
 	from = (from)? " from " + from : "";
-	var query = (inputs.query)? " - " + inputs.query:"";
+	const query = (inputs.query)? " - " + inputs.query:"";
 	logger.info("Calling NDAC Service: " + url + from + query);
-	var promiseData = (new Promise((rsv, rej) => {
-		client.post(epurl + url, args, (result, response) => {
+	const promiseData = (new Promise((rsv, rej) => {
+		const apiReq = client.post(epurl + url, args, (result, response) => {
 			if (response.statusCode != 200 || result.rows == "fail") {
 				logger.error("Error occurred in " + url + from + query + ", Error Code : ERRNDAC");
+				logger.debug("Response is %s", result.toString());
 				//rej("fail");
 				if (all) rsv(["fail", result, response]);
 				else rsv("fail");
@@ -134,6 +135,10 @@ var fetchData = async (inputs, url, from, all) => {
 				if (all) rsv([result, response]);
 				else rsv(result);
 			}
+		});
+		apiReq.on('error', function(err) {
+			logger.error("Error occurred in " + url + from + query + ", Error Code : ERRNDAC, Error: %s", err);
+			rsv("fail");
 		});
 	}));
 	return promiseData;
