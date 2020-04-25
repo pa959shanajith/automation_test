@@ -531,9 +531,9 @@ if (cluster.isMaster) {
 		//Execute Screen Routes
 		app.post('/readTestSuite_ICE', auth.protect, suite.readTestSuite_ICE);
 		app.post('/updateTestSuite_ICE', auth.protect, suite.updateTestSuite_ICE);
-		app.post('/ExecuteTestSuite_ICE', auth.protect, suite.ExecuteTestSuite_ICE);
 		app.post('/getTestcaseDetailsForScenario_ICE', auth.protect, suite.getTestcaseDetailsForScenario_ICE);
-		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_SVN);
+		app.post('/ExecuteTestSuite_ICE', auth.protect, suite.ExecuteTestSuite_ICE);
+		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
 		//Scheduling Screen Routes
 		app.post('/testSuitesScheduler_ICE', auth.protect, suite.testSuitesScheduler_ICE);
 		app.post('/getScheduledDetails_ICE', auth.protect, suite.getScheduledDetails_ICE);

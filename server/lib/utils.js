@@ -41,12 +41,12 @@ module.exports.getSocketList = async (toFetch) => {
 	if (toFetch != "ICE") {
 		connectusers = redisres.map(e => e.split('_').slice(2).join('_'));
 	} else {
-		for (let i = 0; i < redisres.length; i++) {
-			const ed = redisres[i].split('_');
+		for (const rri of redisres) {
+			const ed = rri.split('_');
 			const mode = ed[1];
 			const user = ed.slice(2).join('_');
 			redisServer.redisSubServer.subscribe('ICE2_' + user, 1);
-			redisServer.redisPubICE.publish(redisres[i], JSON.stringify({"emitAction":"getSocketInfo","username":user}));
+			redisServer.redisPubICE.publish(rri, JSON.stringify({"emitAction":"getSocketInfo","username":user}));
 			const res = await (new Promise((rsv, rej) => {
 				async function fetchIP(channel, message) {
 					var data = JSON.parse(message);
@@ -149,7 +149,7 @@ module.exports.fetchData = fetchData;
 
 module.exports.tokenValidation = async (userInfo) => {
 	var validUser = false;
-	const username = userInfo.username.toLowerCase();
+	const username = (userInfo.username || "").toLowerCase();
 	userInfo.username = username;
 	const emsg = "Inside UI service: ExecuteTestSuite_ICE_SVN ";
 	const tokenValidation = {
@@ -158,10 +158,10 @@ module.exports.tokenValidation = async (userInfo) => {
 	}
 	const inputs = {
 		'username': username,
-		'tokenname': userInfo.tokenname
+		'tokenname': userInfo.tokenname || ""
 	};
 	const response = await fetchData(inputs, "login/authenticateUser_Nineteen68_CI", "tokenValidation");
-	if (response !== "err") validUser = bcrypt.compareSync(userInfo.tokenhash, response.hash);
+	if (response != "fail") validUser = bcrypt.compareSync(userInfo.tokenhash || "", response.hash);
 	if (validUser) {
 		userInfo.userid = response.userid;
 		userInfo.role = response.role;

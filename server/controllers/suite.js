@@ -24,8 +24,7 @@ exports.readTestSuite_ICE = async (req, res) => {
 	var responsedata = {};
 	var inputs = {};
 
-	for (let i = 0; i < batchData.length; i++) {
-		const suite = batchData[i];
+	for (const suite of batchData) {
 		const moduleId = suite.testsuiteid;
 		inputs = {
 			"query": "gettestsuite",
@@ -74,8 +73,7 @@ exports.updateTestSuite_ICE = async (req, res) => {
 	const userInfo = {"userid": req.session.userid, "username": req.session.username, "role": req.session.activeRoleId};
 	var batchDetails = req.body.batchDetails;
 	var overallstatusflag = "success";
-	for (let i = 0; i < batchDetails.length; i++) {
-		var testsuite = batchDetails[i];
+	for (const testsuite of batchDetails) {
 		var inputs = {
 			"query": "updatetestsuitedataquery",
 			"conditioncheck": testsuite.conditioncheck,
@@ -140,8 +138,7 @@ const fetchScenarioDetails = async (scenarioid, userid) => {
 	if (testcases == "fail") return "fail";
 
 	// Step 2: Get Testcasesteps
-	for (let i = 0; i < testcases.length; i++) {
-		const tc = testcases[i];
+	for (const tc of testcases) {
 		if (allTestcaseObj[tc._id] === undefined) {
 			inputs = {
 				"testcaseid": tc._id,
@@ -188,8 +185,7 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 		"suitedetails": []
 	};
 	const batchInfo = batchData.batchInfo;
-	for (let i = 0; i < batchInfo.length; i++) {
-		const suite = batchInfo[i];
+	for (const suite of batchInfo) {
 		const testsuiteid = suite.testsuiteId;
 		const scenarioList = [];
 		const suiteObj = {
@@ -208,8 +204,7 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			"scenarioIds": []
 		};
 		const suiteDetails = suite.suiteDetails;
-		for (let j = 0; j < suiteDetails.length; j++) {
-			const tsco = suiteDetails[j];
+		for (const tsco of suiteDetails) {
 			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid);
 			if (scenario == "fail") return "fail";
 			scenario = Object.assign(scenario, tsco);
@@ -231,8 +226,7 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 
 /** Function responsible for generating batchid and executionid dfor given list of testsuiteid */
 const generateExecutionIds = async (execIds, tsuIds, userid) => {
-	for (let i = 0; i < tsuIds.length; i++) {
-		const tsuid = tsuIds[i];
+	for (const tsuid of tsuIds) {
 		if (execIds.execid[tsuid] == undefined) execIds.execid[tsuid] = null;
 	}
 	const inputs = {
@@ -291,8 +285,8 @@ const updateSkippedExecutionStatus = async (batchData, userInfo, status, msg) =>
 	const executionIds = batchData.executionIds;
 	for (let i = 0; i < batchData.suitedetails.length; i++) {
 		const suite = batchData.suitedetails[i];
-		for (let j = 0; j < suite.scenarioIds.length; j++) {
-			await insertReport(executionIds[i], suite.scenarioIds[j], "N/A", userInfo, reportData);
+		for (const scid of suite.scenarioIds) {
+			await insertReport(executionIds[i], scid, "N/A", userInfo, reportData);
 		}
 	}
 	await updateExecutionStatus(executionIds, "fail");
@@ -452,11 +446,10 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 
 /** This service executes the testsuite(s) for request from API */
 exports.ExecuteTestSuite_ICE_SVN = async (req, res) => {
-	logger.info("Inside UI service: ExecuteTestSuite_ICE_SVN");
+	logger.info("Inside UI service: ExecuteTestSuite_ICE_API");
 	const multiBatchExecutionData = req.body.executionData;
 	const executionResult = [];
-	for (let i = 0; i < multiBatchExecutionData.length; i++) {
-		const batchExecutionData = multiBatchExecutionData[i];
+	for (const batchExecutionData of multiBatchExecutionData) {
 		const userInfo = await utils.tokenValidation(batchExecutionData.userInfo);
 		const execResponse = userInfo.inputs;
 		executionResult.push(execResponse);
@@ -468,7 +461,7 @@ exports.ExecuteTestSuite_ICE_SVN = async (req, res) => {
 			result = await executionFunction(batchExecutionData, execIds, userInfo, "API");
 		} catch (ex) {
 			result = "fail";
-			logger.error("Error in ExecuteTestSuite_ICE_SVN service. Error: %s", ex)
+			logger.error("Error in ExecuteTestSuite_ICE_API service. Error: %s", ex)
 		}
 		if (result == SOCK_NA) execResponse.err = SOCK_NA_MSG;
 		else if (result == SOCK_SCHD) execResponse.err = SOCK_SCHD_MSG;
@@ -494,6 +487,70 @@ exports.ExecuteTestSuite_ICE_SVN = async (req, res) => {
 	return res.send({"executionStatus": executionResult});
 };
 
+/** This service executes the testsuite(s) for request from API */
+exports.ExecuteTestSuite_ICE_API = async (req, res) => {
+	logger.info("Inside UI service: ExecuteTestSuite_ICE_API");
+	const multiBatchExecutionData = req.body.executionData;
+	const userRequestMap = {};
+	const userInfoList = [];
+	const executionResult = [];
+	for (let i = 0; i < multiBatchExecutionData.length; i++) {
+		const executionData = multiBatchExecutionData[i];
+		const userInfo = await utils.tokenValidation(executionData.userInfo || {});
+		userInfoList.push(userInfo);
+		const execResponse = userInfo.inputs;
+		if (execResponse.tokenValidation == "passed") {
+			delete execResponse.err;
+			const username = userInfo.username;
+			if (userRequestMap[username] == undefined) userRequestMap[username] = [i];
+			else userRequestMap[username].push(i);
+		}
+		executionResult.push(execResponse);
+	}
+	const executionIndicesList = Object.values(userRequestMap);
+	const batchExecutionPromiseList = executionIndicesList.map(executionIndices => (async () => {
+		try {
+			for (const exi of executionIndices) {
+				const batchExecutionData = multiBatchExecutionData[exi];
+				const execResponse = executionResult[exi];
+				const userInfo = userInfoList[exi];
+				const execIds = {"batchid": "generate", "execid": {}};
+				var result;
+				try {
+					result = await executionFunction(batchExecutionData, execIds, userInfo, "API");
+				} catch (ex) {
+					result = "fail";
+					logger.error("Error in ExecuteTestSuite_ICE_API service. Error: %s", ex)
+				}
+				if (result == SOCK_NA) execResponse.err = SOCK_NA_MSG;
+				else if (result == SOCK_SCHD) execResponse.err = SOCK_SCHD_MSG;
+				else if (result == "NotApproved") execResponse.err = "All the dependent tasks (design, scrape) needs to be approved before execution";
+				else if (result == "NoTask") execResponse.err = "Task does not exist for child node";
+				else if (result == "Modified") execResponse.err = "Task has been modified, Please approve the task";
+				else if (result == "Skipped") execResponse.err = "Execution is skipped because another execution is running in ICE";
+				else if (result == "fail") execResponse.err = "Internal error occurred during execution";
+				else {
+					execResponse.status = result[1];
+					const execResult = [];
+					for (tsuid in result[0]) {
+						const tsu = result[0][tsuid];
+						const scenarios = [];
+						for (tscid in tsu.scenarios) scenarios.push(tsu.scenarios[tscid]);
+						delete tsu.scenarios;
+						tsu.suiteDetails = scenarios;
+						execResult.push(tsu);
+					}
+					execResponse.batchInfo = execResult;
+				}
+			}
+		} catch (e) {
+			return false;
+		}
+	})());
+	await Promise.all(batchExecutionPromiseList)
+	return res.send({"executionStatus": executionResult});
+};
+
 /** Service to fetch all the testcase, screen and project names for provided scenarioid */
 exports.getTestcaseDetailsForScenario_ICE = async (req, res) => {
 	logger.info("Inside Ui service getTestcaseDetailsForScenario_ICE");
@@ -509,8 +566,7 @@ exports.getTestcaseDetailsForScenario_ICE = async (req, res) => {
 		"id": req.body.testScenarioId
 	};
 	data = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", fnName);
-	if (data != "fail") for (let i = 0; i < data.length; i++) {
-		const e = data[i];
+	if (data != "fail") for (const e of data) {
 		testcasenamelist.push(e["name"]);
 		testcaseidlist.push(e["_id"]);
 		screenidlist.push(e["screenid"]);
@@ -560,7 +616,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 		if (userTimeMap[key] === undefined) userTimeMap[key] = [i];
 		else userTimeMap[key].push(i);
 	}
-	for (let userTime in userTimeMap) {
+	for (const userTime in userTimeMap) {
 		const batchIdx = userTimeMap[userTime]
 		const dt = userTime.split('_').pop().replace(/-/g, ' ').replace(':', ' ').split(' ');
 		const timestamp = new Date(dt[2], dt[1] - 1, dt[0], dt[3], dt[4], 0).valueOf();
@@ -610,18 +666,17 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
 	var inputs = {};
 
 	const userList = multiBatchExecutionData.map(u => u.targetUser);
-	for (let i = 0; i < userList.length; i++) {
-		if (!userInfoMap[userList[i]]) {
-			inputs = { "username": userList[i] };
+	for (const user of userList) {
+		if (!userInfoMap[user]) {
+			inputs = { "username": user };
 			const profile = await utils.fetchData(inputs, "login/loadUser_Nineteen68", fnName);
-			if (profile != "fail") return "fail";
-			userInfoMap[profile.name] = {"userid": profile._id, "username": profile.name, "role": profile.defaultrole};
+			if (profile == "fail") return "fail";
+			userInfoMap[user] = {"userid": profile._id, "username": profile.name, "role": profile.defaultrole};
 		}
 	}
 
-	for (let i = 0; i < multiBatchExecutionData.length; i++) {
+	for (const batchExecutionData of multiBatchExecutionData) {
 		var execIds = {"batchid": "generate", "execid": {}};
-		const batchExecutionData = multiBatchExecutionData[i];
 		const userInfo = userInfoMap[batchExecutionData.targetUser];
 		const scheduleTime = batchExecutionData.timestamp;
 		const scheduleId = batchExecutionData.scheduleId;
