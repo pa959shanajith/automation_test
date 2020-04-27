@@ -478,11 +478,10 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			const scenarioDescriptionText = [];
 			const scenarioAccNoMap = {};
 			$.each($(this).parents('.suiteNameTxt').next('div').find('.exe-scenarioIds'), function () {
-				const scenarioDescObj = [];
 				testScenarioIds.push($(this).attr("sId"));
 				getParamPaths.push($(this).parent().find(".getParamPath").val().trim());
 				conditionCheck.push($(this).parent().find(".conditionCheck option:selected").val());
-				scenarioDescObj = $(this).parent().find('.getScenarioDescVal').text().trim();
+				var scenarioDescObj = $(this).parent().find('.getScenarioDescVal').text().trim();
 				if (scenarioDescObj !== '') scenarioDescObj = JSON.parse(scenarioDescObj);
 				scenarioAccNoMap[$(this).attr("sId")] = scenarioDescObj;
 				scenarioDescriptionText.push($(this).parent().children('td.variableMap').find('.scenarioDescriptionTxt').text());

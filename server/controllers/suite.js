@@ -445,49 +445,6 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 };
 
 /** This service executes the testsuite(s) for request from API */
-exports.ExecuteTestSuite_ICE_SVN = async (req, res) => {
-	logger.info("Inside UI service: ExecuteTestSuite_ICE_API");
-	const multiBatchExecutionData = req.body.executionData;
-	const executionResult = [];
-	for (const batchExecutionData of multiBatchExecutionData) {
-		const userInfo = await utils.tokenValidation(batchExecutionData.userInfo);
-		const execResponse = userInfo.inputs;
-		executionResult.push(execResponse);
-		if (execResponse.tokenValidation != "passed") continue;
-		else delete execResponse.err;
-		const execIds = {"batchid": "generate", "execid": {}};
-		var result;
-		try {
-			result = await executionFunction(batchExecutionData, execIds, userInfo, "API");
-		} catch (ex) {
-			result = "fail";
-			logger.error("Error in ExecuteTestSuite_ICE_API service. Error: %s", ex)
-		}
-		if (result == SOCK_NA) execResponse.err = SOCK_NA_MSG;
-		else if (result == SOCK_SCHD) execResponse.err = SOCK_SCHD_MSG;
-		else if (result == "NotApproved") execResponse.err = "All the dependent tasks (design, scrape) needs to be approved before execution";
-		else if (result == "NoTask") execResponse.err = "Task does not exist for child node";
-		else if (result == "Modified") execResponse.err = "Task has been modified, Please approve the task";
-		else if (result == "Skipped") execResponse.err = "Execution is skipped because another execution is running in ICE";
-		else if (result == "fail") execResponse.err = "Internal error occurred during execution";
-		else {
-			execResponse.status = result[1];
-			const execResult = [];
-			for (tsuid in result[0]) {
-				const tsu = result[0][tsuid];
-				const scenarios = [];
-				for (tscid in tsu.scenarios) scenarios.push(tsu.scenarios[tscid]);
-				delete tsu.scenarios;
-				tsu.suiteDetails = scenarios;
-				execResult.push(tsu);
-			}
-			execResponse.batchInfo = execResult;
-		}
-	}
-	return res.send({"executionStatus": executionResult});
-};
-
-/** This service executes the testsuite(s) for request from API */
 exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE_API");
 	const multiBatchExecutionData = req.body.executionData;

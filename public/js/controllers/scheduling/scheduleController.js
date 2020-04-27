@@ -228,8 +228,8 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 			else if(slctdOption == "In Progress") keySlctd = "Inprogress";
 			else if(slctdOption == "Terminated") keySlctd = "Terminate";
 			else if(slctdOption == "Skipped") keySlctd = "Skipped";
-			else if(slctdOption == "Failed 01") keySlctd = "Failed 01";
-			else if(slctdOption == "Failed 02") keySlctd = "Failed 02";
+			else if(slctdOption == "Missed") keySlctd = "Missed";
+			else if(slctdOption == "Failed") keySlctd = "Failed";
 			else if(slctdOption == "Cancelled") keySlctd = "cancelled";
 			else if(slctdOption == "Scheduled") keySlctd = "scheduled";
 			var content = $("#scheduledDataBody>.scheduleDataBodyRow .scheduleDataBodyRowChild");

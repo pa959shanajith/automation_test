@@ -161,7 +161,7 @@ module.exports.tokenValidation = async (userInfo) => {
 		'tokenname': userInfo.tokenname || ""
 	};
 	const response = await fetchData(inputs, "login/authenticateUser_Nineteen68_CI", "tokenValidation");
-	if (response != "fail") validUser = bcrypt.compareSync(userInfo.tokenhash || "", response.hash);
+	if (response != "fail" && response != "invalid") validUser = bcrypt.compareSync(userInfo.tokenhash || "", response.hash);
 	if (validUser) {
 		userInfo.userid = response.userid;
 		userInfo.role = response.role;

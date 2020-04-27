@@ -719,7 +719,7 @@ exports.getReportsData_ICE = function(req, res) {
 exports.get_Nineteen68Report = async(req, res) => {
     logger.info("Inside UI service: get_Nineteen68Report");
     try {
-		var executionId = req.body.execution_data.executionId;
+		var executionId = req.body.execution_data.executionId || "";
 		var scenarioIds = req.body.execution_data.scenarioIds;
 		var flag = "";
 		var finalReport = [];
@@ -740,12 +740,12 @@ exports.get_Nineteen68Report = async(req, res) => {
 				"Content-Type": "application/json"
 			}
 		};
-		logger.info("Calling NDAC Service from getReport_Nineteen68 - projectsUnderDomain: reports/getReport_Nineteen68");
+		logger.info("Calling NDAC Service from get_Nineteen68Report - get_Nineteen68Report: reports/get_Nineteen68Report");
 		client.post(epurl + "reports/get_Nineteen68Report", args,
 			function(reportResult, response) {
 				if (response.statusCode != 200 || reportResult.rows == "fail") {
 					flag = "fail";
-					logger.error("Error occurred in the service getReport_Nineteen68 - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports. Error Code : ERRNDAC");
+					logger.error("Error occurred in the service get_Nineteen68Report - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports. Error Code : ERRNDAC");
 					res.send(flag);
 				} else {
 					try{
@@ -814,16 +814,16 @@ exports.get_Nineteen68Report = async(req, res) => {
 						for(var k in tempModDict){
 							finalReport.push(tempModDict[k]);
 						} 
-						logger.info("Sending reports in the service getReport_Nineteen68: final function");
+						logger.info("Sending reports in the service get_Nineteen68Report: final function");
 						res.send(finalReport);
 					} catch (exception) {
-						logger.error("Exception in the service getReport_Nineteen68 - projectsUnderDomain: %s", exception);
+						logger.error("Exception in the service get_Nineteen68Report - projectsUnderDomain: %s", exception);
 						res.send("fail");
 					}            
 				}
 			});
     } catch (exception) {
-        logger.error("Exception in the service getReport_Nineteen68 - cycleid: %s", exception);
+        logger.error("Exception in the service get_Nineteen68Report - cycleid: %s", exception);
         res.send("fail");
     }
 };
