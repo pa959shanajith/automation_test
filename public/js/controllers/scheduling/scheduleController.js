@@ -108,7 +108,9 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 				for (var k=0; k < result.length; k++) {
 					if (result[k].scenariodetails[0].scenarioids !== undefined) result[k].scenariodetails = [result[k].scenariodetails];
 					result[k].browserlist = result[k].executeon;
-					result[k].scheduledatetime = new Date(result[k].scheduledon).toISOString().replace("T"," ").split(":").slice(0,-1).join(":");
+					const dt = new Date(result[k].scheduledon);
+					result[k].scheduledatetime = dt.getFullYear()+"-"+("0"+(dt.getMonth()+1)).slice(-2)+"-"
+						+("0"+dt.getDate()).slice(-2)+" "+("0"+dt.getHours()).slice(-2)+":"+("0"+dt.getMinutes()).slice(-2);
 				}
 				$scope.scheduledData = result;
 				$timeout(function(){
