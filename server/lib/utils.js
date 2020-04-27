@@ -126,7 +126,7 @@ const fetchData = async (inputs, url, from, all) => {
 		const apiReq = client.post(epurl + url, args, (result, response) => {
 			if (response.statusCode != 200 || result.rows == "fail") {
 				logger.error("Error occurred in " + url + from + query + ", Error Code : ERRNDAC");
-				logger.debug("Response is %s", result.toString());
+				logger.debug("Response is %s", (typeof(result)  == "object")? JSON.stringify(result):result.toString());
 				//rej("fail");
 				if (all) rsv(["fail", result, response]);
 				else rsv("fail");
