@@ -715,6 +715,119 @@ exports.getReportsData_ICE = function(req, res) {
     }
 };
 
+//Get report for execution
+exports.get_Nineteen68Report = async(req, res) => {
+    logger.info("Inside UI service: get_Nineteen68Report");
+    try {
+		var executionId = req.body.execution_data.executionId;
+		var scenarioIds = req.body.execution_data.scenarioIds;
+		var flag = "";
+		var finalReport = [];
+		var tempModDict = {};
+		const userInfo = await utils.tokenValidation(req.body.userInfo);
+		const execResponse = userInfo.inputs;
+		finalReport.push(execResponse);
+		if (execResponse.tokenValidation != "passed") pass;
+		else delete execResponse.err;
+		var inputs = {
+			"query": "get_Nineteen68Report",
+			"executionId": executionId,
+			"scenarioIds": scenarioIds
+		};
+		var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
+		logger.info("Calling NDAC Service from getReport_Nineteen68 - projectsUnderDomain: reports/getReport_Nineteen68");
+		client.post(epurl + "reports/get_Nineteen68Report", args,
+			function(reportResult, response) {
+				if (response.statusCode != 200 || reportResult.rows == "fail") {
+					flag = "fail";
+					logger.error("Error occurred in the service getReport_Nineteen68 - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports. Error Code : ERRNDAC");
+					res.send(flag);
+				} else {
+					try{
+						for(i=0; i<reportResult.rows.length; ++i) {
+							var reportData = reportResult.rows[i].report;
+							var reportInfo = reportResult.rows[i];
+							var pass = fail = terminated = total = 0;
+							reportData.overallstatus[0].domainName=reportInfo.domainName;
+							reportData.overallstatus[0].projectName=reportInfo.projectName;
+							reportData.overallstatus[0].releaseName=reportInfo.releaseName;
+							reportData.overallstatus[0].cycleName=reportInfo.cycleName;
+							reportData.overallstatus[0].reportId=reportInfo.reportId;
+							var getTym = reportData.overallstatus[0].EndTime.split(".")[0];
+							var getDat = getTym.split(" ")[0].split("-");
+							reportData.overallstatus[0].date = getDat[1] + "/" + getDat[2] + "/" + getDat[0];
+							reportData.overallstatus[0].time = getTym.split(" ")[1];
+							for(j=0;j<reportData.rows.length;++j){
+								if (reportData.rows[j].status == "Pass") {
+									pass++;
+								} else if (reportData.rows[j].status == "Fail") {
+									fail++;
+								} else if (reportData.rows[j].hasOwnProperty("Step") && reportData.rows[j].Step == "Terminated") {
+									terminated++
+								}
+
+								if ('testcase_details' in reportData.rows[j]) {
+									if (typeof(reportData.rows[j].testcase_details) == "string" && reportData.rows[j].testcase_details != "" && reportData.rows[j].testcase_details != "undefined") {
+										reportData.rows[j].testcase_details = JSON.parse(reportData.rows[j].testcase_details);
+									} else if (typeof(reportData.rows[j].testcase_details) == "object") {
+										reportData.rows[j].testcase_details = reportData.rows[j].testcase_details;
+									} else {
+										reportData.rows[j].testcase_details = reportData.rows[j].testcase_details;
+									}
+
+									if (reportData.rows[j].testcase_details == "") {
+										reportData.rows[j].testcase_details = {
+											"actualResult_pass": "",
+											"actualResult_fail": "",
+											"testcaseDetails": ""
+										}
+									}
+								}
+							}
+							total = pass+fail+terminated;
+							reportData.overallstatus[0].pass = (parseFloat((pass / total) * 100).toFixed(2)) > 0 ? parseFloat((pass / total) * 100).toFixed(2) : parseInt(0);
+							reportData.overallstatus[0].fail = (parseFloat((fail / total) * 100).toFixed(2)) > 0 ? parseFloat((fail / total) * 100).toFixed(2) : parseInt(0);
+							reportData.overallstatus[0].terminate = (parseFloat((terminated / total) * 100).toFixed(2)) > 0 ? parseFloat((terminated / total) * 100).toFixed(2) : parseInt(0);
+							// finalReport.push(reportData);
+							scenarioReport={};
+							scenarioReport.scenarioId=reportInfo.scenariodId;
+							scenarioReport.scenarioName=reportInfo.scenarioName;
+							scenarioReport.Report=reportData;
+							if (reportInfo.moduleId in tempModDict) {
+								moduleRep=tempModDict[reportInfo.moduleId];
+								moduleRep.Scenarios.push(scenarioReport);
+								tempModDict[reportInfo.moduleId]=moduleRep;
+							} else {
+								moduleReport={};
+								moduleReport.moduleId=reportInfo.moduleId;
+								moduleReport.moduleName=reportInfo.moduleName;
+								moduleReport.Scenarios=[];
+								moduleReport.Scenarios.push(scenarioReport);
+								tempModDict[reportInfo.moduleId]=moduleReport;
+							}
+						}
+						for(var k in tempModDict){
+							finalReport.push(tempModDict[k]);
+						} 
+						logger.info("Sending reports in the service getReport_Nineteen68: final function");
+						res.send(finalReport);
+					} catch (exception) {
+						logger.error("Exception in the service getReport_Nineteen68 - projectsUnderDomain: %s", exception);
+						res.send("fail");
+					}            
+				}
+			});
+    } catch (exception) {
+        logger.error("Exception in the service getReport_Nineteen68 - cycleid: %s", exception);
+        res.send("fail");
+    }
+};
+
 function validateData(content, type) {
     logger.info("Inside function: validateData");
     switch (type) {

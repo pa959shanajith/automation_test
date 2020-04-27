@@ -547,6 +547,7 @@ if (cluster.isMaster) {
 		app.post('/openScreenShot', report.openScreenShot);
 		app.post('/connectJira_ICE', report.connectJira_ICE);
 		app.post('/getReportsData_ICE', report.getReportsData_ICE);
+		app.post('/get_Nineteen68Report', report.get_Nineteen68Report);
 		//Plugin Routes
 		app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
 		app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
