@@ -535,6 +535,7 @@ exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 					for (tsuid in result[0]) {
 						const tsu = result[0][tsuid];
 						const scenarios = [];
+						tsu.executionId = execIds.execid[tsuid];
 						for (tscid in tsu.scenarios) scenarios.push(tsu.scenarios[tscid]);
 						delete tsu.scenarios;
 						tsu.suiteDetails = scenarios;
