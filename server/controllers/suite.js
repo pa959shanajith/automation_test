@@ -556,7 +556,11 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 	const batchInfo = multiExecutionData.batchInfo;
 	const taskApproval = await utils.approvalStatusCheck(batchInfo);
 	if (taskApproval.res !== "pass") return res.send(taskApproval.res);
-	const dateTimeList = batchInfo.map(u => (u.date + " " + u.time));
+	const dateTimeList = batchInfo.map(u => {
+		const dt = u.date.split("-");
+		const tm = u.time.split(":");
+		return new Date(dt[2], dt[1] - 1, dt[0], tm[0], tm[1], 0).valueOf().toString();
+	});
 	const addressList = batchInfo.map(u => u.targetUser);
 	var inputs = {
 		"query": "checkscheduleddetails",
@@ -576,8 +580,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 	}
 	for (const userTime in userTimeMap) {
 		const batchIdx = userTimeMap[userTime]
-		const dt = userTime.split('_').pop().replace(/-/g, ' ').replace(':', ' ').split(' ');
-		const timestamp = new Date(dt[2], dt[1] - 1, dt[0], dt[3], dt[4], 0).valueOf();
+		const timestamp = parseInt(userTime.split('_').pop());
 		const targetUser = batchInfo[batchIdx[0]].targetUser;
 		const batchObj = JSON.parse(JSON.stringify(multiExecutionData));
 		delete batchObj.batchInfo;
@@ -628,7 +631,7 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
 		if (!userInfoMap[user]) {
 			inputs = { "username": user };
 			const profile = await utils.fetchData(inputs, "login/loadUser_Nineteen68", fnName);
-			if (profile == "fail") return "fail";
+			if (profile == "fail" || profile == null) return "fail";
 			userInfoMap[user] = {"userid": profile._id, "username": profile.name, "role": profile.defaultrole};
 		}
 	}
