@@ -363,8 +363,9 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 				else if (data == "NoTask") openModelPopup("Schedule Test Suite", "Task does not exist for child node");
 				else if (data == "Modified") openModelPopup("Schedule Test Suite", "Task has been modified, Please approve the task");
 				else if (data.status == "booked") openModelPopup("Schedule Test Suite", "Schedule time is matching for testsuites scheduled for " + data.user);
-				else if (data == "success") {
-					openModelPopup("Schedule Test Suite", "Successfully scheduled.");
+				else if (data == "success" || data.includes("success")) {
+					if(data.includes("Set")) openModelPopup("Schedule Test Suite", data.replace('success',''));
+					else openModelPopup("Schedule Test Suite", "Successfully scheduled.");
 					$(".selectScheduleSuite, .selectToSched").prop("checked", false);
 					$(".selectBrowserSc").find(".sb").removeClass("sb");
 					$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;").val("");
@@ -440,11 +441,14 @@ function openPopup(id) {
 			$('#smartScheduling').find('.btn-default')[1].click();
 			openModelPopup("Smart Scheduling", "More than 1 ICE needs to be active to use Smart Scheduling");
 			$('#' + id)[0].children[0].selectedIndex = 0;
+			sequence(true);
 		} else {
 			$("#smartScheduling").modal("show");
 			$($('#smartScheduling').find('.btn-default')[1]).data('selector-id', id);
 			$('#smartScheduling').find('.btn-default')[1].onclick = function () {
 				$('#' + $(this).data('selector-id')).children()[0].selectedIndex = 0;
+				sequence(true);
+				smartBatch = false;
 			}
 			smartBatch = true;
 			sequence(true);

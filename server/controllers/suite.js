@@ -598,11 +598,20 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 	const userInfo = { "userid": req.session.userid, "username": req.session.username, "role": req.session.activeRoleId };
 	const multiExecutionData = req.body.executionData;
 	var batchInfo = multiExecutionData.batchInfo;
-	const dateTimeList = batchInfo.map(u => (u.date + " " + u.time));
+	var stat = "none"
+	var dateTimeList = batchInfo.map(u => (u.date + " " + u.time));
 	var smart = false;
 	if (batchInfo[0].targetUser.includes('Smart')) {
 		smart = true;
-		batchInfo = await smartSchedule(batchInfo, batchInfo[0].targetUser, dateTimeList[0])
+		result = await smartSchedule(batchInfo, batchInfo[0].targetUser, dateTimeList[0])
+		if (result["status"] == "fail") {
+			res.send("fail")
+		}
+		stat = result["status"]
+		batchInfo = result["batchInfo"]
+		displayString = result["displayString"]
+		dateTimeList = batchInfo.map(u => (u.date + " " + u.time));
+
 	}
 	const taskApproval = await utils.approvalStatusCheck(batchInfo);
 	if (taskApproval.res !== "pass") return res.send(taskApproval.res);
@@ -662,7 +671,8 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 		multiBatchExecutionData.push(batchObj);
 	}
 	/** Add if else for smart schedule above this **/
-	const schResult = await scheduleTestSuite(multiBatchExecutionData);
+	var schResult = await scheduleTestSuite(multiBatchExecutionData);
+	if (schResult == "success" && stat != "none") schResult = displayString + " " + "success";
 	return res.send(schResult);
 };
 /**
@@ -675,39 +685,66 @@ const smartSchedule = async (batchInfo, type, time) => {
 	// deep copying batchinfo
 	var partBatchInfo = JSON.parse(JSON.stringify(batchInfo));
 	var partitions = await getMachinePartitions(batchInfo, type, time);
-	var pushUser = {}
+	result = {}
+	result["displayString"] = "";
+	if (partitions == "fail") {
+		result["status"] = "fail";
+		return result;
+	} else if (partitions.result == "busy") {
+		result["status"] = "busy"
+		result["displayString"] = "ICE busy, Some modules might skip.\n"
+	} else {
+		result["status"] = "success"
+		result["displayString"] = "Succesfully Scheduled.\n\n"
+	}
+	result["batchInfo"] = {}
+	var setCount = 0;
 	//creating batches
-	for (var i = 0; i < batchInfo.length; i++) {
-		partBatchInfo[i].suiteDetails = [];
-		partBatchInfo[i].smartScheduleId = uuid();
-		for (var j = 0; j < batchInfo[i].suiteDetails.length; j++) {
-			for (let set in partitions.partitions) {
+	var partBatchInfo = []
+	var moduleUserMap = {}
+	for (let set in partitions.partitions) {
+		result["displayString"] = result["displayString"] + "Set " + setCount.toString() + ": " + set + "\n";
+		setCount++;
+		for (var i = 0; i < batchInfo.length; i++) {
+			var temp = JSON.parse(JSON.stringify(batchInfo[i]));
+			temp.suiteDetails = [];
+			temp.smartScheduleId = uuid();
+			temp.targetUser = set;
+			for (var j = 0; j < batchInfo[i].suiteDetails.length; j++) {
 				if (partitions.partitions[set].toString().includes(batchInfo[i].suiteDetails[j].scenarioId)) {
-					// if(set in pushUser){
-					// 	var index = pushUser[set]
-					// 	partBatchInfo[index].suiteDetails.push(batchInfo[i].suiteDetails[j]);
-					// 	partBatchInfo[index].testSuiteI.push(batchInfo[i].suiteDetails[j]);
-							
-					// }
-					partBatchInfo[i].targetUser = set;
-					//pushUser[set] = i;
-					partBatchInfo[i].suiteDetails.push(batchInfo[i].suiteDetails[j]);
+					testId = batchInfo[i].testsuiteId;
+					if (moduleUserMap[testId] && moduleUserMap[testId]['user'] == set) {
+						partBatchInfo[moduleUserMap[testId]["index"]].suiteDetails.push(batchInfo[i].suiteDetails[j]);
+					} else {
+						temp.suiteDetails.push(batchInfo[i].suiteDetails[j])
+						moduleUserMap[testId] = {};
+						moduleUserMap[testId]['index'] = partBatchInfo.length;
+						moduleUserMap[testId]['user'] = set;
+						partBatchInfo.push(temp);
+					}
 				}
 			}
 		}
 	}
-	
-	return partBatchInfo;
+	result["displayString"] = result["displayString"] + "\nEstimated Time: " + secondsToHms(partitions.totalTime);
+	result["batchInfo"] = partBatchInfo
+	return result;
 }
 /**
- * Generat UUID for smartID
+ * Format Seconds to display string days/hours/minutes
+ * @param {*} seconds 
  */
-function uuid() {
-	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-	  var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-	  return v.toString(16);
-	});
-  }
+function secondsToHms(seconds) {
+	var days = Math.floor(seconds / (24 * 60 * 60));
+	seconds -= days * (24 * 60 * 60);
+	var hours = Math.floor(seconds / (60 * 60));
+	seconds -= hours * (60 * 60);
+	var minutes = Math.floor(seconds / (60));
+	seconds -= minutes * (60);
+	return ((0 < days) ? (days + " day, ") : "") + hours + "h, " + minutes + "m and " + seconds.toFixed(2) + "s";
+
+}
+
 /**
  * 
  * @param {*} mod   BatchInfo
