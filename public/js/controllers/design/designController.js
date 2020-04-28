@@ -1238,9 +1238,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						//$("#WSSaveSuccess").modal("show");
 						$("#enbledWS").prop("checked", false)
 						angular.element(document.getElementById("left-nav-section")).scope().getWSData();
-					} else {
-						openDialog("Save WebService Template", "Failed to save WebService Template.");
+					} else if("Invalid Input"){
+						openDialog("Save WebService Template", "Failed to save WebService Template. Invalid Request Header or Body");
 						//$("#WSSaveFail").modal("show")
+					}else{
+						openDialog("Save WebService Template", "Failed to save WebService Template.");
 					}
 				}, function (error) {
 					console.log("Error")

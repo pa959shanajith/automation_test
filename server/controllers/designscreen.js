@@ -306,6 +306,9 @@ exports.updateScreen_ICE = function (req, res) {
 													scrapedObjects = JSON.stringify(scrapedObjects);
 													scrapedObjects = scrapedObjects.replace(/'+/g, "''")
 												}
+											}else{
+												logger.error("Invalid Request header or Request body for XML")
+												scrapedObjects="Fail";
 											}
 										}
 										else if(requestedHeader.indexOf('json') !== -1){
@@ -324,7 +327,11 @@ exports.updateScreen_ICE = function (req, res) {
 											}
 											catch(Exception){
 												logger.error("Invalid Request body for RestAPI")
+												scrapedObjects="Fail";
 											}
+										}else{
+											logger.error("Invalid Request header or Request body")
+											scrapedObjects="Fail";
 										}						
 									}
 								}
@@ -459,7 +466,7 @@ exports.updateScreen_ICE = function (req, res) {
 				allXpaths=[];
 				allCustnames=[];
 				try {
-					if (statusFlag == "" && scrapedObjects != "scrape data error: Fail") {
+					if (statusFlag == "" && scrapedObjects != "Fail") {
 						var args = {
 							data: inputs,
 							headers: {
@@ -547,6 +554,9 @@ exports.updateScreen_ICE = function (req, res) {
 								logger.error("Exception in the finalFunction: %s", exception);
 							}
 						});
+					}else{
+						statusFlag = "Invalid Input";
+						res.send(statusFlag); 
 					}
 					finalcallback;
 				} catch (exception) {
