@@ -47,7 +47,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 				for(i=0; i<dataLen; i++){
 					$(".scheduleSuiteTable").append('<div class="batchSuite"><div class="scheduleSuite"><input type="checkbox" class="selectScheduleSuite"/>'
 					+'<span class="scheduleSuiteName" data-testsuiteid="'+eachData[i].testsuiteid+'" data-moduleid="'+eachData[i].moduleid+'" data-versionnumber="'+eachData[i].versionnumber+'">'+eachData[i].testsuitename+'</span>'
-					+'<span class="ipContainer"><select class="form-control ipformating"><option selected disabled>Select User</option></select></span>'
+					+'<span id="mod' + i + '" onchange="openPopup(id)"" class="ipContainer"><select class="form-control ipformating"><option selected disabled>Select User</option></select></span>'
 					+'<span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIcon" src="../imgs/ic-datepicker.png" /></span>'
 					+'<span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>'
 					+'<table class="scenarioSchdCon scenarioSch_'+i+'"><thead class="scenarioHeaders"><tr><td>Sl No.</td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td></tr></thead>'
@@ -67,6 +67,9 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 						for(k=0; k<result.connectedUsers.length; k++){
 							$(".ipformating").append("<option value='"+result.connectedUsers[k]+"'>"+result.connectedUsers[k]+"</option>")
 						}
+						$(".ipformating").append("<option value='Module Smart Scheduling'>Module Smart Scheduling</option>")
+						$(".ipformating").append("<option value='Scenario Smart Scheduling'>Scenario Smart Scheduling</option>")
+
 					}
 				}				
 				$('.scrollbar-inner').scrollbar();
@@ -254,6 +257,9 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 
 	//Add to list and schedule
 	$scope.initSchedule = function($event){
+		if(smartBatch){
+			sequence(true);
+		}
 		if ($(".selectScheduleSuite:checked").length == 0) openModelPopup("Schedule Test Suite", "Please select atleast one Suite(s) to schedule");
 		else if ($('.selectToSched:checked').length == 0) openModelPopup("Schedule Test Suite", "Please select atleast one scenario to schedule");
 		else if (appType == "SAP" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select SAP Apps option");
@@ -425,4 +431,44 @@ function openModelPopup(title, body){
 	setTimeout(function(){
 		$("#scheduleGlobalModal").find('.btn-accept').focus();
 	}, 300);
+}
+var smartBatch = false;
+function openPopup(id) {
+	if ($('.ipContainer').find(":selected")[parseInt(id[id.length - 1])].label === "Scenario Smart Scheduling") {
+		console.log(id)
+		if ($('#' + id)[0].children[0].options.length <= 4) {
+			$('#smartScheduling').find('.btn-default')[1].click();
+			openModelPopup("Smart Scheduling", "More than 1 ICE needs to be active to use Smart Scheduling");
+			$('#' + id)[0].children[0].selectedIndex = 0;
+		} else {
+			$("#smartScheduling").modal("show");
+			$($('#smartScheduling').find('.btn-default')[1]).data('selector-id', id);
+			$('#smartScheduling').find('.btn-default')[1].onclick = function () {
+				$('#' + $(this).data('selector-id')).children()[0].selectedIndex = 0;
+			}
+			smartBatch = true;
+			sequence(true);
+		}
+	}
+	else if($('.ipContainer').find(":selected")[parseInt(id[id.length - 1])].label === "Module Smart Scheduling"){
+		openModelPopup("Smart Scheduling","All the modules will be executed as batch");
+		smartBatch = true;
+		sequence(true);
+	}else{smartBatch = false}
+}
+function sequence(bool){
+	for(var i = 0 ; i < $(".batchSuite").length ; i++) {
+		if(bool){
+			$(".batchSuite")[i].children[0].children[2].children[0].selectedIndex = $(".batchSuite")[0].children[0].children[2].children[0].selectedIndex;
+		}
+		$(".batchSuite")[i].children[0].children[3].children[0].value = $(".batchSuite")[0].children[0].children[3].children[0].value;
+		$(".batchSuite")[i].children[0].children[4].children[0].value = $(".batchSuite")[0].children[0].children[4].children[0].value;
+		$(".batchSuite")[i].children[0].children[4]	= $(".batchSuite")[0].children[0].children[4]
+		$(".batchSuite")[i].children[0].children[0].checked = $(".batchSuite")[0].children[0].children[0].checked
+
+	}
+	for(var i = 0 ; i < $(".batchSuite").find(".selectToSched").length ; i++){
+		$(".batchSuite").find(".selectToSched")[i].checked = true;
+	}
+
 }
