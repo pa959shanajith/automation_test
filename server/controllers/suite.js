@@ -637,7 +637,7 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
 	}
 
 	for (const batchExecutionData of multiBatchExecutionData) {
-		var execIds = {"batchid": "generate", "execid": {}};
+		let execIds = {"batchid": "generate", "execid": {}};
 		const userInfo = userInfoMap[batchExecutionData.targetUser];
 		const scheduleTime = batchExecutionData.timestamp;
 		const scheduleId = batchExecutionData.scheduleId;
@@ -648,7 +648,7 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
 		}
 		try {
 			const scheduledjob = schedule.scheduleJob(scheduleId, scheduleTime, async function () {
-				var result;
+				let result;
 				try {
 					result = await executionFunction(batchExecutionData, execIds, userInfo, "SCHEDULE");
 				} catch (ex) {
@@ -656,9 +656,9 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
 					logger.error("Error in " + fnName + " service. Error: %s", ex)
 				}
 				result = (result == "success")? "Completed" : result;
-				var schedStatus = result;
+				let schedStatus = result;
 				if (["Completed", "Terminate", "Skipped", "fail"].indexOf(result) == -1) {
-					var msg = "This scenario was skipped ";
+					let msg = "This scenario was skipped ";
 					if ([SOCK_NA, SOCK_NORM, "NotApproved", "NoTask", "Modified"].indexOf(result) > -1) {
 						if (result == SOCK_NA) msg += "due to unavailability of ICE";
 						else if (result == SOCK_NORM) msg += "due to unavailability of ICE in schedule mode";
