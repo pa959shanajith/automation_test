@@ -45,6 +45,7 @@ if (cluster.isMaster) {
 		var lusca = require('lusca');
 		var consts = require('constants');
 		var redis = require("redis");
+		var path = require('path');
 		var Client = require("node-rest-client").Client;
 		var apiclient = new Client();
 		var redisStore = require('connect-redis')(sessions);
@@ -439,6 +440,21 @@ if (cluster.isMaster) {
 
 		app.post('/designTestCase', function(req, res) {
 			return res.sendFile("app.html", { root: __dirname + "/public/" });
+		});
+
+		app.get('/Nineteen68_ICE', async (req, res) => {
+			const iceFile = "Nineteen68_ICE.zip";
+			const iceFilePath = path.resolve(process.env.HOST_PATH);
+			if (req.query.file == "getICE") {
+				return res.sendFile(iceFile, { root: iceFilePath })
+			} else {
+				let status = "na";
+				try {
+					await fs.promises.access(iceFilePath + path.sep + iceFile);
+					status = "available";
+				} catch (error) {}
+				return res.send(status);
+			}
 		});
 
 		//Route Directories
