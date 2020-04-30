@@ -30,6 +30,9 @@ exports.saveMindmap = function(req,res) {
 		if (response.statusCode != 200 || result.rows == "fail") {
 			logger.error("Error occurred in create_ice/saveMindmap: saveMindmap, Error Code : ERRNDAC");
 			res(null, result);
+		} else if (result.rows == "reuseerror") {
+			result.rows = "fail";
+			res(null, result);
 		} else {
 			projectdetails=result.rows;
 			// callback();

@@ -350,8 +350,12 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 						var scenarioCount = testsuite.scenarioIds.length * testsuite.browserType.length;
 						if (execType == "API") {
 							if (d2R[testsuiteid] === undefined) d2R[testsuiteid] = {"testsuiteName": testsuite.testsuitename, "testsuiteId": testsuiteid, "scenarios": {}};
-							const scenarioIndex = testsuite.scenarioIds.indexOf(scenarioid);
-							d2R[testsuiteid].scenarios[scenarioid] = {"scenarioname": testsuite.scenarioNames[scenarioIndex], "scenarioid": scenarioid, "overallstatus": "Not Executed"};
+							if (d2R[testsuiteid].scenarios[scenarioid] === undefined) d2R[testsuiteid].scenarios[scenarioid] = [];
+							d2R[testsuiteid].scenarios[scenarioid].push({
+								"scenarioname": testsuite.scenarioNames[testsuite.scenarioIds.indexOf(scenarioid)],
+								"scenarioid": scenarioid,
+								"overallstatus": "Not Executed"
+							});
 						}
 						if (reportData.overallstatus.length == 0) {
 							completedSceCount++;
@@ -364,7 +368,10 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 							const appTypes = ["OEBS", "MobileApp", "System", "Webservice", "Mainframe", "SAP", "Desktop"];
 							const browserType = (appTypes.indexOf(execReq.apptype) > -1)? execReq.apptype:reportData.overallstatus[0].browserType;
 							reportData.overallstatus[0].browserType = browserType;
-							if (execType == "API") d2R[testsuiteid].scenarios[scenarioid] = {...d2R[testsuiteid].scenarios[scenarioid], ...reportData.overallstatus[0]};
+							if (execType == "API") {
+								const cidx = d2R[testsuiteid].scenarios[scenarioid].length - 1;
+								d2R[testsuiteid].scenarios[scenarioid][cidx] = {...d2R[testsuiteid].scenarios[scenarioid][cidx], ...reportData.overallstatus[0]};
+							}
 							if (reportData.overallstatus[0].overallstatus == "Pass") statusPass++;
 							const insRepStatus =  await insertReport(executionid, scenarioid, browserType, userInfo, reportData);
 							if (insRepStatus != "fail") logger.info("Successfully inserted report data");
@@ -457,7 +464,7 @@ exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 		userInfoList.push(userInfo);
 		const execResponse = userInfo.inputs;
 		if (execResponse.tokenValidation == "passed") {
-			delete execResponse.err;
+			delete execResponse.error_message;
 			const username = userInfo.username;
 			if (userRequestMap[username] == undefined) userRequestMap[username] = [i];
 			else userRequestMap[username].push(i);
@@ -479,13 +486,13 @@ exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 					result = "fail";
 					logger.error("Error in ExecuteTestSuite_ICE_API service. Error: %s", ex)
 				}
-				if (result == SOCK_NA) execResponse.err = SOCK_NA_MSG;
-				else if (result == SOCK_SCHD) execResponse.err = SOCK_SCHD_MSG;
-				else if (result == "NotApproved") execResponse.err = "All the dependent tasks (design, scrape) needs to be approved before execution";
-				else if (result == "NoTask") execResponse.err = "Task does not exist for child node";
-				else if (result == "Modified") execResponse.err = "Task has been modified, Please approve the task";
-				else if (result == "Skipped") execResponse.err = "Execution is skipped because another execution is running in ICE";
-				else if (result == "fail") execResponse.err = "Internal error occurred during execution";
+				if (result == SOCK_NA) execResponse.error_message = SOCK_NA_MSG;
+				else if (result == SOCK_SCHD) execResponse.error_message = SOCK_SCHD_MSG;
+				else if (result == "NotApproved") execResponse.error_message = "All the dependent tasks (design, scrape) needs to be approved before execution";
+				else if (result == "NoTask") execResponse.error_message = "Task does not exist for child node";
+				else if (result == "Modified") execResponse.error_message = "Task has been modified, Please approve the task";
+				else if (result == "Skipped") execResponse.error_message = "Execution is skipped because another execution is running in ICE";
+				else if (result == "fail") execResponse.error_message = "Internal error occurred during execution";
 				else {
 					execResponse.status = result[1];
 					const execResult = [];
@@ -493,7 +500,7 @@ exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 						const tsu = result[0][tsuid];
 						const scenarios = [];
 						tsu.executionId = execIds.execid[tsuid];
-						for (tscid in tsu.scenarios) scenarios.push(tsu.scenarios[tscid]);
+						for (tscid in tsu.scenarios) scenarios.push(...tsu.scenarios[tscid]);
 						delete tsu.scenarios;
 						tsu.suiteDetails = scenarios;
 						execResult.push(tsu);

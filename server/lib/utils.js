@@ -179,7 +179,7 @@ module.exports.tokenValidation = async (userInfo) => {
 		}
 	} else logger.info(emsg + "Token authentication failed for username: " + username);
 	inputs.tokenValidation = tokenValidation.status;
-	inputs.err = tokenValidation.msg;
+	inputs.error_message = tokenValidation.msg;
 	userInfo.inputs = inputs;
 	return userInfo;
 };
