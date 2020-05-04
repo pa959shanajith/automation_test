@@ -19,7 +19,7 @@ function register_GUID() {
 
 function storage_Handler(e) {
     // if tabGUID does not match then more than one tab and GUID
-    if (e.key == 'tabGUID') {
+    if (e.key == 'tabGUID' && e.oldValue != "") {
         if (e.oldValue != e.newValue) tab_Warning();
     }else if(e.key == "tabValidity"){
 		window.sessionStorage.clear();
