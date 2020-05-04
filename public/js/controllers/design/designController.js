@@ -7537,13 +7537,13 @@ function getTags(data) {
 	} else if (appTypeLocal == "OEBS") {
 		obnames = ["@Generic", "@Excel", "@Oebs", "@Custom", "@Word"];
 	} else if (appTypeLocal == "MobileApp" && navigator.appVersion.indexOf("Mac") == -1) {
-		obnames = ["@Generic", "@Mobile", "@Android_Custom", "@Action"];
+		obnames = ["@Generic", "@Mobile", "@Android_Custom", "@Action","@Excel","@Word"];
 	} else if (appTypeLocal == "MobileApp" && navigator.appVersion.indexOf("Mac") != -1) {
-		obnames = ["@Generic", "@Mobile", "@CustomiOS"];
+		obnames = ["@Generic", "@Mobile", "@CustomiOS","@Excel","@Word"];
 	} else if (appTypeLocal == "MobileWeb") {
-		obnames = ["@Generic", "@Browser", "@BrowserPopUp", "@Action"];
+		obnames = ["@Generic", "@Browser", "@BrowserPopUp", "@Action","@Excel","@Word"];
 	} else if (appTypeLocal == "SAP") {
-		obnames = ["@Generic", "@Sap", "@Custom", "@Word"]
+		obnames = ["@Generic", "@Sap", "@Custom", "@Word","@Excel"]
 	} else if (appTypeLocal = "System") {
 		obnames = ["@Generic", "@Excel", "@System", "@Word"];
 	}
