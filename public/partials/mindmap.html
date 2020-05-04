@@ -174,17 +174,16 @@
                <select class="project-list" ng-change="projectListChange(projectName2)" ng-model="projectName2">
                     <option ng-repeat="project in projectList" ng-selected="projectNameO == project.id" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}'>{{project.name}}</option>
                </select>
-               <span id="copy-paste">
+            </span>
+            <span id="copy-paste">
                <i class="fa fa-crop fa-lg plus-icon" id="copyImg1" title="add a rectangle" ng-click="startCopy()"></i>
                <i class="fa fa-files-o fa-lg plus-icon" title="copy selected map" ng-click="copyMindMap()"></i>
                <i class="fa fa-clipboard fa-lg plus-icon" id="pasteImg1" title="Paste map" ng-click="pasteMap()"></i>
-               <i class="glyphicon glyphicon-export export-icon" ng-click="exportData(0)" title="Export Version"></i>
-			   <i class="glyphicon glyphicon-save export-excel-icon" id="export-excel" ng-click="exportToExcel()" title="Export To Excel"></i>
-			   <label for="pd-input" style="margin-bottom: 0px;height: 14px;width: 10px;">
-                <i class="glyphicon glyphicon-import import-pd-icon" id="import-pd" ng-click="importFromPD()" title="Import Process Discovery File"></i>
+               <i class="glyphicon glyphicon-save export-excel-icon" id="export-excel" ng-click="exportToExcel()" title="Export To Excel"></i>
+               <label for="pd-input" style="margin-bottom: 0px;height: 14px;width: 10px;">
+                  <i class="glyphicon glyphicon-import import-pd-icon" id="import-pd" ng-click="importFromPD()" title="Import Process Discovery File"></i>
                </label>
                <input id="pd-input" on-read-file="importFromPD($fileContent)" type="file" name="xlsfile" accept=".pd" required="" autofocus="" style="display:none"/>
-               </span>
             </span>
          </div>
          <!-- versioning -->
@@ -211,12 +210,15 @@
                </select>
             </span>
             <span class="selectRelease selectProjectPosition"> 
-            <label class="selectReleaseLabel">Release:</label>
-            <select class="release-list"></select>
+               <label class="selectReleaseLabel">Release:</label>
+               <select class="release-list"></select>
             </span>
             <span class="selectCycle selectProjectPosition"> 
-            <label class="selectCycleLabel">Cycle:</label>
-            <select class="cycle-list"></select>
+               <label class="selectCycleLabel">Cycle:</label>
+               <select class="cycle-list"></select>
+            </span>
+            <span id="copy-paste">
+               <i class="glyphicon glyphicon-export export-icon" ng-click="exportData(0)" title="Export Version"></i>
             </span>
          </div>
          <div class="ct-nodeBox">

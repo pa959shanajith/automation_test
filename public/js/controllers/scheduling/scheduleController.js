@@ -5,95 +5,69 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 	$("body").css("background","#eee");
 	$("head").append('<link rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
 	$timeout(function(){
-		//$('.scrollbar-inner').scrollbar();
-	    //$('.scrollbar-macosx').scrollbar();
 	    document.getElementById("currentYear").innerHTML = new Date().getFullYear()
-	}, 500)
+	}, 500);
 	var browserTypeExe = [];
-	var exc_action = "serial";
+	var execAction = "serial";
     //Task Listing
     loadUserTasks()
 	blockUI("Loading...");
-    /*var taskAuth;
-	if(window.localStorage['_CT'] == "")
-	{
-		taskAuth = false;
-	}*/
-	if(window.localStorage['navigateScreen'] != "scheduling"){
-		return $rootScope.redirectPage();
-	}
+
+	if(window.localStorage['navigateScreen'] != "scheduling") return $rootScope.redirectPage();
 	$('.submitTaskBtn').hide();
 	if(window.localStorage['_CT']){
 		var window_ct=JSON.parse(window.localStorage['_CT']);
 		var readTestSuite = window_ct.testSuiteDetails;
-		for(var rti=0;rti<readTestSuite.length;rti++){
-			readTestSuite[rti].versionnumber = parseFloat(window_ct.versionnumber);
-		}
-		//console.log("read",readTestSuite);
-	   	var getTaskName = window_ct.taskName;
+		var versionnumber = parseFloat(window_ct.versionnumber);
+		for(var rti=0;rti<readTestSuite.length;rti++) readTestSuite[rti].versionnumber = versionnumber;
 		var	appType = window_ct.appType;
-		//$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
 		$(".projectInfoWrap").empty()
-		//testSuiteName = window_ct.testSuiteName;
+		$scope.getScreenView = window_ct.appType;
 	}
-	$scope.getScreenView = JSON.parse(window.localStorage['_CT']).appType;
-	
-	/*$timeout(function(){
-		var releaseId = JSON.parse(window.localStorage['_CT']).testSuiteDetails[0].releaseId;
-		var cycleId = JSON.parse(window.localStorage['_CT']).cycleId;
-		var projectId = JSON.parse(window.localStorage['_CT']).projectId;
-		var	projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
-		 	releaseName = angular.element(document.getElementById("left-nav-section")).scope().releaseDetails.respnames[0];
-			cycleName = angular.element(document.getElementById("left-nav-section")).scope().cycleDetails.respnames[0];
-			if(projectDetails.respnames[0] !="" &&  releaseName!="" && cycleName !="")
-			{
-				$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.respnames[0]+'</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">'+releaseName+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+cycleName+'</span></p>')
-			}
-	}, 2000)*/
     var sortFlag = false;
 	//Onload ServiceCall
 	$timeout(function(){
 		angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 	}, 1000)
 
-	//update scheduled table every 20 seconds
-	$interval(getScheduledDetailsInterval, 20000);
+	//update scheduled table every 60 seconds
+	$interval(getScheduledDetailsInterval, 60000);
 	
 	$scope.readTestSuite_ICE = function(){
 		ScheduleService.readTestSuite_ICE(readTestSuite, "schedule")
 		.then(function(result) {
 			if(result == "Invalid Session"){
 				return $rootScope.redirectPage();
-			}else if(result.testSuiteDetails){
+			} else if(result.testSuiteDetails) {
 				var data = result.testSuiteDetails;
 				//Populating Data in Scheduling Table
 				var dataLen = Object.keys(data).length;
 				$(".scheduleSuiteTable").empty();
-				var keys = Object.keys(data);
 				var eachData = Object.keys(data).map(function(itm) { return data[itm]; });
 				for(i=0; i<dataLen; i++){
-					var count=1;
-					$(".scheduleSuiteTable").append('<div class="batchSuite"><div class="scheduleSuite"><input type="checkbox" class="selectScheduleSuite"/><span class="scheduleSuiteName" data-testsuiteid="'+eachData[i].testsuiteid+'" data-versionnumber="'+eachData[i].versionnumber+'">'+eachData[i].testsuitename+'</span><span class="ipContainer"><select class="form-control ipformating"><option selected disabled>Select User</option></select></span><span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIcon" src="../imgs/ic-datepicker.png" /></span><span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>'
-					+'<table class="scenarioSchdCon scenarioSch_'+i+'"><thead class="scenarioHeaders"><tr><td>Sl No.</td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td></tr></thead><tbody class="scenarioBody scenarioTbCon_'+i+'"></tbody></table>');
-
-					if(result.connectedUsers != "" && result.connectedUsers.length >0){
+					$(".scheduleSuiteTable").append('<div class="batchSuite"><div class="scheduleSuite"><input type="checkbox" class="selectScheduleSuite"/>'
+					+'<span class="scheduleSuiteName" data-testsuiteid="'+eachData[i].testsuiteid+'" data-moduleid="'+eachData[i].moduleid+'" data-versionnumber="'+eachData[i].versionnumber+'">'+eachData[i].testsuitename+'</span>'
+					+'<span class="ipContainer"><select class="form-control ipformating"><option selected disabled>Select User</option></select></span>'
+					+'<span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIcon" src="../imgs/ic-datepicker.png" /></span>'
+					+'<span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>'
+					+'<table class="scenarioSchdCon scenarioSch_'+i+'"><thead class="scenarioHeaders"><tr><td>Sl No.</td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td></tr></thead>'
+					+'<tbody class="scenarioBody scenarioTbCon_'+i+'"></tbody></table>');
+					for(j=0;j<eachData[i].scenarioids.length;j++){
+						const flag = eachData[i].condition[j] == 0;
+						$(document).find(".scenarioTbCon_"+i+"").append('<tr><td><span>'+(j+1)+'</span><input type="checkbox" class="selectToSched"/></td>'
+							+'<td data-scenarioid="'+eachData[i].scenarioids[j]+'">'+eachData[i].scenarionames[j]+'</td>'
+							+'<td style="padding: 2px 0 2px 0;"><input type="text" value="'+eachData[i].dataparam[j]+'" disabled/></td>'
+							+'<td><select disabled><option value="1" '+((flag)? '':'selected')+'>True</option><option value="0" '+((flag)? 'selected':'')+'>False</option></select></td>'
+							+'<td>'+eachData[i].projectnames[j]+'</td></tr>');
+					}
+					if(result.connectedUsers.length == 0) openModelPopup("Schedule Test Suite", "Please enable scheduling in Local Server. And refresh the page.");
+					else {
 						$(".ipformating").empty();
 						$(".ipformating").append("<option selected disabled>Select User</option>")
 						for(k=0; k<result.connectedUsers.length; k++){
 							$(".ipformating").append("<option value='"+result.connectedUsers[k]+"'>"+result.connectedUsers[k]+"</option>")
 						}
 					}
-					else{
-						openModelPopup("Schedule Test Suite", "Please enable scheduling in Local Server. And refresh the page.");
-					}
-					for(j=0;j<eachData[i].scenarioids.length;j++){
-						if(eachData[i].condition[j] == 0)
-							$(document).find(".scenarioTbCon_"+i+"").append('<tr><td><span>'+count+'</span><input type="checkbox" class="selectToSched"/></td><td data-scenarioid="'+eachData[i].scenarioids[j]+'">'+eachData[i].scenarionames[j]+'</td><td style="padding: 2px 0 2px 0;"><input type="text" value="'+eachData[i].dataparam[j]+'" disabled/></td><td><select disabled><option value="1">True</option><option value="0" selected>False</option></select></td><td>'+eachData[i].projectnames[j]+'</td></tr>');//<input type="checkbox" class="scenarioCheck"/>
-						else
-							$(document).find(".scenarioTbCon_"+i+"").append('<tr><td><span>'+count+'</span><input type="checkbox" class="selectToSched"/></td><td data-scenarioid="'+eachData[i].scenarioids[j]+'">'+eachData[i].scenarionames[j]+'</td><td style="padding: 2px 0 2px 0;"><input type="text" value="'+eachData[i].dataparam[j]+'" disabled/></td><td><select disabled><option value="1" selected>True</option><option value="0">False</option></select></td><td>'+eachData[i].projectnames[j]+'</td></tr>');//<input type="checkbox" class="scenarioCheck"/>
-						count++;
-					}		
-							//+'<div id="scheduleDataBody" class="scrollbar-inner scheduleDataBody"><label>'+(i+1)+'</label><input type="checkbox"/><label>scenario</label><span><input type="text" class="dataParamValue"/></span><span><select><option value="false" selected>False</option><option>True</option></select></span><label>project</label></div></div>')
 				}				
 				$('.scrollbar-inner').scrollbar();
 				sortFlag = true;
@@ -104,76 +78,41 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 			unblockUI();
 		}, 
 		function(error) {
-			console.log("Error")
+			console.log("Error:", error);
 		});
 	}
 	
 	$(document).on("change", ".selectScheduleSuite", function(){
-		if($(this).is(":checked")){
-			$(this).parent().siblings(".scenarioSchdCon").find(".selectToSched").attr("disabled",false).prop("checked", true);
-		}
-		else
-			$(this).parent().siblings(".scenarioSchdCon").find(".selectToSched").prop("checked", false);
+		if($(this).is(":checked")) $(this).parent().siblings(".scenarioSchdCon").find(".selectToSched").attr("disabled",false).prop("checked", true);
+		else $(this).parent().siblings(".scenarioSchdCon").find(".selectToSched").prop("checked", false);
 	})
 
 	$(document).on("change", '.selectToSched', function(){
-		 var allCount = $(".selectToSched").length;
-		 var selectedCount = $(this).parents(".scenarioBody").children("tr").find(".selectToSched:checked").length
-		 if(selectedCount == 0)
-		 	$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", false);
-		 else if(allCount == selectedCount){
-			$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", true);
-		}
-		else{
-			$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", true);
-		}
-	
+		const selectedCount = $(this).parents(".scenarioBody").children("tr").find(".selectToSched:checked").length;
+		const flag = (selectedCount == 0)? false:true;
+		$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", flag);
 	});
 
 	//Function to get scheduled details on interval
-	function getScheduledDetailsInterval(){
+	function getScheduledDetailsInterval() {
 		if(Math.round(new Date() / 1000) - triggeredSeconds >= 20){
 			getScheduledDetails();
 		}
 	}
+
 	//Function to get scheduled details
 	function getScheduledDetails(){
 		ScheduleService.getScheduledDetails_ICE()
 		.then(function(result) {
-			if(result == "fail"){}
-			else if(result && result.length > 0){
-				for(var k=0; k<result.length; k++){
+			if (result && result.length > 0 && result != "fail") {
+				for (var k=0; k < result.length; k++) {
+					if (result[k].scenariodetails[0].scenarioids !== undefined) result[k].scenariodetails = [result[k].scenariodetails];
 					result[k].browserlist = result[k].executeon;
-					result[k].scenariodetails = result[k].scenariodetails;
-					result[k].scheduledatetime = new Date(result[k].scheduledon).getFullYear()+"-"
-					+("0" + (new Date(result[k].scheduledon).getMonth()+1)).slice(-2)+"-"
-					+("0" + new Date(result[k].scheduledon).getUTCDate()).slice(-2)+" "
-					+("0" + new Date(result[k].scheduledon).getUTCHours()).slice(-2)+":"
-					+("0" + new Date(result[k].scheduledon).getUTCMinutes()).slice(-2)
+					const dt = new Date(result[k].scheduledon);
+					result[k].scheduledatetime = dt.getFullYear()+"-"+("0"+(dt.getMonth()+1)).slice(-2)+"-"
+						+("0"+dt.getDate()).slice(-2)+" "+("0"+dt.getHours()).slice(-2)+":"+("0"+dt.getMinutes()).slice(-2);
 				}
 				$scope.scheduledData = result;
-				// $("#scheduledDataBody").empty();
-				// for(var k=0; k<result.length; k++){
-				// 	var browser = JSON.parse(result[k].browserlist);
-				// 	var browImg="";
-				// 	for(var a=0;a<browser.length;a++){
-				// 		if(browser[a] == 1)	browImg = browImg + "<img src='imgs/ic-ch-schedule.png'/>";
-				// 		else if(browser[a] == 2)	browImg = browImg + "<img src='imgs/ic-ff-schedule.png'/>";
-				// 		if(browser[a] == 3)	browImg = browImg + "<img src='imgs/ic-ie-schedule.png'/>";
-				// 	}
-				// 	var scenarios = JSON.parse(result[k].scenariodetails);
-				// 	for(var l=0; l<scenarios.length; l++){
-				// 		if(result[k].schedulestatus == "scheduled"){
-				// 			var $el = $("<div class='scheduleDataBodyRow'><div style='width: 20%'>"+result[k].scheduledatetime.split("T")[0]+" "+result[k].scheduledatetime.split("T")[1].split(".")[0]+"</div><div style='width: 13%'>"+result[k].clientipaddress+"</div><div style='width: 20%'>"+scenarios[l].scenarioname+"</div><div style='width: 20%'>"+result[k].testsuitename+"</div><div style='width: 15%'>"+browImg+"</div><div style='width: 12%' data-cycleid='"+result[k].cycleid+"' data-scheduleid='"+result[k].scheduleid+"' data-scheduledatetime='"+result[k].scheduledatetime.valueOf().toString()+"'>"+result[k].schedulestatus+"<img src='imgs/ic-close.png' class='cancelJob' ng-click='cancelThisJob($event)' title='Cancel Job'/></div></div>");
-
-				// 			$("#scheduledDataBody").append($el);
-				// 			$compile($el)($scope);
-				// 		}
-				// 		else{
-				// 			$("#scheduledDataBody").append("<div class='scheduleDataBodyRow'><div style='width: 20%'>"+result[k].scheduledatetime.split("T")[0]+" "+result[k].scheduledatetime.split("T")[1].split(".")[0]+"</div><div style='width: 13%'>"+result[k].clientipaddress+"</div><div style='width: 20%'>"+scenarios[l].scenarioname+"</div><div style='width: 20%'>"+result[k].testsuitename+"</div><div style='width: 15%'>"+browImg+"</div><div style='width: 12%' data-cycleid='"+result[k].cycleid+"' data-scheduleid='"+result[k].scheduleid+"' data-scheduledatetime='"+result[k].scheduledatetime.valueOf().toString()+"'>"+result[k].schedulestatus+"</div></div>");
-				// 		}
-				// 	}
-				// }						
 				$timeout(function(){
 					sortFlag == true? $(".scheduleDataHeader span:first-child").trigger("click") : 
 					changeBackground();
@@ -188,10 +127,10 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 	}
 
 	$scope.browImg = function(brow,appType){
-		if (appType == "Web"){
-			if(parseInt(brow) == 1)	return './imgs/ic-ch-schedule.png';
-			else if(parseInt(brow) == 2)	return './imgs/ic-ff-schedule.png';
-			else if(parseInt(brow) == 3)	return './imgs/ic-ie-schedule.png';
+		if (appType == "Web") {
+			if(parseInt(brow) == 1) return './imgs/ic-ch-schedule.png';
+			else if(parseInt(brow) == 2) return './imgs/ic-ff-schedule.png';
+			else if(parseInt(brow) == 3) return './imgs/ic-ie-schedule.png';
 		} 
 		else if(appType == "Webservice") return './imgs/webservice.png';
 		else if(appType == "MobileApp") return './imgs/mobileApps.png';
@@ -202,15 +141,9 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 		else if(appType == "OEBS") return './imgs/oracleApps.png';
 		else if(appType == "MobileWeb") return './imgs/MobileWeb.png';
 	}
-	/*//Populating Data in Scheduling Table	
-	$("#scheduleDataBody").empty()
-	for(i=0; i<testSuiteData.length; i++){
-		$("#scheduleDataBody").append('<div class="scheduleDataBodyRow"><div style="width: 4%" class="tabeleCellPadding"><input type="checkbox" class="d-schedule"></div><div style="width: 23%; text-align:left" class="tabeleCellPadding" data-SuiteId="'+testSuiteData[i].test_suite_id+'">'+testSuiteData[i].test_suite_name+'</div><div style="width: 17%"><input class="form-control ipformating" type="text" value=""/></div><div style="width: 20%"><input class="form-control" type="text" value=""/></div><div style="width: 25%"><span style="position: relative; display: inline-block; width:50%; margin-right:5%" title="Select Date"><input class="form-control fc-datePicker" type="text" value="" readonly/><img class="datepickerIcon" src="../imgs/ic-datepicker.png" /></span><span style="position: relative; display: inline-block; width:40%" title="Select Time"><input class="form-control fc-timePicker" type="text" value="" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div><div style="width: 11%" class="tabeleCellPadding"><img src="../imgs/ic-alm.png" style="cursor:pointer" /></div></div>')
-	}
-	*/
+
 	$("#tableActionButtons, .scheduleDataTable").delay(400).animate({opacity: "1"}, 300)
-	
-	
+
 	//Datepicker Function
 	$(document).on('focus', '.fc-datePicker', function(){
 		$(this).datepicker({
@@ -232,91 +165,55 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 			}
 		})
 	})
-	//$(document).on('focus', '#datetimepicker1', function(){
-	//	$(this).datetimepicker({
-	//		minDate: moment()
-	//	});
-	//})
-	$(document).on('focus', '.fc-timePicker', function(){
+
+	$(document).on('focus', '.fc-timePicker', function() {
 		$(this).timepicker({
 			minTime: new Date().getHours() + ':' + (parseInt(new Date().getMinutes()+5)),
 			minuteStep: 1,
 			showMeridian: false
-			//minTime: (new Date().getHours() + ':' + ((new Date().getMinutes())+05))
 		})
 	})
 	
 	$(document).on('click', ".datepickerIcon", function(){
 		$(this).siblings(".fc-datePicker").focus()
-	})
-	.on('click', ".timepickerIcon", function(){
-		//$(".bootstrap-timepicker-hour, .bootstrap-timepicker-minute").val("");
+	}).on('click', ".timepickerIcon", function(){
 		$(this).siblings(".fc-timePicker").focus()
 	})
 	//Datepicker Function
-	
-	//IP Address masking
-	/*$(document).on('keyup', '.ipformating', function(){
-		$(this).mask('0ZZ.0ZZ.0ZZ.0ZZ', {
-			translation: {
-		        'Z': {
-		          pattern: /[0-9]/, optional: true
-		         }
-		    }
-		});
-	    $(this).mask('099.099.099.099');
-	})*/
-	
+
 	//Select Browser Function
 	$(document).on("click", ".selectBrowserSc", function(){
 		$(this).find("img").toggleClass("sb")
 	})
 	//Select Browser Function
-	
+
 	//Submit Task Scheduling
 	$scope.submitTaskScheduling = function(){
 		$("#submitTasksdScheduling").modal("show")
 		$('#submitTasksdScheduling').find('.btn-default-yes').focus();
 	}
 	//Submit Task Scheduling
-	
+
 	//select all scenario in testSuite
 	$(document).on('click', '.slctAllScenarioSchdule', function(){
-		if($(this).is(":checked")){
-			$(this).parents(".scenarioHeaders").siblings("tbody.scenarioBody").find(".scenarioCheck").prop("checked",true);
-		}
-		else{
-			$(this).parents(".scenarioHeaders").siblings("tbody.scenarioBody").find(".scenarioCheck").prop("checked",false);
-		}
+		$(this).parents(".scenarioHeaders").siblings("tbody.scenarioBody").find(".scenarioCheck").prop("checked", $(this).is(":checked"));
 	})
 
 	$(document).on('click', '.scenarioCheck', function(){
-		if($(this).is(":checked")){
-			if($(this).parents("tbody").children("tr").length == $(this).parents("tbody").children("tr").find(".scenarioCheck:checked").length){
-				$(this).parents("tbody").siblings("thead.scenarioHeaders").find(".slctAllScenarioSchdule").prop("checked", true);
-			}
-			else{
-				$(this).parents("tbody").siblings("thead.scenarioHeaders").find(".slctAllScenarioSchdule").prop("checked", false);
-			}
-		}
-		else{
-			$(this).parents("tbody").siblings("thead.scenarioHeaders").find(".slctAllScenarioSchdule").prop("checked", false);
-		}
+		const tr = $(this).parents("tbody").children("tr");
+		const flag = ($(this).is(":checked") && (tr.length == tr.find(".scenarioCheck:checked").length))? true:false;
+		$(this).parents("tbody").siblings("thead.scenarioHeaders").find(".slctAllScenarioSchdule").prop("checked", flag);
 	})
 
 	//Select Browser Function
 	$(document).on("click", ".selectBrowserSc", function(){
-		//$(this).find("img").toggleClass("sb")
 		if($(this).find("img").hasClass("sb") == false) {
-			var getSpliceIndex = browserTypeExe.indexOf(''+$(this).data("name")+'')
-			browserTypeExe.splice(getSpliceIndex, 1)
-			$(this).find("img").removeClass("sb")
+			browserTypeExe.splice(browserTypeExe.indexOf(''+$(this).data("name")), 1);
+			$(this).find("img").removeClass("sb");
+		} else {
+			$(this).find("img").addClass("sb");
+			browserTypeExe.push(''+$(this).data("name"));
 		}
-		else {
-			$(this).find("img").addClass("sb")
-			browserTypeExe.push(''+$(this).data("name"))
-		}
-		console.log(browserTypeExe)
 	})
 	//Select Browser Function
 
@@ -327,31 +224,25 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 			$("#scheduledDataBody>.scheduleDataBodyRow .scheduleDataBodyRowChild").show();
 			$("#scheduledSuitesFilterData").prop('selectedIndex', 0);
 			changeBackground();
-		}
-		else{
+		} else {
 			var keySlctd;
-			if(slctdOption == "Completed")	keySlctd = "Completed";
-			else if(slctdOption == "In Progress")	keySlctd = "Inprogress";
-			else if(slctdOption == "Terminated")	keySlctd = "Terminate";
-			else if(slctdOption == "Skipped")	keySlctd = "Skipped";
-			else if(slctdOption == "Failed 01")	keySlctd = "Failed 01";
-			else if(slctdOption == "Failed 02")	keySlctd = "Failed 02";
-			else if(slctdOption == "Cancelled")	keySlctd = "cancelled";
-			else if(slctdOption == "Scheduled")	keySlctd = "scheduled";
+			if(slctdOption == "Completed") keySlctd = "Completed";
+			else if(slctdOption == "In Progress") keySlctd = "Inprogress";
+			else if(slctdOption == "Terminated") keySlctd = "Terminate";
+			else if(slctdOption == "Skipped") keySlctd = "Skipped";
+			else if(slctdOption == "Missed") keySlctd = "Missed";
+			else if(slctdOption == "Failed") keySlctd = "Failed";
+			else if(slctdOption == "Cancelled") keySlctd = "cancelled";
+			else if(slctdOption == "Scheduled") keySlctd = "scheduled";
 			var content = $("#scheduledDataBody>.scheduleDataBodyRow .scheduleDataBodyRowChild");
 			$.each(content, function(){
-				if($(this).children("div:nth-child(6)").text().indexOf(keySlctd) >= 0){
-					$(this).show();
-				}
-				else if($(this).children("div:nth-child(6)").text() != keySlctd){
-					$(this).hide();
-				}				 
+				if($(this).children("div:nth-child(6)").text().indexOf(keySlctd) >= 0) $(this).show();
+				else if($(this).children("div:nth-child(6)").text() != keySlctd) $(this).hide();
 				else $(this).show();
 			})
 			changeBackground();
 		}
 	})
-
 	
 	function changeBackground(){
 		var oddColorify = $(".scheduleDataBodyRowChild:visible");
@@ -362,250 +253,173 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 			l = l+2;
 		}
 	}
+
 	//Add to list and schedule
 	$scope.initSchedule = function($event){
-		var moduleInfo = [];
-		var doNotSchedule = false;
-		if($(".selectScheduleSuite:checked").length == 0) openModelPopup("Schedule Test Suite", "Please select atleast one Suite(s) to schedule");
-		else if($('.selectToSched:checked').length == 0) openModelPopup("Schedule Test Suite", "Please select atleast one scenario to schedule");
-		else if(appType == "SAP" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select SAP Apps option");
-		else if(appType == "MobileApp" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select Mobile Apps option");
-		else if(appType == "MobileWeb" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select Mobile Web option");
-		else if(appType == "Desktop" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select Desktop Apps option");
-		else if(appType == "Web" && browserTypeExe.length == 0)	openModelPopup("Schedule Test Suite", "Please select a browser");
-		else if(appType == "Webservice" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select Web Services option");
+		if ($(".selectScheduleSuite:checked").length == 0) openModelPopup("Schedule Test Suite", "Please select atleast one Suite(s) to schedule");
+		else if ($('.selectToSched:checked').length == 0) openModelPopup("Schedule Test Suite", "Please select atleast one scenario to schedule");
+		else if (appType == "SAP" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select SAP Apps option");
+		else if (appType == "MobileApp" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select Mobile Apps option");
+		else if (appType == "MobileWeb" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select Mobile Web option");
+		else if (appType == "Desktop" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select Desktop Apps option");
+		else if (appType == "Web" && browserTypeExe.length == 0)	openModelPopup("Schedule Test Suite", "Please select a browser");
+		else if (appType == "Webservice" && browserTypeExe.length == 0) openModelPopup("Schedule Test Suite", "Please select Web Services option");
 		else if (appType == "Mainframe" && browserTypeExe.length === 0) openModelPopup("Schedule Test Suite", "Please select Mainframe option");
 		else if (appType == "OEBS" && browserTypeExe.length === 0) openModelPopup("Schedule Test Suite", "Please select OEBS Apps option");
 		else if (browserTypeExe.length === 0) openModelPopup("Schedule Test Suite", "Please select " + appType + " option");
-		else if ((appType == "Web") && browserTypeExe.length == 1 && exc_action == "parallel")
-		openModelPopup("Execute Test Suite", "Please select multiple browsers");
-		else{
+		else if ((appType == "Web") && browserTypeExe.length == 1 && execAction == "parallel") openModelPopup("Schedule Test Suite", "Please select multiple browsers");
+		else {
 			if(appType == "SAP") browserTypeExe = ["1"];
-			$.each($(".batchSuite"), function(){
-				var suiteInfo = {};
-				var selectedScenarioData = [];
+			var doNotSchedule = false;
+			const moduleInfo = [];
+			$.each($(".batchSuite"), function() {
+				const suiteInfo = {};
+				const selectedScenarioData = [];
 				if($(this).find(".selectScheduleSuite").is(":checked")){
-					var sldate = $(this).children('.scheduleSuite').find(".datePicContainer .fc-datePicker").val();
-					var sltime = $(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").val();
-					var sldate_2 = sldate.split("-");
-					var sltime_2 = sltime.split(":");
-					var dt = new Date();
-					suiteInfo.versionnumber = $(this).children('.scheduleSuite').find(".scheduleSuiteName").data("versionnumber");
-					if($(this).children('.scheduleSuite').find(".ipContainer .ipformating").children("option:selected").val() != "Select User")
-						suiteInfo.Ip = $(this).children('.scheduleSuite').find(".ipContainer .ipformating").children("option:selected").val();
-					else{
+					suiteInfo.date = $(this).children('.scheduleSuite').find(".datePicContainer .fc-datePicker").val();
+					suiteInfo.time = $(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").val();
+					suiteInfo.targetUser = $(this).children('.scheduleSuite').find(".ipContainer .ipformating").children("option:selected").val()
+					if(suiteInfo.targetUser == "Select User") {  // Check if any user is selected for scheduling
 						$(this).children('.scheduleSuite').find(".ipContainer .ipformating").prop("style","border: 2px solid red;"); 
 						doNotSchedule = true;
 						return false;
 					}
-					if(sldate)
-						suiteInfo.date = $(this).children('.scheduleSuite').find(".datePicContainer .fc-datePicker").val();
-					else{
+					if(!suiteInfo.date) {  // Check if schedule date is not empty
 						$(this).children('.scheduleSuite').find(".datePicContainer .fc-datePicker").prop("style","border: 2px solid red;");
 						doNotSchedule = true;
 						return false;
 					}
-					if(new Date(sldate_2[2],(sldate_2[1]-1),sldate_2[0],sltime_2[0],sltime_2[1]) < new Date()){
+					if(!suiteInfo.time) {  // Check if schedule time is not empty
+						$(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").prop("style","border: 2px solid red;");
+						doNotSchedule = true;
+						return false;
+					}
+					const sldate_2 = suiteInfo.date.split("-");
+					const sltime_2 = suiteInfo.time.split(":");
+					const timestamp = new Date(sldate_2[2],(sldate_2[1]-1),sldate_2[0],sltime_2[0],sltime_2[1]);
+					const diff = (timestamp - new Date())/60000;
+					if (diff < 5) {  // Check if schedule time is not ahead of 5 minutes from current time
+						if (diff < 0) $(this).children('.scheduleSuite').find(".datePicContainer .fc-datePicker").prop("style","border: 2px solid red;");
 						$(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").prop("style","border: 2px solid red;");
 						openModelPopup("Schedule Test Suite", "Schedule time must be 5 mins more than current time.");
 						doNotSchedule = true;
 						return false;
 					}
-					else if((new Date(sldate_2[2],(sldate_2[1]-1),sldate_2[0],sltime_2[0],sltime_2[1]) > new Date()) && (parseInt(sldate_2[0]) == new Date().getDate()) && (parseInt(sltime_2[0]) == new Date().getHours()) && (parseInt(sltime_2[1]) <= new Date().getMinutes()+5)){
-						$(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").prop("style","border: 2px solid red;");
-						openModelPopup("Schedule Test Suite", "Schedule time must be 5 mins more than current time.");
-						doNotSchedule = true;
-						return false;
-					}
-					else{
-						if(sltime)
-							suiteInfo.time = $(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").val();
-						else{
-							$(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").prop("style","border: 2px solid red;");
-							doNotSchedule = true;
-							return false;
+					if (doNotSchedule) return false;
+					$(this).find(".scenarioSchdCon tbody tr").each(function() {
+						if($(this).find(".selectToSched").is(":checked")) {
+							selectedScenarioData.push({
+								condition : parseInt($(this).children("td:nth-child(4)").find("select option:selected").val()),
+								dataparam : [$(this).children("td:nth-child(3)").find("input").val().trim()],
+								scenarioId : $(this).children("td:nth-child(2)").data("scenarioid"),
+								scenarioName: $(this).children("td:nth-child(2)").text(),
+							});
 						}
-					}
-					var chkExistDT = $(".scheduleDataBodyRowChild");
-					for(i=0;i<chkExistDT.length;i++){
-						var cEd = chkExistDT[i].children[0].innerText.split(" ")[0];
-						var cEt = chkExistDT[i].children[0].innerText.split(" ")[1];
-						var cEDd = cEd.split("-");
-						var cETt = cEt.split(":");
-						//if(chkExistDT[i].children[0].innerText == (sldate_2[2]+"-"+sldate_2[1]+"-"+sldate_2[0]+" "+sltime) && chkExistDT[i].children[5].innerText.trim() == "scheduled" && chkExistDT[i].children[1].innerText.trim() == suiteInfo.Ip){
-						if(new Date(cEDd[0], cEDd[1]-1, cEDd[2], cETt[0], cETt[1]).toString() == new Date(sldate_2[2],sldate_2[1]-1,sldate_2[0],sltime_2[0],sltime_2[1]).toString() && chkExistDT[i].children[5].innerText.trim() == "scheduled" && chkExistDT[i].children[1].innerText.trim() == suiteInfo.Ip){
-							doNotSchedule = true;
-							openModelPopup("Schedule Test Suite", "Selected host already scheduled for given time.");
-							break;
-						}
-					}
-					if(doNotSchedule == false){					
-						$(this).find(".scenarioSchdCon tbody tr").each(function(){
-							if($(this).find(".selectToSched").is(":checked")){
-								selectedScenarioData.push({
-									condition : parseInt($(this).children("td:nth-child(4)").find("select option:selected").val()),
-									dataparam : [$(this).children("td:nth-child(3)").find("input").val().trim()],
-									executestatus : 1,
-									scenarioids : $(this).children("td:nth-child(2)").data("scenarioid"),
-									scenarioname: $(this).children("td:nth-child(2)").text(),
-									appType: window_ct.appType
-								})
-							}
-						})
-						suiteInfo.suiteDetails = selectedScenarioData;
-						suiteInfo.testsuitename = $(this).children('.scheduleSuite').find(".scheduleSuiteName").text();
-						suiteInfo.testsuiteid = $(this).children('.scheduleSuite').find(".scheduleSuiteName").data("testsuiteid");
-						suiteInfo.browserType = browserTypeExe;
-						suiteInfo.reschedule = false;
-						suiteInfo.scheduleid = "";
-						suiteInfo.scenarionames = [];
-						suiteInfo.userInfo = JSON.parse(window.localStorage['_UI']);
-						info = JSON.parse(window.localStorage['_FD']);
-						var scenarioDetails = JSON.parse(window.localStorage["_CT"]).testSuiteDetails;
-						for(var i=0; i<scenarioDetails.length;i++){
-							if(scenarioDetails[i].testsuiteid == suiteInfo.testsuiteid){
-								suiteInfo.cycleid = scenarioDetails[i].cycleid;
-								suiteInfo.releaseid = scenarioDetails[i].releaseid;
-								suiteInfo.cyclename = info.idnamemapcyc[scenarioDetails[i].cycleid];
-								suiteInfo.domainname = info.idnamemapdom[scenarioDetails[i].projectidts];
-								suiteInfo.projectname = info.idnamemapprj[scenarioDetails[i].projectidts];
-								for(j=0;j<suiteInfo.suiteDetails.length;j++){
-									suiteInfo.scenarionames.push(suiteInfo.suiteDetails[j].scenarioname);
-								}
-								break;
-							}
-						}
-						moduleInfo.push(suiteInfo);
-					}
+					});
+					suiteInfo.testsuiteName = $(this).children('.scheduleSuite').find(".scheduleSuiteName").text();
+					suiteInfo.testsuiteId = $(this).children('.scheduleSuite').find(".scheduleSuiteName").data("testsuiteid");
+					suiteInfo.versionNumber = $(this).children('.scheduleSuite').find(".scheduleSuiteName").data("versionnumber");
+					suiteInfo.appType = appType;
+					const moduleId = $(this).children('.scheduleSuite').find(".scheduleSuiteName").data("moduleid");
+					const tsu = readTestSuite[readTestSuite.map(t => t.testsuiteid).indexOf(moduleId)];
+					const info = JSON.parse(window.localStorage['_FD']);
+					suiteInfo.domainName = info.idnamemapdom[tsu.projectidts];
+					suiteInfo.projectName = info.idnamemapprj[tsu.projectidts];
+					suiteInfo.projectId = tsu.projectidts;
+					suiteInfo.releaseId = tsu.releaseid;
+					suiteInfo.cycleName = info.idnamemapcyc[tsu.cycleid];
+					suiteInfo.cycleId = tsu.cycleid;
+					suiteInfo.suiteDetails = selectedScenarioData;
+					moduleInfo.push(suiteInfo);
 				}
-			})
-			if(doNotSchedule == false){		
-				for(var i=0; i<moduleInfo.length; i++){
-					for(var j=0; j<moduleInfo.length; j++){
-						if(moduleInfo[i].Ip == moduleInfo[j].Ip && i!=j){
-							if(moduleInfo[i].date == moduleInfo[j].date){
-								if(moduleInfo[i].time == moduleInfo[j].time){
-									doNotSchedule = true;
-									openModelPopup("Schedule Test Suite", "Time's are matching for testsuite's containing following IP: "+moduleInfo[i].Ip+"");
-								}
-							}
-						}
-					}
-				}
-				if(doNotSchedule == false){
-					var counter=0;
-					for(var i=0; i<moduleInfo.length; i++){
-						var dat = moduleInfo[i].date.split("-");
-						var details = {
-							"clientipaddress": moduleInfo[i].Ip,
-							"curDate": dat[2]+"-"+dat[1]+"-"+dat[0]+" "+moduleInfo[i].time+":00+0000",
-						}
-						//var curDate = new Date(Date.UTC(sldate_2[2],sldate_2[1]-1,sldate_2[0],sltime_2[0],sltime_2[1],0));
-						var chktype = "checkexist"
-						ScheduleService.testSuitesScheduler_ICE(chktype,details,moduleInfo)
-						.then(function(data){
-							counter++;
-							if(data == "fail"){
-								doNotSchedule = true;
-							}else if(data=="NotApproved"){
-								doNotSchedule = true;
-								openModelPopup("Schedule Test Suite", "All the dependent tasks (design, scrape) needs to be approved before execution");
-							}
-							else if(data.length > 0){
-								doNotSchedule = true;
-								openModelPopup("Schedule Test Suite", "Selected host already scheduled for given time.");
-							}
-							else if(data.length == 0){
-								if(moduleInfo.length == counter){
-									proceedScheduling();
-								}
-							}
-						},
-						function(error){
-							console.log(error);
-						})
-					}									
+			});
+			if(doNotSchedule) return false;
+			const chkRepeat = {};
+			for(let i = 0; i < moduleInfo.length; i++) {
+				if (chkRepeat[moduleInfo[i].targetUser+"_"+moduleInfo[i].date+"_"+moduleInfo[i].time] !== undefined) {
+					// doNotSchedule = true;
+					// openModelPopup("Schedule Test Suite", "Schedule time is matching for testsuites scheduled for "+moduleInfo[i].targetUser);
+					console.log("Schedule time is matching for testsuites scheduled for "+moduleInfo[i].targetUser+". These will be combined and executed as a batch.");
 				}
 			}
-			function proceedScheduling(){
-				if(doNotSchedule == false){
-					var chktype = "schedule";
-					ScheduleService.testSuitesScheduler_ICE(chktype,'',moduleInfo, exc_action)
-					.then(function(data){
-						if(data == "success"){
-							openModelPopup("Schedule Test Suite", "Successfully scheduled.");
-							$(".selectScheduleSuite, .selectToSched").prop("checked", false);
-							$(".selectBrowserSc").find(".sb").removeClass("sb");
-							$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;").val("");
-							getScheduledDetails();
-							//Transaction Activity for InitSchedule Button Action
-							// var labelArr = [];
-							// var infoArr = [];
-							// labelArr.push(txnHistory.codesDict['InitSchedule']);
-							// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
-						}
-						else if(data == "few"){
-							openModelPopup("Schedule Test Suite", "Few suites are failed to schedule");
-							$(".selectScheduleSuite").prop("checked", false);
-							$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;").val("");
-						}
-						else{
-							openModelPopup("Schedule Test Suite", "Failed to schedule Testsuite.");
-							$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;")
-						}
-						$(".fc-timePicker").focus()
-					},
-					function(error){
-						console.log(error);
-					})
-					$("#scheduledDataBody>.scheduleDataBodyRow .scheduleDataBodyRowChild").show();
-					$("#scheduledSuitesFilterData").prop('selectedIndex', 0);
-					changeBackground();
-					browserTypeExe = [];
+			if(doNotSchedule) return false;
+			const executionData = {
+				source: "schedule",
+				exectionMode: execAction,
+				browserType: browserTypeExe,
+				qccredentials: {"qcurl": "", "qcusername": "", "qcpassword": ""},
+				batchInfo: moduleInfo
+			};
+			blockUI("Scheduling...");
+			ScheduleService.testSuitesScheduler_ICE(executionData)
+			.then(function(data) {
+				unblockUI();
+				if (data == "Invalid Session") return $rootScope.redirectPage();
+				else if (data == "NotApproved") openModelPopup("Schedule Test Suite", "All the dependent tasks (design, scrape) needs to be approved before execution");
+				else if (data == "NoTask") openModelPopup("Schedule Test Suite", "Task does not exist for child node");
+				else if (data == "Modified") openModelPopup("Schedule Test Suite", "Task has been modified, Please approve the task");
+				else if (data.status == "booked") openModelPopup("Schedule Test Suite", "Schedule time is matching for testsuites scheduled for " + data.user);
+				else if (data == "success") {
+					openModelPopup("Schedule Test Suite", "Successfully scheduled.");
+					$(".selectScheduleSuite, .selectToSched").prop("checked", false);
+					$(".selectBrowserSc").find(".sb").removeClass("sb");
+					$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;").val("");
+					getScheduledDetails();
+					//Transaction Activity for InitSchedule Button Action
+					// var labelArr = [];
+					// var infoArr = [];
+					// labelArr.push(txnHistory.codesDict['InitSchedule']);
+					// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+				} else if (data == "few") {
+					openModelPopup("Schedule Test Suite", "Failed to schedule few testsuites");
+					$(".selectScheduleSuite").prop("checked", false);
+					$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;").val("");
+				} else if (data == "fail") {
+					openModelPopup("Schedule Test Suite", "Failed to schedule Testsuite");
+					$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;");
+				} else {
+					openModelPopup("Schedule Test Suite", "Error in scheduling Testsuite. Scheduling failed");
+					$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;");
 				}
-			}
+				$("#scheduledDataBody>.scheduleDataBodyRow .scheduleDataBodyRowChild").show();
+				$("#scheduledSuitesFilterData").prop('selectedIndex', 0);
+				changeBackground();
+				browserTypeExe = [];
+				$(".fc-timePicker").focus()
+			}, function(error) {
+				unblockUI();
+				openModelPopup("Schedule Test Suite", "Failed to schedule Testsuite");
+				console.error("Error: ", error);
+			});
 		}		
 	}
 
 	//select parallel execution
 	$(document).on("click", ".selectParallel", function () {
 		$(this).find("img").toggleClass("sb");
-		if ($("img").hasClass('sb') == true) {
-			exc_action = "parallel";
-		} else {
-			exc_action = "serial";
-		}
+		if ($("img").hasClass('sb') == true) execAction = "parallel";
+		else execAction = "serial";
 	});
+
 	//Cancel scheduled jobs
 	$scope.cancelThisJob = function($event,status){
-		var suiteDetailsObj = $event.currentTarget.parentElement.dataset;
-		var host = $event.currentTarget.parentElement.parentElement.children[1].innerText;
-		var schedUserid = $event.currentTarget.parentElement.parentElement.children[1].dataset.userid;
-		ScheduleService.cancelScheduledJob_ICE(suiteDetailsObj,status,host,schedUserid)
+		const target = $event.currentTarget.parentElement;
+		const schDetails = target.dataset;
+		const host = target.parentElement.children[1].innerText;
+		const schedUserid = target.parentElement.children[1].dataset.scheduledby;
+		ScheduleService.cancelScheduledJob_ICE(schDetails, host, schedUserid)
 		.then(function(data){
 			if(data == "success"){
 				openModelPopup("Scheduled Test Suite", "Job is "+status+".");
-				$event.target.parentElement.textContent = status;
-				var tabEle = $(".scheduleDataBodyRowChild");
-				for(var i=0; i<tabEle.length; i++){
-					if(tabEle[i].children[5].dataset.scheduleid == suiteDetailsObj._id){
-						tabEle[i].children[5].innerText = status;
-					}
-				}
+				target.innerText = status;
 				getScheduledDetails();
-			}
-			else if(data == "inprogress"){
-				openModelPopup("Scheduled Test Suite", "Job is in progress.. cannot be cancelled.");
-			}
-			else if(data == "not authorised"){
-				openModelPopup("Scheduled Test Suite", "You are not authorized to cancel this job.");
-			}
-			else{
-				openModelPopup("Scheduled Test Suite", "Failed to cancel Job");
-			}
+			} else if(data == "inprogress") openModelPopup("Scheduled Test Suite", "Job is in progress.. cannot be cancelled.");
+			else if(data == "not authorised") openModelPopup("Scheduled Test Suite", "You are not authorized to cancel this job.");
+			else openModelPopup("Scheduled Test Suite", "Failed to cancel Job");
 		})
 	}
 }]);
+
 function openModelPopup(title, body){
 	$("#scheduleGlobalModal").find('.modal-title').text(title);
     $("#scheduleGlobalModal").find('.modal-body p').text(body).css('color','black');

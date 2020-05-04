@@ -1,183 +1,20 @@
 var uuidV4 = require('uuid-random');
 var admin = require('../controllers/admin');
-var suite = require('../controllers/suite');
 var create_ice = require('../controllers/create_ice');
 var myserver = require('../lib/socket.js');
-var notificationMsg = require("../notifications/notifyMessages");
 var logger = require('../../logger');
 var utils = require('../lib/utils');
 var xlsx = require('xlsx');
 var path = require('path');
 var fs = require('fs');
 var xl = require('excel4node');
-var taskflow = require('../config/options').strictTaskWorkflow;
 var crypto = require("crypto");
-var async = require("async");
-var design = require('../controllers/design');
+var asynclib = require("async");
 var Client = require("node-rest-client").Client;
 var DOMParser = require('xmldom').DOMParser;
 var epurl = process.env.NDAC_URL;
 var client = new Client();
-/**
-*
-*  Base64 encode / decode
-*  http://www.webtoolkit.info
-*
-**/
-var Base64 = {
 
-    // private property
-    _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
-
-    // public method for encoding
-    , encode: function (input)
-    {
-        var output = "";
-        var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
-        var i = 0;
-
-        input = Base64._utf8_encode(input);
-
-        while (i < input.length)
-        {
-            chr1 = input.charCodeAt(i++);
-            chr2 = input.charCodeAt(i++);
-            chr3 = input.charCodeAt(i++);
-
-            enc1 = chr1 >> 2;
-            enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
-            enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
-            enc4 = chr3 & 63;
-
-            if (isNaN(chr2))
-            {
-                enc3 = enc4 = 64;
-            }
-            else if (isNaN(chr3))
-            {
-                enc4 = 64;
-            }
-
-            output = output +
-                this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) +
-                this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
-        } // Whend 
-
-        return output;
-    } // End Function encode 
-
-
-    // public method for decoding
-    ,decode: function (input)
-    {
-        var output = "";
-        var chr1, chr2, chr3;
-        var enc1, enc2, enc3, enc4;
-        var i = 0;
-
-        input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
-        while (i < input.length)
-        {
-            enc1 = this._keyStr.indexOf(input.charAt(i++));
-            enc2 = this._keyStr.indexOf(input.charAt(i++));
-            enc3 = this._keyStr.indexOf(input.charAt(i++));
-            enc4 = this._keyStr.indexOf(input.charAt(i++));
-
-            chr1 = (enc1 << 2) | (enc2 >> 4);
-            chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
-            chr3 = ((enc3 & 3) << 6) | enc4;
-
-            output = output + String.fromCharCode(chr1);
-
-            if (enc3 != 64)
-            {
-                output = output + String.fromCharCode(chr2);
-            }
-
-            if (enc4 != 64)
-            {
-                output = output + String.fromCharCode(chr3);
-            }
-
-        } // Whend 
-
-        output = Base64._utf8_decode(output);
-
-        return output;
-    } // End Function decode 
-
-
-    // private method for UTF-8 encoding
-    ,_utf8_encode: function (string)
-    {
-        var utftext = "";
-        string = string.replace(/\r\n/g, "\n");
-
-        for (var n = 0; n < string.length; n++)
-        {
-            var c = string.charCodeAt(n);
-
-            if (c < 128)
-            {
-                utftext += String.fromCharCode(c);
-            }
-            else if ((c > 127) && (c < 2048))
-            {
-                utftext += String.fromCharCode((c >> 6) | 192);
-                utftext += String.fromCharCode((c & 63) | 128);
-            }
-            else
-            {
-                utftext += String.fromCharCode((c >> 12) | 224);
-                utftext += String.fromCharCode(((c >> 6) & 63) | 128);
-                utftext += String.fromCharCode((c & 63) | 128);
-            }
-
-        } // Next n 
-
-        return utftext;
-    } // End Function _utf8_encode 
-
-    // private method for UTF-8 decoding
-    ,_utf8_decode: function (utftext)
-    {
-        var string = "";
-        var i = 0;
-        var c, c1, c2, c3;
-        c = c1 = c2 = 0;
-
-        while (i < utftext.length)
-        {
-            c = utftext.charCodeAt(i);
-
-            if (c < 128)
-            {
-                string += String.fromCharCode(c);
-                i++;
-            }
-            else if ((c > 191) && (c < 224))
-            {
-                c2 = utftext.charCodeAt(i + 1);
-                string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
-                i += 2;
-            }
-            else
-            {
-                c2 = utftext.charCodeAt(i + 1);
-                c3 = utftext.charCodeAt(i + 2);
-                string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
-                i += 3;
-            }
-
-        } // Whend 
-
-        return string;
-    } // End Function _utf8_decode 
-
-}
-function addslashes( str ) {
-    return str;
-}
 /* Convert excel file to CSV Object. */
 var xlsToCSV = function (workbook, sheetname) {
 	var result = [];
@@ -286,427 +123,20 @@ exports.populateUsers = function (req, res) {
 
 };
 
-exports.populateReleases = function (req, res) {
-	logger.info("Inside UI service: populateReleases");
-	if (utils.isSessionActive(req)) {
-		var d = req.body;
-		var project_id = { projectId: d.projectId };
-		create_ice.getReleaseIDs_Nineteen68(project_id, function (err, data) {
-			res.setHeader('Content-Type', 'application/json');
-			if (err)
-				res.status(500).send('Fail');
-			else {
-				res.status(200).send(data);
-			}
-		});
-	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
-	}
-};
-
-exports.populateCycles = function (req, res) {
-	logger.info("Inside UI service: populateCycles");
-	if (utils.isSessionActive(req)) {
-		var rel_id = { relId: req.body.releaseId };
-		create_ice.getCycleIDs_Nineteen68(rel_id, function (err, data) {
-			res.setHeader('Content-Type', 'application/json');
-			if (err)
-				res.status(500).send(err);
-			else {
-				res.status(200).send(data);
-			}
-		});
-	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
-	}
-};
-
-// exports.getCRId = function (req, res) {
-// 	logger.info("Inside UI service: getCRId");
-// 	if (utils.isSessionActive(req)) {
-// 		var inputs = { "projectid": req.body.projectid };
-// 		suite.getCRId(inputs, function (status, result) {
-// 			res.setHeader('Content-Type', 'application/json');
-// 			if (status != 200) res.status(status).send(result);
-// 			else {
-// 				res.status(status).send(result);
-// 			}
-// 		});
-// 	}
-// 	else {
-// 		logger.error("Invalid Session");
-// 		res.send("Invalid Session");
-// 	}
-// };
-
-exports.checkReuse = function (req, res) {
-	logger.info("Inside UI service: checkReuse");
-	if (utils.isSessionActive(req)) {
-		var d = req.body;
-		var qData = d.parsedata; 
-		/* 
-		 	Check Reuse LOgic goes here
-		*/
-		// this is coming from mindmapservice which is restrict_scenario_reuse from parsedata reuse in minmapcontroller.js
-		//var qListReuse = getQueries(qData);
-		// neo4jAPI.executeQueries(qListReuse, function (status, result) {
-		// 	res.setHeader('Content-Type', 'application/json');
-		// 	if (status != 200) {
-		// 		logger.error('Error in checkReuse mindmap service');
-		// 		res.status(500).send('Fail');
-		// 	}
-		// 	else {
-		// 		if (qData.gettestcases) {
-		// 			res.status(200).send(result[0].data[0].row[0]);
-		// 		}
-		// 		else {
-		// 			var i = 0;
-		// 			while (i < qData['screen'].length) {
-		// 				if (result[i].data[0].row[0] > 1)
-		// 					qData['screen'][i].reuse = true;
-		// 				else
-		// 					qData['screen'][i].reuse = false;
-		// 				qData['screen'][i].count = result[i].data[0].row[0];
-		// 				i = i + 1;
-		// 			}
-		// 			var j = 0;
-		// 			while (j < qData['testcase'].length) {
-		// 				if (result[i + j].data[0].row[0].length > 1) {
-		// 					qData['testcase'][j].reuse = true;
-		// 					qData['testcase'][j].oidlist = result[i + j].data[0].row[0];
-		// 				}
-		// 				else
-		// 					qData['testcase'][j].reuse = false;
-		// 				j = j + 1;
-		// 			}
-		// 			var k = 0;
-		// 			if (qData['scenarios']) {
-		// 				while (k < qData['scenarios'].length) {
-		// 					if (result[k].data.length > 0 && (result[k].data[0].row[0] > 1 || (result[k].data[0].row[0] == 1 && qData['modules'] != result[k].data[0].row[1])))
-		// 						qData['scenarios'][k].reuse = true;
-		// 					else
-		// 						qData['scenarios'][k].reuse = false;
-		// 					k = k + 1;
-		// 				}
-		// 			}
-		// 			res.status(status).send(qData);
-		// 		}
-		// 	}
-		// });
-	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
-	}
-};
-
-// exports.getReleaseIDs_Nineteen68 = function (req, res) {
-// 	logger.info("Inside UI service: getReleaseIDs_Nineteen68");
-// 	var rname = [];
-// 	var r_ids = [];
-// 	var rel = {
-// 		rel: [],
-// 		r_ids: []
-// 	};
-// 	var project_id = req.projectId;
-// 	inputs = {
-// 		"projectid": project_id
-// 	};
-// 	var args = {
-// 		data: inputs,
-// 		headers: {
-// 			"Content-Type": "application/json"
-// 		}
-// 	};
-// 	logger.info("Calling NDAC Service from getReleaseIDs_Nineteen68: create_ice/getReleaseIDs_Nineteen68");
-// 	client.post(epurl+"create_ice/getReleaseIDs_Nineteen68", args,
-// 		function (result, response) {
-// 			try {
-// 				if (response.statusCode != 200 || result.rows == "fail") {
-// 					logger.error("Error occurred in create_ice/getReleaseIDs_Nineteen68: getReleaseIDs_Nineteen68, Error Code : ERRNDAC");
-// 					res(null, result.rows);
-// 				} else {
-// 					async.forEachSeries(result.rows, function (iterator, callback1) {
-// 						rname.push(iterator.releasename);
-// 						r_ids.push(iterator.releaseid);
-// 						callback1();
-// 					});
-// 					rel.rel = rname;
-// 					rel.r_ids = r_ids;
-// 					res(null, rel);
-// 				}
-// 			} catch (ex) {
-// 				logger.error("Exception in the service getReleaseIDs_Nineteen68: %s", ex);
-// 			}
-// 		});
-// };
-
-exports.getModules = function (req, res) {
+exports.getModules = async (req, res) => {
 	logger.info("Inside UI service: getModules");
-	if (utils.isSessionActive(req)) {
-		// var nData = [], qList = [], idDict = {};
-		// var urlData = req.get('host').split(':');
-		var d = req.body;
-		// var tab = d.tab;
-		// var prjId = d.prjId;
-		// var modName = d.modName;
-		// var relId = d.relId;
-		// var cycId = d.cycId;
-		// var qmod = '';
-
-		var inputs= {
-			"tab":d.tab,
-			"projectid":d.projectid || null,
-			"modulename":d.modName,
-			"moduleid":d.moduleid,
-			// "releaseid":d.relId,
-			"cycleid":d.cycId,
-			"name":"getModules"
-		}
-		// console.log("Came in getModules");
-		var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
-			}
-		};
-
-		client.post(epurl+"mindmap/getModules", args,
-		function (result, response) {
-			try {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in mindmaps/getModules: getModules, Error Code : ERRNDAC");
-					res.send("fail");
-				} else {
-					// async.forEachSeries(result.rows, function (iterator, callback1) {
-					// 	rname.push(iterator.releasename);
-					// 	r_ids.push(iterator.releaseid);
-					// 	callback1();
-					// });
-					// rel.rel = rname;
-					// rel.r_ids = r_ids;
-					res.send(result.rows);
-				}
-			} catch (ex) {
-				logger.error("Exception in the service getReleaseIDs_Nineteen68: %s", ex);
-			}
-		});
-
-		
-		// if (modName == 'fetch all')  {
-		// 	if (d.tab == 'tabAssign' || d.tab == 'endToend') {
-		// 		qList.push({ "statement": "MATCH path=(n:MODULES_ENDTOEND{projectID:'" + prjId + "'})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] });
-		// 		qList.push({ "statement": "MATCH path=(n:MODULES_ENDTOEND{projectID:'" + prjId + "'}) WHERE NOT (n)-[:FMTTS]->() RETURN n", "resultDataContents": ["graph"] });
-		// 	}
-		// 	qList.push({ "statement": " MATCH path=(n:MODULES{projectID:'" + prjId + "'})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] });
-		// 	qList.push({ "statement": "MATCH path=(n:MODULES{projectID:'" + prjId + "'}) WHERE NOT (n)-[:FMTTS]->() RETURN n", "resultDataContents": ["graph"] });
-			
-		// 	// MATCH (a:MODULES) WHERE NOT (a)-[:FMTTS]->() return a
-
-			
-		// 	neo4jAPI.executeQueries(qList, function (status, result) {
-		// 		res.setHeader('Content-Type', 'application/json');
-		// 		if (status != 200) res.status(status).send(result);
-		// 		else {
-		// 			var k = 0, rIndex = [], lbl, neoIdDict = {}, maps = [], tList = [];
-		// 			var attrDict = { "modules_endtoend": { "childIndex": "childIndex", "projectID": "projectID", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "modules": { "childIndex": "childIndex", "projectID": "projectID", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "scenarios": { "projectID": "projectID", "childIndex": "childIndex", "moduleID": "pid_n", "testScenarioName": "name", "testScenarioID": "id_n", "testScenarioID_c": "id_c" }, "screens": { "projectID": "projectID", "childIndex": "childIndex", "testScenarioID": "pid_n", "screenName": "name", "screenID": "id_n", "screenID_c": "id_c", "taskexists": "taskexists" }, "testcases": { "projectID": "projectID", "childIndex": "childIndex", "screenID": "pid_n", "testCaseName": "name", "testCaseID": "id_n", "testCaseID_c": "id_c", "taskexists": "taskexists" }, "tasks": { "taskID": "id_n", "task": "t", "batchName": "bn", "assignedTo": "at", "reviewer": "rw", "startDate": "sd", "endDate": "ed", "re_estimation": "re_estimation", "release": "re", "cycle": "cy", "details": "det", "nodeID": "pid", "parent": "anc", "cx": "cx" } };
-		// 			var jsonData = result;
-		// 			var all_modules = jsonData[0].data;
-		// 			if (d.tab == 'tabAssign' || d.tab == 'endToend') {
-		// 				all_modules = jsonData[0].data.concat(jsonData[1].data).concat(jsonData[2].data).concat(jsonData[3].data);
-		// 			} else {
-		// 				all_modules = jsonData[0].data.concat(jsonData[1].data);
-		// 			}
-		// 			all_modules.forEach(function (row) {
-		// 				row.graph.nodes.forEach(function (n) {
-		// 					if (idDict[n.id] === undefined) {
-		// 						lbl = n.labels[0].toLowerCase();
-		// 						if (lbl == 'testscenarios') lbl = 'scenarios';
-		// 						for (var attrs in n.properties) {
-		// 							if (attrDict[lbl][attrs] !== undefined) n[attrDict[lbl][attrs]] = n.properties[attrs];
-		// 							delete n.properties[attrs];
-		// 						}
-		// 						if (lbl == "tasks") {
-		// 							try {
-		// 								nData.push({ id: n.id_n, oid: n.id, task: n.t, batchName: n.bn, assignedTo: n.at, reviewer: n.rw, startDate: n.sd, endDate: n.ed, re_estimation: n.re_estimation, release: n.re, cycle: n.cy, details: n.det, nodeID: n.pid, parent: n.anc.slice(1, -1).split(','), cx: n.cx });
-		// 							}
-		// 							catch (ex) {
-		// 								logger.error("exception in mindmapService: ", ex);
-		// 							}
-		// 						}
-		// 						else {
-		// 							if (lbl == "modules" || lbl == "modules_endtoend") n.childIndex = 0;
-		// 							nData.push({ projectID: n.projectID, childIndex: n.childIndex, id: n.id, "type": lbl, name: n.name, id_n: n.id_n, pid_n: n.pid_n, id_c: n.id_c, children: [], task: null });
-		// 						}
-		// 						if (lbl == "modules" || lbl == "modules_endtoend") rIndex.push(k);
-		// 						idDict[n.id] = k; neoIdDict[n.id_n] = k;
-		// 						k++;
-		// 					}
-		// 				});
-		// 				row.graph.relationships.forEach(function (r) {
-		// 					try {
-		// 						var srcIndex = idDict[r.startNode.toString()];
-		// 						var tgtIndex = idDict[r.endNode.toString()];
-		// 						//if(nData[tgtIndex].children===undefined) nData[srcIndex].task=nData[tgtIndex];
-		// 						if (nData[tgtIndex].children === undefined) {
-		// 							if ((tab == 'tabAssign' && nData[tgtIndex].release == relId && nData[tgtIndex].cycle == cycId) || tab == 'tabCreate' || tab == 'endToend') {
-		// 								nData[srcIndex].task = nData[tgtIndex];
-		// 							} else if (nData[srcIndex].type == 'testcases' || nData[srcIndex].type == 'screens') {
-		// 								nData[srcIndex].taskexists = nData[tgtIndex];
-		// 							}
-		// 						}
-		// 						else if (nData[srcIndex].children.indexOf(nData[tgtIndex]) == -1) {
-		// 							nData[srcIndex].children.push(nData[tgtIndex]);
-		// 							if (nData[tgtIndex].childIndex == undefined) {
-		// 								nData[tgtIndex].childIndex = nData[srcIndex].children.length;
-		// 							}
-		// 						}
-		// 					} catch (ex) {
-
-		// 						logger.error("exception in mindmapService: ", ex);
-		// 					}
-		// 				});
-		// 			});
-		// 			//tList.forEach(function(t){nData[neoIdDict[t.nodeID]].task=t;});
-		// 			nData.forEach(function (e) {
-		// 				if (e.pid_n) {
-		// 					if (neoIdDict[e.pid_n] !== undefined) e.pid_n = nData[neoIdDict[e.pid_n]].id;
-		// 					else e.pid_n = null;
-		// 				}
-		// 			});
-		// 			rIndex.forEach(function (m) { maps.push(nData[m]); });
-		// 			res.status(status).send(maps);
-		// 		}
-		// 	});
-		// }
-		// if (modName) {
-		// 	qmod = ',moduleName:"' + modName + '"';
-		// 	if (d.tab == 'tabAssign' || d.tab == 'endToend') {
-		// 		qList.push({ "statement": "MATCH path=(n:MODULES_ENDTOEND{projectID:'" + prjId + "' " + qmod + "})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] });
-		// 		qList.push({ "statement": "MATCH path=(n:MODULES_ENDTOEND{projectID:'" + prjId + "' " + qmod + "}) WHERE NOT (n)-[:FMTTS]->() RETURN n", "resultDataContents": ["graph"] });
-		// 	}
-		// 	qList.push({ "statement": " MATCH path=(n:MODULES{projectID:'" + prjId + "' " + qmod + "})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] });
-		// 	qList.push({ "statement": "MATCH path=(n:MODULES{projectID:'" + prjId + "' " + qmod + "}) WHERE NOT (n)-[:FMTTS]->() RETURN n", "resultDataContents": ["graph"] });
-		// 	//MATCH (a:MODULES) WHERE NOT (a)-[:FMTTS]->() return a
-
-		// 	neo4jAPI.executeQueries(qList, function (status, result) {
-		// 		res.setHeader('Content-Type', 'application/json');
-		// 		if (status != 200) res.status(status).send(result);
-		// 		else {
-		// 			var k = 0, rIndex = [], lbl, neoIdDict = {}, maps = [], tList = [];
-		// 			var attrDict = { "modules_endtoend": { "childIndex": "childIndex", "projectID": "projectID", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "modules": { "childIndex": "childIndex", "projectID": "projectID", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "scenarios": { "projectID": "projectID", "childIndex": "childIndex", "moduleID": "pid_n", "testScenarioName": "name", "testScenarioID": "id_n", "testScenarioID_c": "id_c" }, "screens": { "projectID": "projectID", "childIndex": "childIndex", "testScenarioID": "pid_n", "screenName": "name", "screenID": "id_n", "screenID_c": "id_c", "taskexists": "taskexists" }, "testcases": { "projectID": "projectID", "childIndex": "childIndex", "screenID": "pid_n", "testCaseName": "name", "testCaseID": "id_n", "testCaseID_c": "id_c", "taskexists": "taskexists" }, "tasks": { "taskID": "id_n", "task": "t", "batchName": "bn", "assignedTo": "at", "reviewer": "rw", "startDate": "sd", "endDate": "ed", "re_estimation": "re_estimation", "release": "re", "cycle": "cy", "details": "det", "nodeID": "pid", "parent": "anc", "cx": "cx" } };
-		// 			var jsonData = result;
-		// 			var all_modules = jsonData[0].data;
-		// 			if (d.tab == 'tabAssign' || d.tab == 'endToend') {
-		// 				all_modules = jsonData[0].data.concat(jsonData[1].data).concat(jsonData[2].data).concat(jsonData[3].data);
-		// 			} else {
-		// 				all_modules = jsonData[0].data.concat(jsonData[1].data);
-		// 			}
-		// 			all_modules.forEach(function (row) {
-		// 				row.graph.nodes.forEach(function (n) {
-		// 					if (idDict[n.id] === undefined) {
-		// 						lbl = n.labels[0].toLowerCase();
-		// 						if (lbl == 'testscenarios') lbl = 'scenarios';
-		// 						for (var attrs in n.properties) {
-		// 							if (attrDict[lbl][attrs] !== undefined) n[attrDict[lbl][attrs]] = n.properties[attrs];
-		// 							delete n.properties[attrs];
-		// 						}
-		// 						if (lbl == "tasks") {
-		// 							try {
-		// 								nData.push({ id: n.id_n, oid: n.id, task: n.t, batchName: n.bn, assignedTo: n.at, reviewer: n.rw, startDate: n.sd, endDate: n.ed, re_estimation: n.re_estimation, release: n.re, cycle: n.cy, details: n.det, nodeID: n.pid, parent: n.anc.slice(1, -1).split(','), cx: n.cx });
-		// 							}
-		// 							catch (ex) {
-		// 								logger.error("exception in mindmapService: ", ex);
-		// 							}
-		// 						}
-		// 						else {
-		// 							if (lbl == "modules" || lbl == "modules_endtoend") n.childIndex = 0;
-		// 							nData.push({ projectID: n.projectID, childIndex: n.childIndex, id: n.id, "type": lbl, name: n.name, id_n: n.id_n, pid_n: n.pid_n, id_c: n.id_c, children: [], task: null });
-		// 						}
-		// 						if (lbl == "modules" || lbl == "modules_endtoend") rIndex.push(k);
-		// 						idDict[n.id] = k; neoIdDict[n.id_n] = k;
-		// 						k++;
-		// 					}
-		// 				});
-		// 				row.graph.relationships.forEach(function (r) {
-		// 					try {
-		// 						var srcIndex = idDict[r.startNode.toString()];
-		// 						var tgtIndex = idDict[r.endNode.toString()];
-		// 						//if(nData[tgtIndex].children===undefined) nData[srcIndex].task=nData[tgtIndex];
-		// 						if (nData[tgtIndex].children === undefined) {
-		// 							if ((tab == 'tabAssign' && nData[tgtIndex].release == relId && nData[tgtIndex].cycle == cycId) || tab == 'tabCreate' || tab == 'endToend') {
-		// 								nData[srcIndex].task = nData[tgtIndex];
-		// 							} else if (nData[srcIndex].type == 'testcases' || nData[srcIndex].type == 'screens') {
-		// 								nData[srcIndex].taskexists = nData[tgtIndex];
-		// 							}
-		// 						}
-		// 						else if (nData[srcIndex].children.indexOf(nData[tgtIndex]) == -1) {
-		// 							nData[srcIndex].children.push(nData[tgtIndex]);
-		// 							if (nData[tgtIndex].childIndex == undefined) {
-		// 								nData[tgtIndex].childIndex = nData[srcIndex].children.length;
-		// 							}
-		// 						}
-		// 					} catch (ex) {
-		// 						logger.error("exception in mindmapService: ", ex);
-		// 					}
-		// 				});
-		// 			});
-		// 			//tList.forEach(function(t){nData[neoIdDict[t.nodeID]].task=t;});
-		// 			nData.forEach(function (e) {
-		// 				if (e.pid_n) {
-		// 					if (neoIdDict[e.pid_n] !== undefined) e.pid_n = nData[neoIdDict[e.pid_n]].id;
-		// 					else e.pid_n = null;
-		// 				}
-		// 			});
-		// 			rIndex.forEach(function (m) { maps.push(nData[m]); });
-		// 			res.status(status).send(maps);
-		// 		}
-		// 	});
-		// }
-	// 	else {
-	// 		qList.push({ "statement": " MATCH (n:MODULES{projectID:'" + prjId + "'}) RETURN n.moduleName,n.moduleID", "resultDataContents": ["row"] });
-	// 		if (d.tab == 'tabAssign' || d.tab == 'endToend') {
-	// 			qList.push({ "statement": "MATCH (n:MODULES_ENDTOEND{projectID:'" + prjId + "'}) RETURN n.moduleName,n.moduleID", "resultDataContents": ["row"] });
-	// 		}
-
-	// 		neo4jAPI.executeQueries(qList, function (status, result) {
-	// 			var modulenames = [];
-	// 			res.setHeader('Content-Type', 'application/json');
-	// 			if (status != 200) res.status(status).send(result);
-	// 			else {
-	// 				if (result[1]) {
-	// 					result[1].data.forEach(function (e, i) {
-	// 						modulenames.push({ name: e.row[0], type: 'modules_endtoend', id_n: e.row[1] });
-	// 					});
-	// 				}
-	// 				result[0].data.forEach(function (e, i) {
-	// 					modulenames.push({ name: e.row[0], type: 'modules', id_n: e.row[1] });
-	// 				});
-	// 				res.status(status).send(modulenames);
-	// 			}
-	// 		});
-	// 	}
+	const d = req.body;
+	const inputs = {
+		"tab":d.tab,
+		"projectid":d.projectid || null,
+		"modulename":d.modName,
+		"moduleid":d.moduleid,
+		"cycleid":d.cycId,
+		"name":"getModules"
 	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
-	}
+	const data = await utils.fetchData(inputs, "mindmap/getModules", "getModules");
+	res.send(data);
 };
-
-// function check_status(ExecutionData,check_callback){
-// 	if(ExecutionData && taskflow){
-// 		utils.approval_status_check(ExecutionData, function (err, approved) {
-// 			check_callback(err,approved)
-// 		});
-// 	}else{
-// 		check_callback(null,true);
-// 	}
-	
-// }
 
 exports.reviewTask = function (req, res) {
 	logger.info("Inside UI service: reviewTask");
@@ -725,13 +155,6 @@ exports.reviewTask = function (req, res) {
 		}else{
 			taskID=batchIds[0];
 		}
-		// var ExecutionData=inputs.module_info;
-		// res.status(200).send('success');
-		/** 
-		 * New logic needs to be implemented for Review task and Strict WOrkflow
-		 * */ 
-		// check_status(ExecutionData, function (err, check_status_result) {
-		// 	if (check_status_result){
 		var cur_date = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + ',' +date.toLocaleTimeString();
 		var taskHistory = { "userid": userId, "status": "", "modifiedBy": username, "modifiedOn": cur_date };
 		if (status == 'inprogress' || status == 'assigned' || status == 'reassigned' || status == 'reassign') {
@@ -769,111 +192,12 @@ exports.reviewTask = function (req, res) {
 			}
 
 		})
-		// 		var qlist_query = [query];
-		// 		var new_queries = [];
-		// 		var task_flag = false;
-		// 		neo4jAPI.executeQueries(qlist_query, function (status_code, result) {
-		// 			if (status_code != 200) {
-		// 				res.status(status_code).send(result);
-		// 			} else {
-		// 				try {
-		// 					var res_data = result;
-		// 					if (res_data[0].data.length != 0 && res_data[0].data[0]['graph']['nodes'] != null) {
-		// 						var task = '';
-		// 						var task_relation = '';
-		// 						if (res_data[0].data[0]['graph']['nodes'][0].labels[0] == 'TASKS') {
-		// 							task = res_data[0].data[0]['graph']['nodes'][0];
-		// 							task_relation = res_data[0].data[0]['graph']['nodes'][1];
-		// 						}
-		// 						else {
-		// 							task = res_data[0].data[0]['graph']['nodes'][1];
-		// 							task_relation = res_data[0].data[0]['graph']['nodes'][0];
-		// 						}
-		// 						var neo_taskHistory = task.taskHistory;
-		// 						if ((status == 'inprogress' || status == 'assigned' || status == 'reassigned') && task.reviewer != 'select reviewer') {
-		// 							taskHistory.status = 'review';
-		// 							if (neo_taskHistory == undefined || neo_taskHistory == '') {
-		// 								neo_taskHistory = [taskHistory];
-		// 							} else {
-		// 								neo_taskHistory = JSON.parse(neo_taskHistory);
-		// 								neo_taskHistory.push(taskHistory);
-		// 							}
-		// 							neo_taskHistory = JSON.stringify(neo_taskHistory);
-		// 							query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.assignedTo='" + userId + "' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review',n.taskHistory='" + neo_taskHistory + "' RETURN n" };
-		// 							new_queries.push(query);
-		// 							task_flag = true;
-
-		// 						} else if (status == 'review') {
-		// 							taskHistory.status = 'complete';
-		// 							if (neo_taskHistory == undefined || neo_taskHistory == '') {
-		// 								neo_taskHistory = [taskHistory];
-		// 							} else {
-		// 								neo_taskHistory = JSON.parse(neo_taskHistory)
-		// 								neo_taskHistory.push(taskHistory);
-		// 							}
-		// 							neo_taskHistory = JSON.stringify(neo_taskHistory);
-		// 							query = { 'statement': "MATCH (m)-[r]-(n:TASKS) WHERE n.taskID in " + taskID + " and n.reviewer='" + userId + "' set n.assignedTo='',n.status='complete',n.taskHistory='" + neo_taskHistory + "' DELETE r RETURN n" };
-		// 							new_queries.push(query);
-		// 							task_flag = true;
-		// 						} else if (status == 'reassign') {
-		// 							taskHistory.status = 'reassigned';
-		// 							if (neo_taskHistory == undefined || neo_taskHistory == '') {
-		// 								neo_taskHistory = [taskHistory];
-		// 							} else {
-		// 								neo_taskHistory = JSON.parse(neo_taskHistory);
-		// 								neo_taskHistory.push(taskHistory);
-		// 							}
-		// 							neo_taskHistory = JSON.stringify(neo_taskHistory);
-		// 							query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.reviewer='" + userId + "' set n.reviewer=n.assignedTo,n.assignedTo=n.task_owner,n.status='reassigned',n.taskHistory='" + neo_taskHistory + "' RETURN n" };
-		// 							new_queries.push(query);
-		// 							task_flag = true;
-		// 						}
-		// 						if (task_flag) {
-		// 							neo4jAPI.executeQueries(new_queries, function (status, result) {
-		// 								if (status != 200) res.status(status).send(result);
-		// 								else res.status(200).send('success');
-
-		// 							});
-		// 						} else {
-		// 							res.status(200).send('fail');
-		// 						}
-		// 					}
-		// 					else {
-		// 						res.status(200).send('fail');
-		// 					}
-		// 				} catch (ex) {
-		// 					logger.error("exception in mindmapService: ", ex);
-		// 					res.status(200).send('fail');
-		// 				}
-		// 			}
-		// 		});
-		// 	}
-		// 	else res.status(err.status).send(err.res);
-		// });
 	}
 	else {
 		logger.error("Invalid Session");
 		res.send("Invalid Session");
 	}
 };
-
-// function getRenameQueries(map, prjId) {
-// 	var rnmQList = [];
-// 	map.forEach(function (e, i) {
-// 		if (e.renamed) {
-// 			if (e.type == 'scenarios') {
-// 				rnmQList.push({ "statement": "MATCH(n:TESTSCENARIOS{testScenarioName:'" + e.orig_name + "',projectID:'" + prjId + "'})<-[r:FMTTS]-(m) SET n.testScenarioName='" + e.name + "'" });
-// 			}
-// 			if (e.type == 'screens') {
-// 				rnmQList.push({ "statement": "MATCH(n:SCREENS{screenName:'" + e.orig_name + "',projectID:'" + prjId + "'}) SET n.screenName='" + e.name + "'" });
-// 			}
-// 			if (e.type == 'testcases') {
-// 				rnmQList.push({ 'statement': 'Match (n:TESTCASES{testCaseName : "' + e.orig_name + '",projectID :"' + prjId + '"})<-[a:FSTTS]-(scr:SCREENS{screenName:"' + e.screenname + '"})  SET n.testCaseName="' + e.name + '"' });
-// 			}
-// 		}
-// 	});
-// 	return rnmQList;
-// }
 
 exports.saveData = function (req, res) {
 	logger.info("Inside UI service: saveData");
@@ -1008,7 +332,6 @@ exports.saveData = function (req, res) {
 				if (err) {
 					res.status(500).send(err);
 				} else {
-					// console.log(data);
 					res.status(200).send(data);
 				}
 			});
@@ -1061,7 +384,6 @@ exports.saveData = function (req, res) {
 				else if (e.type == 'modules') {
 					if (t != null && e._id != null) {
 						if (t._id!=null && (removeTask.includes(t._id))) return;
-						
 						tsk.tasktype=t.task
 						tsk.nodetype="testsuites"
 						tsk.name=e.name
@@ -1167,19 +489,10 @@ exports.saveData = function (req, res) {
 							if(!screenids.has(tsk.nodeid))
 								tasks_insert.push(tsk)
 						}
-						// else if (!t.copied) {
-						// 	// If reused 
-						// 	// t.parent = [prjId].concat(t.parent);
-						// 	tasks_insert.push(tsk)
-						// 	// qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',release:'" + t.release + "',cycle:'" + t.cycle + "',re_estimation:'" + t.re_estimation + "',details:'" + t.details + "',parent:'[" + t.parent + "]',uid:'" + uidx + "',cx:'" + t.cx + "'})" });
-						// }
-						// qList.push({ "statement": "MATCH (a:SCREENS{screenID_c:'" + e.id_c + "'}),(b:TASKS{taskID:'" + t.id + "'}) MERGE (a)-[r:FNTT {id:a.screenID}]-(b)" });
 						screenids.add(tsk.nodeid)
 					}
 				}
 				else if (e.type == 'testcases') {
-					var screenid_c = 'null';
-
 					if (t != null && e.id != null) {
 						if (t._id!=null && (removeTask.includes(t._id))) return;
 						tsk.tasktype=t.task
@@ -1205,25 +518,12 @@ exports.saveData = function (req, res) {
 							if (cycId == t.cycleid) {
 								tsk._id=t._id
 								tasks_update.push(tsk)
-								// if (t.updatedParent != undefined) {
-								// 	qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]'}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.status='" + taskstatus + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]',n.cx='" + t.cx + "'" });
-								// } else {
-								// 	qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]'}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.status='" + taskstatus + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "',n.cx='" + t.cx + "'" });
-								// }
 							}
-
 						}else{
 							if(!testcaseids.has(tsk.nodeid))
 								tasks_insert.push(tsk)
 						}
 						testcaseids.add(tsk.nodeid);
-						// else if (!t.copied) {
-						// 	// If reused 
-						// 	// t.parent = [prjId].concat(t.parent);
-						// 	tasks_insert.push(tsk)
-						// 	// qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',release:'" + t.release + "',cycle:'" + t.cycle + "',re_estimation:'" + t.re_estimation + "',details:'" + t.details + "',parent:'[" + t.parent + "]',uid:'" + uidx + "',cx:'" + t.cx + "'})" });
-						// }
-						// qList.push({ "statement": "MATCH (a:SCREENS{screenID_c:'" + e.id_c + "'}),(b:TASKS{taskID:'" + t.id + "'}) MERGE (a)-[r:FNTT {id:a.screenID}]-(b)" });
 					}
 				}
 			});
@@ -1253,7 +553,6 @@ exports.saveData = function (req, res) {
 						res.send(modid);
 					}
 			});
-			
 		}
 	} else {
 		logger.error("Invalid Session");
@@ -1539,24 +838,6 @@ exports.exportToExcel = function (req, res) {
 	}
 };
 
-exports.getDomain = function (req, res) {
-	admin.getDomains_ICE(req, res);
-};
-function getElementByAttribute(attr, value, root) {
-    root = root || document.body;
-    if(root.hasAttribute(attr) && root.getAttribute(attr) == value) {
-        return root;
-    }
-    var children = root.children, 
-        element;
-    for(var i = children.length; i--; ) {
-        element = getElementByAttribute(attr, value, children[i]);
-        if(element) {
-            return element;
-        }
-    }
-    return null;
-}
 function xml2json(xml, tab) {
 	var X = {
 	   toObj: function(xml) {
@@ -1617,7 +898,7 @@ function xml2json(xml, tab) {
 			 o = X.toObj(xml.documentElement);
 		  }
 		  else
-			 console.log("unhandled node type: " + xml.nodeType);
+			 logger.debug("unhandled node type: " + xml.nodeType);
 		  return o;
 	   },
 	   toJson: function(o, name, ind) {
@@ -1770,8 +1051,6 @@ var getAdjacentItems = function(activityJSON,taskidx,type){
 
 exports.pdProcess = function (req, res) {
 	try{
-		var testcaseid = uuidV4(),screenid = uuidV4();
-
 		// orderlist contains {label:'',type:''}
 		var file = JSON.parse(req.body.data.file);
 		var sessionID = uuidV4();
@@ -1803,10 +1082,9 @@ exports.pdProcess = function (req, res) {
 			var adjacentItems = getAdjacentItems(activityJSON,eachActivityIdx,'task');
 			screendatamindmap = [];
 			try{
-				screenshotdatapertask = JSON.parse(Base64.decode(eachActivity.mxCell["@data"]));	// list of objects
+				screenshotdatapertask = JSON.parse(Buffer.from(eachActivity.mxCell["@data"], "base64").toString());	// list of objects
 			}
 			catch(ex){
-				console.log("empty task");
 				screenshotdatapertask = [];
 			}
 			// Encrypt for storage
@@ -1864,7 +1142,7 @@ exports.pdProcess = function (req, res) {
 	
 	
 		// data insertion logic
-		async.forEachSeries(orderlist, function (nodeObj, savedcallback) {
+		asynclib.forEachSeries(orderlist, function (nodeObj, savedcallback) {
 			var name = nodeObj.label,type = nodeObj.type;
 			testcaseid = uuidV4(),screenid = uuidV4();
 			var inputs = {
@@ -1900,7 +1178,6 @@ exports.pdProcess = function (req, res) {
 						if (response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail") {
 							logger.error("Error occurred in create_ice/updateScreenname_ICE from fetchScrapedData Error Code : ERRNDAC");
 						} else {
-							console.log("screen saved successfully!");
 							var inputs = {
 								'screenid': screenid,
 								'testcasename': 'Testcase_PD_'+name,
@@ -1931,7 +1208,6 @@ exports.pdProcess = function (req, res) {
 										if (response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail") {
 											logger.error("Error occurred in design/getScrapeDataScreenLevel_ICE from fetchScrapedData Error Code : ERRNDAC");
 										} else {
-											console.log("Testcase saved successfully!");
 											savedcallback();		
 										}
 									} catch (exception) {
@@ -1949,17 +1225,13 @@ exports.pdProcess = function (req, res) {
 			//final callback
 			res.send({"success":true,"data":orderMatrix,"history":activityJSON['mxGraphModel']['@history']});
 		});
-	
 	}
 	catch(err){
 		console.log(err)
 	}
-
-	
 };
                                                                                                                  
 var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
-
 	var testCaseSteps = [],testcaseObj,step = 1;
 	var firstScript = false,windowId;
 	if(adjacentItems){
@@ -2041,7 +1313,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					testcaseObj = {
 						"stepNo": step,
 						"objectName": eachScrapedAction.xpath,
-						"custname": addslashes(eachScrapedAction.custname),
+						"custname": eachScrapedAction.custname,
 						"keywordVal": "click",
 						"inputVal": [""],
 						"outputVal": "",
@@ -2061,7 +1333,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
                         testcaseObj = {
                             "stepNo": step,
                             "objectName": eachScrapedAction.xpath,
-                            "custname": addslashes(eachScrapedAction.custname),
+                            "custname": eachScrapedAction.custname,
                             "keywordVal": "selectValueByIndex",
                             "inputVal": [eachScrapedAction.action.actionData.split(";")[0]],
                             "outputVal": "",
@@ -2080,7 +1352,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						testcaseObj = {
 							"stepNo": step,
 							"objectName": eachScrapedAction.xpath,
-							"custname": addslashes(eachScrapedAction.custname),
+							"custname": eachScrapedAction.custname,
 							"keywordVal": "selectValueByIndex",
 							"inputVal": [selectIdxList],
 							"outputVal": "",
@@ -2101,7 +1373,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
                         testcaseObj = {
                             "stepNo": step,
                             "objectName": eachScrapedAction.xpath,
-                            "custname": addslashes(eachScrapedAction.custname),
+                            "custname": eachScrapedAction.custname,
                             "keywordVal": "setText",
                             "inputVal": [eachScrapedAction.action.actionData],
                             "outputVal": "",
@@ -2151,9 +1423,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 	// console.log(screendata)
 
 	if(adjacentItems){
-		console.log("adjacent:",adjacentItems);
 		// list of sources(only shapes) and targets (assuming only one)
-
 		if(adjacentItems["error"]){
 			console.log(adjacentItems["error"]);
 		}
@@ -2331,20 +1601,8 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 	return {"data":testCaseSteps,"start":firstScript};
 }
 
-var encrypt = function(data){
-
-	// var key = 'Nineeteen68@SecureScrapeDataPath'
-	// var ciphertext = CryptoJS.AES.encrypt(data, key,{ 
-	// 	iv: "00000000", 
-	// 	padding: CryptoJS.pad.Pkcs7,
-	// 	mode: CryptoJS.mode.CBC
-	
-	//   }).toString();
-    // var e64 = CryptoJS.enc.Base64.parse(ciphertext);
-    // var eHex = e64.toString(CryptoJS.enc.Hex);
-	// return eHex;	
-	let cipher = crypto.createCipheriv('aes-256-cbc', 'Nineeteen68@SecureScrapeDataPath', "0000000000000000");
-	let encryptedData = cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
-	// console.log('encrypted data=', encryptedData.toUpperCase());
+var encrypt = (data) => {
+	const cipher = crypto.createCipheriv('aes-256-cbc', 'Nineeteen68@SecureScrapeDataPath', "0000000000000000");
+	const encryptedData = cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
 	return 	encryptedData.toUpperCase();
 }

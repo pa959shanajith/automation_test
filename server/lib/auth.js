@@ -75,7 +75,7 @@ var strategyUtil = {
 				function authenticateUser(callback){
 					logger.info("Inside function authenticateUser");
 					var args = {
-						data: { "username": username ,"query":'userInfobyName' },
+						data: { "username": username },
 						headers: { "Content-Type": "application/json" }
 					};
 					logger.info("Calling NDAC Service : loadUser_Nineteen68");

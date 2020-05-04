@@ -148,10 +148,10 @@ exports.getScrapeDataScreenLevel_ICE = function (req, res) {
 				"projectid": req.body.projectId,
 				"query": "getscrapedata"
 			};
-			if (req.body.type == "WS_screen"){
+			if (req.body.type == "WS_screen" || req.body.type== "Webservice"){
 				inputs.query = "getWSscrapedata";
 			}
-			else if (req.body.testCaseId){
+			if (req.body.testCaseId){
 				inputs.testcaseid = req.body.testCaseId;//Send versionnumber also if needed
 				delete inputs['screenid'];
 			}
@@ -268,45 +268,71 @@ exports.updateScreen_ICE = function (req, res) {
 								'header' in scrapedObjects &&
 								'body' in scrapedObjects) {
 								if (scrapedObjects.method == 'POST') {
-									var requestedBody = scrapedObjects.body[0];
-									var requestedHeader = scrapedObjects.header[0];
+									var requestedBody = scrapedObjects.body;
+									var requestedHeader = scrapedObjects.header;
 									if (requestedBody != null &&
-										requestedBody != '' &&
-										requestedHeader.indexOf('json') === -1) {
-										if (requestedBody.indexOf('Envelope') !== -1) {
-											var obj = parse(requestedBody);
-											if ('root' in obj) {
-												temp_flag = false
-												var baseRequestBody = obj.root;
-												allXpaths = [];
-												allCustnames = [];
-												try {
-													logger.info("Calling function parseRequest from the service updateScreen_ICE: updateScrapeData_ICE");
-													parseRequest(baseRequestBody);
-												} catch (exception) {
-													logger.error(exception.message);
+										requestedBody != ''){
+										if(requestedHeader.indexOf('json') === -1){
+											if (requestedBody.indexOf('Envelope') !== -1) {
+												var obj = parse(requestedBody);
+												if ('root' in obj) {
+													temp_flag = false
+													var baseRequestBody = obj.root;
+													allXpaths = [];
+													allCustnames = [];
+													try {
+														logger.info("Calling function parseRequest from the service updateScreen_ICE: updateScrapeData_ICE");
+														parseRequest(baseRequestBody);
+													} catch (exception) {
+														logger.error(exception.message);
+													}
+													for (var populationindex = 0; populationindex < allXpaths.length; populationindex++) {
+														var scrapedObjectsWS = {};
+														scrapedObjectsWS.xpath = allXpaths[populationindex];
+														scrapedObjectsWS.custname = allCustnames[populationindex];
+														scrapedObjectsWS.tag = "elementWS";
+														viewArray.push(scrapedObjectsWS);
+													}
+													var baseData = {};
+													baseData.endPointURL = scrapedObjects.endPointURL;
+													baseData.method = scrapedObjects.method;
+													baseData.header = scrapedObjects.header;
+													baseData.operations = scrapedObjects.operations;
+													baseData.body = scrapedObjects.body;
+													baseData.responseHeader = scrapedObjects.responseHeader;
+													baseData.responseBody = scrapedObjects.responseBody;
+													baseData.view = viewArray;
+													scrapedObjects = baseData;
+													scrapedObjects = JSON.stringify(scrapedObjects);
+													scrapedObjects = scrapedObjects.replace(/'+/g, "''")
 												}
-												for (var populationindex = 0; populationindex < allXpaths.length; populationindex++) {
+											}else{
+												logger.error("Invalid Request header or Request body for XML")
+												scrapedObjects="Fail";
+											}
+										}
+										else if(requestedHeader.indexOf('json') !== -1){
+											try{
+												requestedBody=JSON.parse(requestedBody)
+												var xpaths=parseJsonRequest(requestedBody,"","");
+												for (var object of xpaths) {
 													var scrapedObjectsWS = {};
-													scrapedObjectsWS.xpath = allXpaths[populationindex];
-													scrapedObjectsWS.custname = allCustnames[populationindex];
+													scrapedObjectsWS.xpath = object;
+													scrapedObjectsWS.custname = object;
 													scrapedObjectsWS.tag = "elementWS";
 													viewArray.push(scrapedObjectsWS);
 												}
-												var baseData = {};
-												baseData.endPointURL = scrapedObjects.endPointURL;
-												baseData.method = scrapedObjects.method;
-												baseData.header = scrapedObjects.header;
-												baseData.operations = scrapedObjects.operations;
-												baseData.body = scrapedObjects.body;
-												baseData.responseHeader = scrapedObjects.responseHeader;
-												baseData.responseBody = scrapedObjects.responseBody;
-												baseData.view = viewArray;
-												scrapedObjects = baseData;
-												scrapedObjects = JSON.stringify(scrapedObjects);
-												scrapedObjects = scrapedObjects.replace(/'+/g, "''")
+												if (viewArray.length>0) scrapedObjects.view=viewArray
+
 											}
-										}
+											catch(Exception){
+												logger.error("Invalid Request body for RestAPI")
+												scrapedObjects="Fail";
+											}
+										}else{
+											logger.error("Invalid Request header or Request body")
+											scrapedObjects="Fail";
+										}						
 									}
 								}
 							}if (temp_flag == false){
@@ -440,7 +466,7 @@ exports.updateScreen_ICE = function (req, res) {
 				allXpaths=[];
 				allCustnames=[];
 				try {
-					if (statusFlag == "" && scrapedObjects != "scrape data error: Fail") {
+					if (statusFlag == "" && scrapedObjects != "Fail") {
 						var args = {
 							data: inputs,
 							headers: {
@@ -528,6 +554,9 @@ exports.updateScreen_ICE = function (req, res) {
 								logger.error("Exception in the finalFunction: %s", exception);
 							}
 						});
+					}else{
+						statusFlag = "Invalid Input";
+						res.send(statusFlag); 
 					}
 					finalcallback;
 				} catch (exception) {
@@ -782,4 +811,36 @@ function parseRequest(readChild) {
 	} catch (exception) {
 		logger.error("Exception in the function parseRequest: %s", exception);
 	}
+}
+
+
+function parseJsonRequest(requestedBody,base_key,cur_key) {
+	xpaths=[]
+	try {
+		logger.info("Inside the function parseRequest ");
+     	for (var key in requestedBody){
+			 var value=requestedBody[key];
+			 if (typeof(value)==="object" && !(Array.isArray(value))){
+				if (base_key!== "")  base_key+='/'+key;
+				else  base_key=key;
+				xpaths.push(base_key);
+				xpaths.concat(parseJsonRequest(value,base_key,key));
+				base_key=base_key.slice(0,-key.length-1);
+
+			 }else if(Array.isArray(value)){
+				for (var i=0;i<value.length;i++){
+					base_key+=key+"["+i.toString()+"]";
+					xpaths.concat(parseJsonRequest(value[i],base_key,key));
+				}
+					
+			 }else{
+				xpaths.push(base_key+'/'+key);
+			 }
+		 }
+		 base_key=base_key.slice(0,-cur_key.length);
+     	 
+	} catch (exception) {
+		logger.error("Exception in the function parseRequest: %s", exception);
+	}
+	return xpaths
 }
