@@ -198,14 +198,15 @@ $(document).ready(function() {
 		}
 		if(window.localStorage['_CT']) {
 			var ct = JSON.parse(window.localStorage['_CT']);
+			var tj = JSON.parse(window.localStorage['_TJ']);
 			var subTaskID = ct.subTaskId;
 			if(window.location.pathname != "/scheduling"){
 				var selectedTask = $("#window-task").find("#accordion").find(".assignedTaskInner");
 				for(var i = 0 ; i < selectedTask.length ; i++){
-					if(ct.taskName === selectedTask[i].textContent){
+					if(ct.taskName === selectedTask[i].textContent && ct.cycleid === tj[i].testSuiteDetails[0].cycleid){
 						selectedTask[i].onclick = null;
 						selectedTask[i].parentNode.style.cursor = "default";
-						selectedTask[i].parentNode.style.webkitFilter = "brightness(50%)";					
+						selectedTask[i].parentNode.style.webkitFilter = "brightness(50%)";
 					}
 				}
 				$.each(selectedTask, function(){
