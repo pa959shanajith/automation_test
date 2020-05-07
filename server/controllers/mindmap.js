@@ -1811,7 +1811,7 @@ exports.pdProcess = function (req, res) {
 			screenshotdatapertask.forEach(function(a,i){
 				
 				if(a['xpath']){
-					// a['url']= encrypt(a['url'])
+					a['url']= encrypt(a['url'])
 					xpath_string=a['xpath'].split(';');
 					left_part=encrypt(xpath_string.slice(0,2).join(';'));	// 0,1
 					right_part=encrypt(xpath_string.slice(3,).join(';'));	// 3,4...
