@@ -316,13 +316,16 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				}*/
 				$('#jqGrid').show();
 				// service call # 2 - objectType service call
-				DesignServices.getScrapeDataScreenLevel_ICE()
+				DesignServices.getScrapeDataScreenLevel_ICE(appType)
 					.then(function (data2) {
 						if (data2 == "Invalid Session") {
 							return $rootScope.redirectPage();
 						}
 						if (appType == "Webservice"){
-							if (data2.view.length > 0) dataFormat12 = data2.view[0].header[0].split("##").join("\n");
+							if (data2.view.length > 0) {
+								if (data2.view[0].header) dataFormat12 = data2.view[0].header[0].split("##").join("\n");
+								else dataFormat12 = data2.header[0].split("##").join("\n");
+							}	
 						}
 						custnameArr.length = 0;
 						// counter to append the items @ correct indexes of custnameArr
@@ -1121,28 +1124,28 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						})
 						$("#wsdlOperation").val(data.operations)
 						//Printing Request Data
-						$("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
-						if (data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0) {
+						$("#wsdlRequestHeader").val(data.header.split("##").join("\n"));
+						if (data.body.indexOf("{") == 0 || data.body.indexOf("[") == 0) {
 							var jsonStr = data.body;
 							var jsonObj = JSON.parse(jsonStr);
 							var jsonPretty = JSON.stringify(jsonObj, null, '\t');
 							$("#wsdlRequestBody").val(jsonPretty)
 						} else {
-							var getXML = formatXml(data.body[0].replace(/>\s+</g, '><'));
+							var getXML = formatXml(data.body.replace(/>\s+</g, '><'));
 							if(getXML=='\r\n'){
 								getXML = '';
 							}
 							$("#wsdlRequestBody").val(getXML)
 						}
 						//Printing Response Data
-						$("#wsdlResponseHeader").val(data.responseHeader[0].split("##").join("\n"));
-						if (data.responseBody[0].indexOf("{") == 0 || data.responseBody[0].indexOf("[") == 0) {
+						$("#wsdlResponseHeader").val(data.responseHeader.split("##").join("\n"));
+						if (data.responseBody.indexOf("{") == 0 || data.responseBody.indexOf("[") == 0) {
 							var jsonStr = data.responseBody;
 							var jsonObj = JSON.parse(jsonStr);
 							var jsonPretty = JSON.stringify(jsonObj, null, '\t');
 							$("#wsdlResponseBody").val(jsonPretty)
 						} else {
-							var getXML = formatXml(data.responseBody[0].replace(/>\s+</g, '><'));
+							var getXML = formatXml(data.responseBody.replace(/>\s+</g, '><'));
 							if(getXML=='\r\n'){
 								getXML = '';
 							}
@@ -1202,13 +1205,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		//else if(!wsdlRequestHeader) $("#wsdlRequestHeader").addClass("inputErrorBorderFull")
 		else {
 			var getWSData = {
-				"body": [wsdlRequestBody],
-				"operations": [wsdlOperation],
-				"responseHeader": [wsdlResponseHeader],
-				"responseBody": [wsdlResponseBody],
-				"method": [wsdlMethods],
-				"endPointURL": [endPointURL],
-				"header": [wsdlRequestHeader]
+				"body": wsdlRequestBody,
+				"operations": wsdlOperation,
+				"responseHeader": wsdlResponseHeader,
+				"responseBody": wsdlResponseBody,
+				"method": wsdlMethods,
+				"endPointURL": endPointURL,
+				"header": wsdlRequestHeader
 			};
 			var appType = $scope.getScreenView;
 			getWSTemplateData = JSON.stringify(getWSData)
@@ -1235,9 +1238,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						//$("#WSSaveSuccess").modal("show");
 						$("#enbledWS").prop("checked", false)
 						angular.element(document.getElementById("left-nav-section")).scope().getWSData();
-					} else {
-						openDialog("Save WebService Template", "Failed to save WebService Template.");
+					} else if("Invalid Input"){
+						openDialog("Save WebService Template", "Failed to save WebService Template. Invalid Request Header or Body");
 						//$("#WSSaveFail").modal("show")
+					}else{
+						openDialog("Save WebService Template", "Failed to save WebService Template.");
 					}
 				}, function (error) {
 					console.log("Error")
@@ -1944,7 +1949,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									} else imgTag = tag;
 									var tag1 = tag.replace(/ /g, "_");
 									var tag2;
-									if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell" || tag=="iris") {
+									if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
 										var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x'><a class='customTxtName'><span class='highlight'></span><input type='checkbox' class='checkCompareAll' name='selectAllChangedItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 									} else {
 										var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x'><a class='customTxtName'><span class='highlight'></span><input type='checkbox' class='checkCompareAll' name='selectAllChangedItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
@@ -2348,7 +2353,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			$("#dialog-irisObject").modal("show");
 			$("#addIrisObjContainer").empty()
 			if ($(".addObj-row").length > 1) $(".addObj-row").remove()
-			$("#addIrisObjContainer").append('<div class = "row row-modal addObj-row"><div class = "form-group"><span><strong>Object Detected as:	'+objType+'</strong></span></div><br><br><span style="float:left"><strong>User input: </strong></span><div class = "form-group form-group-2" style="float:left; margin-left:10px;"><select class = "form-control form-control-custom" id="objectType"><option selected disabled > Select Object Type </option><option value = "textbox" > Textbox / Textarea </option><option value = "table" > Table </option><option value = "dropdown" > Dropdown </option><option value = "button" > Button </option><option value = "radiobutton" > Radiobutton </option> <option value = "iris" > iris </option> <option value = "checkbox" > Checkbox </option><option value = "others" > Others </option></select></div> </div>');
+			$("#addIrisObjContainer").append('<div class = "row row-modal addObj-row"><div class = "form-group"><span><strong>Object Detected as:	'+objType+'</strong></span></div><br><br><span style="float:left"><strong>User input: </strong></span><div class = "form-group form-group-2" style="float:left; margin-left:10px;"><select class = "form-control form-control-custom" id="objectType"><option selected disabled > Select Object Type </option><option value = "textbox" > Textbox / Textarea </option><option value = "table" > Table </option><option value = "dropdown" > Dropdown </option><option value = "button" > Button </option><option value = "radiobutton" > Radiobutton </option><option value = "checkbox" > Checkbox </option><option value = "others" > Others </option></select></div> </div>');
 		}, 500);
 	});
 	
@@ -2433,7 +2438,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						$("#left-top-section,#left-bottom-section").removeClass('disableClick');
 						$("#changedOrdList li,#compareUnchangedObjectsBox li ,#compareNotFoundObjectsBox li").empty();
 						//window.location.href = "/design";
-						deleteScrapeDataservice = true;
 					});
 				} else {
 					openDialog("Compared Objects", "Failed to update objects");
@@ -2573,7 +2577,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				getIndexOfDeletedObjects = [];
 				angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
 				unblockUI()
-				deleteScrapeDataservice = true;
 				//add popoup for error and saved 
 			}, function (error) {unblockUI() })
 		
@@ -2885,7 +2888,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								getIndexOfDeletedObjects = [];
 								angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
 								unblockUI()
-								deleteScrapeDataservice = true;
 								//add popoup for error and saved 
 							}, function (error) {unblockUI()  })
 							return;
@@ -3702,7 +3704,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				} else imgTag = tag;
 				var tag1 = tag.replace(/ /g, "_");
 				var tag2;
-				if ((tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell" || tag=="iris") && ob.hasOwnProperty('editable')) {
+				if ((tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") && ob.hasOwnProperty('editable')) {
 					var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><span id='decrypt' class='userObject'></span></li>";
 				} else {
 					var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
@@ -3866,7 +3868,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				$(this).hide();
 			} else if (clickElem == "Element") {
 				var elem = $(this).data("tag")
-				if (elem == "a" || elem == "input" || elem == "table" || elem == "list" || elem == "select" || elem == "img" || elem == "button" || elem == "radiobutton" || elem == "checkbox" || elem=="iris") {
+				if (elem == "a" || elem == "input" || elem == "table" || elem == "list" || elem == "select" || elem == "img" || elem == "button" || elem == "radiobutton" || elem == "checkbox") {
 					$(this).hide();
 				} else {
 					$(this).show();
@@ -4725,7 +4727,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							$(this).data("tag") != "checkbox" &&
 							$(this).data("tag") != "select" &&
 							$(this).data("tag") != "img" &&
-							$(this).data("tag") != "iris" &&
 							$(this).data("tag") != "a" &&
 							$(this).data("tag") != "radiobutton" &&
 							$(this).data("tag") != "input" &&
@@ -4745,7 +4746,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							$(this).data("tag").toLowerCase().indexOf("check box") == -1 &&
 							$(this).data("tag").toLowerCase().indexOf("checkbox") == -1 &&
 							$(this).data("tag").toLowerCase().indexOf("image") == -1 &&
-							$(this).data("tag").toLowerCase().indexOf("iris") == -1 &&
 							($(this).data("tag").toLowerCase().indexOf("table") == -1 || $(this).data("tag").toLowerCase() == "tablecell") &&
 							$(this).data("tag").toLowerCase().indexOf("radio button") == -1) {
 							$(this).show();
@@ -5102,7 +5102,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		// var labelArr = [];
 		// var infoArr = [];
 
-		mindmapServices.reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs,false).then(function (result) {
+		mindmapServices.reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs).then(function (result) {
 			if (result == 'fail') {
 				openDialog("Task Submission Error", "Reviewer is not assigned !", true)
 			} else if (taskstatus == 'reassign') {
@@ -5145,7 +5145,11 @@ function contentTable(newTestScriptDataLS) {
 	var newTestScriptData = newTestScriptDataLS;
 	if (newTestScriptData == "undefined" || newTestScriptData == null || newTestScriptData == "") {
 		scrappedData = "";
-	} else {
+	}
+	// else if (newTestScriptData.length>0 && newTestScriptData[0].header && newTestScriptData[0].view) {
+	// 	scrappedData=newTestScriptData[0].view;
+	// } 
+	else {
 		scrappedData = newTestScriptData;
 	}
 	$("#jqGrid").jqGrid({
@@ -5297,28 +5301,7 @@ function contentTable(newTestScriptDataLS) {
 				}
 				v++;
 			})
-			//$("#cb_jqGrid").on('click', function() {
-			/*var cboxParent =  $(this).is(":checked");
-					   var editableLen = $(".editable").length;
-					   if (cboxParent == true && editableLen == 0){
-						   $(".commentIcon,.unCommentIcon,.deleteIcon").show();
-					   }
-					   else{
-						   $(".commentIcon,.unCommentIcon,.deleteIcon").hide();
-					   }
-					   window.localStorage['selectRowStepNo']='';*/
-			//});
-			/*$("#jqGrid tr").children("td[aria-describedby='jqGrid_outputVal']").each(function(){
-					   if($(this).text().trim() == "##" || $(this).is(":contains(';##')")){
-						   if($(this).parent('tr:nth-child(odd)').length > 0){
-							   $(this).parent().css("background","linear-gradient(90deg, red 0.6%, #e8e6ff 0)").focus();
-						   }
-						   else{
-							   $(this).parent().css("background","linear-gradient(90deg, red 0.6%, white 0)").focus();
-						   }
-						   $(this).css('color','red');
-					   }background: linear-gradient(to right, #d41e2d, #b31f2d) !important;
-				   });*/
+			
 			var gridArrayData = $("#jqGrid").jqGrid('getRowData');
 			for (i = 0; i < gridArrayData.length; i++) {
 				commented = gridArrayData[i].outputVal.split(';');
@@ -7554,13 +7537,13 @@ function getTags(data) {
 	} else if (appTypeLocal == "OEBS") {
 		obnames = ["@Generic", "@Excel", "@Oebs", "@Custom", "@Word"];
 	} else if (appTypeLocal == "MobileApp" && navigator.appVersion.indexOf("Mac") == -1) {
-		obnames = ["@Generic", "@Mobile", "@Android_Custom", "@Action"];
+		obnames = ["@Generic", "@Mobile", "@Android_Custom", "@Action","@Excel","@Word"];
 	} else if (appTypeLocal == "MobileApp" && navigator.appVersion.indexOf("Mac") != -1) {
-		obnames = ["@Generic", "@Mobile", "@CustomiOS"];
+		obnames = ["@Generic", "@Mobile", "@CustomiOS","@Excel","@Word"];
 	} else if (appTypeLocal == "MobileWeb") {
-		obnames = ["@Generic", "@Browser", "@BrowserPopUp", "@Action"];
+		obnames = ["@Generic", "@Browser", "@BrowserPopUp", "@Action","@Excel","@Word"];
 	} else if (appTypeLocal == "SAP") {
-		obnames = ["@Generic", "@Sap", "@Custom", "@Word"]
+		obnames = ["@Generic", "@Sap", "@Custom", "@Word","@Excel"]
 	} else if (appTypeLocal = "System") {
 		obnames = ["@Generic", "@Excel", "@System", "@Word"];
 	}

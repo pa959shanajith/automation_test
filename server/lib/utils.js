@@ -1,56 +1,66 @@
-var async = require('async');
+var bcrypt = require('bcryptjs');
 var logger = require('../../logger');
 var myserver = require('../../server');
 var redisServer = require('./redisSocketHandler');
+var taskflow = require('../config/options').strictTaskWorkflow;
 var epurl = process.env.NDAC_URL;
 var Client = require("node-rest-client").Client;
 var client = new Client();
 //var neo4jAPI = require('../controllers/neo4jAPI');
 
 
-module.exports.getChannelNum = function(channel,cb) {
-	redisServer.redisPubICE.pubsub('numsub', channel,function(err,redisres){
-		if (redisres[1]>0) cb(true);
+const getChannelNum_cb = (channel,cb) => {
+	redisServer.redisPubICE.pubsub('numsub', channel, function(err, redisres) {
+		if (redisres[1] > 0) cb(true);
 		else cb(false);
 	});
 };
 
-module.exports.getSocketList = function(toFetch, cb) {
+const getChannelNum = async (...channel) => {
+	const redisres = await redisServer.redisPubICE.pubsubPromise('numsub', ...channel);
+	return redisres.filter((e,i) => (i%2===1));
+};
+
+module.exports.channelStatus = async (name) => {
+	var num = [0,0];
+	try {
+		num = await getChannelNum('ICE1_normal_' + name, 'ICE1_scheduling_' + name);
+	} finally {
+		return { normal: (num[0] > 0), schedule: (num[1] > 0) }
+	}
+};
+
+module.exports.getSocketList = async (toFetch) => {
 	var fetchQuery;
 	var connectusers = [];
 	if (toFetch == "ICE") fetchQuery = "ICE1_*";
-	else if (toFetch == "default") fetchQuery = "ICE1_normal_*";
+	else if (toFetch == undefined || toFetch == "default") fetchQuery = "ICE1_normal_*";
 	else if (toFetch == "schedule") fetchQuery = "ICE1_scheduling_*";
 	else if (toFetch == "notify") fetchQuery = "notify_*";
-	if (toFetch == "ICE") {
-		redisServer.redisPubICE.pubsub('channels', fetchQuery, function(err,redisres) {
-			async.eachSeries(redisres, function(e, innerCB){
-				var ed = e.split('_');
-				var mode = ed[1];
-				var user = ed.slice(2).join('_');
-				redisServer.redisSubServer.subscribe('ICE2_' + user ,1);
-				redisServer.redisPubICE.publish(e, JSON.stringify({"emitAction":"getSocketInfo","username":user}));
-				function fetchIP(channel, message) {
+	const redisres = await redisServer.redisPubICE.pubsubPromise('channels', fetchQuery);
+	if (toFetch != "ICE") {
+		connectusers = redisres.map(e => e.split('_').slice(2).join('_'));
+	} else {
+		for (const rri of redisres) {
+			const ed = rri.split('_');
+			const mode = ed[1];
+			const user = ed.slice(2).join('_');
+			redisServer.redisSubServer.subscribe('ICE2_' + user, 1);
+			redisServer.redisPubICE.publish(rri, JSON.stringify({"emitAction":"getSocketInfo","username":user}));
+			const res = await (new Promise((rsv, rej) => {
+				async function fetchIP(channel, message) {
 					var data = JSON.parse(message);
 					if (user == data.username) {
 						redisServer.redisSubServer.removeListener('message', fetchIP);
-						if (data.value != "fail") connectusers.push([user,mode,data.value]);
+						rsv(data.value);
 					}
-					innerCB();
 				}
 				redisServer.redisSubServer.on("message",fetchIP);
-			}, function () {
-				cb(connectusers);
-			});
-		});
-	} else {
-		redisServer.redisPubICE.pubsub('channels', fetchQuery, function(err,redisres){
-			redisres.forEach(function(e){
-				connectusers.push(e.split('_')[2]);
-			});
-			cb(connectusers);
-		});
+			}));
+			if (res != "fail") connectusers.push([user,mode,res]);
+		}
 	}
+	return connectusers;
 };
 
 module.exports.allSess = function (cb){
@@ -86,51 +96,94 @@ module.exports.isSessionActive = function (req){
 	return sessionCheck && cookieCheck;
 };
 
-module.exports.approval_status_check=function(ExecutionData,approval_callback){
-	async.forEachSeries(ExecutionData,function(eachmoduledata,callback){
-		var qlist=[];
-		var scenario_list=[];
-		var arr=eachmoduledata.suiteDetails;
-		for (i=0;i<arr.length;i++){
-			scenario_list.push(arr[i].scenarioids);
+module.exports.approvalStatusCheck = async executionData => {
+	var data = {res: "pass", status: null};
+	if (!taskflow) return data
+	var scenarioList=[];
+	executionData.forEach(tsu => tsu.suiteDetails.forEach(tsco => scenarioList.push(tsco.scenarioId)));
+	const inputs = {
+		"scenario_ids": scenarioList
+	};
+	const result = await fetchData(inputs, "suite/checkApproval", "approvalStatusCheck", true);
+	data.statusCode = result[1].statusCode;
+	if (result[0] == "No task") data.res = 'Notask';
+	else if (result[0] == "Modified") data.res = 'Modified';
+	else if (result[0] != 0) data.res = 'NotApproved';
+	return data;
+};
+
+const fetchData = async (inputs, url, from, all) => {
+	const args = {
+		data: inputs,
+		headers: {
+			"Content-Type": "application/json"
 		}
-		var inputs = {
-			"scenario_ids":scenario_list
-		};
-		var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
-			}
-		};
-		logger.info("Calling NDAC Service from executionFunction: suite/checkApproval");
-		client.post(epurl + "suite/checkApproval", args,
-			function (result, response) {
+	};
+	//from = " from " + ((from)? from : fetchData.caller.name);
+	from = (from)? " from " + from : "";
+	const query = (inputs.query)? " - " + inputs.query:"";
+	logger.info("Calling NDAC Service: " + url + from + query);
+	const promiseData = (new Promise((rsv, rej) => {
+		const apiReq = client.post(epurl + url, args, (result, response) => {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				logger.error("Error occurred in suite/checkApproval from executionFunction Error Code : ERRNDAC");
-				err = {res:'fail',status:response.statusCode};
-				callback(err);
+				logger.error("Error occurred in " + url + from + query + ", Error Code : ERRNDAC");
+				const toLog = ((typeof(result)  == "object") && !(result instanceof Buffer))? JSON.stringify(result):result.toString();
+				logger.debug("Response is %s", toLog);
+				//rej("fail");
+				if (all) rsv(["fail", response, result]);
+				else rsv("fail");
 			} else {
-				logger.info("Successfully inserted report data");
-				if(result.rows=="No task"){
-					err = {res:'Notask',status:response.statusCode};
-					callback(err);
-				}
-				if(result.rows=="Modified"){
-					err = {res:'Modified',status:response.statusCode};
-					callback(err);
-				}
-				else if(result.rows!=0){
-					err = {res:'NotApproved',status:response.statusCode};
-					callback(err);
-				} else callback()
+				result = (result.rows === undefined)? result:result.rows;
+				if (all) rsv([result, response]);
+				else rsv(result);
 			}
 		});
-	}, function (err,data){
-		console.log(err);
-		if (err) approval_callback(err,false)
-		else approval_callback(null,true)
-	});
+		apiReq.on('error', function(err) {
+			logger.error("Error occurred in " + url + from + query + ", Error Code : ERRNDAC, Error: %s", err);
+			rsv("fail");
+		});
+	}));
+	return promiseData;
+};
+
+module.exports.getChannelNum = getChannelNum_cb;
+module.exports.fetchData = fetchData;
+
+module.exports.tokenValidation = async (userInfo) => {
+	var validUser = false;
+	const username = (userInfo.username || "").toLowerCase();
+	userInfo.username = username;
+	const emsg = "Inside UI service: ExecuteTestSuite_ICE_SVN ";
+	const tokenValidation = {
+		"status": "failed",
+		"msg": "Token authentication failed"
+	}
+	const inputs = {
+		'username': username,
+		'tokenname': userInfo.tokenname || ""
+	};
+	const response = await fetchData(inputs, "login/authenticateUser_Nineteen68_CI", "tokenValidation");
+	if (response != "fail" && response != "invalid") validUser = bcrypt.compareSync(userInfo.tokenhash || "", response.hash);
+	if (validUser) {
+		userInfo.userid = response.userid;
+		userInfo.role = response.role;
+		if(response.deactivated == "active") {
+			tokenValidation.status = "passed";
+			tokenValidation.msg = "Token validation successful";
+		} else if(response.deactivated == "expired") {
+			tokenValidation.status = "expired";
+			tokenValidation.msg = "Token is expired";
+			logger.error(emsg + tokenValidation.msg + " for username: " + username);
+		} else if(response.deactivated == "deactivated") {
+			tokenValidation.status = "deactivated";
+			tokenValidation.msg = "Token is deactivated";
+			logger.error(emsg + tokenValidation.msg + " for username: " + username);
+		}
+	} else logger.info(emsg + "Token authentication failed for username: " + username);
+	inputs.tokenValidation = tokenValidation.status;
+	inputs.error_message = tokenValidation.msg;
+	userInfo.inputs = inputs;
+	return userInfo;
 };
 
 /*module.exports.cache = {

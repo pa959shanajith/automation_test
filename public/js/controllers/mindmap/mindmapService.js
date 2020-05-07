@@ -8,28 +8,9 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
-		checkReuse: function (parsedata) {
-    		var param = "checkReuse";
-    		return $http.post('/checkReuse', {
-    			action: param,
-				parsedata:parsedata
-    		})
-    		.then(function (response) { return response.data; },
-    				function (response) { return $q.reject(response.data); });
-    	},
 		populateUsers: function (projectId) {
     		var param = "populateUsers";
     		return $http.post('/populateUsers', {
-    			action: param,
-				projectId:projectId
-
-    		})
-    		.then(function (response) { return response.data; },
-    				function (response) { return $q.reject(response.data); });
-    	},
-		populateReleases: function (projectId) {
-    		var param = "populateReleases";
-    		return $http.post('/populateReleases', {
     			action: param,
 				projectId:projectId
 
@@ -47,16 +28,6 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
-		populateCycles: function (releaseId) {
-    		var param = "populateCycles";
-    		return $http.post('/populateCycles', {
-    			action: param,
-				releaseId:releaseId
-
-    		})
-    		.then(function (response) { return response.data; },
-    				function (response) { return $q.reject(response.data); });
-    	},
 		getProjectTypeMM_Nineteen68: function (projectId) {
     		var param = "getProjectTypeMM_Nineteen68";
     		return $http.post('/getProjectTypeMM_Nineteen68', {
@@ -68,7 +39,6 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     				function (response) { return $q.reject(response.data); });
     	},
 		getModules: function (versioning_enabled,usertab,projectid,version,cycId,modName,moduleid){
-					
     		var param = "/getModules";
 			if (versioning_enabled==1){
 				param = "/getModulesVersioning";
@@ -77,7 +47,6 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 				tab:usertab,
                 projectid: projectid,
                 version:version,
-				// relId: relId,
 				cycId: cycId,
 				modName:modName,
 				moduleid:moduleid
@@ -91,7 +60,6 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 				param = "/saveDataVersioning";
 			}
 			return $http.post(param, {
-				
 					action: param,
 					sendNotify:assignedTo,
 					write:writeFlag,
@@ -129,7 +97,7 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
-		reviewTask: function (projectId,taskId,taskstatus,version,batchTaskIDs,module_info){
+		reviewTask: function (projectId,taskId,taskstatus,version,batchTaskIDs){
     		var param = "reviewTask";
     		return $http.post('/reviewTask', {
     			action: param,
@@ -137,22 +105,11 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 				taskId:taskId,
 				status:taskstatus,
 				versionnumber:version,
-				batchIds:batchTaskIDs,
-				module_info:module_info
-				
+				batchIds:batchTaskIDs
     		})
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
-		// getCRId:function (projectId){
-		// 	var param = "getCRId";
-    	// 	return $http.post('/getCRId', {
-		// 		projectid:projectId
-				
-    	// 	})
-    	// 	.then(function (response) { return response.data; },
-    	// 			function (response) { return $q.reject(response.data); });
-		// },
 		getVersions:function (projectId){
 			var param = "getVersions";
     		return $http.post('/getVersions', {
@@ -204,21 +161,20 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 				 excelMap: excelMap
 				 //responseType: 'arraybuffer'
 			},{responseType:'arraybuffer'})
-			
-    		
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	
 		},
-		getDomain : function(data){
-			return $http.post('/getDomain',{
-				 data: data
+		getTestSuiteDetails: function(data){
+			return $http.post('/readTestSuite_ICE', {
+				param: 'readTestSuite_ICE',
+				readTestSuite: data,
+				fromFlag: "mindmaps"
 			})
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
-    	
 		},
-		pdProcess : function(data){
+		pdProcess: function(data){
 			return $http.post('/pdProcess',{
 				 data: data
 			})

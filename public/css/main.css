@@ -2502,7 +2502,7 @@ input[disabled]{
     vertical-align: middle;
 }
 .designDataTable tbody tr, .ui-widget-content{cursor: pointer;}
-.executionDataTable th, .executionDataTable td, .scheduleDataHeader span, .scheduleDataBodyRow div, .designDataTable th, .designDataTable td{
+.executionDataTable th, .executionDataTable td, .scheduleDataHeader span, .scheduleDataBodyRow>div div, .designDataTable th, .designDataTable td{
 	font-weight: normal !important;
 	padding: 1px 0px;
 	display: inline-block;
