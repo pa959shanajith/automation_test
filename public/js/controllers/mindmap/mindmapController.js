@@ -5053,6 +5053,7 @@ Purpose : displaying pop up for replication of project
             $scope.createFromJson();
             $timeout(function() {
                 angular.element('#ct-saveAction').triggerHandler('click');
+				openDialogMindmap("Success","Data saved successfully");
             }, 100);
             
             // now save and create
