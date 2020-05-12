@@ -2883,6 +2883,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 else{
                     $timeout(function() {
                         angular.element('#ct-createAction').triggerHandler('click');
+						openDialogMindmap("Success", "Data saved successfully");
                     }, 100);                            
                 }
             }
@@ -5014,6 +5015,16 @@ Purpose : displaying pop up for replication of project
 
     $scope.importFromPD = function(file){
         if(!file) return;
+		var res = $scope.apptype;
+		var file1 = JSON.parse(file);
+		var doc = new DOMParser().parseFromString(file1.data,'text/xml');
+		var activityJSON = JSON.parse(xml2json(doc).replace("\nundefined",""));
+		var cdata = JSON.parse(activityJSON["mxGraphModel"]["root"]["Task"][0]["#cdata"]);
+		var res1 = cdata[0]['apptype'];
+        if(res1.toLowerCase()!=res.toLowerCase()){
+            openDialogMindmap("App Type Error", "Project application type and Imported PD's application type doesn't match, please check!!")
+            return;
+        }
         $scope.pdmode = true;
         $scope.createdthrough="PD";
         clearSvg();
