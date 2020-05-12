@@ -45,6 +45,7 @@ if (cluster.isMaster) {
 		var lusca = require('lusca');
 		var consts = require('constants');
 		var redis = require("redis");
+		var path = require('path');
 		var Client = require("node-rest-client").Client;
 		var apiclient = new Client();
 		var redisStore = require('connect-redis')(sessions);
@@ -441,6 +442,21 @@ if (cluster.isMaster) {
 			return res.sendFile("app.html", { root: __dirname + "/public/" });
 		});
 
+		app.get('/Nineteen68_ICE', async (req, res) => {
+			const iceFile = "Nineteen68_ICE.zip";
+			const iceFilePath = path.resolve(process.env.HOST_PATH);
+			if (req.query.file == "getICE") {
+				return res.sendFile(iceFile, { root: iceFilePath })
+			} else {
+				let status = "na";
+				try {
+					await fs.promises.access(iceFilePath + path.sep + iceFile);
+					status = "available";
+				} catch (error) {}
+				return res.send(status);
+			}
+		});
+
 		//Route Directories
 		var mindmap = require('./server/controllers/mindmap');
 		var login = require('./server/controllers/login');
@@ -547,6 +563,7 @@ if (cluster.isMaster) {
 		app.post('/openScreenShot', report.openScreenShot);
 		app.post('/connectJira_ICE', report.connectJira_ICE);
 		app.post('/getReportsData_ICE', report.getReportsData_ICE);
+		app.post('/get_Nineteen68Report', report.get_Nineteen68Report);
 		//Plugin Routes
 		app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
 		app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);

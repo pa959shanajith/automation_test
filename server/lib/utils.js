@@ -104,11 +104,12 @@ module.exports.approvalStatusCheck = async executionData => {
 	const inputs = {
 		"scenario_ids": scenarioList
 	};
-	const result = fetchData(inputs, "suite/checkApproval", "approvalStatusCheck", true);
+	const result = await fetchData(inputs, "suite/checkApproval", "approvalStatusCheck", true);
 	data.statusCode = result[1].statusCode;
 	if (result[0] == "No task") data.res = 'Notask';
 	else if (result[0] == "Modified") data.res = 'Modified';
 	else if (result[0] != 0) data.res = 'NotApproved';
+	return data;
 };
 
 const fetchData = async (inputs, url, from, all) => {
@@ -126,9 +127,10 @@ const fetchData = async (inputs, url, from, all) => {
 		const apiReq = client.post(epurl + url, args, (result, response) => {
 			if (response.statusCode != 200 || result.rows == "fail") {
 				logger.error("Error occurred in " + url + from + query + ", Error Code : ERRNDAC");
-				logger.debug("Response is %s", result.toString());
+				const toLog = ((typeof(result)  == "object") && !(result instanceof Buffer))? JSON.stringify(result):result.toString();
+				logger.debug("Response is %s", toLog);
 				//rej("fail");
-				if (all) rsv(["fail", result, response]);
+				if (all) rsv(["fail", response, result]);
 				else rsv("fail");
 			} else {
 				result = (result.rows === undefined)? result:result.rows;
@@ -161,7 +163,7 @@ module.exports.tokenValidation = async (userInfo) => {
 		'tokenname': userInfo.tokenname || ""
 	};
 	const response = await fetchData(inputs, "login/authenticateUser_Nineteen68_CI", "tokenValidation");
-	if (response != "fail") validUser = bcrypt.compareSync(userInfo.tokenhash || "", response.hash);
+	if (response != "fail" && response != "invalid") validUser = bcrypt.compareSync(userInfo.tokenhash || "", response.hash);
 	if (validUser) {
 		userInfo.userid = response.userid;
 		userInfo.role = response.role;
@@ -179,7 +181,7 @@ module.exports.tokenValidation = async (userInfo) => {
 		}
 	} else logger.info(emsg + "Token authentication failed for username: " + username);
 	inputs.tokenValidation = tokenValidation.status;
-	inputs.err = tokenValidation.msg;
+	inputs.error_message = tokenValidation.msg;
 	userInfo.inputs = inputs;
 	return userInfo;
 };

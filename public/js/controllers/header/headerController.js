@@ -398,4 +398,16 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		window.sessionStorage["checkLoggedOut"] = true;
 		$rootScope.redirectPage();
 	};
+
+	$scope.getIce = async () => {
+		try {
+			const res = await fetch("/Nineteen68_ICE");
+			const status = await res.text();
+			if (status == "available") location.href = location.origin+"/Nineteen68_ICE?file=getICE"
+			else openModelPopup("switchRoleStatus", "Download Nineteen68 ICE", "Package is not available");
+		} catch (ex) {
+			console.error("Error while downloading ICE package. Error:", ex);
+			openModelPopup("switchRoleStatus", "Download Nineteen68 ICE", "Package is not available");
+		}
+	}
 });
