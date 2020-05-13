@@ -203,7 +203,7 @@ $(document).ready(function() {
 			if(window.location.pathname != "/scheduling"){
 				var selectedTask = $("#window-task").find("#accordion").find(".assignedTaskInner");
 				for(var i = 0 ; i < selectedTask.length ; i++){
-					if(ct.taskName === selectedTask[i].textContent && ct.cycleid === tj[i].testSuiteDetails[0].cycleid){
+					if(ct.taskName === selectedTask[i].textContent && (ct.cycleid === tj[i].testSuiteDetails[0].cycleid || ct.cycleid === tj[i].cycleid)){
 						selectedTask[i].onclick = null;
 						selectedTask[i].parentNode.style.cursor = "default";
 						selectedTask[i].parentNode.style.webkitFilter = "brightness(50%)";
