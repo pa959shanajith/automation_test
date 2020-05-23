@@ -454,6 +454,13 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 /** This service executes the testsuite(s) for request from API */
 exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE_API");
+	const hdrs = req.headers;
+	let reqFromADO = false;
+	// Check if request came from Azure DevOps. If yes, then send the acknowledgement
+	if (hdrs["user-agent"].startsWith("VSTS") && hdrs.planurl && hdrs.projectid) {
+		reqFromADO = true;
+		res.send("Request Received");
+	}
 	const multiBatchExecutionData = req.body.executionData;
 	const userRequestMap = {};
 	const userInfoList = [];
@@ -513,7 +520,37 @@ exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 		}
 	})());
 	await Promise.all(batchExecutionPromiseList)
-	return res.send({"executionStatus": executionResult});
+	const finalResult = {"executionStatus": executionResult};
+	if (!reqFromADO) return res.send(finalResult);
+	// This code only executes when request comes from Azure DevOps
+	let adoStatus = finalResult.executionStatus.every(e => e.status == "success");
+	const args = {
+		data: { "name": "TaskCompleted", "taskId": hdrs.taskinstanceid, "jobId": hdrs.jobid, "result": (adoStatus? "succeeded":"failed") },
+		headers: {
+			"Authorization": 'Basic ' + Buffer.from(':' + hdrs.authtoken).toString('base64'),
+			"Content-Type": "application/json"
+		}
+	};
+	const adourl = hdrs.planurl+'/'+hdrs.projectid+'/_apis/distributedtask/hubs/'+hdrs.hubname+'/plans/'+hdrs.planid+'/events?api-version=2.0-preview.1';
+	logger.info("Sending response to Azure DevOps");
+	const promiseData = (new Promise((rsv, rej) => {
+		const apiReq = client.post(adourl, args, (result, response) => {
+			if (response.statusCode < 200 && response.statusCode >= 400) {
+				logger.error("Error occurred while sending response to Azure DevOps");
+				const toLog = ((typeof(result)  == "object") && !(result instanceof Buffer))? JSON.stringify(result):result.toString();
+				logger.debug("Response code is %s and content is %s", response.statusCode, toLog);
+				rsv("fail");
+			} else {
+				rsv(result);
+			}
+		});
+		apiReq.on('error', function(err) {
+			logger.error("Error occurred while sending response to Azure DevOps, Error: %s", err);
+			rsv("fail");
+		});
+	}));
+	try { return await promiseData; }
+	catch (e) { logger.error(e); }
 };
 
 /** Service to fetch all the testcase, screen and project names for provided scenarioid */
