@@ -145,6 +145,16 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			return $http.post('/getPreferences')
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
+		},
+		fetchICE: function () {
+			return $http.post('/fetchICE')
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		provisions: function () {
+			return $http.post('/provisions')
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
 		}
 	};
 }]);

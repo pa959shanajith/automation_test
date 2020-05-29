@@ -14,6 +14,8 @@
 						<span><img class='selectedIcon' src='imgs/user.png' alt='User'/></span>User</a></li>
 					<li><a id='tokenTab' ng-click="tab = 'tabToken';tokens.click()" title="Manage Tokens" class="selectBrowser" data-name="1">
 						<span><img src='imgs/ic-tokens.png' alt='Tokens' /></span>Tokens</a></li>
+					<li><a id='provisionTab' ng-click="tab = 'tabProvision';provision.click()" title="Manage Provision" class="selectBrowser" data-name="1">
+						<span><img src='imgs/ic-tokens.png' alt='Provision' /></span>ICE Provision</a></li>
 					<li><a id='projectTab' ng-click="tab = 'tabProject'" title="Create/Update Project" class="selectBrowser" data-name="1">
 						<span><img src='imgs/project.png' alt='Project'/></span>Project</a></li>
 					<li class='userDivider'><a id='assignProjectTab' ng-click="tab='tabAssignProject';assignProj.click()" title="Assign Project" class="selectBrowser" data-name="1">
@@ -802,6 +804,71 @@
 			</div>
 		</div>
 		<!-- Assign Tokens -->			
+
+		<!-- ICE Provision -->
+		<div class="containerWrap" ng-if="tab == 'tabProvision'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>ICE Provision</span>
+			</div>
+			<div class="adminActionBtn">
+					<!-- <button title="Settings" class="btn btn-md pull-right adminBtn" ng-click="settings($event)" style="margin-right:10px">Settings</button> -->
+			</div>
+			<div class="col-xs-9 form-group" style="width: 83%;height: 35%;">
+				<div class='userForm projectForm1' style="display: inline-block;">
+					<label class='domainTxt' style="width: 11%;">Ice Type</label>
+					<label>
+							<input type="radio" value="normal" id="provisions" name="provision" ng-change="selectprovision($event)" class="ng-pristine ng-untouched ng-valid" checked="checked" ng-model="provision.op"/>
+						Normal</label>
+					<label>
+						<input type="radio" value="cicd" id="provisions" name="provision" ng-change="selectprovision($event)" class="ng-pristine ng-untouched ng-valid" ng-model="provision.op"/>
+						CI/CD</label>
+				</div>
+				<div class='userForm projectForm1' style="display: inline-block;">
+					<label class='domainTxt' style="width: 11%;">Ice Name</label>
+					<input type="text" id="icename" name="projectName"  style="width: 41%"/>
+				</div>
+				<div class='userForm projectForm1' style="display: inline-block;" >
+					<label class='domainTxt' style="width: 11%;" id='selectuser'>User</label>
+					<select class="adminSelect form-control selectDomain" style="width: 41%" id="selAssignUser2">
+						<option value="" disabled selected>Please Select User</option>
+					</select>
+				</div>	
+				<div class='userForm projectForm1' style="display: inline-block;">
+						<button title="Provision" class="btn btn-md adminBtn" ng-click="provisionsIce($event)" style="margin-right:10px">Provision</button>
+						<button title="Cancel" class="btn btn-md adminBtn" ng-click="resetProvisions($event)" style="margin-right:10px">Cancel</button>
+				</div>
+			</div>
+			<div class="col-xs-9 form-group" style="height:100%">
+				<div class="containerWrap sessionItemWrap">
+					<div class="sessionHeading" data-toggle="collapse" data-target="#activeUsersToken-x">
+						<h4>ICE Client Engine</h4>
+						<input type="text" id="searchTasks" style="left: 451px;top: 5px;" class="searchInput">
+						<span class="searchIcon" style="border-radius: 0px 7px 7px 0px;left: 694px;top: 5px;position: absolute;">
+							<img src="imgs/ic-search-icon.png" style="margin-top: -1px; margin-left: 1px;">
+						</span>
+					</div>
+					<div id="activeUsersToken" class="wrap scrollbar-inner">
+						<table class = "table table-hover sessionTable" id="tokensDetail">
+							<tr>
+								<th> Username </th>
+								<th> ICE Name </th>
+								<th> Connection Mode</th>
+								<th> Hostname </th>
+							</tr>
+							<tr ng-repeat="provision in provision.users" class='provisionTokens'>
+								<td> {{provision.name}} </td>
+								<td> {{provision.deactivated}} </td>
+								<td> {{provision.expireson }} </td>
+								<td ng-if="provision.deactivated == 'active'"><button class="btn" data-id="{{$index}}" ng-click="deactivate($event)" style="margin-left:-21%"> Deactivate </button></td>
+								<td ng-if="provision.deactivated != 'active'"></td>
+							</tr>
+						</table>
+	</div>
+				</div>
+			</div>
+		</div>
+		<!-- ICE Provision -->			
 	</div>
 	<!--Middle Panel-->
 

@@ -21,6 +21,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.preferences = {};
 	$scope.sessionConf = {};
 	$scope.tokens = {};
+	$scope.provision = {};
 	$('.dropdown').on('hide.bs.dropdown', function (e) {
 		$(this).find('.dropdown-menu').first().stop(true, true).slideUp(300);
 	});
@@ -319,6 +320,138 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				console.log("Error:::::::::::::", error);
 			});
 	});
+	$scope.provision.click = function(){
+		$('#provisions').click();
+		$('#icename').val('');
+		$scope.provision.op='normal'
+		$(".selectedIcon").removeClass("selectedIcon");
+		$("#provisionTab").find('img').addClass('selectedIcon');
+		$scope.provision.users=[]
+		adminServices.getUserDetails("user")
+			.then(function(data){
+				if(data == "Invalid Session") {
+					$rootScope.redirectPage();
+				} else if(data == "fail") {
+					openModalPopup("Token Management", "Failed to fetch users.");
+				} else if(data == "empty") {
+					openModalPopup("Token Management", "There are no users present.");
+				} else {
+					data.sort(function(a,b){ return a[0] > b[0]; });
+					var selectBox = $("#selAssignUser2");
+					selectBox.empty();
+					selectBox.append('<option data-id="" value disabled selected>Select User</option>');
+					for(i=0; i<data.length; i++){
+						if(data[i][3] != "Admin"){
+							selectBox.append('<option data-id="'+data[i][1]+'" value="'+data[i][0]+'">'+data[i][0]+'</option>');
+						}
+					}
+					selectBox.prop('selectedIndex', 0);
+				}
+			}, function (error) {
+				console.log("Error:::::::::::::", error);
+			});
+		adminServices.fetchICE()
+			.then(function (data) {
+				unblockUI();
+				if (data == "Invalid Session") {
+					$rootScope.redirectPage();
+				}
+				else if (data == 'fail') {
+						openModalPopup("ICE Provisions", "Failed to load Ice Provisions");
+				} else {
+					openModalPopup("ICE Provisions", "Ice Provisions fetched Successfully");
+				}
+			}, function (error) {
+				unblockUI();
+				console.log("Error:::::::::::::", error);
+			});
+	}
+	$scope.provisionsIce = function ($event){
+		var userId = $("#selAssignUser2 option:selected").attr("data-id");
+		var generatetoken = {};
+		generatetoken.userId = userId;
+		adminServices.provisions()
+		.then(function (data) {
+				unblockUI();
+				if (data == "Invalid Session") {
+					$rootScope.redirectPage();
+				}
+				else if (data == 'fail') {
+						openModalPopup("ICE Provisions", "Failed to load Ice Provisions");
+				} else {
+					openModalPopup("ICE Provisions", "Fetch Token details successful");
+				}
+			}, function (error) {
+				unblockUI();
+				console.log("Error:::::::::::::", error);
+			});
+	}
+	$scope.resetProvisions = function(){
+		$scope.provision.click();
+	}
+	$(document).on('change', '#provisions', function (e){
+		if(e.currentTarget.value=="normal"){
+			$('#selectuser').show();
+			$('.selectDomain').show();
+			$('.provisionTokens').show();
+			console.log('else')
+			adminServices.getUserDetails("user")
+			.then(function(data){
+				if(data == "Invalid Session") {
+					$rootScope.redirectPage();
+				} else if(data == "fail") {
+					openModalPopup("Token Management", "Failed to fetch users.");
+				} else if(data == "empty") {
+					openModalPopup("Token Management", "There are no users present.");
+				} else {
+					data.sort(function(a,b){ return a[0] > b[0]; });
+					var selectBox = $("#selAssignUser2");
+					selectBox.empty();
+					selectBox.append('<option data-id="" value disabled selected>Select User</option>');
+					for(i=0; i<data.length; i++){
+						if(data[i][3] != "Admin"){
+							selectBox.append('<option data-id="'+data[i][1]+'" value="'+data[i][0]+'">'+data[i][0]+'</option>');
+						}
+					}
+					selectBox.prop('selectedIndex', 0);
+				}
+			}, function (error) {
+				console.log("Error:::::::::::::", error);
+			});
+			
+		}else{
+			$('#selectuser').hide();
+			$('.selectDomain').hide();
+			// $('#tokensDetail').empty();
+			// $('#tokensDetail').append("<tr><th>Token Name</th><th>Status</th><th>Expiry</th><th>Action</th></tr><tr ng-repeat='provision in provision.users'><td>{{provision.name}}</td><td>{{provision.deactivated}}</td><td>{{provision.expireson}}</td><td ng-if='provision.deactivated == 'active''><button class='btn'data-id='{{$index}}'ng-click='deactivate($event)'style='margin-left:-21%'>Deactivate</button></td><td ng-if='provision.deactivated != 'active''></td></tr>")
+			$('.provisionTokens').hide();
+			$("#selAssignUser2").empty();
+		}
+	});
+	$scope.settings = function(){
+		blockUI();
+		$('#dialog-settings').attr('st');
+	}
+	$(document).on('click','.searchIcon', function($event){
+		filter(this,event);
+	});
+	$(document).on('keyup','#searchTasks', function($event) {
+		filter(this,event); 
+		// event.stopImmediatePropagation();
+	});
+	function filter(element,event) {
+		console.log('filter');
+		title=$('.searchInput').val();
+		$('.provisionTokens').each(function(){
+			// elements=$(this).children('td:nth-child(2)')
+			if($(this).children('td:nth-child(2)').text().trim() != '' && $(this).children('td:nth-child(2)').text().trim().indexOf(title.toLowerCase())>-1){
+				$(this).show();
+			}
+			else{
+				$(this).hide();
+			}
+		});
+	}
 	$scope.tokens.click = function () {
 		$scope.tokens.users=[]
 		$(".selectedIcon").removeClass("selectedIcon");

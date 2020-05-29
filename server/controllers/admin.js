@@ -1642,3 +1642,45 @@ exports.getPreferences = function (req, res) {
 		res.send("fail");
 	}
 };
+
+exports.fetchICE = function (req, res) {
+	logger.info("Inside UI service: fetchICE");
+	try {
+		if (utils.isSessionActive(req)) {
+			client.post(epurl + "admin/fetchICE",
+				function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					res.send("fail");
+				} else {
+					res.send(result.rows);
+				}
+			});
+		} else {
+			res.send("Invalid Session");
+		}
+	} catch (exception) {
+		logger.error("Error occurred in admin/fetchICE:", exception);
+		res.send("fail");
+	}
+};
+
+exports.provisions = function (req, res) {
+	logger.info("Inside UI service: provisions");
+	try {
+		if (utils.isSessionActive(req)) {
+			client.post(epurl + "admin/provisions",
+				function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					res.send("fail");
+				} else {
+					res.send(result.rows);
+				}
+			});
+		} else {
+			res.send("Invalid Session");
+		}
+	} catch (exception) {
+		logger.error("Error occurred in admin/provisions:", exception);
+		res.send("fail");
+	}
+};
