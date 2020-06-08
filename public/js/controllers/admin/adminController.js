@@ -492,6 +492,22 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			$('.provisionTokens').hide();
 			$("#selAssignUser2").empty();
 		}
+		adminServices.fetchICE()
+			.then(function (data) {
+				unblockUI();
+				if (data == "Invalid Session") {
+					$rootScope.redirectPage();
+				}
+				else if (data == 'fail') {
+						openModalPopup("ICE Provisions", "Failed to load Ice Provisions");
+				} else {
+					data.sort(function(a,b){ return a.icename > b.icename; });
+					$scope.provision.users=data;
+				}
+			}, function (error) {
+				unblockUI();
+				console.log("Error:::::::::::::", error);
+			});
 	});
 	$scope.settings = function(){
 		blockUI();
