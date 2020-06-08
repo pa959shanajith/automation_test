@@ -79,7 +79,7 @@ exports.APG_OpenFileInEditor = function (req, res) {
 	try {
 		logger.info("Inside UI service: APG_OpenFileInEditor");
 		if (isSessionActive(req)) {
-			var name = req.session.username;
+			var name = myserver.allSocketsICEUser[req.session.username];
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 				if (redisres[1]>0) {
@@ -175,7 +175,7 @@ exports.APG_runDeadcodeIdentifier = function(req,res){
 	try{
 			logger.info("Inside UI service: APG_runDeadcodeIdentifier");
 			if(isSessionActive(req)){
-				var name = req.session.username;
+				var name = myserver.allSocketsICEUser[req.session.username];
 				redisServer.redisSubServer.subscribe('ICE2_' + name);
 				redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 					if (redisres[1]>0) {

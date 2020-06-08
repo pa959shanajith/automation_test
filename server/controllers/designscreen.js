@@ -24,7 +24,7 @@ exports.initScraping_ICE = function (req, res) {
 	logger.info("Inside UI service: initScraping_ICE");
 	try {
 		if (utils.isSessionActive(req)) {
-			name = req.session.username;
+			name = myserver.allSocketsICEUser[req.session.username];
 			redisServer.redisSubServer.subscribe('ICE2_' + name);	
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
@@ -515,7 +515,7 @@ exports.updateScreen_ICE = function (req, res) {
 											res.send("success");
 										}
 										else{
-											name = req.session.username;
+											name = myserver.allSocketsICEUser[req.session.username];
 											redisServer.redisSubServer.subscribe('ICE2_' + name);
 											logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 											logger.debug("ICE Socket requesting Address: %s" , name);
@@ -576,7 +576,7 @@ exports.userObjectElement_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: userObjectElement_ICE");
 		if (utils.isSessionActive(req)) {
-			var name = req.session.username;
+			name = myserver.allSocketsICEUser[req.session.username];
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			var operation = req.body.object[0];
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -648,7 +648,7 @@ exports.highlightScrapElement_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: highlightScrapElement_ICE");
 		if (utils.isSessionActive(req)) {
-			var name = req.session.username;
+			var name = myserver.allSocketsICEUser[req.session.username];
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			var focusParam = req.body.elementXpath;
 			var elementURL = req.body.elementUrl;
@@ -675,7 +675,7 @@ exports.updateIrisDataset = function updateIrisDataset(req, res) {
 	try{
 		logger.info("Inside UI service: updateIrisDataset");
 		if (utils.isSessionActive(req)) {
-			name = req.session.username;
+			name = myserver.allSocketsICEUser[req.session.username];
 			image_data = req.body.data;
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());

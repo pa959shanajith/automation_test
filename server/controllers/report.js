@@ -67,7 +67,7 @@ fs.readFile('assets/templates/specificReport/content.handlebars', 'utf8', functi
 //to open screen shot
 function openScreenShot(req, path, cb) {
     try {
-        var name = req.session.username;
+        var name = myserver.allSocketsICEUser[req.session.username];
         logger.debug("ICE Socket requesting Address: %s", name);
         redisServer.redisSubServer.subscribe('ICE2_' + name);
         redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + name, function(err, redisres) {
@@ -514,7 +514,7 @@ exports.connectJira_ICE = function(req, res) {
     logger.info("Inside UI service: connectJira_ICE");
     try {
         if (utils.isSessionActive(req)) {
-            var name = req.session.username;
+            var name = myserver.allSocketsICEUser[req.session.username];
             redisServer.redisSubServer.subscribe('ICE2_' + name);
             if (req.body.action == 'loginToJira') { //Login to Jira for creating issues
                 var jiraurl = req.body.url;

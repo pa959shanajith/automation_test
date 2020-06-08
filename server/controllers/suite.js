@@ -416,8 +416,9 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 
 /** Function responsible for Orchestrating execution flow. Invokes series of functions to achive the results */
 const executionFunction = async (batchExecutionData, execIds, userInfo, execType) => {
-	redisServer.redisSubServer.subscribe('ICE2_' + userInfo.username);
-	var iceStatus = await checkForICEstatus(userInfo.username, execType);
+	var icename=myserver.allSocketsICEUser[userInfo.username];
+	redisServer.redisSubServer.subscribe('ICE2_' + icename);
+	var iceStatus = await checkForICEstatus(icename, execType);
 	if (iceStatus != null) return iceStatus;
 	const taskApproval = await utils.approvalStatusCheck(batchExecutionData.batchInfo);
 	if (taskApproval.res !== "pass") return taskApproval.res;

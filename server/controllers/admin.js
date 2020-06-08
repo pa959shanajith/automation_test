@@ -1670,7 +1670,7 @@ exports.provisionIce = function (req, res) {
 		if (utils.isSessionActive(req)) {
 			var tokeninfo=req.body.tokeninfo;
 			var inputs = {
-				userid:tokeninfo.userid,
+				provisionedto:tokeninfo.userid,
 				icename:tokeninfo.icename,
 				icetype:tokeninfo.icetype,
 				query:tokeninfo.action

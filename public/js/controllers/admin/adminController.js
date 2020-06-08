@@ -383,9 +383,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					$rootScope.redirectPage();
 				}
 				else if (data == 'fail') {
-						openModalPopup("ICE Provisions", "ICE Provisioned Failed");
+						openModalPopup("ICE Provision Error", "ICE Provisioned Failed");
+				}else if (data=='DuplicateIceName'){
+					openModalPopup("ICE Provision Error", "ICE already provisioned with same name or user, Provisioned Failed");
 				} else {
-					openModalPopup("ICE Provisions", "ICE Provisioned Successfully");
+					openModalPopup("ICE Provision Success", "ICE Provisioned Successfully");
 					if (data!="success")
 					jsonDownload(icename+"_icetoken.txt",data);
 					adminServices.fetchICE()

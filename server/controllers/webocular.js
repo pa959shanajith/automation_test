@@ -12,7 +12,7 @@ exports.getCrawlResults = function (req, res) {
 	try {
 		logger.info("Inside UI service: getCrawlResults");
 		if (utils.isSessionActive(req)) {
-			var name = req.session.username;
+			var name = myserver.allSocketsICEUser[req.session.username];
 			redisServer.redisSubServer.subscribe('ICE2_' + name ,1);
 			var url = req.body.url;
 			var level = req.body.level;
