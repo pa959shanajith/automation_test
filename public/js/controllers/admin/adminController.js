@@ -3,6 +3,7 @@ var createprojectObj = {}; var projectDetails = [];var flag;var projectExists;va
 var editedProjectDetails = [];
 var deletedProjectDetails = [];
 var newProjectDetails = [];
+var isIE = /*@cc_on!@*/ false || !!document.documentMode;
 var unAssignedProjects = []; var assignedProjects = [];var projectData =[];var valid = "";var getAssignedProjectsLen=0;
 mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location', 'adminServices','$timeout','cfpLoadingBar', function ($scope, $rootScope, $http, $location, adminServices, $timeout, cfpLoadingBar) {
 	$("body").css("background","#eee");
@@ -384,6 +385,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 						openModalPopup("ICE Provisions", "ICE Provisioned Failed");
 				} else {
 					openModalPopup("ICE Provisions", "ICE Provisioned Successfully");
+					if (data!="success")
+					jsonDownload(icename+"_icetoken.txt",data);
 					adminServices.fetchICE()
 						.then(function (data) {
 							unblockUI();
@@ -406,6 +409,28 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				console.log("Error:::::::::::::", error);
 			});
 	}
+
+	/*
+    function : jsonDownload()
+    Purpose : download json file
+    */
+
+   function jsonDownload(filename, responseData) {
+	if (isIE) {
+		window.navigator.msSaveOrOpenBlob(new Blob([responseData], { type: "text/json;charset=utf-8" }), filename);
+	} else {
+		var blob = new Blob([responseData], { type: 'text/json' });
+		var e = document.createEvent('MouseEvents');
+		var a = document.createElement('a');
+		a.download = filename;
+		a.href = window.URL.createObjectURL(blob);
+		a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+		e.initMouseEvent('click', true, true, window,
+			0, 0, 0, 0, 0, false, false, false, false, 0, null);
+		a.dispatchEvent(e);
+	}
+}
+
 	$scope.resetProvisions = function(){
 		$scope.provision.click();
 	}
