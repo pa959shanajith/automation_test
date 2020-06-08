@@ -332,9 +332,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if(data == "Invalid Session") {
 					$rootScope.redirectPage();
 				} else if(data == "fail") {
-					openModalPopup("Token Management", "Failed to fetch users.");
+					openModalPopup("ICE Provision", "Failed to fetch users.");
 				} else if(data == "empty") {
-					openModalPopup("Token Management", "There are no users present.");
+					openModalPopup("ICE Provision", "There are no users present.");
 				} else {
 					data.sort(function(a,b){ return a[0] > b[0]; });
 					var selectBox = $("#selAssignUser2");
@@ -359,7 +359,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				else if (data == 'fail') {
 						openModalPopup("ICE Provisions", "Failed to load Ice Provisions");
 				} else {
-					openModalPopup("ICE Provisions", "Ice Provisions fetched Successfully");
+					data.sort(function(a,b){ return a.icename > b.icename; });
+					$scope.provision.users=data;
 				}
 			}, function (error) {
 				unblockUI();
@@ -367,19 +368,38 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			});
 	}
 	$scope.provisionsIce = function ($event){
-		var userId = $("#selAssignUser2 option:selected").attr("data-id");
-		var generatetoken = {};
-		generatetoken.userId = userId;
-		adminServices.provisions()
+		var userid = $("#selAssignUser2 option:selected").attr("data-id");
+		var icename=$("#icename").val()
+		var tokeninfo = {};
+		tokeninfo.userid = userid;
+		tokeninfo.icename=icename;
+		tokeninfo.icetype=$scope.provision.op;
+		adminServices.provisions(tokeninfo)
 		.then(function (data) {
 				unblockUI();
 				if (data == "Invalid Session") {
 					$rootScope.redirectPage();
 				}
 				else if (data == 'fail') {
-						openModalPopup("ICE Provisions", "Failed to load Ice Provisions");
+						openModalPopup("ICE Provisions", "ICE Provisioned Failed");
 				} else {
-					openModalPopup("ICE Provisions", "Fetch Token details successful");
+					openModalPopup("ICE Provisions", "ICE Provisioned Successfully");
+					adminServices.fetchICE()
+						.then(function (data) {
+							unblockUI();
+							if (data == "Invalid Session") {
+								$rootScope.redirectPage();
+							}
+							else if (data == 'fail') {
+									openModalPopup("ICE Provisions", "Failed to load Ice Provisions");
+							} else {
+								data.sort(function(a,b){ return a.icename > b.icename; });
+								$scope.provision.users=data;
+							}
+						}, function (error) {
+							unblockUI();
+							console.log("Error:::::::::::::", error);
+						});
 				}
 			}, function (error) {
 				unblockUI();
@@ -389,6 +409,26 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.resetProvisions = function(){
 		$scope.provision.click();
 	}
+
+	$scope.deregister = function ($event) {
+		var iceuser={}
+		action="deregister";
+		
+	};
+
+	$scope.reregister = function ($event) {
+		var iceuser={}
+		action="reregister";
+		
+	};
+
+	$scope.gettoken = function ($event) {
+		var iceuser={}
+		action="getcitoken";
+		
+	};
+	
+
 	$(document).on('change', '#provisions', function (e){
 		if(e.currentTarget.value=="normal"){
 			$('#selectuser').show();
@@ -400,9 +440,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if(data == "Invalid Session") {
 					$rootScope.redirectPage();
 				} else if(data == "fail") {
-					openModalPopup("Token Management", "Failed to fetch users.");
+					openModalPopup("ICE Provision", "Failed to fetch users.");
 				} else if(data == "empty") {
-					openModalPopup("Token Management", "There are no users present.");
+					openModalPopup("ICE Provision", "There are no users present.");
 				} else {
 					data.sort(function(a,b){ return a[0] > b[0]; });
 					var selectBox = $("#selAssignUser2");

@@ -821,7 +821,7 @@
 							<input type="radio" value="normal" id="provisions" name="provision" ng-change="selectprovision($event)" class="ng-pristine ng-untouched ng-valid" checked="checked" ng-model="provision.op"/>
 						Normal</label>
 					<label>
-						<input type="radio" value="cicd" id="provisions" name="provision" ng-change="selectprovision($event)" class="ng-pristine ng-untouched ng-valid" ng-model="provision.op"/>
+						<input type="radio" value="ci-cd" id="provisions" name="provision" ng-change="selectprovision($event)" class="ng-pristine ng-untouched ng-valid" ng-model="provision.op"/>
 						CI/CD</label>
 				</div>
 				<div class='userForm projectForm1' style="display: inline-block;">
@@ -851,17 +851,26 @@
 					<div id="activeUsersToken" class="wrap scrollbar-inner">
 						<table class = "table table-hover sessionTable" id="tokensDetail">
 							<tr>
-								<th> Username </th>
+								<th > Username </th>
 								<th> ICE Name </th>
-								<th> Connection Mode</th>
+								<th> ICE Type</th>
 								<th> Hostname </th>
+								<th> status </th>
 							</tr>
 							<tr ng-repeat="provision in provision.users" class='provisionTokens'>
-								<td> {{provision.name}} </td>
-								<td> {{provision.deactivated}} </td>
-								<td> {{provision.expireson }} </td>
-								<td ng-if="provision.deactivated == 'active'"><button class="btn" data-id="{{$index}}" ng-click="deactivate($event)" style="margin-left:-21%"> Deactivate </button></td>
-								<td ng-if="provision.deactivated != 'active'"></td>
+								<td> {{provision.username}} </td>
+								<td> {{provision.icename}} </td>
+								<td> {{provision.icetype}} </td>
+								<td> {{provision.hostname}} </td>
+								<td> {{provision.status}} </td>
+	
+								<td ng-if="provision.icetype == 'normal'"></td>
+								<td ng-if="provision.icetype == 'ci-cd'"><button class="btn" data-id="{{$index}}" ng-click="gettoken($event)" style="margin-left:-21%"> Get Token </button></td>
+								<td ng-if="provision.status == 'provisioned'"><button class="btn" data-id="{{$index}}" ng-click="reregister($event)" style="margin-left:-31%"> Reprovision </button></td>
+								<td ng-if="provision.status == 'registered'"><button class="btn" data-id="{{$index}}" ng-click="reregister($event)" style="margin-left:-31%"> Reregister </button></td>
+								<td ng-if="provision.status == 'deregistered'"></td>
+								<td ng-if="provision.status != 'deregistered'"><button class="btn" data-id="{{provision._id}}" ng-click="deregister($event)" style="margin-left:-31%"> Deregister </button></td>
+								
 							</tr>
 						</table>
 	</div>

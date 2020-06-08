@@ -1664,11 +1664,25 @@ exports.fetchICE = function (req, res) {
 	}
 };
 
-exports.provisions = function (req, res) {
+exports.provisionIce = function (req, res) {
 	logger.info("Inside UI service: provisions");
 	try {
 		if (utils.isSessionActive(req)) {
-			client.post(epurl + "admin/provisions",
+			var tokeninfo=req.body.tokeninfo;
+			var inputs = {
+				userid:tokeninfo.userid,
+				icename:tokeninfo.icename,
+				icetype:tokeninfo.icetype,
+				query:"provision"
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			logger.info("Calling NDAC Service: getUsers_Nineteen68");
+			client.post(epurl + "admin/provisionICE",args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					res.send("fail");

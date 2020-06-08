@@ -151,9 +151,10 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
-		provisions: function () {
-			return $http.post('/provisions')
-			.then(function(response) { return response.data },
+		provisions: function (tokeninfo) {
+			return $http.post('/provisionIce',{
+				tokeninfo:tokeninfo
+			}).then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		}
 	};

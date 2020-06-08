@@ -530,6 +530,8 @@ if (cluster.isMaster) {
 		app.post('/getCIUsersDetails', admin.getCIUsersDetails);
 		app.post('/manageCIUsers', admin.manageCIUsers);
 		app.post('/getPreferences', admin.getPreferences);
+		app.post('/provisionIce', admin.provisionIce);
+		app.post('/fetchICE', admin.fetchICE);
 
 		//Design Screen Routes
 		app.post('/initScraping_ICE', designscreen.initScraping_ICE);

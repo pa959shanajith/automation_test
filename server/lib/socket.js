@@ -45,8 +45,10 @@ io.on('connection', function (socket) {
 		address = socket.handshake.query.username;
 		logger.info("Socket connecting address %s", address);
 		var icesession = socket.handshake.query.icesession;
+		var icetoken=socket.handshake.query.icetoken;
 		var inputs = {
 			"icesession": icesession,
+			"icetoken":icetoken,
 			"query": 'connect'
 		};
 		var args = {
@@ -64,7 +66,7 @@ io.on('connection', function (socket) {
 				socket.send('checkConnection', result.ice_check);
 				if (result.node_check === "allow") {
 					socketMap[address] = socket;
-					socket.send('connected');
+					socket.send('connected',result.ice_check);
 					logger.debug("%s is connected", address);
 					logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
 					socket.emit('update_screenshot_path', screenShotPath);
