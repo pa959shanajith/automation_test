@@ -851,11 +851,14 @@
 					<div id="activeUsersToken" class="wrap scrollbar-inner">
 						<table class = "table table-hover sessionTable" id="tokensDetail">
 							<tr>
-								<th > Username </th>
+								<th> Username </th>
 								<th> ICE Name </th>
 								<th> ICE Type</th>
 								<th> Hostname </th>
 								<th> status </th>
+								<th>  </th>
+								<th>  </th>
+								<th>  </th>
 							</tr>
 							<tr ng-repeat="provision in provision.users" class='provisionTokens'>
 								<td> {{provision.username}} </td>
@@ -868,6 +871,7 @@
 								<td ng-if="provision.icetype == 'ci-cd'"><button class="btn" data-id="{{$index}}" ng-click="gettoken($event)" style="margin-left:-21%"> Get Token </button></td>
 								<td ng-if="provision.status == 'provisioned'"><button class="btn" data-id="{{$index}}" ng-click="reregister($event)" style="margin-left:-31%"> Reprovision </button></td>
 								<td ng-if="provision.status == 'registered'"><button class="btn" data-id="{{$index}}" ng-click="reregister($event)" style="margin-left:-31%"> Reregister </button></td>
+								<td ng-if="provision.status == 'deregistered'"></td>
 								<td ng-if="provision.status == 'deregistered'"></td>
 								<td ng-if="provision.status != 'deregistered'"><button class="btn" data-id="{{provision._id}}" ng-click="deregister($event)" style="margin-left:-31%"> Deregister </button></td>
 								

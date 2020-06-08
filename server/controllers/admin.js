@@ -1673,7 +1673,7 @@ exports.provisionIce = function (req, res) {
 				userid:tokeninfo.userid,
 				icename:tokeninfo.icename,
 				icetype:tokeninfo.icetype,
-				query:"provision"
+				query:tokeninfo.action
 			};
 			var args = {
 				data: inputs,

@@ -374,6 +374,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		tokeninfo.userid = userid;
 		tokeninfo.icename=icename;
 		tokeninfo.icetype=$scope.provision.op;
+		tokeninfo.action="provision";
 		adminServices.provisions(tokeninfo)
 		.then(function (data) {
 				unblockUI();
@@ -411,15 +412,83 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	}
 
 	$scope.deregister = function ($event) {
-		var iceuser={}
-		action="deregister";
-		
+		var tokeninfo={};
+		index=$event.target.parentElement.parentElement.rowIndex-1;
+		tokeninfo.userid=$scope.provision.users[index].userid;
+		tokeninfo.icename=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.textContent);
+		tokeninfo.icetype=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.nextElementSibling.textContent);
+		tokeninfo.action="deregister";
+		adminServices.provisions(tokeninfo)
+		.then(function (data) {
+				unblockUI();
+				if (data == "Invalid Session") {
+					$rootScope.redirectPage();
+				}
+				else if (data == 'fail') {
+						openModalPopup("ICE Provisions", "ICE Provisioned Failed");
+				} else {
+					openModalPopup("ICE Provisions", "ICE Provisioned Successfully");
+					adminServices.fetchICE()
+						.then(function (data) {
+							unblockUI();
+							if (data == "Invalid Session") {
+								$rootScope.redirectPage();
+							}
+							else if (data == 'fail') {
+									openModalPopup("ICE Provisions", "Failed to load Ice Provisions");
+							} else {
+								data.sort(function(a,b){ return a.icename > b.icename; });
+								$scope.provision.users=data;
+							}
+						}, function (error) {
+							unblockUI();
+							console.log("Error:::::::::::::", error);
+						});
+				}
+			}, function (error) {
+				unblockUI();
+				console.log("Error:::::::::::::", error);
+			});
 	};
 
 	$scope.reregister = function ($event) {
-		var iceuser={}
-		action="reregister";
-		
+		var tokeninfo={};
+		index=$event.target.parentElement.parentElement.rowIndex-1;
+		tokeninfo.userid=$scope.provision.users[index].userid;
+		tokeninfo.icename=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.textContent);
+		tokeninfo.icetype=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.nextElementSibling.textContent);
+		tokeninfo.action="reregister";
+		adminServices.provisions(tokeninfo)
+		.then(function (data) {
+				unblockUI();
+				if (data == "Invalid Session") {
+					$rootScope.redirectPage();
+				}
+				else if (data == 'fail') {
+						openModalPopup("ICE Provisions", "ICE Provisioned Failed");
+				} else {
+					openModalPopup("ICE Provisions", "ICE Provisioned Successfully");
+					adminServices.fetchICE()
+						.then(function (data) {
+							unblockUI();
+							if (data == "Invalid Session") {
+								$rootScope.redirectPage();
+							}
+							else if (data == 'fail') {
+									openModalPopup("ICE Provisions", "Failed to load Ice Provisions");
+							} else {
+								data.sort(function(a,b){ return a.icename > b.icename; });
+								$scope.provision.users=data;
+							}
+						}, function (error) {
+							unblockUI();
+							console.log("Error:::::::::::::", error);
+						});
+				}
+			}, function (error) {
+				unblockUI();
+				console.log("Error:::::::::::::", error);
+			});
 	};
 
 	$scope.gettoken = function ($event) {
@@ -484,7 +553,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		title=$('.searchInput').val();
 		$('.provisionTokens').each(function(){
 			// elements=$(this).children('td:nth-child(2)')
-			if($(this).children('td:nth-child(2)').text().trim() != '' && $(this).children('td:nth-child(2)').text().trim().indexOf(title.toLowerCase())>-1){
+			if($(this).children('td:nth-child(2)').text().trim() != '' && $(this).children('td:nth-child(2)').text().trim().indexOf(title.toLowerCase())>-1
+			|| $(this).children('td:nth-child(1)').text().trim() != '' && $(this).children('td:nth-child(1)').text().trim().indexOf(title.toLowerCase())>-1){
 				$(this).show();
 			}
 			else{
