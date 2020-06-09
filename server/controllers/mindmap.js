@@ -1082,7 +1082,7 @@ exports.pdProcess = function (req, res) {
 			var adjacentItems = getAdjacentItems(activityJSON,eachActivityIdx,'task');
 			screendatamindmap = [];
 			try{
-				screenshotdatapertask = JSON.parse(Buffer.from(eachActivity.mxCell["@data"], "base64").toString());	// list of objects
+				screenshotdatapertask = JSON.parse(eachActivity["#cdata"]);	// list of objects
 			}
 			catch(ex){
 				screenshotdatapertask = [];
@@ -1143,24 +1143,27 @@ exports.pdProcess = function (req, res) {
 	
 		// data insertion logic
 		asynclib.forEachSeries(orderlist, function (nodeObj, savedcallback) {
-			var name = nodeObj.label,type = nodeObj.type;
-			testcaseid = uuidV4(),screenid = uuidV4();
+			var name = nodeObj.label;
+			if(screendataobj[name].data.view[0]!=undefined){
+				var screenshotdeatils = screendataobj[name].data.view[0].screenshot.split(";")[1];
+			    var screenshotdata = screenshotdeatils.split(",")[1];
+			}else{
+				var screenshotdata = "";
+			}
 			var inputs = {
 				'projectid': req.body.data.projectid,
 				'screenname': 'Screen_PD_'+name,
-				'screenid': screenid,
 				'versionnumber': 0,
 				'createdby': 'PD',
 				'createdon':new Date().getTime().toString(),
-				'createdthrough':'null1',				
-				'createdthrough': 'pd',
+				'createdbyrole':'ad',
 				'modifiedby':'asd',
 				'modifiedbyrole':'ad',
 				'modifiedon':'ew',
 				'deleted': false,
-				'skucodescreen': 'skucodescreen',
-				'tags': 'tags',
-				'screendata': JSON.stringify(screendataobj[name].data)
+				'screenshot':screenshotdata,
+				'scrapedurl':'',
+				'scrapedata': screendataobj[name].data
 			};
 			ordernameidlist.push({'name':'Screen_PD_'+name,'type':3})
 	
@@ -1178,22 +1181,28 @@ exports.pdProcess = function (req, res) {
 						if (response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail") {
 							logger.error("Error occurred in create_ice/updateScreenname_ICE from fetchScrapedData Error Code : ERRNDAC");
 						} else {
+							console.log("screen saved successfully!");
+							if(getScrapeDataQueryresult.rows[0]['parent']!=undefined){
+								var screenid = getScrapeDataQueryresult.rows[0]['parent'][0];
+								var dobjects = getScrapeDataQueryresult.rows;
+							}else{
+								var screenid = getScrapeDataQueryresult.rows;
+								var dobjects = [];
+							}
 							var inputs = {
 								'screenid': screenid,
 								'testcasename': 'Testcase_PD_'+name,
-								'testcaseid': uuidV4(),
 								'versionnumber': 0,
 								'createdby': 'pd',
 								'createdthrough': 'pd',
 								'createdon':new Date().getTime().toString(),
-								'createdthrough':'null1',
 								'modifiedby':'asd',
 								'modifiedbyrole':'ad',
 								'modifiedon':'ew',
 								'deleted': false,
-								'skucodetestcase': 'skucodetestcase',
-								'tags': 'tags',
-								'testcasesteps':JSON.stringify(screendataobj[name].script)
+								'parent':0,
+								'dataobjects':dobjects,
+								'steps':screendataobj[name].script
 							};
 							ordernameidlist.push({'name':'Testcase_PD_'+name,'type':4})
 							var args = {
@@ -1208,6 +1217,7 @@ exports.pdProcess = function (req, res) {
 										if (response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail") {
 											logger.error("Error occurred in design/getScrapeDataScreenLevel_ICE from fetchScrapedData Error Code : ERRNDAC");
 										} else {
+											console.log("Testcase saved successfully!");
 											savedcallback();		
 										}
 									} catch (exception) {
@@ -1423,6 +1433,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 	// console.log(screendata)
 
 	if(adjacentItems){
+		// console.log("adjacent:",adjacentItems);
 		// list of sources(only shapes) and targets (assuming only one)
 		if(adjacentItems["error"]){
 			console.log(adjacentItems["error"]);

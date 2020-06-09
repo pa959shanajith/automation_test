@@ -6416,6 +6416,9 @@ function contentTable(newTestScriptDataLS) {
 						} else if (obType == 'GuiShell' || obType == 'shell') {
 							sc = Object.keys(keywordArrayList.shell);
 							selectedKeywordList = "shell";
+						} else if (obType == 'scontainer') {
+							sc = Object.keys(keywordArrayList.scontainer);
+							selectedKeywordList = "scontainer";
 						} else if (obType == 'tree') {
 							sc = Object.keys(keywordArrayList.tree);
 							selectedKeywordList = "tree";
