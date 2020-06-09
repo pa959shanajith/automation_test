@@ -2,6 +2,7 @@ var logger = require('../../logger');
 var redisServer = require('./redisSocketHandler');
 //SOCKET CONNECTION USING SOCKET.IO
 var socketMap = {};
+var userICEMap={};
 var socketMapUI = {};
 var socketMapScheduling = {};
 var socketMapNotify = {};
@@ -41,11 +42,18 @@ io.on('connection', function (socket) {
 			}
 		});
 	} else {
-		logger.info("Socket request from ICE");
-		address = socket.handshake.query.username;
-		logger.info("Socket connecting address %s", address);
-		var icesession = socket.handshake.query.icesession;
-		var icetoken=socket.handshake.query.icetoken;
+		var ice_info=socket.handshake.query;
+		var iceaction=ice_info.iceaction;
+		var hostname = ice_info.hostname;
+		var icename=ice_info.icename;
+		if (iceaction=="register"){
+			logger.info("Registration request from ICE %s : %s", icename,hostname);
+		}else{
+			logger.info("Socket request from ICE");
+			logger.info("Socket connecting address %s : %s", icename,hostname);
+		}
+		var icesession = ice_info.icesession;
+		var icetoken=ice_info.icetoken;
 		var inputs = {
 			"icesession": icesession,
 			"icetoken":icetoken,
@@ -65,19 +73,24 @@ io.on('connection', function (socket) {
 			} else {
 				socket.send('checkConnection', result.ice_check);
 				if (result.node_check === "allow") {
-					socketMap[address] = socket;
+					icename=result.ice_name;
+					socketMap[icename] = socket;
+					userICEMap[result.username]=icename;
 					socket.send('connected',result.ice_check);
-					logger.debug("%s is connected", address);
+					logger.debug("%s is connected", icename);
 					logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
 					socket.emit('update_screenshot_path', screenShotPath);
-					redisServer.redisSubClient.unsubscribe('ICE1_normal_' + address);
-					redisServer.redisSubClient.unsubscribe('ICE1_scheduling_' + address);
-					redisServer.redisSubClient.subscribe('ICE1_normal_' + address);
+					redisServer.redisSubClient.unsubscribe('ICE1_normal_' + icename);
+					redisServer.redisSubClient.unsubscribe('ICE1_scheduling_' + icename);
+					redisServer.redisSubClient.subscribe('ICE1_normal_' + icename);
 					redisServer.initListeners(socket);
 				} else {
-					if (result.node_check === "userNotValid") {
-						logger.error("%s is not authorized to connect", address);
-					}
+					if (result.node_check === "InvalidToken" || result.node_check === "InvalidICE") {
+						logger.error("%s is not authorized to connect", result.ice_name);
+					}else if(result.node_check === "validICE"){
+						logger.info("%s Registered Successfully", result.ice_name)
+					}	
+					if (socket.handshake.query.ice_action != "register")
 					socket.disconnect(false);
 				}
 			}
@@ -90,6 +103,7 @@ io.on('connection', function (socket) {
 		});
 	}
 	module.exports.allSocketsMap = socketMap;
+	module.exports.allSocketsICEUser=userICEMap;
 	module.exports.allSocketsMapUI = socketMapUI;
 	module.exports.allSchedulingSocketsMap = socketMapScheduling;
 	module.exports.socketMapNotify = socketMapNotify;

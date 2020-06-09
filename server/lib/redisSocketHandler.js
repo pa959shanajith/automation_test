@@ -134,7 +134,7 @@ module.exports.redisSubServer = server_sub;
 //module.exports.cache = cache;
 
 module.exports.initListeners = mySocket => {
-	const username = mySocket.handshake.query.username;
+	const username = mySocket.handshake.query.icename;
 	logger.debug("Initializing ICE Engine connection for %s",username);
 	mySocket.evdata = {};
 	mySocket.pckts = [];
