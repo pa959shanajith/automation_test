@@ -870,10 +870,10 @@
 								<td ng-if="provision.icetype == 'normal'"></td>
 								<td ng-if="provision.icetype == 'ci-cd'"><button class="btn" data-id="{{$index}}" ng-click="gettoken($event)" style="margin-left:-21%"> Get Token </button></td>
 								<td ng-if="provision.status == 'provisioned'"><button class="btn" data-id="{{$index}}" ng-click="reregister($event)" style="margin-left:-31%"> Reprovision </button></td>
-								<td ng-if="provision.status == 'registered'"><button class="btn" data-id="{{$index}}" ng-click="reregister($event)" style="margin-left:-31%"> Reregister </button></td>
+								<td ng-if="provision.status != 'provisioned'"><button class="btn" data-id="{{$index}}" ng-click="reregister($event)" style="margin-left:-31%"> Reregister </button></td>
 								<td ng-if="provision.status == 'deregistered'"></td>
 								<td ng-if="provision.status == 'deregistered'"></td>
-								<td ng-if="provision.status != 'deregistered'"><button class="btn" data-id="{{provision._id}}" ng-click="deregister($event)" style="margin-left:-31%"> Deregister </button></td>
+								<td ng-if="provision.status != 'deregistered'"><button class="btn" data-id="{{$index}}" ng-click="deregister($event)" style="margin-left:-31%"> Deregister </button></td>
 								
 							</tr>
 						</table>

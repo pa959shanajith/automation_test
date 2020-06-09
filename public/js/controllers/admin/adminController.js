@@ -353,7 +353,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			});
 		adminServices.fetchICE()
 			.then(function (data) {
-				unblockUI();
 				if (data == "Invalid Session") {
 					$rootScope.redirectPage();
 				}
@@ -362,9 +361,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				} else {
 					data.sort(function(a,b){ return a.icename > b.icename; });
 					$scope.provision.users=data;
+					//unblockUI();
 				}
 			}, function (error) {
-				unblockUI();
+				//unblockUI();
 				console.log("Error:::::::::::::", error);
 			});
 	}
@@ -392,7 +392,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					jsonDownload(icename+"_icetoken.txt",data);
 					adminServices.fetchICE()
 						.then(function (data) {
-							unblockUI();
 							if (data == "Invalid Session") {
 								$rootScope.redirectPage();
 							}
@@ -441,7 +440,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.deregister = function ($event) {
 		var tokeninfo={};
 		index=$event.target.parentElement.parentElement.rowIndex-1;
-		tokeninfo.userid=$scope.provision.users[index].userid;
+		tokeninfo.userid=$scope.provision.users[index].provisionedto;
 		tokeninfo.icename=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.textContent);
 		tokeninfo.icetype=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.nextElementSibling.textContent);
 		tokeninfo.action="deregister";
@@ -452,9 +451,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					$rootScope.redirectPage();
 				}
 				else if (data == 'fail') {
-						openModalPopup("ICE Provisions", "ICE Provisioned Failed");
+						openModalPopup("ICE Provisions", "ICE Deregister Failed");
 				} else {
-					openModalPopup("ICE Provisions", "ICE Provisioned Successfully");
+					openModalPopup("ICE Provisions", "ICE Deregistered Successfully");
 					adminServices.fetchICE()
 						.then(function (data) {
 							unblockUI();
@@ -481,8 +480,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.reregister = function ($event) {
 		var tokeninfo={};
 		index=$event.target.parentElement.parentElement.rowIndex-1;
-		tokeninfo.userid=$scope.provision.users[index].userid;
-		tokeninfo.icename=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.textContent);
+		tokeninfo.userid=$scope.provision.users[index].provisionedto;
+		var icename=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.textContent);
+		tokeninfo.icename=icename;
 		tokeninfo.icetype=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.nextElementSibling.textContent);
 		tokeninfo.action="reregister";
 		adminServices.provisions(tokeninfo)
@@ -492,9 +492,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					$rootScope.redirectPage();
 				}
 				else if (data == 'fail') {
-						openModalPopup("ICE Provisions", "ICE Provisioned Failed");
+						openModalPopup("ICE Provisions", "ICE Reregister Failed");
 				} else {
-					openModalPopup("ICE Provisions", "ICE Provisioned Successfully");
+					openModalPopup("ICE Provisions", "ICE Reregistered Successfully");
+					if (data!="success")
+					jsonDownload(icename+"_icetoken.txt",data);
 					adminServices.fetchICE()
 						.then(function (data) {
 							unblockUI();

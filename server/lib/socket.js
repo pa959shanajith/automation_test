@@ -123,7 +123,7 @@ io.on('connection', function (socket) {
 		} else {
 			var connect_flag = false;
 			logger.info("Inside ICE Socket disconnection");
-			address = socket.handshake.query.username;
+			address = socket.handshake.query.icename;
 			if (socketMap[address] != undefined) {
 				connect_flag = true;
 				logger.info('Disconnecting from ICE socket (%s) : %s', reason, address);
@@ -173,7 +173,7 @@ io.on('connection', function (socket) {
 
 	socket.on('toggle_schedule', function (data) {
 		logger.info("Inside Socket toggle_schedule: Reconnecting for scheduling socket");
-		var address = socket.handshake.query.username;
+		var address = socket.handshake.query.icename;
 		if (data && socketMap[address] != undefined) {
 			redisServer.redisSubClient.unsubscribe('ICE1_normal_' + address);
 			redisServer.redisSubClient.subscribe('ICE1_scheduling_' + address);
