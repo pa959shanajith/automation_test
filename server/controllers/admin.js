@@ -395,7 +395,7 @@ exports.manageSessionData = async function (req, res) {
 			} else if (action == "logout" || action == "disconnect") {
 				logger.info("Inside UI service: manageSessionData/"+action);
 				if (action == "logout") key = Buffer.from(req.body.key, "base64").toString();
-				var d2s = {"action":action, "key":key, "user":user, "cmdBy":currUser};
+				  var d2s = {"action":action, "key":key, "user":user, "cmdBy":currUser};
 				utils.delSession(d2s, function(err){
 					if (err) {
 						logger.error("Error occurred in admin/manageSessionData: Fail to "+action+" "+user);
@@ -1675,6 +1675,14 @@ exports.provisionIce = function (req, res) {
 				icetype:tokeninfo.icetype,
 				query:tokeninfo.action
 			};
+			if (tokeninfo.expireson) inputs.expireson=tokeninfo.expireson
+			if (tokeninfo.action=="gettoken"){
+				const tokgen2 = new TokenGenerator(256, TokenGenerator.BASE62);
+				var token=tokgen2.generate()
+				var salt = bcrypt.genSaltSync(10);
+				inputs.token=bcrypt.hashSync(token, salt);
+				// inputs.expireson=tokeninfo.expireson;
+			}
 			var args = {
 				data: inputs,
 				headers: {

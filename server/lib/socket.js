@@ -72,8 +72,8 @@ io.on('connection', function (socket) {
 				logger.error("Error occurred in updateActiveIceSessions Error Code: ERRNDAC");
 			} else {
 				socket.send('checkConnection', result.ice_check);
+				icename=result.icename;
 				if (result.node_check === "allow") {
-					icename=result.ice_name;
 					socketMap[icename] = socket;
 					userICEMap[result.username]=icename;
 					socket.send('connected',result.ice_check);
@@ -86,9 +86,9 @@ io.on('connection', function (socket) {
 					redisServer.initListeners(socket);
 				} else {
 					if (result.node_check === "InvalidToken" || result.node_check === "InvalidICE") {
-						logger.error("%s is not authorized to connect", result.ice_name);
+						logger.error("%s is not authorized to connect", icename);
 					}else if(result.node_check === "validICE"){
-						logger.info("%s Registered Successfully", result.ice_name)
+						logger.info("%s Registered Successfully", icename)
 					}	
 					if (socket.handshake.query.ice_action != "register")
 					socket.disconnect(false);

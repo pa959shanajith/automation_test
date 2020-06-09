@@ -323,6 +323,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	});
 	$scope.provision.click = function(){
 		$('#provisions').click();
+		blockUI("Loading");
 		$('#icename').val('');
 		$scope.provision.op='normal';
 		$(".selectedIcon").removeClass("selectedIcon");
@@ -361,10 +362,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				} else {
 					data.sort(function(a,b){ return a.icename > b.icename; });
 					$scope.provision.users=data;
-					//unblockUI();
+					unblockUI();
 				}
 			}, function (error) {
-				//unblockUI();
+				unblockUI();
 				console.log("Error:::::::::::::", error);
 			});
 		$('#tokeninfo').hide();
@@ -372,17 +373,28 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$("#tokeninfo .tokenSuite .timePicContainer .fc-timePicker").val('');
 	}
 	$scope.provisionsIce = function ($event){
+		$("#icename").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
+		$("#selAssignUser2").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
 		var userid = $("#selAssignUser2 option:selected").attr("data-id");
 		var icename=$("#icename").val()
+		if (icename==""){
+			$("#icename").addClass("selectErrorBorder");
+			return false;
+		}
+		if (userid==""){
+			$("#selAssignUser2").addClass("selectErrorBorder");
+			return false;
+		}
+		
 		var tokeninfo = {};
 		tokeninfo.userid = userid;
 		tokeninfo.icename=icename;
 		tokeninfo.icetype=$scope.provision.op;
 		tokeninfo.action="provision";
-		if($scope.provision.op=="cicd"){
+		if($scope.provision.op=="ci-cd"){
 			var date=$("#tokeninfo .tokenSuite .datePicContainer .fc-datePicker").val();
 			var time=$("#tokeninfo .tokenSuite .timePicContainer .fc-timePicker").val();
-			tokeninfo.expiry= date+" "+time;
+			tokeninfo.expireson= date+" "+time;
 		}
 		adminServices.provisions(tokeninfo)
 		.then(function (data) {
@@ -442,6 +454,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 }
 
 	$scope.resetProvisions = function(){
+		$("#icename").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
+		$("#selAssignUser2").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
 		$scope.provision.click();
 	}
 
@@ -461,6 +475,19 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				else if (data == 'fail') {
 						openModalPopup("ICE Provisions", "ICE Deregister Failed");
 				} else {
+					adminServices.manageSessionData('disconnect',icename,"normal")
+						.then(function (data) {
+							if (data == "Invalid Session") {
+								$rootScope.redirectPage();
+							} else if (data == "fail") {
+								//openModalPopup("Session Management", msg+"failed!")
+							} else {
+								rootObj.splice(id,1);
+							}
+							unblockUI();
+						}, function (error) {
+							console.error("Fail to load session data", error);
+					});
 					openModalPopup("ICE Provisions", "ICE Deregistered Successfully");
 					adminServices.fetchICE()
 						.then(function (data) {
@@ -477,7 +504,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 						}, function (error) {
 							unblockUI();
 							console.log("Error:::::::::::::", error);
-						});
+					});
+					
 				}
 			}, function (error) {
 				unblockUI();
@@ -529,8 +557,45 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	};
 
 	$scope.gettoken = function ($event) {
-		var iceuser={}
-		action="getcitoken";
+		var tokeninfo={};
+		index=$event.target.parentElement.parentElement.rowIndex-1;
+		var icename=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.textContent);
+		tokeninfo.icename=icename;
+		tokeninfo.icetype=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.nextElementSibling.textContent);
+		tokeninfo.action="gettoken";
+		adminServices.provisions(tokeninfo)
+		.then(function (data) {
+				unblockUI();
+				if (data == "Invalid Session") {
+					$rootScope.redirectPage();
+				}
+				else if (data == 'fail') {
+						openModalPopup("ICE Provisions","Authentication Token generation failed");
+				} else {
+					openModalPopup("ICE Provisions", "Authentication Token generated successfully");
+					if (data!="success")
+					jsonDownload(icename+"_icetoken.txt",data);
+					adminServices.fetchICE()
+						.then(function (data) {
+							unblockUI();
+							if (data == "Invalid Session") {
+								$rootScope.redirectPage();
+							}
+							else if (data == 'fail') {
+									openModalPopup("ICE Provisions", "Failed to load Ice Provisions");
+							} else {
+								data.sort(function(a,b){ return a.icename > b.icename; });
+								$scope.provision.users=data;
+							}
+						}, function (error) {
+							unblockUI();
+							console.log("Error:::::::::::::", error);
+						});
+				}
+			}, function (error) {
+				unblockUI();
+				console.log("Error:::::::::::::", error);
+			});
 		
 	};
 	
@@ -3082,7 +3147,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	// Session Management: Logoff/Disconnect User
 	$scope.sessionConf.kill = function ($event) {
-		var ele = $event.target;
+		// var ele = $event.target;
 		var action = $event.target.innerHTML.trim().toLowerCase();
 		var id = parseInt($event.target.dataset.id);
 		var msg, rootObj, key, obj;
