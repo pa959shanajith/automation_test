@@ -324,7 +324,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.provision.click = function(){
 		$('#provisions').click();
 		$('#icename').val('');
-		$scope.provision.op='normal'
+		$scope.provision.op='normal';
 		$(".selectedIcon").removeClass("selectedIcon");
 		$("#provisionTab").find('img').addClass('selectedIcon');
 		$scope.provision.users=[]
@@ -367,6 +367,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				//unblockUI();
 				console.log("Error:::::::::::::", error);
 			});
+		$('#tokeninfo').hide();
 	}
 	$scope.provisionsIce = function ($event){
 		var userid = $("#selAssignUser2 option:selected").attr("data-id");
@@ -376,6 +377,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		tokeninfo.icename=icename;
 		tokeninfo.icetype=$scope.provision.op;
 		tokeninfo.action="provision";
+		if($scope.provision.op=="cicd"){
+			var date=$("#tokeninfo .tokenSuite .datePicContainer .fc-datePicker").val();
+			var time=$("#tokeninfo .tokenSuite .datePicContainer .fc-timePicker").val();
+			tokeninfo.expiry= date+" "+time;
+		}
 		adminServices.provisions(tokeninfo)
 		.then(function (data) {
 				unblockUI();
@@ -530,6 +536,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$(document).on('change', '#provisions', function (e){
 		if(e.currentTarget.value=="normal"){
 			$('#selectuser').show();
+			$('#userinfo').show();
+			$('#tokeninfo').hide();
 			$('.selectDomain').show();
 			$('.provisionTokens').show();
 			console.log('else')
@@ -564,6 +572,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			// $('#tokensDetail').append("<tr><th>Token Name</th><th>Status</th><th>Expiry</th><th>Action</th></tr><tr ng-repeat='provision in provision.users'><td>{{provision.name}}</td><td>{{provision.deactivated}}</td><td>{{provision.expireson}}</td><td ng-if='provision.deactivated == 'active''><button class='btn'data-id='{{$index}}'ng-click='deactivate($event)'style='margin-left:-21%'>Deactivate</button></td><td ng-if='provision.deactivated != 'active''></td></tr>")
 			$('.provisionTokens').hide();
 			$("#selAssignUser2").empty();
+			$('#userinfo').hide();
+			$('#tokeninfo').show();
 		}
 		adminServices.fetchICE()
 			.then(function (data) {

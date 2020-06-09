@@ -829,11 +829,27 @@
 					<input type="text" id="icename" name="projectName"  style="width: 41%"/>
 				</div>
 				<div class='userForm projectForm1' style="display: inline-block;" >
-					<label class='domainTxt' style="width: 11%;" id='selectuser'>User</label>
-					<select class="adminSelect form-control selectDomain" style="width: 41%" id="selAssignUser2">
-						<option value="" disabled selected>Please Select User</option>
-					</select>
+					<div id="userinfo">
+						<label class='domainTxt' style="width: 11%;" id='selectuser'>User</label>
+						<select class="adminSelect form-control selectDomain" style="width: 41%" id="selAssignUser2">
+							<option value="" disabled selected>Please Select User</option>
+						</select>
+					</div>
+					<div class="tokeninfo" id="tokeninfo" style="display: none;">
+						<label class='domainTxt' style="width: 11%;" id='selectuser'>Expiry</label>
+						<div class="tokenSuite" style="margin-left: -3px;">
+							<span class="datePicContainer">
+								<input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly="">
+								<img class="datepickerIconToken" src="../imgs/ic-datepicker.png">
+							</span>
+							<span class="timePicContainer">
+								<input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/>
+								<img class="timepickerIconToken" src="../imgs/ic-timepicker.png" />
+							</span>
+						</div>
+					</div>
 				</div>	
+				
 				<div class='userForm projectForm1' style="display: inline-block;">
 						<button title="Provision" class="btn btn-md adminBtn" ng-click="provisionsIce($event)" style="margin-right:10px">Provision</button>
 						<button title="Cancel" class="btn btn-md adminBtn" ng-click="resetProvisions($event)" style="margin-right:10px">Cancel</button>
@@ -868,12 +884,12 @@
 								<td> {{provision.status}} </td>
 	
 								<td ng-if="provision.icetype == 'normal'"></td>
-								<td ng-if="provision.icetype == 'ci-cd'"><button class="btn" data-id="{{$index}}" ng-click="gettoken($event)" style="margin-left:-21%"> Get Token </button></td>
-								<td ng-if="provision.status == 'provisioned'"><button class="btn" data-id="{{$index}}" ng-click="reregister($event)" style="margin-left:-31%"> Reprovision </button></td>
-								<td ng-if="provision.status != 'provisioned'"><button class="btn" data-id="{{$index}}" ng-click="reregister($event)" style="margin-left:-31%"> Reregister </button></td>
+								<td ng-if="provision.icetype == 'ci-cd'"><button class="btn" data-id="{{$index}}" ng-click="gettoken($event)" style="margin-left:0%"> Get Token </button></td>
+								<td ng-if="provision.status == 'provisioned'"><button class="btn" data-id="{{$index}}" ng-click="reregister($event)" style="margin-left:0%"> Reprovision </button></td>
+								<td ng-if="provision.status == 'registered'"><button class="btn" data-id="{{$index}}" ng-click="reregister($event)" style="margin-left:0%"> Reregister </button></td>
 								<td ng-if="provision.status == 'deregistered'"></td>
 								<td ng-if="provision.status == 'deregistered'"></td>
-								<td ng-if="provision.status != 'deregistered'"><button class="btn" data-id="{{$index}}" ng-click="deregister($event)" style="margin-left:-31%"> Deregister </button></td>
+								<td ng-if="provision.status != 'deregistered'"><button class="btn" data-id="{{provision._id}}" ng-click="deregister($event)" style="margin-left:0%"> Deregister </button></td>
 								
 							</tr>
 						</table>
