@@ -296,7 +296,7 @@ const updateSkippedExecutionStatus = async (batchData, userInfo, status, msg) =>
 const executionRequestToICE = async (execReq, execType, userInfo) => {
 	const fnName = "executionRequestToICE";
 	logger.info("Inside " + fnName + " function");
-	const name = userInfo.username;
+	const name = myserver.allSocketsICEUser[userInfo.username];
 	const channel = (execType == "SCHEDULE")? "scheduling":"normal";
 	var completedSceCount = 0;
 	var statusPass = 0;
