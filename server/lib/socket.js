@@ -8,6 +8,7 @@ var socketMapNotify = {};
 
 var uiConfig = require('./../config/options');
 var screenShotPath = uiConfig.screenShotPath;
+var benchmarkRunTimes = uiConfig.benchmarkRuntimes;
 var myserver = require('./../../server');
 var httpsServer = myserver.httpsServer;
 var io = require('socket.io').listen(httpsServer, { cookie: false, pingInterval: uiConfig.socketio.pingInterval, pingTimeout: uiConfig.socketio.pingTimeout });
@@ -67,7 +68,7 @@ io.on('connection', function (socket) {
 					socket.send('connected');
 					logger.debug("%s is connected", address);
 					logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
-					socket.emit('update_screenshot_path', screenShotPath);
+					socket.emit('update_screenshot_path', screenShotPath,benchmarkRunTimes);
 					redisServer.redisSubClient.unsubscribe('ICE1_normal_' + address);
 					redisServer.redisSubClient.unsubscribe('ICE1_scheduling_' + address);
 					redisServer.redisSubClient.subscribe('ICE1_normal_' + address);

@@ -24,5 +24,6 @@
     "screenShotPath": {
         "default": "",
         "mac": ""
-    }
+    },
+    "benchmarkRuntimes":["12:30","12:40","12:50","13:00"]
 }

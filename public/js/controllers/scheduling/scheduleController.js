@@ -260,7 +260,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 	//Add to list and schedule
 	$scope.initSchedule = function ($event) {
 		if (smartBatch) {
-			sequence(true,true);
+			sequence(true,false,copyId);
 		}
 		if ($(".selectScheduleSuite:checked").length == 0) openModelPopup("Schedule Test Suite", "Please select atleast one Suite(s) to schedule");
 		else if ($('.selectToSched:checked').length == 0) openModelPopup("Schedule Test Suite", "Please select atleast one scenario to schedule");
@@ -360,7 +360,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 			ScheduleService.testSuitesScheduler_ICE(executionData)
 				.then(function (data) {
 					unblockUI();
-					sequence(false,false);
+					sequence(false,false,0);
 					if (data == "Invalid Session") return $rootScope.redirectPage();
 					else if (data == "NotApproved") openModelPopup("Schedule Test Suite", "All the dependent tasks (design, scrape) needs to be approved before execution");
 					else if (data == "NoTask") openModelPopup("Schedule Test Suite", "Task does not exist for child node");
@@ -393,7 +393,9 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 					$("#scheduledSuitesFilterData").prop('selectedIndex', 0);
 					changeBackground();
 					browserTypeExe = [];
-					$(".fc-timePicker").focus()
+					sequence(true,false,copyId);
+					$(".selectScheduleSuite, .selectToSched").prop("checked", false);
+					//$(".fc-timePicker").focus()
 				}, function (error) {
 					unblockUI();
 					openModelPopup("Schedule Test Suite", "Failed to schedule Testsuite");
@@ -437,6 +439,7 @@ function openModelPopup(title, body) {
 	}, 300);
 }
 var smartBatch = false;
+var copyId = 0
 function openPopup(id) {
 	if ($('.ipContainer').find(":selected")[parseInt(id[id.length - 1])].label === "Scenario Smart Scheduling") {
 		console.log(id)
@@ -444,17 +447,20 @@ function openPopup(id) {
 			$('#smartScheduling').find('.btn-default')[1].click();
 			openModelPopup("Smart Scheduling", "No active ICE found to use Smart Scheduling");
 			$('#' + id)[0].children[0].selectedIndex = 0;
-			sequence(true,false);
+			sequence(true,fals,0);
+			copyId = 0
 		} else {
 			$("#smartScheduling").modal("show");
 			$($('#smartScheduling').find('.btn-default')[1]).data('selector-id', id);
 			$('#smartScheduling').find('.btn-default')[1].onclick = function () {
 				$('#' + $(this).data('selector-id')).children()[0].selectedIndex = 0;
-				sequence(true,false);
+				sequence(true,false,0);
 				smartBatch = false;
+				copyId = 0;
 			}
 			smartBatch = true;
-			sequence(true,true);
+			copyId = parseInt(id.replace("mod",""));
+			sequence(true,true,copyId);
 		}
 	}
 	else if ($('.ipContainer').find(":selected")[parseInt(id[id.length - 1])].label === "Module Smart Scheduling") {
@@ -462,33 +468,30 @@ function openPopup(id) {
 			$('#smartScheduling').find('.btn-default')[1].click();
 			openModelPopup("Smart Scheduling", "No active ICE found to use Smart Scheduling");
 			$('#' + id)[0].children[0].selectedIndex = 0;
-			sequence(true,false);
+			sequence(true,false,0);
+			copyId = 0;
 		} else {
-			openModelPopup("Smart Scheduling", "All the modules will be executed as batch");
+			openModelPopup("Smart Scheduling", "All the modules will be executed as batch.\nAll available ICE should be in similar configurations for optimal results.");
 			smartBatch = true;
-			sequence(true,true);
+			copyId = parseInt(id.replace("mod",""));
+			sequence(true,true,copyId);
 		}
 	} else { 
 		smartBatch = false;
-		sequence(false,false);
+		sequence(false,false,parseInt(id.replace("mod","")));
 	 }
 }
-function sequence(copy,block) {
+function sequence(copy,block,id) {
 	var selectall = block; // select all only when blockin
-	for (var i = 1; i < $(".batchSuite").length; i++) {
+	for (var i = 0; i < $(".batchSuite").length ; i++) {
+		if(i == id){
+			continue;
+		}
 		if(copy){
-			$(".batchSuite")[i].children[0].children[2].children[0].selectedIndex = $(".batchSuite")[0].children[0].children[2].children[0].selectedIndex;
-			$(".batchSuite")[i].children[0].children[3].children[0].value = $(".batchSuite")[0].children[0].children[3].children[0].value;
-			$(".batchSuite")[i].children[0].children[4].children[0].value = $(".batchSuite")[0].children[0].children[4].children[0].value;
-			$(".batchSuite")[i].children[0].children[4] = $(".batchSuite")[0].children[0].children[4]
-			$(".batchSuite")[0].children[0].children[0].checked = true
-			if(selectall){
-				 $(".batchSuite")[i].children[0].children[0].checked = true;
-				 $(".batchSuite")[0].children[0].children[0].checked = true
-			}
-			else $(".batchSuite")[i].children[0].children[0].checked = false;
-
-			
+			$(".batchSuite")[i].children[0].children[2].children[0].selectedIndex = $(".batchSuite")[id].children[0].children[2].children[0].selectedIndex;
+			$(".batchSuite")[i].children[0].children[3].children[0].value = $(".batchSuite")[id].children[0].children[3].children[0].value;
+			$(".batchSuite")[i].children[0].children[4].children[0].value = $(".batchSuite")[id].children[0].children[4].children[0].value;
+			$(".batchSuite")[i].children[0].children[4] = $(".batchSuite")[id].children[0].children[4]
 			
 		}
 		if (block) {
@@ -501,15 +504,13 @@ function sequence(copy,block) {
 			$(".batchSuite")[i].children[0].children[2].children[0].disabled = false;
 		}
 	}
-	for (var i = 0; i < $(".batchSuite").find(".selectToSched").length ; i++) {
-		if(selectall && copy){ 
-			$(".batchSuite").find(".selectToSched")[i].checked = true;
-		}else if(!selectall && copy){
-			 $(".batchSuite").find(".selectToSched")[i].checked = false;
-		}
+	// for (var i = 0; i < $(".batchSuite").find(".selectToSched").length ; i++) {
+	// 	if(selectall && copy){ 
+	// 		$(".batchSuite").find(".selectToSched")[i].checked = true;
+	// 	}
 
 
-	}
+	// }
 	
 
 }
