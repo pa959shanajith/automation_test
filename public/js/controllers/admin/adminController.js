@@ -368,6 +368,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				console.log("Error:::::::::::::", error);
 			});
 		$('#tokeninfo').hide();
+		$("#tokeninfo .tokenSuite .datePicContainer .fc-datePicker").val('');
+		$("#tokeninfo .tokenSuite .timePicContainer .fc-timePicker").val('');
 	}
 	$scope.provisionsIce = function ($event){
 		var userid = $("#selAssignUser2 option:selected").attr("data-id");
@@ -379,7 +381,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		tokeninfo.action="provision";
 		if($scope.provision.op=="cicd"){
 			var date=$("#tokeninfo .tokenSuite .datePicContainer .fc-datePicker").val();
-			var time=$("#tokeninfo .tokenSuite .datePicContainer .fc-timePicker").val();
+			var time=$("#tokeninfo .tokenSuite .timePicContainer .fc-timePicker").val();
 			tokeninfo.expiry= date+" "+time;
 		}
 		adminServices.provisions(tokeninfo)
