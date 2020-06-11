@@ -379,11 +379,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		tokeninfo.icename=icename;
 		tokeninfo.icetype=$scope.provision.op;
 		tokeninfo.action="provision";
-		if($scope.provision.op=="cicd"){
-			var date=$("#tokeninfo .tokenSuite .datePicContainer .fc-datePicker").val();
-			var time=$("#tokeninfo .tokenSuite .timePicContainer .fc-timePicker").val();
-			tokeninfo.expiry= date+" "+time;
-		}
+		// if($scope.provision.op=="cicd"){
+		// 	var date=$("#tokeninfo .tokenSuite .datePicContainer .fc-datePicker").val();
+		// 	var time=$("#tokeninfo .tokenSuite .timePicContainer .fc-timePicker").val();
+		// 	tokeninfo.expiry= date+" "+time;
+		// }
 		adminServices.provisions(tokeninfo)
 		.then(function (data) {
 				unblockUI();
@@ -575,7 +575,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			$('.provisionTokens').hide();
 			$("#selAssignUser2").empty();
 			$('#userinfo').hide();
-			$('#tokeninfo').show();
+			$('#tokeninfo').hide();
 		}
 		adminServices.fetchICE()
 			.then(function (data) {
