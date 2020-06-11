@@ -743,10 +743,22 @@
 			<div class="adminActionBtn">
 				<button title="Generate New Token" class="btn btn-md pull-right adminBtn" ng-click="generateCIusertokens($event)" style="margin-right:10px">Generate</button>
 			</div>
-			<div class="col-xs-9 form-group" style="width: 83%">
+			<div class="col-xs-9 form-group" style="width: 83%;height: 45%;">
 				<div class='userForm projectForm' style="display: inline-block;">
-					<label class='domainTxt' style="width: 11%;">User</label>
+					<label class='domainTxt' style="width: 11%;">Ice Type</label>
+					<label>
+							<input type="radio" value="normal" id="IceType" name="provision" ng-change="selectIceType($event)" class="ng-pristine ng-untouched ng-valid" checked="checked" ng-model="provision.op"/>
+						Normal</label>
+					<label style="margin-left: 3%;">
+						<input type="radio" value="ci-cd" id="IceType" name="provision" ng-change="selectIceType($event)" class="ng-pristine ng-untouched ng-valid" ng-model="provision.op"/>
+						CI/CD</label>
+				</div>
+				<div class='userForm projectForm' style="display: inline-block;">
+					<label id="userToken" class='domainTxt' style="width: 11%;">User</label>
 					<select class="adminSelect form-control selectDomain" style="width: 71%" id="selAssignUser1">
+						<option value="" disabled selected>Please Select User</option>
+					</select>
+					<select class="adminSelect form-control selectDomain" style="width: 71%" id="icename">
 						<option value="" disabled selected>Please Select User</option>
 					</select>
 					<span ng-show="userNameRequired" class="error-msg ng-cloak errorlbl">{{userNameRequired}}</span>
