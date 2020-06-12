@@ -283,7 +283,24 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	};
 
 	$(document).on('click', '#tokenTab', function () {
+		$('#userToken').text('User')
+		$('#selAssignUser1').show()
+		$('#icename').hide()
+		$('#IceType').click();
+		$scope.provision.op='normal';
 	});
+	$scope.selectIceType=function($event){
+		if(event.currentTarget.value=='normal'){
+			$('#userToken').text('User')
+			$('#selAssignUser1').show()
+			$('#icename').hide()
+		}
+		else if(event.currentTarget.value=='ci-cd'){
+			$('#userToken').text('Ice Name')
+			$('#selAssignUser1').hide()
+			$('#icename').show()
+		}
+	}
 	$(document).on('change', '#selAssignUser1', function (e) {
 		blockUI("Fetchin Token data. Please wait...")
 		var userId = $("#selAssignUser1 option:selected").attr("data-id");
@@ -391,11 +408,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		tokeninfo.icename=icename;
 		tokeninfo.icetype=$scope.provision.op;
 		tokeninfo.action="provision";
-		if($scope.provision.op=="ci-cd"){
-			var date=$("#tokeninfo .tokenSuite .datePicContainer .fc-datePicker").val();
-			var time=$("#tokeninfo .tokenSuite .timePicContainer .fc-timePicker").val();
-			tokeninfo.expireson= date+" "+time;
-		}
+		// if($scope.provision.op=="cicd"){
+		// 	var date=$("#tokeninfo .tokenSuite .datePicContainer .fc-datePicker").val();
+		// 	var time=$("#tokeninfo .tokenSuite .timePicContainer .fc-timePicker").val();
+		// 	tokeninfo.expiry= date+" "+time;
+		// }
 		adminServices.provisions(tokeninfo)
 		.then(function (data) {
 				unblockUI();
@@ -640,7 +657,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			$('.provisionTokens').hide();
 			$("#selAssignUser2").empty();
 			$('#userinfo').hide();
-			$('#tokeninfo').show();
+			$('#tokeninfo').hide();
 		}
 		adminServices.fetchICE()
 			.then(function (data) {
@@ -705,6 +722,29 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				for(i=0; i<data.length; i++){
 					if(data[i][3] != "Admin"){
 						selectBox.append('<option data-id="'+data[i][1]+'" value="'+data[i][0]+'">'+data[i][0]+'</option>');
+					}
+				}
+				selectBox.prop('selectedIndex', 0);
+			}
+		}, function (error) {
+			console.log("Error:::::::::::::", error);
+		});
+		adminServices.fetchICE()
+		.then(function(data){
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "fail") {
+				openModalPopup("Token Management", "Failed to fetch users.");
+			} else if(data == "empty") {
+				openModalPopup("Token Management", "There are no users present.");
+			} else {
+				data.sort(function(a,b){ return a[0] > b[0]; });
+				var selectBox = $("#icename");
+				selectBox.empty();
+				selectBox.append('<option data-id="" value disabled selected>Select User</option>');
+				for(i=0; i<data.length; i++){
+					if(data[i]["icetype"]=='ci-cd'){
+						selectBox.append('<option data-id="'+data[i]['_id']+'" value="'+data[i]['icename']+'">'+data[i]['icename']+'</option>');
 					}
 				}
 				selectBox.prop('selectedIndex', 0);
