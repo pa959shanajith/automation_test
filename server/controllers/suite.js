@@ -570,9 +570,9 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 		return new Date(dt[2], dt[1] - 1, dt[0], tm[0], tm[1], 0).valueOf().toString();
 	});
 	var smart = false;
-	if (batchInfo[0].targetUser.includes('Smart')) {
+	if (batchInfo[0].targetUser && batchInfo[0].targetUser.includes('Smart')) {
 		smart = true;
-		result = await smartSchedule(batchInfo, batchInfo[0].targetUser, dateTimeUtc)
+		result = await smartSchedule(batchInfo, batchInfo[0].targetUser, dateTimeUtc, multiExecutionData.browserType.length)
 		if (result["status"] == "fail") {
 			res.send("fail")
 		}
@@ -653,9 +653,8 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
  * @param {*} type , sceanriolevel / modulelevel , batch.targetUser
  * @param {*} time , time of schedule
  */
-const smartSchedule = async (batchInfo, type, time) => {
+const smartSchedule = async (batchInfo, type, time, browsers) => {
 	// deep copying batchinfo
-	var partBatchInfo = JSON.parse(JSON.stringify(batchInfo));
 	result = {}
 	result["displayString"] = "";
 	var partitions = await getMachinePartitions(batchInfo, type, time);
@@ -667,7 +666,7 @@ const smartSchedule = async (batchInfo, type, time) => {
 		result["displayString"] = "ICE busy, Some modules might skip.\n"
 	} else {
 		result["status"] = "success"
-		result["displayString"] = "Succesfully Scheduled.\n\n"
+		result["displayString"] = "Successfully Scheduled.\n\n"
 	}
 	result["batchInfo"] = {}
 	var setCount = 1;
@@ -675,6 +674,7 @@ const smartSchedule = async (batchInfo, type, time) => {
 	var partBatchInfo = []
 	var moduleUserMap = {}
 	for (let set in partitions.partitions) {
+		var partitionsString = partitions.partitions[set].toString();
 		result["displayString"] = result["displayString"] + "Set " + setCount.toString() + ": " + set + "\n";
 		setCount++;
 		for (var i = 0; i < batchInfo.length; i++) {
@@ -683,12 +683,15 @@ const smartSchedule = async (batchInfo, type, time) => {
 			temp.smartScheduleId = uuid();
 			temp.targetUser = set;
 			for (var j = 0; j < batchInfo[i].suiteDetails.length; j++) {
-				if (partitions.partitions[set].toString().includes(batchInfo[i].suiteDetails[j].scenarioId)) {
+				if (partitionsString.includes(batchInfo[i].suiteDetails[j].scenarioId)) {
+					partitionsString = partitionsString.replace(batchInfo[i].suiteDetails[j].scenarioId,"");
 					testId = batchInfo[i].testsuiteId;
 					if (moduleUserMap[testId] && moduleUserMap[testId]['user'] == set) {
-						partBatchInfo[moduleUserMap[testId]["index"]].suiteDetails.push(batchInfo[i].suiteDetails[j]);
-					} else {
-						temp.suiteDetails.push(batchInfo[i].suiteDetails[j])
+						partBatchInfo[moduleUserMap[testId]["index"]].suiteDetails.push(JSON.parse(JSON.stringify(batchInfo[i].suiteDetails[j])));
+						batchInfo[i].suiteDetails[j].scenarioId = "NONE";
+					} else {				
+						temp.suiteDetails.push(JSON.parse(JSON.stringify(batchInfo[i].suiteDetails[j])))
+						batchInfo[i].suiteDetails[j].scenarioId = "NONE";
 						moduleUserMap[testId] = {};
 						moduleUserMap[testId]['index'] = partBatchInfo.length;
 						moduleUserMap[testId]['user'] = set;
@@ -698,7 +701,7 @@ const smartSchedule = async (batchInfo, type, time) => {
 			}
 		}
 	}
-	result["displayString"] = result["displayString"] + "\nEstimated Time: " + secondsToHms(partitions.totalTime);
+	result["displayString"] = result["displayString"] + "\nEstimated Time: " + secondsToHms(partitions.totalTime * browsers);
 	result["batchInfo"] = partBatchInfo
 	return result;
 }

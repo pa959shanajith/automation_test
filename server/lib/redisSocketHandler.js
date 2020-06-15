@@ -7,6 +7,9 @@ const default_pub = redis.createClient(redisConfig);
 const server_sub = redis.createClient(redisConfig);
 // const cache = redis.createClient(redisConfig);
 // cache.select(2);
+var Client = require("node-rest-client").Client;
+var client = new Client();
+var epurl = process.env.NDAC_URL;
 const server_pub = default_pub;
 default_pub.pubsubPromise =  async (cmd, ...channel) => (new Promise((rsv, rej) => default_pub.pubsub(cmd, channel, (e,d) => ((e)? rej(e):rsv(d)))));
 
@@ -293,5 +296,20 @@ module.exports.initListeners = mySocket => {
 	mySocket.on('iris_operations_result', value => {
 		const dataToNode = JSON.stringify({"username" : username,"onAction" : "iris_operations_result","value":JSON.parse(value)});
 		server_pub.publish('ICE2_' + username, dataToNode);
+	});
+	mySocket.on('benchmark_ping', value => {
+		var inputs = value;
+		var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
+		client.post(epurl + "benchmark/store", args,
+				function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.error("Error occurred in storing benchmark");
+				} 
+			});
 	});
 };
