@@ -278,6 +278,7 @@ exports.manageCIUsers = function (req, res) {
 					userid: requestDetails.userId,
 					expireson: requestDetails.expiry,
 					name: requestDetails.tokenname,
+					icetype:requestDetails.icetype,
 					hash: bcrypt.hashSync(token, salt),
 					action: req.body.action,
 					type: "TOKENS",
@@ -1675,14 +1676,6 @@ exports.provisionIce = function (req, res) {
 				icetype:tokeninfo.icetype,
 				query:tokeninfo.action
 			};
-			if (tokeninfo.expireson) inputs.expireson=tokeninfo.expireson
-			if (tokeninfo.action=="gettoken"){
-				const tokgen2 = new TokenGenerator(256, TokenGenerator.BASE62);
-				var token=tokgen2.generate()
-				var salt = bcrypt.genSaltSync(10);
-				inputs.token=bcrypt.hashSync(token, salt);
-				// inputs.expireson=tokeninfo.expireson;
-			}
 			var args = {
 				data: inputs,
 				headers: {

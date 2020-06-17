@@ -43,14 +43,13 @@ io.on('connection', function (socket) {
 		});
 	} else {
 		var ice_info=socket.handshake.query;
-		var iceaction=ice_info.iceaction;
-		var hostname = ice_info.hostname;
+		var iceaction=ice_info.ice_action;
 		var icename=ice_info.icename;
 		if (iceaction=="register"){
-			logger.info("Registration request from ICE %s : %s", icename,hostname);
+			logger.info("Registration request from ICE %s : %s", icename);
 		}else{
 			logger.info("Socket request from ICE");
-			logger.info("Socket connecting address %s : %s", icename,hostname);
+			logger.info("Socket connecting address %s : %s", icename);
 		}
 		var icesession = ice_info.icesession;
 		var icetoken=ice_info.icetoken;

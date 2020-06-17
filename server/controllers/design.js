@@ -197,17 +197,18 @@ exports.updateTestCase_ICE = function (req, res) {
 };
 
 exports.debugTestCase_ICE = function (req, res) {
-	var name;
+	var username,icename;
 	try {
 		logger.info("Inside UI service: debugTestCase_ICE");
 		if (utils.isSessionActive(req)) {
-			name = myserver.allSocketsICEUser[req.session.username];
-			redisServer.redisSubServer.subscribe('ICE2_' + name);
+			username=req.session.username;
+			icename = myserver.allSocketsICEUser[username];
+			redisServer.redisSubServer.subscribe('ICE2_' + icename);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.info("ICE Socket requesting Address: %s" , name);
+			logger.info("ICE Socket requesting Address: %s" , icename);
 			//LB: check on redis whether the ice socket is connected to any of the servers
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
 				if (redisres[1]>0) {
 					try {
 						var action = req.body.param;
@@ -260,17 +261,17 @@ exports.debugTestCase_ICE = function (req, res) {
 											}
 											responsedata.push(browsertypeobject);
 											logger.info("Sending socket request for debugTestCase to redis");
-											dataToIce = {"emitAction" : "debugTestCase","username" : name, "responsedata":responsedata};
-											redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+											dataToIce = {"emitAction" : "debugTestCase","username" : icename, "responsedata":responsedata};
+											redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 											function result_debugTestCase_listener(channel, message) {
 												data = JSON.parse(message);
 												//LB: make sure to send recieved data to corresponding user
-												if (name == data.username) {
+												if (icename == data.username) {
 													redisServer.redisSubServer.removeListener('message', result_debugTestCase_listener);
 													if (data.onAction == "unavailableLocalServer") {
 														logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
-														if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
-															var soc = myserver.socketMapNotify[name];
+														if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+															var soc = myserver.socketMapNotify[username];
 															soc.emit("ICEnotAvailable");
 														}
 													} else if (data.onAction == "result_debugTestCase") {
@@ -296,17 +297,17 @@ exports.debugTestCase_ICE = function (req, res) {
 								var testcaseWS = [];
 								testcaseWS.push(req.body.testCaseWS);
 								logger.info("Sending socket request for debugTestCaseWS_ICE to redis");
-								dataToIce = {"emitAction" : "debugTestCase","username" : name, "responsedata":testcaseWS};
-								redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+								dataToIce = {"emitAction" : "debugTestCase","username" : icename, "responsedata":testcaseWS};
+								redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 								function result_debugTestCaseWS_listener(channel, message) {
 									data = JSON.parse(message);
 									//LB: make sure to send recieved data to corresponding user
-									if (data.username == name) {
+									if (data.username == icename) {
 										redisServer.redisSubServer.removeListener('message', result_debugTestCaseWS_listener);
 										if (data.onAction == "unavailableLocalServer") {
 											logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
-											if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
-												var soc = myserver.socketMapNotify[name];
+											if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+												var soc = myserver.socketMapNotify[username];
 												soc.emit("ICEnotAvailable");
 											}
 										} else {
@@ -374,17 +375,17 @@ exports.debugTestCase_ICE = function (req, res) {
 							try {
 								var wsdlurl = req.body.wsdlurl;
 								logger.info("Sending socket request for debugTestCase to redis");
-								dataToIce = {"emitAction" : "wsdl_listOfOperation","username" : name, "wsdlurl":wsdlurl};
-								redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));	
+								dataToIce = {"emitAction" : "wsdl_listOfOperation","username" : icename, "wsdlurl":wsdlurl};
+								redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));	
 									function result_wsdl_listOfOperation_listener(channel, message) {
 										data = JSON.parse(message);
 										//LB: make sure to send recieved data to corresponding user
-										if (data.username == name) {
+										if (data.username == icename) {
 											redisServer.redisSubServer.removeListener('message', result_wsdl_listOfOperation_listener);
 											if (data.onAction == "unavailableLocalServer") {
 												logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
-												if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
-													var soc = myserver.socketMapNotify[name];
+												if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+													var soc = myserver.socketMapNotify[username];
 													soc.emit("ICEnotAvailable");
 												}
 											} else if (data.onAction == "result_wsdl_listOfOperation") {
@@ -444,17 +445,17 @@ exports.debugTestCase_ICE = function (req, res) {
                                     serverCertificate:certificate
 								};
 								logger.info("Sending socket request for debugTestCase to redis");
-								dataToIce = {"emitAction" : "wsdl_ServiceGenerator","username" : name, "serviceGenRequest":serviceGenRequest};
-								redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+								dataToIce = {"emitAction" : "wsdl_ServiceGenerator","username" : icename, "serviceGenRequest":serviceGenRequest};
+								redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 								function result_wsdl_ServiceGenerator_listener(channel, message) {
 									data = JSON.parse(message);
 									//LB: make sure to send recieved data to corresponding user
-									if (data.username == name) {
+									if (data.username == icename) {
 										redisServer.redisSubServer.removeListener('message', result_wsdl_ServiceGenerator_listener);
 										if (data.onAction == "unavailableLocalServer") {
 											logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
-											if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
-												var soc = myserver.socketMapNotify[name];
+											if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+												var soc = myserver.socketMapNotify[username];
 												soc.emit("ICEnotAvailable");
 											}
 										} else if (data.onAction == "result_wsdl_ServiceGenerator") {
@@ -516,7 +517,7 @@ exports.debugTestCase_ICE = function (req, res) {
 				} else {
 					logger.error("Error in the service debugTestCase_ICE: Socket not Available");
 					try {
-						utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+						utils.getChannelNum('ICE1_scheduling_' + icename, function(found){
 							var flag="";
 							if (found) flag = "scheduleModeOn";
 							else flag = "unavailableLocalServer";
@@ -532,7 +533,7 @@ exports.debugTestCase_ICE = function (req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+		utils.getChannelNum('ICE1_scheduling_' + icename, function(found){
 			var flag="";
 			if (found) flag = "scheduleModeOn";
 			else flag = "unavailableLocalServer";

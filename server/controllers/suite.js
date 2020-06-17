@@ -296,14 +296,15 @@ const updateSkippedExecutionStatus = async (batchData, userInfo, status, msg) =>
 const executionRequestToICE = async (execReq, execType, userInfo) => {
 	const fnName = "executionRequestToICE";
 	logger.info("Inside " + fnName + " function");
-	const name = myserver.allSocketsICEUser[userInfo.username];
+	const username=userInfo.username;
+	const icename = myserver.allSocketsICEUser[username];
 	const channel = (execType == "SCHEDULE")? "scheduling":"normal";
 	var completedSceCount = 0;
 	var statusPass = 0;
 
 	logger.info("Sending request to ICE for executeTestSuite");
-	const dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": execReq};
-	redisServer.redisPubICE.publish('ICE1_' + channel + '_' + name, JSON.stringify(dataToIce));
+	const dataToIce = {"emitAction" : "executeTestSuite","username" : icename, "executionRequest": execReq};
+	redisServer.redisPubICE.publish('ICE1_' + channel + '_' + icename, JSON.stringify(dataToIce));
 
 	const exePromise = async (resSent) => (new Promise((rsv, rej) => {
 		var d2R = {};
@@ -312,13 +313,13 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 			const event = data.onAction;
 			const resultData = data.value;
 			const batchId = (resultData)? resultData.batchId : "";
-			if (!(name == data.username && (event == SOCK_NA || (event != SOCK_NA  && execReq.batchId == batchId)))) return false;
+			if (!(icename == data.username && (event == SOCK_NA || (event != SOCK_NA  && execReq.batchId == batchId)))) return false;
 			const status = resultData.status;
 			if (event == SOCK_NA) {
 				redisServer.redisSubServer.removeListener("message", executeTestSuite_listener);
 				logger.error("Error occurred in " + fnName + ": Socket Disconnected");
-				if (resSent && notifySocMap[name]) {
-					notifySocMap[name].emit("ICEnotAvailable");
+				if (resSent && notifySocMap[username]) {
+					notifySocMap[username].emit("ICEnotAvailable");
 					rsv(DO_NOT_PROCESS);
 				} else rsv(SOCK_NA);
 			} else if (event == "return_status_executeTestSuite") {
@@ -332,8 +333,8 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 					logger.error("Error occurred in " + fnName + ": Execution is skipped " + errMsg);
 					errMsg = "This scenario was skipped " + errMsg;
 					await updateSkippedExecutionStatus(execReq, userInfo, execStatus, errMsg);
-					if (resSent && notifySocMap[name]) {
-						notifySocMap[name].emit(execStatus);
+					if (resSent && notifySocMap[username]) {
+						notifySocMap[username].emit(execStatus);
 						rsv(DO_NOT_PROCESS);
 					} else rsv(execStatus);
 				}
@@ -389,8 +390,8 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 				} else { // This block will trigger when resultData.status has "success or "Terminate"
 					redisServer.redisSubServer.removeListener("message", executeTestSuite_listener);
 					try {
-						if (resSent && notifySocMap[name]) { // This block is only for active mode
-							notifySocMap[name].emit("result_ExecutionDataInfo", status);
+						if (resSent && notifySocMap[username]) { // This block is only for active mode
+							notifySocMap[username].emit("result_ExecutionDataInfo", status);
 							rsv(DO_NOT_PROCESS);
 						} else {
 							if (execType == "API") d2R = [d2R, status];
@@ -408,7 +409,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 	}));
 
 	const notifySocMap = myserver.socketMapNotify; 
-	if (execType == "ACTIVE" && notifySocMap && notifySocMap[name]) {
+	if (execType == "ACTIVE" && notifySocMap && notifySocMap[username]) {
 		exePromise(true);
 		return "begin";
 	} else return await exePromise(false);
@@ -417,6 +418,8 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 /** Function responsible for Orchestrating execution flow. Invokes series of functions to achive the results */
 const executionFunction = async (batchExecutionData, execIds, userInfo, execType) => {
 	var icename=myserver.allSocketsICEUser[userInfo.username];
+	if (execType=='API')
+	icename=userInfo.icename;
 	redisServer.redisSubServer.subscribe('ICE2_' + icename);
 	var iceStatus = await checkForICEstatus(icename, execType);
 	if (iceStatus != null) return iceStatus;

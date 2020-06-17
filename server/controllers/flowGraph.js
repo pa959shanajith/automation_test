@@ -15,29 +15,30 @@ exports.flowGraphResults = function(req, res){
 	logger.info("Inside UI service: flowGraphResults");
 	try{
 		if(isSessionActive(req)){
-			var name = req.session.username;
+			var username = req.session.username;
+			var icename=myserver.allSocketsICEUser[username];
 			var version = req.body.version;
 			var path = req.body.path;
-			redisServer.redisSubServer.subscribe('ICE2_' + name ,1);
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+			redisServer.redisSubServer.subscribe('ICE2_' + icename ,1);
+			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
 				if (redisres[1]>0) {
 					logger.info("Sending socket request for generateFlowGraph to redis");
-					var dataToIce = {"emitAction" : "generateFlowGraph","username" : name, "version":version, "path" : path};
-					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					var dataToIce = {"emitAction" : "generateFlowGraph","username" : icename, "version":version, "path" : path};
+					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					function generateFlowGraph_listener(channel,message) {
 						data = JSON.parse(message);
-						if(name == data.username){
+						if(icename == data.username){
 							var value = data.value;
 							if (data.onAction == "unavailableLocalServer") {
 								redisServer.redisSubServer.removeListener('message',generateFlowGraph_listener);	
 								logger.error("Error occurred in flowGraphResults: Socket Disconnected");
-								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-									var soc = myserver.socketMapNotify[name];
+								if('socketMapNotify' in myserver &&  username in myserver.socketMapNotify){
+									var soc = myserver.socketMapNotify[username];
 									soc.emit("ICEnotAvailable");
 								}
 							} else if (data.onAction == "flowgraph_result") {
 								try {
-									var mySocketUI = myserver.allSocketsMapUI[name];
+									var mySocketUI = myserver.allSocketsMapUI[username];
 									mySocketUI.emit("newdata", value);
 								} catch (exception) {
 									logger.error(exception.message);
@@ -45,7 +46,7 @@ exports.flowGraphResults = function(req, res){
 							} else if (data.onAction == "result_flow_graph_finished") {
 								redisServer.redisSubServer.removeListener('message',generateFlowGraph_listener);	
 								try {
-									var mySocketUI = myserver.allSocketsMapUI[name];
+									var mySocketUI = myserver.allSocketsMapUI[username];
 									mySocketUI.emit("endData", value);
 									res.status(200).json({success: true});
 								} catch (exception) {
@@ -57,7 +58,7 @@ exports.flowGraphResults = function(req, res){
 					};
 					redisServer.redisSubServer.on("message",generateFlowGraph_listener);
 				} else {
-					logger.info("ICE socket not available for Address : %s", name);
+					logger.info("ICE socket not available for Address : %s", icename);
 					res.send("unavailableLocalServer");
 				}
 			});
@@ -79,28 +80,28 @@ exports.APG_OpenFileInEditor = function (req, res) {
 	try {
 		logger.info("Inside UI service: APG_OpenFileInEditor");
 		if (isSessionActive(req)) {
-			var name = myserver.allSocketsICEUser[req.session.username];
-			redisServer.redisSubServer.subscribe('ICE2_' + name);
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+			var username = req.session.username;
+			var icename = myserver.allSocketsICEUser[username];
+			redisServer.redisSubServer.subscribe('ICE2_' + icename);
+			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
 				if (redisres[1]>0) {
 					var editorName = req.body.editorName;
 					var filePath = req.body.filePath;
 					var lineNumber = req.body.lineNumber;
 					var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-					logger.info("ICE Socket requesting Address: %s" , name);
+					logger.info("ICE Socket requesting Address: %s" , icename);
 					logger.info("Sending socket request for apgOpenFileInEditor to redis");
-					var dataToIce = {"emitAction" : "apgOpenFileInEditor","username" : name,
+					var dataToIce = {"emitAction" : "apgOpenFileInEditor","username" : icename,
 								"editorName":editorName,"filePath":filePath,"lineNumber":lineNumber};
-					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					function apgOpenFileInEditor_listener(channel,message) {
 						data = JSON.parse(message);
-						if(name == data.username){
-							var value = data.value;
+						if(icename == data.username){
 							if (data.onAction == "unavailableLocalServer") {
 								redisServer.redisSubServer.removeListener('message',apgOpenFileInEditor_listener);	
 								logger.error("Error occurred in APG_OpenFileInEditor: Socket Disconnected");
-								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-									var soc = myserver.socketMapNotify[name];
+								if('socketMapNotify' in myserver &&  username in myserver.socketMapNotify){
+									var soc = myserver.socketMapNotify[username];
 									soc.emit("ICEnotAvailable");
 								}
 
@@ -117,7 +118,7 @@ exports.APG_OpenFileInEditor = function (req, res) {
 					};
 					redisServer.redisSubServer.on("message",apgOpenFileInEditor_listener);
 				} else {
-					logger.info("ICE socket not available for Address : %s", name);
+					logger.info("ICE socket not available for Address : %s", icename);
 					res.send("unavailableLocalServer");
 				}
 			});
@@ -175,20 +176,20 @@ exports.APG_runDeadcodeIdentifier = function(req,res){
 	try{
 			logger.info("Inside UI service: APG_runDeadcodeIdentifier");
 			if(isSessionActive(req)){
-				var name = myserver.allSocketsICEUser[req.session.username];
-				redisServer.redisSubServer.subscribe('ICE2_' + name);
-				redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+				var icename = myserver.allSocketsICEUser[req.session.username];
+				redisServer.redisSubServer.subscribe('ICE2_' + icename);
+				redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
 					if (redisres[1]>0) {
 						var version = req.body.version;
 						var path = req.body.path;
-						logger.info("ICE Socket requesting Address: %s" , name);
+						logger.info("ICE Socket requesting Address: %s" , icename);
 						logger.info("Sending socket request for runDeadcodeIdentifier to redis");
-						var dataToIce = {"emitAction" : "runDeadcodeIdentifier","username" : name,
+						var dataToIce = {"emitAction" : "runDeadcodeIdentifier","username" : icename,
 									"version":version,"path":path};
-						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+						redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 						function apgRunDeadcodeIdentifier_listener(channel,message) {
 							data = JSON.parse(message);
-							if(name == data.username){
+							if(icename == data.username){
 								redisServer.redisSubServer.removeListener('message',apgRunDeadcodeIdentifier_listener);
 								if (data.onAction == "unavailableLocalServer") {	
 									logger.error("Error occurred in APG_runDeadcodeIdentifier: Socket Disconnected");
@@ -200,7 +201,7 @@ exports.APG_runDeadcodeIdentifier = function(req,res){
 						};
 						redisServer.redisSubServer.on("message",apgRunDeadcodeIdentifier_listener);
 					} else {
-						logger.info("ICE socket not available for Address : %s", name);
+						logger.info("ICE socket not available for Address : %s", icename);
 						res.send("unavailableLocalServer");
 					}
 				});

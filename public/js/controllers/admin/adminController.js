@@ -7,7 +7,7 @@ var isIE = /*@cc_on!@*/ false || !!document.documentMode;
 var unAssignedProjects = []; var assignedProjects = [];var projectData =[];var valid = "";var getAssignedProjectsLen=0;
 mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location', 'adminServices','$timeout','cfpLoadingBar', function ($scope, $rootScope, $http, $location, adminServices, $timeout, cfpLoadingBar) {
 	$("body").css("background","#eee");
-
+	$("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />');
 	localStorage.setItem("navigateEnable", false);
 
 	$('.dropdown').on('show.bs.dropdown', function (e) {
@@ -23,6 +23,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.sessionConf = {};
 	$scope.tokens = {};
 	$scope.provision = {};
+	$scope.tokeninfo={};
 	$('.dropdown').on('hide.bs.dropdown', function (e) {
 		$(this).find('.dropdown-menu').first().stop(true, true).slideUp(300);
 	});
@@ -285,7 +286,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$(document).on('click', '#tokenTab', function () {
 		$('#userToken').text('User')
 		$('#selAssignUser1').show()
-		$('#icename').hide()
+		$('#selICEuser').hide()
 		$('#IceType').click();
 		$scope.provision.op='normal';
 	});
@@ -293,17 +294,21 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		if(event.currentTarget.value=='normal'){
 			$('#userToken').text('User')
 			$('#selAssignUser1').show()
-			$('#icename').hide()
+			$('#selICEuser').hide()
+			$scope.provision.op='normal';
 		}
 		else if(event.currentTarget.value=='ci-cd'){
 			$('#userToken').text('Ice Name')
 			$('#selAssignUser1').hide()
-			$('#icename').show()
+			$('#selICEuser').show()
+			$scope.provision.op='ci-cd';
 		}
 	}
-	$(document).on('change', '#selAssignUser1', function (e) {
-		blockUI("Fetchin Token data. Please wait...")
+	$(document).on('change', '#selAssignUser1, #selICEuser',  function (e) {
+		blockUI("Fetchin Token data. Please wait...");
 		var userId = $("#selAssignUser1 option:selected").attr("data-id");
+		if ($scope.provision.op == 'ci-cd')
+		userId = $("#selICEuser option:selected").attr("data-id");
 		var generatetoken = {};
 		generatetoken.userId = userId;
 		
@@ -342,6 +347,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$('#provisions').click();
 		blockUI("Loading");
 		$('#icename').val('');
+		$("#generateICEToken").val('');
 		$scope.provision.op='normal';
 		$(".selectedIcon").removeClass("selectedIcon");
 		$("#provisionTab").find('img').addClass('selectedIcon');
@@ -393,6 +399,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$("#icename").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
 		$("#selAssignUser2").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
 		var userid = $("#selAssignUser2 option:selected").attr("data-id");
+		$("#generateICEToken").val('');
 		var icename=$("#icename").val()
 		if (icename==""){
 			$("#icename").addClass("selectErrorBorder");
@@ -408,11 +415,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		tokeninfo.icename=icename;
 		tokeninfo.icetype=$scope.provision.op;
 		tokeninfo.action="provision";
-		// if($scope.provision.op=="cicd"){
-		// 	var date=$("#tokeninfo .tokenSuite .datePicContainer .fc-datePicker").val();
-		// 	var time=$("#tokeninfo .tokenSuite .timePicContainer .fc-timePicker").val();
-		// 	tokeninfo.expiry= date+" "+time;
-		// }
 		adminServices.provisions(tokeninfo)
 		.then(function (data) {
 				unblockUI();
@@ -420,13 +422,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					$rootScope.redirectPage();
 				}
 				else if (data == 'fail') {
-						openModalPopup("ICE Provision Error", "ICE Provisioned Failed");
+					openModalPopup("ICE Provision Error", "ICE Provisioned Failed");
 				}else if (data=='DuplicateIceName'){
-					openModalPopup("ICE Provision Error", "ICE already provisioned with same name or user, Provisioned Failed");
+					openModalPopup("ICE Provision Error", "ICE Provisioned Failed!"+"<br/>"+"ICE name or User already exists");
 				} else {
-					openModalPopup("ICE Provision Success", "ICE Provisioned Successfully");
-					if (data!="success")
-					jsonDownload(icename+"_icetoken.txt",data);
+					$scope.tokeninfo.icename=icename;
+					$scope.tokeninfo.token=data;
+					openProvsionPopup("ICE Provision Success", "Token generated Successfully for ICE '"+icename+"'\n"+"Copy or Download the token");
+					$("#generateICEToken").val(data);
 					adminServices.fetchICE()
 						.then(function (data) {
 							if (data == "Invalid Session") {
@@ -447,6 +450,21 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				unblockUI();
 				console.log("Error:::::::::::::", error);
 			});
+	}
+
+
+	$scope.copyToken = function (){
+		const x = document.createElement('TEXTAREA')
+		x.value = $scope.tokeninfo.token;
+		document.body.appendChild(x);
+		x.select();
+		document.execCommand('copy');
+		document.body.removeChild(x);
+		
+	}
+
+	$scope.downloadToken = function (){
+		jsonDownload($scope.tokeninfo.icename+"_icetoken.txt",$scope.tokeninfo.token);
 	}
 
 	/*
@@ -573,58 +591,15 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			});
 	};
 
-	$scope.gettoken = function ($event) {
-		var tokeninfo={};
-		index=$event.target.parentElement.parentElement.rowIndex-1;
-		var icename=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.textContent);
-		tokeninfo.icename=icename;
-		tokeninfo.icetype=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.nextElementSibling.textContent);
-		tokeninfo.action="gettoken";
-		adminServices.provisions(tokeninfo)
-		.then(function (data) {
-				unblockUI();
-				if (data == "Invalid Session") {
-					$rootScope.redirectPage();
-				}
-				else if (data == 'fail') {
-						openModalPopup("ICE Provisions","Authentication Token generation failed");
-				} else {
-					openModalPopup("ICE Provisions", "Authentication Token generated successfully");
-					if (data!="success")
-					jsonDownload(icename+"_icetoken.txt",data);
-					adminServices.fetchICE()
-						.then(function (data) {
-							unblockUI();
-							if (data == "Invalid Session") {
-								$rootScope.redirectPage();
-							}
-							else if (data == 'fail') {
-									openModalPopup("ICE Provisions", "Failed to load Ice Provisions");
-							} else {
-								data.sort(function(a,b){ return a.icename > b.icename; });
-								$scope.provision.users=data;
-							}
-						}, function (error) {
-							unblockUI();
-							console.log("Error:::::::::::::", error);
-						});
-				}
-			}, function (error) {
-				unblockUI();
-				console.log("Error:::::::::::::", error);
-			});
-		
-	};
-	
-
 	$(document).on('change', '#provisions', function (e){
+		$("#generateICEToken").val('');
+		$("#icename").val('');
 		if(e.currentTarget.value=="normal"){
 			$('#selectuser').show();
-			$('#userinfo').show();
+			$('#userinfo').parent().show();
 			$('#tokeninfo').hide();
-			$('.selectDomain').show();
-			$('.provisionTokens').show();
-			console.log('else')
+			// $('.selectDomain').show();
+			//$('.provisionTokens').show();
 			adminServices.getUserDetails("user")
 			.then(function(data){
 				if(data == "Invalid Session") {
@@ -650,13 +625,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			});
 			
 		}else{
-			$('#selectuser').hide();
-			$('.selectDomain').hide();
+			//$('#selectuser').hide();
+			//$('.selectDomain').hide();
 			// $('#tokensDetail').empty();
 			// $('#tokensDetail').append("<tr><th>Token Name</th><th>Status</th><th>Expiry</th><th>Action</th></tr><tr ng-repeat='provision in provision.users'><td>{{provision.name}}</td><td>{{provision.deactivated}}</td><td>{{provision.expireson}}</td><td ng-if='provision.deactivated == 'active''><button class='btn'data-id='{{$index}}'ng-click='deactivate($event)'style='margin-left:-21%'>Deactivate</button></td><td ng-if='provision.deactivated != 'active''></td></tr>")
 			$('.provisionTokens').hide();
 			$("#selAssignUser2").empty();
-			$('#userinfo').hide();
+			$('#userinfo').parent().hide();
 			$('#tokeninfo').hide();
 		}
 		adminServices.fetchICE()
@@ -739,9 +714,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				openModalPopup("Token Management", "There are no users present.");
 			} else {
 				data.sort(function(a,b){ return a[0] > b[0]; });
-				var selectBox = $("#icename");
+				var selectBox = $("#selICEuser");
 				selectBox.empty();
-				selectBox.append('<option data-id="" value disabled selected>Select User</option>');
+				selectBox.append('<option data-id="" value disabled selected>Select ICE</option>');
 				for(i=0; i<data.length; i++){
 					if(data[i]["icetype"]=='ci-cd'){
 						selectBox.append('<option data-id="'+data[i]['_id']+'" value="'+data[i]['icename']+'">'+data[i]['icename']+'</option>');
@@ -757,18 +732,26 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.generateCIusertokens = function ($event) {
 		$("#GenerateNewTkenModal").modal("hide");
 		$("#selAssignUser1").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
+		$("selICEuser").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
 		$("#tokenName").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
 		$(".tokeninfo .tokenSuite .datePicContainer .fc-datePicker").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
-		if ($('#selAssignUser1 option:selected').val() == "") {
+		var icetype = $scope.provision.op;
+		var ele=$('#selAssignUser1 option:selected');
+		if (icetype =='ci-cd') 
+		ele=$('#selICEuser option:selected');
+		if (icetype =='normal' && ele.val() == "") {
 			$("#selAssignUser1").css('border', '').addClass("selectErrorBorder");
+			return false;
+		} else if (icetype =='ci-cd' && ele.val() == "") {
+			$("selICEuser").css('border', '').addClass("selectErrorBorder");
 			return false;
 		} else if ($('#tokenName').val().trim() == "") {
 			$("#tokenName").css('border', '').addClass("selectErrorBorder");
 			return false;
 		} else{
 			var userDetails = JSON.parse(window.localStorage['_UI']);
-			var userId = $("#selAssignUser1 option:selected").attr("data-id");
-			var CIUser = {};
+			var userId = ele.attr("data-id");
+			var CIUser={};
 			$(".scheduleSuiteTable").append('<div class="tokenSuite"><span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIconToken" src="../imgs/ic-datepicker.png" /></span><span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>');
 			var expdate=$(".tokeninfo .tokenSuite .datePicContainer .fc-datePicker").val()
 			var exptime=$(".tokeninfo .tokenSuite .timePicContainer .fc-timePicker").val()
@@ -812,6 +795,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				CIUser.userId = userId;
 				CIUser.expiry = expiry;
 				CIUser.tokenname = tokenname;
+				CIUser.icetype=icetype;
 				action="create";
 				blockUI('Generating Token. Please Wait...');
 				adminServices.manageCIUsers(action,CIUser)
@@ -866,6 +850,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		var CIUser={}
 		action="deactivate";
 		CIUser.userId = $("#selAssignUser1 option:selected").attr("data-id");
+		if ($scope.provision.op == 'ci-cd') CIUser.userId = $("#selICEuser option:selected").attr("data-id");
 		CIUser.tokenName = $.trim($event.target.parentElement.parentElement.firstElementChild.textContent);
 		adminServices.manageCIUsers(action,CIUser)
 		.then(function (data) {
@@ -2835,6 +2820,17 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	//Global modal popup
 	function openModalPopup(title, body) {
 		var mainModal = $("#adminModal");
+		mainModal.find('.modal-title').text(title);
+		mainModal.find('.modal-body p').html(body);
+		mainModal.modal("show");
+		setTimeout(function () {
+			$("#adminModal").find('.btn-default').focus();
+		}, 300);
+	}
+
+	//Global provision popup
+	function openProvsionPopup(title, body) {
+		var mainModal = $("#ICEProvision");
 		mainModal.find('.modal-title').text(title);
 		mainModal.find('.modal-body p').text(body);
 		mainModal.modal("show");
