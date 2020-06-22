@@ -297,7 +297,8 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 	const fnName = "executionRequestToICE";
 	logger.info("Inside " + fnName + " function");
 	const username=userInfo.username;
-	const icename = myserver.allSocketsICEUser[username];
+	// const icename = myserver.allSocketsICEUser[username];
+	const icename = userInfo.icename;
 	const channel = (execType == "SCHEDULE")? "scheduling":"normal";
 	var completedSceCount = 0;
 	var statusPass = 0;
@@ -420,6 +421,7 @@ const executionFunction = async (batchExecutionData, execIds, userInfo, execType
 	var icename=myserver.allSocketsICEUser[userInfo.username];
 	if (execType=='API')
 	icename=userInfo.icename;
+	userInfo.icename=icename;
 	redisServer.redisSubServer.subscribe('ICE2_' + icename);
 	var iceStatus = await checkForICEstatus(icename, execType);
 	if (iceStatus != null) return iceStatus;
@@ -469,9 +471,9 @@ exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 		const execResponse = userInfo.inputs;
 		if (execResponse.tokenValidation == "passed") {
 			delete execResponse.error_message;
-			const username = userInfo.username;
-			if (userRequestMap[username] == undefined) userRequestMap[username] = [i];
-			else userRequestMap[username].push(i);
+			const icename = userInfo.icename;
+			if (userRequestMap[icename] == undefined) userRequestMap[icename] = [i];
+			else userRequestMap[icename].push(i);
 		}
 		executionResult.push(execResponse);
 	}

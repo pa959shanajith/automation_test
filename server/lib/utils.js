@@ -151,15 +151,15 @@ module.exports.fetchData = fetchData;
 
 module.exports.tokenValidation = async (userInfo) => {
 	var validUser = false;
-	const username = (userInfo.username || "").toLowerCase();
-	userInfo.username = username;
+	const icename = (userInfo.icename || "").toLowerCase();
+	userInfo.icename = icename;
 	const emsg = "Inside UI service: ExecuteTestSuite_ICE_SVN ";
 	const tokenValidation = {
 		"status": "failed",
 		"msg": "Token authentication failed"
 	}
 	const inputs = {
-		'username': username,
+		'icename': icename,
 		'tokenname': userInfo.tokenname || ""
 	};
 	const response = await fetchData(inputs, "login/authenticateUser_Nineteen68_CI", "tokenValidation");
@@ -173,13 +173,13 @@ module.exports.tokenValidation = async (userInfo) => {
 		} else if(response.deactivated == "expired") {
 			tokenValidation.status = "expired";
 			tokenValidation.msg = "Token is expired";
-			logger.error(emsg + tokenValidation.msg + " for username: " + username);
+			logger.error(emsg + tokenValidation.msg + " for username: " + icename);
 		} else if(response.deactivated == "deactivated") {
 			tokenValidation.status = "deactivated";
 			tokenValidation.msg = "Token is deactivated";
-			logger.error(emsg + tokenValidation.msg + " for username: " + username);
+			logger.error(emsg + tokenValidation.msg + " for username: " + icename);
 		}
-	} else logger.info(emsg + "Token authentication failed for username: " + username);
+	} else logger.info(emsg + "Token authentication failed for username: " + icename);
 	inputs.tokenValidation = tokenValidation.status;
 	inputs.error_message = tokenValidation.msg;
 	userInfo.inputs = inputs;
