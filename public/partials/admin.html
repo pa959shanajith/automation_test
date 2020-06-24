@@ -838,7 +838,7 @@
 				</div>
 				<div class='userForm projectForm1' style="display: inline-block;">
 					<label class='domainTxt' style="width: 11%;">ICE Name</label>
-					<input type="text" id="icename" name="icename" placeholder="Enter ICE name" maxlength="100" class="validationKeydown preventSpecialChar create ng-valid-maxlength " style="width: 41%"/>
+					<input type="text" id="icename" name="icename" placeholder="ICE name" maxlength="100" class="validationKeydown preventSpecialChar create ng-valid ng-valid-maxlength ng-touched ng-dirty ng-valid-parse" style="width: 41%"/>
 				</div>
 				<div class='userForm projectForm1' style="display: inline-block;" >
 					<div id="userinfo">
@@ -887,9 +887,9 @@
 								<td> {{provision.status}} </td>
 								<td> {{provision.username}} </td>
 								<td> {{provision.hostname}} </td>
-	
+
 								<td ng-if="provision.status == 'provisioned'"><button class="btn" data-id="{{$index}}" ng-click="reregister($event)" style="margin-left:0%"> Reprovision </button></td>
-								<td ng-if="provision.status == 'registered'"><button class="btn" data-id="{{$index}}" ng-click="reregister($event)" style="margin-left:0%"> Reregister </button></td>
+								<td ng-if="provision.status == 'registered' || provision.status == 'deregistered'"><button class="btn" data-id="{{$index}}" ng-click="reregister($event)" style="margin-left:0%"> Reregister </button></td>
 								<td ng-if="provision.status == 'deregistered'"></td>
 								<td ng-if="provision.status == 'deregistered'"></td>
 								<td ng-if="provision.status != 'deregistered'"><button class="btn" data-id="{{provision._id}}" ng-click="deregister($event)" style="margin-left:0%"> Deregister </button></td>

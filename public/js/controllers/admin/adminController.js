@@ -496,9 +496,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.deregister = function ($event) {
 		var tokeninfo={};
+		var icename=tokeninfo.icename=$.trim($event.target.parentElement.parentElement.firstElementChild.textContent);
 		index=$event.target.parentElement.parentElement.rowIndex-1;
 		tokeninfo.userid=$scope.provision.users[index].provisionedto;
-		tokeninfo.icename=$.trim($event.target.parentElement.parentElement.firstElementChild.textContent);
 		tokeninfo.icetype=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.textContent);
 		tokeninfo.action="deregister";
 		adminServices.provisions(tokeninfo)
@@ -514,10 +514,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 						.then(function (data) {
 							if (data == "Invalid Session") {
 								$rootScope.redirectPage();
-							} else if (data == "fail") {
-								//openModalPopup("Session Management", msg+"failed!")
-							} else {
-								rootObj.splice(id,1);
 							}
 							unblockUI();
 						}, function (error) {
@@ -2791,7 +2787,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		setTimeout(function () {
 			var userEnteredText = element.val();
 			var regex;
-			if (e.target.id == 'userName')
+			if (e.target.id == 'userName' || e.target.id == 'icename')
 				regex = /[\\[\]\~`!@#$%^&*()+={}|;:"',<>?/\s]/g;
 			else if (e.target.id == 'ldapServerURL')
 				regex = /[\\[\]\~`!@#$%^&*()+={}|;"',<>?\s]/g;

@@ -1672,7 +1672,7 @@ exports.provisionIce = function (req, res) {
 			var tokeninfo=req.body.tokeninfo;
 			var inputs = {
 				provisionedto:tokeninfo.userid,
-				icename:tokeninfo.icename,
+				icename:tokeninfo.icename.toLowerCase(),
 				icetype:tokeninfo.icetype,
 				query:tokeninfo.action
 			};

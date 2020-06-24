@@ -3216,7 +3216,7 @@ li.select_all .addCustObj{
 	font-size: 15px;
 	top:2px;
 }
-#userName
+#userName, #icename
 {
     text-transform: lowercase;
 }
