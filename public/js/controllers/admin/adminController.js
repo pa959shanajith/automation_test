@@ -498,8 +498,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		var tokeninfo={};
 		index=$event.target.parentElement.parentElement.rowIndex-1;
 		tokeninfo.userid=$scope.provision.users[index].provisionedto;
-		tokeninfo.icename=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.textContent);
-		tokeninfo.icetype=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.nextElementSibling.textContent);
+		tokeninfo.icename=$.trim($event.target.parentElement.parentElement.firstElementChild.textContent);
+		tokeninfo.icetype=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.textContent);
 		tokeninfo.action="deregister";
 		adminServices.provisions(tokeninfo)
 		.then(function (data) {
@@ -550,11 +550,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.reregister = function ($event) {
 		var tokeninfo={};
+		var event=$.trim($event.currentTarget.textContent)
 		index=$event.target.parentElement.parentElement.rowIndex-1;
 		tokeninfo.userid=$scope.provision.users[index].provisionedto;
-		var icename=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.textContent);
+		var icename=$.trim($event.target.parentElement.parentElement.firstElementChild.textContent);
 		tokeninfo.icename=icename;
-		tokeninfo.icetype=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.nextElementSibling.textContent);
+		tokeninfo.icetype=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.textContent);
 		tokeninfo.action="reregister";
 		adminServices.provisions(tokeninfo)
 		.then(function (data) {
@@ -563,11 +564,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					$rootScope.redirectPage();
 				}
 				else if (data == 'fail') {
-						openModalPopup("ICE Provisions", "ICE Reregister Failed");
+						openModalPopup("ICE Provisions", "ICE "+event+" Failed");
 				} else {
-					openModalPopup("ICE Provisions", "ICE Reregistered Successfully");
-					if (data!="success")
-					jsonDownload(icename+"_icetoken.txt",data);
+					$scope.tokeninfo.icename=icename;
+					$scope.tokeninfo.token=data;
+					$('#icename').val(icename);
+					openProvsionPopup("ICE Provision Success", "ICE "+event+"ed Successfully : '"+icename+"'\n"+"Copy or Download the token");
+					$("#generateICEToken").val(data);
+					$('#selAssignUser2').val($scope.provision.users[index].username)
 					adminServices.fetchICE()
 						.then(function (data) {
 							unblockUI();

@@ -6483,3 +6483,7 @@ h4.titleBadge
     color: #333;
     pointer-events: none !important;
 }
+
+.projectForm1 i:hover{
+    background: whitesmoke;
+}
