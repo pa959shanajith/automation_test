@@ -1000,11 +1000,25 @@ input[type="radio"]{
     outline: 0
 }
 
-#left-top-section ul li a span img, #left-bottom-section ul li a span img {
+#left-top-section ul li a span img,
+#left-bottom-section ul li a span img,
+#left-top-section ul li a span span.fa,
+#left-bottom-section ul li a span span.fa {
     padding: 8px 10px;
 }
 
-#left-top-section ul li a:hover span img, #left-bottom-section ul li a:hover span img {
+#left-top-section ul li a span span.fa,
+#left-bottom-section ul li a span span.fa {
+    font-size: 30px;
+    vertical-align: middle;
+    float: none;
+    width: auto;
+}
+
+#left-top-section ul li a:hover span img,
+#left-bottom-section ul li a:hover span img,
+#left-top-section ul li a:hover span span.fa,
+#left-bottom-section ul li a:hover span span.fa {
     /*background: #331d4c;*/
     background: #523176;
     border-radius: 5px;

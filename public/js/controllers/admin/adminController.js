@@ -167,7 +167,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.assignProj.click = function () {
 		resetAssignProjectForm();
 		$(".selectedIcon").removeClass("selectedIcon");
-		$("#assignProjectTab").find("img").addClass("selectedIcon");
+		$("#assignProjectTab").find("span.fa").addClass("selectedIcon");
 		adminServices.getUserDetails("user")
 		.then(function(data){
 			if(data == "Invalid Session") {
@@ -350,7 +350,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$("#generateICEToken").val('');
 		$scope.provision.op='normal';
 		$(".selectedIcon").removeClass("selectedIcon");
-		$("#provisionTab").find('img').addClass('selectedIcon');
+		$("#provisionTab").find("span.fa").addClass("selectedIcon");;
 		$scope.provision.users=[]
 		adminServices.getUserDetails("user")
 			.then(function(data){
@@ -679,7 +679,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.tokens.click = function () {
 		$scope.tokens.users=[]
 		$(".selectedIcon").removeClass("selectedIcon");
-		$("#tokenTab").find('img').addClass('selectedIcon');
+		$("#tokenTab").find("span.fa").addClass("selectedIcon");;
 		taskName = $("#page-taskName").children("span").text();
 		adminServices.getUserDetails("user")
 		.then(function(data){
@@ -916,7 +916,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.domainConf.click = function(query) {
 		$(".selectedIcon").removeClass("selectedIcon");
 		$("button.userTypeBtnActive").removeClass('userTypeBtnActive');
-		$("#projectTab").find("img").addClass("selectedIcon");
+		$("#projectTab").find("span.fa").addClass("selectedIcon");
 		this.query0 = '';
 		this.query1 = '';
 	}
@@ -927,7 +927,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		updateProjectDetails = [];
 		var plugins = [];
 		$(".selectedIcon").removeClass("selectedIcon");
-		$(this).children().find('img').addClass('selectedIcon');
+		$(this).children().find("span.fa").addClass("selectedIcon");;
 		adminServices.getAvailablePlugins()
 		.then(function (plugins_list) {
 			for (var i = 0; i < plugins_list.length; i++) {
@@ -996,7 +996,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.preferences.click = function () {
 		blockUI()
 		$(".selectedIcon").removeClass("selectedIcon");
-		$("#preferencesTab").find("img").addClass("selectedIcon");
+		$("#preferencesTab").find("span.fa").addClass("selectedIcon");
 		setTimeout(function () {
 			adminServices.getPreferences()
 			.then(function (response) {
@@ -2296,7 +2296,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			$scope.userConf.ldapActive=false
 		}
 		$("button.userTypeBtnActive").removeClass('userTypeBtnActive');
-		$("#userTab").find("img").addClass("selectedIcon");
+		$("#userTab").find("span.fa").addClass("selectedIcon");
 		this.userId = '';
 		this.userName = '';
 		this.userIdName = '';
@@ -2906,7 +2906,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.ldapConf.click = function (action) {
 		$(".selectedIcon").removeClass("selectedIcon");
-		$("#ldapConfigTab").find("img").addClass("selectedIcon");
+		$("#ldapConfigTab").find("span.fa").addClass("selectedIcon");
 		this.serverName = "";
 		this.url = "";
 		this.auth = "anonymous";
@@ -3163,7 +3163,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	// Session Management Tab Click
 	$scope.sessionConf.click = function () {
 		$(".selectedIcon").removeClass("selectedIcon");
-		$("#sessionTab").find("img").addClass("selectedIcon");
+		$("#sessionTab").find("span.fa").addClass("selectedIcon");
 		blockUI("Retrieving session data...");
 		adminServices.manageSessionData("get")
 		.then(function (data) {
