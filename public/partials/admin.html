@@ -29,7 +29,7 @@
 					<li><a id='sessionTab' title="Session Management" ng-click="tab = 'tabSession';sessionConf.click()" class="selectBrowser" data-name="5">
 						<span><span class='fa fa-users'></span></span>Session Management</a></li>
 					<li style="margin-bottom: 30px"><a id='preferencesTab' title="Preferences" ng-click="tab='tabPreferences';preferences.click()" class="selectBrowser" data-name="2">
-						<span><span class='fa fa-sliders'></span></span>Preferences</a></li>																										   																
+						<span><span class='fa fa-sliders'></span></span>Preferences</a></li>
 				</ul>
 			</div>
 			<div class='clear-both'></div>
@@ -533,6 +533,161 @@
 		</div>
 		<!-- Edit LDAP Configuration -->
 
+		<!-- Create SAML Configuration -->
+		<div class="containerWrap" ng-if="tab == 'tabsamlConfig'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Create SAML Configuration</span>
+			</div>
+			<!--Task Name-->
+			<!-- Button -->
+			<div class="adminActionBtn">
+				<button class="btn btn-md pull-right adminBtn" ng-click="samlConf.edit()" title="Edit Configuration">Edit</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="samlConf.manage('create',$event)" style="margin-right:10px" title="Create Configuration">Create</button>
+			</div>
+			<!-- Button -->
+			<!-- Create Configuration Form -->
+			<div class="col-xs-9 form-group adminForm" style="padding-top:0">
+				<h4>SAML Server Details</h4>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Server Name">Server Name</span>
+					<input type="text" autocomplete="off" id="samlServerName" name="samlServerName" ng-model="samlConf.name" maxlength="50" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Server Name"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{samlConf.urlToolTip}}">Single Sign-On URL</span>
+					<input type="text" autocomplete="off" id="samlAcsUrl" name="samlAcsUrl" ng-model="samlConf.url" maxlength="250" class="form-control form-control-custom create" placeholder="{{samlConf.urlToolTip}}"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{samlConf.idpToolTip}}">Issuer</span>
+					<input type="text" autocomplete="off" id="samlIDP" name="samlIDP" ng-model="samlConf.idp" class="form-control form-control-custom create" placeholder="{{samlConf.idpToolTip}}"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{samlConf.certToolTip}}">Certificate</span>
+					<label id="samlCert" for="samlCertInput" style="cursor:pointer"><span class="fa fa-upload" style="width:auto;margin-right:10px"></span>{{samlConf.certName}}</label>
+					<input type="file" accept=".cer,.crt,.cert,.pem" autocomplete="off" id="samlCertInput" name="samlCert" style="margin-top:5px" class="no-disp"/>
+				</div></div>
+			</div>
+			<!-- Create Configuration Form -->
+		</div>
+		<!-- Create SAML Configuration -->
+
+		<!-- Edit SAML Configuration -->
+		<div class="containerWrap" ng-if="tab == 'tabsamlConfigEdit'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Edit SAML Configuration</span>
+			</div>
+			<!--Task Name-->
+			<!-- Button -->
+			<div class="adminActionBtn">
+				<button class="btn btn-md pull-right adminBtn" ng-click="samlConf.manage('update',$event)" ng-disabled="samlConf.name == ''" title="Update Configuration">Update</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="samlConf.delete()" ng-disabled="samlConf.name == ''" style="margin-right:10px" title="Delete Configuration">Delete</button>
+			</div>
+			<!-- Button -->
+			<!-- Edit Configuration Form -->
+			<div class="col-xs-9 form-group adminForm" style="padding-top:0">
+				<h4>SAML Server Details</h4>
+				<div class='userForm adminControl'><div>
+					<span class="leftControl" title="Server Name">Server Name</span><select ng-change="samlConf.getServerData()" class='adminSelect form-control' ng-model="samlConf.name" id="samlServerName" class="form-control rightControl selectControl">
+						<option value="" disabled selected>Select Server</option>
+					</select>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{samlConf.urlToolTip}}">Single Sign-On URL</span>
+					<input type="text" autocomplete="off" id="samlAcsUrl" name="samlAcsUrl" ng-model="samlConf.url" maxlength="250" class="form-control form-control-custom create" placeholder="{{samlConf.urlToolTip}}"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{samlConf.idpToolTip}}">Issuer</span>
+					<input type="text" autocomplete="off" id="samlIDP" name="samlIDP" ng-model="samlConf.idp" class="form-control form-control-custom create" placeholder="{{samlConf.idpToolTip}}"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{samlConf.certToolTip}}">Certificate</span>
+					<label id="samlCert" for="samlCertInput" style="cursor:pointer;display:inline"><span class="fa fa-upload" style="width:auto;margin-right:10px"></span>{{samlConf.certName}}</label>
+					<input type="file" accept=".cer,.crt,.cert,.pem" autocomplete="off" id="samlCertInput" name="samlCert" style="margin-top:5px" class="no-disp"/>
+					<textarea autocomplete="off" id="samlCertValue" name="samlCertValue" disabled="" readonly="">{{samlConf.cert}}</textarea>
+				</div></div>
+			</div>
+			<!-- Edit Configuration Form -->
+
+		</div>
+		<!-- Edit SAML Configuration -->
+
+		<!-- Create OIDC Configuration -->
+		<div class="containerWrap" ng-if="tab == 'taboidcConfig'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Create OpenID Connect Configuration</span>
+			</div>
+			<!--Task Name-->
+			<!-- Button -->
+			<div class="adminActionBtn">
+				<button class="btn btn-md pull-right adminBtn" ng-click="oidcConf.edit()" title="Edit Configuration">Edit</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="oidcConf.manage('create',$event)" style="margin-right:10px" title="Create Configuration">Create</button>
+			</div>
+			<!-- Button -->
+			<!-- Create Configuration Form -->
+			<div class="col-xs-9 form-group adminForm" style="padding-top:0">
+				<h4>OpenID Connect Server Details</h4>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Server Name">Server Name</span>
+					<input type="text" autocomplete="off" id="oidcServerName" name="oidcServerName" ng-model="oidcConf.name" maxlength="50" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Server Name"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Issuer URL">Issuer</span>
+					<input type="text" autocomplete="off" id="oidcUrl" name="oidcUrl" ng-model="oidcConf.url" maxlength="250" class="form-control form-control-custom create" placeholder="Issuer URL"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{oidcConf.idToolTip}}">Client ID</span>
+					<input type="text" autocomplete="off" id="oidcClientId" name="oidcClientId" ng-model="oidcConf.clientId" maxlength="250" class="form-control form-control-custom create" placeholder="{{oidcConf.idToolTip}}"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{oidcConf.idToolTip}}">Client Secret</span>
+					<input type="text" autocomplete="off" id="oidcClientSecret" name="oidcClientSecret" ng-model="oidcConf.secret" maxlength="250" class="form-control form-control-custom create" placeholder="{{oidcConf.secretToolTip}}"/>
+				</div></div>
+			</div>
+			<!-- Create Configuration Form -->
+		</div>
+		<!-- Create OIDC Configuration -->
+
+		<!-- Edit OIDC Configuration -->
+		<div class="containerWrap" ng-if="tab == 'taboidcConfigEdit'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Edit OpenID Connect Configuration</span>
+			</div>
+			<!--Task Name-->
+			<!-- Button -->
+			<div class="adminActionBtn">
+				<button class="btn btn-md pull-right adminBtn" ng-click="oidcConf.manage('update',$event)" ng-disabled="oidcConf.name == ''" title="Update Configuration">Update</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="oidcConf.delete()" ng-disabled="oidcConf.name == ''" style="margin-right:10px" title="Delete Configuration">Delete</button>
+			</div>
+			<!-- Button -->
+			<!-- Edit Configuration Form -->
+			<div class="col-xs-9 form-group adminForm" style="padding-top:0">
+				<h4>OpenID Connect Server Details</h4>
+				<div class='userForm adminControl'><div>
+					<span class="leftControl" title="Server Name">Server Name</span><select ng-change="oidcConf.getServerData()" class='adminSelect form-control' ng-model="oidcConf.name" id="oidcServerName" class="form-control rightControl selectControl">
+						<option value="" disabled selected>Select Server</option>
+					</select>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Issuer URL">Issuer</span>
+					<input type="text" autocomplete="off" id="oidcUrl" name="oidcUrl" ng-model="oidcConf.url" maxlength="250" class="form-control form-control-custom create" placeholder="Issuer URL"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{oidcConf.idToolTip}}">Client ID</span>
+					<input type="text" autocomplete="off" id="oidcClientId" name="oidcClientId" ng-model="oidcConf.clientId" maxlength="250" class="form-control form-control-custom create" placeholder="{{oidcConf.idToolTip}}"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{oidcConf.idToolTip}}">Client Secret</span>
+					<input type="text" autocomplete="off" id="oidcClientSecret" name="oidcClientSecret" ng-model="oidcConf.secret" maxlength="250" class="form-control form-control-custom create" placeholder="{{oidcConf.secretToolTip}}"/>
+				</div></div>
+			</div>
+			<!-- Edit Configuration Form -->
+
+		</div>
+		<!-- Edit OIDC Configuration -->
+
 		<!-- Session Management -->
 		<div class="containerWrap" ng-if="tab == 'tabSession'">
 			<!--Task Name-->
@@ -847,7 +1002,7 @@
 				<h4 class="modal-title"></h4>
 			</div>
 			<div class="modal-body">
-				<p>Are you sure you want to delete ? All task assignment information will be deleted for this user.</p>
+				<p></p>
 			</div>
 			<div class="modal-footer">
 				<button id="deleteGlobalModalButton" type="button" class="btn btn-default btnGlobalYes" data-dismiss="modal">Yes</button>

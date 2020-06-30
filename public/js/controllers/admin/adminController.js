@@ -9,12 +9,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$("body").css("background","#eee");
 	$("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />');
 	localStorage.setItem("navigateEnable", false);
-
-	$('.dropdown').on('show.bs.dropdown', function (e) {
-		$(this).find('.dropdown-menu').first().stop(true, true).slideDown(300);
-	});
-
 	$scope.ldapConf = {};
+	$scope.samlConf = {};
+	$scope.oidcConf = {};
 	$scope.userConf = {};
 	$scope.domainConf = {};
 	$scope.moveItems = {};
@@ -24,6 +21,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.tokens = {};
 	$scope.provision = {};
 	$scope.tokeninfo={};
+
+	$('.dropdown').on('show.bs.dropdown', function (e) {
+		$(this).find('.dropdown-menu').first().stop(true, true).slideDown(300);
+	});
+	
 	$('.dropdown').on('hide.bs.dropdown', function (e) {
 		$(this).find('.dropdown-menu').first().stop(true, true).slideUp(300);
 	});
@@ -1695,7 +1697,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	//Delete Release Functionality: Open Popup
 	$(document).on("click", "[id^=deleteReleaseName_]", function (e) {
-		openDeleteGlobalModal("Delete Release","deleteReleaseYes");
+		openDeleteGlobalModal("Delete Release","deleteReleaseYes","Are you sure you want to delete ?");
 		deleteReleaseId = e.target.id;
 		deleteRelid = e.target.parentElement.previousSibling.dataset.releaseid;
 	});
@@ -1955,7 +1957,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	//Delete Cycle Functionality: Open Popup
 	$(document).on("click", "[id^=deleteCycleName_]", function(e){
-		openDeleteGlobalModal("Delete Cycle","deleteCycleYes");
+		openDeleteGlobalModal("Delete Cycle","deleteCycleYes","Are you sure you want to delete ?");
 		deleteCycleId = e.target.id;
 		var cycName = $(this).parent().siblings(".cycleName").text();
 		deleteCycId = $(this).parent().siblings(".cycleName").attr("data-cycleid");
@@ -2718,7 +2720,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	//Delete User Data: Confirmation
 	$scope.userConf.delete = function (action) {
-		openDeleteGlobalModal("Delete User", "delUserConf");
+		openDeleteGlobalModal("Delete User", "delUserConf", "Are you sure you want to delete ? All task assignment information will be deleted for this user.");
 	};
 	
 	//Delete User Data
@@ -2852,10 +2854,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	}
 
 	//Show Global delete modal popup
-	function openDeleteGlobalModal(title, buttonID) {
+	function openDeleteGlobalModal(title, buttonID, content) {
 		var delModal = $("#deleteGlobalModal");
 		delModal.find('.modal-title').text(title);
 		delModal.find('button.btnGlobalYes').prop("id", buttonID);
+		delModal.find('modal-body').find('p').text(content);
 		delModal.modal("show");
 		setTimeout(function () {
 			$("#deleteGlobalModal").find('.btn-default')[1].focus();
@@ -3066,7 +3069,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	};
 
 	$scope.ldapConf.delete = function (action) {
-		openDeleteGlobalModal("Delete Configuration", "delLdapConf");
+		openDeleteGlobalModal("Delete Configuration", "delLdapConf", "Are you sure you want to delete ? Users depending on this configuration will not be able to login.");
 	};
 	
 	$(document).on('click','#delLdapConf', function(e) {
@@ -3158,6 +3161,369 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			$("#binddn").val('');
 			$("#bindCredentials").val('');
 		}
+	};
+
+	$scope.samlConf.click = function (action) {
+		$(".selectedIcon").removeClass("selectedIcon");
+		$("#samlConfigTab").find("span.fa").addClass("selectedIcon");
+		this.name = "";
+		this.url = "";
+		this.idp = "";
+		this.cert = "";
+		this.certName = "No file choosen";
+		this.urlToolTip = "Single Sign-On URL (SAML assertion URL)"
+		this.idpToolTip = "Identity Issuer (Can be text or URL)"
+		this.certToolTip = "X.509 certificate issued by provider"
+	};
+
+	$scope.samlConf.validate = function(action) {
+		var flag = true;
+		$("#samlAcsUrl,#samlIDP").removeClass("inputErrorBorder");
+		$("#samlCert").removeClass("inputErrorText");
+		var nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
+		$("#samlServerName").removeClass(nameErrorClass);
+		regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
+		if (this.name == "") {
+			$("#samlServerName").addClass(nameErrorClass);
+			flag = false;
+		}
+		if (this.url == "") {
+			$("#samlAcsUrl").addClass("inputErrorBorder");
+			flag = false;
+		} else if (regExURL.test(this.url) == false) {
+			$("#samlAcsUrl").addClass("inputErrorBorder");
+			openModalPopup("Error", "Invalid URL provided! URL must start with http:// or https://");
+			flag = false;
+		}
+		if (this.idp == "") {
+			$("#samlIDP").addClass("inputErrorBorder");
+			flag = false;
+		}
+		if (this.cert == "") {
+			$("#samlCert").addClass("inputErrorText");
+			flag = false;
+		}
+		return flag;
+	};
+
+	$scope.samlConf.manage = function (action,$event) {
+		var samlConf = $scope.samlConf;
+		if (!samlConf.validate(action)) return;
+		var bAction = action.charAt(0).toUpperCase() + action.substr(1);
+		var confObj = {
+			name: samlConf.serverName,
+			url: samlConf.url,
+			basedn: samlConf.basedn,
+			auth: samlConf.auth,
+			binddn: samlConf.binddn,
+			bindcredentials: samlConf.bindCredentials,
+			fieldmap: samlConf.fieldmap
+		};
+		blockUI(bAction.slice(0,-1)+"ing configuration...");
+		//Transaction Activity for Create/ Update/ Delete SAML conf button Action
+		// var labelArr = [];
+		// var infoArr = [];
+		// labelArr.push(txnHistory.codesDict['SamlConfmanage']);
+		// infoArr.push(action);
+		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+		adminServices.manageSAMLConfig(action, confObj)
+		.then(function(data){
+			unblockUI();
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "success") {
+				if (action == "create") $scope.samlConf.click();
+				else $scope.samlConf.edit();
+				openModalPopup(bAction+" Configuration", "Configuration '"+confObj.name+"' "+action+"d successfully!");
+			} else if(data == "exists") {
+				$("#samlServerName").addClass("inputErrorBorder");
+				openModalPopup(bAction+" Configuration", "Configuration '"+confObj.name+"' already Exists!");
+			} else if(data == "fail") {
+				if (action == "create") $scope.samlConf.click();
+				else $scope.samlConf.edit();
+				openModalPopup(bAction+" Configuration", "Failed to "+action+" '"+confObj.name+"' configuration.");
+			} else if(/^1[0-4]{8}$/.test(data)) {
+				if (parseInt(data[1])) {
+					openModalPopup(bAction+" Configuration", "Failed to "+action+" '"+confObj.name+"' configuration. Invalid Request!");
+					return;
+				}
+				var errfields = [];
+				var errHints = [];
+				if (parseInt(data[2])) errfields.push("Server Name");
+				if (parseInt(data[3])) errfields.push("Directory Provider URL");
+				if (parseInt(data[3]) == 2) errHints.push("'ldaps' protocol is not supported");
+				if (parseInt(data[3]) == 3) errHints.push("'ldap://' is missing from url prefix");
+				if (parseInt(data[4])) errfields.push("Base Domain Name");
+				if (parseInt(data[5])) errfields.push("Authentication Type");
+				if (parseInt(data[6])) errfields.push("Authentication Principal");
+				if (parseInt(data[7])) errfields.push("Authentication Credentials");
+				if (parseInt(data[8])) errfields.push("Data Mapping Settings");
+				openModalPopup(bAction+" Configuration", "Following values are invalid: "+errfields.join(", ")+". Note: "+errHints);
+			}
+		}, function (error) {
+			unblockUI();
+			openModalPopup(bAction+" Configuration", "Failed to "+action+" '"+confObj.name+"' configuration.");
+		});
+	};
+
+	$scope.samlConf.edit = function () {
+		$scope.tab = "tabsamlConfigEdit";
+		this.click("edit");
+		return ;
+		blockUI("Fetching details...");
+		adminServices.getSAMLConfig("server")
+		.then(function(data){
+			unblockUI();
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "fail") {
+				openModalPopup("Edit Configuration", "Failed to fetch configurations.");
+			} else if(data == "empty") {
+				openModalPopup("Edit Configuration", "There are no configurations created yet.");
+				var selBox = $("#samlServerName");
+				selBox.empty();
+				selBox.append("<option value='' disabled selected>Select Server</option>");
+				selBox.prop("selectedIndex", 0);
+			} else {
+				data.sort(function(a,b){ return a > b; });
+				var selBox = $("#samlServerName");
+				selBox.empty();
+				selBox.append("<option value='' disabled selected>Select Server</option>");
+				for(var i = 0; i < data.length; i++){
+					selBox.append("<option value=\""+data[i]+"\">"+data[i]+"</option>");
+				}
+				selBox.prop("selectedIndex", 0);
+			}
+		}, function (error) {
+			unblockUI();
+			openModalPopup("Edit Configuration", "Failed to fetch configurations.");
+		});
+	};
+
+	$scope.samlConf.delete = function (action) {
+		openDeleteGlobalModal("Delete Configuration", "delSamlConf", "Are you sure you want to delete ? Users depending on this configuration will not be able to login.");
+	};
+
+	$(document).on('click','#delSamlConf', function(e) {
+		hideDeleteGlobalModal();
+		$scope.samlConf.manage("delete", e);
+	});
+
+	$(document).on('change','#samlCertInput', function(event) {
+		const targetFile = event && (event.srcElement || event.target).files[0] || null;
+		if (targetFile == null) return;
+		$scope.samlConf.certName = targetFile.name;
+		var reader = new FileReader();
+		reader.onload = function(e) {
+			$scope.samlConf.cert = (e && e.target.result)? e.target.result : this.content;
+			$scope.$apply();
+		};
+		reader.readAsBinaryString(targetFile);
+	});
+
+	$scope.samlConf.getServerData = function () {
+		var name = this.serverName;
+		samlConf = $scope.samlConf;
+		var failMsg = "Failed to fetch details for '"+name+"' configuration.";
+		blockUI("Fetching details...");
+		adminServices.getSAMLConfig("config", name)
+		.then(function(data){
+			unblockUI();
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "fail") {
+				openModalPopup("Edit Configuration", failMsg);
+			} else {
+				samlConf.url = data.url;
+				samlConf.basedn = data.basedn;
+				samlConf.auth = data.auth;
+				samlConf.binddn = data.binddn;
+				samlConf.bindCredentials = data.bindCredentials;
+				samlConf.fieldmap = data.fieldmap;
+				samlConf.fieldMapOpts = []
+				samlConf.fieldMapOpts.push(samlConf.fieldmap.uname)
+				samlConf.fieldMapOpts.push(samlConf.fieldmap.fname)
+				samlConf.fieldMapOpts.push(samlConf.fieldmap.lname)
+				samlConf.fieldMapOpts.push(samlConf.fieldmap.email)
+			}
+		}, function (error) {
+			unblockUI();
+			openModalPopup("Edit Configuration", failMsg);
+		});
+	};
+
+	$scope.oidcConf.click = function (action) {
+		$(".selectedIcon").removeClass("selectedIcon");
+		$("#oidcConfigTab").find("span.fa").addClass("selectedIcon");
+		this.name = "";
+		this.url = "";
+		this.clientId = "";
+		this.secret = "";
+		this.idToolTip = "Public identifier for the client"
+		this.secretToolTip = "Secret used by the client to exchange an authorization code for a token"
+	};
+
+	$scope.oidcConf.validate = function(action) {
+		var flag = true;
+		$("#oidcUrl,#oidcClientId,#oidcClientSecret").removeClass("inputErrorBorder");
+		var nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
+		$("#oidcServerName").removeClass(nameErrorClass);
+		regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
+		if (this.name == "") {
+			$("#oidcServerName").addClass(nameErrorClass);
+			flag = false;
+		}
+		if (this.url == "") {
+			$("#oidcUrl").addClass("inputErrorBorder");
+			flag = false;
+		} else if (regExURL.test(this.url) == false) {
+			$("#oidcUrl").addClass("inputErrorBorder");
+			openModalPopup("Error", "Invalid URL provided! URL must start with http:// or https://");
+			flag = false;
+		}
+		if (this.clientId == "") {
+			$("#oidcClientId").addClass("inputErrorBorder");
+			flag = false;
+		}
+		if (this.secret == "") {
+			$("#oidcClientSecret").addClass("inputErrorBorder");
+			flag = false;
+		}
+		return flag;
+	};
+
+	$scope.oidcConf.manage = function (action,$event) {
+		var oidcConf = $scope.oidcConf;
+		if (!oidcConf.validate(action)) return;
+		var bAction = action.charAt(0).toUpperCase() + action.substr(1);
+		var confObj = {
+			name: oidcConf.serverName,
+			url: oidcConf.url,
+			basedn: oidcConf.basedn,
+			auth: oidcConf.auth,
+			binddn: oidcConf.binddn,
+			bindcredentials: oidcConf.bindCredentials,
+			fieldmap: oidcConf.fieldmap
+		};
+		blockUI(bAction.slice(0,-1)+"ing configuration...");
+		//Transaction Activity for Create/ Update/ Delete OIDC conf button Action
+		// var labelArr = [];
+		// var infoArr = [];
+		// labelArr.push(txnHistory.codesDict['OidcConfmanage']);
+		// infoArr.push(action);
+		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+		adminServices.manageOIDCConfig(action, confObj)
+		.then(function(data){
+			unblockUI();
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "success") {
+				if (action == "create") $scope.oidcConf.click();
+				else $scope.oidcConf.edit();
+				openModalPopup(bAction+" Configuration", "Configuration '"+confObj.name+"' "+action+"d successfully!");
+			} else if(data == "exists") {
+				$("#oidcServerName").addClass("inputErrorBorder");
+				openModalPopup(bAction+" Configuration", "Configuration '"+confObj.name+"' already Exists!");
+			} else if(data == "fail") {
+				if (action == "create") $scope.oidcConf.click();
+				else $scope.oidcConf.edit();
+				openModalPopup(bAction+" Configuration", "Failed to "+action+" '"+confObj.name+"' configuration.");
+			} else if(/^1[0-4]{8}$/.test(data)) {
+				if (parseInt(data[1])) {
+					openModalPopup(bAction+" Configuration", "Failed to "+action+" '"+confObj.name+"' configuration. Invalid Request!");
+					return;
+				}
+				var errfields = [];
+				var errHints = [];
+				if (parseInt(data[2])) errfields.push("Server Name");
+				if (parseInt(data[3])) errfields.push("Directory Provider URL");
+				if (parseInt(data[3]) == 2) errHints.push("'ldaps' protocol is not supported");
+				if (parseInt(data[3]) == 3) errHints.push("'ldap://' is missing from url prefix");
+				if (parseInt(data[4])) errfields.push("Base Domain Name");
+				if (parseInt(data[5])) errfields.push("Authentication Type");
+				if (parseInt(data[6])) errfields.push("Authentication Principal");
+				if (parseInt(data[7])) errfields.push("Authentication Credentials");
+				if (parseInt(data[8])) errfields.push("Data Mapping Settings");
+				openModalPopup(bAction+" Configuration", "Following values are invalid: "+errfields.join(", ")+". Note: "+errHints);
+			}
+		}, function (error) {
+			unblockUI();
+			openModalPopup(bAction+" Configuration", "Failed to "+action+" '"+confObj.name+"' configuration.");
+		});
+	};
+
+	$scope.oidcConf.edit = function () {
+		$scope.tab = "taboidcConfigEdit";
+		this.click("edit");
+		return ;
+		blockUI("Fetching details...");
+		adminServices.getOIDCConfig("server")
+		.then(function(data){
+			unblockUI();
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "fail") {
+				openModalPopup("Edit Configuration", "Failed to fetch configurations.");
+			} else if(data == "empty") {
+				openModalPopup("Edit Configuration", "There are no configurations created yet.");
+				var selBox = $("#oidcServerName");
+				selBox.empty();
+				selBox.append("<option value='' disabled selected>Select Server</option>");
+				selBox.prop("selectedIndex", 0);
+			} else {
+				data.sort(function(a,b){ return a > b; });
+				var selBox = $("#oidcServerName");
+				selBox.empty();
+				selBox.append("<option value='' disabled selected>Select Server</option>");
+				for(var i = 0; i < data.length; i++){
+					selBox.append("<option value=\""+data[i]+"\">"+data[i]+"</option>");
+				}
+				selBox.prop("selectedIndex", 0);
+			}
+		}, function (error) {
+			unblockUI();
+			openModalPopup("Edit Configuration", "Failed to fetch configurations.");
+		});
+	};
+
+	$scope.oidcConf.delete = function (action) {
+		openDeleteGlobalModal("Delete Configuration", "deloidcConf", "Are you sure you want to delete ? Users depending on this configuration will not be able to login.");
+	};
+
+	$(document).on('click','#deloidcConf', function(e) {
+		hideDeleteGlobalModal();
+		$scope.oidcConf.manage("delete", e);
+	});
+
+	$scope.oidcConf.getServerData = function () {
+		var name = this.serverName;
+		oidcConf = $scope.oidcConf;
+		var failMsg = "Failed to fetch details for '"+name+"' configuration.";
+		blockUI("Fetching details...");
+		adminServices.getOIDCConfig("config", name)
+		.then(function(data){
+			unblockUI();
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "fail") {
+				openModalPopup("Edit Configuration", failMsg);
+			} else {
+				oidcConf.url = data.url;
+				oidcConf.basedn = data.basedn;
+				oidcConf.auth = data.auth;
+				oidcConf.binddn = data.binddn;
+				oidcConf.bindCredentials = data.bindCredentials;
+				oidcConf.fieldmap = data.fieldmap;
+				oidcConf.fieldMapOpts = []
+				oidcConf.fieldMapOpts.push(oidcConf.fieldmap.uname)
+				oidcConf.fieldMapOpts.push(oidcConf.fieldmap.fname)
+				oidcConf.fieldMapOpts.push(oidcConf.fieldmap.lname)
+				oidcConf.fieldMapOpts.push(oidcConf.fieldmap.email)
+			}
+		}, function (error) {
+			unblockUI();
+			openModalPopup("Edit Configuration", failMsg);
+		});
 	};
 
 	// Session Management Tab Click

@@ -877,7 +877,6 @@ input[type="radio"]{
 #left-nav-section {
     width: 166px;
     height: 100%;
-    /*background: #643693;*/
     background: #633691;
     box-sizing: content-box;
     font-family: 'LatoWebLight';
@@ -3404,15 +3403,16 @@ li.select_all .addCustObj{
     width: 100%;
 }
 
-.adminControl div span{
+.adminControl div span {
     display: inline-block;
-    width: 75px;
-	font-weight: 700;
+    width: 130px;
+    font-weight: 700;
+    margin-top: 5px;
 }
 
-.adminControl div input{
-    display: inline;
-	width: calc(100% - 75px);
+.adminControl div input, .adminControl div select {
+    /* display: inline-block; */
+	width: calc(100% - 130px);
 }
 
 .adminSelect:focus {
@@ -3715,29 +3715,27 @@ li.select_all .addCustObj{
     background: #f1f1f1;
 }
 
-.disableAddCycle
-{
+.disableAddCycle {
     cursor: not-allowed !important;
     pointer-events: none;
 }
-.createProjectBtn
-{
+.createProjectBtn {
     margin-right: 10px;
 }
-#selProject
-{
+
+#selProject {
     margin-left: 0;
     position: relative;
     left: 24px;
 }
-#userRoles
-{
+
+#userRoles {
     position: relative;
     left: 10px;
     top: 2px;
 }
 
-#additionalRoles{
+#additionalRoles {
 	position: relative;
     top: -1px;
 }
@@ -3833,25 +3831,25 @@ li.select_all .addCustObj{
     width: 10%;
 }
 .center-button button {
-font-size: 11px;
-cursor: pointer;
-font-weight: 600;
-width: 35px;
-outline: none;
-margin-bottom: 15px;
-padding: 6px 12px;
-background: #643693;
-border: none;
-color: #fff;
-border-radius: 3px;
--moz-border-radius: 3px;
--webkit-border-radius: 3px;
--o-border-radius: 3px;
--ms-border-radius: 3px;
-margin-top: 1%;
-margin-left: 12%;
-clear: both;
-float: left;
+    font-size: 11px;
+    cursor: pointer;
+    font-weight: 600;
+    width: 35px;
+    outline: none;
+    margin-bottom: 15px;
+    padding: 6px 12px;
+    background: #643693;
+    border: none;
+    color: #fff;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -o-border-radius: 3px;
+    -ms-border-radius: 3px;
+    margin-top: 1%;
+    margin-left: 12%;
+    clear: both;
+    float: left;
 }
 .right-select {
     float: right;
@@ -3870,6 +3868,14 @@ select[multiple]:focus option:checked {
 }
 select[multiple]:-internal-list-box option:checked {
 	background: none;
+}
+
+#samlCertValue {
+    margin-top: 5px;
+    width: calc(100% - 130px);
+    height: 175px;
+    font-size: 12px;
+    resize: none;
 }
 
 .sessionItemWrap {
@@ -4393,8 +4399,11 @@ select:-webkit-autofill:focus {
 	border: 2px solid #d33c3c !important;
 }
 
-.modal-body .row-modal .form-control-custom.inputErrorBorderBottom, .form-control-custom.inputErrorBorderBottom
-{
+.inputErrorText{
+	color: #d33c3c !important;
+}
+
+.modal-body .row-modal .form-control-custom.inputErrorBorderBottom, .form-control-custom.inputErrorBorderBottom{
     border: 2px solid #d33c3c !important;
     border-left: 0 !important;
     border-right: 0 !important;
