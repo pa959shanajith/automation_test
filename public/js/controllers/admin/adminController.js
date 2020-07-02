@@ -205,6 +205,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			$scope.assignProjects1();
 		}
 	}
+
 	$scope.assignProjects1 = function ($event) {
 		$("#assignProjectModal").modal("hide");
 		unAssignedProjects = [];
@@ -292,6 +293,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$('#IceType').click();
 		$scope.provision.op='normal';
 	});
+
 	$scope.selectIceType=function($event){
 		if(event.currentTarget.value=='normal'){
 			$('#userToken').text('User')
@@ -306,6 +308,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			$scope.provision.op='ci-cd';
 		}
 	}
+
 	$(document).on('change', '#selAssignUser1, #selICEuser',  function (e) {
 		blockUI("Fetchin Token data. Please wait...");
 		var userId = $("#selAssignUser1 option:selected").attr("data-id");
@@ -345,135 +348,98 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				console.log("Error:::::::::::::", error);
 			});
 	});
-	$scope.provision.click = function(){
-		$('#provisions').click();
-		blockUI("Loading");
-		$('#icename').val('');
-		$("#generateICEToken").val('');
-		$scope.provision.op='normal';
+
+	$scope.provision.click = function($event){
 		$(".selectedIcon").removeClass("selectedIcon");
 		$("#provisionTab").find("span.fa").addClass("selectedIcon");;
+		$scope.provision.op='normal';
+		$scope.provision.icename = '';
+		$scope.provision.tokentooltip = "Click on Provision/Reregister to generate token";
+		$scope.provision.token = $scope.provision.tokentooltip;
 		$scope.provision.users=[]
-		adminServices.getUserDetails("user")
-			.then(function(data){
-				if(data == "Invalid Session") {
-					$rootScope.redirectPage();
-				} else if(data == "fail") {
-					openModalPopup("ICE Provision", "Failed to fetch users.");
-				} else if(data == "empty") {
-					openModalPopup("ICE Provision", "There are no users present.");
-				} else {
-					data.sort(function(a,b){ return a[0] > b[0]; });
-					var selectBox = $("#selAssignUser2");
-					selectBox.empty();
-					selectBox.append('<option data-id="" value disabled selected>Select User</option>');
-					for(i=0; i<data.length; i++){
-						if(data[i][3] != "Admin"){
-							selectBox.append('<option data-id="'+data[i][1]+'" value="'+data[i][0]+'">'+data[i][0]+'</option>');
-						}
-					}
-					selectBox.prop('selectedIndex', 0);
-				}
-			}, function (error) {
-				console.log("Error:::::::::::::", error);
-			});
-		adminServices.fetchICE()
-			.then(function (data) {
-				if (data == "Invalid Session") {
-					$rootScope.redirectPage();
-				}
-				else if (data == 'fail') {
-						openModalPopup("ICE Provisions", "Failed to load ICE Provisions");
-				} else {
-					data.sort(function(a,b){ return a.icename > b.icename; });
-					$scope.provision.users=data;
-					unblockUI();
-				}
-			}, function (error) {
-				unblockUI();
-				console.log("Error:::::::::::::", error);
-			});
-		$('#tokeninfo').hide();
-		$("#tokeninfo .tokenSuite .datePicContainer .fc-datePicker").val('');
-		$("#tokeninfo .tokenSuite .timePicContainer .fc-timePicker").val('');
-	}
-	$scope.provisionsIce = function ($event){
-		$("#icename").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
-		$("#selAssignUser2").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
-		var userid = $("#selAssignUser2 option:selected").attr("data-id");
-		$("#generateICEToken").val('');
-		var icename=$("#icename").val()
-		if (icename==""){
-			$("#icename").addClass("selectErrorBorder");
-			return false;
+		$scope.tokeninfo = {};
+		$scope.provision.selectProvisionType($event);
+		$('body').tooltip({trigger: "hover", selector: "span.fa"});
+		$("#icename").removeClass("inputErrorBorder");
+		$("#selAssignUser2").removeClass("selectErrorBorder");
+	};
+
+	$scope.provision.provisionsIce = function ($event) {
+		$("#icename").removeClass("inputErrorBorder");
+		$("#selAssignUser2").removeClass("selectErrorBorder");
+		const icename = $scope.provision.icename;
+		const userid = $scope.provision.userid;
+		const icetype = $scope.provision.op;
+		var flag = false;
+		$scope.provision.token = "";
+		if (icename == "") {
+			$("#icename").addClass("inputErrorBorder");
+			flag = true;
 		}
-		if (userid==""){
+		if (icetype == "normal"  && (!userid || userid == "")) {
 			$("#selAssignUser2").addClass("selectErrorBorder");
-			return false;
+			flag = true;
 		}
-		
-		var tokeninfo = {};
-		tokeninfo.userid = userid;
-		tokeninfo.icename=icename;
-		tokeninfo.icetype=$scope.provision.op;
-		tokeninfo.action="provision";
-		adminServices.provisions(tokeninfo)
-		.then(function (data) {
-				unblockUI();
-				if (data == "Invalid Session") {
-					$rootScope.redirectPage();
-				}
-				else if (data == 'fail') {
-					openModalPopup("ICE Provision Error", "ICE Provisioned Failed");
-				}else if (data=='DuplicateIceName'){
-					openModalPopup("ICE Provision Error", "ICE Provisioned Failed!"+"<br/>"+"ICE name or User already exists");
-				} else {
-					$scope.tokeninfo.icename=icename;
-					$scope.tokeninfo.token=data;
-					openProvsionPopup("ICE Provision Success", "Token generated Successfully for ICE '"+icename+"'\n"+"Copy or Download the token");
-					$("#generateICEToken").val(data);
-					adminServices.fetchICE()
-						.then(function (data) {
-							if (data == "Invalid Session") {
-								$rootScope.redirectPage();
-							}
-							else if (data == 'fail') {
-									openModalPopup("ICE Provisions", "Failed to load ICE Provisions");
-							} else {
-								data.sort(function(a,b){ return a.icename > b.icename; });
-								$scope.provision.users=data;
-							}
-						}, function (error) {
-							unblockUI();
-							console.log("Error:::::::::::::", error);
-						});
-				}
-			}, function (error) {
-				unblockUI();
-				console.log("Error:::::::::::::", error);
-			});
+		if (flag) return false;
+
+		var tokeninfo = {
+			userid: userid,
+			icename: icename,
+			icetype: icetype,
+			action: "provision"
+		};
+		blockUI("Provisioning Token...")
+		adminServices.provisions(tokeninfo).then(function (data) {
+			unblockUI();
+			if (data == "Invalid Session") return $rootScope.redirectPage();
+			else if (data == 'fail') openModalPopup("ICE Provision Error", "ICE Provisioned Failed");
+			else if (data=='DuplicateIceName') openModalPopup("ICE Provision Error", "ICE Provisioned Failed!<br/>ICE name or User already exists");
+			else {
+				$scope.tokeninfo.icename = icename;
+				$scope.tokeninfo.token = data;
+				$scope.provision.token = data;
+				$scope.provision.fetchICE();
+				openModalPopup("ICE Provision Success", "Token generated Successfully for ICE '"+icename+"'<br/>Copy or Download the token");
+			}
+		}, function (error) {
+			unblockUI();
+			console.log("Error:::::::::::::", error);
+		});
 	}
 
+	$scope.showTooltip = function (btn, msg, resetmsg) {
+		btn.attr('data-original-title', msg).tooltip('show');
+		setTimeout(function() {
+			btn.tooltip('hide');
+			btn.attr('data-original-title', resetmsg);
+		}, 1500);
+	};
 
-	$scope.copyToken = function (){
-		const x = document.createElement('TEXTAREA')
-		x.value = $scope.tokeninfo.token;
-		document.body.appendChild(x);
+	$scope.copyToken = function ($event) {
+		const data = $scope.tokeninfo.token;
+		const btn = $($event.target);
+		if (!data) {
+			$scope.showTooltip(btn, "Nothing to Copy!", "Click to Copy");
+			return;
+		}
+		const x = document.getElementById('iceToken');
 		x.select();
 		document.execCommand('copy');
-		document.body.removeChild(x);
-		
+		$scope.showTooltip(btn, "Copied!", "Click to Copy");
 	}
 
-	$scope.downloadToken = function (){
-		jsonDownload($scope.tokeninfo.icename+"_icetoken.txt",$scope.tokeninfo.token);
-	}
-
-	function jsonDownload(filename, responseData) {
+	$scope.downloadToken = function ($event){
+		const data = $scope.tokeninfo.token;
+		const btn = $($event.target);
+		if (!data) {
+			$scope.showTooltip(btn, "Nothing to Download!", "Download Token")
+			return;
+		}
+		const filename = $scope.tokeninfo.icename + "_icetoken.txt";
 		if (isIE) {
-			window.navigator.msSaveOrOpenBlob(new Blob([responseData], { type: "text/json;charset=utf-8" }), filename);
+			window.navigator.msSaveOrOpenBlob(new Blob([data], { type: "text/json;charset=utf-8" }), filename);
 		} else {
-			var blob = new Blob([responseData], { type: 'text/json' });
+			var blob = new Blob([data], { type: 'text/json' });
 			var e = document.createEvent('MouseEvents');
 			var a = document.createElement('a');
 			a.download = filename;
@@ -483,136 +449,86 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			0, 0, 0, 0, 0, false, false, false, false, 0, null);
 			a.dispatchEvent(e);
 		}
+		$scope.showTooltip(btn, "Downloaded!", "Download Token");
 	}
 
-	$scope.resetProvisions = function(){
-		$("#icename").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
-		$("#selAssignUser2").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
-		$scope.provision.click();
-	}
-
-	$scope.deregister = function ($event) {
-		var tokeninfo={};
-		var icename=tokeninfo.icename=$.trim($event.target.parentElement.parentElement.firstElementChild.textContent);
-		index=$event.target.parentElement.parentElement.rowIndex-1;
-		tokeninfo.userid=$scope.provision.users[index].provisionedto;
-		tokeninfo.icetype=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.textContent);
-		tokeninfo.action="deregister";
-		adminServices.provisions(tokeninfo)
-		.then(function (data) {
-				unblockUI();
-				if (data == "Invalid Session") {
-					$rootScope.redirectPage();
-				}
-				else if (data == 'fail') {
-						openModalPopup("ICE Provisions", "ICE Deregister Failed");
-				} else {
-					adminServices.manageSessionData('disconnect',icename,"normal")
-						.then(function (data) {
-							if (data == "Invalid Session") {
-								$rootScope.redirectPage();
-							}
-							unblockUI();
-						}, function (error) {
-							console.error("Fail to load session data", error);
-					});
-					openModalPopup("ICE Provisions", "ICE Deregistered Successfully");
-					adminServices.fetchICE()
-						.then(function (data) {
-							unblockUI();
-							if (data == "Invalid Session") {
-								$rootScope.redirectPage();
-							}
-							else if (data == 'fail') {
-									openModalPopup("ICE Provisions", "Failed to load ICE Provisions");
-							} else {
-								data.sort(function(a,b){ return a.icename > b.icename; });
-								$scope.provision.users=data;
-							}
-						}, function (error) {
-							unblockUI();
-							console.log("Error:::::::::::::", error);
-					});
-					
-				}
-			}, function (error) {
-				unblockUI();
-				console.log("Error:::::::::::::", error);
-			});
+	$scope.provision.deregister = function ($event) {
+		const provisionDetails = $scope.provision.users[$($event.target).data("index")];
+		const icename = provisionDetails.icename;
+		const tokeninfo = {
+			icename: icename,
+			userid: provisionDetails.provisionedto,
+			icetype: provisionDetails.icetype,
+			action: "deregister"
+		};
+		blockUI("Deregistering...");
+		adminServices.provisions(tokeninfo).then(function (data) {
+			unblockUI();
+			if (data == "Invalid Session") return $rootScope.redirectPage();
+			else if (data == 'fail') openModalPopup("ICE Provisions", "ICE Deregister Failed");
+			else {
+				adminServices.manageSessionData('disconnect', icename, "normal").then(function (data) {
+					if (data == "Invalid Session") return $rootScope.redirectPage();
+				}, function (error) { });
+				openModalPopup("ICE Provisions", "ICE Deregistered Successfully");
+				$scope.provision.selectProvisionType($event);
+				//$scope.provision.fetchICE();
+			}
+		}, function (error) {
+			unblockUI();
+			console.log("Error:::::::::::::", error);
+		});
 	};
 
-	$scope.reregister = function ($event) {
-		var tokeninfo={};
-		var event=$.trim($event.currentTarget.textContent)
-		index=$event.target.parentElement.parentElement.rowIndex-1;
-		tokeninfo.userid=$scope.provision.users[index].provisionedto;
-		var icename=$.trim($event.target.parentElement.parentElement.firstElementChild.textContent);
-		tokeninfo.icename=icename;
-		tokeninfo.icetype=$.trim($event.target.parentElement.parentElement.firstElementChild.nextElementSibling.textContent);
-		tokeninfo.action="reregister";
-		adminServices.provisions(tokeninfo)
-		.then(function (data) {
-				unblockUI();
-				if (data == "Invalid Session") {
-					$rootScope.redirectPage();
-				}
-				else if (data == 'fail') {
-						openModalPopup("ICE Provisions", "ICE "+event+" Failed");
-				} else {
-					$scope.tokeninfo.icename=icename;
-					$scope.tokeninfo.token=data;
-					$('#icename').val(icename);
-					openProvsionPopup("ICE Provision Success", "ICE "+event+"ed Successfully : '"+icename+"'\n"+"Copy or Download the token");
-					$("#generateICEToken").val(data);
-					$('#selAssignUser2').val($scope.provision.users[index].username)
-					adminServices.fetchICE()
-						.then(function (data) {
-							unblockUI();
-							if (data == "Invalid Session") {
-								$rootScope.redirectPage();
-							}
-							else if (data == 'fail') {
-									openModalPopup("ICE Provisions", "Failed to load ICE Provisions");
-							} else {
-								data.sort(function(a,b){ return a.icename > b.icename; });
-								$scope.provision.users=data;
-							}
-						}, function (error) {
-							unblockUI();
-							console.log("Error:::::::::::::", error);
-						});
-				}
-			}, function (error) {
-				unblockUI();
-				console.log("Error:::::::::::::", error);
-			});
+	$scope.provision.reregister = function ($event) {
+		const provisionDetails = $scope.provision.users[$($event.target).data("index")];
+		const icename = provisionDetails.icename;
+		const event=$.trim($event.currentTarget.textContent);
+		const tokeninfo = {
+			icename: icename,
+			userid: provisionDetails.provisionedto,
+			icetype: provisionDetails.icetype,
+			action: "reregister"
+		};
+		blockUI(event+"ing...");
+		adminServices.provisions(tokeninfo).then(function (data) {
+			unblockUI();
+			if (data == "Invalid Session") return $rootScope.redirectPage();
+			else if (data == 'fail') openModalPopup("ICE Provisions", "ICE "+event+" Failed");
+			else {
+				$scope.tokeninfo.icename = icename;
+				$scope.tokeninfo.token = data;
+				$scope.provision.token = data;
+				$scope.provision.icename = icename;
+				$scope.provision.op = provisionDetails.icetype;
+				$('#selAssignUser2').val(provisionDetails.provisionedto);
+				openModalPopup("ICE Provision Success", "ICE "+event+"ed Successfully: '"+icename+"'<br/>Copy or Download the token");
+				$scope.provision.fetchICE();
+			}
+		}, function (error) {
+			unblockUI();
+			console.log("Error:::::::::::::", error);
+		});
 	};
 
-	$(document).on('change', '#provisions', function (e){
-		$("#generateICEToken").val('');
-		$("#icename").val('');
-		if(e.currentTarget.value=="normal"){
-			$('#selectuser').show();
-			$('#userinfo').parent().show();
-			$('#tokeninfo').hide();
-			// $('.selectDomain').show();
-			//$('.provisionTokens').show();
-			adminServices.getUserDetails("user")
-			.then(function(data){
-				if(data == "Invalid Session") {
-					$rootScope.redirectPage();
-				} else if(data == "fail") {
-					openModalPopup("ICE Provision", "Failed to fetch users.");
-				} else if(data == "empty") {
-					openModalPopup("ICE Provision", "There are no users present.");
-				} else {
+	$scope.provision.selectProvisionType = function($event) {
+		$("#icename").removeClass("inputErrorBorder");
+		$("#selAssignUser2").removeClass("selectErrorBorder");
+		$scope.provision.token = $scope.provision.tokentooltip;
+		$scope.provision.icename = '';
+		if ($scope.provision.op == "normal") {
+			adminServices.getUserDetails("user").then(function(data) {
+				if (data == "Invalid Session") $rootScope.redirectPage();
+				else if (data == "fail") openModalPopup("ICE Provision", "Failed to fetch users.");
+				else if (data == "empty") openModalPopup("ICE Provision", "There are no users present.");
+				else {
 					data.sort(function(a,b){ return a[0] > b[0]; });
 					var selectBox = $("#selAssignUser2");
 					selectBox.empty();
-					selectBox.append('<option data-id="" value disabled selected>Select User</option>');
-					for(i=0; i<data.length; i++){
-						if(data[i][3] != "Admin"){
-							selectBox.append('<option data-id="'+data[i][1]+'" value="'+data[i][0]+'">'+data[i][0]+'</option>');
+					selectBox.append('<option value=" " disabled selected>Select User</option>');
+					for (i=0; i<data.length; i++) {
+						if(data[i][3] != "Admin") {
+							selectBox.append('<option value="'+data[i][1]+'">'+data[i][0]+'</option>');
 						}
 					}
 					selectBox.prop('selectedIndex', 0);
@@ -620,45 +536,42 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			}, function (error) {
 				console.log("Error:::::::::::::", error);
 			});
-			
-		}else{
-			//$('#selectuser').hide();
-			//$('.selectDomain').hide();
-			// $('#tokensDetail').empty();
-			// $('#tokensDetail').append("<tr><th>Token Name</th><th>Status</th><th>Expiry</th><th>Action</th></tr><tr ng-repeat='provision in provision.users'><td>{{provision.name}}</td><td>{{provision.deactivated}}</td><td>{{provision.expireson}}</td><td ng-if='provision.deactivated == 'active''><button class='btn'data-id='{{$index}}'ng-click='deactivate($event)'style='margin-left:-21%'>Deactivate</button></td><td ng-if='provision.deactivated != 'active''></td></tr>")
-			$('.provisionTokens').hide();
-			$("#selAssignUser2").empty();
-			$('#userinfo').parent().hide();
-			$('#tokeninfo').hide();
+		} else {
+			$("#selAssignUser2").prop('selectedIndex', 0);
 		}
-		adminServices.fetchICE()
-			.then(function (data) {
-				unblockUI();
-				if (data == "Invalid Session") {
-					$rootScope.redirectPage();
-				}
-				else if (data == 'fail') {
-						openModalPopup("ICE Provisions", "Failed to load ICE Provisions");
-				} else {
-					data.sort(function(a,b){ return a.icename > b.icename; });
-					$scope.provision.users=data;
-				}
-			}, function (error) {
-				unblockUI();
-				console.log("Error:::::::::::::", error);
-			});
-	});
+		$scope.provision.fetchICE();
+	};
+
+	$scope.provision.fetchICE = function($event) {
+		blockUI("Loading...");
+		adminServices.fetchICE().then(function (data) {
+			unblockUI();
+			if (data == "Invalid Session") $rootScope.redirectPage();
+			else if (data == 'fail') openModalPopup("ICE Provisions", "Failed to load ICE Provisions");
+			else {
+				data.sort(function(a,b){ return a.icename > b.icename; });
+				$scope.provision.users = data;
+			}
+		}, function (error) {
+			unblockUI();
+			console.log("Error:::::::::::::", error);
+		});
+	}
+
 	$scope.settings = function(){
 		blockUI();
 		$('#dialog-settings').attr('st');
 	}
+
 	$(document).on('click','.searchIcon', function($event){
 		filter(this,event);
 	});
+
 	$(document).on('keyup','#searchTasks', function($event) {
 		filter(this,event); 
 		// event.stopImmediatePropagation();
 	});
+
 	function filter(element,event) {
 		console.log('filter');
 		title=$('.searchInput').val();
@@ -673,6 +586,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			}
 		});
 	}
+
 	$scope.tokens.click = function () {
 		$scope.tokens.users=[]
 		$(".selectedIcon").removeClass("selectedIcon");
@@ -725,6 +639,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			console.log("Error:::::::::::::", error);
 		});
 	};
+
 	//	Generate CI user Token
 	$scope.generateCIusertokens = function ($event) {
 		$("#GenerateNewTkenModal").modal("hide");
@@ -843,6 +758,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			}
 		}		
 	};
+
 	$scope.deactivate = function ($event) {
 		var CIUser={}
 		action="deactivate";
@@ -873,6 +789,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				console.log("Error:::::::::::::", error);
 			});
 	};
+
 	$(document).on('focus', '.fc-datePicker', function(){
 		$(this).datepicker({
 			autoclose:"true",
@@ -893,6 +810,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			}
 		})
 	})
+
 	$(document).on('focus', '.fc-timePicker', function(){
 		$(this).timepicker({
 			minTime: new Date().getHours() + ':' + (parseInt(new Date().getMinutes()+5)),
@@ -2825,17 +2743,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		}, 300);
 	}
 
-	//Global provision popup
-	function openProvsionPopup(title, body) {
-		var mainModal = $("#ICEProvision");
-		mainModal.find('.modal-title').text(title);
-		mainModal.find('.modal-body p').text(body);
-		mainModal.modal("show");
-		setTimeout(function () {
-			$("#adminModal").find('.btn-default').focus();
-		}, 300);
-	}
-
 	//Global edit modal popup
 	function openEditGlobalModal(title, inputID, placeholder, buttonID) {
 		var editModal = $("#editGlobalModal");
@@ -3169,6 +3076,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		this.urlToolTip = "Single Sign-On URL (SAML assertion URL)"
 		this.idpToolTip = "Identity Issuer (Can be text or URL)"
 		this.certToolTip = "X.509 certificate issued by provider"
+		$("#samlAcsUrl,#samlIDP").removeClass("inputErrorBorder");
+		$("#samlCert").removeClass("inputErrorText");
+		var nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
+		$("#samlServerName").removeClass(nameErrorClass);
 	};
 
 	$scope.samlConf.validate = function(action) {
@@ -3356,6 +3267,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		this.secret = "";
 		this.idToolTip = "Public identifier for the client"
 		this.secretToolTip = "Secret used by the client to exchange an authorization code for a token"
+		$("#oidcUrl,#oidcClientId,#oidcClientSecret").removeClass("inputErrorBorder");
+		var nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
+		$("#oidcServerName").removeClass(nameErrorClass);
 	};
 
 	$scope.oidcConf.validate = function(action) {

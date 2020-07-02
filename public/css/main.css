@@ -6507,6 +6507,23 @@ h4.titleBadge
     pointer-events: none !important;
 }
 
-.projectForm1 i:hover{
-    background: whitesmoke;
+
+#icetokenarea textarea {
+    margin-top: 5px;
+    width: calc(100% - 180px);
+    height: 70px;
+    resize: none;
+}
+
+#icetokenarea span.fa {
+    font-size: 22px;
+    padding: 5px;
+    width: auto;
+    display: block;
+}
+
+#icetokenarea span.fa:hover {
+    background: #ddd;
+    border-radius: 7px;
+    cursor: pointer;
 }
