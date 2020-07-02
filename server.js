@@ -592,6 +592,8 @@ if (cluster.isMaster) {
 		app.post('/APG_OpenFileInEditor', flowGraph.APG_OpenFileInEditor);
 		app.post('/APG_createAPGProject', flowGraph.APG_createAPGProject);
 		app.post('/APG_runDeadcodeIdentifier', flowGraph.APG_runDeadcodeIdentifier);
+		// ICE Provisioning
+		app.post('/ICE_provisioning_register', io.registerICE);
 		//-------------Route Mapping-------------//
 
 		// To prevent can't send header response

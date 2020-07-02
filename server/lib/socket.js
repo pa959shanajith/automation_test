@@ -1,5 +1,6 @@
 var logger = require('../../logger');
 var redisServer = require('./redisSocketHandler');
+var utils = require('./utils');
 //SOCKET CONNECTION USING SOCKET.IO
 var socketMap = {};
 var userICEMap={};
@@ -43,19 +44,11 @@ io.on('connection', function (socket) {
 		});
 	} else {
 		var ice_info=socket.handshake.query;
-		var iceaction=ice_info.ice_action;
 		var icename=ice_info.icename;
-		if (iceaction=="register"){
-			logger.info("Registration request from ICE %s : %s", icename);
-		}else{
-			logger.info("Socket request from ICE");
-			logger.info("Socket connecting address %s : %s", icename);
-		}
+		logger.info("ICE Socket connecting address %s : %s", icename);
 		var icesession = ice_info.icesession;
-		var icetoken=ice_info.icetoken;
 		var inputs = {
 			"icesession": icesession,
-			"icetoken":icetoken,
 			"query": 'connect'
 		};
 		var args = {
@@ -69,13 +62,13 @@ io.on('connection', function (socket) {
 			function (result, response) {
 			if (response.statusCode != 200) {
 				logger.error("Error occurred in updateActiveIceSessions Error Code: ERRNDAC");
+				socket.send('fail', "conn");
 			} else {
 				socket.send('checkConnection', result.ice_check);
-				icename=result.icename;
 				if (result.node_check === "allow") {
 					socketMap[icename] = socket;
 					userICEMap[result.username]=icename;
-					socket.send('connected',result.ice_check);
+					setTimeout(()=> socket.send('connected', result.ice_check), 300);
 					logger.debug("%s is connected", icename);
 					logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
 					socket.emit('update_screenshot_path', screenShotPath);
@@ -86,10 +79,9 @@ io.on('connection', function (socket) {
 				} else {
 					if (result.node_check === "InvalidToken" || result.node_check === "InvalidICE") {
 						logger.error("%s is not authorized to connect", icename);
-					}else if(result.node_check === "validICE"){
+					} else if(result.node_check === "validICE"){
 						logger.info("%s Registered Successfully", icename)
-					}	
-					if (socket.handshake.query.ice_action != "register")
+					}
 					socket.disconnect(false);
 				}
 			}
@@ -142,7 +134,7 @@ io.on('connection', function (socket) {
 			}
 			if (connect_flag) {
 				var inputs = {
-					"username": address,
+					"icename": address,
 					"query": 'disconnect'
 				};
 				var args = {
@@ -208,4 +200,27 @@ io.on('connection', function (socket) {
 });
 //SOCKET CONNECTION USING SOCKET.IO
 
+const registerICE = async (req, res) => {
+	logger.info("Inside ICE Registration");
+	const icename = req.body.icename;
+	logger.info("Registration request from ICE %s : %s", icename);
+	const inputs = { "query": "connect", "icesession": req.body.icesession };
+	var data = {};
+	try {
+		data = await utils.fetchData(inputs, "server/updateActiveIceSessions", "registerICE");
+		if (data.node_check === "InvalidToken" || result.node_check === "InvalidICE") {
+			logger.error("%s is not authorized to connect", icename);
+		} else if(result.node_check === "validICE"){
+			logger.info("%s Registered Successfully", icename)
+		} else {
+			logger.info("Failed to register %s", icename)
+		}
+	} catch (ex) {
+		logger.info("Failed to register %s", icename)
+		data = "fail";
+	}
+	res.send(data.ice_check);
+};
+
 module.exports = io;
+module.exports.registerICE = registerICE;

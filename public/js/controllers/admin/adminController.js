@@ -300,7 +300,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			$scope.provision.op='normal';
 		}
 		else if(event.currentTarget.value=='ci-cd'){
-			$('#userToken').text('Ice Name')
+			$('#userToken').text('ICE Name')
 			$('#selAssignUser1').hide()
 			$('#selICEuser').show()
 			$scope.provision.op='ci-cd';
@@ -383,7 +383,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					$rootScope.redirectPage();
 				}
 				else if (data == 'fail') {
-						openModalPopup("ICE Provisions", "Failed to load Ice Provisions");
+						openModalPopup("ICE Provisions", "Failed to load ICE Provisions");
 				} else {
 					data.sort(function(a,b){ return a.icename > b.icename; });
 					$scope.provision.users=data;
@@ -438,7 +438,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 								$rootScope.redirectPage();
 							}
 							else if (data == 'fail') {
-									openModalPopup("ICE Provisions", "Failed to load Ice Provisions");
+									openModalPopup("ICE Provisions", "Failed to load ICE Provisions");
 							} else {
 								data.sort(function(a,b){ return a.icename > b.icename; });
 								$scope.provision.users=data;
@@ -469,26 +469,21 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		jsonDownload($scope.tokeninfo.icename+"_icetoken.txt",$scope.tokeninfo.token);
 	}
 
-	/*
-    function : jsonDownload()
-    Purpose : download json file
-    */
-
-   function jsonDownload(filename, responseData) {
-	if (isIE) {
-		window.navigator.msSaveOrOpenBlob(new Blob([responseData], { type: "text/json;charset=utf-8" }), filename);
-	} else {
-		var blob = new Blob([responseData], { type: 'text/json' });
-		var e = document.createEvent('MouseEvents');
-		var a = document.createElement('a');
-		a.download = filename;
-		a.href = window.URL.createObjectURL(blob);
-		a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
-		e.initMouseEvent('click', true, true, window,
+	function jsonDownload(filename, responseData) {
+		if (isIE) {
+			window.navigator.msSaveOrOpenBlob(new Blob([responseData], { type: "text/json;charset=utf-8" }), filename);
+		} else {
+			var blob = new Blob([responseData], { type: 'text/json' });
+			var e = document.createEvent('MouseEvents');
+			var a = document.createElement('a');
+			a.download = filename;
+			a.href = window.URL.createObjectURL(blob);
+			a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+			e.initMouseEvent('click', true, true, window,
 			0, 0, 0, 0, 0, false, false, false, false, 0, null);
-		a.dispatchEvent(e);
+			a.dispatchEvent(e);
+		}
 	}
-}
 
 	$scope.resetProvisions = function(){
 		$("#icename").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
@@ -529,7 +524,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 								$rootScope.redirectPage();
 							}
 							else if (data == 'fail') {
-									openModalPopup("ICE Provisions", "Failed to load Ice Provisions");
+									openModalPopup("ICE Provisions", "Failed to load ICE Provisions");
 							} else {
 								data.sort(function(a,b){ return a.icename > b.icename; });
 								$scope.provision.users=data;
@@ -577,7 +572,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 								$rootScope.redirectPage();
 							}
 							else if (data == 'fail') {
-									openModalPopup("ICE Provisions", "Failed to load Ice Provisions");
+									openModalPopup("ICE Provisions", "Failed to load ICE Provisions");
 							} else {
 								data.sort(function(a,b){ return a.icename > b.icename; });
 								$scope.provision.users=data;
@@ -643,7 +638,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					$rootScope.redirectPage();
 				}
 				else if (data == 'fail') {
-						openModalPopup("ICE Provisions", "Failed to load Ice Provisions");
+						openModalPopup("ICE Provisions", "Failed to load ICE Provisions");
 				} else {
 					data.sort(function(a,b){ return a.icename > b.icename; });
 					$scope.provision.users=data;

@@ -799,7 +799,7 @@
 						<option value="" disabled selected>Please Select User</option>
 					</select>
 					<select class="adminSelect form-control selectDomain" style="width: 71%" id="selICEuser">
-						<option value="" disabled selected>Please Select User</option>
+						<option value="" disabled selected>Please Select ICE</option>
 					</select>
 					<span ng-show="userNameRequired" class="error-msg ng-cloak errorlbl">{{userNameRequired}}</span>
 				</div>	
@@ -864,7 +864,7 @@
 				<span>ICE Provision</span>
 			</div>
 			<div class="adminActionBtn">
-				<button title="Generate New Token" class="btn btn-md pull-right adminBtn" ng-click="provision.click" style="margin-right:10px" title="Refresh">Refresh</button>
+				<button title="Generate New Token" class="btn btn-md pull-right adminBtn" ng-click="provision.click()" style="margin-right:10px" title="Refresh">Refresh</button>
 				<button title="Provision" class="btn btn-md pull-right adminBtn" ng-click="provisionsIce($event)" style="margin-right:10px" title="Provision">Provision</button>
 				<button title="Cancel" class="btn btn-md pull-right adminBtn" ng-click="resetProvisions($event)" style="margin-right:10px" title="Cancel">Cancel</button>
 			</div>
