@@ -3873,9 +3873,10 @@ select[multiple]:-internal-list-box option:checked {
 #samlCertValue {
     margin-top: 5px;
     width: calc(100% - 130px);
-    height: 175px;
+    height: 150px;
     font-size: 12px;
     resize: none;
+    float: right;
 }
 
 .sessionItemWrap {

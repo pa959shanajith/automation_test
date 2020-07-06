@@ -132,25 +132,6 @@ exports.manageUserDetails = function(req, res){
 					logger.error("Error occurred in admin/manageUserDetails Error Code : ERRNDAC");
 					res.status(500).send("fail");					
 				} else {
-                    "change here"
-					// if(action == 'delete'){
-					// 	qList.push({"statement":"match p = (m)-[FNTT]-(t:TASKS{assignedTo:'"+reqData.userid+"'}) where t.status = 'assigned' or t.status = 'inprogress' or t.status = 'reassign' detach delete t;"});
-					// 	qList.push({"statement":"match p = (m)-[FNTT]-(t:TASKS{reviewer:'"+reqData.userid+"'}) where t.status = 'review' detach delete t;"});
-					// 	qList.push({"statement":"match p = (m)-[FNTT]-(t:TASKS{assignedTo:'"+reqData.userid+"'}) set m.assignedTo = '' "});
-					// 	qList.push({"statement":"match p = (m)-[FNTT]-(t:TASKS{reviewer:'"+reqData.userid+"'}) set m.reviewer = '' "});
-					// }
-
-					// logger.info("Calling neo4jAPI execute queries for manageUserDetails");
-					// neo4jAPI.executeQueries(qList,function(status1,result1){
-					// 	if(status1!=200){
-					// 		logger.error("Error in neo4jAPI execute queries with status for manageUserDetails: %d",status1,"\n response for manageUserDetails:%s",result1);
-					// 		return res.send(result.rows);
-					// 	}
-					// 	else{
-					// 		logger.info('neo4jAPI execute queries for manageUserDetails executed successfully');
-					// 		return res.send(result.rows);
-					// 	}
-					// });					
 					res.send(result.rows)
 				}
 			});
@@ -359,10 +340,8 @@ exports.manageSessionData = async function (req, res) {
 	logger.info("Inside UI service: manageSessionData");
 	try {
 		if (utils.isSessionActive(req)) {
-			var currUser = req.session.username;
-			var action = req.body.action;
-			var user = req.body.user;
-			var key = req.body.key;
+			const currUser = req.session.username;
+			const action = req.body.action;
 			var data = {sessionData: [], clientData: []};
 			if (action == "get") {
 				logger.info("Inside UI service: manageSessionData/getSessions");
@@ -394,10 +373,13 @@ exports.manageSessionData = async function (req, res) {
 					return res.send(data);
 				});
 			} else if (action == "logout" || action == "disconnect") {
+				const user = req.body.user;
+				const reason = req.body.reason;
+				let key = req.body.key;
 				logger.info("Inside UI service: manageSessionData/"+action);
 				if (action == "logout") key = Buffer.from(req.body.key, "base64").toString();
-				  var d2s = {"action":action, "key":key, "user":user, "cmdBy":currUser};
-				utils.delSession(d2s, function(err){
+				const d2s = {"action":action, "key":key, "user":user, "cmdBy":currUser, "reason": reason};
+				utils.delSession(d2s, function(err) {
 					if (err) {
 						logger.error("Error occurred in admin/manageSessionData: Fail to "+action+" "+user);
 						logger.debug(err);
@@ -409,11 +391,10 @@ exports.manageSessionData = async function (req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error("Error occurred in admin/manageSessionData:",exception);
+		logger.error("Error occurred in admin/manageSessionData:", exception);
 		res.status(500).send("fail");
 	}
 };
-
 
 exports.getNames_ICE = function (req, res) {
 	logger.info("Inside UI service: getNames_ICE");
@@ -817,6 +798,143 @@ exports.manageLDAPConfig = function(req, res){
 		}
 	} catch (exception){
 		logger.error("Error occurred in admin/manageLDAPConfig", exception);
+		res.status(500).send("fail");
+	}
+};
+
+exports.getSAMLConfig = async (req, res) => {
+	const fnName = "getSAMLConfig";
+	const errPretext = "Error occurred in admin/" + fnName;
+	logger.info("Inside UI Service: " + fnName);
+	try {
+		const name = req.body.name || "all";
+		const inputs = { name: name};
+		var data = await utils.fetchData(inputs, "admin/getSAMLConfig", fnName);
+		if (data == "fail") res.status(500).send(data);
+		else if (data.length == 0) res.send("empty");
+		else res.send(data);
+	} catch (exception){
+		logger.error(errPretext, exception);
+		res.status(500).send("fail");
+	}
+}
+
+exports.manageSAMLConfig = async (req, res) => {
+	const fnName = "manageSAMLConfig";
+	const errPretext = "Error occurred in admin/" + fnName;
+	logger.info("Inside UI Service: " + fnName);
+	try{
+		let flag = ['1','0','0','0','0'];
+		const reqData = req.body.conf;
+		const action = req.body.action;
+		const inputs = {};
+		inputs.action = action;
+		inputs.name = (reqData.name || "").trim();
+		if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
+			logger.error(errPretext + ": Invalid action.");
+			flag[1] = '1';
+		}
+		if (validator.isEmpty(inputs.name)) {
+			logger.error(errPretext + ": SAML Server Name cannot be empty.");
+			flag[2] = '1';
+		}
+		if  (action != "delete") {
+			inputs.url = (reqData.url || "").trim();
+			inputs.idp = (reqData.idp || "").trim();
+			inputs.cert = (reqData.cert || "").trim();
+			if (validator.isEmpty(inputs.url)) {
+				logger.error(errPretext + ": Single Sign-On URL cannot be empty.");
+				flag[3] = '1';
+			} else if (!inputs.url.startsWith("https://") && !inputs.url.startsWith("http://")) {
+				logger.error(errPretext + ": Single Sign-On URL must start with http:// or https://");
+				flag[3] = '2';
+			}
+			if (validator.isEmpty(inputs.idp)) {
+				logger.error(errPretext + ": Issuer cannot be empty.");
+				flag[4] = '1';
+			}
+			if (validator.isEmpty(inputs.cert)) {
+				logger.error(errPretext + ": Certificate cannot be empty.");
+				flag[5] = '1';
+			} else if (inputs.cert.indexOf("BEGIN CERTIFICATE") == -1 || inputs.cert.indexOf("END CERTIFICATE") == -1) {
+				logger.error(errPretext + ": Invalid certificate provided.");
+				flag[5] = '2';
+			}
+		}
+		flag = flag.join('');
+		if (flag != "10000") return res.send(flag);
+		const data = await utils.fetchData(inputs, "admin/manageSAMLConfig", fnName);
+		if (data == "fail") res.status(500).send(data);
+		else return res.send(data);
+	} catch (exception){
+		logger.error(errPretext, exception);
+		res.status(500).send("fail");
+	}
+};
+
+exports.getOIDCConfig = async (req, res) => {
+	const fnName = "getOIDCConfig";
+	const errPretext = "Error occurred in admin/" + fnName;
+	logger.info("Inside UI Service: " + fnName);
+	try {
+		const name = req.body.name || "all";
+		const inputs = { name: name};
+		var data = await utils.fetchData(inputs, "admin/getOIDCConfig", fnName);
+		if (data == "fail") res.status(500).send(data);
+		else if (data.length == 0) res.send("empty");
+		else res.send(data);
+	} catch (exception){
+		logger.error(errPretext, exception);
+		res.status(500).send("fail");
+	}
+}
+
+exports.manageOIDCConfig = async (req, res) => {
+	const fnName = "manageOIDCConfig";
+	const errPretext = "Error occurred in admin/" + fnName;
+	logger.info("Inside UI Service: " + fnName);
+	try{
+		let flag = ['1','0','0','0','0'];
+		const reqData = req.body.conf;
+		const action = req.body.action;
+		const inputs = {};
+		inputs.action = action;
+		inputs.name = (reqData.name || "").trim();
+		if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
+			logger.error(errPretext + ": Invalid action.");
+			flag[1] = '1';
+		}
+		if (validator.isEmpty(inputs.name)) {
+			logger.error(errPretext + ": OIDC Server Name cannot be empty.");
+			flag[2] = '1';
+		}
+		if  (action != "delete") {
+			inputs.url = (reqData.url || "").trim();
+			inputs.clientid = (reqData.clientid || "").trim();
+			inputs.secret = (reqData.secret || "").trim();
+			if (validator.isEmpty(inputs.url)) {
+				logger.error(errPretext + ": Issuer URL cannot be empty.");
+				flag[3] = '1';
+			} else if (!inputs.url.startsWith("https://") && !inputs.url.startsWith("http://")) {
+				logger.error(errPretext + ": Issuer URL must start with http:// or https://");
+				flag[3] = '2';
+			}
+			if (validator.isEmpty(inputs.clientid)) {
+				logger.error(errPretext + ": Client ID cannot be empty.");
+				flag[4] = '1';
+			}
+			if (validator.isEmpty(inputs.secret)) {
+				logger.error(errPretext + ": Client Secret cannot be empty.");
+				flag[5] = '1';
+			}
+		}
+		flag = flag.join('');
+		if (flag != "10000") return res.send(flag);
+		const data = await utils.fetchData(inputs, "admin/manageOIDCConfig", fnName);
+		if (data == "fail") res.status(500).send(data);
+		else return res.send(data);
+	} catch (exception){
+		logger.error(errPretext, exception);
 		res.status(500).send("fail");
 	}
 };

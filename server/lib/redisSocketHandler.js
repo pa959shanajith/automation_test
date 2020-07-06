@@ -22,6 +22,11 @@ default_sub.on("message", (channel, message) => {
 		mySocket = sockets.allSchedulingSocketsMap[data.username];
 	else
 		mySocket = sockets.allSocketsMap[data.username];
+	if (mySocket === undefined) {
+		const dataToNode = JSON.stringify({"username": data.username, "onAction": "unavailableLocalServer", "value": {}});
+		server_pub.publish("ICE2_" + data.username, dataToNode);
+		return false;
+	}
 	switch (data.emitAction) {
 	case "webCrawlerGo":
 		mySocket.emit("webCrawlerGo", data.input_url, data.level, data.agent, data.proxy,data.searchData);
@@ -99,20 +104,20 @@ default_sub.on("message", (channel, message) => {
 	case "runDeadcodeIdentifier":
 		mySocket.emit("runDeadcodeIdentifier", data.version, data.path);
 		break;
-		
+
 	case "getSocketInfo":
 		const data_packet = {"username": data.username, "value": mySocket? mySocket.handshake.address:"fail"};
 		server_pub.publish("ICE2_" + data.username, JSON.stringify(data_packet));
 		break;
 
 	case "killSession":
-		mySocket.emit("killSession", data.cmdBy);
+		mySocket.emit("killSession", data.cmdBy, data.reason);
 		break;
-	
+
 	case "irisOperations":
 		mySocket.emit("irisOperations", data.image_data, data.param);
 		break
-		
+
 	default:
 		var dataToNode = JSON.stringify({"username": data.username, "onAction": "fail", "value": "fail"});
 		server_pub.publish("ICE2_" + data.username, dataToNode);

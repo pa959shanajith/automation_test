@@ -548,7 +548,6 @@
 			<!-- Button -->
 			<!-- Create Configuration Form -->
 			<div class="col-xs-9 form-group adminForm">
-				<h4>SAML Server Details</h4>
 				<div class='adminControl'><div>
 					<span class="leftControl" title="Server Name">Server Name</span>
 					<input type="text" autocomplete="off" id="samlServerName" name="samlServerName" ng-model="samlConf.name" maxlength="50" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Server Name"/>
@@ -586,7 +585,6 @@
 			<!-- Button -->
 			<!-- Edit Configuration Form -->
 			<div class="col-xs-9 form-group adminForm">
-				<h4>SAML Server Details</h4>
 				<div class='userForm adminControl'><div>
 					<span class="leftControl" title="Server Name">Server Name</span><select ng-change="samlConf.getServerData()" class='adminSelect form-control' ng-model="samlConf.name" id="samlServerName" class="form-control rightControl selectControl">
 						<option value="" disabled selected>Select Server</option>
@@ -626,7 +624,6 @@
 			<!-- Button -->
 			<!-- Create Configuration Form -->
 			<div class="col-xs-9 form-group adminForm">
-				<h4>OpenID Connect Server Details</h4>
 				<div class='adminControl'><div>
 					<span class="leftControl" title="Server Name">Server Name</span>
 					<input type="text" autocomplete="off" id="oidcServerName" name="oidcServerName" ng-model="oidcConf.name" maxlength="50" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Server Name"/>
@@ -663,7 +660,6 @@
 			<!-- Button -->
 			<!-- Edit Configuration Form -->
 			<div class="col-xs-9 form-group adminForm">
-				<h4>OpenID Connect Server Details</h4>
 				<div class='userForm adminControl'><div>
 					<span class="leftControl" title="Server Name">Server Name</span><select ng-change="oidcConf.getServerData()" class='adminSelect form-control' ng-model="oidcConf.name" id="oidcServerName" class="form-control rightControl selectControl">
 						<option value="" disabled selected>Select Server</option>
@@ -881,13 +877,11 @@
 					<input type="text" autocomplete="off" id="icename" name="icename" ng-model="provision.icename" maxlength="100" class="form-control form-control-custom create validationKeydown preventSpecialChar" placeholder="ICE Name"/>
 				</div></div>
 				<div class='userForm adminControl'><div>
-					<span class="leftControl" title="User">User</span><select class='adminSelect form-control' ng-disabled="provision.op!='normal'" ng-model="provision.userid" id="selAssignUser2" class="form-control rightControl selectControl">
-						<option value=" " disabled selected>Select User</option>
-					</select>
+					<span class="leftControl" title="User">User</span><select class='adminSelect form-control' ng-disabled="provision.op!='normal'" ng-model="provision.userid" id="selAssignUser2" ng-init="provision.userid=' '" ng-options="entry[1] as entry[0] for entry in provision.users"></select>
 				</div></div>
 				<div class='adminControl' id="icetokenarea"><div>
 					<span class="leftControl" title="Token">Token</span>
-					<textarea autocomplete="off" id="iceToken" name="iceToken" readonly="">{{provision.token}}</textarea>
+					<textarea autocomplete="off" id="iceToken" ng-model="provision.token" name="iceToken" readonly=""></textarea>
 					<!-- <input type="text" autocomplete="off" id="iceToken" name="iceToken" ng-model="provision.token" class="form-control form-control-custom create" placeholder="Click on Provision/Reregister to generate token" readonly="readonly"/> -->
 					<label style="float:right">
 						<span class="fa fa-files-o" style="width:auto;margin-right:10px" data-original-title="Click To Copy" ng-click="copyToken($event)"></span>
@@ -919,7 +913,7 @@
 								<th>  </th>
 								<th>  </th>
 							</tr>
-							<tr ng-repeat="entry in provision.users" class='provisionTokens'>
+							<tr ng-repeat="entry in provision.icelist" class='provisionTokens'>
 								<td> {{entry.icename}} </td>
 								<td> {{entry.icetype}} </td>
 								<td> {{entry.status}} </td>

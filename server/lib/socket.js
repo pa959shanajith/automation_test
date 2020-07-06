@@ -68,10 +68,12 @@ io.on('connection', function (socket) {
 				if (result.node_check === "allow") {
 					socketMap[icename] = socket;
 					userICEMap[result.username]=icename;
-					setTimeout(()=> socket.send('connected', result.ice_check), 300);
+					setTimeout(()=> {
+						socket.send('connected', result.ice_check);
+						socket.emit('update_screenshot_path', screenShotPath);
+					}, 300);
 					logger.debug("%s is connected", icename);
 					logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
-					socket.emit('update_screenshot_path', screenShotPath);
 					redisServer.redisSubClient.unsubscribe('ICE1_normal_' + icename);
 					redisServer.redisSubClient.unsubscribe('ICE1_scheduling_' + icename);
 					redisServer.redisSubClient.subscribe('ICE1_normal_' + icename);

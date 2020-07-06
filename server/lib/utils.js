@@ -69,7 +69,12 @@ module.exports.allSess = function (cb){
 
 module.exports.delSession = function (data, cb){
 	if (data.action == "disconnect") {
-		redisServer.redisPubICE.publish("ICE1_"+data.key+"_"+data.user, JSON.stringify({"emitAction":"killSession","username":data.user,"cmdBy":data.cmdBy}));
+		const dataToSend = JSON.stringify({"emitAction":"killSession","username":data.user,"cmdBy":data.cmdBy,"reason":data.reason});
+		if (data.key == "both") data.key = ["normal", "scheduling"];
+		else data.key = [data.key];
+		for (let key of data.key) {
+			redisServer.redisPubICE.publish("ICE1_"+key+"_"+data.user, dataToSend);
+		}
 		cb();
 	} else {
 		redisServer.redisPubICE.publish("UI_notify_"+data.user, JSON.stringify({"emitAction":"killSession","username":data.user}));

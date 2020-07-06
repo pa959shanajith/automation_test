@@ -527,6 +527,10 @@ if (cluster.isMaster) {
 		app.post('/testLDAPConnection', admin.testLDAPConnection);
 		app.post('/getLDAPConfig', admin.getLDAPConfig);
 		app.post('/manageLDAPConfig', admin.manageLDAPConfig);
+		app.post('/getSAMLConfig', auth.protect, admin.getSAMLConfig);
+		app.post('/manageSAMLConfig', auth.protect, admin.manageSAMLConfig);
+		app.post('/getOIDCConfig', auth.protect, admin.getOIDCConfig);
+		app.post('/manageOIDCConfig', auth.protect, admin.manageOIDCConfig);
 		app.post('/getCIUsersDetails', admin.getCIUsersDetails);
 		app.post('/manageCIUsers', admin.manageCIUsers);
 		app.post('/getPreferences', admin.getPreferences);
