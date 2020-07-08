@@ -543,6 +543,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			else if (data == 'fail') openModalPopup("ICE Provisions", "Failed to load ICE Provisions");
 			else {
 				data.sort(function(a,b){ return a.icename > b.icename; });
+				data = data.filter(e => e.provisionedto != "--Deleted--");
 				$scope.provision.icelist = data;
 			}
 		}, function (error) {
@@ -625,6 +626,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				openModalPopup("Token Management", "There are no users present.");
 			} else {
 				data.sort(function(a,b){ return a[0] > b[0]; });
+				data = data.filter(e => e.provisionedto!="--Deleted--");
 				var selectBox = $("#selICEuser");
 				selectBox.empty();
 				selectBox.append('<option data-id="" value disabled selected>Select ICE</option>');
