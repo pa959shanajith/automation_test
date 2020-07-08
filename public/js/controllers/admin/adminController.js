@@ -549,7 +549,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			unblockUI();
 			console.log("Error:::::::::::::", error);
 		});
-	}
+	};
+
+	$scope.provision.verifyName = function($event) {
+		const name = $scope.provision.icename;
+		const icelist = $scope.provision.icelist.map(e => e.icename);
+		if (icelist.indexOf(name) > -1) $("#icename").addClass("inputErrorBorder")[0].title = "ICE Name already Exists!";
+		else $("#icename").removeClass("inputErrorBorder")[0].title = "";
+	};
 
 	$scope.settings = function(){
 		blockUI();
@@ -2343,7 +2350,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	};
 
 	//Create / Update / Delete User
-	$scope.userConf.manage = function(action,$event) {
+	$scope.userConf.manage = function(action, $event) {
 		//Transaction Activity for Create/ Update/ Delete User button Action
 		// var labelArr = [];
 		// var infoArr = [];
@@ -2378,12 +2385,25 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		adminServices.manageUserDetails(action, userObj)
 		.then(function (data) {
 			unblockUI();
-			if(data == "Invalid Session"){
+			if(data == "Invalid Session") {
 				$rootScope.redirectPage();
 			} else if(data == "success") {
 				if (action == "create") $scope.userConf.click();
 				else $scope.userConf.edit();
 				openModalPopup(bAction+" User", "User "+action+"d successfully!");
+				if (action == "delete") {
+					adminServices.manageSessionData('logout', userObj.username, '?', 'dereg').then(function (data) {
+						if (data == "Invalid Session") return $rootScope.redirectPage();
+					}, function (error) {});
+					adminServices.fetchICE(userObj.userid).then(function (data) {
+						if (data == "Invalid Session") return $rootScope.redirectPage();
+						if (data.length == 0) return false;
+						const icename = data[0].icename;
+						adminServices.manageSessionData('disconnect', icename, '?', 'dereg').then(function (data) {
+							if (data == "Invalid Session") return $rootScope.redirectPage();
+						}, function (error) {});
+					}, function (error) {});
+				}
 			} else if(data == "exists") {
 				$("#userName").addClass("inputErrorBorder");
 				openModalPopup(bAction+" User", "User already Exists!");
@@ -2391,7 +2411,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (action == "create") $scope.userConf.click();
 				else $scope.userConf.edit();
 				openModalPopup(bAction+" User", "Failed to "+action+" user.");
-			} else if(/^2[0-4]{10}$/.test(data)) {
+			} else if(/^2[0-4]{8}$/.test(data)) {
 				if (parseInt(data[1])) {
 					openModalPopup(bAction+" User", "Failed to "+action+" user. Invalid Request!");
 					return;
@@ -2402,15 +2422,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (parseInt(data[4])) errfields.push("Last Name");
 				if (parseInt(data[5])) errfields.push("Password");
 				if (parseInt(data[6])) errfields.push("Email");
-				if (parseInt(data[7])) errfields.push("Primary Role");
-				if (parseInt(data[8])) errfields.push("Additional Role");
-				if (parseInt(data[9])) errfields.push("LDAP Server");
-				if (parseInt(data[10])) errfields.push("User Domain Name");
+				if (parseInt(data[7])) errfields.push("LDAP Server");
+				if (parseInt(data[8])) errfields.push("User Domain Name");
 				openModalPopup(bAction+" User", "Following values are invalid: "+errfields.join(", "));
 			}
 		}, function (error) {
 			unblockUI();
 			openModalPopup(bAction+" User", "Failed to "+action+" user.");
+			console.log("Error:::", error);
 		});
 	};
 
@@ -2648,7 +2667,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		var roleSel = $("#additionalRole_options");
 		var roleOpt = $("#additionalRoles");
 		if ((!roleSel.is(e.target) && roleSel.has(e.target).length === 0) && (!roleOpt.is(e.target) && roleOpt.has(e.target).length === 0)) {
-			$('#additionalRoles').hide();
+			roleOpt.hide();
 		}
 	});
 
@@ -2695,11 +2714,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			var userEnteredText = element.val();
 			var regex;
 			if (e.target.id == 'userName' || e.target.id == 'icename')
-				regex = /[\\[\]\~`!@#$%^&*()+={}|;:"',<>?/\s]/g;
+				regex = /[\\\~`@|;:"',<>?/\s]/g;
 			else if (e.target.id == 'ldapServerURL')
-				regex = /[\\[\]\~`!@#$%^&*()+={}|;"',<>?\s]/g;
+				regex = /[\\\[\]\~`!@#$%^&*()+={}|;"',<>?\s]/g;
 			else if (e.target.id == 'projectName' || e.target.id == 'releaseTxt' || e.target.id == 'cycleTxt' || e.target.id == 'releaseName' || e.target.id == 'cycleName')
-				regex = /[-\\[\]\~`!@#$%^&*()+={}|;:"',.<>?/\s]/g;
+				regex = /[-\\\[\]\~`!@#$%^&*()+={}|;:"',.<>?/\s]/g;
 			else
 				regex = /[-\\0-9[\]\~`!@#$%^&*()-+={}|;:"',.<>?/\s_]/g;
 			userEnteredText = userEnteredText.replace(regex, "");
@@ -3074,12 +3093,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$("#samlServerName").removeClass(nameErrorClass);
 	};
 
-	$scope.samlConf.validate = function() {
-		var flag = true;
+	$scope.samlConf.validate = function(action) {
+		let flag = true;
 		$("#samlAcsUrl,#samlIDP,#samlServerName").removeClass("inputErrorBorder");
 		$("#samlCert").removeClass("inputErrorText");
 		$("#samlServerName").removeClass("selectErrorBorder");
-		regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
+		const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
+		const nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
 		if (this.name == "") {
 			$("#samlServerName").addClass(nameErrorClass);
 			flag = false;
@@ -3105,7 +3125,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.samlConf.manage = function (action,$event) {
 		const samlConf = $scope.samlConf;
-		if (!samlConf.validate()) return;
+		if (!samlConf.validate(action)) return;
 		const bAction = action.charAt(0).toUpperCase() + action.substr(1);
 		var confObj = {
 			name: samlConf.name,
@@ -3160,7 +3180,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.samlConf.edit = function () {
 		$scope.tab = "tabsamlConfigEdit";
 		$scope.samlConf.click("edit");
-		const selBox = $("#samlServerName");
 		blockUI("Fetching details...");
 		adminServices.getSAMLConfig()
 		.then(function(data) {
@@ -3169,15 +3188,17 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			else if(data == "fail") openModalPopup("Edit Configuration", "Failed to fetch configurations.");
 			else if(data == "empty") {
 				openModalPopup("Edit Configuration", "There are no configurations created yet.");
+				const selBox = $("#samlServerName");
 				selBox.empty();
 				selBox.append("<option value='' disabled selected>Select Server</option>");
 				selBox.prop("selectedIndex", 0);
 			} else {
 				data.sort(function(a,b){ return a > b; });
+				const selBox = $("#samlServerName");
 				selBox.empty();
 				selBox.append("<option value='' disabled selected>Select Server</option>");
 				for(var i = 0; i < data.length; i++){
-					selBox.append("<option value='"+data[i]+"'>"+data[i]+"</option>");
+					selBox.append("<option value='"+data[i].name+"'>"+data[i].name+"</option>");
 				}
 				selBox.prop("selectedIndex", 0);
 			}
@@ -3243,11 +3264,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$("#oidcServerName").removeClass(nameErrorClass);
 	};
 
-	$scope.oidcConf.validate = function() {
-		var flag = true;
+	$scope.oidcConf.validate = function(action) {
+		let flag = true;
 		$("#oidcUrl,#oidcClientId,#oidcClientSecret,#oidcServerName").removeClass("inputErrorBorder");
 		$("#oidcServerName").removeClass("selectErrorBorder");
-		regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
+		const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
+		const nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
 		if (this.name == "") {
 			$("#oidcServerName").addClass(nameErrorClass);
 			flag = false;
@@ -3272,8 +3294,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	};
 
 	$scope.oidcConf.manage = function (action,$event) {
-		const oidcConf = $scope.samlConf;
-		if (!oidcConf.validate()) return;
+		const oidcConf = $scope.oidcConf;
+		if (!oidcConf.validate(action)) return;
 		const bAction = action.charAt(0).toUpperCase() + action.substr(1);
 		var confObj = {
 			name: oidcConf.name,
@@ -3328,7 +3350,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.oidcConf.edit = function () {
 		$scope.tab = "taboidcConfigEdit";
 		$scope.oidcConf.click("edit");
-		const selBox = $("#oidcServerName");
 		blockUI("Fetching details...");
 		adminServices.getOIDCConfig()
 		.then(function(data){
@@ -3337,15 +3358,17 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			else if(data == "fail") openModalPopup("Edit Configuration", "Failed to fetch configurations.");
 			else if(data == "empty") {
 				openModalPopup("Edit Configuration", "There are no configurations created yet.");
+				const selBox = $("#oidcServerName");
 				selBox.empty();
 				selBox.append("<option value='' disabled selected>Select Server</option>");
 				selBox.prop("selectedIndex", 0);
 			} else {
 				data.sort(function(a,b){ return a > b; });
+				const selBox = $("#oidcServerName");
 				selBox.empty();
 				selBox.append("<option value='' disabled selected>Select Server</option>");
 				for(var i = 0; i < data.length; i++){
-					selBox.append("<option value='"+data[i]+"'>"+data[i]+"</option>");
+					selBox.append("<option value='"+data[i].name+"'>"+data[i].name+"</option>");
 				}
 				selBox.prop("selectedIndex", 0);
 			}
@@ -3365,7 +3388,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	});
 
 	$scope.oidcConf.getServerData = function () {
-		const name = $scope.samlConf.name;
+		const name = $scope.oidcConf.name;
 		const failMsg = "Failed to fetch details for '"+name+"' configuration.";
 		blockUI("Fetching details...");
 		adminServices.getOIDCConfig(name)

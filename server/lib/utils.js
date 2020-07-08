@@ -63,34 +63,45 @@ module.exports.getSocketList = async (toFetch) => {
 	return connectusers;
 };
 
-module.exports.allSess = function (cb){
-	myserver.redisSessionStore.all(cb);
+module.exports.allSess = async () => {
+	return myserver.rsStore.pAll();
 };
 
-module.exports.delSession = function (data, cb){
+module.exports.delSession = async (data) => {
+	const dataToSend = JSON.stringify({"emitAction":"killSession","username":data.user,"cmdBy":data.cmdBy,"reason":data.reason});
 	if (data.action == "disconnect") {
-		const dataToSend = JSON.stringify({"emitAction":"killSession","username":data.user,"cmdBy":data.cmdBy,"reason":data.reason});
-		if (data.key == "both") data.key = ["normal", "scheduling"];
-		else data.key = [data.key];
-		for (let key of data.key) {
-			redisServer.redisPubICE.publish("ICE1_"+key+"_"+data.user, dataToSend);
-		}
-		cb();
+		redisServer.redisPubICE.publish("ICE1_"+data.key+"_"+data.user, dataToSend);
+		return true;
 	} else {
-		redisServer.redisPubICE.publish("UI_notify_"+data.user, JSON.stringify({"emitAction":"killSession","username":data.user}));
-		myserver.redisSessionStore.destroy(data.key, cb);
+		redisServer.redisPubICE.publish("UI_notify_"+data.user, dataToSend);
+		const sessDeletePromise = myserver.rsStore.pDestroy(data.key);
+		return sessDeletePromise;
 	}
 };
 
-module.exports.cloneSession = function (req, cb){
+module.exports.findSessID = async (username) => {
+	let sid = "";
+	const sessList = await this.allSess();
+	for (let ki of sessList) {
+		if (username == ki.username) {
+			sid = ki.uniqueId;
+			break;
+		}
+	}
+	return sid;
+};
+
+module.exports.cloneSession = async (req) => {
 	var sessid = "sess:" + req.session.id;
-	var sessClient = myserver.redisSessionStore.client;
-	sessClient.ttl(sessid, function(err, ttl) {
-		if (err) return cb(err);
-		var args = [sessid,JSON.stringify(req.session),'EX',ttl];
-		req.clearSession();
-		sessClient.set(args, function(err) { return cb(err); });
-	});
+	var sessClient = myserver.rsStore.client;
+	return (new Promise((rsv, rej) => {
+		sessClient.ttl(sessid, (err, ttl) => {
+			if (err) return rsv(err);
+			var args = [sessid,JSON.stringify(req.session),'EX',ttl];
+			req.clearSession();
+			sessClient.set(args, err => rsv(err));
+		});
+	}));
 };
 
 module.exports.isSessionActive = function (req){

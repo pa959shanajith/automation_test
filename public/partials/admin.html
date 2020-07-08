@@ -22,10 +22,10 @@
 						<span><span class='fa fa-link'></span></span>Assign Projects</a></li>
 					<li><a id='ldapConfigTab' title="Manage LDAP Configuration" ng-click="tab = 'tabldapConfig';ldapConf.click()" class="selectBrowser" data-name="4">
 						<span><span class='fa fa-address-book'></span></span>LDAP Configuration</a></li>
-					<!--<li><a id='samlConfigTab' title="Manage SAML Configuration" ng-click="tab = 'tabsamlConfig';samlConf.click()" class="selectBrowser" data-name="4">
+					<!-- <li><a id='samlConfigTab' title="Manage SAML Configuration" ng-click="tab = 'tabsamlConfig';samlConf.click()" class="selectBrowser" data-name="4">
 						<span><span class='fa fa-lock'></span></span>SAML Configuration</a></li>
 					<li><a id='oidcConfigTab' title="Manage OpenID Connect Configuration" ng-click="tab = 'taboidcConfig';oidcConf.click()" class="selectBrowser" data-name="4">
-						<span><span class='fa fa-openid'></span></span>OpenID Connect Configuration</a></li>-->
+						<span><span class='fa fa-openid'></span></span>OpenID Connect Configuration</a></li> -->
 					<li><a id='sessionTab' title="Session Management" ng-click="tab = 'tabSession';sessionConf.click()" class="selectBrowser" data-name="5">
 						<span><span class='fa fa-users'></span></span>Session Management</a></li>
 					<li style="margin-bottom: 30px"><a id='preferencesTab' title="Preferences" ng-click="tab='tabPreferences';preferences.click()" class="selectBrowser" data-name="2">
@@ -169,8 +169,8 @@
 				</div>
 				<div class="col-xs-6 selectRole" ng-if="userConf.userIdName && userConf.rolename!='Admin'">
 					<label class="leftControl secondaryRole" id="additionalRoleTxt">Additional Role: </label>
-					<label class="chooseRole dropdown-toggle" id="additionalRole_options" data-toggle="dropdown" ng-click="userConf.toggleAddRoles()"> Select Additional Role</label>
-					<ul class="dropdown-menu-multiselect" id="additionalRoles">
+					<label class="chooseRole dropdown-toggle" id="additionalRole_options" data-toggle="dropdown" ng-click="userConf.toggleAddRoles()" title="Select Additional Role">Select Additional Role</label>
+					<ul class="dropdown-menu-multiselect" id="additionalRoles" style="display:none">
 						<li class='RolesCheck' ng-repeat="arid in userConf.allAddRoles" ng-if="arid[1]!=userConf.role" ng-click="userConf.addRole[arid[1]]= !userConf.addRole[arid[1]]">
 							<span class='rolesSpan'><input class='addcheckBox' name="additionalRole" type='checkbox' value="{{arid[1]}}" ng-model="userConf.addRole[arid[1]]" ng-click="userConf.addRole[arid[1]]= !userConf.addRole[arid[1]]"/><label class='rolesChecklabel'>{{arid[0]}}</label></span>
 						</li>
@@ -874,7 +874,7 @@
 				</div></div>
 				<div class='adminControl'><div>
 					<span class="leftControl" title="ICE Name">ICE Name</span>
-					<input type="text" autocomplete="off" id="icename" name="icename" ng-model="provision.icename" maxlength="100" class="form-control form-control-custom create validationKeydown preventSpecialChar" placeholder="ICE Name"/>
+					<input type="text" autocomplete="off" id="icename" name="icename" ng-change="provision.verifyName($event)" ng-model="provision.icename" maxlength="100" class="form-control form-control-custom create validationKeydown preventSpecialChar" placeholder="ICE Name"/>
 				</div></div>
 				<div class='userForm adminControl'><div>
 					<span class="leftControl" title="User">User</span><select class='adminSelect form-control' ng-disabled="provision.op!='normal'" ng-model="provision.userid" id="selAssignUser2" ng-init="provision.userid=' '" ng-options="entry[1] as entry[0] for entry in provision.users"></select>

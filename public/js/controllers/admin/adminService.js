@@ -177,8 +177,10 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
-		fetchICE: function () {
-			return $http.post('/fetchICE')
+		fetchICE: function (args) {
+			return $http.post('/fetchICE', {
+				user: args
+			})
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
