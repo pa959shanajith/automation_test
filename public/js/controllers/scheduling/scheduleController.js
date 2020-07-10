@@ -131,6 +131,8 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 			if(parseInt(brow) == 1) return './imgs/ic-ch-schedule.png';
 			else if(parseInt(brow) == 2) return './imgs/ic-ff-schedule.png';
 			else if(parseInt(brow) == 3) return './imgs/ic-ie-schedule.png';
+			else if(parseInt(brow) == 7) return './imgs/legacy.png';
+			else if(parseInt(brow) == 8) return './imgs/chromium.png';
 		} 
 		else if(appType == "Webservice") return './imgs/webservice.png';
 		else if(appType == "MobileApp") return './imgs/mobileApps.png';
@@ -208,11 +210,13 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 
 	//Select Browser Function
 	$(document).on("click", ".selectBrowserSc", function(){
-		if($(this).find("img").hasClass("sb") == false) {
+		if($(this).find("img").hasClass("sb") == false && $(this).find("svg").hasClass("sb") == false) {
 			browserTypeExe.splice(browserTypeExe.indexOf(''+$(this).data("name")), 1);
 			$(this).find("img").removeClass("sb");
+			$(this).find("svg").removeClass("sb");
 		} else {
 			$(this).find("img").addClass("sb");
+			$(this).find("svg").addClass("sb");
 			browserTypeExe.push(''+$(this).data("name"));
 		}
 	})

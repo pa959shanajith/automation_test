@@ -1433,7 +1433,6 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 	// console.log(screendata)
 
 	if(adjacentItems){
-		// console.log("adjacent:",adjacentItems);
 		// list of sources(only shapes) and targets (assuming only one)
 		if(adjacentItems["error"]){
 			console.log(adjacentItems["error"]);
