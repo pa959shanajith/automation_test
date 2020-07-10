@@ -22,8 +22,7 @@ function checkAssignedProjects(username, main_callback) {
 	async.waterfall([
 		function getUserInfo(callback) {
 			var inputs = {
-				"username": username,
-				"query": "userInfobyName"
+				"username": username
 			};
 			var args = {
 				data: inputs,
@@ -141,8 +140,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 			async.waterfall([
 				function userInfo(callback) {
 					var inputs = {
-						"username": userName,
-						"query": "userInfobyName"
+						"username": userName
 					};
 					var args = {
 						data: inputs,
@@ -273,8 +271,7 @@ exports.resetPassword_Nineteen68 = function(req, res) {
 	var currpassword = req.body.currpassword;
 	var newpassword = req.body.newpassword;
 	var inputs = {
-		"username": username,
-		"query":'userInfobyName'
+		"username": username
 	};
 	var args = {
 		data: inputs,

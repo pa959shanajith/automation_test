@@ -307,6 +307,7 @@ exports.manageCIUsers = function (req, res) {
 				} else if (response.statusCode != 200 || result.rows == "duplicate"){
 					res.send("duplicate")
 				}else {
+					result.rows.token = token;
 					res.send(result.rows);
 				}
 			});
@@ -353,7 +354,7 @@ exports.getCIUsersDetails = function(req,res){
 };
 
 //Manage Session for User
-exports.manageSessionData = function (req, res) {
+exports.manageSessionData = async function (req, res) {
 	logger.info("Inside UI service: manageSessionData");
 	try {
 		if (utils.isSessionActive(req)) {
@@ -364,33 +365,32 @@ exports.manageSessionData = function (req, res) {
 			var data = {sessionData: [], clientData: []};
 			if (action == "get") {
 				logger.info("Inside UI service: manageSessionData/getSessions");
-				utils.getSocketList("ICE", function(connectusers) {
-					connectusers.forEach(function(e) {
-						data.clientData.push({
-							username: e[0],
-							mode: e[1],
-							ip: e[2]
+				const connectusers = await utils.getSocketList("ICE");
+				connectusers.forEach(function(e) {
+					data.clientData.push({
+						username: e[0],
+						mode: e[1],
+						ip: e[2]
+					});
+				});
+				utils.allSess(function(err, sessions){
+					if (err) {
+						logger.error("Error occurred in admin/manageSessionData");
+						logger.debug(err);
+					} else {
+						sessions.forEach(function(e) {
+							if (e.uniqueId && currUser != e.username) {
+								data.sessionData.push({
+									username: e.username,
+									id: Buffer.from(e.uniqueId).toString("base64"),
+									role: e.activeRole,
+									loggedin: (new Date(e.loggedin)).toLocaleString(),
+									ip: e.ip
+								});
+							}
 						});
-					});
-					utils.allSess(function(err, sessions){
-						if (err) {
-							logger.error("Error occurred in admin/manageSessionData");
-							logger.debug(err);
-						} else {
-							sessions.forEach(function(e) {
-								if (e.uniqueId && currUser != e.username) {
-									data.sessionData.push({
-										username: e.username,
-										id: Buffer.from(e.uniqueId).toString("base64"),
-										role: e.activeRole,
-										loggedin: (new Date(e.loggedin)).toLocaleString(),
-										ip: e.ip
-									});
-								}
-							});
-						}
-						return res.send(data);
-					});
+					}
+					return res.send(data);
 				});
 			} else if (action == "logout" || action == "disconnect") {
 				logger.info("Inside UI service: manageSessionData/"+action);

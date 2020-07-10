@@ -8,6 +8,7 @@ const server_sub = redis.createClient(redisConfig);
 // const cache = redis.createClient(redisConfig);
 // cache.select(2);
 const server_pub = default_pub;
+default_pub.pubsubPromise =  async (cmd, ...channel) => (new Promise((rsv, rej) => default_pub.pubsub(cmd, channel, (e,d) => ((e)? rej(e):rsv(d)))));
 
 default_sub.on("message", (channel, message) => {
 	logger.debug("In redisSocketHandler: Channel is %s", channel);
@@ -188,7 +189,7 @@ module.exports.initListeners = mySocket => {
 
 	mySocket.on("message", value => {
 		if (value == "unavailableLocalServer") {
-			const dataToNode = JSON.stringify({"username": username, "onAction": value});
+			const dataToNode = JSON.stringify({"username": username, "onAction": value, "value": {}});
 			server_pub.publish("ICE2_" + username, dataToNode);
 		} else console.log("\n\nOn Message:", value);
 	});

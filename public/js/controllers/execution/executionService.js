@@ -19,11 +19,10 @@ mySPA.factory('ExecutionService', ['$http','$q', function ($http,$q)   {
 			function(response)        {return $q.reject(response.data)})
 		},
 		
-		ExecuteTestSuite_ICE : function(moduleInfo,exc_action){
-			return $http.post('/ExecuteTestSuite_ICE',{
+		ExecuteTestSuite_ICE : function(executionData){
+			return $http.post('/ExecuteTestSuite_ICE', {
 				param : 'ExecuteTestSuite_ICE',
-				moduleInfo: moduleInfo,
-				action: exc_action
+				executionData: executionData
 			})
 			.then(function(response)  { return response.data},
 			function(response)        {return $q.reject(response.data)})

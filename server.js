@@ -45,6 +45,7 @@ if (cluster.isMaster) {
 		var lusca = require('lusca');
 		var consts = require('constants');
 		var redis = require("redis");
+		var path = require('path');
 		var Client = require("node-rest-client").Client;
 		var apiclient = new Client();
 		var redisStore = require('connect-redis')(sessions);
@@ -441,6 +442,21 @@ if (cluster.isMaster) {
 			return res.sendFile("app.html", { root: __dirname + "/public/" });
 		});
 
+		app.get('/Nineteen68_ICE', async (req, res) => {
+			const iceFile = "Nineteen68_ICE.zip";
+			const iceFilePath = path.resolve(process.env.HOST_PATH);
+			if (req.query.file == "getICE") {
+				return res.sendFile(iceFile, { root: iceFilePath })
+			} else {
+				let status = "na";
+				try {
+					await fs.promises.access(iceFilePath + path.sep + iceFile);
+					status = "available";
+				} catch (error) {}
+				return res.send(status);
+			}
+		});
+
 		//Route Directories
 		var mindmap = require('./server/controllers/mindmap');
 		var login = require('./server/controllers/login');
@@ -478,21 +494,15 @@ if (cluster.isMaster) {
 
 		app.post('/populateProjects', mindmap.populateProjects);
 		app.post('/populateUsers', mindmap.populateUsers);
-		app.post('/checkReuse', mindmap.checkReuse);
-		// app.post('/getCRId', mindmap.getCRId);
 		app.post('/getProjectTypeMM_Nineteen68', mindmap.getProjectTypeMM_Nineteen68);
 		app.post('/populateScenarios', mindmap.populateScenarios);
-		app.post('/populateReleases', mindmap.populateReleases);
-		app.post('/populateCycles', mindmap.populateCycles);
-		app.post('/getModules', mindmap.getModules);
+		app.post('/getModules', auth.protect, mindmap.getModules);
 		app.post('/reviewTask', mindmap.reviewTask);
 		app.post('/saveData', mindmap.saveData);
 		app.post('/saveEndtoEndData', mindmap.saveEndtoEndData);
 		app.post('/excelToMindmap', mindmap.excelToMindmap);
 		app.post('/getScreens', mindmap.getScreens);
 		app.post('/exportToExcel', mindmap.exportToExcel);
-		app.post('/getDomain', mindmap.getDomain);
-
 		app.post('/pdProcess',mindmap.pdProcess);	// process discovery service
 		//Login Routes
 		//app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
@@ -535,19 +545,15 @@ if (cluster.isMaster) {
 		app.post('/getKeywordDetails_ICE', design.getKeywordDetails_ICE);
 		app.post('/getTestcasesByScenarioId_ICE', design.getTestcasesByScenarioId_ICE);
 		//Execute Screen Routes
-		app.post('/readTestSuite_ICE', suite.readTestSuite_ICE);
-		app.post('/updateTestSuite_ICE', suite.updateTestSuite_ICE);
-		//app.post('/updateTestScenario_ICE', suite.updateTestScenario_ICE);
-		app.post('/ExecuteTestSuite_ICE', suite.ExecuteTestSuite_ICE);
-		app.post('/getTestcaseDetailsForScenario_ICE', suite.getTestcaseDetailsForScenario_ICE);
-		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_SVN);
-		//app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
-		// app.post('/getListofScheduledSocketMap',suite.getListofScheduledSocketMap);
-
+		app.post('/readTestSuite_ICE', auth.protect, suite.readTestSuite_ICE);
+		app.post('/updateTestSuite_ICE', auth.protect, suite.updateTestSuite_ICE);
+		app.post('/getTestcaseDetailsForScenario_ICE', auth.protect, suite.getTestcaseDetailsForScenario_ICE);
+		app.post('/ExecuteTestSuite_ICE', auth.protect, suite.ExecuteTestSuite_ICE);
+		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
 		//Scheduling Screen Routes
-		app.post('/testSuitesScheduler_ICE', suite.testSuitesScheduler_ICE);
-		app.post('/getScheduledDetails_ICE', suite.getScheduledDetails_ICE);
-		app.post('/cancelScheduledJob_ICE', suite.cancelScheduledJob_ICE);
+		app.post('/testSuitesScheduler_ICE', auth.protect, suite.testSuitesScheduler_ICE);
+		app.post('/getScheduledDetails_ICE', auth.protect, suite.getScheduledDetails_ICE);
+		app.post('/cancelScheduledJob_ICE', auth.protect, suite.cancelScheduledJob_ICE);
 		//Report Screen Routes
 		app.post('/getAllSuites_ICE', report.getAllSuites_ICE);
 		app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
@@ -557,6 +563,7 @@ if (cluster.isMaster) {
 		app.post('/openScreenShot', report.openScreenShot);
 		app.post('/connectJira_ICE', report.connectJira_ICE);
 		app.post('/getReportsData_ICE', report.getReportsData_ICE);
+		app.post('/get_Nineteen68Report', report.get_Nineteen68Report);
 		//Plugin Routes
 		app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
 		app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);

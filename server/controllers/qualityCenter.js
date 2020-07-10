@@ -22,20 +22,14 @@ exports.loginQCServer_ICE = function (req, res) {
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("ICE Socket connecting IP: %s" , ip);
 			logger.debug("ICE Socket requesting Address: %s" , name);
-            var check_qcUrl = validator.isEmpty(req.body.qcURL);
-			var validate_qcUsername,validate_qcPassword,validate_qcUrl;
-            if(check_qcUrl == false) {
-                validate_qcUrl = true;
+            var check_qcUrl = !validator.isEmpty(req.body.qcURL);
+            var check_qcUsername = !validator.isEmpty(req.body.qcUsername);
+            var check_qcPassword = !validator.isEmpty(req.body.qcPassword);
+			if(!check_qcUrl) {
+				logger.info("Error occurred in loginQCServer_ICE: Invalid QC Url");
+				return res.send("invalidurl");
             }
-            var check_qcUsername = validator.isEmpty(req.body.qcUsername);
-            if(check_qcUsername == false) {
-                validate_qcUsername = true;
-            }
-            var check_qcPassword = validator.isEmpty(req.body.qcPassword);
-            if(check_qcPassword == false) {
-                 validate_qcPassword = true;
-            }
-			if(validate_qcUrl == true && validate_qcUsername == true &&  validate_qcPassword == true) {
+			if(check_qcUrl && check_qcUsername &&  check_qcPassword) {
 				redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 					if (redisres[1]>0) {
 						var username = req.body.qcUsername;
@@ -81,25 +75,16 @@ exports.loginQCServer_ICE = function (req, res) {
 					}
 				});
 			} else {
-				logger.info("Invalid Session");
-				res.send("Invalid Session");
+				logger.info("Error occurred in loginQCServer_ICE: Invalid QC Credentials");
+				res.send("invalidcredentials");
 			}
 		} else {
-			utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-				var flag="";
-				if (found) flag = "scheduleModeOn";
-				else flag = "unavailableLocalServer";
-				res.send(flag);
-			});
+			logger.error("Invalid Session");
+			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error(exception.message);
-		utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-			var flag="";
-			if (found) flag = "scheduleModeOn";
-			else flag = "unavailableLocalServer";
-			res.send(flag);
-		});
+		logger.error("Error occurred in loginQCServer_ICE:", exception.message);
+		res.send("fail");
 	}
 };
 
@@ -139,10 +124,10 @@ exports.qcProjectDetails_ICE = function (req, res) {
 										soc.emit("ICEnotAvailable");
 									}
 								} else if (data.onAction == "qcresponse") {
-									if (data.value.toLowerCase() == "fail")
+									if (data == "fail")
 										res.send("fail");
 									else {
-										data = JSON.parse(data.value);
+										data = data.value;
 										try {
 											projectDetailList.nineteen68_projects = projectdata;
 											projectDetailList.qc_projects = data.project;
@@ -209,7 +194,7 @@ function getProjectsForUser(userid, cb) {
 				} else {
 					if (projectrows.rows.length != 0) {
 						//flagtocheckifexists = true;
-						projectidlist = projectrows.rows[0].projectids;
+						projectidlist = projectrows.rows[0].projects;
 					}
 				}
 				callback1();
@@ -259,7 +244,7 @@ function projectandscenario(projectid, cb) {
 					logger.error("Error occurred in getProjectsForUser from projectname1 Error Code : ERRNDAC");
 				} else {
 					if (projectdata.rows.length != 0) {
-						projectname = projectdata.rows[0].projectname;
+						projectname = projectdata.rows[0].name;
 					}
 				}
 				callback1();
@@ -378,14 +363,12 @@ exports.saveQcDetails_ICE = function (req, res) {
 		flag = false;
 	}
 	async.forEachSeries(mappedDetails, function (itr, callback) {
-		var qcdetailsid = null;
 		var testscenarioid = itr.scenarioId;
 		var qcdomain = itr.domain;
 		var qcproject = itr.project;
 		var qcfolderpath = itr.folderpath;
 		var qctestcase = itr.testcase;
 		var qctestset = itr.testset;
-		var scenarioquery = "INSERT INTO qualitycenterdetails (testscenarioid,qcdetailsid,qcdomain,qcfolderpath,qcproject,qctestcase,qctestset) VALUES (" + testscenarioid + "," + testscenarioid + ",'" + qcdomain + "','" + qcfolderpath + "','" + qcproject + "','" + qctestcase + "','" + qctestset + "')";
 		var inputs = {
 			"testscenarioid": testscenarioid,
 			"qcdetailsid": testscenarioid,
@@ -471,7 +454,7 @@ function getQcDetailsForUser(userid, cb) {
 				} else {
 					if (projectrows.rows.length != 0) {
 						//flagtocheckifexists = true;
-						projectidlist = projectrows.rows[0].projectids;
+						projectidlist = projectrows.rows[0].projects;
 					}
 
 				}
@@ -538,7 +521,7 @@ function qcscenariodetails(projectid, cb) {
 			logger.info("Inside function qcdetails");
 			async.forEachSeries(scenarios_list, function (itr, callback2) {
 				var inputs = {
-					"testscenarioid": itr.testscenarioid,
+					"testscenarioid": itr._id,
 					"query": "qcdetails"
 				};
 				var args = {
@@ -556,7 +539,7 @@ function qcscenariodetails(projectid, cb) {
 						if (qcdetailsows.rows.length != 0) {
 							//flagtocheckifexists = true;
 							qcdetails = JSON.parse(JSON.stringify(qcdetailsows.rows[0]));
-							qcdetails.testscenarioname = itr.testscenarioname;
+							qcdetails.testscenarioname = itr.name;
 							// projectDetails.project_id = projectid;
 							// projectDetails.scenario_details = scenarios_list;
 							// projectDetails.project_name = projectname;
