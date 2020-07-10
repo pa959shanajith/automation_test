@@ -208,16 +208,12 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 
 	//Select Browser Function
 	$(document).on("click", ".selectBrowserSc", function(){
-		//$(this).find("img").toggleClass("sb")
-		if($(this).find("img").hasClass("sb") == false && $(this).find("svg").hasClass("sb") == false) {
-			var getSpliceIndex = browserTypeExe.indexOf(''+$(this).data("name")+'')
-			browserTypeExe.splice(getSpliceIndex, 1)
-			$(this).find("img").removeClass("sb")
-		}
-		else {
-			$(this).find("img").addClass("sb")
-			$(this).find("svg").addClass("sb")
-			browserTypeExe.push(''+$(this).data("name"))
+		if($(this).find("img").hasClass("sb") == false) {
+			browserTypeExe.splice(browserTypeExe.indexOf(''+$(this).data("name")), 1);
+			$(this).find("img").removeClass("sb");
+		} else {
+			$(this).find("img").addClass("sb");
+			browserTypeExe.push(''+$(this).data("name"));
 		}
 	})
 	//Select Browser Function
