@@ -1,12 +1,11 @@
-var bcrypt = require('bcryptjs');
-var logger = require('../../logger');
-var myserver = require('../../server');
-var redisServer = require('./redisSocketHandler');
-var taskflow = require('../config/options').strictTaskWorkflow;
-var epurl = process.env.NDAC_URL;
-var Client = require("node-rest-client").Client;
-var client = new Client();
-//var neo4jAPI = require('../controllers/neo4jAPI');
+const bcrypt = require('bcryptjs');
+const logger = require('../../logger');
+const myserver = require('../../server');
+const redisServer = require('./redisSocketHandler');
+const taskflow = require('../config/options').strictTaskWorkflow;
+const epurl = process.env.NDAC_URL;
+const Client = require("node-rest-client").Client;
+const client = new Client();
 
 
 const getChannelNum_cb = (channel,cb) => {

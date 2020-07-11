@@ -9,6 +9,7 @@ const server_sub = redis.createClient(redisConfig);
 // cache.select(2);
 const server_pub = default_pub;
 default_pub.pubsubPromise =  async (cmd, ...channel) => (new Promise((rsv, rej) => default_pub.pubsub(cmd, channel, (e,d) => ((e)? rej(e):rsv(d)))));
+const utils = require("./utils");
 
 default_sub.on("message", (channel, message) => {
 	logger.debug("In redisSocketHandler: Channel is %s", channel);
@@ -298,5 +299,9 @@ module.exports.initListeners = mySocket => {
 	mySocket.on('iris_operations_result', value => {
 		const dataToNode = JSON.stringify({"username" : username,"onAction" : "iris_operations_result","value":JSON.parse(value)});
 		server_pub.publish('ICE2_' + username, dataToNode);
+	});
+	mySocket.on('benchmark_ping', async value => {
+		const result = await utils.fetchData(value, "benchmark/store", "benchmark_ping");
+		if (result == "fail") logger.error("Error occurred in storing benchmark");
 	});
 };

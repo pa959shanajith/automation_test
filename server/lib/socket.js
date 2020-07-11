@@ -10,6 +10,7 @@ var socketMapNotify = {};
 
 var uiConfig = require('./../config/options');
 var screenShotPath = uiConfig.screenShotPath;
+var benchmarkRunTimes = uiConfig.benchmarkRuntimes;
 var myserver = require('./../../server');
 var httpsServer = myserver.httpsServer;
 var io = require('socket.io').listen(httpsServer, { cookie: false, pingInterval: uiConfig.socketio.pingInterval, pingTimeout: uiConfig.socketio.pingTimeout });
@@ -70,7 +71,7 @@ io.on('connection', function (socket) {
 					userICEMap[result.username]=icename;
 					setTimeout(()=> {
 						socket.send('connected', result.ice_check);
-						socket.emit('update_screenshot_path', screenShotPath);
+						socket.emit('update_screenshot_path', screenShotPath, benchmarkRunTimes);
 					}, 300);
 					logger.debug("%s is connected", icename);
 					logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);

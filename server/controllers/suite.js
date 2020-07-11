@@ -4,7 +4,7 @@ var myserver = require('../lib/socket');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
-if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT)*1024*1024;
+if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT) * 1024 * 1024;
 const scheduleJobMap = {};
 const SOCK_NORM = "normalModeOn";
 const SOCK_SCHD = "scheduleModeOn";
@@ -20,7 +20,7 @@ exports.readTestSuite_ICE = async (req, res) => {
 	logger.info("Inside UI service " + fnName);
 	const batchData = req.body.readTestSuite;
 	const fromFlg = req.body.fromFlag;
-	const userInfo = {"userid": req.session.userid, "role": req.session.activeRoleId};
+	const userInfo = { "userid": req.session.userid, "role": req.session.activeRoleId };
 	var responsedata = {};
 	var inputs = {};
 
@@ -69,8 +69,8 @@ exports.readTestSuite_ICE = async (req, res) => {
 
 /** This service updates the testsuite and scenario information for the loaded testsuite */
 exports.updateTestSuite_ICE = async (req, res) => {
-    logger.info("Inside UI service: updateTestSuite_ICE");
-	const userInfo = {"userid": req.session.userid, "username": req.session.username, "role": req.session.activeRoleId};
+	logger.info("Inside UI service: updateTestSuite_ICE");
+	const userInfo = { "userid": req.session.userid, "username": req.session.username, "role": req.session.activeRoleId };
 	var batchDetails = req.body.batchDetails;
 	var overallstatusflag = "success";
 	for (const testsuite of batchDetails) {
@@ -79,7 +79,7 @@ exports.updateTestSuite_ICE = async (req, res) => {
 			"conditioncheck": testsuite.conditioncheck,
 			"donotexecute": testsuite.donotexecute,
 			"getparampaths": testsuite.getparampaths,
-			"testscenarioids": testsuite.testscenarioids,	
+			"testscenarioids": testsuite.testscenarioids,
 			"modifiedby": userInfo.userid,
 			"modifiedbyrole": userInfo.role,
 			"testsuiteid": testsuite.testsuiteid,
@@ -94,7 +94,7 @@ exports.updateTestSuite_ICE = async (req, res) => {
 /** Function responsible for returning ICE connection status */
 const checkForICEstatus = async (user, execType) => {
 	const err = "Error occurred in the function checkForICEstatus: ";
-	logger.debug("ICE Socket requesting Address: %s" , user);
+	logger.debug("ICE Socket requesting Address: %s", user);
 	const sockmode = await utils.channelStatus(user);
 	if (!sockmode.schedule && !sockmode.normal) {
 		logger.error(err + SOCK_NA_MSG + ".");
@@ -275,11 +275,11 @@ const updateExecutionStatus = async (execIds, status) => {
 /** Function responsible for updating execution status and insert reports for the skipped scenarios. */
 const updateSkippedExecutionStatus = async (batchData, userInfo, status, msg) => {
 	const dt = new Date();
-	const currtime = dt.getFullYear()+'-'+(dt.getMonth()+1)+'-'+dt.getDate()+' '+dt.getHours()+':'+dt.getMinutes()+':'+dt.getSeconds()+'.'+dt.getMilliseconds();
+	const currtime = dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate() + ' ' + dt.getHours() + ':' + dt.getMinutes() + ':' + dt.getSeconds() + '.' + dt.getMilliseconds();
 	//const currtime = new Date(dt.getTime()-dt.getTimezoneOffset()*60000).toISOString().replace('T',' ').replace('Z','');
 	const reportData = {
-		'rows': [{ 'id': '1', 'Keyword': '', 'parentId': '', 'status': status, 'Step ': '', 'Comments': null, 'StepDescription': msg, "screenshot_path" : null, "EllapsedTime" : "0:00:00.000000", "Remark" : "", "testcase_details" : "" } ],
-		'overallstatus': [{ 'EllapsedTime': '0:00:00.000000', 'EndTime': currtime, 'browserVersion': 'NA', 'StartTime': currtime, 'overallstatus': status, 'browserType': 'NA' } ], 
+		'rows': [{ 'id': '1', 'Keyword': '', 'parentId': '', 'status': status, 'Step ': '', 'Comments': null, 'StepDescription': msg, "screenshot_path": null, "EllapsedTime": "0:00:00.000000", "Remark": "", "testcase_details": "" }],
+		'overallstatus': [{ 'EllapsedTime': '0:00:00.000000', 'EndTime': currtime, 'browserVersion': 'NA', 'StartTime': currtime, 'overallstatus': status, 'browserType': 'NA' }],
 		'commentsLength': []
 	}
 	const executionIds = batchData.executionIds;
@@ -296,8 +296,7 @@ const updateSkippedExecutionStatus = async (batchData, userInfo, status, msg) =>
 const executionRequestToICE = async (execReq, execType, userInfo) => {
 	const fnName = "executionRequestToICE";
 	logger.info("Inside " + fnName + " function");
-	const username=userInfo.username;
-	// const icename = myserver.allSocketsICEUser[username];
+	const username = userInfo.username;
 	const icename = userInfo.icename;
 	const channel = (execType == "SCHEDULE")? "scheduling":"normal";
 	var completedSceCount = 0;
@@ -314,7 +313,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 			const event = data.onAction;
 			const resultData = data.value;
 			const batchId = (resultData)? resultData.batchId : "";
-			if (!(icename == data.username && (event == SOCK_NA || (event != SOCK_NA  && execReq.batchId == batchId)))) return false;
+			if (!(icename == data.username && (event == SOCK_NA || (event != SOCK_NA && execReq.batchId == batchId)))) return false;
 			const status = resultData.status;
 			if (event == SOCK_NA) {
 				redisServer.redisSubServer.removeListener("message", executeTestSuite_listener);
@@ -328,7 +327,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 					if (execType == "SCHEDULE") await updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
 				} else if (status == "skipped") {
 					const execStatus = "Skipped";
-					var errMsg = (execType == "SCHEDULE")? "due to conflicting schedules":
+					var errMsg = (execType == "SCHEDULE") ? "due to conflicting schedules" :
 						"because another execution is running in ICE";
 					redisServer.redisSubServer.removeListener("message", executeTestSuite_listener);
 					logger.error("Error occurred in " + fnName + ": Execution is skipped " + errMsg);
@@ -368,18 +367,18 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 							}
 						} else {
 							const appTypes = ["OEBS", "MobileApp", "System", "Webservice", "Mainframe", "SAP", "Desktop"];
-							const browserType = (appTypes.indexOf(execReq.apptype) > -1)? execReq.apptype:reportData.overallstatus[0].browserType;
+							const browserType = (appTypes.indexOf(execReq.apptype) > -1) ? execReq.apptype : reportData.overallstatus[0].browserType;
 							reportData.overallstatus[0].browserType = browserType;
 							if (execType == "API") {
 								const cidx = d2R[testsuiteid].scenarios[scenarioid].length - 1;
 								d2R[testsuiteid].scenarios[scenarioid][cidx] = {...d2R[testsuiteid].scenarios[scenarioid][cidx], ...reportData.overallstatus[0]};
 							}
 							if (reportData.overallstatus[0].overallstatus == "Pass") statusPass++;
-							const insRepStatus =  await insertReport(executionid, scenarioid, browserType, userInfo, reportData);
+							const insRepStatus = await insertReport(executionid, scenarioid, browserType, userInfo, reportData);
 							if (insRepStatus != "fail") logger.info("Successfully inserted report data");
 							else logger.error("Failed to insert report data");
 							if (completedSceCount == scenarioCount) {
-								const suiteStatus = (statusPass == scenarioCount)? "pass" : "fail";
+								const suiteStatus = (statusPass == scenarioCount) ? "pass" : "fail";
 								completedSceCount = statusPass = 0;
 								await updateExecutionStatus([executionid], suiteStatus);
 							}
@@ -406,7 +405,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 				}
 			}
 		}
-		redisServer.redisSubServer.on("message",executeTestSuite_listener);
+		redisServer.redisSubServer.on("message", executeTestSuite_listener);
 	}));
 
 	const notifySocMap = myserver.socketMapNotify; 
@@ -443,9 +442,9 @@ const executionFunction = async (batchExecutionData, execIds, userInfo, execType
 /** This service executes the testsuite(s) for request from Nineteen68 */
 exports.ExecuteTestSuite_ICE = async (req, res) => {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE");
-	const userInfo = {"userid": req.session.userid, "username": req.session.username, "role": req.session.activeRoleId};
+	const userInfo = { "userid": req.session.userid, "username": req.session.username, "role": req.session.activeRoleId };
 	const batchExecutionData = req.body.executionData;
-	const execIds = {"batchid": "generate", "execid": {}};
+	const execIds = { "batchid": "generate", "execid": {} };
 	var result;
 	try {
 		result = await executionFunction(batchExecutionData, execIds, userInfo, "ACTIVE");
@@ -491,7 +490,7 @@ exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 				const batchExecutionData = multiBatchExecutionData[exi];
 				const execResponse = executionResult[exi];
 				const userInfo = userInfoList[exi];
-				const execIds = {"batchid": "generate", "execid": {}};
+				const execIds = { "batchid": "generate", "execid": {} };
 				var result;
 				try {
 					result = await executionFunction(batchExecutionData, execIds, userInfo, "API");
@@ -601,25 +600,48 @@ exports.getTestcaseDetailsForScenario_ICE = async (req, res) => {
 exports.testSuitesScheduler_ICE = async (req, res) => {
 	logger.info("Inside UI service testSuitesScheduler_ICE");
 	const fnName = "testSuitesScheduler_ICE";
-	const userInfo = {"userid": req.session.userid, "username": req.session.username, "role": req.session.activeRoleId};
+	const userInfo = { "userid": req.session.userid, "username": req.session.username, "role": req.session.activeRoleId };
 	const multiExecutionData = req.body.executionData;
-	const batchInfo = multiExecutionData.batchInfo;
-	const taskApproval = await utils.approvalStatusCheck(batchInfo);
-	if (taskApproval.res !== "pass") return res.send(taskApproval.res);
-	const dateTimeList = batchInfo.map(u => {
+	var batchInfo = multiExecutionData.batchInfo;
+	var stat = "none"
+	var dateTimeUtc = ""
+	var dateTimeList = batchInfo.map(u => {
 		const dt = u.date.split("-");
 		const tm = u.time.split(":");
+		dateTimeUtc = new Date(dt[2], dt[1] - 1, dt[0], tm[0], tm[1], 0).toUTCString();
 		return new Date(dt[2], dt[1] - 1, dt[0], tm[0], tm[1], 0).valueOf().toString();
 	});
+	var smart = false;
+	if (batchInfo[0].targetUser && batchInfo[0].targetUser.includes('Smart')) {
+		smart = true;
+		result = await smartSchedule(batchInfo, batchInfo[0].targetUser, dateTimeUtc, multiExecutionData.browserType.length)
+		if (result["status"] == "fail") {
+			res.send("fail")
+		}
+		stat = result["status"]
+		batchInfo = result["batchInfo"]
+		displayString = result["displayString"]
+		dateTimeList = batchInfo.map(u => {
+			const dt = u.date.split("-");
+			const tm = u.time.split(":");
+			return new Date(dt[2], dt[1] - 1, dt[0], tm[0], tm[1], 0).valueOf().toString();
+		});
+
+	}
+	const taskApproval = await utils.approvalStatusCheck(batchInfo);
+	if (taskApproval.res !== "pass") return res.send(taskApproval.res);
 	const addressList = batchInfo.map(u => u.targetUser);
 	var inputs = {
 		"query": "checkscheduleddetails",
 		"scheduledatetime": dateTimeList,
 		"targetaddress": addressList
 	};
-	const chkResult = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
-	if (chkResult != -1) return res.send((chkResult == "fail")? "fail": {"status": "booked", "user": addressList[chkResult]});
-	/** Add if else for smart schedule below this **/
+	if (!smart) {
+		const chkResult = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
+		if (chkResult != -1) return res.send((chkResult == "fail") ? "fail" : { "status": "booked", "user": addressList[chkResult] });
+	}
+
+	/** Add if else for smart schedule below this => NO **/
 	// smartScheduleId = uuid(); Pass it to args as smartid
 	const userTimeMap = {};
 	const multiBatchExecutionData = [];
@@ -663,10 +685,105 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 		multiBatchExecutionData.push(batchObj);
 	}
 	/** Add if else for smart schedule above this **/
-	const schResult = await scheduleTestSuite(multiBatchExecutionData);
+	var schResult = await scheduleTestSuite(multiBatchExecutionData);
+	if (schResult == "success" && stat != "none") schResult = displayString + " " + "success";
 	return res.send(schResult);
 };
+/**
+ * Function responsible for creating smart batches
+ * @param {*} batchInfo 
+ * @param {*} type , sceanriolevel / modulelevel , batch.targetUser
+ * @param {*} time , time of schedule
+ */
+const smartSchedule = async (batchInfo, type, time, browsers) => {
+	// deep copying batchinfo
+	const result = {}
+	result["displayString"] = "";
+	var partitions = await getMachinePartitions(batchInfo, type, time);
+	if (partitions == "fail") {
+		result["status"] = "fail";
+		return result;
+	} else if (partitions.result == "busy") {
+		result["status"] = "busy"
+		result["displayString"] = "ICE busy, Some modules might skip.\n"
+	} else {
+		result["status"] = "success"
+		result["displayString"] = "Successfully Scheduled.\n\n"
+	}
+	result["batchInfo"] = {}
+	var setCount = 1;
+	//creating batches
+	var partBatchInfo = []
+	var moduleUserMap = {}
+	for (let set in partitions.partitions) {
+		var partitionsString = partitions.partitions[set].toString();
+		result["displayString"] = result["displayString"] + "Set " + setCount.toString() + ": " + set + "\n";
+		setCount++;
+		for (var i = 0; i < batchInfo.length; i++) {
+			var temp = JSON.parse(JSON.stringify(batchInfo[i]));
+			temp.suiteDetails = [];
+			temp.smartScheduleId = uuid();
+			temp.targetUser = set;
+			for (var j = 0; j < batchInfo[i].suiteDetails.length; j++) {
+				if (partitionsString.includes(batchInfo[i].suiteDetails[j].scenarioId)) {
+					partitionsString = partitionsString.replace(batchInfo[i].suiteDetails[j].scenarioId,"");
+					testId = batchInfo[i].testsuiteId;
+					if (moduleUserMap[testId] && moduleUserMap[testId]['user'] == set) {
+						partBatchInfo[moduleUserMap[testId]["index"]].suiteDetails.push(JSON.parse(JSON.stringify(batchInfo[i].suiteDetails[j])));
+						batchInfo[i].suiteDetails[j].scenarioId = "NONE";
+					} else {				
+						temp.suiteDetails.push(JSON.parse(JSON.stringify(batchInfo[i].suiteDetails[j])))
+						batchInfo[i].suiteDetails[j].scenarioId = "NONE";
+						moduleUserMap[testId] = {};
+						moduleUserMap[testId]['index'] = partBatchInfo.length;
+						moduleUserMap[testId]['user'] = set;
+						partBatchInfo.push(temp);
+					}
+				}
+			}
+		}
+	}
+	result["displayString"] = result["displayString"] + "\nEstimated Time: " + secondsToHms(partitions.totalTime * browsers);
+	result["batchInfo"] = partBatchInfo
+	return result;
+}
+/**
+ * Format Seconds to display string days/hours/minutes
+ * @param {*} seconds 
+ */
+function secondsToHms(seconds) {
+	var days = Math.floor(seconds / (24 * 60 * 60));
+	seconds -= days * (24 * 60 * 60);
+	var hours = Math.floor(seconds / (60 * 60));
+	seconds -= hours * (60 * 60);
+	var minutes = Math.floor(seconds / (60));
+	seconds -= minutes * (60);
+	return ((0 < days) ? (days + " day, ") : "") + hours + "h, " + minutes + "m and " + seconds.toFixed(2) + "s";
+}
 
+/**
+ * 
+ * @param {*} mod   BatchInfo
+ * @param {*} type  Scenario level / module level
+ * @param {*} time  Time of schedule
+ */
+const getMachinePartitions = async (mod, type, time) => {
+	let scenarios = [];
+	const activeUsers = await utils.getSocketList("schedule");
+	for (var i = 0; i < mod.length; i++) {
+		scenarios = scenarios.concat(mod[i].suiteDetails);
+	}
+	const inputs = {
+		"scenarios": scenarios,
+		"activeIce": activeUsers.length,
+		"ipAddressList": activeUsers,
+		"type": type,
+		"modules": mod,
+		"time": time
+	};
+	const result = await utils.fetchData(inputs, "partitons/getPartitions", "getMachineParitions");
+	return result;
+}
 /** Function responsible for scheduling Jobs. Returns: success/few/fail */
 const scheduleTestSuite = async (multiBatchExecutionData) => {
 	const fnName = "scheduleTestSuite";
@@ -727,7 +844,7 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
 						const executionIds = tsuIds.map(i => currExecIds.execids[i]);
 						const batchObj = {
 							"executionIds": executionIds,
-							"suitedetails": batchExecutionData.batchInfo.map(t => ({"scenarioIds": t.suiteDetails.map(s => s.scenarioId)}))
+							"suitedetails": batchExecutionData.batchInfo.map(t => ({ "scenarioIds": t.suiteDetails.map(s => s.scenarioId) }))
 						};
 						await updateSkippedExecutionStatus(batchObj, userInfo, result, msg);
 					}
@@ -776,7 +893,7 @@ exports.cancelScheduledJob_ICE = async (req, res) => {
 	const scheduleid = req.body.schDetails.scheduleid;
 	const schedHost = req.body.host;
 	const schedUserid = req.body.schedUserid;
-	if(!(schedUserid == userid || schedHost == username)) {
+	if (!(schedUserid == userid || schedHost == username)) {
 		logger.info("Sending response 'not authorised' from cancelScheduledJob_ICE service");
 		return res.send("not authorised");
 	}
@@ -821,7 +938,7 @@ exports.reScheduleTestsuite = async () => {
 			"status": "scheduled"
 		};
 		const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
-		if (result == "fail") return logger.error("Status from the function "+fnName+": Jobs are not rescheduled");
+		if (result == "fail") return logger.error("Status from the function " + fnName + ": Jobs are not rescheduled");
 		const multiBatchExecutionData = [];
 		for (var i = 0; i < result.length; i++) {
 			const schd = result[i];
@@ -871,9 +988,9 @@ exports.reScheduleTestsuite = async () => {
 			}
 		}
 		const status = await scheduleTestSuite(multiBatchExecutionData);
-		if (status == "fail") logger.error("Status from the function "+fnName+": Jobs are not rescheduled");
-		else if (status == "few") logger.warn("Status from the function "+fnName+": All except few jobs are rescheduled");
-		else logger.info("Status from the function "+fnName+": Jobs successfully rescheduled");
+		if (status == "fail") logger.error("Status from the function " + fnName + ": Jobs are not rescheduled");
+		else if (status == "few") logger.warn("Status from the function " + fnName + ": All except few jobs are rescheduled");
+		else logger.info("Status from the function " + fnName + ": Jobs successfully rescheduled");
 	} catch (ex) {
 		logger.error("Exception in the function " + fnName + ": %s", ex);
 	}
