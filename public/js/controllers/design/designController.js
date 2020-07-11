@@ -38,6 +38,7 @@ var newScrapedData;
 var saveScrapeDataFlag = false;
 var deleteObjectsFlag = false;
 var certObj={};
+var scrapedurl='';
 var scrape_data = '';
 window.localStorage['disableEditing'] = "false";
 mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$location', '$timeout', 'DesignServices', 'mindmapServices', 'cfpLoadingBar', '$window', 'socket', function ($scope, $rootScope, $http, $location, $timeout, DesignServices, mindmapServices, cfpLoadingBar, $window, socket) {
@@ -114,7 +115,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	if (appType == "Webservice" && window.location.href.split("/")[3] == "designTestCase") {
 		$("#right-dependencies-section .thumbnail:first-child").hide();
 	}
-	//console.log(appType);
 	$scope.getScreenView = appType
 	$scope.isMac =  navigator.userAgent.indexOf('Mac');
 	//Getting Apptype orScreen Type
@@ -133,92 +133,15 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 
 	$timeout(function () {
-		// projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
-		// releaseName = angular.element(document.getElementById("left-nav-section")).scope().releaseDetails;
-		// cycleName = angular.element(document.getElementById("left-nav-section")).scope().cycleDetails;
-		// var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
-		// appType = JSON.parse(window.localStorage['_CT']).appType;
-		// screenName = angular.element(document.getElementById("left-nav-section")).scope().screenName;
-		// testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
-		// subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
-		// subTask = JSON.parse(window.localStorage['_CT']).subTask;
 		var taskInfo = JSON.parse(window.localStorage['_CT']);
 		var filterData = JSON.parse(window.localStorage['_FD']);
 		if (taskInfo.subTaskType == "Scrape" || taskInfo.subTask == "Scrape") {
-			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">' + filterData.idnamemapprj[taskInfo.projectId] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">' + taskInfo.screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + filterData.idnamemaprel[taskInfo.releaseid] + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + filterData.idnamemapcyc[taskInfo.cycleid] + '</span></p>')
+			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">' + filterData.idnamemapprj[taskInfo.projectId] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">' + taskInfo.screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + filterData.idnamemaprel[taskInfo.releaseid] + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + filterData.idnamemapcyc[taskInfo.cycleid] + '</span></p><p class="proj-info-wrap"><span class="content-label">URL :</span><span id="scrapedurlinfo" class="content">' +scrapedurl + '</span></p>')
 		} else {
 			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">' + filterData.idnamemapprj[taskInfo.projectId] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">' + taskInfo.screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">TestCase: </span><span class="content">' + taskInfo.testCaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + filterData.idnamemaprel[taskInfo.releaseid] + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + filterData.idnamemapcyc[taskInfo.cycleid] + '</span></p>')
 		}
+	}, 3000);
 
-	}, 3000)
-
-	//console.log("screenName:", screenName);
-	// if (window.localStorage['_TJ']) {
-	//	 allTasks = JSON.parse(window.localStorage['_TJ']);
-	//	 if(allTasks.length > 0)
-	//	 {
-	//			 allTasks =  allTasks.filter(function(n){
-	//				 return n.appType === appType
-	//			 });
-	//	 }
-
-	//	 for (var i = 0; i < allTasks.length; i++) {
-	//		 //Screen with no testcases
-	//		 if (allTasks[i].screenName != "" && allTasks[i].testCaseId == "") {
-	//			 allScreenNames.push(allTasks[i].screenName);
-	//		 }
-	//		 //screen with testcases
-	//		 if (allTasks[i].screenName != "" && allTasks[i].testCaseId != "") {
-	//			 allScreenTestcaseNames.push(allTasks[i].screenName);
-	//		 }
-	//		 //testcases
-	//		 if (allTasks[i].testCaseName != "" && allTasks[i].testCaseId != "") {
-	//			 allTestcases.push(allTasks[i].testCaseName);
-	//		 }
-	//	 }
-	//	 var sorted_screens = allScreenNames.slice().sort();
-	//	 for (var i = 0; i < allScreenNames.length - 1; i++) {
-	//		 if (sorted_screens[i + 1] == sorted_screens[i]) {
-	//			 reusedScreens.push(sorted_screens[i]);
-	//		 }
-	//	 }
-	//	 var sorted_screensTestcase = allScreenTestcaseNames.slice().sort();
-	//	 for (var i = 0; i < allScreenTestcaseNames.length - 1; i++) {
-	//		 if (sorted_screensTestcase[i + 1] == sorted_screensTestcase[i]) {
-	//			 reusedScreensTestcase.push(sorted_screensTestcase[i]);
-	//		 }
-	//	 }
-	//	 var sorted_testcases = allTestcases.slice().sort();
-	//	 for (var i = 0; i < allTestcases.length - 1; i++) {
-	//		 if (sorted_testcases[i + 1] == sorted_testcases[i]) {
-	//			 reusedTestcases.push(sorted_testcases[i]);
-	//		 }
-	//	 }
-	//	 //console.log("reusedScreens",reusedScreens);
-	//	 //console.log("reusedScreensTestcase",reusedScreensTestcase);
-	//	 //console.log("reusedTestcases", reusedTestcases);
-	//	 if (reusedScreens.length > 0) {
-	//		 for (var j = 0; j < reusedScreens.length; j++) {
-	//			 if ($.trim(reusedScreens[j]) == $.trim(screenName)) {
-	//				 reusedScreenNames = true;
-	//			 }
-	//		 }
-	//	 }
-	//	 if (reusedScreens.length > 0) {
-	//		 for (var j = 0; j < reusedScreensTestcase.length; j++) {
-	//			 if ($.trim(reusedScreensTestcase[j]) == $.trim(screenName)) {
-	//				 reusedScreenTestcaseNames = true;
-	//			 }
-	//		 }
-	//	 }
-	//	 if (reusedTestcases.length > 0) {
-	//		 for (var j = 0; j < reusedTestcases.length; j++) {
-	//			 if ($.trim(reusedTestcases[j]) == $.trim(testCaseName)) {
-	//				 reusedTestcaseNames = true;
-	//			 }
-	//		 }
-	//	 }
-	// }
 
 	var custnameArr = [];
 	var keywordValArr = [];
@@ -338,7 +261,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS">No Screenshot Available</div>')
 						else{
 							$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror + '" /></div>')
-						}	
+						}
 						// service call # 3 -objectType service call
 						DesignServices.getKeywordDetails_ICE(appType)
 							.then(function (data3) {
@@ -869,7 +792,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		//enableScreenShotHighlight = true;
 		DesignServices.getScrapeDataScreenLevel_ICE()
 			.then(function (data) {
-			    localStorage['_cust']=JSON.stringify({})
+				var taskInfo = JSON.parse(window.localStorage['_CT']);
+				if (taskInfo.subTaskType == "Scrape" || taskInfo.subTask == "Scrape") {
+					scrapedurl = data.scrapedurl;
+					$("#scrapedurlinfo").html(scrapedurl);
+				}
+				localStorage['_cust']=JSON.stringify({})
 				if (data == "Invalid Session") {
 					return $rootScope.redirectPage();
 				}
@@ -4307,6 +4235,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				}
 				if(typeof(data)=="object" || data=="success"){
 					eaCheckbox = false;
+					var taskInfo = JSON.parse(window.localStorage['_CT']);
+					if (taskInfo.subTaskType == "Scrape" || taskInfo.subTask == "Scrape") {
+						scrapedurl = data.scrapedurl;
+						$("#scrapedurlinfo").html(scrapedurl);
+					}
 					//window.localStorage['_modified'] = "";
 					modifiednames = [];
 					getIndexOfDeletedObjects = [];
