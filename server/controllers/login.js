@@ -15,107 +15,67 @@ var admin=require('../controllers/admin');
  * @see : function to check whether projects are assigned for user
  * @author : vinay
  */
-function checkAssignedProjects(username, main_callback) {
-	logger.info("Inside checkAssignedProjects function");
-	var assignedProjects = false;
-	var flag = 'fail';
-	async.waterfall([
-		function getUserInfo(callback) {
-			var inputs = {
-				"username": username,
-				"query": "userInfobyName"
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling NDAC Service from getUserInfo :loadUser_Nineteen68");
-			client.post(epurl + "login/loadUser_Nineteen68", args,
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in loadUser_Nineteen68 Error Code : ERRNDAC");
-					callback(flag);
-				} else if (result.rows.length !== 0) {
-					var userid = result.rows._id;
-					var roleid = result.rows.defaultrole;
-					if (result.rows.projects != null) {
-						assignedProjects = result.rows.projects.length!==0;
-					}
-					callback(null, userid, roleid, assignedProjects);
-				} else callback("invalid_username_password");
-			});
-		},
-		function getUserRole(userid,roleid,assignedProjects, callback) {
-			var inputs = {
-				"roleid": roleid,
-				"query": "permissionInfoByRoleID"
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling NDAC Service from getUserRole :loadPermission_Nineteen68");
-			client.post(epurl + "login/loadPermission_Nineteen68", args,
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in loadPermission_Nineteen68 Error Code : ERRNDAC");
-					callback(flag);
-				} else if (result.rows !== null) {
-					var rolename = result.rows.rolename;
-					callback(null,assignedProjects, userid, rolename);
-				} else {
-					callback("invalid_username_password");
-				}
-			});
-		}
-	], function (err, assignedProjects, userid, rolename) {
-		main_callback(err, assignedProjects, userid, rolename);
-	});
+const checkAssignedProjects = async username => {
+	const fnName = "checkAssignedProjects";
+	logger.info("Inside " + fnName + " function");
+	let assignedProjects = false;
+	// Get user profile by username
+	let inputs = {
+		"username": username
+	};
+	const userInfo = await utils.fetchData(inputs, "login/loadUser_Nineteen68", fnName);
+	if (userInfo == "fail") return ['fail'];
+	else if (userInfo.length === 0) return ["invalid_username_password"];
+	const userid = userInfo._id;
+	const roleid = userInfo.defaultrole;
+	if (userInfo.projects != null) assignedProjects = userInfo.projects.length !== 0;
+	// Get Rolename by role id
+	inputs = {
+		"roleid": roleid,
+		"query": "permissionInfoByRoleID"
+	};
+	const userRole = await utils.fetchData(inputs, "login/loadPermission_Nineteen68", fnName);
+	if (userRole == "fail") return ['fail'];
+	else if (userRole === null) return ["invalid_username_password"];
+	else return [null, userid, userRole.rolename, assignedProjects];
 }
 
 // Check User login State - Nineteen68
-exports.checkUserState_Nineteen68 = function (req, res) {
+exports.checkUserState_Nineteen68 = async (req, res) => {
 	try {
 		logger.info("Inside UI Service: checkUserState_Nineteen68");
-		var sess = req.session;
+		const sess = req.session;
 		if (sess && (sess.emsg || sess.username)) {
-			var emsg = req.session.emsg || "ok";
-			async.series({
-				checkProjects_ifOK: function(callback) {
-					if (emsg != "ok") callback(emsg);
-					else {
-						var username = sess.username;
-						checkAssignedProjects(username, function (err, assignedProjects, userid, role) {
-							if(err) {
-								logger.error("Error occurred in checkUserState_Nineteen68. Cause: "+ err);
-								emsg = err;
-							} else {
-								logger.info("Inside function call of checkAssignedProjects");
-								if (role != "Admin" && !assignedProjects) {
-									emsg = "noProjectsAssigned";
-									logger.info("User has not been assigned any projects");
-								} else {
-									req.session.userid = userid;
-									req.session.ip = req.ip;
-									req.session.loggedin = (new Date()).toISOString();
-								}
-							}
-							callback(emsg);
-						});
+			let emsg = req.session.emsg || "ok";
+			if (emsg == "ok") {
+				const username = sess.username;
+				const data = await checkAssignedProjects(username);
+				const err = data[0];
+				if(err) {
+					logger.error("Error occurred in checkUserState_Nineteen68. Cause: "+ err);
+					emsg = err;
+				} else {
+					const userid = data[1];
+					const role = data[2];
+					const assignedProjects = data[3];
+					if (role != "Admin" && !assignedProjects) {
+						emsg = "noProjectsAssigned";
+						logger.info("User has not been assigned any projects");
+					} else {
+						req.session.userid = userid;
+						req.session.ip = req.ip;
+						req.session.loggedin = (new Date()).toISOString();
 					}
 				}
-			}, function (emsg) {
-				if (sess.dndSess) utils.cloneSession(req, function(err){ return res.send("reload"); });
-				else {
-					if (emsg == "ok") res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed:true});
-					else req.clearSession();
-					return res.send(emsg);
-				}
-			});
+			}
+			if (sess.dndSess) {
+				await utils.cloneSession(req);
+				emsg = "reload";
+			} else {
+				if (emsg == "ok") res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed:true});
+				else req.clearSession();
+			}
+			return res.send(emsg);
 		} else {
 			logger.info("Invalid Session");
 			req.clearSession();
@@ -141,8 +101,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 			async.waterfall([
 				function userInfo(callback) {
 					var inputs = {
-						"username": userName,
-						"query": "userInfobyName"
+						"username": userName
 					};
 					var args = {
 						data: inputs,
@@ -227,39 +186,23 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 };
 
 //Get UserRoles By RoleId - Nineteen68
-exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
+exports.getRoleNameByRoleId_Nineteen68 = async (req, res) => {
+	const fnName = "getRoleNameByRoleId_Nineteen68";
+	logger.info("Inside UI service: " + fnName);
 	try {
-		logger.info("Inside UI service: getRoleNameByRoleId_Nineteen68");
-		if (utils.isSessionActive(req)) {
-			var roleList = req.body.role;
-			var inputs = {
-				"roleid": roleList,
-				"query":"nameidInfoByRoleIDList"
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling NDAC Service: loadPermission_Nineteen68");
-			client.post(epurl + "login/loadPermission_Nineteen68", args,
-				function (rolesResult, response) {
-				if (response.statusCode != 200 || rolesResult.rows == "fail") {
-					logger.error("Error occurred in loadPermission_Nineteen68 Error Code : ERRNDAC");
-					res.send("fail");
-				} else {
-					result={}
-					for(i=0;i<rolesResult.rows.length;i++){
-						result[rolesResult.rows[i]._id]=rolesResult.rows[i].name
-					}
-					res.send(result);
-				}
-			});
-		} else {
-			logger.info("Invalid Session");
-			res.send("Invalid Session");
+		const inputs = {
+			"roleid": req.body.role,
+			"query":"nameidInfoByRoleIDList"
+		};
+		const rolesResult = await utils.fetchData(inputs, "login/loadPermission_Nineteen68", fnName)
+		let result = {};
+		if (rolesResult == "fail") result = "fail";
+		else {
+			for(let role of rolesResult) {
+				result[role._id] = role.name;
+			}
 		}
+		res.send(result);
 	} catch (exception) {
 		logger.error(exception.message);
 		res.send("fail");
@@ -273,8 +216,7 @@ exports.resetPassword_Nineteen68 = function(req, res) {
 	var currpassword = req.body.currpassword;
 	var newpassword = req.body.newpassword;
 	var inputs = {
-		"username": username,
-		"query":'userInfobyName'
+		"username": username
 	};
 	var args = {
 		data: inputs,
@@ -317,7 +259,7 @@ exports.resetPassword_Nineteen68 = function(req, res) {
 	});
 };
 
-exports.logoutUser_Nineteen68 = function (req, res) {
+exports.logoutUser_Nineteen68 = async (req, res) => {
 	logger.info("Inside UI Service: logoutUser_Nineteen68");
 	logger.info("%s logged out successfully", req.session.username);
 	req.logOut();

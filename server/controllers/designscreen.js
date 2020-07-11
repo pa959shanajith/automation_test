@@ -19,18 +19,19 @@ var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
 
 exports.initScraping_ICE = function (req, res) {
-	var name,value;
+	var icename,value,username;
 	var dataToIce={};
 	logger.info("Inside UI service: initScraping_ICE");
 	try {
 		if (utils.isSessionActive(req)) {
-			name = req.session.username;
-			redisServer.redisSubServer.subscribe('ICE2_' + name);	
+			username=req.session.username;
+			icename = myserver.allSocketsICEUser[username];
+			redisServer.redisSubServer.subscribe('ICE2_' + icename);	
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.info("ICE Socket requesting Address: %s" , name);
+			logger.info("ICE Socket requesting Address: %s" , icename);
 			//cr:use utils.getChannelNum('ICE1_scheduling_' + name, function(found)
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
 				if (redisres[1]>0) {
 					var reqAction = "";
 					var reqBody = req.body.screenViewObject;
@@ -39,16 +40,16 @@ exports.initScraping_ICE = function (req, res) {
 						var processID = reqBody.processID;
 						var scrapeMethod = reqBody.scrapeMethod;
 						reqAction = "desktop";
-						dataToIce = {"emitAction": "LAUNCH_DESKTOP", "username": name, "applicationPath": applicationPath,
+						dataToIce = {"emitAction": "LAUNCH_DESKTOP", "username": icename, "applicationPath": applicationPath,
 							"processID": processID, "scrapeMethod": scrapeMethod};
 					} else if (reqBody.appType == "SAP") {
 						var applicationPath = reqBody.applicationPath;
 						reqAction = "SAP";
-						dataToIce = {"emitAction": "LAUNCH_SAP", "username": name, "applicationPath": applicationPath};
-					} else if (reqBody.appType == "DesktopJava") {
+						dataToIce = {"emitAction": "LAUNCH_SAP", "username": icename, "applicationPath": applicationPath};
+					} else if (reqBody.appType == "OEBS") {
 						var applicationPath = reqBody.applicationPath;
 						reqAction = "OEBS";
-						dataToIce = {"emitAction": "LAUNCH_OEBS", "username": name, "applicationPath": applicationPath};
+						dataToIce = {"emitAction": "LAUNCH_OEBS", "username": icename, "applicationPath": applicationPath};
 					} else if (reqBody.appType == "MobileApp") {
 						var apkPath = reqBody.apkPath;
 						var serial = reqBody.mobileSerial;
@@ -61,23 +62,23 @@ exports.initScraping_ICE = function (req, res) {
 						var ipAddress = reqBody.ipAddress;
 						reqAction = "mobile";
 						if(reqBody.param == 'ios') {
-							dataToIce = {"emitAction": "LAUNCH_MOBILE", "username" : name, "deviceName": deviceName,
+							dataToIce = {"emitAction": "LAUNCH_MOBILE", "username" : icename, "deviceName": deviceName,
 								"versionNumber": versionNumber, "bundleId":bundleId, "ipAddress": ipAddress, "param": "ios"};
 						} else {
-							dataToIce = {"emitAction" : "LAUNCH_MOBILE", "username" : name, "apkPath": apkPath, "serial": serial,
+							dataToIce = {"emitAction" : "LAUNCH_MOBILE", "username" : icename, "apkPath": apkPath, "serial": serial,
 								"mobileDeviceName": mobileDeviceName, "mobileIosVersion": mobileIosVersion, "mobileUDID": mobileUDID};
 						}
 					} else if (reqBody.appType == "MobileWeb") {
 						var mobileSerial = reqBody.mobileSerial;
 						var androidVersion = reqBody.androidVersion;
 						reqAction = "mobile web";
-						dataToIce = {"emitAction": "LAUNCH_MOBILE_WEB", "username" : name,
+						dataToIce = {"emitAction": "LAUNCH_MOBILE_WEB", "username" : icename,
 							"mobileSerial": mobileSerial, "androidVersion": androidVersion};
 					} else if (req.body.screenViewObject.appType == "pdf"){
 						var data = {};
 						var browserType = req.body.screenViewObject.appType;
 						data.browsertype = browserType;
-						dataToIce = {"emitAction" : "PDF_SCRAPE","username" : name, "data":data,"browsertype":browserType};
+						dataToIce = {"emitAction" : "PDF_SCRAPE","username" : icename, "data":data,"browsertype":browserType};
 					} else {  //Web Scrape
 						var data = {action: "scrape"};
 						var browserType = reqBody.browserType;
@@ -97,20 +98,20 @@ exports.initScraping_ICE = function (req, res) {
 						else if (browserType == "mozilla") data.task = "OPEN BROWSER FX";
 						else if (browserType == "safari") data.task = "OPEN BROWSER SF"
 						reqAction = "web";
-						dataToIce = {"emitAction": "webscrape", "username" : name, "data": data};
+						dataToIce = {"emitAction": "webscrape", "username" : icename, "data": data};
 					}
-					dataToIce.username = name;
+					dataToIce.username = icename;
 					logger.info("Sending socket request for "+dataToIce.emitAction+" to redis");
-					redisServer.redisPubICE.publish('ICE1_normal_' + name, JSON.stringify(dataToIce));
+					redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
 					function scrape_listener(channel, message) {
 						var data = JSON.parse(message);
 						//LB: make sure to send recieved data to corresponding user
-						if (name == data.username) {
+						if (icename == data.username) {
 							redisServer.redisSubServer.removeListener('message', scrape_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
-								if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
-									var soc = myserver.socketMapNotify[name];
+								if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+									var soc = myserver.socketMapNotify[username];
 									soc.emit("ICEnotAvailable");
 								}
 							} else {
@@ -123,7 +124,7 @@ exports.initScraping_ICE = function (req, res) {
 					redisServer.redisSubServer.on("message",scrape_listener);
 				} else {
 					logger.error("Error occurred in the service initScraping_ICE: Socket not Available");
-					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+					utils.getChannelNum('ICE1_scheduling_' + icename, function(found){
 						var flag = (found)? "scheduleModeOn" : "unavailableLocalServer";
 						res.send(flag);
 					});
@@ -148,10 +149,10 @@ exports.getScrapeDataScreenLevel_ICE = function (req, res) {
 				"projectid": req.body.projectId,
 				"query": "getscrapedata"
 			};
-			if (req.body.type == "WS_screen"){
+			if (req.body.type == "WS_screen" || req.body.type== "Webservice"){
 				inputs.query = "getWSscrapedata";
 			}
-			else if (req.body.testCaseId){
+			if (req.body.testCaseId){
 				inputs.testcaseid = req.body.testCaseId;//Send versionnumber also if needed
 				delete inputs['screenid'];
 			}
@@ -268,45 +269,71 @@ exports.updateScreen_ICE = function (req, res) {
 								'header' in scrapedObjects &&
 								'body' in scrapedObjects) {
 								if (scrapedObjects.method == 'POST') {
-									var requestedBody = scrapedObjects.body[0];
-									var requestedHeader = scrapedObjects.header[0];
+									var requestedBody = scrapedObjects.body;
+									var requestedHeader = scrapedObjects.header;
 									if (requestedBody != null &&
-										requestedBody != '' &&
-										requestedHeader.indexOf('json') === -1) {
-										if (requestedBody.indexOf('Envelope') !== -1) {
-											var obj = parse(requestedBody);
-											if ('root' in obj) {
-												temp_flag = false
-												var baseRequestBody = obj.root;
-												allXpaths = [];
-												allCustnames = [];
-												try {
-													logger.info("Calling function parseRequest from the service updateScreen_ICE: updateScrapeData_ICE");
-													parseRequest(baseRequestBody);
-												} catch (exception) {
-													logger.error(exception.message);
+										requestedBody != ''){
+										if(requestedHeader.indexOf('json') === -1){
+											if (requestedBody.indexOf('Envelope') !== -1) {
+												var obj = parse(requestedBody);
+												if ('root' in obj) {
+													temp_flag = false
+													var baseRequestBody = obj.root;
+													allXpaths = [];
+													allCustnames = [];
+													try {
+														logger.info("Calling function parseRequest from the service updateScreen_ICE: updateScrapeData_ICE");
+														parseRequest(baseRequestBody);
+													} catch (exception) {
+														logger.error(exception.message);
+													}
+													for (var populationindex = 0; populationindex < allXpaths.length; populationindex++) {
+														var scrapedObjectsWS = {};
+														scrapedObjectsWS.xpath = allXpaths[populationindex];
+														scrapedObjectsWS.custname = allCustnames[populationindex];
+														scrapedObjectsWS.tag = "elementWS";
+														viewArray.push(scrapedObjectsWS);
+													}
+													var baseData = {};
+													baseData.endPointURL = scrapedObjects.endPointURL;
+													baseData.method = scrapedObjects.method;
+													baseData.header = scrapedObjects.header;
+													baseData.operations = scrapedObjects.operations;
+													baseData.body = scrapedObjects.body;
+													baseData.responseHeader = scrapedObjects.responseHeader;
+													baseData.responseBody = scrapedObjects.responseBody;
+													baseData.view = viewArray;
+													scrapedObjects = baseData;
+													scrapedObjects = JSON.stringify(scrapedObjects);
+													scrapedObjects = scrapedObjects.replace(/'+/g, "''")
 												}
-												for (var populationindex = 0; populationindex < allXpaths.length; populationindex++) {
+											}else{
+												logger.error("Invalid Request header or Request body for XML")
+												scrapedObjects="Fail";
+											}
+										}
+										else if(requestedHeader.indexOf('json') !== -1){
+											try{
+												requestedBody=JSON.parse(requestedBody)
+												var xpaths=parseJsonRequest(requestedBody,"","");
+												for (var object of xpaths) {
 													var scrapedObjectsWS = {};
-													scrapedObjectsWS.xpath = allXpaths[populationindex];
-													scrapedObjectsWS.custname = allCustnames[populationindex];
+													scrapedObjectsWS.xpath = object;
+													scrapedObjectsWS.custname = object;
 													scrapedObjectsWS.tag = "elementWS";
 													viewArray.push(scrapedObjectsWS);
 												}
-												var baseData = {};
-												baseData.endPointURL = scrapedObjects.endPointURL;
-												baseData.method = scrapedObjects.method;
-												baseData.header = scrapedObjects.header;
-												baseData.operations = scrapedObjects.operations;
-												baseData.body = scrapedObjects.body;
-												baseData.responseHeader = scrapedObjects.responseHeader;
-												baseData.responseBody = scrapedObjects.responseBody;
-												baseData.view = viewArray;
-												scrapedObjects = baseData;
-												scrapedObjects = JSON.stringify(scrapedObjects);
-												scrapedObjects = scrapedObjects.replace(/'+/g, "''")
+												if (viewArray.length>0) scrapedObjects.view=viewArray
+
 											}
-										}
+											catch(Exception){
+												logger.error("Invalid Request body for RestAPI")
+												scrapedObjects="Fail";
+											}
+										}else{
+											logger.error("Invalid Request header or Request body")
+											scrapedObjects="Fail";
+										}						
 									}
 								}
 							}if (temp_flag == false){
@@ -440,7 +467,7 @@ exports.updateScreen_ICE = function (req, res) {
 				allXpaths=[];
 				allCustnames=[];
 				try {
-					if (statusFlag == "" && scrapedObjects != "scrape data error: Fail") {
+					if (statusFlag == "" && scrapedObjects != "Fail") {
 						var args = {
 							data: inputs,
 							headers: {
@@ -489,24 +516,24 @@ exports.updateScreen_ICE = function (req, res) {
 											res.send("success");
 										}
 										else{
-											name = req.session.username;
-											redisServer.redisSubServer.subscribe('ICE2_' + name);
+											icename = myserver.allSocketsICEUser[req.session.username];
+											redisServer.redisSubServer.subscribe('ICE2_' + icename);
 											logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-											logger.debug("ICE Socket requesting Address: %s" , name);
-											redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+											logger.debug("ICE Socket requesting Address: %s" , icename);
+											redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
 												if (redisres[1]>0){
 													var scrapedata = newData;
 													logger.info("Sending socket request for checkIrisDuplicate_ICE to redis");
-													dataToIce = {"emitAction" : "irisOperations","username" : name, "image_data":scrapedata, "param":"checkDuplicate"};
-													redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+													dataToIce = {"emitAction" : "irisOperations","username" : icename, "image_data":scrapedata, "param":"checkDuplicate"};
+													redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 													function checkIrisDuplicate_listener(channel,message) {
 														var data = JSON.parse(message);
-														if(name == data.username){
+														if(icename == data.username){
 															redisServer.redisSubServer.removeListener('message',checkIrisDuplicate_listener);
 															if (data.onAction == "unavailableLocalServer") {
 																logger.error("Error occurred in checkIrisDuplicate_ICE: Socket Disconnected");
-																if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-																	var soc = myserver.socketMapNotify[name];
+																if('socketMapNotify' in myserver &&  username in myserver.socketMapNotify){
+																	var soc = myserver.socketMapNotify[username];
 																	soc.emit("ICEnotAvailable");
 																}
 															} else if (data.onAction == "iris_operations_result") {
@@ -528,6 +555,9 @@ exports.updateScreen_ICE = function (req, res) {
 								logger.error("Exception in the finalFunction: %s", exception);
 							}
 						});
+					}else{
+						statusFlag = "Invalid Input";
+						res.send(statusFlag); 
 					}
 					finalcallback;
 				} catch (exception) {
@@ -547,20 +577,21 @@ exports.userObjectElement_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: userObjectElement_ICE");
 		if (utils.isSessionActive(req)) {
-			var name = req.session.username;
-			redisServer.redisSubServer.subscribe('ICE2_' + name);
+			var username=req.session.username;
+			var icename = myserver.allSocketsICEUser[username];
+			redisServer.redisSubServer.subscribe('ICE2_' + icename);
 			var operation = req.body.object[0];
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.info("ICE Socket requesting Address: %s" , name);
+			logger.info("ICE Socket requesting Address: %s" , icename);
 			logger.info("Sending socket request for focus to redis");
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
 				if (redisres[1]>0) {
 					if(operation=='encrypt'){
 						props={
 							action:"userobject",
 							url:req.body.object[1],
-							name:req.body.object[2],
+							icename:req.body.object[2],
 							rpath:req.body.object[3],
 							apath:req.body.object[4],
 							classname:req.body.object[5],
@@ -579,16 +610,16 @@ exports.userObjectElement_ICE = function (req, res) {
 							operation:operation
 						}
 					}
-					dataToIce = {"emitAction": "webscrape", "username" : name, "data": props};
-					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					dataToIce = {"emitAction": "webscrape", "username" : icename, "data": props};
+					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					function userObjectElement_ICE_listener(channel, message) {
 						var data = JSON.parse(message);
-						if (name == data.username) {
+						if (icename == data.username) {
 							redisServer.redisSubServer.removeListener('message', userObjectElement_ICE_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
-								if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
-									var soc = myserver.socketMapNotify[name];
+								if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+									var soc = myserver.socketMapNotify[username];
 									soc.emit("ICEnotAvailable");
 								}
 							} else {
@@ -619,17 +650,18 @@ exports.highlightScrapElement_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: highlightScrapElement_ICE");
 		if (utils.isSessionActive(req)) {
-			var name = req.session.username;
-			redisServer.redisSubServer.subscribe('ICE2_' + name);
+			var username=req.session.username;
+			var icename = myserver.allSocketsICEUser[username];
+			redisServer.redisSubServer.subscribe('ICE2_' + icename);
 			var focusParam = req.body.elementXpath;
 			var elementURL = req.body.elementUrl;
 			var appType = req.body.appType;
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.info("ICE Socket requesting Address: %s" , name);
+			logger.info("ICE Socket requesting Address: %s" , icename);
 			logger.info("Sending socket request for focus to redis");
-			var dataToIce = {"emitAction": "focus", "username": name, "focusParam": focusParam, "elementURL": elementURL, "appType": appType};
-			redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+			var dataToIce = {"emitAction": "focus", "username": icename, "focusParam": focusParam, "elementURL": elementURL, "appType": appType};
+			redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 			logger.info("Successfully highlighted selected object");
 			res.send('success');
 		} else {
@@ -646,24 +678,25 @@ exports.updateIrisDataset = function updateIrisDataset(req, res) {
 	try{
 		logger.info("Inside UI service: updateIrisDataset");
 		if (utils.isSessionActive(req)) {
-			name = req.session.username;
+			var username=req.session.username
+			var icename = myserver.allSocketsICEUser[username];
 			image_data = req.body.data;
-			redisServer.redisSubServer.subscribe('ICE2_' + name);
+			redisServer.redisSubServer.subscribe('ICE2_' + icename);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.debug("ICE Socket requesting Address: %s" , name);
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+			logger.debug("ICE Socket requesting Address: %s" , icename);
+			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
 				if (redisres[1]>0) {
 					logger.info("Sending socket request for updateIrisDataset to redis");
-					dataToIce = {"emitAction" : "irisOperations","username" : name, "image_data":image_data, "param":"updateDataset"};
-					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					dataToIce = {"emitAction" : "irisOperations","username" : icename, "image_data":image_data, "param":"updateDataset"};
+					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					function updateIrisDataset_listener(channel,message) {
 						var data = JSON.parse(message);
-						if(name == data.username){
+						if(icename == data.username){
 							redisServer.redisSubServer.removeListener('message',updateIrisDataset_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occurred in updateIrisDataset: Socket Disconnected");
-								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-									var soc = myserver.socketMapNotify[name];
+								if('socketMapNotify' in myserver &&  username in myserver.socketMapNotify){
+									var soc = myserver.socketMapNotify[username];
 									soc.emit("ICEnotAvailable");
 								}
 							} else if (data.onAction == "iris_operations_result") {
@@ -693,7 +726,7 @@ exports.updateIrisDataset = function updateIrisDataset(req, res) {
 					}
 					redisServer.redisSubServer.on("message",updateIrisDataset_listener);
 				} else {
-					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+					utils.getChannelNum('ICE1_scheduling_' + icename, function(found){
 						var flag="";
 						if (found) flag = "scheduleModeOn";
 						else {
@@ -782,4 +815,36 @@ function parseRequest(readChild) {
 	} catch (exception) {
 		logger.error("Exception in the function parseRequest: %s", exception);
 	}
+}
+
+
+function parseJsonRequest(requestedBody,base_key,cur_key) {
+	xpaths=[]
+	try {
+		logger.info("Inside the function parseRequest ");
+     	for (var key in requestedBody){
+			 var value=requestedBody[key];
+			 if (typeof(value)==="object" && !(Array.isArray(value))){
+				if (base_key!== "")  base_key+='/'+key;
+				else  base_key=key;
+				xpaths.push(base_key);
+				xpaths.concat(parseJsonRequest(value,base_key,key));
+				base_key=base_key.slice(0,-key.length-1);
+
+			 }else if(Array.isArray(value)){
+				for (var i=0;i<value.length;i++){
+					base_key+=key+"["+i.toString()+"]";
+					xpaths.concat(parseJsonRequest(value[i],base_key,key));
+				}
+					
+			 }else{
+				xpaths.push(base_key+'/'+key);
+			 }
+		 }
+		 base_key=base_key.slice(0,-cur_key.length);
+     	 
+	} catch (exception) {
+		logger.error("Exception in the function parseRequest: %s", exception);
+	}
+	return xpaths
 }

@@ -75,7 +75,7 @@ var strategyUtil = {
 				function authenticateUser(callback){
 					logger.info("Inside function authenticateUser");
 					var args = {
-						data: { "username": username ,"query":'userInfobyName' },
+						data: { "username": username },
 						headers: { "Content-Type": "application/json" }
 					};
 					logger.info("Calling NDAC Service : loadUser_Nineteen68");
@@ -185,11 +185,9 @@ var strategyUtil = {
 
 var routeUtil = {
 	"inhouse": function inhouse(opts){
-		authRouter.get(opts.route.login, function(req, res) {
-			if (req.session.uniqueId) utils.cloneSession(req, function(err){
-				return res.sendFile("app.html", { root: __dirname + "/../../public/" });
-			});
-			else return res.sendFile("app.html", { root: __dirname + "/../../public/" });
+		authRouter.get(opts.route.login, async (req, res) => {
+			if (req.session.uniqueId) await utils.cloneSession(req);
+			return res.sendFile("app.html", { root: __dirname + "/../../public/" });
 		});
 		authRouter.post(opts.route.login, function (req, res, next){
 			logger.info("Inside UI service: login");

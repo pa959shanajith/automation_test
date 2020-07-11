@@ -337,7 +337,7 @@
       <div class="reportStatus">
          <span class="progresslabel" style='width:35%'>Overall Status</span>
          <span class="progresslabel progressLabelVal"
-            style="width:35%; color:{{getColor overAllStatus}}"><text style='color:#000; !important'>:</text> {{overAllStatus}}</span>
+            style="width:35%; color:{{getColor overallstatus}}"><text style='color:#000; !important'>:</text> {{overallstatus}}</span>
         {{#ifnotEquals overAllStatus "Incomplete"}}
          <span class="progresslabel" style='width:35%'>Tescase Status</span>
          <span class="progress customprogress  progressLabelVal" style='width:53%'>
@@ -406,14 +406,16 @@
                {{#ifnotEquals Keyword "TestCase Name"}}
                <td class="rDExpectedRes tabCont {{getClass StepDescription}}"></td>
                {{/ifnotEquals}}
+               {{#ifEquals Keyword "TestCase Name"}}
+               <td class="rDExpectedRes tabCont"></td>
+               {{/ifEquals}}
                {{/ifEquals}}
                {{#ifEquals testcase_details.testcaseDetails ""}}
                <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
                {{/ifEquals}}
                {{#ifnotEquals testcase_details.testcaseDetails ""}}
                {{#ifnotEquals testcase_details undefined}}
-               <td class="rDExpectedRes tabCont" style="padding-left: 10px;">Expected Result is:
-                  {{testcase_details.testcaseDetails}}</td>
+               <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{testcase_details.testcaseDetails}}</td>
                {{/ifnotEquals}}
                {{/ifnotEquals}}
                {{#ifEquals status undefined}}
@@ -439,7 +441,7 @@
                {{/ifEquals}}
                {{#ifnotEquals testcase_details.actualResult_fail ""}}
                <td class="rDActualRes tabCont" style="padding-left: 10px;">
-                  {{testcase_details.actualResult_fail}}>{{status}}</a></td>
+                  {{testcase_details.actualResult_fail}}</td>
                {{/ifnotEquals}}
                {{/ifEquals}}
                {{#ifEquals status "Terminate"}}
@@ -470,7 +472,7 @@
          <img id="img-{{slno}}" src="{{getDataURI screenshot_dataURI}}" style="width:100%;display:block;"
             alt="Image for Sl No. {{slno}}">
          {{/ifnotEquals}}
-         <a href="#report-slno{{slno}}">Above Image belongs to Sl No. {{slno}}</a>
+         <a href="#report-slno{{slno}}">Above image belongs to Sl No. {{slno}}</a>
       </div>
       {{/each}}
    </div>

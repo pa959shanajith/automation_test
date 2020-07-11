@@ -939,7 +939,7 @@
     stroke-width:0
 }
  .modal-backdrop.in{
-    background-color:transparent
+   /* background-color:transparent; */
 }
  .disableButton{
     cursor: default;
@@ -1368,8 +1368,8 @@
  #copy-paste{
      display: inline-block;
      white-space: nowrap;
-     padding-right: 7px;
-     padding-left: 7px;
+     padding: 4px 7px 0 7px;
+     float: left;
 }
  #rect-copy {
      width: 150px;

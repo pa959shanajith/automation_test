@@ -17,25 +17,19 @@ exports.loginQCServer_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: loginQCServer_ICE");
 		if (utils.isSessionActive(req)) {
-			var name = req.session.username;
+			var name = myserver.allSocketsICEUser[req.session.username];
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("ICE Socket connecting IP: %s" , ip);
 			logger.debug("ICE Socket requesting Address: %s" , name);
-            var check_qcUrl = validator.isEmpty(req.body.qcURL);
-			var validate_qcUsername,validate_qcPassword,validate_qcUrl;
-            if(check_qcUrl == false) {
-                validate_qcUrl = true;
+            var check_qcUrl = !validator.isEmpty(req.body.qcURL);
+            var check_qcUsername = !validator.isEmpty(req.body.qcUsername);
+            var check_qcPassword = !validator.isEmpty(req.body.qcPassword);
+			if(!check_qcUrl) {
+				logger.info("Error occurred in loginQCServer_ICE: Invalid QC Url");
+				return res.send("invalidurl");
             }
-            var check_qcUsername = validator.isEmpty(req.body.qcUsername);
-            if(check_qcUsername == false) {
-                validate_qcUsername = true;
-            }
-            var check_qcPassword = validator.isEmpty(req.body.qcPassword);
-            if(check_qcPassword == false) {
-                 validate_qcPassword = true;
-            }
-			if(validate_qcUrl == true && validate_qcUsername == true &&  validate_qcPassword == true) {
+			if(check_qcUrl && check_qcUsername &&  check_qcPassword) {
 				redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 					if (redisres[1]>0) {
 						var username = req.body.qcUsername;
@@ -81,25 +75,16 @@ exports.loginQCServer_ICE = function (req, res) {
 					}
 				});
 			} else {
-				logger.info("Invalid Session");
-				res.send("Invalid Session");
+				logger.info("Error occurred in loginQCServer_ICE: Invalid QC Credentials");
+				res.send("invalidcredentials");
 			}
 		} else {
-			utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-				var flag="";
-				if (found) flag = "scheduleModeOn";
-				else flag = "unavailableLocalServer";
-				res.send(flag);
-			});
+			logger.error("Invalid Session");
+			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error(exception.message);
-		utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-			var flag="";
-			if (found) flag = "scheduleModeOn";
-			else flag = "unavailableLocalServer";
-			res.send(flag);
-		});
+		logger.error("Error occurred in loginQCServer_ICE:", exception.message);
+		res.send("fail");
 	}
 };
 
@@ -112,7 +97,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 	var name;
 	try {
 		if (utils.isSessionActive(req)) {
-			name = req.session.username;
+			name = myserver.allSocketsICEUser[req.session.username];
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.debug("ICE Socket requesting Address: %s" , name);
@@ -139,10 +124,10 @@ exports.qcProjectDetails_ICE = function (req, res) {
 										soc.emit("ICEnotAvailable");
 									}
 								} else if (data.onAction == "qcresponse") {
-									if (data.value.toLowerCase() == "fail")
+									if (data == "fail")
 										res.send("fail");
 									else {
-										data = JSON.parse(data.value);
+										data = data.value;
 										try {
 											projectDetailList.nineteen68_projects = projectdata;
 											projectDetailList.qc_projects = data.project;
@@ -190,7 +175,6 @@ function getProjectsForUser(userid, cb) {
 	var projectidlist = [];
 	async.series({
 		getprojectDetails: function (callback1) {
-			var getprojects = "select projectids from icepermissions where userid=" + userid;
 			var inputs = {
 				"userid": userid,
 				"query": "getprojectDetails"
@@ -208,8 +192,7 @@ function getProjectsForUser(userid, cb) {
 					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from getprojectDetails Error Code : ERRNDAC");
 				} else {
 					if (projectrows.rows.length != 0) {
-						//flagtocheckifexists = true;
-						projectidlist = projectrows.rows[0].projectids;
+						projectidlist = projectrows.rows[0].projects;
 					}
 				}
 				callback1();
@@ -259,7 +242,7 @@ function projectandscenario(projectid, cb) {
 					logger.error("Error occurred in getProjectsForUser from projectname1 Error Code : ERRNDAC");
 				} else {
 					if (projectdata.rows.length != 0) {
-						projectname = projectdata.rows[0].projectname;
+						projectname = projectdata.rows[0].name;
 					}
 				}
 				callback1();
@@ -307,27 +290,28 @@ exports.qcFolderDetails_ICE = function (req, res) {
 		"nineteen68_projects": '',
 		"qc_projects": ""
 	};
-	var name;
+	var icename;
 	try {
 		if (utils.isSessionActive(req)) {
 			var qcDetails = req.body;
-			name = req.session.username;
-			redisServer.redisSubServer.subscribe('ICE2_' + name);
+			var username=req.session.username;
+			icename = myserver.allSocketsICEUser[username];
+			redisServer.redisSubServer.subscribe('ICE2_' + icename);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.debug("ICE Socket requesting Address: %s" , name);
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+			logger.debug("ICE Socket requesting Address: %s" , icename);
+			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
 				if (redisres[1]>0) {
 					logger.info("Sending socket request for qclogin to redis");
-					dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
-					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					dataToIce = {"emitAction" : "qclogin","username" : icename, "responsedata":qcDetails};
+					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					function qclogin_listener(channel,message) {
 						var data = JSON.parse(message);
-						if(name == data.username){
+						if(icename == data.username){
 							redisServer.redisSubServer.removeListener('message',qclogin_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occurred in qcFolderDetails_ICE: Socket Disconnected");
-								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-									var soc = myserver.socketMapNotify[name];
+								if('socketMapNotify' in myserver &&  username in myserver.socketMapNotify){
+									var soc = myserver.socketMapNotify[username];
 									soc.emit("ICEnotAvailable");
 								}
 							} else if (data.onAction == "qcresponse") {
@@ -339,7 +323,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 					redisServer.redisSubServer.on("message",qclogin_listener);
 				} else {
 					try {
-						utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+						utils.getChannelNum('ICE1_scheduling_' + icename, function(found){
 							var flag="";
 							if (found) flag = "scheduleModeOn";
 							else {
@@ -359,7 +343,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 		}
 	} catch (exception) {
 		logger.error(exception.message);
-		utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+		utils.getChannelNum('ICE1_scheduling_' + icename, function(found){
 			var flag="";
 			if (found) flag = "scheduleModeOn";
 			else flag = "unavailableLocalServer";
@@ -378,14 +362,12 @@ exports.saveQcDetails_ICE = function (req, res) {
 		flag = false;
 	}
 	async.forEachSeries(mappedDetails, function (itr, callback) {
-		var qcdetailsid = null;
 		var testscenarioid = itr.scenarioId;
 		var qcdomain = itr.domain;
 		var qcproject = itr.project;
 		var qcfolderpath = itr.folderpath;
 		var qctestcase = itr.testcase;
 		var qctestset = itr.testset;
-		var scenarioquery = "INSERT INTO qualitycenterdetails (testscenarioid,qcdetailsid,qcdomain,qcfolderpath,qcproject,qctestcase,qctestset) VALUES (" + testscenarioid + "," + testscenarioid + ",'" + qcdomain + "','" + qcfolderpath + "','" + qcproject + "','" + qctestcase + "','" + qctestset + "')";
 		var inputs = {
 			"testscenarioid": testscenarioid,
 			"qcdetailsid": testscenarioid,
@@ -437,7 +419,6 @@ exports.saveQcDetails_ICE = function (req, res) {
 
 exports.viewQcMappedList_ICE = function (req, res) {
 	logger.info("Inside UI service: viewQcMappedList_ICE");
-	var qcDetailsList = [];
 	var userid = req.body.user_id;
 	getQcDetailsForUser(userid, function (responsedata) {
 		//console.log(responsedata);
@@ -449,7 +430,6 @@ function getQcDetailsForUser(userid, cb) {
 	logger.info("Inside function getQcDetailsForUser");
 	var projectDetailsList = [];
 	var projectidlist = [];
-	var scenarioDetailsList;
 	async.series({
 		getprojectDetails: function (callback1) {
 			var inputs = {
@@ -471,7 +451,7 @@ function getQcDetailsForUser(userid, cb) {
 				} else {
 					if (projectrows.rows.length != 0) {
 						//flagtocheckifexists = true;
-						projectidlist = projectrows.rows[0].projectids;
+						projectidlist = projectrows.rows[0].projects;
 					}
 
 				}
@@ -524,11 +504,7 @@ function qcscenariodetails(projectid, cb) {
 					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from qcscenariodetails Error Code : ERRNDAC");
 				} else {
 					if (scenariorows.rows.length != 0) {
-						//flagtocheckifexists = true;
 						scenarios_list = JSON.parse(JSON.stringify(scenariorows.rows));
-						// projectDetails.project_id = projectid;
-						// projectDetails.scenario_details = scenarios_list;
-						// projectDetails.project_name = projectname;
 					}
 				}
 				callback1();
@@ -538,7 +514,7 @@ function qcscenariodetails(projectid, cb) {
 			logger.info("Inside function qcdetails");
 			async.forEachSeries(scenarios_list, function (itr, callback2) {
 				var inputs = {
-					"testscenarioid": itr.testscenarioid,
+					"testscenarioid": itr._id,
 					"query": "qcdetails"
 				};
 				var args = {
@@ -556,7 +532,7 @@ function qcscenariodetails(projectid, cb) {
 						if (qcdetailsows.rows.length != 0) {
 							//flagtocheckifexists = true;
 							qcdetails = JSON.parse(JSON.stringify(qcdetailsows.rows[0]));
-							qcdetails.testscenarioname = itr.testscenarioname;
+							qcdetails.testscenarioname = itr.name;
 							// projectDetails.project_id = projectid;
 							// projectDetails.scenario_details = scenarios_list;
 							// projectDetails.project_name = projectname;
@@ -587,7 +563,6 @@ function getProjectsAndModules(userid,cb){
 		logger.info("Inside function getProjectsAndModules");
     var projectDetailsList1 = [];
     var projectidlist = [];
-    var scenarioDetailsList ;
     async.series({
         getprojectDetails:function(callback){
             //var getprojects = "select projectids from icepermissions where userid="+userid;
@@ -600,10 +575,7 @@ function getProjectsAndModules(userid,cb){
             client.post(epurl+"qualityCenter/qcProjectDetails_ICE",args,
                 function (projectrows, response) {
                     if (response.statusCode != 200 || projectrows.rows == "fail") {
-           // dbConnICE.execute(getprojects,function(err,projectrows){
-                //if(err){
-                    //console.log(err);
-                  					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from getProjectsAndModules Error Code : ERRNDAC");
+                  		logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from getProjectsAndModules Error Code : ERRNDAC");
 
                 }else{
                     if(projectrows.rows.length!=0){
@@ -633,7 +605,6 @@ function getProjectsAndModules(userid,cb){
 function projectandmodule(projectid,cb,data){
 		logger.info("Inside function projectandmodule");
     var projectDetails = {"project_id":'',"project_name":'',"module_details":[]};
-    var projectname = '';
     var modulelist = [];
     async.series({
         projectname1 : function(callback1){
@@ -660,113 +631,8 @@ function projectandmodule(projectid,cb,data){
                     callback1();
             });
         },
-        /*scenariodata:function(callback1){
-            var modulequery = "SELECT * FROM modules where projectid="+projectid
-                var inputs = {"projectid":projectid,"query":"scenariodata"}
-                var args = {
-                    data:inputs,
-                    headers:{"Content-Type" : "application/json"}
-                    
-                }
-                projectDetails.project_id = projectid;
-                projectDetails.project_name = projectname;
-                // client.post(epurl+"qualityCenter/qcProjectDetails_ICE",args,
-                //     function (modulerows, response) {
-                //     if (response.statusCode != 200 || scenariorows.rows == "fail") {
-                dbConnICE.execute(modulequery,function(err,modulerows){
-                if(err){
-                    console.log(err);
-                        console.log("Error occurred in getProjectsForUser: fail , scenariodata");
-                }else{
-                    if(modulerows.rows.length!=0){
-                        flagtocheckifexists = true;
-                        //scenarios_list = JSON.parse(JSON.stringify(modulerows.rows));
-                        getmodulescenario(modulerows.rows,function(moduledata){
-                            modulelist = moduledata;
-                            callback1();
-                        })
-                        
-                    }else{
-                        projectDetails.project_id = projectid;
-                        projectDetails.project_name = projectname;
-                        callback1();
-                    }
-                }
-            });
-        }*/
     },function(err,data){
         projectDetails.module_details = modulelist;
         cb(projectDetails);
     });
 }
-
-
-/*function getmodulescenario(rows,cb){
-    var modulelist = [];
-    async.forEachSeries(rows,function(itr,callback){
-        var moduleobj = {"module_name":itr.modulename,"module_id":itr.moduleid,"scenario_details":[]};
-        getScenarioDetails(itr.testscenarioids,function(scenariodata){
-            moduleobj.scenario_details = scenariodata;
-            modulelist.push(moduleobj);
-            callback();
-        });
-
-    },function(){
-        cb(modulelist)
-    });
-}
-
-function getScenarioDetails(scenarioids,cb){
-    var scenariolist = [];
-    async.forEachSeries(scenarioids,function(itr,callback){
-        var scenarioquery = "select * from testscenarios where testscenarioid="+itr;
-        var scenarioobj = {"scenario_name":"","scenario_id":"","testcase_details":[]};
-        dbConnICE.execute(scenarioquery,function(err,scenariodata){
-            if(err){
-                console.log(err);
-            }else{
-                if(scenariodata.rows.length >0){
-                    scenarioobj.scenario_name = scenariodata.rows[0].testscenarioname;
-                    scenarioobj.scenario_id = scenariodata.rows[0].testscenarioid;
-                    getTestCaseDetails(scenariodata.rows[0].testcaseids,function(testcasedata){
-                        scenarioobj.testcase_details = testcasedata;
-                        scenariolist.push(scenarioobj);
-                        callback();
-                    });
-
-                }else{
-                    callback();
-                }
-            }
-        });
-        
-    },function(){
-        cb(scenariolist);
-    })
-}
-
-function getTestCaseDetails(testcaseids,cb){
-    var testcaselist = [];
-    async.forEachSeries(testcaseids,function(itr,callback){
-        var testcaseobj = {"testcase_name":"","testcase_id":""};
-        var testcasequery = "select testcasename,testcaseid from testcases where testcaseid="+itr;
-        dbConnICE.execute(testcasequery,function(err,testcasedata){
-            if(err){
-                console.log("Error occurred is :",err);
-                callback();
-            }else{
-                if(testcasedata.rows.length >0){
-                    testcaseobj.testcase_name = testcasedata.rows[0].testcasename;
-                    testcaseobj.testcase_id = testcasedata.rows[0].testcaseid;
-                    testcaselist.push(testcaseobj);
-                    callback();
-                }else{
-                    callback()
-                }
-            }
-        });
-
-    },function(){
-        cb(testcaselist);
-    });
-};*/

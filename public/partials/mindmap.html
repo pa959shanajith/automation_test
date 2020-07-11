@@ -1,0 +1,691 @@
+<header header></header>
+<div id="ct-page">
+   <!-- Left Section -->
+   <div class="ct-side fl-left" id="ct-lSide">
+      <div id="left-nav-section" style='z-index:9999;' class='left-sec-mindmap lsSlide'>
+         <div class="scroll-wrapper scrollbar-macosx" style="position: relative;">
+            <div class="scrollbar-macosx scroll-content" style="height: auto; margin-bottom: 0px; margin-right: 0px; max-height: 410px;">
+               <div class="clear-both"></div>
+               <div id="left-top-section" class="mindmap-left-section" style="top: 150px !important;">
+                  <ul>
+                     <li>
+                        <a id='createImg1' ng-click="tab = 'mindmapCreateOption'; createMapsCall()" href="#" title="Create"><span ><img id='createImg' class="highlightImg highlightImg1" src="imgs/create.png" alt="Create"></span>Create</a>
+                     </li>
+                     <li>
+                        <a id='assignImg1' ng-click="createMap('tabAssign'); createMapsCall();" href="#" title="Assign"><span><img id='assignImg' class="highlightImg highlightImg1" src="imgs/assign.png" alt="Assign"></span>Assign</a>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+            <div class="scroll-element scroll-x">
+               <div class="scroll-element_outer">
+                  <div class="scroll-element_size"></div>
+                  <div class="scroll-element_track"></div>
+                  <div class="scroll-bar" style="width: 96px;"></div>
+               </div>
+            </div>
+            <div class="scroll-element scroll-y">
+               <div class="scroll-element_outer">
+                  <div class="scroll-element_size"></div>
+                  <div class="scroll-element_track"></div>
+                  <div class="scroll-bar" style="height: 96px;"></div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div id='ct-expand-left' class="ct-expand ct-rev"></div>
+   </div>
+   <!-- Left Section -->
+   <!-- Mid Section -->
+   <div class="createFirstContainer" ng-show="tab == 'mindmapCreateOption'">
+      <div class="createOptionContainer">
+         <div ng-click="createMap('tabCreate'); tab = 'tabCreate'; createMapsCall()" title="Create New">
+            <img alt="Create New" class="" src="imgs/ic-create-newMindmap.png">
+            <label>Create New</label>
+         </div>
+         <div ng-click="createMap('mindmapEndtoEndModules'); tab = 'mindmapEndtoEndModules'; createMapsCall()" title="End to End flow">
+            <img alt="End to End flow" class="" src="imgs/ic-endtoendFlow.png">
+            <label>End to End Flow</label>
+         </div>
+         <div title="Import from Excel">
+            <label for="file-input" style="margin:0; cursor:pointer;">
+            <img alt="Import from Excel" class="" src="imgs/ic-importfromexcel-mindmap.png">
+            </label>
+            <label>Import from Excel</label>
+            <input id="file-input" on-read-file="getSheetName($fileContent)" type="file" name="xlsfile" accept=".xls,.xlsx" required="" autofocus="" style="display:none"/>
+         </div>
+      </div>
+   </div>
+   <div id="ct-main-e2e" class="fl-left" ng-if="tab == 'mindmapEndtoEndModules'">
+      <div class="endtoend-modulesContainer">
+         <div class="endtoend-modules-left endtoend-module-upperSection">
+            <div class="endtoend-modules-left-upper">
+               <select class="makeElementFloatleft project-list" id="selectProjectEtem" ng-change="projectListChange(projectName1)" ng-model="projectName1">
+                  <option ng-repeat="project in projectList" ng-selected="projectNameO == project.id" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}'>{{project.name}}</option>
+               </select>
+               <input type="text" class="makeElementFloatleft" id="eteSearchModules"  ng-keyup = "searchModule('eteSearchModules')" placeholder="Search modules" /><img alt="Search Icon" class="searchModuleimg" src="imgs/ic-search-icon.png" >
+               <span class="eteLabel makeElementFloatleft no-disp">End to End Modules</span>
+            </div>
+            <div class="scrollbar-inner endtoend-modules-left-lower makeElementFloatleft" style="overflow-y:auto !important" id="etemModuleContainer">
+                <span class="moduleContainer" ng-repeat="map in allMMaps" ng-click="loadEndToEnd($index,map.type,map.name,map._id)" data-mapid="{{$index}}" title="{{map.name}}">
+                    <img class="ct-nodeIcon eteMbox" src="imgs/node-{{map.type}}.png" alt="Module" aria-hidden="true">
+                    <span class="ct-nodeLabel ct-node-e2e" style="width: 120px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 20px;">{{map.name}}</span>
+                </span>                 
+            </div>
+      
+         </div>
+         <div class="endtoend-modules-right endtoend-module-upperSection">
+            <div class="endtoend-modules-right-upper">
+               <label class="makeElementFloatleft">Scenarios</label>
+               <input type="text" class="makeElementFloatleft" id="eteSearchScenarios" placeholder="search scenarios"  ng-keyup = "searchModule('eteSearchScenarios')"/><img alt="Search Icon" class="searchModuleimg" src="imgs/ic-search-icon.png" >
+            </div>
+            <div class="endtoend-modules-right-lower makeElementFloatleft">
+               <div class="scrollbar-inner endtoend-modules-rightfirst-lower makeElementFloatleft" id="eteScenarioContainer"></div>
+               <button class="createNew-ete" ng-click="createNewMap_W($event)">CreateNew</button>
+               <button class="addScenarios-ete" ng-click ="addScenariosete($event)" >Add</button>
+            </div>
+         </div>
+         <span class="suitedropdownicon"><img alt="Collapse Icon" class="iconSpace collapseEte" src="imgs/ic-collapse.png" ng-click = "collapseETE()"></span>
+      </div>
+      <div class="ct-canvas-Container" id="ct-canvas">
+         <div id="search-canvas-icon" class="ui-draggable ui-draggable-handle"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>
+         <div id="ct-inpBox" class="no-disp">
+            <input id="ct-inpPredict" class="ct-inp"><input id="ct-inpAct" maxlength="255" class="ct-inp" ng-model="inpText" ng-keyup="txtBoxKeyup($event.keyCode)">
+            <ul id="ct-inpSugg" class="no-disp"></ul>
+         </div>
+         <div id="ct-ctrlBox" class="no-disp" style="top: 413px; left: 457.333px;">
+            <p class="ct-ctrl fa fa-plus" ng-click="createNode($event)"><span class="ct-tooltiptext">Create Scenarios</span></p>
+            <!-- <p class="ct-ctrl fa fa-hand-peace-o" ng-click="createMultipleNode()"><span class="ct-tooltiptext">Create Multiple Scenarios</span></p> -->
+            <p class="ct-ctrl fa fa-pencil-square-o" ng-click="editNode($event)"><span class="ct-tooltiptext">Edit Module</span></p>
+            <p class="ct-ctrl fa fa-trash-o ct-ctrl-inactive" ng-click="deleteNode($event)"><span class="ct-tooltiptext"></span></p>
+         </div>
+         <svg id="ct-mapSvg" style="width: 100%; height: 100%;">
+            <g id="ct-mindMap">
+                <path ng-repeat="(id,link) in linkDisplay" ng-model="link" id="{{id}}" class="ct-link" d="{{link.d}}"></path>           
+                <g ng-repeat="(id, node) in nodeDisplay" ng-model="dispnode" id="ct-node-{{id}}" class="ct-node" data-nodetype="{{node.type}}" transform="{{node.transform}}">
+                    <image height="40px" width="40px" class="ct-nodeIcon" xlink:href={{node.img_src}} style="opacity:{{node.opacity}}" ng-click="nodeUniversalClick(id)" ></image>
+                    <text class="ct-nodeLabel" text-anchor="middle" x="20" title="{{node.title}}" y="50">{{node.name}}</text>
+                    <title>{{node.title}}</title>
+                    <circle ng-if="node.type=='modules'|| node.type=='modules_endtoend'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="{{verticalLayout ? 20 : 44}}" cy="{{verticalLayout ? 55 : 20}}" r="4" ng-click = "toggleNode(id)"></circle>
+                    <circle ng-if="node.type=='scenarios'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="-3" cy="20" r="4"  ng-mousedown="moveNodeBegin(id)" ng-mouseup="moveNodeEnd(id)"></circle>    
+                </g>         
+            </g>
+         </svg>
+         <div class="navigate-widget no-disp">
+            <div class="arrow-box">
+                    <p><i class="arrow-box-ic up"></i></p>
+                    <p><i class="arrow-box-ic left"></i><i class="arrow-box-ic right"></i></p>
+                    <p><i class="arrow-box-ic down"></i></p>
+            </div>   
+            <div class="zoom-box">
+                <div><button class="zoom-btn my-btn" id="zoom_in">+</button></div>
+                <div><button class="zoom-btn my-btn" id="zoom_out">-</button></div>
+                <!-- <div id="slider-range-min"></div> -->
+            </div>     
+        </div>
+         <svg id="ct-legendBox">
+            <g transform="translate(10,10)">
+               <g>
+                  <circle class="ct-modules" cx="0" cy="0" r="10"></circle>
+                  <text class="ct-nodeLabel" x="15" y="3">Modules</text>
+               </g>
+               <g>
+                  <circle class="ct-scenarios" cx="90" cy="0" r="10"></circle>
+                  <text class="ct-nodeLabel" x="105" y="3">Scenarios</text>
+               </g>
+               <g>
+                  <circle class="ct-screens" cx="180" cy="0" r="10"></circle>
+                  <text class="ct-nodeLabel" x="195" y="3">Screens</text>
+               </g>
+               <g>
+                  <circle class="ct-testcases" cx="270" cy="0" r="10"></circle>
+                  <text class="ct-nodeLabel" x="285" y="3">Test Cases</text>
+               </g>
+            </g>
+         </svg>
+         <svg id="ct-actionBox">
+            <g>
+               <g id="ct-saveAction" class="ct-actionButton" ng-click = "actionEvent_W($event)">
+                  <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
+                  <text x="23" y="18">Save</text>
+               </g>
+               <!-- <g id="ct-createAction" class="ct-actionButton disableButton" ng-click = "actionEvent_W($event)">
+                  <rect x="100" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
+                  <text x="114" y="18">Create</text>
+               </g> -->
+            </g>
+         </svg>      
+      </div>
+   </div>
+   <div id="ct-main" class="fl-left">
+      <div id="ct-projectList">
+         <div class="ct-project"></div>
+      </div>
+      <!--<div ng-show="tab == 'tabRequirement'" id="page-taskName" class="showContainer" style="width:0px !important"><span class="taskname">Requirement</span></div>-->
+      <div ng-show="tab == 'tabCreate'" id="ct-moduleBox" class="ct-moduleBoxOptional tabCreate">
+         <div class="ct-project-tab">
+            <button ng-show="tab=='tabCreate'" style="position: absolute;padding: 0px 13px;top: 1px;right: 209px;" class="btn btn-md pull-right pairwise-GenBtn" ng-click="createNewMapModal()" title="Create New Mindmap">Create New</button>
+            <span ng-show="tab == 'tabCreate'" id='SearchCreate-ete'>
+            <span class="search-create"><img alt="Search Icon" class="searchModuleimg-create" src="imgs/ic-search-icon.png"></span>
+            <input type="text" id="searchModule-create" class="searchbox-create" placeholder="Search Modules" ng-keyup = "searchModule('searchModule-create')">
+            </span>
+            <span class="selectProject">
+               <label class="selectProjectLabel">Project:</label>
+               <select class="project-list" ng-change="projectListChange(projectName2)" ng-model="projectName2">
+                    <option ng-repeat="project in projectList" ng-selected="projectNameO == project.id" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}'>{{project.name}}</option>
+               </select>
+            </span>
+            <span id="copy-paste">
+               <i class="fa fa-crop fa-lg plus-icon" id="copyImg1" title="add a rectangle" ng-click="startCopy()"></i>
+               <i class="fa fa-files-o fa-lg plus-icon" title="copy selected map" ng-click="copyMindMap()"></i>
+               <i class="fa fa-clipboard fa-lg plus-icon" id="pasteImg1" title="Paste map" ng-click="pasteMap()"></i>
+               <i class="glyphicon glyphicon-save export-excel-icon" id="export-excel" ng-click="exportToExcel()" title="Export To Excel"></i>
+               <label for="pd-input" style="margin-bottom: 0px;height: 14px;width: 10px;">
+                  <i class="glyphicon glyphicon-import import-pd-icon" id="import-pd" ng-click="importFromPD()" title="Import Process Discovery File"></i>
+               </label>
+               <input id="pd-input" on-read-file="importFromPD($fileContent)" type="file" name="xlsfile" accept=".pd" required="" autofocus="" style="display:none"/>
+            </span>
+         </div>
+         <!-- versioning -->
+         <div class="ct-nodeBox">
+            <div ng-repeat="map in allMMaps" ng-click="loadMap($index)" class="ct-node fl-left" data-mapid="{{$index}}" title="{{map.name}}" style="width: 139px;">
+               <img class="ct-nodeIcon" src="imgs/node-modules.png" alt="Module" aria-hidden="true">
+               <span class="ct-nodeLabel" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">{{map.name}}</span>
+            </div>
+         </div>
+         <span id='ctExpandCreate' class=''><img alt="Collapse Icon" id="expCreate" class="iconSpaceArrow" src="imgs/ic-collapse.png"></span>
+         <!--<div id="ctExpandCreate" class="ct-expand"></div>-->
+      </div>
+      <div ng-show="tab == 'tabAssign'" id="ct-AssignBox" class="ct-moduleBoxOptional tabAssign">
+         <div class='ct-project-tab'>
+            <span ng-show="tab == 'tabAssign'" id='SearchAssign-ete'>
+            <span class="search-assign"><img alt="Search Icon" class="searchModuleimg-assign" src="imgs/ic-search-icon.png"></span>
+            <input type="text" id="searchModule-assign" class="searchbox-assign" placeholder="Search Modules"  ng-keyup = "searchModule('searchModule-assign')">
+            </span>
+            <span class="selectProject">
+               <label class="selectProjectLabel">Project:</label>
+               <select class="project-list" ng-change="projectListChange(projectName3)" ng-model="projectName3">
+                <!-- <select class="project-list" ng-model="projectName3"> -->
+                    <option ng-repeat="project in projectList" ng-selected="projectNameO == project.id" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}' >{{project.name}}</option>
+               </select>
+            </span>
+            <span class="selectRelease selectProjectPosition"> 
+               <label class="selectReleaseLabel">Release:</label>
+               <select class="release-list"></select>
+            </span>
+            <span class="selectCycle selectProjectPosition"> 
+               <label class="selectCycleLabel">Cycle:</label>
+               <select class="cycle-list"></select>
+            </span>
+            <span id="copy-paste">
+               <i class="glyphicon glyphicon-export export-icon" ng-click="exportData(0)" title="Export Version"></i>
+            </span>
+         </div>
+         <div class="ct-nodeBox">
+            <div ng-repeat="map in allMMaps" ng-click="loadMap($index)" class="ct-node fl-left" data-mapid="{{$index}}" title="{{map.name}}" style="width: 139px;">
+               <img class="ct-nodeIcon" src="imgs/node-{{map.type}}.png" alt="Module" aria-hidden="true">
+               <span class="ct-nodeLabel" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">{{map.name}}</span>
+            </div>
+         </div>
+         <span id='ctExpandAssign' class=''><img alt="Collapse Icon" id="expAssign" class="iconSpaceArrow" src="imgs/ic-collapse.png"></span>
+         <!--<div id="ctExpandAssign" class="ct-expand"></div>-->
+      </div>
+      <div ng-if="tab == 'tabAssign'" id="ct-canvasforAssign" class="tabAssign">
+         <div id="search-canvas-icon" class="ui-draggable ui-draggable-handle"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>
+         <div id="ct-inpBox" class="no-disp">
+                <input id="ct-inpPredict" class="ct-inp"><input id="ct-inpAct" maxlength="255" class="ct-inp" ng-model="inpText" ng-keyup="txtBoxKeyup($event.keyCode)">
+                <ul id="ct-inpSugg" class="no-disp"></ul>
+        </div>
+        <div id="ct-assignBox" class="no-disp">
+            <div id="ct-assignTable"></div>
+            <div class="ct-assignDetailsBox"><textarea id="ct-assignDetails" placeholder="Enter Details"></textarea></div>
+            <div id="ct-assignButton" ng-click="addTask()"><a>OK</a></div>
+            <div id="ct-unassignButton" ng-click="removeTask()"><a>Unassign</a></div>
+        </div>
+         <svg id="ct-mapSvg" style="width: 100%; height: 100%;">
+            <g id="ct-mindMap">
+                <path ng-repeat="(id,link) in linkDisplay" ng-model="link" id="{{id}}" class="ct-link" d="{{link.d}}"></path>           
+                <g ng-repeat="(id, node) in nodeDisplay" ng-model="dispnode" id="ct-node-{{id}}" class="ct-node" data-nodetype="{{node.type}}" transform="{{node.transform}}">
+                    <image height="40px" width="40px" class="ct-nodeIcon" xlink:href={{node.img_src}} style="opacity:{{node.opacity}};" ng-click="nodeUniversalClick(id)"></image>
+                    <image ng-if="node.task == true && node.status != 'complete'" class="ct-nodeTask" width="21px" height="21px" xlink:href="imgs/node-task-assigned.png" style="opacity:{{node.taskOpacity}}" x="29" y="-10"></image>                    
+                    <text class="ct-nodeLabel" text-anchor="middle" x="20" title="{{node.title}}" y="50">{{node.name}}</text>
+                    <title>{{node.title}}</title>
+                    <circle ng-if="(node.type=='scenarios' && modType == 'generic') || node.type=='screens' || node.type=='modules' || node.type=='modules_endtoend'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="{{verticalLayout ? 20 : 44}}" cy="{{verticalLayout ? 55 : 20}}" r="4" ng-click="toggleNode(id)"></circle>
+                    <circle ng-if="node.type=='scenarios' || node.type=='screens' || node.type=='testcases'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="-3" cy="20" r="4" ></circle>    
+                </g>         
+            </g>
+         </svg>
+         <div class="navigate-widget no-disp">
+            <div class="arrow-box">
+                    <p><i class="arrow-box-ic up"></i></p>
+                    <p><i class="arrow-box-ic left"></i><i class="arrow-box-ic right"></i></p>
+                    <p><i class="arrow-box-ic down"></i></p>
+            </div>   
+            <div class="zoom-box">
+                <div><button class="zoom-btn my-btn" id="zoom_in">+</button></div>
+                <div><button class="zoom-btn my-btn" id="zoom_out">-</button></div>
+                <!-- <div id="slider-range-min"></div> -->
+            </div>     
+        </div>
+         <svg id="ct-legendBox">
+            <g transform="translate(10,10)">
+               <g>
+                  <circle class="ct-modules" cx="0" cy="0" r="10"></circle>
+                  <text class="ct-nodeLabel" x="15" y="3">Modules</text>
+               </g>
+               <g>
+                  <circle class="ct-scenarios" cx="90" cy="0" r="10"></circle>
+                  <text class="ct-nodeLabel" x="105" y="3">Scenarios</text>
+               </g>
+               <g>
+                  <circle class="ct-screens" cx="180" cy="0" r="10"></circle>
+                  <text class="ct-nodeLabel" x="195" y="3">Screens</text>
+               </g>
+               <g>
+                  <circle class="ct-testcases" cx="270" cy="0" r="10"></circle>
+                  <text class="ct-nodeLabel" x="285" y="3">Test Cases</text>
+               </g>
+            </g>
+         </svg>
+         <svg id="ct-actionBox">
+            <g>
+               <g id="ct-saveAction" class="ct-actionButton" ng-click = "actionEvent($event)">
+                  <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
+                  <text x="23" y="18">Save</text>
+               </g>
+               <!-- <g id="ct-createAction" class="ct-actionButton disableButton" ng-click = "actionEvent($event)">
+                  <rect x="100" y="0" rx="12" ry="12" width="80px" height="50px"></rect>
+                  <text x="114" y="18">Create</text>
+               </g> -->
+            </g>
+         </svg>      
+      </div>
+      <div ng-if="tab == 'tabCreate'" id="ct-canvas" class="tabCreate">
+
+         <div id="search-canvas-icon" class="ui-draggable ui-draggable-handle"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>
+         <div id="ct-inpBox" class="no-disp">
+            <input id="ct-inpPredict" class="ct-inp"><input id="ct-inpAct" maxlength="255" class="ct-inp" ng-model="inpText" ng-keyup="txtBoxKeyup($event.keyCode)">
+            <ul id="ct-inpSugg" class="no-disp"></ul>
+         </div>
+         <div id="ct-ctrlBox" class="no-disp" style="top: 413px; left: 457.333px;">
+            <p class="ct-ctrl fa fa-plus" ng-click="createNode($event)"><span class="ct-tooltiptext">Create Scenarios</span></p>
+            <p class="ct-ctrl fa fa-hand-peace-o" ng-click="createMultipleNode($event)"><span class="ct-tooltiptext">Create Multiple Scenarios</span></p>
+            <p class="ct-ctrl fa fa-pencil-square-o" ng-click="editNode($event)"><span class="ct-tooltiptext">Edit Module</span></p>
+            <p class="ct-ctrl fa fa-trash-o ct-ctrl-inactive" ng-click="deleteNode($event)"><span class="ct-tooltiptext"></span></p>
+         </div>
+         <svg id="ct-mapSvg" style="width: 100%; height: 100%;">
+            <g id="ct-mindMap">
+                <path ng-repeat="(id,link) in linkDisplay" ng-model="link" id="{{id}}" class="ct-link" d="{{link.d}}"></path>           
+                <g ng-repeat="(id, node) in nodeDisplay" ng-model="dispnode" id="ct-node-{{id}}" class="ct-node" data-nodetype="{{node.type}}" transform="{{node.transform}}">
+                    <image height="40px" width="40px" class="ct-nodeIcon" xlink:href={{node.img_src}} style="opacity:{{node.opacity}};" ng-click="nodeUniversalClick(id)"></image>
+                    <text class="ct-nodeLabel" text-anchor="middle" x="20" title="{{node.title}}" y="50">{{node.name}}</text>
+                    <title>{{node.title}}</title>
+                    <circle ng-if="node.type=='scenarios' || node.type=='screens' || node.type=='modules'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="{{verticalLayout ? 20 : 44}}" cy="{{verticalLayout ? 55 : 20}}" r="4"  ng-click = "toggleNode(id)"></circle>
+                    <circle ng-if="node.type=='scenarios' || node.type=='screens' || node.type=='testcases'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="-3" cy="20" r="4" ng-mousedown="moveNodeBegin(id)" ng-mouseup="moveNodeEnd(id)"></circle> 
+                </g>         
+            </g>
+        </svg>
+        <div class="navigate-widget no-disp">
+            <div class="arrow-box">
+                    <p><i class="arrow-box-ic up"></i></p>
+                    <p><i class="arrow-box-ic left"></i><i class="arrow-box-ic right"></i></p>
+                    <p><i class="arrow-box-ic down"></i></p>
+            </div>   
+            <div class="zoom-box">
+                <div><button class="zoom-btn my-btn" id="zoom_in">+</button></div>
+                <div><button class="zoom-btn my-btn" id="zoom_out">-</button></div>
+                <!-- <div id="slider-range-min"></div> -->
+            </div>     
+        </div>        
+         <svg id="ct-legendBox">
+            <g transform="translate(10,10)">
+               <g>
+                  <circle class="ct-modules" cx="0" cy="0" r="10"></circle>
+                  <text class="ct-nodeLabel" x="15" y="3">Modules</text>
+               </g>
+               <g>
+                  <circle class="ct-scenarios" cx="90" cy="0" r="10"></circle>
+                  <text class="ct-nodeLabel" x="105" y="3">Scenarios</text>
+               </g>
+               <g>
+                  <circle class="ct-screens" cx="180" cy="0" r="10"></circle>
+                  <text class="ct-nodeLabel" x="195" y="3">Screens</text>
+               </g>
+               <g>
+                  <circle class="ct-testcases" cx="270" cy="0" r="10"></circle>
+                  <text class="ct-nodeLabel" x="285" y="3">Test Cases</text>
+               </g>
+            </g>
+         </svg>
+         <svg id="ct-actionBox">
+            <g>
+               <g id="ct-saveAction" class="ct-actionButton" ng-click = "actionEvent($event)">
+                  <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
+                  <text x="23" y="18">Save</text>
+               </g>
+               <!-- <g id="ct-createAction" class="ct-actionButton disableButton" ng-click = "actionEvent($event)">
+                  <rect x="100" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
+                  <text x="114" y="18">Create</text>
+               </g> -->
+            </g>
+         </svg>
+      </div>
+      <!--Bootstrap Popup-->
+      <!-- Add Object -->
+      <div id="dialog-addObject" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
+         <div class="modal-dialog" style="width: 500px">
+            <!-- Modal content-->
+            <div class="modal-content">
+               <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">Add Node</h4>
+               </div>
+               <div class="modal-body modal-body-add_obj">
+                  <!-- Add Button -->
+                  <div class="row addObjTopWrap">
+                     <span ng-show="errorMessage" class="error-msg-abs ng-cloak addObjeError">{{errorMessage}}</span>
+                     <button ng-click="addMoreNode()" type="button" id="addMoreObjRow" class="btn btn-default btn-no-bg pull-left"><img src="imgs/ic-add.png" /> Add</button>
+                  </div>
+                  <!-- Add Button -->
+                  <!--Modal Content-->
+                  <form class="form-inline scrollbar-inner addObjectScroll" id="addObjContainer"></form>
+                  <!--Modal Content-->
+               </div>
+               <div class="modal-footer">
+                  <span class="view-msg"></span>
+                  <button ng-click="clearNodes()" type="button" id="resetObjRow" class="btn btn-default">Reset</button>
+                  <button ng-click="createNodes($event)" type="button" id="rubmitObjRow" class="btn btn-default">Create</button>
+               </div>
+            </div>
+         </div>
+      </div>
+      <!-- Add Object -->
+   </div>
+   <!-- Mid Section -->  
+   <!-- Right Section --> 
+   <div class="ct-side fl-right" id="ct-rSide">
+      <div id="right-dependencies-section" class="rsSlide" style='z-index:9999; '>  
+         <!--Images Blocks-->
+         <div class="thumbnail thumbnail-custom">
+            <a class="slidePopup" title="Tasks">
+               <img class="thumb-ic" src="imgs/ic-task.png" alt="Tasks">
+               <div class="caption">
+                  <p>Tasks</p>
+               </div>
+            </a>
+            <!--Popup-->
+            <div tabindex="0" id="window-task" class="popupWrap">
+               <h4 class="h4-custom closePopup">My task(s)<img class="closePopup pull-right" src="imgs/ic-arrow.png" /></h4>
+               <div class="input-group">
+                  <span class="input-group-addon inputMyTask" id="basic-addon1"><img src="imgs/ic-search-icon.png"></span>
+                  <input type="text" class="form-control searchInputMyTask" placeholder="Search My task(s)" aria-describedby="basic-addon1">
+               </div>
+               <div class="popupContent popupTasks">
+                  <div class="scrollbar-inner scrollbar-innerpages">
+                     <!--Tasks-->
+                     <div class="panel-group task-content-inner" id="accordion"></div>
+                     <!--Tasks-->
+                  </div>
+               </div>
+            </div>
+            <!--Popup-->
+         </div>
+         <!--Images Blocks-->
+         <div ng-show="tab == 'tabCreate' || tab == 'tabAssign' || tab=='mindmapEndtoEndModules'" class="thumbnail thumbnail-custom">
+            <!--<div class="thumbnail thumbnail-custom">-->
+            <a class="slidePopup" ng-click ="toggleview()" id="switch-layout" class="vertical-layout" title="SwitchLayout" >
+               <img class="thumb-ic" src="imgs/switch.png" alt="SwitchLayout" style="height: 55px;">
+               <div class="caption">
+                  <p>Switch Layout</p>
+               </div>
+            </a>
+         </div>
+         <div ng-show="tab == 'tabCreate' || tab == 'tabAssign' || tab=='mindmapEndtoEndModules'" class="thumbnail thumbnail-custom">
+            <!--<div class="thumbnail thumbnail-custom">-->
+            <a class="slidePopup" ng-click ="fullScreen()" id="fullscr" title="full screen">
+               <img class="thumb-ic" src="imgs/fscr.png" alt="full screen" style="height: 55px;">
+               <div class="caption">
+                  <p>Full Screen</p>
+               </div>
+            </a>
+         </div>
+         <!--Images Blocks-->  		
+         <div class="thumbnail thumbnail-custom">
+            <a class="slidePopup" title="Info">
+               <img class="thumb-ic" src="imgs/ic-info.png" alt="Project Info">
+               <div class="caption ">
+                  <p >Info</p>
+               </div>
+            </a>
+            <!--Popup-->
+            <div tabindex="0" id="window-pi" class="popupWrap">
+               <h4 class="h4-custom closePopup">Information <img class="closePopup pull-right" src="imgs/ic-arrow.png"></h4>
+               <div class="popupContent projectInfoWrap">
+                  <p class="proj-info-wrap"></p>
+               </div>
+            </div>
+            <!--Popup-->
+         </div>
+         <!--Images Blocks-->
+         <!--<div class="ct-show-right">
+            </div>-->
+         <!--Images Blocks-->
+         <chatbot chatbot></chatbot>
+         <!--Images Blocks-->
+      </div>
+      <div id='ct-expand-right' class="ct-expand ct-rev"></div>
+   </div>
+   <!-- Right Section -->  
+</div>
+<footer footer id="footer" class="footer-global"></footer>
+<!--Footer-->
+<!-- MIndmaps -->
+<div class="modal fade" id="mindmapGlobalDialog" role="dialog" data-keyboard="false" data-backdrop="static">
+   <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title"></h4>
+         </div>
+         <div class="modal-body">
+            <p></p>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+         </div>
+      </div>
+   </div>
+</div>
+<!-- MIndmaps Versioning-dialog box -->
+<div class="modal fade" id="versioningSuccessDialog" role="dialog" data-keyboard="false" data-backdrop="static">
+   <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title"></h4>
+         </div>
+         <div class="modal-body" id='newversionLink'>
+            <p></p>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+         </div>
+      </div>
+   </div>
+</div>
+<div class="modal fade" id="SaveStructure" role="dialog" data-keyboard="false" data-backdrop="static">
+   <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Save Structure</h4>
+         </div>
+         <div class="modal-body">
+            <p>'Unsaved work will be lost if you continue.<br/>Continue?'</p>
+         </div>
+         <div class="modal-footer">
+            <button id='yes' type="button" class="btn btn-default" data-dismiss="modal">Yes</button>
+            <button id='no' type="button" class="btn btn-default" data-dismiss="modal">No</button>
+         </div>
+      </div>
+   </div>
+</div>
+<!-- Complexity box -->
+<div id="dialog-compBox" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
+   <div class="modal-dialog" style="width: 500px">
+      <!-- Modal content-->
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Complexity</h4>
+         </div>
+         <div class="modal-body modal-body-add_obj">
+            <form class="form-inline scrollbar-inner addObjectScroll" id="addObjContainer111">
+            </form>
+            <!--Modal Content-->
+         </div>
+         <div class="modal-footer">
+            <div id="complexity-val" class="" style="display: inline-block;float: left;">Complexity: Not Set</div>
+            <button ng-click="submitComplexity()" type="button" id="submitComplexity" class="btn btn-default">Ok</button>
+         </div>
+      </div>
+   </div>
+</div>
+<!-- Complexity Box -->
+<!-- MIndmaps -->
+<!-- Provide version number pop up -->
+<div class="modal fade" id="versionNumInputPopUp" role="dialog" data-keyboard="false" data-backdrop="static" >
+   <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" onclick="versionInputDialogClose()" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Create version</h4>
+         </div>
+         <div class="modal-body">
+            <p><input class='launchPopupInput form-control' type='text' onkeypress="return validateFloatKeyPress(this,event);" step=0.1 placeholder='Enter Version Number' id='versionNumberInput'/></p>
+         </div>
+         <div class="modal-footer" style="text-align: center">
+            <span id="versioningErrorMsg" style="color: red; float: left; margin-left: 15px; margin-top: 5px;"></span>
+            <img class="qcLoginload" src="imgs/loader.gif" alt="Loading..." style="float: left; display: none;">
+            <button type="button" id = "clearInputDataButton" class="btn btn-default btn-default-modal qcConnsubmit" ng-click="clearInputData()">Clear</button>
+            <button type="button" id = "createNewVersionButton" class="btn btn-default btn-default-modal qcConnsubmit" data-dismiss="modal">Create</button>
+         </div>
+      </div>
+   </div>
+</div>
+<!-- PorjectVersioingPopUp -->
+<div class="modal fade" id="ProjectReplicationPopUp" role="dialog" data-keyboard="false" data-backdrop="static">
+   <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Project Replication</h4>
+         </div>
+         <div class="modal-body">
+            Project
+            <select id='destProjects'>
+            </select>	
+         </div>
+         <div class="modal-footer" style="text-align: center">
+            <span id="versioningErrorMsg" style="color: red; float: left; margin-left: 15px; margin-top: 5px;"></span>
+            <img class="qcLoginload" src="imgs/loader.gif" alt="Loading..." style="float: left; display: none;">
+            <button type="button" id = "replicateVersionButton" class="btn btn-default btn-default-modal qcConnsubmit" data-dismiss="modal" ng-click="replicationController()" >Replicate</button>
+         </div>
+      </div>
+   </div>
+</div>
+<!-- MIndmaps renaming confirmation dialog-->
+<div class="modal fade" id="renamingConfirmationPopup" role="dialog" data-keyboard="false" data-backdrop="static">
+   <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Confirmation</h4>
+         </div>
+         <div class="modal-body">
+            <p>This screenname is already reused, It will delete all the testcases associated. Do you wish to continue?</p>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" id="deleteTestcase" data-dismiss="modal">Yes</button>
+            <button type="button" class="btn btn-default" id="undoChanges" data-dismiss="modal">No</button>
+         </div>
+      </div>
+   </div>
+</div>
+<!-- MIndmaps Task unassignment confirmation Popup-->
+<div class="modal fade" id="unassignmentConfirmationPopup" role="dialog" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog modal-sm">
+       <div class="modal-content">
+          <div class="modal-header">
+             <button type="button" class="close" data-dismiss="modal">&times;</button>
+             <h4 class="modal-title">Confirmation</h4>
+          </div>
+          <div class="modal-body">
+             <p>Taskworkflow Strict mode enabled ! Unassigning Tasks of Screens and Tetscases will lead to failure of Execution. Do you wish to continue?</p>
+          </div>
+          <div class="modal-footer">
+             <button type="button" class="btn btn-default" id="unassignTask" data-dismiss="modal">Yes</button>
+             <button type="button" class="btn btn-default" id="undoUnassign" data-dismiss="modal">No</button>
+          </div>
+       </div>
+    </div>
+ </div>
+<!-- MIndmaps createnewmap confirmation dialog-->
+<div class="modal fade" id="createNewConfirmationPopup" role="dialog" data-keyboard="false" data-backdrop="static">
+   <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Confirmation</h4>
+         </div>
+         <div class="modal-body">
+            <p>Unsaved work will be lost if you continue. Do you want to continue?</p>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" ng-click="callFunction()" data-dismiss="modal">Yes</button>
+            <button type="button" class="btn btn-default" id="undoChanges" data-dismiss="modal">No</button>
+         </div>
+      </div>
+   </div>
+</div>
+<!-- MIndmaps createnewmap confirmation dialog-->
+<div class="modal fade" id="ProjectInput" role="dialog" data-keyboard="false" data-backdrop="static">
+   <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Select a Project</h4>
+         </div>
+         <div class="modal-body">
+            <select class="project-list project-list-popup" ng-change="projectListChange(projectName4)" ng-model="projectName4">
+               <option value="" disabled selected>Please Select Project</option>
+               <option ng-repeat="project in projectList" ng-selected="projectNameO == project.id" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}'>{{project.name}}</option>
+            </select>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" ng-click="createFromJson($event)" data-dismiss="modal">Create Flow</button>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- MIndmaps excel sheetname confirmation dialog-->
+<div class="modal fade" id="SheetInput" role="dialog" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog modal-sm">
+       <div class="modal-content">
+          <div class="modal-header">
+             <button type="button" class="close" data-dismiss="modal">&times;</button>
+             <h4 class="modal-title">Select a Sheet</h4>
+          </div>
+          <div class="modal-body">
+             <select id="selectid" class="sheet-list" ng-model="sheetname">
+                <option value="" disabled selected>Please Select Sheet</option>
+                <option ng-repeat="sheet in sheetnames" value='{{sheet}}'>{{sheet}}</option>
+             </select>
+          </div>
+          <div class="modal-footer">
+             <button type="button" class="btn btn-default" ng-click="showContent(sheetname)">OK</button>
+          </div>
+       </div>
+    </div>
+ </div>

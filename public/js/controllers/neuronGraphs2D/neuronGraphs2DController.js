@@ -1410,42 +1410,39 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$rootScope', '$http', '
      * use:	builds JSON to send to execution service
      */	
     function createExecutionJson() {
-        globalobj['jsondata'] = [];
+        delete globalobj['jsondata'];
+        var testsuiteObj = null
+        if (viewPageName == 'fullView' || viewPageName =='2DView') testsuiteObj = $scope.nodes[globalobj['lockedSuite'].idx];
+        else testsuiteObj = $scope.nodes.filter((obj) => (obj.id == globalobj['lockedSuite'].id))[0];
+        var cycleObj = testsuiteObj.parent[0];
+        var relObj = cycleObj.parent[0];
+        var prjObj = relObj.parent[0];
         var jsondata11 = [{
-            "suiteDetails": [],
-            "testsuitename": "",
-            "testsuiteid": "",
-            "browserType": ["1"],
-            "NG": "true",
-            "appType": "web"
-        }]
-        if (viewPageName == 'fullView' || viewPageName =='2DView')
-            var lockedSuiteObj = [$scope.nodes[globalobj['lockedSuite'].idx]];
-        else
-            var lockedSuiteObj = $scope.nodes.filter(function(obj) {
-                return obj.id == globalobj['lockedSuite'].id;
-            });
-        jsondata11[0].testsuitename = lockedSuiteObj[0].name;
-        jsondata11[0].testsuiteid = lockedSuiteObj[0].attributes.testSuiteid;
-        globalobj['testscenario_ids'] = lockedSuiteObj[0].attributes.testScenarioids;
-        var i = 0;
+            "testsuiteName": testsuiteObj.name,
+            "testsuiteId": testsuiteObj.attributes.mindmapid,
+            "versionNumber": testsuiteObj.attributes.versionnumber,
+            "appType": prjObj.attributes.Type,
+            "domainName": prjObj.parent[0].name,
+            "projectName": prjObj.name,
+            "projectId": prjObj.id,
+            "releaseId": relObj.name,
+            "cycleName": cycleObj.name,
+            "cycleId": cycleObj.id,
+            "suiteDetails": []
+        }];
 
-        for (var k = 0; k < lockedSuiteObj[0].attributes.testScenarioids.length; k++) {
-            var part1 = {
-                "condition": 0,
-                "dataparam": [""],
-                "executestatus": 1,
-                "scenarioids": "",
-                "qccredentials": {
-                    "qcurl": "",
-                    "qcusername": "",
-                    "qcpassword": ""
-                }
+        var testscenarios = testsuiteObj.children;
+        var conditionChk = testsuiteObj.attributes.conditioncheck;
+        var dataparam = testsuiteObj.attributes.getparampaths;
+        for (var k = 0; k < testscenarios.length; k++) {
+            var scenarioObj = {
+                "condition": conditionChk[k],
+                "dataparam": dataparam[k],
+                "scenarioName": testscenarios[k].name,
+                "scenarioId": testscenarios[k].id
             }
-            part1.scenarioids = lockedSuiteObj[0].attributes.testScenarioids[k];
-            jsondata11[0].suiteDetails.push(part1);
+            jsondata11[0].suiteDetails.push(scenarioObj);
         }
-        globalobj['jsondata'] = jsondata11;
         return jsondata11;
     }
 
@@ -1453,24 +1450,30 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$rootScope', '$http', '
      * use:	calls execution service for execution
      */	
     $scope.execute = function(browserNum) {
-        globalobj['jsondata'][0].browserType = [String(browserNum)]
         if ($("#ct-expand-left").hasClass('ct-rev'))
             $("#ct-expand-left").trigger("click");
         if ($("#ct-expand-right").hasClass('ct-rev'))
             $("#ct-expand-right").trigger("click");
-        blockUI('Executing...')
-        ExecutionService.ExecuteTestSuite_ICE(globalobj['jsondata']).then(function(data) {
+        var executionData = {
+            source: "neurongraphs",
+            exectionMode: "serial",
+            browserType: [String(browserNum)],
+            qccredentials: { "qcurl": "", "qcusername": "", "qcpassword": "" },
+            batchInfo: globalobj['jsondata']
+        };
+        blockUI('Executing...');
+        ExecutionService.ExecuteTestSuite_ICE(executionData).then(function(data) {
                 executeFlag = true;
                 if (data == "Invalid Session") {
                     return $rootScope.redirectPage();
                 }
                 if (data == "Terminate") {
-                    openDialog("Terminate", "execution Terminated")
+                    openDialog("Terminate", "Execution Terminated")
                 } else if (data == "unavailableLocalServer") {
                     openDialog('Error', "Execute Test Suite,"+$rootScope.unavailableLocalServer_msg)
                 } else {
-                    openDialog("Success", "execution successful")
-                    globalobj['module_id'] = globalobj['jsondata'][0].testsuiteid
+                    openDialog("Success", "Execution Successful")
+                    //globalobj['module_id'] = globalobj['jsondata'][0].moduleId;
                     for (a in data.TCS) {
                         if (data.TCS[a] == 'Fail' || data.TCS[a] == 'fail')
                             globalobj['failed_tc_list'].push(b)

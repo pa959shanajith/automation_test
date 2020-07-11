@@ -1,9 +1,55 @@
 //Window Load Function
 function loadBody(){
 	$("body").delay(400).animate({opacity:"1"});
+	register_GUID();
 }
 window.onload = loadBody;
 //Window Load Function
+function register_GUID() {
+    // detect local storage available
+    if (typeof (Storage) === "undefined") return;
+	// get (set if not) tab GUID and store in tab session
+	if (window.name == "") window.name = GUID();
+	// add eventlistener to session storage
+	window.addEventListener("storage", storage_Handler, false);
+	// set tab GUID in session storage
+	localStorage["tabGUID"] = window.name;
+	flag = true;
+}
+
+function storage_Handler(e) {
+    // if tabGUID does not match then more than one tab and GUID
+    if (e.key == 'tabGUID' && e.oldValue != "") {
+        if (e.oldValue != e.newValue) tab_Warning();
+    }else if(e.key == "tabValidity"){
+		window.sessionStorage.clear();
+		history.pushState(null, null, document.URL);
+		angular.element(document).scope().$root.redirectPage();
+		blockUI("<h5>Duplicate Tabs not allowed, Please Close this Tab and refresh.</h5>");
+	}
+}
+var flag = true;
+function GUID() {
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000)
+          .toString(16)
+          .substring(1);
+    }
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+      s4() + '-' + s4() + s4() + s4();
+}
+
+function tab_Warning() {
+	history.pushState(null, null, document.URL);
+	if(flag){
+		history.pushState(null, null, document.URL);
+		window.localStorage.clear();
+		localStorage["tabValidity"] = "invalid";
+		window.sessionStorage.clear();
+		angular.element(document).scope().$root.redirectPage();
+		blockUI("<h5>Duplicate Tabs not allowed, Please Close the duplicate Tab and refresh.</h5>");
+	}
+}
 
 var Encrypt = {
 	_keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
@@ -152,9 +198,17 @@ $(document).ready(function() {
 		}
 		if(window.localStorage['_CT']) {
 			var ct = JSON.parse(window.localStorage['_CT']);
+			var tj = JSON.parse(window.localStorage['_TJ']);
 			var subTaskID = ct.subTaskId;
 			if(window.location.pathname != "/scheduling"){
 				var selectedTask = $("#window-task").find("#accordion").find(".assignedTaskInner");
+				for(var i = 0 ; i < selectedTask.length ; i++){
+					if(ct.taskName === selectedTask[i].textContent && (ct.cycleid === tj[i].testSuiteDetails[0].cycleid || ct.cycleid === tj[i].cycleid)){
+						selectedTask[i].onclick = null;
+						selectedTask[i].parentNode.style.cursor = "default";
+						selectedTask[i].parentNode.style.webkitFilter = "brightness(50%)";
+					}
+				}
 				$.each(selectedTask, function(){
 					if($(this)[0].dataset.subtaskid == subTaskID){
 						$(this).parents(".panel-default").addClass("disableActions");

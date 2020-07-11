@@ -1,6 +1,5 @@
 var screenshotObj, scrapedGlobJson, enableScreenShotHighlight, mirrorObj, eaCheckbox, finalViewString, scrapedData, deleteFlag, globalSelectedBrowserType, selectedKeywordList, keywordListData, dependentTestCaseFlag = false;
 checkedTestcases = [];
-
 pasteSelecteStepNo = [];
 var initScraping = {};
 var mirrorObj = {};
@@ -116,7 +115,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	if (appType == "Webservice" && window.location.href.split("/")[3] == "designTestCase") {
 		$("#right-dependencies-section .thumbnail:first-child").hide();
 	}
-	//console.log(appType);
 	$scope.getScreenView = appType
 	$scope.isMac =  navigator.userAgent.indexOf('Mac');
 	//Getting Apptype orScreen Type
@@ -135,94 +133,15 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 
 	$timeout(function () {
-		// projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
-		// releaseName = angular.element(document.getElementById("left-nav-section")).scope().releaseDetails;
-		// cycleName = angular.element(document.getElementById("left-nav-section")).scope().cycleDetails;
-		// var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
-		// appType = JSON.parse(window.localStorage['_CT']).appType;
-		// screenName = angular.element(document.getElementById("left-nav-section")).scope().screenName;
-		// testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
-		// subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
-		// subTask = JSON.parse(window.localStorage['_CT']).subTask;
 		var taskInfo = JSON.parse(window.localStorage['_CT']);
 		var filterData = JSON.parse(window.localStorage['_FD']);
 		if (taskInfo.subTaskType == "Scrape" || taskInfo.subTask == "Scrape") {
-			// $(".projectInfoWrap").empty()
 			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">' + filterData.idnamemapprj[taskInfo.projectId] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">' + taskInfo.screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + filterData.idnamemaprel[taskInfo.releaseid] + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + filterData.idnamemapcyc[taskInfo.cycleid] + '</span></p><p class="proj-info-wrap"><span class="content-label">URL :</span><span id="scrapedurlinfo" class="content">' +scrapedurl + '</span></p>')
 		} else {
-			// $(".projectInfoWrap").empty()
 			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">' + filterData.idnamemapprj[taskInfo.projectId] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">' + taskInfo.screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">TestCase: </span><span class="content">' + taskInfo.testCaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + filterData.idnamemaprel[taskInfo.releaseid] + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + filterData.idnamemapcyc[taskInfo.cycleid] + '</span></p>')
 		}
+	}, 3000);
 
-	}, 3000)
-
-	//console.log("screenName:", screenName);
-	// if (window.localStorage['_TJ']) {
-	//	 allTasks = JSON.parse(window.localStorage['_TJ']);
-	//	 if(allTasks.length > 0)
-	//	 {
-	//			 allTasks =  allTasks.filter(function(n){
-	//				 return n.appType === appType
-	//			 });
-	//	 }
-
-	//	 for (var i = 0; i < allTasks.length; i++) {
-	//		 //Screen with no testcases
-	//		 if (allTasks[i].screenName != "" && allTasks[i].testCaseId == "") {
-	//			 allScreenNames.push(allTasks[i].screenName);
-	//		 }
-	//		 //screen with testcases
-	//		 if (allTasks[i].screenName != "" && allTasks[i].testCaseId != "") {
-	//			 allScreenTestcaseNames.push(allTasks[i].screenName);
-	//		 }
-	//		 //testcases
-	//		 if (allTasks[i].testCaseName != "" && allTasks[i].testCaseId != "") {
-	//			 allTestcases.push(allTasks[i].testCaseName);
-	//		 }
-	//	 }
-	//	 var sorted_screens = allScreenNames.slice().sort();
-	//	 for (var i = 0; i < allScreenNames.length - 1; i++) {
-	//		 if (sorted_screens[i + 1] == sorted_screens[i]) {
-	//			 reusedScreens.push(sorted_screens[i]);
-	//		 }
-	//	 }
-	//	 var sorted_screensTestcase = allScreenTestcaseNames.slice().sort();
-	//	 for (var i = 0; i < allScreenTestcaseNames.length - 1; i++) {
-	//		 if (sorted_screensTestcase[i + 1] == sorted_screensTestcase[i]) {
-	//			 reusedScreensTestcase.push(sorted_screensTestcase[i]);
-	//		 }
-	//	 }
-	//	 var sorted_testcases = allTestcases.slice().sort();
-	//	 for (var i = 0; i < allTestcases.length - 1; i++) {
-	//		 if (sorted_testcases[i + 1] == sorted_testcases[i]) {
-	//			 reusedTestcases.push(sorted_testcases[i]);
-	//		 }
-	//	 }
-	//	 //console.log("reusedScreens",reusedScreens);
-	//	 //console.log("reusedScreensTestcase",reusedScreensTestcase);
-	//	 //console.log("reusedTestcases", reusedTestcases);
-	//	 if (reusedScreens.length > 0) {
-	//		 for (var j = 0; j < reusedScreens.length; j++) {
-	//			 if ($.trim(reusedScreens[j]) == $.trim(screenName)) {
-	//				 reusedScreenNames = true;
-	//			 }
-	//		 }
-	//	 }
-	//	 if (reusedScreens.length > 0) {
-	//		 for (var j = 0; j < reusedScreensTestcase.length; j++) {
-	//			 if ($.trim(reusedScreensTestcase[j]) == $.trim(screenName)) {
-	//				 reusedScreenTestcaseNames = true;
-	//			 }
-	//		 }
-	//	 }
-	//	 if (reusedTestcases.length > 0) {
-	//		 for (var j = 0; j < reusedTestcases.length; j++) {
-	//			 if ($.trim(reusedTestcases[j]) == $.trim(testCaseName)) {
-	//				 reusedTestcaseNames = true;
-	//			 }
-	//		 }
-	//	 }
-	// }
 
 	var custnameArr = [];
 	var keywordValArr = [];
@@ -320,13 +239,16 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				}*/
 				$('#jqGrid').show();
 				// service call # 2 - objectType service call
-				DesignServices.getScrapeDataScreenLevel_ICE()
+				DesignServices.getScrapeDataScreenLevel_ICE(appType)
 					.then(function (data2) {
 						if (data2 == "Invalid Session") {
 							return $rootScope.redirectPage();
 						}
 						if (appType == "Webservice"){
-							if (data2.view.length > 0) dataFormat12 = data2.view[0].header[0].split("##").join("\n");
+							if (data2.view.length > 0) {
+								if (data2.view[0].header) dataFormat12 = data2.view[0].header[0].split("##").join("\n");
+								else dataFormat12 = data2.header[0].split("##").join("\n");
+							}	
 						}
 						custnameArr.length = 0;
 						// counter to append the items @ correct indexes of custnameArr
@@ -338,11 +260,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						if (data2.mirror == undefined)
 							$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS">No Screenshot Available</div>')
 						else{
-							if(data2.scrapetype=='caa')
-								$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src=",' + data2.mirror.substring(2,data2.mirror.length-1) + '" /></div>')
-							else
-								$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror + '" /></div>')
-						}	
+							$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror + '" /></div>')
+						}
 						// service call # 3 -objectType service call
 						DesignServices.getKeywordDetails_ICE(appType)
 							.then(function (data3) {
@@ -375,6 +294,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									contentTable(data2.view);
 									$('.cbox').prop('disabled', false);
 									$('.cbox').parent().removeClass('disable_a_href');
+									updateColumnStyle();
+									$("#jqGrid").focusout(()=>{
+										updateColumnStyle();
+									})
 									return;
 								} else {
 									var testcase = data.testcase;//JSON.parse(data.testcase);
@@ -404,6 +327,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									contentTable(data2.view);
 									$('.cbox').prop('disabled', false);
 									$('.cbox').parent().removeClass('disable_a_href');
+									updateColumnStyle();
+									$("#jqGrid").focusout(()=>{
+										updateColumnStyle();	
+									});				
 									return;
 								}
 							},
@@ -866,7 +793,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		DesignServices.getScrapeDataScreenLevel_ICE()
 			.then(function (data) {
 				scrapedurl=data.scrapedurl;
-				// console.log(data)
+				$("#scrapedurlinfo").html(scrapedurl);
 				localStorage['_cust']=JSON.stringify({})
 				if (data == "Invalid Session") {
 					return $rootScope.redirectPage();
@@ -901,10 +828,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					}
 					newScrapedList = viewString
 					$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
-					if(viewString.scrapetype=='caa')
-						$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror.substring(2,viewString.mirror.length-1) + '" /></div>')
-					else
-						$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
+					$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
 					$("#finalScrap").empty()
 					if (jQuery.isEmptyObject(viewString)) {
 						console.log("Data is Empty");
@@ -1048,7 +972,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				$(document).find("#desktopPath").val('')
 				$(document).find('#app_pid').val('');
 				$(document).find("#desktopPath").removeClass("inputErrorBorder");
-			} else if ($scope.getScreenView == "DesktopJava") {
+			} else if ($scope.getScreenView == "OEBS") {
 				$("#launchOEBSApps").modal("show");
 				$(document).find("#OEBSPath").val('');
 				$(document).find("#OEBSPath").removeClass("inputErrorBorder");
@@ -1125,28 +1049,28 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						})
 						$("#wsdlOperation").val(data.operations)
 						//Printing Request Data
-						$("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
-						if (data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0) {
+						$("#wsdlRequestHeader").val(data.header.split("##").join("\n"));
+						if (data.body.indexOf("{") == 0 || data.body.indexOf("[") == 0) {
 							var jsonStr = data.body;
 							var jsonObj = JSON.parse(jsonStr);
 							var jsonPretty = JSON.stringify(jsonObj, null, '\t');
 							$("#wsdlRequestBody").val(jsonPretty)
 						} else {
-							var getXML = formatXml(data.body[0].replace(/>\s+</g, '><'));
+							var getXML = formatXml(data.body.replace(/>\s+</g, '><'));
 							if(getXML=='\r\n'){
 								getXML = '';
 							}
 							$("#wsdlRequestBody").val(getXML)
 						}
 						//Printing Response Data
-						$("#wsdlResponseHeader").val(data.responseHeader[0].split("##").join("\n"));
-						if (data.responseBody[0].indexOf("{") == 0 || data.responseBody[0].indexOf("[") == 0) {
+						$("#wsdlResponseHeader").val(data.responseHeader.split("##").join("\n"));
+						if (data.responseBody.indexOf("{") == 0 || data.responseBody.indexOf("[") == 0) {
 							var jsonStr = data.responseBody;
 							var jsonObj = JSON.parse(jsonStr);
 							var jsonPretty = JSON.stringify(jsonObj, null, '\t');
 							$("#wsdlResponseBody").val(jsonPretty)
 						} else {
-							var getXML = formatXml(data.responseBody[0].replace(/>\s+</g, '><'));
+							var getXML = formatXml(data.responseBody.replace(/>\s+</g, '><'));
 							if(getXML=='\r\n'){
 								getXML = '';
 							}
@@ -1206,13 +1130,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		//else if(!wsdlRequestHeader) $("#wsdlRequestHeader").addClass("inputErrorBorderFull")
 		else {
 			var getWSData = {
-				"body": [wsdlRequestBody],
-				"operations": [wsdlOperation],
-				"responseHeader": [wsdlResponseHeader],
-				"responseBody": [wsdlResponseBody],
-				"method": [wsdlMethods],
-				"endPointURL": [endPointURL],
-				"header": [wsdlRequestHeader]
+				"body": wsdlRequestBody,
+				"operations": wsdlOperation,
+				"responseHeader": wsdlResponseHeader,
+				"responseBody": wsdlResponseBody,
+				"method": wsdlMethods,
+				"endPointURL": endPointURL,
+				"header": wsdlRequestHeader
 			};
 			var appType = $scope.getScreenView;
 			getWSTemplateData = JSON.stringify(getWSData)
@@ -1239,9 +1163,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						//$("#WSSaveSuccess").modal("show");
 						$("#enbledWS").prop("checked", false)
 						angular.element(document.getElementById("left-nav-section")).scope().getWSData();
-					} else {
-						openDialog("Save WebService Template", "Failed to save WebService Template.");
+					} else if("Invalid Input"){
+						openDialog("Save WebService Template", "Failed to save WebService Template. Invalid Request Header or Body");
 						//$("#WSSaveFail").modal("show")
+					}else{
+						openDialog("Save WebService Template", "Failed to save WebService Template.");
 					}
 				}, function (error) {
 					console.log("Error")
@@ -1813,7 +1739,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			//For Mobility Web
 
 			//For OEBS
-			else if ($scope.getScreenView == "DesktopJava") {
+			else if ($scope.getScreenView == "OEBS") {
 				if ($(document).find("#OEBSPath").val() == "" && browserType != 'pdf' ) {
 					$(document).find("#OEBSPath").addClass("inputErrorBorder")
 					return false
@@ -2065,10 +1991,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						//mirrorObj = scrapeJson[1];
 						//scrapeTypeObj = scrapeJson[2];
 						$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
-						if(viewString.scrapetype=='caa')
-								$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror.substring(2,viewString.mirror.length-1) + '" /></div>')
-						else	
-							$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
+						$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
 						$("#finalScrap").empty()
 						$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'/><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 10' disabled>Delete</button><button data-toggle='modal' id='editObjects' data-target='#editObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' data-toggle='tooltip' title='Edit Objects' disabled>Edit</button></span><span class='searchScrapEle'><img src='imgs/ic-search-icon.png'></input></span><span><input type='text' class='searchScrapInput'></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
 						var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
@@ -2086,7 +2009,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								var path = newScrapedList.view[i].xpath;
 								var ob = newScrapedList.view[i];
 								ob.tempId = i;
-								if (appType == "DesktopJava" || appType == "Desktop") {
+								if (appType == "OEBS" || appType == "Desktop") {
 									custN = ob.custname.replace('/\s/g', ' ').replace('\n', ' ').replace(/[<>]/g, '');
 								}
 								else {
@@ -2112,7 +2035,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								// } else {
 								// }
 								// }								
-								if (appType == "DesktopJava" || appType == "Desktop") {
+								if (appType == "OEBS" || appType == "Desktop") {
 									var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 								}
 								else {
@@ -2174,7 +2097,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									tempId++
 									var path = viewString.view[i].xpath;
 									var ob = viewString.view[i];
-									if (appType == "DesktopJava" || appType == "Desktop") {
+									if (appType == "OEBS" || appType == "Desktop") {
 										var custN = ob.custname.replace('/\s/g', ' ').replace('\n', ' ').replace(/[<>]/g, '');
 									}
 									else {
@@ -2197,7 +2120,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 										ob.url = "",
 										ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
 									}
-									if (appType == "DesktopJava" || appType == "Desktop") {
+									if (appType == "OEBS" || appType == "Desktop") {
 										var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 									}
 									else {
@@ -2235,7 +2158,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								var path = viewString.view[i].xpath;
 								var ob = viewString.view[i];
 								ob.tempId = i;
-								if (appType == "DesktopJava" || appType == "Desktop") {
+								if (appType == "OEBS" || appType == "Desktop") {
 									var custN = ob.custname.replace('/\s/g', ' ').replace('\n', ' ').replace(/[<>]/g, '');
 								}
 								else {
@@ -2259,7 +2182,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								}
 								// }
 								// }
-								if (appType == "DesktopJava" || appType == "Desktop") {
+								if (appType == "OEBS" || appType == "Desktop") {
 									var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 								}
 								else {
@@ -2896,7 +2819,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 /*	
 						$.each($("input[type=checkbox].checkall:checked"), function () {
 							for (var i = 0; i < newScrapedList.view.length; i++) {
-								if (appType == 'DesktopJava'|| appType == 'Desktop' || appType == 'MobileApp') {
+								if (appType == 'OEBS'|| appType == 'Desktop' || appType == 'MobileApp') {
 									if ($(this).parents("li").data("xpath").replace(/[\"]/g, "\'") == newScrapedList.view[i].xpath.replace(/\n/g," ") && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim()).replace(/[<>]/g, '').replace('\n', ' ') == newScrapedList.view[i].custname.trim().replace(/[<>]/g, '').replace('/\s/g', ' ').replace(/  +/g, ' ').replace('\n', ' ')) {
 										if (!(isInArray(newScrapedList.view.indexOf(newScrapedList.view[i]), getIndexOfDeletedObjects))) {
 											getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
@@ -2921,7 +2844,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						if ($("input[type=checkbox].checkall:checked").length != dontChkViewString) {
 							$.each($("input[type=checkbox].checkall:checked"), function () {
 								for (var i = 0; i < viewString.view.length; i++) {
-									if (appType == 'DesktopJava' || appType == 'MobileApp') {
+									if (appType == 'OEBS' || appType == 'MobileApp') {
 										if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ').replace(/[<>]/g, '') == viewString.view[i].custname.trim().replace(/[<>]/g, '').replace('/\s/g', ' ').replace(/  +/g, ' ').replace('\n', ' ')) {
 											if (!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))) {
 												getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
@@ -3109,10 +3032,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					d.css('height', (rect.h * scale_highlight) + 'px');
 					d.css('width', (rect.w * scale_highlight) + 'px');
 				} else if (navigator.appVersion.indexOf("Mac") != -1) {
-					d.css('left', (rect.x * scale_highlight) + 'px');
-					d.css('top', (rect.y * scale_highlight) + 'px');
-					d.css('height', (rect.h * scale_highlight) + 'px');
-					d.css('width', (rect.w * scale_highlight) + 'px');
+					d.css('left', (rect.x * (1/scale_highlight)) + 'px');
+					d.css('top', (rect.y * (1/scale_highlight)) + 'px');
+					d.css('height', (rect.h * (1/scale_highlight)) + 'px');
+					d.css('width', (rect.w * (1/scale_highlight)) + 'px');
 				}
 			} else if (appType == "MobileWeb") {
 				if (navigator.appVersion.indexOf("Mac") != -1) {
@@ -4309,34 +4232,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				}
 				if(typeof(data)=="object" || data=="success"){
 					eaCheckbox = false;
-					 scrapedurl = data.scrapedurl
-					
-					// console.log(scrapedurl)
-					// New Line
-					$timeout(function (){
-
-						// projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
-						// releaseName = angular.element(document.getElementById("left-nav-section")).scope().releaseDetails;
-						// cycleName = angular.element(document.getElementById("left-nav-section")).scope().cycleDetails;
-						// var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
-						// appType = JSON.parse(window.localStorage['_CT']).appType;
-						// screenName = angular.element(document.getElementById("left-nav-section")).scope().screenName;
-						// testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
-						// subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
-						// subTask = JSON.parse(window.localStorage['_CT']).subTask;
-						var taskInfo = JSON.parse(window.localStorage['_CT']);
-						var filterData = JSON.parse(window.localStorage['_FD']);
-						if (taskInfo.subTaskType == "Scrape" || taskInfo.subTask == "Scrape") {
-							
-							$(".projectInfoWrap").empty()
-						    $(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">' + filterData.idnamemapprj[taskInfo.projectId] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">' + taskInfo.screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + filterData.idnamemaprel[taskInfo.releaseid] + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + filterData.idnamemapcyc[taskInfo.cycleid] + '</span></p><p class="proj-info-wrap"><span class="content-label">URL :</span><span id="scrapedurlinfo" class="content">' +scrapedurl + '</span></p>')
-						} else {
-							$(".projectInfoWrap").empty()
-							$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">' + filterData.idnamemapprj[taskInfo.projectId] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">' + taskInfo.screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">TestCase: </span><span class="content">' + taskInfo.testCaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + filterData.idnamemaprel[taskInfo.releaseid] + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + filterData.idnamemapcyc[taskInfo.cycleid] + '</span></p>')
-						}
-					}, 1500);
-				
-					//END
+					var taskInfo = JSON.parse(window.localStorage['_CT']);
+					if (taskInfo.subTaskType == "Scrape" || taskInfo.subTask == "Scrape") {
+						scrapedurl = data.scrapedurl;
+						$("#scrapedurlinfo").html(scrapedurl);
+					}
 					//window.localStorage['_modified'] = "";
 					modifiednames = [];
 					getIndexOfDeletedObjects = [];
@@ -4455,7 +4355,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		}
 		updateTestCase(e);
 	};
-
+	
 	$scope.saveTestcase = function (e) {
 		$("#reUsedTestcaseModal").modal("hide");
 		noSaveTestcase = "false";
@@ -5069,7 +4969,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		if (e.target.className.includes('inActiveDetails')) {
 			openModalFormDialog('Add Test Step Details', '');
 			$(".stepDetailsContainer").empty()
-			$(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div>")
+			$(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='100' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='100' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='100' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div>")
 
 		}
 		else {
@@ -5093,7 +4993,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 					openModalFormDialog('Add Test Step Details', '');
 					$(".stepDetailsContainer").empty()
-					$(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div>");
+					$(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='100' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='100' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='100' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div>");
 					$("#testDetails_" + modalId + "").val(details.testcaseDetails);
 					//$("#pass_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_pass);
 					$("#pass_" + modalId + "").find("#actualResult_" + modalId + "").val(details.actualResult_pass);
@@ -5132,7 +5032,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		// var labelArr = [];
 		// var infoArr = [];
 
-		mindmapServices.reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs,false).then(function (result) {
+		mindmapServices.reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs).then(function (result) {
 			if (result == 'fail') {
 				openDialog("Task Submission Error", "Reviewer is not assigned !", true)
 			} else if (taskstatus == 'reassign') {
@@ -5175,7 +5075,11 @@ function contentTable(newTestScriptDataLS) {
 	var newTestScriptData = newTestScriptDataLS;
 	if (newTestScriptData == "undefined" || newTestScriptData == null || newTestScriptData == "") {
 		scrappedData = "";
-	} else {
+	}
+	// else if (newTestScriptData.length>0 && newTestScriptData[0].header && newTestScriptData[0].view) {
+	// 	scrappedData=newTestScriptData[0].view;
+	// } 
+	else {
 		scrappedData = newTestScriptData;
 	}
 	$("#jqGrid").jqGrid({
@@ -5327,28 +5231,7 @@ function contentTable(newTestScriptDataLS) {
 				}
 				v++;
 			})
-			//$("#cb_jqGrid").on('click', function() {
-			/*var cboxParent =  $(this).is(":checked");
-					   var editableLen = $(".editable").length;
-					   if (cboxParent == true && editableLen == 0){
-						   $(".commentIcon,.unCommentIcon,.deleteIcon").show();
-					   }
-					   else{
-						   $(".commentIcon,.unCommentIcon,.deleteIcon").hide();
-					   }
-					   window.localStorage['selectRowStepNo']='';*/
-			//});
-			/*$("#jqGrid tr").children("td[aria-describedby='jqGrid_outputVal']").each(function(){
-					   if($(this).text().trim() == "##" || $(this).is(":contains(';##')")){
-						   if($(this).parent('tr:nth-child(odd)').length > 0){
-							   $(this).parent().css("background","linear-gradient(90deg, red 0.6%, #e8e6ff 0)").focus();
-						   }
-						   else{
-							   $(this).parent().css("background","linear-gradient(90deg, red 0.6%, white 0)").focus();
-						   }
-						   $(this).css('color','red');
-					   }background: linear-gradient(to right, #d41e2d, #b31f2d) !important;
-				   });*/
+			
 			var gridArrayData = $("#jqGrid").jqGrid('getRowData');
 			for (i = 0; i < gridArrayData.length; i++) {
 				commented = gridArrayData[i].outputVal.split(';');
@@ -5867,7 +5750,7 @@ function contentTable(newTestScriptDataLS) {
 			if (appTypeLocal == 'Desktop') {
 				sc = Object.keys(keywordArrayList.customDp);
 				selectedKeywordList = "customDp";
-			} else if (appTypeLocal == 'DesktopJava') {
+			} else if (appTypeLocal == 'OEBS') {
 				sc = Object.keys(keywordArrayList.customOEBS);
 				selectedKeywordList = "customOEBS";
 				var newTSDataLS = angular.element(document.getElementById('jqGrid')).scope().newTestScriptDataLS;
@@ -6463,9 +6346,21 @@ function contentTable(newTestScriptDataLS) {
 						} else if (obType == 'GuiShell' || obType == 'shell') {
 							sc = Object.keys(keywordArrayList.shell);
 							selectedKeywordList = "shell";
+						} else if (obType == 'scontainer') {
+							sc = Object.keys(keywordArrayList.scontainer);
+							selectedKeywordList = "scontainer";
 						} else if (obType == 'tree') {
 							sc = Object.keys(keywordArrayList.tree);
 							selectedKeywordList = "tree";
+						} else if (obType == 'calendar') {
+							sc = Object.keys(keywordArrayList.calendar);
+							selectedKeywordList = "calendar";
+						} else if (obType == 'gridview') {
+							sc = Object.keys(keywordArrayList.gridview);
+							selectedKeywordList = "gridview";
+						} else if (obType == 'toolbar') {
+							sc = Object.keys(keywordArrayList.toolbar);
+							selectedKeywordList = "toolbar";
 						} else if (obType == 'list_item' || obType == 'list') {
 							if (listType == 'true') {
 								sc = Object.keys(keywordArrayList.list);
@@ -6508,14 +6403,14 @@ function contentTable(newTestScriptDataLS) {
 					} else if (appTypeLocal == 'MobileApp' &&
 						(obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0 ||
 							obType.indexOf("Switch") >= 0 || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0 ||
-							obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("iOSEditText") >= 0 ||
+							obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("TextField") >= 0 ||
 							obType.indexOf("PickerWheel") >= 0 || obType.indexOf("Slider") >= 0 || obType.indexOf("SearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >= 0 || obType.indexOf("SecureTextField") >= 0)) {
 						var res = '';
 						var sc;
 						if (obType.indexOf("RadioButton") >= 0) {
 							sc = Object.keys(keywordArrayList.radiobutton);
 							selectedKeywordList = "radiobutton";
-						} else if (obType.indexOf("iOSEditText") >= 0 || obType.indexOf("SearchField") >= 0 || obType.indexOf("SecureTextField") >= 0){
+						} else if (obType.indexOf("TextField") >= 0 || obType.indexOf("SearchField") >= 0 || obType.indexOf("SecureTextField") >= 0){
 							sc = Object.keys(keywordArrayList.inputIos);
 							selectedKeywordList = "inputIos";
 						} else if (obType.indexOf("EditText") >= 0) {
@@ -6606,7 +6501,7 @@ function contentTable(newTestScriptDataLS) {
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
-					} else if (appTypeLocal == 'DesktopJava' && (obType == 'push button' || obType == 'text' || obType == 'combo box' || obType == 'list item' || obType == 'hyperlink' || obType == 'label' || obType == 'scroll bar' || obType == 'toggle button' || obType == 'menu' ||
+					} else if (appTypeLocal == 'OEBS' && (obType == 'push button' || obType == 'text' || obType == 'combo box' || obType == 'list item' || obType == 'hyperlink' || obType == 'label' || obType == 'scroll bar' || obType == 'toggle button' || obType == 'menu' ||
 						obType == 'list' || obType == 'edit' || obType == 'Edit Box' || obType == null || obType == 'Static' || obType == 'check box' || obType == 'radio button' || obType == 'panel' || obType != undefined || obType == 'table') || obType == 'password text') {
 						var sc;
 						if (obType == 'push button' || obType == 'toggle button') {
@@ -7179,7 +7074,7 @@ function pasteTestStep(e) {
 		if (window.localStorage['anotherScriptId'] != JSON.parse(window.localStorage['_CT']).testCaseId) {
 			var flg = true;
 			for (var i = 0; i < getRowJsonToPaste.length; i++) {
-				if (getRowJsonToPaste[i].appType == "Web" || getRowJsonToPaste[i].appType == "Desktop" || getRowJsonToPaste[i].appType == "Mainframe" || getRowJsonToPaste[i].appType == "DesktopJava" || getRowJsonToPaste[i].appType == "MobileApp" || getRowJsonToPaste[i].appType == "MobileWeb" || getRowJsonToPaste[i].appType == "MobileApp" || getRowJsonToPaste[i].appType == "SAP") {
+				if (getRowJsonToPaste[i].appType == "Web" || getRowJsonToPaste[i].appType == "Desktop" || getRowJsonToPaste[i].appType == "Mainframe" || getRowJsonToPaste[i].appType == "OEBS" || getRowJsonToPaste[i].appType == "MobileApp" || getRowJsonToPaste[i].appType == "MobileWeb" || getRowJsonToPaste[i].appType == "MobileApp" || getRowJsonToPaste[i].appType == "SAP") {
 					flg = false;
 					break;
 				}
@@ -7572,16 +7467,16 @@ function getTags(data) {
 		obnames = ["@Generic", "@Excel", "Mainframe List", "@Word"];
 	} else if (appTypeLocal == "Desktop") {
 		obnames = ["@Generic", "@Excel", "@Window", "@Custom", "@Email", "@Word"];
-	} else if (appTypeLocal == "DesktopJava") {
+	} else if (appTypeLocal == "OEBS") {
 		obnames = ["@Generic", "@Excel", "@Oebs", "@Custom", "@Word"];
 	} else if (appTypeLocal == "MobileApp" && navigator.appVersion.indexOf("Mac") == -1) {
-		obnames = ["@Generic", "@Mobile", "@Android_Custom", "@Action"];
+		obnames = ["@Generic", "@Mobile", "@Android_Custom", "@Action","@Excel","@Word"];
 	} else if (appTypeLocal == "MobileApp" && navigator.appVersion.indexOf("Mac") != -1) {
-		obnames = ["@Generic", "@Mobile", "@CustomiOS"];
+		obnames = ["@Generic", "@Mobile", "@CustomiOS","@Excel","@Word"];
 	} else if (appTypeLocal == "MobileWeb") {
-		obnames = ["@Generic", "@Browser", "@BrowserPopUp", "@Action"];
+		obnames = ["@Generic", "@Browser", "@BrowserPopUp", "@Action","@Excel","@Word"];
 	} else if (appTypeLocal == "SAP") {
-		obnames = ["@Generic", "@Sap", "@Custom", "@Word"]
+		obnames = ["@Generic", "@Sap", "@Custom", "@Word","@Excel"]
 	} else if (appTypeLocal = "System") {
 		obnames = ["@Generic", "@Excel", "@System", "@Word"];
 	}
@@ -7702,4 +7597,11 @@ function openModalFormDialog(title, body) {
 	setTimeout(function () {
 		$("#globalModalForm").find('.btn-default').focus();
 	}, 300);
+}
+
+function updateColumnStyle(){
+	var gridInnerElement =  $("#jqGrid").find("td[aria-describedby=jqGrid_inputVal]:visible").find('input').prevObject;
+	for(var i = 0; i < gridInnerElement.length ; i++){
+		gridInnerElement[i].style.whiteSpace = 'pre-wrap';
+	}	
 }

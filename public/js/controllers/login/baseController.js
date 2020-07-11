@@ -2,14 +2,19 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 	$scope.loginValidation = "Loading Profile...";
 	$scope.loginAgain = true;
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear();
-	var chkLogOut = window.sessionStorage.getItem('checkLoggedOut');
+	const chkLogOut = JSON.parse(window.sessionStorage.getItem('checkLoggedOut'));
 	window.localStorage.clear();
 	window.sessionStorage.clear();
 	$('.row').addClass('displayRow');
 	$('.jumbotron').addClass('displayBgTransparent');
-	//if chkLogOut was true, then user logged out manually else if chkLogIn was true, then user was logged in but now the session is expired
+	//if chkLogOut was true, then either user logged out manually or their session is terminated else session is expired due to user inactivity
 	if (chkLogOut) {
-		$scope.loginValidation = "You Have Successfully Logged Out!";
+		if ((typeof(chkLogOut) == "object") && (chkLogOut.length == 2)) {
+			$scope.loginValidation = "Your session has been terminated by "+chkLogOut[0];
+			if (chkLogOut[1] == "dereg") $(".absoluteError.errorMessages span").html("Reason: User is deleted from Nineteen68");
+		} else {
+			$scope.loginValidation = "You Have Successfully Logged Out!";
+		}
 		cfpLoadingBar.complete();
 	} else {
 		$scope.loginAgain = false;

@@ -14,149 +14,105 @@ var utils = require('../lib/utils');
 
 
 //GetUserRoles
-exports.getUserRoles_Nineteen68 = function (req, res) {
+exports.getUserRoles_Nineteen68 = async (req, res) => {
+	const fnName = "getUserRoles_Nineteen68";
+	logger.info("Inside UI service: " + fnName);
 	try {
-		logger.info("Inside UI service: getUserRoles_Nineteen68");
-		if (utils.isSessionActive(req)) {
-			logger.info("Calling NDAC Service: getUserRoles_Nineteen68");
-			client.post(epurl + "admin/getUserRoles_Nineteen68",
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in getUserRoles_Nineteen68 Error Code : ERRNDAC");
-					res.status(500).send("fail");
-				} else {
-					var rolesList = [];
-					var result = result.rows;
-					for (var i = 0; i < result.length; i++) {
-						rolesList.push([result[i].name, result[i]._id]);
-					}
-					res.send(rolesList);
-				}
-			});
-		} else {
-			logger.error("Error occurred in getUserRoles_Nineteen68: Invalid Session");
-			res.send("Invalid Session");
+		const result = await utils.fetchData({}, "admin/getUserRoles_Nineteen68", fnName);
+		if (result == "fail") res.status(500).send("fail");
+		else {
+			const rolesList = [];
+			for (let role of result) {
+				rolesList.push([role.name, role._id]);
+			}
+			res.send(rolesList);
 		}
 	} catch (exception) {
-		logger.error(exception.message);
+		logger.error("Error occurred in "+fnName+":", exception);
 		res.status(500).send("fail");
 	}
 };
 
 // Create/Edit/Delete Users
-exports.manageUserDetails = function(req, res){
-	logger.info("Inside UI Service: manageUserDetails");
-	try{
-		if (utils.isSessionActive(req)) {
-			var flag = ['2','0','0','0','0','0','0','0','0','0','0'];
-			var salt = bcrypt.genSaltSync(10);
-			var reqData = req.body.user;
-			var action = req.body.action;
-			var inputs = {};
-			inputs.action=action;
-			inputs.createdby = req.session.userid;
-			inputs.createdbyrole = reqData.role;
-			inputs.name = (reqData.username || "").trim();
-			inputs.ldapuser = reqData.ldapUser;
-			inputs.password = (reqData.password || "").trim();
+exports.manageUserDetails = async (req, res) => {
+	const fnName = "manageUserDetails";
+	logger.info("Inside UI Service: " + fnName);
+	try {
+		let flag = ['2','0','0','0','0','0','0','0','0'];
+		const reqData = req.body.user;
+		const action = req.body.action;
+		let inputs = {
+			action: action,
+			createdby: req.session.userid,
+			createdbyrole: reqData.role,
+			name: (reqData.username || "").trim(),
+			ldapuser: reqData.ldapUser,
+			password: (reqData.password || "").trim()
+		};
 
-			if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
-				logger.error("Error occurred in admin/manageUserDetails: Invalid action.");
-				flag[1]='1';
-			}
-			if (!validator.isLength(inputs.name,1,100)) {
-				logger.error("Error occurred in admin/manageUserDetails: Invalid User name.");
-				flag[2]='1';
-			}
-			if (action != "create") {
-				inputs.userid = (reqData.userid || "").trim();
-			}
-			if (!inputs.ldapuser && action == "create") {
-				if (validator.isEmpty(inputs.password) && !(validator.isLength(inputs.password,1,12))) {
-					logger.error("Error occurred in admin/manageUserDetails: Invalid Password.");
-					flag[5]='1';
-				}
-			}
-			if (inputs.password == '') delete inputs.password;
-			else inputs.password = bcrypt.hashSync(inputs.password, salt);
-			if (action != "delete") {
-				inputs.firstname = (reqData.firstname || "").trim();
-				inputs.lastname = (reqData.lastname || "").trim();
-				inputs.email = (reqData.email || "").trim();
-				inputs.defaultrole = (reqData.role || "").trim();
-
-				if (!validator.isLength(inputs.firstname,1,100)) {
-					logger.error("Error occurred in admin/manageUserDetails: Invalid First name.");
-					flag[3]='1';
-				}
-				if (!validator.isLength(inputs.lastname,1,100)) {
-					logger.error("Error occurred in admin/manageUserDetails: Invalid Last name.");
-					flag[4]='1';
-				}
-				if (!validator.isLength(inputs.email,1,100)) {
-					logger.error("Error occurred in admin/manageUserDetails: Email cannot be empty.");
-					flag[6]='1';
-				}
-				if (action == "update") {
-					inputs.additionalroles = reqData.addRole || [];
-					inputs.additionalroles.every(function(e) {
-					});
-				}
-				if (inputs.ldapuser) {
-					inputs.ldapuser = reqData.ldapUser || {};
-					if (!inputs.ldapuser.server || validator.isEmpty(inputs.ldapuser.server)) {
-						logger.error("Error occurred in admin/manageUserDetails: Invalid LDAP Server.");
-						flag[9]='1';
-					}
-					if (validator.isEmpty(inputs.ldapuser.user)) {
-						logger.error("Error occurred in admin/manageUserDetails: Invalid User Domain Name.");
-						flag[10]='1';
-					}
-					inputs.ldapuser = JSON.stringify({server:inputs.ldapuser.server,user:inputs.ldapuser.user});
-				}
-			}
-			flag = flag.join('');
-			if (flag != "20000000000") {
-				return res.send(flag);
-			}
-			logger.info("Calling NDAC Service: manageUserDetails");
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			client.post(epurl + "admin/manageUserDetails", args,
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in admin/manageUserDetails Error Code : ERRNDAC");
-					res.status(500).send("fail");					
-				} else {
-                    "change here"
-					// if(action == 'delete'){
-					// 	qList.push({"statement":"match p = (m)-[FNTT]-(t:TASKS{assignedTo:'"+reqData.userid+"'}) where t.status = 'assigned' or t.status = 'inprogress' or t.status = 'reassign' detach delete t;"});
-					// 	qList.push({"statement":"match p = (m)-[FNTT]-(t:TASKS{reviewer:'"+reqData.userid+"'}) where t.status = 'review' detach delete t;"});
-					// 	qList.push({"statement":"match p = (m)-[FNTT]-(t:TASKS{assignedTo:'"+reqData.userid+"'}) set m.assignedTo = '' "});
-					// 	qList.push({"statement":"match p = (m)-[FNTT]-(t:TASKS{reviewer:'"+reqData.userid+"'}) set m.reviewer = '' "});
-					// }
-
-					// logger.info("Calling neo4jAPI execute queries for manageUserDetails");
-					// neo4jAPI.executeQueries(qList,function(status1,result1){
-					// 	if(status1!=200){
-					// 		logger.error("Error in neo4jAPI execute queries with status for manageUserDetails: %d",status1,"\n response for manageUserDetails:%s",result1);
-					// 		return res.send(result.rows);
-					// 	}
-					// 	else{
-					// 		logger.info('neo4jAPI execute queries for manageUserDetails executed successfully');
-					// 		return res.send(result.rows);
-					// 	}
-					// });					
-					res.send(result.rows)
-				}
-			});
-		} else {
-			res.send("Invalid Session");
+		if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
+			logger.error("Error occurred in admin/manageUserDetails: Invalid action.");
+			flag[1]='1';
 		}
+		if (!validator.isLength(inputs.name,1,100)) {
+			logger.error("Error occurred in admin/manageUserDetails: Invalid User name.");
+			flag[2]='1';
+		}
+		if (action != "create") {
+			inputs.userid = (reqData.userid || "").trim();
+		}
+		if (!inputs.ldapuser && action == "create") {
+			if (validator.isEmpty(inputs.password) && !(validator.isLength(inputs.password,1,12))) {
+				logger.error("Error occurred in admin/manageUserDetails: Invalid Password.");
+				flag[5]='1';
+			}
+		}
+		if (inputs.password == '') delete inputs.password;
+		else {
+			const salt = bcrypt.genSaltSync(10);
+			inputs.password = bcrypt.hashSync(inputs.password, salt);
+		}
+		if (action != "delete") {
+			inputs.firstname = (reqData.firstname || "").trim();
+			inputs.lastname = (reqData.lastname || "").trim();
+			inputs.email = (reqData.email || "").trim();
+			inputs.defaultrole = (reqData.role || "").trim();
+
+			if (!validator.isLength(inputs.firstname,1,100)) {
+				logger.error("Error occurred in admin/manageUserDetails: Invalid First name.");
+				flag[3]='1';
+			}
+			if (!validator.isLength(inputs.lastname,1,100)) {
+				logger.error("Error occurred in admin/manageUserDetails: Invalid Last name.");
+				flag[4]='1';
+			}
+			if (!validator.isLength(inputs.email,1,100)) {
+				logger.error("Error occurred in admin/manageUserDetails: Email cannot be empty.");
+				flag[6]='1';
+			}
+			if (action == "update") {
+				inputs.additionalroles = reqData.addRole || [];
+			}
+			if (inputs.ldapuser) {
+				inputs.ldapuser = reqData.ldapUser || {};
+				if (!inputs.ldapuser.server || validator.isEmpty(inputs.ldapuser.server)) {
+					logger.error("Error occurred in admin/manageUserDetails: Invalid LDAP Server.");
+					flag[7]='1';
+				}
+				if (validator.isEmpty(inputs.ldapuser.user)) {
+					logger.error("Error occurred in admin/manageUserDetails: Invalid User Domain Name.");
+					flag[8]='1';
+				}
+				inputs.ldapuser = JSON.stringify({server:inputs.ldapuser.server,user:inputs.ldapuser.user});
+			}
+		}
+		flag = flag.join('');
+		if (flag != "200000000") {
+			return res.send(flag);
+		}
+		const result = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
+		if (result == "fail") res.status(500).send("fail");
+		else res.send(result)
 	} catch (exception){
 		logger.error("Error occurred in admin/manageUserDetails", exception);
 		res.status(500).send("fail");
@@ -164,60 +120,37 @@ exports.manageUserDetails = function(req, res){
 };
 
 // Fetch Users or a specific user details
-exports.getUserDetails = function (req, res) {
+exports.getUserDetails = async (req, res) => {
 	logger.info("Inside UI Service: getUserDetails");
-	try{
-		if (utils.isSessionActive(req)) {
-			var action = req.body.action;
-			var userid = req.body.args;
-			logger.info("Calling NDAC Service: getUserDetails");
-			var inputs = {};
-			if (action != "user") inputs.userid = userid;
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
+	try {
+		const action = req.body.action;
+		const userid = req.body.args;
+		let inputs = {};
+		if (action != "user") inputs.userid = userid;
+		const result = await utils.fetchData(inputs, "admin/getUserDetails", "getUserDetails");
+		if (result == "fail") res.status(500).send("fail");
+		else if (result.length == 0) res.send("empty");
+		else {
+			let data = [];
+			if (action == "user") {
+				for (let row of result) {
+					data.push([row.name, row._id, row.defaultrole, row.rolename]);
 				}
-			};
-			client.post(epurl + "admin/getUserDetails", args,
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in admin/getUserDetails Error Code : ERRNDAC");
-					res.status(500).send("fail");
-				} else if (result.rows.length == 0) {
-					res.send("empty");
-				} else {
-					var data;
-					if (action != "user") {
-						result = result.rows;
-						//var password = result.password;
-						data = {
-							userid: userid,
-							username: result.name,
-							password: '',
-							firstname: result.firstname,
-							lastname: result.lastname,
-							email: result.email,
-							role: result.defaultrole,
-							rolename: result.rolename,
-							addrole: result.addroles,
-							ldapuser: result.ldapuser,
-						};
-						if (!data.ldapuser.server) data.ldapuser = false;
-						return res.send(data);
-					}
-					else {
-						data = [];
-						var result = result.rows;
-						for(var i = 0; i < result.length; i++) {
-							data.push([result[i].name,result[i]._id,result[i].defaultrole,result[i].rolename]);
-						}
-						return res.send(data);
-					}
-				}
-			});
-		} else {
-			res.status(403).send("Invalid Session");
+			} else {
+				data = {
+					userid: userid,
+					username: result.name,
+					password: '',
+					firstname: result.firstname,
+					lastname: result.lastname,
+					email: result.email,
+					role: result.defaultrole,
+					rolename: result.rolename,
+					addrole: result.addroles,
+					ldapuser: (result.ldapuser.server)? result.ldapuser : false,
+				};
+			}
+			return res.send(data);
 		}
 	} catch (exception){
 		logger.error("Error occurred in admin/getUserDetails", exception);
@@ -278,6 +211,7 @@ exports.manageCIUsers = function (req, res) {
 					userid: requestDetails.userId,
 					expireson: requestDetails.expiry,
 					name: requestDetails.tokenname,
+					icetype:requestDetails.icetype,
 					hash: bcrypt.hashSync(token, salt),
 					action: req.body.action,
 					type: "TOKENS",
@@ -307,6 +241,7 @@ exports.manageCIUsers = function (req, res) {
 				} else if (response.statusCode != 200 || result.rows == "duplicate"){
 					res.send("duplicate")
 				}else {
+					result.rows.token = token;
 					res.send(result.rows);
 				}
 			});
@@ -353,66 +288,77 @@ exports.getCIUsersDetails = function(req,res){
 };
 
 //Manage Session for User
-exports.manageSessionData = function (req, res) {
+exports.manageSessionData = async (req, res) => {
 	logger.info("Inside UI service: manageSessionData");
 	try {
-		if (utils.isSessionActive(req)) {
-			var currUser = req.session.username;
-			var action = req.body.action;
-			var user = req.body.user;
-			var key = req.body.key;
-			var data = {sessionData: [], clientData: []};
-			if (action == "get") {
-				logger.info("Inside UI service: manageSessionData/getSessions");
-				utils.getSocketList("ICE", function(connectusers) {
-					connectusers.forEach(function(e) {
-						data.clientData.push({
-							username: e[0],
-							mode: e[1],
-							ip: e[2]
-						});
-					});
-					utils.allSess(function(err, sessions){
-						if (err) {
-							logger.error("Error occurred in admin/manageSessionData");
-							logger.debug(err);
-						} else {
-							sessions.forEach(function(e) {
-								if (e.uniqueId && currUser != e.username) {
-									data.sessionData.push({
-										username: e.username,
-										id: Buffer.from(e.uniqueId).toString("base64"),
-										role: e.activeRole,
-										loggedin: (new Date(e.loggedin)).toLocaleString(),
-										ip: e.ip
-									});
-								}
-							});
-						}
-						return res.send(data);
-					});
+		const currUser = req.session.username;
+		const action = req.body.action;
+		if (action == "get") {
+			logger.info("Inside UI service: manageSessionData/getSessions");
+			const data = {sessionData: [], clientData: []};
+			const connectusers = await utils.getSocketList("ICE");
+			connectusers.forEach(function(e) {
+				data.clientData.push({
+					username: e[0],
+					mode: e[1],
+					ip: e[2]
 				});
-			} else if (action == "logout" || action == "disconnect") {
-				logger.info("Inside UI service: manageSessionData/"+action);
-				if (action == "logout") key = Buffer.from(req.body.key, "base64").toString();
-				var d2s = {"action":action, "key":key, "user":user, "cmdBy":currUser};
-				utils.delSession(d2s, function(err){
-					if (err) {
+			});
+			try {
+				const sessions = await utils.allSess();
+				sessions.forEach(function(e) {
+					if (e.uniqueId && currUser != e.username) {
+						data.sessionData.push({
+							username: e.username,
+							id: Buffer.from(e.uniqueId).toString("base64"),
+							role: e.activeRole,
+							loggedin: (new Date(e.loggedin)).toLocaleString(),
+							ip: e.ip
+						});
+					}
+				});
+			} catch(err) {
+				logger.error("Error occurred in admin/manageSessionData");
+				logger.debug(err);
+			}
+			return res.send(data);
+		} else if (action == "logout" || action == "disconnect") {
+			const user = req.body.user;
+			const reason = req.body.reason;
+			let key = req.body.key;
+			logger.info("Inside UI service: manageSessionData/"+action);
+			if (action == "logout") {
+				if (key != '?') key = Buffer.from(req.body.key, "base64").toString();
+				else {
+					try {
+						key = await utils.findSessID(user);
+					} catch (err) {
 						logger.error("Error occurred in admin/manageSessionData: Fail to "+action+" "+user);
 						logger.debug(err);
 						return res.status(500).send("fail");
-					} else return res.send("success");
-				});
+					}
+				}
+			} else if (action == "disconnect" && key == '?') {
+				const icemode = await utils.channelStatus(user);
+				if (icemode.schedule) key = "schedule";
+				else if (icemode.normal) key = "normal";
+				else return res.send("success");
 			}
-		} else {
-			res.send("Invalid Session");
+			const d2s = {"action":action, "key":key, "user":user, "cmdBy":currUser, "reason": reason};
+			try {
+				const status = await utils.delSession(d2s);
+				return res.send("success");
+			} catch (err) {
+				logger.error("Error occurred in admin/manageSessionData: Fail to "+action+" "+user);
+				logger.debug(err);
+				return res.status(500).send("fail");
+			}
 		}
 	} catch (exception) {
-		logger.error("Error occurred in admin/manageSessionData:",exception);
+		logger.error("Error occurred in admin/manageSessionData:", exception);
 		res.status(500).send("fail");
 	}
 };
-
 
 exports.getNames_ICE = function (req, res) {
 	logger.info("Inside UI service: getNames_ICE");
@@ -421,57 +367,57 @@ exports.getNames_ICE = function (req, res) {
 			var id=req.body.requestedids;
 			var type=req.body.idtype[0];
 			logger.info("Inside function namesfetcher");
-				var inputs = {
-					"type": type,
-					"id": id,
-				};
-				var args = {
-					data: inputs,
-					headers: {
-						"Content-Type": "application/json"
-					}
-				};
-				logger.info("Calling NDAC Service from namesfetcher: admin/getNames_ICE");
-				client.post(epurl + "admin/getNames_ICE", args,
-					function (queryStringresult, response) {
-					try {
-						if (response.statusCode != 200 || queryStringresult.rows == "fail") {
-							var statusFlag = "Error occurred in namesfetcher : Fail";
-							logger.error("Error occurred in admin/getNames_ICE from namesfetcher Error Code : ERRNDAC");
-							// namesfetchercallback(statusFlag, null);
+			var inputs = {
+				"type": type,
+				"id": id,
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			logger.info("Calling NDAC Service from namesfetcher: admin/getNames_ICE");
+			client.post(epurl + "admin/getNames_ICE", args,
+				function (queryStringresult, response) {
+				try {
+					if (response.statusCode != 200 || queryStringresult.rows == "fail") {
+						var statusFlag = "Error occurred in namesfetcher : Fail";
+						logger.error("Error occurred in admin/getNames_ICE from namesfetcher Error Code : ERRNDAC");
+						// namesfetchercallback(statusFlag, null);
+					} else {
+						respLength = queryStringresult.rows.length;
+						responsedata = {
+							projectIds: [],
+							projectNames: []
+						};
+						if (respLength <= 0) {
+							logger.info('No projects found');
+							res.send("No Projects");
 						} else {
-							respLength = queryStringresult.rows.length;
-							responsedata = {
-								projectIds: [],
-								projectNames: []
-							};
-							if (respLength <= 0) {
-								logger.info('No projects found');
-								res.send("No Projects");
-							} else {
-								for (var i = 0; i < respLength; i++) {
-									responsedata.projectIds.push(queryStringresult.rows[i]._id);
-									responsedata.projectNames.push(queryStringresult.rows[i].name);
-									if (i == respLength - 1) {
-										logger.info('Project details fetched successfully');
-										res.send(responsedata);
-									}
+							for (var i = 0; i < respLength; i++) {
+								responsedata.projectIds.push(queryStringresult.rows[i]._id);
+								responsedata.projectNames.push(queryStringresult.rows[i].name);
+								if (i == respLength - 1) {
+									logger.info('Project details fetched successfully');
+									res.send(responsedata);
 								}
 							}
 						}
-					} catch (exception) {
-						logger.error(exception.message);
 					}
-				});
-			}
-			else {
-				logger.info("Invalid Session");
-				res.send("Invalid Session");
-			}
-		} catch (exception) {
-			logger.error(exception.message);
+				} catch (exception) {
+					logger.error(exception.message);
+				}
+			});
 		}
-	};
+		else {
+			logger.info("Invalid Session");
+			res.send("Invalid Session");
+		}
+	} catch (exception) {
+		logger.error(exception.message);
+	}
+};
 
 exports.createProject_ICE = function createProject_ICE(req, res) {
 	try {
@@ -518,72 +464,68 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 	}
 };
 
-exports.testLDAPConnection = function(req, res){
+exports.testLDAPConnection = (req, res) => {
 	logger.info("Inside UI Service: testLDAPConnection");
 	try{
-		if (utils.isSessionActive(req)) {
-			var reqData = req.body;
-			var ldapURL = (reqData.ldapURL || "").trim();
-			if (ldapURL.slice(0,8) == "ldaps://") {
-				logger.error("Error occurred in admin/testLDAPConnection: 'ldaps' protocol is not supported.");
-				res.send("invalid_url_protocol");
-			} else if (ldapURL.slice(0,7) != "ldap://") {
-				logger.error("Error occurred in admin/testLDAPConnection: Invalid URL provided for connection test.");
-				res.send("invalid_url");
-			}
-			var baseDN = (reqData.baseDN || "").trim();
-			var authUser = (reqData.username || "").trim();
-			var authKey = (reqData.password || "").trim();
-			var authType = reqData.authType;
-			var adConfig = {
-				url: ldapURL,
-				baseDN: baseDN
-			};
-			if (authType == "simple") {
-				adConfig.bindDN = authUser;
-				adConfig.bindCredentials = authKey;
-			}
-			var ad = new activeDirectory(adConfig);
-			var resSent = false;
-			ad.find("cn=*", function (err, result) {
-				if (resSent) return;
-				resSent = !resSent;
-				var flag = "success";
-				var data = {fields:{}};
-				if (err) {
-					if (err.errno == "EADDRNOTAVAIL" || err.errno == "ECONNREFUSED" || err.errno == "ETIMEDOUT") flag = "invalid_addr";
-					else if (err.errno == "INSUFFICIENT_ACCESS_RIGHTS") {
+		var reqData = req.body;
+		var ldapURL = (reqData.ldapURL || "").trim();
+		if (ldapURL.slice(0,8) == "ldaps://") {
+			logger.error("Error occurred in admin/testLDAPConnection: 'ldaps' protocol is not supported.");
+			res.send("invalid_url_protocol");
+		} else if (ldapURL.slice(0,7) != "ldap://") {
+			logger.error("Error occurred in admin/testLDAPConnection: Invalid URL provided for connection test.");
+			res.send("invalid_url");
+		}
+		var baseDN = (reqData.baseDN || "").trim();
+		var authUser = (reqData.username || "").trim();
+		var authKey = (reqData.password || "").trim();
+		var authType = reqData.authType;
+		var adConfig = {
+			url: ldapURL,
+			baseDN: baseDN
+		};
+		if (authType == "simple") {
+			adConfig.bindDN = authUser;
+			adConfig.bindCredentials = authKey;
+		}
+		var ad = new activeDirectory(adConfig);
+		var resSent = false;
+		ad.find("cn=*", function (err, result) {
+			if (resSent) return;
+			resSent = !resSent;
+			var flag = "success";
+			var data = {fields:{}};
+			if (err) {
+				if (err.errno == "EADDRNOTAVAIL" || err.errno == "ECONNREFUSED" || err.errno == "ETIMEDOUT") flag = "invalid_addr";
+				else if (err.errno == "INSUFFICIENT_ACCESS_RIGHTS") {
+					if (authType == "simple") flag = "insufficient_access";
+					else flag = "success";
+				} else if (err.lde_message) {
+					if (err.lde_message.indexOf("DSID-0C0906E8") > -1) {
 						if (authType == "simple") flag = "insufficient_access";
-						else flag = "success";
-					} else if (err.lde_message) {
-						if (err.lde_message.indexOf("DSID-0C0906E8") > -1) {
-							if (authType == "simple") flag = "insufficient_access";
-							else flag = "invalid_auth";
-						} else if (err.lde_message.indexOf("DSID-031522C9") > -1) {
-							flag = "insufficient_access";
-							logger.error("User Does not have sufficient Access!");
-						} else if (((err.lde_message.indexOf("DSID-0C0903A9") > -1) || (err.lde_message.indexOf("DSID-0C090400") > -1)) && authType == "simple") flag = "invalid_credentials";
-						else if (err.lde_message.indexOf("DSID-031007DB") > -1) flag = "invalid_basedn";
-					}
-					else flag = "fail";
-					logger.debug("Error occurred in admin/testLDAPConnection: " + JSON.stringify(err));
+						else flag = "invalid_auth";
+					} else if (err.lde_message.indexOf("DSID-031522C9") > -1) {
+						flag = "insufficient_access";
+						logger.error("User Does not have sufficient Access!");
+					} else if (((err.lde_message.indexOf("DSID-0C0903A9") > -1) || (err.lde_message.indexOf("DSID-0C090400") > -1)) && authType == "simple") flag = "invalid_credentials";
+					else if (err.lde_message.indexOf("DSID-031007DB") > -1) flag = "invalid_basedn";
 				}
-				if (flag == "success") {
-					logger.info('LDAP Connection test passed!');
-					if (result && result.users && result.users.length>0) data.fields = Object.keys(result.users[0]);
-					else{ 
-						flag= "fail";
-						logger.error('LDAP Connection test failed!');
-					}
-				} else {
+				else flag = "fail";
+				logger.debug("Error occurred in admin/testLDAPConnection: " + JSON.stringify(err));
+			}
+			if (flag == "success") {
+				logger.info('LDAP Connection test passed!');
+				if (result && result.users && result.users.length>0) data.fields = Object.keys(result.users[0]);
+				else{ 
+					flag= "fail";
 					logger.error('LDAP Connection test failed!');
 				}
-				data.flag = flag;
-				return res.send(data);
-			});
-		} else {
-			res.send("Invalid Session");
-		}
+			} else {
+				logger.error('LDAP Connection test failed!');
+			}
+			data.flag = flag;
+			return res.send(data);
+		});
 	} catch (exception){
 		if (exception.name == "InvalidDistinguishedNameError") {
 			res.send("invalid_basedn");
@@ -595,133 +537,110 @@ exports.testLDAPConnection = function(req, res){
 	}
 };
 
-exports.getLDAPConfig = function(req, res){
-	logger.info("Inside UI Service: getLDAPConfig");
+exports.getLDAPConfig = async (req, res) => {
+	const fnName = "getLDAPConfig";
+	logger.info("Inside UI Service: " + fnName);
 	try{
-		if (utils.isSessionActive(req)) {
-			var action = req.body.action;
-			var name = req.body.args;
-			var opts = (req.body.opts || "").trim();
-			logger.info("Calling NDAC Service: getLDAPConfig");
-			var inputs = {};
-			if (action != "server") inputs.name = name;
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
+		const action = req.body.action;
+		const name = req.body.args;
+		const opts = (req.body.opts || "").trim();
+		let inputs = {};
+		if (action != "server") inputs.name = name;
+		const resConf = await utils.fetchData(inputs, "admin/getLDAPConfig", fnName);
+		if (resConf == "fail") return res.status(500).send("fail");
+		else if (resConf.length == 0) return res.send("empty");
+		let data = "";
+		if (action == "server") {
+			data = resConf.map(e => e.name);
+			return res.send(data);
+		}
+
+		const bindCredentials = resConf.bindcredentials;
+		data = {
+			url: resConf.url,
+			basedn: resConf.basedn,
+			auth: resConf.auth,
+			binddn: resConf.binddn,
+			bindCredentials: '',
+			fieldmap: resConf.fieldmap
+		};
+		if (action == "config") return res.send(data);
+		if (action != "user") return res.send("fail");
+
+		const adConfig = {
+			url: data.url,
+			baseDN: data.basedn
+		};
+		if (data.auth == "simple") {
+			adConfig.bindDN = data.binddn;
+			adConfig.bindCredentials = bindCredentials;
+		}
+		const dataMaps = data.fieldmap;
+		const filter = dataMaps.uname;
+		const ad = new activeDirectory(adConfig);
+		let resSent = false;
+		if (opts.length > 0) {
+			ad.findUser(opts, function (err, result) {
+				if (resSent) return;
+				resSent = !resSent;
+				if (err) {
+					if (err.lde_message && err.lde_message.indexOf("DSID-031522C9") > -1) {
+						logger.error("Error occurred in admin/getLDAPConfig: Fetch User Details: Insufficient Access");
+						data = "insufficient_access";
+					} else {
+						logger.error("Error occurred in admin/getLDAPConfig: Fetch User Details:", err.lde_message || err.message);
+						logger.debug("ERROR: " + JSON.stringify(err));
+						data = "server_error";
+					}
 				}
-			};
-			client.post(epurl + "admin/getLDAPConfig", args,
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in admin/getLDAPConfig Error Code : ERRNDAC");
-					res.status(500).send("fail");
-				} else if (result.rows.length == 0) {
-					res.send("empty");
+				if (result) {
+					data = {
+						username: result[filter],
+						firstname: result[dataMaps.fname],
+						lastname: result[dataMaps.lname],
+						email: result[dataMaps.email],
+						ldapname: result.dn
+					};
 				} else {
-					var data;
-					if (action != "server") {
-						result = result.rows;
-						var bindCredentials = result.bindcredentials;
-						data = {
-							url: result.url,
-							basedn: result.basedn,
-							auth: result.auth,
-							binddn: result.binddn,
-							bindCredentials: '',
-							fieldmap: result.fieldmap
-						};
-						if (action == "config") return res.send(data);
-						if (action == "user") {
-							var adConfig = {
-								url: data.url,
-								baseDN: data.basedn
-							};
-							if (data.auth == "simple") {
-								adConfig.bindDN = data.binddn;
-								adConfig.bindCredentials = bindCredentials;
-							}
-							var dataMaps = data.fieldmap;
-							var filter = dataMaps.uname;
-							var ad = new activeDirectory(adConfig);
-							if (opts.length > 0) {
-								var resSent = false;
-								ad.findUser(opts, function (err, result) {
-									if (resSent) return;
-									resSent = !resSent;
-									if (err) {
-										if (err.lde_message.indexOf("DSID-031522C9") > -1) {
-											logger.error("Error occurred in admin/getLDAPConfig: Fetch User Details: Insufficient Access");
-											data = "insufficient_access";
-										} else {
-											logger.error("Error occurred in admin/getLDAPConfig: Fetch User Details:", err.lde_message);
-											logger.debug("ERROR: " + JSON.stringify(err));
-											data = "server_error";
-										}
-									}
-									if (result) {
-										data = {
-											username: result[filter],
-											firstname: result[dataMaps.fname],
-											lastname: result[dataMaps.lname],
-											email: result[dataMaps.email],
-											ldapname: result.dn
-										};
-									} else {
-										logger.error("Error occurred in admin/getLDAPConfig: Fetch User Details: User not Found");
-										data = "empty";
-									}
-									return res.send(data);
-								});
-							} else {
-								var resSent = false;
-								ad.find(filter+"=*", function (err, result) {
-									if (resSent) return;
-									resSent = !resSent;
-									if (err) {
-										if (err.lde_message.indexOf("DSID-031522C9") > -1) {
-											logger.error("Error occurred in admin/getLDAPConfig: Fetch Users: Insufficient Access");
-											data = "insufficient_access";
-										} else {
-											logger.error("Error occurred in admin/getLDAPConfig: Fetch Users:", err.lde_message);
-											logger.debug("ERROR: " + JSON.stringify(err));
-											data = "server_error";
-										}
-									}
-									if (result) {
-										var groups = result.groups;
-										var others = result.other;
-										groups.forEach(function(e) {
-											logger.info("Group '%s' found in base domain '%s'", e.dn, adConfig.baseDN);
-										});
-										others.forEach(function(e) {
-											logger.info("Unknown entry '%s' found in base domain '%s'", e.dn, adConfig.baseDN);
-										});
-										var users = result.users;
-										data = [];
-										for (var i = 0; i < users.length; i++) {
-											data.push([users[i].cn, users[i].dn]);
-										}
-									} else {
-										logger.error("Error occurred in admin/getLDAPConfig: Fetch Users: No users Found");
-										data = "empty";
-									}
-									return res.send(data);
-								});
-							}
-						}
-					}
-					else {
-						data = [];
-						for(var i = 0; i < result.rows.length; i++) {
-							data.push(result.rows[i].name);
-						}
-						return res.send(data);
-					}
+					logger.error("Error occurred in admin/getLDAPConfig: Fetch User Details: User not Found");
+					data = "empty";
 				}
+				return res.send(data);
 			});
 		} else {
-			res.send("Invalid Session");
+			ad.find(filter+"=*", function (err, result) {
+				if (resSent) return;
+				resSent = !resSent;
+				if (err) {
+					if (err.lde_message && err.lde_message.indexOf("DSID-031522C9") > -1) {
+						logger.error("Error occurred in admin/getLDAPConfig: Fetch Users: Insufficient Access");
+						data = "insufficient_access";
+					} else {
+						logger.error("Error occurred in admin/getLDAPConfig: Fetch Users:", err.lde_message || err.message);
+						logger.debug("ERROR: " + JSON.stringify(err));
+						data = "server_error";
+					}
+				}
+				if (result) {
+					var groups = result.groups;
+					var others = result.other;
+					groups.forEach(function(e) {
+						logger.info("Group '%s' found in base domain '%s'", e.dn, adConfig.baseDN);
+					});
+					others.forEach(function(e) {
+						logger.info("Unknown entry '%s' found in base domain '%s'", e.dn, adConfig.baseDN);
+					});
+					var users = result.users;
+					data = [];
+					for (var i = 0; i < users.length; i++) {
+						data.push([users[i].cn, users[i].dn]);
+					}
+				} else {
+					logger.error("Error occurred in admin/getLDAPConfig: Fetch Users: No users Found");
+					data = "empty";
+				}
+				return res.send(data);
+			});
 		}
 	} catch (exception){
 		logger.error("Error occurred in admin/getLDAPConfig", exception);
@@ -729,93 +648,212 @@ exports.getLDAPConfig = function(req, res){
 	}
 };
 
-exports.manageLDAPConfig = function(req, res){
-	logger.info("Inside UI Service: manageLDAPConfig");
+exports.manageLDAPConfig = async (req, res) => {
+	const fnName = "manageLDAPConfig";
+	logger.info("Inside UI Service: " + fnName);
 	try{
-		if (utils.isSessionActive(req)) {
-			var flag = ['1','0','0','0','0','0','0','0','0'];
-			var reqData = req.body.conf;
-			var action = req.body.action;
-			var inputs = {};
-			inputs.action = action;
-			inputs.name = (reqData.name || "").trim();
-			if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
-				logger.error("Error occurred in admin/manageLDAPConfig: Invalid action.");
-				flag[1] = '1';
-			}
-			if (validator.isEmpty(inputs.name)) {
-				logger.error("Error occurred in admin/manageLDAPConfig: LDAP Server Name cannot be empty.");
-				flag[2] = '1';
-			}
-			if  (action != "delete") {
-				inputs.url = (reqData.url || "").trim();
-				inputs.basedn = (reqData.basedn || "").trim();
-				inputs.auth = reqData.auth;
-				inputs.fieldmap = reqData.fieldmap || {};
-				if (validator.isEmpty(inputs.url)) {
-					logger.error("Error occurred in admin/manageLDAPConfig: LDAP Server URL cannot be empty.");
-					flag[3] = '1';
-				} else if (inputs.url.slice(0,8) == "ldaps://") {
-					logger.error("Error occurred in admin/manageLDAPConfig: 'ldaps' protocol is not supported.");
-					flag[3] = '2';
-				} else if (inputs.url.slice(0,7) != "ldap://") {
-					logger.error("Error occurred in admin/manageLDAPConfig: Invalid URL provided for connection test.");
-					flag[3] = '3';
-				}
-				if (validator.isEmpty(inputs.basedn)) {
-					logger.error("Error occurred in admin/manageLDAPConfig: Invalid Base Domain Name.");
-					flag[4] = '1';
-				}
-				if (validator.isEmpty(inputs.auth)) {
-					logger.error("Error occurred in admin/manageLDAPConfig: Invalid Authentication Protocol.");
-					flag[5] = '1';
-				}
-				if (inputs.auth == "simple") {
-					inputs.binddn = (reqData.binddn || "").trim();
-					inputs.bindcredentials = (reqData.bindcredentials || "").trim();
-					if (validator.isEmpty(inputs.binddn)) {
-						logger.error("Error occurred in admin/manageLDAPConfig: Invalid Bind Domain Name.");
-						flag[6] = '1';
-					}
-					if (validator.isEmpty(inputs.bindcredentials)) {
-						if (action == "create") {
-							logger.error("Error occurred in admin/manageLDAPConfig: Invalid Bind Credentials.");
-							flag[7] = '1';
-						} else {
-							delete inputs.bindcredentials;
-						}
-					}
-				}
-				if (!inputs.fieldmap.uname || !inputs.fieldmap.fname || !inputs.fieldmap.lname || !inputs.fieldmap.email) {
-					logger.error("Error occurred in admin/manageLDAPConfig: Invalid Field Map.");
-					flag[8] = '1';
-				} else inputs.fieldmap = JSON.stringify(inputs.fieldmap);
-			}
-			flag = flag.join('');
-			if (flag != "100000000") {
-				return res.send(flag);
-			}
-			logger.info("Calling NDAC Service: manageLDAPConfig");
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			client.post(epurl + "admin/manageLDAPConfig", args,
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in admin/manageLDAPConfig Error Code : ERRNDAC");
-					res.status(500).send("fail");
-				} else {
-					return res.send(result.rows);
-				}
-			});
-		} else {
-			res.send("Invalid Session");
+		let flag = ['1','0','0','0','0','0','0','0','0'];
+		const reqData = req.body.conf;
+		const action = req.body.action;
+		let inputs = {};
+		inputs.action = action;
+		inputs.name = (reqData.name || "").trim();
+		if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
+			logger.error("Error occurred in admin/manageLDAPConfig: Invalid action.");
+			flag[1] = '1';
 		}
+		if (validator.isEmpty(inputs.name)) {
+			logger.error("Error occurred in admin/manageLDAPConfig: LDAP Server Name cannot be empty.");
+			flag[2] = '1';
+		}
+		if  (action != "delete") {
+			inputs.url = (reqData.url || "").trim();
+			inputs.basedn = (reqData.basedn || "").trim();
+			inputs.auth = reqData.auth;
+			inputs.fieldmap = reqData.fieldmap || {};
+			if (validator.isEmpty(inputs.url)) {
+				logger.error("Error occurred in admin/manageLDAPConfig: LDAP Server URL cannot be empty.");
+				flag[3] = '1';
+			} else if (inputs.url.slice(0,8) == "ldaps://") {
+				logger.error("Error occurred in admin/manageLDAPConfig: 'ldaps' protocol is not supported.");
+				flag[3] = '2';
+			} else if (inputs.url.slice(0,7) != "ldap://") {
+				logger.error("Error occurred in admin/manageLDAPConfig: Invalid URL provided for connection test.");
+				flag[3] = '3';
+			}
+			if (validator.isEmpty(inputs.basedn)) {
+				logger.error("Error occurred in admin/manageLDAPConfig: Invalid Base Domain Name.");
+				flag[4] = '1';
+			}
+			if (validator.isEmpty(inputs.auth)) {
+				logger.error("Error occurred in admin/manageLDAPConfig: Invalid Authentication Protocol.");
+				flag[5] = '1';
+			}
+			if (inputs.auth == "simple") {
+				inputs.binddn = (reqData.binddn || "").trim();
+				inputs.bindcredentials = (reqData.bindcredentials || "").trim();
+				if (validator.isEmpty(inputs.binddn)) {
+					logger.error("Error occurred in admin/manageLDAPConfig: Invalid Bind Domain Name.");
+					flag[6] = '1';
+				}
+				if (validator.isEmpty(inputs.bindcredentials)) {
+					if (action == "create") {
+						logger.error("Error occurred in admin/manageLDAPConfig: Invalid Bind Credentials.");
+						flag[7] = '1';
+					} else {
+						delete inputs.bindcredentials;
+					}
+				}
+			}
+			if (!inputs.fieldmap.uname || !inputs.fieldmap.fname || !inputs.fieldmap.lname || !inputs.fieldmap.email) {
+				logger.error("Error occurred in admin/manageLDAPConfig: Invalid Field Map.");
+				flag[8] = '1';
+			} else inputs.fieldmap = JSON.stringify(inputs.fieldmap);
+		}
+		flag = flag.join('');
+		if (flag != "100000000") return res.send(flag);
+		const data = await utils.fetchData(inputs, "admin/manageLDAPConfig", fnName);
+		if (data == "fail") res.status(500).send(data);
+		else return res.send(data);
 	} catch (exception){
 		logger.error("Error occurred in admin/manageLDAPConfig", exception);
+		res.status(500).send("fail");
+	}
+};
+
+exports.getSAMLConfig = async (req, res) => {
+	const fnName = "getSAMLConfig";
+	const errPretext = "Error occurred in admin/" + fnName;
+	logger.info("Inside UI Service: " + fnName);
+	try {
+		const name = req.body.name;
+		const inputs = { name: name };
+		var data = await utils.fetchData(inputs, "admin/getSAMLConfig", fnName);
+		if (data == "fail") res.status(500).send(data);
+		else if (data.length == 0) res.send("empty");
+		else res.send(data);
+	} catch (exception){
+		logger.error(errPretext, exception);
+		res.status(500).send("fail");
+	}
+}
+
+exports.manageSAMLConfig = async (req, res) => {
+	const fnName = "manageSAMLConfig";
+	const errPretext = "Error occurred in admin/" + fnName;
+	logger.info("Inside UI Service: " + fnName);
+	try{
+		let flag = ['1','0','0','0','0'];
+		const reqData = req.body.conf;
+		const action = req.body.action;
+		const inputs = {};
+		inputs.action = action;
+		inputs.name = (reqData.name || "").trim();
+		if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
+			logger.error(errPretext + ": Invalid action.");
+			flag[1] = '1';
+		}
+		if (validator.isEmpty(inputs.name)) {
+			logger.error(errPretext + ": SAML Server Name cannot be empty.");
+			flag[2] = '1';
+		}
+		if  (action != "delete") {
+			inputs.url = (reqData.url || "").trim();
+			inputs.idp = (reqData.idp || "").trim();
+			inputs.cert = (reqData.cert || "").trim();
+			if (validator.isEmpty(inputs.url)) {
+				logger.error(errPretext + ": Single Sign-On URL cannot be empty.");
+				flag[3] = '1';
+			} else if (!inputs.url.startsWith("https://") && !inputs.url.startsWith("http://")) {
+				logger.error(errPretext + ": Single Sign-On URL must start with http:// or https://");
+				flag[3] = '2';
+			}
+			if (validator.isEmpty(inputs.idp)) {
+				logger.error(errPretext + ": Issuer cannot be empty.");
+				flag[4] = '1';
+			}
+			if (validator.isEmpty(inputs.cert)) {
+				logger.error(errPretext + ": Certificate cannot be empty.");
+				flag[5] = '1';
+			} else if (inputs.cert.indexOf("BEGIN CERTIFICATE") == -1 || inputs.cert.indexOf("END CERTIFICATE") == -1) {
+				logger.error(errPretext + ": Invalid certificate provided.");
+				flag[5] = '2';
+			}
+		}
+		flag = flag.join('');
+		if (flag != "10000") return res.send(flag);
+		const data = await utils.fetchData(inputs, "admin/manageSAMLConfig", fnName);
+		if (data == "fail") res.status(500).send(data);
+		else return res.send(data);
+	} catch (exception){
+		logger.error(errPretext, exception);
+		res.status(500).send("fail");
+	}
+};
+
+exports.getOIDCConfig = async (req, res) => {
+	const fnName = "getOIDCConfig";
+	const errPretext = "Error occurred in admin/" + fnName;
+	logger.info("Inside UI Service: " + fnName);
+	try {
+		const name = req.body.name;
+		const inputs = { name: name };
+		var data = await utils.fetchData(inputs, "admin/getOIDCConfig", fnName);
+		if (data == "fail") res.status(500).send(data);
+		else if (data.length == 0) res.send("empty");
+		else res.send(data);
+	} catch (exception){
+		logger.error(errPretext, exception);
+		res.status(500).send("fail");
+	}
+}
+
+exports.manageOIDCConfig = async (req, res) => {
+	const fnName = "manageOIDCConfig";
+	const errPretext = "Error occurred in admin/" + fnName;
+	logger.info("Inside UI Service: " + fnName);
+	try{
+		let flag = ['1','0','0','0','0'];
+		const reqData = req.body.conf;
+		const action = req.body.action;
+		const inputs = {};
+		inputs.action = action;
+		inputs.name = (reqData.name || "").trim();
+		if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
+			logger.error(errPretext + ": Invalid action.");
+			flag[1] = '1';
+		}
+		if (validator.isEmpty(inputs.name)) {
+			logger.error(errPretext + ": OIDC Server Name cannot be empty.");
+			flag[2] = '1';
+		}
+		if  (action != "delete") {
+			inputs.url = (reqData.url || "").trim();
+			inputs.clientid = (reqData.clientid || "").trim();
+			inputs.secret = (reqData.secret || "").trim();
+			if (validator.isEmpty(inputs.url)) {
+				logger.error(errPretext + ": Issuer URL cannot be empty.");
+				flag[3] = '1';
+			} else if (!inputs.url.startsWith("https://") && !inputs.url.startsWith("http://")) {
+				logger.error(errPretext + ": Issuer URL must start with http:// or https://");
+				flag[3] = '2';
+			}
+			if (validator.isEmpty(inputs.clientid)) {
+				logger.error(errPretext + ": Client ID cannot be empty.");
+				flag[4] = '1';
+			}
+			if (validator.isEmpty(inputs.secret)) {
+				logger.error(errPretext + ": Client Secret cannot be empty.");
+				flag[5] = '1';
+			}
+		}
+		flag = flag.join('');
+		if (flag != "10000") return res.send(flag);
+		const data = await utils.fetchData(inputs, "admin/manageOIDCConfig", fnName);
+		if (data == "fail") res.status(500).send(data);
+		else return res.send(data);
+	} catch (exception){
+		logger.error(errPretext, exception);
 		res.status(500).send("fail");
 	}
 };
@@ -1601,44 +1639,55 @@ exports.getUsers_Nineteen68 = function (req, res) {
 };
 
 //-----------------------------------------------------no changes here
-exports.getAvailablePlugins = function (req, res) {
+exports.getAvailablePlugins = async (req, res) => {
 	logger.info("Inside UI service: getAvailablePlugins");
 	try {
-		if (utils.isSessionActive(req)) {
-			client.post(epurl + "admin/getAvailablePlugins",
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					res.send("fail");
-				} else {
-					res.send(result.rows);
-				}
-			});
-		} else {
-			res.send("Invalid Session");
-		}
+		const result = await utils.fetchData({}, "admin/getAvailablePlugins", "getAvailablePlugins");
+		res.send(result);
 	} catch (exception) {
 		logger.error("Error occurred in admin/getAvailablePlugins:", exception);
 		res.send("fail");
 	}
 };
 
-exports.getPreferences = function (req, res) {
+exports.getPreferences = async (req, res) => {
 	logger.info("Inside UI service: getPreferences");
 	try {
-		if (utils.isSessionActive(req)) {
-			client.post(epurl + "admin/getPreferences",
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					res.send("fail");
-				} else {
-					res.send(result.rows);
-				}
-			});
-		} else {
-			res.send("Invalid Session");
-		}
+		const result = await utils.fetchData({}, "admin/getPreferences", "getPreferences");
+		res.send(result);
 	} catch (exception) {
 		logger.error("Error occurred in admin/getPreferences:", exception);
+		res.send("fail");
+	}
+};
+
+exports.fetchICE = async (req, res) => {
+	logger.info("Inside UI service: fetchICE");
+	try {
+		const inputs = { user: req.body.user };
+		const result = await utils.fetchData(inputs, "admin/fetchICE", "fetchICE");
+		res.send(result);
+	} catch (exception) {
+		logger.error("Error occurred in admin/fetchICE:", exception);
+		res.send("fail");
+	}
+};
+
+exports.provisionICE = async (req, res) => {
+	const fnName = "provisionICE";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const tokeninfo = req.body.tokeninfo;
+		const inputs = {
+			provisionedto: tokeninfo.userid,
+			icename: tokeninfo.icename.toLowerCase(),
+			icetype: tokeninfo.icetype,
+			query: tokeninfo.action
+		};
+		const result = await utils.fetchData(inputs, "admin/provisionICE", fnName);
+		res.send(result);
+	} catch (exception) {
+		logger.error("Error occurred in admin/provisionICE:", exception);
 		res.send("fail");
 	}
 };

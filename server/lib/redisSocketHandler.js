@@ -1,17 +1,21 @@
-var redis = require("redis");
-var validator =  require('validator');
-var logger = require("../../logger");
-var redisConfig = {"host": process.env.REDIS_IP, "port": parseInt(process.env.REDIS_PORT),"password" : process.env.REDIS_AUTH};
-var default_sub = redis.createClient(redisConfig);
-var default_pub = redis.createClient(redisConfig);
-var server_sub = redis.createClient(redisConfig);
-var server_pub = redis.createClient(redisConfig);
+const redis = require("redis");
+const validator =  require('validator');
+const logger = require("../../logger");
+const redisConfig = {"host": process.env.REDIS_IP, "port": parseInt(process.env.REDIS_PORT),"password" : process.env.REDIS_AUTH};
+const default_sub = redis.createClient(redisConfig);
+const default_pub = redis.createClient(redisConfig);
+const server_sub = redis.createClient(redisConfig);
+// const cache = redis.createClient(redisConfig);
+// cache.select(2);
+const server_pub = default_pub;
+default_pub.pubsubPromise =  async (cmd, ...channel) => (new Promise((rsv, rej) => default_pub.pubsub(cmd, channel, (e,d) => ((e)? rej(e):rsv(d)))));
+const utils = require("./utils");
 
-default_sub.on("message", function (channel, message) {
+default_sub.on("message", (channel, message) => {
 	logger.debug("In redisSocketHandler: Channel is %s", channel);
-	var data = JSON.parse(message);
-	var socketchannel = channel.split('_')[1];
-	var sockets = require("./socket");
+	const data = JSON.parse(message);
+	const socketchannel = channel.split('_')[1];
+	const sockets = require("./socket");
 	var mySocket;
 	if (socketchannel === "notify")
 		mySocket = sockets.socketMapNotify[data.username];
@@ -19,6 +23,11 @@ default_sub.on("message", function (channel, message) {
 		mySocket = sockets.allSchedulingSocketsMap[data.username];
 	else
 		mySocket = sockets.allSocketsMap[data.username];
+	if (mySocket === undefined) {
+		const dataToNode = JSON.stringify({"username": data.username, "onAction": "unavailableLocalServer", "value": {}});
+		server_pub.publish("ICE2_" + data.username, dataToNode);
+		return false;
+	}
 	switch (data.emitAction) {
 	case "webCrawlerGo":
 		mySocket.emit("webCrawlerGo", data.input_url, data.level, data.agent, data.proxy,data.searchData);
@@ -37,11 +46,8 @@ default_sub.on("message", function (channel, message) {
 		break;
 
 	case "LAUNCH_MOBILE":
-		if(data.param == "ios") {
-			mySocket.emit("LAUNCH_MOBILE", data.deviceName, data.versionNumber, data.bundleId, data.ipAddress, data.param);
-		} else {
-			mySocket.emit("LAUNCH_MOBILE", data.apkPath, data.serial, data.mobileDeviceName, data.mobileIosVersion, data.mobileUDID);
-		}
+		if(data.param == "ios") mySocket.emit("LAUNCH_MOBILE", data.deviceName, data.versionNumber, data.bundleId, data.ipAddress, data.param);
+		else mySocket.emit("LAUNCH_MOBILE", data.apkPath, data.serial, data.mobileDeviceName, data.mobileIosVersion, data.mobileUDID);
 		break;
 
 	case "LAUNCH_MOBILE_WEB":
@@ -99,21 +105,20 @@ default_sub.on("message", function (channel, message) {
 	case "runDeadcodeIdentifier":
 		mySocket.emit("runDeadcodeIdentifier", data.version, data.path);
 		break;
-		
+
 	case "getSocketInfo":
-		var data_packet = {"username": data.username, "value": "fail"};
-		if (mySocket) data_packet.value = mySocket.handshake.address;
+		const data_packet = {"username": data.username, "value": mySocket? mySocket.handshake.address:"fail"};
 		server_pub.publish("ICE2_" + data.username, JSON.stringify(data_packet));
 		break;
 
 	case "killSession":
-		mySocket.emit("killSession", data.cmdBy);
+		mySocket.emit("killSession", data.cmdBy, data.reason);
 		break;
-	
+
 	case "irisOperations":
 		mySocket.emit("irisOperations", data.image_data, data.param);
 		break
-		
+
 	default:
 		var dataToNode = JSON.stringify({"username": data.username, "onAction": "fail", "value": "fail"});
 		server_pub.publish("ICE2_" + data.username, dataToNode);
@@ -121,158 +126,182 @@ default_sub.on("message", function (channel, message) {
 	}
 });
 
-function redisErrorHandler(err) {
-	/* Error Handler function */
-}
+const redisErrorHandler = err => { /* Error Handler */ }
 
 default_sub.on("error",redisErrorHandler);
 default_pub.on("error",redisErrorHandler);
 server_sub.on("error",redisErrorHandler);
-server_pub.on("error",redisErrorHandler);
+//server_pub.on("error",redisErrorHandler);
 
 module.exports.redisSubClient = default_sub;
 module.exports.redisPubICE = default_pub;
 module.exports.redisSubServer = server_sub;
 //module.exports.redisPubServer = server_pub;
+//module.exports.cache = cache;
 
-module.exports.initListeners = function(mySocket){
-	var username = mySocket.handshake.query.username;
+module.exports.initListeners = mySocket => {
+	const username = mySocket.handshake.query.icename;
 	logger.debug("Initializing ICE Engine connection for %s",username);
 	mySocket.evdata = {};
+	mySocket.pckts = [];
 
-	mySocket.use(function paginator(args, cb) {
-		var ev = args[0];
-		var data = args[1];
-		if (typeof(data) !== "string") return cb();
-		var comps = data.split(';');
-		var id = comps.shift();
-		var index = comps.shift();
-		var payload = comps.join(';');
-		var ev_data = mySocket.evdata[ev];
+	mySocket.use((args, cb) => {
+		const ev = args[0];
+		const fullPcktId = args.splice(1,1)[0];
+		const pcktId = fullPcktId.split('_')[0];
+		const index = fullPcktId.split('_')[1];
+		mySocket.emit("data_ack", fullPcktId);
+		if (mySocket.pckts.indexOf(pcktId) !== -1) { // Check if packet has already been consumed by server
+			if (index == 'eof') mySocket.emit("data_ack", pcktId); // If this was EOF packet, send 2nd ACK
+			return null;  // Do nothing as packet has already been consumed
+		}
+		if (index === undefined) {  // Normal packet
+			mySocket.pckts.push(pcktId);
+			return cb();
+		}
+		/* Paginated packets processing starts */
+		const data = args[1];
+		const ev_data = mySocket.evdata[ev];
+		const comps = data.split(';');
+		const subPackId = comps.shift();
+		const payload = comps.join(';');
 		if (index == "p@gIn8" && comps.length == 3) {
-			var d2p = [parseInt(comps[0])].concat(Array.apply(null, Array(parseInt(comps[1]))));
-			mySocket.evdata[ev] = {id: id, data: d2p, jsonify: comps[2] === "True"};
-			mySocket.emit("data_nack", id, "all");
-		} else if (ev_data && ev_data.id == id) {
+			const d2p = [parseInt(comps[0])].concat(Array.apply(null, Array(parseInt(comps[1]))));
+			mySocket.evdata[ev] = {id: subPackId, data: d2p, jsonify: comps[2] === "True"};
+		} else if (ev_data && ev_data.id == subPackId) {
 			if (index == 'eof') {
-				var nack = ev_data.data.reduce(function(a,e,i) { return (e===undefined)? a.concat(i):a }, []);
-				if (nack.length !== 0) mySocket.emit("data_nack", id, nack);
-				else {
-					var payloadlength = mySocket.evdata[ev].data.shift();
-					payload = mySocket.evdata[ev].data.join('');
-					if (payload.length != payloadlength) {
-						mySocket.emit("data_nack", id, "all");
-						var blocks = mySocket.evdata[ev].data.length;
-						delete mySocket.evdata[ev].data;
-						mySocket.evdata[ev].data = [payloadlength].concat(Array.apply(null, Array(blocks)));
-					} else {
-						mySocket.emit("data_ack", id);
-						if (ev_data.jsonify) args[1] = JSON.parse(payload);
-						else args[1] = payload;
-						delete mySocket.evdata[ev]
-						cb();
-					}
+				const payloadlength = mySocket.evdata[ev].data.shift();
+				const fpayload = mySocket.evdata[ev].data.join('');
+				if (fpayload.length != payloadlength) {
+					mySocket.emit("data_ack", pcktId, "paginate_fail");
+					const blocks = mySocket.evdata[ev].data.length;
+					delete mySocket.evdata[ev].data;
+					mySocket.evdata[ev].data = [payloadlength].concat(Array.apply(null, Array(blocks)));
+				} else {
+					mySocket.pckts.push(pcktId);
+					mySocket.emit("data_ack", pcktId);
+					args[1] = ev_data.jsonify? JSON.parse(fpayload):fpayload;
+					delete mySocket.evdata[ev]
+					cb();
 				}
 			} else {
 				mySocket.evdata[ev].data[parseInt(index)] = payload;
 			}
-		} else if (!validator.isUUID(id)) cb();
+		} else if (validator.isUUID(subPackId)) {
+			logger.info("Unknown packet received! Restarting pagination. Event: "+args[0]+", ID: "+fullPcktId);
+			mySocket.emit("data_ack", pcktId, "paginate_fail");
+		} else cb();
 	});
 
-	mySocket.on("message", function (value) { console.log("\n\n\nOn Message:",value); });
+	mySocket.on("message", value => {
+		if (value == "unavailableLocalServer") {
+			const dataToNode = JSON.stringify({"username": username, "onAction": value, "value": {}});
+			server_pub.publish("ICE2_" + username, dataToNode);
+		} else console.log("\n\nOn Message:", value);
+	});
 
-	mySocket.on("unavailableLocalServer", function (value) {
-		var dataToNode = JSON.stringify({"username": username, "onAction": "unavailableLocalServer", "value": value});
+	mySocket.on("result_web_crawler", value => {
+		const dataToNode = JSON.stringify({"username": username, "onAction": "result_web_crawler", "value": JSON.parse(value)});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 
-	mySocket.on("result_web_crawler", function (value) {
-		var dataToNode = JSON.stringify({"username": username, "onAction": "result_web_crawler", "value": JSON.parse(value)});
+	mySocket.on("result_web_crawler_finished", value => {
+		const dataToNode = JSON.stringify({"username" : username,"onAction" : "result_web_crawler_finished","value":JSON.parse(value)});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 
-	mySocket.on("result_web_crawler_finished", function (value) {
-		var dataToNode = JSON.stringify({"username" : username,"onAction" : "result_web_crawler_finished","value":JSON.parse(value)});
+	mySocket.on("scrape", value => {
+		const dataToNode = JSON.stringify({"username" : username,"onAction" : "scrape","value":value});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 
-	mySocket.on("scrape", function (value) {
-		var dataToNode = JSON.stringify({"username" : username,"onAction" : "scrape","value":value});
+	mySocket.on("result_debugTestCase", value => {
+		const dataToNode = JSON.stringify({"username": username, "onAction": "result_debugTestCase", "value": value});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 
-	mySocket.on("result_debugTestCase", function (value) {
-		var dataToNode = JSON.stringify({"username": username, "onAction": "result_debugTestCase", "value": value});
+	mySocket.on("result_debugTestCaseWS", value => {
+		const dataToNode = JSON.stringify({"username": username, "onAction": "result_debugTestCaseWS", "value": value});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 
-	mySocket.on("result_debugTestCaseWS", function (value) {
-		var dataToNode = JSON.stringify({"username": username, "onAction": "result_debugTestCaseWS", "value": value});
+	mySocket.on("result_wsdl_listOfOperation", value => {
+		const dataToNode = JSON.stringify({"username": username, "onAction": "result_wsdl_listOfOperation", "value": value});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 
-	mySocket.on("result_wsdl_listOfOperation", function (value) {
-		var dataToNode = JSON.stringify({"username": username, "onAction": "result_wsdl_listOfOperation", "value": value});
+	mySocket.on("result_wsdl_ServiceGenerator", value => {
+		const dataToNode = JSON.stringify({"username": username, "onAction": "result_wsdl_ServiceGenerator", "value": value});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 
-	mySocket.on("result_wsdl_ServiceGenerator", function (value) {
-		var dataToNode = JSON.stringify({"username": username, "onAction": "result_wsdl_ServiceGenerator", "value": value});
+	mySocket.on("render_screenshot", value => {
+		var dataToNode = {"username": username, "onAction": "render_screenshot"};
+		if (value.length > 25) {
+			for (var i = 0; i <= parseInt((value.length)/500); i++) {
+				dataToNode.value = value.slice(i*500, (i+1)*500);
+				server_pub.publish("ICE2_" + username, JSON.stringify(dataToNode));
+			}
+		} else {
+			dataToNode.value = value;
+			server_pub.publish("ICE2_" + username, JSON.stringify(dataToNode));
+		}
+		dataToNode.onAction = "render_screenshot_finished";
+		dataToNode.value = (typeof(value) === "string")? value: "";
+		server_pub.publish("ICE2_" + username, JSON.stringify(dataToNode));
+	});
+
+	mySocket.on("auto_populate", value => {
+		const dataToNode = JSON.stringify({"username": username, "onAction": "auto_populate", "value": value});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 
-	mySocket.on("render_screenshot", function (value) {
-		var dataToNode = JSON.stringify({"username": username, "onAction": "render_screenshot", "value": value});
+	mySocket.on("issue_id", value => {
+		const dataToNode = JSON.stringify({"username": username, "onAction": "issue_id", "value": value});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 
-	mySocket.on("auto_populate", function (value) {
-		var dataToNode = JSON.stringify({"username": username, "onAction": "auto_populate", "value": value});
+	mySocket.on("result_executeTestSuite", value => {
+		const dataToNode = JSON.stringify({"username": username, "onAction": "result_executeTestSuite", "value": value});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 
-	mySocket.on("issue_id", function (value) {
-		var dataToNode = JSON.stringify({"username": username, "onAction": "issue_id", "value": value});
+	mySocket.on("return_status_executeTestSuite", value => {
+		const dataToNode = JSON.stringify({"username": username, "onAction": "return_status_executeTestSuite", "value": value});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 
-	mySocket.on("result_executeTestSuite", function (value) {
-		var dataToNode = JSON.stringify({"username": username, "onAction": "result_executeTestSuite", "value": value});
+	mySocket.on("qcresponse", value => {
+		const dataToNode = JSON.stringify({"username": username, "onAction": "qcresponse", "value": value});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 
-	mySocket.on("return_status_executeTestSuite", function (value) {
-		var dataToNode = JSON.stringify({"username": username, "onAction": "return_status_executeTestSuite", "value": value});
-		server_pub.publish("ICE2_" + username, dataToNode);
-	});
-
-	mySocket.on("qcresponse", function (value) {
-		var dataToNode = JSON.stringify({"username": username, "onAction": "qcresponse", "value": value});
-		server_pub.publish("ICE2_" + username, dataToNode);
-	});
-
-	mySocket.on('open_file_in_editor_result', function (value) {
-		var dataToNode = JSON.stringify({"username" : username,"onAction" : "open_file_in_editor_result","value":JSON.parse(value)});
+	mySocket.on('open_file_in_editor_result', value => {
+		const dataToNode = JSON.stringify({"username" : username,"onAction" : "open_file_in_editor_result","value":JSON.parse(value)});
 		server_pub.publish('ICE2_' + username, dataToNode);
 	});
 
-	mySocket.on('flowgraph_result', function (value) {
-		var dataToNode = JSON.stringify({"username" : username,"onAction" : "flowgraph_result","value":JSON.parse(value)});
+	mySocket.on('flowgraph_result', value => {
+		const dataToNode = JSON.stringify({"username" : username,"onAction" : "flowgraph_result","value":JSON.parse(value)});
 		server_pub.publish('ICE2_' + username, dataToNode);
 	});
 
-	mySocket.on('result_flow_graph_finished', function (value) {
-		var dataToNode = JSON.stringify({"username" : username,"onAction" : "result_flow_graph_finished","value":JSON.parse(value)});
+	mySocket.on('result_flow_graph_finished', value => {
+		const dataToNode = JSON.stringify({"username" : username,"onAction" : "result_flow_graph_finished","value":JSON.parse(value)});
 		server_pub.publish('ICE2_' + username, dataToNode);
 	});
 
-	mySocket.on('deadcode_identifier', function (value) {
-		var dataToNode = JSON.stringify({"username" : username,"onAction" : "deadcode_identifier","value":value});
+	mySocket.on('deadcode_identifier', value => {
+		const dataToNode = JSON.stringify({"username" : username,"onAction" : "deadcode_identifier","value":value});
 		server_pub.publish('ICE2_' + username, dataToNode);
 	});
 
-	mySocket.on('iris_operations_result', function (value) {
-		var dataToNode = JSON.stringify({"username" : username,"onAction" : "iris_operations_result","value":JSON.parse(value)});
+	mySocket.on('iris_operations_result', value => {
+		const dataToNode = JSON.stringify({"username" : username,"onAction" : "iris_operations_result","value":JSON.parse(value)});
 		server_pub.publish('ICE2_' + username, dataToNode);
+	});
+	mySocket.on('benchmark_ping', async value => {
+		const result = await utils.fetchData(value, "benchmark/store", "benchmark_ping");
+		if (result == "fail") logger.error("Error occurred in storing benchmark");
 	});
 };
