@@ -2391,22 +2391,7 @@ input[disabled]{
 	width:100%;
 	padding-bottom: 25px;
 }
-.scheduleSuite {
-    background: #331d4e;
-    width: 100%;
-    padding: 2px;
-    height: 35px;
-    border-radius: 6px;
-    position: sticky;
-    top: 0;
-}
-.scenarioHeaders tr td{
-    margin-top: 0px;
-    text-align: left;
-    position: sticky;
-    top: 34px;
-    background: #5E626B
-}
+
 #scheduleSuitesBottomSection{
 	float: left;
     width: calc(100% + 40px);
@@ -2641,7 +2626,7 @@ input[disabled]{
     margin-top: 5%;
 }
 .scenarioBody tr td:first-child input{
-    position: static;
+    position: relative;
     top: 2px;  
     left: 0px;  
     float: left;

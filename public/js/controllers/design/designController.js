@@ -792,8 +792,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		//enableScreenShotHighlight = true;
 		DesignServices.getScrapeDataScreenLevel_ICE()
 			.then(function (data) {
-				scrapedurl=data.scrapedurl;
-				$("#scrapedurlinfo").html(scrapedurl);
+				var taskInfo = JSON.parse(window.localStorage['_CT']);
+				if (taskInfo.subTaskType == "Scrape" || taskInfo.subTask == "Scrape") {
+					scrapedurl = data.scrapedurl;
+					$("#scrapedurlinfo").html(scrapedurl);
+				}
 				localStorage['_cust']=JSON.stringify({})
 				if (data == "Invalid Session") {
 					return $rootScope.redirectPage();
