@@ -1,12 +1,11 @@
-var bcrypt = require('bcryptjs');
-var logger = require('../../logger');
-var myserver = require('../../server');
-var redisServer = require('./redisSocketHandler');
-var taskflow = require('../config/options').strictTaskWorkflow;
-var epurl = process.env.NDAC_URL;
-var Client = require("node-rest-client").Client;
-var client = new Client();
-//var neo4jAPI = require('../controllers/neo4jAPI');
+const bcrypt = require('bcryptjs');
+const logger = require('../../logger');
+const myserver = require('../../server');
+const redisServer = require('./redisSocketHandler');
+const taskflow = require('../config/options').strictTaskWorkflow;
+const epurl = process.env.NDAC_URL;
+const Client = require("node-rest-client").Client;
+const client = new Client();
 
 
 const getChannelNum_cb = (channel,cb) => {
@@ -63,29 +62,45 @@ module.exports.getSocketList = async (toFetch) => {
 	return connectusers;
 };
 
-module.exports.allSess = function (cb){
-	myserver.redisSessionStore.all(cb);
+module.exports.allSess = async () => {
+	return myserver.rsStore.pAll();
 };
 
-module.exports.delSession = function (data, cb){
+module.exports.delSession = async (data) => {
+	const dataToSend = JSON.stringify({"emitAction":"killSession","username":data.user,"cmdBy":data.cmdBy,"reason":data.reason});
 	if (data.action == "disconnect") {
-		redisServer.redisPubICE.publish("ICE1_"+data.key+"_"+data.user, JSON.stringify({"emitAction":"killSession","username":data.user,"cmdBy":data.cmdBy}));
-		cb();
+		redisServer.redisPubICE.publish("ICE1_"+data.key+"_"+data.user, dataToSend);
+		return true;
 	} else {
-		redisServer.redisPubICE.publish("UI_notify_"+data.user, JSON.stringify({"emitAction":"killSession","username":data.user}));
-		myserver.redisSessionStore.destroy(data.key, cb);
+		redisServer.redisPubICE.publish("UI_notify_"+data.user, dataToSend);
+		const sessDeletePromise = myserver.rsStore.pDestroy(data.key);
+		return sessDeletePromise;
 	}
 };
 
-module.exports.cloneSession = function (req, cb){
+module.exports.findSessID = async (username) => {
+	let sid = "";
+	const sessList = await this.allSess();
+	for (let ki of sessList) {
+		if (username == ki.username) {
+			sid = ki.uniqueId;
+			break;
+		}
+	}
+	return sid;
+};
+
+module.exports.cloneSession = async (req) => {
 	var sessid = "sess:" + req.session.id;
-	var sessClient = myserver.redisSessionStore.client;
-	sessClient.ttl(sessid, function(err, ttl) {
-		if (err) return cb(err);
-		var args = [sessid,JSON.stringify(req.session),'EX',ttl];
-		req.clearSession();
-		sessClient.set(args, function(err) { return cb(err); });
-	});
+	var sessClient = myserver.rsStore.client;
+	return (new Promise((rsv, rej) => {
+		sessClient.ttl(sessid, (err, ttl) => {
+			if (err) return rsv(err);
+			var args = [sessid,JSON.stringify(req.session),'EX',ttl];
+			req.clearSession();
+			sessClient.set(args, err => rsv(err));
+		});
+	}));
 };
 
 module.exports.isSessionActive = function (req){
@@ -151,15 +166,15 @@ module.exports.fetchData = fetchData;
 
 module.exports.tokenValidation = async (userInfo) => {
 	var validUser = false;
-	const username = (userInfo.username || "").toLowerCase();
-	userInfo.username = username;
+	const icename = (userInfo.icename || "").toLowerCase();
+	userInfo.icename = icename;
 	const emsg = "Inside UI service: ExecuteTestSuite_ICE_SVN ";
 	const tokenValidation = {
 		"status": "failed",
 		"msg": "Token authentication failed"
 	}
 	const inputs = {
-		'username': username,
+		'icename': icename,
 		'tokenname': userInfo.tokenname || ""
 	};
 	const response = await fetchData(inputs, "login/authenticateUser_Nineteen68_CI", "tokenValidation");
@@ -173,13 +188,13 @@ module.exports.tokenValidation = async (userInfo) => {
 		} else if(response.deactivated == "expired") {
 			tokenValidation.status = "expired";
 			tokenValidation.msg = "Token is expired";
-			logger.error(emsg + tokenValidation.msg + " for username: " + username);
+			logger.error(emsg + tokenValidation.msg + " for username: " + icename);
 		} else if(response.deactivated == "deactivated") {
 			tokenValidation.status = "deactivated";
 			tokenValidation.msg = "Token is deactivated";
-			logger.error(emsg + tokenValidation.msg + " for username: " + username);
+			logger.error(emsg + tokenValidation.msg + " for username: " + icename);
 		}
-	} else logger.info(emsg + "Token authentication failed for username: " + username);
+	} else logger.info(emsg + "Token authentication failed for username: " + icename);
 	inputs.tokenValidation = tokenValidation.status;
 	inputs.error_message = tokenValidation.msg;
 	userInfo.inputs = inputs;

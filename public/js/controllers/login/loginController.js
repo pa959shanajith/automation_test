@@ -8,9 +8,7 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 	$scope.restartForm = false;
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear();
 
-    
-
-    $scope.showPassword=function() {
+	$scope.showPassword=function() {
 		if($scope.ud.password != null){
 			if($scope.inputType=='password') {
 				$scope.inputType='text';
@@ -21,9 +19,7 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 			}
 		}
 	}
-   
-    
-	
+
 	$scope.check_credentials = function (path, $event) {
 		cfpLoadingBar.start();
 		$scope.loginValidation = "";
