@@ -12,8 +12,9 @@ exports.getCrawlResults = function (req, res) {
 	try {
 		logger.info("Inside UI service: getCrawlResults");
 		if (utils.isSessionActive(req)) {
-			var name = req.session.username;
-			redisServer.redisSubServer.subscribe('ICE2_' + name ,1);
+			var username=req.session.username;
+			var icename = myserver.allSocketsICEUser[username];
+			redisServer.redisSubServer.subscribe('ICE2_' + icename ,1);
 			var url = req.body.url;
 			var level = req.body.level;
 			var agent = req.body.agent;
@@ -28,31 +29,31 @@ exports.getCrawlResults = function (req, res) {
 				logger.error("Error occurred in the service getCrawlResults: Invalid URL or Agent or Proxy");
 				return res.send("invalidParams");
 			}
-			logger.info("ICE Socket requesting Address: %s", name);
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres) {
+			logger.info("ICE Socket requesting Address: %s", icename);
+			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres) {
 				if (redisres[1]>0) {
 					logger.info("Sending socket request for webCrawlerGo to redis");
-					var dataToIce = {"emitAction": "webCrawlerGo", "username": name, "input_url": url, "level": level, "agent":agent, "proxy": proxy,"searchData":searchData};
-					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					var dataToIce = {"emitAction": "webCrawlerGo", "username": icename, "input_url": url, "level": level, "agent":agent, "proxy": proxy,"searchData":searchData};
+					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					var notifySocMap = myserver.socketMapNotify;
 					var mySocketUIMap = myserver.allSocketsMapUI;
 					var resSent = false;
-					if(notifySocMap && notifySocMap[name]) {
+					if(notifySocMap && notifySocMap[username]) {
 						resSent = true;
 						res.end('begin');
 					}
 					function webCrawlerGo_listener(channel,message) {
 						var data = JSON.parse(message);
-						if (name == data.username) {
+						if (icename == data.username) {
 							var value = data.value;
 							if (data.onAction == "unavailableLocalServer") {
 								redisServer.redisSubServer.removeListener('message',webCrawlerGo_listener);	
 								logger.error("Error occurred in getCrawlResults: Socket Disconnected");
-								if (notifySocMap[name]) notifySocMap[name].emit("ICEnotAvailable");
+								if (notifySocMap[username]) notifySocMap[username].emit("ICEnotAvailable");
 								else if (!resSent) res.send("unavailableLocalServer");
 							} else if (data.onAction == "result_web_crawler") {
 								try {
-									mySocketUIMap[name].emit("newdata", value);
+									mySocketUIMap[username].emit("newdata", value);
 								} catch (exception) {
 									logger.error(exception.message);
 								}
@@ -64,10 +65,10 @@ exports.getCrawlResults = function (req, res) {
 										resultData = {success: false, data: "Error While Crawling"}										
 									} else {
 										resultData = {success: true};
-										mySocketUIMap[name].emit("endData", value);
+										mySocketUIMap[username].emit("endData", value);
 										logger.info("Crawl completed successfully!");
 									}
-									if (notifySocMap[name]) notifySocMap[name].emit("result_WebcrawlerFinished", resultData);
+									if (notifySocMap[username]) notifySocMap[username].emit("result_WebcrawlerFinished", resultData);
 									else if (!resSent) res.json(resultData);
 								} catch (exception) {
 									var resultData = {success: false, data: exception};

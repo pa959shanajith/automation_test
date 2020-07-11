@@ -11,19 +11,25 @@
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Manage</a></span></li>
 					<li><a id='userTab' ng-click="tab = 'tabUser';userConf.click()" title="Manage Users" class="selectBrowser" data-name="3">
-						<span><img class='selectedIcon' src='imgs/user.png' alt='User'/></span>User</a></li>
+						<span><span class='fa fa-user'></span></span>User</a></li>
 					<li><a id='tokenTab' ng-click="tab = 'tabToken';tokens.click()" title="Manage Tokens" class="selectBrowser" data-name="1">
-						<span><img src='imgs/ic-tokens.png' alt='Tokens' /></span>Tokens</a></li>
+						<span><span class='fa fa-tags'></span></span>Tokens</a></li>
+					<li><a id='provisionTab' ng-click="tab = 'tabProvision';provision.click($event)" title="Manage Provision" class="selectBrowser" data-name="1">
+						<span><span class='fa fa-cogs'></span></span>ICE Provision</a></li>
 					<li><a id='projectTab' ng-click="tab = 'tabProject'" title="Create/Update Project" class="selectBrowser" data-name="1">
-						<span><img src='imgs/project.png' alt='Project'/></span>Project</a></li>
+						<span><span class='fa fa-briefcase'></span></span>Project</a></li>
 					<li class='userDivider'><a id='assignProjectTab' ng-click="tab='tabAssignProject';assignProj.click()" title="Assign Project" class="selectBrowser" data-name="1">
-						<span><img src='imgs/project.png' alt='Project'/></span>Assign Projects</a></li>
+						<span><span class='fa fa-link'></span></span>Assign Projects</a></li>
 					<li><a id='ldapConfigTab' title="Manage LDAP Configuration" ng-click="tab = 'tabldapConfig';ldapConf.click()" class="selectBrowser" data-name="4">
-						<span><img src='imgs/ldap-config.png' alt='LDAP Configuration'/></span>LDAP Configuration</a></li>
+						<span><span class='fa fa-address-book'></span></span>LDAP Configuration</a></li>
+					<!-- <li><a id='samlConfigTab' title="Manage SAML Configuration" ng-click="tab = 'tabsamlConfig';samlConf.click()" class="selectBrowser" data-name="4">
+						<span><span class='fa fa-lock'></span></span>SAML Configuration</a></li>
+					<li><a id='oidcConfigTab' title="Manage OpenID Connect Configuration" ng-click="tab = 'taboidcConfig';oidcConf.click()" class="selectBrowser" data-name="4">
+						<span><span class='fa fa-openid'></span></span>OpenID Connect Configuration</a></li> -->
 					<li><a id='sessionTab' title="Session Management" ng-click="tab = 'tabSession';sessionConf.click()" class="selectBrowser" data-name="5">
-						<span><img src='imgs/session.png' alt='Session' /></span>Session Management</a></li>
+						<span><span class='fa fa-users'></span></span>Session Management</a></li>
 					<li style="margin-bottom: 30px"><a id='preferencesTab' title="Preferences" ng-click="tab='tabPreferences';preferences.click()" class="selectBrowser" data-name="2">
-						<span><img src='imgs/preferences.png' alt='Preferences' /></span>Preferences</a></li>																										   																
+						<span><span class='fa fa-sliders'></span></span>Preferences</a></li>
 				</ul>
 			</div>
 			<div class='clear-both'></div>
@@ -163,8 +169,8 @@
 				</div>
 				<div class="col-xs-6 selectRole" ng-if="userConf.userIdName && userConf.rolename!='Admin'">
 					<label class="leftControl secondaryRole" id="additionalRoleTxt">Additional Role: </label>
-					<label class="chooseRole dropdown-toggle" id="additionalRole_options" data-toggle="dropdown" ng-click="userConf.toggleAddRoles()"> Select Additional Role</label>
-					<ul class="dropdown-menu-multiselect" id="additionalRoles">
+					<label class="chooseRole dropdown-toggle" id="additionalRole_options" data-toggle="dropdown" ng-click="userConf.toggleAddRoles()" title="Select Additional Role">Select Additional Role</label>
+					<ul class="dropdown-menu-multiselect" id="additionalRoles" style="display:none">
 						<li class='RolesCheck' ng-repeat="arid in userConf.allAddRoles" ng-if="arid[1]!=userConf.role" ng-click="userConf.addRole[arid[1]]= !userConf.addRole[arid[1]]">
 							<span class='rolesSpan'><input class='addcheckBox' name="additionalRole" type='checkbox' value="{{arid[1]}}" ng-model="userConf.addRole[arid[1]]" ng-click="userConf.addRole[arid[1]]= !userConf.addRole[arid[1]]"/><label class='rolesChecklabel'>{{arid[0]}}</label></span>
 						</li>
@@ -527,6 +533,156 @@
 		</div>
 		<!-- Edit LDAP Configuration -->
 
+		<!-- Create SAML Configuration -->
+		<div class="containerWrap" ng-if="tab == 'tabsamlConfig'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Create SAML Configuration</span>
+			</div>
+			<!--Task Name-->
+			<!-- Button -->
+			<div class="adminActionBtn">
+				<button class="btn btn-md pull-right adminBtn" ng-click="samlConf.edit()" title="Edit Configuration">Edit</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="samlConf.manage('create',$event)" style="margin-right:10px" title="Create Configuration">Create</button>
+			</div>
+			<!-- Button -->
+			<!-- Create Configuration Form -->
+			<div class="col-xs-9 form-group adminForm">
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Server Name">Server Name</span>
+					<input type="text" autocomplete="off" id="samlServerName" name="samlServerName" ng-model="samlConf.name" maxlength="50" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Server Name"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{samlConf.urlToolTip}}">Single Sign-On URL</span>
+					<input type="text" autocomplete="off" id="samlAcsUrl" name="samlAcsUrl" ng-model="samlConf.url" maxlength="250" class="form-control form-control-custom create" placeholder="{{samlConf.urlToolTip}}"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{samlConf.idpToolTip}}">Issuer</span>
+					<input type="text" autocomplete="off" id="samlIDP" name="samlIDP" ng-model="samlConf.idp" class="form-control form-control-custom create" placeholder="{{samlConf.idpToolTip}}"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{samlConf.certToolTip}}">Certificate</span>
+					<label id="samlCert" for="samlCertInput" style="cursor:pointer"><span class="fa fa-upload" style="width:auto;margin-right:10px"></span>{{samlConf.certName}}</label>
+					<input type="file" accept=".cer,.crt,.cert,.pem" autocomplete="off" id="samlCertInput" name="samlCert" style="margin-top:5px" class="no-disp"/>
+				</div></div>
+			</div>
+			<!-- Create Configuration Form -->
+		</div>
+		<!-- Create SAML Configuration -->
+
+		<!-- Edit SAML Configuration -->
+		<div class="containerWrap" ng-if="tab == 'tabsamlConfigEdit'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Edit SAML Configuration</span>
+			</div>
+			<!--Task Name-->
+			<!-- Button -->
+			<div class="adminActionBtn">
+				<button class="btn btn-md pull-right adminBtn" ng-click="samlConf.manage('update',$event)" ng-disabled="samlConf.name == ''" title="Update Configuration">Update</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="samlConf.delete()" ng-disabled="samlConf.name == ''" style="margin-right:10px" title="Delete Configuration">Delete</button>
+			</div>
+			<!-- Button -->
+			<!-- Edit Configuration Form -->
+			<div class="col-xs-9 form-group adminForm">
+				<div class='userForm adminControl'><div>
+					<span class="leftControl" title="Server Name">Server Name</span><select ng-change="samlConf.getServerData()" class='adminSelect form-control' ng-model="samlConf.name" id="samlServerName" class="form-control rightControl selectControl">
+						<option value="" disabled selected>Select Server</option>
+					</select>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{samlConf.urlToolTip}}">Single Sign-On URL</span>
+					<input type="text" autocomplete="off" id="samlAcsUrl" name="samlAcsUrl" ng-model="samlConf.url" maxlength="250" class="form-control form-control-custom create" placeholder="{{samlConf.urlToolTip}}"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{samlConf.idpToolTip}}">Issuer</span>
+					<input type="text" autocomplete="off" id="samlIDP" name="samlIDP" ng-model="samlConf.idp" class="form-control form-control-custom create" placeholder="{{samlConf.idpToolTip}}"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{samlConf.certToolTip}}">Certificate</span>
+					<label id="samlCert" for="samlCertInput" style="cursor:pointer;display:inline"><span class="fa fa-upload" style="width:auto;margin-right:10px"></span>{{samlConf.certName}}</label>
+					<input type="file" accept=".cer,.crt,.cert,.pem" autocomplete="off" id="samlCertInput" name="samlCert" style="margin-top:5px" class="no-disp"/>
+					<textarea autocomplete="off" id="samlCertValue" name="samlCertValue" disabled="" readonly="">{{samlConf.cert}}</textarea>
+				</div></div>
+			</div>
+			<!-- Edit Configuration Form -->
+		</div>
+		<!-- Edit SAML Configuration -->
+
+		<!-- Create OIDC Configuration -->
+		<div class="containerWrap" ng-if="tab == 'taboidcConfig'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Create OpenID Connect Configuration</span>
+			</div>
+			<!--Task Name-->
+			<!-- Button -->
+			<div class="adminActionBtn">
+				<button class="btn btn-md pull-right adminBtn" ng-click="oidcConf.edit()" title="Edit Configuration">Edit</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="oidcConf.manage('create',$event)" style="margin-right:10px" title="Create Configuration">Create</button>
+			</div>
+			<!-- Button -->
+			<!-- Create Configuration Form -->
+			<div class="col-xs-9 form-group adminForm">
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Server Name">Server Name</span>
+					<input type="text" autocomplete="off" id="oidcServerName" name="oidcServerName" ng-model="oidcConf.name" maxlength="50" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Server Name"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Issuer URL">Issuer</span>
+					<input type="text" autocomplete="off" id="oidcUrl" name="oidcUrl" ng-model="oidcConf.url" maxlength="250" class="form-control form-control-custom create" placeholder="Issuer URL"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{oidcConf.idToolTip}}">Client ID</span>
+					<input type="text" autocomplete="off" id="oidcClientId" name="oidcClientId" ng-model="oidcConf.clientId" maxlength="250" class="form-control form-control-custom create" placeholder="{{oidcConf.idToolTip}}"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{oidcConf.idToolTip}}">Client Secret</span>
+					<input type="text" autocomplete="off" id="oidcClientSecret" name="oidcClientSecret" ng-model="oidcConf.secret" maxlength="250" class="form-control form-control-custom create" placeholder="{{oidcConf.secretToolTip}}"/>
+				</div></div>
+			</div>
+			<!-- Create Configuration Form -->
+		</div>
+		<!-- Create OIDC Configuration -->
+
+		<!-- Edit OIDC Configuration -->
+		<div class="containerWrap" ng-if="tab == 'taboidcConfigEdit'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Edit OpenID Connect Configuration</span>
+			</div>
+			<!--Task Name-->
+			<!-- Button -->
+			<div class="adminActionBtn">
+				<button class="btn btn-md pull-right adminBtn" ng-click="oidcConf.manage('update',$event)" ng-disabled="oidcConf.name == ''" title="Update Configuration">Update</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="oidcConf.delete()" ng-disabled="oidcConf.name == ''" style="margin-right:10px" title="Delete Configuration">Delete</button>
+			</div>
+			<!-- Button -->
+			<!-- Edit Configuration Form -->
+			<div class="col-xs-9 form-group adminForm">
+				<div class='userForm adminControl'><div>
+					<span class="leftControl" title="Server Name">Server Name</span><select ng-change="oidcConf.getServerData()" class='adminSelect form-control' ng-model="oidcConf.name" id="oidcServerName" class="form-control rightControl selectControl">
+						<option value="" disabled selected>Select Server</option>
+					</select>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Issuer URL">Issuer</span>
+					<input type="text" autocomplete="off" id="oidcUrl" name="oidcUrl" ng-model="oidcConf.url" maxlength="250" class="form-control form-control-custom create" placeholder="Issuer URL"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{oidcConf.idToolTip}}">Client ID</span>
+					<input type="text" autocomplete="off" id="oidcClientId" name="oidcClientId" ng-model="oidcConf.clientId" maxlength="250" class="form-control form-control-custom create" placeholder="{{oidcConf.idToolTip}}"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{oidcConf.idToolTip}}">Client Secret</span>
+					<input type="text" autocomplete="off" id="oidcClientSecret" name="oidcClientSecret" ng-model="oidcConf.secret" maxlength="250" class="form-control form-control-custom create" placeholder="{{oidcConf.secretToolTip}}"/>
+				</div></div>
+			</div>
+			<!-- Edit Configuration Form -->
+
+		</div>
+		<!-- Edit OIDC Configuration -->
+
 		<!-- Session Management -->
 		<div class="containerWrap" ng-if="tab == 'tabSession'">
 			<!--Task Name-->
@@ -606,128 +762,9 @@
 							<th>Test Manager</th>
 							<th>Test Lead</th>
 							<th>Test Engineer</th> -->
-							<!-- <th>Tech Lead</th>
-							<th>Business Analyst</th> -->
 						</tr>
 					</thead>
-					<tbody id="pref">
-						<!-- <tr>
-							<td>Admin</td>
-							<td><input type="checkbox" value="" checked="checked" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-						</tr> -->
-						<!-- <tr>
-							<td>ALM</td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" checked="checked" class='module_admin'></td>
-							<td><input type="checkbox" value="" checked="checked" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-						</tr> -->
-						<!-- <tr>
-							<td>Automatic Path Generator</td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-						</tr> -->
-						<!--<tr>
-							<td>Dashboard</td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-						</tr>-->
-						<!-- <tr>
-							<td>Dead Code Identifier</td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-						</tr> -->
-						<!-- <tr>
-							<td>ICE</td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-						</tr> -->
-						<!-- <tr>
-							<td>Mindmap</td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-						</tr> -->
-						<!-- <tr>
-							<td>NeuronGraphs</td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-						</tr> -->
-						<!-- <tr>
-							<td>Oxbow Code Identifier</td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-						</tr> -->
-						<!-- <tr>
-							<td>Performance Testing</td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-						</tr> -->
-						<!-- <tr>
-							<td>Reports</td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-						</tr> -->
-						<!-- <tr>
-							<td>Utility</td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-						</tr> -->
-						<!-- <tr>
-							<td>Webocular</td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" checked="checked" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-							<td><input type="checkbox" value="" class='module_admin'></td>
-						</tr> -->
-
-					</tbody>
+					<tbody id="pref"></tbody>
 				</table>
 			</div>
 		</div>
@@ -741,11 +778,23 @@
 			<div class="adminActionBtn">
 				<button title="Generate New Token" class="btn btn-md pull-right adminBtn" ng-click="generateCIusertokens($event)" style="margin-right:10px">Generate</button>
 			</div>
-			<div class="col-xs-9 form-group" style="width: 83%">
+			<div class="col-xs-9 form-group" style="width: 83%;height: 45%;">
 				<div class='userForm projectForm' style="display: inline-block;">
-					<label class='domainTxt' style="width: 11%;">User</label>
+					<label class='domainTxt' style="width: 11%;">ICE Type</label>
+					<label>
+							<input type="radio" value="normal" id="IceType" name="provision" ng-change="selectIceType($event)" class="ng-pristine ng-untouched ng-valid" checked="checked" ng-model="provision.op"/>
+						Normal</label>
+					<label style="margin-left: 3%;">
+						<input type="radio" value="ci-cd" id="IceType" name="provision" ng-change="selectIceType($event)" class="ng-pristine ng-untouched ng-valid" ng-model="provision.op"/>
+						CI/CD</label>
+				</div>
+				<div class='userForm projectForm' style="display: inline-block;">
+					<label id="userToken" class='domainTxt' style="width: 11%;">User</label>
 					<select class="adminSelect form-control selectDomain" style="width: 71%" id="selAssignUser1">
 						<option value="" disabled selected>Please Select User</option>
+					</select>
+					<select class="adminSelect form-control selectDomain" style="width: 71%" id="selICEuser">
+						<option value="" disabled selected>Please Select ICE</option>
 					</select>
 					<span ng-show="userNameRequired" class="error-msg ng-cloak errorlbl">{{userNameRequired}}</span>
 				</div>	
@@ -773,7 +822,7 @@
 						<option value="" disabled selected>Please Select Your Domain</option>
 					</select> -->
 
-					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
+					<!-- <span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span> -->
 				</div>
 			</div>
 			<div class="col-xs-9 form-group adminForm" style="height:90%">
@@ -802,6 +851,87 @@
 			</div>
 		</div>
 		<!-- Assign Tokens -->			
+
+		<!-- ICE Provision -->
+		<div ng-if="tab == 'tabProvision'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>ICE Provision</span>
+			</div>
+			<!--Task Name-->
+			<!-- Button -->
+			<div class="adminActionBtn">
+				<button title="Provision" class="btn btn-md pull-right adminBtn" ng-click="provision.provisionsIce($event)" style="margin-right:10px" title="Provision">Provision</button>
+				<button title="Refresh" class="btn btn-md pull-right adminBtn" ng-click="provision.click($event)" style="margin-right:10px" title="Cancel">Refresh</button>
+			</div>
+			<!-- Button -->
+			<!-- ICE Provision Form -->
+			<div class="col-xs-9 adminForm">
+				<div class='adminControl' style="margin-bottom:2%"><div>
+					<span class="leftControl" title="ICE Name">ICE Type</span>
+					<label style="margin-right:30px"><input type="radio" style="width:auto;vertical-align:top" ng-model="provision.op" value="normal" name="provisionType" ng-change='provision.selectProvisionType($event)'/> Normal</label>
+					<label><input type="radio" style="width:auto;vertical-align:top" ng-model="provision.op" value="ci-cd" name="provisionType" ng-change='provision.selectProvisionType($event)'/> CI/CD</label>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="ICE Name">ICE Name</span>
+					<input type="text" autocomplete="off" id="icename" name="icename" ng-change="provision.verifyName($event)" ng-model="provision.icename" maxlength="100" class="form-control form-control-custom create validationKeydown preventSpecialChar" placeholder="ICE Name"/>
+				</div></div>
+				<div class='userForm adminControl'><div>
+					<span class="leftControl" title="User">User</span><select class='adminSelect form-control' ng-disabled="provision.op!='normal'" ng-model="provision.userid" id="selAssignUser2" ng-init="provision.userid=' '" ng-options="entry[1] as entry[0] for entry in provision.users"></select>
+				</div></div>
+				<div class='adminControl' id="icetokenarea"><div>
+					<span class="leftControl" title="Token">Token</span>
+					<textarea autocomplete="off" id="iceToken" ng-model="provision.token" name="iceToken" readonly=""></textarea>
+					<!-- <input type="text" autocomplete="off" id="iceToken" name="iceToken" ng-model="provision.token" class="form-control form-control-custom create" placeholder="Click on Provision/Reregister to generate token" readonly="readonly"/> -->
+					<label style="float:right">
+						<span class="fa fa-files-o" style="width:auto;margin-right:10px" data-original-title="Click To Copy" ng-click="copyToken($event)"></span>
+						<span class="fa fa-download" style="width:auto;margin-right:10px" data-original-title="Download Token" ng-click="downloadToken($event)"></span>
+					</label>
+				</div></div>
+			</div>
+			<!-- ICE Provision Form -->
+			<!-- ICE Provision List -->
+			<div class="col-xs-9 form-group adminForm" style="padding-top:0">
+				<div class="containerWrap">
+					<div class="sessionHeading" data-toggle="collapse" data-target="#activeUsersToken-x">
+						<h4>ICE Provisions</h4>
+						<div style="float:right;margin-right:30px">
+							<span class="searchIcon" style="border-radius: 0px 7px 7px 0px;left:0;top:5px;float:right">
+								<img src="imgs/ic-search-icon.png" style="margin-top: -1px; margin-left: 1px">
+							</span>
+							<input type="text" id="searchTasks" style="left:0;top:5px;float:right;position:relative;margin-left:0" class="searchInput">
+						</div>
+					</div>
+					<div id="activeUsersToken" class="wrap scrollbar-inner" style="height:auto;max-height:450px">
+						<table class = "table table-hover sessionTable" id="tokensDetail">
+							<tr>
+								<th> ICE Name </th>
+								<th> ICE Type</th>
+								<th> Status </th>
+								<th> Username </th>
+								<th> Hostname </th>
+								<th>  </th>
+								<th>  </th>
+							</tr>
+							<tr ng-repeat="entry in provision.icelist" class='provisionTokens'>
+								<td> {{entry.icename}} </td>
+								<td> {{entry.icetype}} </td>
+								<td> {{entry.status}} </td>
+								<td> {{entry.username}} </td>
+								<td> {{entry.hostname}} </td>
+								<td ng-if="entry.status == 'provisioned'"><button class="btn" data-index="{{$index}}" ng-click="provision.reregister($event)" style="margin-left:0%"> Reprovision </button></td>
+								<td ng-if="entry.status == 'registered' || entry.status == 'deregistered'"><button class="btn" data-index="{{$index}}" ng-click="provision.reregister($event)" style="margin-left:0%"> Reregister </button></td>
+								<td ng-if="entry.status == 'deregistered'"></td>
+								<td ng-if="entry.status != 'deregistered'"><button class="btn" data-id="{{entry._id}}" data-index="{{$index}}" ng-click="provision.deregister($event)" style="margin-left:0%"> Deregister </button></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+			<!-- ICE Provision List -->
+		</div>
+		<!-- ICE Provision -->
+
 	</div>
 	<!--Middle Panel-->
 
@@ -866,7 +996,7 @@
 				<h4 class="modal-title"></h4>
 			</div>
 			<div class="modal-body">
-				<p>Are you sure you want to delete ? All task assignment information will be deleted for this user.</p>
+				<p></p>
 			</div>
 			<div class="modal-footer">
 				<button id="deleteGlobalModalButton" type="button" class="btn btn-default btnGlobalYes" data-dismiss="modal">Yes</button>

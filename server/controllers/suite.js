@@ -296,14 +296,15 @@ const updateSkippedExecutionStatus = async (batchData, userInfo, status, msg) =>
 const executionRequestToICE = async (execReq, execType, userInfo) => {
 	const fnName = "executionRequestToICE";
 	logger.info("Inside " + fnName + " function");
-	const name = userInfo.username;
-	const channel = (execType == "SCHEDULE") ? "scheduling" : "normal";
+	const username = userInfo.username;
+	const icename = userInfo.icename;
+	const channel = (execType == "SCHEDULE")? "scheduling":"normal";
 	var completedSceCount = 0;
 	var statusPass = 0;
 
 	logger.info("Sending request to ICE for executeTestSuite");
-	const dataToIce = { "emitAction": "executeTestSuite", "username": name, "executionRequest": execReq };
-	redisServer.redisPubICE.publish('ICE1_' + channel + '_' + name, JSON.stringify(dataToIce));
+	const dataToIce = {"emitAction" : "executeTestSuite","username" : icename, "executionRequest": execReq};
+	redisServer.redisPubICE.publish('ICE1_' + channel + '_' + icename, JSON.stringify(dataToIce));
 
 	const exePromise = async (resSent) => (new Promise((rsv, rej) => {
 		var d2R = {};
@@ -311,14 +312,14 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 			const data = JSON.parse(message);
 			const event = data.onAction;
 			const resultData = data.value;
-			const batchId = (resultData) ? resultData.batchId : "";
-			if (!(name == data.username && (event == SOCK_NA || (event != SOCK_NA && execReq.batchId == batchId)))) return false;
+			const batchId = (resultData)? resultData.batchId : "";
+			if (!(icename == data.username && (event == SOCK_NA || (event != SOCK_NA && execReq.batchId == batchId)))) return false;
 			const status = resultData.status;
 			if (event == SOCK_NA) {
 				redisServer.redisSubServer.removeListener("message", executeTestSuite_listener);
 				logger.error("Error occurred in " + fnName + ": Socket Disconnected");
-				if (resSent && notifySocMap[name]) {
-					notifySocMap[name].emit("ICEnotAvailable");
+				if (resSent && notifySocMap[username]) {
+					notifySocMap[username].emit("ICEnotAvailable");
 					rsv(DO_NOT_PROCESS);
 				} else rsv(SOCK_NA);
 			} else if (event == "return_status_executeTestSuite") {
@@ -332,8 +333,8 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 					logger.error("Error occurred in " + fnName + ": Execution is skipped " + errMsg);
 					errMsg = "This scenario was skipped " + errMsg;
 					await updateSkippedExecutionStatus(execReq, userInfo, execStatus, errMsg);
-					if (resSent && notifySocMap[name]) {
-						notifySocMap[name].emit(execStatus);
+					if (resSent && notifySocMap[username]) {
+						notifySocMap[username].emit(execStatus);
 						rsv(DO_NOT_PROCESS);
 					} else rsv(execStatus);
 				}
@@ -389,8 +390,8 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 				} else { // This block will trigger when resultData.status has "success or "Terminate"
 					redisServer.redisSubServer.removeListener("message", executeTestSuite_listener);
 					try {
-						if (resSent && notifySocMap[name]) { // This block is only for active mode
-							notifySocMap[name].emit("result_ExecutionDataInfo", status);
+						if (resSent && notifySocMap[username]) { // This block is only for active mode
+							notifySocMap[username].emit("result_ExecutionDataInfo", status);
 							rsv(DO_NOT_PROCESS);
 						} else {
 							if (execType == "API") d2R = [d2R, status];
@@ -407,8 +408,8 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 		redisServer.redisSubServer.on("message", executeTestSuite_listener);
 	}));
 
-	const notifySocMap = myserver.socketMapNotify;
-	if (execType == "ACTIVE" && notifySocMap && notifySocMap[name]) {
+	const notifySocMap = myserver.socketMapNotify; 
+	if (execType == "ACTIVE" && notifySocMap && notifySocMap[username]) {
 		exePromise(true);
 		return "begin";
 	} else return await exePromise(false);
@@ -416,8 +417,12 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 
 /** Function responsible for Orchestrating execution flow. Invokes series of functions to achive the results */
 const executionFunction = async (batchExecutionData, execIds, userInfo, execType) => {
-	redisServer.redisSubServer.subscribe('ICE2_' + userInfo.username);
-	var iceStatus = await checkForICEstatus(userInfo.username, execType);
+	var icename=myserver.allSocketsICEUser[userInfo.username];
+	if (execType=='API')
+	icename=userInfo.icename;
+	userInfo.icename=icename;
+	redisServer.redisSubServer.subscribe('ICE2_' + icename);
+	var iceStatus = await checkForICEstatus(icename, execType);
 	if (iceStatus != null) return iceStatus;
 	const taskApproval = await utils.approvalStatusCheck(batchExecutionData.batchInfo);
 	if (taskApproval.res !== "pass") return taskApproval.res;
@@ -454,6 +459,13 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 /** This service executes the testsuite(s) for request from API */
 exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE_API");
+	const hdrs = req.headers;
+	let reqFromADO = false;
+	// Check if request came from Azure DevOps. If yes, then send the acknowledgement
+	if (hdrs["user-agent"].startsWith("VSTS") && hdrs.planurl && hdrs.projectid) {
+		reqFromADO = true;
+		res.send("Request Received");
+	}
 	const multiBatchExecutionData = req.body.executionData;
 	const userRequestMap = {};
 	const userInfoList = [];
@@ -465,9 +477,9 @@ exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 		const execResponse = userInfo.inputs;
 		if (execResponse.tokenValidation == "passed") {
 			delete execResponse.error_message;
-			const username = userInfo.username;
-			if (userRequestMap[username] == undefined) userRequestMap[username] = [i];
-			else userRequestMap[username].push(i);
+			const icename = userInfo.icename;
+			if (userRequestMap[icename] == undefined) userRequestMap[icename] = [i];
+			else userRequestMap[icename].push(i);
 		}
 		executionResult.push(execResponse);
 	}
@@ -513,7 +525,37 @@ exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 		}
 	})());
 	await Promise.all(batchExecutionPromiseList)
-	return res.send({ "executionStatus": executionResult });
+	const finalResult = {"executionStatus": executionResult};
+	if (!reqFromADO) return res.send(finalResult);
+	// This code only executes when request comes from Azure DevOps
+	let adoStatus = finalResult.executionStatus.every(e => e.status == "success");
+	const args = {
+		data: { "name": "TaskCompleted", "taskId": hdrs.taskinstanceid, "jobId": hdrs.jobid, "result": (adoStatus? "succeeded":"failed") },
+		headers: {
+			"Authorization": 'Basic ' + Buffer.from(':' + hdrs.authtoken).toString('base64'),
+			"Content-Type": "application/json"
+		}
+	};
+	const adourl = hdrs.planurl+'/'+hdrs.projectid+'/_apis/distributedtask/hubs/'+hdrs.hubname+'/plans/'+hdrs.planid+'/events?api-version=2.0-preview.1';
+	logger.info("Sending response to Azure DevOps");
+	const promiseData = (new Promise((rsv, rej) => {
+		const apiReq = client.post(adourl, args, (result, response) => {
+			if (response.statusCode < 200 && response.statusCode >= 400) {
+				logger.error("Error occurred while sending response to Azure DevOps");
+				const toLog = ((typeof(result)  == "object") && !(result instanceof Buffer))? JSON.stringify(result):result.toString();
+				logger.debug("Response code is %s and content is %s", response.statusCode, toLog);
+				rsv("fail");
+			} else {
+				rsv(result);
+			}
+		});
+		apiReq.on('error', function(err) {
+			logger.error("Error occurred while sending response to Azure DevOps, Error: %s", err);
+			rsv("fail");
+		});
+	}));
+	try { return await promiseData; }
+	catch (e) { logger.error(e); }
 };
 
 /** Service to fetch all the testcase, screen and project names for provided scenarioid */
@@ -655,7 +697,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
  */
 const smartSchedule = async (batchInfo, type, time, browsers) => {
 	// deep copying batchinfo
-	result = {}
+	const result = {}
 	result["displayString"] = "";
 	var partitions = await getMachinePartitions(batchInfo, type, time);
 	if (partitions == "fail") {
@@ -717,7 +759,6 @@ function secondsToHms(seconds) {
 	var minutes = Math.floor(seconds / (60));
 	seconds -= minutes * (60);
 	return ((0 < days) ? (days + " day, ") : "") + hours + "h, " + minutes + "m and " + seconds.toFixed(2) + "s";
-
 }
 
 /**
@@ -727,12 +768,12 @@ function secondsToHms(seconds) {
  * @param {*} time  Time of schedule
  */
 const getMachinePartitions = async (mod, type, time) => {
-	var scenarios = [];
+	let scenarios = [];
 	const activeUsers = await utils.getSocketList("schedule");
 	for (var i = 0; i < mod.length; i++) {
 		scenarios = scenarios.concat(mod[i].suiteDetails);
 	}
-	var inputs = {
+	const inputs = {
 		"scenarios": scenarios,
 		"activeIce": activeUsers.length,
 		"ipAddressList": activeUsers,
@@ -740,7 +781,7 @@ const getMachinePartitions = async (mod, type, time) => {
 		"modules": mod,
 		"time": time
 	};
-	result = await utils.fetchData(inputs, "partitons/getPartitions", "getMachineParitions");
+	const result = await utils.fetchData(inputs, "partitons/getPartitions", "getMachineParitions");
 	return result;
 }
 /** Function responsible for scheduling Jobs. Returns: success/few/fail */

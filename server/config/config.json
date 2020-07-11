@@ -1,6 +1,7 @@
 {
     "defaultTokenExpiry": "720",
     "strictTaskWorkflow": false,
+    "benchmarkRuntimes":["14:12","11:35","11:55","12:00"],
     "certificate": {
         "key": "./server/https/server.key",
         "cert": "./server/https/server.crt"
@@ -24,6 +25,5 @@
     "screenShotPath": {
         "default": "",
         "mac": ""
-    },
-    "benchmarkRuntimes":["14:12","11:35","11:55","12:00"]
+    }
 }
