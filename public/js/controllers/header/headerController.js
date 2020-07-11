@@ -61,7 +61,8 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	$("#notifications-count").hide();
 
 
-	socket.on('killSession', function (value) {
+	socket.on('killSession', function (source, reason) {
+		window.sessionStorage["checkLoggedOut"] = JSON.stringify([source, reason]);
 		return $rootScope.redirectPage();
 	});
 
