@@ -95,6 +95,8 @@ exports.initScraping_ICE = function (req, res) {
 						}
 						if (browserType == "chrome") data.task = "OPEN BROWSER CH";
 						else if (browserType == "ie") data.task = "OPEN BROWSER IE";
+						else if (browserType == "edge") data.task = "OPEN BROWSER EDGE";
+						else if (browserType == "chromium") data.task = "OPEN BROWSER CHROMIUM";
 						else if (browserType == "mozilla") data.task = "OPEN BROWSER FX";
 						else if (browserType == "safari") data.task = "OPEN BROWSER SF"
 						reqAction = "web";
