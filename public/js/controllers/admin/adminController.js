@@ -465,7 +465,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			if (data == "Invalid Session") return $rootScope.redirectPage();
 			else if (data == 'fail') openModalPopup("ICE Provisions", "ICE Deregister Failed");
 			else {
-				adminServices.manageSessionData('disconnect', icename, "both", "dereg").then(function (data) {
+				adminServices.manageSessionData('disconnect', icename, "?", "dereg").then(function (data) {
 					if (data == "Invalid Session") return $rootScope.redirectPage();
 				}, function (error) { });
 				openModalPopup("ICE Provisions", "ICE Deregistered Successfully");
@@ -494,7 +494,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			if (data == "Invalid Session") return $rootScope.redirectPage();
 			else if (data == 'fail') openModalPopup("ICE Provisions", "ICE "+event+" Failed");
 			else {
-				adminServices.manageSessionData('disconnect', icename, "both", "dereg").then(function (data) {
+				adminServices.manageSessionData('disconnect', icename, "?", "dereg").then(function (data) {
 					if (data == "Invalid Session") return $rootScope.redirectPage();
 				}, function (error) { });
 				$scope.tokeninfo.icename = icename;
