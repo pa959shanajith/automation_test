@@ -1091,11 +1091,13 @@ exports.pdProcess = function (req, res) {
 			screenshotdatapertask.forEach(function(a,i){
 				
 				if(a['xpath']){
-					a['url']= encrypt(a['url'])
-					xpath_string=a['xpath'].split(';');
-					left_part=encrypt(xpath_string.slice(0,2).join(';'));	// 0,1
-					right_part=encrypt(xpath_string.slice(3,).join(';'));	// 3,4...
-					a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part;	
+					if(a['apptype']=="WEB"){
+						a['url']= encrypt(a['url'])
+						xpath_string=a['xpath'].split(';');
+						left_part=encrypt(xpath_string.slice(0,2).join(';'));	// 0,1
+						right_part=encrypt(xpath_string.slice(3,).join(';'));	// 3,4...
+						a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part;	
+					}
 					screendatamindmap.push(a);
 				}
 			});
@@ -1250,7 +1252,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 		// move the script to first
 
 		adjacentItems.sources.forEach(function(item,idx){
-			if(item["@label"]=="Start"){
+			if(item["@label"]=="Start" && screendata[0].apptype=="WEB"){
 				firstScript = true;
 				testCaseSteps = [{
 					"stepNo": 1,
@@ -1269,102 +1271,74 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					"_id_": "1"
 				}],step = 2;			
 			}
+			else if(item["@label"]=="Start" && screendata[0].apptype=="SAP"){
+				firstScript = true;
+				testcaseObj = '';
+				testCaseSteps = [{
+					"stepNo": 1,
+					"objectName": " ",
+					"custname": "@Sap",
+					"keywordVal": "LaunchApplication",
+					"inputVal": [""],
+					"outputVal": "",
+					"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+					"remarks": "",
+					"appType": "SAP",
+					"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+					"addTestCaseDetailsInfo": "",
+					"cord": "",
+					"_id_": "1"
+				}],step = 2;
+				testcaseObj = {
+					"stepNo": step,
+					"objectName": " ",
+					"custname": "@Sap",
+					"keywordVal": "ServerConnect",
+					"inputVal": [""],
+					"outputVal": "",
+					"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+					"remarks": "",
+					"appType": "SAP",
+					"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+					"addTestCaseDetailsInfo": "",
+					"cord": "",
+					"_id_": String(step)
+				},step = 3;
+				testCaseSteps.push(testcaseObj);
+				if(screendata[0].tag=="GuiOkCodeField"){
+					testcaseObj = {
+						"stepNo": step,
+						"objectName": " ",
+						"custname": "@Sap",
+						"keywordVal": "StartTransaction",
+						"inputVal": [screendata[0].text],
+						"outputVal": "",
+						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+						"remarks": "",
+						"appType": "SAP",
+						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+						"addTestCaseDetailsInfo": "",
+						"cord": "",
+						"_id_": String(step)
+					},step = 4;	
+				testCaseSteps.push(testcaseObj);
+				}
+			}
 		});	
 	}
 
 	screendata.forEach(function(eachScrapedAction,i){
 		testcaseObj = '';
-		if(eachScrapedAction.action){
-            if(eachScrapedAction.action.windowId){
-                if(windowId && windowId!=eachScrapedAction.action.windowId) {
-                    testcaseObj = {
-                        "stepNo": step,
-                        "objectName": " ",
-                        "custname": "@Browser",
-                        "keywordVal": "switchToWindow",
-                        "inputVal": [""],
-                        "outputVal": "",
-                        "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-                        "remarks": "",
-                        "url": eachScrapedAction.url,
-                        "appType": "Web",
-                        "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-                        "addTestCaseDetailsInfo": "",
-                        "cord": "",
-                        "_id_": String(step)
-                    } 
-                    testCaseSteps.push(testcaseObj);
-                    step++;                    
-                }
-                else{
-                    windowId=eachScrapedAction.action.windowId;
-                }
-            }            
-			switch(eachScrapedAction.action.actionName){
-				case "navigate":
-					testcaseObj = {
+		if(eachScrapedAction.apptype=="WEB"){
+			if(eachScrapedAction.action){
+				if(eachScrapedAction.action.windowId){
+					if(windowId && windowId!=eachScrapedAction.action.windowId) {
+						testcaseObj = {
 							"stepNo": step,
 							"objectName": " ",
 							"custname": "@Browser",
-							"keywordVal": "navigateToURL",
-							"inputVal": [eachScrapedAction.action.actionData],
-							"outputVal": "",
-							"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-							"remarks": "",
-							"url": " ",
-							"appType": "Web",
-							"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-							"addTestCaseDetailsInfo": "",
-							"cord": "",
-							"_id_": String(step)
-					}
-					break;
-				case "click":
-					testcaseObj = {
-						"stepNo": step,
-						"objectName": eachScrapedAction.xpath,
-						"custname": eachScrapedAction.custname,
-						"keywordVal": "click",
-						"inputVal": [""],
-						"outputVal": "",
-						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-						"remarks": "",
-						"url": eachScrapedAction.url,
-						"appType": "Web",
-						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_3\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-						"addTestCaseDetailsInfo": "",
-						"cord": "",
-						"_id_": String(step)
-					}		
-					if(eachScrapedAction.custname.split('_')[eachScrapedAction.custname.split('_').length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
-					break;	
-				case "inputChange":
-                    if(eachScrapedAction.action.actionData.split(";").length == 2 && eachScrapedAction.action.actionData.split(";")[1] =='byIndex'){
-                        testcaseObj = {
-                            "stepNo": step,
-                            "objectName": eachScrapedAction.xpath,
-                            "custname": eachScrapedAction.custname,
-                            "keywordVal": "selectValueByIndex",
-                            "inputVal": [eachScrapedAction.action.actionData.split(";")[0]],
-                            "outputVal": "",
-                            "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-                            "remarks": "",
-                            "url": eachScrapedAction.url,
-                            "appType": "Web",
-                            "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-                            "addTestCaseDetailsInfo": "",
-                            "cord": "",
-                            "_id_": String(step)
-                        }                      
-					}
-					else if(eachScrapedAction.action.actionData.split(";").length == 2 && eachScrapedAction.action.actionData.split(";")[1] =='byIndexes'){
-						var selectIdxList = eachScrapedAction.value.split(";")[0].replace(/,/g,';');
-						testcaseObj = {
-							"stepNo": step,
-							"objectName": eachScrapedAction.xpath,
-							"custname": eachScrapedAction.custname,
-							"keywordVal": "selectValueByIndex",
-							"inputVal": [selectIdxList],
+							"keywordVal": "switchToWindow",
+							"inputVal": [""],
 							"outputVal": "",
 							"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 							"remarks": "",
@@ -1374,63 +1348,264 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 							"addTestCaseDetailsInfo": "",
 							"cord": "",
 							"_id_": String(step)
-						}    
-						if(selectIdxList.length > 1){
-							testcaseObj.keywordVal = "selectMultipleValuesByIndexes";
-						}
+						} 
+						testCaseSteps.push(testcaseObj);
+						step++;                    
 					}
-                    else{
-                        testcaseObj = {
-                            "stepNo": step,
-                            "objectName": eachScrapedAction.xpath,
-                            "custname": eachScrapedAction.custname,
-                            "keywordVal": "setText",
-                            "inputVal": [eachScrapedAction.action.actionData],
-                            "outputVal": "",
-                            "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-                            "remarks": "",
-                            "url": eachScrapedAction.url,
-                            "appType": "Web",
-                            "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-                            "addTestCaseDetailsInfo": "",
-                            "cord": "",
-                            "_id_": String(step)
-                        }
-                        
-                    }
-					break;		
+					else{
+						windowId=eachScrapedAction.action.windowId;
+					}
+				}            
+				switch(eachScrapedAction.action.actionName){
+					case "navigate":
+						testcaseObj = {
+								"stepNo": step,
+								"objectName": " ",
+								"custname": "@Browser",
+								"keywordVal": "navigateToURL",
+								"inputVal": [eachScrapedAction.action.actionData],
+								"outputVal": "",
+								"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+								"remarks": "",
+								"url": " ",
+								"appType": "Web",
+								"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+								"addTestCaseDetailsInfo": "",
+								"cord": "",
+								"_id_": String(step)
+						}
+						break;
+					case "click":
+						testcaseObj = {
+							"stepNo": step,
+							"objectName": eachScrapedAction.xpath,
+							"custname": eachScrapedAction.custname,
+							"keywordVal": "click",
+							"inputVal": [""],
+							"outputVal": "",
+							"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+							"remarks": "",
+							"url": eachScrapedAction.url,
+							"appType": "Web",
+							"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_3\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+							"addTestCaseDetailsInfo": "",
+							"cord": "",
+							"_id_": String(step)
+						}		
+						if(eachScrapedAction.custname.split('_')[eachScrapedAction.custname.split('_').length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+						break;	
+					case "inputChange":
+						if(eachScrapedAction.action.actionData.split(";").length == 2 && eachScrapedAction.action.actionData.split(";")[1] =='byIndex'){
+							testcaseObj = {
+								"stepNo": step,
+								"objectName": eachScrapedAction.xpath,
+								"custname": eachScrapedAction.custname,
+								"keywordVal": "selectValueByIndex",
+								"inputVal": [eachScrapedAction.action.actionData.split(";")[0]],
+								"outputVal": "",
+								"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+								"remarks": "",
+								"url": eachScrapedAction.url,
+								"appType": "Web",
+								"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+								"addTestCaseDetailsInfo": "",
+								"cord": "",
+								"_id_": String(step)
+							}                      
+						}
+						else if(eachScrapedAction.action.actionData.split(";").length == 2 && eachScrapedAction.action.actionData.split(";")[1] =='byIndexes'){
+							var selectIdxList = eachScrapedAction.value.split(";")[0].replace(/,/g,';');
+							testcaseObj = {
+								"stepNo": step,
+								"objectName": eachScrapedAction.xpath,
+								"custname": eachScrapedAction.custname,
+								"keywordVal": "selectValueByIndex",
+								"inputVal": [selectIdxList],
+								"outputVal": "",
+								"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+								"remarks": "",
+								"url": eachScrapedAction.url,
+								"appType": "Web",
+								"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+								"addTestCaseDetailsInfo": "",
+								"cord": "",
+								"_id_": String(step)
+							}    
+							if(selectIdxList.length > 1){
+								testcaseObj.keywordVal = "selectMultipleValuesByIndexes";
+							}
+						}
+						else{
+							testcaseObj = {
+								"stepNo": step,
+								"objectName": eachScrapedAction.xpath,
+								"custname": eachScrapedAction.custname,
+								"keywordVal": "setText",
+								"inputVal": [eachScrapedAction.action.actionData],
+								"outputVal": "",
+								"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+								"remarks": "",
+								"url": eachScrapedAction.url,
+								"appType": "Web",
+								"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+								"addTestCaseDetailsInfo": "",
+								"cord": "",
+								"_id_": String(step)
+							}
+							
+						}
+						break;		
+					default:
+						console.log("no match found!");
+						break;
+				}
+				if(testcaseObj){
+					testCaseSteps.push(testcaseObj);
+					step++;
+				}
+
+			}	
+			else if(eachScrapedAction.tag == "browser_navigate"){
+				testcaseObj = {
+					"stepNo": step,
+					"objectName": " ",
+					"custname": "@Browser",
+					"keywordVal": "navigateToURL",
+					"inputVal": [eachScrapedAction.url],
+					"outputVal": "",
+					"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+					"remarks": "",
+					"url": " ",
+					"appType": "Web",
+					"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+					"addTestCaseDetailsInfo": "",
+					"cord": "",
+					"_id_": String(step)
+				}			
+				testCaseSteps.push(testcaseObj);
+				step++;
+			}
+		}
+		//mapping for SAP objects 
+		else if(eachScrapedAction.apptype=="SAP"){
+			text = eachScrapedAction.text;
+			input = text.split("  ");
+			switch(eachScrapedAction.tag){
+				case "input":
+					testcaseObj = {
+						"stepNo": step,
+						"objectName": eachScrapedAction.xpath,
+						"custname": eachScrapedAction.custname,
+						"keywordVal": "SetText",
+						"inputVal": [input[0]],
+						"outputVal": "",
+						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+						"remarks": "",
+						"appType": "SAP",
+						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+						"addTestCaseDetailsInfo": "",
+						"cord": "",
+						"_id_": String(step)
+					}
+					break;
+				case "button":
+				case "shell":
+				case "table":
+					testcaseObj = {
+						"stepNo": step,
+						"objectName": eachScrapedAction.xpath,
+						"custname": eachScrapedAction.custname,
+						"keywordVal": "Click",
+						"inputVal": [""],
+						"outputVal": "",
+						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+						"remarks": "",
+						"appType": "SAP",
+						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_3\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+						"addTestCaseDetailsInfo": "",
+						"cord": "",
+						"_id_": String(step)
+					}		
+					if(eachScrapedAction.custname.split('_')[eachScrapedAction.custname.split('_').length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+					break;
+				case "GuiTab":
+					testcaseObj = {
+						"stepNo": step,
+						"objectName": eachScrapedAction.xpath,
+						"custname": eachScrapedAction.custname,
+						"keywordVal": "SelectTab",
+						"inputVal": [""],
+						"outputVal": "",
+						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+						"remarks": "",
+						"appType": "SAP",
+						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+						"addTestCaseDetailsInfo": "",
+						"cord": "",
+						"_id_": String(step)
+					}                      
+					break;
+				case "select":
+					testcaseObj = {
+						"stepNo": step,
+						"objectName": eachScrapedAction.xpath,
+						"custname": eachScrapedAction.custname,
+						"keywordVal": "selectValueByText",
+						"inputVal": [input[0]],
+						"outputVal": "",
+						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+						"remarks": "",
+						"appType": "SAP",
+						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+						"addTestCaseDetailsInfo": "",
+						"cord": "",
+						"_id_": String(step)
+					}                      
+					break;
+				case "radiobutton":
+					testcaseObj = {
+						"stepNo": step,
+						"objectName": eachScrapedAction.xpath,
+						"custname": eachScrapedAction.custname,
+						"keywordVal": "SelectRadioButton",
+						"inputVal": [""],
+						"outputVal": "",
+						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+						"remarks": "",
+						"appType": "SAP",
+						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+						"addTestCaseDetailsInfo": "",
+						"cord": "",
+						"_id_": String(step)
+					}                      
+					break;
+				case "checkbox":
+					testcaseObj = {
+						"stepNo": step,
+						"objectName": eachScrapedAction.xpath,
+						"custname": eachScrapedAction.custname,
+						"keywordVal": "SelectCheckbox",
+						"inputVal": [""],
+						"outputVal": "",
+						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+						"remarks": "",
+						"appType": "SAP",
+						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+						"addTestCaseDetailsInfo": "",
+						"cord": "",
+						"_id_": String(step)
+					}                      
+					break;
 				default:
 					console.log("no match found!");
 					break;
-			}
+			}		
 			if(testcaseObj){
 				testCaseSteps.push(testcaseObj);
 				step++;
 			}
-
-		}
-		else if(eachScrapedAction.tag == "browser_navigate"){
-			testcaseObj = {
-				"stepNo": step,
-				"objectName": " ",
-				"custname": "@Browser",
-				"keywordVal": "navigateToURL",
-				"inputVal": [eachScrapedAction.url],
-				"outputVal": "",
-				"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-				"remarks": "",
-				"url": " ",
-				"appType": "Web",
-				"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-				"addTestCaseDetailsInfo": "",
-				"cord": "",
-				"_id_": String(step)
-			}			
-			testCaseSteps.push(testcaseObj);
-			step++;
 		}
 	});
-	// console.log(screendata)
 
 	if(adjacentItems){
 		// list of sources(only shapes) and targets (assuming only one)
@@ -1601,12 +1776,8 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					testCaseSteps.push(testcaseObj);
 					step++;													
 				}
-			}	
-
-	
-
+			}
 		}
-
 	}
 	return {"data":testCaseSteps,"start":firstScript};
 }
