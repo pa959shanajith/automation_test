@@ -1119,16 +1119,15 @@ exports.pdProcess = function (req, res) {
 			// scrapedObjects = newParse;		
 			scrapedObjects = JSON.parse(newParse);	
 			screendataobj[tempName].data = scrapedObjects;
-			
+
 			var testCaseOut = generateTestCaseMap(screenshotdatapertask,eachActivityIdx,adjacentItems,sessionID);
 			if(testCaseOut.start) orderlist.unshift({'label':tempName,'type':'task'}) // in case of first script
 			else orderlist.push({'label':tempName,'type':'task'});
 			var requestedtestcasesteps = JSON.stringify(testCaseOut.data);
 			requestedtestcasesteps = requestedtestcasesteps.replace(/'+/g, "''");
 			screendataobj[tempName].script = JSON.parse(requestedtestcasesteps);
-	
 		});
-	
+
 		activityJSON["mxGraphModel"]["root"]["Shape"].forEach(function(eachShape,eachActivityIdx){
 			if(eachShape.mxCell['@style']!='rhombus') return;
 			var tempName = eachShape["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'');		// name id combo
@@ -1139,10 +1138,8 @@ exports.pdProcess = function (req, res) {
 			if(testCaseOut.start) orderlist.unshift({'label':tempName,'type':'rhombus'}) // in case of first script
 			else orderlist.push({'label':tempName,'type':'rhombus'});
 			screendataobj[tempName].script = testCaseOut.data;
-	
 		});
-	
-	
+
 		// data insertion logic
 		asynclib.forEachSeries(orderlist, function (nodeObj, savedcallback) {
 			var name = nodeObj.label;
@@ -1168,15 +1165,14 @@ exports.pdProcess = function (req, res) {
 				'scrapedata': screendataobj[name].data
 			};
 			ordernameidlist.push({'name':'Screen_PD_'+name,'type':3})
-	
-			
+
 			var args = {
 				data: inputs,
 				headers: {
 					"Content-Type": "application/json"
 				}
 			};
-			
+
 			client.post(epurl + "create_ice/updateScreenname_ICE", args,
 				function (getScrapeDataQueryresult, response) {
 					try {
@@ -1242,15 +1238,14 @@ exports.pdProcess = function (req, res) {
 		console.log(err)
 	}
 };
-                                                                                                                 
+
 var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 	var testCaseSteps = [],testcaseObj,step = 1;
 	var firstScript = false,windowId;
 	if(adjacentItems){
-	// in case is first script
+		// in case is first script
 		// make orderlist global
 		// move the script to first
-
 		adjacentItems.sources.forEach(function(item,idx){
 			if(item["@label"]=="Start" && screendata[0].apptype=="WEB"){
 				firstScript = true;
@@ -1261,19 +1256,15 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					"keywordVal": "openBrowser",
 					"inputVal": [""],
 					"outputVal": "",
-					"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 					"remarks": "",
 					"url": " ",
 					"appType": "Web",
-					"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-					"addTestCaseDetailsInfo": "",
-					"cord": "",
-					"_id_": "1"
+					"addDetails": "",
+					"cord": ""
 				}],step = 2;			
 			}
 			else if(item["@label"]=="Start" && screendata[0].apptype=="SAP"){
 				firstScript = true;
-				testcaseObj = '';
 				testCaseSteps = [{
 					"stepNo": 1,
 					"objectName": " ",
@@ -1281,13 +1272,10 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					"keywordVal": "LaunchApplication",
 					"inputVal": [""],
 					"outputVal": "",
-					"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 					"remarks": "",
 					"appType": "SAP",
-					"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-					"addTestCaseDetailsInfo": "",
-					"cord": "",
-					"_id_": "1"
+					"addDetails": "",
+					"cord": ""
 				}],step = 2;
 				testcaseObj = {
 					"stepNo": step,
@@ -1296,13 +1284,10 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					"keywordVal": "ServerConnect",
 					"inputVal": [""],
 					"outputVal": "",
-					"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 					"remarks": "",
 					"appType": "SAP",
-					"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-					"addTestCaseDetailsInfo": "",
-					"cord": "",
-					"_id_": String(step)
+					"addDetails": "",
+					"cord": ""
 				},step = 3;
 				testCaseSteps.push(testcaseObj);
 				if(screendata[0].tag=="GuiOkCodeField"){
@@ -1313,13 +1298,10 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						"keywordVal": "StartTransaction",
 						"inputVal": [screendata[0].text],
 						"outputVal": "",
-						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 						"remarks": "",
 						"appType": "SAP",
-						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-						"addTestCaseDetailsInfo": "",
-						"cord": "",
-						"_id_": String(step)
+						"addDetails": "",
+						"cord": ""
 					},step = 4;	
 				testCaseSteps.push(testcaseObj);
 				}
@@ -1340,14 +1322,11 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 							"keywordVal": "switchToWindow",
 							"inputVal": [""],
 							"outputVal": "",
-							"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 							"remarks": "",
 							"url": eachScrapedAction.url,
 							"appType": "Web",
-							"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-							"addTestCaseDetailsInfo": "",
-							"cord": "",
-							"_id_": String(step)
+							"addDetails": "",
+							"cord": ""
 						} 
 						testCaseSteps.push(testcaseObj);
 						step++;                    
@@ -1365,14 +1344,11 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 								"keywordVal": "navigateToURL",
 								"inputVal": [eachScrapedAction.action.actionData],
 								"outputVal": "",
-								"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 								"remarks": "",
 								"url": " ",
 								"appType": "Web",
-								"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-								"addTestCaseDetailsInfo": "",
-								"cord": "",
-								"_id_": String(step)
+								"addDetails": "",
+								"cord": ""
 						}
 						break;
 					case "click":
@@ -1383,14 +1359,11 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 							"keywordVal": "click",
 							"inputVal": [""],
 							"outputVal": "",
-							"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 							"remarks": "",
 							"url": eachScrapedAction.url,
 							"appType": "Web",
-							"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_3\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-							"addTestCaseDetailsInfo": "",
-							"cord": "",
-							"_id_": String(step)
+							"addDetails": "",
+							"cord": ""
 						}		
 						if(eachScrapedAction.custname.split('_')[eachScrapedAction.custname.split('_').length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
 						break;	
@@ -1403,14 +1376,11 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 								"keywordVal": "selectValueByIndex",
 								"inputVal": [eachScrapedAction.action.actionData.split(";")[0]],
 								"outputVal": "",
-								"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 								"remarks": "",
 								"url": eachScrapedAction.url,
 								"appType": "Web",
-								"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-								"addTestCaseDetailsInfo": "",
-								"cord": "",
-								"_id_": String(step)
+								"addDetails": "",
+								"cord": ""
 							}                      
 						}
 						else if(eachScrapedAction.action.actionData.split(";").length == 2 && eachScrapedAction.action.actionData.split(";")[1] =='byIndexes'){
@@ -1422,14 +1392,11 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 								"keywordVal": "selectValueByIndex",
 								"inputVal": [selectIdxList],
 								"outputVal": "",
-								"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 								"remarks": "",
 								"url": eachScrapedAction.url,
 								"appType": "Web",
-								"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-								"addTestCaseDetailsInfo": "",
-								"cord": "",
-								"_id_": String(step)
+								"addDetails": "",
+								"cord": ""
 							}    
 							if(selectIdxList.length > 1){
 								testcaseObj.keywordVal = "selectMultipleValuesByIndexes";
@@ -1443,14 +1410,11 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 								"keywordVal": "setText",
 								"inputVal": [eachScrapedAction.action.actionData],
 								"outputVal": "",
-								"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 								"remarks": "",
 								"url": eachScrapedAction.url,
 								"appType": "Web",
-								"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-								"addTestCaseDetailsInfo": "",
-								"cord": "",
-								"_id_": String(step)
+								"addDetails": "",
+								"cord": ""
 							}
 							
 						}
@@ -1463,8 +1427,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					testCaseSteps.push(testcaseObj);
 					step++;
 				}
-
-			}	
+			}
 			else if(eachScrapedAction.tag == "browser_navigate"){
 				testcaseObj = {
 					"stepNo": step,
@@ -1473,14 +1436,11 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					"keywordVal": "navigateToURL",
 					"inputVal": [eachScrapedAction.url],
 					"outputVal": "",
-					"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 					"remarks": "",
 					"url": " ",
 					"appType": "Web",
-					"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-					"addTestCaseDetailsInfo": "",
-					"cord": "",
-					"_id_": String(step)
+					"addDetails": "",
+					"cord": ""
 				}			
 				testCaseSteps.push(testcaseObj);
 				step++;
@@ -1499,13 +1459,10 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						"keywordVal": "SetText",
 						"inputVal": [input[0]],
 						"outputVal": "",
-						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 						"remarks": "",
 						"appType": "SAP",
-						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-						"addTestCaseDetailsInfo": "",
-						"cord": "",
-						"_id_": String(step)
+						"addDetails": "",
+						"cord": ""
 					}
 					break;
 				case "button":
@@ -1518,13 +1475,10 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						"keywordVal": "Click",
 						"inputVal": [""],
 						"outputVal": "",
-						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 						"remarks": "",
 						"appType": "SAP",
-						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_3\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-						"addTestCaseDetailsInfo": "",
-						"cord": "",
-						"_id_": String(step)
+						"addDetails": "",
+						"cord": ""
 					}		
 					if(eachScrapedAction.custname.split('_')[eachScrapedAction.custname.split('_').length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
 					break;
@@ -1536,13 +1490,10 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						"keywordVal": "SelectTab",
 						"inputVal": [""],
 						"outputVal": "",
-						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 						"remarks": "",
 						"appType": "SAP",
-						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-						"addTestCaseDetailsInfo": "",
-						"cord": "",
-						"_id_": String(step)
+						"addDetails": "",
+						"cord": ""
 					}                      
 					break;
 				case "select":
@@ -1553,13 +1504,10 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						"keywordVal": "selectValueByText",
 						"inputVal": [input[0]],
 						"outputVal": "",
-						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 						"remarks": "",
 						"appType": "SAP",
-						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-						"addTestCaseDetailsInfo": "",
-						"cord": "",
-						"_id_": String(step)
+						"addDetails": "",
+						"cord": ""
 					}                      
 					break;
 				case "radiobutton":
@@ -1570,13 +1518,10 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						"keywordVal": "SelectRadioButton",
 						"inputVal": [""],
 						"outputVal": "",
-						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 						"remarks": "",
 						"appType": "SAP",
-						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-						"addTestCaseDetailsInfo": "",
-						"cord": "",
-						"_id_": String(step)
+						"addDetails": "",
+						"cord": ""
 					}                      
 					break;
 				case "checkbox":
@@ -1587,13 +1532,10 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						"keywordVal": "SelectCheckbox",
 						"inputVal": [""],
 						"outputVal": "",
-						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 						"remarks": "",
 						"appType": "SAP",
-						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-						"addTestCaseDetailsInfo": "",
-						"cord": "",
-						"_id_": String(step)
+						"addDetails": "",
+						"cord": ""
 					}                      
 					break;
 				default:
@@ -1613,7 +1555,6 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 			console.log(adjacentItems["error"]);
 		}
 		else{
-
 			// old logic
 			// in case target is if
 			// 	get next items
@@ -1631,14 +1572,11 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						"keywordVal": "elseIf",
 						"inputVal": [""],
 						"outputVal": "",
-						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 						"remarks": "",
 						"url": " ",
 						"appType": "Generic",
-						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-						"addTestCaseDetailsInfo": "",
-						"cord": "",
-						"_id_": String(step)
+						"addDetails": "",
+						"cord": ""
 					}		
 					if(eachBoxIdx==0) testcaseObj["keywordVal"] = "if"; 		
 					testCaseSteps.push(testcaseObj);
@@ -1651,15 +1589,12 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 							"keywordVal": "stop",
 							"inputVal": [""],
 							"outputVal": "",
-							"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 							"remarks": "",
 							"url": " ",
 							"appType": "Generic",
-							"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-							"addTestCaseDetailsInfo": "",
-							"cord": "",
-							"_id_": String(step)
-						}				
+							"addDetails": "",
+							"cord": ""
+						}
 						testCaseSteps.push(testcaseObj);
 						step++;
 					}
@@ -1671,18 +1606,15 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 							"keywordVal": "jumpTo",
 							"inputVal": ['Testcase_PD_'+eachBox["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],
 							"outputVal": "",
-							"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 							"remarks": "",
 							"url": " ",
 							"appType": "Generic",
-							"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-							"addTestCaseDetailsInfo": "",
-							"cord": "",
-							"_id_": String(step)
-						}				
+							"addDetails": "",
+							"cord": ""
+						}
 						testCaseSteps.push(testcaseObj);
 						step++;
-					}					
+					}	
 					else if(eachBox['mxCell']['@style'] == 'task'){	// in case of task
 						testcaseObj = {
 							"stepNo": step,
@@ -1691,20 +1623,15 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 							"keywordVal": "jumpTo",
 							"inputVal": ['Testcase_PD_'+eachBox["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],
 							"outputVal": "",
-							"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 							"remarks": "",
 							"url": " ",
 							"appType": "Generic",
-							"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-							"addTestCaseDetailsInfo": "",
-							"cord": "",
-							"_id_": String(step)
-						}				
+							"addDetails": "",
+							"cord": ""
+						}
 						testCaseSteps.push(testcaseObj);
 						step++;								
 					}
-
-	
 				});
 				// end of if step
 				testcaseObj = {
@@ -1714,28 +1641,19 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					"keywordVal": "endIf",
 					"inputVal": [""],
 					"outputVal": "",
-					"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 					"remarks": "",
 					"url": " ",
 					"appType": "Generic",
-					"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-					"addTestCaseDetailsInfo": "",
-					"cord": "",
-					"_id_": String(step)
-				}				
+					"addDetails": "",
+					"cord": ""
+				}
 				testCaseSteps.push(testcaseObj);
 				step++;							
 			}
 
-
-
-			// in case target is activity
-				// add jumpto activity
-			
+			// in case target is activity -> add jumpto activity
 			else if(adjacentItems.targets[0]){	// assuming only 1 target // I am activity
-	
-				// in case activity target is end			
-				// add end keyword
+				// in case activity target is end -> add end keyword
 				if(adjacentItems.targets[0]["@label"]=="End"){	// assuming only 1 target // if end
 					testcaseObj = {
 						"stepNo": step,
@@ -1744,15 +1662,12 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						"keywordVal": "stop",
 						"inputVal": [""],
 						"outputVal": "",
-						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 						"remarks": "",
 						"url": " ",
 						"appType": "Generic",
-						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-						"addTestCaseDetailsInfo": "",
-						"cord": "",
-						"_id_": String(step)
-					}				
+						"addDetails": "",
+						"cord": ""
+					}
 					testCaseSteps.push(testcaseObj);
 					step++;			
 				}	
@@ -1764,15 +1679,12 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						"keywordVal": "jumpTo",
 						"inputVal": ['Testcase_PD_'+adjacentItems.targets[0]["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],
 						"outputVal": "",
-						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
 						"remarks": "",
 						"url": " ",
 						"appType": "Generic",
-						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-						"addTestCaseDetailsInfo": "",
-						"cord": "",
-						"_id_": String(step)
-					}				
+						"addDetails": "",
+						"cord": ""
+					}
 					testCaseSteps.push(testcaseObj);
 					step++;													
 				}
