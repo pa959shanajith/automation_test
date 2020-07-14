@@ -1239,6 +1239,24 @@ exports.pdProcess = function (req, res) {
 	}
 };
 
+var getTestcaseStep = function(sno, ob, cn, keyVal, inp, out, url, app) {
+	const tsp = {
+		"stepNo": sno,
+		"objectName": ob || ' ',
+		"custname": cn,
+		"keywordVal": keyVal,
+		"inputVal": inp || [''],
+		"outputVal": out || '',
+		"remarks": "",
+		"url": url || ' ',
+		"appType": app,
+		"addDetails": "",
+		"cord": ''
+	}
+	if (app == "SAP") delete tsp["url"];
+	return tsp;
+};
+
 var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 	var testCaseSteps = [],testcaseObj,step = 1;
 	var firstScript = false,windowId;
@@ -1249,61 +1267,19 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 		adjacentItems.sources.forEach(function(item,idx){
 			if(item["@label"]=="Start" && screendata[0].apptype=="WEB"){
 				firstScript = true;
-				testCaseSteps = [{
-					"stepNo": 1,
-					"objectName": " ",
-					"custname": "@Browser",
-					"keywordVal": "openBrowser",
-					"inputVal": [""],
-					"outputVal": "",
-					"remarks": "",
-					"url": " ",
-					"appType": "Web",
-					"addDetails": "",
-					"cord": ""
-				}],step = 2;			
+				testCaseSteps = [getTestcaseStep(1,null,'@Browser','openBrowser',null,null,null,"Web")],step = 2;
 			}
 			else if(item["@label"]=="Start" && screendata[0].apptype=="SAP"){
 				firstScript = true;
-				testCaseSteps = [{
-					"stepNo": 1,
-					"objectName": " ",
-					"custname": "@Sap",
-					"keywordVal": "LaunchApplication",
-					"inputVal": [""],
-					"outputVal": "",
-					"remarks": "",
-					"appType": "SAP",
-					"addDetails": "",
-					"cord": ""
-				}],step = 2;
-				testcaseObj = {
-					"stepNo": step,
-					"objectName": " ",
-					"custname": "@Sap",
-					"keywordVal": "ServerConnect",
-					"inputVal": [""],
-					"outputVal": "",
-					"remarks": "",
-					"appType": "SAP",
-					"addDetails": "",
-					"cord": ""
-				},step = 3;
-				testCaseSteps.push(testcaseObj);
-				if(screendata[0].tag=="GuiOkCodeField"){
-					testcaseObj = {
-						"stepNo": step,
-						"objectName": " ",
-						"custname": "@Sap",
-						"keywordVal": "StartTransaction",
-						"inputVal": [screendata[0].text],
-						"outputVal": "",
-						"remarks": "",
-						"appType": "SAP",
-						"addDetails": "",
-						"cord": ""
-					},step = 4;	
-				testCaseSteps.push(testcaseObj);
+				testCaseSteps = [
+					getTestcaseStep(1,null,'@Sap','LaunchApplication',null,null,null,"SAP"),
+					getTestcaseStep(2,null,'@Sap','ServerConnect',null,null,null,"SAP")
+				];
+				step = 3;
+				if(screendata[0].tag=="GuiOkCodeField") {
+					testcaseObj = getTestcaseStep(step,null,'@Sap','StartTransaction',[screendata[0].text],null,null,"SAP");
+					step = 4;	
+					testCaseSteps.push(testcaseObj);
 				}
 			}
 		});	
@@ -1315,21 +1291,9 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 			if(eachScrapedAction.action){
 				if(eachScrapedAction.action.windowId){
 					if(windowId && windowId!=eachScrapedAction.action.windowId) {
-						testcaseObj = {
-							"stepNo": step,
-							"objectName": " ",
-							"custname": "@Browser",
-							"keywordVal": "switchToWindow",
-							"inputVal": [""],
-							"outputVal": "",
-							"remarks": "",
-							"url": eachScrapedAction.url,
-							"appType": "Web",
-							"addDetails": "",
-							"cord": ""
-						} 
+						testcaseObj = getTestcaseStep(step,null,'@Browser','switchToWindow',null,null,eachScrapedAction.url,"Web");
 						testCaseSteps.push(testcaseObj);
-						step++;                    
+						step++;
 					}
 					else{
 						windowId=eachScrapedAction.action.windowId;
@@ -1337,86 +1301,29 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 				}            
 				switch(eachScrapedAction.action.actionName){
 					case "navigate":
-						testcaseObj = {
-								"stepNo": step,
-								"objectName": " ",
-								"custname": "@Browser",
-								"keywordVal": "navigateToURL",
-								"inputVal": [eachScrapedAction.action.actionData],
-								"outputVal": "",
-								"remarks": "",
-								"url": " ",
-								"appType": "Web",
-								"addDetails": "",
-								"cord": ""
-						}
+						testcaseObj = getTestcaseStep(step,null,'@Browser','navigateToURL',[eachScrapedAction.action.actionData],null,null,"Web");
 						break;
 					case "click":
-						testcaseObj = {
-							"stepNo": step,
-							"objectName": eachScrapedAction.xpath,
-							"custname": eachScrapedAction.custname,
-							"keywordVal": "click",
-							"inputVal": [""],
-							"outputVal": "",
-							"remarks": "",
-							"url": eachScrapedAction.url,
-							"appType": "Web",
-							"addDetails": "",
-							"cord": ""
-						}		
-						if(eachScrapedAction.custname.split('_')[eachScrapedAction.custname.split('_').length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
-						break;	
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'click',null,null,eachScrapedAction.url,"Web");
+						var custname_split = eachScrapedAction.custname.split('_');
+						if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+						break;
 					case "inputChange":
 						if(eachScrapedAction.action.actionData.split(";").length == 2 && eachScrapedAction.action.actionData.split(";")[1] =='byIndex'){
-							testcaseObj = {
-								"stepNo": step,
-								"objectName": eachScrapedAction.xpath,
-								"custname": eachScrapedAction.custname,
-								"keywordVal": "selectValueByIndex",
-								"inputVal": [eachScrapedAction.action.actionData.split(";")[0]],
-								"outputVal": "",
-								"remarks": "",
-								"url": eachScrapedAction.url,
-								"appType": "Web",
-								"addDetails": "",
-								"cord": ""
-							}                      
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,
+								'selectValueByIndex',[eachScrapedAction.action.actionData.split(";")[0]],null,eachScrapedAction.url,"Web");                     
 						}
 						else if(eachScrapedAction.action.actionData.split(";").length == 2 && eachScrapedAction.action.actionData.split(";")[1] =='byIndexes'){
 							var selectIdxList = eachScrapedAction.value.split(";")[0].replace(/,/g,';');
-							testcaseObj = {
-								"stepNo": step,
-								"objectName": eachScrapedAction.xpath,
-								"custname": eachScrapedAction.custname,
-								"keywordVal": "selectValueByIndex",
-								"inputVal": [selectIdxList],
-								"outputVal": "",
-								"remarks": "",
-								"url": eachScrapedAction.url,
-								"appType": "Web",
-								"addDetails": "",
-								"cord": ""
-							}    
-							if(selectIdxList.length > 1){
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,
+								'selectValueByIndex',[selectIdxList],null,eachScrapedAction.url,"Web");
+							if(selectIdxList.length > 1) {
 								testcaseObj.keywordVal = "selectMultipleValuesByIndexes";
 							}
 						}
-						else{
-							testcaseObj = {
-								"stepNo": step,
-								"objectName": eachScrapedAction.xpath,
-								"custname": eachScrapedAction.custname,
-								"keywordVal": "setText",
-								"inputVal": [eachScrapedAction.action.actionData],
-								"outputVal": "",
-								"remarks": "",
-								"url": eachScrapedAction.url,
-								"appType": "Web",
-								"addDetails": "",
-								"cord": ""
-							}
-							
+						else {
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,
+								'setText',[eachScrapedAction.action.actionData],null,eachScrapedAction.url,"Web")
 						}
 						break;		
 					default:
@@ -1429,19 +1336,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 				}
 			}
 			else if(eachScrapedAction.tag == "browser_navigate"){
-				testcaseObj = {
-					"stepNo": step,
-					"objectName": " ",
-					"custname": "@Browser",
-					"keywordVal": "navigateToURL",
-					"inputVal": [eachScrapedAction.url],
-					"outputVal": "",
-					"remarks": "",
-					"url": " ",
-					"appType": "Web",
-					"addDetails": "",
-					"cord": ""
-				}			
+				testcaseObj = getTestcaseStep(step,null,"@Browser",'navigateToURL',[eachScrapedAction.url],null,null,"Web");
 				testCaseSteps.push(testcaseObj);
 				step++;
 			}
@@ -1452,96 +1347,32 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 			input = text.split("  ");
 			switch(eachScrapedAction.tag){
 				case "input":
-					testcaseObj = {
-						"stepNo": step,
-						"objectName": eachScrapedAction.xpath,
-						"custname": eachScrapedAction.custname,
-						"keywordVal": "SetText",
-						"inputVal": [input[0]],
-						"outputVal": "",
-						"remarks": "",
-						"appType": "SAP",
-						"addDetails": "",
-						"cord": ""
-					}
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
 					break;
 				case "button":
 				case "shell":
 				case "table":
-					testcaseObj = {
-						"stepNo": step,
-						"objectName": eachScrapedAction.xpath,
-						"custname": eachScrapedAction.custname,
-						"keywordVal": "Click",
-						"inputVal": [""],
-						"outputVal": "",
-						"remarks": "",
-						"appType": "SAP",
-						"addDetails": "",
-						"cord": ""
-					}		
-					if(eachScrapedAction.custname.split('_')[eachScrapedAction.custname.split('_').length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
+					var custname_split = eachScrapedAction.custname.split('_');
+					if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
 					break;
 				case "GuiTab":
-					testcaseObj = {
-						"stepNo": step,
-						"objectName": eachScrapedAction.xpath,
-						"custname": eachScrapedAction.custname,
-						"keywordVal": "SelectTab",
-						"inputVal": [""],
-						"outputVal": "",
-						"remarks": "",
-						"appType": "SAP",
-						"addDetails": "",
-						"cord": ""
-					}                      
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTab',null,null,null,"SAP");
 					break;
 				case "select":
-					testcaseObj = {
-						"stepNo": step,
-						"objectName": eachScrapedAction.xpath,
-						"custname": eachScrapedAction.custname,
-						"keywordVal": "selectValueByText",
-						"inputVal": [input[0]],
-						"outputVal": "",
-						"remarks": "",
-						"appType": "SAP",
-						"addDetails": "",
-						"cord": ""
-					}                      
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,
+						'selectValueByText',[input[0]],null,null,"SAP");
 					break;
 				case "radiobutton":
-					testcaseObj = {
-						"stepNo": step,
-						"objectName": eachScrapedAction.xpath,
-						"custname": eachScrapedAction.custname,
-						"keywordVal": "SelectRadioButton",
-						"inputVal": [""],
-						"outputVal": "",
-						"remarks": "",
-						"appType": "SAP",
-						"addDetails": "",
-						"cord": ""
-					}                      
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRadioButton',null,null,null,"SAP");
 					break;
 				case "checkbox":
-					testcaseObj = {
-						"stepNo": step,
-						"objectName": eachScrapedAction.xpath,
-						"custname": eachScrapedAction.custname,
-						"keywordVal": "SelectCheckbox",
-						"inputVal": [""],
-						"outputVal": "",
-						"remarks": "",
-						"appType": "SAP",
-						"addDetails": "",
-						"cord": ""
-					}                      
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectCheckbox',null,null,null,"SAP");
 					break;
 				default:
-					console.log("no match found!");
+					logger.info("Import PD: No match found for "+eachScrapedAction.tag+" for SAP apptype.");
 					break;
-			}		
+			}
 			if(testcaseObj){
 				testCaseSteps.push(testcaseObj);
 				step++;
@@ -1565,88 +1396,30 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 			// otherwise just jump to
 			if(adjacentItems.targets.length>1){	// I am if block
 				adjacentItems.targets.forEach(function(eachBox,eachBoxIdx){
-					  testcaseObj = {
-						"stepNo": step,
-						"objectName": " ",
-						"custname": "@Generic",
-						"keywordVal": "elseIf",
-						"inputVal": [""],
-						"outputVal": "",
-						"remarks": "",
-						"url": " ",
-						"appType": "Generic",
-						"addDetails": "",
-						"cord": ""
-					}		
+					  testcaseObj = getTestcaseStep(step,null,"@Generic",'elseIf',null,null,null,"Generic");
 					if(eachBoxIdx==0) testcaseObj["keywordVal"] = "if"; 		
 					testCaseSteps.push(testcaseObj);
 					step++;					
 					if(eachBox["@label"]=="End"){// in case of end
-						testcaseObj = {
-							"stepNo": step,
-							"objectName": " ",
-							"custname": "@Generic",
-							"keywordVal": "stop",
-							"inputVal": [""],
-							"outputVal": "",
-							"remarks": "",
-							"url": " ",
-							"appType": "Generic",
-							"addDetails": "",
-							"cord": ""
-						}
+						testcaseObj = getTestcaseStep(step,null,"@Generic",'stop',null,null,null,"Generic");
 						testCaseSteps.push(testcaseObj);
 						step++;
 					}
 					if(eachBox['mxCell']['@style'] == 'rhombus'){// in case of if
-						testcaseObj = {
-							"stepNo": step,
-							"objectName": " ",
-							"custname": "@Generic",
-							"keywordVal": "jumpTo",
-							"inputVal": ['Testcase_PD_'+eachBox["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],
-							"outputVal": "",
-							"remarks": "",
-							"url": " ",
-							"appType": "Generic",
-							"addDetails": "",
-							"cord": ""
-						}
+						testcaseObj = getTestcaseStep(step,null,"@Generic",'jumpTo',
+							['Testcase_PD_'+eachBox["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],null,null,"Generic");
 						testCaseSteps.push(testcaseObj);
 						step++;
 					}	
 					else if(eachBox['mxCell']['@style'] == 'task'){	// in case of task
-						testcaseObj = {
-							"stepNo": step,
-							"objectName": " ",
-							"custname": "@Generic",
-							"keywordVal": "jumpTo",
-							"inputVal": ['Testcase_PD_'+eachBox["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],
-							"outputVal": "",
-							"remarks": "",
-							"url": " ",
-							"appType": "Generic",
-							"addDetails": "",
-							"cord": ""
-						}
+						testcaseObj = getTestcaseStep(step,null,"@Generic",'jumpTo',
+							['Testcase_PD_'+eachBox["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],null,null,"Generic");
 						testCaseSteps.push(testcaseObj);
 						step++;								
 					}
 				});
 				// end of if step
-				testcaseObj = {
-					"stepNo": step,
-					"objectName": " ",
-					"custname": "@Generic",
-					"keywordVal": "endIf",
-					"inputVal": [""],
-					"outputVal": "",
-					"remarks": "",
-					"url": " ",
-					"appType": "Generic",
-					"addDetails": "",
-					"cord": ""
-				}
+				testcaseObj = getTestcaseStep(step,null,"@Generic",'endIf',null,null,null,"Generic");
 				testCaseSteps.push(testcaseObj);
 				step++;							
 			}
@@ -1655,36 +1428,13 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 			else if(adjacentItems.targets[0]){	// assuming only 1 target // I am activity
 				// in case activity target is end -> add end keyword
 				if(adjacentItems.targets[0]["@label"]=="End"){	// assuming only 1 target // if end
-					testcaseObj = {
-						"stepNo": step,
-						"objectName": " ",
-						"custname": "@Generic",
-						"keywordVal": "stop",
-						"inputVal": [""],
-						"outputVal": "",
-						"remarks": "",
-						"url": " ",
-						"appType": "Generic",
-						"addDetails": "",
-						"cord": ""
-					}
+					testcaseObj = getTestcaseStep(step,null,"@Generic",'stop',null,null,null,"Generic");
 					testCaseSteps.push(testcaseObj);
 					step++;			
 				}	
 				else{ // otherwise task or activity
-					testcaseObj = {
-						"stepNo": step,
-						"objectName": " ",
-						"custname": "@Generic",
-						"keywordVal": "jumpTo",
-						"inputVal": ['Testcase_PD_'+adjacentItems.targets[0]["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],
-						"outputVal": "",
-						"remarks": "",
-						"url": " ",
-						"appType": "Generic",
-						"addDetails": "",
-						"cord": ""
-					}
+					testcaseObj = getTestcaseStep(step,null,"@Generic",'jumpTo',
+						['Testcase_PD_'+adjacentItems.targets[0]["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],null,null,"Generic");
 					testCaseSteps.push(testcaseObj);
 					step++;													
 				}
