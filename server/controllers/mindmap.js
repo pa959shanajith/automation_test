@@ -1091,11 +1091,13 @@ exports.pdProcess = function (req, res) {
 			screenshotdatapertask.forEach(function(a,i){
 				
 				if(a['xpath']){
-					a['url']= encrypt(a['url'])
-					xpath_string=a['xpath'].split(';');
-					left_part=encrypt(xpath_string.slice(0,2).join(';'));	// 0,1
-					right_part=encrypt(xpath_string.slice(3,).join(';'));	// 3,4...
-					a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part;	
+					if(a['apptype']=="WEB"){
+						a['url']= encrypt(a['url'])
+						xpath_string=a['xpath'].split(';');
+						left_part=encrypt(xpath_string.slice(0,2).join(';'));	// 0,1
+						right_part=encrypt(xpath_string.slice(3,).join(';'));	// 3,4...
+						a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part;	
+					}
 					screendatamindmap.push(a);
 				}
 			});
@@ -1117,16 +1119,15 @@ exports.pdProcess = function (req, res) {
 			// scrapedObjects = newParse;		
 			scrapedObjects = JSON.parse(newParse);	
 			screendataobj[tempName].data = scrapedObjects;
-			
+
 			var testCaseOut = generateTestCaseMap(screenshotdatapertask,eachActivityIdx,adjacentItems,sessionID);
 			if(testCaseOut.start) orderlist.unshift({'label':tempName,'type':'task'}) // in case of first script
 			else orderlist.push({'label':tempName,'type':'task'});
 			var requestedtestcasesteps = JSON.stringify(testCaseOut.data);
 			requestedtestcasesteps = requestedtestcasesteps.replace(/'+/g, "''");
 			screendataobj[tempName].script = JSON.parse(requestedtestcasesteps);
-	
 		});
-	
+
 		activityJSON["mxGraphModel"]["root"]["Shape"].forEach(function(eachShape,eachActivityIdx){
 			if(eachShape.mxCell['@style']!='rhombus') return;
 			var tempName = eachShape["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'');		// name id combo
@@ -1137,10 +1138,8 @@ exports.pdProcess = function (req, res) {
 			if(testCaseOut.start) orderlist.unshift({'label':tempName,'type':'rhombus'}) // in case of first script
 			else orderlist.push({'label':tempName,'type':'rhombus'});
 			screendataobj[tempName].script = testCaseOut.data;
-	
 		});
-	
-	
+
 		// data insertion logic
 		asynclib.forEachSeries(orderlist, function (nodeObj, savedcallback) {
 			var name = nodeObj.label;
@@ -1166,15 +1165,14 @@ exports.pdProcess = function (req, res) {
 				'scrapedata': screendataobj[name].data
 			};
 			ordernameidlist.push({'name':'Screen_PD_'+name,'type':3})
-	
-			
+
 			var args = {
 				data: inputs,
 				headers: {
 					"Content-Type": "application/json"
 				}
 			};
-			
+
 			client.post(epurl + "create_ice/updateScreenname_ICE", args,
 				function (getScrapeDataQueryresult, response) {
 					try {
@@ -1240,197 +1238,147 @@ exports.pdProcess = function (req, res) {
 		console.log(err)
 	}
 };
-                                                                                                                 
+
+var getTestcaseStep = function(sno, ob, cn, keyVal, inp, out, url, app) {
+	const tsp = {
+		"stepNo": sno,
+		"objectName": ob || ' ',
+		"custname": cn,
+		"keywordVal": keyVal,
+		"inputVal": inp || [''],
+		"outputVal": out || '',
+		"remarks": "",
+		"url": url || ' ',
+		"appType": app,
+		"addDetails": "",
+		"cord": ''
+	}
+	if (app == "SAP") delete tsp["url"];
+	return tsp;
+};
+
 var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 	var testCaseSteps = [],testcaseObj,step = 1;
 	var firstScript = false,windowId;
 	if(adjacentItems){
-	// in case is first script
+		// in case is first script
 		// make orderlist global
 		// move the script to first
-
 		adjacentItems.sources.forEach(function(item,idx){
-			if(item["@label"]=="Start"){
+			if(item["@label"]=="Start" && screendata[0].apptype=="WEB"){
 				firstScript = true;
-				testCaseSteps = [{
-					"stepNo": 1,
-					"objectName": " ",
-					"custname": "@Browser",
-					"keywordVal": "openBrowser",
-					"inputVal": [""],
-					"outputVal": "",
-					"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-					"remarks": "",
-					"url": " ",
-					"appType": "Web",
-					"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-					"addTestCaseDetailsInfo": "",
-					"cord": "",
-					"_id_": "1"
-				}],step = 2;			
+				testCaseSteps = [getTestcaseStep(1,null,'@Browser','openBrowser',null,null,null,"Web")],step = 2;
+			}
+			else if(item["@label"]=="Start" && screendata[0].apptype=="SAP"){
+				firstScript = true;
+				testCaseSteps = [
+					getTestcaseStep(1,null,'@Sap','LaunchApplication',null,null,null,"SAP"),
+					getTestcaseStep(2,null,'@Sap','ServerConnect',null,null,null,"SAP")
+				];
+				step = 3;
+				if(screendata[0].tag=="GuiOkCodeField") {
+					testcaseObj = getTestcaseStep(step,null,'@Sap','StartTransaction',[screendata[0].text],null,null,"SAP");
+					step = 4;	
+					testCaseSteps.push(testcaseObj);
+				}
 			}
 		});	
 	}
 
 	screendata.forEach(function(eachScrapedAction,i){
 		testcaseObj = '';
-		if(eachScrapedAction.action){
-            if(eachScrapedAction.action.windowId){
-                if(windowId && windowId!=eachScrapedAction.action.windowId) {
-                    testcaseObj = {
-                        "stepNo": step,
-                        "objectName": " ",
-                        "custname": "@Browser",
-                        "keywordVal": "switchToWindow",
-                        "inputVal": [""],
-                        "outputVal": "",
-                        "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-                        "remarks": "",
-                        "url": eachScrapedAction.url,
-                        "appType": "Web",
-                        "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-                        "addTestCaseDetailsInfo": "",
-                        "cord": "",
-                        "_id_": String(step)
-                    } 
-                    testCaseSteps.push(testcaseObj);
-                    step++;                    
-                }
-                else{
-                    windowId=eachScrapedAction.action.windowId;
-                }
-            }            
-			switch(eachScrapedAction.action.actionName){
-				case "navigate":
-					testcaseObj = {
-							"stepNo": step,
-							"objectName": " ",
-							"custname": "@Browser",
-							"keywordVal": "navigateToURL",
-							"inputVal": [eachScrapedAction.action.actionData],
-							"outputVal": "",
-							"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-							"remarks": "",
-							"url": " ",
-							"appType": "Web",
-							"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-							"addTestCaseDetailsInfo": "",
-							"cord": "",
-							"_id_": String(step)
+		if(eachScrapedAction.apptype=="WEB"){
+			if(eachScrapedAction.action){
+				if(eachScrapedAction.action.windowId){
+					if(windowId && windowId!=eachScrapedAction.action.windowId) {
+						testcaseObj = getTestcaseStep(step,null,'@Browser','switchToWindow',null,null,eachScrapedAction.url,"Web");
+						testCaseSteps.push(testcaseObj);
+						step++;
 					}
-					break;
-				case "click":
-					testcaseObj = {
-						"stepNo": step,
-						"objectName": eachScrapedAction.xpath,
-						"custname": eachScrapedAction.custname,
-						"keywordVal": "click",
-						"inputVal": [""],
-						"outputVal": "",
-						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-						"remarks": "",
-						"url": eachScrapedAction.url,
-						"appType": "Web",
-						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_3\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-						"addTestCaseDetailsInfo": "",
-						"cord": "",
-						"_id_": String(step)
-					}		
-					if(eachScrapedAction.custname.split('_')[eachScrapedAction.custname.split('_').length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
-					break;	
-				case "inputChange":
-                    if(eachScrapedAction.action.actionData.split(";").length == 2 && eachScrapedAction.action.actionData.split(";")[1] =='byIndex'){
-                        testcaseObj = {
-                            "stepNo": step,
-                            "objectName": eachScrapedAction.xpath,
-                            "custname": eachScrapedAction.custname,
-                            "keywordVal": "selectValueByIndex",
-                            "inputVal": [eachScrapedAction.action.actionData.split(";")[0]],
-                            "outputVal": "",
-                            "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-                            "remarks": "",
-                            "url": eachScrapedAction.url,
-                            "appType": "Web",
-                            "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-                            "addTestCaseDetailsInfo": "",
-                            "cord": "",
-                            "_id_": String(step)
-                        }                      
+					else{
+						windowId=eachScrapedAction.action.windowId;
 					}
-					else if(eachScrapedAction.action.actionData.split(";").length == 2 && eachScrapedAction.action.actionData.split(";")[1] =='byIndexes'){
-						var selectIdxList = eachScrapedAction.value.split(";")[0].replace(/,/g,';');
-						testcaseObj = {
-							"stepNo": step,
-							"objectName": eachScrapedAction.xpath,
-							"custname": eachScrapedAction.custname,
-							"keywordVal": "selectValueByIndex",
-							"inputVal": [selectIdxList],
-							"outputVal": "",
-							"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-							"remarks": "",
-							"url": eachScrapedAction.url,
-							"appType": "Web",
-							"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-							"addTestCaseDetailsInfo": "",
-							"cord": "",
-							"_id_": String(step)
-						}    
-						if(selectIdxList.length > 1){
-							testcaseObj.keywordVal = "selectMultipleValuesByIndexes";
+				}            
+				switch(eachScrapedAction.action.actionName){
+					case "navigate":
+						testcaseObj = getTestcaseStep(step,null,'@Browser','navigateToURL',[eachScrapedAction.action.actionData],null,null,"Web");
+						break;
+					case "click":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'click',null,null,eachScrapedAction.url,"Web");
+						var custname_split = eachScrapedAction.custname.split('_');
+						if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+						break;
+					case "inputChange":
+						if(eachScrapedAction.action.actionData.split(";").length == 2 && eachScrapedAction.action.actionData.split(";")[1] =='byIndex'){
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,
+								'selectValueByIndex',[eachScrapedAction.action.actionData.split(";")[0]],null,eachScrapedAction.url,"Web");                     
 						}
-					}
-                    else{
-                        testcaseObj = {
-                            "stepNo": step,
-                            "objectName": eachScrapedAction.xpath,
-                            "custname": eachScrapedAction.custname,
-                            "keywordVal": "setText",
-                            "inputVal": [eachScrapedAction.action.actionData],
-                            "outputVal": "",
-                            "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-                            "remarks": "",
-                            "url": eachScrapedAction.url,
-                            "appType": "Web",
-                            "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-                            "addTestCaseDetailsInfo": "",
-                            "cord": "",
-                            "_id_": String(step)
-                        }
-                        
-                    }
-					break;		
+						else if(eachScrapedAction.action.actionData.split(";").length == 2 && eachScrapedAction.action.actionData.split(";")[1] =='byIndexes'){
+							var selectIdxList = eachScrapedAction.value.split(";")[0].replace(/,/g,';');
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,
+								'selectValueByIndex',[selectIdxList],null,eachScrapedAction.url,"Web");
+							if(selectIdxList.length > 1) {
+								testcaseObj.keywordVal = "selectMultipleValuesByIndexes";
+							}
+						}
+						else {
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,
+								'setText',[eachScrapedAction.action.actionData],null,eachScrapedAction.url,"Web")
+						}
+						break;		
+					default:
+						console.log("no match found!");
+						break;
+				}
+				if(testcaseObj){
+					testCaseSteps.push(testcaseObj);
+					step++;
+				}
+			}
+			else if(eachScrapedAction.tag == "browser_navigate"){
+				testcaseObj = getTestcaseStep(step,null,"@Browser",'navigateToURL',[eachScrapedAction.url],null,null,"Web");
+				testCaseSteps.push(testcaseObj);
+				step++;
+			}
+		}
+		//mapping for SAP objects 
+		else if(eachScrapedAction.apptype=="SAP"){
+			text = eachScrapedAction.text;
+			input = text.split("  ");
+			switch(eachScrapedAction.tag){
+				case "input":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
+					break;
+				case "button":
+				case "shell":
+				case "table":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
+					var custname_split = eachScrapedAction.custname.split('_');
+					if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+					break;
+				case "GuiTab":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTab',null,null,null,"SAP");
+					break;
+				case "select":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,
+						'selectValueByText',[input[0]],null,null,"SAP");
+					break;
+				case "radiobutton":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRadioButton',null,null,null,"SAP");
+					break;
+				case "checkbox":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectCheckbox',null,null,null,"SAP");
+					break;
 				default:
-					console.log("no match found!");
+					logger.info("Import PD: No match found for "+eachScrapedAction.tag+" for SAP apptype.");
 					break;
 			}
 			if(testcaseObj){
 				testCaseSteps.push(testcaseObj);
 				step++;
 			}
-
-		}
-		else if(eachScrapedAction.tag == "browser_navigate"){
-			testcaseObj = {
-				"stepNo": step,
-				"objectName": " ",
-				"custname": "@Browser",
-				"keywordVal": "navigateToURL",
-				"inputVal": [eachScrapedAction.url],
-				"outputVal": "",
-				"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-				"remarks": "",
-				"url": " ",
-				"appType": "Web",
-				"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-				"addTestCaseDetailsInfo": "",
-				"cord": "",
-				"_id_": String(step)
-			}			
-			testCaseSteps.push(testcaseObj);
-			step++;
 		}
 	});
-	// console.log(screendata)
 
 	if(adjacentItems){
 		// list of sources(only shapes) and targets (assuming only one)
@@ -1438,7 +1386,6 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 			console.log(adjacentItems["error"]);
 		}
 		else{
-
 			// old logic
 			// in case target is if
 			// 	get next items
@@ -1449,164 +1396,50 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 			// otherwise just jump to
 			if(adjacentItems.targets.length>1){	// I am if block
 				adjacentItems.targets.forEach(function(eachBox,eachBoxIdx){
-					  testcaseObj = {
-						"stepNo": step,
-						"objectName": " ",
-						"custname": "@Generic",
-						"keywordVal": "elseIf",
-						"inputVal": [""],
-						"outputVal": "",
-						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-						"remarks": "",
-						"url": " ",
-						"appType": "Generic",
-						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-						"addTestCaseDetailsInfo": "",
-						"cord": "",
-						"_id_": String(step)
-					}		
+					  testcaseObj = getTestcaseStep(step,null,"@Generic",'elseIf',null,null,null,"Generic");
 					if(eachBoxIdx==0) testcaseObj["keywordVal"] = "if"; 		
 					testCaseSteps.push(testcaseObj);
 					step++;					
 					if(eachBox["@label"]=="End"){// in case of end
-						testcaseObj = {
-							"stepNo": step,
-							"objectName": " ",
-							"custname": "@Generic",
-							"keywordVal": "stop",
-							"inputVal": [""],
-							"outputVal": "",
-							"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-							"remarks": "",
-							"url": " ",
-							"appType": "Generic",
-							"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-							"addTestCaseDetailsInfo": "",
-							"cord": "",
-							"_id_": String(step)
-						}				
+						testcaseObj = getTestcaseStep(step,null,"@Generic",'stop',null,null,null,"Generic");
 						testCaseSteps.push(testcaseObj);
 						step++;
 					}
 					if(eachBox['mxCell']['@style'] == 'rhombus'){// in case of if
-						testcaseObj = {
-							"stepNo": step,
-							"objectName": " ",
-							"custname": "@Generic",
-							"keywordVal": "jumpTo",
-							"inputVal": ['Testcase_PD_'+eachBox["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],
-							"outputVal": "",
-							"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-							"remarks": "",
-							"url": " ",
-							"appType": "Generic",
-							"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-							"addTestCaseDetailsInfo": "",
-							"cord": "",
-							"_id_": String(step)
-						}				
+						testcaseObj = getTestcaseStep(step,null,"@Generic",'jumpTo',
+							['Testcase_PD_'+eachBox["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],null,null,"Generic");
 						testCaseSteps.push(testcaseObj);
 						step++;
-					}					
+					}	
 					else if(eachBox['mxCell']['@style'] == 'task'){	// in case of task
-						testcaseObj = {
-							"stepNo": step,
-							"objectName": " ",
-							"custname": "@Generic",
-							"keywordVal": "jumpTo",
-							"inputVal": ['Testcase_PD_'+eachBox["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],
-							"outputVal": "",
-							"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-							"remarks": "",
-							"url": " ",
-							"appType": "Generic",
-							"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-							"addTestCaseDetailsInfo": "",
-							"cord": "",
-							"_id_": String(step)
-						}				
+						testcaseObj = getTestcaseStep(step,null,"@Generic",'jumpTo',
+							['Testcase_PD_'+eachBox["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],null,null,"Generic");
 						testCaseSteps.push(testcaseObj);
 						step++;								
 					}
-
-	
 				});
 				// end of if step
-				testcaseObj = {
-					"stepNo": step,
-					"objectName": " ",
-					"custname": "@Generic",
-					"keywordVal": "endIf",
-					"inputVal": [""],
-					"outputVal": "",
-					"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-					"remarks": "",
-					"url": " ",
-					"appType": "Generic",
-					"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-					"addTestCaseDetailsInfo": "",
-					"cord": "",
-					"_id_": String(step)
-				}				
+				testcaseObj = getTestcaseStep(step,null,"@Generic",'endIf',null,null,null,"Generic");
 				testCaseSteps.push(testcaseObj);
 				step++;							
 			}
 
-
-
-			// in case target is activity
-				// add jumpto activity
-			
+			// in case target is activity -> add jumpto activity
 			else if(adjacentItems.targets[0]){	// assuming only 1 target // I am activity
-	
-				// in case activity target is end			
-				// add end keyword
+				// in case activity target is end -> add end keyword
 				if(adjacentItems.targets[0]["@label"]=="End"){	// assuming only 1 target // if end
-					testcaseObj = {
-						"stepNo": step,
-						"objectName": " ",
-						"custname": "@Generic",
-						"keywordVal": "stop",
-						"inputVal": [""],
-						"outputVal": "",
-						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-						"remarks": "",
-						"url": " ",
-						"appType": "Generic",
-						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-						"addTestCaseDetailsInfo": "",
-						"cord": "",
-						"_id_": String(step)
-					}				
+					testcaseObj = getTestcaseStep(step,null,"@Generic",'stop',null,null,null,"Generic");
 					testCaseSteps.push(testcaseObj);
 					step++;			
 				}	
 				else{ // otherwise task or activity
-					testcaseObj = {
-						"stepNo": step,
-						"objectName": " ",
-						"custname": "@Generic",
-						"keywordVal": "jumpTo",
-						"inputVal": ['Testcase_PD_'+adjacentItems.targets[0]["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],
-						"outputVal": "",
-						"remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
-						"remarks": "",
-						"url": " ",
-						"appType": "Generic",
-						"addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
-						"addTestCaseDetailsInfo": "",
-						"cord": "",
-						"_id_": String(step)
-					}				
+					testcaseObj = getTestcaseStep(step,null,"@Generic",'jumpTo',
+						['Testcase_PD_'+adjacentItems.targets[0]["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],null,null,"Generic");
 					testCaseSteps.push(testcaseObj);
 					step++;													
 				}
-			}	
-
-	
-
+			}
 		}
-
 	}
 	return {"data":testCaseSteps,"start":firstScript};
 }

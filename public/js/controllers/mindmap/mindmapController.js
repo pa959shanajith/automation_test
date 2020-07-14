@@ -5018,11 +5018,16 @@ Purpose : displaying pop up for replication of project
 		var res = $scope.apptype;
 		var file1 = JSON.parse(file);
 		var doc = new DOMParser().parseFromString(file1.data,'text/xml');
-		var activityJSON = JSON.parse(xml2json(doc).replace("\nundefined",""));
-		var cdata = JSON.parse(activityJSON["mxGraphModel"]["root"]["Task"][0]["#cdata"]);
-		var res1 = cdata[0]['apptype'];
+        var activityJSON = JSON.parse(xml2json(doc).replace("\nundefined",""));
+        if(activityJSON["mxGraphModel"]["root"]["Task"].length>1){
+            var cdata = JSON.parse(activityJSON["mxGraphModel"]["root"]["Task"][0]["#cdata"]);  
+        }
+		else{
+            var cdata = JSON.parse(activityJSON["mxGraphModel"]["root"]["Task"]["#cdata"]);
+        }
+        var res1 = cdata[0]['apptype'];
         if(res1.toLowerCase()!=res.toLowerCase()){
-            openDialogMindmap("App Type Error", "Project application type and Imported PD's application type doesn't match, please check!!")
+            openDialogMindmap("App Type Error", "AppType doesn't match, please check!!")
             return;
         }
         $scope.pdmode = true;
