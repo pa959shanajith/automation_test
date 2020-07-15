@@ -1933,10 +1933,8 @@ input[disabled]{
 }
 
 .thumbnail-custom-wiki {                           
-    position: relative;
-    bottom: -363px;
-    margin: 0;
-    width: 100%;
+    position: absolute;
+    bottom: 0;
     left: 0;
 }
 
