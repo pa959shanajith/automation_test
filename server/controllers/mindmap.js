@@ -225,14 +225,7 @@ exports.saveData = function (req, res) {
 		//var relId = inputs.relId;
 		var cycId = inputs.cycId;
 		var idxDict = [];
-		if(inputs.createdthrough!="")
-		{
-			var createdthrough=inputs.createdthrough;
-		}
-		else
-		{
-			var createdthrough="Web";
-		}
+		var createdthrough = inputs.createdthrough || "Web";
 		//Assigned Tasks Notification
 		var assignedObj = {};
 		for (var k = 0; k < data.length; k++) {
@@ -1050,7 +1043,9 @@ var getAdjacentItems = function(activityJSON,taskidx,type){
 }
 
 exports.pdProcess = function (req, res) {
-	try{
+	try {
+		const userid = req.session.userid;
+		const role = req.session.activeRoleId;
 		// orderlist contains {label:'',type:''}
 		var file = JSON.parse(req.body.data.file);
 		var sessionID = uuidV4();
@@ -1073,7 +1068,6 @@ exports.pdProcess = function (req, res) {
 		if(!activityJSON["mxGraphModel"]["root"]["Task"].length){
 			activityJSON["mxGraphModel"]["root"]["Task"] = [activityJSON["mxGraphModel"]["root"]["Task"]];
 		}
-		
 
 		// new logic
 		//	 for each "task" create screen, testcase
@@ -1089,7 +1083,6 @@ exports.pdProcess = function (req, res) {
 			}
 			// Encrypt for storage
 			screenshotdatapertask.forEach(function(a,i){
-				
 				if(a['xpath']){
 					if(a['apptype']=="WEB"){
 						a['url']= encrypt(a['url'])
@@ -1153,12 +1146,10 @@ exports.pdProcess = function (req, res) {
 				'projectid': req.body.data.projectid,
 				'screenname': 'Screen_PD_'+name,
 				'versionnumber': 0,
-				'createdby': 'PD',
-				'createdon':new Date().getTime().toString(),
-				'createdbyrole':'ad',
-				'modifiedby':'asd',
-				'modifiedbyrole':'ad',
-				'modifiedon':'ew',
+				'createdby': userid,
+				'createdbyrole': role,
+				'modifiedby': userid,
+				'modifiedbyrole': role,
 				'deleted': false,
 				'screenshot':screenshotdata,
 				'scrapedurl':'',
@@ -1191,12 +1182,11 @@ exports.pdProcess = function (req, res) {
 								'screenid': screenid,
 								'testcasename': 'Testcase_PD_'+name,
 								'versionnumber': 0,
-								'createdby': 'pd',
-								'createdthrough': 'pd',
-								'createdon':new Date().getTime().toString(),
-								'modifiedby':'asd',
-								'modifiedbyrole':'ad',
-								'modifiedon':'ew',
+								'createdthrough': 'PD',
+								'createdby': userid,
+								'createdbyrole': role,
+								'modifiedby': userid,
+								'modifiedbyrole': role,
 								'deleted': false,
 								'parent':0,
 								'dataobjects':dobjects,
@@ -1229,13 +1219,13 @@ exports.pdProcess = function (req, res) {
 					}
 				}
 			);
-		},function(){
+		}, function(){
 			//final callback
 			res.send({"success":true,"data":orderMatrix,"history":activityJSON['mxGraphModel']['@history']});
 		});
-	}
-	catch(err){
+	} catch(err) {
 		console.log(err)
+		res.status(500).send("fail");
 	}
 };
 

@@ -1910,7 +1910,7 @@ input[disabled]{
     /*background: #321e4f;*/
     background: #311d4e;
     color: #fff;
-    overflow: auto;
+    /* overflow: auto; */
     word-wrap: break-word;
     padding: 50px 5px;
     margin-right: 1px;
@@ -1933,10 +1933,8 @@ input[disabled]{
 }
 
 .thumbnail-custom-wiki {                           
-    position: relative;
-    bottom: -363px;
-    margin: 0;
-    width: 100%;
+    position: absolute;
+    bottom: 0;
     left: 0;
 }
 

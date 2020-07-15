@@ -111,8 +111,8 @@ exports.manageUserDetails = async (req, res) => {
 			return res.send(flag);
 		}
 		const result = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
-		if (result == "fail") res.status(500).send("fail");
-		else res.send(result)
+		if (result == "fail" || result == "forbidden") res.status(500).send("fail");
+		else res.send(result);
 	} catch (exception){
 		logger.error("Error occurred in admin/manageUserDetails", exception);
 		res.status(500).send("fail");
