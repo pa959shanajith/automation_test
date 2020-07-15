@@ -374,8 +374,6 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 					else if (data == "success" || data.includes("success")) {
 						if (data.includes("Set")) openModelPopup("Schedule Test Suite", data.replace('success', ''));
 						else openModelPopup("Schedule Test Suite", "Successfully scheduled.");
-						$(".selectScheduleSuite, .selectToSched").prop("checked", false);
-						$(".selectBrowserSc").find(".sb").removeClass("sb");
 						$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style", "border: none;").val("");
 						getScheduledDetails();
 						//Transaction Activity for InitSchedule Button Action
@@ -385,7 +383,6 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 						// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 					} else if (data == "few") {
 						openModelPopup("Schedule Test Suite", "Failed to schedule few testsuites");
-						$(".selectScheduleSuite").prop("checked", false);
 						$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style", "border: none;").val("");
 					} else if (data == "fail") {
 						openModelPopup("Schedule Test Suite", "Failed to schedule Testsuite");
@@ -400,6 +397,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 					browserTypeExe = [];
 					sequence(true,false,copyId);
 					$(".selectScheduleSuite, .selectToSched").prop("checked", false);
+					$(".selectBrowserSc").find(".sb").removeClass("sb");
 					//$(".fc-timePicker").focus()
 				}, function (error) {
 					unblockUI();

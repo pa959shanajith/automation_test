@@ -603,8 +603,8 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 	const userInfo = { "userid": req.session.userid, "username": req.session.username, "role": req.session.activeRoleId };
 	const multiExecutionData = req.body.executionData;
 	var batchInfo = multiExecutionData.batchInfo;
-	var stat = "none"
-	var dateTimeUtc = ""
+	var stat = "none";
+	var dateTimeUtc = "";
 	var dateTimeList = batchInfo.map(u => {
 		const dt = u.date.split("-");
 		const tm = u.time.split(":");
@@ -796,10 +796,10 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
 	const userList = multiBatchExecutionData.map(u => u.targetUser);
 	for (const user of userList) {
 		if (!userInfoMap[user]) {
-			inputs = { "username": user };
-			const profile = await utils.fetchData(inputs, "login/loadUser_Nineteen68", fnName);
+			inputs = { "icename": user };
+			const profile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
 			if (profile == "fail" || profile == null) return "fail";
-			userInfoMap[user] = {"userid": profile._id, "username": profile.name, "role": profile.defaultrole};
+			userInfoMap[user] = {"userid": profile.userid, "username": profile.name, "role": profile.role};
 		}
 	}
 
