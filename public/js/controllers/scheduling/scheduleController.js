@@ -28,6 +28,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 	//Onload ServiceCall
 	$timeout(function () {
 		angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
+		$('.scrollbar-macosx').scrollbar();
 	}, 1000)
 
 	//update scheduled table every 60 seconds
@@ -49,7 +50,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 							+ '<span class="scheduleSuiteName" data-testsuiteid="' + eachData[i].testsuiteid + '" data-moduleid="' + eachData[i].moduleid + '" data-versionnumber="' + eachData[i].versionnumber + '">' + eachData[i].testsuitename + '</span>'
 							+ '<span id="mod' + i + '" onchange="openPopup(id)"" class="ipContainer"><select class="form-control ipformating"><option selected disabled>Select User</option></select></span>'
 							+ '<span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIcon" src="../imgs/ic-datepicker.png" /></span>'
-							+ '<span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>'
+							+ '<span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" class="cursor:not-allowed" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>'
 							+ '<table class="scenarioSchdCon scenarioSch_' + i + '"><thead class="scenarioHeaders"><tr><td>Sl No.</td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td></tr></thead>'
 							+ '<tbody class="scenarioBody scenarioTbCon_' + i + '"></tbody></table>');
 						for (j = 0; j < eachData[i].scenarioids.length; j++) {
@@ -63,7 +64,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 						if (result.connectedUsers.length == 0) openModelPopup("Schedule Test Suite", "Please enable scheduling in Local Server. And refresh the page.");
 						else {
 							$(".ipformating").empty();
-							$(".ipformating").append("<option selected disabled>Select User</option>")
+							$(".ipformating").append("<option value=' ' selected disabled>Select User</option>")
 							for (k = 0; k < result.connectedUsers.length; k++) {
 								$(".ipformating").append("<option value='" + result.connectedUsers[k] + "'>" + result.connectedUsers[k] + "</option>")
 							}
@@ -72,6 +73,36 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 
 						}
 					}
+					$(".fc-timePicker").timepicker({
+						//minTime: new Date().getHours() + ':' + (parseInt(new Date().getMinutes() + 5)),
+						minuteStep: 1,
+						showMeridian: false
+					});
+					$(".fc-timePicker").timepicker('clear');
+					$(".fc-datePicker").datepicker({
+						autoclose: "true",
+						format: "dd-mm-yyyy",
+						todayHighlight: true,
+						startDate: new Date()
+					}).on('hide.datepicker', function (e) {
+						var timepicker =  $(".fc-timePicker");
+						if ($(this).val().length > 0) {
+							const selDate = $(this).datepicker('getDate');
+							const timeNow = new Date();
+							if (selDate.toDateString() == timeNow.toDateString()) {
+								let timeset = timepicker.val();
+								if (timeset != "") timeset = new Date().setHours(timeset.split(":")[0],timeset.split(":")[1],0,0);
+								if (timeset != "" && (timeNow.getTime() - timeset) > 0) {
+									timeNow.setMinutes(timeNow.getMinutes()+6);
+									const timeToSet = timeNow.getHours() + ":" + timeNow.getMinutes();
+									timepicker.timepicker('setTime', timeToSet);
+								}
+							}
+							timepicker.prop('disabled', false).css({ 'cursor': 'pointer', 'background-color': 'white' }).focus();
+						} else {
+							timepicker.prop('disabled', true).css('cursor', 'not-allowed');
+						}
+					});
 					$('.scrollbar-inner').scrollbar();
 					sortFlag = true;
 					getScheduledDetails();
@@ -80,10 +111,25 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 				cfpLoadingBar.complete();
 				unblockUI();
 			},
-				function (error) {
-					console.log("Error:", error);
-				});
+			function (error) {
+				console.log("Error:", error);
+			}
+		);
 	}
+
+	//Datepicker Function
+	$(document).on('focus', '.fc-datePicker', function () {
+		$(this).datepicker('show');
+	}).on('focus', '.fc-timePicker', function () {
+		$(this).timepicker('showWidget');
+	});
+
+	$(document).on('click', ".datepickerIcon", function () {
+		$(this).siblings(".fc-datePicker").focus()
+	}).on('click', ".timepickerIcon", function () {
+		$(this).siblings(".fc-timePicker").focus()
+	})
+	//Datepicker Function
 
 	$(document).on("change", ".selectScheduleSuite", function () {
 		if ($(this).is(":checked")) $(this).parent().siblings(".scenarioSchdCon").find(".selectToSched").attr("disabled", false).prop("checked", true);
@@ -148,43 +194,6 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 	}
 
 	$("#tableActionButtons, .scheduleDataTable").delay(400).animate({ opacity: "1" }, 300)
-
-	//Datepicker Function
-	$(document).on('focus', '.fc-datePicker', function () {
-		$(this).datepicker({
-			autoclose: "true",
-			format: "dd-mm-yyyy",
-			todayHighlight: true,
-			startDate: new Date()
-		}).on('hide.datepicker', function (e) {
-			if ($(this).val().length > 0) {
-				$(this).parent().siblings('.timePicContainer').find('.fc-timePicker').timepicker({
-					minTime: new Date().getHours() + ':' + (parseInt(new Date().getMinutes() + 5)),
-					minuteStep: 1,
-					showMeridian: false
-				})
-				$(this).parent().siblings('span').find('.fc-timePicker').prop('disabled', false).css({ 'cursor': 'pointer', 'background-color': 'white' });
-			}
-			else {
-				$(this).parent().siblings('span').find('.fc-timePicker').prop('disabled', true).css('cursor', 'not-allowed');
-			}
-		})
-	})
-
-	$(document).on('focus', '.fc-timePicker', function () {
-		$(this).timepicker({
-			minTime: new Date().getHours() + ':' + (parseInt(new Date().getMinutes() + 5)),
-			minuteStep: 1,
-			showMeridian: false
-		})
-	})
-
-	$(document).on('click', ".datepickerIcon", function () {
-		$(this).siblings(".fc-datePicker").focus()
-	}).on('click', ".timepickerIcon", function () {
-		$(this).siblings(".fc-timePicker").focus()
-	})
-	//Datepicker Function
 
 	//Select Browser Function
 	$(document).on("click", ".selectBrowserSc", function () {
@@ -374,7 +383,9 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 					else if (data == "success" || data.includes("success")) {
 						if (data.includes("Set")) openModelPopup("Schedule Test Suite", data.replace('success', ''));
 						else openModelPopup("Schedule Test Suite", "Successfully scheduled.");
-						$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style", "border: none;").val("");
+						$(".ipformating").val(" ");
+						$(".fc-datePicker").datepicker('clearDates');
+						$(".fc-timePicker").prop('disabled', true).css('cursor', 'not-allowed').timepicker('clear');
 						getScheduledDetails();
 						//Transaction Activity for InitSchedule Button Action
 						// var labelArr = [];
@@ -383,13 +394,13 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 						// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 					} else if (data == "few") {
 						openModelPopup("Schedule Test Suite", "Failed to schedule few testsuites");
-						$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style", "border: none;").val("");
+						$(".ipformating").val(" ");
+						$(".fc-datePicker").datepicker('clearDates');
+						$(".fc-timePicker").prop('disabled', true).css('cursor', 'not-allowed').timepicker('clear');
 					} else if (data == "fail") {
 						openModelPopup("Schedule Test Suite", "Failed to schedule Testsuite");
-						$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style", "border: none;");
 					} else {
 						openModelPopup("Schedule Test Suite", "Error in scheduling Testsuite. Scheduling failed");
-						$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style", "border: none;");
 					}
 					$("#scheduledDataBody>.scheduleDataBodyRow .scheduleDataBodyRowChild").show();
 					$("#scheduledSuitesFilterData").prop('selectedIndex', 0);
@@ -398,6 +409,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 					sequence(true,false,copyId);
 					$(".selectScheduleSuite, .selectToSched").prop("checked", false);
 					$(".selectBrowserSc").find(".sb").removeClass("sb");
+					$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style", "border: none;");
 					//$(".fc-timePicker").focus()
 				}, function (error) {
 					unblockUI();

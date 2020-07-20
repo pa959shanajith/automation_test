@@ -1,5 +1,7 @@
 var uuid = require('uuid-random');
 var schedule = require('node-schedule');
+var Client = require("node-rest-client").Client;
+var client = new Client();
 var myserver = require('../lib/socket');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
@@ -48,7 +50,7 @@ exports.readTestSuite_ICE = async (req, res) => {
 			"scenarioids": testsuite.testscenarioids,
 			"scenarionames": testscenarioDetails.testscenarionames,
 			"projectnames": testscenarioDetails.projectnames,
-			"testsuitename": suite.testsuitename,
+			"testsuitename": testsuite.name,
 			"moduleid": moduleId,
 			"testsuiteid": testsuite.testsuiteid,
 			"versionnumber": suite.versionnumber
@@ -887,25 +889,29 @@ exports.getScheduledDetails_ICE = async (req, res) => {
 
 /** This service cancels the specified scheduled job */
 exports.cancelScheduledJob_ICE = async (req, res) => {
-	logger.info("Inside UI service cancelScheduledJob_ICE");
+	const fnName = "cancelScheduledJob_ICE";
+	logger.info("Inside UI service " + fnName);
 	const userid = req.session.userid;
 	const username = req.session.username;
 	const scheduleid = req.body.schDetails.scheduleid;
 	const schedHost = req.body.host;
 	const schedUserid = req.body.schedUserid;
-	if (!(schedUserid == userid || schedHost == username)) {
-		logger.info("Sending response 'not authorised' from cancelScheduledJob_ICE service");
+	let inputs = { "icename": schedHost };
+	const userprofile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
+	if (userprofile == "fail" || userprofile == null) return res.send("fail");
+	if (!(schedUserid == userid || userprofile.name == username)) {
+		logger.info("Sending response 'not authorised' from " + fnName + " service");
 		return res.send("not authorised");
 	}
-	const inputs = {
+	inputs = {
 		"query": "getscheduledata",
 		"scheduleid": scheduleid
 	};
-	const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", "getScheduledDetails_ICE");
+	const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
 	if (result == "fail") return res.send("fail");
 	const status = result[0].status;
 	if (status != "scheduled") {
-		logger.info("Sending response 'inprogress' from cancelScheduledJob_ICE service");
+		logger.info("Sending response 'inprogress' from " + fnName + " service");
 		return res.send("inprogress");
 	}
 	if (scheduleJobMap[scheduleid] && scheduleJobMap[scheduleid].cancel) scheduleJobMap[scheduleid].cancel();
