@@ -537,6 +537,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.provision.fetchICE = function($event) {
 		blockUI("Loading...");
+		$("#searchTasks").val('');
 		adminServices.fetchICE().then(function (data) {
 			unblockUI();
 			if (data == "Invalid Session") $rootScope.redirectPage();
@@ -574,8 +575,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	});
 
 	function filter(element,event) {
-		console.log('filter');
-		title=$('.searchInput').val();
+		var title=$('.searchInput').val();
 		$('.provisionTokens').each(function(){
 			// elements=$(this).children('td:nth-child(2)')
 			if($(this).children('td:nth-child(2)').text().trim() != '' && $(this).children('td:nth-child(2)').text().trim().indexOf(title.toLowerCase())>-1
@@ -918,34 +918,26 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			.then(function (response) {
 				if (response == "Invalid Session") {
 					$rootScope.redirectPage();
-				}
-				else{
+				} else {
 					$('#pref').empty()
 					$('#pref').append("<tr><td>Admin</td><td><input type='checkbox' value='' checked='checked' class='module_admin'></td><td><input type='checkbox' value='' class='module_admin'></td><td><input type='checkbox' value='' class='module_admin'></td><td><input type='checkbox' value='' class='module_admin'></td></tr>")
 					$('#pref').append("<tr id=rows><td>ICE</td></tr>")
 					rows=["ALM","Mindmap","NeuronGraphs","Reports","Utility"];
 					for(i=0;i<response.length;i++){
 						$('#head').append("<th>"+response[i].name+"</th>");
-						if(response[i].name == 'Test Lead' || response[i].name == 'Test Engineer')
-							$('#rows').append("<td><input type='checkbox' value='' checked='checked' class='module_admin'></td>");
-						else
-							$('#rows').append("<td><input type='checkbox' value='' class='module_admin'></td>");
+						let checked = (['Test Lead', 'Test Engineer'].indexOf(response[i].name) > -1)? "checked='checked'":'';
+						$('#rows').append("<td><input type='checkbox' value='' "+checked+" class='module_admin'></td>");
 					}
 					for (j=0;j<rows.length;j++){
 						$('#pref').append("<tr id="+rows[j]+"><td>"+rows[j]+"</td></tr>")
 						for(i=0;i<response.length;i++){
-							if(response[i].plugins[rows[j].toLowerCase()]==true){
-								$("#"+rows[j]).append("<td><input type='checkbox' value='' checked='checked' class='module_admin'></td>");
-							}
-							else {
-								$("#"+rows[j]).append("<td><input type='checkbox' value=''class='module_admin'></td>");
-						}
+							let checked = (response[i].plugins[rows[j].toLowerCase()]==true)? "checked='checked'":'';
+							$("#"+rows[j]).append("<td><input type='checkbox' value='' "+checked+" class='module_admin'></td>");
 						}
 					}
 					$("#preferencesTable").find("input[type=checkbox]").each(function () {
 						$(this).attr("disabled", "disabled");
 					});
-					console.log("Preferences fetched successfully")
 				}
 			}, function (error) {
 				console.log("Error:::::::::::::", error);
