@@ -67,28 +67,29 @@ fs.readFile('assets/templates/specificReport/content.handlebars', 'utf8', functi
 //to open screen shot
 function openScreenShot(req, path, cb) {
     try {
-        var name = req.session.username;
-        logger.debug("ICE Socket requesting Address: %s", name);
-        redisServer.redisSubServer.subscribe('ICE2_' + name);
-        redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + name, function(err, redisres) {
+        var username=req.session.username;
+        var icename = myserver.allSocketsICEUser[username];
+        logger.debug("ICE Socket requesting Address: %s", icename);
+        redisServer.redisSubServer.subscribe('ICE2_' + icename);
+        redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
             if (redisres[1] > 0) {
                 logger.info("Sending socket request for render_screenshot to redis");
                 var dataToIce = {
                     "emitAction": "render_screenshot",
-                    "username": name,
+                    "username": icename,
                     "path": path
                 };
-                redisServer.redisPubICE.publish('ICE1_normal_' + name, JSON.stringify(dataToIce));
+                redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
                 var scrShotData = [];
                 function render_screenshot_listener(channel, message) {
                     var data = JSON.parse(message);
-                    if (name == data.username) {
+                    if (icename == data.username) {
                         var resultData = data.value;
                         if (data.onAction == "unavailableLocalServer") {
                             redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
                             logger.error("Error occurred in openScreenShot: Socket Disconnected");
-                            if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
-                                var soc = myserver.socketMapNotify[name];
+                            if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+                                var soc = myserver.socketMapNotify[username];
                                 soc.emit("ICEnotAvailable");
                                 cb('unavailableLocalServer');
                             }
@@ -108,7 +109,7 @@ function openScreenShot(req, path, cb) {
                 }
                 redisServer.redisSubServer.on("message", render_screenshot_listener);
             } else {
-                utils.getChannelNum('ICE1_scheduling_' + name, function(found) {
+                utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
                     var flag = "";
                     if (found) flag = "scheduleModeOn";
                     else {
@@ -514,8 +515,9 @@ exports.connectJira_ICE = function(req, res) {
     logger.info("Inside UI service: connectJira_ICE");
     try {
         if (utils.isSessionActive(req)) {
-            var name = req.session.username;
-            redisServer.redisSubServer.subscribe('ICE2_' + name);
+            var username=req.session.username;
+            var icename = myserver.allSocketsICEUser[username];
+            redisServer.redisSubServer.subscribe('ICE2_' + icename);
             if (req.body.action == 'loginToJira') { //Login to Jira for creating issues
                 var jiraurl = req.body.url;
                 var jirausername = req.body.username;
@@ -529,27 +531,27 @@ exports.connectJira_ICE = function(req, res) {
                     };
                     try {
                         logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-                        logger.debug("ICE Socket requesting Address: %s", name);
-                        redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + name, function(err, redisres) {
+                        logger.debug("ICE Socket requesting Address: %s", icename);
+                        redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
                             if (redisres[1] > 0) {
                                 logger.info("Sending socket request for jira_login to redis");
                                 var dataToIce = {
                                     "emitAction": "jiralogin",
-                                    "username": name,
+                                    "username": icename,
                                     "action": req.body.action,
                                     "inputs": inputs
                                 };
-                                redisServer.redisPubICE.publish('ICE1_normal_' + name, JSON.stringify(dataToIce));
+                                redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
                                 var count = 0;
 
                                 function jira_login_1_listener(channel, message) {
                                     var data = JSON.parse(message);
-                                    if (name == data.username) {
+                                    if (icename == data.username) {
                                         redisServer.redisSubServer.removeListener("message", jira_login_1_listener);
                                         if (data.onAction == "unavailableLocalServer") {
                                             logger.error("Error occurred in connectJira_ICE - loginToJira: Socket Disconnected");
-                                            if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
-                                                var soc = myserver.socketMapNotify[name];
+                                            if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+                                                var soc = myserver.socketMapNotify[username];
                                                 soc.emit("ICEnotAvailable");
                                             }
                                         } else if (data.onAction == "auto_populate") {
@@ -568,7 +570,7 @@ exports.connectJira_ICE = function(req, res) {
                                 }
                                 redisServer.redisSubServer.on("message", jira_login_1_listener);
                             } else {
-                                utils.getChannelNum('ICE1_scheduling_' + name, function(found) {
+                                utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
                                     var flag = "";
                                     if (found) flag = "scheduleModeOn";
                                     else {
@@ -591,27 +593,27 @@ exports.connectJira_ICE = function(req, res) {
                 if (!validateData(createObj.project, "empty") && !validateData(createObj.issuetype, "empty") && !validateData(createObj.summary, "empty") && !validateData(createObj.priority, "empty")) {
                     try {
                         logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-                        logger.debug("ICE Socket requesting Address: %s", name);
-                        redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + name, function(err, redisres) {
+                        logger.debug("ICE Socket requesting Address: %s", icename);
+                        redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
                             if (redisres[1] > 0) {
                                 logger.info("Sending socket request for jira_login to redis");
                                 dataToIce = {
                                     "emitAction": "jiralogin",
-                                    "username": name,
+                                    "username": icename,
                                     "action": req.body.action,
                                     "inputs": createObj
                                 };
-                                redisServer.redisPubICE.publish('ICE1_normal_' + name, JSON.stringify(dataToIce));
+                                redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
                                 var count = 0;
 
                                 function jira_login_2_listener(channel, message) {
                                     var data = JSON.parse(message);
-                                    if (name == data.username) {
+                                    if (icename == data.username) {
                                         redisServer.redisSubServer.removeListener("message", jira_login_2_listener);
                                         if (data.onAction == "unavailableLocalServer") {
                                             logger.error("Error occurred in connectJira_ICE - createIssueInJira: Socket Disconnected");
-                                            if ('socketMapNotify' in myserver && name in myserver.socketMapNotify) {
-                                                var soc = myserver.socketMapNotify[name];
+                                            if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+                                                var soc = myserver.socketMapNotify[username];
                                                 soc.emit("ICEnotAvailable");
                                             }
                                         } else if (data.onAction == "issue_id") {
@@ -631,7 +633,7 @@ exports.connectJira_ICE = function(req, res) {
                                 }
                                 redisServer.redisSubServer.on("message", jira_login_2_listener);
                             } else {
-                                utils.getChannelNum('ICE1_scheduling_' + name, function(found) {
+                                utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
                                     var flag = "";
                                     if (found) flag = "scheduleModeOn";
                                     else {

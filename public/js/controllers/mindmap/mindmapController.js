@@ -3321,7 +3321,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var version_num = ($('.version-list').val() != undefined)? $('.version-list').val(): "0.0";
         var suiteDetailsTemplate = { "condition": 0, "dataparam": [" "], "scenarioId": "", "scenarioName": "" };
         var moduleData = { "testsuiteName": "", "testsuiteId": "", "versionNumber": "", "appType": "", "domainName": "", "projectName": "", "projectId": "", "releaseId": "", "cycleName": "", "cycleId": "", "suiteDetails": [suiteDetailsTemplate] };
-        var executionData = { "executionData": [{ "source": "api", "exectionMode": "serial", "browserType": ["1"], "qccredentials": { "qcurl": "", "qcusername": "", "qcpassword": "" }, "batchInfo": [JSON.parse(JSON.stringify(moduleData))], "userInfo": { "tokenhash": "", "tokenname": "", "username": "" } } ] };
+        var executionData = { "executionData": [{ "source": "api", "exectionMode": "serial", "browserType": ["1"], "qccredentials": { "qcurl": "", "qcusername": "", "qcpassword": "" }, "batchInfo": [JSON.parse(JSON.stringify(moduleData))], "userInfo": { "tokenhash": "", "tokenname": "", "icename": "" } } ] };
         var moduleInfo = { "batchInfo": [] };
         blockUI('Loading UI');
         var moduleid = $('#createNewConfirmationPopup').attr('mapid');
@@ -5018,11 +5018,16 @@ Purpose : displaying pop up for replication of project
 		var res = $scope.apptype;
 		var file1 = JSON.parse(file);
 		var doc = new DOMParser().parseFromString(file1.data,'text/xml');
-		var activityJSON = JSON.parse(xml2json(doc).replace("\nundefined",""));
-		var cdata = JSON.parse(activityJSON["mxGraphModel"]["root"]["Task"][0]["#cdata"]);
-		var res1 = cdata[0]['apptype'];
+        var activityJSON = JSON.parse(xml2json(doc).replace("\nundefined",""));
+        if(activityJSON["mxGraphModel"]["root"]["Task"].length>1){
+            var cdata = JSON.parse(activityJSON["mxGraphModel"]["root"]["Task"][0]["#cdata"]);  
+        }
+		else{
+            var cdata = JSON.parse(activityJSON["mxGraphModel"]["root"]["Task"]["#cdata"]);
+        }
+        var res1 = cdata[0]['apptype'];
         if(res1.toLowerCase()!=res.toLowerCase()){
-            openDialogMindmap("App Type Error", "Project application type and Imported PD's application type doesn't match, please check!!")
+            openDialogMindmap("App Type Error", "AppType doesn't match, please check!!")
             return;
         }
         $scope.pdmode = true;

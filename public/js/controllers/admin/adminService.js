@@ -97,11 +97,12 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
-		manageSessionData: function (action, user, key) {
+		manageSessionData: function (action, user, key, reason) {
 			return $http.post('/manageSessionData', {
 				action: action,
 				user: user,
-				key: key
+				key: key,
+				reason: reason
 			})
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
@@ -141,9 +142,52 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
+		manageSAMLConfig: function (action, confObj) {
+			return $http.post('/manageSAMLConfig', {
+				action: action,
+				conf: confObj
+			})
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		getSAMLConfig: function (name) {
+			return $http.post('/getSAMLConfig', {
+				name: name
+			})
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		manageOIDCConfig: function (action, confObj) {
+			return $http.post('/manageOIDCConfig', {
+				action: action,
+				conf: confObj
+			})
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		getOIDCConfig: function (name) {
+			return $http.post('/getOIDCConfig', {
+				name: name
+			})
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
 		getPreferences: function () {
 			return $http.post('/getPreferences')
 			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		fetchICE: function (args) {
+			return $http.post('/fetchICE', {
+				user: args
+			})
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		provisions: function (tokeninfo) {
+			return $http.post('/provisionIce',{
+				tokeninfo:tokeninfo
+			}).then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		}
 	};

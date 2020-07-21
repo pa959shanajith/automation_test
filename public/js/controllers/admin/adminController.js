@@ -3,17 +3,15 @@ var createprojectObj = {}; var projectDetails = [];var flag;var projectExists;va
 var editedProjectDetails = [];
 var deletedProjectDetails = [];
 var newProjectDetails = [];
+var isIE = /*@cc_on!@*/ false || !!document.documentMode;
 var unAssignedProjects = []; var assignedProjects = [];var projectData =[];var valid = "";var getAssignedProjectsLen=0;
 mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location', 'adminServices','$timeout','cfpLoadingBar', function ($scope, $rootScope, $http, $location, adminServices, $timeout, cfpLoadingBar) {
 	$("body").css("background","#eee");
-
+	$("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />');
 	localStorage.setItem("navigateEnable", false);
-
-	$('.dropdown').on('show.bs.dropdown', function (e) {
-		$(this).find('.dropdown-menu').first().stop(true, true).slideDown(300);
-	});
-
 	$scope.ldapConf = {};
+	$scope.samlConf = {};
+	$scope.oidcConf = {};
 	$scope.userConf = {};
 	$scope.domainConf = {};
 	$scope.moveItems = {};
@@ -21,6 +19,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.preferences = {};
 	$scope.sessionConf = {};
 	$scope.tokens = {};
+	$scope.provision = {};
+	$scope.tokeninfo={};
+
+	$('.dropdown').on('show.bs.dropdown', function (e) {
+		$(this).find('.dropdown-menu').first().stop(true, true).slideDown(300);
+	});
+	
 	$('.dropdown').on('hide.bs.dropdown', function (e) {
 		$(this).find('.dropdown-menu').first().stop(true, true).slideUp(300);
 	});
@@ -28,7 +33,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$timeout(function(){
 		angular.element('#userTab').triggerHandler('click');
 		cfpLoadingBar.complete();
-	}, 500);
+		$('.scrollbar-macosx').scrollbar();
+	}, 300);
 
 	$(document).on('change', '#selDomains', function (e) {
 		domainname = $("#selDomains").val();
@@ -164,7 +170,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.assignProj.click = function () {
 		resetAssignProjectForm();
 		$(".selectedIcon").removeClass("selectedIcon");
-		$("#assignProjectTab").find("img").addClass("selectedIcon");
+		$("#assignProjectTab").find("span.fa").addClass("selectedIcon");
 		adminServices.getUserDetails("user")
 		.then(function(data){
 			if(data == "Invalid Session") {
@@ -200,6 +206,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			$scope.assignProjects1();
 		}
 	}
+
 	$scope.assignProjects1 = function ($event) {
 		$("#assignProjectModal").modal("hide");
 		unAssignedProjects = [];
@@ -281,10 +288,33 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	};
 
 	$(document).on('click', '#tokenTab', function () {
+		$('#userToken').text('User')
+		$('#selAssignUser1').show()
+		$('#selICEuser').hide()
+		$('#IceType').click();
+		$scope.provision.op='normal';
 	});
-	$(document).on('change', '#selAssignUser1', function (e) {
-		blockUI("Fetchin Token data. Please wait...")
+
+	$scope.selectIceType=function($event){
+		if(event.currentTarget.value=='normal'){
+			$('#userToken').text('User')
+			$('#selAssignUser1').show()
+			$('#selICEuser').hide()
+			$scope.provision.op='normal';
+		}
+		else if(event.currentTarget.value=='ci-cd'){
+			$('#userToken').text('ICE Name')
+			$('#selAssignUser1').hide()
+			$('#selICEuser').show()
+			$scope.provision.op='ci-cd';
+		}
+	}
+
+	$(document).on('change', '#selAssignUser1, #selICEuser',  function (e) {
+		blockUI("Fetchin Token data. Please wait...");
 		var userId = $("#selAssignUser1 option:selected").attr("data-id");
+		if ($scope.provision.op == 'ci-cd')
+		userId = $("#selICEuser option:selected").attr("data-id");
 		var generatetoken = {};
 		generatetoken.userId = userId;
 		
@@ -319,10 +349,249 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				console.log("Error:::::::::::::", error);
 			});
 	});
+
+	$scope.provision.click = function($event){
+		$(".selectedIcon").removeClass("selectedIcon");
+		$("#provisionTab").find("span.fa").addClass("selectedIcon");;
+		$scope.provision.op='normal';
+		$scope.provision.tokentooltip = "Click on Provision/Reregister to generate token";
+		$scope.provision.icelist=[];
+		$scope.provision.users = [['Select User',' ','','']];
+		$scope.tokeninfo = {};
+		$scope.provision.selectProvisionType($event);
+		$('body').tooltip({trigger: "hover", selector: "span.fa"});
+	};
+
+	$scope.provision.provisionsIce = function ($event) {
+		$("#icename").removeClass("inputErrorBorder");
+		$("#selAssignUser2").removeClass("selectErrorBorder");
+		const icename = $scope.provision.icename;
+		const userid = $scope.provision.userid;
+		const icetype = $scope.provision.op;
+		var flag = false;
+		$scope.provision.token = "";
+		if (icename == "") {
+			$("#icename").addClass("inputErrorBorder");
+			flag = true;
+		}
+		if (icetype == "normal"  && (!userid || userid.trim() == "")) {
+			$("#selAssignUser2").addClass("selectErrorBorder");
+			flag = true;
+		}
+		if (flag) return false;
+
+		var tokeninfo = {
+			userid: userid,
+			icename: icename,
+			icetype: icetype,
+			action: "provision"
+		};
+		blockUI("Provisioning Token...")
+		adminServices.provisions(tokeninfo).then(function (data) {
+			unblockUI();
+			if (data == "Invalid Session") return $rootScope.redirectPage();
+			else if (data == 'fail') openModalPopup("ICE Provision Error", "ICE Provisioned Failed");
+			else if (data=='DuplicateIceName') openModalPopup("ICE Provision Error", "ICE Provisioned Failed!<br/>ICE name or User already exists");
+			else {
+				$scope.tokeninfo.icename = icename;
+				$scope.tokeninfo.token = data;
+				$scope.provision.token = data;
+				$scope.provision.fetchICE();
+				openModalPopup("ICE Provision Success", "Token generated Successfully for ICE '"+icename+"'<br/>Copy or Download the token");
+			}
+		}, function (error) {
+			unblockUI();
+			console.log("Error:::::::::::::", error);
+		});
+	}
+
+	$scope.showTooltip = function (btn, msg, resetmsg) {
+		btn.attr('data-original-title', msg).tooltip('show');
+		setTimeout(function() {
+			btn.tooltip('hide');
+			btn.attr('data-original-title', resetmsg);
+		}, 1500);
+	};
+
+	$scope.copyToken = function ($event) {
+		const data = $scope.tokeninfo.token;
+		const btn = $($event.target);
+		if (!data) {
+			$scope.showTooltip(btn, "Nothing to Copy!", "Click to Copy");
+			return;
+		}
+		const x = document.getElementById('iceToken');
+		x.select();
+		document.execCommand('copy');
+		$scope.showTooltip(btn, "Copied!", "Click to Copy");
+	}
+
+	$scope.downloadToken = function ($event){
+		const data = $scope.tokeninfo.token;
+		const btn = $($event.target);
+		if (!data) {
+			$scope.showTooltip(btn, "Nothing to Download!", "Download Token")
+			return;
+		}
+		const filename = $scope.tokeninfo.icename + "_icetoken.txt";
+		if (isIE) {
+			window.navigator.msSaveOrOpenBlob(new Blob([data], { type: "text/json;charset=utf-8" }), filename);
+		} else {
+			var blob = new Blob([data], { type: 'text/json' });
+			var e = document.createEvent('MouseEvents');
+			var a = document.createElement('a');
+			a.download = filename;
+			a.href = window.URL.createObjectURL(blob);
+			a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+			e.initMouseEvent('click', true, true, window,
+			0, 0, 0, 0, 0, false, false, false, false, 0, null);
+			a.dispatchEvent(e);
+		}
+		$scope.showTooltip(btn, "Downloaded!", "Download Token");
+	}
+
+	$scope.provision.deregister = function ($event) {
+		const provisionDetails = $scope.provision.icelist[$($event.target).data("index")];
+		const icename = provisionDetails.icename;
+		const tokeninfo = {
+			icename: icename,
+			userid: provisionDetails.provisionedto,
+			icetype: provisionDetails.icetype,
+			action: "deregister"
+		};
+		blockUI("Deregistering...");
+		adminServices.provisions(tokeninfo).then(function (data) {
+			unblockUI();
+			if (data == "Invalid Session") return $rootScope.redirectPage();
+			else if (data == 'fail') openModalPopup("ICE Provisions", "ICE Deregister Failed");
+			else {
+				adminServices.manageSessionData('disconnect', icename, "?", "dereg").then(function (data) {
+					if (data == "Invalid Session") return $rootScope.redirectPage();
+				}, function (error) { });
+				openModalPopup("ICE Provisions", "ICE Deregistered Successfully");
+				$scope.provision.selectProvisionType($event);
+				//$scope.provision.fetchICE();
+			}
+		}, function (error) {
+			unblockUI();
+			console.log("Error:::::::::::::", error);
+		});
+	};
+
+	$scope.provision.reregister = function ($event) {
+		const provisionDetails = $scope.provision.icelist[$($event.target).data("index")];
+		const icename = provisionDetails.icename;
+		const event=$.trim($event.currentTarget.textContent);
+		const tokeninfo = {
+			icename: icename,
+			userid: provisionDetails.provisionedto,
+			icetype: provisionDetails.icetype,
+			action: "reregister"
+		};
+		blockUI(event+"ing...");
+		adminServices.provisions(tokeninfo).then(function (data) {
+			unblockUI();
+			if (data == "Invalid Session") return $rootScope.redirectPage();
+			else if (data == 'fail') openModalPopup("ICE Provisions", "ICE "+event+" Failed");
+			else {
+				adminServices.manageSessionData('disconnect', icename, "?", "dereg").then(function (data) {
+					if (data == "Invalid Session") return $rootScope.redirectPage();
+				}, function (error) { });
+				$scope.tokeninfo.icename = icename;
+				$scope.tokeninfo.token = data;
+				$scope.provision.token = data;
+				$scope.provision.icename = icename;
+				$scope.provision.op = provisionDetails.icetype;
+				$scope.provision.userid = provisionDetails.provisionedto || ' ';
+				openModalPopup("ICE Provision Success", "ICE "+event+"ed Successfully: '"+icename+"'<br/>Copy or Download the token");
+				$scope.provision.fetchICE();
+			}
+		}, function (error) {
+			unblockUI();
+			console.log("Error:::::::::::::", error);
+		});
+	};
+
+	$scope.provision.selectProvisionType = function($event) {
+		$("#icename").removeClass("inputErrorBorder");
+		$("#selAssignUser2").removeClass("selectErrorBorder");
+		$scope.provision.token = $scope.provision.tokentooltip;
+		$scope.provision.icename = '';
+		$scope.provision.userid = ' ';
+		if ($scope.provision.op == "normal") {
+			adminServices.getUserDetails("user").then(function(data) {
+				if (data == "Invalid Session") $rootScope.redirectPage();
+				else if (data == "fail") openModalPopup("ICE Provision", "Failed to fetch users.");
+				else if (data == "empty") openModalPopup("ICE Provision", "There are no users present.");
+				else {
+					data.sort(function(a,b){ return a[0] > b[0]; });
+					data.splice(0, 0, ['Select User',' ','','']);
+					$scope.provision.users = data.filter((e)=> (e[3] != "Admin"));
+				}
+			}, function (error) {
+				console.log("Error:::::::::::::", error);
+			});
+		}
+		$scope.provision.fetchICE();
+	};
+
+	$scope.provision.fetchICE = function($event) {
+		blockUI("Loading...");
+		$("#searchTasks").val('');
+		adminServices.fetchICE().then(function (data) {
+			unblockUI();
+			if (data == "Invalid Session") $rootScope.redirectPage();
+			else if (data == 'fail') openModalPopup("ICE Provisions", "Failed to load ICE Provisions");
+			else {
+				data.sort(function(a,b){ return a.icename > b.icename; });
+				data = data.filter(e => e.provisionedto != "--Deleted--");
+				$scope.provision.icelist = data;
+			}
+		}, function (error) {
+			unblockUI();
+			console.log("Error:::::::::::::", error);
+		});
+	};
+
+	$scope.provision.verifyName = function($event) {
+		const name = $scope.provision.icename;
+		const icelist = $scope.provision.icelist.map(e => e.icename);
+		if (icelist.indexOf(name) > -1) $("#icename").addClass("inputErrorBorder")[0].title = "ICE Name already Exists!";
+		else $("#icename").removeClass("inputErrorBorder")[0].title = "";
+	};
+
+	$scope.settings = function(){
+		blockUI();
+		$('#dialog-settings').attr('st');
+	}
+
+	$(document).on('click','.searchIcon', function($event){
+		filter(this,event);
+	});
+
+	$(document).on('keyup','#searchTasks', function($event) {
+		filter(this,event); 
+		// event.stopImmediatePropagation();
+	});
+
+	function filter(element,event) {
+		var title=$('.searchInput').val();
+		$('.provisionTokens').each(function(){
+			// elements=$(this).children('td:nth-child(2)')
+			if($(this).children('td:nth-child(2)').text().trim() != '' && $(this).children('td:nth-child(2)').text().trim().indexOf(title.toLowerCase())>-1
+			|| $(this).children('td:nth-child(1)').text().trim() != '' && $(this).children('td:nth-child(1)').text().trim().indexOf(title.toLowerCase())>-1){
+				$(this).show();
+			}
+			else{
+				$(this).hide();
+			}
+		});
+	}
+
 	$scope.tokens.click = function () {
 		$scope.tokens.users=[]
 		$(".selectedIcon").removeClass("selectedIcon");
-		$("#tokenTab").find('img').addClass('selectedIcon');
+		$("#tokenTab").find("span.fa").addClass("selectedIcon");;
 		taskName = $("#page-taskName").children("span").text();
 		adminServices.getUserDetails("user")
 		.then(function(data){
@@ -347,23 +616,56 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		}, function (error) {
 			console.log("Error:::::::::::::", error);
 		});
+		adminServices.fetchICE()
+		.then(function(data){
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "fail") {
+				openModalPopup("Token Management", "Failed to fetch ICE list.");
+			} else if(data == "empty") {
+				openModalPopup("Token Management", "There are no users present.");
+			} else {
+				data.sort(function(a,b){ return a[0] > b[0]; });
+				data = data.filter(e => e.provisionedto!="--Deleted--");
+				var selectBox = $("#selICEuser");
+				selectBox.empty();
+				selectBox.append('<option data-id="" value disabled selected>Select ICE</option>');
+				for(i=0; i<data.length; i++){
+					if(data[i]["icetype"]=='ci-cd'){
+						selectBox.append('<option data-id="'+data[i]['_id']+'" value="'+data[i]['icename']+'">'+data[i]['icename']+'</option>');
+					}
+				}
+				selectBox.prop('selectedIndex', 0);
+			}
+		}, function (error) {
+			console.log("Error:::::::::::::", error);
+		});
 	};
+
 	//	Generate CI user Token
 	$scope.generateCIusertokens = function ($event) {
 		$("#GenerateNewTkenModal").modal("hide");
 		$("#selAssignUser1").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
+		$("selICEuser").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
 		$("#tokenName").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
 		$(".tokeninfo .tokenSuite .datePicContainer .fc-datePicker").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
-		if ($('#selAssignUser1 option:selected').val() == "") {
+		var icetype = $scope.provision.op;
+		var ele=$('#selAssignUser1 option:selected');
+		if (icetype =='ci-cd') 
+		ele=$('#selICEuser option:selected');
+		if (icetype =='normal' && ele.val() == "") {
 			$("#selAssignUser1").css('border', '').addClass("selectErrorBorder");
+			return false;
+		} else if (icetype =='ci-cd' && ele.val() == "") {
+			$("selICEuser").css('border', '').addClass("selectErrorBorder");
 			return false;
 		} else if ($('#tokenName').val().trim() == "") {
 			$("#tokenName").css('border', '').addClass("selectErrorBorder");
 			return false;
 		} else{
 			var userDetails = JSON.parse(window.localStorage['_UI']);
-			var userId = $("#selAssignUser1 option:selected").attr("data-id");
-			var CIUser = {};
+			var userId = ele.attr("data-id");
+			var CIUser={};
 			$(".scheduleSuiteTable").append('<div class="tokenSuite"><span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIconToken" src="../imgs/ic-datepicker.png" /></span><span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>');
 			var expdate=$(".tokeninfo .tokenSuite .datePicContainer .fc-datePicker").val()
 			var exptime=$(".tokeninfo .tokenSuite .timePicContainer .fc-timePicker").val()
@@ -407,6 +709,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				CIUser.userId = userId;
 				CIUser.expiry = expiry;
 				CIUser.tokenname = tokenname;
+				CIUser.icetype=icetype;
 				action="create";
 				blockUI('Generating Token. Please Wait...');
 				adminServices.manageCIUsers(action,CIUser)
@@ -457,10 +760,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			}
 		}		
 	};
+
 	$scope.deactivate = function ($event) {
 		var CIUser={}
 		action="deactivate";
 		CIUser.userId = $("#selAssignUser1 option:selected").attr("data-id");
+		if ($scope.provision.op == 'ci-cd') CIUser.userId = $("#selICEuser option:selected").attr("data-id");
 		CIUser.tokenName = $.trim($event.target.parentElement.parentElement.firstElementChild.textContent);
 		adminServices.manageCIUsers(action,CIUser)
 		.then(function (data) {
@@ -486,6 +791,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				console.log("Error:::::::::::::", error);
 			});
 	};
+
 	$(document).on('focus', '.fc-datePicker', function(){
 		$(this).datepicker({
 			autoclose:"true",
@@ -506,6 +812,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			}
 		})
 	})
+
 	$(document).on('focus', '.fc-timePicker', function(){
 		$(this).timepicker({
 			minTime: new Date().getHours() + ':' + (parseInt(new Date().getMinutes()+5)),
@@ -526,7 +833,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.domainConf.click = function(query) {
 		$(".selectedIcon").removeClass("selectedIcon");
 		$("button.userTypeBtnActive").removeClass('userTypeBtnActive');
-		$("#projectTab").find("img").addClass("selectedIcon");
+		$("#projectTab").find("span.fa").addClass("selectedIcon");
 		this.query0 = '';
 		this.query1 = '';
 	}
@@ -537,7 +844,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		updateProjectDetails = [];
 		var plugins = [];
 		$(".selectedIcon").removeClass("selectedIcon");
-		$(this).children().find('img').addClass('selectedIcon');
+		$(this).children().find("span.fa").addClass("selectedIcon");;
 		adminServices.getAvailablePlugins()
 		.then(function (plugins_list) {
 			for (var i = 0; i < plugins_list.length; i++) {
@@ -545,7 +852,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			}
 			$timeout(function () {
 				$('.scrollbar-inner').scrollbar();
-				$('.scrollbar-macosx').scrollbar();
 				toggleCycleClick();
 			}, 10);
 			adminServices.getDomains_ICE()
@@ -606,40 +912,32 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.preferences.click = function () {
 		blockUI()
 		$(".selectedIcon").removeClass("selectedIcon");
-		$("#preferencesTab").find("img").addClass("selectedIcon");
+		$("#preferencesTab").find("span.fa").addClass("selectedIcon");
 		setTimeout(function () {
 			adminServices.getPreferences()
 			.then(function (response) {
 				if (response == "Invalid Session") {
 					$rootScope.redirectPage();
-				}
-				else{
+				} else {
 					$('#pref').empty()
 					$('#pref').append("<tr><td>Admin</td><td><input type='checkbox' value='' checked='checked' class='module_admin'></td><td><input type='checkbox' value='' class='module_admin'></td><td><input type='checkbox' value='' class='module_admin'></td><td><input type='checkbox' value='' class='module_admin'></td></tr>")
 					$('#pref').append("<tr id=rows><td>ICE</td></tr>")
 					rows=["ALM","Mindmap","NeuronGraphs","Reports","Utility"];
 					for(i=0;i<response.length;i++){
 						$('#head').append("<th>"+response[i].name+"</th>");
-						if(response[i].name == 'Test Lead' || response[i].name == 'Test Engineer')
-							$('#rows').append("<td><input type='checkbox' value='' checked='checked' class='module_admin'></td>");
-						else
-							$('#rows').append("<td><input type='checkbox' value='' class='module_admin'></td>");
+						let checked = (['Test Lead', 'Test Engineer'].indexOf(response[i].name) > -1)? "checked='checked'":'';
+						$('#rows').append("<td><input type='checkbox' value='' "+checked+" class='module_admin'></td>");
 					}
 					for (j=0;j<rows.length;j++){
 						$('#pref').append("<tr id="+rows[j]+"><td>"+rows[j]+"</td></tr>")
 						for(i=0;i<response.length;i++){
-							if(response[i].plugins[rows[j].toLowerCase()]==true){
-								$("#"+rows[j]).append("<td><input type='checkbox' value='' checked='checked' class='module_admin'></td>");
-							}
-							else {
-								$("#"+rows[j]).append("<td><input type='checkbox' value=''class='module_admin'></td>");
-						}
+							let checked = (response[i].plugins[rows[j].toLowerCase()]==true)? "checked='checked'":'';
+							$("#"+rows[j]).append("<td><input type='checkbox' value='' "+checked+" class='module_admin'></td>");
 						}
 					}
 					$("#preferencesTable").find("input[type=checkbox]").each(function () {
 						$(this).attr("disabled", "disabled");
 					});
-					console.log("Preferences fetched successfully")
 				}
 			}, function (error) {
 				console.log("Error:::::::::::::", error);
@@ -1305,7 +1603,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	//Delete Release Functionality: Open Popup
 	$(document).on("click", "[id^=deleteReleaseName_]", function (e) {
-		openDeleteGlobalModal("Delete Release","deleteReleaseYes");
+		openDeleteGlobalModal("Delete Release","deleteReleaseYes","Are you sure you want to delete ?");
 		deleteReleaseId = e.target.id;
 		deleteRelid = e.target.parentElement.previousSibling.dataset.releaseid;
 	});
@@ -1565,7 +1863,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	//Delete Cycle Functionality: Open Popup
 	$(document).on("click", "[id^=deleteCycleName_]", function(e){
-		openDeleteGlobalModal("Delete Cycle","deleteCycleYes");
+		openDeleteGlobalModal("Delete Cycle","deleteCycleYes","Are you sure you want to delete ?");
 		deleteCycleId = e.target.id;
 		var cycName = $(this).parent().siblings(".cycleName").text();
 		deleteCycId = $(this).parent().siblings(".cycleName").attr("data-cycleid");
@@ -1906,7 +2204,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			$scope.userConf.ldapActive=false
 		}
 		$("button.userTypeBtnActive").removeClass('userTypeBtnActive');
-		$("#userTab").find("img").addClass("selectedIcon");
+		$("#userTab").find("span.fa").addClass("selectedIcon");
 		this.userId = '';
 		this.userName = '';
 		this.userIdName = '';
@@ -2046,7 +2344,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	};
 
 	//Create / Update / Delete User
-	$scope.userConf.manage = function(action,$event) {
+	$scope.userConf.manage = function(action, $event) {
 		//Transaction Activity for Create/ Update/ Delete User button Action
 		// var labelArr = [];
 		// var infoArr = [];
@@ -2081,12 +2379,25 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		adminServices.manageUserDetails(action, userObj)
 		.then(function (data) {
 			unblockUI();
-			if(data == "Invalid Session"){
+			if(data == "Invalid Session") {
 				$rootScope.redirectPage();
 			} else if(data == "success") {
 				if (action == "create") $scope.userConf.click();
 				else $scope.userConf.edit();
 				openModalPopup(bAction+" User", "User "+action+"d successfully!");
+				if (action == "delete") {
+					adminServices.manageSessionData('logout', userObj.username, '?', 'dereg').then(function (data) {
+						if (data == "Invalid Session") return $rootScope.redirectPage();
+					}, function (error) {});
+					adminServices.fetchICE(userObj.userid).then(function (data) {
+						if (data == "Invalid Session") return $rootScope.redirectPage();
+						if (data.length == 0) return false;
+						const icename = data[0].icename;
+						adminServices.manageSessionData('disconnect', icename, '?', 'dereg').then(function (data) {
+							if (data == "Invalid Session") return $rootScope.redirectPage();
+						}, function (error) {});
+					}, function (error) {});
+				}
 			} else if(data == "exists") {
 				$("#userName").addClass("inputErrorBorder");
 				openModalPopup(bAction+" User", "User already Exists!");
@@ -2094,7 +2405,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (action == "create") $scope.userConf.click();
 				else $scope.userConf.edit();
 				openModalPopup(bAction+" User", "Failed to "+action+" user.");
-			} else if(/^2[0-4]{10}$/.test(data)) {
+			} else if(/^2[0-4]{8}$/.test(data)) {
 				if (parseInt(data[1])) {
 					openModalPopup(bAction+" User", "Failed to "+action+" user. Invalid Request!");
 					return;
@@ -2105,15 +2416,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (parseInt(data[4])) errfields.push("Last Name");
 				if (parseInt(data[5])) errfields.push("Password");
 				if (parseInt(data[6])) errfields.push("Email");
-				if (parseInt(data[7])) errfields.push("Primary Role");
-				if (parseInt(data[8])) errfields.push("Additional Role");
-				if (parseInt(data[9])) errfields.push("LDAP Server");
-				if (parseInt(data[10])) errfields.push("User Domain Name");
+				if (parseInt(data[7])) errfields.push("LDAP Server");
+				if (parseInt(data[8])) errfields.push("User Domain Name");
 				openModalPopup(bAction+" User", "Following values are invalid: "+errfields.join(", "));
 			}
 		}, function (error) {
 			unblockUI();
 			openModalPopup(bAction+" User", "Failed to "+action+" user.");
+			console.log("Error:::", error);
 		});
 	};
 
@@ -2328,9 +2638,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	//Delete User Data: Confirmation
 	$scope.userConf.delete = function (action) {
-		openDeleteGlobalModal("Delete User", "delUserConf");
+		openDeleteGlobalModal("Delete User", "delUserConf", "Are you sure you want to delete ? All task assignment information and ICE provisions will be deleted for this user.");
 	};
-	
+
 	//Delete User Data
 	$(document).on('click','#delUserConf', function(e) {
 		hideDeleteGlobalModal();
@@ -2351,7 +2661,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		var roleSel = $("#additionalRole_options");
 		var roleOpt = $("#additionalRoles");
 		if ((!roleSel.is(e.target) && roleSel.has(e.target).length === 0) && (!roleOpt.is(e.target) && roleOpt.has(e.target).length === 0)) {
-			$('#additionalRoles').hide();
+			roleOpt.hide();
 		}
 	});
 
@@ -2397,12 +2707,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		setTimeout(function () {
 			var userEnteredText = element.val();
 			var regex;
-			if (e.target.id == 'userName')
-				regex = /[\\[\]\~`!@#$%^&*()+={}|;:"',<>?/\s]/g;
+			if (e.target.id == 'userName' || e.target.id == 'icename')
+				regex = /[\\\~`@|;:"',<>?/\s]/g;
 			else if (e.target.id == 'ldapServerURL')
-				regex = /[\\[\]\~`!@#$%^&*()+={}|;"',<>?\s]/g;
+				regex = /[\\\[\]\~`!@#$%^&*()+={}|;"',<>?\s]/g;
 			else if (e.target.id == 'projectName' || e.target.id == 'releaseTxt' || e.target.id == 'cycleTxt' || e.target.id == 'releaseName' || e.target.id == 'cycleName')
-				regex = /[-\\[\]\~`!@#$%^&*()+={}|;:"',.<>?/\s]/g;
+				regex = /[-\\\[\]\~`!@#$%^&*()+={}|;:"',.<>?/\s]/g;
 			else
 				regex = /[-\\0-9[\]\~`!@#$%^&*()-+={}|;:"',.<>?/\s_]/g;
 			userEnteredText = userEnteredText.replace(regex, "");
@@ -2431,7 +2741,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	function openModalPopup(title, body) {
 		var mainModal = $("#adminModal");
 		mainModal.find('.modal-title').text(title);
-		mainModal.find('.modal-body p').text(body);
+		mainModal.find('.modal-body p').html(body);
 		mainModal.modal("show");
 		setTimeout(function () {
 			$("#adminModal").find('.btn-default').focus();
@@ -2451,10 +2761,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	}
 
 	//Show Global delete modal popup
-	function openDeleteGlobalModal(title, buttonID) {
+	function openDeleteGlobalModal(title, buttonID, content) {
 		var delModal = $("#deleteGlobalModal");
 		delModal.find('.modal-title').text(title);
 		delModal.find('button.btnGlobalYes').prop("id", buttonID);
+		delModal.find('.modal-body').find('p').text(content);
 		delModal.modal("show");
 		setTimeout(function () {
 			$("#deleteGlobalModal").find('.btn-default')[1].focus();
@@ -2505,7 +2816,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.ldapConf.click = function (action) {
 		$(".selectedIcon").removeClass("selectedIcon");
-		$("#ldapConfigTab").find("img").addClass("selectedIcon");
+		$("#ldapConfigTab").find("span.fa").addClass("selectedIcon");
 		this.serverName = "";
 		this.url = "";
 		this.auth = "anonymous";
@@ -2623,7 +2934,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (parseInt(data[6])) errfields.push("Authentication Principal");
 				if (parseInt(data[7])) errfields.push("Authentication Credentials");
 				if (parseInt(data[8])) errfields.push("Data Mapping Settings");
-				openModalPopup(bAction+" Configuration", "Following values are invalid: "+errfields.join(", ")+". Note: "+errHints);
+				openModalPopup(bAction+" Configuration", "Following values are invalid: "+errfields.join(", ")+ (errHints.length!=0)? (". Note: "+errHints):'.');
 			}
 		}, function (error) {
 			unblockUI();
@@ -2665,7 +2976,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	};
 
 	$scope.ldapConf.delete = function (action) {
-		openDeleteGlobalModal("Delete Configuration", "delLdapConf");
+		openDeleteGlobalModal("Delete Configuration", "delLdapConf", "Are you sure you want to delete ? Users depending on this configuration will not be able to login.");
 	};
 	
 	$(document).on('click','#delLdapConf', function(e) {
@@ -2759,10 +3070,342 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		}
 	};
 
+	$scope.samlConf.click = function (action) {
+		$(".selectedIcon").removeClass("selectedIcon");
+		$("#samlConfigTab").find("span.fa").addClass("selectedIcon");
+		this.name = "";
+		this.url = "";
+		this.idp = "";
+		this.cert = "";
+		this.certName = "No file choosen";
+		this.urlToolTip = "Single Sign-On URL (SAML assertion URL)"
+		this.idpToolTip = "Identity Issuer (Can be text or URL)"
+		this.certToolTip = "X.509 certificate issued by provider"
+		$("#samlAcsUrl,#samlIDP").removeClass("inputErrorBorder");
+		$("#samlCert").removeClass("inputErrorText");
+		var nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
+		$("#samlServerName").removeClass(nameErrorClass);
+	};
+
+	$scope.samlConf.validate = function(action) {
+		let flag = true;
+		$("#samlAcsUrl,#samlIDP,#samlServerName").removeClass("inputErrorBorder");
+		$("#samlCert").removeClass("inputErrorText");
+		$("#samlServerName").removeClass("selectErrorBorder");
+		const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
+		const nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
+		if (this.name == "") {
+			$("#samlServerName").addClass(nameErrorClass);
+			flag = false;
+		}
+		if (this.url == "") {
+			$("#samlAcsUrl").addClass("inputErrorBorder");
+			flag = false;
+		} else if (regExURL.test(this.url) == false) {
+			$("#samlAcsUrl").addClass("inputErrorBorder");
+			openModalPopup("Error", "Invalid URL provided! URL must start with http:// or https://");
+			flag = false;
+		}
+		if (this.idp == "") {
+			$("#samlIDP").addClass("inputErrorBorder");
+			flag = false;
+		}
+		if (this.cert == "") {
+			$("#samlCert").addClass("inputErrorText");
+			flag = false;
+		}
+		return flag;
+	};
+
+	$scope.samlConf.manage = function (action,$event) {
+		const samlConf = $scope.samlConf;
+		if (!samlConf.validate(action)) return;
+		const bAction = action.charAt(0).toUpperCase() + action.substr(1);
+		var confObj = {
+			name: samlConf.name,
+			url: samlConf.url,
+			idp: samlConf.idp,
+			cert: samlConf.cert
+		};
+		const popupTitle = bAction+" SAML Configuration";
+		const failMsg = "Failed to "+action+" '"+confObj.name+"' configuration.";
+		blockUI(bAction.slice(0,-1)+"ing configuration...");
+		//Transaction Activity for Create/ Update/ Delete SAML conf button Action
+		// var labelArr = [];
+		// var infoArr = [];
+		// labelArr.push(txnHistory.codesDict['SamlConfmanage']);
+		// infoArr.push(action);
+		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+		adminServices.manageSAMLConfig(action, confObj).then(function(data){
+			unblockUI();
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "success") {
+				if (action == "create") $scope.samlConf.click();
+				else $scope.samlConf.edit();
+				openModalPopup(popupTitle, "Configuration '"+confObj.name+"' "+action+"d successfully!");
+			} else if(data == "exists") {
+				$("#samlServerName").addClass("inputErrorBorder");
+				openModalPopup(popupTitle, "Configuration '"+confObj.name+"' already Exists!");
+			} else if(data == "fail") {
+				if (action == "create") $scope.samlConf.click();
+				else $scope.samlConf.edit();
+				openModalPopup(popupTitle, failMsg);
+			} else if(/^1[0-2]{4}$/.test(data)) {
+				if (parseInt(data[1])) {
+					openModalPopup(popupTitle, failMsg+" Invalid Request!");
+					return;
+				}
+				const errHints = "<br/>";
+				if (parseInt(data[2])) $("#samlServerName").addClass("inputErrorBorder");
+				if (parseInt(data[3])) $("#samlAcsUrl").addClass("inputErrorBorder");
+				if (parseInt(data[3]) == 2) errHints += "Single Sign-On URL must start with http:// or https://<br/>";
+				if (parseInt(data[4])) $("#samlIDP").addClass("inputErrorBorder");
+				if (parseInt(data[5])) $("#samlCert").addClass("inputErrorText");
+				if (parseInt(data[5]) == 2) errHints += "File uploaded is not a valid certificate";
+				openModalPopup(popupTitle, "Some values are Invalid!" + errHints);
+			}
+		}, function (error) {
+			unblockUI();
+			openModalPopup(popupTitle, failMsg);
+		});
+	};
+
+	$scope.samlConf.edit = function () {
+		$scope.tab = "tabsamlConfigEdit";
+		$scope.samlConf.click("edit");
+		blockUI("Fetching details...");
+		adminServices.getSAMLConfig()
+		.then(function(data) {
+			unblockUI();
+			if(data == "Invalid Session") return $rootScope.redirectPage();
+			else if(data == "fail") openModalPopup("Edit Configuration", "Failed to fetch configurations.");
+			else if(data == "empty") {
+				openModalPopup("Edit Configuration", "There are no configurations created yet.");
+				const selBox = $("#samlServerName");
+				selBox.empty();
+				selBox.append("<option value='' disabled selected>Select Server</option>");
+				selBox.prop("selectedIndex", 0);
+			} else {
+				data.sort(function(a,b){ return a > b; });
+				const selBox = $("#samlServerName");
+				selBox.empty();
+				selBox.append("<option value='' disabled selected>Select Server</option>");
+				for(var i = 0; i < data.length; i++){
+					selBox.append("<option value='"+data[i].name+"'>"+data[i].name+"</option>");
+				}
+				selBox.prop("selectedIndex", 0);
+			}
+		}, function (error) {
+			unblockUI();
+			openModalPopup("Edit Configuration", "Failed to fetch configurations.");
+		});
+	};
+
+	$scope.samlConf.delete = function (action) {
+		openDeleteGlobalModal("Delete Configuration", "delSamlConf", "Are you sure you want to delete ? Users depending on this configuration will not be able to login.");
+	};
+
+	$(document).on('click','#delSamlConf', function(e) {
+		hideDeleteGlobalModal();
+		$scope.samlConf.manage("delete", e);
+	});
+
+	$(document).on('change','#samlCertInput', function(event) {
+		const targetFile = event && (event.srcElement || event.target).files[0] || null;
+		if (targetFile == null) return;
+		$scope.samlConf.certName = targetFile.name;
+		var reader = new FileReader();
+		reader.onload = function(e) {
+			$scope.samlConf.cert = (e && e.target.result)? e.target.result : this.content;
+			$scope.$apply();
+		};
+		reader.readAsBinaryString(targetFile);
+	});
+
+	$scope.samlConf.getServerData = function () {
+		const name = $scope.samlConf.name;
+		const failMsg = "Failed to fetch details for '"+name+"' configuration.";
+		blockUI("Fetching details...");
+		adminServices.getSAMLConfig(name)
+		.then(function(data){
+			unblockUI();
+			if(data == "Invalid Session") return $rootScope.redirectPage();
+			else if(data == "fail") openModalPopup("Edit Configuration", failMsg);
+			else if(data == "empty") openModalPopup("Edit Configuration", failMsg + "No such configuration exists");
+			else {
+				$scope.samlConf.url = data.url;
+				$scope.samlConf.idp = data.idp;
+				$scope.samlConf.cert = data.cert;
+			}
+		}, function (error) {
+			unblockUI();
+			openModalPopup("Edit Configuration", failMsg);
+		});
+	};
+
+	$scope.oidcConf.click = function (action) {
+		$(".selectedIcon").removeClass("selectedIcon");
+		$("#oidcConfigTab").find("span.fa").addClass("selectedIcon");
+		this.name = "";
+		this.url = "";
+		this.clientId = "";
+		this.secret = "";
+		this.idToolTip = "Public identifier for the client"
+		this.secretToolTip = "Secret used by the client to exchange an authorization code for a token"
+		$("#oidcUrl,#oidcClientId,#oidcClientSecret").removeClass("inputErrorBorder");
+		var nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
+		$("#oidcServerName").removeClass(nameErrorClass);
+	};
+
+	$scope.oidcConf.validate = function(action) {
+		let flag = true;
+		$("#oidcUrl,#oidcClientId,#oidcClientSecret,#oidcServerName").removeClass("inputErrorBorder");
+		$("#oidcServerName").removeClass("selectErrorBorder");
+		const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
+		const nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
+		if (this.name == "") {
+			$("#oidcServerName").addClass(nameErrorClass);
+			flag = false;
+		}
+		if (this.url == "") {
+			$("#oidcUrl").addClass("inputErrorBorder");
+			flag = false;
+		} else if (regExURL.test(this.url) == false) {
+			$("#oidcUrl").addClass("inputErrorBorder");
+			openModalPopup("Error", "Invalid URL provided! URL must start with http:// or https://");
+			flag = false;
+		}
+		if (this.clientId == "") {
+			$("#oidcClientId").addClass("inputErrorBorder");
+			flag = false;
+		}
+		if (this.secret == "") {
+			$("#oidcClientSecret").addClass("inputErrorBorder");
+			flag = false;
+		}
+		return flag;
+	};
+
+	$scope.oidcConf.manage = function (action,$event) {
+		const oidcConf = $scope.oidcConf;
+		if (!oidcConf.validate(action)) return;
+		const bAction = action.charAt(0).toUpperCase() + action.substr(1);
+		var confObj = {
+			name: oidcConf.name,
+			url: oidcConf.url,
+			clientid: oidcConf.clientId,
+			secret: oidcConf.secret
+		};
+		const popupTitle = bAction+" OIDC Configuration";
+		const failMsg = "Failed to "+action+" '"+confObj.name+"' configuration.";
+		blockUI(bAction.slice(0,-1)+"ing configuration...");
+		//Transaction Activity for Create/ Update/ Delete OIDC conf button Action
+		// var labelArr = [];
+		// var infoArr = [];
+		// labelArr.push(txnHistory.codesDict['OidcConfmanage']);
+		// infoArr.push(action);
+		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+		adminServices.manageOIDCConfig(action, confObj)
+		.then(function(data){
+			unblockUI();
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "success") {
+				if (action == "create") $scope.oidcConf.click();
+				else $scope.oidcConf.edit();
+				openModalPopup(popupTitle, "Configuration '"+confObj.name+"' "+action+"d successfully!");
+			} else if(data == "exists") {
+				$("#oidcServerName").addClass("inputErrorBorder");
+				openModalPopup(popupTitle, "Configuration '"+confObj.name+"' already Exists!");
+			} else if(data == "fail") {
+				if (action == "create") $scope.oidcConf.click();
+				else $scope.oidcConf.edit();
+				openModalPopup(popupTitle, "Failed to "+action+" '"+confObj.name+"' configuration.");
+			} else if(/^1[0-3]{4}$/.test(data)) {
+				if (parseInt(data[1])) {
+					openModalPopup(popupTitle, failMsg+" Invalid Request!");
+					return;
+				}
+				const errHints = "<br/>";
+				if (parseInt(data[2])) $("#oidcServerName").addClass("inputErrorBorder");
+				if (parseInt(data[3])) $("#oidcUrl").addClass("inputErrorBorder");
+				if (parseInt(data[3]) == 2) errHints += "Issuer must start with http:// or https://<br/>";
+				if (parseInt(data[4])) $("#oidcClientId").addClass("inputErrorBorder");
+				if (parseInt(data[5])) $("#oidcClientSecret").addClass("inputErrorText");
+				openModalPopup(popupTitle, "Some values are Invalid!" + errHints);
+			}
+		}, function (error) {
+			unblockUI();
+			openModalPopup(popupTitle, failMsg);
+		});
+	};
+
+	$scope.oidcConf.edit = function () {
+		$scope.tab = "taboidcConfigEdit";
+		$scope.oidcConf.click("edit");
+		blockUI("Fetching details...");
+		adminServices.getOIDCConfig()
+		.then(function(data){
+			unblockUI();
+			if(data == "Invalid Session") return $rootScope.redirectPage();
+			else if(data == "fail") openModalPopup("Edit Configuration", "Failed to fetch configurations.");
+			else if(data == "empty") {
+				openModalPopup("Edit Configuration", "There are no configurations created yet.");
+				const selBox = $("#oidcServerName");
+				selBox.empty();
+				selBox.append("<option value='' disabled selected>Select Server</option>");
+				selBox.prop("selectedIndex", 0);
+			} else {
+				data.sort(function(a,b){ return a > b; });
+				const selBox = $("#oidcServerName");
+				selBox.empty();
+				selBox.append("<option value='' disabled selected>Select Server</option>");
+				for(var i = 0; i < data.length; i++){
+					selBox.append("<option value='"+data[i].name+"'>"+data[i].name+"</option>");
+				}
+				selBox.prop("selectedIndex", 0);
+			}
+		}, function (error) {
+			unblockUI();
+			openModalPopup("Edit Configuration", "Failed to fetch configurations.");
+		});
+	};
+
+	$scope.oidcConf.delete = function (action) {
+		openDeleteGlobalModal("Delete Configuration", "deloidcConf", "Are you sure you want to delete ? Users depending on this configuration will not be able to login.");
+	};
+
+	$(document).on('click','#deloidcConf', function(e) {
+		hideDeleteGlobalModal();
+		$scope.oidcConf.manage("delete", e);
+	});
+
+	$scope.oidcConf.getServerData = function () {
+		const name = $scope.oidcConf.name;
+		const failMsg = "Failed to fetch details for '"+name+"' configuration.";
+		blockUI("Fetching details...");
+		adminServices.getOIDCConfig(name)
+		.then(function(data){
+			unblockUI();
+			if(data == "Invalid Session") return $rootScope.redirectPage();
+			else if(data == "fail") openModalPopup("Edit Configuration", failMsg);
+			else if(data == "empty") openModalPopup("Edit Configuration", failMsg + "No such configuration exists");
+			else {
+				$scope.oidcConf.url = data.url;
+				$scope.oidcConf.clientId = data.clientid;
+				$scope.oidcConf.secret = data.secret;
+			}
+		}, function (error) {
+			unblockUI();
+			openModalPopup("Edit Configuration", failMsg);
+		});
+	};
+
 	// Session Management Tab Click
 	$scope.sessionConf.click = function () {
 		$(".selectedIcon").removeClass("selectedIcon");
-		$("#sessionTab").find("img").addClass("selectedIcon");
+		$("#sessionTab").find("span.fa").addClass("selectedIcon");
 		blockUI("Retrieving session data...");
 		adminServices.manageSessionData("get")
 		.then(function (data) {
@@ -2782,7 +3425,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	// Session Management: Logoff/Disconnect User
 	$scope.sessionConf.kill = function ($event) {
-		var ele = $event.target;
+		// var ele = $event.target;
 		var action = $event.target.innerHTML.trim().toLowerCase();
 		var id = parseInt($event.target.dataset.id);
 		var msg, rootObj, key, obj;
@@ -2799,7 +3442,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		}
 		var user = obj.username;
 		blockUI(msg+user+"...");
-		adminServices.manageSessionData(action,user,key)
+		adminServices.manageSessionData(action,user,key,"session")
 		.then(function (data) {
 			if (data == "Invalid Session") {
 				$rootScope.redirectPage();

@@ -664,6 +664,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				} else openDialogExe("Execute Test Suite", "Failed to execute.");
 				$(".selectBrowser").find("img").removeClass("sb");
 				$(".selectParallel").find("img").removeClass("sb");
+				$(".selectBrowser").find("svg").removeClass("sb");
+				$(".selectParallel").find("svg").removeClass("sb");
 				browserTypeExe = [];
 				$scope.moduleInfo = [];
 				$scope.readTestSuite_ICE();
@@ -683,6 +685,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				//$('#executionFailed').modal('show');
 				$(".selectBrowser").find("img").removeClass("sb");
 				$(".selectParallel").find("img").removeClass("sb");
+				$(".selectBrowser").find("svg").removeClass("sb");
+				$(".selectParallel").find("svg").removeClass("sb");
 				browserTypeExe = [];
 				$scope.moduleInfo = [];
 				$scope.readTestSuite_ICE();
@@ -709,6 +713,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		$rootScope.resetSession.end();
 		$(".selectBrowser").find("img").removeClass("sb");
 		$(".selectParallel").find("img").removeClass("sb");
+		$(".selectBrowser").find("svg").removeClass("sb");
+		$(".selectParallel").find("svg").removeClass("sb");
 		browserTypeExe = [];
 		$scope.moduleInfo = [];
 		$scope.readTestSuite_ICE();
@@ -800,7 +806,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	//select parallel execution
 	$(document).on("click", ".selectParallel", function () {
 		$(this).find("img").toggleClass("sb");
-		if ($("img").hasClass('sb') == true) {
+		$(this).find("svg").toggleClass("sb");
+		if ($("img").hasClass('sb') == true || $("svg").hasClass('sb') == true) {
 			execAction = "parallel";
 		} else {
 			execAction = "serial";
@@ -810,7 +817,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	//Select Browser Function
 	$(document).on("click", ".selectBrowser", function () {
 		$(this).find("img").toggleClass("sb");
-		if ($(this).find("img").hasClass("sb") == false) {
+		$(this).find("svg").toggleClass("sb");
+		if ($(this).find("img").hasClass("sb") == false && $(this).find("svg").hasClass("sb") == false) {
 			var getSpliceIndex = browserTypeExe.indexOf($(this).data("name").toString());
 			browserTypeExe.splice(getSpliceIndex, 1);
 		} else {

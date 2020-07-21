@@ -877,7 +877,6 @@ input[type="radio"]{
 #left-nav-section {
     width: 166px;
     height: 100%;
-    /*background: #643693;*/
     background: #633691;
     box-sizing: content-box;
     font-family: 'LatoWebLight';
@@ -1000,11 +999,25 @@ input[type="radio"]{
     outline: 0
 }
 
-#left-top-section ul li a span img, #left-bottom-section ul li a span img {
+#left-top-section ul li a span img,
+#left-bottom-section ul li a span img,
+#left-top-section ul li a span span.fa,
+#left-bottom-section ul li a span span.fa {
     padding: 8px 10px;
 }
 
-#left-top-section ul li a:hover span img, #left-bottom-section ul li a:hover span img {
+#left-top-section ul li a span span.fa,
+#left-bottom-section ul li a span span.fa {
+    font-size: 30px;
+    vertical-align: middle;
+    float: none;
+    width: auto;
+}
+
+#left-top-section ul li a:hover span img,
+#left-bottom-section ul li a:hover span img,
+#left-top-section ul li a:hover span span.fa,
+#left-bottom-section ul li a:hover span span.fa {
     /*background: #331d4c;*/
     background: #523176;
     border-radius: 5px;
@@ -1489,9 +1502,6 @@ input[disabled]{
 	text-align: center;
     padding: 5px 0;
 }
-.pairwiseTableInput{
-
-}
 /* utility plugins */
 .comparedListItems
 {
@@ -1555,6 +1565,7 @@ input[disabled]{
     width: 60%;
     line-height: 1.7;
     border: 1px solid #656565 !important;
+    overflow: hidden;
 }
 
 .dropdown-menu-multiselect>li>input {
@@ -1899,7 +1910,7 @@ input[disabled]{
     /*background: #321e4f;*/
     background: #311d4e;
     color: #fff;
-    overflow: auto
+    /* overflow: auto; */
     word-wrap: break-word;
     padding: 50px 5px;
     margin-right: 1px;
@@ -1922,10 +1933,8 @@ input[disabled]{
 }
 
 .thumbnail-custom-wiki {                           
-    position: relative;
-    bottom: -363px;
-    margin: 0;
-    width: 100%;
+    position: absolute;
+    bottom: 0;
     left: 0;
 }
 
@@ -2139,10 +2148,6 @@ input[disabled]{
 .assist-left img{
 	vertical-align: middle;
     margin-right: 8px;
-}
-
-.assist-right{
-
 }
 .assist-right img{
 	cursor: pointer;
@@ -3216,7 +3221,7 @@ li.select_all .addCustObj{
 	font-size: 15px;
 	top:2px;
 }
-#userName
+#userName, #icename
 {
     text-transform: lowercase;
 }
@@ -3304,8 +3309,6 @@ li.select_all .addCustObj{
     -ms-box-shadow: 1px 1px 1px rgba(115, 115, 115, 0.73);
 }
 
-.toMergeObj{}
-
 .fromMergeObj{
 	cursor: pointer !important;
 }
@@ -3390,15 +3393,16 @@ li.select_all .addCustObj{
     width: 100%;
 }
 
-.adminControl div span{
+.adminControl div span {
     display: inline-block;
-    width: 75px;
-	font-weight: 700;
+    width: 130px;
+    font-weight: 700;
+    margin-top: 5px;
 }
 
-.adminControl div input{
-    display: inline;
-	width: calc(100% - 75px);
+.adminControl div input, .adminControl div select {
+    /* display: inline-block; */
+	width: calc(100% - 130px);
 }
 
 .adminSelect:focus {
@@ -3479,6 +3483,11 @@ li.select_all .addCustObj{
 .projectForm {
 	margin-bottom: 3%;
 	padding: 0 0px;
+}
+
+.projectForm1 {
+	margin-bottom: 2%;
+    padding: 0 0px;
 }
 
 .appTypeTxt {
@@ -3696,29 +3705,27 @@ li.select_all .addCustObj{
     background: #f1f1f1;
 }
 
-.disableAddCycle
-{
+.disableAddCycle {
     cursor: not-allowed !important;
     pointer-events: none;
 }
-.createProjectBtn
-{
+.createProjectBtn {
     margin-right: 10px;
 }
-#selProject
-{
+
+#selProject {
     margin-left: 0;
     position: relative;
     left: 24px;
 }
-#userRoles
-{
+
+#userRoles {
     position: relative;
     left: 10px;
     top: 2px;
 }
 
-#additionalRoles{
+#additionalRoles {
 	position: relative;
     top: -1px;
 }
@@ -3814,25 +3821,25 @@ li.select_all .addCustObj{
     width: 10%;
 }
 .center-button button {
-font-size: 11px;
-cursor: pointer;
-font-weight: 600;
-width: 35px;
-outline: none;
-margin-bottom: 15px;
-padding: 6px 12px;
-background: #643693;
-border: none;
-color: #fff;
-border-radius: 3px;
--moz-border-radius: 3px;
--webkit-border-radius: 3px;
--o-border-radius: 3px;
--ms-border-radius: 3px;
-margin-top: 1%;
-margin-left: 12%;
-clear: both;
-float: left;
+    font-size: 11px;
+    cursor: pointer;
+    font-weight: 600;
+    width: 35px;
+    outline: none;
+    margin-bottom: 15px;
+    padding: 6px 12px;
+    background: #643693;
+    border: none;
+    color: #fff;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -o-border-radius: 3px;
+    -ms-border-radius: 3px;
+    margin-top: 1%;
+    margin-left: 12%;
+    clear: both;
+    float: left;
 }
 .right-select {
     float: right;
@@ -3851,6 +3858,15 @@ select[multiple]:focus option:checked {
 }
 select[multiple]:-internal-list-box option:checked {
 	background: none;
+}
+
+#samlCertValue {
+    margin-top: 5px;
+    width: calc(100% - 130px);
+    height: 150px;
+    font-size: 12px;
+    resize: none;
+    float: right;
 }
 
 .sessionItemWrap {
@@ -4374,8 +4390,11 @@ select:-webkit-autofill:focus {
 	border: 2px solid #d33c3c !important;
 }
 
-.modal-body .row-modal .form-control-custom.inputErrorBorderBottom, .form-control-custom.inputErrorBorderBottom
-{
+.inputErrorText{
+	color: #d33c3c !important;
+}
+
+.modal-body .row-modal .form-control-custom.inputErrorBorderBottom, .form-control-custom.inputErrorBorderBottom{
     border: 2px solid #d33c3c !important;
     border-left: 0 !important;
     border-right: 0 !important;
@@ -5100,29 +5119,13 @@ line.subdomain {
 }
 
 #first{
-  /*float: left;
-  margin: 20px ;
-*/  padding: 20px;
+  padding: 20px;
   position: relative;
-//  width: 38%;
-//  align: center;
-//  border-radius: 5px;
-  /*background: #e0d2f7;*/
   background: #f5f5f5;
-//  box-shadow: 1px 1px 10px -1px #6b6473;*/
 }
 .second{
-  //float: left;
-//  margin: 20px ;
-  //padding: 20px;
   position: relative;
-  //width: 20.5%;
-  //align: center;
-//  border-radius: 5px;
-  /*background: #e0d2f7;*/
   background: #f5f5f5;
-  //box-shadow: 1px 1px 10px -1px #6b6473;
- /*border:1px solid;*/
 }
 
 .d-dropdown{
@@ -5153,7 +5156,6 @@ line.subdomain {
 .btn-cotainer{
   position: absolute;
   z-index: 99;
-  //width: 100px;
   top: -20px;
   position: relative;
   float: right;
@@ -5166,7 +5168,6 @@ line.subdomain {
   padding: 10px;
   background-color:#e0d2f7;;
   text-align:center;
-  //border-radius: 7px;
   box-shadow: 1px 1px 10px -1px #6b6473;
   font-family: Cambria;
   color: purple;
@@ -5827,7 +5828,7 @@ option:disabled {
     float: left;
     margin-top: 1%;
     position: relative;
-    left: 13%;
+    left: 0.5%;
 }
 ul.browserInlineIcons
 {
@@ -6477,4 +6478,24 @@ h4.titleBadge
     text-decoration: none;
     color: #333;
     pointer-events: none !important;
+}
+
+#icetokenarea textarea {
+    margin-top: 5px;
+    width: calc(100% - 180px);
+    height: 70px;
+    resize: none;
+}
+
+#icetokenarea span.fa {
+    font-size: 22px;
+    padding: 5px;
+    width: auto;
+    display: block;
+}
+
+#icetokenarea span.fa:hover {
+    background: #ddd;
+    border-radius: 7px;
+    cursor: pointer;
 }

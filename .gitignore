@@ -3,3 +3,4 @@ logs/*
 node.exe
 npm.cmd
 assets/wkhtmltox
+*.bat

@@ -62,9 +62,11 @@ if (cluster.isMaster) {
 		redisSessionClient.on("connect", function(err) {
 			logger.debug("Redis DB connected");
 		});
-		var redisSessionStore = new redisStore({
+		var rsStore = new redisStore({
 			client: redisSessionClient
 		});
+		rsStore.pDestroy =  async (sid) => (new Promise((rsv, rej) => rsStore.destroy(sid, (e,d) => ((e)? rej(e):rsv(d)))));
+		rsStore.pAll =  async () => (new Promise((rsv, rej) => rsStore.all((e,d) => ((e)? rej(e):rsv(d)))));
 
 		//HTTPS Configuration
 		var uiConfig = require('./server/config/options');
@@ -82,7 +84,7 @@ if (cluster.isMaster) {
 		var httpsServer = require('https').createServer(credentials, app);
 		var serverPort = process.env.SERVER_PORT || 8443;
 		module.exports = app;
-		module.exports.redisSessionStore = redisSessionStore;
+		module.exports.rsStore = rsStore;
 		module.exports.httpsServer = httpsServer;
 		var io = require('./server/lib/socket');
 
@@ -131,7 +133,7 @@ if (cluster.isMaster) {
 			rolling: true,
 			saveUninitialized: false, //Should always be false for cookie to clear
 			secret: '$^%EDE%^tfd65e7ufyCYDR^%IU',
-			store: redisSessionStore
+			store: rsStore
 		}));
 
 		app.use('*', function(req, res, next) {
@@ -159,9 +161,10 @@ if (cluster.isMaster) {
 				failure: "/error?e=403"
 			}
 		};
-		var authlib = require("./server/lib/auth");
+		const utils = require("./server/lib/utils");
+		const authlib = require("./server/lib/auth");
 		var auth = authlib(authParams);
-		var authStrategy = auth.strategy;
+		//var authStrategy = auth.strategy;
 		app.use(auth.router);
 		auth = auth.util;
 
@@ -267,61 +270,39 @@ if (cluster.isMaster) {
 			res.redirect('/');
 		});
 
-		app.get('/', function(req, res, next) {
-			if (!(req.url == '/' || req.url.startsWith("/?"))) return next();
-			authRedirecter(req, req.user, function(redirect) {
-				if (redirect) {
-					req.clearSession();
-					return res.redirect('login');
-				} else {
-					req.session.logged = true;
-					return res.sendFile("app.html", { root: __dirname + "/public/" });
-				}
-			});
-		});
-
-		function authRedirecter(req, user, cb) {
-			var redirect = !1;
-			var userLogged = req.session.logged;
+		const authRedirecter = async req => {
+			let redirect = !1;
+			let userLogged = req.session.logged;
+			let user = req.user;
 			if (userLogged && !req.session.emsg) {
 				req.session.emsg = "userLogged";
 				req.session.dndSess = true;
-				cb(redirect);
 			} else if (!req.session.emsg && req.session.username == undefined) {
 				if (user) {
-					var username = user.username;
+					let username = user.username;
 					if (username == undefined) {
 						req.session.emsg = "invalid_username_password";
-						cb(redirect);
 					} else {
 						username = username.toLowerCase();
-						redisSessionStore.all(function(err, allKeys) {
-							if (err) {
-								logger.info("User Authentication failed");
-								req.session.emsg = "fail";
+						try {
+							const sessid = await utils.findSessID(username);
+							if (sessid != "") {
+								req.session.emsg = "userLogged";
 							} else {
-								for (var ki = 0; ki < allKeys.length; ki++) {
-									if (username == allKeys[ki].username) {
-										userLogged = true;
-										break;
-									}
-								}
-								if (userLogged) {
-									req.session.emsg = "userLogged";
-								} else {
-									req.session.username = username;
-									req.session.uniqueId = req.session.id;;
-									req.session.ldapuser = user.ldap_flag;
-									logger.rewriters[0] = function(level, msg, meta) {
-										meta.username = username;
-										meta.userid = null;
-										meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
-										return meta;
-									};
-								}
+								req.session.username = username;
+								req.session.uniqueId = req.session.id;;
+								req.session.ldapuser = user.ldap_flag;
+								logger.rewriters[0] = function(level, msg, meta) {
+									meta.username = username;
+									meta.userid = null;
+									meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
+									return meta;
+								};
 							}
-							cb(redirect);
-						});
+						} catch (err) {
+							logger.error("User Authentication failed. Error: ", err);
+							req.session.emsg = "fail";
+						}
 					}
 				} else {
 					logger.rewriters[0] = function(level, msg, meta) {
@@ -330,10 +311,23 @@ if (cluster.isMaster) {
 						meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
 						return meta;
 					};
-					cb(!redirect);
+					redirect = !redirect;
 				}
-			} else cb(redirect);
+			}
+			return redirect;
 		};
+
+		app.get('/', async (req, res, next) => {
+			if (!(req.url == '/' || req.url.startsWith("/?"))) return next();
+			const redirect = await authRedirecter(req);
+			if (redirect) {
+				req.clearSession();
+				return res.redirect('login');
+			} else {
+				req.session.logged = true;
+				return res.sendFile("app.html", { root: __dirname + "/public/" });
+			}
+		});
 
 		// Dummy Service for keeping session alive during long-term execution, etc. #Polling
 		app.post('/keepSessionAlive_Nineteen68', function(req, res, next) { res.end(); });
@@ -503,14 +497,14 @@ if (cluster.isMaster) {
 		app.post('/excelToMindmap', mindmap.excelToMindmap);
 		app.post('/getScreens', mindmap.getScreens);
 		app.post('/exportToExcel', mindmap.exportToExcel);
-		app.post('/pdProcess',mindmap.pdProcess);	// process discovery service
+		app.post('/pdProcess', auth.protect, mindmap.pdProcess);	// process discovery service
 		//Login Routes
 		//app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
 		app.post('/checkUserState_Nineteen68', login.checkUserState_Nineteen68);
 		app.post('/loadUserInfo_Nineteen68', login.loadUserInfo_Nineteen68);
-		app.post('/getRoleNameByRoleId_Nineteen68', login.getRoleNameByRoleId_Nineteen68);
+		app.post('/getRoleNameByRoleId_Nineteen68', auth.protect, login.getRoleNameByRoleId_Nineteen68);
 		app.post('/logoutUser_Nineteen68', login.logoutUser_Nineteen68);
-		app.post('/resetPassword_Nineteen68', login.resetPassword_Nineteen68);
+		app.post('/resetPassword_Nineteen68', auth.protect, login.resetPassword_Nineteen68);
 		//Admin Routes
 		app.post('/getUserRoles_Nineteen68', admin.getUserRoles_Nineteen68);
 		app.post('/getDomains_ICE', admin.getDomains_ICE);
@@ -520,16 +514,22 @@ if (cluster.isMaster) {
 		app.post('/getDetails_ICE', admin.getDetails_ICE);
 		app.post('/assignProjects_ICE', admin.assignProjects_ICE);
 		app.post('/getAssignedProjects_ICE', admin.getAssignedProjects_ICE);
-		app.post('/getAvailablePlugins', admin.getAvailablePlugins);
-		app.post('/manageSessionData', admin.manageSessionData);
-		app.post('/manageUserDetails', admin.manageUserDetails);
-		app.post('/getUserDetails', admin.getUserDetails);
-		app.post('/testLDAPConnection', admin.testLDAPConnection);
-		app.post('/getLDAPConfig', admin.getLDAPConfig);
-		app.post('/manageLDAPConfig', admin.manageLDAPConfig);
+		app.post('/getAvailablePlugins', auth.protect, admin.getAvailablePlugins);
+		app.post('/manageSessionData', auth.protect, admin.manageSessionData);
+		app.post('/manageUserDetails', auth.protect, admin.manageUserDetails);
+		app.post('/getUserDetails', auth.protect, admin.getUserDetails);
+		app.post('/testLDAPConnection', auth.protect, admin.testLDAPConnection);
+		app.post('/getLDAPConfig', auth.protect, admin.getLDAPConfig);
+		app.post('/manageLDAPConfig', auth.protect, admin.manageLDAPConfig);
+		app.post('/getSAMLConfig', auth.protect, admin.getSAMLConfig);
+		app.post('/manageSAMLConfig', auth.protect, admin.manageSAMLConfig);
+		app.post('/getOIDCConfig', auth.protect, admin.getOIDCConfig);
+		app.post('/manageOIDCConfig', auth.protect, admin.manageOIDCConfig);
 		app.post('/getCIUsersDetails', admin.getCIUsersDetails);
 		app.post('/manageCIUsers', admin.manageCIUsers);
-		app.post('/getPreferences', admin.getPreferences);
+		app.post('/getPreferences', auth.protect, admin.getPreferences);
+		app.post('/provisionIce', auth.protect, admin.provisionICE);
+		app.post('/fetchICE', auth.protect, admin.fetchICE);
 
 		//Design Screen Routes
 		app.post('/initScraping_ICE', designscreen.initScraping_ICE);
@@ -590,6 +590,8 @@ if (cluster.isMaster) {
 		app.post('/APG_OpenFileInEditor', flowGraph.APG_OpenFileInEditor);
 		app.post('/APG_createAPGProject', flowGraph.APG_createAPGProject);
 		app.post('/APG_runDeadcodeIdentifier', flowGraph.APG_runDeadcodeIdentifier);
+		// ICE Provisioning
+		app.post('/ICE_provisioning_register', io.registerICE);
 		//-------------Route Mapping-------------//
 
 		// To prevent can't send header response

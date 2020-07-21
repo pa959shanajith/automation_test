@@ -9,6 +9,7 @@ const server_sub = redis.createClient(redisConfig);
 // cache.select(2);
 const server_pub = default_pub;
 default_pub.pubsubPromise =  async (cmd, ...channel) => (new Promise((rsv, rej) => default_pub.pubsub(cmd, channel, (e,d) => ((e)? rej(e):rsv(d)))));
+const utils = require("./utils");
 
 default_sub.on("message", (channel, message) => {
 	logger.debug("In redisSocketHandler: Channel is %s", channel);
@@ -22,6 +23,11 @@ default_sub.on("message", (channel, message) => {
 		mySocket = sockets.allSchedulingSocketsMap[data.username];
 	else
 		mySocket = sockets.allSocketsMap[data.username];
+	if (mySocket === undefined) {
+		const dataToNode = JSON.stringify({"username": data.username, "onAction": "unavailableLocalServer", "value": {}});
+		server_pub.publish("ICE2_" + data.username, dataToNode);
+		return false;
+	}
 	switch (data.emitAction) {
 	case "webCrawlerGo":
 		mySocket.emit("webCrawlerGo", data.input_url, data.level, data.agent, data.proxy,data.searchData);
@@ -99,20 +105,20 @@ default_sub.on("message", (channel, message) => {
 	case "runDeadcodeIdentifier":
 		mySocket.emit("runDeadcodeIdentifier", data.version, data.path);
 		break;
-		
+
 	case "getSocketInfo":
 		const data_packet = {"username": data.username, "value": mySocket? mySocket.handshake.address:"fail"};
 		server_pub.publish("ICE2_" + data.username, JSON.stringify(data_packet));
 		break;
 
 	case "killSession":
-		mySocket.emit("killSession", data.cmdBy);
+		mySocket.emit("killSession", data.cmdBy, data.reason);
 		break;
-	
+
 	case "irisOperations":
 		mySocket.emit("irisOperations", data.image_data, data.param);
 		break
-		
+
 	default:
 		var dataToNode = JSON.stringify({"username": data.username, "onAction": "fail", "value": "fail"});
 		server_pub.publish("ICE2_" + data.username, dataToNode);
@@ -134,7 +140,7 @@ module.exports.redisSubServer = server_sub;
 //module.exports.cache = cache;
 
 module.exports.initListeners = mySocket => {
-	const username = mySocket.handshake.query.username;
+	const username = mySocket.handshake.query.icename;
 	logger.debug("Initializing ICE Engine connection for %s",username);
 	mySocket.evdata = {};
 	mySocket.pckts = [];
@@ -293,5 +299,9 @@ module.exports.initListeners = mySocket => {
 	mySocket.on('iris_operations_result', value => {
 		const dataToNode = JSON.stringify({"username" : username,"onAction" : "iris_operations_result","value":JSON.parse(value)});
 		server_pub.publish('ICE2_' + username, dataToNode);
+	});
+	mySocket.on('benchmark_ping', async value => {
+		const result = await utils.fetchData(value, "benchmark/store", "benchmark_ping");
+		if (result == "fail") logger.error("Error occurred in storing benchmark");
 	});
 };
