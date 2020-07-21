@@ -332,7 +332,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 		$(".btn-accept").click();
 		$(".modal-backdrop.fade.in").remove();
 		window.localStorage.clear();
-		headerServices.logoutUser_Nineteen68()
+		headerServices.logoutUser()
 		.then(function(data){
 			$location.path('/');
 		}, function(error) {
@@ -341,7 +341,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 	};
 	$rootScope.resetSession = {
 		poll: function pollingCall() {
-			headerServices.keepSessionAlive_Nineteen68()
+			headerServices.keepSessionAlive()
 			.then(function(data){
 				console.debug("User Session Extended");
 			}, function(error) {

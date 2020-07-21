@@ -45,7 +45,7 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 		} else {
 			var username = $scope.ud.userName.toLowerCase();
 			var password = $scope.ud.password;
-			LoginService.authenticateUser_Nineteen68(username, password)
+			LoginService.authenticateUser(username, password)
 			.then(function (data) {
 				cfpLoadingBar.complete();
 				if (data == "restart") {

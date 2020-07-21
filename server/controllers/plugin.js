@@ -3,15 +3,15 @@ var logger = require('../../logger');
 var utils = require('../lib/utils');
 
 //getProjectIds
-exports.getProjectIDs_Nineteen68 = function (req, res) {
-	logger.info("Inside UI service: getProjectIDs_Nineteen68");
+exports.getProjectIDs = function (req, res) {
+	logger.info("Inside UI service: getProjectIDs");
 	if (utils.isSessionActive(req)) {
-		logger.info("Calling UI Service getProjectIDs_Nineteen68 from create_ice");
+		logger.info("Calling UI Service getProjectIDs from create_ice");
 		var obj = req.body;
 		obj.userid = req.session.userid;
-		create_ice.getProjectIDs_Nineteen68(obj, function (err, data) {
+		create_ice.getProjectIDs(obj, function (err, data) {
 			if (err) {
-				logger.info("Error in getProjectIDs_Nineteen68 from create_ice");
+				logger.info("Error in getProjectIDs from create_ice");
 				logger.error(err);
 				res.send('fail');
 			} else {

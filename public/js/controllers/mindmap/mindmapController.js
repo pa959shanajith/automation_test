@@ -203,7 +203,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (!$scope.projectNameO) {
                     $scope.projectNameO = res.projectId[0];
                 }
-                mindmapServices.getProjectTypeMM_Nineteen68($scope.projectNameO).then(function(res1){
+                mindmapServices.getProjectTypeMM($scope.projectNameO).then(function(res1){
                     $scope.apptypelist = res1;
                     $scope.apptype = res1.project_typename;
                     $scope.domain = res1.domains;
@@ -381,7 +381,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         } else if ($scope.tab == 'tabCreate') {
             loadMindmapData1();
         }
-        mindmapServices.getProjectTypeMM_Nineteen68($scope.projectNameO).then(function(res1){
+        mindmapServices.getProjectTypeMM($scope.projectNameO).then(function(res1){
             $scope.apptypelist = res1;
             $scope.apptype = res1.project_typename;
             addInfo({'attributes':{

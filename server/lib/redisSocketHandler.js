@@ -1,7 +1,7 @@
 const redis = require("redis");
 const validator =  require('validator');
 const logger = require("../../logger");
-const redisConfig = {"host": process.env.REDIS_IP, "port": parseInt(process.env.REDIS_PORT),"password" : process.env.REDIS_AUTH};
+const redisConfig = {"host": process.env.CACHEDB_IP, "port": parseInt(process.env.CACHEDB_PORT),"password" : process.env.CACHEDB_AUTH};
 const default_sub = redis.createClient(redisConfig);
 const default_pub = redis.createClient(redisConfig);
 const server_sub = redis.createClient(redisConfig);

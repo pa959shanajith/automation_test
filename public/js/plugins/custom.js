@@ -675,7 +675,7 @@ var txnHistory = {
 
 	codesDict : {
 		"Login" : "100",
-		"Nineteen68Logo" : "101",
+		"AvoAssureLogo" : "101",
 		"BellIcon" : "102",
 		"SwitchRole" : "103",
 		"Logout" : "104",		

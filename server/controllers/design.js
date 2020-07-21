@@ -260,7 +260,7 @@ exports.debugTestCase_ICE = function (req, res) {
 												responsedata.push(responseobject);
 											}
 											responsedata.push(browsertypeobject);
-											logger.info("Sending socket request for debugTestCase to redis");
+											logger.info("Sending socket request for debugTestCase to cachedb");
 											dataToIce = {"emitAction" : "debugTestCase","username" : icename, "responsedata":responsedata};
 											redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 											function result_debugTestCase_listener(channel, message) {
@@ -296,7 +296,7 @@ exports.debugTestCase_ICE = function (req, res) {
 							try {
 								var testcaseWS = [];
 								testcaseWS.push(req.body.testCaseWS);
-								logger.info("Sending socket request for debugTestCaseWS_ICE to redis");
+								logger.info("Sending socket request for debugTestCaseWS_ICE to cachedb");
 								dataToIce = {"emitAction" : "debugTestCase","username" : icename, "responsedata":testcaseWS};
 								redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 								function result_debugTestCaseWS_listener(channel, message) {
@@ -374,7 +374,7 @@ exports.debugTestCase_ICE = function (req, res) {
 						} else if (action == 'wsdlListGenerator_ICE') {
 							try {
 								var wsdlurl = req.body.wsdlurl;
-								logger.info("Sending socket request for debugTestCase to redis");
+								logger.info("Sending socket request for debugTestCase to cachedb");
 								dataToIce = {"emitAction" : "wsdl_listOfOperation","username" : icename, "wsdlurl":wsdlurl};
 								redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));	
 									function result_wsdl_listOfOperation_listener(channel, message) {
@@ -444,7 +444,7 @@ exports.debugTestCase_ICE = function (req, res) {
 									soapVersion: soapVersion,
                                     serverCertificate:certificate
 								};
-								logger.info("Sending socket request for debugTestCase to redis");
+								logger.info("Sending socket request for debugTestCase to cachedb");
 								dataToIce = {"emitAction" : "wsdl_ServiceGenerator","username" : icename, "serviceGenRequest":serviceGenRequest};
 								redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 								function result_wsdl_ServiceGenerator_listener(channel, message) {

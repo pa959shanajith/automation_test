@@ -73,7 +73,7 @@ function openScreenShot(req, path, cb) {
         redisServer.redisSubServer.subscribe('ICE2_' + icename);
         redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
             if (redisres[1] > 0) {
-                logger.info("Sending socket request for render_screenshot to redis");
+                logger.info("Sending socket request for render_screenshot to cachedb");
                 var dataToIce = {
                     "emitAction": "render_screenshot",
                     "username": icename,
@@ -450,8 +450,8 @@ exports.reportStatusScenarios_ICE = function(req, res) {
 };
 
 //To render reports
-exports.getReport_Nineteen68 = function(req, res) {
-    logger.info("Inside UI service: getReport_Nineteen68");
+exports.getReport = function(req, res) {
+    logger.info("Inside UI service: getReport");
     try {
         if (utils.isSessionActive(req)) {
             var reportId = req.body.reportId;
@@ -469,12 +469,12 @@ exports.getReport_Nineteen68 = function(req, res) {
                     "Content-Type": "application/json"
                 }
             };
-            logger.info("Calling NDAC Service from getReport_Nineteen68 - projectsUnderDomain: reports/getReport_Nineteen68");
-            client.post(epurl + "reports/getReport_Nineteen68", args,
+            logger.info("Calling NDAC Service from getReport - projectsUnderDomain: reports/getReport");
+            client.post(epurl + "reports/getReport", args,
                 function(reportResult, response) {
                     if (response.statusCode != 200 || reportResult.rows == "fail") {
                         flag = "fail";
-                        logger.error("Error occurred in the service getReport_Nineteen68 - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports. Error Code : ERRNDAC");
+                        logger.error("Error occurred in the service getReport - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports. Error Code : ERRNDAC");
                         res.send(flag);
                     } else {
                         try{
@@ -492,20 +492,20 @@ exports.getReport_Nineteen68 = function(req, res) {
                             reportInfoObj.domainname = domainname;
                             finalReport.push(reportInfoObj);
                             finalReport.push(reportjson);
-                            logger.info("Sending reports in the service getReport_Nineteen68: final function");
+                            logger.info("Sending reports in the service getReport: final function");
                             res.send(finalReport);
                         } catch (exception) {
-                            logger.error("Exception in the service getReport_Nineteen68 - projectsUnderDomain: %s", exception);
+                            logger.error("Exception in the service getReport - projectsUnderDomain: %s", exception);
                             res.send("fail");
                         }            
                     }
                 });
             } else {
-            logger.error("Invalid Session, in the service getReport_Nineteen68");
+            logger.error("Invalid Session, in the service getReport");
             res.send("Invalid Session");
         }
     } catch (exception) {
-        logger.error("Exception in the service getReport_Nineteen68 - cycleid: %s", exception);
+        logger.error("Exception in the service getReport - Error: %s", exception);
         res.send("fail");
     }
 };
@@ -534,7 +534,7 @@ exports.connectJira_ICE = function(req, res) {
                         logger.debug("ICE Socket requesting Address: %s", icename);
                         redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
                             if (redisres[1] > 0) {
-                                logger.info("Sending socket request for jira_login to redis");
+                                logger.info("Sending socket request for jira_login to cachedb");
                                 var dataToIce = {
                                     "emitAction": "jiralogin",
                                     "username": icename,
@@ -596,7 +596,7 @@ exports.connectJira_ICE = function(req, res) {
                         logger.debug("ICE Socket requesting Address: %s", icename);
                         redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
                             if (redisres[1] > 0) {
-                                logger.info("Sending socket request for jira_login to redis");
+                                logger.info("Sending socket request for jira_login to cachedb");
                                 dataToIce = {
                                     "emitAction": "jiralogin",
                                     "username": icename,
@@ -718,8 +718,8 @@ exports.getReportsData_ICE = function(req, res) {
 };
 
 //Get report for execution
-exports.get_Nineteen68Report = async(req, res) => {
-    logger.info("Inside UI service: get_Nineteen68Report");
+exports.getReport_API = async(req, res) => {
+    logger.info("Inside UI service: getReport_API");
     try {
 		var executionId = req.body.execution_data.executionId || "";
 		var scenarioIds = req.body.execution_data.scenarioIds;
@@ -731,7 +731,6 @@ exports.get_Nineteen68Report = async(req, res) => {
 		if (execResponse.tokenValidation == "passed"){
             delete execResponse.error_message; 
             var inputs = {
-                "query": "get_Nineteen68Report",
                 "executionId": executionId,
                 "scenarioIds": scenarioIds
             };
@@ -741,11 +740,11 @@ exports.get_Nineteen68Report = async(req, res) => {
                     "Content-Type": "application/json"
                 }
             };
-            logger.info("Calling NDAC Service from get_Nineteen68Report - get_Nineteen68Report: reports/get_Nineteen68Report");
-            client.post(epurl + "reports/get_Nineteen68Report", args,
+            logger.info("Calling NDAC Service from getReport_API - getReport_API: reports/getReport_API");
+            client.post(epurl + "reports/getReport_API", args,
                 function(reportResult, response) {
                     if (response.statusCode != 200 || reportResult.rows == "fail") {
-                        logger.error("Error occurred in the service get_Nineteen68Report - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports. Error Code : ERRNDAC");
+                        logger.error("Error occurred in the service getReport_API - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports. Error Code : ERRNDAC");
                         if(reportResult.errMsg != ""){
                             execResponse.error_message=reportResult.errMsg;
                         }
@@ -821,10 +820,10 @@ exports.get_Nineteen68Report = async(req, res) => {
                             for(var k in tempModDict){
                                 finalReport.push(tempModDict[k]);
                             } 
-                            logger.info("Sending reports in the service get_Nineteen68Report: final function");
+                            logger.info("Sending reports in the service getReport_API: final function");
                             res.send(finalReport);
                         } catch (exception) {
-                            logger.error("Exception in the service get_Nineteen68Report - projectsUnderDomain: %s", exception);
+                            logger.error("Exception in the service getReport_API - projectsUnderDomain: %s", exception);
                             res.send("fail");
                         }            
                     }
@@ -834,7 +833,7 @@ exports.get_Nineteen68Report = async(req, res) => {
                 res.send(finalReport);
             }
     } catch (exception) {
-        logger.error("Exception in the service get_Nineteen68Report - cycleid: %s", exception);
+        logger.error("Exception in the service getReport_API - Error: %s", exception);
         res.send("fail");
     }
 };

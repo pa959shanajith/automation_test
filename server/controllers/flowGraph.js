@@ -22,7 +22,7 @@ exports.flowGraphResults = function(req, res){
 			redisServer.redisSubServer.subscribe('ICE2_' + icename ,1);
 			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
 				if (redisres[1]>0) {
-					logger.info("Sending socket request for generateFlowGraph to redis");
+					logger.info("Sending socket request for generateFlowGraph to cachedb");
 					var dataToIce = {"emitAction" : "generateFlowGraph","username" : icename, "version":version, "path" : path};
 					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					function generateFlowGraph_listener(channel,message) {
@@ -90,7 +90,7 @@ exports.APG_OpenFileInEditor = function (req, res) {
 					var lineNumber = req.body.lineNumber;
 					var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 					logger.info("ICE Socket requesting Address: %s" , icename);
-					logger.info("Sending socket request for apgOpenFileInEditor to redis");
+					logger.info("Sending socket request for apgOpenFileInEditor to cachedb");
 					var dataToIce = {"emitAction" : "apgOpenFileInEditor","username" : icename,
 								"editorName":editorName,"filePath":filePath,"lineNumber":lineNumber};
 					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
@@ -183,7 +183,7 @@ exports.APG_runDeadcodeIdentifier = function(req,res){
 						var version = req.body.version;
 						var path = req.body.path;
 						logger.info("ICE Socket requesting Address: %s" , icename);
-						logger.info("Sending socket request for runDeadcodeIdentifier to redis");
+						logger.info("Sending socket request for runDeadcodeIdentifier to cachedb");
 						var dataToIce = {"emitAction" : "runDeadcodeIdentifier","username" : icename,
 									"version":version,"path":path};
 						redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));

@@ -441,7 +441,7 @@ const executionFunction = async (batchExecutionData, execIds, userInfo, execType
 	return result;
 };
 
-/** This service executes the testsuite(s) for request from Nineteen68 */
+/** This service executes the testsuite(s) for request from Avo Assure */
 exports.ExecuteTestSuite_ICE = async (req, res) => {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE");
 	const userInfo = { "userid": req.session.userid, "username": req.session.username, "role": req.session.activeRoleId };

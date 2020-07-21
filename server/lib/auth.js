@@ -78,10 +78,10 @@ var strategyUtil = {
 						data: { "username": username },
 						headers: { "Content-Type": "application/json" }
 					};
-					logger.info("Calling NDAC Service : loadUser_Nineteen68");
-					client.post(epurl + "login/loadUser_Nineteen68", args, function (result, response) {
+					logger.info("Calling NDAC Service : loadUser");
+					client.post(epurl + "login/loadUser", args, function (result, response) {
 						if (response.statusCode != 200 || result.rows == "fail") {
-							logger.error("Error occurred in loadUser_Nineteen68 Error Code : ERRNDAC");
+							logger.error("Error occurred in loadUser Error Code : ERRNDAC");
 							callback('fail')
 						}else if (result.rows == null) return callback("invalid_username_password");
 						else if (result.rows.ldapuser.server != undefined) {    // LDAP Authentication
@@ -122,7 +122,7 @@ var strategyUtil = {
 	"oidc": function openid_connect(opts){
 		var userAgent = OpenIdClientIssuer.defaultHttpOptions.headers['User-Agent'];
 		userAgent = (userAgent && typeof userAgent === 'string')? userAgent.split(' ')[0]:'';
-		userAgent = "Nineteen68 Webserver "+userAgent+" node/"+process.versions.node;
+		userAgent = "Avo Assure Webserver "+userAgent+" node/"+process.versions.node;
 		OpenIdClientIssuer.defaultHttpOptions.headers['User-Agent'] = userAgent;
 		OpenIdClientIssuer.defaultHttpOptions.timeout = 10000;
 		var issuer = config.identitityProviderURL;
@@ -165,7 +165,7 @@ var strategyUtil = {
 		var END_CERT = "-----END CERTIFICATE-----\n";
 		config.cert=fs.readFileSync(config.cert, 'utf-8').replace(BEGIN_CERT,'').replace(END_CERT,'');
 		var samlStrategy = new SamlStrategy({
-			issuer: config.issuer || "SLK Nineteen68 Webserver",
+			issuer: config.issuer || "Avo Assure Webserver",
 			callbackUrl: config.redirectURI,
 			entryPoint: config.acsURL,
 			cert: config.cert, //privateCert, decryptionPvk,

@@ -2,7 +2,7 @@
 var nodewin = require('node-windows')
 var Service = nodewin.Service;
 var SERVER = 'WebServer';
-var svcName = 'nineteen68WebServer';
+var svcName = 'AvoAssureWebServer';
 var svcScript = '.\\server.js';
 
 nodewin.isAdminUser(function(isAdmin){
@@ -10,12 +10,12 @@ nodewin.isAdminUser(function(isAdmin){
 		// Create a new service object
 		if(process.argv.length == 4 && process.argv[3] == 'FILESERVER'){
 			SERVER = 'FileServer';
-			svcName = 'nineteen68FileServer';
+			svcName = 'AvoAssureFileServer';
 			svcScript = '.\\server\\controllers\\fileserver.js';
 		}
 		var svc = new Service({
 			name: svcName,
-			description: 'Nineteen68 '+SERVER+' Windows Service',
+			description: 'Avo Assure '+SERVER+' Windows Service',
 			script: svcScript,
 			nodeOptions: [
 				'--max_old_space_size=4096',
@@ -25,18 +25,18 @@ nodewin.isAdminUser(function(isAdmin){
 		// Listen for the "install" event, which indicates the
 		// process is available as a service.
 		svc.on('install',function(){
-			console.log("Nineteen68 "+SERVER+" service installed.");
+			console.log("Avo Assure "+SERVER+" service installed.");
 		});
 
 		// Listen for the "alreadyinstalled" event, which indicates the
 		// process is already available as a service.
 		svc.on('alreadyinstalled',function(){
-			console.log("Nineteen68 "+SERVER+" service is already installed.");
+			console.log("Avo Assure "+SERVER+" service is already installed.");
 		});
 
 		// Listen for the "uninstall" event so we know when it's done.
 		svc.on('uninstall',function(){
-			console.log("Nineteen68 "+SERVER+" service uninstallation complete.");
+			console.log("Avo Assure "+SERVER+" service uninstallation complete.");
 		});
 
 		// arg could be 'install', 'uninstall', 'start', 'stop', by default 'install' will be considered
@@ -52,11 +52,11 @@ nodewin.isAdminUser(function(isAdmin){
 					svc.uninstall();
 					break;
 				case 'start':
-					console.log("Starting Nineteen68 "+SERVER+" service...");
+					console.log("Starting Avo Assure "+SERVER+" service...");
 					svc.start();
 					break;
 				case 'stop':
-					console.log("Stopping Nineteen68 "+SERVER+" service...");
+					console.log("Stopping Avo Assure "+SERVER+" service...");
 					svc.stop();
 					break;
 				default:
@@ -69,7 +69,7 @@ nodewin.isAdminUser(function(isAdmin){
 			svc.install();
 		}
 	}else{
-		console.log("Running Nineteen68 "+SERVER+" as windows service needs admin rights, kindly run this using admin rights")
+		console.log("Running Avo Assure "+SERVER+" as windows service needs admin rights, kindly run this using admin rights")
 	}
 	
 });

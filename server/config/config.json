@@ -13,7 +13,7 @@
         "redirectURI": ""
     },
     "saml": {
-        "issuer": "SLK Nineteen68 Webserver",
+        "issuer": "Avo Assure Webserver",
         "acsURL": "",
         "cert": "",
         "redirectURI": ""

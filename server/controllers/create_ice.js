@@ -63,25 +63,21 @@ exports.saveMindmapE2E = function(req,res) {
 	};
 
 	client.post(epurl+"create_ice/saveMindmapE2E", args,
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in create_ice/saveMindmapE2E: saveMindmapE2E, Error Code : ERRNDAC");
-					res(null, result);
-				} else {
-					projectdetails=result.rows;
-					// callback();
-					res(null, result.rows);
-				}
-			});
-	
-	var cloneflag = RequestedJSON.action;
-	var suiteflag = false;
-
+		function (result, response) {
+		if (response.statusCode != 200 || result.rows == "fail") {
+			logger.error("Error occurred in create_ice/saveMindmapE2E: saveMindmapE2E, Error Code : ERRNDAC");
+			res(null, result);
+		} else {
+			projectdetails=result.rows;
+			// callback();
+			res(null, result.rows);
+		}
+	});
 }
 
 // Have to check the result object how it is coming and how we need. 
-exports.getProjectIDs_Nineteen68 = function (req, res) {
-	logger.info("Inside UI service: getProjectIDs_Nineteen68");
+exports.getProjectIDs = function (req, res) {
+	logger.info("Inside UI service: getProjectIDs");
 	var projectdetails = {
 		projectId: [],
 		projectName: [],
@@ -103,12 +99,11 @@ exports.getProjectIDs_Nineteen68 = function (req, res) {
 	};
 	async.series({
 		function (callback) {
-			logger.info("Calling NDAC Service from getProjectIDs_Nineteen68: create_ice/getProjectIDs_Nineteen68");
-			// client.post(epurl+"create_ice/getProjectIDs_Nineteen68", args,
-			client.post(epurl+"create_ice/getProjectIDs_Nineteen68", args,
+			logger.info("Calling NDAC Service from getProjectIDs: create_ice/getProjectIDs");
+			client.post(epurl+"create_ice/getProjectIDs", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in create_ice/getProjectIDs_Nineteen68: getProjectIDs_Nineteen68, Error Code : ERRNDAC");
+					logger.error("Error occurred in create_ice/getProjectIDs: getProjectIDs, Error Code : ERRNDAC");
 					res(null, result.rows);
 				} else {
 					projectdetails=result.rows;
@@ -120,14 +115,14 @@ exports.getProjectIDs_Nineteen68 = function (req, res) {
 		try {
 			res(null, projectdetails);
 		} catch (ex) {
-			logger.info("Exception in the service getProjectIDs_Nineteen68: ", ex);
+			logger.info("Exception in the service getProjectIDs: ", ex);
 		}
 	});
 };
 
 // Have to check the result object how it is coming and how we need. 
-exports.getProjectType_Nineteen68 = function (req, res) {
-	logger.info("Inside UI service: getProjectType_Nineteen68");
+exports.getProjectType = function (req, res) {
+	logger.info("Inside UI service: getProjectType");
 	var projectDetails = {
 		projectType: '',
 		project_id: ''
@@ -142,12 +137,12 @@ exports.getProjectType_Nineteen68 = function (req, res) {
 			"Content-Type": "application/json"
 		}
 	};
-	logger.info("Calling NDAC Service from getProjectType_Nineteen68: create_ice/getProjectType_Nineteen68");
-	client.post(epurl+"create_ice/getProjectType_Nineteen68", args,
+	logger.info("Calling NDAC Service from getProjectType: create_ice/getProjectType");
+	client.post(epurl+"create_ice/getProjectType", args,
 		function (result, response) {
 		try {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				logger.error("Error occurred in create_ice/getProjectType_Nineteen68: getProjectType_Nineteen68, Error Code : ERRNDAC");
+				logger.error("Error occurred in create_ice/getProjectType: getProjectType, Error Code : ERRNDAC");
 				res(null, result.rows);
 			} else {
 				if (result.rows.length != 0) {
@@ -163,7 +158,7 @@ exports.getProjectType_Nineteen68 = function (req, res) {
 				res(null, projectDetails);
 			}
 		} catch (ex) {
-			logger.error("Exception in the service getProjectType_Nineteen68: %s", ex);
+			logger.error("Exception in the service getProjectType: %s", ex);
 		}
 	});
 };

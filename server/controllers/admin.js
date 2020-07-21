@@ -14,11 +14,11 @@ var utils = require('../lib/utils');
 
 
 //GetUserRoles
-exports.getUserRoles_Nineteen68 = async (req, res) => {
-	const fnName = "getUserRoles_Nineteen68";
+exports.getUserRoles = async (req, res) => {
+	const fnName = "getUserRoles";
 	logger.info("Inside UI service: " + fnName);
 	try {
-		const result = await utils.fetchData({}, "admin/getUserRoles_Nineteen68", fnName);
+		const result = await utils.fetchData({}, "admin/getUserRoles", fnName);
 		if (result == "fail") res.status(500).send("fail");
 		else {
 			const rolesList = [];
@@ -1598,19 +1598,19 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 };
 
 //GetUsers service has been changed to populate the users who has access to the project
-exports.getUsers_Nineteen68 = function (req, res) {
-	logger.info("Inside UI service: getUsers_Nineteen68");
+exports.getUsers = function (req, res) {
+	logger.info("Inside UI service: getUsers");
 	var prjId = req.prjId;
 	var args = {
 		headers: {
 			"Content-Type": "application/json"
 		}
 	};
-	logger.info("Calling NDAC Service: getUsers_Nineteen68");
-	client.post(epurl + "admin/getUserRoles_Nineteen68", args,
+	logger.info("Calling NDAC Service: getUsers");
+	client.post(epurl + "admin/getUserRoles", args,
 		function (userrolesresult, userrolesresponse) {
 		if (userrolesresponse.statusCode != 200 || userrolesresult.rows == "fail") {
-			logger.error("Error occurred in getUsers_Nineteen68 Error Code : ERRNDAC");
+			logger.error("Error occurred in getUsers Error Code : ERRNDAC");
 			res(null, "fail");
 		} else {
 			var inputs = {
@@ -1623,11 +1623,11 @@ exports.getUsers_Nineteen68 = function (req, res) {
 					"Content-Type": "application/json"
 				}
 			};
-			logger.info("Calling NDAC Service: getUsers_Nineteen68");
-			client.post(epurl + "admin/getUsers_Nineteen68", args,
+			logger.info("Calling NDAC Service: getUsers");
+			client.post(epurl + "admin/getUsers", args,
 				function (getUsers, response) {
 				if (response.statusCode != 200 || getUsers.rows == "fail") {
-					logger.error("Error occurred in getUsers_Nineteen68 Error Code : ERRNDAC");
+					logger.error("Error occurred in getUsers Error Code : ERRNDAC");
 					res(null, "fail");
 				} else {
 					logger.info("Users fetched successfully");

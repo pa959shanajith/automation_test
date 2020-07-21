@@ -23,7 +23,7 @@ const checkAssignedProjects = async username => {
 	let inputs = {
 		"username": username
 	};
-	const userInfo = await utils.fetchData(inputs, "login/loadUser_Nineteen68", fnName);
+	const userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
 	if (userInfo == "fail") return ['fail'];
 	else if (userInfo.length === 0) return ["invalid_username_password"];
 	const userid = userInfo._id;
@@ -34,16 +34,16 @@ const checkAssignedProjects = async username => {
 		"roleid": roleid,
 		"query": "permissionInfoByRoleID"
 	};
-	const userRole = await utils.fetchData(inputs, "login/loadPermission_Nineteen68", fnName);
+	const userRole = await utils.fetchData(inputs, "login/loadPermission", fnName);
 	if (userRole == "fail") return ['fail'];
 	else if (userRole === null) return ["invalid_username_password"];
 	else return [null, userid, userRole.rolename, assignedProjects];
 }
 
-// Check User login State - Nineteen68
-exports.checkUserState_Nineteen68 = async (req, res) => {
+// Check User login State - Avo Assure
+exports.checkUserState = async (req, res) => {
 	try {
-		logger.info("Inside UI Service: checkUserState_Nineteen68");
+		logger.info("Inside UI Service: checkUserState");
 		const sess = req.session;
 		if (sess && (sess.emsg || sess.username)) {
 			let emsg = req.session.emsg || "ok";
@@ -52,7 +52,7 @@ exports.checkUserState_Nineteen68 = async (req, res) => {
 				const data = await checkAssignedProjects(username);
 				const err = data[0];
 				if(err) {
-					logger.error("Error occurred in checkUserState_Nineteen68. Cause: "+ err);
+					logger.error("Error occurred in checkUserState. Cause: "+ err);
 					emsg = err;
 				} else {
 					const userid = data[1];
@@ -88,10 +88,10 @@ exports.checkUserState_Nineteen68 = async (req, res) => {
 	}
 };
 
-//Load User Information - Nineteen68
-exports.loadUserInfo_Nineteen68 = function (req, res) {
+//Load User Information - Avo Assure
+exports.loadUserInfo = function (req, res) {
 	try {
-		logger.info("Inside UI Service: loadUserInfo_Nineteen68");
+		logger.info("Inside UI Service: loadUserInfo");
 		if (utils.isSessionActive(req)) {
 			var selectedRole = req.body.selRole;
 			var userName = req.session.username;
@@ -109,11 +109,11 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 							"Content-Type": "application/json"
 						}
 					};
-					logger.info("Calling NDAC Service from userInfo : loadUser_Nineteen68");
-					client.post(epurl + "login/loadUser_Nineteen68", args,
+					logger.info("Calling NDAC Service from userInfo : loadUser");
+					client.post(epurl + "login/loadUser", args,
 						function (result, response) {
 						if (response.statusCode != 200 || result.rows == "fail") {
-							logger.error("Error occurred in loadUser_Nineteen68 Error Code : ERRNDAC");
+							logger.error("Error occurred in loadUser Error Code : ERRNDAC");
 							callback("fail");
 						} else {
 							var service = result.rows;
@@ -144,11 +144,11 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 							"Content-Type": "application/json"
 						}
 					};
-					logger.info("Calling NDAC Service from loggedinRole: loadPermission_Nineteen68");
-					client.post(epurl+ "login/loadPermission_Nineteen68", args,
+					logger.info("Calling NDAC Service from loggedinRole: loadPermission");
+					client.post(epurl+ "login/loadPermission", args,
 						function (result, response) {
 						if (response.statusCode != 200 || result.rows == "fail") {
-							logger.error("Error occurred in loadPermission_Nineteen68 Error Code : ERRNDAC");
+							logger.error("Error occurred in loadPermission Error Code : ERRNDAC");
 							callback("fail");
 						} else {
 							var rolename = result.rows.rolename;
@@ -185,16 +185,16 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 	}
 };
 
-//Get UserRoles By RoleId - Nineteen68
-exports.getRoleNameByRoleId_Nineteen68 = async (req, res) => {
-	const fnName = "getRoleNameByRoleId_Nineteen68";
+//Get UserRoles By RoleId - Avo Assure
+exports.getRoleNameByRoleId = async (req, res) => {
+	const fnName = "getRoleNameByRoleId";
 	logger.info("Inside UI service: " + fnName);
 	try {
 		const inputs = {
 			"roleid": req.body.role,
 			"query":"nameidInfoByRoleIDList"
 		};
-		const rolesResult = await utils.fetchData(inputs, "login/loadPermission_Nineteen68", fnName)
+		const rolesResult = await utils.fetchData(inputs, "login/loadPermission", fnName)
 		let result = {};
 		if (rolesResult == "fail") result = "fail";
 		else {
@@ -209,9 +209,9 @@ exports.getRoleNameByRoleId_Nineteen68 = async (req, res) => {
 	}
 };
 
-// Get Current password - Nineteen68
-exports.resetPassword_Nineteen68 = function(req, res) {
-	logger.info("Inside UI Service: resetPassword_Nineteen68");
+// Get Current password - Avo Assure
+exports.resetPassword = function(req, res) {
+	logger.info("Inside UI Service: resetPassword");
 	var username = req.session.username;
 	var currpassword = req.body.currpassword;
 	var newpassword = req.body.newpassword;
@@ -224,11 +224,11 @@ exports.resetPassword_Nineteen68 = function(req, res) {
 			"Content-Type": "application/json"
 		}
 	};
-	logger.info("Calling NDAC Service: loadUser_Nineteen68");
-	client.post(epurl + "login/loadUser_Nineteen68", args,
+	logger.info("Calling NDAC Service: loadUser");
+	client.post(epurl + "login/loadUser", args,
 		function (result, response) {
 		if (response.statusCode != 200 || result.rows == "fail") {
-			logger.error("Error occurred in loadUser_Nineteen68 Error Code : ERRNDAC");
+			logger.error("Error occurred in loadUser Error Code : ERRNDAC");
 			res.send("fail");
 		} else {
 			password = result.rows.password;
@@ -259,8 +259,8 @@ exports.resetPassword_Nineteen68 = function(req, res) {
 	});
 };
 
-exports.logoutUser_Nineteen68 = async (req, res) => {
-	logger.info("Inside UI Service: logoutUser_Nineteen68");
+exports.logoutUser = async (req, res) => {
+	logger.info("Inside UI Service: logoutUser");
 	logger.info("%s logged out successfully", req.session.username);
 	req.logOut();
 	req.clearSession();
