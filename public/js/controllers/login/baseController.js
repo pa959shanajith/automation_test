@@ -11,19 +11,19 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 	if (chkLogOut) {
 		if ((typeof(chkLogOut) == "object") && (chkLogOut.length == 2)) {
 			$scope.loginValidation = "Your session has been terminated by "+chkLogOut[0];
-			if (chkLogOut[1] == "dereg") $(".absoluteError.errorMessages span").html("Reason: User is deleted from Nineteen68");
+			if (chkLogOut[1] == "dereg") $(".absoluteError.errorMessages span").html("Reason: User is deleted from Avo Assure");
 		} else {
 			$scope.loginValidation = "You Have Successfully Logged Out!";
 		}
 		cfpLoadingBar.complete();
 	} else {
 		$scope.loginAgain = false;
-		LoginService.checkUserState_Nineteen68()
+		LoginService.checkUserState()
 		.then(function (data) {
 			cfpLoadingBar.complete();
 			var emsg = "Loading Profile...";
 			if (data == "fail") emsg = "Failed to load user profile.";
-			else if (data == "unauthorized") emsg = "User is not authorized to use Nineteen68.";
+			else if (data == "unauthorized") emsg = "User is not authorized to use Avo Assure.";
 			else if (data == "badrequest") emsg = "User does not have sufficient permission to view this page.";
 			else if (data == "userLogged") emsg = "User is already logged in! Please logout from the previous session.";
 			else if (data == "inValidCredential" || data == "invalid_username_password") emsg = "The username or password you entered isn't correct. Please try again.";
@@ -33,7 +33,7 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 				emsg = "Your session has expired!";
 				$scope.loginAgain = true;
 			} else {
-				LoginService.loadUserInfo_Nineteen68()
+				LoginService.loadUserInfo()
 				.then(function (data) {
 					if (data == "fail") emsg = "Failed to Login.";
 					else if (data == "Invalid Session") {

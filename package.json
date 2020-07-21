@@ -1,5 +1,5 @@
 {
-  "name": "nineteen68",
+  "name": "avoassure",
   "version": "2.0.0",
   "description": "Test Automation",
   "start": "server.js",
@@ -10,8 +10,8 @@
     "filestart": "node --max_old_space_size=4096 --optimize_for_size .\\server\\controllers\\fileserver.js",
     "service": "node server_winservice.js"
   },
-  "author": "Dimension Labs",
-  "license": "Copyright (c) SLK Software Services Pvt. Ltd.",
+  "author": "Avo Automation",
+  "license": "Copyright (c) Avo Automation",
   "dependencies": {
     "activedirectory": "^0.7.2",
     "async": "^2.6.0",

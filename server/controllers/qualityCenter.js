@@ -42,7 +42,7 @@ exports.loginQCServer_ICE = function (req, res) {
 							"qcURL": url,
 							"qcaction": qcaction
 						};
-						logger.info("Sending socket request for qclogin to redis");
+						logger.info("Sending socket request for qclogin to cachedb");
 						dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						function qclogin_listener(channel,message) {
@@ -91,7 +91,7 @@ exports.loginQCServer_ICE = function (req, res) {
 exports.qcProjectDetails_ICE = function (req, res) {
 	logger.info("Inside UI service: qcProjectDetails_ICE");
 	var projectDetailList = {
-		"nineteen68_projects": '',
+		"avoassure_projects": '',
 		"qc_projects": ""
 	};
 	var name;
@@ -110,7 +110,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 					};
 					getProjectsForUser(userid, function (projectdata) {
 						// var qcDetails = {"qcUsername":username,"qcPassword":password,"qcURL":url};
-						logger.info("Sending socket request for qclogin to redis");
+						logger.info("Sending socket request for qclogin to cachedb");
 						dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						function qclogin_listener(channel,message) {
@@ -129,7 +129,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 									else {
 										data = data.value;
 										try {
-											projectDetailList.nineteen68_projects = projectdata;
+											projectDetailList.avoassure_projects = projectdata;
 											projectDetailList.qc_projects = data.project;
 											res.send(projectDetailList);
 										} catch (ex) {
@@ -286,10 +286,6 @@ function projectandscenario(projectid, cb) {
 
 exports.qcFolderDetails_ICE = function (req, res) {
 	logger.info("Inside UI service: qcFolderDetails_ICE");
-	var projectDetailList = {
-		"nineteen68_projects": '',
-		"qc_projects": ""
-	};
 	var icename;
 	try {
 		if (utils.isSessionActive(req)) {
@@ -301,7 +297,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 			logger.debug("ICE Socket requesting Address: %s" , icename);
 			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
 				if (redisres[1]>0) {
-					logger.info("Sending socket request for qclogin to redis");
+					logger.info("Sending socket request for qclogin to cachedb");
 					dataToIce = {"emitAction" : "qclogin","username" : icename, "responsedata":qcDetails};
 					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					function qclogin_listener(channel,message) {
