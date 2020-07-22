@@ -563,7 +563,7 @@ if (cluster.isMaster) {
 		app.post('/openScreenShot', report.openScreenShot);
 		app.post('/connectJira_ICE', report.connectJira_ICE);
 		app.post('/getReportsData_ICE', report.getReportsData_ICE);
-		app.post('/getReport_API', report.getReport);
+		app.post('/getReport_API', report.getReport_API);
 		//Plugin Routes
 		app.post('/getProjectIDs', plugin.getProjectIDs);
 		app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
