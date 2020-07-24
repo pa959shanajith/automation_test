@@ -593,7 +593,7 @@ exports.userObjectElement_ICE = function (req, res) {
 						props={
 							action:"userobject",
 							url:req.body.object[1],
-							icename:req.body.object[2],
+							name:req.body.object[2],
 							rpath:req.body.object[3],
 							apath:req.body.object[4],
 							classname:req.body.object[5],
