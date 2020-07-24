@@ -770,7 +770,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             }],
             rows: []
         };
-        reportService.getReport_Nineteen68(reportID, testsuiteId, testsuitename)
+        reportService.getReport(reportID, testsuiteId, testsuitename)
             .then(function(data) {
                     if (data == "Invalid Session") {
                         return $rootScope.redirectPage();
@@ -913,7 +913,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                         openModalPopup("Reports", msg);
                                         console.error(msg);
                                     } else if (strData === "limitExceeded") {
-                                        var msg = "Fail to load PDF Report. Report Limit size exceeded. Generate PDF Report using Nineteen68 PDF utility.";
+                                        var msg = "Fail to load PDF Report. Report Limit size exceeded. Generate PDF Report using Avo Assure PDF utility available in ICE.";
                                         openModalPopup("Reports", msg);
                                         console.error(msg);
                                     } else {

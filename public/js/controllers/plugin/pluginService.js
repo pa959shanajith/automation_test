@@ -1,8 +1,8 @@
 mySPA.factory('PluginService', ['$http','$q', function ($http,$q) {
 	return{
-		getProjectIDs_Nineteen68: function(){
-			var param = "getProjectIDs_Nineteen68";
-			return $http.post('/getProjectIDs_Nineteen68', {
+		getProjectIDs: function(){
+			var param = "getProjectIDs";
+			return $http.post('/getProjectIDs', {
 				action: param,
 				allflag : true
 			})

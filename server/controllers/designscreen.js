@@ -103,7 +103,7 @@ exports.initScraping_ICE = function (req, res) {
 						dataToIce = {"emitAction": "webscrape", "username" : icename, "data": data};
 					}
 					dataToIce.username = icename;
-					logger.info("Sending socket request for "+dataToIce.emitAction+" to redis");
+					logger.info("Sending socket request for "+dataToIce.emitAction+" to cachedb");
 					redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
 					function scrape_listener(channel, message) {
 						var data = JSON.parse(message);
@@ -525,7 +525,7 @@ exports.updateScreen_ICE = function (req, res) {
 											redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
 												if (redisres[1]>0){
 													var scrapedata = newData;
-													logger.info("Sending socket request for checkIrisDuplicate_ICE to redis");
+													logger.info("Sending socket request for checkIrisDuplicate_ICE to cachedb");
 													dataToIce = {"emitAction" : "irisOperations","username" : icename, "image_data":scrapedata, "param":"checkDuplicate"};
 													redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 													function checkIrisDuplicate_listener(channel,message) {
@@ -586,14 +586,14 @@ exports.userObjectElement_ICE = function (req, res) {
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , icename);
-			logger.info("Sending socket request for focus to redis");
+			logger.info("Sending socket request for focus to cachedb");
 			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
 				if (redisres[1]>0) {
 					if(operation=='encrypt'){
 						props={
 							action:"userobject",
 							url:req.body.object[1],
-							icename:req.body.object[2],
+							name:req.body.object[2],
 							rpath:req.body.object[3],
 							apath:req.body.object[4],
 							classname:req.body.object[5],
@@ -661,7 +661,7 @@ exports.highlightScrapElement_ICE = function (req, res) {
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , icename);
-			logger.info("Sending socket request for focus to redis");
+			logger.info("Sending socket request for focus to cachedb");
 			var dataToIce = {"emitAction": "focus", "username": icename, "focusParam": focusParam, "elementURL": elementURL, "appType": appType};
 			redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 			logger.info("Successfully highlighted selected object");
@@ -688,7 +688,7 @@ exports.updateIrisDataset = function updateIrisDataset(req, res) {
 			logger.debug("ICE Socket requesting Address: %s" , icename);
 			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
 				if (redisres[1]>0) {
-					logger.info("Sending socket request for updateIrisDataset to redis");
+					logger.info("Sending socket request for updateIrisDataset to cachedb");
 					dataToIce = {"emitAction" : "irisOperations","username" : icename, "image_data":image_data, "param":"updateDataset"};
 					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					function updateIrisDataset_listener(channel,message) {

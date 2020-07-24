@@ -2235,7 +2235,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	//Fetch All Available User Roles
 	$scope.userConf.getUserRoles = function() {
 		if (!this.allRoles) {
-			adminServices.getUserRoles_Nineteen68()
+			adminServices.getUserRoles()
 			.then(function (rolesRes) {
 				if(rolesRes == "Invalid Session"){
 					$rootScope.redirectPage();

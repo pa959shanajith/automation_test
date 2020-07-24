@@ -1,6 +1,6 @@
-# Nineteen68 Version 2.0 UI
+# Avo Assure Version 2.0 UI
 
-Webserver Component of Nineteen68 V2.0.
+Webserver Component of Avo Assure V2.0.
 
 ## Configuration
 
@@ -37,7 +37,7 @@ These instructions will help setting up the project and running on a local machi
 * Update the `NDAC_IP` and `REDIS_IP` variables with the `IPs` on which NDAC and redis are running.
 * To start the server:
     * **In Normal Mode:** ```npm start```
-    * **In Windows Service Mode:** ***(name of the service: nineteen68_web_server)***
+    * **In Windows Service Mode:** ***(name of the service: avoassure_web_server)***
         * to install service and start: ```npm run service```
         * to start (for an already installed service): ```npm run service start```
         * to stop: ```npm run service stop```
@@ -53,4 +53,4 @@ These instructions will help setting up the project and running on a local machi
 
 ## License
 
-Copyright © 2018 SLK Software Services Pvt. Ltd. All Rights Reserved.
+Copyright © 2020 Avo Automation. All Rights Reserved.

@@ -1,6 +1,6 @@
 mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$location','$timeout','qcServices','cfpLoadingBar', 'socket', function($scope, $rootScope, $window,$http,$location,$timeout,qcServices,cfpLoadingBar,socket) {
 	$('.scrollbar-inner').scrollbar();
-	var nineteen68_projects_details;
+	var avoAssureProjectsDetails;
 	$timeout(function(){
 		$('.scrollbar-inner').scrollbar();
 		$('.scrollbar-macosx').scrollbar();
@@ -136,7 +136,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		blockUI('Loading....');
 		qcServices.qcProjectDetails_ICE(getDomain)
 			.then(function(data){
-				nineteen68_projects_details = data.nineteen68_projects;
+				avoAssureProjectsDetails = data.avoassure_projects;
 				if(data == "unavailableLocalServer"){
 					openModelPopup("ALM Connection", "ICE Engine is not available, Please run the batch file and connect to the Server.");
 				}	
@@ -153,10 +153,10 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 					for(var i=0;i<data.qc_projects.length;i++){
 						$(".qcSelectProject").append("<option value='"+data.qc_projects[i]+"'>"+data.qc_projects[i]+"</option>");
 					}
-					$(".qcN68SelectProject").empty();					
-					$(".qcN68SelectProject").append("<option value='' selected disabled>Select Project</option>");
-					for(var i=0;i<data.nineteen68_projects.length;i++){
-						$(".qcN68SelectProject").append("<option value='"+data.nineteen68_projects[i].project_id+"'>"+data.nineteen68_projects[i].project_name+"</option>");
+					$(".qcAvoAssureSelectProject").empty();					
+					$(".qcAvoAssureSelectProject").append("<option value='' selected disabled>Select Project</option>");
+					for(var i=0;i<data.avoassure_projects.length;i++){
+						$(".qcAvoAssureSelectProject").append("<option value='"+data.avoassure_projects[i].project_id+"'>"+data.avoassure_projects[i].project_name+"</option>");
 					}
 					$(document.body).css({'cursor' : 'default'});
 				}
@@ -198,25 +198,25 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			$('.scrollbar-inner').scrollbar();
 	});
 
-	//Select Nineteen68 projects
-	$(document).on("change", ".qcN68SelectProject", function(){
+	//Select Avo Assure projects
+	$(document).on("change", ".qcAvoAssureSelectProject", function(){
 		var getProject = $(this).children("option:selected").val();
-		for(var i=0; i<nineteen68_projects_details.length; i++){
-			if(getProject == nineteen68_projects_details[i].project_id){
-				var N68Container = $(".qcN68TreeContainer");
-				N68Container.empty();
-				N68Container.append("<ul class='scrollbar-inner'></ul>");
-				var scnDetails = nineteen68_projects_details[i].scenario_details;
+		for(var i=0; i<avoAssureProjectsDetails.length; i++){
+			if(getProject == avoAssureProjectsDetails[i].project_id){
+				var qcAvoAssureContainer = $(".qcAvoAssureTreeContainer");
+				qcAvoAssureContainer.empty();
+				qcAvoAssureContainer.append("<ul class='scrollbar-inner'></ul>");
+				var scnDetails = avoAssureProjectsDetails[i].scenario_details;
 				if(scnDetails.length >0){
 					for(var j=0; j<scnDetails.length; j++){
-						N68Container.find("ul").append("<li class='testSet testScenariolink' data-scenarioid='"+scnDetails[j]._id+"'><label title='"+scnDetails[j].name+"'>"+scnDetails[j].name+"</label></li>");
+						qcAvoAssureContainer.find("ul").append("<li class='testSet testScenariolink' data-scenarioid='"+scnDetails[j]._id+"'><label title='"+scnDetails[j].name+"'>"+scnDetails[j].name+"</label></li>");
 					}
 					//if(scnDetails.length >= 25)
 					$('.scrollbar-inner').scrollbar();
-					$(".searchScenarioN68").show();
+					$(".searchScenarioAvoAssure").show();
 				} else{
-					N68Container.append("This project does not contain any scenarios");
-					$(".searchScenarioN68").hide();
+					qcAvoAssureContainer.append("This project does not contain any scenarios");
+					$(".searchScenarioAvoAssure").hide();
 				}
 			}
 		}
@@ -224,7 +224,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 
 	//Search scenarios
 	var flgTog = 1;
-	$(document).on('click', ".searchScenarioN68", function(){
+	$(document).on('click', ".searchScenarioAvoAssure", function(){
 		$('.searchScenarioQC').val('');
 		if(flgTog){
 			$(this).siblings("input").css({"opacity":1});
@@ -243,7 +243,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 
 	function filter(element) {
 		var value = $(element).val();
-		$(".qcN68TreeContainer ul li").each(function () {
+		$(".qcAvoAssureTreeContainer ul li").each(function () {
 			if ($(this).children("label").text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
 				$(this).show();
 			} else {
@@ -372,13 +372,13 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		var qcTestcaseName = $(this).siblings("label").children()[1].innerText;
 		var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
 		var qcFolderPath = $(this).parent("li").parent("ul").prev("li").parent("ul").prev("li").data("folderpath");
-		var N68ScenarioId = $(".qcN68TreeContainer").find(".selectedToMap").data("scenarioid");
+		var AvoAssureScenarioId = $(".qcAvoAssureTreeContainer").find(".selectedToMap").data("scenarioid");
 		
 		if(!getDomainName)	openModelPopup("Save Mapped Testcase", "Please select domain");
 		else if(!getProjectName)	openModelPopup("Save Mapped Testcase", "Please select project");
 		else if(!qcTestcaseName)	openModelPopup("Save Mapped Testcase", "Please select Testcase");
 		else if(!qcTestsetName)	openModelPopup("Save Mapped Testcase", "Please select Testset");
-		else if(!N68ScenarioId)	openModelPopup("Save Mapped Testcase", "Please select scenario");
+		else if(!AvoAssureScenarioId)	openModelPopup("Save Mapped Testcase", "Please select scenario");
 		else{
 			mappedList.push({
 				'domain': getDomainName,
@@ -386,7 +386,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				'testcase': qcTestcaseName,
 				'testset': qcTestsetName,
 				'folderpath': qcFolderPath,
-				'scenarioId': N68ScenarioId,
+				'scenarioId': AvoAssureScenarioId,
 			});
 			$(this).parent().css({"background-color":"#ddd"});
 			$(this).hide();
@@ -395,7 +395,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 	});
 
 	//Submit mapped details
-	$scope.mapTestcaseToN68 = function(){
+	$scope.mapTestcaseToAvoAssure = function(){
 		if(mappedList.length > 0){
 			qcServices.saveQcDetails_ICE(mappedList)
 			.then(function(data){
@@ -417,7 +417,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 					openModelPopup("Save Mapped Testcase", "Saved successfully");
 				}
 			},
-			function(error) {	console.log("Error in qcController.js file mapTestcaseToN68 method! \r\n "+(error.data));
+			function(error) {	console.log("Error in qcController.js file mapTestcaseToAvoAssure method! \r\n "+(error.data));
 			});
 		}
 		else 	openModelPopup("Save Mapped Testcase", "Map Testcases before save");

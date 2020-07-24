@@ -34,7 +34,7 @@ exports.populateProjects = function (req, res) {
 			"userid": req.session.userid,
 			"allflag": true
 		};
-		create_ice.getProjectIDs_Nineteen68(reqData, function (err, data) {
+		create_ice.getProjectIDs(reqData, function (err, data) {
 			res.setHeader('Content-Type', 'application/json');
 			if (err)
 				res.status(500).send('Fail');
@@ -84,11 +84,11 @@ exports.populateScenarios = function (req, res) {
 	}
 };
 
-exports.getProjectTypeMM_Nineteen68 = function (req, res) {
-	logger.info("Inside UI service: getProjectTypeMM_Nineteen68");
+exports.getProjectTypeMM = function (req, res) {
+	logger.info("Inside UI service: getProjectTypeMM");
 	if (utils.isSessionActive(req)) {
 		var inputs = req.body.projectId;
-		create_ice.getProjectType_Nineteen68(inputs, function (err, result) {
+		create_ice.getProjectType(inputs, function (err, result) {
 			if (err) {
 				res.status(500).send('Fail');
 			}
@@ -107,7 +107,7 @@ exports.populateUsers = function (req, res) {
 	logger.info("Inside UI service: populateUsers");
 	if (utils.isSessionActive(req)) {
 		var d = req.body;
-		admin.getUsers_Nineteen68({ prjId: d.projectId }, function (err, data) {
+		admin.getUsers({ prjId: d.projectId }, function (err, data) {
 			res.setHeader('Content-Type', 'application/json');
 			if (err)
 				res.status(500).send('Fail');

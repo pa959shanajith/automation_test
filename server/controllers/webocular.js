@@ -32,7 +32,7 @@ exports.getCrawlResults = function (req, res) {
 			logger.info("ICE Socket requesting Address: %s", icename);
 			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres) {
 				if (redisres[1]>0) {
-					logger.info("Sending socket request for webCrawlerGo to redis");
+					logger.info("Sending socket request for webCrawlerGo to cachedb");
 					var dataToIce = {"emitAction": "webCrawlerGo", "username": icename, "input_url": url, "level": level, "agent":agent, "proxy": proxy,"searchData":searchData};
 					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					var notifySocMap = myserver.socketMapNotify;

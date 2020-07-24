@@ -346,8 +346,8 @@ exports.createVersion=function(req,res){
 								if (!incompleteFlow) {
 									qObj.testsuiteDetails = [{ "testsuiteId": nData[rIndex].attrs.moduleID, "testsuiteId_c": null, "testsuiteName": nData[rIndex].attrs.moduleName, "task": nData[rIndex].attrs.task, "testscenarioDetails": tsList }];
 									//Passing the details of hierarchical structure of module and its children to NDAC service to create Structure in Cassandra
-									logger.info("Calling createStructure_Nineteen68 node Service from versioning: project_versioning/versioning");
-									create_ice.createStructure_Nineteen68(qObj, function (err, data) {
+									logger.info("Calling createStructure node Service from versioning: project_versioning/versioning");
+									create_ice.createStructure(qObj, function (err, data) {
 										if (err){
 											logger.error("Error occurred in project_versioning/versioning: versioning service",err);
 											res.status(500).send(err);
@@ -729,8 +729,8 @@ exports.saveDataVersioning=function(req,res){
 				});
 				qObj.testsuiteDetails = [{ "testsuiteId": nObj[rIndex].id, "testsuiteId_c": nObj[rIndex].id_c, "testsuiteName": nObj[rIndex].name, "task": nObj[rIndex].task, "testscenarioDetails": tsList }];
 				qObj.userName = user;
-				logger.info("Calling createStructure_Nineteen68 node Service from versioning: project_versioning/versioning");
-				create_ice.createStructure_Nineteen68(qObj, function (err, data) {
+				logger.info("Calling createStructure node Service from versioning: project_versioning/versioning");
+				create_ice.createStructure(qObj, function (err, data) {
 					if (err){
 						logger.error("Error occurred in project_versioning/versioning: versioning service",err);
 						res.status(500).send(err);

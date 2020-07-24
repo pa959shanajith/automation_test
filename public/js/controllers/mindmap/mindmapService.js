@@ -28,9 +28,9 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
-		getProjectTypeMM_Nineteen68: function (projectId) {
-    		var param = "getProjectTypeMM_Nineteen68";
-    		return $http.post('/getProjectTypeMM_Nineteen68', {
+		getProjectTypeMM: function (projectId) {
+    		var param = "getProjectTypeMM";
+    		return $http.post('/getProjectTypeMM', {
     			action: param,
 				projectId:projectId
 

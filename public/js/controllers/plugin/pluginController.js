@@ -61,7 +61,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		}
 		blockUI("Loading Tasks..Please wait...");
 		//var userid = userInfo.user_id;
-		PluginService.getProjectIDs_Nineteen68()
+		PluginService.getProjectIDs()
 		.then(function (data) {
 			if(data == "Fail" || data == "Invalid Session") return $rootScope.redirectPage();
 			else {

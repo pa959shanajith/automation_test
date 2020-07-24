@@ -24,7 +24,7 @@ var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 if (cluster.isMaster) {
 	cluster.fork();
 	cluster.on('disconnect', function(worker) {
-		logger.error('Nineteen68 server has encountered some problems, Disconnecting!');
+		logger.error('Avo Assure server has encountered some problems, Disconnecting!');
 	});
 	cluster.on('exit', function(worker) {
 		if (worker.exitedAfterDisconnect !== true) {
@@ -50,17 +50,17 @@ if (cluster.isMaster) {
 		var apiclient = new Client();
 		var redisStore = require('connect-redis')(sessions);
 		var redisConfig = {
-			"host": process.env.REDIS_IP,
-			"port": parseInt(process.env.REDIS_PORT),
-			"password": process.env.REDIS_AUTH
+			"host": process.env.CACHEDB_IP,
+			"port": parseInt(process.env.CACHEDB_PORT),
+			"password": process.env.CACHEDB_AUTH
 		};
 		var redisSessionClient = redis.createClient(redisConfig);
 		redisSessionClient.on("error", function(err) {
-			logger.error("Please run the Redis DB");
+			logger.error("Please run the Cache DB");
 			//cluster.worker.disconnect().kill();
 		});
 		redisSessionClient.on("connect", function(err) {
-			logger.debug("Redis DB connected");
+			logger.debug("Cache DB connected");
 		});
 		var rsStore = new redisStore({
 			client: redisSessionClient
@@ -138,7 +138,7 @@ if (cluster.isMaster) {
 
 		app.use('*', function(req, res, next) {
 			if (req.session === undefined) {
-				return next(new Error("redisnotavailable"));
+				return next(new Error("cachedbnotavailable"));
 			}
 			return next();
 		});
@@ -154,7 +154,7 @@ if (cluster.isMaster) {
 
 		// For Selecting Authentication Strategy and adding required routes
 		var authParams = {
-			username: "nineteen68_username",
+			username: "avoassure_username",
 			route: {
 				login: "/login",
 				success: "/",
@@ -330,7 +330,7 @@ if (cluster.isMaster) {
 		});
 
 		// Dummy Service for keeping session alive during long-term execution, etc. #Polling
-		app.post('/keepSessionAlive_Nineteen68', function(req, res, next) { res.end(); });
+		app.post('/keepSessionAlive', function(req, res, next) { res.end(); });
 
 		//Only Admin have access
 		app.get('/admin', function(req, res) {
@@ -391,10 +391,10 @@ if (cluster.isMaster) {
 		// 			"Content-Type": "application/json"
 		// 		}
 		// 	};
-		// 	var apireq = apiclient.post(epurl + "utility/userAccess_Nineteen68", args, function(result, response) {
+		// 	var apireq = apiclient.post(epurl + "utility/userAccess", args, function(result, response) {
 		// 		if (roleId) {
 		// 			if (response.statusCode != 200 || result.rows == "fail") {
-		// 				logger.error("Error occured in userAccess_Nineteen68");
+		// 				logger.error("Error occured in userAccess");
 		// 				res.send("Invalid Session");
 		// 			} else if (result.rows == "off") {
 		// 				res.status(500).send("fail");
@@ -436,8 +436,8 @@ if (cluster.isMaster) {
 			return res.sendFile("app.html", { root: __dirname + "/public/" });
 		});
 
-		app.get('/Nineteen68_ICE', async (req, res) => {
-			const iceFile = "Nineteen68_ICE.zip";
+		app.get('/AvoAssure_ICE', async (req, res) => {
+			const iceFile = "AvoAssure_ICE.zip";
 			const iceFilePath = path.resolve(process.env.HOST_PATH);
 			if (req.query.file == "getICE") {
 				return res.sendFile(iceFile, { root: iceFilePath })
@@ -488,7 +488,7 @@ if (cluster.isMaster) {
 
 		app.post('/populateProjects', mindmap.populateProjects);
 		app.post('/populateUsers', mindmap.populateUsers);
-		app.post('/getProjectTypeMM_Nineteen68', mindmap.getProjectTypeMM_Nineteen68);
+		app.post('/getProjectTypeMM', mindmap.getProjectTypeMM);
 		app.post('/populateScenarios', mindmap.populateScenarios);
 		app.post('/getModules', auth.protect, mindmap.getModules);
 		app.post('/reviewTask', mindmap.reviewTask);
@@ -499,14 +499,14 @@ if (cluster.isMaster) {
 		app.post('/exportToExcel', mindmap.exportToExcel);
 		app.post('/pdProcess', auth.protect, mindmap.pdProcess);	// process discovery service
 		//Login Routes
-		//app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
-		app.post('/checkUserState_Nineteen68', login.checkUserState_Nineteen68);
-		app.post('/loadUserInfo_Nineteen68', login.loadUserInfo_Nineteen68);
-		app.post('/getRoleNameByRoleId_Nineteen68', auth.protect, login.getRoleNameByRoleId_Nineteen68);
-		app.post('/logoutUser_Nineteen68', login.logoutUser_Nineteen68);
-		app.post('/resetPassword_Nineteen68', auth.protect, login.resetPassword_Nineteen68);
+		//app.post('/authenticateUser', login.authenticateUser);
+		app.post('/checkUserState', login.checkUserState);
+		app.post('/loadUserInfo', login.loadUserInfo);
+		app.post('/getRoleNameByRoleId', auth.protect, login.getRoleNameByRoleId);
+		app.post('/logoutUser', login.logoutUser);
+		app.post('/resetPassword', auth.protect, login.resetPassword);
 		//Admin Routes
-		app.post('/getUserRoles_Nineteen68', admin.getUserRoles_Nineteen68);
+		app.post('/getUserRoles', admin.getUserRoles);
 		app.post('/getDomains_ICE', admin.getDomains_ICE);
 		app.post('/createProject_ICE', admin.createProject_ICE);
 		app.post('/updateProject_ICE', admin.updateProject_ICE);
@@ -559,13 +559,13 @@ if (cluster.isMaster) {
 		app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
 		app.post('/reportStatusScenarios_ICE', report.reportStatusScenarios_ICE);
 		app.post('/renderReport_ICE', report.renderReport_ICE);
-		app.post('/getReport_Nineteen68', report.getReport_Nineteen68);
+		app.post('/getReport', report.getReport);
 		app.post('/openScreenShot', report.openScreenShot);
 		app.post('/connectJira_ICE', report.connectJira_ICE);
 		app.post('/getReportsData_ICE', report.getReportsData_ICE);
-		app.post('/get_Nineteen68Report', report.get_Nineteen68Report);
+		app.post('/getReport_API', report.getReport_API);
 		//Plugin Routes
-		app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
+		app.post('/getProjectIDs', plugin.getProjectIDs);
 		app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
 		app.post('/updateTaskstatus_mindmaps', taskbuilder.updateTaskstatus_mindmaps);
 		//Utility plugins
@@ -615,9 +615,9 @@ if (cluster.isMaster) {
 		app.use(function(err, req, res, next) {
 			var ecode = "601";
 			var emsg = err.message;
-			if (err.message == "redisnotavailable") {
+			if (err.message == "cachedbnotavailable") {
 				ecode = "600";
-				emsg = "Redis Database unavailable";
+				emsg = "Cache Database unavailable";
 			}
 			logger.error(emsg);
 			res.status(500).send("<html><body><p>[ECODE " + ecode + "] Internal Server Error Occurred!</p></body></html>");
@@ -635,7 +635,7 @@ if (cluster.isMaster) {
 							logger.error("Please run the Service API and Restart the Server");
 						} else {
 							suite.reScheduleTestsuite();
-							console.info("Nineteen68 Server Ready...\n");
+							console.info("Avo Assure Server Ready...\n");
 						}
 					} catch (exception) {
 						httpsServer.close();

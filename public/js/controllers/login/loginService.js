@@ -1,7 +1,7 @@
 mySPA.factory('LoginService', ['$http', '$q', function ($http, $q) {
 	return {
 		//Checking User Validation
-		authenticateUser_Nineteen68: function (username, password) {
+		authenticateUser: function (username, password) {
 			return $http.post('/login', {
 				username: username,
 				password: password
@@ -13,9 +13,9 @@ mySPA.factory('LoginService', ['$http', '$q', function ($http, $q) {
 				return $q.reject(response.data)
 			})
 		},
-		loadUserInfo_Nineteen68: function (selRole) {
-			var param = "loadUserInfo_Nineteen68";
-			return $http.post('/loadUserInfo_Nineteen68', {
+		loadUserInfo: function (selRole) {
+			var param = "loadUserInfo";
+			return $http.post('/loadUserInfo', {
 				action: param,
 				selRole: selRole
 			})
@@ -26,8 +26,8 @@ mySPA.factory('LoginService', ['$http', '$q', function ($http, $q) {
 				return $q.reject(response.data);
 			});
 		},
-		resetPassword_Nineteen68: function (newpassword,currpassword) {
-			return $http.post('/resetPassword_Nineteen68', {
+		resetPassword: function (newpassword,currpassword) {
+			return $http.post('/resetPassword', {
 				newpassword: newpassword,
 				currpassword: currpassword
 			})
@@ -38,9 +38,9 @@ mySPA.factory('LoginService', ['$http', '$q', function ($http, $q) {
 				return $q.reject(response.data)
 			})
 		},
-		getRoleNameByRoleId_Nineteen68: function (roleasarray) {
-			var param = "getRoleNameByRoleId_Nineteen68";
-			return $http.post('/getRoleNameByRoleId_Nineteen68', {
+		getRoleNameByRoleId: function (roleasarray) {
+			var param = "getRoleNameByRoleId";
+			return $http.post('/getRoleNameByRoleId', {
 				action: param,
 				role: roleasarray,
 			})
@@ -51,8 +51,8 @@ mySPA.factory('LoginService', ['$http', '$q', function ($http, $q) {
 				return $q.reject(response.data);
 			});
 		},
-		checkUserState_Nineteen68: function () {
-			return $http.post('/checkUserState_Nineteen68')
+		checkUserState: function () {
+			return $http.post('/checkUserState')
 			.then(function (response) {
 				return response.data;
 			},

@@ -1,7 +1,7 @@
 mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 	return {
-		getUserRoles_Nineteen68: function () {
-			return $http.post('/getUserRoles_Nineteen68')
+		getUserRoles: function () {
+			return $http.post('/getUserRoles')
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},

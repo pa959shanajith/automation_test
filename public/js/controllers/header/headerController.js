@@ -6,7 +6,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	var cycleId = [];
 	var screenId = [];
 	$scope.passwordValidation = "";
-	$rootScope.unavailableLocalServer_msg="No Intelligent Core Engine (ICE) connection found with the Nineteen68 logged in username. Please run the ICE batch file once again and connect to Server.";
+	$rootScope.unavailableLocalServer_msg="No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.";
 
 	if(window.localStorage['_UI']){
 		userDetails = JSON.parse(window.localStorage['_UI']);
@@ -174,10 +174,10 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	$scope.naviPg = function($event){
 		if (localStorage.getItem("navigateEnable") == "true") {
 			window.localStorage['navigateScreen'] = "plugin";
-			//Transaction Activity for Nineteen68 Logo Action
+			//Transaction Activity for Avo Assure Logo Action
 			// var labelArr = [];
 			// var infoArr = [];
-			// labelArr.push(txnHistory.codesDict['Nineteen68Logo']);
+			// labelArr.push(txnHistory.codesDict['AvoAssureLogo']);
 			// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 			$timeout(function () {
 				$location.path('/plugin');
@@ -205,7 +205,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			$("#switchRoles").hide();
 			openModelPopup("switchRoleStatus", "Switch Role", "There are no roles to switch");
 		} else {
-			LoginService.getRoleNameByRoleId_Nineteen68(roleasarray)
+			LoginService.getRoleNameByRoleId(roleasarray)
 			.then(function (data) {
 				if (data == "Invalid Session") {
 					return $rootScope.redirectPage();
@@ -227,7 +227,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	$scope.switchedRole = function ($event) {
 		$("#switchRoleModal").modal("hide");
 		blockUI("Switching to " + selectedRoleName);
-		LoginService.loadUserInfo_Nineteen68(selectedRoleID)
+		LoginService.loadUserInfo(selectedRoleID)
 		.then(function (data) {
 			unblockUI();
 			if (data != "fail") {
@@ -299,7 +299,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			$(".ic-confpassword").parent().addClass("input-border-error");
 			$scope.passwordValidation = "New Password and Confirm Password do not match";
 		} else {
-			LoginService.resetPassword_Nineteen68(newpassword,currpassword)
+			LoginService.resetPassword(newpassword,currpassword)
 			.then(function (data) {
 				if(data == "Invalid Session"){
 					$scope.passwordValidation = "Invalid Session";
@@ -402,13 +402,13 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 
 	$scope.getIce = async () => {
 		try {
-			const res = await fetch("/Nineteen68_ICE");
+			const res = await fetch("/AvoAssure_ICE");
 			const status = await res.text();
-			if (status == "available") location.href = location.origin+"/Nineteen68_ICE?file=getICE"
-			else openModelPopup("switchRoleStatus", "Download Nineteen68 ICE", "Package is not available");
+			if (status == "available") location.href = location.origin+"/AvoAssure_ICE?file=getICE"
+			else openModelPopup("switchRoleStatus", "Download Avo Assure ICE", "Package is not available");
 		} catch (ex) {
 			console.error("Error while downloading ICE package. Error:", ex);
-			openModelPopup("switchRoleStatus", "Download Nineteen68 ICE", "Package is not available");
+			openModelPopup("switchRoleStatus", "Download Avo Assure ICE", "Package is not available");
 		}
 	}
 });

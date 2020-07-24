@@ -6,7 +6,7 @@ mySPA.controller('respHeaderController', function($scope, $rootScope, $timeout, 
 	var cycleId = [];
 	var screenId = [];
 	$('#passwordValidation').text("");
-	$rootScope.unavailableLocalServer_msg="No Intelligent Core Engine (ICE) connection found with the Nineteen68 logged in username. Please run the ICE batch file once again and connect to Server.";
+	$rootScope.unavailableLocalServer_msg="No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.";
 
 	if(window.localStorage['_UI']){
 		userDetails = JSON.parse(window.localStorage['_UI']);
@@ -185,10 +185,10 @@ mySPA.controller('respHeaderController', function($scope, $rootScope, $timeout, 
 	$scope.naviPg = function($event){
 		if (localStorage.getItem("navigateEnable") == "true") {
 			window.localStorage['navigateScreen'] = "plugin";
-			//Transaction Activity for Nineteen68 Logo Action
+			//Transaction Activity for Avo Assure Logo Action
 			// var labelArr = [];
 			// var infoArr = [];
-			// labelArr.push(txnHistory.codesDict['Nineteen68Logo']);
+			// labelArr.push(txnHistory.codesDict['AvoAssureLogo']);
 			// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 			$timeout(function () {
 				//$location.path('/plugin');
@@ -219,7 +219,7 @@ mySPA.controller('respHeaderController', function($scope, $rootScope, $timeout, 
 			openModelPopup("switchRoleStatus", "Switch Role", "There are no roles to switch");
 		} else {
 			$("#switchRoles").removeClass('hide');
-			LoginService.getRoleNameByRoleId_Nineteen68(roleasarray)
+			LoginService.getRoleNameByRoleId(roleasarray)
 			.then(function (data) {
 				if (data == "Invalid Session") {
 					return $rootScope.redirectPage();
@@ -241,7 +241,7 @@ mySPA.controller('respHeaderController', function($scope, $rootScope, $timeout, 
 	$(document).on('click', ".switchedRole", function ($event) {
 		$("#switchRoleModal").modal("hide");
 		blockUI("Switching to " + selectedRoleName);
-		LoginService.loadUserInfo_Nineteen68(selectedRoleID)
+		LoginService.loadUserInfo(selectedRoleID)
 		.then(function (data) {
 			unblockUI();
 			if (data != "fail") {
@@ -317,7 +317,7 @@ mySPA.controller('respHeaderController', function($scope, $rootScope, $timeout, 
 			$(".ic-confpassword").parent().addClass("input-border-error");
 			$('#passwordValidation').text("New Password and Confirm Password do not match");
 		} else {
-			LoginService.resetPassword_Nineteen68(newpassword,currpassword)
+			LoginService.resetPassword(newpassword,currpassword)
 			.then(function (data) {
 				if(data == "Invalid Session"){
 					$('#passwordValidation').text("Invalid Session");
