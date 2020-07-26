@@ -812,7 +812,7 @@
 /*********QC*********/
 /*Mapped Files*/ 
 .scroll-wrapper > .mappedFiles{
-	/*width: 100% !important;*/
+	width: 90% !important;
     float: left;
     height: 100% !important;
 }

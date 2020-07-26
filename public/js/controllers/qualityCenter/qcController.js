@@ -117,8 +117,8 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		// var infoArr = [];
 		// labelArr.push(txnHistory.codesDict['CancelALMLogin']);
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
-		window.localStorage['navigateScreen'] = "plugin";
-		window.location.assign('plugin');
+		window.localStorage['navigateScreen'] = "p_Integration";
+		window.location.assign('p_Integration');
 	};
 
 	$scope.hideMappedFilesTab = function(){
@@ -463,8 +463,8 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		qcServices.qcFolderDetails_ICE(dataAction,"","","","")
 		.then(function(data){
 			if(data == "closedqc"){
-				window.localStorage['navigateScreen'] = "plugin";
-				window.location.href = "/plugin";
+				window.localStorage['navigateScreen'] = "p_Integration";
+				window.location.href = "/p_Integration";
 			}		
 		},
 		function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
