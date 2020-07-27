@@ -180,8 +180,8 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 			if (parseInt(brow) == 1) return './imgs/ic-ch-schedule.png';
 			else if (parseInt(brow) == 2) return './imgs/ic-ff-schedule.png';
 			else if (parseInt(brow) == 3) return './imgs/ic-ie-schedule.png';
-			else if (parseInt(brow) == 7) return './imgs/legacy.png';
-			else if (parseInt(brow) == 8) return './imgs/chromium.png';
+			else if (parseInt(brow) == 7) return './imgs/ic-legacy-schedule.png';
+			else if (parseInt(brow) == 8) return './imgs/ic-chromium-schedule.png';
 		}
 		else if (appType == "Webservice") return './imgs/webservice.png';
 		else if (appType == "MobileApp") return './imgs/mobileApps.png';
