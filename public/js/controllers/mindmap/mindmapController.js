@@ -3439,7 +3439,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         $('#ct-node-' + e.parent.id).addClass('node-selected');
                         dNodes_c.push(dNodes[e.parent.id]);
                     }
-                    dNodes_c.push(e);
+                    if (dNodes_c.indexOf(dNodes[e.id]) == -1) {
+                        dNodes_c.push(e);
+                    }
                 }
             }
         });
