@@ -7480,7 +7480,7 @@ function getTags(data) {
 	} else if (appTypeLocal == "MobileApp" && navigator.appVersion.indexOf("Mac") != -1) {
 		obnames = ["@Generic", "@Mobile", "@CustomiOS","@Excel","@Word"];
 	} else if (appTypeLocal == "MobileWeb") {
-		obnames = ["@Generic", "@Browser", "@BrowserPopUp", "@Action","@Excel","@Word"];
+		obnames = ["@Generic", "@Browser", "@BrowserPopUp", "@Action","@Excel","@Word","@Custom"];
 	} else if (appTypeLocal == "SAP") {
 		obnames = ["@Generic", "@Sap", "@Custom", "@Word","@Excel"]
 	} else if (appTypeLocal = "System") {
