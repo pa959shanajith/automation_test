@@ -526,7 +526,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	};
 	//Save TestSuite Functionality
 
-	$scope.qccredentials = {qcurl: "", qcusername: "", qcpassword: ""};
+	$scope.qccredentials = {qcurl: "", qcusername: "", qcpassword: "", qctype: ""};
 
 	//Save QC Details
 	$scope.saveQcCredentials = function (e) {
@@ -582,6 +582,56 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		}
 	};
 
+	//Save qTest Details
+	$scope.saveQTestCredentials = function (e) {
+		var checkedVal = $("#qtestSteps")[0].checked;
+		$("#almURL, #almUserName, #almPassword").removeClass('inputErrorBorder');
+		if (!$scope.almURL) {
+			$("#almURL").addClass('inputErrorBorder');
+			$(".error-msg-exeQc").text("Please Enter URL.");
+		} else if (!$scope.almUserName) {
+			$("#almUserName").addClass('inputErrorBorder');
+			$(".error-msg-exeQc").text("Please Enter User Name.");
+		} else if (!$scope.almPassword) {
+			$("#almPassword").addClass('inputErrorBorder');
+			$(".error-msg-exeQc").text("Please Enter Password.");
+		} else if (appType != "SAP" && browserTypeExe.length === 0) {
+			$("#QTestSyncWindow").find("button.close").trigger("click");
+			openDialogExe("Execute Test Suite", "Please select a browser");
+		} else if ($(".exe-ExecuteStatus input:checked").length === 0) {
+			$("#QTestSyncWindow").find("button.close").trigger("click");
+			openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
+		} else {
+			$("#almURL,#almUserName,#almPassword").css({
+				"background": "none"
+			});
+			$(".error-msg-exeQc").text("");
+			ExecutionService.loginQTestServer_ICE($scope.almURL, $scope.almUserName, $scope.almPassword,"qTest")
+			.then(function (data) {
+				if (data == "unavailableLocalServer") {
+					$(".error-msg-exeQc").text("Unavailable LocalServer");
+				} else if (data == "Invalid Session") {
+					$(".error-msg-exeQc").text("Invalid Session");
+				} else if (data == "invalidcredentials") {
+					$(".error-msg-exeQc").text("Invalid Credentials");
+				} else if (data == "invalidurl") {
+					$(".error-msg-exeQc").text("Invalid URL");
+				} else {
+					$scope.qccredentials = {
+						qcurl: $("#almURL").val(),
+						qcusername: $("#almUserName").val(),
+						qcpassword: $("#almPassword").val(),
+						qteststeps: checkedVal,
+						qctype: "qTest"
+					}
+					$("#QTestSyncWindow").find("button.close").trigger("click");
+				}
+			}, function (error) {
+				console.log("Error in qcController.js file loginQCServer method! \r\n " + (error.data));
+			});
+		}
+	};
+	
 	//Execute TestSuite Functionality
 	$scope.ExecuteTestSuite = function ($event) {
 		if ($(".exe-ExecuteStatus input:checked").length === 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
@@ -722,14 +772,24 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	});
 	//Execute TestSuite Functionality
 
-	//ALM Functionality
-	$(document).on("click", "#syncScenario", function () {
-		$("#ALMSyncWindow").modal("show");
-		$(".error-msg-exeQc").text('');
-		$("#almURL").val($scope.qccredentials.qcurl);
-		$("#almUserName").val($scope.qccredentials.qcusername);
-		$("#almPassword").val($scope.qccredentials.qcpassword);
+	//Integration Functionality
+	$(document).on("change", "#syncScenario", function () {
+		if ($(this).val() == "1") {
+			$("#ALMSyncWindow").modal("show");
+			$(".error-msg-exeQc").text('');
+			$("#almURL").val($scope.qccredentials.qcurl);
+			$("#almUserName").val($scope.qccredentials.qcusername);
+			$("#almPassword").val($scope.qccredentials.qcpassword);
+		}
+		else if ($(this).val() == "0") {
+			$("#QTestSyncWindow").modal("show");
+			$(".error-msg-exeQc").text('');
+			$("#almURL").val($scope.qccredentials.qcurl);
+			$("#almUserName").val($scope.qccredentials.qcusername);
+			$("#almPassword").val($scope.qccredentials.qcpassword);
+		}
 	});
+
 	//ALM Functionality
 
 	$scope.submit_task = function (action, e) {

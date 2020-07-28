@@ -351,7 +351,7 @@ if (cluster.isMaster) {
 		});
 
 		//Test Lead and Test Manager can access
-		app.get(/^\/(p_Webocular|neuronGraphs|p_ALM|p_APG)$/, function(req, res) {
+		app.get(/^\/(p_Webocular|neuronGraphs|p_ALM|p_APG|p_Integration|p_qTest)$/, function(req, res) {
 			var roles = ["Test Manager", "Test Lead"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
@@ -462,6 +462,7 @@ if (cluster.isMaster) {
 		var plugin = require('./server/controllers/plugin');
 		var utility = require('./server/controllers/utility');
 		var qc = require('./server/controllers/qualityCenter');
+		var qtest = require('./server/controllers/qtest');
 		var webocular = require('./server/controllers/webocular');
 		var chatbot = require('./server/controllers/chatbot');
 		var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
@@ -584,6 +585,12 @@ if (cluster.isMaster) {
 		app.post('/qcFolderDetails_ICE', qc.qcFolderDetails_ICE);
 		app.post('/saveQcDetails_ICE', qc.saveQcDetails_ICE);
 		app.post('/viewQcMappedList_ICE', qc.viewQcMappedList_ICE);
+		//qTest Plugin
+		app.post('/loginToQTest_ICE', qtest.loginToQTest_ICE);
+		app.post('/qtestProjectDetails_ICE', qtest.qtestProjectDetails_ICE);
+		app.post('/qtestFolderDetails_ICE', qtest.qtestFolderDetails_ICE);
+		app.post('/saveQtestDetails_ICE', qtest.saveQtestDetails_ICE);
+		app.post('/viewQtestMappedList_ICE', qtest.viewQtestMappedList_ICE);		
 		//app.post('/manualTestcaseDetails_ICE', qc.manualTestcaseDetails_ICE);
 		// Automated Path Generator Routes
 		app.post('/flowGraphResults', flowGraph.flowGraphResults);

@@ -233,6 +233,46 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                 }]
             }
 		})
+		.state('integration', {
+            url: '/p_Integration',
+            templateUrl: 'partials/integration.html',
+            controller: 'integrationController',
+            resolve: {
+                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+						'js/directives/headerDirective.js',	
+						'css/css_QC/qcStyle.css',
+						'js/factories/socketFactory.js',
+						'js/controllers/chatbot/chatbotController.js',
+						'js/controllers/chatbot/chatbotService.js',
+						'js/controllers/login/loginService.js',						
+						'js/controllers/header/headerController.js',
+						'js/controllers/integration/integrationController.js',
+						'js/controllers/integration/integrationService.js'
+                    ]);
+                }]
+            }
+		})
+		.state('qtest', {
+            url: '/p_qTest',
+            templateUrl: 'partials/qtest.html',
+            controller: 'qtestController',
+            resolve: {
+                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+						'js/directives/headerDirective.js',	
+						'css/css_QC/qcStyle.css',
+						'js/factories/socketFactory.js',
+						'js/controllers/chatbot/chatbotController.js',
+						'js/controllers/chatbot/chatbotService.js',
+						'js/controllers/login/loginService.js',						
+						'js/controllers/header/headerController.js',
+						'js/controllers/qtest/qtestController.js',
+						'js/controllers/qtest/qtestService.js'
+                    ]);
+                }]
+            }
+		})
 		.state('utility', {
             url: '/p_Utility',
             templateUrl: 'partials/utility.html',

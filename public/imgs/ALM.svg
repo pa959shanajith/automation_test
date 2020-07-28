@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="168" height="168" viewBox="0 0 168 168">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+
+      .cls-2 {
+        font-size: 300px;
+        fill: #6a28b7;
+        font-family: "Fira Sans";
+        text-transform: uppercase;
+      }
+    </style>
+  </defs>
+  <g id="Artboard_1" data-name="Artboard 1">
+    <rect class="cls-1" width="168" height="168"/>
+    <text id="ALM" class="cls-2" transform="translate(18.078 106.238) scale(0.219 0.219)">ALM</text>
+  </g>
+</svg>
