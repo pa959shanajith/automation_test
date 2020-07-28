@@ -867,7 +867,12 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             total = pass+fail+terminated;
                             finalReports.overallstatus[0].pass = (parseFloat((pass / total) * 100).toFixed(2)) > 0 ? parseFloat((pass / total) * 100).toFixed(2) : parseInt(0);
                             finalReports.overallstatus[0].fail = (parseFloat((fail / total) * 100).toFixed(2)) > 0 ? parseFloat((fail / total) * 100).toFixed(2) : parseInt(0);
-                            finalReports.overallstatus[0].terminate = (parseFloat((terminated / total) * 100).toFixed(2)) > 0 ? parseFloat((terminated / total) * 100).toFixed(2) : parseInt(0);
+                            if(pass>0 && fail>0){
+                                finalReports.overallstatus[0].terminate = (100-(parseFloat(finalReports.overallstatus[0].fail)+parseFloat(finalReports.overallstatus[0].pass))).toFixed(2);
+                            } else{
+                                finalReports.overallstatus[0].terminate = (parseFloat((terminated / total) * 100).toFixed(2)) > 0 ? parseFloat((terminated / total) * 100).toFixed(2) : parseInt(0);
+                            }
+                            // finalReports.overallstatus[0].terminate = (parseFloat((terminated / total) * 100).toFixed(2)) > 0 ? parseFloat((terminated / total) * 100).toFixed(2) : parseInt(0);
                             finalReports.remarksLength = remarksLength;
                             finalReports.commentsLength = commentsLength;
                         }
