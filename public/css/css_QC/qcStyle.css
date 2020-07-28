@@ -53,7 +53,7 @@
 .qcTreeContainer, .qcAvoAssureTreeContainer{
     float: left;
     width: 100%;
-    height: 90%;
+    height: 80%;
     margin-top: 20px;
     padding: 0 6px 0 6px;
 }
@@ -66,6 +66,14 @@
 .qcAvoAssureTreeContainer ul li.testSet label{position: relative;top: 3px;}
 .testSet:hover{background-color: #f3eaff; border-radius: 5px !important;}
 .root ul{margin-left: 17px;}
+
+.qcTreeContainer ul.suiteList li.testSuite label{margin-left: 0px !important; position: relative; top: 3px; overflow: hidden; text-overflow: ellipsis; width: 70%; white-space: nowrap;margin-bottom: 0;}
+.qcTreeContainer ul.suiteList li.testSuite img{float: right; margin-right: 8px; height: 13px; position: relative; top: 6px; cursor: pointer;}
+/* .testSuite:hover{background-color: #f3eaff; border-radius: 5px !important;} */
+
+.qcTreeContainer ul.runList li.testRun label{margin-left: 57px !important; position: relative; top: 3px; overflow: hidden; text-overflow: ellipsis; width: 70%; white-space: nowrap;margin-bottom: 0;}
+.qcTreeContainer ul.runList li.testRun img{float: right; margin-right: 8px; height: 13px; position: relative; top: 6px; cursor: pointer;}
+.testRun:hover{background-color: #f3eaff; border-radius: 5px !important;}
 
 .qcTreeContainer ul li.Tsetnode label{position: relative; top: 3px; overflow: hidden; text-overflow: ellipsis; width: 70%;}
 .qcTreeContainer ul li.Tsetnode img{float: left; position: relative; top: 6px; cursor: pointer;}

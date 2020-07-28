@@ -380,11 +380,11 @@ exports.saveQcDetails_ICE = function (req, res) {
 				"Content-Type": "application/json"
 			}
 		};
-			logger.info("Calling NDAC Service: qualityCenter/saveQcDetails_ICE");
-		client.post(epurl + "qualityCenter/saveQcDetails_ICE", args,
+		logger.info("Calling NDAC Service: qualityCenter/saveIntegrationDetails_ICE");
+		client.post(epurl + "qualityCenter/saveIntegrationDetails_ICE", args,
 			function (qcdetailsows, response) {
 			if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
-					logger.error("Error occurred in saveQcDetails_ICE Error Code : ERRNDAC");
+				logger.error("Error occurred in saveIntegrationDetails_ICE Error Code : ERRNDAC");
 				flag = false;
 			}
 			callback();
@@ -519,11 +519,11 @@ function qcscenariodetails(projectid, cb) {
 						"Content-Type": "application/json"
 					}
 				};
-					logger.info("Calling NDAC Service from qcdetails: qualityCenter/viewQcMappedList_ICE");
-				client.post(epurl + "qualityCenter/viewQcMappedList_ICE", args,
+				logger.info("Calling NDAC Service from qcdetails: qualityCenter/viewIntegrationMappedList_ICE");
+				client.post(epurl + "qualityCenter/viewIntegrationMappedList_ICE", args,
 					function (qcdetailsows, response) {
 					if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
-						logger.error("Error occurred inqualityCenter/viewQcMappedList_ICE from qcdetails Error Code : ERRNDAC");
+						logger.error("Error occurred inqualityCenter/viewIntegrationMappedList_ICE from qcdetails Error Code : ERRNDAC");
 					} else {
 						if (qcdetailsows.rows.length != 0) {
 							//flagtocheckifexists = true;

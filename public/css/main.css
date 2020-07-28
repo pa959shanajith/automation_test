@@ -4496,7 +4496,7 @@ select:-webkit-autofill:focus {
 	/*.leftQcStructure, .rightQcStructure{width: calc(100% - 505px) !important; height: 720px !important;}
 	.qcActionBtnFirstChild{margin-left: 480px !important;}
 	.qcActionBtn label:nth-child(2){left: 440px !important;}*/
-	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 226px) !important;}
+	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 236px) !important;}
     .mappedFiles{height: calc(100% - 53px) !important;}
 }
 

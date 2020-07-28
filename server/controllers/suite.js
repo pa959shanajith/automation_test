@@ -123,7 +123,7 @@ const counterUpdater = async (count, userid) => {
 };
 
 /** Function responsible for fetching testcase and qcdetails for given scenarioid */
-const fetchScenarioDetails = async (scenarioid, userid) => {
+const fetchScenarioDetails = async (scenarioid, userid, qcType) => {
 	const fnName = "fetchScenarioDetails";
 	const scenario = {};
 	const allTestcaseSteps = [];
@@ -165,11 +165,18 @@ const fetchScenarioDetails = async (scenarioid, userid) => {
 	scenario.testcase = JSON.stringify(allTestcaseSteps);
 
 	// Step 3: Get qcdetails
-	inputs = {
-		"query": "qcdetails",
-		"testscenarioid": scenarioid
-	};
-	const qcdetails = await utils.fetchData(inputs, "qualityCenter/viewQcMappedList_ICE", fnName);
+	if(qcType == 'qTest') {
+		inputs = {
+			"query": "qtestdetails",
+			"testscenarioid": scenarioid
+		};
+	} else {
+		inputs = {
+			"query": "qcdetails",
+			"testscenarioid": scenarioid
+		};
+	}
+	const qcdetails = await utils.fetchData(inputs, "qualityCenter/viewIntegrationMappedList_ICE", fnName);
 	if (qcdetails != "fail" && qcdetails.length > 0) scenario.qcdetails = JSON.parse(JSON.stringify(qcdetails[0]));
 	else scenario.qcdetails = {};
 	return scenario;
@@ -207,7 +214,7 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 		};
 		const suiteDetails = suite.suiteDetails;
 		for (const tsco of suiteDetails) {
-			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid);
+			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid, batchData.qccredentials.qctype);
 			if (scenario == "fail") return "fail";
 			scenario = Object.assign(scenario, tsco);
 			suiteObj.condition.push(scenario.condition);
