@@ -38,10 +38,6 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 			$(".ic-password").parent().addClass("input-border-error");
 			$scope.loginValidation = "Please Enter Password";
 			cfpLoadingBar.complete();
-			
-
-			
-			
 		} else {
 			var username = $scope.ud.userName.toLowerCase();
 			var password = $scope.ud.password;

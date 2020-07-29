@@ -22,10 +22,10 @@
 						<span><span class='fa fa-link'></span></span>Assign Projects</a></li>
 					<li><a id='ldapConfigTab' title="Manage LDAP Configuration" ng-click="tab = 'tabldapConfig';ldapConf.click()" class="selectBrowser" data-name="4">
 						<span><span class='fa fa-address-book'></span></span>LDAP Configuration</a></li>
-					<!-- <li><a id='samlConfigTab' title="Manage SAML Configuration" ng-click="tab = 'tabsamlConfig';samlConf.click()" class="selectBrowser" data-name="4">
+					<li><a id='samlConfigTab' title="Manage SAML Configuration" ng-click="tab = 'tabsamlConfig';samlConf.click()" class="selectBrowser" data-name="4">
 						<span><span class='fa fa-lock'></span></span>SAML Configuration</a></li>
 					<li><a id='oidcConfigTab' title="Manage OpenID Connect Configuration" ng-click="tab = 'taboidcConfig';oidcConf.click()" class="selectBrowser" data-name="4">
-						<span><span class='fa fa-openid'></span></span>OpenID Connect Configuration</a></li> -->
+						<span><span class='fa fa-openid'></span></span>OpenID Connect Configuration</a></li>
 					<li><a id='sessionTab' title="Session Management" ng-click="tab = 'tabSession';sessionConf.click()" class="selectBrowser" data-name="5">
 						<span><span class='fa fa-users'></span></span>Session Management</a></li>
 					<li style="margin-bottom: 30px"><a id='preferencesTab' title="Preferences" ng-click="tab='tabPreferences';preferences.click()" class="selectBrowser" data-name="2">
@@ -54,30 +54,63 @@
 			<!-- Button -->
 			<!-- Action area -->
 			<div class="col-xs-9 form-group adminForm">
+				<!-- <div class='adminControl no-disp' style="margin-bottom:2%"><div style="padding-left:30px">
+					<label class="adminFormRadio">
+						<input type="radio" ng-model="userConf.type" value="inhouse" name="userType" ng-change='userConf.selectUserType($event)'/>
+						<span>In-House</span>
+					</label>
+					<label class="adminFormRadio">
+						<input type="radio" ng-model="userConf.type" value="ldap" name="userType" ng-change='userConf.selectUserType($event)'/>
+						<span>LDAP</span>
+					</label>
+					<label class="adminFormRadio">
+						<input type="radio" ng-model="userConf.type" value="saml" name="userType" ng-change='userConf.selectUserType($event)'/>
+						<span>SAML</span>
+					</label>
+					<label class="adminFormRadio" style="margin-right:0px">
+						<input type="radio" ng-model="userConf.type" value="oidc" name="userType" ng-change='userConf.selectUserType($event)'/>
+						<span>OpenID</span>
+					</label>
+				</div></div> -->
+				<div class="selectRole">
+					<label class="leftControl primaryRole">User Type</label>
+					<select class='adminSelect form-control' id="userTypes" class="form-control rightControl selectControl"  ng-model="userConf.type" ng-change="userConf.selectUserType($event)">
+						<option value="inhouse" selected>Default</option>
+						<option value="ldap">LDAP</option>
+						<option value="saml">SAML</option>
+						<option value="oidc">OpenID</option>
+					</select>
+				</div>
 				<div class='userForm adminControl'>
-					<button title="LDAP" class="btn btn-xs userTypeBtn ldapBtn" ng-click="userConf.ldapActive=!userConf.ldapActive;userConf.activateLDAP()">LDAP</button>
 					<input type="text" autocomplete="off" id="userName" name="userName" ng-model="userConf.userName" style="padding-right:175px" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="User Name"/>
 				</div>
-				<div class="userLDAPFetch" ng-if="userConf.ldapActive">
+				<div class="userLDAPFetch adminControl" ng-if="userConf.type=='ldap'">
 					<div class="userForm adminControl">
-						<select ng-change="userConf.ldapSetServer()" class='adminSelect selectlg form-control' ng-model="userConf.ldap.server" id="ldapServer" class="form-control rightControl selectControl">
+						<select ng-change="userConf.ldapSetServer()" class='adminSelect selectlg form-control' ng-model="userConf.ldap.server" id="ldapServer" class="form-control rightControl selectControl" style="width:100%">
 							<option value="" disabled selected>Select LDAP Server</option>
 							<option ng-repeat="ldapids in userConf.ldapAllServerList" value="{{ldapids}}" ng-selected="ldapids==userConf.ldap.server" ng-disabled="userConf.ldap.expired==ldapids">{{ldapids}}</option>
 						</select>
 					</div>
-					<label><input type="radio" ng-model="userConf.ldap.fetch" value="map" name="ldapFetch" ng-change='userConf.ldapSwitchFetch()' ng-disabled="userConf.ldap.server == ''"/> Map New User</label>
-					<label><input type="radio" ng-model="userConf.ldap.fetch" value="import" name="ldapFetch" ng-change='userConf.ldapSwitchFetch()' ng-disabled="userConf.ldap.server == ''"/> Import User</label>
-					<div class="userForm adminControl" ng-if="userConf.ldap.fetch != 'import'">
+					<div class="col-xs-12" style="padding-left:70px">
+						<label class="adminFormRadio">
+							<input type="radio" ng-model="userConf.ldap.fetch" value="map" name="ldapFetch" ng-change='userConf.ldapSwitchFetch()' ng-disabled="userConf.ldap.server == ''"/>
+							<span>Map New User</span>
+						</label>
+						<label class="adminFormRadio">
+							<input type="radio" ng-model="userConf.ldap.fetch" value="import" name="ldapFetch" ng-change='userConf.ldapSwitchFetch()' ng-disabled="userConf.ldap.server == ''"/>
+							<span>Import User</span>
+						</label>
+					</div>
+					<div class="userForm" ng-if="userConf.ldap.fetch != 'import'">
 						<button title="Fetch" class="btn btn-xs userTypeBtn userTypeBtnActive" style="right:0" ng-click="userConf.ldapGetUser()" ng-disabled="userConf.ldap.server == ''">Fetch</button>
-						<input type="text" autocomplete="off" id="ldapDirectory" name="ldapDirectory" ng-model="userConf.ldap.user"  style="padding-right:90px" class="form-control form-control-custom create" placeholder="User Domain Name"/>
+						<input type="text" autocomplete="off" id="ldapDirectory" name="ldapDirectory" ng-model="userConf.ldap.user"  class="form-control form-control-custom create" placeholder="User Domain Name"/>
 					</div>
 					<div class="dropdown dropdown-scroll userForm adminControl" ng-if="userConf.ldap.fetch == 'import'">
-						<input class="btn btn-users dropdown-toggle" type="text" autocomplete="off" id="ldapDirectory" data-toggle="dropdown" ng-model="userConf.query0" placeholder="Search User.." ng-click = "userConf.click('retainldap')"></input>
+						<input class="btn btn-users dropdown-toggle" type="text" autocomplete="off" id="ldapDirectory" data-toggle="dropdown" ng-model="userConf.ldapUserFilter" placeholder="Search User.." ng-click = "userConf.click('retaintype')" style="width:100%"></input>
 						<ul class="dropdown-menu dropdown-menu-users" role="menu" aria-labelledby="ldapDirectory">
-							<li role="presentation" ng-repeat='luser in userConf.ldapAllUserList | filter:userConf.query0' ng-click="userConf.ldap.user=luser.value; userConf.query0=luser.html; userConf.ldapGetUser()" value="{{luser.value}}"> {{luser.html}}</li>
+							<li role="presentation" ng-repeat='luser in userConf.ldapAllUserList | filter:userConf.ldapUserFilter' ng-click="userConf.ldap.user=luser.value;userConf.ldapUserFilter=luser.html; userConf.ldapGetUser()" value="{{luser.value}}"> {{luser.html}}</li>
 						</ul>
-					</div>					
-
+					</div>
 				</div>
 
 				<div class='leftControl adminControl'>
@@ -86,7 +119,7 @@
 				<div class='rightControl adminControl'>
 					<input type="text" autocomplete="off" name="lastname" id="lastname" ng-model="userConf.lastname" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Last Name"/>
 				</div>
-				<div ng-if="!userConf.ldapActive">
+				<div ng-if="userConf.type=='inhouse'">
 					<div class='leftControl adminControl'>
 						<input type="password" autocomplete="off" name="passWord" id="password" ng-model="userConf.passWord" maxlength="16" class="form-control form-control-custom create spaceRegex passwordRegex" placeholder="Password" autocomplete="off"/>
 					</div>
@@ -97,7 +130,7 @@
 				<div class='adminControl'>
 					<input type="email" autocomplete="off" name="email" id="email" ng-model="userConf.email" maxlength="100" class="form-control form-control-custom create" placeholder="Email Id"/>
 				</div>
-				<div class="col-xs-6 selectRole">
+				<div class="selectRole" style="padding-left:0">
 					<label class="leftControl primaryRole">Primary Role</label>
 					<select class='adminSelect form-control' ng-model="userConf.role" id="userRoles" class="form-control rightControl selectControl">
 						<option value="" disabled selected>Select User Role</option>
@@ -125,14 +158,14 @@
 			<!-- Edit User Form -->
 			<div class="col-xs-9 form-group adminForm">
 				<div class='userForm adminControl'>
-					<button title="LDAP" class="btn btn-xs userTypeBtn ldapBtn" style="margin:2px 0" disabled>LDAP</button>
-					<input class="btn btn-users users-edit dropdown-toggle" type="text" autocomplete="off" id="userIdName" data-toggle="dropdown" ng-model="userConf.query1" placeholder="Search User.." ng-click = "userConf.click()">
+					<button title="Default" class="btn btn-xs userTypeBtn" style="margin:2px 0;right:0" disabled>Default</button>
+					<input class="btn btn-users users-edit dropdown-toggle" type="text" autocomplete="off" id="userIdName" data-toggle="dropdown" ng-model="userConf.allUserFilter" placeholder="Search User.." ng-click = "userConf.click()">
 					<ul class="dropdown-menu dropdown-menu-users users-edit" role="menu" aria-labelledby="userIdName">
-						<li role="presentation" ng-repeat='uid in userConf.allUsersList | filter:userConf.query1' ng-click="userConf.userIdName=uid[1]+';'+uid[0] ;userConf.query1=uid[0]; userConf.getUserData()" value="{{uid[1]}};{{uid[0]}}"> {{uid[0]}}</li>
-					</ul>					
+						<li role="presentation" ng-repeat='uid in userConf.allUsersList | filter:userConf.allUserFilter' ng-click="userConf.userIdName=uid[1]+';'+uid[0];userConf.allUserFilter=uid[0]; userConf.getUserData()" value="{{uid[1]}};{{uid[0]}}"> {{uid[0]}}</li>
+					</ul>
 				</div>
 
-				<div class="userLDAPFetch" ng-if="userConf.ldapActive">
+				<div class="userLDAPFetch" ng-if="userConf.type=='ldap'">
 					<div class="userForm adminControl">
 						<select ng-change="userConf.ldapSetServer()" class='adminSelect selectlg form-control' ng-model="userConf.ldap.server" id="ldapServer" class="form-control rightControl selectControl">
 							<option ng-repeat="ldapids in userConf.ldapAllServerList" value="{{ldapids}}" ng-selected="ldapids==userConf.ldap.server" ng-disabled="userConf.ldap.expired==ldapids">{{ldapids}}</option>
@@ -149,7 +182,7 @@
 				<div class='rightControl adminControl'>
 					<input type="text" autocomplete="off" name="lastname" id="lastname" ng-model="userConf.lastname" maxlength="100" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Last Name">
 				</div>
-				<div ng-if="!userConf.ldapActive">
+				<div ng-if="userConf.type=='inhouse'">
 					<div class='leftControl adminControl'>
 						<input type="password" autocomplete="off" name="passWord" id="password" ng-model="userConf.passWord" maxlength="16" class="form-control form-control-custom create spaceRegex passwordRegex" placeholder="Password" autocomplete="off">
 					</div>
@@ -197,7 +230,7 @@
 			<div class="col-xs-9 form-group" style="width: 83%">
 				<div class='userForm projectForm'>
 					<div class='domainTxt'>Domain</div>
-					<select class="adminSelect form-control" style="width: 91%" id="selDomain">
+					<select class="adminSelect form-control" id="selDomain">
 						<option value="" disabled selected>Please Select Your Domain</option>
 					</select>
 					<!-- <label class='domainTxt'>Domain :</label> -->
@@ -342,7 +375,7 @@
 			<div class="col-xs-9 form-group" style="width: 83%" id='updateProjectForm'>
 				<div class='userForm projectForm'>
 					<label class='domainTxt' style="margin-left: 1px;">Domain  </label>
-					<select class="adminSelect form-control selectDomain" style="width: 91%; margin-left: 8%;display: none;" id="selDomainEdit" name="DomainName" placeholder="Domain Name">
+					<select class="adminSelect form-control selectDomain" style="width: 91%; margin-left: 7%;display: none;" id="selDomainEdit" name="DomainName" placeholder="Domain Name">
 						<option value="" disabled selected>Please Select Your Domain</option>
 					</select>
 					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
@@ -393,7 +426,7 @@
 		<!-- Update Project -->
 
 		<!-- Create LDAP Configuration -->
-		<div ng-if="tab == 'tabldapConfig'" class="containerWrap" style="overflow:visible">
+		<div class="containerWrap" ng-if="tab == 'tabldapConfig'">
 			<!--Task Name-->
 			<div id="page-taskName">
 				<span>Create LDAP Configuration</span>
@@ -460,7 +493,7 @@
 		<!-- Create LDAP Configuration -->
 
 		<!-- Edit LDAP Configuration -->
-		<div ng-if="tab == 'tabldapConfigEdit'" class="containerWrap" style="overflow:visible">
+		<div class="containerWrap" ng-if="tab == 'tabldapConfigEdit'">
 			<!--Task Name-->
 			<div id="page-taskName">
 				<span>Edit LDAP Configuration</span>
@@ -776,61 +809,56 @@
 				<span>Token Management</span>
 			</div>
 			<div class="adminActionBtn">
-				<button title="Generate New Token" class="btn btn-md pull-right adminBtn" ng-click="generateCIusertokens($event)" style="margin-right:10px">Generate</button>
+				<button title="Generate New Token" class="btn btn-md pull-right adminBtn" ng-click="tokens.generateCIusertokens($event)" style="margin-right:10px">Generate</button>
 			</div>
-			<div class="col-xs-9 form-group" style="width: 83%;height: 45%;">
-				<div class='userForm projectForm' style="display: inline-block;">
-					<label class='domainTxt' style="width: 11%;">ICE Type</label>
-					<label>
-							<input type="radio" value="normal" id="IceType" name="provision" ng-change="selectIceType($event)" class="ng-pristine ng-untouched ng-valid" checked="checked" ng-model="provision.op"/>
-						Normal</label>
-					<label style="margin-left: 3%;">
-						<input type="radio" value="ci-cd" id="IceType" name="provision" ng-change="selectIceType($event)" class="ng-pristine ng-untouched ng-valid" ng-model="provision.op"/>
-						CI/CD</label>
-				</div>
-				<div class='userForm projectForm' style="display: inline-block;">
-					<label id="userToken" class='domainTxt' style="width: 11%;">User</label>
-					<select class="adminSelect form-control selectDomain" style="width: 71%" id="selAssignUser1">
-						<option value="" disabled selected>Please Select User</option>
-					</select>
-					<select class="adminSelect form-control selectDomain" style="width: 71%" id="selICEuser">
-						<option value="" disabled selected>Please Select ICE</option>
-					</select>
-					<span ng-show="userNameRequired" class="error-msg ng-cloak errorlbl">{{userNameRequired}}</span>
-				</div>	
-				<div class='userForm projectForm' style="display: inline-block;">
-					<div class="tokeninfo">
-						<label class='domainTxt' style="width: 11%;">Token name</label>
-						<input type="text" id="tokenName" name="tokenName" placeholder="Enter token name" >
-						<div class="tokenSuite" >
-							<span class="datePicContainer">
-								<input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly="">
-								<img class="datepickerIconToken" src="../imgs/ic-datepicker.png">
-							</span>
-							<span class="timePicContainer">
-								<input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/>
-								<img class="timepickerIconToken" src="../imgs/ic-timepicker.png" />
-							</span>
-						</div>	
+			<div class="col-xs-9 adminForm">
+				<div class='adminControl' style="margin-bottom:2%"><div>
+					<span class="leftControl" title="ICE Type">ICE Type</span>
+					<label class="adminFormRadio">
+						<input type="radio" ng-model="tokens.op" value="normal" name="provisionType" ng-change="tokens.repopulateEntries($event)"/>
+						<span>Normal</span>
+					</label>
+					<label class="adminFormRadio">
+						<input type="radio" ng-model="tokens.op" value="ci-cd" name="provisionType" ng-change="tokens.repopulateEntries($event)"/>
+						<span>CI/CD</span>
+					</label>
+				</div></div>
+				<div class='userForm adminControl'>
+					<div ng-if="tokens.op=='normal'">
+						<span class="leftControl" title="User">Username</span><select class='adminSelect form-control' ng-model="tokens.targetid" id="selAssignUser1" ng-init="tokens.targetid=' '" ng-options="entry[1] as entry[0] for entry in tokens.allUsers" ng-change="tokens.loadData($event, true)"></select>
+					</div>
+					<div ng-if="tokens.op=='ci-cd'">
+						<span class="leftControl" title="ICE">ICE Name</span><select class='adminSelect form-control' ng-model="tokens.targetid" id="selAssignUser1" ng-init="tokens.targetid=' '" ng-options="entry._id as entry.icename for entry in tokens.allICE" ng-change="tokens.loadData($event, true)"></select>
 					</div>
 				</div>
-				<div class='userForm projectForm'>
-					<label class='domainTxt' style="width: 11%;">Token  </label>
-					<input type="text" id="generateNewToken" name="projectName" readonly="readonly" style="width: 71%">
-					<!--<div class='domainTxt'>Domain</div>
-					<select class="adminSelect form-control selectDomain" style="width: 91%" id="selAssignProject">
-						<option value="" disabled selected>Please Select Your Domain</option>
-					</select> -->
-
-					<!-- <span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span> -->
-				</div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Token Name">Token Name</span>
+					<input type="text" autocomplete="off" id="tokenName" name="tokenName" ng-change="tokens.verifyName($event)" ng-model="tokens.name" maxlength="100" class="form-control form-control-custom create validationKeydown preventSpecialChar" placeholder="Token Name"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Token Expiry">Token Expiry</span>
+					<div class="tokenSuite">
+						<span class="datePicContainer" style="margin-right:10px">
+							<input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly="">
+							<img class="datepickerIconToken" src="../imgs/ic-datepicker.png">
+						</span>
+						<span class="timePicContainer">
+							<input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/>
+							<img class="timepickerIconToken" src="../imgs/ic-timepicker.png" />
+						</span>
+					</div>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Generated Token">Token</span>
+					<input type="text" autocomplete="off" id="ciToken" name="ciToken" ng-model="tokens.token" class="create" placeholder="Click on Generate to generate token" readonly="readonly"/>
+				</div></div>
 			</div>
-			<div class="col-xs-9 form-group adminForm" style="height:90%">
-				<div class="containerWrap sessionItemWrap">
+			<div class="col-xs-9 form-group adminForm" style="padding-top:0">
+				<div class="containerWrap">
 					<div class="sessionHeading" data-toggle="collapse" data-target="#activeUsersToken-x">
 						<h4>CI Tokens</h4>
 					</div>
-					<div id="activeUsersToken" class="wrap scrollbar-inner">
+					<div id="activeUsersToken" class="wrap scrollbar-inner" style="height:auto;max-height:450px">
 						<table class = "table table-hover sessionTable" id="tokensDetail">
 							<tr>
 								<th> Token Name </th>
@@ -838,22 +866,22 @@
 								<th> Expiry </th>
 								<th> Action </th>
 							</tr>
-							<tr ng-repeat="tokens in tokens.users">
-								<td> {{tokens.name}} </td>
-								<td> {{tokens.deactivated}} </td>
-								<td> {{tokens.expireson }} </td>
-								<td ng-if="tokens.deactivated == 'active'"><button class="btn" data-id="{{$index}}" ng-click="deactivate($event)" style="margin-left:-21%"> Deactivate </button></td>
-								<td ng-if="tokens.deactivated != 'active'"></td>
+							<tr ng-repeat="token in tokens.allTokens">
+								<td> {{token.name}} </td>
+								<td> {{token.deactivated}} </td>
+								<td> {{token.expireson }} </td>
+								<td ng-if="token.deactivated == 'active'"><button class="btn" data-id="{{$index}}" ng-click="tokens.deactivate($event)" style="margin-left:-21%"> Deactivate </button></td>
+								<td ng-if="token.deactivated != 'active'"></td>
 							</tr>
 						</table>
 					</div>
 				</div>
 			</div>
 		</div>
-		<!-- Assign Tokens -->			
+		<!-- Assign Tokens -->
 
 		<!-- ICE Provision -->
-		<div ng-if="tab == 'tabProvision'">
+		<div class="containerWrap" ng-if="tab == 'tabProvision'">
 			<!--Task Name-->
 			<div id="page-taskName">
 				<span>ICE Provision</span>
@@ -868,9 +896,15 @@
 			<!-- ICE Provision Form -->
 			<div class="col-xs-9 adminForm">
 				<div class='adminControl' style="margin-bottom:2%"><div>
-					<span class="leftControl" title="ICE Name">ICE Type</span>
-					<label style="margin-right:30px"><input type="radio" style="width:auto;vertical-align:top" ng-model="provision.op" value="normal" name="provisionType" ng-change='provision.selectProvisionType($event)'/> Normal</label>
-					<label><input type="radio" style="width:auto;vertical-align:top" ng-model="provision.op" value="ci-cd" name="provisionType" ng-change='provision.selectProvisionType($event)'/> CI/CD</label>
+					<span class="leftControl" title="ICE Type">ICE Type</span>
+					<label class="adminFormRadio">
+						<input type="radio" ng-model="provision.op" value="normal" name="provisionType" ng-change='provision.selectProvisionType($event)'/>
+						<span>Normal</span>
+					</label>
+					<label class="adminFormRadio">
+						<input type="radio" ng-model="provision.op" value="ci-cd" name="provisionType" ng-change='provision.selectProvisionType($event)'/>
+						<span>CI/CD</span>
+					</label>
 				</div></div>
 				<div class='adminControl'><div>
 					<span class="leftControl" title="ICE Name">ICE Name</span>

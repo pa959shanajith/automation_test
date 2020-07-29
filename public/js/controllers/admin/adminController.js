@@ -287,69 +287,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		});
 	};
 
-	$(document).on('click', '#tokenTab', function () {
-		$('#userToken').text('User')
-		$('#selAssignUser1').show()
-		$('#selICEuser').hide()
-		$('#IceType').click();
-		$scope.provision.op='normal';
-	});
-
-	$scope.selectIceType=function($event){
-		if(event.currentTarget.value=='normal'){
-			$('#userToken').text('User')
-			$('#selAssignUser1').show()
-			$('#selICEuser').hide()
-			$scope.provision.op='normal';
-		}
-		else if(event.currentTarget.value=='ci-cd'){
-			$('#userToken').text('ICE Name')
-			$('#selAssignUser1').hide()
-			$('#selICEuser').show()
-			$scope.provision.op='ci-cd';
-		}
-	}
-
-	$(document).on('change', '#selAssignUser1, #selICEuser',  function (e) {
-		blockUI("Fetchin Token data. Please wait...");
-		var userId = $("#selAssignUser1 option:selected").attr("data-id");
-		if ($scope.provision.op == 'ci-cd')
-		userId = $("#selICEuser option:selected").attr("data-id");
-		var generatetoken = {};
-		generatetoken.userId = userId;
-		
-		$scope.tokens.users={}
-		adminServices.getCIUsersDetails(generatetoken)
-		.then(function (data) {
-				unblockUI();
-				if (data == "Invalid Session") {
-					$rootScope.redirectPage();
-				}
-				else if (data == 'fail') {
-						openModalPopup("Token Management", "Failed to fetch user data");
-						resetAssignProjectForm();
-				} else {
-					openModalPopup("Token Management", "Fetch Token details successful");
-					data.sort(function(a,b) { 
-						if (a.deactivated < b.deactivated) return -1;
-						else if(a.deactivated > b.deactivated) return 1;
-						else return 0
-					 });
-					for (i=0;i<data.length;i++){
-						data[i].expiry=new Date(data[i].expiry).toString().slice(0,-22);
-					}
-					$scope.tokens.users=data;
-					$('#tokenName').val('');
-					$('.fc-datePicker').val('');
-					$('.fc-timePicker').val('');
-					$('#generateNewToken').val('');
-				}
-			}, function (error) {
-				unblockUI();
-				console.log("Error:::::::::::::", error);
-			});
-	});
-
 	$scope.provision.click = function($event){
 		$(".selectedIcon").removeClass("selectedIcon");
 		$("#provisionTab").find("span.fa").addClass("selectedIcon");;
@@ -524,7 +461,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				else if (data == "fail") openModalPopup("ICE Provision", "Failed to fetch users.");
 				else if (data == "empty") openModalPopup("ICE Provision", "There are no users present.");
 				else {
-					data.sort(function(a,b){ return a[0] > b[0]; });
+					data.sort((a,b)=>a[0].localeCompare(b[0]));
 					data.splice(0, 0, ['Select User',' ','','']);
 					$scope.provision.users = data.filter((e)=> (e[3] != "Admin"));
 				}
@@ -543,7 +480,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			if (data == "Invalid Session") $rootScope.redirectPage();
 			else if (data == 'fail') openModalPopup("ICE Provisions", "Failed to load ICE Provisions");
 			else {
-				data.sort(function(a,b){ return a.icename > b.icename; });
+				data.sort((a,b)=>a.icename.localeCompare(b.icename));
 				data = data.filter(e => e.provisionedto != "--Deleted--");
 				$scope.provision.icelist = data;
 			}
@@ -559,11 +496,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		if (icelist.indexOf(name) > -1) $("#icename").addClass("inputErrorBorder")[0].title = "ICE Name already Exists!";
 		else $("#icename").removeClass("inputErrorBorder")[0].title = "";
 	};
-
-	$scope.settings = function(){
-		blockUI();
-		$('#dialog-settings').attr('st');
-	}
 
 	$(document).on('click','.searchIcon', function($event){
 		filter(this,event);
@@ -589,207 +521,178 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	}
 
 	$scope.tokens.click = function () {
-		$scope.tokens.users=[]
 		$(".selectedIcon").removeClass("selectedIcon");
 		$("#tokenTab").find("span.fa").addClass("selectedIcon");;
-		taskName = $("#page-taskName").children("span").text();
-		adminServices.getUserDetails("user")
-		.then(function(data){
-			if(data == "Invalid Session") {
-				$rootScope.redirectPage();
-			} else if(data == "fail") {
-				openModalPopup("Token Management", "Failed to fetch users.");
-			} else if(data == "empty") {
-				openModalPopup("Token Management", "There are no users present.");
-			} else {
-				data.sort(function(a,b){ return a[0] > b[0]; });
-				var selectBox = $("#selAssignUser1");
-				selectBox.empty();
-				selectBox.append('<option data-id="" value disabled selected>Select User</option>');
-				for(i=0; i<data.length; i++){
-					if(data[i][3] != "Admin"){
-						selectBox.append('<option data-id="'+data[i][1]+'" value="'+data[i][0]+'">'+data[i][0]+'</option>');
-					}
-				}
-				selectBox.prop('selectedIndex', 0);
-			}
-		}, function (error) {
-			console.log("Error:::::::::::::", error);
-		});
-		adminServices.fetchICE()
-		.then(function(data){
-			if(data == "Invalid Session") {
-				$rootScope.redirectPage();
-			} else if(data == "fail") {
-				openModalPopup("Token Management", "Failed to fetch ICE list.");
-			} else if(data == "empty") {
-				openModalPopup("Token Management", "There are no users present.");
-			} else {
-				data.sort(function(a,b){ return a[0] > b[0]; });
-				data = data.filter(e => e.provisionedto!="--Deleted--");
-				var selectBox = $("#selICEuser");
-				selectBox.empty();
-				selectBox.append('<option data-id="" value disabled selected>Select ICE</option>');
-				for(i=0; i<data.length; i++){
-					if(data[i]["icetype"]=='ci-cd'){
-						selectBox.append('<option data-id="'+data[i]['_id']+'" value="'+data[i]['icename']+'">'+data[i]['icename']+'</option>');
-					}
-				}
-				selectBox.prop('selectedIndex', 0);
-			}
-		}, function (error) {
-			console.log("Error:::::::::::::", error);
-		});
+		$scope.tokens.op = 'normal';
+		$scope.tokens.repopulateEntries();
 	};
 
-	//	Generate CI user Token
-	$scope.generateCIusertokens = function ($event) {
-		$("#GenerateNewTkenModal").modal("hide");
-		$("#selAssignUser1").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
-		$("selICEuser").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
-		$("#tokenName").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
-		$(".tokeninfo .tokenSuite .datePicContainer .fc-datePicker").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
-		var icetype = $scope.provision.op;
-		var ele=$('#selAssignUser1 option:selected');
-		if (icetype =='ci-cd') 
-		ele=$('#selICEuser option:selected');
-		if (icetype =='normal' && ele.val() == "") {
-			$("#selAssignUser1").css('border', '').addClass("selectErrorBorder");
-			return false;
-		} else if (icetype =='ci-cd' && ele.val() == "") {
-			$("selICEuser").css('border', '').addClass("selectErrorBorder");
-			return false;
-		} else if ($('#tokenName').val().trim() == "") {
-			$("#tokenName").css('border', '').addClass("selectErrorBorder");
-			return false;
-		} else{
-			var userDetails = JSON.parse(window.localStorage['_UI']);
-			var userId = ele.attr("data-id");
-			var CIUser={};
-			$(".scheduleSuiteTable").append('<div class="tokenSuite"><span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIconToken" src="../imgs/ic-datepicker.png" /></span><span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>');
-			var expdate=$(".tokeninfo .tokenSuite .datePicContainer .fc-datePicker").val()
-			var exptime=$(".tokeninfo .tokenSuite .timePicContainer .fc-timePicker").val()
-			var tokendetails=userDetails.token;
-			var tokenname=$('#tokenName').val().trim()
-			var today = new Date()
-			var td = new Date()
-			var expiry=""
-			if(expdate == ""){
-				td.setHours(today.getHours()+parseInt(tokendetails));
-				var expdate=""+td.getDate()+"-"+(td.getMonth()+1)+"-"+td.getFullYear()
-				$('.fc-datePicker').val(expdate);
-			}
-			if(exptime == ""){
-				var sldate = $(".tokeninfo .tokenSuite .datePicContainer .fc-datePicker").val()
-				var sldate_2 = sldate.split("-");
-				if(parseInt(sldate_2[0])==today.getDate() && (parseInt(sldate_2[1]))==today.getMonth()+1 && parseInt(sldate_2[2])==today.getFullYear()){
-					td.setHours(today.getHours()+8);
-					var exptime=""+td.getHours()+":"+td.getMinutes
-					$('.fc-timePicker').val(exptime);
-				}
-				else{
-					var exptime=""+today.getHours()+":"+today.getMinutes()
-					$('.fc-timePicker').val(exptime);
-				}	
-			}
-			var sldate_2 = expdate.split("-");
-			var sltime_2 = exptime.split(":");
-			expiry=expdate+" "+exptime;
-			var now = new Date(sldate_2[2],sldate_2[1]-1,sldate_2[0],sltime_2[0],sltime_2[1]);
-			td=today;
-			td.setHours(today.getHours()+8);
-			if(now < today || (now >= today && now < td)) {
-				openModalPopup("Token Management", "Expiry time should be 8 hours more than current time");
-				return false;
-			} else if($('td:contains("active")').length>=10){
-				openModalPopup("Token Management", "User can have max 10 active tokens. Please Deactivate old tokens");
-				return false;
-			}
-			else{
-				CIUser.userId = userId;
-				CIUser.expiry = expiry;
-				CIUser.tokenname = tokenname;
-				CIUser.icetype=icetype;
-				action="create";
-				blockUI('Generating Token. Please Wait...');
-				adminServices.manageCIUsers(action,CIUser)
-				.then(function (data) {
-					unblockUI();
-					//console.log(data)
-					if (data == "Invalid Session") {
-						$rootScope.redirectPage();
-					}
-					else if (data == 'fail') {
-						openModalPopup("Token Management", "Failed to generate token");
-					} 
-					else if (data == 'duplicate') {
-						openModalPopup("Token Management", "Failed to generate token, Token Name already exist");
-					} 
-					else {
-						$("#generateNewToken").val(data.token);
-						adminServices.getCIUsersDetails(CIUser)
-						.then(function (data) {
-							unblockUI();
-							if (data == "Invalid Session") {
-								$rootScope.redirectPage();
-							}
-							else if (data == 'fail') {
-								openModalPopup("Token Management", "Failed to fetch user data");
-								resetAssignProjectForm();
-							} else {
-								openModalPopup("Token Management", "Token generated successfully");
-								data.sort(function(a,b) { 
-								if (a.deactivated < b.deactivated) return -1;
-									else if(a.deactivated > b.deactivated) return 1;
-									else return 0
-								});
-								for (i=0;i<data.length;i++){
-									data[i].expiry=new Date(data[i].expiry).toString().slice(0,-22);
-								}
-								$scope.tokens.users=data
-							}
-						}, function (error) {
-								unblockUI();
-								console.log("Error:::::::::::::", error);
-							});	
-					}
-				}, function (error) {
-					unblockUI();
-					console.log("Error:::::::::::::", error);
-				});
-			}
-		}		
-	};
-
-	$scope.deactivate = function ($event) {
-		var CIUser={}
-		action="deactivate";
-		CIUser.userId = $("#selAssignUser1 option:selected").attr("data-id");
-		if ($scope.provision.op == 'ci-cd') CIUser.userId = $("#selICEuser option:selected").attr("data-id");
-		CIUser.tokenName = $.trim($event.target.parentElement.parentElement.firstElementChild.textContent);
-		adminServices.manageCIUsers(action,CIUser)
-		.then(function (data) {
-				unblockUI();
-				// console.log(data)
-				if (data == "Invalid Session") {
-					$rootScope.redirectPage();
-				}
-				else if (data == 'fail') {
-					openModalPopup("Token Management", "Failed to deactivate token");
-				}  
+	$scope.tokens.repopulateEntries = function ($event) {
+		$scope.tokens.name = '';
+		$scope.tokens.token = '';
+		$scope.tokens.allUsers = [['Select User',' ','','']];
+		$scope.tokens.allICE = [{'_id':' ', 'icename':'Select ICE', 'icetype':'ci-cd'}];
+		$scope.tokens.allTokens = [];
+		$scope.tokens.targetid = ' ';
+		$('.fc-datePicker').val('');
+		$('.fc-timePicker').val('');
+		if ($scope.tokens.op == 'normal') {
+			adminServices.getUserDetails("user").then(function(data) {
+				if (data == "Invalid Session") $rootScope.redirectPage();
+				else if (data == "fail") openModalPopup("Token Management", "Failed to fetch users.");
+				else if (data == "empty") openModalPopup("Token Management", "There are no users present.");
 				else {
-					openModalPopup("Token Management", "Token '"+CIUser.tokenName+"' has been Deactivated");
-					data.sort(function(a,b) { 
-						if (a.deactivated < b.deactivated) return -1;
-							else if(a.deactivated > b.deactivated) return 1;
-							else return 0
-						});
-					$scope.tokens.users=data
+					data.sort((a,b)=>a[0].localeCompare(b[0]));
+					data.splice(0, 0, ['Select User',' ','','']);
+					$scope.tokens.allUsers = data.filter((e)=> (e[3] != "Admin"));
+				}
+			}, function (error) {
+				console.log("Error:::::::::::::", error);
+			});
+		} else {
+			adminServices.fetchICE().then(function (data) {
+				unblockUI();
+				if (data == "Invalid Session") $rootScope.redirectPage();
+				else if (data == 'fail') openModalPopup("Token Management", "Failed to load ICE Provisions");
+				else if(data == "empty") openModalPopup("Token Management", "There are no ICE provisioned");
+				else {
+					data.sort((a,b)=>a.icename.localeCompare(b.icename));
+					data.splice(0, 0, {'_id':' ', 'icename':'Select ICE', 'icetype':'ci-cd'});
+					$scope.tokens.allICE = data.filter(e => (e.provisionedto != "--Deleted--" && e.icetype=='ci-cd'));
 				}
 			}, function (error) {
 				unblockUI();
 				console.log("Error:::::::::::::", error);
 			});
+		}
+	};
+
+	$scope.tokens.loadData = function ($event, clearFields) {
+		const generatetoken = { 'userId': $scope.tokens.targetid };
+		if (generatetoken.userId == ' ') return false;
+		blockUI("Fetching Token data. Please wait...");
+		adminServices.getCIUsersDetails(generatetoken).then(function (data) {
+			unblockUI();
+			if (data == "Invalid Session") $rootScope.redirectPage();
+			else if (data == 'fail') openModalPopup("Token Management", "Failed to fetch token data");
+			else if (data.length == 0) openModalPopup("Token Management", "No tokens have been issued");
+			else {
+				//openModalPopup("Token Management", "Fetch Token details successful");
+				data.sort((a,b)=>a.deactivated.localeCompare(b.deactivated));
+				data.forEach(e=>e.expiry=new Date(e.expiry).toString().slice(0,-22))
+				$scope.tokens.allTokens = data;
+				if (clearFields) {
+					$scope.tokens.name = '';
+					$scope.tokens.token = '';
+					$('.fc-datePicker').val('');
+					$('.fc-timePicker').val('');
+				}
+			}
+		}, function (error) {
+			unblockUI();
+			console.log("Error:::::::::::::", error);
+		});
+	};
+
+	//	Generate CI user Token
+	$scope.tokens.generateCIusertokens = function ($event) {
+		$("#tokenName").removeClass("inputErrorBorder");
+		$("#selAssignUser1").removeClass("selectErrorBorder");
+		//$(".tokenSuite .datePicContainer .fc-datePicker").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
+		const icetype = $scope.tokens.op;
+		const userId = $scope.tokens.targetid.trim();
+		const tokenname = $scope.tokens.name.trim();
+		let flag = false;
+		if (userId == "") {
+			$("#selAssignUser1").addClass("selectErrorBorder");
+			flag = true;
+		}
+		if (tokenname == "") {
+			$("#tokenName").addClass("inputErrorBorder");
+			flag = true;
+		}
+		if (flag) return flag;
+		const tokendetails = JSON.parse(window.localStorage['_UI']).token;
+		$(".scheduleSuiteTable").append('<div class="tokenSuite"><span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIconToken" src="../imgs/ic-datepicker.png" /></span><span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>');
+		var expdate=$(".tokenSuite .datePicContainer .fc-datePicker").val();
+		var exptime=$(".tokenSuite .timePicContainer .fc-timePicker").val();
+		var today = new Date();
+		var td = new Date();
+		var expiry = "";
+		if (expdate == "") {
+			td.setHours(today.getHours()+parseInt(tokendetails));
+			expdate = td.getDate()+"-"+(td.getMonth()+1)+"-"+td.getFullYear()
+			$('.fc-datePicker').val(expdate);
+		}
+		if (exptime == "") {
+			var sldate = $(".tokenSuite .datePicContainer .fc-datePicker").val()
+			var sldate_2 = sldate.split("-");
+			if(parseInt(sldate_2[0])==today.getDate() && (parseInt(sldate_2[1]))==today.getMonth()+1 && parseInt(sldate_2[2])==today.getFullYear()){
+				td.setHours(today.getHours()+8);
+				var exptime=""+td.getHours()+":"+td.getMinutes
+				$('.fc-timePicker').val(exptime);
+			}
+			else{
+				var exptime=""+today.getHours()+":"+today.getMinutes()
+				$('.fc-timePicker').val(exptime);
+			}	
+		}
+		var sldate_2 = expdate.split("-");
+		var sltime_2 = exptime.split(":");
+		expiry = expdate+" "+exptime;
+		var now = new Date(sldate_2[2],sldate_2[1]-1,sldate_2[0],sltime_2[0],sltime_2[1]);
+		td = today;
+		td.setHours(today.getHours()+8);
+		if (now < today || (now >= today && now < td)) {
+			openModalPopup("Token Management", "Expiry time should be 8 hours more than current time");
+			return false;
+		} else if($('td:contains("active")').length>=10){
+			openModalPopup("Token Management", "User can have max 10 active tokens. Please Deactivate old tokens");
+			return false;
+		}
+		const CIUser = {
+			'userId': userId,
+			'expiry': expiry,
+			'tokenname': tokenname,
+			'icetype': icetype
+		};
+		blockUI('Generating Token. Please Wait...');
+		adminServices.manageCIUsers("create", CIUser)
+		.then(function (data) {
+			unblockUI();
+			if (data == "Invalid Session") $rootScope.redirectPage();
+			else if (data == 'fail') openModalPopup("Token Management", "Failed to generate token");
+			else if (data == 'duplicate') openModalPopup("Token Management", "Failed to generate token, Token Name already exists");
+			else {
+				$scope.tokens.token = data.token;
+				$scope.tokens.loadData($event);
+				openModalPopup("Token Management", "Token generated successfully");
+			}
+		}, function (error) {
+			unblockUI();
+			console.log("Error:::::::::::::", error);
+		});
+	};
+
+	$scope.tokens.deactivate = function ($event) {
+		const CIUser = {
+			'userId': $scope.tokens.targetid,
+			'tokenName': $scope.tokens.allTokens[$($event.target).data("id")].name
+		};
+		adminServices.manageCIUsers("deactivate", CIUser).then(function (data) {
+			unblockUI();
+			if (data == "Invalid Session") $rootScope.redirectPage();
+			else if (data == 'fail') openModalPopup("Token Management", "Failed to deactivate token");
+			else {
+				openModalPopup("Token Management", "Token '"+CIUser.tokenName+"' has been Deactivated");
+				data.sort((a,b)=>a.deactivated.localeCompare(b.deactivated));
+				data.forEach(e=>e.expiry=new Date(e.expiry).toString().slice(0,-22))
+				$scope.tokens.allTokens = data;
+			}
+		}, function (error) {
+			unblockUI();
+			console.log("Error:::::::::::::", error);
+		});
 	};
 
 	$(document).on('focus', '.fc-datePicker', function(){
@@ -821,7 +724,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			//minTime: (new Date().getHours() + ':' + ((new Date().getMinutes())+05))
 		})
 	})
-	
+
 	$(document).on('click', ".datepickerIconToken", function(){
 		$(this).siblings(".fc-datePicker").focus()
 	})
@@ -829,7 +732,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		//$(".bootstrap-timepicker-hour, .bootstrap-timepicker-minute").val("");
 		$(this).siblings(".fc-timePicker").focus()
 	})
-	
+
+	$scope.tokens.verifyName = function($event) {
+		const name = $scope.tokens.name;
+		const tknlist = $scope.tokens.allTokens.map(e => e.name);
+		if (tknlist.indexOf(name) > -1) $("#tokenName").addClass("inputErrorBorder")[0].title = "Token Name already Exists!";
+		else $("#tokenName").removeClass("inputErrorBorder")[0].title = "";
+	};
+
 	$scope.domainConf.click = function(query) {
 		$(".selectedIcon").removeClass("selectedIcon");
 		$("button.userTypeBtnActive").removeClass('userTypeBtnActive');
@@ -2200,9 +2110,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.userConf.click = function(query) {
 		$(".selectedIcon").removeClass("selectedIcon");
-		if (query != 'retainldap'){
-			$scope.userConf.ldapActive=false
-		}
 		$("button.userTypeBtnActive").removeClass('userTypeBtnActive');
 		$("#userTab").find("span.fa").addClass("selectedIcon");
 		this.userId = '';
@@ -2217,19 +2124,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		this.addRole = {};
 		this.nocreate = false;
 		this.getUserRoles();
-		if (query != "retainldap") {
-			if (!this.ldapActive) {
-				this.ldapActive = false;
-				this.ldap = {server: '', fetch: "map", user: '', expired: false};
-			} else {
-				this.ldapActive = true;
-				$scope.userConf.activateLDAP();
-			}
+		if (query != "retaintype") {
+			this.type="inhouse";
+			this.ldap = {server: '', fetch: "map", user: '', expired: false};
 			this.ldapAllServerList=[];
 			this.ldapAllUserList=[];
 		}
-		this.query0 = '';
-		this.query1 = '';
+		this.ldapUserFilter = '';
+		this.allUserFilter = '';
 	};
 
 	//Fetch All Available User Roles
@@ -2282,7 +2184,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			$("#lastname").addClass("inputErrorBorder");
 			flag = false;
 		}
-		if (this.ldapActive) {
+		if (this.type=="ldap") {
 			if (this.ldap.server == "") {
 				$("#ldapServer").addClass("selectErrorBorder");
 				flag = false;
@@ -2369,10 +2271,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			email: userConf.email,
 			role: userConf.role,
 			addRole: addRole,
-			ldapUser: userConf.ldapActive,
+			ldapUser: userConf.type=="ldap",
 			createdbyrole: createdbyrole
 		};
-		if (userConf.ldapActive) {
+		if (userConf.type=="ldap") {
 			userObj.ldapUser = userConf.ldap;
 		}
 		blockUI(bAction.slice(0,-1)+"ing User...");
@@ -2427,18 +2329,16 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		});
 	};
 
+	// Switch between multiple usertypes.
+	$scope.userConf.selectUserType = function($event) {
+		if (this.type == "ldap") $scope.userConf.activateLDAP();
+	};
+
 	//LDAP Functionality for User
 	$scope.userConf.activateLDAP = function(cb) {
 		if (!cb) cb = function() {};
-		var currentServer = this.ldap.server;
-		if (currentServer) this.ldap = {server: currentServer, fetch: "map", user: ''};
-		else this.ldap = {server: '', fetch: "map", user: ''};
-		setTimeout(function(){
-			var target = $("button.ldapBtn");
-			if ($scope.userConf.ldapActive) target.addClass("userTypeBtnActive");
-			else target.removeClass("userTypeBtnActive");
-		}, 50);
-		if (!this.ldapActive) return;
+		const currentServer = this.ldap.server || '';
+		this.ldap = {server: currentServer, fetch: "map", user: ''};
 		blockUI("Fetching LDAP Server configurations...");
 		adminServices.getLDAPConfig("server")
 		.then(function(data){
@@ -2478,6 +2378,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	//LDAP Functionality for User: Switch choice between import and map
 	$scope.userConf.ldapSwitchFetch = function() {
+		this.ldapUserFilter = '';
 		$("#ldapDirectory").removeClass("inputErrorBorder").removeClass("selectErrorBorder");
 		if (this.ldap.fetch == "import") {
 			var ldapServer = this.ldap.server;
@@ -2559,7 +2460,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	//Load Users for Edit
 	$scope.userConf.edit = function() {
-		this.ldapActive = false;
 		this.click();
 		$scope.tab = "editUser";
 		blockUI("Fetching users...");
@@ -2612,10 +2512,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					userConf.addRole[e] = true;
 				});
 				if (!data.ldapuser) {
-					userConf.ldapActive = false;
-					$scope.userConf.activateLDAP();
+					$("button.userTypeBtn").html("Default").title("Default");
+					userConf.type = "inhouse";
+					// $scope.userConf.activateLDAP();
 				} else {
-					userConf.ldapActive = true;
+					$("button.userTypeBtn").html("LDAP").title("LDAP");
+					userConf.type = "ldap";
 					var ldapserver = data.ldapuser.server;
 					var ldapuser = data.ldapuser.user;
 					$scope.userConf.activateLDAP(function() {
