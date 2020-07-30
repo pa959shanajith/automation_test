@@ -215,6 +215,8 @@ exports.updateScreen_ICE = function (req, res) {
 			var modifiedByID = userInfo.user_id;
 			var modifiedByrole = userInfo.role;//user_role
 			var param = updateData.param;
+			var delete_list = updateData.delete_list;
+			var update_list = updateData.update_list;
 			var appType = updateData.appType;
 			var requestedversionnumber = updateData.versionnumber;
 			//xpaths required to be mapped(used only when param is mapScrapeData_ICE)
@@ -360,6 +362,10 @@ exports.updateScreen_ICE = function (req, res) {
 							logger.error("Exception from the service updateScreen_ICE: updateScrapeData_ICE - WEBSERVICE: %s",exception);
 						}
 					} else {
+						if(type == 'delete') deleteList=updateData.delete_list
+						else deleteList=[]
+						if(updateData.update_list != '') updateList=updateData.update_list
+						else updateList=[]
 						inputs = {
 							"scrapedata": scrapedObjects,
 							"modifiedby": modifiedByID,
@@ -368,7 +374,9 @@ exports.updateScreen_ICE = function (req, res) {
 							"projectid": projectID,
 							"screenname": screenName,
 							"versionnumber": requestedversionnumber,
-							"type": "insert_obj"
+							"type": "insert_obj",
+							"delete_list": deleteList,
+							"update_list": updateList
 						};
 						if (updateData.propedit != undefined){
 							inputs.propedit = updateData.propedit
@@ -445,6 +453,8 @@ exports.updateScreen_ICE = function (req, res) {
 
 			} else if (param == "delete_updateScrapeData_ICE"){
 				scrapedObjects = updateData.getScrapeData;
+				if (updateData.update_list== "") update_list=[]
+				else update_list=updateData.update_list
 				//var parsedScrapedObj = JSON.parse(scrapedObjects);
 				inputs = {
 					"scrapedata": scrapedObjects,
@@ -454,7 +464,8 @@ exports.updateScreen_ICE = function (req, res) {
 					"projectid": projectID,
 					"screenname": screenName,
 					"versionnumber": requestedversionnumber,
-					"type": "delete_obj"
+					"type": "delete_obj",
+					"update_list": update_list
 				};
 				logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE");
 				finalFunction(scrapedObjects)
