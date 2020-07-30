@@ -6,18 +6,6 @@
         "key": "./server/https/server.key",
         "cert": "./server/https/server.crt"
     },
-    "oidc": {
-        "identitityProviderURL": "",
-        "clientId": "",
-        "clientSecret": "",
-        "redirectURI": ""
-    },
-    "saml": {
-        "issuer": "Avo Assure Webserver",
-        "acsURL": "",
-        "cert": "",
-        "redirectURI": ""
-    },
     "socketio": {
         "pingTimeout": "15000",
         "pingInterval": "25000"

@@ -1,26 +1,22 @@
-var authRouter = require("express").Router();
-var passport = require("passport");
-var activeDirectory = require('activedirectory');
-var LocalStrategy = require("passport-local").Strategy;
-var SamlStrategy = require("passport-saml").Strategy;
-var OpenIdClientStrategy = require('openid-client').Strategy;
-var OpenIdClientIssuer = require('openid-client').Issuer;
-var Negotiator = require('negotiator');
-var fs = require("fs");
-var Client = require("node-rest-client").Client;
-var client = new Client();
-var epurl = process.env.NDAC_URL;
-var logger = require("../../logger");
-var utils = require('./utils');
-var ssoEnabled = process.env.ENABLE_SSO.toLowerCase().trim() == "true";
-var strategy = (ssoEnabled)? process.env.SSO_PROTOCOL.toLowerCase().trim():"inhouse";
-var config = require("../config/config.json");
+let authRouter = require("express").Router();
+let passport = require("passport");
+const activeDirectory = require('activedirectory');
+const LocalStrategy = require("passport-local").Strategy;
+const SamlStrategy = require("passport-saml").Strategy;
+const OpenIdClientStrategy = require('openid-client').Strategy;
+const OpenIdClientIssuer = require('openid-client').Issuer;
+const Negotiator = require('negotiator');
+const fs = require("fs");
+const Client = require("node-rest-client").Client;
+const client = new Client();
+const epurl = process.env.NDAC_URL;
+const logger = require("../../logger");
+const utils = require('./utils');
+const LOGIN_URL = "/login";
+const SAML_LOGIN_URL = LOGIN_URL + "/saml";
+const OIDC_LOGIN_URL = LOGIN_URL + "/oidc";
+var strategy = "inhouse"
 var callbackPath = "/login/callback";
-config = (config[strategy])? config[strategy]:config;
-if (config.redirectURI) {
-	callbackPath = config.redirectURI.replace("http://",'').replace("https://",'');
-	callbackPath = callbackPath.replace(callbackPath.split('/')[0],'');
-}
 
 function authenticateLDAP(ldapdata, cb) {
 	logger.info("Inside authenticateLDAP function");
@@ -116,7 +112,7 @@ var strategyUtil = {
 			], function(err) {
 				if (err) flag = err;
 				if (!validUser) return done(null, null, flag);
-				else return done(null, {"username": username, "ldap_flag": ldap_flag}, "validCredential");
+				else return done(null, {"username": username, "type": (ldap_flag)?"ldap":"inhouse"}, "validCredential");
 			});
 		});
 		passport.use('local', localStrategy);

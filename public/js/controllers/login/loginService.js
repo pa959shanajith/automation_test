@@ -59,6 +59,17 @@ mySPA.factory('LoginService', ['$http', '$q', function ($http, $q) {
 				function (response) {
 				return $q.reject(response.data);
 			});
+		},
+		checkUser: function (user) {
+			return $http.post('/checkUser', {
+				username: user
+			})
+			.then(function (response) {
+				return response.data;
+			},
+				function (response) {
+				return $q.reject(response.data);
+			});
 		}
 	}
 }]);

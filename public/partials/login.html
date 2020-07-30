@@ -27,15 +27,16 @@
 					<form>
 						<div class="input-group">
 							<span class="input-group-addon ic-username"><img src="imgs/ic-username.png" /></span>
-							<input ng-model="ud.userName" type="text" class="form-control" name="username" placeholder="Username">
+							<input ng-model="ud.userName" ng-change="hideLogin()" type="text" id="userName" class="form-control" name="username" placeholder="Username">
+							<span ng-if="!showLogin" class="input-group-addon fa fa-arrow-circle-right" ng-click="checkUser()" style="color:#a0a0a0;font-size:25px"> </span>
 						</div>
-						<div class="input-group">
+						<div class="input-group" ng-if="showLogin">
 							<span class="input-group-addon ic-password"><img src="imgs/ic-password.png" /></span>
-							<input ng-model="ud.password" id="eye" type="{{inputType}}" class="form-control" name="password" placeholder="Password" autocomplete="off">
-							<span class="{{showHideClass}}  input-group-addon ic-password "  style="color:#a0a0a0" ng-click="showPassword()"> </span>
+							<input ng-model="ud.password" id="passWord" type="{{inputType}}" class="form-control" name="password" placeholder="Password" autocomplete="off">
+							<span class="input-group-addon ic-password fa {{showHideClass}}" style="color:#a0a0a0;font-size:20px" ng-click="showPassword()"> </span>
 						</div>
 						<span ng-show="loginValidation" class="absoluteError errorMessages">{{loginValidation}}</span>
-						<button ng-click="check_credentials('/plugin', $event)" type="submit" class="btn btn-block">Login</button>
+						<button ng-if="showLogin" ng-click="check_credentials('/plugin', $event)" type="submit" class="btn btn-block">Login</button>
 					</form>
 				</div>
 				<div class="wrap login-wrap" ng-if="restartForm==true">
