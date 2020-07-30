@@ -48,6 +48,9 @@ function authenticateLDAP(ldapdata, cb) {
 			ad.authenticate(ldapdata.user, ldapdata.password, function (err, auth) {
 				if (err) {
 					logger.error("Error occurred in ldap authentication");
+					const errm = err.lde_message;
+					if (errm && ((errm.indexOf("DSID-0C0903A9") > -1) || (errm.indexOf("DSID-0C090400") > -1) || (errm.indexOf("DSID-0C090442") > -1)))
+						return cb("inValidCredential");
 					logger.debug("Error occurred in ldap authentication : " + JSON.stringify(err));
 					cb("fail");
 				}
@@ -83,13 +86,14 @@ var strategyUtil = {
 						if (response.statusCode != 200 || result.rows == "fail") {
 							logger.error("Error occurred in loadUser Error Code : ERRNDAC");
 							callback('fail')
-						}else if (result.rows == null) return callback("invalid_username_password");
-						else if (result.rows.ldapuser.server != undefined) {    // LDAP Authentication
-							var resp = result.rows.ldapuser;
+						} else if (result.rows == null) return callback("invalid_username_password");
+						else if (result.rows.auth.server != undefined) {    // LDAP Authentication
+							var resp = result.rows.auth;
 							logger.info("Calling In-House Authentication");
 							resp.password = password;
 							authenticateLDAP(resp, function (ldapdata) {
 								if (ldapdata == "empty" || ldapdata == "fail") callback("inValidLDAPServer");
+								else if (ldapdata != "pass") callback(ldapdata);
 								else if (ldapdata == "pass") {
 									validUser = true;
 									ldap_flag = true;
@@ -99,7 +103,7 @@ var strategyUtil = {
 						} else {    // In-House Authentication
 							logger.info("Calling In-House Authentication");
 							try {
-								var dbHashedPassword = result.rows.password;
+								var dbHashedPassword = result.rows.auth.password;
 								validUser = bcrypt.compareSync(password, dbHashedPassword); // true
 								callback(null);
 							} catch (exception) {

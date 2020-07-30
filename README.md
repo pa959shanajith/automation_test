@@ -20,15 +20,6 @@ These instructions will help setting up the project and running on a local machi
 * Clone this repository
 * Clone [UINodeModules.git](ssh://slklocal@10.41.31.52:/home/slklocal/Nineteen68BnR/UINodeModules.git) repository and place `node modules folder`, `node.exe` and `npm.cmd` files inside the source(`ui`) folder.
 * Open the `config.json` file in `config` folder within `server` folder.
-* Update `ldap_Ip` to ldap system ip 
-* Update `ldap_port` to `389`
-* Update `ldap_domain` to `psys.com`
-* Fetch the `ip` of the system in which the `Mindmaps` db is setup
-* Update the `host` in the following format : `<<IP of Mindmaps DB>>:7474`
-
-                    E.g. for local setup: "127.0.0.1:7474"
-
-* Do not modify `username` and `password` fields.
 * Update `screenShot_PathName`: Value should be, shared location in the server where the screenshots are stored. For local setup, provide a folder where screenshots should be saved.
     * ```default```: Shared location corresponding to windows systems
     * ```mac```: Shared location corresponding to mac systems

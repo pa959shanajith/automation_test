@@ -231,17 +231,17 @@ exports.resetPassword = function(req, res) {
 			logger.error("Error occurred in loadUser Error Code : ERRNDAC");
 			res.send("fail");
 		} else {
-			password = result.rows.password;
+			password = result.rows.auth.password;
 			validUser = bcrypt.compareSync(currpassword, password);
 			if (validUser){
-				if (currpassword == newpassword){
+				if (currpassword == newpassword) {
 					res.send("same");
-				} else{
+				} else {
 					var action = "update";
 					var userObj = {
 						userid: req.session.userid,
 						username: req.session.username.toLowerCase(),
-						password: newpassword,
+						auth: {type: "inhouse", password: newpassword},
 						firstname: req.session.firstname,
 						lastname: req.session.lastname,
 						email: req.session.emailid,

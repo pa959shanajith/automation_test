@@ -2123,46 +2123,41 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		this.role = '';
 		this.addRole = {};
 		this.nocreate = false;
+		this.confExpired = false;
 		this.getUserRoles();
-		if (query != "retaintype") {
-			this.type="inhouse";
-			this.ldap = {server: '', fetch: "map", user: '', expired: false};
-			this.ldapAllServerList=[];
-			this.ldapAllUserList=[];
-		}
 		this.ldapUserFilter = '';
 		this.allUserFilter = '';
+		if (query != "retaintype") {
+			this.type="inhouse";
+			this.server = '';
+			this.ldap = {fetch: "map", user: ''};
+			this.confServerList=[];
+			this.ldapAllUserList=[];
+		}
 	};
 
 	//Fetch All Available User Roles
 	$scope.userConf.getUserRoles = function() {
-		if (!this.allRoles) {
-			adminServices.getUserRoles()
-			.then(function (rolesRes) {
-				if(rolesRes == "Invalid Session"){
-					$rootScope.redirectPage();
-				} else {
-					rolesRes.sort(function(a,b){ return a[0] >  b[0]; });
-					$scope.userConf.allRoles = rolesRes;
-					$scope.userConf.allAddRoles = rolesRes.slice(0);
-					rolesRes.some(function(e,i) {
-						if (e[0].toLowerCase()=="admin") {
-							$scope.userConf.allAddRoles.splice(i,1);
-							return true;
-						}
-					});
-				}
-			}, function (error) {
-				$scope.userConf.allRoles = [];
-				openModalPopup("Manage Users", "Something Went Wrong");
-			});
-		}
+		if (this.allRoles && this.allRoles.length > 0) return true;
+		adminServices.getUserRoles()
+		.then(function (rolesRes) {
+			if(rolesRes == "Invalid Session"){
+				$rootScope.redirectPage();
+			} else {
+				rolesRes.sort(function(a,b){ return a[0] >  b[0]; });
+				$scope.userConf.allRoles = rolesRes;
+				$scope.userConf.allAddRoles = rolesRes.filter((e)=> (e[0].toLowerCase() != "admin"));
+			}
+		}, function (error) {
+			$scope.userConf.allRoles = [];
+			openModalPopup("Manage Users", "Something Went Wrong");
+		});
 	};
 
 	$scope.userConf.validate = function(action) {
 		var flag = true;
 		$("#userName,#firstname,#lastname,#password,#confirmPassword,#email,#ldapDirectory").removeClass("inputErrorBorder");
-		$("#userIdName,#userRoles,#ldapServer,#ldapDirectory").removeClass("selectErrorBorder");
+		$("#userIdName,#userRoles,#confServer,#ldapDirectory").removeClass("selectErrorBorder");
 		var emailRegEx = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 		//var regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,16}$/;
 		var regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,16}$/;
@@ -2184,22 +2179,23 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			$("#lastname").addClass("inputErrorBorder");
 			flag = false;
 		}
-		if (this.type=="ldap") {
-			if (this.ldap.server == "") {
-				$("#ldapServer").addClass("selectErrorBorder");
+		if (this.type!="inhouse") {
+			if (this.server == "") {
+				$("#confServer").addClass("selectErrorBorder");
 				flag = false;
 			}
-			if (this.ldap.expired && action != "delete") {
+			if (this.confExpired && action != "delete") {
 				if (!popupOpen) openModalPopup("Error", "This configuration is deleted/invalid...");
 				popupOpen = true;
-				$("#ldapServer").addClass("selectErrorBorder");
+				$("#confServer").addClass("selectErrorBorder");
 				flag = false;
 			}
-			if (this.ldap.user == "") {
-				$("#ldapDirectory").addClass("selectErrorBorder");
-				flag = false;
-			}
-		} else if (action != "delete" && !(action == "update" && this.passWord == "" && this.confirmPassword == "")) {
+		}
+		if (this.type=="ldap" && this.ldap.user == "") {
+			$("#ldapDirectory").addClass("selectErrorBorder");
+			flag = false;
+		}
+		if (this.type=="inhouse" && action != "delete" && !(action == "update" && this.passWord == "" && this.confirmPassword == "")) {
 			if (this.passWord == "") {
 				$("#password").addClass("inputErrorBorder");
 				flag = false;
@@ -2254,14 +2250,15 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		// infoArr.push(action);
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 
-		var userConf = $scope.userConf;
+		const userConf = $scope.userConf;
 		if (!userConf.validate(action)) return;
-		var bAction = action.charAt(0).toUpperCase() + action.substr(1);
-		var addRole = [];
-		for (var role in userConf.addRole) {
+		const bAction = action.charAt(0).toUpperCase() + action.substr(1);
+		const uType = userConf.type;
+		const addRole = [];
+		for (let role in userConf.addRole) {
 			if (userConf.addRole[role]) addRole.push(role);
 		}
-		var createdbyrole=userConf.allRoles[0][1];
+		const createdbyrole = userConf.allRoles.filter((e)=> (e[0].toLowerCase() == "admin"));;
 		var userObj = {
 			userid: userConf.userId,
 			username: userConf.userName.toLowerCase(),
@@ -2271,12 +2268,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			email: userConf.email,
 			role: userConf.role,
 			addRole: addRole,
-			ldapUser: userConf.type=="ldap",
-			createdbyrole: createdbyrole
+			type: uType,
+			createdbyrole: createdbyrole,
+			server: userConf.server
 		};
-		if (userConf.type=="ldap") {
-			userObj.ldapUser = userConf.ldap;
-		}
+		if (uType=="ldap") userObj.ldapUser = userConf.ldap.user;
 		blockUI(bAction.slice(0,-1)+"ing User...");
 		adminServices.manageUserDetails(action, userObj)
 		.then(function (data) {
@@ -2318,7 +2314,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (parseInt(data[4])) errfields.push("Last Name");
 				if (parseInt(data[5])) errfields.push("Password");
 				if (parseInt(data[6])) errfields.push("Email");
-				if (parseInt(data[7])) errfields.push("LDAP Server");
+				if (parseInt(data[7])) errfields.push("Authentication Server");
 				if (parseInt(data[8])) errfields.push("User Domain Name");
 				openModalPopup(bAction+" User", "Following values are invalid: "+errfields.join(", "));
 			}
@@ -2330,120 +2326,152 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	};
 
 	// Switch between multiple usertypes.
-	$scope.userConf.selectUserType = function($event) {
-		if (this.type == "ldap") $scope.userConf.activateLDAP();
+	$scope.userConf.selectUserType = async ($event) => {
+		$scope.userConf.server = '';
+		$scope.userConf.confServerList = [];
+		if ($scope.userConf.type == "ldap") await $scope.userConf.populateLDAPConf();
+		else if ($scope.userConf.type == "saml") await $scope.userConf.populateSAMLConf();
+		else if ($scope.userConf.type == "oidc") await $scope.userConf.populateOIDCConf();
 	};
 
-	//LDAP Functionality for User
-	$scope.userConf.activateLDAP = function(cb) {
-		if (!cb) cb = function() {};
-		const currentServer = this.ldap.server || '';
-		this.ldap = {server: currentServer, fetch: "map", user: ''};
+	// Fetch LDAP servers for User
+	$scope.userConf.populateLDAPConf = async () => {
+		$scope.userConf.ldap = {fetch: "map", user: ''};
+		$scope.userConf.nocreate = true;
 		blockUI("Fetching LDAP Server configurations...");
-		adminServices.getLDAPConfig("server")
-		.then(function(data){
-			unblockUI();
-			if(data == "Invalid Session") {
-				$rootScope.redirectPage();
-			} else if(data == "fail") {
-				$scope.userConf.nocreate = true;
-				openModalPopup("Create User", "Failed to fetch LDAP server configurations.");
-			} else if(data == "empty") {
-				$scope.userConf.nocreate = true;
-				openModalPopup("Create User","There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section.");
-			} else {
-				$scope.userConf.ldapAllServerList=[];
-				data.sort(function(a,b) { return a > b; });
-				data.forEach(function(e) {
-					$scope.userConf.ldapAllServerList.push(e);
-				});
-				cb();
-			}
-		}, function (error) {
-			unblockUI();
-			$scope.userConf.nocreate = true;
-			console.log("Error:::::::::::::", error);
-			openModalPopup("Create User", "Failed to fetch LDAP server configurations");
+		return new Promise((rsv, rej) => {
+			adminServices.getLDAPConfig("server").then(function(data) {
+				unblockUI();
+				if(data == "Invalid Session") $rootScope.redirectPage();
+				else if(data == "fail") openModalPopup("Create User", "Failed to fetch LDAP server configurations.");
+				else if(data == "empty") openModalPopup("Create User","There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section.");
+				else {
+					$scope.userConf.nocreate = false;
+					data.sort((a,b)=>a.name.localeCompare(b.name));
+					$scope.userConf.confServerList = data
+				}
+				rsv(true);
+			}, function (error) {
+				unblockUI();
+				console.log("Error:::::::::::::", error);
+				openModalPopup("Create User", "Failed to fetch LDAP server configurations");
+				rsv(false);
+			});
 		});
 	};
 
-	$scope.userConf.ldapSetServer = function() {
+	// Fetch SAML servers for User
+	$scope.userConf.populateSAMLConf = async () => {
+		$scope.userConf.nocreate = true;
+		blockUI("Fetching SAML Server configurations...");
+		return new Promise((rsv, rej) => {
+			adminServices.getSAMLConfig().then(function(data){
+				unblockUI();
+				if(data == "Invalid Session") $rootScope.redirectPage();
+				else if(data == "fail") openModalPopup("Create User", "Failed to fetch SAML server configurations.");
+				else if(data == "empty") openModalPopup("Create User","There are no SAML server configured. To proceed create a server configuration in SAML configuration section.");
+				else {
+					$scope.userConf.nocreate = false;
+					data.sort((a,b)=>a.name.localeCompare(b.name));
+					$scope.userConf.confServerList = data
+				}
+				rsv(true);
+			}, function (error) {
+				unblockUI();
+				console.log("Error:::::::::::::", error);
+				openModalPopup("Create User", "Failed to fetch SAML server configurations");
+				rsv(false);
+			});
+		});
+	};
+
+	// Fetch OIDC servers for User
+	$scope.userConf.populateOIDCConf = async () => {
+		$scope.userConf.nocreate = true;
+		blockUI("Fetching OpenID Server configurations...");
+		return new Promise((rsv, rej) => {
+			adminServices.getOIDCConfig()
+			.then(function(data) {
+				unblockUI();
+				if(data == "Invalid Session") $rootScope.redirectPage();
+				else if(data == "fail") openModalPopup("Create User", "Failed to fetch OpenID server configurations.");
+				else if(data == "empty") openModalPopup("Create User","There are no OpenID server configured. To proceed create a server configuration in OpenID configuration section.");
+				else {
+					$scope.userConf.nocreate = false;
+					data.sort((a,b)=>a.name.localeCompare(b.name));
+					$scope.userConf.confServerList = data
+				}
+				rsv(true);
+			}, function (error) {
+				unblockUI();
+				console.log("Error:::::::::::::", error);
+				openModalPopup("Create User", "Failed to fetch OpenID server configurations");
+				rsv(false);
+			});
+		});
+	};
+
+	$scope.userConf.clearForm = function(retainExtra) {
 		this.userName = '';
 		this.firstname = '';
 		this.lastname = '';
 		this.email = '';
-		this.ldap.user = '';
-		this.ldap.fetch = 'map';
+		if (!retainExtra && this.type == "ldap") {
+			this.ldap.user = '';
+			this.ldap.fetch = 'map';
+		}
 	};
 
 	//LDAP Functionality for User: Switch choice between import and map
 	$scope.userConf.ldapSwitchFetch = function() {
 		this.ldapUserFilter = '';
+		this.ldap.user = '';
+		this.clearForm(true);
 		$("#ldapDirectory").removeClass("inputErrorBorder").removeClass("selectErrorBorder");
-		if (this.ldap.fetch == "import") {
-			var ldapServer = this.ldap.server;
-			$scope.userConf.nocreate = true;
-			blockUI("Fetching LDAP users...");
-			adminServices.getLDAPConfig("user", ldapServer)
-			.then(function(data){
-				$scope.userConf.ldapAllUserList=[];
-				unblockUI();
-				if(data == "Invalid Session") {
-					$rootScope.redirectPage();
-				} else if(data == "fail") {
-					openModalPopup("Create User", "Failed to LDAP fetch users");
-				} else if(data == "insufficient_access") {
-					openModalPopup("Create User", "Either Credentials provided in LDAP server configuration does not have required privileges for fetching users or there are no users available in this Server");
-				} else if(data == "empty") {
-					openModalPopup("Create User","There are no users available in this Server.");
-				} else {
-					$scope.userConf.nocreate = false;
-					data.sort(function(a,b) { return a > b; });
-					data.forEach(function(e) {
-						$scope.userConf.ldapAllUserList.push({value:e[1],html:e[0]});
-					});
-				}
-			}, function (error) {
-				unblockUI();
-				console.log("Error:::::::::::::", error);
-				openModalPopup("Create User", "Failed to fetch LDAP server configurations");
-			});
-		} else {
-			this.ldap.user = '';
-			this.userName = '';
-			this.firstname = '';
-			this.lastname = '';
-			this.email = '';
-		}
+		if (this.ldap.fetch != "import") return false;
+		const ldapServer = this.server;
+		$scope.userConf.nocreate = true;
+		$scope.userConf.ldapAllUserList=[];
+		blockUI("Fetching LDAP users...");
+		adminServices.getLDAPConfig("user", ldapServer)
+		.then(function(data) {
+			unblockUI();
+			if(data == "Invalid Session") $rootScope.redirectPage();
+			else if(data == "fail")  openModalPopup("Create User", "Failed to LDAP fetch users");
+			else if(data == "insufficient_access") openModalPopup("Create User", "Either Credentials provided in LDAP server configuration does not have required privileges for fetching users or there are no users available in this Server");
+			else if(data == "empty") openModalPopup("Create User","There are no users available in this Server.");
+			else {
+				$scope.userConf.nocreate = false;
+				data.sort((a,b)=>a.localeCompare(b));
+				$scope.userConf.ldapAllUserList = data.map(e=>({value:e[1],html:e[0]}));
+			}
+		}, function (error) {
+			unblockUI();
+			console.log("Error:::::::::::::", error);
+			openModalPopup("Create User", "Failed to fetch LDAP server configurations");
+		});
 	};
 
 	//LDAP Functionality for User: Verify and Fetch user details from ldapdb
 	$scope.userConf.ldapGetUser = function() {
-		var ldapUser = this.ldap.user;
-		var ldapServer = this.ldap.server;
+		const ldapUser = this.ldap.user;
+		const ldapServer = this.server;
 		this.nocreate = true;
-		this.userName = '';
-		this.firstname = '';
-		this.lastname = '';
-		this.email = '';
 		if (this.ldap.user == '') {
 			$("#ldapDirectory").addClass("inputErrorBorder");
 			return;
 		}
-		userConf = $scope.userConf;
+		this.clearForm(true);
+		const userConf = $scope.userConf;
 		blockUI("Fetching User details...");
 		adminServices.getLDAPConfig("user", ldapServer, ldapUser)
 		.then(function(data){
 			unblockUI();
-			if(data == "Invalid Session") {
-				$rootScope.redirectPage();
-			} else if(data == "fail") {
-				openModalPopup("Create User", "Failed to populate User details");
-			} else if(data == "insufficient_access") {
-				openModalPopup("Create User", "Either Credentials provided in LDAP server configuration does not have required privileges for fetching users or there is no such user");
-			} else if(data == "empty") {
-				openModalPopup("Create User","User not found!");				
-			} else {
+			if(data == "Invalid Session") $rootScope.redirectPage();
+			else if(data == "fail") openModalPopup("Create User", "Failed to populate User details");
+			else if(data == "insufficient_access") openModalPopup("Create User", "Either Credentials provided in LDAP server configuration does not have required privileges for fetching users or there is no such user");
+			else if(data == "empty") openModalPopup("Create User","User not found!");				
+			else {
 				userConf.nocreate = false;
 				userConf.userName = data.username;
 				userConf.firstname = data.firstname;
@@ -2462,6 +2490,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.userConf.edit = function() {
 		this.click();
 		$scope.tab = "editUser";
+		$scope.userConf.fType = "Default";
 		blockUI("Fetching users...");
 		adminServices.getUserDetails("user")
 		.then(function(data){
@@ -2473,7 +2502,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			} else if(data == "empty") {
 				openModalPopup("Edit User", "There are no users created yet.");
 			} else {
-				data.sort(function(a,b){ return a[0] > b[0]; });
+				data.sort((a,b) => a[0].localeCompare(b[0]));
 				$scope.userConf.allUsersList = data;
 			}
 		}, function (error) {
@@ -2484,20 +2513,19 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	//Get Selected User Data
 	$scope.userConf.getUserData = function() {
-		var userObj = this.userIdName.split(';');
+		const userObj = this.userIdName.split(';');
 		this.userId = userObj[0];
 		this.userName = userObj[1];
-		userConf = $scope.userConf;
+		var userConf = $scope.userConf;
 		var failMsg = "Failed to fetch user details.";
 		blockUI("Fetching User details...");
 		adminServices.getUserDetails("userid", userObj[0])
-		.then(function(data){
+		.then(async data => {
 			unblockUI();
-			if(data == "Invalid Session") {
-				$rootScope.redirectPage();
-			} else if(data == "fail") {
-				openModalPopup("Edit User", failMsg);
-			} else {
+			if(data == "Invalid Session") $rootScope.redirectPage();
+			else if(data == "fail") openModalPopup("Edit User", failMsg);
+			else {
+				const uType = data.type;
 				userConf.userId = data.userid;
 				userConf.userName = data.username;
 				userConf.userIdName = data.userid+";"+data.username;
@@ -2508,28 +2536,20 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				userConf.role = data.role;
 				userConf.rolename = data.rolename;
 				userConf.addRole = {};
-				data.addrole.forEach(function(e){
-					userConf.addRole[e] = true;
-				});
-				if (!data.ldapuser) {
-					$("button.userTypeBtn").html("Default").title("Default");
-					userConf.type = "inhouse";
-					// $scope.userConf.activateLDAP();
-				} else {
-					$("button.userTypeBtn").html("LDAP").title("LDAP");
-					userConf.type = "ldap";
-					var ldapserver = data.ldapuser.server;
-					var ldapuser = data.ldapuser.user;
-					$scope.userConf.activateLDAP(function() {
-						userConf.ldap.expired = false;
-						if (!userConf.ldapAllServerList.some(function(e) { return e == ldapserver;})) {
-							userConf.ldapAllServerList.push(ldapserver);
-							userConf.ldap.expired = ldapserver;
-						}
-						userConf.ldap.user = ldapuser;
-						userConf.ldap.server = ldapserver;
-					});
-					
+				data.addrole.forEach((e) => userConf.addRole[e] = true);
+				userConf.type = uType;
+				userConf.confExpired = false;
+				userConf.fType = (uType=="inhouse")? "Default":((uType=="oidc")? "OpenID":uType.toUpperCase());
+				if (data.type != "inhouse") {
+					var confserver = data.server;
+					await $scope.userConf.selectUserType();
+					if (!userConf.confServerList.some(function(e) { return e.name == confserver;})) {
+						userConf.confServerList.push({_id: '', name: confserver});
+						userConf.confExpired = confserver;
+					}
+					userConf.server = confserver;
+					userConf.ldap.user = data.ldapuser || '';
+					$scope.$apply();
 				}
 			}
 		}, function (error) {

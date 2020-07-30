@@ -41,13 +41,16 @@ exports.manageUserDetails = async (req, res) => {
 		let flag = ['2','0','0','0','0','0','0','0','0'];
 		const reqData = req.body.user;
 		const action = req.body.action;
+		const internalUser = reqData.type == "inhouse";
 		let inputs = {
 			action: action,
 			createdby: req.session.userid,
 			createdbyrole: reqData.role,
 			name: (reqData.username || "").trim(),
-			ldapuser: reqData.ldapUser,
-			password: (reqData.password || "").trim()
+			auth: {
+				type: reqData.type,
+				password: reqData.password || ""
+			},
 		};
 
 		if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
@@ -61,18 +64,17 @@ exports.manageUserDetails = async (req, res) => {
 		if (action != "create") {
 			inputs.userid = (reqData.userid || "").trim();
 		}
-		if (!inputs.ldapuser && action == "create") {
-			if (validator.isEmpty(inputs.password) && !(validator.isLength(inputs.password,1,12))) {
-				logger.error("Error occurred in admin/manageUserDetails: Invalid Password.");
-				flag[5]='1';
-			}
-		}
-		if (inputs.password == '') delete inputs.password;
-		else {
-			const salt = bcrypt.genSaltSync(10);
-			inputs.password = bcrypt.hashSync(inputs.password, salt);
-		}
 		if (action != "delete") {
+			if (internalUser) {
+				if (validator.isEmpty(inputs.auth.password) && !(validator.isLength(inputs.auth.password,1,12))) {
+					logger.error("Error occurred in admin/manageUserDetails: Invalid Password.");
+					flag[5]='1';
+				}
+			}
+			if (inputs.auth.password != '') {
+				const salt = bcrypt.genSaltSync(10);
+				inputs.auth.password = bcrypt.hashSync(inputs.auth.password, salt);
+			} else delete inputs.auth.password;
 			inputs.firstname = (reqData.firstname || "").trim();
 			inputs.lastname = (reqData.lastname || "").trim();
 			inputs.email = (reqData.email || "").trim();
@@ -93,17 +95,19 @@ exports.manageUserDetails = async (req, res) => {
 			if (action == "update") {
 				inputs.additionalroles = reqData.addRole || [];
 			}
-			if (inputs.ldapuser) {
-				inputs.ldapuser = reqData.ldapUser || {};
-				if (!inputs.ldapuser.server || validator.isEmpty(inputs.ldapuser.server)) {
-					logger.error("Error occurred in admin/manageUserDetails: Invalid LDAP Server.");
+			if (!internalUser) {
+				inputs.auth.server = reqData.server;
+				if (!inputs.auth.server || validator.isEmpty(inputs.auth.server)) {
+					logger.error("Error occurred in admin/manageUserDetails: Invalid Authentication Server.");
 					flag[7]='1';
 				}
-				if (validator.isEmpty(inputs.ldapuser.user)) {
-					logger.error("Error occurred in admin/manageUserDetails: Invalid User Domain Name.");
-					flag[8]='1';
+				if (inputs.auth.type == "ldap") {
+					inputs.auth.user = reqData.ldapUser;
+					if (validator.isEmpty(inputs.auth.user)) {
+						logger.error("Error occurred in admin/manageUserDetails: Invalid User Domain Name.");
+						flag[8]='1';
+					}
 				}
-				inputs.ldapuser = JSON.stringify({server:inputs.ldapuser.server,user:inputs.ldapuser.user});
 			}
 		}
 		flag = flag.join('');
@@ -113,7 +117,7 @@ exports.manageUserDetails = async (req, res) => {
 		const result = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
 		if (result == "fail" || result == "forbidden") res.status(500).send("fail");
 		else res.send(result);
-	} catch (exception){
+	} catch (exception) {
 		logger.error("Error occurred in admin/manageUserDetails", exception);
 		res.status(500).send("fail");
 	}
@@ -147,8 +151,10 @@ exports.getUserDetails = async (req, res) => {
 					role: result.defaultrole,
 					rolename: result.rolename,
 					addrole: result.addroles,
-					ldapuser: (result.ldapuser.server)? result.ldapuser : false,
+					type: result.auth.type,
+					server: result.auth.server || '',
 				};
+				if (result.auth.user) data.ldapuser = result.auth.user;
 			}
 			return res.send(data);
 		}
@@ -496,19 +502,23 @@ exports.testLDAPConnection = (req, res) => {
 			var flag = "success";
 			var data = {fields:{}};
 			if (err) {
+				const errm = err.lde_message;
 				if (err.errno == "EADDRNOTAVAIL" || err.errno == "ECONNREFUSED" || err.errno == "ETIMEDOUT") flag = "invalid_addr";
 				else if (err.errno == "INSUFFICIENT_ACCESS_RIGHTS") {
 					if (authType == "simple") flag = "insufficient_access";
 					else flag = "success";
-				} else if (err.lde_message) {
-					if (err.lde_message.indexOf("DSID-0C0906E8") > -1) {
+				} else if (errm) {
+					if (errm.indexOf("DSID-0C0906E8") > -1) {
 						if (authType == "simple") flag = "insufficient_access";
 						else flag = "invalid_auth";
-					} else if (err.lde_message.indexOf("DSID-031522C9") > -1) {
+					} else if (errm.indexOf("DSID-031522C9") > -1) {
 						flag = "insufficient_access";
 						logger.error("User Does not have sufficient Access!");
-					} else if (((err.lde_message.indexOf("DSID-0C0903A9") > -1) || (err.lde_message.indexOf("DSID-0C090400") > -1)) && authType == "simple") flag = "invalid_credentials";
-					else if (err.lde_message.indexOf("DSID-031007DB") > -1) flag = "invalid_basedn";
+					} else if (authType == "simple") {
+						if ((errm.indexOf("DSID-0C0903A9") > -1) || (errm.indexOf("DSID-0C090400") > -1) || (errm.indexOf("DSID-0C090442") > -1))
+							flag = "invalid_credentials";
+					}
+					else if (errm.indexOf("DSID-031007DB") > -1) flag = "invalid_basedn";
 				}
 				else flag = "fail";
 				logger.debug("Error occurred in admin/testLDAPConnection: " + JSON.stringify(err));
@@ -549,14 +559,10 @@ exports.getLDAPConfig = async (req, res) => {
 		const resConf = await utils.fetchData(inputs, "admin/getLDAPConfig", fnName);
 		if (resConf == "fail") return res.status(500).send("fail");
 		else if (resConf.length == 0) return res.send("empty");
-		let data = "";
-		if (action == "server") {
-			data = resConf.map(e => e.name);
-			return res.send(data);
-		}
+		if (action == "server") return res.send(resConf);
 
 		const bindCredentials = resConf.bindcredentials;
-		data = {
+		let data = {
 			url: resConf.url,
 			basedn: resConf.basedn,
 			auth: resConf.auth,
