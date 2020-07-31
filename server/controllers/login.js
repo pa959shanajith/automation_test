@@ -1,15 +1,8 @@
-var async = require('async');
-var uidsafe = require('uid-safe');
-var epurl = process.env.NDAC_URL;
-var Client = require("node-rest-client").Client;
-var client = new Client();
-var logger = require('../../logger');
-var utils = require('../lib/utils');
-var configpath= require('../config/options');
-var taskflow = configpath.strictTaskWorkflow;
-var bcrypt = require('bcryptjs');
-var admin=require('../controllers/admin');
-
+const uidsafe = require('uid-safe');
+const logger = require('../../logger');
+const utils = require('../lib/utils');
+const configpath= require('../config/options');
+const bcrypt = require('bcryptjs');
 
 /**
  * @see : function to check whether projects are assigned for user
@@ -20,9 +13,7 @@ const checkAssignedProjects = async username => {
 	logger.info("Inside " + fnName + " function");
 	let assignedProjects = false;
 	// Get user profile by username
-	let inputs = {
-		"username": username
-	};
+	let inputs = { username };
 	const userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
 	if (userInfo == "fail") return ['fail'];
 	else if (userInfo.length === 0) return ["invalid_username_password"];
@@ -88,97 +79,81 @@ exports.checkUserState = async (req, res) => {
 	}
 };
 
-//Load User Information - Avo Assure
-exports.loadUserInfo = function (req, res) {
+// Check User login State - Avo Assure
+exports.checkUser = async (req, res) => {
+	const fnName = "checkUser";
 	try {
-		logger.info("Inside UI Service: loadUserInfo");
-		if (utils.isSessionActive(req)) {
-			var selectedRole = req.body.selRole;
-			var userName = req.session.username;
-			var jsonService = {};
-			jsonService.token = configpath.defaultTokenExpiry;
-			jsonService.ldapuser = req.session.ldapuser;
-			async.waterfall([
-				function userInfo(callback) {
-					var inputs = {
-						"username": userName
-					};
-					var args = {
-						data: inputs,
-						headers: {
-							"Content-Type": "application/json"
-						}
-					};
-					logger.info("Calling NDAC Service from userInfo : loadUser");
-					client.post(epurl + "login/loadUser", args,
-						function (result, response) {
-						if (response.statusCode != 200 || result.rows == "fail") {
-							logger.error("Error occurred in loadUser Error Code : ERRNDAC");
-							callback("fail");
-						} else {
-							var service = result.rows;
-							jsonService.user_id = service._id;
-							jsonService.email_id = req.session.emailid = service.email;
-							jsonService.additionalrole = req.session.additionalroles = service.addroles;
-							jsonService.firstname = req.session.firstname = service.firstname;
-							jsonService.lastname = req.session.lastname = service.lastname;
-							jsonService.role = service.defaultrole;
-							jsonService.taskwflow = taskflow;
-							jsonService.username = service.name.toLowerCase();
-							selectedRole = selectedRole||jsonService.role;
-							req.session.userid = service._id;
-							req.session.defaultRoleId = service.defaultrole;
-							req.session.activeRoleId = selectedRole;
-							callback(null);
-						}
-					});
-				},
-				function loggedinRole(callback) {
-					var inputs = {
-						"roleid": selectedRole,
-						"query": "permissionInfoByRoleID"
-					};
-					var args = {
-						data: inputs,
-						headers: {
-							"Content-Type": "application/json"
-						}
-					};
-					logger.info("Calling NDAC Service from loggedinRole: loadPermission");
-					client.post(epurl+ "login/loadPermission", args,
-						function (result, response) {
-						if (response.statusCode != 200 || result.rows == "fail") {
-							logger.error("Error occurred in loadPermission Error Code : ERRNDAC");
-							callback("fail");
-						} else {
-							var rolename = result.rows.rolename;
-							if (!rolename) {
-								logger.error("User role not found");
-								callback("fail");
-							} else {
-								if (result.rows.pluginresult.length === 0) {
-									logger.info("User plugins not found");
-									callback("fail");
-								} else {
-									jsonService.pluginsInfo = result.rows.pluginresult;
-								}
-								if (selectedRole == req.session.defaultRoleId) req.session.defaultRole = rolename;
-								req.session.activeRole = rolename;
-								jsonService.rolename = req.session.defaultRole;
-								jsonService.page = (jsonService.rolename == "Admin")? "admin":"plugin";
-								callback(null);
-							}
-						}
-					});
-				}
-			], function (err) {
-				if (err) jsonService = err;
-				return res.send(jsonService);
-			});
-		} else {
-			logger.info("Invalid Session");
-			res.send("Invalid Session");
+		logger.info("Inside UI Service: " + fnName);
+		const inputs = 	{ "username": req.body.username };
+		const userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
+		let result = { "proceed": true };
+		if (userInfo == "fail") return res.send("fail");
+		else if (userInfo && userInfo.auth) {
+			const uType = userInfo.auth.type;
+			if (["saml","oidc"].indexOf(uType) > -1) result.redirect = "/login/" + uType;
 		}
+		return res.send(result);
+	} catch (exception) {
+		logger.error(exception.message);
+		res.send("fail");
+	}
+};
+
+//Load User Information - Avo Assure
+exports.loadUserInfo = async (req, res) => {
+	const fnName = "loadUserInfo";
+	try {
+		logger.info("Inside UI Service: " + fnName);
+		const username = req.session.username;
+		const userType = req.session.usertype;
+		let inputs = { username };
+		const userData = await utils.fetchData(inputs, "login/loadUser", fnName);
+		if (userData == "fail") return res.send("fail");
+		const userProfile = {
+			user_id: userData._id,
+			username: userData.name.toLowerCase(),
+			email_id: userData.email,
+			additionalrole: userData.addroles,
+			firstname: userData.firstname,
+			lastname: userData.lastname,
+			role: userData.defaultrole,
+			taskwflow: configpath.strictTaskWorkflow,
+			token: configpath.defaultTokenExpiry,
+			dbuser: userType=="inhouse",
+			ldapuser: userType=="ldap",
+			samluser: userType=="saml",
+			openiduser: userType=="oidc",
+		};
+		const selectedRole = req.body.selRole || userProfile.role;
+		req.session.userid = userData._id;
+		req.session.defaultRoleId = userData.defaultrole;
+		req.session.activeRoleId = selectedRole;
+		req.session.emailid = userData.email,
+		req.session.additionalroles = userData.addroles,
+		req.session.firstname = userData.firstname,
+		req.session.lastname = userData.lastname,
+
+		inputs = {
+			"roleid": selectedRole,
+			"query": "permissionInfoByRoleID"
+		};
+		const permData = await utils.fetchData(inputs, "login/loadPermission", fnName);
+		if (permData == "fail") return res.send("fail");
+		const rolename = permData.rolename;
+		if (!rolename) {
+			logger.error("User role not found");
+			return res.send("fail");
+		}
+		if (permData.pluginresult.length === 0) {
+			logger.info("User plugins not found");
+			return res.send("fail");
+		}
+		if (selectedRole == req.session.defaultRoleId) req.session.defaultRole = rolename;
+		req.session.activeRole = rolename;
+		userProfile.rolename = req.session.defaultRole;
+		userProfile.pluginsInfo = permData.pluginresult;
+		userProfile.page = (userProfile.rolename == "Admin")? "admin":"plugin";
+		return res.send(userProfile);
 	} catch (exception) {
 		logger.error(exception.message);
 		return res.send("fail");
@@ -209,54 +184,38 @@ exports.getRoleNameByRoleId = async (req, res) => {
 	}
 };
 
-// Get Current password - Avo Assure
-exports.resetPassword = function(req, res) {
-	logger.info("Inside UI Service: resetPassword");
-	var username = req.session.username;
-	var currpassword = req.body.currpassword;
-	var newpassword = req.body.newpassword;
-	var inputs = {
-		"username": username
-	};
-	var args = {
-		data: inputs,
-		headers: {
-			"Content-Type": "application/json"
-		}
-	};
-	logger.info("Calling NDAC Service: loadUser");
-	client.post(epurl + "login/loadUser", args,
-		function (result, response) {
-		if (response.statusCode != 200 || result.rows == "fail") {
-			logger.error("Error occurred in loadUser Error Code : ERRNDAC");
-			res.send("fail");
-		} else {
-			password = result.rows.password;
-			validUser = bcrypt.compareSync(currpassword, password);
-			if (validUser){
-				if (currpassword == newpassword){
-					res.send("same");
-				} else{
-					var action = "update";
-					var userObj = {
-						userid: req.session.userid,
-						username: req.session.username.toLowerCase(),
-						password: newpassword,
-						firstname: req.session.firstname,
-						lastname: req.session.lastname,
-						email: req.session.emailid,
-						role: req.session.activeRoleId,
-						addRole: req.session.additionalroles,
-						ldapUser: false
-					};
-					req.body = {"action": action, "user": userObj};
-					admin.manageUserDetails(req, res);
-				}
-			} else{
-				res.send("incorrect");
-			}
-		}
-	});
+// Reset Current password
+exports.resetPassword = async (req, res) => {
+	const fnName = "resetPassword";
+	logger.info("Inside UI Service: " + fnName);
+	try {
+		if (req.session.usertype != "inhouse") return res.send("fail");
+		const username = req.session.username;
+		const currpassword = req.body.currpassword;
+		const newpassword = req.body.newpassword;
+		let inputs = { username };
+		const result = await utils.fetchData(inputs, "login/loadUser", fnName);
+		if (result == "fail") return res.send("fail");
+		const dbpassword = result.auth.password;
+		const validUser = bcrypt.compareSync(currpassword, dbpassword);
+		if (!validUser) return res.send("incorrect");
+		if (currpassword == newpassword) return res.send("same");
+		const password = bcrypt.hashSync(newpassword, bcrypt.genSaltSync(10));
+		inputs = {
+			action: "resetpassword",
+			userid: req.session.userid,
+			name: req.session.username,
+			modifiedby: req.session.userid,
+			modifiedbyrole: req.session.activeRoleId,
+			password: password
+		};
+		const status = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
+		if (status == "fail" || status == "forbidden") return res.send("fail");
+		else res.send(status);
+	} catch (exception) {
+		logger.error(exception.message);
+		res.send("fail");
+	}
 };
 
 exports.logoutUser = async (req, res) => {

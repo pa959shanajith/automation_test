@@ -291,7 +291,7 @@ if (cluster.isMaster) {
 							} else {
 								req.session.username = username;
 								req.session.uniqueId = req.session.id;;
-								req.session.ldapuser = user.ldap_flag;
+								req.session.usertype = user.type;
 								logger.rewriters[0] = function(level, msg, meta) {
 									meta.username = username;
 									meta.userid = null;
@@ -501,8 +501,9 @@ if (cluster.isMaster) {
 		app.post('/pdProcess', auth.protect, mindmap.pdProcess);	// process discovery service
 		//Login Routes
 		//app.post('/authenticateUser', login.authenticateUser);
+		app.post('/checkUser', login.checkUser);
 		app.post('/checkUserState', login.checkUserState);
-		app.post('/loadUserInfo', login.loadUserInfo);
+		app.post('/loadUserInfo', auth.protect, login.loadUserInfo);
 		app.post('/getRoleNameByRoleId', auth.protect, login.getRoleNameByRoleId);
 		app.post('/logoutUser', login.logoutUser);
 		app.post('/resetPassword', auth.protect, login.resetPassword);

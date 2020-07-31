@@ -1,26 +1,22 @@
-var authRouter = require("express").Router();
-var passport = require("passport");
-var activeDirectory = require('activedirectory');
-var LocalStrategy = require("passport-local").Strategy;
-var SamlStrategy = require("passport-saml").Strategy;
-var OpenIdClientStrategy = require('openid-client').Strategy;
-var OpenIdClientIssuer = require('openid-client').Issuer;
-var Negotiator = require('negotiator');
-var fs = require("fs");
-var Client = require("node-rest-client").Client;
-var client = new Client();
-var epurl = process.env.NDAC_URL;
-var logger = require("../../logger");
-var utils = require('./utils');
-var ssoEnabled = process.env.ENABLE_SSO.toLowerCase().trim() == "true";
-var strategy = (ssoEnabled)? process.env.SSO_PROTOCOL.toLowerCase().trim():"inhouse";
-var config = require("../config/config.json");
+let authRouter = require("express").Router();
+let passport = require("passport");
+const activeDirectory = require('activedirectory');
+const LocalStrategy = require("passport-local").Strategy;
+const SamlStrategy = require("passport-saml").Strategy;
+const OpenIdClientStrategy = require('openid-client').Strategy;
+const OpenIdClientIssuer = require('openid-client').Issuer;
+const Negotiator = require('negotiator');
+const fs = require("fs");
+const Client = require("node-rest-client").Client;
+const client = new Client();
+const epurl = process.env.NDAC_URL;
+const logger = require("../../logger");
+const utils = require('./utils');
+const LOGIN_URL = "/login";
+const SAML_LOGIN_URL = LOGIN_URL + "/saml";
+const OIDC_LOGIN_URL = LOGIN_URL + "/oidc";
+var strategy = "inhouse"
 var callbackPath = "/login/callback";
-config = (config[strategy])? config[strategy]:config;
-if (config.redirectURI) {
-	callbackPath = config.redirectURI.replace("http://",'').replace("https://",'');
-	callbackPath = callbackPath.replace(callbackPath.split('/')[0],'');
-}
 
 function authenticateLDAP(ldapdata, cb) {
 	logger.info("Inside authenticateLDAP function");
@@ -48,6 +44,9 @@ function authenticateLDAP(ldapdata, cb) {
 			ad.authenticate(ldapdata.user, ldapdata.password, function (err, auth) {
 				if (err) {
 					logger.error("Error occurred in ldap authentication");
+					const errm = err.lde_message;
+					if (errm && ((errm.indexOf("DSID-0C0903A9") > -1) || (errm.indexOf("DSID-0C090400") > -1) || (errm.indexOf("DSID-0C090442") > -1)))
+						return cb("inValidCredential");
 					logger.debug("Error occurred in ldap authentication : " + JSON.stringify(err));
 					cb("fail");
 				}
@@ -83,13 +82,14 @@ var strategyUtil = {
 						if (response.statusCode != 200 || result.rows == "fail") {
 							logger.error("Error occurred in loadUser Error Code : ERRNDAC");
 							callback('fail')
-						}else if (result.rows == null) return callback("invalid_username_password");
-						else if (result.rows.ldapuser.server != undefined) {    // LDAP Authentication
-							var resp = result.rows.ldapuser;
+						} else if (result.rows == null) return callback("invalid_username_password");
+						else if (result.rows.auth.server != undefined) {    // LDAP Authentication
+							var resp = result.rows.auth;
 							logger.info("Calling In-House Authentication");
 							resp.password = password;
 							authenticateLDAP(resp, function (ldapdata) {
 								if (ldapdata == "empty" || ldapdata == "fail") callback("inValidLDAPServer");
+								else if (ldapdata != "pass") callback(ldapdata);
 								else if (ldapdata == "pass") {
 									validUser = true;
 									ldap_flag = true;
@@ -99,7 +99,7 @@ var strategyUtil = {
 						} else {    // In-House Authentication
 							logger.info("Calling In-House Authentication");
 							try {
-								var dbHashedPassword = result.rows.password;
+								var dbHashedPassword = result.rows.auth.password;
 								validUser = bcrypt.compareSync(password, dbHashedPassword); // true
 								callback(null);
 							} catch (exception) {
@@ -112,7 +112,7 @@ var strategyUtil = {
 			], function(err) {
 				if (err) flag = err;
 				if (!validUser) return done(null, null, flag);
-				else return done(null, {"username": username, "ldap_flag": ldap_flag}, "validCredential");
+				else return done(null, {"username": username, "type": (ldap_flag)?"ldap":"inhouse"}, "validCredential");
 			});
 		});
 		passport.use('local', localStrategy);

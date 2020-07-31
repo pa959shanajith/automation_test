@@ -50,7 +50,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		$(".resetPassEntry").hide();
 	}
 
-	if (userDetails.ldapuser){
+	if (!userDetails.dbuser){
 		$(".resetPassEntry").hide();
 	}
 

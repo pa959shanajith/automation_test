@@ -3,7 +3,6 @@ var triggeredSeconds = 0;
 mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeout', '$location', 'ScheduleService', 'cfpLoadingBar', '$compile', '$interval', function ($scope, $rootScope, $http, $timeout, $location, ScheduleService, cfpLoadingBar, $compile, $interval) {
 	cfpLoadingBar.start();
 	$("body").css("background", "#eee");
-	$("head").append('<link rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
 	$timeout(function () {
 		document.getElementById("currentYear").innerHTML = new Date().getFullYear()
 	}, 500);

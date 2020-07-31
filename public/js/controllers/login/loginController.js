@@ -2,46 +2,72 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 	$(".ic-username, .ic-password").parent().removeClass("input-border-error");
 	$scope.loginValidation = "";
 	$scope.ud = {};
-	$scope.inputType='password';
-    $scope.showHideClass='glyphicon glyphicon-eye-open';
+	$scope.inputType = 'password';
+	$scope.showLogin = false;
+    $scope.showHideClass = 'fa-eye';
 	$scope.serverList = [{"name": "License Server", "active": false}, {"name": "NDAC Server", "active": false}, {"name": "Web Server", "active": false}];
 	$scope.restartForm = false;
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear();
 
 	$scope.showPassword=function() {
-		if($scope.ud.password != null){
-			if($scope.inputType=='password') {
-				$scope.inputType='text';
-				$scope.showHideClass='glyphicon glyphicon-eye-close';
-			} else {
-				$scope.inputType='password';
-				$scope.showHideClass='glyphicon glyphicon-eye-open';
-			}
+		if($scope.inputType == 'password') {
+			$scope.inputType = 'text';
+			$scope.showHideClass = 'fa-eye-slash';
+		} else {
+			$scope.inputType = 'password';
+			$scope.showHideClass = 'fa-eye';
 		}
+	}
+
+	$scope.hideLogin = function() {
+		$scope.showLogin = false;
+	};
+
+	$scope.checkUser = function() {
+		const err = "Failed to Login.";
+		$scope.loginValidation = "";
+		$(".ic-username").parent().removeClass("input-border-error");
+		$(".ic-username").children().attr("src", "imgs/ic-username.png");
+		if (!$scope.ud.userName) {
+			$(".ic-username").children().attr("src", "imgs/ic-username-error.png");
+			$(".ic-username").parent().addClass("input-border-error");
+			$scope.loginValidation = "Please Enter Username";
+			cfpLoadingBar.complete();
+			return false;
+		}
+		LoginService.checkUser($scope.ud.userName).then(function (data) {
+			cfpLoadingBar.complete();
+			if (data.redirect) {
+				window.location.href = data.redirect;
+			} else if (data.proceed) {
+				$scope.showLogin = true;
+				//$("#userName").attr("disabled",true);
+			} else {
+				$scope.loginValidation = err;
+			}
+		}, function (error) {
+			console.log(err);
+			$scope.loginValidation = err;
+			cfpLoadingBar.complete();
+		});
 	}
 
 	$scope.check_credentials = function (path, $event) {
 		cfpLoadingBar.start();
 		$scope.loginValidation = "";
 		$(".ic-username, .ic-password").parent().removeClass("input-border-error");
+		$(".ic-username").children().attr("src", "imgs/ic-username.png");
+		$(".ic-password").children().attr("src", "imgs/ic-password.png");
 		if (!$scope.ud.userName) {
 			$(".ic-username").children().attr("src", "imgs/ic-username-error.png");
 			$(".ic-username").parent().addClass("input-border-error");
-			$(".ic-password").children().attr("src", "imgs/ic-password.png");
-			$(".ic-password").parent().removeClass("input-border-error");
 			$scope.loginValidation = "Please Enter Username";
 			cfpLoadingBar.complete();
 		} else if (!$scope.ud.password) {
-			$(".ic-username").children().attr("src", "imgs/ic-username.png");
-			$(".ic-username").parent().removeClass("input-border-error");
 			$(".ic-password").children().attr("src", "imgs/ic-password-error.png");
 			$(".ic-password").parent().addClass("input-border-error");
 			$scope.loginValidation = "Please Enter Password";
 			cfpLoadingBar.complete();
-			
-
-			
-			
 		} else {
 			var username = $scope.ud.userName.toLowerCase();
 			var password = $scope.ud.password;
@@ -69,7 +95,6 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 					$(".ic-username").children().attr("src", "imgs/ic-username.png");
 					$(".ic-password").children().attr("src", "imgs/ic-password.png");
 					$(".ic-username, .ic-password").parent().removeClass("input-border-error");
-					$scope.loginButtonValidation = "";
 					window.location = '/';
 				} else if (data == 'inValidCredential' || data == "invalid_username_password") {
 					$(".ic-username").children().attr("src", "imgs/ic-username-error.png");
@@ -111,8 +136,6 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 			openModalPopup("Restart Service", errmsg);
 		});
 	};
-	
-
 
 	function openModalPopup(title, body){
 		var mainModal = $("#popupModal");
