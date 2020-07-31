@@ -585,15 +585,15 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	//Save qTest Details
 	$scope.saveQTestCredentials = function (e) {
 		var checkedVal = $("#qtestSteps")[0].checked;
-		$("#almURL, #almUserName, #almPassword").removeClass('inputErrorBorder');
-		if (!$scope.almURL) {
-			$("#almURL").addClass('inputErrorBorder');
+		$("#qTestURL, #qTestUserName, #qTestPassword").removeClass('inputErrorBorder');
+		if (!$scope.qTestURL) {
+			$("#qTestURL").addClass('inputErrorBorder');
 			$(".error-msg-exeQc").text("Please Enter URL.");
-		} else if (!$scope.almUserName) {
-			$("#almUserName").addClass('inputErrorBorder');
+		} else if (!$scope.qTestUserName) {
+			$("#qTestUserName").addClass('inputErrorBorder');
 			$(".error-msg-exeQc").text("Please Enter User Name.");
-		} else if (!$scope.almPassword) {
-			$("#almPassword").addClass('inputErrorBorder');
+		} else if (!$scope.qTestPassword) {
+			$("#qTestPassword").addClass('inputErrorBorder');
 			$(".error-msg-exeQc").text("Please Enter Password.");
 		} else if (appType != "SAP" && browserTypeExe.length === 0) {
 			$("#QTestSyncWindow").find("button.close").trigger("click");
@@ -602,11 +602,11 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			$("#QTestSyncWindow").find("button.close").trigger("click");
 			openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
 		} else {
-			$("#almURL,#almUserName,#almPassword").css({
+			$("#qTestURL,#qTestUserName,#qTestPassword").css({
 				"background": "none"
 			});
 			$(".error-msg-exeQc").text("");
-			ExecutionService.loginQTestServer_ICE($scope.almURL, $scope.almUserName, $scope.almPassword,"qTest")
+			ExecutionService.loginQTestServer_ICE($scope.qTestURL, $scope.qTestUserName, $scope.qTestPassword,"qTest")
 			.then(function (data) {
 				if (data == "unavailableLocalServer") {
 					$(".error-msg-exeQc").text("Unavailable LocalServer");
@@ -618,9 +618,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					$(".error-msg-exeQc").text("Invalid URL");
 				} else {
 					$scope.qccredentials = {
-						qcurl: $("#almURL").val(),
-						qcusername: $("#almUserName").val(),
-						qcpassword: $("#almPassword").val(),
+						qcurl: $("#qTestURL").val(),
+						qcusername: $("#qTestUserName").val(),
+						qcpassword: $("#qTestPassword").val(),
 						qteststeps: checkedVal,
 						qctype: "qTest"
 					}
@@ -775,18 +775,24 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	//Integration Functionality
 	$(document).on("change", "#syncScenario", function () {
 		if ($(this).val() == "1") {
+			$("#almURL").val('');
+			$("#almUserName").val('');
+			$("#almPassword").val('');
+			$scope.almURL = '';
+			$scope.almUserName = '';
+			$scope.almPassword = '';
 			$("#ALMSyncWindow").modal("show");
 			$(".error-msg-exeQc").text('');
-			$("#almURL").val($scope.qccredentials.qcurl);
-			$("#almUserName").val($scope.qccredentials.qcusername);
-			$("#almPassword").val($scope.qccredentials.qcpassword);
 		}
 		else if ($(this).val() == "0") {
+			$("#qTestURL").val('');
+			$("#qTestUserName").val('');
+			$("#qTestPassword").val('');
+			$scope.qTestURL = '';
+			$scope.qTestUserName = '';
+			$scope.qTestPassword = '';
 			$("#QTestSyncWindow").modal("show");
 			$(".error-msg-exeQc").text('');
-			$("#almURL").val($scope.qccredentials.qcurl);
-			$("#almUserName").val($scope.qccredentials.qcusername);
-			$("#almPassword").val($scope.qccredentials.qcpassword);
 		}
 	});
 

@@ -237,6 +237,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				/*if(itemLabelName == "Runtime_Settings"){
 				}else {
 				}*/
+				if(data.testcase.length == 0) $('.submitTaskBtn').addClass('hidden1')
+				else $('.submitTaskBtn').removeClass('hidden1')
 				$('#jqGrid').show();
 				// service call # 2 - objectType service call
 				DesignServices.getScrapeDataScreenLevel_ICE(appType)
@@ -938,6 +940,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			{
 				$("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');
 			}
+			if(viewString.view.length == 0) $('.submitTaskBtn.showContainer').addClass('hidden1')
+			else $('.submitTaskBtn.showContainer').removeClass('hidden1')
 				unblockUI();
 			},
 			function (error) {
@@ -2490,11 +2494,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		scrapeObject.screenName = screenName;
 		scrapeObject.userinfo = userinfo;
 		scrapeObject.param = "delete_updateScrapeData_ICE";
+		scrapeObject.update_list = window.localStorage['_modified']
+		window.localStorage['_modified']='';
 		scrapeObject.appType = tasks.appType;
 		scrapeObject.versionnumber = tasks.versionnumber;
 		scrapeObject.newData = viewString;
 		if(deleteObjectsFlag==true){
 			scrapeObject.type = "delete";
+			scrapeObject.delete_list = JSON.stringify(getIndexOfDeletedObjects);
 			deleteObjectsFlag = false;
 		}
 		else
@@ -2664,28 +2671,57 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					copiedViewstring = true;
 				}
 			}
+			var edit = [];
 			if (modifiednames.length > 0) {
 				var mdName;
 				for (var i = 0; i < modifiednames.length; i++) {
 					mdName = modifiednames[i].split("^^");
+					editName = modifiednames[i].split("editObj");
+					if (editName[1]) {
+						propedit.push(JSON.parse(editName[1]))
+						propeditFlag = true
+					}
 					if (eaCheckbox) {
-						if (mdName[1] != undefined) {
-							if (newScrapedList.view[mdName[1]])
+						if (mdName[1]) {
+							if (newScrapedList.view[mdName[1]]){
 								newScrapedList.view[mdName[1]].custname = mdName[0];
-							tempModifiednames[i] = mdName[0];
-							//tempModifiednames = tempModifiednames.filter(function(n) {return n != null});
-							window.localStorage['_modified'] = JSON.stringify(tempModifiednames)
+								if(newScrapedList.view[mdName[1]].cord != undefined && newScrapedList.view[mdName[1]].cord != ''){
+									var newxpath = newScrapedList.view[mdName[1]].xpath;
+									var ind = newxpath.indexOf(';');
+									var s_ind = newxpath.indexOf(';',ind);
+									newxpath = newxpath.slice(0,ind+1)+mdName[0]+newxpath.slice(newxpath.indexOf(';',ind+s_ind),newxpath.length);
+									newScrapedList.view[mdName[1]].xpath = newxpath;
+						}
+								if ("_id" in newScrapedList.view[mdName[1]]){
+									modifiedobj.push([newScrapedList.view[mdName[1]]._id,mdName[0]])
+					}
+							}
 						}
 					}
 					else {
-						if (mdName[1] != undefined) {
-							if (viewString.view[mdName[1]])
+						if (mdName[1]) {
+							if (viewString.view[mdName[1]]){
+								if (viewString.view[mdName[1]]._id == undefined){
 								viewString.view[mdName[1]].custname = mdName[0];
-							tempModifiednames[i] = mdName[0];
-							//tempModifiednames = tempModifiednames.filter(function(n) {return n != null});
-							window.localStorage['_modified'] = JSON.stringify(tempModifiednames)
+						}
+								else{
+									edit.push([viewString.view[mdName[1]]._id,mdName[0]]);
+					}
+								/*
+								if(viewString.view[mdName[1]].cord != undefined && viewString.view[mdName[1]].cord != ''){
+									var newxpath = viewString.view[mdName[1]].xpath;
+									var ind = newxpath.indexOf(';');
+									var s_ind = newxpath.indexOf(';',ind);
+									newxpath = newxpath.slice(0,ind+1)+mdName[0]+newxpath.slice(newxpath.indexOf(';',ind+s_ind),newxpath.length);
+									viewString.view[mdName[1]].xpath = newxpath;
+								}*/
+							
+							}	
 						}
 					}
+				}
+				if (edit.length > 0){
+					window.localStorage['_modified'] = JSON.stringify(edit)
 				}
 			}
 			//Delete all objects ------------------------------------------
@@ -2705,26 +2741,56 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					copiedViewstring = true;
 				}
 			}
+			var edit = [];
 			if (modifiednames.length > 0) {
 				var mdName;
 				for (var i = 0; i < modifiednames.length; i++) {
 					mdName = modifiednames[i].split("^^");
+					editName = modifiednames[i].split("editObj");
+					if (editName[1]) {
+						propedit.push(JSON.parse(editName[1]))
+						propeditFlag = true
+					}
 					if (eaCheckbox) {
-						if (mdName[1] != undefined) {
-							if (newScrapedList.view[mdName[1]])
+						if (mdName[1]) {
+							if (newScrapedList.view[mdName[1]]){
 								newScrapedList.view[mdName[1]].custname = mdName[0];
-							tempModifiednames[i] = mdName[0];
-							window.localStorage['_modified'] = JSON.stringify(tempModifiednames)
+								if(newScrapedList.view[mdName[1]].cord != undefined && newScrapedList.view[mdName[1]].cord != ''){
+									var newxpath = newScrapedList.view[mdName[1]].xpath;
+									var ind = newxpath.indexOf(';');
+									var s_ind = newxpath.indexOf(';',ind);
+									newxpath = newxpath.slice(0,ind+1)+mdName[0]+newxpath.slice(newxpath.indexOf(';',ind+s_ind),newxpath.length);
+									newScrapedList.view[mdName[1]].xpath = newxpath;
+								}
+								if ("_id" in newScrapedList.view[mdName[1]]){
+									edit.push([newScrapedList.view[mdName[1]]._id,mdName[0]])
+								}
+							}
 						}
 					}
 					else {
-						if (mdName[1] != undefined) {
-							if (viewString.view[mdName[1]])
+						if (mdName[1]) {
+							if (viewString.view[mdName[1]]){
+								if (viewString.view[mdName[1]]._id == undefined){
 								viewString.view[mdName[1]].custname = mdName[0];
-							tempModifiednames[i] = mdName[0];
-							window.localStorage['_modified'] = JSON.stringify(tempModifiednames)
+								}
+								else{
+									edit.push([viewString.view[mdName[1]]._id,mdName[0]]);
+								}
+								/*
+								if(viewString.view[mdName[1]].cord != undefined && viewString.view[mdName[1]].cord != ''){
+									var newxpath = viewString.view[mdName[1]].xpath;
+									var ind = newxpath.indexOf(';');
+									var s_ind = newxpath.indexOf(';',ind);
+									newxpath = newxpath.slice(0,ind+1)+mdName[0]+newxpath.slice(newxpath.indexOf(';',ind+s_ind),newxpath.length);
+									viewString.view[mdName[1]].xpath = newxpath;
+								}*/
+							}	
+						}
 						}
 					}
+				if (edit.length > 0){
+					window.localStorage['_modified'] = JSON.stringify(edit)
 				}
 			}
 			if ($(".parentObjContainer").find(".checkStylebox").is(":checked") && saveScrapeDataFlag == true) {
@@ -2773,11 +2839,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						}
 					}
 					else {
+						var delete_list = []
 						var temp_scrapedlist = JSON.stringify(newScrapedList)
 						var dontChkViewString = 0;
 						$.each($("input[type=checkbox].checkall:checked"), function () {
 							var delId = $(this).parent().attr('id').split('_')[1];
 							$(this).parents("li.select_all").remove();
+							delete_list.push(newScrapedList.view[delId]);
 							delete newScrapedList.view[delId];
 						});						
 						var isduplicate = duplicateCheck();
@@ -2801,11 +2869,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						scrapeObject.screenName = screenName;
 						scrapeObject.userinfo = userinfo;
 						scrapeObject.param = "updateScrapeData_ICE";
+						scrapeObject.update_list = window.localStorage['_modified'];
+						window.localStorage['_modified']='';
 						scrapeObject.appType = tasks.appType;
 						scrapeObject.versionnumber = tasks.versionnumber;
 						scrapeObject.newData = viewString;
 						if(deleteObjectsFlag==true){
 							scrapeObject.type = "delete";
+							scrapeObject.delete_list = delete_list;
 							deleteObjectsFlag = false;
 						}
 						else
@@ -3215,7 +3286,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 	//Add Object Functionality
 	$scope.addObj = function () {
-
+		$('.checkStylebox').prop('checked',false)
+		$("#scraplist li").find('input[name="selectAllListItems"]:visible').prop("checked", false).removeClass('checked');
 		$(".generateObj span img").removeClass("left-bottom-selection");
 		$(".compareObject span img").removeClass("left-bottom-selection");
 		$(".addObject span img").addClass("left-bottom-selection");
@@ -3243,6 +3315,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		$(".userObject span img").addClass("left-bottom-selection");
 		if(param=='encrypt'){
 			//$scope.errorMessage = "";
+			$('.checkStylebox').prop('checked',false)
+			$("#scraplist li").find('input[name="selectAllListItems"]:visible').prop("checked", false).removeClass('checked');
 			$('.errorMessage').val('');
 			$("#dialog-userObject").modal("show");
 			$("#userObjContainer").empty();
@@ -3961,6 +4035,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	$(document).on('click', "#saveObjects", function (e) {
 		//console.log("reused", reusedScreenNames);
 		//console.log("reusedT", reusedScreenTestcaseNames);
+		deleteScrapeDataservice=true
 		var task = JSON.parse(window.localStorage['_CT'])
 		if (task.reuse == 'True') {
 			$("#reUsedObjectsModal").find('.modal-title').text("Save Scraped data");
@@ -4102,7 +4177,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		if (eaCheckbox) {
 			if (!copiedViewstring) {
 				for (var j = 0; j < viewString.view.length; j++) {
+					if(newScrapedList.view.indexOf(viewString.view[j])==-1){
 					newScrapedList.view.push(viewString.view[j]);
+				}
+					
 				}
 			}
 			newScrapedList.mirror = viewString.mirror;
@@ -4215,6 +4293,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		if (!eaCheckbox && window.localStorage['_modified'] != "" && edit.length > 0){
 			scrapeObject.param = "edit_updateScrapeData_ICE";
 			scrapeObject.getScrapeData = window.localStorage['_modified'];
+			window.localStorage['_modified'] = '';
 			scrapeObject.scrapedobj = viewString.view
 		}
 		scrapeObject.appType = tasks.appType;
