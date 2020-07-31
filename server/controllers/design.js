@@ -4,7 +4,7 @@
 var myserver = require('../lib/socket');
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var epurl = process.env.NDAC_URL;
+var epurl = process.env.DAS_URL;
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
@@ -20,11 +20,11 @@ function uploadTestCaseData(inputs, uploadTestCaseDatacallback) {
 				"Content-Type": "application/json"
 			}
 		};
-		logger.info("Calling NDAC Service from uploadTestCaseData: design/updateTestCase_ICE");
+		logger.info("Calling DAS Service from uploadTestCaseData: design/updateTestCase_ICE");
 		client.post(epurl + "design/updateTestCase_ICE", args,
 			function (result, response) {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				logger.error("Error occurred in design/updateTestCase_ICE from uploadTestCaseData Error Code : ERRNDAC");
+				logger.error("Error occurred in design/updateTestCase_ICE from uploadTestCaseData Error Code : ERRDAS");
 				statusFlag = "Error occurred in updateTestCaseQuery : Fail";
 				uploadTestCaseDatacallback(statusFlag, null);
 			} else {
@@ -79,14 +79,14 @@ exports.readTestCase_ICE = function (req, res) {
 				testcase: "",
 				testcasename: ""
 			};
-			logger.info("Calling NDAC Service from readTestCase_ICE: design/readTestCase_ICE");
+			logger.info("Calling DAS Service from readTestCase_ICE: design/readTestCase_ICE");
 			//Query 1 fetching the testcasesteps from the test cases based on requested screenid,testcasename,testcaseid
 			client.post(epurl + "design/readTestCase_ICE", args,
 				function (result, response) {
 				try {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						var flag = "Error in readTestCase_ICE : Fail";
-						logger.error("Error occurred in design/readTestCase_ICE: service readTestCase_ICE, Error Code : ERRNDAC");
+						logger.error("Error occurred in design/readTestCase_ICE: service readTestCase_ICE, Error Code : ERRDAS");
 						try {
 							res.send(flag);
 						} catch (exception) {
@@ -233,13 +233,13 @@ exports.debugTestCase_ICE = function (req, res) {
 										"Content-Type": "application/json"
 									}
 								};
-								logger.info("Calling NDAC Service from debugTestCase_ICE: design/readTestCase_ICE");
+								logger.info("Calling DAS Service from debugTestCase_ICE: design/readTestCase_ICE");
 								client.post(epurl + "design/readTestCase_ICE", args,
 									function (testcasedataresult, response) {
 									try {
 										if (response.statusCode != 200 || testcasedataresult.rows == "fail") {
 											flag = "Error in getProjectTestcasedata : Fail";
-											logger.error("Error occurred in design/readTestCase_ICE from the service debugTestCase_ICE Error Code : ERRNDAC");
+											logger.error("Error occurred in design/readTestCase_ICE from the service debugTestCase_ICE Error Code : ERRDAS");
 											try {
 												res.send(flag);
 											} catch (exception) {
@@ -556,13 +556,13 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 					'Content-Type': 'application/json'
 				}
 			};
-			logger.info("Calling NDAC Service from getKeywordDetails_ICE: design/getKeywordDetails_ICE");
+			logger.info("Calling DAS Service from getKeywordDetails_ICE: design/getKeywordDetails_ICE");
 			client.post(epurl + "design/getKeywordDetails_ICE", args,
 				function (projectBasedKeywordsresult, response) {
 					try {
 						if (response.statusCode != 200 || projectBasedKeywordsresult.rows == "fail") {
 							try {
-								logger.error("Error occurred in design/getKeywordDetails_ICE from getKeywordDetails_ICE, Error Code : ERRNDAC");
+								logger.error("Error occurred in design/getKeywordDetails_ICE from getKeywordDetails_ICE, Error Code : ERRDAS");
 								res.send("Server data rendering failed: Fail");
 							} catch (exception) {
 								logger.error("Exception in the service getKeywordDetails_ICE: %s", exception);
@@ -608,7 +608,7 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 					"Content-Type": "application/json"
 				}
 			};
-			logger.info("Calling NDAC Service from getTestcasesByScenarioId_ICE - gettestcaseids: design/getTestcasesByScenarioId_ICE");
+			logger.info("Calling DAS Service from getTestcasesByScenarioId_ICE - gettestcaseids: design/getTestcasesByScenarioId_ICE");
 			client.post(epurl + "design/getTestcasesByScenarioId_ICE", args,
 				function (testcasesResult, response) {
 				try {

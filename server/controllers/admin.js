@@ -7,7 +7,7 @@ var async = require('async');
 var activeDirectory = require('activedirectory');
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var epurl = process.env.NDAC_URL;
+var epurl = process.env.DAS_URL;
 var validator =  require('validator');
 var logger = require('../../logger');
 var utils = require('../lib/utils');
@@ -174,12 +174,12 @@ exports.getDomains_ICE = function getDomains_ICE(req, res) {
 					"Content-Type": "application/json"
 				}
 			};
-			logger.info("Calling NDAC Service: getDomains_ICE");
+			logger.info("Calling DAS Service: getDomains_ICE");
 			client.post(epurl + "admin/getDomains_ICE", args,
 				function (result, response) {
 				try {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in getDomains_ICE Error Code : ERRNDAC");
+						logger.error("Error occurred in getDomains_ICE Error Code : ERRDAS");
 						res.send("fail");
 					} else {
 						res.send(result.rows)
@@ -239,7 +239,7 @@ exports.manageCIUsers = function (req, res) {
 					"Content-Type": "application/json"
 				}
 			};
-			logger.info("Calling NDAC Service : admin/manageCIUsers");
+			logger.info("Calling DAS Service : admin/manageCIUsers");
 			client.post(epurl + "admin/manageCIUsers",args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
@@ -275,7 +275,7 @@ exports.getCIUsersDetails = function(req,res){
 					"Content-Type": "application/json"
 				}
 			};
-			logger.info("Calling NDAC Service : admin/getCIUsersDetails");
+			logger.info("Calling DAS Service : admin/getCIUsersDetails");
 			client.post(epurl + "admin/getCIUsersDetails",args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
@@ -383,13 +383,13 @@ exports.getNames_ICE = function (req, res) {
 					"Content-Type": "application/json"
 				}
 			};
-			logger.info("Calling NDAC Service from namesfetcher: admin/getNames_ICE");
+			logger.info("Calling DAS Service from namesfetcher: admin/getNames_ICE");
 			client.post(epurl + "admin/getNames_ICE", args,
 				function (queryStringresult, response) {
 				try {
 					if (response.statusCode != 200 || queryStringresult.rows == "fail") {
 						var statusFlag = "Error occurred in namesfetcher : Fail";
-						logger.error("Error occurred in admin/getNames_ICE from namesfetcher Error Code : ERRNDAC");
+						logger.error("Error occurred in admin/getNames_ICE from namesfetcher Error Code : ERRDAS");
 						// namesfetchercallback(statusFlag, null);
 					} else {
 						respLength = queryStringresult.rows.length;
@@ -447,12 +447,12 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 					"Content-Type": "application/json"
 				}
 			};
-			logger.info("Calling NDAC Service: createProject_ICE");
+			logger.info("Calling DAS Service: createProject_ICE");
 			client.post(epurl + "admin/createProject_ICE", args,
 				function (result, response) {
 				try {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in createProject_ICE Error Code : ERRNDAC");
+						logger.error("Error occurred in createProject_ICE Error Code : ERRDAS");
 						res.send("fail");
 					} else {
 						res.send(result.rows)
@@ -883,13 +883,13 @@ exports.getDetails_ICE = function (req, res) {
 							"Content-Type": "application/json"
 						}
 					};
-					logger.info("Calling NDAC Service from namesfetcher: admin/getDetails_ICE");
+					logger.info("Calling DAS Service from namesfetcher: admin/getDetails_ICE");
 					client.post(epurl + "admin/getDetails_ICE", args,
 						function (queryStringresult, response) {
 						try {
 							if (response.statusCode != 200 || queryStringresult.rows == "fail") {
 								var statusFlag = "Error occurred in namesfetcher : Fail";
-								logger.error("Error occurred in admin/getDetails_ICE from namesfetcher Error Code : ERRNDAC");
+								logger.error("Error occurred in admin/getDetails_ICE from namesfetcher Error Code : ERRDAS");
 								// namesfetchercallback(statusFlag, null);
 							} else {
 								if(type=="projectsdetails"){
@@ -991,11 +991,11 @@ exports.assignProjects_ICE = function (req, res) {
 				}
 			};
 			if (valid_domainId == true && valid_userId == true && valid_objects == true) {
-				logger.info("Calling NDAC Service : admin/assignProjects_ICE");
+				logger.info("Calling DAS Service : admin/assignProjects_ICE");
 				client.post(epurl + "admin/assignProjects_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in admin/assignProjects_ICE Error Code : ERRNDAC");
+						logger.error("Error occurred in admin/assignProjects_ICE Error Code : ERRDAS");
 						res.send("fail");
 					} else {
                         inputs.projectids1 = "'"+inputs.projectids.join('\',\'')+"'";
@@ -1063,12 +1063,12 @@ exports.getAssignedProjects_ICE = function (req, res) {
 					"Content-Type": "application/json"
 				}
 			};
-			logger.info("Calling NDAC Service : admin/getAssignedProjects_ICE");
+			logger.info("Calling DAS Service : admin/getAssignedProjects_ICE");
 			client.post(epurl + "admin/getAssignedProjects_ICE", args,
 				function (result, response) {
 				try {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in admin/getAssignedProjects_ICE Error Code : ERRNDAC");
+						logger.error("Error occurred in admin/getAssignedProjects_ICE Error Code : ERRDAS");
 						res.send("fail");
 					} else {
 						assignedProjectIds = result.rows.projects;
@@ -1085,12 +1085,12 @@ exports.getAssignedProjects_ICE = function (req, res) {
 										"Content-Type": "application/json"
 									}
 								};
-								logger.info("Calling NDAC Service : admin/getAssignedProjects_ICE inside async function");
+								logger.info("Calling DAS Service : admin/getAssignedProjects_ICE inside async function");
 								client.post(epurl + "admin/getAssignedProjects_ICE", args,
 									function (result, response) {
 									try {
 										if (response.statusCode != 200 || result.rows == "fail") {
-											logger.error("Error occurred in admin/getAssignedProjects_ICE inside async function Error Code : ERRNDAC");
+											logger.error("Error occurred in admin/getAssignedProjects_ICE inside async function Error Code : ERRDAS");
 											res.send("fail");
 										} else {
 											res.send(result.rows)
@@ -1129,13 +1129,13 @@ exports.getAssignedProjects_ICE = function (req, res) {
 function createCycle(args, createCycleCallback) {
 	logger.info("Inside function createCycle");
 	var statusFlag = "";
-	logger.info("Calling NDAC Service from createCycle:createProject_ICE");
+	logger.info("Calling DAS Service from createCycle:createProject_ICE");
 	client.post(epurl + "admin/updateProject_ICE", args,
 		function (result, response) {
 		try {
 			if (response.statusCode != 200 || result.rows == "fail") {
 				statusFlag = "Error occurred in createCycle of createProject_ICE : Fail";
-				logger.error("Error occurred in createProject_ICE from createCycle Error Code : ERRNDAC");
+				logger.error("Error occurred in createProject_ICE from createCycle Error Code : ERRDAS");
 				createCycleCallback(statusFlag, null);
 			} else {
 				var newCycleID  = result.rows[0].cycleid;
@@ -1207,13 +1207,13 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 												"Content-Type": "application/json"
 											}
 										};
-										logger.info("Calling NDAC Service from newProjectDetails : admin/createProject_ICE");
+										logger.info("Calling DAS Service from newProjectDetails : admin/createProject_ICE");
 										client.post(epurl + "admin/updateProject_ICE", args,
 											function (data, response) {
 
 											try {
 												if (response.statusCode != 200 || data.rows == "fail") {
-												logger.error("Error occurred in admin/createProject_ICE from newProjectDetails Error Code : ERRNDAC");
+												logger.error("Error occurred in admin/createProject_ICE from newProjectDetails Error Code : ERRDAS");
 												} else {
 													//newReleaseID = data.rows[0].releaseid;
                                                   res.send("success")
@@ -1308,13 +1308,13 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 												"Content-Type": "application/json"
 											}
 										};
-										logger.info("Calling NDAC Service from deletedProjectDetails : admin/updateProject_ICE");
+										logger.info("Calling DAS Service from deletedProjectDetails : admin/updateProject_ICE");
 										client.post(epurl + "admin/updateProject_ICE", args,
 											function (result, response) {
 											try {
 												if (response.statusCode != 200 || result.rows == "fail") {
 													flag = "Error in deleteRelease-updateProject_ICE : Fail";
-													logger.error("Error occurred in admin/updateProject_ICE from deletedProjectDetails Error Code : ERRNDAC");
+													logger.error("Error occurred in admin/updateProject_ICE from deletedProjectDetails Error Code : ERRDAS");
 													res.send(flag);
 												} else {
                                                     //Execute neo4j query!! deleterelease
@@ -1338,11 +1338,11 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																	"Content-Type": "application/json"
 																}
 															};
-															logger.info("Calling NDAC Service from deletedProjectDetails inside async : admin/updateProject_ICE");
+															logger.info("Calling DAS Service from deletedProjectDetails inside async : admin/updateProject_ICE");
 															client.post(epurl + "admin/updateProject_ICE", args,
 																function (result, response) {
 																if (response.statusCode != 200 || result.rows == "fail") {
-																	logger.error("Error occurred in admin/updateProject_ICE inside async Error Code : ERRNDAC");
+																	logger.error("Error occurred in admin/updateProject_ICE inside async Error Code : ERRDAS");
 																	flag = "Error in deleteCycles(true)-updateProject_ICE : Fail";
 																	res.send(flag);
 																} else {
@@ -1384,11 +1384,11 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																	"Content-Type": "application/json"
 																}
 															};
-															logger.info("Calling NDAC Service inside async from !deleteStatus: admin/updateProject_ICE");
+															logger.info("Calling DAS Service inside async from !deleteStatus: admin/updateProject_ICE");
 															client.post(epurl + "admin/updateProject_ICE", args,
 																function (result, response) {
 																if (response.statusCode != 200 || result.rows == "fail") {
-																	logger.error("Error occurred in admin/updateProject_ICE inside async from !deleteStatus Error Code : ERRNDAC");
+																	logger.error("Error occurred in admin/updateProject_ICE inside async from !deleteStatus Error Code : ERRDAS");
 																	flag = "Error in deleteCycles(false)-updateProject_ICE : Fail";
 																	res.send(flag);
 																} else {
@@ -1446,12 +1446,12 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 													"Content-Type": "application/json"
 												}
 											};
-											logger.info("Calling NDAC Service from editedProjectDetails : admin/updateProject_ICE");
+											logger.info("Calling DAS Service from editedProjectDetails : admin/updateProject_ICE");
 											client.post(epurl + "admin/updateProject_ICE", args,
 												function (result, response) {
 												try {
 													if (response.statusCode != 200 || result.rows == "fail") {
-														logger.error("Error occurred in admin/updateProject_ICE from editedProjectDetails Error Code : ERRNDAC");
+														logger.error("Error occurred in admin/updateProject_ICE from editedProjectDetails Error Code : ERRDAS");
 														flag = "Error in delete-Release(true)-updateProject_ICE : Fail";
 														res.send(flag);
 													} else {
@@ -1482,11 +1482,11 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																					"Content-Type": "application/json"
 																				}
 																			};
-																			logger.info("Calling NDAC Service from editedProjectDetails :admin/updateProject_ICE");
+																			logger.info("Calling DAS Service from editedProjectDetails :admin/updateProject_ICE");
 																			client.post(epurl + "admin/updateProject_ICE", args,
 																				function (result, response) {
 																				if (response.statusCode != 200 || result.rows == "fail") {
-																					logger.error("Error occurred in admin/updateProject_ICE from editedProjectDetails Error Code : ERRNDAC");
+																					logger.error("Error occurred in admin/updateProject_ICE from editedProjectDetails Error Code : ERRDAS");
 																					flag = "Error in delete-Cycle(true)-updateProject_ICE : Fail";
 																					res.send(flag);
 																				} else {
@@ -1546,11 +1546,11 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																	"Content-Type": "application/json"
 																}
 															};
-															logger.info("Calling NDAC Service : admin/updateProject_ICE");
+															logger.info("Calling DAS Service : admin/updateProject_ICE");
 															client.post(epurl + "admin/updateProject_ICE", args,
 																function (result, response) {
 																if (response.statusCode != 200 || result.rows == "fail") {
-																	logger.error("Error occurred in admin/updateProject_ICE Error Code : ERRNDAC");
+																	logger.error("Error occurred in admin/updateProject_ICE Error Code : ERRDAS");
 																	flag = "Error in delete-Cycle(true)-updateProject_ICE : Fail";
 																	res.send(flag);
 																} else {
@@ -1612,11 +1612,11 @@ exports.getUsers = function (req, res) {
 			"Content-Type": "application/json"
 		}
 	};
-	logger.info("Calling NDAC Service: getUsers");
+	logger.info("Calling DAS Service: getUsers");
 	client.post(epurl + "admin/getUserRoles", args,
 		function (userrolesresult, userrolesresponse) {
 		if (userrolesresponse.statusCode != 200 || userrolesresult.rows == "fail") {
-			logger.error("Error occurred in getUsers Error Code : ERRNDAC");
+			logger.error("Error occurred in getUsers Error Code : ERRDAS");
 			res(null, "fail");
 		} else {
 			var inputs = {
@@ -1629,11 +1629,11 @@ exports.getUsers = function (req, res) {
 					"Content-Type": "application/json"
 				}
 			};
-			logger.info("Calling NDAC Service: getUsers");
+			logger.info("Calling DAS Service: getUsers");
 			client.post(epurl + "admin/getUsers", args,
 				function (getUsers, response) {
 				if (response.statusCode != 200 || getUsers.rows == "fail") {
-					logger.error("Error occurred in getUsers Error Code : ERRNDAC");
+					logger.error("Error occurred in getUsers Error Code : ERRDAS");
 					res(null, "fail");
 				} else {
 					logger.info("Users fetched successfully");

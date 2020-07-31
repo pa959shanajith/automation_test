@@ -3,7 +3,7 @@
  */
 var async = require('async');
 var myserver = require('../lib/socket');
-var epurl = process.env.NDAC_URL;
+var epurl = process.env.DAS_URL;
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
@@ -194,11 +194,11 @@ function getProjectsForUser(userid, cb) {
 					"Content-Type": "application/json"
 				}
 			};
-			logger.info("Calling NDAC Service from getProjectsForUser: qualityCenter/qcProjectDetails_ICE");
+			logger.info("Calling DAS Service from getProjectsForUser: qualityCenter/qcProjectDetails_ICE");
 			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
 				function (projectrows, response) {
 				if (response.statusCode != 200 || projectrows.rows == "fail") {
-					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from getprojectDetails Error Code : ERRNDAC");
+					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from getprojectDetails Error Code : ERRDAS");
 				} else {
 					if (projectrows.rows.length != 0) {
 						//flagtocheckifexists = true;
@@ -244,12 +244,12 @@ function projectandscenario(projectid, cb) {
 					"Content-Type": "application/json"
 				}
 			};
-				logger.info("Calling NDAC Service : qualityCenter/qcProjectDetails_ICE");
+				logger.info("Calling DAS Service : qualityCenter/qcProjectDetails_ICE");
 			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
 				function (projectdata, response) {
 				if (response.statusCode != 200 || projectdata.rows == "fail") {
 					
-					logger.error("Error occurred in getProjectsForUser from projectname1 Error Code : ERRNDAC");
+					logger.error("Error occurred in getProjectsForUser from projectname1 Error Code : ERRDAS");
 				} else {
 					if (projectdata.rows.length != 0) {
 						projectname = projectdata.rows[0].name;
@@ -269,11 +269,11 @@ function projectandscenario(projectid, cb) {
 					"Content-Type": "application/json"
 				}
 			};
-				logger.info("Calling NDAC Service :qualityCenter/qcProjectDetails_ICE");
+				logger.info("Calling DAS Service :qualityCenter/qcProjectDetails_ICE");
 			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
 				function (scenariorows, response) {
 				if (response.statusCode != 200 || scenariorows.rows == "fail") {
-					logger.error("Error occurred in getProjectsForUser from scenariodata Error Code : ERRNDAC");
+					logger.error("Error occurred in getProjectsForUser from scenariodata Error Code : ERRDAS");
 				} else {
 					if (scenariorows.rows.length != 0) {
 						//flagtocheckifexists = true;
@@ -394,11 +394,11 @@ exports.saveQtestDetails_ICE = function (req, res) {
 				"Content-Type": "application/json"
 			}
 		};
-			logger.info("Calling NDAC Service: qualityCenter/saveIntegrationDetails_ICE");
+			logger.info("Calling DAS Service: qualityCenter/saveIntegrationDetails_ICE");
 		client.post(epurl + "qualityCenter/saveIntegrationDetails_ICE", args,
 			function (qcdetailsows, response) {
 			if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
-					logger.error("Error occurred in saveIntegrationDetails_ICE Error Code : ERRNDAC");
+					logger.error("Error occurred in saveIntegrationDetails_ICE Error Code : ERRDAS");
 				flag = false;
 			}
 			callback();
@@ -491,11 +491,11 @@ function getQcDetailsForUser(userid, cb) {
 				}
 
 			};
-			logger.info("Calling NDAC Service :qualityCenter/qcProjectDetails_ICE");
+			logger.info("Calling DAS Service :qualityCenter/qcProjectDetails_ICE");
 			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
 				function (projectrows, response) {
 				if (response.statusCode != 200 || projectrows.rows == "fail") {
-					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from getQcDetailsForUser Error Code : ERRNDAC");
+					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from getQcDetailsForUser Error Code : ERRDAS");
 				} else {
 					if (projectrows.rows.length != 0) {
 						//flagtocheckifexists = true;
@@ -546,11 +546,11 @@ function qcscenariodetails(projectid, cb) {
 					"Content-Type": "application/json"
 				}
 			};
-			logger.info("Calling NDAC Service from qcscenariodetails: qualityCenter/qcProjectDetails_ICE");
+			logger.info("Calling DAS Service from qcscenariodetails: qualityCenter/qcProjectDetails_ICE");
 			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
 				function (scenariorows, response) {
 				if (response.statusCode != 200 || scenariorows.rows == "fail") {
-					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from qcscenariodetails Error Code : ERRNDAC");
+					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from qcscenariodetails Error Code : ERRDAS");
 				} else {
 					if (scenariorows.rows.length != 0) {
 						//flagtocheckifexists = true;
@@ -576,11 +576,11 @@ function qcscenariodetails(projectid, cb) {
 						"Content-Type": "application/json"
 					}
 				};
-				logger.info("Calling NDAC Service from qcdetails: qualityCenter/viewIntegrationMappedList_ICE");
+				logger.info("Calling DAS Service from qcdetails: qualityCenter/viewIntegrationMappedList_ICE");
 				client.post(epurl + "qualityCenter/viewIntegrationMappedList_ICE", args,
 					function (qcdetailsows, response) {
 					if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
-						logger.error("Error occurred inqualityCenter/viewIntegrationMappedList_ICE from qcdetails Error Code : ERRNDAC");
+						logger.error("Error occurred inqualityCenter/viewIntegrationMappedList_ICE from qcdetails Error Code : ERRDAS");
 					} else {
 						if (qcdetailsows.rows.length != 0) {
 							//flagtocheckifexists = true;
@@ -625,14 +625,14 @@ function getProjectsAndModules(userid,cb){
                 data:inputs,
                 headers:{"Content-Type" : "application/json"}                
             };
-				logger.info("Calling NDAC Service from getProjectsAndModules: qualityCenter/qcProjectDetails_ICE");
+				logger.info("Calling DAS Service from getProjectsAndModules: qualityCenter/qcProjectDetails_ICE");
             client.post(epurl+"qualityCenter/qcProjectDetails_ICE",args,
                 function (projectrows, response) {
                     if (response.statusCode != 200 || projectrows.rows == "fail") {
            // dbConnICE.execute(getprojects,function(err,projectrows){
                 //if(err){
                     //console.log(err);
-                  					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from getProjectsAndModules Error Code : ERRNDAC");
+                  					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from getProjectsAndModules Error Code : ERRDAS");
 
                 }else{
                     if(projectrows.rows.length!=0){
@@ -673,14 +673,14 @@ function projectandmodule(projectid,cb,data){
                 headers:{"Content-Type" : "application/json"}
                 
             };
-				logger.info("Calling NDAC Service from projectname1: qualityCenter/qcProjectDetails_ICE");
+				logger.info("Calling DAS Service from projectname1: qualityCenter/qcProjectDetails_ICE");
             client.post(epurl+"qualityCenter/qcProjectDetails_ICE",args,
                 function (projectdata, response) {
                     if (response.statusCode != 200 || projectdata.rows == "fail") {
             // dbConnICE.execute(projectnamequery,function(err,projectdata){
             //         if(err){
             //             console.log(err);
-					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from projectname1 Error Code : ERRNDAC");
+					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from projectname1 Error Code : ERRDAS");
                     }else{
                         if(projectdata.rows.length!=0){
                             projectname = projectdata.rows[0].projectname;

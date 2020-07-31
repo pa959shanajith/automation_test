@@ -2,7 +2,7 @@ var async = require('async');
 var myserver = require('../lib/socket');
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var epurl = process.env.NDAC_URL;
+var epurl = process.env.DAS_URL;
 var validator = require('validator');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
@@ -247,11 +247,11 @@ exports.getAllSuites_ICE = function(req, res) {
                     "Content-Type": "application/json"
                 }
             };
-            logger.info("Calling NDAC Service from getprojectdetails: reports/getAllSuites_ICE");
+            logger.info("Calling DAS Service from getprojectdetails: reports/getAllSuites_ICE");
             client.post(epurl + "reports/getAllSuites_ICE", args,
                 function(projectdetails, response) {
                     if (response.statusCode != 200 || projectdetails.rows == "fail") {
-                        logger.error("Error occurred in reports/getAllSuites_ICE from getprojectdetails Error Code : ERRNDAC");
+                        logger.error("Error occurred in reports/getAllSuites_ICE from getprojectdetails Error Code : ERRDAS");
                         getprojectdetailscallback("fail", null);
                     } else {                       
                         try {
@@ -286,7 +286,7 @@ exports.getSuiteDetailsInExecution_ICE = function(req, res) {
                     "Content-Type": "application/json"
                 }
             };
-            logger.info("Calling NDAC Service from getSuiteDetailsInExecution_ICE: reports/getSuiteDetailsInExecution_ICE");
+            logger.info("Calling DAS Service from getSuiteDetailsInExecution_ICE: reports/getSuiteDetailsInExecution_ICE");
             client.post(epurl + "reports/getSuiteDetailsInExecution_ICE", args,
                 function(executionData, response) {
                     try {
@@ -345,7 +345,7 @@ exports.reportStatusScenarios_ICE = function(req, res) {
                                 "Content-Type": "application/json"
                             }
                         };
-                        logger.info("Calling NDAC Service from reportStatusScenarios_ICE - executiondetails: reports/reportStatusScenarios_ICE");
+                        logger.info("Calling DAS Service from reportStatusScenarios_ICE - executiondetails: reports/reportStatusScenarios_ICE");
                         client.post(epurl + "reports/reportStatusScenarios_ICE", args,
                             function(result, response) {
                                 if (response.statusCode != 200 || result.rows == "fail") {
@@ -373,7 +373,7 @@ exports.reportStatusScenarios_ICE = function(req, res) {
                                                     "Content-Type": "application/json"
                                                 }
                                             };
-                                            logger.info("Calling NDAC Service from reportStatusScenarios_ICE - scenarioname: reports/reportStatusScenarios_ICE");
+                                            logger.info("Calling DAS Service from reportStatusScenarios_ICE - scenarioname: reports/reportStatusScenarios_ICE");
                                             client.post(epurl + "reports/reportStatusScenarios_ICE", args,
                                                 function(scenarioNameDetails, response) {
                                                     if (response.statusCode != 200 || scenarioNameDetails.rows == "fail") {
@@ -469,12 +469,12 @@ exports.getReport = function(req, res) {
                     "Content-Type": "application/json"
                 }
             };
-            logger.info("Calling NDAC Service from getReport - projectsUnderDomain: reports/getReport");
+            logger.info("Calling DAS Service from getReport - projectsUnderDomain: reports/getReport");
             client.post(epurl + "reports/getReport", args,
                 function(reportResult, response) {
                     if (response.statusCode != 200 || reportResult.rows == "fail") {
                         flag = "fail";
-                        logger.error("Error occurred in the service getReport - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports. Error Code : ERRNDAC");
+                        logger.error("Error occurred in the service getReport - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports. Error Code : ERRDAS");
                         res.send(flag);
                     } else {
                         try{
@@ -674,11 +674,11 @@ function updateDbReportData(reportId, slno, defectId) {
             "Content-Type": "application/json"
         }
     };
-    logger.info("Calling NDAC Service from connectJira_ICE for updateDbReportData: reports/updateReportData");
+    logger.info("Calling DAS Service from connectJira_ICE for updateDbReportData: reports/updateReportData");
     client.post(epurl + "reports/updateReportData", args,
         function(reportdata, response) {
             if (response.statusCode != 200 || reportdata.rows == "fail") {
-                logger.error("Error occurred in reports/updateReportData from updateDbReportData Error Code : ERRNDAC");
+                logger.error("Error occurred in reports/updateReportData from updateDbReportData Error Code : ERRDAS");
                 return false;
             } else {
                 return true;
@@ -704,7 +704,7 @@ exports.getReportsData_ICE = function(req, res) {
             client.post(epurl + "reports/getAllSuites_ICE", args,
                 function(result1, response1) {
                     if (response1.statusCode != 200 || result1.rows == "fail") {
-                        logger.error("Error occurred in reports/getReportsData_ICE: getAllModules from getAllSuites_ICE Error Code : ERRNDAC");
+                        logger.error("Error occurred in reports/getReportsData_ICE: getAllModules from getAllSuites_ICE Error Code : ERRDAS");
                         res.send("fail");
                     } else {
                         res.send(result1);
@@ -740,11 +740,11 @@ exports.getReport_API = async(req, res) => {
                     "Content-Type": "application/json"
                 }
             };
-            logger.info("Calling NDAC Service from getReport_API - getReport_API: reports/getReport_API");
+            logger.info("Calling DAS Service from getReport_API - getReport_API: reports/getReport_API");
             client.post(epurl + "reports/getReport_API", args,
                 function(reportResult, response) {
                     if (response.statusCode != 200 || reportResult.rows == "fail") {
-                        logger.error("Error occurred in the service getReport_API - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports. Error Code : ERRNDAC");
+                        logger.error("Error occurred in the service getReport_API - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports. Error Code : ERRDAS");
                         if(reportResult.errMsg != ""){
                             execResponse.error_message=reportResult.errMsg;
                         }

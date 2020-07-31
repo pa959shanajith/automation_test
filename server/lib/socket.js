@@ -15,7 +15,7 @@ var myserver = require('./../../server');
 var httpsServer = myserver.httpsServer;
 var io = require('socket.io').listen(httpsServer, { cookie: false, pingInterval: uiConfig.socketio.pingInterval, pingTimeout: uiConfig.socketio.pingTimeout });
 var notificationMsg = require('./../notifications/notifyMessages');
-var epurl = process.env.NDAC_URL;
+var epurl = process.env.DAS_URL;
 var Client = require("node-rest-client").Client;
 var apiclient = new Client();
 
@@ -58,11 +58,11 @@ io.on('connection', function (socket) {
 				"Content-Type": "application/json"
 			}
 		};
-		logger.info("Calling NDAC Service: updateActiveIceSessions");
+		logger.info("Calling DAS Service: updateActiveIceSessions");
 		var apireq = apiclient.post(epurl + "server/updateActiveIceSessions", args,
 			function (result, response) {
 			if (response.statusCode != 200) {
-				logger.error("Error occurred in updateActiveIceSessions Error Code: ERRNDAC");
+				logger.error("Error occurred in updateActiveIceSessions Error Code: ERRDAS");
 				socket.send('fail', "conn");
 			} else {
 				socket.send('checkConnection', result.ice_check);
@@ -146,11 +146,11 @@ io.on('connection', function (socket) {
 						"Content-Type": "application/json"
 					}
 				};
-				logger.info("Calling NDAC Service: updateActiveIceSessions");
+				logger.info("Calling DAS Service: updateActiveIceSessions");
 				var apireq = apiclient.post(epurl + "server/updateActiveIceSessions", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in updateActiveIceSessions Error Code: ERRNDAC");
+						logger.error("Error occurred in updateActiveIceSessions Error Code: ERRDAS");
 					} else {
 						logger.info("%s is disconnected", address);
 					}

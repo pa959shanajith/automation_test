@@ -3,7 +3,7 @@ const logger = require('../../logger');
 const myserver = require('../../server');
 const redisServer = require('./redisSocketHandler');
 const taskflow = require('../config/options').strictTaskWorkflow;
-const epurl = process.env.NDAC_URL;
+const epurl = process.env.DAS_URL;
 const Client = require("node-rest-client").Client;
 const client = new Client();
 
@@ -137,11 +137,11 @@ const fetchData = async (inputs, url, from, all) => {
 	//from = " from " + ((from)? from : fetchData.caller.name);
 	from = (from)? " from " + from : "";
 	const query = (inputs.query)? " - " + inputs.query:"";
-	logger.info("Calling NDAC Service: " + url + from + query);
+	logger.info("Calling DAS Service: " + url + from + query);
 	const promiseData = (new Promise((rsv, rej) => {
 		const apiReq = client.post(epurl + url, args, (result, response) => {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				logger.error("Error occurred in " + url + from + query + ", Error Code : ERRNDAC");
+				logger.error("Error occurred in " + url + from + query + ", Error Code : ERRDAS");
 				const toLog = ((typeof(result)  == "object") && !(result instanceof Buffer))? JSON.stringify(result):result.toString();
 				logger.debug("Response is %s", toLog);
 				//rej("fail");
@@ -154,7 +154,7 @@ const fetchData = async (inputs, url, from, all) => {
 			}
 		});
 		apiReq.on('error', function(err) {
-			logger.error("Error occurred in " + url + from + query + ", Error Code : ERRNDAC, Error: %s", err);
+			logger.error("Error occurred in " + url + from + query + ", Error Code : ERRDAS, Error: %s", err);
 			rsv("fail");
 		});
 	}));

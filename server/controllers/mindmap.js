@@ -12,7 +12,7 @@ var crypto = require("crypto");
 var asynclib = require("async");
 var Client = require("node-rest-client").Client;
 var DOMParser = require('xmldom').DOMParser;
-var epurl = process.env.NDAC_URL;
+var epurl = process.env.DAS_URL;
 var client = new Client();
 
 /* Convert excel file to CSV Object. */
@@ -68,7 +68,7 @@ exports.populateScenarios = function (req, res) {
 		function (result, response) {
 			try {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in mindmap/getScenarios: getScenarios, Error Code : ERRNDAC");
+					logger.error("Error occurred in mindmap/getScenarios: getScenarios, Error Code : ERRDAS");
 					res.send("fail");
 				} else {
 					res.send(result.rows);
@@ -185,7 +185,7 @@ exports.reviewTask = function (req, res) {
 		client.post(epurl+"mindmap/manageTask", args,
 		function (result, response) {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				logger.error("Error occurred in mindmap/manageTask: updateTaskstatus_mindmaps, Error Code : ERRNDAC");
+				logger.error("Error occurred in mindmap/manageTask: updateTaskstatus_mindmaps, Error Code : ERRDAS");
 				res.send("fail");
 			} else {
 				res.send('inprogress');
@@ -532,11 +532,11 @@ exports.saveData = function (req, res) {
 					"Content-Type": "application/json"
 				}
 			}
-			logger.info("Calling NDAC Service from saveData : admin/createProject_ICE");
+			logger.info("Calling DAS Service from saveData : admin/createProject_ICE");
 			client.post(epurl+"mindmap/manageTask", args,
 				function (data_var, response) {
 					if (response.statusCode != 200 || data_var.rows == "fail") {
-						logger.error("Error occurred in mindmap/manageTask from saveData Error Code : ERRNDAC");
+						logger.error("Error occurred in mindmap/manageTask from saveData Error Code : ERRDAS");
 						res.send("fail");
 					} else {
 						var modid='fail'
@@ -710,7 +710,7 @@ exports.getScreens = function (req, res) {
 		function (result, response) {
 			try {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in mindmap/getScenarios: getScenarios, Error Code : ERRNDAC");
+					logger.error("Error occurred in mindmap/getScenarios: getScenarios, Error Code : ERRDAS");
 					res.send("fail");
 				} else {
 					res.send(result.rows);
@@ -1168,7 +1168,7 @@ exports.pdProcess = function (req, res) {
 				function (getScrapeDataQueryresult, response) {
 					try {
 						if (response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail") {
-							logger.error("Error occurred in create_ice/updateScreenname_ICE from fetchScrapedData Error Code : ERRNDAC");
+							logger.error("Error occurred in create_ice/updateScreenname_ICE from fetchScrapedData Error Code : ERRDAS");
 						} else {
 							console.log("screen saved successfully!");
 							if(getScrapeDataQueryresult.rows[0]['parent']!=undefined){
@@ -1203,7 +1203,7 @@ exports.pdProcess = function (req, res) {
 								function (getScrapeDataQueryresult, response) {
 									try {
 										if (response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail") {
-											logger.error("Error occurred in design/getScrapeDataScreenLevel_ICE from fetchScrapedData Error Code : ERRNDAC");
+											logger.error("Error occurred in design/getScrapeDataScreenLevel_ICE from fetchScrapedData Error Code : ERRDAS");
 										} else {
 											console.log("Testcase saved successfully!");
 											savedcallback();		

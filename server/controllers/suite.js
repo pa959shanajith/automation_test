@@ -252,7 +252,7 @@ const generateExecutionIds = async (execIds, tsuIds, userid) => {
 	return newExecIds;
 };
 
-/** Function responsible for inserting report into NDAC */
+/** Function responsible for inserting reports */
 const insertReport = async (executionid, scenarioId, browserType, userInfo, reportData) => {
 	const inputs = {
 		"executionid": executionid,

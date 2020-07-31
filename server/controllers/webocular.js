@@ -7,7 +7,7 @@ var async = require('async');
 var Client = require("node-rest-client").Client;
 var client = new Client();
 
-var epurl = process.env.NDAC_URL;
+var epurl = process.env.DAS_URL;
 exports.getCrawlResults = function (req, res) {
 	try {
 		logger.info("Inside UI service: getCrawlResults");
@@ -121,11 +121,11 @@ exports.saveResults = function (req, res) {
                 "Content-Type": "application/json"
 			}
         };
-		logger.info("Calling NDAC Service from saveResults: reports/getWebocularData_ICE");
+		logger.info("Calling DAS Service from saveResults: reports/getWebocularData_ICE");
 		client.post(epurl + "reports/getWebocularData_ICE", args,
 		function(result, response) {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				logger.error("Error occurred in reports/getWebocularData_ICE from saveResults Error Code : ERRNDAC");
+				logger.error("Error occurred in reports/getWebocularData_ICE from saveResults Error Code : ERRDAS");
 				res.send("fail");
 			} else {
 		res.send("success");
@@ -147,7 +147,7 @@ exports.getWebocularModule_ICE = function(req, res) {
         client.post(epurl + "reports/getWebocularData_ICE", args,
                 function(result1, response1) {
                     if (response1.statusCode != 200 || result1.rows == "fail") {
-                        logger.error("Error occurred in reports/getWebocularData_ICE: getAllModules from getAllSuites_ICE Error Code : ERRNDAC");
+                        logger.error("Error occurred in reports/getWebocularData_ICE: getAllModules from getAllSuites_ICE Error Code : ERRDAS");
                         res.send("fail");
                     } else {
                         res.send(result1);

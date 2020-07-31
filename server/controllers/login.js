@@ -79,26 +79,6 @@ exports.checkUserState = async (req, res) => {
 	}
 };
 
-// Check User login State - Avo Assure
-exports.checkUser = async (req, res) => {
-	const fnName = "checkUser";
-	try {
-		logger.info("Inside UI Service: " + fnName);
-		const inputs = 	{ "username": req.body.username };
-		const userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
-		let result = { "proceed": true };
-		if (userInfo == "fail") return res.send("fail");
-		else if (userInfo && userInfo.auth) {
-			const uType = userInfo.auth.type;
-			if (["saml","oidc"].indexOf(uType) > -1) result.redirect = "/login/" + uType;
-		}
-		return res.send(result);
-	} catch (exception) {
-		logger.error(exception.message);
-		res.send("fail");
-	}
-};
-
 //Load User Information - Avo Assure
 exports.loadUserInfo = async (req, res) => {
 	const fnName = "loadUserInfo";

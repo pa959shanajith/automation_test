@@ -36,7 +36,7 @@
 							<span class="input-group-addon ic-password fa {{showHideClass}}" style="color:#a0a0a0;font-size:20px" ng-click="showPassword()"> </span>
 						</div>
 						<span ng-show="loginValidation" class="absoluteError errorMessages">{{loginValidation}}</span>
-						<button ng-if="showLogin" ng-click="check_credentials('/plugin', $event)" type="submit" class="btn btn-block">Login</button>
+						<button ng-if="showLogin" ng-click="check_credentials('/plugin', $event)" type="submit" class="btn btn-block" ng-disabled="requested==true">Login</button>
 					</form>
 				</div>
 				<div class="wrap login-wrap" ng-if="restartForm==true">

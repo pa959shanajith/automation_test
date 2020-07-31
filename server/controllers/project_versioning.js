@@ -345,7 +345,7 @@ exports.createVersion=function(req,res){
 								}
 								if (!incompleteFlow) {
 									qObj.testsuiteDetails = [{ "testsuiteId": nData[rIndex].attrs.moduleID, "testsuiteId_c": null, "testsuiteName": nData[rIndex].attrs.moduleName, "task": nData[rIndex].attrs.task, "testscenarioDetails": tsList }];
-									//Passing the details of hierarchical structure of module and its children to NDAC service to create Structure in Cassandra
+									//Passing the details of hierarchical structure of module and its children to DAS service to create Structure in DB
 									logger.info("Calling createStructure node Service from versioning: project_versioning/versioning");
 									create_ice.createStructure(qObj, function (err, data) {
 										if (err){
