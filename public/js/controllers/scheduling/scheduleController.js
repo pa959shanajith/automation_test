@@ -299,7 +299,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 					suiteInfo.date = $(this).children('.scheduleSuite').find(".datePicContainer .fc-datePicker").val();
 					suiteInfo.time = $(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").val();
 					suiteInfo.targetUser = $(this).children('.scheduleSuite').find(".ipContainer .ipformating").children("option:selected").val()
-					if (suiteInfo.targetUser == "Select User") {  // Check if any user is selected for scheduling
+					if (suiteInfo.targetUser == "Select User" || suiteInfo.targetUser.trim() == '') {  // Check if any user is selected for scheduling
 						$(this).children('.scheduleSuite').find(".ipContainer .ipformating").prop("style", "border: 2px solid red;");
 						doNotSchedule = true;
 						return false;

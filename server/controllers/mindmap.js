@@ -1086,7 +1086,7 @@ exports.pdProcess = function (req, res) {
 				if(a['xpath']){
 					if(a['apptype']=="WEB"){
 						a['url']= encrypt(a['url'])
-						xpath_string=a['xpath'].split(';');
+						xpath_string=a['xpath'].split(';').concat(['null',a['tag']]);
 						left_part=encrypt(xpath_string.slice(0,2).join(';'));	// 0,1
 						right_part=encrypt(xpath_string.slice(3,).join(';'));	// 3,4...
 						a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part;	
