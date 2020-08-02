@@ -201,6 +201,18 @@ module.exports.tokenValidation = async (userInfo) => {
 	return userInfo;
 };
 
+// Fetch original requested url without proxy
+exports.originalURL = function(req) {
+	const app = req.app;
+	const trustProxy = (app && app.get && app.get('trust proxy'));
+	const proto = (req.headers['x-forwarded-proto'] || '').toLowerCase();
+	const tls = req.connection.encrypted || (trustProxy && 'https' == proto.split(/\s*,\s*/)[0]);
+	const host = (trustProxy && req.headers['x-forwarded-host']) || req.headers.host;
+	const protocol = tls ? 'https' : 'http';
+	const path = req.url || '';
+	return protocol + '://' + host + path;
+};
+
 /*module.exports.cache = {
 	get: function get(key, cb) {
 		redisServer.cache.get(key, function(err, data) {

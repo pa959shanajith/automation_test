@@ -153,17 +153,9 @@ if (cluster.isMaster) {
 		});
 
 		// For Selecting Authentication Strategy and adding required routes
-		var authParams = {
-			username: "avoassure_username",
-			route: {
-				login: "/login",
-				success: "/",
-				failure: "/error?e=403"
-			}
-		};
 		const utils = require("./server/lib/utils");
 		const authlib = require("./server/lib/auth");
-		const authconf = authlib(authParams);
+		const authconf = authlib();
 		const auth = authconf.auth;
 		app.use(authconf.router);
 

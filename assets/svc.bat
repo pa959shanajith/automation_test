@@ -8,42 +8,42 @@ IF ERRORLEVEL 1 CALL :DEFAULT_CASE # if service doesn't exist
 EXIT /B
 
 :QUERY_0
-  sc query nineteen68LS
+  sc query AvoAssureLS
   GOTO END_CASE
 :RESTART_0
-  sc stop nineteen68LS
+  sc stop AvoAssureLS
 :START_0
-  for /f "tokens=*" %%i in ('sc query nineteen68LS ^| FIND "STOPPED"') do SET SVC_STATUS=%%i
+  for /f "tokens=*" %%i in ('sc query AvoAssureLS ^| FIND "STOPPED"') do SET SVC_STATUS=%%i
   @if "%SVC_STATUS%"=="STATE              : 1  STOPPED " (
-    sc start nineteen68LS
+    sc start AvoAssureLS
     GOTO END_CASE
   ) else (
     @ping localhost -n 3 > nul
 	GOTO :START_0
   )
 :QUERY_1
-  sc query nineteen68NDAC
+  sc query AvoAssureDAS
   GOTO END_CASE
 :RESTART_1
-  sc stop nineteen68NDAC
+  sc stop AvoAssureDAS
 :START_1
-  for /f "tokens=*" %%i in ('sc query nineteen68NDAC ^| FIND "STOPPED"') do SET SVC_STATUS=%%i
+  for /f "tokens=*" %%i in ('sc query AvoAssureDAS ^| FIND "STOPPED"') do SET SVC_STATUS=%%i
   @if "%SVC_STATUS%"=="STATE              : 1  STOPPED " (
-    sc start nineteen68NDAC
+    sc start AvoAssureDAS
     GOTO END_CASE
   ) else (
     @ping localhost -n 3 > nul
 	GOTO :START_1
   )
 :QUERY_2
-  sc query nineteen68webserver.exe
+  sc query avoassurewebserver.exe
   GOTO END_CASE
 :RESTART_2
-  sc stop nineteen68webserver.exe
+  sc stop avoassurewebserver.exe
 :START_2
-  for /f "tokens=*" %%i in ('sc query nineteen68webserver.exe ^| FIND "STOPPED"') do SET SVC_STATUS=%%i
+  for /f "tokens=*" %%i in ('sc query avoassurewebserver.exe ^| FIND "STOPPED"') do SET SVC_STATUS=%%i
   @if "%SVC_STATUS%"=="STATE              : 1  STOPPED " (
-    sc start nineteen68webserver.exe
+    sc start avoassurewebserver.exe
     GOTO END_CASE
   ) else (
     @ping localhost -n 3 > nul
