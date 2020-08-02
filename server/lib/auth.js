@@ -1,248 +1,259 @@
 let authRouter = require("express").Router();
 let passport = require("passport");
+const bcrypt = require('bcryptjs');
 const activeDirectory = require('activedirectory');
 const LocalStrategy = require("passport-local").Strategy;
 const SamlStrategy = require("passport-saml").Strategy;
 const OpenIdClientStrategy = require('openid-client').Strategy;
 const OpenIdClientIssuer = require('openid-client').Issuer;
 const Negotiator = require('negotiator');
-const fs = require("fs");
-const Client = require("node-rest-client").Client;
-const client = new Client();
-const epurl = process.env.NDAC_URL;
 const logger = require("../../logger");
 const utils = require('./utils');
-const LOGIN_URL = "/login";
-const SAML_LOGIN_URL = LOGIN_URL + "/saml";
-const OIDC_LOGIN_URL = LOGIN_URL + "/oidc";
-var strategy = "inhouse"
-var callbackPath = "/login/callback";
+const strategies = []; // Store all registered strategies
+const options = {
+	route: {
+		login: "/login",
+		success: "/",
+		failure: "/error?e=403"
+	}
+};
 
-function authenticateLDAP(ldapdata, cb) {
-	logger.info("Inside authenticateLDAP function");
-	var args = {
-		data: { "name": ldapdata.server },
-		headers: { "Content-Type": "application/json" }
-	};
-	client.post(epurl + "admin/getLDAPConfig", args,
-		function (result, response) {
-		if (result.rows.length === 0) cb("empty");
-		else if (response.statusCode != 200 || result.rows == "fail") {
-			logger.error("Error occurred in admin/getLDAPConfig Error Code : ERRNDAC");
-			cb("fail");
-		} else {
-			result = result.rows;
-			var ad_config = {
-				url: result.url,
-				baseDN: result.basedn,
-			};
-			if (result.auth == "simple") {
-				ad_config.bindDN = result.binddn;
-				ad_config.bindCredentials = result.bindcredentials;
+
+const strategyUtil = {
+	"inhouse": async opts => {
+		const localStrategy = new LocalStrategy(async (username, password, done) => {
+			const fnName = "setupInhouseStrategy";
+			if (!(username && password)) return done(null, null, "invalid_username_password");
+			let flag = 'inValidCredential';
+			let userInfo = null;
+			let validAuth = false;
+			let inputs = { username };
+			const user = await utils.fetchData(inputs, "login/loadUser", fnName);
+			if (user == "fail") flag = "fail";
+			else if (!user) flag = "invalid_username_password";
+			const type = user.auth.type;
+			if (type != "ldap") {
+				const dbHashedPassword = user.auth.password;
+				try {
+					validAuth = bcrypt.compareSync(password, dbHashedPassword);
+				} catch (exception) {
+					logger.error("Error occurred in user authentication: " + exception.message.toString());
+					flag = "fail";
+				}
 			}
-			var ad = new activeDirectory(ad_config);
-			ad.authenticate(ldapdata.user, ldapdata.password, function (err, auth) {
-				if (err) {
-					logger.error("Error occurred in ldap authentication");
-					const errm = err.lde_message;
-					if (errm && ((errm.indexOf("DSID-0C0903A9") > -1) || (errm.indexOf("DSID-0C090400") > -1) || (errm.indexOf("DSID-0C090442") > -1)))
-						return cb("inValidCredential");
-					logger.debug("Error occurred in ldap authentication : " + JSON.stringify(err));
-					cb("fail");
-				}
-				else if (auth) cb("pass");
-				else cb("fail");
-			});
-		}
-	});
-}
-
-var strategyUtil = {
-	"inhouse": function inhouse(opts){
-		var async = require('async');
-		var bcrypt = require('bcryptjs');
-		var validator = require('validator');
-
-		var localStrategy = new LocalStrategy(function (username, password, done) {
-			var valid_username = validator.isLength(username, 1, 100);
-			var valid_password = validator.isLength(password, 1, 100);
-			if (!(valid_username && valid_password)) return done(null, null, "invalid_username_password");
-			var flag = 'inValidCredential';
-			var validUser = false;
-			var ldap_flag = false;
-			async.waterfall([
-				function authenticateUser(callback){
-					logger.info("Inside function authenticateUser");
-					var args = {
-						data: { "username": username },
-						headers: { "Content-Type": "application/json" }
+			// LDAP auth starts
+			else if (!user.auth.user) flag = "invalidUserConf";
+			else {
+				inputs = { name: user.auth.server };
+				const config = await utils.fetchData(inputs, "admin/getLDAPConfig", fnName);
+				if (config == "fail") flag  = "fail";
+				else if (config.length == 0) flag = "inValidLDAPServer";
+				else {
+					const adConfig = {
+						url: config.url,
+						baseDN: config.basedn,
 					};
-					logger.info("Calling NDAC Service : loadUser");
-					client.post(epurl + "login/loadUser", args, function (result, response) {
-						if (response.statusCode != 200 || result.rows == "fail") {
-							logger.error("Error occurred in loadUser Error Code : ERRNDAC");
-							callback('fail')
-						} else if (result.rows == null) return callback("invalid_username_password");
-						else if (result.rows.auth.server != undefined) {    // LDAP Authentication
-							var resp = result.rows.auth;
-							logger.info("Calling In-House Authentication");
-							resp.password = password;
-							authenticateLDAP(resp, function (ldapdata) {
-								if (ldapdata == "empty" || ldapdata == "fail") callback("inValidLDAPServer");
-								else if (ldapdata != "pass") callback(ldapdata);
-								else if (ldapdata == "pass") {
-									validUser = true;
-									ldap_flag = true;
-									callback(null);
-								}
-							});
-						} else {    // In-House Authentication
-							logger.info("Calling In-House Authentication");
-							try {
-								var dbHashedPassword = result.rows.auth.password;
-								validUser = bcrypt.compareSync(password, dbHashedPassword); // true
-								callback(null);
-							} catch (exception) {
-								logger.error(exception.message);
-								callback("fail");
-							}
-						}
-					});
+					if (config.auth == "simple") {
+						adConfig.bindDN = config.binddn;
+						adConfig.bindCredentials = config.bindcredentials;
+					}
+					const ad = new activeDirectory(adConfig);
+					const userdn = user.auth.user;
+					const authResult = await (new Promise((rsv, rej) => {
+						ad.authenticate(userdn, password, (err, auth) => {
+							if (err) {
+								const errm = err.lde_message;
+								if (errm && (errm.includes("DSID-0C0903A9") || errm.includes("DSID-0C090400") || errm.includes("DSID-0C090442")))
+									return rsv("inValidCredential");
+								logger.debug("Error occurred in ldap authentication : " + JSON.stringify(err));
+								rsv("fail");
+							} else if (auth) rsv("pass");
+							else rsv("inValidCredential"); // rsv("fail");
+						});
+					}));
+					if (authResult == "fail") flag = "inValidLDAPServer";
+					else if (authResult != "pass") flag = authResult;
+					else if (authResult == "pass") validAuth = true;
 				}
-			], function(err) {
-				if (err) flag = err;
-				if (!validUser) return done(null, null, flag);
-				else return done(null, {"username": username, "type": (ldap_flag)?"ldap":"inhouse"}, "validCredential");
-			});
+			}
+			if (validAuth) {
+				flag = "validCredential";
+				userInfo = { username, type };
+			}
+			return done(null, userInfo, flag);
 		});
-		passport.use('local', localStrategy);
-		passport.isReady = true;
-		return passport;
+		return localStrategy;
 	},
-	"oidc": function openid_connect(opts){
-		var userAgent = OpenIdClientIssuer.defaultHttpOptions.headers['User-Agent'];
+	"oidc": async opts => {
+		let userAgent = OpenIdClientIssuer.defaultHttpOptions.headers['User-Agent'];
 		userAgent = (userAgent && typeof userAgent === 'string')? userAgent.split(' ')[0]:'';
 		userAgent = "Avo Assure Webserver "+userAgent+" node/"+process.versions.node;
 		OpenIdClientIssuer.defaultHttpOptions.headers['User-Agent'] = userAgent;
 		OpenIdClientIssuer.defaultHttpOptions.timeout = 10000;
-		var issuer = config.identitityProviderURL;
+		let issuerUri = opts.url;
+		if (!issuerUri.includes('/.well-known/')) {
+			if (issuerUri.endsWith('/')) issuerUri = issuerUri.slice(0,-1);
+			issuerUri += "/.well-known/openid-configuration";
+		}
 		//process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-		OpenIdClientIssuer.discover(issuer).then(function(iss) {
-			var client = new iss.Client({
-				client_id: config.clientId,
-				client_secret: config.clientSecret,
-				redirect_uris: [ config.redirectURI ]
-			});
-			client.CLOCK_TOLERANCE = 120;
-			return client;
-		}).then(function(client){
-			var oidcStrategy = new OpenIdClientStrategy({
-				params: {
-					scope: "openid profile email"
-				},
-				sessionKey: "oidc:"+issuer,
-				client: client
-			}, function(tokenSet, userinfo, done) {
-				if (tokenSet && userinfo && userinfo[opts.username]) {
-					userinfo.username = userinfo[opts.username];
-					return done(null, userinfo);
-				}
-				else return done(null, false, "invalid_username_password");
-			});
-
-			passport.use("oidc", oidcStrategy);
-			passport.isReady = true;
-			if (passport.onReadyCallback) passport.onReadyCallback.apply(this);
-		}).catch(function(err){
-			logger.error(err);
-			//throw "Invalid values in SSO configuration. Please provide valid values in config.json file";
-			logger.error("Invalid values in SSO configuration. Please provide valid values in config.json file");
+		const issuer = await OpenIdClientIssuer.discover(issuerUri);
+		const oidcClient = new issuer.Client({
+			client_id: opts.clientid,
+			client_secret: opts.secret,
+			redirect_uris: [ opts.hostUri + opts.callbackPath ]
 		});
-		return passport;
+		oidcClient.CLOCK_TOLERANCE = 120;
+		const oidcStrategy = new OpenIdClientStrategy({
+			params: { scope: "openid profile email" },
+			sessionKey: "oidc:"+issuerUri,
+			client: oidcClient
+		}, (tokenSet, userinfo, done) => {
+			if (tokenSet && userinfo && userinfo.preferred_username) {
+				userinfo.username = userinfo.preferred_username;
+				userinfo.type = "oidc";
+				return done(null, userinfo);
+			}
+			else return done(null, null, "nouserprofile");
+		});
+		return oidcStrategy;
 	},
-	"saml": function saml_2(opts){
-		var BEGIN_CERT = "-----BEGIN CERTIFICATE-----\n";
-		var END_CERT = "-----END CERTIFICATE-----\n";
-		config.cert=fs.readFileSync(config.cert, 'utf-8').replace(BEGIN_CERT,'').replace(END_CERT,'');
-		var samlStrategy = new SamlStrategy({
-			issuer: config.issuer || "Avo Assure Webserver",
-			callbackUrl: config.redirectURI,
-			entryPoint: config.acsURL,
-			cert: config.cert, //privateCert, decryptionPvk,
+	"saml": async opts => {
+		const BEGIN_CERT = "-----BEGIN CERTIFICATE-----\n";
+		const END_CERT = "-----END CERTIFICATE-----\n";
+		opts.cert = opts.cert.replace(BEGIN_CERT,'').replace(END_CERT,'').replace('\r','');
+		const samlStrategy = new SamlStrategy({
+			issuer: opts.idp || "Avo Assure Webserver",
+			callbackUrl: opts.callbackPath,
+			entryPoint: opts.url,
+			cert: opts.cert, //privateCert, decryptionPvk,
 			acceptedClockSkewMs: 120
-		}, function (profile, done) {
-			if (profile && profile[opts.username]) {
-				profile.username = profile[opts.username];
+		}, (profile, done) => {
+			if (profile && profile.nameID) {
+				profile.username = profile.nameID;
+				profile.type = "saml";
 				return done(null, profile);
 			}
-			else return done(null, null, "invalid_username_password");
+			else return done(null, null, "nouserprofile");
 		});
-		passport.use("saml", samlStrategy);
-		passport.isReady = true;
-		return passport;
+		return samlStrategy;
 	}
 };
 
 var routeUtil = {
-	"inhouse": function inhouse(opts){
+	"inhouse": async opts => {
 		authRouter.get(opts.route.login, async (req, res) => {
 			if (req.session.uniqueId) await utils.cloneSession(req);
 			return res.sendFile("app.html", { root: __dirname + "/../../public/" });
 		});
-		authRouter.post(opts.route.login, function (req, res, next){
+		authRouter.post(opts.route.login, (req, res, next) => {
 			logger.info("Inside UI service: login");
 			// Credentials for service user that can restart services
 			if (req.body.username == "restartservice" && req.body.password == "r3Start@3") return res.send("restart");
-			return passport.authenticate("local", {
+			return passport.authenticate("inhouse", {
 				successRedirect: opts.route.success, failureRedirect: opts.route.failure, failureMessage: true
-			}, function(err, user, info){
+			}, (err, user, info) => {
 				if (!user || req.body.query == "api") res.send(info);
-				else req.logIn(user, function(err) {
+				else req.logIn(user, err => {
 					if (err) return next(err);
 					return res.send(info);
 				});
 			})(req, res, next);
 		});
-		return authRouter;
 	},
-	"oidc": function openid_connect(opts){
-		var callbackHandler = passport.authenticate("oidc", {
+	"oidc": async opts => {
+		var callbackHandler = passport.authenticate(opts.strategy, {
 			successRedirect: opts.route.success, failureRedirect: opts.route.failure, failureMessage: true
 		});
 		authRouter.use(opts.route.login, callbackHandler);
-		authRouter.use(callbackPath, callbackHandler);
-		return authRouter;
+		authRouter.use(opts.callbackPath, callbackHandler);
 	},
-	"saml": function saml_2(opts){
-		var callbackHandler = passport.authenticate("saml", {
+	"saml": async opts => {
+		var callbackHandler = passport.authenticate(opts.strategy, {
 			successRedirect: opts.route.success, failureRedirect: opts.route.failure, failureMessage: true
 		});
 		authRouter.get(opts.route.login, callbackHandler);
-		authRouter.post(callbackPath, callbackHandler);
-		return authRouter;
+		authRouter.post(opts.callbackPath, callbackHandler);
 	}
 };
 
-module.exports = function auth(options){
-	passport.serializeUser(function(user, done) {done(null, user);});
-	passport.protect = function protect(req, res, next) {
+module.exports = () => {
+	passport.serializeUser((user, done) => done(null, user));
+	passport.protect = (req, res, next) => {
 		if (req.isAuthenticated && req.isAuthenticated()) return next();
 		var negotiator = new Negotiator(req);
 		if (negotiator.mediaType() === 'text/html') return res.redirect(options.route.login);
 		else return res.send("Invalid Session");
 	};
-	passport.deserializeUser(function(user, done) {done(null, user);});
-	passport = strategyUtil[strategy](options);
+	passport.deserializeUser((user, done) => done(null, user));
 	authRouter.use(passport.initialize({ userProperty: "user" }));
 	authRouter.use(passport.session());
-	authRouter = routeUtil[strategy](options);
-	authRouter.use(function(err, req, res, next){
-		res.status(401);
-		next(err);
-	});
+	// Initialize inhouse & ldap login method
+	const ih = "inhouse";
+	strategyUtil[ih](options).then(ihStrategy => passport.use(ih, ihStrategy), err => {});
+	routeUtil[ih](options);
 	return {
-		strategy: strategy,
-		util: passport,
+		auth: passport,
 		router: authRouter
 	};
+};
+
+const registerAuthStrategy = async (opts) => {
+	const fnName = "registerAuthStrategy";
+	const strategyName = opts.strategy;
+	const name = opts.name;
+	const strategyType = opts.type;
+	logger.info("Inside " + fnName + " for " + strategyName);
+	const inputs = { name };
+	const config = await utils.fetchData(inputs, "admin/get"+strategyType.toUpperCase()+"Config", fnName);
+	if (config == "fail") return "fail";
+	else if (config.length == 0) return "invalid";
+	Object.assign(config, opts);
+	try {
+		const strategy = await strategyUtil[strategyType](config);
+		passport.use(strategyName, strategy);
+		routeUtil[strategyType](config);
+		strategies.push(strategyName);
+	} catch (e) {
+		logger.error("Error while setting up "+strategyType+" authentication server '"+name+"'. Error Stacktrace: " + err.toString());
+		return "invalid";
+	}
+};
+
+// Check User login State
+module.exports.checkUser = async (req, res) => {
+	const fnName = "checkUser";
+	try {
+		logger.info("Inside UI Service: " + fnName);
+		const inputs = 	{ "username": req.body.username };
+		const userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
+		let result = { "proceed": true };
+		if (userInfo == "fail") return res.send("fail");
+		else if (userInfo && userInfo.auth) {
+			const uType = userInfo.auth.type;
+			const serverName = userInfo.auth.server || '';
+			const strategyName = uType + '/' + serverName;
+			if (uType != "inhouse" && serverName.length === 0) result = "invalidServerConf";
+			else if (["saml","oidc"].includes(uType)) {
+				result.redirect = "/login/" + strategyName;
+				if (!strategies.includes(strategyName)) {
+					const config = {
+						type: uType,
+						name: serverName,
+						strategy: strategyName,
+						callbackPath: "/login/callback/" + strategyName,
+						route: Object.assign({}, options.route),
+						hostUri: utils.originalURL(req).replace('/checkUser', '')
+					};
+					config.route.login = result.redirect;
+					const status = await registerAuthStrategy(config);
+					if (status == "fail") result = "fail";
+					else if (status == "invalid") result = "invalidServerConf";
+				}
+			}
+		}
+		return res.send(result);
+	} catch (exception) {
+		logger.error(exception.message);
+		res.send("fail");
+	}
 };

@@ -3,7 +3,7 @@ var logger = require('../../logger');
 var utils = require('../lib/utils');
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var epurl = process.env.NDAC_URL;
+var epurl = process.env.DAS_URL;
 
 exports.updateTaskstatus_mindmaps = function (req, res) {
 	logger.info("Inside UI service: updateTaskstatus_mindmaps");
@@ -26,7 +26,7 @@ exports.updateTaskstatus_mindmaps = function (req, res) {
 			client.post(epurl+"mindmap/manageTask", args,
 			function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in mindmap/manageTask: updateTaskstatus_mindmaps, Error Code : ERRNDAC");
+					logger.error("Error occurred in mindmap/manageTask: updateTaskstatus_mindmaps, Error Code : ERRDAS");
 					res.send("fail");
 				} else {
 					res.send('inprogress');
@@ -99,7 +99,7 @@ exports.getTaskJson_mindmaps = function (req, res) {
 			function (result, response) {
 				try {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in plugins/getModules: getTasksJSON, Error Code : ERRNDAC");
+						logger.error("Error occurred in plugins/getModules: getTasksJSON, Error Code : ERRDAS");
 						res.send("fail");
 					} else {
 							taskJSON=next_function(result.rows,prjId);

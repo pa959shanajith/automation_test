@@ -6,7 +6,7 @@ var async = require('async');
 var parse = require('xml-parser');
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var epurl = process.env.NDAC_URL;
+var epurl = process.env.DAS_URL;
 var logger = require('../../logger');
 //xpath for view
 var allXpaths = [];
@@ -183,12 +183,12 @@ function fetchScrapedData(inputs, fetchScrapedDatacallback) {
 				"Content-Type": "application/json"
 			}
 		};
-		logger.info("Calling NDAC Service from fetchScrapedData: design/getScrapeDataScreenLevel_ICE");
+		logger.info("Calling DAS Service from fetchScrapedData: design/getScrapeDataScreenLevel_ICE");
 		client.post(epurl + "design/getScrapeDataScreenLevel_ICE", args,
 			function (getScrapeDataQueryresult, response) {
 				try {
 					if (response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail") {
-						logger.error("Error occurred in design/getScrapeDataScreenLevel_ICE from fetchScrapedData Error Code : ERRNDAC");
+						logger.error("Error occurred in design/getScrapeDataScreenLevel_ICE from fetchScrapedData Error Code : ERRDAS");
 						fetchScrapedDatacallback("getScrapeData Fail", null);
 					} else {
 						responsedata = JSON.stringify(getScrapeDataQueryresult.rows)
@@ -487,13 +487,13 @@ exports.updateScreen_ICE = function (req, res) {
 								"Content-Type": "application/json"
 							}
 						};
-						logger.info("Calling NDAC Service from finalFunction: design/updateScreen_ICE");
+						logger.info("Calling DAS Service from finalFunction: design/updateScreen_ICE");
 						client.post(epurl + "design/updateScreen_ICE", args,
 							function (result, response) {
 							try {
 								if (response.statusCode != 200 || result.rows == "fail") {
 									statusFlag = "Error occurred in updateScreenData : Fail";
-									logger.error("Error occurred in design/updateScreen_ICE from finalFunction Error Code : ERRNDAC");
+									logger.error("Error occurred in design/updateScreen_ICE from finalFunction Error Code : ERRDAS");
 									try {
 										res.send(statusFlag);
 									} catch (exception) {
@@ -720,7 +720,7 @@ exports.updateIrisDataset = function updateIrisDataset(req, res) {
 											"Content-Type": "application/json"
 										}
 									};
-									logger.info("Calling NDAC Service from updateIrisDataset: design/updateIrisObjectType");
+									logger.info("Calling DAS Service from updateIrisDataset: design/updateIrisObjectType");
 									client.post(epurl + "design/updateIrisObjectType", args,
 										function (result, response) {
 										try {

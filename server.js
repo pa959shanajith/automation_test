@@ -16,8 +16,8 @@ try {
 // Module Dependencies
 var cluster = require('cluster');
 var expressWinston = require('express-winston');
-var epurl = "http://" + (process.env.NDAC_IP || "127.0.0.1") + ":" + (process.env.NDAC_PORT || "1990") + "/";
-process.env.NDAC_URL = epurl;
+var epurl = "http://" + (process.env.DAS_IP || "127.0.0.1") + ":" + (process.env.DAS_PORT || "1990") + "/";
+process.env.DAS_URL = epurl;
 var logger = require('./logger');
 var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 
@@ -153,20 +153,11 @@ if (cluster.isMaster) {
 		});
 
 		// For Selecting Authentication Strategy and adding required routes
-		var authParams = {
-			username: "avoassure_username",
-			route: {
-				login: "/login",
-				success: "/",
-				failure: "/error?e=403"
-			}
-		};
 		const utils = require("./server/lib/utils");
 		const authlib = require("./server/lib/auth");
-		var auth = authlib(authParams);
-		//var authStrategy = auth.strategy;
-		app.use(auth.router);
-		auth = auth.util;
+		const authconf = authlib();
+		const auth = authconf.auth;
+		app.use(authconf.router);
 
 		//Based on NGINX Config Security Headers are configured
 		if (!nginxEnabled) {
@@ -199,7 +190,7 @@ if (cluster.isMaster) {
 		app.post('/restartService', function(req, res) {
 			logger.info("Inside UI Service: restartService");
 			var childProcess = require("child_process");
-			var serverList = ["License Server", "NDAC Server", "Web Server"];
+			var serverList = ["License Server", "DAS Server", "Web Server"];
 			var svcNA = "service does not exist";
 			var svcRun = "RUNNING";
 			var svcRunPending = "START_PENDING";
@@ -500,8 +491,7 @@ if (cluster.isMaster) {
 		app.post('/exportToExcel', mindmap.exportToExcel);
 		app.post('/pdProcess', auth.protect, mindmap.pdProcess);	// process discovery service
 		//Login Routes
-		//app.post('/authenticateUser', login.authenticateUser);
-		app.post('/checkUser', login.checkUser);
+		app.post('/checkUser', authlib.checkUser);
 		app.post('/checkUserState', login.checkUserState);
 		app.post('/loadUserInfo', auth.protect, login.loadUserInfo);
 		app.post('/getRoleNameByRoleId', auth.protect, login.getRoleNameByRoleId);
@@ -633,37 +623,29 @@ if (cluster.isMaster) {
 
 		//-------------SERVER START------------//
 		var hostFamilyType = (nginxEnabled) ? '127.0.0.1' : '0.0.0.0';
-		var initServer = function initServer(httpsServer, suite, logger, epurl, apiclient) {
-			httpsServer.listen(serverPort, hostFamilyType); //Https Server
-			try {
-				var apireq = apiclient.post(epurl + "server", function(data, response) {
-					try {
-						if (response.statusCode != 200) {
-							httpsServer.close();
-							logger.error("Please run the Service API and Restart the Server");
-						} else {
-							suite.reScheduleTestsuite();
-							console.info("Avo Assure Server Ready...\n");
-						}
-					} catch (exception) {
+		httpsServer.listen(serverPort, hostFamilyType); //Https Server
+		try {
+			var apireq = apiclient.post(epurl + "server", function(data, response) {
+				try {
+					if (response.statusCode != 200) {
 						httpsServer.close();
 						logger.error("Please run the Service API and Restart the Server");
+					} else {
+						suite.reScheduleTestsuite();
+						console.info("Avo Assure Server Ready...\n");
 					}
-				});
-				apireq.on('error', function(err) {
+				} catch (exception) {
 					httpsServer.close();
 					logger.error("Please run the Service API and Restart the Server");
-				});
-			} catch (exception) {
+				}
+			});
+			apireq.on('error', function(err) {
 				httpsServer.close();
-				logger.error("Please run the Service API");
-			}
-		};
-		if (auth.isReady) initServer(httpsServer, suite, logger, epurl, apiclient);
-		else {
-			auth.onReadyCallback = function() {
-				initServer(httpsServer, suite, logger, epurl, apiclient);
-			};
+				logger.error("Please run the Service API and Restart the Server");
+			});
+		} catch (exception) {
+			httpsServer.close();
+			logger.error("Please run the Service API");
 		}
 		//-------------SERVER END------------//
 	} catch (e) {

@@ -8,11 +8,11 @@ These instructions will help setting up the project and running on a local machi
 
 ### Prerequisites
 
-* Clone and Run [Cassandra](https://10.41.31.131/nineteen68v2.0/db) DB
-* Clone and Run [Redis](ssh://slklocal@10.41.31.52:/home/slklocal/Nineteen68BnR/redis.git) DB
+* Clone and Run [AvoAssureDB](https://10.41.31.131/nineteen68v2.0/db) DB
+* Clone and Run [CacheDB](ssh://slklocal@10.41.31.52:/home/slklocal/Nineteen68BnR/redis.git) DB
 * Clone and Run [Mindmaps](https://10.41.31.131/nineteen68v2.0/Mindmap_DB) DB(Neo4j)
 * Clone and Run [LicenseServer](https://10.41.31.131/nineteen68v2.0/licenseserver) API
-* Clone and Run [NDAC](https://10.41.31.131/nineteen68v2.0/ndac) API
+* Clone and Run [DAS](https://10.41.31.131/nineteen68v2.0/ndac) API
 
 
 ### Setup
@@ -25,7 +25,7 @@ These instructions will help setting up the project and running on a local machi
     * ```mac```: Shared location corresponding to mac systems
 * Open the `.env` file present in the source folder.
 * Update the value of `ENV` variable to `DEV` / `TEST` / `PROD` accrodingly.
-* Update the `NDAC_IP` and `REDIS_IP` variables with the `IPs` on which NDAC and redis are running.
+* Update the `DAS_IP` and `CACHEDB_IP` variables with the `IPs` on which DAS and CacheDB are running.
 * To start the server:
     * **In Normal Mode:** ```npm start```
     * **In Windows Service Mode:** ***(name of the service: avoassure_web_server)***

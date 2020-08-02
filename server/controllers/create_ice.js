@@ -5,7 +5,7 @@ var async = require('async');
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var logger = require('../../logger');
-var epurl = process.env.NDAC_URL;
+var epurl = process.env.DAS_URL;
 
 //Create Structure
 exports.saveMindmap = function(req,res) {
@@ -28,7 +28,7 @@ exports.saveMindmap = function(req,res) {
 	client.post(epurl+"create_ice/saveMindmap", args,
 		function (result, response) {
 		if (response.statusCode != 200 || result.rows == "fail") {
-			logger.error("Error occurred in create_ice/saveMindmap: saveMindmap, Error Code : ERRNDAC");
+			logger.error("Error occurred in create_ice/saveMindmap: saveMindmap, Error Code : ERRDAS");
 			res(null, result);
 		} else if (result.rows == "reuseerror") {
 			result.rows = "fail";
@@ -65,7 +65,7 @@ exports.saveMindmapE2E = function(req,res) {
 	client.post(epurl+"create_ice/saveMindmapE2E", args,
 		function (result, response) {
 		if (response.statusCode != 200 || result.rows == "fail") {
-			logger.error("Error occurred in create_ice/saveMindmapE2E: saveMindmapE2E, Error Code : ERRNDAC");
+			logger.error("Error occurred in create_ice/saveMindmapE2E: saveMindmapE2E, Error Code : ERRDAS");
 			res(null, result);
 		} else {
 			projectdetails=result.rows;
@@ -99,11 +99,11 @@ exports.getProjectIDs = function (req, res) {
 	};
 	async.series({
 		function (callback) {
-			logger.info("Calling NDAC Service from getProjectIDs: create_ice/getProjectIDs");
+			logger.info("Calling DAS Service from getProjectIDs: create_ice/getProjectIDs");
 			client.post(epurl+"create_ice/getProjectIDs", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in create_ice/getProjectIDs: getProjectIDs, Error Code : ERRNDAC");
+					logger.error("Error occurred in create_ice/getProjectIDs: getProjectIDs, Error Code : ERRDAS");
 					res(null, result.rows);
 				} else {
 					projectdetails=result.rows;
@@ -137,12 +137,12 @@ exports.getProjectType = function (req, res) {
 			"Content-Type": "application/json"
 		}
 	};
-	logger.info("Calling NDAC Service from getProjectType: create_ice/getProjectType");
+	logger.info("Calling DAS Service from getProjectType: create_ice/getProjectType");
 	client.post(epurl+"create_ice/getProjectType", args,
 		function (result, response) {
 		try {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				logger.error("Error occurred in create_ice/getProjectType: getProjectType, Error Code : ERRNDAC");
+				logger.error("Error occurred in create_ice/getProjectType: getProjectType, Error Code : ERRDAS");
 				res(null, result.rows);
 			} else {
 				if (result.rows.length != 0) {
@@ -179,12 +179,12 @@ exports.submitTask = function (req, res) {
 			"Content-Type": "application/json"
 		}
 	};
-	logger.info("Calling NDAC Service from submitTask: create_ice/submitTask");
+	logger.info("Calling DAS Service from submitTask: create_ice/submitTask");
 	client.post(epurl+"create_ice/submitTask", args,
 		function (result, response) {
 			try {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in create_ice/submitTask: submitTask, Error Code : ERRNDAC");
+					logger.error("Error occurred in create_ice/submitTask: submitTask, Error Code : ERRDAS");
 					res(null, result.rows);
 				} else {
 					logger.info("Task submitted successfully");

@@ -8,7 +8,7 @@ const bcrypt = require('bcryptjs');
  * @see : function to check whether projects are assigned for user
  * @author : vinay
  */
-const checkAssignedProjects = async username => {
+const checkAssignedProjects = async (username, usertype) => {
 	const fnName = "checkAssignedProjects";
 	logger.info("Inside " + fnName + " function");
 	let assignedProjects = false;
@@ -16,7 +16,11 @@ const checkAssignedProjects = async username => {
 	let inputs = { username };
 	const userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
 	if (userInfo == "fail") return ['fail'];
-	else if (userInfo.length === 0) return ["invalid_username_password"];
+	else if (!userInfo) {
+		let flag = "invalid_username_password";
+		if (["saml","oidc"].includes(usertype)) flag = "nouser";
+		return [flag];
+	}
 	const userid = userInfo._id;
 	const roleid = userInfo.defaultrole;
 	if (userInfo.projects != null) assignedProjects = userInfo.projects.length !== 0;
@@ -40,7 +44,7 @@ exports.checkUserState = async (req, res) => {
 			let emsg = req.session.emsg || "ok";
 			if (emsg == "ok") {
 				const username = sess.username;
-				const data = await checkAssignedProjects(username);
+				const data = await checkAssignedProjects(username, sess.usertype);
 				const err = data[0];
 				if(err) {
 					logger.error("Error occurred in checkUserState. Cause: "+ err);
@@ -75,26 +79,6 @@ exports.checkUserState = async (req, res) => {
 	} catch (exception) {
 		logger.error(exception.message);
 		req.clearSession();
-		res.send("fail");
-	}
-};
-
-// Check User login State - Avo Assure
-exports.checkUser = async (req, res) => {
-	const fnName = "checkUser";
-	try {
-		logger.info("Inside UI Service: " + fnName);
-		const inputs = 	{ "username": req.body.username };
-		const userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
-		let result = { "proceed": true };
-		if (userInfo == "fail") return res.send("fail");
-		else if (userInfo && userInfo.auth) {
-			const uType = userInfo.auth.type;
-			if (["saml","oidc"].indexOf(uType) > -1) result.redirect = "/login/" + uType;
-		}
-		return res.send(result);
-	} catch (exception) {
-		logger.error(exception.message);
 		res.send("fail");
 	}
 };

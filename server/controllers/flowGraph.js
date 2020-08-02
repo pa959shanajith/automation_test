@@ -3,7 +3,7 @@ var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var epurl = process.env.NDAC_URL;
+var epurl = process.env.DAS_URL;
 var utils = require('../lib/utils');
 
 function isSessionActive(req){
@@ -149,7 +149,7 @@ exports.APG_createAPGProject = function(req,res){
 						"Content-Type": "application/json"
 					}
 				};
-				logger.info("Calling NDAC Service from APG_createAPGProject: /apg/createAPGProject");
+				logger.info("Calling DAS Service from APG_createAPGProject: /apg/createAPGProject");
 				client.post(epurl+"apg/createAPGProject", args,
 				function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {

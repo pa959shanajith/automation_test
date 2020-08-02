@@ -4,8 +4,9 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 	$scope.ud = {};
 	$scope.inputType = 'password';
 	$scope.showLogin = false;
+	$scope.requested = false;
     $scope.showHideClass = 'fa-eye';
-	$scope.serverList = [{"name": "License Server", "active": false}, {"name": "NDAC Server", "active": false}, {"name": "Web Server", "active": false}];
+	$scope.serverList = [{"name": "License Server", "active": false}, {"name": "DAS Server", "active": false}, {"name": "Web Server", "active": false}];
 	$scope.restartForm = false;
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear();
 
@@ -24,6 +25,7 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 	};
 
 	$scope.checkUser = function() {
+		if ($scope.requested) return false;
 		const err = "Failed to Login.";
 		$scope.loginValidation = "";
 		$(".ic-username").parent().removeClass("input-border-error");
@@ -35,20 +37,22 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 			cfpLoadingBar.complete();
 			return false;
 		}
+		$scope.requested = true;
 		LoginService.checkUser($scope.ud.userName).then(function (data) {
 			cfpLoadingBar.complete();
+			$scope.requested = false;
 			if (data.redirect) {
 				window.location.href = data.redirect;
 			} else if (data.proceed) {
 				$scope.showLogin = true;
 				//$("#userName").attr("disabled",true);
-			} else {
-				$scope.loginValidation = err;
-			}
+			} else if (data == "invalidServerConf") $scope.loginValidation = "Authentication Server Configuration is invalid!";
+			else $scope.loginValidation = err;
 		}, function (error) {
 			console.log(err);
 			$scope.loginValidation = err;
 			cfpLoadingBar.complete();
+			$scope.requested = false;
 		});
 	}
 
@@ -71,9 +75,11 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 		} else {
 			var username = $scope.ud.userName.toLowerCase();
 			var password = $scope.ud.password;
+			$scope.requested = true;
 			LoginService.authenticateUser(username, password)
 			.then(function (data) {
 				cfpLoadingBar.complete();
+				$scope.requested = false;
 				if (data == "restart") {
 					blockUI("Fetching active services...");
 					adminServices.restartService("query")
@@ -101,17 +107,15 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 					$(".ic-password").children().attr("src", "imgs/ic-password-error.png");
 					$(".ic-password").parent().addClass("input-border-error");
 					$scope.loginValidation = "The username or password you entered isn't correct. Please try again.";
-				} else if (data == "userLogged") {
-					$scope.loginValidation = "User is already logged in! Please logout from the previous session.";
-				} else if (data == "inValidLDAPServer") {
-					$scope.loginValidation = "LDAP Server Configuration is invalid!";
-				} else {
-					$scope.loginValidation = "Failed to Login.";
-				}
+				} else if (data == "userLogged") $scope.loginValidation = "User is already logged in! Please logout from the previous session.";
+				else if (data == "inValidLDAPServer") $scope.loginValidation = "LDAP Server Configuration is invalid!";
+				else if (data == "invalidUserConf") $scope.loginValidation = "User-LDAP mapping is incorrect!";
+				else $scope.loginValidation = "Failed to Login.";
 			}, function (error) {
 				console.log("Failed to Authenticate User.");
 				$scope.loginValidation = "Failed to Authenticate User.";
 				cfpLoadingBar.complete();
+				$scope.requested = false;
 			});
 		}
 	};

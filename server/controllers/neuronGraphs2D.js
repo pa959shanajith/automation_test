@@ -1,7 +1,7 @@
 var logger = require('../../logger');
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var epurl = process.env.NDAC_URL;
+var epurl = process.env.DAS_URL;
 var utils = require('../lib/utils');
 
 exports.getGraphData = function(req, res){

@@ -25,6 +25,8 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 			if (data == "fail") emsg = "Failed to load user profile.";
 			else if (data == "unauthorized") emsg = "User is not authorized to use Avo Assure.";
 			else if (data == "badrequest") emsg = "User does not have sufficient permission to view this page.";
+			else if (data == "nouser") emsg = "User profile not found in Avo Assure.";
+			else if (data == "nouserprofile") emsg = "User profile not found in Authorization Server.";
 			else if (data == "userLogged") emsg = "User is already logged in! Please logout from the previous session.";
 			else if (data == "inValidCredential" || data == "invalid_username_password") emsg = "The username or password you entered isn't correct. Please try again.";
 			else if (data == "noProjectsAssigned") emsg = "To Login, user must be allocated to a Domain and Project. Please contact Admin.";

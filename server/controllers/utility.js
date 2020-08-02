@@ -3,7 +3,7 @@ var myserver = require('../../server');
 // var PythonShell = require('python-shell');
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var epurl = process.env.NDAC_URL;
+var epurl = process.env.DAS_URL;
 var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 var validator =  require('validator');
 var logger = require('../../logger');
@@ -68,12 +68,12 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 							headers:{'Content-Type': 'plain/text'}
 						};
 						// PythonShell.run("AES_encryption.py", options, function (err, results) {
-							logger.info("Calling NDAC Service : utility/encrypt_ICE/aes");
+							logger.info("Calling DAS Service : utility/encrypt_ICE/aes");
 						client.post(epurl+"utility/encrypt_ICE/aes",args,
 							function (results, response) {
 							// if (err){
 								if(response.statusCode != 200){
-								logger.error("Error occurred in encrypt_ICE Error Code : ERRNDAC");
+								logger.error("Error occurred in encrypt_ICE Error Code : ERRDAS");
 								res.send("fail");
 							}else{
 									// results is an array consisting of messages collected during execution

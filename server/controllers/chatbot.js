@@ -1,7 +1,7 @@
 // var PythonShell = require('python-shell');
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var epurl = process.env.NDAC_URL;
+var epurl = process.env.DAS_URL;
 var utils = require('../lib/utils');
 
 exports.getTopMatches_ProfJ = function getTopMatches(req, res) {
