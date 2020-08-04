@@ -30,55 +30,57 @@ const strategyUtil = {
 			let inputs = { username };
 			const user = await utils.fetchData(inputs, "login/loadUser", fnName);
 			if (user == "fail") flag = "fail";
-			else if (!user) flag = "invalid_username_password";
-			const type = user.auth.type;
-			if (type != "ldap") {
-				const dbHashedPassword = user.auth.password;
-				try {
-					validAuth = bcrypt.compareSync(password, dbHashedPassword);
-				} catch (exception) {
-					logger.error("Error occurred in user authentication: " + exception.message.toString());
-					flag = "fail";
-				}
-			}
-			// LDAP auth starts
-			else if (!user.auth.user) flag = "invalidUserConf";
+			else if (!user || !user.auth) flag = "invalid_username_password";
 			else {
-				inputs = { name: user.auth.server };
-				const config = await utils.fetchData(inputs, "admin/getLDAPConfig", fnName);
-				if (config == "fail") flag  = "fail";
-				else if (config.length == 0) flag = "inValidLDAPServer";
-				else {
-					const adConfig = {
-						url: config.url,
-						baseDN: config.basedn,
-					};
-					if (config.auth == "simple") {
-						adConfig.bindDN = config.binddn;
-						adConfig.bindCredentials = config.bindcredentials;
+				const type = user.auth.type;
+				if (type != "ldap") {
+					const dbHashedPassword = user.auth.password;
+					try {
+						validAuth = bcrypt.compareSync(password, dbHashedPassword);
+					} catch (exception) {
+						logger.error("Error occurred in user authentication: " + exception.message.toString());
+						flag = "fail";
 					}
-					const ad = new activeDirectory(adConfig);
-					const userdn = user.auth.user;
-					const authResult = await (new Promise((rsv, rej) => {
-						ad.authenticate(userdn, password, (err, auth) => {
-							if (err) {
-								const errm = err.lde_message;
-								if (errm && (errm.includes("DSID-0C0903A9") || errm.includes("DSID-0C090400") || errm.includes("DSID-0C090442")))
-									return rsv("inValidCredential");
-								logger.debug("Error occurred in ldap authentication : " + JSON.stringify(err));
-								rsv("fail");
-							} else if (auth) rsv("pass");
-							else rsv("inValidCredential"); // rsv("fail");
-						});
-					}));
-					if (authResult == "fail") flag = "inValidLDAPServer";
-					else if (authResult != "pass") flag = authResult;
-					else if (authResult == "pass") validAuth = true;
 				}
-			}
-			if (validAuth) {
-				flag = "validCredential";
-				userInfo = { username, type };
+				// LDAP auth starts
+				else if (!user.auth.user) flag = "invalidUserConf";
+				else {
+					inputs = { name: user.auth.server };
+					const config = await utils.fetchData(inputs, "admin/getLDAPConfig", fnName);
+					if (config == "fail") flag  = "fail";
+					else if (config.length == 0) flag = "inValidLDAPServer";
+					else {
+						const adConfig = {
+							url: config.url,
+							baseDN: config.basedn,
+						};
+						if (config.auth == "simple") {
+							adConfig.bindDN = config.binddn;
+							adConfig.bindCredentials = config.bindcredentials;
+						}
+						const ad = new activeDirectory(adConfig);
+						const userdn = user.auth.user;
+						const authResult = await (new Promise((rsv, rej) => {
+							ad.authenticate(userdn, password, (err, auth) => {
+								if (err) {
+									const errm = err.lde_message;
+									if (errm && (errm.includes("DSID-0C0903A9") || errm.includes("DSID-0C090400") || errm.includes("DSID-0C090442")))
+										return rsv("inValidCredential");
+									logger.debug("Error occurred in ldap authentication : " + JSON.stringify(err));
+									rsv("fail");
+								} else if (auth) rsv("pass");
+								else rsv("inValidCredential"); // rsv("fail");
+							});
+						}));
+						if (authResult == "fail") flag = "inValidLDAPServer";
+						else if (authResult != "pass") flag = authResult;
+						else if (authResult == "pass") validAuth = true;
+					}
+				}
+				if (validAuth) {
+					flag = "validCredential";
+					userInfo = { username, type };
+				}
 			}
 			return done(null, userInfo, flag);
 		});
@@ -179,7 +181,10 @@ var routeUtil = {
 module.exports = () => {
 	passport.serializeUser((user, done) => done(null, user));
 	passport.protect = (req, res, next) => {
-		if (req.isAuthenticated && req.isAuthenticated()) return next();
+		const sessFlag = (req.isAuthenticated && req.isAuthenticated())
+		const cookies = req.signedCookies;
+		const cookieFlag = (cookies["connect.sid"]!==undefined) && (cookies["maintain.sid"]!==undefined);
+		if (sessFlag && cookieFlag) return next();
 		var negotiator = new Negotiator(req);
 		if (negotiator.mediaType() === 'text/html') return res.redirect(options.route.login);
 		else return res.send("Invalid Session");
@@ -229,7 +234,7 @@ module.exports.checkUser = async (req, res) => {
 		let result = { "proceed": true };
 		if (userInfo == "fail") return res.send("fail");
 		else if (userInfo && userInfo.auth) {
-			const uType = userInfo.auth.type;
+			const uType = userInfo.auth.type || "inhouse";
 			const serverName = userInfo.auth.server || '';
 			const strategyName = uType + '/' + serverName;
 			if (uType != "inhouse" && serverName.length === 0) result = "invalidServerConf";

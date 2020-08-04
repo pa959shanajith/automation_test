@@ -2609,8 +2609,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$(document).on("keydown", ".validationKeydown", function (e) {
 		if (e.target.id == "ldapServerURL" && [':', '/'].indexOf(e.key) > -1)
 			return true;
-		// Block all characters except _ . a-Z 0-9 - [ ] { } ! # $ ^ & . space
-		if (([59, 61, 106, 107, 109, 111, 173, 186, 187, 188, 191, 192, 220, 222].indexOf(e.keyCode) > -1) || e.shiftKey && ([48, 50, 53, 56, 57, 190].indexOf(e.keyCode) > -1))
+		// Block all characters except _ . a-Z 0-9 - [ ] { } ! @ # $ ^ & . space
+		if (([59, 61, 106, 107, 109, 111, 173, 186, 187, 188, 191, 192, 220, 222].indexOf(e.keyCode) > -1) || e.shiftKey && ([48, 53, 56, 57, 190].indexOf(e.keyCode) > -1))
 			return false;
 		else
 			return true;
@@ -2630,7 +2630,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			var userEnteredText = element.val();
 			var regex;
 			if (e.target.id == 'userName' || e.target.id == 'icename')
-				regex = /[\\\~`@|;:"',<>?/\s]/g;
+				regex = /[\\\~`|;:"',<>?/\s]/g;
 			else if (e.target.id == 'ldapServerURL')
 				regex = /[\\\[\]\~`!@#$%^&*()+={}|;"',<>?\s]/g;
 			else if (e.target.id == 'projectName' || e.target.id == 'releaseTxt' || e.target.id == 'cycleTxt' || e.target.id == 'releaseName' || e.target.id == 'cycleName')
@@ -2887,7 +2887,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				selBox.empty();
 				selBox.append("<option value='' disabled selected>Select Server</option>");
 				for(var i = 0; i < data.length; i++){
-					selBox.append("<option value=\""+data[i]+"\">"+data[i]+"</option>");
+					selBox.append("<option value=\""+data[i].name+"\">"+data[i].name+"</option>");
 				}
 				selBox.prop("selectedIndex", 0);
 			}

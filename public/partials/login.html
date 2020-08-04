@@ -23,7 +23,7 @@
 				<!--Logo-->
 
 				<!--Login Form-->
-				<div class="wrap login-wrap" ng-if="restartForm!=true">
+				<div class="wrap login-wrap" ng-if="!restartForm">
 					<form>
 						<div class="input-group">
 							<span class="input-group-addon ic-username"><img src="imgs/ic-username.png" /></span>
@@ -39,7 +39,7 @@
 						<button ng-if="showLogin" ng-click="check_credentials('/plugin', $event)" type="submit" class="btn btn-block" ng-disabled="requested==true">Login</button>
 					</form>
 				</div>
-				<div class="wrap login-wrap" ng-if="restartForm==true">
+				<div class="wrap login-wrap" ng-if="restartForm">
 					<button ng-repeat="server in serverList" ng-click="restartServer($index, server.name)" ng-disabled="!server.active" style="font-size:25px;margin-bottom:35px" type="submit" class="btn btn-block">Restart {{server.name}}</button>
 				</div>
 				<!--Login Form-->
