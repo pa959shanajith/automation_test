@@ -23,10 +23,16 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 	$scope.hideLogin = function() {
 		$scope.showLogin = false;
 		$scope.loginValidation = "";
+		$scope.ud.password = "";
+		if ($scope.inputType == "text") $scope.showPassword();
 		$(".ic-username, .ic-password").parent().removeClass("input-border-error");
 		$(".ic-username").children().attr("src", "imgs/ic-username.png");
 		$(".ic-password").children().attr("src", "imgs/ic-password.png");
 	};
+
+	$(document).on('keyup', '#userName', function keyuphandler(event) {
+		if (!$scope.showLogin && event.keyCode == '13') $scope.checkUser();
+	});
 
 	$scope.checkUser = function() {
 		if ($scope.requested) return false;
