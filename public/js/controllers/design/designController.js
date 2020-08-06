@@ -2445,9 +2445,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		//Delete All Elements
 		getIndexOfDeletedObjects = [];
 		insert_list = [];
-		for (var j = 0; j < viewString.view.length; j++) {
-			if(newScrapedList.view.indexOf(viewString.view[j]) == -1){
-				newScrapedList.view.push(viewString.view[j]);
+		if('view' in viewString){
+			for (var j = 0; j < viewString.view.length; j++) {
+				if(newScrapedList.view.indexOf(viewString.view[j]) == -1){
+					newScrapedList.view.push(viewString.view[j]);
+				}
 			}
 		}
 		if (totalElements == selectedElements) {
@@ -2647,9 +2649,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	$scope.del_Objects = function (e) {
 		blockUI('Deleting objects..please wait..')
 		$("#deleteObjectsModal").modal("hide");
-		for (i = 0; i < viewString.view.length; i++){
-			if(newScrapedList.view.indexOf(viewString.view[i]) == -1){
-				newScrapedList.view.push(viewString.view[i]);
+		if('view' in viewString){
+			for (i = 0; i < viewString.view.length; i++){
+				if(newScrapedList.view.indexOf(viewString.view[i]) == -1){
+					newScrapedList.view.push(viewString.view[i]);
+				}
 			}
 		}
 		if (deleteScrapeDataservice) {
@@ -2981,7 +2985,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				}
 				else {
 					deleteScrapedObjects(e);
-					$("#saveObjects").trigger('click');
+					var isduplicate = duplicateCheck();
+					if(isduplicate) $("#saveObjects").trigger('click');
 				}
 				$("#deleteObjects").prop("disabled", true);
 			}
