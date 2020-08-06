@@ -249,7 +249,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						if (appType == "Webservice"){
 							if (data2.view.length > 0) {
 								if (data2.view[0].header) dataFormat12 = data2.view[0].header[0].split("##").join("\n");
-								else dataFormat12 = data2.header[0].split("##").join("\n");
+								else if (data2.header) dataFormat12 = data2.header[0].split("##").join("\n");
 							}	
 						}
 						custnameArr.length = 0;
