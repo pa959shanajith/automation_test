@@ -217,6 +217,7 @@ exports.updateScreen_ICE = function (req, res) {
 			var param = updateData.param;
 			var delete_list = updateData.delete_list;
 			var update_list = updateData.update_list;
+			var insert_list = updateData.insert_list;
 			var appType = updateData.appType;
 			var requestedversionnumber = updateData.versionnumber;
 			//xpaths required to be mapped(used only when param is mapScrapeData_ICE)
@@ -431,6 +432,8 @@ exports.updateScreen_ICE = function (req, res) {
 				};
 				finalFunction(scrapedObjects);	
 			} else if (param == 'edit_updateScrapeData_ICE'){
+				if(updateData.insert_list != '') insertList=updateData.insert_list
+				else insertList=[]
 				try {
 					scrapedObjects = updateData.getScrapeData;
 					var parsedScrapedObj = JSON.parse(scrapedObjects);
@@ -442,7 +445,8 @@ exports.updateScreen_ICE = function (req, res) {
 						"projectid": projectID,
 						"screenname": screenName,
 						"versionnumber": requestedversionnumber,
-						"type": "update_obj"
+						"type": "update_obj",
+						"insert_list": insertList
 					};
 					logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE");
 					finalFunction(scrapedObjects);
@@ -455,6 +459,8 @@ exports.updateScreen_ICE = function (req, res) {
 				scrapedObjects = updateData.getScrapeData;
 				if (updateData.update_list== "") update_list=[]
 				else update_list=updateData.update_list
+				if(updateData.insert_list != '') insertList=updateData.insert_list
+						else insertList=[]
 				//var parsedScrapedObj = JSON.parse(scrapedObjects);
 				inputs = {
 					"scrapedata": scrapedObjects,
@@ -465,7 +471,8 @@ exports.updateScreen_ICE = function (req, res) {
 					"screenname": screenName,
 					"versionnumber": requestedversionnumber,
 					"type": "delete_obj",
-					"update_list": update_list
+					"update_list": update_list,
+					"insert_list": insertList
 				};
 				logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE");
 				finalFunction(scrapedObjects)
