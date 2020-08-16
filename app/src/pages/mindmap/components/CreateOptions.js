@@ -9,7 +9,7 @@ import '../styles/CreateOptions.scss'
 
 const CreateOptions = (props) => {
   const options = [
-    {ico : "ic-create-newMindmap.png",label:'CREATE NEW',comp:'defmindmap'},
+    {ico : "ic-create-newMindmap.png",label:'CREATE NEW',comp:'newmindmap'},
     {ico : "ic-endtoendFlow.png",label:'End to End Flow',comp:'enemindmap'},
     {ico :"ic-importfromexcel-mindmap.png",label:'Import From Excel',comp:'excelmindmap'}
   ]

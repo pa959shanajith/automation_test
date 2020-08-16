@@ -1,9 +1,9 @@
 import React from 'react';
-import MindmapHome from './MindmapHome'
+import MindmapHome from './containers/MindmapHome'
 
 /*Component Mindmap
   use: direct to mindmap landing page
-  note: 
+  todo: 
     add user permission check 
 */
 
