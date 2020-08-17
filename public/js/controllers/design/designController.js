@@ -1713,10 +1713,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 			//For Mobility Web
 			else if ($scope.getScreenView == "MobileWeb") {
-				if ($(document).find("#mobilityWebSerialNo").val() == "" && browserType != 'pdf') {
+				if ($(document).find("#mobilityWebSerialNo").val() == "" && (browserType != 'pdf' && browserType != 'chrome')) {
 					$(document).find("#mobilityWebSerialNo").addClass("inputErrorBorder" && browserType != 'pdf')
 					return false
-				} else if ($(document).find("#mobilityAndroidVersion").val() == "" && browserType != 'pdf') {
+				} else if ($(document).find("#mobilityAndroidVersion").val() == "" && (browserType != 'pdf' && browserType != 'chrome')) {
 					$(document).find("#mobilityAndroidVersion").addClass("inputErrorBorder")
 					return false
 				} else if (browserType == 'pdf'){
