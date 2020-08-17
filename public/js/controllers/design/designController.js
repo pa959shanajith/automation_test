@@ -109,7 +109,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	//Loading Project Info
 
 	//Getting Apptype or Screen Type
-	if (appType != "Web" && window.location.href.split("/")[3] == "design") {
+	if ((appType != "Web" && appType != "MobileWeb") && window.location.href.split("/")[3] == "design") {
 		$("#left-bottom-section").hide();
 	}
 	if (appType == "Webservice" && window.location.href.split("/")[3] == "designTestCase") {
@@ -913,7 +913,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					});
 				   
 
-					if (appType == 'Web') {
+					if (appType == 'Web' || appType == 'MobileWeb') {
 						if ($(".ellipsis").length > 0) {
 							$("li.compareObjects").removeClass('disableActions compareObjectDisable').addClass('enableActions');
 							$("li.generateObj").removeClass('disableActions addObjectDisable').addClass('enableActions');
@@ -1511,7 +1511,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 	//Initiating Scraping
 	$scope.initScraping = function (e, browserType) {
-		$('#compareObjectModal').modal('hide');
+		if (appType == "Web") {
+			$('#compareObjectModal').modal('hide');
+		}
+		if (appType == "MobileWeb") {
+			$('#compareObjectModal_MW').modal('hide');
+		}
 		$(".addObject span img").removeClass("left-bottom-selection");
 		$(".compareObject span img").removeClass("left-bottom-selection");
 		$(".generateObj span img").removeClass("left-bottom-selection");
@@ -1732,6 +1737,20 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						screenViewObject.mobileSerial = $(document).find("#mobilityWebSerialNo").val();
 					screenViewObject.androidVersion = $(document).find("#mobilityAndroidVersion").val();
 					$("#launchMobilityWeb").modal("hide");
+					// blockUI(blockMsg);
+					// if ($rootScope.compareFlag == true) {
+					// 	blockUI(blockMsg2);
+					// 	e.stopImmediatePropagation();
+					// }
+					// else {
+					// 	blockUI(blockMsg);
+					// 	e.stopImmediatePropagation();
+					// }
+					if ($rootScope.compareFlag == true) {
+						screenViewObject.viewString = viewString;
+						screenViewObject.action = "compare";
+					}
+					screenViewObject.browserType = browserType
 					// blockUI(blockMsg);
 					if ($rootScope.compareFlag == true) {
 						blockUI(blockMsg2);
@@ -3839,7 +3858,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		//openDialog("Compare Object", "");
 		$rootScope.compareFlag = true;
 		if ($rootScope.compareFlag == true) {
-			$("#compareObjectModal").modal("show");
+			if (appType == "Web") {
+				$("#compareObjectModal").modal("show");
+			}
+			if (appType == "MobileWeb") {
+				$("#compareObjectModal_MW").modal("show");
+			}
 			$timeout(function () {
 				if (navigator.appVersion.indexOf("Mac") != -1) {
 					$(".safariBrowser").show();
