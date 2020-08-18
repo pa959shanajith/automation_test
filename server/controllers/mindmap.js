@@ -1342,6 +1342,9 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 				case "button":
 				case "shell":
 				case "table":
+				case "toolbar":
+				case "calendar":
+				case "gridview":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
 					var custname_split = eachScrapedAction.custname.split('_');
 					if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
@@ -1358,6 +1361,9 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					break;
 				case "checkbox":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectCheckbox',null,null,null,"SAP");
+					break;
+				case "tree":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTreeElement',null,null,null,"SAP");
 					break;
 				default:
 					logger.info("Import PD: No match found for "+eachScrapedAction.tag+" for SAP apptype.");

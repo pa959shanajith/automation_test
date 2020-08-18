@@ -32,7 +32,7 @@
 						</div>
 						<div class="input-group" ng-if="showLogin">
 							<span class="input-group-addon ic-password"><img src="imgs/ic-password.png" /></span>
-							<input ng-model="ud.password" id="passWord" type="{{inputType}}" class="form-control" name="password" placeholder="Password" autocomplete="off">
+							<input ng-model="ud.password" ng-trim="false" id="passWord" type="{{inputType}}" class="form-control" name="password" placeholder="Password" autocomplete="off">
 							<span class="input-group-addon ic-password fa {{showHideClass}}" style="color:#a0a0a0;font-size:20px" ng-click="showPassword()"> </span>
 						</div>
 						<span ng-show="loginValidation" class="absoluteError errorMessages">{{loginValidation}}</span>

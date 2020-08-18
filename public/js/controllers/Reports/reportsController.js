@@ -447,6 +447,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         var browserIcon, brow = "";
                         var styleColor, exeDate, exeDat, exeTime;
                         $("#accordion").show();
+                        var moduleName = $('.highlight-module').next('span.ct-nodeLabel').text();
                         var scenarioDetails = $('.tblRowHighlight').children('td.executionNo').html() + "   Scenario Details";
                         $('#moduleNameHeader').html('<span id="moduleTxt" title=' + moduleName + '>' + scenarioDetails + '</span>');
                         for (i = 0; i < data.length; i++) {

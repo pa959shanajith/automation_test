@@ -832,17 +832,18 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					$('#pref').empty()
 					$('#pref').append("<tr><td>Admin</td><td><input type='checkbox' value='' checked='checked' class='module_admin'></td><td><input type='checkbox' value='' class='module_admin'></td><td><input type='checkbox' value='' class='module_admin'></td><td><input type='checkbox' value='' class='module_admin'></td></tr>")
 					$('#pref').append("<tr id=rows><td>ICE</td></tr>")
-					rows=["ALM","Mindmap","NeuronGraphs","Reports","Utility"];
-					for(i=0;i<response.length;i++){
+					for(i=0;i<response.length;i++) {
 						$('#head').append("<th>"+response[i].name+"</th>");
 						let checked = (['Test Lead', 'Test Engineer'].indexOf(response[i].name) > -1)? "checked='checked'":'';
 						$('#rows').append("<td><input type='checkbox' value='' "+checked+" class='module_admin'></td>");
 					}
+					var rows = ["ALM","Mindmap","Reports","Utility"];
 					for (j=0;j<rows.length;j++){
-						$('#pref').append("<tr id="+rows[j]+"><td>"+rows[j]+"</td></tr>")
+						let pluginName = (rows[j]=="ALM")? "Integration" : rows[j];
+						$('#pref').append("<tr id="+pluginName+"><td>"+pluginName+"</td></tr>")
 						for(i=0;i<response.length;i++){
 							let checked = (response[i].plugins[rows[j].toLowerCase()]==true)? "checked='checked'":'';
-							$("#"+rows[j]).append("<td><input type='checkbox' value='' "+checked+" class='module_admin'></td>");
+							$("#"+pluginName).append("<td><input type='checkbox' value='' "+checked+" class='module_admin'></td>");
 						}
 					}
 					$("#preferencesTable").find("input[type=checkbox]").each(function () {
@@ -2442,7 +2443,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			else if(data == "empty") openModalPopup("Create User","There are no users available in this Server.");
 			else {
 				$scope.userConf.nocreate = false;
-				data.sort((a,b)=>a.localeCompare(b));
+				data.sort((a,b)=>a[0].localeCompare(b[0]));
 				$scope.userConf.ldapAllUserList = data.map(e=>({value:e[1],html:e[0]}));
 			}
 		}, function (error) {
