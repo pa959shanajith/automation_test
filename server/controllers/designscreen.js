@@ -69,11 +69,25 @@ exports.initScraping_ICE = function (req, res) {
 								"mobileDeviceName": mobileDeviceName, "mobileIosVersion": mobileIosVersion, "mobileUDID": mobileUDID};
 						}
 					} else if (reqBody.appType == "MobileWeb") {
+						var data = {action: "scrape"};
+						// var browserType = reqBody.browserType;
 						var mobileSerial = reqBody.mobileSerial;
 						var androidVersion = reqBody.androidVersion;
+						if (reqBody.action == 'compare') {
+							data.viewString = reqBody.viewString.view;
+							if ("scrapedurl" in reqBody.viewString){
+								data.scrapedurl = reqBody.viewString.scrapedurl;
+							}
+							else{
+								data.scrapedurl = "";
+							}
+							data.scrapedurl = reqBody.viewString.scrapedurl;
+							data.action = reqBody.action;
+						}
+						if (browserType == "chrome") data.task = "MOBILE CHROME BROWSER";
 						reqAction = "mobile web";
 						dataToIce = {"emitAction": "LAUNCH_MOBILE_WEB", "username" : icename,
-							"mobileSerial": mobileSerial, "androidVersion": androidVersion};
+							"mobileSerial": mobileSerial, "androidVersion": androidVersion, "data": data};
 					} else if (req.body.screenViewObject.appType == "pdf"){
 						var data = {};
 						var browserType = req.body.screenViewObject.appType;
