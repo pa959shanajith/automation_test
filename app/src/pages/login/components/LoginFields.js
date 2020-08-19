@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import 'font-awesome/css/font-awesome.min.css';
-// import "../styles/LoginFields.scss"
+import "../styles/LoginFields.scss"
 
 const LoginFields = () => {
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [showPassField, setPassField] = useState(false);
+    const [showPass, setShowPass] = useState(false);
 
     const handleUsername = event => setUsername(event.target.value);
     const handlePassword = event => setPassword(event.target.value);
     const handleToggle = () => setPassField(!showPassField);
+    const handleShowPass = () => setShowPass(!showPass);
 
     const onSubmit = event => {
         event.preventDefault();
@@ -30,8 +32,8 @@ const LoginFields = () => {
         username ? <>
         <div className="password-wrap">
             <span><img className="ic-password" src="static/imgs/ic-password.png"/></span>
-            <input className="field" type="password" value={password} onChange={handlePassword}></input>
-            <span className="password-eye fa fa-eye"></span>
+            <input className="field" type={showPass ? "text" : "password"} value={password} onChange={handlePassword}></input>
+            <span className={showPass ? "password-eye fa fa-eye-slash" : "password-eye fa fa-eye"} onClick={handleShowPass}></span>
         </div>
         <button className="login-btn" type="submit" onClick={onSubmit}>Login</button>
         </>

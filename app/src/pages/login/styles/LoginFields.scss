@@ -46,6 +46,11 @@
     // }
 }
 
+.fa-eye-slash{
+    content: "\f06e";
+    color:#a0a0a0;
+    font-size: 20px;
+}
 .fa-eye:before {
     content: "\f06e";
     color:#a0a0a0;
@@ -110,6 +115,11 @@
     }
 
     .fa-eye:before {
+        content: "\f06e";
+        color:#a0a0a0;
+        font-size: 1.5vw;
+    }
+    .fa-eye-slash{
         content: "\f06e";
         color:#a0a0a0;
         font-size: 1.5vw;

@@ -19,7 +19,7 @@ const BasePage = () => {
                     <LoginFields />
                 </form>
             </div>
-            {/* <Footer/> */}
+            <Footer/>
         </div>
     );
 }
