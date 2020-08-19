@@ -11,10 +11,13 @@ const LoginFields = () => {
 
     const handleUsername = event => setUsername(event.target.value);
     const handlePassword = event => setPassword(event.target.value);
-    const handleToggle = () => setPassField(!showPassField);
     const handleShowPass = () => setShowPass(!showPass);
+    const handleToggle = () => {
+        setPassField(!showPassField);
+        setPassword("");
+    }
 
-    const onSubmit = event => {
+    const check_credentials = event => {
         event.preventDefault();
         console.log(username);
     }
@@ -32,10 +35,10 @@ const LoginFields = () => {
         username ? <>
         <div className="password-wrap">
             <span><img className="ic-password" src="static/imgs/ic-password.png"/></span>
-            <input className="field" type={showPass ? "text" : "password"} value={password} onChange={handlePassword}></input>
+            <input className="field" type={showPass ? "text" : "password"} placeholder="Password" value={password} onChange={handlePassword}></input>
             <span className={showPass ? "password-eye fa fa-eye-slash" : "password-eye fa fa-eye"} onClick={handleShowPass}></span>
         </div>
-        <button className="login-btn" type="submit" onClick={onSubmit}>Login</button>
+        <button className="login-btn" type="submit" onClick={check_credentials}>Login</button>
         </>
         : handleToggle()
         : false
