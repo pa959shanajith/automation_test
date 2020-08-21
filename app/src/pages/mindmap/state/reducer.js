@@ -1,7 +1,10 @@
 import * as actionTypes from './action.js';
 
 const initialState = {
-    projectList : []
+    projectList : {},
+    moduleList: [],
+    selectedProj: undefined,
+    searchModule: undefined
 };
 
 const reducer = (state = initialState , action) => {
@@ -11,8 +14,24 @@ const reducer = (state = initialState , action) => {
                 ...state,
                 projectList: action.payload
             }
+        case actionTypes.SELECT_PROJECT:
+            return{
+                ...state,
+                selectedProj: action.payload
+            }   
+        case actionTypes.UPDATE_MODULELIST:
+            return{
+                ...state,
+                moduleList: action.payload
+            }
+        case actionTypes.SEARCH_MODULELIST:
+            return{
+                ...state,
+                searchModule: action.payload
+            }
+        default: 
+            return state
     }
-    return state
 }
 
 export default reducer;

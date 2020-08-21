@@ -1,5 +1,6 @@
 import axios from 'axios';
-const url = 'https://127.0.0.1:8443';
+//const url =  window.location.host.split("/")[0]
+const url =  'https://127.0.0.1:8443'
 
 
 /*Component getProjectList
@@ -18,7 +19,7 @@ export const getProjectList = async() => {
             data: {"action":"populateProjects"},
             credentials: 'include'
         });
-        if(res.status=200){
+        if(res.status===200){
             return res.data;
         }else{
             console.error(res.status)
@@ -43,7 +44,57 @@ export const getProjectType = async(projectId) => {
             data: {"action":"getProjectTypeMM",projectId:projectId},
             credentials: 'include'
         });
-        if(res.status=200){
+        if(res.status===200){
+            return res.data;
+        }else{
+            console.error(res.status)
+        }
+    }catch(err){
+        console.error(err)
+    }
+}
+
+/*Component getProjectType
+  api returns {projectType: "", project_id: "", projectid: "", project_typename: "", releases: []}
+  todo : add url from env or store and error handling 
+*/
+
+export const getModules = async(props) => {
+    try{
+        const res = await axios(url+'/getModules', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+            credentials: 'include'
+        });
+        if(res.status===200){
+            return res.data;
+        }else{
+            console.error(res.status)
+        }
+    }catch(err){
+        console.error(err)
+    }
+}
+
+/*Component getScreens
+  api returns {projectType: "", project_id: "", projectid: "", project_typename: "", releases: []}
+  todo : add url from env or store and error handling 
+*/
+
+export const getScreens = async(projectId) => {
+    try{
+        const res = await axios(url+'/getScreens', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {"action":"getProjectTypeMM",projectId:projectId},
+            credentials: 'include'
+        });
+        if(res.status===200){
             return res.data;
         }else{
             console.error(res.status)

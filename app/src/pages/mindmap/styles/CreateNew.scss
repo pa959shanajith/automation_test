@@ -1,0 +1,20 @@
+.mp__canvas{
+    position: absolute;
+    top: 34px;
+    height: calc(100% - 34px);
+    overflow: hidden;
+    border: 1px solid transparent;
+    width: calc(100% - 10px);
+    z-index: 1;
+}
+.mp__canvas_container{
+    position: relative;
+    margin: 2px;
+    height: calc(100% - 4px);
+    width: calc(100% - 16px);
+    float: left;
+}
+
+.loading-bar{
+    position:absolute!important;
+}

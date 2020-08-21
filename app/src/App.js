@@ -5,6 +5,8 @@ import Mindmap from './pages/mindmap';
 import {createStore,combineReducers} from 'redux';
 import {Provider} from 'react-redux';
 import mindmapReducer from './pages/mindmap/state/reducer.js'
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 /* combining multiple domains reducer */
 const rootReducer = combineReducers({

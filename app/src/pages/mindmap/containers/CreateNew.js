@@ -1,31 +1,46 @@
-import React ,  { Fragment, useEffect } from 'react';
-import {getProjectList , getProjectType} from '../api';
-import { useDispatch, useSelector } from 'react-redux';
+import React ,  { Fragment, useEffect, useState, useRef} from 'react';
+import {getProjectList , getModules} from '../api';
+import LoadingBar from 'react-top-loading-bar';
+import { useDispatch} from 'react-redux';
+import MindmapToolbar from './MindmapToolbar';
 import 'font-awesome/css/font-awesome.min.css';
 import * as actionTypes from '../state/action';
+import Canvas from './MindmapCanvas';
 import '../styles/CreateNew.scss';
 
 /*Component CreateNew
   use: renders create New Mindmap page
-  todo: invalid session check
+  todo: invalid session check error handling for apis
 */
     
 const CreateNew = () => {
   const dispatch = useDispatch()
-  const projectList = useSelector(state=>state.mindmap.projectList)
+  const loadref = useRef(null)
+  const [loading,setLoading] = useState(true)
   useEffect(()=>{
     (async()=>{
+      loadref.current.staticStart()
       var res = await getProjectList()
       var data = parseProjList(res)
-      var projdata = await getProjectType(data[0].id) 
       dispatch({type:actionTypes.UPDATE_PROJECTLIST,payload:data})
+      dispatch({type:actionTypes.SELECT_PROJECT,payload:res.projectId[0]}) 
+      var moduledata = await getModules({"tab":"tabCreate","projectid":res.projectId[0],"moduleid":null})
+      dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
+      loadref.current.complete()
+      setLoading(false)
     })()
-  },[])
+  },[dispatch])
   return (
     <Fragment>
-        <div>{projectList.length}</div>
-        <div className='create__tool-bar'>
-        </div>
+        <LoadingBar shadow={false} color={'#633690'} className='loading-bar' ref={loadref}/>
+        {(!loading)?
+          <div className='mp__canvas_container'>
+            <MindmapToolbar/>
+              <div className='mp__canvas'>
+                <Canvas/>
+            </div>
+          </div>:null
+        }      
     </Fragment>
   );
 }
@@ -35,15 +50,15 @@ const CreateNew = () => {
 */
 
 const parseProjList = (res) =>{
-  var proj = [];
+  var proj = {};
   res.projectId.forEach((e,i) => {
-    proj.push({
+    proj[res.projectId[i]]= {
       'apptype': res.appType[i],
       'name': res.projectName[i],
       'id': res.projectId[i],
       'releases':res.releases[i],
       'domains':res.domains[i]
-    });
+    };
   });
   return proj
 }
