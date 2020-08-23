@@ -473,30 +473,39 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 exports.testLDAPConnection = (req, res) => {
 	logger.info("Inside UI Service: testLDAPConnection");
 	try{
-		var reqData = req.body;
-		var ldapURL = (reqData.ldapURL || "").trim();
-		var tlsCert = (reqData.tlsCert || "").trim() || false;
-		if (ldapURL.slice(0,8) == "ldaps://" && !tlsCert) {
-			logger.error("Error occurred in admin/testLDAPConnection: 'ldaps' protocol require TLS Certificate.");
-			return res.send("invalid_cert");
+		const reqData = req.body;
+		const ldapURL = (reqData.ldapURL || "").trim();
+		const secure = (reqData.secure || "false").trim();
+		const tlsCert = (reqData.tlsCert || "").trim() || false;
+		if (ldapURL.slice(0,8) == "ldaps://") {
+			if (secure === "false") {
+				logger.error("Error occurred in admin/testLDAPConnection: Secure connection must be enabled for 'ldaps' protocol");
+				return res.send("mismatch_secure");
+			} else if (!tlsCert) {
+				logger.error("Error occurred in admin/testLDAPConnection: 'ldaps' protocol require TLS Certificate.");
+				return res.send("invalid_cert");
+			}
 		} else if (ldapURL.slice(0,8) != "ldaps://" && ldapURL.slice(0,7) != "ldap://") {
 			logger.error("Error occurred in admin/testLDAPConnection: Invalid URL provided for connection test.");
 			return res.send("invalid_url");
 		}
-		var baseDN = (reqData.baseDN || "").trim();
-		var authUser = (reqData.username || "").trim();
-		var authKey = (reqData.password || "").trim();
-		var authType = reqData.authType;
-		var adConfig = {
+		const baseDN = (reqData.baseDN || "").trim();
+		const authUser = (reqData.username || "").trim();
+		const authKey = (reqData.password || "").trim();
+		const authType = reqData.authType;
+		const adConfig = {
 			url: ldapURL,
 			baseDN: baseDN
 		};
-		if (tlsCert) adConfig.tlsOptions = { ca: tlsCert };
+		if (secure !== "false") adConfig.tlsOptions = { 
+			ca: tlsCert,
+			rejectUnauthorized: secure === "secure"
+		};
 		if (authType == "simple") {
 			adConfig.bindDN = authUser;
 			adConfig.bindCredentials = authKey;
 		}
-		var ad = new activeDirectory(adConfig);
+		const ad = new activeDirectory(adConfig);
 		var resSent = false;
 		ad.find("cn=*", function (err, result) {
 			if (resSent) return;
@@ -588,7 +597,10 @@ exports.getLDAPConfig = async (req, res) => {
 			url: data.url,
 			baseDN: data.basedn
 		};
-		if (data.secure) adConfig.tlsOptions = { ca: data.cert };
+		if (data.secure !== "false") adConfig.tlsOptions = { 
+			ca: data.cert,
+			rejectUnauthorized: (data.secure === "secure")
+		};
 		if (data.auth == "simple") {
 			adConfig.bindDN = data.binddn;
 			adConfig.bindCredentials = bindCredentials;
@@ -690,20 +702,21 @@ exports.manageLDAPConfig = async (req, res) => {
 			inputs.secure = reqData.secure;
 			inputs.auth = reqData.auth;
 			inputs.fieldmap = reqData.fieldmap || {};
+			const secure = (reqData.secure !== "false");
 			const protocol = (inputs.url.slice(0,7) + ((inputs.url.slice(7,8)=='/')?'/':'')).slice(0,-3);
 			if (validator.isEmpty(inputs.url)) {
 				logger.error("Error occurred in admin/manageLDAPConfig: LDAP Server URL cannot be empty.");
 				flag[3] = '1';
-			} else if (inputs.secure && protocol == "ldap") {
+			} else if (secure && protocol == "ldap") {
 				logger.error("Error occurred in admin/manageLDAPConfig: Secure Connection needs 'ldaps' protocol.");
 				flag[3] = '2';
-			} else if (inputs.secure && protocol == "ldaps") {
+			} else if (secure && protocol == "ldaps") {
 				if ((reqData.cert || "").trim().length !== 0) inputs.cert = reqData.cert;
 				else {
 					logger.error("Error occurred in admin/manageLDAPConfig: Secure Connection needs a TLS Certificate.");
 					flag[3] = '3';
 				}
-			} else if (!inputs.secure && protocol == "ldaps") {
+			} else if (!secure && protocol == "ldaps") {
 				logger.error("Error occurred in admin/manageLDAPConfig: 'ldaps' protocol needs secure connection enabled.");
 				flag[3] = '4';
 			} else if (!["ldap", "ldaps"].includes(protocol)) {

@@ -2765,7 +2765,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.ldapConf.validate = function(action) {
 		var flag = true;
-		const secure = this.secure == "true";
+		const secure = this.secure != "false";
 		$("#ldapServerURL,#binddn,#bindCredentials,#ldapBaseDN").removeClass("inputErrorBorder");
 		$("#ldapFMapUname,#ldapFMapFname,#ldapFMapLname,#ldapFMapEmail").removeClass("selectErrorBorder");
 		$("#ldapCert").removeClass("inputErrorText");
@@ -2830,7 +2830,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			name: ldapConf.serverName,
 			url: ldapConf.url,
 			basedn: ldapConf.basedn,
-			secure: ldapConf.secure == "true",
+			secure: ldapConf.secure,
 			cert: ldapConf.cert,
 			auth: ldapConf.auth,
 			binddn: ldapConf.binddn,
@@ -2943,7 +2943,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			} else {
 				ldapConf.url = data.url;
 				ldapConf.basedn = data.basedn;
-				ldapConf.secure = (data.secure)? "true":"false";
+				ldapConf.secure = data.secure;
 				ldapConf.cert = data.cert;
 				ldapConf.auth = data.auth;
 				ldapConf.binddn = data.binddn;
@@ -2967,14 +2967,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		// var infoArr = [];
 		// labelArr.push(txnHistory.codesDict['LdapConftest']);
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
-		const url = this.url;
-		const base_dn = this.basedn;
-		const bind_dn = this.binddn;
-		const bind_auth = this.bindCredentials;
-		const auth = this.auth;
-		const cert = this.secure && this.cert || false;
 		blockUI("Testing Connection...");
-		adminServices.testLDAPConnection(auth, url, base_dn, bind_dn, bind_auth, cert)
+		adminServices.testLDAPConnection(this.auth, this.url, this.basedn, this.binddn, this.bindCredentials, this.secure, this.cert)
 		.then(function(data){
 			unblockUI();
 			var fields = (typeof data=="string")? [] : (data.fields || []);
@@ -2991,6 +2985,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				}
 				$scope.ldapConf.fieldMapOpts = fields.sort();
 			} else if(data == "invalid_addr") openModalPopup("Test Connection", "Test Connection Failed! Either host is unavailable or port is incorrect.");
+			else if(data == "mismatch_secure") openModalPopup("Test Connection", "Test Connection Failed! Secure connection must be enabled for 'ldaps' protocol.");
 			else if(data == "invalid_cert") openModalPopup("Test Connection", "Test Connection Failed! 'ldaps://' protocol require TLS Certificate.");
 			else if(data == "invalid_cacert") openModalPopup("Test Connection", "Test Connection Failed! TLS Certificate should have full certificate chain including issuer CA certificate.");
 			else if(data == "invalid_cacert_host") openModalPopup("Test Connection", "Test Connection Failed! Hostname/IP provided for connection is not in the TLS Certificate's list.");
@@ -3017,7 +3012,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.ldapConf.switchSecureUrl = function() {
 		let url = this.url.trim();
-		if(this.secure != "true") {
+		if(this.secure == "false") {
 			this.cert = "";
 			this.certName = "No file choosen";
 			if (url.toLowerCase().startsWith("ldaps://")) this.url = "ldap://" + url.slice(8);

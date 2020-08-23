@@ -456,13 +456,17 @@
 				</div></div>
 				<div class='adminControl' style="margin-bottom:2%"><div>
 					<span class="leftControl" title="Secure Connection (ldaps protocol)">Secure Connection</span>
-					<label class="adminFormRadio">
-						<input type="radio" ng-model="ldapConf.secure" value="true" name="ldapSecure" ng-change='ldapConf.switchSecureUrl($event)'/>
-						<span>Enable</span>
-					</label>
-					<label class="adminFormRadio">
+					<label class="adminFormRadio" title="Disable Secure LDAP (No ldaps)">
 						<input type="radio" ng-model="ldapConf.secure" value="false" name="ldapSecure" ng-change='ldapConf.switchSecureUrl($event)'/>
 						<span>Disable</span>
+					</label>
+					<label class="adminFormRadio" title="Enable Secure LDAP (ldaps)">
+						<input type="radio" ng-model="ldapConf.secure" value="secure" name="ldapSecure" ng-change='ldapConf.switchSecureUrl($event)'/>
+						<span>Enable</span>
+					</label>
+					<label class="adminFormRadio" title="Enable Secure LDAP (ldaps) but ignore TLS errors">
+						<input type="radio" ng-model="ldapConf.secure" value="insecure" name="ldapSecure" ng-change='ldapConf.switchSecureUrl($event)'/>
+						<span>Enable Insecure</span>
 					</label>
 				</div></div>
 				<div class='adminControl'><div>
@@ -549,13 +553,17 @@
 				</div></div>
 				<div class='adminControl' style="margin-bottom:2%"><div>
 					<span class="leftControl" title="Secure Connection (ldaps protocol)">Secure Connection</span>
-					<label class="adminFormRadio">
-						<input type="radio" ng-model="ldapConf.secure" value="true" name="ldapSecure" ng-change='ldapConf.switchSecureUrl($event)'/>
-						<span>Enable</span>
-					</label>
-					<label class="adminFormRadio">
+					<label class="adminFormRadio" title="Disable Secure LDAP (No ldaps)">
 						<input type="radio" ng-model="ldapConf.secure" value="false" name="ldapSecure" ng-change='ldapConf.switchSecureUrl($event)'/>
 						<span>Disable</span>
+					</label>
+					<label class="adminFormRadio" title="Enable Secure LDAP (ldaps)">
+						<input type="radio" ng-model="ldapConf.secure" value="secure" name="ldapSecure" ng-change='ldapConf.switchSecureUrl($event)'/>
+						<span>Enable</span>
+					</label>
+					<label class="adminFormRadio" title="Enable Secure LDAP (ldaps) but ignore TLS errors">
+						<input type="radio" ng-model="ldapConf.secure" value="insecure" name="ldapSecure" ng-change='ldapConf.switchSecureUrl($event)'/>
+						<span>Enable Insecure</span>
 					</label>
 				</div></div>
 				<div class='adminControl'><div>
