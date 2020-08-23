@@ -114,13 +114,14 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
-		testLDAPConnection: function (auth, url, baseDN, bindDN, bindCredentials) {
+		testLDAPConnection: function (auth, url, baseDN, bindDN, bindCredentials, cert) {
 			return $http.post('/testLDAPConnection', {
 				authType: auth,
 				ldapURL: url,
 				baseDN: baseDN,
 				username: bindDN,
-				password: bindCredentials
+				password: bindCredentials,
+				tlsCert: cert
 			})
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
