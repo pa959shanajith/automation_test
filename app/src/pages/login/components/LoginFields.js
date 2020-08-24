@@ -21,7 +21,7 @@ const LoginFields = () => {
     const [passError, setPassError] = useState(false);
     const [loginValidation, setLoginValidation] = useState("");
     const history = useHistory();
-    // const [requested, setRequested] = useState(false);
+    const [requested, setRequested] = useState(false);
 
     const handleShowPass = () => setShowPass(!showPass);
 
@@ -38,9 +38,31 @@ const LoginFields = () => {
         setPassword("");
         setPassError(false);
     }
-    const handleToggle = () => {
-        if (username) togglePassField();
-        else setUserError(true);
+    const checkUser = () => {
+        if (requested) return false;
+        let err = "Failed to Login.";
+        if (!username) {
+            setUserError(true);
+            // cfpLoadingBar.complete();
+            return false;
+        }
+        setRequested(true);
+        api.checkUser(username).then(data=> {
+            // cfpLoadingBar.complete();
+            setRequested(false);
+            if (data.redirect) {
+                // history.push(data.redirect);
+                // window.location.href = data.redirect;
+            } else if (data.proceed) {
+                togglePassField();
+            } else if (data == "invalidServerConf") setLoginValidation("Authentication Server Configuration is invalid!");
+            else setLoginValidation(err);
+        }).catch(error=> {
+            console.log(err);
+            setLoginValidation(err);
+            // cfpLoadingBar.complete();
+            setRequested(false);
+        });
     }
 
     const login = event => {
@@ -58,7 +80,7 @@ const LoginFields = () => {
         <div className="username-wrap" style={userError ? styles.errorBorder : null }>
             <span><img className="ic-username" src={userError ? res.errorUserIcon : res.defaultUserIcon}/></span>
             <input className="field" placeholder="username" value={username} onChange={handleUsername}></input>
-            {showPassField && username ? true : <span className="ic-rightarrow fa fa-arrow-circle-right" onClick={handleToggle}></span>}
+            {showPassField && username ? true : <span className="ic-rightarrow fa fa-arrow-circle-right" onClick={checkUser}></span>}
         </div>
         {userError && !loginValidation ? <div className="error-msg">Please Enter Username</div> : null}
         {
@@ -82,9 +104,10 @@ const LoginFields = () => {
 
 const check_credentials = (username, password, setUserError, setPassError, setLoginValidation, history) => {
     if (username && password){
-        console.log(username, password);
+        let user = username.toLowerCase();
+        console.log(user, password);
         try{
-            api.authenticateUser(username, password)
+            api.authenticateUser(user, password)
             .then(data=>{
                 // cfpLoadingBar.complete();
                 // $scope.requested = false;
@@ -142,43 +165,6 @@ const check_credentials = (username, password, setUserError, setPassError, setLo
         }
     }
 }
-
-// const checkUser = () => {
-//     const err = ""
-// }
-
-// $scope.checkUser = function() {
-//     if ($scope.requested) return false;
-//     const err = "Failed to Login.";
-//     $scope.loginValidation = "";
-//     $(".ic-username").parent().removeClass("input-border-error");
-//     $(".ic-username").children().attr("src", "imgs/ic-username.png");
-//     if (!$scope.ud.userName) {
-//         $(".ic-username").children().attr("src", "imgs/ic-username-error.png");
-//         $(".ic-username").parent().addClass("input-border-error");
-//         $scope.loginValidation = "Please Enter Username";
-//         cfpLoadingBar.complete();
-//         return false;
-//     }
-//     $scope.requested = true;
-//     LoginService.checkUser($scope.ud.userName).then(function (data) {
-//         cfpLoadingBar.complete();
-//         $scope.requested = false;
-//         if (data.redirect) {
-//             window.location.href = data.redirect;
-//         } else if (data.proceed) {
-//             $scope.showLogin = true;
-//             //$("#userName").attr("disabled",true);
-//         } else if (data == "invalidServerConf") $scope.loginValidation = "Authentication Server Configuration is invalid!";
-//         else $scope.loginValidation = err;
-//     }, function (error) {
-//         console.log(err);
-//         $scope.loginValidation = err;
-//         cfpLoadingBar.complete();
-//         $scope.requested = false;
-//     });
-// }
-
 
 export default LoginFields;
 

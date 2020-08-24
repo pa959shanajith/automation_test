@@ -17,8 +17,10 @@ const BasePage = (props) => {
     const [checkLogout, setCheckLogout] = useState(JSON.parse(window.sessionStorage.getItem('checkLoggedOut')));
 
     useEffect(()=>{
+        if (!props.showLoginField) {
         window.localStorage.clear();
         window.sessionStorage.clear();
+        console.log("here")
         if (checkLogout) {
             if ((typeof(checkLogout) == "object") && (checkLogout.length == 2)) {
                 setLoginValidation("Your session has been terminated by "+checkLogout[0]);
@@ -80,7 +82,7 @@ const BasePage = (props) => {
                 setLoginValidation(emsg);
                 // cfpLoadingBar.complete();
             });
-        }
+        }}
     }, []);
 
     return (
