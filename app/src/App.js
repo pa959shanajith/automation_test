@@ -1,6 +1,6 @@
 import React from 'react';
 import { HashRouter as Router, Route ,Switch} from "react-router-dom";
-import Login from './pages/login';
+import Login, {BasePage} from './pages/login';
 import Mindmap from './pages/mindmap';
 import {createStore,combineReducers} from 'redux';
 import {Provider} from 'react-redux';
@@ -22,6 +22,7 @@ const App = () => {
     <Provider store={store}>
       <Router>
         <Switch>
+          <Route exact path="/" component={BasePage} />
           <Route path="/login" component={Login} />
           <Route path="/mindmap" component={Mindmap} />
           <Route component={Login} />

@@ -28,6 +28,12 @@
 }
 
 
+.login-form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .login-block{
     display: flex;
     flex-direction: column;

@@ -1,4 +1,5 @@
 import React from 'react';
+import LoginPage from './containers/LoginPage'
 import BasePage from './containers/BasePage'
 
 /*Component App
@@ -7,8 +8,9 @@ import BasePage from './containers/BasePage'
 
 const Login = () => {
   return (
-      <BasePage/>
+      <LoginPage/>
   );
 }
 
+export {BasePage} ;
 export default Login;

@@ -36,7 +36,7 @@
     border: none;
     background-color: #9f62e1;
     color: #FFF;
-    padding: 0 12px;
+    padding: 4px 12px;
     margin-top: 35px;
     cursor: pointer;
     touch-action: manipulation;
@@ -55,6 +55,13 @@
     content: "\f06e";
     color:#a0a0a0;
     font-size: 20px;
+}
+.error-msg{
+    font-family: "LatoWebMedium";
+    font-size: 14px;
+    color: #d33c3c;
+    width: 100%;
+    text-align: center;
 }
 
 @media screen and (max-width: 800px){
