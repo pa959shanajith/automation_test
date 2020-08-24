@@ -5,7 +5,11 @@ import 'font-awesome/css/font-awesome.min.css';
 import "../styles/LoginFields.scss"
 import { res, styles } from './Properties'
 
-//
+/*
+    Component: LoginFields
+    Uses; Renders input fields for user to login
+    Todo: loading bar and checkUser function
+*/
 
 const LoginFields = () => {
 

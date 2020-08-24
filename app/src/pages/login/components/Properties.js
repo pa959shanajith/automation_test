@@ -1,3 +1,7 @@
+/*
+    Exports resource and some css for components when they change state value
+*/
+
 export const styles = {
     errorBorder : { borderColor: "#d33c3c", marginBottom: '19px'},
 }

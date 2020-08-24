@@ -3,6 +3,12 @@ import LoginFields from "../components/LoginFields.js";
 import BasePage from './BasePage';
 import "../styles/BasePage.scss";
 
+/*
+    Component: LoginPage
+    Use: returns the base page component with login field component in it to render
+    Todo : Loading bar and disabling login button after pressing it once  
+*/
+
 const LoginPage = () => {
 
     return (

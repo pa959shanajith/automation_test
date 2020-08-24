@@ -3,6 +3,13 @@ import * as api from '../api';
 import Footer from "../components/Footer.js"
 import "../styles/BasePage.scss";
 
+/*
+    Component: BasePage
+    Uses: When loading from '/' it renders the base page 
+            and when calling '/login' it renders the login fields by checking the props
+    Todo: Loading bar
+*/
+
 const BasePage = (props) => {
 
     const [loginValidation, setLoginValidation] = useState("Loading Profile...");
