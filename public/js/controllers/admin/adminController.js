@@ -2610,6 +2610,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$(document).on("keydown", ".validationKeydown", function (e) {
 		if (e.target.id == "ldapServerURL" && [':', '/'].indexOf(e.key) > -1)
 			return true;
+		// Block all characters except hyphen, alphabet, digit
+		if (['ldapServerName', 'samlServerName', 'oidcServerName'].includes(e.target.id)) {
+			if (([59,61,106,107,109,111,173,186,187,188,190,191,192,219,220,221,222].indexOf(e.keyCode) > -1) ||
+			 e.shiftKey && (e.keyCode >= 48 && e.keyCode <= 57 || e.keyCode == 189))
+				return false;
+			return true;
+		}
 		// Block all characters except _ . a-Z 0-9 - [ ] { } ! @ # $ ^ & . space
 		if (([59, 61, 106, 107, 109, 111, 173, 186, 187, 188, 191, 192, 220, 222].indexOf(e.keyCode) > -1) || e.shiftKey && ([48, 53, 56, 57, 190].indexOf(e.keyCode) > -1))
 			return false;
@@ -2634,8 +2641,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				regex = /[\\\~`|;:"',<>?/\s]/g;
 			else if (e.target.id == 'ldapServerURL')
 				regex = /[\\\[\]\~`!@#$%^&*()+={}|;"',<>?\s]/g;
-			else if (e.target.id == 'projectName' || e.target.id == 'releaseTxt' || e.target.id == 'cycleTxt' || e.target.id == 'releaseName' || e.target.id == 'cycleName')
+			else if (['projectName', 'releaseTxt', 'cycleTxt', 'releaseName', 'cycleName'].includes(e.target.id))
 				regex = /[-\\\[\]\~`!@#$%^&*()+={}|;:"',.<>?/\s]/g;
+			else if (['ldapServerName', 'samlServerName', 'oidcServerName'].includes(e.target.id))
+				regex = /[\\\[\]\~`!@#$%^&*()_+=\{\}|;:"',.<>?/\s]/g;
 			else
 				regex = /[-\\0-9[\]\~`!@#$%^&*()-+={}|;:"',.<>?/\s_]/g;
 			userEnteredText = userEnteredText.replace(regex, "");
@@ -2764,26 +2773,34 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	};
 
 	$scope.ldapConf.validate = function(action) {
-		var flag = true;
+		let flag = true;
+		let popped = false;
 		const secure = this.secure != "false";
 		$("#ldapServerURL,#binddn,#bindCredentials,#ldapBaseDN").removeClass("inputErrorBorder");
 		$("#ldapFMapUname,#ldapFMapFname,#ldapFMapLname,#ldapFMapEmail").removeClass("selectErrorBorder");
 		$("#ldapCert").removeClass("inputErrorText");
 		let nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
 		$("#ldapServerName").removeClass(nameErrorClass);
+		const regExName = /^[A-Za-z0-9]+([A-Za-z0-9-]*[A-Za-z0-9]+|[A-Za-z0-9]*)$/;
 		let regExURL = /^ldap:\/\/[A-Za-z0-9.-]+:\d+$/;
 		if (secure) regExURL = /^ldaps:\/\/[A-Za-z0-9.-]+:\d+$/;
 		if (this.serverName == "") {
 			$("#ldapServerName").addClass(nameErrorClass);
 			flag = false;
+		} else if (!regExName.test(this.serverName) && action == "create") {
+			$("#ldapServerName").addClass("inputErrorBorder");
+			openModalPopup("Error", "Invalid Server Name provided! Name cannot contain any special characters other than hyphen. Also name cannot start or end with hyphen.");
+			flag = false;
+			popped = true;
 		}
 		if (this.url == "") {
 			$("#ldapServerURL").addClass("inputErrorBorder");
 			flag = false;
-		} else if (regExURL.test(this.url) == false) {
+		} else if (!regExURL.test(this.url)) {
 			$("#ldapServerURL").addClass("inputErrorBorder");
-			openModalPopup("Error", "Invalid URL provided! URL must start with 'ldap"+((secure)?'s':'')+"://' followed by either an IP or a well defined domain name followed by a port number.");
+			if (!popped) openModalPopup("Error", "Invalid URL provided! URL must start with 'ldap"+((secure)?'s':'')+"://' followed by either an IP or a well defined domain name followed by a port number.");
 			flag = false;
+			popped = true;
 		}
 		if (this.basedn == "") {
 			$("#ldapBaseDN").addClass("inputErrorBorder");
@@ -3040,22 +3057,30 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.samlConf.validate = function(action) {
 		let flag = true;
+		let popped = false;
 		$("#samlAcsUrl,#samlIDP,#samlServerName").removeClass("inputErrorBorder");
 		$("#samlCert").removeClass("inputErrorText");
 		$("#samlServerName").removeClass("selectErrorBorder");
+		const regExName = /^[A-Za-z0-9]+([A-Za-z0-9-]*[A-Za-z0-9]+|[A-Za-z0-9]*)$/;
 		const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
 		const nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
 		if (this.name == "") {
 			$("#samlServerName").addClass(nameErrorClass);
 			flag = false;
+		} else if (!regExName.test(this.name) && action == "create") {
+			$("#samlServerName").addClass("inputErrorBorder");
+			openModalPopup("Error", "Invalid Server Name provided! Name cannot contain any special characters other than hyphen. Also name cannot start or end with hyphen.");
+			flag = false;
+			popped = true;
 		}
 		if (this.url == "") {
 			$("#samlAcsUrl").addClass("inputErrorBorder");
 			flag = false;
 		} else if (regExURL.test(this.url) == false) {
 			$("#samlAcsUrl").addClass("inputErrorBorder");
-			openModalPopup("Error", "Invalid URL provided! URL must start with http:// or https://");
+			if (!popped) openModalPopup("Error", "Invalid URL provided! URL must start with http:// or https://");
 			flag = false;
+			popped = true;
 		}
 		if (this.idp == "") {
 			$("#samlIDP").addClass("inputErrorBorder");
@@ -3213,21 +3238,29 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.oidcConf.validate = function(action) {
 		let flag = true;
+		let popped = false;
 		$("#oidcUrl,#oidcClientId,#oidcClientSecret,#oidcServerName").removeClass("inputErrorBorder");
 		$("#oidcServerName").removeClass("selectErrorBorder");
+		const regExName = /^[A-Za-z0-9]+([A-Za-z0-9-]*[A-Za-z0-9]+|[A-Za-z0-9]*)$/;
 		const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
 		const nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
 		if (this.name == "") {
 			$("#oidcServerName").addClass(nameErrorClass);
 			flag = false;
+		} else if (!regExName.test(this.name) && action == "create") {
+			$("#oidcServerName").addClass("inputErrorBorder");
+			openModalPopup("Error", "Invalid Server Name provided! Name cannot contain any special characters other than hyphen. Also name cannot start or end with hyphen.");
+			flag = false;
+			popped = true;
 		}
 		if (this.url == "") {
 			$("#oidcUrl").addClass("inputErrorBorder");
 			flag = false;
 		} else if (regExURL.test(this.url) == false) {
 			$("#oidcUrl").addClass("inputErrorBorder");
-			openModalPopup("Error", "Invalid URL provided! URL must start with http:// or https://");
+			if (!popped) openModalPopup("Error", "Invalid URL provided! URL must start with http:// or https://");
 			flag = false;
+			popped = true;
 		}
 		if (this.clientId == "") {
 			$("#oidcClientId").addClass("inputErrorBorder");
