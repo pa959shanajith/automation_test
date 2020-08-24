@@ -19,7 +19,7 @@ const AdminHome = () => {
 
                 {/* <!--Middle Panel--> */}
                 <div id="middle-content-section" style={{ overflow: "auto" }}>
-                    <div class="containerWrap">
+                    <div className="containerWrap">
                         {(middleScreen==="createUser")?<CreateUser setMiddleScreen={setMiddleScreen}/>:null}
                         {(middleScreen==="tokenTab")?null:null}
                         {(middleScreen==="provisionTa")?null:null}
