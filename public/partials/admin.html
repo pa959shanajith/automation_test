@@ -471,9 +471,9 @@
 				</div></div>
 				<div class='adminControl'><div>
 					<span class="leftControl" title="{{ldapConf.certToolTip}}">TLS Certificate</span>
-					<label id="ldapCert" ng-if="ldapConf.secure=='true'" style="cursor:pointer" for="certInput"><span class="fa fa-upload" style="width:auto;margin-right:10px"></span>{{ldapConf.certName}}</label>
-					<label id="ldapCert" ng-if="ldapConf.secure!='true'" style="cursor:not-allowed"><span style="width:auto;font-weight:normal">Secure Option needs to be enabled</span></label>
-					<input type="file" accept=".cer,.crt,.cert,.pem" autocomplete="off" id="certInput" name="ldapCert" style="margin-top:5px" class="no-disp" ng-disabled="ldapConf.secure!='true'"/>
+					<label id="ldapCert" ng-if="ldapConf.secure!='false'" style="cursor:pointer" for="certInput"><span class="fa fa-upload" style="width:auto;margin-right:10px"></span>{{ldapConf.certName}}</label>
+					<label id="ldapCert" ng-if="ldapConf.secure=='false'" style="cursor:not-allowed"><span style="width:auto;font-weight:normal">Secure Option needs to be enabled</span></label>
+					<input type="file" accept=".cer,.crt,.cert,.pem" autocomplete="off" id="certInput" name="ldapCert" style="margin-top:5px" class="no-disp" ng-disabled="ldapConf.secure=='false'"/>
 				</div></div>
 				<div class='adminControl' style="margin-bottom:2%"><div>
 					<span class="leftControl" title="Secure Connection">Authentication</span>
@@ -568,9 +568,9 @@
 				</div></div>
 				<div class='adminControl'><div>
 					<span class="leftControl" title="{{ldapConf.certToolTip}}">TLS Certificate</span>
-					<label id="ldapCert" ng-if="ldapConf.secure=='true'" style="display:inline;cursor:pointer" for="certInput"><span class="fa fa-upload" style="width:auto;margin-right:10px"></span>{{ldapConf.certName}}</label>
-					<label id="ldapCert" ng-if="ldapConf.secure!='true'" style="display:inline;cursor:not-allowed"><span style="width:auto;font-weight:normal">Secure Option needs to be enabled</span></label>
-					<input type="file" accept=".cer,.crt,.cert,.pem" autocomplete="off" id="certInput" name="ldapCert" style="margin-top:5px" class="no-disp"/>
+					<label id="ldapCert" ng-if="ldapConf.secure!='false'" style="display:inline;cursor:pointer" for="certInput"><span class="fa fa-upload" style="width:auto;margin-right:10px"></span>{{ldapConf.certName}}</label>
+					<label id="ldapCert" ng-if="ldapConf.secure=='false'" style="display:inline;cursor:not-allowed"><span style="width:auto;font-weight:normal">Secure Option needs to be enabled</span></label>
+					<input type="file" accept=".cer,.crt,.cert,.pem" autocomplete="off" id="certInput" name="ldapCert" style="margin-top:5px" class="no-disp" ng-disabled="ldapConf.secure=='false'"/>
 					<textarea autocomplete="off" id="ldapCertValue" name="ldapCertValue" disabled="" readonly="" class="certTextarea" style="height:70px">{{ldapConf.cert}}</textarea>
 				</div></div>
 				<div class='adminControl' style="margin-bottom:2%"><div>

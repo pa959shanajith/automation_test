@@ -2474,7 +2474,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			else if(data == "empty") openModalPopup("Create User","User not found!");				
 			else {
 				userConf.nocreate = false;
-				userConf.userName = data.username;
+				if ($scope.tab !== "editUser") userConf.userName = data.username;
 				userConf.firstname = data.firstname;
 				userConf.lastname = data.lastname;
 				userConf.email = data.email;

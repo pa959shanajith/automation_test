@@ -54,6 +54,10 @@ const strategyUtil = {
 							url: config.url,
 							baseDN: config.basedn,
 						};
+						if (config.secure !== "false") adConfig.tlsOptions = { 
+							ca: config.cert,
+							rejectUnauthorized: (config.secure === "secure")
+						};
 						if (config.auth == "simple") {
 							adConfig.bindDN = config.binddn;
 							adConfig.bindCredentials = config.bindcredentials;
