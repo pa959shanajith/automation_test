@@ -1,7 +1,6 @@
 import React ,  { Fragment, useState } from 'react';
 import LeftPanel from '../components/LeftPanel'
 import CreateUser from '../components/CreateUser'
-// import AdminOpenModalPopup from '../components/AdminOpenModalPopup' 
 import '../styles/AdminHome.scss'
 
 /*Component AdminHome
@@ -11,16 +10,17 @@ import '../styles/AdminHome.scss'
 
 const AdminHome = () => {
     const [middleScreen,setMiddleScreen] = useState("createUser")
+    const [showEditUser,setShowEditUser] = useState(false)
     return (
         <Fragment>
                 <div className="header">header</div>
 
-                <LeftPanel setMiddleScreen={setMiddleScreen}/>
+                <LeftPanel setMiddleScreen={setMiddleScreen} setShowEditUser={setShowEditUser}/>
 
                 {/* <!--Middle Panel--> */}
                 <div id="middle-content-section" style={{ overflow: "auto" }}>
                     <div className="containerWrap">
-                        {(middleScreen==="createUser")?<CreateUser setMiddleScreen={setMiddleScreen}/>:null}
+                        {(middleScreen==="createUser")?<CreateUser showEditUser={showEditUser} setShowEditUser={setShowEditUser} setMiddleScreen={setMiddleScreen} middleScreen={middleScreen}/>:null}
                         {(middleScreen==="tokenTab")?null:null}
                         {(middleScreen==="provisionTa")?null:null}
                         {(middleScreen==="projectTab")?null:null}

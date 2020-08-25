@@ -17,7 +17,7 @@ const LeftPanel = (props) => {
 			<div id="left-top-section" className='left-top-section-div'>
 				<ul>
 					<li><span><a href="#/Admin" id='managePanel' className='scrapeOnTxt'>Manage</a></span></li>
-                    <li><a href="#/Admin" id='userTab' title="Manage Users" onClick={()=>props.setMiddleScreen("createUser")} className="selectBrowser" data-name="3">
+                    <li><a href="#/Admin" id='userTab' title="Manage Users" onClick={()=>{props.setShowEditUser(false);props.setMiddleScreen("createUser");}} className="selectBrowser" data-name="3">
 						<span><span className='fa fa-user'></span></span>User</a></li>
                     <li><a href="#/Admin" id='tokenTab'  title="Manage Tokens" onClick={()=>props.setMiddleScreen("tokenTab")} className="selectBrowser" data-name="1">
 						<span><span className='fa fa-tags'></span></span>Tokens</a></li>

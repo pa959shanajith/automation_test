@@ -17,13 +17,55 @@
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
 }
-#userRoles, #userTypes {  
+#userRoles, #userTypes{  
     position: relative;
     left: 10px;
     top: 2px;
 }
+#additionalRole_options {
+    position: relative;
+    left: 10px;
+    top: 5px;
+}
+
+@media screen and (max-width:770px){
+    
+    #additionalRole_options {
+        position: relative;
+        left: 10px;
+        top: 2px;
+    }
+}
+
 .userLDAPFetch label{
 	margin-right: 50px;
+}
+.edit-user-dropdown{
+    width: 85%;
+    background: none;
+    height: 30px;
+}
+@media screen and (max-width:1056px){
+    .edit-user-dropdown{
+        width: 78%;
+        background: none;
+        height: 30px;
+    }
+}
+
+@media screen and (max-width:850px){
+    .edit-user-dropdown{
+        width: 68%;
+        background: none;
+        height: 30px;
+    }
+}
+@media screen and (max-width:700px){
+    .edit-user-dropdown{
+        width: 58%;
+        background: none;
+        height: 30px;
+    }
 }
 .adminActionBtn {
 	float: right;
@@ -49,6 +91,9 @@
 .btn-disabled:disabled {
 	opacity: 0.5;
 }
+.Create-User__btn_edit:disabled {
+	opacity: 0.5;
+}
 .adminFormRadio input {
     position: absolute;
     width: auto!important;
@@ -58,6 +103,28 @@
 .adminFormRadio span {
     padding-left: 18px;
     width: fit-content;
+}
+
+.userTypeBtn_conv{
+    margin: 4px 0px;
+    right: 0px;
+    cursor: default;
+    position: absolute;
+    width: 80px;
+    z-index: 1;
+    background: #5e636b;
+    color: #fff;
+    outline: 0;
+    border-radius: 20px;
+    padding: 0px 12px;
+    font-size: 13px;
+    font-family: "LatoWeb";
+    margin-right: 7px;
+    font-family: 'LatoWebLight';
+    text-align: center;
+    white-space: nowrap;
+    border: 0;
+    vertical-align: middle;
 }
 
 .userTypeBtn.focus, .userTypeBtn, .userTypeBtn:active:focus, .userTypeBtn:focus, .userTypeBtn:hover {
@@ -105,7 +172,7 @@
 .selectRole {
 	margin-top: 2%;
     float: left;
-    width: 60%;
+    width: 50%;
 }
 .leftControl {
 	float: left;
@@ -423,3 +490,47 @@
     width: fit-content;
 }
 
+.secondaryRole{
+	width: auto;
+	vertical-align: middle;
+	font-weight: normal;
+	line-height: 2;
+}
+.chooseRole{
+    /*cursor: pointer;*/
+    float: left;
+    width: 47%;
+    vertical-align: middle;
+	font-weight: normal;
+	line-height: 2;
+    padding-right: 4px;
+    padding-left: 4px;
+    padding-bottom: 0px;
+    border-radius: 4px;
+    height: 25px;
+    width: 155px;
+    line-height: 1.7;
+    border: 1px solid #656565 !important;
+    overflow: hidden;
+    line-height: 1.42857143;
+    color: #555;
+    font-size: 14px;
+}
+.rolesSpan>label{
+    font-weight: normal;
+    padding-left: 7px;
+    width: calc(100% - 26px);
+  }
+  
+  .rolesSpan>input{
+    margin-top: 3px;
+    margin-left: 12px;
+  }
+  
+  .rolesSpan{
+      padding-top: 6px;
+      padding-bottom: 6px;
+  }
+.rolesChecklabel{
+    margin-bottom: 5px;
+}

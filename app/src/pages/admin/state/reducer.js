@@ -22,7 +22,10 @@ const initialState = {
         server : "",
         ldap : {fetch: "map", user: ''},
         confServerList : [],
-		ldapAllUserList : []
+        ldapAllUserList : [],
+        allUsersList : [],
+        fType : "Default",
+        rolename : ""
     }
 };
 
@@ -33,6 +36,21 @@ const reducer = (state = initialState , action) => {
             return{
                 ...state,
                 userConf : {...state.userConf,userName :action.payload}
+            }
+        case actionTypes.UPDATE_ROLENAME:
+            return{
+                ...state,
+                userConf : {...state.userConf,rolename :action.payload}
+            }
+        case actionTypes.UPDATE_FTYPE:
+            return{
+                ...state,
+                userConf : {...state.userConf,fType :action.payload}
+            }
+        case actionTypes.UPDATE_ALL_USERS_LIST:
+            return{
+                ...state,
+                userConf : {...state.userConf,allUsersList :action.payload}
             }
         case actionTypes.UPDATE_INPUT_FIRSTNAME:
             return{
@@ -74,6 +92,11 @@ const reducer = (state = initialState , action) => {
                 ...state,
                 userConf : {...state.userConf,allAddRoles :action.payload}
             } 
+        case actionTypes.UPDATE_ADDROLES:
+            return{
+                ...state,
+                userConf : {...state.userConf,addRole :action.payload}
+            } 
         case actionTypes.UPDATE_USERROLE:
             return{
                 ...state,
@@ -84,6 +107,12 @@ const reducer = (state = initialState , action) => {
                 ...state,
                 userConf : {...state.userConf,type :action.payload}
             }     
+        case actionTypes.UPDATE_CONF_SERVER_LIST_PUSH:
+            state.userConf.confServerList.push(action.payload);
+            return{
+                ...state,
+                userConf : {...state.userConf,confServerList :state.userConf.confServerList}
+            } 
         case actionTypes.UPDATE_USERIDNAME:
             return{
                 ...state,
@@ -139,7 +168,20 @@ const reducer = (state = initialState , action) => {
             return{
                 ...state,
                 userConf : {...state.userConf,ldap:{...state.userConf.ldap,fetch:action.payload}}
-            }                            
+            }  
+        case actionTypes.ADD_ADDROLE:
+            state.userConf.addRole[action.payload]=true;
+            return{
+                ...state,
+                userConf : {...state.userConf,addRole:state.userConf.addRole}
+            }   
+        case actionTypes.EDIT_ADDROLES:
+            if(state.userConf.addRole[action.payload]===undefined)state.userConf.addRole[action.payload]=true;
+            else state.userConf.addRole[action.payload]=!state.userConf.addRole[action.payload];
+            return{
+                ...state,
+                userConf : {...state.userConf,addRole:state.userConf.addRole}
+            }                                
         default: return state     
     }
 }

@@ -107,3 +107,23 @@ export const getOIDCConfig = async(name) => {
         console.error(err)
     }
 }
+
+export const getUserDetails = async(action, args) => { 
+    try{
+        const res = await axios(url+'/getUserDetails', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {action: action,args: args},
+            credentials: 'include'
+        });
+        if(res.status===200){
+            return res.data;
+        }else{
+            console.error(res.status)
+        }
+    }catch(err){
+        console.error(err)
+    }
+}
