@@ -94,7 +94,10 @@ export const getRoleNameByRoleId = async(roleasarray) => {
 export const checkUserState = async() => {
     try{
         console.log("Calling...");
-        const res = await axios(url+"/checkUserState");
+        const res = await axios(url+"/checkUserState", {
+            method: "POST",
+            credentials : 'include'
+        });
         if (res.status == 200){
             return res.data;
         }

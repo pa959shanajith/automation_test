@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Redirect, useHistory } from 'react-router-dom';
 import * as api from '../api';
+import LoadingBar from 'react-top-loading-bar';
 import Footer from "../components/Footer.js"
 import "../styles/BasePage.scss";
 
@@ -12,80 +14,96 @@ import "../styles/BasePage.scss";
 
 const BasePage = (props) => {
 
+    // const ref = useRef(null);
     const [loginValidation, setLoginValidation] = useState("Loading Profile...");
     const [loginAgain, setLoginAgain] = useState(true);
     const [checkLogout, setCheckLogout] = useState(JSON.parse(window.sessionStorage.getItem('checkLoggedOut')));
+    const [redirectTo , setRedirectTo] = useState(null);
+    const history = useHistory();
 
     useEffect(()=>{
-        if (!props.showLoginField) {
-        window.localStorage.clear();
-        window.sessionStorage.clear();
-        console.log("here")
-        if (checkLogout) {
-            if ((typeof(checkLogout) == "object") && (checkLogout.length == 2)) {
-                setLoginValidation("Your session has been terminated by "+checkLogout[0]);
-                if (checkLogout[1] == "dereg") setLoginValidation("Reason: User is deleted from Avo Assure");
-            } 
-            else {
-                setLoginValidation("You Have Successfully Logged Out!");
+        console.log(props)
+        if (props.location) {
+            if (!props.location.state){ 
+                setRedirectTo("/login");
             }
-            // cfpLoadingBar.complete();
-        }else {
-            setLoginAgain(false);
-            api.checkUserState()
-            .then(data => {
-                // cfpLoadingBar.complete();
-                let emsg = "Loading Profile...";
-                if (data == "fail") emsg = "Failed to load user profile.";
-                else if (data == "unauthorized") emsg = "User is not authorized to use Avo Assure.";
-                else if (data == "badrequest") emsg = "User does not have sufficient permission to view this page.";
-                else if (data == "nouser") emsg = "User profile not found in Avo Assure.";
-                else if (data == "nouserprofile") emsg = "User profile not found in Authorization Server.";
-                else if (data == "userLogged") emsg = "User is already logged in! Please logout from the previous session.";
-                else if (data == "inValidCredential" || data == "invalid_username_password") emsg = "The username or password you entered isn't correct. Please try again.";
-                else if (data == "noProjectsAssigned") emsg = "To Login, user must be allocated to a Domain and Project. Please contact Admin.";
-                else if (data == "reload") window.location.reload();
-                else if (data == "Invalid Session") {
-                    emsg = "Your session has expired!";
-                    setLoginAgain(true);
-                }
-                else {
-                    api.loadUserInfo()
-                    .then(data => {
-                        if (data == "fail") emsg = "Failed to Login.";
-                        else
-                        if (data == "Invalid Session") {
-                            emsg = "Your session has expired!";
-                            setLoginAgain(true);
+            else{    
+                (async()=>{
+                        window.localStorage.clear();
+                        window.sessionStorage.clear();
+                        if (checkLogout) {
+                            if ((typeof(checkLogout) == "object") && (checkLogout.length == 2)) {
+                                setLoginValidation("Your session has been terminated by "+checkLogout[0]);
+                                if (checkLogout[1] == "dereg") setLoginValidation("Reason: User is deleted from Avo Assure");
+                            } 
+                            else setLoginValidation("You Have Successfully Logged Out!");
+                            // ref.current.complete();
                         }
                         else {
-                            window.localStorage['_SR'] = data.rolename;
-                            window.localStorage['_UI'] = JSON.stringify(data);
-                            window.localStorage.navigateScreen = data.page;
-                            console.log(data.page)
-                            // $location.path("/"+data.page);
+                            setLoginAgain(false);
+                            try{
+                                let data = await api.checkUserState()
+                                // ref.current.complete();
+                                let emsg = "Loading Profile...";
+                                if (data == "fail") emsg = "Failed to load user profile.";
+                                else if (data == "unauthorized") emsg = "User is not authorized to use Avo Assure.";
+                                else if (data == "badrequest") emsg = "User does not have sufficient permission to view this page.";
+                                else if (data == "nouser") emsg = "User profile not found in Avo Assure.";
+                                else if (data == "nouserprofile") emsg = "User profile not found in Authorization Server.";
+                                else if (data == "userLogged") emsg = "User is already logged in! Please logout from the previous session.";
+                                else if (data == "inValidCredential" || data == "invalid_username_password") emsg = "The username or password you entered isn't correct. Please try again.";
+                                else if (data == "noProjectsAssigned") emsg = "To Login, user must be allocated to a Domain and Project. Please contact Admin.";
+                                else if (data == "reload") window.location.reload();
+                                else if (data == "Invalid Session") {
+                                    emsg = "Your session has expired!";
+                                    setLoginAgain(true);
+                                }
+                                else {
+                                    try{
+                                        let userinfo = await api.loadUserInfo()
+                                    
+                                        if (userinfo == "fail") emsg = "Failed to Login.";
+                                        else
+                                        if (userinfo == "Invalid Session") {
+                                            emsg = "Your session has expired!";
+                                            setLoginAgain(true);
+                                        }
+                                        else {
+                                            window.localStorage['_SR'] = userinfo.rolename;
+                                            window.localStorage['_UI'] = JSON.stringify(userinfo);
+                                            window.localStorage.navigateScreen = userinfo.page;
+                                            // history.replace(`/${data.page}`)
+                                            setRedirectTo(`/${userinfo.page}`);
+                                        }
+                                        setLoginValidation(emsg);
+                                        if (emsg != "Loading Profile...") console.log(emsg);
+                                    }
+                                    catch(err){
+                                        setLoginValidation("Failed to Login.");
+                                        console.log("Fail to Load UserInfo");    
+                                    }
+                                }
+                                setLoginValidation(emsg);
+                                if (emsg != "Loading Profile...") console.log(emsg);
+                            }
+                            catch(err){
+                                console.error(err)
+                                let emsg = "Failed to load user profile.";
+                                console.log(emsg);
+                                setLoginValidation(emsg);
+                                // ref.current.complete();
+                            }
                         }
-                        setLoginValidation(emsg);
-                        if (emsg != "Loading Profile...") console.log(emsg);
-                    })
-                    .catch(error => {
-                        setLoginValidation("Failed to Login.");
-                        console.log("Fail to Load UserInfo");
-                    });
-                }
-                setLoginValidation(emsg);
-                if (emsg != "Loading Profile...") console.log(emsg);
-            })
-            .catch(error => {
-                let emsg = "Failed to load user profile.";
-                console.log(emsg);
-                setLoginValidation(emsg);
-                // cfpLoadingBar.complete();
-            });
-        }}
+                    }
+                )()
+            }
+        } 
+        
     }, []);
 
     return (
+        <>
+        {redirectTo ? <Redirect to={redirectTo} /> :
         <div className="bg-container">
             <img className="bg-img" src="static/imgs/login-bg.png"/>
             <div className="element-holder">
@@ -105,7 +123,8 @@ const BasePage = (props) => {
                 </div>
             </div>
             <Footer/>
-        </div>
+        </div>}
+        </>
     );
 }
 

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import * as api from '../api';
-import { useHistory } from 'react-router-dom';
+import { Redirect, useHistory } from 'react-router-dom';
 import 'font-awesome/css/font-awesome.min.css';
 import "../styles/LoginFields.scss"
 import { res, styles } from './Properties'
@@ -20,8 +20,9 @@ const LoginFields = () => {
     const [userError, setUserError] = useState(false);
     const [passError, setPassError] = useState(false);
     const [loginValidation, setLoginValidation] = useState("");
-    const history = useHistory();
     const [requested, setRequested] = useState(false);
+    const [redirectTo, setRedirectTo] = useState(null);
+    const history = useHistory();
 
     const handleShowPass = () => setShowPass(!showPass);
 
@@ -47,22 +48,23 @@ const LoginFields = () => {
             return false;
         }
         setRequested(true);
-        api.checkUser(username).then(data=> {
-            // cfpLoadingBar.complete();
-            setRequested(false);
-            if (data.redirect) {
-                // history.push(data.redirect);
-                // window.location.href = data.redirect;
-            } else if (data.proceed) {
-                togglePassField();
-            } else if (data == "invalidServerConf") setLoginValidation("Authentication Server Configuration is invalid!");
-            else setLoginValidation(err);
-        }).catch(error=> {
-            console.log(err);
-            setLoginValidation(err);
-            // cfpLoadingBar.complete();
-            setRequested(false);
-        });
+        (async()=>{
+            try{
+                let data = await api.checkUser(username)
+                // cfpLoadingBar.complete();
+                setRequested(false);
+                if (data.redirect) setRedirectTo(data.redirect); // history.replace(data.redirect);
+                else if (data.proceed) togglePassField();
+                else if (data == "invalidServerConf") setLoginValidation("Authentication Server Configuration is invalid!");
+                else setLoginValidation(err);    
+            }
+            catch(err){
+                console.log(err);
+                setLoginValidation(err);
+                // cfpLoadingBar.complete();
+                setRequested(false);
+            }
+        })()
     }
 
     const login = event => {
@@ -71,11 +73,13 @@ const LoginFields = () => {
         if (!username) setUserError(true);
         else if (!showPassField) setPassField(true);
         else if (!password) setPassError(true);
-        check_credentials(username, password, setUserError, setPassError, setLoginValidation, history);
+        check_credentials(username, password, setUserError, setPassError, setLoginValidation, history, setRedirectTo);
     }
 
 
     return (
+        <>
+        {redirectTo ? <Redirect to={{pathname: redirectTo, state: { redirected: true } }} /> : 
         <form className="login-form" onSubmit={login}>
         <div className="username-wrap" style={userError ? styles.errorBorder : null }>
             <span><img className="ic-username" src={userError ? res.errorUserIcon : res.defaultUserIcon}/></span>
@@ -99,70 +103,54 @@ const LoginFields = () => {
         : false
         }
         </form>
+        }
+        </>
     );
 }
 
-const check_credentials = (username, password, setUserError, setPassError, setLoginValidation, history) => {
+const check_credentials = (username, password, setUserError, setPassError, setLoginValidation, history, setRedirectTo) => {
     if (username && password){
         let user = username.toLowerCase();
         console.log(user, password);
-        try{
-            api.authenticateUser(user, password)
-            .then(data=>{
+        (async()=>{
+            try{
+                let data = await api.authenticateUser(user, password)
                 // cfpLoadingBar.complete();
                 // $scope.requested = false;
                 let error_msg = "";
-				if (data == "restart") {
-					// blockUI("Fetching active services...");
-					// adminServices.restartService("query")
-					// .then(function (data) {
-					// 	if (data == "fail") {
-					// 		$scope.loginValidation = "Failed to fetch services.";
-					// 	} else {
-					// 		$scope.restartForm = true;
-					// 		data.forEach(function(e, i){
-					// 			$scope.serverList[i].active = e;
-					// 		});
-					// 	}
-					// 	unblockUI();
-					// }, function (error) {
-					// 	unblockUI();
-					// 	$scope.loginValidation = "Failed to fetch services.";
-					// });
+                if (data == "restart") {
+                    // blockUI("Fetching active services...");
+                    // adminServices.restartService("query")
+                    // .then(function (data) {
+                    // 	if (data == "fail") {
+                    // 		$scope.loginValidation = "Failed to fetch services.";
+                    // 	} else {
+                    // 		$scope.restartForm = true;
+                    // 		data.forEach(function(e, i){
+                    // 			$scope.serverList[i].active = e;
+                    // 		});
+                    // 	}
+                    // 	unblockUI();
+                    // }, function (error) {
+                    // 	unblockUI();
+                    // 	$scope.loginValidation = "Failed to fetch services.";
+                    // });
                 }
-                else
-                if (data == 'validCredential') {
-                    console.log("ok")
-                    history.push('/')
-					// window.location = '/'; this works
-                }
-                else
-                if (data == 'inValidCredential' || data == "invalid_username_password") {
+                else if (data == 'validCredential') setRedirectTo('/')//  //  history.replace('/')
+                else if (data == 'inValidCredential' || data == "invalid_username_password") {
                     setUserError(true);
                     setPassError(true);
-					error_msg = "The username or password you entered isn't correct. Please try again.";
+                    error_msg = "The username or password you entered isn't correct. Please try again.";
                 }
-                else
-                if (data == "userLogged"){
-                    error_msg = "User is already logged in! Please logout from the previous session.";
-                }
-                else 
-                if (data == "inValidLDAPServer") {
-                    error_msg = "LDAP Server Configuration is invalid!";
-                }
-                else
-                if (data == "invalidUserConf") {
-                    error_msg = "User-LDAP mapping is incorrect!";
-                }
-                else error_msg = "Failed to Login.";
-                
-                setLoginValidation(error_msg);
-            })
-            .catch(data => console.log(data))
-        }
-        catch(err){
-            console.log(err)
-        }
+                else if (data == "userLogged") setLoginValidation("User is already logged in! Please logout from the previous session.");
+                else if (data == "inValidLDAPServer") setLoginValidation("LDAP Server Configuration is invalid!");
+                else if (data == "invalidUserConf") setLoginValidation("User-LDAP mapping is incorrect!");
+                else setLoginValidation("Failed to Login.");
+            }
+            catch(err){
+                console.log(err)
+            }
+        })()
     }
 }
 
