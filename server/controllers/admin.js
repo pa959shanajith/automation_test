@@ -473,28 +473,39 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 exports.testLDAPConnection = (req, res) => {
 	logger.info("Inside UI Service: testLDAPConnection");
 	try{
-		var reqData = req.body;
-		var ldapURL = (reqData.ldapURL || "").trim();
+		const reqData = req.body;
+		const ldapURL = (reqData.ldapURL || "").trim();
+		const secure = (reqData.secure || "false").trim();
+		const tlsCert = (reqData.tlsCert || "").trim() || false;
 		if (ldapURL.slice(0,8) == "ldaps://") {
-			logger.error("Error occurred in admin/testLDAPConnection: 'ldaps' protocol is not supported.");
-			res.send("invalid_url_protocol");
-		} else if (ldapURL.slice(0,7) != "ldap://") {
+			if (secure === "false") {
+				logger.error("Error occurred in admin/testLDAPConnection: Secure connection must be enabled for 'ldaps' protocol");
+				return res.send("mismatch_secure");
+			} else if (!tlsCert) {
+				logger.error("Error occurred in admin/testLDAPConnection: 'ldaps' protocol require TLS Certificate.");
+				return res.send("invalid_cert");
+			}
+		} else if (ldapURL.slice(0,8) != "ldaps://" && ldapURL.slice(0,7) != "ldap://") {
 			logger.error("Error occurred in admin/testLDAPConnection: Invalid URL provided for connection test.");
-			res.send("invalid_url");
+			return res.send("invalid_url");
 		}
-		var baseDN = (reqData.baseDN || "").trim();
-		var authUser = (reqData.username || "").trim();
-		var authKey = (reqData.password || "").trim();
-		var authType = reqData.authType;
-		var adConfig = {
+		const baseDN = (reqData.baseDN || "").trim();
+		const authUser = (reqData.username || "").trim();
+		const authKey = (reqData.password || "").trim();
+		const authType = reqData.authType;
+		const adConfig = {
 			url: ldapURL,
 			baseDN: baseDN
+		};
+		if (secure !== "false") adConfig.tlsOptions = { 
+			ca: tlsCert,
+			rejectUnauthorized: secure === "secure"
 		};
 		if (authType == "simple") {
 			adConfig.bindDN = authUser;
 			adConfig.bindCredentials = authKey;
 		}
-		var ad = new activeDirectory(adConfig);
+		const ad = new activeDirectory(adConfig);
 		var resSent = false;
 		ad.find("cn=*", function (err, result) {
 			if (resSent) return;
@@ -503,7 +514,7 @@ exports.testLDAPConnection = (req, res) => {
 			var data = {fields:{}};
 			if (err) {
 				const errm = err.lde_message;
-				if (err.errno == "EADDRNOTAVAIL" || err.errno == "ECONNREFUSED" || err.errno == "ETIMEDOUT") flag = "invalid_addr";
+				if (["EADDRNOTAVAIL", "ECONNREFUSED", "ETIMEDOUT"].includes(err.errno)) flag = "invalid_addr";
 				else if (err.errno == "INSUFFICIENT_ACCESS_RIGHTS") {
 					if (authType == "simple") flag = "insufficient_access";
 					else flag = "success";
@@ -519,16 +530,23 @@ exports.testLDAPConnection = (req, res) => {
 							flag = "invalid_credentials";
 					}
 					else if (errm.indexOf("DSID-031007DB") > -1) flag = "invalid_basedn";
-				}
+				} else if (err.code == "UNABLE_TO_VERIFY_LEAF_SIGNATURE") flag = "invalid_cacert";
+				else if (err.code == "ERR_TLS_CERT_ALTNAME_INVALID") flag = "invalid_cacert_host";
 				else flag = "fail";
-				logger.debug("Error occurred in admin/testLDAPConnection: " + JSON.stringify(err));
+				var errStack = "";
+				try {
+					errStack = JSON.stringify(err);
+				} catch(_){
+					errStack = JSON.stringify({"message": err.lde_message || err.message, "code": err.errno || err.code});
+				}
+				logger.debug("Error occurred in admin/testLDAPConnection: " + errStack);
 			}
 			if (flag == "success") {
 				logger.info('LDAP Connection test passed!');
 				if (result && result.users && result.users.length>0) data.fields = Object.keys(result.users[0]);
 				else{ 
-					flag= "fail";
-					logger.error('LDAP Connection test failed!');
+					flag= "empty";
+					logger.warn('LDAP Connection test passed but directory is empty');
 				}
 			} else {
 				logger.error('LDAP Connection test failed!');
@@ -550,7 +568,7 @@ exports.testLDAPConnection = (req, res) => {
 exports.getLDAPConfig = async (req, res) => {
 	const fnName = "getLDAPConfig";
 	logger.info("Inside UI Service: " + fnName);
-	try{
+	try {
 		const action = req.body.action;
 		const name = req.body.args;
 		const opts = (req.body.opts || "").trim();
@@ -565,6 +583,8 @@ exports.getLDAPConfig = async (req, res) => {
 		let data = {
 			url: resConf.url,
 			basedn: resConf.basedn,
+			secure: resConf.secure,
+			cert: resConf.cert || '',
 			auth: resConf.auth,
 			binddn: resConf.binddn,
 			bindCredentials: '',
@@ -576,6 +596,10 @@ exports.getLDAPConfig = async (req, res) => {
 		const adConfig = {
 			url: data.url,
 			baseDN: data.basedn
+		};
+		if (data.secure !== "false") adConfig.tlsOptions = { 
+			ca: data.cert,
+			rejectUnauthorized: (data.secure === "secure")
 		};
 		if (data.auth == "simple") {
 			adConfig.bindDN = data.binddn;
@@ -599,7 +623,7 @@ exports.getLDAPConfig = async (req, res) => {
 						data = "server_error";
 					}
 				}
-				if (result) {
+				else if (result) {
 					data = {
 						username: result[filter],
 						firstname: result[dataMaps.fname],
@@ -627,7 +651,7 @@ exports.getLDAPConfig = async (req, res) => {
 						data = "server_error";
 					}
 				}
-				if (result) {
+				else if (result) {
 					var groups = result.groups;
 					var others = result.other;
 					groups.forEach(function(e) {
@@ -657,7 +681,7 @@ exports.getLDAPConfig = async (req, res) => {
 exports.manageLDAPConfig = async (req, res) => {
 	const fnName = "manageLDAPConfig";
 	logger.info("Inside UI Service: " + fnName);
-	try{
+	try {
 		let flag = ['1','0','0','0','0','0','0','0','0'];
 		const reqData = req.body.conf;
 		const action = req.body.action;
@@ -675,17 +699,29 @@ exports.manageLDAPConfig = async (req, res) => {
 		if  (action != "delete") {
 			inputs.url = (reqData.url || "").trim();
 			inputs.basedn = (reqData.basedn || "").trim();
+			inputs.secure = reqData.secure;
 			inputs.auth = reqData.auth;
 			inputs.fieldmap = reqData.fieldmap || {};
+			const secure = (reqData.secure !== "false");
+			const protocol = (inputs.url.slice(0,7) + ((inputs.url.slice(7,8)=='/')?'/':'')).slice(0,-3);
 			if (validator.isEmpty(inputs.url)) {
 				logger.error("Error occurred in admin/manageLDAPConfig: LDAP Server URL cannot be empty.");
 				flag[3] = '1';
-			} else if (inputs.url.slice(0,8) == "ldaps://") {
-				logger.error("Error occurred in admin/manageLDAPConfig: 'ldaps' protocol is not supported.");
+			} else if (secure && protocol == "ldap") {
+				logger.error("Error occurred in admin/manageLDAPConfig: Secure Connection needs 'ldaps' protocol.");
 				flag[3] = '2';
-			} else if (inputs.url.slice(0,7) != "ldap://") {
-				logger.error("Error occurred in admin/manageLDAPConfig: Invalid URL provided for connection test.");
-				flag[3] = '3';
+			} else if (secure && protocol == "ldaps") {
+				if ((reqData.cert || "").trim().length !== 0) inputs.cert = reqData.cert;
+				else {
+					logger.error("Error occurred in admin/manageLDAPConfig: Secure Connection needs a TLS Certificate.");
+					flag[3] = '3';
+				}
+			} else if (!secure && protocol == "ldaps") {
+				logger.error("Error occurred in admin/manageLDAPConfig: 'ldaps' protocol needs secure connection enabled.");
+				flag[3] = '4';
+			} else if (!["ldap", "ldaps"].includes(protocol)) {
+				logger.error("Error occurred in admin/manageLDAPConfig: Invalid URL provided. URL should start with ldap or ldaps");
+				flag[3] = '5';
 			}
 			if (validator.isEmpty(inputs.basedn)) {
 				logger.error("Error occurred in admin/manageLDAPConfig: Invalid Base Domain Name.");

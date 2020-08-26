@@ -3863,7 +3863,7 @@ select[multiple]:-internal-list-box option:checked {
 	background: none;
 }
 
-#samlCertValue {
+.certTextarea {
     margin-top: 5px;
     width: calc(100% - 130px);
     height: 150px;
