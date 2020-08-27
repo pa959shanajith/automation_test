@@ -1,14 +1,18 @@
 import React from 'react';
 import { HashRouter as Router, Route ,Switch} from "react-router-dom";
 import Login, {BasePage} from './pages/login';
+import {ProgressBar} from './pages/global'
+import Plugin from './pages/plugin';
 import Mindmap from './pages/mindmap';
 import {createStore,combineReducers} from 'redux';
 import {Provider} from 'react-redux';
-import mindmapReducer from './pages/mindmap/state/reducer.js'
+import mindmapReducer from './pages/mindmap/state/reducer.js';
+import progressBarReducer from "./pages/global/state/reducer";
 
 /* combining multiple domains reducer */
 const rootReducer = combineReducers({
-  mindmap : mindmapReducer
+  mindmap : mindmapReducer,
+  progressbar : progressBarReducer,
 });
 
 const store = createStore(rootReducer)
@@ -19,13 +23,16 @@ const store = createStore(rootReducer)
 */
 
 const App = () => {
+  
   return (
     <Provider store={store}>
+      <ProgressBar />
       <Router>
         <Switch>
           <Route exact path="/" component={BasePage} />
           <Route path="/login" component={Login} />
           <Route path="/mindmap" component={Mindmap} />
+          <Route path="/plugin" component={Plugin} />
           <Route component={Login} />
         </Switch>
       </Router>

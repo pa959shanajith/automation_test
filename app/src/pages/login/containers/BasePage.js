@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Redirect, useHistory } from 'react-router-dom';
+import { Redirect, useHistory, Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { SetProgressBar } from '../../global';
 import * as api from '../api';
-import LoadingBar from 'react-top-loading-bar';
-import Footer from "../components/Footer.js"
+import {FooterOne} from "../../global"
 import "../styles/BasePage.scss";
 
 /*
@@ -20,11 +21,12 @@ const BasePage = (props) => {
     const [checkLogout, setCheckLogout] = useState(JSON.parse(window.sessionStorage.getItem('checkLoggedOut')));
     const [redirectTo , setRedirectTo] = useState(null);
     const history = useHistory();
+    let dispatch = useDispatch();
 
     useEffect(()=>{
-        console.log(props)
         if (props.location) {
-            if (!props.location.state){ 
+            if (!props.location.state){
+                SetProgressBar("start", dispatch);
                 setRedirectTo("/login");
             }
             else{    
@@ -38,12 +40,14 @@ const BasePage = (props) => {
                             } 
                             else setLoginValidation("You Have Successfully Logged Out!");
                             // ref.current.complete();
+                            SetProgressBar("stop", dispatch);
                         }
                         else {
                             setLoginAgain(false);
                             try{
                                 let data = await api.checkUserState()
                                 // ref.current.complete();
+                                SetProgressBar("stop", dispatch);
                                 let emsg = "Loading Profile...";
                                 if (data == "fail") emsg = "Failed to load user profile.";
                                 else if (data == "unauthorized") emsg = "User is not authorized to use Avo Assure.";
@@ -62,10 +66,10 @@ const BasePage = (props) => {
                                     try{
                                         let userinfo = await api.loadUserInfo()
                                     
-                                        if (userinfo == "fail") emsg = "Failed to Login.";
+                                        if (userinfo == "fail") setLoginValidation("Failed to Login.");
                                         else
                                         if (userinfo == "Invalid Session") {
-                                            emsg = "Your session has expired!";
+                                            setLoginValidation("Your session has expired!");
                                             setLoginAgain(true);
                                         }
                                         else {
@@ -73,9 +77,9 @@ const BasePage = (props) => {
                                             window.localStorage['_UI'] = JSON.stringify(userinfo);
                                             window.localStorage.navigateScreen = userinfo.page;
                                             // history.replace(`/${data.page}`)
+                                            SetProgressBar("start", dispatch);
                                             setRedirectTo(`/${userinfo.page}`);
                                         }
-                                        setLoginValidation(emsg);
                                         if (emsg != "Loading Profile...") console.log(emsg);
                                     }
                                     catch(err){
@@ -91,14 +95,17 @@ const BasePage = (props) => {
                                 let emsg = "Failed to load user profile.";
                                 console.log(emsg);
                                 setLoginValidation(emsg);
+                                SetProgressBar("stop", dispatch);
                                 // ref.current.complete();
                             }
                         }
                     }
                 )()
             }
-        } 
-        
+        }
+        else{
+            SetProgressBar("stop", dispatch);
+        }
     }, []);
 
     return (
@@ -118,11 +125,11 @@ const BasePage = (props) => {
                     ? <props.LoginFields/>
                     : <>
                     <div className="error-msg">{loginValidation}</div>
-                    {loginAgain ? <span className="error-msg">Click here to login again.</span> : null}
+                    {loginAgain ? <span className="error-msg">Click <Link to="/login">here</Link> to login again.</span> : null}
                     </>}
                 </div>
             </div>
-            <Footer/>
+            <FooterOne/>
         </div>}
         </>
     );
