@@ -1266,7 +1266,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					getTestcaseStep(2,null,'@Sap','ServerConnect',null,null,null,"SAP")
 				];
 				step = 3;
-				if(screendata[0].tag!="GuiOkCodeField") {
+				if(screendata[0].tag=="GuiOkCodeField") {
 					testcaseObj = getTestcaseStep(step,null,'@Sap','StartTransaction',[screendata[0].text],null,null,"SAP");
 					step = 4;	
 					testCaseSteps.push(testcaseObj);
