@@ -1345,17 +1345,26 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 				case "table":
 				case "toolbar":
 				case "calendar":
-				case "gridview":
+				case "gridview": 
+				case "GuiLabel":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
 					var custname_split = eachScrapedAction.custname.split('_');
 					if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+					break;
+				case "GuiStatusbar":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClickStatusBar',null,null,null,"SAP");
 					break;
 				case "GuiTab":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTab',null,null,null,"SAP");
 					break;
 				case "select":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,
-						'selectValueByText',[input[0]],null,null,"SAP");
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'selectValueByText',[input[0]],null,null,"SAP");
+					break;
+				case "GuiMenubar":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'SelectMenu',[input[0]],null,null,"SAP");
+					break;
+				case "GuiSimpleContainer":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'DoubleClickOnCell',[input[0]],null,null,"SAP");
 					break;
 				case "radiobutton":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRadioButton',null,null,null,"SAP");
