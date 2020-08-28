@@ -12,6 +12,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.ldapConf = {};
 	$scope.samlConf = {};
 	$scope.oidcConf = {};
+	$scope.mailConf = {};
 	$scope.userConf = {};
 	$scope.domainConf = {};
 	$scope.moveItems = {};
@@ -3388,6 +3389,47 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		});
 	};
 
+
+
+	// Email Server Configuration Click
+	$scope.mailConf.click =function (){
+		
+	}
+
+	$scope.mailConf.getEmailprovider=function(){
+		if (this.allproviders && this.allproviders.length > 0) return true;
+		adminServices.getProviders()
+		.then(function (res) {
+			if(res == "Invalid Session"){
+				$rootScope.redirectPage();
+			} else {
+				
+			}
+		}, function (error) {
+			console.log(error);
+			$scope.mailConf.allproviders = [];
+			openModalPopup("Email Configuration", "Something Went Wrong");
+		});
+	}
+
+	$scope.mailConf.testmailconfig = function(){
+		$('#emailserverModal').modal("show");
+	}
+
+	$scope.mailConf.manageMail = function(){
+		var emailObj={};
+		emailObj.host=$("#mailHost").val().trim();
+		emailObj.port=$("#mailPort").val().trim();
+		emailObj.fromMail=$("#fromMail").val().trim();
+		emailObj.displayname=$("#displayname").val().trim();
+		emailObj.displayname=$("#displayname").val().trim();
+		emailObj.displayname=$("#displayname").val().trim();
+		emailObj.displayname=$("#displayname").val().trim();
+
+		
+
+		
+	}
 	// Session Management Tab Click
 	$scope.sessionConf.click = function () {
 		$(".selectedIcon").removeClass("selectedIcon");

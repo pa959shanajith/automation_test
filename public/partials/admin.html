@@ -20,6 +20,8 @@
 						<span><span class='fa fa-briefcase'></span></span>Project</a></li>
 					<li class='userDivider'><a id='assignProjectTab' ng-click="tab='tabAssignProject';assignProj.click()" title="Assign Project" class="selectBrowser" data-name="1">
 						<span><span class='fa fa-link'></span></span>Assign Projects</a></li>
+					<li><a id='mailConfigTab' title="Manage Email Server Configuration" ng-click="tab = 'tabmailConfig';mailConf.click()" class="selectBrowser" data-name="4">
+						<span><span class='fa fa-envelope'></span></span>Email Server Configuration</a></li>
 					<li><a id='ldapConfigTab' title="Manage LDAP Configuration" ng-click="tab = 'tabldapConfig';ldapConf.click()" class="selectBrowser" data-name="4">
 						<span><span class='fa fa-address-book'></span></span>LDAP Configuration</a></li>
 					<li><a id='samlConfigTab' title="Manage SAML Configuration" ng-click="tab = 'tabsamlConfig';samlConf.click()" class="selectBrowser" data-name="4">
@@ -774,6 +776,100 @@
 		</div>
 		<!-- Edit OIDC Configuration -->
 
+		<!-- Create Email server Configuration -->
+		<div class="containerWrap" ng-if="tab == 'tabmailConfig'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Manage Email Server Configuration</span>
+			</div>
+			<!--Task Name-->
+			<!-- Button -->
+			<div class="adminActionBtn">
+				<button class="btn btn-md pull-right adminBtn" ng-click="mailConf.testmailconfig()" title="Test Configuration">Test</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="mailConf.manageMail('Update',$event)" style="margin-right:10px" title="Update Configuration">Update</button>
+			</div>
+			<!-- Button -->
+			<!-- Create Configuration Form -->
+			<div class="col-xs-9 form-group adminForm">
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Server Name">Provider</span>
+					<select ng-change="mailConf.getEmailprovider()" class="adminSelect form-control ng-pristine ng-valid ng-touched" ng-model="mailConf.provider" id="provider">
+						<option value="" disabled selected="selected">Select Provider</option></select>
+						<option ng-repeat="pid in mailConf.allproviders" value="{{pid[1]}}">{{pid[0]}}</option>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Issuer URL">Host</span>
+					<input type="text" autocomplete="off" id="mailHost" name="mailHost" ng-model="mailConf.host" maxlength="100" class="form-control form-control-custom create" placeholder="Enter Hostname"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Issuer URL">Port</span>
+					<input type="text" autocomplete="off" id="mailPort" name="mailPort" ng-model="mailConf.port" maxlength="100" class="form-control form-control-custom create" placeholder="Enter Port"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Issuer URL">Authentication</span>
+					<select class="adminSelect form-control ng-pristine ng-valid ng-touched" ng-model="mailConf.auth" id="authenticationType"><option value="" label="Select Authentication type" selected="selected">Select Authentication type</option>
+						<option value="basic">Basic</option>
+						<option value="None">None</option>
+					</select>
+				</div></div>
+				<div class='adminControl'><div>
+						<span class="leftControl" title="Authentication Username">Authentication Username</span>
+						<input type="text" autocomplete="off" name="emailusername" id="emailusername" ng-disabled="mailConf.auth != 'basic'" ng-model="mailConf.username" class="form-control form-control-custom create" placeholder="Authentication Username" autocomplete="off"/>
+				</div></div>
+				<div class='adminControl'><div>
+						<span class="leftControl" title="Authentication Password">Authentication Password</span>
+						<input type="password" autocomplete="off" name="emailpwd" id="emailpwd" ng-disabled="mailConf.auth != 'basic'" ng-model="mailConf.password" class="form-control form-control-custom create" placeholder="Authentication Password" autocomplete="off"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Issuer URL">Default From Address</span>
+					<input type="email" autocomplete="off" id="fromMail" name="fromMail" ng-model="mailConf.fromMail" maxlength="100" class="form-control form-control-custom create" placeholder="nineteen68.alerts@slkgroup.com"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Issuer URL">Default Display Name</span>
+					<input type="text" autocomplete="off" id="displayname" name="displayname" ng-model="mailConf.displayname" maxlength="100" class="form-control form-control-custom create" placeholder="Nineteen68 alerts"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Issuer URL">Security</span>
+					<select class="adminSelect form-control ng-pristine ng-valid ng-touched" ng-model="mailConf.security" id="security"><option value="" label="Select Security type" selected="selected">Select Security Type</option><option value="Auto" label="Auto">Auto</option></select>
+				</div></div>
+				<div class='adminControl'><div>
+					<input type="checkbox" ng-model="mailConf.ignoreSecurity" value="Yes" name="ignoreSecurity" class="ng-pristine ng-valid ng-touched" style="width: 4%;"><span style="width: 96%;">Ignore Security Validation</span>
+				</div></div>
+			</div>
+			<div class="col-xs-9 form-group">
+				<div class="sessionHeading collapsed" data-toggle="collapse" data-target="#advancedConfig" aria-expanded="true">
+					<h4>Advanced Configuration</h4>
+				</div>
+				<div id="advancedConfig" aria-expanded="true" class="collapse in" >
+					<div class='adminControl'><div>
+						<span class="leftControl" title="Issuer URL">Connection Timeout</span>
+						<input type="number" autocomplete="off" id="connTime" name="connTime" ng-model="mailConf.connTime" maxlength="100" class="form-control form-control-custom create" placeholder="Enter in milliseconds"/>
+					</div></div>
+					<div class='adminControl'><div>
+						<span class="leftControl" title="Issuer URL">Greeting Timeout</span>
+						<input type="number" autocomplete="off" id="greetTIme" name="greetTIme" ng-model="mailConf.greetTIme" maxlength="100" class="form-control form-control-custom create" placeholder="Enter in milliseconds"/>
+					</div></div>
+					<div class='adminControl'><div>
+						<span class="leftControl" title="Issuer URL">Socket TImeout</span>
+						<input type="number" autocomplete="off" id="sockTime" name="sockTime" ng-model="mailConf.sockTime" maxlength="100" class="form-control form-control-custom create" placeholder="Enter in milliseconds"/>
+					</div></div>
+					<div class='adminControl'><div>
+						<input type="checkbox" ng-model="mailConf.connectionPool" value="Enable" name="connectionPool" class="ng-pristine ng-valid ng-touched" style="width: 4%;"><span style="width: 96%;">Use Connection Pool</span>
+					</div></div>
+					<div class='adminControl'><div>
+						<span class="leftControl" title="Issuer URL">Max Connections</span>
+						<input type="number" autocomplete="off" id="maxConn" name="maxConn" ng-model="mailConf.maxConn" maxlength="100" class="form-control form-control-custom create" placeholder="Enter in milliseconds"/>
+					</div></div>
+					<div class='adminControl'><div>
+						<span class="leftControl" title="Issuer URL">Max Messages</span>
+						<input type="number" autocomplete="off" id="maxMsg" name="maxMsg" ng-model="mailConf.maxMsg" maxlength="100" class="form-control form-control-custom create" placeholder="Enter in milliseconds"/>
+					</div></div>
+				</div>
+			</div>
+			<!-- Create Configuration Form -->
+		</div>
+		<!-- Create Email Server Configuration -->
+
 		<!-- Session Management -->
 		<div class="containerWrap" ng-if="tab == 'tabSession'">
 			<!--Task Name-->
@@ -1138,3 +1234,23 @@
 	</div>
 </div>
 <!-- Admin Modal Box -->
+
+<!-- Email server Model  -->
+<div class="modal fade" id="emailserverModal" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm" style="width: 400px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Email Server Configuration</h4>
+			</div>
+			<div class="modal-body">
+				<div><span>Email Address: </span></div><div><input type="text" placeholder="Enter mail id" style="width: 100%;"></div>
+			</div>
+			<div class="modal-footer">
+				<button id="assignProjectModalButton" type="button" class="btn btn-default" ng-click="testmail($event)">Test</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Email Server Model  -->
