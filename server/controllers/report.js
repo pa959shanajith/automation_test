@@ -723,7 +723,6 @@ exports.getReport_API = async(req, res) => {
     try {
 		var executionId = req.body.execution_data.executionId || "";
 		var scenarioIds = req.body.execution_data.scenarioIds;
-		var flag = "";
 		var finalReport = [];
 		var tempModDict = {};
 		const userInfo = await utils.tokenValidation(req.body.userInfo);
