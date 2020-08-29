@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import * as api from '../api';
+import * as adminApi from "../../admin/api";
 import { Redirect, useHistory } from 'react-router-dom';
 import 'font-awesome/css/font-awesome.min.css';
 import "../styles/LoginFields.scss"
@@ -11,7 +12,7 @@ import { res, styles } from './Properties'
     Todo: loading bar and checkUser function
 */
 
-const LoginFields = () => {
+const LoginFields = (props) => {
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -22,39 +23,48 @@ const LoginFields = () => {
     const [loginValidation, setLoginValidation] = useState("");
     const [requested, setRequested] = useState(false);
     const [redirectTo, setRedirectTo] = useState(null);
+    const [restartForm, setRestartForm] = useState(false);
+    let serverList = [{"name": "License Server", "active": false}, {"name": "DAS Server", "active": false}, {"name": "Web Server", "active": false}];
     const history = useHistory();
+    let dispatch = props.dispatch;
+    let SetProgressBar = props.SetProgressBar;
 
     const handleShowPass = () => setShowPass(!showPass);
 
     const handleUsername = event => {
         setUserError(false);
+        if (showPassField){
+            hidePassField(false);
+        }
         setUsername(event.target.value);
     }
     const handlePassword = event => {
         setPassError(false);
         setPassword(event.target.value);
     }
-    const togglePassField = () => {
-        setPassField(!showPassField);
+
+    const hidePassField = () => {
+        setPassField(false);
         setPassword("");
         setPassError(false);
     }
+
     const checkUser = () => {
         if (requested) return false;
         let err = "Failed to Login.";
         if (!username) {
             setUserError(true);
-            // cfpLoadingBar.complete();
+            // SetProgressBar("stop", dispatch);
             return false;
         }
         setRequested(true);
         (async()=>{
             try{
                 let data = await api.checkUser(username)
-                // cfpLoadingBar.complete();
+                // SetProgressBar("stop", dispatch);
                 setRequested(false);
                 if (data.redirect) setRedirectTo(data.redirect); // history.replace(data.redirect);
-                else if (data.proceed) togglePassField();
+                else if (data.proceed) setPassField(true);
                 else if (data == "invalidServerConf") setLoginValidation("Authentication Server Configuration is invalid!");
                 else setLoginValidation(err);    
             }
@@ -70,89 +80,128 @@ const LoginFields = () => {
     const login = event => {
         event.preventDefault();
         setLoginValidation("");
-        if (!username) setUserError(true);
-        else if (!showPassField) setPassField(true);
+        if (!showPassField) checkUser();
         else if (!password) setPassError(true);
-        check_credentials(username, password, setUserError, setPassError, setLoginValidation, history, setRedirectTo);
+        else check_credentials(username, password, setUserError, setPassError, setLoginValidation, setRedirectTo);
     }
+
+    
+    const check_credentials = () => {
+        if (username && password){
+            SetProgressBar("start", dispatch);
+            let user = username.toLowerCase();
+            console.log(user, password);
+            (async()=>{
+                try{
+                    let data = await api.authenticateUser(user, password)
+                    SetProgressBar("stop", dispatch);
+                    // $scope.requested = false;
+                    let error_msg = "";
+                    if (data == "restart") {
+                        // blockUI("Fetching active services...");
+                        adminApi.restartService("query")
+                        .then(data=> {
+                            if (data == "fail") {
+                                setLoginValidation("Failed to fetch services.");
+                            } else {
+                                setRestartForm(true);
+                                data.forEach((e, i)=>{
+                                    serverList[i].active = e;
+                                });
+                            }
+                            // unblockUI();
+                        })
+                        .catch(error=> {
+                            // unblockUI();
+                            setLoginValidation("Failed to fetch services.");
+                        });
+                    }
+                    else if (data == 'validCredential') window.location='/';//setRedirectTo('/')  //  history.replace('/')
+                    else if (data == 'inValidCredential' || data == "invalid_username_password") {
+                        setUserError(true);
+                        setPassError(true);
+                        setLoginValidation("The username or password you entered isn't correct. Please try again.");
+                    }
+                    else if (data == "userLogged") setLoginValidation("User is already logged in! Please logout from the previous session.");
+                    else if (data == "inValidLDAPServer") setLoginValidation("LDAP Server Configuration is invalid!");
+                    else if (data == "invalidUserConf") setLoginValidation("User-LDAP mapping is incorrect!");
+                    else setLoginValidation("Failed to Login.");
+                }
+                catch(err){
+                    console.log(err)
+                }
+            })()
+        }
+    }
+
+    const restartServer = (serverid, serverName) => {
+        let errmsg = "Fail to restart " + serverName + " service!";
+        // blockUI("Please wait while " + serverName + " service is being restarted...");
+        adminApi.restartService(serverid)
+        .then(data => {
+            if (data == "success") {
+                setTimeout(()=>{
+                    // unblockUI();
+                    // openModalPopup("Restart Service", serverName+" service is restarted successfully!!");
+                    alert("Restart Service", serverName+" service is restarted successfully!!");
+                }, 120 * 1000);
+            } else {
+                // unblockUI();
+                if (data == "na") errmsg = "Service is not found. Ensure "+serverName+" is running as a service.";
+                // openModalPopup("Restart Service", errmsg);
+                alert("Restart Service", errmsg);
+            }
+        })
+        .catch(error=> {
+            // unblockUI();
+            // openModalPopup("Restart Service", errmsg);
+            alert("Restart Service", errmsg);
+        });
+    };
+    
 
 
     return (
         <>
         {redirectTo ? <Redirect to={{pathname: redirectTo, state: { redirected: true } }} /> : 
-        <form className="login-form" onSubmit={login}>
-        <div className="username-wrap" style={userError ? styles.errorBorder : null }>
-            <span><img className="ic-username" src={userError ? res.errorUserIcon : res.defaultUserIcon}/></span>
-            <input className="field" placeholder="username" value={username} onChange={handleUsername}></input>
-            {showPassField && username ? true : <span className="ic-rightarrow fa fa-arrow-circle-right" onClick={checkUser}></span>}
-        </div>
-        {userError && !loginValidation ? <div className="error-msg">Please Enter Username</div> : null}
-        {
-        showPassField ? 
-        username ? <>
-        <div className="password-wrap" style={passError ? styles.errorBorder : null }>
-            <span><img className="ic-password" src={passError ? res.errorPassIcon : res.defaultUserIcon}/></span>
-            <input className="field" type={showPass ? "text" : "password"} placeholder="Password" value={password} onChange={handlePassword}></input>
-            <span className={showPass ? res.eyeSlashIcon : res.eyeIcon } onClick={handleShowPass}></span>
-        </div>
-        {passError && !loginValidation? <div className="error-msg">Please Enter Password</div> : null}
-        <div className="error-msg">{loginValidation}</div>
-        <button className="login-btn" type="submit" onClick={login}>Login</button>
-        </>
-        : togglePassField()
-        : false
+        <>
+        { restartForm 
+            ?
+            <div>
+                {serverList.map((server, index)=>{
+                    return <button className="restart-service-btn" disabled={!server.active} onClick={()=>restartServer(index, server.name)} type="submit">Restart {server.name}</button>
+                })}
+            </div>
+            :
+            <form className="login-form" onSubmit={login}>
+            <div className="username-wrap" style={userError ? styles.errorBorder : null }>
+                <span><img className="ic-username" src={userError ? res.errorUserIcon : res.defaultUserIcon}/></span>
+                <input className="field" placeholder="username" value={username} onChange={handleUsername}></input>
+                {showPassField && username ? true : <span className="ic-rightarrow fa fa-arrow-circle-right" onClick={checkUser}></span>}
+            </div>
+            {userError && !loginValidation ? <div className="error-msg">Please Enter Username</div> : null}
+            {
+            showPassField ?
+                <>
+                <div className="password-wrap" style={passError ? styles.errorBorder : null }>
+                    <span><img className="ic-password" src={passError ? res.errorPassIcon : res.defaultUserIcon}/></span>
+                    <input className="field" type={showPass ? "text" : "password"} placeholder="Password" value={password} onChange={handlePassword}></input>
+                    <span className={showPass ? res.eyeSlashIcon : res.eyeIcon } onClick={handleShowPass}></span>
+                </div>
+                {passError && !loginValidation? <div className="error-msg">Please Enter Password</div> : null}
+                <div className="error-msg">{loginValidation}</div>
+                <button className="login-btn" type="submit" onClick={login}>Login</button>
+                </>
+            : false
+            }
+            </form>
         }
-        </form>
+            </>
         }
         </>
     );
 }
 
-const check_credentials = (username, password, setUserError, setPassError, setLoginValidation, history, setRedirectTo) => {
-    if (username && password){
-        let user = username.toLowerCase();
-        console.log(user, password);
-        (async()=>{
-            try{
-                let data = await api.authenticateUser(user, password)
-                // cfpLoadingBar.complete();
-                // $scope.requested = false;
-                let error_msg = "";
-                if (data == "restart") {
-                    // blockUI("Fetching active services...");
-                    // adminServices.restartService("query")
-                    // .then(function (data) {
-                    // 	if (data == "fail") {
-                    // 		$scope.loginValidation = "Failed to fetch services.";
-                    // 	} else {
-                    // 		$scope.restartForm = true;
-                    // 		data.forEach(function(e, i){
-                    // 			$scope.serverList[i].active = e;
-                    // 		});
-                    // 	}
-                    // 	unblockUI();
-                    // }, function (error) {
-                    // 	unblockUI();
-                    // 	$scope.loginValidation = "Failed to fetch services.";
-                    // });
-                }
-                else if (data == 'validCredential') setRedirectTo('/')//  //  history.replace('/')
-                else if (data == 'inValidCredential' || data == "invalid_username_password") {
-                    setUserError(true);
-                    setPassError(true);
-                    error_msg = "The username or password you entered isn't correct. Please try again.";
-                }
-                else if (data == "userLogged") setLoginValidation("User is already logged in! Please logout from the previous session.");
-                else if (data == "inValidLDAPServer") setLoginValidation("LDAP Server Configuration is invalid!");
-                else if (data == "invalidUserConf") setLoginValidation("User-LDAP mapping is incorrect!");
-                else setLoginValidation("Failed to Login.");
-            }
-            catch(err){
-                console.log(err)
-            }
-        })()
-    }
-}
 
 export default LoginFields;
 

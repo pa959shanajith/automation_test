@@ -12,5 +12,11 @@ const Login = () => {
   );
 }
 
-export {BasePage} ;
+const Base = () => {
+  return (
+      <BasePage/>
+  );
+}
+
+export {Base};
 export default Login;
