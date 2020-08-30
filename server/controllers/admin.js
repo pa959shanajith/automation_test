@@ -1646,7 +1646,6 @@ exports.getUsers = function (req, res) {
 	});
 };
 
-//-----------------------------------------------------no changes here
 exports.getAvailablePlugins = async (req, res) => {
 	logger.info("Inside UI service: getAvailablePlugins");
 	try {
@@ -1700,12 +1699,37 @@ exports.provisionICE = async (req, res) => {
 	}
 };
 
+// Send Test Notification over a specific channel and provider
+exports.testNotificationChannels = async (req, res) => {
+	const fnName = "testNotificationChannels";
+	logger.info("Inside UI Service: "+fnName);
+	try {
+		const channel = (req.body.channel || "").trim();
+		const provider = (req.body.provider || "").trim();
+		const recipient = (req.body.recipient || "").trim();
+		const conf = req.body.conf || {};
+		let flag = "fail";
+		if (channel == "email") {
+			if (provider != "smtp") flag = "invalidprovider";
+			else if (!validator.isEmail(recipient)) flag = "invalidrecipient";
+			else {
+				// notify using conf
+				flag = "success";
+			}
+		} else flag = "invalidchannel";
+		return res.send(flag);
+	} catch (exception){
+		logger.error("Error occurred in admin/"+fnName, exception);
+		res.status(500).send("fail");
+	}
+};
+
 // Create/Edit/Delete Notification Channels
 exports.manageNotificationChannels = async (req, res) => {
 	const fnName = "manageNotificationChannels";
 	logger.info("Inside UI Service: " + fnName);
 	try {
-		let flag = ['1','0','0','0','0','0','0','0','0'];
+		let flag = ['1','0','0','0','0','0','0','0','0','0'];
 		const conf = req.body.conf;
 		const action = req.body.action;
 		// if (action == "delete") return res.send("fail");
@@ -1731,23 +1755,24 @@ exports.manageNotificationChannels = async (req, res) => {
 		if (action == "create" || action == "update") {
 			if (inputs.channel == "email") {
 				if (inputs.provider == "smtp") {  // Only smtp provider is supported as of now
-					inputs.host = conf.host;
-					inputs.port = conf.port;
-					if (false && !validator.isIP(inputs.host) && !validator.isFQDN(inputs.host)) { // Allow Anything as of now
-						logger.error("Error occurred in admin/"+fnName+": Invalid host.");
+					inputs.host = (conf.host || "").trim();
+					inputs.port = conf.port || "";
+					if (inputs.host || (!validator.isIP(inputs.host) && !validator.isFQDN(inputs.host))) { // Allow Anything as of now
+						logger.error("Error occurred in admin/"+fnName+": Invalid Hostname or IP.");
 						flag[5]='1';
 					}
 					if (!validator.isPort(inputs.port.toString())) {
 						logger.error("Error occurred in admin/"+fnName+": Invalid Port Number.");
-						flag[5]='2';
+						flag[6]='1';
 					}
+					conf.sender = conf.sender || {};
 					inputs.sender = {
-						name: (conf.senderName || "Avo Assure Alerts").trim(),
-						email: (conf.senderEmail || "avoassure-alerts@slkgroup.com").trim()
+						name: (conf.sender.name || "Avo Assure Alerts").trim(),
+						email: (conf.sender.email || "avoassure-alerts@slkgroup.com").trim()
 					}
 					if (!validator.isEmail(inputs.sender.email)) {
 						logger.error("Error occurred in admin/"+fnName+": Invalid sender email address.");
-						flag[6]='1';
+						flag[7]='1';
 					}
 					inputs.tls = {
 						security: conf.enabletls || "auto",
@@ -1755,7 +1780,7 @@ exports.manageNotificationChannels = async (req, res) => {
 					}
 					if (!["enable", "disable", "auto"].includes(inputs.tls.security)) {
 						logger.error("Error occurred in admin/"+fnName+": Invalid TLS Options.");
-						flag[7]='1';
+						flag[8]='1';
 					}
 					const pool = conf.pool;
 					if (!pool) inputs.pool = false;
@@ -1777,7 +1802,7 @@ exports.manageNotificationChannels = async (req, res) => {
 						if (inputs.auth.type == "none") inputs.auth.type = false;
 						else if (!["basic", false].includes(inputs.auth.type)) {
 							logger.error("Error occurred in admin/"+fnName+": Invalid auth type.");
-							flag[8]='1';
+							flag[9]='1';
 						}
 					}
 					const timeouts = conf.timeouts;
@@ -1795,7 +1820,7 @@ exports.manageNotificationChannels = async (req, res) => {
 			}
 		}
 		flag = flag.join('');
-		if (flag != "100000000") {
+		if (flag != "1000000000") {
 			return res.send(flag);
 		}
 		const result = await utils.fetchData(inputs, "admin/manageNotificationChannels", fnName);
@@ -1829,7 +1854,7 @@ exports.getNotificationChannels = async (req, res) => {
 		else if (result.length == 0) res.send("empty");
 		else {
 			let data = [];
-			if (action == "list" || action == "provider") {
+			if (action == "list") {
 				for (let row of result) {
 					data.push([row.name, row._id, row.channel, row.provider]);
 				}

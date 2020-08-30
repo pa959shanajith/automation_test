@@ -522,6 +522,7 @@ if (cluster.isMaster) {
 		app.post('/getPreferences', auth.protect, admin.getPreferences);
 		app.post('/provisionIce', auth.protect, admin.provisionICE);
 		app.post('/fetchICE', auth.protect, admin.fetchICE);
+		app.post('/testNotificationChannels', auth.protect, admin.testNotificationChannels);
 		app.post('/manageNotificationChannels', auth.protect, admin.manageNotificationChannels);
 		app.post('/getNotificationChannels', auth.protect, admin.getNotificationChannels);
 

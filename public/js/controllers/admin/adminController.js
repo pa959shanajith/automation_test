@@ -3389,47 +3389,256 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		});
 	};
 
-
-
 	// Email Server Configuration Click
-	$scope.mailConf.click =function (){
-		
-	}
+	$scope.mailConf.click = function () {
+		$(".selectedIcon").removeClass("selectedIcon");
+		$("#mailConfigTab").find("span.fa").addClass("selectedIcon");
+		this.providers = ["SMTP"];
+		this.channel = "email";
+		this.toggleStatus = "Disable";
+		this.loaded = "";
+		this.provider = "";
+		this.active = false;
+		this.name = "";
+		this.host = "";
+		this.port = "";
+		this.secure = "auto";
+		this.insecuretls = "false";
+		this.testMailID = "";
+		this.testMailMsg = "";
+		this.auth = {
+			type: "",
+			username: "",
+			password: ""
+		};
+		this.sender = {
+			name: "",
+			email: ""
+		};
+		this.pool = {
+			enable: false,
+			maxConnections: "",
+			maxMessages: ""
+		};
+		this.timeouts = {
+			connection: "",
+			greeting: "",
+			socket: ""
+		};
+		$("#mailName,#mailHost,#mailPort,#senderName,#senderEmail").removeClass("inputErrorBorder");
+		$("#mailProvider,#authenticationType").removeClass("selectErrorBorder");
+	};
 
-	$scope.mailConf.getEmailprovider=function(){
-		if (this.allproviders && this.allproviders.length > 0) return true;
-		adminServices.getProviders()
-		.then(function (res) {
-			if(res == "Invalid Session"){
-				$rootScope.redirectPage();
-			} else {
-				
+	$scope.mailConf.getProviderInfo = function() {
+		$("#mailName,#mailHost,#mailPort,#senderName,#senderEmail").removeClass("inputErrorBorder");
+		$("#mailProvider,#authenticationType").removeClass("selectErrorBorder");
+		blockUI("Loading Configurations...");
+		adminServices.getNotificationChannels("provider", this.channel, this.provider)
+		.then(function (data) {
+			unblockUI();
+			if (data == "Invalid Session") $rootScope.redirectPage();
+			else if (data == "fail") openModalPopup("Email Configuration", "Fail to fetch configured details for selected provider.");
+			else if (data != "empty") {
+				$scope.mailConf.loaded = $scope.mailConf.name = data.name;
+				$scope.mailConf.host = data.host;
+				$scope.mailConf.port = data.port;
+				$scope.mailConf.active = data.active;
+				$scope.mailConf.toggleStatus = (data.active)? "Disable":"Enable";
+				$scope.mailConf.secure = data.tls.security;
+				$scope.mailConf.insecuretls = data.tls.insecure.toString();
+				const authType = (data.auth && data.auth.type) || data.auth;
+				if (authType == "basic") $scope.mailConf.auth = data.auth;
+				else {
+					$scope.mailConf.auth = {
+						type: "none",
+						username: '',
+						password: ''
+					};
+				}
+				$scope.mailConf.sender = data.sender;
+				$scope.mailConf.timeouts = data.timeouts || {};
+				$scope.mailConf.pool.enable = data.pool != false;
+				$scope.mailConf.pool.maxConnections = (data.pool)? ((data.pool.maxconnections) || ""):"";
+				$scope.mailConf.pool.maxMessages = (data.pool)? ((data.pool.maxmessages) || ""):"";
 			}
 		}, function (error) {
-			console.log(error);
-			$scope.mailConf.allproviders = [];
+			unblockUI();
+			console.error(error);
 			openModalPopup("Email Configuration", "Something Went Wrong");
 		});
-	}
+	};
 
-	$scope.mailConf.testmailconfig = function(){
+	$scope.mailConf.getConfObj = function() {
+		return {
+			channel: this.channel,
+			provider: this.provider,
+			name: this.name,
+			host: this.host,
+			port: this.port,
+			auth: this.auth,
+			sender: this.sender,
+			enabletls: this.secure,
+			insecuretls: this.insecuretls,
+			pool: this.pool.enable && this.pool || false,
+			timeouts: this.timeouts
+		};
+	};
+
+	$scope.mailConf.toggle = function() {
+		const conf = {
+			channel: this.channel,
+			provider: this.provider,
+			name: this.loaded
+		};
+		const action = this.toggleStatus;
+		let emsg = "Failed to "+action+" '"+conf.name+"' Configuration.";
+		blockUI(action.slice(0,-1) + "ing Configuration...")
+		adminServices.manageNotificationChannels(action.toLowerCase(), conf)
+		.then(function(data) {
+			unblockUI();
+			if (data == "Invalid Session") return $rootScope.redirectPage();
+			else if (data == "fail") openModalPopup(action+" Configuration", emsg);
+			else if (data == "success") {
+				openModalPopup(action+" Configuration", "'"+conf.name+"' Configuration "+action+"d!");
+				$scope.mailConf.getProviderInfo();
+			} else if(/^1[0-4]{9}$/.test(data)) {
+				if (parseInt(data[1])) {
+					openModalPopup(action+" Configuration", emsg+" Invalid Request!");
+					return;
+				}
+				const errfields = [];
+				if (parseInt(data[2])) errfields.push("Server Name");
+				if (parseInt(data[3])) errfields.push("Channel");
+				openModalPopup(action+" Configuration", emsg+" Following values are invalid: "+errfields.join(", "));
+			}
+		}, function (error) {
+			unblockUI();
+			openModalPopup(action+" Configuration", emsg);
+			console.error("Error in "+action+" Configuration:", error);
+		});
+	};
+
+	$scope.mailConf.validate = function() {
+		let flag = true;
+		let popped = false;
+		$("#mailName,#mailHost,#mailPort,#senderName,#senderEmail").removeClass("inputErrorBorder");
+		$("#mailProvider,#authenticationType").removeClass("selectErrorBorder");
+		const regExName = /^[A-Za-z0-9]+([A-Za-z0-9-]*[A-Za-z0-9]+|[A-Za-z0-9]*)$/;
+		const emailRegEx = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		if (this.provider == "") {
+			$("#mailProvider").addClass("selectErrorBorder");
+			flag = false;
+		}
+		if (this.name == "") {
+			$("#mailName").addClass("inputErrorBorder");
+			flag = false;
+		} else if (!regExName.test(this.name)) {
+			$("#mailName").addClass("inputErrorBorder");
+			if (!popped) openModalPopup("Error", "Invalid Server Name provided! Name cannot contain any special characters other than hyphen. Also name cannot start or end with hyphen.");
+			flag = false;
+			popped = true;
+		}
+		if (this.host == "") {
+			$("#mailHost").addClass("inputErrorBorder");
+			flag = false;
+		}
+		if (this.port == "") {
+			$("#mailPort").addClass("inputErrorBorder");
+			flag = false;
+		} else if (!((+this.port >= 0) && (+this.port < 65536))) {
+			$("#mailPort").addClass("inputErrorBorder");
+			if (!popped) openModalPopup("Error", "Invalid Server Port provided! Value has to be a number between 0 and 65535.");
+			flag = false;
+			popped = true;
+		}
+		if (this.auth.type == "") {
+			$("#authenticationType").addClass("selectErrorBorder");
+			flag = false;
+		}
+		if (this.sender.name == "") {
+			$("#senderName").addClass("inputErrorBorder");
+			flag = false;
+		}
+		if (this.sender.email == "" || !emailRegEx.test(this.sender.email)) {
+			$("#senderEmail").addClass("inputErrorBorder");
+			flag = false;
+		}
+		return flag;
+	};
+
+	$scope.mailConf.showTestMail = function() {
+		if (!this.validate()) return false;//openModalPopup("Test Configuration", "Certain fields have invalid values");
+		this.testMailID = '';
+		this.testMailMsg = '';
+		$("#testMailID").removeClass("inputErrorBorder");
 		$('#emailserverModal').modal("show");
-	}
+	};
 
-	$scope.mailConf.manageMail = function(){
-		var emailObj={};
-		emailObj.host=$("#mailHost").val().trim();
-		emailObj.port=$("#mailPort").val().trim();
-		emailObj.fromMail=$("#fromMail").val().trim();
-		emailObj.displayname=$("#displayname").val().trim();
-		emailObj.displayname=$("#displayname").val().trim();
-		emailObj.displayname=$("#displayname").val().trim();
-		emailObj.displayname=$("#displayname").val().trim();
+	$scope.mailConf.test = function() {
+		$("#testMailID").removeClass("inputErrorBorder");
+		const recipient = this.testMailID;
+		const emailRegEx = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		if (recipient.length === 0 || !emailRegEx.test(recipient)) {
+			this.testMailMsg = "Recipient address is invalid!";
+			$("#testMailID").addClass("inputErrorBorder");
+			return false;
+		}
+		this.testMailMsg = 'Sending...';
+		const conf = this.getConfObj();
+		adminServices.testNotificationChannels(this.channel, this.provider, recipient, conf)
+		.then(function(data) {
+			let status = "Fail to send the test mail. Re-check the configuration.";
+			if (data == "Invalid Session") return $rootScope.redirectPage();
+			else if (data == "invalidprovider") status = "Selected Provider is not supported yet!";
+			else if (data == "invalidrecipient") status = "Recipient address is invalid!";
+			else if (data == "success") status = "Test Email Sent!";
+			else status = "Fail to send the test mail. Re-check the configuration.";
+			$scope.mailConf.testMailMsg = status;
+		}, function (error) {
+			$scope.mailConf.testMailMsg = "Fail to send the test mail. Re-check the configuration.";
+			console.error("Error in Test Email:", error);
+		});
+		//$('#emailserverModal').modal("hide");
+	};
 
-		
+	$scope.mailConf.manage = function() {
+		// if (!this.validate()) return false;
+		const conf = this.getConfObj();
+		const action = (this.loaded)? "Update":"Create";
+		let emsg = "Failed to "+action+" '"+conf.name+"' Configuration.";
+		blockUI(action.slice(0,-1) + "ing Configuration...")
+		adminServices.manageNotificationChannels(action.toLowerCase(), conf)
+		.then(function(data) {
+			unblockUI();
+			if (data == "Invalid Session") return $rootScope.redirectPage();
+			else if (data == "fail") openModalPopup(action+" Configuration", emsg);
+			else if (data == "exists") openModalPopup(action+" Configuration", "'"+conf.name+"' configuration already exists");
+			else if (data == "success") {
+				openModalPopup(action+" Configuration", "'"+conf.name+"' Configuration "+action+"d!");
+				$scope.mailConf.getProviderInfo();
+			} else if(/^1[0-4]{9}$/.test(data)) {
+				if (+data[1]) {
+					openModalPopup(action+" Configuration", emsg+" Invalid Request!");
+					return;
+				}
+				const errfields = [];
+				if (+data[2]) errfields.push("Server Name");
+				if (+data[3]) errfields.push("Channel");
+				if (+data[4]) errfields.push("Provider");
+				if (+data[5]) errfields.push("Server Host");
+				if (+data[6]) errfields.push("Server Port");
+				if (+data[7]) errfields.push("Sender Email");
+				if (+data[8]) errfields.push("Secure Connection");
+				if (+data[9]) errfields.push("Authentication");
+				openModalPopup(action+" Configuration", emsg+" Following values are invalid: "+errfields.join(", "));
+			}
+		}, function (error) {
+			unblockUI();
+			openModalPopup(action+" Configuration", emsg);
+			console.error("Error in "+action+" Configuration:", error);
+		});
+	};
 
-		
-	}
 	// Session Management Tab Click
 	$scope.sessionConf.click = function () {
 		$(".selectedIcon").removeClass("selectedIcon");
