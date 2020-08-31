@@ -2510,7 +2510,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					for (var i = 0; i < getIndexOfDeletedObjects.length; i++) {
 						//delete newScrapedList.view[getIndexOfDeletedObjects[i].tempId];
 						if (getIndexOfDeletedObjects[i].hasOwnProperty("tempId")) {
-							delete insert_list[getIndexOfDeletedObjects[i].tempId];
+							delete insert_list[insert_list.indexOf(getIndexOfDeletedObjects[i])];
 						}
 						else {
 							if(insert_list.indexOf(getIndexOfDeletedObjects[i]) != -1){
