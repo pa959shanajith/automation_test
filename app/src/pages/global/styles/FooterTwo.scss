@@ -1,5 +1,9 @@
 .main-footer{
     display: flex;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
     justify-content: flex-end;
     color: #643693;
     background-color: rgb(238, 238, 238);
