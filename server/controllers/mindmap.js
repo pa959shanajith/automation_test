@@ -1294,9 +1294,15 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						testcaseObj = getTestcaseStep(step,null,'@Browser','navigateToURL',[eachScrapedAction.action.actionData],null,null,"Web");
 						break;
 					case "click":
-						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'click',null,null,eachScrapedAction.url,"Web");
-						var custname_split = eachScrapedAction.custname.split('_');
-						if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+						if(eachScrapedAction.tag == "radiobutton") {
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectRadioButton',null,null,eachScrapedAction.url,"Web");
+						} else if(eachScrapedAction.tag == "checkbox") {
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectCheckbox',null,null,eachScrapedAction.url,"Web");
+						} else {
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'click',null,null,eachScrapedAction.url,"Web");
+							var custname_split = eachScrapedAction.custname.split('_');
+							if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+						}
 						break;
 					case "inputChange":
 						if(eachScrapedAction.action.actionData.split(";").length == 2 && eachScrapedAction.action.actionData.split(";")[1] =='byIndex'){
@@ -1345,7 +1351,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 				case "table":
 				case "toolbar":
 				case "calendar":
-				case "gridview": 
+				case "gridview":
 				case "GuiLabel":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
 					var custname_split = eachScrapedAction.custname.split('_');
