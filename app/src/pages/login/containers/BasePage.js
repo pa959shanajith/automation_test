@@ -67,11 +67,9 @@ const BasePage = (props) => {
                                 setLoginAgain(true);
                             }
                             else {
-                                window.localStorage['_SR'] = userinfo.rolename;
-                                window.localStorage['_UI'] = JSON.stringify(userinfo);
                                 window.localStorage.navigateScreen = userinfo.page;
                                 // history.replace(`/${data.page}`)
-                                dispatch({type:actionTypes.SET_USERINFO, payload: userinfo});
+                                dispatch({type:actionTypes.SET_USERINFO, payload: JSON.stringify(userinfo)});
                                 SetProgressBar("start", dispatch);
                                 setRedirectTo(`/${userinfo.page}`);
                             }

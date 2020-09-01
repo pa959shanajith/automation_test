@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {Dropdown} from 'react-bootstrap';
 import { useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
+import { RedirectPage } from '../../global';
 import "../styles/Header.scss";
 import 'font-awesome/css/font-awesome.min.css';
 import * as loginApi from '../../login/api';
+import ChangePassword from './ChangePassword';
 
 const Header = () => {
 
@@ -24,16 +27,26 @@ const Header = () => {
     const [cycleDetails, setCycleDetails] = useState(null);
 	const [passwordValidation, setPasswordValid] = useState("");
     let unavailableLocalServer_msg = "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.";
-    const userInfo = useSelector(state=>state.login.userinfo);
+    const [userInfo, setUserInfo] = useState(useSelector(state=>state.login.userinfo));
+    const [callRedirect, setCallRedirect] = useState(false);
+    let history = useHistory();
+
+    // setUserDetails(JSON.parse(userInfo))
+    // setUserRole(userInfo.rolename);
+    // setUsername(userDetails.username.toLowerCase());
 
     useEffect(()=>{
-        // if(userInfo){
-        //     let userDetailsVar = JSON.parse(userInfo);
-        // }
-        // // let userRoleVar = userInfo.rolename;
-        // // let usernameVar = userDetailsVar.username.toLowerCase();
-        // setUserRole(userInfo.rolename);
-        // setUsername(userDetails.username.toLowerCase());
+        
+        console.log("USERINFO I AM GETTING: ", userInfo)
+        let userDetailsVar;
+        if(userInfo){
+            userDetailsVar = JSON.parse(userInfo);
+        }
+        let userRoleVar = userInfo.rolename;
+        let usernameVar = userDetailsVar.username.toLowerCase();
+        setUserDetails(userDetailsVar)
+        setUserRole(userRoleVar);
+        setUsername(usernameVar);
     }, []);
 
     const naviPg = () => {
@@ -45,13 +58,14 @@ const Header = () => {
 			// labelArr.push(txnHistory.codesDict['AvoAssureLogo']);
 			// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 			setTimeout(() => {
-                // $location.path('/plugin');
+                history.replace('/plugin');
                 console.log("Go to /plugin")
 		   	}, 100);
 		}
     };
     
     const logout = event => {
+        event.preventDefault();
 		//Transaction Activity for Logout Button Action
 		// var labelArr = [];
 		// var infoArr = [];
@@ -61,6 +75,8 @@ const Header = () => {
 		window.sessionStorage["checkLoggedOut"] = true;
         // $rootScope.redirectPage();
         console.log("redirectPage")
+        RedirectPage(history);
+        // setCallRedirect(true);
     };
     
     const getIce = async () => {
@@ -185,7 +201,8 @@ const Header = () => {
 	};
 
     return(
-        <>
+        <> 
+            {/* { callRedirect ? RedirectPage() :  */}
             <div className = "main-header">
                 <span className="header-logo-span"><img className="header-logo" src="static/imgs/logo.png" onClick={naviPg}/></span>
                 <div className="btn-container"><button className="fa fa-bell no-border"></button></div>
@@ -204,20 +221,21 @@ const Header = () => {
                 <div className="btn-container">
                     <Dropdown>
                         <Dropdown.Toggle className="user-name-btn no-border">
-                            <span className="user-name">{username}</span>
+                            <span className="user-name">{username ? username : "Demo User"}</span>
                             <span><img className = "user-name-icon" src="static/imgs/ic-user-nav.png"/></span>
                         </Dropdown.Toggle>
                         <Dropdown.Menu className="user-name-menu">
-                            <Dropdown.Item>{userRole}</Dropdown.Item>
-                            <Dropdown.Divider />
+                            <Dropdown.Item className="user-role-item">{userRole ? userRole : "Test Manager"}</Dropdown.Item>
+                            <Dropdown.Divider className="dropdown-divider" />
                             <Dropdown.Item onClick={getIce} >Download ICE</Dropdown.Item>
-                            <Dropdown.Divider />
+                            <Dropdown.Divider className="dropdown-divider" />
                             <Dropdown.Item onClick={resetPass}>Change Password</Dropdown.Item>
                             <Dropdown.Item onClick={logout}>Logout</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </div>
             </div>
+            {/* } */}
         </>
     );
 }

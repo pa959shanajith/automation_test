@@ -13,7 +13,7 @@ const ProgressBar = (props) => {
         setProgress(progress2);
     }, [progress2]);
 
-    return <LoadingBar progress={progress} color="#000000" onLoaderFinished={()=>{
+    return <LoadingBar progress={progress} color="#643693" onLoaderFinished={()=>{
         dispatch({type: actionTypes.SET_PROGRESS, payload: 0});
     }}/>
   

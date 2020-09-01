@@ -43,6 +43,37 @@
     border-left: 1px solid gray;
 }
 
+.user-name-menu{
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    font-family: "LatoWeb";
+    font-size: 14px;
+    color: #333;
+    position: absolute;
+    right:87%;
+    a{
+        outline: none;
+        border: none;
+        &:hover{
+            background-color: #eee;
+        }
+    }
+    
+    .dropdown-divider{
+        background-color: #eee;
+        width: 100%;
+        margin: 2px 0;
+        height: 1px;
+    }
+}
+
+.user-role-item{
+    &:hover{
+            cursor: default;
+            background-color: transparent;
+    }
+}
 .switch-role-btn {
     display: flex;
     flex-direction: row;
@@ -195,6 +226,31 @@
         border-left: .1vw solid gray;
     }
     
+    .user-name-menu{
+        display: flex;
+        flex-direction: column;
+        z-index: 100;
+        font-family: "LatoWeb";
+        font-size: 1.0vw;
+        color: #333;
+        position: absolute;
+        right:87%;
+        a{
+            outline: none;
+            border: none;
+            &:hover{
+                background-color: #eee;
+            }
+        }
+        
+        .dropdown-divider{
+            background-color: #eee;
+            width: 100%;
+            margin: 2px 0;
+            height: 1px;
+        }
+    }
+
     .switch-role-btn {
         display: flex;
         flex-direction: row;

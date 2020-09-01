@@ -63,7 +63,11 @@ const LoginFields = (props) => {
                 let data = await api.checkUser(username)
                 // SetProgressBar("stop", dispatch);
                 setRequested(false);
-                if (data.redirect) setRedirectTo(data.redirect); // history.replace(data.redirect);
+                if (data.redirect) {
+                    console.log(data.redirect)
+                    window.location.href = data.redirect;
+                    // setRedirectTo(data.redirect);
+                } // history.replace(data.redirect);
                 else if (data.proceed) setPassField(true);
                 else if (data == "invalidServerConf") setLoginValidation("Authentication Server Configuration is invalid!");
                 else setLoginValidation(err);    
