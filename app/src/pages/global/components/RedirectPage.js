@@ -1,12 +1,10 @@
 import * as headerApi from '../api';
 
-
 const RedirectPage = (history) => {
 
     window.localStorage.clear();
     headerApi.logoutUser()
     .then(data=>{
-        console.log(data)
         history.push('/')
     })
     .catch(error => {

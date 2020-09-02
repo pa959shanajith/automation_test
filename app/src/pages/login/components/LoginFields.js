@@ -40,6 +40,8 @@ const LoginFields = (props) => {
     }
     const handlePassword = event => {
         setPassError(false);
+        setUserError(false);
+        setLoginValidation("");
         setPassword(event.target.value);
     }
 
@@ -86,12 +88,13 @@ const LoginFields = (props) => {
         setLoginValidation("");
         if (!showPassField) checkUser();
         else if (!password) setPassError(true);
-        else check_credentials(username, password, setUserError, setPassError, setLoginValidation, setRedirectTo);
+        else check_credentials();
     }
 
     
     const check_credentials = () => {
         if (username && password){
+            setRequested(true);
             SetProgressBar("start", dispatch);
             let user = username.toLowerCase();
             console.log(user, password);
@@ -100,6 +103,7 @@ const LoginFields = (props) => {
                     let data = await api.authenticateUser(user, password)
                     SetProgressBar("stop", dispatch);
                     // $scope.requested = false;
+                    setRequested(false);
                     let error_msg = "";
                     if (data == "restart") {
                         // blockUI("Fetching active services...");
@@ -132,6 +136,7 @@ const LoginFields = (props) => {
                     else setLoginValidation("Failed to Login.");
                 }
                 catch(err){
+                    setRequested(false);
                     console.log(err)
                 }
             })()
@@ -178,7 +183,7 @@ const LoginFields = (props) => {
             </div>
             :
             <form className="login-form" onSubmit={login}>
-            <div className="username-wrap" style={userError ? styles.errorBorder : null }>
+            <div className="username-wrap" style={userError ? loginValidation ? {borderColor: "#d33c3c"} : styles.errorBorder : null }>
                 <span><img className="ic-username" src={userError ? res.errorUserIcon : res.defaultUserIcon}/></span>
                 <input className="field" placeholder="username" value={username} onChange={handleUsername}></input>
                 {showPassField && username ? true : <span className="ic-rightarrow fa fa-arrow-circle-right" onClick={checkUser}></span>}
@@ -194,7 +199,7 @@ const LoginFields = (props) => {
                 </div>
                 {passError && !loginValidation? <div className="error-msg">Please Enter Password</div> : null}
                 <div className="error-msg">{loginValidation}</div>
-                <button className="login-btn" type="submit" onClick={login}>Login</button>
+                <button className="login-btn" type="submit" disabled={requested} onClick={login}>Login</button>
                 </>
             : false
             }
