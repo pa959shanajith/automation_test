@@ -1,0 +1,48 @@
+<html>
+
+<body>
+	<table style="width:100%; text-align: center; background-color: #d4d4d4;
+            color: #333333; font-size: 14px">
+		<tbody>
+			<tr>
+				<td>
+					<h2>Execution Report</h2>
+				</td>
+			</tr>
+	</table>
+	<table style="padding: 1%; padding: 20px; text-align: center; width:100%">
+		<tbody>
+			<tr>
+				<td style="margin:8%">
+					{{#if completed}}
+					<p>Report has been generated for <b>{{processName}}</b></p>
+					{{else if terminatedSystem}}
+					<p>Report has been generated on the failed execution of {{processName}}. </p>
+					{{else if skipped}}
+					<p>Execution of {{processName}} is skipped. Detailed report is now available.</p>
+					{{else}}
+					<p>{{processName}} was manually terminated {{user}} </p>
+					{{/if}}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table align="center">
+						<tbody>
+							<tr>
+								<td
+									style="background-color: #4CAF50; padding: 10px 10px; text-align: center; font-size: 16 px;">
+									<a style="color: white;" href="{{reportURL}}">
+										View Report
+									</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</body>
+
+</html>

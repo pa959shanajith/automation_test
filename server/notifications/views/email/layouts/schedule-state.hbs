@@ -1,0 +1,106 @@
+<html>
+
+<body>
+    <table style="width:100%; text-align: center; background-color: #d4d4d4;
+            color: #333333; font-size: 14px">
+        <tr>
+            <td>
+                <h2 style="margin: 1em">Schedule State</h2>
+            </td>
+        </tr>
+    </table>
+    <table style="margin: 2em;">
+        <tbody>
+            <tr>
+                <td>
+                    The schedule for a process has been
+                    {{#if deleted}}
+                    deleted
+                    {{else if cancelled}}
+                    cancelled
+                    {{else if edited}}
+                    edited
+                    {{/if}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table style="margin: 2em;width:60%">
+        <tbody>
+            <tr>
+                <td>
+                    <table style="table-layout: fixed;width: 100%;">
+                        <tbody>
+                            <tr>
+                                <td style="vertical-align: top; text-align: left;
+                                width: 30%; padding: 0.5em; word-wrap: break-word;">
+                                    <b>Process</b>
+                                </td>
+                                <td style="vertical-align: top; text-align: left;
+                                width: 70%; padding: 0.5em; word-wrap: break-word;">
+                                    {{processName}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="vertical-align: top; text-align: left;
+                                width: 30%; padding: 0.5em; word-wrap: break-word;">
+                                    <b>Project</b>
+                                </td>
+                                <td style="vertical-align: top; text-align: left;
+                                width: 70%; padding: 0.5em; word-wrap: break-word;">
+                                    {{projectName}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="vertical-align: top; text-align: left;
+                                width: 70%; padding: 0.5em; word-wrap: break-word;">
+                                    <b>PaCER</b>
+                                </td>
+                                <td style="vertical-align: top; text-align: left;
+                                width: 70%; padding: 0.5em; word-wrap: break-word;">
+                                    {{botName}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="vertical-align: top; text-align: left; width: 30%;
+                                padding: 0.5em; word-wrap: break-word;">
+                                    {{#if deleted}}
+                                    <b>Deleted By</b>
+                                    {{else if cancelled}}
+                                    <b>Cancelled By</b>
+                                    {{else if edited}}
+                                    <b>Edited By</b>
+                                    {{/if}}
+                                </td>
+                                <td style="vertical-align: top; text-align: left; width: 70%;
+                                padding: 0.5em; word-wrap: break-word;">
+                                    {{#if deleted}}
+                                    {{deletedBy}}
+                                    {{else if cancelled}}
+                                    {{cancelledBy}}
+                                    {{else if edited}}
+                                    {{editedBy}}
+                                    {{/if}}
+                                </td>
+                            </tr>
+                            {{#unless edited}}
+                            <tr>
+                                <td style="vertical-align: top; text-align: left; width: 30%;
+                                padding: 0.5em; word-wrap: break-word;">
+                                    <b>Reason</b>
+                                </td>
+                                <td style="vertical-align: top; text-align: left; width: 70%;
+                                padding: 0.5em; word-break:break-all;">
+                                    {{reason}}
+                                </td>
+                            </tr>
+                            {{/unless}}
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+
+</html>

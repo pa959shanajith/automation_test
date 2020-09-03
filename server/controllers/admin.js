@@ -8,6 +8,7 @@ const epurl = process.env.DAS_URL;
 const validator =  require('validator');
 const logger = require('../../logger');
 const utils = require('../lib/utils');
+const notifications = require('../notifications');
 
 
 //GetUserRoles
@@ -1713,8 +1714,13 @@ exports.testNotificationChannels = async (req, res) => {
 			if (provider != "smtp") flag = "invalidprovider";
 			else if (!validator.isEmail(recipient)) flag = "invalidrecipient";
 			else {
-				// notify using conf
-				flag = "success";
+				const testData = {
+					recipient,
+					url: req.headers.origin || req.headers["x-forwarded-for"]
+				}
+				const status = notifications.test(channel, conf, testData);
+				if (status.error) flag = "fail";
+				else flag = "success";
 			}
 		} else flag = "invalidchannel";
 		return res.send(flag);
@@ -1757,7 +1763,7 @@ exports.manageNotificationChannels = async (req, res) => {
 				if (inputs.provider == "smtp") {  // Only smtp provider is supported as of now
 					inputs.host = (conf.host || "").trim();
 					inputs.port = conf.port || "";
-					if (inputs.host || (!validator.isIP(inputs.host) && !validator.isFQDN(inputs.host))) { // Allow Anything as of now
+					if (!inputs.host || (!validator.isIP(inputs.host) && !validator.isFQDN(inputs.host))) { // Allow Anything as of now
 						logger.error("Error occurred in admin/"+fnName+": Invalid Hostname or IP.");
 						flag[5]='1';
 					}
@@ -1859,7 +1865,8 @@ exports.getNotificationChannels = async (req, res) => {
 					data.push([row.name, row._id, row.channel, row.provider]);
 				}
 			} else {
-				data = result;
+				if (action == "provider") data = result[0];  // Return First provider only.
+				else data = result;
 				if (data.auth && data.auth.password) data.auth.password = '';
 			}
 			return res.send(data);
