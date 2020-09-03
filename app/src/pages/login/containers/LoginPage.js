@@ -3,11 +3,12 @@ import { useDispatch } from 'react-redux';
 import LoginFields from "../components/LoginFields.js";
 import { SetProgressBar} from '../../global';
 import StaticElements from '../components/StaticElements';
-import "../styles/BasePage.scss";
 
 /*
     Component: LoginPage
-    Use: returns the base page component with login field component in it to render
+    Props: None
+    Uses: Renders the Login page.
+    Todo: None
 */
 
 

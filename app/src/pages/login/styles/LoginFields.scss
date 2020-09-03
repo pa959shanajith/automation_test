@@ -30,6 +30,12 @@
     margin-bottom: 35px;
 }
 
+.login-form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .restart-service-btn, .login-btn{
     font-size: 32px;
     border-radius: 22px;
@@ -116,6 +122,17 @@
         flex-direction: row;
         border-bottom: .1vw solid #cacaca;
         margin-bottom: 2.5vw;
+    }
+
+    .error-msg{
+        font-family: "LatoWebMedium";
+        font-size: 1.1vw;
+        color: #d33c3c;
+        width: 100%;
+        text-align: center;
+        a{
+            color: #d33c3c;
+        }
     }
 
     .restart-service-btn, .login-btn{

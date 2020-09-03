@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Redirect, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import * as actionTypes from '../state/action';
-import { FooterOne, SetProgressBar } from '../../global';
+import { SetProgressBar } from '../../global';
 import StaticElements from '../components/StaticElements';
 import * as api from '../api';
 import "../styles/BasePage.scss";
 
 /*
     Component: BasePage
-    Uses: When loading from '/' it renders the base page 
-            and when calling '/login' it renders the login fields by checking the props
+    Props: None
+    Uses: Renders the base page for avo assure
+    Todo: None
 */
 
 const BasePage = () => {

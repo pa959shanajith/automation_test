@@ -1,5 +1,14 @@
 import React from 'react';
 import { FooterOne } from '../../global';
+import "../styles/StaticElements.scss";
+
+
+/*
+    Component: StaticElements
+    Props: Child Elements (children)
+    Uses: Renders the Bg-Img and Greeting text and puts child elements in it
+    Todo: none
+*/
 
 const StaticElements = ({children}) => {
 

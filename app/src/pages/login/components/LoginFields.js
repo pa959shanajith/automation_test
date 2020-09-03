@@ -5,7 +5,8 @@ import "../styles/LoginFields.scss";
 
 /*
     Component: LoginFields
-    Uses; Renders input fields for user to login
+    Props: dispatch and SetProgressBar
+    Uses: Renders input fields for user to login
     Todo: modal popups
 */
 
@@ -176,7 +177,7 @@ const LoginFields = (props) => {
             <form className="login-form" onSubmit={login}>
             <div className="username-wrap" style={userError ? loginValidation ? {borderColor: "#d33c3c"} : styles.errorBorder : null }>
                 <span><img className="ic-username" src={userError ? res.errorUserIcon : res.defaultUserIcon}/></span>
-                <input className="field" placeholder="username" value={username} onChange={handleUsername}></input>
+                <input className="field" placeholder="Username" value={username} onChange={handleUsername}></input>
                 {showPassField && username ? true : <span className="ic-rightarrow fa fa-arrow-circle-right" onClick={checkUser}></span>}
             </div>
             {userError && !loginValidation ? <div className="error-msg">Please Enter Username</div> : null}
