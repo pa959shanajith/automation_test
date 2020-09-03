@@ -1,31 +1,28 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Redirect, useHistory, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Redirect, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import * as actionTypes from '../state/action';
-import { SetProgressBar } from '../../global';
+import { FooterOne, SetProgressBar } from '../../global';
+import StaticElements from '../components/StaticElements';
 import * as api from '../api';
-import {FooterOne} from "../../global"
 import "../styles/BasePage.scss";
 
 /*
     Component: BasePage
     Uses: When loading from '/' it renders the base page 
             and when calling '/login' it renders the login fields by checking the props
-    Todo: Loading bar
 */
 
-const BasePage = (props) => {
+const BasePage = () => {
 
-    // const ref = useRef(null);
     const [loginValidation, setLoginValidation] = useState("Loading Profile...");
     const [loginAgain, setLoginAgain] = useState(true);
-    const [checkLogout, setCheckLogout] = useState(JSON.parse(window.sessionStorage.getItem('checkLoggedOut')));
     const [redirectTo , setRedirectTo] = useState(null);
-    const history = useHistory();
-    let dispatch = useDispatch();
+    const dispatch = useDispatch();
 
     useEffect(()=>{
         (async()=>{
+            const checkLogout = JSON.parse(window.sessionStorage.getItem('checkLoggedOut'));
             window.localStorage.clear();
             window.sessionStorage.clear();
             if (checkLogout) {
@@ -40,7 +37,6 @@ const BasePage = (props) => {
                 setLoginAgain(false);
                 try{
                     let data = await api.checkUserState()
-                    // ref.current.complete();
                     SetProgressBar("stop", dispatch);
                     let emsg = "Loading Profile...";
                     if (data == "fail") emsg = "Failed to load user profile.";
@@ -52,44 +48,36 @@ const BasePage = (props) => {
                     else if (data == "inValidCredential" || data == "invalid_username_password") emsg = "The username or password you entered isn't correct. Please try again.";
                     else if (data == "noProjectsAssigned") emsg = "To Login, user must be allocated to a Domain and Project. Please contact Admin.";
                     else if (data == "reload") window.location.reload();
+                    else if (data == "redirect") setRedirectTo('/login');
                     else if (data == "Invalid Session") {
                         emsg = "Your session has expired!";
                         setLoginAgain(true);
-                    }
-                    else {
+                    } else {
                         try{
                             let userinfo = await api.loadUserInfo()
-                        
                             if (userinfo == "fail") setLoginValidation("Failed to Login.");
-                            else
-                            if (userinfo == "Invalid Session") {
+                            else if (userinfo == "Invalid Session") {
                                 setLoginValidation("Your session has expired!");
                                 setLoginAgain(true);
-                            }
-                            else {
+                            } else {
                                 window.localStorage.navigateScreen = userinfo.page;
-                                // history.replace(`/${data.page}`)
                                 dispatch({type:actionTypes.SET_USERINFO, payload: JSON.stringify(userinfo)});
                                 SetProgressBar("start", dispatch);
                                 setRedirectTo(`/${userinfo.page}`);
                             }
-                            if (emsg != "Loading Profile...") console.log(emsg);
                         }
                         catch(err){
                             setLoginValidation("Failed to Login.");
-                            console.log("Fail to Load UserInfo");    
+                            console.error("Fail to Load UserInfo. Error::", err);    
                         }
                     }
-                    setLoginValidation(emsg);
-                    if (emsg != "Loading Profile...") console.log(emsg);
+                    setLoginValidation(emsg);     
                 }
                 catch(err){
-                    console.error(err)
-                    let emsg = "Failed to load user profile.";
-                    console.log(emsg);
+                    const emsg = "Failed to load user profile. Error::";
+                    console.error(emsg, err);
                     setLoginValidation(emsg);
                     SetProgressBar("stop", dispatch);
-                    // ref.current.complete();
                 }
             }
         })()
@@ -98,22 +86,11 @@ const BasePage = (props) => {
     return (
         <>
         {redirectTo ? <Redirect to={redirectTo} /> :
-        <div className="bg-container">
-            <img className="bg-img" src="static/imgs/login-bg.png"/>
-            <div className="element-holder">
-                <div className="greet-text">
-                    <h1>Hello.</h1>
-                    <h2>Welcome to Avo Assure!</h2>
-                    <h3>Login to Experience Intelligence</h3>
-                </div>
-                <div className="login-block">
-                    <span className="logo-wrap"><img className="logo-img" src="static/imgs/logo.png"/></span>
-                    <div className="error-msg">{loginValidation}</div>
-                    {loginAgain ? <span className="error-msg">Click <Link to="/login">here</Link> to login again.</span> : null}
-                </div>
-            </div>
-            <FooterOne/>
-        </div>}
+        < StaticElements> 
+            <div className="error-msg">{loginValidation}</div>
+            {loginAgain ? <span className="error-msg">Click <Link to="/login">here</Link> to login again.</span> : null}
+        </ StaticElements>
+        }
         </>
     );
 }

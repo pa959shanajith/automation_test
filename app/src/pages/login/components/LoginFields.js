@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 import * as api from '../api';
 import * as adminApi from "../../admin/api";
-import { Redirect, useHistory } from 'react-router-dom';
-import 'font-awesome/css/font-awesome.min.css';
-import "../styles/LoginFields.scss"
-import { res, styles } from './Properties'
+import "../styles/LoginFields.scss";
 
 /*
     Component: LoginFields
     Uses; Renders input fields for user to login
-    Todo: loading bar and checkUser function
+    Todo: modal popups
 */
 
 const LoginFields = (props) => {
@@ -22,10 +19,8 @@ const LoginFields = (props) => {
     const [passError, setPassError] = useState(false);
     const [loginValidation, setLoginValidation] = useState("");
     const [requested, setRequested] = useState(false);
-    const [redirectTo, setRedirectTo] = useState(null);
     const [restartForm, setRestartForm] = useState(false);
     let serverList = [{"name": "License Server", "active": false}, {"name": "DAS Server", "active": false}, {"name": "Web Server", "active": false}];
-    const history = useHistory();
     let dispatch = props.dispatch;
     let SetProgressBar = props.SetProgressBar;
 
@@ -97,14 +92,11 @@ const LoginFields = (props) => {
             setRequested(true);
             SetProgressBar("start", dispatch);
             let user = username.toLowerCase();
-            console.log(user, password);
             (async()=>{
                 try{
                     let data = await api.authenticateUser(user, password)
                     SetProgressBar("stop", dispatch);
-                    // $scope.requested = false;
                     setRequested(false);
-                    let error_msg = "";
                     if (data == "restart") {
                         // blockUI("Fetching active services...");
                         adminApi.restartService("query")
@@ -121,10 +113,11 @@ const LoginFields = (props) => {
                         })
                         .catch(error=> {
                             // unblockUI();
+                            console.log("Failed to fetch services. Error::", error)
                             setLoginValidation("Failed to fetch services.");
                         });
                     }
-                    else if (data == 'validCredential') window.location='/';//setRedirectTo('/')  //  history.replace('/')
+                    else if (data == 'validCredential') window.location='/'; //setRedirectTo('/')  //  history.replace('/')
                     else if (data == 'inValidCredential' || data == "invalid_username_password") {
                         setUserError(true);
                         setPassError(true);
@@ -137,7 +130,7 @@ const LoginFields = (props) => {
                 }
                 catch(err){
                     setRequested(false);
-                    console.log(err)
+                    console.error("Error::", err)
                 }
             })()
         }
@@ -164,15 +157,13 @@ const LoginFields = (props) => {
         .catch(error=> {
             // unblockUI();
             // openModalPopup("Restart Service", errmsg);
-            alert("Restart Service", errmsg);
+            alert("Restart Service", error);
         });
     };
     
 
 
     return (
-        <>
-        {redirectTo ? <Redirect to={{pathname: redirectTo, state: { redirected: true } }} /> : 
         <>
         { restartForm 
             ?
@@ -205,10 +196,21 @@ const LoginFields = (props) => {
             }
             </form>
         }
-            </>
-        }
         </>
     );
+}
+
+const styles = {
+    errorBorder : { borderColor: "#d33c3c", marginBottom: '19px'},
+}
+
+const res = {
+    defaultUserIcon : "static/imgs/ic-username.png",
+    errorUserIcon :  "static/imgs/ic-username-error.png",
+    defaultPassIcon : "static/imgs/ic-password.png",
+    errorPassIcon : "static/imgs/ic-password-error.png",
+    eyeSlashIcon : "password-eye fa fa-eye-slash",
+    eyeIcon : "password-eye fa fa-eye",
 }
 
 

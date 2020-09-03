@@ -8,7 +8,7 @@ import 'font-awesome/css/font-awesome.min.css';
 import * as loginApi from '../../login/api';
 import ChangePassword from './ChangePassword';
 
-const Header = () => {
+const Header = (props) => {
 
     const [userDetails, setUserDetails] = useState(null);
     const [username, setUsername] = useState(null);
@@ -25,7 +25,8 @@ const Header = () => {
     const [projectDetails, setProjectDetails] = useState(null);
     const [releaseDetails, setReleaseDetails] = useState(null);
     const [cycleDetails, setCycleDetails] = useState(null);
-	const [passwordValidation, setPasswordValid] = useState("");
+    const [passwordValidation, setPasswordValid] = useState("");
+    const [showChangePass, setShowChangePass] = useState(false);
     let unavailableLocalServer_msg = "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.";
     const [userInfo, setUserInfo] = useState(useSelector(state=>state.login.userinfo));
     const [callRedirect, setCallRedirect] = useState(false);
@@ -37,16 +38,16 @@ const Header = () => {
 
     useEffect(()=>{
         
-        console.log("USERINFO I AM GETTING: ", userInfo)
-        let userDetailsVar;
-        if(userInfo){
-            userDetailsVar = JSON.parse(userInfo);
-        }
-        let userRoleVar = userInfo.rolename;
-        let usernameVar = userDetailsVar.username.toLowerCase();
-        setUserDetails(userDetailsVar)
-        setUserRole(userRoleVar);
-        setUsername(usernameVar);
+        // console.log("USERINFO I AM GETTING: ", userInfo)
+        // let userDetailsVar;
+        // if(userInfo){
+        //     userDetailsVar = JSON.parse(userInfo);
+        // }
+        // let userRoleVar = userInfo.rolename;
+        // let usernameVar = userDetailsVar.username.toLowerCase();
+        // setUserDetails(userDetailsVar)
+        // setUserRole(userRoleVar);
+        // setUsername(usernameVar);
     }, []);
 
     const naviPg = () => {
@@ -77,6 +78,7 @@ const Header = () => {
         console.log("redirectPage")
         RedirectPage(history);
         // setCallRedirect(true);
+        // props.callRedirectPage(true);
     };
     
     const getIce = async () => {
@@ -127,8 +129,11 @@ const Header = () => {
     };
     
     const resetPass = () => {
-		alert("resetPassPopup");
+        // alert("resetPassPopup");
+        setShowChangePass(!showChangePass);
     };
+
+    const toggleChangePass = () => setShowChangePass(!showChangePass);
     
 
     const [currpassword, setCurrPassword] = useState("");
@@ -203,6 +208,7 @@ const Header = () => {
     return(
         <> 
             {/* { callRedirect ? RedirectPage() :  */}
+            { showChangePass ? <ChangePassword show={showChangePass} setShow={toggleChangePass} /> : null }
             <div className = "main-header">
                 <span className="header-logo-span"><img className="header-logo" src="static/imgs/logo.png" onClick={naviPg}/></span>
                 <div className="btn-container"><button className="fa fa-bell no-border"></button></div>

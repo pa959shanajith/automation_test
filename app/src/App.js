@@ -9,6 +9,7 @@ import {Provider} from 'react-redux';
 import mindmapReducer from './pages/mindmap/state/reducer.js';
 import progressBarReducer from "./pages/global/state/reducer";
 import LoginReducer from './pages/login/state/reducer';
+import 'font-awesome/css/font-awesome.min.css';
 
 /* combining multiple domains reducer */
 const rootReducer = combineReducers({
@@ -35,7 +36,7 @@ const App = () => {
           <Route path="/login" component={Login} />
           <Route path="/mindmap" component={Mindmap} />
           <Route path="/plugin" component={Plugin} />
-          <Route component={Login} />
+          <Route component={Base} />
         </Switch>
       </Router>
     </Provider>
