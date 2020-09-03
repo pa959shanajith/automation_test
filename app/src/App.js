@@ -22,11 +22,9 @@ const store = createStore(rootReducer)
 
 /*Component App
   use: defines components for each url
-  note: right now it does not redirect '/' path to /login automtically
 */
 
 const App = () => {
-  
   return (
     <Provider store={store}>
       <ProgressBar />

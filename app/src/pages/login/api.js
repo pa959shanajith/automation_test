@@ -1,6 +1,6 @@
 
 import axios from 'axios';
-const url = "https://wslkcmp6f-473.slksoft.com:8443";
+const url = "https://"+window.location.hostname+":8443";
 
 export const authenticateUser = async(username, password) => {
     try{

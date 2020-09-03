@@ -1,5 +1,5 @@
 import axios from 'axios';
-const url = 'https://127.0.0.1:8443';
+const url = 'https://'+window.location.hostname+':8443';
 
 
 /*Component getProjectList
