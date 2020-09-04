@@ -139,10 +139,10 @@ const Canvas = (props) => {
 const moveNodeBegin = (idx,linkDisplay,dLinks,temp,cScale) => {
     // d3.select('#ct-inpAct').classed('no-disp', !0);
     dLinks.forEach(function(d, i) {
-        if (d.source.id === idx) {
+        if (d.source.id === parseInt(idx)) {
             temp.s.push(i);
             delete linkDisplay['link-' + d.source.id + '-' + d.target.id];
-        } else if (d.target.id === idx) {
+        } else if (d.target.id === parseInt(idx)) {
             temp.t = i;
             delete linkDisplay['link-' + d.source.id + '-' + d.target.id];
         }
