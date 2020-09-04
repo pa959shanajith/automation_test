@@ -6,7 +6,7 @@ import { RedirectPage } from '../../global';
 import "../styles/Header.scss";
 import 'font-awesome/css/font-awesome.min.css';
 import * as loginApi from '../../login/api';
-import ChangePassword from './ChangePassword';
+// import ChangePassword from './ChangePassword';
 
 const Header = (props) => {
 
@@ -208,7 +208,7 @@ const Header = (props) => {
     return(
         <> 
             {/* { callRedirect ? RedirectPage() :  */}
-            { showChangePass ? <ChangePassword show={showChangePass} setShow={toggleChangePass} /> : null }
+            {/* { showChangePass ? <ChangePassword show={showChangePass} setShow={toggleChangePass} /> : null } */}
             <div className = "main-header">
                 <span className="header-logo-span"><img className="header-logo" src="static/imgs/logo.png" onClick={naviPg}/></span>
                 <div className="btn-container"><button className="fa fa-bell no-border"></button></div>

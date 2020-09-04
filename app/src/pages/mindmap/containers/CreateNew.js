@@ -3,7 +3,6 @@ import {getProjectList , getModules} from '../api';
 import LoadingBar from 'react-top-loading-bar';
 import { useDispatch, useSelector} from 'react-redux';
 import MindmapToolbar from './MindmapToolbar';
-import 'font-awesome/css/font-awesome.min.css';
 import * as actionTypes from '../state/action';
 import Canvas from './MindmapCanvas';
 import '../styles/CreateNew.scss';

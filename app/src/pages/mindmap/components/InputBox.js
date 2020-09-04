@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import ClickAwayListener from 'react-click-away-listener';
 import * as d3 from 'd3';
-import { tree } from 'd3';
 
 const InputBox = (props) => {
     const InpBox = useRef()
@@ -97,7 +96,7 @@ const InputBox = (props) => {
             if(e.target.className.baseVal !== "ct-nodeIcon")props.setInpBox(false);
             }}>
             <div id="ct-inpBox" className='no-disp'>
-                <input autoFocus={true} ref={InpBox} id="ct-inpAct" maxlength="255" className="ct-inp" onKeyPress={(e)=>{if(e.key==='Enter')onEnter(e.target.value)}}/>
+                <input autoFocus={true} ref={InpBox} id="ct-inpAct" maxLength="255" className="ct-inp" onKeyPress={(e)=>{if(e.key==='Enter')onEnter(e.target.value)}}/>
             </div>
         </ClickAwayListener>
     )

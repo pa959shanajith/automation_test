@@ -2,8 +2,8 @@ import React, { useState, Fragment} from 'react';
 import { useSelector, useDispatch} from 'react-redux';
 import {getModules}  from '../api'
 import '../styles/ModuleListDrop.scss'
-import Scrollbar from '../../../globals/components/Scrollbar';
-import ScreenOverlay from '../../../globals/components/ScreenOverlay'
+import {Scrollbar} from '../../global';
+import {ScreenOverlay} from '../../global'
 import * as actionTypes from '../state/action';
 
 /*Component ModuleListDrop

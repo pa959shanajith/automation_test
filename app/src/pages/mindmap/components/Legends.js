@@ -1,5 +1,6 @@
 import React from 'react';
 import '../styles/Legends.scss'
+
 /*Component Legends
   use: returns static legends at the bottom of the screen
 */

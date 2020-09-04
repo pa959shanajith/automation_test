@@ -33,7 +33,6 @@ const Canvas = (props) => {
     const [dNodes,setdNodes] = useState([])
     const [dLinks,setdLinks] = useState([])
     const [createnew,setCreateNew] =useState(false)
-    // const [moving,setMoving] = useState(false)
     const CanvasRef = useRef();
     const verticalLayout = false;
     useEffect(() => {
@@ -48,7 +47,6 @@ const Canvas = (props) => {
                 zoom.on("zoom",null)
             }
             d3.select('.ct-container').attr("transform", "translate(" + tree.translate[0]+','+tree.translate[1] + ")scale(" + 1 + ")");
-            // zoom = bindZoomListner(setCtScale,tree.translate)
             setCreateNew(0)
         }else{
             //load mindmap from data
@@ -96,9 +94,6 @@ const Canvas = (props) => {
             moving = false
         }
         else{
-            // setMoving(true)
-            // var svg = d3.select(`.mp__canvas_svg`);
-            // svg.on('.zoom',null)
             moving = true
             var res = moveNodeBegin(id,{...links},[...dLinks],{...temp},{...ctScale})
             setLinks(res.linkDisplay)
@@ -167,7 +162,6 @@ const moveNodeBegin = (idx,linkDisplay,dLinks,temp,cScale) => {
 }
 
 const moveNodeEnd = (pi,dNodes,dLinks,linkDisplay,temp) => {
-    // $scope.moving = false;
     const svg = d3.select(`.mp__canvas_svg`);
     svg.on('mousemove', null);
     var p = d3.select("#node_" + pi);

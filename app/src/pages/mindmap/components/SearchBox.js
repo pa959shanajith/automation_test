@@ -5,8 +5,9 @@ import * as d3 from 'd3';
 
 /*Component Canvas
   use: returns floating search box
-  
+  props: setCtScale,zoom
 */
+
 var idxSearch = 0
 var nodeID ;
 const SearchBox = (props) => {

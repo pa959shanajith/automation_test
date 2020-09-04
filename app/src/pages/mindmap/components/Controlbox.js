@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import ClickAwayListener from 'react-click-away-listener';
 import '../styles/ControlBox.scss'
 import * as d3 from 'd3';
@@ -71,11 +71,11 @@ const ControlBox = (props) => {
     return(
         <ClickAwayListener onClickAway={(e)=>{if(e.target.className.baseVal !== "ct-nodeIcon")props.setCtrlBox(false)}}>
             <div id="ct-ctrlBox" >
-                <p class="ct-ctrl fa fa-plus" value={props.nid} onClick={(e)=>addNode(e)}>
-                        <span class="ct-tooltiptext">Create Scenarios</span></p>
-                <p class="ct-ctrl fa fa-hand-peace-o" ><span class="ct-tooltiptext">Create Multiple Scenarios</span></p>
-                <p class="ct-ctrl fa fa-pencil-square-o"onClick={()=>editNode()} ><span class="ct-tooltiptext">Edit Module</span></p>
-                <p class="ct-ctrl fa fa-trash-o ct-ctrl-inactive" ><span class="ct-tooltiptext"></span></p>
+                <p className="ct-ctrl fa fa-plus" value={props.nid} onClick={(e)=>addNode(e)}>
+                        <span className="ct-tooltiptext">Create Scenarios</span></p>
+                <p className="ct-ctrl fa fa-hand-peace-o" ><span className="ct-tooltiptext">Create Multiple Scenarios</span></p>
+                <p className="ct-ctrl fa fa-pencil-square-o"onClick={()=>editNode()} ><span className="ct-tooltiptext">Edit Module</span></p>
+                <p className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" ><span className="ct-tooltiptext"></span></p>
             </div>
         </ClickAwayListener>
     )
