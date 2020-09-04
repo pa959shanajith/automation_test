@@ -167,16 +167,17 @@ const ProjectNew = (props) => {
             return false;
         } else {
             setModalInputErrorBorder(false);
-
+            var flag1 = flag;
             for( var i = 0; i < releaseList.length; i++){
                 if ( releaseList[i] === releaseTxt) {
                     setShowEditModalRelease(false);
                     // openModalPopup("Add Release", "Release Name already exists");
                     alert("Release Name already exists");
                     setFlag(true);
+                    flag1 = true;
                 }
             }
-            if (flag === true) {
+            if (flag1 === true) {
                 setShowEditModalRelease(false);
                 return false;
             }
@@ -235,7 +236,7 @@ const ProjectNew = (props) => {
             setReleaseTxt("");
             return false;
         } else {
-            var flag1 = {...flag};
+            var flag1 = flag;
             setModalInputErrorBorder(false);
             for (var i = 0; i < releaseList.length; i++) {
                 if (releaseList[i] === releaseTxt) {
@@ -352,7 +353,8 @@ const ProjectNew = (props) => {
                         break;
                     }
                 }
-                }
+                setActiveRelease(releaseName);
+            }
             
             //$("#"+editReleaseId).addClass("editedRelease");
             //$("#"+editReleaseId).siblings(".deleteRelease").addClass("editedRelease");

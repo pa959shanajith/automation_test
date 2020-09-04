@@ -344,26 +344,26 @@ const CreateUser = (props) => {
 
     const  populateOIDCConf = () =>{
         (async()=>{
-        try{
-            dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
-            // blockUI("Fetching OpenID Server configurations...");
-            var data = await getOIDCConfig();
-            // unblockUI();
-            if(data === "Invalid Session") ; //$rootScope.redirectPage();
-            else if(data === "fail")alert("Failed to fetch OpenID server configurations.") ;//openModalPopup("Create User", "Failed to fetch OpenID server configurations.");
-            else if(data === "empty") alert("There are no OpenID server configured. To proceed create a server configuration in OpenID configuration section.") ;//openModalPopup("Create User","There are no OpenID server configured. To proceed create a server configuration in OpenID configuration section.");
-            else {
-                
-                dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
-                data.sort((a,b)=>a.name.localeCompare(b.name));
-                dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data})
+            try{
+                dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
+                // blockUI("Fetching OpenID Server configurations...");
+                var data = await getOIDCConfig();
+                // unblockUI();
+                if(data === "Invalid Session") ; //$rootScope.redirectPage();
+                else if(data === "fail")alert("Failed to fetch OpenID server configurations.") ;//openModalPopup("Create User", "Failed to fetch OpenID server configurations.");
+                else if(data === "empty") alert("There are no OpenID server configured. To proceed create a server configuration in OpenID configuration section.") ;//openModalPopup("Create User","There are no OpenID server configured. To proceed create a server configuration in OpenID configuration section.");
+                else {
+                    
+                    dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
+                    data.sort((a,b)=>a.name.localeCompare(b.name));
+                    dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data})
+                }
+            }catch(error){
+                // unblockUI();
+                console.log("Error:::::::::::::", error);
+                // openModalPopup("Create User", "Failed to fetch OpenID server configurations");
+                alert("Failed to fetch OpenID server configurations");
             }
-        }catch(error){
-            // unblockUI();
-            console.log("Error:::::::::::::", error);
-            // openModalPopup("Create User", "Failed to fetch OpenID server configurations");
-            alert("Failed to fetch OpenID server configurations");
-        }
         })()
     }
 
@@ -499,19 +499,86 @@ const CreateUser = (props) => {
                 dispatch({type:actionTypes.UPDATE_USERROLE,payload: data.role});
                 dispatch({type:actionTypes.UPDATE_ROLENAME,payload: data.rolename});
                 dispatch({type:actionTypes.UPDATE_ADDROLES,payload: {}});
-                
                 data.addrole.forEach((e) => dispatch({type:actionTypes.ADD_ADDROLE,payload: e}));
-                
-                
                 dispatch({type:actionTypes.UPDATE_TYPE,payload: uType});
                 dispatch({type:actionTypes.UPDATE_CONF_EXP,payload: false});
                 dispatch({type:actionTypes.UPDATE_FTYPE,payload:  (uType==="inhouse")? "Default":((uType==="oidc")? "OpenID":uType.toUpperCase())});
 
 				if (data.type !== "inhouse") {
 					var confserver = data.server;
-                    const wait = await selectUserType({type:data.type});
+                    dispatch({type:actionTypes.UPDATE_SERVER,payload:""})
+                    dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:[]})
+                    if (data.type === "ldap") {
+                        try{
+                            dispatch({type:actionTypes.UPDATE_LDAP,payload:{fetch: "map", user: ''}})
+                            dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
+                            // blockUI("Fetching LDAP Server configurations...");
+                            var data1 = await getLDAPConfig("server");
+                            // unblockUI();
+                            if(data1 === "Invalid Session") ; //$rootScope.redirectPage();
+                            else if(data1 === "fail")alert("Failed to fetch LDAP server configurations.");//openModalPopup("Create User", "Failed to fetch LDAP server configurations.");
+                            else if(data1 === "empty")alert("There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section.") ;//openModalPopup("Create User","There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section.");
+                            else {
+                                dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
+                                data1.sort((a,b)=>a.name.localeCompare(b.name));
+                                dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data1})
+                            }
+                        } catch(error){
+                            // unblockUI();
+                            console.log("Error:::::::::::::", error);
+                            alert("Failed to fetch LDAP server configurations");
+                            // openModalPopup("Create User", "Failed to fetch LDAP server configurations");
+                        }
                     
-                    if (!userConf.confServerList.some(function(e) { return e.name === confserver;})) {
+                    }
+                    else if (data.type === "saml"){
+                         try{
+                            dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
+                            // blockUI("Fetching SAML Server configurations...");
+                            
+                            var data1 = await getSAMLConfig();
+                            // unblockUI();
+                            if(data1 === "Invalid Session");//$rootScope.redirectPage();
+                            else if(data1 === "fail") alert("Failed to fetch SAML server configurations.");//openModalPopup("Create User", "Failed to fetch SAML server configurations.");
+                            else if(data1 === "empty")alert("There are no SAML server configured. To proceed create a server configuration in SAML configuration section.");//openModalPopup("Create User","There are no SAML server configured. To proceed create a server configuration in SAML configuration section.");
+                            else {
+                                
+                                dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
+                                // data.sort((a,b)=>a.name.localeCompare(b.name));
+                                data1.sort();
+                                dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data1})
+                            }
+                        }catch(error){
+                            // unblockUI();
+                            console.log("Error:::::::::::::", error);
+                            // openModalPopup("Create User", "Failed to fetch SAML server configurations");
+                            alert("Failed to fetch SAML server configurations");
+                        }    
+                    }
+                    else if (data.type === "oidc"){ 
+                        try{
+                            dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
+                            // blockUI("Fetching OpenID Server configurations...");
+                            var data1 = await getOIDCConfig();
+                            // unblockUI();
+                            if(data1 === "Invalid Session") ; //$rootScope.redirectPage();
+                            else if(data1 === "fail")alert("Failed to fetch OpenID server configurations.") ;//openModalPopup("Create User", "Failed to fetch OpenID server configurations.");
+                            else if(data1 === "empty") alert("There are no OpenID server configured. To proceed create a server configuration in OpenID configuration section.") ;//openModalPopup("Create User","There are no OpenID server configured. To proceed create a server configuration in OpenID configuration section.");
+                            else {
+                                
+                                dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
+                                data1.sort((a,b)=>a.name.localeCompare(b.name));
+                                dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data1})
+                            }
+                        }catch(error){
+                            // unblockUI();
+                            console.log("Error:::::::::::::", error);
+                            // openModalPopup("Create User", "Failed to fetch OpenID server configurations");
+                            alert("Failed to fetch OpenID server configurations");
+                        }
+                    
+                    }
+                    if (!data1.some(function(e) { return e.name === confserver;})) {
                         dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST_PUSH,payload: {_id: '', name: confserver}});
                         dispatch({type:actionTypes.UPDATE_CONF_EXP,payload: confserver});
 					}
