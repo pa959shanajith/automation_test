@@ -36,9 +36,10 @@ const Canvas = (props) => {
     const CanvasRef = useRef();
     const verticalLayout = false;
     useEffect(() => {
+        var tree;
         if(props.module.createnew){
             //create new mindmap
-            var tree = createNewMap()
+            tree = createNewMap()
             tree.sections = types
             tree.links = {}
             tree.dLinks = []
@@ -50,7 +51,7 @@ const Canvas = (props) => {
             setCreateNew(0)
         }else{
             //load mindmap from data
-            var tree = generateTree(props.module,types)
+            tree = generateTree(props.module,types)
         }
         d3.select('.ct-container').attr("transform", "translate(" + tree.translate[0]+','+tree.translate[1] + ")scale(" + 1 + ")");
         zoom = bindZoomListner(setCtScale,tree.translate,moving)
@@ -87,23 +88,24 @@ const Canvas = (props) => {
         setdNodes(res.dNodes)
     }
     const moveNode=(e,type)=>{
+        var res;
         var id = e.target.parentElement.id.split('node_')[1];
-        if(type=='KeyUp'){
-            var res = moveNodeEnd(id,[...dNodes],[...dLinks],{...links},{...temp})
+        if(type==='KeyUp'){
+            res = moveNodeEnd(id,[...dNodes],[...dLinks],{...links},{...temp})
             setLinks(res.linkDisplay)
             moving = false
         }
         else{
             moving = true
-            var res = moveNodeBegin(id,{...links},[...dLinks],{...temp},{...ctScale})
+            res = moveNodeBegin(id,{...links},[...dLinks],{...temp},{...ctScale})
             setLinks(res.linkDisplay)
             temp=res.temp
         }
     }
     return (
         <Fragment>
-            {(ctrlBox!=false)?<ControlBox nid={ctrlBox} clickAdd={clickAdd} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
-            {(inpBox!=false)?<InputBox node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale}/>:null}
+            {(ctrlBox!==false)?<ControlBox nid={ctrlBox} clickAdd={clickAdd} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
+            {(inpBox!==false)?<InputBox node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale}/>:null}
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton/>
             <Legends/>
@@ -118,14 +120,14 @@ const Canvas = (props) => {
                         <image  onClick={(e)=>nodeClick(e)} style={{height:'40px',width:'40px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
                         <text className="ct-nodeLabel" textAnchor="middle" x="20" title={node[1].title} y="50">{node[1].name}</text>
                         <title val={node[0]} className="ct-node-title">{node[1].title}</title>
-                        {(node[1].type!='testcases')?
+                        {(node[1].type!=='testcases')?
                         <circle onClick={(e)=>clickCollpase(e)} className={"ct-"+node[1].type+" ct-cRight ct-nodeBubble"} cx={verticalLayout ? 20 : 44} cy={verticalLayout ? 55 : 20} r="4"></circle>
                         :null}
-                        {(node[1].type!='modules')?
+                        {(node[1].type!=='modules')?
                         <circle 
                         onMouseUp={(e)=>moveNode(e,'KeyUp')}
                         onMouseDown={(e)=>moveNode(e,'KeyDown')}
-                        className={"ct-"+node[1].type+" "+"ct-nodeBubble"} cx="-3" cy="20" r="4"></circle>
+                        className={"ct-"+node[1].type+" ct-nodeBubble"} cx="-3" cy="20" r="4"></circle>
                         :null}
                     </g>)}
                 </g>
@@ -137,25 +139,22 @@ const Canvas = (props) => {
 const moveNodeBegin = (idx,linkDisplay,dLinks,temp,cScale) => {
     // d3.select('#ct-inpAct').classed('no-disp', !0);
     dLinks.forEach(function(d, i) {
-        if (d.source.id == idx) {
+        if (d.source.id === idx) {
             temp.s.push(i);
             delete linkDisplay['link-' + d.source.id + '-' + d.target.id];
-        } else if (d.target.id == idx) {
+        } else if (d.target.id === idx) {
             temp.t = i;
             delete linkDisplay['link-' + d.source.id + '-' + d.target.id];
         }
     });
     const svg = d3.select(`.mp__canvas_svg`);
     d3.select('#node_' + idx).classed('ct-movable', !0);
-    var lol= document.getElementsByClassName('mp__canvas_svg')[0].getBBox()
+    // var temp = document.getElementsByClassName('mp__canvas_svg')[0].getBBox()
     svg.on('mousemove', (e)=>{
         d3.select('.ct-movable').attr('transform', "translate(" + parseFloat((d3.event.x - 4 ) /cScale.k  - cScale.x) + "," + parseFloat((d3.event.y - 90) / cScale.k - cScale.y)+ ")");
         // [(parseFloat(l[0]) + 40) * ctScale.k + ctScale.x, (parseFloat(l[1]) + 40) * ctScale.k + ctScale.y];
         d3.event.preventDefault();
     })
-    // on('mouseup',()=>{
-    //     svg.on('mousemove',null).on('mouseup',null)
-    // })
     // d3.select('.ct-movable').attr('transform', "translate(" + parseFloat((d3.event.x - cScale.x) / cScale.k - 4 ) + "," + parseFloat((d3.event.y - cScale.y) / cScale.k - 90)+ ")");
 
     return {linkDisplay,temp}
@@ -207,7 +206,7 @@ const recurseTogChild = (d , v, dLinks) => {
         recurseTogChild(e, v, dLinks);
         d3.select('#node_' + e.id).classed('no-disp', v);
         for (var j = dLinks.length - 1; j >= 0; j--) {
-            if (dLinks[j].source.id == d.id) {
+            if (dLinks[j].source.id === d.id) {
                 d3.select('#link-' + dLinks[j].source.id + '-' + dLinks[j].target.id).classed('no-disp', v);
             }
         }
@@ -216,7 +215,7 @@ const recurseTogChild = (d , v, dLinks) => {
         recurseTogChild(e, !0, dLinks);
         d3.select('#node_' + e.id).classed('no-disp', !0);
         for (var j = dLinks.length - 1; j >= 0; j--) {
-            if (dLinks[j].source.id == d.id) {
+            if (dLinks[j].source.id === d.id) {
                 d3.select('#link-' + dLinks[j].source.id + '-' + dLinks[j].target.id).classed('no-disp', !0);
             }
         }
@@ -272,11 +271,11 @@ const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sections) =
     // d3.select('#ct-ctrlBox').classed('no-disp', !0);
     var pi = activeNode;
     var pt = nodeDisplay[pi].type;
-    if (pt == 'testcases') return;
+    if (pt === 'testcases') return;
     // SaveCreateED('#ct-createAction', 1, 0);
     if (false && nodeDisplay[pi]._children != null)
         return ;// openDialogMindmap('Error', 'Expand the node');
-    if (dNodes[pi].children == undefined) dNodes[pi]['children'] = [];
+    if (dNodes[pi].children === undefined) dNodes[pi]['children'] = [];
     var nNext = {
         'modules': ['Scenario', 1],
         'scenarios': ['Screen', 2],
@@ -294,10 +293,11 @@ const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sections) =
         arr_co.push(objj);
     });
     // switch-layout feature
+    var tempName;
     if (obj) {
-        var tempName = obj.name;
+        tempName = obj.name;
     } else {
-        var tempName = nNext[pt][0] + '_' + nNext[pt][1];
+        tempName = nNext[pt][0] + '_' + nNext[pt][1];
     }
     var node = {
         id: uNix,
@@ -343,15 +343,17 @@ const getNewPosition = (dNodes,node, pi, arr_co ,layout_vertical,sections) => {
     // **NOTE**
     //dNodes[pi].children are arranged in increasing
     // order of x/y disance depending on layout
+    var index;
+    var new_one;
     if (dNodes[pi].children.length > 0) { // new node has siblings
-        var index = dNodes[pi].children.length - 1;
+        index = dNodes[pi].children.length - 1;
         if (layout_vertical)
-            var new_one = {
+            new_one = {
                 x: parseInt(dNodes[pi].children[index].x) + 100,
                 y: sections[node.type]
             }; // Go beside last sibling node
         else
-            var new_one = {
+            new_one = {
                 x: sections[node.type],
                 y: parseInt(dNodes[pi].children[index].y + 80)
             };
@@ -359,17 +361,17 @@ const getNewPosition = (dNodes,node, pi, arr_co ,layout_vertical,sections) => {
 
     } else { //first kid of any node
         if (dNodes[pi].parent != null) { //if kid of scenario/testcase/screen
-            var arr = dNodes[pi].parent.children;
-            var index = dNodes[pi].parent.children.length - 1; //number of parents siblings - 1
+            // var arr = dNodes[pi].parent.children;
+            index = dNodes[pi].parent.children.length - 1; //number of parents siblings - 1
             //new_one={x:parseInt(arr[index].x),y:parseInt(arr[index].y)+125};
 
             if (layout_vertical) {
-                var new_one = {
+                new_one = {
                     x: parseInt(dNodes[pi].x),
                     y: parseInt(sections[node.type])
                 }; // go directly below parent
             } else {
-                var new_one = {
+                new_one = {
                     x: parseInt(sections[node.type]),
                     y: parseInt(dNodes[pi].y)
                 }; // go directly below parent
@@ -506,12 +508,12 @@ const addNode = (n) =>{
         n.display_name = n.display_name.slice(0, ch) + '...';
     }
     var img_src = 'static/imgs/node-' + n.type + '.png';
-    if (n.reuse && (n.type == 'testcases' || n.type == 'screens')) img_src = 'static/imgs/' + n.type + '-reuse.png';
+    if (n.reuse && (n.type === 'testcases' || n.type === 'screens')) img_src = 'static/imgs/' + n.type + '-reuse.png';
 
     var nodeDisplay= {
         'type': n.type,
         'transform': "translate(" + (n.x).toString() + "," + (n.y).toString() + ")",
-        'opacity': !( n._id == null || n._id == undefined) ? 1 : 0.5,
+        'opacity': !( n._id === null || n._id === undefined) ? 1 : 0.5,
         'title': n.name,
         'name': n.display_name,
         'img_src': img_src,
@@ -525,15 +527,17 @@ const addNode = (n) =>{
 
 const addLink = (p, c) => {
     const verticalLayout = false
+    var s;
+    var t;
     function genPathData(s, t) {
         return ('M' + s[0] + ',' + s[1] + 'C' + (s[0] + t[0]) / 2 + ',' + s[1] + ' ' + (s[0] + t[0]) / 2 + ',' + t[1] + ' ' + t[0] + ',' + t[1]);
     };
     if (verticalLayout) {
-        var s = [p.x + 20, p.y + 55];
-        var t = [c.x + 20, c.y - 3];
+        s = [p.x + 20, p.y + 55];
+        t = [c.x + 20, c.y - 3];
     } else {
-        var s = [p.x + 43, p.y + 20];
-        var t = [c.x - 3, c.y + 20];
+        s = [p.x + 43, p.y + 20];
+        t = [c.x - 3, c.y + 20];
     }
     var d = genPathData(s, t);
     return { 'd': d }
