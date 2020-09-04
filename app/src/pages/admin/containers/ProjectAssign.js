@@ -294,20 +294,22 @@ const ProjectNew = (props) => {
 			return false;
 		}
 
+        var unAssignedProjects1 = [];
         for(var i=0; i<assignProj.allProjectAP.length; i++){
             var unassignedProj = {};
 			unassignedProj.projectId = assignProj.allProjectAP[i].projectid;
 			unassignedProj.projectName = assignProj.allProjectAP[i].projectname;
-            unAssignedProjects.push(unassignedProj);
-            setUnAssignedProjects(unAssignedProjects);
+            unAssignedProjects1.push(unassignedProj);
+            setUnAssignedProjects(unAssignedProjects1);
         }
 
+        var assignedProjects1 = [];
         for( i=0; i<assignProj.assignedProjectAP.length; i++){
             var assignedProj = {};
 			assignedProj.projectId = assignProj.assignedProjectAP[i].projectid;
 			assignedProj.projectName = assignProj.assignedProjectAP[i].projectname;
-            assignedProjects.push(assignedProj);
-            setAssignedProjects(assignedProjects);
+            assignedProjects1.push(assignedProj);
+            setAssignedProjects(assignedProjects1);
         }
 
         // var userDetails = JSON.parse(window.localStorage['_UI']);
@@ -317,12 +319,12 @@ const ProjectNew = (props) => {
 		assignProjectsObj.domainname = selectedProject;
 		// assignProjectsObj.userInfo = userDetails;
 		assignProjectsObj.userId = userId;
-		assignProjectsObj.assignedProjects = assignedProjects;
+		assignProjectsObj.assignedProjects = assignedProjects1;
 		assignProjectsObj.getAssignedProjectsLen = getAssignedProjectsLen;
 
 		/* Logic to get unassigned project list */
         setDiffprj([]);
-        var currentDiffPrj = getDifferentProjects({diffP:[]});
+        var currentDiffPrj = getDifferentProjects(assignedProjects1);
 		//console.log($scope.diffprj);
 		/*End of logic to get unassigned project list */
 		assignProjectsObj.deletetasksofprojects = currentDiffPrj;
@@ -342,7 +344,7 @@ const ProjectNew = (props) => {
                 //$rootScope.redirectPage();
             }
             if (data === 'success') {
-                if (assignedProjects.length !== 0) alert("Projects assigned to user successfully");
+                if (assignedProjects1.length !== 0) alert("Projects assigned to user successfully");
                     //openModalPopup("Assign Projects", "Projects assigned to user successfully");
                 else alert("Projects unassigned successfully")
                     // openModalPopup("Assign Projects", "Projects unassigned successfully");
@@ -358,19 +360,19 @@ const ProjectNew = (props) => {
         }
     }
 
-    const getDifferentProjects= ({diffP})=>{
+    const getDifferentProjects= (assignedProjects1)=>{
         setDiffprj(assignedProjectInitial);
         var diffprjNew = [];
-        for (var i = 0; i < assignedProjects.length; i++) { 
-            for (var j = 0; j < diffprj.length; j++) { 
-                if(diffprj[j].projectid !== assignedProjects[i].projectId){
-                    diffprjNew.push()
+        
+        for (var i = 0; i < assignedProjectInitial.length; i++) { 
+            var flag1 = false; 
+            for (var j = 0; j < assignedProjects1.length; j++) { 
+                if(assignedProjectInitial[i].projectid === assignedProjects1[j].projectId){
+                    flag1 = true;
+                    break;
                 }
             }
-            // diffprj = grep(diffprj, function(e){ 
-            //     return e.projectid !== assignedProjects[i].projectId ; 
-            // });
-           
+            if(flag1 === false) diffprjNew.push(assignedProjectInitial[i]);
         }
         setDiffprj(diffprjNew);
         return diffprjNew
