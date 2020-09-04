@@ -17,11 +17,6 @@
 	cursor: pointer;
 }
 
-
-
-
-
-
 /*************** SCROLLBAR MAC OS X - For Action Bar***************/
 .scroll-wrapper > .scrollbar-macosx{
     height: 100% !important;
@@ -127,6 +122,11 @@
 	}
 }
 
+.selected-icon{
+    background: #331d4c;
+    border-radius: 6px;
+    padding: 10px;
+}
 
 #left-top-section {
     min-height: 60%;
@@ -172,10 +172,13 @@
     text-align: center;
     margin-bottom: 2px;
 }
-#left-top-section ul li a,
-#left-bottom-section ul li a {
+
+
+#left-top-section ul li i,
+#left-bottom-section ul li i {
     text-decoration: none;
     font-size: 12px;
+    font-style: normal!important;
     font-family: 'LatoWebLight';
     color: #eee9ff;
     word-wrap: break-word;
@@ -184,23 +187,29 @@
     width: 75%;
     margin: 0 auto;
 }
-#left-top-section ul li a:focus,
+@media screen and (min-width:1700px){
+    #left-top-section ul li i,
+    #left-bottom-section ul li a {
+        font-size: 0.8vw;
+    }
+}
+#left-top-section ul li i:focus,
 #left-bottom-section ul li a:focus {
     outline: 0
 }
-#left-top-section ul li a:focus,
+#left-top-section ul li i:focus,
 #left-bottom-section ul li a:focus {
     outline: 0
 }
 
-#left-top-section ul li a span img,
+#left-top-section ul li i span img,
 #left-bottom-section ul li a span img,
-#left-top-section ul li a span span.fa,
+#left-top-section ul li i span span.fa,
 #left-bottom-section ul li a span span.fa {
     padding: 8px 10px;
 }
 
-#left-top-section ul li a span span.fa,
+#left-top-section ul li i span span.fa,
 #left-bottom-section ul li a span span.fa {
     font-size: 30px;
     vertical-align: middle;
@@ -208,9 +217,9 @@
     width: auto;
 }
 
-#left-top-section ul li a:hover span img,
+#left-top-section ul li i:hover span img,
 #left-bottom-section ul li a:hover span img,
-#left-top-section ul li a:hover span span.fa,
+#left-top-section ul li i:hover span span.fa,
 #left-bottom-section ul li a:hover span span.fa {
     /*background: #331d4c;*/
     background: #523176;
@@ -223,12 +232,12 @@
     -moz-transition: 0.2s ease-in-out;
     -webkit-transition: 0.2s ease-in-out;
 }
-#left-top-section ul li a.disableActions:hover, #left-top-section ul li a.disableActions:hover span img{
+#left-top-section ul li i.disableActions:hover, #left-top-section ul li i.disableActions:hover span img{
 	background:none;
 	cursor: no-drop
 }
 
-#left-top-section ul li a.disableActionsWS:hover, #left-top-section ul li a.disableActionsWS:hover span img{
+#left-top-section ul li i.disableActionsWS:hover, #left-top-section ul li i.disableActionsWS:hover span img{
 	background:none;
 	cursor: no-drop
 }

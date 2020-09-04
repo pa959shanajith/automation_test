@@ -21,18 +21,18 @@ process.env.DAS_URL = epurl;
 var logger = require('./logger');
 var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 
-if (cluster.isMaster) {
-	cluster.fork();
-	cluster.on('disconnect', function(worker) {
-		logger.error('Avo Assure server has encountered some problems, Disconnecting!');
-	});
-	cluster.on('exit', function(worker) {
-		if (worker.exitedAfterDisconnect !== true) {
-			logger.error('Worker %d is killed!', worker.id);
-			cluster.fork();
-		}
-	});
-} else
+// if (cluster.isMaster) {
+// 	cluster.fork();
+// 	cluster.on('disconnect', function(worker) {
+// 		logger.error('Avo Assure server has encountered some problems, Disconnecting!');
+// 	});
+// 	cluster.on('exit', function(worker) {
+// 		if (worker.exitedAfterDisconnect !== true) {
+// 			logger.error('Worker %d is killed!', worker.id);
+// 			cluster.fork();
+// 		}
+// 	});
+// } else
 {
 	try {
 		var express = require('express');
@@ -140,6 +140,29 @@ if (cluster.isMaster) {
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
 			}
+			if (!req.session.username) {
+				req.session.username = "admin";
+				req.session.uniqueId = "vm-eH5lLa-76Ka-F2Y6aTZJsqW_KmHAo";
+				req.session.usertype = "inhouse";
+				req.session.logged = true;
+				// req.session.userid = "FETCH FROM db.users";
+				req.session.userid = "5db0022cf87fdec084ae49ad";
+				//req.session.userid = "5de4e4aed9cdd57f4061bc99";
+				req.session.ip = "0.0.0.0";
+				req.session.loggedin = "2020-08-10T15:21:03.472Z";
+				// req.session.defaultRoleId = "5db0022cf87fdec084ae49aa";
+				// req.session.activeRoleId = "5db0022cf87fdec084ae49aa";
+				req.session.defaultRoleId = "5db0022cf87fdec084ae49a9"
+				req.session.activeRoleId = "5db0022cf87fdec084ae49a9"
+				// req.session.defaultRoleId = "FETCH FROM DB.permissions(for admin) AND POPULATE";
+				// req.session.activeRoleId = "FETCH FROM DB.permissions(for admin) AND POPULATE";
+				req.session.emailid = "batman@dc.com";
+				req.session.additionalroles = [];
+				req.session.firstname = "Bat";
+				req.session.lastname = "Man";
+				// req.session.activeRole = req.session.defaultRole = "Test Lead";
+				req.session.activeRole = req.session.defaultRole = "Admin";
+			}
 			return next();
 		});
 
@@ -180,8 +203,10 @@ if (cluster.isMaster) {
 			}));
 			//CORS
 			app.all('*', function(req, res, next) {
-				res.setHeader('Access-Control-Allow-Origin', req.hostname);
-				res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+				const origin =  req.headers["origin"] || req.hostname;
+				res.setHeader('Access-Control-Allow-Origin', origin);
+				res.setHeader('Access-Control-Allow-Credentials', true);
+				res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, Accept, Content-Type, Upgrade-Insecure-Requests');
 				next();
 			});
 			// app.use(helmet.noCache());

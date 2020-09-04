@@ -1,5 +1,9 @@
 
-
+@media screen and (min-width:1700px){ 
+    #page-taskName span,[id^=page-taskName] span {
+        font-size: 1.2vw
+    }
+}
 #page-taskName,[id^=page-taskName] {
     float: left;
     width: 100%;
@@ -17,15 +21,31 @@
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
 }
+
 #userRoles, #userTypes{  
     position: relative;
     left: 10px;
-    top: 2px;
+    top: -2px;
 }
+@media screen and (min-width:1700px){
+    #userRoles, #userTypes{  
+        position: relative;
+        left: 10px;
+        top: 5px;
+    }
+}
+@media screen and (min-width:1366px) and (max-width:1700px){
+    #userRoles, #userTypes{  
+        position: relative;
+        left: 10px;
+        top: 2px;
+    }
+}
+
 #additionalRole_options {
     position: relative;
     left: 10px;
-    top: 5px;
+    top: 2px;
 }
 
 @media screen and (max-width:770px){
@@ -36,6 +56,22 @@
         top: 2px;
     }
 }
+@media screen and (max-width:1700px) and (min-width:1366px){
+    
+    #additionalRole_options {
+        position: relative;
+        left: 10px;
+        top: 6px;
+    }
+}
+@media screen and (min-width:1700px){
+    
+    #additionalRole_options {
+        position: relative;
+        left: 10px;
+        top: 12px;
+    }
+}
 
 .userLDAPFetch label{
 	margin-right: 50px;
@@ -44,12 +80,68 @@
     width: 85%;
     background: none;
     height: 30px;
+    
+    display: inline-block;
+    font-weight: 400;
+    color: #212529;
+    text-align: center;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    user-select: none;
+    background-color: transparent;
+    border: 1px solid;
+    padding: .375rem .75rem;
+    font-size: 14px;
+    line-height: 1.5;
+    border-radius: .25rem;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  
+}
+.dropdown-menu-users-ldap{
+    max-height:165px;
+    overflow-y:scroll;
+    width: 100%;
+    padding: 6px;
+}
+.dropdown-menu-users-ldap>li{
+    padding: 3px 12px;
+}
+
+
+.dropdown-menu-users{
+    max-height:165px;
+    overflow-y:scroll;
+    width: 85%;
+    padding: 6px;
+}
+.dropdown-menu-users>li{
+    padding: 3px 12px;
+}
+.dropdown-menu-users>li:hover{
+    background:#633691;
+    border-radius: 3px;
+    color:#fff;
+    cursor: pointer;
+}  
+@media screen and (min-width:1700px){
+    .edit-user-dropdown{
+        width: 78%;
+        background: none;
+        height: 35px;
+        font-size: 0.8vw;
+    }
+    .dropdown-menu-users{
+        width: 78%;
+    }
 }
 @media screen and (max-width:1056px){
     .edit-user-dropdown{
         width: 78%;
         background: none;
         height: 30px;
+    }
+    .dropdown-menu-users{
+        width: 78%;
     }
 }
 
@@ -59,6 +151,9 @@
         background: none;
         height: 30px;
     }
+    .dropdown-menu-users{
+        width: 68%;
+    }
 }
 @media screen and (max-width:700px){
     .edit-user-dropdown{
@@ -66,16 +161,20 @@
         background: none;
         height: 30px;
     }
+    .dropdown-menu-users{
+        width: 58%;
+    }
 }
 .adminActionBtn {
 	float: right;
 	width: auto;
 }
-.btn-md.focus,
-.btn-md,
-.btn-md:active:focus,
-.btn-md:focus,
-.btn-md:hover {
+
+.btn-md-create.focus,
+.btn-md-create,
+.btn-md-create:active:focus,
+.btn-md-create:focus,
+.btn-md-create:hover {
     color: #fff;
     border: 0;
     border-radius: 20px;
@@ -85,6 +184,12 @@
 	font-family: 'LatoWebLight';
     outline: 0;
 }
+@media screen and (min-width:1700px){
+    .btn-md-create{
+        font-size: 1.2vw;
+    }
+}
+
 .adminBtn {
 	padding: 2px 25px !important;
 }
@@ -99,7 +204,6 @@
     width: auto!important;
     margin-top: 7px;
 }
-
 .adminFormRadio span {
     padding-left: 18px;
     width: fit-content;
@@ -125,6 +229,11 @@
     white-space: nowrap;
     border: 0;
     vertical-align: middle;
+}
+@media screen and (min-width:1700px){
+    .userTypeBtn_conv{
+        font-size: 0.8vw;
+    }
 }
 
 .userTypeBtn.focus, .userTypeBtn, .userTypeBtn:active:focus, .userTypeBtn:focus, .userTypeBtn:hover {
@@ -156,10 +265,18 @@
 
 .adminControl div span {
     display: inline-block;
+    font-size: small;
     width: 130px;
     font-weight: 700;
     margin-top: 5px;
 }
+@media screen and (min-width:1366px){
+    .adminControl div span {
+        width: 100%;
+        font-size: 1.2vw;
+    }
+}
+
 
 .adminControl div input, .adminControl div select {
     /* display: inline-block; */
@@ -183,7 +300,16 @@
 	vertical-align: middle;
 	font-weight: 600;
     line-height: 2;
+    font-size: 14px;
 } 
+@media screen and (min-width: 1366px) {
+    .primaryRole {
+        font-size: 1.2vw;
+        margin-top: 2px;
+    }
+}
+
+
 .rightControl {
 	float: right;
 	width: 50%;
@@ -193,16 +319,6 @@
 	left: -90px;
 }
 
-
-// .col-xs-9 {
-//     width: 75%;
-//     float: left;
-//     position: relative;
-//     min-height: 1px;
-//     padding-right: 15px;
-//     padding-left: 15px;
-//     box-sizing: border-box;
-// }
 .col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
     position: relative;
     min-height: 1px;
@@ -215,9 +331,9 @@
 .col-xs-9 {
     width: 75%;
 }
-.form-group__conv{
-    margin-bottom:15px
-}
+// .form-group__conv{
+//     margin-bottom:15px
+// }
 .rightControl {
 	float: right;
 	width: 50%;
@@ -298,6 +414,21 @@
     // -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
     // transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 }
+@media screen and (min-width: 1366px) and (max-width: 1700px){
+    .form-control__conv {
+        font-size: 1.2vw;
+    }
+}
+@media screen and (min-width: 1701px) {
+    .form-control__conv {
+        font-size: 1.2vw;
+        height: 2.2vw;
+    }
+    .adminSelect {
+        font-size: 1.2vw;
+        height: 1.4vw;
+    }
+}
 
 .selectlg {
     margin-left: 0;
@@ -319,6 +450,12 @@
 }
 .adminSelect:focus {
 	box-shadow: none !important;
+}
+@media screen and (min-width: 1701px) {
+    .adminSelect {
+        font-size: 1.2vw;
+        height: 1.4vw;
+    }
 }
 .dropdown, .dropup {
     position: relative;
@@ -378,7 +515,9 @@
 }
 
 .dropdown-menu-multiselect{
-    margin-top: -5px;
+    position: relative;
+    left: 10px;
+    margin-top: -6px;
     z-index: 1000;
     float: left;
     min-width: 187px;
@@ -393,6 +532,21 @@
     border-radius: 1px;
 
 }
+
+@media screen and (min-width: 1701px) {
+    .dropdown-menu-multiselect{
+        font-size: 24px;
+        margin-top: 11px;
+    }
+}
+
+@media screen and (min-width: 1366px) and (max-width: 1700px) {
+    .dropdown-menu-multiselect{
+        margin-top: -3px;
+    }
+}
+
+
 .dropdown-menu-multiselect>li{
     border-bottom: 1px solid #eceaea;
     margin-top: 3px;
@@ -419,21 +573,7 @@
     color:#fff;
     cursor: pointer;
 }
-.dropdown-menu-users{
-    max-height:165px;
-    overflow-y:scroll;
-    width: 100%;
-    padding: 6px;
-}
-.dropdown-menu-users>li{
-    padding: 3px 12px;
-}
-.dropdown-menu-users>li:hover{
-    background:#633691;
-    border-radius: 3px;
-    color:#fff;
-    cursor: pointer;
-}  
+
 .d-dropdown{
     border: 0px;
     width:100px;
@@ -496,6 +636,8 @@
 	font-weight: normal;
 	line-height: 2;
 }
+
+
 .chooseRole{
     /*cursor: pointer;*/
     float: left;
@@ -516,6 +658,14 @@
     color: #555;
     font-size: 14px;
 }
+@media screen and (min-width:1700px){
+    .chooseRole{
+        font-size: 1vw;
+        height: 40px;
+        width: 290px;
+        top: 11px;
+    }
+}
 .rolesSpan>label{
     font-weight: normal;
     padding-left: 7px;
@@ -533,4 +683,23 @@
   }
 .rolesChecklabel{
     margin-bottom: 5px;
+}
+
+.btn-search-user{
+    
+        display: inline-block;
+        font-weight: 400;
+        color: #212529;
+        text-align: center;
+        vertical-align: middle;
+        -webkit-user-select: none;
+        user-select: none;
+        background-color: transparent;
+        border: 1px solid transparent;
+        padding: .375rem .75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-radius: .25rem;
+        transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    
 }

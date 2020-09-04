@@ -26,6 +26,7 @@
 #middle-content-section>.containerWrap {
     overflow: visible;
     float: none;
+    font-family: LatoWeb;
 }
 #middle-content-section {
     width: calc(100% - 270px); /* Required when sidebars added */
@@ -37,6 +38,7 @@
      position: absolute;
      left: 173px;           /* Required when sidebars added */
      top: 0;
+     font-family: LatoWeb;
      
  }
 

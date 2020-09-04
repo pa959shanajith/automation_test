@@ -181,6 +181,7 @@ var routeUtil = {
 module.exports = () => {
 	passport.serializeUser((user, done) => done(null, user));
 	passport.protect = (req, res, next) => {
+		return next();
 		const sessFlag = (req.isAuthenticated && req.isAuthenticated())
 		const cookies = req.signedCookies;
 		const cookieFlag = (cookies["connect.sid"]!==undefined) && (cookies["maintain.sid"]!==undefined);

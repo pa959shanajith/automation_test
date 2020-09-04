@@ -1,0 +1,56 @@
+.login-footer{
+    display: flex;
+    justify-content: flex-end;
+    color: #643693;
+    font-family: "LatoWeb";
+    z-index: 1;
+    padding: 0 30px 10px 0;
+}
+
+.footer-content{
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+}
+
+.upper-text{
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: baseline;
+    font-size: 1.1vw; //tochange
+    line-height: 1.42857143;
+}
+
+.lower-text{
+    font-size: 1vw;
+    line-height: 1.42857143;
+}
+
+.footer-logo{
+    // vertical-align: baseline;
+    margin-left: .5vw;
+    height: 1.1vw;
+}
+
+@media screen and (max-width: 800px){
+    .upper-text{
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        align-items: baseline;
+        font-size: 10px; //tochange
+        line-height: 1.42857143;
+    }
+    
+    .lower-text{
+        font-size: 8px;
+        line-height: 1.42857143;
+    }
+    
+    .footer-logo{
+        // vertical-align: baseline;
+        margin-left: 3px;
+        height: 10px;
+    }
+}
