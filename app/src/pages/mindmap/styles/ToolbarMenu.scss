@@ -19,6 +19,8 @@
     position: relative;
     width: 160px;
     padding: 2px;
+    outline-style: none;
+    box-shadow: none;
 }
 .toolbar__header-menus{
     display: inline-block;
@@ -67,4 +69,6 @@
     height: 26px;
     padding-right: 27px;
     bottom: 2px;
+    outline-style: none;
+    box-shadow: none;
 }

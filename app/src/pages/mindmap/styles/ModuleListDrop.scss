@@ -8,17 +8,7 @@
     position: relative;
     background: #e6e7e9;
     height: 10px;
-}
-.toolbar__module-footer img{
-    position: absolute;
-    margin-left: calc(50% - 37px);
-    cursor: pointer;
-    position: absolute;
-    -webkit-user-drag: none;
-    -khtml-user-drag: none;
-    -moz-user-drag: none;
-    -o-user-drag: none;
-    user-drag: none;
+    margin-top: 1px;
 }
 .toolbar__module-box{
     position: relative;
@@ -37,6 +27,9 @@
 .toolbar__module-box:hover{
     background-color: #f4f4f4;
 }
+.selected{
+    background: #f4f4f4;
+}
 .toolbar__module-box img{
     display: inline-block;
     height: 40px;
@@ -52,4 +45,23 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+.toolbar__module-footer div{
+    background: white;
+    outline: none;
+    border: none;
+    display: inline-block;
+    text-align: center;
+    width: 75px;
+    position: absolute;
+    height: 11px;
+    top: -3px;
+    border-radius: 2px;
+    left: calc(50% - 37px);
+    cursor: pointer;
+}
+.toolbar__module-footer i{
+    position: absolute;
+    left: 32.5px;
+    top: -3px;
 }

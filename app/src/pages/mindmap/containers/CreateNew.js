@@ -1,7 +1,7 @@
 import React ,  { Fragment, useEffect, useState, useRef} from 'react';
 import {getProjectList , getModules} from '../api';
 import LoadingBar from 'react-top-loading-bar';
-import { useDispatch} from 'react-redux';
+import { useDispatch, useSelector} from 'react-redux';
 import MindmapToolbar from './MindmapToolbar';
 import 'font-awesome/css/font-awesome.min.css';
 import * as actionTypes from '../state/action';
@@ -17,6 +17,7 @@ const CreateNew = () => {
   const dispatch = useDispatch()
   const loadref = useRef(null)
   const [loading,setLoading] = useState(true)
+  const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
   useEffect(()=>{
     (async()=>{
       loadref.current.staticStart()
@@ -37,7 +38,7 @@ const CreateNew = () => {
           <div className='mp__canvas_container'>
             <MindmapToolbar/>
               <div className='mp__canvas'>
-                <Canvas/>
+                {(Object.keys(moduleSelect).length>0)?<Canvas module={moduleSelect}/>:null}
             </div>
           </div>:null
         }      

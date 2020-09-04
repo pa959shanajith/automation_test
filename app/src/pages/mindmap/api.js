@@ -23,9 +23,11 @@ export const getProjectList = async() => {
             return res.data;
         }else{
             console.error(res.status)
+            return;
         }
     }catch(err){
         console.error(err)
+        return;
     }
 }
 
@@ -48,9 +50,11 @@ export const getProjectType = async(projectId) => {
             return res.data;
         }else{
             console.error(res.status)
+            return;
         }
     }catch(err){
         console.error(err)
+        return;
     }
 }
 
@@ -73,9 +77,11 @@ export const getModules = async(props) => {
             return res.data;
         }else{
             console.error(res.status)
+            return;
         }
     }catch(err){
         console.error(err)
+        return;
     }
 }
 
@@ -98,8 +104,10 @@ export const getScreens = async(projectId) => {
             return res.data;
         }else{
             console.error(res.status)
+            return;
         }
     }catch(err){
         console.error(err)
+        return;
     }
 }

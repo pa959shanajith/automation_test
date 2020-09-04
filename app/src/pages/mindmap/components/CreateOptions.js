@@ -17,7 +17,7 @@ const CreateOptions = (props) => {
     <div className='mindmap__option-container'>
       <div>
         {options.map((e,i)=>(
-          <div className='mindmap__option-box' onClick={()=>props.setOptions(e.comp)} key={i}>
+          <div className='mindmap__option-box' onClick={()=>props.setOptions(e.comp)} key={i} data-test="OptionBox">
             <div>
               <img src={"static/imgs/"+e.ico} alt={e.label}/>
               <div>{e.label}</div>

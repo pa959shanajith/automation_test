@@ -1,5 +1,5 @@
 import React from 'react';
-import { HashRouter as Router, Route ,Switch} from "react-router-dom";
+import { BrowserRouter as Router, Route ,Switch} from "react-router-dom";
 import Login from './pages/login';
 import Mindmap from './pages/mindmap';
 import {createStore,combineReducers} from 'redux';
@@ -9,7 +9,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 /* combining multiple domains reducer */
-const rootReducer = combineReducers({
+export const rootReducer = combineReducers({
   mindmap : mindmapReducer
 });
 

@@ -4,7 +4,8 @@ const initialState = {
     projectList : {},
     moduleList: [],
     selectedProj: undefined,
-    searchModule: undefined
+    searchModule: undefined,
+    selectedModule: {}
 };
 
 const reducer = (state = initialState , action) => {
@@ -28,6 +29,11 @@ const reducer = (state = initialState , action) => {
             return{
                 ...state,
                 searchModule: action.payload
+            }
+        case actionTypes.SELECT_MODULE:
+            return{
+                ...state,
+                selectedModule: action.payload
             }
         default: 
             return state
