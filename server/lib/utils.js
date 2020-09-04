@@ -104,7 +104,6 @@ module.exports.cloneSession = async (req) => {
 };
 
 module.exports.isSessionActive = function (req){
-	return true;
 	var sessionToken = (req.session)? req.session.uniqueId:undefined;
 	var sessionCheck = (sessionToken!==undefined) && (req.sessionID==sessionToken);
 	var cookies = req.signedCookies;
