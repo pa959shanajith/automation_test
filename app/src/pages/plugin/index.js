@@ -1,19 +1,27 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Redirect } from 'react-router-dom';
 import PluginHome from './containers/PluginHome';
 import { useDispatch } from 'react-redux';
-import { SetProgressBar } from '../global';
+import { SetProgressBar, RedirectPage } from '../global';
 
 const Plugin = () => {
 
     let dispatch = useDispatch();
+    const [redirectPage, callRedirectPage] = useState(false);
+    const [redirectTo, setRedirectTo] = useState("");
 
     useEffect(()=>{
         SetProgressBar("stop", dispatch);
     }, []);
 
     return (
-    <>
-        <PluginHome/>
+    <>  
+        {/* {
+            redirectPage ? RedirectPage() : 
+            redirectTo ? <Redirect to={redirectTo} /> :
+            <PluginHome  callRedirectPage={callRedirectPage} setRedirectTo={setRedirectTo}/>
+        } */}
+        <PluginHome />
     </>);
 }
 

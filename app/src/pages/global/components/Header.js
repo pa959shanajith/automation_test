@@ -210,13 +210,13 @@ const Header = (props) => {
             {/* { callRedirect ? RedirectPage() :  */}
             { showChangePass ? <ChangePassword show={showChangePass} setShow={toggleChangePass} /> : null }
             <div className = "main-header">
-                <span className="header-logo-span"><img className="header-logo" src="static/imgs/logo.png" onClick={naviPg}/></span>
+                <span className="header-logo-span"><img className="header-logo" alt="logo" src="static/imgs/logo.png" onClick={naviPg}/></span>
                 <div className="btn-container"><button className="fa fa-bell no-border"></button></div>
                 { userRole == "Admin" ? null :
                 <div className="btn-container" onClick={switchRole}>
                     <Dropdown>
                         <Dropdown.Toggle className="switch-role-btn no-border">
-                            <span><img className="switch-role-icon" src="static/imgs/ic-switch-user.png"/></span>
+                            <span><img className="switch-role-icon" alt="switch-ic" src="static/imgs/ic-switch-user.png"/></span>
                             <span>Switch Roles</span>
                         </Dropdown.Toggle>
                         <Dropdown.Menu className="switch-role-menu">
@@ -228,7 +228,7 @@ const Header = (props) => {
                     <Dropdown>
                         <Dropdown.Toggle className="user-name-btn no-border">
                             <span className="user-name">{username ? username : "Demo User"}</span>
-                            <span><img className = "user-name-icon" src="static/imgs/ic-user-nav.png"/></span>
+                            <span><img className = "user-name-icon" alt="user-ic" src="static/imgs/ic-user-nav.png"/></span>
                         </Dropdown.Toggle>
                         <Dropdown.Menu className="user-name-menu">
                             <Dropdown.Item className="user-role-item">{userRole ? userRole : "Test Manager"}</Dropdown.Item>
