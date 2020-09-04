@@ -3,7 +3,6 @@ var createprojectObj = {}; var projectDetails = [];var flag;var projectExists;va
 var editedProjectDetails = [];
 var deletedProjectDetails = [];
 var newProjectDetails = [];
-
 var isIE = /*@cc_on!@*/ false || !!document.documentMode;
 var unAssignedProjects = []; var assignedProjects = [];var projectData =[];var valid = "";var getAssignedProjectsLen=0;
 mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location', 'adminServices','$timeout','cfpLoadingBar', function ($scope, $rootScope, $http, $location, adminServices, $timeout, cfpLoadingBar) {
@@ -37,31 +36,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$('.scrollbar-macosx').scrollbar();
 	}, 300);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	//assign projects domain fetch assignProj filling
 	$(document).on('change', '#selDomains', function (e) {
 		domainname = $("#selDomains").val();
 		// $("#selAssignProject").val(domainname);
@@ -222,8 +196,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		});
 	};
 
-
-	//save button
 	//	Assign Projects Button Click
 	$scope.assignProjects = function($event){
 		if(unAssignedFlag == true)
@@ -2135,8 +2107,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			return false;
 		event.stopImmediatePropagation();
 	});
-
-
 
 	$scope.userConf.click = function(query) {
 		$(".selectedIcon").removeClass("selectedIcon");
