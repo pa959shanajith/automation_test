@@ -18,13 +18,15 @@ export const getProjectList = async() => {
             data: {"action":"populateProjects"},
             credentials: 'include'
         });
-        if(res.status=200){
+        if(res.status===200){
             return res.data;
         }else{
             console.error(res.status)
+            return;
         }
     }catch(err){
         console.error(err)
+        return;
     }
 }
 
@@ -43,12 +45,68 @@ export const getProjectType = async(projectId) => {
             data: {"action":"getProjectTypeMM",projectId:projectId},
             credentials: 'include'
         });
-        if(res.status=200){
+        if(res.status===200){
             return res.data;
         }else{
             console.error(res.status)
+            return;
         }
     }catch(err){
         console.error(err)
+        return;
+    }
+}
+
+/*Component getProjectType
+  api returns {projectType: "", project_id: "", projectid: "", project_typename: "", releases: []}
+  todo : add url from env or store and error handling 
+*/
+
+export const getModules = async(props) => {
+    try{
+        const res = await axios(url+'/getModules', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+            credentials: 'include'
+        });
+        if(res.status===200){
+            return res.data;
+        }else{
+            console.error(res.status)
+            return;
+        }
+    }catch(err){
+        console.error(err)
+        return;
+    }
+}
+
+/*Component getScreens
+  api returns {projectType: "", project_id: "", projectid: "", project_typename: "", releases: []}
+  todo : add url from env or store and error handling 
+*/
+
+export const getScreens = async(projectId) => {
+    try{
+        const res = await axios(url+'/getScreens', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {"action":"getProjectTypeMM",projectId:projectId},
+            credentials: 'include'
+        });
+        if(res.status===200){
+            return res.data;
+        }else{
+            console.error(res.status)
+            return;
+        }
+    }catch(err){
+        console.error(err)
+        return;
     }
 }

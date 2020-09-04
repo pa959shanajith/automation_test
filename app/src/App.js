@@ -9,10 +9,11 @@ import {Provider} from 'react-redux';
 import mindmapReducer from './pages/mindmap/state/reducer.js';
 import progressBarReducer from "./pages/global/state/reducer";
 import LoginReducer from './pages/login/state/reducer';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 
 /* combining multiple domains reducer */
-const rootReducer = combineReducers({
+export const rootReducer = combineReducers({
   mindmap : mindmapReducer,
   progressbar : progressBarReducer,
   login : LoginReducer,
