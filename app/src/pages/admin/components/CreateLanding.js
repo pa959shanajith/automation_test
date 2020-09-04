@@ -5,7 +5,7 @@ import '../styles/CreateLanding.scss';
 // import NameFields from './NameFields';
 
 /*Component CreateLanding
-  use: renders create New Project Landing page
+  use: renders create New User Landing page
   todo: 
 */
     
@@ -70,7 +70,7 @@ const CreateLanding = (props) => {
                                     {(props.showDropdown && userConf.ldapAllUserList!==[])?
                                     <ul className=" dropdown-menu-edit dropdown-menu-users-ldap create-user__dropdown" role="menu" aria-labelledby="ldapDirectory" style={{padding: "6px",fontSize: "14px",webkitBoxShadow: "0 6px 12px rgba(0,0,0,.175)",boxShadow: "0 6px 12px rgba(0,0,0,.175)",display: "block", border: "1px solid rgba(0,0,0,.15)"}}>
                                         {props.ldapUserList.map((luser,index) => (      
-                                            <li role="presentation" onClick={()=>{props.setShowDropdown(!props.showDropdown);dispatch({type:actionTypes.UPDATE_LDAP_USER,payload:luser.value});dispatch({type:actionTypes.UPDATE_LDAP_USER_FILTER,payload:luser.html});props.ldapGetUser({luser:luser.value});}} value={luser.value}>{luser.html}</li>
+                                            <li index={index} role="presentation" onClick={()=>{props.setShowDropdown(!props.showDropdown);dispatch({type:actionTypes.UPDATE_LDAP_USER,payload:luser.value});dispatch({type:actionTypes.UPDATE_LDAP_USER_FILTER,payload:luser.html});props.ldapGetUser({luser:luser.value});}} value={luser.value}>{luser.html}</li>
                                         ))}
                                     </ul>
                                     :null}

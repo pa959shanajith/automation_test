@@ -1,12 +1,12 @@
 import React, { Fragment, useEffect } from 'react';
 import '../styles/EditGlobalModal.scss'
 
-/*Component CreateOptions
+/*Component EditProjectModal
   use:  Edit Global Model
   props: 
 */
 
-const CreateOptions = (props) => {
+const EditProjectModal = (props) => {
 
     
     useEffect(()=>{
@@ -40,4 +40,4 @@ const CreateOptions = (props) => {
   );
 }
 
-export default CreateOptions;
+export default EditProjectModal;

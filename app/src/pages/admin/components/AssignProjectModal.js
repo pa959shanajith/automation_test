@@ -1,12 +1,12 @@
 import React, { Fragment} from 'react';
 import '../styles/EditGlobalModal.scss'
 
-/*Component CreateOptions
-  use:  Edit Global Model
+/*Component AssignProjectModal
+  use:  AssignProjectModal Global Model
   props: 
 */
 
-const CreateOptions = (props) => { 
+const AssignProjectModal = (props) => { 
 
     return (
     <Fragment>
@@ -33,4 +33,4 @@ const CreateOptions = (props) => {
   );
 }
 
-export default CreateOptions;
+export default AssignProjectModal;

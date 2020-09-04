@@ -4,8 +4,8 @@ import * as actionTypes from '../state/action';
 import '../styles/EditLanding.scss';
 // import NameFields from './NameFields';
 
-/*Component CreateLanding
-  use: renders create New Project Landing page
+/*Component EditLanding
+  use: renders edit New User Landing page
   todo: 
 */
     

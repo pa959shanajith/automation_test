@@ -3,8 +3,8 @@ import {getUserDetails, getDomains_ICE, getAssignedProjects_ICE, getDetails_ICE,
 import '../styles/ProjectAssign.scss';
 import AssignProjectmodal from '../components/AssignProjectModal'
 
-/*Component ProjectNew
-  use: renders create New Project page
+/*Component ProjectAssign
+  use: renders Project Assign Middle Screen
   todo: 
 */
     

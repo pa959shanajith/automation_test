@@ -1,10 +1,9 @@
 import React ,  { Fragment} from 'react';
-// import {getAvailablePlugins , getDomains_ICE} from '../api';
 
 import '../styles/ReleaseCycle.scss';
 
-/*Component ProjectNew
-  use: renders create New Project page
+/*Component AssignListBox
+  use: renders Assign List Bottom Box
   todo: 
 */
     

@@ -1,10 +1,9 @@
 import React ,  { Fragment} from 'react';
-// import {getAvailablePlugins , getDomains_ICE} from '../api';
 
 import '../styles/ReleaseCycle.scss';
 
-/*Component ProjectNew
-  use: renders create New Project page
+/*Component ReleaseCycle
+  use: renders ReleaseCycle for Project Assign page
   todo: 
 */
     
