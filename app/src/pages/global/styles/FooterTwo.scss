@@ -1,0 +1,85 @@
+.main-footer{
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    justify-content: flex-end;
+    color: #643693;
+    background-color: rgb(238, 238, 238);
+    font-family: "LatoWeb";
+    z-index: 1;
+    padding: 12px;
+}
+
+.main-footer-content{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.footer-logo{
+    margin-left:3px;
+    height: 16px; 
+}
+
+.left-text{
+    width: fit-content;
+    display: flex;
+    justify-content: flex-end;
+    align-items: baseline;
+    font-size: 1.0vw; //tochange
+    line-height: 1.42857143;
+}
+
+
+
+.right-text{
+    font-size: 0.95vw;
+    line-height: 1.42857143;
+    flex-grow: 2;
+}
+
+.footer-logo{
+    // vertical-align: baseline;
+    margin-left: .5vw;
+    height: 1.1vw;
+}
+
+@media screen and (max-width: 1025px){
+    .left-text{
+        font-size: 1.5vw; //tochange
+        line-height: 1.42857143;
+    }
+    
+    .right-text{
+        font-size: 1.4vw;
+        line-height: 1.42857143;
+    }
+    
+    .footer-logo{
+        // vertical-align: baseline;
+        margin-left: 3px;
+        height: 14px;
+    }
+}
+
+
+@media screen and (min-width: 1366px){    
+    .left-text{
+        width: fit-content;
+        display: flex;
+        justify-content: flex-end;
+        align-items: baseline;
+        font-size: 1.1vw; //tochange
+        line-height: 1.42857143;
+    }
+    .right-text{
+        font-size: 1.0vw;
+        line-height: 1.42857143;
+        flex-grow: 2;
+    }
+    .main-footer{
+        padding: 0.95vw;
+    }
+}

@@ -1,0 +1,24 @@
+.error-msg{
+    font-family: "LatoWebMedium";
+    font-size: 14px;
+    color: #d33c3c;
+    width: 100%;
+    text-align: center;
+    a{
+        color: #d33c3c;
+    }
+}
+
+
+@media screen and (min-width: 1366px){
+    .error-msg{
+        font-family: "LatoWebMedium";
+        font-size: 1.2vw;
+        color: #d33c3c;
+        width: 100%;
+        text-align: center;
+        a{
+            color: #d33c3c;
+        }
+    }
+}
