@@ -1,0 +1,231 @@
+
+#page-taskName,[id^=page-taskName] {
+    float: left;
+    width: 100%;
+	margin-bottom: 10px;
+}#page-taskName span,[id^=page-taskName] span {
+    display: inline-block;
+    /*background: #2f1c49;*/
+    background: #331d4e;
+    font-size: 18px;
+    color: #fff;
+    font-family: 'LatoWebLight';
+    padding: 2px 14px 1px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+
+@media screen and (min-width:1700px){
+    #page-taskName span,[id^=page-taskName] span {
+        font-size: 1.2vw
+    }
+}
+
+#selAssignUser{
+    margin-left: 5.6%;
+}
+
+.wrap {
+    float: left;
+    width: 100%;
+    position: relative
+}
+
+.project-left2 {
+    float: left;
+    background: #fff;
+    width: 100%;
+    border-radius: 3px;
+    padding: 0 47px 0 0px;
+    position: relative;
+}
+
+.left-select
+{
+    float: left;
+    width: 40%;
+}
+.labelStyle1 {
+    float: left;
+    line-height: 1;
+    margin-bottom: 12px;
+    font-weight: 300;
+    cursor: default;
+}
+@media screen and (min-width:1700px){
+    .labelStyle1 {
+        font-size: 1.2vw
+    }
+}
+
+.seprator {
+    position: relative;
+    margin-bottom: 0px;
+    float: left;
+    width: 100%;
+}
+.adminFontStyling .wrap #allProjectAP,.adminFontStyling .wrap #assignedProjectAP, #assignedProjectAP:hover,#allProjectAP:hover {
+    background-color: #fff;
+}
+.adminFontStyling .wrap #allProjectAP,.adminFontStyling .wrap #assignedProjectAP, #allProjectAP,#assignedProjectAP {
+    width: 100%;
+    background-image: none;
+    -webkit-appearance: select;
+    // overflow-y: scroll;
+    margin-bottom: 0;
+    font-size: 13px;
+    font-family: LatoWebMedium;
+    height: 30%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -o-border-radius: 3px;
+    -ms-border-radius: 3px;
+    box-shadow: inset 0px 1px 6px #ddd;
+    -moz-box-shadow: inset 0px 1px 6px #ddd;
+    -webkit-box-shadow: inset 0px 1px 6px #ddd;
+    -o-box-shadow: inset 0px 1px 6px #ddd;
+    -ms-box-shadow: inset 0px 1px 6px #ddd;
+}
+
+@media screen and (min-height: 1000px) and (max-height: 1080px){
+	#left-bottom-section ul li{margin-bottom:12px;}
+	.list-inline-right{padding-right: 0;}
+	.list-inline-right li:first-child{margin-right:6px;}
+	.list-inline-right li:nth-child(2){margin-right:-24px;}
+	.mindmap-left-section{margin-top:65px;}
+	.suitestartend thead{width: calc(100% - 729px);}
+	.reportStatus{margin-top:12px;}
+	.scroll-wrapper.scrollbar-inner-rep{max-height: 154px !important;}
+	.project-left2{padding: 0 47px 0 0;}
+	#allProjectAP,#assignedProjectAP, #allProjectAP[size],#assignedProjectAP[size]{min-height: 258px !important;}
+	.endtoend-modulesContainer{height: 28% !important;}
+}
+
+.wrap-editpro {
+    float: left;
+    top: 60%;
+    left: 48%;
+    transform: translateX(-50%) translateY(-50%);
+    position: absolute;
+    width: 10%;
+}
+@media screen and (max-width:800px){
+    .wrap-editpro {
+        left: 43%;
+    }
+}
+@media screen and (min-width:1700px){
+    .wrap-editpro {
+        left: 52%;
+    }
+}
+@media screen and (min-width:1366px){
+    .select-margin {
+        margin-left: 6%;
+    }
+}
+@media screen and (max-width:1366px) and (min-width:800px){
+    .select-margin {
+        margin-left: 6%;
+    }
+}
+@media screen and (max-width:800px){
+    .select-margin {
+        margin-left: 8%;
+    }
+}
+
+.center-button button {
+    font-size: 11px;
+    cursor: pointer;
+    font-weight: 600;
+    width: 35px;
+    outline: none;
+    margin-bottom: 15px;
+    padding: 6px 12px;
+    background: #643693;
+    border: none;
+    color: #fff;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -o-border-radius: 3px;
+    -ms-border-radius: 3px;
+    margin-top: 1%;
+    margin-left: 12%;
+    clear: both;
+    float: left;
+}
+@media screen and (min-width:1700px){
+    .center-button button {
+        font-size: 1vw;
+        width: 53px;
+        height: 53px;
+    }
+}
+@media screen and (min-width:1366px) and (max-width:1700px){
+    .center-button button {
+        font-size: 1vw;
+    }
+}
+
+.right-select {
+    float: right;
+    width: 40%;
+}
+#allProjectAP option,#assignedProjectAP option
+{
+    padding: 10px;
+    user-select: none;
+}
+#allProjectAP,#assignedProjectAP, #allProjectAP[size],#assignedProjectAP[size] {
+    min-height: 400px;
+    outline: none;
+    overflow: auto;
+}
+select[multiple]:focus option:checked {
+	background: #633691 linear-gradient(0deg, #633691 0%, #633691 100%);
+}
+select[multiple]:-internal-list-box option:checked {
+	background: none;
+}
+.wrap { padding: 8px; }
+
+#allProjectAP,#assignedProjectAP, #allProjectAP[size],#assignedProjectAP[size] {
+    min-height: 238px !important;
+}
+
+select[size] {
+    height: auto;
+  }
+
+.selected-project{
+    background-color: #633691 !important;
+    color:white !important;
+}  
+
+.adminSelect-project {
+	padding: 0px;
+	height: 25px;
+	margin-bottom: 0;
+	width: 100%;
+	margin-left: 4%;
+	margin-top: 3px;
+	line-height: 2;
+    border: 1px solid #656565 !important;
+    -webkit-text-stroke: thin;
+}
+@media screen and (min-width:1366px){
+    .adminSelect-project{
+        height: 1.4vw;
+        margin-top: 10px;
+    }
+}
+
+.adminSelect-project:focus {
+	box-shadow: none !important;
+}

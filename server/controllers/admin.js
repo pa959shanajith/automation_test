@@ -45,7 +45,7 @@ exports.manageUserDetails = async (req, res) => {
 		let inputs = {
 			action: action,
 			createdby: req.session.userid,
-			createdbyrole: reqData.role,
+			createdbyrole: req.session.activeRoleId,
 			name: (reqData.username || "").trim(),
 			auth: {
 				type: reqData.type,
@@ -430,7 +430,10 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 		logger.info("Inside UI service: createProject_ICE");
 		if (utils.isSessionActive(req)) {
 			var createProjectObj=req.body.createProjectObj;
-			var userDetails=req.body.userDetails;
+			var userDetails = {
+				role: req.session.activeRoleId,
+                user_id: req.session.userid
+            };
 			var inputs={
 				name: createProjectObj.projectName,
 				domain: createProjectObj.domain,
@@ -957,8 +960,8 @@ exports.assignProjects_ICE = function (req, res) {
 				// if (check_userid == true) {
 				// 	valid_userId = true;
 				// }
-				var check_userInfo = validator.isJSON(JSON.stringify(assignProjectsDetails.userInfo));
-				var check_assignProjectDetails = validator.isJSON(JSON.stringify(assignProjectsDetails.userInfo));
+				var check_userInfo = validator.isJSON(JSON.stringify(req.session));
+				var check_assignProjectDetails = validator.isJSON(JSON.stringify(req.session));
 				if (check_userInfo == true && check_assignProjectDetails == true) {
 					valid_objects = true;
 				}
@@ -971,8 +974,8 @@ exports.assignProjects_ICE = function (req, res) {
 					"alreadyassigned": alreadyassigned,
 					"userid": assignProjectsDetails.userId,
 					"domainid": assignProjectsDetails.domainname,
-					"modifiedbyrole": assignProjectsDetails.userInfo.role,
-					"modifiedby": assignProjectsDetails.userInfo.username.toLowerCase(),
+					"modifiedbyrole": req.session.defaultRoleId,
+					"modifiedby": req.session.username.toLowerCase(),
 					"projectids": projectIds
 				};
 			} else {
@@ -980,7 +983,7 @@ exports.assignProjects_ICE = function (req, res) {
 					"alreadyassigned": alreadyassigned,
 					"userid": assignProjectsDetails.userId,
 					"domainid": assignProjectsDetails.domainname,
-					"createdby": assignProjectsDetails.userInfo.username.toLowerCase(),
+					"createdby": req.session.username.toLowerCase(),
 					"projectids": projectIds
 				};
 			}
@@ -1158,7 +1161,10 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 		logger.info("Inside UI Service: updateProject_ICE");
 		if (utils.isSessionActive(req)) {
 			var updateProjectDetails = req.body.updateProjectObj;
-			var userinfo = req.body.userDetails;
+			var userinfo = {
+                role: req.session.activeRoleId,
+                user_id: req.session.userid
+            };
 			var flag = "";
 			var requestedprojectid = updateProjectDetails.projectId;
 			validateUpdateProject();
