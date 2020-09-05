@@ -33,16 +33,18 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    box-sizing: content-box;
 }
 
 .restart-service-btn, .login-btn{
-    font-size: 32px;
-    border-radius: 22px;
+    font-family: "LatoWeb";
+    font-size: 32px!important;
+    border-radius: 22px!important;
     border: none;
     background-color: #9f62e1;
     color: #FFF;
-    padding: 4px 12px;
-    margin-top: 35px;
+    padding: 4px 12px!important;
+    margin-top: 35px!important;
     cursor: pointer;
     touch-action: manipulation;
     outline: none;
@@ -50,6 +52,10 @@
     //     outline: none;
     // }
 }
+
+.login-btn{
+    padding: 0 12px!important; 
+ }
 
 .restart-service-btn{
     font-size: 24px;
@@ -130,6 +136,10 @@
             color: #d33c3c;
         }
     }
+
+    .login-btn{
+        padding: 0 .2px!important; 
+     }
 
     .restart-service-btn, .login-btn{
         font-size: 2.5vw;
