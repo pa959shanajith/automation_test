@@ -14,7 +14,7 @@ const StaticElements = ({children}) => {
 
     return (
         <div className="bg-container">
-            <img className="bg-img" src="static/imgs/login-bg.png"/>
+            <img className="bg-img" alt="bg-img" src="static/imgs/login-bg.png"/>
             <div className="element-holder">
                 <div className="greet-text">
                     <h1>Hello.</h1>
@@ -22,7 +22,7 @@ const StaticElements = ({children}) => {
                     <h3>Login to Experience Intelligence</h3>
                 </div>
                 <div className="login-block">
-                    <span className="logo-wrap"><img className="logo-img" src="static/imgs/logo.png"/></span>
+                    <span className="logo-wrap"><img className="logo-img" alt="logo" src="static/imgs/logo.png"/></span>
                     {children}
                 </div>
             </div>

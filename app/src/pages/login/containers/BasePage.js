@@ -39,19 +39,19 @@ const BasePage = () => {
                 try{
                     let data = await api.checkUserState()
                     SetProgressBar("stop", dispatch);
-                    let emsg = "Loading Profile...";
-                    if (data == "fail") emsg = "Failed to load user profile.";
-                    else if (data == "unauthorized") emsg = "User is not authorized to use Avo Assure.";
-                    else if (data == "badrequest") emsg = "User does not have sufficient permission to view this page.";
-                    else if (data == "nouser") emsg = "User profile not found in Avo Assure.";
-                    else if (data == "nouserprofile") emsg = "User profile not found in Authorization Server.";
-                    else if (data == "userLogged") emsg = "User is already logged in! Please logout from the previous session.";
-                    else if (data == "inValidCredential" || data == "invalid_username_password") emsg = "The username or password you entered isn't correct. Please try again.";
-                    else if (data == "noProjectsAssigned") emsg = "To Login, user must be allocated to a Domain and Project. Please contact Admin.";
+                    setLoginValidation("Loading Profile...");
+                    if (data == "fail") setLoginValidation("Failed to load user profile.");
+                    else if (data == "unauthorized") setLoginValidation("User is not authorized to use Avo Assure.");
+                    else if (data == "badrequest") setLoginValidation("User does not have sufficient permission to view this page.");
+                    else if (data == "nouser") setLoginValidation("User profile not found in Avo Assure.");
+                    else if (data == "nouserprofile") setLoginValidation("User profile not found in Authorization Server.");
+                    else if (data == "userLogged") setLoginValidation("User is already logged in! Please logout from the previous session.");
+                    else if (data == "inValidCredential" || data == "invalid_username_password") setLoginValidation("The username or password you entered isn't correct. Please try again.");
+                    else if (data == "noProjectsAssigned") setLoginValidation("To Login, user must be allocated to a Domain and Project. Please contact Admin.");
                     else if (data == "reload") window.location.reload();
                     else if (data == "redirect") setRedirectTo('/login');
                     else if (data == "Invalid Session") {
-                        emsg = "Your session has expired!";
+                        setLoginValidation("Your session has expired!");
                         setLoginAgain(true);
                     } else {
                         try{
@@ -71,8 +71,7 @@ const BasePage = () => {
                             setLoginValidation("Failed to Login.");
                             console.error("Fail to Load UserInfo. Error::", err);    
                         }
-                    }
-                    setLoginValidation(emsg);     
+                    }    
                 }
                 catch(err){
                     const emsg = "Failed to load user profile. Error::";

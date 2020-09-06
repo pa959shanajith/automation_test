@@ -5,10 +5,11 @@ import TaskSection from '../components/TaskSection';
 import "../styles/PluginHome.scss"
 
 const PluginHome = () => {
+
     return(
         <div className="plugin-bg-container">
-            <img className="plugin-bg-img" src="static/imgs/light-bg.png"/>
-            <Header/>
+            <img className="plugin-bg-img" alt="bg-img" src="static/imgs/light-bg.png"/>
+            <Header />
             <div className="plugin-elements">
                 <div className="greeting-text">
                     Welcome Demo User!

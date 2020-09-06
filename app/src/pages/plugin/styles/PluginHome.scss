@@ -22,7 +22,7 @@
     flex-direction: column;
     margin: 0;
     padding: 0;
-    justify-content: center;
+    // justify-content: center;
     flex-grow: 1;
 }
 
@@ -39,12 +39,12 @@
 .plugin-blocks{
     display: grid;
     grid-template-columns: auto auto;
-    grid-gap: 30px 40px;
+    grid-gap: 20px 30px;
 }
 
 .plugin-ic{
-    height: 150px;
-    width: 150px;
+    height: 140px;
+    width: 140px;
 }
 
 .plugin-block{
@@ -130,14 +130,14 @@
 
 .plugin-text{
     font-family: "LatoWebLight";
-    font-size: 25px;
+    font-size: 23px;
     font-weight: 500;
     line-height: 1.1;
     margin-top: 10px;
 }
 
 .section-divider{
-    height: 100%;
+    height: 95%;
     width: 2px;
     background-color: #888;
 }
@@ -283,7 +283,7 @@
     }
     
     .section-divider{
-        height: 100%;
+        height: 95%;
         width: .2vw;
         background-color: #888;
     }
@@ -433,7 +433,7 @@
     }
     
     .section-divider{
-        height: 100%;
+        height: 95%;
         width: .2vw;
         background-color: #888;
     }

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import {Dropdown} from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import { RedirectPage } from '../../global';
 import "../styles/Header.scss";
 import 'font-awesome/css/font-awesome.min.css';
 import * as loginApi from '../../login/api';
+import ClickAwayListener from 'react-click-away-listener';
 // import ChangePassword from './ChangePassword';
 
 const Header = (props) => {
@@ -13,41 +13,37 @@ const Header = (props) => {
     const [userDetails, setUserDetails] = useState(null);
     const [username, setUsername] = useState(null);
     const [userRole, setUserRole] = useState(null);
-    const [task, setTask] = useState(null);
-    const [selectedRoleID, setSelectedRoleID] = useState(null);
-    const [selectedRoleName, setSelectedRoleName] = useState(null);
-    const [redirectPath, setRedirectPath] = useState(null);
-	const [projectId, setProjectId] = useState([]);
-	const [releaseId, setReleaseId] = useState([]);
-	const [cycleId, setCycleId] = useState([]);
-    const [screenId, setScreenId] = useState([]);
-    const [screenName, setScreenName] = useState(null);
-    const [projectDetails, setProjectDetails] = useState(null);
-    const [releaseDetails, setReleaseDetails] = useState(null);
-    const [cycleDetails, setCycleDetails] = useState(null);
+    // const [task, setTask] = useState(null);
+    // const [selectedRoleID, setSelectedRoleID] = useState(null);
+    // const [selectedRoleName, setSelectedRoleName] = useState(null);
+    // const [redirectPath, setRedirectPath] = useState(null);
+	// const [projectId, setProjectId] = useState([]);
+	// const [releaseId, setReleaseId] = useState([]);
+	// const [cycleId, setCycleId] = useState([]);
+    // const [screenId, setScreenId] = useState([]);
+    // const [screenName, setScreenName] = useState(null);
+    // const [projectDetails, setProjectDetails] = useState(null);
+    // const [releaseDetails, setReleaseDetails] = useState(null);
+    // const [cycleDetails, setCycleDetails] = useState(null);
     const [passwordValidation, setPasswordValid] = useState("");
     const [showChangePass, setShowChangePass] = useState(false);
     let unavailableLocalServer_msg = "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.";
     const [userInfo, setUserInfo] = useState(useSelector(state=>state.login.userinfo));
-    const [callRedirect, setCallRedirect] = useState(false);
+    // const [callRedirect, setCallRedirect] = useState(false);
+    const [showUD, setShowUD] = useState(false);
+    const [showSR, setShowSR] = useState(false);
     let history = useHistory();
 
-    // setUserDetails(JSON.parse(userInfo))
-    // setUserRole(userInfo.rolename);
-    // setUsername(userDetails.username.toLowerCase());
-
     useEffect(()=>{
-        
-        // console.log("USERINFO I AM GETTING: ", userInfo)
-        // let userDetailsVar;
-        // if(userInfo){
-        //     userDetailsVar = JSON.parse(userInfo);
-        // }
-        // let userRoleVar = userInfo.rolename;
-        // let usernameVar = userDetailsVar.username.toLowerCase();
-        // setUserDetails(userDetailsVar)
-        // setUserRole(userRoleVar);
-        // setUsername(usernameVar);
+        let userDetailsVar;
+        if(userInfo){
+            userDetailsVar = JSON.parse(userInfo);
+        }
+        let userRoleVar = userInfo.rolename;
+        let usernameVar = userDetailsVar.username.toLowerCase();
+        setUserDetails(userDetailsVar)
+        setUserRole(userRoleVar);
+        setUsername(usernameVar);
     }, []);
 
     const naviPg = () => {
@@ -134,6 +130,9 @@ const Header = (props) => {
     };
 
     const toggleChangePass = () => setShowChangePass(!showChangePass);
+
+    const onClickAwayUD = () => setShowUD(false);
+    const onClickAwaySR = () => setShowSR(false);
     
 
     const [currpassword, setCurrPassword] = useState("");
@@ -210,40 +209,42 @@ const Header = (props) => {
             {/* { callRedirect ? RedirectPage() :  */}
             {/* { showChangePass ? <ChangePassword show={showChangePass} setShow={toggleChangePass} /> : null } */}
             <div className = "main-header">
-                <span className="header-logo-span"><img className="header-logo" src="static/imgs/logo.png" onClick={naviPg}/></span>
-                <div className="btn-container"><button className="fa fa-bell no-border"></button></div>
-                { userRole == "Admin" ? null :
-                <div className="btn-container" onClick={switchRole}>
-                    <Dropdown>
-                        <Dropdown.Toggle className="switch-role-btn no-border">
-                            <span><img className="switch-role-icon" src="static/imgs/ic-switch-user.png"/></span>
-                            <span>Switch Roles</span>
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu className="switch-role-menu">
-                            <Dropdown.Item>Item</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </div>}
-                <div className="btn-container">
-                    <Dropdown>
-                        <Dropdown.Toggle className="user-name-btn no-border">
+                <span className="header-logo-span"><img className="header-logo" alt="logo" src="static/imgs/logo.png" onClick={naviPg}/></span>
+                    <div className="dropdown user-options">
+
+                        <div className="btn-container"><button className="fa fa-bell no-border"></button></div>
+                        { userRole == "Admin" ? null :
+                        <ClickAwayListener onClickAway={onClickAwaySR}>
+                            <div className="switch-role-btn no-border" data-toggle="dropdown" onClick={()=>setShowSR(true)} >
+                                <span><img className="switch-role-icon" alt="switch-ic" src="static/imgs/ic-switch-user.png"/></span>
+                                <span>Switch Roles</span>
+                            </div>
+                            <div className={showSR ? "switch-role-menu dropdown-menu show" : " switch-role-menu dropdown-menu"}>
+                                <div><Link to="#">Role 1</Link></div>
+                                <div><Link to="#">Role 2</Link></div>
+                            </div>
+                        </ClickAwayListener>
+                        }
+
+                        <ClickAwayListener onClickAway={onClickAwayUD}>
+                        <div className="user-name-btn no-border" data-toggle="dropdown" onClick={()=>setShowUD(true)}>
                             <span className="user-name">{username ? username : "Demo User"}</span>
-                            <span><img className = "user-name-icon" src="static/imgs/ic-user-nav.png"/></span>
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu className="user-name-menu">
-                            <Dropdown.Item className="user-role-item">{userRole ? userRole : "Test Manager"}</Dropdown.Item>
-                            <Dropdown.Divider className="dropdown-divider" />
-                            <Dropdown.Item onClick={getIce} >Download ICE</Dropdown.Item>
-                            <Dropdown.Divider className="dropdown-divider" />
-                            <Dropdown.Item onClick={resetPass}>Change Password</Dropdown.Item>
-                            <Dropdown.Item onClick={logout}>Logout</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
+                            <span><img className = "user-name-icon" alt="user-ic" src="static/imgs/ic-user-nav.png"/></span>
+                        </div>
+                        <div className={showUD ? "user-name-menu dropdown-menu dropdown-menu-right show" : "dropdown-menu-right user-name-menu dropdown-menu"}>
+                            <div><Link className="user-role-item" to="#">{userRole ? userRole : "Test Manager"}</Link></div>
+                            <div className="divider" />
+                            <div onClick={getIce} ><Link to="#">Download ICE</Link></div>
+                            <div className="divider" />
+                            <div onClick={resetPass}><Link to="#">Change Password</Link></div>
+                            <div onClick={logout}><Link to="#">Logout</Link></div>
+                        </div>
+                        </ClickAwayListener>
+                    </div>
                 </div>
-            </div>
             {/* } */}
         </>
-    );
+    ); 
 }
 
 export default Header;

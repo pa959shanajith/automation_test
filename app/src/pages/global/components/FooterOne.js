@@ -7,7 +7,7 @@ const FooterOne = () => {
             <div className="footer-content">
             <span className="upper-text">
                 Powered By
-                <img className="footer-logo" src="static/imgs/ftr-avo-logo.png"/>
+                <img className="footer-logo" alt="logo" src="static/imgs/ftr-avo-logo.png"/>
             </span>
             <span className="lower-text">
                 © {new Date().getFullYear()}  Avo Automation. All Rights Reserved

@@ -1,5 +1,4 @@
 .fa-arrow-circle-right:before {
-    content: "\f0a9";
     color:#a0a0a0;
     font-size:25px
 }
@@ -34,16 +33,18 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    box-sizing: content-box;
 }
 
 .restart-service-btn, .login-btn{
-    font-size: 32px;
-    border-radius: 22px;
+    font-family: "LatoWeb";
+    font-size: 32px!important;
+    border-radius: 22px!important;
     border: none;
     background-color: #9f62e1;
     color: #FFF;
-    padding: 4px 12px;
-    margin-top: 35px;
+    padding: 4px 12px!important;
+    margin-top: 35px!important;
     cursor: pointer;
     touch-action: manipulation;
     outline: none;
@@ -51,6 +52,10 @@
     //     outline: none;
     // }
 }
+
+.login-btn{
+    padding: 0 12px!important; 
+ }
 
 .restart-service-btn{
     font-size: 24px;
@@ -63,12 +68,10 @@
 }
 
 .fa-eye-slash{
-    content: "\f06e";
     color:#a0a0a0;
     font-size: 20px;
 }
 .fa-eye:before {
-    content: "\f06e";
     color:#a0a0a0;
     font-size: 20px;
 }
@@ -93,7 +96,6 @@
 @media screen and (min-width: 1366px){
 
     .fa-arrow-circle-right:before {
-        content: "\f0a9";
         color:#a0a0a0;
         font-size:1.5vw;
     }
@@ -135,6 +137,10 @@
         }
     }
 
+    .login-btn{
+        padding: 0 .2px!important; 
+     }
+
     .restart-service-btn, .login-btn{
         font-size: 2.5vw;
         border-radius: 2vw;
@@ -158,12 +164,10 @@
     }
 
     .fa-eye:before {
-        content: "\f06e";
         color:#a0a0a0;
         font-size: 1.5vw;
     }
     .fa-eye-slash{
-        content: "\f06e";
         color:#a0a0a0;
         font-size: 1.5vw;
     }
