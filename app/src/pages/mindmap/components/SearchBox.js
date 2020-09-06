@@ -17,7 +17,7 @@ const SearchBox = (props) => {
     const onSearch = (e) =>{
         if(nodeID)d3.select('#'+nodeID).classed('searched-node',false)
         var val = e.target.value
-        const reg = /[^a-zA-Z0-9\_]+/;
+        const reg = /[^a-zA-Z0-9_]+/;
         if(val === '')return;
         if(reg.test(val)){
             setErr(true)

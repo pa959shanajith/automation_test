@@ -1,11 +1,11 @@
 .leftnav{
     width: 166px;
-    height: calc(100% - 60px);
+    height: 100%;
     background: #633691;
     box-sizing: content-box;
     font-family: 'LatoWebLight';
-    position: absolute;
-    left: 0px;
+    position: relative;
+    float: left;
     overflow: auto;
     -ms-overflow-style: none;
     -webkit-overflow-style: none;

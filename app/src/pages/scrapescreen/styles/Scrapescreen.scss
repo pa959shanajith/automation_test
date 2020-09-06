@@ -8,6 +8,7 @@
     width: 100vw;
     position: absolute;
     overflow: hidden;
+    background-color: rgb(238, 238, 238)
 }
 
 .footer{
@@ -15,4 +16,9 @@
     width:100%;
     height: 30px;
     bottom: 0;
+}
+.holder{
+    position: relative;
+    top: 30px;
+    height: calc(100% - 60px);
 }

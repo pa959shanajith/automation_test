@@ -1,11 +1,12 @@
 #middleContent{
     width: calc(100% - 270px);
-    height: calc(100% - 60px);
+    height:100%;
     background: #fff;
     padding: 20px;
     box-sizing: border-box;
-    position: absolute;
-    left: 173px;
+    position: relative;
+    left: 6px;
+    float: left;
 }
 
 .page-taskName{

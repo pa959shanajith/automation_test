@@ -4,15 +4,15 @@
     align-items: center;
     box-sizing: border-box;
     width: 90px;
-    height: calc(100% - 60px);
+    height:100%;
     background: #311d4e;
     color: #fff;
     word-wrap: break-word;
     padding: 50px 5px;
     margin-right: 1px;
     text-align: center;
-    position:absolute;
-    right: -1px;
+    position:relative;
+    float: right;
 }
 
 .rightnav-container span span img{

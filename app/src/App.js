@@ -1,20 +1,19 @@
 import React from 'react';
 import { BrowserRouter as Router, Route ,Switch} from "react-router-dom";
-import Login, {Base} from './pages/login';
-import Admin from './pages/admin';
-import Mindmap from './pages/mindmap';
-import Scrape from './pages/scrapescreen';
 import {createStore,combineReducers} from 'redux';
 import {Provider} from 'react-redux';
-import adminReducer from './pages/admin/state/reducer.js'
 import {ProgressBar} from './pages/global'
-import Plugin from './pages/plugin';
-import mindmapReducer from './pages/mindmap/state/reducer.js';
 import progressBarReducer from "./pages/global/state/reducer";
+import Login, {Base} from './pages/login';
 import LoginReducer from './pages/login/state/reducer';
-import 'bootstrap/dist/css/bootstrap.min.css'
+import Admin from './pages/admin';
+import adminReducer from './pages/admin/state/reducer.js'
+import Plugin from './pages/plugin';
+import Mindmap from './pages/mindmap';
+import mindmapReducer from './pages/mindmap/state/reducer.js';
+import Scrape from './pages/scrapescreen';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
-import 'bootstrap/dist/css/bootstrap.min.css' ;
 
 /* combining multiple domains reducer */
 export const rootReducer = combineReducers({
