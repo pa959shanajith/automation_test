@@ -1,0 +1,110 @@
+.leftnav{
+    width: 166px;
+    height: calc(100% - 60px);
+    background: #633691;
+    box-sizing: content-box;
+    font-family: 'LatoWebLight';
+    position: absolute;
+    left: 0px;
+    overflow: auto;
+    -ms-overflow-style: none;
+    -webkit-overflow-style: none;
+}
+
+.leftbar-container{
+    min-height: 60%;
+    float: left;
+    width: 100%;
+    border-bottom: 2px solid #461F6E;
+}
+
+
+.clearboth{
+    clear: both;
+}
+
+.leftbar-top ul{
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+}
+
+.leftbar-top ul li i{
+    text-decoration: none;
+    font-size: 12px;
+    font-family: 'LatoWebLight';
+    color: #eee9ff;
+    word-wrap: break-word;
+    font-weight: normal;
+    display: block;
+    width: 75%;
+    margin: 0 auto;
+    font-style: normal !important;
+  
+}
+.leftbar-top li:first-child{
+    margin-bottom: 0;
+    margin-top: 30px
+}
+
+.leftbar-top ul li {
+    list-style-type: none;
+    float: left;
+    width: 100%;
+    color: #fff;
+    line-height: inherit;
+    text-align: center;
+    margin: 10% 0px 5%;
+}
+
+.leftbar-top ul li span{
+    padding: 8px 10px;
+}
+
+
+.leftbottom{
+    height: 25%; 
+    float: left;
+    width: 100%;
+    position: relative;
+}
+
+
+.cards{
+    list-style-type: none;
+    float: left;
+    width: 75%;
+    color: #fff;
+    line-height: inherit;
+    text-align: center;
+    margin: 16% 10% 10%;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.scrapeon{
+    list-style-type: none;
+    float: left;
+    width: 75%;
+    color: #fff;
+    line-height: inherit;
+    text-align: center;
+    margin: 16% 10% 10%;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.Append{
+     font-size: 16px !important;
+
+}
+
+.special{
+    cursor: not-allowed;
+}
+
+.scrapeOnTxt{
+ font-size: 18px !important;
+ font-family: 'LatoWebMedium' !important;
+}

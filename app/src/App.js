@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route ,Switch} from "react-router-dom";
 import Login, {Base} from './pages/login';
 import Admin from './pages/admin';
 import Mindmap from './pages/mindmap';
+import Scrape from './pages/scrapescreen';
 import {createStore,combineReducers} from 'redux';
 import {Provider} from 'react-redux';
 import adminReducer from './pages/admin/state/reducer.js'
@@ -40,6 +41,7 @@ const App = () => {
           <Route path="/admin" component={Admin} />
           <Route path="/mindmap" component={Mindmap} />
           <Route path="/plugin" component={Plugin} />
+          <Route path ="/scrape" component={Scrape}/>
           <Route component={Base} />
         </Switch>
       </Router>
