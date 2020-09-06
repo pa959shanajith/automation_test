@@ -1,0 +1,34 @@
+.ct-scenarios {
+    background-color: #4299e2;
+    stroke:#4299e2;
+    fill: #4299e2;
+    stroke-width: 0;
+}
+.ct-modules, .ct-modules_endtoend {
+    background-color: #5c5ce5;
+    stroke:#5c5ce5;
+    fill: #5c5ce5;
+    stroke-width: 0;
+}
+.ct-screens {
+    background-color: #19baae;
+    stroke:#19baae;
+    fill: #19baae;
+    stroke-width: 0;
+}
+.ct-testcases {
+    background-color: #efa022;
+    stroke:#efa022;
+    fill: #efa022;
+    stroke-width: 0;
+}
+.ct-legendBox{
+    position: absolute;
+    height: 20px;
+    width: 351px;
+    top: calc(100% - 62px);
+    left: 161px;
+}
+.ct-nodeLabel{
+    font-size: 12px;
+}

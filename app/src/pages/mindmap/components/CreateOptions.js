@@ -9,7 +9,7 @@ import '../styles/CreateOptions.scss'
 
 const CreateOptions = (props) => {
   const options = [
-    {ico : "ic-create-newMindmap.png",label:'CREATE NEW',comp:'newmindmap'},
+    {ico : "ic-create-newMindmap.png",label:'Create New',comp:'newmindmap'},
     {ico : "ic-endtoendFlow.png",label:'End to End Flow',comp:'enemindmap'},
     {ico :"ic-importfromexcel-mindmap.png",label:'Import From Excel',comp:'excelmindmap'}
   ]
@@ -17,7 +17,7 @@ const CreateOptions = (props) => {
     <div className='mindmap__option-container'>
       <div>
         {options.map((e,i)=>(
-          <div className='mindmap__option-box' onClick={()=>props.setOptions(e.comp)} key={i}>
+          <div className='mindmap__option-box' onClick={()=>props.setOptions(e.comp)} key={i} data-test="OptionBox">
             <div>
               <img src={"static/imgs/"+e.ico} alt={e.label}/>
               <div>{e.label}</div>

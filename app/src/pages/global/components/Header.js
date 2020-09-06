@@ -6,6 +6,7 @@ import "../styles/Header.scss";
 import 'font-awesome/css/font-awesome.min.css';
 import * as loginApi from '../../login/api';
 import ClickAwayListener from 'react-click-away-listener';
+// import ChangePassword from './ChangePassword';
 
 const Header = (props) => {
 
