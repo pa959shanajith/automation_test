@@ -19,7 +19,7 @@ const AdminHome = () => {
 
     return (
         <Fragment>
-                <div className="header">header</div>
+                <div className="header-admin">header</div>
                 
                 <LeftPanel resetMiddleScreen={resetMiddleScreen} setResetMiddleScreen={setResetMiddleScreen} middleScreen={middleScreen} setMiddleScreen={setMiddleScreen} setShowEditUser={setShowEditUser}/>
 
@@ -42,7 +42,7 @@ const AdminHome = () => {
                 { /* <!--Right Panel--> */}
                 <div id="right-dependencies-section"></div>
 
-                <div className="footer">footer</div>
+                <div className="footer-admin">footer</div>
 
         </Fragment>
   );

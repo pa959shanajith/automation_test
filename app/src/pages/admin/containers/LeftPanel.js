@@ -22,7 +22,7 @@ const LeftPanel = (props) => {
 		<div className="scrollbar-macosx">
 			<div id="left-top-section" className='left-top-section-div'>
 				<ul>
-					<li><span><a href="/Admin" id='managePanel' className='scrapeOnTxt'>Manage</a></span></li>
+					<li><span><i href="/Admin" id='managePanel' className='scrapeOnTxt'>Manage</i></span></li>
                     <li><i id='userTab' title="Manage Users" onClick={()=>{props.setShowEditUser(false);props.setMiddleScreen("createUser");}} className="selectBrowser" data-name="3">
 						<span><span className="fa fa-user" style={(props.middleScreen==="createUser")? {background: "#331d4c",borderRadius: "6px"}:{}} ></span></span>User</i></li>
                     {/* <li><i id='tokenTab'  title="Manage Tokens" onClick={()=>props.setMiddleScreen("tokenTab")} className="selectBrowser" data-name="1">
