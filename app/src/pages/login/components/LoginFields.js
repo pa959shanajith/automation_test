@@ -67,7 +67,7 @@ const LoginFields = (props) => {
                     // setRedirectTo(data.redirect);
                 } // history.replace(data.redirect);
                 else if (data.proceed) setPassField(true);
-                else if (data == "invalidServerConf") setLoginValidation("Authentication Server Configuration is invalid!");
+                else if (data === "invalidServerConf") setLoginValidation("Authentication Server Configuration is invalid!");
                 else setLoginValidation(err);    
             }
             catch(err){
@@ -98,11 +98,11 @@ const LoginFields = (props) => {
                     let data = await api.authenticateUser(user, password)
                     SetProgressBar("stop", dispatch);
                     setRequested(false);
-                    if (data == "restart") {
+                    if (data === "restart") {
                         // blockUI("Fetching active services...");
                         adminApi.restartService("query")
                         .then(data=> {
-                            if (data == "fail") {
+                            if (data === "fail") {
                                 setLoginValidation("Failed to fetch services.");
                             } else {
                                 setRestartForm(true);
@@ -118,15 +118,15 @@ const LoginFields = (props) => {
                             setLoginValidation("Failed to fetch services.");
                         });
                     }
-                    else if (data == 'validCredential') window.location='/'; //setRedirectTo('/')  //  history.replace('/')
-                    else if (data == 'inValidCredential' || data == "invalid_username_password") {
+                    else if (data === 'validCredential') window.location='/'; //setRedirectTo('/')  //  history.replace('/')
+                    else if (data === 'inValidCredential' || data === "invalid_username_password") {
                         setUserError(true);
                         setPassError(true);
                         setLoginValidation("The username or password you entered isn't correct. Please try again.");
                     }
-                    else if (data == "userLogged") setLoginValidation("User is already logged in! Please logout from the previous session.");
-                    else if (data == "inValidLDAPServer") setLoginValidation("LDAP Server Configuration is invalid!");
-                    else if (data == "invalidUserConf") setLoginValidation("User-LDAP mapping is incorrect!");
+                    else if (data === "userLogged") setLoginValidation("User is already logged in! Please logout from the previous session.");
+                    else if (data === "inValidLDAPServer") setLoginValidation("LDAP Server Configuration is invalid!");
+                    else if (data === "invalidUserConf") setLoginValidation("User-LDAP mapping is incorrect!");
                     else setLoginValidation("Failed to Login.");
                 }
                 catch(err){
@@ -142,7 +142,7 @@ const LoginFields = (props) => {
         // blockUI("Please wait while " + serverName + " service is being restarted...");
         adminApi.restartService(serverid)
         .then(data => {
-            if (data == "success") {
+            if (data === "success") {
                 setTimeout(()=>{
                     // unblockUI();
                     // openModalPopup("Restart Service", serverName+" service is restarted successfully!!");
@@ -150,7 +150,7 @@ const LoginFields = (props) => {
                 }, 120 * 1000);
             } else {
                 // unblockUI();
-                if (data == "na") errmsg = "Service is not found. Ensure "+serverName+" is running as a service.";
+                if (data === "na") errmsg = "Service is not found. Ensure "+serverName+" is running as a service.";
                 // openModalPopup("Restart Service", errmsg);
                 alert("Restart Service", errmsg);
             }

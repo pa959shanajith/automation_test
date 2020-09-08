@@ -48,6 +48,9 @@
     cursor: pointer;
     touch-action: manipulation;
     outline: none;
+    &:focus{
+        outline: none!important;
+    }
     // &:active{
     //     outline: none;
     // }

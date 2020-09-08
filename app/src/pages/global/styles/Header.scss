@@ -46,35 +46,6 @@
 
 
 .user-name-menu{
-    display: flex;
-    flex-direction: column;
-    z-index: 100;
-    font-family: "LatoWeb";
-    font-size: 14px;
-    color: #333;
-    position: absolute;
-    margin-right: 20px!important;
-    margin-top: 10px!important;
-    div{
-        width: 100%;
-        display: flex;
-        font-size: 14px;
-        margin: 0;
-        padding: 0;
-    }
-    // right:87%;
-    a{
-        width: 100%;
-        text-decoration: none!important;
-        outline: none;
-        border: none;
-        padding: 3px 20px!important;
-        &:hover{
-            color: #333!important;
-            background-color: #eee;
-        }
-    }
-    
     .divider{
         background-color: #eee;
         width: 100%;
@@ -111,10 +82,13 @@
     margin-right: 10px;
 }
 
-.fa-bell{
+.bell-ic{
     color: #764ba2;
     font-size: 20px!important;
     margin-top: 3px!important;
+    &:focus{
+        outline: none!important;
+    }
 }
 
 .switch-role-menu{
@@ -131,27 +105,43 @@
         border: none;
         padding: 3px 20px!important;
         &:hover{
-            color: #333!important;
+            color: rgb(145, 117, 117)!important;
             background-color: #eee;
         }
     }
 }
 .switch-role-menu, .user-name-menu{
+    z-index: 100;
+    margin-right: 20px!important;
+    margin-top: 10px!important;
     min-width: 160px;
     font-family: "LatoWeb";
     border: 1px solid rgba(0, 0, 0, 0.15);
     box-shadow: 0 6px 12px rgba(0,0,0,.175);
     background-color: #FFF;
-    margin-top: 10px!important;
     padding: 5px 0;
     border-radius: 4px;
+    div{
+        font-size: 14px;
+        width: 100%;
+        display: flex;
+        margin: 0;
+        padding: 0;
+    }
     a{
-        text-decoration: none;
+        width: 100%;
+        text-decoration: none!important;
         color: #333;   
+        outline: none;
         font-weight: 400;
         line-height: 1.42857143;
-        padding: 6px 20px;
+        border: none;
+        padding: 3px 20px!important;
         white-space: nowrap;
+        &:hover{
+            color: #333!important;
+            background-color: #eee;
+        }
     }
 }
 
@@ -215,8 +205,7 @@
         margin-right: 1.8vw;
     }
     
-    .fa-bell{
-        color: #764ba2;
+    .bell-ic{
         font-size: 2.7vw;
     }
 
@@ -269,8 +258,6 @@
     }
     
     .switch-role-menu, .user-name-menu{
-        display: flex;
-        flex-direction: column;
         z-index: 100;
         font-family: "LatoWeb";
         font-size: 1.2vw;
@@ -332,8 +319,7 @@
         margin-right: .9vw;
     }
     
-    .fa-bell{
-        color: #764ba2;
+    .bell-ic{
         font-size: 1.6vw!important;
         margin-top: 0.2vw;
     }
