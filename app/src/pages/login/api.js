@@ -12,7 +12,7 @@ export const authenticateUser = async(username, password) => {
             data: {'username': username, 'password': password},
             credentials : 'include'
         });
-        if (res.status == 200) {
+        if (res.status === 200) {
             return res.data;
         }
         else{
@@ -34,7 +34,7 @@ export const loadUserInfo = async(selRole) => {
             data: {'action': 'loadUserInfo', selRole: selRole},
             credentials : 'include'
         });
-        if (res.status == 200){
+        if (res.status === 200){
             return res.data;
         }
         else{
@@ -56,7 +56,7 @@ export const resetPassword = async(newpassword, currpassword) => {
             data: {'newpassword': newpassword, 'currpassword': currpassword},
             credentials : 'include'
         });
-        if (res.status == 200){
+        if (res.status === 200){
             return res.data;
         }
         else{
@@ -79,7 +79,7 @@ export const getRoleNameByRoleId = async(roleasarray) => {
             data: {'action': "getRoleNameByRoleId", 'role': roleasarray},
             credentials : 'include'
         });
-        if (res.status == 200){
+        if (res.status === 200){
             return res.data;
         }
         else{
@@ -93,21 +93,18 @@ export const getRoleNameByRoleId = async(roleasarray) => {
 
 export const checkUserState = async() => {
     try{
-        console.log("Calling...");
         const res = await axios(url+"/checkUserState", {
             method: "POST",
             credentials : 'include'
         });
-        if (res.status == 200){
+        if (res.status === 200){
             return res.data;
         }
         else{
-            console.log("Else...");
             console.log(res.status);
         }
     }
     catch(err){
-        console.log("Err...");
         console.log(err);
     }
 }
@@ -122,7 +119,7 @@ export const checkUser = async(user) => {
             data: {'username': user},
             credentials : 'include'
         });
-        if (res.status == 200){
+        if (res.status === 200){
             return res.data;
         }
         else{

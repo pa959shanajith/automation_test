@@ -10,15 +10,8 @@
 }
 
 
-@media screen and (min-width: 1366px){
+@media screen and (min-width: 1400px) and (min-height: 770px){
     .error-msg{
-        font-family: "LatoWebMedium";
         font-size: 1.2vw;
-        color: #d33c3c;
-        width: 100%;
-        text-align: center;
-        a{
-            color: #d33c3c;
-        }
     }
 }

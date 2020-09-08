@@ -1,4 +1,4 @@
-.fa-arrow-circle-right:before {
+.arrow-circle {
     color:#a0a0a0;
     font-size:25px
 }
@@ -15,14 +15,7 @@
     outline: none;
 }
 
-.username-wrap{
-    display: flex;
-    flex-direction: row;
-    border-bottom: 1px solid #cacaca;
-    margin-bottom: 35px;
-}
-
-.password-wrap{
+.password-wrap, .username-wrap{
     display: flex;
     flex-direction: row;
     border-bottom: 1px solid #cacaca;
@@ -38,19 +31,19 @@
 
 .restart-service-btn, .login-btn{
     font-family: "LatoWeb";
-    font-size: 32px!important;
+    font-size: 32px;
     border-radius: 22px!important;
     border: none;
     background-color: #9f62e1;
     color: #FFF;
-    padding: 4px 12px!important;
+    padding: 4px 12px;
     margin-top: 35px!important;
     cursor: pointer;
     touch-action: manipulation;
     outline: none;
-    // &:active{
-    //     outline: none;
-    // }
+    &:focus{
+        outline: none!important;
+    }
 }
 
 .login-btn{
@@ -58,7 +51,7 @@
  }
 
 .restart-service-btn{
-    font-size: 24px;
+    font-size: 24px!important;
     width: 100%;
     margin: 10px 0;
     &:disabled{
@@ -67,11 +60,7 @@
     }
 }
 
-.fa-eye-slash{
-    color:#a0a0a0;
-    font-size: 20px;
-}
-.fa-eye:before {
+.eye-ic{
     color:#a0a0a0;
     font-size: 20px;
 }
@@ -93,88 +82,49 @@
     }
 }
 
-@media screen and (min-width: 1366px){
+@media screen and (min-width: 1400px) and (min-height: 770px){
 
-    .fa-arrow-circle-right:before {
-        color:#a0a0a0;
+    .arrow-circle {
         font-size:1.5vw;
     }
 
     .field{
         font-size: 2vw;
-        border: none;
-        box-shadow: none;
-        flex-grow: 1;
-        width: 90%;
         padding: 0 1vw;
-        color: #555;
-        font-family: "LatoWebLight";
-        outline: none;
     }
 
-    .username-wrap{
-        display: flex;
-        flex-direction: row;
-        border-bottom: .1vw solid #cacaca;
-        margin-bottom: 2.5vw;
-    }
-
-    .password-wrap{
-        display: flex;
-        flex-direction: row;
+    .password-wrap, .username-wrap{
         border-bottom: .1vw solid #cacaca;
         margin-bottom: 2.5vw;
     }
 
     .error-msg{
-        font-family: "LatoWebMedium";
         font-size: 1.1vw;
-        color: #d33c3c;
-        width: 100%;
-        text-align: center;
-        a{
-            color: #d33c3c;
-        }
     }
 
     .login-btn{
         padding: 0 .2px!important; 
      }
 
-    .restart-service-btn, .login-btn{
+    .login-btn{
         font-size: 2.5vw;
-        border-radius: 2vw;
-        border: none;
-        background-color: #9f62e1;
-        color: #FFF;
+        border-radius: 2vw!important;
         padding: 0 .2vw;
         margin-top: .2vw;
-        cursor: pointer;
-        touch-action: manipulation;
-        outline: none;
-        // &:active{
-        //     outline: none;
-        // }
     }
 
     .restart-service-btn{
         font-size: 1.7vw;
-        margin: .9vw 0;
+        border-radius: 2vw;
+        margin: .2vw 0 .9vw 0;
         padding: .2vw .9vw;
     }
 
-    .fa-eye:before {
-        color:#a0a0a0;
+    .eye-ic {
         font-size: 1.5vw;
     }
-    .fa-eye-slash{
-        color:#a0a0a0;
-        font-size: 1.5vw;
-    }
-    .ic-username{
+    .ic-password, .ic-username{
         height: 1.5vw;
     }
-    .ic-password{
-        height: 1.5vw;
-    }
+    
 }
