@@ -8,8 +8,7 @@ import '../styles/AdminHome.scss'
 
 /*Component AdminHome
   use: renders Admin landing page (footer,header,sidebars,middle saection)
-  todo: select Icon css(dark)
-        font-family: LatoWeb;
+  todo: 
 */
 
 const AdminHome = () => {
@@ -20,10 +19,7 @@ const AdminHome = () => {
 
     return (
         <Fragment>
-                {/* <div className="header-admin">header</div> */}
                 <Header />
-                {/* <div> */}
-                
                 <LeftPanel resetMiddleScreen={resetMiddleScreen} setResetMiddleScreen={setResetMiddleScreen} middleScreen={middleScreen} setMiddleScreen={setMiddleScreen} setShowEditUser={setShowEditUser}/>
 
                 {/* <!--Middle Panel--> */}
@@ -44,10 +40,7 @@ const AdminHome = () => {
 
                 { /* <!--Right Panel--> */}
                 <div id="right-dependencies-section"></div>
-                {/* </div> */}
                 <FooterTwo />
-                {/* <div className="footer-admin">footer</div> */}
-
         </Fragment>
   );
 }

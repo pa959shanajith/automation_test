@@ -15,18 +15,23 @@ const ProjectNew = (props) => {
     const [selectBox,setSelectBox] = useState([])
     const [assignProj,setAssignProj] = useState({allProjectAP:[],assignedProjectAP:[]})
     const [assignedProjectInitial,setAssignedProjectInitial] = useState([])
-    const [showload,setShowload] = useState(false)
+    const [unAssignedFlag,setUnAssignedFlag] = useState(false)
+    const [showAssignProjectModal,setShowAssignProjectModal] = useState(false)
+    const [statechange,setStateChange] = useState(true)
     const [selDomainsOptions,setSelDomainsOptions] = useState([])
     const [selectedUserName,setSelectedUserName] = useState("")
     const [selectedProject,setSelectedProject] = useState("")
     const [selectedUserId,setSelectedUserId] = useState("")
     const [getAssignedProjectsLen,setGetAssignedProjectsLen] = useState(0)
+    // eslint-disable-next-line
+    const [showload,setShowload] = useState(false)
+    // eslint-disable-next-line
     const [unAssignedProjects,setUnAssignedProjects] = useState([])
+    // eslint-disable-next-line
     const [assignedProjects,setAssignedProjects] = useState([])
+    // eslint-disable-next-line
     const [diffprj,setDiffprj] = useState("")
-    const [unAssignedFlag,setUnAssignedFlag] = useState(false)
-    const [showAssignProjectModal,setShowAssignProjectModal] = useState(false)
-    const [statechange,setStateChange] = useState(true)
+    
 
     useEffect(()=>{
         setShowload(false);
