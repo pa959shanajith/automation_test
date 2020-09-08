@@ -319,7 +319,9 @@ input[type="radio"]{
 }
 
 .heading-light {
-    font-family: 'LatoWebLight'
+    font-family: 'LatoWebLight';
+    padding-left: 25px;
+    margin-bottom: 30px;
 }
 
 .h4-custom {
@@ -557,16 +559,19 @@ input[type="radio"]{
 }
 
 .plugin-block {
-    background: url(../imgs/ic-plugin-bg.png) left no-repeat;
     height: 128px;
     text-align: center;
-    margin-bottom: 4%
+    margin-bottom: 4%;
+}
+
+.plugin-logo {
+    width: 110px;
+    height: 110px;
 }
 
 .plugin-block span {
     font-size: 14px;
     line-height: 21px;
-    color: #fff;
     position: absolute;
     width: 50%;
     top: 50%;
@@ -577,6 +582,12 @@ input[type="radio"]{
     -ms-transform: translateX(-84%) translateY(-50%);
     padding: 20px 0px;
     cursor: pointer
+}
+
+.plugin-block span h4{
+    width: 110px;
+    margin-top: 5px;
+    text-align:center;
 }
 
 .pluginTaskBlock{
@@ -631,7 +642,7 @@ input[type="radio"]{
     height: calc(100% - 42px);
     background: #000000;
     top: 22px;
-    left: 55%;
+    left: 48%;
     transform: translateX(-50%) translateY(-2%);
     -moz-transform: translateX(-50%) translateY(-2%);
     -webkit-transform: translateX(-50%) translateY(-2%);
@@ -4609,7 +4620,7 @@ select:-webkit-autofill:focus {
 	.encryptionData-body{height: 176px;}
 	#optimization-fn{position: relative; top: 50%; left: 50%; transform: translateX(-50%) translateY(70%);}
 	.col-md-5{width: 43.5%;}
-	.plugin-block{height: 116px; background-size: 115px;}
+	.plugin-block{height: 116px; background-size: 115px; margin-bottom: 8%;width: 38%;}
 	.plugin-block span{
 		font-size: 15px;
 		line-height: 19px;
