@@ -3,6 +3,7 @@ import LeftPanel from './LeftPanel'
 import CreateUser from './CreateUser'
 import Project from './Project'
 import ProjectAssign from './ProjectAssign'
+import {Header,FooterTwo} from '../../global'
 import '../styles/AdminHome.scss'
 
 /*Component AdminHome
@@ -19,7 +20,9 @@ const AdminHome = () => {
 
     return (
         <Fragment>
-                <div className="header-admin">header</div>
+                {/* <div className="header-admin">header</div> */}
+                <Header />
+                {/* <div> */}
                 
                 <LeftPanel resetMiddleScreen={resetMiddleScreen} setResetMiddleScreen={setResetMiddleScreen} middleScreen={middleScreen} setMiddleScreen={setMiddleScreen} setShowEditUser={setShowEditUser}/>
 
@@ -41,8 +44,9 @@ const AdminHome = () => {
 
                 { /* <!--Right Panel--> */}
                 <div id="right-dependencies-section"></div>
-
-                <div className="footer-admin">footer</div>
+                {/* </div> */}
+                <FooterTwo />
+                {/* <div className="footer-admin">footer</div> */}
 
         </Fragment>
   );
