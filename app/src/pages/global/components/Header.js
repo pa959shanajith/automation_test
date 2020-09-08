@@ -231,7 +231,7 @@ const Header = () => {
         <> 
             {/* { callRedirect ? RedirectPage() :  */}
             {/* { showChangePass ? <ChangePassword show={showChangePass} setShow={toggleChangePass} /> : null } */}
-            <div className = "main-header" style={userRole == "Admin" ? {backgroundColor: "#eee"} : {backgroundColor: "#fff"}}>
+            <div className = "main-header">
                 <span className="header-logo-span"><img className="header-logo" alt="logo" src="static/imgs/logo.png" onClick={naviPg}/></span>
                     <div className="dropdown user-options">
 
