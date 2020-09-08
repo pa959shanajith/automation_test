@@ -2,6 +2,8 @@
     height: 100vh;
     width: 100%;
     min-width: 767px;
+    display: flex;
+    flex-direction: column;
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
     -khtml-user-select: none; /* Konqueror HTML */
@@ -9,25 +11,19 @@
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
     font-family: LatoWeb;
-}
-.mp__header{
-    width:100%;
-    height:30px;
+    background: rgb(238, 238, 238);
 }
 .mp__body{
-    position: absolute;
-    height: calc( 100% - 60px);
+    flex: auto;
     width: 100%;
     background-color: #fff;
     margin: 0;
     padding: 0;
     min-width: 768px;
 }
-.mp__footer{
-    position: absolute;
-    width: 100%;
-    bottom:0;
-    height:30px
+
+.mp__footer .main-footer{
+    position: static;
 }
 .mp__leftbar{
     left: 0;

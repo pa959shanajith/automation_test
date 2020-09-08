@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import CreateOptions from '../components/CreateOptions.js'; 
 import CreateNew from './CreateNew.js';
+import { Header, FooterTwo as Footer} from '../../global'
 import '../styles/MindmapHome.scss';
 
 /*Component MindmapHome
@@ -19,16 +20,16 @@ const MindmapHome = () => {
   var Component = (!options)? null : createType[options];
   return (
     <div className='mp__container'>
-      <div className='mp__header'>HEADER</div>
-        <div className='mp__body'>
-          <div className='mp__leftbar'></div>
-          {(!options)?
-            <CreateOptions setOptions={setOptions}/>:
-            <Component/>
-          }
-          <div className='mp__rightbar'></div>
-        </div>
-      <div className='mp__footer'>FOOTER</div>
+      <Header/> 
+      <div className='mp__body'>
+        <div className='mp__leftbar'></div>
+        {(!options)?
+          <CreateOptions setOptions={setOptions}/>:
+          <Component/>
+        }
+        <div className='mp__rightbar'></div>
+      </div>
+      <div className='mp__footer'><Footer/></div>
     </div>
   );
 }
