@@ -53,16 +53,16 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 				var dataName = Encrypt.encode("p_"+pluginTxt);
 				$rootScope.plugins.push("p_"+pluginName);
 				if(pluginName == "Mindmap") {
-					$("#plugin-container").append('<div class="col-md-5 plugin-block"><span ng-click="pluginBox()" class="toggleClick pluginBox" data-name="p_'+pluginTxt+'" id="'+pluginName+'" title="'+pluginName+'"><img src="imgs/Mindmaps.png" class="plugin-logo"></img><h4>Mindmaps</h4></span><input class="plugins" type="hidden" id="'+pluginName+"_"+dataName+'"  title="'+pluginTxt+"_"+dataName+'"></div>').fadeIn();
+					$("#plugin-container").append('<div class="col-md-6 plugin-block"><span ng-click="pluginBox()" class="toggleClick pluginBox" data-name="p_'+pluginTxt+'" id="'+pluginName+'" title="'+pluginName+'"><img src="imgs/Mindmaps.png" class="plugin-logo"></img><h4>Mindmaps</h4></span><input class="plugins" type="hidden" id="'+pluginName+"_"+dataName+'"  title="'+pluginTxt+"_"+dataName+'"></div>').fadeIn();
 				}
 				else if(pluginName == "Reports") {
-					$("#plugin-container").append('<div class="col-md-5 plugin-block"><span ng-click="pluginBox()" class="toggleClick pluginBox" data-name="p_'+pluginTxt+'" id="'+pluginName+'" title="'+pluginName+'"><img src="imgs/Reports.png" class="plugin-logo"></img><h4>Reports</h4></span><input class="plugins" type="hidden" id="'+pluginName+"_"+dataName+'"  title="'+pluginTxt+"_"+dataName+'"></div>').fadeIn();
+					$("#plugin-container").append('<div class="col-md-6 plugin-block"><span ng-click="pluginBox()" class="toggleClick pluginBox" data-name="p_'+pluginTxt+'" id="'+pluginName+'" title="'+pluginName+'"><img src="imgs/Reports.png" class="plugin-logo"></img><h4>Reports</h4></span><input class="plugins" type="hidden" id="'+pluginName+"_"+dataName+'"  title="'+pluginTxt+"_"+dataName+'"></div>').fadeIn();
 				}
 				else if(pluginName == "Utility") {
-					$("#plugin-container").append('<div class="col-md-5 plugin-block"><span ng-click="pluginBox()" class="toggleClick pluginBox" data-name="p_'+pluginTxt+'" id="'+pluginName+'" title="'+pluginName+'"><img src="imgs/Utilities.png" class="plugin-logo"></img><h4>Utilities</h4></span><input class="plugins" type="hidden" id="'+pluginName+"_"+dataName+'"  title="'+pluginTxt+"_"+dataName+'"></div>').fadeIn();
+					$("#plugin-container").append('<div class="col-md-6 plugin-block"><span ng-click="pluginBox()" class="toggleClick pluginBox" data-name="p_'+pluginTxt+'" id="'+pluginName+'" title="'+pluginName+'"><img src="imgs/Utilities.png" class="plugin-logo"></img><h4>Utilities</h4></span><input class="plugins" type="hidden" id="'+pluginName+"_"+dataName+'"  title="'+pluginTxt+"_"+dataName+'"></div>').fadeIn();
 				}
 				else if(pluginName == "Integration") {
-					$("#plugin-container").append('<div class="col-md-5 plugin-block"><span ng-click="pluginBox()" class="toggleClick pluginBox" data-name="p_'+pluginTxt+'" id="'+pluginName+'" title="'+pluginName+'"><img src="imgs/Integrations.png" class="plugin-logo"></img><h4>Integrations</h4></span><input class="plugins" type="hidden" id="'+pluginName+"_"+dataName+'"  title="'+pluginTxt+"_"+dataName+'"></div>').fadeIn();
+					$("#plugin-container").append('<div class="col-md-6 plugin-block"><span ng-click="pluginBox()" class="toggleClick pluginBox" data-name="p_'+pluginTxt+'" id="'+pluginName+'" title="'+pluginName+'"><img src="imgs/Integrations.png" class="plugin-logo"></img><h4>Integrations</h4></span><input class="plugins" type="hidden" id="'+pluginName+"_"+dataName+'"  title="'+pluginTxt+"_"+dataName+'"></div>').fadeIn();
 				}
 			}
 		}
