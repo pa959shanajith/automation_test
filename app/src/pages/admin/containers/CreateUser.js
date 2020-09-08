@@ -10,7 +10,7 @@ import EditLanding from '../components/EditLanding';
   use: defines Admin middle Section for create user
   ToDo: add modals all popup
         only ldap code red border class divs USERIDNAME
-        delete modal
+        delete modal on delete (currently direct delete happening)
 */
 
 const CreateUser = (props) => {
