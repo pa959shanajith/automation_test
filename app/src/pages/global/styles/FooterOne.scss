@@ -18,8 +18,7 @@
     display: flex;
     justify-content: flex-end;
     align-items: baseline;
-    font-size: 1.1vw; //tochange
-    line-height: 1.42857143;
+    font-size: 1.1vw;
 }
 
 .lower-text{
@@ -28,18 +27,13 @@
 }
 
 .footer-logo{
-    // vertical-align: baseline;
     margin-left: .5vw;
     height: 1.1vw;
 }
 
 @media screen and (max-width: 800px){
     .upper-text{
-        width: 100%;
-        display: flex;
-        justify-content: flex-end;
-        align-items: baseline;
-        font-size: 10px; //tochange
+        font-size: 10px;
         line-height: 1.42857143;
     }
     
@@ -49,7 +43,6 @@
     }
     
     .footer-logo{
-        // vertical-align: baseline;
         margin-left: 3px;
         height: 10px;
     }

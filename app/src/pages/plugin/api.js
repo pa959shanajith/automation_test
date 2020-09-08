@@ -12,7 +12,7 @@ export const getProjectIDs = async() => {
             data : {'action': 'getProjectIDs', 'allflag': true},
             credentials : 'include',
         });
-        if (res.status == 200){
+        if (res.status === 200){
             return res.data;
         }
         else{
@@ -34,7 +34,7 @@ export const getTaskJson_mindmaps = async(obj) => {
             data : {'action': 'getTaskJson_mindmaps', 'obj': obj},
             credentials : 'include',
         });
-        if (res.status == 200){
+        if (res.status === 200){
             return res.data;
         }
         else{
@@ -56,7 +56,7 @@ export const updateTaskStatus = async(obj) => {
             data : {'obj': obj},
             credentials : 'include',
         });
-        if (res.status == 200){
+        if (res.status === 200){
             return res.data;
         }
         else{
@@ -78,7 +78,7 @@ export const getNames_ICE = async(requestedids, idtype) => {
             data : {'action': 'getNames_ICE', 'requestedids': requestedids, 'idtype': idtype},
             credentials : 'include',
         });
-        if (res.status == 200){
+        if (res.status === 200){
             return res.data;
         }
         else{

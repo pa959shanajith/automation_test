@@ -1,14 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useHistory, Link } from 'react-router-dom';
-import { RedirectPage } from '../../global';
+import { RedirectPage, SetProgressBar } from '../../global';
 import "../styles/Header.scss";
 import 'font-awesome/css/font-awesome.min.css';
 import * as loginApi from '../../login/api';
+import * as actionTypes from '../../login/state/action'
 import ClickAwayListener from 'react-click-away-listener';
 // import ChangePassword from './ChangePassword';
 
-const Header = (props) => {
+
+/*
+    Component: Header Bar
+    Uses: Provides header functionality to the page
+    Props: None
+    Todo: Functionality part. ChangePassword import is commented because work in progress.
+    Note: LogOut is working fine.
+
+*/
+
+const Header = () => {
+
+    const dispatch = useDispatch()
 
     const [userDetails, setUserDetails] = useState(null);
     const [username, setUsername] = useState(null);
@@ -27,24 +40,35 @@ const Header = (props) => {
     // const [cycleDetails, setCycleDetails] = useState(null);
     const [passwordValidation, setPasswordValid] = useState("");
     const [showChangePass, setShowChangePass] = useState(false);
-    let unavailableLocalServer_msg = "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.";
-    const [userInfo, setUserInfo] = useState(useSelector(state=>state.login.userinfo));
+    // let unavailableLocalServer_msg = "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.";
     // const [callRedirect, setCallRedirect] = useState(false);
     const [showUD, setShowUD] = useState(false);
     const [showSR, setShowSR] = useState(false);
     let history = useHistory();
 
+    const userInfo = useSelector(state=>state.login.userinfo);
+
     useEffect(()=>{
-        let userDetailsVar;
-        if(userInfo){
-            userDetailsVar = JSON.parse(userInfo);
+        if(Object.keys(userInfo).length!==0){
+            setUserDetails(userInfo);
+            setUserRole(userInfo.rolename);
+            setUsername(userInfo.username.toLowerCase());
         }
-        let userRoleVar = userInfo.rolename;
-        let usernameVar = userDetailsVar.username.toLowerCase();
-        setUserDetails(userDetailsVar)
-        setUserRole(userRoleVar);
-        setUsername(usernameVar);
-    }, []);
+        else{
+            {/* Retaining the userInfo after page refresh */}
+            (async()=>{
+                let userinfo = await loginApi.loadUserInfo()
+                if (userinfo === "fail") console.log("Failed to loadUserInfo.");
+                else if (userinfo === "Invalid Session") {
+                    console.log("Your session has expired! --onLoadUserInfo Header");
+                } else if (Object.keys(userInfo).length!==0) {
+                    window.localStorage.navigateScreen = userinfo.page;
+                    dispatch({type:actionTypes.SET_USERINFO, payload: userinfo});
+                    SetProgressBar("start", dispatch);
+            }
+            })()
+        }
+    }, [userInfo]);
 
     const naviPg = () => {
 		if (localStorage.getItem("navigateEnable") == "true") {
@@ -71,7 +95,6 @@ const Header = (props) => {
 		window.sessionStorage.clear();
 		window.sessionStorage["checkLoggedOut"] = true;
         // $rootScope.redirectPage();
-        console.log("redirectPage")
         RedirectPage(history);
         // setCallRedirect(true);
         // props.callRedirectPage(true);
@@ -208,11 +231,11 @@ const Header = (props) => {
         <> 
             {/* { callRedirect ? RedirectPage() :  */}
             {/* { showChangePass ? <ChangePassword show={showChangePass} setShow={toggleChangePass} /> : null } */}
-            <div className = "main-header">
+            <div className = "main-header" style={userRole == "Admin" ? {backgroundColor: "#eee"} : {backgroundColor: "#fff"}}>
                 <span className="header-logo-span"><img className="header-logo" alt="logo" src="static/imgs/logo.png" onClick={naviPg}/></span>
                     <div className="dropdown user-options">
 
-                        <div className="btn-container"><button className="fa fa-bell no-border"></button></div>
+                        <div className="btn-container"><button className="fa fa-bell no-border bell-ic"></button></div>
                         { userRole == "Admin" ? null :
                         <ClickAwayListener onClickAway={onClickAwaySR}>
                             <div className="switch-role-btn no-border" data-toggle="dropdown" onClick={()=>setShowSR(true)} >

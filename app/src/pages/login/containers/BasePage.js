@@ -27,9 +27,9 @@ const BasePage = () => {
             window.localStorage.clear();
             window.sessionStorage.clear();
             if (checkLogout) {
-                if ((typeof(checkLogout) == "object") && (checkLogout.length == 2)) {
+                if ((typeof(checkLogout) === "object") && (checkLogout.length === 2)) {
                     setLoginValidation("Your session has been terminated by "+checkLogout[0]);
-                    if (checkLogout[1] == "dereg") setLoginValidation("Reason: User is deleted from Avo Assure");
+                    if (checkLogout[1] === "dereg") setLoginValidation("Reason: User is deleted from Avo Assure");
                 } 
                 else setLoginValidation("You Have Successfully Logged Out!");
                 SetProgressBar("stop", dispatch);
@@ -40,29 +40,29 @@ const BasePage = () => {
                     let data = await api.checkUserState()
                     SetProgressBar("stop", dispatch);
                     setLoginValidation("Loading Profile...");
-                    if (data == "fail") setLoginValidation("Failed to load user profile.");
-                    else if (data == "unauthorized") setLoginValidation("User is not authorized to use Avo Assure.");
-                    else if (data == "badrequest") setLoginValidation("User does not have sufficient permission to view this page.");
-                    else if (data == "nouser") setLoginValidation("User profile not found in Avo Assure.");
-                    else if (data == "nouserprofile") setLoginValidation("User profile not found in Authorization Server.");
-                    else if (data == "userLogged") setLoginValidation("User is already logged in! Please logout from the previous session.");
-                    else if (data == "inValidCredential" || data == "invalid_username_password") setLoginValidation("The username or password you entered isn't correct. Please try again.");
-                    else if (data == "noProjectsAssigned") setLoginValidation("To Login, user must be allocated to a Domain and Project. Please contact Admin.");
-                    else if (data == "reload") window.location.reload();
-                    else if (data == "redirect") setRedirectTo('/login');
-                    else if (data == "Invalid Session") {
+                    if (data === "fail") setLoginValidation("Failed to load user profile.");
+                    else if (data === "unauthorized") setLoginValidation("User is not authorized to use Avo Assure.");
+                    else if (data === "badrequest") setLoginValidation("User does not have sufficient permission to view this page.");
+                    else if (data === "nouser") setLoginValidation("User profile not found in Avo Assure.");
+                    else if (data === "nouserprofile") setLoginValidation("User profile not found in Authorization Server.");
+                    else if (data === "userLogged") setLoginValidation("User is already logged in! Please logout from the previous session.");
+                    else if (data === "inValidCredential" || data === "invalid_username_password") setLoginValidation("The username or password you entered isn't correct. Please try again.");
+                    else if (data === "noProjectsAssigned") setLoginValidation("To Login, user must be allocated to a Domain and Project. Please contact Admin.");
+                    else if (data === "reload") window.location.reload();
+                    else if (data === "redirect") setRedirectTo('/login');
+                    else if (data === "Invalid Session") {
                         setLoginValidation("Your session has expired!");
                         setLoginAgain(true);
                     } else {
                         try{
                             let userinfo = await api.loadUserInfo()
-                            if (userinfo == "fail") setLoginValidation("Failed to Login.");
-                            else if (userinfo == "Invalid Session") {
+                            if (userinfo === "fail") setLoginValidation("Failed to Login.");
+                            else if (userinfo === "Invalid Session") {
                                 setLoginValidation("Your session has expired!");
                                 setLoginAgain(true);
                             } else {
                                 window.localStorage.navigateScreen = userinfo.page;
-                                dispatch({type:actionTypes.SET_USERINFO, payload: JSON.stringify(userinfo)});
+                                dispatch({type:actionTypes.SET_USERINFO, payload: userinfo});
                                 SetProgressBar("start", dispatch);
                                 setRedirectTo(`/${userinfo.page}`);
                             }
