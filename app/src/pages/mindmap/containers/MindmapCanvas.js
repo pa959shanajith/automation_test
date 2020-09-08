@@ -47,14 +47,13 @@ const Canvas = (props) => {
                 zoom.scale(1).translate([0,0]).event(d3.select(`.mp__canvas_svg`))
                 zoom.on("zoom",null)
             }
-            d3.select('.ct-container').attr("transform", "translate(" + tree.translate[0]+','+tree.translate[1] + ")scale(" + 1 + ")");
             setCreateNew(0)
         }else{
             //load mindmap from data
             tree = generateTree(props.module,types)
         }
         d3.select('.ct-container').attr("transform", "translate(" + tree.translate[0]+','+tree.translate[1] + ")scale(" + 1 + ")");
-        zoom = bindZoomListner(setCtScale,tree.translate,moving)
+        zoom = bindZoomListner(setCtScale,tree.translate)
         setLinks(tree.links)
         setdLinks(tree.dLinks)
         setNodes(tree.nodes)
@@ -110,7 +109,7 @@ const Canvas = (props) => {
             <NavButton/>
             <Legends/>
             <SaveButton/>
-            <svg className='mp__canvas_svg' ref={CanvasRef}>
+            <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
                 <g className='ct-container'>
                 {Object.entries(links).map((link)=>{
                 return(<path id={link[0]} key={link[0]+'_link'} className="ct-link" d={link[1].d}></path>)
@@ -136,8 +135,7 @@ const Canvas = (props) => {
     );
 }
 
-const moveNodeBegin = (idx,linkDisplay,dLinks,temp,cScale) => {
-    // d3.select('#ct-inpAct').classed('no-disp', !0);
+const moveNodeBegin = (idx,linkDisplay,dLinks,temp,pos) => {
     dLinks.forEach(function(d, i) {
         if (d.source.id === parseInt(idx)) {
             temp.s.push(i);
@@ -149,14 +147,13 @@ const moveNodeBegin = (idx,linkDisplay,dLinks,temp,cScale) => {
     });
     const svg = d3.select(`.mp__canvas_svg`);
     d3.select('#node_' + idx).classed('ct-movable', !0);
-    // var temp = document.getElementsByClassName('mp__canvas_svg')[0].getBBox()
     svg.on('mousemove', (e)=>{
-        d3.select('.ct-movable').attr('transform', "translate(" + parseFloat((d3.event.x - 4 ) /cScale.k  - cScale.x) + "," + parseFloat((d3.event.y - 90) / cScale.k - cScale.y)+ ")");
-        // [(parseFloat(l[0]) + 40) * ctScale.k + ctScale.x, (parseFloat(l[1]) + 40) * ctScale.k + ctScale.y];
+        const cSpan = [pos.x, pos.y];
+        const cScale = pos.k;
+        const svgOff = document.getElementById('mp__canvas_svg').getBoundingClientRect();
+        d3.select('.ct-movable').attr('transform', "translate(" + parseFloat((d3.event.x - svgOff.left - cSpan[0]) / cScale + 2) + "," + parseFloat((d3.event.y - svgOff.top - cSpan[1]) / cScale - 20) + ")");
         d3.event.preventDefault();
     })
-    // d3.select('.ct-movable').attr('transform', "translate(" + parseFloat((d3.event.x - cScale.x) / cScale.k - 4 ) + "," + parseFloat((d3.event.y - cScale.y) / cScale.k - 90)+ ")");
-
     return {linkDisplay,temp}
 }
 
@@ -422,6 +419,7 @@ function closestCord(arr_co, new_one) {
 }
 
 const bindZoomListner = (setCtScale,translate) => {
+    //need global move
     const svg = d3.select(`.mp__canvas_svg`);
     const g = d3.select(`.ct-container`);
     const zoom  = d3.behavior.zoom()
