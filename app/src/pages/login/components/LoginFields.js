@@ -178,7 +178,7 @@ const LoginFields = (props) => {
             <div className="username-wrap" style={userError ? loginValidation ? {borderColor: "#d33c3c"} : styles.errorBorder : null }>
                 <span><img className="ic-username" alt="user-ic" src={userError ? res.errorUserIcon : res.defaultUserIcon}/></span>
                 <input className="field" placeholder="Username" value={username} onChange={handleUsername}></input>
-                {showPassField && username ? true : <span className="ic-rightarrow fa fa-arrow-circle-right" onClick={checkUser}></span>}
+                {showPassField && username ? true : <span className="ic-rightarrow fa fa-arrow-circle-right arrow-circle" onClick={checkUser}></span>}
             </div>
             {userError && !loginValidation ? <div className="error-msg">Please Enter Username</div> : null}
             {
@@ -210,8 +210,8 @@ const res = {
     errorUserIcon :  "static/imgs/ic-username-error.png",
     defaultPassIcon : "static/imgs/ic-password.png",
     errorPassIcon : "static/imgs/ic-password-error.png",
-    eyeSlashIcon : "password-eye fa fa-eye-slash",
-    eyeIcon : "password-eye fa fa-eye",
+    eyeSlashIcon : "password-eye fa fa-eye-slash eye-ic",
+    eyeIcon : "password-eye fa fa-eye eye-ic",
 }
 
 

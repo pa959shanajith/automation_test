@@ -60,21 +60,19 @@
     z-index: 1;
     flex-grow: 1;
     color: #643693;
-    
+    font-family: "LatoWebMedium";
     
     h1 {
         font-family: "LatoWebBlack";
         font-size: 68px;
         margin-bottom: 6px;
     }
-    h2{
-        font-family: "LatoWebMedium";
+    h2{ 
         font-weight: 500;
         font-size: 40px;
         margin: 0 8px;
     }
     h3{
-        font-family: "LatoWebMedium";
         font-weight: 500;
         font-size: 25px;
         margin: 0 10px
@@ -91,36 +89,24 @@
     .element-holder{
         flex-direction: column;
         justify-content: center;
-        align-items: center;
         padding: 0 6%;
     }
     .logo-wrap{
         margin-bottom: 30px;
     }
     .greet-text{
-        z-index: 1;
         flex-grow: 0;
-        // margin-top: 18%;        // need to discuss
-        // margin-left: 7%;
-        color: #643693;
-        
         h1 {
-            font-family: "LatoWebBlack";
             font-size: 58px;
             margin-bottom: 3px;
             margin-top: 0;
         }
         h2{
-            font-family: "LatoWebMedium";
-            font-weight: 500;
             font-size: 30px;
             margin: 0 4px;
         }
         h3{
-            font-family: "LatoWebMedium";
-            font-weight: 500;
             font-size: 20px;
-            margin: 0 10px
         }
     }
 }
@@ -133,38 +119,23 @@
 
 @media screen and (min-width: 1366px){
     .greet-text{
-        z-index: 1;
-        flex-grow: 1;
-        // margin-top: 18%;        // need to discuss
-        // margin-left: 7%;
-        color: #643693;
-        
         h1 {
-            font-family: "LatoWebBlack";
             font-size: 3.5vw;
             margin-bottom: 1vw;
             margin-top: 0;
         }
         h2{
-            font-family: "LatoWebMedium";
-            font-weight: 500;
             font-size: 3vw;
             margin: 0 .5vw;
         }
         h3{
-            font-family: "LatoWebMedium";
-            font-weight: 500;
             font-size: 2.5vw;
         }
     }
         
     .login-block{
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
         margin-right: 10%;
         width: 20vw;
-        background: #FFF;
         padding: 5vw 3vw;
         border-radius: 3vw;
     }
@@ -174,7 +145,5 @@
     }
     .logo-wrap{
         margin-bottom: 4vw;
-        display: flex;
-        justify-content: center;
     }
 }

@@ -34,12 +34,6 @@
 }
 
 .user-name-btn{
-    display: flex;
-    flex-direction: row;
-    font-family: "LatoWeb";
-    color: #333;
-    justify-content: space-between;
-    align-items: center;
     padding-right: 12px;
     border-left: 1px solid gray;
 }
@@ -67,7 +61,7 @@
     flex-direction: row;
 }
 
-.switch-role-btn {
+.user-name-btn, .switch-role-btn {
     display: flex;
     flex-direction: row;
     font-family: "LatoWeb";
@@ -93,23 +87,8 @@
 
 .switch-role-menu{
     left: 20%!important;
-    div{
-        display: flex;
-        margin: 0;
-        padding: 0;
-    }
-    a{
-        width: 100%;
-        text-decoration: none!important;
-        outline: none;
-        border: none;
-        padding: 3px 20px!important;
-        &:hover{
-            color: rgb(145, 117, 117)!important;
-            background-color: #eee;
-        }
-    }
 }
+
 .switch-role-menu, .user-name-menu{
     z-index: 100;
     margin-right: 20px!important;
@@ -147,32 +126,16 @@
 
 @media screen and (max-width: 800px){
     .main-header {
-        display: flex;
-        flex-direction: row;
         padding: 2vw 0 2vw 2.5vw;
-        color: #333;
-        align-items: center;
     }
     
     .header-logo{
         height: 3.3vw;
-        cursor: pointer;
-    }
-    
-    .header-logo-span{
-        flex-grow: 1;
     }
     
     .no-border{
-        border: none;
-        outline: none;
-        background-color: transparent;
         padding: 0 2.8vw;
         font-size: 2.3vw;
-        font-weight: 400;
-        line-height: 1.42857143;
-        margin: 0;
-        cursor: pointer;
     }
     
     .user-name-icon{
@@ -182,21 +145,8 @@
     }
     
     .user-name-btn{
-        display: flex;
-        flex-direction: row;
-        font-family: "LatoWeb";
-        justify-content: space-between;
-        align-items: center;
         padding-right: 2vw;
         border-left: .1vw solid gray;
-    }
-    
-    .switch-role-btn {
-        display: flex;
-        flex-direction: row;
-        font-family: "LatoWeb";
-        justify-content: space-between;
-        align-items: center;
     }
     
     .switch-role-icon{
@@ -213,32 +163,17 @@
 
 @media screen and (min-width: 1367px){
     .main-header {
-        display: flex;
-        flex-direction: row;
         padding: .9vw 0 .9vw 1.5vw;
         color: rgb(151, 151, 151);
-        align-items: center;
     }
     
     .header-logo{
         height: 2.5vw;
-        cursor: pointer;
-    }
-    
-    .header-logo-span{
-        flex-grow: 1;
     }
     
     .no-border{
-        border: none;
-        outline: none;
-        background-color: transparent;
         padding: 0 2vw;
         font-size: 1.3vw;
-        font-weight: 400;
-        line-height: 1.42857143;
-        margin: 0;
-        cursor: pointer;
     }
     
     .user-name-icon{
@@ -248,11 +183,6 @@
     }
     
     .user-name-btn{
-        display: flex;
-        flex-direction: row;
-        font-family: "LatoWeb";
-        justify-content: space-between;
-        align-items: center;
         padding-right: 1vw;
         border-left: .1vw solid gray;
     }
@@ -272,7 +202,6 @@
             margin: 0;
             padding: 0;
         }
-        // right:87%;
         a{
             width: 100%;
             text-decoration: none!important;
@@ -305,14 +234,6 @@
         
     }
 
-    .switch-role-btn {
-        display: flex;
-        flex-direction: row;
-        font-family: "LatoWeb";
-        justify-content: space-between;
-        align-items: center;
-    }
-    
     .switch-role-icon{
         height: 1.8vw;
         width: 1.8vw;

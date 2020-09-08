@@ -28,11 +28,8 @@
     display: flex;
     justify-content: flex-end;
     align-items: baseline;
-    font-size: 1.0vw; //tochange
-    line-height: 1.42857143;
+    font-size: 1.0vw;
 }
-
-
 
 .right-text{
     font-size: 0.95vw;
@@ -41,14 +38,13 @@
 }
 
 .footer-logo{
-    // vertical-align: baseline;
     margin-left: .5vw;
     height: 1.1vw;
 }
 
 @media screen and (max-width: 1025px){
     .left-text{
-        font-size: 1.5vw; //tochange
+        font-size: 1.5vw;
         line-height: 1.42857143;
     }
     
@@ -58,7 +54,6 @@
     }
     
     .footer-logo{
-        // vertical-align: baseline;
         margin-left: 3px;
         height: 14px;
     }
@@ -67,10 +62,6 @@
 
 @media screen and (min-width: 1366px){    
     .left-text{
-        width: fit-content;
-        display: flex;
-        justify-content: flex-end;
-        align-items: baseline;
         font-size: 1.1vw; //tochange
         line-height: 1.42857143;
     }
