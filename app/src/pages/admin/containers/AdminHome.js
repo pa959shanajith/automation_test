@@ -3,12 +3,12 @@ import LeftPanel from './LeftPanel'
 import CreateUser from './CreateUser'
 import Project from './Project'
 import ProjectAssign from './ProjectAssign'
+import {Header,FooterTwo} from '../../global'
 import '../styles/AdminHome.scss'
 
 /*Component AdminHome
   use: renders Admin landing page (footer,header,sidebars,middle saection)
-  todo: select Icon css(dark)
-        font-family: LatoWeb;
+  todo: 
 */
 
 const AdminHome = () => {
@@ -19,8 +19,7 @@ const AdminHome = () => {
 
     return (
         <Fragment>
-                <div className="header">header</div>
-                
+                <Header />
                 <LeftPanel resetMiddleScreen={resetMiddleScreen} setResetMiddleScreen={setResetMiddleScreen} middleScreen={middleScreen} setMiddleScreen={setMiddleScreen} setShowEditUser={setShowEditUser}/>
 
                 {/* <!--Middle Panel--> */}
@@ -41,9 +40,7 @@ const AdminHome = () => {
 
                 { /* <!--Right Panel--> */}
                 <div id="right-dependencies-section"></div>
-
-                <div className="footer">footer</div>
-
+                <FooterTwo />
         </Fragment>
   );
 }
