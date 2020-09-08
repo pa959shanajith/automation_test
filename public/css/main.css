@@ -565,8 +565,8 @@ input[type="radio"]{
 }
 
 .plugin-logo {
-    width: 110px;
-    height: 110px;
+    width: 130px;
+    height: 130px;
 }
 
 .plugin-block span {
@@ -585,7 +585,7 @@ input[type="radio"]{
 }
 
 .plugin-block span h4{
-    width: 110px;
+    width: 130px;
     margin-top: 5px;
     text-align:center;
 }
@@ -4620,7 +4620,7 @@ select:-webkit-autofill:focus {
 	.encryptionData-body{height: 176px;}
 	#optimization-fn{position: relative; top: 50%; left: 50%; transform: translateX(-50%) translateY(70%);}
 	.col-md-5{width: 43.5%;}
-	.plugin-block{height: 116px; background-size: 115px; margin-bottom: 8%;width: 38%;}
+	.plugin-block{height: 116px; background-size: 115px; margin-bottom: 11%;width: 38%;}
 	.plugin-block span{
 		font-size: 15px;
 		line-height: 19px;
