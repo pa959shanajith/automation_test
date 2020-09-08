@@ -80,6 +80,7 @@ const ProjectNew = (props) => {
                     if (data === "Invalid Session") ;// $rootScope.redirectPage();
                     else {
                         if(data.length===0){
+                            // eslint-disable-next-line
                             data=['Banking','Manufacturing','Finance'];
                         }
                         setSelDomainOptions(data);
@@ -156,6 +157,7 @@ const ProjectNew = (props) => {
     }
 
     const clickAddReleaseName = (props)=>{
+        // eslint-disable-next-line
         var reg = /^[a-zA-Z0-9\s\.\-\_]+$/;
         if (releaseTxt.trim() === "") {
             setModalInputErrorBorder(true);
@@ -227,6 +229,7 @@ const ProjectNew = (props) => {
 		setFlag(false);
 		// var editReleaseId = editReleaseID;
         var editRelid = existingReleaseName;
+        // eslint-disable-next-line
         var reg = /^[a-zA-Z0-9\s\.\-\_]+$/;
         if (releaseTxt=== "") {
             setModalInputErrorBorder(true);
@@ -386,6 +389,7 @@ const ProjectNew = (props) => {
         var existingCycleName = oldCyclename;
         // var editCycId = oldCyclename; //check if needed or not || using from updateProjectDetails
         setFlag(false);
+        // eslint-disable-next-line
         var reg = /^[a-zA-Z0-9\s\.\-\_]+$/;
         for (var i = 0; i < cycleList.length; i++) {
             if (cycleList[i] === cycleTxt.trim()) {
@@ -558,7 +562,7 @@ const ProjectNew = (props) => {
 
     //Add Cycle Name Functionality
     const clickAddCycleName = (props)=>{
-        
+        // eslint-disable-next-line 
         var reg = /^[a-zA-Z0-9\s\.\-\_]+$/;
         var relName = activeRelease;
         // e.preventDefault();

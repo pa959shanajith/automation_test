@@ -11,7 +11,7 @@ export const logoutUser = async() => {
             data: {'param': 'logoutUser'},
             credentials : 'include'
         });
-        if (res.status == 200) {
+        if (res.status === 200) {
             return res.data;
         }
         else{
@@ -33,7 +33,7 @@ export const getNames_ICE = async(requestedIds, idType) => {
             data: {'param': 'getNames_ICE', requestedids : requestedIds, idtype : idType},
             credentials : 'include'
         });
-        if (res.status == 200) {
+        if (res.status === 200) {
             return res.data;
         }
         else{
@@ -51,7 +51,7 @@ export const keepSessionAlive = async() => {
             method : 'POST',
             credentials : 'include'
         });
-        if (res.status == 200) {
+        if (res.status === 200) {
             return res.data;
         }
         else{

@@ -15,18 +15,23 @@ const ProjectNew = (props) => {
     const [selectBox,setSelectBox] = useState([])
     const [assignProj,setAssignProj] = useState({allProjectAP:[],assignedProjectAP:[]})
     const [assignedProjectInitial,setAssignedProjectInitial] = useState([])
-    const [showload,setShowload] = useState(false)
+    const [unAssignedFlag,setUnAssignedFlag] = useState(false)
+    const [showAssignProjectModal,setShowAssignProjectModal] = useState(false)
+    const [statechange,setStateChange] = useState(true)
     const [selDomainsOptions,setSelDomainsOptions] = useState([])
     const [selectedUserName,setSelectedUserName] = useState("")
     const [selectedProject,setSelectedProject] = useState("")
     const [selectedUserId,setSelectedUserId] = useState("")
     const [getAssignedProjectsLen,setGetAssignedProjectsLen] = useState(0)
+    // eslint-disable-next-line
+    const [showload,setShowload] = useState(false)
+    // eslint-disable-next-line
     const [unAssignedProjects,setUnAssignedProjects] = useState([])
+    // eslint-disable-next-line
     const [assignedProjects,setAssignedProjects] = useState([])
+    // eslint-disable-next-line
     const [diffprj,setDiffprj] = useState("")
-    const [unAssignedFlag,setUnAssignedFlag] = useState(false)
-    const [showAssignProjectModal,setShowAssignProjectModal] = useState(false)
-    const [statechange,setStateChange] = useState(true)
+    
 
     useEffect(()=>{
         setShowload(false);
@@ -402,7 +407,7 @@ const ProjectNew = (props) => {
                 </div>
                 
                 <div className='userForm-project projectForm-project' style={{display: "flex"}} >
-                    <div className='domainTxt'>Project</div>
+                    <div className='domainTxt'>Domain</div>
                     <select onChange={(event)=>{ClickSelDomains(event.target.value)}}  className={domainSelectErrorBorder===true?'selectErrorBorder adminSelect-project form-control__conv-project ':"adminSelect-project form-control__conv-project "} id="selDomains" style={{width: "100%"}} >
                             <option key="" value="" selected>Please Select Your Domain</option>
                             {selDomainsOptions.map((data)=>(
@@ -419,9 +424,9 @@ const ProjectNew = (props) => {
 					<div className="wrap left-select scrollbar-inner">
 						{/* <!--Labels--> */}
 						<label className="labelStyle1">All Projects</label>
-                        {((selectedProject ==="" && selectedUserName!=="") || showload)?
+                        {/* {((selectedProject ==="" && selectedUserName!=="") || showload)?
                         <img className="load" style={{position: "relative", left: "10px", bottom: "4px"}} src={"static/imgs/loader.gif"} alt="Loading..."/>
-                        :null}
+                        :null} */}
                         {/* <!--Labels--> */}
 						<div className="seprator" style={{marginBottom:"0px"}}>
 							<select multiple id="allProjectAP" className="ng-pristine ng-untouched ng-valid">
@@ -439,20 +444,20 @@ const ProjectNew = (props) => {
 
 					{/* <!--Center Input--> */}
 					<div className="wrap wrap-editpro center-button">
-						<button id="rightall" type="button" onClick={()=>{moveItemsRightall('#allProjectAP', '#assignedProjectAP')}} title="Move all to right"> &gt;&gt; </button>
 						<button type="button" id="rightgo"  onClick={()=>{moveItemsRightgo('#allProjectAP', '#assignedProjectAP')}} title="Move to right"> &gt; </button>
-						<button type="button" id="leftgo" onClick={()=>{moveItemsLeftgo('#assignedProjectAP','#allProjectAP')}} title="Move to left"> &lt; </button>
+						<button id="rightall" type="button" onClick={()=>{moveItemsRightall('#allProjectAP', '#assignedProjectAP')}} title="Move all to right"> &gt;&gt; </button>
 						<button id="leftall" type="button" onClick={()=>{moveItemsLeftall('#assignedProjectAP','#allProjectAP')}} title="Move all to left"> &lt;&lt; </button>
-					</div>
+                        <button type="button" id="leftgo" onClick={()=>{moveItemsLeftgo('#assignedProjectAP','#allProjectAP')}} title="Move to left"> &lt; </button>
+						</div>
 					{/* <!--Center Input--> */}
 
 					{/* <!--Right Select Box--> */}
 					<div className="wrap right-select">
 						{/* <!--Labels--> */}
 						<label className="labelStyle1">Assigned Projects</label>
-                        {((selectedProject ==="" && selectedUserName!=="") || showload)?
+                        {/* {((selectedProject ==="" && selectedUserName!=="") || showload)?
                         <img className="load" style={{position: "relative", left: "10px", bottom: "4px"}} src={"static/imgs/loader.gif"} alt="Loading..."/>
-                        :null}
+                        :null} */}
                         {/* <!--Labels--> */}
 
 						<div className="seprator" style={{marginBottom:"0px"}}>
