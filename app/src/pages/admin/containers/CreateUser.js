@@ -1,5 +1,6 @@
 import React, { Fragment, useState, useEffect , useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import {ScreenOverlay} from '../../global' 
 import {getUserRoles, manageUserDetails, getLDAPConfig, getSAMLConfig, getOIDCConfig, getUserDetails, fetchICE, manageSessionData} from '../api';
 import * as actionTypes from '../state/action';
 import '../styles/CreateUser.scss'
@@ -33,6 +34,8 @@ const CreateUser = (props) => {
     const [passwordAddClass,setPasswordAddClass] = useState(false)
     const [allUserFilList,setAllUserFilList] = useState(userConf.allUsersList)
     const [ldapUserList,setLdapUserList] = useState([])
+    const [loading,setLoading] = useState(false)
+    const [loadingContent,setLoadingContent] = useState("")
 
     useEffect(()=>{
         
@@ -60,7 +63,7 @@ const CreateUser = (props) => {
     const manage = (props) =>{
         const action = props.action;
         if (!validate({action:action})) return;
-        // const bAction = action.charAt(0).toUpperCase() + action.substr(1);
+        const bAction = action.charAt(0).toUpperCase() + action.substr(1);
         const uType = userConf.type;
         const addRole = [];
         for (let role in userConf.addRole) {
@@ -81,12 +84,14 @@ const CreateUser = (props) => {
             server: userConf.server
         };
         if (uType==="ldap") userObj.ldapUser = userConf.ldap.user;
-        // blockUI(bAction.slice(0,-1)+"ing User...");
+        setLoadingContent(bAction.slice(0,-1)+"ing User...");
+        setLoading(true);
+        
         
         (async()=>{
             try{
                 var data = await manageUserDetails(action, userObj);
-                // unblockUI();
+                setLoading(false);
                 if(data === "Invalid Session") {
                     // $rootScope.redirectPage();
                 } else if(data === "success") {
@@ -133,7 +138,7 @@ const CreateUser = (props) => {
                 }
             }
             catch(error){
-                // unblockUI();
+                setLoading(false);
                 // openModalPopup(bAction+" User", "Failed to "+action+" user.");
                 alert("Failed to "+action+" user.");
                 console.log("Error:::", error);
@@ -295,9 +300,10 @@ const CreateUser = (props) => {
             try{
                 dispatch({type:actionTypes.UPDATE_LDAP,payload:{fetch: "map", user: ''}})
                 dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
-                // blockUI("Fetching LDAP Server configurations...");
+                setLoadingContent("Fetching LDAP Server configurations...");
+                setLoading(true);
                 var data = await getLDAPConfig("server");
-                // unblockUI();
+                setLoading(false);
                 if(data === "Invalid Session") ; //$rootScope.redirectPage();
                 else if(data === "fail")alert("Failed to fetch LDAP server configurations.");//openModalPopup("Create User", "Failed to fetch LDAP server configurations.");
                 else if(data === "empty")alert("There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section.") ;//openModalPopup("Create User","There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section.");
@@ -308,7 +314,7 @@ const CreateUser = (props) => {
                     dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data})
                 }
             } catch(error){
-                // unblockUI();
+                setLoading(false);
                 console.log("Error:::::::::::::", error);
                 alert("Failed to fetch LDAP server configurations");
                 // openModalPopup("Create User", "Failed to fetch LDAP server configurations");
@@ -320,10 +326,11 @@ const CreateUser = (props) => {
         (async()=>{
             try{
                 dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
-                // blockUI("Fetching SAML Server configurations...");
+                setLoadingContent("Fetching SAML Server configurations...");
+                setLoading(true);
                 
                 var data = await getSAMLConfig();
-                // unblockUI();
+                setLoading(false);
                 if(data === "Invalid Session");//$rootScope.redirectPage();
                 else if(data === "fail") alert("Failed to fetch SAML server configurations.");//openModalPopup("Create User", "Failed to fetch SAML server configurations.");
                 else if(data === "empty")alert("There are no SAML server configured. To proceed create a server configuration in SAML configuration section.");//openModalPopup("Create User","There are no SAML server configured. To proceed create a server configuration in SAML configuration section.");
@@ -335,7 +342,7 @@ const CreateUser = (props) => {
                     dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data})
                 }
             }catch(error){
-                // unblockUI();
+                setLoading(false);
 				console.log("Error:::::::::::::", error);
                 // openModalPopup("Create User", "Failed to fetch SAML server configurations");
                 alert("Failed to fetch SAML server configurations");
@@ -347,9 +354,10 @@ const CreateUser = (props) => {
         (async()=>{
             try{
                 dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
-                // blockUI("Fetching OpenID Server configurations...");
+                setLoadingContent("Fetching OpenID Server configurations...");
+                setLoading(true);
                 var data = await getOIDCConfig();
-                // unblockUI();
+                setLoading(false);
                 if(data === "Invalid Session") ; //$rootScope.redirectPage();
                 else if(data === "fail")alert("Failed to fetch OpenID server configurations.") ;//openModalPopup("Create User", "Failed to fetch OpenID server configurations.");
                 else if(data === "empty") alert("There are no OpenID server configured. To proceed create a server configuration in OpenID configuration section.") ;//openModalPopup("Create User","There are no OpenID server configured. To proceed create a server configuration in OpenID configuration section.");
@@ -360,7 +368,7 @@ const CreateUser = (props) => {
                     dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data})
                 }
             }catch(error){
-                // unblockUI();
+                setLoading(false);
                 console.log("Error:::::::::::::", error);
                 // openModalPopup("Create User", "Failed to fetch OpenID server configurations");
                 alert("Failed to fetch OpenID server configurations");
@@ -377,10 +385,11 @@ const CreateUser = (props) => {
 		const ldapServer = userConf.server;
         dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
         dispatch({type:actionTypes.UPDATE_LDAP_ALLUSER_LIST,payload:[]})
-		// blockUI("Fetching LDAP users...");
+        setLoadingContent("Fetching LDAP users...");
+        setLoading(true);
         try{
             const data = await getLDAPConfig("user", ldapServer);
-            // unblockUI();
+            setLoading(false);
 			if(data === "Invalid Session");// $rootScope.redirectPage();
 			else if(data === "fail")alert("Failed to LDAP fetch users") ;// openModalPopup("Create User", "Failed to LDAP fetch users");
 			else if(data === "insufficient_access")alert("Either Credentials provided in LDAP server configuration does not have required privileges for fetching users or there are no users available in this Server") ;//openModalPopup("Create User", "Either Credentials provided in LDAP server configuration does not have required privileges for fetching users or there are no users available in this Server");
@@ -394,7 +403,7 @@ const CreateUser = (props) => {
                 setLdapUserList(ldapAllUserList);  
             }
         }catch(error){
-            // unblockUI();
+            setLoading(false);
             console.log("Error:::::::::::::", error);
             // openModalPopup("Create User", "Failed to fetch LDAP server configurations");
             alert("Failed to fetch LDAP server configurations");
@@ -424,11 +433,11 @@ const CreateUser = (props) => {
 			return;
 		}
 		clearForm(true);
-		// blockUI("Fetching User details...");
+        setLoadingContent("Fetching User details...");
+        setLoading(true);
         try{    
             const data = await getLDAPConfig("user", ldapServer, ldapUser);
-		
-			// unblockUI();
+            setLoading(false);
 			if(data === "Invalid Session");// $rootScope.redirectPage();
 			else if(data === "fail")alert("Failed to populate User details");// openModalPopup("Create User", "Failed to populate User details");
 			else if(data === "insufficient_access")alert("Either Credentials provided in LDAP server configuration does not have required privileges for fetching users or there is no such user");// openModalPopup("Create User", "Either Credentials provided in LDAP server configuration does not have required privileges for fetching users or there is no such user");
@@ -441,7 +450,7 @@ const CreateUser = (props) => {
                 dispatch({type:actionTypes.UPDATE_INPUT_EMAIL,payload:data.email})  
             }
         }catch(error){
-           	// unblockUI();
+            setLoading(false);
             console.log("Error:::::::::::::", error);
             alert("Failed to fetch LDAP server configurations");
 		    // 	openModalPopup("Create User", "Failed to fetch LDAP server configurations");
@@ -458,10 +467,11 @@ const CreateUser = (props) => {
         click(); 
         dispatch({type:actionTypes.UPDATE_TYPE,payload: "inhouse"})
         dispatch({type:actionTypes.UPDATE_FTYPE,payload: "Default"})
-        //   blockUI("Fetching users...");
+        setLoadingContent("Fetching users...");
+        setLoading(true);
         try{
             var data = await getUserDetails("user");
-            //   unblockUI();
+            setLoading(false);
             if(data === "Invalid Session");//$rootScope.redirectPage();
             else if(data === "fail") alert("Failed to fetch users.");//openModalPopup("Edit User", "Failed to fetch users.");
             else if(data === "empty") alert("There are no users created yet.");//openModalPopup("Edit User", "There are no users created yet.");
@@ -471,7 +481,7 @@ const CreateUser = (props) => {
                 setAllUserFilList(data);
             }
         }catch(error){
-            //       unblockUI();
+            setLoading(false);
             //       openModalPopup("Edit User", "Failed to fetch users.");
             alert("Failed to fetch users.");
         }
@@ -482,10 +492,11 @@ const CreateUser = (props) => {
         dispatch({type:actionTypes.UPDATE_USERID,payload: userObj[0]});
         dispatch({type:actionTypes.UPDATE_INPUT_USERNAME,payload: userObj[1]});
 		var failMsg = "Failed to fetch user details.";
-		// blockUI("Fetching User details...");
+        setLoadingContent("Fetching User details...");
+        setLoading(true);
         try{    
             const data = await getUserDetails("userid", userObj[0]);
-			// unblockUI();
+            setLoading(false);
 			if(data === "Invalid Session") ;//$rootScope.redirectPage();
 			else if(data === "fail")alert(failMsg) ;//openModalPopup("Edit User", failMsg);
 			else {
@@ -513,9 +524,10 @@ const CreateUser = (props) => {
                         try{
                             dispatch({type:actionTypes.UPDATE_LDAP,payload:{fetch: "map", user: ''}})
                             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
-                            // blockUI("Fetching LDAP Server configurations...");
+                            setLoadingContent("Fetching LDAP Server configurations...");
+                            setLoading(true);
                             var data1 = await getLDAPConfig("server");
-                            // unblockUI();
+                            setLoading(false);
                             if(data1 === "Invalid Session") ; //$rootScope.redirectPage();
                             else if(data1 === "fail")alert("Failed to fetch LDAP server configurations.");//openModalPopup("Create User", "Failed to fetch LDAP server configurations.");
                             else if(data1 === "empty")alert("There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section.") ;//openModalPopup("Create User","There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section.");
@@ -525,7 +537,7 @@ const CreateUser = (props) => {
                                 dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data1})
                             }
                         } catch(error){
-                            // unblockUI();
+                            setLoading(false);
                             console.log("Error:::::::::::::", error);
                             alert("Failed to fetch LDAP server configurations");
                             // openModalPopup("Create User", "Failed to fetch LDAP server configurations");
@@ -535,10 +547,10 @@ const CreateUser = (props) => {
                     else if (data.type === "saml"){
                          try{
                             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
-                            // blockUI("Fetching SAML Server configurations...");
-                            
+                            setLoadingContent("Fetching SAML Server configurations...");
+                            setLoading(true);
                             data1 = await getSAMLConfig();
-                            // unblockUI();
+                            setLoading(false);
                             if(data1 === "Invalid Session");//$rootScope.redirectPage();
                             else if(data1 === "fail") alert("Failed to fetch SAML server configurations.");//openModalPopup("Create User", "Failed to fetch SAML server configurations.");
                             else if(data1 === "empty")alert("There are no SAML server configured. To proceed create a server configuration in SAML configuration section.");//openModalPopup("Create User","There are no SAML server configured. To proceed create a server configuration in SAML configuration section.");
@@ -550,7 +562,7 @@ const CreateUser = (props) => {
                                 dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data1})
                             }
                         }catch(error){
-                            // unblockUI();
+                            setLoading(false);
                             console.log("Error:::::::::::::", error);
                             // openModalPopup("Create User", "Failed to fetch SAML server configurations");
                             alert("Failed to fetch SAML server configurations");
@@ -559,9 +571,10 @@ const CreateUser = (props) => {
                     else if (data.type === "oidc"){ 
                         try{
                             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
-                            // blockUI("Fetching OpenID Server configurations...");
+                            setLoadingContent("Fetching OpenID Server configurations...");
+                            setLoading(true);
                             data1 = await getOIDCConfig();
-                            // unblockUI();
+                            setLoading(false);
                             if(data1 === "Invalid Session") ; //$rootScope.redirectPage();
                             else if(data1 === "fail")alert("Failed to fetch OpenID server configurations.") ;//openModalPopup("Create User", "Failed to fetch OpenID server configurations.");
                             else if(data1 === "empty") alert("There are no OpenID server configured. To proceed create a server configuration in OpenID configuration section.") ;//openModalPopup("Create User","There are no OpenID server configured. To proceed create a server configuration in OpenID configuration section.");
@@ -572,7 +585,7 @@ const CreateUser = (props) => {
                                 dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data1})
                             }
                         }catch(error){
-                            // unblockUI();
+                            setLoading(false);
                             console.log("Error:::::::::::::", error);
                             // openModalPopup("Create User", "Failed to fetch OpenID server configurations");
                             alert("Failed to fetch OpenID server configurations");
@@ -589,7 +602,7 @@ const CreateUser = (props) => {
 				}
             }
         }catch(error){
-            // 	unblockUI();
+            setLoading(false);
             // 	openModalPopup("Edit User", failMsg);
             alert(failMsg);
         }    
@@ -609,6 +622,7 @@ const CreateUser = (props) => {
 
     return (
         <Fragment>
+            {loading?<ScreenOverlay content={loadingContent}/>:null}
             <div id="page-taskName"><span>{(props.showEditUser===false)?"Create User":"Edit User"}</span></div>
             
             {(props.showEditUser===false)?

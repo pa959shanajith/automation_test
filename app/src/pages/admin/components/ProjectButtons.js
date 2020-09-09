@@ -1,16 +1,17 @@
 import React ,  { Fragment, useState} from 'react';
 import { getNames_ICE, createProject_ICE, updateProject_ICE} from '../api';
-
-
+import {ScreenOverlay} from '../../global' 
 import '../styles/ProjectButtons.scss';
 
 /*Component ProjectButtons
   use: Contains Project Management Buttons and Create and Update Actions
-  todo: add try catch, Modals
+  todo: Modals
 */
     
 const ProjectButtons = (props) => {
     const [valid,setValid] = useState("")
+    const [loading,setLoading] = useState(false)
+    const [loadingContent,setLoadingContent] = useState("")
 
     // Create Project Action
     const create_project = async()=>{
@@ -71,7 +72,8 @@ const ProjectButtons = (props) => {
                             return false;
                         }
                         if (proceeed === true) {
-                            // blockUI("Loading...");
+                            setLoadingContent("Loading...");
+                            setLoading(true);
                             // var userDetails = JSON.parse(window.localStorage['_UI']);
                             const createprojectObj = {};
                             createprojectObj.domain = props.selDomain;
@@ -94,7 +96,7 @@ const ProjectButtons = (props) => {
                                     alert("Failed to create project");
                                     props.resetForm();
                                 }
-                                // unblockUI();
+                                setLoading(false);
                             }catch(error){
                                 console.log("Error:::::::::::::", error);
                             }    
@@ -105,7 +107,7 @@ const ProjectButtons = (props) => {
 				}
             }
             else {
-				// unblockUI();
+				setLoading(false);
                 // openModalPopup("Create Project", "Please add atleast one cycle for a release");
                 alert("Please add atleast one cycle for a release");
 			}
@@ -139,7 +141,8 @@ const ProjectButtons = (props) => {
             alert("Please add atleast one release");
             // openModalPopup("Update Project", "Please add atleast one release");
 		}else {
-			// blockUI("Loading...");
+            setLoadingContent("Loading...");
+            setLoading(true);
 			props.setFlag(false);
 			//Update project details json with editedProjectDetails, deletedProjectDetails, newProjectDetails
             
@@ -202,7 +205,7 @@ const ProjectButtons = (props) => {
 				}
             }
             if (proceedFlag === false) {
-				// unblockUI();
+				setLoading(false);
 				// openModalPopup("Update Project", "Please add atleast one cycle for release: " + relName);
                 alert( "Please add atleast one cycle for release: " + relName);
                 return false;
@@ -234,7 +237,7 @@ const ProjectButtons = (props) => {
                         alert("Failed to update project");
                         props.resetForm();
                     }
-                    // unblockUI();
+                    setLoading(false);
                 }catch(error){
                     console.log("Error:::::::::::::", error);
                 }    
@@ -243,15 +246,18 @@ const ProjectButtons = (props) => {
     }
 
     return(
-        <div className="adminActionBtn">
-            {props.taskName==="Create Project"?
-                <Fragment>
-                    <button className="btn-md pull-right adminBtn" onClick={()=>props.editProjectTab()}  title="Edit Project">Edit</button>
-                    <button className="btn-md pull-right adminBtn" onClick={()=>{create_project()}} style={{marginRight:"10px"}} title="Create Project">Create</button>            
-                </Fragment>
-            :<button className="btn-md pull-right adminBtn" onClick={()=>{updateProject()}}  title="Update Project">Update</button>
-            }
-        </div> 
+        <Fragment>
+            {loading?<ScreenOverlay content={loadingContent}/>:null}
+            <div className="adminActionBtn">
+                {props.taskName==="Create Project"?
+                    <Fragment>
+                        <button className="btn-md pull-right adminBtn" onClick={()=>props.editProjectTab()}  title="Edit Project">Edit</button>
+                        <button className="btn-md pull-right adminBtn" onClick={()=>{create_project()}} style={{marginRight:"10px"}} title="Create Project">Create</button>            
+                    </Fragment>
+                :<button className="btn-md pull-right adminBtn" onClick={()=>{updateProject()}}  title="Update Project">Update</button>
+                }
+            </div> 
+        </Fragment>
     )
 }
 

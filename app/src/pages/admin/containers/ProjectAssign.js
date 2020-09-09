@@ -1,5 +1,6 @@
 import React ,  { Fragment, useEffect, useState} from 'react';
 import {getUserDetails, getDomains_ICE, getAssignedProjects_ICE, getDetails_ICE, assignProjects_ICE} from '../api';
+import {ScreenOverlay} from '../../global' 
 import '../styles/ProjectAssign.scss';
 import AssignProjectmodal from '../components/AssignProjectModal'
 
@@ -22,6 +23,8 @@ const ProjectNew = (props) => {
     const [selectedUserName,setSelectedUserName] = useState("")
     const [selectedProject,setSelectedProject] = useState("")
     const [selectedUserId,setSelectedUserId] = useState("")
+    const [loading,setLoading] = useState(false)
+    const [loadingContent,setLoadingContent] = useState("")
     const [getAssignedProjectsLen,setGetAssignedProjectsLen] = useState(0)
     // eslint-disable-next-line
     const [showload,setShowload] = useState(false)
@@ -342,9 +345,10 @@ const ProjectNew = (props) => {
         // txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
         
         try{
-            // blockUI('Saving in Progress. Please Wait...');
+            setLoadingContent('Saving in Progress. Please Wait...');
+            setLoading(true);
             const data = await assignProjects_ICE(assignProjectsObj)
-            // unblockUI();
+            setLoading(false);
             if (data === "Invalid Session") {
                 //$rootScope.redirectPage();
             }
@@ -385,7 +389,7 @@ const ProjectNew = (props) => {
     
     return (
         <Fragment>
-            
+            {loading?<ScreenOverlay content={loadingContent}/>:null}
             <div id="page-taskName">
                 <span>Assign Project</span>
 		    </div>

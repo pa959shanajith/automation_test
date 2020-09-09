@@ -1,10 +1,11 @@
 import React ,  { Fragment, useEffect, useState } from 'react';
 import {getAvailablePlugins , getDomains_ICE, getDetails_ICE} from '../api';
 import EditGlobalModal from '../components/EditGlobalModal'
-import 'font-awesome/css/font-awesome.min.css';
-import '../styles/Project.scss';
+import {ScreenOverlay} from '../../global'
 import ProjectButtons from '../components/ProjectButtons';
 import ReleaseCycle from '../components/ReleaseCycle';
+import 'font-awesome/css/font-awesome.min.css';
+import '../styles/Project.scss';
 
 /*Component ProjectNew
   use: renders create New Project page
@@ -51,6 +52,8 @@ const ProjectNew = (props) => {
     // const [editReleaseID,setEditReleaseId] = useState("")
     const [oldCyclename,setOldCyclename] = useState("")
     const [showEditNameModalCycle,setShowEditNameModalCycle] = useState("")
+    const [loading,setLoading] = useState(false)
+    const [loadingContent,setLoadingContent] = useState("")
 
     useEffect(()=>{
         getDomains();
@@ -58,15 +61,15 @@ const ProjectNew = (props) => {
     },[props.resetMiddleScreen["projectTab"]])
 
     const getDomains = () => {
-        (async()=>{
+        (async()=>{    
             setTaskName("Create Project")
             resetForm();
             setProjectDetails([]);
             setUpdateProjectDetails([]);
             var plugins = []; 
-            // $(".selectedIcon").removeClass("selectedIcon");
-            // $(this).children().find("span.fa").addClass("selectedIcon");;
             try{
+                setLoadingContent("Loading...");
+                setLoading(true);
                 const plugins_list = await getAvailablePlugins();
                 for (var i = 0; i < plugins_list.length; i++) {
                     plugins[i] = plugins_list[i];
@@ -105,8 +108,10 @@ const ProjectNew = (props) => {
                     }
                 }catch(error){
                     console.log("Error:::::::::::::", error);
-                }    
+                } 
+                setLoading(false);   
             }catch(error){
+                setLoading(false);
                 console.log("Error:::::::::::::", error);
             }
         })()
@@ -805,6 +810,7 @@ const ProjectNew = (props) => {
     
     return (
     <Fragment>
+        {loading?<ScreenOverlay content={loadingContent}/>:null}
         <div id="page-taskName">
 				{taskName==="Create Project"?
                 <span>Create Project</span>
