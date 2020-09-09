@@ -269,7 +269,7 @@ input[type="radio"]{
     top: 9px;
 }
 .hidden1{
-    display: none;
+    visibility: hidden;
 }
 
 #footer {
