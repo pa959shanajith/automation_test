@@ -12,6 +12,7 @@ module.exports.initalize = async () => {
 	const chList = await utils.fetchData(inputs, "admin/getNotificationChannels", fnName);
 	chList.forEach((ch)=> {
 		const chType = ch.channel;
+		return // remove this
 		if (!channels[chType]) {
 			if (chType == "email") channels[chType] = new email(ch);
 			//else if (chType == "otherChannelType") channels[chType] = otherChannelType;
@@ -71,7 +72,7 @@ module.exports.notify = async (event, data, channel) => {
 };
 
 module.exports.update = async () => {
-
+	
 };
 
 // UI notifications

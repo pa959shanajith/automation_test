@@ -51,8 +51,8 @@ mySPA.factory('LoginService', ['$http', '$q', function ($http, $q) {
 				return $q.reject(response.data);
 			});
 		},
-		checkUserState: function () {
-			return $http.post('/checkUserState')
+		validateUserState: function () {
+			return $http.post('/validateUserState')
 			.then(function (response) {
 				return response.data;
 			},
