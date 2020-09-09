@@ -64,6 +64,19 @@
     color:#a0a0a0;
     font-size: 20px;
 }
+
+.no-decor{
+    border: none;
+    outline: none;
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+    &:focus{
+        border: none;
+        outline: none;
+    }
+}
+
 .error-msg{
     font-family: "LatoWebMedium";
     font-size: 14px;

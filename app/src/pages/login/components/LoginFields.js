@@ -21,30 +21,41 @@ const LoginFields = (props) => {
     const [loginValidation, setLoginValidation] = useState("");
     const [requested, setRequested] = useState(false);
     const [restartForm, setRestartForm] = useState(false);
+    const [focusBtn, setFocus] = useState("");
     let serverList = [{"name": "License Server", "active": false}, {"name": "DAS Server", "active": false}, {"name": "Web Server", "active": false}];
     let dispatch = props.dispatch;
     let SetProgressBar = props.SetProgressBar;
 
-    const handleShowPass = () => setShowPass(!showPass);
+    const handleShowPass = () => {
+        // setPassError(false);
+        // setUserError(false);
+        // setLoginValidation("");
+        setShowPass(!showPass);
+    }
 
     const handleUsername = event => {
-        setUserError(false);
+        resetErrors();
         if (showPassField){
-            hidePassField(false);
+            hidePassField();
         }
         setUsername(event.target.value);
     }
     const handlePassword = event => {
+        resetErrors();
+        setPassword(event.target.value);
+    }
+
+    const resetErrors = () =>{
         setPassError(false);
         setUserError(false);
         setLoginValidation("");
-        setPassword(event.target.value);
     }
 
     const hidePassField = () => {
         setPassField(false);
         setPassword("");
         setPassError(false);
+        setShowPass(false);
     }
 
     const checkUser = () => {
@@ -62,7 +73,6 @@ const LoginFields = (props) => {
                 // SetProgressBar("stop", dispatch);
                 setRequested(false);
                 if (data.redirect) {
-                    console.log(data.redirect)
                     window.location.href = data.redirect;
                     // setRedirectTo(data.redirect);
                 } // history.replace(data.redirect);
@@ -71,7 +81,6 @@ const LoginFields = (props) => {
                 else setLoginValidation(err);    
             }
             catch(err){
-                console.log(err);
                 setLoginValidation(err);
                 // cfpLoadingBar.complete();
                 setRequested(false);
@@ -81,10 +90,13 @@ const LoginFields = (props) => {
 
     const login = event => {
         event.preventDefault();
-        setLoginValidation("");
-        if (!showPassField) checkUser();
-        else if (!password) setPassError(true);
-        else check_credentials();
+        if (focusBtn ==="checkpass") handleShowPass();
+        else if (focusBtn !== "checkuser" && focusBtn !== "checkpass"){
+            resetErrors();
+            if (!showPassField) checkUser();
+            else if (!password) setPassError(true);
+            else check_credentials();
+        }
     }
 
     
@@ -177,8 +189,8 @@ const LoginFields = (props) => {
             <form className="login-form" onSubmit={login}>
             <div className="username-wrap" style={userError ? loginValidation ? {borderColor: "#d33c3c"} : styles.errorBorder : null }>
                 <span><img className="ic-username" alt="user-ic" src={userError ? res.errorUserIcon : res.defaultUserIcon}/></span>
-                <input className="field" placeholder="Username" value={username} onChange={handleUsername}></input>
-                {showPassField && username ? true : <span className="ic-rightarrow fa fa-arrow-circle-right arrow-circle" onClick={checkUser}></span>}
+                <input className="field" placeholder="Username" onFocus={()=>setFocus("username")} value={username} onChange={handleUsername}></input>
+                {showPassField && username ? true : <button className="ic-rightarrow fa fa-arrow-circle-right arrow-circle no-decor" onFocus={()=>setFocus("checkuser")} onClick={checkUser}></button>}
             </div>
             {userError && !loginValidation ? <div className="error-msg">Please Enter Username</div> : null}
             {
@@ -186,12 +198,12 @@ const LoginFields = (props) => {
                 <>
                 <div className="password-wrap" style={passError ? styles.errorBorder : null }>
                     <span><img className="ic-password" alt="pass-ic" src={passError ? res.errorPassIcon : res.defaultUserIcon}/></span>
-                    <input className="field" type={showPass ? "text" : "password"} placeholder="Password" value={password} onChange={handlePassword}></input>
-                    <span className={showPass ? res.eyeSlashIcon : res.eyeIcon } onClick={handleShowPass}></span>
+                    <input className="field" type={showPass ? "text" : "password"} autoFocus onFocus={()=>setFocus("password")} placeholder="Password" value={password} onChange={handlePassword}></input>
+                    <button className={ "no-decor " + (showPass ? res.eyeSlashIcon : res.eyeIcon) } onFocus={()=>setFocus("checkpass")}></button>
                 </div>
                 {passError && !loginValidation? <div className="error-msg">Please Enter Password</div> : null}
                 <div className="error-msg">{loginValidation}</div>
-                <button className="login-btn" type="submit" disabled={requested} onClick={login}>Login</button>
+                <button className="login-btn" type="submit" disabled={requested} onFocus={()=>{setFocus("login")}} onClick={login}>Login</button>
                 </>
             : false
             }
