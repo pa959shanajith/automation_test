@@ -2612,7 +2612,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			return true;
 		// Block all characters except hyphen, alphabet, digit
 		if (['ldapServerName', 'samlServerName', 'oidcServerName'].includes(e.target.id)) {
-			if (([59,61,106,107,109,111,173,186,187,188,190,191,192,219,220,221,222].indexOf(e.keyCode) > -1) ||
+			if (([32,59,61,106,107,109,111,173,186,187,188,190,191,192,219,220,221,222].indexOf(e.keyCode) > -1) ||
 			 e.shiftKey && (e.keyCode >= 48 && e.keyCode <= 57 || e.keyCode == 189))
 				return false;
 			return true;
@@ -2962,6 +2962,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				ldapConf.basedn = data.basedn;
 				ldapConf.secure = data.secure;
 				ldapConf.cert = data.cert;
+				ldapConf.certName = "No file choosen";
 				ldapConf.auth = data.auth;
 				ldapConf.binddn = data.binddn;
 				ldapConf.bindCredentials = data.bindCredentials;
@@ -3028,13 +3029,15 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	};
 
 	$scope.ldapConf.switchSecureUrl = function() {
-		let url = this.url.trim();
+		this.url = this.url.trim();
 		if(this.secure == "false") {
 			this.cert = "";
 			this.certName = "No file choosen";
-			if (url.toLowerCase().startsWith("ldaps://")) this.url = "ldap://" + url.slice(8);
+			if (this.url.toLowerCase().startsWith("ldaps://")) this.url = "ldap://" + this.url.slice(8);
+			if (this.url.toLowerCase().endsWith(":636")) this.url = this.url.slice(0,-3) + "389";
 		} else {
-			if (url.toLowerCase().startsWith("ldap://")) this.url = "ldaps://" + url.slice(7);
+			if (this.url.toLowerCase().startsWith("ldap://")) this.url = "ldaps://" + this.url.slice(7);
+			if (this.url.toLowerCase().endsWith(":389")) this.url = this.url.slice(0,-3) + "636";
 		}
 	};
 
@@ -3199,6 +3202,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			$scope.$apply();
 		};
 		reader.readAsBinaryString(targetFile);
+		target.value = '';
 	});
 
 	$scope.samlConf.getServerData = function () {
@@ -3215,6 +3219,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				$scope.samlConf.url = data.url;
 				$scope.samlConf.idp = data.idp;
 				$scope.samlConf.cert = data.cert;
+				$scope.samlConf.certName = "No file choosen";
 			}
 		}, function (error) {
 			unblockUI();
