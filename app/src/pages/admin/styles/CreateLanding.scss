@@ -7,7 +7,7 @@
 {
     text-transform: lowercase;
 }
-@media screen and (min-width:1700px){
+@media screen and (min-width:1800px){
     #userRoles, #userTypes-create{  
         position: relative;
         left: 10px;
@@ -55,7 +55,7 @@
     color:#fff;
     cursor: pointer;
 }  
-@media screen and (min-width:1700px){
+@media screen and (min-width:1800px){
     .edit-user-dropdown{
         width: 78%;
         background: none;
@@ -118,7 +118,7 @@
 	font-family: 'LatoWebLight';
     outline: 0;
 }
-@media screen and (min-width:1700px){
+@media screen and (min-width:1800px){
     .btn-md-create{
         font-size: 1.2vw;
     }
@@ -222,7 +222,7 @@
     font-weight: 700;
     margin-top: 5px;
 }
-@media screen and (min-width:1701px){
+@media screen and (min-width:1801px){
     .adminControl-create div span {
         width: 100%;
         font-size: 1.2vw;
@@ -256,7 +256,7 @@
     // -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
     // transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 }
-@media screen and (min-width: 1701px) {
+@media screen and (min-width: 1801px) {
     .form-control__conv-create {
         font-size: 1.2vw;
         height: 2.2vw;
@@ -281,7 +281,7 @@
 .adminSelect-create:focus {
 	box-shadow: none !important;
 }
-@media screen and (min-width: 1701px) {
+@media screen and (min-width: 1801px) {
     .adminSelect-create {
         font-size: 1.2vw;
         height: 1.4vw;
@@ -326,7 +326,7 @@
     line-height: 2;
     font-size: 14px;
 } 
-@media screen and (min-width: 1701px) {
+@media screen and (min-width: 1801px) {
     .primaryRole-create {
         font-size: 1.2vw;
         margin-top: 2px;

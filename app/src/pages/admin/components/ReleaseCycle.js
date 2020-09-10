@@ -1,5 +1,4 @@
 import React ,  { Fragment} from 'react';
-
 import '../styles/ReleaseCycle.scss';
 
 /*Component ReleaseCycle
@@ -20,19 +19,19 @@ const ReleaseCycle = (props) => {
 					{/* <!-- Add Release --> */}
 
 					{/* <!-- Releases List --> */}
-					<ul id="releaseList" className="containerWrap-project scrollbar-inner relCycScroll createRelBox">
-            {props.releaseList.map((releaseName,index) => ( 
-                <li key={index} id={'releaseList_' + props.count} onClick={()=>{props.clickReleaseListName({id:'releaseList_' + props.count,releaseName:releaseName});props.setActiveRelease(releaseName);}} className={(releaseName===props.activeRelease)?"active-release":""} >
-                    <img src={"static/imgs/ic-release.png"} alt="Release"/><span title={releaseName} className='releaseName'>{releaseName}</span>
-                    {(releaseName===props.activeRelease)?
-                    <span className='actionOnHover'>
-                        <img onClick={()=>{props.clickEditRelease("editReleaseName_" + props.count)}} id={"editReleaseName_" + props.count} title='Edit Release Name' src={"static/imgs/ic-edit-sm.png"} alt="Edit Release Name" className='editReleaseName'/>
-                    </span>
-                    :null}
-                </li>
-            ))}
-            </ul>
-					{/* <!-- Releases List --> */}
+                    <ul id="releaseList" className="containerWrap-project ">
+                    {props.releaseList.map((releaseName,index) => ( 
+                        <li key={index} id={'releaseList_' + props.count} onClick={()=>{props.clickReleaseListName({id:'releaseList_' + props.count,releaseName:releaseName});props.setActiveRelease(releaseName);}} className={(releaseName===props.activeRelease)?"active-release":""} >
+                            <img src={"static/imgs/ic-release.png"} alt="Release"/><span title={releaseName} className='releaseName'>{releaseName}</span>
+                            {(releaseName===props.activeRelease)?
+                            <span className='actionOnHover'>
+                                <img onClick={()=>{props.clickEditRelease("editReleaseName_" + props.count)}} id={"editReleaseName_" + props.count} title='Edit Release Name' src={"static/imgs/ic-edit-sm.png"} alt="Edit Release Name" className='editReleaseName'/>
+                            </span>
+                            :null}
+                        </li>
+                    ))}
+                    </ul>
+                    {/* <!-- Releases List --> */}
 				</div>
 				{/* <!-- Release Container --> */}
 

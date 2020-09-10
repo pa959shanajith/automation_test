@@ -86,12 +86,12 @@
     // -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
     // transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 }
-@media screen and (min-width: 1366px) and (max-width: 1700px){
-    .form-control__conv-edit {
-        font-size: 1.2vw;
-    }
-}
-@media screen and (min-width: 1701px) {
+// @media screen and (min-width: 1366px) and (max-width: 1800px){
+//     .form-control__conv-edit {
+//         font-size: 1.2vw;
+//     }
+// }
+@media screen and (min-width: 1801px) {
     .form-control__conv-edit {
         font-size: 1.2vw;
         height: 2.2vw;
@@ -116,7 +116,7 @@
 .adminSelect-edit:focus {
 	box-shadow: none !important;
 }
-@media screen and (min-width: 1701px) {
+@media screen and (min-width: 1801px) {
     .adminSelect-edit {
         font-size: 1.2vw;
         height: 1.4vw;
@@ -155,7 +155,7 @@
     color:#fff;
     cursor: pointer;
 }  
-@media screen and (min-width:1700px){
+@media screen and (min-width:1800px){
     .edit-user-dropdown-edit{
         width: 78%;
         background: none;
@@ -217,7 +217,7 @@
 	font-family: 'LatoWebLight';
     outline: 0;
 }
-@media screen and (min-width:1700px){
+@media screen and (min-width:1800px){
     .btn-md-create{
         font-size: 1.2vw;
     }
@@ -305,7 +305,7 @@
 .userTypeBtn_conv-edit:focus{
     outline: 0;
 }
-@media screen and (min-width:1700px){
+@media screen and (min-width:1800px){
     .userTypeBtn_conv-edit{
         font-size: 0.8vw;
     }
@@ -353,18 +353,18 @@
 
 }
 
-@media screen and (min-width: 1701px) {
+@media screen and (min-width: 1801px) {
     .dropdown-menu-edit-multiselect{
         font-size: 24px;
         margin-top: 11px;
     }
 }
 
-@media screen and (min-width: 1366px) and (max-width: 1700px) {
-    .dropdown-menu-edit-multiselect{
-        margin-top: -3px;
-    }
-}
+// @media screen and (min-width: 1366px) and (max-width: 1800px) {
+//     .dropdown-menu-edit-multiselect{
+//         margin-top: -3px;
+//     }
+// }
 
 
 .dropdown-menu-edit-multiselect>li{

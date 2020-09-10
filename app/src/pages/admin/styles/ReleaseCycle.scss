@@ -11,17 +11,17 @@
     position: relative;
     top: 5px;
 }
-@media screen and (max-height: 680px) {
-    .relCycContainer{
-        height: calc(100% - 285px);
-    }
-}
+// @media screen and (max-height: 680px) {
+//     .relCycContainer{
+//         height: calc(100% - 285px);
+//     }
+// }
 .containerWrap-project {
     float: left;
     width: 100%;
-    // height: 100%;
+    height: 100%;
     overflow: hidden;
-    max-height: calc(100% - 0px);
+    max-height: calc(100% - 125px);
 }
 .addContainer{
 	float: left;
@@ -35,7 +35,7 @@
 	cursor: pointer;
 	display: inline-block;
 }
-@media screen and (min-width: 1701px) {
+@media screen and (min-width: 1801px) {
     .addContainer span{
         font-size: 1.2vw;
     }
@@ -54,7 +54,6 @@
 {
     overflow-y: auto !important; 
 }
-
 #releaseList, #cycleList{
 	padding: 0;
     float: left;

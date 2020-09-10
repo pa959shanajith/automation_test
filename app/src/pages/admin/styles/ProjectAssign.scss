@@ -160,7 +160,7 @@
     clear: both;
     float: left;
 }
-@media screen and (min-width:1700px){
+@media screen and (min-width:1801px){
     .center-button button {
         font-size: 1vw;
         width: 53px;
@@ -180,7 +180,7 @@
     padding: 10px;
     user-select: none;
 }
-@media screen and (min-width:1700px){
+@media screen and (min-width:1801px){
     #allProjectAP option,#assignedProjectAP option{
         font-size: 1vw;
     }
@@ -222,7 +222,7 @@ select[size] {
     border: 1px solid #656565 !important;
     -webkit-text-stroke: thin;
 }
-@media screen and (min-width:1701px){
+@media screen and (min-width:1801px){
     .adminSelect-project{
         height: 1.4vw;
         margin-top: 10px;

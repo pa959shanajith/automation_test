@@ -396,15 +396,17 @@ const ProjectNew = (props) => {
         setFlag(false);
         // eslint-disable-next-line
         var reg = /^[a-zA-Z0-9\s\.\-\_]+$/;
+        var flag1 = flag;
         for (var i = 0; i < cycleList.length; i++) {
             if (cycleList[i] === cycleTxt.trim()) {
                 // $(".close:visible").trigger('click');
                 // openModalPopup("Add Cycle", "Cycle Name already exists for this release");
                 alert("Cycle Name already exists for this release");
                 setFlag(true);
+                flag1 = true;
             }
         }
-        if (flag === true) {
+        if (flag1 === true) {
             return false;
         }
         if (cycleTxt === "") {
@@ -580,15 +582,17 @@ const ProjectNew = (props) => {
             setCycleTxt("");
             return false;
         }else {
+            var flag1 = flag;
             for( var i = 0; i < cycleList.length; i++){
                 if ( cycleList[i] === cycleTxt) {
                     setShowEditModalCycle(false);
                     // openModalPopup("Add Cycle", "Cycle Name already exists for this release");
                     alert("Cycle Name already exists for this release");
                     setFlag(true);
+                    flag1 = true;
                 }
             }
-            if (flag === true) {
+            if (flag1 === true) {
                 return false;
             }
             setModalInputErrorBorder(false);
