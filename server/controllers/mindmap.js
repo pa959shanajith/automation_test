@@ -1144,7 +1144,7 @@ exports.pdProcess = function (req, res) {
 			}
 			var inputs = {
 				'projectid': req.body.data.projectid,
-				'screenname': 'Screen_PD_'+name,
+				'screenname': 'Screen_'+name,
 				'versionnumber': 0,
 				'createdby': userid,
 				'createdbyrole': role,
@@ -1155,7 +1155,7 @@ exports.pdProcess = function (req, res) {
 				'scrapedurl':'',
 				'scrapedata': screendataobj[name].data
 			};
-			ordernameidlist.push({'name':'Screen_PD_'+name,'type':3})
+			ordernameidlist.push({'name':'Screen_'+name,'type':3})
 
 			var args = {
 				data: inputs,
@@ -1180,7 +1180,7 @@ exports.pdProcess = function (req, res) {
 							}
 							var inputs = {
 								'screenid': screenid,
-								'testcasename': 'Testcase_PD_'+name,
+								'testcasename': 'Testcase_'+name,
 								'versionnumber': 0,
 								'createdthrough': 'PD',
 								'createdby': userid,
@@ -1192,7 +1192,7 @@ exports.pdProcess = function (req, res) {
 								'dataobjects':dobjects,
 								'steps':screendataobj[name].script
 							};
-							ordernameidlist.push({'name':'Testcase_PD_'+name,'type':4})
+							ordernameidlist.push({'name':'Testcase_'+name,'type':4})
 							var args = {
 								data: inputs,
 								headers: {
@@ -1414,13 +1414,13 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					}
 					if(eachBox['mxCell']['@style'] == 'rhombus'){// in case of if
 						testcaseObj = getTestcaseStep(step,null,"@Generic",'jumpTo',
-							['Testcase_PD_'+eachBox["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],null,null,"Generic");
+							['Testcase_'+eachBox["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],null,null,"Generic");
 						testCaseSteps.push(testcaseObj);
 						step++;
 					}	
 					else if(eachBox['mxCell']['@style'] == 'task'){	// in case of task
 						testcaseObj = getTestcaseStep(step,null,"@Generic",'jumpTo',
-							['Testcase_PD_'+eachBox["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],null,null,"Generic");
+							['Testcase_'+eachBox["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],null,null,"Generic");
 						testCaseSteps.push(testcaseObj);
 						step++;								
 					}
@@ -1441,7 +1441,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 				}	
 				else{ // otherwise task or activity
 					testcaseObj = getTestcaseStep(step,null,"@Generic",'jumpTo',
-						['Testcase_PD_'+adjacentItems.targets[0]["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],null,null,"Generic");
+						['Testcase_'+adjacentItems.targets[0]["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],null,null,"Generic");
 					testCaseSteps.push(testcaseObj);
 					step++;													
 				}
