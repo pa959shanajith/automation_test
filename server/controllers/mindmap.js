@@ -1266,11 +1266,6 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					getTestcaseStep(2,null,'@Sap','ServerConnect',null,null,null,"SAP")
 				];
 				step = 3;
-				if(screendata[0].tag=="GuiOkCodeField") {
-					testcaseObj = getTestcaseStep(step,null,'@Sap','StartTransaction',[screendata[0].text],null,null,"SAP");
-					step = 4;	
-					testCaseSteps.push(testcaseObj);
-				}
 			}
 		});	
 	}
@@ -1294,9 +1289,15 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						testcaseObj = getTestcaseStep(step,null,'@Browser','navigateToURL',[eachScrapedAction.action.actionData],null,null,"Web");
 						break;
 					case "click":
-						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'click',null,null,eachScrapedAction.url,"Web");
-						var custname_split = eachScrapedAction.custname.split('_');
-						if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+						if(eachScrapedAction.tag == "radiobutton") {
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectRadioButton',null,null,eachScrapedAction.url,"Web");
+						} else if(eachScrapedAction.tag == "checkbox") {
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectCheckbox',null,null,eachScrapedAction.url,"Web");
+						} else {
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'click',null,null,eachScrapedAction.url,"Web");
+							var custname_split = eachScrapedAction.custname.split('_');
+							if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+						}
 						break;
 					case "inputChange":
 						if(eachScrapedAction.action.actionData.split(";").length == 2 && eachScrapedAction.action.actionData.split(";")[1] =='byIndex'){
@@ -1337,6 +1338,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 			input = text.split("  ");
 			switch(eachScrapedAction.tag){
 				case "input":
+				case "GuiOkCodeField":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
 					break;
 				case "button":
@@ -1345,16 +1347,25 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 				case "toolbar":
 				case "calendar":
 				case "gridview":
+				case "GuiLabel":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
 					var custname_split = eachScrapedAction.custname.split('_');
 					if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+					break;
+				case "GuiStatusbar":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClickStatusBar',null,null,null,"SAP");
 					break;
 				case "GuiTab":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTab',null,null,null,"SAP");
 					break;
 				case "select":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,
-						'selectValueByText',[input[0]],null,null,"SAP");
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'selectValueByText',[input[0]],null,null,"SAP");
+					break;
+				case "GuiMenubar":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'SelectMenu',[input[0]],null,null,"SAP");
+					break;
+				case "GuiSimpleContainer":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'DoubleClickOnCell',[input[0]],null,null,"SAP");
 					break;
 				case "radiobutton":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRadioButton',null,null,null,"SAP");
