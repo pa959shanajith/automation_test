@@ -140,6 +140,11 @@
     overflow-y:scroll;
     width: 85%;
     padding: 6px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    z-index: 1000;
 }
 .dropdown-menu-users-edit>li{
     padding: 3px 12px;
@@ -297,6 +302,9 @@
     border: 0;
     vertical-align: middle;
 }
+.userTypeBtn_conv-edit:focus{
+    outline: 0;
+}
 @media screen and (min-width:1700px){
     .userTypeBtn_conv-edit{
         font-size: 0.8vw;
@@ -399,4 +407,10 @@
 .leftControl-edit {
 	float: left;
 	width: 47%;
+}
+.user-select__option:hover{
+    background:#633691;
+    border-radius: 3px;
+    color:#fff;
+    cursor: pointer;
 }

@@ -97,16 +97,6 @@
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
   
 }
-.dropdown-menu-users-ldap{
-    max-height:165px;
-    overflow-y:scroll;
-    width: 100%;
-    padding: 6px;
-}
-.dropdown-menu-users-ldap>li{
-    padding: 3px 12px;
-}
-
 
 .dropdown-menu-users{
     max-height:165px;
@@ -302,7 +292,7 @@
     line-height: 2;
     font-size: 14px;
 } 
-@media screen and (min-width: 1366px) {
+@media screen and (min-width: 1701px) {
     .primaryRole {
         font-size: 1.2vw;
         margin-top: 2px;
@@ -413,11 +403,6 @@
     // -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
     // -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
     // transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-}
-@media screen and (min-width: 1366px) and (max-width: 1700px){
-    .form-control__conv {
-        font-size: 1.2vw;
-    }
 }
 @media screen and (min-width: 1701px) {
     .form-control__conv {

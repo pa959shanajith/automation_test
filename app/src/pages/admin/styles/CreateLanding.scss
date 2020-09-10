@@ -14,28 +14,31 @@
         top: 5px;
     }
 }
-@media screen and (min-width:1366px) and (max-width:1700px){
-    #userRoles, #userTypes-create{  
-        position: relative;
-        left: 10px;
-        top: 2px;
-    }
-}
 
 .userLDAPFetch label{
 	margin-right: 50px;
 }
 
-.dropdown-menu-edit-users-ldap{
+.dropdown-menu-users-ldap{
     max-height:165px;
     overflow-y:scroll;
     width: 100%;
     padding: 6px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    z-index: 1000;
 }
-.dropdown-menu-edit-users-ldap>li{
+.dropdown-menu-users-ldap>li{
     padding: 3px 12px;
 }
-
+.ldap-user__li:hover{
+    background:#633691;
+    border-radius: 3px;
+    color:#fff;
+    cursor: pointer;
+}
 
 .dropdown-menu-edit-users{
     max-height:165px;
@@ -219,7 +222,7 @@
     font-weight: 700;
     margin-top: 5px;
 }
-@media screen and (min-width:1366px){
+@media screen and (min-width:1701px){
     .adminControl-create div span {
         width: 100%;
         font-size: 1.2vw;
@@ -252,11 +255,6 @@
     // -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
     // -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
     // transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-}
-@media screen and (min-width: 1366px) and (max-width: 1700px){
-    .form-control__conv-create {
-        font-size: 1.2vw;
-    }
 }
 @media screen and (min-width: 1701px) {
     .form-control__conv-create {
@@ -328,7 +326,7 @@
     line-height: 2;
     font-size: 14px;
 } 
-@media screen and (min-width: 1366px) {
+@media screen and (min-width: 1701px) {
     .primaryRole-create {
         font-size: 1.2vw;
         margin-top: 2px;

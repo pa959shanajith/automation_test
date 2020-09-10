@@ -448,6 +448,7 @@ const CreateUser = (props) => {
                 dispatch({type:actionTypes.UPDATE_INPUT_FIRSTNAME,payload:data.firstname})
                 dispatch({type:actionTypes.UPDATE_INPUT_LASTNAME,payload:data.lastname})
                 dispatch({type:actionTypes.UPDATE_INPUT_EMAIL,payload:data.email})  
+                dispatch({type:actionTypes.UPDATE_LDAP_USER,payload:data.ldapname})
             }
         }catch(error){
             setLoading(false);

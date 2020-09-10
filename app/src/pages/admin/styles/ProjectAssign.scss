@@ -167,10 +167,8 @@
         height: 53px;
     }
 }
-@media screen and (min-width:1366px) and (max-width:1700px){
-    .center-button button {
-        font-size: 1vw;
-    }
+.center-button button:focus {
+    outline: 0;
 }
 
 .right-select {
@@ -181,6 +179,11 @@
 {
     padding: 10px;
     user-select: none;
+}
+@media screen and (min-width:1700px){
+    #allProjectAP option,#assignedProjectAP option{
+        font-size: 1vw;
+    }
 }
 #allProjectAP,#assignedProjectAP, #allProjectAP[size],#assignedProjectAP[size] {
     min-height: 400px;
@@ -219,7 +222,7 @@ select[size] {
     border: 1px solid #656565 !important;
     -webkit-text-stroke: thin;
 }
-@media screen and (min-width:1366px){
+@media screen and (min-width:1701px){
     .adminSelect-project{
         height: 1.4vw;
         margin-top: 10px;

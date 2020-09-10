@@ -1,4 +1,4 @@
-import React ,  { Fragment} from 'react';
+import React ,  { Fragment ,useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as actionTypes from '../state/action';
 import '../styles/EditLanding.scss';
@@ -12,6 +12,9 @@ import '../styles/EditLanding.scss';
 const EditLanding = (props) => {
     const dispatch = useDispatch()
     const userConf = useSelector(state=>state.admin.userConf)
+    const node = useRef();
+
+    useOnClickOutside(node, () => props.setShowDropdownEdit(!props.showDropdownEdit));
 
     return (
         <Fragment>
@@ -25,9 +28,9 @@ const EditLanding = (props) => {
                     <button title={userConf.fType} className="userTypeBtn_conv-edit " style={{margin:"4px 0",right:"0",cursor:"default"}}>{userConf.fType}</button>
                     <input list="allUsersListauto" className=" btn-users dropdown-toggle-edit edit-user-dropdown-edit" onClick = {()=>{props.click();props.setShowDropdownEdit(!props.showDropdownEdit);}} type="text"  id="userIdName"  onChange={(event)=>{dispatch({type:actionTypes.UPDATE_ALL_USER_FILTER,payload:event.target.value});props.searchFunctionUser(event.target.value);}} data-toggle="dropdown" value={userConf.allUserFilter}  placeholder="Search User.." autoComplete="none"/>
                     {(props.showDropdownEdit && userConf.allUsersList!==[])?
-                        <div className=" dropdown-menu-edit dropdown-menu-users-edit create-user__dropdown" role="menu" aria-labelledby="userIdName" style={{padding: "6px",fontSize: "14px",WebkitBoxShadow: "0 6px 12px rgba(0,0,0,.175)",boxShadow: "0 6px 12px rgba(0,0,0,.175)",display: "block", border: "1px solid rgba(0,0,0,.15)"}}>
+                        <div ref={node} className=" dropdown-menu-edit dropdown-menu-users-edit create-user__dropdown" role="menu" aria-labelledby="userIdName" style={{padding: "6px",fontSize: "14px",WebkitBoxShadow: "0 6px 12px rgba(0,0,0,.175)",boxShadow: "0 6px 12px rgba(0,0,0,.175)",display: "block", border: "1px solid rgba(0,0,0,.15)"}}>
                             {props.allUserFilList.map((uid,index) => (  
-                                <option key={index} role="presentation" onClick = {()=>{props.setShowDropdownEdit(!props.showDropdownEdit);dispatch({type:actionTypes.UPDATE_USERIDNAME,payload:uid[1]+';'+uid[0]});dispatch({type:actionTypes.UPDATE_ALL_USER_FILTER,payload:uid[0]});props.getUserData({user_idName:uid[1]+';'+uid[0]});}} value={uid[1] +";"+uid[0]}> {uid[0]}</option> 
+                                <option key={index} role="presentation" onClick = {()=>{props.setShowDropdownEdit(!props.showDropdownEdit);dispatch({type:actionTypes.UPDATE_USERIDNAME,payload:uid[1]+';'+uid[0]});dispatch({type:actionTypes.UPDATE_ALL_USER_FILTER,payload:uid[0]});props.getUserData({user_idName:uid[1]+';'+uid[0]});}} value={uid[1] +";"+uid[0]} className="user-select__option"> {uid[0]}</option> 
                             ))}
                         </div>
                         :null
@@ -55,21 +58,37 @@ const EditLanding = (props) => {
                 }
                 <div className='leftControl-edit adminControl-edit'>
                 <input type="text" autoComplete="First-name" name="firstname" id="firstname" value={userConf.firstname} onChange={(event)=>{dispatch({type:actionTypes.UPDATE_INPUT_FIRSTNAME,payload:event.target.value})}} maxLength="100" className={props.firstnameAddClass?"middle__input__border-edit form-control__conv-edit form-control-custom-edit  inputErrorBorder":"middle__input__border-edit form-control__conv-edit form-control-custom-edit "} placeholder="First Name"/>
+                </div>
+                <div className='rightControl-edit adminControl-edit'>
+                    <input type="text" autoComplete="Last-name" name="lastname" id="lastname" value={userConf.lastname} onChange={(event)=>{dispatch({type:actionTypes.UPDATE_INPUT_LASTNAME,payload:event.target.value})}} maxLength="100" className={props.lastnameAddClass?"middle__input__border-edit form-control__conv-edit form-control-custom-edit inputErrorBorder":"middle__input__border-edit form-control__conv-edit form-control-custom-edit   "} placeholder="Last Name"/>
+                </div>
             </div>
-            <div className='rightControl-edit adminControl-edit'>
-                <input type="text" autoComplete="Last-name" name="lastname" id="lastname" value={userConf.lastname} onChange={(event)=>{dispatch({type:actionTypes.UPDATE_INPUT_LASTNAME,payload:event.target.value})}} maxLength="100" className={props.lastnameAddClass?"middle__input__border-edit form-control__conv-edit form-control-custom-edit inputErrorBorder":"middle__input__border-edit form-control__conv-edit form-control-custom-edit   "} placeholder="Last Name"/>
-            </div>
-
-            </div>
-
-            
-
-            
-
-            
         </Fragment>
     )
 }  
 
+function useOnClickOutside(ref, handler) {
+    useEffect(
+      () => {
+        const listener = event => {
+          // Do nothing if clicking ref's element or descendent elements
+          if (!ref.current || ref.current.contains(event.target)) {
+            return;
+          }
+  
+          handler(event);
+        };
+  
+        document.addEventListener('mousedown', listener);
+        document.addEventListener('touchstart', listener);
+  
+        return () => {
+          document.removeEventListener('mousedown', listener);
+          document.removeEventListener('touchstart', listener);
+        };
+      },
+      [ref, handler]
+    );
+}
 
 export default EditLanding;
