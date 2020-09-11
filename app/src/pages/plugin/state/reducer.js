@@ -1,20 +1,20 @@
 import * as actionTypes from './action';
 
 const initialState = {
-    userinfo: {},
-    SR: {}
+    tasksJson: {},
+    FD: {}
 }
 
 const reducer = (state=initialState, action) => {
     switch(action.type){
-        case actionTypes.SET_USERINFO:
+        case actionTypes.SET_TASKJSON:
             return {
-                ...state, userinfo: action.payload
+                ...state, tasksJson: action.payload
             }
-        case actionTypes.SET_SR:
-            return {
-                ...state, SR: action.payload
-            }
+        case actionTypes.SET_FD:
+                return {
+                    ...state, FD: action.payload
+                }
         default:
             return state
     }
