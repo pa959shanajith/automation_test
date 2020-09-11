@@ -5043,21 +5043,21 @@ Purpose : displaying pop up for replication of project
             var orderMatrix = result.data;
             $scope.dataJSON = [];
             $scope.dataJSON.push({
-                name:'Module_PD_'+generateGuid(),
+                name:'Module_'+generateGuid(),
                 type:1
             });
             orderMatrix.forEach(function(orderList,orderListIdx){
                 $scope.dataJSON.push({
-                    name:'Scenario_PD_'+generateGuid(),
+                    name:'Scenario_'+generateGuid(),
                     type:2
                 });
                 orderList.forEach(function(data,i){
                     $scope.dataJSON.push({
-                        name:"Screen_PD_"+data.label,
+                        name:"Screen_"+data.label,
                         type:3
                     });     
                     $scope.dataJSON.push({
-                        name:"Testcase_PD_"+data.label,
+                        name:"Testcase_"+data.label,
                         type:4
                     });                                                             
                 });    
