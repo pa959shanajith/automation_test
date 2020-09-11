@@ -1,7 +1,7 @@
 import React ,  { Fragment, useEffect, useState } from 'react';
 import {getAvailablePlugins , getDomains_ICE, getDetails_ICE} from '../api';
 import EditGlobalModal from '../components/EditGlobalModal'
-import {ScreenOverlay} from '../../global'
+import {ScreenOverlay,PopupMsg} from '../../global' 
 import ProjectButtons from '../components/ProjectButtons';
 import ReleaseCycle from '../components/ReleaseCycle';
 import 'font-awesome/css/font-awesome.min.css';
@@ -54,6 +54,9 @@ const ProjectNew = (props) => {
     const [showEditNameModalCycle,setShowEditNameModalCycle] = useState("")
     const [loading,setLoading] = useState(false)
     const [loadingContent,setLoadingContent] = useState("")
+    const [showPopup,setShowPopup] = useState(false)   
+    const [popupContent,setPopupContent] = useState("")  
+    const [popupTitle,setPopupTitle] = useState("") 
 
     useEffect(()=>{
         getDomains();
@@ -178,8 +181,9 @@ const ProjectNew = (props) => {
             for( var i = 0; i < releaseList.length; i++){
                 if ( releaseList[i] === releaseTxt) {
                     setShowEditModalRelease(false);
-                    // openModalPopup("Add Release", "Release Name already exists");
-                    alert("Release Name already exists");
+                    setPopupTitle("Add Release");
+                    setPopupContent("Release Name already exists");
+                    setShowPopup(true);
                     setFlag(true);
                     flag1 = true;
                 }
@@ -249,8 +253,9 @@ const ProjectNew = (props) => {
             for (var i = 0; i < releaseList.length; i++) {
                 if (releaseList[i] === releaseTxt) {
                     // $(".close:visible").trigger('click');
-                    // openModalPopup("Add Release", "Release Name already exists");
-                    alert( "Release Name already exists");
+                    setPopupTitle("Add Release");
+                    setPopupContent("Release Name already exists");
+                    setShowPopup(true);
                     setFlag(true);
                     flag1 = true;
                 }
@@ -282,16 +287,18 @@ const ProjectNew = (props) => {
                 for (i = 0; i < updateProjectDetails.length; i++) {
                     if (releaseName.trim() === updateProjectDetails[i].name) {
                         setShowEditNameModalRelease(false);
-                        alert("Release Name already exists");
-                        // openModalPopup("Edit Release Name", "Release Name already exists");
+                        setPopupTitle("Add Release");
+                        setPopupContent("Release Name already exists");
+                        setShowPopup(true);
                         return false;
                     }
                 }
                 for (i = 0; i < newProjectDetails.length; i++) {
                     if (releaseName.trim() === newProjectDetails[i].name) {
                         setShowEditNameModalRelease(false);
-                        alert("Release Name already exists");
-                        // openModalPopup("Edit Release Name", "Release Name already exists");
+                        setPopupTitle("Edit Release Name");
+                        setPopupContent("Release Name already exists");
+                        setShowPopup(true);
                         return false;
                     } else {
                         if (existingReleaseName === newProjectDetails[i].name) {
@@ -399,9 +406,9 @@ const ProjectNew = (props) => {
         var flag1 = flag;
         for (var i = 0; i < cycleList.length; i++) {
             if (cycleList[i] === cycleTxt.trim()) {
-                // $(".close:visible").trigger('click');
-                // openModalPopup("Add Cycle", "Cycle Name already exists for this release");
-                alert("Cycle Name already exists for this release");
+                setPopupTitle("Add Cycle");
+                setPopupContent("Cycle Name already exists for this release");
+                setShowPopup(true);
                 setFlag(true);
                 flag1 = true;
             }
@@ -423,8 +430,9 @@ const ProjectNew = (props) => {
                     for (var j = 0; j < updateProjectDetails[i].cycles.length; j++) {
                         if (cycleTxt.trim() === updateProjectDetails[i].cycles[j].name) {
                             setShowEditNameModalCycle(false);
-                            alert("Cycle Name already exists")
-                            // openModalPopup("Edit Cycle Name", "Cycle Name already exists");
+                            setPopupTitle("Edit Cycle Name");
+                            setPopupContent("Cycle Name already exists");
+                            setShowPopup(true);
                             return false;
                         }
                     }
@@ -586,8 +594,9 @@ const ProjectNew = (props) => {
             for( var i = 0; i < cycleList.length; i++){
                 if ( cycleList[i] === cycleTxt) {
                     setShowEditModalCycle(false);
-                    // openModalPopup("Add Cycle", "Cycle Name already exists for this release");
-                    alert("Cycle Name already exists for this release");
+                    setPopupTitle("Add Cycle");
+                    setPopupContent("Cycle Name already exists for this release");
+                    setShowPopup(true);
                     setFlag(true);
                     flag1 = true;
                 }
@@ -811,9 +820,14 @@ const ProjectNew = (props) => {
         }
         clearUpdateProjectObjects();
     }
+
+    const closePopup = () =>{
+        setShowPopup(false);
+    }
     
     return (
     <Fragment>
+        {showPopup?<PopupMsg content={popupContent} title={popupTitle} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}    
         {loading?<ScreenOverlay content={loadingContent}/>:null}
         <div id="page-taskName">
 				{taskName==="Create Project"?

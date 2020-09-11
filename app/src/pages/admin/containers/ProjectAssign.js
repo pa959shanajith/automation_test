@@ -1,6 +1,6 @@
 import React ,  { Fragment, useEffect, useState} from 'react';
 import {getUserDetails, getDomains_ICE, getAssignedProjects_ICE, getDetails_ICE, assignProjects_ICE} from '../api';
-import {ScreenOverlay} from '../../global' 
+import {ScreenOverlay,PopupMsg} from '../../global' 
 import '../styles/ProjectAssign.scss';
 import AssignProjectmodal from '../components/AssignProjectModal'
 
@@ -24,6 +24,9 @@ const ProjectNew = (props) => {
     const [selectedProject,setSelectedProject] = useState("")
     const [selectedUserId,setSelectedUserId] = useState("")
     const [loading,setLoading] = useState(false)
+    const [showPopup,setShowPopup] = useState(false)   
+    const [popupContent,setPopupContent] = useState("")  
+    const [popupTitle,setPopupTitle] = useState("") 
     const [loadingContent,setLoadingContent] = useState("")
     const [getAssignedProjectsLen,setGetAssignedProjectsLen] = useState(0)
     // eslint-disable-next-line
@@ -49,11 +52,13 @@ const ProjectNew = (props) => {
             if(data === "Invalid Session") {
                 // $rootScope.redirectPage();
             } else if(data === "fail") {
-                alert("Failed to fetch users.");
-                // openModalPopup("Assign Project", "Failed to fetch users.");
+                setPopupTitle("Assign Project");
+                setPopupContent("Failed to fetch users.");
+                setShowPopup(true);
             } else if(data === "empty") {
-                alert("There are no users present.");
-                // openModalPopup("Assign Project", "There are no users present.");
+                setPopupTitle("Assign Project");
+                setPopupContent("There are no users present.");
+                setShowPopup(true);
             } else {
                 // data.sort(function(a,b){ return a[0] > b[0]; });
                 
@@ -353,14 +358,21 @@ const ProjectNew = (props) => {
                 //$rootScope.redirectPage();
             }
             if (data === 'success') {
-                if (assignedProjects1.length !== 0) alert("Projects assigned to user successfully");
-                    //openModalPopup("Assign Projects", "Projects assigned to user successfully");
-                else alert("Projects unassigned successfully")
-                    // openModalPopup("Assign Projects", "Projects unassigned successfully");
+                if (assignedProjects1.length !== 0){
+                    setPopupTitle("Assign Project");
+                    setPopupContent("Projects assigned to user successfully");
+                    setShowPopup(true);
+                }
+                else{
+                    setPopupTitle("Assign Project");
+                    setPopupContent("Projects unassigned successfully");
+                    setShowPopup(true);
+                } 
                 resetAssignProjectForm();
             } else {
-                alert("Failed to assign projects to user");
-                // openModalPopup("Assign Projects", "Failed to assign projects to user");
+                setPopupTitle("Assign Project");
+                setPopupContent("Failed to assign projects to user");
+                setShowPopup(true);
             }
 
             fetchUsers();
@@ -386,9 +398,14 @@ const ProjectNew = (props) => {
         setDiffprj(diffprjNew);
         return diffprjNew
     }
+
+    const closePopup = () =>{
+        setShowPopup(false);
+    }
     
     return (
         <Fragment>
+            {showPopup?<PopupMsg content={popupContent} title={popupTitle} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}    
             {loading?<ScreenOverlay content={loadingContent}/>:null}
             <div id="page-taskName">
                 <span>Assign Project</span>
