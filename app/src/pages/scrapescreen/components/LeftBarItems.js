@@ -93,10 +93,10 @@ import {GetScrapeDataScreenLevel_ICE} from '../api';
                   <div className="leftbar-container">
                     <div className="leftbar-top">
                   <ul>
-                        <li><span><i className="scrapeOnTxt">Scrape On</i></span></li>
+                        <li><i className="scrapeOnTxt">Scrape On</i></li>
                         <li><i className={flag?"browserIcon" : "special"}   title="Launch Internet Explorer"><span className="fa fa-internet-explorer fa-3x"></span><br/>Internet Explorer</i></li>
                         <li><i className={flag?"browserIcon" : "special"}   title="Launch Google Chrome" ><span className="fa fa-chrome fa-3x"></span><br/>Google Chrome</i></li>
-                        {macOS? <li ><i className={flag?"browserIcon" : "special"}  href='#/scrape'  title="Launch Safari"><span className="fa fa-safari fa-3x"></span><br/>Safari</i></li> : null}
+                        {macOS? <li ><i className={flag?"browserIcon" : "special"} title="Launch Safari"><span className="fa fa-safari fa-3x"></span><br/>Safari</i></li> : null}
                         <li><i className={flag?"browserIcon" : "special"}   title="Launch Mozilla Firefox"><span className="fa fa-firefox fa-3x"></span><br/>Mozilla Firefox</i></li>
                         <li><i className={flag?"browserIcon" : "special"}   title="Launch Edge Legacy"><span className="fa fa-edge fa-3x"></span><br/>Edge Legacy</i></li>
                         <li><i className={flag?"browserIcon" : "special"}   title="Launch PDF utility" ><span className="fa fa-file-pdf-o fa-3x"></span><br/>PDF Utility</i></li>
@@ -120,10 +120,10 @@ import {GetScrapeDataScreenLevel_ICE} from '../api';
               {(apptype==="Desktop")? <div className="leftbar-container">
                 <div className="leftbar-top">
                     <ul>
-                        <li><span><i className='scrapeOnTxt'>Scrape On</i></span></li>
-                        <li><i className='browserIcon' href='#/scrape'  title="Desktop Apps"><span><img src='static/imgs/ic-desktop.png' alt='Desktop Apps' /></span><br/>Desktop Apps</i></li>
-                        <li><i className='pdfIcon' href='#/scrape'  title="Launch PDF utility"><span><img src='static/imgs/ic-pdf_scrape.png' alt='pdf' /></span><br/>PDF Utility</i></li>
-                        <li><i class='Append' href='#/scrape'  title="Append ON" ><span><input type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/><br/>Append</i></li>
+                        <li><i className='scrapeOnTxt'>Scrape On</i></li>
+                        <li><i className='browserIcon'   title="Desktop Apps"><span><img src='static/imgs/ic-desktop.png' alt='Desktop Apps' /></span><br/>Desktop Apps</i></li>
+                        <li><i className='pdfIcon'   title="Launch PDF utility"><span><img src='static/imgs/ic-pdf_scrape.png' alt='pdf' /></span><br/>PDF Utility</i></li>
+                        <li><i class='Append'   title="Append ON" ><span><input type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/><br/>Append</i></li>
                     </ul>
                   </div>
               </div> : null}
@@ -132,10 +132,10 @@ import {GetScrapeDataScreenLevel_ICE} from '../api';
               {(apptype==="SAP")? <div className="leftbar-container">
                 <div className="leftbar-top">
                     <ul>
-                        <li><span><i className='scrapeOnTxt'>Scrape On</i></span></li>
-                        <li><i className='browserIcon' href='#/scrape'  title="Desktop Apps"><span><img src='static/imgs/ic-desktop.png' alt='SAP Apps' /></span><br/>SAP Apps</i></li>
-                        <li><i className='pdfIcon' href='#/scrape'  title="Launch PDF utility"><span><img src='static/imgs/ic-pdf_scrape.png' alt='pdf' /></span><br/>PDF Utility</i></li>
-                        <li><i class='Append' href='#/scrape'  title="Append ON" ><span><input type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/><br/>Append</i></li>
+                        <li><i className='scrapeOnTxt'>Scrape On</i></li>
+                        <li><i className='browserIcon'  title="Desktop Apps"><span><img src='static/imgs/ic-desktop.png' alt='SAP Apps' /></span><br/>SAP Apps</i></li>
+                        <li><i className='pdfIcon'   title="Launch PDF utility"><span><img src='static/imgs/ic-pdf_scrape.png' alt='pdf' /></span><br/>PDF Utility</i></li>
+                        <li><i class='Append'   title="Append ON" ><span><input type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/><br/>Append</i></li>
                     </ul>
                   </div>
               </div> : null}
@@ -144,10 +144,10 @@ import {GetScrapeDataScreenLevel_ICE} from '../api';
               {(apptype==="OEBS")? <div className="leftbar-container">
                 <div className="leftbar-top">
                     <ul>
-                        <li><span><i className='scrapeOnTxt'>Scrape On</i></span></li>
-                        <li><i className='browserIcon' href='#/scrape'  title="Desktop Apps"><span><img src='static/imgs/ic-desktop.png' alt='OEBS Apps' /></span><br/>OEBS Apps</i></li>
-                        <li><i className='pdfIcon' href='#/scrape'  title="Launch PDF utility"><span><img src='static/imgs/ic-pdf_scrape.png' alt='pdf' /></span><br/>PDF Utility</i></li>
-                        <li><i class='Append' href='#/scrape'  title="Append ON" ><span><input type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/><br/>Append</i></li>
+                        <li><i className='scrapeOnTxt'>Scrape On</i></li>
+                        <li><i className='browserIcon'   title="Desktop Apps"><span><img src='static/imgs/ic-desktop.png' alt='OEBS Apps' /></span><br/>OEBS Apps</i></li>
+                        <li><i className='pdfIcon'   title="Launch PDF utility"><span><img src='static/imgs/ic-pdf_scrape.png' alt='pdf' /></span><br/>PDF Utility</i></li>
+                        <li><i class='Append'   title="Append ON" ><span><input type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/><br/>Append</i></li>
                     </ul>
                   </div>
               </div> : null}
@@ -156,10 +156,10 @@ import {GetScrapeDataScreenLevel_ICE} from '../api';
               {(apptype==="MobileApp")? <div className="leftbar-container">
                 <div className="leftbar-top">
                     <ul>
-                        <li><span><i className='scrapeOnTxt'>Scrape On</i></span></li>
-                        <li><i className='browserIcon' href='#/scrape'  title="Desktop Apps"><span><img src='static/imgs/ic-mobility.png' alt='Desktop Apps' /></span><br/>Mobile Apps</i></li>
-                        <li><i className='pdfIcon' href='#/scrape'  title="Launch PDF utility"><span><img src='static/imgs/ic-pdf_scrape.png' alt='pdf' /></span><br/>PDF Utility</i></li>
-                        <li><i class='Append' href='#/scrape'  title="Append ON" ><span><input type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/><br/>Append</i></li>
+                        <li><i className='scrapeOnTxt'>Scrape On</i></li>
+                        <li><i className='browserIcon'   title="Desktop Apps"><span><img src='static/imgs/ic-mobility.png' alt='Desktop Apps' /></span><br/>Mobile Apps</i></li>
+                        <li><i className='pdfIcon'   title="Launch PDF utility"><span><img src='static/imgs/ic-pdf_scrape.png' alt='pdf' /></span><br/>PDF Utility</i></li>
+                        <li><i class='Append'   title="Append ON" ><span><input type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/><br/>Append</i></li>
                     </ul>
                   </div>
               </div> : null}
@@ -168,10 +168,10 @@ import {GetScrapeDataScreenLevel_ICE} from '../api';
               {(apptype==="MobileWeb")? <div className="leftbar-container">
                 <div className="leftbar-top">
                     <ul>
-                        <li><span><i className='scrapeOnTxt'>Scrape On</i></span></li>
-                        <li><i className='browserIcon' href='#/scrape'  title="Desktop Apps"><span><img src='static/imgs/ic-mobility.png' alt='Desktop Apps' /></span><br/>Mobile Web</i></li>
-                        <li><i className='pdfIcon' href='#/scrape'  title="Launch PDF utility"><span><img src='static/imgs/ic-pdf_scrape.png' alt='pdf' /></span><br/>PDF Utility</i></li>
-                        <li><i className='Append' href='#/scrape'  title="Append ON" ><span><input type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/><br/>Append</i></li>
+                        <li><i className='scrapeOnTxt'>Scrape On</i></li>
+                        <li><i className='browserIcon'   title="Desktop Apps"><span><img src='static/imgs/ic-mobility.png' alt='Desktop Apps' /></span><br/>Mobile Web</i></li>
+                        <li><i className='pdfIcon'   title="Launch PDF utility"><span><img src='static/imgs/ic-pdf_scrape.png' alt='pdf' /></span><br/>PDF Utility</i></li>
+                        <li><i className='Append'   title="Append ON" ><span><input type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/><br/>Append</i></li>
                     </ul>
                   </div>
               </div> : null}
@@ -181,8 +181,8 @@ import {GetScrapeDataScreenLevel_ICE} from '../api';
                 <div className="leftbar-top">
                     <ul>
                         <li><span><i className='scrapeOnTxt'>Scrape On</i></span></li>
-                        <li><i className='browserIcon' href='#/scrape'  title="Desktop Apps"><span><img src='static/imgs/ic-Webservice.png' alt='Desktop Apps' /></span><br/>Desktop Apps</i></li>
-                        <li><i class='Append' href='#/scrape'  title="Append ON" ><span><input type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/><br/>Edit</i></li>
+                        <li><i className='browserIcon'   title="Desktop Apps"><span><img src='static/imgs/ic-Webservice.png' alt='Desktop Apps' /></span><br/>Desktop Apps</i></li>
+                        <li><i class='Append'   title="Append ON" ><span><input type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/><br/>Edit</i></li>
                     </ul>
                   </div>
               </div> : null} */}
@@ -191,10 +191,10 @@ import {GetScrapeDataScreenLevel_ICE} from '../api';
               {(apptype==="desktop")? <div className="leftbar-container">
                 <div className="leftbar-top">
                     <ul>
-                        <li><span><i className='scrapeOnTxt'>Scrape On</i></span></li>
-                        <li><i className='browserIcon' href='#/scrape'  title="Desktop Apps"><span><img src='static/imgs/ic-desktop.png' alt='Desktop Apps' /></span><br/>Desktop Apps</i></li>
-                        <li><i className='pdfIcon' href='#/scrape'  title="Launch PDF utility"><span><img src='static/imgs/ic-pdf_scrape.png' alt='pdf' /></span><br/>PDF Utility</i></li>
-                        <li><i class='Append' href='#/scrape'  title="Append ON" ><span><input type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/><br/>Append</i></li>
+                        <li><i className='scrapeOnTxt'>Scrape On</i></li>
+                        <li><i className='browserIcon'   title="Desktop Apps"><span><img src='static/imgs/ic-desktop.png' alt='Desktop Apps' /></span><br/>Desktop Apps</i></li>
+                        <li><i className='pdfIcon'   title="Launch PDF utility"><span><img src='static/imgs/ic-pdf_scrape.png' alt='pdf' /></span><br/>PDF Utility</i></li>
+                        <li><i class='Append'   title="Append ON" ><span><input type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/><br/>Append</i></li>
                     </ul>
                   </div>
               </div> : null}

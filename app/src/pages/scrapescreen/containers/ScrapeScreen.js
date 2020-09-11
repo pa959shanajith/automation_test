@@ -2,7 +2,9 @@ import React ,{Fragment } from 'react';
 import ScrapeCenter from '../components/CenterScr.js';
 import Rightbar from '../components/RightBarItems.js';
 import ScrapeLeft from './LeftBar.js';
-import '../styles/Scrapescreen.scss'
+import '../styles/Scrapescreen.scss';
+import Header from '../../global/components/Header';
+import Footer from '../../global/components/FooterTwo';
 
 
 const ScrapeScreen = ()=>{
@@ -10,7 +12,7 @@ const ScrapeScreen = ()=>{
         <Fragment>
             <div  className="parent">
                 {/* header Section */}
-                <div className="header">Header</div>
+                <Header/>
                 <div className="holder">
                     {/* Left Dependencies Section as per Particular Appt type */}
                     <ScrapeLeft/>
@@ -20,7 +22,7 @@ const ScrapeScreen = ()=>{
                     <Rightbar/>
                 </div>
                 {/* Footer */}
-                <div className="footer">Footer</div>
+                <Footer/>
             </div>
         </Fragment>
     );

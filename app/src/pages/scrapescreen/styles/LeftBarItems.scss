@@ -62,6 +62,11 @@
     padding: 8px 10px;
 }
 
+.leftbar-top ul li i span input[type=checkbox]{
+    width: 18px !important;
+    height: 18px !important;
+    outline: 0 !important;
+}
 
 .leftbottom{
     height: 25%; 
@@ -102,9 +107,16 @@
 
 .special{
     cursor: not-allowed;
+    opacity: .5;
+    transition: opacity .2s;
+    -webkit-transition: opacity .2s;
+    transition-timing-function: ease-out;
+    -webkit-transition-timing-function: ease-out;
+
 }
 
 .scrapeOnTxt{
  font-size: 18px !important;
  font-family: 'LatoWebMedium' !important;
 }
+

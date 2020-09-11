@@ -10,7 +10,7 @@ import EditLanding from '../components/EditLanding';
   use: defines Admin middle Section for create user
   ToDo: add modals all popup
         only ldap code red border class divs USERIDNAME
-        delete modal
+        delete modal on delete (currently direct delete happening)
 */
 
 const CreateUser = (props) => {
@@ -150,7 +150,8 @@ const CreateUser = (props) => {
         //eslint-disable-next-line
         var emailRegEx = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 		var regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,16}$/;
-		var popupOpen = false;
+        var popupOpen = false;
+        // eslint-disable-next-line
 		var reg = /^[a-zA-Z0-9\.\@\-\_]+$/;
 
         if(userIdNameAddClass);
@@ -536,7 +537,7 @@ const CreateUser = (props) => {
                             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
                             // blockUI("Fetching SAML Server configurations...");
                             
-                            var data1 = await getSAMLConfig();
+                            data1 = await getSAMLConfig();
                             // unblockUI();
                             if(data1 === "Invalid Session");//$rootScope.redirectPage();
                             else if(data1 === "fail") alert("Failed to fetch SAML server configurations.");//openModalPopup("Create User", "Failed to fetch SAML server configurations.");
@@ -559,7 +560,7 @@ const CreateUser = (props) => {
                         try{
                             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
                             // blockUI("Fetching OpenID Server configurations...");
-                            var data1 = await getOIDCConfig();
+                            data1 = await getOIDCConfig();
                             // unblockUI();
                             if(data1 === "Invalid Session") ; //$rootScope.redirectPage();
                             else if(data1 === "fail")alert("Failed to fetch OpenID server configurations.") ;//openModalPopup("Create User", "Failed to fetch OpenID server configurations.");
