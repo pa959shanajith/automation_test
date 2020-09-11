@@ -4,7 +4,6 @@ import EditGlobalModal from '../components/EditGlobalModal'
 import {ScreenOverlay,PopupMsg} from '../../global' 
 import ProjectButtons from '../components/ProjectButtons';
 import ReleaseCycle from '../components/ReleaseCycle';
-import 'font-awesome/css/font-awesome.min.css';
 import '../styles/Project.scss';
 
 /*Component ProjectNew
@@ -54,9 +53,7 @@ const ProjectNew = (props) => {
     const [showEditNameModalCycle,setShowEditNameModalCycle] = useState("")
     const [loading,setLoading] = useState(false)
     const [loadingContent,setLoadingContent] = useState("")
-    const [showPopup,setShowPopup] = useState(false)   
-    const [popupContent,setPopupContent] = useState("")  
-    const [popupTitle,setPopupTitle] = useState("") 
+    const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
 
     useEffect(()=>{
         getDomains();
@@ -181,9 +178,7 @@ const ProjectNew = (props) => {
             for( var i = 0; i < releaseList.length; i++){
                 if ( releaseList[i] === releaseTxt) {
                     setShowEditModalRelease(false);
-                    setPopupTitle("Add Release");
-                    setPopupContent("Release Name already exists");
-                    setShowPopup(true);
+                    setPopupState({show:true,title:"Add Release",content:"Release Name already exists"});
                     setFlag(true);
                     flag1 = true;
                 }
@@ -252,10 +247,7 @@ const ProjectNew = (props) => {
             setModalInputErrorBorder(false);
             for (var i = 0; i < releaseList.length; i++) {
                 if (releaseList[i] === releaseTxt) {
-                    // $(".close:visible").trigger('click');
-                    setPopupTitle("Add Release");
-                    setPopupContent("Release Name already exists");
-                    setShowPopup(true);
+                    setPopupState({show:true,title:"Add Release",content:"Release Name already exists"});
                     setFlag(true);
                     flag1 = true;
                 }
@@ -287,18 +279,14 @@ const ProjectNew = (props) => {
                 for (i = 0; i < updateProjectDetails.length; i++) {
                     if (releaseName.trim() === updateProjectDetails[i].name) {
                         setShowEditNameModalRelease(false);
-                        setPopupTitle("Add Release");
-                        setPopupContent("Release Name already exists");
-                        setShowPopup(true);
+                        setPopupState({show:true,title:"Add Release",content:"Release Name already exists"});
                         return false;
                     }
                 }
                 for (i = 0; i < newProjectDetails.length; i++) {
                     if (releaseName.trim() === newProjectDetails[i].name) {
                         setShowEditNameModalRelease(false);
-                        setPopupTitle("Edit Release Name");
-                        setPopupContent("Release Name already exists");
-                        setShowPopup(true);
+                        setPopupState({show:true,title:"Edit Release Name",content:"Release Name already exists"});
                         return false;
                     } else {
                         if (existingReleaseName === newProjectDetails[i].name) {
@@ -406,9 +394,7 @@ const ProjectNew = (props) => {
         var flag1 = flag;
         for (var i = 0; i < cycleList.length; i++) {
             if (cycleList[i] === cycleTxt.trim()) {
-                setPopupTitle("Add Cycle");
-                setPopupContent("Cycle Name already exists for this release");
-                setShowPopup(true);
+                setPopupState({show:true,title:"Add Cycle",content:"Cycle Name already exists for this release"});
                 setFlag(true);
                 flag1 = true;
             }
@@ -430,9 +416,7 @@ const ProjectNew = (props) => {
                     for (var j = 0; j < updateProjectDetails[i].cycles.length; j++) {
                         if (cycleTxt.trim() === updateProjectDetails[i].cycles[j].name) {
                             setShowEditNameModalCycle(false);
-                            setPopupTitle("Edit Cycle Name");
-                            setPopupContent("Cycle Name already exists");
-                            setShowPopup(true);
+                            setPopupState({show:true,title:"Edit Cycle Name",content:"Cycle Name already exists"});
                             return false;
                         }
                     }
@@ -594,9 +578,7 @@ const ProjectNew = (props) => {
             for( var i = 0; i < cycleList.length; i++){
                 if ( cycleList[i] === cycleTxt) {
                     setShowEditModalCycle(false);
-                    setPopupTitle("Add Cycle");
-                    setPopupContent("Cycle Name already exists for this release");
-                    setShowPopup(true);
+                    setPopupState({show:true,title:"Add Cycle",content:"Cycle Name already exists for this release"});
                     setFlag(true);
                     flag1 = true;
                 }
@@ -822,12 +804,12 @@ const ProjectNew = (props) => {
     }
 
     const closePopup = () =>{
-        setShowPopup(false);
+        setPopupState({show:false,title:"",content:""});
     }
     
     return (
     <Fragment>
-        {showPopup?<PopupMsg content={popupContent} title={popupTitle} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}    
+        {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
         {loading?<ScreenOverlay content={loadingContent}/>:null}
         <div id="page-taskName">
 				{taskName==="Create Project"?

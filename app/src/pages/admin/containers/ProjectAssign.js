@@ -24,9 +24,7 @@ const ProjectNew = (props) => {
     const [selectedProject,setSelectedProject] = useState("")
     const [selectedUserId,setSelectedUserId] = useState("")
     const [loading,setLoading] = useState(false)
-    const [showPopup,setShowPopup] = useState(false)   
-    const [popupContent,setPopupContent] = useState("")  
-    const [popupTitle,setPopupTitle] = useState("") 
+    const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
     const [loadingContent,setLoadingContent] = useState("")
     const [getAssignedProjectsLen,setGetAssignedProjectsLen] = useState(0)
     // eslint-disable-next-line
@@ -52,13 +50,9 @@ const ProjectNew = (props) => {
             if(data === "Invalid Session") {
                 // $rootScope.redirectPage();
             } else if(data === "fail") {
-                setPopupTitle("Assign Project");
-                setPopupContent("Failed to fetch users.");
-                setShowPopup(true);
+                setPopupState({show:true,title:"Assign Project",content:"Failed to fetch users."});
             } else if(data === "empty") {
-                setPopupTitle("Assign Project");
-                setPopupContent("There are no users present.");
-                setShowPopup(true);
+                setPopupState({show:true,title:"Assign Project",content:"There are no users present."});
             } else {
                 // data.sort(function(a,b){ return a[0] > b[0]; });
                 
@@ -359,20 +353,14 @@ const ProjectNew = (props) => {
             }
             if (data === 'success') {
                 if (assignedProjects1.length !== 0){
-                    setPopupTitle("Assign Project");
-                    setPopupContent("Projects assigned to user successfully");
-                    setShowPopup(true);
+                    setPopupState({show:true,title:"Assign Project",content:"Projects assigned to user successfully"});
                 }
                 else{
-                    setPopupTitle("Assign Project");
-                    setPopupContent("Projects unassigned successfully");
-                    setShowPopup(true);
+                    setPopupState({show:true,title:"Assign Project",content:"Projects unassigned successfully"});
                 } 
                 resetAssignProjectForm();
             } else {
-                setPopupTitle("Assign Project");
-                setPopupContent("Failed to assign projects to user");
-                setShowPopup(true);
+                setPopupState({show:true,title:"Assign Project",content:"Failed to assign projects to user"});
             }
 
             fetchUsers();
@@ -400,12 +388,12 @@ const ProjectNew = (props) => {
     }
 
     const closePopup = () =>{
-        setShowPopup(false);
+        setPopupState({show:false,title:"",content:""});
     }
     
     return (
         <Fragment>
-            {showPopup?<PopupMsg content={popupContent} title={popupTitle} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}    
+            {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loadingContent}/>:null}
             <div id="page-taskName">
                 <span>Assign Project</span>

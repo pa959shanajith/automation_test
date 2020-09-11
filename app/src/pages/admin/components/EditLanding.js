@@ -2,7 +2,7 @@ import React ,  { Fragment ,useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as actionTypes from '../state/action';
 import '../styles/EditLanding.scss';
-// import NameFields from './NameFields';
+import useOnClickOutside from './UseOnClickOutside'
 
 /*Component EditLanding
   use: renders edit New User Landing page
@@ -66,29 +66,5 @@ const EditLanding = (props) => {
         </Fragment>
     )
 }  
-
-function useOnClickOutside(ref, handler) {
-    useEffect(
-      () => {
-        const listener = event => {
-          // Do nothing if clicking ref's element or descendent elements
-          if (!ref.current || ref.current.contains(event.target)) {
-            return;
-          }
-  
-          handler(event);
-        };
-  
-        document.addEventListener('mousedown', listener);
-        document.addEventListener('touchstart', listener);
-  
-        return () => {
-          document.removeEventListener('mousedown', listener);
-          document.removeEventListener('touchstart', listener);
-        };
-      },
-      [ref, handler]
-    );
-}
 
 export default EditLanding;

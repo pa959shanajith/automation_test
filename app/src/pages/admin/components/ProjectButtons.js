@@ -12,22 +12,16 @@ const ProjectButtons = (props) => {
     const [valid,setValid] = useState("")
     const [loading,setLoading] = useState(false)
     const [loadingContent,setLoadingContent] = useState("")
-    const [showPopup,setShowPopup] = useState(false)   
-    const [popupContent,setPopupContent] = useState("")  
-    const [popupTitle,setPopupTitle] = useState("") 
+    const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
 
     // Create Project Action
     const create_project = async()=>{
         props.setProjectNameInputErrorBorder(false);
         if (props.projectName === "") props.setProjectNameInputErrorBorder(true);
-        else if (props.projectTypeSelected=== "") {
-            setPopupTitle("Create Project");
-            setPopupContent("Please select Application Type");
-            setShowPopup(true);
+        else if (props.projectTypeSelected=== ""){
+            setPopupState({show:true,title:"Create Project",content:"Please select Application Type"});
         } else if (props.releaseList.length === 0) {
-            setPopupTitle("Create Project");
-            setPopupContent("Please add atleast one release");
-            setShowPopup(true);
+            setPopupState({show:true,title:"Create Project",content:"Please add atleast one release"});
         }else {
 			var proceedToCreate = true;
 			var relNames = "";
@@ -38,9 +32,7 @@ const ProjectButtons = (props) => {
 				}
 			}
 			if (proceedToCreate === false) {
-                setPopupTitle("Update Project");
-                setPopupContent("Please add atleast one cycle for release: " + relNames);
-                setShowPopup(true);
+                setPopupState({show:true,title:"Update Project",content:"Please add atleast one cycle for release: " + relNames});
             } 
             else if (proceedToCreate === true) {
 				// var projectExists = false; //check needed or not
@@ -66,16 +58,12 @@ const ProjectButtons = (props) => {
                         } else if (response.projectNames.length > 0) {
                             for ( i = 0; i < response.projectNames.length; i++) {
                                 if (props.projectName === response.projectNames[i]) {
-                                    setPopupTitle("Create Project");
-                                    setPopupContent("Project Name already Exists");
-                                    setShowPopup(true);
+                                    setPopupState({show:true,title:"Create Project",content:"Project Name already Exists"});
                                     return false;
                                 } else proceeed = true;
                             }
                         } else {
-                            setPopupTitle("Create Project");
-                            setPopupContent("Failed to create project");
-                            setShowPopup(true);
+                            setPopupState({show:true,title:"Create Project",content:"Failed to create project"});
                             return false;
                         }
                         if (proceeed === true) {
@@ -91,15 +79,11 @@ const ProjectButtons = (props) => {
                                 const createProjectRes = await createProject_ICE(createprojectObj)
                                 if (createProjectRes === "Invalid Session");//$rootScope.redirectPage();
                                 if (createProjectRes === 'success') {
-                                    setPopupTitle("Create Project");
-                                    setPopupContent("Project created successfully");
-                                    setShowPopup(true);
+                                    setPopupState({show:true,title:"Create Project",content:"Project created successfully"});
                                     props.resetForm();
                                     props.setProjectDetails([]);
                                 } else {
-                                    setPopupTitle("Create Project");
-                                    setPopupContent("Failed to create project");
-                                    setShowPopup(true);
+                                    setPopupState({show:true,title:"Create Project",content:"Failed to create project"});
                                     props.resetForm();
                                 }
                                 setLoading(false);
@@ -114,9 +98,7 @@ const ProjectButtons = (props) => {
             }
             else {
 				setLoading(false);
-                setPopupTitle("Create Project");
-                setPopupContent("Please add atleast one cycle for a release");
-                setShowPopup(true);
+                setPopupState({show:true,title:"Create Project",content:"Please add atleast one cycle for a release"});
 			}
 		}
     }
@@ -126,9 +108,7 @@ const ProjectButtons = (props) => {
 			for (var i = 0; i < props.projectDetails.length; i++) {
 				if (props.releaseList[j] === props.projectDetails[i].name) {
 					if (props.projectDetails[i].cycles.length === 0) {
-                        setPopupTitle("Create Project");
-                        setPopupContent("Please add atleast one cycle for a release");
-                        setShowPopup(true);
+                        setPopupState({show:true,title:"Create Project",content:"Please add atleast one cycle for a release"});
                         setValid(false);
 						return flag;
 					}
@@ -146,9 +126,7 @@ const ProjectButtons = (props) => {
 		} else if (props.selProject === "") {
 			props.setProjectSelectErrorBorder(true);
 		} else if (props.releaseList.length === 0) {
-            setPopupTitle("Update Project");
-            setPopupContent("Please add atleast one release");
-            setShowPopup(true);
+            setPopupState({show:true,title:"Update Project",content:"Please add atleast one release"});
 		}else {
             setLoadingContent("Loading...");
             setLoading(true);
@@ -214,10 +192,7 @@ const ProjectButtons = (props) => {
 				}
             }
             if (proceedFlag === false) {
-				setLoading(false);
-                setPopupTitle("Update Project");
-                setPopupContent("Please add atleast one cycle for release: " + relName);
-                setShowPopup(true);
+                setPopupState({show:true,title:"Update Project",content:"Please add atleast one cycle for release: " + relName});
                 return false;
             }
             if (proceedFlag === true) {
@@ -234,9 +209,8 @@ const ProjectButtons = (props) => {
                     props.clearUpdateProjectObjects();
                     if (updateProjectRes === 'success') {
                         //Clearing old data from updateProject object
-                        setPopupTitle("Update Project");
-                        setPopupContent("Project updated successfully");
-                        setShowPopup(true);
+                        
+                        setPopupState({show:true,title:"Update Project",content:"Project updated successfully"});
                         // $timeout(function () {
                         //     $("#projectTab").trigger("click");
                         //     $(".adminActionBtn button:nth-child(1)").trigger("click");
@@ -244,9 +218,7 @@ const ProjectButtons = (props) => {
                         // resetForm();  //check if needed or not 
                         
                     } else {
-                        setPopupTitle("Update Project");
-                        setPopupContent("Failed to update project");
-                        setShowPopup(true);
+                        setPopupState({show:true,title:"Update Project",content:"Failed to update project"});
                         props.resetForm();
                     }
                     setLoading(false);
@@ -258,12 +230,12 @@ const ProjectButtons = (props) => {
     }
 
     const closePopup = () =>{
-        setShowPopup(false);
+        setPopupState({show:false,title:"",content:""});
     }
 
     return(
         <Fragment>
-            {showPopup?<PopupMsg content={popupContent} title={popupTitle} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}    
+            {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loadingContent}/>:null}
             <div className="adminActionBtn">
                 {props.taskName==="Create Project"?
