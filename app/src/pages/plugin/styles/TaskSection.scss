@@ -9,6 +9,10 @@
     border-radius: 8px;
 }
 
+.task-content{
+    padding: 0 15px 0 25px;
+}
+
 .filter-ic{
     height: 20px;
 }
@@ -61,6 +65,7 @@
     color: #633693;
     padding: 10px 15px;
     margin-right: 2px;
+    margin-bottom: -1px;
     &:hover{
         background-color: #eee;
         border-radius: 4px 4px 0 0;
@@ -68,10 +73,30 @@
     }
 }
 
+.active-tab{
+    border-top: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #fff;
+    background-color: #fff;
+    border-radius: 4px 4px 0 0;
+    &:hover{
+        background-color: #fff;
+        cursor: default;
+    }
+}
 
 
 
 @media screen and (min-width: 1400px) and (min-height: 770px){
+    .active-tab{
+        border-top: .1vw solid #ddd;
+        border-left: .1vw solid #ddd;
+        border-right: .1vw solid #ddd;
+        border-bottom: .1vw solid #fff;
+        border-radius: .2vw .2vw 0 0;
+    }
+
     .task-header{
         margin: 0;
         padding: .1vw .1vw .1vw 1.3vw;
@@ -105,13 +130,14 @@
     
     .task-nav-bar{
         margin-top: .8vw;
-        border-bottom: .2vw solid #ddd;
+        border-bottom: .1vw solid #ddd;
     }
     
     .task-nav-item{
         font-size: 1.45vw;
         padding: .7vw .9vw;
         margin-right: .6vw;
+        margin-bottom: -.1vw;
         &:hover{
             border-radius: .3vw .3vw 0 0;
         }
@@ -119,6 +145,14 @@
 }
 
 @media screen and (max-width: 1025px){
+    .active-tab{
+        border-top: .1vw solid #ddd;
+        border-left: .1vw solid #ddd;
+        border-right: .1vw solid #ddd;
+        border-bottom: .1vw solid #fff;
+        border-radius: .2vw .2vw 0 0;
+    }
+
     .task-header{
         border-radius: .7vw;
         margin: 0;
@@ -152,13 +186,18 @@
     
     .task-nav-bar{
         margin-top: .9vw;
-        border-bottom: .2vw solid #ddd;
+        border-bottom: .1vw solid #ddd;
+    }
+
+    .task-content{
+        padding: 0 1.2vw 0 2.2vw;
     }
     
     .task-nav-item{
         font-size: 1.55vw;
         padding: .8vw 1vw;
         margin-right: .7vw;
+        margin-bottom: -.1vw;
         &:hover{
             border-radius: .3vw .3vw 0 0;
         }

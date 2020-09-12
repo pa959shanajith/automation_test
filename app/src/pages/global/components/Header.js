@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useHistory, Link } from 'react-router-dom';
-import { RedirectPage, SetProgressBar } from '../../global';
+import { RedirectPage } from '../../global';
 import "../styles/Header.scss";
-import 'font-awesome/css/font-awesome.min.css';
 import * as loginApi from '../../login/api';
-import * as actionTypes from '../../login/state/action'
 import ClickAwayListener from 'react-click-away-listener';
 // import ChangePassword from './ChangePassword';
 
@@ -20,8 +18,6 @@ import ClickAwayListener from 'react-click-away-listener';
 */
 
 const Header = () => {
-
-    const dispatch = useDispatch()
 
     const [userDetails, setUserDetails] = useState(null);
     const [username, setUsername] = useState(null);
@@ -55,18 +51,7 @@ const Header = () => {
             setUsername(userInfo.username.toLowerCase());
         }
         else{
-            {/* Retaining the userInfo after page refresh */}
-            (async()=>{
-                let userinfo = await loginApi.loadUserInfo()
-                if (userinfo === "fail") console.log("Failed to loadUserInfo.");
-                else if (userinfo === "Invalid Session") {
-                    console.log("Your session has expired! --onLoadUserInfo Header");
-                } else if (Object.keys(userInfo).length!==0) {
-                    window.localStorage.navigateScreen = userinfo.page;
-                    dispatch({type:actionTypes.SET_USERINFO, payload: userinfo});
-                    SetProgressBar("start", dispatch);
-            }
-            })()
+            console.log("UserInfo Empty")
         }
     }, [userInfo]);
 

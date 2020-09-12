@@ -21,9 +21,9 @@ const PluginHome = () => {
             setName(first_name + ' ' + last_name);
         }
         else{
-            dispatch({type: "UPDATE", payload: "none"});
+            console.log("UserInfo Empty")
         }
-    }, []);
+    }, [userInfo]);
 
     return(
         <div className="plugin-bg-container">

@@ -188,7 +188,7 @@ const LoginFields = (props) => {
             :
             <form className="login-form" onSubmit={login}>
             <div className="username-wrap" style={userError ? loginValidation ? {borderColor: "#d33c3c"} : styles.errorBorder : null }>
-                <span><img className="ic-username" alt="user-ic" src={userError ? res.errorUserIcon : res.defaultUserIcon}/></span>
+                <span className="ic-holder"><img className="ic-username" alt="user-ic" src={userError ? res.errorUserIcon : res.defaultUserIcon}/></span>
                 <input className="field" placeholder="Username" onFocus={()=>setFocus("username")} value={username} onChange={handleUsername}></input>
                 {showPassField && username ? true : <button className="ic-rightarrow fa fa-arrow-circle-right arrow-circle no-decor" onFocus={()=>setFocus("checkuser")} onClick={checkUser}></button>}
             </div>
@@ -197,7 +197,7 @@ const LoginFields = (props) => {
             showPassField ?
                 <>
                 <div className="password-wrap" style={passError ? styles.errorBorder : null }>
-                    <span><img className="ic-password" alt="pass-ic" src={passError ? res.errorPassIcon : res.defaultUserIcon}/></span>
+                    <span className="ic-holder"><img className="ic-password" alt="pass-ic" src={passError ? res.errorPassIcon : res.defaultPassIcon}/></span>
                     <input className="field" type={showPass ? "text" : "password"} autoFocus onFocus={()=>setFocus("password")} placeholder="Password" value={password} onChange={handlePassword}></input>
                     <button className={ "no-decor " + (showPass ? res.eyeSlashIcon : res.eyeIcon) } onFocus={()=>setFocus("checkpass")}></button>
                 </div>

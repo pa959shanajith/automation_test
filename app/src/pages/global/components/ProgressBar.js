@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import * as actionTypes from '../state/action';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingBar from 'react-top-loading-bar';
+import { store } from '../../../reducer';
 
 const ProgressBar = (props) => {
 
@@ -23,10 +24,10 @@ const ProgressBar = (props) => {
 const SetProgressBar=(op, dispatch)=>{
 
     if (op=="start"){
-        dispatch({type: actionTypes.SET_PROGRESS, payload: Math.floor(Math.random() * (80-30) + 30)});
+        store.dispatch({type: actionTypes.SET_PROGRESS, payload: Math.floor(Math.random() * (80-30) + 30)});
     }
     else{
-        dispatch({type: actionTypes.SET_PROGRESS, payload: 100});
+        store.dispatch({type: actionTypes.SET_PROGRESS, payload: 100});
     }
 }
 

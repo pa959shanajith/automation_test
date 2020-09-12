@@ -1,0 +1,123 @@
+.task-panel{
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid #949494;
+}
+
+.active-task{
+    background-color: #dad8d8;
+}
+
+.task-description{
+    div{
+        font-family: "LatoWeb";
+        font-size: 14px;
+        padding: 1px 10px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+}
+
+.panel-content{
+    display: flex;
+    flex-direction: row;
+    min-height: 55px;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    font-family: "LatoWeb";
+
+    h4{
+        font-family: "LatoWebBold";
+        font-size: 18px;
+        margin: 0;
+    }
+
+}
+
+.tasktype-btn{
+    outline: none;
+    border: none;
+    font-size: 14px;
+    border-radius: 20px;
+    height: 25px;
+    width: 75px;
+    background: #efefef;
+    cursor: default;
+    &:hover{
+        cursor: default;
+    }
+    &:focus{
+        border: none;
+        outline: none;
+    }
+}
+
+
+.assign-task{
+    font-size: 17px;
+    text-align: start;
+    flex-grow: 1;
+    padding: 0 40px;
+    cursor: pointer;
+}
+
+
+@media screen and (max-width: 1024px){
+    .task-description{
+        div{
+            font-size: 1.2vw;
+            padding: .1vw .9vw;
+        }
+    }
+    
+    .panel-content{
+        min-height: 5.5vw;
+        h4{
+            font-size: 1.6vw;
+        }
+    }
+    
+    .tasktype-btn{
+        font-size: 1.2vw;
+        border-radius: 1.8vw;
+        height: 2.2vw;
+        width: 7.2vw;
+    }
+    
+    
+    .assign-task{
+        font-size: 1.4vw;
+        padding: 0 3.6vw;
+    }
+}
+
+@media screen and (min-width: 1400px){
+    .task-description{
+        div{
+            font-size: 1.2vw;
+            padding: .1vw .9vw;
+        }
+    }
+    
+    .panel-content{
+        min-height: 5.1vw;
+        h4{
+            font-size: 1.6vw;
+        }
+    }
+    
+    .tasktype-btn{
+        font-size: 1.2vw;
+        border-radius: 1.8vw;
+        height: 2.2vw;
+        width: 7.2vw;
+    }
+    
+    
+    .assign-task{
+        font-size: 1.4vw;
+        padding: 0 3.6vw;
+    }
+}

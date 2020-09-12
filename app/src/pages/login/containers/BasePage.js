@@ -37,7 +37,7 @@ const BasePage = () => {
             else {
                 setLoginAgain(false);
                 try{
-                    let data = await api.checkUserState()
+                    let data = await api.validateUserState()
                     SetProgressBar("stop", dispatch);
                     setLoginValidation("Loading Profile...");
                     if (data === "fail") setLoginValidation("Failed to load user profile.");

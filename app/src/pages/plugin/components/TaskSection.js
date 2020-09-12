@@ -3,7 +3,7 @@ import * as pluginApi from "../api";
 import { RedirectPage } from '../../global';
 import { useHistory } from 'react-router-dom';
 import * as actionTypes from '../state/action';
-import TaskRow from './TaskRow';
+import TaskContents from './TaskContents';
 import "../styles/TaskSection.scss";
 
 const TaskSection = ({userInfo, userRole, dispatch}) =>{
@@ -12,13 +12,18 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
 
     const [showSearch, setShowSearch] = useState(false);
     const [activeTab, setActiveTab] = useState("todo");
-    let filterDat;
-    let taskJson;
 
     // to render components which will populate under review
     let review_items = []
     // to render components which will populate under todo
     let todo_items = []
+    let filterDat;
+
+    const [reviewItems, setReviewItems] = useState([]);
+    const [todoItems, setTodoItems] = useState([]);
+    const [filterData, setFilterData] = useState(null);
+    const [taskJson, setTaskJson] = useState(null);
+
     
     useEffect(()=>{
         if(userInfo) {
@@ -42,6 +47,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             }
             // ANVESH'S BLOCKUI
             // blockUI("Loading Tasks..Please wait...");
+            // FOR DEV ONLY
             pluginApi.getProjectIDs()
             .then(data => {
                 if(data === "Fail" || data === "Invalid Session") return RedirectPage(history);
@@ -51,8 +57,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                         if(data1 === "Invalid Session") return RedirectPage(history);
                         else {
                             let tasksJson = data1;
-                            taskJson = data1;
-                            console.log(tasksJson)
+                            setTaskJson(data1);
                             dispatch({type: actionTypes.SET_TASKSJSON, payload: tasksJson});
                             if (tasksJson.length === 0) console.log("anvesh's blockui")// unblockUI();
                             /*	Build a list of releaseids and cycleids
@@ -60,13 +65,9 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                             * List of apptype and tasktype
                             */
                             filterDat = {'projectids':[],'releaseids':[],'cycleids':[],'prjrelmap':{},'relcycmap':{},'apptypes':[],'tasktypes':['Design','Execution'],'idnamemapprj':{},'idnamemaprel':{},'idnamemapcyc':{},'idnamemapdom':{}};
-                            // HIDING CONTENT DIV
-                            // $(".plugin-taks-listing:visible").empty().hide();
                             let counter = 1, countertodo = 1, counterreview = 1;
                             let length_tasksJson = tasksJson.length;
                             for (i=0 ; i < length_tasksJson ; i++){
-                                // UNDERSTAND THIS
-                                let classIndex = i<100 ? "tasks-l-s" : i<1000 ? "tasks-l-m" : "tasks-l-l";
                                 let length_taskdetails = tasksJson[i].taskDetails.length;
                                 for(j=0 ; j < length_taskdetails ; j++){
                                     // UNUSED CAN I REMOVE IT?
@@ -105,15 +106,11 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                                         }
                                     dataobj = JSON.stringify(dataobj);
                                         if(status === 'underReview'){
-                                            review_items.push({'panel-idx': i, 'counter': counter, 'classIdx': classIndex, 'counter-review': counterreview, 'testSuiteDetails': testSuiteDetails, 'data-dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
-                                            // POPULATE UNDER REVIEW
-                                            // $('.plugin-taks-listing.review').append("<div class='panel panel-default' panel-id='"+i+"'><div id='panelBlock_"+i+"' class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+" taskRedir'>"+ counterreview +"</h4><span class='assignedTask' data-testsuitedetails='"+testSuiteDetails+"' data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
+                                            review_items.push({'panel_idx': i, 'counter': counter, 'type_counter': counterreview, 'testSuiteDetails': testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
                                             counterreview++;
                                         }
                                         else{
-                                            todo_items.push({'panel-idx': i, 'counter': counter, 'classIdx': classIndex, 'counter-todo': countertodo, 'testSuiteDetails': testSuiteDetails, 'data-dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
-                                            // POPULATE UNDER TODO
-                                            // $('.plugin-taks-listing.todo').append("<div class='panel panel-default' panel-id='"+i+"'><div id='panelBlock_"+i+"' class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+" taskRedir'>"+ countertodo +"</h4><span class='assignedTask' data-testsuitedetails='"+testSuiteDetails+"' data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
+                                            todo_items.push({'panel_idx': i, 'counter': counter, 'type_counter': countertodo, 'testSuiteDetails': testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
                                             countertodo++;
                                         }				
                                         
@@ -128,10 +125,11 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                                         //     $("#panelBlock_"+i+"").children().find('span.assignedTask').text(visiblePart).attr('title',assignedTaskText).append(dots);
                                         //  }
                                     counter++;
-                                    // THIS ONE IS BIG
-                                    // fillFilterValues(tasksJson[i],j);
+                                    fillFilterValues(tasksJson[i],j);
                                 }
                             }
+                            setReviewItems(review_items);
+                            setTodoItems(todo_items);
                             // unblockUI();
                             //prevent mouseclick before loading tasks
                             // $("span.toggleClick").removeClass('toggleClick');
@@ -151,17 +149,20 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                                 }
                             }
                         }
-                        dispatch({type: actionTypes.SET_FD, payload: filterDat})
+                        setFilterData(filterDat);
+                        // dispatch({type: actionTypes.SET_FD, payload: filterDat})
                         // USE DISPATCH
                         // window.localStorage['_FD'] = angular.toJson(filterDat);
-                    }, function (error) {
+                    })
+                    .catch(error => {
                         // unblockUI();
                         // blockUI("Fail to load tasks!");
                         // setTimeout(function(){ unblockUI(); }, 3000);
                         console.log("Error:::::::::::::", error);
                     });
                 }
-            }, function (error) {
+            })
+            .catch(error => {
                 // unblockUI();
                 // blockUI("Fail to load Projects!");
                 // setTimeout(function(){ unblockUI(); }, 3000);
@@ -171,7 +172,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     }, []);
 
 
-    const fillFilterValues = ({obj, tidx}) => {
+    const fillFilterValues = (obj, tidx) => {
 		/*	Build a list of releaseids and cycleids
 		* Another dict for releaseid and cyclelist out of task json
 		* List of apptype and tasktype
@@ -196,33 +197,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
 		if(filterDat.apptypes.indexOf(obj.appType)===-1)
 			filterDat.apptypes.push(obj.appType);
         
-        dispatch({type: actionTypes.SET_FD, payload: filterDat})
-
-		// $(".panel-additional-details").off("click");
-		// $(".panel-additional-details").click(function(e){
-		// 	var data_object = this.parentElement.children[1].getAttribute('data-dataobj');
-		// 	data_object=JSON.parse(data_object)
-		// 	var tdes = data_object['taskdes']
-		// 	var olddescriptionid = "null";
-		// 	if($(".description-container").length>0)
-		// 		olddescriptionid = $(".description-container")[0].getAttribute("description-id");
-		// 	$(".description-container").remove();
-		// 	$(".active-task").removeClass("active-task");
-		// 	var clickedtask = this.parentElement.parentElement.parentElement.getAttribute('panel-id');
-		// 	if(clickedtask == olddescriptionid){
-		// 		$(".description-container").remove();
-		// 		$(".active-task").removeClass("active-task");
-		// 		return;
-		// 	}
-		// 	var clktask = taskJson[clickedtask];
-		// 	var maintask = clktask;
-		// 	var filterDat = filterDat;
-		// 	if(clktask.taskDetails[0].taskType != 'Design')
-		// 		clktask = clktask.testSuiteDetails[0];
-		// 	adddetailhtml = '<div class="panel panel-default description-container" description-id="'+clickedtask+'"><li class="description-item" title="Description: '+tdes+'">Description: '+tdes+'</li><li class="description-item" title="Release: '+filterDat.idnamemaprel[clktask.releaseid]+'">Release: '+filterDat.idnamemaprel[clktask.releaseid]+'</li><li class="description-item" title="Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'">Cycle: '+filterDat.idnamemapcyc[clktask.cycleid]+'</li><li class="description-item" title="Apptype: '+maintask.appType+'">Apptype: '+maintask.appType+'</li></div>';
-		// 	$(adddetailhtml).insertAfter("[panel-id="+clickedtask+"]");
-		// 	$("[panel-id="+clickedtask+"]").addClass("active-task");
-		// });
+        // dispatch({type: actionTypes.SET_FD, payload: filterDat})
 	}
     
 
@@ -235,11 +210,13 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                 <span className="task-ic-container"><img className="filter-ic" alt="filter-ic" src="static/imgs/ic-filter-task.png"/></span>
             </div>
             <div className="task-nav-bar">
-                <span className="task-nav-item" onClick={()=>setActiveTab("todo")}>To Do</span>
-                <span className="task-nav-item" onClick={()=>setActiveTab("review")}>To Review</span>
+                <span className={"task-nav-item " + (activeTab==="todo" ? "active-tab" : "")} onClick={()=>setActiveTab("todo")}>To Do</span>
+                <span className={"task-nav-item " + (activeTab==="review" ? "active-tab" : "")} onClick={()=>setActiveTab("review")}>To Review</span>
             </div>
             <div className="task-content">
-                {activeTab === "todo" ? <TaskRow todo_items={todo_items}/> : <TaskRow review_items={review_items}/>}
+                {activeTab === "todo"
+                 ? <TaskContents items={todoItems} filterDat={filterData} taskJson={taskJson} />
+                 : <TaskContents items={reviewItems} filterDat={filterData} taskJson={taskJson} />}
             </div>
         </div>
     );
