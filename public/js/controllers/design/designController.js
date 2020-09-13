@@ -6316,7 +6316,7 @@ function contentTable(newTestScriptDataLS) {
 
 					//changes from wasim
 					if (obType != 'a' && obType != 'select' && obType != 'radiobutton' && obType != 'checkbox' && obType != 'input' && obType != 'list' &&
-						obType != 'tablecell' && obType != 'table' && obType != 'img' && obType != 'button' && obType != 'iris' && (appTypeLocal == 'Web' || appTypeLocal == 'MobileWeb') && !ob.tag.startsWith('@PDF')) {
+						obType != 'tablecell' && obType != 'table' && obtype != 'grid' && obType != 'img' && obType != 'button' && obType != 'iris' && (appTypeLocal == 'Web' || appTypeLocal == 'MobileWeb') && !ob.tag.startsWith('@PDF')) {
 						var sc = Object.keys(keywordArrayList.element);
 						selectedKeywordList = "element";
 						var res = '';
