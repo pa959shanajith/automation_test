@@ -442,31 +442,60 @@
 			<!-- Create Configuration Form -->
 			<div class="col-xs-9 form-group adminForm" style="padding-top:0">
 				<h4>LDAP Server Details</h4>
-				<div class='adminControl'>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Server Name">Server Name</span>
 					<input type="text" autocomplete="off" id="ldapServerName" name="ldapServerName" ng-model="ldapConf.serverName" maxlength="50" class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Server Name"/>
-				</div>
-				<div class='adminControl'>
-					<input type="text" autocomplete="off" id="ldapServerURL" name="ldapServerURL" ng-model="ldapConf.url" maxlength="250"
-					class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Directory Provider URL (Eg: ldap://example.com:389)"/>
-				</div>
-				<div class='adminControl'>
-					<input type="text" autocomplete="off" id="ldapBaseDN" name="ldapBaseDN" ng-model="ldapConf.basedn" class="form-control form-control-custom create" placeholder="Base Domain Name"/>
-				</div>
-				<br><br><br><br><br><br><br><br><h4>Authentication Type</h4>
-				<div>
-					<label><input type="radio" ng-model="ldapConf.auth" value="anonymous" name="optradio" ng-change='ldapConf.switchAuthType()'/> Anonymous</label>
-				</div>
-				<div>
-					<label><input type="radio" ng-model="ldapConf.auth" value="simple" name="optradio" ng-change='ldapConf.switchAuthType()'/> Simple</label>
-				</div>
-				<div class='leftControl adminControl'>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{ldapConf.urlToolTip}}">Server URL</span>
+					<input type="text" autocomplete="off" id="ldapServerURL" name="ldapServerURL" ng-model="ldapConf.url" class="form-control form-control-custom create" placeholder="{{ldapConf.urlToolTip}}"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{ldapConf.baseDNToolTip}}">Base Domain Name</span>
+					<input type="text" autocomplete="off" id="ldapBaseDN" name="ldapBaseDN" ng-model="ldapConf.basedn" class="form-control form-control-custom create" placeholder="{{ldapConf.baseDNToolTip}}"/>
+				</div></div>
+				<div class='adminControl' style="margin-bottom:2%"><div>
+					<span class="leftControl" title="Secure Connection (ldaps protocol)">Secure Connection</span>
+					<label class="adminFormRadio" title="Disable Secure LDAP (No ldaps)">
+						<input type="radio" ng-model="ldapConf.secure" value="false" name="ldapSecure" ng-change='ldapConf.switchSecureUrl($event)'/>
+						<span>Disable</span>
+					</label>
+					<label class="adminFormRadio" title="Enable Secure LDAP (ldaps)">
+						<input type="radio" ng-model="ldapConf.secure" value="secure" name="ldapSecure" ng-change='ldapConf.switchSecureUrl($event)'/>
+						<span>Enable</span>
+					</label>
+					<label class="adminFormRadio" title="Enable Secure LDAP (ldaps) but ignore TLS errors">
+						<input type="radio" ng-model="ldapConf.secure" value="insecure" name="ldapSecure" ng-change='ldapConf.switchSecureUrl($event)'/>
+						<span>Enable Insecure</span>
+					</label>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{ldapConf.certToolTip}}">TLS Certificate</span>
+					<label id="ldapCert" ng-if="ldapConf.secure!='false'" style="cursor:pointer" for="certInput"><span class="fa fa-upload" style="width:auto;margin-right:10px"></span>{{ldapConf.certName}}</label>
+					<label id="ldapCert" ng-if="ldapConf.secure=='false'" style="cursor:not-allowed"><span style="width:auto;font-weight:normal">Secure Option needs to be enabled</span></label>
+					<input type="file" accept=".cer,.crt,.cert,.pem" autocomplete="off" id="certInput" name="ldapCert" style="margin-top:5px" class="no-disp" ng-disabled="ldapConf.secure=='false'"/>
+				</div></div>
+				<div class='adminControl' style="margin-bottom:2%"><div>
+					<span class="leftControl" title="Secure Connection">Authentication</span>
+					<label class="adminFormRadio">
+						<input type="radio" ng-model="ldapConf.auth" value="anonymous" name="ldapAuth" ng-change='ldapConf.switchAuthType($event)'/>
+						<span>Anonymous</span>
+					</label>
+					<label class="adminFormRadio">
+						<input type="radio" ng-model="ldapConf.auth" value="simple" name="ldapAuth" ng-change='ldapConf.switchAuthType($event)'/>
+						<span>Simple</span>
+					</label>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Bind Principal">Bind Principal</span>
 					<input type="text" autocomplete="off" name="binddn" id="binddn" ng-disabled="ldapConf.auth != 'simple'" ng-model="ldapConf.binddn" class="form-control form-control-custom create" placeholder="Authentication Principal" autocomplete="off"/>
-				</div>
-				<div class='rightControl adminControl'>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Bind Credentials">Bind Credentials</span>
 					<input type="password" autocomplete="off" name="bindCredentials" id="bindCredentials" ng-disabled="ldapConf.auth != 'simple'" ng-model="ldapConf.bindCredentials" class="form-control form-control-custom create" placeholder="Authentication Credentials" autocomplete="off"/>
-				</div>
-				<br><br><br><h4>Data Mapping Settings</h4>
-				<h5>Mapping options are populates on click of <i>Test</i> with connection successful.</h5>
+				</div></div>
+				<h4>Data Mapping Settings</h4>
+				<h5>Mapping options are populated on click of <i>Test</i> with connection successful.</h5>
 				<div class='adminControl'><div>
 					<span class="leftControl">Username</span><select class='adminSelect form-control' ng-model="ldapConf.fieldmap.uname" id="ldapFMapUname" class="form-control rightControl selectControl">
 						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldmap.uname">{{field}}</option>
@@ -509,33 +538,62 @@
 			<!-- Edit Configuration Form -->
 			<div class="col-xs-9 form-group adminForm" style="padding-top:0">
 				<h4>LDAP Server Details</h4>
-				<div class='userForm adminControl'>
-					<select ng-change="ldapConf.getServerData()" class='adminSelect selectlg form-control' ng-model="ldapConf.serverName" id="ldapServerName" class="form-control rightControl selectControl">
+				<div class='userForm adminControl'><div>
+					<span class="leftControl" title="Server Name">Server Name</span><select ng-change="ldapConf.getServerData()" class='adminSelect form-control' ng-model="ldapConf.serverName" id="ldapServerName" class="form-control rightControl selectControl">
 						<option value="" disabled selected>Select Server</option>
 					</select>
-				</div>
-				<div class='adminControl'>
-					<input type="text" autocomplete="off" id="ldapServerURL" name="ldapServerURL" ng-model="ldapConf.url" maxlength="250"
-					class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Directory Provider URL (Eg: ldap://example.com:389)"/>
-				</div>
-				<div class='adminControl'>
-					<input type="text" autocomplete="off" id="ldapBaseDN" name="ldapBaseDN" ng-model="ldapConf.basedn" class="form-control form-control-custom create" placeholder="Base Domain Name"/>
-				</div>
-				<br><br><br><br><br><br><br><br><h4>Authentication Type</h4>
-				<div>
-					<label><input type="radio" ng-model="ldapConf.auth" value="anonymous" name="optradio" ng-change='ldapConf.switchAuthType()'/> Anonymous</label>
-				</div>
-				<div>
-					<label><input type="radio" ng-model="ldapConf.auth" value="simple" name="optradio" ng-change='ldapConf.switchAuthType()'/> Simple</label>
-				</div>
-				<div class='leftControl adminControl'>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{ldapConf.urlToolTip}}">Server URL</span>
+					<input type="text" autocomplete="off" id="ldapServerURL" name="ldapServerURL" ng-model="ldapConf.url" class="form-control form-control-custom create" placeholder="{{ldapConf.urlToolTip}}"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{ldapConf.baseDNToolTip}}">Base Domain Name</span>
+					<input type="text" autocomplete="off" id="ldapBaseDN" name="ldapBaseDN" ng-model="ldapConf.basedn" class="form-control form-control-custom create" placeholder="{{ldapConf.baseDNToolTip}}"/>
+				</div></div>
+				<div class='adminControl' style="margin-bottom:2%"><div>
+					<span class="leftControl" title="Secure Connection (ldaps protocol)">Secure Connection</span>
+					<label class="adminFormRadio" title="Disable Secure LDAP (No ldaps)">
+						<input type="radio" ng-model="ldapConf.secure" value="false" name="ldapSecure" ng-change='ldapConf.switchSecureUrl($event)'/>
+						<span>Disable</span>
+					</label>
+					<label class="adminFormRadio" title="Enable Secure LDAP (ldaps)">
+						<input type="radio" ng-model="ldapConf.secure" value="secure" name="ldapSecure" ng-change='ldapConf.switchSecureUrl($event)'/>
+						<span>Enable</span>
+					</label>
+					<label class="adminFormRadio" title="Enable Secure LDAP (ldaps) but ignore TLS errors">
+						<input type="radio" ng-model="ldapConf.secure" value="insecure" name="ldapSecure" ng-change='ldapConf.switchSecureUrl($event)'/>
+						<span>Enable Insecure</span>
+					</label>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="{{ldapConf.certToolTip}}">TLS Certificate</span>
+					<label id="ldapCert" ng-if="ldapConf.secure!='false'" style="display:inline;cursor:pointer" for="certInput"><span class="fa fa-upload" style="width:auto;margin-right:10px"></span>{{ldapConf.certName}}</label>
+					<label id="ldapCert" ng-if="ldapConf.secure=='false'" style="display:inline;cursor:not-allowed"><span style="width:auto;font-weight:normal">Secure Option needs to be enabled</span></label>
+					<input type="file" accept=".cer,.crt,.cert,.pem" autocomplete="off" id="certInput" name="ldapCert" style="margin-top:5px" class="no-disp" ng-disabled="ldapConf.secure=='false'"/>
+					<textarea autocomplete="off" id="ldapCertValue" name="ldapCertValue" disabled="" readonly="" class="certTextarea" style="height:70px">{{ldapConf.cert}}</textarea>
+				</div></div>
+				<div class='adminControl' style="margin-bottom:2%"><div>
+					<span class="leftControl" title="Secure Connection">Authentication</span>
+					<label class="adminFormRadio">
+						<input type="radio" ng-model="ldapConf.auth" value="anonymous" name="ldapAuth" ng-change='ldapConf.switchAuthType($event)'/>
+						<span>Anonymous</span>
+					</label>
+					<label class="adminFormRadio">
+						<input type="radio" ng-model="ldapConf.auth" value="simple" name="ldapAuth" ng-change='ldapConf.switchAuthType($event)'/>
+						<span>Simple</span>
+					</label>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Bind Principal">Bind Principal</span>
 					<input type="text" autocomplete="off" name="binddn" id="binddn" ng-disabled="ldapConf.auth != 'simple'" ng-model="ldapConf.binddn" class="form-control form-control-custom create" placeholder="Authentication Principal" autocomplete="off"/>
-				</div>
-				<div class='rightControl adminControl'>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Bind Credentials">Bind Credentials</span>
 					<input type="password" autocomplete="off" name="bindCredentials" id="bindCredentials" ng-disabled="ldapConf.auth != 'simple'" ng-model="ldapConf.bindCredentials" class="form-control form-control-custom create" placeholder="Authentication Credentials" autocomplete="off"/>
-				</div>
-				<br><br><br><h4>Data Mapping Settings</h4>
-				<h5>All Mapping options are populates on click of <i>Test</i> with connection successful.</h5>
+				</div></div>
+				<h4>Data Mapping Settings</h4>
+				<h5>All Mapping options are populated on click of <i>Test</i> with connection successful.</h5>
 				<div class='adminControl'><div>
 					<span class="leftControl">Username</span><select class='adminSelect form-control' ng-model="ldapConf.fieldmap.uname" id="ldapFMapUname" class="form-control rightControl selectControl">
 						<option value="{{ldapConf.fieldmap.uname}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldmap.uname)==-1" ng-selected="true">{{ldapConf.fieldmap.uname}}</option>
@@ -595,8 +653,8 @@
 				</div></div>
 				<div class='adminControl'><div>
 					<span class="leftControl" title="{{samlConf.certToolTip}}">Certificate</span>
-					<label id="samlCert" for="samlCertInput" style="cursor:pointer"><span class="fa fa-upload" style="width:auto;margin-right:10px"></span>{{samlConf.certName}}</label>
-					<input type="file" accept=".cer,.crt,.cert,.pem" autocomplete="off" id="samlCertInput" name="samlCert" style="margin-top:5px" class="no-disp"/>
+					<label id="samlCert" for="certInput" style="cursor:pointer"><span class="fa fa-upload" style="width:auto;margin-right:10px"></span>{{samlConf.certName}}</label>
+					<input type="file" accept=".cer,.crt,.cert,.pem" autocomplete="off" id="certInput" name="samlCert" style="margin-top:5px" class="no-disp"/>
 				</div></div>
 			</div>
 			<!-- Create Configuration Form -->
@@ -633,9 +691,9 @@
 				</div></div>
 				<div class='adminControl'><div>
 					<span class="leftControl" title="{{samlConf.certToolTip}}">Certificate</span>
-					<label id="samlCert" for="samlCertInput" style="cursor:pointer;display:inline"><span class="fa fa-upload" style="width:auto;margin-right:10px"></span>{{samlConf.certName}}</label>
-					<input type="file" accept=".cer,.crt,.cert,.pem" autocomplete="off" id="samlCertInput" name="samlCert" style="margin-top:5px" class="no-disp"/>
-					<textarea autocomplete="off" id="samlCertValue" name="samlCertValue" disabled="" readonly="">{{samlConf.cert}}</textarea>
+					<label id="samlCert" for="certInput" style="cursor:pointer;display:inline"><span class="fa fa-upload" style="width:auto;margin-right:10px"></span>{{samlConf.certName}}</label>
+					<input type="file" accept=".cer,.crt,.cert,.pem" autocomplete="off" id="certInput" name="samlCert" style="margin-top:5px" class="no-disp"/>
+					<textarea autocomplete="off" id="samlCertValue" name="samlCertValue" disabled="" readonly="" class="certTextarea">{{samlConf.cert}}</textarea>
 				</div></div>
 			</div>
 			<!-- Edit Configuration Form -->

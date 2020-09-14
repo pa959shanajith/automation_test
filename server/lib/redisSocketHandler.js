@@ -51,7 +51,7 @@ default_sub.on("message", (channel, message) => {
 		break;
 
 	case "LAUNCH_MOBILE_WEB":
-		mySocket.emit("LAUNCH_MOBILE_WEB", data.mobileSerial, data.androidVersion);
+		mySocket.emit("LAUNCH_MOBILE_WEB", data.mobileSerial, data.androidVersion, data.data);
 		break;
 
 	case "PDF_SCRAPE":

@@ -832,17 +832,18 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					$('#pref').empty()
 					$('#pref').append("<tr><td>Admin</td><td><input type='checkbox' value='' checked='checked' class='module_admin'></td><td><input type='checkbox' value='' class='module_admin'></td><td><input type='checkbox' value='' class='module_admin'></td><td><input type='checkbox' value='' class='module_admin'></td></tr>")
 					$('#pref').append("<tr id=rows><td>ICE</td></tr>")
-					rows=["ALM","Mindmap","NeuronGraphs","Reports","Utility"];
-					for(i=0;i<response.length;i++){
+					for(i=0;i<response.length;i++) {
 						$('#head').append("<th>"+response[i].name+"</th>");
 						let checked = (['Test Lead', 'Test Engineer'].indexOf(response[i].name) > -1)? "checked='checked'":'';
 						$('#rows').append("<td><input type='checkbox' value='' "+checked+" class='module_admin'></td>");
 					}
+					var rows = ["ALM","Mindmap","Reports","Utility"];
 					for (j=0;j<rows.length;j++){
-						$('#pref').append("<tr id="+rows[j]+"><td>"+rows[j]+"</td></tr>")
+						let pluginName = (rows[j]=="ALM")? "Integration" : rows[j];
+						$('#pref').append("<tr id="+pluginName+"><td>"+pluginName+"</td></tr>")
 						for(i=0;i<response.length;i++){
 							let checked = (response[i].plugins[rows[j].toLowerCase()]==true)? "checked='checked'":'';
-							$("#"+rows[j]).append("<td><input type='checkbox' value='' "+checked+" class='module_admin'></td>");
+							$("#"+pluginName).append("<td><input type='checkbox' value='' "+checked+" class='module_admin'></td>");
 						}
 					}
 					$("#preferencesTable").find("input[type=checkbox]").each(function () {
@@ -2442,7 +2443,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			else if(data == "empty") openModalPopup("Create User","There are no users available in this Server.");
 			else {
 				$scope.userConf.nocreate = false;
-				data.sort((a,b)=>a.localeCompare(b));
+				data.sort((a,b)=>a[0].localeCompare(b[0]));
 				$scope.userConf.ldapAllUserList = data.map(e=>({value:e[1],html:e[0]}));
 			}
 		}, function (error) {
@@ -2473,7 +2474,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			else if(data == "empty") openModalPopup("Create User","User not found!");				
 			else {
 				userConf.nocreate = false;
-				userConf.userName = data.username;
+				if ($scope.tab !== "editUser") userConf.userName = data.username;
 				userConf.firstname = data.firstname;
 				userConf.lastname = data.lastname;
 				userConf.email = data.email;
@@ -2609,6 +2610,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$(document).on("keydown", ".validationKeydown", function (e) {
 		if (e.target.id == "ldapServerURL" && [':', '/'].indexOf(e.key) > -1)
 			return true;
+		// Block all characters except hyphen, alphabet, digit
+		if (['ldapServerName', 'samlServerName', 'oidcServerName'].includes(e.target.id)) {
+			if (([32,59,61,106,107,109,111,173,186,187,188,190,191,192,219,220,221,222].indexOf(e.keyCode) > -1) ||
+			 e.shiftKey && (e.keyCode >= 48 && e.keyCode <= 57 || e.keyCode == 189))
+				return false;
+			return true;
+		}
 		// Block all characters except _ . a-Z 0-9 - [ ] { } ! @ # $ ^ & . space
 		if (([59, 61, 106, 107, 109, 111, 173, 186, 187, 188, 191, 192, 220, 222].indexOf(e.keyCode) > -1) || e.shiftKey && ([48, 53, 56, 57, 190].indexOf(e.keyCode) > -1))
 			return false;
@@ -2633,8 +2641,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				regex = /[\\\~`|;:"',<>?/\s]/g;
 			else if (e.target.id == 'ldapServerURL')
 				regex = /[\\\[\]\~`!@#$%^&*()+={}|;"',<>?\s]/g;
-			else if (e.target.id == 'projectName' || e.target.id == 'releaseTxt' || e.target.id == 'cycleTxt' || e.target.id == 'releaseName' || e.target.id == 'cycleName')
+			else if (['projectName', 'releaseTxt', 'cycleTxt', 'releaseName', 'cycleName'].includes(e.target.id))
 				regex = /[-\\\[\]\~`!@#$%^&*()+={}|;:"',.<>?/\s]/g;
+			else if (['ldapServerName', 'samlServerName', 'oidcServerName'].includes(e.target.id))
+				regex = /[\\\[\]\~`!@#$%^&*()_+=\{\}|;:"',.<>?/\s]/g;
 			else
 				regex = /[-\\0-9[\]\~`!@#$%^&*()-+={}|;:"',.<>?/\s_]/g;
 			userEnteredText = userEnteredText.replace(regex, "");
@@ -2745,34 +2755,59 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		this.binddn = "";
 		this.bindCredentials = "";
 		this.basedn = "";
+		this.cert = "";
+		this.certName = "No file choosen";
+		this.secure = "false";
 		this.fieldmap = {uname: "None", fname: "None", lname: "None", email: "None"};
 		this.fieldMapOpts = ["None"];
 		if (action == "edit") this.auth = "";
 		this.testStatus = "false";
+		this.urlToolTip = "Directory Provider URL (Eg: ldap://example.com:389)";
+		this.baseDNToolTip = "Base Domain Name (Eg: DC=EXAMPLE,DC=COM)";
+		this.certToolTip = "TLS certificate for secure connection";
 		this.switchAuthType();
+		this.switchSecureUrl();
+		$("#ldapServerURL,#binddn,#bindCredentials,#ldapBaseDN").removeClass("inputErrorBorder");
+		$("#ldapFMapUname,#ldapFMapFname,#ldapFMapLname,#ldapFMapEmail").removeClass("selectErrorBorder");
+		$("#ldapCert").removeClass("inputErrorText");
 	};
 
 	$scope.ldapConf.validate = function(action) {
-		var flag = true;
+		let flag = true;
+		let popped = false;
+		const secure = this.secure != "false";
 		$("#ldapServerURL,#binddn,#bindCredentials,#ldapBaseDN").removeClass("inputErrorBorder");
 		$("#ldapFMapUname,#ldapFMapFname,#ldapFMapLname,#ldapFMapEmail").removeClass("selectErrorBorder");
-		var nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
+		$("#ldapCert").removeClass("inputErrorText");
+		let nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
 		$("#ldapServerName").removeClass(nameErrorClass);
-		regExURL = /^ldap:\/\/[A-Za-z0-9._-]+:\d+$/;
+		const regExName = /^[A-Za-z0-9]+([A-Za-z0-9-]*[A-Za-z0-9]+|[A-Za-z0-9]*)$/;
+		let regExURL = /^ldap:\/\/[A-Za-z0-9.-]+:\d+$/;
+		if (secure) regExURL = /^ldaps:\/\/[A-Za-z0-9.-]+:\d+$/;
 		if (this.serverName == "") {
 			$("#ldapServerName").addClass(nameErrorClass);
 			flag = false;
+		} else if (!regExName.test(this.serverName) && action == "create") {
+			$("#ldapServerName").addClass("inputErrorBorder");
+			openModalPopup("Error", "Invalid Server Name provided! Name cannot contain any special characters other than hyphen. Also name cannot start or end with hyphen.");
+			flag = false;
+			popped = true;
 		}
 		if (this.url == "") {
 			$("#ldapServerURL").addClass("inputErrorBorder");
 			flag = false;
-		} else if (regExURL.test(this.url) == false) {
+		} else if (!regExURL.test(this.url)) {
 			$("#ldapServerURL").addClass("inputErrorBorder");
-			openModalPopup("Error", "Invalid URL provided! URL must start with ldap:// followed by either an IP or a well defined domain name has to be provided along with a port number.");
+			if (!popped) openModalPopup("Error", "Invalid URL provided! URL must start with 'ldap"+((secure)?'s':'')+"://' followed by either an IP or a well defined domain name followed by a port number.");
 			flag = false;
+			popped = true;
 		}
 		if (this.basedn == "") {
 			$("#ldapBaseDN").addClass("inputErrorBorder");
+			flag = false;
+		}
+		if (secure && this.cert == "") {
+			$("#ldapCert").addClass("inputErrorText");
 			flag = false;
 		}
 		if (this.binddn == "" && this.auth == "simple") {
@@ -2783,7 +2818,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			$("#bindCredentials").addClass("inputErrorBorder");
 			flag = false;
 		}
-		if (action != "test") {
+		if (action != "test" && action != "delete") {
 			if (this.fieldmap.uname == "") {
 				$("#ldapFMapUname").addClass("selectErrorBorder");
 				flag = false;
@@ -2812,6 +2847,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			name: ldapConf.serverName,
 			url: ldapConf.url,
 			basedn: ldapConf.basedn,
+			secure: ldapConf.secure,
+			cert: ldapConf.cert,
 			auth: ldapConf.auth,
 			binddn: ldapConf.binddn,
 			bindcredentials: ldapConf.bindCredentials,
@@ -2832,7 +2869,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			} else if(data == "success") {
 				if (action == "create") $scope.ldapConf.click();
 				else $scope.ldapConf.edit();
-				openModalPopup(bAction+" Configuration", "Configuration '"+confObj.name+"' "+action+"d successfully!");
+				openModalPopup(bAction+" Configuration", "Configuration '"+confObj.name+"' "+action+"d Successfully!");
 			} else if(data == "exists") {
 				$("#ldapServerName").addClass("inputErrorBorder");
 				openModalPopup(bAction+" Configuration", "Configuration '"+confObj.name+"' already Exists!");
@@ -2840,7 +2877,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (action == "create") $scope.ldapConf.click();
 				else $scope.ldapConf.edit();
 				openModalPopup(bAction+" Configuration", "Failed to "+action+" '"+confObj.name+"' configuration.");
-			} else if(/^1[0-4]{8}$/.test(data)) {
+			} else if(/^1[0-7]{8}$/.test(data)) {
 				if (parseInt(data[1])) {
 					openModalPopup(bAction+" Configuration", "Failed to "+action+" '"+confObj.name+"' configuration. Invalid Request!");
 					return;
@@ -2848,9 +2885,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				var errfields = [];
 				var errHints = [];
 				if (parseInt(data[2])) errfields.push("Server Name");
-				if (parseInt(data[3])) errfields.push("Directory Provider URL");
-				if (parseInt(data[3]) == 2) errHints.push("'ldaps' protocol is not supported");
-				if (parseInt(data[3]) == 3) errHints.push("'ldap://' is missing from url prefix");
+				if (parseInt(data[3])) errfields.push("Server URL");
+				if (parseInt(data[3]) == 2) errHints.push("Secure Connection needs 'ldaps' protocol");
+				else if (parseInt(data[3]) == 3) errHints.push("Secure Connection needs a TLS Certificate");
+				else if (parseInt(data[3]) == 4) errHints.push("'ldaps' protocol needs secure connection enabled");
+				else if (parseInt(data[3]) == 5) errHints.push("'ldap(s)://' is missing from url prefix");
 				if (parseInt(data[4])) errfields.push("Base Domain Name");
 				if (parseInt(data[5])) errfields.push("Authentication Type");
 				if (parseInt(data[6])) errfields.push("Authentication Principal");
@@ -2921,15 +2960,17 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			} else {
 				ldapConf.url = data.url;
 				ldapConf.basedn = data.basedn;
+				ldapConf.secure = data.secure;
+				ldapConf.cert = data.cert;
+				ldapConf.certName = "No file choosen";
 				ldapConf.auth = data.auth;
 				ldapConf.binddn = data.binddn;
 				ldapConf.bindCredentials = data.bindCredentials;
+				ldapConf.fieldMapOpts = ["None"]
+				for (let fmo of Object.values(data.fieldmap)) {
+					if (!ldapConf.fieldMapOpts.includes(fmo)) ldapConf.fieldMapOpts.push(fmo);
+				}
 				ldapConf.fieldmap = data.fieldmap;
-				ldapConf.fieldMapOpts = []
-				ldapConf.fieldMapOpts.push(ldapConf.fieldmap.uname)
-				ldapConf.fieldMapOpts.push(ldapConf.fieldmap.fname)
-				ldapConf.fieldMapOpts.push(ldapConf.fieldmap.lname)
-				ldapConf.fieldMapOpts.push(ldapConf.fieldmap.email)
 			}
 		}, function (error) {
 			unblockUI();
@@ -2944,51 +2985,59 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		// var infoArr = [];
 		// labelArr.push(txnHistory.codesDict['LdapConftest']);
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
-		var url = this.url;
-		var base_dn = this.basedn;
-		var bind_dn = this.binddn;
-		var bind_auth = this.bindCredentials;
-		var auth = this.auth;
 		blockUI("Testing Connection...");
-		adminServices.testLDAPConnection(auth, url, base_dn, bind_dn, bind_auth)
+		adminServices.testLDAPConnection(this.auth, this.url, this.basedn, this.binddn, this.bindCredentials, this.secure, this.cert)
 		.then(function(data){
 			unblockUI();
 			var fields = (typeof data=="string")? [] : (data.fields || []);
 			if (typeof data!="string") data = data.flag;
 			$scope.ldapConf.testStatus = data;
-			if(data == "Invalid Session"){
-				$rootScope.redirectPage();
+			if(data == "Invalid Session") {
 				$(".modal-backdrop").remove();
-			} else if(data == "success"){
+				$rootScope.redirectPage();
+			} else if(data == "success") {
 				openModalPopup("Test Connection", "Test Connection Successful!");
-				$scope.ldapConf.fieldMapOpts = fields.concat("None").sort();
-			} else if(data == "fail"){
-				openModalPopup("Test Connection", "Test Connection Failed!");
-			} else if(data == "invalid_addr"){
-				openModalPopup("Test Connection", "Test Connection Failed! Either host is unavailable or port is incorrect.");
-			} else if(data == "invalid_url_protocol"){
-				openModalPopup("Test Connection", "Test Connection Failed! Invalid URL. 'ldaps://' is not permitted");
-			} else if(data == "invalid_url"){
-				openModalPopup("Test Connection", "Test Connection Failed! Invalid URL. It must start with 'ldap://'");
-			} else if(data == "invalid_auth"){
-				openModalPopup("Test Connection", "Test Connection Success! Anonymous access is not allowed for this server.");
-			} else if(data == "invalid_credentials"){
-				openModalPopup("Test Connection", "Test Connection Failed! Credentials provided for Authentication are invalid.");
-			} else if(data == "insufficient_access"){
-				openModalPopup("Test Connection", "Test Connection Failed! Credentials provided does not have required privileges for setting up LDAP.");
-			} else if(data == "invalid_basedn"){
-				openModalPopup("Test Connection", "Test Connection Failed! Base Domain Name is incorrect.");
-			}
+				fields = fields.concat("None");
+				for (let fmo of $scope.ldapConf.fieldMapOpts) {
+					if (!fields.includes(fmo)) fields.push(fmo);
+				}
+				$scope.ldapConf.fieldMapOpts = fields.sort();
+			} else if(data == "invalid_addr") openModalPopup("Test Connection", "Test Connection Failed! Either host is unavailable or port is incorrect.");
+			else if(data == "mismatch_secure") openModalPopup("Test Connection", "Test Connection Failed! Secure connection must be enabled for 'ldaps' protocol.");
+			else if(data == "invalid_cert") openModalPopup("Test Connection", "Test Connection Failed! 'ldaps://' protocol require TLS Certificate.");
+			else if(data == "invalid_cacert") openModalPopup("Test Connection", "Test Connection Failed! TLS Certificate should have full certificate chain including issuer CA certificate.");
+			else if(data == "invalid_cacert_host") openModalPopup("Test Connection", "Test Connection Failed! Hostname/IP provided for connection is not in the TLS Certificate's list.");
+			else if(data == "invalid_url") openModalPopup("Test Connection", "Test Connection Failed! Invalid URL. It must start with 'ldap://'");
+			else if(data == "invalid_auth") openModalPopup("Test Connection", "Test Connection Success! Anonymous access is not allowed for this server.");
+			else if(data == "invalid_credentials") openModalPopup("Test Connection", "Test Connection Failed! Credentials provided for Authentication are invalid.");
+			else if(data == "insufficient_access") openModalPopup("Test Connection", "Test Connection Failed! Credentials provided does not have required privileges for setting up LDAP.");
+			else if(data == "invalid_basedn") openModalPopup("Test Connection", "Test Connection Failed! Base Domain Name is incorrect.");
+			else if(data == "empty") openModalPopup("Test Connection", "Test Connection Successful but LDAP directory is empty!");
+			else if(data == "fail") openModalPopup("Test Connection", "Test Connection Failed!");
+			else openModalPopup("Test Connection", "Test Connection Failed due to unexpected error!");
 		}, function (error) {
 			unblockUI();
 			openModalPopup("Test Connection", "Test Connection Failed!");
 		});
 	};
 
-	$scope.ldapConf.switchAuthType = function(){
-		if($scope.ldapConf.auth == "anonymous"){
-			$("#binddn").val('');
-			$("#bindCredentials").val('');
+	$scope.ldapConf.switchAuthType = function() {
+		if(this.auth == "anonymous") {
+			this.binddn = "";
+			this.bindCredentials = "";
+		}
+	};
+
+	$scope.ldapConf.switchSecureUrl = function() {
+		this.url = this.url.trim();
+		if(this.secure == "false") {
+			this.cert = "";
+			this.certName = "No file choosen";
+			if (this.url.toLowerCase().startsWith("ldaps://")) this.url = "ldap://" + this.url.slice(8);
+			if (this.url.toLowerCase().endsWith(":636")) this.url = this.url.slice(0,-3) + "389";
+		} else {
+			if (this.url.toLowerCase().startsWith("ldap://")) this.url = "ldaps://" + this.url.slice(7);
+			if (this.url.toLowerCase().endsWith(":389")) this.url = this.url.slice(0,-3) + "636";
 		}
 	};
 
@@ -3011,22 +3060,30 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.samlConf.validate = function(action) {
 		let flag = true;
+		let popped = false;
 		$("#samlAcsUrl,#samlIDP,#samlServerName").removeClass("inputErrorBorder");
 		$("#samlCert").removeClass("inputErrorText");
 		$("#samlServerName").removeClass("selectErrorBorder");
+		const regExName = /^[A-Za-z0-9]+([A-Za-z0-9-]*[A-Za-z0-9]+|[A-Za-z0-9]*)$/;
 		const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
 		const nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
 		if (this.name == "") {
 			$("#samlServerName").addClass(nameErrorClass);
 			flag = false;
+		} else if (!regExName.test(this.name) && action == "create") {
+			$("#samlServerName").addClass("inputErrorBorder");
+			openModalPopup("Error", "Invalid Server Name provided! Name cannot contain any special characters other than hyphen. Also name cannot start or end with hyphen.");
+			flag = false;
+			popped = true;
 		}
 		if (this.url == "") {
 			$("#samlAcsUrl").addClass("inputErrorBorder");
 			flag = false;
 		} else if (regExURL.test(this.url) == false) {
 			$("#samlAcsUrl").addClass("inputErrorBorder");
-			openModalPopup("Error", "Invalid URL provided! URL must start with http:// or https://");
+			if (!popped) openModalPopup("Error", "Invalid URL provided! URL must start with http:// or https://");
 			flag = false;
+			popped = true;
 		}
 		if (this.idp == "") {
 			$("#samlIDP").addClass("inputErrorBorder");
@@ -3133,16 +3190,19 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$scope.samlConf.manage("delete", e);
 	});
 
-	$(document).on('change','#samlCertInput', function(event) {
-		const targetFile = event && (event.srcElement || event.target).files[0] || null;
+	$(document).on('change','#certInput', function(event) {
+		const target = event && (event.srcElement || event.target) || null;
+		const targetFile = target && target.files[0] || null;
 		if (targetFile == null) return;
-		$scope.samlConf.certName = targetFile.name;
+		var conf = (target.name.includes('ldap'))? $scope.ldapConf:$scope.samlConf;
+		conf.certName = targetFile.name;
 		var reader = new FileReader();
 		reader.onload = function(e) {
-			$scope.samlConf.cert = (e && e.target.result)? e.target.result : this.content;
+			conf.cert = (e && e.target.result)? e.target.result : this.content;
 			$scope.$apply();
 		};
 		reader.readAsBinaryString(targetFile);
+		target.value = '';
 	});
 
 	$scope.samlConf.getServerData = function () {
@@ -3159,6 +3219,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				$scope.samlConf.url = data.url;
 				$scope.samlConf.idp = data.idp;
 				$scope.samlConf.cert = data.cert;
+				$scope.samlConf.certName = "No file choosen";
 			}
 		}, function (error) {
 			unblockUI();
@@ -3182,21 +3243,29 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.oidcConf.validate = function(action) {
 		let flag = true;
+		let popped = false;
 		$("#oidcUrl,#oidcClientId,#oidcClientSecret,#oidcServerName").removeClass("inputErrorBorder");
 		$("#oidcServerName").removeClass("selectErrorBorder");
+		const regExName = /^[A-Za-z0-9]+([A-Za-z0-9-]*[A-Za-z0-9]+|[A-Za-z0-9]*)$/;
 		const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
 		const nameErrorClass = (action == "update")? "selectErrorBorder":"inputErrorBorder";
 		if (this.name == "") {
 			$("#oidcServerName").addClass(nameErrorClass);
 			flag = false;
+		} else if (!regExName.test(this.name) && action == "create") {
+			$("#oidcServerName").addClass("inputErrorBorder");
+			openModalPopup("Error", "Invalid Server Name provided! Name cannot contain any special characters other than hyphen. Also name cannot start or end with hyphen.");
+			flag = false;
+			popped = true;
 		}
 		if (this.url == "") {
 			$("#oidcUrl").addClass("inputErrorBorder");
 			flag = false;
 		} else if (regExURL.test(this.url) == false) {
 			$("#oidcUrl").addClass("inputErrorBorder");
-			openModalPopup("Error", "Invalid URL provided! URL must start with http:// or https://");
+			if (!popped) openModalPopup("Error", "Invalid URL provided! URL must start with http:// or https://");
 			flag = false;
+			popped = true;
 		}
 		if (this.clientId == "") {
 			$("#oidcClientId").addClass("inputErrorBorder");
