@@ -1,0 +1,97 @@
+.plugin-blocks{
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-gap: 20px 30px;
+}
+
+.plugin-ic{
+    height: 140px;
+    width: 140px;
+}
+
+.plugin-block{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #212529;
+    text-decoration: none;
+    &:hover{
+        color: #212529;
+        text-decoration: none;
+    }
+}
+
+.plugin-section{
+    display: flex;
+    flex-direction: column;
+    margin-right: 30px;
+}
+
+.avail-plugin-title{
+    font-family: "LatoWebLight";
+    font-size: 30px;
+    font-weight: 500;
+    line-height: 1.1;
+    padding-left: 15px;
+    margin-bottom: 10px;
+}
+
+.plugin-text{
+    font-family: "LatoWebLight";
+    font-size: 23px;
+    font-weight: 500;
+    line-height: 1.1;
+    margin-top: 10px;
+}
+
+@media screen and (min-width: 1400px) and (min-height: 770px){
+    .plugin-blocks{
+        grid-gap: 1.8vw 2.2vw;
+    }
+    
+    .plugin-ic{
+        height: 12vw;
+        width: 12vw;
+    }
+    
+    .plugin-section{
+        margin-right: 1.8vw;
+    }
+    
+    .avail-plugin-title{
+        font-size: 2.4vw;
+        padding-left: 1.6vw;
+        margin-bottom: 1vw;
+    }
+    
+    .plugin-text{
+        font-size: 2.1vw;
+        margin-top: .3vw;
+    }
+}
+
+@media screen and (max-width: 1025px){
+    .plugin-blocks{
+        grid-gap: 2vw 2.4vw;
+    }
+    
+    .plugin-ic{
+        height: 16vw;
+        width: 16vw;
+    }
+    
+    .plugin-section{
+        margin-right: 2vw;
+    }
+    
+    .avail-plugin-title{
+        font-size: 2.7vw;
+        padding-left: 1.8vw;
+        margin-bottom: 1.2vw;
+    }
+    
+    .plugin-text{
+        font-size: 2.3vw;
+        margin-top: .4vw;
+    }
+}

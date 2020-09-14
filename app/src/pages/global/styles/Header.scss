@@ -35,9 +35,7 @@
 
 .user-name-btn{
     padding-right: 12px;
-    border-left: 1px solid gray;
 }
-
 
 .user-name-menu{
     .divider{
@@ -61,6 +59,10 @@
     flex-direction: row;
 }
 
+.logo-disable{
+    cursor: default;
+}
+
 .user-name-btn, .switch-role-btn {
     display: flex;
     flex-direction: row;
@@ -68,6 +70,10 @@
     color: #333;
     justify-content: space-between;
     align-items: center;
+}
+
+.switch-role-btn{
+    border-right: 1px solid #d2d2d2;
 }
 
 .switch-role-icon{
@@ -79,7 +85,7 @@
 .bell-ic{
     color: #764ba2;
     font-size: 20px!important;
-    margin-top: 3px!important;
+    // margin-top: 3px!important;
     &:focus{
         outline: none!important;
     }
@@ -242,7 +248,7 @@
     
     .bell-ic{
         font-size: 1.6vw!important;
-        margin-top: 0.2vw;
+        // margin-top: 0.2vw;
     }
     
 }

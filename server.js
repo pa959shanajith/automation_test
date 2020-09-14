@@ -261,63 +261,10 @@ if (cluster.isMaster) {
 			res.redirect('/');
 		});
 
-		const authRedirecter = async req => {
-			let redirect = !1;
-			let userLogged = req.session.logged;
-			let user = req.user;
-			if (userLogged && !req.session.emsg) {
-				req.session.emsg = "userLogged";
-				req.session.dndSess = true;
-			} else if (!req.session.emsg && req.session.username == undefined) {
-				if (user) {
-					let username = user.username;
-					if (username == undefined) {
-						req.session.emsg = "invalid_username_password";
-					} else {
-						username = username.toLowerCase();
-						try {
-							const sessid = await utils.findSessID(username);
-							if (sessid != "") {
-								req.session.emsg = "userLogged";
-							} else {
-								req.session.username = username;
-								req.session.uniqueId = req.session.id;;
-								req.session.usertype = user.type;
-								logger.rewriters[0] = function(level, msg, meta) {
-									meta.username = username;
-									meta.userid = null;
-									meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
-									return meta;
-								};
-							}
-						} catch (err) {
-							logger.error("User Authentication failed. Error: ", err);
-							req.session.emsg = "fail";
-						}
-					}
-				} else {
-					logger.rewriters[0] = function(level, msg, meta) {
-						meta.username = null;
-						meta.userid = null;
-						meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
-						return meta;
-					};
-					redirect = !redirect;
-				}
-			}
-			return redirect;
-		};
 
 		app.get('/', async (req, res, next) => {
 			if (!(req.url == '/' || req.url.startsWith("/?"))) return next();
-			const redirect = await authRedirecter(req);
-			if (redirect) {
-				req.clearSession();
-				return res.redirect('login');
-			} else {
-				req.session.logged = true;
-				return res.sendFile("app.html", { root: __dirname + "/public/" });
-			}
+			return res.sendFile("app.html", { root: __dirname + "/public/" });
 		});
 
 		// Dummy Service for keeping session alive during long-term execution, etc. #Polling
@@ -330,7 +277,7 @@ if (cluster.isMaster) {
 		});
 
 		//Only Test Engineer and Test Lead have access
-		app.get(/^\/(design|designTestCase|execute|scheduling)$/, function(req, res) {
+		app.get(/^\/(scrape|design|designTestCase|execute|scheduling)$/, function(req, res) {
 			var roles = ["Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
@@ -364,7 +311,7 @@ if (cluster.isMaster) {
 			if (sessChk && roleChk) return res.sendFile("app.html", { root: __dirname + "/public/" });
 			else {
 				req.clearSession();
-				return res.redirect("/error?e=" + ((sessChk) ? "400" : "401"));
+				return res.redirect("/error?e=" + ((sessChk) ? "403" : "401"));
 			}
 		}
 
@@ -492,7 +439,7 @@ if (cluster.isMaster) {
 		app.post('/pdProcess', auth.protect, mindmap.pdProcess);	// process discovery service
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
-		app.post('/checkUserState', login.checkUserState);
+		app.post('/validateUserState', authlib.validateUserState);
 		app.post('/loadUserInfo', auth.protect, login.loadUserInfo);
 		app.post('/getRoleNameByRoleId', auth.protect, login.getRoleNameByRoleId);
 		app.post('/logoutUser', login.logoutUser);

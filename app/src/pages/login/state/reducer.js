@@ -1,7 +1,8 @@
 import * as actionTypes from './action';
 
 const initialState = {
-    userinfo: {}
+    userinfo: {},
+    SR: {}
 }
 
 const reducer = (state=initialState, action) => {
@@ -9,6 +10,10 @@ const reducer = (state=initialState, action) => {
         case actionTypes.SET_USERINFO:
             return {
                 ...state, userinfo: action.payload
+            }
+        case actionTypes.SET_SR:
+            return {
+                ...state, SR: action.payload
             }
         default:
             return state

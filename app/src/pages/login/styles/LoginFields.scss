@@ -3,6 +3,11 @@
     font-size:25px
 }
 
+.ic-holder{
+    display: flex;
+    align-items: center;
+}
+
 .field{
     font-size: 25px;
     border: none;
@@ -44,6 +49,10 @@
     &:focus{
         outline: none!important;
     }
+    &:disabled{
+        background-color: #ca99ff;
+        cursor: auto;
+    }
 }
 
 .login-btn{
@@ -54,16 +63,25 @@
     font-size: 24px!important;
     width: 100%;
     margin: 10px 0;
-    &:disabled{
-        background-color: #ca99ff;
-        cursor: auto;
-    }
 }
 
 .eye-ic{
     color:#a0a0a0;
     font-size: 20px;
 }
+
+.no-decor{
+    border: none;
+    outline: none;
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+    &:focus{
+        border: none;
+        outline: none;
+    }
+}
+
 .error-msg{
     font-family: "LatoWebMedium";
     font-size: 14px;

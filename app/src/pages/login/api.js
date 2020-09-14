@@ -91,9 +91,9 @@ export const getRoleNameByRoleId = async(roleasarray) => {
     }
 }
 
-export const checkUserState = async() => {
+export const validateUserState = async() => {
     try{
-        const res = await axios(url+"/checkUserState", {
+        const res = await axios(url+"/validateUserState", {
             method: "POST",
             credentials : 'include'
         });

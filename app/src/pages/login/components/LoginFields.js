@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Redirect } from 'react-router-dom';
 import * as api from '../api';
 import * as adminApi from "../../admin/api";
 import "../styles/LoginFields.scss";
@@ -21,30 +22,38 @@ const LoginFields = (props) => {
     const [loginValidation, setLoginValidation] = useState("");
     const [requested, setRequested] = useState(false);
     const [restartForm, setRestartForm] = useState(false);
+    const [redirectTo, setRedirectTo] = useState("");
+    const [focusBtn, setFocus] = useState("");
     let serverList = [{"name": "License Server", "active": false}, {"name": "DAS Server", "active": false}, {"name": "Web Server", "active": false}];
-    let dispatch = props.dispatch;
     let SetProgressBar = props.SetProgressBar;
 
-    const handleShowPass = () => setShowPass(!showPass);
+    const handleShowPass = () => {
+        setShowPass(!showPass);
+    }
 
     const handleUsername = event => {
-        setUserError(false);
+        resetErrors();
         if (showPassField){
-            hidePassField(false);
+            hidePassField();
         }
         setUsername(event.target.value);
     }
     const handlePassword = event => {
+        resetErrors();
+        setPassword(event.target.value);
+    }
+
+    const resetErrors = () =>{
         setPassError(false);
         setUserError(false);
         setLoginValidation("");
-        setPassword(event.target.value);
     }
 
     const hidePassField = () => {
         setPassField(false);
         setPassword("");
         setPassError(false);
+        setShowPass(false);
     }
 
     const checkUser = () => {
@@ -62,16 +71,13 @@ const LoginFields = (props) => {
                 // SetProgressBar("stop", dispatch);
                 setRequested(false);
                 if (data.redirect) {
-                    console.log(data.redirect)
                     window.location.href = data.redirect;
-                    // setRedirectTo(data.redirect);
-                } // history.replace(data.redirect);
+                }
                 else if (data.proceed) setPassField(true);
                 else if (data === "invalidServerConf") setLoginValidation("Authentication Server Configuration is invalid!");
                 else setLoginValidation(err);    
             }
             catch(err){
-                console.log(err);
                 setLoginValidation(err);
                 // cfpLoadingBar.complete();
                 setRequested(false);
@@ -81,22 +87,25 @@ const LoginFields = (props) => {
 
     const login = event => {
         event.preventDefault();
-        setLoginValidation("");
-        if (!showPassField) checkUser();
-        else if (!password) setPassError(true);
-        else check_credentials();
+        if (focusBtn ==="checkpass") handleShowPass();
+        else if (focusBtn !== "checkuser" && focusBtn !== "checkpass"){
+            resetErrors();
+            if (!showPassField) checkUser();
+            else if (!password) setPassError(true);
+            else check_credentials();
+        }
     }
 
     
     const check_credentials = () => {
         if (username && password){
             setRequested(true);
-            SetProgressBar("start", dispatch);
+            SetProgressBar("start");
             let user = username.toLowerCase();
             (async()=>{
                 try{
                     let data = await api.authenticateUser(user, password)
-                    SetProgressBar("stop", dispatch);
+                    SetProgressBar("stop");
                     setRequested(false);
                     if (data === "restart") {
                         // blockUI("Fetching active services...");
@@ -118,7 +127,7 @@ const LoginFields = (props) => {
                             setLoginValidation("Failed to fetch services.");
                         });
                     }
-                    else if (data === 'validCredential') window.location='/'; //setRedirectTo('/')  //  history.replace('/')
+                    else if (data === 'validCredential')  setRedirectTo("/")
                     else if (data === 'inValidCredential' || data === "invalid_username_password") {
                         setUserError(true);
                         setPassError(true);
@@ -166,7 +175,9 @@ const LoginFields = (props) => {
 
     return (
         <>
-        { restartForm 
+        {redirectTo ? <Redirect to={redirectTo} /> :
+            <>
+            { restartForm 
             ?
             <div>
                 {serverList.map((server, index)=>{
@@ -176,27 +187,27 @@ const LoginFields = (props) => {
             :
             <form className="login-form" onSubmit={login}>
             <div className="username-wrap" style={userError ? loginValidation ? {borderColor: "#d33c3c"} : styles.errorBorder : null }>
-                <span><img className="ic-username" alt="user-ic" src={userError ? res.errorUserIcon : res.defaultUserIcon}/></span>
-                <input className="field" placeholder="Username" value={username} onChange={handleUsername}></input>
-                {showPassField && username ? true : <span className="ic-rightarrow fa fa-arrow-circle-right arrow-circle" onClick={checkUser}></span>}
+                <span className="ic-holder"><img className="ic-username" alt="user-ic" src={userError ? res.errorUserIcon : res.defaultUserIcon}/></span>
+                <input className="field" placeholder="Username" onFocus={()=>setFocus("username")} value={username} onChange={handleUsername}></input>
+                {showPassField && username ? true : <button className="ic-rightarrow fa fa-arrow-circle-right arrow-circle no-decor" onFocus={()=>setFocus("checkuser")} onClick={checkUser}></button>}
             </div>
             {userError && !loginValidation ? <div className="error-msg">Please Enter Username</div> : null}
             {
             showPassField ?
                 <>
                 <div className="password-wrap" style={passError ? styles.errorBorder : null }>
-                    <span><img className="ic-password" alt="pass-ic" src={passError ? res.errorPassIcon : res.defaultUserIcon}/></span>
-                    <input className="field" type={showPass ? "text" : "password"} placeholder="Password" value={password} onChange={handlePassword}></input>
-                    <span className={showPass ? res.eyeSlashIcon : res.eyeIcon } onClick={handleShowPass}></span>
+                    <span className="ic-holder"><img className="ic-password" alt="pass-ic" src={passError ? res.errorPassIcon : res.defaultPassIcon}/></span>
+                    <input className="field" type={showPass ? "text" : "password"} autoFocus onFocus={()=>setFocus("password")} placeholder="Password" value={password} onChange={handlePassword}></input>
+                    <button className={ "no-decor " + (showPass ? res.eyeSlashIcon : res.eyeIcon) } onFocus={()=>setFocus("checkpass")}></button>
                 </div>
                 {passError && !loginValidation? <div className="error-msg">Please Enter Password</div> : null}
                 <div className="error-msg">{loginValidation}</div>
-                <button className="login-btn" type="submit" disabled={requested} onClick={login}>Login</button>
+                <button className="login-btn" type="submit" disabled={requested} onFocus={()=>{setFocus("login")}} onClick={login}>Login</button>
                 </>
             : false
             }
             </form>
-        }
+        } </> }
         </>
     );
 }

@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useHistory, Link } from 'react-router-dom';
-import { RedirectPage, SetProgressBar } from '../../global';
+import { RedirectPage } from '../../global';
 import "../styles/Header.scss";
-import 'font-awesome/css/font-awesome.min.css';
 import * as loginApi from '../../login/api';
-import * as actionTypes from '../../login/state/action'
 import ClickAwayListener from 'react-click-away-listener';
 // import ChangePassword from './ChangePassword';
 
@@ -20,8 +18,6 @@ import ClickAwayListener from 'react-click-away-listener';
 */
 
 const Header = () => {
-
-    const dispatch = useDispatch()
 
     const [userDetails, setUserDetails] = useState(null);
     const [username, setUsername] = useState(null);
@@ -44,60 +40,44 @@ const Header = () => {
     // const [callRedirect, setCallRedirect] = useState(false);
     const [showUD, setShowUD] = useState(false);
     const [showSR, setShowSR] = useState(false);
+    const [adminDisable, setAdminDisable] = useState(false);
     let history = useHistory();
 
     const userInfo = useSelector(state=>state.login.userinfo);
 
     useEffect(()=>{
         if(Object.keys(userInfo).length!==0){
+            let first_name = userInfo.firstname.charAt(0).toUpperCase() + userInfo.firstname.slice(1);
+            let last_name = userInfo.lastname.charAt(0).toUpperCase() + userInfo.lastname.slice(1);
             setUserDetails(userInfo);
             setUserRole(userInfo.rolename);
-            setUsername(userInfo.username.toLowerCase());
+            if (userInfo.rolename === "Admin") setAdminDisable(true); 
+            if (first_name === last_name) setUsername(first_name);
+            else setUsername(first_name + ' ' + last_name);
         }
         else{
-            {/* Retaining the userInfo after page refresh */}
-            (async()=>{
-                let userinfo = await loginApi.loadUserInfo()
-                if (userinfo === "fail") console.log("Failed to loadUserInfo.");
-                else if (userinfo === "Invalid Session") {
-                    console.log("Your session has expired! --onLoadUserInfo Header");
-                } else if (Object.keys(userInfo).length!==0) {
-                    window.localStorage.navigateScreen = userinfo.page;
-                    dispatch({type:actionTypes.SET_USERINFO, payload: userinfo});
-                    SetProgressBar("start", dispatch);
-            }
-            })()
+            console.log("UserInfo Empty")
         }
     }, [userInfo]);
 
     const naviPg = () => {
-		if (localStorage.getItem("navigateEnable") == "true") {
+		if (localStorage.getItem("navigateEnable") === "true") {
 			window.localStorage['navigateScreen'] = "plugin";
-			//Transaction Activity for Avo Assure Logo Action
-			// var labelArr = [];
-			// var infoArr = [];
-			// labelArr.push(txnHistory.codesDict['AvoAssureLogo']);
-			// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 			setTimeout(() => {
                 history.replace('/plugin');
-                console.log("Go to /plugin")
 		   	}, 100);
-		}
+        }
+        else{
+            history.replace('/plugin');
+            console.log("navigateEnable was false")
+        }
     };
     
     const logout = event => {
         event.preventDefault();
-		//Transaction Activity for Logout Button Action
-		// var labelArr = [];
-		// var infoArr = [];
-		// labelArr.push(txnHistory.codesDict['Logout']);
-		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 		window.sessionStorage.clear();
 		window.sessionStorage["checkLoggedOut"] = true;
-        // $rootScope.redirectPage();
         RedirectPage(history);
-        // setCallRedirect(true);
-        // props.callRedirectPage(true);
     };
     
     const getIce = async () => {
@@ -232,21 +212,21 @@ const Header = () => {
             {/* { callRedirect ? RedirectPage() :  */}
             {/* { showChangePass ? <ChangePassword show={showChangePass} setShow={toggleChangePass} /> : null } */}
             <div className = "main-header">
-                <span className="header-logo-span"><img className="header-logo" alt="logo" src="static/imgs/logo.png" onClick={naviPg}/></span>
+                <span className="header-logo-span"><img className={"header-logo " + (!adminDisable ? "" : "logo-disable")} alt="logo" src="static/imgs/logo.png" onClick={ !adminDisable ? naviPg : null } /></span>
                     <div className="dropdown user-options">
 
+                        { !adminDisable &&
+                        <>
                         <div className="btn-container"><button className="fa fa-bell no-border bell-ic"></button></div>
-                        { userRole == "Admin" ? null :
                         <ClickAwayListener onClickAway={onClickAwaySR}>
                             <div className="switch-role-btn no-border" data-toggle="dropdown" onClick={()=>setShowSR(true)} >
                                 <span><img className="switch-role-icon" alt="switch-ic" src="static/imgs/ic-switch-user.png"/></span>
                                 <span>Switch Roles</span>
                             </div>
                             <div className={showSR ? "switch-role-menu dropdown-menu show" : " switch-role-menu dropdown-menu"}>
-                                <div><Link to="#">Role 1</Link></div>
-                                <div><Link to="#">Role 2</Link></div>
                             </div>
                         </ClickAwayListener>
+                        </>
                         }
 
                         <ClickAwayListener onClickAway={onClickAwayUD}>
@@ -257,9 +237,14 @@ const Header = () => {
                         <div className={showUD ? "user-name-menu dropdown-menu dropdown-menu-right show" : "dropdown-menu-right user-name-menu dropdown-menu"}>
                             <div><Link className="user-role-item" to="#">{userRole ? userRole : "Test Manager"}</Link></div>
                             <div className="divider" />
-                            <div onClick={getIce} ><Link to="#">Download ICE</Link></div>
-                            <div className="divider" />
-                            <div onClick={resetPass}><Link to="#">Change Password</Link></div>
+                            {
+                                !adminDisable &&
+                                <>
+                                <div onClick={getIce} ><Link to="#">Download ICE</Link></div>
+                                <div className="divider" />
+                                <div onClick={resetPass}><Link to="#">Change Password</Link></div>
+                                </>
+                            }
                             <div onClick={logout}><Link to="#">Logout</Link></div>
                         </div>
                         </ClickAwayListener>
