@@ -1,27 +1,28 @@
 import React ,  { Fragment, useState} from 'react';
 import { getNames_ICE, createProject_ICE, updateProject_ICE} from '../api';
-
-
+import {ScreenOverlay, PopupMsg, RedirectPage} from '../../global' 
+import { useHistory } from 'react-router-dom';
 import '../styles/ProjectButtons.scss';
 
 /*Component ProjectButtons
   use: Contains Project Management Buttons and Create and Update Actions
-  todo: add try catch, Modals
+  todo: Modals
 */
     
 const ProjectButtons = (props) => {
+    const history = useHistory();
     const [valid,setValid] = useState("")
+    const [loading,setLoading] = useState(false)
+    const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
 
     // Create Project Action
     const create_project = async()=>{
         props.setProjectNameInputErrorBorder(false);
         if (props.projectName === "") props.setProjectNameInputErrorBorder(true);
-        else if (props.projectTypeSelected=== "") {
-            // openModalPopup("Create Project", "Please select Application Type");
-            alert("Please select Application Type");
+        else if (props.projectTypeSelected=== ""){
+            setPopupState({show:true,title:"Create Project",content:"Please select Application Type"});
         } else if (props.releaseList.length === 0) {
-            // openModalPopup("Create Project", "Please add atleast one release");
-            alert("Please add atleast one release");
+            setPopupState({show:true,title:"Create Project",content:"Please add atleast one release"});
         }else {
 			var proceedToCreate = true;
 			var relNames = "";
@@ -32,8 +33,7 @@ const ProjectButtons = (props) => {
 				}
 			}
 			if (proceedToCreate === false) {
-                // openModalPopup("Update Project", "Please add atleast one cycle for release: " + relNames);
-                alert("Please add atleast one cycle for release: " + relNames);
+                setPopupState({show:true,title:"Update Project",content:"Please add atleast one cycle for release: " + relNames});
             } 
             else if (proceedToCreate === true) {
 				// var projectExists = false; //check needed or not
@@ -53,26 +53,22 @@ const ProjectButtons = (props) => {
                     try{
                         const response = await getNames_ICE(requestedids, idtype)
                         
-                        if (response === "Invalid Session");//$rootScope.redirectPage();
+                        if (response === "Invalid Session")RedirectPage(history);
                         if (response === "No Projects") {
                             proceeed = true;
                         } else if (response.projectNames.length > 0) {
                             for ( i = 0; i < response.projectNames.length; i++) {
                                 if (props.projectName === response.projectNames[i]) {
-                                    // openModalPopup("Create Project", "Project Name already Exists");
-                                    alert("Project Name already Exists");
-                                    // projectExists = true;
+                                    setPopupState({show:true,title:"Create Project",content:"Project Name already Exists"});
                                     return false;
                                 } else proceeed = true;
                             }
                         } else {
-                            // openModalPopup("Create Project", "Failed to create project");
-                            alert("Failed to create project");
+                            setPopupState({show:true,title:"Create Project",content:"Failed to create project"});
                             return false;
                         }
                         if (proceeed === true) {
-                            // blockUI("Loading...");
-                            // var userDetails = JSON.parse(window.localStorage['_UI']);
+                            setLoading("Loading...");
                             const createprojectObj = {};
                             createprojectObj.domain = props.selDomain;
                             createprojectObj.projectName = props.projectName.trim();
@@ -81,20 +77,16 @@ const ProjectButtons = (props) => {
                             console.log("Controller: " + createprojectObj);
                             try{
                                 const createProjectRes = await createProject_ICE(createprojectObj)
-                                
-                                if (createProjectRes === "Invalid Session");//$rootScope.redirectPage();
-                                
+                                if (createProjectRes === "Invalid Session")RedirectPage(history);
                                 if (createProjectRes === 'success') {
-                                    // openModalPopup("Create Project", "Project created successfully");
-                                    alert("Project created successfully");
+                                    setPopupState({show:true,title:"Create Project",content:"Project created successfully"});
                                     props.resetForm();
                                     props.setProjectDetails([]);
                                 } else {
-                                    // openModalPopup("Create Project", "Failed to create project");
-                                    alert("Failed to create project");
+                                    setPopupState({show:true,title:"Create Project",content:"Failed to create project"});
                                     props.resetForm();
                                 }
-                                // unblockUI();
+                                setLoading(false);
                             }catch(error){
                                 console.log("Error:::::::::::::", error);
                             }    
@@ -105,9 +97,8 @@ const ProjectButtons = (props) => {
 				}
             }
             else {
-				// unblockUI();
-                // openModalPopup("Create Project", "Please add atleast one cycle for a release");
-                alert("Please add atleast one cycle for a release");
+				setLoading(false);
+                setPopupState({show:true,title:"Create Project",content:"Please add atleast one cycle for a release"});
 			}
 		}
     }
@@ -117,8 +108,7 @@ const ProjectButtons = (props) => {
 			for (var i = 0; i < props.projectDetails.length; i++) {
 				if (props.releaseList[j] === props.projectDetails[i].name) {
 					if (props.projectDetails[i].cycles.length === 0) {
-						// openModalPopup("Create Project", "Please add atleast one cycle for a release");
-                        alert("Please add atleast one cycle for a release");
+                        setPopupState({show:true,title:"Create Project",content:"Please add atleast one cycle for a release"});
                         setValid(false);
 						return flag;
 					}
@@ -136,10 +126,9 @@ const ProjectButtons = (props) => {
 		} else if (props.selProject === "") {
 			props.setProjectSelectErrorBorder(true);
 		} else if (props.releaseList.length === 0) {
-            alert("Please add atleast one release");
-            // openModalPopup("Update Project", "Please add atleast one release");
+            setPopupState({show:true,title:"Update Project",content:"Please add atleast one release"});
 		}else {
-			// blockUI("Loading...");
+            setLoading("Loading...");
 			props.setFlag(false);
 			//Update project details json with editedProjectDetails, deletedProjectDetails, newProjectDetails
             
@@ -202,9 +191,7 @@ const ProjectButtons = (props) => {
 				}
             }
             if (proceedFlag === false) {
-				// unblockUI();
-				// openModalPopup("Update Project", "Please add atleast one cycle for release: " + relName);
-                alert( "Please add atleast one cycle for release: " + relName);
+                setPopupState({show:true,title:"Update Project",content:"Please add atleast one cycle for release: " + relName});
                 return false;
             }
             if (proceedFlag === true) {
@@ -216,13 +203,13 @@ const ProjectButtons = (props) => {
                 try{    
                     const updateProjectRes = await updateProject_ICE(updateProjectObj);
                     if (updateProjectRes === "Invalid Session") {
-                        //$rootScope.redirectPage();
+                        RedirectPage(history);
                     }
                     props.clearUpdateProjectObjects();
                     if (updateProjectRes === 'success') {
                         //Clearing old data from updateProject object
-                        alert("Project updated successfully");
-                        // openModalPopup("Update Project", "Project updated successfully");
+                        
+                        setPopupState({show:true,title:"Update Project",content:"Project updated successfully"});
                         // $timeout(function () {
                         //     $("#projectTab").trigger("click");
                         //     $(".adminActionBtn button:nth-child(1)").trigger("click");
@@ -230,11 +217,10 @@ const ProjectButtons = (props) => {
                         // resetForm();  //check if needed or not 
                         
                     } else {
-                        // openModalPopup("Update Project", "Failed to update project");
-                        alert("Failed to update project");
+                        setPopupState({show:true,title:"Update Project",content:"Failed to update project"});
                         props.resetForm();
                     }
-                    // unblockUI();
+                    setLoading(false);
                 }catch(error){
                     console.log("Error:::::::::::::", error);
                 }    
@@ -242,16 +228,24 @@ const ProjectButtons = (props) => {
         }    
     }
 
+    const closePopup = () =>{
+        setPopupState({show:false,title:"",content:""});
+    }
+
     return(
-        <div className="adminActionBtn">
-            {props.taskName==="Create Project"?
-                <Fragment>
-                    <button className="btn-md pull-right adminBtn" onClick={()=>props.editProjectTab()}  title="Edit Project">Edit</button>
-                    <button className="btn-md pull-right adminBtn" onClick={()=>{create_project()}} style={{marginRight:"10px"}} title="Create Project">Create</button>            
-                </Fragment>
-            :<button className="btn-md pull-right adminBtn" onClick={()=>{updateProject()}}  title="Update Project">Update</button>
-            }
-        </div> 
+        <Fragment>
+            {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
+            {loading?<ScreenOverlay content={loading}/>:null}
+            <div className="adminActionBtn">
+                {props.taskName==="Create Project"?
+                    <Fragment>
+                        <button className="btn-md pull-right adminBtn" onClick={()=>props.editProjectTab()}  title="Edit Project">Edit</button>
+                        <button className="btn-md pull-right adminBtn" onClick={()=>{create_project()}} style={{marginRight:"10px"}} title="Create Project">Create</button>            
+                    </Fragment>
+                :<button className="btn-md pull-right adminBtn" onClick={()=>{updateProject()}}  title="Update Project">Update</button>
+                }
+            </div> 
+        </Fragment>
     )
 }
 

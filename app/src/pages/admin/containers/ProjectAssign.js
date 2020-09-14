@@ -1,7 +1,9 @@
 import React ,  { Fragment, useEffect, useState} from 'react';
 import {getUserDetails, getDomains_ICE, getAssignedProjects_ICE, getDetails_ICE, assignProjects_ICE} from '../api';
+import {ScreenOverlay, PopupMsg, RedirectPage} from '../../global' 
 import '../styles/ProjectAssign.scss';
 import AssignProjectmodal from '../components/AssignProjectModal'
+import { useHistory } from 'react-router-dom';
 
 /*Component ProjectAssign
   use: renders Project Assign Middle Screen
@@ -10,6 +12,7 @@ import AssignProjectmodal from '../components/AssignProjectModal'
     
 const ProjectNew = (props) => {
     
+    const history = useHistory();
     const [userSelectErrorBorder,setUserSelectErrorBorder] = useState(false)
     const [domainSelectErrorBorder,setDomainSelectErrorBorder] = useState(false)
     const [selectBox,setSelectBox] = useState([])
@@ -22,6 +25,8 @@ const ProjectNew = (props) => {
     const [selectedUserName,setSelectedUserName] = useState("")
     const [selectedProject,setSelectedProject] = useState("")
     const [selectedUserId,setSelectedUserId] = useState("")
+    const [loading,setLoading] = useState(false)
+    const [popupState,setPopupState] = useState({show:false,title:"",content:""})
     const [getAssignedProjectsLen,setGetAssignedProjectsLen] = useState(0)
     // eslint-disable-next-line
     const [showload,setShowload] = useState(false)
@@ -44,13 +49,11 @@ const ProjectNew = (props) => {
         try{
             const data = await getUserDetails("user");
             if(data === "Invalid Session") {
-                // $rootScope.redirectPage();
+                RedirectPage(history);
             } else if(data === "fail") {
-                alert("Failed to fetch users.");
-                // openModalPopup("Assign Project", "Failed to fetch users.");
+                setPopupState({show:true,title:"Assign Project",content:"Failed to fetch users."});
             } else if(data === "empty") {
-                alert("There are no users present.");
-                // openModalPopup("Assign Project", "There are no users present.");
+                setPopupState({show:true,title:"Assign Project",content:"There are no users present."});
             } else {
                 // data.sort(function(a,b){ return a[0] > b[0]; });
                 
@@ -101,7 +104,7 @@ const ProjectNew = (props) => {
         try{
             const data = await getDomains_ICE();
             if (data === "Invalid Session") {
-                //$rootScope.redirectPage();
+                RedirectPage(history);
             } else setSelDomainsOptions(data);
         }catch(error){
             console.log("Error:::::::::::::", error);
@@ -129,7 +132,7 @@ const ProjectNew = (props) => {
             const data1 = await getAssignedProjects_ICE(getAssignProj);
 			setGetAssignedProjectsLen(data1.length);
 			if (data1 === "Invalid Session") {
-				//$rootScope.redirectPage();
+				RedirectPage(history);
             }
 			assignProj.assignedProjectAP = [];
             setAssignProj(assignProj);
@@ -148,7 +151,7 @@ const ProjectNew = (props) => {
                     const detResponse = await getDetails_ICE(idtype, requestedids);
 				
 					if (detResponse === "Invalid Session") {
-						//$rootScope.redirectPage();
+						RedirectPage(history);
 					}
 					assignProj.allProjectAP = [];
                     setAssignProj(assignProj);
@@ -186,7 +189,7 @@ const ProjectNew = (props) => {
                 try{    
                     const res = await getDetails_ICE(idtype, requestedids);
 					if (res === "Invalid Session") {
-						//$rootScope.redirectPage();
+						RedirectPage(history);
 					}
 					if (res.projectIds.length > 0) {
 						assignProj.allProjectAP = [];
@@ -342,21 +345,22 @@ const ProjectNew = (props) => {
         // txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
         
         try{
-            // blockUI('Saving in Progress. Please Wait...');
+            setLoading('Saving in Progress. Please Wait...');
             const data = await assignProjects_ICE(assignProjectsObj)
-            // unblockUI();
+            setLoading(false);
             if (data === "Invalid Session") {
-                //$rootScope.redirectPage();
+                RedirectPage(history);
             }
             if (data === 'success') {
-                if (assignedProjects1.length !== 0) alert("Projects assigned to user successfully");
-                    //openModalPopup("Assign Projects", "Projects assigned to user successfully");
-                else alert("Projects unassigned successfully")
-                    // openModalPopup("Assign Projects", "Projects unassigned successfully");
+                if (assignedProjects1.length !== 0){
+                    setPopupState({show:true,title:"Assign Project",content:"Projects assigned to user successfully"});
+                }
+                else{
+                    setPopupState({show:true,title:"Assign Project",content:"Projects unassigned successfully"});
+                } 
                 resetAssignProjectForm();
             } else {
-                alert("Failed to assign projects to user");
-                // openModalPopup("Assign Projects", "Failed to assign projects to user");
+                setPopupState({show:true,title:"Assign Project",content:"Failed to assign projects to user"});
             }
 
             fetchUsers();
@@ -382,10 +386,15 @@ const ProjectNew = (props) => {
         setDiffprj(diffprjNew);
         return diffprjNew
     }
+
+    const closePopup = () =>{
+        setPopupState({show:false,title:"",content:""});
+    }
     
     return (
         <Fragment>
-            
+            {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
+            {loading?<ScreenOverlay content={loading}/>:null}
             <div id="page-taskName">
                 <span>Assign Project</span>
 		    </div>
