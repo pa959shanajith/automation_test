@@ -1,6 +1,7 @@
 import React ,{useState , useEffect, Fragment} from'react';
 import '../styles/LeftBarItems.scss'
 import {GetScrapeDataScreenLevel_ICE} from '../api';
+import {Scrollbar} from '../../global';
 
 /*Component LeftBarItems
   use: renders  6 options in design  in the left of screen
@@ -87,9 +88,11 @@ import {GetScrapeDataScreenLevel_ICE} from '../api';
           
     
           return (
+              
                 <div className="leftnav" >
                   {(apptype=== "Web")? 
                   <Fragment>
+                    <Scrollbar>
                   <div className="leftbar-container">
                     <div className="leftbar-top">
                   <ul>
@@ -115,7 +118,8 @@ import {GetScrapeDataScreenLevel_ICE} from '../api';
             </div>
               ))}
               </div>
-                </Fragment>
+              </Scrollbar>
+              </Fragment>
               : null }
               {(apptype==="Desktop")? <div className="leftbar-container">
                 <div className="leftbar-top">
@@ -126,7 +130,7 @@ import {GetScrapeDataScreenLevel_ICE} from '../api';
                         <li><i class='Append'   title="Append ON" ><span><input type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/><br/>Append</i></li>
                     </ul>
                   </div>
-              </div> : null}
+              </div>: null}
 
               
               {(apptype==="SAP")? <div className="leftbar-container">
@@ -199,6 +203,7 @@ import {GetScrapeDataScreenLevel_ICE} from '../api';
                   </div>
               </div> : null}
               </div>
+              
 
             );
           }
