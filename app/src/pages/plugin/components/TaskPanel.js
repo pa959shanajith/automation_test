@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Redirect } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import * as pluginApi from '../api';
 import * as actionTypes from "../state/action";
@@ -17,6 +17,7 @@ const TaskPanel = ({item, showPanel, setShowPanel, filterDat, taskJson}) => {
     const [cyc, setCyc] = useState(null);
     const [appType, setAppType] = useState(null);
     const [descId, setDescId] = useState(null);
+    const [redirectTo, setRedirectTo] = useState("");
 
     const taskRedirection = event => {
         event.preventDefault();
@@ -59,24 +60,28 @@ const TaskPanel = ({item, showPanel, setShowPanel, filterDat, taskJson}) => {
         if(dataobj_json.subtask === "Scrape"){
             window.localStorage['navigateScreen'] = "Scrape";
             window.localStorage['navigateScrape'] = true;
-            history.replace('/scrape')
+            setRedirectTo("/scrape")
+            // history.replace('/scrape')
             // $window.location.assign("/design");
 
         }
         else if(dataobj_json.subtask === "TestCase"){
             window.localStorage['navigateScreen'] = "TestCase";
             window.localStorage['navigateTestcase'] = true;
-            history.replace("/designTestCase")
+            // setRedirectTo("/plugin")
+            history.replace("/plugin")
             // $window.location.assign("/designTestCase");
         }
         else if(dataobj_json.subtask === "TestSuite"){
             window.localStorage['navigateScreen'] = "TestSuite";
-            history.replace("/execute")
+            // setRedirectTo("/plugin")
+            history.replace("/plugin")
             // $window.location.assign("/execute");
         }
         else if(dataobj_json.subtask === "Scheduling"){
             window.localStorage['navigateScreen'] = "scheduling";
-            history.replace("/scheduling")
+            // setRedirectTo("/plugin")
+            history.replace("/plugin")
             // $window.location.assign("/scheduling");
         }
     }
@@ -105,7 +110,10 @@ const TaskPanel = ({item, showPanel, setShowPanel, filterDat, taskJson}) => {
 
     return (  
         <>
-        <div className={"task-panel " + (showPanel === item.panel_idx ? "active-task" : "")} panel-id={item.panel_idx}>
+        {
+            redirectTo ? <Redirect to={redirectTo} /> : 
+            <>
+            <div className={"task-panel " + (showPanel === item.panel_idx ? "active-task" : "")} panel-id={item.panel_idx}>
             <div className="panel-content" id={`panelBlock_${item.panel_idx}`}>
                 <h4 className="task-num">{item.type_counter}</h4>
                 <span className="assign-task" onClick={taskRedirection} >{item.taskname}</span>
@@ -122,8 +130,9 @@ const TaskPanel = ({item, showPanel, setShowPanel, filterDat, taskJson}) => {
             </div>
             : null
             }
-        </div>
-        
+            </div>
+        </>
+        }
         </>
     );
 }

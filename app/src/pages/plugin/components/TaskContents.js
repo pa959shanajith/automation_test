@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TaskPanel from './TaskPanel';
 
 
 const TaskContents = ({items, filterDat, taskJson}) => {
 
     const [showPanel, setShowPanel] = useState("");
+
+    useEffect(()=>{
+        setShowPanel("");
+    }, [items]);
 
     return (
         <>

@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import LoginFields from "../components/LoginFields.js";
 import { SetProgressBar} from '../../global';
 import StaticElements from '../components/StaticElements';
@@ -13,8 +12,6 @@ import StaticElements from '../components/StaticElements';
 
 
 const LoginPage = () => {
-
-    const dispatch = useDispatch();
      
     useEffect(()=>{
         SetProgressBar('complete');
@@ -22,7 +19,7 @@ const LoginPage = () => {
 
     return (
         <StaticElements>
-             <LoginFields dispatch={dispatch} SetProgressBar={SetProgressBar}/>
+             <LoginFields SetProgressBar={SetProgressBar}/>
         </StaticElements>
     );
 }

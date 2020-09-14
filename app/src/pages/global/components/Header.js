@@ -46,9 +46,12 @@ const Header = () => {
 
     useEffect(()=>{
         if(Object.keys(userInfo).length!==0){
+            let first_name = userInfo.firstname.charAt(0).toUpperCase() + userInfo.firstname.slice(1);
+            let last_name = userInfo.lastname.charAt(0).toUpperCase() + userInfo.lastname.slice(1);
             setUserDetails(userInfo);
             setUserRole(userInfo.rolename);
-            setUsername(userInfo.username.toLowerCase());
+            if (first_name === last_name) setUsername(first_name);
+            else setUsername(first_name + ' ' + last_name);
         }
         else{
             console.log("UserInfo Empty")
@@ -56,11 +59,10 @@ const Header = () => {
     }, [userInfo]);
 
     const naviPg = () => {
-		if (localStorage.getItem("navigateEnable") == "true") {
+		if (localStorage.getItem("navigateEnable") === "true") {
 			window.localStorage['navigateScreen'] = "plugin";
 			setTimeout(() => {
                 history.replace('/plugin');
-                console.log("Go to /plugin")
 		   	}, 100);
         }
         else{
@@ -73,10 +75,7 @@ const Header = () => {
         event.preventDefault();
 		window.sessionStorage.clear();
 		window.sessionStorage["checkLoggedOut"] = true;
-        // $rootScope.redirectPage();
         RedirectPage(history);
-        // setCallRedirect(true);
-        // props.callRedirectPage(true);
     };
     
     const getIce = async () => {
@@ -211,21 +210,21 @@ const Header = () => {
             {/* { callRedirect ? RedirectPage() :  */}
             {/* { showChangePass ? <ChangePassword show={showChangePass} setShow={toggleChangePass} /> : null } */}
             <div className = "main-header">
-                <span className="header-logo-span" onClick={naviPg}><img className="header-logo" alt="logo" src="static/imgs/logo.png" onClick={naviPg}/></span>
+                <span className="header-logo-span" onClick={ naviPg } disabled={userRole === "Admin"}><img className="header-logo" alt="logo" src="static/imgs/logo.png" onClick={naviPg}/></span>
                     <div className="dropdown user-options">
 
+                        { userRole === "Admin" ? null :
+                        <>
                         <div className="btn-container"><button className="fa fa-bell no-border bell-ic"></button></div>
-                        { userRole == "Admin" ? null :
                         <ClickAwayListener onClickAway={onClickAwaySR}>
                             <div className="switch-role-btn no-border" data-toggle="dropdown" onClick={()=>setShowSR(true)} >
                                 <span><img className="switch-role-icon" alt="switch-ic" src="static/imgs/ic-switch-user.png"/></span>
                                 <span>Switch Roles</span>
                             </div>
                             <div className={showSR ? "switch-role-menu dropdown-menu show" : " switch-role-menu dropdown-menu"}>
-                                <div><Link to="#">Role 1</Link></div>
-                                <div><Link to="#">Role 2</Link></div>
                             </div>
                         </ClickAwayListener>
+                        </>
                         }
 
                         <ClickAwayListener onClickAway={onClickAwayUD}>
@@ -236,9 +235,14 @@ const Header = () => {
                         <div className={showUD ? "user-name-menu dropdown-menu dropdown-menu-right show" : "dropdown-menu-right user-name-menu dropdown-menu"}>
                             <div><Link className="user-role-item" to="#">{userRole ? userRole : "Test Manager"}</Link></div>
                             <div className="divider" />
-                            <div onClick={getIce} ><Link to="#">Download ICE</Link></div>
-                            <div className="divider" />
-                            <div onClick={resetPass}><Link to="#">Change Password</Link></div>
+                            {
+                                userRole === "Admin" ? null :
+                                <>
+                                <div onClick={getIce} ><Link to="#">Download ICE</Link></div>
+                                <div className="divider" />
+                                <div onClick={resetPass}><Link to="#">Change Password</Link></div>
+                                </>
+                            }
                             <div onClick={logout}><Link to="#">Logout</Link></div>
                         </div>
                         </ClickAwayListener>

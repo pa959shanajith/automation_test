@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Redirect } from 'react-router-dom';
 import * as api from '../api';
 import * as adminApi from "../../admin/api";
 import "../styles/LoginFields.scss";
@@ -21,15 +22,12 @@ const LoginFields = (props) => {
     const [loginValidation, setLoginValidation] = useState("");
     const [requested, setRequested] = useState(false);
     const [restartForm, setRestartForm] = useState(false);
+    const [redirectTo, setRedirectTo] = useState("");
     const [focusBtn, setFocus] = useState("");
     let serverList = [{"name": "License Server", "active": false}, {"name": "DAS Server", "active": false}, {"name": "Web Server", "active": false}];
-    let dispatch = props.dispatch;
     let SetProgressBar = props.SetProgressBar;
 
     const handleShowPass = () => {
-        // setPassError(false);
-        // setUserError(false);
-        // setLoginValidation("");
         setShowPass(!showPass);
     }
 
@@ -74,8 +72,7 @@ const LoginFields = (props) => {
                 setRequested(false);
                 if (data.redirect) {
                     window.location.href = data.redirect;
-                    // setRedirectTo(data.redirect);
-                } // history.replace(data.redirect);
+                }
                 else if (data.proceed) setPassField(true);
                 else if (data === "invalidServerConf") setLoginValidation("Authentication Server Configuration is invalid!");
                 else setLoginValidation(err);    
@@ -103,12 +100,12 @@ const LoginFields = (props) => {
     const check_credentials = () => {
         if (username && password){
             setRequested(true);
-            SetProgressBar("start", dispatch);
+            SetProgressBar("start");
             let user = username.toLowerCase();
             (async()=>{
                 try{
                     let data = await api.authenticateUser(user, password)
-                    SetProgressBar("stop", dispatch);
+                    SetProgressBar("stop");
                     setRequested(false);
                     if (data === "restart") {
                         // blockUI("Fetching active services...");
@@ -130,7 +127,7 @@ const LoginFields = (props) => {
                             setLoginValidation("Failed to fetch services.");
                         });
                     }
-                    else if (data === 'validCredential') window.location='/'; //setRedirectTo('/')  //  history.replace('/')
+                    else if (data === 'validCredential')  setRedirectTo("/")
                     else if (data === 'inValidCredential' || data === "invalid_username_password") {
                         setUserError(true);
                         setPassError(true);
@@ -178,7 +175,9 @@ const LoginFields = (props) => {
 
     return (
         <>
-        { restartForm 
+        {redirectTo ? <Redirect to={redirectTo} /> :
+            <>
+            { restartForm 
             ?
             <div>
                 {serverList.map((server, index)=>{
@@ -208,7 +207,7 @@ const LoginFields = (props) => {
             : false
             }
             </form>
-        }
+        } </> }
         </>
     );
 }

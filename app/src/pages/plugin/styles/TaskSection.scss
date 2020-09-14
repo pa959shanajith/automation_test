@@ -9,10 +9,14 @@
     border-radius: 8px;
 }
 
+.no-search-bar{
+    visibility: hidden;
+}
+
 .task-content{
     flex: 1;
     overflow: auto;
-    padding: 0 15px 0 25px;
+    padding-right: 10px;
 }
 
 .task-overflow{

@@ -18,13 +18,15 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     // to render components which will populate under todo
     let todo_items = []
     let filterDat;
+    let filterData = {'prjval':'Select Project','relval':'Select Release','cycval':'Select Cycle','apptype':{},'tasktype':{}};
 
     const [reviewItems, setReviewItems] = useState([]);
     const [todoItems, setTodoItems] = useState([]);
-    const [filterData, setFilterData] = useState(null);
+    const [searchItems, setSearchItems] = useState([]);
+    const [filterDatState, setFilterDatState] = useState(null);
     const [taskJson, setTaskJson] = useState(null);
+    const [searchValue, setSearchValue] = useState("");
 
-    
     useEffect(()=>{
         if(userInfo) {
             let i, j, k;
@@ -149,7 +151,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                                 }
                             }
                         }
-                        setFilterData(filterDat);
+                        setFilterDatState(filterDat);
                         // dispatch({type: actionTypes.SET_FD, payload: filterDat})
                         // USE DISPATCH
                         // window.localStorage['_FD'] = angular.toJson(filterDat);
@@ -170,6 +172,24 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             });
         }
     }, []);
+
+
+
+    const searchTask = event => {
+        let items = activeTab === "todo" ? todoItems : reviewItems;
+        let filteredItem = [];
+        let value = event.target.value;
+        
+        let counter = 1;
+        items.forEach(item => {
+            if (item.taskname.toLowerCase().indexOf(value.toLowerCase()) > -1) {
+                item.type_counter = counter++;
+                filteredItem.push(item)
+            }
+        });
+        setSearchItems(filteredItem);
+        setSearchValue(value);
+    }
 
 
     const fillFilterValues = (obj, tidx) => {
@@ -205,7 +225,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
         <div className="task-section">
             <div className="task-header">
                 <span className="my-task">My Task(s)</span>
-                <input className="task-search-bar" style={showSearch ? {visibility: "visible"} : {visibility: "hidden"}}/>
+                <input className={"task-search-bar " + (showSearch ? "" : "no-search-bar")} onChange={searchTask} />
                 <span className="task-ic-container" onClick={()=>setShowSearch(!showSearch)}><img className="search-ic" alt="search-ic" src="static/imgs/ic-search-icon.png"/></span>
                 <span className="task-ic-container"><img className="filter-ic" alt="filter-ic" src="static/imgs/ic-filter-task.png"/></span>
             </div>
@@ -214,11 +234,12 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                 <span className={"task-nav-item " + (activeTab==="review" ? "active-tab" : "")} onClick={()=>setActiveTab("review")}>To Review</span>
             </div>
             <div className="task-overflow">
-                <Scrollbar>
+                <Scrollbar verticalThumb={{backgroundColor: "#321e4f"}} verticalTrack={{backgroundColor: "rgb(211, 211, 211)"}} >
                 <div className="task-content">
-                {activeTab === "todo"
-                 ? <TaskContents items={todoItems} filterDat={filterData} taskJson={taskJson} />
-                 : <TaskContents items={reviewItems} filterDat={filterData} taskJson={taskJson} />}
+                <TaskContents items={searchValue ? searchItems : activeTab === "todo" ? todoItems : reviewItems} filterDat={filterDatState} taskJson={taskJson} />
+                {/* {activeTab === "todo"
+                 ? <TaskContents items={todoItems} filterDat={filterDatState} taskJson={taskJson} />
+                 : <TaskContents items={reviewItems} filterDat={filterDatState} taskJson={taskJson} />} */}
                  </div>
                  </Scrollbar>
             </div>

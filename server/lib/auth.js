@@ -189,7 +189,7 @@ module.exports = () => {
 		const sessFlag = (req.isAuthenticated && req.isAuthenticated())
 		const cookies = req.signedCookies;
 		const cookieFlag = (cookies["connect.sid"]!==undefined) && (cookies["maintain.sid"]!==undefined);
-		if (true || sessFlag && cookieFlag) return next();
+		if (sessFlag && cookieFlag) return next();
 		var negotiator = new Negotiator(req);
 		if (negotiator.mediaType() === 'text/html') return res.redirect(options.route.login);
 		else return res.send("Invalid Session");
