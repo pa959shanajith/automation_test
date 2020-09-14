@@ -2,7 +2,8 @@ import * as actionTypes from './action';
 
 const initialState = {
     tasksJson: {},
-    FD: {}
+    FD: {},
+    CT: {}
 }
 
 const reducer = (state=initialState, action) => {
@@ -15,6 +16,10 @@ const reducer = (state=initialState, action) => {
                 return {
                     ...state, FD: action.payload
                 }
+        case actionTypes.SET_CT:
+            return {
+                ...state, CT: action.payload
+            }
         default:
             return state
     }

@@ -15,7 +15,6 @@ const PluginHome = () => {
 
     useEffect(()=>{
         if (Object.keys(userInfo).length!==0){
-            console.log(userInfo)
             let first_name = userInfo.firstname.charAt(0).toUpperCase() + userInfo.firstname.slice(1);
             let last_name = userInfo.lastname.charAt(0).toUpperCase() + userInfo.lastname.slice(1);
             setName(first_name + ' ' + last_name);

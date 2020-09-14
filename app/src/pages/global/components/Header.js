@@ -58,25 +58,19 @@ const Header = () => {
     const naviPg = () => {
 		if (localStorage.getItem("navigateEnable") == "true") {
 			window.localStorage['navigateScreen'] = "plugin";
-			//Transaction Activity for Avo Assure Logo Action
-			// var labelArr = [];
-			// var infoArr = [];
-			// labelArr.push(txnHistory.codesDict['AvoAssureLogo']);
-			// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 			setTimeout(() => {
                 history.replace('/plugin');
                 console.log("Go to /plugin")
 		   	}, 100);
-		}
+        }
+        else{
+            history.replace('/plugin');
+            console.log("navigateEnable was false")
+        }
     };
     
     const logout = event => {
         event.preventDefault();
-		//Transaction Activity for Logout Button Action
-		// var labelArr = [];
-		// var infoArr = [];
-		// labelArr.push(txnHistory.codesDict['Logout']);
-		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 		window.sessionStorage.clear();
 		window.sessionStorage["checkLoggedOut"] = true;
         // $rootScope.redirectPage();
@@ -217,7 +211,7 @@ const Header = () => {
             {/* { callRedirect ? RedirectPage() :  */}
             {/* { showChangePass ? <ChangePassword show={showChangePass} setShow={toggleChangePass} /> : null } */}
             <div className = "main-header">
-                <span className="header-logo-span"><img className="header-logo" alt="logo" src="static/imgs/logo.png" onClick={naviPg}/></span>
+                <span className="header-logo-span" onClick={naviPg}><img className="header-logo" alt="logo" src="static/imgs/logo.png" onClick={naviPg}/></span>
                     <div className="dropdown user-options">
 
                         <div className="btn-container"><button className="fa fa-bell no-border bell-ic"></button></div>

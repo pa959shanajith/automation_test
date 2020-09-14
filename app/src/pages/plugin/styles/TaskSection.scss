@@ -10,7 +10,16 @@
 }
 
 .task-content{
+    flex: 1;
+    overflow: auto;
     padding: 0 15px 0 25px;
+}
+
+.task-overflow{
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 60%;
 }
 
 .filter-ic{

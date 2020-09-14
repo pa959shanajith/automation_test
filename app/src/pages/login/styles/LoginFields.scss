@@ -49,6 +49,10 @@
     &:focus{
         outline: none!important;
     }
+    &:disabled{
+        background-color: #ca99ff;
+        cursor: auto;
+    }
 }
 
 .login-btn{
@@ -59,10 +63,6 @@
     font-size: 24px!important;
     width: 100%;
     margin: 10px 0;
-    &:disabled{
-        background-color: #ca99ff;
-        cursor: auto;
-    }
 }
 
 .eye-ic{

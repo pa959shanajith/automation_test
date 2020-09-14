@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as pluginApi from "../api";
-import { RedirectPage } from '../../global';
+import { RedirectPage, Scrollbar } from '../../global';
 import { useHistory } from 'react-router-dom';
 import * as actionTypes from '../state/action';
 import TaskContents from './TaskContents';
@@ -213,10 +213,14 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                 <span className={"task-nav-item " + (activeTab==="todo" ? "active-tab" : "")} onClick={()=>setActiveTab("todo")}>To Do</span>
                 <span className={"task-nav-item " + (activeTab==="review" ? "active-tab" : "")} onClick={()=>setActiveTab("review")}>To Review</span>
             </div>
-            <div className="task-content">
+            <div className="task-overflow">
+                <Scrollbar>
+                <div className="task-content">
                 {activeTab === "todo"
                  ? <TaskContents items={todoItems} filterDat={filterData} taskJson={taskJson} />
                  : <TaskContents items={reviewItems} filterDat={filterData} taskJson={taskJson} />}
+                 </div>
+                 </Scrollbar>
             </div>
         </div>
     );

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import * as pluginApi from '../api';
+import * as actionTypes from "../state/action";
 import "../styles/TaskPanel.scss";
 
 const TaskPanel = ({item, showPanel, setShowPanel, filterDat, taskJson}) => {
@@ -9,6 +11,7 @@ const TaskPanel = ({item, showPanel, setShowPanel, filterDat, taskJson}) => {
     const dataobj = item.dataobj;
 
     const history = useHistory();
+    const dispatch = useDispatch();
     const [desc, setDesc] = useState(null);
     const [rel, setRel] = useState(null);
     const [cyc, setCyc] = useState(null);
@@ -51,6 +54,7 @@ const TaskPanel = ({item, showPanel, setShowPanel, filterDat, taskJson}) => {
         taskObj.reuse = dataobj_json.reuse;
     
         // DISPATCH
+        dispatch({type: actionTypes.SET_CT, payload: taskObj});
         // window.localStorage['_CT'] = JSON.stringify(taskObj);
         if(dataobj_json.subtask === "Scrape"){
             window.localStorage['navigateScreen'] = "Scrape";
@@ -62,14 +66,17 @@ const TaskPanel = ({item, showPanel, setShowPanel, filterDat, taskJson}) => {
         else if(dataobj_json.subtask === "TestCase"){
             window.localStorage['navigateScreen'] = "TestCase";
             window.localStorage['navigateTestcase'] = true;
+            history.replace("/designTestCase")
             // $window.location.assign("/designTestCase");
         }
         else if(dataobj_json.subtask === "TestSuite"){
             window.localStorage['navigateScreen'] = "TestSuite";
+            history.replace("/execute")
             // $window.location.assign("/execute");
         }
         else if(dataobj_json.subtask === "Scheduling"){
             window.localStorage['navigateScreen'] = "scheduling";
+            history.replace("/scheduling")
             // $window.location.assign("/scheduling");
         }
     }
