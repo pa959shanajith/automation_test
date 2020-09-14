@@ -1,6 +1,7 @@
 import React ,  { Fragment, useState} from 'react';
 import { getNames_ICE, createProject_ICE, updateProject_ICE} from '../api';
-import {ScreenOverlay,PopupMsg} from '../../global' 
+import {ScreenOverlay, PopupMsg, RedirectPage} from '../../global' 
+import { useHistory } from 'react-router-dom';
 import '../styles/ProjectButtons.scss';
 
 /*Component ProjectButtons
@@ -9,9 +10,9 @@ import '../styles/ProjectButtons.scss';
 */
     
 const ProjectButtons = (props) => {
+    const history = useHistory();
     const [valid,setValid] = useState("")
     const [loading,setLoading] = useState(false)
-    const [loadingContent,setLoadingContent] = useState("")
     const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
 
     // Create Project Action
@@ -52,7 +53,7 @@ const ProjectButtons = (props) => {
                     try{
                         const response = await getNames_ICE(requestedids, idtype)
                         
-                        if (response === "Invalid Session");//$rootScope.redirectPage();
+                        if (response === "Invalid Session")RedirectPage(history);
                         if (response === "No Projects") {
                             proceeed = true;
                         } else if (response.projectNames.length > 0) {
@@ -67,8 +68,7 @@ const ProjectButtons = (props) => {
                             return false;
                         }
                         if (proceeed === true) {
-                            setLoadingContent("Loading...");
-                            setLoading(true);
+                            setLoading("Loading...");
                             const createprojectObj = {};
                             createprojectObj.domain = props.selDomain;
                             createprojectObj.projectName = props.projectName.trim();
@@ -77,7 +77,7 @@ const ProjectButtons = (props) => {
                             console.log("Controller: " + createprojectObj);
                             try{
                                 const createProjectRes = await createProject_ICE(createprojectObj)
-                                if (createProjectRes === "Invalid Session");//$rootScope.redirectPage();
+                                if (createProjectRes === "Invalid Session")RedirectPage(history);
                                 if (createProjectRes === 'success') {
                                     setPopupState({show:true,title:"Create Project",content:"Project created successfully"});
                                     props.resetForm();
@@ -128,8 +128,7 @@ const ProjectButtons = (props) => {
 		} else if (props.releaseList.length === 0) {
             setPopupState({show:true,title:"Update Project",content:"Please add atleast one release"});
 		}else {
-            setLoadingContent("Loading...");
-            setLoading(true);
+            setLoading("Loading...");
 			props.setFlag(false);
 			//Update project details json with editedProjectDetails, deletedProjectDetails, newProjectDetails
             
@@ -204,7 +203,7 @@ const ProjectButtons = (props) => {
                 try{    
                     const updateProjectRes = await updateProject_ICE(updateProjectObj);
                     if (updateProjectRes === "Invalid Session") {
-                        //$rootScope.redirectPage();
+                        RedirectPage(history);
                     }
                     props.clearUpdateProjectObjects();
                     if (updateProjectRes === 'success') {
@@ -236,7 +235,7 @@ const ProjectButtons = (props) => {
     return(
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
-            {loading?<ScreenOverlay content={loadingContent}/>:null}
+            {loading?<ScreenOverlay content={loading}/>:null}
             <div className="adminActionBtn">
                 {props.taskName==="Create Project"?
                     <Fragment>

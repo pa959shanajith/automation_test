@@ -1,12 +1,13 @@
 import React, { Fragment, useState, useEffect , useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {ScreenOverlay,PopupMsg} from '../../global' 
+import {ScreenOverlay, PopupMsg, RedirectPage} from '../../global' 
 import {getUserRoles, manageUserDetails, getLDAPConfig, getSAMLConfig, getOIDCConfig, getUserDetails, fetchICE, manageSessionData} from '../api';
 import * as actionTypes from '../state/action';
 import '../styles/CreateUser.scss'
 import CreateLanding from '../components/CreateLanding';
 import EditLanding from '../components/EditLanding';
 import useOnClickOutside from '../components/UseOnClickOutside'
+import { useHistory } from 'react-router-dom';
 
 /*Component CreateUser
   use: defines Admin middle Section for create user
@@ -19,6 +20,7 @@ const CreateUser = (props) => {
     const userConf = useSelector(state=>state.admin.userConf)
     
     const node = useRef();
+    const history = useHistory();
     const [toggleAddRoles,setToggleAddRoles] = useState(false)
     const [showDropdown,setShowDropdown] = useState(false)
     const [showDropdownEdit,setShowDropdownEdit] = useState(false)
@@ -35,7 +37,6 @@ const CreateUser = (props) => {
     const [allUserFilList,setAllUserFilList] = useState(userConf.allUsersList)
     const [ldapUserList,setLdapUserList] = useState([])
     const [loading,setLoading] = useState(false)
-    const [loadingContent,setLoadingContent] = useState("")
     const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
     
     useEffect(()=>{
@@ -85,8 +86,7 @@ const CreateUser = (props) => {
             server: userConf.server
         };
         if (uType==="ldap") userObj.ldapUser = userConf.ldap.user;
-        setLoadingContent(bAction.slice(0,-1)+"ing User...");
-        setLoading(true);
+        setLoading(bAction.slice(0,-1)+"ing User...");
         
         
         (async()=>{
@@ -94,20 +94,20 @@ const CreateUser = (props) => {
                 var data = await manageUserDetails(action, userObj);
                 setLoading(false);
                 if(data === "Invalid Session") {
-                    // $rootScope.redirectPage();
+                    RedirectPage(history);
                 } else if(data === "success") {
                     if (action === "create") click();
                     else edit();
                     setPopupState({show:true,title:bAction+" User",content:"User "+action+"d successfully!"});
                     if (action === "delete") {
                         const data0 = await manageSessionData('logout', userObj.username, '?', 'dereg')
-                        if (data0 === "Invalid Session") return //$rootScope.redirectPage();
+                        if (data0 === "Invalid Session") return RedirectPage(history);
                         var data1 = await fetchICE(userObj.userid)
-                        if (data1 === "Invalid Session") return //$rootScope.redirectPage();
+                        if (data1 === "Invalid Session") return RedirectPage(history);
                         if (data1.length === 0) return false;
                         const icename = data1[0].icename;
                         var data2 = await manageSessionData('disconnect', icename, '?', 'dereg')
-                        if (data2 === "Invalid Session") return //$rootScope.redirectPage();
+                        if (data2 === "Invalid Session") return RedirectPage(history);
                     }
                 } else if(data === "exists") {
                     setPopupState({show:true,title:bAction+" User",content:"User already Exists!"});
@@ -306,11 +306,10 @@ const CreateUser = (props) => {
             try{
                 dispatch({type:actionTypes.UPDATE_LDAP,payload:{fetch: "map", user: ''}})
                 dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
-                setLoadingContent("Fetching LDAP Server configurations...");
-                setLoading(true);
+                setLoading("Fetching LDAP Server configurations...");
                 var data = await getLDAPConfig("server");
                 setLoading(false);
-                if(data === "Invalid Session") ; //$rootScope.redirectPage();
+                if(data === "Invalid Session") RedirectPage(history);
                 else if(data === "fail"){
                     setPopupState({show:true,title:"Create User",content:"Failed to fetch LDAP server configurations."});
                 }
@@ -335,12 +334,11 @@ const CreateUser = (props) => {
         (async()=>{
             try{
                 dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
-                setLoadingContent("Fetching SAML Server configurations...");
-                setLoading(true);
+                setLoading("Fetching SAML Server configurations...");
                 
                 var data = await getSAMLConfig();
                 setLoading(false);
-                if(data === "Invalid Session");//$rootScope.redirectPage();
+                if(data === "Invalid Session")RedirectPage(history);
                 else if(data === "fail"){
                     setPopupState({show:true,title:"Create User",content:"Failed to fetch SAML server configurations."});
                 } 
@@ -366,11 +364,10 @@ const CreateUser = (props) => {
         (async()=>{
             try{
                 dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
-                setLoadingContent("Fetching OpenID Server configurations...");
-                setLoading(true);
+                setLoading("Fetching OpenID Server configurations...");
                 var data = await getOIDCConfig();
                 setLoading(false);
-                if(data === "Invalid Session") ; //$rootScope.redirectPage();
+                if(data === "Invalid Session")RedirectPage(history);
                 else if(data === "fail"){
                     setPopupState({show:true,title:"Create User",content:"Failed to fetch OpenID server configurations."});
                 }
@@ -400,12 +397,11 @@ const CreateUser = (props) => {
 		const ldapServer = userConf.server;
         dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
         dispatch({type:actionTypes.UPDATE_LDAP_ALLUSER_LIST,payload:[]})
-        setLoadingContent("Fetching LDAP users...");
-        setLoading(true);
+        setLoading("Fetching LDAP users...");
         try{
             const data = await getLDAPConfig("user", ldapServer);
             setLoading(false);
-			if(data === "Invalid Session");// $rootScope.redirectPage();
+			if(data === "Invalid Session")RedirectPage(history);
 			else if(data === "fail"){
                 setPopupState({show:true,title:"Create User",content:"Failed to LDAP fetch users"});
             }
@@ -453,12 +449,11 @@ const CreateUser = (props) => {
 			return;
 		}
 		clearForm(true);
-        setLoadingContent("Fetching User details...");
-        setLoading(true);
+        setLoading("Fetching User details...");
         try{    
             const data = await getLDAPConfig("user", ldapServer, ldapUser);
             setLoading(false);
-			if(data === "Invalid Session");// $rootScope.redirectPage();
+			if(data === "Invalid Session")RedirectPage(history);
 			else if(data === "fail"){
                 setPopupState({show:true,title:"Create User",content:"Failed to populate User details"});
             }
@@ -493,12 +488,11 @@ const CreateUser = (props) => {
         click(); 
         dispatch({type:actionTypes.UPDATE_TYPE,payload: "inhouse"})
         dispatch({type:actionTypes.UPDATE_FTYPE,payload: "Default"})
-        setLoadingContent("Fetching users...");
-        setLoading(true);
+        setLoading("Fetching users...");
         try{
             var data = await getUserDetails("user");
             setLoading(false);
-            if(data === "Invalid Session");//$rootScope.redirectPage();
+            if(data === "Invalid Session")RedirectPage(history);
             else if(data === "fail"){
                 setPopupState({show:true,title:"Edit User",content:"Failed to fetch users."});
             } 
@@ -521,12 +515,11 @@ const CreateUser = (props) => {
         dispatch({type:actionTypes.UPDATE_USERID,payload: userObj[0]});
         dispatch({type:actionTypes.UPDATE_INPUT_USERNAME,payload: userObj[1]});
 		var failMsg = "Failed to fetch user details.";
-        setLoadingContent("Fetching User details...");
-        setLoading(true);
+        setLoading("Fetching User details...");
         try{    
             const data = await getUserDetails("userid", userObj[0]);
             setLoading(false);
-			if(data === "Invalid Session") ;//$rootScope.redirectPage();
+			if(data === "Invalid Session")RedirectPage(history);
 			else if(data === "fail"){
                 setPopupState({show:true,title:"Edit User",content:failMsg});
             }
@@ -555,11 +548,10 @@ const CreateUser = (props) => {
                         try{
                             dispatch({type:actionTypes.UPDATE_LDAP,payload:{fetch: "map", user: ''}})
                             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
-                            setLoadingContent("Fetching LDAP Server configurations...");
-                            setLoading(true);
+                            setLoading("Fetching LDAP Server configurations...");
                             var data1 = await getLDAPConfig("server");
                             setLoading(false);
-                            if(data1 === "Invalid Session") ; //$rootScope.redirectPage();
+                            if(data1 === "Invalid Session") RedirectPage(history);
                             else if(data1 === "fail"){
                                 setPopupState({show:true,title:"Create User",content:"Failed to fetch LDAP server configurations."});
                             }
@@ -581,11 +573,10 @@ const CreateUser = (props) => {
                     else if (data.type === "saml"){
                          try{
                             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
-                            setLoadingContent("Fetching SAML Server configurations...");
-                            setLoading(true);
+                            setLoading("Fetching SAML Server configurations...");
                             data1 = await getSAMLConfig();
                             setLoading(false);
-                            if(data1 === "Invalid Session");//$rootScope.redirectPage();
+                            if(data1 === "Invalid Session")RedirectPage(history);
                             else if(data1 === "fail"){
                                 setPopupState({show:true,title:"Create User",content:"Failed to fetch SAML server configurations."});
                             }
@@ -607,11 +598,10 @@ const CreateUser = (props) => {
                     else if (data.type === "oidc"){ 
                         try{
                             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
-                            setLoadingContent("Fetching OpenID Server configurations...");
-                            setLoading(true);
+                            setLoading("Fetching OpenID Server configurations...");
                             data1 = await getOIDCConfig();
                             setLoading(false);
-                            if(data1 === "Invalid Session") ; //$rootScope.redirectPage();
+                            if(data1 === "Invalid Session") RedirectPage(history);
                             else if(data1 === "fail"){
                                 setPopupState({show:true,title:"Create User",content:"Failed to fetch OpenID server configurations."});
                             }
@@ -665,7 +655,7 @@ const CreateUser = (props) => {
     return (
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
-            {loading?<ScreenOverlay content={loadingContent}/>:null}
+            {loading?<ScreenOverlay content={loading}/>:null}
             <div id="page-taskName"><span>{(props.showEditUser===false)?"Create User":"Edit User"}</span></div>
             
             {(props.showEditUser===false)?

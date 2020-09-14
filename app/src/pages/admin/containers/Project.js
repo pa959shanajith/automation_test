@@ -1,9 +1,10 @@
 import React ,  { Fragment, useEffect, useState } from 'react';
 import {getAvailablePlugins , getDomains_ICE, getDetails_ICE} from '../api';
 import EditGlobalModal from '../components/EditGlobalModal'
-import {ScreenOverlay,PopupMsg} from '../../global' 
+import {ScreenOverlay,PopupMsg, RedirectPage} from '../../global' 
 import ProjectButtons from '../components/ProjectButtons';
 import ReleaseCycle from '../components/ReleaseCycle';
+import { useHistory } from 'react-router-dom';
 import '../styles/Project.scss';
 
 /*Component ProjectNew
@@ -13,6 +14,7 @@ import '../styles/Project.scss';
     
 const ProjectNew = (props) => {
 
+    const history = useHistory();
     const [taskName,setTaskName] = useState("Create Project")
     const [selProject,setSelProject] = useState("")
     const [selProjectId,setSelProjectId] = useState("")
@@ -52,7 +54,6 @@ const ProjectNew = (props) => {
     const [oldCyclename,setOldCyclename] = useState("")
     const [showEditNameModalCycle,setShowEditNameModalCycle] = useState("")
     const [loading,setLoading] = useState(false)
-    const [loadingContent,setLoadingContent] = useState("")
     const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
 
     useEffect(()=>{
@@ -68,8 +69,7 @@ const ProjectNew = (props) => {
             setUpdateProjectDetails([]);
             var plugins = []; 
             try{
-                setLoadingContent("Loading...");
-                setLoading(true);
+                setLoading("Loading...");
                 const plugins_list = await getAvailablePlugins();
                 for (var i = 0; i < plugins_list.length; i++) {
                     plugins[i] = plugins_list[i];
@@ -80,7 +80,7 @@ const ProjectNew = (props) => {
                 // }, 10);
                 try{
                     const data = await getDomains_ICE()
-                    if (data === "Invalid Session") ;// $rootScope.redirectPage();
+                    if (data === "Invalid Session") RedirectPage(history);
                     else {
                         if(data.length===0){
                             // eslint-disable-next-line
@@ -174,18 +174,14 @@ const ProjectNew = (props) => {
             return false;
         } else {
             setModalInputErrorBorder(false);
-            var flag1 = flag;
             for( var i = 0; i < releaseList.length; i++){
                 if ( releaseList[i] === releaseTxt) {
                     setShowEditModalRelease(false);
                     setPopupState({show:true,title:"Add Release",content:"Release Name already exists"});
                     setFlag(true);
-                    flag1 = true;
+                    setShowEditModalRelease(false);
+                    return false;
                 }
-            }
-            if (flag1 === true) {
-                setShowEditModalRelease(false);
-                return false;
             }
             
             setShowEditModalRelease(false);
@@ -243,18 +239,13 @@ const ProjectNew = (props) => {
             setReleaseTxt("");
             return false;
         } else {
-            var flag1 = flag;
             setModalInputErrorBorder(false);
             for (var i = 0; i < releaseList.length; i++) {
                 if (releaseList[i] === releaseTxt) {
                     setPopupState({show:true,title:"Add Release",content:"Release Name already exists"});
                     setFlag(true);
-                    flag1 = true;
+                    return false;
                 }
-            }
-
-            if (flag1 === true) {
-                return false;
             }
             const releaseName = releaseTxt;
             if (taskName === "Create Project") {
@@ -391,16 +382,13 @@ const ProjectNew = (props) => {
         setFlag(false);
         // eslint-disable-next-line
         var reg = /^[a-zA-Z0-9\s\.\-\_]+$/;
-        var flag1 = flag;
+        
         for (var i = 0; i < cycleList.length; i++) {
             if (cycleList[i] === cycleTxt.trim()) {
                 setPopupState({show:true,title:"Add Cycle",content:"Cycle Name already exists for this release"});
                 setFlag(true);
-                flag1 = true;
+                return false;
             }
-        }
-        if (flag1 === true) {
-            return false;
         }
         if (cycleTxt === "") {
             setModalInputErrorBorder(true);
@@ -574,17 +562,13 @@ const ProjectNew = (props) => {
             setCycleTxt("");
             return false;
         }else {
-            var flag1 = flag;
             for( var i = 0; i < cycleList.length; i++){
                 if ( cycleList[i] === cycleTxt) {
                     setShowEditModalCycle(false);
                     setPopupState({show:true,title:"Add Cycle",content:"Cycle Name already exists for this release"});
                     setFlag(true);
-                    flag1 = true;
+                    return false;
                 }
-            }
-            if (flag1 === true) {
-                return false;
             }
             setModalInputErrorBorder(false);
             const cycleName = cycleTxt;
@@ -747,7 +731,7 @@ const ProjectNew = (props) => {
                     projectOptions.push({id:getDetailsResponse.projectIds[i],name:getDetailsResponse.projectNames[i]})
                 }    
                 setSelProjectOptions(projectOptions)
-                if (getDetailsResponse === "Invalid Session");// $rootScope.redirectPage();
+                if (getDetailsResponse === "Invalid Session")RedirectPage(history);
             }catch(error){
                 console.log("Error:::::::::::::", error);
             }
@@ -772,7 +756,7 @@ const ProjectNew = (props) => {
         projects.push(domaiprojectId);
         try{    
             const selProjectRes = await getDetails_ICE(idtype, requestedids);
-            if (selProjectRes === "Invalid Session");//$rootScope.redirectPage();
+            if (selProjectRes === "Invalid Session")RedirectPage(history);
             setprojectTypeSelected(selProjectRes.appType);
 
             setUpdateProjectDetails(selProjectRes.projectDetails);
@@ -810,7 +794,7 @@ const ProjectNew = (props) => {
     return (
     <Fragment>
         {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
-        {loading?<ScreenOverlay content={loadingContent}/>:null}
+        {loading?<ScreenOverlay content={loading}/>:null}
         <div id="page-taskName">
 				{taskName==="Create Project"?
                 <span>Create Project</span>

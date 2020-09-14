@@ -1,8 +1,9 @@
 import React ,  { Fragment, useEffect, useState} from 'react';
 import {getUserDetails, getDomains_ICE, getAssignedProjects_ICE, getDetails_ICE, assignProjects_ICE} from '../api';
-import {ScreenOverlay,PopupMsg} from '../../global' 
+import {ScreenOverlay, PopupMsg, RedirectPage} from '../../global' 
 import '../styles/ProjectAssign.scss';
 import AssignProjectmodal from '../components/AssignProjectModal'
+import { useHistory } from 'react-router-dom';
 
 /*Component ProjectAssign
   use: renders Project Assign Middle Screen
@@ -11,6 +12,7 @@ import AssignProjectmodal from '../components/AssignProjectModal'
     
 const ProjectNew = (props) => {
     
+    const history = useHistory();
     const [userSelectErrorBorder,setUserSelectErrorBorder] = useState(false)
     const [domainSelectErrorBorder,setDomainSelectErrorBorder] = useState(false)
     const [selectBox,setSelectBox] = useState([])
@@ -24,8 +26,7 @@ const ProjectNew = (props) => {
     const [selectedProject,setSelectedProject] = useState("")
     const [selectedUserId,setSelectedUserId] = useState("")
     const [loading,setLoading] = useState(false)
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
-    const [loadingContent,setLoadingContent] = useState("")
+    const [popupState,setPopupState] = useState({show:false,title:"",content:""})
     const [getAssignedProjectsLen,setGetAssignedProjectsLen] = useState(0)
     // eslint-disable-next-line
     const [showload,setShowload] = useState(false)
@@ -48,7 +49,7 @@ const ProjectNew = (props) => {
         try{
             const data = await getUserDetails("user");
             if(data === "Invalid Session") {
-                // $rootScope.redirectPage();
+                RedirectPage(history);
             } else if(data === "fail") {
                 setPopupState({show:true,title:"Assign Project",content:"Failed to fetch users."});
             } else if(data === "empty") {
@@ -103,7 +104,7 @@ const ProjectNew = (props) => {
         try{
             const data = await getDomains_ICE();
             if (data === "Invalid Session") {
-                //$rootScope.redirectPage();
+                RedirectPage(history);
             } else setSelDomainsOptions(data);
         }catch(error){
             console.log("Error:::::::::::::", error);
@@ -131,7 +132,7 @@ const ProjectNew = (props) => {
             const data1 = await getAssignedProjects_ICE(getAssignProj);
 			setGetAssignedProjectsLen(data1.length);
 			if (data1 === "Invalid Session") {
-				//$rootScope.redirectPage();
+				RedirectPage(history);
             }
 			assignProj.assignedProjectAP = [];
             setAssignProj(assignProj);
@@ -150,7 +151,7 @@ const ProjectNew = (props) => {
                     const detResponse = await getDetails_ICE(idtype, requestedids);
 				
 					if (detResponse === "Invalid Session") {
-						//$rootScope.redirectPage();
+						RedirectPage(history);
 					}
 					assignProj.allProjectAP = [];
                     setAssignProj(assignProj);
@@ -188,7 +189,7 @@ const ProjectNew = (props) => {
                 try{    
                     const res = await getDetails_ICE(idtype, requestedids);
 					if (res === "Invalid Session") {
-						//$rootScope.redirectPage();
+						RedirectPage(history);
 					}
 					if (res.projectIds.length > 0) {
 						assignProj.allProjectAP = [];
@@ -344,12 +345,11 @@ const ProjectNew = (props) => {
         // txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
         
         try{
-            setLoadingContent('Saving in Progress. Please Wait...');
-            setLoading(true);
+            setLoading('Saving in Progress. Please Wait...');
             const data = await assignProjects_ICE(assignProjectsObj)
             setLoading(false);
             if (data === "Invalid Session") {
-                //$rootScope.redirectPage();
+                RedirectPage(history);
             }
             if (data === 'success') {
                 if (assignedProjects1.length !== 0){
@@ -394,7 +394,7 @@ const ProjectNew = (props) => {
     return (
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
-            {loading?<ScreenOverlay content={loadingContent}/>:null}
+            {loading?<ScreenOverlay content={loading}/>:null}
             <div id="page-taskName">
                 <span>Assign Project</span>
 		    </div>
