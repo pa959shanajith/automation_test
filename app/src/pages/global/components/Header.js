@@ -40,6 +40,7 @@ const Header = () => {
     // const [callRedirect, setCallRedirect] = useState(false);
     const [showUD, setShowUD] = useState(false);
     const [showSR, setShowSR] = useState(false);
+    const [adminDisable, setAdminDisable] = useState(false);
     let history = useHistory();
 
     const userInfo = useSelector(state=>state.login.userinfo);
@@ -50,6 +51,7 @@ const Header = () => {
             let last_name = userInfo.lastname.charAt(0).toUpperCase() + userInfo.lastname.slice(1);
             setUserDetails(userInfo);
             setUserRole(userInfo.rolename);
+            if (userInfo.rolename === "Admin") setAdminDisable(true); 
             if (first_name === last_name) setUsername(first_name);
             else setUsername(first_name + ' ' + last_name);
         }
@@ -210,10 +212,10 @@ const Header = () => {
             {/* { callRedirect ? RedirectPage() :  */}
             {/* { showChangePass ? <ChangePassword show={showChangePass} setShow={toggleChangePass} /> : null } */}
             <div className = "main-header">
-                <span className="header-logo-span" onClick={ naviPg } disabled={userRole === "Admin"}><img className="header-logo" alt="logo" src="static/imgs/logo.png" onClick={naviPg}/></span>
+                <span className="header-logo-span"><img className={"header-logo " + (!adminDisable ? "" : "logo-disable")} alt="logo" src="static/imgs/logo.png" onClick={ !adminDisable ? naviPg : null } /></span>
                     <div className="dropdown user-options">
 
-                        { userRole === "Admin" ? null :
+                        { !adminDisable &&
                         <>
                         <div className="btn-container"><button className="fa fa-bell no-border bell-ic"></button></div>
                         <ClickAwayListener onClickAway={onClickAwaySR}>
@@ -236,7 +238,7 @@ const Header = () => {
                             <div><Link className="user-role-item" to="#">{userRole ? userRole : "Test Manager"}</Link></div>
                             <div className="divider" />
                             {
-                                userRole === "Admin" ? null :
+                                !adminDisable &&
                                 <>
                                 <div onClick={getIce} ><Link to="#">Download ICE</Link></div>
                                 <div className="divider" />
