@@ -277,7 +277,7 @@ if (cluster.isMaster) {
 		});
 
 		//Only Test Engineer and Test Lead have access
-		app.get(/^\/(design|designTestCase|execute|scheduling)$/, function(req, res) {
+		app.get(/^\/(scrape|design|designTestCase|execute|scheduling)$/, function(req, res) {
 			var roles = ["Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
