@@ -6,6 +6,7 @@ import RedirectPage from './components/RedirectPage';
 import ScreenOverlay from './components/ScreenOverlay';
 import Scrollbar from './components/Scrollbar';
 import PopupMsg from './components/PopupMsg';
+import ModalContainer from './components/ModalContainer';
 // import ChangePassword from './components/ChangePassword';
 
-export { Header, FooterOne, FooterTwo, ProgressBar, SetProgressBar, RedirectPage, ScreenOverlay, Scrollbar, PopupMsg};
+export { Header, FooterOne, FooterTwo, ProgressBar, SetProgressBar, RedirectPage, ScreenOverlay, Scrollbar, PopupMsg, ModalContainer};
