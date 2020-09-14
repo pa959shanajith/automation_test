@@ -17,7 +17,7 @@ const LoginPage = () => {
     const dispatch = useDispatch();
      
     useEffect(()=>{
-        SetProgressBar('complete', dispatch);
+        SetProgressBar('complete');
     }, []);
 
     return (

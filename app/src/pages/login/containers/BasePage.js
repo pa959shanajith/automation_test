@@ -32,13 +32,13 @@ const BasePage = () => {
                     if (checkLogout[1] === "dereg") setLoginValidation("Reason: User is deleted from Avo Assure");
                 } 
                 else setLoginValidation("You Have Successfully Logged Out!");
-                SetProgressBar("stop", dispatch);
+                SetProgressBar("stop");
             }
             else {
                 setLoginAgain(false);
                 try{
                     let data = await api.validateUserState()
-                    SetProgressBar("stop", dispatch);
+                    SetProgressBar("stop");
                     setLoginValidation("Loading Profile...");
                     if (data === "fail") setLoginValidation("Failed to load user profile.");
                     else if (data === "unauthorized") setLoginValidation("User is not authorized to use Avo Assure.");
@@ -64,7 +64,7 @@ const BasePage = () => {
                                 window.localStorage.navigateScreen = userinfo.page;
                                 dispatch({type:actionTypes.SET_SR, payload: userinfo.rolename});
                                 dispatch({type:actionTypes.SET_USERINFO, payload: userinfo});
-                                SetProgressBar("start", dispatch);
+                                SetProgressBar("start");
                                 setRedirectTo(`/${userinfo.page}`);
                             }
                         }
@@ -78,7 +78,7 @@ const BasePage = () => {
                     const emsg = "Failed to load user profile. Error::";
                     console.error(emsg, err);
                     setLoginValidation(emsg);
-                    SetProgressBar("stop", dispatch);
+                    SetProgressBar("stop");
                 }
             }
         })()

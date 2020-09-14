@@ -21,8 +21,7 @@ const ProgressBar = (props) => {
 
 }
 
-const SetProgressBar=(op, dispatch)=>{
-
+const SetProgressBar=(op)=>{
     if (op=="start"){
         store.dispatch({type: actionTypes.SET_PROGRESS, payload: Math.floor(Math.random() * (80-30) + 30)});
     }
