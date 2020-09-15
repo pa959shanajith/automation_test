@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as pluginApi from "../api";
-import { RedirectPage, Scrollbar } from '../../global';
+import { RedirectPage, ScrollBar } from '../../global';
 import { useHistory } from 'react-router-dom';
 import * as actionTypes from '../state/action';
 import TaskContents from './TaskContents';
@@ -234,14 +234,14 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                 <span className={"task-nav-item " + (activeTab==="review" ? "active-tab" : "")} onClick={()=>setActiveTab("review")}>To Review</span>
             </div>
             <div className="task-overflow">
-                <Scrollbar verticalThumb={{backgroundColor: "#321e4f"}} verticalTrack={{backgroundColor: "rgb(211, 211, 211)"}} >
+                <ScrollBar thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" >
                 <div className="task-content">
                 <TaskContents items={searchValue ? searchItems : activeTab === "todo" ? todoItems : reviewItems} filterDat={filterDatState} taskJson={taskJson} />
                 {/* {activeTab === "todo"
                  ? <TaskContents items={todoItems} filterDat={filterDatState} taskJson={taskJson} />
                  : <TaskContents items={reviewItems} filterDat={filterDatState} taskJson={taskJson} />} */}
                  </div>
-                 </Scrollbar>
+                 </ScrollBar>
             </div>
         </div>
     );

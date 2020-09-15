@@ -1,7 +1,7 @@
 import React ,{useState , useEffect, Fragment} from'react';
 import '../styles/LeftBarItems.scss'
 import {GetScrapeDataScreenLevel_ICE} from '../api';
-import {Scrollbar} from '../../global';
+import {ScrollBar} from '../../global';
 
 /*Component LeftBarItems
   use: renders  6 options in design  in the left of screen
@@ -95,7 +95,7 @@ const CreateOptions = (props) => {
     <div className="leftnav" >
       {(apptype=== "Web")? 
         <Fragment>
-          <Scrollbar verticalThumb = {{backgroundColor:'rgba(255, 255, 255, 0.27)'}} verticalTrack = {{background: 'none'}}>
+          <ScrollBar thumbColor = 'rgba(255, 255, 255, 0.27)' trackColor = 'none'>
             <div className="leftbar-container">
               <div className="leftbar-top">
                 <ul>
@@ -120,7 +120,7 @@ const CreateOptions = (props) => {
                 </div>
               ))}
             </div>
-          </Scrollbar>
+          </ScrollBar>
         </Fragment>
         : null }
       {(apptype==="Desktop")? <div className="leftbar-container">
