@@ -13,16 +13,18 @@ import '../styles/ModalContainer.scss'
 const ModalContainer = (props) => {
     return(
         <div className='modal__container'>
-            <div className='modal__content modal-content modal-sm'>
-                <div className='modal-header modal__header'>
-                    <button onClick={(e)=>props.close(e)}>×</button>
-                    <h4 className='modal-title'>{props.title}</h4>
-                </div>
-                <div className='modal-body modal__body'>
-                    {props.content}
-                </div>
-                <div className='modal-footer modal__footer'>
-                    {props.footer}
+            <div className='modal-dialog'>
+                <div className='modal__content modal-content'>
+                    <div className='modal-header modal__header'>
+                        <button onClick={(e)=>props.close(e)}>×</button>
+                        <h4 className='modal-title'>{props.title}</h4>
+                    </div>
+                    <div className='modal-body modal__body'>
+                        {props.content}
+                    </div>
+                    <div className='modal-footer modal__footer'>
+                        {props.footer}
+                    </div>
                 </div>
             </div>
         </div>
