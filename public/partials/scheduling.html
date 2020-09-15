@@ -111,7 +111,12 @@
 
 			<div id="left-bottom-section" class="lbs-single">
 				<ul>
-					<li style="position:absolute;" ng-if="getScreenView == 'Web'"><a class="selectParallel" href='#' title="Parallel Execution"><span><img src='imgs/ic-parallel.png' alt='Parallel' height='55' width='57'/></span><font size="2">Parallel Execution</font></a></li>
+					<li style="position:absolute;" ng-if="getScreenView == 'Web'">
+						<a class="selectParallel" href='#' title="Parallel Execution"><span><img src='imgs/ic-parallel.png' alt='Parallel' height='55' width='57'/></span><font size="2">Parallel Execution</font></a>
+						<a class="selectModSmart" onclick="moduleSmartScheduling()" title="Module Smart Scheduling"><span><img src='imgs/ic-module-smart.png' alt='Parallel' height='55' width='57'/></span><font size="2">Module Smart Scheduling</font></a>
+						<a class="selectScnSmart" onclick="scenarioSmartScheduling()" title="Scenario Smart Scheduling"><span><img src='imgs/ic-scenario-smart.png' alt='Parallel' height='55' width='57'/></span><font size="2">Scenario Smart Scheduling</font></a>
+
+					</li>
 				</ul>
 			</div>
 		</div>
