@@ -1,0 +1,47 @@
+import React, { Fragment } from 'react';
+import SimpleBar from 'simplebar-react';
+import 'simplebar-react/dist/simplebar.min.css'
+
+/*Component Scrollbar
+  use: Wrapper function extends react-custom-scollbars;
+  props: 
+    styles for horizontalTrack,horizontalThumb,verticalTrack,verticalThumb,
+    maxThumbSize : number
+    minThumbSize : number
+    trackColor : color
+    thumbColor : color
+*/
+
+const ScrollBar = (props) => {
+    return(
+        <Fragment>
+            <style type="text/css">
+                {`
+                .simplebar-scrollbar:before {
+                    top: 0px;
+                    bottom: 0px;
+                    left: 0px;
+                    right: 0px;
+                    background:${props.thumbColor?props.thumbColor:'#000'};
+                }
+                .simplebar-track.simplebar-vertical {
+                    top: 2px;
+                    bottom: 2px;
+                    right: 2px;
+                    border-radius: 3px;
+                    background: ${props.trackColor?props.trackColor:'white'};
+                    width: 6px;
+                }
+                simplebar-track.simplebar-horizontal {
+                    background: ${props.trackColor?props.trackColor:'white'};
+                }
+                `}
+            </style>
+            <SimpleBar scrollbarMaxSize={props.maxThumbSize?props.maxThumbSize:0} scrollbarMinSize={props.maxThumbSize?props.maxThumbSize:25} autoHide={false} style={{height:'inherit'}}>
+                {props.children}
+            </SimpleBar>
+        </Fragment>
+    )
+}
+
+export default ScrollBar;

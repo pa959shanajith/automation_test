@@ -1144,7 +1144,7 @@ exports.pdProcess = function (req, res) {
 			}
 			var inputs = {
 				'projectid': req.body.data.projectid,
-				'screenname': 'Screen_PD_'+name,
+				'screenname': 'Screen_'+name,
 				'versionnumber': 0,
 				'createdby': userid,
 				'createdbyrole': role,
@@ -1155,7 +1155,7 @@ exports.pdProcess = function (req, res) {
 				'scrapedurl':'',
 				'scrapedata': screendataobj[name].data
 			};
-			ordernameidlist.push({'name':'Screen_PD_'+name,'type':3})
+			ordernameidlist.push({'name':'Screen_'+name,'type':3})
 
 			var args = {
 				data: inputs,
@@ -1180,7 +1180,7 @@ exports.pdProcess = function (req, res) {
 							}
 							var inputs = {
 								'screenid': screenid,
-								'testcasename': 'Testcase_PD_'+name,
+								'testcasename': 'Testcase_'+name,
 								'versionnumber': 0,
 								'createdthrough': 'PD',
 								'createdby': userid,
@@ -1192,7 +1192,7 @@ exports.pdProcess = function (req, res) {
 								'dataobjects':dobjects,
 								'steps':screendataobj[name].script
 							};
-							ordernameidlist.push({'name':'Testcase_PD_'+name,'type':4})
+							ordernameidlist.push({'name':'Testcase_'+name,'type':4})
 							var args = {
 								data: inputs,
 								headers: {
@@ -1266,11 +1266,6 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					getTestcaseStep(2,null,'@Sap','ServerConnect',null,null,null,"SAP")
 				];
 				step = 3;
-				if(screendata[0].tag=="GuiOkCodeField") {
-					testcaseObj = getTestcaseStep(step,null,'@Sap','StartTransaction',[screendata[0].text],null,null,"SAP");
-					step = 4;	
-					testCaseSteps.push(testcaseObj);
-				}
 			}
 		});	
 	}
@@ -1294,9 +1289,15 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						testcaseObj = getTestcaseStep(step,null,'@Browser','navigateToURL',[eachScrapedAction.action.actionData],null,null,"Web");
 						break;
 					case "click":
-						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'click',null,null,eachScrapedAction.url,"Web");
-						var custname_split = eachScrapedAction.custname.split('_');
-						if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+						if(eachScrapedAction.tag == "radiobutton") {
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectRadioButton',null,null,eachScrapedAction.url,"Web");
+						} else if(eachScrapedAction.tag == "checkbox") {
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectCheckbox',null,null,eachScrapedAction.url,"Web");
+						} else {
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'click',null,null,eachScrapedAction.url,"Web");
+							var custname_split = eachScrapedAction.custname.split('_');
+							if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+						}
 						break;
 					case "inputChange":
 						if(eachScrapedAction.action.actionData.split(";").length == 2 && eachScrapedAction.action.actionData.split(";")[1] =='byIndex'){
@@ -1337,27 +1338,43 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 			input = text.split("  ");
 			switch(eachScrapedAction.tag){
 				case "input":
+				case "GuiOkCodeField":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
 					break;
 				case "button":
 				case "shell":
 				case "table":
+				case "toolbar":
+				case "calendar":
+				case "gridview":
+				case "GuiLabel":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
 					var custname_split = eachScrapedAction.custname.split('_');
 					if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+					break;
+				case "GuiStatusbar":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClickStatusBar',null,null,null,"SAP");
 					break;
 				case "GuiTab":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTab',null,null,null,"SAP");
 					break;
 				case "select":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,
-						'selectValueByText',[input[0]],null,null,"SAP");
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'selectValueByText',[input[0]],null,null,"SAP");
+					break;
+				case "GuiMenubar":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'SelectMenu',[input[0]],null,null,"SAP");
+					break;
+				case "GuiSimpleContainer":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'DoubleClickOnCell',[input[0]],null,null,"SAP");
 					break;
 				case "radiobutton":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRadioButton',null,null,null,"SAP");
 					break;
 				case "checkbox":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectCheckbox',null,null,null,"SAP");
+					break;
+				case "tree":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTreeElement',null,null,null,"SAP");
 					break;
 				default:
 					logger.info("Import PD: No match found for "+eachScrapedAction.tag+" for SAP apptype.");
@@ -1397,13 +1414,13 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					}
 					if(eachBox['mxCell']['@style'] == 'rhombus'){// in case of if
 						testcaseObj = getTestcaseStep(step,null,"@Generic",'jumpTo',
-							['Testcase_PD_'+eachBox["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],null,null,"Generic");
+							['Testcase_'+eachBox["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],null,null,"Generic");
 						testCaseSteps.push(testcaseObj);
 						step++;
 					}	
 					else if(eachBox['mxCell']['@style'] == 'task'){	// in case of task
 						testcaseObj = getTestcaseStep(step,null,"@Generic",'jumpTo',
-							['Testcase_PD_'+eachBox["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],null,null,"Generic");
+							['Testcase_'+eachBox["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],null,null,"Generic");
 						testCaseSteps.push(testcaseObj);
 						step++;								
 					}
@@ -1424,7 +1441,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 				}	
 				else{ // otherwise task or activity
 					testcaseObj = getTestcaseStep(step,null,"@Generic",'jumpTo',
-						['Testcase_PD_'+adjacentItems.targets[0]["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],null,null,"Generic");
+						['Testcase_'+adjacentItems.targets[0]["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'')],null,null,"Generic");
 					testCaseSteps.push(testcaseObj);
 					step++;													
 				}

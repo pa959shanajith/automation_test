@@ -1,10 +1,10 @@
 import React, { useState, Fragment} from 'react';
 import { useSelector, useDispatch} from 'react-redux';
 import {getModules}  from '../api'
-import '../styles/ModuleListDrop.scss'
-import {Scrollbar} from '../../global';
+import {ScrollBar} from '../../global';
 import {ScreenOverlay} from '../../global'
 import * as actionTypes from '../state/action';
+import '../styles/ModuleListDrop.scss'
 
 /*Component ModuleListDrop
   use: renders 
@@ -43,7 +43,7 @@ const ModuleListDrop = () =>{
             {loading?<ScreenOverlay content={'Loading Mindmap ...'}/>:null}
             {(moddrop)?
                 <div className='toolbar__module-container'>
-                    <Scrollbar>
+                    <ScrollBar>
                         {moduleList.map((e,i)=>{
                             return(
                                 <div onClick={(e)=>selectModule(e)} value={e._id} key={i} className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")}>
@@ -52,7 +52,7 @@ const ModuleListDrop = () =>{
                                 </div>
                             )
                         })}
-                    </Scrollbar>
+                    </ScrollBar>
                 </div>
                 :null
             }

@@ -1,10 +1,11 @@
 import React ,  { Fragment, useEffect, useState } from 'react';
 import {getAvailablePlugins , getDomains_ICE, getDetails_ICE} from '../api';
 import EditGlobalModal from '../components/EditGlobalModal'
-import 'font-awesome/css/font-awesome.min.css';
-import '../styles/Project.scss';
+import {ScreenOverlay,PopupMsg, RedirectPage} from '../../global' 
 import ProjectButtons from '../components/ProjectButtons';
 import ReleaseCycle from '../components/ReleaseCycle';
+import { useHistory } from 'react-router-dom';
+import '../styles/Project.scss';
 
 /*Component ProjectNew
   use: renders create New Project page
@@ -13,6 +14,7 @@ import ReleaseCycle from '../components/ReleaseCycle';
     
 const ProjectNew = (props) => {
 
+    const history = useHistory();
     const [taskName,setTaskName] = useState("Create Project")
     const [selProject,setSelProject] = useState("")
     const [selProjectId,setSelProjectId] = useState("")
@@ -51,6 +53,8 @@ const ProjectNew = (props) => {
     // const [editReleaseID,setEditReleaseId] = useState("")
     const [oldCyclename,setOldCyclename] = useState("")
     const [showEditNameModalCycle,setShowEditNameModalCycle] = useState("")
+    const [loading,setLoading] = useState(false)
+    const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
 
     useEffect(()=>{
         getDomains();
@@ -58,15 +62,14 @@ const ProjectNew = (props) => {
     },[props.resetMiddleScreen["projectTab"]])
 
     const getDomains = () => {
-        (async()=>{
+        (async()=>{    
             setTaskName("Create Project")
             resetForm();
             setProjectDetails([]);
             setUpdateProjectDetails([]);
             var plugins = []; 
-            // $(".selectedIcon").removeClass("selectedIcon");
-            // $(this).children().find("span.fa").addClass("selectedIcon");;
             try{
+                setLoading("Loading...");
                 const plugins_list = await getAvailablePlugins();
                 for (var i = 0; i < plugins_list.length; i++) {
                     plugins[i] = plugins_list[i];
@@ -77,7 +80,7 @@ const ProjectNew = (props) => {
                 // }, 10);
                 try{
                     const data = await getDomains_ICE()
-                    if (data === "Invalid Session") ;// $rootScope.redirectPage();
+                    if (data === "Invalid Session") RedirectPage(history);
                     else {
                         if(data.length===0){
                             // eslint-disable-next-line
@@ -105,8 +108,10 @@ const ProjectNew = (props) => {
                     }
                 }catch(error){
                     console.log("Error:::::::::::::", error);
-                }    
+                } 
+                setLoading(false);   
             }catch(error){
+                setLoading(false);
                 console.log("Error:::::::::::::", error);
             }
         })()
@@ -169,19 +174,14 @@ const ProjectNew = (props) => {
             return false;
         } else {
             setModalInputErrorBorder(false);
-            var flag1 = flag;
             for( var i = 0; i < releaseList.length; i++){
                 if ( releaseList[i] === releaseTxt) {
                     setShowEditModalRelease(false);
-                    // openModalPopup("Add Release", "Release Name already exists");
-                    alert("Release Name already exists");
+                    setPopupState({show:true,title:"Add Release",content:"Release Name already exists"});
                     setFlag(true);
-                    flag1 = true;
+                    setShowEditModalRelease(false);
+                    return false;
                 }
-            }
-            if (flag1 === true) {
-                setShowEditModalRelease(false);
-                return false;
             }
             
             setShowEditModalRelease(false);
@@ -239,20 +239,13 @@ const ProjectNew = (props) => {
             setReleaseTxt("");
             return false;
         } else {
-            var flag1 = flag;
             setModalInputErrorBorder(false);
             for (var i = 0; i < releaseList.length; i++) {
                 if (releaseList[i] === releaseTxt) {
-                    // $(".close:visible").trigger('click');
-                    // openModalPopup("Add Release", "Release Name already exists");
-                    alert( "Release Name already exists");
+                    setPopupState({show:true,title:"Add Release",content:"Release Name already exists"});
                     setFlag(true);
-                    flag1 = true;
+                    return false;
                 }
-            }
-
-            if (flag1 === true) {
-                return false;
             }
             const releaseName = releaseTxt;
             if (taskName === "Create Project") {
@@ -277,16 +270,14 @@ const ProjectNew = (props) => {
                 for (i = 0; i < updateProjectDetails.length; i++) {
                     if (releaseName.trim() === updateProjectDetails[i].name) {
                         setShowEditNameModalRelease(false);
-                        alert("Release Name already exists");
-                        // openModalPopup("Edit Release Name", "Release Name already exists");
+                        setPopupState({show:true,title:"Add Release",content:"Release Name already exists"});
                         return false;
                     }
                 }
                 for (i = 0; i < newProjectDetails.length; i++) {
                     if (releaseName.trim() === newProjectDetails[i].name) {
                         setShowEditNameModalRelease(false);
-                        alert("Release Name already exists");
-                        // openModalPopup("Edit Release Name", "Release Name already exists");
+                        setPopupState({show:true,title:"Edit Release Name",content:"Release Name already exists"});
                         return false;
                     } else {
                         if (existingReleaseName === newProjectDetails[i].name) {
@@ -391,16 +382,13 @@ const ProjectNew = (props) => {
         setFlag(false);
         // eslint-disable-next-line
         var reg = /^[a-zA-Z0-9\s\.\-\_]+$/;
+        
         for (var i = 0; i < cycleList.length; i++) {
             if (cycleList[i] === cycleTxt.trim()) {
-                // $(".close:visible").trigger('click');
-                // openModalPopup("Add Cycle", "Cycle Name already exists for this release");
-                alert("Cycle Name already exists for this release");
+                setPopupState({show:true,title:"Add Cycle",content:"Cycle Name already exists for this release"});
                 setFlag(true);
+                return false;
             }
-        }
-        if (flag === true) {
-            return false;
         }
         if (cycleTxt === "") {
             setModalInputErrorBorder(true);
@@ -416,8 +404,7 @@ const ProjectNew = (props) => {
                     for (var j = 0; j < updateProjectDetails[i].cycles.length; j++) {
                         if (cycleTxt.trim() === updateProjectDetails[i].cycles[j].name) {
                             setShowEditNameModalCycle(false);
-                            alert("Cycle Name already exists")
-                            // openModalPopup("Edit Cycle Name", "Cycle Name already exists");
+                            setPopupState({show:true,title:"Edit Cycle Name",content:"Cycle Name already exists"});
                             return false;
                         }
                     }
@@ -578,13 +565,10 @@ const ProjectNew = (props) => {
             for( var i = 0; i < cycleList.length; i++){
                 if ( cycleList[i] === cycleTxt) {
                     setShowEditModalCycle(false);
-                    // openModalPopup("Add Cycle", "Cycle Name already exists for this release");
-                    alert("Cycle Name already exists for this release");
+                    setPopupState({show:true,title:"Add Cycle",content:"Cycle Name already exists for this release"});
                     setFlag(true);
+                    return false;
                 }
-            }
-            if (flag === true) {
-                return false;
             }
             setModalInputErrorBorder(false);
             const cycleName = cycleTxt;
@@ -747,7 +731,7 @@ const ProjectNew = (props) => {
                     projectOptions.push({id:getDetailsResponse.projectIds[i],name:getDetailsResponse.projectNames[i]})
                 }    
                 setSelProjectOptions(projectOptions)
-                if (getDetailsResponse === "Invalid Session");// $rootScope.redirectPage();
+                if (getDetailsResponse === "Invalid Session")RedirectPage(history);
             }catch(error){
                 console.log("Error:::::::::::::", error);
             }
@@ -772,7 +756,7 @@ const ProjectNew = (props) => {
         projects.push(domaiprojectId);
         try{    
             const selProjectRes = await getDetails_ICE(idtype, requestedids);
-            if (selProjectRes === "Invalid Session");//$rootScope.redirectPage();
+            if (selProjectRes === "Invalid Session")RedirectPage(history);
             setprojectTypeSelected(selProjectRes.appType);
 
             setUpdateProjectDetails(selProjectRes.projectDetails);
@@ -802,9 +786,15 @@ const ProjectNew = (props) => {
         }
         clearUpdateProjectObjects();
     }
+
+    const closePopup = () =>{
+        setPopupState({show:false,title:"",content:""});
+    }
     
     return (
     <Fragment>
+        {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
+        {loading?<ScreenOverlay content={loading}/>:null}
         <div id="page-taskName">
 				{taskName==="Create Project"?
                 <span>Create Project</span>
