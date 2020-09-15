@@ -1,12 +1,12 @@
 .plugin-blocks{
     display: grid;
     grid-template-columns: auto auto;
-    grid-gap: 20px 30px;
+    grid-gap: 10px 45px;
 }
 
 .plugin-ic{
-    height: 140px;
-    width: 140px;
+    height: 160px;
+    width: 160px;
 }
 
 .plugin-block{
@@ -24,7 +24,6 @@
 .plugin-section{
     display: flex;
     flex-direction: column;
-    margin-right: 30px;
 }
 
 .avail-plugin-title{
@@ -33,15 +32,16 @@
     font-weight: 500;
     line-height: 1.1;
     padding-left: 15px;
-    margin-bottom: 10px;
+    margin-bottom: 30px;
 }
 
 .plugin-text{
-    font-family: "LatoWebLight";
-    font-size: 23px;
+    font-family: "LatoWeb";
+    font-size: 18px;
     font-weight: 500;
     line-height: 1.1;
     margin-top: 10px;
+    cursor: pointer;
 }
 
 @media screen and (min-width: 1400px) and (min-height: 770px){
