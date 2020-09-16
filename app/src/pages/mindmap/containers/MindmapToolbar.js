@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import Toolbarmenu from '../components/ToolbarMenu';
 import ModuleListDrop from '../components/ModuleListDrop'
 import '../styles/MindmapToolbar.scss'
@@ -11,10 +11,12 @@ import '../styles/MindmapToolbar.scss'
 
 const MindmapToolbar = () => {
   return (
-    <div className='toolbar__container'>
-        <Toolbarmenu/>
-        <ModuleListDrop/>
-    </div>
+    <Fragment>
+      <div className='toolbar__container'>
+          <Toolbarmenu/>
+      </div>
+      <ModuleListDrop/>
+    </Fragment>
   );
 }
 

@@ -56,7 +56,7 @@ const ModuleListDrop = () =>{
                 </div>
                 :null
             }
-            <div className='toolbar__module-footer' onClick={()=>setModdrop(!moddrop)}>
+            <div className={'toolbar__module-footer'+ (moddrop?' z-up':'')} onClick={()=>setModdrop(!moddrop)}>
                 <div><i className={(!moddrop)?"fa fa-caret-down":"fa fa-caret-up"} title="Drop down button"></i></div>
             </div>
         </Fragment>

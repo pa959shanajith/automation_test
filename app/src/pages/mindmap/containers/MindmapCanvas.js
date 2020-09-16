@@ -6,6 +6,9 @@ import NavButton from '../components/NavButton'
 import Legends from '../components/Legends'
 import ControlBox from '../components/Controlbox'
 import InputBox from '../components/InputBox' 
+import MultiNodeBox from '../components/MultiNodeBox'
+import RectangleBox from '../components/RectangleBox'
+import { ScreenOverlay, PopupMsg } from '../../global';
 import '../styles/MindmapCanvas.scss';
 
 /*Component Canvas
@@ -18,25 +21,34 @@ const types = {
     'screens': 363,
     'testcases': 488
 };
+var count;
 var temp = {
     s: [],
     t: ""
 };
-var moving = false
 const Canvas = (props) => {
     const [sections,setSection] =  useState({})
     const [ctrlBox,setCtrlBox] = useState(false);
     const [inpBox,setInpBox] = useState(false);
+    const [multipleNode,setMultipleNode] = useState(false)
     const [ctScale,setCtScale] = useState({})
     const [links,setLinks] = useState({})
     const [nodes,setNodes] = useState({})
     const [dNodes,setdNodes] = useState([])
     const [dLinks,setdLinks] = useState([])
     const [createnew,setCreateNew] =useState(false)
+    const [popup,setPopup] =  useState({show:false})
+    const [blockui,setBlockui] =  useState({show:false})
     const CanvasRef = useRef();
     const verticalLayout = false;
     useEffect(() => {
         var tree;
+        count = {
+            'modules': 0,
+            'scenarios': 0,
+            'screens': 0,
+            'testcases': 0
+        }
         if(props.module.createnew){
             //create new mindmap
             tree = createNewMap()
@@ -47,10 +59,12 @@ const Canvas = (props) => {
                 zoom.scale(1).translate([0,0]).event(d3.select(`.mp__canvas_svg`))
                 zoom.on("zoom",null)
             }
+            count['modules'] = 1
             setCreateNew(0)
         }else{
             //load mindmap from data
-            tree = generateTree(props.module,types)
+            tree = generateTree(props.module,types,{...count})
+            count= {...count,...tree.count}
         }
         d3.select('.ct-container').attr("transform", "translate(" + tree.translate[0]+','+tree.translate[1] + ")scale(" + 1 + ")");
         zoom = bindZoomListner(setCtScale,tree.translate)
@@ -73,12 +87,41 @@ const Canvas = (props) => {
         setInpBox(false)
         setCtrlBox(e.target.parentElement.id)
     }
-    const clickAdd=(e)=>{
-        var res = createNode(e,{...nodes},{...links},[...dNodes],[...dLinks],{...sections})
+    const createMultipleNode = (e,mnode)=>{
+        setMultipleNode(false)
+        if (mnode.length === 0){
+            setPopup({show:true,title:'Failure',content:'No nodes to create',submitText:'Ok'})
+            return;
+        }
+        setBlockui({show:true,content:'Creating Nodes...'})
+        var cnodes = {...nodes}
+        var clinks = {...links}
+        var cdNodes = [...dNodes]
+        var cdLinks = [...dLinks]
+        var csections = {...sections}
+        mnode.forEach((name)=>{
+            var res = createNode(e,cnodes,clinks,cdNodes,cdLinks,csections,{...count},name)
+            cnodes = res.nodeDisplay
+            clinks = res.linkDisplay
+            cdNodes = res.dNodes
+            cdLinks = res.dLinks
+            count= {...count,...res.count}
+        })
+        setNodes(cnodes)
+        setLinks(clinks)
+        setdLinks(cdLinks)
+        setdNodes(cdNodes)
+        setBlockui({show:false})
+        setPopup({show:true,title:'Success',content:'Nodes created successfully!',submitText:'Ok'})
+
+    }
+    const clickAddNode=(e)=>{
+        var res = createNode(e,{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count})
         setNodes(res.nodeDisplay)
         setLinks(res.linkDisplay)
         setdLinks(res.dLinks)
         setdNodes(res.dNodes)
+        count= {...count,...res.count}
     }
     const clickCollpase=(e)=>{
         var id = e.target.parentElement.id;
@@ -92,10 +135,8 @@ const Canvas = (props) => {
         if(type==='KeyUp'){
             res = moveNodeEnd(id,[...dNodes],[...dLinks],{...links},{...temp})
             setLinks(res.linkDisplay)
-            moving = false
         }
         else{
-            moving = true
             res = moveNodeBegin(id,{...links},[...dLinks],{...temp},{...ctScale})
             setLinks(res.linkDisplay)
             temp=res.temp
@@ -103,8 +144,12 @@ const Canvas = (props) => {
     }
     return (
         <Fragment>
-            {(ctrlBox!==false)?<ControlBox nid={ctrlBox} clickAdd={clickAdd} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
-            {(inpBox!==false)?<InputBox node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale}/>:null}
+            {(false)?<RectangleBox />:null}
+            {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
+            {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
+            {(ctrlBox !== false)?<ControlBox nid={ctrlBox} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
+            {(inpBox !== false)?<InputBox node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale}/>:null}
+            {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton/>
             <Legends/>
@@ -147,34 +192,31 @@ const moveNodeBegin = (idx,linkDisplay,dLinks,temp,pos) => {
     });
     const svg = d3.select(`.mp__canvas_svg`);
     d3.select('#node_' + idx).classed('ct-movable', !0);
-    svg.on('mousemove', (e)=>{
+    svg.on('mousemove.nodemove', ()=>{
+        d3.event.stopImmediatePropagation();
         const cSpan = [pos.x, pos.y];
         const cScale = pos.k;
         const svgOff = document.getElementById('mp__canvas_svg').getBoundingClientRect();
         d3.select('.ct-movable').attr('transform', "translate(" + parseFloat((d3.event.x - svgOff.left - cSpan[0]) / cScale + 2) + "," + parseFloat((d3.event.y - svgOff.top - cSpan[1]) / cScale - 20) + ")");
-        d3.event.preventDefault();
     })
     return {linkDisplay,temp}
 }
 
 const moveNodeEnd = (pi,dNodes,dLinks,linkDisplay,temp) => {
     const svg = d3.select(`.mp__canvas_svg`);
-    svg.on('mousemove', null);
+    svg.on('mousemove.nodemove', null);
     var p = d3.select("#node_" + pi);
     var l = p.attr('transform').slice(10, -1).split(',');
     dNodes[pi].x = parseFloat(l[0]);
     dNodes[pi].y = parseFloat(l[1]);
     var link = addLink(dLinks[temp.t].source, dLinks[temp.t].target,temp.t);
     var lid = 'link-' + dLinks[temp.t].source.id + '-' + dLinks[temp.t].target.id
-    // var v = (dNodes[pi].children) ? !1 : !0;
     linkDisplay[lid] = link
-    //Issue fixed #374: 'Mindmap - Blank nodes are retained if we delete the connected nodes'
     temp.s.forEach(function(d) {
         // if (deletednode_info.indexOf(dLinks[d].target) == -1) {
             var link = addLink(dLinks[d].source, dLinks[d].target);
             var lid = 'link-' + dLinks[d].source.id + '-' + dLinks[d].target.id
             linkDisplay[lid] = link
-            // d3.select('#ct-link-' + d).classed('no-disp', v);
         //}
     });
     p.classed('ct-movable', !1);
@@ -259,8 +301,7 @@ const SaveButton = (props) => {
     )
 }
 
-const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sections) => {
-    const obj = undefined
+const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sections,count,obj) => {
     const verticalLayout =  false
     var uNix = dNodes.length
     // if ($event !== true && (d3.select('#ct-inpBox').attr('class') == "" || d3.select($event.target).classed('ct-ctrl-inactive'))) return;
@@ -292,7 +333,7 @@ const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sections) =
     // switch-layout feature
     var tempName;
     if (obj) {
-        tempName = obj.name;
+        tempName = obj;
     } else {
         tempName = nNext[pt][0] + '_' + nNext[pt][1];
     }
@@ -308,6 +349,7 @@ const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sections) =
         childIndex: '',
         type: (nNext[pt][0]).toLowerCase() + 's'
     };
+    count[node.type] += 1
     getNewPosition(dNodes,node, pi, arr_co,verticalLayout,sections);
     dNodes.push(node);
     dNodes[pi].children.push(dNodes[uNix]);
@@ -324,7 +366,7 @@ const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sections) =
     var currentLink = addLink(dNodes[pi], dNodes[uNix]);
     nodeDisplay[uNix] = currentNode;
     linkDisplay[lid] = currentLink;
-    return {nodeDisplay,linkDisplay,dNodes,dLinks}
+    return {nodeDisplay,linkDisplay,dNodes,dLinks,count}
 
         //By default when a node is created it's name should be in ediatable mode
         // CreateEditFlag = true;
@@ -425,18 +467,16 @@ const bindZoomListner = (setCtScale,translate) => {
     const zoom  = d3.behavior.zoom()
         .scaleExtent([0.1, 3])
         .on('zoom', () => {
-            if(!moving){
                 g.attr('transform', `translate(${d3.event.translate}) scale(${d3.event.scale})`);
                 var cScale = d3.event.translate;
                 setCtScale({x:cScale[0],y:cScale[1],k:d3.event.scale})
-            }
         })
     if(translate)zoom.scale(1).translate([translate[0],translate[1]])
     svg.call(zoom)
     return zoom
 }
 
-const generateTree = (tree,sections) =>{
+const generateTree = (tree,sections,count) =>{
     var nodeDisplay = {}
     var linkDisplay = {}
     var verticalLayout = false;
@@ -461,14 +501,7 @@ const generateTree = (tree,sections) =>{
     };
     childCounter(1, tree);
     var newHeight = d3.max(levelCount) * 90;
-    // var d3Tree = d3.tree().size([newHeight * 2, cSize[0]])
     var d3Tree = d3.layout.tree().size([newHeight * 2, cSize[0]]);
-    // const treeRoot = d3.hierarchy(tree)
-    // d3Tree(treeRoot)
-    // treeRoot.sort(function(a, b) {
-    //     return a.data.childIndex - b.data.childIndex;
-    // });  
-    // const dNodes = treeRoot.descendants()
     var dNodes = d3Tree.nodes(tree);
     var dLinks=d3Tree.links(dNodes);
     dNodes.sort(function(a, b) {
@@ -484,11 +517,11 @@ const generateTree = (tree,sections) =>{
             sections[d.type] = d.x;
         }
         d.id = ind
+        count[d.type] += 1; 
         var node = addNode(d);
         nodeDisplay[d.id] = node
         nodeDisplay[d.id].task = false;
     })
-    // const dLinks = treeRoot.links()
     dLinks.forEach(function(d) {
         d.id = uuid();
         var lid = 'link-' + d.source.id + '-' + d.target.id
@@ -496,7 +529,7 @@ const generateTree = (tree,sections) =>{
         linkDisplay[lid] = link
     });               
     var translate = [(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]
-    return {nodes:nodeDisplay,links:linkDisplay,translate:translate,dNodes,dLinks,sections}
+    return {nodes:nodeDisplay,links:linkDisplay,translate:translate,dNodes,dLinks,sections,count}
 }
 
 const addNode = (n) =>{

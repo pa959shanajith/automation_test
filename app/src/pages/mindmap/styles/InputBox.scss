@@ -1,0 +1,48 @@
+#ct-inpBox{
+    position: absolute;
+}
+.ct-inp {
+    position: absolute;
+    padding: 3px 8px;
+    height: 17px;
+    width: 130px;
+    outline: none;
+    border: 1px solid #6e6e6e;
+    font-size: 10px;
+}
+#ct-inpSugg {
+    position: absolute;
+    top: 17px;
+    left: 1px;
+    padding: 2px 0;
+    margin: 0;
+    height: 56px;
+    width: 128px;
+    font-size: 10px;
+    text-align: left;
+    list-style: none;
+    background-color: #e1e1e1;
+}
+#ct-inpSugg .divider{
+    height: 1px;
+    margin: 2px 0;
+    overflow: hidden;
+    background-color: #c3c3c3;
+}
+#ct-inpSugg li{
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+#ct-inpSugg li>i{
+    display: block;
+    padding: 1px 3px;
+    clear: both;
+    font-size: 9px;
+    color: #111;
+    white-space: nowrap;
+}
+#ct-inpSugg li>i:hover {
+    text-decoration: none;
+    background-color: #c3c3c3;
+}

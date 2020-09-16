@@ -1,5 +1,5 @@
 import React from 'react';
-import Draggable from 'react-draggable';
+import { Rnd } from "react-rnd";
 import '../styles/NavButton.scss'
 
 /*Component NavButton
@@ -8,7 +8,7 @@ import '../styles/NavButton.scss'
 
 const NavButton = () => {
     return(
-        <Draggable bounds="parent">
+        <Rnd bounds="parent">
             <div id="navigate-widget">
                 <div className="arrow-box">
                         <p><i className="arrow-box-ic up"></i></p>
@@ -20,7 +20,7 @@ const NavButton = () => {
                     <div><button className="zoom-btn" id="zoom_out"><span>-</span></button></div>
                 </div>     
             </div>
-        </Draggable>
+        </Rnd>
     )
 }
 

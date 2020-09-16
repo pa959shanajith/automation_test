@@ -1,5 +1,5 @@
 import React from 'react';
-import MindmapHome from './containers/MindmapHome'
+import MindmapHome from './containers/MindmapHome';
 
 /*Component Mindmap
   use: direct to mindmap landing page
