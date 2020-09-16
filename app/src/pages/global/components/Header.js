@@ -54,7 +54,7 @@ const Header = () => {
             if(window.localStorage['_SRS']==="success"){
                 delete window.localStorage['_SRS'];
                 setTimeout(() => {
-                    setShowSR_Pop({'content': `Your role is changed to ${selectedRole}`});
+                    setShowSR_Pop({'title': 'Switch Role', 'content': `Your role is changed to ${selectedRole}`});
                 }, 500);
             }
         }
@@ -88,11 +88,11 @@ const Header = () => {
 		try {
 			const res = await fetch("/AvoAssure_ICE");
 			const status = await res.text();
-			// if (status == "available") location.href = location.origin+"/AvoAssure_ICE?file=getICE"
-			// else openModelPopup("switchRoleStatus", "Download Avo Assure ICE", "Package is not available");
+			if (status === "available") window.location.href = window.location.origin+"/AvoAssure_ICE?file=getICE"
+			else setShowSR_Pop({'title': 'Download Avo Assure ICE', 'content': 'Package is not available'})
 		} catch (ex) {
 			console.error("Error while downloading ICE package. Error:", ex);
-			// openModelPopup("switchRoleStatus", "Download Avo Assure ICE", "Package is not available");
+			setShowSR_Pop({'title': 'Download Avo Assure ICE', 'content': 'Package is not available'})
 		}
 	}
 
@@ -100,7 +100,7 @@ const Header = () => {
 		let roleasarray = userInfo.additionalrole;
 		if (roleasarray.length === 0) {
 			setShowSR(false);
-			setShowSR_Pop({'content': "There are no roles to switch"});
+			setShowSR_Pop({'title': 'Switch Role', 'content': "There are no roles to switch"});
 		} else {
 			loginApi.getRoleNameByRoleId(roleasarray)
 			.then(data => {
@@ -141,38 +141,29 @@ const Header = () => {
     const switchedRole = (event) => {
         setShowConfSR(false);
         setShowOverlay(`Switching to ${clickedRole.data}`)
-		// blockUI("Switching to " + selectedRoleName);
 		loginApi.loadUserInfo(clickedRole.rid)
 		.then(data => {
-            // unblockUI();
             setShowOverlay("");
 			if (data !== "fail") {
-                // window.localStorage['_SR'] = clickedRole.data;
-                // window.localStorage['_UI'] = JSON.stringify(data);
                 dispatch({type: actionTypes.SET_SR, payload: clickedRole.data});
 				dispatch({type: actionTypes.SET_USERINFO, payload: data});
 				window.localStorage['_SRS'] = "success";
 				if (clickedRole.data === "Admin") {
 					window.localStorage['navigateScreen'] = "admin";
-                    // window.location.href = "/admin";
                     setRedirectTo('/admin');
                 } else {
 					window.localStorage['navigateScreen'] = "plugin";
-                    // window.location.href = "plugin";
                     setRedirectTo("/plugin");
                 }
 			} else {
                 console.log("Fail to Switch User");
-                setShowSR_Pop({'content': "Fail to Switch User"});
-				// openModelPopup("switchRoleStatus", "Switch Role", "Fail to Switch User");
+                setShowSR_Pop({'title': 'Switch Role', 'content': "Fail to Switch User"});
 			}
         })
         .catch(error=> {
-            // unblockUI();
             setShowOverlay("");
             console.log("Fail to Switch User");
-            setShowSR_Pop({'content': "Fail to Switch User"});
-			// openModelPopup("switchRoleStatus", "Switch Role", "Fail to Switch User");
+            setShowSR_Pop({'title': 'Switch Role', 'content': "Fail to Switch User"});
 		});
 	};
 
@@ -188,7 +179,7 @@ const Header = () => {
 
     const SR_Popup = () => (
         <PopupMsg 
-            title="Switch Role"
+            title={showSR_Pop.title}
             content={showSR_Pop.content}
             submitText="OK"
             close={()=>setShowSR_Pop("")}
