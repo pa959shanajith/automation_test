@@ -7,6 +7,7 @@ import ScreenOverlay from './components/ScreenOverlay';
 import ScrollBar from './components/ScrollBar';
 import PopupMsg from './components/PopupMsg';
 import ModalContainer from './components/ModalContainer';
+import {Encrypt} from './components/Encrypt';
 // import ChangePassword from './components/ChangePassword';
 
-export { Header, FooterOne, FooterTwo, ProgressBar, SetProgressBar, RedirectPage, ScreenOverlay, ScrollBar, PopupMsg, ModalContainer};
+export { Header, FooterOne, FooterTwo, ProgressBar, SetProgressBar, RedirectPage, ScreenOverlay, ScrollBar, PopupMsg, ModalContainer, Encrypt};

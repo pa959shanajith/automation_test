@@ -70,10 +70,6 @@ const Header = () => {
                 history.replace('/plugin');
 		   	}, 100);
         }
-        else{
-            history.replace('/plugin');
-            console.log("navigateEnable was false")
-        }
     };
     
     const logout = event => {

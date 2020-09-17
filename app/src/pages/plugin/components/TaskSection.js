@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import * as pluginApi from "../api";
-import { RedirectPage, ScrollBar } from '../../global';
+import { RedirectPage, ScrollBar, ScreenOverlay } from '../../global';
 import { useHistory } from 'react-router-dom';
 import * as actionTypes from '../state/action';
 import TaskContents from './TaskContents';
+import FilterDialog from "./FilterDialog";
 import "../styles/TaskSection.scss";
 
 const TaskSection = ({userInfo, userRole, dispatch}) =>{
@@ -12,6 +13,15 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
 
     const [showSearch, setShowSearch] = useState(false);
     const [activeTab, setActiveTab] = useState("todo");
+    const [reviewItems, setReviewItems] = useState([]);
+    const [todoItems, setTodoItems] = useState([]);
+    const [searchItems, setSearchItems] = useState([]);
+    const [filterDatState, setFilterDatState] = useState(null);
+    const [taskJson, setTaskJson] = useState(null);
+    const [searchValue, setSearchValue] = useState("");
+    const [overlay, setOverlay] = useState("");
+    const [notManager, setNotManager] = useState(true);
+    const [showFltrDlg, setShowFltrDlg] = useState(false);
 
     // to render components which will populate under review
     let review_items = []
@@ -20,36 +30,13 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     let filterDat;
     let filterData = {'prjval':'Select Project','relval':'Select Release','cycval':'Select Cycle','apptype':{},'tasktype':{}};
 
-    const [reviewItems, setReviewItems] = useState([]);
-    const [todoItems, setTodoItems] = useState([]);
-    const [searchItems, setSearchItems] = useState([]);
-    const [filterDatState, setFilterDatState] = useState(null);
-    const [taskJson, setTaskJson] = useState(null);
-    const [searchValue, setSearchValue] = useState("");
-
     useEffect(()=>{
-        if(userInfo) {
+        if(Object.keys(userInfo).length!==0) {
+            resetStates();
             let i, j, k;
-            // let plugins = [];
-            // let availablePlugins = userInfo.pluginsInfo;
-            // let pluginsLength = availablePlugins.length;
-            // for(i=0 ; i < pluginsLength ; i++){
-            //     if(availablePlugins[i].pluginValue !== false){
-            //         let pluginName = availablePlugins[i].pluginName;
-            //         let pluginTxt = pluginName.replace(/\s/g,'');
-            //         let dataName = Encrypt.encode("p_"+pluginTxt);
-            //         plugins.push("p_"+pluginName);
-            //         // RENDER PLUGIN BOXES FOR REACT
-            //         // $("#plugin-container").append('<div class="col-md-4 plugin-block"><span ng-click="pluginBox()" class="toggleClick pluginBox" data-name="p_'+pluginTxt+'" id="'+pluginName+'" title="'+pluginName+'">'+pluginName+'</span><input class="plugins" type="hidden" id="'+pluginName+"_"+dataName+'"  title="'+pluginTxt+"_"+dataName+'"></div>').fadeIn();
-            //     }
-            // }
-            if(userRole === "Test Manager") {
-                // HIDE SOMETHING 
-                // $(".task-content").hide();
-            }
-            // ANVESH'S BLOCKUI
-            // blockUI("Loading Tasks..Please wait...");
-            // FOR DEV ONLY
+            if(userRole === "Test Manager") setNotManager(false);
+            
+            setOverlay("Loading Tasks..Please wait...");
             pluginApi.getProjectIDs()
             .then(data => {
                 if(data === "Fail" || data === "Invalid Session") return RedirectPage(history);
@@ -61,7 +48,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                             let tasksJson = data1;
                             setTaskJson(data1);
                             dispatch({type: actionTypes.SET_TASKSJSON, payload: tasksJson});
-                            if (tasksJson.length === 0) console.log("anvesh's blockui")// unblockUI();
+                            if (tasksJson.length === 0) setOverlay("");
                             /*	Build a list of releaseids and cycleids
                             * Another dict for releaseid and cyclelist out of task json
                             * List of apptype and tasktype
@@ -132,7 +119,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                             }
                             setReviewItems(review_items);
                             setTodoItems(todo_items);
-                            // unblockUI();
+                            setOverlay("");
                             //prevent mouseclick before loading tasks
                             // $("span.toggleClick").removeClass('toggleClick');
                             // Enable Filter
@@ -157,29 +144,44 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                         // window.localStorage['_FD'] = angular.toJson(filterDat);
                     })
                     .catch(error => {
-                        // unblockUI();
-                        // blockUI("Fail to load tasks!");
-                        // setTimeout(function(){ unblockUI(); }, 3000);
+                        setOverlay("");
+                        setOverlay("Fail to load tasks!");
+                        setTimeout(function(){ setOverlay(""); }, 3000);
                         console.log("Error:::::::::::::", error);
                     });
                 }
             })
             .catch(error => {
-                // unblockUI();
-                // blockUI("Fail to load Projects!");
-                // setTimeout(function(){ unblockUI(); }, 3000);
+                setOverlay("");
+                setOverlay("Fail to load Projects!");
+                setTimeout(function(){ setOverlay(""); }, 3000);
                 console.log("Error:::::::::::::", error);
             });
         }
-    }, []);
+    }, [userInfo, userRole]);
+
+    const resetStates = () => {
+        setShowSearch(false);
+        setActiveTab("todo");
+        setReviewItems([]);
+        setTodoItems([]);
+        setSearchItems([]);
+        setFilterDatState(null);
+        setTaskJson(null);
+        setSearchValue("");
+        setOverlay("");
+        setNotManager(true);
+    }
 
 
+    const onSearchHandler = event => {
+        searchTask(activeTab, event.target.value)
+        setSearchValue(event.target.value);
+    };
 
-    const searchTask = event => {
+    const searchTask = (activeTab, value) => {
         let items = activeTab === "todo" ? todoItems : reviewItems;
         let filteredItem = [];
-        let value = event.target.value;
-        
         let counter = 1;
         items.forEach(item => {
             if (item.taskname.toLowerCase().indexOf(value.toLowerCase()) > -1) {
@@ -188,7 +190,6 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             }
         });
         setSearchItems(filteredItem);
-        setSearchValue(value);
     }
 
 
@@ -218,32 +219,43 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
 			filterDat.apptypes.push(obj.appType);
         
         // dispatch({type: actionTypes.SET_FD, payload: filterDat})
-	}
+    }
+    
+    const onSelectTodo = event =>{
+        setActiveTab("todo");
+        if (showSearch) searchTask("todo", searchValue);
+    }
+
+    const onSelectReview = event => {
+        setActiveTab("review");
+        if (showSearch) searchTask("review", searchValue);
+    }
     
 
     return (
+        <>
+        {overlay && <ScreenOverlay content={overlay}/>}
+        { showFltrDlg && <FilterDialog setShow={setShowFltrDlg}/> }
         <div className="task-section">
             <div className="task-header">
                 <span className="my-task">My Task(s)</span>
-                <input className={"task-search-bar " + (showSearch ? "" : "no-search-bar")} onChange={searchTask} />
+                <input className={"task-search-bar " + (!showSearch && "no-search-bar")} onChange={onSearchHandler} />
                 <span className="task-ic-container" onClick={()=>setShowSearch(!showSearch)}><img className="search-ic" alt="search-ic" src="static/imgs/ic-search-icon.png"/></span>
-                <span className="task-ic-container"><img className="filter-ic" alt="filter-ic" src="static/imgs/ic-filter-task.png"/></span>
+                <span className="task-ic-container" onClick={()=>setShowFltrDlg(true)}><img className="filter-ic" alt="filter-ic" src="static/imgs/ic-filter-task.png"/></span>
             </div>
             <div className="task-nav-bar">
-                <span className={"task-nav-item " + (activeTab==="todo" ? "active-tab" : "")} onClick={()=>setActiveTab("todo")}>To Do</span>
-                <span className={"task-nav-item " + (activeTab==="review" ? "active-tab" : "")} onClick={()=>setActiveTab("review")}>To Review</span>
+                <span className={"task-nav-item " + (activeTab==="todo" && "active-tab")} onClick={onSelectTodo}>To Do</span>
+                <span className={"task-nav-item " + (activeTab==="review" && "active-tab")} onClick={onSelectReview}>To Review</span>
             </div>
-            <div className="task-overflow">
+            { notManager && <div className="task-overflow">
                 <ScrollBar thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" >
-                <div className="task-content">
-                <TaskContents items={searchValue ? searchItems : activeTab === "todo" ? todoItems : reviewItems} filterDat={filterDatState} taskJson={taskJson} />
-                {/* {activeTab === "todo"
-                 ? <TaskContents items={todoItems} filterDat={filterDatState} taskJson={taskJson} />
-                 : <TaskContents items={reviewItems} filterDat={filterDatState} taskJson={taskJson} />} */}
-                 </div>
+                    <div className="task-content">
+                        <TaskContents items={searchValue ? searchItems : activeTab === "todo" ? todoItems : reviewItems} filterDat={filterDatState} taskJson={taskJson} />
+                    </div>
                  </ScrollBar>
-            </div>
+            </div>}
         </div>
+        </>
     );
 }
 

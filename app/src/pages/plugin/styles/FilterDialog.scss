@@ -1,0 +1,17 @@
+.filter_body{
+    display: flex;
+    min-height: 0;
+    flex-grow: 1;
+}
+
+.body_overflow{
+    display: flex;
+    flex-direction: column;
+    flex: 1 1;
+}
+
+.body_content{
+    flex: 1 1;
+    overflow: auto;
+    flex-direction: column;
+}
