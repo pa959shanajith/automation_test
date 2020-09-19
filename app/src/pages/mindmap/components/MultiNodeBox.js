@@ -91,6 +91,11 @@ const AddnodeContainer = (props) =>{
             submit()
         }
     },[props.submit])
+    useEffect(()=>{
+        if(errList.length===0){
+            props.setErrMsg("")
+        }
+    },[errList])
     const reset = () =>{
         var arr = Array(mnode.length).fill("")
         setMnode(arr)
@@ -131,7 +136,7 @@ const AddnodeContainer = (props) =>{
                     <div className='row mnode__row' key={i}>
                         <div className='col-sm-3'>{i+1}</div>
                         <div className='col-sm-6 mnode__input'>
-                            <input className={(i in errList)?'err-border':''} id={'mnode_'+i} value={e} maxLength={255} placeholder={'Enter node name'} onChange={(e)=>{
+                            <input className={(errList.includes(i))?'err-border':''} id={'mnode_'+i} value={e} maxLength={255} placeholder={'Enter node name'} onChange={(e)=>{
                                 var arr = [...mnode]
                                 arr[e.target.id.split('mnode_')[1]] = e.target.value
                                 setMnode(arr)
@@ -140,7 +145,10 @@ const AddnodeContainer = (props) =>{
                         <div className='col-sm-3'>
                             <img onClick={(e)=>{
                                 var arr=[...mnode]
+                                var errArr=[...errList]
+                                errArr.splice(mnode.indexOf(e.target.attributes.value.value),1)
                                 arr.splice(e.target.attributes.value.value,1)
+                                setErrList(errArr)
                                 setMnode(arr)}} value={i} className='mnode__delete' src={"static/imgs/ic-delete.png"} alt='module'/>
                         </div>
                     </div>

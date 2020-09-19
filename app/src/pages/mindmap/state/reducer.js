@@ -5,7 +5,10 @@ const initialState = {
     moduleList: [],
     selectedProj: undefined,
     searchModule: undefined,
-    selectedModule: {}
+    selectedModule: {},
+    selectBoxState: false,
+    selectNodes: {nodes:[],links:[]},
+    copyNodes: {nodes:[],links:[]}
 };
 
 const reducer = (state = initialState , action) => {
@@ -34,6 +37,21 @@ const reducer = (state = initialState , action) => {
             return{
                 ...state,
                 selectedModule: action.payload
+            }
+        case actionTypes.SELECT_SELECTBOX:
+            return{
+                ...state,
+                selectBoxState: action.payload
+            }
+        case actionTypes.UPDATE_SELECTNODES:
+            return{
+                ...state,
+                selectNodes: action.payload
+            }
+        case actionTypes.UPDATE_COPYNODES:
+            return{
+                ...state,
+                copyNodes: action.payload
             }
         default: 
             return state

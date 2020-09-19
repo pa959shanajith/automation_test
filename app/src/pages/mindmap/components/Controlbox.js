@@ -72,13 +72,17 @@ const ControlBox = (props) => {
         if(e.target.classList.contains('ct-ctrl-inactive'))return;
         props.setMultipleNode(e.target.attributes.value.value.split("node_")[1])
     }
+    const deleteNode = () =>{
+        props.clickDeleteNode(props.nid)
+        props.setCtrlBox(false)
+    }
     return(
         <ClickAwayListener onClickAway={(e)=>{if(e.target.className.baseVal !== "ct-nodeIcon")props.setCtrlBox(false)}}>
             <div id="ct-ctrlBox" >
                 <p className="ct-ctrl fa fa-plus" value={props.nid} onClick={(e)=>addNode(e)}><span className="ct-tooltiptext">Create Scenarios</span></p>
                 <p className="ct-ctrl fa fa-hand-peace-o" value={props.nid} onClick={(e)=>addMultipleNode(e)}><span className="ct-tooltiptext">Create Multiple Scenarios</span></p>
-                <p className="ct-ctrl fa fa-pencil-square-o"onClick={()=>editNode()} ><span className="ct-tooltiptext">Edit Module</span></p>
-                <p className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" ><span className="ct-tooltiptext"></span></p>
+                <p className="ct-ctrl fa fa-pencil-square-o"onClick={editNode} ><span className="ct-tooltiptext">Edit Module</span></p>
+                <p className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" onClick={deleteNode} ><span className="ct-tooltiptext"></span></p>
             </div>
         </ClickAwayListener>
     )

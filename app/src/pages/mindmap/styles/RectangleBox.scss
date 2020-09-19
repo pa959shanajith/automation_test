@@ -1,13 +1,12 @@
-#rect-copy {
-    width: 150px;
-    height: 150px;
-    padding: 0.5em;
-    position: absolute;
-    top: 150px;
-    left: 200px;
-    border: 1px solid blue;
-    background-color: rgba(200, 200, 200, 0.3);
-    border-radius: 5px;
-    resize: both;
-    overflow: auto;
+#rect-copy>span>div:nth-child(2){
+    cursor: e-resize!important;
+}
+#rect-copy>span>div:nth-child(4){
+    cursor: e-resize!important;
+}
+#rect-copy>span>div:nth-child(1){
+    cursor: s-resize!important;
+}
+#rect-copy>span>div:nth-child(3){
+    cursor: s-resize!important;
 }

@@ -8,7 +8,7 @@ import '../styles/NavButton.scss'
 
 const NavButton = () => {
     return(
-        <Rnd bounds="parent">
+        <Rnd enableResizing={false} bounds="parent">
             <div id="navigate-widget">
                 <div className="arrow-box">
                         <p><i className="arrow-box-ic up"></i></p>

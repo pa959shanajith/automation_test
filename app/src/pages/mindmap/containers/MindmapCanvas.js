@@ -9,6 +9,8 @@ import InputBox from '../components/InputBox'
 import MultiNodeBox from '../components/MultiNodeBox'
 import RectangleBox from '../components/RectangleBox'
 import { ScreenOverlay, PopupMsg } from '../../global';
+import { useDispatch, useSelector} from 'react-redux';
+import * as actionTypes from '../state/action';
 import '../styles/MindmapCanvas.scss';
 
 /*Component Canvas
@@ -26,7 +28,13 @@ var temp = {
     s: [],
     t: ""
 };
+var deletednode=[]
+var deletednode_info =[]
+var nodeMoving = false;
+
 const Canvas = (props) => {
+    const copyNodes = useSelector(state=>state.mindmap.copyNodes)
+    const selectBox = useSelector(state=>state.mindmap.selectBoxState)
     const [sections,setSection] =  useState({})
     const [ctrlBox,setCtrlBox] = useState(false);
     const [inpBox,setInpBox] = useState(false);
@@ -67,7 +75,7 @@ const Canvas = (props) => {
             count= {...count,...tree.count}
         }
         d3.select('.ct-container').attr("transform", "translate(" + tree.translate[0]+','+tree.translate[1] + ")scale(" + 1 + ")");
-        zoom = bindZoomListner(setCtScale,tree.translate)
+        zoom = bindZoomListner(setCtScale,tree.translate,ctScale)
         setLinks(tree.links)
         setdLinks(tree.dLinks)
         setNodes(tree.nodes)
@@ -84,8 +92,19 @@ const Canvas = (props) => {
     },[createnew])
     const nodeClick=(e)=>{
         e.preventDefault()
-        setInpBox(false)
-        setCtrlBox(e.target.parentElement.id)
+        if(d3.select('#pasteImg').classed('active-map')){
+            var res = pasteNode(e.target.parentElement.id,{...copyNodes},{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},setPopup)
+            if(res){
+                setNodes(res.cnodes)
+                setLinks(res.clinks)
+                setdLinks(res.cdLinks)
+                setdNodes(res.cdNodes)
+                count = res.count
+            }
+        }else{
+            setInpBox(false)
+            setCtrlBox(e.target.parentElement.id)
+        }
     }
     const createMultipleNode = (e,mnode)=>{
         setMultipleNode(false)
@@ -123,6 +142,15 @@ const Canvas = (props) => {
         setdNodes(res.dNodes)
         count= {...count,...res.count}
     }
+    const clickDeleteNode=(id)=>{
+        var res = deleteNode(id,[...dNodes],[...dLinks],{...links},{...nodes},setPopup)
+        if(res){
+            setNodes(res.nodeDisplay)
+            setLinks(res.linkDisplay)
+            setdLinks(res.dLinks)
+            setdNodes(res.dNodes)
+        }
+    }
     const clickCollpase=(e)=>{
         var id = e.target.parentElement.id;
         var res = toggleNode(id,[...dNodes],[...dLinks])
@@ -135,8 +163,10 @@ const Canvas = (props) => {
         if(type==='KeyUp'){
             res = moveNodeEnd(id,[...dNodes],[...dLinks],{...links},{...temp})
             setLinks(res.linkDisplay)
+            nodeMoving = false
         }
         else{
+            nodeMoving = true
             res = moveNodeBegin(id,{...links},[...dLinks],{...temp},{...ctScale})
             setLinks(res.linkDisplay)
             temp=res.temp
@@ -144,11 +174,11 @@ const Canvas = (props) => {
     }
     return (
         <Fragment>
-            {(false)?<RectangleBox />:null}
+            {(selectBox)?<RectangleBox ctScale={ctScale} dNodes={[...dNodes]} dLinks={[...dLinks]}/>:null}
             {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
             {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
-            {(ctrlBox !== false)?<ControlBox nid={ctrlBox} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
-            {(inpBox !== false)?<InputBox node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale}/>:null}
+            {(ctrlBox !== false)?<ControlBox nid={ctrlBox} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
+            {(inpBox !== false)?<InputBox node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton/>
@@ -171,7 +201,8 @@ const Canvas = (props) => {
                         <circle 
                         onMouseUp={(e)=>moveNode(e,'KeyUp')}
                         onMouseDown={(e)=>moveNode(e,'KeyDown')}
-                        className={"ct-"+node[1].type+" ct-nodeBubble"} cx="-3" cy="20" r="4"></circle>
+                        cx={verticalLayout ? 20 : -3} cy={verticalLayout ? -4 : 20}
+                        className={"ct-"+node[1].type+" ct-nodeBubble"} r="4"></circle>
                         :null}
                     </g>)}
                 </g>
@@ -180,7 +211,184 @@ const Canvas = (props) => {
     );
 }
 
+const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay,setPopup) =>{
+    var sid = activeNode.split('node_')[1]
+    var s = d3.select('#'+activeNode);
+    // SaveCreateED('#ct-createAction', 1, 0);
+    var t = s.attr('data-nodetype');
+    if (t == 'modules') return;
+    var p = dNodes[sid].parent;
+    if(dNodes[sid]['taskexists']!=null){
+        setPopup({show:true,title:'Error',content:'Cannot delete node if task is assigned. Please unassign task first.',submitText:'Ok'})
+        return; 
+    }
+    var taskCheck=checkparenttask(dNodes[sid],false);
+    if(taskCheck){
+        setPopup({show:true,title:'Error',content:'Cannot delete node if parent task is assigned. Please unassign task first.',submitText:'Ok'})
+        return;
+    }
+    taskCheck=checkchildrentask(dNodes[sid],false);
+    if(taskCheck){
+        setPopup({show:true,title:'Error',content:'Cannot delete node if children task is assigned. Please unassign task first.',submitText:'Ok'})
+        return;
+    }
+    recurseDelChild(dNodes[sid],linkDisplay, nodeDisplay,dNodes,dLinks,undefined);
+    for (var j = dLinks.length - 1; j >= 0; j--) {
+        if (dLinks[j].target.id == sid){
+            dLinks[j].deleted = !0;
+            delete linkDisplay['link-' + dLinks[j].source.id + '-' + dLinks[j].target.id];
+            break;
+        }
+    }
+    p.children.some((d, i)=>{
+        if (d.id == sid) {
+            p.children.splice(i, 1);
+            return !0;
+        }
+        return !1;
+    });
+    return {dNodes,dLinks,linkDisplay,nodeDisplay}
+}
+
+const recurseDelChild = (d, linkDisplay, nodeDisplay, dNodes, dLinks, tab) =>{
+    if (d.children) d.children.forEach((e)=>{recurseDelChild(e, linkDisplay, nodeDisplay, dNodes, dLinks, tab)});
+    if(d.state=="deleted")return;
+    if(d._id){  
+        var parentid=dNodes[d.parent.id]._id;
+        deletednode.push([d._id,d.type,parentid]);
+    }
+    d.parent = null;
+    d.children = null;
+    d.task = null;
+    delete nodeDisplay[d.id];
+    deletednode_info.push(d);
+    dNodes[d.id].state = 'deleted';
+    var temp = dLinks;
+    for (var j = temp.length - 1; j >= 0; j--) {
+        if (temp[j].source.id == d.id) {
+            delete linkDisplay['link-' + temp[j].source.id + '-' + temp[j].target.id];
+            temp[j].deleted = !0;
+        }
+    }
+};
+
+const checkchildrentask = (childNode,children_flag)=>{
+    if(children_flag) return children_flag;
+    if (childNode.taskexists != null) {
+        children_flag=true;
+        return children_flag;
+    }
+    if (childNode.children) {
+        childNode.children.forEach((e)=>{children_flag=checkchildrentask(e, children_flag)})
+    }
+    return children_flag;
+}
+
+const checkparenttask = (parentNode,parent_flag)=>{
+    if (parent_flag) return parent_flag;
+    if(parentNode!=null){
+        if (parentNode.taskexists!=null) {
+            parent_flag=true;
+        }
+        parentNode=parentNode.parent || null;
+        parent_flag=checkparenttask(parentNode,parent_flag);
+    }
+    return parent_flag;
+}
+
+const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,count,setPopup) => {
+    var dNodes_c = copyNodes.nodes
+    var dLinks_c = copyNodes.links
+    var nodetype =  d3.select('.node-selected').attr('data-nodetype');
+    if (d3.select('#'+activeNode).attr('data-nodetype') === nodetype) {
+        if (nodetype === 'scenarios') {
+            activeNode = activeNode.split("node_")[1]
+            //paste to scenarios
+            dNodes_c.forEach((e) =>{
+                if (e.type == 'screens') {
+                    var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,e.name)
+                    cnodes = res.nodeDisplay
+                    clinks = res.linkDisplay
+                    cdNodes = res.dNodes
+                    cdLinks = res.dLinks
+                    count= {...count,...res.count}
+                    activeNode = cdNodes.length-1
+                    dLinks_c.forEach((f)=>{
+                        if (f.source.id == e.id) {
+                            var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,f.target.name)
+                            cnodes = res.nodeDisplay
+                            clinks = res.linkDisplay
+                            cdNodes = res.dNodes
+                            cdLinks = res.dLinks
+                            count= {...count,...res.count}
+                        }
+                    })
+                }
+            });
+        }else if(nodetype === 'modules'){
+            var activenode_scr;
+            //paste to module
+            //call $scope.createNode for each node
+            dNodes_c.forEach((e)=> {
+                if (e.type == 'scenarios') {
+                    activeNode = 0;
+                    var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,e.name)
+                    cnodes = res.nodeDisplay
+                    clinks = res.linkDisplay
+                    cdNodes = res.dNodes
+                    cdLinks = res.dLinks
+                    count= {...count,...res.count}
+                    activeNode = cdNodes.length-1;
+                    activenode_scr = activeNode;
+                    dLinks_c.forEach((f) =>{
+                        if (f.source.id == e.id && f.target.type == 'screens') {
+                            activeNode = activenode_scr;
+                            var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,f.target.name)
+                            cnodes = res.nodeDisplay
+                            clinks = res.linkDisplay
+                            cdNodes = res.dNodes
+                            cdLinks = res.dLinks
+                            count= {...count,...res.count}
+                            activeNode = cdNodes.length-1;
+                            dLinks_c.forEach(function(g, k) {
+                                if (g.source.id == f.target.id && g.source.type == 'screens') {
+                                    var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,g.target.name)
+                                    cnodes = res.nodeDisplay
+                                    clinks = res.linkDisplay
+                                    cdNodes = res.dNodes
+                                    cdLinks = res.dLinks
+                                    count= {...count,...res.count}
+                                }
+                            });
+                        }
+                    })
+                }
+
+            });
+        }
+    }
+    else if (d3.select('.node-selected').attr('data-nodetype') === 'scenarios') {
+        setPopup({
+            title:'Error',
+            content: 'Please select a Scenario to paste to..',
+            submitText:'Ok',
+            show:true
+        })
+        return false
+    } else if(d3.select('.node-selected').attr('data-nodetype') === 'modules') {
+        setPopup({
+            title:'Error',
+            content: 'Please select a Module to paste to..',
+            submitText:'Ok',
+            show:true
+        })
+        return false
+    }
+    return {cnodes,clinks,cdNodes,cdLinks,csections,count};
+}
+
 const moveNodeBegin = (idx,linkDisplay,dLinks,temp,pos) => {
+    var verticalLayout = false;
     dLinks.forEach(function(d, i) {
         if (d.source.id === parseInt(idx)) {
             temp.s.push(i);
@@ -192,12 +400,31 @@ const moveNodeBegin = (idx,linkDisplay,dLinks,temp,pos) => {
     });
     const svg = d3.select(`.mp__canvas_svg`);
     d3.select('#node_' + idx).classed('ct-movable', !0);
+    // svg.on('.zoom',()=>{
+    //     d3.event.stopImmediatePropagation();
+    // })
     svg.on('mousemove.nodemove', ()=>{
         d3.event.stopImmediatePropagation();
+        var t = {} ;
         const cSpan = [pos.x, pos.y];
         const cScale = pos.k;
         const svgOff = document.getElementById('mp__canvas_svg').getBoundingClientRect();
-        d3.select('.ct-movable').attr('transform', "translate(" + parseFloat((d3.event.x - svgOff.left - cSpan[0]) / cScale + 2) + "," + parseFloat((d3.event.y - svgOff.top - cSpan[1]) / cScale - 20) + ")");
+        if(verticalLayout){
+            t.x = parseFloat((d3.event.x - svgOff.left - cSpan[0]) / cScale - 20)
+            t.y = parseFloat((d3.event.y - svgOff.top - cSpan[1]) / cScale + 2)
+        }else{
+            t.x = parseFloat((d3.event.x - svgOff.left - cSpan[0]) / cScale + 2)
+            t.y = parseFloat((d3.event.y - svgOff.top - cSpan[1]) / cScale - 20)
+        }
+        d3.select('.ct-movable').attr('transform', "translate(" + t.x + "," + t.y + ")");
+
+        // var s = d3.select('.mp__canvas_svg');
+        // let  cSize= [parseFloat(s.style("width")), parseFloat(s.style("height"))];
+        // if(cSize[0]>d3.event.x +40){
+        //     d3.select('.ct-movable').attr('transform', "translate(" + t.x + "," + t.y + ")");
+        // }else{
+        //     console.log(d3.event.x +40)
+        // }
     })
     return {linkDisplay,temp}
 }
@@ -205,6 +432,7 @@ const moveNodeBegin = (idx,linkDisplay,dLinks,temp,pos) => {
 const moveNodeEnd = (pi,dNodes,dLinks,linkDisplay,temp) => {
     const svg = d3.select(`.mp__canvas_svg`);
     svg.on('mousemove.nodemove', null);
+    // svg.on('zoom', null);
     var p = d3.select("#node_" + pi);
     var l = p.attr('transform').slice(10, -1).split(',');
     dNodes[pi].x = parseFloat(l[0]);
@@ -467,11 +695,19 @@ const bindZoomListner = (setCtScale,translate) => {
     const zoom  = d3.behavior.zoom()
         .scaleExtent([0.1, 3])
         .on('zoom', () => {
+            if(!nodeMoving) {
                 g.attr('transform', `translate(${d3.event.translate}) scale(${d3.event.scale})`);
                 var cScale = d3.event.translate;
                 setCtScale({x:cScale[0],y:cScale[1],k:d3.event.scale})
+            } else {
+                const x = g.attr("transform").split(/[()]/)[1].split(',')[0];
+                const y = g.attr("transform").split(/[()]/)[1].split(',')[1];
+                const scale = g.attr("transform").split(/[()]/)[3];
+                // const pos = g.attr("transform");
+                zoom.scale(scale).translate([x,y]);
+            }
         })
-    if(translate)zoom.scale(1).translate([translate[0],translate[1]])
+    if(translate) zoom.scale(1).translate([translate[0],translate[1]])
     svg.call(zoom)
     return zoom
 }
@@ -528,7 +764,12 @@ const generateTree = (tree,sections,count) =>{
         var link = addLink(d.source, d.target);
         linkDisplay[lid] = link
     });               
-    var translate = [(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]
+    if (verticalLayout){
+        var translate = [(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]
+    }
+    else{
+        var translate = [(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]
+    }
     return {nodes:nodeDisplay,links:linkDisplay,translate:translate,dNodes,dLinks,sections,count}
 }
 
@@ -560,8 +801,9 @@ const addLink = (p, c) => {
     const verticalLayout = false
     var s;
     var t;
-    function genPathData(s, t) {
-        return ('M' + s[0] + ',' + s[1] + 'C' + (s[0] + t[0]) / 2 + ',' + s[1] + ' ' + (s[0] + t[0]) / 2 + ',' + t[1] + ' ' + t[0] + ',' + t[1]);
+    function genPathData(s, t, vl) {
+        const pth = (vl)? (s[0] + ',' + (s[1] + t[1]) / 2 + ' ' + t[0] + ',' + (s[1] + t[1]) / 2):((s[0] + t[0]) / 2 + ',' + s[1] + ' ' + (s[0] + t[0]) / 2 + ',' + t[1]);
+        return ('M' + s[0] + ',' + s[1] + 'C' + pth + ' ' + t[0] + ',' + t[1]);
     };
     if (verticalLayout) {
         s = [p.x + 20, p.y + 55];
@@ -570,7 +812,7 @@ const addLink = (p, c) => {
         s = [p.x + 43, p.y + 20];
         t = [c.x - 3, c.y + 20];
     }
-    var d = genPathData(s, t);
+    var d = genPathData(s, t, verticalLayout);
     return { 'd': d }
 }
 
