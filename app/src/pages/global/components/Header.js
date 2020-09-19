@@ -7,6 +7,7 @@ import * as loginApi from '../../login/api';
 import * as actionTypes from '../../login/state/action';
 import ClickAwayListener from 'react-click-away-listener';
 import ChangePassword from './ChangePassword';
+import { persistor } from '../../../reducer'
 
 
 /*
@@ -73,7 +74,7 @@ const Header = () => {
     };
     
     const logout = event => {
-        // CLEAR REDUX PERSIST
+        persistor.purge();
         event.preventDefault();
 		window.sessionStorage.clear();
 		window.sessionStorage["checkLoggedOut"] = true;
