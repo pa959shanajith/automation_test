@@ -38,7 +38,7 @@ const SearchBox = (props) => {
         }
         nodeID = filter[idxSearch].parentElement.id
         var nodetf = filter[idxSearch].parentElement.attributes.transform.value
-        var mptf =  document.getElementsByClassName('ct-container')[0].attributes.transform.value
+        var mptf =  d3.select('.ct-container').attr('transform')
         var split_char = ',';
         var x_mptf = parseInt(mptf.split(/[()]/)[1].split(split_char)[0]);
         var y_mptf = parseInt(mptf.split(/[()]/)[1].split(split_char)[1]);

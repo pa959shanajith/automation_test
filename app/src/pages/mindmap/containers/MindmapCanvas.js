@@ -8,6 +8,7 @@ import ControlBox from '../components/Controlbox'
 import InputBox from '../components/InputBox' 
 import MultiNodeBox from '../components/MultiNodeBox'
 import RectangleBox from '../components/RectangleBox'
+import SaveMapButton from '../components/SaveMapButton'
 import { ScreenOverlay, PopupMsg } from '../../global';
 import { useDispatch, useSelector} from 'react-redux';
 import * as actionTypes from '../state/action';
@@ -181,9 +182,9 @@ const Canvas = (props) => {
             {(inpBox !== false)?<InputBox node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
-            <NavButton/>
+            <NavButton setCtScale={setCtScale} zoom={zoom}/>
             <Legends/>
-            <SaveButton/>
+            <SaveMapButton dNodes={[...dNodes]} setPopup={setPopup}/>
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
                 <g className='ct-container'>
                 {Object.entries(links).map((link)=>{
@@ -210,6 +211,7 @@ const Canvas = (props) => {
         </Fragment>
     );
 }
+
 
 const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay,setPopup) =>{
     var sid = activeNode.split('node_')[1]
@@ -518,16 +520,7 @@ const createNewMap = (moduleName) => {
     return{nodes:nodeDisplay,dNodes,translate}
 }
 
-const SaveButton = (props) => {
-    return(
-        <svg className="ct-actionBox">
-            <g id="ct-saveAction" className="ct-actionButton">
-                <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
-                <text x="23" y="18">Save</text>
-            </g>
-        </svg>
-    )
-}
+
 
 const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sections,count,obj) => {
     const verticalLayout =  false

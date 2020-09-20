@@ -1,4 +1,6 @@
 import axios from 'axios';
+import {RedirectPage} from '../global'
+import {history} from './containers/CreateNew'
 const url = 'https://'+window.location.hostname+':8443';
 
 
@@ -18,15 +20,18 @@ export const getProjectList = async() => {
             data: {"action":"populateProjects"},
             credentials: 'include'
         });
+        if(res.status === 401){
+            RedirectPage(history)
+            // return;
+        }
         if(res.status===200){
             return res.data;
         }else{
-            console.error(res.status)
-            return;
+            return {error:res.status}
         }
     }catch(err){
         console.error(err)
-        return;
+        return {error:'Failed to fetch project list'}
     }
 }
 
@@ -97,6 +102,43 @@ export const getScreens = async(projectId) => {
                 'Content-Type': 'application/json'
             },
             data: {"action":"getProjectTypeMM",projectId:projectId},
+            credentials: 'include'
+        });
+        if(res.status===200){
+            return res.data;
+        }else{
+            console.error(res.status)
+            return;
+        }
+    }catch(err){
+        console.error(err)
+        return;
+    }
+}
+
+/*Component getScreens
+  api returns {projectType: "", project_id: "", projectid: "", project_typename: "", releases: []}
+  todo : add url from env or store and error handling 
+*/
+
+export const saveMindmap = async(props) => {
+    var data = {
+        action: "/saveData",
+        write: props.write,
+        map: props.map,
+        deletednode: props.deletednode,
+        unassignTask: props.unassignTask,
+        prjId: props.prjId,
+        createdthrough: props.createdthrough,
+        cycId: props.cycId
+    }
+    try{
+        const res = await axios(url+'/saveData', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data,
             credentials: 'include'
         });
         if(res.status===200){
