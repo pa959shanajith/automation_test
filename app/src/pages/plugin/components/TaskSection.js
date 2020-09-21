@@ -135,9 +135,8 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                             }
                         }
                         setFilterDatState(filterDat);
-                        // dispatch({type: actionTypes.SET_FD, payload: filterDat})
-                        // USE DISPATCH
-                        // window.localStorage['_FD'] = angular.toJson(filterDat);
+                        dispatch({type: actionTypes.SET_FD, payload: filterDat})
+                        
                     })
                     .catch(error => {
                         setOverlay("");
@@ -267,7 +266,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
 		if(filterDat.apptypes.indexOf(obj.appType)===-1)
 			filterDat.apptypes.push(obj.appType);
         
-        // dispatch({type: actionTypes.SET_FD, payload: filterDat})
+        dispatch({type: actionTypes.SET_FD, payload: filterDat})
     }
 
     const passFilterTest = (node, tidx, filterData) => {

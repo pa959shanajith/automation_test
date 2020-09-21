@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
+import { ScreenOverlay , PopupMsg } from '../../global';
 import * as api from '../api';
 import * as adminApi from "../../admin/api";
 import "../styles/LoginFields.scss";
@@ -24,6 +25,9 @@ const LoginFields = (props) => {
     const [restartForm, setRestartForm] = useState(false);
     const [redirectTo, setRedirectTo] = useState("");
     const [focusBtn, setFocus] = useState("");
+    const [overlayText, setOverlayText] = useState("");
+    const [popup, setPopup] = useState("");
+
     let serverList = [{"name": "License Server", "active": false}, {"name": "DAS Server", "active": false}, {"name": "Web Server", "active": false}];
     let SetProgressBar = props.SetProgressBar;
 
@@ -108,7 +112,7 @@ const LoginFields = (props) => {
                     SetProgressBar("stop");
                     setRequested(false);
                     if (data === "restart") {
-                        // blockUI("Fetching active services...");
+                        setOverlayText("Fetching active services...");
                         adminApi.restartService("query")
                         .then(data=> {
                             if (data === "fail") {
@@ -119,10 +123,10 @@ const LoginFields = (props) => {
                                     serverList[i].active = e;
                                 });
                             }
-                            // unblockUI();
+                            setOverlayText("");
                         })
                         .catch(error=> {
-                            // unblockUI();
+                            setOverlayText("");
                             console.log("Failed to fetch services. Error::", error)
                             setLoginValidation("Failed to fetch services.");
                         });
@@ -148,33 +152,41 @@ const LoginFields = (props) => {
 
     const restartServer = (serverid, serverName) => {
         let errmsg = "Fail to restart " + serverName + " service!";
-        // blockUI("Please wait while " + serverName + " service is being restarted...");
+        setOverlayText("Please wait while " + serverName + " service is being restarted...");
         adminApi.restartService(serverid)
         .then(data => {
             if (data === "success") {
                 setTimeout(()=>{
-                    // unblockUI();
-                    // openModalPopup("Restart Service", serverName+" service is restarted successfully!!");
-                    alert("Restart Service", serverName+" service is restarted successfully!!");
+                    setOverlayText("");
+                    setPopup({'title': "Restart Service", "content": serverName+" service is restarted successfully!!"})
                 }, 120 * 1000);
             } else {
-                // unblockUI();
+                setOverlayText("");
                 if (data === "na") errmsg = "Service is not found. Ensure "+serverName+" is running as a service.";
-                // openModalPopup("Restart Service", errmsg);
-                alert("Restart Service", errmsg);
+                setPopup({"title": "Restart Service", "content": errmsg})
             }
         })
         .catch(error=> {
-            // unblockUI();
-            // openModalPopup("Restart Service", errmsg);
-            alert("Restart Service", error);
+            setOverlayText("");
+            setPopup({'title': "Restart Service", 'content': errmsg})
         });
     };
     
+    const PopUp = () => (
+        <PopupMsg 
+            title={popup.title}
+            content={popup.content}
+            submitText="OK"
+            close={()=>setPopup("")}
+            submit={()=>setPopup("")}
+        />
+    );
 
 
     return (
         <>
+        { popup && PopUp() }
+        { overlayText && <ScreenOverlay content={overlayText}/>}
         {redirectTo ? <Redirect to={redirectTo} /> :
             <>
             { restartForm 

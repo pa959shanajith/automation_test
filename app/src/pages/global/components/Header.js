@@ -47,7 +47,7 @@ const Header = () => {
             let first_name = userInfo.firstname.charAt(0).toUpperCase() + userInfo.firstname.slice(1);
             let last_name = userInfo.lastname.charAt(0).toUpperCase() + userInfo.lastname.slice(1);
             setUserDetails(userInfo);
-            setUserRole(userInfo.rolename);
+            setUserRole(selectedRole);
             if (userInfo.rolename === "Admin") setAdminDisable(true); 
             if (first_name === last_name) setUsername(first_name);
             else setUsername(first_name + ' ' + last_name);

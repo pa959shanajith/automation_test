@@ -1,4 +1,4 @@
-import * as actionTypes from './action';
+import * as actionTypes from './action.js';
 
 const initialState = {
     tasksJson: {},
@@ -8,7 +8,7 @@ const initialState = {
 
 const reducer = (state=initialState, action) => {
     switch(action.type){
-        case actionTypes.SET_TASKJSON:
+        case actionTypes.SET_TASKSJSON:
             return {
                 ...state, tasksJson: action.payload
             }
