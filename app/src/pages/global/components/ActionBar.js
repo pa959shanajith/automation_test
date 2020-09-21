@@ -29,7 +29,7 @@ const ActionBar = (props) => {
             { !collapse && 
             <div className="action__content">
                 <div className="scrollable_action_container">
-                <ScrollBar thumbColor="rgb(255, 255, 255, 0.27)" trackColor="transparent">    
+                <ScrollBar id="action_bar_scroll" thumbColor="rgb(255, 255, 255, 0.27)" trackColor="transparent">    
                     <div className="action__contents">
                         <div className={"ab__contents " + (props.bottomContent ? "ab__upper_contents" : "")}>
                             {props.children ? props.children : props.upperContent}
