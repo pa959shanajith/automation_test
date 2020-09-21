@@ -2,6 +2,7 @@
     // width: 166px;
     background: #311d4e;
     position: absolute;
+    color: #fff;
     display: flex;
     flex-direction: column;
     // align-items: flex-end;
@@ -20,7 +21,6 @@
     font-family: "LatoWebLight";
     font-size: 12px;
     padding: 50px 0 5px;
-    // height: 100%;
     // min-height: 0;
 }
 .scrollable_ref_container{
@@ -173,8 +173,9 @@
     .rb__task-panel{
         display: flex;
         flex-direction: column;
+        min-height: 60px;
         border-bottom: 1px solid #643693;
-        padding: 0;
+        padding: 15px 0;
     }
     
     .rb__active-task{
@@ -196,6 +197,7 @@
         display: flex;
         flex-direction: row;
         align-items: center;
+        margin-bottom: 10px;
         justify-content: space-between;
         width: 100%;
         font-family: "LatoWeb";

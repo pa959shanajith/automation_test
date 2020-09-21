@@ -62,7 +62,7 @@ const FilterDialog = ({setShow, filterDat, filterData, filterTasks}) => {
                 <div className="selection-lbl">
                     <span>Select Release</span>
                 </div>
-                <select className="selection-select" onChange={onRelSel} disabled={!proj} value={rel}>
+                <select className="selection-select" onChange={onRelSel} disabled={proj==="Select Project"} value={rel}>
                     <option className="select__menu" disabled value="Select Release">Select Release</option>
                     {Object.keys(filterDat.idnamemaprel).map(id=>(
                         <option className="select__menu" value={id}>{filterDat.idnamemaprel[id]}</option>
@@ -72,7 +72,7 @@ const FilterDialog = ({setShow, filterDat, filterData, filterTasks}) => {
                 <div className="selection-lbl">
                     <span>Select Cycle</span>
                 </div>
-                <select className="selection-select" onChange={onCycSel} disabled={!rel} value={cyc}>
+                <select className="selection-select" onChange={onCycSel} disabled={rel==="Select Release"} value={cyc}>
                     <option className="select__menu" disabled value="Select Cycle">Select Cycle</option>
                     {Object.keys(filterDat.idnamemapcyc).map(id=>(
                         <option className="select__menu" value={id}>{filterDat.idnamemapcyc[id]}</option>

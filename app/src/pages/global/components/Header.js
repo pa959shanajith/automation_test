@@ -256,7 +256,6 @@ const Header = () => {
                         </ClickAwayListener>
                     </div>
                 </div>
-            {/* } */}
         </>
     ); 
 }

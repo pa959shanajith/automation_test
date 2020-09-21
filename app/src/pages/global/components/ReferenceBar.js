@@ -5,7 +5,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as actionTypes from "../../plugin/state/action";
 import "../styles/ReferenceBar.scss";
 
-// props - 
+    /* 
+        Component : ReferenceBar (Right Bar)
+        Uses: Renders the Reference bar on the page
+        Props :
+            collapsible : if true ReferenceBar can be collapsed or expand. Default is false 
+            hideInfo : to hide the default info Icon . by default hideInfo is false
+            children : renders the children passed above the task icon. 
+    */
+
 const ReferenceBar = (props) => {
 
     const [collapse, setCollapse] = useState(false);
@@ -15,10 +23,6 @@ const ReferenceBar = (props) => {
     const [showTask, setShowTask] = useState(false);
     const tasksJson = useSelector(state=>state.plugin.tasksJson);
     const filterDat = useSelector(state=>state.plugin.FD);
-
-    // const nums = [1,2,3,4,5,6,7,8,9,11,22,33];
-    // const nums = [44,55,66,77,88,99,11,222,333,444,555,666,777,888,999];
-    // const nums = [1,2,3,4,5,6,7,8,9,11,22,33,44,55,66,77,88,99,11,222,333,444,555,666,777,888,999];
 
     useEffect(()=>{
             // if(window.location.pathname != '/mindmap'){

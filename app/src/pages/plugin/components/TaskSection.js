@@ -167,6 +167,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
         setOverlay("");
         setNotManager(true);
         setDataObj(null);
+        setFiltered(false);
     }
 
     const filterTasks = (filterData) => {

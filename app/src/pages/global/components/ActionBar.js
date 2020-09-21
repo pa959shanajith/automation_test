@@ -2,14 +2,20 @@ import React, { useState, useEffect } from 'react';
 import {ScrollBar} from '../../global';
 import "../styles/ActionBar.scss";
 
-// props - 
+/* 
+    Component : ActionBar (Left Bar) Wrapper Component
+    Use : Renders Action Bar on the page
+    Props : 
+        collapsible : if true ActionBar can be collapsed or expand. Default is false.
+        children : if one section then main content of the ActionBar. ex- <ActionBar> <YourContents/> </ActionBar>
+        upperContent : if two sections then content on the upper half. 
+        bottomContent :  contents of the bottom half. ex- <ActionBar upperContent={} bottomContent={} / 
+    */
+
+    
 const ActionBar = (props) => {
 
     const [collapse, setCollapse] = useState(false);
-
-    // const nums = [1,2,3,4,5,6,7,8,9,11,22,33];
-    // const nums = [44,55,66,77,88,99,11,222,333,444,555,666,777,888,999];
-    // const nums = [1,2,3,4,5,6,7,8,9,11,22,33,44,55,66,77,88,99,11,222,333,444,555,666,777,888,999];
 
     useEffect(()=>{
         
@@ -25,7 +31,7 @@ const ActionBar = (props) => {
                 <div className="scrollable_action_container">
                 <ScrollBar thumbColor="rgb(255, 255, 255, 0.27)" trackColor="transparent">    
                     <div className="action__contents">
-                        <div className={props.bottomContent ? "ab__upper_contents" : "ab__contents"}>
+                        <div className={"ab__contents " + (props.bottomContent ? "ab__upper_contents" : "")}>
                             {props.children ? props.children : props.upperContent}
                         </div>
                         { props.bottomContent &&
