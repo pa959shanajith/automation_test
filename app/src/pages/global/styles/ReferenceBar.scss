@@ -3,6 +3,8 @@
     background: #311d4e;
     position: absolute;
     color: #fff;
+    font-family: "LatoWebLight";
+    font-size: 12px;
     display: flex;
     flex-direction: column;
     // align-items: flex-end;
@@ -13,17 +15,28 @@
 }
 
 .ref__content{
-    width: 90px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    // width: 90px;
+    // height: 100%;
+    // display: flex;
+    // flex-direction: column;
+    // align-items: center;
     overflow: auto;
-    font-family: "LatoWebLight";
-    font-size: 12px;
-    padding: 50px 0 5px;
+    padding: 40px 0 5px;
     
     // min-height: 0;
+}
+
+.min_height_div{
+    width: 90px;
+    min-height: 0;
+    height: 100%;
+}
+
+.inside_min{
+    display: flex;
+    flex-direction: column;
+    flex: 1 1;
+    height: 100%;
 }
 
 // .test_div{
@@ -94,6 +107,12 @@
     flex-direction: column;
     align-items: center;
     margin-bottom: 15px;
+    cursor: pointer;
+    
+    &:hover .thumb__ic{
+        background-color: #61349b;
+        border-radius: 5px;
+    }
 
     .rb_box_title{
         margin-top: 2px;
@@ -102,18 +121,18 @@
 
 .thumb__ic{
     padding: 10px;
-    cursor: pointer;
-    &:hover{
-        background-color: #61349b;
-        border-radius: 5px;
-    }
 }
 
 .rb_upper_contents{
-    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 1;
+    // flex-grow: 1;
 }
 
 .task_pop{
+    margin-top: 100%;
     background-color: #311d4e;
     z-index: 100;
     display: flex;
@@ -123,7 +142,7 @@
     right: 110%;
     border-radius: 5px;
     width: 350px;
-    height: 60%;
+    height: 56%;
     
     .pop__header{
         cursor: pointer;
@@ -201,9 +220,9 @@
     .rb__task-panel{
         display: flex;
         flex-direction: column;
-        min-height: 60px;
+        min-height: 50px;
         border-bottom: 1px solid #643693;
-        padding: 15px 0;
+        padding: 10px 0;
     }
     
     .rb__active-task{

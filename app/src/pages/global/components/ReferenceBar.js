@@ -21,6 +21,9 @@ const ReferenceBar = (props) => {
     const [searchValue, setSearchValue] = useState("");
     const [searchItems, setSearchItems] = useState([]);
     const [showTask, setShowTask] = useState(false);
+    const [taskPopY, setTaskPopY] = useState(null);
+
+
     const tasksJson = useSelector(state=>state.plugin.tasksJson);
     const filterDat = useSelector(state=>state.plugin.FD);
 
@@ -100,44 +103,59 @@ const ReferenceBar = (props) => {
         setSearchItems(filteredItem);
     }
 
+    const toggleTaskPop = event => {
+        setTaskPopY(event.clientY)
+        setShowTask(!showTask)
+    }
 
     return (
         <div className="ref__bar">
-            { props.collapsible && <div className={"caret__ref_bar " + (collapse && " caret_ref_collapsed") } onClick={()=>setCollapse(!collapse)}>
+            { props.collapsible &&
+                 <div className={"caret__ref_bar " + (collapse && " caret_ref_collapsed") } onClick={()=>setCollapse(!collapse)}>
                 {collapse ? "<" : ">"}
-            </div>}
-            { !collapse && 
-            // <ScrollBar>
-            <div className="ref__content">
-                <div className="rb_upper_contents">
-                        {props.children}
-                        				
-                {showTask && <div className="task_pop">
-                    <h4 className="pop__header" onClick={()=>setShowTask(false)}><span className="pop__title">My task(s)</span><img className="task_close_arrow" src="static/imgs/ic-arrow.png"/></h4>
-                    <div className="input_group">
-                        <span className="search_task__ic_box">
-                            <img className="search_task__ic" src="static/imgs/ic-search-icon.png"/>
-                        </span>
-                        <input className="search_task__input" onChange={onSearchHandler} value={searchValue} placeholder="Seach My task(s)"/>
-                    </div>
-                    <div className="task_pop__list">
-                        <div className="task_pop__overflow">
-                            <ScrollBar thumbColor= "#fff" trackColor= "#46326b" >
-                                <div className="task_pop__content">
-                                    <TaskContents items={searchValue ? searchItems : taskList} filterDat={filterDat} taskJson={tasksJson} />
-                                </div>
-                            </ScrollBar>
-                        </div>
-                    </div>
-                </div>}
-                    <div className="ic_box" onClick={()=>setShowTask(!showTask)}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>
-                    { !props.hideInfo && <div className="ic_box"><img className="rb__ic-info thumb__ic" src="static/imgs/ic-info.png"/><span className="rb_box_title">Info</span></div>}
                 </div>
-                <div className="rb__bottom_content">
-                <div className="ic_box"><img className="rb__ic-assist thumb__ic" src="static/imgs/ic-assist.png"/><span className="rb_box_title">Assist</span></div>
+            }
+            { !collapse && 
+                <>
+                <div className="min_height_div">
+                    <div id="ref_bar_scroll" className="inside_min">
+                    {
+                        showTask && 
+                        <div className="task_pop" style={{marginTop: `calc(${taskPopY}px - 15vh)`}}>
+                            <h4 className="pop__header" onClick={()=>setShowTask(false)}><span className="pop__title">My task(s)</span><img className="task_close_arrow" src="static/imgs/ic-arrow.png"/></h4>
+                            <div className="input_group">
+                                <span className="search_task__ic_box">
+                                    <img className="search_task__ic" src="static/imgs/ic-search-icon.png"/>
+                                </span>
+                                <input className="search_task__input" onChange={onSearchHandler} value={searchValue} placeholder="Seach My task(s)"/>
+                            </div>
+                            <div className="task_pop__list">
+                                <div id='task_pop_scroll' className="task_pop__overflow">
+                                    <ScrollBar scrollId='task_pop_scroll' trackColor="#46326b" thumbColor="#fff">
+                                        <div className="task_pop__content">
+                                            <TaskContents items={searchValue ? searchItems : taskList} filterDat={filterDat} taskJson={tasksJson} />
+                                        </div>
+                                    </ScrollBar>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <ScrollBar scrollId="ref_bar_scroll" trackColor="transparent" thumbColor="#7143b3">
+                        <div className="ref__content">
+                            <div className="rb_upper_contents">
+                                    {props.children}
+                                    
+                                <div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>
+                                { !props.hideInfo && <div className="ic_box"><img className="rb__ic-info thumb__ic" src="static/imgs/ic-info.png"/><span className="rb_box_title">Info</span></div>}
+                            </div>
+                        </div>
+                    </ScrollBar>
                 </div>
             </div>
-            // </ScrollBar>
+            <div className="rb__bottom_content">
+                <div className="ic_box"><img className="rb__ic-assist thumb__ic" src="static/imgs/ic-assist.png"/><span className="rb_box_title">Assist</span></div>
+                </div>
+                </>
         }
         </div>
     );

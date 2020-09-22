@@ -190,7 +190,7 @@ const Header = () => {
         setShowConfSR(true);
     }
 
-    const confSwitchRole = () => (
+    const ConfSwitchRole = () => (
        <ModalContainer 
             title="Switch Role"
             content={`Are you sure you want to switch role to: ${clickedRole.data}`}
@@ -208,9 +208,9 @@ const Header = () => {
         <> 
             { redirectTo && <Redirect to={redirectTo} /> }
             { showChangePass && <ChangePassword setShow={toggleChangePass} loginApi={loginApi} setSuccessPass={setSuccessPass} /> }
-            { showSuccessPass && PasswordSuccessPopup() }
-            { showConfSR && confSwitchRole() }
-            { showSR_Pop && SR_Popup() }
+            { showSuccessPass && <PasswordSuccessPopup /> }
+            { showConfSR && <ConfSwitchRole />  }
+            { showSR_Pop && <SR_Popup /> }
             { showOverlay && <ScreenOverlay content={showOverlay} /> }
 
             <div className = "main-header">

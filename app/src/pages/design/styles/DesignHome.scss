@@ -22,26 +22,24 @@
     position: static;
 }
 
-.d__leftbar{
-    left: 0;
-    float: left;
+.d__leftbar, .d__rightbar{
     position: relative;
     display: flex;
     height: 100%;
     // width: 6px;
     color: #fff;
-    background-color: #633690;
+}
+
+.d__leftbar{
+    left: 0;
+    float: left;
+    width: 166px;
 }
 
 .d__rightbar{
     right: 0;
     float: right;
-    display: flex;
-    position: relative;
-    height: 100%;
-    // width: 6px;
-    color: #fff;
-    background-color: #633690;
+    width: 90px;
 }
 
 .d__content{

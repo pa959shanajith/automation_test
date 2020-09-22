@@ -7,9 +7,14 @@
     color: #eee9ff;
     margin: 10% 0 5%;
     cursor: pointer;
-    &:hover .thumbnail__img{
+    &:hover .thumbnail__img, &:hover .thumbnail__svg{
         background-color: #523176;
     }
+}
+
+.thumbnail__svg{
+    margin-bottom: 2px;
+    border-radius: 5px;
 }
 
 .thumbnail__img{

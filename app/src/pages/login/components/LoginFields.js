@@ -185,7 +185,7 @@ const LoginFields = (props) => {
 
     return (
         <>
-        { popup && PopUp() }
+        { popup && <PopUp /> }
         { overlayText && <ScreenOverlay content={overlayText}/>}
         {redirectTo ? <Redirect to={redirectTo} /> :
             <>

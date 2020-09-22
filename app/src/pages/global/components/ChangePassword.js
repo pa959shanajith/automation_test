@@ -95,7 +95,7 @@ const ChangePassword = ({setShow, loginApi, setSuccessPass}) => {
 		}
     };
 
-    const content = () => (
+    const Content = () => (
         <div className="pass_inputs_container">
             <input className={"reset_pass_inputs " + (currPassError ? "error_reset_field" : "")} placeholder="Current Password" type="password" onChange={currPassHandler} value={currpassword} />
             <input className={"reset_pass_inputs " + (newPassError ? "error_reset_field" : "")} placeholder="New Password" type="password" onChange={newPassHandler} value={newpassword} />
@@ -104,7 +104,7 @@ const ChangePassword = ({setShow, loginApi, setSuccessPass}) => {
         </div>
     );
 
-    const footer = () => (
+    const Footer = () => (
         <div className="reset_dialog_btns">
             <button className="clear_reset_fields" onClick={resetFields}>Clear</button>
             <button className="submit_reset" onClick={resetPassword}>Submit</button>
@@ -115,8 +115,8 @@ const ChangePassword = ({setShow, loginApi, setSuccessPass}) => {
         <ModalContainer
         close={handleClose}
         title={"Change Password"}
-        content={content()}
-        footer={footer()}
+        content={<Content />}
+        footer={<Footer/>}
         />
     );
 }

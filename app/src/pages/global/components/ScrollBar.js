@@ -12,6 +12,7 @@ import 'simplebar-react/dist/simplebar.min.css'
     thumbColor : color
     hideYbar : boolean 
     hideXbar : boolean 
+    scrollId : container id
 */
 
 const ScrollBar = (props) => {
@@ -19,7 +20,7 @@ const ScrollBar = (props) => {
         <Fragment>
             <style type="text/css">
                 {`
-                .simplebar-scrollbar:before {
+                ${props.scrollId?'#'+props.scrollId+' ':''}.simplebar-scrollbar:before {
                     top: 0px;
                     bottom: 0px;
                     left: 0px;
@@ -27,16 +28,16 @@ const ScrollBar = (props) => {
                     opacity: 1!important;
                     background:${props.thumbColor?props.thumbColor:'#000'};
                 }
-                .simplebar-track.simplebar-vertical {
+                ${props.scrollId?'#'+props.scrollId+' ':''}.simplebar-track.simplebar-vertical {
                     top: 2px;
                     bottom: 2px;
                     right: 2px;
                     border-radius: 3px;
                     background: ${props.trackColor?props.trackColor:'white'};
-                    width: 6px;
+                    width: ${props.verticalbarWidth?props.verticalbarWidth:'6px'};
                     ${(props.hideYbar)?'visibility: hidden!important':''};
                 }
-                .simplebar-track.simplebar-horizontal {
+                ${props.scrollId?'#'+props.scrollId+' ':''}.simplebar-track.simplebar-horizontal {
                     background: ${props.trackColor?props.trackColor:'white'};
                     left: 0;
                     height: 10px;
