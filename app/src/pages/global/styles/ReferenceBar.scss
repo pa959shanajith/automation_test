@@ -1,0 +1,289 @@
+.ref__bar{
+    // width: 166px;
+    background: #311d4e;
+    position: absolute;
+    color: #fff;
+    font-family: "LatoWebLight";
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    // align-items: flex-end;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    height: 100%;
+}
+
+.ref__content{
+    // width: 90px;
+    // height: 100%;
+    // display: flex;
+    // flex-direction: column;
+    // align-items: center;
+    overflow: auto;
+    padding: 40px 0 5px;
+    
+    // min-height: 0;
+}
+
+.min_height_div{
+    width: 90px;
+    min-height: 0;
+    height: 100%;
+}
+
+.inside_min{
+    display: flex;
+    flex-direction: column;
+    flex: 1 1;
+    height: 100%;
+}
+
+// .test_div{
+//     // display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//     overflow: auto;
+//     font-family: "LatoWebLight";
+//     font-size: 12px;
+//     padding: 50px 0 5px;
+// }
+
+// .abs{
+//     position: absolute;
+//     left: 0;
+//     right: 0;
+//     bottom: 0;
+//     top: 0;
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//     overflow: auto;
+//     font-family: "LatoWebLight";
+//     font-size: 12px;
+//     padding: 50px 0 5px;
+// }
+
+// .scrollable_ref_container{
+//     display: flex;
+//     flex-direction: column;
+//     flex: 1;
+//     height: 100%;
+// }
+
+// .ref__contents{
+//     position: absolute;
+//     left: 0;
+//     right: 0;
+//     bottom: 0;
+//     top: 0;
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//     flex: 1;
+//     overflow: auto;
+//     font-family: "LatoWebLight";
+//     font-size: 12px;
+//     padding: 50px 0 5px;
+// }
+
+
+.caret__ref_bar{
+    position: absolute;
+    top: 50%;
+    left: 0;
+    z-index: 100;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.caret_ref_collapsed{
+    position: relative;
+}
+
+
+.ic_box{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
+    cursor: pointer;
+    
+    &:hover .thumb__ic{
+        background-color: #61349b;
+        border-radius: 5px;
+    }
+
+    .rb_box_title{
+        margin-top: 2px;
+    }
+}
+
+.thumb__ic{
+    padding: 10px;
+}
+
+.rb_upper_contents{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 1;
+    // flex-grow: 1;
+}
+
+.task_pop{
+    margin-top: 100%;
+    background-color: #311d4e;
+    z-index: 100;
+    display: flex;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    right: 110%;
+    border-radius: 5px;
+    width: 350px;
+    height: 56%;
+    
+    .pop__header{
+        cursor: pointer;
+        display: flex;
+        border-bottom: 2px solid #604b83;
+        padding: 8px 15px;
+        margin: 0;
+        font-size: 18px;
+        font-family: "LatoWeb";
+
+        img{
+            width: 8px;
+            height: 16px;
+        }
+    }
+}
+
+.pop__title{
+    flex-grow: 1;
+}
+
+.input_group{
+    display: flex;
+    padding: 0;
+    margin: 0;
+}
+
+.search_task__ic{
+    padding: 6px 12px;
+    box-sizing: content-box;
+    color: #555;
+    text-align: center;
+    background-color: #fafafa;
+    border: 1px solid #ccc;
+    border-radius: 4px 0 0 4px;
+}
+
+.search_task__input{
+    font-family: "LatoWeb";
+    font-size: 13px;
+    border: 1px solid #ccc;
+    border-left: none;
+    padding: 6px 12px;
+    background-color: #fafafa;
+    color: #333;
+    border-radius: 0 4px 4px 0;
+    flex-grow: 1;
+    outline: none;
+    &:focus{
+        outline: none;
+    }
+}
+
+.active_rb_thumb{
+    background-color: #61349b;
+    border-radius: 5px;
+}
+
+.task_pop__overflow{
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 100%;
+}
+
+.task_pop__content{
+    flex: 1;
+    overflow: auto;
+    margin-top: 10px;
+    padding: 0 15px 0 25px;
+}
+
+.task_pop__list{
+    overflow: auto;
+    .rb__task-panel{
+        display: flex;
+        flex-direction: column;
+        min-height: 50px;
+        border-bottom: 1px solid #643693;
+        padding: 10px 0;
+    }
+    
+    .rb__active-task{
+        background-color: transparent;
+    }
+    
+    .rb__task-description{
+        div{
+            font-family: "LatoWeb";
+            font-size: 14px;
+            padding: 1px 10px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+    }
+    
+    .rb__panel-content{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-bottom: 10px;
+        justify-content: space-between;
+        width: 100%;
+        font-family: "LatoWeb";
+    
+        h4{
+            font-family: "LatoWebBold";
+            font-size: 15px;
+            margin: 0;
+            flex-basis: 30px;
+        }
+    
+    }
+    
+    .rb__tasktype-btn{
+        outline: none;
+        border: none;
+        font-size: 14px;
+        border-radius: 20px;
+        height: 25px;
+        width: 80px;
+        color: white;
+        background: #a08ab7;
+        cursor: default;
+        &:hover{
+            cursor: default;
+        }
+        &:focus{
+            border: none;
+            outline: none;
+        }
+    }
+    
+    
+    .rb__assign-task{
+        font-size: 15px;
+        font-family: "LatoWebLight";
+        text-align: start;
+        flex-grow: 1;
+        padding: 0 10px 0 10px;
+        cursor: pointer;
+    }
+}

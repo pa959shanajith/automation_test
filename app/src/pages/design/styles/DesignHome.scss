@@ -1,0 +1,71 @@
+.d__body{
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgb(238, 238, 238);
+}
+
+.d__mid_section{
+    display: flex;
+    flex: auto;
+    width: 100%;
+    background-color: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+.d__footer .main-footer{
+    position: static;
+}
+
+.d__leftbar, .d__rightbar{
+    position: relative;
+    display: flex;
+    height: 100%;
+    // width: 6px;
+    color: #fff;
+}
+
+.d__leftbar{
+    left: 0;
+    float: left;
+    width: 166px;
+}
+
+.d__rightbar{
+    right: 0;
+    float: right;
+    width: 90px;
+}
+
+.d__content{
+    flex-grow: 1;
+}
+
+.d__thumbnail input[type='checkbox']{
+    width: 18px;
+    height: 18px;
+    outline: none;
+}
+
+.d__thumbnail{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20% 20px 15%;
+    font-size: 16px;
+}
+
+.d__thumbnail_title{
+    text-align: center;
+}
+
+.d__scrapeOn{
+    font-family: "LatoWebMedium";
+    font-size: 18px;
+    user-select: none;
+}
