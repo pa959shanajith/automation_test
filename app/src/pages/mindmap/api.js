@@ -89,6 +89,34 @@ export const getModules = async(props) => {
     }
 }
 
+/*Component getProjectType
+  api returns {projectType: "", project_id: "", projectid: "", project_typename: "", releases: []}
+  todo : add url from env or store and error handling 
+*/
+
+export const exportToExcel = async(props) => {
+    try{
+        const res = await axios(url+'/exportToExcel', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+            credentials: 'include',
+            responseType:'arraybuffer'
+        });
+        if(res.status===200){
+            return res.data;
+        }else{
+            console.error(res.status)
+            return;
+        }
+    }catch(err){
+        console.error(err)
+        return;
+    }
+}
+
 /*Component getScreens
   api returns {projectType: "", project_id: "", projectid: "", project_typename: "", releases: []}
   todo : add url from env or store and error handling 

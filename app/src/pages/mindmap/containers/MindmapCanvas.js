@@ -29,13 +29,14 @@ var temp = {
     s: [],
     t: ""
 };
-var deletednode=[]
 var deletednode_info =[]
 var nodeMoving = false;
 
 const Canvas = (props) => {
+    const dispatch = useDispatch()
     const copyNodes = useSelector(state=>state.mindmap.copyNodes)
     const selectBox = useSelector(state=>state.mindmap.selectBoxState)
+    const deletedNodes = useSelector(state=>state.mindmap.deletedNodes)
     const [sections,setSection] =  useState({})
     const [ctrlBox,setCtrlBox] = useState(false);
     const [inpBox,setInpBox] = useState(false);
@@ -46,8 +47,8 @@ const Canvas = (props) => {
     const [dNodes,setdNodes] = useState([])
     const [dLinks,setdLinks] = useState([])
     const [createnew,setCreateNew] =useState(false)
-    const [popup,setPopup] =  useState({show:false})
-    const [blockui,setBlockui] =  useState({show:false})
+    const setPopup=props.setPopup
+    const setBlockui=props.setBlockui
     const CanvasRef = useRef();
     const verticalLayout = false;
     useEffect(() => {
@@ -92,7 +93,7 @@ const Canvas = (props) => {
         }
     },[createnew])
     const nodeClick=(e)=>{
-        e.preventDefault()
+        e.stopPropagation()
         if(d3.select('#pasteImg').classed('active-map')){
             var res = pasteNode(e.target.parentElement.id,{...copyNodes},{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},setPopup)
             if(res){
@@ -146,6 +147,7 @@ const Canvas = (props) => {
     const clickDeleteNode=(id)=>{
         var res = deleteNode(id,[...dNodes],[...dLinks],{...links},{...nodes},setPopup)
         if(res){
+            dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[...deletedNodes,...res.deletedNodes]})
             setNodes(res.nodeDisplay)
             setLinks(res.linkDisplay)
             setdLinks(res.dLinks)
@@ -176,15 +178,13 @@ const Canvas = (props) => {
     return (
         <Fragment>
             {(selectBox)?<RectangleBox ctScale={ctScale} dNodes={[...dNodes]} dLinks={[...dLinks]}/>:null}
-            {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-            {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
             {(ctrlBox !== false)?<ControlBox nid={ctrlBox} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
-            {(inpBox !== false)?<InputBox node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
+            {(inpBox !== false)?<InputBox setPopup={setPopup} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
             <Legends/>
-            <SaveMapButton dNodes={[...dNodes]} setPopup={setPopup}/>
+            <SaveMapButton dNodes={[...dNodes]} setPopup={setPopup} setBlockui={setBlockui}/>
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
                 <g className='ct-container'>
                 {Object.entries(links).map((link)=>{
@@ -214,6 +214,7 @@ const Canvas = (props) => {
 
 
 const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay,setPopup) =>{
+    var deletedNodes = []
     var sid = activeNode.split('node_')[1]
     var s = d3.select('#'+activeNode);
     // SaveCreateED('#ct-createAction', 1, 0);
@@ -234,7 +235,7 @@ const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay,setPopup) =
         setPopup({show:true,title:'Error',content:'Cannot delete node if children task is assigned. Please unassign task first.',submitText:'Ok'})
         return;
     }
-    recurseDelChild(dNodes[sid],linkDisplay, nodeDisplay,dNodes,dLinks,undefined);
+    recurseDelChild(dNodes[sid],linkDisplay, nodeDisplay,dNodes,dLinks,undefined,deletedNodes);
     for (var j = dLinks.length - 1; j >= 0; j--) {
         if (dLinks[j].target.id == sid){
             dLinks[j].deleted = !0;
@@ -249,15 +250,15 @@ const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay,setPopup) =
         }
         return !1;
     });
-    return {dNodes,dLinks,linkDisplay,nodeDisplay}
+    return {dNodes,dLinks,linkDisplay,nodeDisplay,deletedNodes}
 }
 
-const recurseDelChild = (d, linkDisplay, nodeDisplay, dNodes, dLinks, tab) =>{
-    if (d.children) d.children.forEach((e)=>{recurseDelChild(e, linkDisplay, nodeDisplay, dNodes, dLinks, tab)});
+const recurseDelChild = (d, linkDisplay, nodeDisplay, dNodes, dLinks, tab , deletedNodes) =>{
+    if (d.children) d.children.forEach((e)=>{recurseDelChild(e, linkDisplay, nodeDisplay, dNodes, dLinks, tab, deletedNodes)});
     if(d.state=="deleted")return;
     if(d._id){  
         var parentid=dNodes[d.parent.id]._id;
-        deletednode.push([d._id,d.type,parentid]);
+        deletedNodes.push([d._id,d.type,parentid]);
     }
     d.parent = null;
     d.children = null;
@@ -552,11 +553,12 @@ const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sections,co
         arr_co.push(objj);
     });
     // switch-layout feature
+    count[(nNext[pt][0]).toLowerCase() + 's'] += 1
     var tempName;
     if (obj) {
         tempName = obj;
     } else {
-        tempName = nNext[pt][0] + '_' + nNext[pt][1];
+        tempName = nNext[pt][0]+'_'+count[(nNext[pt][0]).toLowerCase() + 's'];
     }
     var node = {
         id: uNix,
@@ -569,8 +571,7 @@ const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sections,co
         name: tempName,
         childIndex: '',
         type: (nNext[pt][0]).toLowerCase() + 's'
-    };
-    count[node.type] += 1
+    }; 
     getNewPosition(dNodes,node, pi, arr_co,verticalLayout,sections);
     dNodes.push(node);
     dNodes[pi].children.push(dNodes[uNix]);

@@ -1,16 +1,16 @@
 import React, { useState, useRef, Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {saveMindmap,getModules} from '../api';
+import {saveMindmap,getModules,getScreens} from '../api';
 import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
-import { ModalContainer, PopupMsg } from '../../global'
 
 const SaveMapButton = (props) => {
     const dispatch = useDispatch()
+    const deletedNodes = useSelector(state=>state.mindmap.deletedNodes)
     const projId = useSelector(state=>state.mindmap.selectedProj)
     const moduleList = useSelector(state=>state.mindmap.moduleList)
     const clickSave = (e)=>{
-        saveNode(props.dNodes,projId,props.setPopup,moduleList,dispatch)
+        saveNode(props.setBlockui,props.dNodes,projId,props.setPopup,moduleList,deletedNodes,dispatch)
     }
     return(
         <svg className="ct-actionBox" id="ct-save" onClick={clickSave}>
@@ -22,20 +22,18 @@ const SaveMapButton = (props) => {
     )
 }
 
-const saveNode = async(dNodes,projId,setPopup,moduleList,dispatch)=>{
+const saveNode = async(setBlockui,dNodes,projId,setPopup,moduleList,deletedNodes,dispatch)=>{
     var layout_vertical = false;
-    var deletednode = []
-    var cur_module = null;
     var error = !1
     var mapData = []
-    var flag = 10 //if ($scope.tab == 'tabAssign') flag = 30;
+    var flag = 10 
     var temp_data = [];
     var counter = {};
     d3.select('#pasteImg').classed('active-map',false)
     d3.select('#copyImg').classed('active-map',false)
     d3.selectAll('.ct-node').classed('node-selected',false)   
     if (d3.select('#ct-save').classed('disableButton')) return;
-    // blockUI('Saving Flow! Please wait...');
+    setBlockui({show:true,content:'Saving flow! Please wait...'})
     dNodes.forEach((e, i)=>{
         if (i == 0) return;
         temp_data[i] = {
@@ -62,44 +60,36 @@ const saveNode = async(dNodes,projId,setPopup,moduleList,dispatch)=>{
         }
         counter[key] = counter[key] + 1;
     })
-    var error = treeIterator(mapData, dNodes[0], error);
-    // if (dNodes[0].type == 'endtoend') {
-    //     cur_module = 'end_to_end';
-    //     error = false;
-    // } else {
-    //     //Part of Issue 1685
-    //     cur_module = $scope.tab;
-    // }
-    // var userInfo = JSON.parse(window.localStorage['_UI']);
-    // var username = userInfo.username;
-    // var assignedTo = assignedObj;
-    // var utcTime = new Date().getTime();
-    // var from_v = to_v = 0;
-    // if ($('.version-list').length != 0)
-    //     from_v = to_v = $('.version-list').val();
+    treeIterator(mapData, dNodes[0], error);
     var data = {
         write: flag,
         map: mapData,
-        deletednode: deletednode,
+        deletednode: deletedNodes,
         unassignTask: [],
         prjId: projId,
-        createdthrough: "Web",
-        // cycId: cycId ??
+        createdthrough: "Web"
     }
     var modId = await saveMindmap(data)
-    if(modId){
+    if(modId && !modId.error){
         var moduledata = await getModules({modName:null,cycId:null,"tab":"tabCreate","projectid":projId,"moduleid":modId})
+        var screendata = await getScreens(projId)
+        if(screendata)dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
+        dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[]})
         dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         dispatch({type:actionTypes.SELECT_MODULE,payload:moduledata})
+        setBlockui({show:false});
+        setPopup({show:true,title:'Success',content:'Data saved successfully',submitText:'Ok'})
+        return;
     }else{
-        setPopup({show:true,title:'Error',content:'Error while Saving.',submitText:'Ok'})
+        setBlockui({show:false});
+        setPopup({show:true,title:'Error',content:((modId && modId.error)?modId.error:'Error while Saving'),submitText:'Ok'})
         return;
     }
 }
 
 const treeIterator = (c, d, e) =>{
     if (c != undefined) {
-        c.push({
+        const obj = {
             projectID: d.projectID,
             id: d.id,
             childIndex: d.childIndex,
@@ -115,8 +105,9 @@ const treeIterator = (c, d, e) =>{
             taskexists: (d.taskexists) ? d.taskexists : null,
             state: (d.state) ? d.state : "created",
             cidxch: (d.cidxch) ? d.cidxch : null // childindex changed
-        });
-        if (d.type == 'testcases') c[c.length - 1].screenname = d.parent.name; // **Impact check**
+        };
+        if (d.type == 'testcases') obj.screenname = d.parent.name; // **Impact check**
+        c.push(obj);
     }
     if (d.children && d.children.length > 0) d.children.forEach(function(t) {
         e = treeIterator(c, t, e);

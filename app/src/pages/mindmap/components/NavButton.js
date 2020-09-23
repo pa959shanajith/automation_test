@@ -20,7 +20,7 @@ const NavButton = (props) => {
             var factor = 0.4
             var extent = [0.1, 3]
             var s = d3.select('.mp__canvas_svg');
-            var  center = [parseFloat(s.style("width"))/2, parseFloat(s.style("height"))/2];
+            var center = [parseFloat(s.style("width"))/2, parseFloat(s.style("height"))/2];
             var mptf =  d3.select('.ct-container').attr('transform')
             var x = parseInt(mptf.split(/[()]/)[1].split(',')[0]) 
             var y = parseInt(mptf.split(/[()]/)[1].split(',')[1]);
@@ -64,15 +64,19 @@ const NavButton = (props) => {
    },[move])
 
     return(                                                                     
-        <Rnd enableResizing={false} bounds="parent">
+        <Rnd enableResizing={false} default={{x:100,y:90}} bounds="parent">
             <div id="navigate-widget">
                 <div className="arrow-box">
-                    <p><i className="arrow-box-ic up" onMouseUp={()=>{setMove(false)}} onMouseDown={()=>setMove('up')}></i></p>
+                    <p>
+                        <i className="arrow-box-ic up" onMouseUp={()=>{setMove(false)}} onMouseDown={()=>setMove('up')}></i>
+                    </p>
                     <p>
                         <i className="arrow-box-ic left" onMouseUp={()=>{setMove(false)}} onMouseDown={()=>setMove('left')}></i>
                         <i className="arrow-box-ic right" onMouseUp={()=>{setMove(false)}} onMouseDown={()=>{setMove('right')}}></i>
                     </p>
-                    <p><i className="arrow-box-ic down" onMouseUp={()=>{setMove(false)}} onMouseDown={()=>setMove('down')}></i></p>
+                    <p>
+                        <i className="arrow-box-ic down" onMouseUp={()=>{setMove(false)}} onMouseDown={()=>setMove('down')}></i>
+                    </p>
                 </div>
                 <div className="zoom-box">
                     <div><button className="zoom-btn" id="zoom_in" onMouseUp={()=>{setMove(false)}} onMouseDown={()=>setMove('zoom-up')}><span>+</span></button></div>

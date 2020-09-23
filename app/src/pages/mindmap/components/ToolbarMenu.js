@@ -1,6 +1,6 @@
 import React, { useState, useRef, Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {getModules} from '../api';
+import {getModules,getScreens,exportToExcel} from '../api';
 import '../styles/ToolbarMenu.scss';
 import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
@@ -15,6 +15,7 @@ const Toolbarmenu = () => {
     const dispatch = useDispatch()
     const SearchInp = useRef()
     const selectBox = useSelector(state=>state.mindmap.selectBoxState)
+    const selectedModule = useSelector(state=>state.mindmap.selectedModule)
     const selectNodes = useSelector(state=>state.mindmap.selectNodes)
     const copyNodes = useSelector(state=>state.mindmap.copyNodes)
     const prjList = useSelector(state=>state.mindmap.projectList)
@@ -26,9 +27,11 @@ const Toolbarmenu = () => {
     const selectProj = async(proj) => {
         dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
         var moduledata = await getModules({"tab":"tabCreate","projectid":proj,"moduleid":null})
+        var screendata = await getScreens(proj)
         setModList(moduledata)
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
         dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+        if(screendata)dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
         SearchInp.current.value = ""
     }
     const searchModule = (val) =>{
@@ -84,6 +87,9 @@ const Toolbarmenu = () => {
         d3.select('#copyImg').classed('active-map',false)
         paste({...copyNodes},setPopup)
     }
+    const clickExporttoExcel = () =>{
+        toExcel(initProj,selectedModule)
+    }
     var projectList = Object.entries(prjList)
     return(
         <Fragment>
@@ -97,8 +103,7 @@ const Toolbarmenu = () => {
                 <i className={"fa fa-crop fa-lg"+(selectBox?' active-map':'')} title="add a rectangle" onClick={clickSelectBox}></i>
                 <i className="fa fa-files-o fa-lg" title="copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
                 <i className="fa fa-clipboard fa-lg" title="Paste map" id="pasteImg" onClick={clickPasteNodes}></i>
-                <i className="fa fa-download fa-lg" title="Export To Excel"></i>
-                <i className="fa fa-upload fa-lg" title="Import Process Discovery File"></i>
+                <i className="fa fa-download fa-lg" title="Export To Excel" onClick={clickExporttoExcel}></i>
             </span>
             <span className='toolbar__header-searchbox'>
                 <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}></input>
@@ -108,6 +113,49 @@ const Toolbarmenu = () => {
         </div>
         </Fragment>
     )
+}
+
+const toExcel = async(projId,modId) => {
+    var data = {
+        "projectid":projId,
+        "moduleid":modId._id
+    }
+    var result = await exportToExcel(data)
+    var file = new Blob([result], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    var fileURL = URL.createObjectURL(file);
+    var a = document.createElement('a');
+    a.href = fileURL;
+    a.download = 'sample.xlsx';
+    //a.target="_new";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    //$window.open(fileURL, '_blank');
+    URL.revokeObjectURL(fileURL);
+
+    // if (result == "fail") openDialogMindmap("Fail", "Error while exporting to excel");
+    // else {
+    //     openWindow = 0;
+    //     if (openWindow == 0) {
+    //         var file = new Blob([result], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    //         if (isIE) {
+    //             navigator.msSaveOrOpenBlob(file);
+    //         }else{
+    //             var fileURL = URL.createObjectURL(file);
+    //             var a = document.createElement('a');
+    //             a.href = fileURL;
+    //             a.download = 'sample.xlsx';
+    //             //a.target="_new";
+    //             document.body.appendChild(a);
+    //             a.click();
+    //             document.body.removeChild(a);
+    //             //$window.open(fileURL, '_blank');
+    //             URL.revokeObjectURL(fileURL);
+    //         }
+    //         openDialogMindmap("Success", "Successfully exported to Excel");
+    //     }
+    //     openWindow++;
+    // }
 }
 
 const paste = (copyNodes,setPopup) =>{

@@ -123,9 +123,7 @@ exports.populateUsers = function (req, res) {
 
 };
 
-exports.getModules = async (req, res) => {
-	logger.info("Inside UI service: getModules");
-	const d = req.body;
+const getModule = async (d) => {
 	const inputs = {
 		"tab":d.tab,
 		"projectid":d.projectid || null,
@@ -134,7 +132,12 @@ exports.getModules = async (req, res) => {
 		"cycleid":d.cycId,
 		"name":"getModules"
 	}
-	const data = await utils.fetchData(inputs, "mindmap/getModules", "getModules");
+	return utils.fetchData(inputs, "mindmap/getModules", "getModules");
+};
+
+exports.getModules = async (req, res) => {
+	logger.info("Inside UI service: getModules");
+	const data = await getModule(req.body);
 	res.send(data);
 };
 
@@ -221,7 +224,6 @@ exports.saveData = function (req, res) {
 		var userroleid = req.session.activeRoleId;
 		var flag = inputs.write;
 		var removeTask = inputs.unassignTask;
-		var sendNotify = inputs.sendNotify;
 		//var relId = inputs.relId;
 		var cycId = inputs.cycId;
 		var idxDict = [];
@@ -727,11 +729,11 @@ exports.getScreens = function (req, res) {
 	}
 };
 
-exports.exportToExcel = function (req, res) {
+exports.exportToExcel = async (req, res) =>{
 	logger.info("Writing Module structure to Excel");
 	if (utils.isSessionActive(req)) {
 		var d = req.body;
-		var excelMap = d.excelMap;
+		var excelMap = await getModule({modName:null,cycId:null,"tab":"tabCreate","projectid":d.projectid,"moduleid":d.moduleid})
 		var dir = './../../excel';
 		var excelDirPath = path.join(__dirname, dir);
 		var filePath = path.join(excelDirPath, 'samp234.xlsx');

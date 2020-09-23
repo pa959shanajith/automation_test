@@ -12,6 +12,7 @@ import 'simplebar-react/dist/simplebar.min.css'
     thumbColor : color
     hideYbar : boolean 
     hideXbar : boolean 
+    verticalbarWidth: number
 */
 
 const ScrollBar = (props) => {
@@ -33,7 +34,7 @@ const ScrollBar = (props) => {
                     right: 2px;
                     border-radius: 3px;
                     background: ${props.trackColor?props.trackColor:'white'};
-                    width: 6px;
+                    width: ${props.verticalbarWidth?props.verticalbarWidth:'6px'};
                     ${(props.hideYbar)?'visibility: hidden!important':''};
                 }
                 .simplebar-track.simplebar-horizontal {
@@ -44,7 +45,7 @@ const ScrollBar = (props) => {
                 }
                 `}
             </style>
-            <SimpleBar scrollbarMaxSize={props.maxThumbSize?props.maxThumbSize:0} scrollbarMinSize={props.maxThumbSize?props.maxThumbSize:25} autoHide={false} style={{height:'inherit'}}>
+            <SimpleBar scrollbarMaxSize={props.maxThumbSize?props.maxThumbSize:0} scrollbarMinSize={props.maxThumbSize?props.maxThumbSize:25} autoHide={false} style={{maxHeight:'inherit',height:'inherit'}}>
                 {props.children}
             </SimpleBar>
         </Fragment>

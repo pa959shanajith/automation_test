@@ -16,7 +16,7 @@
     left: 1px;
     padding: 2px 0;
     margin: 0;
-    height: 56px;
+    max-height: 56px;
     width: 128px;
     font-size: 10px;
     text-align: left;
@@ -41,8 +41,16 @@
     font-size: 9px;
     color: #111;
     white-space: nowrap;
+    background: #e1e1e1;
+    font-style: normal;
 }
 #ct-inpSugg li>i:hover {
     text-decoration: none;
     background-color: #c3c3c3;
+}
+#ct-inpSugg .simplebar-track.simplebar-vertical{
+    bottom: 5px;
+}
+.errorClass {
+    border: 1px solid red;
 }
