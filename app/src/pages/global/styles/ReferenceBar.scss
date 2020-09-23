@@ -180,6 +180,10 @@
     border-radius: 4px 0 0 4px;
 }
 
+.task_pop__list{
+    overflow: auto;
+}
+
 .search_task__input{
     font-family: "LatoWeb";
     font-size: 13px;
@@ -213,77 +217,4 @@
     overflow: auto;
     margin-top: 10px;
     padding: 0 15px 0 25px;
-}
-
-.task_pop__list{
-    overflow: auto;
-    .rb__task-panel{
-        display: flex;
-        flex-direction: column;
-        min-height: 50px;
-        border-bottom: 1px solid #643693;
-        padding: 10px 0;
-    }
-    
-    .rb__active-task{
-        background-color: transparent;
-    }
-    
-    .rb__task-description{
-        div{
-            font-family: "LatoWeb";
-            font-size: 14px;
-            padding: 1px 10px;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-    }
-    
-    .rb__panel-content{
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        margin-bottom: 10px;
-        justify-content: space-between;
-        width: 100%;
-        font-family: "LatoWeb";
-    
-        h4{
-            font-family: "LatoWebBold";
-            font-size: 15px;
-            margin: 0;
-            flex-basis: 30px;
-        }
-    
-    }
-    
-    .rb__tasktype-btn{
-        outline: none;
-        border: none;
-        font-size: 14px;
-        border-radius: 20px;
-        height: 25px;
-        width: 80px;
-        color: white;
-        background: #a08ab7;
-        cursor: default;
-        &:hover{
-            cursor: default;
-        }
-        &:focus{
-            border: none;
-            outline: none;
-        }
-    }
-    
-    
-    .rb__assign-task{
-        font-size: 15px;
-        font-family: "LatoWebLight";
-        text-align: start;
-        flex-grow: 1;
-        padding: 0 10px 0 10px;
-        cursor: pointer;
-    }
 }

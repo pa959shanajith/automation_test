@@ -13,7 +13,7 @@
     display: flex;
     flex: auto;
     width: 100%;
-    background-color: #fff;
+    background-color: rgb(238, 238, 238);
     margin: 0;
     padding: 0;
 }
@@ -33,39 +33,11 @@
 .d__leftbar{
     left: 0;
     float: left;
-    width: 166px;
+    flex: 0 0 166px;
 }
 
 .d__rightbar{
     right: 0;
     float: right;
-    width: 90px;
-}
-
-.d__content{
-    flex-grow: 1;
-}
-
-.d__thumbnail input[type='checkbox']{
-    width: 18px;
-    height: 18px;
-    outline: none;
-}
-
-.d__thumbnail{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 20% 20px 15%;
-    font-size: 16px;
-}
-
-.d__thumbnail_title{
-    text-align: center;
-}
-
-.d__scrapeOn{
-    font-family: "LatoWebMedium";
-    font-size: 18px;
-    user-select: none;
+    flex: 0 0 90px;
 }

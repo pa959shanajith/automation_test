@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import * as pluginApi from "../api";
-import { RedirectPage, ScrollBar, ScreenOverlay } from '../../global';
 import { useHistory } from 'react-router-dom';
-import * as actionTypes from '../state/action';
-import TaskContents from './TaskContents';
+import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents } from '../../global';
 import FilterDialog from "./FilterDialog";
+import * as actionTypes from '../state/action';
+import * as pluginApi from "../api";
 import "../styles/TaskSection.scss";
 
 const TaskSection = ({userInfo, userRole, dispatch}) =>{
@@ -315,7 +314,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             </div>
             { notManager && <div className="task-overflow">
                 <ScrollBar thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" >
-                    <div className="task-content">
+                    <div className="task-content" id="plugin_page__list">
                         <TaskContents items={searchValue ? searchItems : activeTab === "todo" ? todoItems : reviewItems} filterDat={filterDatState} taskJson={taskJson} />
                     </div>
                  </ScrollBar>

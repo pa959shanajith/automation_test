@@ -14,7 +14,6 @@ const ChangePassword = ({setShow, loginApi, setSuccessPass}) => {
 
     const handleClose = () => setShow(false);
     const showSuccessPopup = () => setSuccessPass(true);
-    const handleOpen = () => setShow(true);
 
     const currPassHandler = event => {
         let val = event.target.value.replace(/\s/g, "");

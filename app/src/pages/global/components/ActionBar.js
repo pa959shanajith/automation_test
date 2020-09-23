@@ -32,7 +32,7 @@ const ActionBar = (props) => {
                 <ScrollBar scrollId="action_bar_scroll"  thumbColor="rgb(255, 255, 255, 0.27)" trackColor="transparent">    
                     <div className="action__contents">
                         <div className={"ab__contents " + (props.bottomContent ? "ab__upper_contents" : "")}>
-                            {props.children ? props.children : props.upperContent}
+                            {props.children || props.upperContent}
                         </div>
                         { props.bottomContent &&
                             <div className="ab__bottom_contents">

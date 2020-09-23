@@ -205,7 +205,7 @@ const LoginFields = (props) => {
             </div>
             {userError && !loginValidation ? <div className="error-msg">Please Enter Username</div> : null}
             {
-            showPassField ?
+            showPassField &&
                 <>
                 <div className="password-wrap" style={passError ? styles.errorBorder : null }>
                     <span className="ic-holder"><img className="ic-password" alt="pass-ic" src={passError ? res.errorPassIcon : res.defaultPassIcon}/></span>
@@ -216,7 +216,6 @@ const LoginFields = (props) => {
                 <div className="error-msg">{loginValidation}</div>
                 <button className="login-btn" type="submit" disabled={requested} onFocus={()=>{setFocus("login")}} onClick={login}>Login</button>
                 </>
-            : false
             }
             </form>
         } </> }
