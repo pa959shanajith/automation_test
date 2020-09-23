@@ -10,10 +10,13 @@ const DesignHome = () => {
     const current_task = useSelector(state=>state.plugin.CT)
 
     const [appType, setAppType] = useState(null);
+    const [isMac, setIsMac] = useState(false);
 
     useEffect(()=>{
         let getTaskName = current_task.taskName;
         setAppType(current_task.appType);
+        const macOS = navigator.appVersion.indexOf("Mac") !== -1;
+        setIsMac(macOS);
     }, []);
 
 
@@ -23,7 +26,7 @@ const DesignHome = () => {
                 <div className="d__mid_section">
                     
                         <div className="d__leftbar">
-                            <ActionBar upperContent={<UpperContent appType={appType}/>} bottomContent={<BottomContent />}/>
+                            <ActionBar upperContent={<UpperContent appType={appType} isMac={isMac}/>} bottomContent={<BottomContent />}/>
                         </div>
                     
                     <div className="d__content">Content</div>

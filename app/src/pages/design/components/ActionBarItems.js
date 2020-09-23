@@ -1,7 +1,7 @@
 import React from 'react';
 import { Thumbnail } from '../../global';
 
-const UpperContent = ({appType}) => {
+const UpperContent = ({appType, isMac}) => {
     let renderComp = [
                     <div className='d__scrapeOn'>Debug On</div>, 
                     <div className="d__thumbnail">
@@ -10,7 +10,9 @@ const UpperContent = ({appType}) => {
                     </div>
                     ];
 
-    if (appType === "Web" || true) renderComp.splice(1, 0, <>{WebList.map(icon => <Thumbnail title={icon.title} img={icon.img} svg={icon.svg} />)}</>)
+    if (appType === "Web") {renderComp.splice(1, 0, <>
+                                {WebList.map(icon => <Thumbnail title={icon.title} img={icon.img} svg={icon.svg} />)}
+                                { isMac && <Thumbnail title="Safari" img="static/imgs/ic-safari.png" />}</>)}
     else if (appType === "OEBS") renderComp.splice(1, 0, <>{oebsList.map(icon => <Thumbnail title={icon.title} img={icon.img} />)}</>)
     else if (appType === "Desktop") renderComp.splice(1, 0, <>{desktopList.map(icon => <Thumbnail title={icon.title} img={icon.img} />)}</>)
     else if (appType === "System") renderComp.splice(1, 0, <>{systemList.map(icon => <Thumbnail title={icon.title} img={icon.img} />)}</>)
