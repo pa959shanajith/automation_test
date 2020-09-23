@@ -33,6 +33,7 @@
         font-family: "LatoWebBold";
         font-size: 18px;
         margin: 0;
+        flex-basis: 40px;
     }
 
 }
@@ -60,7 +61,7 @@
     font-size: 17px;
     text-align: start;
     flex-grow: 1;
-    padding: 0 40px;
+    padding: 0 10px 0 10px;
     cursor: pointer;
 }
 

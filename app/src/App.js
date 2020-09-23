@@ -8,6 +8,7 @@ import Admin from './pages/admin';
 import Plugin from './pages/plugin';
 import Mindmap from './pages/mindmap';
 import Scrape from './pages/scrapescreen';
+import Design from './pages/design';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 
@@ -28,6 +29,7 @@ const App = () => {
           <Route path="/mindmap" component={Mindmap} />
           <Route path="/plugin" component={Plugin} />
           <Route path ="/scrape" component={Scrape}/>
+          <Route path ="/design" component={Design}/>
           <Route component={Base} />
         </Switch>
       </Router>

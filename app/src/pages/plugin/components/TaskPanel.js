@@ -61,26 +61,20 @@ const TaskPanel = ({item, showPanel, setShowPanel, filterDat, taskJson}) => {
             window.localStorage['navigateScreen'] = "Scrape";
             window.localStorage['navigateScrape'] = true;
             setRedirectTo("/scrape")
-            // history.replace('/scrape')
-            // $window.location.assign("/design");
 
         }
         else if(dataobj_json.subtask === "TestCase"){
             window.localStorage['navigateScreen'] = "TestCase";
             window.localStorage['navigateTestcase'] = true;
-            // setRedirectTo("/plugin")
-            history.replace("/plugin")
-            // $window.location.assign("/designTestCase");
+            setRedirectTo("/design")
         }
         else if(dataobj_json.subtask === "TestSuite"){
             window.localStorage['navigateScreen'] = "TestSuite";
-            // setRedirectTo("/plugin")
             history.replace("/plugin")
             // $window.location.assign("/execute");
         }
         else if(dataobj_json.subtask === "Scheduling"){
             window.localStorage['navigateScreen'] = "scheduling";
-            // setRedirectTo("/plugin")
             history.replace("/plugin")
             // $window.location.assign("/scheduling");
         }
