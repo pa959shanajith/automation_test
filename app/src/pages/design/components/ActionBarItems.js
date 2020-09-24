@@ -1,5 +1,6 @@
 import React from 'react';
 import { Thumbnail } from '../../global';
+import "../styles/ActionBarItems.scss"
 
 const UpperContent = ({appType, isMac}) => {
     let renderComp = [

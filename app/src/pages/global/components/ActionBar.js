@@ -22,17 +22,16 @@ const ActionBar = (props) => {
     }, []);
 
     return (
+        <div className={"action__wrapper " + (!collapse && "action__wrapper__expand")}>
         <div className="action__bar">
-            { props.collapsible && <div className={"caret__action_bar " + (collapse && " caret_action_collapsed") } onClick={()=>setCollapse(!collapse)}>
-                {collapse ? ">" : "<"}
-            </div>}
+            { props.collapsible && <div className={"caret__action_bar " + (collapse ? "fa fa-caret-right caret_action_collapsed" : "fa fa-caret-left") } onClick={()=>setCollapse(!collapse)}></div>}
             { !collapse && 
             <div className="action__content">
                 <div id="action_bar_scroll" className="scrollable_action_container">
                 <ScrollBar scrollId="action_bar_scroll"  thumbColor="rgb(255, 255, 255, 0.27)" trackColor="transparent">    
                     <div className="action__contents">
                         <div className={"ab__contents " + (props.bottomContent ? "ab__upper_contents" : "")}>
-                            {props.children ? props.children : props.upperContent}
+                            {props.children || props.upperContent}
                         </div>
                         { props.bottomContent &&
                             <div className="ab__bottom_contents">
@@ -43,6 +42,7 @@ const ActionBar = (props) => {
                 </ScrollBar>    
                 </div>  
             </div>}
+        </div>
         </div>
     );
 

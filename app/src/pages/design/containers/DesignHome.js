@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import DesignContent from '../components/DesignContent';
 import { UpperContent, BottomContent } from "../components/ActionBarItems";
 import { ReferenceContent } from "../components/RefBarItems";
 import { Header, FooterTwo as Footer, ActionBar, ReferenceBar } from '../../global';
@@ -9,11 +10,12 @@ const DesignHome = () => {
     
     const current_task = useSelector(state=>state.plugin.CT)
 
+    const [taskName, setTaskName] = useState(null);
     const [appType, setAppType] = useState(null);
     const [isMac, setIsMac] = useState(false);
 
     useEffect(()=>{
-        let getTaskName = current_task.taskName;
+        setTaskName(current_task.taskName);
         setAppType(current_task.appType);
         const macOS = navigator.appVersion.indexOf("Mac") !== -1;
         setIsMac(macOS);
@@ -25,15 +27,9 @@ const DesignHome = () => {
             <Header />
                 <div className="d__mid_section">
                     
-                        <div className="d__leftbar">
-                            <ActionBar upperContent={<UpperContent appType={appType} isMac={isMac}/>} bottomContent={<BottomContent />}/>
-                        </div>
-                    
-                    <div className="d__content">Content</div>
-                    
-                        <div className="d__rightbar">
-                            <ReferenceBar><ReferenceContent /></ReferenceBar>
-                        </div>
+                    <ActionBar upperContent={<UpperContent appType={appType} isMac={isMac}/>} bottomContent={<BottomContent />}/>
+                    <DesignContent taskName={taskName}/>
+                    <ReferenceBar ><ReferenceContent /></ReferenceBar>
                     
                 </div>
                 <div className='d__footer'><Footer/></div>

@@ -1,0 +1,82 @@
+.d__content{
+    display: flex;
+    flex-direction: column;
+    flex: 0 1 100%;
+    min-width: 0;
+    padding: 20px;
+    margin: 0 5px;
+    background-color: #fff;
+}
+
+.d__task_title{
+    margin-bottom: 10px;
+   max-width: 80%;
+}
+
+.d__task_name{
+    background-color: #331d4e;
+    color: #fff;
+    padding: 1px 14px 0;
+    font-family: "LatoWebLight";
+    font-size: 18px;
+    width: fit-content;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border-radius: 5px;
+}
+
+.d__btn{
+    border: none;
+    outline: none;
+    color: #fff;
+    border-radius: 20px;
+}
+
+.d__btngroup{
+    display: flex;
+    width: 100%;
+    margin-bottom: 15px;
+    font-family: 'LatoWebLight';
+}
+
+.d__table_ac_btn_grp{
+    display: inherit;
+}
+
+.d__tblBtn_ic{
+    padding: 6px 16px;
+    font-size: 14px;
+    margin: 0 3px;
+    vertical-align: middle;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.d__tblBtn{
+    border: none;
+    outline: none;
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+}
+
+.d__taskBtns{
+    display: flex;
+    align-items: center;
+    margin-left: 60px;
+    flex-grow: 1;
+    font-size: 14px;
+}
+
+.d__taskBtn{
+    padding: 0px 12px;
+    margin-right: 10px;
+    background-color: #633693;
+}
+
+.d__submitBtn{
+    background-color: #ff7300;
+    padding: 2px 15px;
+    font-size: 17px;
+    margin-right: 5px;
+}
