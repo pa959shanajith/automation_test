@@ -22,22 +22,4 @@
     position: static;
 }
 
-.d__leftbar, .d__rightbar{
-    position: relative;
-    display: flex;
-    height: 100%;
-    // width: 6px;
-    color: #fff;
-}
 
-.d__leftbar{
-    left: 0;
-    float: left;
-    flex: 0 0 166px;
-}
-
-.d__rightbar{
-    right: 0;
-    float: right;
-    flex: 0 0 90px;
-}

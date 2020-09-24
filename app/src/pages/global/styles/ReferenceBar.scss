@@ -88,13 +88,34 @@
 // }
 
 
+.ref__wrapper{
+    position: relative;
+    display: flex;
+    height: 100%;
+    // width: 6px;
+    color: #fff;
+    right: 0;
+    float: right;
+    flex: 0 0 6px;
+}
+
+.ref__wrapper__expand{
+    flex: 0 0 90px;
+}
+
 .caret__ref_bar{
     position: absolute;
     top: 50%;
+    display: flex!important;
+    align-items: center;
+    justify-content: center;
+    color: #444;
+    width: 6px;
+    height: 25px;
     left: 0;
     z-index: 100;
     cursor: pointer;
-    background-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(255, 255, 255, 0.7);
 }
 
 .caret_ref_collapsed{

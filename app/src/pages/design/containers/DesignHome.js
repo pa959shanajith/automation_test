@@ -26,13 +26,11 @@ const DesignHome = () => {
         <div className="d__body">
             <Header />
                 <div className="d__mid_section">
-                    <div className="d__leftbar">
-                        <ActionBar upperContent={<UpperContent appType={appType} isMac={isMac}/>} bottomContent={<BottomContent />}/>
-                    </div>
+                    
+                    <ActionBar upperContent={<UpperContent appType={appType} isMac={isMac}/>} bottomContent={<BottomContent />}/>
                     <DesignContent taskName={taskName}/>
-                    <div className="d__rightbar">
-                        <ReferenceBar><ReferenceContent /></ReferenceBar>
-                    </div>
+                    <ReferenceBar ><ReferenceContent /></ReferenceBar>
+                    
                 </div>
                 <div className='d__footer'><Footer/></div>
         </div>

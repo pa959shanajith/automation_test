@@ -107,11 +107,10 @@ const ReferenceBar = (props) => {
     }
 
     return (
+        <div className={"ref__wrapper " + (!collapse && "ref__wrapper__expand")}>
         <div className="ref__bar">
             { props.collapsible &&
-                 <div className={"caret__ref_bar " + (collapse && " caret_ref_collapsed") } onClick={()=>setCollapse(!collapse)}>
-                {collapse ? "<" : ">"}
-                </div>
+                <div className={"caret__ref_bar " + (collapse ? "fa fa-caret-left caret_ref_collapsed" : "fa fa-caret-right") } onClick={()=>setCollapse(!collapse)}></div>
             }
             { !collapse && 
                 <>
@@ -154,6 +153,7 @@ const ReferenceBar = (props) => {
                 </div>
         </>
         }
+        </div>
         </div>
     );
 }
