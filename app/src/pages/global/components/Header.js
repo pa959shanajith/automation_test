@@ -237,11 +237,11 @@ const Header = () => {
 
                         <ClickAwayListener onClickAway={onClickAwayUD}>
                         <div className="user-name-btn no-border" data-toggle="dropdown" onClick={()=>setShowUD(true)}>
-                            <span className="user-name">{username ? username : "Demo User"}</span>
+                            <span className="user-name">{username || "Demo User"}</span>
                             <span><img className = "user-name-icon" alt="user-ic" src="static/imgs/ic-user-nav.png"/></span>
                         </div>
                         <div className={"user-name-menu dropdown-menu dropdown-menu-right " + (showUD && "show")}>
-                            <div><Link className="user-role-item" to="#">{userRole ? userRole : "Test Manager"}</Link></div>
+                            <div><Link className="user-role-item" to="#">{userRole || "Test Manager"}</Link></div>
                             <div className="divider" />
                             {
                                 !adminDisable &&

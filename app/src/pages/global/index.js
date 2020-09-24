@@ -10,6 +10,6 @@ import ModalContainer from './components/ModalContainer';
 import ActionBar from './components/ActionBar';
 import ReferenceBar from './components/ReferenceBar';
 import Thumbnail from './components/Thumbnail';
-import {Encrypt} from './components/Encrypt';
+import TaskContents from './components/TaskContents';
 
-export { Header, FooterOne, FooterTwo, ProgressBar, SetProgressBar, RedirectPage, ScreenOverlay, ScrollBar, PopupMsg, ModalContainer, Encrypt, ActionBar, ReferenceBar, Thumbnail};
+export { Header, FooterOne, FooterTwo, ProgressBar, SetProgressBar, RedirectPage, ScreenOverlay, ScrollBar, PopupMsg, ModalContainer, ActionBar, ReferenceBar, Thumbnail, TaskContents};

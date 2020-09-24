@@ -1,26 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { Encrypt } from '../../global';
 import PluginBox from './PluginBox';
-import { Link } from 'react-router-dom';
 import "../styles/PluginSection.scss"
 
-const PluginSection = ({userInfo, userRole, dispatch}) => {
+const PluginSection = ({userInfo}) => {
 
     const [pluginList, setPluginList] = useState([]);
 
     useEffect(()=>{
         if (Object.keys(userInfo).length!==0){
             let tempList = [];
-            let plugins = [];
             let availablePlugins = userInfo.pluginsInfo;
             let pluginsLength = availablePlugins.length;
             for(let i=0 ; i < pluginsLength ; i++){
                 if(availablePlugins[i].pluginValue !== false){
                     let pluginName = availablePlugins[i].pluginName;
-                    let pluginTxt = pluginName.replace(/\s/g,'');
-                    let dataName = Encrypt.encode("p_"+pluginTxt);
-                    plugins.push("p_"+pluginName);
-                    tempList.push({'pluginName': pluginName, 'pluginTxt': pluginTxt, 'dataName': dataName});
+                    tempList.push({'pluginName': pluginName});
                 }
             }
             setPluginList(tempList);

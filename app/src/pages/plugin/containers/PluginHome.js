@@ -40,7 +40,7 @@ const PluginHome = () => {
                     Welcome {name}!
                 </div>
                 <div className="page-contents">
-                    <PluginSection userInfo={userInfo} userRole={userRole} dispatch={dispatch}/>
+                    <PluginSection userInfo={userInfo}/>
                     <div className="section-divider" />
                     <TaskSection userInfo={userInfo} userRole={userRole} dispatch={dispatch}/>
                 </div>

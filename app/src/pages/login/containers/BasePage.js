@@ -89,7 +89,7 @@ const BasePage = () => {
         {redirectTo ? <Redirect to={redirectTo} /> :
         < StaticElements> 
             <div className="error-msg">{loginValidation}</div>
-            {loginAgain ? <span className="error-msg">Click <Link to="/login">here</Link> to login again.</span> : null}
+            {loginAgain && <span className="error-msg">Click <Link to="/login">here</Link> to login again.</span>}
         </ StaticElements>
         }
         </>

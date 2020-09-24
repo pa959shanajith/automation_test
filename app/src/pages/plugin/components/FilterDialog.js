@@ -43,12 +43,10 @@ const FilterDialog = ({setShow, filterDat, filterData, filterTasks}) => {
         }
     }, []);
 
-    const content = () => (
+    const Content = () => (
         <div className="filter_body">
-            {console.log(task)}
             <ScrollBar thumbColor="#311d4e" trackColor="#fff">
             <div className="filter_content">
-                
                 <div className="selection-lbl">
                     <span>Select Project</span>
                 </div>
@@ -116,7 +114,7 @@ const FilterDialog = ({setShow, filterDat, filterData, filterTasks}) => {
         filterTasks(filterData);
     }
 
-    const footer = () => (
+    const Footer = () => (
         <>
             <button onClick={onResetFields}>Reset Fields</button>
             <button onClick={filter}>Filter</button>
@@ -127,9 +125,9 @@ const FilterDialog = ({setShow, filterDat, filterData, filterTasks}) => {
         <div className="filter__pop">
         <ModalContainer 
             title="Filter Tasks"
-            content={content()}
+            content={<Content/>}
             close={()=>setShow(false)}
-            footer={footer()}
+            footer={<Footer/>}
         />
         </div>
     );
