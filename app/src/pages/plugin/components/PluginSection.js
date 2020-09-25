@@ -1,30 +1,35 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import PluginBox from './PluginBox';
 import "../styles/PluginSection.scss"
 
-const PluginSection = () => {
+const PluginSection = ({userInfo}) => {
+
+    const [pluginList, setPluginList] = useState([]);
+
+    useEffect(()=>{
+        if (Object.keys(userInfo).length!==0){
+            let tempList = [];
+            let availablePlugins = userInfo.pluginsInfo;
+            let pluginsLength = availablePlugins.length;
+            for(let i=0 ; i < pluginsLength ; i++){
+                if(availablePlugins[i].pluginValue !== false){
+                    let pluginName = availablePlugins[i].pluginName;
+                    tempList.push({'pluginName': pluginName});
+                }
+            }
+            setPluginList(tempList);
+        }
+    }, [userInfo]);
+
     return(
         <div className="plugin-section">
             <div className="avail-plugin-title">Available Plugins</div>
             <div className="plugin-blocks">
-                <div >
-                    <Link to="/mindmap" className="plugin-block">
-                        <img className="plugin-ic" alt="plugin-ic" src="static/imgs/Mindmaps.png" />
-                        <span className="plugin-text">Mindmaps</span>
-                    </Link>
-                </div>
-                <div className="plugin-block">
-                    <img className="plugin-ic" alt="plugin-ic" src="static/imgs/Reports.png" />
-                    <span className="plugin-text">Reports</span>
-                </div>
-                <div className="plugin-block">
-                    <img className="plugin-ic" alt="plugin-ic" src="static/imgs/Utilities.png" />
-                    <span className="plugin-text">Utilities</span>
-                </div>
-                <div className="plugin-block">
-                    <img className="plugin-ic" alt="plugin-ic" src="static/imgs/Integrations.png" />
-                    <span className="plugin-text">Integrations</span>
-                </div>
+                {
+                    pluginList.length !==0 && pluginList.map(plugin=>
+                        <PluginBox plugin={plugin}/>
+                    )
+                }
             </div>
         </div>
     );

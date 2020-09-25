@@ -29,7 +29,7 @@ const PluginHome = () => {
         else{
             console.log("UserInfo Empty")
         }
-    }, [userInfo]);
+    }, [userInfo, userRole]);
 
     return(
         <div className="plugin-bg-container">
@@ -40,9 +40,9 @@ const PluginHome = () => {
                     Welcome {name}!
                 </div>
                 <div className="page-contents">
-                    <PluginSection />
+                    <PluginSection userInfo={userInfo}/>
                     <div className="section-divider" />
-                    <TaskSection userInfo={userInfo} userRoles={userRole} dispatch={dispatch}/>
+                    <TaskSection userInfo={userInfo} userRole={userRole} dispatch={dispatch}/>
                 </div>
             </div>
             <FooterOne/>

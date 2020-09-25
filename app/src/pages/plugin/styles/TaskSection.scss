@@ -23,7 +23,7 @@
     display: flex;
     flex-direction: column;
     flex: 1;
-    height: 60%;
+    height: 85%;
 }
 
 .filter-ic{
@@ -43,6 +43,10 @@
         vertical-align: 0;
         border-style: none;
     }
+}
+
+.filter-on{
+    background-color: #b875da;
 }
 
 .my-task{

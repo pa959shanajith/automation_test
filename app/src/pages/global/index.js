@@ -7,6 +7,9 @@ import ScreenOverlay from './components/ScreenOverlay';
 import ScrollBar from './components/ScrollBar';
 import PopupMsg from './components/PopupMsg';
 import ModalContainer from './components/ModalContainer';
-// import ChangePassword from './components/ChangePassword';
+import ActionBar from './components/ActionBar';
+import ReferenceBar from './components/ReferenceBar';
+import Thumbnail from './components/Thumbnail';
+import TaskContents from './components/TaskContents';
 
-export { Header, FooterOne, FooterTwo, ProgressBar, SetProgressBar, RedirectPage, ScreenOverlay, ScrollBar, PopupMsg, ModalContainer};
+export { Header, FooterOne, FooterTwo, ProgressBar, SetProgressBar, RedirectPage, ScreenOverlay, ScrollBar, PopupMsg, ModalContainer, ActionBar, ReferenceBar, Thumbnail, TaskContents};
