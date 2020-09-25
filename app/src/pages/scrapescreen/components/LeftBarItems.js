@@ -1,7 +1,8 @@
-import React ,{useState , useEffect, Fragment} from'react';
+import React ,{useState , useEffect, Fragment} from 'react';
 import '../styles/LeftBarItems.scss'
-import {GetScrapeDataScreenLevel_ICE} from '../api';
-import {ScrollBar} from '../../global';
+import {GetScrapeDataScreenLevel_ICE ,initScraping_ICE } from '../api';
+import {ScrollBar , ModalContainer } from '../../global';
+import ModalContent from './ModalContent'
 
 /*Component LeftBarItems
   use: renders  6 options in design  in the left of screen
@@ -22,6 +23,8 @@ const CreateOptions = (props) => {
         
         
   const [appen , setAppen] =useState(false)
+
+  const [os , setOs]= useState(" ")
 
   const macOS = navigator.appVersion.indexOf("Mac") != -1;
         
@@ -69,13 +72,34 @@ const CreateOptions = (props) => {
       testCaseName: "",
       testSuiteDetails: [{assignedTime: "", releaseid: "", cycleid: "", testsuiteid: "", testsuitename: ""}],
       versionnumber: 0
+    },
+    {
+      appType: "MobileApp",
+      assignedTestScenarioIds: [],
+      batchTaskIDs: ["5f6c8a62d2876445ecee6c82"],
+      cycleid: "5f6c84c8d2876445ecee6c6e",
+      projectId: "5f6c84c8d2876445ecee6c6f",
+      releaseid: "Rel1",
+      reuse: "False",
+      scenarioFlag: "False",
+      scenarioId: "",
+      screenId: "5f6c8a42d2876445ecee6c80",
+      screenName: "Screen_5",
+      status: "inprogress",
+      subTask: "Scrape",
+      subTaskId: "5f6c8a62d2876445ecee6c82",
+      taskName: "Scrape Screen_5",
+      testCaseId: "",
+      testCaseName: "",
+      testSuiteDetails: [{assignedTime: "", releaseid: "", cycleid: "", testsuiteid: "", testsuitename: ""}],
+      versionnumber: 0
     }
   ]
 
 
-  localStorage.setItem('user' , JSON.stringify(_CT));
+  localStorage.setItem('_CT' , JSON.stringify(_CT));
 
-  const user = JSON.parse(localStorage.getItem('user'))
+  const user = JSON.parse(localStorage.getItem('_CT'))
 
   const apptype = user[1].appType;
           
@@ -89,8 +113,18 @@ const CreateOptions = (props) => {
       }
     })()
   }, [macOS])
-          
-    
+
+  
+
+  const callICE =async(browesertype)=>{
+    const items = await initScraping_ICE(browesertype);
+    props.setScpitm(items);
+  }
+  const onClose = () =>{
+    props.setMweb(false);
+    setOs(" ")
+  }
+
   return (
     <div className="leftnav" >
       {(apptype=== "Web")? 
@@ -100,11 +134,11 @@ const CreateOptions = (props) => {
               <div className="leftbar-top">
                 <ul>
                   <li><i className="scrapeOnTxt">Scrape On</i></li>
-                  <li><i className={flag?"browserIcon" : "special"}   title="Launch Internet Explorer"><span className="fa fa-internet-explorer fa-3x"></span><br/>Internet Explorer</i></li>
-                  <li><i className={flag?"browserIcon" : "special"}   title="Launch Google Chrome" ><span className="fa fa-chrome fa-3x"></span><br/>Google Chrome</i></li>
-                  {macOS? <li ><i className={flag?"browserIcon" : "special"} title="Launch Safari"><span className="fa fa-safari fa-3x"></span><br/>Safari</i></li> : null}
-                  <li><i className={flag?"browserIcon" : "special"}   title="Launch Mozilla Firefox"><span className="fa fa-firefox fa-3x"></span><br/>Mozilla Firefox</i></li>
-                  <li><i className={flag?"browserIcon" : "special"}   title="Launch Edge Legacy"><span className="fa fa-edge fa-3x"></span><br/>Edge Legacy</i></li>
+                  <li><i className={flag?"browserIcon" : "special"}   title="Launch Internet Explorer"><span onClick={()=> callICE('ie')} className="fa fa-internet-explorer fa-3x"></span><br/>Internet Explorer</i></li>
+                  <li><i className={flag?"browserIcon" : "special"}   title="Launch Google Chrome" ><span  onClick={()=> callICE('chrome')} className="fa fa-chrome fa-3x"></span><br/>Google Chrome</i></li>
+                  {macOS? <li ><i className={flag?"browserIcon" : "special"} title="Launch Safari"><span   className="fa fa-safari fa-3x"></span><br/>Safari</i></li> : null}
+                  <li><i className={flag?"browserIcon" : "special"}   title="Launch Mozilla Firefox"><span  onClick={()=> callICE('mozilla')} className="fa fa-firefox fa-3x"></span><br/>Mozilla Firefox</i></li>
+                  <li><i className={flag?"browserIcon" : "special"}   title="Launch Edge Legacy"><span  onClick={()=> callICE('edge')} className="fa fa-edge fa-3x"></span><br/>Edge Legacy</i></li>
                   <li><i className={flag?"browserIcon" : "special"}   title="Launch PDF utility" ><span className="fa fa-file-pdf-o fa-3x"></span><br/>PDF Utility</i></li>
                   <li className= {(!appen)?"special" : null}><i className="Append"    title="Append ON" ><span><input  type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/>Append</i></li>
                 </ul>
@@ -112,30 +146,16 @@ const CreateOptions = (props) => {
             </div>
             <div className="leftbottom">
               {options.map((e,i)=>(
-                <div className="cards" onClick={()=>props.setOptions(e.comp)} key={i}>
-                  <div>
+                  <div key={i} className="cards">
                     <img src={"static/imgs/"+e.ico} alt={e.label}/>
                     <div>{e.label}</div>
                   </div>
-                </div>
               ))}
             </div>
           </ScrollBar>
         </Fragment>
         : null }
-      {(apptype==="Desktop")? <div className="leftbar-container">
-        <div className="leftbar-top">
-          <ul>
-            <li><i className='scrapeOnTxt'>Scrape On</i></li>
-            <li><i className='browserIcon'   title="Desktop Apps"><span><img src='static/imgs/ic-desktop.png' alt='Desktop Apps' /></span><br/>Desktop Apps</i></li>
-            <li><i className='pdfIcon'   title="Launch PDF utility"><span><img src='static/imgs/ic-pdf_scrape.png' alt='pdf' /></span><br/>PDF Utility</i></li>
-            <li><i class='Append'   title="Append ON" ><span><input type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/><br/>Append</i></li>
-          </ul>
-        </div>
-      </div>: null}
-
-                
-      {(apptype==="SAP")? <div className="leftbar-container">
+        {(apptype==="SAP")? <div className="leftbar-container">
         <div className="leftbar-top">
           <ul>
             <li><i className='scrapeOnTxt'>Scrape On</i></li>
@@ -156,15 +176,18 @@ const CreateOptions = (props) => {
             <li><i class='Append'   title="Append ON" ><span><input type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/><br/>Append</i></li>
           </ul>
         </div>
-      </div> : null}
-
-                
+      </div> : null}    
       {(apptype==="MobileApp")? <div className="leftbar-container">
-        <div className="leftbar-top">
+        <div className="leftbar-top" id="leftbar-top">
+        {props.mweb  ? <ModalContainer title='Launch Application' 
+            content= {<ModalContent os={os} setOs={setOs}/>}
+            close={onClose} footer ={(os==="android" ||os==="ios")? <button>Launch</button> : null}/>: null}
+          {props.spdf  ? <ModalContainer title='Scrape Screen' content="No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server." close={()=>props.setSpdf(false)} footer ={<button>OK</button>}/>: null}
+          
           <ul>
-            <li><i className='scrapeOnTxt'>Scrape On</i></li>
-            <li><i className='browserIcon'   title="Desktop Apps"><span><img src='static/imgs/ic-mobility.png' alt='Desktop Apps' /></span><br/>Mobile Apps</i></li>
-            <li><i className='pdfIcon'   title="Launch PDF utility"><span><img src='static/imgs/ic-pdf_scrape.png' alt='pdf' /></span><br/>PDF Utility</i></li>
+            <li><i  className='scrapeOnTxt'>Scrape On</i></li>
+            <li><i className='browserIcon'   title="Desktop Apps"><span><img onClick={()=>props.setMweb(true)} src='static/imgs/ic-mobility.png' alt='Desktop Apps' /></span><br/>Mobile Apps</i></li>
+            <li><i className='pdfIcon'   title="Launch PDF utility"><span><img onClick={()=>props.setSpdf(true)} src='static/imgs/ic-pdf_scrape.png' alt='pdf' /></span><br/>PDF Utility</i></li>
             <li><i class='Append'   title="Append ON" ><span><input type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/><br/>Append</i></li>
           </ul>
         </div>
@@ -174,15 +197,17 @@ const CreateOptions = (props) => {
       {(apptype==="MobileWeb")? <div className="leftbar-container">
         <div className="leftbar-top">
           <ul>
-            <li><i className='scrapeOnTxt'>Scrape On</i></li>
-            <li><i className='browserIcon'   title="Desktop Apps"><span><img src='static/imgs/ic-mobility.png' alt='Desktop Apps' /></span><br/>Mobile Web</i></li>
-            <li><i className='pdfIcon'   title="Launch PDF utility"><span><img src='static/imgs/ic-pdf_scrape.png' alt='pdf' /></span><br/>PDF Utility</i></li>
+            <li><i  className='scrapeOnTxt'>Scrape On</i></li>
+            <li><i  className='browserIcon'   title="Desktop Apps"><span><img  src='static/imgs/ic-mobility.png' alt='Desktop Apps' /></span><br/>Mobile Web</i></li>
+            <li><i className='pdfIcon'   title="Launch PDF utility"><span><img   src='static/imgs/ic-pdf_scrape.png' alt='pdf' /></span><br/>PDF Utility</i></li>
             <li><i className='Append'   title="Append ON" ><span><input type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/><br/>Append</i></li>
           </ul>
         </div>
       </div> : null}
       {(apptype==="desktop")? <div className="leftbar-container">
         <div className="leftbar-top">
+        {props.mweb  ? <ModalContainer title='Launch Application' content={<div><br/><input className="modalInput" type="text" placeholder="AndroidDeviceSerialNo/IOSDeviceNO"/><br/><br/><input className="modalInput" type="text" placeholder="Android/IOSVersion" /></div>} close={()=>props.setMweb(false)} footer ={<button>Launch</button>}/>: null}
+          {props.spdf  ? <ModalContainer title='Scrape Screen' content="No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server." close={()=>props.setSpdf(false)} footer ={<button>OK</button>}/>: null}
           <ul>
             <li><i className='scrapeOnTxt'>Scrape On</i></li>
             <li><i className='browserIcon'   title="Desktop Apps"><span><img src='static/imgs/ic-desktop.png' alt='Desktop Apps' /></span><br/>Desktop Apps</i></li>

@@ -1,24 +1,102 @@
 import React , {useState, useEffect} from'react';
+import {useSelector} from "react-redux"
+import {PopupMsg } from '../../global';
 import '../styles/CenterScr.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {GetScrapeDataScreenLevel_ICE} from '../api';
+import {GetScrapeDataScreenLevel_ICE , updateScreen_ICE} from '../api';
+import ScrapeObject from './ScrapeObject.js'
 
 
-var ScrapeCenter =()=>{
+
+var ScrapeCenter =(props)=>{
     const user = JSON.parse(localStorage.getItem('user'))
     const taskScrenName = user[1].taskName;
-    const [task , setTask] = useState(false)
+    var screenId = JSON.parse(localStorage.getItem('user'))[1].screenId;
+    var projectId = JSON.parse(localStorage.getItem('user'))[1].projectId;
+    var testCaseId = JSON.parse(localStorage.getItem('user'))[1].testCaseId;
+    var type = JSON.parse(localStorage.getItem('user'))[1].appType;
     const [custName , setCustName] = useState([])
     const [search , setSearch] = useState(true)
+    const [eye , setEye] = useState(false);
+    const [userInfo , setUserInfo] = useState([])
+    const userinfo = useSelector(state=> state.login.userinfo);
+    const [element, setElement]=useState([])
+    const [elementedit , setElementedit] = useState(false)
+    const [filtered, setFiltered] = useState([]);
+    const [searchVal, setSearchVal] = useState(null);
+    const [dubliobjlist , setDubliobjlist]= useState([ ]);
+    const [dubli , setDubli] = useState(true);
+    useEffect(()=>{
+        if(Object.keys(userinfo).length!==0){
+            setUserInfo(userinfo)
+        }
+    },[userinfo])
+
+    const scrapeObject = {
+        appType : type,
+        getScrapeData :props.scpitm,
+        insert_list : props.scpitm.view,
+        newData :props.scpitm,
+        param: "updateScrapeData_ICE",
+        projectId: projectId,
+        screenId: screenId,
+        screenName: taskScrenName,
+        type: "save",
+        userinfo: userInfo,
+    }
+
+    const onSearch=(e)=>{
+        var val = e.target.value;
+        var filter = []
+        var elem = [...element]
+        filter = [...elem].filter((e)=>e.toUpperCase().indexOf(val.toUpperCase())!==-1)
+        setFiltered(filter)
+        setSearchVal(val);
+    }
+    
     useEffect(() => {
         (async () =>{
             var res = await GetScrapeDataScreenLevel_ICE()
-            var custName =[] ;
-            custName = res.view;
-            setCustName(custName)
-            setTask(true);
+            setCustName(res.view)
+            const onetime =[...res.view.map((e)=>(e.custname))]
+            setElement(onetime)
         })()
     }, [])
+
+    useEffect(()=>{
+        if (props.scpitm.view){
+            var arr = [...custName.map((e)=>(e.custname))]
+            arr.push(props.scpitm.view[0]);
+            setCustName(arr)
+        }
+    }, [props.scpitm]); 
+
+    const callSavebtn = () => {
+        let findDuplicates = element.filter((item, index) => element.indexOf(item) != index)
+        if(findDuplicates.length !==0){
+            setDubliobjlist(findDuplicates)
+            setDubli(true)
+            console.log("save Btn was clicked")
+        }
+    }
+
+    const saveName = (i, cName, event)=>{
+        if(event.key === 'Enter'){
+            let arr = [...element]
+            arr.splice(i, 1, cName)
+            setElement(arr);
+            setElementedit(null);
+        }
+    }
+
+    const List = ({items}) => (
+        <>
+        {items.map((e,i) => (
+            <ScrapeObject key={i} item={e} idx={i} setElementedit={setElementedit} elementedit={elementedit} eye={eye} setEye={setEye} saveName={saveName}/>
+        ))}
+        </>
+    )
+    
     return(
         <div id="middleContent">
             <div className="page-taskName" >
@@ -34,17 +112,25 @@ var ScrapeCenter =()=>{
                         <input title="selectall" type="checkbox" className="checkstylebox"></input>
                         <span className="parentobject">
                             <span className="ascrapper">Select All</span>
-                            <button className=" btn" id="savetaskbtn" style={{marginLeft:"10px"}} title="savetask">Save</button>
+                            <button onClick={callSavebtn}className=" btn" id="savetaskbtn" style={{marginLeft:"10px"}} title="savetask">Save</button>
                             <button className="btn" id= "savetaskbtn" title="deletetask">Delete</button>
                             <button className="btn" id="savetaskbtn" title="edittask">Edit</button>
                             <span><i onClick={()=>setSearch(!search)}><img src="static/imgs/ic-search-icon.png" alt=" searchICon"/></i></span>
-                            <span><input type="textbox" className={search?"special searchdcrapinput" :"searchdcrapinput"}></input></span> 
+                            <span><input onChange={(e)=>onSearch(e)}type="textbox" className={search?"special searchdcrapinput" :"searchdcrapinput"}></input></span> 
                         </span>
                     </span>
                     <br/>
-                    {task? custName.map((e,i) => (
-                    <span key={i}>{e.custname}</span>
-                    )): null}
+                    {  
+                     <List items={ searchVal ? filtered : element}  />
+                    }
+                    {
+                        ((dubliobjlist.length!==0) && dubli)? 
+                            <PopupMsg 
+                                title="Save Scrape Data" 
+                                content={<span><span>Please rename/delete duplicate scraped objects</span><br></br><span>Object characterstics are same for:{dubliobjlist.map((e)=><div>{e}</div>)}</span></span>}
+                                close={()=>setDubli(false)} submit={()=>setDubli(false)} submitText ="ok"
+                            /> : null 
+                    }
                 </div>
             </div>
         </div>
