@@ -5,20 +5,27 @@ import * as pluginApi from '../../plugin/api';
 import * as actionTypes from "../../plugin/state/action";
 import "../styles/TaskContents.scss";
 
-const TaskContents = ({items, filterDat, taskJson}) => {
+const TaskContents = (props) => {
 
     const [showPanel, setShowPanel] = useState("");
 
     useEffect(()=>{
         setShowPanel("");
-    }, [items]);
+    }, [props.items]);
 
     return (
         <>
-        {items.length !== 0 ? 
+        {props.items.length !== 0 ? 
         <>
-        {items.map(item=>{
-            return <TaskPanel item={item} showPanel={showPanel} setShowPanel={setShowPanel} filterDat={filterDat} taskJson={taskJson} />
+        {props.items.map(item=>{
+            return <TaskPanel 
+                        item={item}
+                        showPanel={showPanel} 
+                        setShowPanel={setShowPanel} 
+                        filterDat={props.filterDat} 
+                        taskJson={props.taskJson}
+                        taskName={props.taskName}
+                    />
         })}
         </>
         : null }
@@ -28,10 +35,10 @@ const TaskContents = ({items, filterDat, taskJson}) => {
 }
 
 
-const TaskPanel = ({item, showPanel, setShowPanel, filterDat, taskJson}) => {
+const TaskPanel = (props) => {
 
-    const taskSuiteDetails = item.testSuiteDetails;
-    const dataobj = item.dataobj;
+    const taskSuiteDetails = props.item.testSuiteDetails;
+    const dataobj = props.item.dataobj;
 
     const history = useHistory();
     const dispatch = useDispatch();
@@ -40,7 +47,6 @@ const TaskPanel = ({item, showPanel, setShowPanel, filterDat, taskJson}) => {
     const [cyc, setCyc] = useState(null);
     const [appType, setAppType] = useState(null);
     const [descId, setDescId] = useState(null);
-    const [redirectTo, setRedirectTo] = useState("");
 
     const taskRedirection = event => {
         event.preventDefault();
@@ -76,20 +82,18 @@ const TaskPanel = ({item, showPanel, setShowPanel, filterDat, taskJson}) => {
         taskObj.releaseid = dataobj_json.releaseid;
         taskObj.cycleid = dataobj_json.cycleid;
         taskObj.reuse = dataobj_json.reuse;
-    
-        // DISPATCH
+
         dispatch({type: actionTypes.SET_CT, payload: taskObj});
-        // window.localStorage['_CT'] = JSON.stringify(taskObj);
+
         if(dataobj_json.subtask === "Scrape"){
             window.localStorage['navigateScreen'] = "Scrape";
             window.localStorage['navigateScrape'] = true;
-            setRedirectTo("/scrape")
-
+            history.replace("/scrape")
         }
         else if(dataobj_json.subtask === "TestCase"){
             window.localStorage['navigateScreen'] = "TestCase";
             window.localStorage['navigateTestcase'] = true;
-            setRedirectTo("/design")
+            history.replace("/design")
         }
         else if(dataobj_json.subtask === "TestSuite"){
             window.localStorage['navigateScreen'] = "TestSuite";
@@ -106,39 +110,36 @@ const TaskPanel = ({item, showPanel, setShowPanel, filterDat, taskJson}) => {
     const expandDetails = event =>{
         event.preventDefault();
         
-        if (showPanel === item.panel_idx) setShowPanel(null);
-        else setShowPanel(item.panel_idx)
+        if (props.showPanel === props.item.panel_idx) props.setShowPanel(null);
+        else props.setShowPanel(props.item.panel_idx)
 
         let data_object = JSON.parse(dataobj)
         let tdes = data_object['taskdes']
         
-        let clktask = taskJson[item.panel_idx];
+        let clktask = props.taskJson[props.item.panel_idx];
         let maintask = clktask;
         if(clktask.taskDetails[0].taskType != 'Design')
             clktask = clktask.testSuiteDetails[0];
         
-        setDescId(item.panel_idx);
+        setDescId(props.item.panel_idx);
         setDesc(tdes);
-        setRel(filterDat.idnamemaprel[clktask.releaseid]);
-        setCyc(filterDat.idnamemapcyc[clktask.cycleid]);
+        setRel(props.filterDat.idnamemaprel[clktask.releaseid]);
+        setCyc(props.filterDat.idnamemapcyc[clktask.cycleid]);
         setAppType(maintask.appType);
     }
 
 
     return (  
         <>
-        {
-            redirectTo ? <Redirect to={redirectTo} /> : 
-            <>
-            <div className={"task-panel " + (showPanel === item.panel_idx ? "active-task" : "")} panel-id={item.panel_idx}>
-            <div className="panel-content" id={`panelBlock_${item.panel_idx}`}>
-                <h4 className="task-num">{item.type_counter || item.counter}</h4>
-                <span className="assign-task" onClick={taskRedirection} >{item.taskname}</span>
+            <div className={"task-panel " + (props.showPanel === props.item.panel_idx ? "active-task " : "")} panel-id={props.item.panel_idx}>
+            <div className={"panel-content " + (props.taskName === props.item.taskname ? "disable-task " : "")} id={`panelBlock_${props.item.panel_idx}`}>
+                <h4 className="task-num">{props.item.type_counter || props.item.counter}</h4>
+                <span className="assign-task" onClick={taskRedirection} >{props.item.taskname}</span>
                 <div className="tasktype-btndiv">
-                    <button className="tasktype-btn" onClick={expandDetails}>{item.tasktype}</button>
+                    <button className="tasktype-btn" onClick={expandDetails}>{props.item.tasktype}</button>
                 </div>
             </div>
-            { showPanel === item.panel_idx &&
+            { props.showPanel === props.item.panel_idx &&
             <div className="task-description" description-id={descId}>
                 <div>Description: {desc}</div>
                 <div>Release: {rel}</div>
@@ -148,13 +149,11 @@ const TaskPanel = ({item, showPanel, setShowPanel, filterDat, taskJson}) => {
             }
             </div>
         </>
-        }
-        </>
     );
 }
 
 {/* <>
-<div className={"rb__task-panel " + (showPanel === item.panel_idx ? "rb__active-task" : "")} panel-id={item.panel_idx}>
+<div className={"rb__task-panel " + (showPanel === props.item.panel_idx ? "rb__active-task" : "")} panel-id={item.panel_idx}>
 <div className="rb__panel-content" id={`panelBlock_${item.panel_idx}`}>
     <h4 className="rb__task-num">{item.counter}</h4>
     <span className="rb__assign-task" onClick={taskRedirection} >{item.taskname}</span>

@@ -10,6 +10,7 @@ import "../styles/ReferenceBar.scss";
             collapsible : if true ReferenceBar can be collapsed or expand. Default is false 
             hideInfo : to hide the default info Icon . by default hideInfo is false
             children : renders the children passed above the task icon. 
+            taskName : to let the reference bar know which task to highlight as disabled.
     */
 
 const ReferenceBar = (props) => {
@@ -19,8 +20,8 @@ const ReferenceBar = (props) => {
     const [searchValue, setSearchValue] = useState("");
     const [searchItems, setSearchItems] = useState([]);
     const [showTask, setShowTask] = useState(false);
+    const [showInfo, setShowInfo] = useState(false);
     const [taskPopY, setTaskPopY] = useState(null);
-
 
     const tasksJson = useSelector(state=>state.plugin.tasksJson);
     const filterDat = useSelector(state=>state.plugin.FD);
@@ -83,6 +84,10 @@ const ReferenceBar = (props) => {
             setTaskList(task_list);
     }, [tasksJson]);
 
+    useEffect(()=>{
+        setShowTask(false);
+    }, [props.taskName]);
+
     const onSearchHandler = event => {
         searchTask(event.target.value)
         setSearchValue(event.target.value);
@@ -106,6 +111,11 @@ const ReferenceBar = (props) => {
         setShowTask(!showTask)
     }
 
+    const toggleInfoPop = event => {
+        setTaskPopY(event.clientY);
+        setShowInfo(!showInfo);
+    }
+
     return (
         <div className={"ref__wrapper " + (!collapse && "ref__wrapper__expand")}>
         <div className="ref__bar">
@@ -118,7 +128,7 @@ const ReferenceBar = (props) => {
                     <div id="ref_bar_scroll" className="inside_min">
                     {
                         showTask && 
-                        <div className="task_pop" style={{marginTop: `calc(${taskPopY}px - 15vh)`}}>
+                        <div className="ref_pop task_pop" style={{marginTop: `calc(${taskPopY}px - 15vh)`}}>
                             <h4 className="pop__header" onClick={()=>setShowTask(false)}><span className="pop__title">My task(s)</span><img className="task_close_arrow" src="static/imgs/ic-arrow.png"/></h4>
                             <div className="input_group">
                                 <span className="search_task__ic_box">
@@ -130,19 +140,39 @@ const ReferenceBar = (props) => {
                                 <div id='task_pop_scroll' className="task_pop__overflow">
                                     <ScrollBar scrollId='task_pop_scroll' trackColor="#46326b" thumbColor="#fff">
                                         <div className="task_pop__content" id="rb__pop_list">
-                                            <TaskContents items={searchValue ? searchItems : taskList} filterDat={filterDat} taskJson={tasksJson}/>
+                                            <TaskContents items={searchValue ? searchItems : taskList} taskName={props.taskName} filterDat={filterDat} taskJson={tasksJson}/>
                                         </div>
                                     </ScrollBar>
                                 </div>
                             </div>
                         </div>
                     }
+
+                    {
+                        showInfo && 
+                        <div className="ref_pop info_pop" style={{marginTop: `calc(${taskPopY}px - 15vh)`}}>
+                            <h4 className="pop__header" onClick={()=>setShowInfo(false)}><span className="pop__title">Information</span><img className="task_close_arrow" src="static/imgs/ic-arrow.png"/></h4>
+                            <div className="info_pop__contents">
+                            {
+                                Object.keys(props.taskInfo).map(key => 
+                                    <>
+                                    {/* // <div className="task_info"> */}
+                                        <div className="task_info__title">{key}:</div>
+                                        <div className="task_info__content">{props.taskInfo[key]}</div>
+                                    {/* // </div>     */}
+                                    </>
+                                )
+                            }
+                            </div>
+                        </div>
+                    }
+
                     <ScrollBar scrollId="ref_bar_scroll" trackColor="transparent" thumbColor="#7143b3">
                         <div className="ref__content">
                             <div className="rb_upper_contents">
                                     {props.children}
                                 <div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>
-                                { !props.hideInfo && <div className="ic_box"><img className="rb__ic-info thumb__ic" src="static/imgs/ic-info.png"/><span className="rb_box_title">Info</span></div>}
+                                { !props.hideInfo && <div className="ic_box" onClick={toggleInfoPop} ><img className="rb__ic-info thumb__ic" src="static/imgs/ic-info.png"/><span className="rb_box_title">Info</span></div>}
                             </div>
                         </div>
                     </ScrollBar>

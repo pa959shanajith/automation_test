@@ -54,6 +54,7 @@
 }
 
 #plugin_page__list {
+
     .task-panel{
         border-bottom: 1px solid #949494;
         padding: 0 15px 0 25px;
@@ -144,6 +145,12 @@
 }
 
 #rb__pop_list{
+
+    .disable-task{
+        pointer-events: none;
+        filter: brightness(0.5);
+    }
+    
     .task-panel{
         min-height: 50px;
         border-bottom: 1px solid #643693;
