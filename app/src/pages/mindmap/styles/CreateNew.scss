@@ -9,9 +9,9 @@
 .mp__canvas_container{
     position: relative;
     margin: 2px;
-    height: calc(100% - 4px);
-    width: calc(100% - 16px);
+    min-width: 0;
     float: left;
+    flex: 0 1 100%;
 }
 
 .loading-bar{

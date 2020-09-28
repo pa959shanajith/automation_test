@@ -11,7 +11,7 @@ const CreateOptions = (props) => {
   const options = [
     {ico : "ic-create-newMindmap.png",label:'Create New',comp:'newmindmap'},
     {ico : "ic-endtoendFlow.png",label:'End to End Flow',comp:'enemindmap'},
-    {ico :"ic-importfromexcel-mindmap.png",label:'Import From Excel',comp:'excelmindmap'}
+    {ico :"ic-importfromexcel-mindmap.png",label:'Import Mindmap',comp:'excelmindmap'}
   ]
   return (
     <div className='mindmap__option-container'>

@@ -10,16 +10,17 @@ import "../styles/ActionBar.scss";
         children : if one section then main content of the ActionBar. ex- <ActionBar> <YourContents/> </ActionBar>
         upperContent : if two sections then content on the upper half. 
         bottomContent :  contents of the bottom half. ex- <ActionBar upperContent={} bottomContent={} / 
+        collapseEvent : collapse Event return collapse state
+        collapse : set true to collpase Action bar
     */
 
     
 const ActionBar = (props) => {
 
     const [collapse, setCollapse] = useState(false);
-
     useEffect(()=>{
-        
-    }, []);
+        setCollapse(props.collapse)
+    },[props.collapse])
 
     return (
         <div className={"action__wrapper " + (!collapse && "action__wrapper__expand")}>

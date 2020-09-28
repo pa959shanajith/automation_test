@@ -17,7 +17,7 @@ const NavButton = (props) => {
         }else{
         interval = setInterval(()=>{
             var offset = -20
-            var factor = 0.4
+            var factor = 0.2
             var extent = [0.1, 3]
             var s = d3.select('.mp__canvas_svg');
             var center = [parseFloat(s.style("width"))/2, parseFloat(s.style("height"))/2];
@@ -56,9 +56,7 @@ const NavButton = (props) => {
             if (k < extent[0] || k > extent[1]){
                 setMove(false)
             }else{
-                d3.select('.ct-container').attr("transform", "translate(" +x+','+y+ ")scale(" + k + ")");
-                props.zoom.scale(k).translate([x,y]);
-                props.setCtScale({x:x,y:y,k:k})
+                interpolateZoom([x, y], k,props.zoom);
             }
         },40)}
    },[move])
@@ -87,6 +85,18 @@ const NavButton = (props) => {
     )
 }
 
-
+function interpolateZoom(translate, scale, zoom) {
+    var self = this;
+    return d3.transition().duration(350).tween("zoom", function() {
+        var iTranslate = d3.interpolate(zoom.translate(), translate),
+            iScale = d3.interpolate(zoom.scale(), scale);
+        return function(t) {
+            zoom
+                .scale(iScale(t))
+                .translate(iTranslate(t));
+                d3.select('.ct-container').attr("transform", "translate(" +translate[0]+','+translate[1]+ ")scale(" + scale + ")");
+        };
+    });
+}
 
 export default NavButton;

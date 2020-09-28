@@ -10,6 +10,8 @@ import "../styles/ReferenceBar.scss";
             collapsible : if true ReferenceBar can be collapsed or expand. Default is false 
             hideInfo : to hide the default info Icon . by default hideInfo is false
             children : renders the children passed above the task icon. 
+            taskTop : send true to keep task before children
+            collapse : set true to collpase Refernce bar
     */
 
 const ReferenceBar = (props) => {
@@ -82,7 +84,9 @@ const ReferenceBar = (props) => {
             }
             setTaskList(task_list);
     }, [tasksJson]);
-
+    useEffect(()=>{
+        setCollapse(props.collapse)
+    },[props.collapse])
     const onSearchHandler = event => {
         searchTask(event.target.value)
         setSearchValue(event.target.value);
@@ -140,8 +144,9 @@ const ReferenceBar = (props) => {
                     <ScrollBar scrollId="ref_bar_scroll" trackColor="transparent" thumbColor="#7143b3">
                         <div className="ref__content">
                             <div className="rb_upper_contents">
+                                {props.taskTop?<div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
                                     {props.children}
-                                <div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>
+                                {!props.taskTop?<div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
                                 { !props.hideInfo && <div className="ic_box"><img className="rb__ic-info thumb__ic" src="static/imgs/ic-info.png"/><span className="rb_box_title">Info</span></div>}
                             </div>
                         </div>

@@ -58,7 +58,7 @@ const SearchBox = (props) => {
         props.setCtScale({x:x,y:y,k:1})
     }
     return(
-        <Rnd enableResizing={false} onDrag={()=>{drag=true}} bounds="parent">
+        <Rnd enableResizing={false} default={{x:10,y:10}} bounds="parent">
             <div id="search-canvas-icon" data-test='SearchCanvas'>
                 <img alt="Search Icon" onClick={(e)=>{
                     if(drag){drag=false; return;}

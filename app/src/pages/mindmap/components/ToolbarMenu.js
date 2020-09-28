@@ -59,7 +59,7 @@ const Toolbarmenu = () => {
             })
             return;
         }
-        var val = copy({...selectNodes},setPopup)
+        var val = copy({...selectNodes},setPopup,copyNodes)
         if(val){
             d3.select('#copyImg').classed('active-map',true)
             dispatch({type:actionTypes.UPDATE_COPYNODES,payload:selectNodes})
@@ -194,7 +194,7 @@ const paste = (copyNodes,setPopup) =>{
 
 }
 
-const copy = (selectNodes,setPopup) =>{
+const copy = (selectNodes,setPopup,copyNodes) =>{
     var dNodes_c = selectNodes.nodes
     var dLinks_c = selectNodes.links
     var dangling_screen_check_flag = false
@@ -202,6 +202,15 @@ const copy = (selectNodes,setPopup) =>{
     var dangling_screen_flag = false
     var ds_list = [];
     if(dNodes_c.length === 0){
+        if(copyNodes.nodes.length>0){
+            setPopup({
+                title:'Warning',
+                content:'Click on paste-map icon to paste copied nodes',
+                submitText:'Ok',
+                show:true
+            })
+            return false
+        }
         setPopup({
             title:'Warning',
             content:'Nothing is copied',

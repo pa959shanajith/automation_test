@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {saveMindmap,getModules,getScreens} from '../api';
 import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
+import '../styles/SaveMapButton.scss'
 
 const SaveMapButton = (props) => {
     const dispatch = useDispatch()
@@ -13,7 +14,7 @@ const SaveMapButton = (props) => {
         saveNode(props.setBlockui,props.dNodes,projId,props.setPopup,moduleList,deletedNodes,dispatch)
     }
     return(
-        <svg className="ct-actionBox" id="ct-save" onClick={clickSave}>
+        <svg className={"ct-actionBox"+(props.disabled?" disableButton":"")} id="ct-save" onClick={clickSave}>
             <g id="ct-saveAction" className="ct-actionButton">
                 <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
                 <text x="23" y="18">Save</text>
@@ -33,6 +34,16 @@ const saveNode = async(setBlockui,dNodes,projId,setPopup,moduleList,deletedNodes
     d3.select('#copyImg').classed('active-map',false)
     d3.selectAll('.ct-node').classed('node-selected',false)   
     if (d3.select('#ct-save').classed('disableButton')) return;
+    var namelist = dNodes.map((e)=>{if(e._id && e.type==='screens' && e.state!="deleted")return e.name})
+    var duplicateNode = dNodes.every((e,i)=>{
+        if(e._id && e.type==='screens' && e.state!="deleted"){
+            return namelist.indexOf(e.name) === i || dNodes[namelist.indexOf(e.name)]._id === e._id
+        } return true;
+    })
+    if(!duplicateNode){
+        setPopup({show:true,title:'Error',content:((modId && modId.error)?modId.error:'Duplicate screen name found.Create new screen to reuse'),submitText:'Ok'})
+        return;
+    }
     setBlockui({show:true,content:'Saving flow! Please wait...'})
     dNodes.forEach((e, i)=>{
         if (i == 0) return;
@@ -71,12 +82,14 @@ const saveNode = async(setBlockui,dNodes,projId,setPopup,moduleList,deletedNodes
     }
     var modId = await saveMindmap(data)
     if(modId && !modId.error){
-        var moduledata = await getModules({modName:null,cycId:null,"tab":"tabCreate","projectid":projId,"moduleid":modId})
+        var moduledata = await getModules({modName:null,cycId:null,"tab":"tabCreate","projectid":projId,"moduleid":null})
+        var moduleselected = await getModules({modName:null,cycId:null,"tab":"tabCreate","projectid":projId,"moduleid":modId})
         var screendata = await getScreens(projId)
         if(screendata)dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
         dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[]})
+        dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
         dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-        dispatch({type:actionTypes.SELECT_MODULE,payload:moduledata})
+        dispatch({type:actionTypes.SELECT_MODULE,payload:moduleselected})
         setBlockui({show:false});
         setPopup({show:true,title:'Success',content:'Data saved successfully',submitText:'Ok'})
         return;

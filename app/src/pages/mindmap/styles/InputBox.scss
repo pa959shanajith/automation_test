@@ -51,6 +51,9 @@
 #ct-inpSugg .simplebar-track.simplebar-vertical{
     bottom: 5px;
 }
+#ct-inpSugg .divider:last-child{
+    display: none;
+}
 .errorClass {
     border: 1px solid red;
 }

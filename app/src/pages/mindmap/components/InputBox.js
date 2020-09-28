@@ -26,6 +26,12 @@ const InputBox = (props) => {
             return;
         }
     },[])
+    useEffect(() => {
+        document.addEventListener("keydown", (e)=>{if(e.keyCode === 27)props.setInpBox(false)}, false);
+        return () => {
+          document.removeEventListener("keydown", (e)=>{if(e.keyCode === 27)props.setInpBox(false)} , false);
+        };
+      }, []);
     useEffect(()=>{
         props.setCtrlBox(false)
         var ctScale = props.ctScale
@@ -45,7 +51,7 @@ const InputBox = (props) => {
         }
         if(nodetype === "testcases"){
             setSuggestList(screenData.testCaseList);
-            initdata = screenData.testCaseList;
+            initdata = screenData.testCaseList.filter((e)=>e.screenid===dNodes[pi].parent._id);
             filterSuggest()
             return;
         }
@@ -118,7 +124,7 @@ const InputBox = (props) => {
                 <input  autoComplete="off" autoFocus={true} ref={InpBox} defaultValue={p.select('.ct-node-title').text()} id="ct-inpAct" maxLength="255" className="ct-inp" onChange={(e)=>{filterSuggest(e.target.value)}} onKeyPress={(e)=>{if(e.key==='Enter')onEnter(e.target.value)}}/>
                 {(suggestList.length>0)?
                 <ul id='ct-inpSugg'>
-                    <ScrollBar trackColor={'white'} thumbColor={'grey'} verticalbarWidth='3px'>
+                    <ScrollBar trackColor={'white'} thumbColor={'grey'} hideXbar={true} verticalbarWidth='3px'>
                         {suggestList.map((e,i)=>{
                             return(
                                 <Fragment key={i}>

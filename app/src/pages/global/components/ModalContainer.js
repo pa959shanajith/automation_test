@@ -8,12 +8,13 @@ import '../styles/ModalContainer.scss'
     footer : "footer component"
     title : "title of the popup"
     close : "event on close"
+    modalClass : bootstrap modal-class for dialogue
 */
 
 const ModalContainer = (props) => {
     return(
         <div className='modal__container'>
-            <div className='modal-dialog'>
+            <div className={'modal-dialog '+(props.modalClass?props.modalClass:"")}>
                 <div className='modal__content modal-content'>
                     <div className='modal-header modal__header'>
                         <button onClick={(e)=>props.close(e)}>×</button>

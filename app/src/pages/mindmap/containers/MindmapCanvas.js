@@ -27,6 +27,8 @@ const types = {
 var count;
 var temp = {
     s: [],
+    hidden:[],
+    deleted:[],
     t: ""
 };
 var deletednode_info =[]
@@ -46,11 +48,11 @@ const Canvas = (props) => {
     const [nodes,setNodes] = useState({})
     const [dNodes,setdNodes] = useState([])
     const [dLinks,setdLinks] = useState([])
-    const [createnew,setCreateNew] =useState(false)
+    const [createnew,setCreateNew] = useState(false)
+    const [verticalLayout,setVerticalLayout] = useState(false)
     const setPopup=props.setPopup
     const setBlockui=props.setBlockui
     const CanvasRef = useRef();
-    const verticalLayout = false;
     useEffect(() => {
         var tree;
         count = {
@@ -59,9 +61,10 @@ const Canvas = (props) => {
             'screens': 0,
             'testcases': 0
         }
-        if(props.module.createnew){
+        if (props.module.createnew && verticalLayout===props.verticalLayout ) {
+            // On Click of Create new button. No tree to be loaded
             //create new mindmap
-            tree = createNewMap()
+            tree = createNewMap(props.verticalLayout)
             tree.sections = types
             tree.links = {}
             tree.dLinks = []
@@ -71,9 +74,14 @@ const Canvas = (props) => {
             }
             count['modules'] = 1
             setCreateNew(0)
-        }else{
+        } else {
+            // To load an existing module. Tree has to be loaded. Possible places, module box / switch layout.
+            var tree = props.module
+            if(verticalLayout!=props.verticalLayout && dNodes.length>0){
+                tree = dNodes[0]
+            }
             //load mindmap from data
-            tree = generateTree(props.module,types,{...count})
+            tree = generateTree(tree,types,{...count},props.verticalLayout)
             count= {...count,...tree.count}
         }
         d3.select('.ct-container').attr("transform", "translate(" + tree.translate[0]+','+tree.translate[1] + ")scale(" + 1 + ")");
@@ -84,7 +92,9 @@ const Canvas = (props) => {
         setdNodes(tree.dNodes)
         setCtScale({x:tree.translate[0],y:tree.translate[1],k:1})
         setSection(tree.sections)
-    }, [props.module,props.reload]);
+        setVerticalLayout(props.verticalLayout);
+        setBlockui({show:false})
+    }, [props.module,props.reload,props.verticalLayout]);
     useEffect((e)=>{
         if(createnew !== false){
             var p = d3.select('#node_'+createnew);
@@ -95,7 +105,7 @@ const Canvas = (props) => {
     const nodeClick=(e)=>{
         e.stopPropagation()
         if(d3.select('#pasteImg').classed('active-map')){
-            var res = pasteNode(e.target.parentElement.id,{...copyNodes},{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},setPopup)
+            var res = pasteNode(e.target.parentElement.id,{...copyNodes},{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},setPopup,verticalLayout)
             if(res){
                 setNodes(res.cnodes)
                 setLinks(res.clinks)
@@ -121,7 +131,7 @@ const Canvas = (props) => {
         var cdLinks = [...dLinks]
         var csections = {...sections}
         mnode.forEach((name)=>{
-            var res = createNode(e,cnodes,clinks,cdNodes,cdLinks,csections,{...count},name)
+            var res = createNode(e,cnodes,clinks,cdNodes,cdLinks,csections,{...count},name,verticalLayout)
             cnodes = res.nodeDisplay
             clinks = res.linkDisplay
             cdNodes = res.dNodes
@@ -137,7 +147,8 @@ const Canvas = (props) => {
 
     }
     const clickAddNode=(e)=>{
-        var res = createNode(e,{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count})
+        var res = createNode(e,{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},undefined,verticalLayout)
+        setCreateNew(res.dNodes.length-1)
         setNodes(res.nodeDisplay)
         setLinks(res.linkDisplay)
         setdLinks(res.dLinks)
@@ -156,7 +167,9 @@ const Canvas = (props) => {
     }
     const clickCollpase=(e)=>{
         var id = e.target.parentElement.id;
-        var res = toggleNode(id,[...dNodes],[...dLinks])
+        var res = toggleNode(id,{...nodes},{...links},[...dNodes],[...dLinks])
+        setNodes(res.nodeDisplay)
+        setLinks(res.linkDisplay)
         setdLinks(res.dLinks)
         setdNodes(res.dNodes)
     }
@@ -164,15 +177,21 @@ const Canvas = (props) => {
         var res;
         var id = e.target.parentElement.id.split('node_')[1];
         if(type==='KeyUp'){
-            res = moveNodeEnd(id,[...dNodes],[...dLinks],{...links},{...temp})
+            res = moveNodeEnd(id,[...dNodes],[...dLinks],{...links},{...temp},verticalLayout)
             setLinks(res.linkDisplay)
             nodeMoving = false
+            temp = {
+                s: [],
+                hidden:[],
+                deleted:[],
+                t: ""
+            };
         }
         else{
             nodeMoving = true
-            res = moveNodeBegin(id,{...links},[...dLinks],{...temp},{...ctScale})
+            res = moveNodeBegin(id,{...links},[...dLinks],{...temp},{...ctScale},verticalLayout)
             setLinks(res.linkDisplay)
-            temp=res.temp
+            temp={...temp,...res.temp}
         }
     }
     return (
@@ -188,15 +207,15 @@ const Canvas = (props) => {
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
                 <g className='ct-container'>
                 {Object.entries(links).map((link)=>{
-                return(<path id={link[0]} key={link[0]+'_link'} className="ct-link" d={link[1].d}></path>)
+                return(<path id={link[0]} key={link[0]+'_link'} className={"ct-link"+(link[1].hidden?" no-disp":"")} d={link[1].d}></path>)
                 })}
                 {Object.entries(nodes).map((node)=>
-                    <g id={'node_'+node[0]}   key={node[0]} className="ct-node" data-nodetype={node[1].type} transform={node[1].transform}>
+                    <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform}>
                         <image  onClick={(e)=>nodeClick(e)} style={{height:'40px',width:'40px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
                         <text className="ct-nodeLabel" textAnchor="middle" x="20" title={node[1].title} y="50">{node[1].name}</text>
                         <title val={node[0]} className="ct-node-title">{node[1].title}</title>
                         {(node[1].type!=='testcases')?
-                        <circle onClick={(e)=>clickCollpase(e)} className={"ct-"+node[1].type+" ct-cRight ct-nodeBubble"} cx={verticalLayout ? 20 : 44} cy={verticalLayout ? 55 : 20} r="4"></circle>
+                        <circle onClick={(e)=>clickCollpase(e)} className={"ct-"+node[1].type+" ct-cRight"+(!dNodes[node[0]]._children?" ct-nodeBubble":"")} cx={verticalLayout ? 20 : 44} cy={verticalLayout ? 55 : 20} r="4"></circle>
                         :null}
                         {(node[1].type!=='modules')?
                         <circle 
@@ -299,7 +318,7 @@ const checkparenttask = (parentNode,parent_flag)=>{
     return parent_flag;
 }
 
-const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,count,setPopup) => {
+const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,count,setPopup,verticalLayout) => {
     var dNodes_c = copyNodes.nodes
     var dLinks_c = copyNodes.links
     var nodetype =  d3.select('.node-selected').attr('data-nodetype');
@@ -309,7 +328,7 @@ const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,
             //paste to scenarios
             dNodes_c.forEach((e) =>{
                 if (e.type == 'screens') {
-                    var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,e.name)
+                    var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,e.name,verticalLayout)
                     cnodes = res.nodeDisplay
                     clinks = res.linkDisplay
                     cdNodes = res.dNodes
@@ -318,7 +337,7 @@ const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,
                     activeNode = cdNodes.length-1
                     dLinks_c.forEach((f)=>{
                         if (f.source.id == e.id) {
-                            var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,f.target.name)
+                            var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,f.target.name,verticalLayout)
                             cnodes = res.nodeDisplay
                             clinks = res.linkDisplay
                             cdNodes = res.dNodes
@@ -335,7 +354,7 @@ const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,
             dNodes_c.forEach((e)=> {
                 if (e.type == 'scenarios') {
                     activeNode = 0;
-                    var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,e.name)
+                    var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,e.name,verticalLayout)
                     cnodes = res.nodeDisplay
                     clinks = res.linkDisplay
                     cdNodes = res.dNodes
@@ -346,7 +365,7 @@ const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,
                     dLinks_c.forEach((f) =>{
                         if (f.source.id == e.id && f.target.type == 'screens') {
                             activeNode = activenode_scr;
-                            var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,f.target.name)
+                            var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,f.target.name,verticalLayout)
                             cnodes = res.nodeDisplay
                             clinks = res.linkDisplay
                             cdNodes = res.dNodes
@@ -355,7 +374,7 @@ const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,
                             activeNode = cdNodes.length-1;
                             dLinks_c.forEach(function(g, k) {
                                 if (g.source.id == f.target.id && g.source.type == 'screens') {
-                                    var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,g.target.name)
+                                    var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,g.target.name,verticalLayout)
                                     cnodes = res.nodeDisplay
                                     clinks = res.linkDisplay
                                     cdNodes = res.dNodes
@@ -390,12 +409,20 @@ const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,
     return {cnodes,clinks,cdNodes,cdLinks,csections,count};
 }
 
-const moveNodeBegin = (idx,linkDisplay,dLinks,temp,pos) => {
-    var verticalLayout = false;
+const moveNodeBegin = (idx,linkDisplay,dLinks,temp,pos,verticalLayout) => {
     dLinks.forEach(function(d, i) {
-        if (d.source.id === parseInt(idx)) {
-            temp.s.push(i);
-            delete linkDisplay['link-' + d.source.id + '-' + d.target.id];
+        if (d.source.id === parseInt(idx)) {      
+            if(!linkDisplay['link-' + d.source.id + '-' + d.target.id]){
+                temp.deleted.push(i)
+            }
+            else if(linkDisplay['link-' + d.source.id + '-' + d.target.id].hidden === true){
+                temp.hidden.push(i)
+                temp.s.push(i);
+                delete linkDisplay['link-' + d.source.id + '-' + d.target.id];
+            }else{
+                temp.s.push(i);
+                delete linkDisplay['link-' + d.source.id + '-' + d.target.id];
+            }
         } else if (d.target.id === parseInt(idx)) {
             temp.t = i;
             delete linkDisplay['link-' + d.source.id + '-' + d.target.id];
@@ -403,9 +430,6 @@ const moveNodeBegin = (idx,linkDisplay,dLinks,temp,pos) => {
     });
     const svg = d3.select(`.mp__canvas_svg`);
     d3.select('#node_' + idx).classed('ct-movable', !0);
-    // svg.on('.zoom',()=>{
-    //     d3.event.stopImmediatePropagation();
-    // })
     svg.on('mousemove.nodemove', ()=>{
         d3.event.stopImmediatePropagation();
         var t = {} ;
@@ -420,19 +444,11 @@ const moveNodeBegin = (idx,linkDisplay,dLinks,temp,pos) => {
             t.y = parseFloat((d3.event.y - svgOff.top - cSpan[1]) / cScale - 20)
         }
         d3.select('.ct-movable').attr('transform', "translate(" + t.x + "," + t.y + ")");
-
-        // var s = d3.select('.mp__canvas_svg');
-        // let  cSize= [parseFloat(s.style("width")), parseFloat(s.style("height"))];
-        // if(cSize[0]>d3.event.x +40){
-        //     d3.select('.ct-movable').attr('transform', "translate(" + t.x + "," + t.y + ")");
-        // }else{
-        //     console.log(d3.event.x +40)
-        // }
     })
     return {linkDisplay,temp}
 }
 
-const moveNodeEnd = (pi,dNodes,dLinks,linkDisplay,temp) => {
+const moveNodeEnd = (pi,dNodes,dLinks,linkDisplay,temp,verticalLayout) => {
     const svg = d3.select(`.mp__canvas_svg`);
     svg.on('mousemove.nodemove', null);
     // svg.on('zoom', null);
@@ -440,60 +456,64 @@ const moveNodeEnd = (pi,dNodes,dLinks,linkDisplay,temp) => {
     var l = p.attr('transform').slice(10, -1).split(',');
     dNodes[pi].x = parseFloat(l[0]);
     dNodes[pi].y = parseFloat(l[1]);
-    var link = addLink(dLinks[temp.t].source, dLinks[temp.t].target,temp.t);
+    var link = addLink(dLinks[temp.t].source, dLinks[temp.t].target,verticalLayout);
     var lid = 'link-' + dLinks[temp.t].source.id + '-' + dLinks[temp.t].target.id
     linkDisplay[lid] = link
     temp.s.forEach(function(d) {
         // if (deletednode_info.indexOf(dLinks[d].target) == -1) {
-            var link = addLink(dLinks[d].source, dLinks[d].target);
+            var link = addLink(dLinks[d].source, dLinks[d].target,verticalLayout);
             var lid = 'link-' + dLinks[d].source.id + '-' + dLinks[d].target.id
             linkDisplay[lid] = link
+            if(temp.hidden.indexOf(d) != -1){
+                linkDisplay[lid].hidden =  true
+            }
         //}
     });
     p.classed('ct-movable', !1);
     return {linkDisplay}
 };
 
-const toggleNode = (nid, dNodes, dLinks) => {
+const toggleNode = (nid, nodeDisplay, linkDisplay, dNodes, dLinks) => {
     var p = d3.select('#' + nid);
     var id = nid.split("node_")[1]
-    if (dNodes[id].children && dNodes[id].children.length > 0) {
-        p.select('.ct-cRight').classed('ct-nodeBubble', !1);
-        dNodes[id]._children = dNodes[id].children;
-        dNodes[id].children = null;
-        recurseTogChild(dNodes[id], !0, dLinks);
-    } else if (dNodes[id]._children && dNodes[id]._children.length > 0) {
-        p.select('.ct-cRight').classed('ct-nodeBubble', !0);
+    if (dNodes[id]._children && dNodes[id]._children.length > 0) {
+        // p.select('.ct-cRight').classed('ct-nodeBubble', !0);
         dNodes[id].children = dNodes[id]._children;
         dNodes[id]._children = null;
-        recurseTogChild(dNodes[id], !1, dLinks);
-    }
-    return {dLinks,dNodes}
+        recurseTogChild(nodeDisplay, linkDisplay, dNodes[id], !1, dLinks);
+    }  else  if (dNodes[id].children && dNodes[id].children.length > 0) {
+        // p.select('.ct-cRight').classed('ct-nodeBubble', !1);  //d._childern 
+        dNodes[id]._children = dNodes[id].children;
+        dNodes[id].children = null;
+        recurseTogChild(nodeDisplay, linkDisplay, dNodes[id], !0, dLinks);
+    } 
+    return {dLinks,dNodes,nodeDisplay,linkDisplay}
 }
 
-const recurseTogChild = (d , v, dLinks) => {
+const recurseTogChild = (nodeDisplay, linkDisplay, d, v, dLinks) => {
     if (d.children) d.children.forEach(function(e) {
-        recurseTogChild(e, v, dLinks);
-        d3.select('#node_' + e.id).classed('no-disp', v);
+        recurseTogChild(nodeDisplay, linkDisplay, e, v, dLinks);
+        nodeDisplay[e.id].hidden = v;
         for (var j = dLinks.length - 1; j >= 0; j--) {
-            if (dLinks[j].source.id === d.id) {
-                d3.select('#link-' + dLinks[j].source.id + '-' + dLinks[j].target.id).classed('no-disp', v);
-            }
+            var lid = 'link-' + dLinks[j].source.id + '-' + dLinks[j].target.id
+            if (linkDisplay[lid] && dLinks[j].source.id === d.id) {
+                linkDisplay[lid].hidden = v
+            } 
         }
     });
     else if (d._children) d._children.forEach(function(e) {
-        recurseTogChild(e, !0, dLinks);
-        d3.select('#node_' + e.id).classed('no-disp', !0);
+        recurseTogChild(nodeDisplay, linkDisplay, e, !0, dLinks);
+        nodeDisplay[e.id].hidden = !0;
         for (var j = dLinks.length - 1; j >= 0; j--) {
-            if (dLinks[j].source.id === d.id) {
-                d3.select('#link-' + dLinks[j].source.id + '-' + dLinks[j].target.id).classed('no-disp', !0);
+            var lid = 'link-' + dLinks[j].source.id + '-' + dLinks[j].target.id
+            if (linkDisplay[lid] && dLinks[j].source.id === d.id) {
+                linkDisplay[lid].hidden = !0
             }
         }
     });
 };
 
-const createNewMap = (moduleName) => {
-    const verticalLayout = false
+const createNewMap = (verticalLayout) => {
     var nodeDisplay = {}
     var dNodes = []
     var s = d3.select('.mp__canvas_svg');
@@ -501,7 +521,7 @@ const createNewMap = (moduleName) => {
     var node = {
         id: 0,
         childIndex: 0,
-        name: moduleName?moduleName:'Module_0',
+        name: 'Module_0',
         type: 'modules',
         y: cSize[1] * 0.4,
         x: cSize[0] * 0.1 * 0.9,
@@ -511,20 +531,24 @@ const createNewMap = (moduleName) => {
         _id: null
     };
     if (verticalLayout) {
-        node.y = s[0] * 0.1 * (0.9);
-        node.x = s[1] * 0.4;
+        node.y = cSize[1] * 0.1 * (0.9);
+        node.x = cSize[0] * 0.4;
     };
     dNodes.push(node);
     nodeDisplay[0] = addNode(dNodes[0]);
-    var translate = [(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]
     // nodeDisplay[0].task = false;
+    if (verticalLayout){
+        var translate = [(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]
+    }
+    else{
+        var translate = [(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]
+    }
     return{nodes:nodeDisplay,dNodes,translate}
 }
 
 
 
-const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sections,count,obj) => {
-    const verticalLayout =  false
+const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sections,count,obj,verticalLayout) => {
     var uNix = dNodes.length
     // if ($event !== true && (d3.select('#ct-inpBox').attr('class') == "" || d3.select($event.target).classed('ct-ctrl-inactive'))) return;
     // d3.select('#ct-inpBox').classed('no-disp', !0);
@@ -546,13 +570,14 @@ const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sections,co
     var h = parseFloat(mapSvg.style('height'));
     var arr_co = [];
     dNodes.forEach(function(d) {
-        var objj = {
-            x: parseInt(d.x),
-            y: parseInt(d.y)
-        };
-        arr_co.push(objj);
+        if(d.state !== 'deleted'){
+            var objj = {
+                x: parseInt(d.x),
+                y: parseInt(d.y)
+            };
+            arr_co.push(objj);
+        }
     });
-    // switch-layout feature
     count[(nNext[pt][0]).toLowerCase() + 's'] += 1
     var tempName;
     if (obj) {
@@ -585,7 +610,7 @@ const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sections,co
     };
     var lid = 'link-' + link.source.id + '-' + link.target.id
     dLinks.push(link);
-    var currentLink = addLink(dNodes[pi], dNodes[uNix]);
+    var currentLink = addLink(dNodes[pi], dNodes[uNix],verticalLayout);
     nodeDisplay[uNix] = currentNode;
     linkDisplay[lid] = currentLink;
     return {nodeDisplay,linkDisplay,dNodes,dLinks,count}
@@ -706,10 +731,35 @@ const bindZoomListner = (setCtScale,translate) => {
     return zoom
 }
 
-const generateTree = (tree,sections,count) =>{
+function unfoldtree(d){
+    // d3.select('#node_' + d.id).classed('no-disp', !1).select('.ct-cRight').classed('ct-nodeBubble', !0); 
+    if (d.parent && (d.parent.revertChild || d.parent.revertChild1)) d.revertChild1 = true;
+    if (d._children) {
+        d.children = d._children;
+        d._children = null;
+        d.revertChild = true;
+    }
+    if (d.children) d.children.forEach(unfoldtree);
+}
+
+
+function foldtree(d){   
+    if (d.children) d.children.forEach(foldtree);
+    if (d.revertChild1) delete d.revertChild1;
+    if (d.revertChild) {
+        d._children = d.children;
+        d.children = null;
+        delete d.revertChild;
+    }
+}
+
+const generateTree = (tree,sections,count,verticalLayout) =>{
+    // var old = {...tree}
+    unfoldtree(tree)
+    // d3.selectAll('.ct-node').classed('no-disp', !1).select('.ct-cRight').classed('ct-nodeBubble', !0); 
+    // d3.selectAll('.ct-link').classed('no-disp', !1)
     var nodeDisplay = {}
     var linkDisplay = {}
-    var verticalLayout = false;
     var s = d3.select('.mp__canvas_svg');
     let  cSize= [parseFloat(s.style("width")), parseFloat(s.style("height"))];
     var typeNum = {
@@ -751,19 +801,21 @@ const generateTree = (tree,sections,count) =>{
         var node = addNode(d);
         nodeDisplay[d.id] = node
         nodeDisplay[d.id].task = false;
+        nodeDisplay[d.id].hidden = ((d.parent)? (d.parent.revertChild || d.parent.revertChild1):false) || false;
     })
     dLinks.forEach(function(d) {
         d.id = uuid();
         var lid = 'link-' + d.source.id + '-' + d.target.id
-        var link = addLink(d.source, d.target);
+        var link = addLink(d.source, d.target,verticalLayout);
         linkDisplay[lid] = link
-    });               
+        linkDisplay[lid].hidden = (d.source.revertChild || d.source.revertChild1) || false;
+    });
     if (verticalLayout){
         var translate = [(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]
-    }
-    else{
+    } else{
         var translate = [(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]
     }
+    foldtree(tree)
     return {nodes:nodeDisplay,links:linkDisplay,translate:translate,dNodes,dLinks,sections,count}
 }
 
@@ -781,6 +833,7 @@ const addNode = (n) =>{
         'transform': "translate(" + (n.x).toString() + "," + (n.y).toString() + ")",
         'opacity': !( n._id === null || n._id === undefined) ? 1 : 0.5,
         'title': n.name,
+        'hidden': false,
         'name': n.display_name,
         'img_src': img_src,
         '_id': n._id || null,
@@ -791,8 +844,7 @@ const addNode = (n) =>{
     return nodeDisplay;
 }
 
-const addLink = (p, c) => {
-    const verticalLayout = false
+const addLink = (p, c,verticalLayout) => {
     var s;
     var t;
     function genPathData(s, t, vl) {
