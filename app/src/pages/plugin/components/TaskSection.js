@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents } from '../../global';
+import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents, PopupMsg } from '../../global';
 import FilterDialog from "./FilterDialog";
 import * as actionTypes from '../state/action';
 import * as pluginApi from "../api";
@@ -24,8 +24,9 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     const [showFltrDlg, setShowFltrDlg] = useState(false);
     const [filterData, setFilterData] = useState({'prjval':'Select Project','relval':'Select Release','cycval':'Select Cycle','apptype':{},'tasktype':{}});
     const [filtered, setFiltered] = useState(false);
+    const [showPopup, setShowPopup] = useState(false);
     let filterDat;
-
+    
     useEffect(()=>{
         if(Object.keys(userInfo).length!==0) {
             resetStates();
@@ -43,7 +44,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                         let review_items = []
                         // to render components which will populate under todo
                         let todo_items = []
-                        if(data1 === "Invalid Session") return RedirectPage(history);
+                        if(data1 === "Fail" || data1 === "Invalid Session") return RedirectPage(history);
                         else {
                             let tasksJson = data1;
                             setTaskJson(data1);
@@ -54,7 +55,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                             * List of apptype and tasktype
                             */
                             filterDat = {'projectids':[],'releaseids':[],'cycleids':[],'prjrelmap':{},'relcycmap':{},'apptypes':[],'tasktypes':['Design','Execution'],'idnamemapprj':{},'idnamemaprel':{},'idnamemapcyc':{},'idnamemapdom':{}};
-                            let counter = 1, countertodo = 1, counterreview = 1;
+                            
                             let length_tasksJson = tasksJson.length;
                             let tempDataObj = [];
                             for (i=0 ; i < length_tasksJson ; i++){
@@ -87,38 +88,18 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                                     'cycleid':tasksJson[i].taskDetails[0].cycleid,
                                     'reuse':tasksJson[i].taskDetails[0].reuse
                                     }
-                                dataobj = JSON.stringify(dataobj);
+                                
                                 tempDataObj.push(dataobj);
-                                    if(status === 'underReview'){
-                                        review_items.push({'panel_idx': i, 'counter': counter, 'type_counter': counterreview, 'testSuiteDetails': testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
-                                        counterreview++;
-                                    }
-                                    else{
-                                        todo_items.push({'panel_idx': i, 'counter': counter, 'type_counter': countertodo, 'testSuiteDetails': testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
-                                        countertodo++;
-                                    }				
-                                    
-                                    // IDK, ELLIPSING?
-                                    // let limit = 45;
-                                    // let chars = $("#panelBlock_"+i+"").children().find('span.assignedTask').text();
-                                    // if (chars.length > limit) {
-                                    //     let visiblePart = chars.substr(0, limit-1);
-                                    //     let dots = $("<span class='dots'>...</span>");
-                                    //     let hiddenPart = chars.substr(limit-1);
-                                    //     let assignedTaskText = visiblePart + hiddenPart;
-                                    //     $("#panelBlock_"+i+"").children().find('span.assignedTask').text(visiblePart).attr('title',assignedTaskText).append(dots);
-                                    //  }
-                                counter++;
+                                
+                                if (status === 'underReview') review_items.push({'panel_idx': i, 'testSuiteDetails': testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
+                                else todo_items.push({'panel_idx': i, 'testSuiteDetails': testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
+                                
                                 fillFilterValues(tasksJson[i],0);
                             }
                             setReviewItems(review_items);
                             setTodoItems(todo_items);
                             setDataObj(tempDataObj);
                             setOverlay("");
-                            //prevent mouseclick before loading tasks
-                            // $("span.toggleClick").removeClass('toggleClick');
-                            // Enable Filter
-                            // $("span.filterIcon").removeClass('disableFilter');
                         }
 
                         for(i=0 ; i < filterDat.projectids.length ; i++){
@@ -139,17 +120,15 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                     })
                     .catch(error => {
                         setOverlay("");
-                        setOverlay("Fail to load tasks!");
-                        setTimeout(function(){ setOverlay(""); }, 3000);
-                        console.log("Error:::::::::::::", error);
+                        setShowPopup({'title': 'Tasks', 'content': "Fail to load tasks!"});
+                        console.error("Error:::::::::::::", error);
                     });
                 }
             })
             .catch(error => {
                 setOverlay("");
-                setOverlay("Fail to load Projects!");
-                setTimeout(function(){ setOverlay(""); }, 3000);
-                console.log("Error:::::::::::::", error);
+                setShowPopup({'title': 'Tasks', 'content': "Fail to load tasks!"});
+                console.error("Error:::::::::::::", error);
             });
         }
     }, [userInfo, userRole]);
@@ -170,8 +149,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     }
 
     const filterTasks = (filterData) => {
-		
-		let counter =1, countertodo = 1, counterreview = 1;
+	
         setShowFltrDlg(false);
 
         let review_items = [];
@@ -186,37 +164,22 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             
             let dataobj = dataObj[i];
             if(passFilterTest(taskJson[i],0, filterData)){
-                if(status === 'underReview'){
-                    review_items.push({'panel_idx': i, 'counter': counter, 'type_counter': counterreview, 'testSuiteDetails': testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
-                    counterreview++;
-                }
-                else{
-                    todo_items.push({'panel_idx': i, 'counter': counter, 'type_counter': countertodo, 'testSuiteDetails': testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
-                    countertodo++;
-                }
-                counter++;
+                if (status === 'underReview') review_items.push({'panel_idx': i, 'testSuiteDetails': testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
+                else todo_items.push({'panel_idx': i, 'testSuiteDetails': testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
             }				
         }
         
         setReviewItems(review_items);
         setTodoItems(todo_items);
 
-        if(filterData['prjval']==='Select Project' && filterData['relval']==='Select Release' && filterData['cycval']==='Select Cycle' && !(Object.values(filterData['tasktype']).includes(true) || Object.values(filterData['apptype']).includes(true))){
-			setFiltered(false);
-		}
-		else{
-			setFiltered(true);
-		}
+        if(filterData['prjval']==='Select Project' && filterData['relval']==='Select Release' && filterData['cycval']==='Select Cycle' && !(Object.values(filterData['tasktype']).includes(true) || Object.values(filterData['apptype']).includes(true))) 
+            setFiltered(false);
+		else setFiltered(true);
 
         let items = activeTab === "todo" ? todo_items : review_items;
         let filteredItem = [];
-        let counter2 = 1;
-        items.forEach(item => {
-            if (item.taskname.toLowerCase().indexOf(searchValue.toLowerCase()) > -1) {
-                item.type_counter = counter2++;
-                filteredItem.push(item)
-            }
-        });
+        filteredItem = items.filter(item=>item.taskname.toLowerCase().indexOf(searchValue.toLowerCase()) > -1);
+
         setSearchItems(filteredItem);
         setFilterData(filterData);
 	};
@@ -230,13 +193,9 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     const searchTask = (activeTab, value) => {
         let items = activeTab === "todo" ? todoItems : reviewItems;
         let filteredItem = [];
-        let counter = 1;
-        items.forEach(item => {
-            if (item.taskname.toLowerCase().indexOf(value.toLowerCase()) > -1) {
-                item.type_counter = counter++;
-                filteredItem.push(item)
-            }
-        });
+
+        filteredItem = items.filter(item=>item.taskname.toLowerCase().indexOf(value.toLowerCase()) > -1);
+
         setSearchItems(filteredItem);
     }
 
@@ -260,22 +219,23 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
 		}
 		if(validID(obj.taskDetails[tidx].cycleid) && filterDat.cycleids.indexOf(obj.taskDetails[tidx].cycleid) === -1){
 			filterDat.cycleids.push(obj.taskDetails[tidx].cycleid);
-			filterDat.relcycmap[obj.taskDetails[tidx].releaseid].push(obj.taskDetails[tidx].cycleid);			
+            if(validID(obj.taskDetails[tidx].releaseid) && filterDat.relcycmap[obj.taskDetails[tidx].releaseid].indexOf(obj.taskDetails[tidx].cycleid) === -1){
+                filterDat.relcycmap[obj.taskDetails[tidx].releaseid].push(obj.taskDetails[tidx].cycleid);			
+            }
 		}
 
 		if(filterDat.apptypes.indexOf(obj.appType)===-1)
 			filterDat.apptypes.push(obj.appType);
         
-        dispatch({type: actionTypes.SET_FD, payload: filterDat})
     }
 
     const passFilterTest = (node, tidx, filterData) => {
 		var pflag = false, rflag = false, cflag = false, aflag = false, tflag = false;
-		if(filterData['prjval']=='Select Project' || filterData['prjval']==node.testSuiteDetails[tidx].projectidts) pflag = true;
-		if(filterData['relval']=='Select Release' || filterData['relval']==node.taskDetails[tidx].releaseid) rflag = true;
-		if(filterData['cycval']=='Select Cycle' || filterData['cycval']==node.taskDetails[tidx].cycleid) cflag = true;
-		if(Object.keys(filterData['tasktype']).map(function(itm) { return filterData['tasktype'][itm]; }).indexOf(true) == -1 || filterData.tasktype[node.taskDetails[tidx].taskType]) tflag = true;
-		if(Object.keys(filterData['apptype']).map(function(itm) { return filterData['apptype'][itm]; }).indexOf(true) == -1 || filterData.apptype[node.appType]) aflag = true;		
+		if(filterData['prjval']==='Select Project' || filterData['prjval']===node.testSuiteDetails[tidx].projectidts) pflag = true;
+		if(filterData['relval']==='Select Release' || filterData['relval']===node.taskDetails[tidx].releaseid) rflag = true;
+		if(filterData['cycval']==='Select Cycle' || filterData['cycval']===node.taskDetails[tidx].cycleid) cflag = true;
+		if(Object.keys(filterData['tasktype']).map(function(itm) { return filterData['tasktype'][itm]; }).indexOf(true) === -1 || filterData.tasktype[node.taskDetails[tidx].taskType]) tflag = true;
+		if(Object.keys(filterData['apptype']).map(function(itm) { return filterData['apptype'][itm]; }).indexOf(true) === -1 || filterData.apptype[node.appType]) aflag = true;		
 		
 		if(pflag && rflag && cflag && aflag && tflag) return true;
 		else return false;
@@ -296,15 +256,25 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
         setShowSearch(!showSearch)
     }
     
+    const Popup = () => (
+        <PopupMsg 
+            title={showPopup.title}
+            content={showPopup.content}
+            submitText="Close"
+            close={()=>setShowPopup(false)}
+            submit={()=>setShowPopup(false)}
+        />
+    )
 
     return (
         <>
+        { showPopup && <Popup />}
         {overlay && <ScreenOverlay content={overlay}/>}
         { showFltrDlg && <FilterDialog setShow={setShowFltrDlg} filterDat={filterDatState} filterData={filterData} filterTasks={filterTasks} /> }
         <div className="task-section">
             <div className="task-header">
                 <span className="my-task">My Task(s)</span>
-                <input className={"task-search-bar " + (!showSearch && "no-search-bar")} onChange={onSearchHandler} />
+                <input className={"task-search-bar " + (!showSearch && "no-search-bar")} onChange={onSearchHandler} value={searchValue} />
                 <span className="task-ic-container" onClick={hideSearchBar}><img className="search-ic" alt="search-ic" src="static/imgs/ic-search-icon.png"/></span>
                 <span className={"task-ic-container " + (filtered && "filter-on") } onClick={()=>setShowFltrDlg(true)}><img className="filter-ic" alt="filter-ic" src="static/imgs/ic-filter-task.png"/></span>
             </div>

@@ -24,8 +24,8 @@ const DesignContent = ({taskName, status}) => {
             <div className="d__btngroup">
                 <div className="d__table_ac_btn_grp">
                 {
-                    tableActionBtnGroup.map(btn => 
-                        <button className="d__tblBtn"><img className="d__tblBtn_ic" src={btn.img} alt={btn.alt} title={btn.title}/> </button>
+                    tableActionBtnGroup.map((btn, i) => 
+                        <button key={i} className="d__tblBtn"><img className="d__tblBtn_ic" src={btn.img} alt={btn.alt} title={btn.title}/> </button>
                     )
                 }
                 </div>

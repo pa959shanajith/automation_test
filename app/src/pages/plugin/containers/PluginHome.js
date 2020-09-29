@@ -1,33 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { Header, FooterOne, RedirectPage } from '../../global'
+import { Header, FooterOne } from '../../global'
 import PluginSection from '../components/PluginSection';
 import TaskSection from '../components/TaskSection';
 import { useSelector, useDispatch } from 'react-redux';
-import { useHistory } from 'react-router-dom';
 import "../styles/PluginHome.scss"
 
 const PluginHome = () => {
 
     const dispatch = useDispatch();
-    const history = useHistory();
+    
     const userInfo = useSelector(state=>state.login.userinfo);
     const userRole = useSelector(state=>state.login.SR);
-    localStorage.setItem("navigateEnable", true);
+    // localStorage.setItem("navigateEnable", true);
 
     const [name, setName] = useState("Demo User");
 
     useEffect(()=>{
-        if(window.localStorage['navigateScreen'] !== "plugin"){
-            RedirectPage(history);
-        }
-        else
         if (Object.keys(userInfo).length!==0){
-            let first_name = userInfo.firstname.charAt(0).toUpperCase() + userInfo.firstname.slice(1);
-            let last_name = userInfo.lastname.charAt(0).toUpperCase() + userInfo.lastname.slice(1);
-            setName(first_name + ' ' + last_name);
-        }
-        else{
-            console.log("UserInfo Empty")
+            setName(userInfo.firstname + ' ' + userInfo.lastname);
         }
     }, [userInfo, userRole]);
 

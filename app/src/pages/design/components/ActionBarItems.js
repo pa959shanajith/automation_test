@@ -4,7 +4,7 @@ import "../styles/ActionBarItems.scss"
 
 const UpperContent = ({appType, isMac}) => {
     let renderComp = [
-                    <div className='d__scrapeOn'>Debug On</div>, 
+                    <div className='d__debugOn'>Debug On</div>, 
                     <div className="d__thumbnail">
                         <input id="add_depend" type="checkbox" />
                         <span className="d__thumbnail_title">Add Dependent Test Cases</span>
@@ -12,16 +12,16 @@ const UpperContent = ({appType, isMac}) => {
                     ];
 
     if (appType === "Web") {renderComp.splice(1, 0, <>
-                                {WebList.map(icon => <Thumbnail title={icon.title} img={icon.img} svg={icon.svg} />)}
+                                {WebList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} svg={icon.svg} />)}
                                 { isMac && <Thumbnail title="Safari" img="static/imgs/ic-safari.png" />}</>)}
-    else if (appType === "OEBS") renderComp.splice(1, 0, <>{oebsList.map(icon => <Thumbnail title={icon.title} img={icon.img} />)}</>)
-    else if (appType === "Desktop") renderComp.splice(1, 0, <>{desktopList.map(icon => <Thumbnail title={icon.title} img={icon.img} />)}</>)
-    else if (appType === "System") renderComp.splice(1, 0, <>{systemList.map(icon => <Thumbnail title={icon.title} img={icon.img} />)}</>)
-    else if (appType === "SAP") renderComp.splice(1, 0, <>{sapList.map(icon => <Thumbnail title={icon.title} img={icon.img} />)}</>)
-    else if (appType === "Webservice") renderComp.splice(1, 0, <>{webserviceList.map(icon => <Thumbnail title={icon.title} img={icon.img} />)}</>)
-    else if (appType === "MobileApp") renderComp.splice(1, 0, <>{mobileAppList.map(icon => <Thumbnail title={icon.title} img={icon.img} />)}</>)
-    else if (appType === "MobileWeb") renderComp.splice(1, 0, <>{mobileWebList.map(icon => <Thumbnail title={icon.title} img={icon.img} />)}</>)
-    else if (appType === "Mainframe") renderComp.splice(1, 0, <>{mainframeList.map(icon => <Thumbnail title={icon.title} img={icon.img} />)}</>)
+    else if (appType === "OEBS") renderComp.splice(1, 0, <>{oebsList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</>)
+    else if (appType === "Desktop") renderComp.splice(1, 0, <>{desktopList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</>)
+    else if (appType === "System") renderComp.splice(1, 0, <>{systemList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</>)
+    else if (appType === "SAP") renderComp.splice(1, 0, <>{sapList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</>)
+    else if (appType === "Webservice") renderComp.splice(1, 0, <>{webserviceList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</>)
+    else if (appType === "MobileApp") renderComp.splice(1, 0, <>{mobileAppList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</>)
+    else if (appType === "MobileWeb") renderComp.splice(1, 0, <>{mobileWebList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</>)
+    else if (appType === "Mainframe") renderComp.splice(1, 0, <>{mainframeList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</>)
     
     return renderComp;
 };
@@ -35,7 +35,7 @@ const BottomContent = () => {
                     // <li style="visibility: hidden; display: none;"><a href='#' ng-click="importTestCase1($event)"></a><input style="visibility: hidden;" type="file" id="overWriteJson" accept=".json"></li>
     return (
         <>
-            {lowerList.map(icon => <Thumbnail title={icon.title} img={icon.img} />)}
+            {lowerList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}
         </>
     );
 };
@@ -88,7 +88,7 @@ const mobileAppList = [{'title': "Mobile Apps" , 'img': 'static/imgs/ic-mobility
 
 const mobileWebList = [{'title': "Mobile Web" , 'img': 'static/imgs/ic-mobility.png'}]
 
-const mainframeList = [{'title': "Mainframe", 'img': "static/imgs/ic-mainframe.png"}]
+const mainframeList = [{'title': "Mainframe", 'img': "static/imgs/ic-mainframe-o.png"}]
 
 
 export { UpperContent, BottomContent };

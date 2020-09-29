@@ -35,6 +35,10 @@
 
 .user-name-btn{
     padding-right: 12px;
+    .user-name{
+        text-transform: capitalize;
+        margin: 0 15px;
+    }
 }
 
 .user-name-menu{

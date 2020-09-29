@@ -44,38 +44,30 @@ const Header = () => {
 
     useEffect(()=>{
         if(Object.keys(userInfo).length!==0){
-            let first_name = userInfo.firstname.charAt(0).toUpperCase() + userInfo.firstname.slice(1);
-            let last_name = userInfo.lastname.charAt(0).toUpperCase() + userInfo.lastname.slice(1);
             setUserDetails(userInfo);
             setUserRole(selectedRole);
             if (userInfo.rolename === "Admin") setAdminDisable(true); 
-            if (first_name === last_name) setUsername(first_name);
-            else setUsername(first_name + ' ' + last_name);
+            if (userInfo.firstname === userInfo.lastname) setUsername(userInfo.firstname);
+            else setUsername(userInfo.firstname + ' ' + userInfo.lastname);
             
             if(window.localStorage['_SRS']==="success"){
-                delete window.localStorage['_SRS'];
-                setTimeout(() => {
-                    setShowSR_Pop({'title': 'Switch Role', 'content': `Your role is changed to ${selectedRole}`});
-                }, 500);
+                delete window.localStorage['_SRS']; 
+                setShowSR_Pop({'title': 'Switch Role', 'content': `Your role is changed to ${selectedRole}`});
             }
-        }
-        else{
-            console.log("UserInfo Empty")
         }
     }, [userInfo, selectedRole]);
 
     const naviPg = () => {
-		if (localStorage.getItem("navigateEnable") === "true") {
+        
+		// if (localStorage.getItem("navigateEnable") === "true") {
 			window.localStorage['navigateScreen'] = "plugin";
-			setTimeout(() => {
-                history.replace('/plugin');
-		   	}, 100);
-        }
+            history.replace('/plugin');
+        // }
     };
     
     const logout = event => {
-        persistor.purge();
         event.preventDefault();
+        persistor.purge();
 		window.sessionStorage.clear();
 		window.sessionStorage["checkLoggedOut"] = true;
         RedirectPage(history);
@@ -113,7 +105,12 @@ const Header = () => {
                     setRoleList(tempList);
                     setShowSR(true);
 				}
-			});
+            })
+            .catch(error=>{
+                setShowSR(false);
+                console.error("Failed to Fetch Role Names. ERROR::", error)
+                setShowSR_Pop({'title': 'Switch Role', 'content': "Failed to Fetch Role Names"});
+            });
 		}
     };
     
@@ -134,8 +131,7 @@ const Header = () => {
     const onClickAwaySR = () => setShowSR(false);
 
 
-
-    const switchedRole = (event) => {
+    const switchedRole = event => {
         setShowConfSR(false);
         setShowOverlay(`Switching to ${clickedRole.data}`)
 		loginApi.loadUserInfo(clickedRole.rid)
@@ -153,13 +149,13 @@ const Header = () => {
                     setRedirectTo("/plugin");
                 }
 			} else {
-                console.log("Fail to Switch User");
+                console.error("Fail to Switch User");
                 setShowSR_Pop({'title': 'Switch Role', 'content': "Fail to Switch User"});
 			}
         })
         .catch(error=> {
             setShowOverlay("");
-            console.log("Fail to Switch User");
+            console.error("Fail to Switch User. ERROR::", error);
             setShowSR_Pop({'title': 'Switch Role', 'content': "Fail to Switch User"});
 		});
 	};
@@ -174,7 +170,7 @@ const Header = () => {
         />
     );
 
-    const SR_Popup = () => (
+    const SRPopup = () => (
         <PopupMsg 
             title={showSR_Pop.title}
             content={showSR_Pop.content}
@@ -210,7 +206,7 @@ const Header = () => {
             { showChangePass && <ChangePassword setShow={toggleChangePass} loginApi={loginApi} setSuccessPass={setSuccessPass} /> }
             { showSuccessPass && <PasswordSuccessPopup /> }
             { showConfSR && <ConfSwitchRole />  }
-            { showSR_Pop && <SR_Popup /> }
+            { showSR_Pop && <SRPopup /> }
             { showOverlay && <ScreenOverlay content={showOverlay} /> }
 
             <div className = "main-header">
@@ -226,7 +222,7 @@ const Header = () => {
                             </div>
                             <div className={ "switch-role-menu dropdown-menu " + (showSR && "show")}>
                                 {roleList.map(role => 
-                                    <div data-id={role.rid} onClick={()=>showConfPop(role.rid, role.data)} >
+                                    <div key={role.rid} data-id={role.rid} onClick={()=>showConfPop(role.rid, role.data)} >
                                         <Link to="#">{role.data}</Link>
                                     </div>    
                                 )}
