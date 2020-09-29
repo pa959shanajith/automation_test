@@ -193,7 +193,7 @@ const LoginFields = (props) => {
             ?
             <div>
                 {serverList.map((server, index)=>{
-                    return <button className="restart-service-btn" disabled={!server.active} onClick={()=>restartServer(index, server.name)} type="submit">Restart {server.name}</button>
+                    return <button key={index} className="restart-service-btn" disabled={!server.active} onClick={()=>restartServer(index, server.name)} type="submit">Restart {server.name}</button>
                 })}
             </div>
             :

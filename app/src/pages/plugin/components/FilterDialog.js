@@ -10,8 +10,25 @@ const FilterDialog = ({setShow, filterDat, filterData, filterTasks}) => {
     const [task, setTask] = useState({});
     const [app, setApp] = useState({});
 
-    const onProjSel = event => setProj(event.target.value);
-    const onRelSel = event => setRel(event.target.value);
+    const onProjSel = event => {
+        let prj = event.target.value;
+        let rl = "Select Release";
+        let cy = "Select Cycle";
+        if (Object.keys(filterDat.prjrelmap[prj]).length === 1) {
+            rl = filterDat.prjrelmap[prj][0];
+            if (Object.keys(filterDat.relcycmap[rl]).length === 1) cy = filterDat.relcycmap[rl][0];
+        }
+        setProj(prj)
+        setRel(rl);
+        setCyc(cy);
+    };
+    const onRelSel = event => {
+        let rl = event.target.value;
+        let cy = "Select Cycle";
+        if (Object.keys(filterDat.relcycmap[rl]).length === 1) cy = filterDat.relcycmap[rl];
+        setRel(rl)
+        setCyc(cy);
+    };
     const onCycSel = event => setCyc(event.target.value);
     const onTaskSel = event => {
         if (event.target.checked) setTask({...task, [event.target.value]: true})
@@ -52,8 +69,8 @@ const FilterDialog = ({setShow, filterDat, filterData, filterTasks}) => {
                 </div>
                 <select className="selection-select" onChange={onProjSel} value={proj}>
                     <option className="select__menu" disabled value="Select Project">Select Project</option>
-                    {Object.keys(filterDat.idnamemapprj).map(id=>(
-                        <option className="select__menu" value={id}>{filterDat.idnamemapprj[id]}</option>   
+                    {Object.keys(filterDat.idnamemapprj).map((id, i)=>(
+                        <option key={i} className="select__menu" value={id}>{filterDat.idnamemapprj[id]}</option>   
                     ))}
                 </select>
             
@@ -62,8 +79,8 @@ const FilterDialog = ({setShow, filterDat, filterData, filterTasks}) => {
                 </div>
                 <select className="selection-select" onChange={onRelSel} disabled={proj==="Select Project"} value={rel}>
                     <option className="select__menu" disabled value="Select Release">Select Release</option>
-                    {Object.keys(filterDat.idnamemaprel).map(id=>(
-                        <option className="select__menu" value={id}>{filterDat.idnamemaprel[id]}</option>
+                    { filterDat.prjrelmap[proj] && filterDat.prjrelmap[proj].map((rel, i)=>(
+                        <option key={i} className="select__menu" value={rel}>{filterDat.idnamemaprel[rel]}</option>
                     ))}
                 </select>
             
@@ -72,23 +89,23 @@ const FilterDialog = ({setShow, filterDat, filterData, filterTasks}) => {
                 </div>
                 <select className="selection-select" onChange={onCycSel} disabled={rel==="Select Release"} value={cyc}>
                     <option className="select__menu" disabled value="Select Cycle">Select Cycle</option>
-                    {Object.keys(filterDat.idnamemapcyc).map(id=>(
-                        <option className="select__menu" value={id}>{filterDat.idnamemapcyc[id]}</option>
+                    { filterDat.relcycmap[rel] && filterDat.relcycmap[rel].map((id, i)=>(
+                        <option key={i} className="select__menu" value={id}>{filterDat.idnamemapcyc[id]}</option>
                     ))}
                 </select>
 
                 <div className="selection-lbl">
                     <span>Task Type:</span>
                 </div>
-                <span className="chkbx_div">{filterDat.tasktypes.map(item=>(
-                    <label className="filter_checkbox"><input className="chkbx" type="checkbox" checked={task[item]} onChange={onTaskSel} value={item}/>{item}</label>
+                <span className="chkbx_div">{filterDat.tasktypes.map((item, i)=>(
+                    <label key={i} className="filter_checkbox"><input className="chkbx" type="checkbox" checked={task[item]} onChange={onTaskSel} value={item}/>{item}</label>
                 ))}</span>
 
                 <div className="selection-lbl">
                     <span>AppTypes:</span>
                 </div>
-                <span className="chkbx_div">{filterDat.apptypes.map(item=>(
-                    <label className="filter_checkbox"><input className="chkbx" type="checkbox" checked={app[item]} onChange={onAppSel} value={item}/>{item}</label>
+                <span className="chkbx_div">{filterDat.apptypes.map((item, i)=>(
+                    <label key={i} className="filter_checkbox"><input className="chkbx" type="checkbox" checked={app[item]} onChange={onAppSel} value={item}/>{item}</label>
                 ))}</span>
             </div>
             </ScrollBar>
@@ -125,9 +142,9 @@ const FilterDialog = ({setShow, filterDat, filterData, filterTasks}) => {
         <div className="filter__pop">
         <ModalContainer 
             title="Filter Tasks"
-            content={<Content/>}
+            content={Content()}
             close={()=>setShow(false)}
-            footer={<Footer/>}
+            footer={Footer()}
         />
         </div>
     );
