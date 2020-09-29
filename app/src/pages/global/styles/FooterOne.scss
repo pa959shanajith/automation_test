@@ -28,7 +28,7 @@
 
 .footer-logo_one{
     margin-left: .5vw;
-    height: 1.25vw;
+    height: 16px;
 }
 
 @media screen and (max-width: 800px){
@@ -42,7 +42,7 @@
         line-height: 1.42857143;
     }
     
-    .footer-logo{
+    .footer-logo_one{
         margin-left: 3px;
         height: 10px;
     }
@@ -52,4 +52,8 @@
     .upper-text{
         font-size: 2vh;
     }
+    .footer-logo_one{
+        margin-left: .5vw;
+        height: 1.25vw;
+    }    
 }

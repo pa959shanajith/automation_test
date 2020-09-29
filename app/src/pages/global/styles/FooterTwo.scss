@@ -20,8 +20,8 @@
 }
 
 .footer-logo_two{
-    margin-left:3px;
-    height: 1.25vw; 
+    margin-left:6px;
+    height: 16px; 
 }
 
 .left-text{
@@ -51,9 +51,13 @@
         font-size: 1.4vw;
     }
     
-    .footer-logo{
+    .footer-logo_two{
         margin-left: 3px;
         height: 14px;
+    }
+    .footer-logo_two{
+        margin-left: .5vw;
+        height: 1.25vw;
     }
 }
 
