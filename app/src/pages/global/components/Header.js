@@ -14,8 +14,6 @@ import { persistor } from '../../../reducer'
     Component: Header Bar
     Uses: Provides header functionality to the page
     Props: None
-    Todo: Functionality part. ChangePassword import is commented because work in progress.
-    Note: LogOut is working fine.
 
 */
 
