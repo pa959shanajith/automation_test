@@ -25,6 +25,7 @@
     h4{
         font-family: "LatoWebBold";
         margin: 0;
+        flex-shrink: 0;
     }
 
 }
@@ -50,10 +51,12 @@
     text-align: start;
     flex-grow: 1;
     padding: 0 10px 0 10px;
+    word-break: break-all;
     cursor: pointer;
 }
 
 #plugin_page__list {
+
     .task-panel{
         border-bottom: 1px solid #949494;
         padding: 0 15px 0 25px;
@@ -144,6 +147,12 @@
 }
 
 #rb__pop_list{
+
+    .disable-task{
+        pointer-events: none;
+        filter: brightness(0.5);
+    }
+    
     .task-panel{
         min-height: 50px;
         border-bottom: 1px solid #643693;
@@ -155,7 +164,7 @@
     }
     
     .panel-content{
-        margin-bottom: 10px;
+        margin: 5px 0;
     
         h4{
             font-size: 15px;

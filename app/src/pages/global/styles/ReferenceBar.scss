@@ -152,8 +152,15 @@
     // flex-grow: 1;
 }
 
-.task_pop{
-    margin-top: 100%;
+.task_info{
+    display: flex;
+}
+
+.task_info__content{
+    flex-grow: 1;
+}
+
+.ref_pop{
     background-color: #311d4e;
     z-index: 100;
     display: flex;
@@ -163,7 +170,6 @@
     right: 110%;
     border-radius: 5px;
     width: 350px;
-    height: 56%;
     
     .pop__header{
         cursor: pointer;
@@ -173,12 +179,41 @@
         margin: 0;
         font-size: 18px;
         font-family: "LatoWeb";
-
+        
         img{
             width: 8px;
             height: 16px;
         }
     }
+}
+
+.task_pop{
+    height: 56%;
+}
+
+.info_pop{
+    height: 38%;
+}
+
+.info_pop__contents{
+    padding: 4% 9%;
+    font-size: 15px;
+    margin-bottom: 5px;
+    font-weight: 600;
+    display: grid;
+    grid-template-columns: 30% auto;
+    grid-gap: 5px 0;
+}
+
+.task_info__title{
+    flex-grow: 2;
+}
+
+.task_info__content{
+    flex-grow: 3;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .pop__title{

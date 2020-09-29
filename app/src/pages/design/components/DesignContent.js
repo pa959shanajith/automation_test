@@ -1,7 +1,7 @@
 import React from 'react';
 import "../styles/DesignContent.scss";
 
-const DesignContent = ({taskName}) => {
+const DesignContent = ({taskName, status}) => {
 
     const tableActionBtnGroup = [
         {'title': 'Add Test Step', 'img': 'static/imgs/ic-jq-addstep.png', 'alt': 'Add Steps', 'onClick': ''},
@@ -24,8 +24,8 @@ const DesignContent = ({taskName}) => {
             <div className="d__btngroup">
                 <div className="d__table_ac_btn_grp">
                 {
-                    tableActionBtnGroup.map(btn => 
-                        <button className="d__tblBtn"><img className="d__tblBtn_ic" src={btn.img} alt={btn.alt} title={btn.title}/> </button>
+                    tableActionBtnGroup.map((btn, i) => 
+                        <button key={i} className="d__tblBtn"><img className="d__tblBtn_ic" src={btn.img} alt={btn.alt} title={btn.title}/> </button>
                     )
                 }
                 </div>
@@ -36,7 +36,8 @@ const DesignContent = ({taskName}) => {
                 </div>
 
                 <div className="d__submit">
-                    <button className="d__submitBtn d__btn">Submit</button>
+                    { status === "underReview" && <button className="d__reassignBtn d__btn">Reassign</button>}
+                    <button className="d__submitBtn d__btn">{status === "underReview" ? "Approve" : "Submit"}</button>
                 </div>
 
             </div>

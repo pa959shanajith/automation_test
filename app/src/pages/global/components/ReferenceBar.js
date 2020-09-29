@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {ScrollBar, TaskContents} from '../../global';
 import { useSelector } from 'react-redux';
 import "../styles/ReferenceBar.scss";
+import ClickAwayListener from 'react-click-away-listener';
 
     /* 
         Component : ReferenceBar (Right Bar)
@@ -12,6 +13,7 @@ import "../styles/ReferenceBar.scss";
             children : renders the children passed above the task icon. 
             taskTop : send true to keep task before children
             collapse : set true to collpase Refernce bar
+            taskName : to let the reference bar know which task to highlight as disabled.
     */
 
 const ReferenceBar = (props) => {
@@ -21,8 +23,8 @@ const ReferenceBar = (props) => {
     const [searchValue, setSearchValue] = useState("");
     const [searchItems, setSearchItems] = useState([]);
     const [showTask, setShowTask] = useState(false);
+    const [showInfo, setShowInfo] = useState(false);
     const [taskPopY, setTaskPopY] = useState(null);
-
 
     const tasksJson = useSelector(state=>state.plugin.tasksJson);
     const filterDat = useSelector(state=>state.plugin.FD);
@@ -68,25 +70,20 @@ const ReferenceBar = (props) => {
                     'cycleid':tasksJson[i].taskDetails[0].cycleid,
                     'reuse':tasksJson[i].taskDetails[0].reuse
                 }
-                dataobj = JSON.stringify(dataobj)
-                task_list.push({'panel_idx': i, 'counter': counter, 'testSuiteDetails': testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype});
+
+                task_list.push({'panel_idx': i, 'testSuiteDetails': testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype});
                 
-                // let limit = 45;
-                // let chars = $("#panelBlock_"+i+"").children().find('span.assignedTaskInner').text();
-                // if (chars.length > limit) {
-                //    let visiblePart = chars.substr(0, limit-1);
-                //    let dots = $("<span class='dots'>...</span>");
-                //    let hiddenPart = chars.substr(limit-1);
-                //    let assignedTaskText = visiblePart + hiddenPart;
-                //    $("#panelBlock_"+i+"").children().find('span.assignedTaskInner').text(visiblePart).attr('title',assignedTaskText).append(dots);
-                // }
-                counter++;
             }
             setTaskList(task_list);
     }, [tasksJson]);
     useEffect(()=>{
         setCollapse(props.collapse)
     },[props.collapse])
+
+    useEffect(()=>{
+        setShowTask(false);
+    }, [props.taskName]);
+
     const onSearchHandler = event => {
         searchTask(event.target.value)
         setSearchValue(event.target.value);
@@ -105,9 +102,21 @@ const ReferenceBar = (props) => {
         setSearchItems(filteredItem);
     }
 
+    const closePopups = () => {
+        setShowInfo(false);
+        setShowTask(false);
+    }
+
     const toggleTaskPop = event => {
+        closePopups();
         setTaskPopY(event.clientY)
         setShowTask(!showTask)
+    }
+
+    const toggleInfoPop = event => {
+        closePopups();
+        setTaskPopY(event.clientY);
+        setShowInfo(!showInfo);
     }
 
     return (
@@ -122,11 +131,12 @@ const ReferenceBar = (props) => {
                     <div id="ref_bar_scroll" className="inside_min">
                     {
                         showTask && 
-                        <div className="task_pop" style={{marginTop: `calc(${taskPopY}px - 15vh)`}}>
-                            <h4 className="pop__header" onClick={()=>setShowTask(false)}><span className="pop__title">My task(s)</span><img className="task_close_arrow" src="static/imgs/ic-arrow.png"/></h4>
+                        <ClickAwayListener onClickAway={closePopups}>
+                        <div className="ref_pop task_pop" style={{marginTop: `calc(${taskPopY}px - 15vh)`}}>
+                            <h4 className="pop__header" onClick={()=>setShowTask(false)}><span className="pop__title">My task(s)</span><img className="task_close_arrow" alt="close_task" src="static/imgs/ic-arrow.png"/></h4>
                             <div className="input_group">
                                 <span className="search_task__ic_box">
-                                    <img className="search_task__ic" src="static/imgs/ic-search-icon.png"/>
+                                    <img className="search_task__ic" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
                                 </span>
                                 <input className="search_task__input" onChange={onSearchHandler} value={searchValue} placeholder="Seach My task(s)"/>
                             </div>
@@ -134,27 +144,49 @@ const ReferenceBar = (props) => {
                                 <div id='task_pop_scroll' className="task_pop__overflow">
                                     <ScrollBar scrollId='task_pop_scroll' trackColor="#46326b" thumbColor="#fff">
                                         <div className="task_pop__content" id="rb__pop_list">
-                                            <TaskContents items={searchValue ? searchItems : taskList} filterDat={filterDat} taskJson={tasksJson}/>
+                                            <TaskContents items={searchValue ? searchItems : taskList} taskName={props.taskName} filterDat={filterDat} taskJson={tasksJson}/>
                                         </div>
                                     </ScrollBar>
                                 </div>
                             </div>
                         </div>
+                        </ClickAwayListener>
                     }
+
+                    {
+                        showInfo && 
+                        <ClickAwayListener onClickAway={closePopups}>
+                        <div className="ref_pop info_pop" style={{marginTop: `calc(${taskPopY}px - 15vh)`}}>
+                            <h4 className="pop__header" onClick={()=>setShowInfo(false)}><span className="pop__title">Information</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
+                            <div className="info_pop__contents">
+                            {
+                                Object.keys(props.taskInfo).map(key => 
+                                    <>
+                                        <div className="task_info__title">{key}:</div>
+                                        <div className="task_info__content">{props.taskInfo[key]}</div>
+                                    </>
+                                )
+                            }
+                            </div>
+                        </div>
+                        </ClickAwayListener>
+                    }
+                    
+
                     <ScrollBar scrollId="ref_bar_scroll" trackColor="transparent" thumbColor="#7143b3">
                         <div className="ref__content">
                             <div className="rb_upper_contents">
                                 {props.taskTop?<div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
                                     {props.children}
                                 {!props.taskTop?<div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
-                                { !props.hideInfo && <div className="ic_box"><img className="rb__ic-info thumb__ic" src="static/imgs/ic-info.png"/><span className="rb_box_title">Info</span></div>}
+                                {!props.hideInfo && <div className="ic_box"><img className="rb__ic-info thumb__ic" src="static/imgs/ic-info.png"/><span className="rb_box_title">Info</span></div>}
                             </div>
                         </div>
                     </ScrollBar>
                 </div>
             </div>
             <div className="rb__bottom_content">
-                <div className="ic_box"><img className="rb__ic-assist thumb__ic" src="static/imgs/ic-assist.png"/><span className="rb_box_title">Assist</span></div>
+                <div className="ic_box"><img className="rb__ic-assist thumb__ic" alt="assist-ic" src="static/imgs/ic-assist.png"/><span className="rb_box_title">Assist</span></div>
                 </div>
         </>
         }

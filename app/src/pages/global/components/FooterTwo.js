@@ -10,7 +10,7 @@ const Footer = () => {
             </span>
             <span className="left-text">
                 Powered By
-                <img className="footer-logo" alt="logo" src="static/imgs/ftr-avo-logo.png"/>
+                <img className="footer-logo_two" alt="logo" src="static/imgs/ftr-avo-logo.png"/>
             </span>
             </div>
         </div>

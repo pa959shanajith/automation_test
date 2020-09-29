@@ -3,7 +3,7 @@
     justify-content: flex-end;
     color: #643693;
     font-family: "LatoWeb";
-    z-index: 1;
+    z-index: 0;
     padding: 0 30px 10px 0;
 }
 
@@ -18,17 +18,17 @@
     display: flex;
     justify-content: flex-end;
     align-items: baseline;
-    font-size: 1.1vw;
+    font-size: 14px;
 }
 
 .lower-text{
-    font-size: 1vw;
+    font-size: 1.8vh;
     line-height: 1.42857143;
 }
 
-.footer-logo{
+.footer-logo_one{
     margin-left: .5vw;
-    height: 1.1vw;
+    height: 16px;
 }
 
 @media screen and (max-width: 800px){
@@ -42,8 +42,18 @@
         line-height: 1.42857143;
     }
     
-    .footer-logo{
+    .footer-logo_one{
         margin-left: 3px;
         height: 10px;
     }
+}
+
+@media screen and (min-width: 1400px) and (min-height: 770px){
+    .upper-text{
+        font-size: 2vh;
+    }
+    .footer-logo_one{
+        margin-left: .5vw;
+        height: 1.25vw;
+    }    
 }
