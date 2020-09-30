@@ -11,7 +11,7 @@ import { ModalContainer, PopupMsg } from '../../global'
   use: renders tool bar menus of create new page
 */
 
-const Toolbarmenu = () => {
+const Toolbarmenu = (props) => {
     const dispatch = useDispatch()
     const SearchInp = useRef()
     const selectBox = useSelector(state=>state.mindmap.selectBoxState)
@@ -22,12 +22,14 @@ const Toolbarmenu = () => {
     const initProj = useSelector(state=>state.mindmap.selectedProj)
     const moduleList = useSelector(state=>state.mindmap.moduleList)
     const [modlist,setModList] = useState(moduleList)
-    const [popup,setPopup] = useState({show:false})
+    const setPopup = props.setPopup
 
     const selectProj = async(proj) => {
         dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
         var moduledata = await getModules({"tab":"tabCreate","projectid":proj,"moduleid":null})
+        if(moduledata.error){displayError(moduledata.error);return;}
         var screendata = await getScreens(proj)
+        if(screendata.error){displayError(screendata.error);return;}
         setModList(moduledata)
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
         dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
@@ -90,10 +92,17 @@ const Toolbarmenu = () => {
     const clickExporttoExcel = () =>{
         toExcel(initProj,selectedModule)
     }
+    const displayError = (error) =>{
+        setPopup({
+          title:'ERROR',
+          content:error,
+          submitText:'Ok',
+          show:true
+        })
+      }
     var projectList = Object.entries(prjList)
     return(
         <Fragment>
-        {popup.show?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
         <div className='toolbar__header'>
             <label>Project:</label>
             <select value={initProj} onChange={(e)=>{selectProj(e.target.value)}}>

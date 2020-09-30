@@ -30,6 +30,11 @@ const saveNode = async(setBlockui,dNodes,projId,setPopup,moduleList,deletedNodes
     var flag = 10 
     var temp_data = [];
     var counter = {};
+    var displayError = (error) => {
+        setBlockui({show:false});
+        setPopup({show:true,title:'Error',content:((error)?error:'Error while Saving'),submitText:'Ok'})
+        return;
+    }
     d3.select('#pasteImg').classed('active-map',false)
     d3.select('#copyImg').classed('active-map',false)
     d3.selectAll('.ct-node').classed('node-selected',false)   
@@ -81,23 +86,21 @@ const saveNode = async(setBlockui,dNodes,projId,setPopup,moduleList,deletedNodes
         createdthrough: "Web"
     }
     var modId = await saveMindmap(data)
-    if(modId && !modId.error){
-        var moduledata = await getModules({modName:null,cycId:null,"tab":"tabCreate","projectid":projId,"moduleid":null})
-        var moduleselected = await getModules({modName:null,cycId:null,"tab":"tabCreate","projectid":projId,"moduleid":modId})
-        var screendata = await getScreens(projId)
-        if(screendata)dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
-        dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[]})
-        dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
-        dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-        dispatch({type:actionTypes.SELECT_MODULE,payload:moduleselected})
-        setBlockui({show:false});
-        setPopup({show:true,title:'Success',content:'Data saved successfully',submitText:'Ok'})
-        return;
-    }else{
-        setBlockui({show:false});
-        setPopup({show:true,title:'Error',content:((modId && modId.error)?modId.error:'Error while Saving'),submitText:'Ok'})
-        return;
-    }
+    if(modId.error){displayError(modId.error);return}
+    var moduledata = await getModules({modName:null,cycId:null,"tab":"tabCreate","projectid":projId,"moduleid":null})
+    if(moduledata.error){displayError(moduledata.error);return}
+    var moduleselected = await getModules({modName:null,cycId:null,"tab":"tabCreate","projectid":projId,"moduleid":modId})
+    if(moduleselected.error){displayError(moduleselected.error);return}
+    var screendata = await getScreens(projId)
+    if(screendata.error){displayError(screendata.error);return}
+    dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
+    dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[]})
+    dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
+    dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+    dispatch({type:actionTypes.SELECT_MODULE,payload:moduleselected})
+    setBlockui({show:false});
+    setPopup({show:true,title:'Success',content:'Data saved successfully',submitText:'Ok'})
+    return;
 }
 
 const treeIterator = (c, d, e) =>{

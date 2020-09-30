@@ -1,6 +1,5 @@
 import React ,  { Fragment, useEffect, useState, useRef} from 'react';
 import {getProjectList, getModules, getScreens} from '../api';
-import { useHistory } from 'react-router-dom';
 import LoadingBar from 'react-top-loading-bar';
 import { useDispatch, useSelector} from 'react-redux';
 import MindmapToolbar from './MindmapToolbar';
@@ -10,7 +9,6 @@ import * as actionTypes from '../state/action';
 import Canvas from './MindmapCanvas';
 import '../styles/CreateNew.scss';
 import { ScreenOverlay, PopupMsg, ReferenceBar, ActionBar} from '../../global';
-export var history
 
 /*Component CreateNew
   use: renders create New Mindmap page
@@ -23,7 +21,6 @@ const CreateNew = () => {
   const [blockui,setBlockui] = useState({show:false})
   const [fullScreen,setFullScreen] = useState(false)
   const [verticalLayout,setVerticalLayout] = useState(false)
-  history =  useHistory()
   const loadref = useRef(null)
   const [loading,setLoading] = useState(true)
   const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
@@ -31,17 +28,29 @@ const CreateNew = () => {
     (async()=>{
       loadref.current.staticStart()
       var res = await getProjectList()
+      if(res.error){displayError(res.error);return;}
       var data = parseProjList(res)
       dispatch({type:actionTypes.UPDATE_PROJECTLIST,payload:data})
       dispatch({type:actionTypes.SELECT_PROJECT,payload:res.projectId[0]}) 
       var moduledata = await getModules({"tab":"tabCreate","projectid":res.projectId[0],"moduleid":null})
+      if(moduledata.error){displayError(moduledata.error);return;}
       var screendata = await getScreens(res.projectId[0])
+      if(screendata.error){displayError(screendata.error);return;}
       dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
       dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
       loadref.current.complete()
       setLoading(false)
     })()
   },[dispatch])
+  const displayError = (error) =>{
+    setLoading(false)
+    setPopup({
+      title:'ERROR',
+      content:error,
+      submitText:'Ok',
+      show:true
+    })
+  }
   return (
     <Fragment>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
@@ -49,7 +58,7 @@ const CreateNew = () => {
         <LoadingBar shadow={false} color={'#633690'} className='loading-bar' ref={loadref}/>
         {(!loading)?
           <div className='mp__canvas_container'>
-            <MindmapToolbar/>
+            <MindmapToolbar setPopup={setPopup}/>
             <div id='mp__canvas' className='mp__canvas'>
               {(Object.keys(moduleSelect).length>0)?
               <Canvas setBlockui={setBlockui} setPopup={setPopup} module={moduleSelect} verticalLayout={verticalLayout}/>

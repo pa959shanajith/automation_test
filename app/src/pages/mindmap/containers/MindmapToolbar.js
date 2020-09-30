@@ -9,13 +9,13 @@ import '../styles/MindmapToolbar.scss'
     add user permission check 
 */
 
-const MindmapToolbar = () => {
+const MindmapToolbar = (props) => {
   return (
     <Fragment>
       <div className='toolbar__container'>
-          <Toolbarmenu/>
+          <Toolbarmenu setPopup={props.setPopup}/>
       </div>
-      <ModuleListDrop/>
+      <ModuleListDrop setPopup={props.setPopup}/>
     </Fragment>
   );
 }

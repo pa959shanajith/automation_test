@@ -12,7 +12,7 @@ import '../styles/ModuleListDrop.scss'
     setoptions from mindmapHome.js 
 */
 
-const ModuleListDrop = () =>{
+const ModuleListDrop = (props) =>{
     const dispatch = useDispatch()
     const moduleList = useSelector(state=>state.mindmap.moduleList)
     const proj = useSelector(state=>state.mindmap.selectedProj)
@@ -45,8 +45,18 @@ const ModuleListDrop = () =>{
             moduleid:modID
         }
         var res = await getModules(req)
+        if(res.error){displayError(res.error);return}
         dispatch({type:actionTypes.SELECT_MODULE,payload:res})
         setLoading(false)
+    }
+    const displayError = (err) =>{
+        setLoading(false)
+        props.setPopup({
+          title:'ERROR',
+          content:err,
+          submitText:'Ok',
+          show:true
+        })
     }
     return(
         <Fragment>
