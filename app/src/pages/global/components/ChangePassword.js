@@ -114,8 +114,8 @@ const ChangePassword = ({setShow, loginApi, setSuccessPass}) => {
         <ModalContainer
         close={handleClose}
         title={"Change Password"}
-        content={<Content />}
-        footer={<Footer/>}
+        content={Content()}
+        footer={Footer()}
         />
     );
 }

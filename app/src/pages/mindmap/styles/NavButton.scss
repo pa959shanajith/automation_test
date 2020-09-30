@@ -1,8 +1,7 @@
 #navigate-widget {
-    position: absolute;
-    top: 100px;
-    left: 100px;
+    position: relative;
     z-index: 1;
+    padding: 1px;
 }
 .arrow-box {
     float: left;
@@ -35,26 +34,31 @@
     border-color: #633690;
 }
 .up {
+    cursor: pointer;
     margin-left: 0px;
     transform: rotate(-135deg);
     -webkit-transform: rotate(-135deg);
 }
 .left {
+    cursor: pointer;
     margin-left: 0px;
     transform: rotate(135deg);
     -webkit-transform: rotate(135deg);
 }
 .right {
+    cursor: pointer;
     margin-left: 50px;
     transform: rotate(-45deg);
     -webkit-transform: rotate(-45deg);
 }
 .down {
+    cursor: pointer;
     margin-left: 0px;
     transform: rotate(45deg);
     -webkit-transform: rotate(45deg);
 }
 .zoom-btn {
+    cursor: pointer;
     background: #fff;
     border: 1px solid #aaa;
     color: #aaa;

@@ -28,13 +28,6 @@
 .node-highlight{
     outline : 2px solid black;
 }
-.ct-actionBox{
-    position: absolute;
-    height: 25px;
-    width: 180px;
-    top: calc(100% - 63px);
-    right: 20px;
-}
 .ct-actionButton>rect{
     fill: #633690;
     height: 25px;
@@ -50,15 +43,9 @@
 .no-disp {
     display: none!important;
 }
-#ct-inpBox{
-    position: absolute;
+.node-selected {
+    outline: 1px dashed blue;
 }
-.ct-inp {
-    position: absolute;
-    padding: 3px 8px;
-    height: 17px;
-    width: 130px;
-    outline: none;
-    border: 1px solid #6e6e6e;
-    font-size: 10px;
+.node-error{
+    outline: 2px dashed red;
 }

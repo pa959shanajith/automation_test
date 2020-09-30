@@ -1,13 +1,18 @@
 import React, { useEffect } from 'react';
 import PluginHome from './containers/PluginHome';
 import { useDispatch } from 'react-redux';
-import { SetProgressBar } from '../global';
+import {useHistory} from 'react-router-dom';
+import { SetProgressBar, RedirectPage } from '../global';
 
 const Plugin = () => {
 
-    let dispatch = useDispatch();
+    const history = useHistory();
+    const dispatch = useDispatch();
 
     useEffect(()=>{
+        if(window.localStorage['navigateScreen'] !== "plugin"){
+            RedirectPage(history);
+        }
         SetProgressBar("stop", dispatch);
     }, []);
 
