@@ -117,7 +117,7 @@ const CreateUser = (props) => {
                     setPopupState({show:true,title:bAction+" User",content:"Failed to "+action+" user."});
                 } 
                 else if(/^2[0-4]{8}$/.test(data)) {
-                    if (parseInt(data[1])) {
+                    if (JSON.parse(JSON.stringify(data)[1])) {
                         setPopupState({show:true,title:bAction+" User",content:"Failed to "+action+" user. Invalid Request!"});
                         return;
                     }
@@ -249,10 +249,6 @@ const CreateUser = (props) => {
 
     //Clear Input values and red Borders( if any)
     const click = (props) =>{
-		// $(".selectedIcon").removeClass("selectedIcon");
-		// $("button.userTypeBtnActive").removeClass('userTypeBtnActive');
-        // $("#userTab").find("span.fa").addClass("selectedIcon");
-        
         setUserNameAddClass(false);
         setfirstnameAddClass(false);
         setLastnameAddClass(false);
@@ -585,7 +581,6 @@ const CreateUser = (props) => {
                             }
                             else {
                                 dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
-                                // data.sort((a,b)=>a.name.localeCompare(b.name));
                                 data1.sort();
                                 dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data1})
                             }
@@ -628,7 +623,6 @@ const CreateUser = (props) => {
 					}
                     dispatch({type:actionTypes.UPDATE_SERVER,payload: confserver});
                     dispatch({type:actionTypes.UPDATE_LDAP_USER,payload: data.ldapuser || ''});
-					// $scope.$apply();    ???????????
 				}
             }
         }catch(error){
@@ -681,7 +675,7 @@ const CreateUser = (props) => {
                 <div className='adminControl'>
 					<input value={userConf.email} onChange={(event)=>{dispatch({type:actionTypes.UPDATE_INPUT_EMAIL,payload:event.target.value})}} type="email" autoComplete="off" name="email" id="email" maxLength="100" className={emailAddClass?"middle__input__border form-control__conv form-control-custom create inputErrorBorder":"middle__input__border form-control__conv form-control-custom create"} placeholder="Email Id"/>
 				</div>
-				<div className="selectRole  adminControl" style={{ paddingLeft: "0" }} >
+				<div className="selectRole  adminControl role-padding" >
 					<label className="leftControl primaryRole">Primary Role</label>
 					<select value={userConf.role} disabled={props.showEditUser===true} className={userRolesAddClass?'adminSelect form-control__conv selectErrorBorder':'adminSelect form-control__conv '} onChange={(event)=>{dispatch({type:actionTypes.UPDATE_USERROLE,payload:event.target.value})}} id="userRoles" style={(props.showEditUser===true)?{backgroundColor: "#eee",cursor: "not-allowed"}:{}} >
 						<option value="" >Select User Role</option>

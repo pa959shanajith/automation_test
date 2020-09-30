@@ -36,7 +36,6 @@ const ProjectButtons = (props) => {
                 setPopupState({show:true,title:"Update Project",content:"Please add atleast one cycle for release: " + relNames});
             } 
             else if (proceedToCreate === true) {
-				// var projectExists = false; //check needed or not
 				var requestedids = [];
 				var idtype = [];
 				checkCycle(props.flag);
@@ -45,8 +44,6 @@ const ProjectButtons = (props) => {
 					return false;
             	} 
             else if (props.selDomain !== "") {
-                    //check down line
-                    // $('#selDomain').val($('#selDomain').val()[0].toUpperCase()+$('#selDomain').val().slice(1))
                     requestedids.push(props.selDomain);
                     idtype.push('domainsall');
                     var proceeed = false;
@@ -207,15 +204,7 @@ const ProjectButtons = (props) => {
                     }
                     props.clearUpdateProjectObjects();
                     if (updateProjectRes === 'success') {
-                        //Clearing old data from updateProject object
-                        
                         setPopupState({show:true,title:"Update Project",content:"Project updated successfully"});
-                        // $timeout(function () {
-                        //     $("#projectTab").trigger("click");
-                        //     $(".adminActionBtn button:nth-child(1)").trigger("click");
-                        // }, 200);
-                        // resetForm();  //check if needed or not 
-                        
                     } else {
                         setPopupState({show:true,title:"Update Project",content:"Failed to update project"});
                         props.resetForm();
@@ -240,7 +229,7 @@ const ProjectButtons = (props) => {
                 {props.taskName==="Create Project"?
                     <Fragment>
                         <button className="btn-md pull-right adminBtn" onClick={()=>props.editProjectTab()}  title="Edit Project">Edit</button>
-                        <button className="btn-md pull-right adminBtn" onClick={()=>{create_project()}} style={{marginRight:"10px"}} title="Create Project">Create</button>            
+                        <button className="btn-md pull-right adminBtn btn-project-cust" onClick={()=>{create_project()}} title="Create Project">Create</button>            
                     </Fragment>
                 :<button className="btn-md pull-right adminBtn" onClick={()=>{updateProject()}}  title="Update Project">Update</button>
                 }
