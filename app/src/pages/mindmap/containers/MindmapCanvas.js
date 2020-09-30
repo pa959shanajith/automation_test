@@ -9,7 +9,6 @@ import InputBox from '../components/InputBox'
 import MultiNodeBox from '../components/MultiNodeBox'
 import RectangleBox from '../components/RectangleBox'
 import SaveMapButton from '../components/SaveMapButton'
-import { ScreenOverlay, PopupMsg } from '../../global';
 import { useDispatch, useSelector} from 'react-redux';
 import * as actionTypes from '../state/action';
 import '../styles/MindmapCanvas.scss';
@@ -76,8 +75,8 @@ const Canvas = (props) => {
             setCreateNew(0)
         } else {
             // To load an existing module. Tree has to be loaded. Possible places, module box / switch layout.
-            var tree = props.module
-            if(verticalLayout!=props.verticalLayout && dNodes.length>0){
+            tree = props.module
+            if(verticalLayout !== props.verticalLayout && dNodes.length > 0){
                 tree = dNodes[0]
             }
             //load mindmap from data
@@ -238,7 +237,7 @@ const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay,setPopup) =
     var s = d3.select('#'+activeNode);
     // SaveCreateED('#ct-createAction', 1, 0);
     var t = s.attr('data-nodetype');
-    if (t == 'modules') return;
+    if (t === 'modules') return;
     var p = dNodes[sid].parent;
     if(dNodes[sid]['taskexists']!=null){
         setPopup({show:true,title:'Error',content:'Cannot delete node if task is assigned. Please unassign task first.',submitText:'Ok'})
@@ -256,14 +255,14 @@ const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay,setPopup) =
     }
     recurseDelChild(dNodes[sid],linkDisplay, nodeDisplay,dNodes,dLinks,undefined,deletedNodes);
     for (var j = dLinks.length - 1; j >= 0; j--) {
-        if (dLinks[j].target.id == sid){
+        if (dLinks[j].target.id === sid){
             dLinks[j].deleted = !0;
             delete linkDisplay['link-' + dLinks[j].source.id + '-' + dLinks[j].target.id];
             break;
         }
     }
     p.children.some((d, i)=>{
-        if (d.id == sid) {
+        if (d.id === sid) {
             p.children.splice(i, 1);
             return !0;
         }
@@ -274,7 +273,7 @@ const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay,setPopup) =
 
 const recurseDelChild = (d, linkDisplay, nodeDisplay, dNodes, dLinks, tab , deletedNodes) =>{
     if (d.children) d.children.forEach((e)=>{recurseDelChild(e, linkDisplay, nodeDisplay, dNodes, dLinks, tab, deletedNodes)});
-    if(d.state=="deleted")return;
+    if(d.state === "deleted")return;
     if(d._id){  
         var parentid=dNodes[d.parent.id]._id;
         deletedNodes.push([d._id,d.type,parentid]);
@@ -287,7 +286,7 @@ const recurseDelChild = (d, linkDisplay, nodeDisplay, dNodes, dLinks, tab , dele
     dNodes[d.id].state = 'deleted';
     var temp = dLinks;
     for (var j = temp.length - 1; j >= 0; j--) {
-        if (temp[j].source.id == d.id) {
+        if (temp[j].source.id === d.id) {
             delete linkDisplay['link-' + temp[j].source.id + '-' + temp[j].target.id];
             temp[j].deleted = !0;
         }
@@ -327,7 +326,7 @@ const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,
             activeNode = activeNode.split("node_")[1]
             //paste to scenarios
             dNodes_c.forEach((e) =>{
-                if (e.type == 'screens') {
+                if (e.type === 'screens') {
                     var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,e.name,verticalLayout)
                     cnodes = res.nodeDisplay
                     clinks = res.linkDisplay
@@ -336,7 +335,7 @@ const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,
                     count= {...count,...res.count}
                     activeNode = cdNodes.length-1
                     dLinks_c.forEach((f)=>{
-                        if (f.source.id == e.id) {
+                        if (f.source.id === e.id) {
                             var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,f.target.name,verticalLayout)
                             cnodes = res.nodeDisplay
                             clinks = res.linkDisplay
@@ -352,7 +351,7 @@ const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,
             //paste to module
             //call $scope.createNode for each node
             dNodes_c.forEach((e)=> {
-                if (e.type == 'scenarios') {
+                if (e.type === 'scenarios') {
                     activeNode = 0;
                     var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,e.name,verticalLayout)
                     cnodes = res.nodeDisplay
@@ -363,7 +362,7 @@ const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,
                     activeNode = cdNodes.length-1;
                     activenode_scr = activeNode;
                     dLinks_c.forEach((f) =>{
-                        if (f.source.id == e.id && f.target.type == 'screens') {
+                        if (f.source.id === e.id && f.target.type === 'screens') {
                             activeNode = activenode_scr;
                             var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,f.target.name,verticalLayout)
                             cnodes = res.nodeDisplay
@@ -373,7 +372,7 @@ const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,
                             count= {...count,...res.count}
                             activeNode = cdNodes.length-1;
                             dLinks_c.forEach(function(g, k) {
-                                if (g.source.id == f.target.id && g.source.type == 'screens') {
+                                if (g.source.id === f.target.id && g.source.type === 'screens') {
                                     var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,g.target.name,verticalLayout)
                                     cnodes = res.nodeDisplay
                                     clinks = res.linkDisplay

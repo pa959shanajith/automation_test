@@ -1,4 +1,4 @@
-import React, { useState, useRef, Fragment } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {saveMindmap,getModules,getScreens} from '../api';
 import * as d3 from 'd3';
@@ -39,9 +39,9 @@ const saveNode = async(setBlockui,dNodes,projId,setPopup,moduleList,deletedNodes
     d3.select('#copyImg').classed('active-map',false)
     d3.selectAll('.ct-node').classed('node-selected',false)   
     if (d3.select('#ct-save').classed('disableButton')) return;
-    var namelist = dNodes.map((e)=>{if(e._id && e.type==='screens' && e.state!="deleted")return e.name})
+    var namelist = dNodes.map((e)=>{if(e._id && e.type === 'screens' && e.state !== "deleted")return e.name})
     var duplicateNode = dNodes.every((e,i)=>{
-        if(e._id && e.type==='screens' && e.state!="deleted"){
+        if(e._id && e.type === 'screens' && e.state!="deleted"){
             return namelist.indexOf(e.name) === i || dNodes[namelist.indexOf(e.name)]._id === e._id
         } return true;
     })
@@ -51,7 +51,7 @@ const saveNode = async(setBlockui,dNodes,projId,setPopup,moduleList,deletedNodes
     }
     setBlockui({show:true,content:'Saving flow! Please wait...'})
     dNodes.forEach((e, i)=>{
-        if (i == 0) return;
+        if (i === 0) return;
         temp_data[i] = {
             idx: i,
             x: e.x,
@@ -66,10 +66,10 @@ const saveNode = async(setBlockui,dNodes,projId,setPopup,moduleList,deletedNodes
     }
     temp_data.forEach((e)=>{
         // var key_1=undefined;
-        if(dNodes[e.idx].parent==null) return;
+        if(dNodes[e.idx].parent === null) return;
         var key_1= dNodes[e.idx].parent.id;
         var key=e.type+'_'+key_1;
-        if(counter[key]==undefined)  counter[key]=1;
+        if(counter[key] === undefined)  counter[key]=1;
         if (dNodes[e.idx].childIndex != counter[key]) {
             dNodes[e.idx].childIndex = counter[key];
             dNodes[e.idx].cidxch = 'true'; // child index updated
@@ -122,7 +122,7 @@ const treeIterator = (c, d, e) =>{
             state: (d.state) ? d.state : "created",
             cidxch: (d.cidxch) ? d.cidxch : null // childindex changed
         };
-        if (d.type == 'testcases') obj.screenname = d.parent.name; // **Impact check**
+        if (d.type === 'testcases') obj.screenname = d.parent.name; // **Impact check**
         c.push(obj);
     }
     if (d.children && d.children.length > 0) d.children.forEach(function(t) {

@@ -8,7 +8,7 @@ import Legends from '../components/Legends'
 import * as actionTypes from '../state/action';
 import Canvas from './MindmapCanvas';
 import '../styles/CreateNew.scss';
-import { ScreenOverlay, PopupMsg, ReferenceBar, ActionBar} from '../../global';
+import { ScreenOverlay, PopupMsg, ReferenceBar} from '../../global';
 
 /*Component CreateNew
   use: renders create New Mindmap page
