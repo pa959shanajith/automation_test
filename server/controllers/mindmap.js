@@ -27,26 +27,14 @@ var xlsToCSV = function (workbook, sheetname) {
 	return result;
 };
 
-exports.populateProjects = function (req, res) {
+exports.populateProjects =  async(req, res) => {
 	logger.info("Inside UI service: populateProjects");
-	if (utils.isSessionActive(req)) {
-		var reqData = {
-			"userid": req.session.userid,
-			"allflag": true
-		};
-		create_ice.getProjectIDs(reqData, function (err, data) {
-			res.setHeader('Content-Type', 'application/json');
-			if (err)
-				res.status(500).send('Fail');
-			else {
-				res.status(200).send(data);
-			}
-		});
-	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
-	}
+	var reqData = {
+		"userid": req.session.userid,
+		"allflag": true
+	};
+	const data = await create_ice.getProjectIDs(reqData);
+	res.send(data);
 };
 
 exports.populateScenarios = function (req, res) {
@@ -123,9 +111,7 @@ exports.populateUsers = function (req, res) {
 
 };
 
-exports.getModules = async (req, res) => {
-	logger.info("Inside UI service: getModules");
-	const d = req.body;
+const getModule = async (d) => {
 	const inputs = {
 		"tab":d.tab,
 		"projectid":d.projectid || null,
@@ -134,7 +120,12 @@ exports.getModules = async (req, res) => {
 		"cycleid":d.cycId,
 		"name":"getModules"
 	}
-	const data = await utils.fetchData(inputs, "mindmap/getModules", "getModules");
+	return utils.fetchData(inputs, "mindmap/getModules", "getModules");
+};
+
+exports.getModules = async (req, res) => {
+	logger.info("Inside UI service: getModules");
+	const data = await getModule(req.body);
 	res.send(data);
 };
 
@@ -199,20 +190,15 @@ exports.reviewTask = function (req, res) {
 	}
 };
 
-exports.saveData = function (req, res) {
+exports.saveData =  async(req, res)=> {
 	logger.info("Inside UI service: saveData");
 	if (utils.isSessionActive(req)) {
 		var tasks = [];
-		var nameDict = {};
-		var nData = [], qList = [], idDict = {};
-		var urlData = req.get('host').split(':');
+		var idDict = {};
 		var inputs = req.body;
 		var data = inputs.map;
 		var vn_from="0.0";
 		var vn_to="0.0";
-		var tab = inputs.tab;
-		var assignedAt = inputs.UtcTime;
-		var selectedTab = inputs.selectedTab;
 		var prjId = inputs.prjId;
 		var deletednodes = inputs.deletednode;
 		var user = req.session.username;
@@ -221,12 +207,8 @@ exports.saveData = function (req, res) {
 		var userroleid = req.session.activeRoleId;
 		var flag = inputs.write;
 		var removeTask = inputs.unassignTask;
-		var sendNotify = inputs.sendNotify;
-		//var relId = inputs.relId;
 		var cycId = inputs.cycId;
-		var idxDict = [];
 		var createdthrough = inputs.createdthrough || "Web";
-		//Assigned Tasks Notification
 		var assignedObj = {};
 		for (var k = 0; k < data.length; k++) {
 			var task = data[k].task;
@@ -321,6 +303,7 @@ exports.saveData = function (req, res) {
 			});
 			tsList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
 			qObj.testsuiteDetails = [{ "testsuiteId": nObj[rIndex]._id||null, "testsuiteName": nObj[rIndex].name, "task": nObj[rIndex].task, "testscenarioDetails": tsList,"state":nObj[rIndex].state}];
+			
 			create_ice.saveMindmap(qObj, function (err, data) {
 				if (err) {
 					res.status(500).send(err);
@@ -688,147 +671,114 @@ exports.excelToMindmap = function (req, res) {
 	}
 };
 
-exports.getScreens = function (req, res) {
+exports.getScreens = async(req, res) =>{
 	logger.info("Inside UI service: populateScenarios");
-	if (utils.isSessionActive(req)) {
-		var d = req.body;
-		var projectid = d.projectId;
-		var screenList = [];
-		var testCasesList = [];
-
-		var inputs= {
-			"projectid":projectid
-		}
-		var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
-			}
-		};
-
-		client.post(epurl+"mindmap/getScreens", args,
-		function (result, response) {
-			try {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in mindmap/getScenarios: getScenarios, Error Code : ERRDAS");
-					res.send("fail");
-				} else {
-					res.send(result.rows);
-				}
-			} catch (ex) {
-				logger.error("Exception in the service getScenarios: %s", ex);
-			}
-		});
-		
+	var d = req.body;
+	var inputs= {
+		"projectid":d.projectId
 	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
-	}
+	var data = await utils.fetchData(inputs, "mindmap/getScreens", "getScreens");
+	res.send(data);
 };
 
-exports.exportToExcel = function (req, res) {
+exports.exportToExcel = async (req, res) =>{
 	logger.info("Writing Module structure to Excel");
-	if (utils.isSessionActive(req)) {
-		var d = req.body;
-		var excelMap = d.excelMap;
-		var dir = './../../excel';
-		var excelDirPath = path.join(__dirname, dir);
-		var filePath = path.join(excelDirPath, 'samp234.xlsx');
+	var d = req.body;
+	var excelMap = await getModule({modName:null,cycId:null,"tab":"tabCreate","projectid":d.projectid,"moduleid":d.moduleid})
+	var dir = './../../excel';
+	var excelDirPath = path.join(__dirname, dir);
+	var filePath = path.join(excelDirPath, 'samp234.xlsx');
 
-		try {
-			if (!fs.existsSync(excelDirPath)) fs.mkdirSync(excelDirPath); // To create directory for storing excel files if DNE.
-			if (fs.existsSync(filePath)) fs.unlinkSync(path.join(filePath)); // To remove the created files
-		} catch (e) {
-			logger.error("Exception in mindmapService: exportToExcel: Create Directory/Remove file", e);
-		}
+	try {
+		if (!fs.existsSync(excelDirPath)) fs.mkdirSync(excelDirPath); // To create directory for storing excel files if DNE.
+		if (fs.existsSync(filePath)) fs.unlinkSync(path.join(filePath)); // To remove the created files
+	} catch (e) {
+		logger.error("Exception in mindmapService: exportToExcel: Create Directory/Remove file", e);
+	}
 
-		//create a new workbook file in current working directory
-		var wb = new xl.Workbook();
-		var ws = wb.addWorksheet('Sheet1');
+	//create a new workbook file in current working directory
+	var wb = new xl.Workbook();
+	var ws = wb.addWorksheet('Sheet1');
 
-		logger.debug(excelMap.name);
+	logger.debug(excelMap.name);
 
-		//create the new worksheet with 10 coloumns and rows equal to number of testcases
-		var curr = excelMap;
+	//create the new worksheet with 10 coloumns and rows equal to number of testcases
+	var curr = excelMap;
 
-		//Sorting the positions of the child nodes according to their childindex
-		for (i = 0; i < curr.children.length; i++) {
-			for (j = 0; j < curr.children[i].children.length; j++) {
-				//sort the testcases based on childindex
-				curr.children[i].children[j].children.sort(function(a,b){
-					return parseInt(a.childIndex)-parseInt(b.childIndex)});
-			}
-			//sort the screens based on childindex
-			curr.children[i].children.sort(function(a,b){
+	//Sorting the positions of the child nodes according to their childindex
+	for (i = 0; i < curr.children.length; i++) {
+		for (j = 0; j < curr.children[i].children.length; j++) {
+			//sort the testcases based on childindex
+			curr.children[i].children[j].children.sort(function(a,b){
 				return parseInt(a.childIndex)-parseInt(b.childIndex)});
 		}
-		//sort the scenarios based on childindex
-		curr.children.sort(function(a,b){
-		return parseInt(a.childIndex)-parseInt(b.childIndex)});
-
-		//Set some width for first 4 columns
-		ws.column(1).setWidth(40);
- 		ws.column(2).setWidth(40);
-  		ws.column(3).setWidth(40);
-		ws.column(4).setWidth(40);
-
-		var style = wb.createStyle({
-			font: {
-				color: '000000',
-				bold: true,
-				  size: 12,
-				}
-			  });
-
-		ws.cell(1, 1)
-			  .string('Module')
-			  .style(style);
-	
-		ws.cell(1, 2)
-			  .string('Scenario')
-			  .style(style);
-	
-		ws.cell(1, 3)
-			  .string('Screen')
-			  .style(style);
-	
-		ws.cell(1, 4)
-			  .string('Script')
-			  .style(style);
-
-		var min_scen_idx = 1;
-		var min_scr_idx = 1;
-		ws.cell(2,1).string(curr.name);
-		try {
-			var tc_count=0;
-			for (i = 0; i < curr.children.length; i++) {
-				for (j = 0; j < curr.children[i].children.length; j++) {
-					for (k = 0; k < curr.children[i].children[j].children.length; k++) {
-						tc_count++;
-						ws.cell(1 + tc_count,4).string(curr.children[i].children[j].children[k].name);
-					}
-					
-					ws.cell(1 + min_scr_idx,3).string(curr.children[i].children[j].name);
-					min_scr_idx= tc_count+1;
-				}
-				ws.cell( 1 + min_scen_idx,2).string(curr.children[i].name);
-				min_scen_idx=tc_count+1;
-			}
-			//save it
-			wb.write('./excel/samp234.xlsx',function (err) {
-				if (err) return res.send('fail');
-				res.writeHead(200, {'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-				var rstream = fs.createReadStream(filePath);
-				rstream.pipe(res);
-			});
-		} catch (ex) {
-			logger.error("Exception in mindmapService: exportToExcel: ", ex);
-		}
-	} else {
-		logger.error("Invalid session");
-		res.send("Invalid Session");
+		//sort the screens based on childindex
+		curr.children[i].children.sort(function(a,b){
+			return parseInt(a.childIndex)-parseInt(b.childIndex)});
 	}
+	//sort the scenarios based on childindex
+	curr.children.sort(function(a,b){
+	return parseInt(a.childIndex)-parseInt(b.childIndex)});
+
+	//Set some width for first 4 columns
+	ws.column(1).setWidth(40);
+	ws.column(2).setWidth(40);
+	ws.column(3).setWidth(40);
+	ws.column(4).setWidth(40);
+
+	var style = wb.createStyle({
+		font: {
+			color: '000000',
+			bold: true,
+				size: 12,
+			}
+			});
+
+	ws.cell(1, 1)
+			.string('Module')
+			.style(style);
+
+	ws.cell(1, 2)
+			.string('Scenario')
+			.style(style);
+
+	ws.cell(1, 3)
+			.string('Screen')
+			.style(style);
+
+	ws.cell(1, 4)
+			.string('Script')
+			.style(style);
+
+	var min_scen_idx = 1;
+	var min_scr_idx = 1;
+	ws.cell(2,1).string(curr.name);
+	try {
+		var tc_count=0;
+		for (i = 0; i < curr.children.length; i++) {
+			for (j = 0; j < curr.children[i].children.length; j++) {
+				for (k = 0; k < curr.children[i].children[j].children.length; k++) {
+					tc_count++;
+					ws.cell(1 + tc_count,4).string(curr.children[i].children[j].children[k].name);
+				}
+				
+				ws.cell(1 + min_scr_idx,3).string(curr.children[i].children[j].name);
+				min_scr_idx= tc_count+1;
+			}
+			ws.cell( 1 + min_scen_idx,2).string(curr.children[i].name);
+			min_scen_idx=tc_count+1;
+		}
+		//save it
+		wb.write('./excel/samp234.xlsx',function (err) {
+			if (err) return res.send('fail');
+			res.writeHead(200, {'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+			var rstream = fs.createReadStream(filePath);
+			rstream.pipe(res);
+		});
+	} catch (ex) {
+		logger.error("Exception in mindmapService: exportToExcel: ", ex);
+	}
+
 };
 
 function xml2json(xml, tab) {

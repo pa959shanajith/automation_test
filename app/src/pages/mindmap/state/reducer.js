@@ -3,13 +3,23 @@ import * as actionTypes from './action.js';
 const initialState = {
     projectList : {},
     moduleList: [],
+    screenData: {testCaseList:[],screenList:[]},
     selectedProj: undefined,
     searchModule: undefined,
-    selectedModule: {}
+    selectedModule: {},
+    selectBoxState: false,
+    selectNodes: {nodes:[],links:[]},
+    copyNodes: {nodes:[],links:[]},
+    deletedNodes: []
 };
 
 const reducer = (state = initialState , action) => {
     switch (action.type) {
+        case actionTypes.UPDATE_SCREENDATA:
+            return{
+                ...state,
+                screenData:action.payload
+            }
         case actionTypes.UPDATE_PROJECTLIST:
             return{
                 ...state,
@@ -35,6 +45,26 @@ const reducer = (state = initialState , action) => {
                 ...state,
                 selectedModule: action.payload
             }
+        case actionTypes.SELECT_SELECTBOX:
+            return{
+                ...state,
+                selectBoxState: action.payload
+            }
+        case actionTypes.UPDATE_SELECTNODES:
+            return{
+                ...state,
+                selectNodes: action.payload
+            }
+        case actionTypes.UPDATE_COPYNODES:
+            return{
+                ...state,
+                copyNodes: action.payload
+            }
+        case actionTypes.UPDATE_DELETENODES:
+            return{
+                ...state,
+                deletedNodes: action.payload
+            }    
         default: 
             return state
     }

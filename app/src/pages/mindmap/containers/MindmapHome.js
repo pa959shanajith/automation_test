@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, Fragment } from 'react';
 import CreateOptions from '../components/CreateOptions.js'; 
 import CreateNew from './CreateNew.js';
-import { Header, FooterTwo as Footer} from '../../global'
+import { Header, FooterTwo as Footer,ActionBar,ReferenceBar} from '../../global'
 import '../styles/MindmapHome.scss';
 
 /*Component MindmapHome
@@ -15,23 +15,39 @@ const MindmapHome = () => {
   const createType = {
     'newmindmap': React.memo(() => (<CreateNew/>)),
     'enemindmap': React.memo(() => (<span>END TO END MINDMAP</span>)),
-    'excelmindmap': React.memo(() => (<span>Import Excel</span>))
+    'excelmindmap': React.memo(() => (<span>Import Excel</span>)),
+    'assignmap': React.memo(() => (<span>Assign Mindmap</span>))
   }
+
   var Component = (!options)? null : createType[options];
   return (
     <div className='mp__container'>
       <Header/> 
       <div className='mp__body'>
-        <div className='mp__leftbar'></div>
+        <ActionBar collapsible={true} collapse={options==='newmindmap'}>
+          <div className="mp__ic_box">
+            <div className="ic_box" >
+              <img onClick={()=>setOptions(undefined)} className={"thumb__ic"+(options!=='assignmap'? " selected_rb_thumb":"")} src="static/imgs/create.png"/>
+                <span className="rb_box_title">Create</span>
+            </div>
+            <div className="ic_box" >
+              <img onClick={()=>setOptions('assignmap')} className={"thumb__ic"+(options==='assignmap'? " selected_rb_thumb":"")} src="static/imgs/assign.png"/>
+              <span className="rb_box_title">Assign</span>
+            </div>
+          </div>
+        </ActionBar>
         {(!options)?
-          <CreateOptions setOptions={setOptions}/>:
-          <Component/>
+        <Fragment>
+          <div className='mp__middle_container'>
+            <CreateOptions setOptions={setOptions}/>
+          </div>
+          <ReferenceBar taskTop={true} collapsible={true}/>
+        </Fragment>:
+        <Component/>
         }
-        <div className='mp__rightbar'></div>
       </div>
       <div className='mp__footer'><Footer/></div>
     </div>
   );
 }
-
 export default MindmapHome;
