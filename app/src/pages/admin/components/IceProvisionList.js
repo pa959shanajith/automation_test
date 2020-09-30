@@ -21,7 +21,6 @@ const IceProvisionList = (props) => {
     
     useEffect(()=>{
 		refreshIceList();
-		setipRefresh(!ipRefresh);
 		// eslint-disable-next-line
     },[props.selectProvisionType,props.refreshIceList])
 
@@ -38,7 +37,6 @@ const IceProvisionList = (props) => {
 				var data1 = data.filter(e => e.provisionedto !== "--Deleted--");
 				props.setIcelist(data1);
 				setIcelistModify(data1);
-				
 			}
 		}catch(error) {
 			setLoading(false);
