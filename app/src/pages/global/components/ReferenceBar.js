@@ -116,6 +116,9 @@ const ReferenceBar = (props) => {
                 <>
                 <div className="min_height_div">
                     <div id="ref_bar_scroll" className="inside_min">
+                        {
+                          props.popups       
+                        }
                     {
                         showTask && 
                         <div className="task_pop" style={{marginTop: `calc(${taskPopY}px - 15vh)`}}>

@@ -1,7 +1,8 @@
 import React ,{useState , useEffect, Fragment} from 'react';
+import { useSelector } from 'react-redux';
 import '../styles/LeftBarItems.scss'
 import {GetScrapeDataScreenLevel_ICE ,initScraping_ICE } from '../api';
-import {ScrollBar , ModalContainer } from '../../global';
+import {ScrollBar , ModalContainer, Thumbnail } from '../../global';
 import ModalContent from './ModalContent'
 
 /*Component LeftBarItems
@@ -28,84 +29,13 @@ const CreateOptions = (props) => {
 
   const macOS = navigator.appVersion.indexOf("Mac") != -1;
         
-
-  var _CT =[
-    {
-      appType: "MobileWeb",
-      assignedTestScenarioIds: [],
-      batchTaskIDs: "5f367dbec233a16310ec169d",
-      cycleid: "5f36591fc233a16310ec1697",
-      projectId: "5f36591fc233a16310ec1698",
-      releaseid: "R1",
-      reuse: "False",
-      scenarioFlag: "False",
-      scenarioId: "",
-      screenId: "5f3663e5c233a16310ec169b",
-      screenName: "Screen_1",
-      status: "inprogress",
-      subTask: "Scrape",
-      subTaskId: "5f367dbec233a16310ec169d",
-      taskName: "Scrape Screen_1",
-      testCaseId: "",
-      testCaseName: "",
-      testSuiteDetails: [{assignedTime: "", releaseid: "", cycleid: "", testsuiteid: "", testsuitename: ""}],
-      versionnumber: 0
-    },
-
-    {
-      appType: "Web",
-      assignedTestScenarioIds: [],
-      batchTaskIDs: "5f368056c233a16310ec16a4",
-      cycleid: "5f367fb1c233a16310ec169e",
-      projectId: "5f367fb1c233a16310ec169f",
-      releaseid: "R1",
-      reuse: "False",
-      scenarioFlag: "False",
-      scenarioId: "",
-      screenId: "5f368004c233a16310ec16a2",
-      screenName: "Screen_1",
-      status: "reassigned",
-      subTask: "Scrape",
-      subTaskId: "5f368056c233a16310ec16a4",
-      taskName: "Scrape Screen_1",
-      testCaseId: "",
-      testCaseName: "",
-      testSuiteDetails: [{assignedTime: "", releaseid: "", cycleid: "", testsuiteid: "", testsuitename: ""}],
-      versionnumber: 0
-    },
-    {
-      appType: "MobileApp",
-      assignedTestScenarioIds: [],
-      batchTaskIDs: ["5f6c8a62d2876445ecee6c82"],
-      cycleid: "5f6c84c8d2876445ecee6c6e",
-      projectId: "5f6c84c8d2876445ecee6c6f",
-      releaseid: "Rel1",
-      reuse: "False",
-      scenarioFlag: "False",
-      scenarioId: "",
-      screenId: "5f6c8a42d2876445ecee6c80",
-      screenName: "Screen_5",
-      status: "inprogress",
-      subTask: "Scrape",
-      subTaskId: "5f6c8a62d2876445ecee6c82",
-      taskName: "Scrape Screen_5",
-      testCaseId: "",
-      testCaseName: "",
-      testSuiteDetails: [{assignedTime: "", releaseid: "", cycleid: "", testsuiteid: "", testsuitename: ""}],
-      versionnumber: 0
-    }
-  ]
-
-
-  localStorage.setItem('_CT' , JSON.stringify(_CT));
-
-  const user = JSON.parse(localStorage.getItem('_CT'))
-
-  const apptype = user[1].appType;
+  const _CT = useSelector(state=>state.plugin.CT);
+  const _FD =useSelector(state=>state.plugin.FD);
+  const apptype = _CT.appType;
           
   useEffect(() => {
     (async () =>{
-      var res = await GetScrapeDataScreenLevel_ICE()
+      var res = await GetScrapeDataScreenLevel_ICE(_CT)
       var custName =[] ;
       custName = res.view;
       if(custName.length !=0){
@@ -119,12 +49,13 @@ const CreateOptions = (props) => {
   const callICE =async(browesertype)=>{
     const items = await initScraping_ICE(browesertype);
     props.setScpitm(items);
+    
   }
   const onClose = () =>{
     props.setMweb(false);
     setOs(" ")
   }
-
+  
   return (
     <div className="leftnav" >
       {(apptype=== "Web")? 
@@ -134,7 +65,7 @@ const CreateOptions = (props) => {
               <div className="leftbar-top">
                 <ul>
                   <li><i className="scrapeOnTxt">Scrape On</i></li>
-                  <li><i className={flag?"browserIcon" : "special"}   title="Launch Internet Explorer"><span onClick={()=> callICE('ie')} className="fa fa-internet-explorer fa-3x"></span><br/>Internet Explorer</i></li>
+                  <li><i className={flag?"browserIcon" : "special"}   title="Launch Internet Explorer"><span onClick={()=> callICE('ie')}className="fa fa-internet-explorer fa-3x"></span><br/>Internet Explorer</i></li>
                   <li><i className={flag?"browserIcon" : "special"}   title="Launch Google Chrome" ><span  onClick={()=> callICE('chrome')} className="fa fa-chrome fa-3x"></span><br/>Google Chrome</i></li>
                   {macOS? <li ><i className={flag?"browserIcon" : "special"} title="Launch Safari"><span   className="fa fa-safari fa-3x"></span><br/>Safari</i></li> : null}
                   <li><i className={flag?"browserIcon" : "special"}   title="Launch Mozilla Firefox"><span  onClick={()=> callICE('mozilla')} className="fa fa-firefox fa-3x"></span><br/>Mozilla Firefox</i></li>

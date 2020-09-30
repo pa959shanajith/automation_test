@@ -1,6 +1,7 @@
-import React , {useState, useEffect} from'react';
+import React , {useState, useEffect , useRef} from'react';
 import {useSelector} from "react-redux"
 import {PopupMsg } from '../../global';
+import ClickAwayListener from 'react-click-away-listener';
 import '../styles/CenterScr.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {GetScrapeDataScreenLevel_ICE , updateScreen_ICE} from '../api';
@@ -9,14 +10,15 @@ import ScrapeObject from './ScrapeObject.js'
 
 
 var ScrapeCenter =(props)=>{
-    const user = JSON.parse(localStorage.getItem('user'))
-    const taskScrenName = user[1].taskName;
-    var screenId = JSON.parse(localStorage.getItem('user'))[1].screenId;
-    var projectId = JSON.parse(localStorage.getItem('user'))[1].projectId;
-    var testCaseId = JSON.parse(localStorage.getItem('user'))[1].testCaseId;
-    var type = JSON.parse(localStorage.getItem('user'))[1].appType;
+    const _CT = useSelector(state=>state.plugin.CT);
+    const taskScrenName = _CT.taskName;
+    var screenId = _CT.screenId;
+    var projectId = _CT.projectId;
+    var testCaseId = _CT.testCaseId;
+    var type = _CT.appType;
     const [custName , setCustName] = useState([])
-    const [search , setSearch] = useState(true)
+    const [scrapeList , setScrapeList] = useState([])
+    const [search , setSearch] = useState(false)
     const [eye , setEye] = useState(false);
     const [userInfo , setUserInfo] = useState([])
     const userinfo = useSelector(state=> state.login.userinfo);
@@ -32,19 +34,6 @@ var ScrapeCenter =(props)=>{
         }
     },[userinfo])
 
-    const scrapeObject = {
-        appType : type,
-        getScrapeData :props.scpitm,
-        insert_list : props.scpitm.view,
-        newData :props.scpitm,
-        param: "updateScrapeData_ICE",
-        projectId: projectId,
-        screenId: screenId,
-        screenName: taskScrenName,
-        type: "save",
-        userinfo: userInfo,
-    }
-
     const onSearch=(e)=>{
         var val = e.target.value;
         var filter = []
@@ -56,28 +45,38 @@ var ScrapeCenter =(props)=>{
     
     useEffect(() => {
         (async () =>{
-            var res = await GetScrapeDataScreenLevel_ICE()
-            setCustName(res.view)
+            var res = await GetScrapeDataScreenLevel_ICE(_CT)
+            setScrapeList(res.view)
             const onetime =[...res.view.map((e)=>(e.custname))]
+            setCustName(onetime)
             setElement(onetime)
         })()
     }, [])
 
     useEffect(()=>{
         if (props.scpitm.view){
-            var arr = [...custName.map((e)=>(e.custname))]
-            arr.push(props.scpitm.view[0]);
-            setCustName(arr)
+            var arr = [...custName]
+            var scrparr =[...scrapeList]
+            scrparr.push(...props.scpitm.view.map((e)=>(e)));
+            arr.push(...props.scpitm.view.map((e)=>(e.custname)));
+            setElement(arr);
+            setCustName(arr);
+            setScrapeList(scrparr);
         }
     }, [props.scpitm]); 
-
+    
     const callSavebtn = () => {
         let findDuplicates = element.filter((item, index) => element.indexOf(item) != index)
         if(findDuplicates.length !==0){
             setDubliobjlist(findDuplicates)
             setDubli(true)
-            console.log("save Btn was clicked")
         }
+    }
+
+    // var dubliname = dubliobjlist.map((e)=>(element.find(e)));
+    // console.log(dubliname)
+    const callDelbtn =()=>{
+        return console.log("delete was clicked");
     }
 
     const saveName = (i, cName, event)=>{
@@ -86,10 +85,11 @@ var ScrapeCenter =(props)=>{
             arr.splice(i, 1, cName)
             setElement(arr);
             setElementedit(null);
+            
         }
     }
 
-    const List = ({items}) => (
+    const List =    ({items}) => (
         <>
         {items.map((e,i) => (
             <ScrapeObject key={i} item={e} idx={i} setElementedit={setElementedit} elementedit={elementedit} eye={eye} setEye={setEye} saveName={saveName}/>
@@ -103,37 +103,39 @@ var ScrapeCenter =(props)=>{
             <span className="taskname">
                 {taskScrenName}
             </span>
-                <button className="btn pull-right" id="submittaskbtn"title="submit task">
-                    Submit 
-                </button>
+            </div>   
             <div className="fscrape">
+                
                 <div className="scraptree">
-                    <span className="parentobjcontainer">
+                    <button className="btn pull-right" id="submittaskbtn"title="submit task">
+                        Submit 
+                    </button>
+                    <ClickAwayListener onClickAway={()=>setSearch(false)}><span className="parentobjcontainer">
+                        
                         <input title="selectall" type="checkbox" className="checkstylebox"></input>
                         <span className="parentobject">
                             <span className="ascrapper">Select All</span>
                             <button onClick={callSavebtn}className=" btn" id="savetaskbtn" style={{marginLeft:"10px"}} title="savetask">Save</button>
-                            <button className="btn" id= "savetaskbtn" title="deletetask">Delete</button>
+                            <button onClick={callDelbtn} className="btn" id= "savetaskbtn" title="deletetask">Delete</button>
                             <button className="btn" id="savetaskbtn" title="edittask">Edit</button>
-                            <span><i onClick={()=>setSearch(!search)}><img src="static/imgs/ic-search-icon.png" alt=" searchICon"/></i></span>
-                            <span><input onChange={(e)=>onSearch(e)}type="textbox" className={search?"special searchdcrapinput" :"searchdcrapinput"}></input></span> 
+                            <span  ><i  className="searchscrapel"   onClick={()=>setSearch(!search)}><img src="static/imgs/ic-search-icon.png" alt=" searchICon"/></i></span>
+                            {search ?<span><input onChange={(e)=>onSearch(e)}type="textbox" className="searchdcrapinput"></input></span> : null}
                         </span>
-                    </span>
-                    <br/>
-                    {  
-                     <List items={ searchVal ? filtered : element}  />
+                    </span></ClickAwayListener>
+                    {   
+                        <List items={ searchVal ? filtered : element}  />
                     }
                     {
                         ((dubliobjlist.length!==0) && dubli)? 
                             <PopupMsg 
                                 title="Save Scrape Data" 
-                                content={<span><span>Please rename/delete duplicate scraped objects</span><br></br><span>Object characterstics are same for:{dubliobjlist.map((e)=><div>{e}</div>)}</span></span>}
-                                close={()=>setDubli(false)} submit={()=>setDubli(false)} submitText ="ok"
+                                content={<span><span><b>Please rename/delete duplicate scraped objects</b></span><br/><br/><span><b>Object characterstics are same for:</b>{dubliobjlist.map((e)=><div>{e}</div>)}</span></span>}
+                                close={()=>setDubli(false)} submit={()=>setDubli(false)} submitText ="Ok"
                             /> : null 
                     }
                 </div>
             </div>
-        </div>
+        
     </div>
     )
 }

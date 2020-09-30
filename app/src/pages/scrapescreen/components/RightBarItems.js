@@ -1,16 +1,68 @@
-import React from 'react'
+import React,{useState} from 'react';
+import {ReferenceBar } from '../../global';
 import '../styles/RightBarItems.scss'
 function Rightbar() {
-    return (
-        <div className="rightnav container" >
-            <div className="rightnav-container row">
-                <span className='rightdep col-sm' ><span><img src="static/imgs/ic-screenshot.png" alt="screenshot"/></span><br/><span className="caption">Screenshot</span></span>
-                <span className='rightdep col-sm' ><span><img src="static/imgs/ic-filter.png" alt="fliter"/></span><br/><span className="caption">Filter</span></span>
-                <span className="col-sm" ><span ><img src="static/imgs/ic-task.png" alt="tasks"/></span><br/><span className="caption">Tasks</span></span>
-                <span className='rightdep col-sm' ><span><img src="static/imgs/ic-info.png" alt="info"/></span><br/><span className="caption">Info</span></span>
-                <span className='rightdep col-sm last '><span><img src="static/imgs/ic-assist.png" alt="profj"/></span><br/><span className="caption">Prof J</span></span>
-            </div>
+    const[filterPop , setFilterPop] = useState(false)
+    const[filterpopY , setFilterpopY] = useState(null)
+
+    const closeAllPopups = () => {
+        setFilterPop(false);
+    }
+
+    const popups = () => {
+
+        return filterPop &&
+        <div className="task_pop" style={{marginTop: `calc(${filterpopY}px-20vh)`}}>
+            <span className="pop__header">Filters</span>
+            <div><button>Checkbox</button></div>
+            <div><button>Dropdown</button></div>
+            <div><button>Button</button></div>
+            <div><button>Image</button></div>
+            <div><button>Link</button></div>
+            <div><button>Radio Button</button></div>
+            <div><button>Textbox</button></div>
+            <div><button>Listbox</button></div>
+            <div><button>Table</button></div>
+            <div><button>IRIS</button></div>
+            <div><button>Other</button></div>
+            <div><button>UserCreted</button></div>
+            <div><button>Dublicate CustNames</button></div>
         </div>
+    }
+
+    const toggleFilterPop =(event)=>{
+        console.log("filter was clicked")
+        setFilterpopY(event.clientY)
+        setFilterPop(!filterPop)
+    }
+    return (
+    
+        <ReferenceBar popups={popups()} >
+         {/* {
+            filterPop?
+            <div className="task_pop" style={{marginTop: `calc(${filterpopY}px)`}}>
+                <span className="pop__header">Filters</span>
+                <div><button>Checkbox</button></div>
+                <div><button>Dropdown</button></div>
+                <div><button>Button</button></div>
+                <div><button>Image</button></div>
+                <div><button>Link</button></div>
+                <div><button>Radio Button</button></div>
+                <div><button>Textbox</button></div>
+                <div><button>Listbox</button></div>
+                <div><button>Table</button></div>
+                <div><button>IRIS</button></div>
+                <div><button>Other</button></div>
+                <div><button>UserCreted</button></div>
+                <div><button>Dublicate CustNames</button></div>
+            </div> :
+            null
+        }   */}
+            <span className="ic_box "><span><img className="rb__ic-info thumb__ic" src="static/imgs/ic-screenshot.png" alt="screenshot"/></span><span className="rb_box_title">Screenshot</span></span>
+            <span onClick={toggleFilterPop} className="ic_box "  ><span><img className={"rb__ic-info thumb__ic " + (filterPop && "active_rb_thumb")} src="static/imgs/ic-filter.png" alt="fliter"/></span><span className="rb_box_title">Filter</span></span>
+        </ReferenceBar>
+        
+    
     )
 }
 

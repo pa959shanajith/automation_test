@@ -1,12 +1,12 @@
 import axios from 'axios';
-const url = 'https://127.0.0.1:8443';
+const url = "https://"+window.location.hostname+":8443";
 
-export const GetScrapeDataScreenLevel_ICE = async() => {
+export const GetScrapeDataScreenLevel_ICE = async(_CT) => {
     try{
-            var screenId = JSON.parse(localStorage.getItem('user'))[1].screenId;
-			var projectId = JSON.parse(localStorage.getItem('user'))[1].projectId;
-            var testCaseId = JSON.parse(localStorage.getItem('user'))[1].testCaseId;
-            var type = JSON.parse(localStorage.getItem('user'))[1].appType;
+            var screenId = _CT.screenId;
+			var projectId = _CT.projectId;
+            var testCaseId = _CT.testCaseId;
+            var type = _CT.appType;
             
         const res = await axios(url+'/getScrapeDataScreenLevel_ICE', {
             method: 'POST',

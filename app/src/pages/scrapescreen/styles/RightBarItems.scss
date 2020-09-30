@@ -32,3 +32,20 @@
     font-family: "LatoWebLight";
     cursor: pointer;
 }
+
+.filter_pop{
+    background-color: #311d4e;
+    z-index: 100;
+    display: flex;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    right: 110%;
+    border-radius: 5px;
+    width: 350px;
+    height: 56%;
+}
+.active_rb_thumb{
+    background-color: #61349b;
+    border-radius: 5px;
+}
