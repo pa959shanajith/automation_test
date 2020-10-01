@@ -16,7 +16,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     const [todoItems, setTodoItems] = useState([]);
     const [searchItems, setSearchItems] = useState([]);
     const [dataObj, setDataObj] = useState([]);
-    const [dataDictState, setDataDictState] = useState({ 'project' : {}, 'apptypes' : [], 'tasktypes' : [], 'projectDict': {}, 'cycleDict': {}, 'domainDict': {} });
+    const [dataDictState, setDataDictState] = useState({ 'project' : {}, 'apptypes' : [], 'tasktypes' : [], 'projectDict': {}, 'cycleDict': {}});
     const [taskJson, setTaskJson] = useState(null);
     const [searchValue, setSearchValue] = useState("");
     const [overlay, setOverlay] = useState("");
@@ -25,7 +25,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     const [filterData, setFilterData] = useState({'prjval':'Select Project','relval':'Select Release','cycval':'Select Cycle','apptype':{},'tasktype':{}});
     const [filtered, setFiltered] = useState(false);
     const [showPopup, setShowPopup] = useState(false);
-    let dataDict = dataDictState;
+    let dataDict;
     
     useEffect(()=>{
         if(Object.keys(userInfo).length!==0) {
@@ -40,6 +40,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                 else {
                     pluginApi.getTaskJson_mindmaps(data)
                     .then(data1 => {
+                        dataDict = dataDictState;
                         // to render components which will populate under review
                         let review_items = []
                         // to render components which will populate under todo
@@ -134,7 +135,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
         setReviewItems([]);
         setTodoItems([]);
         setSearchItems([]);
-        setDataDictState(null);
+        setDataDictState({ 'project' : {}, 'apptypes' : [], 'tasktypes' : [], 'projectDict': {}, 'cycleDict': {} });
         setTaskJson(null);
         setSearchValue("");
         setOverlay("");
