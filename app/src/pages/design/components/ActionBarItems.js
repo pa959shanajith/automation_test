@@ -1,27 +1,27 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { Thumbnail } from '../../global';
 import "../styles/ActionBarItems.scss"
 
 const UpperContent = ({appType, isMac}) => {
     let renderComp = [
-                    <div className='d__debugOn'>Debug On</div>, 
-                    <div className="d__thumbnail">
+                    <div key={1} className='d__debugOn'>Debug On</div>, 
+                    <div key={3} className="d__thumbnail">
                         <input id="add_depend" type="checkbox" />
                         <span className="d__thumbnail_title">Add Dependent Test Cases</span>
                     </div>
                     ];
 
-    if (appType === "Web") {renderComp.splice(1, 0, <>
+    if (appType === "Web") {renderComp.splice(1, 0, <Fragment key={2}>
                                 {WebList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} svg={icon.svg} />)}
-                                { isMac && <Thumbnail title="Safari" img="static/imgs/ic-safari.png" />}</>)}
-    else if (appType === "OEBS") renderComp.splice(1, 0, <>{oebsList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</>)
-    else if (appType === "Desktop") renderComp.splice(1, 0, <>{desktopList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</>)
-    else if (appType === "System") renderComp.splice(1, 0, <>{systemList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</>)
-    else if (appType === "SAP") renderComp.splice(1, 0, <>{sapList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</>)
-    else if (appType === "Webservice") renderComp.splice(1, 0, <>{webserviceList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</>)
-    else if (appType === "MobileApp") renderComp.splice(1, 0, <>{mobileAppList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</>)
-    else if (appType === "MobileWeb") renderComp.splice(1, 0, <>{mobileWebList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</>)
-    else if (appType === "Mainframe") renderComp.splice(1, 0, <>{mainframeList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</>)
+                                { isMac && <Thumbnail title="Safari" img="static/imgs/ic-safari.png" />}</Fragment>)}
+    else if (appType === "OEBS") renderComp.splice(1, 0, <Fragment key={2}>{oebsList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</Fragment>)
+    else if (appType === "Desktop") renderComp.splice(1, 0, <Fragment key={2}>{desktopList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</Fragment>)
+    else if (appType === "System") renderComp.splice(1, 0, <Fragment key={2}>{systemList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</Fragment>)
+    else if (appType === "SAP") renderComp.splice(1, 0, <Fragment key={2}>{sapList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</Fragment>)
+    else if (appType === "Webservice") renderComp.splice(1, 0, <Fragment key={2}>{webserviceList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</Fragment>)
+    else if (appType === "MobileApp") renderComp.splice(1, 0, <Fragment key={2}>{mobileAppList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</Fragment>)
+    else if (appType === "MobileWeb") renderComp.splice(1, 0, <Fragment key={2}>{mobileWebList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</Fragment>)
+    else if (appType === "Mainframe") renderComp.splice(1, 0, <Fragment key={2}>{mainframeList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</Fragment>)
     
     return renderComp;
 };
@@ -45,17 +45,17 @@ const WebList = [
     {'title': "Google Chrome", 'img': "static/imgs/ic-chrome.png"},
     {'title': "Mozilla Firefox", 'img': "static/imgs/ic-mozilla.png"},
     {'title': "Microsoft Edge", 'svg': 
-        <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 265" style={{padding: "4px"}} height="48px" width="56px">
+        <svg id="Layer_1" className="cls-1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 265" style={{padding: "4px"}} height="48px" width="56px">
             <defs>
                 <style type="text/css">{`.cls-1{fill: #eee9ff;}`}</style>
             </defs>
             <title>Launch Microsoft Edge</title>
-            <path class="cls-1" d="M310.83,169.32a119.87,119.87,0,0,0-239.66-4.2c15.13-19.57,28.31-32.52,48-45.77,20-13.51,45.93-20.77,71.88-20.06,24.5.67,44.33,20.1,44.33,44.61v12.83H146.57c-1-13.39,7.69-30.14,15.45-40.47,0,0-25.47,12.78-40.4,31.57a82.25,82.25,0,0,0-17.18,32A86.1,86.1,0,0,0,100.67,204h0c-1.91,39,15.77,75,49,94.58C210.71,334.47,288,294.64,288,294.64v-54.4c-38.4,18.49-95.6,26.69-124,3.56C150.76,233,147.2,219.11,146,204h164.8Zm0,0" transform="translate(-71.17 -49.44)"/>
+            <path className="cls-1" d="M310.83,169.32a119.87,119.87,0,0,0-239.66-4.2c15.13-19.57,28.31-32.52,48-45.77,20-13.51,45.93-20.77,71.88-20.06,24.5.67,44.33,20.1,44.33,44.61v12.83H146.57c-1-13.39,7.69-30.14,15.45-40.47,0,0-25.47,12.78-40.4,31.57a82.25,82.25,0,0,0-17.18,32A86.1,86.1,0,0,0,100.67,204h0c-1.91,39,15.77,75,49,94.58C210.71,334.47,288,294.64,288,294.64v-54.4c-38.4,18.49-95.6,26.69-124,3.56C150.76,233,147.2,219.11,146,204h164.8Zm0,0" transform="translate(-71.17 -49.44)"/>
         </svg>
     },
     {'title': "Edge Chromium", 'svg': 
-            <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-        viewBox="0 0 566.4 566.4" style={{fill:"#eee9ff", padding:"2px"}} xmlSpace="preserve" height="47px" width="56px">
+            <svg className="cls-1" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+        viewBox="0 0 566.4 566.4" style={{fill:"#eee9ff", padding:"2px"}} xmlSpace="preserve" >
         <path d="M286.1,43c-99.4,0-196.9,60.3-232.7,172.4c-37,115.6,25.3,231.1,114,280.8c25.9,14.5,69.6,29.9,119.8,29.9
         c62.7,0,135.6-24,196.9-103.6c5.1-7.2,8.8-13.7,3.6-19.2c-1.3-1.4-2.8-2-4.6-2c-5.5,0-14.6,5.6-34.4,13.7
         c-14.4,5.9-35.6,9.1-57.4,9.1c-18.2,0-36.7-2.2-51.8-6.8c-33.4-10.1-82.4-27.3-109-94c-6-15.2-12.8-49.4,3.9-72.6

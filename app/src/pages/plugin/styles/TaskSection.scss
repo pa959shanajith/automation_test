@@ -13,6 +13,10 @@
     visibility: hidden;
 }
 
+.task-section{
+    max-width: 60%;
+}
+
 .task-content{
     flex: 1;
     overflow: auto;
@@ -51,8 +55,8 @@
 
 .my-task{
     flex-grow: 1;
+    flex-shrink: 1;
     font-size: 20px;
-    margin-right: 20px;
 }
 
 .task-search-bar{
@@ -103,7 +107,6 @@
         cursor: default;
     }
 }
-
 
 
 @media screen and (min-width: 1400px) and (min-height: 770px){
@@ -162,6 +165,7 @@
     }
 }
 
+
 @media screen and (max-width: 1025px){
     .active-tab{
         border-top: .1vw solid #ddd;
@@ -171,6 +175,10 @@
         border-radius: .2vw .2vw 0 0;
     }
 
+    .task-section{
+        max-width: 50%;
+    }
+
     .task-header{
         border-radius: .7vw;
         margin: 0;
@@ -178,7 +186,8 @@
     }
     
     .filter-ic, .search-ic{
-        height: 1.5vw;
+        height: 1.8vw;
+        width: 1.8vw;
     }
     
     .task-ic-container{
@@ -187,6 +196,7 @@
         margin: .3vw;
         height: 1.6vw;
         width: 1.6vw;
+        display: flex;
     }
     
     .my-task{

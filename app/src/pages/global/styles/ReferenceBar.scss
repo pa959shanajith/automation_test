@@ -1,5 +1,4 @@
 .ref__bar{
-    // width: 166px;
     background: #311d4e;
     position: absolute;
     color: #fff;
@@ -7,7 +6,6 @@
     font-size: 12px;
     display: flex;
     flex-direction: column;
-    // align-items: flex-end;
     top: 0;
     bottom: 0;
     right: 0;
@@ -15,15 +13,8 @@
 }
 
 .ref__content{
-    // width: 90px;
-    // height: 100%;
-    // display: flex;
-    // flex-direction: column;
-    // align-items: center;
     overflow: auto;
     padding: 40px 0 5px;
-    
-    // min-height: 0;
 }
 
 .min_height_div{
@@ -39,60 +30,10 @@
     height: 100%;
 }
 
-// .test_div{
-//     // display: flex;
-//     flex-direction: column;
-//     align-items: center;
-//     overflow: auto;
-//     font-family: "LatoWebLight";
-//     font-size: 12px;
-//     padding: 50px 0 5px;
-// }
-
-// .abs{
-//     position: absolute;
-//     left: 0;
-//     right: 0;
-//     bottom: 0;
-//     top: 0;
-//     display: flex;
-//     flex-direction: column;
-//     align-items: center;
-//     overflow: auto;
-//     font-family: "LatoWebLight";
-//     font-size: 12px;
-//     padding: 50px 0 5px;
-// }
-
-// .scrollable_ref_container{
-//     display: flex;
-//     flex-direction: column;
-//     flex: 1;
-//     height: 100%;
-// }
-
-// .ref__contents{
-//     position: absolute;
-//     left: 0;
-//     right: 0;
-//     bottom: 0;
-//     top: 0;
-//     display: flex;
-//     flex-direction: column;
-//     align-items: center;
-//     flex: 1;
-//     overflow: auto;
-//     font-family: "LatoWebLight";
-//     font-size: 12px;
-//     padding: 50px 0 5px;
-// }
-
-
 .ref__wrapper{
     position: relative;
     display: flex;
     height: 100%;
-    // width: 6px;
     color: #fff;
     right: 0;
     float: right;
@@ -113,7 +54,7 @@
     width: 6px;
     height: 25px;
     left: 0;
-    z-index: 100;
+    z-index: 1;
     cursor: pointer;
     background-color: rgba(255, 255, 255, 0.7);
 }
@@ -149,7 +90,6 @@
     flex-direction: column;
     align-items: center;
     flex: 1 1;
-    // flex-grow: 1;
 }
 
 .task_info{
@@ -273,4 +213,108 @@
     overflow: auto;
     margin-top: 10px;
     padding: 0 15px 0 25px;
+}
+
+
+@media screen and (min-width: 1400px) and (min-height: 770px){
+    .search_task__ic{
+        height: 2.4vh;
+        width: 2.4vh;
+    }
+
+    .ref__bar{
+        font-size: 1.8vh;
+    }
+    
+    .ref__content{
+        padding: 5.2vh 0 0.6vh;
+    }
+    
+    .min_height_div{
+        width: 11.7vh;
+    }
+    
+    .ref__wrapper{
+        flex: 0 0 0.78vh;
+    }
+    
+    .ref__wrapper__expand{
+        flex: 0 0 11.7vh;
+    }
+    
+    .caret__ref_bar{
+        width: 0.78vh;
+        height: 3.25vh;
+    }
+    
+    .ic_box{
+        margin-bottom: 1.95vh;
+        &:hover .thumb__ic{
+            border-radius: 0.6vh;
+        }
+    
+        .rb_box_title{
+            margin-top: 0.26vh;
+        }
+    }
+    
+    .thumb__ic{
+        padding: 1.3vh;
+        width: 6.77vh;
+        height: 6.5vh;
+    }
+    
+    .ref_pop{
+        border-radius: 0.6vh;
+        width: 45.5vh;
+        
+        .pop__header{
+            border-bottom: 0.26vh solid #604b83;
+            padding: 1.04vh 1.95vh;
+            font-size: 2.34vh;
+            img{
+                width: 1.04vh;
+                height: 2.08vh;
+            }
+        }
+    }
+    
+    .task_pop{
+        height: 46%;
+    }
+    
+    .info_pop{
+        height: 30%;
+    }
+    
+    .info_pop__contents{
+        padding: 4% 9%;
+        font-size: 1.95vh;
+        margin-bottom: 0.6vh;
+        grid-template-columns: 30% auto;
+        grid-gap: 0.6vh 0;
+    }
+    
+    .search_task__ic{
+        padding: 0.78vh 1.56vh;
+        border: 0.13vh solid #ccc;
+        border-radius: 0.52vh 0 0 0.52vh;
+    }
+    
+    .search_task__input{
+        font-size: 1.69vh;
+        height: 4.2vh;
+        border: 0.13vh solid #ccc;
+        padding: 0.78vh 1.69vh;
+        border-radius: 0 0.52vh 0.52vh 0;
+    }
+    
+    .active_rb_thumb{
+        border-radius: 0.6vh;
+    }
+    
+    .task_pop__content{
+        margin-top: 1.3vh;
+        padding: 0 1.9vh 0 3.2vh;
+    }
 }

@@ -2,42 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { ModalContainer, ScrollBar } from '../../global'
 import "../styles/FilterDialog.scss";
 
-const FilterDialog = ({setShow, filterDat, filterData, filterTasks}) => {
+const FilterDialog = ({setShow, dataDict, filterData, filterTasks}) => {
 
     const [proj, setProj] = useState("Select Project");
     const [rel, setRel] = useState("Select Release");
     const [cyc, setCyc] = useState("Select Cycle");
     const [task, setTask] = useState({});
     const [app, setApp] = useState({});
-
-    const onProjSel = event => {
-        let prj = event.target.value;
-        let rl = "Select Release";
-        let cy = "Select Cycle";
-        if (Object.keys(filterDat.prjrelmap[prj]).length === 1) {
-            rl = filterDat.prjrelmap[prj][0];
-            if (Object.keys(filterDat.relcycmap[rl]).length === 1) cy = filterDat.relcycmap[rl][0];
-        }
-        setProj(prj)
-        setRel(rl);
-        setCyc(cy);
-    };
-    const onRelSel = event => {
-        let rl = event.target.value;
-        let cy = "Select Cycle";
-        if (Object.keys(filterDat.relcycmap[rl]).length === 1) cy = filterDat.relcycmap[rl];
-        setRel(rl)
-        setCyc(cy);
-    };
-    const onCycSel = event => setCyc(event.target.value);
-    const onTaskSel = event => {
-        if (event.target.checked) setTask({...task, [event.target.value]: true})
-        else setTask({...task, [event.target.value]: false})
-    }
-    const onAppSel = event => {
-        if (event.target.checked) setApp({...app, [event.target.value]: true})
-        else setApp({...app, [event.target.value]: false})
-    }
 
     useEffect(()=>{
         setProj(filterData['prjval']);
@@ -60,51 +31,106 @@ const FilterDialog = ({setShow, filterDat, filterData, filterTasks}) => {
         }
     }, []);
 
+    const onProjSel = event => {
+        let prj = event.target.value;
+        let rl = "Select Release";
+        let cy = "Select Cycle";
+
+        if (Object.keys(dataDict.project[prj].release).length === 1) {
+            rl = Object.keys(dataDict.project[prj].release)[0];
+            
+            if (dataDict.project[prj].release[rl].length === 1) 
+                cy = dataDict.project[prj].release[rl][0];
+        }
+
+        setProj(prj)
+        setRel(rl);
+        setCyc(cy);
+    };
+
+
+    const onRelSel = event => {
+        let rl = event.target.value;
+        let cy = "Select Cycle";
+
+        if (dataDict.project[proj].release[rl].length === 1)
+            cy = dataDict.project[proj].release[rl][0];
+
+        setRel(rl)
+        setCyc(cy);
+    };
+
+    const onCycSel = event => setCyc(event.target.value);
+
+    const onTaskSel = event => {
+        if (event.target.checked) setTask({...task, [event.target.value]: true})   
+        else setTask({...task, [event.target.value]: false})   
+    }
+
+    const onAppSel = event => {
+        if (event.target.checked) setApp({...app, [event.target.value]: true})
+        else setApp({...app, [event.target.value]: false})
+    }
+
     const Content = () => (
         <div className="filter_body">
             <ScrollBar thumbColor="#311d4e" trackColor="#fff">
             <div className="filter_content">
+                
+                { /* Project Selection */ }
                 <div className="selection-lbl">
                     <span>Select Project</span>
                 </div>
+                
                 <select className="selection-select" onChange={onProjSel} value={proj}>
                     <option className="select__menu" disabled value="Select Project">Select Project</option>
-                    {Object.keys(filterDat.idnamemapprj).map((id, i)=>(
-                        <option key={i} className="select__menu" value={id}>{filterDat.idnamemapprj[id]}</option>   
+                    {Object.keys(dataDict.project).map((id, i)=>(
+                        <option key={i} className="select__menu" value={id}>
+                            {dataDict.projectDict[id]}
+                        </option>   
                     ))}
                 </select>
             
+                { /* Release Selection */ }
                 <div className="selection-lbl">
                     <span>Select Release</span>
                 </div>
+                
                 <select className="selection-select" onChange={onRelSel} disabled={proj==="Select Project"} value={rel}>
                     <option className="select__menu" disabled value="Select Release">Select Release</option>
-                    { filterDat.prjrelmap[proj] && filterDat.prjrelmap[proj].map((rel, i)=>(
-                        <option key={i} className="select__menu" value={rel}>{filterDat.idnamemaprel[rel]}</option>
+                    { dataDict.project[proj] && Object.keys(dataDict.project[proj].release).map((rel, i)=>(
+                        <option key={i} className="select__menu" value={rel}>
+                            {rel}
+                        </option>
                     ))}
                 </select>
             
+                { /* Cycle Selection */ }
                 <div className="selection-lbl">
                     <span>Select Cycle</span>
                 </div>
                 <select className="selection-select" onChange={onCycSel} disabled={rel==="Select Release"} value={cyc}>
                     <option className="select__menu" disabled value="Select Cycle">Select Cycle</option>
-                    { filterDat.relcycmap[rel] && filterDat.relcycmap[rel].map((id, i)=>(
-                        <option key={i} className="select__menu" value={id}>{filterDat.idnamemapcyc[id]}</option>
+                    { dataDict.project[proj] && dataDict.project[proj].release[rel] && dataDict.project[proj].release[rel].map((cycID, i)=>(
+                        <option key={i} className="select__menu" value={cycID}>
+                            {dataDict.cycleDict[cycID]}
+                        </option>
                     ))}
                 </select>
 
+                {/*  Task Types */}
                 <div className="selection-lbl">
                     <span>Task Type:</span>
                 </div>
-                <span className="chkbx_div">{filterDat.tasktypes.map((item, i)=>(
+                <span className="chkbx_div">{dataDict.tasktypes.map((item, i)=>(
                     <label key={i} className="filter_checkbox"><input className="chkbx" type="checkbox" checked={task[item]} onChange={onTaskSel} value={item}/>{item}</label>
                 ))}</span>
 
+                {/*  App Types */}
                 <div className="selection-lbl">
                     <span>AppTypes:</span>
                 </div>
-                <span className="chkbx_div">{filterDat.apptypes.map((item, i)=>(
+                <span className="chkbx_div">{dataDict.apptypes.map((item, i)=>(
                     <label key={i} className="filter_checkbox"><input className="chkbx" type="checkbox" checked={app[item]} onChange={onAppSel} value={item}/>{item}</label>
                 ))}</span>
             </div>
@@ -124,9 +150,6 @@ const FilterDialog = ({setShow, filterDat, filterData, filterTasks}) => {
         let p = proj;
         let r = rel;
         let c = cyc;
-        if (!p) p = "Select Project";
-        if (!r) r = "Select Release";
-        if (!c) c = "Select Cycle";
         let filterData = {'prjval': p,'relval': r,'cycval':c,'apptype':app,'tasktype':task};
         filterTasks(filterData);
     }

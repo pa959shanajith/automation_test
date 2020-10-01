@@ -22,3 +22,24 @@
     margin-bottom: 2px;
     border-radius: 5px;
 }
+
+
+@media screen and (min-width: 1400px) and (min-height: 770px){
+    .thumbnail{
+        font-size: 1.56vh;
+        margin: 10% 0 5%;
+    }
+    
+    .thumbnail__svg{
+        margin-bottom: 0.26vh;
+        border-radius: 0.65vh;
+    }
+    
+    .thumbnail__img{
+        padding: 1.04vh 1.30vh;
+        height: 6.7vh;
+        width: 7.29vh;
+        margin-bottom: 0.26vh;
+        border-radius: 0.65vh;
+    }
+}

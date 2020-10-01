@@ -12,6 +12,8 @@ import ClickAwayListener from 'react-click-away-listener';
             hideInfo : to hide the default info Icon . by default hideInfo is false
             children : renders the children passed above the task icon. 
             taskName : to let the reference bar know which task to highlight as disabled.
+            popups : to render pop up menus like filter, screenshot 
+            closeAllpopups : method to close all passed popups
     */
 
 const ReferenceBar = (props) => {
@@ -25,7 +27,7 @@ const ReferenceBar = (props) => {
     const [taskPopY, setTaskPopY] = useState(null);
 
     const tasksJson = useSelector(state=>state.plugin.tasksJson);
-    const filterDat = useSelector(state=>state.plugin.FD);
+    const dataDict = useSelector(state=>state.plugin.FD);
 
     useEffect(()=>{
             // if(window.location.pathname != '/mindmap'){
@@ -98,6 +100,7 @@ const ReferenceBar = (props) => {
     }
 
     const closePopups = () => {
+        if (props.popups) props.closeAllPopups();
         setShowInfo(false);
         setShowTask(false);
     }
@@ -118,12 +121,14 @@ const ReferenceBar = (props) => {
         <div className={"ref__wrapper " + (!collapse && "ref__wrapper__expand")}>
         <div className="ref__bar">
             { props.collapsible &&
-                <div className={"caret__ref_bar " + (collapse ? "fa fa-caret-left caret_ref_collapsed" : "fa fa-caret-right") } onClick={()=>setCollapse(!collapse)}></div>
+                <div className={"caret__ref_bar " + (collapse ? "fa fa-caret-left caret_ref_collapsed" : "fa fa-caret-right") } onClick={()=>{ setCollapse(!collapse); closePopups() }}></div>
             }
             { !collapse && 
                 <>
                 <div className="min_height_div">
                     <div id="ref_bar_scroll" className="inside_min">
+
+                    { props.popups }
                     {
                         showTask && 
                         <ClickAwayListener onClickAway={closePopups}>
@@ -139,7 +144,7 @@ const ReferenceBar = (props) => {
                                 <div id='task_pop_scroll' className="task_pop__overflow">
                                     <ScrollBar scrollId='task_pop_scroll' trackColor="#46326b" thumbColor="#fff">
                                         <div className="task_pop__content" id="rb__pop_list">
-                                            <TaskContents items={searchValue ? searchItems : taskList} taskName={props.taskName} filterDat={filterDat} taskJson={tasksJson}/>
+                                            <TaskContents items={searchValue ? searchItems : taskList} taskName={props.taskName} cycleDict={dataDict.cycleDict} taskJson={tasksJson}/>
                                         </div>
                                     </ScrollBar>
                                 </div>
