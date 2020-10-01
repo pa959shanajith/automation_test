@@ -48,7 +48,7 @@ const AdminHome = () => {
                     </div>    
                 </div>
             </div>  
-            <ReferenceBar hideInfo={true} hideTask={true}/>
+            <ReferenceBar taskTop={false} hideInfo={true} hideTask={true}/>
         </div>
         <div className='admin-footer'><FooterTwo /></div>
     </div>
