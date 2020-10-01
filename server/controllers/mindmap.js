@@ -1137,7 +1137,8 @@ exports.pdProcess = function (req, res) {
 		asynclib.forEachSeries(orderlist, function (nodeObj, savedcallback) {
 			var name = nodeObj.label;
 			if(screendataobj[name].data.view[0]!=undefined){
-				var screenshotdeatils = screendataobj[name].data.view[0].screenshot.split(";")[1];
+				var len1=(screendataobj[name].data.view).length
+				var screenshotdeatils = screendataobj[name].data.view[len1-1].screenshot.split(";")[1];
 			    var screenshotdata = screenshotdeatils.split(",")[1];
 			}else{
 				var screenshotdata = "";
@@ -1376,6 +1377,10 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 				case "tree":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTreeElement',null,null,null,"SAP");
 					break;
+				case "picture":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClick',null,null,null,"SAP");
+				case "text":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
 				default:
 					logger.info("Import PD: No match found for "+eachScrapedAction.tag+" for SAP apptype.");
 					break;

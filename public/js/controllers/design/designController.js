@@ -6514,6 +6514,9 @@ function contentTable(newTestScriptDataLS) {
 						} else if (obType == 'gridview') {
 							sc = Object.keys(keywordArrayList.gridview);
 							selectedKeywordList = "gridview";
+						} else if (obType == 'picture') {
+							sc = Object.keys(keywordArrayList.picture);
+							selectedKeywordList = "picture";
 						} else if (obType == 'toolbar') {
 							sc = Object.keys(keywordArrayList.toolbar);
 							selectedKeywordList = "toolbar";
