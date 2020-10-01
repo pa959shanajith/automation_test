@@ -82,6 +82,26 @@ export const getSAMLConfig = async(name) => {
     }
 }
 
+export const manageSAMLConfig = async(action, confObj) => { 
+    try{
+        const res = await axios(url+'/manageSAMLConfig', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {action: action,conf: confObj},
+            credentials: 'include'
+        });
+        if(res.status===200){
+            return res.data;
+        }else{
+            console.error(res.status)
+        }
+    }catch(err){
+        console.error(err)
+    }
+}
+
 export const getOIDCConfig = async(name) => { 
     try{
         const res = await axios(url+'/getOIDCConfig', {
@@ -134,7 +154,7 @@ export const restartService = async(i) => {
             data: {id: i},
             credentials : 'include'
         });
-        if (res.status == 200) {
+        if (res.status === 200) {
             return res.data;
         }
         else{
@@ -145,9 +165,29 @@ export const restartService = async(i) => {
         console.log(err)
     }
 } 
+
 export const getAvailablePlugins = async() => { 
     try{
         const res = await axios(url+'/getAvailablePlugins', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            credentials: 'include'
+        });
+        if(res.status===200){
+            return res.data;
+        }else{
+            console.error(res.status)
+        }
+    }catch(err){
+        console.error(err)
+    }
+}
+
+export const getPreferences = async() => { 
+    try{
+        const res = await axios(url+'/getPreferences', {
             method: 'POST',
             headers: {
             'Content-type': 'application/json',
@@ -348,3 +388,85 @@ export const fetchICE = async(args) => {
         console.error(err)
     }
 }
+
+export const provisions = async(tokeninfo) => { 
+    try{
+        const res = await axios(url+'/provisionIce', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {tokeninfo:tokeninfo},
+            credentials: 'include'
+        });
+        if(res.status===200){
+            return res.data;
+        }else{
+            console.error(res.status)
+        }
+    }catch(err){
+        console.error(err)
+    }
+}
+
+
+export const manageOIDCConfig = async(action, confObj) => { 
+    try{
+        const res = await axios(url+'/manageOIDCConfig', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {action: action, conf: confObj},
+            credentials: 'include'
+        });
+        if(res.status===200){
+            return res.data;
+        }else{
+            console.error(res.status)
+        }
+    }catch(err){
+        console.error(err)
+    }
+} 
+
+
+export const getCIUsersDetails = async(CIUser) => { 
+    try{
+        const res = await axios(url+'/getCIUsersDetails', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {CIUser: CIUser},
+            credentials: 'include'
+        });
+        if(res.status===200){
+            return res.data;
+        }else{
+            console.error(res.status)
+        }
+    }catch(err){
+        console.error(err)
+    }
+} 
+
+export const manageCIUsers = async(action,CIUser) => { 
+    try{
+        const res = await axios(url+'/manageCIUsers', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {action: action, CIUser: CIUser},
+            credentials: 'include'
+        });
+        if(res.status===200){
+            return res.data;
+        }else{
+            console.error(res.status)
+        }
+    }catch(err){
+        console.error(err)
+    }
+} 

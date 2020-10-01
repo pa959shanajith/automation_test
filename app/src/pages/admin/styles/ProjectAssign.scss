@@ -23,7 +23,7 @@
 }
 
 #selAssignUser{
-    margin-left: 5.6%;
+    margin-left: 37px;
 }
 
 .wrap {
@@ -65,10 +65,10 @@
     float: left;
     width: 100%;
 }
-.adminFontStyling .wrap #allProjectAP,.adminFontStyling .wrap #assignedProjectAP, #assignedProjectAP:hover,#allProjectAP:hover {
+ #assignedProjectAP:hover,#allProjectAP:hover {
     background-color: #fff;
 }
-.adminFontStyling .wrap #allProjectAP,.adminFontStyling .wrap #assignedProjectAP, #allProjectAP,#assignedProjectAP {
+ #allProjectAP,#assignedProjectAP {
     width: 100%;
     background-image: none;
     -webkit-appearance: select;
@@ -210,7 +210,7 @@ select[size] {
     color:white !important;
 }  
 
-.adminSelect-project {
+.adminSelect-project-assign {
 	padding: 0px;
 	height: 25px;
 	margin-bottom: 0;
@@ -222,12 +222,12 @@ select[size] {
     -webkit-text-stroke: thin;
 }
 @media screen and (min-width:1801px){
-    .adminSelect-project{
+    .adminSelect-project-assign{
         height: 1.4vw;
         margin-top: 10px;
     }
 }
 
-.adminSelect-project:focus {
+.adminSelect-project-assign:focus {
 	box-shadow: none !important;
 }

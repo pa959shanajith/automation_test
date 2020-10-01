@@ -62,7 +62,7 @@
 	width: 100%;
 }
 .domainTxt {
-    /*font-weight: normal;*/
+    font-weight: 700;
     float: left;
     font-family: LatoWeb;
     line-height: 1.428571429;
@@ -79,7 +79,7 @@
     }
 }
 .projectForm-project:first-child {
-	margin-top: 5%;
+	margin-top: 2%;
 }
 
 .projectForm-project {
@@ -239,7 +239,7 @@
 	height: 25px;
 	margin-bottom: 0;
 	width: 100%;
-	margin-left: 4%;
+	margin-left: 38px;
 	margin-top: 3px;
 	line-height: 2;
     border: 1px solid #656565 !important;
@@ -269,4 +269,24 @@
 }
 .selectErrorBorder{
 	border: 2px solid #d33c3c !important;
+}
+.display-project{
+    display: flex;
+}
+.def-margin{
+    margin-left: 50px;
+}
+.domain-custom{
+    width: 100%;
+    margin-left: 32px;
+}
+.sel-domain-wid{
+    width: 100%;
+}
+.project-custom-top{
+    display: flex;
+    margin-top: 5%;
+}
+.seprator-custom{
+    margin-bottom:0px;
 }

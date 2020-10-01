@@ -74,10 +74,6 @@ const ProjectNew = (props) => {
                 for (var i = 0; i < plugins_list.length; i++) {
                     plugins[i] = plugins_list[i];
                 }
-                // $timeout(function () {
-                // 	$('.scrollbar-inner').scrollbar();
-                // 	toggleCycleClick();
-                // }, 10);
                 try{
                     const data = await getDomains_ICE()
                     if (data === "Invalid Session") RedirectPage(history);
@@ -218,16 +214,12 @@ const ProjectNew = (props) => {
                 setCount(count+1);
                 setCycleList([]);
             }
-            // if ($("#releaseList li").length >= 11)
-            //     $('.scrollbar-inner').scrollbar();
-            // e.stopImmediatePropagation();
         }
     }
 
     const updateReleaseName = ()=>{
 		var existingReleaseName = activeRelease;
 		setFlag(false);
-		// var editReleaseId = editReleaseID;
         var editRelid = existingReleaseName;
         // eslint-disable-next-line
         var reg = /^[a-zA-Z0-9\s\.\-\_]+$/;
@@ -349,10 +341,6 @@ const ProjectNew = (props) => {
                 }
                 setActiveRelease(releaseName);
             }
-            
-            //$("#"+editReleaseId).addClass("editedRelease");
-            //$("#"+editReleaseId).siblings(".deleteRelease").addClass("editedRelease");
-            // event.stopImmediatePropagation();
         }
     }
 
@@ -378,7 +366,6 @@ const ProjectNew = (props) => {
     
     const updateCycleName = () =>{
         var existingCycleName = oldCyclename;
-        // var editCycId = oldCyclename; //check if needed or not || using from updateProjectDetails
         setFlag(false);
         // eslint-disable-next-line
         var reg = /^[a-zA-Z0-9\s\.\-\_]+$/;
@@ -446,7 +433,7 @@ const ProjectNew = (props) => {
                     if (updateProjectDetails[i].name === activeRelease) {
                         for ( j = 0; j < updateProjectDetails[i].cycles.length; j++) {
                             var objectType = typeof(updateProjectDetails[i].cycles[j]);
-                            if (objectType === "object" && (updateProjectDetails[i].cycles[j].name === existingCycleName) && (updateProjectDetails[i].name === activeRelease) ) { //&& (updateProjectDetails[i].cycles[j]._id === editCycleId)
+                            if (objectType === "object" && (updateProjectDetails[i].cycles[j].name === existingCycleName) && (updateProjectDetails[i].name === activeRelease) ) {
                                 var editCycId= updateProjectDetails[i].cycles[j]._id;
                                 var editRelCyc = {
                                     "releaseId": "",
@@ -461,7 +448,6 @@ const ProjectNew = (props) => {
                                     "_id": "",
                                     "editStatus": false
                                 };
-                                //console.log("objectType", typeof(updateProjectDetails[i].cycles[j]))
                                 updateProjectDetails[i].cycles[j].name = cycleTxt;
 
                                 //For update project json
@@ -532,10 +518,6 @@ const ProjectNew = (props) => {
                     }
                 }
             }
-            //$("#"+editCycleId).addClass("editedCycle");
-            //$("#"+editCycleId).siblings(".deleteCycle").addClass("editedCycle");
-            // event.stopImmediatePropagation();
-            // $("#" + event.target.id).unbind('click');
         }
     }
 
@@ -574,7 +556,6 @@ const ProjectNew = (props) => {
             const cycleName = cycleTxt;
 
             setShowEditModalCycle(false);
-            // setCycleListClass(false);
             if (taskName === "Create Project") {
                 cycleList.push(cycleName);
                 
@@ -636,21 +617,7 @@ const ProjectNew = (props) => {
                 setDelCount(delCount+1);
                 
             }
-            // if ($("#cycleList li:visible").length >= 11)
-            //     $('.scrollbar-inner').scrollbar();
-            // e.stopImmediatePropagation();
         }    
-    }
-
-    //Toggle Release Edit Delete Icons
-    const showHideEditDeleteIcons =  ()=>{
-        // $("#releaseList li").each(function () {
-		// 	if ($(this).hasClass("active")) {
-		// 		$(this).children("span.actionOnHover").children("img").show();
-		// 	} else {
-		// 		$(this).children("span.actionOnHover").children("img").hide();
-		// 	}
-		// });
     }
 
     const clickReleaseListName = (props)=>{
@@ -662,7 +629,6 @@ const ProjectNew = (props) => {
 			setUpdateProjectDetails([]);
 		}
 		toggleCycleClick();
-    	showHideEditDeleteIcons();
         var id = "#".concat(props.id);
 		if (taskName === "Create Project" && id.indexOf("edit") !== 0 && id.indexOf("delete") !== 0) {
             const CycleList = [];
@@ -776,11 +742,6 @@ const ProjectNew = (props) => {
             setReleaseList(RelaseNames);
             setCycleList(cycleNames)
             setActiveRelease(RelaseNames[0]);
-            // for (var i = 0; i < updateProjectDetails.length; i++) {
-            //     $("#releaseList:not(.createRelBox)").append("<li class='updateRelease' id='releaseList_" + i + "'><img src='imgs/ic-release.png' /><span title=" + updateProjectDetails[i].name + " data-releaseid=" + updateProjectDetails[i].name + " class='releaseName'>" + updateProjectDetails[i].name + "</span><span class='actionOnHover'><img id=editReleaseName_" + i + " title='Edit Release Name' src='imgs/ic-edit-sm.png' class='editReleaseName'><img id=deleteReleaseName_" + i + " title='Delete Release' src='imgs/ic-delete-sm.png' class='deleteRelease'></span></li>");
-            //     $("#releaseList:not(.createRelBox) li:first").trigger('click');
-            // }
-            // showHideEditDeleteIcons();
             }catch(error){
             console.log("Error:::::::::::::", error);
         }
@@ -805,9 +766,9 @@ const ProjectNew = (props) => {
         <ProjectButtons setProjectDetails={setProjectDetails} selDomain={selDomain} resetForm={resetForm} newProjectDetails={newProjectDetails} projectDetails={projectDetails} releaseList={releaseList} selProject={selProject} updateProjectDetails={updateProjectDetails} projectTypeSelected={projectTypeSelected} projectName={projectName} flag={flag} clearUpdateProjectObjects={clearUpdateProjectObjects} setProjectNameInputErrorBorder={setProjectNameInputErrorBorder} taskName={taskName} setFlag={setFlag} editProjectTab={editProjectTab} selProjectId={selProjectId} editedProjectDetails={editedProjectDetails} deletedProjectDetails={deletedProjectDetails} setDomainSelectErrorBorder={setDomainSelectErrorBorder} setProjectSelectErrorBorder={setProjectSelectErrorBorder}/>
 
         <div className="col-xs-9 form-group" style={{width: "83%"}}>
-            <div className='userForm-project projectForm-project' style={{display: "flex"}} >
+            <div className='userForm-project projectForm-project display-project' >
                 <div className='domainTxt'>Domain</div>
-                <select onChange={(event)=>{fetchProjectList(event.target.value);setSelDomain(event.target.value);}} className={domainSelectErrorBorder===true?'selectErrorBorder adminSelect-project form-control__conv-project ':"adminSelect-project form-control__conv-project "} id="selDomain" style={{width: "100%"}} >
+                <select onChange={(event)=>{fetchProjectList(event.target.value);setSelDomain(event.target.value);}} className={domainSelectErrorBorder===true?'selectErrorBorder adminSelect-project form-control__conv-project domain-custom':"adminSelect-project form-control__conv-project domain-custom"} id="selDomain" >
                     {(taskName==="Update Project")?
                         <option value="" selected>Please Select Your Domain</option>
                     :null}
@@ -817,17 +778,18 @@ const ProjectNew = (props) => {
                 </select>
             </div>
             {(taskName==="Update Project")?
-            <div className='userForm-project projectForm-project' style={{display: "flex"}} >
+            <div className='userForm-project projectForm-project display-project'  >
                 <div className='domainTxt'>Project</div>
-                <select onChange={(event)=>{selectProject(event.target.value);}}  className={projectSelectErrorBorder===true?'selectErrorBorder adminSelect-project form-control__conv-project ':"adminSelect-project form-control__conv-project "} id="selDomain" style={{width: "100%"}} >
+                <select onChange={(event)=>{selectProject(event.target.value);}}  className={projectSelectErrorBorder===true?'selectErrorBorder adminSelect-project form-control__conv-project sel-domain-wid':"adminSelect-project form-control__conv-project sel-domain-wid"} id="selDomain" >
                         <option value="" selected>Please Select Your Project</option>
                         {selProjectOptions.map((optionProject)=>(
                             <option key={optionProject.id} name={optionProject.name} value={optionProject.id}>{optionProject.name}</option>
                         ))}
                 </select>
             </div>
-            :<div className='userForm-project adminControl-project'>
-                <input value={projectName} onChange={(event)=>{setProjectName(event.target.value)}} type="text" autoComplete="off" id="projectName" name="projectName" maxLength="50" className={projectNameErrorBorder?"inputErrorBorder middle__input__border form-control__conv-project form-control-custom validationKeydown preventSpecialChar":"middle__input__border form-control__conv-project form-control-custom validationKeydown preventSpecialChar"} placeholder="Project Name"/>
+            :<div className='userForm-project adminControl-project display-project' >
+                <div className='domainTxt'>Name</div>
+                <input value={projectName} onChange={(event)=>{setProjectName(event.target.value)}} type="text" autoComplete="off" id="projectName" name="projectName" maxLength="50" className={projectNameErrorBorder?"inputErrorBorder middle__input__border form-control__conv-project form-control-custom def-margin":"middle__input__border form-control__conv-project form-control-custom def-margin"} placeholder="Project Name"/>
             </div>
             }
             
