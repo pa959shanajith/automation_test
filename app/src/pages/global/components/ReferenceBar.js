@@ -10,6 +10,7 @@ import ClickAwayListener from 'react-click-away-listener';
         Props :
             collapsible : if true ReferenceBar can be collapsed or expand. Default is false 
             hideInfo : to hide the default info Icon . by default hideInfo is false
+            hideTask : to hide the default task Icon . by default hideTask is false
             children : renders the children passed above the task icon. 
             taskTop : send true to keep task before children
             collapse : set true to collpase Refernce bar
@@ -184,7 +185,6 @@ const ReferenceBar = (props) => {
                                 {props.taskTop?<div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
                                     {props.children}
                                 {!props.taskTop && !props.hideTask?<div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
-                                {!props.hideTask && <div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>}
                                 {!props.hideInfo && <div className="ic_box"><img className="rb__ic-info thumb__ic" src="static/imgs/ic-info.png"/><span className="rb_box_title">Info</span></div>}
                             </div>
                         </div>
