@@ -8,13 +8,17 @@ const preferences = {};
 
 module.exports.initalize = async () => {
 	const fnName = "initalizeNotification";
-	const inputs = { action: "list", filter: "active" };
+	const inputs = {
+		action: "list",
+		filter: "active"
+	};
 	const chList = await utils.fetchData(inputs, "admin/getNotificationChannels", fnName);
-	chList.forEach((ch)=> {
-		const chType = ch.channel;
-		return // remove this
+	if (chList == "fail") return logger.error("Failed to initialize notification module");
+	chList.forEach((chConf)=> {
+		const chType = chConf.channel;
+		// return // remove this
 		if (!channels[chType]) {
-			if (chType == "email") channels[chType] = new email(ch);
+			if (chType == "email") channels[chType] = new email(chConf);
 			//else if (chType == "otherChannelType") channels[chType] = otherChannelType;
 		}
 	});
@@ -26,7 +30,7 @@ module.exports.initalize = async () => {
 	}
 };
 
-module.exports.test = async (channel, conf, data) => {
+module.exports.test = async (channel, data, conf) => {
 	if (!notfEvents.includes("test")) {
 		logger.error("Unable to send notification for Event: '"+event+"', No such event exists.")
 		return {error: { msg: "Notification event "+event+" not found", code: "UNKNOWN_EVENT"}};
@@ -35,7 +39,7 @@ module.exports.test = async (channel, conf, data) => {
 		const { error, msg, receivers } = await generator.getPayload(channel, "test", data);
 		if (error) return error;
 		const mailer = new email(conf);
-		const res = mailer.send(msg, receivers);
+		const res = await mailer.send(msg, receivers);
 		mailer.destroy();
 		return res;
 	} else {
@@ -53,7 +57,7 @@ module.exports.notify = async (event, data, channel) => {
 		logger.error("Unable to send notification over "+channel+", Channel is not supported.")
 		return {error: { msg: "Notification channel "+channel+" not supported", code: "UNKNOWN_CHANNEL"}};
 	}
-	let targetChannels = (channel)? [channel]:Object.keys(channels);
+	let targetChannels = (channel)? [channel] : Object.keys(channels);
 	if (targetChannels.length === 0) {
 		logger.error("Unable to send notifications, No Channels are configured/enabled.")
 		return {error: { msg: "Notification channel not available", code: "NO_CHANNEL"}};
@@ -71,8 +75,22 @@ module.exports.notify = async (event, data, channel) => {
 	});
 };
 
-module.exports.update = async () => {
-	
+module.exports.update = async (action, name, channel, provider) => {
+	const fnName = "updateNotification";
+	if (["disable", "update"].includes(action) && channels.includes(channel)) {
+		await channels[channel].destroy();
+		delete channels[channel];
+	}
+	if (["enable", "create", "update"].includes(action)) {
+		const inputs = {
+			channel, name, action: "specific"
+		};
+		const chConf = await utils.fetchData(inputs, "admin/getNotificationChannels", fnName);
+		if (chConf === "fail") return logger.error(`Error occurred in ${fnName}: Failed to start ${channel} notification module`);
+		else if (chConf.length === 0) return logger.error(`Error occurred in ${fnName}: Unable to find configuration details for ${name}`);
+		if (channel === "email") channels[channel] = new email(chConf);
+		//else if (channel == "otherChannelType") channels[channel] = otherChannelType;
+	}
 };
 
 // UI notifications

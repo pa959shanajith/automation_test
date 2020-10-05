@@ -1,13 +1,6 @@
 const utils = require('../lib/utils');
 
-const generateEmailPayload = {
-	test: (data) => {},
-	report: (data) => {},
-	userUpdate: (data) => {},
-	schedule: (data) => {},
-	iceAssign: (data) => {},
-	projectAssign: (data) => {}
-};
+const generateEmailPayload = {};
 
 module.exports.getPayload = async (channel, event, data) => {
 	let payloadGenerator;
@@ -16,6 +9,28 @@ module.exports.getPayload = async (channel, event, data) => {
 	return payloadGenerator(data);
 };
 
+generateEmailPayload.test = async data => {
+	const url = data.url + "/imgs/";
+	let msg = {
+		'subject': 'Avo Assure: Test Email',
+		'template': 'test',
+		'context': {
+			'companyLogo': url + "ftr-avo-logo.ico",
+			'productLogo': url + "logo.png"
+		}
+	};
+	return {
+		error: null,
+		msg,
+		receivers: data.recipient
+	};
+};
+
+generateEmailPayload.report = async data => {};
+generateEmailPayload.userUpdate = async data => {};
+generateEmailPayload.schedule = async data => {};
+generateEmailPayload.iceAssign = async data => {};
+generateEmailPayload.projectAssign = async data => {};
 
 
 function userUpdate(data) {

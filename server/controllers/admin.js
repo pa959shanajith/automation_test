@@ -1718,9 +1718,10 @@ exports.testNotificationChannels = async (req, res) => {
 					recipient,
 					url: req.headers.origin || req.headers["x-forwarded-for"]
 				}
-				const status = notifications.test(channel, conf, testData);
-				if (status.error) flag = "fail";
-				else flag = "success";
+				const testResp = await notifications.test(channel, testData, conf);
+				if (testResp.error) flag = "fail";
+				else flag = testResp.status;
+				// else flag = "success";
 			}
 		} else flag = "invalidchannel";
 		return res.send(flag);
@@ -1774,7 +1775,7 @@ exports.manageNotificationChannels = async (req, res) => {
 					conf.sender = conf.sender || {};
 					inputs.sender = {
 						name: (conf.sender.name || "Avo Assure Alerts").trim(),
-						email: (conf.sender.email || "avoassure-alerts@slkgroup.com").trim()
+						email: (conf.sender.email || "avoassure-alerts@avoautomation.com").trim()
 					}
 					if (!validator.isEmail(inputs.sender.email)) {
 						logger.error("Error occurred in admin/"+fnName+": Invalid sender email address.");
@@ -1835,6 +1836,7 @@ exports.manageNotificationChannels = async (req, res) => {
 			logger.error("Error occurred in admin/"+fnName+": Specified Configuration '"+inputs.name+"' does not exists");
 			return res.send("fail");
 		}
+		notifications.update(action, inputs.name, inputs.channel, inputs.provider);
 		return res.send(result);
 	} catch (exception) {
 		logger.error("Error occurred in admin/"+fnName, exception);
