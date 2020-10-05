@@ -156,10 +156,8 @@ const LoginFields = (props) => {
         adminApi.restartService(serverid)
         .then(data => {
             if (data === "success") {
-                setTimeout(()=>{
-                    setOverlayText("");
-                    setPopup({'title': "Restart Service", "content": serverName+" service is restarted successfully!!"})
-                }, 120 * 1000);
+                setOverlayText("");
+                setPopup({'title': "Restart Service", "content": serverName+" service is restarted successfully!!"})                
             } else {
                 setOverlayText("");
                 if (data === "na") errmsg = "Service is not found. Ensure "+serverName+" is running as a service.";

@@ -22,7 +22,7 @@ const FilterDialog = ({setShow, dataDict, filterData, filterTasks}) => {
             })
             setTask(types);
         }
-        if (filterData['apptypes']){
+        if (filterData['apptype']){
             let types = {}
             Object.keys(filterData.apptype).forEach(item=>(
                 types[item] = filterData.apptype[item]
