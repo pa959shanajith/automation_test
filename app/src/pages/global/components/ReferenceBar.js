@@ -41,7 +41,6 @@ const ReferenceBar = (props) => {
             if (Object.keys(tasksJson)!==0){
                 setTaskList([]);
             }
-            let counter = 1;
             let lenght_tasksJson = tasksJson.length;
             let task_list = [];
             for(let i=0; i < lenght_tasksJson; i++) {
@@ -166,7 +165,7 @@ const ReferenceBar = (props) => {
                             <h4 className="pop__header" onClick={()=>setShowInfo(false)}><span className="pop__title">Information</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
                             <div className="info_pop__contents">
                             {
-                                Object.keys(props.taskInfo).map(key => 
+                                props.taskInfo && Object.keys(props.taskInfo).map(key => 
                                     <>
                                         <div className="task_info__title">{key}:</div>
                                         <div className="task_info__content">{props.taskInfo[key]}</div>
@@ -185,7 +184,7 @@ const ReferenceBar = (props) => {
                                 {props.taskTop?<div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
                                     {props.children}
                                 {!props.taskTop && !props.hideTask?<div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
-                                {!props.hideInfo && <div className="ic_box"><img className="rb__ic-info thumb__ic" src="static/imgs/ic-info.png"/><span className="rb_box_title">Info</span></div>}
+                                {!props.hideInfo && <div className="ic_box"  onClick={toggleInfoPop} ><img className="rb__ic-info thumb__ic" src="static/imgs/ic-info.png"/><span className="rb_box_title">Info</span></div>}
                             </div>
                         </div>
                     </ScrollBar>
