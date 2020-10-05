@@ -315,61 +315,6 @@ if (cluster.isMaster) {
 			}
 		}
 
-		//Role Based User Access to services
-		
-		// app.post('*', function(req, res, next) {
-		// 	var roleId = (req.session) ? req.session.activeRoleId : undefined;
-		// 	var updateinp = {
-		// 		roleid: roleId || "ignore",
-		// 		servicename: req.url.replace("/", "")
-		// 	};
-		// 	var args = {
-		// 		data: updateinp,
-		// 		headers: {
-		// 			"Content-Type": "application/json"
-		// 		}
-		// 	};
-		// 	var apireq = apiclient.post(epurl + "utility/userAccess", args, function(result, response) {
-		// 		if (roleId) {
-		// 			if (response.statusCode != 200 || result.rows == "fail") {
-		// 				logger.error("Error occured in userAccess");
-		// 				res.send("Invalid Session");
-		// 			} else if (result.rows == "off") {
-		// 				res.status(500).send("fail");
-		// 				httpsServer.close();
-		// 				logger.error("License Expired!!");
-		// 				logger.error("Please run the Service API and Restart the Server");
-		// 			} else {
-		// 				if (result.rows == "True") {
-		// 					logger.rewriters[0] = function(level, msg, meta) {
-		// 						if (req.session && req.session.uniqueId) {
-		// 							meta.username = req.session.username;
-		// 							meta.userid = req.session.userid;
-		// 							meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
-		// 							return meta;
-		// 						} else {
-		// 							meta.username = null;
-		// 							meta.userid = null;
-		// 							return meta;
-		// 						}
-		// 					};
-		// 					return next();
-		// 				} else {
-		// 					req.clearSession();
-		// 					return res.send("Invalid Session");
-		// 				}
-		// 			}
-		// 		} else {
-		// 			return next();
-		// 		}
-		// 	});
-		// 	apireq.on('error', function(err) {
-		// 		res.status(500).send("fail");
-		// 		httpsServer.close();
-		// 		logger.error("Please run the Service API and Restart the Server");
-		// 	});
-		// });
-
 		app.post('/designTestCase', function(req, res) {
 			return res.sendFile("app.html", { root: __dirname + "/public/" });
 		});
@@ -411,12 +356,6 @@ if (cluster.isMaster) {
 		// Mindmap Routes
 		try {
 			throw "Disable Versioning";
-			var version = require('./server/controllers/project_versioning');
-			app.post('/getVersions', version.getVersions);
-			app.post('/getModulesVersioning', version.getModulesVersioning);
-			app.post('/saveDataVersioning', version.saveDataVersioning);
-			app.post('/createVersion', version.createVersion);
-			app.post('/getProjectsNeo', version.getProjectsNeo);
 		} catch (Ex) {
 			process.env.projectVersioning = "disabled";
 			logger.warn('Versioning is disabled');
@@ -425,7 +364,7 @@ if (cluster.isMaster) {
 			});
 		}
 
-		app.post('/populateProjects', mindmap.populateProjects);
+		app.post('/populateProjects', auth.protect, mindmap.populateProjects);
 		app.post('/populateUsers', mindmap.populateUsers);
 		app.post('/getProjectTypeMM', mindmap.getProjectTypeMM);
 		app.post('/populateScenarios', mindmap.populateScenarios);
@@ -434,8 +373,8 @@ if (cluster.isMaster) {
 		app.post('/saveData', mindmap.saveData);
 		app.post('/saveEndtoEndData', mindmap.saveEndtoEndData);
 		app.post('/excelToMindmap', mindmap.excelToMindmap);
-		app.post('/getScreens', mindmap.getScreens);
-		app.post('/exportToExcel', mindmap.exportToExcel);
+		app.post('/getScreens', auth.protect, mindmap.getScreens);
+		app.post('/exportToExcel', auth.protect, mindmap.exportToExcel);
 		app.post('/pdProcess', auth.protect, mindmap.pdProcess);	// process discovery service
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);

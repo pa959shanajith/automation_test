@@ -12,6 +12,7 @@ import 'simplebar-react/dist/simplebar.min.css'
     thumbColor : color
     hideYbar : boolean 
     hideXbar : boolean 
+    verticalbarWidth: number
     scrollId : container id
 */
 
@@ -45,7 +46,7 @@ const ScrollBar = (props) => {
                 }
                 `}
             </style>
-            <SimpleBar scrollbarMaxSize={props.maxThumbSize?props.maxThumbSize:0} scrollbarMinSize={props.maxThumbSize?props.maxThumbSize:25} autoHide={false} style={{height:'inherit'}}>
+            <SimpleBar scrollbarMaxSize={props.maxThumbSize?props.maxThumbSize:0} scrollbarMinSize={props.maxThumbSize?props.maxThumbSize:25} autoHide={false} style={{maxHeight:'inherit',height:'inherit'}}>
                 {props.children}
             </SimpleBar>
         </Fragment>

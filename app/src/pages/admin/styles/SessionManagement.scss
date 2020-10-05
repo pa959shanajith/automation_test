@@ -1,0 +1,181 @@
+#page-taskName,[id^=page-taskName] {
+    float: left;
+    width: 100%;
+	margin-bottom: 10px;
+}
+#page-taskName span,[id^=page-taskName] span {
+    display: inline-block;
+    /*background: #2f1c49;*/
+    background: #331d4e;
+    font-size: 18px;
+    color: #fff;
+    font-family: 'LatoWebLight';
+    padding: 2px 14px 1px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+
+@media screen and (min-width:1801px){ 
+    #page-taskName span,[id^=page-taskName] span {
+        font-size: 1.2vw
+    }
+}
+#activeUsers,#clientUsers {
+    height: calc(100% - 40px);
+}
+.adminActionBtn-sess-mgmt {
+	float: right;
+	width: auto;
+}
+.btn-md.focus,
+.btn-md,
+.btn-md:active:focus,
+.btn-md:focus,
+.btn-md:hover {
+    color: #fff;
+    border: 0;
+    border-radius: 20px;
+    padding: 2px 15px;
+    font-size: 17px;
+    background: #643693;
+	font-family: 'LatoWebLight';
+    outline: 0;
+}
+@media screen and (min-width: 1700px){
+    .btn-md {
+        font-size: 1.2vw;
+    }
+}
+
+.adminBtn {
+	padding: 2px 25px !important;
+}
+.form-group__conv-Sess-mgmt{
+    margin-bottom:15px
+} 
+.adminForm {
+	padding-top: 5%;
+}
+#middle-content-section>.containerWrap {
+    overflow: visible;
+    float: none;
+}
+.containerWrap {
+    float: left;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    max-height: calc(100% - 0px);
+}
+.sessionItemWrap {
+	// position: absolute;
+	height: auto;
+}
+
+.sessionTable.table>tbody>tr>th{
+	vertical-align: middle;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+}
+
+.sessionTable.table>tbody>tr>td{
+	vertical-align: middle;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+}
+
+.sessionTable button{
+	color: #643693;
+	background: none;
+	border-color: #643693;
+	border-radius: 20px;
+	visibility: hidden;
+}
+
+.sessionTable button:hover,.sessionTable button:active,.sessionTable button:active:focus,.sessionTable button:focus{
+	color: #643693;
+	outline: none;
+}
+
+.sessionTable button:hover{
+	color: #fff!important;
+	background: #643693;
+	font-weight: 400;
+}
+
+.sessionTable.table-hover>tbody>tr:hover button{
+	visibility: visible;
+}
+.sessionHeading{
+	padding-left: 5px;
+	display: block;
+	background: #eeeeee;
+	cursor: pointer;
+	width: 100%;
+	margin-bottom: 3px;
+}
+
+.sessionHeading:hover {
+	background: #e0e0e0;
+}
+
+.sessionHeading h4{
+    margin-top: 10px;
+    margin-bottom: 10px;
+	display: inline-block;
+	padding-right: 5px;
+    user-select: none;
+    font-size: 18px;
+}
+@media screen and (min-width:1801px){ 
+    .sessionHeading h4{
+        font-size: 1.2vw
+    }
+    .sessionTable.table>tbody>tr>td{
+        font-size: 1vw   
+    }
+    .sessionTable.table>tbody>tr>th{
+        font-size: 1vw   
+    }
+    .sessionTable button{
+        font-size: 1vw  
+    }
+}
+@media screen and (max-width:800px){ 
+    .sessionHeading{
+        width: 95%;
+    }
+}
+.wrap-sess-mgmt {
+    float: left;
+    width: 100%;
+    position: relative;
+    padding: 8px;
+}
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    padding: 8px;
+    line-height: 1.42857143;
+    vertical-align: top;
+    border-top: 1px solid #ddd;
+}
+@media screen and (min-width:1800px){ 
+    .clientUsers-height{
+        top: 530px !important;
+    }
+}
+
+.wrap-sess-mgmt-cust{
+    max-height:320px;
+    margin-bottom:15px;
+}
+.btn-hidden-cust{
+    visibility:hidden
+}
+.wrap-sess-mgmt-custom{
+    max-height:400px;
+    margin-bottom:15px;
+}
+.btn-table-cust{
+    font-size: 14px;
+}

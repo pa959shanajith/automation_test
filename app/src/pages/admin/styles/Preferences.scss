@@ -1,0 +1,84 @@
+
+#page-taskName,[id^=page-taskName] {
+    float: left;
+    width: 100%;
+	margin-bottom: 10px;
+}
+#page-taskName span,[id^=page-taskName] span {
+    display: inline-block;
+    /*background: #2f1c49;*/
+    background: #331d4e;
+    font-size: 18px;
+    color: #fff;
+    font-family: 'LatoWebLight';
+    padding: 2px 14px 1px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+
+@media screen and (min-width:1801px){ 
+    #page-taskName span,[id^=page-taskName] span {
+        font-size: 1.2vw
+    }
+}
+
+.preferencesTbl
+{
+    width: 100%;
+    float: left;
+    margin-top: 2%;
+}
+.preferencesTbl th,.preferencesTbl td
+{
+    text-align: center;
+}
+.preferencesTbl th
+{
+    font-family: latowebbold;
+    font-size: 16px;
+}
+
+.preferencesTbl td
+{
+    font-family: latoweb;
+    font-size: 12px;
+}
+@media screen and (min-width:1801px){ 
+    .preferencesTbl td{
+        font-size: 1.2vw
+    }
+}
+#preferencesTable thead th
+{
+    background: #5e626b;
+    color: #fff;
+    border-right: 1px solid #fff;
+    border-radius: 5px;
+    padding: 0.5%;
+}
+#preferencesTable tbody td
+{
+    padding: 1% !important;
+}
+.module_admin
+{
+    width: 14px;
+    height: 14px;
+}
+@media screen and (min-width:1801px){ 
+    .preferencesTbl td{
+        font-size: 1.2vw
+    }
+    #preferencesTable thead th{
+        font-size: 1.2vw
+    }
+    .module_admin{
+        width: 25px;
+        height: 25px;
+    }
+}
+#preferencesTable tr:nth-child(odd)
+{
+    background: rgb(232, 230, 254);
+}

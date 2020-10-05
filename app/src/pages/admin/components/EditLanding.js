@@ -1,8 +1,9 @@
-import React ,  { Fragment ,useEffect, useRef } from 'react';
+import React ,  { Fragment , useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as actionTypes from '../state/action';
 import '../styles/EditLanding.scss';
 import useOnClickOutside from './UseOnClickOutside'
+import {ScrollBar} from '../../global' 
 
 /*Component EditLanding
   use: renders edit New User Landing page
@@ -29,9 +30,11 @@ const EditLanding = (props) => {
                     <input list="allUsersListauto" className=" btn-users dropdown-toggle-edit edit-user-dropdown-edit" onClick = {()=>{props.click();props.setShowDropdownEdit(!props.showDropdownEdit);}} type="text"  id="userIdName"  onChange={(event)=>{dispatch({type:actionTypes.UPDATE_ALL_USER_FILTER,payload:event.target.value});props.searchFunctionUser(event.target.value);}} data-toggle="dropdown" value={userConf.allUserFilter}  placeholder="Search User.." autoComplete="none"/>
                     {(props.showDropdownEdit && userConf.allUsersList!==[])?
                         <div ref={node} className=" dropdown-menu-edit dropdown-menu-users-edit create-user__dropdown" role="menu" aria-labelledby="userIdName" style={{padding: "6px",fontSize: "14px",WebkitBoxShadow: "0 6px 12px rgba(0,0,0,.175)",boxShadow: "0 6px 12px rgba(0,0,0,.175)",display: "block", border: "1px solid rgba(0,0,0,.15)"}}>
+                            <ScrollBar scrollId='allUsersListauto' thumbColor="#929397" >
                             {props.allUserFilList.map((uid,index) => (  
                                 <option key={index} role="presentation" onClick = {()=>{props.setShowDropdownEdit(!props.showDropdownEdit);dispatch({type:actionTypes.UPDATE_USERIDNAME,payload:uid[1]+';'+uid[0]});dispatch({type:actionTypes.UPDATE_ALL_USER_FILTER,payload:uid[0]});props.getUserData({user_idName:uid[1]+';'+uid[0]});}} value={uid[1] +";"+uid[0]} className="user-select__option"> {uid[0]}</option> 
                             ))}
+                            </ScrollBar>
                         </div>
                         :null
                     }

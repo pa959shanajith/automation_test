@@ -11,6 +11,8 @@ import ClickAwayListener from 'react-click-away-listener';
             collapsible : if true ReferenceBar can be collapsed or expand. Default is false 
             hideInfo : to hide the default info Icon . by default hideInfo is false
             children : renders the children passed above the task icon. 
+            taskTop : send true to keep task before children
+            collapse : set true to collpase Refernce bar
             taskName : to let the reference bar know which task to highlight as disabled.
             popups : to render pop up menus like filter, screenshot 
             closeAllpopups : method to close all passed popups
@@ -76,6 +78,9 @@ const ReferenceBar = (props) => {
             }
             setTaskList(task_list);
     }, [tasksJson]);
+    useEffect(()=>{
+        setCollapse(props.collapse)
+    },[props.collapse])
 
     useEffect(()=>{
         setShowTask(false);
@@ -176,9 +181,11 @@ const ReferenceBar = (props) => {
                     <ScrollBar scrollId="ref_bar_scroll" trackColor="transparent" thumbColor="#7143b3">
                         <div className="ref__content">
                             <div className="rb_upper_contents">
+                                {props.taskTop?<div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
                                     {props.children}
-                                <div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} alt="task-ic" src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>
-                                { !props.hideInfo && <div className="ic_box" onClick={toggleInfoPop} ><img className="rb__ic-info thumb__ic" src="static/imgs/ic-info.png"/><span className="rb_box_title">Info</span></div>}
+                                {!props.taskTop && !props.hideTask?<div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
+                                {!props.hideTask && <div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>}
+                                {!props.hideInfo && <div className="ic_box"><img className="rb__ic-info thumb__ic" src="static/imgs/ic-info.png"/><span className="rb_box_title">Info</span></div>}
                             </div>
                         </div>
                     </ScrollBar>

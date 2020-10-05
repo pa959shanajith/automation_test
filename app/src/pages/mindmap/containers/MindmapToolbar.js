@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import Toolbarmenu from '../components/ToolbarMenu';
 import ModuleListDrop from '../components/ModuleListDrop'
 import '../styles/MindmapToolbar.scss'
@@ -9,12 +9,14 @@ import '../styles/MindmapToolbar.scss'
     add user permission check 
 */
 
-const MindmapToolbar = () => {
+const MindmapToolbar = (props) => {
   return (
-    <div className='toolbar__container'>
-        <Toolbarmenu/>
-        <ModuleListDrop/>
-    </div>
+    <Fragment>
+      <div className='toolbar__container'>
+          <Toolbarmenu setPopup={props.setPopup}/>
+      </div>
+      <ModuleListDrop setPopup={props.setPopup}/>
+    </Fragment>
   );
 }
 

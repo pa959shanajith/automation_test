@@ -3,12 +3,16 @@
     width: 100%;
     background-color: #e6e7e9;
     padding: 10px 20px;
+    z-index:2;
+    position: relative;
 }
 .toolbar__module-footer{
     position: relative;
     background: #e6e7e9;
     height: 10px;
-    margin-top: 1px;
+}
+.z-up{
+    z-index: 2;
 }
 .toolbar__module-box{
     position: relative;
@@ -64,4 +68,7 @@
     position: absolute;
     left: 32.5px;
     top: -3px;
+}
+.toolbar__module-warning-footer .btn-yes{
+    margin-right: 15px;
 }

@@ -11,7 +11,7 @@ import Scrape from './pages/scrapescreen';
 import Design from './pages/design';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
-
+import 'react-datetime/css/react-datetime.css';
 
 /*Component App
   use: defines components for each url
