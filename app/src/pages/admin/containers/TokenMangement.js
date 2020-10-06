@@ -30,7 +30,8 @@ const TokenManagement = (props) => {
     const [nameErrBorder,setNameErrBorder] = useState(false)
     const [selAssignUser2ErrBorder,setSelAssignUser2ErrBorder] = useState(false)
     const [runLoadData,setRunLoadData] = useState(true)
-    const [refresh,setRefresh] = useState(false)
+	const [refresh,setRefresh] = useState(false)
+	const [showList,setShowList] = useState(false)
 
     useEffect(()=>{
 		setOp("normal");
@@ -129,8 +130,8 @@ const TokenManagement = (props) => {
                 <button className="btn-md pull-right adminBtn-tkn-mgmt" onClick={()=>{generateCIusertokens();}}  title="Generate New Token">Generate</button>
                 <button className="btn-md pull-right adminBtn-tkn-mgmt btn-right-cust-tkn" onClick={()=>{setRefresh(!refresh);setOp("normal")}} title="Refresh">Refresh</button>            
             </div>
-            <TokenMgmtForm runLoadData={runLoadData} op={op} setOp={setOp} dateVal={dateVal} setSelAssignUser2ErrBorder={setSelAssignUser2ErrBorder} setNameErrBorder={setNameErrBorder} nameErrBorder={nameErrBorder} refresh={refresh} selAssignUser2ErrBorder={selAssignUser2ErrBorder} timeVal={timeVal} setTimeVal={setTimeVal} setdateVal={setdateVal} setAllTokens={setAllTokens} setTargetid={setTargetid} targetid={targetid} name={name} allICE={allICE} setAllICE={setAllICE} setName={setName} token={token} allTokens={allTokens} setToken={setToken} />
-            <TokenMgmtList allTokens={allTokens} setAllTokens={setAllTokens} targetid={targetid} />  
+            <TokenMgmtForm setShowList={setShowList} showList={showList} runLoadData={runLoadData} op={op} setOp={setOp} dateVal={dateVal} setSelAssignUser2ErrBorder={setSelAssignUser2ErrBorder} setNameErrBorder={setNameErrBorder} nameErrBorder={nameErrBorder} refresh={refresh} selAssignUser2ErrBorder={selAssignUser2ErrBorder} timeVal={timeVal} setTimeVal={setTimeVal} setdateVal={setdateVal} setAllTokens={setAllTokens} setTargetid={setTargetid} targetid={targetid} name={name} allICE={allICE} setAllICE={setAllICE} setName={setName} token={token} allTokens={allTokens} setToken={setToken} />
+            <TokenMgmtList showList={showList} setShowList={setShowList} allTokens={allTokens} setAllTokens={setAllTokens} targetid={targetid} />  
         </Fragment>
   );
 }

@@ -256,7 +256,7 @@ const SamlConfig = (props) => {
                     </Fragment>
                     :<Fragment>
                         <span className="leftControl-saml" title="Server Name">Server Name</span>
-                        <select onChange = {(event)=>{setName(event.target.value); samlGetServerData(event.target.value);}} className={nameErrBorder?'selectErrorBorder adminSelect-saml form-control-saml':'adminSelect-saml form-control-saml'} id="samlServerName" >
+                        <select value={name} onChange = {(event)=>{setName(event.target.value); samlGetServerData(event.target.value);}} className={nameErrBorder?'selectErrorBorder adminSelect-saml form-control-saml':'adminSelect-saml form-control-saml'} id="samlServerName" >
                             <option value="" disabled selected>Select Server</option>
                             {selBox.map((data,index)=>(
                                 <option key={index}  value={data}>{data}</option>
@@ -278,7 +278,7 @@ const SamlConfig = (props) => {
 					<span className="leftControl-saml" title="X.509 certificate issued by provider">Certificate</span>
 					<label   id="samlCert" for="certInput" className={certNameErrBorder?"inputErrorText saml-cursor":"certInput-saml saml-cursor"}><span className="fa fa-upload cert-input-cust" ></span>{certName}</label>
 					<input type="file" accept=".cer,.crt,.cert,.pem" onChange={(event)=>{certInputClick(event)}} autoComplete="off" id="certInput" name="samlCert" className="no-disp cert-saml"/>
-                    {samlEdit?<ScrollBar scrollId='saml-cert' thumbColor="#929397" ><textarea autoComplete="off" id="samlCertValue" name="samlCertValue" disabled="" readOnly="readOnly" className="certTextarea-saml" value={cert} /></ScrollBar>:null}
+                    {samlEdit?<textarea autoComplete="off" id="samlCertValue" name="samlCertValue" disabled="" readOnly="readOnly" className="certTextarea-saml" value={cert} />:null}
                 </div></div>
             </div>
 

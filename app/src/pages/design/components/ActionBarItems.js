@@ -44,8 +44,8 @@ const WebList = [
     {'title': "Internet Explorer", 'img': "static/imgs/ic-ie.png"}, 
     {'title': "Google Chrome", 'img': "static/imgs/ic-chrome.png"},
     {'title': "Mozilla Firefox", 'img': "static/imgs/ic-mozilla.png"},
-    {'title': "Microsoft Edge", 'img': "static/imgs/ic-edge.svg"},
-    {'title': "Edge Chromium", 'img': "static/imgs/ic-edge-chromium.svg"}
+    {'title': "Microsoft Edge", 'svg': "static/imgs/ic-edge.svg"},
+    {'title': "Edge Chromium", 'svg': "static/imgs/ic-edge-chromium.svg"}
     ]
 
 const oebsList = [{'title': "OEBS Apps" , 'img': 'static/imgs/ic-desktop.png'}]
