@@ -103,6 +103,7 @@ const ReferenceBar = (props) => {
     }
 
     const closePopups = () => {
+        if (props.popups) props.closeAllPopups();
         setShowInfo(false);
         setShowTask(false);
     }

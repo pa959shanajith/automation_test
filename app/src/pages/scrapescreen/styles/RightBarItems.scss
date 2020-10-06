@@ -38,12 +38,60 @@
     z-index: 100;
     display: flex;
     position: absolute;
-    display: flex;
-    flex-direction: column;
+    display: block;
     right: 110%;
     border-radius: 5px;
     width: 350px;
-    height: 56%;
+    
+    .pop_header{
+        cursor: pointer;
+        border-bottom: 2px solid #604b83;
+        padding: 8px 15px;
+        margin: 0;
+        font-size: 18px;
+        font-family: "LatoWeb";
+    }
+    .popupContent{
+        padding: 4% 9%;
+        float: left;
+        width: 100%;
+        
+    }
+    img{
+        width: 8px;
+        height: 16px;
+    }
+}
+.task_close_arrow{
+    float: right;
+}
+.popupContent-filter div{
+    float: left;
+    width: 50%;
+    font-size: 15px;
+
+}
+.popupContent-filter div span{
+    display: inline-block;
+    padding: 0px 20px 0 12px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    border-radius: 20px;
+    background: #46316c;
+    color: white;
+    &:hover{
+        background:#9D6AE0;
+    }
+}
+#selectAllFilters{
+    float: left;
+    width: 100%;
+    font-size: 12px;
+    margin-bottom: 10px;
+    margin-left: 0%;
+}
+#selecttext{
+    margin-left: 5px;
 }
 .active_rb_thumb{
     background-color: #61349b;

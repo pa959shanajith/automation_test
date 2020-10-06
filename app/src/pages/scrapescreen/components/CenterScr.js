@@ -1,27 +1,33 @@
 import React , {useState, useEffect , useRef} from'react';
-import {useSelector} from "react-redux"
-import {PopupMsg } from '../../global';
+import {useSelector, useDispatch} from "react-redux"
+import {PopupMsg ,ScrollBar , ModalContainer} from '../../global';
 import ClickAwayListener from 'react-click-away-listener';
 import '../styles/CenterScr.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {GetScrapeDataScreenLevel_ICE , updateScreen_ICE} from '../api';
+import ModalContent from './ModalContent';
 import ScrapeObject from './ScrapeObject.js'
+import * as actionTypes from '../state/action';
 
 
 
 var ScrapeCenter =(props)=>{
-    const _CT = useSelector(state=>state.plugin.CT);
+
+    
+    const _CT = props._CT;
+    const userinfo = useSelector(state=> state.login.userinfo);
+    const scrapeData = useSelector(state=> state.scrape.ScrapeData);
     const taskScrenName = _CT.taskName;
     var screenId = _CT.screenId;
     var projectId = _CT.projectId;
     var testCaseId = _CT.testCaseId;
     var type = _CT.appType;
+    const [os , setOs]= useState(undefined)
     const [custName , setCustName] = useState([])
     const [scrapeList , setScrapeList] = useState([])
     const [search , setSearch] = useState(false)
     const [eye , setEye] = useState(false);
     const [userInfo , setUserInfo] = useState([])
-    const userinfo = useSelector(state=> state.login.userinfo);
     const [element, setElement]=useState([])
     const [elementedit , setElementedit] = useState(false)
     const [filtered, setFiltered] = useState([]);
@@ -32,26 +38,15 @@ var ScrapeCenter =(props)=>{
         if(Object.keys(userinfo).length!==0){
             setUserInfo(userinfo)
         }
-    },[userinfo])
-
-    const onSearch=(e)=>{
-        var val = e.target.value;
-        var filter = []
-        var elem = [...element]
-        filter = [...elem].filter((e)=>e.toUpperCase().indexOf(val.toUpperCase())!==-1)
-        setFiltered(filter)
-        setSearchVal(val);
-    }
-    
+    },[userinfo])    
     useEffect(() => {
-        (async () =>{
-            var res = await GetScrapeDataScreenLevel_ICE(_CT)
-            setScrapeList(res.view)
-            const onetime =[...res.view.map((e)=>(e.custname))]
+            if (scrapeData.length !== 0){
+            setScrapeList(scrapeData.view)
+            const onetime =[...scrapeData.view.map((e)=>(e.custname))]
             setCustName(onetime)
-            setElement(onetime)
-        })()
-    }, [])
+            setElement(onetime)}
+        }
+    , [scrapeData])
 
     useEffect(()=>{
         if (props.scpitm.view){
@@ -65,6 +60,13 @@ var ScrapeCenter =(props)=>{
         }
     }, [props.scpitm]); 
     
+    const onSearch=(e)=>{
+        var val = e.target.value;
+        var filter = []
+        filter = [...element].filter((e)=>e.toUpperCase().indexOf(val.toUpperCase())!==-1)
+        setFiltered(filter)
+        setSearchVal(val);
+    }
     const callSavebtn = () => {
         let findDuplicates = element.filter((item, index) => element.indexOf(item) != index)
         if(findDuplicates.length !==0){
@@ -72,9 +74,6 @@ var ScrapeCenter =(props)=>{
             setDubli(true)
         }
     }
-
-    // var dubliname = dubliobjlist.map((e)=>(element.find(e)));
-    // console.log(dubliname)
     const callDelbtn =()=>{
         return console.log("delete was clicked");
     }
@@ -84,28 +83,41 @@ var ScrapeCenter =(props)=>{
             let arr = [...element]
             arr.splice(i, 1, cName)
             setElement(arr);
-            setElementedit(null);
             
         }
     }
+    const onClose = () =>{
+        props.setMweb(false);
+        setOs(undefined)
+      }
 
-    const List =    ({items}) => (
+    const List =    ({items}) => {
+        return(
         <>
+        
         {items.map((e,i) => (
             <ScrapeObject key={i} item={e} idx={i} setElementedit={setElementedit} elementedit={elementedit} eye={eye} setEye={setEye} saveName={saveName}/>
         ))}
+        
         </>
-    )
+    )}
     
     return(
         <div id="middleContent">
+            {props.mweb  ? 
+            <ModalContainer title='Launch Application' 
+            content= {<ModalContent os={os} setOs={setOs}/>}
+            close={onClose}
+            footer ={(os)? <button>Launch</button> : null}
+            />: null}
+            {props.spdf  ? <ModalContainer title='Scrape Screen' content="No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server." close={()=>props.setSpdf(false)} footer ={<button>OK</button>}/>: null}
             <div className="page-taskName" >
             <span className="taskname">
                 {taskScrenName}
             </span>
             </div>   
             <div className="fscrape">
-                
+            <ScrollBar thumbColor = 'rgba(255, 255, 255, 0.27)' trackColor = 'none'>
                 <div className="scraptree">
                     <button className="btn pull-right" id="submittaskbtn"title="submit task">
                         Submit 
@@ -123,7 +135,7 @@ var ScrapeCenter =(props)=>{
                         </span>
                     </span></ClickAwayListener>
                     {   
-                        <List items={ searchVal ? filtered : element}  />
+                            <List items={ searchVal? filtered : element}  />
                     }
                     {
                         ((dubliobjlist.length!==0) && dubli)? 
@@ -134,6 +146,7 @@ var ScrapeCenter =(props)=>{
                             /> : null 
                     }
                 </div>
+                </ScrollBar>
             </div>
         
     </div>

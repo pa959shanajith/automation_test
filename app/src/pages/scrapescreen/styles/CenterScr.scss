@@ -100,12 +100,10 @@
 .searchdcrapinput{
     padding: 3px;
     position: relative;
-    bottom: 3px;
     border: 1px solid #633693;
     border-radius: 5px;
     width: 200px;
-    
-    height: 25px;
+    height: 24px;
 }
 
 .special{
@@ -113,7 +111,7 @@
 }
 
 .searchscrapel{
-    padding: 5px;
+    padding: 4px;
     margin-left: 4px;
     bottom: 2px;
     border: 1px solid #633693;
@@ -136,6 +134,7 @@
     img{
         padding-right: 5px;
         cursor: pointer;
+        padding-bottom: 5px;
 
     }
     span:hover{

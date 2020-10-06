@@ -2,7 +2,7 @@ import React ,{useState , useEffect, Fragment} from 'react';
 import { useSelector } from 'react-redux';
 import '../styles/LeftBarItems.scss'
 import {GetScrapeDataScreenLevel_ICE ,initScraping_ICE } from '../api';
-import {ScrollBar , ModalContainer, Thumbnail } from '../../global';
+import {ScrollBar , ModalContainer, Thumbnail, ActionBar } from '../../global';
 import ModalContent from './ModalContent'
 
 /*Component LeftBarItems
@@ -12,37 +12,28 @@ import ModalContent from './ModalContent'
 */
 
 const CreateOptions = (props) => {
-
   const options = [
     {ico : "ic-addobject.png",label:'Add Object',comp:'addobject'},
     {ico : "ic-mapobject.png",label:'Map Object',comp:'map'},
     {ico :"ic-compareobject.png",label:'Compare Object',comp:'compare'},
     {ico:"ic-jq-editstep.png",label:'Create Object',comp:'create'}
     ]
-  const [flag,setFlag] = useState(false)
-
-        
-        
+  const [flag,setFlag] = useState(false)    
   const [appen , setAppen] =useState(false)
-
-  const [os , setOs]= useState(" ")
-
+  
   const macOS = navigator.appVersion.indexOf("Mac") != -1;
-        
-  const _CT = useSelector(state=>state.plugin.CT);
-  const _FD =useSelector(state=>state.plugin.FD);
-  const apptype = _CT.appType;
+  const scrapeData = useSelector(state=> state.scrape.ScrapeData);
+  // const _FD =useSelector(state=>state.plugin.FD);
+  const apptype = props.apptype;
           
   useEffect(() => {
-    (async () =>{
-      var res = await GetScrapeDataScreenLevel_ICE(_CT)
-      var custName =[] ;
-      custName = res.view;
+      if(scrapeData.length !== 0)
+      {var custName =[] ;
+      custName = scrapeData.view;
       if(custName.length !=0){
         setAppen(true)
-      }
-    })()
-  }, [macOS])
+      }}
+  }, [scrapeData])
 
   
 
@@ -51,16 +42,14 @@ const CreateOptions = (props) => {
     props.setScpitm(items);
     
   }
-  const onClose = () =>{
-    props.setMweb(false);
-    setOs(" ")
-  }
-  
-  return (
-    <div className="leftnav" >
-      {(apptype=== "Web")? 
-        <Fragment>
-          <ScrollBar thumbColor = 'rgba(255, 255, 255, 0.27)' trackColor = 'none'>
+
+  const upperContent=(apptype)=>{
+    return (
+      <div className="leftnav" >
+      
+      {(apptype === "Web")? 
+          <Fragment>
+            
             <div className="leftbar-container">
               <div className="leftbar-top">
                 <ul>
@@ -74,18 +63,12 @@ const CreateOptions = (props) => {
                   <li className= {(!appen)?"special" : null}><i className="Append"    title="Append ON" ><span><input  type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/>Append</i></li>
                 </ul>
               </div>
+             
             </div>
-            <div className="leftbottom">
-              {options.map((e,i)=>(
-                  <div key={i} className="cards">
-                    <img src={"static/imgs/"+e.ico} alt={e.label}/>
-                    <div>{e.label}</div>
-                  </div>
-              ))}
-            </div>
-          </ScrollBar>
-        </Fragment>
-        : null }
+            
+            </Fragment>
+        : null }  
+     
         {(apptype==="SAP")? <div className="leftbar-container">
         <div className="leftbar-top">
           <ul>
@@ -110,14 +93,9 @@ const CreateOptions = (props) => {
       </div> : null}    
       {(apptype==="MobileApp")? <div className="leftbar-container">
         <div className="leftbar-top" id="leftbar-top">
-        {props.mweb  ? <ModalContainer title='Launch Application' 
-            content= {<ModalContent os={os} setOs={setOs}/>}
-            close={onClose} footer ={(os==="android" ||os==="ios")? <button>Launch</button> : null}/>: null}
-          {props.spdf  ? <ModalContainer title='Scrape Screen' content="No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server." close={()=>props.setSpdf(false)} footer ={<button>OK</button>}/>: null}
-          
-          <ul>
+        <ul>
             <li><i  className='scrapeOnTxt'>Scrape On</i></li>
-            <li><i className='browserIcon'   title="Desktop Apps"><span><img onClick={()=>props.setMweb(true)} src='static/imgs/ic-mobility.png' alt='Desktop Apps' /></span><br/>Mobile Apps</i></li>
+            <li><i className='browserIcon'   title="Desktop Apps"><span><img onClick={()=>{props.setMweb(true);console.log("this is clicked")}} src='static/imgs/ic-mobility.png' alt='Desktop Apps' /></span><br/>Mobile Apps</i></li>
             <li><i className='pdfIcon'   title="Launch PDF utility"><span><img onClick={()=>props.setSpdf(true)} src='static/imgs/ic-pdf_scrape.png' alt='pdf' /></span><br/>PDF Utility</i></li>
             <li><i class='Append'   title="Append ON" ><span><input type="checkbox" onChange={()=>setFlag(!flag)}/></span><br/><br/>Append</i></li>
           </ul>
@@ -147,8 +125,28 @@ const CreateOptions = (props) => {
           </ul>
         </div>
       </div> : null}
-    </div>
-    );
+        </div> )
+  }
+  const bottomContent=(apptype)=>{
+    return(
+      <Fragment>
+      {(apptype === "Web")?
+        <div className="leftbottom">
+          {options.map((e,i)=>(
+            <div key={i} className="cards">
+              <img src={"static/imgs/"+e.ico} alt={e.label}/>
+              <div>{e.label}</div>
+            </div>
+          ))}
+        </div>: <div className="leftbottom"></div> } </Fragment>
+    ) 
+  }
+  return(
+    <ActionBar 
+      upperContent={upperContent(apptype)} 
+      bottomContent={bottomContent(apptype)}
+    />    
+  )
   }
 
   export default CreateOptions;
