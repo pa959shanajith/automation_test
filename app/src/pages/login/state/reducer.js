@@ -1,7 +1,7 @@
 import * as actionTypes from './action';
 
 const initialState = {
-    userinfo:{username:"nishant.mishra" ,rolename:"Test Lead",firstname:"nishant" , lastname:"mishra"}
+
 }
 
 const reducer = (state=initialState, action) => {
