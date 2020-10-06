@@ -1152,6 +1152,7 @@ exports.pdProcess = function (req, res) {
 				'modifiedby': userid,
 				'modifiedbyrole': role,
 				'deleted': false,
+				'createdthrough':'PD',
 				'screenshot':screenshotdata,
 				'scrapedurl':'',
 				'scrapedata': screendataobj[name].data
