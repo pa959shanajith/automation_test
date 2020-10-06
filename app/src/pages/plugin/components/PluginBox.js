@@ -6,9 +6,10 @@ const PluginBox = ({plugin}) => {
 	const [redirectTo, setRedirectTo] = useState("");
 
 	const pluginRedirect = event => {
-		window.localStorage['navigateScreen'] = plugin.pluginName;
-		if (['p_Reports', 'performancetesting', 'dashboard'].indexOf(plugin.pluginName) > -1) window.location.href = "/"+ plugin.pluginName;
-		else setRedirectTo(`/${plugin.pluginName.toLowerCase()}`)
+		let pluginName = plugin.pluginName.toLowerCase();
+		window.localStorage['navigateScreen'] = pluginName;
+		if (['p_Reports', 'performancetesting', 'dashboard'].indexOf(pluginName) > -1) window.location.href = "/"+ pluginName;
+		else setRedirectTo(`/${pluginName}`)
 	}
 
     return (

@@ -34,7 +34,7 @@
 
 .d__btngroup{
     display: flex;
-    width: 100%;
+    max-width: 100%;
     margin-bottom: 15px;
     font-family: 'LatoWebLight';
 }
@@ -79,4 +79,51 @@
     padding: 2px 15px;
     font-size: 17px;
     margin-right: 5px;
+}
+
+@media screen and (min-width: 1400px) and (min-height: 770px){
+    .d__content{
+        padding: 2.6vh;
+        margin: 0 0.6vh;
+    }
+    
+    .d__task_title{
+        margin-bottom: 1.3vh;
+    }
+    
+    .d__task_name{
+        padding: 0.13vh 1.8vh 0;
+        font-size: 2.34vh;
+        border-radius: 0.6vh;
+    }
+    
+    .d__btn{
+        border-radius: 2.6vh;
+    }
+    
+    .d__btngroup{
+        margin-bottom: 1.95vh;
+    }
+    
+    .d__tblBtn_ic{
+        padding: 0.7vh 2.08vh;
+        font-size: 1.8vh;
+        margin: 0 0.39vh;
+        height: 4.8vh;
+        width: 7.9vh;
+    }
+    .d__taskBtns{
+        font-size: 1.8vh;
+    }
+    
+    .d__taskBtn{
+        padding: 0px 1.56vh;
+        margin-right: 1.3vh;
+    }
+    
+    .d__submitBtn, .d__reassignBtn{
+        padding: 0.26vh 1.95vh;
+        font-size: 2.21vh;
+        margin-right: 0.6vh;
+    } 
 }

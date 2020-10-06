@@ -100,7 +100,7 @@
 }
 
 .switch-role-menu, .user-name-menu{
-    z-index: 19!important;
+    z-index: 5!important;
     margin-right: 20px!important;
     margin-top: 10px!important;
     min-width: 160px;
@@ -195,32 +195,25 @@
     .user-name-btn{
         padding-right: 1vw;
         border-left: .1vw solid gray;
+        .user-name{
+            margin: 0 1.9vh;
+        }
     }
     
     .switch-role-menu, .user-name-menu{
-        z-index: 100;
-        font-family: "LatoWeb";
+        z-index: 5;
         font-size: 1.2vw;
         color: #333;
         position: absolute;
         margin-right: 1.3vw!important;
         margin-top: 1vw!important;
         div{
-            width: 100%;
-            display: flex;
             font-size: 1.2vw;
-            margin: 0;
-            padding: 0;
         }
         a{
-            width: 100%;
-            text-decoration: none!important;
-            outline: none;
-            border: none;
             padding: .1vw 1.2vw!important;
             &:hover{
                 color: #333!important;
-                background-color: #eee;
             }
         }
         

@@ -23,11 +23,11 @@ const DesignHome = () => {
             setStatus(current_task.status);
             setAppType(current_task.appType);
             setTaskInfo({
-                'Project' : filter_data.idnamemapprj[current_task.projectId],
+                'Project' : filter_data.projectDict[current_task.projectId],
                 'Screen' : current_task.screenName,
                 'TestCase' : current_task.testCaseName,
-                'Release' : filter_data.idnamemaprel[current_task.releaseid],
-                'Cycle' : filter_data.idnamemapcyc[current_task.cycleid]
+                'Release' : current_task.releaseid,
+                'Cycle' : filter_data.cycleDict[current_task.cycleid]
             });
         }
 
@@ -41,7 +41,7 @@ const DesignHome = () => {
             <Header />
                 <div className="d__mid_section">
                     
-                    <ActionBar upperContent={<UpperContent appType={appType} isMac={isMac}/>} bottomContent={<BottomContent />}/>
+                    <ActionBar upperContent={<UpperContent key={666} appType={appType} isMac={isMac}/>} bottomContent={<BottomContent />}/>
                     <DesignContent taskName={taskName} status={status} />
                     <ReferenceBar 
                         taskName={taskName}

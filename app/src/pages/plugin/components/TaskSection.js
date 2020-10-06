@@ -16,7 +16,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     const [todoItems, setTodoItems] = useState([]);
     const [searchItems, setSearchItems] = useState([]);
     const [dataObj, setDataObj] = useState([]);
-    const [filterDatState, setFilterDatState] = useState(null);
+    const [dataDictState, setDataDictState] = useState({ 'project' : {}, 'apptypes' : [], 'tasktypes' : [], 'projectDict': {}, 'cycleDict': {}});
     const [taskJson, setTaskJson] = useState(null);
     const [searchValue, setSearchValue] = useState("");
     const [overlay, setOverlay] = useState("");
@@ -25,12 +25,12 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     const [filterData, setFilterData] = useState({'prjval':'Select Project','relval':'Select Release','cycval':'Select Cycle','apptype':{},'tasktype':{}});
     const [filtered, setFiltered] = useState(false);
     const [showPopup, setShowPopup] = useState(false);
-    let filterDat;
+    let dataDict;
     
     useEffect(()=>{
         if(Object.keys(userInfo).length!==0) {
             resetStates();
-            let i, j, k;
+            let i;
             if(userRole === "Test Manager") setNotManager(false);
             
             setOverlay("Loading Tasks..Please wait...");
@@ -40,6 +40,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                 else {
                     pluginApi.getTaskJson_mindmaps(data)
                     .then(data1 => {
+                        dataDict = dataDictState;
                         // to render components which will populate under review
                         let review_items = []
                         // to render components which will populate under todo
@@ -50,16 +51,10 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                             setTaskJson(data1);
                             dispatch({type: actionTypes.SET_TASKSJSON, payload: tasksJson});
                             if (tasksJson.length === 0) setOverlay("");
-                            /*	Build a list of releaseids and cycleids
-                            * Another dict for releaseid and cyclelist out of task json
-                            * List of apptype and tasktype
-                            */
-                            filterDat = {'projectids':[],'releaseids':[],'cycleids':[],'prjrelmap':{},'relcycmap':{},'apptypes':[],'tasktypes':['Design','Execution'],'idnamemapprj':{},'idnamemaprel':{},'idnamemapcyc':{},'idnamemapdom':{}};
                             
                             let length_tasksJson = tasksJson.length;
                             let tempDataObj = [];
                             for (i=0 ; i < length_tasksJson ; i++){
-                                let testSuiteDetails = JSON.stringify(tasksJson[i].testSuiteDetails);
                                 let taskname = tasksJson[i].taskDetails[0].taskName;
                                 let tasktype = tasksJson[i].taskDetails[0].taskType;
                                 let status = tasksJson[i].taskDetails[0].status;
@@ -91,8 +86,8 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                                 
                                 tempDataObj.push(dataobj);
                                 
-                                if (status === 'underReview') review_items.push({'panel_idx': i, 'testSuiteDetails': testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
-                                else todo_items.push({'panel_idx': i, 'testSuiteDetails': testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
+                                if (status === 'underReview') review_items.push({'panel_idx': i, 'testSuiteDetails': tasksJson[i].testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
+                                else todo_items.push({'panel_idx': i, 'testSuiteDetails': tasksJson[i].testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
                                 
                                 fillFilterValues(tasksJson[i],0);
                             }
@@ -102,20 +97,21 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                             setOverlay("");
                         }
 
-                        for(i=0 ; i < filterDat.projectids.length ; i++){
-                            let index=data.projectId.indexOf(filterDat.projectids[i]);
-                            index=data.projectId.indexOf(filterDat.projectids[i]);
-                            filterDat.idnamemapprj[filterDat.projectids[i]] = data.projectName[index];
-                            filterDat.idnamemapdom[filterDat.projectids[i]] = data.domains[index];
-                            for(j=0 ; j < filterDat.releaseids.length ; j++){
-                                filterDat.idnamemaprel[filterDat.releaseids[j]] = filterDat.releaseids[j];
-                                for(k=0 ; k < filterDat.cycleids.length ; k++){
-                                    filterDat.idnamemapcyc[filterDat.cycleids[k]] = data.cycles[filterDat.cycleids[k]][2];
-                                }
-                            }
-                        }
-                        setFilterDatState(filterDat);
-                        dispatch({type: actionTypes.SET_FD, payload: filterDat})
+                        for (const projectID in dataDict.project){
+                          let dataIdx = data.projectId.indexOf(projectID);
+                          
+                          dataDict.project[projectID].domain = data.domains[dataIdx];
+                          dataDict.projectDict[projectID] = data.projectName[dataIdx];
+                          
+                          for (const releaseID in dataDict.project[projectID].release){
+                            dataDict.project[projectID].release[releaseID].forEach(cycleID=> {
+                              dataDict.cycleDict[cycleID] = data.cycles[cycleID][2];
+                            })
+                          }
+                        } 
+
+                        setDataDictState(dataDict);
+                        dispatch({type: actionTypes.SET_FD, payload: dataDict})
                         
                     })
                     .catch(error => {
@@ -139,7 +135,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
         setReviewItems([]);
         setTodoItems([]);
         setSearchItems([]);
-        setFilterDatState(null);
+        setDataDictState({ 'project' : {}, 'apptypes' : [], 'tasktypes' : [], 'projectDict': {}, 'cycleDict': {} });
         setTaskJson(null);
         setSearchValue("");
         setOverlay("");
@@ -154,18 +150,16 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
 
         let review_items = [];
         let todo_items = [];
-		let length_tasksJson = taskJson.length;
-		for(let i=0; i < length_tasksJson; i++){
+        let length_tasksJson = taskJson.length;
+        for(let i=0; i < length_tasksJson; i++){
             let taskname = taskJson[i].taskDetails[0].taskName;
             let tasktype = taskJson[i].taskDetails[0].taskType;
             let status = taskJson[i].taskDetails[0].status;
-
-            let testSuiteDetails = JSON.stringify(taskJson[i].testSuiteDetails)
             
             let dataobj = dataObj[i];
             if(passFilterTest(taskJson[i],0, filterData)){
-                if (status === 'underReview') review_items.push({'panel_idx': i, 'testSuiteDetails': testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
-                else todo_items.push({'panel_idx': i, 'testSuiteDetails': testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
+                if (status === 'underReview') review_items.push({'panel_idx': i, 'testSuiteDetails': taskJson[i].testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
+                else todo_items.push({'panel_idx': i, 'testSuiteDetails': taskJson[i].testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
             }				
         }
         
@@ -174,7 +168,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
 
         if(filterData['prjval']==='Select Project' && filterData['relval']==='Select Release' && filterData['cycval']==='Select Cycle' && !(Object.values(filterData['tasktype']).includes(true) || Object.values(filterData['apptype']).includes(true))) 
             setFiltered(false);
-		else setFiltered(true);
+		    else setFiltered(true);
 
         let items = activeTab === "todo" ? todo_items : review_items;
         let filteredItem = [];
@@ -201,44 +195,28 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
 
 
     const fillFilterValues = (obj, tidx) => {
-		/*	Build a list of releaseids and cycleids
-		* Another dict for releaseid and cyclelist out of task json
-		* List of apptype and tasktype
-		*/
-
-		if(validID(obj.projectId) && filterDat.projectids.indexOf(obj.projectId) === -1){
-			filterDat.projectids.push(obj.projectId);
-			filterDat.prjrelmap[obj.projectId] = [obj.taskDetails[tidx].releaseid];
-		}
-		if(validID(obj.taskDetails[tidx].releaseid) && filterDat.releaseids.indexOf(obj.taskDetails[tidx].releaseid) === -1){
-			filterDat.releaseids.push(obj.taskDetails[tidx].releaseid);
-			if(validID(obj.projectId) && filterDat.prjrelmap[obj.projectId].indexOf(obj.taskDetails[tidx].releaseid) === -1){
-				filterDat.prjrelmap[obj.projectId].push(obj.taskDetails[tidx].releaseid);
-			}
-			filterDat.relcycmap[obj.taskDetails[tidx].releaseid] = [obj.taskDetails[tidx].cycleid];
-		}
-		if(validID(obj.taskDetails[tidx].cycleid) && filterDat.cycleids.indexOf(obj.taskDetails[tidx].cycleid) === -1){
-			filterDat.cycleids.push(obj.taskDetails[tidx].cycleid);
-            if(validID(obj.taskDetails[tidx].releaseid) && filterDat.relcycmap[obj.taskDetails[tidx].releaseid].indexOf(obj.taskDetails[tidx].cycleid) === -1){
-                filterDat.relcycmap[obj.taskDetails[tidx].releaseid].push(obj.taskDetails[tidx].cycleid);			
-            }
-		}
-
-		if(filterDat.apptypes.indexOf(obj.appType)===-1)
-			filterDat.apptypes.push(obj.appType);
+        if (!dataDict.project[obj.projectId]) dataDict.project[obj.projectId] = {'release': {}}
         
+        if (!dataDict.project[obj.projectId].release[obj.taskDetails[tidx].releaseid])
+            dataDict['project'][obj.projectId].release[obj.taskDetails[tidx].releaseid] = [];
+        
+        if (!dataDict.project[obj.projectId].release[obj.taskDetails[tidx].releaseid].includes(obj.taskDetails[tidx].cycleid))
+            dataDict.project[obj.projectId].release[obj.taskDetails[tidx].releaseid].push(obj.taskDetails[tidx].cycleid)
+
+        if(!dataDict.apptypes.includes(obj.appType)) dataDict.apptypes.push(obj.appType);
+        if(!dataDict.tasktypes.includes(obj.taskDetails[0].taskType)) dataDict.tasktypes.push(obj.taskDetails[0].taskType);
     }
 
     const passFilterTest = (node, tidx, filterData) => {
-		var pflag = false, rflag = false, cflag = false, aflag = false, tflag = false;
-		if(filterData['prjval']==='Select Project' || filterData['prjval']===node.testSuiteDetails[tidx].projectidts) pflag = true;
-		if(filterData['relval']==='Select Release' || filterData['relval']===node.taskDetails[tidx].releaseid) rflag = true;
-		if(filterData['cycval']==='Select Cycle' || filterData['cycval']===node.taskDetails[tidx].cycleid) cflag = true;
-		if(Object.keys(filterData['tasktype']).map(function(itm) { return filterData['tasktype'][itm]; }).indexOf(true) === -1 || filterData.tasktype[node.taskDetails[tidx].taskType]) tflag = true;
-		if(Object.keys(filterData['apptype']).map(function(itm) { return filterData['apptype'][itm]; }).indexOf(true) === -1 || filterData.apptype[node.appType]) aflag = true;		
-		
-		if(pflag && rflag && cflag && aflag && tflag) return true;
-		else return false;
+      var pflag = false, rflag = false, cflag = false, aflag = false, tflag = false;
+      if(filterData['prjval']==='Select Project' || filterData['prjval']===node.testSuiteDetails[tidx].projectidts) pflag = true;
+      if(filterData['relval']==='Select Release' || filterData['relval']===node.taskDetails[tidx].releaseid) rflag = true;
+      if(filterData['cycval']==='Select Cycle' || filterData['cycval']===node.taskDetails[tidx].cycleid) cflag = true;
+      if(Object.keys(filterData['tasktype']).map(function(itm) { return filterData['tasktype'][itm]; }).indexOf(true) === -1 || filterData.tasktype[node.taskDetails[tidx].taskType]) tflag = true;
+      if(Object.keys(filterData['apptype']).map(function(itm) { return filterData['apptype'][itm]; }).indexOf(true) === -1 || filterData.apptype[node.appType]) aflag = true;		
+      
+      if(pflag && rflag && cflag && aflag && tflag) return true;
+      else return false;
 	}
     
     const onSelectTodo = event =>{
@@ -270,7 +248,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
         <>
         { showPopup && <Popup />}
         {overlay && <ScreenOverlay content={overlay}/>}
-        { showFltrDlg && <FilterDialog setShow={setShowFltrDlg} filterDat={filterDatState} filterData={filterData} filterTasks={filterTasks} /> }
+        { showFltrDlg && <FilterDialog setShow={setShowFltrDlg} dataDict={dataDictState} filterData={filterData} filterTasks={filterTasks} /> }
         <div className="task-section">
             <div className="task-header">
                 <span className="my-task">My Task(s)</span>
@@ -285,7 +263,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             { notManager && <div className="task-overflow">
                 <ScrollBar thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" >
                     <div className="task-content" id="plugin_page__list">
-                        <TaskContents items={searchValue ? searchItems : activeTab === "todo" ? todoItems : reviewItems} filterDat={filterDatState} taskJson={taskJson} />
+                        <TaskContents items={searchValue ? searchItems : activeTab === "todo" ? todoItems : reviewItems} cycleDict={dataDictState.cycleDict} taskJson={taskJson} />
                     </div>
                  </ScrollBar>
             </div>}
@@ -293,12 +271,4 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
         </>
     );
 }
-
-
-const validID = id => {
-    // Checks if neo4j id for relase and cycle in task is valid
-    if(id == 'null' || id == 'undefined' || id == null || id == undefined || id == 'Select Release' || id == 'Select Cycle' || id == '') return false;
-    return true;
-}
-
 export default TaskSection;

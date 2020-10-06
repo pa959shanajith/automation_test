@@ -22,3 +22,29 @@
     font-size: 18px;
     user-select: none;
 }
+
+
+.cls-1{
+    height: 36px;
+    width: 36px;
+}
+
+@media screen and (min-width: 1400px) and (min-height: 770px){
+    
+    .d__thumbnail input[type='checkbox']{
+        width: 2.34vh;
+        height: 2.34vh;
+    }
+
+    .d__thumbnail{
+        font-size: 2.08vh;
+    }
+    .d__debugOn{
+        font-size: 2.34vh;
+    }
+    .cls-1{
+        height: 5.6vh;
+        width: 6vh;
+        padding: 0.26vh;
+    }
+}
