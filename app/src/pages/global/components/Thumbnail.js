@@ -13,7 +13,7 @@ const Thumbnail = (props) => {
 
     return (
         <div className="thumbnail" onClick={props.action}>
-            <img className="thumbnail__img" src={props.img} alt={props.title}/>
+            <img className={"thumbnail__img " + (props.svg ? "svg_ic" : "" )} src={props.img || props.svg} alt={props.title}/>
             <span className="thumbnail__title">{props.title}</span>
         </div>
     );
