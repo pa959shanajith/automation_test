@@ -1,7 +1,8 @@
 import * as actionTypes from './action';
 
 const initialState = {
-
+    userinfo:{},
+    SR:{}
 }
 
 const reducer = (state=initialState, action) => {
