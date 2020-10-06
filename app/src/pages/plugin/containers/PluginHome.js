@@ -31,7 +31,9 @@ const PluginHome = () => {
                 </div>
                 <div className="page-contents">
                     <PluginSection userInfo={userInfo}/>
+                    <div className='min_gap'>
                     <div className="section-divider" />
+                    </div>
                     <TaskSection userInfo={userInfo} userRole={userRole} dispatch={dispatch}/>
                 </div>
             </div>

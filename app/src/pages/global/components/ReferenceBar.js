@@ -10,10 +10,13 @@ import ClickAwayListener from 'react-click-away-listener';
         Props :
             collapsible : if true ReferenceBar can be collapsed or expand. Default is false 
             hideInfo : to hide the default info Icon . by default hideInfo is false
+            hideTask : to hide the default task Icon . by default hideTask is false
             children : renders the children passed above the task icon. 
             taskTop : send true to keep task before children
             collapse : set true to collpase Refernce bar
             taskName : to let the reference bar know which task to highlight as disabled.
+            popups : to render pop up menus like filter, screenshot 
+            closeAllpopups : method to close all passed popups
     */
 
 const ReferenceBar = (props) => {
@@ -27,7 +30,7 @@ const ReferenceBar = (props) => {
     const [taskPopY, setTaskPopY] = useState(null);
 
     const tasksJson = useSelector(state=>state.plugin.tasksJson);
-    const filterDat = useSelector(state=>state.plugin.FD);
+    const dataDict = useSelector(state=>state.plugin.FD);
 
     useEffect(()=>{
             // if(window.location.pathname != '/mindmap'){
@@ -38,7 +41,6 @@ const ReferenceBar = (props) => {
             if (Object.keys(tasksJson)!==0){
                 setTaskList([]);
             }
-            let counter = 1;
             let lenght_tasksJson = tasksJson.length;
             let task_list = [];
             for(let i=0; i < lenght_tasksJson; i++) {
@@ -103,6 +105,7 @@ const ReferenceBar = (props) => {
     }
 
     const closePopups = () => {
+        if (props.popups) props.closeAllPopups();
         setShowInfo(false);
         setShowTask(false);
     }
@@ -123,12 +126,14 @@ const ReferenceBar = (props) => {
         <div className={"ref__wrapper " + (!collapse && "ref__wrapper__expand")}>
         <div className="ref__bar">
             { props.collapsible &&
-                <div className={"caret__ref_bar " + (collapse ? "fa fa-caret-left caret_ref_collapsed" : "fa fa-caret-right") } onClick={()=>setCollapse(!collapse)}></div>
+                <div className={"caret__ref_bar " + (collapse ? "fa fa-caret-left caret_ref_collapsed" : "fa fa-caret-right") } onClick={()=>{ setCollapse(!collapse); closePopups() }}></div>
             }
             { !collapse && 
                 <>
                 <div className="min_height_div">
                     <div id="ref_bar_scroll" className="inside_min">
+
+                    { props.popups }
                     {
                         showTask && 
                         <ClickAwayListener onClickAway={closePopups}>
@@ -144,7 +149,7 @@ const ReferenceBar = (props) => {
                                 <div id='task_pop_scroll' className="task_pop__overflow">
                                     <ScrollBar scrollId='task_pop_scroll' trackColor="#46326b" thumbColor="#fff">
                                         <div className="task_pop__content" id="rb__pop_list">
-                                            <TaskContents items={searchValue ? searchItems : taskList} taskName={props.taskName} filterDat={filterDat} taskJson={tasksJson}/>
+                                            <TaskContents items={searchValue ? searchItems : taskList} taskName={props.taskName} cycleDict={dataDict.cycleDict} taskJson={tasksJson}/>
                                         </div>
                                     </ScrollBar>
                                 </div>
@@ -160,7 +165,7 @@ const ReferenceBar = (props) => {
                             <h4 className="pop__header" onClick={()=>setShowInfo(false)}><span className="pop__title">Information</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
                             <div className="info_pop__contents">
                             {
-                                Object.keys(props.taskInfo).map(key => 
+                                props.taskInfo && Object.keys(props.taskInfo).map(key => 
                                     <>
                                         <div className="task_info__title">{key}:</div>
                                         <div className="task_info__content">{props.taskInfo[key]}</div>
@@ -179,8 +184,7 @@ const ReferenceBar = (props) => {
                                 {props.taskTop?<div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
                                     {props.children}
                                 {!props.taskTop && !props.hideTask?<div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
-                                {!props.hideTask && <div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>}
-                                {!props.hideInfo && <div className="ic_box"><img className="rb__ic-info thumb__ic" src="static/imgs/ic-info.png"/><span className="rb_box_title">Info</span></div>}
+                                {!props.hideInfo && <div className="ic_box"  onClick={toggleInfoPop} ><img className="rb__ic-info thumb__ic" src="static/imgs/ic-info.png"/><span className="rb_box_title">Info</span></div>}
                             </div>
                         </div>
                     </ScrollBar>

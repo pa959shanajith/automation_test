@@ -23,10 +23,10 @@ const TaskContents = (props) => {
                         item={item}
                         counter={i+1}
                         showPanel={showPanel} 
-                        setShowPanel={setShowPanel} 
-                        filterDat={props.filterDat} 
+                        setShowPanel={setShowPanel}
                         taskJson={props.taskJson}
                         taskName={props.taskName}
+                        cycleDict={props.cycleDict}
                     />
         })}
         </> }
@@ -63,7 +63,7 @@ const TaskPanel = (props) => {
                         console.log("Error updating task status " + (error.data));
                     });
         }
-        taskObj.testSuiteDetails = JSON.parse(taskSuiteDetails);
+        taskObj.testSuiteDetails = taskSuiteDetails;
         taskObj.scenarioFlag = dataobj.scenarioflag;
         taskObj.assignedTestScenarioIds = dataobj.assignedtestscenarioids;
         taskObj.screenId = dataobj.screenid;
@@ -121,8 +121,8 @@ const TaskPanel = (props) => {
         
         setDescId(props.item.panel_idx);
         setDesc(tdes);
-        setRel(props.filterDat.idnamemaprel[clktask.releaseid]);
-        setCyc(props.filterDat.idnamemapcyc[clktask.cycleid]);
+        setRel(clktask.releaseid);
+        setCyc(props.cycleDict[clktask.cycleid]);
         setAppType(maintask.appType);
     }
 
