@@ -108,7 +108,7 @@ const SessionManagement = (props) => {
                                 <th> Role </th>
                                 <th> Logged in </th>
                                 <th> IP </th>
-                                <th><button className="btn btn-hidden-cust"> Logout </button></th>
+                                <th> </th>
                             </tr>
                             {sessions.map((user,index)=>(
 							    <tr >
@@ -138,7 +138,7 @@ const SessionManagement = (props) => {
 								<th> Username </th>
 								<th> Connection Mode </th>
 								<th> IP </th>
-								<th><button className="btn btn-hidden-cust" > Disconnect </button></th>
+								<th> </th>
 							</tr>
                             {clients.map((user,index)=>(
 							    <tr>

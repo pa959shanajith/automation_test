@@ -26,7 +26,7 @@ const TokenMgmtForm = (props) => {
 	let inputProps = {
 		placeholder: "Select Date",
 		readOnly:"readonly" ,
-        className:"fc-datePicker"
+		className:"fc-datePicker"
     };
 
     let inputProps1 = {
@@ -58,7 +58,8 @@ const TokenMgmtForm = (props) => {
 		props.setToken("");
         setAllUsers([['Select User',' ','','']]);
         props.setAllICE( [{'_id':' ', 'icename':'Select ICE', 'icetype':'ci-cd'}]);
-        props.setAllTokens([]);
+		props.setAllTokens([]);
+		props.setShowList(true);
 		props.setTargetid(" "); 
 		props.setdateVal("");
 		props.setTimeVal("");
@@ -125,6 +126,7 @@ const TokenMgmtForm = (props) => {
 					props.setTimeVal("");
 				}
 			}
+			props.setShowList(true);
 		}catch(error) {
 			setLoading(false);
 			console.log("Error:::::::::::::", error);
@@ -228,7 +230,7 @@ const TokenMgmtForm = (props) => {
 					<span className="adminControl-tkn-mgmt1__title leftControl-tkn-mgmt" title="Token Expiry">Token Expiry</span>
                     <div className="tokenSuite">
 						<span className="datePicContainer datePic-cust" >
-							<Datetime isValidDate={valid} value={props.dateVal} onChange={(event)=>{props.setdateVal(event.format("DD-MM-YYYY"));setInputProps1Disable(false);props.setTimeVal(new Date().getHours() + ':' + (parseInt(new Date().getMinutes()+5)))}} dateFormat="DD-MM-YYYY" closeOnSelect={true} inputProps={inputProps} timeFormat={false} /> 
+							<Datetime isValidDate={valid} value={props.dateVal} onChange={(event)=>{props.setdateVal(event.format("DD-MM-YYYY"));setInputProps1Disable(false);props.setTimeVal(new Date().getHours() + ':' + (parseInt(new Date().getMinutes()+5)))}} dateFormat="DD-MM-YYYY" closeOnSelect={true} inputProps={inputProps} timeFormat={false} id="data-token"/> 
                             <img className="datepickerIconToken" src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
 						</span>
 						<span className="timePicContainer">
