@@ -1312,7 +1312,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'selectValueByText',[input[0]],null,null,"SAP");
 					break;
 				case "GuiMenubar":
-					testcaseObj = getTestcaseStep(step,null,'@Sap','SelectMenu',null,null,null,"SAP");
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'SelectMenu',[input[0]],null,null,"SAP");
 					break;
 				case "GuiSimpleContainer":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'DoubleClickOnCell',[input[0]],null,null,"SAP");
