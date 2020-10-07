@@ -24,14 +24,14 @@ const ControlBox = (props) => {
         var l = p.attr('transform').slice(10, -1).split(split_char);
         l = [(parseFloat(l[0]) + 40) * ctScale.k + ctScale.x, (parseFloat(l[1]) + 40) * ctScale.k + ctScale.y];
         var c = d3.select('#ct-ctrlBox').style('top', l[1] + 'px').style('left', l[0] + 'px')
-        if (t == 'modules') {
+        if (t === 'modules') {
             c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.plus + ' .ct-tooltiptext').html('Create Scenarios');
             c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.plus1 + ' .ct-tooltiptext').html('Create Multiple Scenarios');
             c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Module');
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !0);
-        } else if (t == 'scenarios') {
+        } else if (t === 'scenarios') {
             c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.plus + ' .ct-tooltiptext').html('Create Screens');
             c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !1);
@@ -39,7 +39,7 @@ const ControlBox = (props) => {
             c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Scenario');
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Scenario');
-        } else if (t == 'screens') {
+        } else if (t === 'screens') {
             c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.plus + ' .ct-tooltiptext').html('Create Testcases');
             c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !1);
@@ -47,7 +47,7 @@ const ControlBox = (props) => {
             c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Screen');
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Screen');
-        } else if (t == 'testcases') {
+        } else if (t === 'testcases') {
             c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !0);
             c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !0);
             c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !1);

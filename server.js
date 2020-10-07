@@ -378,6 +378,7 @@ if (cluster.isMaster) {
 		app.post('/pdProcess', auth.protect, mindmap.pdProcess);	// process discovery service
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
+		app.post('/checkUserState', authlib.validateUserState);
 		app.post('/validateUserState', authlib.validateUserState);
 		app.post('/loadUserInfo', auth.protect, login.loadUserInfo);
 		app.post('/getRoleNameByRoleId', auth.protect, login.getRoleNameByRoleId);
@@ -443,7 +444,7 @@ if (cluster.isMaster) {
 		app.post('/getReportsData_ICE', report.getReportsData_ICE);
 		app.post('/getReport_API', report.getReport_API);
 		//Plugin Routes
-		app.post('/getProjectIDs', plugin.getProjectIDs);
+		app.post('/getProjectIDs', auth.protect, plugin.getProjectIDs);
 		app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
 		app.post('/updateTaskstatus_mindmaps', taskbuilder.updateTaskstatus_mindmaps);
 		//Utility plugins

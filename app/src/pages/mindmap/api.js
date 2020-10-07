@@ -22,7 +22,7 @@ export const getProjectList = async() => {
             RedirectPage(history)
             return {error:'invalid session'};
         }
-        if(res.status===200 && res.data != "fail"){            
+        if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
@@ -47,7 +47,7 @@ export const getModules = async(props) => {
             data: props,
             credentials: 'include'
         });
-        if(res.status===200 && res.data != "fail"){            
+        if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }else if(res.status === 401){
             RedirectPage(history)
@@ -79,7 +79,7 @@ export const getScreens = async(projectId) => {
             RedirectPage(history)
             return {error:'invalid session'};
         }
-        if(res.status===200 && res.data != "fail"){            
+        if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
@@ -118,7 +118,7 @@ export const saveMindmap = async(props) => {
             RedirectPage(history)
             return {error:'invalid session'};
         }
-        if(res.status===200 && res.data != "fail"){            
+        if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
@@ -148,7 +148,7 @@ export const exportToExcel = async(props) => {
             RedirectPage(history)
             return {error:'invalid session'};
         }
-        if(res.status===200 && res.data != "fail"){            
+        if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)

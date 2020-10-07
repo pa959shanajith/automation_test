@@ -93,6 +93,7 @@ const Canvas = (props) => {
         setSection(tree.sections)
         setVerticalLayout(props.verticalLayout);
         setBlockui({show:false})
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.module,props.reload,props.verticalLayout]);
     useEffect((e)=>{
         if(createnew !== false){
@@ -197,7 +198,7 @@ const Canvas = (props) => {
         <Fragment>
             {(selectBox)?<RectangleBox ctScale={ctScale} dNodes={[...dNodes]} dLinks={[...dLinks]}/>:null}
             {(ctrlBox !== false)?<ControlBox nid={ctrlBox} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
-            {(inpBox !== false)?<InputBox setPopup={setPopup} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
+            {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} setPopup={setPopup} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
@@ -233,7 +234,7 @@ const Canvas = (props) => {
 
 const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay,setPopup) =>{
     var deletedNodes = []
-    var sid = activeNode.split('node_')[1]
+    var sid = parseFloat(activeNode.split('node_')[1])
     var s = d3.select('#'+activeNode);
     // SaveCreateED('#ct-createAction', 1, 0);
     var t = s.attr('data-nodetype');
@@ -328,20 +329,23 @@ const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,
             dNodes_c.forEach((e) =>{
                 if (e.type === 'screens') {
                     var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,e.name,verticalLayout)
-                    cnodes = res.nodeDisplay
-                    clinks = res.linkDisplay
-                    cdNodes = res.dNodes
-                    cdLinks = res.dLinks
-                    count= {...count,...res.count}
+                    if(res){                    cnodes = res.nodeDisplay
+                        clinks = res.linkDisplay
+                        cdNodes = res.dNodes
+                        cdLinks = res.dLinks
+                        count= {...count,...res.count}
+                    }
                     activeNode = cdNodes.length-1
                     dLinks_c.forEach((f)=>{
                         if (f.source.id === e.id) {
                             var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,f.target.name,verticalLayout)
-                            cnodes = res.nodeDisplay
-                            clinks = res.linkDisplay
-                            cdNodes = res.dNodes
-                            cdLinks = res.dLinks
-                            count= {...count,...res.count}
+                            if(res){
+                                cnodes = res.nodeDisplay
+                                clinks = res.linkDisplay
+                                cdNodes = res.dNodes
+                                cdLinks = res.dLinks
+                                count= {...count,...res.count}
+                            }
                         }
                     })
                 }
@@ -463,7 +467,7 @@ const moveNodeEnd = (pi,dNodes,dLinks,linkDisplay,temp,verticalLayout) => {
             var link = addLink(dLinks[d].source, dLinks[d].target,verticalLayout);
             var lid = 'link-' + dLinks[d].source.id + '-' + dLinks[d].target.id
             linkDisplay[lid] = link
-            if(temp.hidden.indexOf(d) != -1){
+            if(temp.hidden.indexOf(d) !== -1){
                 linkDisplay[lid].hidden =  true
             }
         //}
@@ -473,7 +477,6 @@ const moveNodeEnd = (pi,dNodes,dLinks,linkDisplay,temp,verticalLayout) => {
 };
 
 const toggleNode = (nid, nodeDisplay, linkDisplay, dNodes, dLinks) => {
-    var p = d3.select('#' + nid);
     var id = nid.split("node_")[1]
     if (dNodes[id]._children && dNodes[id]._children.length > 0) {
         // p.select('.ct-cRight').classed('ct-nodeBubble', !0);
@@ -515,6 +518,7 @@ const recurseTogChild = (nodeDisplay, linkDisplay, d, v, dLinks) => {
 const createNewMap = (verticalLayout) => {
     var nodeDisplay = {}
     var dNodes = []
+    var translate
     var s = d3.select('.mp__canvas_svg');
     var  cSize= [parseFloat(s.style("width")), parseFloat(s.style("height"))];
     var node = {
@@ -537,10 +541,10 @@ const createNewMap = (verticalLayout) => {
     nodeDisplay[0] = addNode(dNodes[0]);
     // nodeDisplay[0].task = false;
     if (verticalLayout){
-        var translate = [(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]
+        translate = [(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]
     }
     else{
-        var translate = [(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]
+        translate = [(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]
     }
     return{nodes:nodeDisplay,dNodes,translate}
 }
@@ -549,13 +553,9 @@ const createNewMap = (verticalLayout) => {
 
 const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sections,count,obj,verticalLayout) => {
     var uNix = dNodes.length
-    // if ($event !== true && (d3.select('#ct-inpBox').attr('class') == "" || d3.select($event.target).classed('ct-ctrl-inactive'))) return;
-    // d3.select('#ct-inpBox').classed('no-disp', !0);
-    // d3.select('#ct-ctrlBox').classed('no-disp', !0);
     var pi = activeNode;
     var pt = nodeDisplay[pi].type;
     if (pt === 'testcases') return;
-    // SaveCreateED('#ct-createAction', 1, 0);
     if (false && nodeDisplay[pi]._children != null)
         return ;// openDialogMindmap('Error', 'Expand the node');
     if (dNodes[pi].children === undefined) dNodes[pi]['children'] = [];
@@ -753,10 +753,8 @@ function foldtree(d){
 }
 
 const generateTree = (tree,sections,count,verticalLayout) =>{
-    // var old = {...tree}
     unfoldtree(tree)
-    // d3.selectAll('.ct-node').classed('no-disp', !1).select('.ct-cRight').classed('ct-nodeBubble', !0); 
-    // d3.selectAll('.ct-link').classed('no-disp', !1)
+    var translate;
     var nodeDisplay = {}
     var linkDisplay = {}
     var s = d3.select('.mp__canvas_svg');
@@ -810,9 +808,9 @@ const generateTree = (tree,sections,count,verticalLayout) =>{
         linkDisplay[lid].hidden = (d.source.revertChild || d.source.revertChild1) || false;
     });
     if (verticalLayout){
-        var translate = [(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]
+        translate = [(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]
     } else{
-        var translate = [(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]
+        translate = [(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]
     }
     foldtree(tree)
     return {nodes:nodeDisplay,links:linkDisplay,translate:translate,dNodes,dLinks,sections,count}

@@ -71,11 +71,11 @@ const CreateNew = () => {
         }
         <ReferenceBar taskTop={true} collapsible={true} collapse={true}>
             <div className="ic_box" >
-              <img onClick={()=>ClickSwitchLayout(verticalLayout,setVerticalLayout,moduleSelect,setPopup,setBlockui,dispatch)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " + (verticalLayout?"active_rb_thumb ":"")} src="static/imgs/switch.png"/>
+              <img onClick={()=>ClickSwitchLayout(verticalLayout,setVerticalLayout,moduleSelect,setPopup,setBlockui,dispatch)} alt='Switch Layout' style={{height: '55px'}} className={"rb__ic-task thumb__ic " + (verticalLayout?"active_rb_thumb ":"")} src="static/imgs/switch.png"/>
                 <span className="rb_box_title">Switch</span><span className="rb_box_title">Layout</span>
             </div>
             <div className="ic_box" >
-              <img onClick={()=>ClickFullScreen(setFullScreen,setPopup)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " +(fullScreen?"active_rb_thumb":"")} src="static/imgs/fscr.png"/>
+              <img onClick={()=>ClickFullScreen(setFullScreen,setPopup)} style={{height: '55px'}} alt='Full Screen' className={"rb__ic-task thumb__ic " +(fullScreen?"active_rb_thumb":"")} src="static/imgs/fscr.png"/>
               <span className="rb_box_title">Full Screen</span>
             </div>
           </ReferenceBar>  
@@ -107,7 +107,7 @@ const ClickSwitchLayout = (verticalLayout,setVerticalLayout,moduleSelect,setPopu
 
 const ClickFullScreen = (setFullScreen,setPopup) => {
   var elt = document.querySelector("html");
-  if ((window.fullScreen) || (window.innerWidth == window.screen.width && (window.screen.height - window.innerHeight) <= 1)) {
+  if ((window.fullScreen) || (window.innerWidth === window.screen.width && (window.screen.height - window.innerHeight) <= 1)) {
     if (document.cancelFullScreen) {
       document.cancelFullScreen();
     } else if (document.mozCancelFullScreen) {
