@@ -378,7 +378,6 @@ if (cluster.isMaster) {
 		app.post('/pdProcess', auth.protect, mindmap.pdProcess);	// process discovery service
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
-		app.post('/checkUserState', authlib.validateUserState);
 		app.post('/validateUserState', authlib.validateUserState);
 		app.post('/loadUserInfo', auth.protect, login.loadUserInfo);
 		app.post('/getRoleNameByRoleId', auth.protect, login.getRoleNameByRoleId);
