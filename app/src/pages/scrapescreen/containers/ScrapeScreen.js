@@ -1,9 +1,9 @@
-import React ,{Fragment ,useState ,useEffect} from 'react';
+import React ,{useState ,useEffect} from 'react';
 import {useSelector, useDispatch} from "react-redux"
 import ScrapeCenter from '../components/CenterScr.js';
 import Rightbar from '../components/RightBarItems.js';
 import CreateOptions from '../components/LeftBarItems.js';
-import {GetScrapeDataScreenLevel_ICE ,initScraping_ICE } from '../api';
+import {GetScrapeDataScreenLevel_ICE } from '../api';
 import '../styles/Scrapescreen.scss';
 import Header from '../../global/components/Header';
 import Footer from '../../global/components/FooterTwo';
@@ -22,7 +22,7 @@ const ScrapeScreen = ()=>{
             var res = await GetScrapeDataScreenLevel_ICE(_CT)
             dispatch({type: actionTypes.SET_SCRAPEDATA, payload: res});
         })()
-    }, [])
+    }, [_CT])
     return (
         <div  className="parent">
             {/* header Section */}

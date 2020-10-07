@@ -21,7 +21,7 @@ export const GetScrapeDataScreenLevel_ICE = async(_CT) => {
 				testCaseId:testCaseId
            }
         });
-        if(res.status=200){
+        if(res.status===200){
             return res.data;
         }else{
             console.error(res.status)

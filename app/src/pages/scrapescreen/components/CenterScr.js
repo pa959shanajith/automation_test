@@ -1,13 +1,12 @@
-import React , {useState, useEffect , useRef} from'react';
-import {useSelector, useDispatch} from "react-redux"
+import React , {useState, useEffect } from'react';
+import {useSelector} from "react-redux"
 import {PopupMsg ,ScrollBar , ModalContainer} from '../../global';
 import ClickAwayListener from 'react-click-away-listener';
 import '../styles/CenterScr.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {GetScrapeDataScreenLevel_ICE , updateScreen_ICE} from '../api';
 import ModalContent from './ModalContent';
 import ScrapeObject from './ScrapeObject.js'
-import * as actionTypes from '../state/action';
+
 
 
 
@@ -18,10 +17,6 @@ var ScrapeCenter =(props)=>{
     const userinfo = useSelector(state=> state.login.userinfo);
     const scrapeData = useSelector(state=> state.scrape.ScrapeData);
     const taskScrenName = _CT.taskName;
-    var screenId = _CT.screenId;
-    var projectId = _CT.projectId;
-    var testCaseId = _CT.testCaseId;
-    var type = _CT.appType;
     const [os , setOs]= useState(undefined)
     const [custName , setCustName] = useState([])
     const [scrapeList , setScrapeList] = useState([])
@@ -68,7 +63,7 @@ var ScrapeCenter =(props)=>{
         setSearchVal(val);
     }
     const callSavebtn = () => {
-        let findDuplicates = element.filter((item, index) => element.indexOf(item) != index)
+        let findDuplicates = element.filter((item, index) => element.indexOf(item) !== index)
         if(findDuplicates.length !==0){
             setDubliobjlist(findDuplicates)
             setDubli(true)

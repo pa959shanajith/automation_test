@@ -1,9 +1,8 @@
 import React ,{useState , useEffect, Fragment} from 'react';
 import { useSelector } from 'react-redux';
 import '../styles/LeftBarItems.scss'
-import {GetScrapeDataScreenLevel_ICE ,initScraping_ICE } from '../api';
-import {ScrollBar , ModalContainer, Thumbnail, ActionBar } from '../../global';
-import ModalContent from './ModalContent'
+import {initScraping_ICE } from '../api';
+import { ModalContainer, ActionBar } from '../../global';
 
 /*Component LeftBarItems
   use: renders  6 options in design  in the left of screen
@@ -21,7 +20,7 @@ const CreateOptions = (props) => {
   const [flag,setFlag] = useState(false)    
   const [appen , setAppen] =useState(false)
   
-  const macOS = navigator.appVersion.indexOf("Mac") != -1;
+  const macOS = navigator.appVersion.indexOf("Mac") !== -1;
   const scrapeData = useSelector(state=> state.scrape.ScrapeData);
   // const _FD =useSelector(state=>state.plugin.FD);
   const apptype = props.apptype;
@@ -30,7 +29,7 @@ const CreateOptions = (props) => {
       if(scrapeData.length !== 0)
       {var custName =[] ;
       custName = scrapeData.view;
-      if(custName.length !=0){
+      if(custName.length !==0){
         setAppen(true)
       }}
   }, [scrapeData])
