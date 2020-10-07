@@ -129,7 +129,7 @@
 
 .dropdown-menu-users-edit{
     max-height:165px;
-    overflow-y:scroll;
+    overflow-y:hidden;
     width: 85%;
     padding: 6px;
     position: absolute;
@@ -395,4 +395,5 @@
     border-radius: 3px;
     color:#fff;
     cursor: pointer;
+    width: 97%;
 }

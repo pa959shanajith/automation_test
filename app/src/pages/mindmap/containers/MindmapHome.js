@@ -1,6 +1,7 @@
 import React, { useState, Fragment } from 'react';
 import CreateOptions from '../components/CreateOptions.js'; 
 import CreateNew from './CreateNew.js';
+// import CreateEnE from './CreateEnE.js'
 import { Header, FooterTwo as Footer,ActionBar,ReferenceBar} from '../../global'
 import '../styles/MindmapHome.scss';
 
@@ -14,7 +15,7 @@ const MindmapHome = () => {
   const [options,setOptions] = useState(undefined)
   const createType = {
     'newmindmap': React.memo(() => (<CreateNew/>)),
-    'enemindmap': React.memo(() => (<span>END TO END MINDMAP</span>)),
+    'enemindmap': React.memo(() => (<div>enemindmap</div>)),
     'excelmindmap': React.memo(() => (<span>Import Excel</span>)),
     'assignmap': React.memo(() => (<span>Assign Mindmap</span>))
   }
@@ -27,11 +28,11 @@ const MindmapHome = () => {
         <ActionBar collapsible={true} collapse={options==='newmindmap'}>
           <div className="mp__ic_box">
             <div className="ic_box" >
-              <img onClick={()=>setOptions(undefined)} className={"thumb__ic"+(options!=='assignmap'? " selected_rb_thumb":"")} src="static/imgs/create.png"/>
+              <img onClick={()=>setOptions(undefined)} alt='Create Mindmap' className={"thumb__ic"+(options!=='assignmap'? " selected_rb_thumb":"")} src="static/imgs/create.png"/>
                 <span className="rb_box_title">Create</span>
             </div>
             <div className="ic_box" >
-              <img onClick={()=>setOptions('assignmap')} className={"thumb__ic"+(options==='assignmap'? " selected_rb_thumb":"")} src="static/imgs/assign.png"/>
+              <img onClick={()=>setOptions('assignmap')} alt='Assign Mindmap' className={"thumb__ic"+(options==='assignmap'? " selected_rb_thumb":"")} src="static/imgs/assign.png"/>
               <span className="rb_box_title">Assign</span>
             </div>
           </div>

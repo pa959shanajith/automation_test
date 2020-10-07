@@ -11,11 +11,20 @@ import Scrape from './pages/scrapescreen';
 import Design from './pages/design';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
-
+import 'react-datetime/css/react-datetime.css';
 
 /*Component App
   use: defines components for each url
 */
+// window.history.pushState(null, null, document.URL);
+// if (!window.localStorage.hiss) window.localStorage.hiss = "";
+// window.localStorage.hiss+=";"+document.URL;
+// window.addEventListener('popstate', function () {
+// 	var currentURL = document.URL.split("/")[0]+'/'+window.localStorage.navigateScreen;
+// 	if (!window.localStorage.hiss) window.localStorage.hiss = "";
+// 	window.localStorage.hiss+=";"+currentURL;
+// 	window.history.pushState(null, null, currentURL);
+// });
 
 const App = () => {
   return (

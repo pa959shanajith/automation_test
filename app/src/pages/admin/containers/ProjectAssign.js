@@ -1,6 +1,6 @@
 import React ,  { Fragment, useEffect, useState} from 'react';
 import {getUserDetails, getDomains_ICE, getAssignedProjects_ICE, getDetails_ICE, assignProjects_ICE} from '../api';
-import {ScreenOverlay, PopupMsg, RedirectPage} from '../../global' 
+import {ScreenOverlay, PopupMsg, RedirectPage, ScrollBar} from '../../global' 
 import '../styles/ProjectAssign.scss';
 import AssignProjectmodal from '../components/AssignProjectModal'
 import { useHistory } from 'react-router-dom';
@@ -55,20 +55,13 @@ const ProjectNew = (props) => {
             } else if(data === "empty") {
                 setPopupState({show:true,title:"Assign Project",content:"There are no users present."});
             } else {
-                // data.sort(function(a,b){ return a[0] > b[0]; });
-                
-                // var selectBox = $("#selAssignUser");
-                // selectBox.empty();
-                // selectBox.append('<option data-id="" value disabled selected>Select User</option>');
                 var userOptions = [];
                 for(var i=0; i<data.length; i++){
                     if(data[i][3] !== "Admin"){
                         userOptions.push(data[i]);
-                        // selectBox.append('<option data-id="'+data[i][1]+'" value="'+data[i][0]+'">'+data[i][0]+'</option>');
                     }
                 }
-                setSelectBox(userOptions);
-                // selectBox.prop('selectedIndex', 0);
+                setSelectBox(userOptions.sort());
             }
         }catch(error){
             console.log("Error:::::::::::::", error);
@@ -99,8 +92,6 @@ const ProjectNew = (props) => {
         assignProj.assignedProjectAP = [];
         setAssignProj(assignProj);
 		setShowload(true);
-		// $("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled", true);
-        // $("#overlayContainer").prop("style", "opacity: 1;");
         try{
             const data = await getDomains_ICE();
             if (data === "Invalid Session") {
@@ -404,20 +395,19 @@ const ProjectNew = (props) => {
             </div> 
 
             <div className="col-xs-9 form-group" style={{width: "83%"}}>
-                <div className='userForm-project projectForm-project' style={{display: "flex"}} >
+                <div className='userForm-project projectForm-project project-custom-top' >
                     <div className='domainTxt'>User</div>
-                    <select onChange={(event)=>{clickSelAssignUser(event.target.value)}} className={userSelectErrorBorder===true?'selectErrorBorder adminSelect-project form-control__conv-project select-margin':"adminSelect-project form-control__conv-project select-margin"} id="selAssignUser" >
+                    <select onChange={(event)=>{clickSelAssignUser(event.target.value)}} className={userSelectErrorBorder===true?'selectErrorBorder adminSelect-project-assign form-control__conv-project select-margin':"adminSelect-project-assign form-control__conv-project select-margin"} id="selAssignUser" >
                         <option key="" value="" selected>Select User</option>
-                        
                         {selectBox.map((data)=>(
                             <option key={data[0]} data-id={data[1]} value={data[0]}>{data[0]}</option>
                         ))}
                     </select>
                 </div>
                 
-                <div className='userForm-project projectForm-project' style={{display: "flex"}} >
+                <div className='userForm-project projectForm-project display-project'  >
                     <div className='domainTxt'>Domain</div>
-                    <select onChange={(event)=>{ClickSelDomains(event.target.value)}}  className={domainSelectErrorBorder===true?'selectErrorBorder adminSelect-project form-control__conv-project ':"adminSelect-project form-control__conv-project "} id="selDomains" style={{width: "100%"}} >
+                    <select onChange={(event)=>{ClickSelDomains(event.target.value)}}  className={domainSelectErrorBorder===true?'selectErrorBorder adminSelect-project-assign form-control__conv-project ':"adminSelect-project-assign form-control__conv-project "} id="selDomains" style={{width: "100%",marginLeft:"16px"}} >
                             <option key="" value="" selected>Please Select Your Domain</option>
                             {selDomainsOptions.map((data)=>(
                                 <option key={data} value={data}>{data}</option>
@@ -430,24 +420,16 @@ const ProjectNew = (props) => {
             <div className="col-xs-9 form-group" style={{width: "100%"}}>
 				<div className="project-left2">
 					{/* <!--Left Select Box--> */}
-					<div className="wrap left-select scrollbar-inner">
+					<div className="wrap left-select">
 						{/* <!--Labels--> */}
 						<label className="labelStyle1">All Projects</label>
-                        {/* {((selectedProject ==="" && selectedUserName!=="") || showload)?
-                        <img className="load" style={{position: "relative", left: "10px", bottom: "4px"}} src={"static/imgs/loader.gif"} alt="Loading..."/>
-                        :null} */}
-                        {/* <!--Labels--> */}
-						<div className="seprator" style={{marginBottom:"0px"}}>
-							<select multiple id="allProjectAP" className="ng-pristine ng-untouched ng-valid">
-								{/* <option ng-repeat="prj in assignProj.allProjectAP" value="{{prj.projectid}}">{{prj.projectname}}</option> */}
+						<div className="seprator" >
+                            <select multiple id="allProjectAP">
                                 {assignProj.allProjectAP.map((prj) => ( 
-                                    // <option onClick={()=>{addSelectAllProjectAP(prj.projectid)}} value={prj.projectid}  className={(  allProjSelectedBackground[prj.projectid]===true)?"selected-project":""}>{prj.projectname} </option>
                                     <option key={prj.projectname} value={JSON.stringify(prj)} >{prj.projectname} </option>
-                                
                                 ))}
                             </select>
-							{/* <span ng-show="projectNameRequired" className="error-msg ng-binding ng-hide"></span> */}
-						</div>
+                        </div>
 					</div>
 					{/* <!--Left Select Box--> */}
 
@@ -464,16 +446,10 @@ const ProjectNew = (props) => {
 					<div className="wrap right-select">
 						{/* <!--Labels--> */}
 						<label className="labelStyle1">Assigned Projects</label>
-                        {/* {((selectedProject ==="" && selectedUserName!=="") || showload)?
-                        <img className="load" style={{position: "relative", left: "10px", bottom: "4px"}} src={"static/imgs/loader.gif"} alt="Loading..."/>
-                        :null} */}
-                        {/* <!--Labels--> */}
-
-						<div className="seprator" style={{marginBottom:"0px"}}>
-							<select multiple id="assignedProjectAP"  size="" className="ng-pristine ng-untouched ng-valid">
+                        <div className="seprator seprator-custom" >
+							<select multiple id="assignedProjectAP"  size="">
 								{assignProj.assignedProjectAP.map((prj,index) => ( 
                                    <option key={index} value={JSON.stringify(prj)}  >{prj.projectname} </option>
-                                //    <option onClick={()=>addSelectAssignProjectAP(prj.projectid)} value={prj.projectid} className={(assignProjSelectedBackground[prj.projectid]===true)?"selected-project":""}>{prj.projectname}</option>
                                 ))}
                             </select>
 						</div>

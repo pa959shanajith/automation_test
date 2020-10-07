@@ -87,7 +87,7 @@
     }
 
 
-    @media screen and (max-width: 1024px){
+    @media screen and (max-width: 1025px){
         .task-description{
             div{
                 font-size: 1.2vw;
@@ -99,6 +99,7 @@
             min-height: 5.5vw;
             h4{
                 font-size: 1.6vw;
+                flex-basis: 2vw;
             }
         }
         
@@ -183,5 +184,36 @@
     .assign-task{
         font-size: 15px;
         font-family: "LatoWebLight";
+    }
+
+    @media screen and (min-width: 1400px) and (min-height: 770px){
+        .task-panel{
+            min-height: 6.51vh;
+            border-bottom: 0.13vh solid #643693;
+            padding: 1.3vh 0;
+        }
+        .panel-content{
+            margin: 0.6vh 0;
+            h4{
+                font-size: 1.95vh;
+                flex-basis: 3.9vh;
+            }
+        }
+        .tasktype-btn{
+            width: 10.4vh;
+            font-size: 1.8vh;
+            border-radius: 2.6vh;
+            height: 3.25vh;
+        }
+        .assign-task{
+            font-size: 1.95vh;
+            padding: 0 1.3vh 0 1.3vh;
+        }
+        .task-description{
+            div{
+                font-size: 1.82vh;
+                padding: 0.13vh 1.3vh;
+            }
+        }
     }
 }

@@ -22,14 +22,10 @@ const AssignListBox = (props) => {
                     {/* <!--Labels--> */}
                     <div className="seprator" style={{marginBottom:"0px"}}>
                         <select multiple id="allProjectAP" className="ng-pristine ng-untouched ng-valid">
-                            {/* <option ng-repeat="prj in assignProj.allProjectAP" value="{{prj.projectid}}">{{prj.projectname}}</option> */}
                             {assignProj.allProjectAP.map((prj) => ( 
-                                // <option onClick={()=>{addSelectAllProjectAP(prj.projectid)}} value={prj.projectid}  className={(  allProjSelectedBackground[prj.projectid]===true)?"selected-project":""}>{prj.projectname} </option>
                                 <option  value={JSON.stringify(prj)} >{prj.projectname} </option>
-                            
                             ))}
                         </select>
-                        {/* <span ng-show="projectNameRequired" className="error-msg ng-binding ng-hide"></span> */}
                     </div>
                 </div>
                 {/* <!--Left Select Box--> */}
@@ -56,7 +52,6 @@ const AssignListBox = (props) => {
                         <select multiple id="assignedProjectAP"  size="" className="ng-pristine ng-untouched ng-valid">
                             {assignProj.assignedProjectAP.map((prj) => ( 
                                 <option  value={JSON.stringify(prj)}  >{prj.projectname} </option>
-                            //    <option onClick={()=>addSelectAssignProjectAP(prj.projectid)} value={prj.projectid} className={(assignProjSelectedBackground[prj.projectid]===true)?"selected-project":""}>{prj.projectname}</option>
                             ))}
                         </select>
                     </div>

@@ -4,10 +4,9 @@ import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { SetProgressBar, RedirectPage } from '../global';
 export var history
+
 /*Component Mindmap
   use: direct to mindmap landing page
-  todo: 
-    add user permission check 
 */
 
 const Mindmap = () => {
@@ -18,7 +17,7 @@ const Mindmap = () => {
         RedirectPage(history);
     }
     SetProgressBar("stop", dispatch);
-  }, []);
+  }, [dispatch]);
   return (
     <MindmapHome/>
   );

@@ -18,7 +18,8 @@
 .filter_content{
     display: grid;
     grid-template-columns: 65% 35%;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     font-size: 14px!important;
     font-family: "LatoWeb"!important;
     padding: 0 40px 0 20px;
@@ -39,6 +40,7 @@
     border-radius: 5px;
     box-shadow: none;
     appearance: none;
+    outline: none;
     &:disabled{
         opacity: 1!important;
         background: #311d4e url('/static/imgs/ic-dropdown.png') 95% 10px no-repeat;
