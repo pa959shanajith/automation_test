@@ -25,6 +25,7 @@ const NavButton = (props) => {
             var x = parseInt(mptf.split(/[()]/)[1].split(',')[0]) 
             var y = parseInt(mptf.split(/[()]/)[1].split(',')[1]);
             var k = mptf.split(/[()]/)[3]
+            var t = [(center[0] - x) / k, (center[1] - y) / k];
             switch (move) {
                 case "left":
                     x -= offset;
@@ -39,13 +40,11 @@ const NavButton = (props) => {
                     y += offset;
                     break;
                 case "zoom-up":
-                    var t = [(center[0] - x) / k, (center[1] - y) / k];
                     k =  k * (1 + factor);
                     x += center[0] - (t[0] * k + x);
                     y += center[1] - (t[1] * k + y);
                     break;
                 case "zoom-down":
-                    var t = [(center[0] - x) / k, (center[1] - y) / k];
                     k =  k * (1 - factor);
                     x += center[0] - (t[0] * k + x);
                     y += center[1] - (t[1] * k + y);
@@ -59,7 +58,7 @@ const NavButton = (props) => {
                 interpolateZoom([x, y], k,props.zoom);
             }
         },40)}
-   },[move])
+   },[move,props.zoom])
 
     return(                                                                     
         <Rnd enableResizing={false} default={{x:100,y:90}} bounds="parent">
@@ -86,7 +85,6 @@ const NavButton = (props) => {
 }
 
 function interpolateZoom(translate, scale, zoom) {
-    var self = this;
     return d3.transition().duration(350).tween("zoom", function() {
         var iTranslate = d3.interpolate(zoom.translate(), translate),
             iScale = d3.interpolate(zoom.scale(), scale);

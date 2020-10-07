@@ -1,46 +1,41 @@
 import React, { useEffect, useRef, useState, Fragment } from 'react';
 import ClickAwayListener from 'react-click-away-listener';
 import {ScrollBar} from '../../global';
-import { useSelector, useDispatch} from 'react-redux';
+import { useSelector} from 'react-redux';
 import * as d3 from 'd3';
 import '../styles/InputBox.scss'
-
 var initdata = []
+
+/*Component InputBox
+  use: returns a texbox component on a selected node 
+*/
 const InputBox = (props) => {
     const screenData = useSelector(state=>state.mindmap.screenData)
     const InpBox = useRef()
     const [suggestList,setSuggestList] = useState([])
+    const [focus,SetFocus] = useState(true)
     var p = props.node
     var pi = p.attr('id').split('node_')[1];
     var pt = p.select('.ct-nodeLabel');
     var t = p.attr('data-nodetype');
     var dNodes = props.dNodes
+
     useEffect(()=>{
+        document.addEventListener("keydown", (e)=>{if(e.keyCode === 27)props.setInpBox(false)}, false);
         if (dNodes[pi].taskexists) {
             var msg = 'Unassign the task to rename';
-            if (t == 'screens') {
+            if (t === 'screens') {
                 msg = 'Unassign the task And the corresponding testcases tasks to rename';
             }
             props.setPopup({show:true,title:'Rename Error',content:msg,submitText:'Ok'})
             props.setInpBox(false)
-            return;
         }
-    },[])
-    useEffect(() => {
-        document.addEventListener("keydown", (e)=>{if(e.keyCode === 27)props.setInpBox(false)}, false);
         return () => {
-          document.removeEventListener("keydown", (e)=>{if(e.keyCode === 27)props.setInpBox(false)} , false);
-        };
-      }, []);
-    useEffect(()=>{
-        props.setCtrlBox(false)
-        var ctScale = props.ctScale
-        // var t = p.attr('data-nodetype');
-        var l = p.attr('transform').slice(10, -1).split(',');
-        l = [(parseFloat(l[0]) - 20) * ctScale.k + ctScale.x, (parseFloat(l[1]) + 42) * ctScale.k + ctScale.y];
-        d3.select('#ct-inpBox').style('top', l[1] + 'px').style('left', l[0] + 'px').classed('no-disp', !1)
-        InpBox.current.focus()
-    },[props.ctScale])
+            document.removeEventListener("keydown", (e)=>{if(e.keyCode === 27)props.setInpBox(false)} , false);
+          };
+        //eslint-disable-next-line react-hooks/exhaustive-deps
+    },[])
+
     useEffect(()=>{
         var nodetype = props.node.attr('data-nodetype');
         if(nodetype === "modules" || nodetype === "scenarios"){
@@ -61,30 +56,59 @@ const InputBox = (props) => {
             filterSuggest()
             return;
         }
+        //eslint-disable-next-line react-hooks/exhaustive-deps
     },[screenData])
+
+    useEffect(()=>{
+        props.setCtrlBox(false)
+        var ctScale = props.ctScale
+        var l = p.attr('transform').slice(10, -1).split(',');
+        l = [(parseFloat(l[0]) - 20) * ctScale.k + ctScale.x, (parseFloat(l[1]) + 42) * ctScale.k + ctScale.y];
+        d3.select('#ct-inpBox').style('top', l[1] + 'px').style('left', l[0] + 'px').classed('no-disp', !1)
+        if(focus)focuson(l)
+        InpBox.current.focus()
+        //eslint-disable-next-line react-hooks/exhaustive-deps
+    },[props.ctScale])
+
+    const focuson = (l) => {
+        var ctScale = props.ctScale
+        var mptf =  d3.select('.ct-container').attr('transform')
+        var s = d3.select('.mp__canvas_svg');
+        var x_mptf = parseInt(mptf.split(/[()]/)[1].split(',')[0]);
+        var y_mptf = parseInt(mptf.split(/[()]/)[1].split(',')[1]);
+        var scale_mptf = ctScale.k; 
+        var Svgwidth = l[0]  > parseFloat(s.style("width"))-80 ?  parseFloat(s.style("width"))-80: false 
+        var Svgheight = l[1] > parseFloat(s.style("height"))-40 ? parseFloat(s.style("height"))-40 : false
+        if(!Svgheight&&!Svgwidth){
+            return;
+        }
+        var ccord = [x_mptf + (l[0] / scale_mptf), y_mptf + (l[1] / scale_mptf)];
+        var x = ctScale.x
+        var y = ctScale.y
+        if(Svgheight){
+            y = (y_mptf *2) - ccord[1] + Svgheight
+        }
+        if(Svgwidth){
+            x = (x_mptf*2) - ccord[0] + Svgwidth - 80
+        }
+        props.zoom.scale(ctScale.k).translate([x,y])
+        d3.select('.ct-container').attr("transform", "translate(" +x+','+y+ ")scale(" + ctScale.k + ")");
+        props.setCtScale({x:x,y:y,k:ctScale.k})
+        SetFocus(false)
+    }
+
     const onEnter = (val) =>{
-        // var scrList = []
         var reuseDict = getReuseDetails(dNodes);
         if (val === 'Screen_0' || val === 'Scenario_0' || val === 'Testcase_0') {
             d3.select('#ct-inpAct').classed('errorClass',!0);
             return;
         }
         if (!validNodeDetails(val)) return; 
-        // var inp = d3.select('#ct-inpAct');
-        // if (!d3.select('#ct-inpSugg').classed('no-disp') && temp && temp.length > 0) return;
         if (dNodes[pi]._id) {
             dNodes[pi].original_name = pt.attr('title');
             dNodes[pi].rnm = !0;
         }
-        
-        // if (t == 'screens' && scrList[inp.attr('data-nodeid')] !== undefined) {
-        //     dNodes[pi].name = scrList[inp.attr('data-nodeid')].name;
-        // } else if (t == 'testcases' && tcList[inp.attr('data-nodeid')] !== undefined) {
-        //     dNodes[pi].name = tcList[inp.attr('data-nodeid')].name;
-        // } else 
-        // {
-            dNodes[pi].name = val;
-        // }
+        dNodes[pi].name = val;
         if (dNodes[pi].original_name !== val) {
             d3.select('.node_' + pi + '>image').attr('style', 'opacity:0.6')
         }

@@ -22,7 +22,7 @@ const ModuleListDrop = (props) =>{
     const [loading,setLoading] = useState(false)
     const selectModule = (e) => {
         var modID = e.target.getAttribute("value")
-        if(Object.keys(moduleSelect).length==0){
+        if(Object.keys(moduleSelect).length===0){
             loadModule(modID)
             return;
         }else{
