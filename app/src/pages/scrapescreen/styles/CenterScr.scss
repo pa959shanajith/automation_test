@@ -41,32 +41,29 @@
 }
 
 .fscrape{
+    margin-left: 0px;
+    margin-right: 0px;
     padding-top: 0%;
     padding-right: 10px;
-    margin: 25px;
+    margin-bottom:25px;
     overflow: auto;
     -moz-overflow-style: none;
-}
-.scraptree{
-    float: left;
+    float:left;
     width: 100%;
-    padding-left: 35px;
 }
 
 .parentobjcontainer{
     display: inline-block;
-    top: 125px;
     border-bottom: 1px solid #707070;
+    margin-bottom: 15px;
     padding-bottom: 5px;
-    left: 228px;
+    margin-left: 35px;
 
 }
 .checkstylebox{
     width: 15px;
     height: 15px;
     outline: 0;
-    margin-right: 10px;
-    margin-bottom: 10px;
 }
 
 .parentobject{
@@ -103,14 +100,44 @@
 .searchdcrapinput{
     padding: 3px;
     position: relative;
-    bottom: 3px;
     border: 1px solid #633693;
     border-radius: 5px;
     width: 200px;
-    
-    height: 25px;
+    height: 24px;
 }
 
 .special{
     display: none;
+}
+
+.searchscrapel{
+    padding: 4px;
+    margin-left: 4px;
+    bottom: 2px;
+    border: 1px solid #633693;
+    border-radius: 5px;
+    height: 24px;
+    img {
+        margin-bottom: 3px;
+        margin-top: 2px;
+    }
+    
+}
+.namecheckbox{
+    width: 15px;
+    height: 15px;
+    outline: 0;
+    margin-right: 5px;
+}
+.scrptreeitms{
+    padding-left: 10px;
+    img{
+        padding-right: 5px;
+        cursor: pointer;
+        padding-bottom: 5px;
+
+    }
+    span:hover{
+        font-weight: bold;
+    }
 }

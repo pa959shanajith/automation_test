@@ -1,0 +1,1 @@
+export const SET_SCRAPEDATA = "SS_SET_SCRAPEDATA"

@@ -6,6 +6,7 @@ import LoginReducer from './pages/login/state/reducer';
 import adminReducer from './pages/admin/state/reducer.js';
 import pluginReducer from './pages/plugin/state/reducer.js';
 import mindmapReducer from './pages/mindmap/state/reducer.js';
+import scrapeReducer from './pages/scrapescreen/state/reducer.js';
 
 const persistConfig = {
     key: 'login',
@@ -19,7 +20,8 @@ export const rootReducer = combineReducers({
     progressbar : progressBarReducer,
     login : LoginReducer,
     admin : adminReducer,
-    plugin : pluginReducer
+    plugin : pluginReducer,
+    scrape : scrapeReducer
 });
   
 const pReducer = persistReducer(persistConfig, rootReducer);

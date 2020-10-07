@@ -132,7 +132,6 @@ const ReferenceBar = (props) => {
                 <>
                 <div className="min_height_div">
                     <div id="ref_bar_scroll" className="inside_min">
-
                     { props.popups }
                     {
                         showTask && 
