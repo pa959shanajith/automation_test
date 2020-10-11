@@ -93,12 +93,12 @@ const Toolbarmenu = (props) => {
     }
     const displayError = (error) =>{
         setPopup({
-          title:'ERROR',
-          content:error,
-          submitText:'Ok',
-          show:true
+            title:'ERROR',
+            content:error,
+            submitText:'Ok',
+            show:true
         })
-      }
+    }
     var projectList = Object.entries(prjList)
     return(
         <Fragment>

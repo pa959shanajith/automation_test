@@ -16,6 +16,7 @@ const ControlBox = (props) => {
         "delete": "fa-trash-o"
     };
     var ctScale = props.ctScale;
+    var isEnE = props.isEnE;
     var p = d3.select('#'+props.nid);
     p.classed('node-highlight',!0)
     var t = p.attr('data-nodetype');
@@ -24,7 +25,21 @@ const ControlBox = (props) => {
         var l = p.attr('transform').slice(10, -1).split(split_char);
         l = [(parseFloat(l[0]) + 40) * ctScale.k + ctScale.x, (parseFloat(l[1]) + 40) * ctScale.k + ctScale.y];
         var c = d3.select('#ct-ctrlBox').style('top', l[1] + 'px').style('left', l[0] + 'px')
-        if (t === 'modules') {
+        if(isEnE){
+            if(t=='endtoend'){
+                c.select('p.' + faRef.plus).classed('ct-ctrl-hide', !0);
+                c.select('p.' + faRef.plus1).classed('ct-ctrl-hide', !0);
+                c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !1);
+                c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit End to End Module');
+                c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !0);
+            }else{
+                c.select('p.' + faRef.plus).classed('ct-ctrl-hide', !0);
+                c.select('p.' + faRef.plus1).classed('ct-ctrl-hide', !0);
+                c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !0);
+                c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
+                c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Scenario');
+            }
+        }else if (t === 'modules') {
             c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.plus + ' .ct-tooltiptext').html('Create Scenarios');
             c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !1);
@@ -78,7 +93,7 @@ const ControlBox = (props) => {
     }
     return(
         <ClickAwayListener onClickAway={(e)=>{if(e.target.className.baseVal !== "ct-nodeIcon")props.setCtrlBox(false)}}>
-            <div id="ct-ctrlBox" >
+            <div id="ct-ctrlBox" className={(isEnE?'end-to-end':'')}>
                 <p className="ct-ctrl fa fa-plus" value={props.nid} onClick={(e)=>addNode(e)}><span className="ct-tooltiptext">Create Scenarios</span></p>
                 <p className="ct-ctrl fa fa-hand-peace-o" value={props.nid} onClick={(e)=>addMultipleNode(e)}><span className="ct-tooltiptext">Create Multiple Scenarios</span></p>
                 <p className="ct-ctrl fa fa-pencil-square-o"onClick={editNode} ><span className="ct-tooltiptext">Edit Module</span></p>

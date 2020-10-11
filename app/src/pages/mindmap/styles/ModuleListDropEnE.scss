@@ -1,6 +1,11 @@
 .ene_toolbar__dropdown{
     height: 300px;
     width: 100%;
+    z-index: 3;
+}
+.ene_toolbar__dropdown .closed{
+    height: 90px;
+    width: 100%;
 }
 .ene_toolbar__dropdown_module{
     float: left;
@@ -22,4 +27,92 @@
     margin: 10px;
     width: 200px;
     border-radius: 5px;
+}
+.ene_toolbar__module-box{
+    position: relative;
+    display: inline-block;
+    height: 75px;
+    // width: 140px;
+    width: calc(100%/3 - 90px);
+    max-width: 155px;
+    min-width: 100px;
+    padding: 5px;
+    margin: 5px 11px 10px;
+    text-align: center;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+}
+.ene_toolbar__module-box:hover{
+    background-color: #f4f4f4;
+}
+.ene_toolbar__module-box img{
+    display: inline-block;
+    height: 40px;
+    width: 40px;
+    cursor: pointer;
+}
+.ene_toolbar__module-box span{
+    display: block;
+    font-size: 12px;
+    cursor: default;
+    word-wrap: break-word;
+    padding: 2px 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.selected{
+    background: #f4f4f4;
+}
+.dropdown_scenarios{
+    display: inline-block;
+    padding: 3px;
+    margin: 10px;
+    width: calc(100%/3 - 20px);
+    max-width: 220px;
+    min-width: 100px;
+    border-radius: 5px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-family: 'LatoWebLight';
+    font-weight: 700;
+    text-align: left;
+    font-size: 13px;
+}
+.dropdown_scenarios:hover{
+    background: #cae0f3;
+    color: inherit;
+}
+.selectScenario{
+    background-color: #4299e2;
+    color: #fff;
+}
+.ene_toolbar__module-footer {
+    position: absolute;
+    background: #e6e7e9;
+    height: 10px;
+    bottom: 0;
+    left: 50%;
+}
+.ene_toolbar__module-footer i {
+    position: absolute;
+    left: 32.5px;
+    top: -3px;
+}
+.ene_toolbar__module-footer div {
+    background: white;
+    outline: none;
+    border: none;
+    display: inline-block;
+    text-align: center;
+    width: 75px;
+    position: absolute;
+    height: 11px;
+    top: -3px;
+    border-radius: 2px;
+    left: calc(50% - 37px);
+    cursor: pointer;
 }

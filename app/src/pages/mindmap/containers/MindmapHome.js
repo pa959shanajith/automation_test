@@ -1,7 +1,7 @@
 import React, { useState, Fragment } from 'react';
 import CreateOptions from '../components/CreateOptions.js'; 
 import CreateNew from './CreateNew.js';
-// import CreateEnE from './CreateEnE.js'
+import CreateEnE from './CreateEnE.js'
 import { Header, FooterTwo as Footer,ActionBar,ReferenceBar} from '../../global'
 import '../styles/MindmapHome.scss';
 
@@ -15,7 +15,7 @@ const MindmapHome = () => {
   const [options,setOptions] = useState(undefined)
   const createType = {
     'newmindmap': React.memo(() => (<CreateNew/>)),
-    'enemindmap': React.memo(() => (<div>enemindmap</div>)),
+    'enemindmap': React.memo(() => (<CreateEnE/>)),
     'excelmindmap': React.memo(() => (<span>Import Excel</span>)),
     'assignmap': React.memo(() => (<span>Assign Mindmap</span>))
   }
