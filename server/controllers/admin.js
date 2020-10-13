@@ -224,8 +224,7 @@ exports.manageCIUsers = function (req, res) {
 					deactivated: "active"
 				};
 			}
-			if(req.body.action=="deactivate")
-			{
+			if(req.body.action=="deactivate") {
 				var requestDetails = req.body.CIUser;
 				var inputs = {
 					userid: requestDetails.userId,
@@ -246,7 +245,7 @@ exports.manageCIUsers = function (req, res) {
 					res.send("fail");
 				} else if (response.statusCode != 200 || result.rows == "duplicate"){
 					res.send("duplicate")
-				}else {
+				} else {
 					result.rows.token = token;
 					res.send(result.rows);
 				}
@@ -543,8 +542,13 @@ exports.testLDAPConnection = (req, res) => {
 			}
 			if (flag == "success") {
 				logger.info('LDAP Connection test passed!');
-				if (result && result.users && result.users.length>0) data.fields = Object.keys(result.users[0]);
-				else{ 
+				if (result && result.users && result.users.length > 0) {
+					const fieldSet = new Set();
+					for (let idx of [0, parseInt(result.users.length/2), result.users.length]) {
+						for (let uo in result.users[idx]) fieldSet.add(uo);
+					}
+					data.fields = [...fieldSet.values()];
+				} else {
 					flag= "empty";
 					logger.warn('LDAP Connection test passed but directory is empty');
 				}
