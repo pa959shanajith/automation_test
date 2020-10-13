@@ -47,7 +47,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 					for (i = 0; i < dataLen; i++) {
 						$(".scheduleSuiteTable").append('<div class="batchSuite"><div class="scheduleSuite"><input type="checkbox" class="selectScheduleSuite"/>'
 							+ '<span class="scheduleSuiteName" data-testsuiteid="' + eachData[i].testsuiteid + '" data-moduleid="' + eachData[i].moduleid + '" data-versionnumber="' + eachData[i].versionnumber + '">' + eachData[i].testsuitename + '</span>'
-							+ '<span id="mod' + i + '" onchange="openPopup(id)"" class="ipContainer"><select class="form-control ipformating"><option selected disabled>Select User</option></select></span>'
+							+ '<span class="ipContainer"><select id="mod' + i + '" onchange="openPopup(id)"" class="form-control ipformating"><option selected disabled>Select User</option></select></span>'
 							+ '<span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIcon" src="../imgs/ic-datepicker.png" /></span>'
 							+ '<span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" class="cursor:not-allowed" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>'
 							+ '<table class="scenarioSchdCon scenarioSch_' + i + '"><thead class="scenarioHeaders"><tr><td>Sl No.</td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td></tr></thead>'
@@ -67,8 +67,8 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 							for (k = 0; k < result.connectedUsers.length; k++) {
 								$(".ipformating").append("<option value='" + result.connectedUsers[k] + "'>" + result.connectedUsers[k] + "</option>")
 							}
-							$(".ipformating").append("<option value='Module Smart Scheduling'>Module Smart Scheduling</option>")
-							$(".ipformating").append("<option value='Scenario Smart Scheduling'>Scenario Smart Scheduling</option>")
+							$(".ipformating").append("<option hidden value='Module Smart Scheduling'>Module Smart Scheduling</option>")
+							$(".ipformating").append("<option hidden value='Scenario Smart Scheduling'>Scenario Smart Scheduling</option>")
 
 						}
 					}
@@ -455,19 +455,20 @@ function openModelPopup(title, body) {
 var smartBatch = false;
 var copyId = 0
 function openPopup(id) {
+	console.log("did reach here")
 	if ($('.ipContainer').find(":selected")[parseInt(id[id.length - 1])].label === "Scenario Smart Scheduling") {
 		console.log(id)
-		if ($('#' + id)[0].children[0].options.length < 3) {
+		if ($('#' + id)[0].length < 3) {
 			$('#smartScheduling').find('.btn-default')[1].click();
 			openModelPopup("Smart Scheduling", "No active ICE found to use Smart Scheduling");
 			$('#' + id)[0].children[0].selectedIndex = 0;
-			sequence(true,fals,0);
+			sequence(true,false,0);
 			copyId = 0
 		} else {
 			$("#smartScheduling").modal("show");
 			$($('#smartScheduling').find('.btn-default')[1]).data('selector-id', id);
 			$('#smartScheduling').find('.btn-default')[1].onclick = function () {
-				$('#' + $(this).data('selector-id')).children()[0].selectedIndex = 0;
+				$('#' + $(this).data('selector-id'))[0].selectedIndex = 0;
 				sequence(true,false,0);
 				smartBatch = false;
 				copyId = 0;
@@ -478,7 +479,7 @@ function openPopup(id) {
 		}
 	}
 	else if ($('.ipContainer').find(":selected")[parseInt(id[id.length - 1])].label === "Module Smart Scheduling") {
-		if ($('#' + id)[0].children[0].options.length <= 3) {
+		if ($('#' + id)[0].length <= 3) {
 			$('#smartScheduling').find('.btn-default')[1].click();
 			openModelPopup("Smart Scheduling", "No active ICE found to use Smart Scheduling");
 			$('#' + id)[0].children[0].selectedIndex = 0;
@@ -527,4 +528,14 @@ function sequence(copy,block,id) {
 	// }
 	
 
+}
+
+function moduleSmartScheduling(){
+	console.log("hello there")
+	$("#mod0")[0].selectedIndex = $("#mod0")[0].length - 2;
+	$("#mod0")[0].onchange();
+}
+function scenarioSmartScheduling(){
+	$("#mod0")[0].selectedIndex = $("#mod0")[0].length - 1;
+	$("#mod0")[0].onchange();
 }
