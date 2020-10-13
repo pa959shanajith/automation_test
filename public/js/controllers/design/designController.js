@@ -795,6 +795,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		DesignServices.getScrapeDataScreenLevel_ICE()
 			.then(function (data) {
 				var taskInfo = JSON.parse(window.localStorage['_CT']);
+				taskInfo['createdthrough'] = data['createdthrough'];
+				window.localStorage['_CT'] = JSON.stringify(taskInfo);
 				if (taskInfo.subTaskType == "Scrape" || taskInfo.subTask == "Scrape") {
 					scrapedurl = data.scrapedurl;
 					$("#scrapedurlinfo").html(scrapedurl);
@@ -3193,8 +3195,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 				}
 			} else if (appType == "SAP") {
-				d.css('left', (Math.round(rect.x) * scale_highlight) + 3 + 'px');
-				d.css('top', (Math.round(rect.y) * scale_highlight) + 2 + 'px');
+				if(JSON.parse(window.localStorage['_CT'])['createdthrough'] == 'PD') {
+					d.css('left', (Math.round(rect.x) * scale_highlight) + 'px');
+					d.css('top', (Math.round(rect.y) * scale_highlight) + 'px');
+				} else {
+					d.css('left', (Math.round(rect.x) * scale_highlight) + 3 + 'px');
+					d.css('top', (Math.round(rect.y) * scale_highlight) + 2 + 'px');
+				}
 				d.css('height', Math.round(rect.h) * scale_highlight + 'px');
 				d.css('width', Math.round(rect.w) * scale_highlight + 'px');
 			} else {
@@ -6514,6 +6521,9 @@ function contentTable(newTestScriptDataLS) {
 						} else if (obType == 'gridview') {
 							sc = Object.keys(keywordArrayList.gridview);
 							selectedKeywordList = "gridview";
+						} else if (obType == 'picture') {
+							sc = Object.keys(keywordArrayList.picture);
+							selectedKeywordList = "picture";
 						} else if (obType == 'toolbar') {
 							sc = Object.keys(keywordArrayList.toolbar);
 							selectedKeywordList = "toolbar";
