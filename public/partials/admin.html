@@ -166,7 +166,6 @@
 						<li role="presentation" ng-repeat='uid in userConf.allUsersList | filter:userConf.allUserFilter' ng-click="userConf.userIdName=uid[1]+';'+uid[0];userConf.allUserFilter=uid[0]; userConf.getUserData()" value="{{uid[1]}};{{uid[0]}}"> {{uid[0]}}</li>
 					</ul>
 				</div>
-
 				<div class="adminControl" ng-if="userConf.type!='inhouse'">
 					<select ng-change="userConf.ldap.user=''" class='adminSelect selectlg form-control' ng-model="userConf.server" id="confServer" class="form-control rightControl selectControl">
 						<option ng-repeat="srv in userConf.confServerList" value="{{srv.name}}" ng-selected="srv.name==userConf.server" ng-disabled="userConf.confExpired==srv.name">{{srv.name}}</option>
@@ -497,26 +496,30 @@
 					<input type="password" autocomplete="off" name="bindCredentials" id="bindCredentials" ng-disabled="ldapConf.auth != 'simple'" ng-model="ldapConf.bindCredentials" class="form-control form-control-custom create" placeholder="Authentication Credentials" autocomplete="off"/>
 				</div></div>
 				<h4>Data Mapping Settings</h4>
-				<h5>Mapping options are populated on click of <i>Test</i> with connection successful.</h5>
+				<h5>Mapping options are populated on click of <i>Test</i> with connection successful message.</h5>
 				<div class='adminControl'><div>
-					<span class="leftControl">Username</span><select class='adminSelect form-control' ng-model="ldapConf.fieldmap.uname" id="ldapFMapUname" class="form-control rightControl selectControl">
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldmap.uname">{{field}}</option>
-					</select>
+					<span class="leftControl">Username</span><input class="btn btn-users btn-left dropdown-toggle" type="text" autocomplete="off" id="ldapFMapUname" data-toggle="dropdown" ng-model="ldapConf.fieldmap.uname" placeholder="Search Data Fields..">
+					<ul class="dropdown-menu dropdown-menu-users" role="menu" aria-labelledby="ldapFMapUname">
+						<li role="presentation" ng-repeat='field in ldapConf.fieldMapOpts | filter:ldapConf.fieldmap.uname' ng-click="ldapConf.fieldmap.uname=field" value="{{field}}"> {{field}}</li>
+					</ul>
 				</div></div>
 				<div class='adminControl'><div>
-					<span class="leftControl">Firstname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldmap.fname" id="ldapFMapFname" class="form-control rightControl selectControl">
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldmap.fname">{{field}}</option>
-					</select>
+					<span class="leftControl">Firstname</span><input class="btn btn-users btn-left dropdown-toggle" type="text" autocomplete="off" id="ldapFMapFname" data-toggle="dropdown" ng-model="ldapConf.fieldmap.fname" placeholder="Search Data Fields..">
+					<ul class="dropdown-menu dropdown-menu-users" role="menu" aria-labelledby="ldapFMapFname">
+						<li role="presentation" ng-repeat='field in ldapConf.fieldMapOpts | filter:ldapConf.fieldmap.fname' ng-click="ldapConf.fieldmap.fname=field" value="{{field}}"> {{field}}</li>
+					</ul>
 				</div></div>
 				<div class='adminControl'><div>
-					<span class="leftControl">Lastname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldmap.lname" id="ldapFMapLname" class="form-control rightControl selectControl">
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldmap.lname">{{field}}</option>
-					</select>
+					<span class="leftControl">Lastname</span><input class="btn btn-users btn-left dropdown-toggle" type="text" autocomplete="off" id="ldapFMapLname" data-toggle="dropdown" ng-model="ldapConf.fieldmap.lname" placeholder="Search Data Fields..">
+					<ul class="dropdown-menu dropdown-menu-users" role="menu" aria-labelledby="ldapFMapLname">
+						<li role="presentation" ng-repeat='field in ldapConf.fieldMapOpts | filter:ldapConf.fieldmap.lname' ng-click="ldapConf.fieldmap.lname=field" value="{{field}}"> {{field}}</li>
+					</ul>
 				</div></div>
 				<div class='adminControl'><div>
-					<span class="leftControl">Email</span><select class='adminSelect form-control' ng-model="ldapConf.fieldmap.email" id="ldapFMapEmail" class="form-control rightControl selectControl">
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldmap.email">{{field}}</option>
-					</select>
+					<span class="leftControl">Email</span><input class="btn btn-users btn-left dropdown-toggle" type="text" autocomplete="off" id="ldapFMapEmail" data-toggle="dropdown" ng-model="ldapConf.fieldmap.email" placeholder="Search Data Fields..">
+					<ul class="dropdown-menu dropdown-menu-users" role="menu" aria-labelledby="ldapFMapEmail">
+						<li role="presentation" ng-repeat='field in ldapConf.fieldMapOpts | filter:ldapConf.fieldmap.email' ng-click="ldapConf.fieldmap.email=field" value="{{field}}"> {{field}}</li>
+					</ul>
 				</div></div>
 			</div>
 			<!-- Create Configuration Form -->
@@ -595,30 +598,30 @@
 					<input type="password" autocomplete="off" name="bindCredentials" id="bindCredentials" ng-disabled="ldapConf.auth != 'simple'" ng-model="ldapConf.bindCredentials" class="form-control form-control-custom create" placeholder="Authentication Credentials" autocomplete="off"/>
 				</div></div>
 				<h4>Data Mapping Settings</h4>
-				<h5>All Mapping options are populated on click of <i>Test</i> with connection successful.</h5>
+				<h5>Mapping options are populated on click of <i>Test</i> with connection successful message.</h5>
 				<div class='adminControl'><div>
-					<span class="leftControl">Username</span><select class='adminSelect form-control' ng-model="ldapConf.fieldmap.uname" id="ldapFMapUname" class="form-control rightControl selectControl">
-						<option value="{{ldapConf.fieldmap.uname}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldmap.uname)==-1" ng-selected="true">{{ldapConf.fieldmap.uname}}</option>
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldmap.uname">{{field}}</option>
-					</select>
+					<span class="leftControl">Username</span><input class="btn btn-users btn-left dropdown-toggle" type="text" autocomplete="off" id="ldapFMapUname" data-toggle="dropdown" ng-model="ldapConf.fieldmap.uname" placeholder="Search Data Fields..">
+					<ul class="dropdown-menu dropdown-menu-users" role="menu" aria-labelledby="ldapFMapUname">
+						<li role="presentation" ng-repeat='field in ldapConf.fieldMapOpts | filter:ldapConf.fieldmap.uname' ng-click="ldapConf.fieldmap.uname=field" value="{{field}}"> {{field}}</li>
+					</ul>
 				</div></div>
 				<div class='adminControl'><div>
-					<span class="leftControl">Firstname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldmap.fname" id="ldapFMapFname" class="form-control rightControl selectControl">
-						<option value="{{ldapConf.fieldmap.fname}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldmap.fname)==-1" ng-selected="true">{{ldapConf.fieldmap.fname}}</option>
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldmap.fname">{{field}}</option>
-					</select>
+					<span class="leftControl">Firstname</span><input class="btn btn-users btn-left dropdown-toggle" type="text" autocomplete="off" id="ldapFMapFname" data-toggle="dropdown" ng-model="ldapConf.fieldmap.fname" placeholder="Search Data Fields..">
+					<ul class="dropdown-menu dropdown-menu-users" role="menu" aria-labelledby="ldapFMapFname">
+						<li role="presentation" ng-repeat='field in ldapConf.fieldMapOpts | filter:ldapConf.fieldmap.fname' ng-click="ldapConf.fieldmap.fname=field" value="{{field}}"> {{field}}</li>
+					</ul>
 				</div></div>
 				<div class='adminControl'><div>
-					<span class="leftControl">Lastname</span><select class='adminSelect form-control' ng-model="ldapConf.fieldmap.lname" id="ldapFMapLname" class="form-control rightControl selectControl">
-						<option value="{{ldapConf.fieldmap.lname}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldmap.lname)==-1" ng-selected="true">{{ldapConf.fieldmap.lname}}</option>
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldmap.lname">{{field}}</option>
-					</select>
+					<span class="leftControl">Lastname</span><input class="btn btn-users btn-left dropdown-toggle" type="text" autocomplete="off" id="ldapFMapLname" data-toggle="dropdown" ng-model="ldapConf.fieldmap.lname" placeholder="Search Data Fields..">
+					<ul class="dropdown-menu dropdown-menu-users" role="menu" aria-labelledby="ldapFMapLname">
+						<li role="presentation" ng-repeat='field in ldapConf.fieldMapOpts | filter:ldapConf.fieldmap.lname' ng-click="ldapConf.fieldmap.lname=field" value="{{field}}"> {{field}}</li>
+					</ul>
 				</div></div>
 				<div class='adminControl'><div>
-					<span class="leftControl">Email</span><select class='adminSelect form-control' ng-model="ldapConf.fieldmap.email" id="ldapFMapEmail" class="form-control rightControl selectControl">
-						<option value="{{ldapConf.fieldmap.email}}" ng-if="ldapConf.fieldMapOpts.indexOf(ldapConf.fieldmap.email)==-1" ng-selected="true">{{ldapConf.fieldmap.email}}</option>
-						<option ng-repeat="field in ldapConf.fieldMapOpts" value="{{field}}" ng-selected="field==ldapConf.fieldmap.email">{{field}}</option>
-					</select>
+					<span class="leftControl">Email</span><input class="btn btn-users btn-left dropdown-toggle" type="text" autocomplete="off" id="ldapFMapEmail" data-toggle="dropdown" ng-model="ldapConf.fieldmap.email" placeholder="Search Data Fields..">
+					<ul class="dropdown-menu dropdown-menu-users" role="menu" aria-labelledby="ldapFMapEmail">
+						<li role="presentation" ng-repeat='field in ldapConf.fieldMapOpts | filter:ldapConf.fieldmap.email' ng-click="ldapConf.fieldmap.email=field" value="{{field}}"> {{field}}</li>
+					</ul>
 				</div></div>
 			</div>
 			<!-- Edit Configuration Form -->

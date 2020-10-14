@@ -1137,7 +1137,8 @@ exports.pdProcess = function (req, res) {
 		asynclib.forEachSeries(orderlist, function (nodeObj, savedcallback) {
 			var name = nodeObj.label;
 			if(screendataobj[name].data.view[0]!=undefined){
-				var screenshotdeatils = screendataobj[name].data.view[0].screenshot.split(";")[1];
+				var len1=(screendataobj[name].data.view).length
+				var screenshotdeatils = screendataobj[name].data.view[len1-1].screenshot.split(";")[1];
 			    var screenshotdata = screenshotdeatils.split(",")[1];
 			}else{
 				var screenshotdata = "";
@@ -1151,6 +1152,7 @@ exports.pdProcess = function (req, res) {
 				'modifiedby': userid,
 				'modifiedbyrole': role,
 				'deleted': false,
+				'createdthrough':'PD',
 				'screenshot':screenshotdata,
 				'scrapedurl':'',
 				'scrapedata': screendataobj[name].data
@@ -1362,7 +1364,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'selectValueByText',[input[0]],null,null,"SAP");
 					break;
 				case "GuiMenubar":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'SelectMenu',[input[0]],null,null,"SAP");
+					testcaseObj = getTestcaseStep(step,null,'@Sap','SelectMenu',null,null,null,"SAP");
 					break;
 				case "GuiSimpleContainer":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'DoubleClickOnCell',[input[0]],null,null,"SAP");
@@ -1375,6 +1377,12 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					break;
 				case "tree":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTreeElement',null,null,null,"SAP");
+					break;
+				case "picture":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClick',null,null,null,"SAP");
+					break;
+				case "text":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
 					break;
 				default:
 					logger.info("Import PD: No match found for "+eachScrapedAction.tag+" for SAP apptype.");

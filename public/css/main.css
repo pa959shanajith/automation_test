@@ -3420,9 +3420,13 @@ li.select_all .addCustObj{
     margin-top: 5px;
 }
 
-.adminControl div input, .adminControl div select {
+.adminControl div input, .adminControl div select, .adminControl div ul {
     /* display: inline-block; */
 	width: calc(100% - 130px);
+}
+
+.adminControl div ul {
+	left: 130px;
 }
 
 .adminSelect:focus {
@@ -5931,8 +5935,7 @@ ul.browserInlineIcons
     display: inline;
     padding: 2px;
 }
-.removeScroll
-{
+.removeScroll{
     overflow: hidden !important;
 }
 
@@ -5942,18 +5945,26 @@ ul.browserInlineIcons
     width: 100%;
     height: 30px;
 }
+
+.btn-left{
+    text-align: left;
+}
+
 .users-edit{
     width: 87%;
 }
+
 .dropdown-menu-users{
     max-height:165px;
     overflow-y:scroll;
     width: 100%;
     padding: 6px;
 }
+
 .dropdown-menu-users>li{
     padding: 3px 12px;
 }
+
 .dropdown-menu-users>li:hover{
     background:#633691;
     border-radius: 3px;

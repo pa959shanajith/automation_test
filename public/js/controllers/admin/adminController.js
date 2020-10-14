@@ -2759,7 +2759,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		this.cert = "";
 		this.certName = "No file choosen";
 		this.secure = "false";
-		this.fieldmap = {uname: "None", fname: "None", lname: "None", email: "None"};
+		this.fieldmap = {uname: "", fname: "", lname: "", email: ""};
 		this.fieldMapOpts = ["None"];
 		if (action == "edit") this.auth = "";
 		this.testStatus = "false";
