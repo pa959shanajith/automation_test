@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { Thumbnail } from '../../global';
 import "../styles/ActionBarItems.scss"
 
-const UpperContent = ({appType, isMac}) => {
+const UpperContent = ({appType, isMac, disable}) => {
     let renderComp = [
                     <div key={1} className='d__debugOn'>Debug On</div>, 
                     <div key={3} className="d__thumbnail">

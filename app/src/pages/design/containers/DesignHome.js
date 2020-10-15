@@ -12,15 +12,14 @@ const DesignHome = () => {
     const filter_data = useSelector(state=>state.plugin.FD)
 
     const [taskName, setTaskName] = useState(null);
-    const [status, setStatus] = useState(null);
     const [appType, setAppType] = useState(null);
     const [taskInfo, setTaskInfo] = useState(null);
     const [isMac, setIsMac] = useState(false);
-
+    const [disableActionBar, setDisableActionBar ] = useState(false);
+    
     useEffect(()=>{
         if (Object.keys(current_task).length!==0 && Object.keys(filter_data).length!==0){
             setTaskName(current_task.taskName);
-            setStatus(current_task.status);
             setAppType(current_task.appType);
             setTaskInfo({
                 'Project' : filter_data.projectDict[current_task.projectId],
@@ -41,8 +40,8 @@ const DesignHome = () => {
             <Header />
                 <div className="d__mid_section">
                     
-                    <ActionBar upperContent={<UpperContent key={666} appType={appType} isMac={isMac}/>} bottomContent={<BottomContent />}/>
-                    <DesignContent taskName={taskName} status={status} />
+                    <ActionBar upperContent={<UpperContent key={666} disable={disableActionBar} appType={appType} isMac={isMac}/>} bottomContent={<BottomContent />}/>
+                    <DesignContent current_task={current_task} />
                     <ReferenceBar 
                         taskName={taskName}
                         taskInfo={taskInfo}

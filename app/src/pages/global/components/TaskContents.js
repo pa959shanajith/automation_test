@@ -91,7 +91,7 @@ const TaskPanel = (props) => {
             history.replace("/scrape")
         }
         else if(dataobj.subtask === "TestCase"){
-            window.localStorage['navigateScreen'] = "TestCase";
+            window.localStorage['navigateScreen'] = "TestCase"; // Can I change it to "Design"?
             window.localStorage['navigateTestcase'] = true;
             history.replace("/design")
         }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+// import {motion, AnimatePresence} from 'framer-motion';
 import {ScrollBar, TaskContents} from '../../global';
 import { useSelector } from 'react-redux';
 import "../styles/ReferenceBar.scss";
@@ -122,6 +123,11 @@ const ReferenceBar = (props) => {
         setShowInfo(!showInfo);
     }
 
+    const sliderVariant = {
+        slideIn : { opacity: 1, x: 0 },
+        slideOut : { opacity: 0, x: 50}
+    }
+
     return (
         <div className={"ref__wrapper " + (!collapse && "ref__wrapper__expand")}>
         <div className="ref__bar">
@@ -132,10 +138,14 @@ const ReferenceBar = (props) => {
                 <>
                 <div className="min_height_div">
                     <div id="ref_bar_scroll" className="inside_min">
+                    
+                    {/* <AnimatePresence> */}
 
                     { props.popups }
+
                     {
                         showTask && 
+                        // <motion.div variants={sliderVariant} animate={"slideIn"} initial={"slideOut"} exit={"slideOut"} transition={{ duration: 0.1 }} >
                         <ClickAwayListener onClickAway={closePopups}>
                         <div className="ref_pop task_pop" style={{marginTop: `calc(${taskPopY}px - 15vh)`}}>
                             <h4 className="pop__header" onClick={()=>setShowTask(false)}><span className="pop__title">My task(s)</span><img className="task_close_arrow" alt="close_task" src="static/imgs/ic-arrow.png"/></h4>
@@ -156,8 +166,9 @@ const ReferenceBar = (props) => {
                             </div>
                         </div>
                         </ClickAwayListener>
+                        // </motion.div>
                     }
-
+                    {/* </AnimatePresence> */}
                     {
                         showInfo && 
                         <ClickAwayListener onClickAway={closePopups}>
