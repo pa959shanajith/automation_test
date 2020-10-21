@@ -41,7 +41,7 @@ module.exports.test = async (channel, data, conf) => {
 		const mailer = new email(conf);
 		const res = await mailer.send(msg, receivers);
 		mailer.destroy();
-		return res;
+		return res.error && res || res[0];
 	} else {
 		logger.error("Unable to send test notification over "+channel+", Channel is not supported.")
 		return {error: { msg: "Notification channel "+channel+" not supported", code: "UNKNOWN_CHANNEL"}};
@@ -53,7 +53,7 @@ module.exports.notify = async (event, data, channel) => {
 		logger.error("Unable to send notification for Event: '"+event+"', No such event exists.")
 		return {error: { msg: "Notification event "+event+" not found", code: "UNKNOWN_EVENT"}};
 	}
-	if (channel && !channels.includes(channel)) {
+	if (channel && !channels[channel]) {
 		logger.error("Unable to send notification over "+channel+", Channel is not supported.")
 		return {error: { msg: "Notification channel "+channel+" not supported", code: "UNKNOWN_CHANNEL"}};
 	}
@@ -77,7 +77,7 @@ module.exports.notify = async (event, data, channel) => {
 
 module.exports.update = async (action, name, channel, provider) => {
 	const fnName = "updateNotification";
-	if (["disable", "update"].includes(action) && channels.includes(channel)) {
+	if (["disable", "update"].includes(action) && channels[channel]) {
 		await channels[channel].destroy();
 		delete channels[channel];
 	}
@@ -88,7 +88,7 @@ module.exports.update = async (action, name, channel, provider) => {
 		const chConf = await utils.fetchData(inputs, "admin/getNotificationChannels", fnName);
 		if (chConf === "fail") return logger.error(`Error occurred in ${fnName}: Failed to start ${channel} notification module`);
 		else if (chConf.length === 0) return logger.error(`Error occurred in ${fnName}: Unable to find configuration details for ${name}`);
-		if (channel === "email") channels[channel] = new email(chConf);
+		if (channel === "email") channels[channel] = new email(chConf[0]);
 		//else if (channel == "otherChannelType") channels[channel] = otherChannelType;
 	}
 };

@@ -3407,6 +3407,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		this.name = "";
 		this.host = "";
 		this.port = "";
+		this.appurl = window.location.href.replace('/admin', '');
 		this.secure = "auto";
 		this.insecuretls = "false";
 		this.testMailID = "";
@@ -3430,7 +3431,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			greeting: "",
 			socket: ""
 		};
-		$("#mailName,#mailHost,#mailPort,#senderName,#senderEmail").removeClass("inputErrorBorder");
+		this.proxy = {
+			enable: false,
+			url: "",
+			auth: false,
+			user: "",
+			pass: ""
+		};
+		$("#mailName,#mailHost,#mailPort,#senderName,#senderEmail,#appURL,#proxyURL,#proxyUser,#proxyPass").removeClass("inputErrorBorder");
 		$("#mailProvider,#authenticationType").removeClass("selectErrorBorder");
 	};
 
@@ -3461,10 +3469,24 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					};
 				}
 				$scope.mailConf.sender = data.sender;
+				$scope.mailConf.appurl = data.appurl;
 				$scope.mailConf.timeouts = data.timeouts || {};
 				$scope.mailConf.pool.enable = data.pool != false;
 				$scope.mailConf.pool.maxConnections = (data.pool)? ((data.pool.maxconnections) || ""):"";
 				$scope.mailConf.pool.maxMessages = (data.pool)? ((data.pool.maxmessages) || ""):"";
+				if (data.proxy) {
+					$scope.mailConf.proxy.enable = true;
+					$scope.mailConf.proxy.url = data.proxy.url;
+					$scope.mailConf.proxy.auth = data.proxy.user && data.proxy.pass && true;
+					$scope.mailConf.proxy.user = data.proxy.user || "";
+					$scope.mailConf.proxy.pass = data.proxy.pass || "";
+				} else $scope.mailConf.proxy = {
+					enable: false,
+					url: "",
+					auth: false,
+					user: "",
+					pass: ""
+				};
 			}
 		}, function (error) {
 			unblockUI();
@@ -3484,7 +3506,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			sender: this.sender,
 			enabletls: this.secure,
 			insecuretls: this.insecuretls,
+			appurl: this.appurl,
 			pool: this.pool.enable && this.pool || false,
+			proxy: this.proxy.enable && this.proxy || false,
 			timeouts: this.timeouts
 		};
 	};
@@ -3526,9 +3550,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.mailConf.validate = function() {
 		let flag = true;
 		let popped = false;
-		$("#mailName,#mailHost,#mailPort,#senderName,#senderEmail").removeClass("inputErrorBorder");
+		$("#mailName,#mailHost,#mailPort,#senderName,#senderEmail,#appURL,#proxyURL,#proxyUser,#proxyPass").removeClass("inputErrorBorder");
 		$("#mailProvider,#authenticationType").removeClass("selectErrorBorder");
 		const regExName = /^[A-Za-z0-9]+([A-Za-z0-9-]*[A-Za-z0-9]+|[A-Za-z0-9]*)$/;
+		const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
 		const emailRegEx = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 		if (this.provider == "") {
 			$("#mailProvider").addClass("selectErrorBorder");
@@ -3568,6 +3593,37 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			$("#senderEmail").addClass("inputErrorBorder");
 			flag = false;
 		}
+		if (this.appurl == "") {
+			$("#appURL").addClass("inputErrorBorder");
+			flag = false;
+		} else if (!regExURL.test(this.appurl)) {
+			$("#appURL").addClass("inputErrorBorder");
+			if (!popped) openModalPopup("Error", "Invalid Avo Assure Application URL provided!");
+			flag = false;
+			popped = true;
+		}
+		if (this.proxy.enable) {
+			if (this.proxy.url == "") {
+				$("#proxyURL").addClass("inputErrorBorder");
+				flag = false;
+			} else if (!regExURL.test(this.proxy.url)) {
+				$("#proxyURL").addClass("inputErrorBorder");
+				if (!popped) openModalPopup("Error", "Invalid Proxy Server URL provided!");
+				flag = false;
+				popped = true;
+			}
+			if (this.proxy.auth) {
+				if (this.proxy.user == "") {
+					$("#proxyUser").addClass("inputErrorBorder");
+					flag = false;
+				}
+				if (this.proxy.pass == "") {
+					$("#proxyPass").addClass("inputErrorBorder");
+					flag = false;
+				}
+			}
+		}
+		if (!flag && !popped) openModalPopup("Error", "Form contains errors!");
 		return flag;
 	};
 
@@ -3607,7 +3663,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	};
 
 	$scope.mailConf.manage = function() {
-		// if (!this.validate()) return false;
+		if (!this.validate()) return false;
 		const conf = this.getConfObj();
 		const action = (this.loaded)? "Update":"Create";
 		let emsg = "Failed to "+action+" '"+conf.name+"' Configuration.";
@@ -3621,7 +3677,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			else if (data == "success") {
 				openModalPopup(action+" Configuration", "'"+conf.name+"' Configuration "+action+"d!");
 				$scope.mailConf.getProviderInfo();
-			} else if(/^1[0-4]{9}$/.test(data)) {
+			} else if(/^1[0-4]{12}$/.test(data)) {
 				if (+data[1]) {
 					openModalPopup(action+" Configuration", emsg+" Invalid Request!");
 					return;
@@ -3635,6 +3691,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (+data[7]) errfields.push("Sender Email");
 				if (+data[8]) errfields.push("Secure Connection");
 				if (+data[9]) errfields.push("Authentication");
+				if (+data[10]) errfields.push("Avo Assure Application URL");
+				if (+data[11]) errfields.push("Proxy URL");
+				if (+data[12] == 1) errfields.push("Proxy Username");
+				else if (+data[12] == 2) errfields.push("Proxy Password");
+				else if (+data[12] == 3) errfields.push("Proxy Credentials");
 				openModalPopup(action+" Configuration", emsg+" Following values are invalid: "+errfields.join(", "));
 			}
 		}, function (error) {

@@ -1,5 +1,7 @@
 const utils = require('../lib/utils');
 
+const companyLogo = "/imgs/ftr-avo-logo.png";
+const productLogo = "/imgs/logo.png";
 const generateEmailPayload = {};
 
 module.exports.getPayload = async (channel, event, data) => {
@@ -10,23 +12,59 @@ module.exports.getPayload = async (channel, event, data) => {
 };
 
 generateEmailPayload.test = async data => {
-	const url = data.url + "/imgs/";
 	let msg = {
 		'subject': 'Avo Assure: Test Email',
 		'template': 'test',
 		'context': {
-			'companyLogo': url + "ftr-avo-logo.ico",
-			'productLogo': url + "logo.png"
+			'companyLogo': data.url + companyLogo,
+			'productLogo': data.url + productLogo
 		}
 	};
 	return {
 		error: null,
 		msg,
-		receivers: data.recipient
+		receivers: [data.recipient]
 	};
 };
 
-generateEmailPayload.report = async data => {};
+generateEmailPayload.report = async data => {
+	// reportid
+	// scenarioname
+	// userid
+	// url
+	// viewtype
+	// status
+	const recv = data.modifiedby;
+	let msg = {
+		'template': 'report',
+		'context': {
+			'companyLogo': data.url + companyLogo,
+			'productLogo': data.url + productLogo,
+			'reportURL': data.url + '/viewreport/' + data.reportView + '/' + data.reportId,
+			'processName': data.flowName
+		}
+	};
+
+	if (data.overAllStatus === 'Completed') {
+		msg.context.completed = true;
+		msg.subject = 'Report for ' + data.flowName + ' is now available';
+	} else if (data.overAllStatus === 'Terminated-System') {
+		msg.context.terminatedSystem = true;
+		msg.subject = 'Execution for ' + data.flowName + ' failed';
+	} else if (data.overAllStatus === 'Skipped') {
+		msg.context.skipped = true;
+		msg.subject = 'Execution for ' + data.flowName + ' skipped';
+	} else {
+		msg.context.terminatedManual = true;
+		msg.subject = data.flowName + ' terminated manually';
+	}
+	return {
+		error: null,
+		msg,
+		receivers: recv
+	};
+};
+
 generateEmailPayload.userUpdate = async data => {};
 generateEmailPayload.schedule = async data => {};
 generateEmailPayload.iceAssign = async data => {};

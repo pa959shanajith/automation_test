@@ -307,7 +307,6 @@ module.exports.validateUserState = async (req, res) => {
 			return res.send("Invalid Session");
 		}
 		let emsg = sess.emsg;
-		const user = req.user;
 		const dndsess = sess.dndSess || (!emsg && sess.logged);
 		if (emsg || dndsess) {
 			if (dndsess) {
@@ -318,7 +317,7 @@ module.exports.validateUserState = async (req, res) => {
 			return res.send(emsg);
 		}
 
-		if (!user) {
+		if (!req.isAuthenticated()) {
 			logger.rewriters[0] = function(level, msg, meta) {
 				meta.username = null;
 				meta.userid = null;
@@ -330,6 +329,7 @@ module.exports.validateUserState = async (req, res) => {
 		}
 
 		emsg = "fail";
+		const user = req.user;
 		const username = (user.username || "").toLowerCase();
 		if (username.length === 0) {
 			logger.error(`User ${username} does not have a valid login session`);

@@ -1,6 +1,6 @@
 const logger = require('../../../logger');
-const defaultEmailFrom = "avoassure-alerts@avoautomation.com";
 const SMTP = require('./smtp');
+const defaultEmailFrom = "avoassure-alerts@avoautomation.com";
 
 class Email {
 	constructor(opts = {}) {

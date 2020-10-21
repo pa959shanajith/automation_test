@@ -1704,6 +1704,100 @@ exports.provisionICE = async (req, res) => {
 	}
 };
 
+const getEmailConf = async (conf, fnName, inputs, flag) => {
+	if (!flag) flag = ['1','0','0','0','0','0','0','0','0','0','0','0','0'];
+	inputs.host = (conf.host || "").trim();
+	inputs.port = conf.port || "";
+	if (!inputs.host || (!validator.isIP(inputs.host) && !validator.isFQDN(inputs.host))) { // Allow Anything as of now
+		logger.error("Error occurred in admin/"+fnName+": Invalid Hostname or IP.");
+		flag[5]='1';
+	}
+	if (!validator.isPort(inputs.port.toString())) {
+		logger.error("Error occurred in admin/"+fnName+": Invalid Port Number.");
+		flag[6]='1';
+	}
+	conf.sender = conf.sender || {};
+	inputs.sender = {
+		name: (conf.sender.name || "Avo Assure Alerts").trim(),
+		email: (conf.sender.email || "avoassure-alerts@avoautomation.com").trim()
+	}
+	if (!validator.isEmail(inputs.sender.email)) {
+		logger.error("Error occurred in admin/"+fnName+": Invalid sender email address.");
+		flag[7]='1';
+	}
+	inputs.tls = {
+		security: conf.enabletls || "auto",
+		insecure: conf.insecuretls || false
+	}
+	if (!["enable", "disable", "auto"].includes(inputs.tls.security)) {
+		logger.error("Error occurred in admin/"+fnName+": Invalid TLS Options.");
+		flag[8]='1';
+	}
+	const pool = conf.pool;
+	if (!pool) inputs.pool = false;
+	else if (typeof(pool) == "boolean") inputs.pool = pool;
+	else {
+		inputs.pool = {};
+		if (validator.isInt((pool.maxConnections||"").toString())) inputs.pool.maxconnections = pool.maxConnections;
+		if (validator.isInt((pool.maxMessages||"").toString())) inputs.pool.maxmessages = pool.maxMessages;
+		if (Object.keys(inputs.pool).length == 0) inputs.pool = true;
+	}
+	const auth = conf.auth;
+	if (!auth) inputs.auth = false;
+	else {
+		inputs.auth = {
+			type: (auth.type || "").trim().toLowerCase(),
+			username: (auth.username || "").trim(),
+			password: (auth.password || "").trim(),
+		};
+		if (inputs.auth.type == "none") inputs.auth = false;
+		else if (!["basic"].includes(inputs.auth.type)) {
+			logger.error("Error occurred in admin/"+fnName+": Invalid auth type.");
+			flag[9]='1';
+		}
+	}
+	const timeouts = conf.timeouts || "";
+	const tOut = {};
+	if (timeouts) {
+		if (validator.isInt((timeouts.connection||"").toString())) tOut.connection = timeouts.connection;
+		if (validator.isInt((timeouts.greeting||"").toString())) tOut.greeting = timeouts.greeting;
+		if (validator.isInt((timeouts.socket||"").toString())) tOut.socket = timeouts.socket;
+		if (Object.keys(tOut).length != 0) inputs.timeouts = tOut;
+	}
+	inputs.appurl = conf.appurl;
+	if (!validator.isURL(inputs.appurl)) {
+		logger.error("Error occurred in admin/"+fnName+": Invalid Avo Assure Application URL.");
+		flag[10]='1';
+	}
+	const proxy = conf.proxy;
+	if (!proxy) inputs.proxy = false;
+	else {
+		inputs.proxy = {
+			url: conf.proxy.url
+		};
+		if (!validator.isURL(inputs.proxy.url)) {
+			logger.error("Error occurred in admin/"+fnName+": Invalid Proxy URL.");
+			flag[11]='1';
+		}
+		if (conf.proxy.auth) {
+			inputs.proxy.user = conf.proxy.user || "";
+			inputs.proxy.pass = conf.proxy.pass || "";
+			if (inputs.proxy.user.length == 0 && inputs.proxy.pass.length == 0) {
+				logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Credentials.");
+				flag[12]='3';
+			}
+			else if (inputs.proxy.user.length == 0) {
+				logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Username.");
+				flag[12]='1';
+			}
+			else if (inputs.proxy.pass.length == 0) {
+				logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Password.");
+				flag[12]='2';
+			}
+		}
+	}
+};
+
 // Send Test Notification over a specific channel and provider
 exports.testNotificationChannels = async (req, res) => {
 	const fnName = "testNotificationChannels";
@@ -1712,17 +1806,15 @@ exports.testNotificationChannels = async (req, res) => {
 		const channel = (req.body.channel || "").trim();
 		const provider = (req.body.provider || "").trim();
 		const recipient = (req.body.recipient || "").trim();
-		const conf = req.body.conf || {};
+		const rawConf = req.body.conf || {};
 		let flag = "fail";
 		if (channel == "email") {
 			if (provider != "smtp") flag = "invalidprovider";
 			else if (!validator.isEmail(recipient)) flag = "invalidrecipient";
 			else {
-				const testData = {
-					recipient,
-					url: req.headers.origin || req.headers["x-forwarded-for"]
-				}
-				const testResp = await notifications.test(channel, testData, conf);
+				const conf = { channel, provider, name: rawConf.name };
+				await getEmailConf(rawConf, fnName, conf);
+				const testResp = await notifications.test(channel, { recipient }, conf);
 				if (testResp.error) flag = "fail";
 				else flag = testResp.status;
 				// else flag = "success";
@@ -1740,7 +1832,7 @@ exports.manageNotificationChannels = async (req, res) => {
 	const fnName = "manageNotificationChannels";
 	logger.info("Inside UI Service: " + fnName);
 	try {
-		let flag = ['1','0','0','0','0','0','0','0','0','0'];
+		let flag = ['1','0','0','0','0','0','0','0','0','0','0','0','0'];
 		const conf = req.body.conf;
 		const action = req.body.action;
 		// if (action == "delete") return res.send("fail");
@@ -1766,64 +1858,7 @@ exports.manageNotificationChannels = async (req, res) => {
 		if (action == "create" || action == "update") {
 			if (inputs.channel == "email") {
 				if (inputs.provider == "smtp") {  // Only smtp provider is supported as of now
-					inputs.host = (conf.host || "").trim();
-					inputs.port = conf.port || "";
-					if (!inputs.host || (!validator.isIP(inputs.host) && !validator.isFQDN(inputs.host))) { // Allow Anything as of now
-						logger.error("Error occurred in admin/"+fnName+": Invalid Hostname or IP.");
-						flag[5]='1';
-					}
-					if (!validator.isPort(inputs.port.toString())) {
-						logger.error("Error occurred in admin/"+fnName+": Invalid Port Number.");
-						flag[6]='1';
-					}
-					conf.sender = conf.sender || {};
-					inputs.sender = {
-						name: (conf.sender.name || "Avo Assure Alerts").trim(),
-						email: (conf.sender.email || "avoassure-alerts@avoautomation.com").trim()
-					}
-					if (!validator.isEmail(inputs.sender.email)) {
-						logger.error("Error occurred in admin/"+fnName+": Invalid sender email address.");
-						flag[7]='1';
-					}
-					inputs.tls = {
-						security: conf.enabletls || "auto",
-						insecure: conf.insecuretls || false
-					}
-					if (!["enable", "disable", "auto"].includes(inputs.tls.security)) {
-						logger.error("Error occurred in admin/"+fnName+": Invalid TLS Options.");
-						flag[8]='1';
-					}
-					const pool = conf.pool;
-					if (!pool) inputs.pool = false;
-					else if (typeof(pool) == "boolean") inputs.pool = pool;
-					else {
-						inputs.pool = {};
-						if (validator.isInt((pool.maxConnections||"").toString())) inputs.pool.maxconnections = pool.maxConnections;
-						if (validator.isInt((pool.maxMessages||"").toString())) inputs.pool.maxmessages = pool.maxMessages;
-						if (Object.keys(inputs.pool).length == 0) inputs.pool = true;
-					}
-					const auth = conf.auth;
-					if (!auth) inputs.auth = false;
-					else {
-						inputs.auth = {
-							type: (auth.type || "").trim().toLowerCase(),
-							username: (auth.username || "").trim().toLowerCase(),
-							password: (auth.password || "").trim().toLowerCase(),
-						};
-						if (inputs.auth.type == "none") inputs.auth.type = false;
-						else if (!["basic", false].includes(inputs.auth.type)) {
-							logger.error("Error occurred in admin/"+fnName+": Invalid auth type.");
-							flag[9]='1';
-						}
-					}
-					const timeouts = conf.timeouts;
-					const tOut = {};
-					if (timeouts) {
-						if (validator.isInt((timeouts.connection||"").toString())) tOut.connection = timeouts.connection;
-						if (validator.isInt((timeouts.greeting||"").toString())) tOut.greeting = timeouts.greeting;
-						if (validator.isInt((timeouts.socket||"").toString())) tOut.socket = timeouts.socket;
-						if (Object.keys(tOut).length != 0) inputs.timeouts = tOut;
-					}
+					await getEmailConf(conf, fnName, inputs, flag);
 				} else {
 					logger.error("Error occurred in admin/"+fnName+": Invalid Provider "+provider+" for "+channel+" channel.");
 					flag[4]='1';
@@ -1831,7 +1866,7 @@ exports.manageNotificationChannels = async (req, res) => {
 			}
 		}
 		flag = flag.join('');
-		if (flag != "1000000000") {
+		if (flag != "1000000000000") {
 			return res.send(flag);
 		}
 		const result = await utils.fetchData(inputs, "admin/manageNotificationChannels", fnName);

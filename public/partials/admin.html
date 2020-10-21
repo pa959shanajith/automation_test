@@ -215,6 +215,171 @@
 		</div>
 		<!-- Edit User -->
 
+		<!-- Assign Tokens -->
+		<div class="containerWrap" ng-if="tab == 'tabToken'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Token Management</span>
+			</div>
+			<div class="adminActionBtn">
+				<button title="Generate New Token" class="btn btn-md pull-right adminBtn" ng-click="tokens.generateCIusertokens($event)" style="margin-right:10px">Generate</button>
+				<button title="Refresh" class="btn btn-md pull-right adminBtn" ng-click="tokens.click($event)" style="margin-right:10px">Refresh</button>
+			</div>
+			<div class="col-xs-9">
+				<div class='adminControl' style="margin-bottom:2%"><div>
+					<span class="leftControl" title="ICE Type">ICE Type</span>
+					<label class="adminFormRadio">
+						<input type="radio" ng-model="tokens.op" value="normal" name="provisionType" ng-change="tokens.repopulateEntries($event)"/>
+						<span>Normal</span>
+					</label>
+					<label class="adminFormRadio">
+						<input type="radio" ng-model="tokens.op" value="ci-cd" name="provisionType" ng-change="tokens.repopulateEntries($event)"/>
+						<span>CI/CD</span>
+					</label>
+				</div></div>
+				<div class='userForm adminControl'>
+					<div ng-if="tokens.op=='normal'">
+						<span class="leftControl" title="User">Username</span><select class='adminSelect form-control' ng-model="tokens.targetid" id="selAssignUser1" ng-init="tokens.targetid=' '" ng-options="entry[1] as entry[0] for entry in tokens.allUsers" ng-change="tokens.loadData($event, true)"></select>
+					</div>
+					<div ng-if="tokens.op=='ci-cd'">
+						<span class="leftControl" title="ICE">ICE Name</span><select class='adminSelect form-control' ng-model="tokens.targetid" id="selAssignUser1" ng-init="tokens.targetid=' '" ng-options="entry._id as entry.icename for entry in tokens.allICE" ng-change="tokens.loadData($event, true)"></select>
+					</div>
+				</div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Token Name">Token Name</span>
+					<input type="text" autocomplete="off" id="tokenName" name="tokenName" ng-change="tokens.verifyName($event)" ng-model="tokens.name" maxlength="100" class="form-control form-control-custom create validationKeydown preventSpecialChar" placeholder="Token Name"/>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Token Expiry">Token Expiry</span>
+					<div class="tokenSuite">
+						<span class="datePicContainer" style="margin-right:10px">
+							<input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly="">
+							<img class="datepickerIconToken" src="../imgs/ic-datepicker.png">
+						</span>
+						<span class="timePicContainer">
+							<input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/>
+							<img class="timepickerIconToken" src="../imgs/ic-timepicker.png" />
+						</span>
+					</div>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Generated Token">Token</span>
+					<input type="text" autocomplete="off" id="ciToken" name="ciToken" ng-model="tokens.token" class="create" placeholder="Click on Generate to generate token" readonly="readonly"/>
+				</div></div>
+			</div>
+			<div class="col-xs-9 form-group adminForm" style="padding-top:0">
+				<div class="containerWrap">
+					<div class="sessionHeading" data-toggle="collapse" data-target="#activeUsersToken-x">
+						<h4>CI Tokens</h4>
+					</div>
+					<div id="activeUsersToken" class="wrap scrollbar-inner" style="height:auto;max-height:450px">
+						<table class = "table table-hover sessionTable" id="tokensDetail">
+							<tr>
+								<th> Token Name </th>
+								<th> Status </th>
+								<th> Expiry </th>
+								<th> Action </th>
+							</tr>
+							<tr ng-repeat="token in tokens.allTokens">
+								<td> {{token.name}} </td>
+								<td> {{token.deactivated}} </td>
+								<td> {{token.expireson }} </td>
+								<td ng-if="token.deactivated == 'active'"><button class="btn" data-id="{{$index}}" ng-click="tokens.deactivate($event)" style="margin-left:-21%"> Deactivate </button></td>
+								<td ng-if="token.deactivated != 'active'"></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Assign Tokens -->
+
+		<!-- ICE Provision -->
+		<div class="containerWrap" ng-if="tab == 'tabProvision'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>ICE Provision</span>
+			</div>
+			<!--Task Name-->
+			<!-- Button -->
+			<div class="adminActionBtn">
+				<button title="Provision" class="btn btn-md pull-right adminBtn" ng-click="provision.provisionsIce($event)" style="margin-right:10px" title="Provision">Provision</button>
+				<button title="Refresh" class="btn btn-md pull-right adminBtn" ng-click="provision.click($event)" style="margin-right:10px">Refresh</button>
+			</div>
+			<!-- Button -->
+			<!-- ICE Provision Form -->
+			<div class="col-xs-9">
+				<div class='adminControl' style="margin-bottom:2%"><div>
+					<span class="leftControl" title="ICE Type">ICE Type</span>
+					<label class="adminFormRadio">
+						<input type="radio" ng-model="provision.op" value="normal" name="provisionType" ng-change='provision.selectProvisionType($event)'/>
+						<span>Normal</span>
+					</label>
+					<label class="adminFormRadio">
+						<input type="radio" ng-model="provision.op" value="ci-cd" name="provisionType" ng-change='provision.selectProvisionType($event)'/>
+						<span>CI/CD</span>
+					</label>
+				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="ICE Name">ICE Name</span>
+					<input type="text" autocomplete="off" id="icename" name="icename" ng-change="provision.verifyName($event)" ng-model="provision.icename" maxlength="100" class="form-control form-control-custom create validationKeydown preventSpecialChar" placeholder="ICE Name"/>
+				</div></div>
+				<div class='userForm adminControl'><div>
+					<span class="leftControl" title="User">User</span><select class='adminSelect form-control' ng-disabled="provision.op!='normal'" ng-model="provision.userid" id="selAssignUser2" ng-init="provision.userid=' '" ng-options="entry[1] as entry[0] for entry in provision.users"></select>
+				</div></div>
+				<div class='adminControl' id="icetokenarea"><div>
+					<span class="leftControl" title="Token">Token</span>
+					<textarea autocomplete="off" id="iceToken" ng-model="provision.token" name="iceToken" readonly=""></textarea>
+					<!-- <input type="text" autocomplete="off" id="iceToken" name="iceToken" ng-model="provision.token" class="form-control form-control-custom create" placeholder="Click on Provision/Reregister to generate token" readonly="readonly"/> -->
+					<label style="float:right">
+						<span class="fa fa-files-o" style="width:auto;margin-right:10px" data-original-title="Click To Copy" ng-click="copyToken($event)"></span>
+						<span class="fa fa-download" style="width:auto;margin-right:10px" data-original-title="Download Token" ng-click="downloadToken($event)"></span>
+					</label>
+				</div></div>
+			</div>
+			<!-- ICE Provision Form -->
+			<!-- ICE Provision List -->
+			<div class="col-xs-9 form-group adminForm" style="padding-top:0">
+				<div class="containerWrap">
+					<div class="sessionHeading" data-toggle="collapse" data-target="#activeUsersToken-x">
+						<h4>ICE Provisions</h4>
+						<div style="float:right;margin-right:30px">
+							<span class="searchIcon" style="border-radius: 0px 7px 7px 0px;left:0;top:5px;float:right">
+								<img src="imgs/ic-search-icon.png" style="margin-top: -1px; margin-left: 1px">
+							</span>
+							<input type="text" id="searchTasks" style="left:0;top:5px;float:right;position:relative;margin-left:0" class="searchInput">
+						</div>
+					</div>
+					<div id="activeUsersToken" class="wrap scrollbar-inner" style="height:auto;max-height:450px">
+						<table class = "table table-hover sessionTable" id="tokensDetail">
+							<tr>
+								<th> ICE Name </th>
+								<th> ICE Type</th>
+								<th> Status </th>
+								<th> Username </th>
+								<th> Hostname </th>
+								<th>  </th>
+								<th>  </th>
+							</tr>
+							<tr ng-repeat="entry in provision.icelist" class='provisionTokens'>
+								<td> {{entry.icename}} </td>
+								<td> {{entry.icetype}} </td>
+								<td> {{entry.status}} </td>
+								<td> {{entry.username}} </td>
+								<td> {{entry.hostname}} </td>
+								<td ng-if="entry.status == 'provisioned'"><button class="btn" data-index="{{$index}}" ng-click="provision.reregister($event)" style="margin-left:0%"> Reprovision </button></td>
+								<td ng-if="entry.status == 'registered' || entry.status == 'deregistered'"><button class="btn" data-index="{{$index}}" ng-click="provision.reregister($event)" style="margin-left:0%"> Reregister </button></td>
+								<td ng-if="entry.status == 'deregistered'"></td>
+								<td ng-if="entry.status != 'deregistered'"><button class="btn" data-id="{{entry._id}}" data-index="{{$index}}" ng-click="provision.deregister($event)" style="margin-left:0%"> Deregister </button></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+			<!-- ICE Provision List -->
+		</div>
+		<!-- ICE Provision -->
+
 		<!-- Create Project -->
 		<div class="containerWrap" ng-if="tab == 'tabProject'">
 			<!--Task Name-->
@@ -789,7 +954,7 @@
 			<!-- Button -->
 			<div class="adminActionBtn">
 				<button class="btn btn-md pull-right adminBtn" ng-click="mailConf.showTestMail()" ng-disabled="mailConf.provider==''" title="Test Configuration">Test</button>
-				<button class="btn btn-md pull-right adminBtn" ng-click="mailConf.manage('Update',$event)" style="margin-right:10px" title="Update Configuration">Update</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="mailConf.manage('Update',$event)" style="margin-right:10px" ng-disabled="mailConf.provider==''" title="Update Configuration">Update</button>
 				<button class="btn btn-md pull-right adminBtn" ng-click="mailConf.toggle($event)" style="margin-right:10px" ng-disabled="mailConf.loaded==''" title="{{mailConf.toggleStatus}} Configuration">{{mailConf.toggleStatus}}</button>
 			</div>
 			<!-- Button -->
@@ -841,7 +1006,7 @@
 				</div></div>
 				<div class='adminControl'><div>
 					<span class="leftControl" title="Sender Account Email">Sender Address</span>
-					<input type="email" autocomplete="off" id="senderEmail" name="senderEmail" ng-model="mailConf.sender.email" maxlength="100" class="form-control form-control-custom create" placeholder="avoassure.alerts@slkgroup.com"/>
+					<input type="email" autocomplete="off" id="senderEmail" name="senderEmail" ng-model="mailConf.sender.email" maxlength="100" class="form-control form-control-custom create" placeholder="avoassure-alerts@avoautomation.com"/>
 				</div></div>
 				<div class='adminControl' style="margin-bottom:2%"><div>
 					<span class="leftControl" title="Secure Connection (TLS)">Secure Connection</span>
@@ -869,6 +1034,10 @@
 						<span>No</span>
 					</label>
 				</div></div>
+				<div class='adminControl'><div>
+					<span class="leftControl" title="Avo Assure Application URL">Avo Assure URL</span>
+					<input type="text" autocomplete="off" id="appURL" name="appURL" ng-model="mailConf.appurl" class="form-control form-control-custom create" placeholder="Avo Assure Application URL"/>
+				</div></div>
 			</div>
 			<div class="col-xs-9 form-group">
 				<div class="sessionHeading collapsed" data-toggle="collapse" data-target="#advancedConfig" aria-expanded="true">
@@ -876,27 +1045,45 @@
 				</div>
 				<div id="advancedConfig" aria-expanded="true" class="collapse in" >
 					<div class='adminControl'><div>
-						<span class="leftControl" title="Issuer URL">Connection Timeout</span>
+						<span class="leftControl" title="Connection Timeout">Connection Timeout</span>
 						<input type="number" autocomplete="off" id="connTime" name="connTime" ng-model="mailConf.timeouts.connection" maxlength="100" class="form-control form-control-custom create" placeholder="Connection Timeout (in milliseconds)"/>
 					</div></div>
 					<div class='adminControl'><div>
-						<span class="leftControl" title="Issuer URL">Greeting Timeout</span>
+						<span class="leftControl" title="Greeting Timeout">Greeting Timeout</span>
 						<input type="number" autocomplete="off" id="greetTIme" name="greetTIme" ng-model="mailConf.timeouts.greeting" maxlength="100" class="form-control form-control-custom create" placeholder="Greeting Timeout (in milliseconds)"/>
 					</div></div>
 					<div class='adminControl'><div>
-						<span class="leftControl" title="Issuer URL">Socket Timeout</span>
+						<span class="leftControl" title="Socket Timeout">Socket Timeout</span>
 						<input type="number" autocomplete="off" id="sockTime" name="sockTime" ng-model="mailConf.timeouts.socket" maxlength="100" class="form-control form-control-custom create" placeholder="Socket Timeout (in milliseconds)"/>
 					</div></div>
 					<div class='adminControl'><div>
 						<input type="checkbox" ng-model="mailConf.pool.enable" value="true" name="connectionPool" style="width: 4%;"><span style="width: 96%;">Use Connection Pool</span>
 					</div></div>
 					<div class='adminControl'><div>
-						<span class="leftControl" title="Issuer URL">Max Connections</span>
+						<span class="leftControl" title="Max Connections">Max Connections</span>
 						<input type="number" autocomplete="off" id="maxConn" name="maxConn" ng-model="mailConf.pool.maxConnections" ng-disabled="!mailConf.pool.enable" class="form-control form-control-custom create" placeholder="Max Number of Connections Allowed in Pool"/>
 					</div></div>
 					<div class='adminControl'><div>
-						<span class="leftControl" title="Issuer URL">Max Messages</span>
+						<span class="leftControl" title="Max Messages">Max Messages</span>
 						<input type="number" autocomplete="off" id="maxMsg" name="maxMsg" ng-model="mailConf.pool.maxMessages" ng-disabled="!mailConf.pool.enable" class="form-control form-control-custom create" placeholder="Max Number of Messages Sent via Pool"/>
+					</div></div>
+					<div class='adminControl'><div>
+						<input type="checkbox" ng-model="mailConf.proxy.enable" value="true" name="connectionProxy" style="width: 4%;"><span style="width: 96%;">Use Proxy</span>
+					</div></div>
+					<div class='adminControl'><div>
+						<span class="leftControl" title="Proxy Server URL">Proxy Server URL</span>
+						<input type="text" autocomplete="off" id="proxyURL" name="proxyURL" ng-model="mailConf.proxy.url" ng-disabled="!mailConf.proxy.enable" class="form-control form-control-custom create" placeholder="Proxy Server URL (Eg: https://localhost:8080)"/>
+					</div></div>
+					<div class='adminControl'><div>
+						<input type="checkbox" ng-model="mailConf.proxy.auth" ng-disabled="!mailConf.proxy.enable" value="true" name="proxyAuth" style="width: 4%;"><span style="width: 96%;">Proxy requires credentials</span>
+					</div></div>
+					<div class='adminControl'><div>
+						<span class="leftControl" title="Proxy Server User">Proxy User</span>
+						<input type="text" autocomplete="off" id="proxyUser" name="proxyUser" ng-model="mailConf.proxy.user" ng-disabled="!mailConf.proxy.auth || !mailConf.proxy.enable" class="form-control form-control-custom create" placeholder="Username for Proxy Server"/>
+					</div></div>
+					<div class='adminControl'><div>
+						<span class="leftControl" title="Proxy Server Password">Proxy Password</span>
+						<input type="text" autocomplete="off" id="proxyPass" name="proxyPass" ng-model="mailConf.proxy.pass" ng-disabled="!mailConf.proxy.auth || !mailConf.proxy.enable" class="form-control form-control-custom create" placeholder="Password for Proxy Server"/>
 					</div></div>
 				</div>
 			</div>
@@ -990,171 +1177,6 @@
 			</div>
 		</div>
 		<!-- Preferences -->
-		<!-- Assign Tokens -->
-		<div class="containerWrap" ng-if="tab == 'tabToken'">
-			<!--Task Name-->
-			<div id="page-taskName">
-				<span>Token Management</span>
-			</div>
-			<div class="adminActionBtn">
-				<button title="Generate New Token" class="btn btn-md pull-right adminBtn" ng-click="tokens.generateCIusertokens($event)" style="margin-right:10px">Generate</button>
-				<button title="Refresh" class="btn btn-md pull-right adminBtn" ng-click="tokens.click($event)" style="margin-right:10px">Refresh</button>
-			</div>
-			<div class="col-xs-9">
-				<div class='adminControl' style="margin-bottom:2%"><div>
-					<span class="leftControl" title="ICE Type">ICE Type</span>
-					<label class="adminFormRadio">
-						<input type="radio" ng-model="tokens.op" value="normal" name="provisionType" ng-change="tokens.repopulateEntries($event)"/>
-						<span>Normal</span>
-					</label>
-					<label class="adminFormRadio">
-						<input type="radio" ng-model="tokens.op" value="ci-cd" name="provisionType" ng-change="tokens.repopulateEntries($event)"/>
-						<span>CI/CD</span>
-					</label>
-				</div></div>
-				<div class='userForm adminControl'>
-					<div ng-if="tokens.op=='normal'">
-						<span class="leftControl" title="User">Username</span><select class='adminSelect form-control' ng-model="tokens.targetid" id="selAssignUser1" ng-init="tokens.targetid=' '" ng-options="entry[1] as entry[0] for entry in tokens.allUsers" ng-change="tokens.loadData($event, true)"></select>
-					</div>
-					<div ng-if="tokens.op=='ci-cd'">
-						<span class="leftControl" title="ICE">ICE Name</span><select class='adminSelect form-control' ng-model="tokens.targetid" id="selAssignUser1" ng-init="tokens.targetid=' '" ng-options="entry._id as entry.icename for entry in tokens.allICE" ng-change="tokens.loadData($event, true)"></select>
-					</div>
-				</div>
-				<div class='adminControl'><div>
-					<span class="leftControl" title="Token Name">Token Name</span>
-					<input type="text" autocomplete="off" id="tokenName" name="tokenName" ng-change="tokens.verifyName($event)" ng-model="tokens.name" maxlength="100" class="form-control form-control-custom create validationKeydown preventSpecialChar" placeholder="Token Name"/>
-				</div></div>
-				<div class='adminControl'><div>
-					<span class="leftControl" title="Token Expiry">Token Expiry</span>
-					<div class="tokenSuite">
-						<span class="datePicContainer" style="margin-right:10px">
-							<input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly="">
-							<img class="datepickerIconToken" src="../imgs/ic-datepicker.png">
-						</span>
-						<span class="timePicContainer">
-							<input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/>
-							<img class="timepickerIconToken" src="../imgs/ic-timepicker.png" />
-						</span>
-					</div>
-				</div></div>
-				<div class='adminControl'><div>
-					<span class="leftControl" title="Generated Token">Token</span>
-					<input type="text" autocomplete="off" id="ciToken" name="ciToken" ng-model="tokens.token" class="create" placeholder="Click on Generate to generate token" readonly="readonly"/>
-				</div></div>
-			</div>
-			<div class="col-xs-9 form-group adminForm" style="padding-top:0">
-				<div class="containerWrap">
-					<div class="sessionHeading" data-toggle="collapse" data-target="#activeUsersToken-x">
-						<h4>CI Tokens</h4>
-					</div>
-					<div id="activeUsersToken" class="wrap scrollbar-inner" style="height:auto;max-height:450px">
-						<table class = "table table-hover sessionTable" id="tokensDetail">
-							<tr>
-								<th> Token Name </th>
-								<th> Status </th>
-								<th> Expiry </th>
-								<th> Action </th>
-							</tr>
-							<tr ng-repeat="token in tokens.allTokens">
-								<td> {{token.name}} </td>
-								<td> {{token.deactivated}} </td>
-								<td> {{token.expireson }} </td>
-								<td ng-if="token.deactivated == 'active'"><button class="btn" data-id="{{$index}}" ng-click="tokens.deactivate($event)" style="margin-left:-21%"> Deactivate </button></td>
-								<td ng-if="token.deactivated != 'active'"></td>
-							</tr>
-						</table>
-					</div>
-				</div>
-			</div>
-		</div>
-		<!-- Assign Tokens -->
-
-		<!-- ICE Provision -->
-		<div class="containerWrap" ng-if="tab == 'tabProvision'">
-			<!--Task Name-->
-			<div id="page-taskName">
-				<span>ICE Provision</span>
-			</div>
-			<!--Task Name-->
-			<!-- Button -->
-			<div class="adminActionBtn">
-				<button title="Provision" class="btn btn-md pull-right adminBtn" ng-click="provision.provisionsIce($event)" style="margin-right:10px" title="Provision">Provision</button>
-				<button title="Refresh" class="btn btn-md pull-right adminBtn" ng-click="provision.click($event)" style="margin-right:10px">Refresh</button>
-			</div>
-			<!-- Button -->
-			<!-- ICE Provision Form -->
-			<div class="col-xs-9">
-				<div class='adminControl' style="margin-bottom:2%"><div>
-					<span class="leftControl" title="ICE Type">ICE Type</span>
-					<label class="adminFormRadio">
-						<input type="radio" ng-model="provision.op" value="normal" name="provisionType" ng-change='provision.selectProvisionType($event)'/>
-						<span>Normal</span>
-					</label>
-					<label class="adminFormRadio">
-						<input type="radio" ng-model="provision.op" value="ci-cd" name="provisionType" ng-change='provision.selectProvisionType($event)'/>
-						<span>CI/CD</span>
-					</label>
-				</div></div>
-				<div class='adminControl'><div>
-					<span class="leftControl" title="ICE Name">ICE Name</span>
-					<input type="text" autocomplete="off" id="icename" name="icename" ng-change="provision.verifyName($event)" ng-model="provision.icename" maxlength="100" class="form-control form-control-custom create validationKeydown preventSpecialChar" placeholder="ICE Name"/>
-				</div></div>
-				<div class='userForm adminControl'><div>
-					<span class="leftControl" title="User">User</span><select class='adminSelect form-control' ng-disabled="provision.op!='normal'" ng-model="provision.userid" id="selAssignUser2" ng-init="provision.userid=' '" ng-options="entry[1] as entry[0] for entry in provision.users"></select>
-				</div></div>
-				<div class='adminControl' id="icetokenarea"><div>
-					<span class="leftControl" title="Token">Token</span>
-					<textarea autocomplete="off" id="iceToken" ng-model="provision.token" name="iceToken" readonly=""></textarea>
-					<!-- <input type="text" autocomplete="off" id="iceToken" name="iceToken" ng-model="provision.token" class="form-control form-control-custom create" placeholder="Click on Provision/Reregister to generate token" readonly="readonly"/> -->
-					<label style="float:right">
-						<span class="fa fa-files-o" style="width:auto;margin-right:10px" data-original-title="Click To Copy" ng-click="copyToken($event)"></span>
-						<span class="fa fa-download" style="width:auto;margin-right:10px" data-original-title="Download Token" ng-click="downloadToken($event)"></span>
-					</label>
-				</div></div>
-			</div>
-			<!-- ICE Provision Form -->
-			<!-- ICE Provision List -->
-			<div class="col-xs-9 form-group adminForm" style="padding-top:0">
-				<div class="containerWrap">
-					<div class="sessionHeading" data-toggle="collapse" data-target="#activeUsersToken-x">
-						<h4>ICE Provisions</h4>
-						<div style="float:right;margin-right:30px">
-							<span class="searchIcon" style="border-radius: 0px 7px 7px 0px;left:0;top:5px;float:right">
-								<img src="imgs/ic-search-icon.png" style="margin-top: -1px; margin-left: 1px">
-							</span>
-							<input type="text" id="searchTasks" style="left:0;top:5px;float:right;position:relative;margin-left:0" class="searchInput">
-						</div>
-					</div>
-					<div id="activeUsersToken" class="wrap scrollbar-inner" style="height:auto;max-height:450px">
-						<table class = "table table-hover sessionTable" id="tokensDetail">
-							<tr>
-								<th> ICE Name </th>
-								<th> ICE Type</th>
-								<th> Status </th>
-								<th> Username </th>
-								<th> Hostname </th>
-								<th>  </th>
-								<th>  </th>
-							</tr>
-							<tr ng-repeat="entry in provision.icelist" class='provisionTokens'>
-								<td> {{entry.icename}} </td>
-								<td> {{entry.icetype}} </td>
-								<td> {{entry.status}} </td>
-								<td> {{entry.username}} </td>
-								<td> {{entry.hostname}} </td>
-								<td ng-if="entry.status == 'provisioned'"><button class="btn" data-index="{{$index}}" ng-click="provision.reregister($event)" style="margin-left:0%"> Reprovision </button></td>
-								<td ng-if="entry.status == 'registered' || entry.status == 'deregistered'"><button class="btn" data-index="{{$index}}" ng-click="provision.reregister($event)" style="margin-left:0%"> Reregister </button></td>
-								<td ng-if="entry.status == 'deregistered'"></td>
-								<td ng-if="entry.status != 'deregistered'"><button class="btn" data-id="{{entry._id}}" data-index="{{$index}}" ng-click="provision.deregister($event)" style="margin-left:0%"> Deregister </button></td>
-							</tr>
-						</table>
-					</div>
-				</div>
-			</div>
-			<!-- ICE Provision List -->
-		</div>
-		<!-- ICE Provision -->
-
 	</div>
 	<!--Middle Panel-->
 
