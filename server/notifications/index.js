@@ -36,9 +36,10 @@ module.exports.test = async (channel, data, conf) => {
 		return {error: { msg: "Notification event "+event+" not found", code: "UNKNOWN_EVENT"}};
 	}
 	if (channel == "email") {
+		const mailer = new email(conf);
+		data.url = mailer.opts.appurl;
 		const { error, msg, receivers } = await generator.getPayload(channel, "test", data);
 		if (error) return error;
-		const mailer = new email(conf);
 		const res = await mailer.send(msg, receivers);
 		mailer.destroy();
 		return res.error && res || res[0];
@@ -65,6 +66,7 @@ module.exports.notify = async (event, data, channel) => {
 	targetChannels.forEach(async ch => {
 		// Consider preferences i.e. Only send over channels which have enabled notifications event.
 		if (!preferences[event][ch]) return false;
+		data.url = channels[ch].opts.appurl;
 		const { error, msg, receivers } = await generator.getPayload(ch, event, data);
 		// Check recipient level preferences here.
 		if (error) {

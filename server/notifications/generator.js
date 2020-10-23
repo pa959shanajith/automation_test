@@ -1,6 +1,6 @@
 const utils = require('../lib/utils');
 
-const companyLogo = "/imgs/ftr-avo-logo.png";
+const companyLogo = "/imgs/avo-logo.png";
 const productLogo = "/imgs/logo.png";
 const generateEmailPayload = {};
 

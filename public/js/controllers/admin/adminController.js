@@ -3471,22 +3471,16 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				$scope.mailConf.sender = data.sender;
 				$scope.mailConf.appurl = data.appurl;
 				$scope.mailConf.timeouts = data.timeouts || {};
-				$scope.mailConf.pool.enable = data.pool != false;
-				$scope.mailConf.pool.maxConnections = (data.pool)? ((data.pool.maxconnections) || ""):"";
-				$scope.mailConf.pool.maxMessages = (data.pool)? ((data.pool.maxmessages) || ""):"";
-				if (data.proxy) {
-					$scope.mailConf.proxy.enable = true;
-					$scope.mailConf.proxy.url = data.proxy.url;
-					$scope.mailConf.proxy.auth = data.proxy.user && data.proxy.pass && true;
-					$scope.mailConf.proxy.user = data.proxy.user || "";
-					$scope.mailConf.proxy.pass = data.proxy.pass || "";
-				} else $scope.mailConf.proxy = {
-					enable: false,
-					url: "",
-					auth: false,
-					user: "",
-					pass: ""
-				};
+				if (!data.pool) data.pool = {};
+				$scope.mailConf.pool.enable = data.pool.enable || false;
+				$scope.mailConf.pool.maxConnections = data.pool.maxconnections || "";
+				$scope.mailConf.pool.maxMessages = data.pool.maxmessages || "";
+				if (!data.proxy) data.proxy = {};
+				$scope.mailConf.proxy.enable = data.proxy.enable || false;
+				$scope.mailConf.proxy.url = data.proxy.url || "";
+				$scope.mailConf.proxy.auth = data.proxy.auth || false;
+				$scope.mailConf.proxy.user = data.proxy.user || "";
+				$scope.mailConf.proxy.pass = data.proxy.pass || "";
 			}
 		}, function (error) {
 			unblockUI();
@@ -3507,8 +3501,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			enabletls: this.secure,
 			insecuretls: this.insecuretls,
 			appurl: this.appurl,
-			pool: this.pool.enable && this.pool || false,
-			proxy: this.proxy.enable && this.proxy || false,
+			pool: this.pool,
+			proxy: this.proxy,
 			timeouts: this.timeouts
 		};
 	};

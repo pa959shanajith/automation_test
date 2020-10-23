@@ -59,20 +59,18 @@ class SMTP {
 		// conf.debug = true;
 
 		/** Pool Configuration*/
-		if (opts.pool) {
+		if (opts.pool && opts.pool.enable) {
 			conf.pool = true;
 			/** For Default values we do not need maxConnections, maxMessages,
 			 * in such a case, pool will be true, otherwise an object with values
 			 */
-			if (typeof (opts.pool) === 'object') {
-				if (opts.pool.maxconnections) {
-					// By default 5 max connections are used
-					conf.maxConnections = +opts.pool.maxconnections;
-				}
-				if (opts.pool.maxmessages) {
-					// By default max 100 messages can be sent using a single connection
-					conf.maxMessages = +opts.pool.maxconnections;
-				}
+			if (opts.pool.maxconnections) {
+				// By default 5 max connections are used
+				conf.maxConnections = +opts.pool.maxconnections;
+			}
+			if (opts.pool.maxmessages) {
+				// By default max 100 messages can be sent using a single connection
+				conf.maxMessages = +opts.pool.maxmessages;
 			}
 		}
 
@@ -107,8 +105,8 @@ class SMTP {
 		}
 
 		/** Proxy Configuration */
-		if (opts.proxy) {
-			if (opts.proxy.user && opts.proxy.pass) {
+		if (opts.proxy && opts.proxy.enable) {
+			if (opts.proxy.auth) {
 				const proxy = new URL(opts.proxy.url);
 				proxy.username = opts.proxy.user;
 				proxy.password = opts.proxy.pass;

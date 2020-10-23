@@ -1706,9 +1706,10 @@ exports.provisionICE = async (req, res) => {
 
 const getEmailConf = async (conf, fnName, inputs, flag) => {
 	if (!flag) flag = ['1','0','0','0','0','0','0','0','0','0','0','0','0'];
+	const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
 	inputs.host = (conf.host || "").trim();
 	inputs.port = conf.port || "";
-	if (!inputs.host || (!validator.isIP(inputs.host) && !validator.isFQDN(inputs.host))) { // Allow Anything as of now
+	if (!inputs.host && !validator.isIP(inputs.host) && !validator.isFQDN(inputs.host)) { // Allow Anything as of now
 		logger.error("Error occurred in admin/"+fnName+": Invalid Hostname or IP.");
 		flag[5]='1';
 	}
@@ -1734,13 +1735,11 @@ const getEmailConf = async (conf, fnName, inputs, flag) => {
 		flag[8]='1';
 	}
 	const pool = conf.pool;
-	if (!pool) inputs.pool = false;
-	else if (typeof(pool) == "boolean") inputs.pool = pool;
+	if (!pool) inputs.pool = { enable: false };
 	else {
-		inputs.pool = {};
+		inputs.pool = { enable: pool.enable || false };
 		if (validator.isInt((pool.maxConnections||"").toString())) inputs.pool.maxconnections = pool.maxConnections;
 		if (validator.isInt((pool.maxMessages||"").toString())) inputs.pool.maxmessages = pool.maxMessages;
-		if (Object.keys(inputs.pool).length == 0) inputs.pool = true;
 	}
 	const auth = conf.auth;
 	if (!auth) inputs.auth = false;
@@ -1765,23 +1764,25 @@ const getEmailConf = async (conf, fnName, inputs, flag) => {
 		if (Object.keys(tOut).length != 0) inputs.timeouts = tOut;
 	}
 	inputs.appurl = conf.appurl;
-	if (!validator.isURL(inputs.appurl)) {
+	if (!regExURL.test(inputs.appurl) && !validator.isURL(inputs.appurl)) {
 		logger.error("Error occurred in admin/"+fnName+": Invalid Avo Assure Application URL.");
 		flag[10]='1';
 	}
 	const proxy = conf.proxy;
-	if (!proxy) inputs.proxy = false;
+	if (!proxy) inputs.proxy = { enable: false };
 	else {
 		inputs.proxy = {
-			url: conf.proxy.url
+			enable: proxy.enable || false,
+			url: proxy.url || "",
+			auth: proxy.auth || false
 		};
-		if (!validator.isURL(inputs.proxy.url)) {
+		if (!regExURL.test(inputs.proxy.url) && !validator.isURL(inputs.proxy.url)) {
 			logger.error("Error occurred in admin/"+fnName+": Invalid Proxy URL.");
 			flag[11]='1';
 		}
-		if (conf.proxy.auth) {
-			inputs.proxy.user = conf.proxy.user || "";
-			inputs.proxy.pass = conf.proxy.pass || "";
+		if (inputs.proxy.auth) {
+			inputs.proxy.user = proxy.user || "";
+			inputs.proxy.pass = proxy.pass || "";
 			if (inputs.proxy.user.length == 0 && inputs.proxy.pass.length == 0) {
 				logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Credentials.");
 				flag[12]='3';
@@ -1817,7 +1818,6 @@ exports.testNotificationChannels = async (req, res) => {
 				const testResp = await notifications.test(channel, { recipient }, conf);
 				if (testResp.error) flag = "fail";
 				else flag = testResp.status;
-				// else flag = "success";
 			}
 		} else flag = "invalidchannel";
 		return res.send(flag);
