@@ -185,16 +185,19 @@ const routeUtil = {
 
 module.exports = () => {
 	passport.serializeUser((user, done) => done(null, user));
-	passport.protect = (req, res, next) => {
-		const sessFlag = (req.isAuthenticated && req.isAuthenticated())
-		const cookies = req.signedCookies;
+	passport.deserializeUser((user, done) => done(null, user));
+	passport.verifySession = req => {
+		const sessFlag = req.isAuthenticated && req.isAuthenticated()
+		const cookies = req.signedCookies || {};
 		const cookieFlag = (cookies["connect.sid"]!==undefined) && (cookies["maintain.sid"]!==undefined);
-		if (sessFlag && cookieFlag) return next();
-		var negotiator = new Negotiator(req);
-		if (negotiator.mediaType() === 'text/html') return res.redirect(options.route.login);
+		if (sessFlag && cookieFlag) return true;
+		return false;
+	};
+	passport.protect = (req, res, next) => {
+		if (passport.verifySession(req)) return next();
+		if (new Negotiator(req).mediaType() === 'text/html') return res.redirect(options.route.login);
 		else return res.send("Invalid Session");
 	};
-	passport.deserializeUser((user, done) => done(null, user));
 	authRouter.use(passport.initialize({ userProperty: "user" }));
 	authRouter.use(passport.session());
 	// Initialize inhouse & ldap login method

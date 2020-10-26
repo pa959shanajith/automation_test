@@ -186,7 +186,6 @@ exports.renderReport_ICE = function(req, res) {
                 var html = templateweb(data);
                 res.send(html);
             }
-
         } else {
             logger.error("Invalid Session");
             res.send("Invalid Session");
@@ -195,6 +194,21 @@ exports.renderReport_ICE = function(req, res) {
         logger.error("Exception occurred in renderReport_ICE when trying to render report: %s", exception);
         res.send("fail");
     }
+};
+
+exports.viewReport = async (req, res, next) => {
+    const url = req.url.split('/');
+    const reportId = url[1] || "";
+    const type = (url[2] || 'html').toUpperCase();
+    if (!req._passport.instance.verifySession(req))
+        return res.status(401).send("Hi! Cannot Load Report #"+reportId+" due to invalid session");
+    if (type == "HTML") {
+    } else if (type == "JSON") {
+    } else if (type == "PDF") {
+    } else {
+        return res.status(400).send("Hi! Cannot Load Report #"+reportId+" with type: "+type);
+    }
+    return res.send("Hi! Loading "+type+" Report #"+reportId);
 };
 
 //To get all the projects and their releases & cycles

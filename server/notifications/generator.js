@@ -1,3 +1,4 @@
+const validator = require('validator');
 const utils = require('../lib/utils');
 
 const companyLogo = "/imgs/avo-logo.png";
@@ -12,7 +13,7 @@ module.exports.getPayload = async (channel, event, data) => {
 };
 
 generateEmailPayload.test = async data => {
-	let msg = {
+	const msg = {
 		'subject': 'Avo Assure: Test Email',
 		'template': 'test',
 		'context': {
@@ -28,40 +29,70 @@ generateEmailPayload.test = async data => {
 };
 
 generateEmailPayload.report = async data => {
-	// reportid
-	// scenarioname
-	// userid
-	// url
-	// viewtype
-	// status
-	const recv = data.modifiedby;
-	let msg = {
+	let recv = "";
+	const username = data.user && data.user.username || '';
+	if (username == "ci_cd") { // Todo?
+	} else if (username) {
+		const userProfile = await utils.fetchData({ username }, "login/loadUser", "generateEmailPayload_report");
+		if (userProfile) recv = userProfile.email || "";
+	}
+	if (!validator.isEmail(recv)) return { error: { msg: "User does not have a valid email address", code: "INVALID_RECIPIENT"} }
+
+	data.reportData.forEach(r => {
+		if (r.reportid.length > 0) r.url = data.url + '/viewreport/' + r.reportid;
+		if (r.status.toLowerCase() == "pass") r.pass = true;
+		else if (r.status.toLowerCase() == "fail") r.fail = true;
+		else if (r.status.toLowerCase() == "terminate") r.terminate = true;
+		else if (r.status.toLowerCase() == "incomplete") r.incomplete = true;
+		else if (r.status.toLowerCase() == "skipped") r.skipped = true;
+	});
+
+	let fStatus = 'fail';
+	if (data.suiteStatus == 'pass') fStatus = 'pass';
+	else if (data.status !== undefined) fStatus = data.status.toLowerCase();
+	else {
+		const userTerm = data.reportData.map(r => r.terminated);
+		if (userTerm.includes("user")) fStatus = "userterminate";
+		else if (userTerm.includes("program")) fStatus = "terminate";
+	}
+	let subj = msgTitle = 'Execution of ' + data.testsuitename;
+	if (fStatus === 'pass') {
+		subj = 'Execution of ' + data.testsuitename + ' completed';
+		msgTitle = subj + ' successfully.';
+	} else if (fStatus === 'userterminate') {
+		subj = 'Execution of ' + data.testsuitename + ' terminated';
+		msgTitle = 'Execution of ' + data.testsuitename + ' failed. Reason: Manually terminated by user.';
+	} else if (fStatus === 'terminate') {
+		subj = 'Execution of ' + data.testsuitename + ' failed';
+		msgTitle = subj + '. Reason: Terminated by program.';
+	} else if (fStatus === 'skipped') {
+		subj = 'Execution of ' + data.testsuitename + ' skipped';
+		msgTitle = 'Execution of ' + data.testsuitename + ' is skipped.';
+	} else {
+		subj = 'Execution of ' + data.testsuitename + ' failed';
+		msgTitle = subj + '.';
+	}
+
+	const msg = {
+		'subject': subj,
 		'template': 'report',
 		'context': {
 			'companyLogo': data.url + companyLogo,
 			'productLogo': data.url + productLogo,
-			'reportURL': data.url + '/viewreport/' + data.reportView + '/' + data.reportId,
-			'processName': data.flowName
+			'status': fStatus[0].toUpperCase() + fStatus.substr(1).toLowerCase(),
+			'msgTitle': msgTitle,
+			'suiteName': data.testsuitename,
+			'projectName': data.projectname,
+			'releaseName': data.releaseid,
+			'cycleName': data.cyclename,
+			'reports': data.reportData
 		}
 	};
 
-	if (data.overAllStatus === 'Completed') {
-		msg.context.completed = true;
-		msg.subject = 'Report for ' + data.flowName + ' is now available';
-	} else if (data.overAllStatus === 'Terminated-System') {
-		msg.context.terminatedSystem = true;
-		msg.subject = 'Execution for ' + data.flowName + ' failed';
-	} else if (data.overAllStatus === 'Skipped') {
-		msg.context.skipped = true;
-		msg.subject = 'Execution for ' + data.flowName + ' skipped';
-	} else {
-		msg.context.terminatedManual = true;
-		msg.subject = data.flowName + ' terminated manually';
-	}
 	return {
 		error: null,
 		msg,
-		receivers: recv
+		receivers: [recv]
 	};
 };
 

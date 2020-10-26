@@ -70,10 +70,15 @@ module.exports.notify = async (event, data, channel) => {
 		const { error, msg, receivers } = await generator.getPayload(ch, event, data);
 		// Check recipient level preferences here.
 		if (error) {
-			logger.error("Unable to send notification over "+channel+", Errcode"+error.code)
+			logger.error("Unable to send notification over "+channel+", Error Code: "+error.code)
 			return error;
 		}
-		channels[ch].send(msg, receivers);
+		try {
+			channels[ch].send(msg, receivers);
+		} catch (e) {
+			logger.error("Error occured while sending "+channel+" notification, Error: "+e);
+			return {error: { msg: "Error occured while sending "+channel+" notification", code: "SEND_ERROR"}};
+		}
 	});
 };
 

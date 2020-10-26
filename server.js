@@ -507,6 +507,7 @@ if (cluster.isMaster) {
 		app.post('/connectJira_ICE', report.connectJira_ICE);
 		app.post('/getReportsData_ICE', report.getReportsData_ICE);
 		app.post('/getReport_API', report.getReport_API);
+		app.use('/viewReport', report.viewReport);
 		//Plugin Routes
 		app.post('/getProjectIDs', plugin.getProjectIDs);
 		app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
