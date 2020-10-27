@@ -330,13 +330,24 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 	});
 	
 	//Select testset
-	$(document).on('click','.testcaselink', function(){
-		$('.testcaselink').removeClass("selectedToMap");
-		$('.testcaselink').find(".qcSyncronise, .qcUndoSyncronise").hide();
-		$('.testcaselink').prop("style","background-color:none;border-radius:0px;");
+	$(document).on('click','.testcaselink', function(e){
+		// $('.testcaselink').removeClass("selectedToMap");
+		// $('.testcaselink').find(".qcSyncronise, .qcUndoSyncronise").hide();
+		// $('.testcaselink').prop("style","background-color:none;border-radius:0px;");
 		$(this).addClass("selectedToMap");
-		$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
-		$(this).find(".qcSyncronise, .qcUndoSyncronise").show();
+		if (e.ctrlKey) {
+			// $(this).addClass("selectedToMap");
+			$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
+			$(this).find(".qcSyncronise, .qcUndoSyncronise").show();
+		}
+		else {
+			// $(this).addClass("selectedToMap");
+			// $('.testcaselink').removeClass("selectedToMap");
+			$('.testcaselink').find(".qcSyncronise, .qcUndoSyncronise").hide();
+			$('.testcaselink').prop("style","background-color:none;border-radius:0px;");
+			$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
+			$(this).find(".qcSyncronise, .qcUndoSyncronise").show();
+		}
 	});
 	$(document).on('click','.testScenariolink', function(){
 		
@@ -369,21 +380,26 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 	$(document).on('click', ".qcSyncronise", function(event){
 		var getDomainName = $(".qcSelectDomain option:selected").val();
 		var getProjectName = $(".qcSelectProject option:selected").val();
-		var qcTestcaseName = $(this).siblings("label").children()[1].innerText;
+		var qcTestcaseName_list = []
+		var abc=$(".selectedToMap").siblings("label").prevObject
+		for(var i=0;i<abc.length-1;i++){
+			var cur_obj =  abc[i].innerText
+			qcTestcaseName_list.push(cur_obj)
+		}
 		var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
 		var qcFolderPath = $(this).parent("li").parent("ul").prev("li").parent("ul").prev("li").data("folderpath");
 		var AvoAssureScenarioId = $(".qcAvoAssureTreeContainer").find(".selectedToMap").data("scenarioid");
 		
 		if(!getDomainName)	openModelPopup("Save Mapped Testcase", "Please select domain");
 		else if(!getProjectName)	openModelPopup("Save Mapped Testcase", "Please select project");
-		else if(!qcTestcaseName)	openModelPopup("Save Mapped Testcase", "Please select Testcase");
+		else if(!qcTestcaseName_list)	openModelPopup("Save Mapped Testcase", "Please select Testcase");
 		else if(!qcTestsetName)	openModelPopup("Save Mapped Testcase", "Please select Testset");
 		else if(!AvoAssureScenarioId)	openModelPopup("Save Mapped Testcase", "Please select scenario");
 		else{
 			mappedList.push({
 				'domain': getDomainName,
 				'project': getProjectName,			
-				'testcase': qcTestcaseName,
+				'testcase': qcTestcaseName_list,
 				'testset': qcTestsetName,
 				'folderpath': qcFolderPath,
 				'scenarioId': AvoAssureScenarioId,
