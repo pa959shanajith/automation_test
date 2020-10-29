@@ -1782,17 +1782,19 @@ const getEmailConf = async (conf, fnName, inputs, flag) => {
 		}
 		inputs.proxy.user = proxy.user || "";
 		inputs.proxy.pass = proxy.pass || "";
-		if (inputs.proxy.user.length == 0 && inputs.proxy.pass.length == 0) {
-			logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Credentials.");
-			flag[12]='3';
-		}
-		else if (inputs.proxy.user.length == 0) {
-			logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Username.");
-			flag[12]='1';
-		}
-		else if (inputs.proxy.pass.length == 0) {
-			logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Password.");
-			flag[12]='2';
+		if (inputs.proxy.auth) {
+			if (inputs.proxy.user.length == 0 && inputs.proxy.pass.length == 0) {
+				logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Credentials.");
+				flag[12]='3';
+			}
+			else if (inputs.proxy.user.length == 0) {
+				logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Username.");
+				flag[12]='1';
+			}
+			else if (inputs.proxy.pass.length == 0) {
+				logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Password.");
+				flag[12]='2';
+			}
 		}
 	}
 };
