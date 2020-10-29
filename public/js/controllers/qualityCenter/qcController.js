@@ -359,12 +359,23 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		
 	});
 
-	//Undo Mapping
+	// Undo Mapping
 	$(document).on('click', ".qcUndoSyncronise", function(){
-		var qcTestcaseName = $(this).siblings("label").text();
-		var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
-		for(var i=0;i<mappedList.length;i++){
-			if(qcTestcaseName == mappedList[i].testcase && qcTestsetName == mappedList[i].testset){
+	// var qcTestcaseName = $(this).siblings("label").text();
+	var qcTcaseName_list = $(".selectedToMap")
+	var abc = []
+	for(var i=0;i<qcTcaseName_list.length-1;i++){
+	 	abc.push(qcTcaseName_list[i].innerText.trim())
+	}
+	var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
+	for(var i=0;i<mappedList.length;i++){
+		// var mapped_testset = mappedList[i].testset
+		// for (var j=0;j<qcTcaseName_list.length-1;i++){
+		// 	for (var k=0;k<=mappedtc_list.length;k++){ 
+		var mappedtc_list = mappedList[i].testcase
+		if (abc.length==mappedtc_list.length){
+			// if(qcTcaseName_list[j].innerText.trim() == mappedtc_list[k] && qcTestsetName == mapped_testset){
+			if(qcTestsetName == mappedList[i].testset){
 				delete mappedList[i];
 				mappedList =  mappedList.filter(function(n){ return n != null; });
 				$('.testScenariolink').removeClass("selectedToMap");
@@ -372,9 +383,28 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				$(this).parent().css({"background-color":"rgb(225, 202, 255)"});
 				$(this).siblings(".qcSyncronise").show();
 				break;
+				}
 			}
+		// }
 		}
 	});
+
+	//Undo Mapping
+	// $(document).on('click', ".qcUndoSyncronise", function(){
+	// 	var qcTestcaseName = $(this).siblings("label").text();
+	// 	var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
+	// 	for(var i=0;i<mappedList.length;i++){
+	// 		if(qcTestcaseName == mappedList[i].testcase && qcTestsetName == mappedList[i].testset){
+	// 			delete mappedList[i];
+	// 			mappedList =  mappedList.filter(function(n){ return n != null; });
+	// 			$('.testScenariolink').removeClass("selectedToMap");
+	// 			$('.testScenariolink').prop("style","background-color:none;border-radius:0px;");
+	// 			$(this).parent().css({"background-color":"rgb(225, 202, 255)"});
+	// 			$(this).siblings(".qcSyncronise").show();
+	// 			break;
+	// 		}
+	// 	}
+	// });
 
 	// Mapping
 	$(document).on('click', ".qcSyncronise", function(event){
@@ -459,8 +489,15 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				$(".mappedFilesLabel").show();
 				for(var i=0;i<data.length;i++){
 					//there is no testscenarioname 
-					$(".mappedFiles").append('<div class="linkedTestset"><label data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" data-qctestset="'+data[i].qctestset+'">'+data[i].qctestcase+'</label><span class="linkedLine"></span><label data-scenarioid="'+data[i].testscenarioid+'">'+data[i].testscenarioname+'</label></div>');  //testscenarioname ??
-				
+					// $(".mappedFiles").append('<div class="linkedTestset"><label data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" data-qctestset="'+data[i].qctestset+'">'+data[i].qctestcase+'</label><span class="linkedLine"></span><label data-scenarioid="'+data[i].testscenarioid+'">'+data[i].testscenarioname+'</label></div>');  //testscenarioname ??
+					var data_list = ''+data[i].qctestcase
+					data_list=data_list.replaceAll(',', ',<br>')
+					$(".mappedFiles").append('<div class="linkedTestset"><label style="float: left; width: 40%;" data-scenarioid="'+data[i].testscenarioid+'">'+data[i].testscenarioname+'</label><label style="float: right; width: 50%;" data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" data-qctestset="'+data[i].qctestset+'">'+data_list+'</label></div>');  //testscenarioname ??
+					// var data_list = data[i].qctestcase
+
+					// for (var j=0;j<data_list;j++){
+					// 	$(".mappedFiles").append('<div class="linkedTestset"><label style="float: left; width: 40%;" data-scenarioid="'+data[i].testscenarioid+'">'+data[i].testscenarioname+'</label><label style="float: right; width: 50%;" data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" data-qctestset="'+data[i].qctestset+'">'+data_list[j].qctestcase+'</label></div>');  //testscenarioname ??
+					// }
 				}	
 
 				$('.scrollbar-inner').scrollbar();
