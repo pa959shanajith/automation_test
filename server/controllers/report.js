@@ -25,12 +25,12 @@ Handlebars.registerHelper('ifnotEquals', function(arg1, arg2, options) {
 });
 
 Handlebars.registerHelper('getStyle', function(StepDescription) {
-    if (StepDescription.indexOf("Testscriptname") !== -1 || StepDescription.indexOf("TestCase Name") !== -1) return "bold";
+    if (StepDescription && (StepDescription.indexOf("Testscriptname") !== -1 || StepDescription.indexOf("TestCase Name") !== -1)) return "bold";
     else return;
 });
 
 Handlebars.registerHelper('getClass', function(StepDescription) {
-    if (StepDescription.indexOf("Testscriptname") !== -1 || StepDescription.indexOf("TestCase Name") !== -1) return "collapsible-tc demo1 txtStepDescription";
+    if (StepDescription && (StepDescription.indexOf("Testscriptname") !== -1 || StepDescription.indexOf("TestCase Name") !== -1)) return "collapsible-tc demo1 txtStepDescription";
     else return "rDstepDes tabCont";
 });
 
@@ -41,18 +41,16 @@ Handlebars.registerHelper('getColor', function(overAllStatus) {
 });
 
 Handlebars.registerHelper('validateImageID', function(path, slno) {
-    if (path != null) return "#img-" + slno;
-    else return '';
+    return path? ("#img-" + slno) : '';
 });
 
 Handlebars.registerHelper('validateImagePath', function(path) {
-    if (path != null) return 'block';
-    else return 'none';
+    return path? 'block' : 'none';
 });
 
 Handlebars.registerHelper('getDataURI', function(uri) {
     var f = "data:image/PNG;base64,";
-    if (uri == "fail" || uri == "unavailableLocalServer") return f;
+    if (!url || uri == "fail" || uri == "unavailableLocalServer") return f;
     else return f + uri;
 });
 
@@ -196,17 +194,137 @@ exports.renderReport_ICE = function(req, res) {
     }
 };
 
+const prepareReportData = (reportData, reportType) => {
+    let pass = fail = terminated = 0;
+    const remarksLength = [];
+    const commentsLength = [];
+    const scrShots = { "idx": [], "paths": [] };
+
+    const report = reportData.report;
+    const endTimeStamp = report.overallstatus[0].EndTime.split(".")[0];
+    const endDate = endTimeStamp.split(" ")[0].split("-");
+    let elapTime = (report.overallstatus[0].EllapsedTime.split(".")[0]).split(":");
+    report.overallstatus[0].domainName = reportData.domainname;
+    report.overallstatus[0].projectName = reportData.projectname;
+    report.overallstatus[0].releaseName = reportData.releasename;
+    report.overallstatus[0].cycleName = reportData.cyclename;
+    report.overallstatus[0].scenarioName = reportData.testscenarioname;
+    report.overallstatus[0].reportId = reportData.reportId;
+    report.overallstatus[0].executionId = reportData.executionid;
+    report.overallstatus[0].moduleName = reportData.testsuitename;
+    report.overallstatus[0].browserVersion = report.overallstatus[0].browserVersion || '-';
+    report.overallstatus[0].browserType = report.overallstatus[0].browserType || '-';
+    report.overallstatus[0].StartTime = report.overallstatus[0].StartTime.split(".")[0] || '-';
+    report.overallstatus[0].EndTime = endTimeStamp || '-';
+    report.overallstatus[0].date = endDate && (endDate[1] + "/" + endDate[2] + "/" + endDate[0]) || '-';
+    report.overallstatus[0].time = endTimeStamp.split(" ")[1] || '-';
+    report.overallstatus[0].EllapsedTime = "~" + ("0" + elapTime[0]).slice(-2) + ":" + ("0" + elapTime[1]).slice(-2) + ":" + ("0" + elapTime[2]).slice(-2)
+
+    report.rows.forEach((row, i) => {
+        row.slno = i + 1;
+        if (row["Step "]) row.Step = row["Step "];
+        if (row.EllapsedTime && row.EllapsedTime.trim() != "") {
+            const eT = row.EllapsedTime.split(".");
+            elapTime = eT[0].split(":")
+            if (!eT[1]) eT[1] = ((eT[1] || "") + "000").slice(0, 3);
+            if (eT.length < 3 && eT[0].indexOf(":") === -1) { // Time is x.x not xx:xx:xx.xx
+                row.EllapsedTime = "00:00:" + ("0" + elapTime[0]).slice(-2) + ":" + eT[1];
+            } else {
+                row.EllapsedTime = ("0" + elapTime[0]).slice(-2) + ":" + ("0" + elapTime[1]).slice(-2) + ":" + ("0" + elapTime[2]).slice(-2) + ":" + eT[1];
+            }
+        }
+        if (reportType == "pdf" && !(row.screenshot_path == undefined)) {
+            scrShots.idx.push(i);
+            scrShots.paths.push(row.screenshot_path);
+        }
+
+        if (row.testcase_details) {
+            if (typeof(row.testcase_details) == "string" && row.testcase_details != "undefined")
+                row.testcase_details = JSON.parse(row.testcase_details);
+        } else if (row.testcase_details === "") {
+            row.testcase_details = {
+                "actualResult_pass": "",
+                "actualResult_fail": "",
+                "testcaseDetails": ""
+            }
+        }
+        if (row.status == "Pass") pass++;
+        else if (row.status == "Fail") fail++;
+        else if (row.Step && row.Step == "Terminated") terminated++
+        if (row.Remark && row.Remark !== " ") remarksLength.push(row.Remark)
+        if (row.Comments && row.Comments !== " ") commentsLength.push(row.Remark)
+    });
+    const total = pass+fail+terminated;
+    const passPercent = parseFloat(100 * pass / total).toFixed(2);
+    const failPercent = parseFloat(100 * fail / total).toFixed(2);
+    const termPercent = parseFloat(100 * terminated / total).toFixed(2);
+    report.overallstatus[0].pass = passPercent > 0 ? passPercent : 0;
+    report.overallstatus[0].fail = failPercent > 0 ? failPercent : 0;
+    if(pass > 0 && fail > 0) report.overallstatus[0].terminate = (100 - failPercent - passPercent).toFixed(2);
+    else report.overallstatus[0].terminate = termPercent > 0 ? termPercent : 0;
+    report.remarksLength = remarksLength;
+    report.commentsLength = commentsLength;
+    return { report, scrShots };
+};
+
 exports.viewReport = async (req, res, next) => {
+    const fnName = "viewReport";
+    logger.info("Inside UI function: " + fnName);
     const url = req.url.split('/');
     const reportId = url[1] || "";
-    const type = (url[2] || 'html').toUpperCase();
-    if (!req._passport.instance.verifySession(req))
-        return res.status(401).send("Hi! Cannot Load Report #"+reportId+" due to invalid session");
-    if (type == "HTML") {
-    } else if (type == "JSON") {
-    } else if (type == "PDF") {
+    const type = (url[2] || 'html').toLowerCase();
+    let report = { overallstatus: [{}], rows: [], remarksLength: 0, commentsLength: 0 };
+    let scrShots = { "idx": [], "paths": [] };
+    // if (!req._passport.instance.verifySession(req)) return res.status(   401).send("Hi! Cannot Load Report #"+reportId+" due to invalid session");
+    if (!req._passport.instance.verifySession(req)) {
+        report.error = {
+            ecode: "INVALID_SESSION",
+            emsg: "Authentication Failed! No Active Sessions found. Please login and try again.",
+            status: 401
+        }
+    } else if (!['html', 'pdf', 'json'].includes(type)) {
+        report.error = {
+            ecode: "BAD_REQUEST",
+            emsg: "Requested Report Type is not Available",
+            status: 400
+        }
+        // return res.status(400).send("Hi! Cannot Load Report #"+reportId+" with type: "+type.toLowerCase());
     } else {
-        return res.status(400).send("Hi! Cannot Load Report #"+reportId+" with type: "+type);
+        const inputs = { reportid: reportId };
+        const reportData = await utils.fetchData(inputs, "reports/getReport", fnName);
+        if (reportData == "fail") {
+            report.error = {
+                ecode: "SERVER_ERROR",
+                emsg: "Error while loading Report due to an internal error. Try again later!",
+                status: 500
+            }
+            // return res.status(500).send("Hi! Error while loading Report #"+reportId+" due to an internal error");
+        } else if (reportData.length == 0) {
+            report.error = {
+                ecode: "NOT_FOUND",
+                emsg: "Requested Report is not Available!",
+                status: 404
+            }
+            // return res.status(400).send("Hi! Report #"+reportId+" not found");
+        } else {
+            reportData.reportId = reportId;
+            const newData = prepareReportData(reportData, type);
+            scrShots = newData.scrShotObj;
+            report = newData.report;
+        }
+    }
+
+    if (type == "html") {
+        report.remarksLength = report.remarksLength.length;
+        report.commentsLength = report.commentsLength.length;
+        const content = templateweb(report);
+        return res.send(content);
+    } else if (type == "json") {
+        const statusCode = report.error && report.error.status || 200;
+        return res.status(statusCode).send(report);
+    } else if (type == "pdf") {
+        report.remarksLength = report.remarksLength.length;
+        report.commentsLength = report.commentsLength.length;
     }
     return res.send("Hi! Loading "+type+" Report #"+reportId);
 };
@@ -464,63 +582,17 @@ exports.reportStatusScenarios_ICE = function(req, res) {
 };
 
 //To render reports
-exports.getReport = function(req, res) {
-    logger.info("Inside UI service: getReport");
+exports.getReport = async (req, res) => {
+    const fnName = "getReport";
+    logger.info("Inside UI service: " + fnName);
     try {
-        if (utils.isSessionActive(req)) {
-            var reportId = req.body.reportId;
-            var reportInfoObj = {};
-            var reportjson = {};
-            var flag = "";
-            var finalReport = [];
-            var inputs = {
-                "query": "projectsUnderDomain",
-                "reportid": reportId
-            };
-            var args = {
-                data: inputs,
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            };
-            logger.info("Calling DAS Service from getReport - projectsUnderDomain: reports/getReport");
-            client.post(epurl + "reports/getReport", args,
-                function(reportResult, response) {
-                    if (response.statusCode != 200 || reportResult.rows == "fail") {
-                        flag = "fail";
-                        logger.error("Error occurred in the service getReport - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports. Error Code : ERRDAS");
-                        res.send(flag);
-                    } else {
-                        try{
-                            var reportdata = reportResult.rows.report;
-                            var executedtime = reportResult.rows.executedtime;
-                            var testscenarioid = reportResult.rows.testscenarioid;
-                            var testscenarioname = reportResult.rows.name;
-                            var projectid = reportResult.rows.projectid;
-                            var domainname = reportResult.rows.domain;
-                            reportjson.reportdata = reportdata;
-                            reportInfoObj.executedtime = executedtime;
-                            reportInfoObj.testscenarioid = testscenarioid;
-                            reportInfoObj.testscenarioname = testscenarioname;
-                            reportInfoObj.projectid = projectid;
-                            reportInfoObj.domainname = domainname;
-                            finalReport.push(reportInfoObj);
-                            finalReport.push(reportjson);
-                            logger.info("Sending reports in the service getReport: final function");
-                            res.send(finalReport);
-                        } catch (exception) {
-                            logger.error("Exception in the service getReport - projectsUnderDomain: %s", exception);
-                            res.send("fail");
-                        }            
-                    }
-                });
-            } else {
-            logger.error("Invalid Session, in the service getReport");
-            res.send("Invalid Session");
-        }
+        const reportid = req.body.reportId;
+        const result = await utils.fetchData({ reportid }, "reports/getReport", fnName);
+        if (result == "fail") return res.send("fail");
+        else res.send(result);
     } catch (exception) {
-        logger.error("Exception in the service getReport - Error: %s", exception);
-        res.send("fail");
+        logger.error("Error occurred in "+fnName+". Error: " + exception.message);
+        res.status(500).send("fail");
     }
 };
 
@@ -701,32 +773,21 @@ function updateDbReportData(reportId, slno, defectId) {
 }
 
 //Fetch all modules on change of projects,release & cycle
-exports.getReportsData_ICE = function(req, res) {
+exports.getReportsData_ICE = async (req, res) => {
+    const fnName = "getReportsData_ICE";
     try {
         if (req.body.reportsInputData.type == 'allmodules') {
-            logger.info("Inside UI service: getReportsData_ICE - allmodules");
-            var inputs = {
+            logger.info("Inside UI service: " + fnName + " - allmodules");
+            const inputs = {
                 "query": "getAlltestSuites",
                 "id": req.body.reportsInputData.cycleId
             };
-            var args = {
-                data: inputs,
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            };
-            client.post(epurl + "reports/getAllSuites_ICE", args,
-                function(result1, response1) {
-                    if (response1.statusCode != 200 || result1.rows == "fail") {
-                        logger.error("Error occurred in reports/getReportsData_ICE: getAllModules from getAllSuites_ICE Error Code : ERRDAS");
-                        res.send("fail");
-                    } else {
-                        res.send(result1);
-                    }
-                });
+            const result1 = await utils.fetchData(inputs, "reports/getAllSuites_ICE", fnName)
+            if (result1 == "fail") return res.send("fail");
+            return res.send({ rows: result1 });
         }
     } catch (exception) {
-        logger.error(exception.message);
+        logger.error("Error occurred in "+fnName+". Error: " + exception.message);
         res.status(500).send("fail");
     }
 };

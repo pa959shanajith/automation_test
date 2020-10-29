@@ -502,10 +502,10 @@ if (cluster.isMaster) {
 		app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
 		app.post('/reportStatusScenarios_ICE', report.reportStatusScenarios_ICE);
 		app.post('/renderReport_ICE', report.renderReport_ICE);
-		app.post('/getReport', report.getReport);
+		app.post('/getReport', auth.protect, report.getReport);
 		app.post('/openScreenShot', report.openScreenShot);
 		app.post('/connectJira_ICE', report.connectJira_ICE);
-		app.post('/getReportsData_ICE', report.getReportsData_ICE);
+		app.post('/getReportsData_ICE', auth.protect, report.getReportsData_ICE);
 		app.post('/getReport_API', report.getReport_API);
 		app.use('/viewReport', report.viewReport);
 		//Plugin Routes

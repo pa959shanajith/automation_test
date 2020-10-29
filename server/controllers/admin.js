@@ -1780,21 +1780,19 @@ const getEmailConf = async (conf, fnName, inputs, flag) => {
 			logger.error("Error occurred in admin/"+fnName+": Invalid Proxy URL.");
 			flag[11]='1';
 		}
-		if (inputs.proxy.auth) {
-			inputs.proxy.user = proxy.user || "";
-			inputs.proxy.pass = proxy.pass || "";
-			if (inputs.proxy.user.length == 0 && inputs.proxy.pass.length == 0) {
-				logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Credentials.");
-				flag[12]='3';
-			}
-			else if (inputs.proxy.user.length == 0) {
-				logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Username.");
-				flag[12]='1';
-			}
-			else if (inputs.proxy.pass.length == 0) {
-				logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Password.");
-				flag[12]='2';
-			}
+		inputs.proxy.user = proxy.user || "";
+		inputs.proxy.pass = proxy.pass || "";
+		if (inputs.proxy.user.length == 0 && inputs.proxy.pass.length == 0) {
+			logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Credentials.");
+			flag[12]='3';
+		}
+		else if (inputs.proxy.user.length == 0) {
+			logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Username.");
+			flag[12]='1';
+		}
+		else if (inputs.proxy.pass.length == 0) {
+			logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Password.");
+			flag[12]='2';
 		}
 	}
 };
