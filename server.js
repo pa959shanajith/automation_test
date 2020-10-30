@@ -501,9 +501,9 @@ if (cluster.isMaster) {
 		app.post('/getAllSuites_ICE', report.getAllSuites_ICE);
 		app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
 		app.post('/reportStatusScenarios_ICE', report.reportStatusScenarios_ICE);
-		app.post('/renderReport_ICE', report.renderReport_ICE);
+		app.post('/renderReport_ICE', auth.protect, report.renderReport_ICE);
 		app.post('/getReport', auth.protect, report.getReport);
-		app.post('/openScreenShot', report.openScreenShot);
+		app.post('/openScreenShot', auth.protect, report.openScreenShot);
 		app.post('/connectJira_ICE', report.connectJira_ICE);
 		app.post('/getReportsData_ICE', auth.protect, report.getReportsData_ICE);
 		app.post('/getReport_API', report.getReport_API);

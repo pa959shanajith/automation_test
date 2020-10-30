@@ -511,54 +511,68 @@ function loadReports() {
             })
         });
 
+        function downloadFile(filedata, filename) {
+            if (window.navigator.msSaveOrOpenBlob) {
+                window.navigator.msSaveOrOpenBlob(filedata, filename);
+            } else {
+                var a = document.createElement('a');
+                a.href = URL.createObjectURL(filedata);
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                URL.revokeObjectURL(a.href);
+                document.body.removeChild(a);
+            }
+        }
+
         $(document).on('click', '.export-icons', function() {
             var repType = $(this).attr("data-rep");
+            var filename = $(".scenarioName").text().substr(2) + "." + repType;
+            var url = window.location.href + '/' + repType;
             if (repType == "json") {
-                var filename = $(".scenarioName").text().substr(2) + ".json";
-                // var reportId = $(".reportId").text();
                 $.ajax({
                     type: 'GET',
-                    url: window.location.href + '/json',
+                    url: url,
                     responseType: 'application/json',
                     success: function(data) {
                         var responseData = JSON.stringify(data, undefined, 2);
-                        var file = new Blob([responseData], {
+                        var filedata = new Blob([responseData], {
                             type: "text/json;charset=utf-8"
                         });
-                        // if (window.navigator.msSaveOrOpenBlob) {
-                        //     window.navigator.msSaveOrOpenBlob(file, filename);
-                        // } else {
-                        //     var e = document.createEvent('MouseEvents');
-                        //     var a = document.createElement('a');
-                        //     a.download = filename;
-                        //     a.href = window.URL.createObjectURL(file);
-                        //     a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
-                        //     e.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-                        //     a.dispatchEvent(e);
-                        // }
-                        if (window.navigator.msSaveOrOpenBlob) {
-                            window.navigator.msSaveOrOpenBlob(file, filename);
-                        } else {
-                            var a = document.createElement('a');
-                            a.href = URL.createObjectURL(file);
-                            a.download = filename;
-                            document.body.appendChild(a);
-                            a.click();
-                            URL.revokeObjectURL(a.href);
-                            document.body.removeChild(a);
-                        }
+                        downloadFile(filedata, filename);
                     },
                     error: function(jqXHR) {
                         unblockUI();
                         var errRes = jqXHR.responseJSON && jqXHR.responseJSON.error || {};
                         var err = errRes.emsg || "Error while exporting report JSON";
                         blockUI(err);
-                        console.log("Error in exporting report JSON. Error: " + JSON.stringify(errRes));
-                        setTimeout(()=>unblockUI(), 1000);
+                        console.log("Error while exporting report JSON. Error: " + JSON.stringify(errRes));
+                        setTimeout(()=>unblockUI(), 2000);
                     }
                 });
             } else if (repType == "pdf") {
-                alert("WIP");
+                var xhrOverride = new XMLHttpRequest();
+                xhrOverride.responseType = 'arraybuffer';
+                if (document.getElementById("scrShotChk").checked) url += "?images=true";
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    responseType: 'arraybuffer',
+                    xhr: () => xhrOverride,
+                    success: function(data) {
+                        var filedata = new Blob([data], {
+                            type: "application/pdf;charset=utf-8"
+                        });
+                        downloadFile(filedata, filename);
+                    },
+                    error: function(jqXHR) {
+                        unblockUI();
+                        var err = jqXHR.getResponseHeader("X-Render-Error") || "Error while generating PDF Report";
+                        blockUI(err);
+                        console.log("Error while generating PDF Report. Error: " + JSON.stringify(err));
+                        setTimeout(()=>unblockUI(), 2000);
+                    }
+                });
             }
         });
 

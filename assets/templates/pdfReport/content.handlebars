@@ -463,7 +463,7 @@
          </tbody>
       </table>
       {{#each rows}}
-      <div class="screenshot-container" style="display:{{validateImagePath screenshot_path}}">
+      <div class="screenshot-container" style="display:{{validateImagePath screenshot_dataURI}}">
          {{#ifEquals ../overallstatus.0.browserType "MobileApp"}}
          <img id="img-{{slno}}" src="{{getDataURI screenshot_dataURI}}" style="width:70%;display:block;"
             alt="Image for Sl No. {{slno}}">

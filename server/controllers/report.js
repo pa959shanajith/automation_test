@@ -50,7 +50,7 @@ Handlebars.registerHelper('validateImagePath', function(path) {
 
 Handlebars.registerHelper('getDataURI', function(uri) {
     var f = "data:image/PNG;base64,";
-    if (!url || uri == "fail" || uri == "unavailableLocalServer") return f;
+    if (!uri || uri == "fail" || uri == "unavailableLocalServer") return f;
     else return f + uri;
 });
 
@@ -62,131 +62,121 @@ fs.readFile('assets/templates/specificReport/content.handlebars', 'utf8', functi
     templateweb = Handlebars.compile(data);
 });
 
-//to open screen shot
-function openScreenShot(req, path, cb) {
+
+/** Function responsible for returning ICE connection status */
+const checkForICEstatus = async (icename, fnName) => {
+    logger.debug("ICE Socket requesting Address: %s", icename);
+	const err = "Error occurred in the function "+fnName+": ";
+    const sockmode = await utils.channelStatus(icename);
+    if (!sockmode.schedule && !sockmode.normal) {
+        logger.error(err + "ICE is not available");
+        return "unavailableLocalServer";
+    } else if (sockmode.schedule) {
+        logger.error(err + "ICE is connected in Scheduling mode");
+        return "scheduleModeOn";
+    } else {
+		return null;
+	}
+};
+
+// To load screenshot from ICE
+const openScreenShot = async (username, path) => {
+    const fnName = "openScreenShot";
     try {
-        var username=req.session.username;
-        var icename = myserver.allSocketsICEUser[username];
-        logger.debug("ICE Socket requesting Address: %s", icename);
+        const icename = myserver.allSocketsICEUser[username];
+        const iceStatus = await checkForICEstatus(icename, fnName);
+        if (iceStatus !== null) return iceStatus;
         redisServer.redisSubServer.subscribe('ICE2_' + icename);
-        redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
-            if (redisres[1] > 0) {
-                logger.info("Sending socket request for render_screenshot to cachedb");
-                var dataToIce = {
-                    "emitAction": "render_screenshot",
-                    "username": icename,
-                    "path": path
-                };
-                redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
-                var scrShotData = [];
-                function render_screenshot_listener(channel, message) {
-                    var data = JSON.parse(message);
-                    if (icename == data.username) {
-                        var resultData = data.value;
-                        if (data.onAction == "unavailableLocalServer") {
-                            redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
-                            logger.error("Error occurred in openScreenShot: Socket Disconnected");
-                            if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
-                                var soc = myserver.socketMapNotify[username];
-                                soc.emit("ICEnotAvailable");
-                                cb('unavailableLocalServer');
-                            }
-                        } else if (data.onAction == "render_screenshot_finished") {
-                            redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
-                            if (resultData === "fail") {
-                                logger.error('Screenshot status: ', resultData);
-                                cb('fail');
-                            } else {
-                                logger.debug("Screenshots processed successfully");
-                                cb(null, scrShotData);
-                            }
-                        } else if (data.onAction == "render_screenshot") {
-                            scrShotData = scrShotData.concat(resultData);
+        logger.info("Sending socket request for render_screenshot to cachedb");
+        const dataToIce = { "emitAction": "render_screenshot", "username": icename, "path": path };
+        redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+
+        return (new Promise((rsv, rej) => {
+            let scrShotData = [];
+            function render_screenshot_listener(channel, message) {
+                const data = JSON.parse(message);
+                if (icename == data.username) {
+                    const resultData = data.value;
+                    if (data.onAction == "unavailableLocalServer") {
+                        redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
+                        logger.error("Error occurred in " + fnName + ": Socket Disconnected");
+                        rsv(data.onAction);
+                    } else if (data.onAction == "render_screenshot_finished") {
+                        redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
+                        if (resultData === "fail") {
+                            logger.error("Screenshots processing failed!");
+                            rsv("fail");
+                        } else {
+                            logger.debug("Screenshots processed successfully");
+                            rsv(scrShotData);
                         }
+                    } else if (data.onAction == "render_screenshot") {
+                        scrShotData = scrShotData.concat(resultData);
                     }
                 }
-                redisServer.redisSubServer.on("message", render_screenshot_listener);
-            } else {
-                utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
-                    var flag = "";
-                    if (found) flag = "scheduleModeOn";
-                    else {
-                        flag = "unavailableLocalServer";
-                        logger.error("ICE Socket not Available");
-                    }
-                    cb(flag);
-                });
             }
-        });
+            redisServer.redisSubServer.on("message", render_screenshot_listener);
+        }));
     } catch (exception) {
         logger.error("Exception in openScreenShot when trying to open screenshot: %s", exception);
         cb('fail');
     }
 };
 
-//render screenshots for html reports
-exports.openScreenShot = function(req, res) {
+// Render screenshots for html reports
+exports.openScreenShot = async (req, res) => {
     try {
-        openScreenShot(req, req.body.absPath, function(err, data) {
-            res.send(data || err);
-        });
+        const username = req.session.username;
+        const result = await openScreenShot(username, req.body.absPath);
+        res.send(result);
     } catch (exception) {
-        logger.error("Exception in openScreenShot when trying to open screenshot: %s", exception);
+        logger.error("Exception in openScreenShot when trying to load screenshot: %s", exception);
         res.send("fail");
     }
 };
 
 //Render HTML/PDF reports for download
-exports.renderReport_ICE = function(req, res) {
+exports.renderReport_ICE = async (req, res) => {
     logger.info("Inside UI service: renderReport_ICE");
     try {
-        if (utils.isSessionActive(req)) {
-            var finalReports = req.body.finalreports;
-            var reportType = req.body.reporttype;
-            var data = {
-                "overallstatus": finalReports.overallstatus,
-                "rows": finalReports.rows,
-                "remarksLength": finalReports.remarksLength.length,
-                'commentsLength': finalReports.commentsLength.length
-            };
-            //PDF Reports
-            if (reportType != "html") {
-                var scrShot = req.body.absPath;
-                openScreenShot(req, scrShot.paths, function(err, dataURIs) {
-                    if (err) logger.warn("Error while loading screenshots %s", err);
-                    else {
-                        if (dataURIs === "fail" || dataURIs === "unavailableLocalServer") scrShot.paths.forEach(function(d, i) {
-                            data.rows[scrShot.idx[i]].screenshot_dataURI = dataURIs;
-                        });
-                        else dataURIs.forEach(function(d, i) {
-                            data.rows[scrShot.idx[i]].screenshot_dataURI = d;
-                        });
-                    }
-                    try {
-                        const pdf = new Readable({read: ()=>{}});
-                        pdf.push(templatepdf(data));
-                        pdf.push(null);
-                        wkhtmltopdf(pdf).pipe(res);
-                    } catch (exception) {
-                        var emsg = exception.message;
-                        var flag = "fail";
-                        if ((exception instanceof RangeError) && emsg === "Invalid string length") {
-                            emsg = "Report Size too large";
-                            flag = "limitExceeded";
-                        }
-                        logger.error("Exception occurred in renderReport_ICE when trying to render report: %s", emsg);
-                        return res.send(flag);
-                    }
-                });
+        const finalReports = req.body.finalreports;
+        const reportType = req.body.reporttype;
+        const username = req.session.username;
+        const data = {
+            "overallstatus": finalReports.overallstatus,
+            "rows": finalReports.rows,
+            "remarksLength": finalReports.remarksLength.length,
+            'commentsLength': finalReports.commentsLength.length
+        };
+        //PDF Reports
+        if (reportType != "html") {
+            const scrShot = req.body.absPath;
+            const result = await openScreenShot(username, scrShot.paths);
+            if (["fail", "unavailableLocalServer", "scheduleModeOn"].includes(result)) {
+                scrShot.paths.forEach((d, i) => data.rows[scrShot.idx[i]].screenshot_dataURI = result);
+            } else {
+                result.forEach((d, i) => data.rows[scrShot.idx[i]].screenshot_dataURI = d);
             }
-            //HTML Reports
-            else {
-                var html = templateweb(data);
-                res.send(html);
+            try {
+                const pdf = new Readable({read: ()=>{}});
+                pdf.push(templatepdf(data));
+                pdf.push(null);
+                wkhtmltopdf(pdf).pipe(res);
+            } catch (exception) {
+                const emsg = exception.message;
+                const flag = "fail";
+                if ((exception instanceof RangeError) && emsg === "Invalid string length") {
+                    emsg = "Report Size too large";
+                    flag = "limitExceeded";
+                }
+                logger.error("Exception occurred in renderReport_ICE when trying to render report: %s", emsg);
+                return res.send(flag);
             }
-        } else {
-            logger.error("Invalid Session");
-            res.send("Invalid Session");
+        }
+        //HTML Reports
+        else {
+            const htmlReport = templateweb(data);
+            return res.send(htmlReport);
         }
     } catch (exception) {
         logger.error("Exception occurred in renderReport_ICE when trying to render report: %s", exception);
@@ -194,7 +184,7 @@ exports.renderReport_ICE = function(req, res) {
     }
 };
 
-const prepareReportData = (reportData, reportType) => {
+const prepareReportData = (reportData, embedImages) => {
     let pass = fail = terminated = 0;
     const remarksLength = [];
     const commentsLength = [];
@@ -233,7 +223,7 @@ const prepareReportData = (reportData, reportType) => {
                 row.EllapsedTime = ("0" + elapTime[0]).slice(-2) + ":" + ("0" + elapTime[1]).slice(-2) + ":" + ("0" + elapTime[2]).slice(-2) + ":" + eT[1];
             }
         }
-        if (reportType == "pdf" && !(row.screenshot_path == undefined)) {
+        if (embedImages && row.screenshot_path) {
             scrShots.idx.push(i);
             scrShots.paths.push(row.screenshot_path);
         }
@@ -270,12 +260,13 @@ const prepareReportData = (reportData, reportType) => {
 exports.viewReport = async (req, res, next) => {
     const fnName = "viewReport";
     logger.info("Inside UI function: " + fnName);
+    const username = req.session.username;
+    const userInfo = {username};
     const url = req.url.split('/');
     const reportId = url[1] || "";
-    const type = (url[2] || 'html').toLowerCase();
+    const type = (url[2] || 'html').toLowerCase().split('?')[0];
+    const embedImages = (url[2] || '').toLowerCase().split('?')[1] == 'images=true';
     let report = { overallstatus: [{}], rows: [], remarksLength: 0, commentsLength: 0 };
-    let scrShots = { "idx": [], "paths": [] };
-    // if (!req._passport.instance.verifySession(req)) return res.status(   401).send("Hi! Cannot Load Report #"+reportId+" due to invalid session");
     if (!req._passport.instance.verifySession(req)) {
         report.error = {
             ecode: "INVALID_SESSION",
@@ -288,7 +279,6 @@ exports.viewReport = async (req, res, next) => {
             emsg: "Requested Report Type is not Available",
             status: 400
         }
-        // return res.status(400).send("Hi! Cannot Load Report #"+reportId+" with type: "+type.toLowerCase());
     } else {
         const inputs = { reportid: reportId };
         const reportData = await utils.fetchData(inputs, "reports/getReport", fnName);
@@ -298,18 +288,16 @@ exports.viewReport = async (req, res, next) => {
                 emsg: "Error while loading Report due to an internal error. Try again later!",
                 status: 500
             }
-            // return res.status(500).send("Hi! Error while loading Report #"+reportId+" due to an internal error");
         } else if (reportData.length == 0) {
             report.error = {
                 ecode: "NOT_FOUND",
                 emsg: "Requested Report is not Available!",
                 status: 404
             }
-            // return res.status(400).send("Hi! Report #"+reportId+" not found");
         } else {
             reportData.reportId = reportId;
-            const newData = prepareReportData(reportData, type);
-            scrShots = newData.scrShotObj;
+            const newData = prepareReportData(reportData, embedImages);
+            var scrShots = newData.scrShots;
             report = newData.report;
         }
     }
@@ -323,10 +311,41 @@ exports.viewReport = async (req, res, next) => {
         const statusCode = report.error && report.error.status || 200;
         return res.status(statusCode).send(report);
     } else if (type == "pdf") {
+        if (report.error) {
+            res.setHeader("X-Render-Error", report.error.emsg);
+            return res.status(report.error.status || 200).send(report.error);
+        }
         report.remarksLength = report.remarksLength.length;
         report.commentsLength = report.commentsLength.length;
+        if (scrShots && scrShots.paths.length > 0) {
+            const dataURIs = await openScreenShot(userInfo.username, scrShots.paths);
+            if (["fail", "unavailableLocalServer", "scheduleModeOn"].includes(dataURIs)) {
+                scrShots.paths.forEach((d, i) => report.rows[scrShots.idx[i]].screenshot_dataURI = '');
+            } else {
+                dataURIs.forEach((d, i) => report.rows[scrShots.idx[i]].screenshot_dataURI = d);
+            }
+        }
+        try {
+            const pdf = new Readable({read: ()=>{}});
+            pdf.push(templatepdf(report));
+            pdf.push(null);
+            wkhtmltopdf(pdf).pipe(res);
+        } catch (exception) {
+            report.error = {
+                ecode: "SERVER_ERROR",
+                emsg: "Error while generating report due to an internal error. Try again later!",
+                status: 500
+            };
+            const emsg = exception.message;
+            if ((exception instanceof RangeError) && emsg === "Invalid string length") {
+                report.error.emsg = emsg = "Error while generating report. Report size too large";
+                report.error.ecode = "LIMIT_EXCEEDED";
+            }
+            logger.error("Exception occurred in " + fnName + " when trying to render report: %s", emsg);
+            const statusCode = report.error && report.error.status || 200;
+            return res.status(statusCode).send(report.error);
+        }
     }
-    return res.send("Hi! Loading "+type+" Report #"+reportId);
 };
 
 //To get all the projects and their releases & cycles

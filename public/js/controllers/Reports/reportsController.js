@@ -736,14 +736,53 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     function htmlReportClick(e) {
         var reportType = $(this).attr('data-getrep');
         var reportID = $(this).attr('data-reportid');
-        var testsuiteId = $(this).parents('tr').attr('id');
-        var testsuitename = $('#moduleNameHeader').children('span').text();
-        var scenarioName = $(this).parent().siblings('td.scenarioName').text();
+        var scenarioName = $(this).parent().parent().children()[0].textContent;
 
         if (reportType == "html") {
             const reportURL = window.location.origin + "/viewReport/" + reportID;
             return window.open(reportURL, '_blank');
+        } else {
+            if (reportType == "wkhtmltopdf") reportType = "pdf";
+            reportService.viewReport(reportID, reportType).then(function(data1) {
+                unblockUI();
+                if (reportType == "json") data1 = JSON.stringify(data, undefined, 2);
+                var filedata = new Blob([data1], {
+                    type: "application/"+reportType+";charset=utf-8"
+                });
+                if (window.navigator.msSaveOrOpenBlob) {
+                    window.navigator.msSaveOrOpenBlob(filedata, scenarioName);
+                } else {
+                    var a = document.createElement('a');
+                    a.href = URL.createObjectURL(filedata);
+                    a.download = scenarioName;
+                    document.body.appendChild(a);
+                    a.click();
+                    URL.revokeObjectURL(a.href);
+                    document.body.removeChild(a);
+                }
+                e.stopImmediatePropagation();
+            },
+            function(error) {
+                unblockUI();
+                if (reportType == 'pdf') error = {error: JSON.parse(String.fromCharCode.apply(null, new Uint8Array(error))|| '')};
+                var errRes = error.error || {};
+                var defErr = (reportType == "json")? "Fail to export report JSON": "Fail to save PDF Report";
+                var err = errRes.emsg || defErr;
+                if (errRes.ecode == "INVALID_SESSION") return $rootScope.redirectPage();
+                else if (errRes.ecode == "LIMIT_EXCEEDED") openModalPopup("Fail to load PDF Report. Report Limit size exceeded. Generate PDF Report using Avo Assure PDF utility available in ICE.")
+                else openModalPopup("Reports", defErr);
+                console.log(defErr + ". Error: " + JSON.stringify(err));
+            });
+            return;
         }
+    }
+
+    function htmlReportClick1(e) {
+        var reportType = $(this).attr('data-getrep');
+        var reportID = $(this).attr('data-reportid');
+        var testsuiteId = $(this).parents('tr').attr('id');
+        var testsuitename = $('#moduleNameHeader').children('span').text();
+        var scenarioName = $(this).parent().siblings('td.scenarioName').text();
 
         var pass = fail = terminated = total = 0;
         var scrShot = {
