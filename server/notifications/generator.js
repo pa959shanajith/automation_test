@@ -96,7 +96,34 @@ generateEmailPayload.report = async data => {
 	};
 };
 
-generateEmailPayload.userUpdate = async data => {};
+generateEmailPayload.userUpdate = async data => {
+	const user = data.user;
+	const recv = user.email;
+	if (!validator.isEmail(recv)) return { error: { msg: "User does not have a valid email address", code: "INVALID_RECIPIENT"} }
+	const msg = {
+		'subject': '',
+		'template': 'user-update',
+		'context': {
+			'companyLogo': data.url + companyLogo,
+			'productLogo': data.url + productLogo,
+			'username': user.name,
+			'name': user.firstname + ' ' + user.lastname,
+			'datetime': new Date().toLocaleString()
+		}
+	};
+
+	if (data.field === 'password') {
+		msg.subject = 'Your password has been changed';
+		msg.context.password = true;
+	}
+
+	return {
+		error: null,
+		msg,
+		receivers: [recv]
+	};
+};
+
 generateEmailPayload.schedule = async data => {};
 generateEmailPayload.iceAssign = async data => {};
 generateEmailPayload.projectAssign = async data => {};

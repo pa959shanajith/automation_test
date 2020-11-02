@@ -1,6 +1,7 @@
 const logger = require('../../logger');
 const utils = require('../lib/utils');
 const configpath= require('../config/options');
+const notifications = require('../notifications');
 const bcrypt = require('bcryptjs');
 
 //Load User Information - Avo Assure
@@ -115,7 +116,10 @@ exports.resetPassword = async (req, res) => {
 		};
 		const status = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
 		if (status == "fail" || status == "forbidden") return res.send("fail");
-		else res.send(status);
+		else {
+			notifications.notify("userUpdate", {field: "password", user: result});
+			res.send(status);
+		}
 	} catch (exception) {
 		logger.error(exception.message);
 		res.send("fail");

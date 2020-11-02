@@ -5,8 +5,13 @@
 		<tbody>
 			<tr>
 				<td style="padding:5%">
-					Hi {{userName}},<br><br>
+					Hi {{name}},<br><br>
+					{{#if password}}
+					Congratulations! Your password for username <i>{{username}}</i> has been updated on {{datetime}}.<br><br>
+					If you encounter any problems logging in, please contact a site administrator.
+					{{else if role}}
 					Your account role has been changed to <b>{{userRole}}</b> by your administrator.
+					{{/if}}
 				</td>
 			</tr>
 		</tbody>
