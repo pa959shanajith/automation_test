@@ -173,50 +173,37 @@ export const readTestCase_ICE = async(userInfo, testCaseId, testCaseName, versio
     }
 }
 
-// export const updateTestCase_ICE = async(testCaseId, testCaseName, mydata, userInfo, versionnumber, import_status) => {
-//     var modifiedData = JSON.parse(JSON.stringify(mydata));
-//     for(let i=0;i<modifiedData.length;i++){
-//         if(modifiedData[i].inputVal == undefined){
-//             modifiedData[i].inputVal = "";
-//         }
-//         modifiedData[i].inputVal= JSON.stringify(modifiedData[i].inputVal);
-
-//         if(modifiedData[i].inputVal[0] != '['){
-//             modifiedData[i].inputVal = jQuery.parseJSON('['+modifiedData[i].inputVal+']');
-//         }else{
-//             modifiedData[i].inputVal = jQuery.parseJSON(modifiedData[i].inputVal); 
-//         }
-//     }
-//     try{
-//         const res = await axios(url+"/updateTestCase_ICE", {
-//             method: 'POST',
-//             headers : {
-//                 'Content-type' : 'application/json'
-//             },
-//             data : {
-//                 param : 'updateTestCase_ICE',
-//                 testcaseid: testCaseId,
-//                 testcasename: testCaseName,
-//                 testcasesteps: JSON.stringify(modifiedData),
-//                 userinfo: userInfo,
-//                 skucodetestcase : "skucodetestcase",
-//                 tags: "tags",
-//                 versionnumber: versionnumber,
-//                 import_status: import_status
-//             },
-//             credentials : 'include',
-//         });
-//         if (res.status === 200){
-//             return res.data;
-//         }
-//         else{
-//             console.log(res.status)
-//         }
-//     }
-//     catch(err){
-//         console.log(err);
-//     }
-// }
+export const updateTestCase_ICE = async(testCaseId, testCaseName, testCaseData, userInfo, versionnumber, import_status) => {
+    try{
+        const res = await axios(url+"/updateTestCase_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param : 'updateTestCase_ICE',
+                testcaseid: testCaseId,
+                testcasename: testCaseName,
+                testcasesteps: JSON.stringify(testCaseData),
+                userinfo: userInfo,
+                skucodetestcase : "skucodetestcase",
+                tags: "tags",
+                versionnumber: versionnumber,
+                import_status: import_status
+            },
+            credentials : 'include',
+        });
+        if (res.status === 200){
+            return res.data;
+        }
+        else{
+            console.log(res.status)
+        }
+    }
+    catch(err){
+        console.log(err);
+    }
+}
 
 //Debug Testcases
 export const debugTestCase_ICE = async(browserType, testcaseID, userInfo, appType) => {

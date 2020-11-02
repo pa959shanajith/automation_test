@@ -9,9 +9,9 @@ const Design = () => {
 
     useEffect(()=>{
         // navigateTestCase is also being checked in 99, do we need that?
-        if(window.localStorage['navigateScreen'] !== "TestCase"){
-            RedirectPage(history);
-        }
+        // if(window.localStorage['navigateScreen'] !== "TestCase"){
+        //     RedirectPage(history);
+        // }
     }, []);
 
     return (
