@@ -492,7 +492,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 					// $(".mappedFiles").append('<div class="linkedTestset"><label data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" data-qctestset="'+data[i].qctestset+'">'+data[i].qctestcase+'</label><span class="linkedLine"></span><label data-scenarioid="'+data[i].testscenarioid+'">'+data[i].testscenarioname+'</label></div>');  //testscenarioname ??
 					var data_list = ''+data[i].qctestcase
 					data_list=data_list.replaceAll(',', ',<br>')
-					$(".mappedFiles").append('<div class="linkedTestset"><label style="float: left; width: 40%;" data-scenarioid="'+data[i].testscenarioid+'">'+data[i].testscenarioname+'</label><label style="float: right; width: 50%;" data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" data-qctestset="'+data[i].qctestset+'">'+data_list+'</label></div>');  //testscenarioname ??
+					$(".mappedFiles").append('<div class="linkedTestset"><label style="float: left; width: 40%; background-color: #E1CAFF;" data-scenarioid="'+data[i].testscenarioid+'">'+data[i].testscenarioname+'</label><label style="float: right; width: 50%; background-color: #fad7f1fb;" data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" data-qctestset="'+data[i].qctestset+'">'+data_list+'</label></div>');  //testscenarioname ??
 					// var data_list = data[i].qctestcase
 
 					// for (var j=0;j<data_list;j++){
