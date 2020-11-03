@@ -115,12 +115,13 @@ generateEmailPayload.userUpdate = async data => {
 			'productLogo': data.url + productLogo,
 			'username': user.name,
 			'name': user.firstname + ' ' + user.lastname,
-			'datetime': new Date().toLocaleString()
+			'datetime': new Date().toLocaleString(),
+			'customFooter': "Please contact your Avo Assure administrator for any trouble logging in, or to disable further notifications."
 		}
 	};
 
 	if (data.field === 'password') {
-		msg.subject = 'Your password has been changed';
+		msg.subject = 'Your Avo Assure password has been changed';
 		msg.context.password = true;
 	}
 
