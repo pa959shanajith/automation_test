@@ -370,10 +370,10 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 					const testsuite = execReq.suitedetails[testsuiteIndex];
 					const scenarioIndex = testsuite.scenarioIds.indexOf(scenarioid);
 					const scenarioname = testsuite.scenarioNames[scenarioIndex];
-					if (!testsuite.reportData) testsuite.reportData = Array.from({length: testsuite.scenarioIds.length}, () => []);
+					let scenarioCount = testsuite.scenarioIds.length * testsuite.browserType.length;
+					if (!testsuite.reportData) testsuite.reportData = [];//Array.from({length: testsuite.scenarioIds.length}, () => {});
 					try {
 						const reportData = JSON.parse(JSON.stringify(resultData.reportData).replace(/'/g, "''"));
-						var scenarioCount = testsuite.scenarioIds.length * testsuite.browserType.length;
 						if (execType == "API") {
 							if (d2R[testsuiteid] === undefined) d2R[testsuiteid] = {"testsuiteName": testsuite.testsuitename, "testsuiteId": testsuiteid, "scenarios": {}};
 							if (d2R[testsuiteid].scenarios[scenarioid] === undefined) d2R[testsuiteid].scenarios[scenarioid] = [];
@@ -406,7 +406,8 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 								logger.info("Successfully inserted report data");
 								logger.debug("Successfully inserted report data for scenario (id: "+scenarioid+") with executionid "+executionid);
 							}
-							testsuite.reportData[scenarioIndex] = reportItem;
+							// testsuite.reportData[scenarioIndex] = reportItem;
+							testsuite.reportData.push(reportItem);
 							completedSceCount++;
 							if (completedSceCount == scenarioCount) {
 								const suiteStatus = (statusPass == scenarioCount) ? "pass" : "fail";

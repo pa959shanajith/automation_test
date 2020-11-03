@@ -1,4 +1,5 @@
 const validator = require('validator');
+const logger = require('../../logger');
 const utils = require('../lib/utils');
 
 const companyLogo = "/imgs/avo-logo.png";
@@ -9,7 +10,13 @@ module.exports.getPayload = async (channel, event, data) => {
 	let payloadGenerator;
 	if (channel == "email") payloadGenerator = generateEmailPayload[event];
 	if (!payloadGenerator) return {error: { msg: "Notification event "+event+" not found", code: "UNKNOWN_EVENT"}};
-	return payloadGenerator(data);
+	try {
+		return payloadGenerator(data);
+	} catch (e) {
+		const err = {error: { msg: "Error while generating payload data", code: "PAYLOAD_ERROR"}};
+		logger.error(err.msg + ". Error: %s", e);
+		return err;
+	}
 };
 
 generateEmailPayload.test = async data => {

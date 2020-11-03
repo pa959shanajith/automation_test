@@ -429,19 +429,17 @@
                <td class="rDActualRes tabCont" style="padding-left: 10px;">As Expected</td>
                {{/ifEquals}}
                {{#ifnotEquals testcase_details.actualResult_pass ""}}
-               <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}}</a>
-               </td>
+               <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}}</td>
                {{/ifnotEquals}}
                {{/ifEquals}}
                {{#ifEquals status "Fail"}}
                {{#ifEquals testcase_details.actualResult_fail ""}}
-               <td class="rDActualRes tabCont" style="padding-left: 10px;"><a
-                     style="color: {{getColor status}};text-decoration:none"
-                     href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
+               <td class="rDActualRes tabCont" style="padding-left: 10px;">
+                  <a style="color: {{getColor status}};text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a>
+               </td>
                {{/ifEquals}}
                {{#ifnotEquals testcase_details.actualResult_fail ""}}
-               <td class="rDActualRes tabCont" style="padding-left: 10px;">
-                  {{testcase_details.actualResult_fail}}</td>
+               <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}</td>
                {{/ifnotEquals}}
                {{/ifEquals}}
                {{#ifEquals status "Terminate"}}
@@ -449,11 +447,11 @@
                {{/ifEquals}}
                {{/ifnotEquals}}
                <!-- If Hide Test Details is False -->
-               <td class="rDstatus tabCont" style="padding-left: 10px; color: {{getColor status}}"><a
-                     style="color:inherit;text-decoration:none"
-                     href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
+               <td class="rDstatus tabCont" style="padding-left: 10px; color: {{getColor status}}">
+                  <a style="color:inherit;text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a>
+               </td>
                <td class="rDellaps tabCont">{{EllapsedTime}}</td>
-               {{#ifnotEquals  ../commentsLength 0}}
+               {{#ifnotEquals ../commentsLength 0}}
                <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td>
                {{/ifnotEquals}}
                <td class="rjira tabCont" style="padding-left: 10px;">{{jira_defect_id}}</td>

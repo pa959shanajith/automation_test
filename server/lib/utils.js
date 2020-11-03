@@ -191,6 +191,7 @@ module.exports.tokenValidation = async (userInfo) => {
 	if (response != "fail" && response != "invalid") validUser = bcrypt.compareSync(userInfo.tokenhash || "", response.hash);
 	if (validUser) {
 		userInfo.userid = response.userid;
+		userInfo.username = response.username;
 		userInfo.role = response.role;
 		if(response.deactivated == "active") {
 			tokenValidation.status = "passed";

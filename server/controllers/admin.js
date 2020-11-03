@@ -1776,13 +1776,13 @@ const getEmailConf = async (conf, fnName, inputs, flag) => {
 			url: proxy.url || "",
 			auth: proxy.auth || false
 		};
-		if (!regExURL.test(inputs.proxy.url) && !validator.isURL(inputs.proxy.url)) {
+		if (inputs.proxy.enable && !regExURL.test(inputs.proxy.url) && !validator.isURL(inputs.proxy.url)) {
 			logger.error("Error occurred in admin/"+fnName+": Invalid Proxy URL.");
 			flag[11]='1';
 		}
 		inputs.proxy.user = proxy.user || "";
 		inputs.proxy.pass = proxy.pass || "";
-		if (inputs.proxy.auth) {
+		if (inputs.proxy.enable && inputs.proxy.auth) {
 			if (inputs.proxy.user.length == 0 && inputs.proxy.pass.length == 0) {
 				logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Credentials.");
 				flag[12]='3';

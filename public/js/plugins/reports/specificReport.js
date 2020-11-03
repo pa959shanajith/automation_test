@@ -547,7 +547,7 @@ function loadReports() {
                         var err = errRes.emsg || "Error while exporting report JSON";
                         blockUI(err);
                         console.log("Error while exporting report JSON. Error: " + JSON.stringify(errRes));
-                        setTimeout(()=>unblockUI(), 2000);
+                        setTimeout(function () {unblockUI()}, 2000);
                     }
                 });
             } else if (repType == "pdf") {
@@ -558,7 +558,7 @@ function loadReports() {
                     type: 'GET',
                     url: url,
                     responseType: 'arraybuffer',
-                    xhr: () => xhrOverride,
+                    xhr: function() { return xhrOverride },
                     success: function(data) {
                         var filedata = new Blob([data], {
                             type: "application/pdf;charset=utf-8"
@@ -570,7 +570,7 @@ function loadReports() {
                         var err = jqXHR.getResponseHeader("X-Render-Error") || "Error while generating PDF Report";
                         blockUI(err);
                         console.log("Error while generating PDF Report. Error: " + JSON.stringify(err));
-                        setTimeout(()=>unblockUI(), 2000);
+                        setTimeout(function () {unblockUI()}, 2000);
                     }
                 });
             }

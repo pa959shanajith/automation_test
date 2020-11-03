@@ -745,7 +745,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             if (reportType == "wkhtmltopdf") reportType = "pdf";
             reportService.viewReport(reportID, reportType).then(function(data1) {
                 unblockUI();
-                if (reportType == "json") data1 = JSON.stringify(data, undefined, 2);
+                if (reportType == "json") data1 = JSON.stringify(data1, undefined, 2);
                 var filedata = new Blob([data1], {
                     type: "application/"+reportType+";charset=utf-8"
                 });

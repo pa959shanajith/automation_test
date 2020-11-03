@@ -46,7 +46,7 @@ io.on('connection', function (socket) {
 	} else {
 		var ice_info=socket.handshake.query;
 		var icename=ice_info.icename;
-		logger.info("ICE Socket connecting address %s : %s", icename);
+		logger.info("ICE Socket connecting address: %s", icename);
 		var icesession = ice_info.icesession;
 		var inputs = {
 			"icesession": icesession,
@@ -206,7 +206,7 @@ io.on('connection', function (socket) {
 const registerICE = async (req, res) => {
 	logger.info("Inside ICE Registration");
 	const icename = req.body.icename;
-	logger.info("Registration request from ICE %s : %s", icename);
+	logger.info("Registration request from ICE address: %s", icename);
 	const inputs = { "query": "connect", "icesession": req.body.icesession };
 	var data = {};
 	try {
