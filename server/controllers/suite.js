@@ -504,7 +504,7 @@ exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 	const userInfoList = [];
 	const executionResult = [];
 	if (!multiBatchExecutionData || multiBatchExecutionData.constructor !== Array || multiBatchExecutionData.length === 0 ) {
-		res.status(400).send({"executionStatus": [{"status": "fail", "error": "Empty or Invalid Batch Data"}]});
+		return res.status(400).send({"executionStatus": [{"status": "fail", "error": "Empty or Invalid Batch Data"}]});
 	}
 	for (let i = 0; i < multiBatchExecutionData.length; i++) {
 		const executionData = multiBatchExecutionData[i];
