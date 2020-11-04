@@ -1,5 +1,6 @@
 import React ,  { Fragment, useEffect, useState, useRef} from 'react';
-import {getProjectList, getModules, getScreens} from '../api';
+import {getProjectList, getModules, getScreens, pdProcess} from '../api';
+import {v4 as uuid} from 'uuid'
 import LoadingBar from 'react-top-loading-bar';
 import { useDispatch, useSelector} from 'react-redux';
 import MindmapToolbar from './MindmapToolbar';
@@ -8,7 +9,9 @@ import Legends from '../components/Legends'
 import * as actionTypes from '../state/action';
 import Canvas from './MindmapCanvas';
 import '../styles/CreateNew.scss';
-import { ScreenOverlay, PopupMsg, ReferenceBar} from '../../global';
+import { xml2json, getApptypePD, getJsonPd } from './MindmapUtils';
+
+import { ScreenOverlay, PopupMsg, ReferenceBar, ModalContainer} from '../../global';
 
 /*Component CreateNew
   use: renders create New Mindmap page
@@ -17,13 +20,17 @@ import { ScreenOverlay, PopupMsg, ReferenceBar} from '../../global';
     
 const CreateNew = () => {
   const dispatch = useDispatch()
+  const loadref = useRef(null)
   const [popup,setPopup] = useState({show:false})
   const [blockui,setBlockui] = useState({show:false})
   const [fullScreen,setFullScreen] = useState(false)
   const [verticalLayout,setVerticalLayout] = useState(false)
-  const loadref = useRef(null)
   const [loading,setLoading] = useState(true)
+  const [importProj,setImportProj] = useState(false)
+  const prjList = useSelector(state=>state.mindmap.projectList)
   const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
+  const importData = useSelector(state=>state.mindmap.importData)
+
   useEffect(()=>{
     (async()=>{
       loadref.current.staticStart()
@@ -42,6 +49,44 @@ const CreateNew = () => {
       setLoading(false)
     })()
   },[dispatch])
+  useEffect(()=>{
+    if(importData.data && importProj){
+      loadImportData()
+    }
+  },[importData,importProj])
+
+  const closeImport = () => {
+    setImportProj(false)
+    dispatch({type:actionTypes.UPDATE_IMPORTDATA,payload:{createdby:undefined,data:undefined}})
+  }
+  
+  const loadImportData = async() =>{
+    var impData = {...importData}
+    if(importData.createdby === 'pd'){
+      var appType = getApptypePD(importData.data)
+      if(appType!=prjList[importProj].apptypeName.toLowerCase()){
+        displayError("App Type Error", "AppType doesn't match, please check!!")
+        return;
+      }else{
+        setBlockui({show:true,content:"Importing File.. Please Wait.."});
+        var res =  await pdProcess({'projectid':importProj,'file':importData.data})
+        if(res.error){displayError(res.error);return;}
+        var data = getJsonPd(res.data)
+        impData.data = data
+      }
+    }
+    var moduledata = await getModules({"tab":"tabCreate","projectid":importProj,"moduleid":null})
+    if(moduledata.error){displayError(moduledata.error);return;}
+    var screendata = await getScreens(importProj)
+    if(screendata.error){displayError(screendata.error);return;}
+    dispatch({type:actionTypes.SELECT_PROJECT,payload:importProj})
+    dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true,importData:impData}})
+    dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
+    dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
+    dispatch({type:actionTypes.UPDATE_IMPORTDATA,payload:{createdby:undefined,data:undefined}})
+    setImportProj(false)
+  }
+
   const displayError = (error) =>{
     setLoading(false)
     setPopup({
@@ -58,7 +103,7 @@ const CreateNew = () => {
         <LoadingBar shadow={false} color={'#633690'} className='loading-bar' ref={loadref}/>
         {(!loading)?
           <div className='mp__canvas_container'>
-            <MindmapToolbar setPopup={setPopup}/>
+            <MindmapToolbar setBlockui={setBlockui} setPopup={setPopup}/>
             <div id='mp__canvas' className='mp__canvas'>
               {(Object.keys(moduleSelect).length>0)?
               <Canvas setBlockui={setBlockui} setPopup={setPopup} module={moduleSelect} verticalLayout={verticalLayout}/>
@@ -69,6 +114,13 @@ const CreateNew = () => {
             </div>
           </div>:null
         }
+        {importData.data && Object.keys(prjList).length>0 ?<ModalContainer 
+        modalClass = 'modal-sm'
+        title='Select Project'
+        close={closeImport}
+        footer={<Footer setImportProj={setImportProj}/>}
+        content={<Container prjList={prjList}/>} 
+        />:null}
         <ReferenceBar taskTop={true} collapsible={true} collapse={true}>
             <div className="ic_box" >
               <img onClick={()=>ClickSwitchLayout(verticalLayout,setVerticalLayout,moduleSelect,setPopup,setBlockui,dispatch)} alt='Switch Layout' style={{height: '55px'}} className={"rb__ic-task thumb__ic " + (verticalLayout?"active_rb_thumb ":"")} src="static/imgs/switch.png"/>
@@ -147,6 +199,7 @@ const parseProjList = (res) =>{
   res.projectId.forEach((e,i) => {
     proj[res.projectId[i]]= {
       'apptype': res.appType[i],
+      'apptypeName':res.appTypeName[i],
       'name': res.projectName[i],
       'id': res.projectId[i],
       'releases':res.releases[i],
@@ -154,6 +207,39 @@ const parseProjList = (res) =>{
     };
   });
   return proj
+}
+
+
+const Container = (props) => {
+  var projectList = Object.entries(props.prjList)
+  return(
+    <div className = 'mp__sheet-popup'>
+      <select id='mp__import-proj'>
+        <option value="" disabled selected>Please Select Project</option>
+        {projectList.map((e,i)=><option value={e[1].id} key={i}>{e[1].name}</option>)}
+      </select>
+    </div>
+  )
+}
+
+const Footer = (props) =>{
+  const [errMsg,setErrMsg] = useState('')
+  const submit = () => {
+    var projid = document.getElementById('mp__import-proj').value
+    if(projid !== ""){
+      props.setImportProj(projid)
+    }else{
+      setErrMsg("Project not selected")
+    }
+  }
+  return(
+    <Fragment>
+        <div className='mnode__buttons'>
+          <label className='err-message'>{errMsg}</label>
+          <button onClick={submit}>OK</button>
+        </div>
+    </Fragment>
+  )
 }
 
 export default CreateNew;

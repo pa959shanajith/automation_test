@@ -10,7 +10,7 @@ import MultiNodeBox from '../components/MultiNodeBox'
 import RectangleBox from '../components/RectangleBox'
 import SaveMapButton from '../components/SaveMapButton'
 import { useDispatch, useSelector} from 'react-redux';
-import {generateTree,addLink,addNode,toggleNode,moveNodeBegin,moveNodeEnd} from './MindmapUtils'
+import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap} from './MindmapUtils'
 import * as actionTypes from '../state/action';
 import '../styles/MindmapCanvas.scss';
 
@@ -31,11 +31,11 @@ var temp = {
     deleted:[],
     t: ""
 };
-var deletednode_info =[]
 var nodeMoving = false;
 
 const Canvas = (props) => {
     const dispatch = useDispatch()
+    const saveBtn = useRef()
     const copyNodes = useSelector(state=>state.mindmap.copyNodes)
     const selectBox = useSelector(state=>state.mindmap.selectBoxState)
     const deletedNodes = useSelector(state=>state.mindmap.deletedNodes)
@@ -61,19 +61,56 @@ const Canvas = (props) => {
             'screens': 0,
             'testcases': 0
         }
-        if (props.module.createnew && verticalLayout===props.verticalLayout ) {
-            // On Click of Create new button. No tree to be loaded
-            //create new mindmap
-            tree = createNewMap(props.verticalLayout)
-            tree.sections = types
-            tree.links = {}
-            tree.dLinks = []
-            if(zoom){
-                zoom.scale(1).translate([0,0]).event(d3.select(`.mp__canvas_svg`))
-                zoom.on("zoom",null)
+        if (props.module.createnew && verticalLayout===props.verticalLayout) {
+            if(props.module.importData){
+                var typeo;
+                var typen;
+                var activeNode=0;
+                // setBlockui({show:true,content:'Creating Nodes...'})
+                props.module.importData.data.forEach((e,i)=>{
+                    if (i === 0) {
+                        tree = createNewMap(props.verticalLayout,undefined,e.name)
+                        tree.links = {}
+                        tree.dLinks = []
+                        tree.sections = types
+                        count['modules'] = 1
+                        typeo = 1;
+                    }else {
+                        typen = e.type;
+                        if (typen > typeo) {
+                            activeNode = tree.dNodes.length - 1;
+                        } else if (typen < typeo) {
+                            var lvl = typeo - typen;
+                            if (lvl == 1) {
+                                activeNode = tree.dNodes[tree.dNodes.length - 1].parent.parent.id;
+                            }
+                            if (lvl == 2) {
+                                activeNode = tree.dNodes[tree.dNodes.length - 1].parent.parent.parent.id;
+                            }
+                        }
+                        var res = createNode(activeNode,{...tree.nodes},{...tree.links},[...tree.dNodes],[...tree.dLinks],{...tree.sections},{...count},e.name,verticalLayout)
+                        tree.links = res.linkDisplay
+                        tree.dLinks = res.dLinks
+                        tree.nodes = res.nodeDisplay
+                        tree.dNodes = res.dNodes
+                        count= {...count,...res.count}
+                        typeo = typen;
+                    }
+                })
+                if(props.module.importData.createdby==='pd')setCreateNew('save')
+            }else{
+                //create new mindmap
+                tree = createNewMap(props.verticalLayout)
+                tree.sections = types
+                tree.links = {}
+                tree.dLinks = []
+                if(zoom){
+                    zoom.scale(1).translate([0,0]).event(d3.select(`.mp__canvas_svg`))
+                    zoom.on("zoom",null)
+                }
+                count['modules'] = 1
+                setCreateNew(0)
             }
-            count['modules'] = 1
-            setCreateNew(0)
         } else {
             // To load an existing module. Tree has to be loaded. Possible places, module box / switch layout.
             tree = props.module
@@ -96,8 +133,11 @@ const Canvas = (props) => {
         setBlockui({show:false})
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.module,props.reload,props.verticalLayout]);
-    useEffect((e)=>{
-        if(createnew !== false){
+    useEffect(()=>{
+        if(createnew === 'save'){
+            setCreateNew(false)
+        }
+        else if(createnew !== false){
             var p = d3.select('#node_'+createnew);
             setCreateNew(false)
             setInpBox(p)
@@ -145,7 +185,6 @@ const Canvas = (props) => {
         setdNodes(cdNodes)
         setBlockui({show:false})
         setPopup({show:true,title:'Success',content:'Nodes created successfully!',submitText:'Ok'})
-
     }
     const clickAddNode=(e)=>{
         var res = createNode(e,{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},undefined,verticalLayout)
@@ -204,7 +243,7 @@ const Canvas = (props) => {
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
             <Legends/>
-            <SaveMapButton dNodes={[...dNodes]} setPopup={setPopup} setBlockui={setBlockui}/>
+            <SaveMapButton createnew={createnew} dNodes={[...dNodes]} setPopup={setPopup} setBlockui={setBlockui}/>
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
                 <g className='ct-container'>
                 {Object.entries(links).map((link)=>{
@@ -230,92 +269,6 @@ const Canvas = (props) => {
             </svg>
         </Fragment>
     );
-}
-
-const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay,setPopup) =>{
-    var deletedNodes = []
-    var sid = parseFloat(activeNode.split('node_')[1])
-    var s = d3.select('#'+activeNode);
-    // SaveCreateED('#ct-createAction', 1, 0);
-    var t = s.attr('data-nodetype');
-    if (t === 'modules') return;
-    var p = dNodes[sid].parent;
-    if(dNodes[sid]['taskexists']!=null){
-        setPopup({show:true,title:'Error',content:'Cannot delete node if task is assigned. Please unassign task first.',submitText:'Ok'})
-        return; 
-    }
-    var taskCheck=checkparenttask(dNodes[sid],false);
-    if(taskCheck){
-        setPopup({show:true,title:'Error',content:'Cannot delete node if parent task is assigned. Please unassign task first.',submitText:'Ok'})
-        return;
-    }
-    taskCheck=checkchildrentask(dNodes[sid],false);
-    if(taskCheck){
-        setPopup({show:true,title:'Error',content:'Cannot delete node if children task is assigned. Please unassign task first.',submitText:'Ok'})
-        return;
-    }
-    recurseDelChild(dNodes[sid],linkDisplay, nodeDisplay,dNodes,dLinks,undefined,deletedNodes);
-    for (var j = dLinks.length - 1; j >= 0; j--) {
-        if (dLinks[j].target.id === sid){
-            dLinks[j].deleted = !0;
-            delete linkDisplay['link-' + dLinks[j].source.id + '-' + dLinks[j].target.id];
-            break;
-        }
-    }
-    p.children.some((d, i)=>{
-        if (d.id === sid) {
-            p.children.splice(i, 1);
-            return !0;
-        }
-        return !1;
-    });
-    return {dNodes,dLinks,linkDisplay,nodeDisplay,deletedNodes}
-}
-
-const recurseDelChild = (d, linkDisplay, nodeDisplay, dNodes, dLinks, tab , deletedNodes) =>{
-    if (d.children) d.children.forEach((e)=>{recurseDelChild(e, linkDisplay, nodeDisplay, dNodes, dLinks, tab, deletedNodes)});
-    if(d.state === "deleted")return;
-    if(d._id){  
-        var parentid=dNodes[d.parent.id]._id;
-        deletedNodes.push([d._id,d.type,parentid]);
-    }
-    d.parent = null;
-    d.children = null;
-    d.task = null;
-    delete nodeDisplay[d.id];
-    deletednode_info.push(d);
-    dNodes[d.id].state = 'deleted';
-    var temp = dLinks;
-    for (var j = temp.length - 1; j >= 0; j--) {
-        if (temp[j].source.id === d.id) {
-            delete linkDisplay['link-' + temp[j].source.id + '-' + temp[j].target.id];
-            temp[j].deleted = !0;
-        }
-    }
-};
-
-const checkchildrentask = (childNode,children_flag)=>{
-    if(children_flag) return children_flag;
-    if (childNode.taskexists != null) {
-        children_flag=true;
-        return children_flag;
-    }
-    if (childNode.children) {
-        childNode.children.forEach((e)=>{children_flag=checkchildrentask(e, children_flag)})
-    }
-    return children_flag;
-}
-
-const checkparenttask = (parentNode,parent_flag)=>{
-    if (parent_flag) return parent_flag;
-    if(parentNode!=null){
-        if (parentNode.taskexists!=null) {
-            parent_flag=true;
-        }
-        parentNode=parentNode.parent || null;
-        parent_flag=checkparenttask(parentNode,parent_flag);
-    }
-    return parent_flag;
 }
 
 const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,count,setPopup,verticalLayout) => {
@@ -410,195 +363,6 @@ const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,
         return false
     }
     return {cnodes,clinks,cdNodes,cdLinks,csections,count};
-}
-
-const createNewMap = (verticalLayout) => {
-    var nodeDisplay = {}
-    var dNodes = []
-    var translate
-    var s = d3.select('.mp__canvas_svg');
-    var  cSize= [parseFloat(s.style("width")), parseFloat(s.style("height"))];
-    var node = {
-        id: 0,
-        childIndex: 0,
-        name: 'Module_0',
-        type: 'modules',
-        y: cSize[1] * 0.4,
-        x: cSize[0] * 0.1 * 0.9,
-        children: [],
-        parent: null,
-        state: 'created',
-        _id: null
-    };
-    if (verticalLayout) {
-        node.y = cSize[1] * 0.1 * (0.9);
-        node.x = cSize[0] * 0.4;
-    };
-    dNodes.push(node);
-    nodeDisplay[0] = addNode(dNodes[0]);
-    // nodeDisplay[0].task = false;
-    if (verticalLayout){
-        translate = [(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]
-    }
-    else{
-        translate = [(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]
-    }
-    return{nodes:nodeDisplay,dNodes,translate}
-}
-
-const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sections,count,obj,verticalLayout) => {
-    var uNix = dNodes.length
-    var pi = activeNode;
-    var pt = nodeDisplay[pi].type;
-    if (pt === 'testcases') return;
-    if (false && nodeDisplay[pi]._children != null)
-        return ;// openDialogMindmap('Error', 'Expand the node');
-    if (dNodes[pi].children === undefined) dNodes[pi]['children'] = [];
-    var nNext = {
-        'modules': ['Scenario', 1],
-        'scenarios': ['Screen', 2],
-        'screens': ['Testcase', 4]
-    };
-    var mapSvg = d3.select('.mp__canvas_svg');
-    var w = parseFloat(mapSvg.style('width'));
-    var h = parseFloat(mapSvg.style('height'));
-    var arr_co = [];
-    dNodes.forEach(function(d) {
-        if(d.state !== 'deleted'){
-            var objj = {
-                x: parseInt(d.x),
-                y: parseInt(d.y)
-            };
-            arr_co.push(objj);
-        }
-    });
-    count[(nNext[pt][0]).toLowerCase() + 's'] += 1
-    var tempName;
-    if (obj) {
-        tempName = obj;
-    } else {
-        tempName = nNext[pt][0]+'_'+count[(nNext[pt][0]).toLowerCase() + 's'];
-    }
-    var node = {
-        id: uNix,
-        children: [],
-        y: h * (0.15 * (1.34 + nNext[pt][1]) + Math.random() * 0.1),
-        x: 90 + 30 * Math.floor(Math.random() * (Math.floor((w - 150) / 80))),
-        parent: dNodes[pi],
-        state: 'created',
-        path: '',
-        name: tempName,
-        childIndex: '',
-        type: (nNext[pt][0]).toLowerCase() + 's'
-    }; 
-    getNewPosition(dNodes,node, pi, arr_co,verticalLayout,sections);
-    dNodes.push(node);
-    dNodes[pi].children.push(dNodes[uNix]);
-    dNodes[uNix].childIndex = dNodes[pi].children.length;
-    dNodes[uNix].cidxch = 'true'; // child index updated
-    var currentNode = addNode(dNodes[uNix]);
-    var link = {
-        id: uuid(),
-        source: dNodes[pi],
-        target: dNodes[uNix]
-    };
-    var lid = 'link-' + link.source.id + '-' + link.target.id
-    dLinks.push(link);
-    var currentLink = addLink(dNodes[pi], dNodes[uNix],verticalLayout);
-    nodeDisplay[uNix] = currentNode;
-    linkDisplay[lid] = currentLink;
-    return {nodeDisplay,linkDisplay,dNodes,dLinks,count}
-
-        //By default when a node is created it's name should be in ediatable mode
-        // CreateEditFlag = true;
-        // if (obj);
-        // else {
-        //     setTimeout(function() { $scope.editNode(true, node); }, 100);
-        // }
-
-}
-
-const getNewPosition = (dNodes,node, pi, arr_co ,layout_vertical,sections) => {
-    // Switch_layout functionality
-    // **NOTE**
-    //dNodes[pi].children are arranged in increasing
-    // order of x/y disance depending on layout
-    var index;
-    var new_one;
-    if (dNodes[pi].children.length > 0) { // new node has siblings
-        index = dNodes[pi].children.length - 1;
-        if (layout_vertical)
-            new_one = {
-                x: parseInt(dNodes[pi].children[index].x) + 100,
-                y: sections[node.type]
-            }; // Go beside last sibling node
-        else
-            new_one = {
-                x: sections[node.type],
-                y: parseInt(dNodes[pi].children[index].y + 80)
-            };
-        node = getNonOverlappingPosition(node, arr_co, new_one,layout_vertical);
-
-    } else { //first kid of any node
-        if (dNodes[pi].parent != null) { //if kid of scenario/testcase/screen
-            // var arr = dNodes[pi].parent.children;
-            index = dNodes[pi].parent.children.length - 1; //number of parents siblings - 1
-            //new_one={x:parseInt(arr[index].x),y:parseInt(arr[index].y)+125};
-
-            if (layout_vertical) {
-                new_one = {
-                    x: parseInt(dNodes[pi].x),
-                    y: parseInt(sections[node.type])
-                }; // go directly below parent
-            } else {
-                new_one = {
-                    x: parseInt(sections[node.type]),
-                    y: parseInt(dNodes[pi].y)
-                }; // go directly below parent
-            }
-            node = getNonOverlappingPosition(node, arr_co, new_one,layout_vertical);
-
-        } else { //Module's kid
-            //layout_change
-            if (layout_vertical) {
-                node.x = parseInt(dNodes[pi].x);
-                node.y = parseInt(sections[node.type]);
-            } else {
-                node.y = parseInt(dNodes[pi].y);
-                node.x = parseInt(sections[node.type]);
-            }
-        }
-
-    }
-    return node;
-}
-
-const getNonOverlappingPosition = (node, arr_co, new_one,verticalLayout) => {
-    var dist = 0;
-    dist = closestCord(arr_co, new_one);
-    while (dist < 60) {
-        if (verticalLayout) {
-            new_one.x = new_one.x + 80;
-        } else {
-            new_one.y = new_one.y + 80;
-        }
-        dist = closestCord(arr_co, new_one);
-    }
-    node.x = new_one.x;
-    node.y = new_one.y;
-    return node;
-}
-
-function closestCord(arr_co, new_one) {
-    var dmin = 1000;
-    for (var i = 0; i < arr_co.length; i++) {
-        var a = new_one.x - arr_co[i].x;
-        var b = new_one.y - arr_co[i].y;
-        var c = Math.sqrt(a * a + b * b);
-        if (c < dmin)
-            dmin = c;
-    }
-    return dmin;
 }
 
 const bindZoomListner = (setCtScale,translate) => {

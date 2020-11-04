@@ -22,8 +22,9 @@ const Toolbarmenu = (props) => {
     const moduleList = useSelector(state=>state.mindmap.moduleList)
     const [modlist,setModList] = useState(moduleList)
     const setPopup = props.setPopup
-
+    const setBlockui = props.setBlockui
     const selectProj = async(proj) => {
+        setBlockui({show:true,content:'Loading Modules ...'})
         dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
         var moduledata = await getModules({"tab":"tabCreate","projectid":proj,"moduleid":null})
         if(moduledata.error){displayError(moduledata.error);return;}
@@ -34,6 +35,7 @@ const Toolbarmenu = (props) => {
         dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         if(screendata)dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
         SearchInp.current.value = ""
+        setBlockui({show:false})
     }
     const searchModule = (val) =>{
         var filter = modlist.filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)

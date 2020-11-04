@@ -50,7 +50,7 @@ const RectangleBox = (props) =>{
         }else if(dNodes_c.indexOf(dNodes[i]) === -1){
           d3.select('#node_'+i).classed('node-selected',false)
         }
-    }
+      }
     })
     dLinks.forEach(function(e, i) {
       if (d3.select('#node_' + e.source.id).classed('node-selected') && d3.select('#node_' + e.target.id).classed('node-selected')) {

@@ -1,7 +1,7 @@
 import React ,  { Fragment, useEffect, useState, useRef} from 'react';
 import {getProjectList, getModules, getScreens} from '../api';
 import { useDispatch, useSelector} from 'react-redux';
-import { ScreenOverlay, PopupMsg, ReferenceBar} from '../../global';
+import { ScreenOverlay, PopupMsg, ReferenceBar, SetProgressBar} from '../../global';
 import  ToolbarMenuEnE from '../components/ToolbarMenuEnE'
 import CanvasEnE from './CanvasEnE'
 import * as actionTypes from '../state/action';
@@ -15,7 +15,7 @@ const CreateEnE = () =>{
   const [verticalLayout,setVerticalLayout] = useState(false)
   const moduleSelect = useSelector(state=>state.mindmap.selectedModule)//remove
   useEffect(()=>{(async()=>{
-    // loadref.current.staticStart()
+    SetProgressBar("start",dispatch)
     var res = await getProjectList()
     if(res.error){displayError(res.error);return;}
     var data = parseProjList(res)
@@ -27,13 +27,11 @@ const CreateEnE = () =>{
     // if(screendata.error){displayError(screendata.error);return;}
     // dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
     dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
-    // loadref.current.complete()
-    // setLoading(false)
+    SetProgressBar("stop",dispatch)
   })()
-    // var projectid = {"tab":"endToend","projectid":"5de4e4aed9cdd57f4061bcb1","version":null,"cycId":null,"modName":null}
   },[])
   const displayError = (error) =>{
-    // setLoading(false)
+    SetProgressBar("stop",dispatch)
     setPopup({
       title:'ERROR',
       content:error,
@@ -46,7 +44,7 @@ const CreateEnE = () =>{
       {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
       {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
       <div id='ene' className='mp__canvas_container'>
-        <ToolbarMenuEnE/>
+        <ToolbarMenuEnE setBlockui={setBlockui} setPopup={setPopup}/>
         <div id='mp__canvas' className='mp__canvas'>
           {(Object.keys(moduleSelect).length>0)?<CanvasEnE setBlockui={setBlockui} setPopup={setPopup} module={moduleSelect} verticalLayout={verticalLayout}/>:null}
         </div>

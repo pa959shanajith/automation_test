@@ -8,14 +8,40 @@ import ModuleListDropEnE from './ModuleListDropEnE';
 
 const ToolbarMenuEnE = (props) =>{
     const dispatch = useDispatch()
+    const SearchMdInp = useRef()
+    const SearchScInp = useRef()
+    const moduleList = useSelector(state=>state.mindmap.moduleList)
     const initProj = useSelector(state=>state.mindmap.selectedProj)
     const prjList = useSelector(state=>state.mindmap.projectList)
+    const [modName,setModName] = useState(false)
+    const [modlist,setModList] = useState(undefined)
+    const [filterSc,setFilterSc] = useState('')
     const setPopup = props.setPopup
+    const setBlockui = props.setBlockui
 
     const selectProj = async(proj) =>{
         dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
-        var moduledata = await getModules({"tab":"tabCreate","projectid":proj,"moduleid":null})
+        setBlockui({show:true,content:'Loading modules ...'})
+        var moduledata = await getModules({"tab":"endToend","projectid":proj,"moduleid":null})
         if(moduledata.error){displayError(moduledata.error);return;}
+        dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
+        setModList(moduledata)
+        setModName(false)
+        setBlockui({show:false})
+        SearchMdInp.current.value = ""
+        SearchScInp.current.value = ""
+    }
+    const searchModule = (val) =>{
+        var initmodule = modlist
+        if(!initmodule){
+            initmodule = moduleList
+            setModList(moduleList)
+        }
+        var filter = initmodule.filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
+        dispatch({type:actionTypes.UPDATE_MODULELIST,payload:filter})
+    }
+    const searchScenario = (val) =>{
+        setFilterSc(val)
     }
     const displayError = (error) =>{
         setPopup({
@@ -35,18 +61,18 @@ const ToolbarMenuEnE = (props) =>{
                     {projectList.map((e,i)=><option value={e[1].id} key={i}>{e[1].name}</option>)}
                 </select>
                 <span className='ene_toolbar__header-searchbox'>
-                    <input placeholder="Search Modules"onChange={(e)=>selectProj(e.target.value)}></input>
+                    <input placeholder="Search Modules" ref={SearchMdInp} onChange={(e)=>searchModule(e.target.value)}></input>
                     <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
                 </span>
             </div>
             <div className='ene_toolbar_scenario'>
-                <label>Scenarios:</label>
+                <label>{modName?`Module Name: ${modName}`:'Scenarios'}</label>
                 <span className='ene_toolbar__header-searchbox'>
-                    <input placeholder="Search Modules"onChange={(e)=>selectProj(e.target.value)}></input>
+                    <input placeholder="Search Scenario" ref={SearchScInp} onChange={(e)=>searchScenario(e.target.value)}></input>
                     <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
                 </span>
             </div>
-            <ModuleListDropEnE/>
+            <ModuleListDropEnE {...props} filterSc={filterSc} setModName={setModName}/>
         </div>
         </Fragment>
     )

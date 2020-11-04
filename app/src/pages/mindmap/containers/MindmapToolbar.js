@@ -13,7 +13,7 @@ const MindmapToolbar = (props) => {
   return (
     <Fragment>
       <div className='toolbar__container'>
-          <Toolbarmenu setPopup={props.setPopup}/>
+          <Toolbarmenu setBlockui={props.setBlockui} setPopup={props.setPopup}/>
       </div>
       <ModuleListDrop setPopup={props.setPopup}/>
     </Fragment>

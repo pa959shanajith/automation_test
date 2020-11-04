@@ -10,7 +10,9 @@ const initialState = {
     selectBoxState: false,
     selectNodes: {nodes:[],links:[]},
     copyNodes: {nodes:[],links:[]},
-    deletedNodes: []
+    deletedNodes: [],
+    scenarioList:[],
+    importData:{createdby:undefined,data:undefined}
 };
 
 const reducer = (state = initialState , action) => {
@@ -64,7 +66,26 @@ const reducer = (state = initialState , action) => {
             return{
                 ...state,
                 deletedNodes: action.payload
-            }    
+            }   
+        case actionTypes.UPDATE_SCENARIOLIST:
+            return{
+                ...state,
+                scenarioList: action.payload
+            }   
+        case actionTypes.UPDATE_IMPORTDATA:
+            return{
+                ...state,
+                importData: action.payload
+            }
+        case actionTypes.SAVE_MINDMAP :
+            return{
+                ...state,
+                screenData: action.payload.screendata,
+                deletedNodes: [],
+                moduleList: action.payload.moduledata,
+                selectedModule: {},
+                scenarioList:[]
+            }
         default: 
             return state
     }

@@ -86,7 +86,7 @@
     background: #cae0f3;
     color: inherit;
 }
-.selectScenario{
+.dropdown_scenarios.selected{
     background-color: #4299e2;
     color: #fff;
 }
@@ -115,4 +115,29 @@
     border-radius: 2px;
     left: calc(50% - 37px);
     cursor: pointer;
+}
+.ene_toolbar__buttons{
+    float: right;
+}
+.ene_toolbar__buttons button{
+    color: #fff;
+    border: 0;
+    border-radius: 20px;
+    background: #643693;
+    outline: 0;
+    margin-right: 15px;
+    font-size: 13px;
+    font-family: 'LatoWebLight';
+    padding: 3px 12px 0px 12px;
+    min-width: 65px;
+}
+.ene_toolbar__buttons button:hover{
+    color: #fff;
+}
+.ene_toolbar__buttons button:focus{
+    outline: 0;
+    box-shadow: none;
+}
+.ene_toolbar__scrollwrap {
+    height: calc(100% - 17px);
 }

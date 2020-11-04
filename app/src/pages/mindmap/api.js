@@ -96,17 +96,18 @@ export const getScreens = async(projectId) => {
 
 export const saveMindmap = async(props) => {
     var data = {
-        action: "/saveData",
+        action:props.action?props.action:"/saveData",
         write: props.write,
         map: props.map,
         deletednode: props.deletednode,
         unassignTask: props.unassignTask,
         prjId: props.prjId,
         createdthrough: props.createdthrough,
-        cycId: props.cycId
+        cycId: props.cycId,
+        relId: props.relId?props.relId:null
     }
     try{
-        const res = await axios(url+'/saveData', {
+        const res = await axios(url+data.action, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -159,4 +160,90 @@ export const exportToExcel = async(props) => {
     }
 }
 
+/*Component getScenarios
+  api returns {screenList: [{name:"",parent:[],_id:""}], testCaseList: [{name:"",parent:[],_id:"",screenid:''}]}
+*/
 
+export const getScenarios = async(moduleID) => {
+    try{
+        const res = await axios(url+'/populateScenarios', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {"action":"populateScenarios","moduleId":moduleID},
+            credentials: 'include'
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'Failed to fetch scenarios'}
+    }catch(err){
+        console.error(err)
+        return {error:'Failed to fetch scenarios'}
+    }
+}
+
+
+
+/*Component excelToMindmap
+  api returns {screenList: [{name:"",parent:[],_id:""}], testCaseList: [{name:"",parent:[],_id:"",screenid:''}]}
+*/
+
+export const excelToMindmap = async(data) => {
+    try{
+        const res = await axios(url+'/excelToMindmap', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {'data':data},
+            credentials: 'include'
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'error fetching sheet names'}
+    }catch(err){
+        console.error(err)
+        return {error:'error fetching sheet names'}
+    }
+}
+
+/*Component excelToMindmap
+  api returns {screenList: [{name:"",parent:[],_id:""}], testCaseList: [{name:"",parent:[],_id:"",screenid:''}]}
+*/
+
+export const pdProcess = async(data) => {
+    try{
+        const res = await axios(url+'/pdProcess', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {'data':data},
+            credentials: 'include'
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        return {error:'error fetching data from file'}
+    }catch(err){
+        console.error(err)
+        return {error:'error fetching data from file'}
+    }
+}

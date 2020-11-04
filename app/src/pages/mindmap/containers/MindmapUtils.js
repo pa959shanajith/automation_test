@@ -45,6 +45,133 @@ const recurseTogChild = (nodeDisplay, linkDisplay, d, v, dLinks) => {
     });
 };
 
+const getNewPosition = (dNodes,node, pi, arr_co ,layout_vertical,sections) => {
+    //dNodes[pi].children are arranged in increasing
+    // order of x/y disance depending on layout
+    var index;
+    var new_one;
+    if (dNodes[pi].children.length > 0) { // new node has siblings
+        index = dNodes[pi].children.length - 1;
+        if (layout_vertical)
+            new_one = {
+                x: parseInt(dNodes[pi].children[index].x) + 100,
+                y: sections[node.type]
+            }; // Go beside last sibling node
+        else
+            new_one = {
+                x: sections[node.type],
+                y: parseInt(dNodes[pi].children[index].y + 80)
+            };
+        node = getNonOverlappingPosition(node, arr_co, new_one,layout_vertical);
+
+    } else { //first kid of any node
+        if (dNodes[pi].parent != null) { //if kid of scenario/testcase/screen
+            // var arr = dNodes[pi].parent.children;
+            index = dNodes[pi].parent.children.length - 1; //number of parents siblings - 1
+            //new_one={x:parseInt(arr[index].x),y:parseInt(arr[index].y)+125};
+
+            if (layout_vertical) {
+                new_one = {
+                    x: parseInt(dNodes[pi].x),
+                    y: parseInt(sections[node.type])
+                }; // go directly below parent
+            } else {
+                new_one = {
+                    x: parseInt(sections[node.type]),
+                    y: parseInt(dNodes[pi].y)
+                }; // go directly below parent
+            }
+            node = getNonOverlappingPosition(node, arr_co, new_one,layout_vertical);
+
+        } else { //Module's kid
+            //layout_change
+            if (layout_vertical) {
+                node.x = parseInt(dNodes[pi].x);
+                node.y = parseInt(sections[node.type]);
+            } else {
+                node.y = parseInt(dNodes[pi].y);
+                node.x = parseInt(sections[node.type]);
+            }
+        }
+
+    }
+    return node;
+}
+
+const getNonOverlappingPosition = (node, arr_co, new_one,verticalLayout) => {
+    var dist = 0;
+    dist = closestCord(arr_co, new_one);
+    while (dist < 60) {
+        if (verticalLayout) {
+            new_one.x = new_one.x + 80;
+        } else {
+            new_one.y = new_one.y + 80;
+        }
+        dist = closestCord(arr_co, new_one);
+    }
+    node.x = new_one.x;
+    node.y = new_one.y;
+    return node;
+}
+
+function closestCord(arr_co, new_one) {
+    var dmin = 1000;
+    for (var i = 0; i < arr_co.length; i++) {
+        var a = new_one.x - arr_co[i].x;
+        var b = new_one.y - arr_co[i].y;
+        var c = Math.sqrt(a * a + b * b);
+        if (c < dmin)
+            dmin = c;
+    }
+    return dmin;
+}
+
+const checkparenttask = (parentNode,parent_flag)=>{
+    if (parent_flag) return parent_flag;
+    if(parentNode!=null){
+        if (parentNode.taskexists!=null) {
+            parent_flag=true;
+        }
+        parentNode=parentNode.parent || null;
+        parent_flag=checkparenttask(parentNode,parent_flag);
+    }
+    return parent_flag;
+}
+
+const checkchildrentask = (childNode,children_flag)=>{
+    if(children_flag) return children_flag;
+    if (childNode.taskexists != null) {
+        children_flag=true;
+        return children_flag;
+    }
+    if (childNode.children) {
+        childNode.children.forEach((e)=>{children_flag=checkchildrentask(e, children_flag)})
+    }
+    return children_flag;
+}
+
+const recurseDelChild = (d, linkDisplay, nodeDisplay, dNodes, dLinks, tab , deletedNodes) =>{
+    if (d.children) d.children.forEach((e)=>{recurseDelChild(e, linkDisplay, nodeDisplay, dNodes, dLinks, tab, deletedNodes)});
+    if(d.state === "deleted")return;
+    if(d._id){  
+        var parentid=dNodes[d.parent.id]._id;
+        deletedNodes.push([d._id,d.type,parentid]);
+    }
+    d.parent = null;
+    d.children = null;
+    d.task = null;
+    delete nodeDisplay[d.id];
+    // deletednode_info.push(d);
+    dNodes[d.id].state = 'deleted';
+    var temp = dLinks;
+    for (var j = temp.length - 1; j >= 0; j--) {
+        if (temp[j].source.id === d.id) {
+            delete linkDisplay['link-' + temp[j].source.id + '-' + temp[j].target.id];
+            temp[j].deleted = !0;
+        }
+    }
+};
+
 export const generateTree = (tree,sections,count,verticalLayout) =>{
     unfoldtree(tree)
     var translate;
@@ -107,6 +234,40 @@ export const generateTree = (tree,sections,count,verticalLayout) =>{
     }
     foldtree(tree)
     return {nodes:nodeDisplay,links:linkDisplay,translate:translate,dNodes,dLinks,sections,count}
+}
+
+export const createNewMap = (verticalLayout,types,name) => {
+    var nodeDisplay = {}
+    var dNodes = []
+    var translate
+    var s = d3.select('.mp__canvas_svg');
+    var  cSize= [parseFloat(s.style("width")), parseFloat(s.style("height"))];
+    var node = {
+        id: 0,
+        childIndex: 0,
+        name: name?name:'Module_0',
+        type: types?types:'modules',
+        y: cSize[1] * 0.4,
+        x: cSize[0] * 0.1 * 0.9,
+        children: [],
+        parent: null,
+        state: 'created',
+        _id: null
+    };
+    if (verticalLayout) {
+        node.y = cSize[1] * 0.1 * (0.9);
+        node.x = cSize[0] * 0.4;
+    };
+    dNodes.push(node);
+    nodeDisplay[0] = addNode(dNodes[0]);
+    // nodeDisplay[0].task = false;
+    if (verticalLayout){
+        translate = [(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]
+    }
+    else{
+        translate = [(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]
+    }
+    return{nodes:nodeDisplay,dNodes,translate}
 }
 
 export const addNode = (n) =>{
@@ -232,3 +393,297 @@ export const toggleNode = (nid, nodeDisplay, linkDisplay, dNodes, dLinks) => {
     return {dLinks,dNodes,nodeDisplay,linkDisplay}
 }
 
+export const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sections,count,obj,verticalLayout,nodeID) => {
+    //if nodeID ene then
+    var uNix = dNodes.length
+    var pi = activeNode;
+    var pt = nodeDisplay[pi].type;
+    if (pt === 'testcases') return;
+    if (false && nodeDisplay[pi]._children != null)
+        return ;// openDialogMindmap('Error', 'Expand the node');
+    if (dNodes[pi].children === undefined) dNodes[pi]['children'] = [];
+    var nNext = {
+        'endtoend': ['Scenario', 1],
+        'modules': ['Scenario', 1],
+        'scenarios': ['Screen', 2],
+        'screens': ['Testcase', 4]
+    };
+    var mapSvg = d3.select('.mp__canvas_svg');
+    var w = parseFloat(mapSvg.style('width'));
+    var h = parseFloat(mapSvg.style('height'));
+    var arr_co = [];
+    dNodes.forEach(function(d) {
+        if(d.state !== 'deleted'){
+            var objj = {
+                x: parseInt(d.x),
+                y: parseInt(d.y)
+            };
+            arr_co.push(objj);
+        }
+    });
+    count[(nNext[pt][0]).toLowerCase() + 's'] += 1
+    var tempName;
+    if (obj) {
+        tempName = obj;
+    } else {
+        tempName = nNext[pt][0]+'_'+count[(nNext[pt][0]).toLowerCase() + 's'];
+    }
+    var node = {
+        id: uNix,
+        children: [],
+        y: h * (0.15 * (1.34 + nNext[pt][1]) + Math.random() * 0.1),
+        x: 90 + 30 * Math.floor(Math.random() * (Math.floor((w - 150) / 80))),
+        parent: dNodes[pi],
+        state: 'created',
+        path: '',
+        name: tempName,
+        childIndex: '',
+        type: (nNext[pt][0]).toLowerCase() + 's'
+    }; 
+    getNewPosition(dNodes,node, pi, arr_co,verticalLayout,sections);
+    if(nodeID){
+        node._id=nodeID
+    }
+    dNodes.push(node);
+    dNodes[pi].children.push(dNodes[uNix]);
+    dNodes[uNix].childIndex = dNodes[pi].children.length;
+    dNodes[uNix].cidxch = 'true'; // child index updated
+    var currentNode = addNode(dNodes[uNix]);
+    var link = {
+        id: uuid(),
+        source: dNodes[pi],
+        target: dNodes[uNix]
+    };
+    var lid = 'link-' + link.source.id + '-' + link.target.id
+    dLinks.push(link);
+    var currentLink = addLink(dNodes[pi], dNodes[uNix],verticalLayout);
+    nodeDisplay[uNix] = currentNode;
+    linkDisplay[lid] = currentLink;
+    return {nodeDisplay,linkDisplay,dNodes,dLinks,count}
+}
+
+export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay,setPopup) =>{
+    var deletedNodes = []
+    var sid = parseFloat(activeNode.split('node_')[1])
+    var s = d3.select('#'+activeNode);
+    // SaveCreateED('#ct-createAction', 1, 0);
+    var t = s.attr('data-nodetype');
+    if (t === 'modules' || t === 'endtoend') return;
+    var p = dNodes[sid].parent;
+    if(dNodes[sid]['taskexists']!=null){
+        setPopup({show:true,title:'Error',content:'Cannot delete node if task is assigned. Please unassign task first.',submitText:'Ok'})
+        return; 
+    }
+    var taskCheck=checkparenttask(dNodes[sid],false);
+    if(taskCheck){
+        setPopup({show:true,title:'Error',content:'Cannot delete node if parent task is assigned. Please unassign task first.',submitText:'Ok'})
+        return;
+    }
+    taskCheck=checkchildrentask(dNodes[sid],false);
+    if(taskCheck){
+        setPopup({show:true,title:'Error',content:'Cannot delete node if children task is assigned. Please unassign task first.',submitText:'Ok'})
+        return;
+    }
+    recurseDelChild(dNodes[sid],linkDisplay, nodeDisplay,dNodes,dLinks,undefined,deletedNodes);
+    for (var j = dLinks.length - 1; j >= 0; j--) {
+        if (dLinks[j].target.id === sid){
+            dLinks[j].deleted = !0;
+            delete linkDisplay['link-' + dLinks[j].source.id + '-' + dLinks[j].target.id];
+            break;
+        }
+    }
+    p.children.some((d, i)=>{
+        if (d.id === sid) {
+            p.children.splice(i, 1);
+            return !0;
+        }
+        return !1;
+    });
+    return {dNodes,dLinks,linkDisplay,nodeDisplay,deletedNodes}
+}
+
+//pd Utils
+const xml2json = (xml, tab) => {
+  var X = {
+    toObj: function (xml) {
+      var o = {};
+      if (xml.nodeType == 1) {   // element node ..
+        if (xml.attributes.length)   // element with attributes  ..
+          for (var i = 0; i < xml.attributes.length; i++)
+            o["@" + xml.attributes[i].nodeName] = (xml.attributes[i].nodeValue || "").toString();
+        if (xml.firstChild) { // element has child nodes ..
+          var textChild = 0, cdataChild = 0, hasElementChild = false;
+          for (var n = xml.firstChild; n; n = n.nextSibling) {
+            if (n.nodeType == 1) hasElementChild = true;
+            else if (n.nodeType == 3 && n.nodeValue.match(/[^ \f\n\r\t\v]/)) textChild++; // non-whitespace text
+            else if (n.nodeType == 4) cdataChild++; // cdata section node
+          }
+          if (hasElementChild) {
+            if (textChild < 2 && cdataChild < 2) { // structured element with evtl. a single text or/and cdata node ..
+              X.removeWhite(xml);
+              for (var n = xml.firstChild; n; n = n.nextSibling) {
+                if (n.nodeType == 3)  // text node
+                  o["#text"] = X.escape(n.nodeValue);
+                else if (n.nodeType == 4)  // cdata node
+                  o["#cdata"] = X.escape(n.nodeValue);
+                else if (o[n.nodeName]) {  // multiple occurence of element ..
+                  if (o[n.nodeName] instanceof Array)
+                    o[n.nodeName][o[n.nodeName].length] = X.toObj(n);
+                  else
+                    o[n.nodeName] = [o[n.nodeName], X.toObj(n)];
+                }
+                else  // first occurence of element..
+                  o[n.nodeName] = X.toObj(n);
+              }
+            }
+            else { // mixed content
+              if (!xml.attributes.length)
+                o = X.escape(X.innerXml(xml));
+              else
+                o["#text"] = X.escape(X.innerXml(xml));
+            }
+          }
+          else if (textChild) { // pure text
+            if (!xml.attributes.length)
+              o = X.escape(X.innerXml(xml));
+            else
+              o["#text"] = X.escape(X.innerXml(xml));
+          }
+          else if (cdataChild) { // cdata
+            if (cdataChild > 1)
+              o = X.escape(X.innerXml(xml));
+            else
+              for (var n = xml.firstChild; n; n = n.nextSibling)
+                o["#cdata"] = X.escape(n.nodeValue);
+          }
+        }
+        if (!xml.attributes.length && !xml.firstChild) o = null;
+      }
+      else if (xml.nodeType == 9) { // document.node
+        o = X.toObj(xml.documentElement);
+      }
+      else
+        alert("unhandled node type: " + xml.nodeType);
+      return o;
+    },
+    toJson: function (o, name, ind) {
+      var json = name ? ("\"" + name + "\"") : "";
+      if (o instanceof Array) {
+        for (var i = 0, n = o.length; i < n; i++)
+          o[i] = X.toJson(o[i], "", ind + "\t");
+        json += (name ? ":[" : "[") + (o.length > 1 ? ("\n" + ind + "\t" + o.join(",\n" + ind + "\t") + "\n" + ind) : o.join("")) + "]";
+      }
+      else if (o == null)
+        json += (name && ":") + "null";
+      else if (typeof (o) == "object") {
+        var arr = [];
+        for (var m in o)
+          arr[arr.length] = X.toJson(o[m], m, ind + "\t");
+        json += (name ? ":{" : "{") + (arr.length > 1 ? ("\n" + ind + "\t" + arr.join(",\n" + ind + "\t") + "\n" + ind) : arr.join("")) + "}";
+      }
+      else if (typeof (o) == "string")
+        json += (name && ":") + "\"" + o.toString() + "\"";
+      else
+        json += (name && ":") + o.toString();
+      return json;
+    },
+    innerXml: function (node) {
+      var s = ""
+      if ("innerHTML" in node)
+        s = node.innerHTML;
+      else {
+        var asXml = function (n) {
+          var s = "";
+          if (n.nodeType == 1) {
+            s += "<" + n.nodeName;
+            for (var i = 0; i < n.attributes.length; i++)
+              s += " " + n.attributes[i].nodeName + "=\"" + (n.attributes[i].nodeValue || "").toString() + "\"";
+            if (n.firstChild) {
+              s += ">";
+              for (var c = n.firstChild; c; c = c.nextSibling)
+                s += asXml(c);
+              s += "</" + n.nodeName + ">";
+            }
+            else
+              s += "/>";
+          }
+          else if (n.nodeType == 3)
+            s += n.nodeValue;
+          else if (n.nodeType == 4)
+            s += "<![CDATA[" + n.nodeValue + "]]>";
+          return s;
+        };
+        for (var c = node.firstChild; c; c = c.nextSibling)
+          s += asXml(c);
+      }
+      return s;
+    },
+    escape: function (txt) {
+      return txt.replace(/[\\]/g, "\\\\")
+        .replace(/[\"]/g, '\\"')
+        .replace(/[\n]/g, '\\n')
+        .replace(/[\r]/g, '\\r');
+    },
+    removeWhite: function (e) {
+      e.normalize();
+      for (var n = e.firstChild; n;) {
+        if (n.nodeType == 3) {  // text node
+          if (!n.nodeValue.match(/[^ \f\n\r\t\v]/)) { // pure whitespace text node
+            var nxt = n.nextSibling;
+            e.removeChild(n);
+            n = nxt;
+          }
+          else
+            n = n.nextSibling;
+        }
+        else if (n.nodeType == 1) {  // element node
+          X.removeWhite(n);
+          n = n.nextSibling;
+        }
+        else                      // any other node
+          n = n.nextSibling;
+      }
+      return e;
+    }
+  };
+  if (xml.nodeType == 9) // document node
+    xml = xml.documentElement;
+  var json = X.toJson(X.toObj(X.removeWhite(xml)), xml.nodeName, "\t");
+  return "{\n" + tab + (tab ? json.replace(/\t/g, tab) : json.replace(/\t|\n/g, "")) + "\n}";
+} 
+
+export const getApptypePD = (data) =>{
+    var file = JSON.parse(data);
+    var doc = new DOMParser().parseFromString(file.data,'text/xml');
+    var activityJSON = JSON.parse(xml2json(doc).replace("\nundefined",""));
+    if(activityJSON["mxGraphModel"]["root"]["Task"].length>1){
+      var cdata = JSON.parse(activityJSON["mxGraphModel"]["root"]["Task"][0]["#cdata"]);  
+    }else{
+      var cdata = JSON.parse(activityJSON["mxGraphModel"]["root"]["Task"]["#cdata"]);
+    }
+    return cdata[0]['apptype'].toLowerCase()
+}
+
+export const getJsonPd = (orderMatrix) =>{
+    var dataJSON = [{
+      name:'Module_'+uuid(),
+      type:1
+    }];
+    orderMatrix.forEach((orderList)=>{
+      dataJSON.push({
+          name:'Scenario_'+uuid(),
+          type:2
+      });
+      orderList.forEach((data)=>{
+          dataJSON.push({
+              name:"Screen_"+data.label,
+              type:3
+          });     
+          dataJSON.push({
+              name:"Testcase_"+data.label,
+              type:4
+          });                                                             
+      });    
+    });
+    return dataJSON
+}
