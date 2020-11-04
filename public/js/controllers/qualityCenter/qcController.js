@@ -19,20 +19,20 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		$(".selectBrowser").find("img").removeClass("selectedIcon");
 		$(this).find("img").addClass("selectedIcon");
 	});
-	$scope.loadDomains = function(){
-		var domainData = $scope.domainData;
-		if(domainData){
-			$timeout(function(){
-				if((domainData != undefined || domainData != "") && domainData.domain.length > 0){
-					$(".qcSelectDomain").empty();
-					$(".qcSelectDomain").append("<option selected disabled>Select Domain</option>");
-					for(var i=0;i<domainData.domain.length;i++){
-						$(".qcSelectDomain").append("<option value='"+domainData.domain[i]+"'>"+domainData.domain[i]+"</option>");
-					}
-				}
-			}, 500);
-		}
-	};
+	// $scope.loadDomains = function(){
+	// 	var domainData = $scope.domainData;
+	// 	if(domainData){
+	// 		$timeout(function(){
+	// 			if((domainData != undefined || domainData != "") && domainData.domain.length > 0){
+	// 				$(".qcSelectDomain").empty();
+	// 				$(".qcSelectDomain").append("<option selected disabled>Select Domain</option>");
+	// 				for(var i=0;i<domainData.domain.length;i++){
+	// 					$(".qcSelectDomain").append("<option value='"+domainData.domain[i]+"'>"+domainData.domain[i]+"</option>");
+	// 				}
+	// 			}
+	// 		}, 500);
+	// 	}
+	// };
 
 	socket.on('ICEnotAvailable', function () {
 		unblockUI();
@@ -351,7 +351,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 	});
 	$(document).on('click','.testScenariolink', function(){
 		
-		$('.selectedToMap').prop("style","background-color:none;border-radius:0px;");
+		// $('.selectedToMap').prop("style","background-color:none;border-radius:0px;");
 		$(this).siblings().removeClass("selectedToMap");
 	//	$(this).siblings().prop("style","background-color:none;border-radius:0px;");
 		$(this).addClass("selectedToMap");
@@ -380,9 +380,14 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				mappedList =  mappedList.filter(function(n){ return n != null; });
 				$('.testScenariolink').removeClass("selectedToMap");
 				$('.testScenariolink').prop("style","background-color:none;border-radius:0px;");
-				$(this).parent().css({"background-color":"rgb(225, 202, 255)"});
-				$(this).siblings(".qcSyncronise").show();
-				break;
+				var selected_tc_list = $(".selectedToMap").siblings("label").prevObject
+				for(var i=0;i<selected_tc_list.length-1;i++){ 
+					// $(this).parent().css({"background-color":"rgb(225, 202, 255)"});
+					// $(this).siblings(".qcSyncronise").show();
+					selected_tc_list[i].style.cssText = "background-color: rgb(225, 202, 255)";
+					selected_tc_list[i].children[2].style.cssText="display:inline";
+				}
+				// break;
 				}
 			}
 		// }
@@ -434,8 +439,12 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				'folderpath': qcFolderPath,
 				'scenarioId': AvoAssureScenarioId,
 			});
-			$(this).parent().css({"background-color":"#ddd"});
-			$(this).hide();
+			for(var i=0;i<abc.length-1;i++){
+				abc[i].style.cssText = "background-color: #ddd";
+				abc[i].children[2].style.cssText="display:hide";
+			}
+			// $(this).parent().css({"background-color":"#ddd"});
+			// $(this).hide();
 			event.stopPropagation();
 		}
 	});
