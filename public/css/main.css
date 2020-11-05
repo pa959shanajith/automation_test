@@ -3715,6 +3715,11 @@ li.select_all .addCustObj{
 	margin-right: 50px;
 }
 
+.userLDAPFetch div ul{
+    left: initial;
+    width: 100%;
+}
+
 .selectlg{
 	margin-left: 0;
     width: 100%;
@@ -5951,7 +5956,7 @@ ul.browserInlineIcons
 }
 
 .users-edit{
-    width: 87%;
+    width: 87% !important;
 }
 
 .dropdown-menu-users{
