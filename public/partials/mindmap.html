@@ -54,6 +54,15 @@
             <label>Import from Excel</label>
             <input id="file-input" on-read-file="getSheetName($fileContent)" type="file" name="xlsfile" accept=".xls,.xlsx" required="" autofocus="" style="display:none"/>
          </div>
+         <div title="Import from JSON">
+            <a href='#' ng-click="importMindmap($event)"  title="Import Mindmap">
+               <label for="importMindmapFile" style="margin:0; cursor:pointer;">
+               <img alt="Import from JSON" class="" src="imgs/ic-importfromexcel-mindmap.png">
+               </label>
+               <label>Import from JSON</label>
+            </a>
+            <input style="visibility: hidden;display: none" type="file" id="importMindmapFile" accept=".json,.mm">
+         </div>
       </div>
    </div>
    <div id="ct-main-e2e" class="fl-left" ng-if="tab == 'mindmapEndtoEndModules'">
@@ -179,11 +188,19 @@
                <i class="fa fa-crop fa-lg plus-icon" id="copyImg1" title="add a rectangle" ng-click="startCopy()"></i>
                <i class="fa fa-files-o fa-lg plus-icon" title="copy selected map" ng-click="copyMindMap()"></i>
                <i class="fa fa-clipboard fa-lg plus-icon" id="pasteImg1" title="Paste map" ng-click="pasteMap()"></i>
-               <i class="glyphicon glyphicon-save export-excel-icon" id="export-excel" ng-click="exportToExcel()" title="Export To Excel"></i>
+               <i class="glyphicon glyphicon-save export-excel-icon" id="export-excel" ng-click="exportToExcel()" title="Export To Excel" style='display:none;'></i>
                <label for="pd-input" style="margin-bottom: 0px;height: 14px;width: 10px;">
                   <i class="glyphicon glyphicon-import import-pd-icon" id="import-pd" ng-click="importFromPD()" title="Import Avo Discover File"></i>
                </label>
                <input id="pd-input" on-read-file="importFromPD($fileContent)" type="file" name="xlsfile" accept=".pd" required="" autofocus="" style="display:none"/>
+            </span>
+            <span class="selectFile" style='float:left;margin-left:50px;'>
+               <label>Export Mindmap to:</label>
+               <select id="export-list-create" disabled>
+                  <option value='select' disabled selected>Select</option>
+                  <option value="json">JSON</option>
+                  <option value="excel">Excel</option>
+               </select>
             </span>
          </div>
          <!-- versioning -->
@@ -217,8 +234,14 @@
                <label class="selectCycleLabel">Cycle:</label>
                <select class="cycle-list"></select>
             </span>
-            <span id="copy-paste">
-               <i class="glyphicon glyphicon-export export-icon" ng-click="exportData(0)" title="Export Version"></i>
+            <span class="selectFile selectProjectPosition">
+               <label>Export Mindmap to:</label>
+               <select id="export-list" disabled>
+                  <option value='select' disabled selected>Select</option>
+                  <option value="json">JSON</option>
+                  <option value="excel">Excel</option>
+                  <option value="version" title="Export Version">Custom</option>
+               </select>
             </span>
          </div>
          <div class="ct-nodeBox">
@@ -297,6 +320,10 @@
                   <rect x="100" y="0" rx="12" ry="12" width="80px" height="50px"></rect>
                   <text x="114" y="18">Create</text>
                </g> -->
+               <g id="ct-exportAction" class="ct-actionButton disableButton" ng-click = "exportMindmap1()">
+                  <rect x="100" y="0" rx="12" ry="12" width="80px" height="50px"></rect>
+                  <text x="114" y="18">Export</text>
+               </g>
             </g>
          </svg>      
       </div>
@@ -367,6 +394,10 @@
                   <rect x="100" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
                   <text x="114" y="18">Create</text>
                </g> -->
+               <g id="ct-exportAction" class="ct-actionButton disableButton" ng-click = "exportMindmap1()">
+                  <rect x="100" y="0" rx="12" ry="12" width="80px" height="50px"></rect>
+                  <text x="114" y="18">Export</text>
+               </g>
             </g>
          </svg>
       </div>

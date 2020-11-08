@@ -1108,6 +1108,56 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		}
 	};
 
+
+	//Export Project Action
+	$scope.export_project = function ($event) {
+		$("#selDomainEdit,#selProject").removeClass("selectErrorBorder");
+		if ($('#selDomainEdit option:selected').val() == "") {
+			$("#selDomainEdit").addClass("selectErrorBorder");
+		} else if ($('#selProject option:selected').val() == "") {
+			$("#selProject").addClass("selectErrorBorder");
+		} else if ($("#releaseList").children("li").length == 0) {
+			openModalPopup("Update Project", "Please add atleast one release");
+		}
+		else {
+			blockUI("Loading...");
+			flag = false;
+			var projectId = $('#selProject option:selected').val();
+			var projectName = $('#selProject option:selected').text();
+			adminServices.exportProject(projectId,projectName)
+				.then(function (data) {
+					if (data == "Invalid Session") {
+						$rootScope.redirectPage();
+					}else if (data == "fail") openModalPopup("Fail", "Error while exporting to excel");
+					else {
+						openWindow = 0;
+						if (openWindow == 0) {
+							var file = new Blob([data], { type: 'application/zip' });
+							if (isIE) {
+								navigator.msSaveOrOpenBlob(file);
+							}else{
+								var fileURL = URL.createObjectURL(file);
+								var a = document.createElement('a');
+								a.href = fileURL;
+								a.download = projectName+'.zip';
+								document.body.appendChild(a);
+								a.click();
+								document.body.removeChild(a);
+								URL.revokeObjectURL(fileURL);
+							}
+							openModalPopup("Success", "Successfully exported to zip");
+						}
+						openWindow++;
+					}
+					unblockUI();
+				}, function (error) {
+					console.log("Error:::::::::::::", error);
+				});
+		}
+	}
+
+
+
 	function resetForm() {
 		//$("#selDomain").prop('selectedIndex', 0);
 		// $("#selDomain").val("")
@@ -1954,6 +2004,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					}
 					$(document).on('change','#selDomainEdit', function() {
 						$("#releaseList, #cycleList").empty()
+						//$("#export_button").addClass("disableButton")
+						document.getElementById("export_button").disabled = true;
 						var domainName = $("#selDomainEdit option:selected").val();
 						console.log(domainName)
 						var requestedname = [];
@@ -2001,6 +2053,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 								$("#selProject").append(selectOptions[i]);
 							}
 							$("#selProject").prop('selectedIndex', 0);
+							document.getElementById("selProject").addEventListener('change', function (e) {
+								document.getElementById("export_button").disabled = false;
+								//$("#export_button").removeClass("disableButton")
+							});
 						}, function (error) {
 							console.log("Error:::::::::::::", error);
 						});

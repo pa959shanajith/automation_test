@@ -191,6 +191,14 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 				tokeninfo:tokeninfo
 			}).then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
+		},
+		exportProject: function (projectId,projectName) {
+			return $http.post('/exportProject',{
+				projectId:projectId,
+				projectName:projectName
+			},{responseType:'arraybuffer'})
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
 		}
 	};
 }]);
