@@ -21,7 +21,7 @@ const CreateOptions = (props) => {
   const options = [
     {ico : "ic-create-newMindmap.png",label:'Create New',comp:'newmindmap'},
     {ico : "ic-endtoendFlow.png",label:'End to End Flow',comp:'enemindmap'},
-    {ico :"ic-importfromexcel-mindmap.png",label:'Import Mindmap',comp:'excelmindmap'}
+    {ico :"ic-importfromexcel-mindmap.png",label:'Import Mindmap',comp:'importmindmap'}
   ]
   const displayError = (error) =>{
     setPopup({
@@ -54,9 +54,9 @@ const CreateOptions = (props) => {
       <div className='mindmap__option-container'>
         <div>
           {options.map((e,i)=>(
-            <div className='mindmap__option-box' onClick={()=>{(e.comp === 'excelmindmap')?upload.current.click():props.setOptions(e.comp)}} key={i} data-test="OptionBox">
+            <div className='mindmap__option-box' onClick={()=>{(e.comp === 'importmindmap')?upload.current.click():props.setOptions(e.comp)}} key={i} data-test="OptionBox">
               <div>
-                {(e.comp === 'excelmindmap')?<input onChange={(e)=>uploadFile(e,setSheetList,displayError,setData,pdImport)} style={{display:'none'}} type="file" name="xlsfile" accept=".pd,.xls,.xlsx" required="" autoFocus="" ref={upload}/>:null}
+                {(e.comp === 'importmindmap')?<input onChange={(e)=>uploadFile(e,setSheetList,displayError,setData,pdImport)} style={{display:'none'}} type="file" name="xlsfile" accept=".pd,.xls,.xlsx" required="" autoFocus="" ref={upload}/>:null}
                 <img src={"static/imgs/"+e.ico} alt={e.label}/>
                 <div>{e.label}</div>
               </div>

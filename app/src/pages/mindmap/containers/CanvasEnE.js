@@ -1,13 +1,10 @@
 import React, { useRef, useEffect, useState, Fragment } from 'react';
 import * as d3 from 'd3';
-import {v4 as uuid} from 'uuid'
 import SearchBox from '../components/SearchBox'
 import NavButton from '../components/NavButton'
 import Legends from '../components/Legends'
 import ControlBox from '../components/Controlbox'
 import InputBox from '../components/InputBox' 
-import MultiNodeBox from '../components/MultiNodeBox'
-import RectangleBox from '../components/RectangleBox'
 import SaveMapButton from '../components/SaveMapButton'
 import { useDispatch, useSelector} from 'react-redux';
 import {generateTree,toggleNode,moveNodeEnd,moveNodeBegin,createNode,createNewMap,deleteNode} from './MindmapUtils'
@@ -107,15 +104,15 @@ const CanvasEnE =(props)=>{
         }
     },[createnew])
     useEffect(()=>{
-        if(scenarioList.length<1)return;
+        if(Object.keys(scenarioList).length<1)return;
         setBlockui({show:true,content:'Creating Nodes...'})
         var cnodes = {...nodes}
         var clinks = {...links}
         var cdNodes = [...dNodes]
         var cdLinks = [...dLinks]
         var csections = {...sections}
-        scenarioList.forEach(e => {
-            var res = createNode(0,{...cnodes},{...clinks},[...cdNodes],[...cdLinks],{...csections},{...count},e.name,verticalLayout,e._id)
+        Object.entries(scenarioList).map(e => {
+            var res = createNode(0,{...cnodes},{...clinks},[...cdNodes],[...cdLinks],{...csections},{...count},e[1],verticalLayout,e[0])
             cnodes = res.nodeDisplay
             clinks = res.linkDisplay
             cdNodes = res.dNodes
@@ -126,6 +123,7 @@ const CanvasEnE =(props)=>{
         setLinks(clinks)
         setdLinks(cdLinks)
         setdNodes(cdNodes)
+        dispatch({type:actionTypes.UPDATE_SCENARIOLIST,payload:{}})
         setBlockui({show:false})
     },[scenarioList])
     const clickCollpase=(e)=>{

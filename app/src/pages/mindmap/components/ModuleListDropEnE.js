@@ -78,13 +78,13 @@ const ModuleListDropEnE = (props) =>{
     }
     const addScenario = (e) => {
         var sceId = e.currentTarget.getAttribute("value")
-        var scArr = [...selectedSc] 
-        var index = scArr.indexOf(sceId)
-        if(index === -1){
-            scArr.push(sceId)
+        var sceName = e.currentTarget.getAttribute("title")
+        var scArr = {...selectedSc}
+        if(scArr[sceId]){
+            delete scArr[sceId] 
         }else{
-            scArr.splice(index,1)
-        }
+            scArr[sceId] = sceName
+        }        
         setSelctedSc(scArr)
     }
     const displayError = (err) =>{
@@ -98,9 +98,8 @@ const ModuleListDropEnE = (props) =>{
         })
     }
     const clickAdd = () =>{
-        if(selectedSc.length<1)return;
-        var scArray =  [...scenarioList].filter(e=>selectedSc.indexOf(e._id)!==-1)
-        dispatch({type:actionTypes.UPDATE_SCENARIOLIST,payload:scArray})
+        if(Object.keys(selectedSc).length<1)return;
+        dispatch({type:actionTypes.UPDATE_SCENARIOLIST,payload:selectedSc})
     }
     const clickCreateNew = () =>{
         dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
@@ -133,7 +132,7 @@ return(
                 <div>
                 {scenarioList.map((e,i)=>{
                     return(
-                        <div key={i+'scenario'} onClick={(e)=>addScenario(e)} className={'dropdown_scenarios'+(selectedSc.indexOf(e._id)!==-1?' selected':'')} title={e.name} value={e._id} >{e.name}</div>
+                        <div key={i+'scenario'} onClick={(e)=>addScenario(e)} className={'dropdown_scenarios'+(selectedSc[e._id]?' selected':'')} title={e.name} value={e._id} >{e.name}</div>
                     )
                 })}
                 </div>

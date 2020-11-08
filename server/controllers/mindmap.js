@@ -538,60 +538,44 @@ exports.saveData =  async(req, res)=> {
 
 exports.saveEndtoEndData = function (req, res) {
 	logger.info("Inside UI service: saveEndtoEndData");
-	if (utils.isSessionActive(req)) {
-		var nData = [], qList = [], idDict = {};
-		var urlData = req.get('host').split(':');
-		var inputs = req.body;
-		var data = inputs.map;
-		var prjId = inputs.prjId;
-		var deletednodes = inputs.deletednode;
-		var user = req.session.username;
-		var userrole = req.session.activeRole;
-		var userid = req.session.userid;
-		var userroleid = req.session.activeRoleId;
-		var flag = inputs.write;
-		// var relId = inputs.relId;
-		var cycId = inputs.cycId;
-		var createdthrough=inputs.createdthrough || "Web";
-
-		//TO support task deletion
-		var removeTask = inputs.unassignTask;
-		if (flag == 10) {
-			var uidx = 0, rIndex;
-			var vn_from = inputs.vn_from;
-			var vn_to = inputs.vn_from;
-			// var idn_v_idc = {};
-
-			var qObj = { "projectid": prjId, "testsuiteDetails": [], "username": user, "userrole": userrole, "versionnumber": parseFloat(vn_from)|| 0, "newversionnumber": parseFloat(vn_to) || 0 , "userid":userid,"userroleid":userroleid ,"createdthrough":createdthrough,"deletednodes":deletednodes};
-			var nObj = [], tsList = [];
-			data.forEach(function (e, i) {
-				if (e.type == "endtoend") rIndex = uidx; // check for normal modules
-				if (e.task != null) delete e.task.oid;
-				nObj.push({ projectID: e.projectID, _id: e._id || null, name: e.name, task: e.task, children: [] ,state: e.state, childIndex:e.childIndex});
-				if (idDict[e.pid] !== undefined) nObj[idDict[e.pid]].children.push(nObj[uidx]);
-				idDict[e.id] = uidx++;
-			});
-
-			nObj[rIndex].children.forEach(function (ts, i) {
-				var sList = [];
-				tsList.push({ "testscenarioid": ts._id||null, "testscenarioName": ts.name, "tasks": ts.task,"state":ts.state,"childIndex":parseInt(ts.childIndex)});
-				
-			});
-			tsList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1)
-			qObj.testsuiteDetails = [{ "testsuiteId": nObj[rIndex]._id||null, "testsuiteName": nObj[rIndex].name, "task": nObj[rIndex].task, "testscenarioDetails": tsList,"state":nObj[rIndex].state}];
-			
-			create_ice.saveMindmapE2E(qObj, function (err, data) {
-				if (err) {
-					res.status(500).send(err);
-				} else {
-					// if res.rows
-					res.status(200).send(data);
-				}
-			});
-		}
-	} else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
+	var idDict = {};
+	var inputs = req.body;
+	var data = inputs.map;
+	var prjId = inputs.prjId;
+	var deletednodes = inputs.deletednode;
+	var user = req.session.username;
+	var userrole = req.session.activeRole;
+	var userid = req.session.userid;
+	var userroleid = req.session.activeRoleId;
+	var flag = inputs.write;
+	var createdthrough=inputs.createdthrough || "Web";
+	if (flag == 10) {
+		var uidx = 0, rIndex;
+		var vn_from = inputs.vn_from;
+		var vn_to = inputs.vn_from;
+		var qObj = { "projectid": prjId, "testsuiteDetails": [], "username": user, "userrole": userrole, "versionnumber": parseFloat(vn_from)|| 0, "newversionnumber": parseFloat(vn_to) || 0 , "userid":userid,"userroleid":userroleid ,"createdthrough":createdthrough,"deletednodes":deletednodes};
+		var nObj = [], tsList = [];
+		data.forEach(function (e, i) {
+			if (e.type == "endtoend") rIndex = uidx; // check for normal modules
+			if (e.task != null) delete e.task.oid;
+			nObj.push({ projectID: e.projectID, _id: e._id || null, name: e.name, task: e.task, children: [] ,state: e.state, childIndex:e.childIndex});
+			if (idDict[e.pid] !== undefined) nObj[idDict[e.pid]].children.push(nObj[uidx]);
+			idDict[e.id] = uidx++;
+		});
+		nObj[rIndex].children.forEach(function (ts, i) {
+			tsList.push({ "testscenarioid": ts._id||null, "testscenarioName": ts.name, "tasks": ts.task,"state":ts.state,"childIndex":parseInt(ts.childIndex)});
+		});
+		tsList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1)
+		qObj.testsuiteDetails = [{ "testsuiteId": nObj[rIndex]._id||null, "testsuiteName": nObj[rIndex].name, "task": nObj[rIndex].task, "testscenarioDetails": tsList,"state":nObj[rIndex].state}];
+		
+		create_ice.saveMindmapE2E(qObj, function (err, data) {
+			if (err) {
+				res.status(500).send(err);
+			} else {
+				// if res.rows
+				res.status(200).send(data);
+			}
+		});
 	}
 };
 

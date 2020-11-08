@@ -687,3 +687,37 @@ export const getJsonPd = (orderMatrix) =>{
     });
     return dataJSON
 }
+
+//reference bar items
+export const ClickFullScreen = (setFullScreen,setPopup) => {
+    var elt = document.querySelector("html");
+    if ((window.fullScreen) || (window.innerWidth == window.screen.width && (window.screen.height - window.innerHeight) <= 1)) {
+      if (document.cancelFullScreen) {
+        document.cancelFullScreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.webkitCancelFullScreen) {
+        document.webkitCancelFullScreen();
+      }
+      setFullScreen(false)
+    } else {
+      if (elt.requestFullscreen) {
+        elt.requestFullscreen();
+      } else if (elt.msRequestFullscreen) {
+        elt.msRequestFullscreen();
+      } else if (elt.mozRequestFullScreen) {
+        elt.mozRequestFullScreen();
+      } else if (elt.webkitRequestFullscreen) {
+        elt.webkitRequestFullscreen();
+      } else {
+        setPopup({
+          title:'ERROR',
+          content:'"Fullscreen not available"',
+          submitText:'Ok',
+          show:true
+        })
+        return;
+      }
+      setFullScreen(true)
+    }
+  } 

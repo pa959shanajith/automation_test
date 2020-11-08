@@ -1,7 +1,8 @@
 import React ,  { Fragment, useEffect, useState, useRef} from 'react';
-import {getProjectList, getModules, getScreens} from '../api';
+import { getProjectList, getModules, getScreens} from '../api';
 import { useDispatch, useSelector} from 'react-redux';
 import { ScreenOverlay, PopupMsg, ReferenceBar, SetProgressBar} from '../../global';
+import { ClickFullScreen } from './MindmapUtils'
 import  ToolbarMenuEnE from '../components/ToolbarMenuEnE'
 import CanvasEnE from './CanvasEnE'
 import * as actionTypes from '../state/action';
@@ -23,6 +24,7 @@ const CreateEnE = () =>{
     dispatch({type:actionTypes.SELECT_PROJECT,payload:res.projectId[0]}) 
     var moduledata = await getModules({"tab":"endToend","projectid":res.projectId[0],"moduleid":null})
     if(moduledata.error){displayError(moduledata.error);return;}
+    dispatch({type:actionTypes.SELECT_MODULE,payload:{}}) 
     // var screendata = await getScreens(res.projectId[0])
     // if(screendata.error){displayError(screendata.error);return;}
     // dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
@@ -85,40 +87,6 @@ const ClickSwitchLayout = (verticalLayout,setVerticalLayout,moduleSelect,setPopu
     // dispatch({type:actionTypes.SELECT_MODULE,payload:{switchlayout:true}})
     setVerticalLayout(true)
   }
-  
-  
-  const ClickFullScreen = (setFullScreen,setPopup) => {
-    var elt = document.querySelector("html");
-    if ((window.fullScreen) || (window.innerWidth == window.screen.width && (window.screen.height - window.innerHeight) <= 1)) {
-      if (document.cancelFullScreen) {
-        document.cancelFullScreen();
-      } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-      } else if (document.webkitCancelFullScreen) {
-        document.webkitCancelFullScreen();
-      }
-      setFullScreen(false)
-    } else {
-      if (elt.requestFullscreen) {
-        elt.requestFullscreen();
-      } else if (elt.msRequestFullscreen) {
-        elt.msRequestFullscreen();
-      } else if (elt.mozRequestFullScreen) {
-        elt.mozRequestFullScreen();
-      } else if (elt.webkitRequestFullscreen) {
-        elt.webkitRequestFullscreen();
-      } else {
-        setPopup({
-          title:'ERROR',
-          content:'"Fullscreen not available"',
-          submitText:'Ok',
-          show:true
-        })
-        return;
-      }
-      setFullScreen(true)
-    }
-  } 
 
 /*function parseProjList
   use:  parses input value to list of project props
