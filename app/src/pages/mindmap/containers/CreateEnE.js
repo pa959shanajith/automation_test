@@ -42,51 +42,49 @@ const CreateEnE = () =>{
     })
   }
   return(
-      <Fragment>
-      {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-      {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
-      <div id='ene' className='mp__canvas_container'>
-        <ToolbarMenuEnE setBlockui={setBlockui} setPopup={setPopup}/>
-        <div id='mp__canvas' className='mp__canvas'>
-          {(Object.keys(moduleSelect).length>0)?<CanvasEnE setBlockui={setBlockui} setPopup={setPopup} module={moduleSelect} verticalLayout={verticalLayout}/>:null}
-        </div>
-        
+    <Fragment>
+    {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
+    {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
+    <div id='ene' className='mp__canvas_container'>
+      <ToolbarMenuEnE setBlockui={setBlockui} setPopup={setPopup}/>
+      <div id='mp__canvas' className='mp__canvas'>
+        {(Object.keys(moduleSelect).length>0)?<CanvasEnE setBlockui={setBlockui} setPopup={setPopup} module={moduleSelect} verticalLayout={verticalLayout}/>:null}
       </div>
-      <ReferenceBar taskTop={true} collapsible={true} collapse={true}>
-          <div className="ic_box" >
-          <   img onClick={()=>ClickSwitchLayout(verticalLayout,setVerticalLayout,moduleSelect,setPopup,setBlockui,dispatch)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " + (verticalLayout?"active_rb_thumb ":"")} src="static/imgs/switch.png"/>
-              <span className="rb_box_title">Switch</span><span className="rb_box_title">Layout</span>
-          </div>
-          <div className="ic_box" >
-              <img onClick={()=>ClickFullScreen(setFullScreen,setPopup)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " +(fullScreen?"active_rb_thumb":"")} src="static/imgs/fscr.png"/>
-              <span className="rb_box_title">Full Screen</span>
-          </div>
-      </ReferenceBar>  
-      </Fragment>
+      
+    </div>
+    <ReferenceBar taskTop={true} collapsible={true} collapse={true}>
+        <div className="ic_box" >
+        <   img onClick={()=>ClickSwitchLayout(verticalLayout,setVerticalLayout,moduleSelect,setPopup,setBlockui,dispatch)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " + (verticalLayout?"active_rb_thumb ":"")} src="static/imgs/switch.png"/>
+            <span className="rb_box_title">Switch</span><span className="rb_box_title">Layout</span>
+        </div>
+        <div className="ic_box" >
+            <img onClick={()=>ClickFullScreen(setFullScreen,setPopup)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " +(fullScreen?"active_rb_thumb":"")} src="static/imgs/fscr.png"/>
+            <span className="rb_box_title">Full Screen</span>
+        </div>
+    </ReferenceBar>  
+    </Fragment>
   )
 }
 
 
 const ClickSwitchLayout = (verticalLayout,setVerticalLayout,moduleSelect,setPopup,setBlockui,dispatch) =>{
-    if(verticalLayout){
-      setBlockui({show:true,content:'Switching Layout...'})
-      // dispatch({type:actionTypes.SELECT_MODULE,payload:{switchlayout:true}})
-      setVerticalLayout(false)
-      return;
-    }
-    if(Object.keys(moduleSelect).length<1){
-      setPopup({
-        title:'Warning',
-        content:'Please select a module first',
-        submitText:'Ok',
-        show:true
-      })
-      return;
-    }
+  if(verticalLayout){
     setBlockui({show:true,content:'Switching Layout...'})
-    // dispatch({type:actionTypes.SELECT_MODULE,payload:{switchlayout:true}})
-    setVerticalLayout(true)
+    setVerticalLayout(false)
+    return;
   }
+  if(Object.keys(moduleSelect).length<1){
+    setPopup({
+      title:'Warning',
+      content:'Please select a module first',
+      submitText:'Ok',
+      show:true
+    })
+    return;
+  }
+  setBlockui({show:true,content:'Switching Layout...'})
+  setVerticalLayout(true)
+}
 
 /*function parseProjList
   use:  parses input value to list of project props

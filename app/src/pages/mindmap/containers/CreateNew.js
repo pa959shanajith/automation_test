@@ -26,6 +26,7 @@ const CreateNew = () => {
   const [verticalLayout,setVerticalLayout] = useState(false)
   const [loading,setLoading] = useState(true)
   const [importProj,setImportProj] = useState(false)
+  const [selectProj,setSelectProj] = useState(false)
   const prjList = useSelector(state=>state.mindmap.projectList)
   const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
   const importData = useSelector(state=>state.mindmap.importData)
@@ -49,25 +50,28 @@ const CreateNew = () => {
     })()
   },[dispatch])
   useEffect(()=>{
+    if(importData.data && Object.keys(prjList).length>0 && !importProj){
+      setSelectProj(true)
+    }
     if(importData.data && importProj){
       loadImportData()
     }
-  },[importData,importProj])
-
+  },[importData,importProj,prjList])
   const closeImport = () => {
+    setSelectProj(false)
     setImportProj(false)
     dispatch({type:actionTypes.UPDATE_IMPORTDATA,payload:{createdby:undefined,data:undefined}})
   }
   
   const loadImportData = async() =>{
     var impData = {...importData}
+    setBlockui({show:true,content:"Importing File.. Please Wait.."});
     if(importData.createdby === 'pd'){
       var appType = getApptypePD(importData.data)
       if(appType!=prjList[importProj].apptypeName.toLowerCase()){
         displayError("App Type Error", "AppType doesn't match, please check!!")
         return;
       }else{
-        setBlockui({show:true,content:"Importing File.. Please Wait.."});
         var res =  await pdProcess({'projectid':importProj,'file':importData.data})
         if(res.error){displayError(res.error);return;}
         var data = getJsonPd(res.data)
@@ -87,6 +91,7 @@ const CreateNew = () => {
   }
 
   const displayError = (error) =>{
+    setBlockui(false)
     setLoading(false)
     setPopup({
       title:'ERROR',
@@ -116,11 +121,11 @@ const CreateNew = () => {
             </div>
           </div>:null
         }
-        {importData.data && Object.keys(prjList).length>0 ?<ModalContainer 
+        {selectProj ?<ModalContainer 
         modalClass = 'modal-sm'
         title='Select Project'
         close={closeImport}
-        footer={<Footer setImportProj={setImportProj}/>}
+        footer={<Footer setSelectProj={setSelectProj} setImportProj={setImportProj}/>}
         content={<Container prjList={prjList}/>} 
         />:null}
         <ReferenceBar taskTop={true} collapsible={true} collapse={true}>
@@ -195,6 +200,7 @@ const Footer = (props) =>{
   const submit = () => {
     var projid = document.getElementById('mp__import-proj').value
     if(projid !== ""){
+      props.setSelectProj(false)
       props.setImportProj(projid)
     }else{
       setErrMsg("Project not selected")
