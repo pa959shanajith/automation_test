@@ -98,6 +98,10 @@ default_sub.on("message", (channel, message) => {
 		mySocket.emit("qtestlogin", data.responsedata);
 		break;
 	
+	case "zephyrlogin":
+		mySocket.emit("zephyrlogin", data.responsedata);
+		break;
+
 	case "apgOpenFileInEditor":
 		mySocket.emit("apgOpenFileInEditor", data.editorName, data.filePath, data.lineNumber);
 		break;

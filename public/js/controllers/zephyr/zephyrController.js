@@ -1,4 +1,4 @@
-mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$location','$timeout','qtestServices','cfpLoadingBar', 'socket', function($scope, $rootScope, $window,$http,$location,$timeout,qcServices,cfpLoadingBar,socket) {
+mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','$location','$timeout','zephyrServices','cfpLoadingBar', 'socket', function($scope, $rootScope, $window,$http,$location,$timeout,qcServices,cfpLoadingBar,socket) {
 	$('.scrollbar-inner').scrollbar();
 	var avoassure_projects_details;
 	$timeout(function(){
@@ -6,10 +6,9 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 		$('.scrollbar-macosx').scrollbar();
 		document.getElementById("currentYear").innerText = new Date().getFullYear();
 		$("#loginToQCpop").modal("show");
-		// $("#testPlanTab").trigger("click");
 	}, 500);
 	var mappedList = [];
-	if(window.localStorage['navigateScreen'] != "p_qTest"){
+	if(window.localStorage['navigateScreen'] != "p_Zephyr"){
 		return $rootScope.redirectPage();
 	}
 
@@ -46,22 +45,24 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 	   	}, 100);
 	};
 
-	$scope.zephyrlogin = function(event){
-		window.localStorage['navigateScreen'] = "p_Zephyr";
+	$scope.qtestlogin = function(event){
+		window.localStorage['navigateScreen'] = "p_qTest";
 		$timeout(function () {
-			$location.path('/'+ "p_Zephyr");
+			$location.path('/'+ "p_qTest");
 	   	}, 100);
-	};	
+	};
 
 	$scope.hideMappedFilesTab = function(){
 		$scope.testLabGenerator = false;
 		$(".mappedFiles, .mappedFilesLabel").hide();
-		$("#page-taskName span").text("qTest Integration");
+		$("#page-taskName span").text("Zephyr Integration");
 		$(".qcActionBtn, .leftQcStructure, .rightQcStructure").show();
-	};
+		$("#qtestTab").show();
+		$("#almTab").show();
+	};	
 
 	//login to QC
-	$scope.loginToQTest = function($event){
+	$scope.loginToZephyr = function($event){
 		$(".qcLoginload").show();
 		//$("#qcName,#qcUserName,#qcPwd,.qcConnsubmit").prop("disabled",true);
 		$("#qcName,#qcUserName,#qcPwd").css("background","none");
@@ -70,24 +71,42 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 		var qcURL = $("#qcName").val();
 		var qcUserName =$("#qcUserName").val();
 		var qcPassword = $("#qcPwd").val();
+		var qcJiraUrl = $("#qcJiraUrl").val();
+		var qcJiraUserName = $("#qcJiraUserName").val();
+		var qcJiraAccToken = $("#qcJiraAccToken").val();
 		if(!qcURL){
-			$("#qcErrorMsg").text("Please Enter URL.");
+			$("#qcErrorMsg").text("Please Enter Zephyr Account Number.");
 			$("#qcName").addClass("inputErrorBorder");
 			$(".qcLoginload").hide();
 		}
 		else if(!qcUserName){
-			$("#qcErrorMsg").text("Please Enter User Name.");
+			$("#qcErrorMsg").text("Please Enter Access Key.");
 			$("#qcUserName").addClass("inputErrorBorder");
 			$(".qcLoginload").hide();
 		}
 		else if(!qcPassword){
-			$("#qcErrorMsg").text("Please Enter Password.");
+			$("#qcErrorMsg").text("Please Enter Secret Key.");
 			$("#qcPwd").addClass("inputErrorBorder");
+			$(".qcLoginload").hide();
+		}
+		else if(!qcJiraUrl){
+			$("#qcErrorMsg").text("Please Enter Jira URL.");
+			$("#qcJiraUrl").addClass("inputErrorBorder");
+			$(".qcLoginload").hide();
+		}
+		else if(!qcJiraUserName){
+			$("#qcErrorMsg").text("Please Enter Jira User Name.");
+			$("#qcJiraUserName").addClass("inputErrorBorder");
+			$(".qcLoginload").hide();
+		}
+		else if(!qcJiraAccToken){
+			$("#qcErrorMsg").text("Please Enter Jira Access Token.");
+			$("#qcJiraAccToken").addClass("inputErrorBorder");
 			$(".qcLoginload").hide();
 		}
 		else{
 			$("#qcPwd").removeClass("inputErrorBorder");
-			qcServices.loginToQTest_ICE(qcURL,qcUserName,qcPassword)
+			qcServices.loginToZephyr_ICE(qcURL,qcUserName,qcPassword,qcJiraUrl,qcJiraUserName,qcJiraAccToken)
 			.then(function(data){
 				$scope.domainData = data;
 				$(".qcLoginload").hide();
@@ -101,6 +120,8 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 					return $rootScope.redirectPage();
 				} else if(data == "invalidcredentials"){
 					$("#qcErrorMsg").text("Invalid Credentials");
+				} else if(data == "noprojectfound"){
+					$("#qcErrorMsg").text("Invalid credentials or no project found");
 				} else if(data == "invalidurl"){
 					$("#qcErrorMsg").text("Invalid URL");
 				} else if(data == "fail"){
@@ -135,10 +156,10 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 	//Select Domains
 	$(document).off('change').on('change', ".qcSelectDomain", function(){
 		$(document.body).css({'cursor' : 'wait'});
-		$(".qcSelectDomain, .qcSelectProject").prop("disabled", true);
+		$(".qcSelectDomain").prop("disabled", true);
 		var getDomain = $(this).children("option:selected").val();
 		blockUI('Loading....');
-		qcServices.qtestProjectDetails_ICE(getDomain)
+		qcServices.zephyrProjectDetails_ICE(getDomain)
 			.then(function(data){
 				avoassure_projects_details = data.avoassure_projects;
 				if(data == "unavailableLocalServer"){
@@ -152,19 +173,40 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 					return $rootScope.redirectPage();
 				}
 				else if(data){
-					$(".qcSelectProject").empty();
-					$(".qcSelectProject").append("<option value='' selected disabled>Select Release</option>");
-					for(var i=0;i<data.qc_projects.length;i++){
-						$(".qcSelectProject").append("<option value='"+data.qc_projects[i]+"'>"+data.qc_projects[i]+"</option>");
-					}
-					$(".qtestAvoAssureSelectProject").empty();					
-					$(".qtestAvoAssureSelectProject").append("<option value='' selected disabled>Select Project</option>");
+
+					$(".zephyrAvoAssureSelectProject").empty();					
+					$(".zephyrAvoAssureSelectProject").append("<option value='' selected disabled>Select Project</option>");
 					for(var i=0;i<data.avoassure_projects.length;i++){
-						$(".qtestAvoAssureSelectProject").append("<option value='"+data.avoassure_projects[i].project_id+"'>"+data.avoassure_projects[i].project_name+"</option>");
+						$(".zephyrAvoAssureSelectProject").append("<option value='"+data.avoassure_projects[i].project_id+"'>"+data.avoassure_projects[i].project_name+"</option>");
 					}
-					$(document.body).css({'cursor' : 'default'});
+
+					var structContainer = $(".qcTreeContainer");
+					structContainer.empty();
+					$(".mtgScenarioList").empty();
+					structContainer.append("<ul class='root scrollbar-inner'><li class='testfolder_'><img class='qcCollapse' title='expand' style='height: 16px;' src='imgs/ic-qcCollapse.png'><label title='Root'>Root</label></li></ul>");
+					project_dets = data.project_dets;
+					if(project_dets.length>0) {
+						for(var i=0 ; i<project_dets.length;++i) {
+							var keyVal = project_dets[i].cycle;
+							var cycleId = project_dets[i].cycleId;
+							var projectId = project_dets[i].projectId;
+							var versionId = project_dets[i].versionId;
+							if(i == 0){				
+								structContainer.find(".root").append("<ul class='cycleList'></ul>");
+							}
+							structContainer.find(".cycleList").append("<li class='Tfolnode testfolder_"+(i+1)+"'><img class='qcExpand qcExpandFolder selectedQcNode' title='expand' style='height: 16px;' src='imgs/ic-qcExpand.png'><label title='"+keyVal+"'>"+keyVal+"</label></li>");
+							var suites = project_dets[i].tests;
+							for (var j=0;j<suites.length;++j){
+								if(j==0){
+									structContainer.find(".testfolder_"+(i+1)).append("<ul class='suiteList suiteList_"+(i+1)+"'></ul>")
+									$(".suiteList_"+(i+1)).hide();
+								}
+								structContainer.find(".suiteList_"+(i+1)).append("<li  class='testSuite testcaselink testSet_"+(i+1)+""+(j+1)+"' data-suiteid="+suites[j].id+" data-issueid="+suites[j].issueId+" data-cycleid="+cycleId+" data-versionid="+versionId+" data-projectid="+projectId+"  data-type='testsuite'><label title='"+suites[j].name+"' style='margin-left:0px'>"+suites[j].name+"</label><img class='qcUndoSyncronise' title='Undo' src='imgs/ic-qcUndoSyncronise.png'><img class='qcSyncronise' title='Syncronise' src='imgs/ic-qcSyncronise.png'></li>");
+							}
+						}
+							$('.scrollbar-inner').scrollbar();
+					}
 				}
-				$(".qcSelectDomain, .qcSelectProject").prop("disabled", false);
 				unblockUI();
 			},
 			function(error) {	unblockUI(); 
@@ -191,20 +233,20 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 							structContainer.find(".root").append("<ul class='cycleList'></ul>");
 						}
 						structContainer.find(".cycleList").append("<li class='Tfolnode testfolder_"+(i+1)+"'><img class='qcExpand qcExpandFolder selectedQcNode' title='expand' style='height: 16px;' src='imgs/ic-qcExpand.png'><label title='"+keyVal+"'>"+keyVal+"</label></li>");
-						var suites = data[i].testsuites;
+						var suites = data[i].tests;
 						for (var j=0;j<suites.length;++j){
 							if(j==0){
 								structContainer.find(".testfolder_"+(i+1)).append("<ul class='suiteList suiteList_"+(i+1)+"'></ul>")
 								$(".suiteList_"+(i+1)).hide();
 							}
-							structContainer.find(".suiteList_"+(i+1)).append("<li  class='testSuite testSet_"+(i+1)+""+(j+1)+"' data-suiteid="+suites[j].id+" data-type='testsuite'><img class='qcExpand qcExpandTestset selectedQcNode' title='expand' style='height: 16px; float:left; margin-left:19px' src='imgs/ic-taskType-blue-plus.png'><label title='"+suites[j].name+"' style='margin-left:0px'>"+suites[j].name+"</label></li>");
-							for (var k=0; k<suites[j].testruns.length;++k){
-								if(k==0){
-									structContainer.find(".suiteList_"+(i+1)).append("<ul class='runList runList_"+(i+1)+""+(j+1)+"'></ul>")
-									$(".runList_"+(i+1)+""+(j+1)).hide();
-								}
-								structContainer.find(".runList_"+(i+1)+""+(j+1)).append("<li  class='testRun testcaselink' data-runid="+suites[j].testruns[k].id+" data-type='testrun'><label title='"+suites[j].testruns[k].name+"' style='margin-left:57px'>"+suites[j].testruns[k].name+"</label><img class='qcUndoSyncronise' title='Undo' src='imgs/ic-qcUndoSyncronise.png'><img class='qcSyncronise' title='Syncronise' src='imgs/ic-qcSyncronise.png'></li>");
-							}
+							structContainer.find(".suiteList_"+(i+1)).append("<li  class='testcaselink testSuite testSet_"+(i+1)+""+(j+1)+"' data-suiteid="+suites[j].id+" data-type='testsuite'><label title='"+suites[j].name+"' style='margin-left:0px'>"+suites[j].name+"</label><img class='qcUndoSyncronise' title='Undo' src='imgs/ic-qcUndoSyncronise.png'><img class='qcSyncronise' title='Syncronise' src='imgs/ic-qcSyncronise.png'></li>");
+							// for (var k=0; k<suites[j].testruns.length;++k){
+							// 	if(k==0){
+							// 		structContainer.find(".suiteList_"+(i+1)).append("<ul class='runList runList_"+(i+1)+""+(j+1)+"'></ul>")
+							// 		$(".runList_"+(i+1)+""+(j+1)).hide();
+							// 	}
+							// 	structContainer.find(".runList_"+(i+1)+""+(j+1)).append("<li  class='testRun testcaselink' data-runid="+suites[j].testruns[k].id+" data-type='testrun'><label title='"+suites[j].testruns[k].name+"' style='margin-left:57px'>"+suites[j].testruns[k].name+"</label><img class='qcUndoSyncronise' title='Undo' src='imgs/ic-qcUndoSyncronise.png'><img class='qcSyncronise' title='Syncronise' src='imgs/ic-qcSyncronise.png'></li>");
+							// }
 						}
 					}
 					// if($(".mtgScenarioList").find("li").length > 11){
@@ -219,7 +261,7 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 	});
 
 	//Select Avo Assure projects
-	$(document).on("change", ".qtestAvoAssureSelectProject", function(){
+	$(document).on("change", ".zephyrAvoAssureSelectProject", function(){
 		var getProject = $(this).children("option:selected").val();
 		for(var i=0; i<avoassure_projects_details.length; i++){
 			if(getProject == avoassure_projects_details[i].project_id){
@@ -233,32 +275,54 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 					}
 					//if(scnDetails.length >= 25)
 					$('.scrollbar-inner').scrollbar();
-					$(".searchScenarioAvoAssure").show();
+					$(".searchZScenarioAvoAssure").show();
 				} else{
 					AvoAssureContainer.append("This project does not contain any scenarios");
-					$(".searchScenarioAvoAssure").hide();
+					$(".searchZScenarioAvoAssure").hide();
 				}
 			}
 		}
 	});
 
 	//Search scenarios
+	// var flgTog = 1;
+	// $(document).on('click', ".searchZScenarioAvoAssure", function(){
+	// 	$('.searchScenarioQC').val('');
+	// 	if(flgTog){
+	// 		$(this).siblings("input").css({"opacity":1});
+	// 		flgTog = 0;
+	// 	}
+	// 	else{
+	// 		$(this).siblings("input").css({"opacity":0});
+	// 		flgTog = 1;
+	// 	}
+	// 	filter($(this).siblings("input"));
+	// });
+
+	//Search scenarios
 	var flgTog = 1;
-	$(document).on('click', ".searchScenarioAvoAssure", function(){
+	$scope.searchScenarioAvo = function(event){
 		$('.searchScenarioQC').val('');
 		if(flgTog){
-			$(this).siblings("input").css({"opacity":1});
+			// $(this).siblings("input").css({"opacity":1});
+			$('.searchScenarioQC').css({"opacity":1});
 			flgTog = 0;
 		}
 		else{
-			$(this).siblings("input").css({"opacity":0});
+			// $(this).siblings("input").css({"opacity":0});
+			$('.searchScenarioQC').css({"opacity":0});
 			flgTog = 1;
 		}
-		filter($(this).siblings("input"));
-	});
+		filter($('.searchScenarioQC'));
+	};
+	
 
 	$(document).on('keyup', '.searchScenarioQC', function() {
 		filter(this);
+	});
+
+	$(document).on('keyup', '.launchPopupInput', function() {
+		$(this).removeClass("inputErrorBorder");
 	});
 
 	function filter(element) {
@@ -305,7 +369,7 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 				$(document.body).css({'cursor' : 'wait'});
 				getParent.addClass("qcCollapse");
 				//if(getParent.hasClass("Tfolnode"))	$(this).prop("src","imgs/ic-qcCollapse.png");
-				var getProjectName = $(".qcSelectProject option:selected").val();
+				// var getProjectName = $(".qcSelectProject option:selected").val();
 				var getDomainName = $(".qcSelectDomain option:selected").val();
 				var datapath, dataAction;
 				if(getParent.hasClass("Tfolnode")){
@@ -401,26 +465,32 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 	// Mapping
 	$(document).on('click', ".qcSyncronise", function(event){
 		var getDomainName = $(".qcSelectDomain option:selected").val();
-		var getProjectId = $(".qcSelectDomain option:selected").data("projectid")
+		var getProjectId = $(".qcTreeContainer").find(".selectedToMap").data("projectid")
+		var versionId = $(".qcTreeContainer").find(".selectedToMap").data("versionid")
+		var cycleId =$(".qcTreeContainer").find(".selectedToMap").data("cycleid")
+		var issueId =$(".qcTreeContainer").find(".selectedToMap").data("issueid")
 		// var dataType = $(".qcTreeContainer").find(".selectedToMap").data("type");
 		// if(dataType == 'testsuite') {
 		// 	var testsuite = $(this).siblings("label")[0].innerText;
 		// 	var qtestSuiteId = $(".qcTreeContainer").find(".selectedToMap").data("suiteid");
 		// } else if(dataType == 'testrun') {
-		var testsuite = $(this).siblings("label")[0].innerText;
-		var qtestSuiteId = $(".qcTreeContainer").find(".selectedToMap").data("runid");
+		var testname = $(this).siblings("label")[0].innerText;
+		var testid = $(".qcTreeContainer").find(".selectedToMap").data("suiteid");
 		// }
 		var AvoAssureScenarioId = $(".qcAvoAssureTreeContainer").find(".selectedToMap").data("scenarioid");
 		
 		if(!getDomainName || !getProjectId)	openModelPopup("Save Mapped Testcase", "Please select project");
-		else if(!testsuite || !qtestSuiteId)	openModelPopup("Save Mapped Testcase", "Please select Testcase");
+		// else if(!testsuite || !qtestSuiteId)	openModelPopup("Save Mapped Testcase", "Please select Testcase");
 		else if(!AvoAssureScenarioId)	openModelPopup("Save Mapped Testcase", "Please select scenario");
 		else{
 			mappedList.push({
-				'project': getDomainName,
+				// 'project': getDomainName,
 				'projectid': getProjectId,			
-				'testsuite': testsuite,
-				'testsuiteid': qtestSuiteId,
+				'cycleid': cycleId,
+				'versionid': versionId,
+				'testid': testid,
+				'testname': testname,
+				'issueid': issueId,
 				'scenarioId': AvoAssureScenarioId
 				// 'maptype':dataType
 			});
@@ -433,7 +503,7 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 	//Submit mapped details
 	$scope.mapTestcaseToAvoAssure = function(){
 		if(mappedList.length > 0){
-			qcServices.saveQtestDetails_ICE(mappedList)
+			qcServices.saveZephyrDetails_ICE(mappedList)
 			.then(function(data){
 				if(data == "unavailableLocalServer"){
 					openModelPopup("Save Mapped Testcase", "ICE Engine is not available, Please run the batch file and connect to the Server.");
@@ -462,7 +532,7 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 	$scope.displayMappedFilesTab = function(){
 		blockUI("Loading...");
 		var userid = JSON.parse(window.localStorage['_UI']).user_id;
-		qcServices.viewQtestMappedList_ICE(userid)
+		qcServices.viewZephyrMappedList_ICE(userid)
 		.then(function(data){
 			// var selectOptions = $("#selAssignUser option:not(:first)");
 			data.sort(function(a,b) {
@@ -477,9 +547,11 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 				$(".mappedFiles").empty().show();
 				$('.mappedFiles').removeClass('scroll-wrapper');
 				$(".mappedFilesLabel").show();
+				$("#qtestTab").hide();
+				$("#almTab").hide();
 				for(var i=0;i<data.length;i++){
 					//there is no testscenarioname 
-					$(".mappedFiles").append('<div class="linkedTestset"><label data-qcdomain="'+data[i].qtestproject+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" data-qctestset="'+data[i].qctestset+'">'+data[i].qtestsuite+'</label><span class="linkedLine"></span><label data-scenarioid="'+data[i].testscenarioid+'">'+data[i].testscenarioname+'</label></div>');  //testscenarioname ??
+					$(".mappedFiles").append('<div class="linkedTestset"><label data-qcdomain="'+data[i].qtestproject+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" data-qctestset="'+data[i].qctestset+'">'+data[i].testname+'</label><span class="linkedLine"></span><label data-scenarioid="'+data[i].testscenarioid+'">'+data[i].testscenarioname+'</label></div>');  //testscenarioname ??
 				
 				}	
 
@@ -490,7 +562,7 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 			}
 			unblockUI();
 		},
-		function(error) {	console.log("Error in qcController.js file viewQtestMappedList_ICE method! \r\n "+(error.data));
+		function(error) {	console.log("Error in qcController.js file viewZephyrMappedList_ICE method! \r\n "+(error.data));
 		});		
 	};
 

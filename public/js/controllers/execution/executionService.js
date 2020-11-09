@@ -92,6 +92,19 @@ mySPA.factory('ExecutionService', ['$http','$q', function ($http,$q)   {
 	        })
 			.then (function(response)	{return response.data;	},
 			function(response){	return $q.reject(response.data);});	
+    	},
+		loginZephyrServer_ICE: function(qcURL,qcUserName,qcPassword, qcType){
+    		var param = "loginToZephyr_ICE";
+	        return $http.post('/loginToZephyr_ICE', {
+				action: param,
+              	qcURL: qcURL,
+				qcUsername: qcUserName,
+				qcPassword : qcPassword,
+				qcType : qcType,
+				qcaction: "domain"
+	        })
+			.then (function(response)	{return response.data;	},
+			function(response){	return $q.reject(response.data);});	
     	}
 	}
 }]);

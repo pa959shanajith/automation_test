@@ -36,7 +36,7 @@ io.on('connection', function (socket) {
 				socketMapNotify[address] = socket;
 				redisServer.redisSubClient.subscribe('UI_notify_' + address, 1);
 				//Broadcast Message
-				var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/mindmap', '/p_Utility', '/p_Reports', 'p_Weboccular', '/neuronGraphs2D', '/p_ALM', '/p_APG', '/p_Integration', '/p_qTest'];
+				var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/mindmap', '/p_Utility', '/p_Reports', 'p_Weboccular', '/neuronGraphs2D', '/p_ALM', '/p_APG', '/p_Integration', '/p_qTest', '/p_Zephyr'];
 				notificationMsg.to = broadcastTo;
 				notificationMsg.notifyMsg = 'Server Maintenance Scheduled';
 				// var soc = socketMapNotify[address];

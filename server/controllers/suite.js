@@ -170,9 +170,14 @@ const fetchScenarioDetails = async (scenarioid, userid, qcType) => {
 			"query": "qtestdetails",
 			"testscenarioid": scenarioid
 		};
-	} else {
+	} else if(qcType == 'ALM'){
 		inputs = {
 			"query": "qcdetails",
+			"testscenarioid": scenarioid
+		};
+	} else if(qcType == 'Zephyr'){
+		inputs = {
+			"query": "zephyrdetails",
 			"testscenarioid": scenarioid
 		};
 	}

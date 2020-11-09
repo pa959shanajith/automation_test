@@ -273,6 +273,26 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                 }]
             }
 		})
+		.state('zephyr', {
+            url: '/p_Zephyr',
+            templateUrl: 'partials/zephyr.html',
+            controller: 'zephyrController',
+            resolve: {
+                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+						'js/directives/headerDirective.js',	
+						'css/css_QC/qcStyle.css',
+						'js/factories/socketFactory.js',
+						'js/controllers/chatbot/chatbotController.js',
+						'js/controllers/chatbot/chatbotService.js',
+						'js/controllers/login/loginService.js',						
+						'js/controllers/header/headerController.js',
+						'js/controllers/zephyr/zephyrController.js',
+						'js/controllers/zephyr/zephyrService.js'
+                    ]);
+                }]
+            }
+		})
 		.state('utility', {
             url: '/p_Utility',
             templateUrl: 'partials/utility.html',
