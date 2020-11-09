@@ -361,31 +361,24 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 
 	// Undo Mapping
 	$(document).on('click', ".qcUndoSyncronise", function(){
-	// var qcTestcaseName = $(this).siblings("label").text();
-	var qcTcaseName_list = $(".selectedToMap")
-	var abc = []
-	for(var i=0;i<qcTcaseName_list.length-1;i++){
-	 	abc.push(qcTcaseName_list[i].innerText.trim())
+	var selectedToMap = $(".selectedToMap")
+	var qcTestcase = []
+	for(var i=0;i<selectedToMap.length-1;i++){
+		qcTestcase.push(selectedToMap[i].innerText.trim())
 	}
 	var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
 	for(var i=0;i<mappedList.length;i++){
-		// var mapped_testset = mappedList[i].testset
-		// for (var j=0;j<qcTcaseName_list.length-1;i++){
-		// 	for (var k=0;k<=mappedtc_list.length;k++){ 
-		var mappedtc_list = mappedList[i].testcase
-		if (abc.length==mappedtc_list.length){
-			// if(qcTcaseName_list[j].innerText.trim() == mappedtc_list[k] && qcTestsetName == mapped_testset){
+		var mappedTcList = mappedList[i].testcase
+		if (qcTestcase.length==mappedTcList.length){
 			if(qcTestsetName == mappedList[i].testset){
 				delete mappedList[i];
 				mappedList =  mappedList.filter(function(n){ return n != null; });
 				$('.testScenariolink').removeClass("selectedToMap");
 				$('.testScenariolink').prop("style","background-color:none;border-radius:0px;");
-				var selected_tc_list = $(".selectedToMap").siblings("label").prevObject
-				for(var i=0;i<selected_tc_list.length-1;i++){ 
-					// $(this).parent().css({"background-color":"rgb(225, 202, 255)"});
-					// $(this).siblings(".qcSyncronise").show();
-					selected_tc_list[i].style.cssText = "background-color: rgb(225, 202, 255)";
-					selected_tc_list[i].children[2].style.cssText="display:inline";
+				var selectedList = $(".selectedToMap").siblings("label").prevObject
+				for(var i=0;i<selectedList.length-1;i++){
+					selectedList[i].style.cssText = "background-color: rgb(225, 202, 255)";
+					selectedList[i].children[2].style.cssText="display:inline";
 				}
 				// break;
 				}
@@ -394,32 +387,15 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		}
 	});
 
-	//Undo Mapping
-	// $(document).on('click', ".qcUndoSyncronise", function(){
-	// 	var qcTestcaseName = $(this).siblings("label").text();
-	// 	var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
-	// 	for(var i=0;i<mappedList.length;i++){
-	// 		if(qcTestcaseName == mappedList[i].testcase && qcTestsetName == mappedList[i].testset){
-	// 			delete mappedList[i];
-	// 			mappedList =  mappedList.filter(function(n){ return n != null; });
-	// 			$('.testScenariolink').removeClass("selectedToMap");
-	// 			$('.testScenariolink').prop("style","background-color:none;border-radius:0px;");
-	// 			$(this).parent().css({"background-color":"rgb(225, 202, 255)"});
-	// 			$(this).siblings(".qcSyncronise").show();
-	// 			break;
-	// 		}
-	// 	}
-	// });
-
 	// Mapping
 	$(document).on('click', ".qcSyncronise", function(event){
 		var getDomainName = $(".qcSelectDomain option:selected").val();
 		var getProjectName = $(".qcSelectProject option:selected").val();
-		var qcTestcaseName_list = []
-		var abc=$(".selectedToMap").siblings("label").prevObject
-		for(var i=0;i<abc.length-1;i++){
-			var cur_obj =  abc[i].innerText
-			qcTestcaseName_list.push(cur_obj)
+		var qcTestcaseNameList = []
+		var selectedElements=$(".selectedToMap").siblings("label").prevObject
+		for(var i=0;i<selectedElements.length-1;i++){
+			var cur_obj =  selectedElements[i].innerText
+			qcTestcaseNameList.push(cur_obj)
 		}
 		var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
 		var qcFolderPath = $(this).parent("li").parent("ul").prev("li").parent("ul").prev("li").data("folderpath");
@@ -427,24 +403,22 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		
 		if(!getDomainName)	openModelPopup("Save Mapped Testcase", "Please select domain");
 		else if(!getProjectName)	openModelPopup("Save Mapped Testcase", "Please select project");
-		else if(!qcTestcaseName_list)	openModelPopup("Save Mapped Testcase", "Please select Testcase");
+		else if(!qcTestcaseNameList)	openModelPopup("Save Mapped Testcase", "Please select Testcase");
 		else if(!qcTestsetName)	openModelPopup("Save Mapped Testcase", "Please select Testset");
 		else if(!AvoAssureScenarioId)	openModelPopup("Save Mapped Testcase", "Please select scenario");
 		else{
 			mappedList.push({
 				'domain': getDomainName,
 				'project': getProjectName,			
-				'testcase': qcTestcaseName_list,
+				'testcase': qcTestcaseNameList,
 				'testset': qcTestsetName,
 				'folderpath': qcFolderPath,
 				'scenarioId': AvoAssureScenarioId,
 			});
-			for(var i=0;i<abc.length-1;i++){
-				abc[i].style.cssText = "background-color: #ddd";
-				abc[i].children[2].style.cssText="display:hide";
+			for(var i=0;i<selectedElements.length-1;i++){
+				selectedElements[i].style.cssText = "background-color: #ddd";
+				selectedElements[i].children[2].style.cssText="display:hide";
 			}
-			// $(this).parent().css({"background-color":"#ddd"});
-			// $(this).hide();
 			event.stopPropagation();
 		}
 	});
@@ -497,16 +471,9 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				$('.mappedFiles').removeClass('scroll-wrapper');
 				$(".mappedFilesLabel").show();
 				for(var i=0;i<data.length;i++){
-					//there is no testscenarioname 
-					// $(".mappedFiles").append('<div class="linkedTestset"><label data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" data-qctestset="'+data[i].qctestset+'">'+data[i].qctestcase+'</label><span class="linkedLine"></span><label data-scenarioid="'+data[i].testscenarioid+'">'+data[i].testscenarioname+'</label></div>');  //testscenarioname ??
 					var data_list = ''+data[i].qctestcase
 					data_list=data_list.replaceAll(',', ',<br>')
 					$(".mappedFiles").append('<div class="linkedTestset"><label style="float: left; width: 40%; background-color: #E1CAFF;" data-scenarioid="'+data[i].testscenarioid+'">'+data[i].testscenarioname+'</label><label style="float: right; width: 50%; background-color: #fad7f1fb;" data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" data-qctestset="'+data[i].qctestset+'">'+data_list+'</label></div>');  //testscenarioname ??
-					// var data_list = data[i].qctestcase
-
-					// for (var j=0;j<data_list;j++){
-					// 	$(".mappedFiles").append('<div class="linkedTestset"><label style="float: left; width: 40%;" data-scenarioid="'+data[i].testscenarioid+'">'+data[i].testscenarioname+'</label><label style="float: right; width: 50%;" data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" data-qctestset="'+data[i].qctestset+'">'+data_list[j].qctestcase+'</label></div>');  //testscenarioname ??
-					// }
 				}	
 
 				$('.scrollbar-inner').scrollbar();

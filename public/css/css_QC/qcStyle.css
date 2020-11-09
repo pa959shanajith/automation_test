@@ -87,22 +87,15 @@
 .linkedTestset{
     width: 100%;
     float: left;
-/* height: 50px; */
     margin-bottom: 26px;
 }
 .linkedTestset label{
-    /* width: 45%; */
-    /* float: left; */
-    /* background-color: #E1CAFF;  */
     border-radius: 5px;
-    /* background-color: #fad7f1fb; */
     padding: 5px 5px 5px 10px;
     font-size: 16px;
     font-family: 'LatoWebLight';
 	overflow: hidden;
     text-overflow: ellipsis;
-    /* height: 50px; */
-    /* margin-bottom: 26px; */
 }
 .linkedTestset span{
     float: left;
