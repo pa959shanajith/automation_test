@@ -1,0 +1,100 @@
+#assistWrap{
+    width: 360px ;
+}
+.assist-image {
+    vertical-align: middle;
+    margin-right: 8px;
+    height : 21px !important;
+    width: 27px !important;
+}
+.down-arrow-img{
+    height: auto !important;
+    width: auto !important;
+    position: relative;
+    margin-left : 200px;
+    margin-right : 10px;
+    padding : 5px 0px;
+}
+.down-close-img{
+    height: auto !important;
+    width: auto !important;
+    position: relative;
+    float : right;
+    padding : 5px 0px;
+}
+#assistContent{
+    background: #fff;
+    color: black;
+    font-family: 'Latoweb';
+    font-size: 15px;
+    border: 1px solid #b7b7b7;
+    padding: 15px 20px !important;
+}
+.chatArea{
+    height: 100%;
+    width: 100% !important;
+    min-height: 128px !important;
+    max-height: 200px !important;
+    margin-bottom: 10px !important;
+    
+    
+}
+.defautMssg{
+    position: relative;
+    padding: 10px 20px !important;
+    background: #E5E5EA !important;
+    border-radius: 25px !important;
+    color: black !important;
+    font-family: 'LatoWeb' !important;
+    font-size: 15px !important;
+    /* float: left; */
+    display: -webkit-inline-box !important;
+    margin-top: 5px !important;
+    /* border: 1px solid;*/
+    //width: 100%;
+    margin: 3px;
+}
+.userQuerymessage{
+    position: relative;
+    padding: 10px 20px;
+    color: white;
+    background: #643693;
+    border-radius: 25px;
+    float: right; 
+    margin-top: 5px;
+    display: -webkit-inline-box;
+    font-family: 'LatoWeb';
+    font-size: 15px;
+}
+.profJinpt{
+    width: 100%;
+    border-radius: 5px;
+    overflow: none;
+    border: 1px solid #797979 !important;
+    margin-bottom: 10px;
+    font-family: 'LatoWebMedium';
+    resize: none;
+    color: #333;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    background-color: #fff;
+    background-image: none;
+}
+.projBtns_container{
+    width: 100% !important;
+}
+.projBtns{
+    color: #fff;
+    border: 0;
+    border-radius: 20px;
+    padding: 2px 15px;
+    font-size: 17px;
+    background: #643693;
+    font-family: 'LatoWebLight';
+    outline: 0;
+}
+.projBtns:last-of-type{
+    float: right !important;
+}
