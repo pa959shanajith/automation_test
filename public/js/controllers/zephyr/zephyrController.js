@@ -110,13 +110,11 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 			.then(function(data){
 				$scope.domainData = data;
 				$(".qcLoginload").hide();
-				//$("#qcName,#qcUserName,#qcPwd,.qcConnsubmit").prop("disabled",false);
 				if(data == "unavailableLocalServer"){
 					$("#qcErrorMsg").text("ICE Engine is not available,Please run the batch file and connect to the Server.");
 				} else if(data == "scheduleModeOn") {
 					$("#qcErrorMsg").text("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
 				} else if(data == "Invalid Session"){
-					//$("#qcErrorMsg").text("Invalid Session");
 					return $rootScope.redirectPage();
 				} else if(data == "invalidcredentials"){
 					$("#qcErrorMsg").text("Invalid Credentials");
@@ -285,31 +283,14 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 	});
 
 	//Search scenarios
-	// var flgTog = 1;
-	// $(document).on('click', ".searchZScenarioAvoAssure", function(){
-	// 	$('.searchScenarioQC').val('');
-	// 	if(flgTog){
-	// 		$(this).siblings("input").css({"opacity":1});
-	// 		flgTog = 0;
-	// 	}
-	// 	else{
-	// 		$(this).siblings("input").css({"opacity":0});
-	// 		flgTog = 1;
-	// 	}
-	// 	filter($(this).siblings("input"));
-	// });
-
-	//Search scenarios
 	var flgTog = 1;
 	$scope.searchScenarioAvo = function(event){
 		$('.searchScenarioQC').val('');
 		if(flgTog){
-			// $(this).siblings("input").css({"opacity":1});
 			$('.searchScenarioQC').css({"opacity":1});
 			flgTog = 0;
 		}
 		else{
-			// $(this).siblings("input").css({"opacity":0});
 			$('.searchScenarioQC').css({"opacity":0});
 			flgTog = 1;
 		}
@@ -469,18 +450,13 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 		var versionId = $(".qcTreeContainer").find(".selectedToMap").data("versionid")
 		var cycleId =$(".qcTreeContainer").find(".selectedToMap").data("cycleid")
 		var issueId =$(".qcTreeContainer").find(".selectedToMap").data("issueid")
-		// var dataType = $(".qcTreeContainer").find(".selectedToMap").data("type");
-		// if(dataType == 'testsuite') {
-		// 	var testsuite = $(this).siblings("label")[0].innerText;
-		// 	var qtestSuiteId = $(".qcTreeContainer").find(".selectedToMap").data("suiteid");
-		// } else if(dataType == 'testrun') {
 		var testname = $(this).siblings("label")[0].innerText;
 		var testid = $(".qcTreeContainer").find(".selectedToMap").data("suiteid");
 		// }
 		var AvoAssureScenarioId = $(".qcAvoAssureTreeContainer").find(".selectedToMap").data("scenarioid");
 		
 		if(!getDomainName || !getProjectId)	openModelPopup("Save Mapped Testcase", "Please select project");
-		// else if(!testsuite || !qtestSuiteId)	openModelPopup("Save Mapped Testcase", "Please select Testcase");
+		else if(!testid) openModelPopup("Save Mapped Testcase", "Please select Testcase");
 		else if(!AvoAssureScenarioId)	openModelPopup("Save Mapped Testcase", "Please select scenario");
 		else{
 			mappedList.push({
