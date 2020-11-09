@@ -47,7 +47,7 @@ export const getNames_ICE = async(requestedIds, idType) => {
 
 export const keepSessionAlive = async() => {
     try{
-        const res = await axios(url+"/getNames_ICE", {
+        const res = await axios(url+"/keepSessionAlive", {
             method : 'POST',
             credentials : 'include'
         });

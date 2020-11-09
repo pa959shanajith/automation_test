@@ -63,9 +63,8 @@ const TableRow = (props) => {
     let objList = props.objList;
     const [highlight, setHighlight] = useState(false);
     const [commented, setCommented] = useState(props.testCase.outputVal.slice(-2) === "##");
-    const [remarks, setRemarks] = useState(props.testCase.remarks === "" ? [] : props.testCase.remarks.split(";"));
+    const [remarks, setRemarks] = useState(props.testCase.remarks.split(";").filter(remark => remark.trim()!==""));
     const [TCDetails, setTCDetails] = useState(props.testCase.addTestCaseDetailsInfo === "" ? "" : JSON.parse(props.testCase.addTestCaseDetailsInfo));
-    const [showDetailsDialog, setShowDetailsDialog] = useState(false);
 
     useEffect(()=>{
         setObjName(props.testCase.custname);
@@ -77,7 +76,7 @@ const TableRow = (props) => {
         setOutputPlaceholder(null);
         setKeywordList(null);
         objList = props.objList;
-        setRemarks(props.testCase.remarks === "" ? [] : props.testCase.remarks.split(";"));
+        setRemarks(props.testCase.remarks.split(";").filter(remark => remark.trim()!==""));
         setCommented(props.testCase.outputVal.slice(-2) === "##");
         setTCDetails(props.testCase.addTestCaseDetailsInfo === "" ? "" : JSON.parse(props.testCase.addTestCaseDetailsInfo));
     }, [props.rowChange, props.testCase]);
@@ -111,17 +110,21 @@ const TableRow = (props) => {
             }
             else{
                 setFocused(false);
+                // props.setRowData(props.idx, objName, keyword, input, output);
                 setObjName(props.testCase.custname);
                 setKeyword(props.testCase.keywordVal);
                 setInput(props.testCase.inputVal[0]);
                 setOutput(props.testCase.outputVal);
             }
         }
+    }, [props.focusedRow, props.edit]);
+
+    useEffect(()=>{
         if (props.focusedRow !== props.idx) {
             setFocused(false);
             setHighlight(false);
         }
-    }, [props.focusedRow, props.edit]);
+    });
 
     const onBoxCheck = event => {
         props.updateChecklist(props.idx,"check");
@@ -129,20 +132,23 @@ const TableRow = (props) => {
         else setChecked(false);
     }
 
-    const onRowClick = event => {
-        props.updateChecklist(props.idx, "row");
-        setHighlight(true);
+    const onRowClick = (event, msg) => {
+        props.updateChecklist(props.idx, "row", msg);
+        if(!props.edit) setHighlight(true);
         setChecked(true);
     }
 
     const onObjSelect = event => {
         const caseData = props.getKeywords(event.target.value)
         const placeholders = props.getRowPlaceholders(caseData.obType, caseData.keywords[0]);
+        setInput("");
+        setOutput("");
         setKeywordList(caseData.keywords);
         setObjType(caseData.obType);
         setOutputPlaceholder(placeholders.outputval);
         setInputPlaceholder(placeholders.inputval);
         setObjName(event.target.value)
+        setKeyword(caseData.keywords[0]);
     };
 
     const onKeySelect = event => {
@@ -155,57 +161,56 @@ const TableRow = (props) => {
     };
 
     const submitChanges = event => {
-        if (event.keyCode === 13) props.setRowData(props.idx, objName, keyword, input, output);
+        if (event.keyCode === 13) props.setRowData({
+                                            rowIdx: props.idx,
+                                            operation: "row",
+                                            objName: objName,
+                                            keyword: keyword,
+                                            inputVal: input,
+                                            outputVal: output
+                                        });
         else if (event.keyCode === 27) props.setFocusedRow(null);
     }
 
     const onInputChange = event => setInput(event.target.value)
 
     const onOutputChange = event => setOutput(event.target.value)
-
-    const onSaveDetails = details => {
-        props.saveDetails(props.idx, details === "" ? "" : JSON.stringify(details))
-        setTCDetails(details);
-        setShowDetailsDialog(false);
-    }
     
     return (
         <>
-        
-        { showDetailsDialog && <DetailsDialog TCDetails={TCDetails} setShow={setShowDetailsDialog} onSaveDetails={onSaveDetails}/> }
-        <div className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + (highlight || (props.focusedRow!== null  && typeof props.focusedRow === "object" && props.focusedRow.includes(props.idx)) ? " highlight-step" : "")}>
-            {console.log(`rendered ${props.idx+1} ${props.testCase.outputVal}`)}
+        <div className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + (highlight || (props.focusedRow!== null  && typeof props.focusedRow === "object" && props.focusedRow.includes(props.idx)) ? " highlight-step" : "") + (props.edit ? " d__table_row_edit": "")}>
+            {/* {console.log(`rendered ${props.idx+1} ${props.testCase.outputVal}`)} */}
             <span className="step_col" onClick={onRowClick}>{props.idx + 1}</span>
             <span className="sel_col"><input className="sel_obj" type="checkbox" checked={checked} onClick={onBoxCheck}/></span>
             
             <span className="objname_col">
                 { focused ? 
-                <select className="col_select" value={objName} onChange={onObjSelect} onKeyDown={submitChanges} autoFocus>
+                <select className="col_select" value={objName} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} autoFocus>
                     { objList.map(object=> <option value={object}>{object}</option>) }
                 </select> :
-                <div className="d__row_text" onClick={onRowClick}>{objName}</div>
+                <div className="d__row_text" onClick={onRowClick} title={objName} >{objName}</div>
                 }
             </span>
             <span className="keyword_col" >
                 { focused ? 
-                <select className="col_select" value={keyword} onChange={onKeySelect} onKeyDown={submitChanges}>
+                <select className="col_select" value={keyword} onChange={onKeySelect} onKeyDown={submitChanges} title={keyword} >
                     { keywordList && keywordList.map(keyword => <option value={keyword}>{keyword}</option>) }
                 </select> :
-                <div className="d__row_text" onClick={onRowClick}>{keyword}</div> }
+                <div className="d__row_text" onClick={onRowClick} title={keyword} >{keyword}</div> }
             </span>
             <span className="input_col" >
                 { focused ? ['getBody', 'setHeader', 'setWholeBody', 'setHeaderTemplate'].includes(keyword) ? 
-                                <textarea className="col_inp col_inp_area" value={input} onChange={onInputChange} /> : 
-                                <input className="col_inp" value={input} placeholder={inputPlaceholder} onChange={onInputChange} onKeyDown={submitChanges} /> :
-                    <div className="d__row_text" onClick={onRowClick}>{input}</div> }
+                                <textarea className="col_inp col_inp_area" value={input} onChange={onInputChange} title={inputPlaceholder}/> : 
+                                <input className="col_inp" value={input} placeholder={inputPlaceholder} onChange={onInputChange} onKeyDown={submitChanges} title={inputPlaceholder}/> :
+                    <div className="d__row_text" onClick={onRowClick} title={input}>{input}</div> }
             </span>
             <span className="output_col" >
-                { focused ? <input className="col_inp" value={output} placeholder={outputPlaceholder} onChange={onOutputChange} onKeyDown={submitChanges} /> :
-                <div className="d__row_text" onClick={onRowClick}>{output}</div> }
+                { focused ? <input className="col_inp" value={output} placeholder={outputPlaceholder} onChange={onOutputChange} onKeyDown={submitChanges} title={outputPlaceholder}/> :
+                <div className="d__row_text" onClick={onRowClick} title={output}>{output}</div> }
             </span>
 
-            <span className="remark_col"  onClick={onRowClick}><img src={"static/imgs/ic-remarks-" + (remarks.length > 0 ? "active.png" : "inactive.png")} alt="remarks" onClick={()=>{props.showRemarkDialog(props.idx); setFocused(false)}}/></span>
-            <span className="details_col" onClick={onRowClick}><img src={"static/imgs/ic-details-" + ( TCDetails !== "" ? (TCDetails.testcaseDetails || TCDetails.actualResult_pass || TCDetails.actualResult_fail ) ? "active.png" : "inactive.png" : "inactive.png")} alt="details"  onClick={()=>setShowDetailsDialog(true)}/></span>
+            <span className="remark_col"  onClick={(e)=>onRowClick(e, "noFocus")}><img src={"static/imgs/ic-remarks-" + (remarks.length > 0 ? "active.png" : "inactive.png")} alt="remarks" onClick={()=>{props.showRemarkDialog(props.idx); setFocused(false)}}/></span>
+            <span className="details_col" onClick={(e)=>onRowClick(e, "noFocus")}><img src={"static/imgs/ic-details-" + ( TCDetails !== "" ? (TCDetails.testcaseDetails || TCDetails.actualResult_pass || TCDetails.actualResult_fail ) ? "active.png" : "inactive.png" : "inactive.png")} alt="details"  onClick={()=>{props.showDetailDialog(props.idx); setFocused(false)}} /></span>
         </div>
         </>
     );

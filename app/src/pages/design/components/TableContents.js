@@ -27,9 +27,9 @@ const TableContents = (props) => {
                                                                 setRowData={props.setRowData}
                                                                 firstName={props.firstName}
                                                                 lastName={props.lastName}
-                                                                saveRemarks={props.saveRemarks}
                                                                 saveDetails={props.saveDetails}
                                                                 showRemarkDialog={props.showRemarkDialog}
+                                                                showDetailDialog={props.showDetailDialog}
                                                                 rowChange={props.rowChange}
                                             />)
                 }

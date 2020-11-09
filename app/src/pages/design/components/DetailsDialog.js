@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ModalContainer } from "../../global";
 
-const DetailsDialog = ({setShow, onSaveDetails, TCDetails}) => {
+const DetailsDialog = ({setShow, onSetRowData, TCDetails, idx}) => {
 
     const [res, setRes] = useState(TCDetails.testcaseDetails || "" );
     const [pass, setPass] = useState(TCDetails.actualResult_pass || "");
@@ -25,7 +25,8 @@ const DetailsDialog = ({setShow, onSaveDetails, TCDetails}) => {
                          actualResult_fail: "" || fail.trim()
                         }    
         }
-        onSaveDetails(TCDetail);
+        // onSaveDetails(idx, TCDetail === "" ? "" : JSON.stringify(TCDetail));
+        onSetRowData({rowIdx: idx, operation: "details", details: TCDetail === "" ? "" : JSON.stringify(TCDetail)});
         setShow(false);
     }
 

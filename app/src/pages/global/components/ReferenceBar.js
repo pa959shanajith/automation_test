@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// import {motion, AnimatePresence} from 'framer-motion';
 import {ScrollBar, TaskContents} from '../../global';
 import { useSelector } from 'react-redux';
 import "../styles/ReferenceBar.scss";
@@ -29,9 +28,11 @@ const ReferenceBar = (props) => {
     const [showTask, setShowTask] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
     const [taskPopY, setTaskPopY] = useState(null);
+    const [taskInfo, setTaskInfo] = useState(null);
 
     const tasksJson = useSelector(state=>state.plugin.tasksJson);
     const dataDict = useSelector(state=>state.plugin.FD);
+    const current_task = useSelector(state=>state.plugin.CT);
 
     useEffect(()=>{
             // if(window.location.pathname != '/mindmap'){
@@ -84,8 +85,25 @@ const ReferenceBar = (props) => {
     },[props.collapse])
 
     useEffect(()=>{
-        setShowTask(false);
-    }, [props.taskName]);
+        if (Object.keys(current_task).length!==0 && Object.keys(dataDict).length!==0){
+            let info = current_task.taskName.slice(0, 3).toLowerCase() === "exe" ?
+            {
+                'Project Name' : dataDict.projectDict[current_task.projectId],
+                'Release' : current_task.releaseid,
+                'Cycle' : dataDict.cycleDict[current_task.cycleid]
+            }
+            :
+            {
+                'Project Name' : dataDict.projectDict[current_task.projectId],
+                'Screen' : current_task.screenName,
+                'TestCase' : current_task.testCaseName,
+                'Release' : current_task.releaseid,
+                'Cycle' : dataDict.cycleDict[current_task.cycleid]
+            }
+            setShowTask(false);
+            setTaskInfo(info);
+        }
+    }, [current_task.taskName]);
 
     const onSearchHandler = event => {
         searchTask(event.target.value)
@@ -123,11 +141,6 @@ const ReferenceBar = (props) => {
         setShowInfo(!showInfo);
     }
 
-    const sliderVariant = {
-        slideIn : { opacity: 1, x: 0 },
-        slideOut : { opacity: 0, x: 50}
-    }
-
     return (
         <div className={"ref__wrapper " + (!collapse && "ref__wrapper__expand")}>
         <div className="ref__bar">
@@ -138,14 +151,9 @@ const ReferenceBar = (props) => {
                 <>
                 <div className="min_height_div">
                     <div id="ref_bar_scroll" className="inside_min">
-                    
-                    {/* <AnimatePresence> */}
-
                     { props.popups }
-
                     {
                         showTask && 
-                        // <motion.div variants={sliderVariant} animate={"slideIn"} initial={"slideOut"} exit={"slideOut"} transition={{ duration: 0.1 }} >
                         <ClickAwayListener onClickAway={closePopups}>
                         <div className="ref_pop task_pop" style={{marginTop: `calc(${taskPopY}px - 15vh)`}}>
                             <h4 className="pop__header" onClick={()=>setShowTask(false)}><span className="pop__title">My task(s)</span><img className="task_close_arrow" alt="close_task" src="static/imgs/ic-arrow.png"/></h4>
@@ -159,16 +167,15 @@ const ReferenceBar = (props) => {
                                 <div id='task_pop_scroll' className="task_pop__overflow">
                                     <ScrollBar scrollId='task_pop_scroll' trackColor="#46326b" thumbColor="#fff">
                                         <div className="task_pop__content" id="rb__pop_list">
-                                            <TaskContents items={searchValue ? searchItems : taskList} taskName={props.taskName} cycleDict={dataDict.cycleDict} taskJson={tasksJson}/>
+                                            <TaskContents items={searchValue ? searchItems : taskList} taskName={current_task.taskName} cycleDict={dataDict.cycleDict} taskJson={tasksJson}/>
                                         </div>
                                     </ScrollBar>
                                 </div>
                             </div>
                         </div>
                         </ClickAwayListener>
-                        // </motion.div>
                     }
-                    {/* </AnimatePresence> */}
+
                     {
                         showInfo && 
                         <ClickAwayListener onClickAway={closePopups}>
@@ -176,10 +183,10 @@ const ReferenceBar = (props) => {
                             <h4 className="pop__header" onClick={()=>setShowInfo(false)}><span className="pop__title">Information</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
                             <div className="info_pop__contents">
                             {
-                                props.taskInfo && Object.keys(props.taskInfo).map(key => 
+                                taskInfo && Object.keys(taskInfo).map(key => 
                                     <>
                                         <div className="task_info__title">{key}:</div>
-                                        <div className="task_info__content">{props.taskInfo[key]}</div>
+                                        <div className="task_info__content">{taskInfo[key]}</div>
                                     </>
                                 )
                             }

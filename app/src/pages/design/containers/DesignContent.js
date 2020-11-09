@@ -3,13 +3,13 @@ import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { ReactSortable } from 'react-sortablejs';
 import { ScreenOverlay, RedirectPage, PopupMsg, ScrollBar, ModalContainer } from '../../global'
-import TableContents from './TableContents';
+import TableContents from '../components/TableContents';
+import DetailsDialog from '../components/DetailsDialog';
 import * as DesignApi from "../api";
 import { reviewTask } from "../../mindmap/api";
 import * as pluginActions from "../../plugin/state/action";
 import * as designActions from '../state/action';
 import "../styles/DesignContent.scss";
-import { TestCases, KeywordData, ScrappedData } from './TestCaseValues.js'
 
 const DesignContent = (props) => {
     
@@ -19,7 +19,6 @@ const DesignContent = (props) => {
     const history = useHistory();
     const dispatch = useDispatch();
     const [overlay, setOverlay] = useState("");
-    const [showPop, setShowPop] = useState("");
     const [hideSubmit, setHideSubmit] = useState(false);
     const [keywordList, setKeywordList] = useState(null);
     const [testCaseData, setTestCaseData] = useState([]);
@@ -27,7 +26,6 @@ const DesignContent = (props) => {
     const [checkedRows, setCheckedRows] = useState([]);
     const [focusedRow, setFocusedRow] = useState(null);
     const [draggable, setDraggable] = useState(false);
-    const [mirror, setMirror] = useState(null);
     const [dataFormat, setDataFormat] = useState(null);
     const [objNameList, setObjNameList] = useState(null);
     const [stepNum, setStepNum] = useState("");
@@ -37,11 +35,12 @@ const DesignContent = (props) => {
     const [edit, setEdit] = useState(false);
     const [remark, setRemark] = useState("");
     const [showRemarkDlg, setShowRemarkDlg] = useState(false);
+    const [showDetailDlg, setShowDetailDlg] = useState(false);
     const [remarkError, setRemarkError] = useState(false);
-    const [showConfirmPop, setShowConfirmPop] = useState(false);
     const [changed, setChanged] = useState(false);
     const [isUnderReview, setIsUnderReview] = useState(props.current_task.status === "underReview");
     const [rowChange, setRowChange] = useState(false);
+    const [headerCheck, setHeaderCheck] = useState(false);
     const emptyRowData = {
         "objectName": "",
         "custname": "",
@@ -57,9 +56,8 @@ const DesignContent = (props) => {
         "addTestCaseDetails": "",
         "addTestCaseDetailsInfo": ""
     };
-    let submitOperation = "";
     // let checkArray = [];
-    let pasteErrors = { 'empty': '*Textbox cannot be empty',
+    const pasteErrors = { 'empty': '*Textbox cannot be empty',
                         'invalidChar': '*Textbox cannot contain characters other than numbers seperated by single semi colon',
                         'invalidStep': '*Please enter a valid step no'
                     }
@@ -74,17 +72,23 @@ const DesignContent = (props) => {
     ]
 
     useEffect(()=>{
-        if (props.imported) fetchTestCases();
+        if (props.imported) {
+            fetchTestCases();
+            props.setImported(false);
+        }
     }, [props.imported]);
 
     useEffect(()=>{
-        if (Object.keys(userInfo).length!==0) {
+        console.log("outside")
+        if (Object.keys(userInfo).length!==0 && Object.keys(props.current_task).length!==0) {
+            console.log("inside")
             fetchTestCases();
             setEdit(false);
             setFocusedRow(null);
             setCheckedRows([]);
             setDraggable(false);
             setChanged(false);
+            setHeaderCheck(false);
             setIsUnderReview(props.current_task.status === "underReview")
         }
     }, [userInfo, props.current_task]);
@@ -104,11 +108,11 @@ const DesignContent = (props) => {
                 
                 let changeFlag = false
                 let taskObj = props.current_task
-                if(data.screenName){
+                if(data.screenName && data.screenName !== taskObj.screenName){
                     taskObj.screenName = data.screenName;
                     changeFlag = true
 				}
-				if(data.reuse){
+				if(data.reuse && data.reuse !== taskObj.reuse){
                     taskObj.reuse = "True";
                     changeFlag = true
                 }
@@ -116,7 +120,7 @@ const DesignContent = (props) => {
 
 				if(data.del_flag){
 					//pop up for presence of deleted objects
-					setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."});
+					props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."});
 					//disable left-top-section
 					// $("#left-top-section").addClass('disableActions');
 					// $("a[title='Export TestCase']").addClass('disableActions');
@@ -132,8 +136,8 @@ const DesignContent = (props) => {
 				// $('.ui-grid-icon-angle-down').removeClass('ui-grid-icon-angle-down');
                 // $("#jqGrid").jqGrid('clearGridData');
                 
-				if(data.testcase.length === 0) setHideSubmit(true);
-				else setHideSubmit(false);
+				setHideSubmit(data.testcase.length === 0);
+				
                 
                 // $('#jqGrid').show();
                 // service call # 2 - objectType service call 
@@ -150,8 +154,8 @@ const DesignContent = (props) => {
                         
                         setTestScriptData(scriptData.view);
                         
-						if (scriptData.mirror) setMirror(scriptData.mirror);
-						else setMirror(null);
+						if (scriptData.mirror) props.setMirror(scriptData.mirror);
+						else props.setMirror(null); //SHORTEN IT
                         
 						// service call # 3 -objectType service call
 						DesignApi.getKeywordDetails_ICE(appType)
@@ -254,7 +258,7 @@ const DesignContent = (props) => {
                     if (!testCases[i].custname || !testCases[i].keywordVal) {
                         let col = "Object Name"
                         if (!testCases[i].keywordVal) col = "keyword"
-                        setShowPop({'title': 'Save Testcase', 'content': `Please select ${col} Name at Step No. ${step}`})
+                        props.setShowPop({'title': 'Save Testcase', 'content': `Please select ${col} Name at Step No. ${step}`})
                         serviceCallFlag = true;
                         break;
                     } else {
@@ -280,7 +284,7 @@ const DesignContent = (props) => {
                 }
 
                 if (serviceCallFlag == true) {
-                    console.log("no service call being made"); // What to do
+                    console.log("no service call being made");
                 } else {
                     DesignApi.getScrapeDataScreenLevel_ICE()
                         .then(res => {
@@ -296,7 +300,7 @@ const DesignContent = (props) => {
                         if (data === "success") {
                             fetchTestCases();
                             setChanged(false);
-                            setShowPop({'title': 'Save Testcase', 'content': 'Testcase saved successfully'});
+                            props.setShowPop({'title': 'Save Testcase', 'content': 'Testcase saved successfully'});
                             
                             // if(taskInfo.appType.toLowerCase()=="web" && '_modified' in localStorage && localStorage['_modified'] != ""){
                             //     var screenId = taskInfo.screenId;
@@ -347,7 +351,9 @@ const DesignContent = (props) => {
                             //             console.log("Error")
                             //         })
                             // }
-                        } else setShowPop({'title':'Save Testcase', 'content':'Failed to save Testcase'});
+                        } else {
+                            props.setShowPop({'title':'Save Testcase', 'content':'Failed to save Testcase'})
+                        };
                     })
                     .catch(error => { 
                         console.error("Error::::", error);
@@ -355,41 +361,44 @@ const DesignContent = (props) => {
                     serviceCallFlag = false;
                 }
             } else {
-                setShowPop({'title':'Save Testcase', 'content':'ScreenID or TestscriptID is undefined'});
+                props.setShowPop({'title':'Save Testcase', 'content':'ScreenID or TestscriptID is undefined'});
             }
         }
+        setFocusedRow(null);
+        setCheckedRows([]);
+        setHeaderCheck(false);
     }
 
-    const setRowData = (rowIdx, objName, keyword, inputVal, outputVal) => {
-        let testCases = [...testCaseData]
-        if (testCases[rowIdx].custname !== objName || testCases[rowIdx].keywordVal !== keyword || testCases[rowIdx].inputVal[0] !== inputVal || testCases[rowIdx].outputVal !== outputVal){
-            testCases[rowIdx].custname = objName;
-            testCases[rowIdx].keywordVal = keyword;
-            testCases[rowIdx].inputVal = [inputVal];
-            testCases[rowIdx].outputVal = outputVal;
+    const setRowData = (data) => {
+        let testCases = [...testCaseData];
+        let { rowIdx, operation } = data;
+        let changed = false;
+        if (operation === "row") {
+            const { objName, keyword, inputVal, outputVal } = data;
+            if (testCases[rowIdx].custname !== objName || testCases[rowIdx].keywordVal !== keyword || testCases[rowIdx].inputVal[0] !== inputVal || testCases[rowIdx].outputVal !== outputVal){
+                testCases[rowIdx].custname = objName;
+                testCases[rowIdx].keywordVal = keyword;
+                testCases[rowIdx].inputVal = [inputVal];
+                testCases[rowIdx].outputVal = outputVal;
+                changed = true;
+            }
+            setFocusedRow("");
+        }
+        else if (operation === "remarks") {
+            testCases[rowIdx].remarks = data.remarks;
+            changed = true;
+        }
+        else if (operation === "details") {
+            let testCase = {...testCases[rowIdx]};
+            testCase.addTestCaseDetailsInfo = data.details;
+            testCases[rowIdx] = testCase
+            changed = true;
+        }
+        if (changed) {
             setTestCaseData(testCases);
             setChanged(true);
             setRowChange(!rowChange);
         }
-        setFocusedRow("");
-    }
-
-    const saveRemarks = (rowIdx, remarks) => {
-        let testCases = [...testCaseData]
-        testCases[rowIdx].remarks = remarks
-        setTestCaseData(testCases);
-        setChanged(true);
-        setRowChange(!rowChange);
-    }
-
-    const saveDetails = (rowIdx, details) => {
-        let testCases = [...testCaseData]
-        let testCase = {...testCases[rowIdx]}
-        testCase.addTestCaseDetailsInfo = details
-        testCases[rowIdx] = testCase
-        setTestCaseData(testCases);
-        setChanged(true);
-        setRowChange(!rowChange);
     }
 
     const redirectToPlugin = () => {
@@ -397,7 +406,7 @@ const DesignContent = (props) => {
         history.replace('/plugin');
     }
 
-    const submitTask = () => {
+    const submitTask = (submitOperation) => {
 		let taskid = props.current_task.subTaskId;
 		let taskstatus = props.current_task.status;
 		let version = props.current_task.versionnumber;
@@ -410,50 +419,53 @@ const DesignContent = (props) => {
 
         reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs)
         .then(result => {
-            if (result === "fail") setShowPop({'title': 'Task Submission Error', 'content': 'Reviewer is not assigned !'});
-            else if (taskstatus === 'reassign') setShowPop({'title': "Task Reassignment Success", 'content': "Task Reassigned successfully!", onClick: ()=>redirectToPlugin()});
-            else if (taskstatus === 'underReview') setShowPop({'title': "Task Completion Success", 'content': "Task Approved successfully!", onClick: ()=>redirectToPlugin()});
-            else setShowPop({'title': "Task Submission Success", 'content': "Task Submitted successfully!", onClick: ()=>redirectToPlugin()});
+            if (result === "fail") props.setShowPop({'title': 'Task Submission Error', 'content': 'Reviewer is not assigned !'});
+            else if (taskstatus === 'reassign') props.setShowPop({'title': "Task Reassignment Success", 'content': "Task Reassigned successfully!", onClick: ()=>redirectToPlugin()});
+            else if (taskstatus === 'underReview') props.setShowPop({'title': "Task Completion Success", 'content': "Task Approved successfully!", onClick: ()=>redirectToPlugin()});
+            else props.setShowPop({'title': "Task Submission Success", 'content': "Task Submitted successfully!", onClick: ()=>redirectToPlugin()});
         })
         .catch(error => {
 			console.error(error);
         })
         
-        setShowConfirmPop(false);
+        props.setShowConfirmPop(false);
     }
 
     const deleteTestcase = () => {
         let testCases = [...testCaseData]
-        if (testCases.length === 1 && !testCases[0].custname) setShowPop({'title': 'Delete Testcase step', 'content': 'No steps to Delete'});
-        else if (checkedRows.length <= 0) setShowPop({'title': 'Delete Test step', 'content': 'Select steps to delete'});
-        else if (props.current_task.reuse === 'True') setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Testcase is been reused. Are you sure, you want to delete?', 'onClick': ()=>onDeleteTestStep()});
-        else setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Are you sure, you want to delete?', 'onClick': ()=>onDeleteTestStep()});
+        if (testCases.length === 1 && !testCases[0].custname) props.setShowPop({'title': 'Delete Testcase step', 'content': 'No steps to Delete'});
+        else if (checkedRows.length <= 0) props.setShowPop({'title': 'Delete Test step', 'content': 'Select steps to delete'});
+        else if (props.current_task.reuse === 'True') props.setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Testcase is been reused. Are you sure, you want to delete?', 'onClick': ()=>onDeleteTestStep()});
+        else props.setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Are you sure, you want to delete?', 'onClick': ()=>onDeleteTestStep()});
     }
 
     const onDeleteTestStep = () => {
         let testCases = [...testCaseData]
-        for (let index of checkedRows) {
-            testCases.splice(index, 1)
-        }
+        testCases = testCases.filter((val, idx) => !checkedRows.includes(idx))
         setTestCaseData(testCases);
         setCheckedRows([]);
+        setHeaderCheck(false);
         setFocusedRow(null);
-        setShowConfirmPop(false);
+        props.setShowConfirmPop(false);
         setChanged(true);
     }
 
     const addRow = () => {
         let testCases = [...testCaseData]
+        let insertedRowIdx = [];
         if (checkedRows.length === 1) {
             const rowIdx = checkedRows[0];
             testCases.splice(rowIdx+1, 0, emptyRowData);
+            insertedRowIdx.push(rowIdx+1)
         }
         else {
             testCases.splice(testCaseData.length, 0, emptyRowData);
+            insertedRowIdx.push(testCaseData.length)
         }
         setTestCaseData(testCases);
         setCheckedRows([]);
-        setFocusedRow(null);
+        setHeaderCheck(false);
+        setFocusedRow(insertedRowIdx);
         setChanged(true);
         // setEdit(false);
     }
@@ -461,12 +473,13 @@ const DesignContent = (props) => {
     const editRow = () => {
         let check = [...checkedRows];
         let focus = null;
-        if (check.length === 0) setShowPop({'title': 'Edit Step', 'content': 'Select step to edit'});
+        if (check.length === 0) props.setShowPop({'title': 'Edit Step', 'content': 'Select step to edit'});
         else {
             if (check.length === 1) focus = check[0]
             else check = []
             
             setCheckedRows(check);
+            setHeaderCheck(false);
             setFocusedRow(focus);
             setEdit(true);
             setDraggable(false);
@@ -474,9 +487,9 @@ const DesignContent = (props) => {
     }
 
     const toggleDrag = () => {
-        let checkArray = []
-        setCheckedRows(checkArray);
+        setCheckedRows([]);
         setFocusedRow(null);
+        setHeaderCheck(false);
         setEdit(false);
 
         if (draggable) setDraggable(false);
@@ -487,12 +500,12 @@ const DesignContent = (props) => {
         let selectedRows = [...checkedRows]
         let copyTestCases = []
         let copyContent = {}
-        if (selectedRows.length === 0) setShowPop({'title': 'Copy Test Step', 'content': 'Select step to copy'});
+        if (selectedRows.length === 0) props.setShowPop({'title': 'Copy Test Step', 'content': 'Select step to copy'});
         else{
             for (let idx of selectedRows) {
                 if (!testCaseData[idx].custname) {
-                    if (selectedRows.length === 1) setShowPop({'title': 'Copy Test Step', 'content': 'Empty step can not be copied.'});
-                    else setShowPop({'title': 'Copy Test Step', 'content': 'The operation cannot be performed as the steps contains invalid/blank object references'});
+                    if (selectedRows.length === 1) props.setShowPop({'title': 'Copy Test Step', 'content': 'Empty step can not be copied.'});
+                    else props.setShowPop({'title': 'Copy Test Step', 'content': 'The operation cannot be performed as the steps contains invalid/blank object references'});
                     break
                 } 
                 else{
@@ -501,9 +514,9 @@ const DesignContent = (props) => {
                 }
             }
             
-            let checkArray = []
             copyContent = {'appType': props.current_task.appType, 'testCaseId': props.current_task.testCaseId, 'testCases': copyTestCases}
-            setCheckedRows(checkArray);
+            setCheckedRows([]);
+            setHeaderCheck(false);
             setEdit(false);
             setFocusedRow(null);
             dispatch({type: designActions.SET_COPYTESTCASES, payload: copyContent});
@@ -511,7 +524,7 @@ const DesignContent = (props) => {
     }
 
     const pasteSteps = () => {
-        if (focusedRow) setFocusedRow(null);
+        setFocusedRow(null);
 
         if (copiedContent.testCaseId !== props.current_task.testCaseId) {
             let appTypeFlag = false;
@@ -522,7 +535,7 @@ const DesignContent = (props) => {
                 }
             }
             if (copiedContent.appType !== props.current_task.appType && appTypeFlag) {
-                setShowPop({'title': 'Paste Test Step', 'content': 'Project Type is not same.'});
+                props.setShowPop({'title': 'Paste Test Step', 'content': 'Project Type is not same.'});
             }
             else{
                 setShowConfPaste(true);
@@ -534,7 +547,7 @@ const DesignContent = (props) => {
     const ConfPasteStep = () => (
         <ModalContainer 
             title="Paste Test Step"
-            close={()=>setShowConfPaste(false)}
+            close={()=>setShowConfPaste(false)} 
             content="Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?"
             footer={
                 <>
@@ -561,6 +574,7 @@ const DesignContent = (props) => {
             </div>}
             close={()=>{
                 setStepNum("");
+                showPasteError("");
                 setShowPS(false)
             }}
             submitText="Submit"
@@ -589,21 +603,22 @@ const DesignContent = (props) => {
                 }
                 if (pass) {
                     let toFocus = []
+                    let testCases = [...testCaseData]
                     for(let step of stepList){
                         let stepInt = parseInt(step)
-                        let testCases = [...testCaseData]
                         if (testCases.length === 1 && !testCases[0].custname) testCases = copiedContent.testCases
                         else testCases.splice(stepInt, 0, ...copiedContent.testCases);
-                        for(let i=1; i<=copiedContent.testCases.length; i++){
-                            toFocus.push(stepInt)
+                        for(let i=0; i<copiedContent.testCases.length; i++){
+                            toFocus.push(stepInt+i)
                         }
-                        setTestCaseData(testCases);
-                        setShowPS(false);
-                        setFocusedRow(toFocus);
-                        setCheckedRows([]);
-                        setStepNum("");
-                        setChanged(true);
                     }
+                    setTestCaseData(testCases);
+                    setShowPS(false);
+                    setFocusedRow(toFocus);
+                    setCheckedRows([]);
+                    setHeaderCheck(false);
+                    setStepNum("");
+                    setChanged(true);
                 }
             }
             else showPasteError('invalidChar')
@@ -615,8 +630,8 @@ const DesignContent = (props) => {
         let selectedIndexes = [...checkedRows]
         let testCases = [ ...testCaseData ]
 
-        if (selectedIndexes.length === 0) setShowPop({'title': 'Skip Testcase step', 'content': 'Please select step to skip'});
-        else if (selectedIndexes.length === 1 && !testCases[selectedIndexes[0]].custname) setShowPop({'title': 'Comment step', 'content': 'Empty step can not be commented.'});
+        if (selectedIndexes.length === 0) props.setShowPop({'title': 'Skip Testcase step', 'content': 'Please select step to skip'});
+        else if (selectedIndexes.length === 1 && !testCases[selectedIndexes[0]].custname) props.setShowPop({'title': 'Comment step', 'content': 'Empty step can not be commented.'});
         else{
             for(let idx of selectedIndexes){
                 let testCase = { ...testCases[idx] }
@@ -628,6 +643,7 @@ const DesignContent = (props) => {
             setTestCaseData(testCases);
             setFocusedRow(null);
             setCheckedRows([]);
+            setHeaderCheck(false);
             setEdit(false);
             setChanged(true);
         }
@@ -651,12 +667,12 @@ const DesignContent = (props) => {
             title="Remarks"
             content={
                 <div className="d__add_remark_content">
-                    { testCaseData[parseInt(showRemarkDlg)].remarks !== "" && 
-                        testCaseData[parseInt(showRemarkDlg)].remarks.split(';').length > 0 &&
+                    { 
+                        testCaseData[parseInt(showRemarkDlg)].remarks.split(';').filter(remark => remark.trim()!=="").length > 0 &&
                         <>
                         <div className="remark_history_lbl">History</div>
                         <div className="remark_history_content">
-                            { testCaseData[parseInt(showRemarkDlg)].remarks.split(";").map(remark=><li>{remark}</li>) }
+                            { testCaseData[parseInt(showRemarkDlg)].remarks.split(';').filter(remark => remark.trim()!=="").map(remark=><li>{remark}</li>) }
                         </div>
                         </>
                     }
@@ -678,7 +694,10 @@ const DesignContent = (props) => {
 
     const submitRemark = () => {
         let remarkVal = remark.trim()
-        if (!remarkVal) setRemarkError(true);
+        if (!remarkVal) {
+            setRemark("");
+            setRemarkError(true)
+        }
         else{
             let date = new Date();
 			let DATE = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
@@ -690,37 +709,20 @@ const DesignContent = (props) => {
             remarkArr.push(remarkVal);
             let remarkString = remarkArr.join(";")
             setRemark("");
-            saveRemarks(parseInt(showRemarkDlg), remarkString)
+            // saveRemarks(parseInt(showRemarkDlg), remarkString)
+            setRowData({rowIdx: parseInt(showRemarkDlg), operation: "remarks", remarks: remarkString})
             setShowRemarkDlg(false);
         }
     }
 
-    const PopupDialog = () => (
-        <PopupMsg 
-            title={showPop.title}
-            close={()=>setShowPop("")}
-            content={showPop.content}
-            submitText="OK"
-            submit={showPop.onClick ? showPop.onClick : ()=>setShowPop("")}
-        />
-    );
+    const showDetailDialog = (rowIdx) => {
+        setFocusedRow(null);
+        setShowDetailDlg(String(rowIdx));
+    }
 
-    const ConfirmPopup = () => (
-        <ModalContainer 
-            title={showConfirmPop.title}
-            content={showConfirmPop.content}
-            close={()=>setShowConfirmPop(false)}
-            footer={
-                <>
-                <button onClick={showConfirmPop.onClick}>Yes</button>
-                <button onClick={()=>setShowConfirmPop(false)}>No</button>
-                </>
-            }
-        />
-    )
-
-    const updateChecklist = (RowIdx, click) => {
+    const updateChecklist = (RowIdx, click, msg) => {
         let check = [...checkedRows]
+        let headerCheckFlag = false
         let focusIdx = null;
         let loc = check.indexOf(RowIdx);
         if (loc>=0) {
@@ -731,7 +733,10 @@ const DesignContent = (props) => {
             check.push(RowIdx)
             focusIdx = RowIdx;
         }
+        if (check.length === testCaseData.length) headerCheckFlag = true;
+        if (msg === "noFocus") focusIdx = null;
         // checkArray = check;
+        setHeaderCheck(headerCheckFlag);
         setFocusedRow(focusIdx); 
         setCheckedRows(check);
     }
@@ -742,19 +747,30 @@ const DesignContent = (props) => {
         setStepNum(value)
     };
 
-    const onReassign = () => {
-        setShowConfirmPop({'title':'Reassign Task', 'content': 'Are you sure you want to reassign the task ?', 'onClick': ()=>submitTask()});
-        submitOperation="reassign";
+    const onAction = (operation) => {
+        switch(operation){
+            case "submit":      props.setShowConfirmPop({'title':'Submit Task', 'content': 'Are you sure you want to submit the task ?', 'onClick': ()=>submitTask(operation)});
+                                break;
+            case "reassign":    props.setShowConfirmPop({'title':'Reassign Task', 'content': 'Are you sure you want to reassign the task ?', 'onClick': ()=>submitTask(operation)});
+                                break;
+            case "approve":     props.setShowConfirmPop({'title':'Approve Task', 'content': 'Are you sure you want to approve the task ?', 'onClick': ()=>submitTask(operation)});
+                                break;
+            default:            break;
+        }                       
     }
 
-    const onSubmit = () => {
-        setShowConfirmPop({'title':'Submit Task', 'content': 'Are you sure you want to submit the task ?', 'onClick': ()=>submitTask()});
-        submitOperation="submit";
-    }
-
-    const onApprove = () => {
-        setShowConfirmPop({'title':'Approve Task', 'content': 'Are you sure you want to approve the task ?', 'onClick': ()=>submitTask()});
-        submitOperation="approve";
+    const onCheckAll = (event) => {
+        let checkList = [...checkedRows]
+        if (event.target.checked) {
+            checkList = new Array(testCaseData.length);
+            for (let i=0; i<checkList.length; i++ ) checkList[i] = i;
+        }
+        else {
+            checkList = []
+        }
+        setFocusedRow(null); 
+        setHeaderCheck(event.target.checked);
+        setCheckedRows(checkList);
     }
 
     const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.current_task, testScriptData), [keywordList, props.current_task, testScriptData]);
@@ -765,10 +781,9 @@ const DesignContent = (props) => {
         <>
         { showPS && PasteStepDialog() }
         { showRemarkDlg && RemarkDialog() }
+        { showDetailDlg && <DetailsDialog TCDetails={testCaseData[showDetailDlg].addTestCaseDetailsInfo && JSON.parse(testCaseData[showDetailDlg].addTestCaseDetailsInfo)} setShow={setShowDetailDlg} onSetRowData={setRowData} idx={showDetailDlg} /> }
         { overlay && <ScreenOverlay content={overlay} /> }
-        { showPop && <PopupDialog /> }
         { showConfPaste && <ConfPasteStep />}
-        { showConfirmPop && <ConfirmPopup /> }
         <div className="d__content">
             <div className="d__content_wrap">
             { /* Task Name */ }
@@ -795,16 +810,16 @@ const DesignContent = (props) => {
                     { isUnderReview && 
                         <>
                         <button className="d__reassignBtn d__btn" 
-                                onClick={onReassign}>
+                                onClick={()=>onAction("reassign")}>
                             Reassign
                         </button>
-                        <button className="d__approveBtn d__btn" onClick={onApprove}>
+                        <button className="d__approveBtn d__btn" onClick={()=>onAction("approve")}>
                             Approve
                         </button>
                         </>
                     }
                     { !hideSubmit && !isUnderReview &&
-                        <button className="d__submitBtn d__btn" onClick={onSubmit}>
+                        <button className="d__submitBtn d__btn" onClick={()=>onAction("submit")}>
                             Submit
                         </button>
                     }
@@ -817,7 +832,7 @@ const DesignContent = (props) => {
             <div className="d__table">
                 <div className="d__table_header">
                     <span className="step_col d__step_head" ></span>
-                    <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox"/></span>
+                    <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll}/></span>
                     <span className="objname_col d__obj_head" >Object Name</span>
                     <span className="keyword_col d__key_head" >Keyword</span>
                     <span className="input_col d__inp_head" >Input</span>
@@ -842,9 +857,8 @@ const DesignContent = (props) => {
                                     focusedRow={focusedRow}
                                     setFocusedRow={setFocusedRow}
                                     setRowData={setRowData}
-                                    saveRemarks={saveRemarks}
-                                    saveDetails={saveDetails}
                                     showRemarkDialog={showRemarkDialog}
+                                    showDetailDialog={showDetailDialog}
                                     rowChange={rowChange}
                                     />
                             </ReactSortable>

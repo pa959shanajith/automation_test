@@ -5,17 +5,18 @@ import { Thumbnail, ResetSession, RedirectPage } from '../../global';
 import * as DesignApi from "../api";
 import "../styles/ActionBarItems.scss"
 
-const UpperContent = ({appType, isMac, disable, setOverlay, setShowPop, testCaseId, setTcList, setShowDlg, dTcFlag, checkedTc, showDlg}) => {
+const UpperContent = ({isMac, disable, setOverlay, setShowPop, testCaseId, setTcList, setShowDlg, dTcFlag, checkedTc, showDlg}) => {
 
     const userInfo = useSelector(state=>state.login.userinfo);
     const current_task = useSelector(state=>state.plugin.CT);
+    let appType = current_task.appType;
     const history = useHistory();
 
     const [dependCheck, setDependCheck] = useState(false);
 
     useEffect(()=>{
         if (!showDlg) setDependCheck(false);
-    }, [setShowDlg]);
+    }, [showDlg]);
 
     const WebList = [
         {'title': "Internet Explorer", 'img': "static/imgs/ic-ie.png", action: ()=>debugTestCases('3')}, 
@@ -106,13 +107,15 @@ const UpperContent = ({appType, isMac, disable, setOverlay, setShowPop, testCase
                     // localStorage['_modified']=JSON.stringify(rows)
                     console.log("populate localstorage[modified]")
                     setShowPop({'title': "Debug Testcase", 'content': "Debug completed successfully."})
+                } else {
+                    console.log(data);
                 }										
             })
             .catch(error => {
                 setOverlay("");
                 ResetSession.end();
                 setOverlay({'title': "Debug Testcase", 'content': "Failed to debug."});
-                console.error("Error while traversing while executing debugTestcase method!! \r\n " + (error.data));
+                console.error("Error while traversing while executing debugTestcase method! \r\n " + (error.data));
             });
     };
 
@@ -195,7 +198,7 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop}) => {
                         break;
                     }
                 }
-                if (flag === false) setShowPop({'title': "App Type Error", 'content': "Project application type and Imported JSON application type doesn't match, please check!!"})
+                if (flag === false) setShowPop({'title': "App Type Error", 'content': "Project application type and Imported JSON application type doesn't match, please check!"})
                 else {
                     DesignApi.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
                         .then(data => {
@@ -227,7 +230,7 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop}) => {
                     document.getElementById("importTestCaseField").click();
                 }
                 else{
-                    setShowConfirmPop({'title': 'Table Consists of Data', 'content': 'Import will erase your old data. Do you want to continue??', 'onClick': ()=>importTestCase(true)});
+                    setShowConfirmPop({'title': 'Table Consists of Data', 'content': 'Import will erase your old data. Do you want to continue?', 'onClick': ()=>importTestCase(true)});
                 }
             })
         .catch(error => console.error("ERROR::::", error));
@@ -242,7 +245,7 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop}) => {
     return (
         <>
             {lowerList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} importElement={icon.importElement}/>)}
-            <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange}/>
+            <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange} accept=".json"/>
         </>
     );
 };
