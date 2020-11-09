@@ -186,6 +186,7 @@ const fetchScenarioDetails = async (scenarioid, userid, qcType) => {
 const prepareExecutionRequest = async (batchData, userInfo) => {
 	const execReq = {
 		"exec_mode": batchData.exectionMode,
+		"exec_env" : batchData.executionEnv,
 		"apptype": batchData.batchInfo[0].appType,
 		"qccredentials": batchData.qccredentials,
 		"batchId": "",
@@ -673,6 +674,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 			"timestamp": timestamp.toString(),
 			"executeon": multiExecutionData.browserType,
 			"executemode": multiExecutionData.exectionMode,
+			"exec_env" : multiExecutionData.executionEnv,
 			"targetaddress": targetUser,
 			"userid": userInfo.userid,
 			"scenarios": [],
@@ -963,6 +965,7 @@ exports.reScheduleTestsuite = async () => {
 				const tsuIds = schd.testsuiteids;
 				const batchObj = {
 					"exectionMode": schd.executemode,
+					"executionEnv": schd.executeenv,
 					"browserType": schd.executeon,
 					"qccredentials": { "qcurl": "", "qcusername": "", "qcpassword": "" },
 					"targetUser": schd.target,
