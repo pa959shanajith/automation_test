@@ -32,6 +32,21 @@ mySPA.factory('reportService', ['$http', '$q', function($http, $q) {
                         })
             }
         },
+        viewReport: function(reportId, reportType) {
+            var responseType = (reportType == 'pdf')? 'arraybuffer':'application/json';
+            var targetURL = '/viewreport/'+reportId+'/'+reportType+((reportType=='pdf')?'?images=true':'');
+            return $http.get(targetURL, {
+                responseType: responseType
+            })
+            .then(function(response) {
+                return response.data
+            },
+            function(response) {
+                return $q.reject(response.data)
+            }, {
+                responseType: responseType
+            })
+        },
         getMainReport_ICE: function() {
             return $http.post('/getMainReport_ICE', {
                     param: 'getMainReport_ICE'

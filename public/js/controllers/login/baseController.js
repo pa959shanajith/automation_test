@@ -18,7 +18,7 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 		cfpLoadingBar.complete();
 	} else {
 		$scope.loginAgain = false;
-		LoginService.checkUserState()
+		LoginService.validateUserState()
 		.then(function (data) {
 			cfpLoadingBar.complete();
 			var emsg = "Loading Profile...";
@@ -30,6 +30,7 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 			else if (data == "userLogged") emsg = "User is already logged in! Please logout from the previous session.";
 			else if (data == "inValidCredential" || data == "invalid_username_password") emsg = "The username or password you entered isn't correct. Please try again.";
 			else if (data == "noProjectsAssigned") emsg = "To Login, user must be allocated to a Domain and Project. Please contact Admin.";
+			else if (data == "redirect") $location.path("/login"); //window.location = "/login";
 			else if (data == "reload") window.location.reload();
 			else if (data == "Invalid Session") {
 				emsg = "Your session has expired!";

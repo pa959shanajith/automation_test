@@ -706,6 +706,11 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				else if(data == "Modified") openDialogExe("Execute Test Suite", "Task has been modified, Please approve the task");
 				else if (data == "unavailableLocalServer") openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
 				else if (data == "Terminate") {
+					$('#executionTerminatedBy').html('Program');
+					$('#executionTerminated').modal('show');
+					$('#executionTerminated').find('.btn-default').focus();
+				} else if (data == "UserTerminate") {
+					$('#executionTerminatedBy').html('User');
 					$('#executionTerminated').modal('show');
 					$('#executionTerminated').find('.btn-default').focus();
 				} else if (data == "success") {
@@ -755,6 +760,11 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		if (!executionActive)
 			return false;
 		if (data == "Terminate") {
+			$('#executionTerminatedBy').html('Program');
+			$('#executionTerminated').modal('show');
+			$('#executionTerminated').find('.btn-default').focus();
+		} else if (data == "UserTerminate") {
+			$('#executionTerminatedBy').html('User');
 			$('#executionTerminated').modal('show');
 			$('#executionTerminated').find('.btn-default').focus();
 		} else if (data == "unavailableLocalServer") {

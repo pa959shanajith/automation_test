@@ -5,8 +5,6 @@ const redisConfig = {"host": process.env.CACHEDB_IP, "port": parseInt(process.en
 const default_sub = redis.createClient(redisConfig);
 const default_pub = redis.createClient(redisConfig);
 const server_sub = redis.createClient(redisConfig);
-// const cache = redis.createClient(redisConfig);
-// cache.select(2);
 const server_pub = default_pub;
 default_pub.pubsubPromise =  async (cmd, ...channel) => (new Promise((rsv, rej) => default_pub.pubsub(cmd, channel, (e,d) => ((e)? rej(e):rsv(d)))));
 const utils = require("./utils");
@@ -141,7 +139,6 @@ module.exports.redisSubClient = default_sub;
 module.exports.redisPubICE = default_pub;
 module.exports.redisSubServer = server_sub;
 //module.exports.redisPubServer = server_pub;
-//module.exports.cache = cache;
 
 module.exports.initListeners = mySocket => {
 	const username = mySocket.handshake.query.icename;

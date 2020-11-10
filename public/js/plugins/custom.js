@@ -18,6 +18,7 @@ function register_GUID() {
 }
 
 function storage_Handler(e) {
+	if (window.location.pathname.includes('/viewreport/')) return false;
     // if tabGUID does not match then more than one tab and GUID
     if (e.key == 'tabGUID' && e.oldValue != "") {
         if (e.oldValue != e.newValue) tab_Warning();
