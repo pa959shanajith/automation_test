@@ -781,6 +781,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		$(".selectParallel").find("img").removeClass("sb");
 		$(".selectBrowser").find("svg").removeClass("sb");
 		$(".selectParallel").find("svg").removeClass("sb");
+		execAction="serial";
 		browserTypeExe = [];
 		$scope.moduleInfo = [];
 		$scope.readTestSuite_ICE();
