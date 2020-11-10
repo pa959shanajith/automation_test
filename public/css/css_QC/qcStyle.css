@@ -87,19 +87,15 @@
 .linkedTestset{
     width: 100%;
     float: left;
-    height: 30px;
     margin-bottom: 26px;
 }
 .linkedTestset label{
-    width: 45%;
-    float: left;
-    background-color: #E1CAFF; 
     border-radius: 5px;
-    padding: 5px 5px 5px 30px;
+    padding: 5px 5px 5px 10px;
     font-size: 16px;
     font-family: 'LatoWebLight';
 	overflow: hidden;
-	text-overflow: ellipsis;
+    text-overflow: ellipsis;
 }
 .linkedTestset span{
     float: left;
