@@ -112,6 +112,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	if ((appType != "Web" && appType != "MobileWeb") && window.location.href.split("/")[3] == "design") {
 		$("#left-bottom-section").hide();
 	}
+	if ((appType != "Mainframe" && appType != "System") && window.location.href.split("/")[3] == "design") {
+		$("#left-bottom-section-app").show();
+	}
 	if (appType == "Webservice" && window.location.href.split("/")[3] == "designTestCase") {
 		$("#right-dependencies-section .thumbnail:first-child").hide();
 	}
@@ -222,8 +225,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					//disable left-top-section
 					$("#left-top-section").addClass('disableActions');
 					$("a[title='Export TestCase']").addClass('disableActions');
-				}
-				else{
+				} else if(data.testcase.length == 0){
+					//disable left-top-section
+					$("#left-top-section").addClass('disableActions');
+					$("a[title='Export TestCase']").addClass('disableActions');
+				} else{
 					//enable left-top-section
 					$("#left-top-section").removeClass('disableActions');
 					$("a[title='Export TestCase']").removeClass('disableActions');
@@ -474,37 +480,41 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						if ((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase() == "json") {
 							var resultString = JSON.parse(reader.result);
 							//var resultString = reader.result;
-							for (i = 0; i < resultString.length; i++) {
-								if (resultString[i].appType.toLowerCase() == "generic" || resultString[i].appType.toLowerCase() == "pdf") {
-									flag = true;
-								} else if (resultString[i].appType == appType) {
-									flag = true;
-									break;
-								} else {
-									flag = false;
-									break;
+							if (!(resultString.length)){
+								openDialog("Import Error", "Incorrect JSON imported. Please check the contents!!");
+							}else{
+								for (i = 0; i < resultString.length; i++) {
+									if (resultString[i].appType.toLowerCase() == "generic" || resultString[i].appType.toLowerCase() == "pdf") {
+										flag = true;
+									} else if (resultString[i].appType == appType) {
+										flag = true;
+										break;
+									} else {
+										flag = false;
+										break;
+									}
 								}
-							}
-							if (flag == false) {
-								openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
-							} else {
-								DesignServices.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
-									.then(function (data) {
-										if (data == "Invalid Session") {
-											return $rootScope.redirectPage();
-										}
-										if (data == "success") {
-											angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
-											openDialog("Import Testcase", "TestCase Json imported successfully.");
-											//Transaction Activity for Import Testcase Button Action
-											// var labelArr = [];
-											// var infoArr = [];
-											// labelArr.push(txnHistory.codesDict['ImportTestCase']);
-											// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);	
-										} else {
-											openDialog("Import Testcase", "Please Check the file format you have uploaded!")
-										}
-									}, function (error) { });
+								if (flag == false) {
+									openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
+								} else {
+									DesignServices.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
+										.then(function (data) {
+											if (data == "Invalid Session") {
+												return $rootScope.redirectPage();
+											}
+											if (data == "success") {
+												angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
+												openDialog("Import Testcase", "TestCase Json imported successfully.");
+												//Transaction Activity for Import Testcase Button Action
+												// var labelArr = [];
+												// var infoArr = [];
+												// labelArr.push(txnHistory.codesDict['ImportTestCase']);
+												// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);	
+											} else {
+												openDialog("Import Testcase", "Please Check the file format you have uploaded!")
+											}
+										}, function (error) { });
+								}
 							}
 						} else {
 							openDialog("Import Testcase", "Please Check the file format you have uploaded!")
@@ -525,6 +535,77 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		}
 	}
 
+
+	//Import Screen
+	$scope.importScreen = function ($event) {
+		var counter1 = 0;
+		var userInfo = JSON.parse(window.localStorage['_UI']);
+		var taskInfo = JSON.parse(window.localStorage['_CT']);
+		var projectId = taskInfo.projectId;
+		var screenId = taskInfo.screenId;
+		var screenName = taskInfo.screenName;
+		var versionnumber = taskInfo.versionnumber;
+		var appType = taskInfo.appType;
+		$("#importScreenFile").attr("type", "file");
+		$("#importScreenFile").trigger("click");
+		importScreenFile.addEventListener('change', function () {
+			if (counter1 == 0) {
+				var file = importScreenFile.files[0];
+				var textType = /json.*/;
+				var reader = new FileReader();
+				reader.onload = function (e) {
+					if ((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase() == "json") {
+						var resultString = JSON.parse(reader.result);
+						if (!('appType' in resultString)){
+							openDialog("Import Error", "Incorrect JSON imported. Please check the contents!!");
+						} else if (resultString.appType != appType) {
+							openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!");
+						} else if(resultString.view.length == 0){
+							openDialog("No Objects found", "The file has no objects to import, please check!!");
+						} else {
+							scrapeObject = {};
+							scrapeObject.projectId = projectId;
+							scrapeObject.screenId = screenId;
+							scrapeObject.screenName = screenName;
+							scrapeObject.userinfo = userInfo;
+							scrapeObject.param = "importScreen";
+							scrapeObject.appType = appType;
+							scrapeObject.versionnumber = versionnumber;
+							scrapeObject.newData = resultString;
+							deleteObjectsFlag = false;
+							DesignServices.updateScreen_ICE(scrapeObject)
+								.then(function (data) {
+									angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
+									openDialog("Import Screen", "Screen Json imported successfully.");
+									// unblockUI()
+									//add popoup for error and saved 
+								}, function (error) {unblockUI() })
+							
+							var currentElements = $(".ellipsis:visible").length;
+							if (currentElements > 0) {
+								$("#saveObjects").prop("disabled", false);
+								$(".checkStylebox").prop("checked", false);
+								$("#deleteObjects").prop("disabled", true);
+							}
+							else {
+								$("#deleteObjects,.checkStylebox").prop("disabled", true);
+								$(".checkStylebox").prop("checked", false);
+								$(".popupContent-filter-active").trigger('click');
+								$("#saveObjects").prop("disabled", false);
+							}
+						}
+					} else {
+						openDialog("Import Screen", "Please Check the file format you have uploaded!");
+					}
+				}
+				reader.readAsText(file);
+				counter1 = 1;
+				$("#importScreenFile").val('');
+			}
+		});
+	}
+
+	
 	$(document).on('click', '#btnImportEmptyErrorYes', function () {
 		$("#globalModalYesNo").modal("hide");
 		var counter2 = 0;
@@ -547,33 +628,37 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				reader.onload = function (e) {
 					if ((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase() == "json") {
 						var resultString = JSON.parse(reader.result);
-						for (i = 0; i < resultString.length; i++) {
-							if (resultString[i].appType.toLowerCase() == "generic") {
-								flag = true;
-							} else if (resultString[i].appType == appType) {
-								flag = true;
-								break;
-							} else {
-								flag = false;
-								break;
+						if (!(resultString.length)){
+							openDialog("Import Error", "Incorrect JSON imported. Please check the contents!!");
+						}else{
+							for (i = 0; i < resultString.length; i++) {
+								if (resultString[i].appType.toLowerCase() == "generic") {
+									flag = true;
+								} else if (resultString[i].appType == appType) {
+									flag = true;
+									break;
+								} else {
+									flag = false;
+									break;
+								}
 							}
-						}
-						if (flag == false) {
-							openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
-						} else {
-							DesignServices.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
-								.then(function (data) {
-									// console.log("hello");
-									if (data == "Invalid Session") {
-										return $rootScope.redirectPage();
-									}
-									if (data == "success") {
-										angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
-										openDialog("Import Testcase", "TestCase Json imported successfully.");
-									} else {
-										openDialog("Import Testcase", "Please Check the file format you have uploaded!")
-									}
-								}, function (error) { });
+							if (flag == false) {
+								openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
+							} else {
+								DesignServices.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
+									.then(function (data) {
+										// console.log("hello");
+										if (data == "Invalid Session") {
+											return $rootScope.redirectPage();
+										}
+										if (data == "success") {
+											angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
+											openDialog("Import Testcase", "TestCase Json imported successfully.");
+										} else {
+											openDialog("Import Testcase", "Please Check the file format you have uploaded!")
+										}
+									}, function (error) { });
+							}
 						}
 					} else {
 						openDialog("Import Testcase", "Please Check the file format you have uploaded!")
@@ -611,38 +696,42 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				if ((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase() == "json") {
 					reader.onload = function (e) {
 						var resultString = JSON.parse(reader.result);
-						for (i = 0; i < resultString.length; i++) {
-							if (resultString[i].appType.toLowerCase() == "generic" || resultString[i].appType.toLowerCase() == "pdf") {
-								flag = true;
+						if (!(resultString.length)){
+							openDialog("Import Error", "Incorrect JSON imported. Please check the contents!!");
+						}else{
+							for (i = 0; i < resultString.length; i++) {
+								if (resultString[i].appType.toLowerCase() == "generic" || resultString[i].appType.toLowerCase() == "pdf") {
+									flag = true;
+								}
+								else if (resultString[i].appType == appType) {
+									flag = true;
+									break;
+								} else {
+									flag = false;
+									break;
+								}
 							}
-							else if (resultString[i].appType == appType) {
-								flag = true;
-								break;
+							if (flag == false) {
+								openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
 							} else {
-								flag = false;
-								break;
+								DesignServices.updateTestCase_ICE( testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
+									.then(function (data) {
+										if (data == "Invalid Session") {
+											return $rootScope.redirectPage();
+										}
+										if (data == "success") {
+											angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
+											openDialog("Import Testcase", "TestCase Json imported successfully.");
+											//Transaction Activity for Import Testcase Button Action
+											// var labelArr = [];
+											// var infoArr = [];
+											// labelArr.push(txnHistory.codesDict['ImportTestCase']);
+											// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+										} else {
+											openDialog("Import Testcase", "Please Check the file format you have uploaded!")
+										}
+									}, function (error) { });
 							}
-						}
-						if (flag == false) {
-							openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
-						} else {
-							DesignServices.updateTestCase_ICE( testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
-								.then(function (data) {
-									if (data == "Invalid Session") {
-										return $rootScope.redirectPage();
-									}
-									if (data == "success") {
-										angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
-										openDialog("Import Testcase", "TestCase Json imported successfully.");
-										//Transaction Activity for Import Testcase Button Action
-										// var labelArr = [];
-										// var infoArr = [];
-										// labelArr.push(txnHistory.codesDict['ImportTestCase']);
-										// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
-									} else {
-										openDialog("Import Testcase", "Please Check the file format you have uploaded!")
-									}
-								}, function (error) { });
 						}
 					}
 					reader.readAsText(file);
@@ -673,73 +762,77 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					temp = response.testcase;//JSON.parse(response.testcase);
 					responseData = JSON.stringify(temp, undefined, 2);
 				}
-				filename = testCaseName + ".json";
-				var objAgent = $window.navigator.userAgent;
-				var objbrowserName = navigator.appName;
-				var objfullVersion = '' + parseFloat(navigator.appVersion);
-				var objBrMajorVersion = parseInt(navigator.appVersion, 10);
-				var objOffsetName, objOffsetVersion, ix;
-				// In Chrome
-				if ((objOffsetVersion = objAgent.indexOf("Chrome")) != -1) {
-					objbrowserName = "Chrome";
-					objfullVersion = objAgent.substring(objOffsetVersion + 7);
-				}
-				// In Microsoft internet explorer
-				else if ((objOffsetVersion = objAgent.indexOf("MSIE")) != -1) {
-					objbrowserName = "Microsoft Internet Explorer";
-					objfullVersion = objAgent.substring(objOffsetVersion + 5);
-				}
-				// In Firefox
-				else if ((objOffsetVersion = objAgent.indexOf("Firefox")) != -1) {
-					objbrowserName = "Firefox";
+				if (responseData == '[]'){
+					openDialog("Export Testcase Failed", "Please Check if you have added some steps and saved the testcase before exporting!!");
+				} else{
+					filename = "Testcase_" + testCaseName + ".json";
+					var objAgent = $window.navigator.userAgent;
+					var objbrowserName = navigator.appName;
+					var objfullVersion = '' + parseFloat(navigator.appVersion);
+					var objBrMajorVersion = parseInt(navigator.appVersion, 10);
+					var objOffsetName, objOffsetVersion, ix;
+					// In Chrome
+					if ((objOffsetVersion = objAgent.indexOf("Chrome")) != -1) {
+						objbrowserName = "Chrome";
+						objfullVersion = objAgent.substring(objOffsetVersion + 7);
+					}
+					// In Microsoft internet explorer
+					else if ((objOffsetVersion = objAgent.indexOf("MSIE")) != -1) {
+						objbrowserName = "Microsoft Internet Explorer";
+						objfullVersion = objAgent.substring(objOffsetVersion + 5);
+					}
+					// In Firefox
+					else if ((objOffsetVersion = objAgent.indexOf("Firefox")) != -1) {
+						objbrowserName = "Firefox";
 
-				}
-				// In Safari
-				else if ((objOffsetVersion = objAgent.indexOf("Safari")) != -1) {
-					objbrowserName = "Safari";
-					objfullVersion = objAgent.substring(objOffsetVersion + 7);
-					if ((objOffsetVersion = objAgent.indexOf("Version")) != -1)
-						objfullVersion = objAgent.substring(objOffsetVersion + 8);
-				}
-				// For other browser "name/version" is at the end of userAgent
-				else if ((objOffsetName = objAgent.lastIndexOf(' ') + 1) < (objOffsetVersion = objAgent.lastIndexOf('/'))) {
-					objbrowserName = objAgent.substring(objOffsetName, objOffsetVersion);
-					objfullVersion = objAgent.substring(objOffsetVersion + 1);
-					if (objbrowserName.toLowerCase() == objbrowserName.toUpperCase()) {
-						objbrowserName = navigator.appName;
 					}
-				}
-				// trimming the fullVersion string at semicolon/space if present
-				if ((ix = objfullVersion.indexOf(";")) != -1) objfullVersion = objfullVersion.substring(0, ix);
-				if ((ix = objfullVersion.indexOf(" ")) != -1) objfullVersion = objfullVersion.substring(0, ix);
-				objBrMajorVersion = parseInt('' + objfullVersion, 10);
-				if (isNaN(objBrMajorVersion)) {
-					objfullVersion = '' + parseFloat(navigator.appVersion);
-					objBrMajorVersion = parseInt(navigator.appVersion, 10);
-				}
-				if (objBrMajorVersion == "9") {
-					if (objbrowserName == "Microsoft Internet Explorer") {
-						window.navigator.msSaveOrOpenBlob(new Blob([responseData], {
-							type: "text/json;charset=utf-8"
-						}), filename);
+					// In Safari
+					else if ((objOffsetVersion = objAgent.indexOf("Safari")) != -1) {
+						objbrowserName = "Safari";
+						objfullVersion = objAgent.substring(objOffsetVersion + 7);
+						if ((objOffsetVersion = objAgent.indexOf("Version")) != -1)
+							objfullVersion = objAgent.substring(objOffsetVersion + 8);
 					}
-				} else {
-					var blob = new Blob([responseData], {
-						type: 'text/json'
-					}),
-						e = document.createEvent('MouseEvents'),
-						a = document.createElement('a');
-					a.download = filename;
-					if (objbrowserName == "Microsoft Internet Explorer" || objbrowserName == "Netscape") {
-						window.navigator.msSaveOrOpenBlob(new Blob([responseData], {
-							type: "text/json;charset=utf-8"
-						}), filename);
+					// For other browser "name/version" is at the end of userAgent
+					else if ((objOffsetName = objAgent.lastIndexOf(' ') + 1) < (objOffsetVersion = objAgent.lastIndexOf('/'))) {
+						objbrowserName = objAgent.substring(objOffsetName, objOffsetVersion);
+						objfullVersion = objAgent.substring(objOffsetVersion + 1);
+						if (objbrowserName.toLowerCase() == objbrowserName.toUpperCase()) {
+							objbrowserName = navigator.appName;
+						}
+					}
+					// trimming the fullVersion string at semicolon/space if present
+					if ((ix = objfullVersion.indexOf(";")) != -1) objfullVersion = objfullVersion.substring(0, ix);
+					if ((ix = objfullVersion.indexOf(" ")) != -1) objfullVersion = objfullVersion.substring(0, ix);
+					objBrMajorVersion = parseInt('' + objfullVersion, 10);
+					if (isNaN(objBrMajorVersion)) {
+						objfullVersion = '' + parseFloat(navigator.appVersion);
+						objBrMajorVersion = parseInt(navigator.appVersion, 10);
+					}
+					if (objBrMajorVersion == "9") {
+						if (objbrowserName == "Microsoft Internet Explorer") {
+							window.navigator.msSaveOrOpenBlob(new Blob([responseData], {
+								type: "text/json;charset=utf-8"
+							}), filename);
+						}
 					} else {
-						a.href = window.URL.createObjectURL(blob);
-						a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
-						e.initMouseEvent('click', true, true, window,
-							0, 0, 0, 0, 0, false, false, false, false, 0, null);
-						a.dispatchEvent(e);
+						var blob = new Blob([responseData], {
+							type: 'text/json'
+						}),
+							e = document.createEvent('MouseEvents'),
+							a = document.createElement('a');
+						a.download = filename;
+						if (objbrowserName == "Microsoft Internet Explorer" || objbrowserName == "Netscape") {
+							window.navigator.msSaveOrOpenBlob(new Blob([responseData], {
+								type: "text/json;charset=utf-8"
+							}), filename);
+						} else {
+							a.href = window.URL.createObjectURL(blob);
+							a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+							e.initMouseEvent('click', true, true, window,
+								0, 0, 0, 0, 0, false, false, false, false, 0, null);
+							a.dispatchEvent(e);
+						}
 					}
 				}
 				//Transaction Activity for Export Testcase Button Action
@@ -751,6 +844,110 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			function (error) { });
 	}
 	//Export Test Case
+
+
+	//Export Screen
+	$scope.exportScreen = function ($event) {
+		var taskInfo = JSON.parse(window.localStorage['_CT']);
+		var screenId = taskInfo.screenId;
+		var screenName = taskInfo.screenName;
+		var apptype = taskInfo.appType;
+		var versionnumber = taskInfo.versionnumber;
+		DesignServices.getScrapeDataScreenLevel_ICE(apptype)
+			.then(function (data) {
+				if (data == "Invalid Session") {
+					return $rootScope.redirectPage();
+				}
+				var temp, responseData;
+				var flag = false;
+				if (typeof data === 'object') {
+					if (data.view.length > 0){
+						flag = true;
+						temp = data;
+						temp['appType'] = apptype;
+						temp['screenId'] = screenId;
+						temp['versionnumber'] = versionnumber;
+						responseData = JSON.stringify(temp, undefined, 2);
+					}
+				}
+				if (flag == true){
+					filename = "Screen_" + screenName + ".json";
+					var objAgent = $window.navigator.userAgent;
+					var objbrowserName = navigator.appName;
+					var objfullVersion = '' + parseFloat(navigator.appVersion);
+					var objBrMajorVersion = parseInt(navigator.appVersion, 10);
+					var objOffsetName, objOffsetVersion, ix;
+					// In Chrome
+					if ((objOffsetVersion = objAgent.indexOf("Chrome")) != -1) {
+						objbrowserName = "Chrome";
+						objfullVersion = objAgent.substring(objOffsetVersion + 7);
+					}
+					// In Microsoft internet explorer
+					else if ((objOffsetVersion = objAgent.indexOf("MSIE")) != -1) {
+						objbrowserName = "Microsoft Internet Explorer";
+						objfullVersion = objAgent.substring(objOffsetVersion + 5);
+					}
+					// In Firefox
+					else if ((objOffsetVersion = objAgent.indexOf("Firefox")) != -1) {
+						objbrowserName = "Firefox";
+					}
+					// In Safari
+					else if ((objOffsetVersion = objAgent.indexOf("Safari")) != -1) {
+						objbrowserName = "Safari";
+						objfullVersion = objAgent.substring(objOffsetVersion + 7);
+						if ((objOffsetVersion = objAgent.indexOf("Version")) != -1)
+							objfullVersion = objAgent.substring(objOffsetVersion + 8);
+					}
+					// For other browser "name/version" is at the end of userAgent
+					else if ((objOffsetName = objAgent.lastIndexOf(' ') + 1) < (objOffsetVersion = objAgent.lastIndexOf('/'))) {
+						objbrowserName = objAgent.substring(objOffsetName, objOffsetVersion);
+						objfullVersion = objAgent.substring(objOffsetVersion + 1);
+						if (objbrowserName.toLowerCase() == objbrowserName.toUpperCase()) {
+							objbrowserName = navigator.appName;
+						}
+					}
+					// trimming the fullVersion string at semicolon/space if present
+					if ((ix = objfullVersion.indexOf(";")) != -1) objfullVersion = objfullVersion.substring(0, ix);
+					if ((ix = objfullVersion.indexOf(" ")) != -1) objfullVersion = objfullVersion.substring(0, ix);
+					objBrMajorVersion = parseInt('' + objfullVersion, 10);
+					if (isNaN(objBrMajorVersion)) {
+						objfullVersion = '' + parseFloat(navigator.appVersion);
+						objBrMajorVersion = parseInt(navigator.appVersion, 10);
+					}
+					if (objBrMajorVersion == "9") {
+						if (objbrowserName == "Microsoft Internet Explorer") {
+							window.navigator.msSaveOrOpenBlob(new Blob([responseData], {
+								type: "text/json;charset=utf-8"
+							}), filename);
+						}
+					} else {
+						var blob = new Blob([responseData], {
+							type: 'text/json'
+						}),
+							e = document.createEvent('MouseEvents'),
+							a = document.createElement('a');
+						a.download = filename;
+						if (objbrowserName == "Microsoft Internet Explorer" || objbrowserName == "Netscape") {
+							window.navigator.msSaveOrOpenBlob(new Blob([responseData], {
+								type: "text/json;charset=utf-8"
+							}), filename);
+						} else {
+							a.href = window.URL.createObjectURL(blob);
+							a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+							e.initMouseEvent('click', true, true, window,
+								0, 0, 0, 0, 0, false, false, false, false, 0, null);
+							a.dispatchEvent(e);
+						}
+					}
+				}else{
+					openDialog("No Objects found", "The screen has no objects to export, please check!!");
+				}
+			},
+			function (error) { });
+	}
+	//Export Screen
+
+
 
 	//Enable Append Checkbox (if after checking the, browser doesn't enables)
 	$(document).on("click", "#enableAppend", function () {
@@ -794,6 +991,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		//enableScreenShotHighlight = true;
 		DesignServices.getScrapeDataScreenLevel_ICE()
 			.then(function (data) {
+				if (data == "Invalid Session") {
+					return $rootScope.redirectPage();
+				}
 				var taskInfo = JSON.parse(window.localStorage['_CT']);
 				taskInfo['createdthrough'] = data['createdthrough'];
 				window.localStorage['_CT'] = JSON.stringify(taskInfo);
@@ -802,9 +1002,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					$("#scrapedurlinfo").html(scrapedurl);
 				}
 				localStorage['_cust']=JSON.stringify({})
-				if (data == "Invalid Session") {
-					return $rootScope.redirectPage();
-				}
 				var objectsLength = $("ellipsis:visible").length;
 			
 				if(objectsLength == 0)
@@ -900,8 +1097,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						$(".checkStylebox, .checkall").prop("disabled", false);
 						if (viewString.view.length == 0) {
 							$(".disableActions").addClass("enableActions").removeClass("disableActions");
+							$("a[title='Export Screen']").addClass('disableActions').removeClass('enableActions');
 							$("#enableAppend").prop("disabled", true).css('cursor', 'no-drop');
 							$(document).find(".checkStylebox").prop("disabled", true);
+						} else{
+							$("a[title='Export Screen']").addClass('enableActions').removeClass('disableActions');
 						}
 					}
 

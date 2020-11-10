@@ -437,6 +437,8 @@ if (cluster.isMaster) {
 		app.post('/excelToMindmap', mindmap.excelToMindmap);
 		app.post('/getScreens', mindmap.getScreens);
 		app.post('/exportToExcel', mindmap.exportToExcel);
+		app.post('/exportMindmap', mindmap.exportMindmap);
+		app.post('/importMindmap', mindmap.importMindmap);
 		app.post('/pdProcess', auth.protect, mindmap.pdProcess);	// process discovery service
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
@@ -470,6 +472,7 @@ if (cluster.isMaster) {
 		app.post('/getPreferences', auth.protect, admin.getPreferences);
 		app.post('/provisionIce', auth.protect, admin.provisionICE);
 		app.post('/fetchICE', auth.protect, admin.fetchICE);
+		app.post('/exportProject', auth.protect, admin.exportProject);
 		app.post('/testNotificationChannels', auth.protect, admin.testNotificationChannels);
 		app.post('/manageNotificationChannels', auth.protect, admin.manageNotificationChannels);
 		app.post('/getNotificationChannels', auth.protect, admin.getNotificationChannels);
