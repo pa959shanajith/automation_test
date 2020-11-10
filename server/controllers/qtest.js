@@ -41,13 +41,13 @@ exports.loginToQTest_ICE = function (req, res) {
 						var username = req.body.qcUsername;
 						var password = req.body.qcPassword;
 						var url = req.body.qcURL;
-						var qcType = req.body.qcType;
+						var integrationType = req.body.integrationType;
 						var qcaction = req.body.qcaction;
 						var qcDetails = {
 							"qcUsername": username,
 							"qcPassword": password,
 							"qcURL": url,
-							"qcType" : qcType,
+							"integrationType" : integrationType,
 							"qcaction": qcaction
 						};
 						logger.info("Sending socket request for qclogin to redis");

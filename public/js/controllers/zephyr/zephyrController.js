@@ -5,7 +5,7 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 		$('.scrollbar-inner').scrollbar();
 		$('.scrollbar-macosx').scrollbar();
 		document.getElementById("currentYear").innerText = new Date().getFullYear();
-		$("#loginToQCpop").modal("show");
+		$("#loginToZephyrpop").modal("show");
 	}, 500);
 	var mappedList = [];
 	if(window.localStorage['navigateScreen'] != "p_Zephyr"){
@@ -63,73 +63,72 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 
 	//login to QC
 	$scope.loginToZephyr = function($event){
-		$(".qcLoginload").show();
-		//$("#qcName,#qcUserName,#qcPwd,.qcConnsubmit").prop("disabled",true);
-		$("#qcName,#qcUserName,#qcPwd").css("background","none");
-		$("#qcErrorMsg").text("");
-		$("#qcName,#qcUserName,#qcPwd").removeClass("inputErrorBorder");
-		var qcURL = $("#qcName").val();
-		var qcUserName =$("#qcUserName").val();
-		var qcPassword = $("#qcPwd").val();
-		var qcJiraUrl = $("#qcJiraUrl").val();
-		var qcJiraUserName = $("#qcJiraUserName").val();
-		var qcJiraAccToken = $("#qcJiraAccToken").val();
-		if(!qcURL){
-			$("#qcErrorMsg").text("Please Enter Zephyr Account Number.");
-			$("#qcName").addClass("inputErrorBorder");
-			$(".qcLoginload").hide();
+		$(".zephyrLoginload").show();
+		$("#zephyrAccNo,#zephyrAcKey,#zephyrSecKey").css("background","none");
+		$("#zephyrErrorMsg").text("");
+		$("#zephyrAccNo,#zephyrAcKey,#zephyrSecKey").removeClass("inputErrorBorder");
+		var zephyrAccNo = $("#zephyrAccNo").val();
+		var zephyrAcKey =$("#zephyrAcKey").val();
+		var zephyrSecKey = $("#zephyrSecKey").val();
+		var zephyrJiraUrl = $("#zephyrJiraUrl").val();
+		var zephyrJiraUserName = $("#zephyrJiraUserName").val();
+		var zephyrJiraAccToken = $("#zephyrJiraAccToken").val();
+		if(!zephyrAccNo){
+			$("#zephyrErrorMsg").text("Please Enter Zephyr Account ID.");
+			$("#zephyrAccNo").addClass("inputErrorBorder");
+			$(".zephyrLoginload").hide();
 		}
-		else if(!qcUserName){
-			$("#qcErrorMsg").text("Please Enter Access Key.");
-			$("#qcUserName").addClass("inputErrorBorder");
-			$(".qcLoginload").hide();
+		else if(!zephyrAcKey){
+			$("#zephyrErrorMsg").text("Please Enter Access Key.");
+			$("#zephyrAcKey").addClass("inputErrorBorder");
+			$(".zephyrLoginload").hide();
 		}
-		else if(!qcPassword){
-			$("#qcErrorMsg").text("Please Enter Secret Key.");
-			$("#qcPwd").addClass("inputErrorBorder");
-			$(".qcLoginload").hide();
+		else if(!zephyrSecKey){
+			$("#zephyrErrorMsg").text("Please Enter Secret Key.");
+			$("#zephyrSecKey").addClass("inputErrorBorder");
+			$(".zephyrLoginload").hide();
 		}
-		else if(!qcJiraUrl){
-			$("#qcErrorMsg").text("Please Enter Jira URL.");
-			$("#qcJiraUrl").addClass("inputErrorBorder");
-			$(".qcLoginload").hide();
+		else if(!zephyrJiraUrl){
+			$("#zephyrErrorMsg").text("Please Enter Jira URL.");
+			$("#zephyrJiraUrl").addClass("inputErrorBorder");
+			$(".zephyrLoginload").hide();
 		}
-		else if(!qcJiraUserName){
-			$("#qcErrorMsg").text("Please Enter Jira User Name.");
-			$("#qcJiraUserName").addClass("inputErrorBorder");
-			$(".qcLoginload").hide();
+		else if(!zephyrJiraUserName){
+			$("#zephyrErrorMsg").text("Please Enter Jira User Name.");
+			$("#zephyrJiraUserName").addClass("inputErrorBorder");
+			$(".zephyrLoginload").hide();
 		}
-		else if(!qcJiraAccToken){
-			$("#qcErrorMsg").text("Please Enter Jira Access Token.");
-			$("#qcJiraAccToken").addClass("inputErrorBorder");
-			$(".qcLoginload").hide();
+		else if(!zephyrJiraAccToken){
+			$("#zephyrErrorMsg").text("Please Enter Jira Access Token.");
+			$("#zephyrJiraAccToken").addClass("inputErrorBorder");
+			$(".zephyrLoginload").hide();
 		}
 		else{
-			$("#qcPwd").removeClass("inputErrorBorder");
-			qcServices.loginToZephyr_ICE(qcURL,qcUserName,qcPassword,qcJiraUrl,qcJiraUserName,qcJiraAccToken)
+			$("#zephyrSecKey").removeClass("inputErrorBorder");
+			qcServices.loginToZephyr_ICE(zephyrAccNo,zephyrAcKey,zephyrSecKey,zephyrJiraUrl,zephyrJiraUserName,zephyrJiraAccToken)
 			.then(function(data){
 				$scope.domainData = data;
-				$(".qcLoginload").hide();
+				$(".zephyrLoginload").hide();
 				if(data == "unavailableLocalServer"){
-					$("#qcErrorMsg").text("ICE Engine is not available,Please run the batch file and connect to the Server.");
+					$("#zephyrErrorMsg").text("ICE Engine is not available,Please run the batch file and connect to the Server.");
 				} else if(data == "scheduleModeOn") {
-					$("#qcErrorMsg").text("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+					$("#zephyrErrorMsg").text("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
 				} else if(data == "Invalid Session"){
 					return $rootScope.redirectPage();
 				} else if(data == "invalidcredentials"){
-					$("#qcErrorMsg").text("Invalid Credentials");
+					$("#zephyrErrorMsg").text("Invalid Credentials");
 				} else if(data == "noprojectfound"){
-					$("#qcErrorMsg").text("Invalid credentials or no project found");
+					$("#zephyrErrorMsg").text("Invalid credentials or no project found");
 				} else if(data == "invalidurl"){
-					$("#qcErrorMsg").text("Invalid URL");
+					$("#zephyrErrorMsg").text("Invalid URL");
 				} else if(data == "fail"){
-					$("#qcErrorMsg").text("Fail to Login");
+					$("#zephyrErrorMsg").text("Fail to Login");
 				}
 				else if(data == "Error:Failed in running Qc"){
-					$("#qcErrorMsg").text("Unable to run Qc");
+					$("#zephyrErrorMsg").text("Unable to run Qc");
 				} 
 				else if(data=="Error:Qc Operations"){
-					$("#qcErrorMsg").text("Failed during execution");
+					$("#zephyrErrorMsg").text("Failed during execution");
 				}
 				else if(data){
 					$(".qcSelectDomain").empty();
@@ -137,8 +136,8 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 					for(var i=0;i<data.length;i++){
 						$(".qcSelectDomain").append("<option data-projectid="+data[i].id+" value='"+data[i].name+"'>"+data[i].name+"</option>");
 					}
-					$("#loginToQCpop").modal("hide");
-					$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">User Name :</span><span class="content">'+qcUserName+'</span></p>');
+					$("#loginToZephyrpop").modal("hide");
+					$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">User Name :</span><span class="content">'+zephyrAcKey+'</span></p>');
 				}
 			},
 			function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
@@ -285,20 +284,20 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 	//Search scenarios
 	var flgTog = 1;
 	$scope.searchScenarioAvo = function(event){
-		$('.searchScenarioQC').val('');
+		$('.searchScenarioZephyr').val('');
 		if(flgTog){
-			$('.searchScenarioQC').css({"opacity":1});
+			$('.searchScenarioZephyr').css({"opacity":1});
 			flgTog = 0;
 		}
 		else{
-			$('.searchScenarioQC').css({"opacity":0});
+			$('.searchScenarioZephyr').css({"opacity":0});
 			flgTog = 1;
 		}
-		filter($('.searchScenarioQC'));
+		filter($('.searchScenarioZephyr'));
 	};
 	
 
-	$(document).on('keyup', '.searchScenarioQC', function() {
+	$(document).on('keyup', '.searchScenarioZephyr', function() {
 		filter(this);
 	});
 
@@ -542,7 +541,7 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 		});		
 	};
 
-	$scope.exitQcConnection = function(){
+	$scope.exitZephyrConnection = function(){
 		window.localStorage['navigateScreen'] = "p_Integration";
 		window.location.href = "/p_Integration";
 	};

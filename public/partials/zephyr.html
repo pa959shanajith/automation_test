@@ -40,21 +40,20 @@
 				<label style="margin-bottom: 0; position: relative; left: 457px; float: left; font-size: 16px;">Avo Assure Scenarios</label>
 				<button class="saveQcbtn qcActionBtnFirstChild" ng-click="mapTestcaseToAvoAssure()" title="Save" style="margin-left: 470px;">Save</button>
 				<a class="viewMapbtn" ng-click="displayMappedFilesTab()" title="View Mapped Files">View Mapped Files</a>
-				<button class="saveQcbtn" ng-click="exitQcConnection()" title="Exit">Exit</button>
+				<button class="saveQcbtn" ng-click="exitZephyrConnection()" title="Exit">Exit</button>
 			</div>
 			<!-- Button -->
 			<!-- Action area -->
 			<div class="leftQcStructure">
 				<div class="qcDomProContainer">
 					<select class="qcSelectDomain"></select>
-					<!-- <select class="qcSelectProject"></select> -->
 				</div>
 				<div class="qcTreeContainer"></div>		
 			</div>
 			<div class="rightQcStructure">
 				<div class="qcProContainer">
 					<select class="zephyrAvoAssureSelectProject"><option value="" selected disabled>Select Project</option></select>
-					<input type="text" placeholder="Scenario Name" class="searchScenarioQC"></input>
+					<input type="text" placeholder="Scenario Name" class="searchScenarioZephyr"></input>
 					<span class="searchZScenarioAvoAssure" ng-click="searchScenarioAvo()"><img src='imgs/ic-searchIcon-black.png' alt='Search Scenarios' /></span>
 				</div>
 				<div class="qcAvoAssureTreeContainer"></div>	
@@ -123,8 +122,8 @@
 </div>
 <!-- Edit Global Model  -->
 
-<!-- QC Login Popup -->
-	<div class="modal fade" id="loginToQCpop" role="dialog" data-keyboard="false" data-backdrop="static">
+<!-- Zephyr Login Popup -->
+	<div class="modal fade" id="loginToZephyrpop" role="dialog" data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog modal-md">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -133,20 +132,20 @@
 				</div>
 				<div class="modal-body">
 					<div class="leftAlign">
-						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter Zephyr Account Number' id='qcName'/></p>
-						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter Access Key' id='qcUserName'/></p>
-						<p><input class='launchPopupInput form-control' type='password' placeholder='Enter Secret Key' id='qcPwd'/></p>
-						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter Jira URL' id='qcJiraUrl'/></p>
-						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter Jira Username' id='qcJiraUserName'/></p>
-						<p><input class='launchPopupInput form-control' type='password' placeholder='Enter Jira Access Token' id='qcJiraAccToken'/></p>
+						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter Zephyr Account ID' id='zephyrAccNo'/></p>
+						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter Zephyr Access Key' id='zephyrAcKey'/></p>
+						<p><input class='launchPopupInput form-control' type='password' placeholder='Enter Zephyr Secret Key' id='zephyrSecKey'/></p>
+						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter Jira URL' id='zephyrJiraUrl'/></p>
+						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter Jira Username' id='zephyrJiraUserName'/></p>
+						<p><input class='launchPopupInput form-control' type='password' placeholder='Enter Jira Access Token' id='zephyrJiraAccToken'/></p>
 					</div>
 				</div>
 				<div class="modal-footer">
-					<span id="qcErrorMsg" style="color: red; float: left; margin-left: 15px; margin-top: 5px;"></span>
-					<img class="qcLoginload" src="imgs/loader.gif" alt="Loading..." style="float: left; display: none;">
-					<button type="button" class="btn btn-default btn-default-modal qcConnsubmit" ng-click="loginToZephyr($event)">Submit</button>
+					<span id="zephyrErrorMsg" style="color: red; float: left; margin-left: 15px; margin-top: 5px;"></span>
+					<img class="zephyrLoginload" src="imgs/loader.gif" alt="Loading..." style="float: left; display: none;">
+					<button type="button" class="btn btn-default btn-default-modal zephyrConnsubmit" ng-click="loginToZephyr($event)">Submit</button>
 				</div>
 			</div>
 		</div>
 	</div>
-	<!-- QC Login Popup -->
+	<!-- Zephyr Login Popup -->

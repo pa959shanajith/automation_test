@@ -526,7 +526,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	};
 	//Save TestSuite Functionality
 
-	$scope.qccredentials = {qcurl: "", qcusername: "", qcpassword: "", qctype: ""};
+	$scope.qccredentials = {qcurl: "", qcusername: "", qcpassword: "", integrationType: ""};
 
 	//Save QC Details
 	$scope.saveQcCredentials = function (e) {
@@ -568,13 +568,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 						qcurl: $("#almURL").val(),
 						qcusername: $("#almUserName").val(),
 						qcpassword: $("#almPassword").val(),
-						qctype: "ALM"
+						integrationType: "ALM"
 					}
-					//Transaction Activity for SaveQcCredentialsExecution Button Action
-					// var labelArr = [];
-					// var infoArr = [];
-					// labelArr.push(txnHistory.codesDict['SaveQcCredentialsExecution']);
-					// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
 					$("#ALMSyncWindow").find("button.close").trigger("click");
 				}
 			}, function (error) {
@@ -623,7 +618,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 						qcusername: $("#qTestUserName").val(),
 						qcpassword: $("#qTestPassword").val(),
 						qteststeps: checkedVal,
-						qctype: "qTest"
+						integrationType: "qTest"
 					}
 					$("#QTestSyncWindow").find("button.close").trigger("click");
 				}
@@ -638,7 +633,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		$("#ZephyrURL, #ZephyrUserName, #ZephyrPassword").removeClass('inputErrorBorder');
 		if (!$scope.ZephyrURL) {
 			$("#ZephyrURL").addClass('inputErrorBorder');
-			$(".error-msg-exeQc").text("Please Enter Zephyr Account Number.");
+			$(".error-msg-exeQc").text("Please Enter Zephyr Account ID.");
 		} else if (!$scope.ZephyrUserName) {
 			$("#ZephyrUserName").addClass('inputErrorBorder');
 			$(".error-msg-exeQc").text("Please Enter Access Key.");
@@ -671,7 +666,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 						qcurl: $("#ZephyrURL").val(),
 						qcusername: $("#ZephyrUserName").val(),
 						qcpassword: $("#ZephyrPassword").val(),
-						qctype: "Zephyr"
+						integrationType: "Zephyr"
 					}
 					$("#ZephyrSyncWindow").find("button.close").trigger("click");
 				}
