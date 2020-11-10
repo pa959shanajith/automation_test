@@ -1706,88 +1706,68 @@ exports.provisionICE = async (req, res) => {
 	}
 };
 
-exports.exportProject = function (req, res) {
-	logger.info("Inside UI service: exportProject");
-	if (utils.isSessionActive(req)) {
-		var d = req.body;
-		var projectId = d.projectId;
-		var proj_name = d.projectName;
-		var inputs= {
+exports.exportProject = async (req, res) => {
+	const fnName = 'exportProject';
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const d = req.body;
+		const projectId = d.projectId;
+		const proj_name = d.projectName;
+		const inputs = {
 			"projectId":projectId
-		}
-		var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
-			}
 		};
-
-		client.post(epurl+"admin/exportProject", args,
-			async (result, response) =>{
-				try {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in mindmap/exportProject: exportProject, Error Code : ERRDAS");
-						res.send("fail");
-					} else {
-						proj_data = result.rows;
-						var projectPath = './assets/projects/'+proj_name;
-						if (!fs.existsSync('./assets/projects')){
-							fs.mkdirSync( './assets/projects');
-						}
-						if (!fs.existsSync(projectPath)){
-							fs.mkdirSync(projectPath);
-						}else{
-							fs.rmdirSync(projectPath,{recursive:true,});
-							fs.mkdirSync(projectPath);
-						}
-						for (i = 0; i < proj_data.length ;i++){
-							mindmap = proj_data[i];
-							mm_name = mindmap.name;
-							mm_path = projectPath+'/'+mm_name
-							screens_path = mm_path+'/'+'screens';
-							testcases_path = mm_path+'/'+'testcases';
-							if (!fs.existsSync(mm_path)) fs.mkdirSync(mm_path);
-							if (!fs.existsSync(screens_path)) fs.mkdirSync(screens_path);
-							if (!fs.existsSync(testcases_path)) fs.mkdirSync(testcases_path);
-							let { screens, testcases, ...mm_data } = mindmap;
-							screenList = mindmap.screens;
-							testcaseList = mindmap.testcases;
-							delete mindmap.screens, mindmap.testcases;
-							fs.writeFileSync(mm_path+'/'+mm_name+'.mm', JSON.stringify(mm_data, undefined, 2), function(err) {});
-							for(j=0;j<screenList.length;j++){
-								screen = screenList[j];
-								screen_name = 'Screen_'+screen.name;
-								fs.writeFileSync(screens_path+'/'+screen_name+'.json', JSON.stringify(screen, undefined, 2), function(err) {});
-							}
-							for(k=0;k<testcaseList.length;k++){
-								testcase = testcaseList[k];
-								testcase_name = 'Testcase_'+testcase.name;
-								fs.writeFileSync(testcases_path+'/'+testcase_name+'.json', JSON.stringify(testcase.steps, undefined, 2), function(err) {});
-							}
-						}
-						zip_path = projectPath+'.zip'
-						const archive = archiver('zip', { zlib: { level: 9 }});
-						const stream = fs.createWriteStream(zip_path);
-						stream.on('close',()=>{
-							res.writeHead(200, {
-								'Content-Type' : 'application/zip',
-							});
-							var filestream = fs.createReadStream(zip_path);
-							filestream.pipe(res);
-						})
-						archive
-							.directory(projectPath, false)
-							.pipe(stream);
-						archive.finalize();
-					}
-				} catch (ex) {
-					logger.error("Exception in the service exportProject: %s", ex);
-				}
-		});
-	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
+		const proj_data = await utils.fetchData(inputs, "admin/exportProject", fnName);
+		if (proj_data == "fail") return res.send("fail");
+		let projectPath = './assets/projects/'+proj_name;
+		if (!fs.existsSync('./assets/projects')){
+			fs.mkdirSync( './assets/projects');
+		}
+		if (!fs.existsSync(projectPath)) {
+			fs.mkdirSync(projectPath);
+		} else {
+			fs.rmdirSync(projectPath,{recursive:true});
+			fs.mkdirSync(projectPath);
+		}
+		for (i = 0; i < proj_data.length ;i++){
+			let mindmap = proj_data[i];
+			let mm_name = mindmap.name;
+			let mm_path = projectPath+'/'+mm_name
+			let screens_path = mm_path+'/'+'screens';
+			let testcases_path = mm_path+'/'+'testcases';
+			if (!fs.existsSync(mm_path)) fs.mkdirSync(mm_path);
+			if (!fs.existsSync(screens_path)) fs.mkdirSync(screens_path);
+			if (!fs.existsSync(testcases_path)) fs.mkdirSync(testcases_path);
+			let { screens, testcases, ...mm_data } = mindmap;
+			let screenList = mindmap.screens;
+			let testcaseList = mindmap.testcases;
+			delete mindmap.screens, mindmap.testcases;
+			fs.writeFileSync(mm_path+'/'+mm_name+'.mm', JSON.stringify(mm_data, undefined, 2), function(err) {});
+			for(let j=0;j<screenList.length;j++){
+				let screen = screenList[j];
+				let screen_name = 'Screen_'+screen.name;
+				fs.writeFileSync(screens_path+'/'+screen_name+'.json', JSON.stringify(screen, undefined, 2), function(err) {});
+			}
+			for(let k=0;k<testcaseList.length;k++){
+				let testcase = testcaseList[k];
+				let testcase_name = 'Testcase_'+testcase.name;
+				fs.writeFileSync(testcases_path+'/'+testcase_name+'.json', JSON.stringify(testcase.steps, undefined, 2), function(err) {});
+			}
+		}
+		let zip_path = projectPath+'.zip'
+		const archive = archiver('zip', { zlib: { level: 9 }});
+		const stream = fs.createWriteStream(zip_path);
+		stream.on('close', ()=>{
+			res.writeHead(200, {
+				'Content-Type' : 'application/zip',
+			});
+			var filestream = fs.createReadStream(zip_path);
+			filestream.pipe(res);
+		})
+		archive.directory(projectPath, false).pipe(stream);
+		archive.finalize();
+	} catch (ex) {
+		logger.error("Exception in the service exportProject: %s", ex);
+		return res.status(500).send("fail");
 	}
 };
 
