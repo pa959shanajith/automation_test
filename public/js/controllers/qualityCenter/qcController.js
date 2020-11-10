@@ -19,20 +19,20 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		$(".selectBrowser").find("img").removeClass("selectedIcon");
 		$(this).find("img").addClass("selectedIcon");
 	});
-	$scope.loadDomains = function(){
-		var domainData = $scope.domainData;
-		if(domainData){
-			$timeout(function(){
-				if((domainData != undefined || domainData != "") && domainData.domain.length > 0){
-					$(".qcSelectDomain").empty();
-					$(".qcSelectDomain").append("<option selected disabled>Select Domain</option>");
-					for(var i=0;i<domainData.domain.length;i++){
-						$(".qcSelectDomain").append("<option value='"+domainData.domain[i]+"'>"+domainData.domain[i]+"</option>");
-					}
-				}
-			}, 500);
-		}
-	};
+	// $scope.loadDomains = function(){
+	// 	var domainData = $scope.domainData;
+	// 	if(domainData){
+	// 		$timeout(function(){
+	// 			if((domainData != undefined || domainData != "") && domainData.domain.length > 0){
+	// 				$(".qcSelectDomain").empty();
+	// 				$(".qcSelectDomain").append("<option selected disabled>Select Domain</option>");
+	// 				for(var i=0;i<domainData.domain.length;i++){
+	// 					$(".qcSelectDomain").append("<option value='"+domainData.domain[i]+"'>"+domainData.domain[i]+"</option>");
+	// 				}
+	// 			}
+	// 		}, 500);
+	// 	}
+	// };
 
 	socket.on('ICEnotAvailable', function () {
 		unblockUI();
@@ -330,17 +330,28 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 	});
 	
 	//Select testset
-	$(document).on('click','.testcaselink', function(){
-		$('.testcaselink').removeClass("selectedToMap");
-		$('.testcaselink').find(".qcSyncronise, .qcUndoSyncronise").hide();
-		$('.testcaselink').prop("style","background-color:none;border-radius:0px;");
+	$(document).on('click','.testcaselink', function(e){
+		// $('.testcaselink').removeClass("selectedToMap");
+		// $('.testcaselink').find(".qcSyncronise, .qcUndoSyncronise").hide();
+		// $('.testcaselink').prop("style","background-color:none;border-radius:0px;");
 		$(this).addClass("selectedToMap");
-		$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
-		$(this).find(".qcSyncronise, .qcUndoSyncronise").show();
+		if (e.ctrlKey) {
+			// $(this).addClass("selectedToMap");
+			$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
+			$(this).find(".qcSyncronise, .qcUndoSyncronise").show();
+		}
+		else {
+			// $(this).addClass("selectedToMap");
+			// $('.testcaselink').removeClass("selectedToMap");
+			$('.testcaselink').find(".qcSyncronise, .qcUndoSyncronise").hide();
+			$('.testcaselink').prop("style","background-color:none;border-radius:0px;");
+			$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
+			$(this).find(".qcSyncronise, .qcUndoSyncronise").show();
+		}
 	});
 	$(document).on('click','.testScenariolink', function(){
 		
-		$('.selectedToMap').prop("style","background-color:none;border-radius:0px;");
+		// $('.selectedToMap').prop("style","background-color:none;border-radius:0px;");
 		$(this).siblings().removeClass("selectedToMap");
 	//	$(this).siblings().prop("style","background-color:none;border-radius:0px;");
 		$(this).addClass("selectedToMap");
@@ -348,20 +359,31 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		
 	});
 
-	//Undo Mapping
+	// Undo Mapping
 	$(document).on('click', ".qcUndoSyncronise", function(){
-		var qcTestcaseName = $(this).siblings("label").text();
-		var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
-		for(var i=0;i<mappedList.length;i++){
-			if(qcTestcaseName == mappedList[i].testcase && qcTestsetName == mappedList[i].testset){
+	var selectedToMap = $(".selectedToMap")
+	var qcTestcase = []
+	for(var i=0;i<selectedToMap.length-1;i++){
+		qcTestcase.push(selectedToMap[i].innerText.trim())
+	}
+	var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
+	for(var i=0;i<mappedList.length;i++){
+		var mappedTcList = mappedList[i].testcase
+		if (qcTestcase.length==mappedTcList.length){
+			if(qcTestsetName == mappedList[i].testset){
 				delete mappedList[i];
 				mappedList =  mappedList.filter(function(n){ return n != null; });
 				$('.testScenariolink').removeClass("selectedToMap");
 				$('.testScenariolink').prop("style","background-color:none;border-radius:0px;");
-				$(this).parent().css({"background-color":"rgb(225, 202, 255)"});
-				$(this).siblings(".qcSyncronise").show();
-				break;
+				var selectedList = $(".selectedToMap").siblings("label").prevObject
+				for(var i=0;i<selectedList.length-1;i++){
+					selectedList[i].style.cssText = "background-color: rgb(225, 202, 255)";
+					selectedList[i].children[2].style.cssText="display:inline";
+				}
+				// break;
+				}
 			}
+		// }
 		}
 	});
 
@@ -369,27 +391,34 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 	$(document).on('click', ".qcSyncronise", function(event){
 		var getDomainName = $(".qcSelectDomain option:selected").val();
 		var getProjectName = $(".qcSelectProject option:selected").val();
-		var qcTestcaseName = $(this).siblings("label").children()[1].innerText;
+		var qcTestcaseNameList = []
+		var selectedElements=$(".selectedToMap").siblings("label").prevObject
+		for(var i=0;i<selectedElements.length-1;i++){
+			var cur_obj =  selectedElements[i].innerText
+			qcTestcaseNameList.push(cur_obj)
+		}
 		var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
 		var qcFolderPath = $(this).parent("li").parent("ul").prev("li").parent("ul").prev("li").data("folderpath");
 		var AvoAssureScenarioId = $(".qcAvoAssureTreeContainer").find(".selectedToMap").data("scenarioid");
 		
 		if(!getDomainName)	openModelPopup("Save Mapped Testcase", "Please select domain");
 		else if(!getProjectName)	openModelPopup("Save Mapped Testcase", "Please select project");
-		else if(!qcTestcaseName)	openModelPopup("Save Mapped Testcase", "Please select Testcase");
+		else if(!qcTestcaseNameList)	openModelPopup("Save Mapped Testcase", "Please select Testcase");
 		else if(!qcTestsetName)	openModelPopup("Save Mapped Testcase", "Please select Testset");
 		else if(!AvoAssureScenarioId)	openModelPopup("Save Mapped Testcase", "Please select scenario");
 		else{
 			mappedList.push({
 				'domain': getDomainName,
 				'project': getProjectName,			
-				'testcase': qcTestcaseName,
+				'testcase': qcTestcaseNameList,
 				'testset': qcTestsetName,
 				'folderpath': qcFolderPath,
 				'scenarioId': AvoAssureScenarioId,
 			});
-			$(this).parent().css({"background-color":"#ddd"});
-			$(this).hide();
+			for(var i=0;i<selectedElements.length-1;i++){
+				selectedElements[i].style.cssText = "background-color: #ddd";
+				selectedElements[i].children[2].style.cssText="display:hide";
+			}
 			event.stopPropagation();
 		}
 	});
@@ -442,9 +471,9 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				$('.mappedFiles').removeClass('scroll-wrapper');
 				$(".mappedFilesLabel").show();
 				for(var i=0;i<data.length;i++){
-					//there is no testscenarioname 
-					$(".mappedFiles").append('<div class="linkedTestset"><label data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" data-qctestset="'+data[i].qctestset+'">'+data[i].qctestcase+'</label><span class="linkedLine"></span><label data-scenarioid="'+data[i].testscenarioid+'">'+data[i].testscenarioname+'</label></div>');  //testscenarioname ??
-				
+					var data_list = ''+data[i].qctestcase
+					data_list=data_list.replaceAll(',', ',<br>')
+					$(".mappedFiles").append('<div class="linkedTestset"><label style="float: left; width: 40%; background-color: #E1CAFF;" data-scenarioid="'+data[i].testscenarioid+'">'+data[i].testscenarioname+'</label><label style="float: right; width: 50%; background-color: #fad7f1fb;" data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" data-qctestset="'+data[i].qctestset+'">'+data_list+'</label></div>');  //testscenarioname ??
 				}	
 
 				$('.scrollbar-inner').scrollbar();

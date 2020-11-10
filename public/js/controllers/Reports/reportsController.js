@@ -735,12 +735,54 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 
     function htmlReportClick(e) {
         var reportType = $(this).attr('data-getrep');
-        var executionId = '';
+        var reportID = $(this).attr('data-reportid');
+        var scenarioName = $(this).parent().parent().children()[0].textContent;
+
+        if (reportType == "html") {
+            const reportURL = window.location.origin + "/viewReport/" + reportID;
+            return window.open(reportURL, '_blank');
+        } else {
+            if (reportType == "wkhtmltopdf") reportType = "pdf";
+            reportService.viewReport(reportID, reportType).then(function(data1) {
+                unblockUI();
+                if (reportType == "json") data1 = JSON.stringify(data1, undefined, 2);
+                var filedata = new Blob([data1], {
+                    type: "application/"+reportType+";charset=utf-8"
+                });
+                if (window.navigator.msSaveOrOpenBlob) {
+                    window.navigator.msSaveOrOpenBlob(filedata, scenarioName);
+                } else {
+                    var a = document.createElement('a');
+                    a.href = URL.createObjectURL(filedata);
+                    a.download = scenarioName;
+                    document.body.appendChild(a);
+                    a.click();
+                    URL.revokeObjectURL(a.href);
+                    document.body.removeChild(a);
+                }
+                e.stopImmediatePropagation();
+            },
+            function(error) {
+                unblockUI();
+                if (reportType == 'pdf') error = {error: JSON.parse(String.fromCharCode.apply(null, new Uint8Array(error))|| '')};
+                var errRes = error.error || {};
+                var defErr = (reportType == "json")? "Fail to export report JSON": "Fail to save PDF Report";
+                var err = errRes.emsg || defErr;
+                if (errRes.ecode == "INVALID_SESSION") return $rootScope.redirectPage();
+                else if (errRes.ecode == "LIMIT_EXCEEDED") openModalPopup("Fail to load PDF Report. Report Limit size exceeded. Generate PDF Report using Avo Assure PDF utility available in ICE.")
+                else openModalPopup("Reports", defErr);
+                console.log(defErr + ". Error: " + JSON.stringify(err));
+            });
+            return;
+        }
+    }
+
+    function htmlReportClick1(e) {
+        var reportType = $(this).attr('data-getrep');
         var reportID = $(this).attr('data-reportid');
         var testsuiteId = $(this).parents('tr').attr('id');
         var testsuitename = $('#moduleNameHeader').children('span').text();
         var scenarioName = $(this).parent().siblings('td.scenarioName').text();
-
 
         var pass = fail = terminated = total = 0;
         var scrShot = {
@@ -778,188 +820,184 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                     }
                     var remarksLength = [];
                     var commentsLength = [];
-                    if (data != "fail") {
-                        blockUI("Generating Report.. please wait..");
-                        if (data.length > 0) {
-                            finalReports.overallstatus[0].domainName = data[0].domainname
-                            finalReports.overallstatus[0].projectName = document.getElementById('selectProjects').selectedOptions[0].text
-                            finalReports.overallstatus[0].releaseName = document.getElementById('selectReleases').selectedOptions[0].text
-                            finalReports.overallstatus[0].cycleName = document.getElementById('selectCycles').selectedOptions[0].text
-                            finalReports.overallstatus[0].scenarioName = data[0].testscenarioname
-                            finalReports.overallstatus[0].reportId = reportID;
-                            finalReports.overallstatus[0].executionId = data[0].executionId;;
-                            finalReports.overallstatus[0].moduleName = $(".highlight-moduleName").text();
-                            
-                            var obj2 = data[1].reportdata;
-                            var elapTym;
-                            for (j = 0; j < obj2.overallstatus.length; j++) {
-                                finalReports.overallstatus[0].browserVersion = (obj2.overallstatus[j].browserVersion) == "" ? "-" : obj2.overallstatus[j].browserVersion;
-                                finalReports.overallstatus[0].browserType = (obj2.overallstatus[j].browserType) == "" ? "-" : obj2.overallstatus[j].browserType;
-                                finalReports.overallstatus[0].StartTime = obj2.overallstatus[j].StartTime.split(".")[0];
-                                finalReports.overallstatus[0].EndTime = obj2.overallstatus[j].EndTime.split(".")[0];
-                                var getTym = obj2.overallstatus[j].EndTime.split(".")[0];
-                                var getDat = getTym.split(" ")[0].split("-");
-                                finalReports.overallstatus[0].date = getDat[1] + "/" + getDat[2] + "/" + getDat[0];
-                                finalReports.overallstatus[0].time = getTym.split(" ")[1];
-                                finalReports.overallstatus[0].overallstatus = obj2.overallstatus[j].overallstatus;
-                                elapTym = (obj2.overallstatus[j].EllapsedTime.split(".")[0]).split(":");
-                                finalReports.overallstatus[0].EllapsedTime = "~" + ("0" + elapTym[0]).slice(-2) + ":" + ("0" + elapTym[1]).slice(-2) + ":" + ("0" + elapTym[2]).slice(-2)
+                    if (data == "fail") {
+                        blockUI("Unable to Generate Report!");
+                        console.log("Failed to get reports details");
+                        return setTimeout(()=>{unblockUI()}, 2000);
+                    }
+                    blockUI("Generating Report.. please wait..");
+                    finalReports.overallstatus[0].domainName = data.domainname
+                    finalReports.overallstatus[0].projectName = document.getElementById('selectProjects').selectedOptions[0].text
+                    finalReports.overallstatus[0].releaseName = document.getElementById('selectReleases').selectedOptions[0].text
+                    finalReports.overallstatus[0].cycleName = document.getElementById('selectCycles').selectedOptions[0].text
+                    finalReports.overallstatus[0].scenarioName = data.testscenarioname
+                    finalReports.overallstatus[0].reportId = reportID;
+                    finalReports.overallstatus[0].executionId = data.executionid;
+                    finalReports.overallstatus[0].moduleName = $(".highlight-moduleName").text();
+
+                    var obj2 = data.report;
+                    var elapTym;
+                    for (j = 0; j < obj2.overallstatus.length; j++) {
+                        finalReports.overallstatus[0].browserVersion = (obj2.overallstatus[j].browserVersion) == "" ? "-" : obj2.overallstatus[j].browserVersion;
+                        finalReports.overallstatus[0].browserType = (obj2.overallstatus[j].browserType) == "" ? "-" : obj2.overallstatus[j].browserType;
+                        finalReports.overallstatus[0].StartTime = obj2.overallstatus[j].StartTime.split(".")[0];
+                        finalReports.overallstatus[0].EndTime = obj2.overallstatus[j].EndTime.split(".")[0];
+                        var getTym = obj2.overallstatus[j].EndTime.split(".")[0];
+                        var getDat = getTym.split(" ")[0].split("-");
+                        finalReports.overallstatus[0].date = getDat[1] + "/" + getDat[2] + "/" + getDat[0];
+                        finalReports.overallstatus[0].time = getTym.split(" ")[1];
+                        finalReports.overallstatus[0].overallstatus = obj2.overallstatus[j].overallstatus;
+                        elapTym = (obj2.overallstatus[j].EllapsedTime.split(".")[0]).split(":");
+                        finalReports.overallstatus[0].EllapsedTime = "~" + ("0" + elapTym[0]).slice(-2) + ":" + ("0" + elapTym[1]).slice(-2) + ":" + ("0" + elapTym[2]).slice(-2)
+                    }
+                    for (k = 0; k < obj2.rows.length; k++) {
+                        finalReports.rows.push(obj2.rows[k]);
+                        finalReports.rows[k].slno = k + 1;
+                        if (finalReports.rows[k]["Step "] != undefined) { // && finalReports.rows[k]["Step "].indexOf("Step") !== -1){
+                            finalReports.rows[k].Step = finalReports.rows[k]["Step "];
+                        }
+                        if (finalReports.rows[k].hasOwnProperty("EllapsedTime") && finalReports.rows[k].EllapsedTime.trim() != "") {
+                            elapTym = (finalReports.rows[k].EllapsedTime.split(".")[0]).split(":")
+                            if (finalReports.rows[k].EllapsedTime.split(".")[1] == undefined || finalReports.rows[k].EllapsedTime.split(".")[1] == "") {
+                                finalReports.rows[k].EllapsedTime = ("0" + elapTym[0]).slice(-2) + ":" + ("0" + elapTym[1]).slice(-2) + ":" + ("0" + elapTym[2]).slice(-2);
+                            } else if (finalReports.rows[k].EllapsedTime.split(".").length < 3 && finalReports.rows[k].EllapsedTime.split(".")[0].indexOf(":") === -1) {
+                                finalReports.rows[k].EllapsedTime = ("0" + 0).slice(-2) + ":" + ("0" + 0).slice(-2) + ":" + ("0" + elapTym[0]).slice(-2) + ":" + ("0" + 0).slice(-2);
+                            } else {
+                                finalReports.rows[k].EllapsedTime = ("0" + elapTym[0]).slice(-2) + ":" + ("0" + elapTym[1]).slice(-2) + ":" + ("0" + elapTym[2]).slice(-2) + ":" + finalReports.rows[k].EllapsedTime.split(".")[1].slice(0, 3);
                             }
-                            for (k = 0; k < obj2.rows.length; k++) {
+                        }
+                        if (finalReports.rows[k].status == "Pass") {
+                            pass++;
+                        } else if (finalReports.rows[k].status == "Fail") {
+                            fail++;
+                        } else if (finalReports.rows[k].hasOwnProperty("Step") && finalReports.rows[k].Step == "Terminated") {
+                            terminated++
+                        }
+                        if (reportType != "html" && !(finalReports.rows[k].screenshot_path == undefined)) {
+                            scrShot.idx.push(k);
+                            scrShot.paths.push(finalReports.rows[k].screenshot_path);
+                        }
+                        if ('testcase_details' in finalReports.rows[k]) {
+                            if (typeof(finalReports.rows[k].testcase_details) == "string" && finalReports.rows[k].testcase_details != "" && finalReports.rows[k].testcase_details != "undefined") {
+                                finalReports.rows[k].testcase_details = JSON.parse(finalReports.rows[k].testcase_details);
+                            } else if (typeof(finalReports.rows[k].testcase_details) == "object") {
+                                finalReports.rows[k].testcase_details = finalReports.rows[k].testcase_details;
+                            } else {
+                                finalReports.rows[k].testcase_details = finalReports.rows[k].testcase_details;
+                            }
 
-                                finalReports.rows.push(obj2.rows[k]);
-                                finalReports.rows[k].slno = k + 1;
-                                if (finalReports.rows[k]["Step "] != undefined) { // && finalReports.rows[k]["Step "].indexOf("Step") !== -1){
-                                    finalReports.rows[k].Step = finalReports.rows[k]["Step "];
+                            if (finalReports.rows[k].testcase_details == "") {
+                                finalReports.rows[k].testcase_details = {
+                                    "actualResult_pass": "",
+                                    "actualResult_fail": "",
+                                    "testcaseDetails": ""
                                 }
-                                if (finalReports.rows[k].hasOwnProperty("EllapsedTime") && finalReports.rows[k].EllapsedTime.trim() != "") {
-                                    elapTym = (finalReports.rows[k].EllapsedTime.split(".")[0]).split(":")
-                                    if (finalReports.rows[k].EllapsedTime.split(".")[1] == undefined || finalReports.rows[k].EllapsedTime.split(".")[1] == "") {
-                                        finalReports.rows[k].EllapsedTime = ("0" + elapTym[0]).slice(-2) + ":" + ("0" + elapTym[1]).slice(-2) + ":" + ("0" + elapTym[2]).slice(-2);
-                                    } else if (finalReports.rows[k].EllapsedTime.split(".").length < 3 && finalReports.rows[k].EllapsedTime.split(".")[0].indexOf(":") === -1) {
-                                        finalReports.rows[k].EllapsedTime = ("0" + 0).slice(-2) + ":" + ("0" + 0).slice(-2) + ":" + ("0" + elapTym[0]).slice(-2) + ":" + ("0" + 0).slice(-2);
-                                    } else {
-                                        finalReports.rows[k].EllapsedTime = ("0" + elapTym[0]).slice(-2) + ":" + ("0" + elapTym[1]).slice(-2) + ":" + ("0" + elapTym[2]).slice(-2) + ":" + finalReports.rows[k].EllapsedTime.split(".")[1].slice(0, 3);
-                                    }
-                                }
-                                // if (finalReports.rows[k].hasOwnProperty("status") && finalReports.rows[k].status != "") {
-                                //     total++;
-                                // }
-                                if (finalReports.rows[k].status == "Pass") {
-                                    pass++;
-                                } else if (finalReports.rows[k].status == "Fail") {
-                                    fail++;
-                                } else if (finalReports.rows[k].hasOwnProperty("Step") && finalReports.rows[k].Step == "Terminated") {
-                                    terminated++
-                                }
-                                if (reportType != "html" && !(finalReports.rows[k].screenshot_path == undefined)) {
-                                    scrShot.idx.push(k);
-                                    scrShot.paths.push(finalReports.rows[k].screenshot_path);
-                                }
-                                if ('testcase_details' in finalReports.rows[k]) {
-                                    if (typeof(finalReports.rows[k].testcase_details) == "string" && finalReports.rows[k].testcase_details != "" && finalReports.rows[k].testcase_details != "undefined") {
-                                        finalReports.rows[k].testcase_details = JSON.parse(finalReports.rows[k].testcase_details);
-                                    } else if (typeof(finalReports.rows[k].testcase_details) == "object") {
-                                        finalReports.rows[k].testcase_details = finalReports.rows[k].testcase_details;
-                                    } else {
-                                        finalReports.rows[k].testcase_details = finalReports.rows[k].testcase_details;
-                                    }
+                            }
+                        }
 
-                                    if (finalReports.rows[k].testcase_details == "") {
-                                        finalReports.rows[k].testcase_details = {
-                                            "actualResult_pass": "",
-                                            "actualResult_fail": "",
-                                            "testcaseDetails": ""
+                        if ('Remark' in finalReports.rows[k]) {
+                            if (finalReports.rows[k].Remark != " " && finalReports.rows[k].Remark != null && finalReports.rows[k].Remark != "") {
+                                remarksLength.push(finalReports.rows[k].Remark)
+                            }
+                        }
+                        if ('Comments' in finalReports.rows[k]) {
+                            if (finalReports.rows[k].Comments != " " && finalReports.rows[k].Comments != null && finalReports.rows[k].Comments != "") {
+                                commentsLength.push(finalReports.rows[k].Comments)
+                            }
+                        }
+                    }
+                    total = pass+fail+terminated;
+                    finalReports.overallstatus[0].pass = (parseFloat((pass / total) * 100).toFixed(2)) > 0 ? parseFloat((pass / total) * 100).toFixed(2) : parseInt(0);
+                    finalReports.overallstatus[0].fail = (parseFloat((fail / total) * 100).toFixed(2)) > 0 ? parseFloat((fail / total) * 100).toFixed(2) : parseInt(0);
+                    if(pass>0 && fail>0){
+                        finalReports.overallstatus[0].terminate = (100-(parseFloat(finalReports.overallstatus[0].fail)+parseFloat(finalReports.overallstatus[0].pass))).toFixed(2);
+                    } else{
+                        finalReports.overallstatus[0].terminate = (parseFloat((terminated / total) * 100).toFixed(2)) > 0 ? parseFloat((terminated / total) * 100).toFixed(2) : parseInt(0);
+                    }
+                    // finalReports.overallstatus[0].terminate = (parseFloat((terminated / total) * 100).toFixed(2)) > 0 ? parseFloat((terminated / total) * 100).toFixed(2) : parseInt(0);
+                    finalReports.remarksLength = remarksLength;
+                    finalReports.commentsLength = commentsLength;
+                    if (reportType == "html") {
+                        //Service call to get Html reports
+                        reportService.renderReport_ICE(finalReports, reportType).then(
+                            function(data1) {
+                                unblockUI();
+                                if (data1 == "Invalid Session") {
+                                    return $rootScope.redirectPage();
+                                } else if (data1 == "fail") {
+                                    console.log("Failed to render reports.");
+                                } else {
+                                    var myWindow;
+                                    myWindow = window.open();
+                                    myWindow.document.write(data1);
+                                }
+                                e.stopImmediatePropagation();
+                            },
+                            function(error) {
+                                unblockUI();
+                                console.log("Error in service renderReport_ICE" + error);
+                            });
+                        //Transaction Activity for HTMLReportClick
+                        // var labelArr = [];
+                        // var infoArr = [];
+                        // labelArr.push(txnHistory.codesDict['HTMLReportClick']);
+                        // txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
+                    } else if (reportType == 'json') {
+                        exportJSONReport(finalReports);
+                    } else {
+                        //Service call to download pdf reports
+                        $rootScope.resetSession.start();
+                        var isIE = /*@cc_on!@*/ false || !!document.documentMode;
+                        reportService.renderReport_ICE(finalReports, reportType, scrShot).then(
+                            function(data1) {
+                                unblockUI();
+                                $rootScope.resetSession.end();
+                                var strData = String.fromCharCode.apply(null, new Uint8Array(data1.slice(0, 20)));
+                                if (strData == "Invalid Session") return $rootScope.redirectPage();
+                                else if (strData === "fail") {
+                                    var msg = "Fail to load PDF Report";
+                                    openModalPopup("Reports", msg);
+                                    console.error(msg);
+                                } else if (strData === "limitExceeded") {
+                                    var msg = "Fail to load PDF Report. Report Limit size exceeded. Generate PDF Report using Avo Assure PDF utility available in ICE.";
+                                    openModalPopup("Reports", msg);
+                                    console.error(msg);
+                                } else {
+                                    openWindow = 0;
+                                    if (openWindow == 0) {
+                                        var file = new Blob([data1], {
+                                            type: 'application/pdf'
+                                        });
+                                        if (isIE) {
+                                            navigator.msSaveOrOpenBlob(file);
+                                        } else {
+                                            var fileURL = URL.createObjectURL(file);
+                                            var a = document.createElement('a');
+                                            a.href = fileURL;
+                                            a.download = finalReports.overallstatus[0].scenarioName;
+                                            //a.target="_new";
+                                            document.body.appendChild(a);
+                                            a.click();
+                                            document.body.removeChild(a);
+                                            //$window.open(fileURL, '_blank');
+                                            URL.revokeObjectURL(fileURL);
                                         }
                                     }
-                                }
-
-                                if ('Remark' in finalReports.rows[k]) {
-                                    if (finalReports.rows[k].Remark != " " && finalReports.rows[k].Remark != null && finalReports.rows[k].Remark != "") {
-                                        remarksLength.push(finalReports.rows[k].Remark)
-                                    }
-                                }
-                                if ('Comments' in finalReports.rows[k]) {
-                                    if (finalReports.rows[k].Comments != " " && finalReports.rows[k].Comments != null && finalReports.rows[k].Comments != "") {
-                                        commentsLength.push(finalReports.rows[k].Comments)
-                                    }
-                                }
-                            }
-                            total = pass+fail+terminated;
-                            finalReports.overallstatus[0].pass = (parseFloat((pass / total) * 100).toFixed(2)) > 0 ? parseFloat((pass / total) * 100).toFixed(2) : parseInt(0);
-                            finalReports.overallstatus[0].fail = (parseFloat((fail / total) * 100).toFixed(2)) > 0 ? parseFloat((fail / total) * 100).toFixed(2) : parseInt(0);
-                            if(pass>0 && fail>0){
-                                finalReports.overallstatus[0].terminate = (100-(parseFloat(finalReports.overallstatus[0].fail)+parseFloat(finalReports.overallstatus[0].pass))).toFixed(2);
-                            } else{
-                                finalReports.overallstatus[0].terminate = (parseFloat((terminated / total) * 100).toFixed(2)) > 0 ? parseFloat((terminated / total) * 100).toFixed(2) : parseInt(0);
-                            }
-                            // finalReports.overallstatus[0].terminate = (parseFloat((terminated / total) * 100).toFixed(2)) > 0 ? parseFloat((terminated / total) * 100).toFixed(2) : parseInt(0);
-                            finalReports.remarksLength = remarksLength;
-                            finalReports.commentsLength = commentsLength;
-                        }
-                        if (reportType == "html") {
-                            //Service call to get Html reports
-                            reportService.renderReport_ICE(finalReports, reportType).then(
-                                function(data1) {
-                                    unblockUI();
-                                    if (data1 == "Invalid Session") {
-                                        return $rootScope.redirectPage();
-                                    } else if (data1 == "fail") {
-                                        console.log("Failed to render reports.");
-                                    } else {
-                                        var myWindow;
-                                        myWindow = window.open();
-                                        myWindow.document.write(data1);
-                                    }
+                                    openWindow++;
+                                    //Transaction Activity for PDFReportClick
+                                    // var labelArr = [];
+                                    // var infoArr = [];
+                                    // labelArr.push(txnHistory.codesDict['PDFReportClick']);
+                                    // txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
                                     e.stopImmediatePropagation();
-                                },
-                                function(error) {
-                                    unblockUI();
-                                    console.log("Error in service renderReport_ICE" + error);
-                                });
-                            //Transaction Activity for HTMLReportClick
-                            // var labelArr = [];
-                            // var infoArr = [];
-                            // labelArr.push(txnHistory.codesDict['HTMLReportClick']);
-                            // txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
-                        } else if (reportType == 'json') {
-                            exportJSONReport(finalReports);
-                        } else {
-                            //Service call to download pdf reports
-                            $rootScope.resetSession.start();
-                            var isIE = /*@cc_on!@*/ false || !!document.documentMode;
-                            reportService.renderReport_ICE(finalReports, reportType, scrShot).then(
-                                function(data1) {
-                                    unblockUI();
-                                    $rootScope.resetSession.end();
-                                    var strData = String.fromCharCode.apply(null, new Uint8Array(data1.slice(0, 20)));
-                                    if (strData == "Invalid Session") return $rootScope.redirectPage();
-                                    else if (strData === "fail") {
-                                        var msg = "Fail to load PDF Report";
-                                        openModalPopup("Reports", msg);
-                                        console.error(msg);
-                                    } else if (strData === "limitExceeded") {
-                                        var msg = "Fail to load PDF Report. Report Limit size exceeded. Generate PDF Report using Avo Assure PDF utility available in ICE.";
-                                        openModalPopup("Reports", msg);
-                                        console.error(msg);
-                                    } else {
-                                        openWindow = 0;
-                                        if (openWindow == 0) {
-                                            var file = new Blob([data1], {
-                                                type: 'application/pdf'
-                                            });
-                                            if (isIE) {
-                                                navigator.msSaveOrOpenBlob(file);
-                                            } else {
-                                                var fileURL = URL.createObjectURL(file);
-                                                var a = document.createElement('a');
-                                                a.href = fileURL;
-                                                a.download = finalReports.overallstatus[0].scenarioName;
-                                                //a.target="_new";
-                                                document.body.appendChild(a);
-                                                a.click();
-                                                document.body.removeChild(a);
-                                                //$window.open(fileURL, '_blank');
-                                                URL.revokeObjectURL(fileURL);
-                                            }
-                                        }
-                                        openWindow++;
-                                        //Transaction Activity for PDFReportClick
-                                        // var labelArr = [];
-                                        // var infoArr = [];
-                                        // labelArr.push(txnHistory.codesDict['PDFReportClick']);
-                                        // txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
-                                        e.stopImmediatePropagation();
-                                    }
-                                },
-                                function(error) {
-                                    unblockUI();
-                                    $rootScope.resetSession.end();
-                                    console.log("Error in service renderReport_ICE" + error);
-                                });
-                        }
-                        $('.formatpdfbrwsrexport').remove();
-                    } else console.log("Failed to get reports details");
+                                }
+                            },
+                            function(error) {
+                                unblockUI();
+                                $rootScope.resetSession.end();
+                                console.log("Error in service renderReport_ICE" + error);
+                            });
+                    }
                 },
                 function(error) {
                     console.log("Error in service renderReport_ICE " + error);

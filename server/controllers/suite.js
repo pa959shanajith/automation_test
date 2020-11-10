@@ -6,6 +6,7 @@ var myserver = require('../lib/socket');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
+const notifications = require('../notifications');
 if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT) * 1024 * 1024;
 const scheduleJobMap = {};
 const SOCK_NORM = "normalModeOn";
@@ -186,6 +187,7 @@ const fetchScenarioDetails = async (scenarioid, userid, qcType) => {
 const prepareExecutionRequest = async (batchData, userInfo) => {
 	const execReq = {
 		"exec_mode": batchData.exectionMode,
+		"exec_env" : batchData.executionEnv,
 		"apptype": batchData.batchInfo[0].appType,
 		"qccredentials": batchData.qccredentials,
 		"batchId": "",
@@ -245,7 +247,7 @@ const generateExecutionIds = async (execIds, tsuIds, userid) => {
 		"executionids": execIds.execid,
 		"batchid": execIds.batchid
 	};
-	const newExecIds = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "prepareExecutionRequest");
+	const newExecIds = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "generateExecutionIds");
 	if (newExecIds == "fail") return "fail";
 	execIds.batchid = newExecIds.batchid;
 	execIds.execid = newExecIds.execids;
@@ -294,9 +296,22 @@ const updateSkippedExecutionStatus = async (batchData, userInfo, status, msg) =>
 	const executionIds = batchData.executionIds;
 	for (let i = 0; i < batchData.suitedetails.length; i++) {
 		const suite = batchData.suitedetails[i];
-		for (const scid of suite.scenarioIds) {
-			await insertReport(executionIds[i], scid, "N/A", userInfo, reportData);
-		}
+		if (!suite.reportData) suite.reportData = [];
+		for (let idx = 0; idx < suite.scenarioIds.length; idx++) {
+			const scid = suite.scenarioIds[idx];
+			const scenarioname = suite.scenarioNames[idx];
+			const reportid = await insertReport(executionIds[i], scid, "N/A", userInfo, reportData);
+			const reportItem = {reportid, scenarioname, status, terminated: 'N/A'};
+			if (reportid == "fail") {
+				logger.error("Failed to insert report data for scenario (id: "+scid+") with executionid "+executionIds[i]);
+				reportItem[reportid] = '';
+			} else {
+				logger.info("Successfully inserted report data");
+				logger.debug("Successfully inserted report data for scenario (id: "+scid+") with executionid "+executionIds[i]);
+			}
+			suite.reportData.push(reportItem);
+		};
+		notifications.notify("report", {...suite, user: userInfo, status, suiteStatus: "fail"});
 	}
 	await updateExecutionStatus(executionIds, "fail");
 };
@@ -354,24 +369,23 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 					const testsuiteid = resultData.testsuiteId;
 					const testsuiteIndex = execReq.testsuiteIds.indexOf(testsuiteid);
 					const testsuite = execReq.suitedetails[testsuiteIndex];
+					const scenarioIndex = testsuite.scenarioIds.indexOf(scenarioid);
+					const scenarioname = testsuite.scenarioNames[scenarioIndex];
+					let scenarioCount = testsuite.scenarioIds.length * testsuite.browserType.length;
+					if (!testsuite.reportData) testsuite.reportData = [];//Array.from({length: testsuite.scenarioIds.length}, () => {});
 					try {
-						completedSceCount++;
 						const reportData = JSON.parse(JSON.stringify(resultData.reportData).replace(/'/g, "''"));
-						var scenarioCount = testsuite.scenarioIds.length * testsuite.browserType.length;
 						if (execType == "API") {
 							if (d2R[testsuiteid] === undefined) d2R[testsuiteid] = {"testsuiteName": testsuite.testsuitename, "testsuiteId": testsuiteid, "scenarios": {}};
 							if (d2R[testsuiteid].scenarios[scenarioid] === undefined) d2R[testsuiteid].scenarios[scenarioid] = [];
-							d2R[testsuiteid].scenarios[scenarioid].push({
-								"scenarioname": testsuite.scenarioNames[testsuite.scenarioIds.indexOf(scenarioid)],
-								"scenarioid": scenarioid,
-								"overallstatus": "Not Executed"
-							});
+							d2R[testsuiteid].scenarios[scenarioid].push({ scenarioname, scenarioid, "overallstatus": "Not Executed" });
 						}
 						if (reportData.overallstatus.length == 0) {
 							completedSceCount++;
 							scenarioCount = testsuite.scenarioIds.length;
 							if (completedSceCount == scenarioCount) {
 								completedSceCount = statusPass = 0;
+								notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus: "fail"});
 								await updateExecutionStatus([executionid], "fail");
 							}
 						} else {
@@ -382,30 +396,43 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 								const cidx = d2R[testsuiteid].scenarios[scenarioid].length - 1;
 								d2R[testsuiteid].scenarios[scenarioid][cidx] = {...d2R[testsuiteid].scenarios[scenarioid][cidx], ...reportData.overallstatus[0]};
 							}
-							if (reportData.overallstatus[0].overallstatus == "Pass") statusPass++;
-							const insRepStatus = await insertReport(executionid, scenarioid, browserType, userInfo, reportData);
-							if (insRepStatus != "fail") logger.info("Successfully inserted report data");
-							else logger.error("Failed to insert report data");
+							const reportStatus = reportData.overallstatus[0].overallstatus;
+							if (reportStatus == "Pass") statusPass++;
+							const reportid = await insertReport(executionid, scenarioid, browserType, userInfo, reportData);
+							const reportItem = {reportid, scenarioname, status: reportStatus, terminated: reportData.overallstatus[0].terminatedBy};
+							if (reportid == "fail") {
+								logger.error("Failed to insert report data for scenario (id: "+scenarioid+") with executionid "+executionid);
+								reportItem[reportid] = '';
+							} else {
+								logger.info("Successfully inserted report data");
+								logger.debug("Successfully inserted report data for scenario (id: "+scenarioid+") with executionid "+executionid);
+							}
+							// testsuite.reportData[scenarioIndex] = reportItem;
+							testsuite.reportData.push(reportItem);
+							completedSceCount++;
 							if (completedSceCount == scenarioCount) {
 								const suiteStatus = (statusPass == scenarioCount) ? "pass" : "fail";
 								completedSceCount = statusPass = 0;
+								notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus});
 								await updateExecutionStatus([executionid], suiteStatus);
 							}
 						}
 					} catch (ex) {
 						logger.error("Exception in the function " + fnName + ": insertreportquery: %s", ex);
+						notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus: "fail"});
 						await updateExecutionStatus([executionid], "fail");
 					}
 				} else { // This block will trigger when resultData.status has "success or "Terminate"
 					redisServer.redisSubServer.removeListener("message", executeTestSuite_listener);
 					try {
+						let result = status;
+						if (resultData.userTerminated) result = "UserTerminate";
+						if (execType == "API") result = [d2R, status];
 						if (resSent && notifySocMap[username]) { // This block is only for active mode
-							notifySocMap[username].emit("result_ExecutionDataInfo", status);
+							notifySocMap[username].emit("result_ExecutionDataInfo", result);
 							rsv(DO_NOT_PROCESS);
 						} else {
-							if (execType == "API") d2R = [d2R, status];
-							else d2R = status;
-							rsv(d2R);
+							rsv(result);
 						}
 					} catch (ex) {
 						logger.error("Exception while returning execution status from function " + fnName + ": %s", ex);
@@ -426,9 +453,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 
 /** Function responsible for Orchestrating execution flow. Invokes series of functions to achive the results */
 const executionFunction = async (batchExecutionData, execIds, userInfo, execType) => {
-	var icename=myserver.allSocketsICEUser[userInfo.username];
-	if (execType=='API')
-	icename=userInfo.icename;
+	const icename = (execType=='API')? userInfo.icename : myserver.allSocketsICEUser[userInfo.username];
 	userInfo.icename=icename;
 	redisServer.redisSubServer.subscribe('ICE2_' + icename);
 	var iceStatus = await checkForICEstatus(icename, execType);
@@ -479,6 +504,9 @@ exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 	const userRequestMap = {};
 	const userInfoList = [];
 	const executionResult = [];
+	if (!multiBatchExecutionData || multiBatchExecutionData.constructor !== Array || multiBatchExecutionData.length === 0 ) {
+		return res.status(400).send({"executionStatus": [{"status": "fail", "error": "Empty or Invalid Batch Data"}]});
+	}
 	for (let i = 0; i < multiBatchExecutionData.length; i++) {
 		const executionData = multiBatchExecutionData[i];
 		const userInfo = await utils.tokenValidation(executionData.userInfo || {});
@@ -673,6 +701,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 			"timestamp": timestamp.toString(),
 			"executeon": multiExecutionData.browserType,
 			"executemode": multiExecutionData.exectionMode,
+			"exec_env" : multiExecutionData.executionEnv,
 			"targetaddress": targetUser,
 			"userid": userInfo.userid,
 			"scenarios": [],
@@ -698,6 +727,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 	if (schResult == "success" && stat != "none") schResult = displayString + " " + "success";
 	return res.send(schResult);
 };
+
 /**
  * Function responsible for creating smart batches
  * @param {*} batchInfo 
@@ -756,6 +786,7 @@ const smartSchedule = async (batchInfo, type, time, browsers) => {
 	result["batchInfo"] = partBatchInfo
 	return result;
 }
+
 /**
  * Format Seconds to display string days/hours/minutes
  * @param {*} seconds 
@@ -793,6 +824,7 @@ const getMachinePartitions = async (mod, type, time) => {
 	const result = await utils.fetchData(inputs, "partitons/getPartitions", "getMachineParitions");
 	return result;
 }
+
 /** Function responsible for scheduling Jobs. Returns: success/few/fail */
 const scheduleTestSuite = async (multiBatchExecutionData) => {
 	const fnName = "scheduleTestSuite";
@@ -831,9 +863,9 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
 					result = "fail";
 					logger.error("Error in " + fnName + " service. Error: %s", ex)
 				}
-				result = (result == "success")? "Completed" : result;
+				result = (result == "success")? "Completed" : ((result == "UserTerminate")? "Terminate" : result);
 				let schedStatus = result;
-				if (["Completed", "Terminate", "Skipped", "fail"].indexOf(result) == -1) {
+				if (!["Completed", "Terminate", "Skipped", "fail"].includes(result)) {
 					let msg = "This scenario was skipped ";
 					if ([SOCK_NA, SOCK_NORM, "NotApproved", "NoTask", "Modified"].indexOf(result) > -1) {
 						if (result == SOCK_NA) msg += "due to unavailability of ICE";
@@ -850,10 +882,17 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
 					const tsuIds = batchExecutionData.batchInfo.map(u => u.testsuiteId);
 					const currExecIds = await generateExecutionIds(execIds, tsuIds, userInfo.userid);
 					if (currExecIds != "fail") {
-						const executionIds = tsuIds.map(i => currExecIds.execids[i]);
 						const batchObj = {
-							"executionIds": executionIds,
-							"suitedetails": batchExecutionData.batchInfo.map(t => ({ "scenarioIds": t.suiteDetails.map(s => s.scenarioId) }))
+							"executionIds": tsuIds.map(i => currExecIds.execids[i]),
+							"suitedetails": batchExecutionData.batchInfo.map(t => ({
+								"testsuitename": t.testsuiteName,
+								"testsuiteid": t.testsuiteId,
+								"projectname": t.projectName,
+								"releaseid": t.releaseId,
+								"cyclename": t.cycleName,
+								"scenarioIds": t.suiteDetails.map(s => s.scenarioId),
+								"scenarioNames": t.suiteDetails.map(s => s.scenarioName)
+							}))
 						};
 						await updateSkippedExecutionStatus(batchObj, userInfo, result, msg);
 					}
@@ -963,6 +1002,7 @@ exports.reScheduleTestsuite = async () => {
 				const tsuIds = schd.testsuiteids;
 				const batchObj = {
 					"exectionMode": schd.executemode,
+					"executionEnv": schd.executeenv,
 					"browserType": schd.executeon,
 					"qccredentials": { "qcurl": "", "qcusername": "", "qcpassword": "" },
 					"targetUser": schd.target,
