@@ -14,7 +14,7 @@ var benchmarkRunTimes = uiConfig.benchmarkRuntimes;
 var myserver = require('./../../server');
 var httpsServer = myserver.httpsServer;
 var io = require('socket.io').listen(httpsServer, { cookie: false, pingInterval: uiConfig.socketio.pingInterval, pingTimeout: uiConfig.socketio.pingTimeout });
-var notificationMsg = require('./../notifications/notifyMessages');
+var notificationMsg = require('./../notifications').broadcast;
 var epurl = process.env.DAS_URL;
 var Client = require("node-rest-client").Client;
 var apiclient = new Client();
@@ -36,7 +36,7 @@ io.on('connection', function (socket) {
 				socketMapNotify[address] = socket;
 				redisServer.redisSubClient.subscribe('UI_notify_' + address, 1);
 				//Broadcast Message
-				var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/mindmap', '/p_Utility', '/p_Reports', 'p_Weboccular', '/neuronGraphs2D', '/p_ALM', '/p_APG', '/p_Integration', '/p_qTest', '/p_Zephyr'];
+				var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/mindmap', '/p_Utility', '/p_Reports', '/p_ALM', '/p_Integration', '/p_qTest', '/p_Zephyr'];
 				notificationMsg.to = broadcastTo;
 				notificationMsg.notifyMsg = 'Server Maintenance Scheduled';
 				// var soc = socketMapNotify[address];
@@ -46,7 +46,7 @@ io.on('connection', function (socket) {
 	} else {
 		var ice_info=socket.handshake.query;
 		var icename=ice_info.icename;
-		logger.info("ICE Socket connecting address %s : %s", icename);
+		logger.info("ICE Socket connecting address: %s", icename);
 		var icesession = ice_info.icesession;
 		var inputs = {
 			"icesession": icesession,
@@ -206,7 +206,7 @@ io.on('connection', function (socket) {
 const registerICE = async (req, res) => {
 	logger.info("Inside ICE Registration");
 	const icename = req.body.icename;
-	logger.info("Registration request from ICE %s : %s", icename);
+	logger.info("Registration request from ICE address: %s", icename);
 	const inputs = { "query": "connect", "icesession": req.body.icesession };
 	var data = {};
 	try {

@@ -1182,7 +1182,7 @@
     width: 160px;
     position: relative;
 }
- .selectRelease,.selectCycle{
+ .selectRelease,.selectCycle,.selectFile{
     margin-left: 10px;
 }
 ;

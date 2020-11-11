@@ -7,6 +7,7 @@ const SamlStrategy = require("passport-saml").Strategy;
 const OpenIdClientStrategy = require('openid-client').Strategy;
 const OpenIdClientIssuer = require('openid-client').Issuer;
 const Negotiator = require('negotiator');
+const uidsafe = require('uid-safe');
 const logger = require("../../logger");
 const utils = require('./utils');
 const strategies = []; // Store all registered strategies
@@ -145,7 +146,7 @@ const strategyUtil = {
 	}
 };
 
-var routeUtil = {
+const routeUtil = {
 	"inhouse": async opts => {
 		authRouter.get(opts.route.login, async (req, res) => {
 			if (req.session.uniqueId) await utils.cloneSession(req);
@@ -184,16 +185,19 @@ var routeUtil = {
 
 module.exports = () => {
 	passport.serializeUser((user, done) => done(null, user));
-	passport.protect = (req, res, next) => {
-		const sessFlag = (req.isAuthenticated && req.isAuthenticated())
-		const cookies = req.signedCookies;
+	passport.deserializeUser((user, done) => done(null, user));
+	passport.verifySession = req => {
+		const sessFlag = req.isAuthenticated && req.isAuthenticated()
+		const cookies = req.signedCookies || {};
 		const cookieFlag = (cookies["connect.sid"]!==undefined) && (cookies["maintain.sid"]!==undefined);
-		if (sessFlag && cookieFlag) return next();
-		var negotiator = new Negotiator(req);
-		if (negotiator.mediaType() === 'text/html') return res.redirect(options.route.login);
+		if (sessFlag && cookieFlag) return true;
+		return false;
+	};
+	passport.protect = (req, res, next) => {
+		if (passport.verifySession(req)) return next();
+		if (new Negotiator(req).mediaType() === 'text/html') return res.redirect(options.route.login);
 		else return res.send("Invalid Session");
 	};
-	passport.deserializeUser((user, done) => done(null, user));
 	authRouter.use(passport.initialize({ userProperty: "user" }));
 	authRouter.use(passport.session());
 	// Initialize inhouse & ldap login method
@@ -263,6 +267,119 @@ module.exports.checkUser = async (req, res) => {
 		return res.send(result);
 	} catch (exception) {
 		logger.error(exception.message);
+		res.send("fail");
+	}
+};
+
+// Function to check whether projects are assigned for user
+const checkAssignedProjects = async (username, usertype) => {
+	const fnName = "checkAssignedProjects";
+	logger.info("Inside " + fnName + " function");
+	let assignedProjects = false;
+	// Get user profile by username
+	let inputs = { username };
+	const userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
+	if (userInfo == "fail") return { err: 'fail' };
+	else if (!userInfo) {
+		let flag = "invalid_username_password";
+		if (["saml","oidc"].includes(usertype)) flag = "nouser";
+		return { err: flag };
+	}
+	const userid = userInfo._id;
+	const roleid = userInfo.defaultrole;
+	if (userInfo.projects != null) assignedProjects = userInfo.projects.length !== 0;
+	// Get Rolename by role id
+	inputs = {
+		"roleid": roleid,
+		"query": "permissionInfoByRoleID"
+	};
+	const userRole = await utils.fetchData(inputs, "login/loadPermission", fnName);
+	if (userRole == "fail") return { err: 'fail' };
+	else if (userRole === null) return { err: 'invalid_username_password'};
+	else return { err: null, userid, role: userRole.rolename, assignedProjects };
+}
+
+// Check User login State - Avo Assure
+module.exports.validateUserState = async (req, res) => {
+	try {
+		logger.info("Inside UI Service: validateUserState");
+		const sess = req.session;
+		if (!sess) {
+			logger.error("Invalid Session");
+			req.clearSession();
+			return res.send("Invalid Session");
+		}
+		let emsg = sess.emsg;
+		const dndsess = sess.dndSess || (!emsg && sess.logged);
+		if (emsg || dndsess) {
+			if (dndsess) {
+				logger.error(`User ${sess.username} is already logged in`);
+				await utils.cloneSession(req);
+				emsg = "reload";
+			} else req.clearSession();
+			return res.send(emsg);
+		}
+
+		if (!req.isAuthenticated()) {
+			logger.rewriters[0] = function(level, msg, meta) {
+				meta.username = null;
+				meta.userid = null;
+				meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
+				return meta;
+			};
+			req.clearSession();
+			return res.send('redirect');
+		}
+
+		emsg = "fail";
+		const user = req.user;
+		const username = (user.username || "").toLowerCase();
+		if (username.length === 0) {
+			logger.error(`User ${username} does not have a valid login session`);
+			emsg = "invalid_username_password";
+		} else {
+			try {
+				const sessid = await utils.findSessID(username);
+				if (sessid.length !== 0) {
+					logger.info(`User ${username} is already logged in`);
+					emsg = "userLogged";
+				} else {
+					const { err, userid, role, assignedProjects } = await checkAssignedProjects(username, user.type);
+					const ip = (!req.headers['client-ip'])? req.headers['client-ip'] : req.ip;
+					if (err) {
+						logger.error("Error occurred in validateUserState. Cause: "+ err);
+						emsg = err;
+					} else if (role != "Admin" && !assignedProjects) {
+						logger.info(`User ${username} has not been assigned any projects`);
+						emsg = "noProjectsAssigned";
+					} else {
+						emsg = "ok";
+						res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed:true});
+						req.session.userid = userid;
+						req.session.ip = ip;
+						req.session.loggedin = (new Date()).toISOString();
+						req.session.username = username;
+						req.session.uniqueId = req.session.id;;
+						req.session.usertype = user.type;
+						logger.rewriters[0] = function(level, msg, meta) {
+							meta.username = username;
+							meta.userid = userid;
+							meta.userip = ip;
+							return meta;
+						};
+					}
+				}
+			} catch (err) {
+				logger.error("User Authentication failed. Error: ", err);
+				emsg = "fail";
+			}
+		}
+		req.session.logged = true;
+		if (emsg != "ok") req.clearSession();
+		return res.send(emsg);
+	} catch (exception) {
+		logger.error(exception.message);
+		req.clearSession();
 		res.send("fail");
 	}
 };

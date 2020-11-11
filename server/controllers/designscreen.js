@@ -402,6 +402,28 @@ exports.updateScreen_ICE = function (req, res) {
 				} catch (exception) {
 					logger.error("Exception from the service updateScreen_ICE: updateScrapeData_ICE: %s",exception);
 				}
+			}else if (param == "importScreen") {
+				try {
+					scrapedObjects.view = newData.view;
+					scrapedObjects.mirror = newData.mirror;
+					scrapedObjects.scrapedurl = newData.scrapedurl;
+					scrapedObjects = JSON.stringify(scrapedObjects);
+					scrapedObjects = scrapedObjects.replace(/'+/g, "''");
+					inputs = {
+						"scrapedata": scrapedObjects,
+						"modifiedby": modifiedByID,
+						"modifiedByrole":modifiedByrole,
+						"screenid": screenID,
+						"projectid": projectID,
+						"screenname": screenName,
+						"versionnumber": requestedversionnumber,
+						"type": "importScreen"
+					};
+					logger.info("Calling final function from the service updateScreen_ICE: importScreen");
+					finalFunction(newData);
+				} catch (exception) {
+					logger.error("Exception from the service updateScreen_ICE: importScreen: %s",exception);
+				}
 			}else if (param == "mapScrapeData_ICE") {
 				//add double type check tag=[button,textbox..]
 				updateObj = updateData.toMerge

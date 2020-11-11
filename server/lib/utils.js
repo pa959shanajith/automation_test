@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const logger = require('../../logger');
 const myserver = require('../../server');
+const cache = require('./cache');
 const redisServer = require('./redisSocketHandler');
 const taskflow = require('../config/options').strictTaskWorkflow;
 const epurl = process.env.DAS_URL;
@@ -138,6 +139,11 @@ const fetchData = async (inputs, url, from, all) => {
 	from = (from)? " from " + from : "";
 	const query = (inputs.query)? " - " + inputs.query:"";
 	logger.info("Calling DAS Service: " + url + from + query);
+	// Check if value is available in cache
+	if (cache.checkapi(url)) {
+		const cacheData = await cache.getapi(url, inputs);
+		if (cacheData) return cacheData;
+	}
 	const promiseData = (new Promise((rsv, rej) => {
 		const apiReq = client.post(epurl + url, args, (result, response) => {
 			if (response.statusCode != 200 || result.rows == "fail") {
@@ -149,6 +155,9 @@ const fetchData = async (inputs, url, from, all) => {
 				else rsv("fail");
 			} else {
 				result = (result.rows === undefined)? result:result.rows;
+				if (cache.checkapi(url) && result != "fail") {
+					cache.setapi(url, inputs, result);
+				}
 				if (all) rsv([result, response]);
 				else rsv(result);
 			}
@@ -163,6 +172,7 @@ const fetchData = async (inputs, url, from, all) => {
 
 module.exports.getChannelNum = getChannelNum_cb;
 module.exports.fetchData = fetchData;
+module.exports.cache = cache;
 
 module.exports.tokenValidation = async (userInfo) => {
 	var validUser = false;
@@ -181,6 +191,7 @@ module.exports.tokenValidation = async (userInfo) => {
 	if (response != "fail" && response != "invalid") validUser = bcrypt.compareSync(userInfo.tokenhash || "", response.hash);
 	if (validUser) {
 		userInfo.userid = response.userid;
+		userInfo.username = response.username;
 		userInfo.role = response.role;
 		if(response.deactivated == "active") {
 			tokenValidation.status = "passed";
@@ -207,21 +218,9 @@ exports.originalURL = function(req) {
 	const trustProxy = (app && app.get && app.get('trust proxy'));
 	const proto = (req.headers['x-forwarded-proto'] || '').toLowerCase();
 	const tls = req.connection.encrypted || (trustProxy && 'https' == proto.split(/\s*,\s*/)[0]);
-	const host = (trustProxy && req.headers['x-forwarded-host']) || req.headers.host;
 	const protocol = tls ? 'https' : 'http';
+	const host = (trustProxy && req.headers['x-forwarded-host']) || req.headers.host;
+	const base = req.baseUrl || '';
 	const path = req.url || '';
-	return protocol + '://' + host + path;
+	return protocol + '://' + host + base+ path;
 };
-
-/*module.exports.cache = {
-	get: function get(key, cb) {
-		redisServer.cache.get(key, function(err, data) {
-			console.log(typeof(data), data[0]);
-			if (data) cb(data);
-			else cb({});
-		});
-	},
-	set: function set(key, data) {
-		redisServer.cache.set(key, data);
-	},
-};*/

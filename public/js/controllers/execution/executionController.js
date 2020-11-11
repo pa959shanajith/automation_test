@@ -5,6 +5,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	var executionActive = false;
 	var rowId;
 	var execAction = "serial";
+	var execEnv = "default";
 	$scope.moduleInfo = [];
 	$scope.somevar = {};
 	$("body").css("background", "#eee");
@@ -729,6 +730,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			var executionData = {
 				source: "task",
 				exectionMode: execAction,
+				executionEnv: execEnv,
 				browserType: browserTypeExe,
 				qccredentials: $scope.qccredentials,
 				batchInfo: $scope.moduleInfo
@@ -749,6 +751,11 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				else if(data == "Modified") openDialogExe("Execute Test Suite", "Task has been modified, Please approve the task");
 				else if (data == "unavailableLocalServer") openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
 				else if (data == "Terminate") {
+					$('#executionTerminatedBy').html('Program');
+					$('#executionTerminated').modal('show');
+					$('#executionTerminated').find('.btn-default').focus();
+				} else if (data == "UserTerminate") {
+					$('#executionTerminatedBy').html('User');
 					$('#executionTerminated').modal('show');
 					$('#executionTerminated').find('.btn-default').focus();
 				} else if (data == "success") {
@@ -759,8 +766,10 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				} else openDialogExe("Execute Test Suite", "Failed to execute.");
 				$(".selectBrowser").find("img").removeClass("sb");
 				$(".selectParallel").find("img").removeClass("sb");
+				$(".selectSauceLabs").find("img").removeClass("sb");
 				$(".selectBrowser").find("svg").removeClass("sb");
 				$(".selectParallel").find("svg").removeClass("sb");
+				$(".selectSauceLabs").find("svg").removeClass("sb");
 				browserTypeExe = [];
 				$scope.moduleInfo = [];
 				$scope.readTestSuite_ICE();
@@ -780,8 +789,10 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				//$('#executionFailed').modal('show');
 				$(".selectBrowser").find("img").removeClass("sb");
 				$(".selectParallel").find("img").removeClass("sb");
+				$(".selectSauceLabs").find("img").removeClass("sb");
 				$(".selectBrowser").find("svg").removeClass("sb");
 				$(".selectParallel").find("svg").removeClass("sb");
+				$(".selectSauceLabs").find("svg").removeClass("sb");
 				browserTypeExe = [];
 				$scope.moduleInfo = [];
 				$scope.readTestSuite_ICE();
@@ -794,6 +805,11 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		if (!executionActive)
 			return false;
 		if (data == "Terminate") {
+			$('#executionTerminatedBy').html('Program');
+			$('#executionTerminated').modal('show');
+			$('#executionTerminated').find('.btn-default').focus();
+		} else if (data == "UserTerminate") {
+			$('#executionTerminatedBy').html('User');
 			$('#executionTerminated').modal('show');
 			$('#executionTerminated').find('.btn-default').focus();
 		} else if (data == "unavailableLocalServer") {
@@ -932,6 +948,17 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			execAction = "parallel";
 		} else {
 			execAction = "serial";
+		}
+	});
+
+	//select Saucelabs execution
+	$(document).on("click", ".selectSaucelabs", function () {
+		$(this).find("img").toggleClass("sb");
+		$(this).find("svg").toggleClass("sb");
+		if ($("img").hasClass('sb') == true || $("svg").hasClass('sb') == true) {
+			execEnv = "Saucelabs";
+		} else {
+			execEnv = "default";
 		}
 	});
 
