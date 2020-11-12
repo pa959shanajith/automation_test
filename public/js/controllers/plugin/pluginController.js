@@ -43,6 +43,12 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	});
 	//$("#plugin-container").addClass("inactiveLink");
 	if(userInfo) {
+		if (userInfo.eulaData == "fail"){
+			var mainModal = $("#tAndCpop");
+			// mainModal.find('.modal-title').text(title);
+			// mainModal.find('.modal-body p').text(body);
+			mainModal.modal("show");
+		}
 		$rootScope.plugins = [];
 		var availablePlugins = userInfo.pluginsInfo;
 		var pluginsLength = availablePlugins.length;
@@ -319,6 +325,17 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 
 	window.localStorage['_TJ'] = "";
 	window.localStorage['_CT'] = "";
+
+	$scope.logout = function($event){
+		//Transaction Activity for Logout Button Action
+		// var labelArr = [];
+		// var infoArr = [];
+		// labelArr.push(txnHistory.codesDict['Logout']);
+		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+		window.sessionStorage.clear();
+		window.sessionStorage["checkLoggedOut"] = true;
+		$rootScope.redirectPage();
+	};
 
 	$scope.taskRedirection = function(testsuitedetails,dataobj,event){
 		//Transaction Activity for Task Navigation
