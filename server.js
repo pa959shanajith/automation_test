@@ -158,6 +158,8 @@ if (cluster.isMaster) {
 		const authconf = authlib();
 		const auth = authconf.auth;
 		app.use(authconf.router);
+		var queue = require("./server/lib/executionQueue")
+		queue.Execution_Queue.queue_init()
 
 		//Based on NGINX Config Security Headers are configured
 		if (!nginxEnabled) {
@@ -522,6 +524,10 @@ if (cluster.isMaster) {
 		app.post('/getPreferences', auth.protect, admin.getPreferences);
 		app.post('/provisionIce', auth.protect, admin.provisionICE);
 		app.post('/fetchICE', auth.protect, admin.fetchICE);
+		app.post('/getICEinPools', auth.protect, admin.getICEinPools);
+		app.post('/updatePool', auth.protect, admin.updatePool);
+		app.post('/getUnassigned_ICE', auth.protect, admin.getUnassigned_ICE);
+		app.post('/createPool_ICE', auth.protect, admin.createPool_ICE);
 
 		//Design Screen Routes
 		app.post('/initScraping_ICE', designscreen.initScraping_ICE);

@@ -213,7 +213,8 @@ exports.originalURL = function(req) {
 	return protocol + '://' + host + path;
 };
 
-/*module.exports.cache = {
+// These function get and store data from Redis
+module.exports.cache = {
 	get: function get(key, cb) {
 		redisServer.cache.get(key, function(err, data) {
 			console.log(typeof(data), data[0]);
@@ -224,4 +225,4 @@ exports.originalURL = function(req) {
 	set: function set(key, data) {
 		redisServer.cache.set(key, data);
 	},
-};*/
+};

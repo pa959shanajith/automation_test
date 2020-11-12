@@ -1737,3 +1737,98 @@ exports.provisionICE = async (req, res) => {
 		res.send("fail");
 	}
 };
+// UI service to create a new ICE pool
+exports.createPool_ICE = async(req,res) => {
+	const fnName = "createPools_ICE"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const poolinfo = req.body.tokeninfo;
+		const inputs = {
+			poolname: poolinfo.poolname,
+			createdby: poolinfo.createdby,
+			createdon: poolinfo.createdon,
+			projectids: poolinfo.projectids,
+			modifiedby: "",
+			modifiedon: ""
+		};
+		const result = await utils.fetchData(inputs, "admin/createPool_ICE", fnName);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in admin/createPools_ICE:", exception);
+		res.send("fail");
+	}
+} 
+// UI service to get relevant unassigned ICE
+exports.getUnassigned_ICE = async(req,res) => {
+	const fnName = "getUnassigned_ICE"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const poolinfo = req.body.tokeninfo;
+		const inputs = {
+			poolname: poolinfo.poolname,
+			poolid: poolinfo.createdby,
+			projectids: poolinfo.projectids,
+		};
+		const result = await utils.fetchData(inputs, "admin/getUnassgined_ICE", fnName);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in admin/getUnassigned_ICE:", exception);
+		res.send("fail");
+	}
+} 
+// UI service to update a pool
+exports.updatePool = async(req,res) => {
+	const fnName = "updatePool"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const poolinfo = req.body.tokeninfo;
+		const inputs = {
+			poolname: poolinfo.poolname,
+			projectids: poolinfo.projectids,
+			ice_added: poolinfo.ice_added,
+			ice_deleted: poolinfo.ice_deleted,
+			updatedby: poolinfo.updatedby,
+			updatedon: new Date().toUTCString()
+
+		};
+		const result = await utils.fetchData(inputs, "admin/updatePool_ICE", fnName);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in admin/provisionICE:", exception);
+		res.send("fail");
+	}
+}
+// UI service to get pools from projectids / poolid
+exports.getPools = async(req,res) => {
+	const fnName = "getPools"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const poolinfo = req.body.tokeninfo;
+		const inputs = {
+			poolid: poolinfo.poolid,
+			projectids: poolinfo.projectids,
+		};
+		const result = await utils.fetchData(inputs, "admin/getPools", fnName);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in admin/provisionICE:", exception);
+		res.send("fail");
+	}
+}
+// UI service to get ICE in pool from poolid
+exports.getICEinPools = async(req,res) => {
+	const fnName = "getICEinPools"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const poolinfo = req.body.tokeninfo;
+		const inputs = {
+			poolid: poolinfo.poolid,
+		};
+		const result = await utils.fetchData(inputs, "admin/getICE_pools", fnName);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in admin/provisionICE:", exception);
+		res.send("fail");
+	}
+}
+

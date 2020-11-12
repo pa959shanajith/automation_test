@@ -191,6 +191,36 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 				tokeninfo:tokeninfo
 			}).then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
-		}
+		},
+		createPool_ICE: function (tokeninfo) {
+			return $http.post('/createPool_ICE',{
+				tokeninfo:tokeninfo
+			}).then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		getUnassigned_ICE: function (tokeninfo) {
+			return $http.post('/getUnassigned_ICE',{
+				tokeninfo:tokeninfo
+			}).then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		updatePool: function (tokeninfo) {
+			return $http.post('/updatePool',{
+				tokeninfo:tokeninfo
+			}).then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		getPools: function (tokeninfo) {
+			return $http.post('/getPools',{
+				tokeninfo:tokeninfo
+			}).then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		getICEinPools: function (tokeninfo) {
+			return $http.post('/getICEinPools',{
+				tokeninfo:tokeninfo
+			}).then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
 	};
 }]);
