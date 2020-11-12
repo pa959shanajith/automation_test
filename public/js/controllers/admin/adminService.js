@@ -187,9 +187,31 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			function(response) { return $q.reject(response.data) });
 		},
 		provisions: function (tokeninfo) {
-			return $http.post('/provisionIce',{
-				tokeninfo:tokeninfo
-			}).then(function(response) { return response.data },
+			return $http.post('/provisionIce',{ tokeninfo })
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		testNotificationChannels: function (channel, provider, recipient, conf) {
+			return $http.post('/testNotificationChannels', { channel, provider, recipient, conf })
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		manageNotificationChannels: function (action, conf) {
+			return $http.post('/manageNotificationChannels', { action, conf })
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		getNotificationChannels: function (action, channel, args) {
+			return $http.post('/getNotificationChannels', { action, channel, args })
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		exportProject: function (projectId,projectName) {
+			return $http.post('/exportProject',{
+				projectId:projectId,
+				projectName:projectName
+			},{responseType:'arraybuffer'})
+			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
 		createPool_ICE: function (tokeninfo) {

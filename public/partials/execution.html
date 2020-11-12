@@ -113,6 +113,7 @@
 			<div id="left-bottom-section" class="lbs-single">
 				<ul>
 					<li ng-if="getScreenView == 'Web'"><a class="selectParallel" href='#' title="Parallel Execution"><span><img src='imgs/ic-parallel.png' alt='Parallel' height='55' width='57'/></span><font size="2">Parallel Execution</font></a></li>
+					<li ng-if="getScreenView == 'Web'"><a class="selectSaucelabs" href='#' title="SauceLabs Execution"><span><img src='imgs/saucelabs.png' alt='Saucelabs' height='55' width='57'/></span><font size="2">SauceLabs Execution</font></a></li>
 					<li><a href='#' onclick="p_redirect('scheduling')" title="Scheduling"><span><img src='imgs/ic-scheduling.png' alt='Scheduling' /></span>Schedule</a></li>
 				</ul>
 			</div>
@@ -280,7 +281,7 @@
 				<h4 class="modal-title">Execute Test Suite</h4>
 			</div>
 			<div class="modal-body">
-				<p>Execution terminated - By User/Program <br /> Go to <a style="color: #643693; font-family: 'LatoWebHeavy'" href="#" onclick="p_redirect('p_Reports')">Reports</a></p>
+				<p>Execution terminated - By <span id="executionTerminatedBy">User/Program</span> <br /> Go to <a style="color: #643693; font-family: 'LatoWebHeavy'" href="#" onclick="p_redirect('p_Reports')">Reports</a></p>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>

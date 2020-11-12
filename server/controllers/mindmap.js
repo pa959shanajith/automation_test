@@ -1464,3 +1464,79 @@ var encrypt = (data) => {
 	const encryptedData = cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
 	return 	encryptedData.toUpperCase();
 }
+
+
+exports.exportMindmap = function (req, res) {
+	logger.info("Inside UI service: exportMindmap");
+	if (utils.isSessionActive(req)) {
+		var d = req.body;
+		var mindmapId = d.mindmapId;
+		var inputs= {
+			"mindmapId":mindmapId,
+			"query":"exportMindmap"
+		}
+		var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
+
+		client.post(epurl+"mindmap/exportMindmap", args,
+		function (result, response) {
+			try {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.error("Error occurred in mindmap/exportMindmap: exportMindmap, Error Code : ERRDAS");
+					res.send("fail");
+				} else {
+					res.send(result.rows);
+				}
+			} catch (ex) {
+				logger.error("Exception in the service exportMindmap: %s", ex);
+			}
+		});
+		
+	}
+	else {
+		logger.error("Invalid Session");
+		res.send("Invalid Session");
+	}
+};
+
+
+exports.importMindmap = function (req, res) {
+	logger.info("Inside UI service: importMindmap");
+	if (utils.isSessionActive(req)) {
+		var d = req.body;
+		var content = d.content;
+		var inputs= {
+			"mindmap":content,
+			"query":"importMindmap"
+		}
+		var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
+
+		client.post(epurl+"mindmap/importMindmap", args,
+		function (result, response) {
+			try {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.error("Error occurred in mindmap/importMindmap: importMindmap, Error Code : ERRDAS");
+					res.send("fail");
+				} else {
+					res.send(result.rows);
+				}
+			} catch (ex) {
+				logger.error("Exception in the service importMindmap: %s", ex);
+			}
+		});
+		
+	}
+	else {
+		logger.error("Invalid Session");
+		res.send("Invalid Session");
+	}
+};
