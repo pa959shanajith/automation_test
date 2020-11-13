@@ -1,71 +1,79 @@
-import React, { useState, useEffect, memo } from 'react';
-import DetailsDialog from './DetailsDialog';
-import { ModalContainer } from "../../global";
+import React, { useState, useEffect, memo, useRef } from 'react';
 
 
-const shouldRender = (prevProps, nextProps) => {
-    // console.log(prevProps.edit, nextProps.edit)
-    // console.log(prevProps, nextProps)
-    // if (deepEqual(prevProps.testCase, nextProps.testCase) === false &&  nextProps.edit === false && prevProps.edit === false){
-    //     return false
-    // }
-    if (prevProps.edit && nextProps.edit){
-        // console.log(prevProps.idx !== nextProps.focusedRow && prevProps.focusedRow !== nextProps.idx)
-        // console.log(prevProps.idx, prevProps.focusedRow, nextProps.focusedRow)
-        return prevProps.idx !== nextProps.focusedRow && prevProps.focusedRow !== nextProps.idx;
-        // return false
-    }
-    else {
-        return false
-    }
-}
+// const shouldRender = (prevProps, nextProps) => {
+//     // console.log(prevProps.edit, nextProps.edit)
+//     // console.log(prevProps, nextProps)
+//     // if (deepEqual(prevProps.testCase, nextProps.testCase) === false &&  nextProps.edit === false && prevProps.edit === false){
+//     //     return false
+//     // }
+//     if (prevProps.edit && nextProps.edit){
+//         // console.log(prevProps.idx !== nextProps.focusedRow && prevProps.focusedRow !== nextProps.idx)
+//         // console.log(prevProps.idx, prevProps.focusedRow, nextProps.focusedRow)
+//         return prevProps.idx !== nextProps.focusedRow && prevProps.focusedRow !== nextProps.idx;
+//         // return false
+//     }
+//     else {
+//         return false
+//     }
+// }
 
-function deepEqual(object1, object2) {
-    const keys1 = Object.keys(object1);
-    const keys2 = Object.keys(object2);
+// function deepEqual(object1, object2) {
+//     const keys1 = Object.keys(object1);
+//     const keys2 = Object.keys(object2);
 
-    if (keys1.length !== keys2.length) {
-        return false;
-    }
+//     if (keys1.length !== keys2.length) {
+//         return false;
+//     }
 
-    for (const key of keys1) {
-        const val1 = object1[key];
-        const val2 = object2[key];
-        const areObjects = isObject(val1) && isObject(val2);
-        if (
-        areObjects && !deepEqual(val1, val2) ||
-        !areObjects && val1 !== val2
-        ) {
-        return false;
-        }
-    }
+//     for (const key of keys1) {
+//         const val1 = object1[key];
+//         const val2 = object2[key];
+//         const areObjects = isObject(val1) && isObject(val2);
+//         if (
+//         areObjects && !deepEqual(val1, val2) ||
+//         !areObjects && val1 !== val2
+//         ) {
+//         return false;
+//         }
+//     }
 
-    return true;
-}
+//     return true;
+// }
 
-function isObject(object) {
-return object != null && typeof object === 'object';
-}
+// function isObject(object) {
+// return object != null && typeof object === 'object';
+// }
 
 
 const TableRow = (props) => {
 
-    const [checked, setChecked] = useState(props.checkedRows.includes(props.idx));
-    const [objName, setObjName] = useState(props.testCase.custname);
+    const rowRef = useRef(null);
+    // const [checked, setChecked] = useState(props.checkedRows.includes(props.idx));
+    const [checked, setChecked] = useState(null);
+    // const [objName, setObjName] = useState(props.testCase.custname);
+    const [objName, setObjName] = useState(null);
     const [objType, setObjType] = useState(null);
-    const [keyword, setKeyword] = useState(props.testCase.keywordVal);
-    const [input, setInput] = useState(props.testCase.inputVal[0]);
-    const [output, setOutput] = useState(props.testCase.outputVal);
+    // const [keyword, setKeyword] = useState(props.testCase.keywordVal);
+    const [keyword, setKeyword] = useState(null);
+    // const [input, setInput] = useState(props.testCase.inputVal[0]);
+    const [input, setInput] = useState(null);
+    // const [output, setOutput] = useState(props.testCase.outputVal);
+    const [output, setOutput] = useState(null);
     const [inputPlaceholder, setInputPlaceholder] = useState(null);
     const [outputPlaceholder, setOutputPlaceholder] = useState(null);
     const [keywordList, setKeywordList] = useState(null);
-    const [focused, setFocused] = useState(props.focusedRow === props.idx);
+    // const [focused, setFocused] = useState(props.focusedRow === props.idx);
+    const [focused, setFocused] = useState(false);
     let objList = props.objList;
     const [highlight, setHighlight] = useState(false);
-    const [commented, setCommented] = useState(props.testCase.outputVal.slice(-2) === "##");
-    const [remarks, setRemarks] = useState(props.testCase.remarks.split(";").filter(remark => remark.trim()!==""));
-    const [TCDetails, setTCDetails] = useState(props.testCase.addTestCaseDetailsInfo === "" ? "" : JSON.parse(props.testCase.addTestCaseDetailsInfo));
-
+    // const [commented, setCommented] = useState(props.testCase.outputVal.slice(-2) === "##");
+    const [commented, setCommented] = useState(false);
+    // const [remarks, setRemarks] = useState(props.testCase.remarks.split(";").filter(remark => remark.trim()!==""));
+    const [remarks, setRemarks] = useState([]);
+    // const [TCDetails, setTCDetails] = useState(props.testCase.addTestCaseDetailsInfo === "" ? "" : JSON.parse(props.testCase.addTestCaseDetailsInfo));
+    const [TCDetails, setTCDetails] = useState("");
+    
     useEffect(()=>{
         setObjName(props.testCase.custname);
         setObjType(null);
@@ -89,6 +97,7 @@ const TableRow = (props) => {
         if (props.edit){
             if (props.focusedRow === props.idx){
                 setFocused(true);
+                rowRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'});
                 let caseData = null;
                 let placeholders = null;
                 if (objName && keyword){
@@ -123,6 +132,9 @@ const TableRow = (props) => {
         if (props.focusedRow !== props.idx) {
             setFocused(false);
             setHighlight(false);
+        }
+        if (props.focusedRow !== null && typeof props.focusedRow === "object" && props.focusedRow.includes(props.idx)) {
+            rowRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'});
         }
     });
 
@@ -178,7 +190,7 @@ const TableRow = (props) => {
     
     return (
         <>
-        <div className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + (highlight || (props.focusedRow!== null  && typeof props.focusedRow === "object" && props.focusedRow.includes(props.idx)) ? " highlight-step" : "") + (props.edit ? " d__table_row_edit": "")}>
+        <div ref={rowRef} className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + (highlight || (props.focusedRow!== null  && typeof props.focusedRow === "object" && props.focusedRow.includes(props.idx)) ? " highlight-step" : "") + (props.edit ? " d__table_row_edit": "")}>
             {/* {console.log(`rendered ${props.idx+1} ${props.testCase.outputVal}`)} */}
             <span className="step_col" onClick={onRowClick}>{props.idx + 1}</span>
             <span className="sel_col"><input className="sel_obj" type="checkbox" checked={checked} onClick={onBoxCheck}/></span>

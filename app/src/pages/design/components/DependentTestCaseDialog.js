@@ -3,32 +3,52 @@ import Handlebars from 'handlebars';
 import { Link, useHistory } from 'react-router-dom';
 import { useSelector } from "react-redux";
 import { ModalContainer, ScrollBar, Report, RedirectPage } from '../../global';
-import { readTestCase_ICE } from '../api';
+import { readTestCase_ICE, getTestcasesByScenarioId_ICE } from '../api';
 import "../styles/DependentTestCaseDialog.scss";
 
 const DependentTestCaseDialog = props => {
 
-    const [check, setCheck] = useState(false);
+    const history = useHistory();
     const [tcList, setTcList] = useState([]);
     const [checkList , setCheckList] = useState([]);
     const [error, setError] = useState("");
 
     useEffect(()=>{
-        let testCases = [];
-        let disableAndBlock = false;
-        if (props.checkedTc <= 0) setCheck(true);
-        else setCheck(false);
 
-        for (let testCase of props.testCaseList) {
-            let tc = testCase;
-            if (tc.testCaseName === props.taskName) disableAndBlock = true;
-            tc.disableAndBlock = disableAndBlock;
+        let dependentTestCases = []
+        getTestcasesByScenarioId_ICE(props.scenarioId)
+        .then(data => {
+            if (data === "Invalid Session") return RedirectPage(history);
+            else{
+                for (let i = 0; i < data.length; i++) {
+                    dependentTestCases.push({'testCaseID': data[i].testcaseId, 'testCaseName': data[i].testcaseName})
+                }
+                
+                let testCases = [];
+                let newCheckedTc = [];
+                let disableAndBlock = true;
 
-            if (props.checkedTc.includes(tc.testCaseID) && props.taskName !== tc.testCaseName) tc.checked = true;
-
-            testCases.push(tc);
-            setTcList(testCases);
-        }
+                let reversedDtc = [...dependentTestCases].reverse();
+                
+                for (let testCase of reversedDtc) {
+                    let tc = testCase;
+                    tc.disableAndBlock = disableAndBlock;
+                    if (tc.testCaseName === props.taskName) disableAndBlock = false;
+                    if (props.checkedTc <= 0 && !disableAndBlock) {
+                        newCheckedTc.push(tc.testCaseID)
+                    }
+        
+                    if (props.checkedTc.includes(tc.testCaseID) && props.taskName !== tc.testCaseName) newCheckedTc.push(tc.testCaseID);
+        
+                    testCases.push(tc);
+                }
+                
+                testCases.reverse();
+                setTcList(testCases);
+                setCheckList(newCheckedTc);
+            }
+        })
+        .catch(error => console.error("ERROR::::", error));
     }, []);
 
     const onSave = () => {
@@ -40,17 +60,12 @@ const DependentTestCaseDialog = props => {
         } else {
             setError("");
             checkedTestcases = [...checkList];
-            
-            if (checkedTestcases.length > 0) {
-                checkedTestcases.push(props.taskId);
-                props.setShowDlg(false);
-                props.setShowPop({'title': 'Dependent Test Cases', 'content': 'Dependent Test Cases saved successfully'});
-                props.setDTcFlag(true);
-                props.setCheckedTc(checkedTestcases);
-            } else {
-                props.setShowDlg(false);
-                props.setShowPop({'title': 'Dependent Test Cases', 'content': 'Failed to save dependent testcases'});
-            }
+
+            checkedTestcases.push(props.taskId);
+            props.setShowDlg(false);
+            props.setShowPop({'title': 'Dependent Test Cases', 'content': 'Dependent Test Cases saved successfully'});
+            props.setDTcFlag(true);
+            props.setCheckedTc(checkedTestcases);
         }
     }
 
@@ -86,7 +101,11 @@ const TestCaseItem = ({testCase, setCheckList, checkList}) => {
 
     const history =  useHistory();
     const userInfo = useSelector(state=>state.login.userinfo);
-    const [check, setCheck] = useState(testCase.disableAndBlock ? false : testCase.checked);
+    const [check, setCheck] = useState(false);
+
+    useEffect(()=>{
+        setCheck(testCase.disableAndBlock ? false : checkList.includes(testCase.testCaseID));
+    }, [checkList]);
 
     const handleCheck = event => {
         let cl = [...checkList];

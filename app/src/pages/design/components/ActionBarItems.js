@@ -5,7 +5,7 @@ import { Thumbnail, ResetSession, RedirectPage } from '../../global';
 import * as DesignApi from "../api";
 import "../styles/ActionBarItems.scss"
 
-const UpperContent = ({isMac, disable, setOverlay, setShowPop, testCaseId, setTcList, setShowDlg, dTcFlag, checkedTc, showDlg}) => {
+const UpperContent = ({setDTcFlag, isMac, disable, setOverlay, setShowPop, setShowDlg, dTcFlag, checkedTc, showDlg}) => {
 
     const userInfo = useSelector(state=>state.login.userinfo);
     const current_task = useSelector(state=>state.plugin.CT);
@@ -15,7 +15,7 @@ const UpperContent = ({isMac, disable, setOverlay, setShowPop, testCaseId, setTc
     const [dependCheck, setDependCheck] = useState(false);
 
     useEffect(()=>{
-        if (!showDlg) setDependCheck(false);
+        if (!showDlg) setDependCheck(dTcFlag);
     }, [showDlg]);
 
     const WebList = [
@@ -43,21 +43,11 @@ const UpperContent = ({isMac, disable, setOverlay, setShowPop, testCaseId, setTc
     const mainframeList = [{'title': "Mainframe", 'img': "static/imgs/ic-mainframe-o.png", action: ()=>debugTestCases()}]
 
     const addDependentTestCase = event => {
-        if (!event.target.checked) setDependCheck(false);
-        else {
-			DesignApi.getTestcasesByScenarioId_ICE(current_task.scenarioId)
-            .then(data => {
-                if (data === "Invalid Session") RedirectPage(history);
-                let dependentTestCases = []
-                for (let i = 0; i < data.length; i++) {
-                    dependentTestCases.push({'testCaseID': data[i].testcaseId, 'testCaseName': data[i].testcaseName})
-                }
-                setTcList(dependentTestCases);
-                setDependCheck(true);
-                setShowDlg(true);
-            })
-            .catch(error => console.error("ERROR::::", error));
+        if (!event.target.checked) {
+            setDependCheck(false);
+            setDTcFlag(false);
         }
+        else setShowDlg(true);
     }
 
     let renderComp = [
@@ -76,8 +66,8 @@ const UpperContent = ({isMac, disable, setOverlay, setShowPop, testCaseId, setTc
         
         // globalSelectedBrowserType = selectedBrowserType;
 
-        if (dTcFlag === true) testcaseID = checkedTc;
-        else testcaseID.push(testCaseId);
+        if (dTcFlag) testcaseID = checkedTc;
+        else testcaseID.push(current_task.testCaseId);
     
         setOverlay('Debug in Progress. Please Wait...');
         ResetSession.start();
@@ -119,17 +109,29 @@ const UpperContent = ({isMac, disable, setOverlay, setShowPop, testCaseId, setTc
             });
     };
 
-    if (appType === "Web") {renderComp.splice(1, 0, <Fragment key={2}>
-                                {WebList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} svg={icon.svg} action={icon.action}/>)}
-                                { isMac && <Thumbnail title="Safari" img="static/imgs/ic-safari.png" action={()=>debugTestCases('6')}/>}</Fragment>)}
-    else if (appType === "OEBS") renderComp.splice(1, 0, <Fragment key={2}>{oebsList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>)
-    else if (appType === "Desktop") renderComp.splice(1, 0, <Fragment key={2}>{desktopList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>)
-    else if (appType === "System") renderComp.splice(1, 0, <Fragment key={2}>{systemList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>)
-    else if (appType === "SAP") renderComp.splice(1, 0, <Fragment key={2}>{sapList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>)
-    else if (appType === "Webservice") renderComp.splice(1, 0, <Fragment key={2}>{webserviceList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action}/>)}</Fragment>)
-    else if (appType === "MobileApp") renderComp.splice(1, 0, <Fragment key={2}>{mobileAppList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>)
-    else if (appType === "MobileWeb") renderComp.splice(1, 0, <Fragment key={2}>{mobileWebList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>)
-    else if (appType === "Mainframe") renderComp.splice(1, 0, <Fragment key={2}>{mainframeList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>)
+    
+    switch(appType) {
+        case "Web": renderComp.splice(1, 0, <Fragment key={2}> { WebList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} svg={icon.svg} action={icon.action}/>)}
+                                            { isMac && <Thumbnail title="Safari" img="static/imgs/ic-safari.png" action={()=>debugTestCases('6')}/>}</Fragment>);
+                    break;
+        case "OEBS": renderComp.splice(1, 0, <Fragment key={2}>{oebsList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>);
+                    break;
+        case "Desktop": renderComp.splice(1, 0, <Fragment key={2}>{desktopList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>);
+                        break;
+        case "System": renderComp.splice(1, 0, <Fragment key={2}>{systemList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>);
+                        break;
+        case "SAP": renderComp.splice(1, 0, <Fragment key={2}>{sapList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>);
+                    break;
+        case "Webservice": renderComp.splice(1, 0, <Fragment key={2}>{webserviceList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action}/>)}</Fragment>);
+                            break;
+        case "MobileApp": renderComp.splice(1, 0, <Fragment key={2}>{mobileAppList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>);
+                            break;
+        case "MobileWeb": renderComp.splice(1, 0, <Fragment key={2}>{mobileWebList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>);
+                            break;
+        case "Mainframe": renderComp.splice(1, 0, <Fragment key={2}>{mainframeList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>);
+                            break;
+        default: break;
+    }
     
     return renderComp;
 };

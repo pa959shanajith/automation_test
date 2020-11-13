@@ -1,6 +1,5 @@
 import React, {useEffect} from 'react';
 import TableRow from './TableRow';
-import { ScrollBar } from '../../global'
 import "../styles/TableContents.scss"
 
 const TableContents = (props) => {

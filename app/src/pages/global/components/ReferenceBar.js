@@ -100,10 +100,11 @@ const ReferenceBar = (props) => {
                 'Release' : current_task.releaseid,
                 'Cycle' : dataDict.cycleDict[current_task.cycleid]
             }
+            setSearchValue("");
             setShowTask(false);
             setTaskInfo(info);
         }
-    }, [current_task.taskName]);
+    }, [current_task]);
 
     const onSearchHandler = event => {
         searchTask(event.target.value)
@@ -133,6 +134,7 @@ const ReferenceBar = (props) => {
         closePopups();
         setTaskPopY(event.clientY)
         setShowTask(!showTask)
+        setSearchValue("");
     }
 
     const toggleInfoPop = event => {
@@ -167,7 +169,7 @@ const ReferenceBar = (props) => {
                                 <div id='task_pop_scroll' className="task_pop__overflow">
                                     <ScrollBar scrollId='task_pop_scroll' trackColor="#46326b" thumbColor="#fff">
                                         <div className="task_pop__content" id="rb__pop_list">
-                                            <TaskContents items={searchValue ? searchItems : taskList} taskName={current_task.taskName} cycleDict={dataDict.cycleDict} taskJson={tasksJson}/>
+                                            <TaskContents items={searchValue ? searchItems : taskList} testCaseId={current_task.testCaseId} cycleDict={dataDict.cycleDict} taskJson={tasksJson}/>
                                         </div>
                                     </ScrollBar>
                                 </div>

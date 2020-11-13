@@ -5,6 +5,8 @@ import { ReactSortable } from 'react-sortablejs';
 import { ScreenOverlay, RedirectPage, PopupMsg, ScrollBar, ModalContainer } from '../../global'
 import TableContents from '../components/TableContents';
 import DetailsDialog from '../components/DetailsDialog';
+import RemarkDialog from '../components/RemarkDialog';
+import PasteStepDialog from '../components/PasteStepDialog';
 import * as DesignApi from "../api";
 import { reviewTask } from "../../mindmap/api";
 import * as pluginActions from "../../plugin/state/action";
@@ -28,15 +30,11 @@ const DesignContent = (props) => {
     const [draggable, setDraggable] = useState(false);
     const [dataFormat, setDataFormat] = useState(null);
     const [objNameList, setObjNameList] = useState(null);
-    const [stepNum, setStepNum] = useState("");
     const [showConfPaste, setShowConfPaste] = useState(false);
     const [showPS, setShowPS] = useState(false);
-    const [pasteError, showPasteError] = useState("");
     const [edit, setEdit] = useState(false);
-    const [remark, setRemark] = useState("");
     const [showRemarkDlg, setShowRemarkDlg] = useState(false);
     const [showDetailDlg, setShowDetailDlg] = useState(false);
-    const [remarkError, setRemarkError] = useState(false);
     const [changed, setChanged] = useState(false);
     const [isUnderReview, setIsUnderReview] = useState(props.current_task.status === "underReview");
     const [rowChange, setRowChange] = useState(false);
@@ -57,186 +55,188 @@ const DesignContent = (props) => {
         "addTestCaseDetailsInfo": ""
     };
     // let checkArray = [];
-    const pasteErrors = { 'empty': '*Textbox cannot be empty',
-                        'invalidChar': '*Textbox cannot contain characters other than numbers seperated by single semi colon',
-                        'invalidStep': '*Please enter a valid step no'
-                    }
+    
 
     const tableActionBtnGroup = [
         {'title': 'Add Test Step', 'img': 'static/imgs/ic-jq-addstep.png', 'alt': 'Add Steps', onClick: ()=>addRow()},
         {'title': 'Edit Test Step', 'img': 'static/imgs/ic-jq-editstep.png', 'alt': 'Edit Steps', onClick:  ()=>editRow()},
         {'title': 'Drag & Drop Test Step', 'img': 'static/imgs/ic-jq-dragstep.png', 'alt': 'Drag Steps', onClick:  ()=>toggleDrag()},
         {'title': 'Copy Test Step', 'img': 'static/imgs/ic-jq-copystep.png', 'alt': 'Copy Steps', onClick:  ()=>copySteps()},
-        {'title': 'Paste Test Step', 'img': 'static/imgs/ic-jq-pastestep.png', 'alt': 'Paste Steps', onClick:  ()=>pasteSteps()},
+        {'title': 'Paste Test Step', 'img': 'static/imgs/ic-jq-pastestep.png', 'alt': 'Paste Steps', onClick:  ()=>onPasteSteps()},
         {'title': 'Skip Test Step', 'img': 'static/imgs/ic-jq-commentstep.png', 'alt': 'Comment Steps', onClick:  ()=>commentRows()}
     ]
 
     useEffect(()=>{
         if (props.imported) {
-            fetchTestCases();
-            props.setImported(false);
+            fetchTestCases()
+            .then(data=>props.setImported(false))
+            .catch(error=>console.error("Error: Fetch TestCase Failed"));
         }
     }, [props.imported]);
 
     useEffect(()=>{
-        console.log("outside")
         if (Object.keys(userInfo).length!==0 && Object.keys(props.current_task).length!==0) {
-            console.log("inside")
-            fetchTestCases();
-            setEdit(false);
-            setFocusedRow(null);
-            setCheckedRows([]);
-            setDraggable(false);
-            setChanged(false);
-            setHeaderCheck(false);
-            setIsUnderReview(props.current_task.status === "underReview")
+            fetchTestCases()
+            .then(data=>{
+                setEdit(false);
+                setFocusedRow(null);
+                setCheckedRows([]);
+                setDraggable(false);
+                setChanged(false);
+                setHeaderCheck(false);
+                setIsUnderReview(props.current_task.status === "underReview")
+            })
+            .catch(error=>console.error("Error: Fetch TestCase Failed"));
         }
     }, [userInfo, props.current_task]);
 
     const fetchTestCases = () => {
-		let taskInfo = props.current_task;
-		let testCaseId = taskInfo.testCaseId;
-		let testCaseName = taskInfo.testCaseName;
-		let versionnumber = taskInfo.versionnumber;
-		
-		setOverlay("Loading...");
-        
-        // service call # 1 - getTestScriptData service call
-		DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName, versionnumber, taskInfo.screenName)
-			.then(data => {
-				if (data === "Invalid Session") RedirectPage(history);
+		return new Promise((resolve, reject)=>{
+            let taskInfo = props.current_task;
+            let testCaseId = taskInfo.testCaseId;
+            let testCaseName = taskInfo.testCaseName;
+            let versionnumber = taskInfo.versionnumber;
+            
+            setOverlay("Loading...");
+            
+            // service call # 1 - getTestScriptData service call
+            DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName, versionnumber, taskInfo.screenName)
+            .then(data => {
+                if (data === "Invalid Session") RedirectPage(history);
                 
                 let changeFlag = false
                 let taskObj = props.current_task
                 if(data.screenName && data.screenName !== taskObj.screenName){
                     taskObj.screenName = data.screenName;
                     changeFlag = true
-				}
-				if(data.reuse && data.reuse !== taskObj.reuse){
+                }
+                if(data.reuse && data.reuse !== taskObj.reuse){
                     taskObj.reuse = "True";
                     changeFlag = true
                 }
                 if (changeFlag) dispatch({type: pluginActions.SET_CT, payload: taskObj});
 
-				if(data.del_flag){
-					//pop up for presence of deleted objects
-					props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."});
-					//disable left-top-section
-					// $("#left-top-section").addClass('disableActions');
-					// $("a[title='Export TestCase']").addClass('disableActions');
-				}
-				else{
-					//enable left-top-section
-					// $("#left-top-section").removeClass('disableActions');
-					// $("a[title='Export TestCase']").removeClass('disableActions');
-				}
-				let appType = taskInfo.appType;
-				// $('#jqGrid').removeClass('visibility-hide').addClass('visibility-show');
-				// removing the down arrow from grid header columns - disabling the grid menu pop-up
-				// $('.ui-grid-icon-angle-down').removeClass('ui-grid-icon-angle-down');
+                if(data.del_flag){
+                    //pop up for presence of deleted objects
+                    props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."});
+                    //disable left-top-section
+                    // $("#left-top-section").addClass('disableActions');
+                    // $("a[title='Export TestCase']").addClass('disableActions');
+                }
+                else{
+                    //enable left-top-section
+                    // $("#left-top-section").removeClass('disableActions');
+                    // $("a[title='Export TestCase']").removeClass('disableActions');
+                }
+                let appType = taskInfo.appType;
+                // $('#jqGrid').removeClass('visibility-hide').addClass('visibility-show');
+                // removing the down arrow from grid header columns - disabling the grid menu pop-up
+                // $('.ui-grid-icon-angle-down').removeClass('ui-grid-icon-angle-down');
                 // $("#jqGrid").jqGrid('clearGridData');
                 
-				setHideSubmit(data.testcase.length === 0);
-				
+                setHideSubmit(data.testcase.length === 0);
+                
                 
                 // $('#jqGrid').show();
                 // service call # 2 - objectType service call 
 
-				DesignApi.getScrapeDataScreenLevel_ICE(appType, taskInfo.screenId, taskInfo.projectId, taskInfo.testCaseId)
-					.then(scriptData => {
-						if (scriptData === "Invalid Session") RedirectPage(history);
-						if (appType === "Webservice"){
-							if (scriptData.view.length > 0) {
-								if (scriptData.view[0].header) setDataFormat(scriptData.view[0].header[0].split("##").join("\n"));
-								else setDataFormat(scriptData.header[0].split("##").join("\n"));
-							}	
+                DesignApi.getScrapeDataScreenLevel_ICE(appType, taskInfo.screenId, taskInfo.projectId, taskInfo.testCaseId)
+                    .then(scriptData => {
+                        if (scriptData === "Invalid Session") RedirectPage(history);
+                        if (appType === "Webservice"){
+                            if (scriptData.view.length > 0) {
+                                if (scriptData.view[0].header) setDataFormat(scriptData.view[0].header[0].split("##").join("\n"));
+                                else setDataFormat(scriptData.header[0].split("##").join("\n"));
+                            }	
                         }
                         
                         setTestScriptData(scriptData.view);
+                        props.setMirror(scriptData.mirror);
                         
-						if (scriptData.mirror) props.setMirror(scriptData.mirror);
-						else props.setMirror(null); //SHORTEN IT
-                        
-						// service call # 3 -objectType service call
-						DesignApi.getKeywordDetails_ICE(appType)
-							.then(keywordData => {
+                        // service call # 3 -objectType service call
+                        DesignApi.getKeywordDetails_ICE(appType)
+                            .then(keywordData => {
                                 if (keywordData === "Invalid Session") RedirectPage(history);
                                 
                                 setKeywordList(keywordData);
                                 let testcaseArray = [];
-								if (data === "" || data === null || data === "{}" || data === "[]" || data.testcase.toString() === "" || data.testcase === "[]") {
-									testcaseArray.push(emptyRowData);
-									// $("#jqGrid").jqGrid('GridUnload');
-									// $("#jqGrid").trigger("reloadGrid");
-									// contentTable(scriptData.view);
-									// $('.cbox').prop('disabled', false);
-									// $('.cbox').parent().removeClass('disable_a_href');
-									// updateColumnStyle();
-									// $("#jqGrid").focusout(()=>{
-									// 	updateColumnStyle();
+                                if (data === "" || data === null || data === "{}" || data === "[]" || data.testcase.toString() === "" || data.testcase === "[]") {
+                                    testcaseArray.push(emptyRowData);
+                                    // $("#jqGrid").jqGrid('GridUnload');
+                                    // $("#jqGrid").trigger("reloadGrid");
+                                    // contentTable(scriptData.view);
+                                    // $('.cbox').prop('disabled', false);
+                                    // $('.cbox').parent().removeClass('disable_a_href');
+                                    // updateColumnStyle();
+                                    // $("#jqGrid").focusout(()=>{
+                                    // 	updateColumnStyle();
                                     // })
                                     
                                     setOverlay("");
-								} else {
-									let testcase = data.testcase;
-									
-									for (let i = 0; i < testcase.length; i++) {
-										if ("comments" in testcase[i]) {
-											delete testcase[i]; // doubt here
-											testcase = testcase.filter(n => n !== null);
-										} else {
-											if (appType === "Webservice") {
-												if (testcase[i].keywordVal === "setHeader" || testcase[i].keywordVal === "setHeaderTemplate") {
-													testcase[i].inputVal[0] = testcase[i].inputVal[0].split("##").join("\n")
-												}
-											}
-											testcase[i].stepNo = (i + 1).toString();
-											testcaseArray.push(testcase[i]);
-										}
-									}
-									// $("#jqGrid_addNewTestScript").jqGrid('clearGridData');
-									// $("#jqGrid").jqGrid('GridUnload');
-									// $("#jqGrid").trigger("reloadGrid");
-									// contentTable(scriptData.view);
-									// $('.cbox').prop('disabled', false);
-									// $('.cbox').parent().removeClass('disable_a_href');
-									// updateColumnStyle();
-									// $("#jqGrid").focusout(()=>{
-									// 	updateColumnStyle();	
+                                } else {
+                                    let testcase = data.testcase;
+                                    
+                                    for (let i = 0; i < testcase.length; i++) {
+                                        if ("comments" in testcase[i]) {
+                                            delete testcase[i];
+                                            testcase = testcase.filter(n => n !== null);
+                                        } else {
+                                            if (appType === "Webservice") {
+                                                if (testcase[i].keywordVal === "setHeader" || testcase[i].keywordVal === "setHeaderTemplate") {
+                                                    testcase[i].inputVal[0] = testcase[i].inputVal[0].split("##").join("\n")
+                                                }
+                                            }
+                                            testcase[i].stepNo = (i + 1).toString();
+                                            testcaseArray.push(testcase[i]);
+                                        }
+                                    }
+                                    // $("#jqGrid_addNewTestScript").jqGrid('clearGridData');
+                                    // $("#jqGrid").jqGrid('GridUnload');
+                                    // $("#jqGrid").trigger("reloadGrid");
+                                    // contentTable(scriptData.view);
+                                    // $('.cbox').prop('disabled', false);
+                                    // $('.cbox').parent().removeClass('disable_a_href');
+                                    // updateColumnStyle();
+                                    // $("#jqGrid").focusout(()=>{
+                                    // 	updateColumnStyle();	
                                     // });				
                                     setOverlay("");
                                 }
                                 setTestCaseData(testcaseArray);
                                 setObjNameList(getObjNameList(props.current_task.appType, scriptData.view));
-							})
-							.catch(error => {
+                                resolve("success");
+                            })
+                            .catch(error => {
                                 setOverlay("");
                                 setTestCaseData([]);
                                 setTestScriptData(null);
                                 setKeywordList(null);
                                 setObjNameList(null);
-								console.error("Error getObjectType method! \r\n " + (error.data));
-							}); //	getObjectType end
-						
-					})
-					.catch(error => {
+                                console.error("Error getObjectType method! \r\n " + (error.data));
+                                reject("fail");
+                            }); //	getObjectType end
+                        
+                    })
+                    .catch(error => {
                         setOverlay("");
                         setTestCaseData([]);
                         setTestScriptData(null);
                         setKeywordList(null);
                         setObjNameList(null);
-						console.error("Error getObjectType method! \r\n " + (error.data));
-					}); //	getScrapeData end
-			})
-			.catch(error => {
+                        console.error("Error getObjectType method! \r\n " + (error));
+                        reject("fail");
+                    }); //	getScrapeData end
+            })
+            .catch(error => {
                 setOverlay("");
                 setTestCaseData([]);
                 setTestScriptData(null);
                 setKeywordList(null);
                 setObjNameList(null);
-				console.error("Error getTestScriptData method! \r\n " + (error.data));
-			});
-
+                console.error("Error getTestScriptData method! \r\n " + (error));
+                reject("fail");
+            });
+        });
     };
     
     const saveTestCases = () => {
@@ -248,7 +248,7 @@ const DesignContent = (props) => {
             let import_status = false;
 
             if (String(screenId) !== "undefined" && String(testCaseId) !== "undefined") {
-                let serviceCallFlag = false;
+                let errorFlag = true;
                 let testCases = [...testCaseData]
 
                 for (let i = 0; i < testCases.length; i++) {
@@ -259,7 +259,7 @@ const DesignContent = (props) => {
                         let col = "Object Name"
                         if (!testCases[i].keywordVal) col = "keyword"
                         props.setShowPop({'title': 'Save Testcase', 'content': `Please select ${col} Name at Step No. ${step}`})
-                        serviceCallFlag = true;
+                        errorFlag = false;
                         break;
                     } else {
                         testCases[i].custname = testCases[i].custname.trim();
@@ -283,9 +283,7 @@ const DesignContent = (props) => {
 
                 }
 
-                if (serviceCallFlag == true) {
-                    console.log("no service call being made");
-                } else {
+                if (errorFlag) {
                     DesignApi.getScrapeDataScreenLevel_ICE()
                         .then(res => {
                             let getScrapeData=res
@@ -298,9 +296,13 @@ const DesignContent = (props) => {
                     .then(data => {
                         if (data === "Invalid Session") return RedirectPage(history);
                         if (data === "success") {
-                            fetchTestCases();
-                            setChanged(false);
-                            props.setShowPop({'title': 'Save Testcase', 'content': 'Testcase saved successfully'});
+                            fetchTestCases()
+                            .then(data=>{
+                                setChanged(false);
+                                props.setShowPop({'title': 'Save Testcase', 'content': 'Testcase saved successfully'});
+                            })
+                            .catch(error=>console.error("Error: Fetch TestCase Failed"));
+                            
                             
                             // if(taskInfo.appType.toLowerCase()=="web" && '_modified' in localStorage && localStorage['_modified'] != ""){
                             //     var screenId = taskInfo.screenId;
@@ -358,7 +360,7 @@ const DesignContent = (props) => {
                     .catch(error => { 
                         console.error("Error::::", error);
                     });
-                    serviceCallFlag = false;
+                    errorFlag = false;
                 }
             } else {
                 props.setShowPop({'title':'Save Testcase', 'content':'ScreenID or TestscriptID is undefined'});
@@ -523,7 +525,7 @@ const DesignContent = (props) => {
         }
     }
 
-    const pasteSteps = () => {
+    const onPasteSteps = () => {
         setFocusedRow(null);
 
         if (copiedContent.testCaseId !== props.current_task.testCaseId) {
@@ -560,70 +562,23 @@ const DesignContent = (props) => {
         />
     );
 
-    const PasteStepDialog = () => (
-        <PopupMsg 
-            title="Paste Test Step"
-            content={
-            <div className="ps_dialog"> 
-                <div className="ps_lbl">Paste after step no:</div>
-                <div className="ps_hint">For multiple paste. Eg: 5;10;20</div>
-                <input className="ps_input" placeholder="Enter a value" onChange={PSHandler} value={stepNum}/>
-                { pasteError && 
-                    <div className="ps_error">{pasteErrors[pasteError]}</div>
-                }
-            </div>}
-            close={()=>{
-                setStepNum("");
-                showPasteError("");
-                setShowPS(false)
-            }}
-            submitText="Submit"
-            submit={()=>pasteCopiedSteps()}
-        />
-    );
-
-    const pasteCopiedSteps = () => {
-        showPasteError("");
-        if (stepNum){
-            if (/^[0-9;]+$/.test(stepNum)){
-                let pass = true
-                let stepList = stepNum.split(";");
-                for(let step of stepList){
-                    let stepInt = parseInt(step)
-                    if (isNaN(stepInt)) {
-                        showPasteError('invalidChar');
-                        pass = false
-                        break;
-                    }
-                    if(stepInt > testCaseData.length || stepInt < 0) {
-                        showPasteError('invalidStep');
-                        pass = false
-                        break;
-                    }
-                }
-                if (pass) {
-                    let toFocus = []
-                    let testCases = [...testCaseData]
-                    for(let step of stepList){
-                        let stepInt = parseInt(step)
-                        if (testCases.length === 1 && !testCases[0].custname) testCases = copiedContent.testCases
-                        else testCases.splice(stepInt, 0, ...copiedContent.testCases);
-                        for(let i=0; i<copiedContent.testCases.length; i++){
-                            toFocus.push(stepInt+i)
-                        }
-                    }
-                    setTestCaseData(testCases);
-                    setShowPS(false);
-                    setFocusedRow(toFocus);
-                    setCheckedRows([]);
-                    setHeaderCheck(false);
-                    setStepNum("");
-                    setChanged(true);
-                }
+    const pasteSteps = (stepList) => {
+        let toFocus = []
+        let testCases = [...testCaseData]
+        for(let step of stepList){
+            let stepInt = parseInt(step)
+            if (testCases.length === 1 && !testCases[0].custname) testCases = copiedContent.testCases
+            else testCases.splice(stepInt, 0, ...copiedContent.testCases);
+            for(let i=0; i<copiedContent.testCases.length; i++){
+                toFocus.push(stepInt+i)
             }
-            else showPasteError('invalidChar')
         }
-        else showPasteError('empty');
+        setTestCaseData(testCases);
+        setShowPS(false);
+        setFocusedRow(toFocus);
+        setCheckedRows([]);
+        setHeaderCheck(false);
+        setChanged(true);
     }
 
     const commentRows = () => {
@@ -649,70 +604,11 @@ const DesignContent = (props) => {
         }
     }
 
-    const onRemarkChange = event => {
-        if (remarkError) setRemarkError(false);
-        let value = event.target.value;
-        value = value.replace(";", "")
-        setRemark(value);
-    }
+    
 
     const showRemarkDialog = (rowIdx) => {
         setFocusedRow(null);
         setShowRemarkDlg(String(rowIdx));
-    }
-
-    const RemarkDialog = () => (
-        <div className="remark_container">
-        <ModalContainer
-            title="Remarks"
-            content={
-                <div className="d__add_remark_content">
-                    { 
-                        testCaseData[parseInt(showRemarkDlg)].remarks.split(';').filter(remark => remark.trim()!=="").length > 0 &&
-                        <>
-                        <div className="remark_history_lbl">History</div>
-                        <div className="remark_history_content">
-                            { testCaseData[parseInt(showRemarkDlg)].remarks.split(';').filter(remark => remark.trim()!=="").map(remark=><li>{remark}</li>) }
-                        </div>
-                        </>
-                    }
-                    <div className="d__add_remark_lbl">Add Remarks</div>
-                    <textarea className={"remark_input" + (remarkError ? " remark_error" : "")} value={remark} onChange={onRemarkChange} />
-                </div>
-            }
-            footer={
-                <button onClick={submitRemark}>Submit</button>
-            }
-            close={()=>{
-                setRemark("");
-                setRemarkError(false);
-                setShowRemarkDlg(false)
-            }}
-        />
-        </div>
-    );
-
-    const submitRemark = () => {
-        let remarkVal = remark.trim()
-        if (!remarkVal) {
-            setRemark("");
-            setRemarkError(true)
-        }
-        else{
-            let date = new Date();
-			let DATE = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
-			let TIME = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-            remarkVal = `${remarkVal} (From: ${userInfo.firstname} ${userInfo.lastname} On: ${DATE} ${TIME})`;
-            let Arr = []
-            if (testCaseData[parseInt(showRemarkDlg)].remarks !== "") Arr = testCaseData[parseInt(showRemarkDlg)].remarks.split(";")
-            let remarkArr = [...Arr];
-            remarkArr.push(remarkVal);
-            let remarkString = remarkArr.join(";")
-            setRemark("");
-            // saveRemarks(parseInt(showRemarkDlg), remarkString)
-            setRowData({rowIdx: parseInt(showRemarkDlg), operation: "remarks", remarks: remarkString})
-            setShowRemarkDlg(false);
-        }
     }
 
     const showDetailDialog = (rowIdx) => {
@@ -741,21 +637,15 @@ const DesignContent = (props) => {
         setCheckedRows(check);
     }
 
-    const PSHandler = event => {
-        let value = event.target.value
-        value = value.replace(/[^0-9;]/g, "")
-        setStepNum(value)
-    };
-
     const onAction = (operation) => {
         switch(operation){
-            case "submit":      props.setShowConfirmPop({'title':'Submit Task', 'content': 'Are you sure you want to submit the task ?', 'onClick': ()=>submitTask(operation)});
-                                break;
-            case "reassign":    props.setShowConfirmPop({'title':'Reassign Task', 'content': 'Are you sure you want to reassign the task ?', 'onClick': ()=>submitTask(operation)});
-                                break;
-            case "approve":     props.setShowConfirmPop({'title':'Approve Task', 'content': 'Are you sure you want to approve the task ?', 'onClick': ()=>submitTask(operation)});
-                                break;
-            default:            break;
+            case "submit": props.setShowConfirmPop({'title':'Submit Task', 'content': 'Are you sure you want to submit the task ?', 'onClick': ()=>submitTask(operation)});
+                           break;
+            case "reassign": props.setShowConfirmPop({'title':'Reassign Task', 'content': 'Are you sure you want to reassign the task ?', 'onClick': ()=>submitTask(operation)});
+                             break;
+            case "approve": props.setShowConfirmPop({'title':'Approve Task', 'content': 'Are you sure you want to approve the task ?', 'onClick': ()=>submitTask(operation)});
+                            break;
+            default: break;
         }                       
     }
 
@@ -779,8 +669,8 @@ const DesignContent = (props) => {
 
     return (
         <>
-        { showPS && PasteStepDialog() }
-        { showRemarkDlg && RemarkDialog() }
+        { showPS && <PasteStepDialog setShow={setShowPS} pasteSteps={pasteSteps} upperLimit={testCaseData.length}/> }
+        { showRemarkDlg && <RemarkDialog remarks={testCaseData[parseInt(showRemarkDlg)].remarks} setShow={setShowRemarkDlg} onSetRowData={setRowData} idx={showRemarkDlg} firstname={userInfo.firstname} lastname={userInfo.lastname}/> }
         { showDetailDlg && <DetailsDialog TCDetails={testCaseData[showDetailDlg].addTestCaseDetailsInfo && JSON.parse(testCaseData[showDetailDlg].addTestCaseDetailsInfo)} setShow={setShowDetailDlg} onSetRowData={setRowData} idx={showDetailDlg} /> }
         { overlay && <ScreenOverlay content={overlay} /> }
         { showConfPaste && <ConfPasteStep />}
@@ -845,7 +735,7 @@ const DesignContent = (props) => {
                     <div className="min">
                         <div className="con">
                             <ScrollBar verticalbarWidth="8px" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)">
-                            <ReactSortable disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData}>
+                            <ReactSortable disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} animation={200} delayOnTouchStart={true} delay={2} ghostClass="d__ghost_row">
                                 <TableContents 
                                     edit={edit} 
                                     objList={objNameList} 

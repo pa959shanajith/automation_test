@@ -21,7 +21,6 @@ const DesignHome = () => {
     const [imported, setImported] = useState(false);
     const [showConfirmPop, setShowConfirmPop] = useState(false);
     const [showDpndntTcDlg, setShowDpndntTcDlg] = useState(false);
-    const [dpndntTcList, setDpndntTcList] = useState([]);
     const [dTcFlag, setDTcFlag] = useState(false);
     const [checkedTc, setCheckedTc] = useState([]);
     
@@ -65,10 +64,10 @@ const DesignHome = () => {
         { showPop && <PopupDialog />}
         { showConfirmPop && <ConfirmPopup /> }
         { showDpndntTcDlg && <DependentTestCaseDialog 
-                                testCaseList={dpndntTcList} 
+                                scenarioId = {current_task.scenarioId}
                                 setShowDlg={setShowDpndntTcDlg} 
                                 checkedTc={checkedTc}
-                                setCheckedTc={setCheckedTc}
+                                setCheckedTc={setCheckedTc} 
                                 setDTcFlag={setDTcFlag}
                                 taskName={current_task.testCaseName}
                                 taskId={current_task.testCaseId}
@@ -79,8 +78,20 @@ const DesignHome = () => {
             <Header />
             <div className="d__mid_section">
                 
-                <ActionBar upperContent={<UpperContent key={777} showDlg={showDpndntTcDlg} dTcFlag={dTcFlag} checkedTc={checkedTc} disable={disableActionBar} isMac={isMac} setOverlay={setOverlay} setShowPop={setShowPop} testCaseId={current_task.testCaseId} setTcList={setDpndntTcList} setShowDlg={setShowDpndntTcDlg}/>} 
-                            bottomContent={<BottomContent setShowPop={setShowPop} setImported={setImported} setShowConfirmPop={setShowConfirmPop}/>}
+                <ActionBar upperContent={<UpperContent key={777} 
+                                                        showDlg={showDpndntTcDlg} 
+                                                        setShowDlg={setShowDpndntTcDlg}
+                                                        dTcFlag={dTcFlag} 
+                                                        setDTcFlag={setDTcFlag} 
+                                                        checkedTc={checkedTc} 
+                                                        disable={disableActionBar} 
+                                                        isMac={isMac} 
+                                                        setOverlay={setOverlay} 
+                                                        setShowPop={setShowPop}
+                                                        />} 
+                            bottomContent={<BottomContent setShowPop={setShowPop} 
+                                                            setImported={setImported} 
+                                                            setShowConfirmPop={setShowConfirmPop}/>}
                 />
                 <DesignContent current_task={current_task} imported={imported} setImported={setImported} setMirror={setMirror} setShowPop={setShowPop} setShowConfirmPop={setShowConfirmPop}/>
                 
