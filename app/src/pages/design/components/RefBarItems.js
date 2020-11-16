@@ -4,6 +4,13 @@ import ClickAwayListener from 'react-click-away-listener';
 import { ReferenceBar } from '../../global';
 import "../styles/RefBarItems.scss";
 
+/*
+    Component: ReferenceBar Content
+    Uses: Provides content to populate on reference bar, includes Popups
+    Props: 
+        mirror -> base64 screenshot
+*/
+
 const ReferenceContent = ({mirror}) => {
 
     const { appType } = useSelector(state=>state.plugin.CT);

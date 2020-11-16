@@ -6,6 +6,20 @@ import { ModalContainer, ScrollBar, Report, RedirectPage } from '../../global';
 import { readTestCase_ICE, getTestcasesByScenarioId_ICE } from '../api';
 import "../styles/DependentTestCaseDialog.scss";
 
+/*
+    Component: Dependent Test Case Dialog Box
+    Uses: Renders dialog for selecting Dependent Testcases
+    Props: 
+        scenarioId -> current selected task's scenarioID
+        setShowDlg -> switch flag to display dependent Testcases dialog
+        checkedTc -> array of dependent testcase IDs' 
+        setCheckedTc -> setState for dependent TC array
+        setDTcFlag -> flag status for dependent test cases / enabled means dependent TC is present
+        taskName -> current task's name
+        taskId= -> current task's ID
+        setShowPop -> state to display popup msgs
+*/
+
 const DependentTestCaseDialog = props => {
 
     const history = useHistory();

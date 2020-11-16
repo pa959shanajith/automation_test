@@ -1,6 +1,16 @@
 import React, { useState } from 'react';
 import { ModalContainer } from "../../global";
 
+/*
+    Component: Details Dialog
+    Uses: Renders details dialog for each row's actual/pass/fail inputs
+    Props: 
+        setShow -> show/hide dialog setState
+        onSetRowData -> Method for on saving the changes
+        TCDetails -> testcase's testcasedetails field
+        idx -> index of row
+*/
+
 const DetailsDialog = ({setShow, onSetRowData, TCDetails, idx}) => {
 
     const [res, setRes] = useState(TCDetails.testcaseDetails || "" );

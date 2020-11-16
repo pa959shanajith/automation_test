@@ -7,6 +7,12 @@ import { ReferenceContent } from "../components/RefBarItems";
 import { Header, FooterTwo as Footer, ActionBar, ScreenOverlay, PopupMsg, ModalContainer } from '../../global';
 import "../styles/DesignHome.scss";
 
+/*
+    Container: Design Home Container
+    Uses: Renders entire design screen
+    Props: None
+*/
+
 const DesignHome = () => {
     
     const current_task = useSelector(state=>state.plugin.CT)
@@ -84,16 +90,24 @@ const DesignHome = () => {
                                                         dTcFlag={dTcFlag} 
                                                         setDTcFlag={setDTcFlag} 
                                                         checkedTc={checkedTc} 
+                                                        isMac={isMac}
                                                         disable={disableActionBar} 
-                                                        isMac={isMac} 
                                                         setOverlay={setOverlay} 
                                                         setShowPop={setShowPop}
                                                         />} 
                             bottomContent={<BottomContent setShowPop={setShowPop} 
+                                                            disable={disableActionBar}
                                                             setImported={setImported} 
                                                             setShowConfirmPop={setShowConfirmPop}/>}
                 />
-                <DesignContent current_task={current_task} imported={imported} setImported={setImported} setMirror={setMirror} setShowPop={setShowPop} setShowConfirmPop={setShowConfirmPop}/>
+                <DesignContent current_task={current_task} 
+                                imported={imported} 
+                                setImported={setImported} 
+                                setMirror={setMirror} 
+                                setShowPop={setShowPop} 
+                                setShowConfirmPop={setShowConfirmPop}
+                                setDisableActionBar={setDisableActionBar}
+                                />
                 
                 <ReferenceContent mirror={mirror}/>
                 

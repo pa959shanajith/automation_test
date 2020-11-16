@@ -1,16 +1,43 @@
 import React, { Fragment, useRef, useState, useEffect } from 'react';
-import { useSelector }  from  "react-redux";
+import { useSelector, useDispatch }  from  "react-redux";
 import { useHistory } from 'react-router-dom';
 import { Thumbnail, ResetSession, RedirectPage } from '../../global';
 import * as DesignApi from "../api";
+import * as DesignActions from '../state/action';
 import "../styles/ActionBarItems.scss"
 
-const UpperContent = ({setDTcFlag, isMac, disable, setOverlay, setShowPop, setShowDlg, dTcFlag, checkedTc, showDlg}) => {
+/*
+    Component: UpperContent , Bottom Content for rendering items on Action Bar
+    Uses: Provides Content for Action Bar
+    Props: 
+    ----------- upperContent ------
+        setDTcFlag -> flips the Dependent Test Case Flag
+        isMac -> Bool value to check if client is running on Mac
+        setOverlay -> overlay msg
+        disable -> flag to check if action bar is required to disable
+        setShowPop -> showPopup state
+        setShowDlg -> Show Dependent TestCase Dialog State
+        dTcFlag -> Dependent TestCase checked/unchecked Flag
+        checkedTc -> list of checked test case IDs'
+        showDlg -> flag to check if dependenet test Case dialog is visible or not
+
+    ---------- bottomContent ---------
+        setShowPop -> showPopup state
+        setImported -> state to switch import status flag
+        setShowConfirmPop -> confirmation dialog popup
+        disable -> flag to check if action bar is required to disable
+*/
+
+const UpperContent = ({setDTcFlag, isMac, setOverlay, disable, setShowPop, setShowDlg, dTcFlag, checkedTc, showDlg}) => {
 
     const userInfo = useSelector(state=>state.login.userinfo);
     const current_task = useSelector(state=>state.plugin.CT);
+    const mainTestCases = useSelector(state=>state.design.testCases);
+    const saveEnable = useSelector(state=>state.design.saveEnable);
+
     let appType = current_task.appType;
     const history = useHistory();
+    const dispatch = useDispatch();
 
     const [dependCheck, setDependCheck] = useState(false);
 
@@ -19,28 +46,28 @@ const UpperContent = ({setDTcFlag, isMac, disable, setOverlay, setShowPop, setSh
     }, [showDlg]);
 
     const WebList = [
-        {'title': "Internet Explorer", 'img': "static/imgs/ic-ie.png", action: ()=>debugTestCases('3')}, 
-        {'title': "Google Chrome", 'img': "static/imgs/ic-chrome.png", action: ()=>debugTestCases('1')},
-        {'title': "Mozilla Firefox", 'img': "static/imgs/ic-mozilla.png", action: ()=>debugTestCases('2')},
-        {'title': "Microsoft Edge", 'svg': "static/imgs/ic-edge.svg", action: ()=>debugTestCases('7')},
-        {'title': "Edge Chromium", 'svg': "static/imgs/ic-edge-chromium.svg", action: ()=>debugTestCases('8')}
+        {'title': "Internet Explorer", 'img': "static/imgs/ic-ie.png", action: ()=>debugTestCases('3'), 'disable': disable}, 
+        {'title': "Google Chrome", 'img': "static/imgs/ic-chrome.png", action: ()=>debugTestCases('1'), 'disable': disable},
+        {'title': "Mozilla Firefox", 'img': "static/imgs/ic-mozilla.png", action: ()=>debugTestCases('2'), 'disable': disable},
+        {'title': "Microsoft Edge", 'svg': "static/imgs/ic-edge.svg", action: ()=>debugTestCases('7'), 'disable': disable},
+        {'title': "Edge Chromium", 'svg': "static/imgs/ic-edge-chromium.svg", action: ()=>debugTestCases('8'), 'disable': disable}
         ]
     
-    const oebsList = [{'title': "OEBS Apps" , 'img': 'static/imgs/ic-desktop.png', action: ()=>debugTestCases('1')}]
+    const oebsList = [{'title': "OEBS Apps" , 'img': 'static/imgs/ic-desktop.png', action: ()=>debugTestCases('1'), 'disable': disable}]
     
-    const desktopList = [{'title': "Desktop Apps" , 'img': 'static/imgs/ic-desktop.png', action: ()=>debugTestCases('1')}]
+    const desktopList = [{'title': "Desktop Apps" , 'img': 'static/imgs/ic-desktop.png', action: ()=>debugTestCases('1'), 'disable': disable}]
     
-    const systemList = [{'title': "System Apps" , 'img': 'static/imgs/ic-desktop.png', action: ()=>debugTestCases('1')}]
+    const systemList = [{'title': "System Apps" , 'img': 'static/imgs/ic-desktop.png', action: ()=>debugTestCases('1'), 'disable': disable, 'disable': disable}]
     
-    const sapList = [{'title': "SAP Apps" , 'img': 'static/imgs/ic-desktop.png', action: ()=>debugTestCases('1')}]
+    const sapList = [{'title': "SAP Apps" , 'img': 'static/imgs/ic-desktop.png', action: ()=>debugTestCases('1'), 'disable': disable}]
     
-    const webserviceList = [{'title': "Web Services" , 'img': 'static/imgs/ic-webservice.png', action: ()=>debugTestCases('1')}]
+    const webserviceList = [{'title': "Web Services" , 'img': 'static/imgs/ic-webservice.png', action: ()=>debugTestCases('1'), 'disable': disable}]
     
-    const mobileAppList = [{'title': "Mobile Apps" , 'img': 'static/imgs/ic-mobility.png', action: ()=>debugTestCases('1')}]
+    const mobileAppList = [{'title': "Mobile Apps" , 'img': 'static/imgs/ic-mobility.png', action: ()=>debugTestCases('1'), 'disable': disable}]
     
-    const mobileWebList = [{'title': "Mobile Web" , 'img': 'static/imgs/ic-mobility.png', action: ()=>debugTestCases()}]
+    const mobileWebList = [{'title': "Mobile Web" , 'img': 'static/imgs/ic-mobility.png', action: ()=>debugTestCases(), 'disable': disable}]
     
-    const mainframeList = [{'title': "Mainframe", 'img': "static/imgs/ic-mainframe-o.png", action: ()=>debugTestCases()}]
+    const mainframeList = [{'title': "Mainframe", 'img': "static/imgs/ic-mainframe-o.png", action: ()=>debugTestCases(), 'disable': disable}]
 
     const addDependentTestCase = event => {
         if (!event.target.checked) {
@@ -51,8 +78,8 @@ const UpperContent = ({setDTcFlag, isMac, disable, setOverlay, setShowPop, setSh
     }
 
     let renderComp = [
-                    <div key={1} className='d__debugOn'>Debug On</div>, 
-                    <div key={3} className="d__thumbnail">
+                    <div key={1} className={'d__debugOn' + (disable ? " disable-thumbnail" : "")}>Debug On</div>, 
+                    <div key={3} className={"d__thumbnail" + (disable ? " disable-thumbnail" : "")}>
                         <input id="add_depend" type="checkbox" onChange={addDependentTestCase} checked={dependCheck}/>
                         <span className="d__thumbnail_title">Add Dependent Test Cases</span>
                     </div>
@@ -84,18 +111,16 @@ const UpperContent = ({setDTcFlag, isMac, disable, setOverlay, setShowPop, setSh
                 else if (data === "scheduleModeOn") setShowPop({'title': "Debug Testcase", 'content': "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."})
                 else if (data === "ExecutionOnlyAllowed") setShowPop({'title': "Debug Testcase", 'content': "Execution Only Allowed"})
                 else if (data.status === "success"){
-                    // rows={}
-                    // $('tr.ui-widget-content.jqgrow.ui-row-ltr.ui-sortable-handle').each(function () {
-                    //     if($(this)[0].id in data){
-                    //         $('#jqGrid').jqGrid('setCell', $(this)[0].id, 'objectName', data[$(this)[0].id].xpath);
-                    //         // $(this).children()[3].title=data[$(this)[0].id].xpath
-                    //         rows[$(this)[0].childNodes[4].innerText]=data[$(this)[0].id].xpath
-                    //         // $(this).children()[3].innerText=
-                    //         console.log($(this));
-                    //     }
-                    // });
-                    // localStorage['_modified']=JSON.stringify(rows)
-                    console.log("populate localstorage[modified]")
+                    let rows={}
+                    mainTestCases.forEach((testCase, index) => {
+                        if(index+1 in data){
+                            // $('#jqGrid').jqGrid('setCell', $(this)[0].id, 'objectName', data[$(this)[0].id].xpath);
+                            rows[testCase.custname]=data[index+1].xpath
+                        }
+                    });
+                    dispatch({type: DesignActions.SET_MODIFIED, payload: rows});
+                    dispatch({type: DesignActions.SET_SAVEENABLE, payload: !saveEnable})
+                    console.log(`dispatching ${!saveEnable}`)
                     setShowPop({'title': "Debug Testcase", 'content': "Debug completed successfully."})
                 } else {
                     console.log(data);
@@ -111,24 +136,24 @@ const UpperContent = ({setDTcFlag, isMac, disable, setOverlay, setShowPop, setSh
 
     
     switch(appType) {
-        case "Web": renderComp.splice(1, 0, <Fragment key={2}> { WebList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} svg={icon.svg} action={icon.action}/>)}
-                                            { isMac && <Thumbnail title="Safari" img="static/imgs/ic-safari.png" action={()=>debugTestCases('6')}/>}</Fragment>);
+        case "Web": renderComp.splice(1, 0, <Fragment key={2}> { WebList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} svg={icon.svg} action={icon.action} disable={icon.disable}/>)}
+                                            { isMac && <Thumbnail title="Safari" img="static/imgs/ic-safari.png" action={()=>debugTestCases('6')} disable={disable}/>}</Fragment>);
                     break;
-        case "OEBS": renderComp.splice(1, 0, <Fragment key={2}>{oebsList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>);
+        case "OEBS": renderComp.splice(1, 0, <Fragment key={2}>{oebsList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
                     break;
-        case "Desktop": renderComp.splice(1, 0, <Fragment key={2}>{desktopList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>);
+        case "Desktop": renderComp.splice(1, 0, <Fragment key={2}>{desktopList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} disable={icon.disable} />)}</Fragment>);
                         break;
-        case "System": renderComp.splice(1, 0, <Fragment key={2}>{systemList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>);
+        case "System": renderComp.splice(1, 0, <Fragment key={2}>{systemList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
                         break;
-        case "SAP": renderComp.splice(1, 0, <Fragment key={2}>{sapList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>);
+        case "SAP": renderComp.splice(1, 0, <Fragment key={2}>{sapList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
                     break;
-        case "Webservice": renderComp.splice(1, 0, <Fragment key={2}>{webserviceList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action}/>)}</Fragment>);
+        case "Webservice": renderComp.splice(1, 0, <Fragment key={2}>{webserviceList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable}/>)}</Fragment>);
                             break;
-        case "MobileApp": renderComp.splice(1, 0, <Fragment key={2}>{mobileAppList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>);
+        case "MobileApp": renderComp.splice(1, 0, <Fragment key={2}>{mobileAppList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
                             break;
-        case "MobileWeb": renderComp.splice(1, 0, <Fragment key={2}>{mobileWebList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>);
+        case "MobileWeb": renderComp.splice(1, 0, <Fragment key={2}>{mobileWebList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable}/>)}</Fragment>);
                             break;
-        case "Mainframe": renderComp.splice(1, 0, <Fragment key={2}>{mainframeList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} />)}</Fragment>);
+        case "Mainframe": renderComp.splice(1, 0, <Fragment key={2}>{mainframeList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
                             break;
         default: break;
     }
@@ -136,7 +161,7 @@ const UpperContent = ({setDTcFlag, isMac, disable, setOverlay, setShowPop, setSh
     return renderComp;
 };
 
-const BottomContent = ({setShowPop, setImported, setShowConfirmPop}) => {
+const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable}) => {
 
     const current_task = useSelector(state=>state.plugin.CT);
     const userInfo = useSelector(state=>state.login.userinfo);
@@ -240,13 +265,13 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop}) => {
 
     const lowerList = [
                         {'title': 'Import Test Case', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase()},
-                        {'title': 'Export Test Case', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>exportTestCase()}
+                        {'title': 'Export Test Case', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>exportTestCase(), 'disable': disable}
                     ]
                     // <input style="visibility: hidden;" type="file" id="importTestCaseFile" accept=".json"></li>
                     // <li style="visibility: hidden; display: none;"><a href='#' ng-click="importTestCase1($event)"></a><input style="visibility: hidden;" type="file" id="overWriteJson" accept=".json"></li>
     return (
         <>
-            {lowerList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} importElement={icon.importElement}/>)}
+            {lowerList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable}/>)}
             <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange} accept=".json"/>
         </>
     );

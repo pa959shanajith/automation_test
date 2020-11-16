@@ -1,6 +1,18 @@
 import React, { useState } from 'react';
 import { ModalContainer } from "../../global";
 
+/*
+    Component: Remark Dialog
+    Uses: Renders Remark dialog box to input remark for specific row
+    Props: 
+        setShow -> show/hide dialog setState
+        onSetRowData -> Method for on saving the changes
+        remarks -> testcase's remark field
+        idx -> index of row
+        firstname -> userinfo's field / user's first name
+        lastname -> userinfo's field / user's last name
+*/
+
 const RemarkDialog = ({setShow, onSetRowData, remarks, idx, firstname, lastname}) => {
     
     const [remarkError, setRemarkError] = useState(false);

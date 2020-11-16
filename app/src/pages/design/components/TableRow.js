@@ -1,6 +1,26 @@
 import React, { useState, useEffect, memo, useRef } from 'react';
 
 
+/*
+    Component: TableRow
+    Uses: Renders Each Row of the Table
+    Props: 
+        idx -> index of row
+        objList -> list of object names
+        testCase -> each testcase object from testcases array
+        edit -> bool flag for edit mode / if true editting mode is ON
+        getKeywords -> method to get a list of keywords
+        getRowPlaceholders -> method to get input/output placeholders
+        checkedRows -> array of indexes of checked rows
+        updateChecklist -> method to call when checking/unchecking row to update overall array and other states
+        focusedRow -> holds index of row which is currently highlighted, contains array when multiple is require to highlight
+        setFocusedRow -> setState for focusedRow
+        setRowData -> method to update overall testCase data
+        showRemarkDialog -> setState to display remark dialog
+        showDetailDialog -> setState to display details dialog
+        rowChange -> flag to check if any row is changed
+*/
+
 // const shouldRender = (prevProps, nextProps) => {
 //     // console.log(prevProps.edit, nextProps.edit)
 //     // console.log(prevProps, nextProps)
@@ -75,18 +95,20 @@ const TableRow = (props) => {
     const [TCDetails, setTCDetails] = useState("");
     
     useEffect(()=>{
-        setObjName(props.testCase.custname);
-        setObjType(null);
-        setKeyword(props.testCase.keywordVal);
-        setInput(props.testCase.inputVal[0]);
-        setOutput(props.testCase.outputVal);
-        setInputPlaceholder(null);
-        setOutputPlaceholder(null);
-        setKeywordList(null);
-        objList = props.objList;
-        setRemarks(props.testCase.remarks.split(";").filter(remark => remark.trim()!==""));
-        setCommented(props.testCase.outputVal.slice(-2) === "##");
-        setTCDetails(props.testCase.addTestCaseDetailsInfo === "" ? "" : JSON.parse(props.testCase.addTestCaseDetailsInfo));
+        if (!focused){
+            setObjName(props.testCase.custname);
+            setObjType(null);
+            setKeyword(props.testCase.keywordVal);
+            setInput(props.testCase.inputVal[0]);
+            setOutput(props.testCase.outputVal);
+            setInputPlaceholder(null);
+            setOutputPlaceholder(null);
+            setKeywordList(null);
+            objList = props.objList;
+            setRemarks(props.testCase.remarks.split(";").filter(remark => remark.trim()!==""));
+            setCommented(props.testCase.outputVal.slice(-2) === "##");
+            setTCDetails(props.testCase.addTestCaseDetailsInfo === "" ? "" : JSON.parse(props.testCase.addTestCaseDetailsInfo));
+        }
     }, [props.rowChange, props.testCase]);
 
     useEffect(()=>{
@@ -119,11 +141,19 @@ const TableRow = (props) => {
             }
             else{
                 setFocused(false);
-                // props.setRowData(props.idx, objName, keyword, input, output);
-                setObjName(props.testCase.custname);
-                setKeyword(props.testCase.keywordVal);
-                setInput(props.testCase.inputVal[0]);
-                setOutput(props.testCase.outputVal);
+                props.setRowData({
+                    rowIdx: props.idx,
+                    operation: "row",
+                    objName: objName,
+                    keyword: keyword,
+                    inputVal: input,
+                    outputVal: output
+                });
+
+                // setObjName(props.testCase.custname);
+                // setKeyword(props.testCase.keywordVal);
+                // setInput(props.testCase.inputVal[0]);
+                // setOutput(props.testCase.outputVal);
             }
         }
     }, [props.focusedRow, props.edit]);
@@ -173,15 +203,9 @@ const TableRow = (props) => {
     };
 
     const submitChanges = event => {
-        if (event.keyCode === 13) props.setRowData({
-                                            rowIdx: props.idx,
-                                            operation: "row",
-                                            objName: objName,
-                                            keyword: keyword,
-                                            inputVal: input,
-                                            outputVal: output
-                                        });
-        else if (event.keyCode === 27) props.setFocusedRow(null);
+        if (event.keyCode === 13)
+            props.setRowData({rowIdx: props.idx, operation: "row", objName: objName, keyword: keyword, inputVal: input, outputVal: output});
+        if (event.keyCode === 27 || event.keyCode === 13) props.setFocusedRow(null);
     }
 
     const onInputChange = event => setInput(event.target.value)

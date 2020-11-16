@@ -5,6 +5,14 @@ import * as pluginApi from '../../plugin/api';
 import * as actionTypes from "../../plugin/state/action";
 import "../styles/TaskContents.scss";
 
+/*
+    Component: Task List for Plugin Page and Reference Bar (Right Bar)
+    Uses: Renders a list of task for above mentioned components
+    Props : items -> array of tasks to populate
+            cycleDict -> cycle dictionary from FD state
+            taskJson -> tasksJson from redux store (can be called here using useSelector, modifications may require in taskSection.js )
+*/
+
 const TaskContents = (props) => {
 
     const [showPanel, setShowPanel] = useState("");

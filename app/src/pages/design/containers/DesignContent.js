@@ -7,16 +7,32 @@ import TableContents from '../components/TableContents';
 import DetailsDialog from '../components/DetailsDialog';
 import RemarkDialog from '../components/RemarkDialog';
 import PasteStepDialog from '../components/PasteStepDialog';
+import SelectMultipleDialog from '../components/SelectMultipleDialog';
 import * as DesignApi from "../api";
 import { reviewTask } from "../../mindmap/api";
 import * as pluginActions from "../../plugin/state/action";
 import * as designActions from '../state/action';
 import "../styles/DesignContent.scss";
 
+/*
+    Container: Design Content
+    Uses: Renders middle screen contents of design screen 
+    Props: 
+        current_task -> current task state from redux
+        imported -> imported flag / changes everytime a testcase is imported
+        setImported -> setState for imported flag
+        setMirror -> setState for mirror value
+        setShowPop -> showPopup state
+        setShowConfirmPop -> confirmation dialog popup
+        setDisableActionBar -> flag to set if action bar is required to disable
+*/
+
 const DesignContent = (props) => {
     
     const userInfo = useSelector(state=>state.login.userinfo);
     const copiedContent = useSelector(state=>state.design.copiedTestCases);
+    const modified = useSelector(state=>state.design.modified);
+    const saveEnable = useSelector(state=>state.design.saveEnable);
 
     const history = useHistory();
     const dispatch = useDispatch();
@@ -35,6 +51,7 @@ const DesignContent = (props) => {
     const [edit, setEdit] = useState(false);
     const [showRemarkDlg, setShowRemarkDlg] = useState(false);
     const [showDetailDlg, setShowDetailDlg] = useState(false);
+    const [showSM, setShowSM] = useState(false);
     const [changed, setChanged] = useState(false);
     const [isUnderReview, setIsUnderReview] = useState(props.current_task.status === "underReview");
     const [rowChange, setRowChange] = useState(false);
@@ -59,12 +76,22 @@ const DesignContent = (props) => {
 
     const tableActionBtnGroup = [
         {'title': 'Add Test Step', 'img': 'static/imgs/ic-jq-addstep.png', 'alt': 'Add Steps', onClick: ()=>addRow()},
+        {'title': 'Select Test Step(s)', 'img': 'static/imgs/ic-jq-addstep.png', 'alt': 'Select Steps', onClick: ()=>selectMultiple()},
         {'title': 'Edit Test Step', 'img': 'static/imgs/ic-jq-editstep.png', 'alt': 'Edit Steps', onClick:  ()=>editRow()},
         {'title': 'Drag & Drop Test Step', 'img': 'static/imgs/ic-jq-dragstep.png', 'alt': 'Drag Steps', onClick:  ()=>toggleDrag()},
         {'title': 'Copy Test Step', 'img': 'static/imgs/ic-jq-copystep.png', 'alt': 'Copy Steps', onClick:  ()=>copySteps()},
         {'title': 'Paste Test Step', 'img': 'static/imgs/ic-jq-pastestep.png', 'alt': 'Paste Steps', onClick:  ()=>onPasteSteps()},
         {'title': 'Skip Test Step', 'img': 'static/imgs/ic-jq-commentstep.png', 'alt': 'Comment Steps', onClick:  ()=>commentRows()}
     ]
+
+    useEffect(()=>{
+        dispatch({type: designActions.SET_TESTCASES, payload: testCaseData})
+    }, [testCaseData]);
+
+    useEffect(()=>{
+        setChanged(true);
+        console.log(`shipped ${saveEnable}`);
+    }, [saveEnable]);
 
     useEffect(()=>{
         if (props.imported) {
@@ -120,13 +147,11 @@ const DesignContent = (props) => {
                     //pop up for presence of deleted objects
                     props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."});
                     //disable left-top-section
-                    // $("#left-top-section").addClass('disableActions');
-                    // $("a[title='Export TestCase']").addClass('disableActions');
+                    props.setDisableActionBar(true);
                 }
                 else{
                     //enable left-top-section
-                    // $("#left-top-section").removeClass('disableActions');
-                    // $("a[title='Export TestCase']").removeClass('disableActions');
+                    props.setDisableActionBar(false);
                 }
                 let appType = taskInfo.appType;
                 // $('#jqGrid').removeClass('visibility-hide').addClass('visibility-show');
@@ -162,6 +187,7 @@ const DesignContent = (props) => {
                                 let testcaseArray = [];
                                 if (data === "" || data === null || data === "{}" || data === "[]" || data.testcase.toString() === "" || data.testcase === "[]") {
                                     testcaseArray.push(emptyRowData);
+                                    props.setDisableActionBar(true);
                                     // $("#jqGrid").jqGrid('GridUnload');
                                     // $("#jqGrid").trigger("reloadGrid");
                                     // contentTable(scriptData.view);
@@ -188,6 +214,7 @@ const DesignContent = (props) => {
                                             }
                                             testcase[i].stepNo = (i + 1).toString();
                                             testcaseArray.push(testcase[i]);
+                                            props.setDisableActionBar(false);
                                         }
                                     }
                                     // $("#jqGrid_addNewTestScript").jqGrid('clearGridData');
@@ -248,7 +275,7 @@ const DesignContent = (props) => {
             let import_status = false;
 
             if (String(screenId) !== "undefined" && String(testCaseId) !== "undefined") {
-                let errorFlag = true;
+                let errorFlag = false;
                 let testCases = [...testCaseData]
 
                 for (let i = 0; i < testCases.length; i++) {
@@ -259,7 +286,7 @@ const DesignContent = (props) => {
                         let col = "Object Name"
                         if (!testCases[i].keywordVal) col = "keyword"
                         props.setShowPop({'title': 'Save Testcase', 'content': `Please select ${col} Name at Step No. ${step}`})
-                        errorFlag = false;
+                        errorFlag = true;
                         break;
                     } else {
                         testCases[i].custname = testCases[i].custname.trim();
@@ -283,11 +310,12 @@ const DesignContent = (props) => {
 
                 }
 
-                if (errorFlag) {
+                if (!errorFlag) {
+                    let scrape_data = null;
                     DesignApi.getScrapeDataScreenLevel_ICE()
                         .then(res => {
                             let getScrapeData=res
-                            let scrape_data = JSON.parse(JSON.stringify(getScrapeData));
+                            scrape_data = JSON.parse(JSON.stringify(getScrapeData));
                         })
                         .catch(error=>{
                             console.error("Error:::::", error)
@@ -300,59 +328,46 @@ const DesignContent = (props) => {
                             .then(data=>{
                                 setChanged(false);
                                 props.setShowPop({'title': 'Save Testcase', 'content': 'Testcase saved successfully'});
+                                
+                                if(props.current_task.appType.toLowerCase()==="web" && Object.keys(modified).length !== 0){
+                                    let screenId = props.current_task.screenId;
+                                    let screenName = props.current_task.screenName;
+                                    let projectId = props.current_task.projectId;
+                                    
+                                    let scrapeObject = {};
+                                    for(let i=0; i<scrape_data.view.length; i++){
+                                        if(scrape_data.view[i].custname in modified){
+                                            scrape_data.view[i].xpath=modified[scrape_data.view[i].custname]
+                                        }
+                                    } 
+
+                                    scrapeObject.getScrapeData = JSON.stringify(scrape_data);
+                                    scrapeObject.projectId = projectId;
+                                    scrapeObject.screenId = screenId;
+                                    scrapeObject.screenName = screenName;
+                                    scrapeObject.userinfo = userInfo;
+                                    scrapeObject.param = "updateScrapeData_ICE";
+                                    scrapeObject.appType = props.current_task.appType;
+                                    scrapeObject.versionnumber = props.current_task.versionnumber;
+                                    scrapeObject.newData = {}; //viewString
+                                    scrapeObject.type = "save";
+                                    
+                                    DesignApi.updateScreen_ICE(scrapeObject)
+                                    .then(data1 => {
+                                        if (data1 === "Invalid Session") return RedirectPage(history);
+                                        
+                                        if (data1 === "success") {
+                                            props.setShowPop({'title': 'Save Testcase', 'content': 'Testcase saved successfully'});
+                                        } else {
+                                            props.setShowPop({'title': 'Save Testcase', 'content': 'Failed to save Testcase'});
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error("Error")
+                                    })
+                                }
                             })
                             .catch(error=>console.error("Error: Fetch TestCase Failed"));
-                            
-                            
-                            // if(taskInfo.appType.toLowerCase()=="web" && '_modified' in localStorage && localStorage['_modified'] != ""){
-                            //     var screenId = taskInfo.screenId;
-                            //     var screenName = angular.element(document.getElementById("left-nav-section")).scope().screenName;
-                            //     var projectId = taskInfo.projectId;
-                            //     var userinfo = JSON.parse(window.localStorage['_UI']);
-                            //     scrapeObject = {};
-                            //     if(localStorage['_modified'])
-                            //     {
-                            //         data1=JSON.parse(localStorage['_modified'])
-                            //         for(i=0;i<scrape_data.view.length;i++){
-                            //             if(scrape_data.view[i].custname in data1){
-                            //                 scrape_data.view[i].xpath=data1[scrape_data.view[i].custname]
-                            //             }
-                            //         } 
-                            //     }
-                            //     scrapeObject.getScrapeData = JSON.stringify(scrape_data);
-                            //     scrapeObject.projectId = projectId;
-                            //     scrapeObject.screenId = screenId;
-                            //     scrapeObject.screenName = screenName;
-                            //     scrapeObject.userinfo = userinfo;
-                            //     scrapeObject.param = "updateScrapeData_ICE";
-                            //     scrapeObject.appType = taskInfo.appType;
-                            //     scrapeObject.versionnumber = taskInfo.versionnumber;
-                            //     scrapeObject.newData = viewString;
-                            //     if(deleteObjectsFlag==true){
-                            //         scrapeObject.type = "delete";
-                            //         deleteObjectsFlag = false;
-                            //     }
-                            //     else
-                            //         scrapeObject.type = "save";
-                            //     //Update Service to Save Scrape Objects
-                            //     DesignApi.updateScreen_ICE(scrapeObject)
-                            //         .then(function (data1) {
-                            //             if (data1 == "Invalid Session") {
-                            //                 return $rootScope.redirectPage();
-                            //             }
-                            //             if (data1 == "success") {
-                            //                 openDialog("Save Testcase", "Testcase saved successfully.");
-                            //                 //$("#WSSaveSuccess").modal("show");
-                            //                 $("#enbledWS").prop("checked", false)
-                            //                 angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
-                            //             } else {
-                            //                 openDialog("Save Testcase", "Failed to save Testcase.");
-                            //                 //$("#WSSaveFail").modal("show")
-                            //             }
-                            //         }, function (error) {
-                            //             console.log("Error")
-                            //         })
-                            // }
                         } else {
                             props.setShowPop({'title':'Save Testcase', 'content':'Failed to save Testcase'})
                         };
@@ -384,7 +399,6 @@ const DesignContent = (props) => {
                 testCases[rowIdx].outputVal = outputVal;
                 changed = true;
             }
-            setFocusedRow("");
         }
         else if (operation === "remarks") {
             testCases[rowIdx].remarks = data.remarks;
@@ -470,6 +484,18 @@ const DesignContent = (props) => {
         setFocusedRow(insertedRowIdx);
         setChanged(true);
         // setEdit(false);
+    }
+
+    const selectMultiple = () => {
+        setCheckedRows([]);
+        setHeaderCheck(false);
+        setFocusedRow(null);
+        setShowSM(true);
+    }
+
+    const selectSteps = stepList => {
+        setCheckedRows([...stepList]);
+        setShowSM(false);
     }
 
     const editRow = () => {
@@ -669,6 +695,7 @@ const DesignContent = (props) => {
 
     return (
         <>
+        { showSM && <SelectMultipleDialog setShow={setShowSM} selectSteps={selectSteps} upperLimit={testCaseData.length} /> }
         { showPS && <PasteStepDialog setShow={setShowPS} pasteSteps={pasteSteps} upperLimit={testCaseData.length}/> }
         { showRemarkDlg && <RemarkDialog remarks={testCaseData[parseInt(showRemarkDlg)].remarks} setShow={setShowRemarkDlg} onSetRowData={setRowData} idx={showRemarkDlg} firstname={userInfo.firstname} lastname={userInfo.lastname}/> }
         { showDetailDlg && <DetailsDialog TCDetails={testCaseData[showDetailDlg].addTestCaseDetailsInfo && JSON.parse(testCaseData[showDetailDlg].addTestCaseDetailsInfo)} setShow={setShowDetailDlg} onSetRowData={setRowData} idx={showDetailDlg} /> }

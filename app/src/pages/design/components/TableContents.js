@@ -2,40 +2,33 @@ import React, {useEffect} from 'react';
 import TableRow from './TableRow';
 import "../styles/TableContents.scss"
 
+/*
+    will be removed soon
+*/
+
 const TableContents = (props) => {
     let key =  0;
     return (
         <>
-        {/* // <div className="ab">
-        //     <div className="min">
-        //         <div className="con">
-        //             <ScrollBar> */}
-                {
-                    props.testCaseList.map((testCase, i) => <TableRow 
-                                                                key={key++}
-                                                                idx={i} 
-                                                                objList={props.objList} 
-                                                                testCase={testCase} 
-                                                                edit={props.edit} 
-                                                                getKeywords={props.getKeywords} 
-                                                                getRowPlaceholders={props.getRowPlaceholders}
-                                                                checkedRows={props.checkedRows}
-                                                                updateChecklist={props.updateChecklist} 
-                                                                focusedRow={props.focusedRow}
-                                                                setFocusedRow={props.setFocusedRow}
-                                                                setRowData={props.setRowData}
-                                                                firstName={props.firstName}
-                                                                lastName={props.lastName}
-                                                                saveDetails={props.saveDetails}
-                                                                showRemarkDialog={props.showRemarkDialog}
-                                                                showDetailDialog={props.showDetailDialog}
-                                                                rowChange={props.rowChange}
-                                            />)
-                }
-        {/* //             </ScrollBar>
-        //         </div>
-        //     </div>
-        // </div> */}
+        {
+            props.testCaseList.map((testCase, i) => <TableRow 
+                                                        key={key++}
+                                                        idx={i} 
+                                                        objList={props.objList} 
+                                                        testCase={testCase} 
+                                                        edit={props.edit} 
+                                                        getKeywords={props.getKeywords} 
+                                                        getRowPlaceholders={props.getRowPlaceholders}
+                                                        checkedRows={props.checkedRows}
+                                                        updateChecklist={props.updateChecklist} 
+                                                        focusedRow={props.focusedRow}
+                                                        setFocusedRow={props.setFocusedRow}
+                                                        setRowData={props.setRowData}
+                                                        showRemarkDialog={props.showRemarkDialog}
+                                                        showDetailDialog={props.showDetailDialog}
+                                                        rowChange={props.rowChange}
+                                    />)
+        }
         </>
     );
 }

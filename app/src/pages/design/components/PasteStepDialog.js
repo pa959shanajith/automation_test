@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { PopupMsg } from '../../global';
 
+/*
+    Component: Paste Steps Dialog
+    Uses: Renders small dialog box to input test step number to paste after
+    Props: 
+        setShow -> show/hide dialog setState
+        upperLimit -> maximum size of testcases / testcase array length
+        pasteSteps -> method to call when pressing paste
+*/
+
 const PasteStepDialog = (props) => {
 
     const [stepNum, setStepNum] = useState("");

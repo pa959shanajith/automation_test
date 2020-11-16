@@ -1,6 +1,13 @@
 import React from 'react';
 import "../styles/FooterTwo.scss"
 
+/*
+    Component: Footer
+    Uses: Provides Footer with text on left and right
+    Props: None
+
+*/
+
 const Footer = () => {
     return (
         <div className="main-footer">

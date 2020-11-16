@@ -2,6 +2,15 @@ import React, { useState } from 'react';
 import { ModalContainer } from '../../global';
 import '../styles/ChangePassword.scss';
 
+/*
+    Component: Change Password Modal Popup
+    Uses: Renders the modal Popup for changing password
+    Props: setShow -> setState for displaying and hiding modal
+            loginApi -> loginApi
+            setSuccessPass -> successPass setState to flip the flag once change pass is success
+
+*/
+
 const ChangePassword = ({setShow, loginApi, setSuccessPass}) => {
 
     const [currpassword, setCurrPassword] = useState("");
