@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PopupMsg } from '../../global';
+import "../styles/PasteStepDialog.scss";
 
 /*
     Component: Paste Steps Dialog

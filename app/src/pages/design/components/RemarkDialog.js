@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ModalContainer } from "../../global";
+import "../styles/RemarkDialog.scss";
 
 /*
     Component: Remark Dialog

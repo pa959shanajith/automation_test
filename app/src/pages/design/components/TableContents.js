@@ -1,6 +1,5 @@
 import React, {useEffect} from 'react';
 import TableRow from './TableRow';
-import "../styles/TableContents.scss"
 
 /*
     will be removed soon

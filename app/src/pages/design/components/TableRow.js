@@ -1,5 +1,5 @@
 import React, { useState, useEffect, memo, useRef } from 'react';
-
+import "../styles/TableRow.scss";
 
 /*
     Component: TableRow

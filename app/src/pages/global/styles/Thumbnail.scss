@@ -12,6 +12,11 @@
     }
 }
 
+.disable-thumbnail{
+    pointer-events: none;
+    opacity: 0.5;
+}
+
 .thumbnail__img{
     padding: 8px 10px;
     margin-bottom: 2px;

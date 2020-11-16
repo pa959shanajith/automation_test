@@ -104,7 +104,7 @@ const ReferenceBar = (props) => {
             setShowTask(false);
             setTaskInfo(info);
         }
-    }, [current_task]);
+    }, [current_task, current_task.screenName]);
 
     const onSearchHandler = event => {
         searchTask(event.target.value)

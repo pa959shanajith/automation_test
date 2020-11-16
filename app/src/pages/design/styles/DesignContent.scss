@@ -182,186 +182,28 @@
     text-overflow: ellipsis;
 }
 
-.d__table_row_edit{
-    &:active{
-        background-color: #e3caff;
-    }
-}
-
-.d__ghost_row{
-    opacity: 0;
-}
-
-.d__table_row{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px 0;
-    margin-right: 2px;
-    font-size: 14px;
-    font-family: "LatoWeb";
-    border-left: 5px solid transparent;
-    cursor: pointer;
-
-    span:not(.remark_col):not(.details_col):not(.step_col){
-        text-align: left;
-    }
-}
-
-.commented_row{
-    border-left: 5px solid red;
-    .output_col {
-        color: red;
-    }
-}
-
-.d__odd_row{
-    background-color: #e8e6fe;
-}
-
-.col_select, .col_inp{
-    height: 25px;
-    width: 95%;
-    padding: 0 10px;
-    border: 1px solid #5e636b;
-    font-size: 12px;
-    color: #555;
-    border-radius: 4px;
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    outline: none;
-    &:focus{
-        box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgb(204, 169, 255);
-    }
-}
-
-.col_inp_area{
-    min-height: 25px;
-    max-height: 25px;
-    resize: none;
-}
-
-.d__row_text{
-    min-height: 20px;
-    width: 95%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin: 0 6px;
-}
-
-.ps_dialog{
-    display: flex;
-    flex-direction: column;
-    font-weight: normal;
-    font-family: "LatoWebMedium";
-    color: black;
-}
-
-.ps_lbl{
-    font-size: 14px;
-    margin-bottom: 3px;
-}
-
-.ps_hint{
-    font-size: 11px;
-    margin-bottom: 10px;
-}
-
-.ps_input{
-    font-family: "LatoWeb";
-    border-radius: 4px;
-    color: #555;
-    background-color: #fff;
-    border: 1px solid #311d4e;
-    height: 34px;
-    padding: 6px 12px;
-    font-size: 14px;
-    outline: none;
-    &:focus{
-        box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgb(204, 169, 255);
-    }
-}
-
-.ps_error{
-    color: #cc3300;
-    font-size: 11px;
-}
-
 .highlight-step{
     background-color: #e3caff;
 }
-
-
-.d__add_remark_lbl, .remark_history_lbl{
-    color: black;
-    font-family: 'LatoWebMedium';
-}
-
-.remark_input{
-    resize: both;
-    border: 1px solid #311d4e;
-    outline: none;
-    padding: 6px 12px;
-    font-size: 14px;
-    color: #555;
-    background-color: #fff;
-    border-radius: 4px;
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    width: 100%;
-    max-width: 100%;
-    max-height: 50vh;
-    min-width: 25%;
-    &:focus{
-        box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgb(204, 169, 255);
-    }
-}
-
-.remark_error{
-    border: 1px solid red;
-}
-
-.remark_history_content{
-    color: black;
-    font-size: 12px;
-    width: 100%;
-    max-height: 110px;
-    border: 1px solid #ccc;
-    padding: 3px;
-    overflow: auto;
-    overflow-x: hidden;
-    margin-bottom: 12px;
-}
-
-.remark_container, .d__details_container{
-    .modal__body{
-        padding-right: 15px;
-    }
-    .modal__content{
-        width: 80%;
-    }
-}
-
-.d__details_container{
-    .modal__content{
-        width: 120%;
-    }
-}
-
-.d__detail_input_group{
+.ab{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
     display: flex;
     flex-direction: column;
 }
-
-.d__detail_input{
-    margin-bottom: 5%;
-    border: none;
-    outline: none;
-    border-bottom: 1px solid #656565;
-    color: #333;
-    height: 34px;
-    padding: 6px 12px;
-    font-size: 14px;
-    font-family: "LatoWeb";
+.min{
+    min-height: 0;
 }
+.con{
+    display: flex;
+    flex-direction: column;
+    flex: 1 1;
+    height: 100%;
+}
+
 
 @media screen and (min-width: 1400px) and (min-height: 770px){
     .d__content{
