@@ -16,6 +16,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.domainConf = {};
 	$scope.moveItems = {};
 	$scope.assignProj = {};
+	$scope.createIcePool = {};
+	$scope.allocateIcePool = {};
 	$scope.preferences = {};
 	$scope.sessionConf = {};
 	$scope.tokens = {};
@@ -166,6 +168,138 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			}
 		});
 	});
+
+	$scope.populatePool = new Promise ((res) => {
+		adminServices.getUserDetails("user")//temp
+		.then(function(data){
+			data = [{name:'pool1',projectList:[],iceList:[]},{name:'pool2',projectList:[],iceList:[]},{name:'pool3',projectList:[],iceList:[]}]
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "fail") {
+				openModalPopup("Edit User", "Failed to fetch users.");
+			} else if(data == "empty") {
+				openModalPopup("Edit User", "There are no users created yet.");
+			} else {
+				data.sort((a,b) => a.name.localeCompare(b.name));
+				res(data) 
+			}
+			unblockUI();
+			res([]);
+		}, function (error) {
+			unblockUI();
+			console.error(error)
+			openModalPopup("Edit User", "Failed to fetch users.");
+			res([]);
+		});
+	})
+	
+	const populateICEList = new Promise ((res) => {
+		adminServices.getUserDetails("user")//temp
+		.then(function(data){
+			data = [{name:'ICE1',projectList:[],iceList:[]},{name:'ICE2',projectList:[],iceList:[]},{name:'ICE3',projectList:[],iceList:[]}]
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "fail") {
+				openModalPopup("Edit User", "Failed to fetch users.");
+			} else if(data == "empty") {
+				openModalPopup("Edit User", "There are no users created yet.");
+			} else {
+				data.sort((a,b) => a.name.localeCompare(b.name));
+				res(data) 
+			}
+			unblockUI();
+			res([]);
+		}, function (error) {
+			unblockUI();
+			console.error(error)
+			openModalPopup("Edit User", "Failed to fetch users.");
+			res([]);
+		});
+	})
+	
+	$scope.allocateIcePool.click = async() =>{
+		$(".selectedIcon").removeClass("selectedIcon");
+		$("#allocateIcePool").find("span.fa").addClass("selectedIcon");
+		//api to get total ice count and remaining ice count
+		$scope.iceAllocateType('quantity');
+		blockUI("Fetching ICE Pools...");
+		$scope.allocateIcePool.iceCount = {total:100,available:50}
+		var data = await $scope.populatePool
+		$scope.allocateIcePool.allIcePoolList = data
+		unblockUI()
+	}
+	
+	$scope.allocateIcePool.saveClick = (pool) =>{
+		blockUI('Saving in Progress. Please Wait...');
+		openModalPopup("ICE Pool Update", "ICE assigned to pool successfully");
+		unblockUI()
+	}
+
+	$scope.allocateIcePool.selectIcePool = (pool) =>{
+		pool.iceList = ['ice-1','ice-2']
+		$scope.allocateIcePool.selectedIcePool=pool
+		if($scope.allocateIcePool.type==='quantity'){
+			$('#update-icepool-count').removeClass("hide")
+			$('#update-icepool-count').find('input').attr({
+				"max":25,
+				"min":0,
+			})
+			$('#update-icepool-count').find('input').val(pool.iceList.length)
+		}
+	}
+
+	$scope.createIcePool.click = () =>{
+		$(".selectedIcon").removeClass("selectedIcon");
+		$("#createIcePool").find("span.fa").addClass("selectedIcon");
+		var idtype =  ["domaindetails"] //temp
+		var requestedids = ["Banking"] //temp
+		adminServices.getDetails_ICE(idtype, requestedids)
+		.then(function (res) {
+			if (res == "Invalid Session") {
+				$rootScope.redirectPage();
+			}
+			if (res.projectIds.length > 0) {
+				$scope.assignProj.allProjectAP = [];
+				$scope.assignProj.assignedProjectAP = [];
+				for (var n = 0; n < res.projectIds.length; n++) {
+					$scope.assignProj.allProjectAP.push({'projectname':res.projectNames[n],'projectid':res.projectIds[n]});
+				}
+			}
+		})
+	}
+
+	$scope.createIcePool.selectIcePool = (pool) =>{
+		$scope.createIcePool.selectedIcePool=pool
+		$("#update-icepool-form").removeClass("hide-from");
+	}
+
+	$scope.editICEPool = async($event) => {
+		$scope.tab = "tabIcePoolEdit";
+		blockUI("Fetching ICE Pools...");//temp
+		var data = await $scope.populatepool
+		$scope.createIcePool.allIcePoolList = data;
+		unblockUI();
+	}
+
+	$scope.allocationPoolReset = () => {
+		$('#update-icepool-count').addClass("hide")
+		$scope.allocateIcePool.allIcePoolListFilter=''
+		$scope.allocateIcePool.selectedIcePool = undefined
+	}
+
+	$scope.iceAllocateType = async(type) => {
+		blockUI('Fetching ICE Pools')
+		$(".active-opt").removeClass("active-opt").addClass('btn-md');
+		$('#icepool-'+type).addClass('active-opt').removeClass('btn-md');
+		$scope.allocationPoolReset()
+		$scope.allocateIcePool.type = type
+		if(type=='specific'){
+			var data = await populateICEList
+			$scope.allocateIcePool.allICEList = data
+		}
+		unblockUI()
+	}
+
 	// Assign Projects Tab Click
 	$scope.assignProj.click = function () {
 		resetAssignProjectForm();

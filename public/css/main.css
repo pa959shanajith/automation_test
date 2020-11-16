@@ -3965,6 +3965,102 @@ select[multiple]:-internal-list-box option:checked {
     padding-left: 18px;
     width: fit-content;
 }
+
+/*** ICEPOOL CREATETAB CSS **/
+#create-icepool .adminControl{
+    width:75%
+}
+#create-icepool .adminControl div span{
+    width: 95px;
+    padding-left: 10px;
+}
+/* #update-icepool-form.hide-from{
+    display:none;
+} */
+#allocate-icepool .adminControl {
+    width: 75%;
+    padding-left: 50px;
+}
+#allocate-icepool .adminControl button{
+    margin-right: 10px;
+    border-radius: 6px;
+}
+#allocate-icepool .adminControl span{
+    margin-right: 20px;
+    border-radius: 6px;
+}
+.active-opt{
+    background: white ;
+    color: #643693 ;
+    border: solid 1px ;
+    /* padding: 2px 15px; */
+    font-size: 17px;
+    /* background: #643693; */
+    font-family: 'LatoWebLight';
+    outline: 0;
+}
+.active-opt:hover{
+    background: white ;
+    color: #643693 ;
+    border: solid 1px ;
+    /* padding: 2px 15px; */
+    font-size: 17px;
+    font-family: 'LatoWebLight';
+    outline: 0;
+}
+.active-opt:focus{
+    outline: 0 !important;
+}
+.btn:active{
+    outline: 0 !important;
+}
+#icepoolNumInp{
+    width: 200px;
+    border: 1px solid !important;;
+}
+#search-ice-pool{
+    padding:0 !important;
+    margin-bottom: 0;
+}
+#search-ice-pool :active{
+    outline: 0!important;
+}
+#search-ice-pool ul{
+   left:0
+}
+#specific-ice-pool{
+    padding: 0;
+}
+#specific-ice-pool .hide{
+    display: none;
+}
+#specific-ice-pool > .left-select{
+    width: 45%;
+}
+#specific-ice-pool > .left-select label{
+    margin-bottom: 14px;
+    line-height: 2;
+}
+#specific-ice-pool > .right-select{
+    width: 45%;
+}
+#specific-ice-pool > .right-select label{
+    line-height: 2;
+}
+#specific-ice-pool > .wrap-editpro button{
+    margin-left: 30%;
+}
+#specific-ice-pool .adminControl {
+    width: 65%;
+    float: right;
+    padding-left: 0px;
+}
+.edit-icepool-proj{
+    margin: 15px 0
+}
+
+/*** ICEPOOL CREATETAB CSS **/
+
 /*****************ADMIN CSS NEW ************************/
 
 /******************Reports CSS***************************/
