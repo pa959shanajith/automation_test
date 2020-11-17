@@ -333,8 +333,8 @@ function check_pulse(){
 			if(Date.parse(time) - Date.parse(iceTime) > 120000){
 				var writeStr = "\n\n------------------\n" + time.toString() + " " + ice + " Disconnected pulse last recieved at: " + iceTime.toString() + "\n------------------\n\n"
 				console.log("Disconnect ice " + ice)
-				pulse_ICE[ice]["time"] = null
-				//TODO Change ICE Status to false in execution Queue
+				pulse_ICE[ice]["time"] = null;
+				pulse_ICE[ice]["connected"] = true;
 			}else{
 				writeStr ="\n"+time.toString() + " " + ice + " status: " + pulse_ICE[ice]["status"] + " ICE mode: " + pulse_ICE[ice]["mode"] 
 				console.log(writeStr)

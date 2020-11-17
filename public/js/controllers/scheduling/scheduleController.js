@@ -317,7 +317,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 					const sltime_2 = suiteInfo.time.split(":");
 					const timestamp = new Date(sldate_2[2], (sldate_2[1] - 1), sldate_2[0], sltime_2[0], sltime_2[1]);
 					const diff = (timestamp - new Date()) / 60000;
-					if (diff < 5) {  // Check if schedule time is not ahead of 5 minutes from current time
+					if (diff < 5 && false) {  // Check if schedule time is not ahead of 5 minutes from current time
 						if (diff < 0) $(this).children('.scheduleSuite').find(".datePicContainer .fc-datePicker").prop("style", "border: 2px solid red;");
 						$(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").prop("style", "border: 2px solid red;");
 						openModelPopup("Schedule Test Suite", "Schedule time must be 5 mins more than current time.");

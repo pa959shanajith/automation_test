@@ -3809,4 +3809,23 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			console.error("Fail to load session data", error);
 		});
 	};
+
+	$("#test")[0].onclick = () => {
+		console.log("test")
+		const inputs = {
+			poolname: "pool1",
+			projectids: [],
+			ice_added: ["ice 1","ice 2"],
+			ice_deleted: [],
+			updatedby: "5db0022cf87fdec084ae49ad",
+			
+
+		};
+		adminServices.updatePool(inputs).then(()=>{
+			console.log("create pool")
+		});
+	}
+	function testAPI(){
+		console.log("test")
+	}
 }]);
