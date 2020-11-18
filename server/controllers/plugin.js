@@ -4,6 +4,8 @@ var utils = require('../lib/utils');
 var epurl = process.env.DAS_URL;
 var Client = require("node-rest-client").Client;
 var client = new Client();
+// var fingerprint = require('browser-fingerprint')()
+// logger.info("fingerprint: " + fingerprint);
 
 //getProjectIds
 exports.getProjectIDs = function (req, res) {
@@ -98,9 +100,9 @@ exports.getProjectIDs = function (req, res) {
 
 
 exports.storeUserDetails = function (req, res) {
-	// const fnName = "storeUserDetails";
+	const fnName = "storeUserDetails";
 	// const fingerprint = gbfp.getBrowserFingerprint();
-	console.log(fingerprint);
+	// console.log(fingerprint);
 	try {
 		logger.info("Inside UI Service: " + fnName);
 		var userDetails = req.body.userDetails;
@@ -115,12 +117,14 @@ exports.storeUserDetails = function (req, res) {
 		var email = userDetails[0].emailaddress;
 		var acceptance = userDetails[0].acceptance;
 		var timestamp = userDetails[0].timestamp;
+		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 		var inputs = {
 			"username": username,
 			"fullname": fullname,
 			"email": email,
 			"acceptance": acceptance,
 			"timestamp" : timestamp,
+			"ip" : ip,
 			"query": "checkTandC"
 		};
 		var args = {

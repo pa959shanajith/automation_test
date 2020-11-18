@@ -72,8 +72,14 @@ exports.loadUserInfo = async (req, res) => {
 		// }
 		if (userProfile.rolename != "Admin" && userProfile.tandc == "True"){
 			const input_name = userProfile.username
-			inputs = { input_name };
+			var funName = "loadUserInfo";
+			// inputs = { input_name };
+			inputs = {
+				"input_name": input_name,
+				"query": funName
+			};
 			const eulaData = await utils.fetchData(inputs, "login/checkTandC", fnName);
+			logger.info("Inside UI Service: " + fnName);
 			// logger.info("Inside UI Service: " + fnName);
 			// logger.info("Inside UI Service: " + fnName);
 			// logger.info("Inside UI Service: " + eulaData);

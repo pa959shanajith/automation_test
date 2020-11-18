@@ -515,6 +515,7 @@ if (cluster.isMaster) {
 		app.post('/getProjectIDs', plugin.getProjectIDs);
 		app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
 		app.post('/updateTaskstatus_mindmaps', taskbuilder.updateTaskstatus_mindmaps);
+		app.post('/storeUserDetails', plugin.storeUserDetails);
 		//Utility plugins
 		app.post('/Encrypt_ICE', utility.Encrypt_ICE);
 		// Wecoccular Plugin
