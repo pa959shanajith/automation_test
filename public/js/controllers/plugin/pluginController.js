@@ -4,6 +4,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	localStorage.setItem("navigateEnable", true);
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear();
 	var userInfo = JSON.parse(window.localStorage['_UI']);
+	var userDataList = [];
 	$scope.filterData = {'prjval':'Select Project','relval':'Select Release','cycval':'Select Cycle','apptype':{},'tasktype':{}};
 	$("#plugin-container").empty().hide();
 	$("body").css("background", "#fff");
@@ -326,15 +327,103 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	window.localStorage['_TJ'] = "";
 	window.localStorage['_CT'] = "";
 
-	$scope.logout = function($event){
+	$scope.declineB = function($event){
 		//Transaction Activity for Logout Button Action
 		// var labelArr = [];
 		// var infoArr = [];
 		// labelArr.push(txnHistory.codesDict['Logout']);
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+		var x = document.getElementById("declineBtn")
+		if (x.innerHTML=="Decline"){
+			console.log("x value is "+ (x.innerHTML))
+			var userDetail = JSON.parse(window.localStorage['_UI']);
+			console.log("userDetail value is "+ (userDetail))
+			var userName = userDetail.username
+			var firstName = userDetail.firstname
+			var lastName = userDetail.lastname
+			var fullName = firstName+" "+lastName
+			var acceptance = x.innerHTML
+			var email = userDetail.email_id
+			// var ip = window.location.hostname
+			var timeStamp = new Date().toLocaleString();
+			var userDataList = [];
+			userDataList.push({
+				'username': userName,
+				'fullname': fullName,			
+				'emailaddress': email,
+				'acceptance': acceptance,
+				'timestamp': timeStamp
+			});
+			// var mainModal = $("#tAndCpop");
+			// mainModal.modal("hide");
+			PluginService.storeUserDetails(userDataList)
+				.then(function (data) {
+					if(data == "Invalid Session") {
+						openModelPopup("store user Details", "failed to save");
+					} 
+					else {if(data == "success"){
+						userDataList = [];
+						// var mainModal = $("#tAndCpop");
+						// mainModal.find('.modal-title').text(title);
+						// mainModal.find('.modal-body p').text(body);
+						// mainModal.modal("hide");
+						}
+					}
+				},function(error) {
+					console.log("Error updating task status " + (error.data));
+				});
+		}
 		window.sessionStorage.clear();
 		window.sessionStorage["checkLoggedOut"] = true;
 		$rootScope.redirectPage();
+	};
+
+	$scope.AcceptB = function($event){
+		var x = document.getElementById("acceptBtn")
+		if (x.innerHTML=="Accept"){
+			console.log("x value is "+ (x.innerHTML))
+			var userDetail = JSON.parse(window.localStorage['_UI']);
+			console.log("userDetail value is "+ (userDetail))
+			var userName = userDetail.username
+			var firstName = userDetail.firstname
+			var lastName = userDetail.lastname
+			var fullName = firstName+" "+lastName
+			var acceptance = x.innerHTML
+			var email = userDetail.email_id
+			// var ip = window.location.hostname
+			var timeStamp = new Date().toLocaleString();
+			var userDataList = [];
+			userDataList.push({
+				'username': userName,
+				'fullname': fullName,			
+				'emailaddress': email,
+				'acceptance': acceptance,
+				'timestamp': timeStamp
+			});
+			// var mainModal = $("#tAndCpop");
+			// mainModal.modal("hide");
+			PluginService.storeUserDetails(userDataList)
+				.then(function (data) {
+					if(data == "Invalid Session") {
+						openModelPopup("store user Details", "failed to save");
+					} 
+					else {if(data == "success"){
+						userDataList = [];
+						var mainModal = $("#tAndCpop");
+						// mainModal.find('.modal-title').text(title);
+						// mainModal.find('.modal-body p').text(body);
+						mainModal.modal("hide");
+						}
+					}
+				},function(error) {
+					console.log("Error updating task status " + (error.data));
+				});
+
+		}
+		// var mainModal = $("#tAndCpop");
+			// mainModal.find('.modal-title').text(title);
+			// mainModal.find('.modal-body p').text(body);
+		// mainModal.modal("hide");
 	};
 
 	$scope.taskRedirection = function(testsuitedetails,dataobj,event){
