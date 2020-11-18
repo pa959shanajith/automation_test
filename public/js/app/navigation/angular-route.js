@@ -261,7 +261,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
 						'js/directives/headerDirective.js',	
-						'css/css_QC/qcStyle.css',
+						'css/css_QC/qtestStyle.css',
 						'js/factories/socketFactory.js',
 						'js/controllers/chatbot/chatbotController.js',
 						'js/controllers/chatbot/chatbotService.js',
@@ -281,7 +281,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
 						'js/directives/headerDirective.js',	
-						'css/css_QC/qcStyle.css',
+						'css/css_QC/zephyrStyle.css',
 						'js/factories/socketFactory.js',
 						'js/controllers/chatbot/chatbotController.js',
 						'js/controllers/chatbot/chatbotService.js',

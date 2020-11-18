@@ -1,4 +1,4 @@
-mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','$location','$timeout','zephyrServices','cfpLoadingBar', 'socket', function($scope, $rootScope, $window,$http,$location,$timeout,qcServices,cfpLoadingBar,socket) {
+mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','$location','$timeout','zephyrServices','cfpLoadingBar', 'socket', function($scope, $rootScope, $window,$http,$location,$timeout,zephyrServices,cfpLoadingBar,socket) {
 	$('.scrollbar-inner').scrollbar();
 	var avoassure_projects_details;
 	$timeout(function(){
@@ -23,10 +23,10 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 		if(domainData){
 			$timeout(function(){
 				if((domainData != undefined || domainData != "") && domainData.length > 0){
-					$(".qcSelectDomain").empty();
-					$(".qcSelectDomain").append("<option selected disabled>Select Project</option>");
+					$(".zephyrSelectProject").empty();
+					$(".zephyrSelectProject").append("<option selected disabled>Select Project</option>");
 					for(var i=0;i<domainData.length;i++){
-						$(".qcSelectDomain").append("<option data-projectid="+domainData[i].id+" value='"+domainData[i].name+"'>"+domainData.domain[i]+"</option>");
+						$(".zephyrSelectProject").append("<option data-projectid="+domainData[i].id+" value='"+domainData[i].name+"'>"+domainData.domain[i]+"</option>");
 					}
 				}
 			}, 500);
@@ -56,12 +56,12 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 		$scope.testLabGenerator = false;
 		$(".mappedFiles, .mappedFilesLabel").hide();
 		$("#page-taskName span").text("Zephyr Integration");
-		$(".qcActionBtn, .leftQcStructure, .rightQcStructure").show();
+		$(".zephyrActionBtn, .leftZephyrStructure, .rightZephyrStructure").show();
 		$("#qtestTab").show();
 		$("#almTab").show();
 	};	
 
-	//login to QC
+	//login to Zephyr
 	$scope.loginToZephyr = function($event){
 		$(".zephyrLoginload").show();
 		$("#zephyrAccNo,#zephyrAcKey,#zephyrSecKey").css("background","none");
@@ -105,7 +105,7 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 		}
 		else{
 			$("#zephyrSecKey").removeClass("inputErrorBorder");
-			qcServices.loginToZephyr_ICE(zephyrAccNo,zephyrAcKey,zephyrSecKey,zephyrJiraUrl,zephyrJiraUserName,zephyrJiraAccToken)
+			zephyrServices.loginToZephyr_ICE(zephyrAccNo,zephyrAcKey,zephyrSecKey,zephyrJiraUrl,zephyrJiraUserName,zephyrJiraAccToken)
 			.then(function(data){
 				$scope.domainData = data;
 				$(".zephyrLoginload").hide();
@@ -124,23 +124,23 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 				} else if(data == "fail"){
 					$("#zephyrErrorMsg").text("Fail to Login");
 				}
-				else if(data == "Error:Failed in running Qc"){
-					$("#zephyrErrorMsg").text("Unable to run Qc");
+				else if(data == "Error:Failed in running Zephyr"){
+					$("#zephyrErrorMsg").text("Unable to run Zephyr");
 				} 
-				else if(data=="Error:Qc Operations"){
+				else if(data=="Error:Zephyr Operations"){
 					$("#zephyrErrorMsg").text("Failed during execution");
 				}
 				else if(data){
-					$(".qcSelectDomain").empty();
-					$(".qcSelectDomain").append("<option selected disabled>Select Project</option>");
+					$(".zephyrSelectProject").empty();
+					$(".zephyrSelectProject").append("<option selected disabled>Select Project</option>");
 					for(var i=0;i<data.length;i++){
-						$(".qcSelectDomain").append("<option data-projectid="+data[i].id+" value='"+data[i].name+"'>"+data[i].name+"</option>");
+						$(".zephyrSelectProject").append("<option data-projectid="+data[i].id+" value='"+data[i].name+"'>"+data[i].name+"</option>");
 					}
 					$("#loginToZephyrpop").modal("hide");
 					$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">User Name :</span><span class="content">'+zephyrAcKey+'</span></p>');
 				}
 			},
-			function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
+			function(error) {	console.log("Error in zephyrController.js file loginToZephyr method! \r\n "+(error.data));
 			});
 		}
 	}; 
@@ -151,12 +151,12 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 	};
 
 	//Select Domains
-	$(document).off('change').on('change', ".qcSelectDomain", function(){
+	$(document).off('change').on('change', ".zephyrSelectProject", function(){
 		$(document.body).css({'cursor' : 'wait'});
-		$(".qcSelectDomain").prop("disabled", true);
+		$(".zephyrSelectProject").prop("disabled", true);
 		var getDomain = $(this).children("option:selected").val();
 		blockUI('Loading....');
-		qcServices.zephyrProjectDetails_ICE(getDomain)
+		zephyrServices.zephyrProjectDetails_ICE(getDomain)
 			.then(function(data){
 				avoassure_projects_details = data.avoassure_projects;
 				if(data == "unavailableLocalServer"){
@@ -177,10 +177,10 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 						$(".zephyrAvoAssureSelectProject").append("<option value='"+data.avoassure_projects[i].project_id+"'>"+data.avoassure_projects[i].project_name+"</option>");
 					}
 
-					var structContainer = $(".qcTreeContainer");
+					var structContainer = $(".zephyrTreeContainer");
 					structContainer.empty();
 					$(".mtgScenarioList").empty();
-					structContainer.append("<ul class='root scrollbar-inner'><li class='testfolder_'><img class='qcCollapse' title='expand' style='height: 16px;' src='imgs/ic-qcCollapse.png'><label title='Root'>Root</label></li></ul>");
+					structContainer.append("<ul class='root scrollbar-inner'><li class='testfolder_'><img class='zephyrCollapse' title='expand' style='height: 16px;' src='imgs/ic-qcCollapse.png'><label title='Root'>Root</label></li></ul>");
 					project_dets = data.project_dets;
 					if(project_dets.length>0) {
 						for(var i=0 ; i<project_dets.length;++i) {
@@ -191,14 +191,14 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 							if(i == 0){				
 								structContainer.find(".root").append("<ul class='cycleList'></ul>");
 							}
-							structContainer.find(".cycleList").append("<li class='Tfolnode testfolder_"+(i+1)+"'><img class='qcExpand qcExpandFolder selectedQcNode' title='expand' style='height: 16px;' src='imgs/ic-qcExpand.png'><label title='"+keyVal+"'>"+keyVal+"</label></li>");
+							structContainer.find(".cycleList").append("<li class='Tfolnode testfolder_"+(i+1)+"'><img class='zephyrExpand zephyrExpandFolder selectedZephyrNode' title='expand' style='height: 16px;' src='imgs/ic-qcExpand.png'><label title='"+keyVal+"'>"+keyVal+"</label></li>");
 							var suites = project_dets[i].tests;
 							for (var j=0;j<suites.length;++j){
 								if(j==0){
 									structContainer.find(".testfolder_"+(i+1)).append("<ul class='suiteList suiteList_"+(i+1)+"'></ul>")
 									$(".suiteList_"+(i+1)).hide();
 								}
-								structContainer.find(".suiteList_"+(i+1)).append("<li  class='testSuite testcaselink testSet_"+(i+1)+""+(j+1)+"' data-suiteid="+suites[j].id+" data-issueid="+suites[j].issueId+" data-cycleid="+cycleId+" data-versionid="+versionId+" data-projectid="+projectId+"  data-type='testsuite'><label title='"+suites[j].name+"' style='margin-left:0px'>"+suites[j].name+"</label><img class='qcUndoSyncronise' title='Undo' src='imgs/ic-qcUndoSyncronise.png'><img class='qcSyncronise' title='Syncronise' src='imgs/ic-qcSyncronise.png'></li>");
+								structContainer.find(".suiteList_"+(i+1)).append("<li  class='testSuite testcaselink testSet_"+(i+1)+""+(j+1)+"' data-suiteid="+suites[j].id+" data-issueid="+suites[j].issueId+" data-cycleid="+cycleId+" data-versionid="+versionId+" data-projectid="+projectId+"  data-type='testsuite'><label title='"+suites[j].name+"' style='margin-left:0px'>"+suites[j].name+"</label><img class='zephyrUndoSyncronise' title='Undo' src='imgs/ic-qcUndoSyncronise.png'><img class='zephyrSyncronise' title='Syncronise' src='imgs/ic-qcSyncronise.png'></li>");
 							}
 						}
 							$('.scrollbar-inner').scrollbar();
@@ -207,52 +207,42 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 				unblockUI();
 			},
 			function(error) {	unblockUI(); 
-				console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
+				console.log("Error in zephyrController.js file loginZephyrServer method! \r\n "+(error.data));
 			});
 	});
 
 	//Select QC projects
 	$(document).on("change", ".qcSelectProject", function(){
 		var getProjectName = $(".qcSelectProject option:selected").val();
-		// var getDomainName = $(".qcSelectDomain option:selected").val();
-		var getProjectId = $(".qcSelectDomain option:selected").data("projectid")
+		var getProjectId = $(".zephyrSelectProject option:selected").data("projectid")
 		blockUI("Loading...");
-		qcServices.qtestFolderDetails_ICE("folder",getProjectName,getProjectId,"root")
+		zephyrServices.qtestFolderDetails_ICE("folder",getProjectName,getProjectId,"root")
 			.then(function(data){
-				var structContainer = $(".qcTreeContainer");
+				var structContainer = $(".zephyrTreeContainer");
 				structContainer.empty();
 				$(".mtgScenarioList").empty();
-				structContainer.append("<ul class='root scrollbar-inner'><li class='testfolder_'><img class='qcCollapse' title='expand' style='height: 16px;' src='imgs/ic-qcCollapse.png'><label title='Root'>Root</label></li></ul>");
+				structContainer.append("<ul class='root scrollbar-inner'><li class='testfolder_'><img class='zephyrCollapse' title='expand' style='height: 16px;' src='imgs/ic-qcCollapse.png'><label title='Root'>Root</label></li></ul>");
 				if(data.length>0) {
 					for(var i=0 ; i<data.length;++i) {
 						var keyVal = data[i].cycle;
 						if(i == 0){				
 							structContainer.find(".root").append("<ul class='cycleList'></ul>");
 						}
-						structContainer.find(".cycleList").append("<li class='Tfolnode testfolder_"+(i+1)+"'><img class='qcExpand qcExpandFolder selectedQcNode' title='expand' style='height: 16px;' src='imgs/ic-qcExpand.png'><label title='"+keyVal+"'>"+keyVal+"</label></li>");
+						structContainer.find(".cycleList").append("<li class='Tfolnode testfolder_"+(i+1)+"'><img class='zephyrExpand zephyrExpandFolder selectedZephyrNode' title='expand' style='height: 16px;' src='imgs/ic-qcExpand.png'><label title='"+keyVal+"'>"+keyVal+"</label></li>");
 						var suites = data[i].tests;
 						for (var j=0;j<suites.length;++j){
 							if(j==0){
 								structContainer.find(".testfolder_"+(i+1)).append("<ul class='suiteList suiteList_"+(i+1)+"'></ul>")
 								$(".suiteList_"+(i+1)).hide();
 							}
-							structContainer.find(".suiteList_"+(i+1)).append("<li  class='testcaselink testSuite testSet_"+(i+1)+""+(j+1)+"' data-suiteid="+suites[j].id+" data-type='testsuite'><label title='"+suites[j].name+"' style='margin-left:0px'>"+suites[j].name+"</label><img class='qcUndoSyncronise' title='Undo' src='imgs/ic-qcUndoSyncronise.png'><img class='qcSyncronise' title='Syncronise' src='imgs/ic-qcSyncronise.png'></li>");
-							// for (var k=0; k<suites[j].testruns.length;++k){
-							// 	if(k==0){
-							// 		structContainer.find(".suiteList_"+(i+1)).append("<ul class='runList runList_"+(i+1)+""+(j+1)+"'></ul>")
-							// 		$(".runList_"+(i+1)+""+(j+1)).hide();
-							// 	}
-							// 	structContainer.find(".runList_"+(i+1)+""+(j+1)).append("<li  class='testRun testcaselink' data-runid="+suites[j].testruns[k].id+" data-type='testrun'><label title='"+suites[j].testruns[k].name+"' style='margin-left:57px'>"+suites[j].testruns[k].name+"</label><img class='qcUndoSyncronise' title='Undo' src='imgs/ic-qcUndoSyncronise.png'><img class='qcSyncronise' title='Syncronise' src='imgs/ic-qcSyncronise.png'></li>");
-							// }
+							structContainer.find(".suiteList_"+(i+1)).append("<li  class='testcaselink testSuite testSet_"+(i+1)+""+(j+1)+"' data-suiteid="+suites[j].id+" data-type='testsuite'><label title='"+suites[j].name+"' style='margin-left:0px'>"+suites[j].name+"</label><img class='zephyrUndoSyncronise' title='Undo' src='imgs/ic-qcUndoSyncronise.png'><img class='zephyrSyncronise' title='Syncronise' src='imgs/ic-qcSyncronise.png'></li>");
 						}
 					}
-					// if($(".mtgScenarioList").find("li").length > 11){
 						$('.scrollbar-inner').scrollbar();
-					// }
 				}
 				unblockUI();				
 			},
-			function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
+			function(error) {	console.log("Error in zephyrController.js file loginZephyrServer method! \r\n "+(error.data));
 			});
 			$('.scrollbar-inner').scrollbar();
 	});
@@ -262,7 +252,7 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 		var getProject = $(this).children("option:selected").val();
 		for(var i=0; i<avoassure_projects_details.length; i++){
 			if(getProject == avoassure_projects_details[i].project_id){
-				var AvoAssureContainer = $(".qcAvoAssureTreeContainer");
+				var AvoAssureContainer = $(".zephyrAvoAssureTreeContainer");
 				AvoAssureContainer.empty();
 				AvoAssureContainer.append("<ul class='scrollbar-inner'></ul>");
 				var scnDetails = avoassure_projects_details[i].scenario_details;
@@ -272,10 +262,10 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 					}
 					//if(scnDetails.length >= 25)
 					$('.scrollbar-inner').scrollbar();
-					$(".searchZScenarioAvoAssure").show();
+					$(".searchScenarioAvoAssure").show();
 				} else{
 					AvoAssureContainer.append("This project does not contain any scenarios");
-					$(".searchZScenarioAvoAssure").hide();
+					$(".searchScenarioAvoAssure").hide();
 				}
 			}
 		}
@@ -307,7 +297,7 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 
 	function filter(element) {
 		var value = $(element).val();
-		$(".qcAvoAssureTreeContainer ul li").each(function () {
+		$(".zephyrAvoAssureTreeContainer ul li").each(function () {
 			if ($(this).children("label").text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
 				$(this).show();
 			} else {
@@ -316,11 +306,11 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 		});
 	}
 
-	//Select selectedQcNode
-	$(document).off('click').on('click','.selectedQcNode', function(){
+	//Select selectedZephyrNode
+	$(document).off('click').on('click','.selectedZephyrNode', function(){
 		var getParent = $(this).parent();
 		var testCasename;
-		if(getParent.hasClass("qcCollapse")){
+		if(getParent.hasClass("zephyrCollapse")){
 			if(getParent.hasClass("Tfolnode")){
 				$(this).prop("src","imgs/ic-qcExpand.png");
 				getParent.find(".suiteList").hide();
@@ -329,7 +319,7 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 				$(this).prop("src","imgs/ic-taskType-blue-plus.png")
 				getParent.next("ul.runList").hide();
 			}
-			getParent.removeClass("qcCollapse");
+			getParent.removeClass("zephyrCollapse");
 		}
 		else{
 			if(getParent.find("ul").length > 0 || getParent.next("ul").length > 0){
@@ -341,16 +331,13 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 					$(this).prop("src","imgs/ic-taskType-blue-minus.png")
 					getParent.next("ul.runList").show();
 				}
-				// if(getParent.hasClass("testrun")) 
-				getParent.addClass("qcCollapse");
+				getParent.addClass("zephyrCollapse");
 			}
 			else{
-				$(".qcExpand").addClass("stopPointerEvent");
+				$(".zephyrExpand").addClass("stopPointerEvent");
 				$(document.body).css({'cursor' : 'wait'});
-				getParent.addClass("qcCollapse");
-				//if(getParent.hasClass("Tfolnode"))	$(this).prop("src","imgs/ic-qcCollapse.png");
-				// var getProjectName = $(".qcSelectProject option:selected").val();
-				var getDomainName = $(".qcSelectDomain option:selected").val();
+				getParent.addClass("zephyrCollapse");
+				var getDomainName = $(".zephyrSelectProject option:selected").val();
 				var datapath, dataAction;
 				if(getParent.hasClass("Tfolnode")){
 					dataAction = "folder";
@@ -363,7 +350,7 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 				}
 				var getObject = getParent;
 				blockUI('Loading....');
-				qcServices.qtestFolderDetails_ICE(dataAction,getProjectName,getDomainName,datapath,testCasename)
+				zephyrServices.qtestFolderDetails_ICE(dataAction,getProjectName,getDomainName,datapath,testCasename)
 					.then(function(data){
 						if(data){
 							getObject.after("<ul class='"+getObject.find("label").text()+"'></ul>");
@@ -374,46 +361,44 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 											var complete_testcase_name = data[a].testcase[k];
 											var testcase_name = complete_testcase_name.substring(0,complete_testcase_name.lastIndexOf('/'));
 											var testcase_id = complete_testcase_name.substring(complete_testcase_name.lastIndexOf('/')+1);
-											getObject.next("ul").append("<li class='testSet testcaselink'><label title='"+complete_testcase_name+"'> <span class='qcTestcaseId'>"+testcase_id+"</span><span class='qcTestcaseName'>"+testcase_name+"</span></label><img class='qcUndoSyncronise' title='Undo' src='imgs/ic-qcUndoSyncronise.png'><img class='qcSyncronise' title='Syncronise' src='imgs/ic-qcSyncronise.png'></li>");
+											getObject.next("ul").append("<li class='testSet testcaselink'><label title='"+complete_testcase_name+"'> <span class='zephyrTestcaseId'>"+testcase_id+"</span><span class='zephyrTestcaseName'>"+testcase_name+"</span></label><img class='zephyrUndoSyncronise' title='Undo' src='imgs/ic-qcUndoSyncronise.png'><img class='zephyrSyncronise' title='Syncronise' src='imgs/ic-qcSyncronise.png'></li>");
 										}
 									}
 								}
 								else if(getObject.hasClass("Tfolnode")){
 									if("testfolder" in data[a] && data[a].testfolder.length > 0){
 										for(var i=0; i<data[a].testfolder.length; i++){
-											getObject.next("ul").append("<li class='Tfolnode' data-folderpath='"+data[a].testfolder[i].folderpath+"'><img class='qcExpand qcExpandFolder selectedQcNode' title='expand' style='height: 16px;' src='imgs/ic-qcExpand.png'><label title='"+data[a].testfolder[i].foldername+"'>"+data[a].testfolder[i].foldername+"</label></li>");
+											getObject.next("ul").append("<li class='Tfolnode' data-folderpath='"+data[a].testfolder[i].folderpath+"'><img class='zephyrExpand zephyrExpandFolder selectedZephyrNode' title='expand' style='height: 16px;' src='imgs/ic-qcExpand.png'><label title='"+data[a].testfolder[i].foldername+"'>"+data[a].testfolder[i].foldername+"</label></li>");
 										}
 									}
 									else if("TestSet" in data[a] && data[a].TestSet.length > 0){
 										for(var j=0; j<data[a].TestSet.length; j++){
-											getObject.next("ul").append("<li class='Tsetnode testSet_' data-testsetpath='"+data[a].TestSet[j].testsetpath+"' data-testsetid='"+data[a].TestSet[j].testsetid+"'><img class='qcExpand qcExpandTestset selectedQcNode' title='expand' style='height: 16px;' src='imgs/ic-taskType-blue-plus.png'><label title='"+data[a].TestSet[j].testset+"'>"+data[a].TestSet[j].testset+"</label></li>");
+											getObject.next("ul").append("<li class='Tsetnode testSet_' data-testsetpath='"+data[a].TestSet[j].testsetpath+"' data-testsetid='"+data[a].TestSet[j].testsetid+"'><img class='zephyrExpand zephyrExpandTestset selectedZephyrNode' title='expand' style='height: 16px;' src='imgs/ic-taskType-blue-plus.png'><label title='"+data[a].TestSet[j].testset+"'>"+data[a].TestSet[j].testset+"</label></li>");
 										}
 									}
 								}
 							}
 						}
-						$(".qcExpand").removeClass("stopPointerEvent");
+						$(".zephyrExpand").removeClass("stopPointerEvent");
 						$(document.body).css({'cursor' : 'default'});	
 						unblockUI();
 					},
-					function(error) {	unblockUI(); console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
+					function(error) {	unblockUI(); console.log("Error in zephyrController.js file loginZephyrServer method! \r\n "+(error.data));
 					});
 					if(getParent.hasClass("Tfolnode"))	$(this).prop("src","imgs/ic-qcCollapse.png");
 				}
 		}
-		//if(($(".qcTreeContainer ul").length + $(".qcTreeContainer li").length) >= 25){
 		$('.scrollbar-inner').scrollbar();
-		//}
 	});
 	
 	//Select testset
 	$(document).on('click','.testcaselink', function(){
 		$('.testcaselink').removeClass("selectedToMap");
-		$('.testcaselink').find(".qcSyncronise, .qcUndoSyncronise").hide();
+		$('.testcaselink').find(".zephyrSyncronise, .zephyrUndoSyncronise").hide();
 		$('.testcaselink').prop("style","background-color:none;border-radius:0px;");
 		$(this).addClass("selectedToMap");
 		$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
-		$(this).find(".qcSyncronise, .qcUndoSyncronise").show();
+		$(this).find(".zephyrSyncronise, .zephyrUndoSyncronise").show();
 	});
 	$(document).on('click','.testScenariolink', function(){
 		
@@ -426,33 +411,33 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 	});
 
 	//Undo Mapping
-	$(document).on('click', ".qcUndoSyncronise", function(){
-		var qcTestcaseName = $(this).siblings("label").text();
-		var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
+	$(document).on('click', ".zephyrUndoSyncronise", function(){
+		var zephyrTestcaseName = $(this).siblings("label").text();
+		var zephyrTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
 		for(var i=0;i<mappedList.length;i++){
-			if(qcTestcaseName == mappedList[i].testcase && qcTestsetName == mappedList[i].testset){
+			if(zephyrTestcaseName == mappedList[i].testcase && zephyrTestsetName == mappedList[i].testset){
 				delete mappedList[i];
 				mappedList =  mappedList.filter(function(n){ return n != null; });
 				$('.testScenariolink').removeClass("selectedToMap");
 				$('.testScenariolink').prop("style","background-color:none;border-radius:0px;");
 				$(this).parent().css({"background-color":"rgb(225, 202, 255)"});
-				$(this).siblings(".qcSyncronise").show();
+				$(this).siblings(".zephyrSyncronise").show();
 				break;
 			}
 		}
 	});
 
 	// Mapping
-	$(document).on('click', ".qcSyncronise", function(event){
-		var getDomainName = $(".qcSelectDomain option:selected").val();
-		var getProjectId = $(".qcTreeContainer").find(".selectedToMap").data("projectid")
-		var versionId = $(".qcTreeContainer").find(".selectedToMap").data("versionid")
-		var cycleId =$(".qcTreeContainer").find(".selectedToMap").data("cycleid")
-		var issueId =$(".qcTreeContainer").find(".selectedToMap").data("issueid")
+	$(document).on('click', ".zephyrSyncronise", function(event){
+		var getDomainName = $(".zephyrSelectProject option:selected").val();
+		var getProjectId = $(".zephyrTreeContainer").find(".selectedToMap").data("projectid")
+		var versionId = $(".zephyrTreeContainer").find(".selectedToMap").data("versionid")
+		var cycleId =$(".zephyrTreeContainer").find(".selectedToMap").data("cycleid")
+		var issueId =$(".zephyrTreeContainer").find(".selectedToMap").data("issueid")
 		var testname = $(this).siblings("label")[0].innerText;
-		var testid = $(".qcTreeContainer").find(".selectedToMap").data("suiteid");
+		var testid = $(".zephyrTreeContainer").find(".selectedToMap").data("suiteid");
 		// }
-		var AvoAssureScenarioId = $(".qcAvoAssureTreeContainer").find(".selectedToMap").data("scenarioid");
+		var AvoAssureScenarioId = $(".zephyrAvoAssureTreeContainer").find(".selectedToMap").data("scenarioid");
 		
 		if(!getDomainName || !getProjectId)	openModelPopup("Save Mapped Testcase", "Please select project");
 		else if(!testid) openModelPopup("Save Mapped Testcase", "Please select Testcase");
@@ -478,7 +463,7 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 	//Submit mapped details
 	$scope.mapTestcaseToAvoAssure = function(){
 		if(mappedList.length > 0){
-			qcServices.saveZephyrDetails_ICE(mappedList)
+			zephyrServices.saveZephyrDetails_ICE(mappedList)
 			.then(function(data){
 				if(data == "unavailableLocalServer"){
 					openModelPopup("Save Mapped Testcase", "ICE Engine is not available, Please run the batch file and connect to the Server.");
@@ -493,12 +478,12 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 					mappedList = [];
 					//mappedList = [];
 					$('.testcaselink, .testScenariolink').removeClass("selectedToMap");
-					$('.testcaselink').find(".qcSyncronise, .qcUndoSyncronise").hide();
+					$('.testcaselink').find(".zephyrSyncronise, .zephyrUndoSyncronise").hide();
 					$('.testcaselink, .testScenariolink').prop("style","background-color:none;border-radius:0px;");
 					openModelPopup("Save Mapped Testcase", "Saved successfully");
 				}
 			},
-			function(error) {	console.log("Error in qcController.js file mapTestcaseToAvoAssure method! \r\n "+(error.data));
+			function(error) {	console.log("Error in ZephyrController.js file mapTestcaseToAvoAssure method! \r\n "+(error.data));
 			});
 		}
 		else 	openModelPopup("Save Mapped Testcase", "Map Testcases before save");
@@ -507,16 +492,15 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 	$scope.displayMappedFilesTab = function(){
 		blockUI("Loading...");
 		var userid = JSON.parse(window.localStorage['_UI']).user_id;
-		qcServices.viewZephyrMappedList_ICE(userid)
+		zephyrServices.viewZephyrMappedList_ICE(userid)
 		.then(function(data){
-			// var selectOptions = $("#selAssignUser option:not(:first)");
 			data.sort(function(a,b) {
 				if (a.qctestcase > b.qctestcase) return 1;
 			    else if (a.qctestcase < b.qctestcase) return -1;
 			    else return 0;
 			});
 			if(data.length > 0){
-				$(".qcActionBtn, .leftQcStructure, .rightQcStructure").hide();
+				$(".zephyrActionBtn, .leftZephyrStructure, .rightZephyrStructure").hide();
 				$("#page-taskName span").text("Mapped Files");	
 				$('.mappedFiles').off();
 				$(".mappedFiles").empty().show();
@@ -537,7 +521,7 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 			}
 			unblockUI();
 		},
-		function(error) {	console.log("Error in qcController.js file viewZephyrMappedList_ICE method! \r\n "+(error.data));
+		function(error) {	console.log("Error in zephyrController.js file viewZephyrMappedList_ICE method! \r\n "+(error.data));
 		});		
 	};
 

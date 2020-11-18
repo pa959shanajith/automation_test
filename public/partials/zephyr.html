@@ -34,29 +34,29 @@
 			</div>
 			<!--Task Name-->
 			<!-- Button -->
-			<div class="qcActionBtn">
+			<div class="zephyrActionBtn">
 				<label style="margin-bottom: 0; float: left; font-size: 16px;">Zephyr Tests</label>
 				<!--<img class="loadALM" style="position: relative; left: 388px; display: none;" src="imgs/loader.gif" alt="Loading...">-->
 				<label style="margin-bottom: 0; position: relative; left: 457px; float: left; font-size: 16px;">Avo Assure Scenarios</label>
-				<button class="saveQcbtn qcActionBtnFirstChild" ng-click="mapTestcaseToAvoAssure()" title="Save" style="margin-left: 470px;">Save</button>
+				<button class="saveZephyrbtn zephyrActionBtnFirstChild" ng-click="mapTestcaseToAvoAssure()" title="Save" style="margin-left: 470px;">Save</button>
 				<a class="viewMapbtn" ng-click="displayMappedFilesTab()" title="View Mapped Files">View Mapped Files</a>
-				<button class="saveQcbtn" ng-click="exitZephyrConnection()" title="Exit">Exit</button>
+				<button class="saveZephyrbtn" ng-click="exitZephyrConnection()" title="Exit">Exit</button>
 			</div>
 			<!-- Button -->
 			<!-- Action area -->
-			<div class="leftQcStructure">
-				<div class="qcDomProContainer">
-					<select class="qcSelectDomain"></select>
+			<div class="leftZephyrStructure">
+				<div class="zephyrDomProContainer">
+					<select class="zephyrSelectProject"></select>
 				</div>
-				<div class="qcTreeContainer"></div>		
+				<div class="zephyrTreeContainer"></div>		
 			</div>
-			<div class="rightQcStructure">
-				<div class="qcProContainer">
+			<div class="rightZephyrStructure">
+				<div class="zephyrProContainer">
 					<select class="zephyrAvoAssureSelectProject"><option value="" selected disabled>Select Project</option></select>
 					<input type="text" placeholder="Scenario Name" class="searchScenarioZephyr"></input>
-					<span class="searchZScenarioAvoAssure" ng-click="searchScenarioAvo()"><img src='imgs/ic-searchIcon-black.png' alt='Search Scenarios' /></span>
+					<span class="searchScenarioAvoAssure" ng-click="searchScenarioAvo()"><img src='imgs/ic-searchIcon-black.png' alt='Search Scenarios' /></span>
 				</div>
-				<div class="qcAvoAssureTreeContainer"></div>	
+				<div class="zephyrAvoAssureTreeContainer"></div>	
 			</div>
 			<!-- Action area -->
 			<!-- Map Files -->

@@ -43,14 +43,6 @@ exports.loginToZephyr_ICE = function (req, res) {
 						var zephyraction = req.body.zephyraction;
 						var execFlag = req.body.execFlag;
 						var zephyrDetails = {
-							// "qcUsername": zephyrAcKey,
-							// "qcPassword": zephyrSecKey,
-							// "qcURL": url,
-							// "qcJiraUrl": zephyrJiraUrl,
-							// "qcJiraUserName": zephyrJiraUserName,
-							// "qcJiraAccToken": zephyrJiraAccToken,
-							// "qcType" : integrationType,
-							// "zephyraction": zephyraction
 							"zephyrAcKey": zephyrAcKey,
 							"zephyrSecKey": zephyrSecKey,
 							"zephyrAccNo": zephyrAccNo,
@@ -61,13 +53,13 @@ exports.loginToZephyr_ICE = function (req, res) {
 							"integrationType" : integrationType,
 							"zephyraction": zephyraction
 						};
-						logger.info("Sending socket request for qclogin to redis");
+						logger.info("Sending socket request for zephyrlogin to redis");
 						dataToIce = {"emitAction" : "zephyrlogin","username" : name, "responsedata":zephyrDetails};
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						function qclogin_listener(channel,message) {
+						function zephyrlogin_listener(channel,message) {
 							var data = JSON.parse(message);
 							if(name == data.username){
-								redisServer.redisSubServer.removeListener('message',qclogin_listener);
+								redisServer.redisSubServer.removeListener('message',zephyrlogin_listener);
 								if (data.onAction == "unavailableLocalServer") {
 									logger.error("Error occurred in loginZephyrServer_ICE: Socket Disconnected");
 									if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -80,7 +72,7 @@ exports.loginToZephyr_ICE = function (req, res) {
 								}
 							}
 						}
-						redisServer.redisSubServer.on("message",qclogin_listener);
+						redisServer.redisSubServer.on("message",zephyrlogin_listener);
 					} else {
 						utils.getChannelNum('ICE1_scheduling_' + name, function(found){
 							var flag="";
@@ -94,7 +86,7 @@ exports.loginToZephyr_ICE = function (req, res) {
 					}
 				});
 			} else {
-				logger.info("Error occurred in loginZephyrServer_ICE: Invalid QC Credentials");
+				logger.info("Error occurred in loginZephyrServer_ICE: Invalid Zephyr Credentials");
 				res.send("invalidcredentials");
 			}
 		} else {
@@ -108,7 +100,7 @@ exports.loginToZephyr_ICE = function (req, res) {
 };
 
 exports.zephyrProjectDetails_ICE = function (req, res) {
-	logger.info("Inside UI service: qcProjectDetails_ICE");
+	logger.info("Inside UI service: zephyrProjectDetails_ICE");
 	var projectDetailList = {
 		"avoassure_projects": '',
 		"project_dets": ""
@@ -128,15 +120,15 @@ exports.zephyrProjectDetails_ICE = function (req, res) {
 						"zephyraction": req.body.zephyraction
 					};
 					getProjectsForUser(userid, function (projectdata) {
-						logger.info("Sending socket request for qclogin to redis");
+						logger.info("Sending socket request for zephyrlogin to redis");
 						dataToIce = {"emitAction" : "zephyrlogin","username" : name, "responsedata":zephyrDetails};
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						function qclogin_listener(channel,message) {
+						function zephyrlogin_listener(channel,message) {
 							var data = JSON.parse(message);
 							if(name == data.username){
-								redisServer.redisSubServer.removeListener('message',qclogin_listener);
+								redisServer.redisSubServer.removeListener('message',zephyrlogin_listener);
 								if (data.onAction == "unavailableLocalServer") {
-									logger.error("Error occurred in qcProjectDetails_ICE: Socket Disconnected");
+									logger.error("Error occurred in zephyrProjectDetails_ICE: Socket Disconnected");
 									if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 										var soc = myserver.socketMapNotify[name];
 										soc.emit("ICEnotAvailable");
@@ -158,7 +150,7 @@ exports.zephyrProjectDetails_ICE = function (req, res) {
 								}
 							}
 						}
-						redisServer.redisSubServer.on("message",qclogin_listener);
+						redisServer.redisSubServer.on("message",zephyrlogin_listener);
 					});
 				} else {
 					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
@@ -211,7 +203,6 @@ function getProjectsForUser(userid, cb) {
 					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from getprojectDetails Error Code : ERRDAS");
 				} else {
 					if (projectrows.rows.length != 0) {
-						//flagtocheckifexists = true;
 						projectidlist = projectrows.rows[0].projects;
 					}
 				}
@@ -286,7 +277,6 @@ function projectandscenario(projectid, cb) {
 					logger.error("Error occurred in getProjectsForUser from scenariodata Error Code : ERRDAS");
 				} else {
 					if (scenariorows.rows.length != 0) {
-						//flagtocheckifexists = true;
 						scenarios_list = JSON.parse(JSON.stringify(scenariorows.rows));
 						projectDetails.project_id = projectid;
 						projectDetails.scenario_details = scenarios_list;
@@ -303,74 +293,6 @@ function projectandscenario(projectid, cb) {
 		cb(null, projectDetails);
 	});
 }
-
-exports.qtestFolderDetails_ICE = function (req, res) {
-	logger.info("Inside UI service: qtestFolderDetails_ICE");
-	var projectDetailList = {
-		"avoassure_projects": '',
-		"qc_projects": ""
-	};
-	var name;
-	try {
-		if (utils.isSessionActive(req)) {
-			var zephyrDetails = req.body;
-			// name = req.session.username;
-			var name = myserver.allSocketsICEUser[req.session.username];
-			redisServer.redisSubServer.subscribe('ICE2_' + name);
-			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.debug("ICE Socket requesting Address: %s" , name);
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-				if (redisres[1]>0) {
-					logger.info("Sending socket request for qclogin to redis");
-					dataToIce = {"emitAction" : "qtestlogin","username" : name, "responsedata":zephyrDetails};
-					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-					function qclogin_listener(channel,message) {
-						var data = JSON.parse(message);
-						if(name == data.username){
-							redisServer.redisSubServer.removeListener('message',qclogin_listener);
-							if (data.onAction == "unavailableLocalServer") {
-								logger.error("Error occurred in qtestFolderDetails_ICE: Socket Disconnected");
-								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-									var soc = myserver.socketMapNotify[name];
-									soc.emit("ICEnotAvailable");
-								}
-							} else if (data.onAction == "qcresponse") {
-								data = data.value;
-								res.send(data);
-							}
-						}
-					}
-					redisServer.redisSubServer.on("message",qclogin_listener);
-				} else {
-					try {
-						utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-							var flag="";
-							if (found) flag = "scheduleModeOn";
-							else {
-								flag = "unavailableLocalServer";
-								logger.info("ICE Socket not Available");
-							}
-							res.send(flag);
-						});
-					} catch (exception) {
-						logger.error(exception.message);
-					}
-				}
-			});
-		} else {
-			logger.info("Invalid Session");
-			res.send("Invalid Session");
-		}
-	} catch (exception) {
-		logger.error(exception.message);
-		utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-			var flag="";
-			if (found) flag = "scheduleModeOn";
-			else flag = "unavailableLocalServer";
-			res.send(flag);
-		});
-	}
-};
 
 exports.saveZephyrDetails_ICE = function (req, res) {
 	logger.info("Inside UI service: saveZephyrDetails_ICE");
@@ -391,7 +313,6 @@ exports.saveZephyrDetails_ICE = function (req, res) {
 		var testid = itr.testid;
 		var testname = itr.testname;
 		var issueid = itr.issueid;
-		// var maptype = itr.maptype;
 		var inputs = {
 			"testscenarioid": testscenarioid,
 			'projectid': projectid,			
@@ -400,7 +321,6 @@ exports.saveZephyrDetails_ICE = function (req, res) {
 			'testid': testid,
 			'testname': testname,
 			'issueid': issueid,
-			// "maptype": maptype,
 			"query": "saveZephyrDetails_ICE"
 		};
 		var args = {
@@ -411,8 +331,8 @@ exports.saveZephyrDetails_ICE = function (req, res) {
 		};
 			logger.info("Calling DAS Service: qualityCenter/saveIntegrationDetails_ICE");
 		client.post(epurl + "qualityCenter/saveIntegrationDetails_ICE", args,
-			function (qcdetailsows, response) {
-			if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
+			function (zephyrdetailsows, response) {
+			if (response.statusCode != 200 || zephyrdetailsows.rows == "fail") {
 					logger.error("Error occurred in saveIntegrationDetails_ICE Error Code : ERRDAS");
 				flag = false;
 			}
@@ -445,15 +365,14 @@ exports.saveZephyrDetails_ICE = function (req, res) {
 exports.viewZephyrMappedList_ICE = function (req, res) {
 	logger.info("Inside UI service: viewZephyrMappedList_ICE");
 	var userid = req.body.user_id;
-	// var name = req.session.username;
 	var name = myserver.allSocketsICEUser[req.session.username];
-	getQcDetailsForUser(userid, function (responsedata) {
+	getZephyrDetailsForUser(userid, function (responsedata) {
 		res.send(responsedata);
 	});
 };
 
-function getQcDetailsForUser(userid, cb) {
-	logger.info("Inside function getQcDetailsForUser");
+function getZephyrDetailsForUser(userid, cb) {
+	logger.info("Inside function getZephyrDetailsForUser");
 	var projectDetailsList = [];
 	var projectidlist = [];
 	async.series({
@@ -473,10 +392,9 @@ function getQcDetailsForUser(userid, cb) {
 			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
 				function (projectrows, response) {
 				if (response.statusCode != 200 || projectrows.rows == "fail") {
-					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from getQcDetailsForUser Error Code : ERRDAS");
+					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from getZephyrDetailsForUser Error Code : ERRDAS");
 				} else {
 					if (projectrows.rows.length != 0) {
-						//flagtocheckifexists = true;
 						projectidlist = projectrows.rows[0].projects;
 					}
 
@@ -487,7 +405,7 @@ function getQcDetailsForUser(userid, cb) {
 		scenarioDetails: function (callback1) {
 			logger.info("Inside function scenarioDetails");
 			async.forEachSeries(projectidlist, function (itr, callback2) {
-				qcscenariodetails(itr, function (err, projectDetails) {
+				zephyrscenariodetails(itr, function (err, projectDetails) {
 					for (i = 0; i < projectDetails.length; i++) {
 						projectDetailsList.push(projectDetails[i]);
 					}
@@ -501,8 +419,8 @@ function getQcDetailsForUser(userid, cb) {
 	});
 }
 
-function qcscenariodetails(projectid, cb) {
-	logger.info("Inside function qcscenariodetails");
+function zephyrscenariodetails(projectid, cb) {
+	logger.info("Inside function zephyrscenariodetails");
 	var scenarios_list;
 	var projectDetails = {
 		"project_id": '',
@@ -510,8 +428,7 @@ function qcscenariodetails(projectid, cb) {
 		"scenario_details": ''
 	};
 	var projectname = '';
-	var qcDetailsList = [];
-	var qcList = [];
+	var zephyrdetailsList = [];
 	async.series({
 		scenariodata: function (callback1) {
 			var inputs = {
@@ -524,25 +441,21 @@ function qcscenariodetails(projectid, cb) {
 					"Content-Type": "application/json"
 				}
 			};
-			logger.info("Calling DAS Service from qcscenariodetails: qualityCenter/qcProjectDetails_ICE");
+			logger.info("Calling DAS Service from zephyrscenariodetails: qualityCenter/qcProjectDetails_ICE");
 			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
 				function (scenariorows, response) {
 				if (response.statusCode != 200 || scenariorows.rows == "fail") {
-					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from qcscenariodetails Error Code : ERRDAS");
+					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from zephyrscenariodetails Error Code : ERRDAS");
 				} else {
 					if (scenariorows.rows.length != 0) {
-						//flagtocheckifexists = true;
 						scenarios_list = JSON.parse(JSON.stringify(scenariorows.rows));
-						// projectDetails.project_id = projectid;
-						// projectDetails.scenario_details = scenarios_list;
-						// projectDetails.project_name = projectname;
 					}
 				}
 				callback1();
 			});
 		},
-		qcdetails: function (callback1) {
-			logger.info("Inside function qcdetails");
+		zephyrdetails: function (callback1) {
+			logger.info("Inside function zephyrdetails");
 			async.forEachSeries(scenarios_list, function (itr, callback2) {
 				var inputs = {
 					"testscenarioid": itr._id,
@@ -554,20 +467,16 @@ function qcscenariodetails(projectid, cb) {
 						"Content-Type": "application/json"
 					}
 				};
-				logger.info("Calling DAS Service from qcdetails: qualityCenter/viewIntegrationMappedList_ICE");
+				logger.info("Calling DAS Service from zephyrdetails: qualityCenter/viewIntegrationMappedList_ICE");
 				client.post(epurl + "qualityCenter/viewIntegrationMappedList_ICE", args,
-					function (qcdetailsows, response) {
-					if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
-						logger.error("Error occurred inqualityCenter/viewIntegrationMappedList_ICE from qcdetails Error Code : ERRDAS");
+					function (zephyrdetailsows, response) {
+					if (response.statusCode != 200 || zephyrdetailsows.rows == "fail") {
+						logger.error("Error occurred inqualityCenter/viewIntegrationMappedList_ICE from zephyrdetails Error Code : ERRDAS");
 					} else {
-						if (qcdetailsows.rows.length != 0) {
-							//flagtocheckifexists = true;
-							qcdetails = JSON.parse(JSON.stringify(qcdetailsows.rows[0]));
-							qcdetails.testscenarioname = itr.name;
-							// projectDetails.project_id = projectid;
-							// projectDetails.scenario_details = scenarios_list;
-							// projectDetails.project_name = projectname;
-							qcDetailsList.push(qcdetails);
+						if (zephyrdetailsows.rows.length != 0) {
+							zephyrdetails = JSON.parse(JSON.stringify(zephyrdetailsows.rows[0]));
+							zephyrdetails.testscenarioname = itr.name;
+							zephyrdetailsList.push(zephyrdetails);
 						}
 					}
 					callback2();
@@ -575,10 +484,10 @@ function qcscenariodetails(projectid, cb) {
 			}, callback1);
 		},
 		data: function (callback1) {
-			cb(null, qcDetailsList);
+			cb(null, zephyrdetailsList);
 		}
 	}, function (err, data) {
-		cb(null, qcDetailsList);
+		cb(null, zephyrdetailsList);
 	});
 }
 
@@ -597,7 +506,6 @@ function getProjectsAndModules(userid,cb){
     var scenarioDetailsList ;
     async.series({
         getprojectDetails:function(callback){
-            //var getprojects = "select projectids from icepermissions where userid="+userid;
             var inputs = {"userid":userid,"query":"getprojectDetails"};
             var args = {
                 data:inputs,
@@ -607,19 +515,14 @@ function getProjectsAndModules(userid,cb){
             client.post(epurl+"qualityCenter/qcProjectDetails_ICE",args,
                 function (projectrows, response) {
                     if (response.statusCode != 200 || projectrows.rows == "fail") {
-           // dbConnICE.execute(getprojects,function(err,projectrows){
-                //if(err){
-                    //console.log(err);
                   					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from getProjectsAndModules Error Code : ERRDAS");
 
                 }else{
                     if(projectrows.rows.length!=0){
-                        //flagtocheckifexists = true;
                         projectidlist = projectrows.rows[0].projectids;
                     }
                 }
                  callback();
-                //cb(null,testcasedatatoupdate);
             }); 
         },
         moduleDetails:function(callback){
@@ -644,7 +547,6 @@ function projectandmodule(projectid,cb,data){
     var modulelist = [];
     async.series({
         projectname1 : function(callback1){
-            //var projectnamequery = "SELECT projectname FROM projects WHERE projectid="+projectid;
             var inputs = {"projectid":projectid,"query":"projectname1"};
             var args = {
                 data:inputs,
@@ -655,9 +557,6 @@ function projectandmodule(projectid,cb,data){
             client.post(epurl+"qualityCenter/qcProjectDetails_ICE",args,
                 function (projectdata, response) {
                     if (response.statusCode != 200 || projectdata.rows == "fail") {
-            // dbConnICE.execute(projectnamequery,function(err,projectdata){
-            //         if(err){
-            //             console.log(err);
 					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from projectname1 Error Code : ERRDAS");
                     }else{
                         if(projectdata.rows.length!=0){
@@ -667,113 +566,9 @@ function projectandmodule(projectid,cb,data){
                     callback1();
             });
         },
-        /*scenariodata:function(callback1){
-            var modulequery = "SELECT * FROM modules where projectid="+projectid
-                var inputs = {"projectid":projectid,"query":"scenariodata"}
-                var args = {
-                    data:inputs,
-                    headers:{"Content-Type" : "application/json"}
-                    
-                }
-                projectDetails.project_id = projectid;
-                projectDetails.project_name = projectname;
-                // client.post(epurl+"qualityCenter/qcProjectDetails_ICE",args,
-                //     function (modulerows, response) {
-                //     if (response.statusCode != 200 || scenariorows.rows == "fail") {
-                dbConnICE.execute(modulequery,function(err,modulerows){
-                if(err){
-                    console.log(err);
-                        console.log("Error occurred in getProjectsForUser: fail , scenariodata");
-                }else{
-                    if(modulerows.rows.length!=0){
-                        flagtocheckifexists = true;
-                        //scenarios_list = JSON.parse(JSON.stringify(modulerows.rows));
-                        getmodulescenario(modulerows.rows,function(moduledata){
-                            modulelist = moduledata;
-                            callback1();
-                        })
-                        
-                    }else{
-                        projectDetails.project_id = projectid;
-                        projectDetails.project_name = projectname;
-                        callback1();
-                    }
-                }
-            });
-        }*/
     },function(err,data){
         projectDetails.module_details = modulelist;
         cb(projectDetails);
     });
 }
 
-
-/*function getmodulescenario(rows,cb){
-    var modulelist = [];
-    async.forEachSeries(rows,function(itr,callback){
-        var moduleobj = {"module_name":itr.modulename,"module_id":itr.moduleid,"scenario_details":[]};
-        getScenarioDetails(itr.testscenarioids,function(scenariodata){
-            moduleobj.scenario_details = scenariodata;
-            modulelist.push(moduleobj);
-            callback();
-        });
-
-    },function(){
-        cb(modulelist)
-    });
-}
-
-function getScenarioDetails(scenarioids,cb){
-    var scenariolist = [];
-    async.forEachSeries(scenarioids,function(itr,callback){
-        var scenarioquery = "select * from testscenarios where testscenarioid="+itr;
-        var scenarioobj = {"scenario_name":"","scenario_id":"","testcase_details":[]};
-        dbConnICE.execute(scenarioquery,function(err,scenariodata){
-            if(err){
-                console.log(err);
-            }else{
-                if(scenariodata.rows.length >0){
-                    scenarioobj.scenario_name = scenariodata.rows[0].testscenarioname;
-                    scenarioobj.scenario_id = scenariodata.rows[0].testscenarioid;
-                    getTestCaseDetails(scenariodata.rows[0].testcaseids,function(testcasedata){
-                        scenarioobj.testcase_details = testcasedata;
-                        scenariolist.push(scenarioobj);
-                        callback();
-                    });
-
-                }else{
-                    callback();
-                }
-            }
-        });
-        
-    },function(){
-        cb(scenariolist);
-    })
-}
-
-function getTestCaseDetails(testcaseids,cb){
-    var testcaselist = [];
-    async.forEachSeries(testcaseids,function(itr,callback){
-        var testcaseobj = {"testcase_name":"","testcase_id":""};
-        var testcasequery = "select testcasename,testcaseid from testcases where testcaseid="+itr;
-        dbConnICE.execute(testcasequery,function(err,testcasedata){
-            if(err){
-                console.log("Error occurred is :",err);
-                callback();
-            }else{
-                if(testcasedata.rows.length >0){
-                    testcaseobj.testcase_name = testcasedata.rows[0].testcasename;
-                    testcaseobj.testcase_id = testcasedata.rows[0].testcaseid;
-                    testcaselist.push(testcaseobj);
-                    callback();
-                }else{
-                    callback()
-                }
-            }
-        });
-
-    },function(){
-        cb(testcaselist);
-    });
-};*/
