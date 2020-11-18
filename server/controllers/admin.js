@@ -1,16 +1,16 @@
-/**
- * Dependencies.
- */
-var bcrypt = require('bcryptjs');
-var TokenGenerator = require('uuid-token-generator')
-var async = require('async');
-var activeDirectory = require('activedirectory');
-var Client = require("node-rest-client").Client;
-var client = new Client();
-var epurl = process.env.DAS_URL;
-var validator =  require('validator');
-var logger = require('../../logger');
-var utils = require('../lib/utils');
+const bcrypt = require('bcryptjs');
+const TokenGenerator = require('uuid-token-generator')
+const async = require('async');
+const fs = require('fs');
+const archiver = require('archiver');
+const activeDirectory = require('activedirectory');
+const Client = require("node-rest-client").Client;
+const client = new Client();
+const epurl = process.env.DAS_URL;
+const validator =  require('validator');
+const logger = require('../../logger');
+const utils = require('../lib/utils');
+const notifications = require('../notifications');
 
 
 //GetUserRoles
@@ -54,11 +54,11 @@ exports.manageUserDetails = async (req, res) => {
 		};
 
 		if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
-			logger.error("Error occurred in admin/manageUserDetails: Invalid action.");
+			logger.error("Error occurred in admin/"+fnName+": Invalid action.");
 			flag[1]='1';
 		}
 		if (!validator.isLength(inputs.name,1,100)) {
-			logger.error("Error occurred in admin/manageUserDetails: Invalid User name.");
+			logger.error("Error occurred in admin/"+fnName+": Invalid User name.");
 			flag[2]='1';
 		}
 		if (action != "create") {
@@ -67,7 +67,7 @@ exports.manageUserDetails = async (req, res) => {
 		if (action != "delete") {
 			if (internalUser) {
 				if (validator.isEmpty(inputs.auth.password) && !(validator.isLength(inputs.auth.password,1,12))) {
-					logger.error("Error occurred in admin/manageUserDetails: Invalid Password.");
+					logger.error("Error occurred in admin/"+fnName+": Invalid Password.");
 					flag[5]='1';
 				}
 			}
@@ -81,15 +81,15 @@ exports.manageUserDetails = async (req, res) => {
 			inputs.defaultrole = (reqData.role || "").trim();
 
 			if (!validator.isLength(inputs.firstname,1,100)) {
-				logger.error("Error occurred in admin/manageUserDetails: Invalid First name.");
+				logger.error("Error occurred in admin/"+fnName+": Invalid First name.");
 				flag[3]='1';
 			}
 			if (!validator.isLength(inputs.lastname,1,100)) {
-				logger.error("Error occurred in admin/manageUserDetails: Invalid Last name.");
+				logger.error("Error occurred in admin/"+fnName+": Invalid Last name.");
 				flag[4]='1';
 			}
 			if (!validator.isLength(inputs.email,1,100)) {
-				logger.error("Error occurred in admin/manageUserDetails: Email cannot be empty.");
+				logger.error("Error occurred in admin/"+fnName+": Email cannot be empty.");
 				flag[6]='1';
 			}
 			if (action == "update") {
@@ -98,13 +98,13 @@ exports.manageUserDetails = async (req, res) => {
 			if (!internalUser) {
 				inputs.auth.server = reqData.server;
 				if (!inputs.auth.server || validator.isEmpty(inputs.auth.server)) {
-					logger.error("Error occurred in admin/manageUserDetails: Invalid Authentication Server.");
+					logger.error("Error occurred in admin/"+fnName+": Invalid Authentication Server.");
 					flag[7]='1';
 				}
 				if (inputs.auth.type == "ldap") {
 					inputs.auth.user = reqData.ldapUser;
 					if (validator.isEmpty(inputs.auth.user)) {
-						logger.error("Error occurred in admin/manageUserDetails: Invalid User Domain Name.");
+						logger.error("Error occurred in admin/"+fnName+": Invalid User Domain Name.");
 						flag[8]='1';
 					}
 				}
@@ -118,7 +118,7 @@ exports.manageUserDetails = async (req, res) => {
 		if (result == "fail" || result == "forbidden") res.status(500).send("fail");
 		else res.send(result);
 	} catch (exception) {
-		logger.error("Error occurred in admin/manageUserDetails", exception);
+		logger.error("Error occurred in admin/"+fnName, exception);
 		res.status(500).send("fail");
 	}
 };
@@ -1039,38 +1039,7 @@ exports.assignProjects_ICE = function (req, res) {
 						res.send("fail");
 					} else {
                         inputs.projectids1 = "'"+inputs.projectids.join('\',\'')+"'";
-                        //Execute neo4j query!!
-						var qList=[];
 						res.send(result.rows);
-                        /*qList.push({"statement":"MERGE (n:ICEPERMISSIONS_NG {userid:'"+inputs.userid+
-                                    "',domainid:'"+inputs.domainid+"'}) set n.projectids=["+inputs.projectids1+"] return n"});*/
-                        //Relationships
-                        /*qList.push({"statement":"MATCH (a:ICEPERMISSIONS_NG{userid:'"+inputs.userid+
-                                    "',domainid:'"+inputs.domainid+"'}),(b:DOMAINS_NG {domainid:'"+
-                                    inputs.domainid+"'}) MERGE(a)-[r:FICETDOM_NG{id:'"+inputs.domainid+"'}]->(b) return a,r,b"});*/
-
-						// MATCH p = (a:DOMAINS_NG{userid:'bced8722-1ce1-41e0-b7d3-d9a9c0bcd800'})-[r1]->(d:DOMAINS_NG) return p
-						
-						// if length of unassigned projects > 0 then delete tasks of that project
-						// if(assignProjectsDetails.deletetasksofprojects.length > 0){
-						// 	assignProjectsDetails.deletetasksofprojects.forEach(function(e,i){
-						// 		qList.push({"statement":"match p = (m{projectID:'"+e.projectid+"'})-[FNTT]-(t:TASKS{assignedTo:'"+assignProjectsDetails.userId+"'}) where t.status = 'assigned' or t.status = 'inprogress' or t.status = 'reassign' detach delete t;"});
-						// 		qList.push({"statement":"match p = (m{projectID:'"+e.projectid+"'})-[FNTT]-(t:TASKS{reviewer:'"+assignProjectsDetails.userId+"'}) where t.status = 'review' detach delete t;"});
-						// 		qList.push({"statement":"match p = (m{projectID:'"+e.projectid+"'})-[FNTT]-(t:TASKS{assignedTo:'"+assignProjectsDetails.userId+"'}) set m.assignedTo = '' "});
-						// 		qList.push({"statement":"match p = (m{projectID:'"+e.projectid+"'})-[FNTT]-(t:TASKS{reviewer:'"+assignProjectsDetails.userId+"'}) set m.reviewer = '' "});
-						// 	});
-						// }
-
-						// logger.info("Calling neo4jAPI execute queries for assignProjects_ICE");
-                        // neo4jAPI.executeQueries(qList,function(status,result){
-                        //     if(status!=200){
-                        //    		logger.info("Error in neo4jAPI execute queries with status for assignProjects_ICE: %d",status,"\n response for assignProjects_ICE:%s",result);
-                        //     }
-                        //     else{
-                        //         logger.info('neo4jAPI execute queries for assignProjects_ICE executed successfully');
-                        //         res.send("success");
-                        //     }
-                        // });
 					}
 				});
 			} else {
@@ -1684,7 +1653,6 @@ exports.getUsers = function (req, res) {
 	});
 };
 
-//-----------------------------------------------------no changes here
 exports.getAvailablePlugins = async (req, res) => {
 	logger.info("Inside UI service: getAvailablePlugins");
 	try {
@@ -1735,5 +1703,426 @@ exports.provisionICE = async (req, res) => {
 	} catch (exception) {
 		logger.error("Error occurred in admin/provisionICE:", exception);
 		res.send("fail");
+	}
+};
+// UI service to create a new ICE pool
+exports.createPool_ICE = async(req,res) => {
+	const fnName = "createPools_ICE"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const poolinfo = req.body.tokeninfo;
+		const inputs = {
+			poolname: poolinfo.poolname,
+			createdby: poolinfo.createdby,
+			createdon: poolinfo.createdon,
+			projectids: poolinfo.projectids,
+			modifiedby: "",
+			modifiedon: ""
+		};
+		const result = await utils.fetchData(inputs, "admin/createPool_ICE", fnName);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in admin/createPools_ICE:", exception);
+		res.send("fail");
+	}
+} 
+// UI service to get relevant unassigned ICE
+exports.getUnassigned_ICE = async(req,res) => {
+	const fnName = "getUnassigned_ICE"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const poolinfo = req.body.tokeninfo;
+		const inputs = {
+			poolname: poolinfo.poolname,
+			poolid: poolinfo.createdby,
+			projectids: poolinfo.projectids,
+		};
+		const result = await utils.fetchData(inputs, "admin/getUnassgined_ICE", fnName);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in admin/getUnassigned_ICE:", exception);
+		res.send("fail");
+	}
+} 
+exports.getAvailable_ICE = async(req,res) => {
+	const fnName = "getAvailable_ICE"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const poolinfo = req.body.tokeninfo;
+		const inputs = {};
+		const result = await utils.fetchData(inputs, "admin/getAvailable_ICE", fnName);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in admin/getAvailable_ICE:", exception);
+		res.send("fail");
+	}
+} 
+// UI service to update a pool
+exports.updatePool = async(req,res) => {
+	const fnName = "updatePool"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const poolinfo = req.body.tokeninfo;
+		const inputs = {
+			poolname: poolinfo.poolname,
+			projectids: poolinfo.projectids,
+			ice_added: poolinfo.ice_added,
+			ice_deleted: poolinfo.ice_deleted,
+			updatedby: poolinfo.updatedby,
+			updatedon: new Date().toUTCString()
+
+		};
+		const result = await utils.fetchData(inputs, "admin/updatePool_ICE", fnName);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in admin/provisionICE:", exception);
+		res.send("fail");
+	}
+}
+// UI service to get pools from projectids / poolid
+exports.getPools = async(req,res) => {
+	const fnName = "getPools"
+	logger.info("Inside UI service: " + fnName)
+	var inputCheck = false;
+	try{
+		const poolinfo = req.body.tokeninfo;
+		const inputs = {
+			poolid: poolinfo.poolid,
+			projectids: poolinfo.projectids,
+		};
+		inputCheck = true;
+		const result = await utils.fetchData(inputs, "admin/getPools", fnName);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in admin/getPools:", exception);
+		if (!inputCheck) res.send("Payload Error")
+		else res.send("fail");
+	}
+}
+// UI service to get ICE in pool from poolid
+exports.getICEinPools = async(req,res) => {
+	const fnName = "getICEinPools"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const poolinfo = req.body.tokeninfo;
+		const inputs = {
+			poolids: poolinfo.poolid,
+		};
+		const result = await utils.fetchData(inputs, "admin/getICE_pools", fnName);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in admin/provisionICE:", exception);
+		res.send("fail");
+	}
+}
+
+exports.deletePools = async(req,res) => {
+	const fnName = "deletePools"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const poolinfo = req.body.tokeninfo;
+		const inputs = {
+			poolids: poolinfo.poolid,
+		};
+		const result = await utils.fetchData(inputs, "admin/deleteICE_pools", fnName);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in admin/deletePools:", exception);
+		res.send("fail");
+	}
+}
+
+exports.getAllProjects = async(req,res) => {
+	const fnName = "getAllProjects"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const poolinfo = req.body.tokeninfo;
+		const inputs = {};
+		const result = await utils.fetchData(inputs, "admin/getAll_projects", fnName);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in admin/getAllProjects:", exception);
+		res.send("fail");
+	}
+}
+
+
+
+exports.exportProject = async (req, res) => {
+	const fnName = 'exportProject';
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const d = req.body;
+		const projectId = d.projectId;
+		const proj_name = d.projectName;
+		const inputs = {
+			"projectId":projectId
+		};
+		const proj_data = await utils.fetchData(inputs, "admin/exportProject", fnName);
+		if (proj_data == "fail") return res.send("fail");
+		let projectPath = './assets/projects/'+proj_name;
+		if (!fs.existsSync('./assets/projects')){
+			fs.mkdirSync( './assets/projects');
+		}
+		if (!fs.existsSync(projectPath)) {
+			fs.mkdirSync(projectPath);
+		} else {
+			fs.rmdirSync(projectPath,{recursive:true});
+			fs.mkdirSync(projectPath);
+		}
+		for (i = 0; i < proj_data.length ;i++){
+			let mindmap = proj_data[i];
+			let mm_name = mindmap.name;
+			let mm_path = projectPath+'/'+mm_name
+			let screens_path = mm_path+'/'+'screens';
+			let testcases_path = mm_path+'/'+'testcases';
+			if (!fs.existsSync(mm_path)) fs.mkdirSync(mm_path);
+			if (!fs.existsSync(screens_path)) fs.mkdirSync(screens_path);
+			if (!fs.existsSync(testcases_path)) fs.mkdirSync(testcases_path);
+			let { screens, testcases, ...mm_data } = mindmap;
+			let screenList = mindmap.screens;
+			let testcaseList = mindmap.testcases;
+			delete mindmap.screens, mindmap.testcases;
+			fs.writeFileSync(mm_path+'/'+mm_name+'.mm', JSON.stringify(mm_data, undefined, 2), function(err) {});
+			for(let j=0;j<screenList.length;j++){
+				let screen = screenList[j];
+				let screen_name = 'Screen_'+screen.name;
+				fs.writeFileSync(screens_path+'/'+screen_name+'.json', JSON.stringify(screen, undefined, 2), function(err) {});
+			}
+			for(let k=0;k<testcaseList.length;k++){
+				let testcase = testcaseList[k];
+				let testcase_name = 'Testcase_'+testcase.name;
+				fs.writeFileSync(testcases_path+'/'+testcase_name+'.json', JSON.stringify(testcase.steps, undefined, 2), function(err) {});
+			}
+		}
+		let zip_path = projectPath+'.zip'
+		const archive = archiver('zip', { zlib: { level: 9 }});
+		const stream = fs.createWriteStream(zip_path);
+		stream.on('close', ()=>{
+			res.writeHead(200, {
+				'Content-Type' : 'application/zip',
+			});
+			var filestream = fs.createReadStream(zip_path);
+			filestream.pipe(res);
+		})
+		archive.directory(projectPath, false).pipe(stream);
+		archive.finalize();
+	} catch (ex) {
+		logger.error("Exception in the service exportProject: %s", ex);
+		return res.status(500).send("fail");
+	}
+};
+
+const getEmailConf = async (conf, fnName, inputs, flag) => {
+	if (!flag) flag = ['1','0','0','0','0','0','0','0','0','0','0','0','0'];
+	const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
+	inputs.host = (conf.host || "").trim();
+	inputs.port = conf.port || "";
+	if (!inputs.host && !validator.isIP(inputs.host) && !validator.isFQDN(inputs.host)) { // Allow Anything as of now
+		logger.error("Error occurred in admin/"+fnName+": Invalid Hostname or IP.");
+		flag[5]='1';
+	}
+	if (!validator.isPort(inputs.port.toString())) {
+		logger.error("Error occurred in admin/"+fnName+": Invalid Port Number.");
+		flag[6]='1';
+	}
+	conf.sender = conf.sender || {};
+	inputs.sender = {
+		name: (conf.sender.name || "Avo Assure Alerts").trim(),
+		email: (conf.sender.email || "avoassure-alerts@avoautomation.com").trim()
+	}
+	if (!validator.isEmail(inputs.sender.email)) {
+		logger.error("Error occurred in admin/"+fnName+": Invalid sender email address.");
+		flag[7]='1';
+	}
+	inputs.tls = {
+		security: conf.enabletls || "auto",
+		insecure: conf.insecuretls || false
+	}
+	if (!["enable", "disable", "auto"].includes(inputs.tls.security)) {
+		logger.error("Error occurred in admin/"+fnName+": Invalid TLS Options.");
+		flag[8]='1';
+	}
+	const pool = conf.pool;
+	if (!pool) inputs.pool = { enable: false };
+	else {
+		inputs.pool = { enable: pool.enable || false };
+		if (validator.isInt((pool.maxConnections||"").toString())) inputs.pool.maxconnections = pool.maxConnections;
+		if (validator.isInt((pool.maxMessages||"").toString())) inputs.pool.maxmessages = pool.maxMessages;
+	}
+	const auth = conf.auth;
+	if (!auth) inputs.auth = false;
+	else {
+		inputs.auth = {
+			type: (auth.type || "").trim().toLowerCase(),
+			username: (auth.username || "").trim(),
+			password: (auth.password || "").trim(),
+		};
+		if (inputs.auth.type == "none") inputs.auth = false;
+		else if (!["basic"].includes(inputs.auth.type)) {
+			logger.error("Error occurred in admin/"+fnName+": Invalid auth type.");
+			flag[9]='1';
+		}
+	}
+	const timeouts = conf.timeouts || "";
+	const tOut = {};
+	if (timeouts) {
+		if (validator.isInt((timeouts.connection||"").toString())) tOut.connection = timeouts.connection;
+		if (validator.isInt((timeouts.greeting||"").toString())) tOut.greeting = timeouts.greeting;
+		if (validator.isInt((timeouts.socket||"").toString())) tOut.socket = timeouts.socket;
+		if (Object.keys(tOut).length != 0) inputs.timeouts = tOut;
+	}
+	inputs.appurl = conf.appurl;
+	if (!regExURL.test(inputs.appurl) && !validator.isURL(inputs.appurl)) {
+		logger.error("Error occurred in admin/"+fnName+": Invalid Avo Assure Application URL.");
+		flag[10]='1';
+	}
+	const proxy = conf.proxy;
+	if (!proxy) inputs.proxy = { enable: false };
+	else {
+		inputs.proxy = {
+			enable: proxy.enable || false,
+			url: proxy.url || "",
+			auth: proxy.auth || false
+		};
+		if (inputs.proxy.enable && !regExURL.test(inputs.proxy.url) && !validator.isURL(inputs.proxy.url)) {
+			logger.error("Error occurred in admin/"+fnName+": Invalid Proxy URL.");
+			flag[11]='1';
+		}
+		inputs.proxy.user = proxy.user || "";
+		inputs.proxy.pass = proxy.pass || "";
+		if (inputs.proxy.enable && inputs.proxy.auth) {
+			if (inputs.proxy.user.length == 0 && inputs.proxy.pass.length == 0) {
+				logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Credentials.");
+				flag[12]='3';
+			}
+			else if (inputs.proxy.user.length == 0) {
+				logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Username.");
+				flag[12]='1';
+			}
+			else if (inputs.proxy.pass.length == 0) {
+				logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Password.");
+				flag[12]='2';
+			}
+		}
+	}
+};
+
+// Send Test Notification over a specific channel and provider
+exports.testNotificationChannels = async (req, res) => {
+	const fnName = "testNotificationChannels";
+	logger.info("Inside UI Service: "+fnName);
+	try {
+		const channel = (req.body.channel || "").trim();
+		const provider = (req.body.provider || "").trim();
+		const recipient = (req.body.recipient || "").trim();
+		const rawConf = req.body.conf || {};
+		let flag = "fail";
+		if (channel == "email") {
+			if (provider != "smtp") flag = "invalidprovider";
+			else if (!validator.isEmail(recipient)) flag = "invalidrecipient";
+			else {
+				const conf = { channel, provider, name: rawConf.name };
+				await getEmailConf(rawConf, fnName, conf);
+				const testResp = await notifications.test(channel, { recipient }, conf);
+				if (testResp.error) flag = "fail";
+				else flag = testResp.status;
+			}
+		} else flag = "invalidchannel";
+		return res.send(flag);
+	} catch (exception){
+		logger.error("Error occurred in admin/"+fnName, exception);
+		res.status(500).send("fail");
+	}
+};
+
+// Create/Edit/Delete Notification Channels
+exports.manageNotificationChannels = async (req, res) => {
+	const fnName = "manageNotificationChannels";
+	logger.info("Inside UI Service: " + fnName);
+	try {
+		let flag = ['1','0','0','0','0','0','0','0','0','0','0','0','0'];
+		const conf = req.body.conf;
+		const action = req.body.action;
+		// if (action == "delete") return res.send("fail");
+		const inputs = {
+			action: action,
+			name: (conf.name || "").trim(),
+			channel: (conf.channel || "").trim(),
+			provider: (conf.provider || "").trim()
+		};
+
+		if (validator.isEmpty(action) || ["create","update","delete","enable","disable"].indexOf(action) == -1) {
+			logger.error("Error occurred in admin/"+fnName+": Invalid action.");
+			flag[1]='1';
+		}
+		if (!validator.isLength(inputs.name,1,100)) {
+			logger.error("Error occurred in admin/"+fnName+": Invalid Configuration name.");
+			flag[2]='1';
+		}
+		if (inputs.channel != "email") {  // Only email channel is supported as of now
+			logger.error("Error occurred in admin/"+fnName+": Invalid Channel: "+channel);
+			flag[3]='1';
+		}
+		if (action == "create" || action == "update") {
+			if (inputs.channel == "email") {
+				if (inputs.provider == "smtp") {  // Only smtp provider is supported as of now
+					await getEmailConf(conf, fnName, inputs, flag);
+				} else {
+					logger.error("Error occurred in admin/"+fnName+": Invalid Provider "+provider+" for "+channel+" channel.");
+					flag[4]='1';
+				}
+			}
+		}
+		flag = flag.join('');
+		if (flag != "1000000000000") {
+			return res.send(flag);
+		}
+		const result = await utils.fetchData(inputs, "admin/manageNotificationChannels", fnName);
+		if (result == "fail") return res.status(500).send("fail");
+		else if (result == "dne") {
+			logger.error("Error occurred in admin/"+fnName+": Specified Configuration '"+inputs.name+"' does not exists");
+			return res.send("fail");
+		}
+		notifications.update(action, inputs.name, inputs.channel, inputs.provider);
+		return res.send(result);
+	} catch (exception) {
+		logger.error("Error occurred in admin/"+fnName, exception);
+		res.status(500).send("fail");
+	}
+};
+
+// Fetch Notification Channels or a specific channel
+exports.getNotificationChannels = async (req, res) => {
+	const fnName = "getNotificationChannels";
+	logger.info("Inside UI Service: "+fnName);
+	try {
+		const action = req.body.action;
+		const channel = req.body.channel;
+		const args = req.body.args;
+		let inputs = { action };
+		if (action != "list") {
+			inputs.name = args;
+			inputs.channel = channel;
+		}
+		const result = await utils.fetchData(inputs, "admin/getNotificationChannels", fnName);
+		if (result == "fail") res.status(500).send("fail");
+		else if (result.length == 0) res.send("empty");
+		else {
+			let data = [];
+			if (action == "list") {
+				for (let row of result) {
+					data.push([row.name, row._id, row.channel, row.provider]);
+				}
+			} else {
+				if (action == "provider") data = result[0];  // Return First provider only.
+				else data = result;
+				if (data.auth && data.auth.password) data.auth.password = '';
+			}
+			return res.send(data);
+		}
+	} catch (exception){
+		logger.error("Error occurred in admin/"+fnName, exception);
+		res.status(500).send("fail");
 	}
 };

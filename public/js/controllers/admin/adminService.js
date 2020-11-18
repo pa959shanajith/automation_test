@@ -187,10 +187,102 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			function(response) { return $q.reject(response.data) });
 		},
 		provisions: function (tokeninfo) {
-			return $http.post('/provisionIce',{
+			return $http.post('/provisionIce',{ tokeninfo })
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		testNotificationChannels: function (channel, provider, recipient, conf) {
+			return $http.post('/testNotificationChannels', { channel, provider, recipient, conf })
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		manageNotificationChannels: function (action, conf) {
+			return $http.post('/manageNotificationChannels', { action, conf })
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		getNotificationChannels: function (action, channel, args) {
+			return $http.post('/getNotificationChannels', { action, channel, args })
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		exportProject: function (projectId,projectName) {
+			return $http.post('/exportProject',{
+				projectId:projectId,
+				projectName:projectName
+			},{responseType:'arraybuffer'})
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		createPool_ICE: function (tokeninfo) {
+			// {
+			// 	poolname: "poolinfo.poolname",
+			// 	createdby: "poolinfo.createdby",
+			// 	createdon: "UTC Date string",
+			// 	projectids: [poolinfo.projectids],
+			// 	modifiedby: "",
+			// 	modifiedon: ""
+			// }
+			return $http.post('/createPool_ICE',{
 				tokeninfo:tokeninfo
 			}).then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
-		}
+		},
+		updatePool: function (tokeninfo) {
+			// {
+			// 	poolname: "poolinfo.poolname",
+			// 	projectids:[id1,id2],
+			// 	ice_added: [ice.nameA, ice.nameB],
+			// 	ice_deleted: [ice.nameC, ice.nameD],
+			// 	updatedby: "string id"
+			// }
+			return $http.post('/updatePool',{
+				tokeninfo:tokeninfo
+			}).then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		getPools: function (tokeninfo) {
+			// {
+			// 	poolid: "stringID" / "all" / "",   ("all", returns all the pools)
+			// 	projectids: ["id1","id2"] / [],	  (returns all the pools that contain atleast one of these ids)
+			// }
+			// returns either on the basis of poolid or projectids not both, if pool id given projectids should be [] or none, if projectids given pool ids should be "" or none
+			return $http.post('/getPools',{
+				tokeninfo:tokeninfo
+			}).then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		getICEinPools: function (tokeninfo) {
+			// {
+			// 	poolids: poolinfo.poolid,
+			// }
+			return $http.post('/getICEinPools',{
+				tokeninfo:tokeninfo
+			}).then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		getAllProjects: function (tokeninfo) {
+			//{}
+			return $http.post('/getAll_projects',{
+				tokeninfo:tokeninfo
+			}).then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		deletePools: function (tokeninfo) {
+			// {
+			// 	poolids:["id1","id2"],
+			// }
+			return $http.post('/deleteICE_pools',{
+				tokeninfo:tokeninfo
+			}).then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		getAvailable_ICE: function (tokeninfo) {
+			// {}
+			return $http.post('/getAvailable_ICE',{
+				tokeninfo:tokeninfo
+			}).then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
 	};
 }]);

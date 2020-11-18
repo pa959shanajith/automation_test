@@ -12,6 +12,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.ldapConf = {};
 	$scope.samlConf = {};
 	$scope.oidcConf = {};
+	$scope.mailConf = {};
 	$scope.userConf = {};
 	$scope.domainConf = {};
 	$scope.moveItems = {};
@@ -1242,6 +1243,56 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		}
 	};
 
+
+	//Export Project Action
+	$scope.export_project = function ($event) {
+		$("#selDomainEdit,#selProject").removeClass("selectErrorBorder");
+		if ($('#selDomainEdit option:selected').val() == "") {
+			$("#selDomainEdit").addClass("selectErrorBorder");
+		} else if ($('#selProject option:selected').val() == "") {
+			$("#selProject").addClass("selectErrorBorder");
+		} else if ($("#releaseList").children("li").length == 0) {
+			openModalPopup("Update Project", "Please add atleast one release");
+		}
+		else {
+			blockUI("Loading...");
+			flag = false;
+			var projectId = $('#selProject option:selected').val();
+			var projectName = $('#selProject option:selected').text();
+			adminServices.exportProject(projectId,projectName)
+				.then(function (data) {
+					if (data == "Invalid Session") {
+						$rootScope.redirectPage();
+					}else if (data == "fail") openModalPopup("Fail", "Error while exporting to excel");
+					else {
+						openWindow = 0;
+						if (openWindow == 0) {
+							var file = new Blob([data], { type: 'application/zip' });
+							if (isIE) {
+								navigator.msSaveOrOpenBlob(file);
+							}else{
+								var fileURL = URL.createObjectURL(file);
+								var a = document.createElement('a');
+								a.href = fileURL;
+								a.download = projectName+'.zip';
+								document.body.appendChild(a);
+								a.click();
+								document.body.removeChild(a);
+								URL.revokeObjectURL(fileURL);
+							}
+							openModalPopup("Success", "Successfully exported to zip");
+						}
+						openWindow++;
+					}
+					unblockUI();
+				}, function (error) {
+					console.log("Error:::::::::::::", error);
+				});
+		}
+	}
+
+
+
 	function resetForm() {
 		//$("#selDomain").prop('selectedIndex', 0);
 		// $("#selDomain").val("")
@@ -2088,6 +2139,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					}
 					$(document).on('change','#selDomainEdit', function() {
 						$("#releaseList, #cycleList").empty()
+						//$("#export_button").addClass("disableButton")
+						document.getElementById("export_button").disabled = true;
 						var domainName = $("#selDomainEdit option:selected").val();
 						console.log(domainName)
 						var requestedname = [];
@@ -2135,6 +2188,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 								$("#selProject").append(selectOptions[i]);
 							}
 							$("#selProject").prop('selectedIndex', 0);
+							document.getElementById("selProject").addEventListener('change', function (e) {
+								document.getElementById("export_button").disabled = false;
+								//$("#export_button").removeClass("disableButton")
+							});
 						}, function (error) {
 							console.log("Error:::::::::::::", error);
 						});
@@ -3527,6 +3584,311 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		});
 	};
 
+	// Email Server Configuration Click
+	$scope.mailConf.click = function () {
+		$(".selectedIcon").removeClass("selectedIcon");
+		$("#mailConfigTab").find("span.fa").addClass("selectedIcon");
+		this.providers = ["SMTP"];
+		this.channel = "email";
+		this.toggleStatus = "Disable";
+		this.loaded = "";
+		this.provider = "";
+		this.active = false;
+		this.name = "";
+		this.host = "";
+		this.port = "";
+		this.appurl = window.location.href.replace('/admin', '');
+		this.secure = "auto";
+		this.insecuretls = "false";
+		this.testMailID = "";
+		this.testMailMsg = "";
+		this.auth = {
+			type: "",
+			username: "",
+			password: ""
+		};
+		this.sender = {
+			name: "",
+			email: ""
+		};
+		this.pool = {
+			enable: false,
+			maxConnections: "",
+			maxMessages: ""
+		};
+		this.timeouts = {
+			connection: "",
+			greeting: "",
+			socket: ""
+		};
+		this.proxy = {
+			enable: false,
+			url: "",
+			auth: false,
+			user: "",
+			pass: ""
+		};
+		$("#mailName,#mailHost,#mailPort,#senderName,#senderEmail,#appURL,#proxyURL,#proxyUser,#proxyPass").removeClass("inputErrorBorder");
+		$("#mailProvider,#authenticationType").removeClass("selectErrorBorder");
+	};
+
+	$scope.mailConf.getProviderInfo = function() {
+		$("#mailName,#mailHost,#mailPort,#senderName,#senderEmail").removeClass("inputErrorBorder");
+		$("#mailProvider,#authenticationType").removeClass("selectErrorBorder");
+		blockUI("Loading Configurations...");
+		adminServices.getNotificationChannels("provider", this.channel, this.provider)
+		.then(function (data) {
+			unblockUI();
+			if (data == "Invalid Session") $rootScope.redirectPage();
+			else if (data == "fail") openModalPopup("Email Configuration", "Fail to fetch configured details for selected provider.");
+			else if (data != "empty") {
+				$scope.mailConf.loaded = $scope.mailConf.name = data.name;
+				$scope.mailConf.host = data.host;
+				$scope.mailConf.port = data.port;
+				$scope.mailConf.active = data.active;
+				$scope.mailConf.toggleStatus = (data.active)? "Disable":"Enable";
+				$scope.mailConf.secure = data.tls.security;
+				$scope.mailConf.insecuretls = data.tls.insecure.toString();
+				const authType = (data.auth && data.auth.type) || data.auth;
+				if (authType == "basic") $scope.mailConf.auth = data.auth;
+				else {
+					$scope.mailConf.auth = {
+						type: "none",
+						username: '',
+						password: ''
+					};
+				}
+				$scope.mailConf.sender = data.sender;
+				$scope.mailConf.appurl = data.appurl;
+				$scope.mailConf.timeouts = data.timeouts || {};
+				if (!data.pool) data.pool = {};
+				$scope.mailConf.pool.enable = data.pool.enable || false;
+				$scope.mailConf.pool.maxConnections = data.pool.maxconnections || "";
+				$scope.mailConf.pool.maxMessages = data.pool.maxmessages || "";
+				if (!data.proxy) data.proxy = {};
+				$scope.mailConf.proxy.enable = data.proxy.enable || false;
+				$scope.mailConf.proxy.url = data.proxy.url || "";
+				$scope.mailConf.proxy.auth = data.proxy.auth || false;
+				$scope.mailConf.proxy.user = data.proxy.user || "";
+				$scope.mailConf.proxy.pass = data.proxy.pass || "";
+			}
+		}, function (error) {
+			unblockUI();
+			console.error(error);
+			openModalPopup("Email Configuration", "Something Went Wrong");
+		});
+	};
+
+	$scope.mailConf.getConfObj = function() {
+		return {
+			channel: this.channel,
+			provider: this.provider,
+			name: this.name,
+			host: this.host,
+			port: this.port,
+			auth: this.auth,
+			sender: this.sender,
+			enabletls: this.secure,
+			insecuretls: this.insecuretls,
+			appurl: this.appurl,
+			pool: this.pool,
+			proxy: this.proxy,
+			timeouts: this.timeouts
+		};
+	};
+
+	$scope.mailConf.toggle = function() {
+		const conf = {
+			channel: this.channel,
+			provider: this.provider,
+			name: this.loaded
+		};
+		const action = this.toggleStatus;
+		let emsg = "Failed to "+action+" '"+conf.name+"' Configuration.";
+		blockUI(action.slice(0,-1) + "ing Configuration...")
+		adminServices.manageNotificationChannels(action.toLowerCase(), conf)
+		.then(function(data) {
+			unblockUI();
+			if (data == "Invalid Session") return $rootScope.redirectPage();
+			else if (data == "fail") openModalPopup(action+" Configuration", emsg);
+			else if (data == "success") {
+				openModalPopup(action+" Configuration", "'"+conf.name+"' Configuration "+action+"d!");
+				$scope.mailConf.getProviderInfo();
+			} else if(/^1[0-4]{9}$/.test(data)) {
+				if (parseInt(data[1])) {
+					openModalPopup(action+" Configuration", emsg+" Invalid Request!");
+					return;
+				}
+				const errfields = [];
+				if (parseInt(data[2])) errfields.push("Server Name");
+				if (parseInt(data[3])) errfields.push("Channel");
+				openModalPopup(action+" Configuration", emsg+" Following values are invalid: "+errfields.join(", "));
+			}
+		}, function (error) {
+			unblockUI();
+			openModalPopup(action+" Configuration", emsg);
+			console.error("Error in "+action+" Configuration:", error);
+		});
+	};
+
+	$scope.mailConf.validate = function() {
+		let flag = true;
+		let popped = false;
+		$("#mailName,#mailHost,#mailPort,#senderName,#senderEmail,#appURL,#proxyURL,#proxyUser,#proxyPass").removeClass("inputErrorBorder");
+		$("#mailProvider,#authenticationType").removeClass("selectErrorBorder");
+		const regExName = /^[A-Za-z0-9]+([A-Za-z0-9-]*[A-Za-z0-9]+|[A-Za-z0-9]*)$/;
+		const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
+		const emailRegEx = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		if (this.provider == "") {
+			$("#mailProvider").addClass("selectErrorBorder");
+			flag = false;
+		}
+		if (this.name == "") {
+			$("#mailName").addClass("inputErrorBorder");
+			flag = false;
+		} else if (!regExName.test(this.name)) {
+			$("#mailName").addClass("inputErrorBorder");
+			if (!popped) openModalPopup("Error", "Invalid Server Name provided! Name cannot contain any special characters other than hyphen. Also name cannot start or end with hyphen.");
+			flag = false;
+			popped = true;
+		}
+		if (this.host == "") {
+			$("#mailHost").addClass("inputErrorBorder");
+			flag = false;
+		}
+		if (this.port == "") {
+			$("#mailPort").addClass("inputErrorBorder");
+			flag = false;
+		} else if (!((+this.port >= 0) && (+this.port < 65536))) {
+			$("#mailPort").addClass("inputErrorBorder");
+			if (!popped) openModalPopup("Error", "Invalid Server Port provided! Value has to be a number between 0 and 65535.");
+			flag = false;
+			popped = true;
+		}
+		if (this.auth.type == "") {
+			$("#authenticationType").addClass("selectErrorBorder");
+			flag = false;
+		}
+		if (this.sender.name == "") {
+			$("#senderName").addClass("inputErrorBorder");
+			flag = false;
+		}
+		if (this.sender.email == "" || !emailRegEx.test(this.sender.email)) {
+			$("#senderEmail").addClass("inputErrorBorder");
+			flag = false;
+		}
+		if (this.appurl == "") {
+			$("#appURL").addClass("inputErrorBorder");
+			flag = false;
+		} else if (!regExURL.test(this.appurl)) {
+			$("#appURL").addClass("inputErrorBorder");
+			if (!popped) openModalPopup("Error", "Invalid Avo Assure Application URL provided!");
+			flag = false;
+			popped = true;
+		}
+		if (this.proxy.enable) {
+			if (this.proxy.url == "") {
+				$("#proxyURL").addClass("inputErrorBorder");
+				flag = false;
+			} else if (!regExURL.test(this.proxy.url)) {
+				$("#proxyURL").addClass("inputErrorBorder");
+				if (!popped) openModalPopup("Error", "Invalid Proxy Server URL provided!");
+				flag = false;
+				popped = true;
+			}
+			if (this.proxy.auth) {
+				if (this.proxy.user == "") {
+					$("#proxyUser").addClass("inputErrorBorder");
+					flag = false;
+				}
+				if (this.proxy.pass == "") {
+					$("#proxyPass").addClass("inputErrorBorder");
+					flag = false;
+				}
+			}
+		}
+		if (!flag && !popped) openModalPopup("Error", "Form contains errors!");
+		return flag;
+	};
+
+	$scope.mailConf.showTestMail = function() {
+		if (!this.validate()) return false;//openModalPopup("Test Configuration", "Certain fields have invalid values");
+		this.testMailID = '';
+		this.testMailMsg = '';
+		$("#testMailID").removeClass("inputErrorBorder");
+		$('#emailserverModal').modal("show");
+	};
+
+	$scope.mailConf.test = function() {
+		$("#testMailID").removeClass("inputErrorBorder");
+		const recipient = this.testMailID;
+		const emailRegEx = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		if (recipient.length === 0 || !emailRegEx.test(recipient)) {
+			this.testMailMsg = "Recipient address is invalid!";
+			$("#testMailID").addClass("inputErrorBorder");
+			return false;
+		}
+		this.testMailMsg = 'Sending...';
+		const conf = this.getConfObj();
+		adminServices.testNotificationChannels(this.channel, this.provider, recipient, conf)
+		.then(function(data) {
+			let status = "Fail to send the test mail. Re-check the configuration.";
+			if (data == "Invalid Session") return $rootScope.redirectPage();
+			else if (data == "invalidprovider") status = "Selected Provider is not supported yet!";
+			else if (data == "invalidrecipient") status = "Recipient address is invalid!";
+			else if (data == "success") status = "Test Email Sent!";
+			else status = "Fail to send the test mail. Re-check the configuration.";
+			$scope.mailConf.testMailMsg = status;
+		}, function (error) {
+			$scope.mailConf.testMailMsg = "Fail to send the test mail. Re-check the configuration.";
+			console.error("Error in Test Email:", error);
+		});
+		//$('#emailserverModal').modal("hide");
+	};
+
+	$scope.mailConf.manage = function() {
+		if (!this.validate()) return false;
+		const conf = this.getConfObj();
+		const action = (this.loaded)? "Update":"Create";
+		let emsg = "Failed to "+action+" '"+conf.name+"' Configuration.";
+		blockUI(action.slice(0,-1) + "ing Configuration...")
+		adminServices.manageNotificationChannels(action.toLowerCase(), conf)
+		.then(function(data) {
+			unblockUI();
+			if (data == "Invalid Session") return $rootScope.redirectPage();
+			else if (data == "fail") openModalPopup(action+" Configuration", emsg);
+			else if (data == "exists") openModalPopup(action+" Configuration", "'"+conf.name+"' configuration already exists");
+			else if (data == "success") {
+				openModalPopup(action+" Configuration", "'"+conf.name+"' Configuration "+action+"d!");
+				$scope.mailConf.getProviderInfo();
+			} else if(/^1[0-4]{12}$/.test(data)) {
+				if (+data[1]) {
+					openModalPopup(action+" Configuration", emsg+" Invalid Request!");
+					return;
+				}
+				const errfields = [];
+				if (+data[2]) errfields.push("Server Name");
+				if (+data[3]) errfields.push("Channel");
+				if (+data[4]) errfields.push("Provider");
+				if (+data[5]) errfields.push("Server Host");
+				if (+data[6]) errfields.push("Server Port");
+				if (+data[7]) errfields.push("Sender Email");
+				if (+data[8]) errfields.push("Secure Connection");
+				if (+data[9]) errfields.push("Authentication");
+				if (+data[10]) errfields.push("Avo Assure Application URL");
+				if (+data[11]) errfields.push("Proxy URL");
+				if (+data[12] == 1) errfields.push("Proxy Username");
+				else if (+data[12] == 2) errfields.push("Proxy Password");
+				else if (+data[12] == 3) errfields.push("Proxy Credentials");
+				openModalPopup(action+" Configuration", emsg+" Following values are invalid: "+errfields.join(", "));
+			}
+		}, function (error) {
+			unblockUI();
+			openModalPopup(action+" Configuration", emsg);
+			console.error("Error in "+action+" Configuration:", error);
+		});
+	};
+
 	// Session Management Tab Click
 	$scope.sessionConf.click = function () {
 		$(".selectedIcon").removeClass("selectedIcon");
@@ -3581,4 +3943,23 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			console.error("Fail to load session data", error);
 		});
 	};
+
+	$("#test")[0].onclick = () => {
+		console.log("test")
+		const inputs = {
+			poolname: "pool1",
+			projectids: [],
+			ice_added: ["ice 1","ice 2"],
+			ice_deleted: [],
+			updatedby: "5db0022cf87fdec084ae49ad",
+			
+
+		};
+		adminServices.updatePool(inputs).then(()=>{
+			console.log("create pool")
+		});
+	}
+	function testAPI(){
+		console.log("test")
+	}
 }]);

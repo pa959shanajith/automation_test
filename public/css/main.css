@@ -911,7 +911,8 @@ input[type="radio"]{
 .left-top-section-utility{
 	border-bottom: none !important;
 }
-#left-bottom-section {
+#left-bottom-section,
+#left-bottom-section-app {
     /*height: 25%;*/
     float: left;
     width: 100%;
@@ -919,7 +920,8 @@ input[type="radio"]{
 }
 
 #left-top-section ul,
-#left-bottom-section ul {
+#left-bottom-section ul,
+#left-bottom-section-app ul {
     /* float: left; */
     width: 100%;
     padding: 0;
@@ -927,7 +929,8 @@ input[type="radio"]{
     text-align: center;
 }
 
-#left-bottom-section ul {
+#left-bottom-section ul,
+#left-bottom-section-app ul {
     /*position: absolute;*/
     position: relative;
     /* top: 120px; */
@@ -939,7 +942,8 @@ input[type="radio"]{
 }
 
 #left-top-section ul li,
-#left-bottom-section ul li {
+#left-bottom-section ul li,
+#left-bottom-section-app ul li {
     list-style-type: none;
     float: left;
     width: 100%;
@@ -959,12 +963,14 @@ input[type="radio"]{
     margin-top: 20%;
 }
 
-#left-bottom-section ul li {
+#left-bottom-section ul li,
+#left-bottom-section-app ul li {
     margin-top: 0;
     margin-bottom: 16%;
 }
 
-#left-bottom-section ul li:last-child {
+#left-bottom-section ul li:last-child,
+#left-bottom-section-app ul li:last-child {
     margin-bottom: 0;
 }
 
@@ -976,7 +982,8 @@ input[type="radio"]{
 }
 
 #left-top-section ul li span,
-#left-bottom-section ul li span {
+#left-bottom-section ul li span,
+#left-bottom-section-app ul li span {
     /* font-size: 18px; */
     float: left;
     width: 100%;
@@ -992,7 +999,8 @@ input[type="radio"]{
 }*/
 
 #left-top-section ul li a,
-#left-bottom-section ul li a {
+#left-bottom-section ul li a,
+#left-bottom-section-app ul li a {
     text-decoration: none;
     font-size: 12px;
     font-family: 'LatoWebLight';
@@ -1010,19 +1018,23 @@ input[type="radio"]{
 }
 
 #left-top-section ul li a:focus,
-#left-bottom-section ul li a:focus {
+#left-bottom-section ul li a:focus,
+#left-bottom-section-app ul li a:focus {
     outline: 0
 }
 
 #left-top-section ul li a span img,
 #left-bottom-section ul li a span img,
+#left-bottom-section-app ul li a span img,
 #left-top-section ul li a span span.fa,
-#left-bottom-section ul li a span span.fa {
+#left-bottom-section ul li a span span.fa,
+#left-bottom-section-app ul li a span span.fa {
     padding: 8px 10px;
 }
 
 #left-top-section ul li a span span.fa,
-#left-bottom-section ul li a span span.fa {
+#left-bottom-section ul li a span span.fa,
+#left-bottom-section-app ul li a span span.fa {
     font-size: 30px;
     vertical-align: middle;
     float: none;
@@ -1031,8 +1043,10 @@ input[type="radio"]{
 
 #left-top-section ul li a:hover span img,
 #left-bottom-section ul li a:hover span img,
+#left-bottom-section-app ul li a:hover span img,
 #left-top-section ul li a:hover span span.fa,
-#left-bottom-section ul li a:hover span span.fa {
+#left-bottom-section ul li a:hover span span.fa,
+#left-bottom-section-app ul li a:hover span span.fa {
     /*background: #331d4c;*/
     background: #523176;
     border-radius: 5px;
@@ -1083,7 +1097,8 @@ input[type="radio"]{
 }
 
 #left-top-section ul li label,
-#left-bottom-section ul li a {
+#left-bottom-section ul li a,
+#left-bottom-section-app ul li a {
     font-weight: normal;
     font-size: 16px;
 }
@@ -4750,7 +4765,7 @@ select:-webkit-autofill:focus {
 }
 
 @media screen and (min-height: 1000px) and (max-height: 1080px){
-	#left-bottom-section ul li{margin-bottom:12px;}
+    #left-bottom-section ul li,#left-bottom-section-app ul li {margin-bottom:12px;}
 	.list-inline-right{padding-right: 0;}
 	.list-inline-right li:first-child{margin-right:6px;}
 	.list-inline-right li:nth-child(2){margin-right:-24px;}
@@ -4777,8 +4792,9 @@ select:-webkit-autofill:focus {
 
 /**********Specifically for Internet Explorer**********/
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-	#left-bottom-section{
-		min-height: 36%;
+    #left-bottom-section,
+    #left-bottom-section-app{
+        min-height: 36%;
 	}
 
 	.list-inline-right > li.list-inline-item:nth-child(2){margin-right: -32px !important;}

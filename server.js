@@ -158,6 +158,10 @@ if (cluster.isMaster) {
 		const authconf = authlib();
 		const auth = authconf.auth;
 		app.use(authconf.router);
+		var queue = require("./server/lib/executionQueue")
+		queue.Execution_Queue.queue_init()
+		const notf = require("./server/notifications");
+		notf.initalize();
 
 		//Based on NGINX Config Security Headers are configured
 		if (!nginxEnabled) {
@@ -261,63 +265,9 @@ if (cluster.isMaster) {
 			res.redirect('/');
 		});
 
-		const authRedirecter = async req => {
-			let redirect = !1;
-			let userLogged = req.session.logged;
-			let user = req.user;
-			if (userLogged && !req.session.emsg) {
-				req.session.emsg = "userLogged";
-				req.session.dndSess = true;
-			} else if (!req.session.emsg && req.session.username == undefined) {
-				if (user) {
-					let username = user.username;
-					if (username == undefined) {
-						req.session.emsg = "invalid_username_password";
-					} else {
-						username = username.toLowerCase();
-						try {
-							const sessid = await utils.findSessID(username);
-							if (sessid != "") {
-								req.session.emsg = "userLogged";
-							} else {
-								req.session.username = username;
-								req.session.uniqueId = req.session.id;;
-								req.session.usertype = user.type;
-								logger.rewriters[0] = function(level, msg, meta) {
-									meta.username = username;
-									meta.userid = null;
-									meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
-									return meta;
-								};
-							}
-						} catch (err) {
-							logger.error("User Authentication failed. Error: ", err);
-							req.session.emsg = "fail";
-						}
-					}
-				} else {
-					logger.rewriters[0] = function(level, msg, meta) {
-						meta.username = null;
-						meta.userid = null;
-						meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
-						return meta;
-					};
-					redirect = !redirect;
-				}
-			}
-			return redirect;
-		};
-
 		app.get('/', async (req, res, next) => {
 			if (!(req.url == '/' || req.url.startsWith("/?"))) return next();
-			const redirect = await authRedirecter(req);
-			if (redirect) {
-				req.clearSession();
-				return res.redirect('login');
-			} else {
-				req.session.logged = true;
-				return res.sendFile("app.html", { root: __dirname + "/public/" });
-			}
+			return res.sendFile("app.html", { root: __dirname + "/public/" });
 		});
 
 		// Dummy Service for keeping session alive during long-term execution, etc. #Polling
@@ -489,10 +439,12 @@ if (cluster.isMaster) {
 		app.post('/excelToMindmap', mindmap.excelToMindmap);
 		app.post('/getScreens', mindmap.getScreens);
 		app.post('/exportToExcel', mindmap.exportToExcel);
+		app.post('/exportMindmap', mindmap.exportMindmap);
+		app.post('/importMindmap', mindmap.importMindmap);
 		app.post('/pdProcess', auth.protect, mindmap.pdProcess);	// process discovery service
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
-		app.post('/checkUserState', login.checkUserState);
+		app.post('/validateUserState', authlib.validateUserState);
 		app.post('/loadUserInfo', auth.protect, login.loadUserInfo);
 		app.post('/getRoleNameByRoleId', auth.protect, login.getRoleNameByRoleId);
 		app.post('/logoutUser', login.logoutUser);
@@ -522,6 +474,17 @@ if (cluster.isMaster) {
 		app.post('/getPreferences', auth.protect, admin.getPreferences);
 		app.post('/provisionIce', auth.protect, admin.provisionICE);
 		app.post('/fetchICE', auth.protect, admin.fetchICE);
+		app.post('/getICEinPools', auth.protect, admin.getICEinPools);
+		app.post('/getAllProjects', auth.protect, admin.getAllProjects);
+		app.post('/deleteICE_pools', auth.protect, admin.deletePools);
+		app.post('/getAvailable_ICE', auth.protect, admin.getAvailable_ICE);
+		app.post('/updatePool', auth.protect, admin.updatePool);
+		app.post('/getUnassigned_ICE', auth.protect, admin.getUnassigned_ICE);
+		app.post('/createPool_ICE', auth.protect, admin.createPool_ICE);
+		app.post('/exportProject', auth.protect, admin.exportProject);
+		app.post('/testNotificationChannels', auth.protect, admin.testNotificationChannels);
+		app.post('/manageNotificationChannels', auth.protect, admin.manageNotificationChannels);
+		app.post('/getNotificationChannels', auth.protect, admin.getNotificationChannels);
 
 		//Design Screen Routes
 		app.post('/initScraping_ICE', designscreen.initScraping_ICE);
@@ -550,12 +513,13 @@ if (cluster.isMaster) {
 		app.post('/getAllSuites_ICE', report.getAllSuites_ICE);
 		app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
 		app.post('/reportStatusScenarios_ICE', report.reportStatusScenarios_ICE);
-		app.post('/renderReport_ICE', report.renderReport_ICE);
-		app.post('/getReport', report.getReport);
-		app.post('/openScreenShot', report.openScreenShot);
+		app.post('/renderReport_ICE', auth.protect, report.renderReport_ICE);
+		app.post('/getReport', auth.protect, report.getReport);
+		app.post('/openScreenShot', auth.protect, report.openScreenShot);
 		app.post('/connectJira_ICE', report.connectJira_ICE);
-		app.post('/getReportsData_ICE', report.getReportsData_ICE);
+		app.post('/getReportsData_ICE', auth.protect, report.getReportsData_ICE);
 		app.post('/getReport_API', report.getReport_API);
+		app.use('/viewReport', report.viewReport);
 		//Plugin Routes
 		app.post('/getProjectIDs', plugin.getProjectIDs);
 		app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
