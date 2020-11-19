@@ -143,12 +143,9 @@ exports.storeUserDetails = function (req, res) {
 				logger.error("Error occurred in checkTandC Error Code : ERRDAS");
 				flag = false;
 			}
-			// return res.send("success");
 		});
-		// return rpns
 	} catch (exception) {
 		logger.error(exception.message);
 		return res.send("fail");
 	}
-	// return rpns
 };

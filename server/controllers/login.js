@@ -60,29 +60,14 @@ exports.loadUserInfo = async (req, res) => {
 		userProfile.rolename = req.session.defaultRole;
 		userProfile.pluginsInfo = permData.pluginresult;
 		userProfile.page = (userProfile.rolename == "Admin")? "admin":"plugin";
-		// if (userProfile.rolename != "Admin" && userProfile.tandc == True){
-		// 	logger.info("Calling DAS Service: login/checkTandC");
-		// 	client.post(epurl + "login/checkTandC",
-		// 		function (userdetails, response) {
-		// 		if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
-		// 			logger.error("Error occurred in checkTandC ");
-		// 			// flag = false;
-		// 		}
-		// 	});
-		// }
 		if (userProfile.rolename != "Admin" && userProfile.tandc == "True"){
 			const input_name = userProfile.username
 			var funName = "loadUserInfo";
-			// inputs = { input_name };
 			inputs = {
 				"input_name": input_name,
 				"query": funName
 			};
 			const eulaData = await utils.fetchData(inputs, "login/checkTandC", fnName);
-			logger.info("Inside UI Service: " + fnName);
-			// logger.info("Inside UI Service: " + fnName);
-			// logger.info("Inside UI Service: " + fnName);
-			// logger.info("Inside UI Service: " + eulaData);
 			if (eulaData == "fail"){
 				userProfile.eulaData = "fail"
 			}

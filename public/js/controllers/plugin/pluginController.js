@@ -328,11 +328,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	window.localStorage['_CT'] = "";
 
 	$scope.declineB = function($event){
-		//Transaction Activity for Logout Button Action
-		// var labelArr = [];
-		// var infoArr = [];
-		// labelArr.push(txnHistory.codesDict['Logout']);
-		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 		var x = document.getElementById("declineBtn")
 		if (x.innerHTML=="Decline"){
 			console.log("x value is "+ (x.innerHTML))
@@ -344,7 +339,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			var fullName = firstName+" "+lastName
 			var acceptance = x.innerHTML
 			var email = userDetail.email_id
-			// var ip = window.location.hostname
 			var timeStamp = new Date().toLocaleString();
 			var userDataList = [];
 			userDataList.push({
@@ -354,8 +348,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 				'acceptance': acceptance,
 				'timestamp': timeStamp
 			});
-			// var mainModal = $("#tAndCpop");
-			// mainModal.modal("hide");
 			PluginService.storeUserDetails(userDataList)
 				.then(function (data) {
 					if(data == "Invalid Session") {
@@ -363,10 +355,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 					} 
 					else {if(data == "success"){
 						userDataList = [];
-						// var mainModal = $("#tAndCpop");
-						// mainModal.find('.modal-title').text(title);
-						// mainModal.find('.modal-body p').text(body);
-						// mainModal.modal("hide");
 						}
 					}
 				},function(error) {
@@ -390,7 +378,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			var fullName = firstName+" "+lastName
 			var acceptance = x.innerHTML
 			var email = userDetail.email_id
-			// var ip = window.location.hostname
 			var timeStamp = new Date().toLocaleString();
 			var userDataList = [];
 			userDataList.push({
@@ -400,8 +387,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 				'acceptance': acceptance,
 				'timestamp': timeStamp
 			});
-			// var mainModal = $("#tAndCpop");
-			// mainModal.modal("hide");
 			PluginService.storeUserDetails(userDataList)
 				.then(function (data) {
 					if(data == "Invalid Session") {
@@ -410,8 +395,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 					else {if(data == "success"){
 						userDataList = [];
 						var mainModal = $("#tAndCpop");
-						// mainModal.find('.modal-title').text(title);
-						// mainModal.find('.modal-body p').text(body);
 						mainModal.modal("hide");
 						}
 					}
@@ -420,10 +403,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 				});
 
 		}
-		// var mainModal = $("#tAndCpop");
-			// mainModal.find('.modal-title').text(title);
-			// mainModal.find('.modal-body p').text(body);
-		// mainModal.modal("hide");
 	};
 
 	$scope.taskRedirection = function(testsuitedetails,dataobj,event){
