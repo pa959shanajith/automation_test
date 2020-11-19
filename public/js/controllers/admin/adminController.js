@@ -170,10 +170,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		});
 	});
 
-	$scope.populatePool = new Promise ((res) => {
-		adminServices.getUserDetails("user")//temp
+	const populatePool = () => new Promise ((res) => {
+		var data = {
+			poolid:"all",
+			projectids:[]
+		}
+		adminServices.getPools(data)
 		.then(function(data){
-			data = [{name:'pool1',projectList:[],iceList:[]},{name:'pool2',projectList:[],iceList:[]},{name:'pool3',projectList:[],iceList:[]}]
 			if(data == "Invalid Session") {
 				$rootScope.redirectPage();
 			} else if(data == "fail") {
@@ -181,8 +184,34 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			} else if(data == "empty") {
 				openModalPopup("Edit User", "There are no users created yet.");
 			} else {
-				data.sort((a,b) => a.name.localeCompare(b.name));
-				res(data) 
+				var e = Object.entries(data)
+				e.sort((a,b) => a[1].poolname.localeCompare(b[1].poolname))
+				res({data:e})
+			}
+			unblockUI();
+			res([]);
+		}, function (error) {
+			unblockUI();
+			console.error(error)
+			openModalPopup("Edit User", "Failed to fetch users.");
+			res([]);
+		});
+	})
+
+	const populateICEList = () => new Promise ((res) => {
+		var id = $scope.allocateIcePool.selectedIcePool._id
+		adminServices.getICEinPools({poolid:[id]})//temp
+		.then(function(data){
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "fail") {
+				openModalPopup("Edit User", "Failed to fetch users.");
+			} else if(data == "empty") {
+				openModalPopup("Edit User", "There are no users created yet.");
+			} else {
+				var e = Object.entries(data)
+				e.sort((a,b) => a[1].icename.localeCompare(b[1].icename))
+				res({data:e,dict:data})
 			}
 			unblockUI();
 			res([]);
@@ -194,111 +223,307 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		});
 	})
 	
-	const populateICEList = new Promise ((res) => {
-		adminServices.getUserDetails("user")//temp
-		.then(function(data){
-			data = [{name:'ICE1',projectList:[],iceList:[]},{name:'ICE2',projectList:[],iceList:[]},{name:'ICE3',projectList:[],iceList:[]}]
+	const createIcePoolReset = () => {
+		$scope.createIcePool.poolName = ""
+		$('#assignedProjectAP option').appendTo($('#allProjectAP'))
+		$('select#allProjectAP').val([])
+		$('#tokenName').val('')
+		$('#tokenName').removeClass('error-border')
+	}
+
+	const EditIcePoolReset = () =>{
+		$('#update-icepool-rename').addClass("hide")
+		$('#assignedProjectAP option').appendTo($('#allProjectAP'))
+		$('select#allProjectAP').val([])
+		$scope.createIcePool.allIcePoolListFilter=''
+		$scope.createIcePool.selectedIcePool = undefined
+	}
+
+	// on click of create ice pool from action bar
+	$scope.createIcePool.click = () =>{
+		$(".selectedIcon").removeClass("selectedIcon");
+		$("#createIcePool").find("span.fa").addClass("selectedIcon");
+		blockUI('Fetching Projects ...')
+		adminServices.getAllProjects()
+		.then((data)=>{
 			if(data == "Invalid Session") {
 				$rootScope.redirectPage();
 			} else if(data == "fail") {
-				openModalPopup("Edit User", "Failed to fetch users.");
+				openModalPopup("Create ICE Pool", "Failed to fetch projects.");
 			} else if(data == "empty") {
-				openModalPopup("Edit User", "There are no users created yet.");
+				openModalPopup("Create ICE Pool", "There are no projects created yet.");
 			} else {
 				data.sort((a,b) => a.name.localeCompare(b.name));
-				res(data) 
+				$scope.createIcePool.allProjectList = data
 			}
-			unblockUI();
-			res([]);
-		}, function (error) {
-			unblockUI();
-			console.error(error)
-			openModalPopup("Edit User", "Failed to fetch users.");
-			res([]);
-		});
-	})
+			unblockUI()
+		},(error)=>{
+			openModalPopup("Create ICE Pool", "Failed to fetch projects.");
+			console.log("Error:::::::::::::", error);
+			unblockUI()
+		})
+	}
 	
+	$scope.createIcePool.changeName = (val) =>{
+		$('#tokenName').removeClass('error-border')
+		$scope.createIcePool.poolName = val
+	} 
+
+	$scope.createIcePool.saveClick = () =>{
+		var projList = [];
+		$("#assignedProjectAP option").each(function () {
+			projList.push($(this).val())
+		});
+		var data = {
+			poolname: $scope.createIcePool.poolName,
+			projectids: projList
+		}
+		blockUI('Saving ICE Pool ...')
+		adminServices.createPool_ICE(data)
+		.then((data)=>{
+			if (data == "success") {
+				createIcePoolReset()
+				openModalPopup("Success", "ICE Pool created successfully.");
+			} else if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data  == 'Pool exists') {
+				$('#tokenName').addClass('error-border')
+				openModalPopup("Error", "Pool name already exist");
+			} else {
+				openModalPopup("Create ICE Pool", "There are no projects created yet.");
+			}
+			unblockUI()
+		},(error)=>{
+			openModalPopup("ICE Pool", "Failed to create ICE Pool");
+			console.log("Error:::::::::::::", error);
+			unblockUI()
+		})
+	}
+
+	$scope.createIcePool.selectIcePool = (pool) =>{
+		$scope.createIcePool.selectedIcePool=pool[1]
+		$("#update-icepool-rename").find('input').val(pool[1].poolname)
+		$("#update-icepool-rename").removeClass("hide");
+		var a=[]
+		if(pool[1].projectids){
+			$scope.createIcePool.allProjectList.forEach((e)=>{
+				if(pool[1].projectids.indexOf(e._id)!=-1){
+					a.push(e)
+					$("#allProjectAP option[value='"+e._id+"']").remove()
+				}
+			})
+		}
+		$scope.createIcePool.selectedIcePool=pool[1]
+		$scope.createIcePool.selectedIcePool.projectList = a;
+	}
+
+	// on click of edit ice pool button
+	$scope.editICEPool = async() => {
+		$scope.tab = "tabIcePoolEdit";
+		blockUI("Fetching ICE Pools...");
+		var res = await populatePool()
+		$scope.createIcePool.allIcePoolList = res.data
+		unblockUI();
+	}
+
+	$scope.createIcePool.updateIcePool = () =>{
+		var pool = $scope.createIcePool.selectedIcePool
+		pool.projectids=[]
+		pool.ice_added=[]
+		pool.ice_deleted=[]
+		pool.poolname=$('#tokenName').val()
+		$('#assignedProjectAP option').each((i,e)=>{pool.projectids.push(e.value)})
+		blockUI('Saving ICE Pool ...')
+		adminServices.updatePool(pool)
+		.then((data)=>{
+			if (data == "success") {
+				EditIcePoolReset()
+				populatePool().then((res)=>{
+				$scope.createIcePool.allIcePoolList = res.data
+				})
+				openModalPopup("Success", "ICE Pool created successfully.");
+			} else if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data  == 'Pool exists') {
+				$('#tokenName').addClass('error-border')
+				openModalPopup("Error", "Pool name already exist");
+			} else {
+				openModalPopup("Create ICE Pool", "There are no projects created yet.");
+			}
+			unblockUI()
+		},(error)=>{
+			openModalPopup("ICE Pool", "Failed to create ICE Pool");
+			console.log("Error:::::::::::::", error);
+			unblockUI()
+		})
+	}
+
+	$scope.createIcePool.deleteIcePool = () =>{
+		blockUI('Deleting ICE Pool ...')
+		var id = $scope.createIcePool.selectedIcePool._id
+		adminServices.deletePools({'poolid':[id]})
+		.then((data)=>{
+			if (data == "success") {
+				EditIcePoolReset()
+				populatePool().then((res)=>{
+				$scope.createIcePool.allIcePoolList = res.data
+				})
+				openModalPopup("Success", "ICE Pool deleted successfully.");
+			} else if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else {
+				openModalPopup("ICE Pool", "Failed to delete ICE Pool");
+			}
+			unblockUI()
+		},(error)=>{
+			openModalPopup("ICE Pool", "Failed to delete ICE Pool");
+			console.log("Error:::::::::::::", error);
+			unblockUI()
+		})
+	}
+	
+	// on click of allocate ice pool button
 	$scope.allocateIcePool.click = async() =>{
 		$(".selectedIcon").removeClass("selectedIcon");
 		$("#allocateIcePool").find("span.fa").addClass("selectedIcon");
 		//api to get total ice count and remaining ice count
 		$scope.iceAllocateType('quantity');
 		blockUI("Fetching ICE Pools...");
-		$scope.allocateIcePool.iceCount = {total:100,available:50}
-		var data = await $scope.populatePool
-		$scope.allocateIcePool.allIcePoolList = data
 		unblockUI()
 	}
 	
-	$scope.allocateIcePool.saveClick = (pool) =>{
+	$scope.allocateIcePool.saveClick = () =>{
 		blockUI('Saving in Progress. Please Wait...');
-		openModalPopup("ICE Pool Update", "ICE assigned to pool successfully");
-		unblockUI()
-	}
-
-	$scope.allocateIcePool.selectIcePool = (pool) =>{
-		pool.iceList = ['ice-1','ice-2']
-		$scope.allocateIcePool.selectedIcePool=pool
-		if($scope.allocateIcePool.type==='quantity'){
-			$('#update-icepool-count').removeClass("hide")
-			$('#update-icepool-count').find('input').attr({
-				"max":25,
-				"min":0,
-			})
-			$('#update-icepool-count').find('input').val(pool.iceList.length)
+		var pool = $scope.allocateIcePool.selectedIcePool
+		var iceData = $scope.allocateIcePool.iceData
+		var type = $scope.allocateIcePool.type 
+		if(type == 'quantity'){
+			var iceList = pool.ice_list
+			var val = $('#icepoolNumInp').val() - iceList.length
+			pool.ice_deleted = []
+			pool.ice_added = []
+			var availableIce = Object.keys(iceData.available_ice).length 
+			if(val > availableIce){
+				openModalPopup("Error", "Number of ICE assigned exceeds available ICE");
+				unblockUI()
+				return;
+			}
+			if(val<0){
+				pool.ice_deleted = Object.keys($scope.allocateIcePool.iceDict).slice(0,Math.abs(val))
+			}else{
+				pool.ice_added = Object.keys(iceData.available_ice).slice(0,val)
+			}
 		}
-	}
-
-	$scope.createIcePool.click = () =>{
-		$(".selectedIcon").removeClass("selectedIcon");
-		$("#createIcePool").find("span.fa").addClass("selectedIcon");
-		var idtype =  ["domaindetails"] //temp
-		var requestedids = ["Banking"] //temp
-		adminServices.getDetails_ICE(idtype, requestedids)
-		.then(function (res) {
-			if (res == "Invalid Session") {
-				$rootScope.redirectPage();
-			}
-			if (res.projectIds.length > 0) {
-				$scope.assignProj.allProjectAP = [];
-				$scope.assignProj.assignedProjectAP = [];
-				for (var n = 0; n < res.projectIds.length; n++) {
-					$scope.assignProj.allProjectAP.push({'projectname':res.projectNames[n],'projectid':res.projectIds[n]});
+		if(type == 'specific'){
+			var ice_List = []
+			var ice_added = []
+			var ice_deleted = []
+			$('#assignedProjectAP option').each((i,e)=>{
+				ice_List.push(e.value)
+				if(!(e in $scope.allocateIcePool.iceDict)){
+					ice_added.push(e.value)
 				}
+			})
+			$scope.allocateIcePool.iceList.forEach((e)=>{
+				if(ice_List.indexOf(e[0])==-1){
+					ice_deleted.push(e[0])
+				}
+			})
+			pool.ice_added= ice_added
+			pool.ice_deleted=ice_deleted
+		}
+		blockUI('Saving ICE Pool ...')
+		adminServices.updatePool(pool)
+		.then((data)=>{
+			if (data == "success") {
+				$scope.iceAllocateType(type)
+				openModalPopup("Success", "ICE Pool updated successfully.");
+			} else if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else {
+				openModalPopup("ICE Pool", "Failed to update ICE Pool");
+				unblockUI()
 			}
+		},(error)=>{
+			openModalPopup("ICE Pool", "Failed to update ICE Pool");
+			console.log("Error:::::::::::::", error);
+			unblockUI()
 		})
 	}
 
-	$scope.createIcePool.selectIcePool = (pool) =>{
-		$scope.createIcePool.selectedIcePool=pool
-		$("#update-icepool-form").removeClass("hide-from");
-	}
+	$scope.allocateIcePool.selectIcePool = (pool) =>{
+		$scope.allocateIcePool.selectedIcePool=pool
+		blockUI('Fetching ICE Pool...')
+		populateICEList().then(function(res){
+			$scope.allocateIcePool.iceList = res.data
+			$scope.allocateIcePool.iceDict = res.dict
+			if($scope.allocateIcePool.type==='quantity'){
+				$('#update-icepool-count').removeClass("hide")
+				$('#update-icepool-count').find('input').attr({
+					"max":$scope.allocateIcePool.iceCount+res.data.length,
+					"min":0,
+				})
+				$('#update-icepool-count').find('input').val(res.data.length)
+			}
+			if($scope.allocateIcePool.type==='specific'){
+				var selectBox = $("#assignedProjectAP");
+				res.data.forEach((e)=>{
+					selectBox.append('<option value='+e[0]+'>'+e[1].icename+'</option>');
+				})
+			}
+		})
 
-	$scope.editICEPool = async($event) => {
-		$scope.tab = "tabIcePoolEdit";
-		blockUI("Fetching ICE Pools...");//temp
-		var data = await $scope.populatepool
-		$scope.createIcePool.allIcePoolList = data;
-		unblockUI();
 	}
 
 	$scope.allocationPoolReset = () => {
-		$('#update-icepool-count').addClass("hide")
+		var type = $scope.allocateIcePool.type 
 		$scope.allocateIcePool.allIcePoolListFilter=''
-		$scope.allocateIcePool.selectedIcePool = undefined
+		$scope.allocateIcePool.selectedIcePool = undefined	
+		if(type == 'quantity'){
+			$('#update-icepool-count').addClass("hide")
+			$('#icepoolNumInp').val('')
+		}
+		if(type == 'specific'){
+			$('#assignedProjectAP option').remove()
+			$('select#allProjectAP').val([])
+		}
 	}
 
 	$scope.iceAllocateType = async(type) => {
-		blockUI('Fetching ICE Pools')
+		blockUI('Fetching ICE Pools...')
+		$scope.allocateIcePool.type = type
 		$(".active-opt").removeClass("active-opt").addClass('btn-md');
 		$('#icepool-'+type).addClass('active-opt').removeClass('btn-md');
 		$scope.allocationPoolReset()
-		$scope.allocateIcePool.type = type
-		if(type=='specific'){
-			var data = await populateICEList
-			$scope.allocateIcePool.allICEList = data
-		}
-		unblockUI()
+		adminServices.getAvailable_ICE()
+		.then((data)=>{
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data  == 'fail') {
+				openModalPopup("Error", "Failed to fetch ICE");
+				unblockUI()
+			} else if(data.length == 0) {
+				openModalPopup("Error", "No active ICE available");
+				unblockUI()
+			} else {
+				if(type==='quantity'){
+					var available = Object.keys(data.available_ice).length
+					var total = available + Object.keys(data.unavailable_ice).length
+					$scope.allocateIcePool.iceCount = {total:total,available:available}
+					$scope.allocateIcePool.iceData = data
+				}if(type=='specific'){
+					$scope.allocateIcePool.iceData = data
+				}
+				populatePool().then((res)=>{
+					$scope.allocateIcePool.allIcePoolList = res.data
+					unblockUI()
+				})
+			}
+		},(error)=>{
+			openModalPopup("ICE Pool", "Failed to fetch ICE Pool");
+			console.log("Error:::::::::::::", error);
+			unblockUI()
+		})
 	}
 
 	// Assign Projects Tab Click
@@ -3943,23 +4168,4 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			console.error("Fail to load session data", error);
 		});
 	};
-
-	$("#test")[0].onclick = () => {
-		console.log("test")
-		const inputs = {
-			poolname: "pool1",
-			projectids: [],
-			ice_added: ["ice 1","ice 2"],
-			ice_deleted: [],
-			updatedby: "5db0022cf87fdec084ae49ad",
-			
-
-		};
-		adminServices.updatePool(inputs).then(()=>{
-			console.log("create pool")
-		});
-	}
-	function testAPI(){
-		console.log("test")
-	}
 }]);

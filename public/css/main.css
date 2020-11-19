@@ -3982,6 +3982,9 @@ select[multiple]:-internal-list-box option:checked {
 }
 
 /*** ICEPOOL CREATETAB CSS **/
+.error-border{
+    border-bottom: 1px solid red!important;
+}
 #create-icepool .adminControl{
     width:75%
 }
@@ -3989,9 +3992,9 @@ select[multiple]:-internal-list-box option:checked {
     width: 95px;
     padding-left: 10px;
 }
-/* #update-icepool-form.hide-from{
-    display:none;
-} */
+#update-icepool-rename .hide{
+    display: none;
+}
 #allocate-icepool .adminControl {
     width: 75%;
     padding-left: 50px;
@@ -4024,9 +4027,6 @@ select[multiple]:-internal-list-box option:checked {
     outline: 0;
 }
 .active-opt:focus{
-    outline: 0 !important;
-}
-.btn:active{
     outline: 0 !important;
 }
 #icepoolNumInp{
@@ -4073,7 +4073,10 @@ select[multiple]:-internal-list-box option:checked {
 .edit-icepool-proj{
     margin: 15px 0
 }
-
+.btn:focus, .btn:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
 /*** ICEPOOL CREATETAB CSS **/
 
 /*****************ADMIN CSS NEW ************************/

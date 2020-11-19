@@ -461,14 +461,14 @@
 				<span>Create ICE Pool</span>
 			</div>
 			<div class="adminActionBtn">
-				<button title="Save" class="btn btn-md pull-right adminBtn" ng-click="saveICEPool($event)" style="margin-right:10px">Save</button>
 				<button title="Edit" class="btn btn-md pull-right adminBtn" ng-click="tab='tabIcePoolEdit';editICEPool($event)" style="margin-right:10px">Edit</button>
+				<button  ng-disabled="createIcePool.poolName==undefined || createIcePool.poolName==''" title="Create ICE Pool" class="btn btn-md pull-right adminBtn" ng-click="createIcePool.saveClick($event)" style="margin-right:10px">Create</button>
 			</div>
 			<div class="col-xs-9 form-group" id='create-icepool' style="width: 100%">
 				<div class='adminControl'>
 					<div>
-						<span class="leftControl" title="Token Name">ICE pool</span>
-						<input type="text" autocomplete="off" id="tokenName" name="tokenName" ng-change="tokens.verifyName($event)" ng-model="tokens.name" maxlength="100" class="form-control form-control-custom create validationKeydown preventSpecialChar" placeholder="Enter ICE Pool Name"/>
+						<span class="leftControl" title="ICE Pool Name">ICE pool</span>
+						<input type="text" autocomplete="off" id="tokenName" name="tokenName" ng-change="createIcePool.changeName(tokens.name)" ng-model="tokens.name" maxlength="100" class="form-control form-control-custom create validationKeydown preventSpecialChar" placeholder="Enter ICE Pool Name"/>
 					</div>
 				</div>
 				<div class="project-left2">
@@ -480,7 +480,7 @@
 						<div class="seprator" style="margin-bottom:0px;">
 							<!-- <select multiple id="allProjectEU" ng-model="allProjectNameEU" size="13" ng-options="p as p.ProjectName for p in projBox1 track by p.ProjectId"></select> -->
 							<select multiple="" id="allProjectAP" ng-model="allProjectNameAP" size="" class="ng-pristine ng-untouched ng-valid">
-								<option ng-repeat="prj in assignProj.allProjectAP" value="{{prj.projectid}}">{{prj.projectname}}</option>
+								<option ng-repeat="prj in createIcePool.allProjectList" value="{{prj._id}}">{{prj.name}}</option>
 							</select>
 							<span ng-show="projectNameRequired" class="error-msg ng-binding ng-hide"></span>
 						</div>
@@ -504,7 +504,7 @@
 						<div class="seprator" style="margin-bottom:0px;">
 							<!-- <select size="13" multiple ng-model="assignedProjectNameEU" id="assignedProject" ng-options="p as p.ProjectName for p in projBox2 track by p.ProjectId"></select> -->
 							<select multiple="" id="assignedProjectAP" ng-model="assignedProjectNameAP" size="" class="ng-pristine ng-untouched ng-valid">
-								<option ng-repeat="prj in assignProj.assignedProjectAP" value="{{prj.projectid}}">{{prj.projectname}}</option>
+								<!-- <option ng-repeat="prj in createIcePool.assignedProjectList" value="{{prj._id}}">{{prj.name}}</option> -->
 							</select>
 							<span ng-show="selectProjects" class="error-msg ng-binding ng-hide"></span>
 						</div>
@@ -521,11 +521,11 @@
 				<span>Edit ICE Pool</span>
 			</div>
 			<div class="adminActionBtn">
-				<button title="Update" class="btn btn-md pull-right adminBtn" ng-click="saveICEPool($event)" style="margin-right:10px">Update</button>
-				<button title="Delete" class="btn btn-md pull-right adminBtn" ng-click="tab='tabIcePoolsCreate';editICEPool($event)" style="margin-right:10px">Delete</button>
+				<button title="Update" class="btn btn-md pull-right adminBtn" ng-disabled="createIcePool.selectedIcePool==undefined || createIcePool.selectedIcePool==''" ng-click="createIcePool.updateIcePool()" style="margin-right:10px">Update</button>
+				<button title="Delete" class="btn btn-md pull-right adminBtn" ng-disabled="createIcePool.selectedIcePool==undefined || createIcePool.selectedIcePool==''" ng-click="createIcePool.deleteIcePool()" style="margin-right:10px">Delete</button>
 			</div>
 			<div class="col-xs-9 form-group" id='create-icepool' style="width: 100%">
-				<div id='update-icepool-form' class="hide-from">
+				<div>
 					<div id='specific-ice-pool' class="project-left2 edit-icepool-proj">
 						<!--Left Select Box-->
 						<div class="wrap left-select scrollbar-inner">
@@ -535,7 +535,7 @@
 							<div class="seprator" style="margin-bottom:0px;">
 								<!-- <select multiple id="allProjectEU" ng-model="allProjectNameEU" size="13" ng-options="p as p.ProjectName for p in projBox1 track by p.ProjectId"></select> -->
 								<select multiple="" id="allProjectAP" ng-model="allProjectNameAP" size="" class="ng-pristine ng-untouched ng-valid">
-									<option ng-repeat="prj in assignProj.allProjectAP" value="{{prj.projectid}}">{{prj.projectname}}</option>
+									<option ng-repeat="prj in createIcePool.allProjectList" value="{{prj._id}}">{{prj.name}}</option>
 								</select>
 								<span ng-show="projectNameRequired" class="error-msg ng-binding ng-hide"></span>
 							</div>
@@ -544,10 +544,10 @@
 
 						<!--Center Input-->
 						<div class="wrap wrap-editpro center-button">
-							<button id="rightall" type="button" ng-click="moveItems.rightall('#allProjectAP', '#assignedProjectAP')" title="Move all to right"> &gt;&gt; </button>
-							<button type="button" id="rightgo" ng-click="moveItems.rightgo('#allProjectAP', '#assignedProjectAP')" title="Move to right"> &gt; </button>
-							<button type="button" id="leftgo" ng-click="moveItems.leftgo('#assignedProjectAP','#allProjectAP')" title="Move to left"> &lt; </button>
-							<button id="leftall" type="button" ng-click="moveItems.leftall('#assignedProjectAP','#allProjectAP')" title="Move all to left"> &lt;&lt; </button>
+							<button id="rightall" type="button" class='btn' ng-disabled="createIcePool.selectedIcePool==undefined || createIcePool.selectedIcePool==''" ng-click="moveItems.rightall('#allProjectAP', '#assignedProjectAP')" title="Move all to right"> &gt;&gt; </button>
+							<button type="button" id="rightgo" class='btn' ng-disabled="createIcePool.selectedIcePool==undefined || createIcePool.selectedIcePool==''" ng-click="moveItems.rightgo('#allProjectAP', '#assignedProjectAP')" title="Move to right"> &gt; </button>
+							<button type="button" id="leftgo" class='btn' ng-disabled="createIcePool.selectedIcePool==undefined || createIcePool.selectedIcePool==''" ng-click="moveItems.leftgo('#assignedProjectAP','#allProjectAP')" title="Move to left"> &lt; </button>
+							<button id="leftall" type="button" class='btn' ng-disabled="createIcePool.selectedIcePool==undefined || createIcePool.selectedIcePool==''" ng-click="moveItems.leftall('#assignedProjectAP','#allProjectAP')" title="Move all to left"> &lt;&lt; </button>
 						</div>
 						<!--Center Input-->
 
@@ -556,23 +556,23 @@
 							<!--Labels-->
 							<label class="labelStyle1">Assign Projects to Pool</label>
 							<div id='search-ice-pool' class='userForm adminControl'>
-								<input class="btn btn-users users-edit dropdown-toggle" type="text" autocomplete="off" id="userIdName" data-toggle="dropdown" ng-model="createIcePool.allIcePoolListFilter" placeholder="Search ICE Pool" ng-click = "">
+								<input class="btn btn-users users-edit dropdown-toggle" type="text" autocomplete="off" id="userIdName" data-toggle="dropdown" ng-click="EditIcePoolReset()" ng-model="createIcePool.allIcePoolListFilter.poolname" placeholder="Search ICE Pool">
 								<ul class="dropdown-menu dropdown-menu-users users-edit" role="menu" aria-labelledby="userIdName">
-									<li role="presentation" ng-repeat='pool in createIcePool.allIcePoolList | filter:createIcePool.allIcePoolListFilter' ng-click="createIcePool.allIcePoolListFilter=pool.name;createIcePool.selectIcePool(pool)" value="{{pool.name}}"> {{pool.name}}</li>
+									<li role="presentation" ng-repeat='pool in createIcePool.allIcePoolList | filter:createIcePool.allIcePoolListFilter' ng-click="createIcePool.allIcePoolListFilter.poolname=pool[1].poolname;createIcePool.selectIcePool(pool)" value="{{pool[1]._id}}"> {{pool[1].poolname}}</li>
 								</ul>
 							</div>
 							<!--Labels-->
 							<div class="seprator" style="margin-bottom:0px;">
 								<!-- <select size="13" multiple ng-model="assignedProjectNameEU" id="assignedProject" ng-options="p as p.ProjectName for p in projBox2 track by p.ProjectId"></select> -->
 								<select multiple="" id="assignedProjectAP" ng-model="assignedProjectNameAP" size="" class="ng-pristine ng-untouched ng-valid">
-									<option ng-repeat="prj in assignProj.assignedProjectAP" value="{{prj.projectid}}">{{prj.projectname}}</option>
+									<option ng-repeat="prj in createIcePool.selectedIcePool.projectList" value="{{prj._id}}">{{prj.name}}</option>
 								</select>
 								<span ng-show="selectProjects" class="error-msg ng-binding ng-hide"></span>
 							</div>
 						</div>
 						<!--Right Select Box-->
 					</div>
-					<div class='adminControl'>
+					<div id='update-icepool-rename' class='adminControl hide'>
 						<div>
 							<span class="leftControl" title="Token Name">ICE pool</span>
 							<input type="text" autocomplete="off" id="tokenName" name="tokenName"  ng-model="createIcePool.selectedIcePool.name" ng-change="tokens.verifyName($event)" ng-model="tokens.name" maxlength="100" class="form-control form-control-custom create validationKeydown preventSpecialChar" placeholder="Enter ICE Pool Name"/>
@@ -607,9 +607,9 @@
 						<div>
 							<span class="leftControl" title="Token Name">Pool Name</span>
 							<div id='search-ice-pool' class='userForm adminControl'>
-								<input class="btn btn-users dropdown-toggle" type="text" autocomplete="off" id="userIdName" data-toggle="dropdown" ng-model="allocateIcePool.allIcePoolListFilter" placeholder="Search ICE Pool" ng-click='allocationPoolReset()' >
+								<input class="btn btn-users dropdown-toggle" type="text" autocomplete="off" id="userIdName" data-toggle="dropdown" ng-model="allocateIcePool.allIcePoolListFilter.name" placeholder="Search ICE Pool" ng-click='allocationPoolReset()' >
 								<ul class="dropdown-menu dropdown-menu-users " role="menu" aria-labelledby="userIdName">
-									<li role="presentation" ng-repeat='pool in allocateIcePool.allIcePoolList | filter:allocateIcePool.allIcePoolListFilter' ng-click="allocateIcePool.allIcePoolListFilter=pool.name;allocateIcePool.selectIcePool(pool)" value="{{pool.name}}"> {{pool.name}}</li>
+									<li role="presentation" ng-repeat='pool in allocateIcePool.allIcePoolList | filter:allocateIcePool.allIcePoolListFilter' ng-click="allocateIcePool.allIcePoolListFilter.name=pool[1].poolname;allocateIcePool.selectIcePool(pool[1])" value="{{pool[1]._id}}"> {{pool[1].poolname}}</li>
 								</ul>
 							</div>
 						</div>
@@ -617,7 +617,7 @@
 					<div id="update-icepool-count" class='adminControl hide'>
 						<div>
 							<span class="leftControl" title="Token Name">Enter number of ICE to assign</span>
-							<input type="number" autocomplete="off" id="icepoolNumInp" name="tokenName" ng-change="tokens.verifyName($event)" ng-model="tokens.name" maxlength="100" class="form-control form-control-custom create validationKeydown preventSpecialChar" placeholder="Enter number of ICE"/>
+							<input type="number" autocomplete="off" id="icepoolNumInp" name="tokenName" ng-change="" ng-model="tokens.name" maxlength="100" class="form-control form-control-custom create validationKeydown preventSpecialChar" placeholder="Enter number of ICE"/>
 						</div>
 					</div>
 				</div>
@@ -630,7 +630,7 @@
 							<!--Labels-->
 							<div class="seprator" style="margin-bottom:0px;">
 								<select multiple="" id="allProjectAP" ng-model="allProjectNameAP" size="" class="ng-pristine ng-untouched ng-valid">
-									<option ng-repeat="ice in allocateIcePool.allICEList" value="{{ice.id}}">{{ice.name}}</option>
+									<option ng-repeat="ice in allocateIcePool.iceData.available_ice" value="{{ice._id}}">{{ice.icename}}</option>
 								</select>
 								<span ng-show="projectNameRequired" class="error-msg ng-binding ng-hide"></span>
 							</div>
@@ -651,15 +651,16 @@
 							<!--Labels-->
 							<label class="labelStyle1">Assign available ICE to </label>
 							<div id='search-ice-pool' class='userForm adminControl'>
-								<input class="btn btn-users dropdown-toggle" type="text" autocomplete="off" id="userIdName" data-toggle="dropdown"  ng-click='allocationPoolReset()' ng-model="allocateIcePool.allIcePoolListFilter" placeholder="Search ICE Pool" ng-click = "">
+								<input class="btn btn-users dropdown-toggle" type="text" autocomplete="off" id="userIdName" data-toggle="dropdown"  ng-click='allocationPoolReset()' ng-model="allocateIcePool.allIcePoolListFilter.poolname" placeholder="Search ICE Pool" ng-click = "">
 								<ul class="dropdown-menu dropdown-menu-users " role="menu" aria-labelledby="userIdName">
-									<li role="presentation" ng-repeat='pool in allocateIcePool.allIcePoolList | filter:allocateIcePool.allIcePoolListFilter' ng-click="allocateIcePool.allIcePoolListFilter=pool.name;allocateIcePool.selectIcePool(pool)" value="{{pool.name}}"> {{pool.name}}</li>
+									<!-- <li role="presentation" ng-repeat='pool in allocateIcePool.allIcePoolList | filter:allocateIcePool.allIcePoolListFilter' ng-click="allocateIcePool.allIcePoolListFilter=pool.name;allocateIcePool.selectIcePool(pool)" value="{{pool.name}}"> {{pool.name}}</li> -->
+									<li role="presentation" ng-repeat='pool in allocateIcePool.allIcePoolList | filter:allocateIcePool.allIcePoolListFilter' ng-click="allocateIcePool.allIcePoolListFilter.poolname=pool[1].poolname;allocateIcePool.selectIcePool(pool[1])" value="{{pool[1]._id}}"> {{pool[1].poolname}}</li>
 								</ul>
 							</div>
 							<!--Labels-->
 							<div class="seprator" style="margin-bottom:0px;">
 								<select multiple="" id="assignedProjectAP" ng-model="assignedProjectNameAP" size="" class="ng-pristine ng-untouched ng-valid">
-									<option ng-repeat="ice in allocateIcePool.selectedIcePool.iceList" value="{{ice}}">{{ice}}</option>
+									<!-- <option ng-repeat="ice in allocateIcePool.iceData.poolice" value="{{ice[0]._id}}">{{ice.icename}}</option> -->
 								</select>
 								<span ng-show="selectProjects" class="error-msg ng-binding ng-hide"></span>
 							</div>
