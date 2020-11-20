@@ -101,7 +101,7 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 					if(data == "Invalid Session") {
 						openModelPopup("store user Details", "failed to save");
 					} 
-					else {if(data == "success"){
+					else if(data == "success"){
 						userDataList = [];
 						var mainModal = $("#tAndCpop");
 						mainModal.modal("hide");
@@ -109,7 +109,6 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 						window.sessionStorage["checkLoggedOut"] = true;
 						$rootScope.redirectPage();
 						window.location.reload()
-						}
 					}
 				},function(error) {
 					console.log("Error updating task status " + (error.data));
@@ -146,11 +145,10 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 					if(data == "Invalid Session") {
 						openModelPopup("store user Details", "failed to save");
 					} 
-					else {if(data == "success"){
+					else if(data == "success"){
 						userDataList = [];
 						var mainModal = $("#tAndCpop");
 						mainModal.modal("hide");
-						}
 					}
 				},function(error) {
 					console.log("Error updating task status " + (error.data));
