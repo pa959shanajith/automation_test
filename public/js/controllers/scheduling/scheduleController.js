@@ -8,6 +8,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 	}, 500);
 	var browserTypeExe = [];
 	var execAction = "serial";
+	var execEnv = "default";
 	//Task Listing
 	loadUserTasks()
 	blockUI("Loading...");
@@ -270,6 +271,17 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 		}
 	}
 
+	//select Saucelabs execution
+	$(document).on("click", ".selectSaucelabs", function () {
+		$(this).find("img").toggleClass("sb");
+		$(this).find("svg").toggleClass("sb");
+		if ($("img").hasClass('sb') == true || $("svg").hasClass('sb') == true) {
+			execEnv = "Saucelabs";
+		} else {
+			execEnv = "default";
+		}
+	});
+
 	//Add to list and schedule
 	$scope.initSchedule = function ($event) {
 		if (smartBatch) {
@@ -364,6 +376,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 			if (doNotSchedule) return false;
 			const executionData = {
 				source: "schedule",
+				executionEnv: execEnv,
 				exectionMode: execAction,
 				browserType: browserTypeExe,
 				qccredentials: { "qcurl": "", "qcusername": "", "qcpassword": "" },
