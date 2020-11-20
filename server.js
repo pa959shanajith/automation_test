@@ -447,6 +447,7 @@ if (cluster.isMaster) {
 		app.post('/getRoleNameByRoleId', auth.protect, login.getRoleNameByRoleId);
 		app.post('/logoutUser', login.logoutUser);
 		app.post('/resetPassword', auth.protect, login.resetPassword);
+		app.post('/storeUserDetails', auth.protect, login.storeUserDetails);
 		//Admin Routes
 		app.post('/getUserRoles', admin.getUserRoles);
 		app.post('/getDomains_ICE', admin.getDomains_ICE);
@@ -515,7 +516,6 @@ if (cluster.isMaster) {
 		app.post('/getProjectIDs', plugin.getProjectIDs);
 		app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
 		app.post('/updateTaskstatus_mindmaps', taskbuilder.updateTaskstatus_mindmaps);
-		app.post('/storeUserDetails', plugin.storeUserDetails);
 		//Utility plugins
 		app.post('/Encrypt_ICE', utility.Encrypt_ICE);
 		// Wecoccular Plugin

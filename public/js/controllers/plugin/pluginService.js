@@ -34,15 +34,6 @@ mySPA.factory('PluginService', ['$http','$q', function ($http,$q) {
             })
             .then(function (response) { return response.data; },
             function (response) { return $q.reject(response.data); });
-		},
-		storeUserDetails: function(userDataList){
-			var param = "storeUserDetails";
-			return $http.post('/storeUserDetails', {
-				action: param,
-				userDetails : userDataList
-			})
-			.then (function(response) { return response.data; },
-			function(response){	return $q.reject(response.data);});	
 		}
 
 	}

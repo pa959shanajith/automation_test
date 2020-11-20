@@ -25,7 +25,6 @@ exports.loadUserInfo = async (req, res) => {
 			taskwflow: configpath.strictTaskWorkflow,
 			token: configpath.defaultTokenExpiry,
 			tandc : configpath.showEULA,
-			// username : userData.name,
 			dbuser: userType=="inhouse",
 			ldapuser: userType=="ldap",
 			samluser: userType=="saml",
@@ -68,9 +67,13 @@ exports.loadUserInfo = async (req, res) => {
 				"query": funName
 			};
 			const eulaData = await utils.fetchData(inputs, "login/checkTandC", fnName);
+			if (eulaData == "success"){
+				userProfile.eulaData = "success"
+			}
 			if (eulaData == "fail"){
 				userProfile.eulaData = "fail"
 			}
+			// userProfile.eulaData = eulaData
 		}
 		return res.send(userProfile);
 	} catch (exception) {
@@ -146,4 +149,52 @@ exports.logoutUser = async (req, res) => {
 	req.logOut();
 	req.clearSession();
 	res.send('Session Expired');
+};
+
+exports.storeUserDetails = async (req, res) => {
+	const fnName = "storeUserDetails";
+	try {
+		logger.info("Inside UI Service: " + fnName);
+		var userDetails = req.body.userDetails;
+		var flag = true;
+		if (userDetails.length > 0) {
+			flag = true;
+		} else {
+			flag = false;
+		}
+		var username = userDetails[0].username;
+		var fullname = userDetails[0].fullname;
+		var email = userDetails[0].emailaddress;
+		var acceptance = userDetails[0].acceptance;
+		var timestamp = userDetails[0].timestamp;
+		var browserfp = userDetails[0].browserfp;
+		var uId = userDetails[0].user_id;
+		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		var inputs = {
+			"username": username,
+			"userId" : uId,
+			"fullname": fullname,
+			"email": email,
+			"acceptance": acceptance,
+			"timestamp" : timestamp,
+			"ip" : ip,
+			"browserfingerprint" : browserfp,
+			"query": "checkTandC"
+		};
+		var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
+		logger.info("Calling DAS Service: /login/checkTandC");
+		const status = await utils.fetchData(inputs, "/login/checkTandC", fnName);
+		if (status == "fail" || status == "forbidden") return res.send("fail");
+		else {
+			res.send(status);
+		}
+	} catch (exception) {
+		logger.error(exception.message);
+		return res.send("fail");
+	}
 };

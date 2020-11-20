@@ -18,6 +18,8 @@ var notificationMsg = require('./../notifications').broadcast;
 var epurl = process.env.DAS_URL;
 var Client = require("node-rest-client").Client;
 var apiclient = new Client();
+var eula = uiConfig.showEULA;
+var eulaFlag = false
 
 io.on('connection', function (socket) {
 	logger.info("Inside Socket connection");
@@ -48,6 +50,47 @@ io.on('connection', function (socket) {
 		var icename=ice_info.icename;
 		logger.info("ICE Socket connecting address: %s", icename);
 		var icesession = ice_info.icesession;
+		if (eula=="True") {
+			var input_name = ice_info.username;
+			var inputss = {
+				"input_name": input_name,
+				"query": "loadUserInfo"
+			};
+			var argss = {
+				data: inputss,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			logger.info("Calling DAS Service: checkTandC");
+			var userAcceptance = apiclient.post(epurl + "login/checkTandC", argss,
+				function (result, response) {
+					logger.info("userAcceptance", userAcceptance);
+				if (result.rows == "success"){
+					if (eula=="True"){
+					iceConnection(icesession);
+					}
+				}
+				if (response.statusCode != 200 || result.rows == "fail") {
+					eulaFlag = false;
+					logger.error("%s has not accepted tand c", icename);
+					socket.send("decline", "conn");
+					socket.disconnect(false);
+				}
+			});
+		}
+		if (eula=="False" ) {
+			iceConnection(icesession);
+		}
+	}
+	module.exports.allSocketsMap = socketMap;
+	module.exports.allSocketsICEUser=userICEMap;
+	module.exports.allSocketsMapUI = socketMapUI;
+	module.exports.allSchedulingSocketsMap = socketMapScheduling;
+	module.exports.socketMapNotify = socketMapNotify;
+	httpsServer.setTimeout();
+
+	function iceConnection(icesession){
 		var inputs = {
 			"icesession": icesession,
 			"query": 'connect'
@@ -96,12 +139,6 @@ io.on('connection', function (socket) {
 			logger.error("Please run the Service API and Restart the Server");
 		});
 	}
-	module.exports.allSocketsMap = socketMap;
-	module.exports.allSocketsICEUser=userICEMap;
-	module.exports.allSocketsMapUI = socketMapUI;
-	module.exports.allSchedulingSocketsMap = socketMapScheduling;
-	module.exports.socketMapNotify = socketMapNotify;
-	httpsServer.setTimeout();
 
 	socket.on('disconnect', function (reason) {
 		logger.info("Inside Socket disconnect");

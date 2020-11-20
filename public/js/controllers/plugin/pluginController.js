@@ -44,12 +44,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	});
 	//$("#plugin-container").addClass("inactiveLink");
 	if(userInfo) {
-		if (userInfo.eulaData == "fail"){
-			var mainModal = $("#tAndCpop");
-			// mainModal.find('.modal-title').text(title);
-			// mainModal.find('.modal-body p').text(body);
-			mainModal.modal("show");
-		}
 		$rootScope.plugins = [];
 		var availablePlugins = userInfo.pluginsInfo;
 		var pluginsLength = availablePlugins.length;
@@ -164,6 +158,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 						$("span.toggleClick").removeClass('toggleClick');
 						// Enable Filter
 						$("span.filterIcon").removeClass('disableFilter');
+						$('.modal-backdrop.in').remove()
 					}
 					for(i=0;i<$scope.filterDat.projectids.length;i++){
 						index=data.projectId.indexOf($scope.filterDat.projectids[i]);
@@ -327,83 +322,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	window.localStorage['_TJ'] = "";
 	window.localStorage['_CT'] = "";
 
-	$scope.declineB = function($event){
-		var x = document.getElementById("declineBtn")
-		if (x.innerHTML=="Decline"){
-			console.log("x value is "+ (x.innerHTML))
-			var userDetail = JSON.parse(window.localStorage['_UI']);
-			console.log("userDetail value is "+ (userDetail))
-			var userName = userDetail.username
-			var firstName = userDetail.firstname
-			var lastName = userDetail.lastname
-			var fullName = firstName+" "+lastName
-			var acceptance = x.innerHTML
-			var email = userDetail.email_id
-			var timeStamp = new Date().toLocaleString();
-			var userDataList = [];
-			userDataList.push({
-				'username': userName,
-				'fullname': fullName,			
-				'emailaddress': email,
-				'acceptance': acceptance,
-				'timestamp': timeStamp
-			});
-			PluginService.storeUserDetails(userDataList)
-				.then(function (data) {
-					if(data == "Invalid Session") {
-						openModelPopup("store user Details", "failed to save");
-					} 
-					else {if(data == "success"){
-						userDataList = [];
-						}
-					}
-				},function(error) {
-					console.log("Error updating task status " + (error.data));
-				});
-		}
-		window.sessionStorage.clear();
-		window.sessionStorage["checkLoggedOut"] = true;
-		$rootScope.redirectPage();
-	};
-
-	$scope.AcceptB = function($event){
-		var x = document.getElementById("acceptBtn")
-		if (x.innerHTML=="Accept"){
-			console.log("x value is "+ (x.innerHTML))
-			var userDetail = JSON.parse(window.localStorage['_UI']);
-			console.log("userDetail value is "+ (userDetail))
-			var userName = userDetail.username
-			var firstName = userDetail.firstname
-			var lastName = userDetail.lastname
-			var fullName = firstName+" "+lastName
-			var acceptance = x.innerHTML
-			var email = userDetail.email_id
-			var timeStamp = new Date().toLocaleString();
-			var userDataList = [];
-			userDataList.push({
-				'username': userName,
-				'fullname': fullName,			
-				'emailaddress': email,
-				'acceptance': acceptance,
-				'timestamp': timeStamp
-			});
-			PluginService.storeUserDetails(userDataList)
-				.then(function (data) {
-					if(data == "Invalid Session") {
-						openModelPopup("store user Details", "failed to save");
-					} 
-					else {if(data == "success"){
-						userDataList = [];
-						var mainModal = $("#tAndCpop");
-						mainModal.modal("hide");
-						}
-					}
-				},function(error) {
-					console.log("Error updating task status " + (error.data));
-				});
-
-		}
-	};
 
 	$scope.taskRedirection = function(testsuitedetails,dataobj,event){
 		//Transaction Activity for Task Navigation

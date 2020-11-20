@@ -3,6 +3,7 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 	$scope.loginAgain = true;
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear();
 	const chkLogOut = JSON.parse(window.sessionStorage.getItem('checkLoggedOut'));
+	var reqVal = {};
 	window.localStorage.clear();
 	window.sessionStorage.clear();
 	$('.row').addClass('displayRow');
@@ -43,10 +44,18 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 						emsg = "Your session has expired!";
 						$scope.loginAgain = true;
 					} else {
-						window.localStorage['_SR'] = data.rolename;
-						window.localStorage['_UI'] = JSON.stringify(data);
-						window.localStorage.navigateScreen = data.page;
-						$location.path("/"+data.page);
+						//t and c popup  displayed here
+						if (data.eulaData == "fail" && data.page== "plugin"){
+							var mainModal = $("#tAndCpop");
+							mainModal.modal("show");
+							reqVal = data
+						}
+						if (data.page != "plugin" || data.eulaData == "success" || data.tandc=="False"){
+							window.localStorage['_SR'] = data.rolename;
+							window.localStorage['_UI'] = JSON.stringify(data);
+							window.localStorage.navigateScreen = data.page;
+							$location.path("/"+data.page);
+						}
 					}
 					$scope.loginValidation = emsg;
 					if (emsg != "Loading Profile...") console.log(emsg);
@@ -64,4 +73,93 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 			cfpLoadingBar.complete();
 		});
 	}
+	$scope.declineB = function($event){
+		var x = document.getElementById("declineBtn");
+		if (x.innerHTML=="Decline"){
+			console.log("x value is "+ (x.innerHTML));
+			var userName = reqVal["username"];
+			var userId = reqVal["user_id"];
+			var firstName = reqVal["firstname"];
+			var lastName = reqVal["lastname"];
+			var fullName = firstName+" "+lastName;
+			var acceptance = x.innerHTML;
+			var email = reqVal["email_id"];
+			var timeStamp = new Date().toLocaleString();
+			var bfp = browserFp()
+			var userDataList = [];
+			userDataList.push({
+				'username': userName,
+				'user_id' : userId,
+				'fullname': fullName,			
+				'emailaddress': email,
+				'acceptance': acceptance,
+				'timestamp': timeStamp,
+				'browserfp': bfp
+			});
+			LoginService.storeUserDetails(userDataList)
+				.then(function (data) {
+					if(data == "Invalid Session") {
+						openModelPopup("store user Details", "failed to save");
+					} 
+					else {if(data == "success"){
+						userDataList = [];
+						var mainModal = $("#tAndCpop");
+						mainModal.modal("hide");
+						window.sessionStorage.clear();
+						window.sessionStorage["checkLoggedOut"] = true;
+						$rootScope.redirectPage();
+						window.location.reload()
+						}
+					}
+				},function(error) {
+					console.log("Error updating task status " + (error.data));
+				});
+		}
+	};
+
+	$scope.AcceptB = function($event){
+		var x = document.getElementById("acceptBtn");
+		console.log("reqVal value is "+ (reqVal))
+		if (x.innerHTML=="Accept"){
+			console.log("x value is "+ (x.innerHTML));
+			var userName = reqVal["username"];
+			var userId = reqVal["user_id"];
+			var firstName = reqVal["firstname"];
+			var lastName = reqVal["lastname"];
+			var fullName = firstName+" "+lastName;
+			var acceptance = x.innerHTML;
+			var email = reqVal["email_id"];
+			var timeStamp = new Date().toLocaleString();
+			var bfp = browserFp()
+			var userDataList = [];
+			userDataList.push({
+				'username': userName,
+				'user_id' : userId,
+				'fullname': fullName,			
+				'emailaddress': email,
+				'acceptance': acceptance,
+				'timestamp': timeStamp,
+				'browserfp': bfp
+			});
+			LoginService.storeUserDetails(userDataList)
+				.then(function (data) {
+					if(data == "Invalid Session") {
+						openModelPopup("store user Details", "failed to save");
+					} 
+					else {if(data == "success"){
+						userDataList = [];
+						var mainModal = $("#tAndCpop");
+						mainModal.modal("hide");
+						}
+					}
+				},function(error) {
+					console.log("Error updating task status " + (error.data));
+				});
+
+		}
+		window.localStorage['_SR'] = reqVal.rolename;
+		window.localStorage['_UI'] = JSON.stringify(reqVal);
+		window.localStorage.navigateScreen = reqVal.page;
+		$location.path("/"+reqVal.page);
+	};
 });
