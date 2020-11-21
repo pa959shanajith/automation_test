@@ -3,7 +3,7 @@ const logger = require('../../logger');
 const redisConfig = {"host": process.env.CACHEDB_IP, "port": parseInt(process.env.CACHEDB_PORT),"password" : process.env.CACHEDB_AUTH};
 
 class Cache {
-	locations = ["login/loadUser"];
+	locations = ["login/loadUserx"];
 
 	constructor(conf) {
 		const client = redis.createClient(conf);

@@ -70,6 +70,19 @@ mySPA.factory('LoginService', ['$http', '$q', function ($http, $q) {
 				function (response) {
 				return $q.reject(response.data);
 			});
+		},
+		storeUserDetails: function (userData) {
+			var param = "storeUserDetails";
+			return $http.post('/storeUserDetails', {
+				action: param,
+				userDetails : userData
+			})
+			.then(function (response) {
+				return response.data;
+			},
+				function (response) {
+				return $q.reject(response.data);
+			});
 		}
 	}
 }]);
