@@ -4529,7 +4529,8 @@ select:-webkit-autofill:focus {
 	/*.leftQcStructure, .rightQcStructure{width: calc(100% - 505px) !important; height: 720px !important;}
 	.qcActionBtnFirstChild{margin-left: 480px !important;}
 	.qcActionBtn label:nth-child(2){left: 440px !important;}*/
-	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 236px) !important;}
+    .qcDomProContainer select, .qcProContainer select{width: calc(100% - 236px) !important;}
+    .zephyrDomProContainer select, .zephyrProContainer select{width: calc(100% - 236px) !important;}
     .mappedFiles{height: calc(100% - 53px) !important;}
 }
 
@@ -4557,16 +4558,24 @@ select:-webkit-autofill:focus {
 	#encrypt_btn, #reset_btn{padding: 0px 25px !important;}
 
     .leftQcStructure, .rightQcStructure{width: calc(100% - 505px) !important; height: 550px !important;}
-	.qcActionBtnFirstChild{margin-left: 472px !important;}
-	.qcActionBtn label:nth-child(2){left: 440px !important;}
-	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 226px) !important;}
+    .leftZephyrStructure, .rightZephyrStructure{width: calc(100% - 505px) !important; height: 550px !important;}
+    .qcActionBtnFirstChild{margin-left: 472px !important;}
+    .zephyrActionBtnFirstChild{margin-left: 472px !important;}
+    .qcActionBtn label:nth-child(2){left: 440px !important;}
+    .zephyActionBtn label:nth-child(2){left: 440px !important;}
+    .qcDomProContainer select, .qcProContainer select{width: calc(100% - 226px) !important;}
+    .zephyrDomProContainer select, .zephyrProContainer select{width: calc(100% - 226px) !important;}
     .mappedFiles{height: calc(100% - 53px) !important;}
 }
 @media only screen and (height:790px){
      .leftQcStructure, .rightQcStructure{width: calc(100% - 506px) !important; height: 570px !important;}
-	.qcActionBtnFirstChild{margin-left: 480px !important;}
-	.qcActionBtn label:nth-child(2){left: 438px !important;}
-	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 225px) !important;}
+     .leftZephyrStructure, .rightZephyrStructure{width: calc(100% - 506px) !important; height: 570px !important;}
+    .qcActionBtnFirstChild{margin-left: 480px !important;}
+    .zephyrActionBtnFirstChild{margin-left: 480px !important;}
+    .qcActionBtn label:nth-child(2){left: 438px !important;}
+    .zephyActionBtn label:nth-child(2){left: 438px !important;}
+    .qcDomProContainer select, .qcProContainer select{width: calc(100% - 225px) !important;}
+    .zephyrDomProContainer select, .zephyrProContainer select{width: calc(100% - 225px) !important;}
     .mappedFiles{height: calc(100% - 54px) !important;}
     .middle-section-testsuites, .bottom-section-testsuites{height: calc(100% - 408px);}
     .suitestartend thead{width: calc(100% - 732px);}
@@ -4684,9 +4693,13 @@ select:-webkit-autofill:focus {
 
 @media only screen and (width: 1440px) and (height: 794px){
     .leftQcStructure, .rightQcStructure{width: calc(100% - 580px) !important; height: 578px !important;}
-	.qcActionBtnFirstChild{margin-left: 630px !important;}
-	.qcActionBtn label:nth-child(2){left: 514px !important;}
-	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 264px) !important;}
+    .leftZephyrStructure, .rightZephyrStructure{width: calc(100% - 580px) !important; height: 578px !important;}
+    .qcActionBtnFirstChild{margin-left: 630px !important;}
+    .zephyrActionBtnFirstChild{margin-left: 630px !important;}
+    .qcActionBtn label:nth-child(2){left: 514px !important;}
+    .zephyActionBtn label:nth-child(2){left: 514px !important;}
+    .qcDomProContainer select, .qcProContainer select{width: calc(100% - 264px) !important;}
+    .zephyrDomProContainer select, .zephyrProContainer select{width: calc(100% - 264px) !important;}
     .scenarioReports thead {width: calc(100% - 312px);}
 }
 /**********Specifically for Firefox**********/
@@ -5945,7 +5958,9 @@ ul.browserInlineIcons
 }
 .qcTestcaseName{
     padding-left:4px;
-
+}
+.zephyrTestcaseName{
+    padding-left:4px;
 }
 .qcTestcaseId{
     background: #331d4c;
@@ -5953,6 +5968,13 @@ ul.browserInlineIcons
     border-radius: 3px;
     /* height: 14px; */
     /* width: 14px; */
+    display: inline;
+    padding: 2px;
+}
+.zephyrTestcaseId{
+    background: #331d4c;
+    color: #fff;
+    border-radius: 3px;
     display: inline;
     padding: 2px;
 }
