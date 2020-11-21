@@ -885,20 +885,47 @@
     float: left;
     height: 100% !important;
 }
+/*** For zephyr ***/
+.scroll-wrapper > .zephyrTreeContainer ul, .scroll-wrapper > .zephyrAvoAssureTreeContainer ul{
+	/*width: 100% !important;*/
+    float: left;
+    height: 100% !important;
+}
 .scroll-wrapper.qcTreeContainer ul, .scroll-wrapper.qcAvoAssureTreeContainer ul{
+    height: 616px !important;
+    max-height: 616px;
+}
+/** For Zephyr **/
+.scroll-wrapper.zephyrTreeContainer ul, .scroll-wrapper.zephyrAvoAssureTreeContainer ul{
     height: 616px !important;
     max-height: 616px;
 }
 .scroll-wrapper .qcTreeContainer ul, .scroll-wrapper .qcAvoAssureTreeContainer ul{
     padding: 0 6px 0 6px;
 }
+/** For Zephyr **/
+.scroll-wrapper .zephyrTreeContainer ul, .scroll-wrapper .zephyrAvoAssureTreeContainer ul{
+    padding: 0 6px 0 6px;
+}
 .qcTreeContainer ul > .scroll-element.scroll-y, .qcAvoAssureTreeContainer ul > .scroll-element.scroll-y{
+	z-index:10;
+}
+/** For Zephyr **/
+.zephyrTreeContainer ul > .scroll-element.scroll-y, .zephyrAvoAssureTreeContainer ul > .scroll-element.scroll-y{
 	z-index:10;
 }
 .qcTreeContainer ul > .scroll-element.scroll-y .scroll-bar, .qcAvoAssureTreeContainer ul > .scroll-element.scroll-y .scroll-bar{
 	background: #321e4f
 }
+/** For Zephyr **/
+.zephyrTreeContainer ul > .scroll-element.scroll-y .scroll-bar, .zephyrAvoAssureTreeContainer ul > .scroll-element.scroll-y .scroll-bar{
+	background: #321e4f
+}
 .qcTreeContainer ul > .scroll-element .scroll-element_track, .qcAvoAssureTreeContainer ul > .scroll-element .scroll-element_track{
+	background: rgb(211, 211, 211)
+}
+/** For Zephyr **/
+.zephyrTreeContainer ul > .scroll-element .scroll-element_track, .zephyrAvoAssureTreeContainer ul > .scroll-element .scroll-element_track{
 	background: rgb(211, 211, 211)
 }
 /**********Specifically for Firefox**********/
