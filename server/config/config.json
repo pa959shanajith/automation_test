@@ -1,6 +1,6 @@
 {
     "defaultTokenExpiry": "720",
-    "showEULA": "False",
+    "showEULA": false,
     "strictTaskWorkflow": false,
     "benchmarkRuntimes": ["00:05","08:00","13:00","18:55"],
     "certificate": {

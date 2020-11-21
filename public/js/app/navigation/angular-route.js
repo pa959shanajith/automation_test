@@ -386,12 +386,13 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
             }
 		});
 }])
-.run(function($rootScope, $location, headerServices){
+.run(function($rootScope, $location, headerServices, socket) {
 	$rootScope.redirectPage = function(){
 		unblockUI();
 		$(".btn-accept").click();
 		$(".modal-backdrop.fade.in").remove();
 		window.localStorage.clear();
+		$rootScope.socket.disconnect();
 		headerServices.logoutUser()
 		.then(function(data){
 			$location.path('/');

@@ -71,11 +71,11 @@ mySPA.factory('LoginService', ['$http', '$q', function ($http, $q) {
 				return $q.reject(response.data);
 			});
 		},
-		storeUserDetails: function (userDataList) {
+		storeUserDetails: function (userData) {
 			var param = "storeUserDetails";
 			return $http.post('/storeUserDetails', {
 				action: param,
-				userDetails : userDataList
+				userDetails : userData
 			})
 			.then(function (response) {
 				return response.data;

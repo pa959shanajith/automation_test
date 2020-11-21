@@ -24,7 +24,6 @@ exports.loadUserInfo = async (req, res) => {
 			role: userData.defaultrole,
 			taskwflow: configpath.strictTaskWorkflow,
 			token: configpath.defaultTokenExpiry,
-			tandc : configpath.showEULA,
 			dbuser: userType=="inhouse",
 			ldapuser: userType=="ldap",
 			samluser: userType=="saml",
@@ -59,21 +58,14 @@ exports.loadUserInfo = async (req, res) => {
 		userProfile.rolename = req.session.defaultRole;
 		userProfile.pluginsInfo = permData.pluginresult;
 		userProfile.page = (userProfile.rolename == "Admin")? "admin":"plugin";
-		if (userProfile.rolename != "Admin" && userProfile.tandc == "True"){
-			const input_name = userProfile.username
-			var funName = "loadUserInfo";
+		userProfile.tandc = false;
+		if (userProfile.rolename != "Admin" && configpath.showEULA) {
 			inputs = {
-				"input_name": input_name,
-				"query": funName
+				"username": userProfile.username,
+				"query": "loadUserInfo"
 			};
 			const eulaData = await utils.fetchData(inputs, "login/checkTandC", fnName);
-			if (eulaData == "success"){
-				userProfile.eulaData = "success"
-			}
-			if (eulaData == "fail"){
-				userProfile.eulaData = "fail"
-			}
-			// userProfile.eulaData = eulaData
+			if (eulaData != "success") userProfile.tandc = true;
 		}
 		return res.send(userProfile);
 	} catch (exception) {
@@ -155,44 +147,24 @@ exports.storeUserDetails = async (req, res) => {
 	const fnName = "storeUserDetails";
 	try {
 		logger.info("Inside UI Service: " + fnName);
-		var userDetails = req.body.userDetails;
-		var flag = true;
-		if (userDetails.length > 0) {
-			flag = true;
-		} else {
-			flag = false;
-		}
-		var username = userDetails[0].username;
-		var fullname = userDetails[0].fullname;
-		var email = userDetails[0].emailaddress;
-		var acceptance = userDetails[0].acceptance;
-		var timestamp = userDetails[0].timestamp;
-		var browserfp = userDetails[0].browserfp;
-		var uId = userDetails[0].user_id;
-		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-		var inputs = {
+		const userDetails = req.body.userDetails;
+		const username = req.session.username;
+		const uId = req.session.userid;
+		const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		const inputs = {
 			"username": username,
 			"userId" : uId,
-			"fullname": fullname,
-			"email": email,
-			"acceptance": acceptance,
-			"timestamp" : timestamp,
+			"fullname": userDetails.fullname,
+			"email": userDetails.emailaddress,
+			"acceptance": userDetails.acceptance,
+			"timestamp" : userDetails.timestamp,
 			"ip" : ip,
-			"browserfingerprint" : browserfp,
+			"browserfingerprint" : userDetails.browserfp,
 			"query": "checkTandC"
 		};
-		var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
-			}
-		};
-		logger.info("Calling DAS Service: /login/checkTandC");
-		const status = await utils.fetchData(inputs, "/login/checkTandC", fnName);
+		const status = await utils.fetchData(inputs, "login/checkTandC", fnName);
 		if (status == "fail" || status == "forbidden") return res.send("fail");
-		else {
-			res.send(status);
-		}
+		else res.send(status);
 	} catch (exception) {
 		logger.error(exception.message);
 		return res.send("fail");

@@ -1,11 +1,6 @@
 var create_ice = require('../controllers/create_ice');
 var logger = require('../../logger');
 var utils = require('../lib/utils');
-var epurl = process.env.DAS_URL;
-var Client = require("node-rest-client").Client;
-var client = new Client();
-// var fingerprint = require('browser-fingerprint')()
-// logger.info("fingerprint: " + fingerprint);
 
 //getProjectIds
 exports.getProjectIDs = function (req, res) {

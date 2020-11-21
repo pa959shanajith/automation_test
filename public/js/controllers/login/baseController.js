@@ -3,7 +3,7 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 	$scope.loginAgain = true;
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear();
 	const chkLogOut = JSON.parse(window.sessionStorage.getItem('checkLoggedOut'));
-	var reqVal = {};
+	let uProf = {};
 	window.localStorage.clear();
 	window.sessionStorage.clear();
 	$('.row').addClass('displayRow');
@@ -13,6 +13,8 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 		if ((typeof(chkLogOut) == "object") && (chkLogOut.length == 2)) {
 			$scope.loginValidation = "Your session has been terminated by "+chkLogOut[0];
 			if (chkLogOut[1] == "dereg") $(".absoluteError.errorMessages span").html("Reason: User is deleted from Avo Assure");
+		} else if ((typeof(chkLogOut) == "object") && (chkLogOut.length == 1)) {
+			$scope.loginValidation = chkLogOut[0];
 		} else {
 			$scope.loginValidation = "You Have Successfully Logged Out!";
 		}
@@ -44,17 +46,11 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 						emsg = "Your session has expired!";
 						$scope.loginAgain = true;
 					} else {
-						//t and c popup  displayed here
-						if (data.eulaData == "fail" && data.page== "plugin"){
-							var mainModal = $("#tAndCpop");
-							mainModal.modal("show");
-							reqVal = data
-						}
-						if (data.page != "plugin" || data.eulaData == "success" || data.tandc=="False"){
-							window.localStorage['_SR'] = data.rolename;
-							window.localStorage['_UI'] = JSON.stringify(data);
-							window.localStorage.navigateScreen = data.page;
-							$location.path("/"+data.page);
+						if (data.tandc) { // T and C popup displayed here
+						uProf = data;
+							$("#tAndCpop").modal("show");
+						} else {
+							$scope.loadProfile(data);
 						}
 					}
 					$scope.loginValidation = emsg;
@@ -72,92 +68,50 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 			$scope.loginValidation = emsg;
 			cfpLoadingBar.complete();
 		});
-	}
-	$scope.declineB = function($event){
-		var x = document.getElementById("declineBtn");
-		if (x.innerHTML=="Decline"){
-			console.log("x value is "+ (x.innerHTML));
-			var userName = reqVal["username"];
-			var userId = reqVal["user_id"];
-			var firstName = reqVal["firstname"];
-			var lastName = reqVal["lastname"];
-			var fullName = firstName+" "+lastName;
-			var acceptance = x.innerHTML;
-			var email = reqVal["email_id"];
-			var timeStamp = new Date().toLocaleString();
-			var bfp = browserFp()
-			var userDataList = [];
-			userDataList.push({
-				'username': userName,
-				'user_id' : userId,
-				'fullname': fullName,			
-				'emailaddress': email,
-				'acceptance': acceptance,
-				'timestamp': timeStamp,
-				'browserfp': bfp
-			});
-			LoginService.storeUserDetails(userDataList)
-				.then(function (data) {
-					if(data == "Invalid Session") {
-						openModelPopup("store user Details", "failed to save");
-					} 
-					else if(data == "success"){
-						userDataList = [];
-						var mainModal = $("#tAndCpop");
-						mainModal.modal("hide");
-						window.sessionStorage.clear();
-						window.sessionStorage["checkLoggedOut"] = true;
-						$rootScope.redirectPage();
-						window.location.reload()
-					}
-				},function(error) {
-					console.log("Error updating task status " + (error.data));
-				});
-		}
 	};
 
-	$scope.AcceptB = function($event){
-		var x = document.getElementById("acceptBtn");
-		console.log("reqVal value is "+ (reqVal))
-		if (x.innerHTML=="Accept"){
-			console.log("x value is "+ (x.innerHTML));
-			var userName = reqVal["username"];
-			var userId = reqVal["user_id"];
-			var firstName = reqVal["firstname"];
-			var lastName = reqVal["lastname"];
-			var fullName = firstName+" "+lastName;
-			var acceptance = x.innerHTML;
-			var email = reqVal["email_id"];
-			var timeStamp = new Date().toLocaleString();
-			var bfp = browserFp()
-			var userDataList = [];
-			userDataList.push({
-				'username': userName,
-				'user_id' : userId,
-				'fullname': fullName,			
-				'emailaddress': email,
-				'acceptance': acceptance,
-				'timestamp': timeStamp,
-				'browserfp': bfp
-			});
-			LoginService.storeUserDetails(userDataList)
-				.then(function (data) {
-					if(data == "Invalid Session") {
-						openModelPopup("store user Details", "failed to save");
-					} 
-					else if(data == "success"){
-						userDataList = [];
-						var mainModal = $("#tAndCpop");
-						mainModal.modal("hide");
-					}
-				},function(error) {
-					console.log("Error updating task status " + (error.data));
-				});
+	$scope.loadProfile = function (data) {
+		window.localStorage['_SR'] = data.rolename;
+		window.localStorage['_UI'] = JSON.stringify(data);
+		window.localStorage.navigateScreen = data.page;
+		$location.path("/"+data.page);
+	};
 
-		}
-		window.localStorage['_SR'] = reqVal.rolename;
-		window.localStorage['_UI'] = JSON.stringify(reqVal);
-		window.localStorage.navigateScreen = reqVal.page;
-		$location.path("/"+reqVal.page);
+	$scope.clickTnC = function(acceptance, $event){
+		$('.modal-backdrop.in').remove();
+		var fullName = uProf["firstname"] + " " + uProf["lastname"];
+		var email = uProf["email_id"];
+		var timeStamp = new Date().toLocaleString();
+		var bfp = browserFp()
+		var userData = {
+			'fullname': fullName,
+			'emailaddress': email,
+			'acceptance': acceptance,
+			'timestamp': timeStamp,
+			'browserfp': bfp
+		};
+
+		LoginService.storeUserDetails(userData)
+		.then(function (data) {
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if (data != "success") {
+				$scope.loginValidation = "Failed to record user preference. Please Try again!";
+				// window.sessionStorage.checkLoggedOut = '["'+$scope.loginValidation+'"]';
+				$rootScope.redirectPage();
+			} else {
+				if (acceptance == "Accept") {
+					$scope.loadProfile(uProf);
+				} else {
+					$scope.loginValidation = "Please accept our terms and conditions to continue to use Avo Assure!";
+					// window.sessionStorage.checkLoggedOut = '["'+$scope.loginValidation+'"]';
+					$rootScope.redirectPage();
+				}
+			}
+		}, function(error) {
+			$scope.loginValidation = "Failed to record user preference. Please Try again!";
+			$scope.loginAgain = false;
+			console.error("Error updating user tnc preference", error);
+		});
 	};
 });

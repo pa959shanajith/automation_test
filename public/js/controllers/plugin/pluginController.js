@@ -4,7 +4,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	localStorage.setItem("navigateEnable", true);
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear();
 	var userInfo = JSON.parse(window.localStorage['_UI']);
-	var userDataList = [];
 	$scope.filterData = {'prjval':'Select Project','relval':'Select Release','cycval':'Select Cycle','apptype':{},'tasktype':{}};
 	$("#plugin-container").empty().hide();
 	$("body").css("background", "#fff");
@@ -158,7 +157,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 						$("span.toggleClick").removeClass('toggleClick');
 						// Enable Filter
 						$("span.filterIcon").removeClass('disableFilter');
-						$('.modal-backdrop.in').remove()
 					}
 					for(i=0;i<$scope.filterDat.projectids.length;i++){
 						index=data.projectId.indexOf($scope.filterDat.projectids[i]);
@@ -321,7 +319,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 
 	window.localStorage['_TJ'] = "";
 	window.localStorage['_CT'] = "";
-
 
 	$scope.taskRedirection = function(testsuitedetails,dataobj,event){
 		//Transaction Activity for Task Navigation
