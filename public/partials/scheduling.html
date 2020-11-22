@@ -366,7 +366,7 @@
 					<li ng-if="smartBatch == true" role="presentation" ng-repeat='ice in availableICE | filter:availableICEFilter' ng-click="iceCheckboxClick($event)" >
 						<lable title='{{ice.status}}'>
 							<input value='{{ice.icename}}' checked type="checkbox"/>
-							<span id='status' ng-style="{'background-color':'{{ice.status}}'}"></span>
+							<span id='status' ng-style="{'background-color':'{{ice.color}}'}"></span>
 							{{ice.icename}}
 						<lable>
 					</li>

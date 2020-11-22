@@ -295,8 +295,9 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 	})
 
 	const allocateICEPopup = () =>{
-		var projId = JSON.parse(window.localStorage['_CT']).projectId
+		var projId = JSON.parse(window.localStorage['_CT']).testSuiteDetails[0].projectidts
 		var data = {poolid:"",projectids: [projId]}
+		$("#chooseICEPool option").slice(1).remove()
 		blockUI('Fetching ICE ...')
 		adminServices.getPools(data)
 		.then(function(data){
@@ -331,7 +332,6 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 			console.error(error)
 			openModalPopup("Edit User", "Failed to fetch users.");
 		});
-		var projId = JSON.parse(window.localStorage['_CT']).projectId
 		$scope.smartBatch = smartBatch
 		$('#selectIcePoolIce').modal("show")
 		return;

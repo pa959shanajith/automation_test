@@ -695,8 +695,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		}
 	};
 	const allocateICEPopup = () =>{
-		var projId = JSON.parse(window.localStorage['_CT']).projectId
+		var projId = JSON.parse(window.localStorage['_CT']).testSuiteDetails[0].projectidts
 		var data = {poolid:"",projectids: [projId]}
+		$("#chooseICEPool option").slice(1).remove()
 		blockUI('Fetching ICE ...')
 		adminServices.getPools(data)
 		.then(function(data){
@@ -731,7 +732,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			console.error(error)
 			openModalPopup("Suite Execution", "Failed to fetch ICE.");
 		});
-		var projId = JSON.parse(window.localStorage['_CT']).projectId
 		$('#selectIcePoolIce').modal("show")
 		return;
 	}
