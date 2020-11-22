@@ -478,6 +478,7 @@ if (cluster.isMaster) {
 		app.post('/getAllProjects', auth.protect, admin.getAllProjects);
 		app.post('/deleteICE_pools', auth.protect, admin.deletePools);
 		app.post('/getAvailable_ICE', auth.protect, admin.getAvailable_ICE);
+		app.post('/getPools', auth.protect, admin.getPools);
 		app.post('/updatePool', auth.protect, admin.updatePool);
 		app.post('/getUnassigned_ICE', auth.protect, admin.getUnassigned_ICE);
 		app.post('/createPool_ICE', auth.protect, admin.createPool_ICE);
@@ -505,6 +506,7 @@ if (cluster.isMaster) {
 		app.post('/getTestcaseDetailsForScenario_ICE', auth.protect, suite.getTestcaseDetailsForScenario_ICE);
 		app.post('/ExecuteTestSuite_ICE', auth.protect, suite.ExecuteTestSuite_ICE);
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
+		app.post('/getICE_list',auth.protect, suite.getICE_list);
 		//Scheduling Screen Routes
 		app.post('/testSuitesScheduler_ICE', auth.protect, suite.testSuitesScheduler_ICE);
 		app.post('/getScheduledDetails_ICE', auth.protect, suite.getScheduledDetails_ICE);

@@ -1,6 +1,5 @@
 var logger = require('../../logger');
-var redisServer = require('./redisSocketHandler');
-var utils = require('./utils');
+
 //SOCKET CONNECTION USING SOCKET.IO
 var socketMap = {};
 var userICEMap={};
@@ -14,10 +13,21 @@ var benchmarkRunTimes = uiConfig.benchmarkRuntimes;
 var myserver = require('./../../server');
 var httpsServer = myserver.httpsServer;
 var io = require('socket.io').listen(httpsServer, { cookie: false, pingInterval: uiConfig.socketio.pingInterval, pingTimeout: uiConfig.socketio.pingTimeout });
+
+
+module.exports = io;
+module.exports.allSocketsICEUser=userICEMap;
+module.exports.allSocketsMap = socketMap;
+module.exports.allSocketsMapUI = socketMapUI;
+module.exports.allSchedulingSocketsMap = socketMapScheduling;
+module.exports.socketMapNotify = socketMapNotify;
 var notificationMsg = require('./../notifications').broadcast;
 var epurl = process.env.DAS_URL;
 var Client = require("node-rest-client").Client;
 var apiclient = new Client();
+var redisServer = require('./redisSocketHandler');
+var utils = require('./utils');
+var cache = require('./cache')
 
 io.on('connection', function (socket) {
 	logger.info("Inside Socket connection");
@@ -26,6 +36,7 @@ io.on('connection', function (socket) {
 		logger.info("Socket request from UI");
 		address = socket.request._query.username;
 		logger.info("Socket connecting address %s", address);
+		
 		socketMapUI[address] = socket;
 		socket.emit("connectionAck", "Success");
 	} else if (socket.request._query.check == "notify") {
@@ -34,6 +45,7 @@ io.on('connection', function (socket) {
 				address = Buffer.from(data, "base64").toString();
 				logger.info("Socket connecting address %s", address);
 				socketMapNotify[address] = socket;
+				sendPendingNotifications(socket,address);
 				redisServer.redisSubClient.subscribe('UI_notify_' + address, 1);
 				//Broadcast Message
 				var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/mindmap', '/p_Utility', '/p_Reports', '/p_ALM', '/p_Integration', '/p_qTest'];
@@ -96,11 +108,7 @@ io.on('connection', function (socket) {
 			logger.error("Please run the Service API and Restart the Server");
 		});
 	}
-	module.exports.allSocketsMap = socketMap;
-	module.exports.allSocketsICEUser=userICEMap;
-	module.exports.allSocketsMapUI = socketMapUI;
-	module.exports.allSchedulingSocketsMap = socketMapScheduling;
-	module.exports.socketMapNotify = socketMapNotify;
+	
 	httpsServer.setTimeout();
 
 	socket.on('disconnect', function (reason) {
@@ -225,5 +233,18 @@ const registerICE = async (req, res) => {
 	res.send(data.ice_check);
 };
 
-module.exports = io;
+async function sendPendingNotifications(socket,address){
+	var pending_notification = await cache.get("pending_notification")
+		if(pending_notification && Object.keys(pending_notification).length > 0){
+			for(user in pending_notification){
+				if(address == user){
+					socket.emit("display_execution_popup",pending_notification[user])
+					delete pending_notification[user]
+					await cache.set("pending_notification",pending_notification)
+				}
+			}
+		}
+}
 module.exports.registerICE = registerICE;
+
+	

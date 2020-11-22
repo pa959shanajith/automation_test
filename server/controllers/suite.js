@@ -61,10 +61,12 @@ exports.readTestSuite_ICE = async (req, res) => {
 		responsedata[moduleId] = finalSuite;
 	}
 	if (fromFlg == "scheduling") {
-		const ice_list = await getICEList(req.body.readTestSuite[0].projectidts);		
+		const ice_status = await getICEList(req.body.readTestSuite[0].projectidts);	
+		const ice_list = Object.keys(ice_status);	
 		logger.debug("IP\'s connected : %s", ice_list.join());
 		const schedulingDetails = {
-			"connectedUsers": ice_list,
+			"connectedICE": ice_status["ice_list"],
+			"connectedICE_status": ice_status,
 			"testSuiteDetails": responsedata
 		};
 		responsedata = schedulingDetails
@@ -72,9 +74,26 @@ exports.readTestSuite_ICE = async (req, res) => {
 	res.send(responsedata);
 };
 
-async function getICEList(projectids){
+exports.getICE_list = async (req,res) => {
+	projectid = req.body.projectid;
+	const ice_status = await getICEList(projectid);
+	if(!ice_status || !ice_status['ice_list']){
+		res.send("fail");
+	}
+	const iceDetails = {
+		"connectedICE": ice_status["ice_list"],
+		"connectedICE_status": ice_status,
+	};
+	res.send(iceDetails)
+	
+}
+
+async function getICEList (projectids){
 	const fnName = "getICEList";
 	var ice_list = [];
+	var ice_status = {}
+	var result = {}
+	result["ice_list"] = []
 	try{
 		const pool_req =  {
 			"projectids":[projectids],
@@ -88,12 +107,38 @@ async function getICEList(projectids){
 				poolids: [pool["_id"]]
 			}
 			ice_in_pool = await utils.fetchData(ice_req,"admin/getICE_pools",fnName);
-			ice_list.push.apply(ice_list,ice_in_pool)
+			ice_status = await cache.get("ICE_status");
+			if(!ice_in_pool ){
+				ice_in_pool = {};
+			}
+			if(!ice_status){
+				ice_status = {}
+			}
+			for(id in ice_in_pool){
+				var ice = ice_in_pool[id];
+				var ice_name = ice["icename"]
+				result[id] = {};
+				result[id]["icename"] = ice_name
+				ice_list.push(ice_name)
+				if(ice_name in ice_status){
+					result[id]["status"] = ice_status[ice_name]["status"];
+					result[id]["mode"] = ice_status[ice_name]["mode"];
+					result[id]["connected"] = ice_status[ice_name]["connected"];
+				}else{
+					result[id]["status"] = false;
+					result[id]["mode"] = false;
+					result[id]["connected"] = false;
+				}
+			}
+			if(ice_list && ice_list.length > 0){
+				result["ice_list"] = ice_list;
+			}
+			
 		}
 	}catch(e){
 		logger.error("Error occurred in getICEList, Error: %s",e);
 	}
-	return ice_list;
+	return result;
 }
 
 /** This service updates the testsuite and scenario information for the loaded testsuite */
@@ -125,16 +170,9 @@ const checkForICEstatus = async (user, execType) => {
 	const err = "Error occurred in the function checkForICEstatus: ";
 	logger.debug("ICE Socket requesting Address: %s", user);
 	const sockmode = await utils.channelStatus(user);
-	return null;
-	if (!sockmode.schedule && !sockmode.normal) {
+	if (!sockmode.normal) {
 		logger.error(err + SOCK_NA_MSG + ".");
 		return SOCK_NA;
-	} else if (execType != "SCHEDULE" && sockmode.schedule) {
-		logger.error(err + SOCK_SCHD_MSG + ".");
-		return SOCK_SCHD;
-	} else if (execType == "SCHEDULE" && sockmode.normal) {
-		logger.error(err + SOCK_NORM_MSG + ".");
-		return SOCK_NORM;
 	} else {
 		return null;
 	}
@@ -386,9 +424,15 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 					redisServer.redisSubServer.removeListener("message", executeTestSuite_listener);
 					logger.error("Error occurred in " + fnName + ": Execution is skipped " + errMsg);
 					errMsg = "This scenario was skipped " + errMsg;
+					let report_result = {};
+					report_result["status"] = execStatus
+					report_result["testSuiteIds"] = execReq["suitedetails"]
 					await updateSkippedExecutionStatus(execReq, userInfo, execStatus, errMsg);
-					if (resSent && notifySocMap[username]) {
+					if (resSent && notifySocMap[username] && notifySocMap[username].connected) {
 						notifySocMap[username].emit(execStatus);
+						rsv(DO_NOT_PROCESS);
+					}else if(resSent){
+						queue.Execution_Queue.add_pending_notification("",report_result,username);
 						rsv(DO_NOT_PROCESS);
 					} else rsv(execStatus);
 				}
@@ -429,7 +473,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 							const reportStatus = reportData.overallstatus[0].overallstatus;
 							if (reportStatus == "Pass") statusPass++;
 							const reportid = await insertReport(executionid, scenarioid, browserType, userInfo, reportData);
-							const reportItem = {reportid, scenarioname, status: reportStatus, terminated: reportData.overallstatus[0].terminatedBy};
+							const reportItem =  {reportid, scenarioname, status: reportStatus, terminated: reportData.overallstatus[0].terminatedBy};
 							if (reportid == "fail") {
 								logger.error("Failed to insert report data for scenario (id: "+scenarioid+") with executionid "+executionid);
 								reportItem[reportid] = '';
@@ -456,12 +500,18 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 					redisServer.redisSubServer.removeListener("message", executeTestSuite_listener);
 					try {
 						let result = status;
+						let report_result = {};
+						report_result["status"] = status
+						report_result["testSuiteIds"] = execReq["suitedetails"]
 						if (resultData.userTerminated) result = "UserTerminate";
 						if (execType == "API") result = [d2R, status];
-						if (resSent && notifySocMap[username]) { // This block is only for active mode
-							notifySocMap[username].emit("result_ExecutionDataInfo", result);
+						if (resSent && notifySocMap[username] && notifySocMap[username].connected) { // This block is only for active mode
+							notifySocMap[username].emit("result_ExecutionDataInfo", report_result);
 							rsv(DO_NOT_PROCESS);
-						} else {
+						} else if(resSent){
+							queue.Execution_Queue.add_pending_notification("",report_result,username);
+							rsv(DO_NOT_PROCESS);
+						}else {
 							rsv(result);
 						}
 					} catch (ex) {
@@ -506,8 +556,11 @@ module.exports.executionFunction = async (batchExecutionData, execIds, userInfo,
 
 /** This service executes the testsuite(s) for request from Avo Assure */
 exports.ExecuteTestSuite_ICE = async (req, res) => {
+	const fnName = "ExecuteTestSuite_ICE"
 	logger.info("Inside UI service: ExecuteTestSuite_ICE");
-	const userInfo = { "userid": req.session.userid, "username": req.session.username, "role": req.session.activeRoleId, "icename": "ice 1"};
+	inputs = { "icename": "ice 1" };
+	const profile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
+	const userInfo = { "userid": profile.userid, "username": profile.name, "role": profile.role, "icename": "ice 1","invokingUser":req.session.userid,"invokingUserName":req.session.username};
 	const batchExecutionData = req.body.executionData;
 	const execIds = { "batchid": "generate", "execid": {} };
 	var result = queue.Execution_Queue.addTestSuiteToQueue(batchExecutionData,execIds,userInfo,"ACTIVE");
@@ -518,7 +571,7 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE_API");
 	result = queue.Execution_Queue.addAPITestSuiteToQueue(req);
-	
+	res.send(result)
 };
 
 /** Service to fetch all the testcase, screen and project names for provided scenarioid */
@@ -566,6 +619,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 	const userInfo = { "userid": req.session.userid, "username": req.session.username, "role": req.session.activeRoleId };
 	const multiExecutionData = req.body.executionData;
 	var batchInfo = multiExecutionData.batchInfo;
+	const invokingUser = req.session.userid;
 	var stat = "none";
 	var dateTimeUtc = "";
 	var dateTimeList = batchInfo.map(u => {
@@ -649,7 +703,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 		multiBatchExecutionData.push(batchObj);
 	}
 	/** Add if else for smart schedule above this **/
-	var schResult = await scheduleTestSuite(multiBatchExecutionData);
+	var schResult = await scheduleTestSuite(multiBatchExecutionData,invokingUser);
 	if (schResult == "success" && stat != "none") schResult = displayString + " " + "success";
 	return res.send(schResult);
 };
@@ -752,7 +806,7 @@ const getMachinePartitions = async (mod, type, time) => {
 }
 
 /** Function responsible for scheduling Jobs. Returns: success/few/fail */
-const scheduleTestSuite = async (multiBatchExecutionData) => {
+const scheduleTestSuite = async (multiBatchExecutionData,invokingUser) => {
 	const fnName = "scheduleTestSuite";
 	logger.info("Inside " + fnName + " function");
 	const userInfoMap = {};
@@ -773,6 +827,7 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
 	for (const batchExecutionData of multiBatchExecutionData) {
 		let execIds = {"batchid": "generate", "execid": {}};
 		const userInfo = userInfoMap[batchExecutionData.targetUser];
+		userInfo['invokingUser'] = invokingUser;
 		const scheduleTime = batchExecutionData.timestamp;
 		const scheduleId = batchExecutionData.scheduleId;
 		const smartId = batchExecutionData.smartScheduleId;
@@ -783,8 +838,9 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
 		try {
 			const scheduledjob = schedule.scheduleJob(scheduleId, scheduleTime, async function () {
 				let result;
+				execIds['scheduleId'] = scheduleId;
 				result = queue.Execution_Queue.addTestSuiteToQueue(batchExecutionData,execIds,userInfo,"SCHEDULE");
-				
+				schedFlag = result['message'];
 			});
 			scheduleJobMap[scheduleId] = scheduledjob;
 		} catch (ex) {
@@ -798,7 +854,7 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
 
 /** Update schedule status of current scheduled job and insert report for the skipped scenarios.
 Possible status options are: "Skipped", "Terminate", "Completed", "Inprogress", "Failed", "Missed", "cancelled", "scheduled" */
-exports.updateScheduleStatus = async (scheduleid, status, batchid) => {
+const updateScheduleStatus = async (scheduleid, status, batchid) => {
 	const fnName = "updateScheduleStatus";
 	logger.info("Inside " + fnName + " function");
 	var inputs = {};
@@ -867,7 +923,7 @@ exports.reScheduleTestsuite = async () => {
 		if (eipResult != "fail") {
 			for (var i = 0; i < eipResult.length; i++) {
 				const eipSchd = eipResult[i];
-				await updateScheduleStatus(eipSchd._id, "Failed");
+				await this.updateScheduleStatus(eipSchd._id, "Failed");
 			}
 		}
 
@@ -883,7 +939,7 @@ exports.reScheduleTestsuite = async () => {
 			const schd = result[i];
 			const scheduleTime = new Date(result[i].scheduledon);
 			if (scheduleTime < new Date()) {
-				await updateScheduleStatus(schd._id, "Missed");
+				await this.updateScheduleStatus(schd._id, "Missed");
 			} else {
 				// Create entire multiBatchExecutionData object;
 				const tsuIds = schd.testsuiteids;
@@ -903,7 +959,7 @@ exports.reScheduleTestsuite = async () => {
 				};
 				const details = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
 				if (details == "fail") {
-					await updateScheduleStatus(schd._id, "Failed");
+					await this.updateScheduleStatus(schd._id, "Failed");
 					continue;
 				}
 				const prjObj = details.project;
@@ -935,3 +991,5 @@ exports.reScheduleTestsuite = async () => {
 		logger.error("Exception in the function " + fnName + ": %s", ex);
 	}
 };
+
+module.exports.updateScheduleStatus = updateScheduleStatus;

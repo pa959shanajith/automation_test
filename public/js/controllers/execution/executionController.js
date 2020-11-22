@@ -681,7 +681,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					$scope.moduleInfo.push(suiteInfo);
 				}
 			});
-			blockUI("Execution in progress. Please Wait...");
+			blockUI("Sending Execution Request");
 			var executionData = {
 				source: "task",
 				exectionMode: execAction,
@@ -698,27 +698,14 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				unblockUI();
 				$rootScope.resetSession.end();
 				executionActive = false;
-				if (data == "Invalid Session") return $rootScope.redirectPage();
-				else if (data == "unavailableLocalServer") openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
-				else if (data == "scheduleModeOn") openDialogExe("Execute Test Suite", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
-				else if(data == "NotApproved") openDialogExe("Execute Test Suite", "All the dependent tasks (design, scrape) needs to be approved before execution");
-				else if(data == "NoTask") openDialogExe("Execute Test Suite", "Task does not exist for child node");
-				else if(data == "Modified") openDialogExe("Execute Test Suite", "Task has been modified, Please approve the task");
-				else if (data == "unavailableLocalServer") openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
-				else if (data == "Terminate") {
-					$('#executionTerminatedBy').html('Program');
-					$('#executionTerminated').modal('show');
-					$('#executionTerminated').find('.btn-default').focus();
-				} else if (data == "UserTerminate") {
-					$('#executionTerminatedBy').html('User');
-					$('#executionTerminated').modal('show');
-					$('#executionTerminated').find('.btn-default').focus();
-				} else if (data == "success") {
-					$('#executionCompleted').modal('show');
-					setTimeout(function () {
-						$("#executionCompleted").find('.btn-default').focus();
-					}, 300);
-				} else openDialogExe("Execute Test Suite", "Failed to execute.");
+				console.log(data)
+				if("status" in data){
+					if(data.status == "fail"){
+						openDialogExe("Queue Test Suite", data["error"]);
+					}else{
+						openDialogExe("Queue Test Suite", data["message"]);
+					}
+				}
 				$(".selectBrowser").find("img").removeClass("sb");
 				$(".selectParallel").find("img").removeClass("sb");
 				$(".selectSauceLabs").find("img").removeClass("sb");
@@ -756,36 +743,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		}
 	};
 
-	socket.on('result_ExecutionDataInfo', function (data) {
-		if (!executionActive)
-			return false;
-		if (data == "Terminate") {
-			$('#executionTerminatedBy').html('Program');
-			$('#executionTerminated').modal('show');
-			$('#executionTerminated').find('.btn-default').focus();
-		} else if (data == "UserTerminate") {
-			$('#executionTerminatedBy').html('User');
-			$('#executionTerminated').modal('show');
-			$('#executionTerminated').find('.btn-default').focus();
-		} else if (data == "unavailableLocalServer") {
-			openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
-		} else if (data == "success") {
-			$('#executionCompleted').modal('show');
-			setTimeout(function () {
-				$("#executionCompleted").find('.btn-default').focus();
-			}, 300);
-		} else openDialogExe("Execute Test Suite", "Failed to execute.");
-		unblockUI();
-		$rootScope.resetSession.end();
-		$(".selectBrowser").find("img").removeClass("sb");
-		$(".selectParallel").find("img").removeClass("sb");
-		$(".selectBrowser").find("svg").removeClass("sb");
-		$(".selectParallel").find("svg").removeClass("sb");
-		browserTypeExe = [];
-		$scope.moduleInfo = [];
-		$scope.readTestSuite_ICE();
-		$("#syncScenario").prop("disabled", true);
-	});
+	
 	//Execute TestSuite Functionality
 
 	//Integration Functionality
@@ -925,6 +883,15 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	});
 	//Select Browser Function
 	$("#tableActionButtons, .executionTableDnd").delay(500).animate({opacity: "1"}, 500);
+
+	$("#test")[0].onclick = () => {
+		console.log("test")
+		
+		ExecutionService.getICE_list().then(()=>{
+			console.log("create pool")
+		});
+	}
+	
 }]);
 
 

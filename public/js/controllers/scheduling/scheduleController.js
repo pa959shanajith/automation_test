@@ -43,6 +43,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 					//Populating Data in Scheduling Table
 					var dataLen = Object.keys(data).length;
 					$(".scheduleSuiteTable").empty();
+					console.log(result)
 					var eachData = Object.keys(data).map(function (itm) { return data[itm]; });
 					for (i = 0; i < dataLen; i++) {
 						$(".scheduleSuiteTable").append('<div class="batchSuite"><div class="scheduleSuite"><input type="checkbox" class="selectScheduleSuite"/>'
@@ -60,12 +61,13 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 								+ '<td><select disabled><option value="1" ' + ((flag) ? '' : 'selected') + '>True</option><option value="0" ' + ((flag) ? 'selected' : '') + '>False</option></select></td>'
 								+ '<td>' + eachData[i].projectnames[j] + '</td></tr>');
 						}
-						if (result.connectedUsers.length == 0) openModelPopup("Schedule Test Suite", "Please enable scheduling in Local Server. And refresh the page.");
+						if (result.connectedICE.length == 0) openModelPopup("Schedule Test Suite", "Please enable scheduling in Local Server. And refresh the page.");
 						else {
 							$(".ipformating").empty();
 							$(".ipformating").append("<option value=' ' selected disabled>Select User</option>")
-							for (k = 0; k < result.connectedUsers.length; k++) {
-								$(".ipformating").append("<option value='" + result.connectedUsers[k] + "'>" + result.connectedUsers[k] + "</option>")
+							
+							for (k = 0; k < result.connectedICE.length; k++) {
+								$(".ipformating").append("<option value='" + result.connectedICE[k] + "'>" + result.connectedICE[k] + "</option>")
 							}
 							$(".ipformating").append("<option hidden value='Module Smart Scheduling'>Module Smart Scheduling</option>")
 							$(".ipformating").append("<option hidden value='Scenario Smart Scheduling'>Scenario Smart Scheduling</option>")

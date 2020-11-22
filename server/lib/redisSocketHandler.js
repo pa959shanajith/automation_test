@@ -5,7 +5,7 @@ const redisConfig = {"host": process.env.CACHEDB_IP, "port": parseInt(process.en
 const default_sub = redis.createClient(redisConfig);
 const default_pub = redis.createClient(redisConfig);
 const server_sub = redis.createClient(redisConfig);
-const cache = redis.createClient(redisConfig);
+var cache = require('../lib/cache')
 var fs = require('fs');
 
 var pulse_ICE = {}
@@ -315,8 +315,10 @@ module.exports.initListeners = mySocket => {
 	});
 	mySocket.on('ICE_status_change', async value => {
 		pulse_ICE[value['icename']] = value
-		cache.set("ICE_status",JSON.stringify(pulse_ICE))
-		const dataToExecute = JSON.stringify({"username" : username,"onAction" : "ice_status_change","value":value});
+		pulse_ICE[value['icename']]['username'] = username;
+		cache.set("ICE_status",pulse_ICE)
+		const dataToExecute = JSON.stringify({"username" : username,"onAction" : "ice_status_change","value":value,"reqID":new Date().toUTCString()});
+
 		server_pub.publish('ICE2_' + username, dataToExecute);
 
 	});
@@ -330,11 +332,14 @@ function check_pulse(){
 		if(pulse_ICE[ice]["time"]){
 			iceTime = pulse_ICE[ice]["time"]
 			var writeStr = "\n\n\n\n\nNone\n\n\n\n\n"
-			if(Date.parse(time) - Date.parse(iceTime) > 120000){
+			if(Date.parse(time) - Date.parse(iceTime) >= 100000){
 				var writeStr = "\n\n------------------\n" + time.toString() + " " + ice + " Disconnected pulse last recieved at: " + iceTime.toString() + "\n------------------\n\n"
 				console.log("Disconnect ice " + ice)
 				pulse_ICE[ice]["time"] = null;
-				pulse_ICE[ice]["connected"] = true;
+				pulse_ICE[ice]["connected"] = false;
+				value = pulse_ICE[ice];
+				const dataToExecute = JSON.stringify({"username" : pulse_ICE[ice]['username'],"onAction" : "ice_status_change","value":value});
+				server_pub.publish('ICE2_' + pulse_ICE[ice]['username'], dataToExecute);
 			}else{
 				writeStr ="\n"+time.toString() + " " + ice + " status: " + pulse_ICE[ice]["status"] + " ICE mode: " + pulse_ICE[ice]["mode"] 
 				console.log(writeStr)
