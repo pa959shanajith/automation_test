@@ -223,7 +223,7 @@
 		<!--Images Blocks-->
 
 	  <!--Images Blocks-->
-      <chatbot chatbot></chatbot>
+	  <chatbot chatbot></chatbot>
       <!--Images Blocks-->
 	</div>
 	<!--Right Panel-->
@@ -231,6 +231,8 @@
 <!--Content Area-->
 
 <!--Footer-->
+<button id="test"> TEST </button>
+
 <footer footer id="footer" class="footer-global"></footer>
 <!--Footer-->
 
@@ -516,3 +518,43 @@
 <!-- Scenario Description Modal -->
 
 <testcasetemplate testcasetemplate></testcasetemplate>
+
+<!-- ICE Pool Popup -->
+<div class="modal fade" id="selectIcePoolIce" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-md">
+	   <div class="modal-content">
+		  <div class="modal-header">
+			 <button type="button" class="close" data-dismiss="modal">&times;</button>
+			 <h4 class="modal-title">Select ICE to Execute</h4>
+		  </div>
+		  <div class="modal-body">
+			<div class='adminControl'>
+				<div>
+					<span class="leftControl" title="Token Name">Select ICE Pool</span>
+					<select id='chooseICEPool'><option value='all'>Select All Pools</option></select>
+				</div>
+			</div>
+			<div class='adminControl'>
+				<div>
+					<span class="leftControl" title="Token Name">Execute on ICE</span>
+				<div>
+				<input class="btn btn-users dropdown-toggle" type="text" autocomplete="off" id="userIdName" data-toggle="dropdown" ng-click='availableICEFilter.icename="";selectedICE=false' ng-model="availableICEFilter.icename" placeholder="{{'Search ICE to execute'}}">
+				<ul id='ice-dropdown' class="dropdown-menu dropdown-menu-users "  aria-labelledby="userIdName">
+					<li role="presentation" ng-repeat='ice in availableICE | filter:availableICEFilter' ng-click="availableICEFilter.icename=ice.icename;selectIce(ice.icename)" >
+						<lable title='{{ice.status}}'>
+							<span id='status' ng-style="{'background-color':'{{ice.color}}'}"></span>
+							{{ice.icename}}
+						<lable>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+		  </div>
+		  <div class="modal-footer">
+			 <button type="button" class="btn btn-default btn-default-modal" ng-click="ExecuteOnclick($event)">Execute</button>
+		  </div>
+	   </div>
+	</div>
+ </div>
+ <!-- ICE Pool Popup -->

@@ -1710,11 +1710,11 @@ exports.createPool_ICE = async(req,res) => {
 	const fnName = "createPools_ICE"
 	logger.info("Inside UI service: " + fnName)
 	try{
-		const poolinfo = req.body.tokeninfo;
+		const poolinfo = req.body.data;
 		const inputs = {
 			poolname: poolinfo.poolname,
-			createdby: poolinfo.createdby,
-			createdon: poolinfo.createdon,
+			createdby: req.session.userid,
+			createdon: "",
 			projectids: poolinfo.projectids,
 			modifiedby: "",
 			modifiedon: ""
@@ -1744,11 +1744,11 @@ exports.getUnassigned_ICE = async(req,res) => {
 		res.send("fail");
 	}
 } 
+
 exports.getAvailable_ICE = async(req,res) => {
 	const fnName = "getAvailable_ICE"
 	logger.info("Inside UI service: " + fnName)
 	try{
-		const poolinfo = req.body.tokeninfo;
 		const inputs = {};
 		const result = await utils.fetchData(inputs, "admin/getAvailable_ICE", fnName);
 		res.send(result);
@@ -1762,14 +1762,15 @@ exports.updatePool = async(req,res) => {
 	const fnName = "updatePool"
 	logger.info("Inside UI service: " + fnName)
 	try{
-		const poolinfo = req.body.tokeninfo;
+		const poolinfo = req.body.data;
 		const inputs = {
 			poolname: poolinfo.poolname,
+			poolid: poolinfo._id,
 			projectids: poolinfo.projectids,
 			ice_added: poolinfo.ice_added,
 			ice_deleted: poolinfo.ice_deleted,
-			updatedby: poolinfo.updatedby,
-			updatedon: new Date().toUTCString()
+			modifiedby: req.session.userid,
+			modifiedon: new Date().toUTCString()
 
 		};
 		const result = await utils.fetchData(inputs, "admin/updatePool_ICE", fnName);
@@ -1785,7 +1786,7 @@ exports.getPools = async(req,res) => {
 	logger.info("Inside UI service: " + fnName)
 	var inputCheck = false;
 	try{
-		const poolinfo = req.body.tokeninfo;
+		const poolinfo = req.body.data;
 		const inputs = {
 			poolid: poolinfo.poolid,
 			projectids: poolinfo.projectids,
@@ -1804,7 +1805,7 @@ exports.getICEinPools = async(req,res) => {
 	const fnName = "getICEinPools"
 	logger.info("Inside UI service: " + fnName)
 	try{
-		const poolinfo = req.body.tokeninfo;
+		const poolinfo = req.body.data;
 		const inputs = {
 			poolids: poolinfo.poolid,
 		};
@@ -1820,7 +1821,7 @@ exports.deletePools = async(req,res) => {
 	const fnName = "deletePools"
 	logger.info("Inside UI service: " + fnName)
 	try{
-		const poolinfo = req.body.tokeninfo;
+		const poolinfo = req.body.data;
 		const inputs = {
 			poolids: poolinfo.poolid,
 		};
@@ -1836,7 +1837,6 @@ exports.getAllProjects = async(req,res) => {
 	const fnName = "getAllProjects"
 	logger.info("Inside UI service: " + fnName)
 	try{
-		const poolinfo = req.body.tokeninfo;
 		const inputs = {};
 		const result = await utils.fetchData(inputs, "admin/getAll_projects", fnName);
 		res.send(result);

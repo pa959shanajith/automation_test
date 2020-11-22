@@ -80,19 +80,14 @@ exports.getICE_list = async (req,res) => {
 	if(!ice_status || !ice_status['ice_list']){
 		res.send("fail");
 	}
-	const iceDetails = {
-		"connectedICE": ice_status["ice_list"],
-		"connectedICE_status": ice_status,
-	};
-	res.send(iceDetails)
-	
+	res.send(ice_status)
 }
 
 async function getICEList (projectids){
 	const fnName = "getICEList";
 	var ice_list = [];
 	var ice_status = {}
-	var result = {}
+	var result = {ice_ids:{}}
 	result["ice_list"] = []
 	try{
 		const pool_req =  {
@@ -108,32 +103,25 @@ async function getICEList (projectids){
 			}
 			ice_in_pool = await utils.fetchData(ice_req,"admin/getICE_pools",fnName);
 			ice_status = await cache.get("ICE_status");
-			if(!ice_in_pool ){
-				ice_in_pool = {};
-			}
-			if(!ice_status){
-				ice_status = {}
-			}
+			if(!ice_in_pool )ice_in_pool = {}
+			if(!ice_status )ice_status = {}
 			for(id in ice_in_pool){
 				var ice = ice_in_pool[id];
 				var ice_name = ice["icename"]
-				result[id] = {};
-				result[id]["icename"] = ice_name
+				result.ice_ids[id] = {};
+				result.ice_ids[id]["icename"] = ice_name
 				ice_list.push(ice_name)
 				if(ice_name in ice_status){
-					result[id]["status"] = ice_status[ice_name]["status"];
-					result[id]["mode"] = ice_status[ice_name]["mode"];
-					result[id]["connected"] = ice_status[ice_name]["connected"];
+					result.ice_ids[id]["status"] = ice_status[ice_name]["status"];
+					result.ice_ids[id]["mode"] = ice_status[ice_name]["mode"];
+					result.ice_ids[id]["connected"] = ice_status[ice_name]["connected"];
 				}else{
-					result[id]["status"] = false;
-					result[id]["mode"] = false;
-					result[id]["connected"] = false;
+					result.ice_ids[id]["status"] = false;
+					result.ice_ids[id]["mode"] = false;
+					result.ice_ids[id]["connected"] = false;
 				}
 			}
-			if(ice_list && ice_list.length > 0){
-				result["ice_list"] = ice_list;
-			}
-			
+			result["ice_list"] = ice_list;
 		}
 	}catch(e){
 		logger.error("Error occurred in getICEList, Error: %s",e);
@@ -416,7 +404,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 				} else rsv(SOCK_NA);
 			} else if (event == "return_status_executeTestSuite") {
 				if (status == "success") {
-					if (execType == "SCHEDULE") await updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
+					if (execType == "SCHEDULE") await this.updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
 				} else if (status == "skipped") {
 					const execStatus = "Skipped";
 					var errMsg = (execType == "SCHEDULE") ? "due to conflicting schedules" :

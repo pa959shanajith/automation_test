@@ -1,5 +1,3 @@
-//import { json } from "body-parser";
-
 mySPA.controller('headerController', function ($scope, $rootScope, $timeout, $http, $location, headerServices, LoginService, cfpLoadingBar, socket) {
 	var userDetails, username, userRole, task;
 	var selectedRoleID, selectedRoleName, redirectPath;

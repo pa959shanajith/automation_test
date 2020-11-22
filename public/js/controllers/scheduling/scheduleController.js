@@ -1,6 +1,7 @@
 var releaseName, cycleName, testSuiteName;
 var triggeredSeconds = 0;
-mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeout', '$location', 'ScheduleService', 'cfpLoadingBar', '$compile', '$interval', function ($scope, $rootScope, $http, $timeout, $location, ScheduleService, cfpLoadingBar, $compile, $interval) {
+var executionData = {}
+mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeout', '$location','adminServices', 'ScheduleService', 'cfpLoadingBar', '$compile', '$interval', function ($scope, $rootScope, $http, $timeout, $location,adminServices, ScheduleService, cfpLoadingBar, $compile, $interval) {
 	cfpLoadingBar.start();
 	$("body").css("background", "#eee");
 	$timeout(function () {
@@ -48,7 +49,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 					for (i = 0; i < dataLen; i++) {
 						$(".scheduleSuiteTable").append('<div class="batchSuite"><div class="scheduleSuite"><input type="checkbox" class="selectScheduleSuite"/>'
 							+ '<span class="scheduleSuiteName" data-testsuiteid="' + eachData[i].testsuiteid + '" data-moduleid="' + eachData[i].moduleid + '" data-versionnumber="' + eachData[i].versionnumber + '">' + eachData[i].testsuitename + '</span>'
-							+ '<span class="ipContainer"><select id="mod' + i + '" onchange="openPopup(id)"" class="form-control ipformating"><option selected disabled>Select User</option></select></span>'
+							+ '<span style="display:none" class="ipContainer"><select id="mod' + i + '" onchange="openPopup(id)"" class="form-control ipformating"><option selected disabled>Select User</option></select></span>'
 							+ '<span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIcon" src="../imgs/ic-datepicker.png" /></span>'
 							+ '<span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" class="cursor:not-allowed" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>'
 							+ '<table class="scenarioSchdCon scenarioSch_' + i + '"><thead class="scenarioHeaders"><tr><td>Sl No.</td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td></tr></thead>'
@@ -61,11 +62,10 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 								+ '<td><select disabled><option value="1" ' + ((flag) ? '' : 'selected') + '>True</option><option value="0" ' + ((flag) ? 'selected' : '') + '>False</option></select></td>'
 								+ '<td>' + eachData[i].projectnames[j] + '</td></tr>');
 						}
-						if (result.connectedICE.length == 0) openModelPopup("Schedule Test Suite", "Please enable scheduling in Local Server. And refresh the page.");
+						if (!result.connectedICE || result.connectedICE.length == 0) openModelPopup("Schedule Test Suite", "Please enable scheduling in Local Server. And refresh the page.");
 						else {
 							$(".ipformating").empty();
-							$(".ipformating").append("<option value=' ' selected disabled>Select User</option>")
-							
+							// $(".ipformating").append("<option value=' ' selected disabled>Select User</option>")			
 							for (k = 0; k < result.connectedICE.length; k++) {
 								$(".ipformating").append("<option value='" + result.connectedICE[k] + "'>" + result.connectedICE[k] + "</option>")
 							}
@@ -271,6 +271,99 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 			l = l + 2;
 		}
 	}
+	//ice pool popup 
+	$scope.iceCheckboxClick = ($event,ice) => {
+		if(smartBatch){
+			if($event.target.tagName.toLowerCase() != 'input'){
+				$event.currentTarget.getElementsByTagName('input')[0].checked = !$event.currentTarget.getElementsByTagName('input')[0].checked
+				$event.stopPropagation()
+			}
+		}else{
+			$scope.selectedICE = ice
+			$('#userIdName').removeClass('error-border')
+		}
+	}
+
+	$('#chooseICEPool').on('change',(e)=>{
+		var id = e.currentTarget.value
+		if(id=='all'){
+			var arr = Object.entries($scope.poolList)
+		}else{
+			var arr = Object.entries({[id]:$scope.poolList[id]})
+		}
+		populateICElist(arr)
+	})
+
+	const allocateICEPopup = () =>{
+		var projId = JSON.parse(window.localStorage['_CT']).projectId
+		var data = {poolid:"",projectids: [projId]}
+		blockUI('Fetching ICE ...')
+		adminServices.getPools(data)
+		.then(function(data){
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "fail") {
+				openModalPopup("Schedule", "Failed to fetch ICE.");
+				unblockUI()
+			} else if(Object.keys(data).length  == 0) {
+				openModalPopup("Schedule", "There are no ICE to schedule.");
+				unblockUI()
+			} else {
+				$scope.poolList = data
+				var arr = Object.entries(data)
+				arr.sort((a,b) => a[1].poolname.localeCompare(b[1].poolname))
+				arr.forEach((e)=>{
+					$("#chooseICEPool").append('<option value='+e[0]+'>'+e[1].poolname+'</option>');
+				})
+				ScheduleService.getICE_list({"projectid":projId})
+				.then(function(data){
+					$scope.iceStatus = data
+					populateICElist(arr)
+					unblockUI()
+				}).catch(error=>{
+					unblockUI()
+					console.error(error)
+					openModalPopup("Schedule", "Failed to fetch users.");
+				})
+			}
+		}, function (error) {
+			unblockUI();
+			console.error(error)
+			openModalPopup("Edit User", "Failed to fetch users.");
+		});
+		var projId = JSON.parse(window.localStorage['_CT']).projectId
+		$scope.smartBatch = smartBatch
+		$('#selectIcePoolIce').modal("show")
+		return;
+	}
+
+	const populateICElist =(arr)=>{
+		var ice=[]
+		var iceStatus = $scope.iceStatus.ice_ids
+		arr.forEach((e)=>{
+			if(e[1].ice_list){
+				Object.entries(e[1].ice_list).forEach((k)=>{
+					if(k[0] in iceStatus){
+						var color = '#fdc010' ;
+						var status = 'Offline';
+						if(iceStatus[k[0]].connected){
+							color = '#95c353';
+							status = 'Online'
+						}
+						if(iceStatus[k[0]].status){
+							color = 'red';
+							status = 'DND mode'
+						}
+						k[1].color = color;
+						k[1].status = status
+						ice.push(k[1])
+					}
+				})
+			}
+		})
+		ice.sort((a,b) => a.icename.localeCompare(b.icename))
+		$scope.availableICE = ice
+	}
 
 	//Add to list and schedule
 	$scope.initSchedule = function ($event) {
@@ -300,11 +393,11 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 					suiteInfo.date = $(this).children('.scheduleSuite').find(".datePicContainer .fc-datePicker").val();
 					suiteInfo.time = $(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").val();
 					suiteInfo.targetUser = $(this).children('.scheduleSuite').find(".ipContainer .ipformating").children("option:selected").val()
-					if (suiteInfo.targetUser == "Select User" || suiteInfo.targetUser.trim() == '') {  // Check if any user is selected for scheduling
-						$(this).children('.scheduleSuite').find(".ipContainer .ipformating").prop("style", "border: 2px solid red;");
-						doNotSchedule = true;
-						return false;
-					}
+					// if (suiteInfo.targetUser == "Select User" || suiteInfo.targetUser.trim() == '') {  // Check if any user is selected for scheduling
+					// 	$(this).children('.scheduleSuite').find(".ipContainer .ipformating").prop("style", "border: 2px solid red;");
+					// 	doNotSchedule = true;
+					// 	return false;
+					// }					
 					if (!suiteInfo.date) {  // Check if schedule date is not empty
 						$(this).children('.scheduleSuite').find(".datePicContainer .fc-datePicker").prop("style", "border: 2px solid red;");
 						doNotSchedule = true;
@@ -364,60 +457,80 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 				}
 			}
 			if (doNotSchedule) return false;
-			const executionData = {
+			executionData = {
 				source: "schedule",
 				exectionMode: execAction,
 				browserType: browserTypeExe,
 				qccredentials: { "qcurl": "", "qcusername": "", "qcpassword": "" },
 				batchInfo: moduleInfo
 			};
-			blockUI("Scheduling...");
-			ScheduleService.testSuitesScheduler_ICE(executionData)
-				.then(function (data) {
-					unblockUI();
-					sequence(false,false,0);
-					if (data == "Invalid Session") return $rootScope.redirectPage();
-					else if (data == "NotApproved") openModelPopup("Schedule Test Suite", "All the dependent tasks (design, scrape) needs to be approved before execution");
-					else if (data == "NoTask") openModelPopup("Schedule Test Suite", "Task does not exist for child node");
-					else if (data == "Modified") openModelPopup("Schedule Test Suite", "Task has been modified, Please approve the task");
-					else if (data.status == "booked") openModelPopup("Schedule Test Suite", "Schedule time is matching for testsuites scheduled for " + data.user);
-					else if (data == "success" || data.includes("success")) {
-						if (data.includes("Set")) openModelPopup("Schedule Test Suite", data.replace('success', ''));
-						else openModelPopup("Schedule Test Suite", "Successfully scheduled.");
-						$(".ipformating").val(" ");
-						$(".fc-datePicker").datepicker('clearDates');
-						$(".fc-timePicker").prop('disabled', true).css('cursor', 'not-allowed').timepicker('clear');
-						getScheduledDetails();
-						//Transaction Activity for InitSchedule Button Action
-						// var labelArr = [];
-						// var infoArr = [];
-						// labelArr.push(txnHistory.codesDict['InitSchedule']);
-						// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
-					} else if (data == "few") {
-						openModelPopup("Schedule Test Suite", "Failed to schedule few testsuites");
-						$(".ipformating").val(" ");
-						$(".fc-datePicker").datepicker('clearDates');
-						$(".fc-timePicker").prop('disabled', true).css('cursor', 'not-allowed').timepicker('clear');
-					} else if (data == "fail") {
-						openModelPopup("Schedule Test Suite", "Failed to schedule Testsuite");
-					} else {
-						openModelPopup("Schedule Test Suite", "Error in scheduling Testsuite. Scheduling failed");
-					}
-					$("#scheduledDataBody>.scheduleDataBodyRow .scheduleDataBodyRowChild").show();
-					$("#scheduledSuitesFilterData").prop('selectedIndex', 0);
-					changeBackground();
-					browserTypeExe = [];
-					sequence(true,false,copyId);
-					$(".selectScheduleSuite, .selectToSched").prop("checked", false);
-					$(".selectBrowserSc").find(".sb").removeClass("sb");
-					$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style", "border: none;");
-					//$(".fc-timePicker").focus()
-				}, function (error) {
-					unblockUI();
-					openModelPopup("Schedule Test Suite", "Failed to schedule Testsuite");
-					console.error("Error: ", error);
-				});
+			allocateICEPopup()
 		}
+	}
+
+	$scope.scheduleClick = () => {
+		if(!smartBatch && !$scope.selectedICE){
+			$('#userIdName').addClass('error-border')
+			return;
+		}
+		$('#selectIcePoolIce').modal("hide")
+		var arr = [...executionData.batchInfo]
+		arr.forEach((e,i)=>{
+			var iceList=[]
+			if(smartBatch){
+				$('#ice-dropdown input:checked').each(function(){iceList.push($(this).val())})
+			}
+			else{
+				executionData.batchInfo[i].targetUser = $scope.selectedICE
+			}
+			executionData.batchInfo[i].iceList = iceList
+		})
+		blockUI("Scheduling...");
+		ScheduleService.testSuitesScheduler_ICE(executionData)
+			.then(function (data) {
+				unblockUI();
+				sequence(false,false,0);
+				if (data == "Invalid Session") return $rootScope.redirectPage();
+				else if (data == "NotApproved") openModelPopup("Schedule Test Suite", "All the dependent tasks (design, scrape) needs to be approved before execution");
+				else if (data == "NoTask") openModelPopup("Schedule Test Suite", "Task does not exist for child node");
+				else if (data == "Modified") openModelPopup("Schedule Test Suite", "Task has been modified, Please approve the task");
+				else if (data.status == "booked") openModelPopup("Schedule Test Suite", "Schedule time is matching for testsuites scheduled for " + data.user);
+				else if (data == "success" || data.includes("success")) {
+					if (data.includes("Set")) openModelPopup("Schedule Test Suite", data.replace('success', ''));
+					else openModelPopup("Schedule Test Suite", "Successfully scheduled.");
+					$(".ipformating").val(" ");
+					$(".fc-datePicker").datepicker('clearDates');
+					$(".fc-timePicker").prop('disabled', true).css('cursor', 'not-allowed').timepicker('clear');
+					getScheduledDetails();
+					//Transaction Activity for InitSchedule Button Action
+					// var labelArr = [];
+					// var infoArr = [];
+					// labelArr.push(txnHistory.codesDict['InitSchedule']);
+					// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+				} else if (data == "few") {
+					openModelPopup("Schedule Test Suite", "Failed to schedule few testsuites");
+					$(".ipformating").val(" ");
+					$(".fc-datePicker").datepicker('clearDates');
+					$(".fc-timePicker").prop('disabled', true).css('cursor', 'not-allowed').timepicker('clear');
+				} else if (data == "fail") {
+					openModelPopup("Schedule Test Suite", "Failed to schedule Testsuite");
+				} else {
+					openModelPopup("Schedule Test Suite", "Error in scheduling Testsuite. Scheduling failed");
+				}
+				$("#scheduledDataBody>.scheduleDataBodyRow .scheduleDataBodyRowChild").show();
+				$("#scheduledSuitesFilterData").prop('selectedIndex', 0);
+				changeBackground();
+				browserTypeExe = [];
+				sequence(true,false,copyId);
+				$(".selectScheduleSuite, .selectToSched").prop("checked", false);
+				$(".selectBrowserSc").find(".sb").removeClass("sb");
+				$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style", "border: none;");
+				//$(".fc-timePicker").focus()
+			}, function (error) {
+				unblockUI();
+				openModelPopup("Schedule Test Suite", "Failed to schedule Testsuite");
+				console.error("Error: ", error);
+			});
 	}
 
 	//select parallel execution
@@ -533,7 +646,6 @@ function sequence(copy,block,id) {
 }
 
 function moduleSmartScheduling(){
-	console.log("hello there")
 	$("#mod0")[0].selectedIndex = $("#mod0")[0].length - 2;
 	$("#mod0")[0].onchange();
 }
