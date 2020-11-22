@@ -404,7 +404,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 				} else rsv(SOCK_NA);
 			} else if (event == "return_status_executeTestSuite") {
 				if (status == "success") {
-					if (execType == "SCHEDULE") await this.updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
+					if (execType == "SCHEDULE") await updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
 				} else if (status == "skipped") {
 					const execStatus = "Skipped";
 					var errMsg = (execType == "SCHEDULE") ? "due to conflicting schedules" :
@@ -525,8 +525,8 @@ module.exports.executionFunction = async (batchExecutionData, execIds, userInfo,
 	icename = userInfo.icename;
 	//userInfo.icename=icename;
 	redisServer.redisSubServer.subscribe('ICE2_' + icename);
-	var iceStatus = await checkForICEstatus(icename, execType);
-	if (iceStatus != null) return iceStatus;
+	//var iceStatus = await checkForICEstatus(icename, execType);
+	//if (iceStatus != null) return iceStatus;
 	const taskApproval = await utils.approvalStatusCheck(batchExecutionData.batchInfo);
 	if (taskApproval.res !== "pass") return taskApproval.res;
 	/*const countStatus =*/ await counterUpdater(batchExecutionData.batchInfo.length, userInfo.userid);
@@ -546,9 +546,10 @@ module.exports.executionFunction = async (batchExecutionData, execIds, userInfo,
 exports.ExecuteTestSuite_ICE = async (req, res) => {
 	const fnName = "ExecuteTestSuite_ICE"
 	logger.info("Inside UI service: ExecuteTestSuite_ICE");
-	inputs = { "icename": "ice 1" };
+	var targetUser = req.body.executionData.targetUser;
+	inputs = { "icename": targetUser };
 	const profile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
-	const userInfo = { "userid": profile.userid, "username": profile.name, "role": profile.role, "icename": "ice 1","invokingUser":req.session.userid,"invokingUserName":req.session.username};
+	const userInfo = { "userid": profile.userid, "username": profile.name, "role": profile.role, "icename": targetUser,"invokingUser":req.session.userid,"invokingUserName":req.session.username};
 	const batchExecutionData = req.body.executionData;
 	const execIds = { "batchid": "generate", "execid": {} };
 	var result = queue.Execution_Queue.addTestSuiteToQueue(batchExecutionData,execIds,userInfo,"ACTIVE");
@@ -626,6 +627,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 		stat = result["status"]
 		batchInfo = result["batchInfo"]
 		displayString = result["displayString"]
+		if (!batchInfo) batchInfo = []
 		dateTimeList = batchInfo.map(u => {
 			const dt = u.date.split("-");
 			const tm = u.time.split(":");
@@ -777,7 +779,12 @@ function secondsToHms(seconds) {
  */
 const getMachinePartitions = async (mod, type, time) => {
 	let scenarios = [];
-	const activeUsers = await utils.getSocketList("schedule");
+	var activeUsers = []
+	if(mod[0].iceList){
+		activeUsers = mod[0].iceList;
+	}else{
+		return "fail";
+	}
 	for (var i = 0; i < mod.length; i++) {
 		scenarios = scenarios.concat(mod[i].suiteDetails);
 	}

@@ -327,25 +327,25 @@ module.exports.initListeners = mySocket => {
 function check_pulse(){
 	time = Date()
 	var writeStr = "None"
-	console.log("Checking ICE pulse")
+	logger.info("Checking ICE pulse")
 	for (var ice in pulse_ICE){
 		if(pulse_ICE[ice]["time"]){
 			iceTime = pulse_ICE[ice]["time"]
-			var writeStr = "\n\n\n\n\nNone\n\n\n\n\n"
+			var writeStr = "";
 			if(Date.parse(time) - Date.parse(iceTime) >= 100000){
-				var writeStr = "\n\n------------------\n" + time.toString() + " " + ice + " Disconnected pulse last recieved at: " + iceTime.toString() + "\n------------------\n\n"
-				console.log("Disconnect ice " + ice)
+				var writeStr = time.toString() + " " + ice + " Disconnected pulse last recieved at: " + iceTime.toString();
+				logger.info(writeStr)
 				pulse_ICE[ice]["time"] = null;
 				pulse_ICE[ice]["connected"] = false;
+				cache.set("ICE_status",pulse_ICE)
 				value = pulse_ICE[ice];
 				const dataToExecute = JSON.stringify({"username" : pulse_ICE[ice]['username'],"onAction" : "ice_status_change","value":value});
 				server_pub.publish('ICE2_' + pulse_ICE[ice]['username'], dataToExecute);
 			}else{
-				writeStr ="\n"+time.toString() + " " + ice + " status: " + pulse_ICE[ice]["status"] + " ICE mode: " + pulse_ICE[ice]["mode"] 
-				console.log(writeStr)
+				writeStr = time.toString() + " " + ice + " status: " + pulse_ICE[ice]["status"] + " ICE mode: " + pulse_ICE[ice]["mode"]; 
+				logger.info(writeStr)
 				
 			}
-			fs.appendFile('socket_stability.txt', writeStr,()=>{})
 		}
 	}
 }

@@ -118,10 +118,7 @@ mySPA.controller('headerController', function ($scope, $rootScope, $timeout, $ht
 		}
 	});
 	socket.on('display_execution_popup', (value) => {
-		console.log("YES BOYS")
-		console.log(value);
 		var msg = "";
-		
 		for(val in value){
 			var data = value[val].status;
 			console.log(data)
@@ -133,7 +130,7 @@ mySPA.controller('headerController', function ($scope, $rootScope, $timeout, $ht
 			else if (data == "NotApproved") data = exec + "All the dependent tasks (design, scrape) needs to be approved before execution";
 			else if (data == "NoTask") data = exec + "Task does not exist for child node";
 			else if (data == "Modified") data = exec +"Task has been modified, Please approve the task";
-			else if (data == "complete") data = exec +"Execution Complete";
+			else if (data == "Completed") data = exec +"Execution Complete";
 			else if (data == "Terminate") data = "Terminated" 
 			else if (data == "UserTerminate") data = exec +"Terminated by User"
 			else if (data == "success") data = exec +"success"
@@ -149,8 +146,6 @@ mySPA.controller('headerController', function ($scope, $rootScope, $timeout, $ht
 	});
 
 	socket.on('result_ExecutionDataInfo', function (result) {
-		console.log("HERE")
-		console.log(result)
 		var data = result.status
 		var testSuiteIds = result.testSuiteIds
 		var tempId = "";
@@ -185,7 +180,7 @@ mySPA.controller('headerController', function ($scope, $rootScope, $timeout, $ht
 			setTimeout(function () {
 				$("#executionCompleted").find('.btn-default').focus();
 			}, 300);
-		} else if(data == "complete"){
+		} else if(data == "Completed"){
 			$("#executionCompleted").find('.modal-title').text(msg);
 			$('#executionCompleted').modal('show');
 			setTimeout(function () {

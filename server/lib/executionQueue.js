@@ -116,15 +116,15 @@ class Execution_Queue{
                     cache.set("execution_queue",queue_list);
                     //create response message
                     response['status'] = "pass";
-                    var msg = "ICE status: Not Connected"
+                    var msg = " ICE status: Not Connected"
                     if(ice_list[targetICE]["connected"]){
-                        msg = "ICE status: connected"
+                        msg = " ICE status: connected"
                     }if(ice_list[targetICE]["mode"]){
                         msg = msg + " ICE mode: DND";
                     }else{
-                        msg = msg + "ICE mode: Avaialble";
+                        msg = msg + " ICE mode: Avaialble";
                     }
-                    response["message"] = "Execution queued on " + targetICE + msg + " Queue lenght: " + pool["execution_list"].length.toString();
+                    response["message"] = "Execution queued on " + targetICE + " " +  msg ;
                 }
                 
             }else if(projectid && projectid in project_list){
@@ -279,7 +279,7 @@ async function triggerExecution(channel, ice_data){
                 return result;
             }
             //commence execution
-            console.log("---------------- Sending Execution request -----------------");
+            logger.info("Sending Execution Request to: " + ice_name + " queue lenght for poolid: " + poolid.toString() + " is: " + queue.length);
             try{
                 switch(testSuite.type){
                     case 'ACTIVE': 
