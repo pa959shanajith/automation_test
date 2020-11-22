@@ -3,13 +3,26 @@ const suite = require('../controllers/suite')
 const redisServer = require('./redisSocketHandler');
 const cache = require("./cache")
 var logger = require('../../logger');
+var myserver = require('./socket');
+const notifications = require('../notifications');
 
 
 class Execution_Queue{
+    /*
+        queue_list: main execution queue, it stores all the queue's corresponding to pools
+        project_list: dictionary of projects as key pool as value, useful for searching purpose
+        ice_list: dictionary contains ice_name as key and poolid/status/mode/connected as values, 
+                  maintains the status of all ice (includes ICE which are not part of any pool but connected to ICE, poolid marked as 'orphan')
+        registred_ice: dictionary to maintain ice whose callbacks have been registred
+        request_ids: dictionary conatining all the requests recieved
+    */
     static queue_list = {}
     static project_list = {}
     static ice_list = {}
-    
+    static registred_ice = {}
+    static request_ids = {}
+    static notification_dict = {}
+    // executon queue initialisation
     static queue_init(){
         var _this = this
         var fnName = 'instantiateQueue'
@@ -17,75 +30,187 @@ class Execution_Queue{
             "projectids": [],
             "poolid": "all"
         }
-        _this.queue_list, _this.project_list, _this.ice_list = setUpPool(inputs)
+        _this.queue_list, _this.project_list, _this.ice_list, _this.request_ids, _this.notification_dict = setUpPool(inputs)
+        
     }
 
+    /** 
+        * @param {string} ice_name 
+        * Register callback for ICE when the status of ICE changes
+    */
     static register_execution_trigger_ICE(ice_name){
-        ice_list[ice_name]["status"] = true
-        redisServer.redisSubServer.subscribe('ICE2_'+ice_name);
-        redisServer.redisSubServer.on("message",triggerExecution);
+        //check if ice is already present in ice_list
+        if(ice_name in ice_list){
+            ice_list[ice_name]["connected"] = true
+        }else{
+            connect_ice(ice_name);
+        }
+        //check if callback for ICE has already been registred
+        if(!(ice_name in this.registred_ice)){
+            redisServer.redisSubServer.subscribe('ICE2_'+ice_name);
+            redisServer.redisSubServer.on("message",triggerExecution);
+            this.registred_ice[ice_name] = true;
+        }   
     }
     
+    static add_pending_notification(execIds, result, username){
+        var reportResult = {};
+        reportResult["execIds"] = execIds;
+        reportResult["result"] = result;
+        if((username in notification_dict)){
+            notification_dict[username] = []; 
+        }
+        notification_dict[username].push(reportResult)
+        cache.set("pending_notification",notification_dict)
+    }
+
+    /** 
+        * @param {} batchExecutionData 
+        * @param {} execIds
+        * @param {dictionary} userInfo
+        * @param {String} type
+        * Adds normal / scheduling test suites to queue
+        * Executes normal / scheduling test suites if the target ICE is in DND mode
+    */
     static addTestSuiteToQueue(batchExecutionData, execIds, userInfo,type){
         var targetICE = "";
         var projectid = "";
-        if (userInfo.icename){
-            targetICE = userInfo.icename;
-        }
-        if( batchExecutionData.batchInfo[0] && batchExecutionData.batchInfo[0].projectid){
-            projectid = batchExecutionData.batchInfo[0].projectid;
-        }
-        var testSuite = {"batchExecutionData":batchExecutionData,"execIds": execIds, "userInfo": userInfo,"type":type}
-        if(targetICE && targetICE in ice_list && ice_list[targetICE]["poolid"] in queue_list){
-            if(ice_list[ice_name]["mode"]){
-                result = executeTestSuite(batchExecutionData, execIds, userInfo, type);
-                cache.set("execution_queue",queue_list);
-                return true;
+        var response = {}
+        response['status'] = "fail";
+        response["message"] = "N/A"
+        response['error'] = "None"
+        try{
+            //check if target ICE was specified or not
+            if (userInfo && userInfo.icename){
+                targetICE = userInfo.icename;
+            }else{
+                userInfo.icename = "any"
             }
-            pool = queue_list[ice_list[targetICE]["poolid"]];
-            pool["execution_list"].push(testSuite);
-            cache.set("execution_queue",queue_list);
-            return true;
-        }else if(projectid && projectid in project_list){
-            pools = project_list[projectid];
-            poolid = getLeastLoadedPool(pools);
-            pool = queue_list[poolid];
-            pool["execution_list"].push(testSuite);
-            cache.set("execution_queue",queue_list);
-            return true;
-        }else{
-            result = executeTestSuite(batchExecutionData, execIds, userInfo, type)
-            return true;
+            //get project id of the test suite in the case targeICE was not specified
+            if(batchExecutionData && batchExecutionData.batchInfo[0] && batchExecutionData.batchInfo[0].projectid){
+                projectid = batchExecutionData.batchInfo[0].projectid;
+            }
+            var testSuite = {"batchExecutionData":batchExecutionData,"execIds": execIds, "userInfo": userInfo,"type":type}
+            //check if target ICE is present in any pool 
+            if(targetICE && targetICE in ice_list && ice_list[targetICE]["poolid"] in queue_list){
+                //check if target ICE is in DND mode, if true check wether the ice owner is has invoked execution
+                if(ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokingUser ){
+                    if(type == "ACTIVE"){
+                         executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
+                    }else{
+                        executeScheduleTestSuite(batchExecutionData, execIds, userInfo, type);
+                    }
+                        response['status'] = "pass";
+                        response["message"] = "Execution Started on " + ice_name + " ICE mode: DND" 
+                }
+                else{
+                    //get pool in which the target ICE present
+                    pool = queue_list[ice_list[targetICE]["poolid"]];
+                    pool["execution_list"].push(testSuite);
+                    //save execution queue to redis
+                    cache.set("execution_queue",queue_list);
+                    //create response message
+                    response['status'] = "pass";
+                    var msg = "ICE status: Not Connected"
+                    if(ice_list[targetICE]["connected"]){
+                        msg = "ICE status: connected"
+                    }if(ice_list[targetICE]["mode"]){
+                        msg = msg + " ICE mode: DND";
+                    }else{
+                        msg = msg + "ICE mode: Avaialble";
+                    }
+                    response["message"] = "Execution queued on " + targetICE + msg + " Queue lenght: " + pool["execution_list"].length.toString();
+                }
+                
+            }else if(projectid && projectid in project_list){
+                //if target ICE was not specified fetch the appropriate pool and push
+                pools = project_list[projectid];
+                poolid = getLeastLoadedPool(pools);
+                pool = queue_list[poolid];
+                pool["execution_list"].push(testSuite);
+                cache.set("execution_queue",queue_list);
+                response['status'] = "pass";
+                response["message"] = "Execution queued on pool" + pool["poolname"];
+            }else{
+                //check if target ice is connected but not preset in any pool, execute directly if true
+                if(ice_list[targetICE] && ice_list[targetICE]["connected"]){
+                    if(ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokingUser ){
+                        if(type == "ACTIVE"){
+                             executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
+                        }else{
+                            executeScheduleTestSuite(batchExecutionData, execIds, userInfo, type);
+                        }
+                    }
+                    response['status'] = "pass";
+                    response["message"] = "Execution Started on " + ice_name + " ICE mode: DND" 
+                }else{
+                    //the target ice is neither part of a pool nor is connected to server, queuing not possible
+                    response['status'] = "pass";
+                    response["message"] = targetICE +" not connected to server and not part of any pool, connect ICE to server or add ICE to a pool to proceed."
+                }
+                
+            }
+        }catch(e){
+            response["error"] = "Error while adding test suite to queue";
+            logger.error("Error in addTestSuiteToQueue. Error: %s",e);
         }
-        return false;
+        
+        return response;
     }
     static addAPITestSuiteToQueue(testSuiteRequest){
         // TODO get target ICE and project ID
         var projectid = "";
         var targetICE = "";
-        var testSuite = {"testSuiteRequest":testSuiteRequest,"type":"API"}
-        if(targetICE && targetICE in ice_list && ice_list[targetICE]["poolid"] in queue_list){
-            if(ice_list[ice_name]["mode"]){
-                result = executeTestSuite(batchExecutionData, execIds, userInfo, type);
-                return true;
+        var response = {}
+        response['status'] = "fail";
+        response["message"] = "N/A"
+        resposne['error'] = "None"
+        try {
+            var userInfo = testSuiteRequest.userInfo;
+            if (userInfo && userInfo.icename){
+                targetICE = userInfo.icename;
             }
-            pool = queue_list[ice_list[targetICE]["poolid"]];
-            pool["execution_list"].push(testSuite);
-            return true;
-        }else if(projectid && projectid in project_list){
-            pools = project_list[projectid];
-            poolid = getLeastLoadedPool(pools);
-            pool = queue_list[poolid];
-            pool["execution_list"].push(testSuite);
-            return true;
-        }else{
-            result = executeTestSuite(batchExecutionData, execIds, userInfo, type)
-            return true;
+            var testSuite = {"testSuiteRequest":testSuiteRequest,"type":"API"}
+            if(targetICE && targetICE in ice_list && ice_list[targetICE]["poolid"] in queue_list){
+                if(ice_list[ice_name]["mode"]){
+                    result = executeTestSuite(batchExecutionData, execIds, userInfo, type);
+                    response['status'] = "pass";
+                    response["message"] = "Execution Started on " + ice_name + " ICE mode: DND" ; 
+                }else{
+                    pool = queue_list[ice_list[targetICE]["poolid"]];
+                    pool["execution_list"].push(testSuite);
+                    cache.set("execution_queue",queue_list);
+                    response['status'] = "pass";
+                    response["message"] = "Execution queued on " + ice_name + " ICE mode: Avaialble" ;
+                }
+                
+            }else if(projectid && projectid in project_list){
+                pools = project_list[projectid];
+                poolid = getLeastLoadedPool(pools);
+                pool = queue_list[poolid];
+                pool["execution_list"].push(testSuite);
+                cache.set("execution_queue",queue_list);
+                response['status'] = "pass";
+                response["message"] = "Execution queued on pool" + pool["poolname"];
+            }else{
+                result = executeTestSuite(batchExecutionData, execIds, userInfo, type)
+                response['status'] = "pass";
+                response["message"] = "Execution Started on " + ice_name + " ICE mode: DND" 
+            }
+            
+        } catch (e) {
+            response["error"] = "Error while adding test suite to queue";
+            logger.error("Error in addTestSuiteToQueue. Error: %s",e);
         }
+       
         return false;
     }
-      
+    /** 
+        * @param {list} batchExecutionData 
+        * Of all the pools avialble for a project returns the one with the smallest queue
+    */      
     getLeastLoadedICE(poolQueues){
+        //increase the value of min if number of execution request in queue exceed 9007199254740991
         var min =  Number.MAX_SAFE_INTEGER
         var index = "";
         for (poolid in poolQueues){
@@ -97,25 +222,45 @@ class Execution_Queue{
         return index;
     }   
 }
-
+/** 
+    * @param {string} channel 
+    * @param {dictionary} ice_data
+    * Function responsible to update ICE status when it changes and execute a test suite from queue when required
+*/  
 async function triggerExecution(channel, ice_data){
-    var data = JSON.parse(ice_data)
-    var result = false
-    if (channel != "ICE2_" + data.username && data.onAction != 'ice_status_change') return;
+    var data = JSON.parse(ice_data);
+    var result = false;
+    //check if the triggered request id for ice status change and check if the request is duplicate or not 
+    if (channel != "ICE2_" + data.username || data.onAction != 'ice_status_change' || data["reqID"] in request_ids) return result;
     var ice_name = data.username
+    //register this request so that dupliacte requests can be ignored
+    request_ids[data["reqID"]] = 1;
+    //check if target ice is in ice_list or not, refer init method of queues for contents ice_list
     if(!ice_name in ice_list){
         return result;
     }
-    ice_list[ice_name]["mode"] = data.mode
-    if(data.mode || data.status){
+    //update ice mode and status in ice_list
+    ice_list[ice_name]["mode"] = data.value.mode;
+    ice_list[ice_name]["status"] = data.value.status;
+    //check if socket connection is available or not
+    const sockmode = await utils.channelStatus(ice_name);
+    //if ice is busy or not connected return 
+    if(data.value.status || (!sockmode.normal && !sockmode.schedule)){
         return result;
     } 
-    poolid = ice_list[ice_name]["poolid"]
-    pool = queue_list[poolid]
-    queue = pool["execution_list"] 
+    poolid = ice_list[ice_name]["poolid"];
+    pool = queue_list[poolid];
+    queue = pool["execution_list"];
+    //iterate over execution queue 
     for(i = 0; i < queue.length; i++){
         testSuite = queue[i];
-        if(testSuite.userInfo.icename === ice_name || testSuite === "any"){
+        //check if target ice for testsuite and the actual ice which has communicated it's status is same or not, accept if ice_name matches or is "any"
+        if(testSuite.userInfo.icename === ice_name || testSuite.userInfo.icename === "any"){
+            //check if the ice is in dnd or not, if in dnd check wether the ICE asignee and the invoking user are same 
+            if(data.value.mode && testSuite.userInfo.userid != testSuite.userInfo.invokingUser){
+                return result;
+            }
+            //commence execution
             console.log("---------------- Sending Execution request -----------------");
             try{
                 switch(testSuite.type){
@@ -129,6 +274,7 @@ async function triggerExecution(channel, ice_data){
                                 executeScheduleTestSuite(testSuite.batchExecutionData, testSuite.execIds, testSuite.userInfo, testSuite.type);
                                 break;
                 }
+                //remove execution from queue
                 queue.splice(i,1);
                 cache.set("execution_queue",queue_list);
             }catch(e){
@@ -144,11 +290,16 @@ async function triggerExecution(channel, ice_data){
 
 async function setUpPool(inputs){
     const fnName = "setUpPool"
-    projectid = {}
-    ice_list = {}
-    queue_list = {}
+    projectid = {};
+    ice_list = {};
+    queue_list = {};
+    request_ids ={};
+    notification_dict = {}
     try{
-        queue_list = await cache.get("execution_queue")
+        queue_list = await cache.get("execution_queue");
+        notification_dict = await cache.get("pending_notifciation");
+        if(!notification_dict) notification_dict = {}
+        if(!queue_list) queue_list = {} 
         pools = await utils.fetchData(inputs, "admin/getPools", fnName);
         for(index in pools){
             pool = pools[index]
@@ -170,15 +321,18 @@ async function setUpPool(inputs){
         }
         
         cache.set("execution_queue",queue_list);
-        return queue_list,project_list,ice_list
+        return queue_list,project_list,ice_list,request_ids,notification_dict
     }catch(exception){
         logger.error("Error in setUpPool. Error: %s",exception);
     }
-    return queue_list,project_list,ice_list
+    return queue_list,project_list,ice_list,request_ids,notification_dict
 }
 
 function setUpProjectList(projectids,poolid){
-    project_list = {}
+    var project_list = {}
+    if(!projectids || !poolid){
+        return project_list;
+    }
     for (project in projectids){
         projectid = projectids[project];
         if (projectid in project_list){
@@ -191,31 +345,53 @@ function setUpProjectList(projectids,poolid){
 }
 
 function setUpICEList(list,poolid){
-    ice_list = {}
+    if(!ice_list){
+        ice_list = {}
+    }
+
+    if(!list || !poolid){
+        return ice_list;
+    }
     for (ice in list){
-        ice_name = list[ice];
+        ice_name = list[ice]["icename"];
         ice_list[ice_name] = {}
         ice_list[ice_name]["poolid"] = poolid;
         ice_list[ice_name]["mode"] = false
         ice_list[ice_name]["status"] = false
+        ice_list[ice_name]["connected"] = false
     }
     return ice_list;
 }
 
 async function executeActiveTestSuite(batchExecutionData, execIds, userInfo,type){
+    var soc = myserver.socketMapNotify[userInfo.username];
     try {
 		result = await suite.executionFunction(batchExecutionData, execIds, userInfo, type);
 	} catch (ex) {
 		result = "fail";
 		logger.error("Error in executeTestSuite. Error: %s", ex)
     }
-    if (result == DO_NOT_PROCESS) return true;
+    var reportResult = {};
+    reportResult["execIds"] = execIds;
+    reportResult["result"] = result;
+    if(soc){
+        soc.emit("display_execution_popup",[reportResult]);
+    }else{
+        if((username in notification_dict)){
+            notification_dict[username] = []; 
+        }
+        notification_dict[userInfo.username].push(reportResult)
+        cache.set("pending_notification",notification_dict)
+    }
+    
 	return result;
 }
 
 async function executeScheduleTestSuite(batchExecutionData, execIds, userInfo,type){
     const fhName = "executeScheduleTestSuite";
+    var soc = myserver.socketMapNotify[userInfo.username];
     try {
+
        result = await suite.executionFunction(batchExecutionData, execIds, userInfo, "SCHEDULE");
    } catch (ex) {
        result = "fail";
@@ -256,6 +432,10 @@ async function executeScheduleTestSuite(batchExecutionData, execIds, userInfo,ty
        }
    }
    await suite.updateScheduleStatus(scheduleId, schedStatus, execIds.batchid);
+   var reportResult = {};
+   reportResult["execIds"] = execIds;
+   reportResult["result"] = schedStatus;
+   soc.emit("display_execution_popup",reportResult);
 }
 
 async function executeAPI(testSuite){
@@ -290,7 +470,7 @@ async function executeAPI(testSuite){
 	const executionIndicesList = Object.values(userRequestMap);
     const batchExecutionPromiseList = executionIndicesList.map(executionIndices => (async () => {
 		try {
-			for (const exi of executionIndices) {
+			for (let exi of executionIndices) {
 				const batchExecutionData = multiBatchExecutionData[exi];
 				const execResponse = executionResult[exi];
 				const userInfo = userInfoList[exi];
@@ -364,5 +544,12 @@ async function executeAPI(testSuite){
     
 }
 
+async function connect_ice(ice_name){
+    queue_list = await cache.get("execution_queue")
+    ice_list[ice_name] = {}
+    ice_list[ice_name]["connected"] = true;
+    ice_list[ice_name]["status"] = false;
+    ice_list[ice_name]["mode"] = false;
+}
 
 module.exports.Execution_Queue = Execution_Queue

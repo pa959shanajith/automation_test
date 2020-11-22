@@ -1,25 +1,25 @@
-mySPA.controller('headerController', function($scope, $rootScope, $timeout, $http, $location, headerServices, LoginService, cfpLoadingBar, socket) {
-	var userDetails,username,userRole,task;
+mySPA.controller('headerController', function ($scope, $rootScope, $timeout, $http, $location, headerServices, LoginService, cfpLoadingBar, socket) {
+	var userDetails, username, userRole, task;
 	var selectedRoleID, selectedRoleName, redirectPath;
 	var projectId = [];
 	var releaseId = [];
 	var cycleId = [];
 	var screenId = [];
 	$scope.passwordValidation = "";
-	$rootScope.unavailableLocalServer_msg="No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.";
+	$rootScope.unavailableLocalServer_msg = "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.";
 
-	if(window.localStorage['_UI']){
+	if (window.localStorage['_UI']) {
 		userDetails = JSON.parse(window.localStorage['_UI']);
 	}
 	$scope.notifications = [];
-	if(window.localStorage.notification){
+	if (window.localStorage.notification) {
 		$scope.notifications = JSON.parse(window.localStorage.notification);
 	}
-	
+
 	userRole = window.localStorage['_SR'];
 	username = userDetails.username.toLowerCase();
 
-	$scope.$on('$locationChangeStart', function(event, next, current){
+	$scope.$on('$locationChangeStart', function (event, next, current) {
 		// Prevent the browser default action (Going back):
 		if (localStorage["navigateScreen"] == $location.path()) {
 			event.preventDefault();
@@ -36,7 +36,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 
 	//Global model popup
 	function openModelPopup(modalId, title, body) {
-		var modalBox = $("#"+modalId);
+		var modalBox = $("#" + modalId);
 		modalBox.find('.modal-title').text(title);
 		modalBox.find('.modal-body p').text(body);
 		modalBox.modal("show");
@@ -50,7 +50,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		$(".resetPassEntry").hide();
 	}
 
-	if (!userDetails.dbuser){
+	if (!userDetails.dbuser) {
 		$(".resetPassEntry").hide();
 	}
 
@@ -117,17 +117,69 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			}
 		}
 	});
+	socket.on('display_execution_popup', (value) => {
+		console.log("YES BOYS")
+		console.log(value);
+		if (!value || !value.result || !value.result === "begin") {
+			return
+		}
+		var data = value.result;
+		console.log(data)
+		var id = value.excIds;
+		if (data == "Invalid Session") return $rootScope.redirectPage();
+		else if (data == "unavailableLocalServer") openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
+		else if (data == "scheduleModeOn") openDialogExe("Execute Test Suite", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+		else if (data == "NotApproved") openDialogExe("Execute Test Suite", "All the dependent tasks (design, scrape) needs to be approved before execution");
+		else if (data == "NoTask") openDialogExe("Execute Test Suite", "Task does not exist for child node");
+		else if (data == "Modified") openDialogExe("Execute Test Suite", "Task has been modified, Please approve the task");
+		else if (data == "unavailableLocalServer") openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
+		else if (data == "Terminate") {
+			$('#executionTerminatedBy').html('Program');
+			$('#executionTerminated').modal('show');
+			$('#executionTerminated').find('.btn-default').focus();
+		} else if (data == "UserTerminate") {
+			$('#executionTerminatedBy').html('User');
+			$('#executionTerminated').modal('show');
+			$('#executionTerminated').find('.btn-default').focus();
+		} else if (data == "success") {
+			$('#executionCompleted').modal('show');
+			setTimeout(function () {
+				$("#executionCompleted").find('.btn-default').focus();
+			}, 300);
+		} else openDialogExe("Execute Test Suite", "Failed to execute.");
+	});
+
+	socket.on('result_ExecutionDataInfo', function (data) {
+		console.log("HERE")
+		console.log(data)
+		if (data == "Terminate") {
+			$('#executionTerminatedBy').html('Program');
+			$('#executionTerminated').modal('show');
+			$('#executionTerminated').find('.btn-default').focus();
+		} else if (data == "UserTerminate") {
+			$('#executionTerminatedBy').html('User');
+			$('#executionTerminated').modal('show');
+			$('#executionTerminated').find('.btn-default').focus();
+		} else if (data == "unavailableLocalServer") {
+			openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
+		} else if (data == "success") {
+			$('#executionCompleted').modal('show');
+			setTimeout(function () {
+				$("#executionCompleted").find('.btn-default').focus();
+			}, 300);
+		} else openDialogExe("Execute Test Suite", "Failed to execute.");
+	});
 
 	function unreadNotifications() {
-		if(window.localStorage.notification){
+		if (window.localStorage.notification) {
 			var notifications = JSON.parse(window.localStorage.notification);
-			var unreadNotifications = notifications.filter(function(a){
+			var unreadNotifications = notifications.filter(function (a) {
 				return a.isRead == false;
 			});
 			var notificationCount = unreadNotifications.length;
 			if (notificationCount < 1 || notificationCount == '' || notificationCount == undefined) {
 				$("#notifications-count").hide();
-			}else {
+			} else {
 				$("#notifications-count").show();
 				$("#notifications-count").text(notificationCount);
 			}
@@ -138,9 +190,8 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		unreadNotifications();
 	}, 500);
 
-	$scope.dropdownMenuButton = function($event){
-		if(window.localStorage.notification)
-		{
+	$scope.dropdownMenuButton = function ($event) {
+		if (window.localStorage.notification) {
 			$scope.notifications = JSON.parse(window.localStorage.notification);
 		}
 		if (!window.localStorage.notification) {
@@ -155,23 +206,21 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			readMessages[i].isRead = true;
 		}
 		window.localStorage.notification = JSON.stringify(readMessages);
-		setTimeout(function() {
-			if($(".dropdown-menu").is(":visible") == true)
-			{
+		setTimeout(function () {
+			if ($(".dropdown-menu").is(":visible") == true) {
 				var notificationCount = parseInt($("#notifications-count").text());
-				$("span.indexCount").each(function() {
-						var text = parseInt($(this).text());
-						$(this).attr('class','notify_'+text);
+				$("span.indexCount").each(function () {
+					var text = parseInt($(this).text());
+					$(this).attr('class', 'notify_' + text);
 				});
-				for(var i=0;i<notificationCount;i++)
-				{
-					$(".notify_"+i).parent().children('.txtNotify').addClass('highlightNotification');
+				for (var i = 0; i < notificationCount; i++) {
+					$(".notify_" + i).parent().children('.txtNotify').addClass('highlightNotification');
 				}
 			}
 		}, 10);
 	};
 
-	$scope.naviPg = function($event){
+	$scope.naviPg = function ($event) {
 		if (localStorage.getItem("navigateEnable") == "true") {
 			window.localStorage['navigateScreen'] = "plugin";
 			//Transaction Activity for Avo Assure Logo Action
@@ -181,11 +230,11 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 			$timeout(function () {
 				$location.path('/plugin');
-		   	}, 100);
+			}, 100);
 		}
 	};
 
-	if(window.localStorage['_SRS']=="success"){
+	if (window.localStorage['_SRS'] == "success") {
 		delete window.localStorage['_SRS'];
 		setTimeout(function () {
 			openModelPopup("switchRoleStatus", "Switch Role", "Your role is changed to " + window.localStorage['_SR']);
@@ -206,21 +255,21 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			openModelPopup("switchRoleStatus", "Switch Role", "There are no roles to switch");
 		} else {
 			LoginService.getRoleNameByRoleId(roleasarray)
-			.then(function (data) {
-				if (data == "Invalid Session") {
-					return $rootScope.redirectPage();
-				} else {
-					var rolesList = $('#switchRoles');
-					rolesList.empty();
-					var selectedRole = window.localStorage['_SR'];
-					data[userDetails.role] = userDetails.rolename;
-					for (var rid in data) {
-						if (data[rid] != selectedRole) {
-							rolesList.append($("<li class='switchRole_confirm' data-id=" + rid + " ><a href='#' data-toggle='modal' data-target='#switchRoleModal'>" + data[rid] + "</a></li>"));
+				.then(function (data) {
+					if (data == "Invalid Session") {
+						return $rootScope.redirectPage();
+					} else {
+						var rolesList = $('#switchRoles');
+						rolesList.empty();
+						var selectedRole = window.localStorage['_SR'];
+						data[userDetails.role] = userDetails.rolename;
+						for (var rid in data) {
+							if (data[rid] != selectedRole) {
+								rolesList.append($("<li class='switchRole_confirm' data-id=" + rid + " ><a href='#' data-toggle='modal' data-target='#switchRoleModal'>" + data[rid] + "</a></li>"));
+							}
 						}
 					}
-				}
-			});
+				});
 		}
 	};
 
@@ -228,47 +277,47 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		$("#switchRoleModal").modal("hide");
 		blockUI("Switching to " + selectedRoleName);
 		LoginService.loadUserInfo(selectedRoleID)
-		.then(function (data) {
-			unblockUI();
-			if (data != "fail") {
-				window.localStorage['_SR'] = selectedRoleName;
-				window.localStorage['_UI'] = JSON.stringify(data);
-				window.localStorage['_SRS'] = "success";
-				//Transaction Activity for SwitchRole Button Action
-				// var labelArr = [];
-				// var infoArr = [];
-				// labelArr.push(txnHistory.codesDict['SwitchRole']);
-				// infoArr.push({"selectedRoleName" : selectedRoleName});
-				// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
-				if (selectedRoleName == "Admin") {
-					window.localStorage['navigateScreen'] = "admin";
-					window.location.href = "/admin";
+			.then(function (data) {
+				unblockUI();
+				if (data != "fail") {
+					window.localStorage['_SR'] = selectedRoleName;
+					window.localStorage['_UI'] = JSON.stringify(data);
+					window.localStorage['_SRS'] = "success";
+					//Transaction Activity for SwitchRole Button Action
+					// var labelArr = [];
+					// var infoArr = [];
+					// labelArr.push(txnHistory.codesDict['SwitchRole']);
+					// infoArr.push({"selectedRoleName" : selectedRoleName});
+					// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+					if (selectedRoleName == "Admin") {
+						window.localStorage['navigateScreen'] = "admin";
+						window.location.href = "/admin";
+					} else {
+						window.localStorage['navigateScreen'] = "plugin";
+						window.location.href = "/plugin";
+					}
 				} else {
-					window.localStorage['navigateScreen'] = "plugin";
-					window.location.href = "/plugin";
+					console.log("Fail to Switch User");
+					openModelPopup("switchRoleStatus", "Switch Role", "Fail to Switch User");
 				}
-			} else {
+			}, function (error) {
+				unblockUI();
 				console.log("Fail to Switch User");
 				openModelPopup("switchRoleStatus", "Switch Role", "Fail to Switch User");
-			}
-		}, function (error) {
-			unblockUI();
-			console.log("Fail to Switch User");
-			openModelPopup("switchRoleStatus", "Switch Role", "Fail to Switch User");
-		});
+			});
 	};
 
-	$scope.resetSuccess = function(){
+	$scope.resetSuccess = function () {
 		window.sessionStorage.clear();
 		window.sessionStorage["checkLoggedOut"] = true;
 		$rootScope.redirectPage();
 	};
 
-	$scope.resetPass = function(){
+	$scope.resetPass = function () {
 		openModelPopup("resetPassPopup");
 	};
 
-	$scope.resetFields = function(){
+	$scope.resetFields = function () {
 		$scope.currpassword = "";
 		$scope.newpassword = "";
 		$scope.confpassword = "";
@@ -276,7 +325,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		$(".ic-currpassword, .ic-newpassword, .ic-confpassword").parent().removeClass("input-border-error");
 	};
 
-	$scope.resetPassword = function(){
+	$scope.resetPassword = function () {
 		$scope.passwordValidation = "";
 		$(".ic-currpassword, .ic-newpassword, .ic-confpassword").parent().removeClass("input-border-error");
 		var currpassword = $scope.currpassword;
@@ -299,35 +348,34 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			$(".ic-confpassword").parent().addClass("input-border-error");
 			$scope.passwordValidation = "New Password and Confirm Password do not match";
 		} else {
-			LoginService.resetPassword(newpassword,currpassword)
-			.then(function (data) {
-				if(data == "Invalid Session"){
-					$scope.passwordValidation = "Invalid Session";
-				} else if(data == "success") {
-					$("#resetPassPopup").modal("hide");
-					openModelPopup("resetSuccessPopup");
-				} else if(data == "same"){
-					$(".ic-newpassword").parent().addClass("input-border-error");
-					$(".ic-confpassword").parent().addClass("input-border-error");
-					$scope.passwordValidation = "Sorry! You can't use the existing password again";
-				} else if(data == "incorrect") {
+			LoginService.resetPassword(newpassword, currpassword)
+				.then(function (data) {
+					if (data == "Invalid Session") {
+						$scope.passwordValidation = "Invalid Session";
+					} else if (data == "success") {
+						$("#resetPassPopup").modal("hide");
+						openModelPopup("resetSuccessPopup");
+					} else if (data == "same") {
+						$(".ic-newpassword").parent().addClass("input-border-error");
+						$(".ic-confpassword").parent().addClass("input-border-error");
+						$scope.passwordValidation = "Sorry! You can't use the existing password again";
+					} else if (data == "incorrect") {
+						$(".ic-currpassword").parent().addClass("input-border-error");
+						$scope.passwordValidation = "Current Password is incorrect";
+					} else if (data == "fail") {
+						$scope.passwordValidation = "Failed to Change Password";
+					} else if (/^2[0-4]{10}$/.test(data)) {
+						$scope.passwordValidation = "Invalid Request";
+					}
+				}, function (error) {
 					$(".ic-currpassword").parent().addClass("input-border-error");
-					$scope.passwordValidation = "Current Password is incorrect";
-				} else if(data == "fail") {
-					$scope.passwordValidation = "Failed to Change Password";
-				} else if(/^2[0-4]{10}$/.test(data)) {
-					$scope.passwordValidation = "Invalid Request";
-				}
-			}, function (error) {
-				$(".ic-currpassword").parent().addClass("input-border-error");
-				$scope.passwordValidation = "Failed to Authenticate Current Password.";
-			});
+					$scope.passwordValidation = "Failed to Authenticate Current Password.";
+				});
 		}
 	};
 
 	$(document).on("keypress", ".spaceRegex", function (e) {
-		if(e.keyCode == 32)
-		{
+		if (e.keyCode == 32) {
 			return false;
 		}
 	});
@@ -338,7 +386,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		setTimeout(function () {
 			var userEnteredText = element.val();
 			var regex;
-				//regex = ;
+			//regex = ;
 			userEnteredText = userEnteredText.replace(/\s/g, "");
 			element.val(userEnteredText);
 		}, 5);
@@ -352,44 +400,44 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		// 	if(data == "Invalid Session"){
 		// 		return $rootScope.redirectPage();
 		// 	}
-		 var data = JSON.parse(window.localStorage['_CT'])
-			$scope.projectDetails = {"idtypes":["projects"],"requestedids":[data.projectId],"respnames":[data.taskName]};
-			task = JSON.parse(window.localStorage['_CT']);
+		var data = JSON.parse(window.localStorage['_CT'])
+		$scope.projectDetails = { "idtypes": ["projects"], "requestedids": [data.projectId], "respnames": [data.taskName] };
+		task = JSON.parse(window.localStorage['_CT']);
 
-			releaseId.push(task.releaseid);
-			screenId.push(task.screenId);
-//			$scope.releaseDetails = data.respnames[0];
-			$scope.releaseDetails = task.releaseid;
-			$scope.cycleDetails = data.cycleid;
-			$scope.screenName = data.taskName;
+		releaseId.push(task.releaseid);
+		screenId.push(task.screenId);
+		//			$scope.releaseDetails = data.respnames[0];
+		$scope.releaseDetails = task.releaseid;
+		$scope.cycleDetails = data.cycleid;
+		$scope.screenName = data.taskName;
 
-			// headerServices.getNames_ICE(releaseId, ['releases']) 
-			// .then(function(data){
-			// 	if(data == "Invalid Session"){
-			// 		return $rootScope.redirectPage();
-			// 	}
-			// 	$scope.releaseDetails = data.respnames[0];
-			// 	cycleId.push(task.cycleid);
-			// 	headerServices.getNames_ICE(cycleId, ['cycles'])
-			// 	.then(function(data){
-			// 		if(data == "Invalid Session"){
-			// 	  		return $rootScope.redirectPage();
-			// 		}
-			// 		$scope.cycleDetails = data.respnames[0];
+		// headerServices.getNames_ICE(releaseId, ['releases']) 
+		// .then(function(data){
+		// 	if(data == "Invalid Session"){
+		// 		return $rootScope.redirectPage();
+		// 	}
+		// 	$scope.releaseDetails = data.respnames[0];
+		// 	cycleId.push(task.cycleid);
+		// 	headerServices.getNames_ICE(cycleId, ['cycles'])
+		// 	.then(function(data){
+		// 		if(data == "Invalid Session"){
+		// 	  		return $rootScope.redirectPage();
+		// 		}
+		// 		$scope.cycleDetails = data.respnames[0];
 
-			// 	}, function(error) { console.log("Failed to get cycle name");});
-			// }, function(error) { console.log("Failed to get release name");});
-	// 		headerServices.getNames_ICE(screenId,['screens'])
-	// 		.then(function(data){
-	// 			if(data == "Invalid Session"){
-	// 				return $rootScope.redirectPage();
-	// 			}
-	// 			$scope.screenName = data.respnames[0];
-	// 		}, function(error) { console.log("Failed to fetch info");});
-	// 	}, function(error) { console.log("Failed to fetch projectInfo");});
+		// 	}, function(error) { console.log("Failed to get cycle name");});
+		// }, function(error) { console.log("Failed to get release name");});
+		// 		headerServices.getNames_ICE(screenId,['screens'])
+		// 		.then(function(data){
+		// 			if(data == "Invalid Session"){
+		// 				return $rootScope.redirectPage();
+		// 			}
+		// 			$scope.screenName = data.respnames[0];
+		// 		}, function(error) { console.log("Failed to fetch info");});
+		// 	}, function(error) { console.log("Failed to fetch projectInfo");});
 	}
 
-	$scope.logout = function($event){
+	$scope.logout = function ($event) {
 		//Transaction Activity for Logout Button Action
 		// var labelArr = [];
 		// var infoArr = [];
@@ -404,7 +452,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		try {
 			const res = await fetch("/AvoAssure_ICE");
 			const status = await res.text();
-			if (status == "available") location.href = location.origin+"/AvoAssure_ICE?file=getICE"
+			if (status == "available") location.href = location.origin + "/AvoAssure_ICE?file=getICE"
 			else openModelPopup("switchRoleStatus", "Download Avo Assure ICE", "Package is not available");
 		} catch (ex) {
 			console.error("Error while downloading ICE package. Error:", ex);
