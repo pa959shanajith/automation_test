@@ -231,10 +231,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$('#tokenName').removeClass('error-border')
 	}
 
-	const EditIcePoolReset = () =>{
+	$scope.EditIcePoolReset = () =>{
 		$('#update-icepool-rename').addClass("hide")
-		$('#assignedProjectAP option').appendTo($('#allProjectAP'))
+		$('#assignedProjectAP option').remove()
+		$("#allProjectAP option").remove()
 		$('select#allProjectAP').val([])
+		$scope.createIcePool.allProjectList.forEach((e)=>{
+			$("#allProjectAP").append('<option value='+e._id+'>'+e.name+'</option>');
+		})
 		$scope.createIcePool.allIcePoolListFilter=''
 		$scope.createIcePool.selectedIcePool = undefined
 	}
@@ -242,7 +246,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	// on click of create ice pool from action bar
 	$scope.createIcePool.click = () =>{
 		$(".selectedIcon").removeClass("selectedIcon");
-		$("#createIcePool").find("span.fa").addClass("selectedIcon");
+		$("#createIcePool").find("img").addClass("selectedIcon");
 		blockUI('Fetching Projects ...')
 		adminServices.getAllProjects()
 		.then((data)=>{
@@ -337,7 +341,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		adminServices.updatePool(pool)
 		.then((data)=>{
 			if (data == "success") {
-				EditIcePoolReset()
+				$scope.EditIcePoolReset()
 				populatePool().then((res)=>{
 				$scope.createIcePool.allIcePoolList = res.data
 				})
@@ -364,7 +368,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		adminServices.deletePools({'poolid':[id]})
 		.then((data)=>{
 			if (data == "success") {
-				EditIcePoolReset()
+				$scope.EditIcePoolReset()
 				populatePool().then((res)=>{
 				$scope.createIcePool.allIcePoolList = res.data
 				})
@@ -385,7 +389,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	// on click of allocate ice pool button
 	$scope.allocateIcePool.click = async() =>{
 		$(".selectedIcon").removeClass("selectedIcon");
-		$("#allocateIcePool").find("span.fa").addClass("selectedIcon");
+		$("#allocateIcePool").find("img").addClass("selectedIcon");
 		//api to get total ice count and remaining ice count
 		$scope.iceAllocateType('quantity');
 		blockUI("Fetching ICE Pools...");
@@ -398,7 +402,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		var iceData = $scope.allocateIcePool.iceData
 		var type = $scope.allocateIcePool.type 
 		if(type == 'quantity'){
-			var iceList = pool.ice_list
+			var iceList = Object.keys(pool.ice_list)
 			var val = $('#icepoolNumInp').val() - iceList.length
 			pool.ice_deleted = []
 			pool.ice_added = []

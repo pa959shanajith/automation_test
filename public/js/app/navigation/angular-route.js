@@ -186,7 +186,9 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/controllers/mindmap/mindmapService.js',
 						'js/controllers/execution/executionController.js',
 						'js/controllers/execution/executionService.js',
-						'js/controllers/design/designService.js'
+						'js/controllers/design/designService.js',
+						'js/controllers/admin/adminService.js',
+						'js/controllers/scheduling/scheduleService.js'
                     ]);
                 }]
             }
@@ -331,7 +333,8 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/controllers/login/loginService.js',						
 						'js/controllers/header/headerController.js',
 						'js/controllers/scheduling/scheduleController.js',
-						'js/controllers/scheduling/scheduleService.js'
+						'js/controllers/scheduling/scheduleService.js',
+						'js/controllers/admin/adminService.js'
                     ]);
                 }]
             }

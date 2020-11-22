@@ -2411,6 +2411,44 @@ input[disabled]{
 /*****************Execution CSS*****************/
 
 /******Exectuion Mid Section******/
+#selectIcePoolIce .adminControl{ 
+    padding: 0px 40px !important;
+}
+#selectIcePoolIce .error-border{
+    border: 1px solid red!important;
+}
+#selectIcePoolIce select{
+    max-width: 180px;
+    height: 35px;
+}
+#selectIcePoolIce ul {
+    width: 335px;
+    left: 171px;
+    max-height: 123px;
+    background: white;
+}
+#selectIcePoolIce ul input[type="checkbox"] {
+    background-color: red;
+    width:auto
+}
+#status{
+    height: 7px;
+    width: 7px;
+    margin: 2px 5px;
+    border-radius: 50%;
+    display: inline-block;
+}
+#status.online{
+    background-color: green;
+}
+#selectIcePoolIce #userIdName{
+    width: 335px;
+    left: 171px;
+}
+#selectIcePoolIce .modal-body{
+    height: 200px;
+    padding: 40px 15px;
+}
 #pageContent{
 	float:left;
 	width:100%;
