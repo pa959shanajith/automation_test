@@ -209,6 +209,7 @@ const prepareReportData = (reportData, embedImages) => {
     report.overallstatus[0].date = endDate && (endDate[1] + "/" + endDate[2] + "/" + endDate[0]) || '-';
     report.overallstatus[0].time = endTimeStamp.split(" ")[1] || '-';
     report.overallstatus[0].EllapsedTime = "~" + ("0" + elapTime[0]).slice(-2) + ":" + ("0" + elapTime[1]).slice(-2) + ":" + ("0" + elapTime[2]).slice(-2)
+    report.overallstatus[0].video = report.overallstatus[0].video || '-'
 
     report.rows.forEach((row, i) => {
         row.slno = i + 1;

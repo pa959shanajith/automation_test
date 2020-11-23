@@ -144,6 +144,12 @@ function loadReports() {
                 });
             }
         })
+        $(document).on('click', '.openvideo', function() {
+            var path = $(this).attr("data-path");
+            var WindowObject = window.open();
+            var strHtml = "<html>\n<head>\n</head>\n<body style='margin: 2px' >\n<video width='100%' height='100%'> <source='" + path + "'/>\n</video>\n</body>\n</html>";
+            WindowObject.document.writeln(strHtml);
+        })
         function calcTableHeight(flag) {
             var windowHeight = $( window ).height();
             var headerHeight =  $('.hearderCon').height();
