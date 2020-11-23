@@ -366,7 +366,7 @@ exports.saveQcDetails_ICE = function (req, res) {
 		var qctestset = itr.testset;
 		var inputs = {
 			"testscenarioid": testscenarioid,
-			"qcdetailsid": testscenarioid,
+			// "qcdetailsid": testscenarioid,
 			"qcdomain": qcdomain,
 			"qcfolderpath": qcfolderpath,
 			"qcproject": qcproject,
@@ -413,6 +413,64 @@ exports.saveQcDetails_ICE = function (req, res) {
 	});
 };
 
+exports.saveUnsyncDetails = function(req, res) {
+	logger.info("Inside UI service: saveUnsyncDetails");
+	var undoMapList = req.body.undoMapList;
+	var flag = true;
+	if (undoMapList.length > 0) {
+		flag = true;
+	} else {
+		flag = false;
+	}
+	async.forEachSeries(undoMapList, function (itr, callback) {
+		var testscenarioid = itr.testscenarioid;
+		var qctestcase = itr.qctestcase;
+		var mapid = itr.mapid;
+		var inputs = {
+			"testscenarioid": testscenarioid,
+			"qctestcase": qctestcase,
+			"mapid": mapid,
+			"query": "updateMapDetails_ICE"
+		};
+		var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
+		logger.info("Calling DAS Service: qualityCenter/updateMapDetails_ICE");
+		client.post(epurl + "qualityCenter/updateMapDetails_ICE", args,
+			function (qcdetailsows, response) {
+			if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
+				logger.error("Error occurred in updateMapDetails_ICE Error Code : ERRDAS");
+				flag = false;
+			}
+			callback();
+		});
+	}, function () {
+		if (flag) {
+			try {
+				if (utils.isSessionActive(req)) {
+					res.send("success");
+				} else {
+					logger.info("Invalid Session");
+					res.send("Invalid Session");
+				}
+			} catch (exception) {
+				logger.error(exception.message);
+				utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+					var flag="";
+					if (found) flag = "scheduleModeOn";
+					else flag = "unavailableLocalServer";
+					res.send(flag);
+				});
+			}
+		} else {
+			res.send("fail");
+		}
+	});
+};
+
 exports.viewQcMappedList_ICE = function (req, res) {
 	logger.info("Inside UI service: viewQcMappedList_ICE");
 	var userid = req.body.user_id;
@@ -426,6 +484,7 @@ function getQcDetailsForUser(userid, cb) {
 	logger.info("Inside function getQcDetailsForUser");
 	var projectDetailsList = [];
 	var projectidlist = [];
+	var qcDetailsList = [];
 	async.series({
 		getprojectDetails: function (callback1) {
 			var inputs = {
@@ -459,14 +518,77 @@ function getQcDetailsForUser(userid, cb) {
 			async.forEachSeries(projectidlist, function (itr, callback2) {
 				qcscenariodetails(itr, function (err, projectDetails) {
 					for (i = 0; i < projectDetails.length; i++) {
-						projectDetailsList.push(projectDetails[i]);
+						projectDetailsList = projectDetailsList.concat(projectDetails[i]);
 					}
 					callback2();
 				});
 			}, callback1);
 		},
+		qcdetails: function (callback1) {
+			logger.info("Inside function qcdetails");
+			// async.forEachSeries(scenarios_list, function (itr, callback2) {
+				var inputs = {
+					// "testscenarioid": itr._id,
+					"query": "qcdetails"
+				};
+				var args = {
+					data: inputs,
+					headers: {
+						"Content-Type": "application/json"
+					}
+				};
+				logger.info("Calling DAS Service from qcdetails: qualityCenter/viewIntegrationMappedList_ICE");
+				client.post(epurl + "qualityCenter/viewIntegrationMappedList_ICE", args,
+					function (qcdetailsows, response) {
+					if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
+						logger.error("Error occurred in qualityCenter/viewIntegrationMappedList_ICE from qcdetails Error Code : ERRDAS");
+					} else {
+						if (qcdetailsows.rows.length != 0) {
+							for(var i=0;i<qcdetailsows.rows.length;i++){
+								qcdetails = JSON.parse(JSON.stringify(qcdetailsows.rows[i]));
+								qcdetails.testscenarioname = [];
+								var testscenarios = qcdetails.testscenarioid;
+								if(Array.isArray(testscenarios)) {
+									for(var j=0;j<testscenarios.length;++j){
+										flag = false;
+										for(var k=0;k<projectDetailsList.length;++k) {
+											if(projectDetailsList[k]._id == testscenarios[j]) {
+												qcdetails.testscenarioname.push(projectDetailsList[k].name);
+												flag = true;
+												break;
+											} 
+										}
+										if(!flag) {
+											qcdetails.testscenarioid.splice(j,1);
+										}
+									}
+									if(qcdetails.testscenarioname.length != 0){
+										qcDetailsList.push(qcdetails);
+									}
+								} else {
+									for(var k=0;k<projectDetailsList.length;++k) {
+										if(projectDetailsList[k]._id == testscenarios) {
+											qcdetails.testscenarioname.push(projectDetailsList[k].name);
+											qcDetailsList.push(qcdetails);
+										}
+									}
+								}
+								// qcDetailsList.push(qcdetails);
+							}
+							// qcdetails.testscenarioname = itr.name;
+							// projectDetails.project_id = projectid;
+							// projectDetails.scenario_details = scenarios_list;
+							// projectDetails.project_name = projectname;
+							// qcDetailsList.push(qcdetails);
+						}
+					}
+					callback1();
+				});
+			// }, callback1); 
+			// callback1();
+		},
 		data: function (callback1) {
-			cb(projectDetailsList);
+			cb(qcDetailsList);
 		}
 	});
 }
@@ -501,44 +623,73 @@ function qcscenariodetails(projectid, cb) {
 				} else {
 					if (scenariorows.rows.length != 0) {
 						scenarios_list = JSON.parse(JSON.stringify(scenariorows.rows));
+						qcDetailsList.push(scenarios_list);
 					}
 				}
 				callback1();
 			});
 		},
-		qcdetails: function (callback1) {
-			logger.info("Inside function qcdetails");
-			async.forEachSeries(scenarios_list, function (itr, callback2) {
-				var inputs = {
-					"testscenarioid": itr._id,
-					"query": "qcdetails"
-				};
-				var args = {
-					data: inputs,
-					headers: {
-						"Content-Type": "application/json"
-					}
-				};
-				logger.info("Calling DAS Service from qcdetails: qualityCenter/viewIntegrationMappedList_ICE");
-				client.post(epurl + "qualityCenter/viewIntegrationMappedList_ICE", args,
-					function (qcdetailsows, response) {
-					if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
-						logger.error("Error occurred inqualityCenter/viewIntegrationMappedList_ICE from qcdetails Error Code : ERRDAS");
-					} else {
-						if (qcdetailsows.rows.length != 0) {
-							//flagtocheckifexists = true;
-							qcdetails = JSON.parse(JSON.stringify(qcdetailsows.rows[0]));
-							qcdetails.testscenarioname = itr.name;
-							// projectDetails.project_id = projectid;
-							// projectDetails.scenario_details = scenarios_list;
-							// projectDetails.project_name = projectname;
-							qcDetailsList.push(qcdetails);
-						}
-					}
-					callback2();
-				});
-			}, callback1);
-		},
+		// qcdetails: function (callback1) {
+		// 	logger.info("Inside function qcdetails");
+		// 	// async.forEachSeries(scenarios_list, function (itr, callback2) {
+		// 		var inputs = {
+		// 			// "testscenarioid": itr._id,
+		// 			"query": "qcdetails"
+		// 		};
+		// 		var args = {
+		// 			data: inputs,
+		// 			headers: {
+		// 				"Content-Type": "application/json"
+		// 			}
+		// 		};
+		// 		logger.info("Calling DAS Service from qcdetails: qualityCenter/viewIntegrationMappedList_ICE");
+		// 		client.post(epurl + "qualityCenter/viewIntegrationMappedList_ICE", args,
+		// 			function (qcdetailsows, response) {
+		// 			if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
+		// 				logger.error("Error occurred in qualityCenter/viewIntegrationMappedList_ICE from qcdetails Error Code : ERRDAS");
+		// 			} else {
+		// 				if (qcdetailsows.rows.length != 0) {
+		// 					//flagtocheckifexists = true;
+		// 					// qcdetails = JSON.parse(JSON.stringify(qcdetailsows.rows[0]));
+		// 					// qcdetails.testscenarioname = [];
+		// 					for(var i=0;i<qcdetailsows.rows.length;i++){
+		// 						qcdetails = JSON.parse(JSON.stringify(qcdetailsows.rows[i]));
+		// 						qcdetails.testscenarioname = [];
+		// 						var testscenarios = qcdetailsows.rows[i].testscenarioid;
+		// 						if(Array.isArray(testscenarios)) {
+		// 							for(var j=0;j<testscenarios.length;++j){
+		// 								flag = false;
+		// 								for(var k=0;k<scenarios_list.length;++k) {
+		// 									if(scenarios_list[k]._id == testscenarios[j]) {
+		// 										qcdetails.testscenarioname.push(scenarios_list[k].name);
+		// 										flag = true;
+		// 									}
+		// 								}
+		// 								if(flag){
+		// 									qcDetailsList.push(qcdetails);
+		// 								}
+		// 							}
+		// 						} else {
+		// 							for(var k=0;k<scenarios_list.length;++k) {
+		// 								if(scenarios_list[k]._id == testscenarios) {
+		// 									qcdetails.testscenarioname.push(scenarios_list[k].name);
+		// 									qcDetailsList.push(qcdetails);
+		// 								}
+		// 							}
+		// 						}
+		// 						// qcDetailsList.push(qcdetails);
+		// 					}
+		// 					// qcdetails.testscenarioname = itr.name;
+		// 					// projectDetails.project_id = projectid;
+		// 					// projectDetails.scenario_details = scenarios_list;
+		// 					// projectDetails.project_name = projectname;
+		// 					// qcDetailsList.push(qcdetails);
+		// 				}
+		// 			}
+		// 			callback1();
+		// 		});
+		// 	// }, callback1);
+		// },
 		data: function (callback1) {
 			cb(null, qcDetailsList);
 		}
