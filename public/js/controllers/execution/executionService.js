@@ -93,12 +93,5 @@ mySPA.factory('ExecutionService', ['$http','$q', function ($http,$q)   {
 			.then (function(response)	{return response.data;	},
 			function(response){	return $q.reject(response.data);});	
 		},
-		getICE_list: function () {
-			var tokeninfo = {"projectid": "5de4e4aed9cdd57f4061bcb1"}
-			return $http.post('/getICE_list',{
-				"projectid":"5de4e4aed9cdd57f4061bcb1"
-			}).then(function(response) { return response.data },
-			function(response) { return $q.reject(response.data) });
-		},
 	}
 }]);

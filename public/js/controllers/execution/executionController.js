@@ -966,15 +966,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	});
 	//Select Browser Function
 	$("#tableActionButtons, .executionTableDnd").delay(500).animate({opacity: "1"}, 500);
-
-	$("#test")[0].onclick = () => {
-		console.log("test")
-		
-		ExecutionService.getICE_list().then(()=>{
-			console.log("create pool")
-		});
-	}
-	
 }]);
 
 

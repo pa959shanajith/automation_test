@@ -32,6 +32,7 @@ class Execution_Queue{
     static notification_dict = {}
     // executon queue initialisation
     static queue_init(){
+        logger.info("Initialisign Execution Queues")
         var _this = this
         var fnName = 'instantiateQueue'
         var inputs = {
@@ -55,6 +56,7 @@ class Execution_Queue{
         }
         //check if callback for ICE has already been registred
         if(!(ice_name in this.registred_ice)){
+            logger.info("Registering executin call back for ICE: " + ice_name);
             redisServer.redisSubServer.subscribe('ICE2_'+ice_name);
             redisServer.redisSubServer.on("message",triggerExecution);
             this.registred_ice[ice_name] = true;
@@ -62,6 +64,7 @@ class Execution_Queue{
     }
     
     static add_pending_notification(execIds, report_result, username){
+        logger.info("Adding pending notification for user: " + username)
         if(!(username in notification_dict)){
             notification_dict[username] = []; 
         }
@@ -264,6 +267,7 @@ async function triggerExecution(channel, ice_data){
     const sockmode = await utils.channelStatus(ice_name);
     //if ice is busy or not connected return 
     if(data.value.status || (!sockmode.normal && !sockmode.schedule)){
+        logger.info("Could not execute on: " + ice_name + " ICE is either Executing a test suite or Server not connected to ice");
         return result;
     } 
     poolid = ice_list[ice_name]["poolid"];
@@ -294,6 +298,7 @@ async function triggerExecution(channel, ice_data){
                 }
                 //remove execution from queue
                 queue.splice(i,1);
+                logger.info("Removing Test Suite from queue");
                 cache.set("execution_queue",queue_list);
             }catch(e){
                 logger.error("Error in triggerExecution. Error: %s",e);
