@@ -3,6 +3,7 @@ var logger = require('../../logger');
 //SOCKET CONNECTION USING SOCKET.IO
 
 var uiConfig = require('./../config/options');
+const eula = uiConfig.showEULA;
 var screenShotPath = uiConfig.screenShotPath;
 var benchmarkRunTimes = uiConfig.benchmarkRuntimes;
 var myserver = require('./../../server');
