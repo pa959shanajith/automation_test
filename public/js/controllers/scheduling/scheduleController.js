@@ -434,8 +434,8 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 
 	//select parallel execution
 	$(document).on("click", ".selectParallel", function () {
-		$(this).find("img").toggleClass("sb");
-		if ($("img").hasClass('sb') == true) execAction = "parallel";
+		$('.selectParallel').find("img").toggleClass("sb");
+		if ($('.selectParallel').find("img").hasClass('sb') == true) execAction = "parallel";
 		else execAction = "serial";
 	});
 
