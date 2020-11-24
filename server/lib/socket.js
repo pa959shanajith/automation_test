@@ -1,14 +1,12 @@
 
-var logger = require('../../logger');
-//SOCKET CONNECTION USING SOCKET.IO
-
-var uiConfig = require('./../config/options');
+const uiConfig = require('./../config/options');
+const screenShotPath = uiConfig.screenShotPath;
+const benchmarkRunTimes = uiConfig.benchmarkRuntimes;
 const eula = uiConfig.showEULA;
-var screenShotPath = uiConfig.screenShotPath;
-var benchmarkRunTimes = uiConfig.benchmarkRuntimes;
-var myserver = require('./../../server');
-var httpsServer = myserver.httpsServer;
-var io = require('socket.io').listen(httpsServer, { cookie: false, pingInterval: uiConfig.socketio.pingInterval, pingTimeout: uiConfig.socketio.pingTimeout });
+const httpsServer = require('./../../server').httpsServer;
+
+//SOCKET CONNECTION USING SOCKET.IO
+const io = require('socket.io').listen(httpsServer, { cookie: false, pingInterval: uiConfig.socketio.pingInterval, pingTimeout: uiConfig.socketio.pingTimeout });
 
 let socketMap = {};
 let userICEMap={};
@@ -17,18 +15,17 @@ let socketMapScheduling = {};
 let socketMapNotify = {};
 
 module.exports = io;
-module.exports.allSocketsICEUser=userICEMap;
 module.exports.allSocketsMap = socketMap;
+module.exports.allSocketsICEUser=userICEMap;
 module.exports.allSocketsMapUI = socketMapUI;
 module.exports.allSchedulingSocketsMap = socketMapScheduling;
 module.exports.socketMapNotify = socketMapNotify;
-var notificationMsg = require('./../notifications').broadcast;
-var epurl = process.env.DAS_URL;
-var Client = require("node-rest-client").Client;
-var apiclient = new Client();
+
+var logger = require('../../logger');
 var redisServer = require('./redisSocketHandler');
 var utils = require('./utils');
-var cache = require('./cache')
+var notificationMsg = require('./../notifications').broadcast;
+const cache = require("./cache")
 
 io.on('connection', async socket => {
 	logger.info("Inside Socket connection");

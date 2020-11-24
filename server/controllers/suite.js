@@ -427,7 +427,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 					errMsg = "This scenario was skipped " + errMsg;
 					let report_result = {};
 					report_result["status"] = execStatus
-					report_result["testSuiteIds"] = execReq["suitedetails"]
+					report_result["testSuiteDetails"] = execReq["suitedetails"]
 					await updateSkippedExecutionStatus(execReq, userInfo, execStatus, errMsg);
 					if (resSent && notifySocMap[username] && notifySocMap[username].connected) {
 						notifySocMap[username].emit(execStatus);
@@ -503,7 +503,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 						let result = status;
 						let report_result = {};
 						report_result["status"] = status
-						report_result["testSuiteIds"] = execReq["suitedetails"]
+						report_result["testSuiteDetails"] = execReq["suitedetails"]
 						if (resultData.userTerminated) result = "UserTerminate";
 						if (execType == "API") result = [d2R, status];
 						if (resSent && notifySocMap[username] && notifySocMap[username].connected) { // This block is only for active mode

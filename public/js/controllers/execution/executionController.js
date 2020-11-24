@@ -98,7 +98,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					//<img class='expandTable' src='imgs/icon-minus.png'>
 
 					var row = $("#executionDataTable_" + m).find('tbody');
-					console.log("row", row);
 					var count = 1;
 
 					//Building object for each row after getting the data from server
@@ -739,6 +738,17 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			allocateICEPopup()
 		}
 	};
+
+	function openModelPopup(modalId, title, body) {
+		var modalBox = $("#" + modalId);
+		modalBox.find('.modal-title').text(title);
+		modalBox.find('.modal-body p').text(body);
+		modalBox.modal("show");
+		setTimeout(function () {
+			modalBox.find('.btn-default').focus();
+		}, 300);
+	}
+
 	const allocateICEPopup = () =>{
 		var projId = JSON.parse(window.localStorage['_CT']).testSuiteDetails[0].projectidts
 		var data = {poolid:"",projectids: [projId]}

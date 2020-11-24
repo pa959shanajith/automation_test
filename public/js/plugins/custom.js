@@ -531,8 +531,6 @@ function p_redirect(name){
 		}else{
 			window.localStorage.setItem('redirectedReportObj',window.localStorage['_CT']);
 		}
-	}if(name == "c"){
-		alert("hi")
 	}
 	window.location.assign(name);
 }

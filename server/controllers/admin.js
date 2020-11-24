@@ -11,7 +11,7 @@ const validator =  require('validator');
 const logger = require('../../logger');
 const utils = require('../lib/utils');
 const notifications = require('../notifications');
-
+const queue = require("../lib/executionQueue")
 
 //GetUserRoles
 exports.getUserRoles = async (req, res) => {
@@ -1707,7 +1707,7 @@ exports.provisionICE = async (req, res) => {
 };
 // UI service to create a new ICE pool
 exports.createPool_ICE = async(req,res) => {
-	const fnName = "createPools_ICE"
+	const fnName = "createPools_ICE";
 	logger.info("Inside UI service: " + fnName)
 	try{
 		const poolinfo = req.body.data;
@@ -1720,6 +1720,7 @@ exports.createPool_ICE = async(req,res) => {
 			modifiedon: ""
 		};
 		const result = await utils.fetchData(inputs, "admin/createPool_ICE", fnName);
+		if(result && result != "fail") queue.Execution_Queue.updatePools("create",poolinfo);
 		res.send(result);
 	}catch (exception){
 		logger.error("Error occurred in admin/createPools_ICE:", exception);
@@ -1774,6 +1775,7 @@ exports.updatePool = async(req,res) => {
 
 		};
 		const result = await utils.fetchData(inputs, "admin/updatePool_ICE", fnName);
+		if(result && result != "fail") queue.Execution_Queue.updatePools("update",poolinfo);
 		res.send(result);
 	}catch (exception){
 		logger.error("Error occurred in admin/provisionICE:", exception);
@@ -1826,6 +1828,7 @@ exports.deletePools = async(req,res) => {
 			poolids: poolinfo.poolid,
 		};
 		const result = await utils.fetchData(inputs, "admin/deleteICE_pools", fnName);
+		if(result && result != "fail") queue.Execution_Queue.updatePools("delete",poolinfo);
 		res.send(result);
 	}catch (exception){
 		logger.error("Error occurred in admin/deletePools:", exception);
