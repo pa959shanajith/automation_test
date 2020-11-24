@@ -827,7 +827,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			unblockUI();
 			$rootScope.resetSession.end();
 			executionActive = false;
-			console.log(data)
 			if("status" in data){
 				if(data.status == "fail"){
 					openDialogExe("Queue Test Suite", data["error"]);

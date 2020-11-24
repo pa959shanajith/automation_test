@@ -215,47 +215,24 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			function(response) { return $q.reject(response.data) });
 		},
 		createPool_ICE: function (data) {
-			// {
-			// 	poolname: "poolinfo.poolname",
-			// 	createdby: "poolinfo.createdby",
-			// 	createdon: "UTC Date string",
-			// 	projectids: [poolinfo.projectids],
-			// 	modifiedby: "",
-			// 	modifiedon: ""
-			// }
 			return $http.post('/createPool_ICE',{
 				data:data
 			}).then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
 		updatePool: function (pool) {
-			// {
-			// 	poolname: "poolinfo.poolname",
-			// 	projectids:[id1,id2],
-			// 	ice_added: [ice.nameA, ice.nameB],
-			// 	ice_deleted: [ice.nameC, ice.nameD],
-			// 	updatedby: "string id"
-			// }
 			return $http.post('/updatePool',{
 				data:pool
 			}).then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
 		getPools: function (data) {
-			// {
-			// 	poolid: "stringID" / "all" / "",   ("all", returns all the pools)
-			// 	projectids: ["id1","id2"] / [],	  (returns all the pools that contain atleast one of these ids)
-			// }
-			// returns either on the basis of poolid or projectids not both, if pool id given projectids should be [] or none, if projectids given pool ids should be "" or none
 			return $http.post('/getPools',{
 				data:data
 			}).then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
 		getICEinPools: function (pool) {
-			// {
-			// 	poolids: poolinfo.poolid,
-			// }
 			return $http.post('/getICEinPools',{
 				data:pool
 			}).then(function(response) { return response.data },
@@ -267,16 +244,12 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			function(response) { return $q.reject(response.data) });
 		},
 		deletePools: function (poolid) {
-			// {
-			// 	poolids:["id1","id2"],
-			// }
 			return $http.post('/deleteICE_pools',{
 				data:poolid
 			}).then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
 		getAvailable_ICE: function () {
-			// {}
 			return $http.post('/getAvailable_ICE').then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
