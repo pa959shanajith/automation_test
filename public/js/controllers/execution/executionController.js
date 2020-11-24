@@ -944,8 +944,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	//select parallel execution
 	$(document).on("click", ".selectParallel", function () {
 		$(this).find("img").toggleClass("sb");
-		$(this).find("svg").toggleClass("sb");
-		if ($("img").hasClass('sb') == true || $("svg").hasClass('sb') == true) {
+		// $(this).find("svg").toggleClass("sb");
+		if ($("img").hasClass('sb') == true){// || $("svg").hasClass('sb') == true) {
 			execAction = "parallel";
 		} else {
 			execAction = "serial";
