@@ -411,4 +411,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			openModelPopup("switchRoleStatus", "Download Avo Assure ICE", "Package is not available");
 		}
 	}
+	$scope.redirectToNeuronGraphs = function() {
+		window.location.href='/neuronGraphs/';
+	}
 });
