@@ -263,7 +263,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
 						'js/directives/headerDirective.js',	
-						'css/css_QC/qcStyle.css',
+						'css/css_QC/qtestStyle.css',
 						'js/factories/socketFactory.js',
 						'js/controllers/chatbot/chatbotController.js',
 						'js/controllers/chatbot/chatbotService.js',
@@ -271,6 +271,26 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/controllers/header/headerController.js',
 						'js/controllers/qtest/qtestController.js',
 						'js/controllers/qtest/qtestService.js'
+                    ]);
+                }]
+            }
+		})
+		.state('zephyr', {
+            url: '/p_Zephyr',
+            templateUrl: 'partials/zephyr.html',
+            controller: 'zephyrController',
+            resolve: {
+                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+						'js/directives/headerDirective.js',	
+						'css/css_QC/zephyrStyle.css',
+						'js/factories/socketFactory.js',
+						'js/controllers/chatbot/chatbotController.js',
+						'js/controllers/chatbot/chatbotService.js',
+						'js/controllers/login/loginService.js',						
+						'js/controllers/header/headerController.js',
+						'js/controllers/zephyr/zephyrController.js',
+						'js/controllers/zephyr/zephyrService.js'
                     ]);
                 }]
             }
@@ -369,12 +389,13 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
             }
 		});
 }])
-.run(function($rootScope, $location, headerServices){
+.run(function($rootScope, $location, headerServices, socket) {
 	$rootScope.redirectPage = function(){
 		unblockUI();
 		$(".btn-accept").click();
 		$(".modal-backdrop.fade.in").remove();
 		window.localStorage.clear();
+		$rootScope.socket.disconnect();
 		headerServices.logoutUser()
 		.then(function(data){
 			$location.path('/');

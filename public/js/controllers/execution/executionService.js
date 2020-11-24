@@ -80,18 +80,32 @@ mySPA.factory('ExecutionService', ['$http','$q', function ($http,$q)   {
 			.then (function(response)	{return response.data;	},
 			function(response){	return $q.reject(response.data);});	
 		},
-		loginQTestServer_ICE: function(qcURL,qcUserName,qcPassword, qcType){
+		loginQTestServer_ICE: function(qcURL,qcUserName,qcPassword, integrationType){
     		var param = "loginToQTest_ICE";
 	        return $http.post('/loginToQTest_ICE', {
 				action: param,
               	qcURL: qcURL,
 				qcUsername: qcUserName,
 				qcPassword : qcPassword,
-				qcType : qcType,
+				integrationType : integrationType,
 				qcaction: "domain"
 	        })
 			.then (function(response)	{return response.data;	},
 			function(response){	return $q.reject(response.data);});	
-		},
+    	},
+		loginZephyrServer_ICE: function(zephyrAccNo,zephyrAcKey,zephyrSecKey, integrationType){
+    		var param = "loginToZephyr_ICE";
+	        return $http.post('/loginToZephyr_ICE', {
+				action: param,
+				zephyrAccNo: zephyrAccNo,
+				zephyrAcKey: zephyrAcKey,
+				zephyrSecKey : zephyrSecKey,
+				integrationType : integrationType,
+				execFlag: "1",
+				zephyraction: "domain"
+	        })
+			.then (function(response)	{return response.data;	},
+			function(response){	return $q.reject(response.data);});	
+    	}
 	}
 }]);
