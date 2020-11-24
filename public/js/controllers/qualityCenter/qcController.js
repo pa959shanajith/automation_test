@@ -409,18 +409,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			$('.almtestScenariolink').find(".viewUndoSyncronise").hide();
 			$('.almtestScenariolink label').removeClass("selectedToMap");
 			$(this).css({"background-color": "#c8c8ff"});
-			// var imgArUp = $(this).children(".arrowup");
-			// if(imgArUp.length != 0) {
-			// 	var styleup = imgArUp[0].style["cssText"];
-			// 	var styleDn = $(this).children(".arrowdown")[0].style["cssText"];
-			// 	$(this).find(".arrowup").hide();
-			// 	$(this).find(".arrowdown").hide();
-			// }
 			$(this).find(".viewUndoSyncronise").show();
-			// if(imgArUp.length != 0) {
-			// 	$(this).children(".arrowdown")[0].setAttribute("style",styleDn);
-			// 	$(this).children(".arrowup")[0].setAttribute("style",styleup);
-			// }
 			$(this).addClass("selectedToMap");
 		} else if($(this).hasClass("selectedToMap")) {
 			$(this).removeClass("selectedToMap");
@@ -510,7 +499,6 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		var undoMapItems = $(".selectedToMap");
 		for (var i=0;i<undoMapItems.length;++i) {
 			var mapid = undoMapItems[i].parentElement.getAttribute("data-mapid");
-			//get scenid or testcsaseid.. get class for each
 
 			//scenid
 			if(undoMapItems[i].classList.contains('almtestScenariolink')) {
@@ -588,13 +576,11 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				}
 				else if(data == "success"){
 					undoMapList = [];
-					//mappedList = [];
 					$('.almtestScenariolink, .almtestcaselink').removeClass("selectedToMap");
 					$('.almtestScenariolink').find(".viewUndoSyncronise").hide();
 					$('.almtestcaselink').find(".viewUndoSyncronise").hide();
 					$('.almtestcaselink').css({"background-color":"#fad7f1fb"});
 					$('.almtestScenariolink').css({"background-color": "#E1CAFF"});
-					// $('.testcaselink, .testScenariolink').prop("style","background-color:none;border-radius:0px;");
 					openModelPopup("Save Mapped Testcase", "Saved successfully");
 				}
 			},
@@ -606,7 +592,6 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 
 	// Undo Mapping
 	$(document).on('click', ".qcUndoSyncronise", function(){
-	// var selectedToMap = $(".selectedToMap")
 	var selectedToMap = $(".qcTreeContainer").find(".selectedToMap")
 	var qcTestcase = []
 	for(var i=0;i<selectedToMap.length;i++){
@@ -619,17 +604,13 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			if(qcTestsetName == mappedList[i].testset){
 				delete mappedList[i];
 				mappedList =  mappedList.filter(function(n){ return n != null; });
-				// $('.testScenariolink').removeClass("selectedToMap");
-				// $('.testScenariolink').prop("style","background-color:none;border-radius:0px;");
 				var selectedList = $(".selectedToMap").siblings("label").prevObject
 				for(var i=0;i<selectedList.length;i++){
 					selectedList[i].style.cssText = "background-color: rgb(225, 202, 255)";
 					selectedList[i].children[2].style.cssText="display:inline";
 				}
-				// break;
 				}
 			}
-		// }
 		}
 	});
 
@@ -646,14 +627,12 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		var avoAssureScenarioList = []
 		var scenarioElements = $(".qcAvoAssureTreeContainer").find(".selectedToMap");
 		for(var i=0;i<scenarioElements.length;i++){
-			// var cur_obj =  scenarioElements[i].scenarioid
 			var cur_obj = scenarioElements[i].getAttribute("data-scenarioid")
 			avoAssureScenarioList.push(cur_obj)
 		}
 
 		var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
 		var qcFolderPath = $(this).parent("li").parent("ul").prev("li").parent("ul").prev("li").data("folderpath");
-		// var AvoAssureScenarioId = $(".qcAvoAssureTreeContainer").find(".selectedToMap").data("scenarioid");
 		
 		if(qcTestcaseNameList.length>1 && avoAssureScenarioList.length>1) {
 			openModelPopup("Save Mapped Testcase","Cannot map multiple test cases with multiple scenarios")
@@ -662,7 +641,6 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		else if(!getProjectName)	openModelPopup("Save Mapped Testcase", "Please select project");
 		else if(!qcTestcaseNameList)	openModelPopup("Save Mapped Testcase", "Please select Testcase");
 		else if(!qcTestsetName)	openModelPopup("Save Mapped Testcase", "Please select Testset");
-		// else if(!AvoAssureScenarioId)	openModelPopup("Save Mapped Testcase", "Please select scenario");
 		else if(!avoAssureScenarioList)  openModelPopup("Save Mapped Testcase", "Please select Scenario");
 		else{
 			mappedList.push({
@@ -697,7 +675,6 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				}
 				else if(data == "success"){
 					mappedList = [];
-					//mappedList = [];
 					$('.testcaselink, .testScenariolink').removeClass("selectedToMap");
 					$('.testcaselink').find(".qcSyncronise, .qcUndoSyncronise").hide();
 					$('.testcaselink, .testScenariolink').prop("style","background-color:none;border-radius:0px;");
@@ -715,7 +692,6 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		var userid = JSON.parse(window.localStorage['_UI']).user_id;
 		qcServices.viewQcMappedList_ICE(userid)
 		.then(function(data){
-			// var selectOptions = $("#selAssignUser option:not(:first)");
 			data.sort(function(a,b) {
 				if (a.qctestcase > b.qctestcase) return 1;
 			    else if (a.qctestcase < b.qctestcase) return -1;
@@ -724,7 +700,6 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			if(data.length > 0){
 				$(".qcActionBtn, .leftQcStructure, .rightQcStructure").hide();
 				$("#page-taskName span").text("Mapped Files");
-				// style="height:65px;"
 				$('.mappedFiles').off();
 				$(".mappedFiles").empty().show();
 				$('.mappedFiles').removeClass('scroll-wrapper');
