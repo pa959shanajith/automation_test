@@ -541,7 +541,7 @@ if (cluster.isMaster) {
 		app.post('/qcProjectDetails_ICE', qc.qcProjectDetails_ICE);
 		app.post('/qcFolderDetails_ICE', qc.qcFolderDetails_ICE);
 		app.post('/saveQcDetails_ICE', qc.saveQcDetails_ICE);
-		app.post('/saveUnsyncDetails', qc.saveUnsyncDetails);
+		app.post('/saveUnsyncDetails', auth.protect, qc.saveUnsyncDetails);
 		app.post('/viewQcMappedList_ICE', qc.viewQcMappedList_ICE);
 		//qTest Plugin
 		app.post('/loginToQTest_ICE', qtest.loginToQTest_ICE);

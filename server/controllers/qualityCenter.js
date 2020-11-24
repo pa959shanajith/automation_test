@@ -366,7 +366,6 @@ exports.saveQcDetails_ICE = function (req, res) {
 		var qctestset = itr.testset;
 		var inputs = {
 			"testscenarioid": testscenarioid,
-			// "qcdetailsid": testscenarioid,
 			"qcdomain": qcdomain,
 			"qcfolderpath": qcfolderpath,
 			"qcproject": qcproject,
@@ -413,42 +412,22 @@ exports.saveQcDetails_ICE = function (req, res) {
 	});
 };
 
-exports.saveUnsyncDetails = function(req, res) {
-	logger.info("Inside UI service: saveUnsyncDetails");
-	var undoMapList = req.body.undoMapList;
-	var flag = true;
-	if (undoMapList.length > 0) {
-		flag = true;
-	} else {
-		flag = false;
-	}
-	if (utils.isSessionActive(req)) {
-			var inputs = {
-				"mapList": undoMapList,
-				"query": "updateMapDetails_ICE"
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling DAS Service: qualityCenter/updateMapDetails_ICE");
-			client.post(epurl + "qualityCenter/updateMapDetails_ICE", args,
-				function (qcdetailsows, response) {
-				if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
-					logger.error("Error occurred in updateMapDetails_ICE Error Code : ERRDAS");
-					flag = false;
-				}
-			});
-		if (flag) {
-			res.send("success");
-		} else {
-			res.send("fail");
-		}
-	} else {
-		logger.info("Invalid Session");
-		res.send("Invalid Session");
+exports.saveUnsyncDetails = async (req, res) => {
+	const fnName = "saveUnsyncDetails";
+	try {
+		logger.info("Inside UI service: " + fnName);
+		const undoMapList = req.body.undoMapList;
+		if (undoMapList.length > 0) return res.send("fail");
+		const inputs = {
+			"mapList": undoMapList,
+			"query": "updateMapDetails_ICE"
+		};
+		const result = await utils.fetchData(inputs, "qualityCenter/updateMapDetails_ICE", fnName);
+		if (result == "fail") return res.send("fail");
+		else return res.send("success");
+	} catch (e) {
+		logger.error("Error in %s service. Error: %s", fnName, ex)
+		res.send("fail");
 	}
 };
 
@@ -507,66 +486,56 @@ function getQcDetailsForUser(userid, cb) {
 		},
 		qcdetails: function (callback1) {
 			logger.info("Inside function qcdetails");
-			// async.forEachSeries(scenarios_list, function (itr, callback2) {
-				var inputs = {
-					// "testscenarioid": itr._id,
-					"query": "qcdetails"
-				};
-				var args = {
-					data: inputs,
-					headers: {
-						"Content-Type": "application/json"
-					}
-				};
-				logger.info("Calling DAS Service from qcdetails: qualityCenter/viewIntegrationMappedList_ICE");
-				client.post(epurl + "qualityCenter/viewIntegrationMappedList_ICE", args,
-					function (qcdetailsows, response) {
-					if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
-						logger.error("Error occurred in qualityCenter/viewIntegrationMappedList_ICE from qcdetails Error Code : ERRDAS");
-					} else {
-						if (qcdetailsows.rows.length != 0) {
-							for(var i=0;i<qcdetailsows.rows.length;i++){
-								qcdetails = JSON.parse(JSON.stringify(qcdetailsows.rows[i]));
-								qcdetails.testscenarioname = [];
-								var testscenarios = qcdetails.testscenarioid;
-								if(Array.isArray(testscenarios)) {
-									for(var j=0;j<testscenarios.length;++j){
-										flag = false;
-										for(var k=0;k<projectDetailsList.length;++k) {
-											if(projectDetailsList[k]._id == testscenarios[j]) {
-												qcdetails.testscenarioname.push(projectDetailsList[k].name);
-												flag = true;
-												break;
-											} 
-										}
-										if(!flag) {
-											qcdetails.testscenarioid.splice(j,1);
-										}
-									}
-									if(qcdetails.testscenarioname.length != 0){
-										qcDetailsList.push(qcdetails);
-									}
-								} else {
+			var inputs = {
+				"query": "qcdetails"
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			logger.info("Calling DAS Service from qcdetails: qualityCenter/viewIntegrationMappedList_ICE");
+			client.post(epurl + "qualityCenter/viewIntegrationMappedList_ICE", args,
+				function (qcdetailsows, response) {
+				if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
+					logger.error("Error occurred in qualityCenter/viewIntegrationMappedList_ICE from qcdetails Error Code : ERRDAS");
+				} else {
+					if (qcdetailsows.rows.length != 0) {
+						for(var i=0;i<qcdetailsows.rows.length;i++){
+							qcdetails = JSON.parse(JSON.stringify(qcdetailsows.rows[i]));
+							qcdetails.testscenarioname = [];
+							var testscenarios = qcdetails.testscenarioid;
+							if(Array.isArray(testscenarios)) {
+								for(var j=0;j<testscenarios.length;++j){
+									flag = false;
 									for(var k=0;k<projectDetailsList.length;++k) {
-										if(projectDetailsList[k]._id == testscenarios) {
+										if(projectDetailsList[k]._id == testscenarios[j]) {
 											qcdetails.testscenarioname.push(projectDetailsList[k].name);
-											qcDetailsList.push(qcdetails);
-										}
+											flag = true;
+											break;
+										} 
+									}
+									if(!flag) {
+										qcdetails.testscenarioid.splice(j,1);
 									}
 								}
-								// qcDetailsList.push(qcdetails);
+								if(qcdetails.testscenarioname.length != 0){
+									qcDetailsList.push(qcdetails);
+								}
+							} else {
+								for(var k=0;k<projectDetailsList.length;++k) {
+									if(projectDetailsList[k]._id == testscenarios) {
+										qcdetails.testscenarioname.push(projectDetailsList[k].name);
+										qcDetailsList.push(qcdetails);
+									}
+								}
 							}
-							// qcdetails.testscenarioname = itr.name;
-							// projectDetails.project_id = projectid;
-							// projectDetails.scenario_details = scenarios_list;
-							// projectDetails.project_name = projectname;
-							// qcDetailsList.push(qcdetails);
 						}
 					}
-					callback1();
-				});
-			// }, callback1); 
-			// callback1();
+				}
+				callback1();
+			});
 		},
 		data: function (callback1) {
 			cb(qcDetailsList);

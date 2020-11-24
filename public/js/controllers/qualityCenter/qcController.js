@@ -397,7 +397,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		// } else {
 		// 	$('.testScenariolink').prop("style","background-color:none;border-radius:0px;");
 		// 	$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
-		// }		
+		// }
 	});
 
 	$(document).on('click','.almtestScenariolink', function(e){
