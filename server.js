@@ -100,6 +100,7 @@ if (cluster.isMaster) {
 		app.use("/imgs", express.static(__dirname + "/public/imgs"));
 		app.use("/css", express.static(__dirname + "/public/css"));
 		app.use("/fonts", express.static(__dirname + "/public/fonts"));
+		app.use("/neuronGraphs", express.static(__dirname + "/public/neurongraphs"));
 
 		app.use(bodyParser.json({
 			limit: '50mb'
@@ -288,9 +289,15 @@ if (cluster.isMaster) {
 			var roles = ["Test Manager", "Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
+		
+		//Test Lead and Test Manager can access
+		app.get(/^\/(neuronGraphs)$/, function(req, res) {
+			var roles = ["Test Manager", "Test Lead"]; //Allowed roles
+			res.sendFile("index.html", { root: __dirname + "/public/neurongraphs/" });
+		});
 
 		//Test Lead and Test Manager can access
-		app.get(/^\/(p_Webocular|neuronGraphs|p_ALM|p_APG|p_Integration|p_qTest|p_Zephyr)$/, function(req, res) {
+		app.get(/^\/(p_Webocular|p_ALM|p_APG|p_Integration|p_qTest|p_Zephyr)$/, function(req, res) {
 			var roles = ["Test Manager", "Test Lead"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
@@ -527,6 +534,8 @@ if (cluster.isMaster) {
 		app.post('/updateFrequency_ProfJ', chatbot.updateFrequency_ProfJ);
 		//NeuronGraphs Plugin Routes
 		app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
+		app.post('/getReport_NG', neuronGraphs2D.getReportNG);
+		app.post('/getReportExecutionStatus_NG', neuronGraphs2D.getReportExecutionStatusNG);
 		//QC Plugin
 		app.post('/loginQCServer_ICE', qc.loginQCServer_ICE);
 		app.post('/qcProjectDetails_ICE', qc.qcProjectDetails_ICE);
