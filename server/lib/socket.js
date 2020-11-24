@@ -1,33 +1,6 @@
-const uiConfig = require('./../config/options');
-const screenShotPath = uiConfig.screenShotPath;
-const benchmarkRunTimes = uiConfig.benchmarkRuntimes;
-const eula = uiConfig.showEULA;
-const httpsServer = require('./../../server').httpsServer;
-
-//SOCKET CONNECTION USING SOCKET.IO
-const io = require('socket.io').listen(httpsServer, { cookie: false, pingInterval: uiConfig.socketio.pingInterval, pingTimeout: uiConfig.socketio.pingTimeout });
-
-let socketMap = {};
-let userICEMap={};
-let socketMapUI = {};
-let socketMapScheduling = {};
-let socketMapNotify = {};
-
-module.exports = io;
-module.exports.allSocketsMap = socketMap;
-module.exports.allSocketsICEUser=userICEMap;
-module.exports.allSocketsMapUI = socketMapUI;
-module.exports.allSchedulingSocketsMap = socketMapScheduling;
-module.exports.socketMapNotify = socketMapNotify;
 
 var logger = require('../../logger');
-
 //SOCKET CONNECTION USING SOCKET.IO
-var socketMap = {};
-var userICEMap={};
-var socketMapUI = {};
-var socketMapScheduling = {};
-var socketMapNotify = {};
 
 var uiConfig = require('./../config/options');
 var screenShotPath = uiConfig.screenShotPath;
@@ -36,6 +9,11 @@ var myserver = require('./../../server');
 var httpsServer = myserver.httpsServer;
 var io = require('socket.io').listen(httpsServer, { cookie: false, pingInterval: uiConfig.socketio.pingInterval, pingTimeout: uiConfig.socketio.pingTimeout });
 
+let socketMap = {};
+let userICEMap={};
+let socketMapUI = {};
+let socketMapScheduling = {};
+let socketMapNotify = {};
 
 module.exports = io;
 module.exports.allSocketsICEUser=userICEMap;
