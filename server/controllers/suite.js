@@ -76,17 +76,18 @@ exports.readTestSuite_ICE = async (req, res) => {
 
 exports.getICE_list = async (req,res) => {
 	projectid = req.body.projectid;
-	const ice_status = await getICEList(projectid);
+	const ice_status = await getICEList(projectid,req.session.userid);
 	if(!ice_status || !ice_status['ice_list']){
 		res.send("fail");
 	}
 	res.send(ice_status)
 }
 
-async function getICEList (projectids){
+async function getICEList (projectids,userid){
 	const fnName = "getICEList";
 	var ice_list = [];
 	var ice_status = {}
+	var userICE = {}
 	var result = {ice_ids:{}}
 	result["ice_list"] = []
 	try{
@@ -94,8 +95,14 @@ async function getICEList (projectids){
 			"projectids":[projectids],
 			"poolid": ""
 		}
-		pool_list = await utils.fetchData(pool_req,"admin/getPools",fnName);
 		
+		pool_list = await utils.fetchData(pool_req,"admin/getPools",fnName);
+		const user_ICE_req = {
+			"userid" : userid,
+			"poolids": Object.keys(pool_list)
+		}
+		userICE = await utils.fetchData(user_ICE_req, "admin/getICE_userid");
+		if(!userICE || userICE === "fail") useriCE = {}
 		for(index in pool_list){
 			pool = pool_list[index];
 			const ice_req = {
@@ -122,6 +129,7 @@ async function getICEList (projectids){
 				}
 			}
 			result["ice_list"] = ice_list;
+			result["user_ice"] = userICE;
 		}
 	}catch(e){
 		logger.error("Error occurred in getICEList, Error: %s",e);
