@@ -321,9 +321,6 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 			} else if(data == "fail") {
 				openModalPopup("Schedule", "Failed to fetch ICE.");
 				unblockUI()
-			} else if(Object.keys(data).length  == 0) {
-				openModalPopup("Schedule", "There are no ICE to schedule.");
-				unblockUI()
 			} else {
 				$scope.poolList = data
 				var arr = Object.entries(data)
@@ -335,6 +332,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 				.then(function(data){
 					$scope.iceStatus = data
 					populateICElist(arr,true)
+					$('#selectIcePoolIce').modal("show")
 					unblockUI()
 				}).catch(error=>{
 					unblockUI()
@@ -348,7 +346,6 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 			openModalPopup("Edit User", "Failed to fetch users.");
 		});
 		$scope.smartBatch = smartBatch
-		$('#selectIcePoolIce').modal("show")
 		return;
 	}
 

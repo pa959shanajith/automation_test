@@ -755,9 +755,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			} else if(data == "fail") {
 				openDialogExe("Suite Execution", "Failed to fetch users.");
 				unblockUI();
-			} else if(Object.keys(data).length == 0) {
-				openDialogExe("Suite Execution", "ICE is not available");
-				unblockUI();
 			} else {
 				$scope.poolList = data
 				var arr = Object.entries(data)
@@ -766,11 +763,11 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					$("#chooseICEPool").append('<option value='+e[0]+'>'+e[1].poolname+'</option>');
 				})
 				$("#chooseICEPool").val('unallocated')
-				unblockUI()
 				ScheduleService.getICE_list({"projectid":projId})
 				.then(function(data){
 					$scope.iceStatus = data
 					populateICElist(arr,true)
+					$('#selectIcePoolIce').modal("show")
 					unblockUI()
 				}).catch(error=>{
 					unblockUI()
@@ -783,7 +780,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			console.error(error)
 			openDialogExe("Suite Execution", "Failed to fetch ICE.");
 		});
-		$('#selectIcePoolIce').modal("show")
 		return;
 	}
 
