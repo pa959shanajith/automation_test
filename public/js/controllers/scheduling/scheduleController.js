@@ -612,12 +612,12 @@ function openPopup(id) {
 		smartBatch = true;
 		copyId = parseInt(id.replace("mod",""));
 		sequence(true,true,copyId);
-		
 	} else { 
 		smartBatch = false;
 		sequence(false,false,parseInt(id.replace("mod","")));
-	 }
+	}
 }
+
 function sequence(copy,block,id) {
 	var selectall = block; // select all only when blockin
 	for (var i = 0; i < $(".batchSuite").length ; i++) {
@@ -641,15 +641,11 @@ function sequence(copy,block,id) {
 			$(".batchSuite")[i].children[0].children[2].children[0].disabled = false;
 		}
 	}
-	// for (var i = 0; i < $(".batchSuite").find(".selectToSched").length ; i++) {
-	// 	if(selectall && copy){ 
-	// 		$(".batchSuite").find(".selectToSched")[i].checked = true;
-	// 	}
-
-
-	// }
-	
-
+	/* for (var i = 0; i < $(".batchSuite").find(".selectToSched").length ; i++) {
+		if(selectall && copy){ 
+			$(".batchSuite").find(".selectToSched")[i].checked = true;
+		}
+	}*/
 }
 
 function moduleSmartScheduling(){

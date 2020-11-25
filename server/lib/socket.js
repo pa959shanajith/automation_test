@@ -106,6 +106,7 @@ io.on('connection', async socket => {
 			}
 		}
 	}
+
 	httpsServer.setTimeout();
 
 	socket.on('disconnect', async reason => {
@@ -230,5 +231,3 @@ async function sendPendingNotifications(socket,address){
 		}
 }
 module.exports.registerICE = registerICE;
-
-	
