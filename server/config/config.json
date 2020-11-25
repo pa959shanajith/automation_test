@@ -14,5 +14,6 @@
     "screenShotPath": {
         "default": "",
         "mac": ""
-    }
+    },
+    "pingTimer":"120000"
 }

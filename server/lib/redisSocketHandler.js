@@ -7,7 +7,7 @@ const default_pub = redis.createClient(redisConfig);
 const server_sub = redis.createClient(redisConfig);
 var cache = require('../lib/cache')
 var fs = require('fs');
-
+var options = require('../config/options');
 var pulse_ICE = {}
 // cache.select(2);
 const server_pub = default_pub;
@@ -149,7 +149,7 @@ module.exports.redisPubICE = default_pub;
 module.exports.redisSubServer = server_sub;
 //module.exports.redisPubServer = server_pub;
 //module.exports.cache = cache;
-setInterval(check_pulse,120000);
+setInterval(check_pulse,options.pingTimer);
 
 module.exports.initListeners = mySocket => {
 	const username = mySocket.handshake.query.icename;

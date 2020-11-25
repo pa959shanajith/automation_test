@@ -1715,9 +1715,7 @@ exports.createPool_ICE = async(req,res) => {
 			poolname: poolinfo.poolname,
 			createdby: req.session.userid,
 			createdon: "",
-			projectids: poolinfo.projectids,
-			modifiedby: "",
-			modifiedon: ""
+			projectids: poolinfo.projectids
 		};
 		const result = await utils.fetchData(inputs, "admin/createPool_ICE", fnName);
 		if(result && result != "fail") queue.Execution_Queue.updatePools("create",poolinfo);

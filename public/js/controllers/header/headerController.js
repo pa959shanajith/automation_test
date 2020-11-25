@@ -118,8 +118,6 @@ mySPA.controller('headerController', function ($scope, $rootScope, $timeout, $ht
 		}
 	});
 	socket.on('display_execution_popup', (value) => {
-		console.log("reading notifications")
-		console.log(value)
 		var msg = "";
 		for(val in value){
 			var data = value[val].status;
@@ -139,19 +137,14 @@ mySPA.controller('headerController', function ($scope, $rootScope, $timeout, $ht
 		}
 		if(msg && msg.trim() != ""){
 			openDialogExe("Execution Result", msg);
-		}
-		
-		
+		}		
 		
 	});
 
 	socket.on('result_ExecutionDataInfo', function (result) {
-		console.log("reading conn notifications")
 		var data = result.status
 		var testSuiteIds = result.testSuiteDetails;
-		var tempId = "";
 		var msg = "";
-		var testSuite = {}
 		testSuiteIds[0]["projectidts"] = testSuiteIds[0]["projectid"];
 		window.localStorage["report"] = JSON.stringify(result);
 		msg = testSuiteIds[0]["testsuitename"]
