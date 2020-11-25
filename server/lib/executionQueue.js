@@ -162,7 +162,7 @@ module.exports.Execution_Queue = class Execution_Queue {
             } else {
                 //check if target ice is connected but not preset in any pool, execute directly if true
                 if (this.ice_list[targetICE] && this.ice_list[targetICE]["connected"]) {
-                    if (this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokingUser) {
+                    if ((this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokingUser) || !this.ice_list[targetICE]["mode"]) {
                         if (type == "ACTIVE") {
                             this.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
                         } else {
@@ -170,13 +170,12 @@ module.exports.Execution_Queue = class Execution_Queue {
                         }
                     }
                     response['status'] = "pass";
-                    response["message"] = "Execution Started on " + ice_name + " ICE mode: DND"
+                    response["message"] = "Execution Started on " + targetICE;
                 } else {
                     //the target ice is neither part of a pool nor is connected to server, queuing not possible
                     response['status'] = "pass";
                     response["message"] = targetICE + " not connected to server and not part of any pool, connect ICE to server or add ICE to a pool to proceed."
                 }
-
             }
         } catch (e) {
             response["error"] = "Error while adding test suite to queue";
@@ -293,6 +292,10 @@ module.exports.Execution_Queue = class Execution_Queue {
             return result;
         }
         let poolid = this.ice_list[ice_name]["poolid"];
+        if(!poolid){
+            logger.debug(ice_name + " does not belong to any pool.")
+            return;
+        }
         let pool = this.queue_list[poolid];
         var queue = pool["execution_list"];
         //iterate over execution queue 

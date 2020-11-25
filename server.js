@@ -21,7 +21,7 @@ process.env.DAS_URL = epurl;
 var logger = require('./logger');
 var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 
-if (cluster.isMaster && false) {
+if (cluster.isMaster) {
 	cluster.fork();
 	cluster.on('disconnect', function(worker) {
 		logger.error('Avo Assure server has encountered some problems, Disconnecting!');
