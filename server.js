@@ -460,6 +460,7 @@ if (cluster.isMaster) {
 		app.post('/getDetails_ICE', admin.getDetails_ICE);
 		app.post('/assignProjects_ICE', admin.assignProjects_ICE);
 		app.post('/getAssignedProjects_ICE', admin.getAssignedProjects_ICE);
+		app.post('/getAvailablePlugins', auth.protect, admin.getAvailablePlugins);
 		app.post('/manageSessionData', auth.protect, admin.manageSessionData);
 		app.post('/manageUserDetails', auth.protect, admin.manageUserDetails);
 		app.post('/getUserDetails', auth.protect, admin.getUserDetails);

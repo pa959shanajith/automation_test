@@ -316,8 +316,7 @@ module.exports.initListeners = mySocket => {
 		if (result == "fail") logger.error("Error occurred in storing benchmark");
 	});
 	mySocket.on('ICE_status_change', async value => {
-		pulse_ICE[value['icename']] = value
-		pulse_ICE[value['icename']]['username'] = username;
+		pulse_ICE[value['icename']] = value;
 		cache.set("ICE_status",pulse_ICE)
 		const dataToExecute = JSON.stringify({"username" : username,"onAction" : "ice_status_change","value":value,"reqID":new Date().toUTCString()});
 
@@ -341,8 +340,8 @@ function check_pulse(){
 				pulse_ICE[ice]["connected"] = false;
 				cache.set("ICE_status",pulse_ICE)
 				value = pulse_ICE[ice];
-				const dataToExecute = JSON.stringify({"username" : pulse_ICE[ice]['username'],"onAction" : "ice_status_change","value":value});
-				server_pub.publish('ICE2_' + pulse_ICE[ice]['username'], dataToExecute);
+				const dataToExecute = JSON.stringify({"username" : ice,"onAction" : "ice_status_change","value":value});
+				server_pub.publish('ICE2_' + ice, dataToExecute);
 			}else{
 				writeStr = time.toString() + " " + ice + " status: " + pulse_ICE[ice]["status"] + " ICE mode: " + pulse_ICE[ice]["mode"]; 
 				logger.info(writeStr)

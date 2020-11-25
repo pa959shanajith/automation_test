@@ -137,7 +137,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			msg = msg + "\n" + data;
 		}
 		if(msg && msg.trim() != ""){
-			openDialogExe("Execution Result", msg);
+			openModelPopup("executionStatus","Execution Result", msg);
 		}		
 		
 	});
@@ -174,7 +174,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			setTimeout(function () {
 				$("#executionCompleted").find('.btn-default').focus();
 			}, 300);
-		}else openDialogExe("Execute Test Suite", "Failed to execute.");
+		}else openModelPopup("executeStatus","Execute Test Suite", "Failed to execute.");
 	});
 
 	

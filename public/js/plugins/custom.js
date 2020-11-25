@@ -1,5 +1,3 @@
-//import { data } from "node-env-file/lib";
-
 //Window Load Function
 function loadBody(){
 	$("body").delay(400).animate({opacity:"1"});
@@ -367,7 +365,6 @@ function loadUserTasks(){
 	$(".task-content-inner").empty().hide();
 	var counter = 1;
 	var lenght_tasksJson=tasksJson.length;
-	var suites = {};
 	for(i=0; i<lenght_tasksJson; i++) {
 		var classIndex = i<100 ? "tasks-l-s": i<1000? "tasks-l-m" : "tasks-l-l";
 		var lenght_taskDetails=tasksJson[i].taskDetails.length;
@@ -403,19 +400,7 @@ function loadUserTasks(){
 				'releaseid':tasksJson[i].taskDetails[j].releaseid,
 				'cycleid':tasksJson[i].taskDetails[j].cycleid,
 				'reuse':tasksJson[i].taskDetails[j].reuse
-			}
-			var tempId = ""
-			suiteDetails = JSON.parse(testSuiteDetails);
-			for(id in suiteDetails){
-				var name = suiteDetails[id].testsuitename;
-				suites[name] = {};
-				suites[name]["testSuiteDetails"] = suiteDetails;
-				suites[name]["projectidts"] = tasksJson[id].projectId;
-				suites[name]["cycleid"] = suiteDetails[id].cycleid;
-				suites[name]['releaseid'] = suiteDetails[id].releaseid;
-			}
-
-			window.localStorage["_ST"] = JSON.stringify(suites);
+			};
 			dataobj = JSON.stringify(dataobj);
 			$('.task-content-inner').append("<div class='panel panel-default' panel-id='"+i+"'><div id='panelBlock_"+i+"' class='panel-heading'><div class='taskDirection' href='#collapse" + counter + "'><h4 class='taskNo-Inner-Pgs "+classIndex+" taskRedir'>" + counter + "</h4><span class='assignedTask-Inner-Pgs assignedTaskInner' data-testsuitedetails='"+testSuiteDetails+"' data-dataobj='"+dataobj+"' onclick='taskRedirectionInner(this.dataset.testsuitedetails,this.dataset.dataobj)'>" + taskname + "</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype-Inner-Pgs'>" + tasktype + "</button></div><!--Addition--></div></div></div>").fadeIn();
 			var limit = 45;

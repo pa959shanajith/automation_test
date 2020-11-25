@@ -1,4 +1,3 @@
-
 const uiConfig = require('./../config/options');
 const screenShotPath = uiConfig.screenShotPath;
 const benchmarkRunTimes = uiConfig.benchmarkRuntimes;
@@ -35,7 +34,6 @@ io.on('connection', async socket => {
 		logger.info("Socket request from UI");
 		address = socket.request._query.username;
 		logger.info("Socket connecting address %s", address);
-		
 		socketMapUI[address] = socket;
 		socket.emit("connectionAck", "Success");
 	} else if (socket.request._query.check == "notify") {
