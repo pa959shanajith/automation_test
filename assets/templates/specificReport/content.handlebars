@@ -1004,6 +1004,9 @@
             <input id="scrShotChk" type="checkbox" title="Include Screenshots in PDF" style="height:12px;margin:0" checked="true">
             <img alt="Save PDF" class="export-icons" data-rep="pdf" src="../imgs/ic-pdf.png" title="Save PDF Report">
             <img alt="Export JSON" class="export-icons" data-rep="json" style="" src="../imgs/ic-export-to-json.png" title="Export to JSON">
+            {{#ifnotEquals video '-'}}
+               <img alt="Export mp4" class="export-icons" data-rep="mp4" data-path={{video}} style="" src="" title="Download Screen Recording">
+            {{/ifnotEquals}}
          </div>
       </div>
       <button class="collapsible">

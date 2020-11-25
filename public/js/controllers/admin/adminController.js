@@ -1129,7 +1129,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				.then(function (data) {
 					if (data == "Invalid Session") {
 						$rootScope.redirectPage();
-					}else if (data == "fail") openModalPopup("Fail", "Error while exporting to excel");
+					}else if (data == "fail") openModalPopup("Fail", "Error while exporting to zip");
 					else {
 						openWindow = 0;
 						if (openWindow == 0) {

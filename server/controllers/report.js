@@ -209,6 +209,7 @@ const prepareReportData = (reportData, embedImages) => {
     report.overallstatus[0].date = endDate && (endDate[1] + "/" + endDate[2] + "/" + endDate[0]) || '-';
     report.overallstatus[0].time = endTimeStamp.split(" ")[1] || '-';
     report.overallstatus[0].EllapsedTime = "~" + ("0" + elapTime[0]).slice(-2) + ":" + ("0" + elapTime[1]).slice(-2) + ":" + ("0" + elapTime[2]).slice(-2)
+    report.overallstatus[0].video = report.overallstatus[0].video || '-'
 
     report.rows.forEach((row, i) => {
         row.slno = i + 1;
@@ -950,5 +951,28 @@ function validateData(content, type) {
             return validator.isEmail(content);
         case "json":
             return validator.isJSON(content);
+    }
+}
+
+exports.downloadVideo = function(req, res) {
+    logger.info("Inside UI service: downloadVideo");
+    try {
+        if (utils.isSessionActive(req)) {
+            const d = req.body;
+            const videoPath = d.videoPath;
+            if (fs.existsSync(videoPath)) {
+                res.writeHead(200, {
+                    'Content-Type': 'video/mp4',
+                });
+                var filestream = fs.createReadStream(videoPath);
+                filestream.pipe(res);
+            } else{
+                logger.error("Requested video file is not available");
+                res.send("fail");
+            }
+        }
+    } catch (exception) {
+        logger.error("Exception in the service downloadVideo - Error: %s", exception);
+        res.send("fail");
     }
 }
