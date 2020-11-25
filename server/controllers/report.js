@@ -954,25 +954,23 @@ function validateData(content, type) {
     }
 }
 
-exports.downloadVideo = function(req, res) {
-    logger.info("Inside UI service: downloadVideo");
+exports.downloadVideo = async (req, res) => {
+    const fnName = "downloadVideo";
+    logger.info("Inside UI service: " + fnName);
     try {
-        if (utils.isSessionActive(req)) {
-            const d = req.body;
-            const videoPath = d.videoPath;
-            if (fs.existsSync(videoPath)) {
-                res.writeHead(200, {
-                    'Content-Type': 'video/mp4',
-                });
-                var filestream = fs.createReadStream(videoPath);
-                filestream.pipe(res);
-            } else{
-                logger.error("Requested video file is not available");
-                res.send("fail");
-            }
+        const videoPath = req.body.videoPath;
+        if (fs.existsSync(videoPath)) {
+            res.writeHead(200, {
+                'Content-Type': 'video/mp4',
+            });
+            const filestream = fs.createReadStream(videoPath);
+            filestream.pipe(res);
+        } else {
+            logger.error("Requested video file '%s' is not available", videoPath);
+            return res.status(404).send("fail");
         }
     } catch (exception) {
-        logger.error("Exception in the service downloadVideo - Error: %s", exception);
+        logger.error("Exception in the service %s - Error: %s", fnName, exception);
         res.send("fail");
     }
 }
