@@ -331,8 +331,8 @@ const insertReport = async (executionid, scenarioId, browserType, userInfo, repo
 		"browser": browserType,
 		"status": reportData.overallstatus[0].overallstatus,
 		"report": JSON.stringify(reportData),
-		"modifiedby": userInfo.userid,
-		"modifiedbyrole": userInfo.role,
+		"modifiedby": userInfo.invokingUser,
+		"modifiedbyrole": userInfo.invokingUserRole,
 		"query": "insertreportquery"
 	};
 	const result = utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "insertReport");
@@ -546,7 +546,7 @@ module.exports.executionFunction = async (batchExecutionData, execIds, userInfo,
 	// if (countStatus == "fail") return "fail";
 	const executionRequest = await prepareExecutionRequest(batchExecutionData, userInfo);
 	if (executionRequest == "fail") return "fail";
-	const currExecIds = await generateExecutionIds(execIds, executionRequest.testsuiteIds, userInfo.userid);
+	const currExecIds = await generateExecutionIds(execIds, executionRequest.testsuiteIds, userInfo.invokingUser);
 	if (currExecIds == "fail") return "fail";
 	executionRequest.batchId = currExecIds.batchid;
 	executionRequest.executionIds = executionRequest.testsuiteIds.map(i => currExecIds.execids[i]);
@@ -562,7 +562,7 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 	var targetUser = req.body.executionData.targetUser;
 	inputs = { "icename": targetUser };
 	const profile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
-	const userInfo = { "userid": profile.userid, "username": profile.name, "role": profile.role, "icename": targetUser,"invokingUser":req.session.userid,"invokingUserName":req.session.username};
+	const userInfo = { "userid": profile.userid, "username": profile.name, "role": profile.role, "icename": targetUser,"invokingUser":req.session.userid,"invokingUserName":req.session.username,"invokingUserRole":req.session.activeRoleId};
 	const batchExecutionData = req.body.executionData;
 	const execIds = { "batchid": "generate", "execid": {} };
 	var result = queue.Execution_Queue.addTestSuiteToQueue(batchExecutionData,execIds,userInfo,"ACTIVE");
@@ -621,7 +621,10 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 	const userInfo = { "userid": req.session.userid, "username": req.session.username, "role": req.session.activeRoleId };
 	const multiExecutionData = req.body.executionData;
 	var batchInfo = multiExecutionData.batchInfo;
-	const invokingUser = req.session.userid;
+	var invokingUser = {}
+	invokingUser["id"] = req.session.userid;
+	invokingUser["invokingUserName"] = req.session.username;
+	invokingUser['invokingUserRole'] = req.session.activeRoleId;
 	var stat = "none";
 	var dateTimeUtc = "";
 	var dateTimeList = batchInfo.map(u => {
@@ -834,8 +837,10 @@ const scheduleTestSuite = async (multiBatchExecutionData,invokingUser) => {
 
 	for (const batchExecutionData of multiBatchExecutionData) {
 		let execIds = {"batchid": "generate", "execid": {}};
-		const userInfo = userInfoMap[batchExecutionData.targetUser];
-		userInfo['invokingUser'] = invokingUser;
+		var userInfo = userInfoMap[batchExecutionData.targetUser];
+		userInfo['invokingUser'] = invokingUser.id;
+		userInfo["invokingUsername"] = invokingUser.invokingUserName;
+		userInfo["invokingUserRole"] = invokingUser.invokingUserRole;
 		const scheduleTime = batchExecutionData.timestamp;
 		const scheduleId = batchExecutionData.scheduleId;
 		const smartId = batchExecutionData.smartScheduleId;
