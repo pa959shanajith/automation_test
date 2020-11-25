@@ -595,8 +595,6 @@ var smartBatch = false;
 var copyId = 0
 function openPopup(id) {
 	if ($('.ipContainer').find(":selected")[parseInt(id[id.length - 1])].label === "Scenario Smart Scheduling") {
-		console.log(id)
-		
 		$("#smartScheduling").modal("show");
 		$($('#smartScheduling').find('.btn-default')[1]).data('selector-id', id);
 		$('#smartScheduling').find('.btn-default')[1].onclick = function () {
@@ -610,7 +608,6 @@ function openPopup(id) {
 		sequence(true,true,copyId);	
 	}
 	else if ($('.ipContainer').find(":selected")[parseInt(id[id.length - 1])].label === "Module Smart Scheduling") {
-		
 		openModelPopup("Smart Scheduling", "All the modules will be executed as batch.\nAll available ICE should be in similar configurations for optimal results.");
 		smartBatch = true;
 		copyId = parseInt(id.replace("mod",""));
