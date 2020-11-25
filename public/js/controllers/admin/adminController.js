@@ -224,6 +224,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	})
 	
 	const createIcePoolReset = () => {
+		$scope.tokens.name=undefined
 		$scope.createIcePool.poolName = ""
 		$('#assignedProjectAP option').appendTo($('#allProjectAP'))
 		$('select#allProjectAP').val([])
@@ -245,6 +246,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	// on click of create ice pool from action bar
 	$scope.createIcePool.click = () =>{
+		createIcePoolReset()
 		$(".selectedIcon").removeClass("selectedIcon");
 		$("#createIcePool").find("img").addClass("selectedIcon");
 		blockUI('Fetching Projects ...')
@@ -269,7 +271,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	}
 	
 	$scope.createIcePool.changeName = (val) =>{
-		$('#tokenName').removeClass('error-border')
+		if($('#tokenName').val()==''){
+			$('#tokenName').addClass('error-border')
+		}else{
+			$('#tokenName').removeClass('error-border')
+		}
 		$scope.createIcePool.poolName = val
 	} 
 
@@ -336,6 +342,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		pool.ice_added=[]
 		pool.ice_deleted=[]
 		pool.poolname=$('#tokenName').val()
+		if(!pool.poolname || pool.poolname == ""){
+			$('#tokenName').addClass('error-border')
+			return;
+		}
 		$('#assignedProjectAP option').each((i,e)=>{pool.projectids.push(e.value)})
 		blockUI('Saving ICE Pool ...')
 		adminServices.updatePool(pool)
@@ -488,6 +498,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			$('#icepoolNumInp').val('')
 		}
 		if(type == 'specific'){
+			$('#allProjectAP option').remove()
+			if($scope.allocateIcePool.iceData){
+				var arr = {...$scope.allocateIcePool.iceData.available_ice}
+				Object.entries(arr).forEach((e)=>{
+					$('#allProjectAP').append('<option value='+e[0]+'>'+e[1].icename+'</option>')
+				})
+			}
 			$('#assignedProjectAP option').remove()
 			$('select#allProjectAP').val([])
 		}
@@ -495,6 +512,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.iceAllocateType = async(type) => {
 		blockUI('Fetching ICE Pools...')
+		$scope.allocateIcePool.iceData = {}
 		$scope.allocateIcePool.type = type
 		$(".active-opt").removeClass("active-opt").addClass('btn-md');
 		$('#icepool-'+type).addClass('active-opt').removeClass('btn-md');

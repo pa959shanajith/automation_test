@@ -635,6 +635,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	};
 	
 	//Execute TestSuite Functionality
+
 	$scope.ExecuteTestSuite = function ($event) {
 		if ($(".exe-ExecuteStatus input:checked").length === 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
 		else if ((appType == "Web") && browserTypeExe.length === 0) openDialogExe("Execute Test Suite", "Please select a browser");
@@ -694,6 +695,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			allocateICEPopup()
 		}
 	};
+
 	const allocateICEPopup = () =>{
 		var projId = JSON.parse(window.localStorage['_CT']).testSuiteDetails[0].projectidts
 		var data = {poolid:"",projectids: [projId]}
@@ -735,10 +737,12 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		$('#selectIcePoolIce').modal("show")
 		return;
 	}
+
 	$scope.selectIce = (ice) =>{
 		$scope.selectedICE = ice
 		$('#userIdName').removeClass('error-border')
 	}
+
 	const populateICElist =(arr)=>{
 		var ice=[]
 		var iceStatus = $scope.iceStatus.ice_ids
@@ -766,6 +770,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		ice.sort((a,b) => a.icename.localeCompare(b.icename))
 		$scope.availableICE = ice
 	}
+
 	$scope.ExecuteOnclick = () =>{
 		if(!$scope.selectedICE){
 			$('#userIdName').addClass('error-border')
@@ -825,7 +830,16 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			$("#syncScenario").prop("disabled", true);
 		});
 	}
-
+	
+	$('#chooseICEPool').on('change',(e)=>{
+		var id = e.currentTarget.value
+		if(id=='all'){
+			var arr = Object.entries($scope.poolList)
+		}else{
+			var arr = Object.entries({[id]:$scope.poolList[id]})
+		}
+		populateICElist(arr)
+	})
 	
 	//Execute TestSuite Functionality
 
@@ -986,4 +1000,15 @@ var openDialogExe = function (title, body, submitflag) {
 		$("#globalTaskSubmit").find('.modal-body p').text(body);
 		$("#globalTaskSubmit").modal("show");
 	}
+	
 };
+
+function openModalPopup(title, body){
+	var mainModal = $("#popupModal");
+	mainModal.find('.modal-title').text(title);
+	mainModal.find('.modal-body p').text(body);
+	mainModal.modal("show");
+	setTimeout(function(){
+		$("#popupModal").find('.btn-default').focus();
+	}, 300);
+}

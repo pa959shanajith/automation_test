@@ -575,7 +575,7 @@
 					<div id='update-icepool-rename' class='adminControl hide'>
 						<div>
 							<span class="leftControl" title="Token Name">ICE pool</span>
-							<input type="text" autocomplete="off" id="tokenName" name="tokenName"  ng-model="createIcePool.selectedIcePool.name" ng-change="tokens.verifyName($event)" ng-model="tokens.name" maxlength="100" class="form-control form-control-custom create validationKeydown preventSpecialChar" placeholder="Enter ICE Pool Name"/>
+							<input type="text" autocomplete="off" id="tokenName" name="tokenName"  ng-model="createIcePool.selectedIcePool.name" ng-change="createIcePool.changeName(tokens.name)" ng-model="tokens.name" maxlength="100" class="form-control form-control-custom create validationKeydown preventSpecialChar" placeholder="Enter ICE Pool Name"/>
 						</div>
 					</div>
 				</div>

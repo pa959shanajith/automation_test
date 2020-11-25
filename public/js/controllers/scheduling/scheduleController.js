@@ -570,7 +570,6 @@ function openModelPopup(title, body) {
 var smartBatch = false;
 var copyId = 0
 function openPopup(id) {
-	console.log("did reach here")
 	if ($('.ipContainer').find(":selected")[parseInt(id[id.length - 1])].label === "Scenario Smart Scheduling") {
 		console.log(id)
 		if ($('#' + id)[0].length < 3) {
