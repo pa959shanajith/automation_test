@@ -1816,7 +1816,18 @@ exports.getAllProjects = async(req,res) => {
 	}
 }
 
-
+exports.getAvailable_ICE = async(req,res) => {
+	const fnName = "getAvailable_ICE"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const inputs = {};
+		const result = await utils.fetchData(inputs, "admin/getAvailable_ICE", fnName);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in admin/getAvailable_ICE:", exception);
+		res.send("fail");
+	}
+} 
 
 exports.exportProject = async (req, res) => {
 	const fnName = 'exportProject';
