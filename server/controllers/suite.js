@@ -107,6 +107,7 @@ async function getICEList (projectids,userid){
 			var ice_name = ice["icename"]
 			ice_list.push(ice_name);
 			result.unallocatedICE[id] = {}
+			if(!ice_status )ice_status = {}
 			if(ice_name in ice_status){
 				result.unallocatedICE[id]["status"] = ice_status[ice_name]["status"];
 				result.unallocatedICE[id]["mode"] = ice_status[ice_name]["mode"];
@@ -124,7 +125,6 @@ async function getICEList (projectids,userid){
 			}
 			ice_in_pool = await utils.fetchData(ice_req,"admin/getICE_pools",fnName);
 			if(!ice_in_pool )ice_in_pool = {}
-			if(!ice_status )ice_status = {}
 			for(id in ice_in_pool){
 				var ice = ice_in_pool[id];
 				var ice_name = ice["icename"]

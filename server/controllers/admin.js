@@ -945,7 +945,7 @@ exports.getDetails_ICE = function (req, res) {
 								responsedata.projectDetails=queryStringresult.rows.releases
 								res.send(responsedata);
 								}
-								else{
+								else if(type == "domaindetails"){
 									var responsedatadomains = {
 										projectIds: [],
 										projectNames: []
@@ -955,6 +955,8 @@ exports.getDetails_ICE = function (req, res) {
 										responsedatadomains.projectNames.push(queryStringresult.rows[i].name);
 									}
 									res.send(responsedatadomains)
+								}else{
+									res.send(queryStringresult.rows);
 								}
 							}
 						} catch (exception) {
@@ -1714,7 +1716,7 @@ exports.createPool_ICE = async(req,res) => {
 		const inputs = {
 			poolname: poolinfo.poolname,
 			createdby: req.session.userid,
-			createdby: req.session.activeRole,
+			createdbyrole: req.session.activeRoleId,
 			projectids: poolinfo.projectids
 		};
 		const result = await utils.fetchData(inputs, "admin/createPool_ICE", fnName);
@@ -1739,7 +1741,7 @@ exports.updatePool = async(req,res) => {
 			ice_added: poolinfo.ice_added,
 			ice_deleted: poolinfo.ice_deleted,
 			modifiedby: req.session.userid,
-			modifiedbyrole: req.session.activeRole,
+			modifiedbyrole: req.session.activeRoleId,
 		};
 		const result = await utils.fetchData(inputs, "admin/updatePool_ICE", fnName);
 		if(result && result != "fail") queue.Execution_Queue.updatePools("update",poolinfo);
@@ -1803,18 +1805,6 @@ exports.deletePools = async(req,res) => {
 	}
 }
 
-exports.getAllProjects = async(req,res) => {
-	const fnName = "getAllProjects"
-	logger.info("Inside UI service: " + fnName)
-	try{
-		const inputs = {};
-		const result = await utils.fetchData(inputs, "admin/getAll_projects", fnName);
-		res.send(result);
-	}catch (exception){
-		logger.error("Error occurred in admin/getAllProjects:", exception);
-		res.send("fail");
-	}
-}
 
 exports.getAvailable_ICE = async(req,res) => {
 	const fnName = "getAvailable_ICE"
