@@ -102,6 +102,7 @@ async function getICEList (projectids,userid){
 		ice_status = await cache.get("ICE_status");
 		unallocatedICE = unallocatedICE["available_ice"];
 		if(!unallocatedICE || unallocatedICE === "fail") unallocatedICE = {}
+		if(!ice_status )ice_status = {}
 		for(let id in unallocatedICE){
 			var ice = unallocatedICE[id];
 			var ice_name = ice["icename"]
@@ -113,6 +114,7 @@ async function getICEList (projectids,userid){
 				result.unallocatedICE[id]["mode"] = ice_status[ice_name]["mode"];
 				result.unallocatedICE[id]["connected"] = ice_status[ice_name]["connected"];
 			}else{
+				result.unallocatedICE[id]["icename"] = ice_name
 				result.unallocatedICE[id]["status"] = false;
 				result.unallocatedICE[id]["mode"] = false;
 				result.unallocatedICE[id]["connected"] = false;

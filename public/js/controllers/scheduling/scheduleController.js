@@ -271,6 +271,18 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 			l = l + 2;
 		}
 	}
+
+	//select Saucelabs execution
+	$(document).on("click", ".selectSaucelabs", function () {
+		$(this).find("img").toggleClass("sb");
+		$(this).find("svg").toggleClass("sb");
+		if ($("img").hasClass('sb') == true || $("svg").hasClass('sb') == true) {
+			execEnv = "Saucelabs";
+		} else {
+			execEnv = "default";
+		}
+	});
+	
 	//ice pool popup 
 	$scope.iceCheckboxClick = ($event,ice) => {
 		if(smartBatch){
@@ -285,13 +297,16 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 	}
 
 	$('#chooseICEPool').on('change',(e)=>{
+		var unallocated = false
 		var id = e.currentTarget.value
 		if(id=='all'){
 			var arr = Object.entries($scope.poolList)
+		}else if(id=='unallocated'){
+			unallocated =  true
 		}else{
 			var arr = Object.entries({[id]:$scope.poolList[id]})
 		}
-		populateICElist(arr)
+		populateICElist(arr,unallocated)
 	})
 
 	const allocateICEPopup = () =>{
@@ -319,7 +334,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 				ScheduleService.getICE_list({"projectid":projId})
 				.then(function(data){
 					$scope.iceStatus = data
-					populateICElist(arr)
+					populateICElist(arr,true)
 					unblockUI()
 				}).catch(error=>{
 					unblockUI()
@@ -337,44 +352,47 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 		return;
 	}
 
-	const populateICElist =(arr)=>{
+	const populateICElist =(arr,unallocated)=>{
 		var ice=[]
 		var iceStatus = $scope.iceStatus.ice_ids
-		arr.forEach((e)=>{
-			if(e[1].ice_list){
-				Object.entries(e[1].ice_list).forEach((k)=>{
-					if(k[0] in iceStatus){
-						var color = '#fdc010' ;
-						var status = 'Offline';
-						if(iceStatus[k[0]].connected){
-							color = '#95c353';
-							status = 'Online'
-						}
-						if(iceStatus[k[0]].status){
-							color = 'red';
-							status = 'DND mode'
-						}
-						k[1].color = color;
-						k[1].status = status
-						ice.push(k[1])
-					}
-				})
+		const statusUpdate = (ice) => {
+			var color = '#fdc010' ;
+			var status = 'Offline';
+			if(ice.connected){
+				color = '#95c353';
+				status = 'Online'
 			}
-		})
+			if(ice.status){
+				color = 'red';
+				status = 'DND mode'
+			}
+			return {color,status}
+		}
+		if(unallocated){
+			arr = Object.entries($scope.iceStatus.unallocatedICE)
+			arr.forEach((e)=>{
+				var res = statusUpdate(e[1])
+				e[1].color = res.color;
+				e[1].statusCode = res.status;
+				ice.push(e[1])
+			})
+		}else{
+			arr.forEach((e)=>{
+				if(e[1].ice_list){
+					Object.entries(e[1].ice_list).forEach((k)=>{
+						if(k[0] in iceStatus){
+							var res = statusUpdate(iceStatus[k[0]])
+							k[1].color = res.color;
+							k[1].statusCode = res.status;
+							ice.push(k[1])
+						}
+					})
+				}
+			})
+		}
 		ice.sort((a,b) => a.icename.localeCompare(b.icename))
 		$scope.availableICE = ice
 	}
-
-	//select Saucelabs execution
-	$(document).on("click", ".selectSaucelabs", function () {
-		$(this).find("img").toggleClass("sb");
-		$(this).find("svg").toggleClass("sb");
-		if ($("img").hasClass('sb') == true || $("svg").hasClass('sb') == true) {
-			execEnv = "Saucelabs";
-		} else {
-			execEnv = "default";
-		}
-	});
 
 	//Add to list and schedule
 	$scope.initSchedule = function ($event) {
@@ -477,9 +495,14 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 
 	$scope.scheduleClick = () => {
 		if(!smartBatch && !$scope.selectedICE){
-			$('#userIdName').addClass('error-border')
-			return;
+			if($('#userIdName').val() == "" && $scope.availableICE && $scope.availableICE.length>0){
+				$scope.selectedICE = $scope.availableICE[0].icename
+			}else{
+				$('#userIdName').addClass('error-border')
+				return;
+			}
 		}
+		$('#userIdName').val("")
 		$('#selectIcePoolIce').modal("hide")
 		var arr = [...executionData.batchInfo]
 		arr.forEach((e,i)=>{

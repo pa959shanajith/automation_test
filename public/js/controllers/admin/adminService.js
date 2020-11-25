@@ -238,11 +238,6 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			}).then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
-		getAllProjects: function () {
-			return $http.post('/getAllprojects')
-			.then(function(response) { return response.data },
-			function(response) { return $q.reject(response.data) });
-		},
 		deletePools: function (poolid) {
 			return $http.post('/deleteICE_pools',{
 				data:poolid

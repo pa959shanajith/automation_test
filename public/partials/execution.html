@@ -564,7 +564,10 @@
 			<div class='adminControl'>
 				<div>
 					<span class="leftControl" title="Token Name">Select ICE Pool</span>
-					<select id='chooseICEPool'><option value='all'>Select All Pools</option></select>
+					<select id='chooseICEPool'>
+						<option value='unallocated'>Unallocated ICE</option>
+						<!-- <option value='all'>Select All Pools</option> -->
+					</select>
 				</div>
 			</div>
 			<div class='adminControl'>
@@ -574,7 +577,7 @@
 				<input class="btn btn-users dropdown-toggle" type="text" autocomplete="off" id="userIdName" data-toggle="dropdown" ng-click='availableICEFilter.icename="";selectedICE=false' ng-model="availableICEFilter.icename" placeholder="{{'Search ICE to execute'}}">
 				<ul id='ice-dropdown' class="dropdown-menu dropdown-menu-users "  aria-labelledby="userIdName">
 					<li role="presentation" ng-repeat='ice in availableICE | filter:availableICEFilter' ng-click="availableICEFilter.icename=ice.icename;selectIce(ice.icename)" >
-						<lable title='{{ice.status}}'>
+						<lable title='{{ice.statusCode}}'>
 							<span id='status' ng-style="{'background-color':'{{ice.color}}'}"></span>
 							{{ice.icename}}
 						<lable>

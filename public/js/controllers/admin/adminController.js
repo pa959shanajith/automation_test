@@ -250,7 +250,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$(".selectedIcon").removeClass("selectedIcon");
 		$("#createIcePool").find("img").addClass("selectedIcon");
 		blockUI('Fetching Projects ...')
-		adminServices.getAllProjects()
+		var requestedids = ["all"];
+		var idtype = ["all"];
+		adminServices.getDetails_ICE(idtype, requestedids)
 		.then((data)=>{
 			if(data == "Invalid Session") {
 				$rootScope.redirectPage();
@@ -259,8 +261,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			} else if(data == "empty") {
 				openModalPopup("Create ICE Pool", "There are no projects created yet.");
 			} else {
-				data.sort((a,b) => a.name.localeCompare(b.name));
-				$scope.createIcePool.allProjectList = data
+				var arr = Object.keys(data).map((id)=>{return data[id]})
+				arr.sort((a,b) => a.name.localeCompare(b.name));
+				$scope.createIcePool.allProjectList = arr
 			}
 			unblockUI()
 		},(error)=>{

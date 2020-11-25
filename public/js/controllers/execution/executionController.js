@@ -746,6 +746,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		var projId = JSON.parse(window.localStorage['_CT']).testSuiteDetails[0].projectidts
 		var data = {poolid:"",projectids: [projId]}
 		$("#chooseICEPool option").slice(1).remove()
+		//$("#chooseICEPool option").remove()
 		blockUI('Fetching ICE ...')
 		adminServices.getPools(data)
 		.then(function(data){
@@ -764,10 +765,12 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				arr.forEach((e)=>{
 					$("#chooseICEPool").append('<option value='+e[0]+'>'+e[1].poolname+'</option>');
 				})
+				$("#chooseICEPool").val('unallocated')
+				unblockUI()
 				ScheduleService.getICE_list({"projectid":projId})
 				.then(function(data){
 					$scope.iceStatus = data
-					populateICElist(arr)
+					populateICElist(arr,true)
 					unblockUI()
 				}).catch(error=>{
 					unblockUI()
@@ -789,39 +792,58 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		$('#userIdName').removeClass('error-border')
 	}
 
-	const populateICElist =(arr)=>{
+	const populateICElist =(arr,unallocated)=>{
 		var ice=[]
 		var iceStatus = $scope.iceStatus.ice_ids
-		arr.forEach((e)=>{
-			if(e[1].ice_list){
-				Object.entries(e[1].ice_list).forEach((k)=>{
-					if(k[0] in iceStatus){
-						var color = '#fdc010' ;
-						var status = 'Offline';
-						if(iceStatus[k[0]].connected){
-							color = '#95c353';
-							status = 'Online'
-						}
-						if(iceStatus[k[0]].status){
-							color = 'red';
-							status = 'DND mode'
-						}
-						k[1].color = color;
-						k[1].status = status
-						ice.push(k[1])
-					}
-				})
+		const statusUpdate = (ice) => {
+			var color = '#fdc010' ;
+			var status = 'Offline';
+			if(ice.connected){
+				color = '#95c353';
+				status = 'Online'
 			}
-		})
+			if(ice.status){
+				color = 'red';
+				status = 'DND mode'
+			}
+			return {color,status}
+		}
+		if(unallocated){
+			arr = Object.entries($scope.iceStatus.unallocatedICE)
+			arr.forEach((e)=>{
+				var res = statusUpdate(e[1])
+				e[1].color = res.color;
+				e[1].statusCode = res.status;
+				ice.push(e[1])
+			})
+		}else{
+			arr.forEach((e)=>{
+				if(e[1].ice_list){
+					Object.entries(e[1].ice_list).forEach((k)=>{
+						if(k[0] in iceStatus){
+							var res = statusUpdate(iceStatus[k[0]])
+							k[1].color = res.color;
+							k[1].statusCode = res.status;
+							ice.push(k[1])
+						}
+					})
+				}
+			})
+		}
 		ice.sort((a,b) => a.icename.localeCompare(b.icename))
 		$scope.availableICE = ice
 	}
 
 	$scope.ExecuteOnclick = () =>{
 		if(!$scope.selectedICE){
-			$('#userIdName').addClass('error-border')
-			return;
+			if($('#userIdName').val() == "" && $scope.availableICE && $scope.availableICE.length>0){
+				$scope.selectedICE = $scope.availableICE[0].icename
+			}else{
+				$('#userIdName').addClass('error-border')
+				return;
+			}
 		}
+		$('#userIdName').val("")
 		$('#selectIcePoolIce').modal("hide")
 		blockUI("Sending Execution Request");
 		executionData.targetUser = $scope.selectedICE
@@ -877,13 +899,16 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	}
 	
 	$('#chooseICEPool').on('change',(e)=>{
+		var unallocated = false
 		var id = e.currentTarget.value
 		if(id=='all'){
 			var arr = Object.entries($scope.poolList)
+		}else if(id=='unallocated'){
+			unallocated =  true
 		}else{
 			var arr = Object.entries({[id]:$scope.poolList[id]})
 		}
-		populateICElist(arr)
+		populateICElist(arr,unallocated)
 	})
 	
 	//Execute TestSuite Functionality
