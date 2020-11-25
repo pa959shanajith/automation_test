@@ -30,14 +30,17 @@
 			<!--Task Name-->
 			<div id="page-taskName">
 				<span>ALM Integration</span>
+				<label class="totalcountbx" style="margin-left:12%;"></label>
+				<label class="scenariobx" style="margin-left:1%;"></label>
+				<label class="almtestcasesbx" style="margin-left:1%;"></label>
 			</div>
 			<!--Task Name-->
 			<!-- Button -->
 			<div class="qcActionBtn">
 				<label style="margin-bottom: 0; float: left;">ALM Tests</label>
 				<!--<img class="loadALM" style="position: relative; left: 388px; display: none;" src="imgs/loader.gif" alt="Loading...">-->
-				<label style="margin-bottom: 0; position: relative; left: 435px; float: left;">Avo Assure Scenarios</label>
-				<button class="saveQcbtn qcActionBtnFirstChild" ng-click="mapTestcaseToAvoAssure()" title="Save" style="margin-left: 470px;">Save</button>
+				<label style="margin-bottom: 0; position: relative; left: 469px; float: left;">Avo Assure Scenarios</label>
+				<button class="saveQcbtn qcActionBtnFirstChild" ng-click="mapTestcaseToAvoAssure()" title="Save" style="margin-left: 545px;">Save</button>
 				<a class="viewMapbtn" ng-click="displayMappedFilesTab()" title="View Mapped Files">View Mapped Files</a>
 				<button class="saveQcbtn" ng-click="exitQcConnection()" title="Exit">Exit</button>
 			</div>
@@ -60,7 +63,7 @@
 			</div>
 			<!-- Action area -->
 			<!-- Map Files -->
-			<div class="mappedFilesLabel" style="display: none;"><label style="margin: 0 0 0 11px;">Avo Assure Scenarios</label><label style="position: relative; left: 350px;">ALM Testcases</label></div>
+			<div class="mappedFilesLabel" style="display: none;"><label style="margin: 0 0 0 11px;">Avo Assure Scenarios</label><label style="position: relative; left: 350px;">ALM Testcases</label><button class="viewSaveButton" ng-click="saveUnsyncDetails();displayMappedFilesTab();" title="Save" style="margin-right: 50px; float: right;">Save</button></div>
 			<div class="mappedFiles scrollbar-inner" style="display: none;">
 			</div>
 			<!-- Map Files -->
