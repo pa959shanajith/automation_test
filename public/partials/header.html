@@ -158,4 +158,39 @@
         </div>
     </div>
     <!-- Popup for successful reset of password -->
+    <div class="modal fade" id="executionCompleted" role="dialog" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Execute Test Suite</h4>
+                </div>
+                <div class="modal-body">
+                    <p  style="white-space: pre-line;">Execution completed successfully. <br /> Go to <a style="color: #643693; font-family: 'LatoWebHeavy'" href="#" id="href_report" onclick="p_redirect('p_Reports')">Reports</a></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Execution Terminated -->
+    <div class="modal fade" id="executionTerminated" role="dialog" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Execute Test Suite</h4>
+                </div>
+                <div class="modal-body">
+                    <p  style="white-space: pre-line;">Execution terminated - By <span id="executionTerminatedBy">User/Program</span> <br /> Go to <a style="color: #643693; font-family: 'LatoWebHeavy'" href="#" onclick="p_redirect('p_Reports')">Reports</a></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Execution Terminated -->
+
 </div>

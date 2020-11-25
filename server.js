@@ -159,6 +159,8 @@ if (cluster.isMaster) {
 		const authconf = authlib();
 		const auth = authconf.auth;
 		app.use(authconf.router);
+		var queue = require("./server/lib/executionQueue")
+		queue.Execution_Queue.queue_init()
 		const notf = require("./server/notifications");
 		notf.initalize();
 
@@ -481,6 +483,12 @@ if (cluster.isMaster) {
 		app.post('/getPreferences', auth.protect, admin.getPreferences);
 		app.post('/provisionIce', auth.protect, admin.provisionICE);
 		app.post('/fetchICE', auth.protect, admin.fetchICE);
+		app.post('/getAvailable_ICE', auth.protect, admin.getAvailable_ICE);
+		app.post('/getICEinPools', auth.protect, admin.getICEinPools);
+		app.post('/deleteICE_pools', auth.protect, admin.deletePools);
+		app.post('/getPools', auth.protect, admin.getPools);
+		app.post('/updatePool', auth.protect, admin.updatePool);
+		app.post('/createPool_ICE', auth.protect, admin.createPool_ICE);
 		app.post('/exportProject', auth.protect, admin.exportProject);
 		app.post('/testNotificationChannels', auth.protect, admin.testNotificationChannels);
 		app.post('/manageNotificationChannels', auth.protect, admin.manageNotificationChannels);
@@ -505,6 +513,7 @@ if (cluster.isMaster) {
 		app.post('/getTestcaseDetailsForScenario_ICE', auth.protect, suite.getTestcaseDetailsForScenario_ICE);
 		app.post('/ExecuteTestSuite_ICE', auth.protect, suite.ExecuteTestSuite_ICE);
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
+		app.post('/getICE_list', auth.protect, suite.getICE_list);
 		//Scheduling Screen Routes
 		app.post('/testSuitesScheduler_ICE', auth.protect, suite.testSuitesScheduler_ICE);
 		app.post('/getScheduledDetails_ICE', auth.protect, suite.getScheduledDetails_ICE);

@@ -400,8 +400,8 @@ function loadUserTasks(){
 				'releaseid':tasksJson[i].taskDetails[j].releaseid,
 				'cycleid':tasksJson[i].taskDetails[j].cycleid,
 				'reuse':tasksJson[i].taskDetails[j].reuse
-			}
-			dataobj = JSON.stringify(dataobj)
+			};
+			dataobj = JSON.stringify(dataobj);
 			$('.task-content-inner').append("<div class='panel panel-default' panel-id='"+i+"'><div id='panelBlock_"+i+"' class='panel-heading'><div class='taskDirection' href='#collapse" + counter + "'><h4 class='taskNo-Inner-Pgs "+classIndex+" taskRedir'>" + counter + "</h4><span class='assignedTask-Inner-Pgs assignedTaskInner' data-testsuitedetails='"+testSuiteDetails+"' data-dataobj='"+dataobj+"' onclick='taskRedirectionInner(this.dataset.testsuitedetails,this.dataset.dataobj)'>" + taskname + "</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype-Inner-Pgs'>" + tasktype + "</button></div><!--Addition--></div></div></div>").fadeIn();
 			var limit = 45;
 			var chars = $("#panelBlock_"+i+"").children().find('span.assignedTaskInner').text();
@@ -510,7 +510,12 @@ function p_redirect(name){
 	window.localStorage['navigateScreen'] = name;
 	if(name == 'p_Reports'){
 		localStorage.setItem('fromExecution','true');
-		window.localStorage.setItem('redirectedReportObj',window.localStorage['_CT']);
+		if(window.localStorage["report"] && window.localStorage["report"] !="null" ){
+			window.localStorage.setItem('redirectedReportObj',window.localStorage['report']);
+			window.localStorage["report"] = null
+		}else{
+			window.localStorage.setItem('redirectedReportObj',window.localStorage['_CT']);
+		}
 	}
 	window.location.assign(name);
 }

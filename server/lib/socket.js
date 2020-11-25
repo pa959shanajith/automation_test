@@ -1,6 +1,7 @@
 const uiConfig = require('./../config/options');
 const screenShotPath = uiConfig.screenShotPath;
 const benchmarkRunTimes = uiConfig.benchmarkRuntimes;
+const pingTimer = uiConfig.pingTimer;
 const eula = uiConfig.showEULA;
 const httpsServer = require('./../../server').httpsServer;
 
@@ -24,6 +25,7 @@ var logger = require('../../logger');
 var redisServer = require('./redisSocketHandler');
 var utils = require('./utils');
 var notificationMsg = require('./../notifications').broadcast;
+const cache = require("./cache")
 
 io.on('connection', async socket => {
 	logger.info("Inside Socket connection");
@@ -40,6 +42,7 @@ io.on('connection', async socket => {
 				address = Buffer.from(data, "base64").toString();
 				logger.info("Notification Socket connecting address %s", address);
 				socketMapNotify[address] = socket;
+				sendPendingNotifications(socket,address);
 				redisServer.redisSubClient.subscribe('UI_notify_' + address, 1);
 				//Broadcast Message
 				var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/mindmap', '/p_Utility', '/p_Reports', '/p_ALM', '/p_Integration', '/p_qTest', '/p_Zephyr'];
@@ -61,7 +64,7 @@ io.on('connection', async socket => {
 				"query": "loadUserInfo"
 			};
 			const eulaResult = await utils.fetchData(inputseula, "login/checkTandC", "socketio");
-			eulaFlag = eulaResult == "success";
+			eulaFlag = (eulaResult == "success" || eulaResult == "nouser");
 			if (!eulaFlag) {
 				logger.error("ICE connection %s rejected because user has not accepted Avo Assure Terms and Conditions", icename);
 				socket.send("decline");
@@ -84,7 +87,7 @@ io.on('connection', async socket => {
 					userICEMap[result.username]=icename;
 					setTimeout(()=> {
 						socket.send('connected', result.ice_check);
-						socket.emit('update_screenshot_path', screenShotPath, benchmarkRunTimes);
+						socket.emit('update_screenshot_path', screenShotPath, benchmarkRunTimes,pingTimer);
 					}, 300);
 					logger.debug("%s is connected", icename);
 					logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
@@ -215,4 +218,16 @@ const registerICE = async (req, res) => {
 	res.send(data.ice_check);
 };
 
+async function sendPendingNotifications(socket,address){
+	var pending_notification = await cache.get("pending_notification")
+		if(pending_notification && Object.keys(pending_notification).length > 0){
+			for(user in pending_notification){
+				if(address == user){
+					socket.emit("display_execution_popup",pending_notification[user])
+					delete pending_notification[user]
+					await cache.set("pending_notification",pending_notification)
+				}
+			}
+		}
+}
 module.exports.registerICE = registerICE;
