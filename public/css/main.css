@@ -2411,6 +2411,44 @@ input[disabled]{
 /*****************Execution CSS*****************/
 
 /******Exectuion Mid Section******/
+#selectIcePoolIce .adminControl{ 
+    padding: 0px 40px !important;
+}
+#selectIcePoolIce .error-border{
+    border: 1px solid red!important;
+}
+#selectIcePoolIce select{
+    max-width: 180px;
+    height: 35px;
+}
+#selectIcePoolIce ul {
+    width: 335px;
+    left: 171px;
+    max-height: 123px;
+    background: white;
+}
+#selectIcePoolIce ul input[type="checkbox"] {
+    background-color: red;
+    width:auto
+}
+#status{
+    height: 7px;
+    width: 7px;
+    margin: 2px 5px;
+    border-radius: 50%;
+    display: inline-block;
+}
+#status.online{
+    background-color: green;
+}
+#selectIcePoolIce #userIdName{
+    width: 335px;
+    left: 171px;
+}
+#selectIcePoolIce .modal-body{
+    height: 200px;
+    padding: 40px 15px;
+}
 #pageContent{
 	float:left;
 	width:100%;
@@ -3980,6 +4018,106 @@ select[multiple]:-internal-list-box option:checked {
     padding-left: 18px;
     width: fit-content;
 }
+
+/*** ICEPOOL CREATETAB CSS **/
+select:focus{
+    outline: none;
+}
+.error-border{
+    border-bottom: 1px solid red!important;
+}
+#create-icepool .adminControl{
+    width:75%
+}
+#create-icepool .adminControl div span{
+    width: 95px;
+    padding-left: 10px;
+}
+#update-icepool-rename .hide{
+    display: none;
+}
+#allocate-icepool .adminControl {
+    width: 75%;
+    padding-left: 50px;
+}
+#allocate-icepool .adminControl button{
+    margin-right: 10px;
+    border-radius: 6px;
+}
+#allocate-icepool .adminControl span{
+    margin-right: 20px;
+    border-radius: 6px;
+}
+.active-opt{
+    background: white ;
+    color: #643693 ;
+    border: solid 1px ;
+    font-size: 17px;
+    font-family: 'LatoWebLight';
+    outline: 0;
+}
+.active-opt:hover{
+    background: white ;
+    color: #643693 ;
+    border: solid 1px ;
+    /* padding: 2px 15px; */
+    font-size: 17px;
+    font-family: 'LatoWebLight';
+    outline: 0;
+}
+.active-opt:focus{
+    outline: 0 !important;
+}
+#icepoolNumInp{
+    width: 200px;
+    border: 1px solid !important;;
+}
+#search-ice-pool{
+    padding:0 !important;
+    margin-bottom: 0;
+}
+#search-ice-pool :active{
+    outline: 0!important;
+}
+#search-ice-pool ul{
+   left:0
+}
+#specific-ice-pool{
+    padding: 0;
+}
+#specific-ice-pool .hide{
+    display: none;
+}
+#specific-ice-pool > .left-select{
+    width: 45%;
+}
+#specific-ice-pool > .left-select label{
+    margin-bottom: 14px;
+    line-height: 2;
+}
+#specific-ice-pool > .right-select{
+    width: 45%;
+}
+#specific-ice-pool > .right-select label{
+    line-height: 2;
+}
+#specific-ice-pool > .wrap-editpro button{
+    margin-left: 30%;
+}
+#specific-ice-pool .adminControl {
+    width: 65%;
+    float: right;
+    padding-left: 0px;
+}
+.edit-icepool-proj{
+    margin: 15px 0
+}
+.btn:focus, .btn:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+/*** ICEPOOL CREATETAB CSS **/
+
 /*****************ADMIN CSS NEW ************************/
 
 /******************Reports CSS***************************/
@@ -4529,7 +4667,8 @@ select:-webkit-autofill:focus {
 	/*.leftQcStructure, .rightQcStructure{width: calc(100% - 505px) !important; height: 720px !important;}
 	.qcActionBtnFirstChild{margin-left: 480px !important;}
 	.qcActionBtn label:nth-child(2){left: 440px !important;}*/
-	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 236px) !important;}
+    .qcDomProContainer select, .qcProContainer select{width: calc(100% - 236px) !important;}
+    .zephyrDomProContainer select, .zephyrProContainer select{width: calc(100% - 236px) !important;}
     .mappedFiles{height: calc(100% - 53px) !important;}
 }
 
@@ -4557,16 +4696,24 @@ select:-webkit-autofill:focus {
 	#encrypt_btn, #reset_btn{padding: 0px 25px !important;}
 
     .leftQcStructure, .rightQcStructure{width: calc(100% - 505px) !important; height: 550px !important;}
-	.qcActionBtnFirstChild{margin-left: 472px !important;}
-	.qcActionBtn label:nth-child(2){left: 440px !important;}
-	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 226px) !important;}
+    .leftZephyrStructure, .rightZephyrStructure{width: calc(100% - 505px) !important; height: 550px !important;}
+    .qcActionBtnFirstChild{margin-left: 472px !important;}
+    .zephyrActionBtnFirstChild{margin-left: 472px !important;}
+    .qcActionBtn label:nth-child(2){left: 440px !important;}
+    .zephyActionBtn label:nth-child(2){left: 440px !important;}
+    .qcDomProContainer select, .qcProContainer select{width: calc(100% - 226px) !important;}
+    .zephyrDomProContainer select, .zephyrProContainer select{width: calc(100% - 226px) !important;}
     .mappedFiles{height: calc(100% - 53px) !important;}
 }
 @media only screen and (height:790px){
      .leftQcStructure, .rightQcStructure{width: calc(100% - 506px) !important; height: 570px !important;}
-	.qcActionBtnFirstChild{margin-left: 480px !important;}
-	.qcActionBtn label:nth-child(2){left: 438px !important;}
-	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 225px) !important;}
+     .leftZephyrStructure, .rightZephyrStructure{width: calc(100% - 506px) !important; height: 570px !important;}
+    .qcActionBtnFirstChild{margin-left: 480px !important;}
+    .zephyrActionBtnFirstChild{margin-left: 480px !important;}
+    .qcActionBtn label:nth-child(2){left: 438px !important;}
+    .zephyActionBtn label:nth-child(2){left: 438px !important;}
+    .qcDomProContainer select, .qcProContainer select{width: calc(100% - 225px) !important;}
+    .zephyrDomProContainer select, .zephyrProContainer select{width: calc(100% - 225px) !important;}
     .mappedFiles{height: calc(100% - 54px) !important;}
     .middle-section-testsuites, .bottom-section-testsuites{height: calc(100% - 408px);}
     .suitestartend thead{width: calc(100% - 732px);}
@@ -4684,9 +4831,13 @@ select:-webkit-autofill:focus {
 
 @media only screen and (width: 1440px) and (height: 794px){
     .leftQcStructure, .rightQcStructure{width: calc(100% - 580px) !important; height: 578px !important;}
-	.qcActionBtnFirstChild{margin-left: 630px !important;}
-	.qcActionBtn label:nth-child(2){left: 514px !important;}
-	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 264px) !important;}
+    .leftZephyrStructure, .rightZephyrStructure{width: calc(100% - 580px) !important; height: 578px !important;}
+    .qcActionBtnFirstChild{margin-left: 630px !important;}
+    .zephyrActionBtnFirstChild{margin-left: 630px !important;}
+    .qcActionBtn label:nth-child(2){left: 514px !important;}
+    .zephyActionBtn label:nth-child(2){left: 514px !important;}
+    .qcDomProContainer select, .qcProContainer select{width: calc(100% - 264px) !important;}
+    .zephyrDomProContainer select, .zephyrProContainer select{width: calc(100% - 264px) !important;}
     .scenarioReports thead {width: calc(100% - 312px);}
 }
 /**********Specifically for Firefox**********/
@@ -5945,7 +6096,9 @@ ul.browserInlineIcons
 }
 .qcTestcaseName{
     padding-left:4px;
-
+}
+.zephyrTestcaseName{
+    padding-left:4px;
 }
 .qcTestcaseId{
     background: #331d4c;
@@ -5953,6 +6106,13 @@ ul.browserInlineIcons
     border-radius: 3px;
     /* height: 14px; */
     /* width: 14px; */
+    display: inline;
+    padding: 2px;
+}
+.zephyrTestcaseId{
+    background: #331d4c;
+    color: #fff;
+    border-radius: 3px;
     display: inline;
     padding: 2px;
 }

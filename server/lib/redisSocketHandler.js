@@ -5,10 +5,14 @@ const redisConfig = {"host": process.env.CACHEDB_IP, "port": parseInt(process.en
 const default_sub = redis.createClient(redisConfig);
 const default_pub = redis.createClient(redisConfig);
 const server_sub = redis.createClient(redisConfig);
+var cache = require('../lib/cache')
+var fs = require('fs');
+var options = require('../config/options');
+var pulse_ICE = {}
 const server_pub = default_pub;
 default_pub.pubsubPromise =  async (cmd, ...channel) => (new Promise((rsv, rej) => default_pub.pubsub(cmd, channel, (e,d) => ((e)? rej(e):rsv(d)))));
 const utils = require("./utils");
-
+const queue = require("./executionQueue")
 default_sub.on("message", (channel, message) => {
 	logger.debug("In redisSocketHandler: Channel is %s", channel);
 	const data = JSON.parse(message);
@@ -96,6 +100,10 @@ default_sub.on("message", (channel, message) => {
 		mySocket.emit("qtestlogin", data.responsedata);
 		break;
 	
+	case "zephyrlogin":
+		mySocket.emit("zephyrlogin", data.responsedata);
+		break;
+
 	case "apgOpenFileInEditor":
 		mySocket.emit("apgOpenFileInEditor", data.editorName, data.filePath, data.lineNumber);
 		break;
@@ -139,13 +147,15 @@ module.exports.redisSubClient = default_sub;
 module.exports.redisPubICE = default_pub;
 module.exports.redisSubServer = server_sub;
 //module.exports.redisPubServer = server_pub;
+setInterval(check_pulse,options.pingTimer);
 
 module.exports.initListeners = mySocket => {
 	const username = mySocket.handshake.query.icename;
 	logger.debug("Initializing ICE Engine connection for %s",username);
 	mySocket.evdata = {};
 	mySocket.pckts = [];
-
+	pulse_ICE[username] = {}
+	queue.Execution_Queue.register_execution_trigger_ICE(username);
 	mySocket.use((args, cb) => {
 		const ev = args[0];
 		const fullPcktId = args.splice(1,1)[0];
@@ -305,4 +315,37 @@ module.exports.initListeners = mySocket => {
 		const result = await utils.fetchData(value, "benchmark/store", "benchmark_ping");
 		if (result == "fail") logger.error("Error occurred in storing benchmark");
 	});
+	mySocket.on('ICE_status_change', async value => {
+		pulse_ICE[value['icename']] = value;
+		cache.set("ICE_status",pulse_ICE)
+		const dataToExecute = JSON.stringify({"username" : username,"onAction" : "ice_status_change","value":value,"reqID":new Date().toUTCString()});
+		server_pub.publish('ICE2_' + username, dataToExecute);
+
+	});
 };
+
+function check_pulse(){
+	time = Date()
+	var writeStr = "None"
+	logger.debug("Checking ICE pulse")
+	for (var ice in pulse_ICE){
+		if(pulse_ICE[ice]["time"]){
+			iceTime = pulse_ICE[ice]["time"]
+			var writeStr = "";
+			if(Date.parse(time) - Date.parse(iceTime) >= 100000){
+				var writeStr = time.toString() + " " + ice + " Disconnected pulse last recieved at: " + iceTime.toString();
+				logger.info(writeStr)
+				pulse_ICE[ice]["time"] = null;
+				pulse_ICE[ice]["connected"] = false;
+				cache.set("ICE_status",pulse_ICE)
+				value = pulse_ICE[ice];
+				const dataToExecute = JSON.stringify({"username" : ice,"onAction" : "ice_status_change","value":value});
+				server_pub.publish('ICE2_' + ice, dataToExecute);
+			}else{
+				writeStr = time.toString() + " " + ice + " status: " + pulse_ICE[ice]["status"] + " ICE mode: " + pulse_ICE[ice]["mode"]; 
+				logger.info(writeStr)
+				
+			}
+		}
+	}
+}

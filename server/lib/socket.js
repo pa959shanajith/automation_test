@@ -1,25 +1,33 @@
+const uiConfig = require('./../config/options');
+const screenShotPath = uiConfig.screenShotPath;
+const benchmarkRunTimes = uiConfig.benchmarkRuntimes;
+const pingTimer = uiConfig.pingTimer;
+const eula = uiConfig.showEULA;
+const httpsServer = require('./../../server').httpsServer;
+
+//SOCKET CONNECTION USING SOCKET.IO
+const io = require('socket.io').listen(httpsServer, { cookie: false, pingInterval: uiConfig.socketio.pingInterval, pingTimeout: uiConfig.socketio.pingTimeout });
+
+let socketMap = {};
+let userICEMap={};
+let socketMapUI = {};
+let socketMapScheduling = {};
+let socketMapNotify = {};
+
+module.exports = io;
+module.exports.allSocketsMap = socketMap;
+module.exports.allSocketsICEUser=userICEMap;
+module.exports.allSocketsMapUI = socketMapUI;
+module.exports.allSchedulingSocketsMap = socketMapScheduling;
+module.exports.socketMapNotify = socketMapNotify;
+
 var logger = require('../../logger');
 var redisServer = require('./redisSocketHandler');
 var utils = require('./utils');
-//SOCKET CONNECTION USING SOCKET.IO
-var socketMap = {};
-var userICEMap={};
-var socketMapUI = {};
-var socketMapScheduling = {};
-var socketMapNotify = {};
-
-var uiConfig = require('./../config/options');
-var screenShotPath = uiConfig.screenShotPath;
-var benchmarkRunTimes = uiConfig.benchmarkRuntimes;
-var myserver = require('./../../server');
-var httpsServer = myserver.httpsServer;
-var io = require('socket.io').listen(httpsServer, { cookie: false, pingInterval: uiConfig.socketio.pingInterval, pingTimeout: uiConfig.socketio.pingTimeout });
 var notificationMsg = require('./../notifications').broadcast;
-var epurl = process.env.DAS_URL;
-var Client = require("node-rest-client").Client;
-var apiclient = new Client();
+const cache = require("./cache")
 
-io.on('connection', function (socket) {
+io.on('connection', async socket => {
 	logger.info("Inside Socket connection");
 	var address;
 	if (socket.request._query.check == "true") {
@@ -32,11 +40,12 @@ io.on('connection', function (socket) {
 		socket.on('key', function (data) {
 			if (typeof(data) == "string") {
 				address = Buffer.from(data, "base64").toString();
-				logger.info("Socket connecting address %s", address);
+				logger.info("Notification Socket connecting address %s", address);
 				socketMapNotify[address] = socket;
+				sendPendingNotifications(socket,address);
 				redisServer.redisSubClient.subscribe('UI_notify_' + address, 1);
 				//Broadcast Message
-				var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/mindmap', '/p_Utility', '/p_Reports', '/p_ALM', '/p_Integration', '/p_qTest'];
+				var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/mindmap', '/p_Utility', '/p_Reports', '/p_ALM', '/p_Integration', '/p_qTest', '/p_Zephyr'];
 				notificationMsg.to = broadcastTo;
 				notificationMsg.notifyMsg = 'Server Maintenance Scheduled';
 				// var soc = socketMapNotify[address];
@@ -44,25 +53,32 @@ io.on('connection', function (socket) {
 			}
 		});
 	} else {
-		var ice_info=socket.handshake.query;
-		var icename=ice_info.icename;
+		const ice_info = socket.handshake.query;
+		const icename = ice_info.icename;
 		logger.info("ICE Socket connecting address: %s", icename);
-		var icesession = ice_info.icesession;
-		var inputs = {
-			"icesession": icesession,
-			"query": 'connect'
-		};
-		var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
+		const icesession = ice_info.icesession;
+		let eulaFlag = !eula;
+		if (eula) {
+			const inputseula = {
+				"icename": icename,
+				"query": "loadUserInfo"
+			};
+			const eulaResult = await utils.fetchData(inputseula, "login/checkTandC", "socketio");
+			eulaFlag = (eulaResult == "success" || eulaResult == "nouser");
+			if (!eulaFlag) {
+				logger.error("ICE connection %s rejected because user has not accepted Avo Assure Terms and Conditions", icename);
+				socket.send("decline");
+				socket.disconnect(false);
 			}
-		};
-		logger.info("Calling DAS Service: updateActiveIceSessions");
-		var apireq = apiclient.post(epurl + "server/updateActiveIceSessions", args,
-			function (result, response) {
-			if (response.statusCode != 200) {
-				logger.error("Error occurred in updateActiveIceSessions Error Code: ERRDAS");
+		}
+
+		if (eulaFlag) {
+			const inputs = {
+				"icesession": icesession,
+				"query": 'connect'
+			};
+			const result = await utils.fetchData(inputs, "server/updateActiveIceSessions", "updateActiveIceSessions");
+			if (result == 'fail') {
 				socket.send('fail', "conn");
 			} else {
 				socket.send('checkConnection', result.ice_check);
@@ -71,7 +87,7 @@ io.on('connection', function (socket) {
 					userICEMap[result.username]=icename;
 					setTimeout(()=> {
 						socket.send('connected', result.ice_check);
-						socket.emit('update_screenshot_path', screenShotPath, benchmarkRunTimes);
+						socket.emit('update_screenshot_path', screenShotPath, benchmarkRunTimes,pingTimer);
 					}, 300);
 					logger.debug("%s is connected", icename);
 					logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
@@ -88,22 +104,12 @@ io.on('connection', function (socket) {
 					socket.disconnect(false);
 				}
 			}
-		});
-		apireq.on('error', function(err) {
-			socket.send("fail", "conn");
-			io.close();
-			httpsServer.close()
-			logger.error("Please run the Service API and Restart the Server");
-		});
+		}
 	}
-	module.exports.allSocketsMap = socketMap;
-	module.exports.allSocketsICEUser=userICEMap;
-	module.exports.allSocketsMapUI = socketMapUI;
-	module.exports.allSchedulingSocketsMap = socketMapScheduling;
-	module.exports.socketMapNotify = socketMapNotify;
+
 	httpsServer.setTimeout();
 
-	socket.on('disconnect', function (reason) {
+	socket.on('disconnect', async reason => {
 		logger.info("Inside Socket disconnect");
 		var address;
 		// var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
@@ -111,9 +117,10 @@ io.on('connection', function (socket) {
 			address = socket.request._query.username;
 			logger.info("Disconnecting from UI socket: %s", address);
 		} else if (socket.request._query.check == "notify") {
-			// logger.info("Disconnecting from Notification socket: %s", address);
-			//address = Buffer.from(socket.request._query.username, "base64").toString();
-			//redisServer.redisSubClient.unsubscribe('UI_notify_' + address, 1);
+			address = socket.request._query.username && Buffer.from(socket.request._query.username, "base64").toString() || "undefined";
+			logger.info("Disconnecting from Notification socket: %s", address);
+			redisServer.redisSubClient.unsubscribe('UI_notify_' + address, 1);
+			if (socketMapNotify[address]) delete socketMapNotify[address];
 		} else {
 			var connect_flag = false;
 			logger.info("Inside ICE Socket disconnection");
@@ -136,31 +143,16 @@ io.on('connection', function (socket) {
 				logger.debug("Clients connected for Scheduling mode : %s", Object.keys(socketMapScheduling).join());
 			}
 			if (connect_flag) {
-				var inputs = {
+				inputs = {
 					"icename": address,
 					"query": 'disconnect'
 				};
-				var args = {
-					data: inputs,
-					headers: {
-						"Content-Type": "application/json"
-					}
-				};
-				logger.info("Calling DAS Service: updateActiveIceSessions");
-				var apireq = apiclient.post(epurl + "server/updateActiveIceSessions", args,
-					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in updateActiveIceSessions Error Code: ERRDAS");
-					} else {
-						logger.info("%s is disconnected", address);
-					}
-				});
-				apireq.on('error', function(err) {
+				const disConnResult = await utils.fetchData(inputs, "server/updateActiveIceSessions", "updateActiveIceSessions");
+				if (disConnResult == "fail") {
 					socket.send("fail", "disconn");
-					io.close();
-					httpsServer.close()
-					logger.error("Please run the Service API and Restart the Server");
-				});
+				} else {
+					logger.info("%s is disconnected", address);
+				}
 			}
 		}
 	});
@@ -198,7 +190,8 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('connect_failed', function () {
-		logger.error("Error occurred in connecting socket");
+		var address = socket.handshake && socket.handshake.query.icename || socket.request._query.username;
+		logger.error("Error occurred in connecting to socket address %s", address);
 	});
 });
 //SOCKET CONNECTION USING SOCKET.IO
@@ -225,5 +218,16 @@ const registerICE = async (req, res) => {
 	res.send(data.ice_check);
 };
 
-module.exports = io;
+async function sendPendingNotifications(socket,address){
+	var pending_notification = await cache.get("pending_notification")
+		if(pending_notification && Object.keys(pending_notification).length > 0){
+			for(user in pending_notification){
+				if(address == user){
+					socket.emit("display_execution_popup",pending_notification[user])
+					delete pending_notification[user]
+					await cache.set("pending_notification",pending_notification)
+				}
+			}
+		}
+}
 module.exports.registerICE = registerICE;

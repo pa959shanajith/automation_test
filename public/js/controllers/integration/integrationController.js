@@ -42,6 +42,13 @@ mySPA.controller('integrationController',['$scope', '$rootScope', '$window','$ht
 	   	}, 100);
 	};
 
+	$scope.zephyrlogin = function(event){
+		window.localStorage['navigateScreen'] = "p_Zephyr";
+		$timeout(function () {
+			$location.path('/'+ "p_Zephyr");
+	   	}, 100);
+	};
+
 	//Global moded popup
 	function openModelPopup(title, body){
 		$("#globalModal").find('.modal-title').text(title);

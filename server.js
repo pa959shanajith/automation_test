@@ -100,6 +100,7 @@ if (cluster.isMaster) {
 		app.use("/imgs", express.static(__dirname + "/public/imgs"));
 		app.use("/css", express.static(__dirname + "/public/css"));
 		app.use("/fonts", express.static(__dirname + "/public/fonts"));
+		app.use("/neuronGraphs", express.static(__dirname + "/public/neurongraphs"));
 
 		app.use(bodyParser.json({
 			limit: '50mb'
@@ -158,6 +159,8 @@ if (cluster.isMaster) {
 		const authconf = authlib();
 		const auth = authconf.auth;
 		app.use(authconf.router);
+		var queue = require("./server/lib/executionQueue")
+		queue.Execution_Queue.queue_init()
 		const notf = require("./server/notifications");
 		notf.initalize();
 
@@ -288,9 +291,15 @@ if (cluster.isMaster) {
 			var roles = ["Test Manager", "Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
+		
+		//Test Lead and Test Manager can access
+		app.get(/^\/(neuronGraphs)$/, function(req, res) {
+			var roles = ["Test Manager", "Test Lead"]; //Allowed roles
+			res.sendFile("index.html", { root: __dirname + "/public/neurongraphs/" });
+		});
 
 		//Test Lead and Test Manager can access
-		app.get(/^\/(p_Webocular|neuronGraphs|p_ALM|p_APG|p_Integration|p_qTest)$/, function(req, res) {
+		app.get(/^\/(p_Webocular|p_ALM|p_APG|p_Integration|p_qTest|p_Zephyr)$/, function(req, res) {
 			var roles = ["Test Manager", "Test Lead"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
@@ -402,6 +411,7 @@ if (cluster.isMaster) {
 		var utility = require('./server/controllers/utility');
 		var qc = require('./server/controllers/qualityCenter');
 		var qtest = require('./server/controllers/qtest');
+		var zephyr = require('./server/controllers/zephyr');
 		var webocular = require('./server/controllers/webocular');
 		var chatbot = require('./server/controllers/chatbot');
 		var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
@@ -447,6 +457,7 @@ if (cluster.isMaster) {
 		app.post('/getRoleNameByRoleId', auth.protect, login.getRoleNameByRoleId);
 		app.post('/logoutUser', login.logoutUser);
 		app.post('/resetPassword', auth.protect, login.resetPassword);
+		app.post('/storeUserDetails', auth.protect, login.storeUserDetails);
 		//Admin Routes
 		app.post('/getUserRoles', admin.getUserRoles);
 		app.post('/getDomains_ICE', admin.getDomains_ICE);
@@ -472,6 +483,12 @@ if (cluster.isMaster) {
 		app.post('/getPreferences', auth.protect, admin.getPreferences);
 		app.post('/provisionIce', auth.protect, admin.provisionICE);
 		app.post('/fetchICE', auth.protect, admin.fetchICE);
+		app.post('/getAvailable_ICE', auth.protect, admin.getAvailable_ICE);
+		app.post('/getICEinPools', auth.protect, admin.getICEinPools);
+		app.post('/deleteICE_pools', auth.protect, admin.deletePools);
+		app.post('/getPools', auth.protect, admin.getPools);
+		app.post('/updatePool', auth.protect, admin.updatePool);
+		app.post('/createPool_ICE', auth.protect, admin.createPool_ICE);
 		app.post('/exportProject', auth.protect, admin.exportProject);
 		app.post('/testNotificationChannels', auth.protect, admin.testNotificationChannels);
 		app.post('/manageNotificationChannels', auth.protect, admin.manageNotificationChannels);
@@ -496,6 +513,7 @@ if (cluster.isMaster) {
 		app.post('/getTestcaseDetailsForScenario_ICE', auth.protect, suite.getTestcaseDetailsForScenario_ICE);
 		app.post('/ExecuteTestSuite_ICE', auth.protect, suite.ExecuteTestSuite_ICE);
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
+		app.post('/getICE_list', auth.protect, suite.getICE_list);
 		//Scheduling Screen Routes
 		app.post('/testSuitesScheduler_ICE', auth.protect, suite.testSuitesScheduler_ICE);
 		app.post('/getScheduledDetails_ICE', auth.protect, suite.getScheduledDetails_ICE);
@@ -526,18 +544,26 @@ if (cluster.isMaster) {
 		app.post('/updateFrequency_ProfJ', chatbot.updateFrequency_ProfJ);
 		//NeuronGraphs Plugin Routes
 		app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
+		app.post('/getReport_NG', neuronGraphs2D.getReportNG);
+		app.post('/getReportExecutionStatus_NG', neuronGraphs2D.getReportExecutionStatusNG);
 		//QC Plugin
 		app.post('/loginQCServer_ICE', qc.loginQCServer_ICE);
 		app.post('/qcProjectDetails_ICE', qc.qcProjectDetails_ICE);
 		app.post('/qcFolderDetails_ICE', qc.qcFolderDetails_ICE);
 		app.post('/saveQcDetails_ICE', qc.saveQcDetails_ICE);
+		app.post('/saveUnsyncDetails', auth.protect, qc.saveUnsyncDetails);
 		app.post('/viewQcMappedList_ICE', qc.viewQcMappedList_ICE);
 		//qTest Plugin
 		app.post('/loginToQTest_ICE', qtest.loginToQTest_ICE);
 		app.post('/qtestProjectDetails_ICE', qtest.qtestProjectDetails_ICE);
 		app.post('/qtestFolderDetails_ICE', qtest.qtestFolderDetails_ICE);
 		app.post('/saveQtestDetails_ICE', qtest.saveQtestDetails_ICE);
-		app.post('/viewQtestMappedList_ICE', qtest.viewQtestMappedList_ICE);		
+		app.post('/viewQtestMappedList_ICE', qtest.viewQtestMappedList_ICE);	
+		//Zephyr Plugin
+		app.post('/loginToZephyr_ICE', zephyr.loginToZephyr_ICE);
+		app.post('/zephyrProjectDetails_ICE', zephyr.zephyrProjectDetails_ICE);
+		app.post('/saveZephyrDetails_ICE', zephyr.saveZephyrDetails_ICE);
+		app.post('/viewZephyrMappedList_ICE', zephyr.viewZephyrMappedList_ICE);	
 		//app.post('/manualTestcaseDetails_ICE', qc.manualTestcaseDetails_ICE);
 		// Automated Path Generator Routes
 		app.post('/flowGraphResults', flowGraph.flowGraphResults);

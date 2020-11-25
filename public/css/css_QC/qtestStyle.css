@@ -14,16 +14,6 @@
     text-decoration: none;
     cursor: pointer;
 }
-.viewSaveButton{
-    color: #fff;
-    border: 0;
-    border-radius: 20px;
-    background: #643693;
-    font-family: 'LatoWebLight';
-    outline: 0;
-    text-decoration: none;
-    cursor: pointer;
-}
 .viewMapbtn{
     padding: 0px 15px !important;
     font-size: 15px;
@@ -60,6 +50,12 @@
     border-radius: 5px;
     border: 1px solid #000;
 }
+/* .qTestProRelContainer select, .qtestProContainer select{
+    width: 48%;
+    height: 24px;
+    border-radius: 5px;
+    border: 1px solid #000;
+} */
 .qcTreeContainer, .qcAvoAssureTreeContainer{
     float: left;
     width: 100%;
@@ -97,15 +93,19 @@
 .linkedTestset{
     width: 100%;
     float: left;
+    height: 30px;
     margin-bottom: 26px;
 }
 .linkedTestset label{
+    width: 45%;
+    float: left;
+    background-color: #E1CAFF; 
     border-radius: 5px;
-    padding: 5px 5px 5px 10px;
+    padding: 5px 5px 5px 30px;
     font-size: 16px;
     font-family: 'LatoWebLight';
 	overflow: hidden;
-    text-overflow: ellipsis;
+	text-overflow: ellipsis;
 }
 .linkedTestset span{
     float: left;
@@ -113,34 +113,7 @@
     width: 90px;
     margin-top: 15px;
 }
-.viewImageSpan{
-    float: right !important;
-    width: 45px !important;
-    height: 22px;
-    margin-top: 0px !important;
-    border: 0px !important;
-}
-.totalcountbx {
-    color: rgb(154, 140, 140);
-}
-.almtestcasesbx {
-    /* color: rgb(216, 70, 143); */
-    color: rgb(222, 126, 164);
-}
-.scenariobx {
-    /* color: rgb(39, 95, 199); */
-    color: #a784d4;
-}
-#page-taskName label {
-    display:none;
-    border: 1px solid;
-    border-radius: 5px;
-    height: 40px;
-    width: 125px;
-    text-align: center;
-}
 .qcUndoSyncronise, .qcSyncronise{display:none;}
-.viewUndoSyncronise{display: none;float:left;margin-top: 5px;}
 .upperTestlabSection{
     width: 100%;
     height: calc(100% - 390px);

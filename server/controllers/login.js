@@ -58,6 +58,15 @@ exports.loadUserInfo = async (req, res) => {
 		userProfile.rolename = req.session.defaultRole;
 		userProfile.pluginsInfo = permData.pluginresult;
 		userProfile.page = (userProfile.rolename == "Admin")? "admin":"plugin";
+		userProfile.tandc = false;
+		if (userProfile.rolename != "Admin" && configpath.showEULA) {
+			inputs = {
+				"username": userProfile.username,
+				"query": "loadUserInfo"
+			};
+			const eulaData = await utils.fetchData(inputs, "login/checkTandC", fnName);
+			if (eulaData != "success") userProfile.tandc = true;
+		}
 		return res.send(userProfile);
 	} catch (exception) {
 		logger.error(exception.message);
@@ -132,4 +141,32 @@ exports.logoutUser = async (req, res) => {
 	req.logOut();
 	req.clearSession();
 	res.send('Session Expired');
+};
+
+exports.storeUserDetails = async (req, res) => {
+	const fnName = "storeUserDetails";
+	try {
+		logger.info("Inside UI Service: " + fnName);
+		const userDetails = req.body.userDetails;
+		const username = req.session.username;
+		const uId = req.session.userid;
+		const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		const inputs = {
+			"username": username,
+			"userId" : uId,
+			"fullname": userDetails.fullname,
+			"email": userDetails.emailaddress,
+			"acceptance": userDetails.acceptance,
+			"timestamp" : userDetails.timestamp,
+			"ip" : ip,
+			"browserfingerprint" : userDetails.browserfp,
+			"query": "checkTandC"
+		};
+		const status = await utils.fetchData(inputs, "login/checkTandC", fnName);
+		if (status == "fail" || status == "forbidden") return res.send("fail");
+		else res.send(status);
+	} catch (exception) {
+		logger.error(exception.message);
+		return res.send("fail");
+	}
 };

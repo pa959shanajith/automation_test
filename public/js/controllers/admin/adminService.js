@@ -213,6 +213,41 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			},{responseType:'arraybuffer'})
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
-		}
+		},
+		createPool_ICE: function (data) {
+			return $http.post('/createPool_ICE',{
+				data:data
+			}).then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		updatePool: function (pool) {
+			return $http.post('/updatePool',{
+				data:pool
+			}).then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		getPools: function (data) {
+			return $http.post('/getPools',{
+				data:data
+			}).then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		getICEinPools: function (pool) {
+			return $http.post('/getICEinPools',{
+				data:pool
+			}).then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		deletePools: function (poolid) {
+			return $http.post('/deleteICE_pools',{
+				data:poolid
+			}).then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		getAvailable_ICE: function () {
+			return $http.post('/getAvailable_ICE').then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		
 	};
 }]);
