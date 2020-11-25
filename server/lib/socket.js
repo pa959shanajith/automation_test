@@ -64,7 +64,7 @@ io.on('connection', async socket => {
 				"query": "loadUserInfo"
 			};
 			const eulaResult = await utils.fetchData(inputseula, "login/checkTandC", "socketio");
-			eulaFlag = eulaResult == "success";
+			eulaFlag = (eulaResult == "success" || eulaResult == "nouser");
 			if (!eulaFlag) {
 				logger.error("ICE connection %s rejected because user has not accepted Avo Assure Terms and Conditions", icename);
 				socket.send("decline");

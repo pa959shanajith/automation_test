@@ -561,7 +561,6 @@ module.exports.Execution_Queue = class Execution_Queue {
         await Promise.all(batchExecutionPromiseList)
         const finalResult = { "executionStatus": executionResult };
         reportResult["status"] = finalResult;
-        console.log(Object.keys(notifySocMap))
 
         if (!reqFromADO) {
             if (notifySocMap && notifySocMap[username] && notifySocMap[username].connected) {
