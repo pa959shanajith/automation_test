@@ -319,7 +319,6 @@ module.exports.initListeners = mySocket => {
 		pulse_ICE[value['icename']] = value;
 		cache.set("ICE_status",pulse_ICE)
 		const dataToExecute = JSON.stringify({"username" : username,"onAction" : "ice_status_change","value":value,"reqID":new Date().toUTCString()});
-
 		server_pub.publish('ICE2_' + username, dataToExecute);
 
 	});

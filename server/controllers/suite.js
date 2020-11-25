@@ -90,6 +90,7 @@ async function getICEList (projectids,userid){
 	var unallocatedICE = {}
 	var result = {ice_ids:{}}
 	result["ice_list"] = []
+	result["unallocatedICE"] = {}
 	try{
 		const pool_req =  {
 			"projectids":[projectids],
@@ -98,15 +99,30 @@ async function getICEList (projectids,userid){
 		
 		pool_list = await utils.fetchData(pool_req,"admin/getPools",fnName);
 		unallocatedICE = await utils.fetchData({}, "admin/getAvailable_ICE");
+		ice_status = await cache.get("ICE_status");
 		unallocatedICE = unallocatedICE["available_ice"];
 		if(!unallocatedICE || unallocatedICE === "fail") unallocatedICE = {}
-		for(index in pool_list){
+		for(let id in unallocatedICE){
+			var ice = unallocatedICE[id];
+			var ice_name = ice["icename"]
+			ice_list.push(ice_name);
+			result.unallocatedICE[id] = {}
+			if(ice_name in ice_status){
+				result.unallocatedICE[id]["status"] = ice_status[ice_name]["status"];
+				result.unallocatedICE[id]["mode"] = ice_status[ice_name]["mode"];
+				result.unallocatedICE[id]["connected"] = ice_status[ice_name]["connected"];
+			}else{
+				result.unallocatedICE[id]["status"] = false;
+				result.unallocatedICE[id]["mode"] = false;
+				result.unallocatedICE[id]["connected"] = false;
+			}
+		}
+		for(let index in pool_list){
 			pool = pool_list[index];
 			const ice_req = {
 				poolids: [pool["_id"]]
 			}
 			ice_in_pool = await utils.fetchData(ice_req,"admin/getICE_pools",fnName);
-			ice_status = await cache.get("ICE_status");
 			if(!ice_in_pool )ice_in_pool = {}
 			if(!ice_status )ice_status = {}
 			for(id in ice_in_pool){
@@ -126,7 +142,6 @@ async function getICEList (projectids,userid){
 				}
 			}
 			result["ice_list"] = ice_list;
-			result["unallocated_ice"] = unallocatedICE;
 		}
 	}catch(e){
 		logger.error("Error occurred in getICEList, Error: %s",e);
