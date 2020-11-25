@@ -118,12 +118,12 @@ mySPA.controller('headerController', function ($scope, $rootScope, $timeout, $ht
 		}
 	});
 	socket.on('display_execution_popup', (value) => {
+		console.log("reading notifications")
+		console.log(value)
 		var msg = "";
 		for(val in value){
 			var data = value[val].status;
-			console.log(data)
 			var testSuite = value[val].testSuiteIds;
-			console.log(data)
 			var exec = testSuite[0].testsuitename + ": "
 			if (data == "begin") continue;
 			if (data == "unavailableLocalServer") data = exec + $rootScope.unavailableLocalServer_msg;
@@ -146,21 +146,15 @@ mySPA.controller('headerController', function ($scope, $rootScope, $timeout, $ht
 	});
 
 	socket.on('result_ExecutionDataInfo', function (result) {
+		console.log("reading conn notifications")
 		var data = result.status
-		var testSuiteIds = result.testSuiteIds
+		var testSuiteIds = result.testSuiteDetails;
 		var tempId = "";
 		var msg = "";
 		var testSuite = {}
-		for(id in testSuiteIds){
-			msg = testSuiteIds[id].testsuitename + ", " + msg; 
-		}
-		if(testSuiteIds && testSuiteIds[0]){
-			var name = testSuiteIds[0].testsuitename;
-			var suites = JSON.parse(window.localStorage["_ST"]);
-			if (name in suites){
-				window.localStorage["report"] = JSON.stringify(suites[name]);
-			}
-		}
+		testSuiteIds[0]["projectidts"] = testSuiteIds[0]["projectid"];
+		window.localStorage["report"] = JSON.stringify(result);
+		msg = testSuiteIds[0]["testsuitename"]
 		
 		if (data == "Terminate") {
 			$('#executionTerminatedBy').html('Program');
@@ -196,7 +190,6 @@ mySPA.controller('headerController', function ($scope, $rootScope, $timeout, $ht
 		setTimeout(function () {
 			$("#executeGlobalModal").find('.btn-accept').focus();
 		}, 300);
-	
 	};
 
 	function unreadNotifications() {

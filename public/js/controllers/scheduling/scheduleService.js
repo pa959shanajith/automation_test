@@ -35,7 +35,6 @@ mySPA.factory('ScheduleService', ['$http','$q', function ($http,$q) {
 			function(response){return $q.reject(response.data)})
 		},
 		getICE_list : function(data){
-			//{"projectid":projId}
 			return $http.post('/getICE_list',data)
 			.then(function(response){	return response.data},
 			function(response){return $q.reject(response.data)})

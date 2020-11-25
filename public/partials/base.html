@@ -41,3 +41,32 @@
 	</p>
 </footer>
 <!--Footer-->
+
+<!-- Terms & Conditions Popup -->
+<div class="modal fade" id="tAndCpop" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" ng-click="clickTnC('Decline', $event)">&times;</button>
+				<h4 class="modal-title">Test Configuration</h4>
+			</div>
+			<div class="modal-body" style="overflow:scroll;max-height:400px">
+				<p><h1>Terms and Conditions </h1></p>
+				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+				<p><h3>Heading 1</h3></p>
+				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
+				<p><h3>Heading 2</h3></p>
+				<p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+				<p><h3>Heading 3</h3></p>
+				<p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+				<p><h3>Heading 4</h3></p>
+				<p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="clickTnC('Accept', $event)">Accept</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="clickTnC('Decline', $event)">Decline</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Terms & conditions  Popup -->

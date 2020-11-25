@@ -185,7 +185,7 @@ const counterUpdater = async (count, userid) => {
 };
 
 /** Function responsible for fetching testcase and qcdetails for given scenarioid */
-const fetchScenarioDetails = async (scenarioid, userid, qcType) => {
+const fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
 	const fnName = "fetchScenarioDetails";
 	const scenario = {};
 	const allTestcaseSteps = [];
@@ -227,14 +227,19 @@ const fetchScenarioDetails = async (scenarioid, userid, qcType) => {
 	scenario.testcase = JSON.stringify(allTestcaseSteps);
 
 	// Step 3: Get qcdetails
-	if(qcType == 'qTest') {
+	if(integrationType == 'qTest') {
 		inputs = {
 			"query": "qtestdetails",
 			"testscenarioid": scenarioid
 		};
-	} else {
+	} else if(integrationType == 'ALM'){
 		inputs = {
 			"query": "qcdetails",
+			"testscenarioid": scenarioid
+		};
+	} else if(integrationType == 'Zephyr'){
+		inputs = {
+			"query": "zephyrdetails",
 			"testscenarioid": scenarioid
 		};
 	}
@@ -280,7 +285,7 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 		};
 		const suiteDetails = suite.suiteDetails;
 		for (const tsco of suiteDetails) {
-			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid, batchData.qccredentials.qctype);
+			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid, batchData.qccredentials.integrationType);
 			if (scenario == "fail") return "fail";
 			scenario = Object.assign(scenario, tsco);
 			suiteObj.condition.push(scenario.condition);
@@ -422,7 +427,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 					errMsg = "This scenario was skipped " + errMsg;
 					let report_result = {};
 					report_result["status"] = execStatus
-					report_result["testSuiteIds"] = execReq["suitedetails"]
+					report_result["testSuiteDetails"] = execReq["suitedetails"]
 					await updateSkippedExecutionStatus(execReq, userInfo, execStatus, errMsg);
 					if (resSent && notifySocMap[username] && notifySocMap[username].connected) {
 						notifySocMap[username].emit(execStatus);
@@ -498,7 +503,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 						let result = status;
 						let report_result = {};
 						report_result["status"] = status
-						report_result["testSuiteIds"] = execReq["suitedetails"]
+						report_result["testSuiteDetails"] = execReq["suitedetails"]
 						if (resultData.userTerminated) result = "UserTerminate";
 						if (execType == "API") result = [d2R, status];
 						if (resSent && notifySocMap[username] && notifySocMap[username].connected) { // This block is only for active mode

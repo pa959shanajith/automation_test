@@ -98,7 +98,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					//<img class='expandTable' src='imgs/icon-minus.png'>
 
 					var row = $("#executionDataTable_" + m).find('tbody');
-					console.log("row", row);
 					var count = 1;
 
 					//Building object for each row after getting the data from server
@@ -528,7 +527,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	};
 	//Save TestSuite Functionality
 
-	$scope.qccredentials = {qcurl: "", qcusername: "", qcpassword: "", qctype: ""};
+	$scope.qccredentials = {qcurl: "", qcusername: "", qcpassword: "", integrationType: ""};
 
 	//Save QC Details
 	$scope.saveQcCredentials = function (e) {
@@ -569,13 +568,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					$scope.qccredentials = {
 						qcurl: $("#almURL").val(),
 						qcusername: $("#almUserName").val(),
-						qcpassword: $("#almPassword").val()
+						qcpassword: $("#almPassword").val(),
+						integrationType: "ALM"
 					}
-					//Transaction Activity for SaveQcCredentialsExecution Button Action
-					// var labelArr = [];
-					// var infoArr = [];
-					// labelArr.push(txnHistory.codesDict['SaveQcCredentialsExecution']);
-					// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
 					$("#ALMSyncWindow").find("button.close").trigger("click");
 				}
 			}, function (error) {
@@ -624,15 +619,64 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 						qcusername: $("#qTestUserName").val(),
 						qcpassword: $("#qTestPassword").val(),
 						qteststeps: checkedVal,
-						qctype: "qTest"
+						integrationType: "qTest"
 					}
 					$("#QTestSyncWindow").find("button.close").trigger("click");
 				}
 			}, function (error) {
-				console.log("Error in qcController.js file loginQCServer method! \r\n " + (error.data));
+				console.log("Error in qTestController.js file loginqTestServer method! \r\n " + (error.data));
 			});
 		}
 	};
+
+	//Save Zephyr Details
+	$scope.saveZephyrCredentials = function (e) {
+		$("#ZephyrURL, #ZephyrUserName, #ZephyrPassword").removeClass('inputErrorBorder');
+		if (!$scope.ZephyrURL) {
+			$("#ZephyrURL").addClass('inputErrorBorder');
+			$(".error-msg-exeQc").text("Please Enter Zephyr Account ID.");
+		} else if (!$scope.ZephyrUserName) {
+			$("#ZephyrUserName").addClass('inputErrorBorder');
+			$(".error-msg-exeQc").text("Please Enter Access Key.");
+		} else if (!$scope.ZephyrPassword) {
+			$("#ZephyrPassword").addClass('inputErrorBorder');
+			$(".error-msg-exeQc").text("Please Enter Secret Key.");
+		} else if (appType != "SAP" && browserTypeExe.length === 0) {
+			$("#ZephyrSyncWindow").find("button.close").trigger("click");
+			openDialogExe("Execute Test Suite", "Please select a browser");
+		} else if ($(".exe-ExecuteStatus input:checked").length === 0) {
+			$("#ZephyrSyncWindow").find("button.close").trigger("click");
+			openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
+		} else {
+			$("#ZephyrURL,#ZephyrUserName,#ZephyrPassword").css({
+				"background": "none"
+			});
+			$(".error-msg-exeQc").text("");
+			ExecutionService.loginZephyrServer_ICE($scope.ZephyrURL, $scope.ZephyrUserName, $scope.ZephyrPassword,"Zephyr")
+			.then(function (data) {
+				if (data == "unavailableLocalServer") {
+					$(".error-msg-exeQc").text("Unavailable LocalServer");
+				} else if (data == "Invalid Session") {
+					$(".error-msg-exeQc").text("Invalid Session");
+				} else if (data == "invalidcredentials") {
+					$(".error-msg-exeQc").text("Invalid Credentials");
+				} else if (data == "invalidurl") {
+					$(".error-msg-exeQc").text("Invalid URL");
+				} else {
+					$scope.qccredentials = {
+						qcurl: $("#ZephyrURL").val(),
+						qcusername: $("#ZephyrUserName").val(),
+						qcpassword: $("#ZephyrPassword").val(),
+						integrationType: "Zephyr"
+					}
+					$("#ZephyrSyncWindow").find("button.close").trigger("click");
+				}
+			}, function (error) {
+				console.log("Error in ZephyrController.js file loginZephyrServer method! \r\n " + (error.data));
+			});
+		}
+	};
+
 	
 	//Execute TestSuite Functionality
 
@@ -695,6 +739,16 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			allocateICEPopup()
 		}
 	};
+
+	function openModelPopup(modalId, title, body) {
+		var modalBox = $("#" + modalId);
+		modalBox.find('.modal-title').text(title);
+		modalBox.find('.modal-body p').text(body);
+		modalBox.modal("show");
+		setTimeout(function () {
+			modalBox.find('.btn-default').focus();
+		}, 300);
+	}
 
 	const allocateICEPopup = () =>{
 		var projId = JSON.parse(window.localStorage['_CT']).testSuiteDetails[0].projectidts
@@ -787,7 +841,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			unblockUI();
 			$rootScope.resetSession.end();
 			executionActive = false;
-			console.log(data)
 			if("status" in data){
 				if(data.status == "fail"){
 					openDialogExe("Queue Test Suite", data["error"]);
@@ -863,6 +916,16 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			$scope.qTestUserName = '';
 			$scope.qTestPassword = '';
 			$("#QTestSyncWindow").modal("show");
+			$(".error-msg-exeQc").text('');
+		}
+		else if ($(this).val() == "2") {
+			$("#ZephyrURL").val('');
+			$("#ZephyrUserName").val('');
+			$("#ZephyrPassword").val('');
+			$scope.ZephyrURL = '';
+			$scope.ZephyrUserName = '';
+			$scope.ZephyrPassword = '';
+			$("#ZephyrSyncWindow").modal("show");
 			$(".error-msg-exeQc").text('');
 		}
 	});

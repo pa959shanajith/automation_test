@@ -164,7 +164,8 @@ const fetchData = async (inputs, url, from, all) => {
 		});
 		apiReq.on('error', function(err) {
 			logger.error("Error occurred in " + url + from + query + ", Error Code : ERRDAS, Error: %s", err);
-			rsv("fail");
+			if (all) rsv(["fail", response, result]);
+			else rsv("fail");
 		});
 	}));
 	return promiseData;

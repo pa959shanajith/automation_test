@@ -5010,7 +5010,7 @@ Purpose : displaying pop up for replication of project
 				var reader = new FileReader();
 				reader.onload = function (e) {
 					if (["mm","json"].indexOf((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase())>=0) {
-						var resultString = JSON.parse(reader.result);
+						resultString = JSON.parse(reader.result);
 						if (!('testscenarios' in resultString)){
 							openDialogMindmap("Import Error", "Incorrect JSON imported. Please check the contents!!");
 						} else if(resultString.testscenarios.length == 0){
@@ -5022,11 +5022,62 @@ Purpose : displaying pop up for replication of project
                                 } else if (result == 'fail') {
                                     openDialogMindmap('Error', 'error fetching data');
                                 } else {
-                                    //openDialogMindmap("Import Mindmap", "Success!");
+                                    var index=-1;
                                     $scope.createMap('tabCreate');
                                     $scope.tab = 'tabCreate';
                                     $scope.createMapsCall();
-                                    $('#ProjectInput').modal('show');
+                                    mindmapServices.populateProjects().then(function(res) {
+                                        if (res == "Invalid Session") {
+                                            return $rootScope.redirectPage();
+                                        }
+                                        if (res.projectId.length > 0) {
+                                            $scope.projectList = [];
+                                            for (i = 0; i < (res.projectId.length && res.projectName.length); i++) {
+                                                $scope.projectList.push({
+                                                    'apptype': res.appType[i],
+                                                    'name': res.projectName[i],
+                                                    'id': res.projectId[i],
+                                                    'releases':res.releases[i],
+                                                    'domains':res.domains[i]
+                                                });
+                                            }
+                                        }
+                                        $scope.projectListChange(resultString['projectid']);
+                                        var version_num = '';
+
+                                        if ($scope.param == 1) {
+                                            version_num = $('.version-list').val();
+                                        }
+                                        unloadMindmapData();
+                                        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO || $scope.projectList[0].id, parseFloat(version_num), $('.cycle-list').val(),null,null)
+                                            .then(function(res) {
+                                                if (res == "Invalid Session") {
+                                                    return $rootScope.redirectPage();
+                                                }
+                                                var nodeBox = d3.select('.ct-nodeBox');
+                                                $scope.allMMaps = res;
+                                                // if (selectedTab == 'tabCreate')
+                                                populateDynamicInputList();
+                                                for (i=0;i<$scope.allMMaps.length;i++){
+                                                    if($scope.allMMaps[i]._id==result._id){
+                                                        // $('.ct-nodeBox').children()[i].click();
+                                                        $scope.loadMap(i);
+                                                    }
+                                                    }
+                                                setModuleBoxHeight();
+                                                unassignTask=[];
+                                                unblockUI();
+                                
+                                            }, function(error) {
+                                                console.log("Error:", error);
+                                                unblockUI();
+                                            })
+                                        
+                                        
+                                    });
+                                    // loadMindmapData1();
+                                    $scope.loadMap(0);
+                                    //openDialogMindmap("Import Mindmap", "Success!");
                                 }
                             }, function(error) {
                                 console.log(error);
