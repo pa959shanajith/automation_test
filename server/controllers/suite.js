@@ -110,6 +110,7 @@ async function getICEList (projectids,userid){
 			result.unallocatedICE[id] = {}
 			if(!ice_status )ice_status = {}
 			if(ice_name in ice_status){
+				result.unallocatedICE[id]["icename"] = ice_name;
 				result.unallocatedICE[id]["status"] = ice_status[ice_name]["status"];
 				result.unallocatedICE[id]["mode"] = ice_status[ice_name]["mode"];
 				result.unallocatedICE[id]["connected"] = ice_status[ice_name]["connected"];

@@ -62,17 +62,14 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 								+ '<td><select disabled><option value="1" ' + ((flag) ? '' : 'selected') + '>True</option><option value="0" ' + ((flag) ? 'selected' : '') + '>False</option></select></td>'
 								+ '<td>' + eachData[i].projectnames[j] + '</td></tr>');
 						}
-						if (!result.connectedICE || result.connectedICE.length == 0) openModelPopup("Schedule Test Suite", "Please enable scheduling in Local Server. And refresh the page.");
-						else {
-							$(".ipformating").empty();
-							// $(".ipformating").append("<option value=' ' selected disabled>Select User</option>")			
-							for (k = 0; k < result.connectedICE.length; k++) {
-								$(".ipformating").append("<option value='" + result.connectedICE[k] + "'>" + result.connectedICE[k] + "</option>")
-							}
-							$(".ipformating").append("<option hidden value='Module Smart Scheduling'>Module Smart Scheduling</option>")
-							$(".ipformating").append("<option hidden value='Scenario Smart Scheduling'>Scenario Smart Scheduling</option>")
-
+						$(".ipformating").empty();
+						// $(".ipformating").append("<option value=' ' selected disabled>Select User</option>")			
+						for (k = 0; k < result.connectedICE.length; k++) {
+							$(".ipformating").append("<option value='" + result.connectedICE[k] + "'>" + result.connectedICE[k] + "</option>")
 						}
+						$(".ipformating").append("<option hidden value='Module Smart Scheduling'>Module Smart Scheduling</option>")
+						$(".ipformating").append("<option hidden value='Scenario Smart Scheduling'>Scenario Smart Scheduling</option>")
+
 					}
 					$(".fc-timePicker").timepicker({
 						//minTime: new Date().getHours() + ':' + (parseInt(new Date().getMinutes() + 5)),
@@ -599,39 +596,26 @@ var copyId = 0
 function openPopup(id) {
 	if ($('.ipContainer').find(":selected")[parseInt(id[id.length - 1])].label === "Scenario Smart Scheduling") {
 		console.log(id)
-		if ($('#' + id)[0].length < 3) {
-			$('#smartScheduling').find('.btn-default')[1].click();
-			openModelPopup("Smart Scheduling", "No active ICE found to use Smart Scheduling");
-			$('#' + id)[0].children[0].selectedIndex = 0;
+		
+		$("#smartScheduling").modal("show");
+		$($('#smartScheduling').find('.btn-default')[1]).data('selector-id', id);
+		$('#smartScheduling').find('.btn-default')[1].onclick = function () {
+			$('#' + $(this).data('selector-id'))[0].selectedIndex = 0;
 			sequence(true,false,0);
-			copyId = 0
-		} else {
-			$("#smartScheduling").modal("show");
-			$($('#smartScheduling').find('.btn-default')[1]).data('selector-id', id);
-			$('#smartScheduling').find('.btn-default')[1].onclick = function () {
-				$('#' + $(this).data('selector-id'))[0].selectedIndex = 0;
-				sequence(true,false,0);
-				smartBatch = false;
-				copyId = 0;
-			}
-			smartBatch = true;
-			copyId = parseInt(id.replace("mod",""));
-			sequence(true,true,copyId);
+			smartBatch = false;
+			copyId = 0;
 		}
+		smartBatch = true;
+		copyId = parseInt(id.replace("mod",""));
+		sequence(true,true,copyId);	
 	}
 	else if ($('.ipContainer').find(":selected")[parseInt(id[id.length - 1])].label === "Module Smart Scheduling") {
-		if ($('#' + id)[0].length <= 3) {
-			$('#smartScheduling').find('.btn-default')[1].click();
-			openModelPopup("Smart Scheduling", "No active ICE found to use Smart Scheduling");
-			$('#' + id)[0].children[0].selectedIndex = 0;
-			sequence(true,false,0);
-			copyId = 0;
-		} else {
-			openModelPopup("Smart Scheduling", "All the modules will be executed as batch.\nAll available ICE should be in similar configurations for optimal results.");
-			smartBatch = true;
-			copyId = parseInt(id.replace("mod",""));
-			sequence(true,true,copyId);
-		}
+		
+		openModelPopup("Smart Scheduling", "All the modules will be executed as batch.\nAll available ICE should be in similar configurations for optimal results.");
+		smartBatch = true;
+		copyId = parseInt(id.replace("mod",""));
+		sequence(true,true,copyId);
+		
 	} else { 
 		smartBatch = false;
 		sequence(false,false,parseInt(id.replace("mod","")));
