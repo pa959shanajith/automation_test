@@ -329,6 +329,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	// on click of edit ice pool button
 	$scope.editICEPool = async() => {
+		$scope.EditIcePoolReset()
 		$scope.tab = "tabIcePoolEdit";
 		blockUI("Fetching ICE Pools...");
 		var res = await populatePool()
