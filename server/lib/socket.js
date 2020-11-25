@@ -2,6 +2,7 @@
 const uiConfig = require('./../config/options');
 const screenShotPath = uiConfig.screenShotPath;
 const benchmarkRunTimes = uiConfig.benchmarkRuntimes;
+const pingTimer = uiConfig.pingTimer;
 const eula = uiConfig.showEULA;
 const httpsServer = require('./../../server').httpsServer;
 
@@ -88,7 +89,7 @@ io.on('connection', async socket => {
 					userICEMap[result.username]=icename;
 					setTimeout(()=> {
 						socket.send('connected', result.ice_check);
-						socket.emit('update_screenshot_path', screenShotPath, benchmarkRunTimes);
+						socket.emit('update_screenshot_path', screenShotPath, benchmarkRunTimes,pingTimer);
 					}, 300);
 					logger.debug("%s is connected", icename);
 					logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
