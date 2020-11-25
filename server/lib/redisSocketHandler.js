@@ -9,7 +9,6 @@ var cache = require('../lib/cache')
 var fs = require('fs');
 var options = require('../config/options');
 var pulse_ICE = {}
-// cache.select(2);
 const server_pub = default_pub;
 default_pub.pubsubPromise =  async (cmd, ...channel) => (new Promise((rsv, rej) => default_pub.pubsub(cmd, channel, (e,d) => ((e)? rej(e):rsv(d)))));
 const utils = require("./utils");
@@ -148,7 +147,6 @@ module.exports.redisSubClient = default_sub;
 module.exports.redisPubICE = default_pub;
 module.exports.redisSubServer = server_sub;
 //module.exports.redisPubServer = server_pub;
-//module.exports.cache = cache;
 setInterval(check_pulse,options.pingTimer);
 
 module.exports.initListeners = mySocket => {
@@ -331,7 +329,7 @@ module.exports.initListeners = mySocket => {
 function check_pulse(){
 	time = Date()
 	var writeStr = "None"
-	logger.info("Checking ICE pulse")
+	logger.debug("Checking ICE pulse")
 	for (var ice in pulse_ICE){
 		if(pulse_ICE[ice]["time"]){
 			iceTime = pulse_ICE[ice]["time"]

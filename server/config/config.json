@@ -1,6 +1,7 @@
 {
     "defaultTokenExpiry": "720",
     "showEULA": false,
+    "pingTimer":"120000",
     "strictTaskWorkflow": false,
     "benchmarkRuntimes": ["00:05","08:00","13:00","18:55"],
     "certificate": {
@@ -14,6 +15,5 @@
     "screenShotPath": {
         "default": "",
         "mac": ""
-    },
-    "pingTimer":"120000"
+    }
 }

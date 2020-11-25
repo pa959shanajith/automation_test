@@ -1714,7 +1714,7 @@ exports.createPool_ICE = async(req,res) => {
 		const inputs = {
 			poolname: poolinfo.poolname,
 			createdby: req.session.userid,
-			createdon: "",
+			createdby: req.session.activeRole,
 			projectids: poolinfo.projectids
 		};
 		const result = await utils.fetchData(inputs, "admin/createPool_ICE", fnName);
@@ -1725,37 +1725,7 @@ exports.createPool_ICE = async(req,res) => {
 		res.send("fail");
 	}
 } 
-// UI service to get relevant unassigned ICE
-exports.getUnassigned_ICE = async(req,res) => {
-	const fnName = "getUnassigned_ICE"
-	logger.info("Inside UI service: " + fnName)
-	try{
-		const poolinfo = req.body.tokeninfo;
-		const inputs = {
-			poolname: poolinfo.poolname,
-			poolid: poolinfo.createdby,
-			projectids: poolinfo.projectids,
-		};
-		const result = await utils.fetchData(inputs, "admin/getUnassgined_ICE", fnName);
-		res.send(result);
-	}catch (exception){
-		logger.error("Error occurred in admin/getUnassigned_ICE:", exception);
-		res.send("fail");
-	}
-} 
-
-exports.getAvailable_ICE = async(req,res) => {
-	const fnName = "getAvailable_ICE"
-	logger.info("Inside UI service: " + fnName)
-	try{
-		const inputs = {};
-		const result = await utils.fetchData(inputs, "admin/getAvailable_ICE", fnName);
-		res.send(result);
-	}catch (exception){
-		logger.error("Error occurred in admin/getAvailable_ICE:", exception);
-		res.send("fail");
-	}
-} 
+ 
 // UI service to update a pool
 exports.updatePool = async(req,res) => {
 	const fnName = "updatePool"
@@ -1769,8 +1739,7 @@ exports.updatePool = async(req,res) => {
 			ice_added: poolinfo.ice_added,
 			ice_deleted: poolinfo.ice_deleted,
 			modifiedby: req.session.userid,
-			modifiedon: new Date().toUTCString()
-
+			modifiedbyrole: req.session.activeRole,
 		};
 		const result = await utils.fetchData(inputs, "admin/updatePool_ICE", fnName);
 		if(result && result != "fail") queue.Execution_Queue.updatePools("update",poolinfo);

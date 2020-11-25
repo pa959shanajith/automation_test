@@ -532,7 +532,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 /** Function responsible for Orchestrating execution flow. Invokes series of functions to achive the results */
 module.exports.executionFunction = async (batchExecutionData, execIds, userInfo, execType) => {
 	//const icename = (execType=='API')? userInfo.icename : myserver.allSocketsICEUser[userInfo.username];
-	icename = userInfo.icename;
+	var icename = userInfo.icename;
 	//userInfo.icename=icename;
 	redisServer.redisSubServer.subscribe('ICE2_' + icename);
 	//var iceStatus = await checkForICEstatus(icename, execType);
@@ -557,7 +557,7 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 	const fnName = "ExecuteTestSuite_ICE"
 	logger.info("Inside UI service: ExecuteTestSuite_ICE");
 	var targetUser = req.body.executionData.targetUser;
-	inputs = { "icename": targetUser };
+	let inputs = { "icename": targetUser };
 	const profile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
 	const userInfo = { "userid": profile.userid, "username": profile.name, "role": profile.role, "icename": targetUser,"invokingUser":req.session.userid,"invokingUserName":req.session.username,"invokingUserRole":req.session.activeRoleId};
 	const batchExecutionData = req.body.executionData;
@@ -569,7 +569,7 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 /** This service executes the testsuite(s) for request from API */
 exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE_API");
-	result = queue.Execution_Queue.addAPITestSuiteToQueue(req);
+	var result = queue.Execution_Queue.addAPITestSuiteToQueue(req);
 	res.send(result)
 };
 
@@ -618,10 +618,11 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 	const userInfo = { "userid": req.session.userid, "username": req.session.username, "role": req.session.activeRoleId };
 	const multiExecutionData = req.body.executionData;
 	var batchInfo = multiExecutionData.batchInfo;
-	var invokingUser = {}
-	invokingUser["id"] = req.session.userid;
-	invokingUser["invokingUserName"] = req.session.username;
-	invokingUser['invokingUserRole'] = req.session.activeRoleId;
+	var invokingUser = {
+		invokingUser: req.session.userid,
+		invokingUserName: req.session.username,
+		invokingUserRole: req.session.activeRoleId
+	}
 	var stat = "none";
 	var dateTimeUtc = "";
 	var dateTimeList = batchInfo.map(u => {
@@ -835,9 +836,7 @@ const scheduleTestSuite = async (multiBatchExecutionData,invokingUser) => {
 	for (const batchExecutionData of multiBatchExecutionData) {
 		let execIds = {"batchid": "generate", "execid": {}};
 		var userInfo = userInfoMap[batchExecutionData.targetUser];
-		userInfo['invokingUser'] = invokingUser.id;
-		userInfo["invokingUsername"] = invokingUser.invokingUserName;
-		userInfo["invokingUserRole"] = invokingUser.invokingUserRole;
+		Object.assign(userInfo, invokingUser);
 		const scheduleTime = batchExecutionData.timestamp;
 		const scheduleId = batchExecutionData.scheduleId;
 		const smartId = batchExecutionData.smartScheduleId;
@@ -933,7 +932,7 @@ exports.reScheduleTestsuite = async () => {
 		if (eipResult != "fail") {
 			for (var i = 0; i < eipResult.length; i++) {
 				const eipSchd = eipResult[i];
-				await this.updateScheduleStatus(eipSchd._id, "Failed");
+				await updateScheduleStatus(eipSchd._id, "Failed");
 			}
 		}
 
@@ -949,7 +948,7 @@ exports.reScheduleTestsuite = async () => {
 			const schd = result[i];
 			const scheduleTime = new Date(result[i].scheduledon);
 			if (scheduleTime < new Date()) {
-				await this.updateScheduleStatus(schd._id, "Missed");
+				await updateScheduleStatus(schd._id, "Missed");
 			} else {
 				// Create entire multiBatchExecutionData object;
 				const tsuIds = schd.testsuiteids;
@@ -969,7 +968,7 @@ exports.reScheduleTestsuite = async () => {
 				};
 				const details = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
 				if (details == "fail") {
-					await this.updateScheduleStatus(schd._id, "Failed");
+					await updateScheduleStatus(schd._id, "Failed");
 					continue;
 				}
 				const prjObj = details.project;

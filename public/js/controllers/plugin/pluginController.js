@@ -83,7 +83,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 					} else {
 						var tasksJson = data1;
 						$scope.taskJson = data1;
-						 window.localStorage['_TJ'] = angular.toJson(tasksJson);
+					 	window.localStorage['_TJ'] = angular.toJson(tasksJson);
 						if (tasksJson.length == 0) unblockUI();
 						/*	Build a list of releaseids and cycleids
 						* Another dict for releaseid and cyclelist out of task json

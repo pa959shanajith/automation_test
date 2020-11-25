@@ -421,8 +421,6 @@ module.exports.Execution_Queue = class Execution_Queue {
     }
 
     static async executeScheduleTestSuite(batchExecutionData, execIds, userInfo, type) {
-        const fhName = "executeScheduleTestSuite";
-        let soc = myserver.socketMapNotify[userInfo.username];
         const scheduleId = execIds["scheduleId"];
         try {
 

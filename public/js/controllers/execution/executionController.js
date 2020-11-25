@@ -740,15 +740,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		}
 	};
 
-	function openModalPopup(modalId, title, body) {
-		var modalBox = $("#" + modalId);
-		modalBox.find('.modal-title').text(title);
-		modalBox.find('.modal-body p').text(body);
-		modalBox.modal("show");
-		setTimeout(function () {
-			modalBox.find('.btn-default').focus();
-		}, 300);
-	}
+	
 
 	const allocateICEPopup = () =>{
 		var projId = JSON.parse(window.localStorage['_CT']).testSuiteDetails[0].projectidts
@@ -760,10 +752,10 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			if(data == "Invalid Session") {
 				$rootScope.redirectPage();
 			} else if(data == "fail") {
-				openModalPopup("Suite Execution", "Failed to fetch users.");
+				openDialogExe("Suite Execution", "Failed to fetch users.");
 				unblockUI();
 			} else if(Object.keys(data).length == 0) {
-				openModalPopup("Suite Execution", "ICE is not available");
+				openDialogExe("Suite Execution", "ICE is not available");
 				unblockUI();
 			} else {
 				$scope.poolList = data
@@ -780,13 +772,13 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				}).catch(error=>{
 					unblockUI()
 					console.error(error)
-					openModalPopup("Suite Execution", "Failed to fetch ICE.");
+					openDialogExe("Suite Execution", "Failed to fetch ICE.");
 				})
 			}
 		}, function (error) {
 			unblockUI();
 			console.error(error)
-			openModalPopup("Suite Execution", "Failed to fetch ICE.");
+			openDialogExe("Suite Execution", "Failed to fetch ICE.");
 		});
 		$('#selectIcePoolIce').modal("show")
 		return;
@@ -1066,12 +1058,3 @@ var openDialogExe = function (title, body, submitflag) {
 	
 };
 
-function openModalPopup(title, body){
-	var mainModal = $("#popupModal");
-	mainModal.find('.modal-title').text(title);
-	mainModal.find('.modal-body p').text(body);
-	mainModal.modal("show");
-	setTimeout(function(){
-		$("#popupModal").find('.btn-default').focus();
-	}, 300);
-}

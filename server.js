@@ -460,7 +460,6 @@ if (cluster.isMaster) {
 		app.post('/getDetails_ICE', admin.getDetails_ICE);
 		app.post('/assignProjects_ICE', admin.assignProjects_ICE);
 		app.post('/getAssignedProjects_ICE', admin.getAssignedProjects_ICE);
-		app.post('/getAvailablePlugins', auth.protect, admin.getAvailablePlugins);
 		app.post('/manageSessionData', auth.protect, admin.manageSessionData);
 		app.post('/manageUserDetails', auth.protect, admin.manageUserDetails);
 		app.post('/getUserDetails', auth.protect, admin.getUserDetails);
@@ -479,10 +478,8 @@ if (cluster.isMaster) {
 		app.post('/getICEinPools', auth.protect, admin.getICEinPools);
 		app.post('/getAllProjects', auth.protect, admin.getAllProjects);
 		app.post('/deleteICE_pools', auth.protect, admin.deletePools);
-		app.post('/getAvailable_ICE', auth.protect, admin.getAvailable_ICE);
 		app.post('/getPools', auth.protect, admin.getPools);
 		app.post('/updatePool', auth.protect, admin.updatePool);
-		app.post('/getUnassigned_ICE', auth.protect, admin.getUnassigned_ICE);
 		app.post('/createPool_ICE', auth.protect, admin.createPool_ICE);
 		app.post('/exportProject', auth.protect, admin.exportProject);
 		app.post('/testNotificationChannels', auth.protect, admin.testNotificationChannels);
