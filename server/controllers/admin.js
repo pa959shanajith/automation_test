@@ -1870,6 +1870,7 @@ exports.exportProject = async (req, res) => {
 		const archive = archiver('zip', { zlib: { level: 9 }});
 		const stream = fs.createWriteStream(zip_path);
 		stream.on('close', ()=>{
+			removeDir(projectPath);
 			res.writeHead(200, {
 				'Content-Type' : 'application/zip',
 			});
@@ -1883,6 +1884,26 @@ exports.exportProject = async (req, res) => {
 		return res.status(500).send("fail");
 	}
 };
+
+const removeDir = function(path) {
+	if (fs.existsSync(path)) {
+		const files = fs.readdirSync(path);
+		if (files.length > 0) {
+			files.forEach(function(filename) {
+				if (fs.statSync(path + "/" + filename).isDirectory()) {
+					removeDir(path + "/" + filename);
+				} else {
+					fs.unlinkSync(path + "/" + filename);
+				}
+			});
+			fs.rmdirSync(path);
+		} else {
+			fs.rmdirSync(path);
+		}
+	} else {
+		logger.error("Directory path not found.")
+	}
+}
 
 const getEmailConf = async (conf, fnName, inputs, flag) => {
 	if (!flag) flag = ['1','0','0','0','0','0','0','0','0','0','0','0','0'];

@@ -526,6 +526,7 @@ if (cluster.isMaster) {
 		app.post('/getReport', auth.protect, report.getReport);
 		app.post('/openScreenShot', auth.protect, report.openScreenShot);
 		app.post('/connectJira_ICE', report.connectJira_ICE);
+		app.post('/downloadVideo', auth.protect, report.downloadVideo);
 		app.post('/getReportsData_ICE', auth.protect, report.getReportsData_ICE);
 		app.post('/getReport_API', report.getReport_API);
 		app.use('/viewReport', report.viewReport);

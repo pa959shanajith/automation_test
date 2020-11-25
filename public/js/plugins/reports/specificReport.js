@@ -557,7 +557,6 @@ function loadReports() {
                 $.ajax({
                     type: 'GET',
                     url: url,
-                    responseType: 'arraybuffer',
                     xhr: function() { return xhrOverride },
                     success: function(data) {
                         var filedata = new Blob([data], {
@@ -570,6 +569,39 @@ function loadReports() {
                         var err = jqXHR.getResponseHeader("X-Render-Error") || "Error while generating PDF Report";
                         blockUI(err);
                         console.log("Error while generating PDF Report. Error: " + JSON.stringify(err));
+                        setTimeout(function () {unblockUI()}, 2000);
+                    }
+                });
+            } else if (repType == "mp4"){
+                var videoPath = $(this).attr("data-path");
+                var hostName = window.location.host;
+                var posturl = 'https://' + hostName + '/downloadVideo';
+                blockUI('Loading....');
+                var xhrOverride = new XMLHttpRequest();
+                xhrOverride.responseType = 'arraybuffer';
+                $.ajax({
+                    type: 'POST',
+                    url: posturl,
+                    data: {'videoPath':videoPath},
+                    xhr: function() { return xhrOverride },
+                    success: function(data1) {
+                        if (data1.byteLength){
+                            var file = new Blob([data1], { type: 'video/mp4' });
+                            downloadFile(file,filename);
+                            unblockUI();
+                        } else{
+                            unblockUI();
+                            var err = "Error while exporting report Video";
+                            blockUI(err);
+                            console.log(err);
+                            setTimeout(function () {unblockUI()}, 2000);
+                        }
+                    },
+                    error: function() {
+                        unblockUI();
+                        var err = "Error while exporting report Video";
+                        blockUI(err);
+                        console.log("Error while exporting report JSON. Error: " + JSON.stringify(err));
                         setTimeout(function () {unblockUI()}, 2000);
                     }
                 });
