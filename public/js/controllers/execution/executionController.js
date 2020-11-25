@@ -740,7 +740,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		}
 	};
 
-	function openModelPopup(modalId, title, body) {
+	function openModalPopup(modalId, title, body) {
 		var modalBox = $("#" + modalId);
 		modalBox.find('.modal-title').text(title);
 		modalBox.find('.modal-body p').text(body);

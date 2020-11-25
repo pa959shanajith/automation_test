@@ -45,7 +45,6 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 					//Populating Data in Scheduling Table
 					var dataLen = Object.keys(data).length;
 					$(".scheduleSuiteTable").empty();
-					console.log(result)
 					var eachData = Object.keys(data).map(function (itm) { return data[itm]; });
 					for (i = 0; i < dataLen; i++) {
 						$(".scheduleSuiteTable").append('<div class="batchSuite"><div class="scheduleSuite"><input type="checkbox" class="selectScheduleSuite"/>'
