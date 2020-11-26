@@ -145,7 +145,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                     } if (this.ice_list[targetICE]["mode"]) {
                         msg = msg + " ICE mode: DND";
                     } else {
-                        msg = msg + " ICE mode: Avaialble";
+                        msg = msg + " ICE mode: Available";
                     }
                     response["message"] = "Execution queued on " + targetICE + " " + msg;
                 }
@@ -230,7 +230,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                     } if (this.ice_list[targetICE]["mode"]) {
                         msg = msg + " ICE mode: DND";
                     } else {
-                        msg = msg + " ICE mode: Avaialble";
+                        msg = msg + " ICE mode: Available";
                     }
                     response["message"] = "Execution queued on " + targetICE + " " + msg;
                 }
