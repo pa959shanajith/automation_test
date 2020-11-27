@@ -40,7 +40,6 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
 						'js/directives/headerDirective.js',	
-						'js/factories/socketFactory.js',
 						'js/controllers/login/loginService.js',
 						'js/controllers/header/headerController.js',
 						'js/controllers/plugin/pluginController.js',
@@ -58,7 +57,6 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                     return $ocLazyLoad.load([
 						'css/bootstrap/bootstrap-datepicker.min.css',
 						'js/directives/headerDirective.js',	
-						'js/factories/socketFactory.js',
 						'js/plugins/bootstrap/bootstrap-datepicker.min.js',	
 						//'js/plugins/jquery-ui.min.js',
 						'js/plugins/jquery.line.js',
@@ -81,7 +79,6 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
 						'js/directives/headerDirective.js',	
-						'js/factories/socketFactory.js',
 						'js/plugins/apg/class-diagram.js',
 						'js/plugins/apg/multiline-text.js',
 						'js/plugins/apg/dagre-d3.js',
@@ -107,7 +104,6 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/plugins/bootstrap/bootstrap-datepicker.min.js',
 						'js/plugins/bootstrap/bootstrap-timepicker.min.js',
 						'js/directives/headerDirective.js',	
-						'js/factories/socketFactory.js',
 						'js/controllers/chatbot/chatbotController.js',
 						'js/controllers/chatbot/chatbotService.js',
 						'js/controllers/login/loginService.js',						
@@ -126,7 +122,6 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
 						'js/directives/headerDirective.js',	
-						'js/factories/socketFactory.js',
 						'js/plugins/jquery.jqGrid.min.js',
 						'js/i18n/grid.locale-en.js',
 						'js/plugins/jquery-ui.min.js',
@@ -151,7 +146,6 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
 						'js/directives/headerDirective.js',	
-						'js/factories/socketFactory.js',
 						'js/plugins/jquery.jqGrid.min.js',
 						'js/i18n/grid.locale-en.js',
 						'js/plugins/jquery-ui.min.js',
@@ -178,7 +172,6 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                     return $ocLazyLoad.load([
 						'js/directives/headerDirective.js',	
 						'js/plugins/handlebar.js',
-						'js/factories/socketFactory.js',
 						'js/controllers/chatbot/chatbotController.js',
 						'js/controllers/chatbot/chatbotService.js',
 						'js/controllers/login/loginService.js',
@@ -202,7 +195,6 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                     return $ocLazyLoad.load([
 						'js/directives/headerDirective.js',	
 						'css/bootstrap/bootstrap-slider.css',
-						'js/factories/socketFactory.js',
 						'js/plugins/bootstrap/bootstrap-slider.js',
 						'js/plugins/d3.v3.min.js',
 						'js/controllers/chatbot/chatbotController.js',
@@ -224,7 +216,6 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                     return $ocLazyLoad.load([
 						'js/directives/headerDirective.js',	
 						'css/css_QC/qcStyle.css',
-						'js/factories/socketFactory.js',
 						'js/controllers/chatbot/chatbotController.js',
 						'js/controllers/chatbot/chatbotService.js',
 						'js/controllers/login/loginService.js',						
@@ -244,7 +235,6 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                     return $ocLazyLoad.load([
 						'js/directives/headerDirective.js',	
 						'css/css_QC/qcStyle.css',
-						'js/factories/socketFactory.js',
 						'js/controllers/chatbot/chatbotController.js',
 						'js/controllers/chatbot/chatbotService.js',
 						'js/controllers/login/loginService.js',						
@@ -264,7 +254,6 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                     return $ocLazyLoad.load([
 						'js/directives/headerDirective.js',	
 						'css/css_QC/qtestStyle.css',
-						'js/factories/socketFactory.js',
 						'js/controllers/chatbot/chatbotController.js',
 						'js/controllers/chatbot/chatbotService.js',
 						'js/controllers/login/loginService.js',						
@@ -284,7 +273,6 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                     return $ocLazyLoad.load([
 						'js/directives/headerDirective.js',	
 						'css/css_QC/zephyrStyle.css',
-						'js/factories/socketFactory.js',
 						'js/controllers/chatbot/chatbotController.js',
 						'js/controllers/chatbot/chatbotService.js',
 						'js/controllers/login/loginService.js',						
@@ -303,7 +291,6 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
 						'js/directives/headerDirective.js',	
-						'js/factories/socketFactory.js',
 						'js/controllers/chatbot/chatbotController.js',
 						'js/controllers/chatbot/chatbotService.js',
 						'js/controllers/login/loginService.js',						
@@ -321,7 +308,6 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
-						'js/factories/socketFactory.js',
 						'js/controllers/chatbot/chatbotController.js',
 						'js/controllers/chatbot/chatbotService.js',
 						'js/controllers/login/loginService.js',				
@@ -345,7 +331,6 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'css/bootstrap/bootstrap-datepicker.min.css',
 						'css/bootstrap/bootstrap-timepicker.min.css',
 						'js/directives/headerDirective.js',	
-						'js/factories/socketFactory.js',
 						'js/plugins/bootstrap/bootstrap-datepicker.min.js',
 						'js/plugins/bootstrap/bootstrap-timepicker.min.js',
 						'js/controllers/chatbot/chatbotController.js',
@@ -375,7 +360,6 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/plugins/Tween.js',
 						'js/plugins/trackballcontrols.min.js',
 						//'js/plugins/libs_ng/OrbitControls.js',
-						'js/factories/socketFactory.js',
 						'js/controllers/chatbot/chatbotController.js',
 						'js/controllers/chatbot/chatbotService.js',
 						'js/controllers/login/loginService.js',												
@@ -395,7 +379,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 		$(".btn-accept").click();
 		$(".modal-backdrop.fade.in").remove();
 		window.localStorage.clear();
-		$rootScope.socket.disconnect();
+		socket.reconnect();
 		headerServices.logoutUser()
 		.then(function(data){
 			$location.path('/');

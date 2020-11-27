@@ -417,7 +417,7 @@ exports.saveUnsyncDetails = async (req, res) => {
 	try {
 		logger.info("Inside UI service: " + fnName);
 		const undoMapList = req.body.undoMapList;
-		if (undoMapList.length > 0) return res.send("fail");
+		if (undoMapList.length == 0) return res.send("fail");
 		const inputs = {
 			"mapList": undoMapList,
 			"query": "updateMapDetails_ICE"
@@ -458,7 +458,7 @@ function getQcDetailsForUser(userid, cb) {
 				}
 
 			};
-				logger.info("Calling DAS Service :qualityCenter/qcProjectDetails_ICE");
+			logger.info("Calling DAS Service :qualityCenter/qcProjectDetails_ICE");
 			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
 				function (projectrows, response) {
 				if (response.statusCode != 200 || projectrows.rows == "fail") {
