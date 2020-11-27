@@ -55,8 +55,8 @@ module.exports.Execution_Queue = class Execution_Queue {
         }
         //check if callback for ICE has already been registred
         if (!(ice_name in this.registred_ICE)) {
-            logger.info("Registering executin call back for ICE: " + ice_name);
-            redisServer.redisSubServer.subscribe('ICE2_' + ice_name);
+            logger.info("Registering execution call back for ICE: " + ice_name);
+            redisServer.redisSubServer.subscribe('ICE_STATUS_' + ice_name);
             redisServer.redisSubServer.on("message", this.triggerExecution);
             this.registred_ICE[ice_name] = true;
         }
@@ -129,7 +129,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                         this.executeScheduleTestSuite(batchExecutionData, execIds, userInfo, type);
                     }
                     response['status'] = "pass";
-                    response["message"] = "Execution Started on " + ice_name + " ICE mode: DND"
+                    response["message"] = "Execution Started on " + targetICE + " ICE mode: DND"
                 }
                 else {
                     //get pool in which the target ICE present
@@ -189,6 +189,8 @@ module.exports.Execution_Queue = class Execution_Queue {
         // TODO get target ICE and project ID
         let projectid = "";
         let targetICE = "any";
+        let request_pool_name = "any";
+        let poolid = "";
         let response = {};
         const hdrs = testSuiteRequest.headers;
         const multiBatchExecutionData = testSuiteRequest.body.executionData;
@@ -197,8 +199,25 @@ module.exports.Execution_Queue = class Execution_Queue {
         response['error'] = "None"
         response['acknowledgement'] = "N/A"
         try {
-            if (testSuiteRequest.body && testSuiteRequest.body.executionData && testSuiteRequest.body.executionData[0] && testSuiteRequest.body.executionData[0].userInfo && testSuiteRequest.body.executionData[0].userInfo.icename) {
-                targetICE = testSuiteRequest.body.executionData[0].userInfo.icename
+            if (testSuiteRequest.body && testSuiteRequest.body.executionData && testSuiteRequest.body.executionData[0] && testSuiteRequest.body.executionData[0].userInfo ) {
+                let suite = testSuiteRequest.body.executionData[0].userInfo
+                var invokingUser = {
+                    invokingUser: testSuiteRequest.session.userid,
+                    invokingUserName: testSuiteRequest.session.username,
+                    invokingUserRole: testSuiteRequest.session.activeRoleId
+                }
+                Object.assign(suite, invokingUser);
+                if(suite.icename) targetICE = testSuiteRequest.body.executionData[0].userInfo.icename;
+                if(suite.poolname){
+                    request_pool_name = suite.poolname;
+                    for(let id in this.queue_list){
+                        if(this.queue_list[id].name ===  request_pool_name){
+                            poolid = id;
+                            suite.icename = "any";
+                            break;
+                        }
+                    }
+                }
             }
 
             // Check if request came from Azure DevOps. If yes, then send the acknowledgement
@@ -210,15 +229,16 @@ module.exports.Execution_Queue = class Execution_Queue {
                 response["error"] = "Empty or Invalid Batch Data";
                 return response;
             }
+            let suiteRequest = {"executionData":testSuiteRequest.body.executionData,"headers":testSuiteRequest.headers}
             let userInfo = testSuiteRequest.body.executionData[0].userInfo;
-            let testSuite = { "testSuiteRequest": testSuiteRequest, "type": "API", "userInfo": userInfo }
+            let testSuite = { "testSuiteRequest": suiteRequest, "type": "API", "userInfo": userInfo }
             if (targetICE && targetICE in this.ice_list && this.ice_list[targetICE]["poolid"] in this.queue_list) {
                 if (this.ice_list[ice_name]["mode"]) {
                     //result = executeTestSuite(batchExecutionData, execIds, userInfo, type);
                     response['status'] = "pass";
                     response["message"] = "Selected ICE on DND mode, API execution not possible.";
                 } else {
-                    pool = this.queue_list[this.ice_list[targetICE]["poolid"]];
+                    let pool = this.queue_list[this.ice_list[targetICE]["poolid"]];
                     pool["execution_list"].push(testSuite);
                     //save execution queue to redis
                     cache.set("execution_queue", this.queue_list);
@@ -235,8 +255,17 @@ module.exports.Execution_Queue = class Execution_Queue {
                     response["message"] = "Execution queued on " + targetICE + " " + msg;
                 }
 
-            } else if (targetICE == "any") {
-                response["message"] = "Taget ICE not defined"
+            } else if (poolid && poolid in this.queue_list) {
+                let pool = this.queue_list[poolid];
+                pool["execution_list"].push(testSuite);
+                //save execution queue to redis
+                cache.set("execution_queue", this.queue_list);
+                //create response message
+                response['status'] = "pass";
+                response["message"] = "Execution queued on pool: " + request_pool_name;
+
+            } else{
+                response["message"] = "ICE name / Poolid not provided"
             }
 
         } catch (e) {
@@ -273,7 +302,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         let data = JSON.parse(ice_data);
         let result = false;
         //check if the triggered request id for ice status change and check if the request is duplicate or not 
-        if (channel != "ICE2_" + data.username || data.onAction != 'ice_status_change' || data["reqID"] in this.request_ids) return result;
+        if (channel != "ICE_STATUS_" + data.username || data.onAction != 'ice_status_change' || data["reqID"] in this.request_ids) return result;
         let ice_name = data.username
         //register this request so that dupliacte requests can be ignored
         this.request_ids[data["reqID"]] = 1;
@@ -303,6 +332,7 @@ module.exports.Execution_Queue = class Execution_Queue {
             let testSuite = queue[i];
             //check if target ice for testsuite and the actual ice which has communicated it's status is same or not, accept if ice_name matches or is "any"
             if (testSuite.userInfo.icename === ice_name || testSuite.userInfo.icename === "any") {
+                testSuite.userInfo.icename = ice_name;
                 //check if the ice is in dnd or not, if in dnd check wether the ICE asignee and the invoking user are same 
                 if (data.value.mode && testSuite.userInfo.userid != testSuite.userInfo.invokingUser) {
                     return result;
@@ -338,7 +368,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         const fnName = "setUpPool"
         try {
             this.queue_list = await cache.get("execution_queue");
-            this.notification_dict = await cache.get("pending_notifciation");
+            this.notification_dict = await cache.get("pending_notification");
             if (!this.notification_dict) this.notification_dict = {}
             if (!this.queue_list) this.queue_list = {}
             var pools = await utils.fetchData(inputs, "admin/getPools", fnName);
@@ -487,7 +517,6 @@ module.exports.Execution_Queue = class Execution_Queue {
     static async executeAPI(testSuite) {
         const req = testSuite.testSuiteRequest;
         const hdrs = req.headers;
-        let icename = testSuite.userInfo.icename;
         let username = testSuite.userInfo.username;
         const notifySocMap = myserver.socketMapNotify;
         let reportResult = {}
@@ -498,14 +527,17 @@ module.exports.Execution_Queue = class Execution_Queue {
         if (hdrs["user-agent"].startsWith("VSTS") && hdrs.planurl && hdrs.projectid) {
             reqFromADO = true;
         }
-        const multiBatchExecutionData = req.body.executionData;
+        const multiBatchExecutionData = req.executionData;
         const userRequestMap = {};
         const userInfoList = [];
         const executionResult = [];
 
         for (let i = 0; i < multiBatchExecutionData.length; i++) {
             const executionData = multiBatchExecutionData[i];
-            const userInfo = await utils.tokenValidation(executionData.userInfo || {});
+            var userInfo = await utils.tokenValidation(executionData.userInfo || {});
+            userInfo.invokingUser = userInfo.userid;
+            userInfo.invokingUserName = userInfo.username;
+            userInfo.invokingUserRole = userInfo.role;
             userInfoList.push(userInfo);
             const execResponse = userInfo.inputs;
             if (execResponse.tokenValidation == "passed") {
@@ -560,8 +592,10 @@ module.exports.Execution_Queue = class Execution_Queue {
         })());
         await Promise.all(batchExecutionPromiseList)
         const finalResult = { "executionStatus": executionResult };
-        reportResult["status"] = finalResult;
-
+        reportResult["testSuiteIds"] = multiBatchExecutionData[0].batchInfo;
+        reportResult["testSuiteIds"][0]["testsuitename"]  = reportResult["testSuiteIds"][0]["testsuiteName"];
+        if(finalResult.executionStatus[0].status) reportResult["status"] = "API Execution Completed";
+        else reportResult["status"] = "API Execution Failed";
         if (!reqFromADO) {
             if (notifySocMap && notifySocMap[username] && notifySocMap[username].connected) {
                 notifySocMap[username].emit("display_execution_popup", [reportResult]);

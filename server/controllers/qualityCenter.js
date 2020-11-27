@@ -417,7 +417,7 @@ exports.saveUnsyncDetails = async (req, res) => {
 	try {
 		logger.info("Inside UI service: " + fnName);
 		const undoMapList = req.body.undoMapList;
-		if (undoMapList.length > 0) return res.send("fail");
+		if (undoMapList.length == 0) return res.send("fail");
 		const inputs = {
 			"mapList": undoMapList,
 			"query": "updateMapDetails_ICE"

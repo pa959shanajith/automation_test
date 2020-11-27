@@ -133,11 +133,13 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			else if (data == "Terminate") data = "Terminated" 
 			else if (data == "UserTerminate") data = exec +"Terminated by User"
 			else if (data == "success") data = exec +"success"
+			else if (data == "API Execution Completed") data = exec + "API Execution Completed"
+			else if (data == "API Execution Completed") data = exec + "API Execution Failed"
 			else data = exec + "Failed to execute.";
 			msg = msg + "\n" + data;
 		}
 		if(msg && msg.trim() != ""){
-			openModelPopup("executionStatus","Execution Result", msg);
+			openDialogExe("Execution Result", msg);
 		}		
 		
 	});
@@ -476,3 +478,17 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		window.location.href='/neuronGraphs/';
 	}
 });
+var openDialogExe = function (title, body, submitflag) {
+	if (submitflag == undefined) {
+		$("#executeGlobalModal").find('.modal-title').text(title);
+		$("#executeGlobalModal").find('.modal-body p').text(body).css('color', 'black');
+		$("#executeGlobalModal").modal("show");
+		setTimeout(function () {
+			$("#executeGlobalModal").find('.btn-accept').focus();
+		}, 300);
+	} else {
+		$("#globalTaskSubmit").find('.modal-title').text(title);
+		$("#globalTaskSubmit").find('.modal-body p').text(body);
+		$("#globalTaskSubmit").modal("show");
+	}
+};

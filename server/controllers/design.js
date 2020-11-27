@@ -266,7 +266,7 @@ exports.debugTestCase_ICE = function (req, res) {
 											function result_debugTestCase_listener(channel, message) {
 												data = JSON.parse(message);
 												//LB: make sure to send recieved data to corresponding user
-												if (icename == data.username) {
+												if (icename == data.username && channel === "ICE2_" + icename) {
 													redisServer.redisSubServer.removeListener('message', result_debugTestCase_listener);
 													if (data.onAction == "unavailableLocalServer") {
 														logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
@@ -380,7 +380,7 @@ exports.debugTestCase_ICE = function (req, res) {
 									function result_wsdl_listOfOperation_listener(channel, message) {
 										data = JSON.parse(message);
 										//LB: make sure to send recieved data to corresponding user
-										if (data.username == icename) {
+										if (data.username == icename && channel === "ICE2_" + icename) {
 											redisServer.redisSubServer.removeListener('message', result_wsdl_listOfOperation_listener);
 											if (data.onAction == "unavailableLocalServer") {
 												logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
@@ -450,7 +450,7 @@ exports.debugTestCase_ICE = function (req, res) {
 								function result_wsdl_ServiceGenerator_listener(channel, message) {
 									data = JSON.parse(message);
 									//LB: make sure to send recieved data to corresponding user
-									if (data.username == icename) {
+									if (data.username == icename && channel === "ICE2_" + icename) {
 										redisServer.redisSubServer.removeListener('message', result_wsdl_ServiceGenerator_listener);
 										if (data.onAction == "unavailableLocalServer") {
 											logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
