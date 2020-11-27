@@ -18,6 +18,8 @@ var cluster = require('cluster');
 var expressWinston = require('express-winston');
 var epurl = "http://" + (process.env.DAS_IP || "127.0.0.1") + ":" + (process.env.DAS_PORT || "1990") + "/";
 process.env.DAS_URL = epurl;
+process.env.nulluser = "5fc137cc72142998e29b5e63";
+process.env.nullpool = "5fc13ea772142998e29b5e64";
 var logger = require('./logger');
 var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 

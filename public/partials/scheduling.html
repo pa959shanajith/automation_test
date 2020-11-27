@@ -365,20 +365,20 @@
 						<input class="btn btn-users dropdown-toggle" type="text" autocomplete="off" id="userIdName" data-toggle="dropdown" ng-click='availableICEFilter.icename="";selectedICE=false' ng-model="availableICEFilter.icename" placeholder="{{'Search ICE to allocate'}}">
 						<!-- <input class="btn btn-users dropdown-toggle" type="text" autocomplete="off" id="userIdName"  ng-model="allocateIcePool.allIcePoolListFilter.poolname" placeholder="Search ICE Pool" > -->
 						<ul id='ice-dropdown' class="dropdown-menu dropdown-menu-users "  aria-labelledby="userIdName">
-							<!-- <li role="presentation"><lable><input type="checkbox" /><span id='status' class='online'></span>new</lable></li> -->
+							<!-- <li role="presentation"><label><input type="checkbox" /><span id='status' class='online'></span>new</label></li> -->
 							<li ng-if="smartBatch == true" role="presentation" ng-repeat='ice in availableICE | filter:availableICEFilter' ng-click="iceCheckboxClick($event)" >
-								<lable title='{{ice.statusCode}}'>
+								<label title='{{ice.statusCode}}'>
 									<input value='{{ice.icename}}' checked type="checkbox"/>
 									<span id='status' ng-style="{'background-color':'{{ice.color}}'}"></span>
 									{{ice.icename}}
-								<lable>
+								<label>
 							</li>
 							<li ng-if="smartBatch == false" role="presentation" ng-repeat='ice in availableICE | filter:availableICEFilter' ng-click="availableICEFilter.icename=ice.icename;iceCheckboxClick($event,ice.icename)" >
-								<lable title='{{ice.statusCode}}'>
+								<label title='{{ice.statusCode}}'>
 									<!-- <input value='{{ice.icename}}' checked type="checkbox"/> -->
 									<span id='status' ng-style="{'background-color':'{{ice.color}}'}"></span>
 									{{ice.icename}}
-								<lable>
+								<label>
 							</li>
 						</ul>
 					</div>
@@ -390,18 +390,18 @@
 					<div>
 						<ul>
 							<li >
-								<lable title='available' ng-style="{'display':'inline-block'}">
+								<label title='available' ng-style="{'display':'inline-block'}">
 									<span id='status' ng-style="{'background-color':'#95c353'}"></span>
 									 Available
-								</lable>
-								<lable title='unavailable' ng-style="{'display':'inline-block'}">
+								</label>
+								<label title='unavailable' ng-style="{'display':'inline-block'}">
 									<span id='status' ng-style="{'background-color':'#fdc010'}"></span>
 									 Unavilable
-								</lable>
-								<lable title='do not disturb' style="display: inline-block;">
+								</label>
+								<label title='do not disturb' style="display: inline-block;">
 									<span id='status' ng-style="{'background-color':'red'}"></span>
 									 Do Not Disturb mode
-								</lable>
+								</label>
 							</li>
 						</ul>
 					</div>

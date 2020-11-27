@@ -18,7 +18,8 @@ const SOCK_NORM_MSG = "ICE is connected in Non-Scheduling mode";
 const SOCK_SCHD_MSG = "ICE is connected in Scheduling mode";
 const SOCK_NA_MSG = "ICE is not Available";
 const DO_NOT_PROCESS = "do_not_process_response";
-
+const EMPTYUSER = process.env.nulluser;
+const EMPTYPOOL = process.env.nullpool;
 /** This service reads the testsuite and scenario information for the testsuites */
 exports.readTestSuite_ICE = async (req, res) => {
 	const fnName = "readTestSuite_ICE";
@@ -348,8 +349,8 @@ const insertReport = async (executionid, scenarioId, browserType, userInfo, repo
 		"browser": browserType,
 		"status": reportData.overallstatus[0].overallstatus,
 		"report": JSON.stringify(reportData),
-		"modifiedby": userInfo.invokingUser,
-		"modifiedbyrole": userInfo.invokingUserRole,
+		"modifiedby": userInfo.invokinguser,
+		"modifiedbyrole": userInfo.invokinguserrole,
 		"query": "insertreportquery"
 	};
 	const result = utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "insertReport");
@@ -407,6 +408,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 	const fnName = "executionRequestToICE";
 	logger.info("Inside " + fnName + " function");
 	const username = userInfo.username;
+	const invokinguser = userInfo.invokingusername;
 	const icename = userInfo.icename;
 	const channel = "normal";
 	var completedSceCount = 0;
@@ -428,8 +430,8 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 			if (event == SOCK_NA) {
 				redisServer.redisSubServer.removeListener("message", executeTestSuite_listener);
 				logger.error("Error occurred in " + fnName + ": Socket Disconnected");
-				if (resSent && notifySocMap[username]) {
-					notifySocMap[username].emit("ICEnotAvailable");
+				if (resSent && notifySocMap[invokinguser]) {
+					notifySocMap[invokinguser].emit("ICEnotAvailable");
 					rsv(DO_NOT_PROCESS);
 				} else rsv(SOCK_NA);
 			} else if (event == "return_status_executeTestSuite") {
@@ -446,8 +448,8 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 					report_result["status"] = execStatus
 					report_result["testSuiteDetails"] = execReq["suitedetails"]
 					await updateSkippedExecutionStatus(execReq, userInfo, execStatus, errMsg);
-					if (resSent && notifySocMap[username] && notifySocMap[username].connected) {
-						notifySocMap[username].emit(execStatus);
+					if (resSent && notifySocMap[invokinguser] && notifySocMap[invokinguser].connected) {
+						notifySocMap[invokinguser].emit(execStatus);
 						rsv(DO_NOT_PROCESS);
 					}else if(resSent){
 						queue.Execution_Queue.add_pending_notification("",report_result,username);
@@ -523,8 +525,8 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 						report_result["testSuiteDetails"] = execReq["suitedetails"]
 						if (resultData.userTerminated) result = "UserTerminate";
 						if (execType == "API") result = [d2R, status];
-						if (resSent && notifySocMap[username] && notifySocMap[username].connected) { // This block is only for active mode
-							notifySocMap[username].emit("result_ExecutionDataInfo", report_result);
+						if (resSent && notifySocMap[invokinguser] && notifySocMap[invokinguser].connected) { // This block is only for active mode
+							notifySocMap[invokinguser].emit("result_ExecutionDataInfo", report_result);
 							rsv(DO_NOT_PROCESS);
 						} else if(resSent){
 							queue.Execution_Queue.add_pending_notification("",report_result,username);
@@ -543,7 +545,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 	}));
 
 	const notifySocMap = myserver.socketMapNotify; 
-	if (execType == "ACTIVE" && notifySocMap && notifySocMap[username]) {
+	if (execType == "ACTIVE" && notifySocMap && notifySocMap[invokinguser]) {
 		exePromise(true);
 		return "begin";
 	} else return await exePromise(false);
@@ -559,11 +561,11 @@ module.exports.executionFunction = async (batchExecutionData, execIds, userInfo,
 	//if (iceStatus != null) return iceStatus;
 	const taskApproval = await utils.approvalStatusCheck(batchExecutionData.batchInfo);
 	if (taskApproval.res !== "pass") return taskApproval.res;
-	/*const countStatus =*/ await counterUpdater(batchExecutionData.batchInfo.length, userInfo.userid);
+	/*const countStatus =*/ await counterUpdater(batchExecutionData.batchInfo.length, userInfo.invokinguser);
 	// if (countStatus == "fail") return "fail";
 	const executionRequest = await prepareExecutionRequest(batchExecutionData, userInfo);
 	if (executionRequest == "fail") return "fail";
-	const currExecIds = await generateExecutionIds(execIds, executionRequest.testsuiteIds, userInfo.invokingUser);
+	const currExecIds = await generateExecutionIds(execIds, executionRequest.testsuiteIds, userInfo.invokinguser);
 	if (currExecIds == "fail") return "fail";
 	executionRequest.batchId = currExecIds.batchid;
 	executionRequest.executionIds = executionRequest.testsuiteIds.map(i => currExecIds.execids[i]);
@@ -577,12 +579,18 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 	const fnName = "ExecuteTestSuite_ICE"
 	logger.info("Inside UI service: ExecuteTestSuite_ICE");
 	var targetUser = req.body.executionData.targetUser;
-	let inputs = { "icename": targetUser };
-	const profile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
-	const userInfo = { "userid": profile.userid, "username": profile.name, "role": profile.role, "icename": targetUser,"invokingUser":req.session.userid,"invokingUserName":req.session.username,"invokingUserRole":req.session.activeRoleId};
+	if (targetUser && targetUser != ""){
+		let inputs = { "icename": targetUser };
+		var profile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
+	}else{
+		targetUser = EMPTYUSER
+		var profile = {userid:EMPTYUSER,role:"N/A",username:EMPTYUSER}
+	}
+	var poolid = req.body.executionData.poolid;
+	const userInfo = { "userid": profile.userid, "username": profile.name, "role": profile.role, "icename": targetUser,"invokinguser":req.session.userid,"invokingusername":req.session.username,"invokinguserrole":req.session.activeRoleId};
 	const batchExecutionData = req.body.executionData;
 	const execIds = { "batchid": "generate", "execid": {} };
-	var result = queue.Execution_Queue.addTestSuiteToQueue(batchExecutionData,execIds,userInfo,"ACTIVE");
+	var result = queue.Execution_Queue.addTestSuiteToQueue(batchExecutionData,execIds,userInfo,"ACTIVE",poolid);
 	return res.send(result);
 };
 
@@ -638,10 +646,12 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 	const userInfo = { "userid": req.session.userid, "username": req.session.username, "role": req.session.activeRoleId };
 	const multiExecutionData = req.body.executionData;
 	var batchInfo = multiExecutionData.batchInfo;
-	var invokingUser = {
-		invokingUser: req.session.userid,
-		invokingUserName: req.session.username,
-		invokingUserRole: req.session.activeRoleId
+	let poolid = req.body.executionData.batchInfo[0].poolid;
+	if(!poolid || poolid === "") poolid = EMPTYPOOL
+	var invokinguser = {
+		invokinguser: req.session.userid,
+		invokingusername: req.session.username,
+		invokinguserrole: req.session.activeRoleId
 	}
 	var stat = "none";
 	var dateTimeUtc = "";
@@ -701,6 +711,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 		batchObj.timestamp = timestamp;
 		batchObj.scheduleId = undefined;
 		batchObj.batchInfo = [];
+		batchObj.scheduledby = invokinguser;
 		inputs = {
 			"timestamp": timestamp.toString(),
 			"executeon": multiExecutionData.browserType,
@@ -710,7 +721,9 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 			"userid": userInfo.userid,
 			"scenarios": [],
 			"testsuiteIds": [],
-			"query": "insertscheduledata"
+			"query": "insertscheduledata",
+			"poolid":poolid,
+			"scheduledby":invokinguser
 		};
 		for (let i = 0; i < batchIdx.length; i++) {
 			let suite = batchInfo[batchIdx[i]];
@@ -721,13 +734,14 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 			delete suite.time;
 			batchObj.batchInfo.push(suite);
 		}
+		if (!inputs.targetaddress || inputs.targetaddress === "") inputs.targetaddress = EMPTYUSER;
 		const insResult = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
 		if (insResult == "fail") return res.send("fail");
 		else batchObj.scheduleId = insResult.id;
 		multiBatchExecutionData.push(batchObj);
 	}
 	/** Add if else for smart schedule above this **/
-	var schResult = await scheduleTestSuite(multiBatchExecutionData,invokingUser);
+	var schResult = await scheduleTestSuite(multiBatchExecutionData);
 	if (schResult == "success" && stat != "none") schResult = displayString + " " + "success";
 	return res.send(schResult);
 };
@@ -835,28 +849,32 @@ const getMachinePartitions = async (mod, type, time) => {
 }
 
 /** Function responsible for scheduling Jobs. Returns: success/few/fail */
-const scheduleTestSuite = async (multiBatchExecutionData,invokingUser) => {
+const scheduleTestSuite = async (multiBatchExecutionData) => {
 	const fnName = "scheduleTestSuite";
 	logger.info("Inside " + fnName + " function");
 	const userInfoMap = {};
 	const execIdsMap = {};
 	var schedFlag = "success";
 	var inputs = {};
-
 	const userList = multiBatchExecutionData.map(u => u.targetUser);
 	for (const user of userList) {
 		if (!userInfoMap[user]) {
-			inputs = { "icename": user };
-			const profile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
-			if (profile == "fail" || profile == null) return "fail";
-			userInfoMap[user] = {"userid": profile.userid, "username": profile.name, "role": profile.role, "icename": user};
+			if(user != ""){
+				inputs = { "icename": user };
+				const profile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
+				if (profile == "fail" || profile == null) return "fail";
+				userInfoMap[user] = {"userid": profile.userid, "username": profile.name, "role": profile.role, "icename": user};
+			}else{
+				userInfoMap[EMPTYUSER] = {"userid": "N/A", "username": "", "role": "", "icename": EMPTYUSER};
+			}
+			
 		}
 	}
-
 	for (const batchExecutionData of multiBatchExecutionData) {
 		let execIds = {"batchid": "generate", "execid": {}};
+		if(batchExecutionData.targetUser === "") batchExecutionData.targetUser = EMPTYUSER
 		var userInfo = userInfoMap[batchExecutionData.targetUser];
-		Object.assign(userInfo, invokingUser);
+		Object.assign(userInfo, batchExecutionData.scheduledby);
 		const scheduleTime = batchExecutionData.timestamp;
 		const scheduleId = batchExecutionData.scheduleId;
 		const smartId = batchExecutionData.smartScheduleId;
@@ -868,7 +886,7 @@ const scheduleTestSuite = async (multiBatchExecutionData,invokingUser) => {
 			const scheduledjob = schedule.scheduleJob(scheduleId, scheduleTime, async function () {
 				let result;
 				execIds['scheduleId'] = scheduleId;
-				result = queue.Execution_Queue.addTestSuiteToQueue(batchExecutionData,execIds,userInfo,"SCHEDULE");
+				result = queue.Execution_Queue.addTestSuiteToQueue(batchExecutionData,execIds,userInfo,"SCHEDULE",batchExecutionData.batchInfo[0].poolid);
 				schedFlag = result['message'];
 			});
 			scheduleJobMap[scheduleId] = scheduledjob;
@@ -966,6 +984,7 @@ exports.reScheduleTestsuite = async () => {
 		const multiBatchExecutionData = [];
 		for (var i = 0; i < result.length; i++) {
 			const schd = result[i];
+			let poolid = schd.poolid;
 			const scheduleTime = new Date(result[i].scheduledon);
 			if (scheduleTime < new Date()) {
 				await updateScheduleStatus(schd._id, "Missed");
@@ -980,7 +999,9 @@ exports.reScheduleTestsuite = async () => {
 					"targetUser": schd.target,
 					"timestamp": scheduleTime.valueOf(),
 					"scheduleId": schd._id,
-					"batchInfo": []
+					"batchInfo": [],
+					"poolid":schd.poolid,
+					"scheduledby":schd.scheduledby
 				};
 				inputs = {
 					"query": "gettestsuiteproject",
