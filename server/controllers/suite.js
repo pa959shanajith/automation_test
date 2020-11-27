@@ -247,22 +247,22 @@ const fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
 		"testscenarioid": scenarioid
 	};
 	if (integrationType == 'qTest') inputs.query = "qtestdetails";
-    else if (integrationType == 'ALM') inputs.query = "qcdetails";
-    else if (integrationType == 'Zephyr') inputs.query = "zephyrdetails";
-    if (!inputs.query) scenario.qcdetails = {};
-    else {
-        const qcdetails = await utils.fetchData(inputs, "qualityCenter/viewIntegrationMappedList_ICE", fnName);
-        if(integrationType == 'ALM' && Array.isArray(qcdetails)) {
-            for(var i=0;i<qcdetails.length;++i) {
-                if (qcdetails[i] != "fail") qcDetailsList.push(JSON.parse(JSON.stringify(qcdetails[i])));
-            }
-            if (qcDetailsList.length > 0) scenario.qcdetails = qcDetailsList;
-            else scenario.qcdetails = {};
-        } else {
-            if (qcdetails != "fail" && qcdetails.length > 0) scenario.qcdetails = JSON.parse(JSON.stringify(qcdetails[0]));
-            else scenario.qcdetails = {};
-        }
-    }
+	else if (integrationType == 'ALM') inputs.query = "qcdetails";
+	else if (integrationType == 'Zephyr') inputs.query = "zephyrdetails";
+	if (!inputs.query) scenario.qcdetails = {};
+	else {
+		const qcdetails = await utils.fetchData(inputs, "qualityCenter/viewIntegrationMappedList_ICE", fnName);
+		if(integrationType == 'ALM' && Array.isArray(qcdetails)) {
+			for(var i=0;i<qcdetails.length;++i) {
+				if (qcdetails[i] != "fail") qcDetailsList.push(JSON.parse(JSON.stringify(qcdetails[i])));
+			}
+			if (qcDetailsList.length > 0) scenario.qcdetails = qcDetailsList;
+			else scenario.qcdetails = {};
+		} else {
+			if (qcdetails != "fail" && qcdetails.length > 0) scenario.qcdetails = JSON.parse(JSON.stringify(qcdetails[0]));
+			else scenario.qcdetails = {};
+		}
+	}
 	return scenario;
 };
 

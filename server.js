@@ -268,7 +268,7 @@ if (cluster.isMaster) {
 
 		app.get('/', async (req, res, next) => {
 			if (!(req.url == '/' || req.url.startsWith("/?"))) return next();
-			return res.sendFile("app.html", { root: __dirname + "/public/" });
+			return res.sendFile("index.html", { root: __dirname + "/public/" });
 		});
 
 		// Dummy Service for keeping session alive during long-term execution, etc. #Polling
@@ -291,15 +291,9 @@ if (cluster.isMaster) {
 			var roles = ["Test Manager", "Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
-		
-		//Test Lead and Test Manager can access
-		app.get(/^\/(neuronGraphs)$/, function(req, res) {
-			var roles = ["Test Manager", "Test Lead"]; //Allowed roles
-			res.sendFile("index.html", { root: __dirname + "/public/neurongraphs/" });
-		});
 
 		//Test Lead and Test Manager can access
-		app.get(/^\/(p_Webocular|p_ALM|p_APG|p_Integration|p_qTest|p_Zephyr)$/, function(req, res) {
+		app.get(/^\/(p_Webocular|neuronGraphs\/|p_ALM|p_APG|p_Integration|p_qTest|p_Zephyr)$/, function(req, res) {
 			var roles = ["Test Manager", "Test Lead"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
@@ -313,12 +307,13 @@ if (cluster.isMaster) {
 				meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
 				return meta;
 			};
-
+			var public = __dirname + "/public/";
+			if (req.url === "/neuronGraphs/") public += "neurongraphs/";
 			var sessChk = sess.uniqueId && sess.activeRole;
 			var roleChk = (roles.indexOf(sess.activeRole) != -1);
 			var maintCookie = req.signedCookies["maintain.sid"];
 			if (sessChk && !maintCookie) return res.redirect("/error?e=sessexists");
-			if (sessChk && roleChk) return res.sendFile("app.html", { root: __dirname + "/public/" });
+			if (sessChk && roleChk) return res.sendFile("index.html", { root: public });
 			else {
 				req.clearSession();
 				return res.redirect("/error?e=" + ((sessChk) ? "400" : "401"));
@@ -381,7 +376,7 @@ if (cluster.isMaster) {
 		// });
 
 		app.post('/designTestCase', function(req, res) {
-			return res.sendFile("app.html", { root: __dirname + "/public/" });
+			return res.sendFile("index.html", { root: __dirname + "/public/" });
 		});
 
 		app.get('/AvoAssure_ICE', async (req, res) => {

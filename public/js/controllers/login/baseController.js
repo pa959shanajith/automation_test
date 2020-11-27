@@ -1,4 +1,4 @@
-mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http, $location, LoginService, cfpLoadingBar) {
+mySPA.controller('baseController', function ($scope, $rootScope, socket, $location, LoginService, cfpLoadingBar) {
 	$scope.loginValidation = "Loading Profile...";
 	$scope.loginAgain = true;
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear();
@@ -74,6 +74,7 @@ mySPA.controller('baseController', function ($scope, $rootScope, $timeout, $http
 		window.localStorage['_SR'] = data.rolename;
 		window.localStorage['_UI'] = JSON.stringify(data);
 		window.localStorage.navigateScreen = data.page;
+		socket.reconnect();
 		$location.path("/"+data.page);
 	};
 

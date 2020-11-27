@@ -150,7 +150,7 @@ const routeUtil = {
 	"inhouse": async opts => {
 		authRouter.get(opts.route.login, async (req, res) => {
 			if (req.session.uniqueId) await utils.cloneSession(req);
-			return res.sendFile("app.html", { root: __dirname + "/../../public/" });
+			return res.sendFile("index.html", { root: __dirname + "/../../public/" });
 		});
 		authRouter.post(opts.route.login, (req, res, next) => {
 			logger.info("Inside UI service: login");

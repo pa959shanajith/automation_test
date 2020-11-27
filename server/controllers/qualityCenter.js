@@ -458,7 +458,7 @@ function getQcDetailsForUser(userid, cb) {
 				}
 
 			};
-				logger.info("Calling DAS Service :qualityCenter/qcProjectDetails_ICE");
+			logger.info("Calling DAS Service :qualityCenter/qcProjectDetails_ICE");
 			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
 				function (projectrows, response) {
 				if (response.statusCode != 200 || projectrows.rows == "fail") {
