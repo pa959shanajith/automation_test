@@ -576,10 +576,33 @@
 						<input class="btn btn-users dropdown-toggle" type="text" autocomplete="off" id="userIdName" data-toggle="dropdown" ng-click='availableICEFilter.icename="";selectedICE=false' ng-model="availableICEFilter.icename" placeholder="{{'Search ICE to execute'}}">
 						<ul id='ice-dropdown' class="dropdown-menu dropdown-menu-users "  aria-labelledby="userIdName">
 							<li role="presentation" ng-repeat='ice in availableICE | filter:availableICEFilter' ng-click="availableICEFilter.icename=ice.icename;selectIce(ice.icename)" >
-								<label title='{{ice.statusCode}}'>
+								<lable title='{{ice.statusCode}}'>
 									<span id='status' ng-style="{'background-color':'{{ice.color}}'}"></span>
 									{{ice.icename}}
-								<label>
+								<lable>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class='adminControl'>
+				<div>
+					<span class="leftControl" title="Token Name">ICE Status:</span>
+					<div>
+						<ul>
+							<li >
+								<lable title='available' ng-style="{'display':'inline-block'}">
+									<span id='status' ng-style="{'background-color':'#95c353'}"></span>
+									 Available
+								</lable>
+								<lable title='unavailable' ng-style="{'display':'inline-block'}">
+									<span id='status' ng-style="{'background-color':'#fdc010'}"></span>
+									 Unavilable
+								</lable>
+								<lable title='do not disturb' style="display: inline-block;">
+									<span id='status' ng-style="{'background-color':'red'}"></span>
+									 Do Not Disturb mode
+								</lable>
 							</li>
 						</ul>
 					</div>

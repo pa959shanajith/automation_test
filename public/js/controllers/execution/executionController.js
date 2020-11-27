@@ -794,7 +794,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				color = '#95c353';
 				status = 'Online'
 			}
-			if(ice.status){
+			if(ice.mode){
 				color = 'red';
 				status = 'DND mode'
 			}
@@ -827,9 +827,11 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	}
 
 	$scope.ExecuteOnclick = () =>{
+		$scope.selectedPool = $('#chooseICEPool').val() 
+		if($('#chooseICEPool').val() == 'unallocated')$scope.selectedPool = "";
 		if(!$scope.selectedICE){
 			if($('#userIdName').val() == "" && $scope.availableICE && $scope.availableICE.length>0){
-				$scope.selectedICE = $scope.availableICE[0].icename
+				$scope.selectedICE = ""
 			}else{
 				$('#userIdName').addClass('error-border')
 				return;
@@ -839,6 +841,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		$('#selectIcePoolIce').modal("hide")
 		blockUI("Sending Execution Request");
 		executionData.targetUser = $scope.selectedICE
+		executionData.poolid = $scope.selectedPool
 		executionActive = true;
 		$rootScope.resetSession.start();
 		ExecutionService.ExecuteTestSuite_ICE(executionData)
