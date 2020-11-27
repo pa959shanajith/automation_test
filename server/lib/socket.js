@@ -37,21 +37,17 @@ io.on('connection', async socket => {
 		socketMapUI[address] = socket;
 		socket.emit("connectionAck", "Success");
 	} else if (socket.request._query.check == "notify") {
-		socket.on('key', function (data) {
-			if (typeof(data) == "string") {
-				address = Buffer.from(data, "base64").toString();
-				logger.info("Notification Socket connecting address %s", address);
-				socketMapNotify[address] = socket;
-				sendPendingNotifications(socket,address);
-				redisServer.redisSubClient.subscribe('UI_notify_' + address, 1);
-				//Broadcast Message
-				var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/mindmap', '/p_Utility', '/p_Reports', '/p_ALM', '/p_Integration', '/p_qTest', '/p_Zephyr'];
-				notificationMsg.to = broadcastTo;
-				notificationMsg.notifyMsg = 'Server Maintenance Scheduled';
-				// var soc = socketMapNotify[address];
-				// soc.emit("notify",notificationMsg);
-			}
-		});
+		address = socket.request._query.key && Buffer.from(socket.request._query.key, "base64").toString() || "-";
+		logger.warn("Notification Socket connecting address %s", address);
+		socketMapNotify[address] = socket;
+		sendPendingNotifications(socket,address);
+		redisServer.redisSubClient.subscribe('UI_notify_' + address, 1);
+		//Broadcast Message
+		var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/mindmap', '/p_Utility', '/p_Reports', '/p_ALM', '/p_Integration', '/p_qTest', '/p_Zephyr'];
+		notificationMsg.to = broadcastTo;
+		notificationMsg.notifyMsg = 'Server Maintenance Scheduled';
+		// var soc = socketMapNotify[address];
+		// soc.emit("notify",notificationMsg);
 	} else {
 		const ice_info = socket.handshake.query;
 		const icename = ice_info.icename;
@@ -117,8 +113,8 @@ io.on('connection', async socket => {
 			address = socket.request._query.username;
 			logger.info("Disconnecting from UI socket: %s", address);
 		} else if (socket.request._query.check == "notify") {
-			address = socket.request._query.username && Buffer.from(socket.request._query.username, "base64").toString() || "undefined";
-			logger.info("Disconnecting from Notification socket: %s", address);
+			address = socket.request._query.key && Buffer.from(socket.request._query.key, "base64").toString() || "-";
+			logger.warn("Disconnecting from Notification socket: %s", address);
 			redisServer.redisSubClient.unsubscribe('UI_notify_' + address, 1);
 			if (socketMapNotify[address]) delete socketMapNotify[address];
 		} else {
