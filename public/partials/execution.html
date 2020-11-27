@@ -232,7 +232,6 @@
 <!--Content Area-->
 
 <!--Footer-->
-
 <footer footer id="footer" class="footer-global"></footer>
 <!--Footer-->
 
@@ -573,22 +572,22 @@
 			<div class='adminControl'>
 				<div>
 					<span class="leftControl" title="Token Name">Execute on ICE</span>
-				<div>
-				<input class="btn btn-users dropdown-toggle" type="text" autocomplete="off" id="userIdName" data-toggle="dropdown" ng-click='availableICEFilter.icename="";selectedICE=false' ng-model="availableICEFilter.icename" placeholder="{{'Search ICE to execute'}}">
-				<ul id='ice-dropdown' class="dropdown-menu dropdown-menu-users "  aria-labelledby="userIdName">
-					<li role="presentation" ng-repeat='ice in availableICE | filter:availableICEFilter' ng-click="availableICEFilter.icename=ice.icename;selectIce(ice.icename)" >
-						<lable title='{{ice.statusCode}}'>
-							<span id='status' ng-style="{'background-color':'{{ice.color}}'}"></span>
-							{{ice.icename}}
-						<lable>
-					</li>
-				</ul>
+					<div>
+						<input class="btn btn-users dropdown-toggle" type="text" autocomplete="off" id="userIdName" data-toggle="dropdown" ng-click='availableICEFilter.icename="";selectedICE=false' ng-model="availableICEFilter.icename" placeholder="{{'Search ICE to execute'}}">
+						<ul id='ice-dropdown' class="dropdown-menu dropdown-menu-users "  aria-labelledby="userIdName">
+							<li role="presentation" ng-repeat='ice in availableICE | filter:availableICEFilter' ng-click="availableICEFilter.icename=ice.icename;selectIce(ice.icename)" >
+								<label title='{{ice.statusCode}}'>
+									<span id='status' ng-style="{'background-color':'{{ice.color}}'}"></span>
+									{{ice.icename}}
+								<label>
+							</li>
+						</ul>
+					</div>
+				</div>
 			</div>
-		</div>
-	</div>
 		  </div>
 		  <div class="modal-footer">
-			 <button type="button" class="btn btn-default btn-default-modal" ng-click="ExecuteOnclick($event)">Execute</button>
+			<button type="button" class="btn btn-default btn-default-modal" ng-click="ExecuteOnclick($event)">Execute</button>
 		  </div>
 	   </div>
 	</div>

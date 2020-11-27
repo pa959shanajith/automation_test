@@ -679,7 +679,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 	
 	//Execute TestSuite Functionality
-
 	$scope.ExecuteTestSuite = function ($event) {
 		if ($(".exe-ExecuteStatus input:checked").length === 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
 		else if ((appType == "Web") && browserTypeExe.length === 0) openDialogExe("Execute Test Suite", "Please select a browser");
@@ -705,7 +704,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				if ($(this).is(":checked") == true) {
 					$(this).parent().parent().next().find('tbody input[type=checkbox]:checked').each(function () {
 						selectedRowData.push({
-							//targetUser
 							condition: parseInt($(this).parent().siblings(".exe-conditionCheck").find("select option:selected").val()),
 							dataparam: [$(this).parent().siblings(".exe-dataParam").find("input").val().trim()],
 							scenarioName: $(this).parent().siblings(".exe-scenarioIds")[0].innerText,
@@ -739,8 +737,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			allocateICEPopup()
 		}
 	};
-
-	
 
 	const allocateICEPopup = () =>{
 		var projId = JSON.parse(window.localStorage['_CT']).testSuiteDetails[0].projectidts
@@ -851,10 +847,10 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			unblockUI();
 			$rootScope.resetSession.end();
 			executionActive = false;
-			if("status" in data){
-				if(data.status == "fail"){
+			if(data.status) {
+				if(data.status == "fail") {
 					openDialogExe("Queue Test Suite", data["error"]);
-				}else{
+				} else {
 					openDialogExe("Queue Test Suite", data["message"]);
 				}
 			}
@@ -1018,9 +1014,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 	//select parallel execution
 	$(document).on("click", ".selectParallel", function () {
-		$(this).find("img").toggleClass("sb");
-		$(this).find("svg").toggleClass("sb");
-		if ($("img").hasClass('sb') == true || $("svg").hasClass('sb') == true) {
+		$('.selectParallel').find("img").toggleClass("sb");
+		// $(this).find("svg").toggleClass("sb");
+		if ($('.selectParallel').find("img").hasClass('sb') == true){// || $("svg").hasClass('sb') == true) {
 			execAction = "parallel";
 		} else {
 			execAction = "serial";
@@ -1076,6 +1072,4 @@ var openDialogExe = function (title, body, submitflag) {
 		$("#globalTaskSubmit").find('.modal-body p').text(body);
 		$("#globalTaskSubmit").modal("show");
 	}
-	
 };
-

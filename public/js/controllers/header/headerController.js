@@ -161,7 +161,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			$('#executionTerminated').modal('show');
 			$('#executionTerminated').find('.btn-default').focus();
 		} else if (data == "unavailableLocalServer") {
-			openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
+			openModelPopup("executeStatus", "Execute Test Suite", $rootScope.unavailableLocalServer_msg);
 		} else if (data == "success") {
 			$("#executionCompleted").find('.modal-title').text(msg);
 			$('#executionCompleted').modal('show');
@@ -471,6 +471,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			openModelPopup("switchRoleStatus", "Download Avo Assure ICE", "Package is not available");
 		}
 	}
+
 	$scope.redirectToNeuronGraphs = function() {
 		window.location.href='/neuronGraphs/';
 	}

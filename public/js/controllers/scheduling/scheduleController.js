@@ -559,8 +559,8 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 
 	//select parallel execution
 	$(document).on("click", ".selectParallel", function () {
-		$(this).find("img").toggleClass("sb");
-		if ($("img").hasClass('sb') == true) execAction = "parallel";
+		$('.selectParallel').find("img").toggleClass("sb");
+		if ($('.selectParallel').find("img").hasClass('sb') == true) execAction = "parallel";
 		else execAction = "serial";
 	});
 
@@ -612,12 +612,12 @@ function openPopup(id) {
 		smartBatch = true;
 		copyId = parseInt(id.replace("mod",""));
 		sequence(true,true,copyId);
-		
 	} else { 
 		smartBatch = false;
 		sequence(false,false,parseInt(id.replace("mod","")));
-	 }
+	}
 }
+
 function sequence(copy,block,id) {
 	var selectall = block; // select all only when blockin
 	for (var i = 0; i < $(".batchSuite").length ; i++) {
@@ -641,15 +641,11 @@ function sequence(copy,block,id) {
 			$(".batchSuite")[i].children[0].children[2].children[0].disabled = false;
 		}
 	}
-	// for (var i = 0; i < $(".batchSuite").find(".selectToSched").length ; i++) {
-	// 	if(selectall && copy){ 
-	// 		$(".batchSuite").find(".selectToSched")[i].checked = true;
-	// 	}
-
-
-	// }
-	
-
+	/* for (var i = 0; i < $(".batchSuite").find(".selectToSched").length ; i++) {
+		if(selectall && copy){ 
+			$(".batchSuite").find(".selectToSched")[i].checked = true;
+		}
+	}*/
 }
 
 function moduleSmartScheduling(){
