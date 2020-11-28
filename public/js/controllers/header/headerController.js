@@ -130,7 +130,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			msg = msg + "\n" + data;
 		}
 		if(msg && msg.trim() != ""){
-			openModelPopup("Execution Result", msg);
+			openHeaderModalPopup("executeGlobalModal","Execution Result", msg);
 		}		
 		
 	});
@@ -154,7 +154,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			$('#executionTerminated').modal('show');
 			$('#executionTerminated').find('.btn-default').focus();
 		} else if (data == "unavailableLocalServer") {
-			openModelPopup("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
+			openHeaderModalPopup("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
 		} else if (data == "success") {
 			$("#executionCompleted").find('.modal-title').text(msg);
 			$('#executionCompleted').modal('show');
@@ -162,8 +162,8 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 				$("#executionCompleted").find('.btn-default').focus();
 			}, 300);
 		} else if(data == "Completed"){
-			openModelPopup("Scheduled Execution Complete", msg);
-		}else openModelPopup("Execute Test Suite", "Failed to execute.");
+			openHeaderModalPopup("executeGlobalModal","Scheduled Execution Complete", msg);
+		}else openHeaderModalPopup("executeGlobalModal","Execute Test Suite", "Failed to execute.");
 	});
 
 	
@@ -237,14 +237,14 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	if(window.localStorage['_SRS']=="success"){
 		delete window.localStorage['_SRS'];
 		setTimeout(function () {
-			openModelPopup("switchRoleStatus", "Switch Role", "Your role is changed to " + window.localStorage['_SR']);
+			openHeaderModalPopup("switchRoleStatus", "Switch Role", "Your role is changed to " + window.localStorage['_SR']);
 		}, 500);
 	}
 
 	$(document).on('click', ".switchRole_confirm", function () {
 		selectedRoleName = $(this).text();
 		selectedRoleID = $(this).valueOf("outerHTML").data("id");
-		openModelPopup("switchRoleModal", "Switch Role", "Are you sure you want to switch role to: " + selectedRoleName);
+		openHeaderModalPopup("switchRoleModal", "Switch Role", "Are you sure you want to switch role to: " + selectedRoleName);
 	});
 
 	$scope.switchRole = function () {
@@ -252,7 +252,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		var roleasarray = userDetails.additionalrole;
 		if (roleasarray.length == 0) {
 			$("#switchRoles").hide();
-			openModelPopup("switchRoleStatus", "Switch Role", "There are no roles to switch");
+			openHeaderModalPopup("switchRoleStatus", "Switch Role", "There are no roles to switch");
 		} else {
 			LoginService.getRoleNameByRoleId(roleasarray)
 			.then(function (data) {
@@ -298,12 +298,12 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 				}
 			} else {
 				console.log("Fail to Switch User");
-				openModelPopup("switchRoleStatus", "Switch Role", "Fail to Switch User");
+				openHeaderModalPopup("switchRoleStatus", "Switch Role", "Fail to Switch User");
 			}
 		}, function (error) {
 			unblockUI();
 			console.log("Fail to Switch User");
-			openModelPopup("switchRoleStatus", "Switch Role", "Fail to Switch User");
+			openHeaderModalPopup("switchRoleStatus", "Switch Role", "Fail to Switch User");
 		});
 	};
 
@@ -314,7 +314,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	};
 
 	$scope.resetPass = function(){
-		openModelPopup("resetPassPopup");
+		openHeaderModalPopup("resetPassPopup");
 	};
 
 	$scope.resetFields = function(){
@@ -354,7 +354,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 					$scope.passwordValidation = "Invalid Session";
 				} else if(data == "success") {
 					$("#resetPassPopup").modal("hide");
-					openModelPopup("resetSuccessPopup");
+					openHeaderModalPopup("resetSuccessPopup");
 				} else if(data == "same"){
 					$(".ic-newpassword").parent().addClass("input-border-error");
 					$(".ic-confpassword").parent().addClass("input-border-error");
@@ -454,10 +454,10 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			const res = await fetch("/AvoAssure_ICE");
 			const status = await res.text();
 			if (status == "available") location.href = location.origin+"/AvoAssure_ICE?file=getICE"
-			else openModelPopup("switchRoleStatus", "Download Avo Assure ICE", "Package is not available");
+			else openHeaderModalPopup("switchRoleStatus", "Download Avo Assure ICE", "Package is not available");
 		} catch (ex) {
 			console.error("Error while downloading ICE package. Error:", ex);
-			openModelPopup("switchRoleStatus", "Download Avo Assure ICE", "Package is not available");
+			openHeaderModalPopup("switchRoleStatus", "Download Avo Assure ICE", "Package is not available");
 		}
 	}
 
@@ -466,7 +466,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	}
 });
 
-function openModelPopup(modalId, title, body) {
+function openHeaderModalPopup(modalId, title, body) {
 	var modalBox = $("#"+modalId);
 	modalBox.find('.modal-title').text(title);
 	modalBox.find('.modal-body p').text(body);
