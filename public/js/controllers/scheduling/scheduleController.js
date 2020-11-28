@@ -356,7 +356,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 				color = '#95c353';
 				status = 'Online'
 			}
-			if(ice.status){
+			if(ice.mode){
 				color = 'red';
 				status = 'DND mode'
 			}
@@ -488,9 +488,11 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 	}
 
 	$scope.scheduleClick = () => {
+		$scope.selectedPool = $('#chooseICEPool').val() 
+		if($('#chooseICEPool').val() == 'unallocated')$scope.selectedPool = "";
 		if(!smartBatch && !$scope.selectedICE){
 			if($('#userIdName').val() == "" && $scope.availableICE && $scope.availableICE.length>0){
-				$scope.selectedICE = $scope.availableICE[0].icename
+				$scope.selectedICE = ""
 			}else{
 				$('#userIdName').addClass('error-border')
 				return;
@@ -507,6 +509,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 			else{
 				executionData.batchInfo[i].targetUser = $scope.selectedICE
 			}
+			executionData.batchInfo[i].poolid = $scope.selectedPool
 			executionData.batchInfo[i].iceList = iceList
 		})
 		blockUI("Scheduling...");

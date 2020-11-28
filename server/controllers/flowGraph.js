@@ -27,7 +27,7 @@ exports.flowGraphResults = function(req, res){
 					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					function generateFlowGraph_listener(channel,message) {
 						data = JSON.parse(message);
-						if(icename == data.username){
+						if(icename == data.username && ["unavailableLocalServer", "flowgraph_result", "result_flow_graph_finished"].includes(data.onAction)){
 							var value = data.value;
 							if (data.onAction == "unavailableLocalServer") {
 								redisServer.redisSubServer.removeListener('message',generateFlowGraph_listener);	
@@ -96,7 +96,7 @@ exports.APG_OpenFileInEditor = function (req, res) {
 					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					function apgOpenFileInEditor_listener(channel,message) {
 						data = JSON.parse(message);
-						if(icename == data.username){
+						if(icename == data.username && ["unavailableLocalServer", "open_file_in_editor_result"].includes(data.onAction)){
 							if (data.onAction == "unavailableLocalServer") {
 								redisServer.redisSubServer.removeListener('message',apgOpenFileInEditor_listener);	
 								logger.error("Error occurred in APG_OpenFileInEditor: Socket Disconnected");
@@ -189,7 +189,7 @@ exports.APG_runDeadcodeIdentifier = function(req,res){
 						redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 						function apgRunDeadcodeIdentifier_listener(channel,message) {
 							data = JSON.parse(message);
-							if(icename == data.username){
+							if(icename == data.username && ["unavailableLocalServer", "deadcode_identifier"].includes(data.onAction)){
 								redisServer.redisSubServer.removeListener('message',apgRunDeadcodeIdentifier_listener);
 								if (data.onAction == "unavailableLocalServer") {	
 									logger.error("Error occurred in APG_runDeadcodeIdentifier: Socket Disconnected");

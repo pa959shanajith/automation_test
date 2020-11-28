@@ -58,7 +58,7 @@ exports.loginToZephyr_ICE = function (req, res) {
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						function zephyrlogin_listener(channel,message) {
 							var data = JSON.parse(message);
-							if(name == data.username){
+							if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
 								redisServer.redisSubServer.removeListener('message',zephyrlogin_listener);
 								if (data.onAction == "unavailableLocalServer") {
 									logger.error("Error occurred in loginZephyrServer_ICE: Socket Disconnected");
@@ -125,7 +125,7 @@ exports.zephyrProjectDetails_ICE = function (req, res) {
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						function zephyrlogin_listener(channel,message) {
 							var data = JSON.parse(message);
-							if(name == data.username){
+							if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
 								redisServer.redisSubServer.removeListener('message',zephyrlogin_listener);
 								if (data.onAction == "unavailableLocalServer") {
 									logger.error("Error occurred in zephyrProjectDetails_ICE: Socket Disconnected");

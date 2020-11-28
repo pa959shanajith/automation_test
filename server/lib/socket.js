@@ -38,7 +38,7 @@ io.on('connection', async socket => {
 		socket.emit("connectionAck", "Success");
 	} else if (socket.request._query.check == "notify") {
 		address = socket.request._query.key && Buffer.from(socket.request._query.key, "base64").toString() || "-";
-		logger.warn("Notification Socket connecting address %s", address);
+		logger.info("Notification Socket connecting address %s", address);
 		socketMapNotify[address] = socket;
 		sendPendingNotifications(socket,address);
 		redisServer.redisSubClient.subscribe('UI_notify_' + address, 1);
@@ -114,7 +114,7 @@ io.on('connection', async socket => {
 			logger.info("Disconnecting from UI socket: %s", address);
 		} else if (socket.request._query.check == "notify") {
 			address = socket.request._query.key && Buffer.from(socket.request._query.key, "base64").toString() || "-";
-			logger.warn("Disconnecting from Notification socket: %s", address);
+			logger.info("Disconnecting from Notification socket: %s", address);
 			redisServer.redisSubClient.unsubscribe('UI_notify_' + address, 1);
 			if (socketMapNotify[address]) delete socketMapNotify[address];
 		} else {

@@ -95,7 +95,7 @@ const openScreenShot = async (username, path) => {
             let scrShotData = [];
             function render_screenshot_listener(channel, message) {
                 const data = JSON.parse(message);
-                if (icename == data.username) {
+                if (icename == data.username && ["unavailableLocalServer", "render_screenshot_finished","render_screenshot"].includes(data.onAction)) {
                     const resultData = data.value;
                     if (data.onAction == "unavailableLocalServer") {
                         redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
@@ -652,7 +652,7 @@ exports.connectJira_ICE = function(req, res) {
 
                                 function jira_login_1_listener(channel, message) {
                                     var data = JSON.parse(message);
-                                    if (icename == data.username) {
+                                    if (icename == data.username && ["unavailableLocalServer", "auto_populate"].includes(data.onAction)) {
                                         redisServer.redisSubServer.removeListener("message", jira_login_1_listener);
                                         if (data.onAction == "unavailableLocalServer") {
                                             logger.error("Error occurred in connectJira_ICE - loginToJira: Socket Disconnected");
@@ -714,7 +714,7 @@ exports.connectJira_ICE = function(req, res) {
 
                                 function jira_login_2_listener(channel, message) {
                                     var data = JSON.parse(message);
-                                    if (icename == data.username) {
+                                    if (icename == data.username && ["unavailableLocalServer", "issue_id"].includes(data.onAction)) {
                                         redisServer.redisSubServer.removeListener("message", jira_login_2_listener);
                                         if (data.onAction == "unavailableLocalServer") {
                                             logger.error("Error occurred in connectJira_ICE - createIssueInJira: Socket Disconnected");
