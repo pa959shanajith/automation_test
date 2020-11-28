@@ -4999,10 +4999,33 @@ Purpose : displaying pop up for replication of project
 
 
     $scope.importMindmap = function($event) {
+        blockUI("Loading...");
 		var counter1 = 0;
         $scope.createdthrough="MM";
         $("#importMindmapFile").attr("type", "file");
         $("#importMindmapFile").trigger("click");
+        if($scope.projectList==undefined){
+            mindmapServices.populateProjects().then(function(res) {
+                if (res == "Invalid Session") {
+                    return $rootScope.redirectPage();
+                }
+                if (res.projectId.length > 0) {
+                    $scope.projectList = [];
+                    for (i = 0; i < (res.projectId.length && res.projectName.length); i++) {
+                        $scope.projectList.push({
+                            'apptype': res.appType[i],
+                            'name': res.projectName[i],
+                            'id': res.projectId[i],
+                            'releases':res.releases[i],
+                            'domains':res.domains[i]
+                        });
+                    }
+                }
+            }, function(error) {
+                console.log("Error:", error);
+                unblockUI();
+            });
+        }
         importMindmapFile.addEventListener('change', function () {
             if (counter1 == 0) {
 				var file = importMindmapFile.files[0];
@@ -5010,11 +5033,21 @@ Purpose : displaying pop up for replication of project
 				var reader = new FileReader();
 				reader.onload = function (e) {
 					if (["mm","json"].indexOf((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase())>=0) {
-						resultString = JSON.parse(reader.result);
+                        resultString = JSON.parse(reader.result);
+                        pro_list = []
+                        
+                        for(i=0;i<$scope.projectList.length;i++){
+                            pro_list.push($scope.projectList[i].id)
+                        }
 						if (!('testscenarios' in resultString)){
-							openDialogMindmap("Import Error", "Incorrect JSON imported. Please check the contents!!");
+                            openDialogMindmap("Import Error", "Incorrect JSON imported. Please check the contents!!");
+                            unblockUI();
 						} else if(resultString.testscenarios.length == 0){
-							openDialogMindmap("No nodes found", "The file has no node structure to import, please check!!");
+                            openDialogMindmap("No nodes found", "The file has no node structure to import, please check!!");
+                            unblockUI();
+						} else if(!(pro_list.includes(resultString.parentid))){
+                            openDialogMindmap("Import Error", "This project is not assigned to user, please check!!");
+                            unblockUI();
 						} else {
                             mindmapServices.importMindmap({'content':resultString}).then(function(result) {
                                 if (result == "Invalid Session") {
@@ -5081,17 +5114,19 @@ Purpose : displaying pop up for replication of project
                                 }
                             }, function(error) {
                                 console.log(error);
+                                unblockUI();
                             });
 						}
 					} else {
-						openDialogMindmap("import Mindmap", "Please Check the file format you have uploaded!");
+                        openDialogMindmap("import Mindmap", "Please Check the file format you have uploaded!");
+                        unblockUI();
 					}
 				}
 				reader.readAsText(file);
 				counter1 = 1;
-				$("#importMindmapFile").val('');
-			}
-		});
+                $("#importMindmapFile").val('');
+            }
+        });
     }
 
 
