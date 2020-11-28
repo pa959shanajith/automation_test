@@ -1,20 +1,10 @@
 @charset "utf-8";
 /*****************QC CSS NEW ************************/
-.qcActionBtn{
+.zephyrActionBtn{
     float: left;
     width: 100%;
 }
-.qcActionBtn a, .qcActionBtn button{
-    color: #fff;
-    border: 0;
-    border-radius: 20px;
-    background: #643693;
-    font-family: 'LatoWebLight';
-    outline: 0;
-    text-decoration: none;
-    cursor: pointer;
-}
-.viewSaveButton{
+.zephyrActionBtn a, .zephyrActionBtn button{
     color: #fff;
     border: 0;
     border-radius: 20px;
@@ -31,7 +21,7 @@
     margin-left: 6px;
     margin-right: 6px;
 }
-.saveQcbtn{
+.saveZephyrbtn{
     float: left !important;
     padding: 0px 19px !important;
     font-size: 16px;
@@ -39,7 +29,7 @@
 .stopPointerEvent{
     pointer-events: none;
 }
-.leftQcStructure, .rightQcStructure{
+.leftZephyrStructure, .rightZephyrStructure{
     border: 1px solid #000;
     position: relative;
     top: 14px;
@@ -48,47 +38,53 @@
     width: 47%;
     float: left;
 }
-.leftQcStructure{margin-right: 35px;}
-.qcDomProContainer{padding: 10px 8px 2px 8px;}
-.qcProContainer{padding: 10px 4px 2px 8px;}
-.qcProContainer input{height: 24px; border-radius: 5px; border: 1px solid #000; width: 40%; opacity: 0; padding-left: 6px;}
+.leftZephyrStructure{margin-right: 35px;}
+.zephyrDomProContainer{padding: 10px 8px 2px 8px;}
+.zephyrProContainer{padding: 10px 4px 2px 8px;}
+.zephyrProContainer input{height: 24px; border-radius: 5px; border: 1px solid #000; width: 40%; opacity: 0; padding-left: 6px;}
 .searchScenarioAvoAssure{padding: 4px 0 4px 0; border-radius: 5px; border: 1px solid #000; position: relative; top: 1px; cursor: pointer; display: none;}
 .searchScenarioAvoAssure img{width: 26px;}
-.qcDomProContainer select, .qcProContainer select{
+.zephyrDomProContainer select, .zephyrProContainer select{
     width: 48%;
     height: 24px;
     border-radius: 5px;
     border: 1px solid #000;
 }
-.qcTreeContainer, .qcAvoAssureTreeContainer{
+/* .qTestProRelContainer select, .qtestProContainer select{
+    width: 48%;
+    height: 24px;
+    border-radius: 5px;
+    border: 1px solid #000;
+} */
+.zephyrTreeContainer, .zephyrAvoAssureTreeContainer{
     float: left;
     width: 100%;
     height: 80%;
     margin-top: 20px;
     padding: 0 6px 0 6px;
 }
-.qcTreeContainer ul:nth-child(1), .qcAvoAssureTreeContainer ul:nth-child(1){height: 616px !important;}
-.qcTreeContainer ul, .qcAvoAssureTreeContainer ul{padding: 0 !important;}
-.qcTreeContainer ul label{margin-left: 10px;}
-.qcTreeContainer ul li.testSet label{margin-left: 34px !important; position: relative; top: 3px; overflow: hidden; text-overflow: ellipsis; width: 70%; white-space: nowrap;margin-bottom: 0;}
-.qcTreeContainer ul li.testSet img{float: right; margin-right: 8px; height: 13px; position: relative; top: 6px; cursor: pointer;}
-.qcAvoAssureTreeContainer ul li.testSet{padding-left: 10px;}
-.qcAvoAssureTreeContainer ul li.testSet label{position: relative;top: 3px;}
+.zephyrTreeContainer ul:nth-child(1), .zephyrAvoAssureTreeContainer ul:nth-child(1){height: 616px !important;}
+.zephyrTreeContainer ul, .zephyrAvoAssureTreeContainer ul{padding: 0 !important;}
+.zephyrTreeContainer ul label{margin-left: 10px;}
+.zephyrTreeContainer ul li.testSet label{margin-left: 34px !important; position: relative; top: 3px; overflow: hidden; text-overflow: ellipsis; width: 70%; white-space: nowrap;margin-bottom: 0;}
+.zephyrTreeContainer ul li.testSet img{float: right; margin-right: 8px; height: 13px; position: relative; top: 6px; cursor: pointer;}
+.zephyrAvoAssureTreeContainer ul li.testSet{padding-left: 10px;}
+.zephyrAvoAssureTreeContainer ul li.testSet label{position: relative;top: 3px;}
 .testSet:hover{background-color: #f3eaff; border-radius: 5px !important;}
 .root ul{margin-left: 17px;}
 
-.qcTreeContainer ul.suiteList li.testSuite label{margin-left: 0px !important; position: relative; top: 3px; overflow: hidden; text-overflow: ellipsis; width: 70%; white-space: nowrap;margin-bottom: 0;}
-.qcTreeContainer ul.suiteList li.testSuite img{float: right; margin-right: 8px; height: 13px; position: relative; top: 6px; cursor: pointer;}
+.zephyrTreeContainer ul.suiteList li.testSuite label{margin-left: 0px !important; position: relative; top: 3px; overflow: hidden; text-overflow: ellipsis; width: 70%; white-space: nowrap;margin-bottom: 0;}
+.zephyrTreeContainer ul.suiteList li.testSuite img{float: right; margin-right: 8px; height: 13px; position: relative; top: 6px; cursor: pointer;}
 /* .testSuite:hover{background-color: #f3eaff; border-radius: 5px !important;} */
 
-.qcTreeContainer ul.runList li.testRun label{margin-left: 57px !important; position: relative; top: 3px; overflow: hidden; text-overflow: ellipsis; width: 70%; white-space: nowrap;margin-bottom: 0;}
-.qcTreeContainer ul.runList li.testRun img{float: right; margin-right: 8px; height: 13px; position: relative; top: 6px; cursor: pointer;}
+.zephyrTreeContainer ul.runList li.testRun label{margin-left: 57px !important; position: relative; top: 3px; overflow: hidden; text-overflow: ellipsis; width: 70%; white-space: nowrap;margin-bottom: 0;}
+.zephyrTreeContainer ul.runList li.testRun img{float: right; margin-right: 8px; height: 13px; position: relative; top: 6px; cursor: pointer;}
 .testRun:hover{background-color: #f3eaff; border-radius: 5px !important;}
 
-.qcTreeContainer ul li.Tsetnode label{position: relative; top: 3px; overflow: hidden; text-overflow: ellipsis; width: 70%;}
-.qcTreeContainer ul li.Tsetnode img{float: left; position: relative; top: 6px; cursor: pointer;}
-.qcTreeContainer ul li.Tfolnode label{position: relative; top: 3px; overflow: hidden; text-overflow: ellipsis; width: 70%;}
-.qcTreeContainer ul li.Tfolnode img{float: left; position: relative; top: 6px; cursor: pointer;}
+.zephyrTreeContainer ul li.Tsetnode label{position: relative; top: 3px; overflow: hidden; text-overflow: ellipsis; width: 70%;}
+.zephyrTreeContainer ul li.Tsetnode img{float: left; position: relative; top: 6px; cursor: pointer;}
+.zephyrTreeContainer ul li.Tfolnode label{position: relative; top: 3px; overflow: hidden; text-overflow: ellipsis; width: 70%;}
+.zephyrTreeContainer ul li.Tfolnode img{float: left; position: relative; top: 6px; cursor: pointer;}
 
 .mappedFiles{
     height: calc(100% - 27px) !important;
@@ -97,15 +93,19 @@
 .linkedTestset{
     width: 100%;
     float: left;
+    height: 30px;
     margin-bottom: 26px;
 }
 .linkedTestset label{
+    width: 45%;
+    float: left;
+    background-color: #E1CAFF; 
     border-radius: 5px;
-    padding: 5px 5px 5px 10px;
+    padding: 5px 5px 5px 30px;
     font-size: 16px;
     font-family: 'LatoWebLight';
 	overflow: hidden;
-    text-overflow: ellipsis;
+	text-overflow: ellipsis;
 }
 .linkedTestset span{
     float: left;
@@ -113,34 +113,7 @@
     width: 90px;
     margin-top: 15px;
 }
-.viewImageSpan{
-    float: right !important;
-    width: 45px !important;
-    height: 22px;
-    margin-top: 0px !important;
-    border: 0px !important;
-}
-.totalcountbx {
-    color: rgb(154, 140, 140);
-}
-.almtestcasesbx {
-    /* color: rgb(216, 70, 143); */
-    color: rgb(222, 126, 164);
-}
-.scenariobx {
-    /* color: rgb(39, 95, 199); */
-    color: #a784d4;
-}
-#page-taskName label {
-    display:none;
-    border: 1px solid;
-    border-radius: 5px;
-    height: 40px;
-    width: 125px;
-    text-align: center;
-}
-.qcUndoSyncronise, .qcSyncronise{display:none;}
-.viewUndoSyncronise{display: none;float:left;margin-top: 5px;}
+.zephyrUndoSyncronise, .zephyrSyncronise{display:none;}
 .upperTestlabSection{
     width: 100%;
     height: calc(100% - 390px);
@@ -251,14 +224,14 @@
 #testLabGen thead tr th{text-align: center; border-right: 1px solid white; width: 10%;}
 /*****************QC CSS NEW ************************/
 @media screen and (max-height: 680px) {
-    .leftQcStructure, .rightQcStructure{
+    .leftZephyrStructure, .rightZephyrStructure{
         height: 400px;
     }
 }
 /**********Specifically for Internet Explorer**********/
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {    
-    .qcActionBtnFirstChild{margin-left: 458px !important;}
-    .qcTreeContainer, .qcAvoAssureTreeContainer{height: 600px;}
+    .zephyrActionBtnFirstChild{margin-left: 458px !important;}
+    .zephyrTreeContainer, .zephyrAvoAssureTreeContainer{height: 600px;}
 }
 @media only screen and (width: 1440px) and (height: 794px){
     .mappedFiles{height: calc(100% - 74px) !important;}

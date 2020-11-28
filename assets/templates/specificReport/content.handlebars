@@ -4,13 +4,11 @@
    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <title>Avo Assure - Execution Report</title>
-	<link rel="icon" href="../imgs/favicon.ico">
+   <link rel="icon" href="../imgs/favicon.ico">
    <link rel="stylesheet" type="text/css" href="../fonts/latofonts.css" />
    <link rel="stylesheet" type="text/css" href="../fonts/font-awesome_mindmap/css/font-awesome.css" />
    <link rel="stylesheet" type="text/css" href="../css/css_reports/datatables/dataTables.css">
-
    <script type="text/javascript" src="../js/plugins/jquery.min.js"></script>
-   <script type="text/javascript" src="../js/plugins/reports/specificReport.js"></script>
    <script type="text/javascript" src="../js/plugins/jquery-ui.min.js"></script>
    <script type="text/javascript" src="../js/plugins/jquery.blockUI.js"></script>
    <script type="text/javascript" src="../js/plugins/reports/datatables/datatables.min.js"></script>
@@ -1004,6 +1002,9 @@
             <input id="scrShotChk" type="checkbox" title="Include Screenshots in PDF" style="height:12px;margin:0" checked="true">
             <img alt="Save PDF" class="export-icons" data-rep="pdf" src="../imgs/ic-pdf.png" title="Save PDF Report">
             <img alt="Export JSON" class="export-icons" data-rep="json" style="" src="../imgs/ic-export-to-json.png" title="Export to JSON">
+            {{#ifnotEquals video '-'}}
+               <i class="fa fa-film export-icons" alt="Download video" data-rep="mp4" data-path={{video}} style="color:#311d4e;position: absolute;font-size: 22px;" aria-hidden="true" title="Download Execution Video"></i>
+            {{/ifnotEquals}}
          </div>
       </div>
       <button class="collapsible">
@@ -1229,6 +1230,7 @@
          <button type="button" class="closeWindow">Ok</button>
       </p>
    </div>
+   <script type="text/javascript" src="../js/plugins/reports/specificReport.js"></script>
 </body>
 
 </html>

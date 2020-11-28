@@ -44,7 +44,7 @@ exports.getCrawlResults = function (req, res) {
 					}
 					function webCrawlerGo_listener(channel,message) {
 						var data = JSON.parse(message);
-						if (icename == data.username) {
+						if (icename == data.username && ["unavailableLocalServer", "result_web_crawler", "result_web_crawler_finished"].includes(data.onAction)) {
 							var value = data.value;
 							if (data.onAction == "unavailableLocalServer") {
 								redisServer.redisSubServer.removeListener('message',webCrawlerGo_listener);	

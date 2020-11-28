@@ -1,37 +1,41 @@
-mySPA.factory('qcServices', ['$http','$q', function ($http,$q)   {
+mySPA.factory('zephyrServices', ['$http','$q', function ($http,$q)   {
   return{
-        loginQCServer_ICE: function(qcURL,qcUserName,qcPassword){
-    			var param = "loginQCServer_ICE";
-	        return $http.post('/loginQCServer_ICE', {
-	        		action: param,
-              qcURL:	qcURL,
-							qcUsername:	qcUserName,
-							qcPassword :	qcPassword,
-							qcaction: "domain"
+	loginToZephyr_ICE: function(zephyrAccNo,zephyrAcKey,zephyrSecKey,zephyrJiraUrl,zephyrJiraUserName,zephyrJiraAccToken){
+    			var param = "loginToZephyr_ICE";
+	        return $http.post('/loginToZephyr_ICE', {
+	        				action: param,
+              				zephyrAccNo:	zephyrAccNo,
+							zephyrAcKey:	zephyrAcKey,
+							zephyrSecKey :	zephyrSecKey,
+							zephyrJiraUrl: zephyrJiraUrl,
+							zephyrJiraUserName: zephyrJiraUserName,
+							zephyrJiraAccToken: zephyrJiraAccToken,
+							execFlag: "0",
+							zephyraction: "domain"
 	        })
 					.then (function(response)	{return response.data;	},
 					function(response){	return $q.reject(response.data);});	
     		},
-				qcProjectDetails_ICE: function(domain){
-    			var param = "qcProjectDetails_ICE";
+			zephyrProjectDetails_ICE: function(domain){
+    			var param = "zephyrProjectDetails_ICE";
 					var userid = JSON.parse(window.localStorage['_UI']).user_id
-	        return $http.post('/qcProjectDetails_ICE', {
+	        return $http.post('/zephyrProjectDetails_ICE', {
 	        		action: param,
               domain:	domain,
-							qcaction: "project",
+							zephyraction: "project",
 							user_id : userid 
 	        })
 					.then (function(response)	{return response.data;	},
 					function(response){	return $q.reject(response.data);});	
     		},
-				qcFolderDetails_ICE: function(qcaction, getProjectName, getDomainName, foldername, testCasename) {
-						var param = "qcFolderDetails_ICE";
-						return $http.post('/qcFolderDetails_ICE', {
+			qtestFolderDetails_ICE: function(zephyraction, getProjectName, getDomainName, foldername, testCasename) {
+						var param = "qtestFolderDetails_ICE";
+						return $http.post('/qtestFolderDetails_ICE', {
 										action: param,
 										foldername: foldername,
 										domain: getDomainName,
 										project: getProjectName,
-										qcaction: qcaction,
+										zephyraction: zephyraction,
 										testset: testCasename
 						})
 						.then(function(response) {
@@ -40,28 +44,19 @@ mySPA.factory('qcServices', ['$http','$q', function ($http,$q)   {
 								return $q.reject(response.data);
 						});
 				},
-				saveQcDetails_ICE: function(mappedList){
-						var param = "saveQcDetails_ICE";
-						return $http.post('/saveQcDetails_ICE', {
+				saveZephyrDetails_ICE: function(mappedList){
+						var param = "saveZephyrDetails_ICE";
+						return $http.post('/saveZephyrDetails_ICE', {
 								action: param,
 								mappedDetails : mappedList, 
 						})
 					.then (function(response)	{return response.data;	},
 					function(response){	return $q.reject(response.data);});	
-			},
-			saveUnsyncDetails: function(undoMapList){
-				var param = "saveUnsyncDetails";
-				return $http.post('/saveUnsyncDetails', {
-					action: param,
-					undoMapList : undoMapList, 
-				})
-				.then (function(response)	{return response.data;	},
-				function(response){	return $q.reject(response.data);});	
-			},
-				viewQcMappedList_ICE: function(userid){
-						var param = "viewQcMappedList_ICE";
+    		},
+			viewZephyrMappedList_ICE: function(userid){
+						var param = "viewZephyrMappedList_ICE";
 						var userid = JSON.parse(window.localStorage['_UI']).user_id
-						return $http.post('/viewQcMappedList_ICE', {
+						return $http.post('/viewZephyrMappedList_ICE', {
 								action: param,
 								user_id : userid
 						})

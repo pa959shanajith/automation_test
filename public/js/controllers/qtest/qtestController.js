@@ -46,6 +46,20 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 	   	}, 100);
 	};
 
+	$scope.zephyrlogin = function(event){
+		window.localStorage['navigateScreen'] = "p_Zephyr";
+		$timeout(function () {
+			$location.path('/'+ "p_Zephyr");
+	   	}, 100);
+	};	
+
+	$scope.hideMappedFilesTab = function(){
+		$scope.testLabGenerator = false;
+		$(".mappedFiles, .mappedFilesLabel").hide();
+		$("#page-taskName span").text("qTest Integration");
+		$(".qcActionBtn, .leftQcStructure, .rightQcStructure").show();
+	};
+
 	//login to QC
 	$scope.loginToQTest = function($event){
 		$(".qcLoginload").show();
@@ -116,13 +130,6 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 	$scope.goBacktoPlugin = function($event){
 		window.localStorage['navigateScreen'] = "p_Integration";
 		window.location.assign('p_Integration');
-	};
-
-	$scope.hideMappedFilesTab = function(){
-		$scope.testLabGenerator = false;
-		$(".mappedFiles, .mappedFilesLabel").hide();
-		$("#page-taskName span").text("ALM Integration");
-		$(".qcActionBtn, .leftQcStructure, .rightQcStructure").show();
 	};
 
 	//Select Domains

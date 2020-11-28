@@ -35,16 +35,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	}
 
 	//Global model popup
-	function openModelPopup(modalId, title, body) {
-		var modalBox = $("#"+modalId);
-		modalBox.find('.modal-title').text(title);
-		modalBox.find('.modal-body p').text(body);
-		modalBox.modal("show");
-		setTimeout(function () {
-			modalBox.find('.btn-default').focus();
-		}, 300);
-	}
-
+	
 	if ($location.$$path == '/admin') {
 		$(".bell-icon-div").hide();
 		$(".resetPassEntry").hide();
@@ -118,6 +109,64 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		}
 	});
 
+	socket.on('display_execution_popup', (value) => {
+		var msg = "";
+		for(val in value){
+			var data = value[val].status;
+			var testSuite = value[val].testSuiteIds;
+			var exec = testSuite[0].testsuitename + ": "
+			if (data == "begin") continue;
+			if (data == "unavailableLocalServer") data = exec + $rootScope.unavailableLocalServer_msg;
+			else if (data == "NotApproved") data = exec + "All the dependent tasks (design, scrape) needs to be approved before execution";
+			else if (data == "NoTask") data = exec + "Task does not exist for child node";
+			else if (data == "Modified") data = exec +"Task has been modified, Please approve the task";
+			else if (data == "Completed") data = exec +"Execution Complete";
+			else if (data == "Terminate") data = "Terminated" 
+			else if (data == "UserTerminate") data = exec +"Terminated by User"
+			else if (data == "success") data = exec +"success"
+			else if (data == "API Execution Completed") data = exec + "API Execution Completed"
+			else if (data == "API Execution Fail") data = exec + "API Execution Failed"
+			else data = exec + "Failed to execute.";
+			msg = msg + "\n" + data;
+		}
+		if(msg && msg.trim() != ""){
+			openModelPopup("Execution Result", msg);
+		}		
+		
+	});
+
+	socket.on('result_ExecutionDataInfo', function (result) {
+		var data = result.status
+		var testSuiteIds = result.testSuiteDetails;
+		var msg = "";
+		testSuiteIds[0]["projectidts"] = testSuiteIds[0]["projectid"];
+		window.localStorage["report"] = JSON.stringify(result);
+		msg = testSuiteIds[0]["testsuitename"]
+		
+		if (data == "Terminate") {
+			$('#executionTerminatedBy').html('Program');
+			$("#executionTerminatedBy").find('.modal-title').text(msg);
+			$('#executionTerminated').modal('show');
+			$('#executionTerminated').find('.btn-default').focus();
+		} else if (data == "UserTerminate") {
+			$('#executionTerminatedBy').html('User');
+			$("#executionTerminatedBy").find('.modal-title').text(msg);
+			$('#executionTerminated').modal('show');
+			$('#executionTerminated').find('.btn-default').focus();
+		} else if (data == "unavailableLocalServer") {
+			openModelPopup("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
+		} else if (data == "success") {
+			$("#executionCompleted").find('.modal-title').text(msg);
+			$('#executionCompleted').modal('show');
+			setTimeout(function () {
+				$("#executionCompleted").find('.btn-default').focus();
+			}, 300);
+		} else if(data == "Completed"){
+			openModelPopup("Scheduled Execution Complete", msg);
+		}else openModelPopup("Execute Test Suite", "Failed to execute.");
+	});
+
+	
 	function unreadNotifications() {
 		if(window.localStorage.notification){
 			var notifications = JSON.parse(window.localStorage.notification);
@@ -411,4 +460,18 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			openModelPopup("switchRoleStatus", "Download Avo Assure ICE", "Package is not available");
 		}
 	}
+
+	$scope.redirectToNeuronGraphs = function() {
+		window.location.href='/neuronGraphs/';
+	}
 });
+
+function openModelPopup(modalId, title, body) {
+	var modalBox = $("#"+modalId);
+	modalBox.find('.modal-title').text(title);
+	modalBox.find('.modal-body p').text(body);
+	modalBox.modal("show");
+	setTimeout(function () {
+		modalBox.find('.btn-default').focus();
+	}, 300);
+}

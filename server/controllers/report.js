@@ -95,7 +95,7 @@ const openScreenShot = async (username, path) => {
             let scrShotData = [];
             function render_screenshot_listener(channel, message) {
                 const data = JSON.parse(message);
-                if (icename == data.username) {
+                if (icename == data.username && ["unavailableLocalServer", "render_screenshot_finished","render_screenshot"].includes(data.onAction)) {
                     const resultData = data.value;
                     if (data.onAction == "unavailableLocalServer") {
                         redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
@@ -209,6 +209,7 @@ const prepareReportData = (reportData, embedImages) => {
     report.overallstatus[0].date = endDate && (endDate[1] + "/" + endDate[2] + "/" + endDate[0]) || '-';
     report.overallstatus[0].time = endTimeStamp.split(" ")[1] || '-';
     report.overallstatus[0].EllapsedTime = "~" + ("0" + elapTime[0]).slice(-2) + ":" + ("0" + elapTime[1]).slice(-2) + ":" + ("0" + elapTime[2]).slice(-2)
+    report.overallstatus[0].video = report.overallstatus[0].video || '-'
 
     report.rows.forEach((row, i) => {
         row.slno = i + 1;
@@ -651,7 +652,7 @@ exports.connectJira_ICE = function(req, res) {
 
                                 function jira_login_1_listener(channel, message) {
                                     var data = JSON.parse(message);
-                                    if (icename == data.username) {
+                                    if (icename == data.username && ["unavailableLocalServer", "auto_populate"].includes(data.onAction)) {
                                         redisServer.redisSubServer.removeListener("message", jira_login_1_listener);
                                         if (data.onAction == "unavailableLocalServer") {
                                             logger.error("Error occurred in connectJira_ICE - loginToJira: Socket Disconnected");
@@ -713,7 +714,7 @@ exports.connectJira_ICE = function(req, res) {
 
                                 function jira_login_2_listener(channel, message) {
                                     var data = JSON.parse(message);
-                                    if (icename == data.username) {
+                                    if (icename == data.username && ["unavailableLocalServer", "issue_id"].includes(data.onAction)) {
                                         redisServer.redisSubServer.removeListener("message", jira_login_2_listener);
                                         if (data.onAction == "unavailableLocalServer") {
                                             logger.error("Error occurred in connectJira_ICE - createIssueInJira: Socket Disconnected");
@@ -950,5 +951,26 @@ function validateData(content, type) {
             return validator.isEmail(content);
         case "json":
             return validator.isJSON(content);
+    }
+}
+
+exports.downloadVideo = async (req, res) => {
+    const fnName = "downloadVideo";
+    logger.info("Inside UI service: " + fnName);
+    try {
+        const videoPath = req.body.videoPath;
+        if (fs.existsSync(videoPath)) {
+            res.writeHead(200, {
+                'Content-Type': 'video/mp4',
+            });
+            const filestream = fs.createReadStream(videoPath);
+            filestream.pipe(res);
+        } else {
+            logger.error("Requested video file '%s' is not available", videoPath);
+            return res.status(404).send("fail");
+        }
+    } catch (exception) {
+        logger.error("Exception in the service %s - Error: %s", fnName, exception);
+        res.send("fail");
     }
 }

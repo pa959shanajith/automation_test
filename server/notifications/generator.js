@@ -37,7 +37,7 @@ generateEmailPayload.test = async data => {
 
 generateEmailPayload.report = async data => {
 	let recv = "";
-	const username = data.user && data.user.username || '';
+	const username = data.user && data.user.invokingusername || '';
 	if (username == "ci_cd") { // Todo?
 	} else if (username) {
 		const userProfile = await utils.fetchData({ username }, "login/loadUser", "generateEmailPayload_report");

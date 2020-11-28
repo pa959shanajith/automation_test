@@ -11,7 +11,7 @@ const validator =  require('validator');
 const logger = require('../../logger');
 const utils = require('../lib/utils');
 const notifications = require('../notifications');
-
+const queue = require("../lib/executionQueue")
 
 //GetUserRoles
 exports.getUserRoles = async (req, res) => {
@@ -945,7 +945,7 @@ exports.getDetails_ICE = function (req, res) {
 								responsedata.projectDetails=queryStringresult.rows.releases
 								res.send(responsedata);
 								}
-								else{
+								else if(type == "domaindetails"){
 									var responsedatadomains = {
 										projectIds: [],
 										projectNames: []
@@ -955,6 +955,8 @@ exports.getDetails_ICE = function (req, res) {
 										responsedatadomains.projectNames.push(queryStringresult.rows[i].name);
 									}
 									res.send(responsedatadomains)
+								}else{
+									res.send(queryStringresult.rows);
 								}
 							}
 						} catch (exception) {
@@ -1705,6 +1707,117 @@ exports.provisionICE = async (req, res) => {
 		res.send("fail");
 	}
 };
+// UI service to create a new ICE pool
+exports.createPool_ICE = async(req,res) => {
+	const fnName = "createPools_ICE";
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const poolinfo = req.body.data;
+		const inputs = {
+			poolname: poolinfo.poolname,
+			createdby: req.session.userid,
+			createdbyrole: req.session.activeRoleId,
+			projectids: poolinfo.projectids
+		};
+		const result = await utils.fetchData(inputs, "admin/createPool_ICE", fnName);
+		if(result && result != "fail") queue.Execution_Queue.updatePools("create",poolinfo);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in admin/createPools_ICE:", exception);
+		res.send("fail");
+	}
+} 
+ 
+// UI service to update a pool
+exports.updatePool = async(req,res) => {
+	const fnName = "updatePool"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const poolinfo = req.body.data;
+		const inputs = {
+			poolname: poolinfo.poolname,
+			poolid: poolinfo._id,
+			projectids: poolinfo.projectids,
+			ice_added: poolinfo.ice_added,
+			ice_deleted: poolinfo.ice_deleted,
+			modifiedby: req.session.userid,
+			modifiedbyrole: req.session.activeRoleId,
+		};
+		const result = await utils.fetchData(inputs, "admin/updatePool_ICE", fnName);
+		if(result && result != "fail") queue.Execution_Queue.updatePools("update",poolinfo);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in admin/provisionICE:", exception);
+		res.send("fail");
+	}
+}
+// UI service to get pools from projectids / poolid
+exports.getPools = async(req,res) => {
+	const fnName = "getPools"
+	logger.info("Inside UI service: " + fnName)
+	var inputCheck = false;
+	try{
+		const poolinfo = req.body.data;
+		const inputs = {
+			poolid: poolinfo.poolid,
+			projectids: poolinfo.projectids,
+		};
+		inputCheck = true;
+		const result = await utils.fetchData(inputs, "admin/getPools", fnName);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in admin/getPools:", exception);
+		if (!inputCheck) res.send("Payload Error")
+		else res.send("fail");
+	}
+}
+// UI service to get ICE in pool from poolid
+exports.getICEinPools = async(req,res) => {
+	const fnName = "getICEinPools"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const poolinfo = req.body.data;
+		const inputs = {
+			poolids: poolinfo.poolid,
+		};
+		const result = await utils.fetchData(inputs, "admin/getICE_pools", fnName);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in admin/provisionICE:", exception);
+		res.send("fail");
+	}
+}
+
+exports.deletePools = async(req,res) => {
+	const fnName = "deletePools"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const poolinfo = req.body.data;
+		const inputs = {
+			poolids: poolinfo.poolid,
+		};
+		const result = await utils.fetchData(inputs, "admin/deleteICE_pools", fnName);
+		if(result && result != "fail") queue.Execution_Queue.updatePools("delete",poolinfo);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in admin/deletePools:", exception);
+		res.send("fail");
+	}
+}
+
+
+exports.getAvailable_ICE = async(req,res) => {
+	const fnName = "getAvailable_ICE"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const inputs = {};
+		const result = await utils.fetchData(inputs, "admin/getAvailable_ICE", fnName);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in admin/getAvailable_ICE:", exception);
+		res.send("fail");
+	}
+} 
 
 exports.exportProject = async (req, res) => {
 	const fnName = 'exportProject';
@@ -1757,6 +1870,7 @@ exports.exportProject = async (req, res) => {
 		const archive = archiver('zip', { zlib: { level: 9 }});
 		const stream = fs.createWriteStream(zip_path);
 		stream.on('close', ()=>{
+			removeDir(projectPath);
 			res.writeHead(200, {
 				'Content-Type' : 'application/zip',
 			});
@@ -1770,6 +1884,26 @@ exports.exportProject = async (req, res) => {
 		return res.status(500).send("fail");
 	}
 };
+
+const removeDir = function(path) {
+	if (fs.existsSync(path)) {
+		const files = fs.readdirSync(path);
+		if (files.length > 0) {
+			files.forEach(function(filename) {
+				if (fs.statSync(path + "/" + filename).isDirectory()) {
+					removeDir(path + "/" + filename);
+				} else {
+					fs.unlinkSync(path + "/" + filename);
+				}
+			});
+			fs.rmdirSync(path);
+		} else {
+			fs.rmdirSync(path);
+		}
+	} else {
+		logger.error("Directory path not found.")
+	}
+}
 
 const getEmailConf = async (conf, fnName, inputs, flag) => {
 	if (!flag) flag = ['1','0','0','0','0','0','0','0','0','0','0','0','0'];

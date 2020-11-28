@@ -122,7 +122,7 @@ exports.initScraping_ICE = function (req, res) {
 					function scrape_listener(channel, message) {
 						var data = JSON.parse(message);
 						//LB: make sure to send recieved data to corresponding user
-						if (icename == data.username) {
+						if (icename == data.username && ["unavailableLocalServer", "scrape"].includes(data.onAction)) {
 							redisServer.redisSubServer.removeListener('message', scrape_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
@@ -594,7 +594,7 @@ exports.updateScreen_ICE = function (req, res) {
 													redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 													function checkIrisDuplicate_listener(channel,message) {
 														var data = JSON.parse(message);
-														if(icename == data.username){
+														if(icename == data.username && ["unavailableLocalServer", "iris_operations_result"].includes(data.onAction)){
 															redisServer.redisSubServer.removeListener('message',checkIrisDuplicate_listener);
 															if (data.onAction == "unavailableLocalServer") {
 																logger.error("Error occurred in checkIrisDuplicate_ICE: Socket Disconnected");
@@ -680,7 +680,7 @@ exports.userObjectElement_ICE = function (req, res) {
 					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					function userObjectElement_ICE_listener(channel, message) {
 						var data = JSON.parse(message);
-						if (icename == data.username) {
+						if (icename == data.username && ["unavailableLocalServer", "scrape"].includes(data.onAction)) {
 							redisServer.redisSubServer.removeListener('message', userObjectElement_ICE_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
@@ -757,7 +757,7 @@ exports.updateIrisDataset = function updateIrisDataset(req, res) {
 					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					function updateIrisDataset_listener(channel,message) {
 						var data = JSON.parse(message);
-						if(icename == data.username){
+						if(icename == data.username && ["unavailableLocalServer", "iris_operations_result"].includes(data.onAction)){
 							redisServer.redisSubServer.removeListener('message',updateIrisDataset_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occurred in updateIrisDataset: Socket Disconnected");
