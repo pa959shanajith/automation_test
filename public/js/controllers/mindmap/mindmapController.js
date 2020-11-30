@@ -4999,7 +4999,6 @@ Purpose : displaying pop up for replication of project
 
 
     $scope.importMindmap = function($event) {
-        blockUI("Loading...");
 		var counter1 = 0;
         $scope.createdthrough="MM";
         $("#importMindmapFile").attr("type", "file");
@@ -5028,6 +5027,7 @@ Purpose : displaying pop up for replication of project
         }
         importMindmapFile.addEventListener('change', function () {
             if (counter1 == 0) {
+                blockUI("Loading...")
 				var file = importMindmapFile.files[0];
 				var textType = /json.*/;
 				var reader = new FileReader();
@@ -5045,7 +5045,7 @@ Purpose : displaying pop up for replication of project
 						} else if(resultString.testscenarios.length == 0){
                             openDialogMindmap("No nodes found", "The file has no node structure to import, please check!!");
                             unblockUI();
-						} else if(!(pro_list.includes(resultString.parentid))){
+						} else if(!(pro_list.includes(resultString.projectid))){
                             openDialogMindmap("Import Error", "This project is not assigned to user, please check!!");
                             unblockUI();
 						} else {
@@ -5084,23 +5084,20 @@ Purpose : displaying pop up for replication of project
                                         unloadMindmapData();
                                         mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO || $scope.projectList[0].id, parseFloat(version_num), $('.cycle-list').val(),null,null)
                                             .then(function(res) {
+                                                blockUI("Loading...");
                                                 if (res == "Invalid Session") {
                                                     return $rootScope.redirectPage();
                                                 }
                                                 var nodeBox = d3.select('.ct-nodeBox');
                                                 $scope.allMMaps = res;
-                                                // if (selectedTab == 'tabCreate')
                                                 populateDynamicInputList();
                                                 for (i=0;i<$scope.allMMaps.length;i++){
                                                     if($scope.allMMaps[i]._id==result._id){
-                                                        // $('.ct-nodeBox').children()[i].click();
                                                         $scope.loadMap(i);
                                                     }
                                                     }
                                                 setModuleBoxHeight();
                                                 unassignTask=[];
-                                                unblockUI();
-                                
                                             }, function(error) {
                                                 console.log("Error:", error);
                                                 unblockUI();
@@ -5109,7 +5106,7 @@ Purpose : displaying pop up for replication of project
                                         
                                     });
                                     // loadMindmapData1();
-                                    $scope.loadMap(0);
+                                    // $scope.loadMap(0);
                                     //openDialogMindmap("Import Mindmap", "Success!");
                                 }
                             }, function(error) {
@@ -5125,6 +5122,7 @@ Purpose : displaying pop up for replication of project
 				reader.readAsText(file);
 				counter1 = 1;
                 $("#importMindmapFile").val('');
+                unblockUI()
             }
         });
     }
