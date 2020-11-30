@@ -139,7 +139,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                     cache.set("execution_queue", this.queue_list);
                     //create response message
                     response['status'] = "pass";
-                    response["message"] = "Execution queued on " + targetICE + "\n Queue Length: " + pool["execution_list"].length.toString();
+                    response["message"] = "Execution queued on " + targetICE + "\nQueue Length: " + pool["execution_list"].length.toString();
                 }
 
             } else if (poolid && poolid in this.queue_list) {
@@ -148,7 +148,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                 pool["execution_list"].push(testSuite);
                 cache.set("execution_queue", this.queue_list);
                 response['status'] = "pass";
-                response["message"] = "Execution queued on pool: " + pool["name"];
+                response["message"] = "Execution queued on pool: " + pool["name"] +"\nQueue Length: " + pool["execution_list"].length.toString();
             } else {
                 //check if target ice is connected but not preset in any pool, execute directly if true
                 if (this.ice_list[targetICE] && this.ice_list[targetICE]["connected"]) {
@@ -223,20 +223,13 @@ module.exports.Execution_Queue = class Execution_Queue {
             let userInfo = testSuiteRequest.body.executionData[0].userInfo;
             let testSuite = { "testSuiteRequest": suiteRequest, "type": "API", "userInfo": userInfo }
             if (targetICE && targetICE in this.ice_list && this.ice_list[targetICE]["poolid"] in this.queue_list) {
-                if (this.ice_list[targetICE]["mode"]) {
-                    //result = executeTestSuite(batchExecutionData, execIds, userInfo, type);
-                    response['status'] = "pass";
-                    response["message"] = "Selected ICE on DND mode, API execution not possible.";
-                } else {
-                    let pool = this.queue_list[this.ice_list[targetICE]["poolid"]];
-                    pool["execution_list"].push(testSuite);
-                    //save execution queue to redis
-                    cache.set("execution_queue", this.queue_list);
-                    //create response message
-                    response['status'] = "pass";
-                    response["message"] = "Execution queued on " + targetICE + "\n Queue Length: " + pool["execution_list"].length.toString();
-                }
-
+                let pool = this.queue_list[this.ice_list[targetICE]["poolid"]];
+                pool["execution_list"].push(testSuite);
+                //save execution queue to redis
+                cache.set("execution_queue", this.queue_list);
+                //create response message
+                response['status'] = "pass";
+                response["message"] = "Execution queued on " + targetICE + " Queue Length: " + pool["execution_list"].length.toString();
             } else if (poolid && poolid in this.queue_list) {
                 let pool = this.queue_list[poolid];
                 pool["execution_list"].push(testSuite);
@@ -244,10 +237,16 @@ module.exports.Execution_Queue = class Execution_Queue {
                 cache.set("execution_queue", this.queue_list);
                 //create response message
                 response['status'] = "pass";
-                response["message"] = "Execution queued on pool: " + request_pool_name;
+                response["message"] = "Execution queued on pool: " + request_pool_name +" Queue Length: " + pool["execution_list"].length.toString();
 
             } else{
-                response["message"] = "ICE name / Poolid not provided"
+                if(targetICE){
+                    this.executeAPI(testSuite);
+                    response["message"] = "Executing on ICE: " + targetICE;
+                }else{
+                    response["message"] = "ICE name / Poolid not provided";
+                }
+                
             }
 
         } catch (e) {
