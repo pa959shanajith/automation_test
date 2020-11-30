@@ -3337,7 +3337,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var version_num = ($('.version-list').val() != undefined)? $('.version-list').val(): "0.0";
         var suiteDetailsTemplate = { "condition": 0, "dataparam": [" "], "scenarioId": "", "scenarioName": "" };
         var moduleData = { "testsuiteName": "", "testsuiteId": "", "versionNumber": "", "appType": "", "domainName": "", "projectName": "", "projectId": "", "releaseId": "", "cycleName": "", "cycleId": "", "suiteDetails": [suiteDetailsTemplate] };
-        var executionData = { "executionData": [{ "source": "api", "exectionMode": "serial", "executionEnv": "default", "browserType": ["1"], "qccredentials": { "qcurl": "", "qcusername": "", "qcpassword": "" }, "batchInfo": [JSON.parse(JSON.stringify(moduleData))], "userInfo": { "tokenhash": "", "tokenname": "", "icename": "" } } ] };
+        var executionData = { "executionData": [{ "source": "api", "exectionMode": "serial", "executionEnv": "default", "browserType": ["1"], "qccredentials": { "qcurl": "", "qcusername": "", "qcpassword": "" }, "batchInfo": [JSON.parse(JSON.stringify(moduleData))], "userInfo": { "tokenhash": "", "tokenname": "", "icename": "","poolname":"","username":"" } } ] };
         var moduleInfo = { "batchInfo": [] };
         blockUI('Loading UI');
         var moduleid = $('#createNewConfirmationPopup').attr('mapid');
