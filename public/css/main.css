@@ -2422,7 +2422,7 @@ input[disabled]{
     height: 35px;
 }
 #selectIcePoolIce ul {
-    width: 335px;
+    width: 100%;
     left: 171px;
     max-height: 123px;
     background: white;
