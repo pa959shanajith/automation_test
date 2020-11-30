@@ -652,10 +652,14 @@ function sequence(copy,block,id) {
 }
 
 function moduleSmartScheduling(){
+	$('.selectScnSmart img').removeClass('sb')
+	$('.selectModSmart img').addClass('sb')
 	$("#mod0")[0].selectedIndex = $("#mod0")[0].length - 2;
 	$("#mod0")[0].onchange();
 }
 function scenarioSmartScheduling(){
+	$('.selectModSmart img').removeClass('sb')
+	$('.selectScnSmart img').addClass('sb')
 	$("#mod0")[0].selectedIndex = $("#mod0")[0].length - 1;
 	$("#mod0")[0].onchange();
 }
