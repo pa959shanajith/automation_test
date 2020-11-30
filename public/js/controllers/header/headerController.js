@@ -121,7 +121,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			else if (data == "NoTask") data = exec + "Task does not exist for child node";
 			else if (data == "Modified") data = exec +"Task has been modified, Please approve the task";
 			else if (data == "Completed") data = exec +"Execution Complete";
-			else if (data == "Terminate") data = "Terminated" 
+			else if (data == "Terminate") data = exec + "Terminated";
 			else if (data == "UserTerminate") data = exec +"Terminated by User"
 			else if (data == "success") data = exec +"success"
 			else if (data == "API Execution Completed") data = exec + "API Execution Completed"

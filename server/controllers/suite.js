@@ -873,7 +873,7 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
 	for (const batchExecutionData of multiBatchExecutionData) {
 		let execIds = {"batchid": "generate", "execid": {}};
 		if(batchExecutionData.targetUser === "") batchExecutionData.targetUser = EMPTYUSER
-		var userInfo = userInfoMap[batchExecutionData.targetUser];
+		let userInfo = userInfoMap[batchExecutionData.targetUser];
 		Object.assign(userInfo, batchExecutionData.scheduledby);
 		const scheduleTime = batchExecutionData.timestamp;
 		const scheduleId = batchExecutionData.scheduleId;
