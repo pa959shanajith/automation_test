@@ -548,9 +548,11 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 				$("#scheduledSuitesFilterData").prop('selectedIndex', 0);
 				changeBackground();
 				browserTypeExe = [];
+				execAction="serial";
 				sequence(true,false,copyId);
 				$(".selectScheduleSuite, .selectToSched").prop("checked", false);
 				$(".selectBrowserSc").find(".sb").removeClass("sb");
+				$(".selectParallel").find("img").removeClass("sb");
 				$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style", "border: none;");
 				//$(".fc-timePicker").focus()
 			}, function (error) {
