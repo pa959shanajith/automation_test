@@ -286,6 +286,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 			if($event.target.tagName.toLowerCase() != 'input'){
 				$event.currentTarget.getElementsByTagName('input')[0].checked = !$event.currentTarget.getElementsByTagName('input')[0].checked
 				$event.stopPropagation()
+				$event.preventDefault()
 			}
 		}else{
 			$scope.selectedICE = ice
@@ -483,6 +484,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 				qccredentials: { "qcurl": "", "qcusername": "", "qcpassword": "" },
 				batchInfo: moduleInfo
 			};
+			$('#userIdName').val("")
 			allocateICEPopup()
 		}
 	}
@@ -652,14 +654,26 @@ function sequence(copy,block,id) {
 }
 
 function moduleSmartScheduling(){
-	$('.selectScnSmart img').removeClass('sb')
-	$('.selectModSmart img').addClass('sb')
-	$("#mod0")[0].selectedIndex = $("#mod0")[0].length - 2;
-	$("#mod0")[0].onchange();
+	if($('.selectModSmart img').hasClass('sb')){
+		$('.selectModSmart img').removeClass('sb')
+		smartBatch = false;
+		copyId = 0;
+	}else{
+		$('.selectScnSmart img').removeClass('sb')
+		$('.selectModSmart img').addClass('sb')
+		$("#mod0")[0].selectedIndex = $("#mod0")[0].length - 2;
+		$("#mod0")[0].onchange();
+	}
 }
 function scenarioSmartScheduling(){
-	$('.selectModSmart img').removeClass('sb')
-	$('.selectScnSmart img').addClass('sb')
-	$("#mod0")[0].selectedIndex = $("#mod0")[0].length - 1;
-	$("#mod0")[0].onchange();
+	if($('.selectScnSmart img').hasClass('sb')){
+		$('.selectScnSmart img').removeClass('sb')
+		smartBatch = false;
+		copyId = 0;
+	}else{
+		$('.selectModSmart img').removeClass('sb')
+		$('.selectScnSmart img').addClass('sb')
+		$("#mod0")[0].selectedIndex = $("#mod0")[0].length - 1;
+		$("#mod0")[0].onchange();
+	}
 }

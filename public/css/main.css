@@ -2422,7 +2422,7 @@ input[disabled]{
     height: 35px;
 }
 #selectIcePoolIce ul {
-    width: 100%;
+    width: 335px;
     left: 171px;
     max-height: 123px;
     background: white;
@@ -2430,6 +2430,10 @@ input[disabled]{
 #selectIcePoolIce ul input[type="checkbox"] {
     background-color: red;
     width:auto
+}
+#selectIcePoolIce .legends{
+    display:'inline-block';
+    font-weight:500;
 }
 #status{
     height: 7px;
