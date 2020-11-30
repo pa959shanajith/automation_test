@@ -531,26 +531,38 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			//testcase
 			if(undoMapItems[i].classList.contains('almtestcaselink')) {
 				var testcase = undoMapItems[i].innerText.trim();
+				var folderpath = undoMapItems[i].getAttribute("data-qcfolderpath");
+				var testset = undoMapItems[i].getAttribute("data-qctestset");
 				if (undoMapIdList.length == 0){
 					var newObj = {
 						'mapid': mapid,
-						'qctestcase': []
+						'qctestcase': [],
+						'qcfolderpath': [],
+						'qctestset': []
 					};
 					newObj.qctestcase.push(testcase);
+					newObj.qcfolderpath.push(folderpath);
+					newObj.qctestset.push(testset);
 					undoMapList.push(newObj);
 					undoMapIdList.push(mapid);
 				} else if (undoMapIdList.indexOf(mapid) == -1){
 					var newObj = {
 						'mapid': mapid,
-						'qctestcase': []
+						'qctestcase': [],
+						'qcfolderpath': [],
+						'qctestset': []
 					};
 					newObj.qctestcase.push(testcase);
+					newObj.qcfolderpath.push(folderpath);
+					newObj.qctestset.push(testset);
 					undoMapList.push(newObj);
 					undoMapIdList.push(mapid);
 				} else {
 					for (var j=0;j<undoMapList.length;++j) {
 						if (undoMapList[j].mapid == mapid) {
 							undoMapList[j].qctestcase.push(testcase);
+							undoMapList[j].qcfolderpath.push(folderpath);
+							undoMapList[j].qctestset.push(testset);
 						}
 					}
 				}
@@ -621,9 +633,15 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		var getDomainName = $(".qcSelectDomain option:selected").val();
 		var getProjectName = $(".qcSelectProject option:selected").val();
 		var qcTestcaseNameList = []
-		var selectedElements=$(".qcTreeContainer").find(".selectedToMap").siblings("label").prevObject
+		var qcFolderPath = []
+		var qcTestsetName = []
+		var selectedElements=$(".qcTreeContainer").find(".selectedToMap")
 		for(var i=0;i<selectedElements.length;i++){
 			var cur_obj =  selectedElements[i].innerText
+			var folder = selectedElements[i].parentElement.previousElementSibling.dataset["testsetpath"]
+			var testset = selectedElements[i].parentElement.previousElementSibling.innerText
+			qcTestsetName.push(testset)
+			qcFolderPath.push(folder)
 			qcTestcaseNameList.push(cur_obj)
 		}
 		var avoAssureScenarioList = []
@@ -633,8 +651,8 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			avoAssureScenarioList.push(cur_obj)
 		}
 
-		var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
-		var qcFolderPath = $(this).parent("li").parent("ul").prev("li").parent("ul").prev("li").data("folderpath");
+		// var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
+		// var qcFolderPath = $(this).parent("li").parent("ul").prev("li").parent("ul").prev("li").data("folderpath");
 		
 		if(qcTestcaseNameList.length>1 && avoAssureScenarioList.length>1) {
 			openModelPopup("Save Mapped Testcase","Cannot map multiple test cases with multiple scenarios")
@@ -730,13 +748,13 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 							$(".mappedFiles").find(".mapline"+i).append('<label class="viewTab" style="display:none; float: left; width: 40%; margin-bottom: 0px; height: 32px;"></label>');
 						}
 						if(j==0 && data[i].qctestcase.length >1){
-							$(".mappedFiles").find(".mapline"+i).append('<label class="almtestcaselink viewTab" style="display:block; float: right; width: 50%; background-color: #fad7f1fb; margin-bottom: 0px; border-radius: 5px" data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" title="'+data[i].qctestcase[j]+'"><span class="viewTextSpan">'+data[i].qctestcase[j]+'</span><span class="viewImageSpan"><img  class="viewUndoSyncronise" title="Undo" src="imgs/ic-qcUndoSyncronise.png"><img class="arrowdown" style="height:22px;float:right;" src="imgs/alm_arrow_down.svg"><img class="arrowup" style="display:none; float:right; height:22px;" src="imgs/alm_arrow_up.svg"></span></label>');
+							$(".mappedFiles").find(".mapline"+i).append('<label class="almtestcaselink viewTab" style="display:block; float: right; width: 50%; background-color: #fad7f1fb; margin-bottom: 0px; border-radius: 5px" data-qctestset="'+data[i].qctestset[j]+'" data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath[j]+'" data-qcproject="'+data[i].qcproject+'" title="'+data[i].qctestcase[j]+'"><span class="viewTextSpan">'+data[i].qctestcase[j]+'</span><span class="viewImageSpan"><img  class="viewUndoSyncronise" title="Undo" src="imgs/ic-qcUndoSyncronise.png"><img class="arrowdown" style="height:22px;float:right;" src="imgs/alm_arrow_down.svg"><img class="arrowup" style="display:none; float:right; height:22px;" src="imgs/alm_arrow_up.svg"></span></label>');
 							almTestCaseMapping+=1;
 						} else if(j==0 && data[i].qctestcase.length ==1) {
-							$(".mappedFiles").find(".mapline"+i).append('<label class="almtestcaselink viewTab" style="display:block; float: right; width: 50%; background-color: #fad7f1fb; margin-bottom: 0px; border-radius: 5px" data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" title="'+data[i].qctestcase[j]+'"><span class="viewTextSpan">'+data[i].qctestcase[j]+'</span><span class="viewImageSpan"><img  class="viewUndoSyncronise" title="Undo" src="imgs/ic-qcUndoSyncronise.png"></span></label>');
+							$(".mappedFiles").find(".mapline"+i).append('<label class="almtestcaselink viewTab" style="display:block; float: right; width: 50%; background-color: #fad7f1fb; margin-bottom: 0px; border-radius: 5px" data-qctestset="'+data[i].qctestset[j]+'" data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath[j]+'" data-qcproject="'+data[i].qcproject+'" title="'+data[i].qctestcase[j]+'"><span class="viewTextSpan">'+data[i].qctestcase[j]+'</span><span class="viewImageSpan"><img  class="viewUndoSyncronise" title="Undo" src="imgs/ic-qcUndoSyncronise.png"></span></label>');
 							almTestCaseMapping+=1;
 						} else if(j< data[i].qctestcase.length) {
-							$(".mappedFiles").find(".mapline"+i).append('<label class="almtestcaselink viewTab" style="display:none; float: right; width: 50%; background-color: #fad7f1fb; margin-bottom: 0px; border-radius: 0px" data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" title="'+data[i].qctestcase[j]+'"><span class="viewTextSpan">'+data[i].qctestcase[j]+'</span><span class="viewImageSpan"><img  class="viewUndoSyncronise" title="Undo" src="imgs/ic-qcUndoSyncronise.png"></span></label>');
+							$(".mappedFiles").find(".mapline"+i).append('<label class="almtestcaselink viewTab" style="display:none; float: right; width: 50%; background-color: #fad7f1fb; margin-bottom: 0px; border-radius: 0px" data-qctestset="'+data[i].qctestset[j]+'" data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath[j]+'" data-qcproject="'+data[i].qcproject+'" title="'+data[i].qctestcase[j]+'"><span class="viewTextSpan">'+data[i].qctestcase[j]+'</span><span class="viewImageSpan"><img  class="viewUndoSyncronise" title="Undo" src="imgs/ic-qcUndoSyncronise.png"></span></label>');
 							almTestCaseMapping+=1;
 						} else {
 							$(".mappedFiles").find(".mapline"+i).append('<label class="viewTab" style="display:none; float: right; width: 50%; margin-bottom: 0px; height: 32px;"></label>');
