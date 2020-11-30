@@ -32,7 +32,7 @@ module.exports.Execution_Queue = class Execution_Queue {
     static notification_dict = {}
     // executon queue initialisation
     static queue_init() {
-        logger.info("Initialisign Execution Queues")
+        logger.info("Initializing Execution Queues")
         let _this = this
         let fnName = 'instantiateQueue'
         let inputs = {

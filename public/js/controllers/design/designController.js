@@ -575,7 +575,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							deleteObjectsFlag = false;
 							DesignServices.updateScreen_ICE(scrapeObject)
 								.then(function (data) {
-									angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
+									if(appType=="Webservice"){
+										angular.element(document.getElementById("left-nav-section")).scope().getWSData();
+									}
+									else{
+										angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
+									}
 									openDialog("Import Screen", "Screen Json imported successfully.");
 									// unblockUI()
 									//add popoup for error and saved 
