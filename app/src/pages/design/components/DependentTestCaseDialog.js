@@ -29,7 +29,7 @@ const DependentTestCaseDialog = props => {
 
     useEffect(()=>{
 
-        let dependentTestCases = []
+        let dependentTestCases = [];
         getTestcasesByScenarioId_ICE(props.scenarioId)
         .then(data => {
             if (data === "Invalid Session") return RedirectPage(history);
@@ -47,17 +47,18 @@ const DependentTestCaseDialog = props => {
                 for (let testCase of reversedDtc) {
                     let tc = testCase;
                     tc.disableAndBlock = disableAndBlock;
-                    if (tc.testCaseName === props.taskName) disableAndBlock = false;
-                    if (props.checkedTc <= 0 && !disableAndBlock) {
+                    if (props.checkedTc.length <= 0 && !disableAndBlock) {
                         newCheckedTc.push(tc.testCaseID)
                     }
-        
-                    if (props.checkedTc.includes(tc.testCaseID) && props.taskName !== tc.testCaseName) newCheckedTc.push(tc.testCaseID);
+                    if (props.checkedTc.includes(tc.testCaseID) && !disableAndBlock) newCheckedTc.push(tc.testCaseID);
+                    
+                    if (tc.testCaseName === props.taskName) disableAndBlock = false;
         
                     testCases.push(tc);
                 }
                 
                 testCases.reverse();
+                newCheckedTc.reverse();
                 setTcList(testCases);
                 setCheckList(newCheckedTc);
             }

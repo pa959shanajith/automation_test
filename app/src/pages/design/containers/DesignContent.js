@@ -2,7 +2,8 @@ import React, { useEffect, useState, useCallback, memo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { ReactSortable } from 'react-sortablejs';
-import { ScreenOverlay, RedirectPage, PopupMsg, ScrollBar, ModalContainer } from '../../global'
+import ClickAwayListener from 'react-click-away-listener';
+import { ScreenOverlay, RedirectPage, ScrollBar, ModalContainer } from '../../global'
 import TableContents from '../components/TableContents';
 import DetailsDialog from '../components/DetailsDialog';
 import RemarkDialog from '../components/RemarkDialog';
@@ -56,6 +57,9 @@ const DesignContent = (props) => {
     const [isUnderReview, setIsUnderReview] = useState(props.current_task.status === "underReview");
     const [rowChange, setRowChange] = useState(false);
     const [headerCheck, setHeaderCheck] = useState(false);
+    const [clickedAway, setClickAway] = useState(false);
+    const [commentFlag, setCommentFlag] = useState(false);
+    let runClickAway = true;
     const emptyRowData = {
         "objectName": "",
         "custname": "",
@@ -76,7 +80,7 @@ const DesignContent = (props) => {
 
     const tableActionBtnGroup = [
         {'title': 'Add Test Step', 'img': 'static/imgs/ic-jq-addstep.png', 'alt': 'Add Steps', onClick: ()=>addRow()},
-        {'title': 'Select Test Step(s)', 'img': 'static/imgs/ic-jq-addstep.png', 'alt': 'Select Steps', onClick: ()=>selectMultiple()},
+        {'title': 'Select Test Step(s)', 'img': 'static/imgs/ic-selmulti.png', 'alt': 'Select Steps', onClick: ()=>selectMultiple()},
         {'title': 'Edit Test Step', 'img': 'static/imgs/ic-jq-editstep.png', 'alt': 'Edit Steps', onClick:  ()=>editRow()},
         {'title': 'Drag & Drop Test Step', 'img': 'static/imgs/ic-jq-dragstep.png', 'alt': 'Drag Steps', onClick:  ()=>toggleDrag()},
         {'title': 'Copy Test Step', 'img': 'static/imgs/ic-jq-copystep.png', 'alt': 'Copy Steps', onClick:  ()=>copySteps()},
@@ -96,7 +100,10 @@ const DesignContent = (props) => {
     useEffect(()=>{
         if (props.imported) {
             fetchTestCases()
-            .then(data=>props.setImported(false))
+            .then(data=>{
+                data !== "success" && props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."});
+                props.setImported(false)
+            })
             .catch(error=>console.error("Error: Fetch TestCase Failed"));
         }
     }, [props.imported]);
@@ -105,6 +112,8 @@ const DesignContent = (props) => {
         if (Object.keys(userInfo).length!==0 && Object.keys(props.current_task).length!==0) {
             fetchTestCases()
             .then(data=>{
+                data !== "success" &&
+                props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."});
                 setEdit(false);
                 setFocusedRow(null);
                 setCheckedRows([]);
@@ -123,6 +132,7 @@ const DesignContent = (props) => {
             let testCaseId = taskInfo.testCaseId;
             let testCaseName = taskInfo.testCaseName;
             let versionnumber = taskInfo.versionnumber;
+            let deleteObjectFlag = false;
             
             setOverlay("Loading...");
             
@@ -145,7 +155,7 @@ const DesignContent = (props) => {
 
                 if(data.del_flag){
                     //pop up for presence of deleted objects
-                    props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."});
+                    deleteObjectFlag = true;
                     //disable left-top-section
                     props.setDisableActionBar(true);
                 }
@@ -231,7 +241,8 @@ const DesignContent = (props) => {
                                 }
                                 setTestCaseData(testcaseArray);
                                 setObjNameList(getObjNameList(props.current_task.appType, scriptData.view));
-                                resolve("success");
+                                let msg = deleteObjectFlag ? "deleteObjs" : "success"
+                                resolve(msg);
                             })
                             .catch(error => {
                                 setOverlay("");
@@ -312,7 +323,8 @@ const DesignContent = (props) => {
 
                 if (!errorFlag) {
                     let scrape_data = null;
-                    DesignApi.getScrapeDataScreenLevel_ICE()
+                    let taskInfo = props.current_task;
+                    DesignApi.getScrapeDataScreenLevel_ICE(taskInfo.appType, taskInfo.screenId, taskInfo.projectId, taskInfo.testCaseId)
                         .then(res => {
                             let getScrapeData=res
                             scrape_data = JSON.parse(JSON.stringify(getScrapeData));
@@ -324,50 +336,59 @@ const DesignContent = (props) => {
                     .then(data => {
                         if (data === "Invalid Session") return RedirectPage(history);
                         if (data === "success") {
-                            fetchTestCases()
-                            .then(data=>{
-                                setChanged(false);
-                                props.setShowPop({'title': 'Save Testcase', 'content': 'Testcase saved successfully'});
+                            
+                            if(props.current_task.appType.toLowerCase()==="web" && Object.keys(modified).length !== 0){
+                                let screenId = props.current_task.screenId;
+                                let screenName = props.current_task.screenName;
+                                let projectId = props.current_task.projectId;
                                 
-                                if(props.current_task.appType.toLowerCase()==="web" && Object.keys(modified).length !== 0){
-                                    let screenId = props.current_task.screenId;
-                                    let screenName = props.current_task.screenName;
-                                    let projectId = props.current_task.projectId;
-                                    
-                                    let scrapeObject = {};
-                                    for(let i=0; i<scrape_data.view.length; i++){
-                                        if(scrape_data.view[i].custname in modified){
-                                            scrape_data.view[i].xpath=modified[scrape_data.view[i].custname]
-                                        }
-                                    } 
+                                let scrapeObject = {};
+                                for(let i=0; i<scrape_data.view.length; i++){
+                                    if(scrape_data.view[i].custname in modified){
+                                        scrape_data.view[i].xpath=modified[scrape_data.view[i].custname]
+                                    }
+                                } 
 
-                                    scrapeObject.getScrapeData = JSON.stringify(scrape_data);
-                                    scrapeObject.projectId = projectId;
-                                    scrapeObject.screenId = screenId;
-                                    scrapeObject.screenName = screenName;
-                                    scrapeObject.userinfo = userInfo;
-                                    scrapeObject.param = "updateScrapeData_ICE";
-                                    scrapeObject.appType = props.current_task.appType;
-                                    scrapeObject.versionnumber = props.current_task.versionnumber;
-                                    scrapeObject.newData = {}; //viewString
-                                    scrapeObject.type = "save";
+                                scrapeObject.getScrapeData = JSON.stringify(scrape_data);
+                                scrapeObject.projectId = projectId;
+                                scrapeObject.screenId = screenId;
+                                scrapeObject.screenName = screenName;
+                                scrapeObject.userinfo = userInfo;
+                                scrapeObject.param = "updateScrapeData_ICE";
+                                scrapeObject.appType = props.current_task.appType;
+                                scrapeObject.versionnumber = props.current_task.versionnumber;
+                                scrapeObject.newData = {}; //viewString
+                                scrapeObject.type = "save";
+                                
+                                DesignApi.updateScreen_ICE(scrapeObject)
+                                .then(data1 => {
+                                    if (data1 === "Invalid Session") return RedirectPage(history);
                                     
-                                    DesignApi.updateScreen_ICE(scrapeObject)
-                                    .then(data1 => {
-                                        if (data1 === "Invalid Session") return RedirectPage(history);
-                                        
-                                        if (data1 === "success") {
-                                            props.setShowPop({'title': 'Save Testcase', 'content': 'Testcase saved successfully'});
-                                        } else {
-                                            props.setShowPop({'title': 'Save Testcase', 'content': 'Failed to save Testcase'});
-                                        }
-                                    })
-                                    .catch(error => {
-                                        console.error("Error")
-                                    })
-                                }
-                            })
-                            .catch(error=>console.error("Error: Fetch TestCase Failed"));
+                                    if (data1 === "success") {            
+                                        fetchTestCases()
+                                        .then(msg=>{
+                                            setChanged(false);
+                                            msg === "success" ? props.setShowPop({'title': 'Save Testcase', 'content': 'Testcase saved successfully'})
+                                            : props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."})
+                                        })
+                                        .catch(error=>console.error("Error: Fetch TestCase Failed"));
+                                    } else {
+                                        props.setShowPop({'title': 'Save Testcase', 'content': 'Failed to save Testcase'});
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error("Error")
+                                })
+                            }
+                            else{
+                                fetchTestCases()
+                                .then(data=>{
+                                    setChanged(false);
+                                    data === "success" ? props.setShowPop({'title': 'Save Testcase', 'content': 'Testcase saved successfully'}) 
+                                    : props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."});
+                                })
+                                .catch(error=>console.error("Error: Fetch TestCase Failed"));
+                            }
                         } else {
                             props.setShowPop({'title':'Save Testcase', 'content':'Failed to save Testcase'})
                         };
@@ -392,11 +413,20 @@ const DesignContent = (props) => {
         let changed = false;
         if (operation === "row") {
             const { objName, keyword, inputVal, outputVal } = data;
-            if (testCases[rowIdx].custname !== objName || testCases[rowIdx].keywordVal !== keyword || testCases[rowIdx].inputVal[0] !== inputVal || testCases[rowIdx].outputVal !== outputVal){
+            if (testCases[rowIdx].custname !== objName || testCases[rowIdx].keywordVal !== keyword || testCases[rowIdx].inputVal[0] !== inputVal || testCases[rowIdx].outputVal !== outputVal || commentFlag){
                 testCases[rowIdx].custname = objName;
                 testCases[rowIdx].keywordVal = keyword;
                 testCases[rowIdx].inputVal = [inputVal];
-                testCases[rowIdx].outputVal = outputVal;
+
+                let outputVal2 = outputVal
+                if (commentFlag) {
+                    let isComment = outputVal2.slice(-2) === "##";
+                    if (isComment) outputVal2 = outputVal2.replace(/(;*##)$/g, "")
+                    else outputVal2 += outputVal2.length === 0 ? "##" : ";##"
+                    setCommentFlag(false);
+                }
+
+                testCases[rowIdx].outputVal = outputVal2;
                 changed = true;
             }
         }
@@ -487,20 +517,22 @@ const DesignContent = (props) => {
     }
 
     const selectMultiple = () => {
-        setCheckedRows([]);
         setHeaderCheck(false);
         setFocusedRow(null);
         setShowSM(true);
     }
 
     const selectSteps = stepList => {
-        setCheckedRows([...stepList]);
+        stepList.push(...checkedRows)
+        let newChecks = Array.from(new Set(stepList))
+        setCheckedRows([...newChecks]);
         setShowSM(false);
     }
 
     const editRow = () => {
         let check = [...checkedRows];
         let focus = null;
+        runClickAway = false;
         if (check.length === 0) props.setShowPop({'title': 'Edit Step', 'content': 'Select step to edit'});
         else {
             if (check.length === 1) focus = check[0]
@@ -530,7 +562,8 @@ const DesignContent = (props) => {
         let copyContent = {}
         if (selectedRows.length === 0) props.setShowPop({'title': 'Copy Test Step', 'content': 'Select step to copy'});
         else{
-            for (let idx of selectedRows) {
+            let sortedSteps = selectedRows.map(step=>parseInt(step)).sort((a,b)=>a-b)
+            for (let idx of sortedSteps) {
                 if (!testCaseData[idx].custname) {
                     if (selectedRows.length === 1) props.setShowPop({'title': 'Copy Test Step', 'content': 'Empty step can not be copied.'});
                     else props.setShowPop({'title': 'Copy Test Step', 'content': 'The operation cannot be performed as the steps contains invalid/blank object references'});
@@ -553,6 +586,11 @@ const DesignContent = (props) => {
 
     const onPasteSteps = () => {
         setFocusedRow(null);
+
+        if (!copiedContent.testCaseId){
+            // console.log("No TestCase to Paste");
+            return;
+        }
 
         if (copiedContent.testCaseId !== props.current_task.testCaseId) {
             let appTypeFlag = false;
@@ -591,13 +629,19 @@ const DesignContent = (props) => {
     const pasteSteps = (stepList) => {
         let toFocus = []
         let testCases = [...testCaseData]
-        for(let step of stepList){
+        let offset = 0;
+
+        let sortedSteps = stepList.map(step=>parseInt(step)).sort((a,b)=>a-b)
+
+        for(let step of sortedSteps){
             let stepInt = parseInt(step)
+            stepInt = stepInt+offset
             if (testCases.length === 1 && !testCases[0].custname) testCases = copiedContent.testCases
             else testCases.splice(stepInt, 0, ...copiedContent.testCases);
             for(let i=0; i<copiedContent.testCases.length; i++){
-                toFocus.push(stepInt+i)
+                toFocus.push(stepInt+i);
             }
+            offset=offset+copiedContent.testCases.length;
         }
         setTestCaseData(testCases);
         setShowPS(false);
@@ -610,11 +654,12 @@ const DesignContent = (props) => {
     const commentRows = () => {
         let selectedIndexes = [...checkedRows]
         let testCases = [ ...testCaseData ]
-
+        runClickAway = false;
         if (selectedIndexes.length === 0) props.setShowPop({'title': 'Skip Testcase step', 'content': 'Please select step to skip'});
         else if (selectedIndexes.length === 1 && !testCases[selectedIndexes[0]].custname) props.setShowPop({'title': 'Comment step', 'content': 'Empty step can not be commented.'});
         else{
             for(let idx of selectedIndexes){
+                if (focusedRow === idx) continue;
                 let testCase = { ...testCases[idx] }
                 let isComment = testCase.outputVal.slice(-2) === "##";
                 if (isComment) testCase.outputVal = testCase.outputVal.replace(/(;*##)$/g, "")
@@ -625,8 +670,10 @@ const DesignContent = (props) => {
             setFocusedRow(null);
             setCheckedRows([]);
             setHeaderCheck(false);
-            setEdit(false);
+            // setEdit(false);
+            // setRowChange(!rowChange);
             setChanged(true);
+            setCommentFlag(true);
         }
     }
 
@@ -757,12 +804,13 @@ const DesignContent = (props) => {
                     <span className="remark_col d__rem_head" >Remarks</span>
                     <span className="details_col d__det_head" >Details</span>
                 </div>
+                <ClickAwayListener onClickAway={()=>{ runClickAway ? setFocusedRow(null) : runClickAway=true}} style={{height: "100%"}}>
                 {testCaseData.length>0 && <div className="d__table_contents" >
                 <div className="ab">
                     <div className="min">
                         <div className="con">
                             <ScrollBar verticalbarWidth="8px" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)">
-                            <ReactSortable disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} animation={200} delayOnTouchStart={true} delay={2} ghostClass="d__ghost_row">
+                            <ReactSortable disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} animation={200} ghostClass="d__ghost_row">
                                 <TableContents 
                                     edit={edit} 
                                     objList={objNameList} 
@@ -784,6 +832,7 @@ const DesignContent = (props) => {
                     </div>
                 </div>
                 </div>}
+                </ClickAwayListener>
             </div>
         </div>
         </>

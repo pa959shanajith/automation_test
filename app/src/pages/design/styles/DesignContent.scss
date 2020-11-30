@@ -250,4 +250,36 @@
         font-size: 2.21vh;
         margin-right: 0.6vh;
     } 
+
+        
+    .d__table_contents{
+        margin-top: 0.647vh;
+    }
+
+    .d__table_header{
+        margin-right: .258vh;
+    }
+
+    .d__step_head, .d__sel_head, .d__obj_head, .d__key_head, .d__inp_head, .d__out_head, .d__rem_head, .d__det_head{
+        font-size: 2.20vh;
+        margin: 0 0.725vh;
+        height: 3.363vh;
+    }
+
+    .d__step_head{
+        border-radius: 0.777vh 0 0 0.777vh;
+    }
+    .d__det_head{
+        border-radius: 0 0.777vh 0.777vh 0; 
+    }
+    .sel_col{
+        .sel_obj{
+            height: 2.07vh;
+            width: 2.07vh;
+        }
+    }
+
+    .objname_col{
+        padding: 0 0.647vh;
+    }
 }

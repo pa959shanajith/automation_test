@@ -16,7 +16,7 @@ const SelectMultipleDialog = props => {
     const [stepNum, setStepNum] = useState("");
     const [selectError, showSelectError] = useState("");
     const selectErrors = { 'empty': '*Textbox cannot be empty',
-                        'invalidChar': '*Textbox cannot contain characters other than numbers seperated by single semi colon or hyphen',
+                        'invalidFormat': 'Invalid format is given',
                         'invalidStep': '*Please enter a valid step no'
                     }
 
@@ -39,7 +39,7 @@ const SelectMultipleDialog = props => {
                     if (stepsArray.length === 1){
                         let stepInt = parseInt(stepsArray[0])
                         if (isNaN(stepInt) || stepInt > props.upperLimit || stepInt < 1) {
-                            if (isNaN(stepInt)) showSelectError('invalidChar');
+                            if (isNaN(stepInt)) showSelectError('invalidFormat');
                             else showSelectError('invalidStep');
                             pass = false
                             break;
@@ -50,7 +50,8 @@ const SelectMultipleDialog = props => {
                         let lowStep = parseInt(stepsArray[0])
                         let highStep = parseInt(stepsArray[1])
                         if (isNaN(lowStep) || isNaN(highStep) || lowStep > props.upperLimit || lowStep < 1 || highStep > props.upperLimit || highStep < 1 || lowStep === highStep || lowStep>highStep){
-                            if (isNaN(lowStep) || isNaN(highStep)) showSelectError('invalidChar');
+                            if (isNaN(lowStep) || isNaN(highStep)) showSelectError('invalidFormat');
+                            if (lowStep === highStep) showSelectError('invalidFormat');
                             else showSelectError('invalidStep');
                             pass = false
                             break;
@@ -66,7 +67,7 @@ const SelectMultipleDialog = props => {
                     setStepNum("");
                 }
             }
-            else showSelectError('invalidChar')
+            else showSelectError('invalidFormat')
         }
         else showSelectError('empty');
     }

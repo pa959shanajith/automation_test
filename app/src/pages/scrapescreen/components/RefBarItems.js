@@ -1,0 +1,245 @@
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import ClickAwayListener from 'react-click-away-listener';
+import { ReferenceBar } from '../../global';
+import "../styles/RefBarItems.scss";
+
+const RefBarItems = props => {
+
+	const { appType } = useSelector(state=>state.plugin.CT);
+	// const [isMac, setIsMac] = useState(false);
+	const [tagList, setTagList] = useState([]);
+	const [showFilterPop, setShowFilterPop] = useState(false);
+	const [filterY, setFilterY] = useState(null);
+	const [showScreenPop, setShowScreenPop] = useState(false);
+    const [screenshotY, setScreenshotY] = useState(null);
+
+	useEffect(()=>{
+		const macOS = navigator.appVersion.indexOf("Mac") !== -1;
+		if (appType === "MobileApp") macOS ? setTagList(mobileMacFilters) : setTagList(mobileFilters);
+		else setTagList(nonMobileFilters);
+	}, [appType]);
+	
+	const mobileMacFilters = [
+		{ label: "Button", tag: "Button"},
+		{ label: "links", tag: "links"},
+		{ label: "statictexts", tag: "statictexts"},
+		{ label: "image", tag: "image"},
+		{ label: "RadioButton", tag: "RadioButton"},
+		{ label: "Slider", tag: "XCUIElementTypeSlider"},
+		{ label: "Datepicker", tag: "Datepicker"},
+		{ label: "SecureTextField", tag: "iOSXCUIElementTypeSecureTextField"},
+		{ label: "TextField", tag: "iOSEditText"},
+		{ label: "OtherElements", tag: "otherElements"},
+		{ label: "SearchField", tag: "iOSXCUIElementTypeSearchField"},
+		{ label: "PickerWheelPickerWheel", tag: "XCUIElementTypePickerWheel"},
+		{ label: "textView", tag: "textViews"},
+		{ label: "cells", tag: "cellscells"},
+		{ label: "Duplicate Custnames", tag: "duplicateCustnames"}
+	]
+
+	const mobileFilters = [
+		{ label: "Button", tag: "android.widget.Button"},
+		{ label: "Checkbox", tag: "android.widget.CheckBox"},
+		{ label: "NumberPicker", tag: "android.widget.NumberPicker"},
+		{ label: "TimePicker", tag: "android.widget.TimePicker"},
+		{ label: "DatePicker", tag: "android.widget.DatePicker"},
+		{ label: "RadioButton", tag: "android.widget.RadioButton"},
+		{ label: "TextBox", tag: "android.widget.EditText"},
+		{ label: "ListView", tag: "android.widget.ListView"},
+		{ label: "Spinner", tag: "android.widget.Spinner"},
+		{ label: "Switch", tag: "android.widget.Switch"},
+		{ label: "ImageButton", tag: "android.widget.ImageButton"},
+		{ label: "SeekBar", tag: "android.widget.SeekBar"},
+		{ label: "Others", tag: "othersAndroid"},
+		{ label: "Duplicate Custnames", tag: "duplicateCustnames"}
+	]
+
+	const nonMobileFilters = [
+		{ label: "Button", tag: "button"},
+		{ label: "Checkbox", tag: "checkbox"},
+		{ label: "Dropdown", tag: "select"},
+		{ label: "Image", tag: "img"},
+		{ label: "Link", tag: "a"},
+		{ label: "Radio Button", tag: "radiobutton"},
+		{ label: "Text Box", tag: "input"},
+		{ label: "List Box", tag: "list"},
+		{ label: "Table", tag: "table"},
+		{ label: "IRIS", tag: "iris"},
+		{ label: "Others", tag: "others"},
+		{ label: "User Created", tag: "userobj"},
+		{ label: "Duplicate Custnames", tag: "duplicateCustnames"}
+	]
+
+    const closeAllPopups = () => {
+		setShowScreenPop(false);
+		setShowFilterPop(false);
+	}
+
+	const toggleScreenshotPop = event => {
+        closeAllPopups();
+        setScreenshotY(event.clientY)
+        setShowScreenPop(!showScreenPop)
+    }
+
+    const toggleFilterPop = event =>{
+		closeAllPopups();
+        setFilterY(event.clientY)
+        setShowFilterPop(!showFilterPop)
+    }
+    const filterMain=(dataTag)=>{
+		let tempToFilterArr = [...props.toFilter];
+		if (dataTag === "*selectAll*") {
+			for (let tag of tagList) {
+				if (tagList.length === tempToFilterArr.length) {
+					tempToFilterArr = []
+					break;
+				} else if (!tempToFilterArr.includes(tag.tag)) tempToFilterArr.push(tag.tag);
+			}
+		}
+        else if (tempToFilterArr.includes(dataTag)) tempToFilterArr.splice(tempToFilterArr.indexOf(dataTag), 1)
+        else tempToFilterArr.push(dataTag);
+		filter(tempToFilterArr);
+        props.setToFilter(tempToFilterArr)
+    }
+
+    const filter = toFilter => {
+		let scrapedItems = [...props.scrapeItems];
+		if (toFilter.length > 0) {
+			for (let tag of toFilter) {
+				if (tag === "others") {
+					scrapedItems.forEach(item => {
+                        if (!["button", "checkbox", "select", "img", "a", "radiobutton", "input", "list",
+                             "link", "scroll bar", "internal frame", "table"].includes(item.tag) &&
+							item.tag.toLowerCase().indexOf("button") == -1 &&
+							item.tag.toLowerCase().indexOf("edit") == -1 &&
+							item.tag.toLowerCase().indexOf("edit box") == -1 &&
+							item.tag.toLowerCase().indexOf("text") == -1 &&
+							item.tag.toLowerCase().indexOf("edittext") == -1 &&
+							item.tag.toLowerCase().indexOf("combo box") == -1 &&
+							item.tag.toLowerCase().indexOf("hyperlink") == -1 &&
+							item.tag.toLowerCase().indexOf("check box") == -1 &&
+							item.tag.toLowerCase().indexOf("checkbox") == -1 &&
+							item.tag.toLowerCase().indexOf("image") == -1 &&
+							(item.tag.toLowerCase().indexOf("table") == -1 || item.tag.toLowerCase() == "tablecell") &&
+							item.tag.toLowerCase().indexOf("radio button") == -1) {
+								item.hide = false;
+						} else item.hide = true
+						return item;
+					});
+				}
+				else if (tag === "othersAndroid"){
+					scrapedItems.forEach(item => {
+						if (!["android.widget.Button", "android.widget.CheckBox", "android.widget.NumberPicker",
+							  "android.widget.TimePicker", "android.widget.DatePicker", "android.widget.RadioButton",
+							 "android.widget.EditText", "android.widget.ListView", "android.widget.Spinner", "android.widget.Switch",
+							 "android.widget.ImageButton", "android.widget.SeekBar"].includes(item.tag) &&
+							item.tag.toLowerCase().indexOf("android.widget.button") == -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.checkbox") == -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.numberpicker") == -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.timepicker") == -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.datepicker") == -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.radiobutton") == -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.edittext") == -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.listview") == -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.spinner") == -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.switch") == -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.imagebutton") == -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.seekbar") == -1){
+								item.hide = false;
+							} else item.hide = true;
+							return item;
+					});
+				}
+				/*** Filtering Duplicate Objects ***/
+				else if (tag === "duplicateCustnames") {
+					let reversedScrapeItems = scrapedItems.reverse();
+					let uniqueBucket = []
+
+					reversedScrapeItems.forEach(item => {
+						let custname = item.title.trim().replace(/[<>]/g, '');
+						if (!uniqueBucket.includes(custname)) {
+							uniqueBucket.push(custname);
+							item.hide = true;
+						}
+						else item.hide = false
+					})
+
+					scrapedItems = reversedScrapeItems.reverse();
+				}
+				else if(tag === "userobj"){
+					scrapedItems.forEach(item => {
+						if (item.userObj) {
+							item.hide = false
+						} else item.hide = true;
+					});
+				}
+				else {
+					scrapedItems.forEach(item => {
+						if (tag == item.tag || (item.tag.toLowerCase().indexOf(tag.toLowerCase()) >= 0 && tag != "a" && item.tag.toLowerCase() != "radio button" && item.tag.toLowerCase() != "radiobutton" && item.tag.toLowerCase().indexOf("listview") < 0 && item.tag.toLowerCase().indexOf("tablecell") < 0) ||
+							(tag == "input" && (item.tag.indexOf("edit") >= 0 || item.tag.indexOf("Edit Box") >= 0 || item.tag.indexOf("text") >= 0 || item.tag.indexOf("EditText") >= 0 || item.tag.indexOf("TextField") >= 0)) ||
+							(tag == "select" && item.tag.indexOf("combo box") >= 0) ||
+							(tag == "a" && (item.tag.indexOf("hyperlink") >= 0)) ||
+							(tag == "checkbox" && item.tag.indexOf("check box") >= 0) ||
+							(tag == "radiobutton" && item.tag.indexOf("radio button") >= 0)
+						) {
+							item.hide = false;
+						}
+						else item.hide = true;
+					});
+				}
+			}
+		} else {
+			scrapedItems.forEach(item => item.hide = false)
+		}
+		// $("html").css({
+		// 	'cursor': 'auto'
+		// });
+		// cfpLoadingBar.complete()
+        props.setScrapeItems(scrapedItems)
+	}
+
+	const Popups = () => (
+        <>
+        {
+            showScreenPop && 
+            <ClickAwayListener onClickAway={closeAllPopups}>
+            <div className="ref_pop screenshot_pop" style={{marginTop: `calc(${screenshotY}px - 15vh)`}}>
+                <h4 className="pop__header" onClick={()=>setShowScreenPop(false)}><span className="pop__title">Screenshot</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
+                <div className="screenshot_pop__content">
+                    { props.mirror ? <img className="screenshot_img" src={`data:image/PNG;base64,${props.mirror}`} /> : "No Screenshot Available"}
+                </div>
+            </div>
+            </ClickAwayListener>
+		}
+		{
+            showFilterPop && 
+            <ClickAwayListener onClickAway={closeAllPopups}>
+            <div className="ref_pop filter_pop" style={{marginTop: `calc(${filterY}px - 15vh)`}}>
+                <h4 className="pop__header" onClick={()=>setShowFilterPop(false)}><span className="pop__title">Filter</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
+                <div className="filter_pop__content">
+					<div className="d__filter-selall" onClick={()=>filterMain("*selectAll*")}><input type="checkbox" checked={tagList.length === props.toFilter.length}/><span>Select All</span></div>
+					{ tagList.map((tag, index)=>(<div className="d__filter-btnbox">
+						<button className={"d__filter-btn" + (props.toFilter.includes(tag.tag) ? " active-filter" : "")} key={index} onClick={()=>filterMain(tag.tag)}>{tag.label}</button>
+					</div>))}
+                </div>
+            </div>
+            </ClickAwayListener>
+        }
+        </>
+    );
+
+    
+    return (
+    
+        <ReferenceBar popups={Popups()} closeAllPopups={closeAllPopups} >
+
+			{ appType!=="Webservice" && appType!=="Mainframe" && <div className="ic_box" onClick={toggleScreenshotPop}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title">Screenshot</span></div>}
+            <span onClick={toggleFilterPop} className="ic_box "  ><span><img className={"rb__ic-info thumb__ic " + (showFilterPop && "active_rb_thumb")} src="static/imgs/ic-filter.png" alt="fliter"/></span><span className="rb_box_title">Filter</span></span>
+        </ReferenceBar>
+        
+    
+    )
+}
+
+export default RefBarItems;

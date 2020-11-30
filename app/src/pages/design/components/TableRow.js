@@ -77,11 +77,11 @@ const TableRow = (props) => {
     // const [keyword, setKeyword] = useState(props.testCase.keywordVal);
     const [keyword, setKeyword] = useState(null);
     // const [input, setInput] = useState(props.testCase.inputVal[0]);
-    const [input, setInput] = useState(null);
+    const [input, setInput] = useState('');
     // const [output, setOutput] = useState(props.testCase.outputVal);
-    const [output, setOutput] = useState(null);
-    const [inputPlaceholder, setInputPlaceholder] = useState(null);
-    const [outputPlaceholder, setOutputPlaceholder] = useState(null);
+    const [output, setOutput] = useState('');
+    const [inputPlaceholder, setInputPlaceholder] = useState('');
+    const [outputPlaceholder, setOutputPlaceholder] = useState('');
     const [keywordList, setKeywordList] = useState(null);
     // const [focused, setFocused] = useState(props.focusedRow === props.idx);
     const [focused, setFocused] = useState(false);
@@ -93,6 +93,7 @@ const TableRow = (props) => {
     const [remarks, setRemarks] = useState([]);
     // const [TCDetails, setTCDetails] = useState(props.testCase.addTestCaseDetailsInfo === "" ? "" : JSON.parse(props.testCase.addTestCaseDetailsInfo));
     const [TCDetails, setTCDetails] = useState("");
+    const [escapeFlag, setEscapeFlag] = useState(true);
     
     useEffect(()=>{
         if (!focused){
@@ -119,9 +120,15 @@ const TableRow = (props) => {
         if (props.edit){
             if (props.focusedRow === props.idx){
                 setFocused(true);
+                setEscapeFlag(false);
                 rowRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'});
                 let caseData = null;
                 let placeholders = null;
+                if (objName === "OBJECT_DELETED") {
+                    caseData = props.getKeywords(objList[0])
+                    placeholders = props.getRowPlaceholders(caseData.obType, caseData.keywords[0]);
+                }
+                else
                 if (objName && keyword){
                     caseData = props.getKeywords(objName)
                     placeholders = props.getRowPlaceholders(caseData.obType, keyword);
@@ -141,19 +148,23 @@ const TableRow = (props) => {
             }
             else{
                 setFocused(false);
-                props.setRowData({
-                    rowIdx: props.idx,
-                    operation: "row",
-                    objName: objName,
-                    keyword: keyword,
-                    inputVal: input,
-                    outputVal: output
-                });
-
-                // setObjName(props.testCase.custname);
-                // setKeyword(props.testCase.keywordVal);
-                // setInput(props.testCase.inputVal[0]);
-                // setOutput(props.testCase.outputVal);
+                if (escapeFlag){
+                    setObjName(props.testCase.custname);
+                    setKeyword(props.testCase.keywordVal);
+                    setInput(props.testCase.inputVal[0]);
+                    setOutput(props.testCase.outputVal);
+                }
+                else{
+                    props.setRowData({
+                        rowIdx: props.idx,
+                        operation: "row",
+                        objName: objName === "OBJECT_DELETED" || !objName ? objList[0] : objName,
+                        keyword: objName === "OBJECT_DELETED" || !keyword ? keywordList[0] : keyword,
+                        inputVal: input,
+                        outputVal: output
+                    });
+                    setEscapeFlag(true);
+                }
             }
         }
     }, [props.focusedRow, props.edit]);
@@ -203,9 +214,14 @@ const TableRow = (props) => {
     };
 
     const submitChanges = event => {
-        if (event.keyCode === 13)
+        if (event.keyCode === 13){
             props.setRowData({rowIdx: props.idx, operation: "row", objName: objName, keyword: keyword, inputVal: input, outputVal: output});
-        if (event.keyCode === 27 || event.keyCode === 13) props.setFocusedRow(null);
+            props.setFocusedRow(null);
+        }
+        else if (event.keyCode === 27) {
+            setEscapeFlag(true);
+            props.setFocusedRow(null);
+        }
     }
 
     const onInputChange = event => setInput(event.target.value)

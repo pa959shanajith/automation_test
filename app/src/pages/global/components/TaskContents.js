@@ -34,6 +34,7 @@ const TaskContents = (props) => {
                         setShowPanel={setShowPanel}
                         taskJson={props.taskJson}
                         testCaseId={props.testCaseId}
+                        taskName={props.taskName}
                         cycleDict={props.cycleDict}
                     />
         })}
@@ -139,11 +140,11 @@ const TaskPanel = (props) => {
         <>
             <div className={"task-panel " + (props.showPanel === props.item.panel_idx ? "active-task " : "")} panel-id={props.item.panel_idx}>
             <div className="panel-content " id={`panelBlock_${props.item.panel_idx}`}>
-                <h4 className={"task-num" + (props.testCaseId === dataobj.testcaseid ? " disable-task" : "")}>{props.counter}</h4>
-                <span className={"assign-task" + (props.testCaseId === dataobj.testcaseid ? "  disable-task" : "")} onClick={taskRedirection} >
+                <h4 className={"task-num" + (props.testCaseId === dataobj.testcaseid && props.taskName === props.item.taskname ? " disable-task" : "")}>{props.counter}</h4>
+                <span className={"assign-task" + (props.testCaseId === dataobj.testcaseid && props.taskName === props.item.taskname  ? "  disable-task" : "")} onClick={taskRedirection} >
                     {props.item.taskname.length >= 45 ? props.item.taskname.substr(0, 44)+"..." : props.item.taskname}
                 </span>
-                <div className={"tasktype-btndiv" + (props.testCaseId === dataobj.testcaseid ? " dark-bg " : "")}>
+                <div className={"tasktype-btndiv" + (props.testCaseId === dataobj.testcaseid && props.taskName === props.item.taskname  ? " dark-bg " : "")}>
                     <button className="tasktype-btn" onClick={expandDetails}>{props.item.tasktype}</button>
                 </div>
             </div>
