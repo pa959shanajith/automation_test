@@ -175,19 +175,12 @@ module.exports.Execution_Queue = class Execution_Queue {
         return response;
     }
 
-    static addAPITestSuiteToQueue(testSuiteRequest) {
-        // TODO get target ICE and project ID
-        let projectid = "";
+    static addAPITestSuiteToQueue(testSuiteRequest,res) {
         let targetICE = EMPTYUSER;
         let request_pool_name = EMPTYUSER;
         let poolid = "";
-        let response = {};
         const hdrs = testSuiteRequest.headers;
         const multiBatchExecutionData = testSuiteRequest.body.executionData;
-        response['status'] = "fail";
-        response["message"] = "N/A"
-        response['error'] = "None"
-        response['acknowledgement'] = "N/A"
         try {
             if (testSuiteRequest.body && testSuiteRequest.body.executionData && testSuiteRequest.body.executionData[0] && testSuiteRequest.body.executionData[0].userInfo ) {
                 let suite = testSuiteRequest.body.executionData[0].userInfo
@@ -209,15 +202,14 @@ module.exports.Execution_Queue = class Execution_Queue {
                     }
                 }
             }
-
             // Check if request came from Azure DevOps. If yes, then send the acknowledgement
             if (hdrs["user-agent"].startsWith("VSTS") && hdrs.planurl && hdrs.projectid) {
                 reqFromADO = true;
-                response["acknowledgement"] = "Request Recieved";
+                res.send("Request Recieved");
             }
             if (!multiBatchExecutionData || multiBatchExecutionData.constructor !== Array || multiBatchExecutionData.length === 0) {
-                response["error"] = "Empty or Invalid Batch Data";
-                return response;
+                res.send("Empty or Invalid Batch Data");
+                return;
             }
             let suiteRequest = {"executionData":testSuiteRequest.body.executionData,"headers":testSuiteRequest.headers}
             let userInfo = testSuiteRequest.body.executionData[0].userInfo;
@@ -227,34 +219,26 @@ module.exports.Execution_Queue = class Execution_Queue {
                 pool["execution_list"].push(testSuite);
                 //save execution queue to redis
                 cache.set("execution_queue", this.queue_list);
-                //create response message
-                response['status'] = "pass";
-                response["message"] = "Execution queued on " + targetICE + " Queue Length: " + pool["execution_list"].length.toString();
+                testSuite['res'] = res; 
             } else if (poolid && poolid in this.queue_list) {
                 let pool = this.queue_list[poolid];
                 pool["execution_list"].push(testSuite);
                 //save execution queue to redis
                 cache.set("execution_queue", this.queue_list);
-                //create response message
-                response['status'] = "pass";
-                response["message"] = "Execution queued on pool: " + request_pool_name +" Queue Length: " + pool["execution_list"].length.toString();
-
-            } else{
-                if(targetICE){
+                testSuite['res'] = res; 
+            } else if(this.ice_list[targetICE] && this.ice_list[targetICE]["connected"]){
+                    testSuite['res'] = res;
                     this.executeAPI(testSuite);
-                    response["message"] = "Executing on ICE: " + targetICE;
-                }else{
-                    response["message"] = "ICE name / Poolid not provided";
-                }
-                
+            } else if(targetICE === EMPTYUSER && (!poolid || poolid === "")){
+                res.send("ICE name and Pool Id not provided.")
+            } else{
+                res.send(targetICE + " not connected to server!")
             }
-
         } catch (e) {
-            response["error"] = "Error while adding test suite to queue";
+            res.send("Error while adding test suite to queue");
             logger.error("Error in addAPITestSuiteToQueue. Error: %s", e);
         }
-
-        return response;
+        return;
     }
     /** 
         * @param {list} batchExecutionData 
@@ -295,12 +279,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         this.ice_list[ice_name]["mode"] = data.value.mode;
         this.ice_list[ice_name]["status"] = data.value.status;
         //check if socket connection is available or not
-        const sockmode = await utils.channelStatus(ice_name);
         //if ice is busy or not connected return 
-        if (data.value.status || (!sockmode.normal && !sockmode.schedule)) {
-            logger.info("Could not execute on: " + ice_name + " ICE is either Executing a test suite or Server not connected to ice");
-            return result;
-        }
         let poolid = this.ice_list[ice_name]["poolid"];
         if(!poolid){
             logger.debug(ice_name + " does not belong to any pool.")
@@ -308,9 +287,16 @@ module.exports.Execution_Queue = class Execution_Queue {
         }
         let pool = this.queue_list[poolid];
         var queue = pool["execution_list"];
+
         //iterate over execution queue 
         for (let i = 0; i < queue.length; i++) {
             let testSuite = queue[i];
+            const sockmode = await utils.channelStatus(ice_name);
+            if (data.value.status || (!sockmode.normal && !sockmode.schedule)) {
+                // TODO shift below queue check
+                logger.info("Could not execute on: " + ice_name + " ICE is either Executing a test suite or Server not connected to ice");
+                return result;
+            }
             //check if target ice for testsuite and the actual ice which has communicated it's status is same or not, accept if ice_name matches or is "any"
             if (testSuite.userInfo.icename === ice_name || testSuite.userInfo.icename === EMPTYUSER) {
                 testSuite.userInfo.icename = ice_name;
@@ -334,7 +320,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                     }
                     //remove execution from queue
                     queue.splice(i, 1);
-                    logger.info("Removing Test Suite from queue");
+                    logger.debug("Removing Test Suite from queue");
                     cache.set("execution_queue", this.queue_list);
                 } catch (e) {
                     logger.error("Error in triggerExecution. Error: %s", e);
@@ -498,12 +484,7 @@ module.exports.Execution_Queue = class Execution_Queue {
     static async executeAPI(testSuite) {
         const req = testSuite.testSuiteRequest;
         const hdrs = req.headers;
-        let username = testSuite.userInfo.username;
-        const notifySocMap = myserver.socketMapNotify;
         let reportResult = {}
-        reportResult["testSuiteIds"] = "";
-        reportResult["status"] = "fail";
-
         let reqFromADO = false;
         if (hdrs["user-agent"].startsWith("VSTS") && hdrs.planurl && hdrs.projectid) {
             reqFromADO = true;
@@ -573,22 +554,15 @@ module.exports.Execution_Queue = class Execution_Queue {
         })());
         await Promise.all(batchExecutionPromiseList)
         const finalResult = { "executionStatus": executionResult };
-        reportResult["testSuiteIds"] = multiBatchExecutionData[0].batchInfo;
-        reportResult["testSuiteIds"][0]["testsuitename"]  = reportResult["testSuiteIds"][0]["testsuiteName"];
-        if(finalResult.executionStatus[0].status) reportResult["status"] = "API Execution Completed";
-        else reportResult["status"] = "API Execution Failed";
-        if (!reqFromADO) {
-            if (notifySocMap && notifySocMap[username] && notifySocMap[username].connected) {
-                notifySocMap[username].emit("display_execution_popup", [reportResult]);
-            } else {
-                if (!(username in this.notification_dict)) {
-                    this.notification_dict[username] = [];
-                }
-                this.notification_dict[username].push(reportResult)
-                cache.set("pending_notification", this.notification_dict)
-            }
-            return reportResult;
-        }
+        const res = testSuite['res'];
+        if(!res){
+            logger.error("Error while sending response in executeAPI, resposne object undefined");
+            return
+        }        
+        if (!reqFromADO){
+            res.send(finalResult);
+            return;
+        } 
         // This code only executes when request comes from Azure DevOps
         let adoStatus = finalResult.executionStatus.every(e => e.status == "success");
         const args = {
