@@ -407,6 +407,16 @@ exports.updateScreen_ICE = function (req, res) {
 					scrapedObjects.view = newData.view;
 					scrapedObjects.mirror = newData.mirror;
 					scrapedObjects.scrapedurl = newData.scrapedurl;
+					scrapeinfo = { 
+						"body" : newData.body,
+						"endPointURL" : newData.endPointURL,
+						"header" : newData.header,
+						"method" : newData.method,
+						"operations" : newData.operations,
+						"responseBody" : newData.responseBody,
+						"responseHeader" : newData.responseHeader
+					};
+					scrapedObjects.scrapeinfo =scrapeinfo
 					scrapedObjects = JSON.stringify(scrapedObjects);
 					scrapedObjects = scrapedObjects.replace(/'+/g, "''");
 					inputs = {
