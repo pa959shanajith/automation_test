@@ -597,7 +597,7 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 /** This service executes the testsuite(s) for request from API */
 exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE_API");
-	var result = await queue.Execution_Queue.addAPITestSuiteToQueue(req,res);
+	await queue.Execution_Queue.addAPITestSuiteToQueue(req,res);
 };
 
 /** Service to fetch all the testcase, screen and project names for provided scenarioid */

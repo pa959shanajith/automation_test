@@ -214,7 +214,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                 res.send("Request Recieved");
             }
             if (!multiBatchExecutionData || multiBatchExecutionData.constructor !== Array || multiBatchExecutionData.length === 0) {
-                res.send("Empty or Invalid Batch Data");
+                res.send({"error":"Empty or Invalid Batch Data"});
                 return;
             }
             let suiteRequest = {"executionData":testSuiteRequest.body.executionData,"headers":testSuiteRequest.headers}
@@ -234,16 +234,16 @@ module.exports.Execution_Queue = class Execution_Queue {
                 testSuite['res'] = res; 
             } else if(this.ice_list[targetICE] && this.ice_list[targetICE]["connected"]){
                     const sockmode = await utils.channelStatus(targetICE);
-                    if((!sockmode.normal && !sockmode.schedule)) res.send("Can't establish connection with ICE Re-Connect to server!")
+                    if((!sockmode.normal && !sockmode.schedule)) res.send({"error":"Can't establish connection with ICE Re-Connect to server!"})
                     testSuite['res'] = res;
                     this.executeAPI(testSuite);
             } else if(targetICE === EMPTYUSER && (!poolid || poolid === "")){
-                res.send("ICE name and Pool Id not provided.")
+                res.send({"error":"ICE name and Pool Id not provided."})
             } else{
-                res.send(targetICE + " not connected to server!")
+                res.send({"error":targetICE + " not connected to server!"})
             }
         } catch (e) {
-            res.send("Error while adding test suite to queue");
+            res.send({"error":"Error while adding test suite to queue"});
             logger.error("Error in addAPITestSuiteToQueue. Error: %s", e);
         }
         return;
@@ -568,7 +568,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         const finalResult = { "executionStatus": executionResult };
         const res = testSuite['res'];
         if(!res){
-            logger.error("Error while sending response in executeAPI, resposne object undefined");
+            logger.error("Error while sending response in executeAPI, response object undefined");
             return
         }        
         if (!reqFromADO){
