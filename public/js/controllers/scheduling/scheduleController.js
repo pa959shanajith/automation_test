@@ -286,6 +286,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 			if($event.target.tagName.toLowerCase() != 'input'){
 				$event.currentTarget.getElementsByTagName('input')[0].checked = !$event.currentTarget.getElementsByTagName('input')[0].checked
 				$event.stopPropagation()
+				$event.preventDefault()
 			}
 		}else{
 			$scope.selectedICE = ice
@@ -483,6 +484,8 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 				qccredentials: { "qcurl": "", "qcusername": "", "qcpassword": "" },
 				batchInfo: moduleInfo
 			};
+			$('#userIdName').val("")
+			$('#userIdName').removeClass('error-border')
 			allocateICEPopup()
 		}
 	}
@@ -589,6 +592,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 }]);
 
 function openModelPopup(title, body) {
+	$("#scheduleGlobalModal").find('.close').css('display','none')
 	$("#scheduleGlobalModal").find('.modal-title').text(title);
 	$("#scheduleGlobalModal").find('.modal-body p').text(body).css('color', 'black');
 	$("#scheduleGlobalModal").modal("show");
@@ -600,11 +604,13 @@ var smartBatch = false;
 var copyId = 0
 function openPopup(id) {
 	if ($('.ipContainer').find(":selected")[parseInt(id[id.length - 1])].label === "Scenario Smart Scheduling") {
+		$("#smartScheduling").find('.close').css('display','none')
 		$("#smartScheduling").modal("show");
 		$($('#smartScheduling').find('.btn-default')[1]).data('selector-id', id);
 		$('#smartScheduling').find('.btn-default')[1].onclick = function () {
 			$('#' + $(this).data('selector-id'))[0].selectedIndex = 0;
 			sequence(true,false,0);
+			$('.selectScnSmart img').removeClass('sb')
 			smartBatch = false;
 			copyId = 0;
 		}
@@ -654,14 +660,26 @@ function sequence(copy,block,id) {
 }
 
 function moduleSmartScheduling(){
-	$('.selectScnSmart img').removeClass('sb')
-	$('.selectModSmart img').addClass('sb')
-	$("#mod0")[0].selectedIndex = $("#mod0")[0].length - 2;
-	$("#mod0")[0].onchange();
+	if($('.selectModSmart img').hasClass('sb')){
+		$('.selectModSmart img').removeClass('sb')
+		smartBatch = false;
+		copyId = 0;
+	}else{
+		$('.selectScnSmart img').removeClass('sb')
+		$('.selectModSmart img').addClass('sb')
+		$("#mod0")[0].selectedIndex = $("#mod0")[0].length - 2;
+		$("#mod0")[0].onchange();
+	}
 }
 function scenarioSmartScheduling(){
-	$('.selectModSmart img').removeClass('sb')
-	$('.selectScnSmart img').addClass('sb')
-	$("#mod0")[0].selectedIndex = $("#mod0")[0].length - 1;
-	$("#mod0")[0].onchange();
+	if($('.selectScnSmart img').hasClass('sb')){
+		$('.selectScnSmart img').removeClass('sb')
+		smartBatch = false;
+		copyId = 0;
+	}else{
+		$('.selectModSmart img').removeClass('sb')
+		$('.selectScnSmart img').addClass('sb')
+		$("#mod0")[0].selectedIndex = $("#mod0")[0].length - 1;
+		$("#mod0")[0].onchange();
+	}
 }

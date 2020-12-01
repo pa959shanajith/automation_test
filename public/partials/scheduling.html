@@ -367,14 +367,14 @@
 						<ul id='ice-dropdown' class="dropdown-menu dropdown-menu-users "  aria-labelledby="userIdName">
 							<!-- <li role="presentation"><label><input type="checkbox" /><span id='status' class='online'></span>new</label></li> -->
 							<li ng-if="smartBatch == true" role="presentation" ng-repeat='ice in availableICE | filter:availableICEFilter' ng-click="iceCheckboxClick($event)" >
-								<label title='{{ice.statusCode}}'>
+								<label title='{{ice.statusCode}}' ng-style="{'font-weight':500}">
 									<input value='{{ice.icename}}' checked type="checkbox"/>
 									<span id='status' ng-style="{'background-color':'{{ice.color}}'}"></span>
 									{{ice.icename}}
 								<label>
 							</li>
 							<li ng-if="smartBatch == false" role="presentation" ng-repeat='ice in availableICE | filter:availableICEFilter' ng-click="availableICEFilter.icename=ice.icename;iceCheckboxClick($event,ice.icename)" >
-								<label title='{{ice.statusCode}}'>
+								<label title='{{ice.statusCode}}' ng-style="{'font-weight':500}">
 									<!-- <input value='{{ice.icename}}' checked type="checkbox"/> -->
 									<span id='status' ng-style="{'background-color':'{{ice.color}}'}"></span>
 									{{ice.icename}}
@@ -388,17 +388,17 @@
 				<div>
 					<span class="leftControl" title="ICE STATUS">ICE Status:</span>
 					<div>
-						<ul style="padding-top: 7px;">
+						<ul style="padding-top: 7px;width:100%">
 							<li >
-								<label title='available' ng-style="{'display':'inline-block'}">
+								<label title='available' class="legends">
 									<span id='status' ng-style="{'background-color':'#95c353'}"></span>
 									 Available
 								</label>
-								<label title='unavailable' ng-style="{'display':'inline-block'}">
+								<label title='unavailable' class="legends">
 									<span id='status' ng-style="{'background-color':'#fdc010'}"></span>
 									 Unavilable
 								</label>
-								<label title='do not disturb' style="display: inline-block;">
+								<label title='do not disturb' class="legends">
 									<span id='status' ng-style="{'background-color':'red'}"></span>
 									 Do Not Disturb
 								</label>
