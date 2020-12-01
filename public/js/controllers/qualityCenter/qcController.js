@@ -771,6 +771,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				$('.scrollbar-inner').scrollbar();
 			} else{
 				openModelPopup("Mapped Testcase", "No mapped details");
+				$scope.hideMappedFilesTab(); 
 			}
 			unblockUI();
 		},
