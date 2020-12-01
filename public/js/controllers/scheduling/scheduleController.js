@@ -485,6 +485,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 				batchInfo: moduleInfo
 			};
 			$('#userIdName').val("")
+			$('#userIdName').removeClass('error-border')
 			allocateICEPopup()
 		}
 	}
