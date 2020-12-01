@@ -590,6 +590,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 }]);
 
 function openModelPopup(title, body) {
+	$("#scheduleGlobalModal").find('.close').css('display','none')
 	$("#scheduleGlobalModal").find('.modal-title').text(title);
 	$("#scheduleGlobalModal").find('.modal-body p').text(body).css('color', 'black');
 	$("#scheduleGlobalModal").modal("show");
@@ -601,6 +602,7 @@ var smartBatch = false;
 var copyId = 0
 function openPopup(id) {
 	if ($('.ipContainer').find(":selected")[parseInt(id[id.length - 1])].label === "Scenario Smart Scheduling") {
+		$("#smartScheduling").find('.close').css('display','none')
 		$("#smartScheduling").modal("show");
 		$($('#smartScheduling').find('.btn-default')[1]).data('selector-id', id);
 		$('#smartScheduling').find('.btn-default')[1].onclick = function () {
