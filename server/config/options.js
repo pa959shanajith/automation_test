@@ -10,6 +10,7 @@ try {
 	if (!numCheck.test(parsed.socketio.pingTimeout) || !numCheck.test(parsed.socketio.pingInterval)) throw "SocketIO config values should be Integer";
 	if (!numCheck.test(parsed.pingTimer)) throw "Ping Timer config values should be Integer";
 	if (parseInt(parsed.pingTimer) > 120000) logger.warn("Large values of ping timer may cause a delay in executions and ICE status refresh");
+	if (parseInt(parsed.pingTimer) < 30000) logger.warn("Small values of ping timer may cause too much traffic for sockets, please increase the value of ping timer");
 	else {
 		parsed.socketio.pingTimeout = parseInt(parsed.socketio.pingTimeout);
 		parsed.socketio.pingInterval = parseInt(parsed.socketio.pingInterval);

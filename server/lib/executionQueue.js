@@ -100,7 +100,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         * Adds normal / scheduling test suites to queue
         * Executes normal / scheduling test suites if the target ICE is in DND mode
     */
-    static addTestSuiteToQueue(batchExecutionData, execIds, userInfo, type,poolid) {
+    static addTestSuiteToQueue = async (batchExecutionData, execIds, userInfo, type,poolid) => {
         let targetICE = EMPTYUSER;
         let projectid = "";
         let response = {}
@@ -152,6 +152,12 @@ module.exports.Execution_Queue = class Execution_Queue {
             } else {
                 //check if target ice is connected but not preset in any pool, execute directly if true
                 if (this.ice_list[targetICE] && this.ice_list[targetICE]["connected"]) {
+                    const sockmode = await utils.channelStatus(targetICE);
+                    if((!sockmode.normal && !sockmode.schedule)){
+                        response["status"] = "pass";
+                        response["message"] = "Can't establish connection with ICE Re-Connect to server!";
+                        return response;
+                    }
                     if ((this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser) || !this.ice_list[targetICE]["mode"]) {
                         if (type == "ACTIVE") {
                             this.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
@@ -175,7 +181,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         return response;
     }
 
-    static addAPITestSuiteToQueue(testSuiteRequest,res) {
+    static addAPITestSuiteToQueue = async (testSuiteRequest,res) => {
         let targetICE = EMPTYUSER;
         let request_pool_name = EMPTYUSER;
         let poolid = "";
@@ -227,6 +233,8 @@ module.exports.Execution_Queue = class Execution_Queue {
                 cache.set("execution_queue", this.queue_list);
                 testSuite['res'] = res; 
             } else if(this.ice_list[targetICE] && this.ice_list[targetICE]["connected"]){
+                    const sockmode = await utils.channelStatus(targetICE);
+                    if((!sockmode.normal && !sockmode.schedule)) res.send("Can't establish connection with ICE Re-Connect to server!")
                     testSuite['res'] = res;
                     this.executeAPI(testSuite);
             } else if(targetICE === EMPTYUSER && (!poolid || poolid === "")){
@@ -344,15 +352,11 @@ module.exports.Execution_Queue = class Execution_Queue {
                 let poolid = pool["_id"];
                 if (!(poolid in this.queue_list)) {
                     this.queue_list[poolid] = {};
-                    
                 }
                 this.queue_list[poolid]["name"] = pool["poolname"];
                 this.project_list = this.setUpProjectList(pool["projectids"], poolid);
-                inputs = {
-                    "poolids": [poolid]
-                }
-                this.queue_list[poolid]["ice_list"] = await utils.fetchData(inputs, "/admin/getICE_pools", fnName);
-                this.ice_list = this.setUpICEList(this.queue_list[poolid]["ice_list"], poolid);
+                this.queue_list[poolid]["ice_list"] = pool["ice_list"];
+                this.ice_list = this.setUpICEList(pool["ice_list"], poolid);
                 if (!this.queue_list[poolid]["execution_list"]) {
                     this.queue_list[poolid]["execution_list"] = []
                 }
@@ -389,6 +393,14 @@ module.exports.Execution_Queue = class Execution_Queue {
             this.ice_list[ice_name]["mode"] = false
             this.ice_list[ice_name]["status"] = false
             this.ice_list[ice_name]["connected"] = false
+            this.ice_list[ice_name]["_id"] = list[ice]["_id"]
+        }
+        for(let ice in this.ice_list){
+            if(this.ice_list[ice]["poolid"] === poolid){
+                if(!(this.ice_list[ice]['_id'] in list)){
+                    delete this.ice_list[ice]
+                }
+            }
         }
         return this.ice_list;
     }
