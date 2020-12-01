@@ -606,6 +606,7 @@ function openPopup(id) {
 		$('#smartScheduling').find('.btn-default')[1].onclick = function () {
 			$('#' + $(this).data('selector-id'))[0].selectedIndex = 0;
 			sequence(true,false,0);
+			$('.selectScnSmart img').removeClass('sb')
 			smartBatch = false;
 			copyId = 0;
 		}
