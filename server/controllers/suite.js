@@ -590,15 +590,14 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 	const userInfo = { "userid": profile.userid, "username": profile.name, "role": profile.role, "icename": targetUser,"invokinguser":req.session.userid,"invokingusername":req.session.username,"invokinguserrole":req.session.activeRoleId};
 	const batchExecutionData = req.body.executionData;
 	const execIds = { "batchid": "generate", "execid": {} };
-	var result = queue.Execution_Queue.addTestSuiteToQueue(batchExecutionData,execIds,userInfo,"ACTIVE",poolid);
+	var result = await queue.Execution_Queue.addTestSuiteToQueue(batchExecutionData,execIds,userInfo,"ACTIVE",poolid);
 	return res.send(result);
 };
 
 /** This service executes the testsuite(s) for request from API */
 exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE_API");
-	var result = queue.Execution_Queue.addAPITestSuiteToQueue(req);
-	res.send(result)
+	await queue.Execution_Queue.addAPITestSuiteToQueue(req,res);
 };
 
 /** Service to fetch all the testcase, screen and project names for provided scenarioid */
