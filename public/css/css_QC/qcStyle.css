@@ -107,11 +107,12 @@
 	overflow: hidden;
     text-overflow: ellipsis;
 }
-.linkedTestset span{
+.viewTextSpan{
     float: left;
-    border: 1px solid #585858;
-    width: 90px;
-    margin-top: 15px;
+    width: 85%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .viewImageSpan{
     float: right !important;
