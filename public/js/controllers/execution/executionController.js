@@ -864,6 +864,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			$(".selectParallel").find("svg").removeClass("sb");
 			$(".selectSauceLabs").find("svg").removeClass("sb");
 			browserTypeExe = [];
+			execAction = "serial";
 			$scope.moduleInfo = [];
 			$scope.readTestSuite_ICE();
 			$("#syncScenario").prop("disabled", true);
