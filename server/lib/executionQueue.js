@@ -71,6 +71,7 @@ module.exports.Execution_Queue = class Execution_Queue {
             case "delete":
                 delete this.queue_list[poolinfo.poolid];
                 cache.set("execution_queue", this.queue_list);
+                this.setUpPool(inputs);
                 break;
             case "create":
                 this.setUpPool(inputs);
@@ -167,10 +168,13 @@ module.exports.Execution_Queue = class Execution_Queue {
                     }
                     response['status'] = "pass";
                     response["message"] = "Execution Started on " + targetICE;
-                } else {
+                } else if(targetICE && targetICE != EMPTYUSER) {
                     //the target ice is neither part of a pool nor is connected to server, queuing not possible
                     response['status'] = "pass";
                     response["message"] = targetICE + " not connected to server and not part of any pool, connect ICE to server or add ICE to a pool to proceed."
+                } else{
+                    response['status'] = "pass";
+                    response["message"] = "ICE not selected."
                 }
             }
         } catch (e) {
@@ -359,6 +363,11 @@ module.exports.Execution_Queue = class Execution_Queue {
                 this.ice_list = this.setUpICEList(pool["ice_list"], poolid);
                 if (!this.queue_list[poolid]["execution_list"]) {
                     this.queue_list[poolid]["execution_list"] = []
+                }
+            }
+            for (let index in this.queue_list){
+                if(!(index in pools)){
+                    delete this.queue_list[index]
                 }
             }
             cache.set("execution_queue", this.queue_list);
