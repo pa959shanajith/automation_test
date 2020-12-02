@@ -486,6 +486,7 @@ if (cluster.isMaster) {
 		app.post('/getPools', auth.protect, admin.getPools);
 		app.post('/updatePool', auth.protect, admin.updatePool);
 		app.post('/createPool_ICE', auth.protect, admin.createPool_ICE);
+		app.post('/clearQueue', auth.protect, admin.clearQueue);
 		app.post('/exportProject', auth.protect, admin.exportProject);
 		app.post('/testNotificationChannels', auth.protect, admin.testNotificationChannels);
 		app.post('/manageNotificationChannels', auth.protect, admin.manageNotificationChannels);
