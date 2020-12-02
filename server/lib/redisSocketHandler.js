@@ -316,7 +316,7 @@ module.exports.initListeners = mySocket => {
 		if (result == "fail") logger.error("Error occurred in storing benchmark");
 	});
 	mySocket.on('ICE_status_change', async value => {
-		pulse_ICE[value['icename']] = value;
+		pulse_ICE[username] = value;
 		cache.set("ICE_status",pulse_ICE)
 		const dataToExecute = JSON.stringify({"username" : username,"onAction" : "ice_status_change","value":value,"reqID":new Date().toUTCString()});
 		server_pub.publish('ICE_STATUS_' + username, dataToExecute);

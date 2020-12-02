@@ -71,6 +71,7 @@ module.exports.Execution_Queue = class Execution_Queue {
             case "delete":
                 delete this.queue_list[poolinfo.poolid];
                 cache.set("execution_queue", this.queue_list);
+                this.setUpPool(inputs);
                 break;
             case "create":
                 this.setUpPool(inputs);
@@ -167,10 +168,13 @@ module.exports.Execution_Queue = class Execution_Queue {
                     }
                     response['status'] = "pass";
                     response["message"] = "Execution Started on " + targetICE;
-                } else {
+                } else if(targetICE && targetICE != EMPTYUSER) {
                     //the target ice is neither part of a pool nor is connected to server, queuing not possible
                     response['status'] = "pass";
                     response["message"] = targetICE + " not connected to server and not part of any pool, connect ICE to server or add ICE to a pool to proceed."
+                } else{
+                    response['status'] = "pass";
+                    response["message"] = "ICE not selected."
                 }
             }
         } catch (e) {
@@ -190,19 +194,12 @@ module.exports.Execution_Queue = class Execution_Queue {
         try {
             if (testSuiteRequest.body && testSuiteRequest.body.executionData && testSuiteRequest.body.executionData[0] && testSuiteRequest.body.executionData[0].userInfo ) {
                 let suite = testSuiteRequest.body.executionData[0].userInfo
-                var invokinguser = {
-                    invokinguser: testSuiteRequest.session.userid,
-                    invokingusername: testSuiteRequest.session.username,
-                    invokinguserrole: testSuiteRequest.session.activeRoleId
-                }
-                Object.assign(suite, invokinguser);
                 if(suite.icename) targetICE = testSuiteRequest.body.executionData[0].userInfo.icename;
                 if(suite.poolname){
                     request_pool_name = suite.poolname;
                     for(let id in this.queue_list){
                         if(this.queue_list[id].name ===  request_pool_name){
                             poolid = id;
-                            suite.icename = EMPTYUSER;
                             break;
                         }
                     }
@@ -361,6 +358,13 @@ module.exports.Execution_Queue = class Execution_Queue {
                     this.queue_list[poolid]["execution_list"] = []
                 }
             }
+            if(inputs["poolid"] === "all"){
+                for (let index in this.queue_list){
+                    if(!(index in pools)){
+                        delete this.queue_list[index]
+                    }
+                }
+            } 
             cache.set("execution_queue", this.queue_list);
         } catch (exception) {
             logger.error("Error in setUpPool. Error: %s", exception);

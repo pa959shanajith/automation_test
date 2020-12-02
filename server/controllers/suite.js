@@ -930,11 +930,11 @@ exports.cancelScheduledJob_ICE = async (req, res) => {
 	const username = req.session.username;
 	const scheduleid = req.body.schDetails.scheduleid;
 	const schedHost = req.body.host;
-	const schedUserid = req.body.schedUserid;
+	const schedUserid = JSON.parse(req.body.schedUserid);
 	let inputs = { "icename": schedHost };
 	const userprofile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
 	if (userprofile == "fail" || userprofile == null) return res.send("fail");
-	if (!(schedUserid == userid || userprofile.name == username)) {
+	if (!(schedUserid["invokinguser"] == userid || userprofile.name == username)) {
 		logger.info("Sending response 'not authorised' from " + fnName + " service");
 		return res.send("not authorised");
 	}
