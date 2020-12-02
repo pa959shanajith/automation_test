@@ -83,7 +83,8 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 						todayHighlight: true,
 						startDate: new Date()
 					}).on('hide.datepicker', function (e) {
-						var timepicker =  $(".fc-timePicker");
+						//var timepicker =  $(".fc-timePicker");
+						var timepicker = $(this).parent().parent().find(".fc-timePicker")
 						if ($(this).val().length > 0) {
 							const selDate = $(this).datepicker('getDate');
 							const timeNow = new Date();
@@ -662,6 +663,7 @@ function moduleSmartScheduling(){
 		$('.selectModSmart img').removeClass('sb')
 		smartBatch = false;
 		copyId = 0;
+		sequence(false,false,parseInt("#mod0".replace("mod","")));
 	}else{
 		$('.selectScnSmart img').removeClass('sb')
 		$('.selectModSmart img').addClass('sb')
@@ -674,6 +676,7 @@ function scenarioSmartScheduling(){
 		$('.selectScnSmart img').removeClass('sb')
 		smartBatch = false;
 		copyId = 0;
+		sequence(false,false,parseInt("#mod0".replace("mod","")));
 	}else{
 		$('.selectModSmart img').removeClass('sb')
 		$('.selectScnSmart img').addClass('sb')

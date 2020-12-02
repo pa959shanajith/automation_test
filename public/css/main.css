@@ -4030,6 +4030,9 @@ select:focus{
 .error-border{
     border-bottom: 1px solid red!important;
 }
+#deleteGlobalModal .modal-body p{
+    white-space: pre-wrap;
+}
 #create-icepool .adminControl{
     width:75%
 }

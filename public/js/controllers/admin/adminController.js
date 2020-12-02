@@ -223,7 +223,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		});
 	})
 	
-	const createIcePoolReset = () => {
+	const createIcePoolReset = () =>{
 		$scope.tokens.name=undefined
 		$scope.createIcePool.poolName = ""
 		$('#assignedProjectAP option').appendTo($('#allProjectAP'))
@@ -231,6 +231,21 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$('#tokenName').val('')
 		$('#tokenName').removeClass('error-border')
 	}
+
+	$scope.clearQueue = () =>{
+		if($scope.createIcePool.selectedIcePool && $scope.createIcePool.selectedIcePool.poolname){
+			openDeleteGlobalModal("Clear Queue", "clearQueue", `Are you sure you want to clear queue of the ICE pool : ${$scope.createIcePool.selectedIcePool.poolname} ? \nAll the jobs queued in this pool will be cancelled.`);
+		}else{
+			openDeleteGlobalModal("Clear Queue", "clearQueue", `Are you sure you want to clear all the queues ? \nAll the jobs queued in every pool will be cancelled.`);
+		}
+	}
+	$(document).on('click','#clearQueue', function(e) {
+		if($scope.createIcePool.selectedIcePool && $scope.createIcePool.selectedIcePool.poolname){
+			alert($scope.createIcePool.selectedIcePool.poolname)
+		}else{
+			alert("all")	
+		}
+	})
 
 	$scope.EditIcePoolReset = () =>{
 		$('#update-icepool-rename').addClass("hide")
@@ -376,7 +391,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		})
 	}
 
-	$scope.createIcePool.deleteIcePool = () =>{
+	$scope.createIcePool.deleteIcePool = function () {
+		openDeleteGlobalModal("Delete ICE Pool", "delICEPool", `Are you sure you want to delete ICE Pool : ${$scope.createIcePool.selectedIcePool.poolname} ? \nAll the jobs queued on this pool will be canceled.`);
+	};
+
+	$(document).on('click','#delICEPool', function(e) {
+		hideDeleteGlobalModal();
 		blockUI('Deleting ICE Pool ...')
 		var id = $scope.createIcePool.selectedIcePool._id
 		adminServices.deletePools({'poolid':[id]})
@@ -398,7 +418,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			console.log("Error:::::::::::::", error);
 			unblockUI()
 		})
-	}
+	})
 	
 	// on click of allocate ice pool button
 	$scope.allocateIcePool.click = async() =>{
