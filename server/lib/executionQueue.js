@@ -194,19 +194,12 @@ module.exports.Execution_Queue = class Execution_Queue {
         try {
             if (testSuiteRequest.body && testSuiteRequest.body.executionData && testSuiteRequest.body.executionData[0] && testSuiteRequest.body.executionData[0].userInfo ) {
                 let suite = testSuiteRequest.body.executionData[0].userInfo
-                var invokinguser = {
-                    invokinguser: testSuiteRequest.session.userid,
-                    invokingusername: testSuiteRequest.session.username,
-                    invokinguserrole: testSuiteRequest.session.activeRoleId
-                }
-                Object.assign(suite, invokinguser);
                 if(suite.icename) targetICE = testSuiteRequest.body.executionData[0].userInfo.icename;
                 if(suite.poolname){
                     request_pool_name = suite.poolname;
                     for(let id in this.queue_list){
                         if(this.queue_list[id].name ===  request_pool_name){
                             poolid = id;
-                            suite.icename = EMPTYUSER;
                             break;
                         }
                     }
