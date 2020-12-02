@@ -4059,26 +4059,6 @@ select:focus{
     box-shadow: 2px 2px #8469a0;
     background: #6e469896;
 }
-/* .active-opt{
-    background: white ;
-    color: #643693 ;
-    border: solid 1px ;
-    font-size: 17px;
-    font-family: 'LatoWebLight';
-    outline: 0;
-}
-.active-opt:hover{
-    background: white ;
-    color: #643693 ;
-    border: solid 1px ;
-    /* padding: 2px 15px; */
-    font-size: 17px;
-    font-family: 'LatoWebLight';
-    outline: 0;
-} */
-.active-opt:focus{
-    outline: 0 !important;
-}
 #icepoolNumInp{
     width: 200px;
     border: 1px solid !important;;

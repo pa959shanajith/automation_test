@@ -240,11 +240,28 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		}
 	}
 	$(document).on('click','#clearQueue', function(e) {
+		blockUI('Clearing Queue ...')
+		var poolid = []
 		if($scope.createIcePool.selectedIcePool && $scope.createIcePool.selectedIcePool.poolname){
-			alert($scope.createIcePool.selectedIcePool.poolname)
+			poolid.push($scope.createIcePool.selectedIcePool.poolname)
 		}else{
-			alert("all")	
+			poolid.push("all")	
 		}
+		adminServices.clearQueue(poolid)
+		.then((data)=>{
+			if (data == "success") {
+				openModalPopup("Success", "Cleared queue successfully.");
+			} else if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			}else {
+				openModalPopup("ICE Pool", "Failed to clear queue");
+			}
+			unblockUI()
+		},(error)=>{
+			openModalPopup("ICE Pool", "Failed to clear queue");
+			console.log("Error:::::::::::::", error);
+			unblockUI()
+		})
 	})
 
 	$scope.EditIcePoolReset = () =>{

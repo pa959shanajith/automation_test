@@ -1823,6 +1823,7 @@ exports.clearQueue = async(req,res) => {
 	try{
 		const poolinfo = req.body.data;
 		const result = await queue.Execution_Queue.updatePools("clear_queue",poolinfo);
+		res.send(result)
 	}catch(e){
 		logger.error("Error occurred in admin/clearQueue:", exception);
 		res.send("fail");
