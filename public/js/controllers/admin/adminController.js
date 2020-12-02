@@ -518,8 +518,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		blockUI('Fetching ICE Pools...')
 		$scope.allocateIcePool.iceData = {}
 		$scope.allocateIcePool.type = type
-		$(".active-opt").removeClass("active-opt").addClass('btn-md');
-		$('#icepool-'+type).addClass('active-opt').removeClass('btn-md');
+		$(".unactive-opt").removeClass("unactive-opt")
+		if(type==='quantity'){
+			$('#icepool-specific').addClass('unactive-opt')
+		}else{
+			$('#icepool-quantity').addClass('unactive-opt')
+		}
 		$scope.allocationPoolReset()
 		adminServices.getAvailable_ICE()
 		.then((data)=>{
