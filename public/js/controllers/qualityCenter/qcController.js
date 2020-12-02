@@ -11,6 +11,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 	var mappedList = [];
 	var undoMapList = [];
 	var undoMapIdList = [];
+	var undoItem = '';
 	if(window.localStorage['navigateScreen'] != "p_ALM"){
 		return $rootScope.redirectPage();
 	}
@@ -403,6 +404,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 	$(document).on('click','.almtestScenariolink', function(e){
 		$('.almtestcaselink').css({"background-color":"#fad7f1fb"});
 		$('.almtestcaselink').find(".viewUndoSyncronise").hide();
+		$('.almtestcaselink').removeClass("selectedToMap");
 		var mapid = $(this).parent().data("mapid");
 		if($(this).hasClass("selectedToMap") && !e.ctrlKey) {
 			$('.almtestScenariolink').css({"background-color": "#E1CAFF"});
@@ -433,7 +435,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 	$(document).on('click','.almtestcaselink', function(e){
 		$('.almtestScenariolink').css({"background-color": "#E1CAFF"});
 		$('.almtestScenariolink').find(".viewUndoSyncronise").hide();
-
+		$('.almtestScenariolink').removeClass("selectedToMap");
 		if($(this).hasClass("selectedToMap") && !e.ctrlKey) {
 			$('.almtestcaselink').css({"background-color": "#fad7f1fb"});
 			$('.almtestcaselink').find(".viewUndoSyncronise").hide();
@@ -503,7 +505,12 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			//scenid
 			if(undoMapItems[i].classList.contains('almtestScenariolink')) {
 				var scenId = undoMapItems[i].getAttribute("data-testscenid")
+				if(undoItem == 'testcase') {
+					undoMapList = [];
+					undoMapIdList = [];
+				}
 				if (undoMapIdList.length == 0){
+					undoItem = 'testscenario';
 					var newObj = {
 						'mapid': mapid,
 						'testscenarioid': []
@@ -533,7 +540,12 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				var testcase = undoMapItems[i].innerText.trim();
 				var folderpath = undoMapItems[i].getAttribute("data-qcfolderpath");
 				var testset = undoMapItems[i].getAttribute("data-qctestset");
+				if(undoItem == 'testscenario') {
+					undoMapList = [];
+					undoMapIdList = [];
+				}
 				if (undoMapIdList.length == 0){
+					undoItem = 'testcase';
 					var newObj = {
 						'mapid': mapid,
 						'qctestcase': [],
@@ -710,6 +722,9 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 	$scope.displayMappedFilesTab = function(){
 		blockUI("Loading...");
 		var userid = JSON.parse(window.localStorage['_UI']).user_id;
+		undoItem = ''; 
+		undoMapIdList = [];
+		undoMapList = [];
 		qcServices.viewQcMappedList_ICE(userid)
 		.then(function(data){
 			data.sort(function(a,b) {
