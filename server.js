@@ -490,6 +490,7 @@ if (cluster.isMaster) {
 		app.post('/testNotificationChannels', auth.protect, admin.testNotificationChannels);
 		app.post('/manageNotificationChannels', auth.protect, admin.manageNotificationChannels);
 		app.post('/getNotificationChannels', auth.protect, admin.getNotificationChannels);
+		app.post('/clearQueue', auth.protect, admin.clearQueue);
 
 		//Design Screen Routes
 		app.post('/initScraping_ICE', designscreen.initScraping_ICE);
