@@ -365,11 +365,13 @@ module.exports.Execution_Queue = class Execution_Queue {
                     this.queue_list[poolid]["execution_list"] = []
                 }
             }
-            for (let index in this.queue_list){
-                if(!(index in pools)){
-                    delete this.queue_list[index]
+            if(inputs["poolid"] === "all"){
+                for (let index in this.queue_list){
+                    if(!(index in pools)){
+                        delete this.queue_list[index]
+                    }
                 }
-            }
+            } 
             cache.set("execution_queue", this.queue_list);
         } catch (exception) {
             logger.error("Error in setUpPool. Error: %s", exception);
