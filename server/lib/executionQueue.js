@@ -62,25 +62,49 @@ module.exports.Execution_Queue = class Execution_Queue {
         }
     }
 
-    static updatePools(action, poolinfo) {
+    static updatePools = async(action, poolinfo) => {
+        let result = "fail"
         let inputs = {
             "projectids": [],
             "poolid": "all"
         }
-        switch(action){
-            case "delete":
-                delete this.queue_list[poolinfo.poolid];
-                cache.set("execution_queue", this.queue_list);
-                this.setUpPool(inputs);
-                break;
-            case "create":
-                this.setUpPool(inputs);
-                break;
-            case "update":
-                inputs["poolid"] = poolinfo._id
-                this.setUpPool(inputs);
-                break;
+        try{
+            switch(action){
+                case "delete":
+                    delete this.queue_list[poolinfo.poolid];
+                    cache.set("execution_queue", this.queue_list);
+                    this.setUpPool(inputs);
+                    result = "success";
+                    break;
+                case "create":
+                    this.setUpPool(inputs);
+                    result = "success";
+                    break;
+                case "update":
+                    inputs["poolid"] = poolinfo._id
+                    this.setUpPool(inputs);
+                    result = "success";
+                    break;
+                case "clear_queue":
+                    if(poolinfo.type && poolinfo.type == "all"){
+                        this.queue_list = {}
+                        await cache.set("execution_queue", this.queue_list);ache.set()
+                        this.setUpPool(inputs);
+                    }else{
+                        for(let poolid in poolinfo.poolids){
+                            if(poolid in this.queue_list){
+                                this.queue_list["poolid"]["execution_list"] = []
+                            }
+                        }
+                        cache.set("execution_queue", this.queue_list);
+                    }
+                    result = "success";
+                    break;
+            }
+        }catch(e){
+            logger.error("Error occured in execution queue, action: " + action + " Error: %s" , e);
         }
+        return result;
     }
 
     static add_pending_notification(execIds, report_result, username) {

@@ -1819,6 +1819,16 @@ exports.getAvailable_ICE = async(req,res) => {
 	}
 } 
 
+exports.clearQueue = async(req,res) => {
+	try{
+		const poolinfo = req.body.data;
+		const result = await queue.Execution_Queue.updatePools("clear_queue",poolinfo);
+	}catch(e){
+		logger.error("Error occurred in admin/clearQueue:", exception);
+		res.send("fail");
+	}
+}
+
 exports.exportProject = async (req, res) => {
 	const fnName = 'exportProject';
 	logger.info("Inside UI service: " + fnName);
