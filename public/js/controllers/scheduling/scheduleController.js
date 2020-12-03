@@ -318,7 +318,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 			if(data == "Invalid Session") {
 				$rootScope.redirectPage();
 			} else if(data == "fail") {
-				openModalPopup("Schedule", "Failed to fetch ICE.");
+				openModelPopup("Schedule", "Failed to fetch ICE.");
 				unblockUI()
 			} else {
 				$scope.poolList = data
@@ -336,13 +336,13 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 				}).catch(error=>{
 					unblockUI()
 					console.error(error)
-					openModalPopup("Schedule", "Failed to fetch users.");
+					openModelPopup("Schedule", "Failed to fetch users.");
 				})
 			}
 		}, function (error) {
 			unblockUI();
 			console.error(error)
-			openModalPopup("Edit User", "Failed to fetch users.");
+			openModelPopup("Schedule", "Failed to fetch users.");
 		});
 		$scope.smartBatch = smartBatch
 		return;
