@@ -223,21 +223,29 @@ const registerICE = async (req, res) => {
 };
 
 const getUserICE = (req,res) => {
-	let username = req.body.username;
+	let username = req.session.username;
+	var result = "fail"
 	if(userICEMap[username]){
-		res.send({"ice_list":userICEMap[username]})
+		result = {"ice_list":userICEMap[username]}
 	}
-	res.send("fail")
+	res.send(result)
 }
 
 const setDefaultUserICE = (req,res) => {
-	let user = req.body.username;
-	let defaultICE = req.body.defaultICE;
-	if(userICEMap[user] && userICEMap[user].indexOf(defaultICE) >= 0){
-		let index = userICEMap[user].indexOf(defaultICE);
-		userICEMap[user].splice(index,1);
-		userICEMap.splice(0,0,defaultICE);
+	var result = "fail"
+	try{
+		let user = req.session.username;
+		let defaultICE = req.body.defaultICE;
+		if(userICEMap[user] && userICEMap[user].indexOf(defaultICE) >= 0){
+			let index = userICEMap[user].indexOf(defaultICE);
+			userICEMap[user].splice(index,1);
+			userICEMap[user].splice(0,0,defaultICE);
+		}
+		result = "success"
+	}catch{
+		result = "fail"
 	}
+	res.send(result)
 }
 
 async function sendPendingNotifications(socket,address){

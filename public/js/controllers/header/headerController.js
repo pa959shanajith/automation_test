@@ -154,7 +154,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			$('#executionTerminated').modal('show');
 			$('#executionTerminated').find('.btn-default').focus();
 		} else if (data == "unavailableLocalServer") {
-			openHeaderModalPopup("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
+			openHeaderModalPopup("executeGlobalModal","Execute Test Suite", $rootScope.unavailableLocalServer_msg);
 		} else if (data == "success") {
 			$("#executionCompleted").find('.modal-title').text(msg);
 			$('#executionCompleted').modal('show');
@@ -459,6 +459,47 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			console.error("Error while downloading ICE package. Error:", ex);
 			openHeaderModalPopup("switchRoleStatus", "Download Avo Assure ICE", "Package is not available");
 		}
+	}
+
+	$scope.changeDefICE = () =>{
+		blockUI("Fetching ICE ...")
+		headerServices.getUserICE()
+		.then(function (data) {
+			unblockUI();
+			if(data == 'fail'){
+				openHeaderModalPopup("executeGlobalModal", "Change Default ICE", $rootScope.unavailableLocalServer_msg);
+			}else{
+				$("#selectDefIce").modal("show")
+				$('#chooseDefICE option').remove()
+				var ice=data.ice_list
+				ice.map((e)=>{
+					$('#chooseDefICE').append(`<option value=${e}>${e}</option>`)
+				})
+			}
+		}).catch(error=>{
+			unblockUI()
+			console.error(error)
+			openHeaderModalPopup("executeGlobalModal", "Change Default ICE", $rootScope.unavailableLocalServer_msg);
+		})
+	}
+	
+	$scope.changeDefICEClick = () =>{
+		blockUI("Setting Default ICE ...")
+		$("#selectDefIce").modal("hide")
+		var ice = $('#chooseDefICE').val()
+		headerServices.setDefaultUserICE(ice)
+		.then(function (data) {
+			unblockUI();
+			if(data == 'success'){
+				openHeaderModalPopup("executeGlobalModal", "Change Default ICE", "Changed default ICE successfully");
+			}else{
+				openHeaderModalPopup("executeGlobalModal", "Change Default ICE", "Failed to change default ICE");
+			}
+		}).catch(error=>{
+			unblockUI()
+			console.error(error)
+			openHeaderModalPopup("executeGlobalModal", "Change Default ICE", "Failed to change default ICE");
+		})
 	}
 
 	$scope.redirectToNeuronGraphs = function() {

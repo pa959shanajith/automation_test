@@ -3420,6 +3420,15 @@ li.select_all .addCustObj{
     text-overflow: ellipsis;
 }
 
+#selectDefIce .adminControl{
+    height: 55px;
+}
+
+#selectDefIce select{
+    height: 27px;
+}
+
+
 
 /******************Header CSS***************************/
 
