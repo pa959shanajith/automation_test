@@ -147,7 +147,7 @@ module.exports.Execution_Queue = class Execution_Queue {
             //check if target ICE is present in any pool 
             if (targetICE && targetICE in this.ice_list && this.ice_list[targetICE]["poolid"] in this.queue_list) {
                 //check if target ICE is in DND mode, if true check wether the ice owner is has invoked execution
-                if (this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser) {
+                if (this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser && !this.ice_list["status"]) {
                     if (type == "ACTIVE") {
                         this.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
                     } else {
@@ -155,8 +155,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                     }
                     response['status'] = "pass";
                     response["message"] = "Execution Started on " + targetICE;
-                }
-                else {
+                }else {
                     //get pool in which the target ICE present
                     let pool = this.queue_list[this.ice_list[targetICE]["poolid"]];
                     pool["execution_list"].push(testSuite);
@@ -164,7 +163,9 @@ module.exports.Execution_Queue = class Execution_Queue {
                     cache.set("execution_queue", this.queue_list);
                     //create response message
                     response['status'] = "pass";
-                    response["message"] = "Execution queued on " + targetICE + "\nQueue Length: " + pool["execution_list"].length.toString();
+                    if(this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser && this.ice_list["status"]){
+                        response["message"] = "ICE busy, queuing execution" + "\nExecution queued on " + targetICE + "\nQueue Length: " + pool["execution_list"].length.toString();
+                    } else response["message"] = "Execution queued on " + targetICE + "\nQueue Length: " + pool["execution_list"].length.toString();
                 }
 
             } else if (poolid && poolid in this.queue_list) {
@@ -242,6 +243,10 @@ module.exports.Execution_Queue = class Execution_Queue {
             let userInfo = testSuiteRequest.body.executionData[0].userInfo;
             let testSuite = { "testSuiteRequest": suiteRequest, "type": "API", "userInfo": userInfo }
             if (targetICE && targetICE in this.ice_list && this.ice_list[targetICE]["poolid"] in this.queue_list) {
+                if(this.ice_list[targetICE]["mode"] && !this.ice_list["status"]){
+                    testSuite['res'] = res; 
+                    this.executeAPI(testSuite);
+                }
                 let pool = this.queue_list[this.ice_list[targetICE]["poolid"]];
                 pool["execution_list"].push(testSuite);
                 //save execution queue to redis
