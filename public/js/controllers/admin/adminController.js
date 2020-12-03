@@ -241,13 +241,15 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	}
 	$(document).on('click','#clearQueue', function(e) {
 		blockUI('Clearing Queue ...')
-		var poolid = []
-		if($scope.createIcePool.selectedIcePool && $scope.createIcePool.selectedIcePool.poolname){
-			poolid.push($scope.createIcePool.selectedIcePool.poolname)
+		var poolids = []
+		var type = "any";
+		if($scope.createIcePool.selectedIcePool && $scope.createIcePool.selectedIcePool._id){
+			poolids.push($scope.createIcePool.selectedIcePool._id)
 		}else{
-			poolid.push("all")	
+			type = "all"	
 		}
-		adminServices.clearQueue(poolid)
+		var input = {"poolids":poolids,"type":type}
+		adminServices.clearQueue(input)
 		.then((data)=>{
 			if (data == "success") {
 				openModalPopup("Success", "Cleared queue successfully.");

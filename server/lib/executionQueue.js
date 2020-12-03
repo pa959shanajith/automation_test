@@ -88,12 +88,12 @@ module.exports.Execution_Queue = class Execution_Queue {
                 case "clear_queue":
                     if(poolinfo.type && poolinfo.type == "all"){
                         this.queue_list = {}
-                        await cache.set("execution_queue", this.queue_list);ache.set()
+                        await cache.set("execution_queue", this.queue_list);
                         this.setUpPool(inputs);
                     }else{
-                        for(let poolid in poolinfo.poolids){
-                            if(poolid in this.queue_list){
-                                this.queue_list["poolid"]["execution_list"] = []
+                        for(let index in poolinfo.poolids){
+                            if(poolinfo.poolids[index] in this.queue_list){
+                                this.queue_list[poolinfo.poolids[index]]["execution_list"] = []
                             }
                         }
                         cache.set("execution_queue", this.queue_list);
