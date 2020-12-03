@@ -223,7 +223,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		});
 	})
 	
-	const createIcePoolReset = () => {
+	const createIcePoolReset = () =>{
 		$scope.tokens.name=undefined
 		$scope.createIcePool.poolName = ""
 		$('#assignedProjectAP option').appendTo($('#allProjectAP'))
@@ -231,6 +231,40 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$('#tokenName').val('')
 		$('#tokenName').removeClass('error-border')
 	}
+
+	$scope.clearQueue = () =>{
+		if($scope.createIcePool.selectedIcePool && $scope.createIcePool.selectedIcePool.poolname){
+			openDeleteGlobalModal("Clear Queue", "clearQueue", `Are you sure you want to clear queue of the ICE pool : ${$scope.createIcePool.selectedIcePool.poolname} ? \nAll the jobs queued in this pool will be cancelled.`);
+		}else{
+			openDeleteGlobalModal("Clear Queue", "clearQueue", `Are you sure you want to clear all the queues ? \nAll the jobs queued in every pool will be cancelled.`);
+		}
+	}
+	$(document).on('click','#clearQueue', function(e) {
+		blockUI('Clearing Queue ...')
+		var poolids = []
+		var type = "any";
+		if($scope.createIcePool.selectedIcePool && $scope.createIcePool.selectedIcePool._id){
+			poolids.push($scope.createIcePool.selectedIcePool._id)
+		}else{
+			type = "all"	
+		}
+		var input = {"poolids":poolids,"type":type}
+		adminServices.clearQueue(input)
+		.then((data)=>{
+			if (data == "success") {
+				openModalPopup("Success", "Cleared queue successfully.");
+			} else if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			}else {
+				openModalPopup("ICE Pool", "Failed to clear queue");
+			}
+			unblockUI()
+		},(error)=>{
+			openModalPopup("ICE Pool", "Failed to clear queue");
+			console.log("Error:::::::::::::", error);
+			unblockUI()
+		})
+	})
 
 	$scope.EditIcePoolReset = () =>{
 		$('#update-icepool-rename').addClass("hide")
@@ -376,7 +410,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		})
 	}
 
-	$scope.createIcePool.deleteIcePool = () =>{
+	$scope.createIcePool.deleteIcePool = function () {
+		openDeleteGlobalModal("Delete ICE Pool", "delICEPool", `Are you sure you want to delete ICE Pool : ${$scope.createIcePool.selectedIcePool.poolname} ? \nAll the jobs queued on this pool will be canceled.`);
+	};
+
+	$(document).on('click','#delICEPool', function(e) {
+		hideDeleteGlobalModal();
 		blockUI('Deleting ICE Pool ...')
 		var id = $scope.createIcePool.selectedIcePool._id
 		adminServices.deletePools({'poolid':[id]})
@@ -398,7 +437,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			console.log("Error:::::::::::::", error);
 			unblockUI()
 		})
-	}
+	})
 	
 	// on click of allocate ice pool button
 	$scope.allocateIcePool.click = async() =>{
@@ -518,8 +557,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		blockUI('Fetching ICE Pools...')
 		$scope.allocateIcePool.iceData = {}
 		$scope.allocateIcePool.type = type
-		$(".active-opt").removeClass("active-opt").addClass('btn-md');
-		$('#icepool-'+type).addClass('active-opt').removeClass('btn-md');
+		$(".unactive-opt").removeClass("unactive-opt")
+		if(type==='quantity'){
+			$('#icepool-specific').addClass('unactive-opt')
+		}else{
+			$('#icepool-quantity').addClass('unactive-opt')
+		}
 		$scope.allocationPoolReset()
 		adminServices.getAvailable_ICE()
 		.then((data)=>{

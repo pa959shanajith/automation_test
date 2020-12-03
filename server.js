@@ -486,6 +486,7 @@ if (cluster.isMaster) {
 		app.post('/getPools', auth.protect, admin.getPools);
 		app.post('/updatePool', auth.protect, admin.updatePool);
 		app.post('/createPool_ICE', auth.protect, admin.createPool_ICE);
+		app.post('/clearQueue', auth.protect, admin.clearQueue);
 		app.post('/exportProject', auth.protect, admin.exportProject);
 		app.post('/testNotificationChannels', auth.protect, admin.testNotificationChannels);
 		app.post('/manageNotificationChannels', auth.protect, admin.manageNotificationChannels);
@@ -569,6 +570,8 @@ if (cluster.isMaster) {
 		app.post('/APG_runDeadcodeIdentifier', flowGraph.APG_runDeadcodeIdentifier);
 		// ICE Provisioning
 		app.post('/ICE_provisioning_register', io.registerICE);
+		app.post('/getUserICE', auth.protect, io.getUserICE)
+		app.post('/setDefaultUserICE', auth.protect, io.setDefaultUserICE)
 		//-------------Route Mapping-------------//
 
 		// To prevent can't send header response

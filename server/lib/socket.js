@@ -13,7 +13,7 @@ let userICEMap={};
 let socketMapUI = {};
 let socketMapScheduling = {};
 let socketMapNotify = {};
-
+let iceUserMap = {};
 module.exports = io;
 module.exports.allSocketsMap = socketMap;
 module.exports.allSocketsICEUser=userICEMap;
@@ -80,7 +80,9 @@ io.on('connection', async socket => {
 				socket.send('checkConnection', result.ice_check);
 				if (result.node_check === "allow") {
 					socketMap[icename] = socket;
-					userICEMap[result.username]=icename;
+					if(!userICEMap[result.username]) userICEMap[result.username] = []
+					iceUserMap[icename] = result.username;
+					if(!userICEMap[result.username].includes(icename)) userICEMap[result.username].push(icename);
 					setTimeout(()=> {
 						socket.send('connected', result.ice_check);
 						socket.emit('update_screenshot_path', screenShotPath, benchmarkRunTimes,pingTimer);
@@ -126,6 +128,12 @@ io.on('connection', async socket => {
 				logger.info('Disconnecting from ICE socket (%s) : %s', reason, address);
 				redisServer.redisSubClient.unsubscribe('ICE1_normal_' + address);
 				delete socketMap[address];
+				if(address in iceUserMap){
+					let user = iceUserMap[address];
+					let index = userICEMap[user].indexOf(address);
+					userICEMap[user].splice(index,1);
+					delete iceUserMap[address];
+				}
 				module.exports.allSocketsMap = socketMap;
 				logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
 				logger.debug("Clients connected for Normal mode : %s", Object.keys(socketMap).join());
@@ -214,6 +222,32 @@ const registerICE = async (req, res) => {
 	res.send(data.ice_check);
 };
 
+const getUserICE = (req,res) => {
+	let username = req.session.username;
+	var result = "fail"
+	if(userICEMap[username]){
+		result = {"ice_list":userICEMap[username]}
+	}
+	res.send(result)
+}
+
+const setDefaultUserICE = (req,res) => {
+	var result = "fail"
+	try{
+		let user = req.session.username;
+		let defaultICE = req.body.defaultICE;
+		if(userICEMap[user] && userICEMap[user].indexOf(defaultICE) >= 0){
+			let index = userICEMap[user].indexOf(defaultICE);
+			userICEMap[user].splice(index,1);
+			userICEMap[user].splice(0,0,defaultICE);
+		}
+		result = "success"
+	}catch{
+		result = "fail"
+	}
+	res.send(result)
+}
+
 async function sendPendingNotifications(socket,address){
 	var pending_notification = await cache.get("pending_notification")
 		if(pending_notification && Object.keys(pending_notification).length > 0){
@@ -227,3 +261,5 @@ async function sendPendingNotifications(socket,address){
 		}
 }
 module.exports.registerICE = registerICE;
+module.exports.getUserICE = getUserICE;
+module.exports.setDefaultUserICE = setDefaultUserICE;

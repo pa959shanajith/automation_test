@@ -16,7 +16,8 @@ exports.flowGraphResults = function(req, res){
 	try{
 		if(isSessionActive(req)){
 			var username = req.session.username;
-			var icename=myserver.allSocketsICEUser[username];
+			var icename = undefined
+			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
 			var version = req.body.version;
 			var path = req.body.path;
 			redisServer.redisSubServer.subscribe('ICE2_' + icename ,1);
@@ -81,7 +82,8 @@ exports.APG_OpenFileInEditor = function (req, res) {
 		logger.info("Inside UI service: APG_OpenFileInEditor");
 		if (isSessionActive(req)) {
 			var username = req.session.username;
-			var icename = myserver.allSocketsICEUser[username];
+			var icename = undefined
+			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
 			redisServer.redisSubServer.subscribe('ICE2_' + icename);
 			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
 				if (redisres[1]>0) {
@@ -176,7 +178,9 @@ exports.APG_runDeadcodeIdentifier = function(req,res){
 	try{
 			logger.info("Inside UI service: APG_runDeadcodeIdentifier");
 			if(isSessionActive(req)){
-				var icename = myserver.allSocketsICEUser[req.session.username];
+				var username = req.session.username;
+				var icename = undefined
+				if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
 				redisServer.redisSubServer.subscribe('ICE2_' + icename);
 				redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
 					if (redisres[1]>0) {

@@ -62,25 +62,49 @@ module.exports.Execution_Queue = class Execution_Queue {
         }
     }
 
-    static updatePools(action, poolinfo) {
+    static updatePools = async(action, poolinfo) => {
+        let result = "fail"
         let inputs = {
             "projectids": [],
             "poolid": "all"
         }
-        switch(action){
-            case "delete":
-                delete this.queue_list[poolinfo.poolid];
-                cache.set("execution_queue", this.queue_list);
-                this.setUpPool(inputs);
-                break;
-            case "create":
-                this.setUpPool(inputs);
-                break;
-            case "update":
-                inputs["poolid"] = poolinfo._id
-                this.setUpPool(inputs);
-                break;
+        try{
+            switch(action){
+                case "delete":
+                    delete this.queue_list[poolinfo.poolid];
+                    cache.set("execution_queue", this.queue_list);
+                    this.setUpPool(inputs);
+                    result = "success";
+                    break;
+                case "create":
+                    this.setUpPool(inputs);
+                    result = "success";
+                    break;
+                case "update":
+                    inputs["poolid"] = poolinfo._id
+                    this.setUpPool(inputs);
+                    result = "success";
+                    break;
+                case "clear_queue":
+                    if(poolinfo.type && poolinfo.type == "all"){
+                        this.queue_list = {}
+                        await cache.set("execution_queue", this.queue_list);
+                        this.setUpPool(inputs);
+                    }else{
+                        for(let index in poolinfo.poolids){
+                            if(poolinfo.poolids[index] in this.queue_list){
+                                this.queue_list[poolinfo.poolids[index]]["execution_list"] = []
+                            }
+                        }
+                        cache.set("execution_queue", this.queue_list);
+                    }
+                    result = "success";
+                    break;
+            }
+        }catch(e){
+            logger.error("Error occured in execution queue, action: " + action + " Error: %s" , e);
         }
+        return result;
     }
 
     static add_pending_notification(execIds, report_result, username) {
@@ -123,7 +147,7 @@ module.exports.Execution_Queue = class Execution_Queue {
             //check if target ICE is present in any pool 
             if (targetICE && targetICE in this.ice_list && this.ice_list[targetICE]["poolid"] in this.queue_list) {
                 //check if target ICE is in DND mode, if true check wether the ice owner is has invoked execution
-                if (this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser) {
+                if (this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser && !this.ice_list[targetICE]["status"]) {
                     if (type == "ACTIVE") {
                         this.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
                     } else {
@@ -131,8 +155,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                     }
                     response['status'] = "pass";
                     response["message"] = "Execution Started on " + targetICE;
-                }
-                else {
+                }else {
                     //get pool in which the target ICE present
                     let pool = this.queue_list[this.ice_list[targetICE]["poolid"]];
                     pool["execution_list"].push(testSuite);
@@ -140,7 +163,9 @@ module.exports.Execution_Queue = class Execution_Queue {
                     cache.set("execution_queue", this.queue_list);
                     //create response message
                     response['status'] = "pass";
-                    response["message"] = "Execution queued on " + targetICE + "\nQueue Length: " + pool["execution_list"].length.toString();
+                    if(this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser && this.ice_list[targetICE]["status"]){
+                        response["message"] = "ICE busy, queuing execution" + "\nExecution queued on " + targetICE + "\nQueue Length: " + pool["execution_list"].length.toString();
+                    } else response["message"] = "Execution queued on " + targetICE + "\nQueue Length: " + pool["execution_list"].length.toString();
                 }
 
             } else if (poolid && poolid in this.queue_list) {
@@ -218,6 +243,10 @@ module.exports.Execution_Queue = class Execution_Queue {
             let userInfo = testSuiteRequest.body.executionData[0].userInfo;
             let testSuite = { "testSuiteRequest": suiteRequest, "type": "API", "userInfo": userInfo }
             if (targetICE && targetICE in this.ice_list && this.ice_list[targetICE]["poolid"] in this.queue_list) {
+                if(this.ice_list[targetICE]["mode"] && !this.ice_list[targetICE]["status"]){
+                    testSuite['res'] = res; 
+                    this.executeAPI(testSuite);
+                }
                 let pool = this.queue_list[this.ice_list[targetICE]["poolid"]];
                 pool["execution_list"].push(testSuite);
                 //save execution queue to redis
@@ -280,6 +309,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         if (!ice_name in this.ice_list) {
             return result;
         }
+        if(!this.ice_list[ice_name]) this.ice_list[ice_name] = {"connected": true,"poolid":"","_id":""};
         //update ice mode and status in this.ice_list
         this.ice_list[ice_name]["mode"] = data.value.mode;
         this.ice_list[ice_name]["status"] = data.value.status;
@@ -392,17 +422,12 @@ module.exports.Execution_Queue = class Execution_Queue {
         }
         for (let ice in list) {
             let ice_name = list[ice]["icename"];
-            this.ice_list[ice_name] = {}
-            this.ice_list[ice_name]["poolid"] = poolid;
-            this.ice_list[ice_name]["mode"] = false
-            this.ice_list[ice_name]["status"] = false
-            this.ice_list[ice_name]["connected"] = false
-            this.ice_list[ice_name]["_id"] = list[ice]["_id"]
+            this.ice_list[ice_name] = {"poolid":poolid, "mode": false, "status": false, "connected": false, "_id": list[ice]["_id"]};
         }
         for(let ice in this.ice_list){
             if(this.ice_list[ice]["poolid"] === poolid){
                 if(!(this.ice_list[ice]['_id'] in list)){
-                    delete this.ice_list[ice]
+                    this.ice_list[ice]['poolid'] = "";
                 }
             }
         }
@@ -613,10 +638,7 @@ module.exports.Execution_Queue = class Execution_Queue {
 
     static async connect_ice(ice_name) {
         this.queue_list = await cache.get("execution_queue")
-        this.ice_list[ice_name] = {}
-        this.ice_list[ice_name]["connected"] = true;
-        this.ice_list[ice_name]["status"] = false;
-        this.ice_list[ice_name]["mode"] = false;
+        this.ice_list[ice_name] = {"connected":true,"status": true,"mode": false,"poolid":"","_id":""};
     }
 
 }

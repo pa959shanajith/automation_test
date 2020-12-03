@@ -83,7 +83,8 @@ const checkForICEstatus = async (icename, fnName) => {
 const openScreenShot = async (username, path) => {
     const fnName = "openScreenShot";
     try {
-        const icename = myserver.allSocketsICEUser[username];
+        var icename = undefined
+		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
         const iceStatus = await checkForICEstatus(icename, fnName);
         if (iceStatus !== null) return iceStatus;
         redisServer.redisSubServer.subscribe('ICE2_' + icename);
@@ -622,7 +623,8 @@ exports.connectJira_ICE = function(req, res) {
     try {
         if (utils.isSessionActive(req)) {
             var username=req.session.username;
-            var icename = myserver.allSocketsICEUser[username];
+            var icename = undefined
+			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
             redisServer.redisSubServer.subscribe('ICE2_' + icename);
             if (req.body.action == 'loginToJira') { //Login to Jira for creating issues
                 var jiraurl = req.body.url;

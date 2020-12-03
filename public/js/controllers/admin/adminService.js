@@ -248,6 +248,12 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			return $http.post('/getAvailable_ICE').then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
+		clearQueue: function (pool) {
+			return $http.post('/clearQueue',{
+				data:pool
+			}).then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
 		
 	};
 }]);
