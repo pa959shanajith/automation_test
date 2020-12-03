@@ -147,7 +147,7 @@ module.exports.Execution_Queue = class Execution_Queue {
             //check if target ICE is present in any pool 
             if (targetICE && targetICE in this.ice_list && this.ice_list[targetICE]["poolid"] in this.queue_list) {
                 //check if target ICE is in DND mode, if true check wether the ice owner is has invoked execution
-                if (this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser && !this.ice_list["status"]) {
+                if (this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser && !this.ice_list[targetICE]["status"]) {
                     if (type == "ACTIVE") {
                         this.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
                     } else {
@@ -163,7 +163,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                     cache.set("execution_queue", this.queue_list);
                     //create response message
                     response['status'] = "pass";
-                    if(this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser && this.ice_list["status"]){
+                    if(this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser && this.ice_list[targetICE]["status"]){
                         response["message"] = "ICE busy, queuing execution" + "\nExecution queued on " + targetICE + "\nQueue Length: " + pool["execution_list"].length.toString();
                     } else response["message"] = "Execution queued on " + targetICE + "\nQueue Length: " + pool["execution_list"].length.toString();
                 }
@@ -243,7 +243,7 @@ module.exports.Execution_Queue = class Execution_Queue {
             let userInfo = testSuiteRequest.body.executionData[0].userInfo;
             let testSuite = { "testSuiteRequest": suiteRequest, "type": "API", "userInfo": userInfo }
             if (targetICE && targetICE in this.ice_list && this.ice_list[targetICE]["poolid"] in this.queue_list) {
-                if(this.ice_list[targetICE]["mode"] && !this.ice_list["status"]){
+                if(this.ice_list[targetICE]["mode"] && !this.ice_list[targetICE]["status"]){
                     testSuite['res'] = res; 
                     this.executeAPI(testSuite);
                 }
