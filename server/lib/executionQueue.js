@@ -309,7 +309,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         if (!ice_name in this.ice_list) {
             return result;
         }
-        if(!this.ice_list[ice_name]) this.ice_list[ice_name] = {}
+        if(!this.ice_list[ice_name]) this.ice_list[ice_name] = {"connected": true,"poolid":"","_id":""};
         //update ice mode and status in this.ice_list
         this.ice_list[ice_name]["mode"] = data.value.mode;
         this.ice_list[ice_name]["status"] = data.value.status;
@@ -422,17 +422,12 @@ module.exports.Execution_Queue = class Execution_Queue {
         }
         for (let ice in list) {
             let ice_name = list[ice]["icename"];
-            this.ice_list[ice_name] = {}
-            this.ice_list[ice_name]["poolid"] = poolid;
-            this.ice_list[ice_name]["mode"] = false
-            this.ice_list[ice_name]["status"] = false
-            this.ice_list[ice_name]["connected"] = false
-            this.ice_list[ice_name]["_id"] = list[ice]["_id"]
+            this.ice_list[ice_name] = {"poolid":poolid, "mode": false, "status": false, "connected": false, "_id": list[ice]["_id"]};
         }
         for(let ice in this.ice_list){
             if(this.ice_list[ice]["poolid"] === poolid){
                 if(!(this.ice_list[ice]['_id'] in list)){
-                    delete this.ice_list[ice]
+                    this.ice_list[ice]['poolid'] = "";
                 }
             }
         }
@@ -643,10 +638,7 @@ module.exports.Execution_Queue = class Execution_Queue {
 
     static async connect_ice(ice_name) {
         this.queue_list = await cache.get("execution_queue")
-        this.ice_list[ice_name] = {}
-        this.ice_list[ice_name]["connected"] = true;
-        this.ice_list[ice_name]["status"] = false;
-        this.ice_list[ice_name]["mode"] = false;
+        this.ice_list[ice_name] = {"connected":true,"status": true,"mode": false,"poolid":"","_id":""};
     }
 
 }

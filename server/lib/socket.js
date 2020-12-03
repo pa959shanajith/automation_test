@@ -82,7 +82,7 @@ io.on('connection', async socket => {
 					socketMap[icename] = socket;
 					if(!userICEMap[result.username]) userICEMap[result.username] = []
 					iceUserMap[icename] = result.username;
-					userICEMap[result.username].push(icename);
+					if(!userICEMap[result.username].includes(icename)) userICEMap[result.username].push(icename);
 					setTimeout(()=> {
 						socket.send('connected', result.ice_check);
 						socket.emit('update_screenshot_path', screenShotPath, benchmarkRunTimes,pingTimer);

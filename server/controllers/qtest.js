@@ -16,8 +16,8 @@ exports.loginToQTest_ICE = function (req, res) {
 	var name;
 	try {
 		logger.info("Inside UI service: loginQCServer_ICE");
-		var username = req.session.username;
 		if (utils.isSessionActive(req)) {
+			var username = req.session.username;
 			var name = undefined
 			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
 			redisServer.redisSubServer.subscribe('ICE2_' + name);

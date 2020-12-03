@@ -369,7 +369,6 @@ exports.saveZephyrDetails_ICE = function (req, res) {
 exports.viewZephyrMappedList_ICE = function (req, res) {
 	logger.info("Inside UI service: viewZephyrMappedList_ICE");
 	var userid = req.body.user_id;
-	//var name = myserver.allSocketsICEUser[req.session.username];
 	getZephyrDetailsForUser(userid, function (responsedata) {
 		res.send(responsedata);
 	});

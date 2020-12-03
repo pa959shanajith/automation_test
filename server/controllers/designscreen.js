@@ -24,8 +24,8 @@ exports.initScraping_ICE = function (req, res) {
 	logger.info("Inside UI service: initScraping_ICE");
 	try {
 		if (utils.isSessionActive(req)) {
-			var username=req.session.username;
-			var icename = undefined
+			username=req.session.username;
+			icename = undefined
 			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
 			redisServer.redisSubServer.subscribe('ICE2_' + icename);	
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
