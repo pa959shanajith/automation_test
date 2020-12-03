@@ -571,7 +571,7 @@ if (cluster.isMaster) {
 		// ICE Provisioning
 		app.post('/ICE_provisioning_register', io.registerICE);
 		app.post('/getUserICE', auth.protect, io.getUserICE)
-		app.post('/setDefaultICE', auth.protect, io.setDefaultUserICE)
+		app.post('/setDefaultUserICE', auth.protect, io.setDefaultUserICE)
 		//-------------Route Mapping-------------//
 
 		// To prevent can't send header response
