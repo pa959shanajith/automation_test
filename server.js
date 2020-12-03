@@ -570,6 +570,8 @@ if (cluster.isMaster) {
 		app.post('/APG_runDeadcodeIdentifier', flowGraph.APG_runDeadcodeIdentifier);
 		// ICE Provisioning
 		app.post('/ICE_provisioning_register', io.registerICE);
+		app.post('/getUserICE', auth.protect, io.getUserICE)
+		app.post('/setDefaultICE', auth.protect, io.setDefaultUserICE)
 		//-------------Route Mapping-------------//
 
 		// To prevent can't send header response

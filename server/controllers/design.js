@@ -201,8 +201,9 @@ exports.debugTestCase_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: debugTestCase_ICE");
 		if (utils.isSessionActive(req)) {
-			username=req.session.username;
-			icename = myserver.allSocketsICEUser[username];
+			var username=req.session.username;
+			var icename = undefined
+			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
 			redisServer.redisSubServer.subscribe('ICE2_' + icename);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
