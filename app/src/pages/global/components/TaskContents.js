@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import * as pluginApi from '../../plugin/api';
+import { updateTaskStatus } from '../api';
 import * as actionTypes from "../../plugin/state/action";
 import "../styles/TaskContents.scss";
 
@@ -64,7 +64,7 @@ const TaskPanel = (props) => {
         let taskObj = {};
         if(dataobj.status==='assigned'){
             dataobj.status='inprogress';
-            pluginApi.updateTaskStatus(dataobj.subtaskid)
+            updateTaskStatus(dataobj.subtaskid)
                     .then(data => {
                         dataobj.status=data;
                     })

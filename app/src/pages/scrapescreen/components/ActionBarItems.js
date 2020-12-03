@@ -35,7 +35,7 @@ const UpperContent = props => {
         { 'title': "Edge Chromium", 'svg': "static/imgs/ic-edge-chromium.svg", action: () => initScraping('chromium'), 'disable': disableAction }
     ]
 
-    const oebsList = [{ 'title': "OEBS Apps", 'img': 'static/imgs/ic-desktop.png', action: () => console.log(""), 'disable': disableAction }]
+    const oebsList = [{ 'title': "OEBS Apps", 'img': 'static/imgs/ic-desktop.png', action: ()=> props.setShowAppPop({'appType': 'OEBS', 'startScrape': (scrapeObjects)=>initScraping(scrapeObjects)}), 'disable': disableAction }]
 
     const desktopList = [{ 'title': "Desktop Apps", 'img': 'static/imgs/ic-desktop.png', action: () => props.setShowAppPop({'appType': 'Desktop', 'startScrape': (scrapeObjects)=>initScraping(scrapeObjects)}), 'disable': disableAction }]
 
@@ -45,7 +45,7 @@ const UpperContent = props => {
 
     const mobileAppList = [{ 'title': "Mobile Apps", 'img': 'static/imgs/ic-mobility.png', action: () => props.setShowAppPop({'appType': 'MobileApp', 'startScrape': (scrapeObjects)=>initScraping(scrapeObjects)}), 'disable': disableAction }]
 
-    const mobileWebList = [{ 'title': "Mobile Web", 'img': 'static/imgs/ic-mobility.png', action: () => console.log(""), 'disable': disableAction }]
+    const mobileWebList = [{ 'title': "Mobile Web", 'img': 'static/imgs/ic-mobility.png', action: () => props.setShowAppPop({'appType': 'MobileWeb', 'startScrape': (scrapeObjects)=>initScraping(scrapeObjects)}), 'disable': disableAction }]
 
 
     const onAppend = event => {
@@ -189,77 +189,62 @@ const UpperContent = props => {
         // //For Mobility
 
         // //For Mobility Web
-        // else if ($scope.getScreenView == "MobileWeb") {
-        //     if ($(document).find("#mobilityWebSerialNo").val() == "" && browserType != 'pdf') {
-        //         $(document).find("#mobilityWebSerialNo").addClass("inputErrorBorder" && browserType != 'pdf')
-        //         return false
-        //     } else if ($(document).find("#mobilityAndroidVersion").val() == "" && browserType != 'pdf') {
-        //         $(document).find("#mobilityAndroidVersion").addClass("inputErrorBorder")
-        //         return false
-        //     } else if (browserType == 'pdf'){
-        //         screenViewObject.appType = browserType;
-        //         // blockUI(blockMsg);
-        //         if ($rootScope.compareFlag == true) {
-        //             blockUI(blockMsg2);
-        //             e.stopImmediatePropagation();
-        //         }
-        //         else {
-        //             blockUI(blockMsg);
-        //             e.stopImmediatePropagation();
-        //         }
-        //     } 
-        //     else {
-        //         $(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion").removeClass("inputErrorBorder")
-        //         screenViewObject.appType = $scope.getScreenView,
-        //             screenViewObject.mobileSerial = $(document).find("#mobilityWebSerialNo").val();
-        //         screenViewObject.androidVersion = $(document).find("#mobilityAndroidVersion").val();
-        //         $("#launchMobilityWeb").modal("hide");
-        //         // blockUI(blockMsg);
-        //         if ($rootScope.compareFlag == true) {
-        //             blockUI(blockMsg2);
-        //             e.stopImmediatePropagation();
-        //         }
-        //         else {
-        //             blockUI(blockMsg);
-        //             e.stopImmediatePropagation();
-        //         }
-        //     }
-        // }
+        else if (appType === "MobileWeb") {
+            if (browserType === 'pdf'){
+                screenViewObject.appType = browserType;
+
+                // if ($rootScope.compareFlag == true) {
+                //     blockUI(blockMsg2);
+                //     e.stopImmediatePropagation();
+                // }
+                // else {
+                    props.setOverlay(blockMsg);
+                //     e.stopImmediatePropagation();
+                // }
+            } 
+            else {
+                screenViewObject.appType = appType;
+                screenViewObject.mobileSerial = browserType.slNum;
+                screenViewObject.androidVersion = browserType.vernNum;
+                
+                // if ($rootScope.compareFlag == true) {
+                //     blockUI(blockMsg2);
+                //     e.stopImmediatePropagation();
+                // }
+                // else {
+                    props.setOverlay(blockMsg);
+                //     e.stopImmediatePropagation();
+                // }
+            }
+        }
         // //For Mobility Web
 
         // //For OEBS
-        // else if ($scope.getScreenView == "OEBS") {
-        //     if ($(document).find("#OEBSPath").val() == "" && browserType != 'pdf' ) {
-        //         $(document).find("#OEBSPath").addClass("inputErrorBorder")
-        //         return false
-        //     } else if (browserType == 'pdf'){
-        //         screenViewObject.appType = browserType;
-        //         // blockUI(blockMsg);
-        //         if ($rootScope.compareFlag == true) {
-        //             blockUI(blockMsg2);
-        //             e.stopImmediatePropagation();
-        //         }
-        //         else {
-        //             blockUI(blockMsg);
-        //             e.stopImmediatePropagation();
-        //         }
-        //     } 
-        //     else {
-        //         $(document).find("#OEBSPath").removeClass("inputErrorBorder")
-        //         screenViewObject.appType = $scope.getScreenView,
-        //             screenViewObject.applicationPath = $(document).find("#OEBSPath").val();
-        //         $("#launchOEBSApps").modal("hide");
-        //         // blockUI(blockMsg);
-        //         if ($rootScope.compareFlag == true) {
-        //             blockUI(blockMsg2);
-        //             e.stopImmediatePropagation();
-        //         }
-        //         else {
-        //             blockUI(blockMsg);
-        //             e.stopImmediatePropagation();
-        //         }
-        //     }
-        // }
+        else if (appType === "OEBS") {
+            if (browserType === 'pdf'){
+                screenViewObject.appType = browserType;
+                // if ($rootScope.compareFlag == true) {
+                //     blockUI(blockMsg2);
+                //     e.stopImmediatePropagation();
+                // }
+                // else {
+                    props.setOverlay(blockMsg);
+                    // e.stopImmediatePropagation();
+                // }
+            } 
+            else {
+                screenViewObject.appType = appType;
+                screenViewObject.applicationPath = browserType.winName;
+                // if ($rootScope.compareFlag == true) {
+                //     blockUI(blockMsg2);
+                //     e.stopImmediatePropagation();
+                // }
+                // else {
+                    props.setOverlay(blockMsg);
+                //     e.stopImmediatePropagation();
+                // }
+            }
+        }
         //For PDF
         else if(browserType === "pdf"){
             screenViewObject.appType = browserType;
@@ -362,14 +347,15 @@ const UpperContent = props => {
                         }
 
                         let scrapeItem = {  objId: ob._id, 
-                                            xpath: ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' '),
-                                            left: ob.left,
-                                            top: ob.top,
-                                            width: ob.width,
-                                            height:  ob.height,
-                                            tag: ob.tag,
-                                            url: ob.url,
-                                            hiddentag: ob.hiddentag,
+                                            // xpath: ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' '),
+                                            // left: ob.left,
+                                            // top: ob.top,
+                                            // width: ob.width,
+                                            // height:  ob.height,
+                                            // tag: ob.tag,
+                                            // url: ob.url,
+                                            // hiddentag: ob.hiddentag,
+                                            objIdx: i,
                                             val: ob.tempId,
                                             hide: false,
                                             title: ob.custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim()
@@ -387,7 +373,6 @@ const UpperContent = props => {
                     }
                     props.setNewScrapedData(viewString);
                     props.updateScrapeItems(localScrapeList)
-                    props.setScrapeChanged(true);
                     
                     if (viewString.view.length > 0) props.setSaved(false);
 
@@ -541,11 +526,10 @@ const ActionBarItems = props => {
     const { appType } = useSelector(state=>state.plugin.CT);
     return (
         <ActionBar
-            upperContent={ appType === "Mainframe" ? null : <UpperContent setShowAppPop={props.setShowAppPop} setNewScrapedData={props.setNewScrapedData} setScrapeChanged={props.setScrapeChanged} setDeleteFlag={props.setDeleteFlag} appendCheck={props.appendCheck} setAppendCheck={props.setAppendCheck} scrapeItems={props.scrapeItems} mainScrapedData={props.mainScrapedData} setMainScrapedData={props.setMainScrapedData} setOverlay={props.setOverlay} setShowPop={props.setShowPop} updateScrapeItems={props.updateScrapeItems} />}
+            upperContent={ appType === "Mainframe" ? null : <UpperContent setShowAppPop={props.setShowAppPop} setNewScrapedData={props.setNewScrapedData} setSaved={props.setSaved} appendCheck={props.appendCheck} setAppendCheck={props.setAppendCheck} scrapeItems={props.scrapeItems} setOverlay={props.setOverlay} setShowPop={props.setShowPop} updateScrapeItems={props.updateScrapeItems} />}
             bottomContent={ appType === "Mainframe" ? null : <BottomContent  />}
         />
     )
 }
 
 export default ActionBarItems;
-

@@ -3,7 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useHistory, Link, Redirect } from 'react-router-dom';
 import { RedirectPage, PopupMsg, ModalContainer, ScreenOverlay } from '../../global';
 import "../styles/Header.scss";
-import * as loginApi from '../../login/api';
+import { loadUserInfo } from '../../login/api';
+import { getRoleNameByRoleId } from '../api';
 import * as actionTypes from '../../login/state/action';
 import ClickAwayListener from 'react-click-away-listener';
 import ChangePassword from './ChangePassword';
@@ -89,7 +90,7 @@ const Header = () => {
 			setShowSR(false);
 			setShowSR_Pop({'title': 'Switch Role', 'content': "There are no roles to switch"});
 		} else {
-			loginApi.getRoleNameByRoleId(roleasarray)
+			getRoleNameByRoleId(roleasarray)
 			.then(data => {
 				if (data === "Invalid Session") {
                     RedirectPage(history);
@@ -132,7 +133,7 @@ const Header = () => {
     const switchedRole = event => {
         setShowConfSR(false);
         setShowOverlay(`Switching to ${clickedRole.data}`)
-		loginApi.loadUserInfo(clickedRole.rid)
+		loadUserInfo(clickedRole.rid)
 		.then(data => {
             setShowOverlay("");
 			if (data !== "fail") {
@@ -201,7 +202,7 @@ const Header = () => {
     return(
         <> 
             { redirectTo && <Redirect to={redirectTo} /> }
-            { showChangePass && <ChangePassword setShow={toggleChangePass} loginApi={loginApi} setSuccessPass={setSuccessPass} /> }
+            { showChangePass && <ChangePassword setShow={toggleChangePass} setSuccessPass={setSuccessPass} /> }
             { showSuccessPass && <PasswordSuccessPopup /> }
             { showConfSR && <ConfSwitchRole />  }
             { showSR_Pop && <SRPopup /> }

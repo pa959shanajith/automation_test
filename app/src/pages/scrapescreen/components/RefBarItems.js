@@ -7,6 +7,7 @@ import "../styles/RefBarItems.scss";
 const RefBarItems = props => {
 
 	const { appType } = useSelector(state=>state.plugin.CT);
+    const [toFilter, setToFilter] = useState([]);
 	// const [isMac, setIsMac] = useState(false);
 	const [tagList, setTagList] = useState([]);
 	const [showFilterPop, setShowFilterPop] = useState(false);
@@ -88,23 +89,29 @@ const RefBarItems = props => {
         setShowFilterPop(!showFilterPop)
     }
     const filterMain=(dataTag)=>{
-		let tempToFilterArr = [...props.toFilter];
+		let tempToFilterArr = [...toFilter];
 		if (dataTag === "*selectAll*") {
-			for (let tag of tagList) {
-				if (tagList.length === tempToFilterArr.length) {
-					tempToFilterArr = []
-					break;
-				} else if (!tempToFilterArr.includes(tag.tag)) tempToFilterArr.push(tag.tag);
+			if (tagList.length === tempToFilterArr.length) {
+				tempToFilterArr = []
+			}
+			else {
+				for (let tag of tagList) {
+					if (!tempToFilterArr.includes(tag.tag)) tempToFilterArr.push(tag.tag);
+				}
 			}
 		}
         else if (tempToFilterArr.includes(dataTag)) tempToFilterArr.splice(tempToFilterArr.indexOf(dataTag), 1)
         else tempToFilterArr.push(dataTag);
 		filter(tempToFilterArr);
-        props.setToFilter(tempToFilterArr)
+        setToFilter(tempToFilterArr)
     }
 
     const filter = toFilter => {
 		let scrapedItems = [...props.scrapeItems];
+		scrapedItems.forEach(item => {
+			item.hide = true;
+			item.duplicate = false;
+		})
 		if (toFilter.length > 0) {
 			for (let tag of toFilter) {
 				if (tag === "others") {
@@ -124,8 +131,7 @@ const RefBarItems = props => {
 							(item.tag.toLowerCase().indexOf("table") == -1 || item.tag.toLowerCase() == "tablecell") &&
 							item.tag.toLowerCase().indexOf("radio button") == -1) {
 								item.hide = false;
-						} else item.hide = true
-						return item;
+						}
 					});
 				}
 				else if (tag === "othersAndroid"){
@@ -147,8 +153,7 @@ const RefBarItems = props => {
 							item.tag.toLowerCase().indexOf("android.widget.imagebutton") == -1 &&
 							item.tag.toLowerCase().indexOf("android.widget.seekbar") == -1){
 								item.hide = false;
-							} else item.hide = true;
-							return item;
+							}
 					});
 				}
 				/*** Filtering Duplicate Objects ***/
@@ -160,9 +165,11 @@ const RefBarItems = props => {
 						let custname = item.title.trim().replace(/[<>]/g, '');
 						if (!uniqueBucket.includes(custname)) {
 							uniqueBucket.push(custname);
-							item.hide = true;
 						}
-						else item.hide = false
+						else {
+							item.hide = false;
+							item.duplicate = true;
+						}
 					})
 
 					scrapedItems = reversedScrapeItems.reverse();
@@ -171,7 +178,7 @@ const RefBarItems = props => {
 					scrapedItems.forEach(item => {
 						if (item.userObj) {
 							item.hide = false
-						} else item.hide = true;
+						}
 					});
 				}
 				else {
@@ -185,7 +192,6 @@ const RefBarItems = props => {
 						) {
 							item.hide = false;
 						}
-						else item.hide = true;
 					});
 				}
 			}
@@ -218,9 +224,9 @@ const RefBarItems = props => {
             <div className="ref_pop filter_pop" style={{marginTop: `calc(${filterY}px - 15vh)`}}>
                 <h4 className="pop__header" onClick={()=>setShowFilterPop(false)}><span className="pop__title">Filter</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
                 <div className="filter_pop__content">
-					<div className="d__filter-selall" onClick={()=>filterMain("*selectAll*")}><input type="checkbox" checked={tagList.length === props.toFilter.length}/><span>Select All</span></div>
+					<div className="d__filter-selall" onClick={()=>filterMain("*selectAll*")}><input type="checkbox" checked={tagList.length === toFilter.length}/><span>Select All</span></div>
 					{ tagList.map((tag, index)=>(<div className="d__filter-btnbox">
-						<button className={"d__filter-btn" + (props.toFilter.includes(tag.tag) ? " active-filter" : "")} key={index} onClick={()=>filterMain(tag.tag)}>{tag.label}</button>
+						<button className={"d__filter-btn" + (toFilter.includes(tag.tag) ? " active-filter" : "")} key={index} onClick={()=>filterMain(tag.tag)}>{tag.label}</button>
 					</div>))}
                 </div>
             </div>

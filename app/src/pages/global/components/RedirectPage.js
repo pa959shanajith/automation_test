@@ -1,4 +1,4 @@
-import * as headerApi from '../api';
+import { logoutUser } from '../api';
 import { persistor } from '../../../reducer'
 
     /* 
@@ -12,7 +12,7 @@ const RedirectPage = (history) => {
 
     persistor.purge();
     window.localStorage.clear();
-    headerApi.logoutUser()
+    logoutUser()
     .then(data=>{
         history.push('/')
     })

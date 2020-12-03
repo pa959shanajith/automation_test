@@ -4,7 +4,7 @@
     }
 }
 
-.ss__dsktp_wndw_name, .ss__dsktp_prc_id, .ss__sap_input, .ss__mblapp_input{
+.ss__dsktp_wndw_name, .ss__dsktp_prc_id, .ss__sap_input, .ss__mblapp_input, .ss__oebs_input, .ss__mblweb_input{
     width: 94%;
     height: 34px;
     color: #555;
@@ -37,12 +37,9 @@
     }
 }
 
-.ss__mblapp_div{
-    display: flex;
-}
-
 .ss__mblapp_inputs{
     display: flex;
+    align-items: center;
     flex-direction: column;
     flex: 1 0 75%;
 }
@@ -61,4 +58,29 @@
 .ss__mblapp_img{
     position: absolute;
     bottom: 20px;
+}
+
+.ss__mblapp_os_op{
+    margin-bottom: 10px;
+}
+
+.ss__mblapp_chooseApp{
+    display: flex;
+    width: 50%;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.ss__mblapp_os_b{
+    background: #643693;
+    color: #fff;
+    border: 0;
+    border-radius: 10px;
+    padding: 5px 20px;
+    font-size: 16px;
+}
+
+.ss__os_active{
+    background: #331d4e!important;
 }

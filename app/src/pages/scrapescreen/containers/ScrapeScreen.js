@@ -25,14 +25,8 @@ const ScrapeScreen = ()=>{
     const [mainScrapedData, setMainScrapedData] = useState({});
     const [saved, setSaved] = useState(true);
     const [showAppPop, setShowAppPop] = useState(false);
-    const [added, setAdded] = useState([]);
-
-    const [toFilter, setToFilter] = useState([]);
-    const [filtered, setFiltered] = useState([]);
-    const [deleteFlag, setDeleteFlag] = useState(true);
     const [scrapedURL, setScrapedURL] = useState("");
     const [hideSubmit, setHideSubmit] = useState(true);
-    const [scrapeChanged, setScrapeChanged] = useState(false);
     const [newScrapedData, setNewScrapedData] = useState([]);
 
     useEffect(() => {
@@ -57,7 +51,6 @@ const ScrapeScreen = ()=>{
                 if (data !== null && data !== "getScrapeData Fail." && data !== "" && data !== " ") {
 
                     viewString = data;
-                    console.log(viewString);
 
                     if(viewString.reuse){
                         let task = { ...current_task }
@@ -89,17 +82,18 @@ const ScrapeScreen = ()=>{
                             }
 
                             let scrapeItem = {  objId: ob._id, 
-                                                xpath: ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' '),
-                                                left: ob.left,
-                                                top: ob.top,
-                                                width: ob.width,
-                                                height:  ob.height,
-                                                tag: ob.tag,
-                                                url: ob.url,
-                                                hiddentag: ob.hiddentag,
+                                                // xpath: ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' '),
+                                                // left: ob.left,
+                                                // top: ob.top,
+                                                // width: ob.width,
+                                                // height:  ob.height,
+                                                // tag: ob.tag,
+                                                // url: ob.url,
+                                                // hiddentag: ob.hiddentag,
+                                                objIdx: i,       
                                                 val: ob.tempId,
                                                 hide: false,
-                                                title: ob.custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim()
+                                                title: ob.custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/[<>]/g, '').trim()
                                             }
                                             
                             if(ob.hasOwnProperty('editable')){
@@ -175,8 +169,12 @@ const ScrapeScreen = ()=>{
             close={()=>setShowConfirmPop(false)}
             footer={
                 <>
-                <button onClick={showConfirmPop.onClick}>Yes</button>
-                <button onClick={()=>setShowConfirmPop(false)}>No</button>
+                <button onClick={showConfirmPop.onClick}>
+                    {showConfirmPop.continueText ? showConfirmPop.continueText : "Yes"}
+                </button>
+                <button onClick={()=>setShowConfirmPop(false)}>
+                    {showConfirmPop.rejectText ? showConfirmPop.rejectText : "No"}
+                </button>
                 </>
             }
         />
@@ -197,11 +195,11 @@ const ScrapeScreen = ()=>{
             <Header/>
             <div className="ss__mid_section">
 
-                <ActionBarItems setShowAppPop={setShowAppPop} saved={saved} setSaved={setSaved} setNewScrapedData={setNewScrapedData} scrapeItems={scrapeItems} setScrapeChanged={setScrapeChanged} setDeleteFlag={setDeleteFlag} mainScrapedData={mainScrapedData} setMainScrapedData={setMainScrapedData} setOverlay={setOverlay} setShowPop={setShowPop} updateScrapeItems={updateScrapeItems}/>
+                <ActionBarItems setShowAppPop={setShowAppPop} setSaved={setSaved} setNewScrapedData={setNewScrapedData} scrapeItems={scrapeItems} setOverlay={setOverlay} setShowPop={setShowPop} updateScrapeItems={updateScrapeItems}/>
                 
-                <ScrapeContent added={added} setAdded={setAdded} saved={saved} setSaved={setSaved} newScrapedData={newScrapedData} setShowPop={setShowPop}  setShowConfirmPop={setShowConfirmPop} scrapeChanged={scrapeChanged} setScrapeChanged={setScrapeChanged} current_task={current_task} scrapeItems={scrapeItems} hideSubmit={hideSubmit} setScrapeItems={setScrapeItems} />
+                <ScrapeContent saved={saved} setSaved={setSaved} newScrapedData={newScrapedData} setShowPop={setShowPop}  setShowConfirmPop={setShowConfirmPop} mainScrapedData={mainScrapedData} current_task={current_task} scrapeItems={scrapeItems} hideSubmit={hideSubmit} setScrapeItems={setScrapeItems} />
                 
-                <RefBarItems setFiltered={setFiltered} setToFilter={setToFilter} toFilter={toFilter} scrapeItems={scrapeItems} setScrapeItems={setScrapeItems} />
+                <RefBarItems scrapeItems={scrapeItems} setScrapeItems={setScrapeItems} />
             </div>
             
             <div className='ss__footer'><Footer/></div>

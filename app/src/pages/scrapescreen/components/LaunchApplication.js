@@ -71,6 +71,8 @@ const LaunchApplication = props => {
 
     // Mobile App
 
+    const [os, setOS] = useState(null);
+
     const [appPath, setAppPath] = useState("");
     const appPathHandler = event => setAppPath(event.target.value);
 
@@ -102,29 +104,71 @@ const LaunchApplication = props => {
     }
 
     const mobileApp = {
-        'content': <div className="ss__mblapp_div">
-            <div className="ss__mblapp_inputs">
-                <input class="ss__mblapp_input" placeholder="Enter Application path" value={appPath} onChange={appPathHandler}/>
-                { appPath.indexOf(".ios") > -1
-                ? <>
+        'content': <div className="ss__mblapp_inputs">
+                { !os && <div className="ss__mblapp_os_op">Choose OS</div>}
+                <div className="ss__mblapp_chooseApp">
+                    <button className={"ss__mblapp_os_b"+(os==="android" ? " ss__os_active":"")} onClick={()=>setOS("android")}>Android</button>
+                    <button className={"ss__mblapp_os_b"+(os==="ios" ? " ss__os_active":"")} onClick={()=>setOS("ios")}>iOS</button>
+                </div>
+                { os === "ios" && <>
                     <input class="ss__mblapp_input" placeholder="Enter Application path" value={appPath2} onChange={appPath2Handler}/>
                     <input className="ss__mblapp_input" placeholder='Enter Version Number' value={verNum} onChange={verNumHandler}/>
                     <input className="ss__mblapp_input" placeholder='Enter Device Name'value={deviceName} onChange={deviceNameHandler}/>
                     <input className="ss__mblapp_input" placeholder='Enter UDID' value={uuid} onChange={uuidHandler}/>
-                </>
-                : <input class="ss__mblapp_input" placeholder="Enter mobile serial number" value={sNum} onChange={sNumHandler} />}
-            </div>
-            <div className="ss__mblapp_icon">
-                { appPath.indexOf(".apk") > -1 ? <img className="ss__mblapp_img" src="static/imgs/ic-andrd-active.png"/> : 
-                    appPath.indexOf(".ios") > -1 ? <img className="ss__mblapp_img" src="static/imgs/ic-ios-active.png"/> : null }
-            </div>
+                </> }
+                { os === "android" && <>
+                    <input class="ss__mblapp_input" placeholder="Enter Application path" value={appPath} onChange={appPathHandler}/> 
+                    <input class="ss__mblapp_input" placeholder="Enter mobile serial number" value={sNum} onChange={sNumHandler} />
+                </> }
         </div>,
 
         'footer': <button onClick={onMobileAppLaunch} style={{width: "100px"}}>Launch</button>
     }
-    
 
-    const appDict = {'Desktop': desktopApp, "SAP": sapApp, 'MobileApp': mobileApp}
+    // OEBS
+
+    const [winName, setWinName] = useState("");
+    const winNameHandler = event => setWinName(event.target.value);
+
+    const onWinLaunch = () => {
+        let scrapeObject = {
+            'winName' : winName
+        }
+        props.appPop.startScrape(scrapeObject);
+    }
+
+    const oebsApp = {
+        'content': <input className='ss__oebs_input' placeholder='Enter window name' value={winName} onChange={winNameHandler}/>,
+        'footer': <button onClick={onWinLaunch} style={{width: "100px"}}>Launch</button>
+    }
+    
+    
+    // Mobile Web
+
+    const [slNum, setSlNum] = useState("");
+    const slNumHandler = event => setSlNum(event.target.value);
+
+    const [vernNum, setVernNum] = useState("");
+    const vernNumHandler = event => setVernNum(event.target.value);
+
+    const onMobileWebLaunch = () => {
+        let scrapeObject = {
+            'slNum': slNum,
+            'vernNum': vernNum
+        }
+        props.appPop.startScrape(scrapeObject);
+    }
+
+    const mobileWeb = {
+        'content': <div className="ss__mblweb_inputs">    
+            <input class="ss__mblweb_input" placeholder="AndroidDeviceSerialNumber/iOSDeviceName" value={slNum} onChange={slNumHandler}/> 
+            <input class="ss__mblweb_input" placeholder="Android/iOSVersion;UDID(for iOS device only)" value={vernNum} onChange={vernNumHandler} />
+        </div>,
+
+        'footer': <button onClick={onMobileWebLaunch} style={{width: "100px"}}>Launch</button>
+    }
+
+    const appDict = {'Desktop': desktopApp, "SAP": sapApp, 'MobileApp': mobileApp, 'OEBS': oebsApp, 'MobileWeb': mobileWeb}
 
     return (
         <div className="ss__launch_app_dialog">

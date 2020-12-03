@@ -23,28 +23,6 @@ export const logoutUser = async() => {
     }
 }
 
-export const getNames_ICE = async(requestedIds, idType) => {
-    try{
-        const res = await axios(url+"/getNames_ICE", {
-            method : 'POST',
-            headers : {
-                'Content-type' : "application/json"
-            },
-            data: {'param': 'getNames_ICE', requestedids : requestedIds, idtype : idType},
-            credentials : 'include'
-        });
-        if (res.status === 200) {
-            return res.data;
-        }
-        else{
-            console.log(res.status);
-        }
-    }
-    catch(err){
-        console.log(err)
-    }
-}
-
 export const keepSessionAlive = async() => {
     try{
         const res = await axios(url+"/keepSessionAlive", {
@@ -60,5 +38,71 @@ export const keepSessionAlive = async() => {
     }
     catch(err){
         console.log(err)
+    }
+}
+
+export const updateTaskStatus = async(obj) => {
+    try{
+        const res = await axios(url+"/updateTaskstatus_mindmaps", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'obj': obj},
+            credentials : 'include',
+        });
+        if (res.status === 200){
+            return res.data;
+        }
+        else{
+            console.log(res.status)
+        }
+    }
+    catch(err){
+        console.log(err);
+    }
+}
+
+export const resetPassword = async(newpassword, currpassword) => {
+    try{
+        const res = await axios(url+"/resetPassword", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            data: {'newpassword': newpassword, 'currpassword': currpassword},
+            credentials : 'include'
+        });
+        if (res.status === 200){
+            return res.data;
+        }
+        else{
+            console.log(res.status);
+        }
+    }
+    catch(err){
+        console.log(err);
+    }
+}
+
+export const getRoleNameByRoleId = async(roleasarray) => {
+    try{
+        const res = await axios(url+"/getRoleNameByRoleId", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            data: {'action': "getRoleNameByRoleId", 'role': roleasarray},
+            credentials : 'include'
+        });
+        if (res.status === 200){
+            return res.data;
+        }
+        else{
+            console.log(res.status);
+        }
+    }
+    catch(err){
+        console.log(err);
     }
 }
