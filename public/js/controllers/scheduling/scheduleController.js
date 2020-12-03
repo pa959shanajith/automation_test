@@ -318,7 +318,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 			if(data == "Invalid Session") {
 				$rootScope.redirectPage();
 			} else if(data == "fail") {
-				openModalPopup("Schedule", "Failed to fetch ICE.");
+				openModelPopup("Schedule", "Failed to fetch ICE.");
 				unblockUI()
 			} else {
 				$scope.poolList = data
@@ -336,13 +336,13 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 				}).catch(error=>{
 					unblockUI()
 					console.error(error)
-					openModalPopup("Schedule", "Failed to fetch users.");
+					openModelPopup("Schedule", "Failed to fetch users.");
 				})
 			}
 		}, function (error) {
 			unblockUI();
 			console.error(error)
-			openModalPopup("Edit User", "Failed to fetch users.");
+			openModelPopup("Edit User", "Failed to fetch users.");
 		});
 		$scope.smartBatch = smartBatch
 		return;
@@ -520,7 +520,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 		ScheduleService.testSuitesScheduler_ICE(executionData)
 			.then(function (data) {
 				unblockUI();
-				sequence(false,false,0);
+				//sequence(false,false,0);
 				if (data == "Invalid Session") return $rootScope.redirectPage();
 				else if (data == "NotApproved") openModelPopup("Schedule Test Suite", "All the dependent tasks (design, scrape) needs to be approved before execution");
 				else if (data == "NoTask") openModelPopup("Schedule Test Suite", "Task does not exist for child node");
@@ -553,7 +553,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 				changeBackground();
 				browserTypeExe = [];
 				execAction="serial";
-				sequence(true,false,copyId);
+				//sequence(true,false,copyId);
 				$(".selectScheduleSuite, .selectToSched").prop("checked", false);
 				$(".selectBrowserSc").find(".sb").removeClass("sb");
 				$(".selectParallel").find("img").removeClass("sb");
