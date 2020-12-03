@@ -309,6 +309,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         if (!ice_name in this.ice_list) {
             return result;
         }
+        if(!this.ice_list[ice_name]) this.ice_list[ice_name] = {}
         //update ice mode and status in this.ice_list
         this.ice_list[ice_name]["mode"] = data.value.mode;
         this.ice_list[ice_name]["status"] = data.value.status;
