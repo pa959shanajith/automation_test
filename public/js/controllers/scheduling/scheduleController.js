@@ -342,7 +342,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 		}, function (error) {
 			unblockUI();
 			console.error(error)
-			openModelPopup("Edit User", "Failed to fetch users.");
+			openModelPopup("Schedule", "Failed to fetch users.");
 		});
 		$scope.smartBatch = smartBatch
 		return;
