@@ -5058,7 +5058,10 @@ Purpose : displaying pop up for replication of project
                                     var index=-1;
                                     $scope.createMap('tabCreate');
                                     $scope.tab = 'tabCreate';
-                                    $scope.createMapsCall();
+                                    $('.selectProject').addClass('selectProjectPosition');
+                                    $('.selectProject').show();
+                                    collapseSidebars();
+                                    $('#ct-moduleBox').attr('style','width:100%;left:0px;')
                                     mindmapServices.populateProjects().then(function(res) {
                                         if (res == "Invalid Session") {
                                             return $rootScope.redirectPage();
