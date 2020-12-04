@@ -671,9 +671,8 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		}
 		else if(!getDomainName)	openModelPopup("Save Mapped Testcase", "Please select domain");
 		else if(!getProjectName)	openModelPopup("Save Mapped Testcase", "Please select project");
-		else if(!qcTestcaseNameList)	openModelPopup("Save Mapped Testcase", "Please select Testcase");
-		else if(!qcTestsetName)	openModelPopup("Save Mapped Testcase", "Please select Testset");
-		else if(!avoAssureScenarioList)  openModelPopup("Save Mapped Testcase", "Please select Scenario");
+		else if(qcTestcaseNameList.length == 0)	openModelPopup("Save Mapped Testcase", "Please select Testcase");
+		else if(avoAssureScenarioList.length == 0)  openModelPopup("Save Mapped Testcase", "Please select Scenario");
 		else{
 			mappedList.push({
 				'domain': getDomainName,
@@ -687,8 +686,8 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				selectedElements[i].style.cssText = "background-color: #ddd";
 				selectedElements[i].children[2].style.cssText="display:hide";
 			}
-			event.stopPropagation();
 		}
+		event.stopPropagation();
 	});
 
 	//Submit mapped details
