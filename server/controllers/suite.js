@@ -665,7 +665,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 		smart = true;
 		result = await smartSchedule(batchInfo, batchInfo[0].targetUser, dateTimeUtc, multiExecutionData.browserType.length)
 		if (result["status"] == "fail") {
-			res.send("fail")
+			return res.send("fail")
 		}
 		stat = result["status"]
 		batchInfo = result["batchInfo"]
@@ -932,8 +932,10 @@ exports.cancelScheduledJob_ICE = async (req, res) => {
 	const schedHost = req.body.host;
 	const schedUserid = JSON.parse(req.body.schedUserid);
 	let inputs = { "icename": schedHost };
-	const userprofile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
-	if (userprofile == "fail" || userprofile == null) return res.send("fail");
+	if(schedHost != EMPTYUSER){
+		const userprofile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
+		if (userprofile == "fail" || userprofile == null) return res.send("fail");
+	}
 	if (!(schedUserid["invokinguser"] == userid || userprofile.name == username)) {
 		logger.info("Sending response 'not authorised' from " + fnName + " service");
 		return res.send("not authorised");
