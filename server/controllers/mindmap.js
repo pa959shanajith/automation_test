@@ -1172,7 +1172,6 @@ exports.pdProcess = function (req, res) {
 						if (response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail") {
 							logger.error("Error occurred in create_ice/updateScreenname_ICE from fetchScrapedData Error Code : ERRDAS");
 						} else {
-							console.log("screen saved successfully!");
 							if(getScrapeDataQueryresult.rows[0]['parent']!=undefined){
 								var screenid = getScrapeDataQueryresult.rows[0]['parent'][0];
 								var dobjects = getScrapeDataQueryresult.rows;
@@ -1207,7 +1206,6 @@ exports.pdProcess = function (req, res) {
 										if (response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail") {
 											logger.error("Error occurred in design/getScrapeDataScreenLevel_ICE from fetchScrapedData Error Code : ERRDAS");
 										} else {
-											console.log("Testcase saved successfully!");
 											savedcallback();		
 										}
 									} catch (exception) {
@@ -1226,7 +1224,7 @@ exports.pdProcess = function (req, res) {
 			res.send({"success":true,"data":orderMatrix,"history":activityJSON['mxGraphModel']['@history']});
 		});
 	} catch(err) {
-		console.log(err)
+		logger.error("Exception occurred in pdProcess", err)
 		res.status(500).send("fail");
 	}
 };
@@ -1320,7 +1318,6 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						}
 						break;		
 					default:
-						console.log("no match found!");
 						break;
 				}
 				if(testcaseObj){
@@ -1398,7 +1395,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 	if(adjacentItems){
 		// list of sources(only shapes) and targets (assuming only one)
 		if(adjacentItems["error"]){
-			console.log(adjacentItems["error"]);
+			logger.error("Error in pdProcess:generateTestCaseMap, Err: ", adjacentItems["error"]);
 		}
 		else{
 			// old logic

@@ -232,7 +232,6 @@ module.exports.Execution_Queue = class Execution_Queue {
             }
             // Check if request came from Azure DevOps. If yes, then send the acknowledgement
             if (hdrs["user-agent"].startsWith("VSTS") && hdrs.planurl && hdrs.projectid) {
-                reqFromADO = true;
                 res.send("Request Recieved");
             }
             if (!multiBatchExecutionData || multiBatchExecutionData.constructor !== Array || multiBatchExecutionData.length === 0) {
