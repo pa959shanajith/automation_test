@@ -422,7 +422,8 @@ module.exports.Execution_Queue = class Execution_Queue {
         }
         for (let ice in list) {
             let ice_name = list[ice]["icename"];
-            this.ice_list[ice_name] = {"poolid":poolid, "mode": false, "status": false, "connected": false, "_id": list[ice]["_id"]};
+            if(this.ice_list[ice_name]) this.ice_list[ice_name]["poolid"] = poolid;
+            else this.ice_list[ice_name] = {"poolid":poolid, "mode": false, "status": false, "connected": false, "_id": list[ice]["_id"]};
         }
         for(let ice in this.ice_list){
             if(this.ice_list[ice]["poolid"] === poolid){
