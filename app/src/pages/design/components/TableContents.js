@@ -1,9 +1,5 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import TableRow from './TableRow';
-
-/*
-    will be removed soon
-*/
 
 const TableContents = (props) => {
     let key =  0;

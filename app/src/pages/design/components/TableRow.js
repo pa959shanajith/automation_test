@@ -231,14 +231,14 @@ const TableRow = (props) => {
     return (
         <>
         <div ref={rowRef} className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + (highlight || (props.focusedRow!== null  && typeof props.focusedRow === "object" && props.focusedRow.includes(props.idx)) ? " highlight-step" : "") + (props.edit ? " d__table_row_edit": "")}>
-            {/* {console.log(`rendered ${props.idx+1} ${props.testCase.outputVal}`)} */}
+            {/* {console.log(`rendered ${props.idx+1}`)} */}
             <span className="step_col" onClick={onRowClick}>{props.idx + 1}</span>
             <span className="sel_col"><input className="sel_obj" type="checkbox" checked={checked} onClick={onBoxCheck}/></span>
             
             <span className="objname_col">
                 { focused ? 
                 <select className="col_select" value={objName} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} autoFocus>
-                    { objList.map(object=> <option value={object}>{object}</option>) }
+                    { objList.map(object=> <option value={object}>{object.length >= 50 ? object.substr(0, 44)+"..." : object}</option>) }
                 </select> :
                 <div className="d__row_text" onClick={onRowClick} title={objName} >{objName}</div>
                 }
