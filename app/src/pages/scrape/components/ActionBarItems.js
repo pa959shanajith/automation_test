@@ -279,6 +279,7 @@ const UpperContent = props => {
         ResetSession.start();
         scrapeApi.initScraping_ICE(screenViewObject)
             .then(data=> {
+                console.log("initScraping result: ", data);
                 props.setOverlay("");
                 ResetSession.end();
                 if (data === "Invalid Session") return RedirectPage(history);

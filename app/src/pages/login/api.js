@@ -12,15 +12,15 @@ export const authenticateUser = async(username, password) => {
             data: {'username': username, 'password': password},
             credentials : 'include'
         });
-        if (res.status === 200) {
+        if (res.status === 200 && res.data !== "fail") {
             return res.data;
         }
         else{
-            console.log(res.status);
+            return {error: 'Failed to Authenticate User'}
         }
     }
     catch(err){
-        console.log(err)
+        return {error: 'Failed to Authenticate User'}
     }
 }
 
@@ -38,11 +38,11 @@ export const loadUserInfo = async(selRole) => {
             return res.data;
         }
         else{
-            console.log(res.status);
+            return {error: 'Failed to load User info'}
         }
     }
     catch(err){
-        console.log(err);
+        return {error: 'Failed to load User info'}
     }
 }
 
@@ -56,11 +56,11 @@ export const validateUserState = async() => {
             return res.data;
         }
         else{
-            console.log(res.status);
+            return {error: 'Failed to validate User'}
         }
     }
     catch(err){
-        console.log(err);
+        return {error: 'Failed to validate User'}
     }
 }
 
@@ -78,10 +78,10 @@ export const checkUser = async(user) => {
             return res.data;
         }
         else{
-            console.log(res.status);
+            return {error: 'Failed to check user'}
         }
     }
     catch(err){
-        console.log(err);
+        return {error: 'Failed to check user'}
     }
 }

@@ -15,7 +15,7 @@ const ScrapeContent = props => {
     const [searchVal, setSearchVal] = useState("");
     const [selAllCheck, setSelAllCheck] = useState(false);
     const [deleted, setDeleted] = useState([]);
-    const [modified, setModified] = useState({});
+    const [modified, setModified] = useState([]);
 
     useEffect(()=>{
         let disable = {};
@@ -252,6 +252,7 @@ const ScrapeContent = props => {
             dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: props.scrapeItems.length === 0});
             console.log("Added:", added);
             console.log("Old:", scrapeData);
+            console.log("Modified: ", modified);
         }
     }
 

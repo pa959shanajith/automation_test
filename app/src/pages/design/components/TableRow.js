@@ -128,8 +128,7 @@ const TableRow = (props) => {
                     caseData = props.getKeywords(objList[0])
                     placeholders = props.getRowPlaceholders(caseData.obType, caseData.keywords[0]);
                 }
-                else
-                if (objName && keyword){
+                else if (objName && keyword){
                     caseData = props.getKeywords(objName)
                     placeholders = props.getRowPlaceholders(caseData.obType, keyword);
                 }

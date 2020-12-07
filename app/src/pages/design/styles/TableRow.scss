@@ -13,7 +13,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 5px 0;
+    // padding: 5px 0;
     margin-right: 2px;
     font-size: 14px;
     font-family: "LatoWeb";
@@ -63,6 +63,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
     margin: 0 6px;
+    display: flex;
+    align-items: center;
+    height: 31px;
 }
 
 

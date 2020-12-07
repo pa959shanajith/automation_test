@@ -30,9 +30,11 @@ const ScrapeScreen = ()=>{
     const [newScrapedData, setNewScrapedData] = useState([]);
 
     useEffect(() => {
-        fetchScrapeData()
-        .then(data=> console.log("fetched data"))
-        .catch(error=> console.log(error));
+        if(Object.keys(current_task).length != 0) {
+            fetchScrapeData()
+            .then(data=> console.log("fetched data"))
+            .catch(error=> console.log(error));
+        }
     }, [current_task])
 
     const fetchScrapeData = () => {
@@ -87,11 +89,11 @@ const ScrapeScreen = ()=>{
                                                 // top: ob.top,
                                                 // width: ob.width,
                                                 // height:  ob.height,
-                                                // tag: ob.tag,
                                                 // url: ob.url,
                                                 // hiddentag: ob.hiddentag,
                                                 objIdx: i,       
                                                 val: ob.tempId,
+                                                tag: ob.tag,
                                                 hide: false,
                                                 title: ob.custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/[<>]/g, '').trim()
                                             }
@@ -110,7 +112,7 @@ const ScrapeScreen = ()=>{
                         setMainScrapedData(viewString);
                         setScrapeItems(localScrapeList);
                         setHideSubmit(false);
-
+                        setSaved(false);
                         dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
                         dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: !haveItems});
                         // screenshot
@@ -121,6 +123,10 @@ const ScrapeScreen = ()=>{
                         setOverlay("");
                     }
                     else {
+                        setScrapeItems([]);
+                        setMainScrapedData({});
+                        setNewScrapedData([]);
+                        setSaved(false);
                         dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
                         dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: !haveItems});
                         // screenshot

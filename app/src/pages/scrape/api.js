@@ -1,6 +1,8 @@
 import axios from 'axios';
-const url = "https://"+window.location.hostname+":8443";
+import { RedirectPage } from '../global';
+import { history } from './index';
 
+const url = "https://"+window.location.hostname+":8443";
 
 export const initScraping_ICE = screenViewObject => {
     return new Promise((resolve, reject)=>{
@@ -13,7 +15,11 @@ export const initScraping_ICE = screenViewObject => {
             credentials : 'include',
         })
         .then(res=>{
-            if (res.status === 200) resolve(res.data)
+            if (res.status === 401) {
+                RedirectPage(history);
+                reject("Invalid Session");
+            }
+            else if (res.status === 200 && res.data !== 'fail') resolve(res.data);
             else reject(res.status)
         })
         .catch(err => reject(err))
