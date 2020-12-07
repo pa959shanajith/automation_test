@@ -924,6 +924,7 @@ exports.getScheduledDetails_ICE = async (req, res) => {
 
 /** This service cancels the specified scheduled job */
 exports.cancelScheduledJob_ICE = async (req, res) => {
+	var userprofile = {}
 	const fnName = "cancelScheduledJob_ICE";
 	logger.info("Inside UI service " + fnName);
 	const userid = req.session.userid;
@@ -933,7 +934,7 @@ exports.cancelScheduledJob_ICE = async (req, res) => {
 	const schedUserid = JSON.parse(req.body.schedUserid);
 	let inputs = { "icename": schedHost };
 	if(schedHost != EMPTYUSER){
-		const userprofile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
+		userprofile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
 		if (userprofile == "fail" || userprofile == null) return res.send("fail");
 	}
 	if (!(schedUserid["invokinguser"] == userid || userprofile.name == username)) {
