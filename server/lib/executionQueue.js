@@ -249,13 +249,13 @@ module.exports.Execution_Queue = class Execution_Queue {
                 let pool = this.queue_list[this.ice_list[targetICE]["poolid"]];
                 pool["execution_list"].push(testSuite);
                 //save execution queue to redis
-                cache.set("execution_queue", this.queue_list);
+                await cache.set("execution_queue", this.queue_list);
                 testSuite['res'] = res; 
             } else if (poolid && poolid in this.queue_list) {
                 let pool = this.queue_list[poolid];
                 pool["execution_list"].push(testSuite);
                 //save execution queue to redis
-                cache.set("execution_queue", this.queue_list);
+                await cache.set("execution_queue", this.queue_list);
                 testSuite['res'] = res; 
             } else if(this.ice_list[targetICE] && this.ice_list[targetICE]["connected"]){
                     const sockmode = await utils.channelStatus(targetICE);
