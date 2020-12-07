@@ -10,6 +10,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 	var browserTypeExe = [];
 	var execAction = "serial";
 	var execEnv = "default";
+	$scope.nulluser = "5fc137cc72142998e29b5e63";
 	//Task Listing
 	loadUserTasks()
 	blockUI("Loading...");
@@ -577,7 +578,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 	$scope.cancelThisJob = function ($event, status) {
 		const target = $event.currentTarget.parentElement;
 		const schDetails = target.dataset;
-		const host = target.parentElement.children[1].innerText;
+		const host = target.parentElement.children[1].getAttribute("value")
 		const schedUserid = target.parentElement.children[1].dataset.scheduledby;
 		ScheduleService.cancelScheduledJob_ICE(schDetails, host, schedUserid)
 			.then(function (data) {

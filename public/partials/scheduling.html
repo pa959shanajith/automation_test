@@ -204,7 +204,7 @@
 								<div ng-repeat="scenariolist in schdata.scenariodetails">
 									<div ng-repeat="data in scenariolist" class="scheduleDataBodyRowChild">
 										<div style='width: 18%'>{{schdata.scheduledatetime}}</div>
-										<div style='width: 12%' data-scheduledby={{schdata.scheduledby}}>{{schdata.target}}</div>
+										<div style='width: 12%' value={{schdata.target}} ng-attr-title="{{schdata.target == nulluser?'Pool: '+ (schdata.poolname?schdata.poolname:'Unallocated ICE'):schdata.target}}" data-scheduledby={{schdata.scheduledby}}>{{schdata.target == nulluser?'Pool: '+ (schdata.poolname?schdata.poolname:'Unallocated ICE'):schdata.target}}</div>
 										<div style='width: 20%' title={{data.scenarioname||data.scenarioName}}>{{data.scenarioname||data.scenarioName}}</div>
 										<div style='width: 20%' title={{schdata.testsuitenames[$parent.$index]}} >{{schdata.testsuitenames[$parent.$index]}}</div>
 										<div style='width: 15%'><img ng-repeat="brow in schdata.browserlist" ng-src={{browImg(brow,data.appType)}} style="margin-right: 5px;"/></div>

@@ -469,9 +469,13 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			if(data == 'fail'){
 				openHeaderModalPopup("executeGlobalModal", "Change Default ICE", $rootScope.unavailableLocalServer_msg);
 			}else{
+				var ice=data.ice_list
+				if(!data.ice_list || ice.length<1){
+					openHeaderModalPopup("executeGlobalModal", "Change Default ICE", $rootScope.unavailableLocalServer_msg);
+					return;
+				}
 				$("#selectDefIce").modal("show")
 				$('#chooseDefICE option').remove()
-				var ice=data.ice_list
 				ice.map((e)=>{
 					$('#chooseDefICE').append(`<option value=${e}>${e}</option>`)
 				})

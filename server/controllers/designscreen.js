@@ -222,13 +222,13 @@ exports.updateScreen_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: updateScreen_ICE");
 		if (utils.isSessionActive(req)) {
+			var username = req.session.username;
+			var modifiedByID = req.session.userid;
+			var modifiedByrole = req.session.activeRoleId;
 			var updateData = req.body.scrapeObject;
 			var projectID = updateData.projectId;
 			var screenID = updateData.screenId;
 			var screenName = updateData.screenName;
-			var userInfo = updateData.userinfo;
-			var modifiedByID = userInfo.user_id;
-			var modifiedByrole = userInfo.role;//user_role
 			var param = updateData.param;
 			var delete_list = updateData.delete_list;
 			var update_list = updateData.update_list;
