@@ -10,6 +10,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 	var browserTypeExe = [];
 	var execAction = "serial";
 	var execEnv = "default";
+	$scope.nulluser = "5fc137cc72142998e29b5e63";
 	//Task Listing
 	loadUserTasks()
 	blockUI("Loading...");
