@@ -657,8 +657,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 	var dateTimeList = batchInfo.map(u => {
 		const dt = u.date.split("-");
 		const tm = u.time.split(":");
-		dateTimeUtc = new Date(dt[2], dt[1] - 1, dt[0], tm[0], tm[1], 0).toUTCString();
-		return new Date(dt[2], dt[1] - 1, dt[0], tm[0], tm[1], 0).valueOf().toString();
+		return new Date(u.timestamp).toUTCString();
 	});
 	var smart = false;
 	if (batchInfo[0].targetUser && batchInfo[0].targetUser.includes('Smart')) {
@@ -702,7 +701,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 	}
 	for (const userTime in userTimeMap) {
 		const batchIdx = userTimeMap[userTime]
-		const timestamp = parseInt(userTime.split('_').pop());
+		const timestamp = userTime.split('_').pop();
 		const targetUser = batchInfo[batchIdx[0]].targetUser;
 		const batchObj = JSON.parse(JSON.stringify(multiExecutionData));
 		delete batchObj.batchInfo;
