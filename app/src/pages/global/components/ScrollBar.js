@@ -38,6 +38,19 @@ const ScrollBar = (props) => {
                     width: ${props.verticalbarWidth?props.verticalbarWidth:'6px'};
                     ${(props.hideYbar)?'visibility: hidden!important':''};
                 }
+                ${
+                    props.hoverColor ? 
+                    `${props.scrollId?`#${props.scrollId}:hover `:''}.simplebar-scrollbar:before {
+                        top: 0px;
+                        bottom: 0px;
+                        left: 0px;
+                        right: 0px;
+                        opacity: 1!important;
+                        background:${props.hoverColor};
+                    }
+                    `
+                    : ''
+                }
                 ${props.scrollId?'#'+props.scrollId+' ':''}.simplebar-track.simplebar-horizontal {
                     background: ${props.trackColor?props.trackColor:'white'};
                     left: 0;
