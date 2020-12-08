@@ -876,7 +876,7 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
 			else execIds = execIdsMap[smartId];
 		}
 		try {
-			const scheduledjob = schedule.scheduleJob(scheduleId, scheduleTime, async function () {
+			const scheduledjob = schedule.scheduleJob(scheduleId, parseInt(scheduleTime), async function () {
 				let result;
 				execIds['scheduleId'] = scheduleId;
 				result = queue.Execution_Queue.addTestSuiteToQueue(batchExecutionData,execIds,userInfo,"SCHEDULE",batchExecutionData.batchInfo[0].poolid);
