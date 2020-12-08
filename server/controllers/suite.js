@@ -653,16 +653,11 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 		invokinguserrole: req.session.activeRoleId
 	}
 	var stat = "none";
-	var dateTimeUtc = "";
-	var dateTimeList = batchInfo.map(u => {
-		const dt = u.date.split("-");
-		const tm = u.time.split(":");
-		dateTimeUtc = new Date(dt[2], dt[1] - 1, dt[0], tm[0], tm[1], 0).toUTCString();
-		return new Date(dt[2], dt[1] - 1, dt[0], tm[0], tm[1], 0).valueOf().toString();
-	});
+	var dateTimeList = batchInfo.map(u => u.timestamp);
 	var smart = false;
 	if (batchInfo[0].targetUser && batchInfo[0].targetUser.includes('Smart')) {
 		smart = true;
+		const dateTimeUtc = new Date(parseInt(batchInfo[0].timestamp)).toUTCString();
 		result = await smartSchedule(batchInfo, batchInfo[0].targetUser, dateTimeUtc, multiExecutionData.browserType.length)
 		if (result["status"] == "fail") {
 			return res.send("fail")
@@ -671,12 +666,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 		batchInfo = result["batchInfo"]
 		displayString = result["displayString"]
 		if (!batchInfo) batchInfo = []
-		dateTimeList = batchInfo.map(u => {
-			const dt = u.date.split("-");
-			const tm = u.time.split(":");
-			return new Date(dt[2], dt[1] - 1, dt[0], tm[0], tm[1], 0).valueOf().toString();
-		});
-
+		dateTimeList = batchInfo.map(u => u.timestamp);
 	}
 	const taskApproval = await utils.approvalStatusCheck(batchInfo);
 	if (taskApproval.res !== "pass") return res.send(taskApproval.res);
@@ -702,7 +692,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 	}
 	for (const userTime in userTimeMap) {
 		const batchIdx = userTimeMap[userTime]
-		const timestamp = parseInt(userTime.split('_').pop());
+		const timestamp = userTime.split('_').pop();
 		const targetUser = batchInfo[batchIdx[0]].targetUser;
 		const batchObj = JSON.parse(JSON.stringify(multiExecutionData));
 		delete batchObj.batchInfo;
@@ -882,7 +872,7 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
 			else execIds = execIdsMap[smartId];
 		}
 		try {
-			const scheduledjob = schedule.scheduleJob(scheduleId, scheduleTime, async function () {
+			const scheduledjob = schedule.scheduleJob(scheduleId, parseInt(scheduleTime), async function () {
 				let result;
 				execIds['scheduleId'] = scheduleId;
 				result = queue.Execution_Queue.addTestSuiteToQueue(batchExecutionData,execIds,userInfo,"SCHEDULE",batchExecutionData.batchInfo[0].poolid);
