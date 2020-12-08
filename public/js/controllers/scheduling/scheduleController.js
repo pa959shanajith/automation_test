@@ -432,7 +432,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 					const sldate_2 = suiteInfo.date.split("-");
 					const sltime_2 = suiteInfo.time.split(":");
 					const timestamp = new Date(sldate_2[2], (sldate_2[1] - 1), sldate_2[0], sltime_2[0], sltime_2[1]);
-					suiteInfo.timestamp = timestamp;
+					suiteInfo.timestamp = timestamp.valueOf().toString();
 					const diff = (timestamp - new Date()) / 60000;
 					if (diff < 5) {  // Check if schedule time is not ahead of 5 minutes from current time
 						if (diff < 0) $(this).children('.scheduleSuite').find(".datePicContainer .fc-datePicker").prop("style", "border: 2px solid red;");

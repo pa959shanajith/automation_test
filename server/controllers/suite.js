@@ -646,6 +646,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 	const multiExecutionData = req.body.executionData;
 	var batchInfo = multiExecutionData.batchInfo;
 	let poolid = req.body.executionData.batchInfo[0].poolid;
+	var dateTimeUtc = "";
 	if(!poolid || poolid === "") poolid = EMPTYPOOL
 	var invokinguser = {
 		invokinguser: req.session.userid,
@@ -655,9 +656,8 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 	var stat = "none";
 	var dateTimeUtc = "";
 	var dateTimeList = batchInfo.map(u => {
-		const dt = u.date.split("-");
-		const tm = u.time.split(":");
-		return new Date(u.timestamp).toUTCString();
+		dateTimeUtc = new Date(parseInt(u.timestamp)).toUTCString();
+		return u.timestamp;
 	});
 	var smart = false;
 	if (batchInfo[0].targetUser && batchInfo[0].targetUser.includes('Smart')) {
@@ -670,12 +670,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 		batchInfo = result["batchInfo"]
 		displayString = result["displayString"]
 		if (!batchInfo) batchInfo = []
-		dateTimeList = batchInfo.map(u => {
-			const dt = u.date.split("-");
-			const tm = u.time.split(":");
-			return new Date(dt[2], dt[1] - 1, dt[0], tm[0], tm[1], 0).valueOf().toString();
-		});
-
+		dateTimeList = batchInfo.map(u => u.timestamp);
 	}
 	const taskApproval = await utils.approvalStatusCheck(batchInfo);
 	if (taskApproval.res !== "pass") return res.send(taskApproval.res);
