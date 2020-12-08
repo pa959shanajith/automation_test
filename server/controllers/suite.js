@@ -646,7 +646,6 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 	const multiExecutionData = req.body.executionData;
 	var batchInfo = multiExecutionData.batchInfo;
 	let poolid = req.body.executionData.batchInfo[0].poolid;
-	var dateTimeUtc = "";
 	if(!poolid || poolid === "") poolid = EMPTYPOOL
 	var invokinguser = {
 		invokinguser: req.session.userid,
@@ -654,14 +653,11 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 		invokinguserrole: req.session.activeRoleId
 	}
 	var stat = "none";
-	var dateTimeUtc = "";
-	var dateTimeList = batchInfo.map(u => {
-		dateTimeUtc = new Date(parseInt(u.timestamp)).toUTCString();
-		return u.timestamp;
-	});
+	var dateTimeList = batchInfo.map(u => u.timestamp);
 	var smart = false;
 	if (batchInfo[0].targetUser && batchInfo[0].targetUser.includes('Smart')) {
 		smart = true;
+		const dateTimeUtc = new Date(parseInt(batchInfo[0].timestamp)).toUTCString();
 		result = await smartSchedule(batchInfo, batchInfo[0].targetUser, dateTimeUtc, multiExecutionData.browserType.length)
 		if (result["status"] == "fail") {
 			return res.send("fail")
