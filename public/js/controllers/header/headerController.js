@@ -477,7 +477,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 				$("#selectDefIce").modal("show")
 				$('#chooseDefICE option').remove()
 				ice.map((e)=>{
-					$('#chooseDefICE').append(`<option value=${e}>${e}</option>`)
+					$('#chooseDefICE').append(`<option value="${e}">${e}</option>`)
 				})
 			}
 		}).catch(error=>{
