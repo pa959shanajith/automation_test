@@ -421,7 +421,10 @@ module.exports.Execution_Queue = class Execution_Queue {
         }
         for (let ice in list) {
             let ice_name = list[ice]["icename"];
-            if(this.ice_list[ice_name]) this.ice_list[ice_name]["poolid"] = poolid;
+            if(this.ice_list[ice_name]){
+                this.ice_list[ice_name]["poolid"] = poolid;
+                this.ice_list[ice_name]["_id"] = list[ice]["_id"];
+            } 
             else this.ice_list[ice_name] = {"poolid":poolid, "mode": false, "status": false, "connected": false, "_id": list[ice]["_id"]};
         }
         for(let ice in this.ice_list){
@@ -463,6 +466,7 @@ module.exports.Execution_Queue = class Execution_Queue {
 
     static async executeScheduleTestSuite(batchExecutionData, execIds, userInfo, type) {
         const scheduleId = execIds["scheduleId"];
+        const fnName = "executeScheduleTestSuite";
         try {
 
             result = await suite.executionFunction(batchExecutionData, execIds, userInfo, "SCHEDULE");
