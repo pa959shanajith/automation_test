@@ -424,14 +424,12 @@ const ProjectNew = (props) => {
 						{/* <!--Labels--> */}
 						<label className="labelStyle1">All Projects</label>
 						<div className="seprator" >
-                            <ScrollBar scrollId='allProjectAP' thumbColor="#929397" >
-							<select multiple id="allProjectAP">
-								{assignProj.allProjectAP.map((prj) => ( 
+                            <select multiple id="allProjectAP">
+                                {assignProj.allProjectAP.map((prj) => ( 
                                     <option key={prj.projectname} value={JSON.stringify(prj)} >{prj.projectname} </option>
                                 ))}
                             </select>
-                            </ScrollBar> 
-						</div>
+                        </div>
 					</div>
 					{/* <!--Left Select Box--> */}
 

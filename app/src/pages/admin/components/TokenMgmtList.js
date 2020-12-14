@@ -18,7 +18,6 @@ const TokenMgmtList = (props) => {
 	const [searchTasks,setSearchTasks] = useState("")
 	const [allTokensModify,setAllTokensModify] = useState(props.allTokens)
     const [firstStop,setFirstStop] = useState(false)
-    const [showList,setShowList] = useState(true)
 
     useEffect(()=>{
         if(firstStop) setFirstStop(!firstStop);
@@ -64,7 +63,7 @@ const TokenMgmtList = (props) => {
             <div className="col-xs-9 adminForm-tkn-mgmt" style={{paddingTop:"0",width:"83%"}}>
                 <div className="tkn-mgmt-Wrap">
                     <div  className="sessionHeading-tkn-mgmt" data-toggle="collapse" data-target="#activeUsersToken-x">
-						<h4 onClick={()=>{setShowList(!showList);}} >CI Tokens</h4>
+						<h4 onClick={()=>{props.setShowList(!props.showList);}} >CI Tokens</h4>
 						<div  className="search-tkn-mgmt search-list-tkn-mgmt">
 							<span className="searchIcon searchIcon-list" >
 								<img src={"static/imgs/ic-search-icon.png"} className="search-img-list" />
@@ -72,7 +71,7 @@ const TokenMgmtList = (props) => {
 							<input value={searchTasks} autoComplete="off" onChange={(event)=>{ setSearchTasks(event.target.value);searchList(event.target.value)}} type="text" id="searchTasks"  className="searchInput searchInput-list-tkn-mgmt" />
 						</div>
 					</div>
-                    {showList ?
+                    {props.showList ?
                         <div id="activeUsersToken" className="wrap active-users-token" >
                             <ScrollBar scrollId='activeUsersToken' thumbColor="#929397" >
                             <table className = "table table-hover sessionTable" id="tokensDetail">

@@ -39,14 +39,17 @@ const saveNode = async(setBlockui,dNodes,projId,setPopup,moduleList,deletedNodes
     d3.select('#copyImg').classed('active-map',false)
     d3.selectAll('.ct-node').classed('node-selected',false)   
     if (d3.select('#ct-save').classed('disableButton')) return;
-    var namelist = dNodes.map((e)=>{if(e._id && e.type === 'screens' && e.state !== "deleted")return e.name})
+    var namelist = dNodes.map((e)=>{
+        if(e._id && e.type === 'screens' && e.state !== "deleted")return e.name;
+        return undefined;
+    })
     var duplicateNode = dNodes.every((e,i)=>{
-        if(e._id && e.type === 'screens' && e.state!="deleted"){
+        if(e._id && e.type === 'screens' && e.state!== "deleted"){
             return namelist.indexOf(e.name) === i || dNodes[namelist.indexOf(e.name)]._id === e._id
         } return true;
     })
     if(!duplicateNode){
-        setPopup({show:true,title:'Error',content:((modId && modId.error)?modId.error:'Duplicate screen name found.Create new screen to reuse'),submitText:'Ok'})
+        setPopup({show:true,title:'Error',content:'Duplicate screen name found.Create new screen to reuse',submitText:'Ok'})
         return;
     }
     setBlockui({show:true,content:'Saving flow! Please wait...'})
@@ -70,7 +73,7 @@ const saveNode = async(setBlockui,dNodes,projId,setPopup,moduleList,deletedNodes
         var key_1= dNodes[e.idx].parent.id;
         var key=e.type+'_'+key_1;
         if(counter[key] === undefined)  counter[key]=1;
-        if (dNodes[e.idx].childIndex != counter[key]) {
+        if (dNodes[e.idx].childIndex !== counter[key]) {
             dNodes[e.idx].childIndex = counter[key];
             dNodes[e.idx].cidxch = 'true'; // child index updated
         }
@@ -104,7 +107,7 @@ const saveNode = async(setBlockui,dNodes,projId,setPopup,moduleList,deletedNodes
 }
 
 const treeIterator = (c, d, e) =>{
-    if (c != undefined) {
+    if (c !== undefined) {
         const obj = {
             projectID: d.projectID,
             id: d.id,
@@ -131,9 +134,8 @@ const treeIterator = (c, d, e) =>{
     else if (d._children && d._children.length > 0) d._children.forEach(function(t) {
         e = treeIterator(c, t, e);
     });
-    else if (d.type != 'testcases') return !0;
+    else if (d.type !== 'testcases') return !0;
     return e;
 };
-
 
 export default SaveMapButton

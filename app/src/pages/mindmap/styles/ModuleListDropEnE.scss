@@ -1,0 +1,25 @@
+.ene_toolbar__dropdown{
+    height: 300px;
+    width: 100%;
+}
+.ene_toolbar__dropdown_module{
+    float: left;
+    width: 50%;
+    height: 100%;
+    margin-top: 21px;
+    border-right: 1px solid grey;
+}
+.ene_toolbar__dropdown_scenario{
+    float: right;
+    width: 50%;
+    height: 100%;
+    margin-top: 21px;
+}
+.ene_toolbar__dropdown_scenario span{
+    display: inline-block;
+    background: grey;
+    padding: 3px;
+    margin: 10px;
+    width: 200px;
+    border-radius: 5px;
+}

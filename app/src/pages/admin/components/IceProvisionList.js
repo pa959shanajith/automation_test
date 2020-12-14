@@ -17,7 +17,7 @@ const IceProvisionList = (props) => {
 	const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
 	const [searchTasks,setSearchTasks] = useState("")
 	const [icelistModify,setIcelistModify] = useState(props.icelist)
-	const [showList,setShowList] = useState(true)
+	const [showList,setShowList] = useState(false)
     
     useEffect(()=>{
 		refreshIceList();
@@ -37,6 +37,7 @@ const IceProvisionList = (props) => {
 				var data1 = data.filter(e => e.provisionedto !== "--Deleted--");
 				props.setIcelist(data1);
 				setIcelistModify(data1);
+				setShowList(true);
 			}
 		}catch(error) {
 			setLoading(false);

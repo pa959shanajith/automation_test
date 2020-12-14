@@ -108,7 +108,7 @@ const SessionManagement = (props) => {
                                 <th> Role </th>
                                 <th> Logged in </th>
                                 <th> IP </th>
-                                <th><button className="btn btn-hidden-cust"> Logout </button></th>
+                                <th> </th>
                             </tr>
                             {sessions.map((user,index)=>(
 							    <tr >
@@ -116,7 +116,7 @@ const SessionManagement = (props) => {
                                     <td> {user.role} </td>
                                     <td> {user.loggedin} </td>
                                     <td> {user.ip} </td>
-                                    <td><button className="btn btn-table-cust" data-id={index} onClick={(event)=>{disconnectLogoff(event)}}> Disconnect </button></td>
+                                    <td><button className="btn btn-table-cust" data-id={index} onClick={(event)=>{disconnectLogoff(event)}}> Logout </button></td>
                                 </tr> 
                             ))}
                             </tbody>
@@ -138,7 +138,7 @@ const SessionManagement = (props) => {
 								<th> Username </th>
 								<th> Connection Mode </th>
 								<th> IP </th>
-								<th><button className="btn btn-hidden-cust" > Disconnect </button></th>
+								<th> </th>
 							</tr>
                             {clients.map((user,index)=>(
 							    <tr>

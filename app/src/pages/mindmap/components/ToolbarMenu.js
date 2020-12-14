@@ -4,7 +4,6 @@ import {getModules,getScreens,exportToExcel} from '../api';
 import '../styles/ToolbarMenu.scss';
 import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
-import { ModalContainer, PopupMsg } from '../../global'
 
 
 /*Component ToolbarMenu
@@ -135,41 +134,15 @@ const toExcel = async(projId,modId) => {
     var a = document.createElement('a');
     a.href = fileURL;
     a.download = 'sample.xlsx';
-    //a.target="_new";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    //$window.open(fileURL, '_blank');
     URL.revokeObjectURL(fileURL);
 
-    // if (result == "fail") openDialogMindmap("Fail", "Error while exporting to excel");
-    // else {
-    //     openWindow = 0;
-    //     if (openWindow == 0) {
-    //         var file = new Blob([result], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    //         if (isIE) {
-    //             navigator.msSaveOrOpenBlob(file);
-    //         }else{
-    //             var fileURL = URL.createObjectURL(file);
-    //             var a = document.createElement('a');
-    //             a.href = fileURL;
-    //             a.download = 'sample.xlsx';
-    //             //a.target="_new";
-    //             document.body.appendChild(a);
-    //             a.click();
-    //             document.body.removeChild(a);
-    //             //$window.open(fileURL, '_blank');
-    //             URL.revokeObjectURL(fileURL);
-    //         }
-    //         openDialogMindmap("Success", "Successfully exported to Excel");
-    //     }
-    //     openWindow++;
-    // }
 }
 
 const paste = (copyNodes,setPopup) =>{
     var dNodes_c = copyNodes.nodes
-    var dLinks_c = copyNodes.links
     var module_check_flag = false
     if(dNodes_c.length === 0){
         setPopup({
@@ -182,7 +155,7 @@ const paste = (copyNodes,setPopup) =>{
     }
     d3.select('#pasteImg').classed('active-map',true)
     d3.selectAll('.ct-node').classed('node-selected',false)
-    module_check_flag = dNodes_c.some(e => e.type == 'scenarios'); // then check for dangling screen
+    module_check_flag = dNodes_c.some(e => e.type === 'scenarios'); // then check for dangling screen
     if (module_check_flag) {
         //highlight module
         d3.selectAll('[data-nodetype=modules]').classed('node-selected',true);
@@ -190,17 +163,6 @@ const paste = (copyNodes,setPopup) =>{
         //highlight scenarios
         d3.selectAll('[data-nodetype=scenarios]').classed('node-selected',true);
     }
-    // if (!$('#pasteImg1').hasClass('active-map')) {
-    //     dNodes_c = [];
-    //     dLinks_c = [];
-    //     $('.node-selected').removeClass('node-selected');            
-    // }
-    // $(".node-selected").mouseenter(function(){
-    //     if(!$(this).children("title").text().includes("Click ")){
-    //         $(this).children("title").text("Click "+$(this).children("title").text()+" to Paste");
-    //     }
-    // })
-
 }
 
 const copy = (selectNodes,setPopup,copyNodes) =>{
@@ -228,13 +190,13 @@ const copy = (selectNodes,setPopup,copyNodes) =>{
         })
         return false;
     }
-    dangling_screen_check_flag = dNodes_c.some(e => e.type == 'scenarios'); // then check for dangling screen
+    dangling_screen_check_flag = dNodes_c.some(e => e.type === 'scenarios'); // then check for dangling screen
     if (dangling_screen_check_flag) {
         dNodes_c.forEach((e)=>{
-            if (e.type == 'screens') {
+            if (e.type === 'screens') {
                 dangling_screen = true;
                 dLinks_c.forEach((f)=>{
-                    if (e.id == f.target.id)
+                    if (parseFloat(e.id) === parseFloat(f.target.id))
                         dangling_screen = false;
                 })
                 if (dangling_screen) {

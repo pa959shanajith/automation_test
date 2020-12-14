@@ -78,23 +78,26 @@ const AddnodeContainer = (props) =>{
         }
         setCount(i+2)
         return ntype;
-    },[props.node])
+    },[props.node,props.count])
     useEffect(()=>{
         if(props.reset===true){
             reset()
             props.setReset(false)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[props.reset])
     useEffect(()=>{
         if(props.submit===true){
             props.setSubmit(false)
             submit()
         }
+        // eslint-disable-next-line 
     },[props.submit])
     useEffect(()=>{
         if(errList.length===0){
             props.setErrMsg("")
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[errList])
     const reset = () =>{
         var arr = Array(mnode.length).fill("")
