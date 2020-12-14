@@ -1,8 +1,9 @@
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, useEffect, Fragment, useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import '../styles/ActionBarItems.scss'
 import * as actionTypes from '../state/action';
+import { ScrapeContext } from "../components/ScrapeContext";
 import * as scrapeApi from '../api';
 import { RedirectPage, ActionBar, Thumbnail, ResetSession } from '../../global';
 
@@ -19,6 +20,7 @@ const UpperContent = props => {
     const disableAppend = useSelector(state => state.scrape.disableAppend);
     const { appType } = useSelector(state => state.plugin.CT);
     const [isMac, setIsMac] = useState(false);
+    const {setShowAppPop, setSaved, setNewScrapedData, scrapeItems, setOverlay, setShowPop, updateScrapeItems} = useContext(ScrapeContext);
 
     useEffect(() => {
         const macOS = navigator.appVersion.indexOf("Mac") !== -1;
@@ -35,17 +37,17 @@ const UpperContent = props => {
         { 'title': "Edge Chromium", 'svg': "static/imgs/ic-edge-chromium.svg", action: () => initScraping('chromium'), 'disable': disableAction }
     ]
 
-    const oebsList = [{ 'title': "OEBS Apps", 'img': 'static/imgs/ic-desktop.png', action: ()=> props.setShowAppPop({'appType': 'OEBS', 'startScrape': (scrapeObjects)=>initScraping(scrapeObjects)}), 'disable': disableAction }]
+    const oebsList = [{ 'title': "OEBS Apps", 'img': 'static/imgs/ic-desktop.png', action: ()=> setShowAppPop({'appType': 'OEBS', 'startScrape': (scrapeObjects)=>initScraping(scrapeObjects)}), 'disable': disableAction }]
 
-    const desktopList = [{ 'title': "Desktop Apps", 'img': 'static/imgs/ic-desktop.png', action: () => props.setShowAppPop({'appType': 'Desktop', 'startScrape': (scrapeObjects)=>initScraping(scrapeObjects)}), 'disable': disableAction }]
+    const desktopList = [{ 'title': "Desktop Apps", 'img': 'static/imgs/ic-desktop.png', action: () => setShowAppPop({'appType': 'Desktop', 'startScrape': (scrapeObjects)=>initScraping(scrapeObjects)}), 'disable': disableAction }]
 
-    const sapList = [{ 'title': "SAP Apps", 'img': 'static/imgs/ic-desktop.png', action: () => props.setShowAppPop({'appType': 'SAP', 'startScrape': (scrapeObjects)=>initScraping(scrapeObjects)}), 'disable': disableAction }]
+    const sapList = [{ 'title': "SAP Apps", 'img': 'static/imgs/ic-desktop.png', action: () => setShowAppPop({'appType': 'SAP', 'startScrape': (scrapeObjects)=>initScraping(scrapeObjects)}), 'disable': disableAction }]
 
     const webserviceList = [{ 'title': "Web Services", 'img': 'static/imgs/ic-webservice.png', action: () => console.log(""), 'disable': disableAction }]
 
-    const mobileAppList = [{ 'title': "Mobile Apps", 'img': 'static/imgs/ic-mobility.png', action: () => props.setShowAppPop({'appType': 'MobileApp', 'startScrape': (scrapeObjects)=>initScraping(scrapeObjects)}), 'disable': disableAction }]
+    const mobileAppList = [{ 'title': "Mobile Apps", 'img': 'static/imgs/ic-mobility.png', action: () => setShowAppPop({'appType': 'MobileApp', 'startScrape': (scrapeObjects)=>initScraping(scrapeObjects)}), 'disable': disableAction }]
 
-    const mobileWebList = [{ 'title': "Mobile Web", 'img': 'static/imgs/ic-mobility.png', action: () => props.setShowAppPop({'appType': 'MobileWeb', 'startScrape': (scrapeObjects)=>initScraping(scrapeObjects)}), 'disable': disableAction }]
+    const mobileWebList = [{ 'title': "Mobile Web", 'img': 'static/imgs/ic-mobility.png', action: () => setShowAppPop({'appType': 'MobileWeb', 'startScrape': (scrapeObjects)=>initScraping(scrapeObjects)}), 'disable': disableAction }]
 
 
     const onAppend = event => {
@@ -79,7 +81,7 @@ const UpperContent = props => {
                 //     e.stopImmediatePropagation();
                 // }
                 // else {
-                    props.setOverlay(blockMsg);
+                    setOverlay(blockMsg);
                 //     e.stopImmediatePropagation();
                 // }
             } else {
@@ -87,14 +89,14 @@ const UpperContent = props => {
                 screenViewObject.applicationPath = browserType.appPath;
                 screenViewObject.processID = browserType.processID;
                 screenViewObject.scrapeMethod = browserType.method;
-                props.setShowAppPop(false);
+                setShowAppPop(false);
                 console.log(screenViewObject)
                 // if (compareFlag == true) {
                 //     blockUI(blockMsg2);
                 //     e.stopImmediatePropagation();
                 // }
                 // else {
-                    props.setOverlay(blockMsg);
+                    setOverlay(blockMsg);
                 // }
             }
         }
@@ -108,19 +110,19 @@ const UpperContent = props => {
                 //     e.stopImmediatePropagation();
                 // }
                 // else {
-                    props.setOverlay(blockMsg);
+                    setOverlay(blockMsg);
                 //     e.stopImmediatePropagation();
                 // }
             } else {
                 screenViewObject.appType = appType;
                 screenViewObject.applicationPath = browserType.appName;
-                props.setShowAppPop(false);
+                setShowAppPop(false);
                 // if (false && compareFlag == true) {
                 //     blockUI(blockMsg2);
                 //     e.stopImmediatePropagation();
                 // }
                 // else {
-                    props.setOverlay(blockMsg);
+                    setOverlay(blockMsg);
                 // }
             }
         }
@@ -134,7 +136,7 @@ const UpperContent = props => {
                 //     e.stopImmediatePropagation();
                 // }
                 // else {
-                    props.setOverlay(blockMsg);
+                    setOverlay(blockMsg);
                 //     e.stopImmediatePropagation();
                 // }
             }
@@ -142,13 +144,13 @@ const UpperContent = props => {
                 screenViewObject.appType = appType;
                 screenViewObject.apkPath = browserType.appPath;
                 screenViewObject.mobileSerial = browserType.sNum;
-                props.setShowAppPop(false);
+                setShowAppPop(false);
                 // if ($rootScope.compareFlag == true) {
                 //     blockUI(blockMsg2);
                 //     e.stopImmediatePropagation();
                 // }
                 // else {
-                props.setOverlay(blockMsg);
+                setOverlay(blockMsg);
                 //     e.stopImmediatePropagation();
                 // }
             } 
@@ -159,13 +161,13 @@ const UpperContent = props => {
                 screenViewObject.bundleId = browserType.deviceName;
                 screenViewObject.ipAddress =  browserType.uuid;
                 screenViewObject.param = 'ios';
-                props.setShowAppPop(false);
+                setShowAppPop(false);
                 // if( $rootScope.compareFlag == true){
                 //     blockUI(blockMsg2);
                 //     e.stopImmediatePropagation();
                 // }
                 // else{
-                    props.setOverlay(blockMsg);
+                    setOverlay(blockMsg);
                 //     e.stopImmediatePropagation();
                 // }
             }
@@ -175,13 +177,13 @@ const UpperContent = props => {
                 screenViewObject.mobileDeviceName = browserType.deviceName;
                 // screenViewObject.mobileIosVersion = $(document).find("#mobilityiOSVersion").val();
                 screenViewObject.mobileUDID = browserType.uuid;
-                props.setShowAppPop(false);
+                setShowAppPop(false);
                 // if( $rootScope.compareFlag == true){
                 //     blockUI(blockMsg2);
                 //     e.stopImmediatePropagation();
                 // }
                 // else{
-                props.setOverlay(blockMsg);
+                setOverlay(blockMsg);
                 //     e.stopImmediatePropagation();                            
                 // }
             }
@@ -198,7 +200,7 @@ const UpperContent = props => {
                 //     e.stopImmediatePropagation();
                 // }
                 // else {
-                    props.setOverlay(blockMsg);
+                    setOverlay(blockMsg);
                 //     e.stopImmediatePropagation();
                 // }
             } 
@@ -212,7 +214,7 @@ const UpperContent = props => {
                 //     e.stopImmediatePropagation();
                 // }
                 // else {
-                    props.setOverlay(blockMsg);
+                    setOverlay(blockMsg);
                 //     e.stopImmediatePropagation();
                 // }
             }
@@ -228,7 +230,7 @@ const UpperContent = props => {
                 //     e.stopImmediatePropagation();
                 // }
                 // else {
-                    props.setOverlay(blockMsg);
+                    setOverlay(blockMsg);
                     // e.stopImmediatePropagation();
                 // }
             } 
@@ -240,7 +242,7 @@ const UpperContent = props => {
                 //     e.stopImmediatePropagation();
                 // }
                 // else {
-                    props.setOverlay(blockMsg);
+                    setOverlay(blockMsg);
                 //     e.stopImmediatePropagation();
                 // }
             }
@@ -253,7 +255,7 @@ const UpperContent = props => {
             //     e.stopImmediatePropagation();
             // }
             // else {
-            props.setOverlay(blockMsg);
+            setOverlay(blockMsg);
             //     e.stopImmediatePropagation();
             // }
         }
@@ -271,7 +273,7 @@ const UpperContent = props => {
             // }
             if (false){}
             else {
-                props.setOverlay(blockMsg);
+                setOverlay(blockMsg);
                 // e.stopImmediatePropagation();
             }
         }
@@ -280,20 +282,20 @@ const UpperContent = props => {
         scrapeApi.initScraping_ICE(screenViewObject)
             .then(data=> {
                 console.log("initScraping result: ", data);
-                props.setOverlay("");
+                setOverlay("");
                 ResetSession.end();
                 if (data === "Invalid Session") return RedirectPage(history);
                 else if (data === "Response Body exceeds max. Limit.") {
-                    props.setShowPop({ 'title': 'Scrape Screen', 'content': 'Scraped data exceeds max. Limit.' });
+                    setShowPop({ 'title': 'Scrape Screen', 'content': 'Scraped data exceeds max. Limit.' });
                     return false;
                 } else if (data === 'scheduleModeOn' || data === "unavailableLocalServer") {
-                    let scrapedItemsLength = props.scrapeItems.length;
+                    let scrapedItemsLength = scrapeItems.length;
 
                     if (scrapedItemsLength > 0) dispatch({ type: actionTypes.SET_DISABLEACTION, payload: true });
                     else dispatch({ type: actionTypes.SET_DISABLEACTION, payload: false });
 
-                    props.setSaved(false);
-                    props.setShowPop({
+                    setSaved(false);
+                    setShowPop({
                         'title': 'Scrape Screen', 'content':
                             data === 'scheduleModeOn' ?
                                 "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed." :
@@ -301,16 +303,16 @@ const UpperContent = props => {
                     });
                     return false;
                 } else if (data === "fail") {
-                    props.setShowPop({ 'title': 'Scrape', 'content': 'Failed to scrape.' });
+                    setShowPop({ 'title': 'Scrape', 'content': 'Failed to scrape.' });
                     return false
                 } else if (data === "Terminate") {
-                    props.setOverlay("");
-                    props.setShowPop({ 'title': 'Scrape Screen', 'content': 'Scrape Terminated' });
+                    setOverlay("");
+                    setShowPop({ 'title': 'Scrape Screen', 'content': 'Scrape Terminated' });
                     return false
                 } else if (data === "wrongWindowName") {
-                    props.setShowPop({ 'title': 'Scrape', 'content': 'Wrong window name.' });
+                    setShowPop({ 'title': 'Scrape', 'content': 'Wrong window name.' });
                 } else if (data === "ExecutionOnlyAllowed") {
-                    props.setShowPop({ 'title': 'Scrape Screen', 'content': 'Execution Only Allowed' });
+                    setShowPop({ 'title': 'Scrape Screen', 'content': 'Execution Only Allowed' });
                     return false
                 }
                 //COMPARE & UPDATE SCRAPE OPERATION
@@ -330,7 +332,7 @@ const UpperContent = props => {
                     if (viewString.view.length !== 0){
                     //Getting the Existing Scrape Data
                     let localScrapeList = [];
-                    let lastIdx = props.scrapeItems[props.scrapeItems.length-1].val;
+                    let lastIdx = scrapeItems[scrapeItems.length-1].val;
                     for (let i = 0; i < viewString.view.length; i++) {
                         
                         let ob = viewString.view[i];
@@ -372,10 +374,10 @@ const UpperContent = props => {
                         
                         localScrapeList.push(scrapeItem)
                     }
-                    props.setNewScrapedData(viewString);
-                    props.updateScrapeItems(localScrapeList)
+                    setNewScrapedData(viewString);
+                    updateScrapeItems(localScrapeList)
                     
-                    if (viewString.view.length > 0) props.setSaved(false);
+                    if (viewString.view.length > 0) setSaved(false);
 
                 }else{
                     //when viewsstring.view is empty after click and add
@@ -473,9 +475,9 @@ const UpperContent = props => {
 
             })
             .catch(error => {
-                props.setOverlay("");
+                setOverlay("");
                 ResetSession.end();
-                props.setShowPop({'title': "Scrape Screen",'content': "Error while performing Scrape."});
+                setShowPop({'title': "Scrape Screen",'content': "Error while performing Scrape."});
                 console.error("Fail to Load design_ICE. Cause:", error);
             });
 		
@@ -502,16 +504,19 @@ const UpperContent = props => {
     return renderComp;
 }
 
-const BottomContent = props => {
+const BottomContent = () => {
     const { appType } = useSelector(state => state.plugin.CT);
-
+    const { setShowObjModal, scrapeItems, customLen} = useContext(ScrapeContext);
+    let scrapeItemsLength = scrapeItems.length;
+    
+    
     const lowerList = [
-        {'title': 'Add Object', 'img': 'static/imgs/ic-addobject.png', 'action': ()=>console.log("Pressed Add Object"), 'show': appType === 'Web'}, 
-        {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>console.log("Pressed Map Object"), 'show': appType === 'Web'},
-        {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>console.log("Pressed Compare Object"), 'show': appType === 'Web'},
-        {'title': 'Create Object', 'img': 'static/imgs/ic-jq-editstep.png', 'action': ()=>console.log("Pressed Create Object"), 'show': appType === 'Web'},
-        {'title': 'Import Test Case', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>console.log("Import TestCase"), show: true},
-        {'title': 'Export Test Case', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>console.log("Export TestCase"), 'disable': false, show: true}
+        {'title': 'Add Object', 'img': 'static/imgs/ic-addobject.png', 'action': ()=>setShowObjModal("addObject"), 'show': appType === 'Web' || appType === "MobileWeb"}, 
+        {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>console.log("Pressed Map Object"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0},
+        {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0},
+        {'title': 'Create Object', 'img': 'static/imgs/ic-jq-editstep.png', 'action': ()=>setShowObjModal("createObject"), 'show': appType === 'Web' || appType === "MobileWeb"},
+        {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>console.log("Import TestCase"), show: true},
+        {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>console.log("Export TestCase"), 'disable': customLen <= 0 && scrapeItemsLength-customLen <= 0, show: true}
     ]
 
     return (
@@ -527,8 +532,8 @@ const ActionBarItems = props => {
     const { appType } = useSelector(state=>state.plugin.CT);
     return (
         <ActionBar
-            upperContent={ appType === "Mainframe" ? null : <UpperContent setShowAppPop={props.setShowAppPop} setNewScrapedData={props.setNewScrapedData} setSaved={props.setSaved} appendCheck={props.appendCheck} setAppendCheck={props.setAppendCheck} scrapeItems={props.scrapeItems} setOverlay={props.setOverlay} setShowPop={props.setShowPop} updateScrapeItems={props.updateScrapeItems} />}
-            bottomContent={ appType === "Mainframe" ? null : <BottomContent  />}
+            upperContent={ appType === "Mainframe" ? null : <UpperContent />}
+            bottomContent={ appType === "Mainframe" ? null : <BottomContent />}
         />
     )
 }

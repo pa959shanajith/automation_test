@@ -217,7 +217,7 @@ const Header = () => {
                         <ClickAwayListener onClickAway={onClickAwaySR}>
                             <div className="switch-role-btn no-border" data-toggle="dropdown" onClick={switchRole} >
                                 <span><img className="switch-role-icon" alt="switch-ic" src="static/imgs/ic-switch-user.png"/></span>
-                                <span>Switch Roles</span>
+                                <span>Switch Role</span>
                             </div>
                             <div className={ "switch-role-menu dropdown-menu " + (showSR && "show")}>
                                 {roleList.map(role => 

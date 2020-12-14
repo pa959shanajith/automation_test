@@ -86,9 +86,18 @@ const ReferenceBar = (props) => {
 
     useEffect(()=>{
         if (Object.keys(current_task).length!==0 && Object.keys(dataDict).length!==0){
-            let info = current_task.taskName.slice(0, 3).toLowerCase() === "exe" ?
+            let identify = current_task.taskName.slice(0, 3).toLowerCase();
+            let info = identify === "exe" ?
             {
                 'Project Name' : dataDict.projectDict[current_task.projectId],
+                'Release' : current_task.releaseid,
+                'Cycle' : dataDict.cycleDict[current_task.cycleid]
+            }
+            : identify === "des" ? 
+            {
+                'Project Name' : dataDict.projectDict[current_task.projectId],
+                'Screen' : current_task.screenName,
+                'TestCase' : current_task.testCaseName,
                 'Release' : current_task.releaseid,
                 'Cycle' : dataDict.cycleDict[current_task.cycleid]
             }
@@ -96,9 +105,9 @@ const ReferenceBar = (props) => {
             {
                 'Project Name' : dataDict.projectDict[current_task.projectId],
                 'Screen' : current_task.screenName,
-                'TestCase' : current_task.testCaseName,
                 'Release' : current_task.releaseid,
-                'Cycle' : dataDict.cycleDict[current_task.cycleid]
+                'Cycle' : dataDict.cycleDict[current_task.cycleid],
+                'URL': ''
             }
             setSearchValue("");
             setShowTask(false);

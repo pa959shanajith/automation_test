@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useSelector } from 'react-redux';
 import ClickAwayListener from 'react-click-away-listener';
 import { ReferenceBar } from '../../global';
+import { ScrapeContext } from './ScrapeContext';
 import "../styles/RefBarItems.scss";
 
 const RefBarItems = props => {
@@ -13,7 +14,8 @@ const RefBarItems = props => {
 	const [showFilterPop, setShowFilterPop] = useState(false);
 	const [filterY, setFilterY] = useState(null);
 	const [showScreenPop, setShowScreenPop] = useState(false);
-    const [screenshotY, setScreenshotY] = useState(null);
+	const [screenshotY, setScreenshotY] = useState(null);
+	const { scrapeItems, setScrapeItems } = useContext(ScrapeContext);
 
 	useEffect(()=>{
 		const macOS = navigator.appVersion.indexOf("Mac") !== -1;
@@ -107,7 +109,7 @@ const RefBarItems = props => {
     }
 
     const filter = toFilter => {
-		let scrapedItems = [...props.scrapeItems];
+		let scrapedItems = [...scrapeItems];
 		scrapedItems.forEach(item => {
 			item.hide = true;
 			item.duplicate = false;
@@ -176,7 +178,7 @@ const RefBarItems = props => {
 				}
 				else if(tag === "userobj"){
 					scrapedItems.forEach(item => {
-						if (item.userObj) {
+						if (item.addCusOb) {
 							item.hide = false
 						}
 					});
@@ -202,7 +204,7 @@ const RefBarItems = props => {
 		// 	'cursor': 'auto'
 		// });
 		// cfpLoadingBar.complete()
-        props.setScrapeItems(scrapedItems)
+        setScrapeItems(scrapedItems)
 	}
 
 	const Popups = () => (

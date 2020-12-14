@@ -1,16 +1,19 @@
 import React ,{useState ,useEffect} from 'react';
 import {useSelector, useDispatch} from "react-redux"
-// import ScrapeCenter from '../components/CenterScr.js';
+import { useHistory } from 'react-router-dom';
 import ScrapeContent from './ScrapeContent';
 import RefBarItems from '../components/RefBarItems.js';
-import { useHistory } from 'react-router-dom';
+import AddObjectModal from '../components/AddObjectModal';
+import CompareObjectModal from '../components/CompareObjectModal';
+import CreateObjectModal from '../components/CreateObjectModal';
 import ActionBarItems from '../components/ActionBarItems';
 import LaunchApplication from '../components/LaunchApplication';
+import { ScrapeContext } from '../components/ScrapeContext';
 import { Header, FooterTwo as Footer, ScreenOverlay, RedirectPage, PopupMsg, ModalContainer } from '../../global';
 import * as scrapeApi from '../api';
-import '../styles/Scrapescreen.scss';
 import * as actionTypes from '../state/action';
 import * as pluginActions from "../../plugin/state/action";
+import '../styles/Scrapescreen.scss';
 
 const ScrapeScreen = ()=>{
     const dispatch = useDispatch();
@@ -22,11 +25,13 @@ const ScrapeScreen = ()=>{
     const [showPop, setShowPop] = useState("");
     const [showConfirmPop, setShowConfirmPop] = useState(false);
     const [scrapeItems, setScrapeItems] = useState([]);
+    const [customLen, setCustomLen] = useState(0);
     const [mainScrapedData, setMainScrapedData] = useState({});
     const [saved, setSaved] = useState(true);
     const [showAppPop, setShowAppPop] = useState(false);
     const [scrapedURL, setScrapedURL] = useState("");
     const [hideSubmit, setHideSubmit] = useState(true);
+    const [showObjModal, setShowObjModal] = useState(false);
     const [newScrapedData, setNewScrapedData] = useState([]);
 
     useEffect(() => {
@@ -103,7 +108,7 @@ const ScrapeScreen = ()=>{
                                 scrapeItem.decryptFlag = true;
                             } else {
                                 scrapeItem.addCusOb = addcusOb
-                                custObjLength++;
+                                if (addcusOb) custObjLength++;
                             };
                             
                             localScrapeList.push(scrapeItem)
@@ -112,9 +117,11 @@ const ScrapeScreen = ()=>{
                         setMainScrapedData(viewString);
                         setScrapeItems(localScrapeList);
                         setHideSubmit(false);
-                        setSaved(false);
+                        setSaved(true);
                         dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
                         dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: !haveItems});
+                        setCustomLen(custObjLength);
+                        console.log(custObjLength)
                         // screenshot
                         // flip selectAll chkbox
                         // if web -> flip gen and compare objects -> check custObjLength as well
@@ -126,7 +133,8 @@ const ScrapeScreen = ()=>{
                         setScrapeItems([]);
                         setMainScrapedData({});
                         setNewScrapedData([]);
-                        setSaved(false);
+                        setCustomLen(0);
+                        setSaved(true);
                         dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
                         dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: !haveItems});
                         // screenshot
@@ -195,19 +203,19 @@ const ScrapeScreen = ()=>{
         { overlay && <ScreenOverlay content={overlay} />}
         { showPop && <PopupDialog />}
         { showConfirmPop && <ConfirmPopup /> }
+        { showObjModal === "addObject" && <AddObjectModal setShow={setShowObjModal} /> }
+        { showObjModal === "compareObject" && <CompareObjectModal setShow={setShowObjModal}/> }
+        { showObjModal === "createObject" && <CreateObjectModal setShow={setShowObjModal}/>}
         { showAppPop && <LaunchApplication setShow={setShowAppPop} appPop={showAppPop} />}
         <div  className="ss__body">
-            
             <Header/>
             <div className="ss__mid_section">
-
-                <ActionBarItems setShowAppPop={setShowAppPop} setSaved={setSaved} setNewScrapedData={setNewScrapedData} scrapeItems={scrapeItems} setOverlay={setOverlay} setShowPop={setShowPop} updateScrapeItems={updateScrapeItems}/>
-                
-                <ScrapeContent saved={saved} setSaved={setSaved} newScrapedData={newScrapedData} setShowPop={setShowPop}  setShowConfirmPop={setShowConfirmPop} mainScrapedData={mainScrapedData} current_task={current_task} scrapeItems={scrapeItems} hideSubmit={hideSubmit} setScrapeItems={setScrapeItems} />
-                
-                <RefBarItems scrapeItems={scrapeItems} setScrapeItems={setScrapeItems} />
+                <ScrapeContext.Provider value={{setShowObjModal, saved, setShowAppPop, setSaved, newScrapedData, setNewScrapedData, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, hideSubmit, setOverlay, setShowPop, updateScrapeItems, customLen}}>
+                    <ActionBarItems />
+                    <ScrapeContent />
+                    <RefBarItems />
+                </ScrapeContext.Provider>
             </div>
-            
             <div className='ss__footer'><Footer/></div>
         </div>
         </>
