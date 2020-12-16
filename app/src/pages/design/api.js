@@ -1,7 +1,9 @@
 import axios from 'axios';
 const url = "https://"+window.location.hostname+":8443";
 
-
+/*Component DesignContent
+  api returns {"mirror":"","name":"","reuse":bool,"scrapedurl":"","view":[{"_id":"","cord":"","custname":"","height":,"hiddentag":"","left":,"objectType":"","parent":[""],"tag":"","top":,"url":"","width":,"xpath":""}/{"_id":"","custname":"","height":,"hiddentag":"","left":,"parent":[""],"tag":"button","top":,"url":"","width":,"xpath":""}]}
+*/
 export const getScrapeDataScreenLevel_ICE = (type, screenId, projectId, testCaseId) =>	{
     return new Promise((resolve, reject)=>{
         axios(url+"/getScrapeDataScreenLevel_ICE", {
@@ -29,6 +31,9 @@ export const getScrapeDataScreenLevel_ICE = (type, screenId, projectId, testCase
     })
 }
 
+/*Component DesignContent
+  api returns String (Invalid Session/Success)
+*/
 export const updateScreen_ICE = (scrapeObject) => {
     return new Promise((resolve, reject)=>{
         axios(url+"/updateScreen_ICE", {
@@ -51,6 +56,9 @@ export const updateScreen_ICE = (scrapeObject) => {
     });
 }
 
+/*Component DesignContent
+  api returns {"template":"","reuse":bool,"testcase":[{"addTestCaseDetails":"","addTestCaseDetailsInfo":"{\"actualResult_fail\":\"\",\"actualResult_pass\":\"\",\"testcaseDetails\":\"\"}","appType":"","cord":"","custname": "","inputVal":[""],"keywordVal":"","objectName":"","outputVal":"","remarks": "a;b","stepNo":int,"url":""}],"testcasename":"","del_flag":bool}
+*/
 export const readTestCase_ICE = (userInfo, testCaseId, testCaseName, versionnumber, screenName) => {
     return new Promise((resolve, reject)=> {
         axios(url+"/readTestCase_ICE", {
@@ -80,6 +88,9 @@ export const readTestCase_ICE = (userInfo, testCaseId, testCaseName, versionnumb
     });
 }
 
+/*Component DesignContent
+  api returns String (Invalid Session/Success)
+*/
 export const updateTestCase_ICE = (testCaseId, testCaseName, testCaseData, userInfo, versionnumber, import_status) => {
     return new Promise((resolve, reject)=>{
         axios(url+"/updateTestCase_ICE", {
@@ -112,6 +123,10 @@ export const updateTestCase_ICE = (testCaseId, testCaseName, testCaseData, userI
     });
 }
 
+/*Component ActionbarItems (DesignPage)
+  api returns String (Invalid Session/unavailableLocalServer/success/fail/Terminate/browserUnavailable/scheduleModeOn/ExecutionOnlyAllowed)
+                or {status:"", "":xpath}
+*/ 
 export const debugTestCase_ICE = (browserType, testcaseID, userInfo, appType) => {
     return new Promise((resolve, reject)=>{
         axios(url+"/debugTestCase_ICE", {
@@ -140,6 +155,10 @@ export const debugTestCase_ICE = (browserType, testcaseID, userInfo, appType) =>
     });
 }
 
+/*Component ActionbarItems (DesignPage)
+  api returns {"<type>":{"<keyword>":{"inputtype": [""],"inputval": [""],"outputval": [""]}}
+}
+*/ 
 export const getKeywordDetails_ICE = (appType) => {
     return new Promise((resolve, reject)=>{
         axios(url+"/getKeywordDetails_ICE", {
@@ -165,6 +184,9 @@ export const getKeywordDetails_ICE = (appType) => {
     })
 }
 
+/*Component DependentTestCaseDialog
+  api returns [{"testcaseId":"","testcaseName":""}]
+*/ 
 export const getTestcasesByScenarioId_ICE = (testScenarioId) => {
     return new Promise((resolve, reject)=>{
         axios(url+"/getTestcasesByScenarioId_ICE", {
@@ -190,6 +212,9 @@ export const getTestcasesByScenarioId_ICE = (testScenarioId) => {
     })
 }
 
+/*Component DesignContent
+  api returns fail/inprogress
+*/ 
 export const reviewTask = (projectId, taskid, taskstatus, version, batchTaskIDs) => {
     return new Promise((resolve, reject)=>{
         axios(url+"/reviewTask", {

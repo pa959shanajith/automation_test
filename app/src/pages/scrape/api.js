@@ -4,6 +4,9 @@ import { history } from './index';
 
 const url = "https://"+window.location.hostname+":8443";
 
+/*Component ActionBarItems (Scrape)
+  api returns Invalid Session/Response Body exceeds max. Limit./scheduleModeOn/unavailableLocalServer/fail/Terminate/wrongWindowName/ExecutionOnlyAllowed/{"mirror":"","name":"",scrapedurl":"","view":[{"_id":"","cord":"","custname":"","height":,"hiddentag":"","left":,"objectType":"","parent":[""],"tag":"","top":,"url":"","width":,"xpath":""}/{"_id":"","custname":"","height":,"hiddentag":"","left":,"parent":[""],"tag":"button","top":,"url":"","width":,"xpath":""}]}
+*/
 export const initScraping_ICE = screenViewObject => {
     return new Promise((resolve, reject)=>{
         axios(url+"/initScraping_ICE", {
@@ -48,6 +51,9 @@ export const initScraping_ICE = screenViewObject => {
 //     });
 // }
 
+/*Component ScrapeScreen
+  api returns {"mirror":"","name":"","reuse":bool,"scrapedurl":"","view":[{"_id":"","cord":"","custname":"","height":,"hiddentag":"","left":,"objectType":"","parent":[""],"tag":"","top":,"url":"","width":,"xpath":""}/{"_id":"","custname":"","height":,"hiddentag":"","left":,"parent":[""],"tag":"button","top":,"url":"","width":,"xpath":""}]}
+*/
 export const getScrapeDataScreenLevel_ICE = (type, screenId, projectId, testCaseId) =>	{
     return new Promise((resolve, reject)=>{
         axios(url+"/getScrapeDataScreenLevel_ICE", {

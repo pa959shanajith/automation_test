@@ -1,7 +1,9 @@
 import axios from 'axios';
 const url = "https://"+window.location.hostname+":8443";
 
-
+/*Component TaskSection
+  api returns {"appType":[""],"appTypeName":[""],"cycles":{"":[""]},"domains":[],"projectId":[],"projectName":[],"projecttypes":{},"releases":[[{"cycles":[{"_id":"","name":""}],"name":""}]]}
+*/
 export const getProjectIDs = () => {
     return new Promise((resolve, reject)=> {
         axios(url+"/getProjectIDs", {
@@ -26,6 +28,10 @@ export const getProjectIDs = () => {
     })
 }
 
+
+/*Component TaskSection
+  api returns {"appType":"","projectId":"","screenId":"","screenName":"","testCaseId":"","versionnumber":int,"testCaseName":"","scenarioId":"","scenarioName":"","assignedTestScenarioIds":[],"taskDetails":[{"taskName":"","taskDescription":"","taskType":"","subTaskType":"","subTaskId":"","assignedTo":"","reviewer":"","startDate":"","expectedEndDate":"","batchTaskIDs":[""],"status":"","reuse":"","releaseid":"","cycleid":""}],"testSuiteDetails":[{"assignedTime":"","releaseid":"","cycleid":"","testsuiteid":"","testsuitename":"","projectidts":"","assignedTestScenarioIds":"","subTaskId":""}],"scenarioFlag":"","releaseid":"","cycleid":""}
+*/
 export const getTaskJson_mindmaps = obj => {
     return new Promise((resolve, reject) => {
         axios(url+"/getTaskJson_mindmaps", {

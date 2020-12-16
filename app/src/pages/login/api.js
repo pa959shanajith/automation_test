@@ -1,7 +1,9 @@
-
 import axios from 'axios';
 const url = "https://"+window.location.hostname+":8443";
 
+/*Component LoginFields
+  api returns String (restart/validCredential/inValidCredential/invalid_username_password/userLogged/inValidLDAPServer/invalidUserConf)
+*/
 export const authenticateUser = async(username, password) => {
     try{
         const res = await axios(url+"/login", {
@@ -24,6 +26,9 @@ export const authenticateUser = async(username, password) => {
     }
 }
 
+/*Component BasePage
+  api returns {"user_id":"","username":"","email_id":"","additionalrole":[],"firstname":"","lastname":"","role":"","taskwflow":bool,"token":"","dbuser":bool,"ldapuser":bool,"samluser":bool,"openiduser":bool,"rolename":"","pluginsInfo":[{"pluginName":"","pluginValue":bool}],"page":"plugin"}
+*/
 export const loadUserInfo = async(selRole) => {
     try{
         const res = await axios(url+"/loadUserInfo", {
@@ -46,6 +51,9 @@ export const loadUserInfo = async(selRole) => {
     }
 }
 
+/*Component BasePage
+  api returns String (fail/unauthorized/badrequest/nouser/nouserprofile/userLogged/inValidCredential/noProjectsAssigned/reload/redirect/Invalid Session)
+*/
 export const validateUserState = async() => {
     try{
         const res = await axios(url+"/validateUserState", {
@@ -64,6 +72,9 @@ export const validateUserState = async() => {
     }
 }
 
+/*Component LoginFields
+  api returns {proceed:true} / invalidServerConf
+*/
 export const checkUser = async(user) => {
     try{
         const res = await axios(url+"/checkUser", {

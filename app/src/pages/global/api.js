@@ -1,6 +1,8 @@
 import axios from 'axios';
 const url = "https://"+window.location.hostname+":8443";
 
+/*Component RedirectPage
+*/
 export const logoutUser = () => {
     return new Promise((resolve, reject) => {
         axios(url+"/logoutUser", {
@@ -25,6 +27,8 @@ export const logoutUser = () => {
     });
 }
 
+/*Component ResetSession
+*/
 export const keepSessionAlive = () => {
     return new Promise((resolve, reject)=>{
         axios(url+"/keepSessionAlive", {
@@ -45,6 +49,9 @@ export const keepSessionAlive = () => {
     });
 }
 
+/*Component TaskContents
+  api returns fail/inprogress
+*/
 export const updateTaskStatus = obj => {
     return new Promise((resolve, reject) => {
         axios(url+"/updateTaskstatus_mindmaps", {
@@ -69,6 +76,9 @@ export const updateTaskStatus = obj => {
     });
 }
 
+/*Component ChangePassword
+  api returns "Invalid Session"/"success"/"same"/"incorrect"/"fail"
+*/
 export const resetPassword = (newpassword, currpassword) => {
     return new Promise((resolve, reject) => {
         axios(url+"/resetPassword", {
@@ -93,6 +103,9 @@ export const resetPassword = (newpassword, currpassword) => {
     })
 }
 
+/*Component Header
+  api returns {"": ""}
+*/
 export const getRoleNameByRoleId = async(roleasarray) => {
     return new Promise((resolve, reject)=>{
         axios(url+"/getRoleNameByRoleId", {
