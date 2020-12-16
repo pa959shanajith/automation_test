@@ -23,8 +23,7 @@ const UpperContent = props => {
     const {setShowAppPop, setSaved, setNewScrapedData, scrapeItems, setOverlay, setShowPop, updateScrapeItems} = useContext(ScrapeContext);
 
     useEffect(() => {
-        const macOS = navigator.appVersion.indexOf("Mac") !== -1;
-        setIsMac(macOS);
+        setIsMac(navigator.appVersion.indexOf("Mac") !== -1);
     }, [appType]);
 
 

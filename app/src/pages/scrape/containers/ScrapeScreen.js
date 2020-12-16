@@ -13,7 +13,7 @@ import { Header, FooterTwo as Footer, ScreenOverlay, RedirectPage, PopupMsg, Mod
 import * as scrapeApi from '../api';
 import * as actionTypes from '../state/action';
 import * as pluginActions from "../../plugin/state/action";
-import '../styles/Scrapescreen.scss';
+import '../styles/ScrapeScreen.scss';
 
 const ScrapeScreen = ()=>{
     const dispatch = useDispatch();

@@ -31,8 +31,7 @@ const DesignHome = () => {
     const [checkedTc, setCheckedTc] = useState([]);
     
     useEffect(()=>{
-        const macOS = navigator.appVersion.indexOf("Mac") !== -1;
-        setIsMac(macOS);
+        setIsMac(navigator.appVersion.indexOf("Mac") !== -1);
         setLoading(false);
         setImported(false);
     }, [current_task, filter_data]);
