@@ -387,7 +387,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                     this.queue_list[poolid]["execution_list"] = []
                 }
             }
-            if(inputs["poolid"] === "all"){
+            if(inputs["poolid"] === "all" && Array.isArray(pools)){
                 for (let index in this.queue_list){
                     if(!(index in pools)){
                         delete this.queue_list[index]
