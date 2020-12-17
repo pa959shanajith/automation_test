@@ -74,7 +74,7 @@ const FilterDialog = ({setShow, dataDict, filterData, filterTasks}) => {
 
     const Content = () => (
         <div className="filter_body">
-            <ScrollBar thumbColor="#311d4e" trackColor="#fff">
+            <ScrollBar thumbColor="#311d4e" trackColor="#fff" hideXbar={true}>
             <div className="filter_content">
                 
                 { /* Project Selection */ }

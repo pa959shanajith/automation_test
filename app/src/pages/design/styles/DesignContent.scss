@@ -14,6 +14,7 @@
 }
 
 .d__task_name{
+    cursor: pointer;
     background-color: #331d4e;
     color: #fff;
     padding: 1px 14px 0;
@@ -72,14 +73,137 @@
     padding: 0px 12px;
     margin-right: 10px;
     background-color: #633693;
+    &:disabled{
+        background-color: #ca99ff;
+        cursor: auto;
+    }
 }
 
-.d__submitBtn, .d__reassignBtn{
+.d__submitBtn, .d__reassignBtn, .d__approveBtn{
     background-color: #ff7300;
     padding: 2px 15px;
     font-size: 17px;
     margin-right: 5px;
 }
+
+.d__table_contents{
+    margin-top: 5px;
+    position: relative;
+    height: 100%;
+}
+
+.d__table{
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 100%;
+}
+
+.d__table_header{
+    display: flex;
+    justify-content: space-between;
+    margin-right: 2px;
+}
+
+.d__step_head, .d__sel_head, .d__obj_head, .d__key_head, .d__inp_head, .d__out_head, .d__rem_head, .d__det_head{
+    font-family: "LatoWebLight";
+    font-size: 17px;
+    color: #fff;
+    background-color: #5e626b;
+    cursor: pointer;
+    margin: 0 0.5px;
+    height: 26px;
+}
+
+.d__inp_head, .d__out_head{
+    display: block!important;
+}
+
+.d__step_head{
+    flex-basis: 4.15%!important;
+    margin-right: 0;
+    border-radius: 6px 0 0 6px;
+}
+.d__sel_head{
+    display: flex;
+    align-items: center;
+    margin: 0 0;
+    padding-right: 1%;
+}
+.d__obj_head{
+    text-align: left;
+    margin-left: 0;
+}
+.d__det_head{
+    border-radius: 0 6px 6px 0; 
+}
+.step_col{
+    flex: 0 0 3.9%;
+    width: 100%;
+    text-align: center;
+}
+.sel_col{
+    display: flex;
+    align-items: center;
+    padding: 0 1%;
+    .sel_obj{
+        height: 16px;
+        width: 16px;
+    }
+}
+
+.objname_col{
+    flex: 0 0 18%;
+    width: 100%;
+    height: 100%;
+    padding: 0 5px;
+    overflow: hidden;
+}
+
+.keyword_col{
+    flex: 0 0 18%;
+    width: 100%;
+    text-align: center;
+    overflow: hidden;
+}
+
+.input_col, .output_col{
+    flex: 0 0 20%;
+    display: flex;
+    text-align: center;
+    width: 100%;
+    overflow: hidden;
+}
+
+.remark_col, .details_col{
+    flex: 0 1 auto;
+    width: 100%;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.highlight-step{
+    background-color: #e3caff;
+}
+.ab{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+}
+.min{
+    min-height: 0;
+}
+.con{
+    display: flex;
+    flex-direction: column;
+    flex: 1 1;
+    height: 100%;
+}
+
 
 @media screen and (min-width: 1400px) and (min-height: 770px){
     .d__content{
@@ -126,4 +250,36 @@
         font-size: 2.21vh;
         margin-right: 0.6vh;
     } 
+
+        
+    .d__table_contents{
+        margin-top: 0.647vh;
+    }
+
+    .d__table_header{
+        margin-right: .258vh;
+    }
+
+    .d__step_head, .d__sel_head, .d__obj_head, .d__key_head, .d__inp_head, .d__out_head, .d__rem_head, .d__det_head{
+        font-size: 2.20vh;
+        margin: 0 0.725vh;
+        height: 3.363vh;
+    }
+
+    .d__step_head{
+        border-radius: 0.777vh 0 0 0.777vh;
+    }
+    .d__det_head{
+        border-radius: 0 0.777vh 0.777vh 0; 
+    }
+    .sel_col{
+        .sel_obj{
+            height: 2.07vh;
+            width: 2.07vh;
+        }
+    }
+
+    .objname_col{
+        padding: 0 0.647vh;
+    }
 }

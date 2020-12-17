@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import * as pluginApi from '../../plugin/api';
+import { updateTaskStatus } from '../api';
 import * as actionTypes from "../../plugin/state/action";
 import "../styles/TaskContents.scss";
+
+/*
+    Component: Task List for Plugin Page and Reference Bar (Right Bar)
+    Uses: Renders a list of task for above mentioned components
+    Props : items -> array of tasks to populate
+            cycleDict -> cycle dictionary from FD state
+            taskJson -> tasksJson from redux store (can be called here using useSelector, modifications may require in taskSection.js )
+*/
 
 const TaskContents = (props) => {
 
@@ -25,6 +33,7 @@ const TaskContents = (props) => {
                         showPanel={showPanel} 
                         setShowPanel={setShowPanel}
                         taskJson={props.taskJson}
+                        testCaseId={props.testCaseId}
                         taskName={props.taskName}
                         cycleDict={props.cycleDict}
                     />
@@ -55,7 +64,7 @@ const TaskPanel = (props) => {
         let taskObj = {};
         if(dataobj.status==='assigned'){
             dataobj.status='inprogress';
-            pluginApi.updateTaskStatus(dataobj.subtaskid)
+            updateTaskStatus(dataobj.subtaskid)
                     .then(data => {
                         dataobj.status=data;
                     })
@@ -91,7 +100,7 @@ const TaskPanel = (props) => {
             history.replace("/scrape")
         }
         else if(dataobj.subtask === "TestCase"){
-            window.localStorage['navigateScreen'] = "TestCase";
+            window.localStorage['navigateScreen'] = "TestCase"; // Can I change it to "Design"?
             window.localStorage['navigateTestcase'] = true;
             history.replace("/design")
         }
@@ -130,12 +139,12 @@ const TaskPanel = (props) => {
     return (  
         <>
             <div className={"task-panel " + (props.showPanel === props.item.panel_idx ? "active-task " : "")} panel-id={props.item.panel_idx}>
-            <div className={"panel-content " + (props.taskName === props.item.taskname ? "disable-task " : "")} id={`panelBlock_${props.item.panel_idx}`}>
-                <h4 className="task-num">{props.counter}</h4>
-                <span className="assign-task" onClick={taskRedirection} >
+            <div className="panel-content " id={`panelBlock_${props.item.panel_idx}`}>
+                <h4 className={"task-num" + (props.testCaseId === dataobj.testcaseid && props.taskName === props.item.taskname ? " disable-task" : "")}>{props.counter}</h4>
+                <span className={"assign-task" + (props.testCaseId === dataobj.testcaseid && props.taskName === props.item.taskname  ? "  disable-task" : "")} onClick={taskRedirection} >
                     {props.item.taskname.length >= 45 ? props.item.taskname.substr(0, 44)+"..." : props.item.taskname}
                 </span>
-                <div className="tasktype-btndiv">
+                <div className={"tasktype-btndiv" + (props.testCaseId === dataobj.testcaseid && props.taskName === props.item.taskname  ? " dark-bg " : "")}>
                     <button className="tasktype-btn" onClick={expandDetails}>{props.item.tasktype}</button>
                 </div>
             </div>

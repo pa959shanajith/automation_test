@@ -1,9 +1,18 @@
-import * as headerApi from '../api';
+import { logoutUser } from '../api';
+import { persistor } from '../../../reducer'
+
+    /* 
+        Method : RedirectPage(arg: useHistory instance)
+        Uses: Redirects user to base page
+        Props :
+            useHistory instance
+    */
 
 const RedirectPage = (history) => {
 
+    persistor.purge();
     window.localStorage.clear();
-    headerApi.logoutUser()
+    logoutUser()
     .then(data=>{
         history.push('/')
     })

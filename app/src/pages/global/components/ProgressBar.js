@@ -4,6 +4,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import LoadingBar from 'react-top-loading-bar';
 import { store } from '../../../reducer';
 
+/*
+    Component: Progress Bar
+    Uses: Provides Progress bar on top of page by call SetProgressBar
+    Props: Arguments for SetProgressBar: "start" to start the progress bar
+                                         "stop" to complete/stop the progress bar
+
+*/
+
 const ProgressBar = (props) => {
 
     const [progress, setProgress] = useState(0);
