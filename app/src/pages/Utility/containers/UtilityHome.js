@@ -9,8 +9,8 @@ import '../styles/UtilityHome.scss';
 //Utility Screen main Home Renders--> Header, LefbarScreen , CenterScreen, RIghtbarScreen and Main FooterBar // 
 
 const  Utilities=()=>{
-    const [screenType , setScreenType] = useState("encryption");
-    const [pairwiseClicked , setPairwiseClicked] = useState(false);
+    const [screenType , setScreenType] = useState("encryption"); //State for Utility screen type selection on icon click in leftbar
+    const [pairwiseClicked , setPairwiseClicked] = useState(false); 
     return(
         <div className="parent">
             <Header/>

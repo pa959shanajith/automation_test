@@ -9,7 +9,8 @@ import Plugin from './pages/plugin';
 import Mindmap from './pages/mindmap';
 import Scrape from './pages/scrapescreen';
 import Design from './pages/design';
-import Utility from './pages/Utility';
+import Utility from './pages/utility';
+import Integration from './pages/integration';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 import 'react-datetime/css/react-datetime.css';
@@ -40,7 +41,8 @@ const App = () => {
           <Route path="/plugin" component={Plugin} />
           <Route path ="/scrape" component={Scrape}/>
           <Route path ="/design" component={Design}/>
-          <Route path ="/Utility" component={Utility}/>
+          <Route path ="/utility" component={Utility}/>
+          <Route path = "/integration" component={Integration}/>
           <Route component={Base} />
         </Switch>
       </Router>

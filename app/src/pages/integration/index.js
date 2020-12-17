@@ -1,24 +1,25 @@
-import React ,{useEffect} from 'react';
-import Utilities from './containers/UtilityHome';
+import React, { useEffect } from 'react';
+import Integrations from './containers/IntegrationHome';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { SetProgressBar, RedirectPage } from '../global';
-export var history;
+export var history
 
 
 
-const Utility = ()=>{
+
+const Integration = ()=>{
     history =  useHistory()
     const dispatch = useDispatch();
     useEffect(()=>{
-        if(window.localStorage['navigateScreen'] !== "utility"){
+        if(window.localStorage['navigateScreen'] !== "integration"){
             RedirectPage(history);
         }
-        SetProgressBar("stop", dispatch);
+    SetProgressBar("stop", dispatch);
     }, [dispatch]);
     return (
-        <Utilities/>
+        <Integrations/>
     );
 }
 
-export default Utility;
+export default Integration;

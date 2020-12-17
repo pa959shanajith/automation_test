@@ -1,9 +1,9 @@
 import React ,{useState} from 'react';
 import { ActionBar } from '../../global';
-import  "../styles/Leftbar.scss"
+import  "../styles/LeftBar.scss"
 
 const Leftbar=(props)=>{
-    const [focus,setFocus] = useState("encryption")
+    const [focus,setFocus] = useState("encryption") //state to manage css on Icon click
     const upperContent=()=>{
         return(
             <div className="letfnav">

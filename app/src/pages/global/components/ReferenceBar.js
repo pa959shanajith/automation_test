@@ -3,7 +3,7 @@ import {ScrollBar, TaskContents} from '../../global';
 import { useSelector } from 'react-redux';
 import "../styles/ReferenceBar.scss";
 import ClickAwayListener from 'react-click-away-listener';
-import ProfJ from '../../ProfJ/Components/ProfJ';
+import ProfJ from '../../profJ';
 
     /* 
         Component : ReferenceBar (Right Bar)
@@ -162,7 +162,6 @@ const ReferenceBar = (props) => {
                         </div>
                         </ClickAwayListener>
                     }
-
                     {
                         showInfo && 
                         <ClickAwayListener onClickAway={closePopups}>

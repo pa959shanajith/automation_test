@@ -1,25 +1,27 @@
 import React, { useState ,Fragment, useRef } from 'react';
-import {ScrollBar ,PopupMsg} from '../../global';
+import {ScrollBar ,PopupMsg ,ScreenOverlay} from '../../global';
 import '../styles/UtilityCenter.scss'
 import {Encrypt_ICE } from '../api';
 
 const UtilityCenter=(props)=>{
-    const factref = useRef()
-    const levelref = useRef()
-    const [encyptMethod , setEncyptMethod]= useState(null);
-    const [encyptValue , setEncyptValue]= useState(null);
-    const [encyptBtn , setEncyptBtn] = useState(false)
+    const factref = useRef() //ref for input in factor in optimization screen
+    const levelref = useRef() //ref for input in level in optimization screen
+    const [encyptMethod , setEncyptMethod]= useState(null); //state to manage the vaue of method selection dropdown
+    const [encyptValue , setEncyptValue]= useState(null);//state to manage user's value in encrypttion value input
+    const [encyptBtn , setEncyptBtn] = useState(false) //to show encrypt button on selection of any encrypt method
     const [encryptedData , setEncryptedData] = useState("");
     const [btnName , setBtnName] = useState("");
     const [factor , setFactor] = useState(0);
     const [level , setLevel] = useState(0);
     const [emptyCall , setEmptyCall] = useState(false);
     const [gererateClick , setGenerateClick] = useState(false);
+    const [blockui,setBlockui] = useState({show:false});
+    const [popup ,setPopup]= useState({show:false});
     const FactorTable = [];
     const LevelTable = [];
     const encryptionType = encyptMethod;
     const encryptionValue = encyptValue;
-    const onDropChange =(e)=>{
+    const onDropChange =(e)=>{ //function to manage dropdown change set values to show encryption buttons , select method
         if(e.target.value==="SelectMethod"){
             setEncyptBtn(false)
             setEncyptMethod(e.target.value)
@@ -49,35 +51,47 @@ const UtilityCenter=(props)=>{
             }
         }
     }
-    const ontextchange =(e)=>{
+    const ontextchange =(e)=>{ //set encrytion query data raised from user 
         setEncyptValue(e.target.value);
     }
-    const callEncrypt = async(encryptionType ,encryptionValue)=>{
+    const callEncrypt = async(encryptionType ,encryptionValue)=>{ //API call and fetch and render encrypted data by changing state 
+        setBlockui({show:true,content:'Encrypting...'})
         if(encyptValue ===""){
             setEmptyCall(true);
+            setBlockui({show:false})
         }
         else{
             const items = await Encrypt_ICE(encryptionType ,encryptionValue);
-            setEncryptedData(items)
+            if(items.error){displayError(items.error);return;}
+            setEncryptedData(items);
+            setBlockui({show:false});
         }
     }
-    const callReset =()=>{
+    const displayError = (error) =>{
+        setPopup({
+          title:'ERROR',
+          content:error,
+          submitText:'Ok',
+          show:true
+        })
+      }
+    const callReset =()=>{ // Reset button , resets states
         setEncryptedData("");
         setEncyptValue("");
         setEmptyCall(false);
     }
-    const callPairwise =()=>{
+    const callPairwise =()=>{ //pairwise icon clicked changes states
         props.setPairwiseClicked(true);
     }
-    const updateInputFactorTable=(e,i)=>{
+    const updateInputFactorTable=(e,i)=>{ //updates user input in Factor in the table
         FactorTable.splice(i , 1 , e.target.value)
         console.log(FactorTable);
     }
-    const updateInputLevelTable =(e,i)=>{
+    const updateInputLevelTable =(e,i)=>{ //updates user input in level in the table
         LevelTable.splice(i,1,e.target.value)
         console.log(LevelTable);
     }
-    const callGenerate =()=>{
+    const callGenerate =()=>{ // Genrate API will be called here rightnow Dummy
         if(FactorTable.length && LevelTable.length){
             console.log("APi will be called");
         }
@@ -87,9 +101,10 @@ const UtilityCenter=(props)=>{
     }
 
     return (
-        
+        <Fragment>
+        {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
+        {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
         <div className="middleContent">
-            {/* <ScrollBar> */}
             <div className="middle_holder">
             {(props.screenType ==="encryption")?
             <Fragment>
@@ -109,9 +124,7 @@ const UtilityCenter=(props)=>{
                 
                 <div >
                     <div className={ emptyCall? "encryptionData-body emptycall" :"encryptionData-body"}>
-                        {/* <ScrollBar> */}
                         <textarea value={encyptValue} id= "encryptData" placeholder="Enter Data For Encryption" onChange={(e)=>ontextchange(e)}/>
-                        {/* </ScrollBar> */}
                     </div>
 
                 {encyptBtn && 
@@ -122,17 +135,14 @@ const UtilityCenter=(props)=>{
                     <button onClick={()=>callReset()} className="btn-reset">Reset</button>
                 </div>}
                 <div className="encryptionData-body">
-                {/* <ScrollBar> */}
                     <textarea id="encryptedData" readOnly placeholder="Encrypted Data" value={encryptedData}/>
-                {/* </ScrollBar> */}
                 </div>
                 </div>
                 
             </Fragment>: null}
 
             {(props.screenType==="optimization")?
-            <Fragment>
-                {(props.pairwiseClicked)?
+                (props.pairwiseClicked)?
                 <Fragment>
                     <div className="page-taskName" >
                         <span className="taskname">
@@ -163,7 +173,7 @@ const UtilityCenter=(props)=>{
                                             submitText={"Ok"} 
                                             close={()=>setGenerateClick(false)}
                                             />}
-                        <div className="pairwise_array" >
+                        <div className="pairwise_array">
                         <ScrollBar thumbColor ={"#311d4e"} trackColor ={"rgb(211, 211, 211);"}>
                             {Array.from(Array(factor)).map((e,i)=>(
                                     <div className='factor__row' key={i} >
@@ -196,12 +206,12 @@ const UtilityCenter=(props)=>{
                             </div>
                         </div>
                     </div>
-                </Fragment>}
-            </Fragment>
+                </Fragment>
+    
             :null}
         </div>
-        {/* </ScrollBar> */}
         </div>
+        </Fragment>
     )
 }
 
