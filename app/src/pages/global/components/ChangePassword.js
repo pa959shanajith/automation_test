@@ -1,8 +1,17 @@
 import React, { useState } from 'react';
 import { ModalContainer } from '../../global';
+import { resetPassword } from '../api';
 import '../styles/ChangePassword.scss';
 
-const ChangePassword = ({setShow, loginApi, setSuccessPass}) => {
+/*
+    Component: Change Password Modal Popup
+    Uses: Renders the modal Popup for changing password
+    Props: setShow -> setState for displaying and hiding modal
+            setSuccessPass -> successPass setState to flip the flag once change pass is success
+
+*/
+
+const ChangePassword = ({setShow, setSuccessPass}) => {
 
     const [currpassword, setCurrPassword] = useState("");
     const [newpassword, setNewPassword] = useState("");
@@ -49,7 +58,7 @@ const ChangePassword = ({setShow, loginApi, setSuccessPass}) => {
         setPasswordValid("");
     }
     
-    const resetPassword = event => {
+    const resetPass = event => {
         event.preventDefault();
         resetErrorFlags();
         
@@ -70,7 +79,7 @@ const ChangePassword = ({setShow, loginApi, setSuccessPass}) => {
 			setConfPassError(true);
 			setPasswordValid("New Password and Confirm Password do not match");
 		} else {
-			loginApi.resetPassword(newpassword, currpassword)
+			resetPassword(newpassword, currpassword)
 			.then(data => {
                 if(data === "Invalid Session") setPasswordValid("Invalid Session")
                 else if(data === "success") {
@@ -106,7 +115,7 @@ const ChangePassword = ({setShow, loginApi, setSuccessPass}) => {
     const Footer = () => (
         <div className="reset_dialog_btns">
             <button className="clear_reset_fields" onClick={resetFields}>Clear</button>
-            <button className="submit_reset" onClick={resetPassword}>Submit</button>
+            <button className="submit_reset" onClick={resetPass}>Submit</button>
         </div>
     );
 

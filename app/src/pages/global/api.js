@@ -1,64 +1,131 @@
 import axios from 'axios';
 const url = "https://"+window.location.hostname+":8443";
 
-export const logoutUser = async() => {
-    try{
-        const res = await axios(url+"/logoutUser", {
+/*Component RedirectPage
+*/
+export const logoutUser = () => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/logoutUser", {
             method : 'POST',
             headers : {
                 'Content-type' : "application/json"
             },
             data: {'param': 'logoutUser'},
             credentials : 'include'
-        });
-        if (res.status === 200) {
-            return res.data;
-        }
-        else{
-            console.log(res.status);
-        }
-    }
-    catch(err){
-        console.log(err)
-    }
+        })
+        .then(res => {
+            if (res.status === 200) {
+                resolve(res.data);
+            }
+            else{
+                reject(res.status);
+            }
+        })
+        .catch(err => {
+            reject(err)
+        })
+    });
 }
 
-export const getNames_ICE = async(requestedIds, idType) => {
-    try{
-        const res = await axios(url+"/getNames_ICE", {
+/*Component ResetSession
+*/
+export const keepSessionAlive = () => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/keepSessionAlive", {
             method : 'POST',
+            credentials : 'include'
+        })
+        .then(res=>{
+            if (res.status === 200) {
+                resolve(res.data);
+            }
+            else{
+                reject(res.status);
+            }
+        })
+        .catch(err => {
+            reject(err)
+        })
+    });
+}
+
+/*Component TaskContents
+  api returns fail/inprogress
+*/
+export const updateTaskStatus = obj => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/updateTaskstatus_mindmaps", {
+            method: 'POST',
             headers : {
-                'Content-type' : "application/json"
+                'Content-type' : 'application/json'
             },
-            data: {'param': 'getNames_ICE', requestedids : requestedIds, idtype : idType},
-            credentials : 'include'
-        });
-        if (res.status === 200) {
-            return res.data;
-        }
-        else{
-            console.log(res.status);
-        }
-    }
-    catch(err){
-        console.log(err)
-    }
+            data : {'obj': obj},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject(res.status)
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    });
 }
 
-export const keepSessionAlive = async() => {
-    try{
-        const res = await axios(url+"/getNames_ICE", {
-            method : 'POST',
+/*Component ChangePassword
+  api returns "Invalid Session"/"success"/"same"/"incorrect"/"fail"
+*/
+export const resetPassword = (newpassword, currpassword) => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/resetPassword", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            data: {'newpassword': newpassword, 'currpassword': currpassword},
             credentials : 'include'
-        });
-        if (res.status === 200) {
-            return res.data;
-        }
-        else{
-            console.log(res.status);
-        }
-    }
-    catch(err){
-        console.log(err)
-    }
+        })
+        .then(res => {
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject(res.status);
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
+
+/*Component Header
+  api returns {"": ""}
+*/
+export const getRoleNameByRoleId = async(roleasarray) => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/getRoleNameByRoleId", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            data: {'action': "getRoleNameByRoleId", 'role': roleasarray},
+            credentials : 'include'
+        })
+        .then(res=>{
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject(res.status);
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
 }

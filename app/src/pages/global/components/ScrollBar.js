@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
-import SimpleBar from 'simplebar-react';
-import 'simplebar-react/dist/simplebar.min.css'
+import PerfectScrollbar from 'react-perfect-scrollbar';
+import 'react-perfect-scrollbar/dist/css/styles.css';
 
 /*Component Scrollbar
   use: Wrapper function extends react-custom-scollbars;
@@ -18,38 +18,48 @@ import 'simplebar-react/dist/simplebar.min.css'
 
 const ScrollBar = (props) => {
     return(
-        <Fragment>
+        <>
+         <Fragment>
             <style type="text/css">
                 {`
-                ${props.scrollId?'#'+props.scrollId+' ':''}.simplebar-scrollbar:before {
-                    top: 0px;
-                    bottom: 0px;
-                    left: 0px;
-                    right: 0px;
-                    opacity: 1!important;
-                    background:${props.thumbColor?props.thumbColor:'#000'};
+                .ps > .ps__rail-x,
+                .ps > .ps__rail-y {
+                    opacity: 1!important; 
                 }
-                ${props.scrollId?'#'+props.scrollId+' ':''}.simplebar-track.simplebar-vertical {
-                    top: 2px;
-                    bottom: 2px;
-                    right: 2px;
+
+                ${props.scrollId?'#'+props.scrollId+' ':''}.ps__thumb-y,
+                ${props.scrollId?'#'+props.scrollId+' ':''}.ps__thumb-y:hover {
+                    opacity: 1!important;
+                    left: 0;
+                    right: 0;
+                    ${props.minThumbSize ? `min-height: ${props.minThumbSize};` : ''}
+                    width: ${props.verticalbarWidth?props.verticalbarWidth:'6px'}!important;
+                    background:${props.thumbColor?props.thumbColor:'#000'}!important;
+                }
+                ${props.scrollId?'#'+props.scrollId+' ':''}.ps__rail-y, 
+                ${props.scrollId?'#'+props.scrollId+' ':''}.ps__rail-y:hover {
                     border-radius: 3px;
-                    background: ${props.trackColor?props.trackColor:'white'};
-                    width: ${props.verticalbarWidth?props.verticalbarWidth:'6px'};
+                    margin-right: 2px;
+                    background: ${props.trackColor?props.trackColor:'white'}!important;
+                    width: ${props.verticalbarWidth?props.verticalbarWidth:'6px'}!important;
                     ${(props.hideYbar)?'visibility: hidden!important':''};
                 }
-                ${props.scrollId?'#'+props.scrollId+' ':''}.simplebar-track.simplebar-horizontal {
-                    background: ${props.trackColor?props.trackColor:'white'};
-                    left: 0;
-                    height: 10px;
-                    ${(props.hideXbar)?'visibility: hidden!important':''};
+                ${
+                    props.hoverColor ? 
+                    `${props.scrollId?`#${props.scrollId}:hover `:''}.ps__thumb-y,
+                    ${props.scrollId?`#${props.scrollId}:hover `:''}.ps__thumb-y:hover {
+                        background:${props.hoverColor}!important;
+                    }
+                    `
+                    : ''
                 }
                 `}
             </style>
-            <SimpleBar scrollbarMaxSize={props.maxThumbSize?props.maxThumbSize:0} scrollbarMinSize={props.maxThumbSize?props.maxThumbSize:25} autoHide={false} style={{maxHeight:'inherit',height:'inherit'}}>
+            <PerfectScrollbar style={{maxHeight:'inherit',height:'inherit'}}>
                 {props.children}
-            </SimpleBar>
+            </PerfectScrollbar>
         </Fragment>
+        </>
     )
 }
 

@@ -11,5 +11,23 @@ import ActionBar from './components/ActionBar';
 import ReferenceBar from './components/ReferenceBar';
 import Thumbnail from './components/Thumbnail';
 import TaskContents from './components/TaskContents';
+import ResetSession from './components/ResetSession';
+import Report from './components/Report'
 
-export { Header, FooterOne, FooterTwo, ProgressBar, SetProgressBar, RedirectPage, ScreenOverlay, ScrollBar, PopupMsg, ModalContainer, ActionBar, ReferenceBar, Thumbnail, TaskContents};
+export { Header, 
+        FooterOne, 
+        FooterTwo,
+        ProgressBar, 
+        SetProgressBar, 
+        RedirectPage, 
+        ScreenOverlay, 
+        ScrollBar, 
+        PopupMsg, 
+        ModalContainer, 
+        ActionBar, 
+        ReferenceBar, 
+        Thumbnail, 
+        TaskContents, 
+        ResetSession, 
+        Report
+    };

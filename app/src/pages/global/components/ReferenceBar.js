@@ -28,9 +28,11 @@ const ReferenceBar = (props) => {
     const [showTask, setShowTask] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
     const [taskPopY, setTaskPopY] = useState(null);
+    const [taskInfo, setTaskInfo] = useState(null);
 
     const tasksJson = useSelector(state=>state.plugin.tasksJson);
     const dataDict = useSelector(state=>state.plugin.FD);
+    const current_task = useSelector(state=>state.plugin.CT);
 
     useEffect(()=>{
             // if(window.location.pathname != '/mindmap'){
@@ -83,8 +85,35 @@ const ReferenceBar = (props) => {
     },[props.collapse])
 
     useEffect(()=>{
-        setShowTask(false);
-    }, [props.taskName]);
+        if (Object.keys(current_task).length!==0 && Object.keys(dataDict).length!==0){
+            let identify = current_task.taskName.slice(0, 3).toLowerCase();
+            let info = identify === "exe" ?
+            {
+                'Project Name' : dataDict.projectDict[current_task.projectId],
+                'Release' : current_task.releaseid,
+                'Cycle' : dataDict.cycleDict[current_task.cycleid]
+            }
+            : identify === "des" ? 
+            {
+                'Project Name' : dataDict.projectDict[current_task.projectId],
+                'Screen' : current_task.screenName,
+                'TestCase' : current_task.testCaseName,
+                'Release' : current_task.releaseid,
+                'Cycle' : dataDict.cycleDict[current_task.cycleid]
+            }
+            :
+            {
+                'Project Name' : dataDict.projectDict[current_task.projectId],
+                'Screen' : current_task.screenName,
+                'Release' : current_task.releaseid,
+                'Cycle' : dataDict.cycleDict[current_task.cycleid],
+                'URL': ''
+            }
+            setSearchValue("");
+            setShowTask(false);
+            setTaskInfo(info);
+        }
+    }, [current_task, current_task.screenName]);
 
     const onSearchHandler = event => {
         searchTask(event.target.value)
@@ -114,6 +143,7 @@ const ReferenceBar = (props) => {
         closePopups();
         setTaskPopY(event.clientY)
         setShowTask(!showTask)
+        setSearchValue("");
     }
 
     const toggleInfoPop = event => {
@@ -148,7 +178,7 @@ const ReferenceBar = (props) => {
                                 <div id='task_pop_scroll' className="task_pop__overflow">
                                     <ScrollBar scrollId='task_pop_scroll' trackColor="#46326b" thumbColor="#fff">
                                         <div className="task_pop__content" id="rb__pop_list">
-                                            <TaskContents items={searchValue ? searchItems : taskList} taskName={props.taskName} cycleDict={dataDict.cycleDict} taskJson={tasksJson}/>
+                                            <TaskContents items={searchValue ? searchItems : taskList} testCaseId={current_task.testCaseId} taskName={current_task.taskName} cycleDict={dataDict.cycleDict} taskJson={tasksJson}/>
                                         </div>
                                     </ScrollBar>
                                 </div>
@@ -164,10 +194,10 @@ const ReferenceBar = (props) => {
                             <h4 className="pop__header" onClick={()=>setShowInfo(false)}><span className="pop__title">Information</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
                             <div className="info_pop__contents">
                             {
-                                props.taskInfo && Object.keys(props.taskInfo).map(key => 
+                                taskInfo && Object.keys(taskInfo).map(key => 
                                     <>
                                         <div className="task_info__title">{key}:</div>
-                                        <div className="task_info__content">{props.taskInfo[key]}</div>
+                                        <div className="task_info__content">{taskInfo[key]}</div>
                                     </>
                                 )
                             }

@@ -116,7 +116,7 @@ const SessionManagement = (props) => {
                                     <td> {user.role} </td>
                                     <td> {user.loggedin} </td>
                                     <td> {user.ip} </td>
-                                    <td><button className="btn btn-table-cust" data-id={index} onClick={(event)=>{disconnectLogoff(event)}}> Disconnect </button></td>
+                                    <td><button className="btn btn-table-cust" data-id={index} onClick={(event)=>{disconnectLogoff(event)}}> Logout </button></td>
                                 </tr> 
                             ))}
                             </tbody>

@@ -7,12 +7,13 @@ import "../styles/Thumbnail.scss";
     Props : action -> onClick event
             title -> title/caption of the icon, also the alt for img
             img -> img-src string or svg -> for svg images (pass svg jsx as whole)
+            disable -> disables the thumbnail and renders it unclickable
 */
 
 const Thumbnail = (props) => {
 
     return (
-        <div className="thumbnail" onClick={props.action}>
+        <div className={"thumbnail" + (props.disable ? " disable-thumbnail" : "")} onClick={props.action}>
             <img className={"thumbnail__img " + (props.svg ? "svg_ic" : "" )} src={props.img || props.svg} alt={props.title}/>
             <span className="thumbnail__title">{props.title}</span>
         </div>
