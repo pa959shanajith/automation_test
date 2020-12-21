@@ -2,7 +2,7 @@ import React ,  { Fragment, useEffect, useState, useRef} from 'react';
 import { getProjectList, getModules, getScreens} from '../api';
 import { useDispatch, useSelector} from 'react-redux';
 import { ScreenOverlay, PopupMsg, ReferenceBar, SetProgressBar} from '../../global';
-import { ClickFullScreen } from './MindmapUtils'
+import { ClickFullScreen , parseProjList} from './MindmapUtils'
 import  ToolbarMenuEnE from '../components/ToolbarMenuEnE'
 import CanvasEnE from './CanvasEnE'
 import * as actionTypes from '../state/action';
@@ -14,7 +14,7 @@ const CreateEnE = () =>{
   const [blockui,setBlockui] = useState({show:false})
   const [fullScreen,setFullScreen] = useState(false)
   const [verticalLayout,setVerticalLayout] = useState(false)
-  const moduleSelect = useSelector(state=>state.mindmap.selectedModule)//remove
+  const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
   useEffect(()=>{(async()=>{
     SetProgressBar("start",dispatch)
     var res = await getProjectList()
@@ -24,10 +24,7 @@ const CreateEnE = () =>{
     dispatch({type:actionTypes.SELECT_PROJECT,payload:res.projectId[0]}) 
     var moduledata = await getModules({"tab":"endToend","projectid":res.projectId[0],"moduleid":null})
     if(moduledata.error){displayError(moduledata.error);return;}
-    dispatch({type:actionTypes.SELECT_MODULE,payload:{}}) 
-    // var screendata = await getScreens(res.projectId[0])
-    // if(screendata.error){displayError(screendata.error);return;}
-    // dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
+    dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
     dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
     SetProgressBar("stop",dispatch)
   })()
@@ -50,7 +47,6 @@ const CreateEnE = () =>{
       <div id='mp__canvas' className='mp__canvas'>
         {(Object.keys(moduleSelect).length>0)?<CanvasEnE setBlockui={setBlockui} setPopup={setPopup} module={moduleSelect} verticalLayout={verticalLayout}/>:null}
       </div>
-      
     </div>
     <ReferenceBar taskTop={true} collapsible={true} collapse={true}>
         <div className="ic_box" >
@@ -84,24 +80,6 @@ const ClickSwitchLayout = (verticalLayout,setVerticalLayout,moduleSelect,setPopu
   }
   setBlockui({show:true,content:'Switching Layout...'})
   setVerticalLayout(true)
-}
-
-/*function parseProjList
-  use:  parses input value to list of project props
-*/
-
-const parseProjList = (res) =>{
-  var proj = {};
-  res.projectId.forEach((e,i) => {
-    proj[res.projectId[i]]= {
-      'apptype': res.appType[i],
-      'name': res.projectName[i],
-      'id': res.projectId[i],
-      'releases':res.releases[i],
-      'domains':res.domains[i]
-    };
-  });
-  return proj
 }
 
 export default CreateEnE;

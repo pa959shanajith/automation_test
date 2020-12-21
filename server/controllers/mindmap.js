@@ -72,23 +72,17 @@ exports.populateScenarios = function (req, res) {
 	}
 };
 
-exports.getProjectTypeMM = function (req, res) {
+exports.getProjectTypeMM = (req, res) =>{
 	logger.info("Inside UI service: getProjectTypeMM");
-	if (utils.isSessionActive(req)) {
-		var inputs = req.body.projectId;
-		create_ice.getProjectType(inputs, function (err, result) {
-			if (err) {
-				res.status(500).send('Fail');
-			}
-			else {
-				res.status(200).send(result);
-			}
-		});
-	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
-	}
+	var inputs = req.body.projectId;
+	create_ice.getProjectType(inputs, function (err, result) {
+		if (err) {
+			res.status(500).send('Fail');
+		}
+		else {
+			res.status(200).send(result);
+		}
+	});
 };
 
 exports.populateUsers = function (req, res) {
@@ -115,7 +109,7 @@ const getModule = async (d) => {
 	const inputs = {
 		"tab":d.tab,
 		"projectid":d.projectid || null,
-		"modulename":d.modName,
+		// "modulename":d.modName,
 		"moduleid":d.moduleid,
 		"cycleid":d.cycId,
 		"name":"getModules"
@@ -582,72 +576,66 @@ exports.saveEndtoEndData = function (req, res) {
 exports.excelToMindmap = function (req, res) {
 	logger.info("Inside UI service: excelToMindmap");
 	try {
-		if (utils.isSessionActive(req)) {
-			var wb1 = xlsx.read(req.body.data.content, { type: 'binary' });
-			if (req.body.data.flag == 'sheetname') {
-				return res.status(200).send(wb1.SheetNames);
+		var wb1 = xlsx.read(req.body.data.content, { type: 'binary' });
+		if (req.body.data.flag == 'sheetname') {
+			return res.status(200).send(wb1.SheetNames);
+		}
+		var myCSV = xlsToCSV(wb1, req.body.data.sheetname);
+		var numSheets = myCSV.length / 2;
+		var qObj = [];
+		var err;
+		for (var k = 0; k < numSheets; k++) {
+			var cSheet = myCSV[k * 2 + 1];
+			var cSheetRow = cSheet.split('\n');
+			var scoIdx = -1, scrIdx = -1, sctIdx = -1,modIdx=-1;
+			var uniqueIndex = 0;
+			cSheetRow[0].split(',').forEach(function (e, i) {
+				if(i== 0 && e.toLowerCase()=="module") modIdx = i;
+				if(i== 1 && e.toLowerCase()=="scenario") scoIdx = i;
+				if(i== 2 && e.toLowerCase()=="screen") scrIdx = i;
+				if(i== 3 && e.toLowerCase()=="script") sctIdx = i;
+			});
+			if (modIdx == -1 || scoIdx == -1 || scrIdx == -1 || sctIdx == -1 || cSheetRow.length < 2) {
+				err = true;
+				break;
 			}
-			var myCSV = xlsToCSV(wb1, req.body.data.sheetname);
-			var numSheets = myCSV.length / 2;
-			var qObj = [];
-			var err;
-			for (var k = 0; k < numSheets; k++) {
-				var cSheet = myCSV[k * 2 + 1];
-				var cSheetRow = cSheet.split('\n');
-				var scoIdx = -1, scrIdx = -1, sctIdx = -1,modIdx=-1;
-				var uniqueIndex = 0;
-				cSheetRow[0].split(',').forEach(function (e, i) {
-					if(i== 0 && e.toLowerCase()=="module") modIdx = i;
-					if(i== 1 && e.toLowerCase()=="scenario") scoIdx = i;
-					if(i== 2 && e.toLowerCase()=="screen") scrIdx = i;
-					if(i== 3 && e.toLowerCase()=="script") sctIdx = i;
-				});
-				if (modIdx == -1 || scoIdx == -1 || scrIdx == -1 || sctIdx == -1 || cSheetRow.length < 2) {
-					err = true;
-					break;
+			var e, lastSco = -1, lastScr = -1, nodeDict = {}, scrDict = {};
+			for (var i = 1; i < cSheetRow.length; i++) {
+				var row = cSheetRow[i].split(',');
+				if (row.length < 3) continue;
+				if (row[modIdx] !== '') {
+					e = { id: uuidV4(), name: row[modIdx], type: 0 };
+					qObj.push(e);
 				}
-				var e, lastSco = -1, lastScr = -1, nodeDict = {}, scrDict = {};
-				for (var i = 1; i < cSheetRow.length; i++) {
-					var row = cSheetRow[i].split(',');
-					if (row.length < 3) continue;
-					if (row[modIdx] !== '') {
-						e = { id: uuidV4(), name: row[modIdx], type: 0 };
-						qObj.push(e);
-					}
-					if (row[scoIdx] !== '') {
-						lastSco = uniqueIndex; lastScr = -1; scrDict = {};
-						e = { id: uuidV4(), name: row[scoIdx], type: 1 };
-						qObj.push(e);
-						nodeDict[e.id] = uniqueIndex;
-						uniqueIndex++;
-					}
-					if (row[scrIdx] !== '' && lastSco != -1) {
-						var tName = row[scrIdx];
-						var lScr = qObj[lastScr];
-						if (lScr === undefined || (lScr)) {
-							if (scrDict[tName] === undefined) scrDict[tName] = uuidV4();
-							lastScr = uniqueIndex;
-							e = { id: scrDict[tName], name: tName, type: 2, uidx: lastScr };
-							qObj.push(e);
-							nodeDict[e.id] = uniqueIndex;
-							uniqueIndex++;
-						}
-					}
-					if (row[sctIdx] !== '' && lastScr != -1) {
-						e = { id: uuidV4(), name: row[sctIdx], type: 3, uidx: lastScr };
+				if (row[scoIdx] !== '') {
+					lastSco = uniqueIndex; lastScr = -1; scrDict = {};
+					e = { id: uuidV4(), name: row[scoIdx], type: 1 };
+					qObj.push(e);
+					nodeDict[e.id] = uniqueIndex;
+					uniqueIndex++;
+				}
+				if (row[scrIdx] !== '' && lastSco != -1) {
+					var tName = row[scrIdx];
+					var lScr = qObj[lastScr];
+					if (lScr === undefined || (lScr)) {
+						if (scrDict[tName] === undefined) scrDict[tName] = uuidV4();
+						lastScr = uniqueIndex;
+						e = { id: scrDict[tName], name: tName, type: 2, uidx: lastScr };
 						qObj.push(e);
 						nodeDict[e.id] = uniqueIndex;
 						uniqueIndex++;
 					}
 				}
+				if (row[sctIdx] !== '' && lastScr != -1) {
+					e = { id: uuidV4(), name: row[sctIdx], type: 3, uidx: lastScr };
+					qObj.push(e);
+					nodeDict[e.id] = uniqueIndex;
+					uniqueIndex++;
+				}
 			}
-			if (err) res.status(200).send('fail');
-			else res.status(200).send(qObj);
 		}
-		else {
-			logger.error("Invalid Session");
-			res.send("Invalid Session");
-		}
+		if (err) res.status(200).send('fail');
+		else res.status(200).send(qObj);
 	}
 	catch (exc) {
 		logger.error(exc.message);

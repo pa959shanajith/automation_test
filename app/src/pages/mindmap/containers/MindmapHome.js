@@ -1,9 +1,11 @@
 import React, { useState, Fragment } from 'react';
+import { Header, FooterTwo as Footer,ActionBar,ReferenceBar} from '../../global'
 import CreateOptions from '../components/CreateOptions.js'; 
 import CreateNew from './CreateNew.js';
 import CreateEnE from './CreateEnE.js'
-import { Header, FooterTwo as Footer,ActionBar,ReferenceBar} from '../../global'
+import CreateAssign from './CreateAssign.js';
 import '../styles/MindmapHome.scss';
+
 
 /*Component MindmapHome
   use: renders mindmap plugins landing page 
@@ -16,7 +18,7 @@ const MindmapHome = () => {
   const createType = {
     'newmindmap': React.memo(() => (<CreateNew/>)),
     'enemindmap': React.memo(() => (<CreateEnE/>)),
-    'assignmap': React.memo(() => (<span>Assign Mindmap</span>))
+    'assignmap': React.memo(() => (<CreateAssign/>))
   }
 
   var Component = (!options)? null : createType[options];

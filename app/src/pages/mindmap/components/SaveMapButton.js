@@ -8,13 +8,14 @@ import '../styles/SaveMapButton.scss'
 const SaveMapButton = (props) => {
     const dispatch = useDispatch()
     const deletedNodes = useSelector(state=>state.mindmap.deletedNodes)
+    const unassignTask = useSelector(state=>state.mindmap.unassignTask)
     const projId = useSelector(state=>state.mindmap.selectedProj)
     const projectList = useSelector(state=>state.mindmap.projectList)
     useEffect(()=>{
         if(props.createnew==='save')clickSave()
     },[props.createnew])
     const clickSave = ()=>{
-        saveNode(props.setBlockui,props.dNodes,projId,props.setPopup,deletedNodes,dispatch,props.isEnE,projectList)
+        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,props.setPopup,deletedNodes,unassignTask,dispatch,props.isEnE,props.isAssign,projectList)
     }
     return(
         <svg className={"ct-actionBox"+(props.disabled?" disableButton":"")} id="ct-save" onClick={clickSave}>
@@ -26,7 +27,8 @@ const SaveMapButton = (props) => {
     )
 }
 
-const saveNode = async(setBlockui,dNodes,projId,setPopup,deletedNodes,dispatch,isEnE,projectList)=>{
+const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unassignTask,dispatch,isEnE,isAssign,projectList)=>{
+    var tab = "tabCreate"
     var layout_vertical = false;
     var selectedProject;
     var error = !1
@@ -90,9 +92,11 @@ const saveNode = async(setBlockui,dNodes,projId,setPopup,deletedNodes,dispatch,i
         deletednode: deletedNodes,
         unassignTask: [],
         prjId: projId,
+        cycId:cycId,
         createdthrough: "Web"
     }
     if(isEnE){
+        tab = "endToend"
         data.action = '/saveEndtoEndData'
         mapData.some((d)=>{
             if (d.type === 'endtoend') {
@@ -105,18 +109,36 @@ const saveNode = async(setBlockui,dNodes,projId,setPopup,deletedNodes,dispatch,i
             return;
         }
     }
+    if(isAssign){
+        tab = "tabAssign"
+        // if (dNodes[0].type == 'endtoend') {
+        //     cur_module = 'end_to_end';
+        //     error = false;
+        // } else {
+        //     //Part of Issue 1685
+        //     cur_module = "tabAssign"
+        // }
+        data = {
+            ...data,
+            tab : "tabAssign",
+            cycId:cycId,
+            write : 30,
+            unassignTask:unassignTask
+            //sendNotify: {} //{Execute Batch: "priyanka.r", Execute Scenario: "priyanka.r"}
+        }
+    }
     var modId = await saveMindmap(data)
     if(modId.error){displayError(modId.error);return}
-    var moduledata = await getModules({modName:null,cycId:null,"tab":(isEnE?"endToend":"tabCreate"),"projectid":projId,"moduleid":null})
+    var moduledata = await getModules({modName:null,cycId:cycId?cycId:null,"tab":tab,"projectid":projId,"moduleid":null})
     if(moduledata.error){displayError(moduledata.error);return}
-    var moduleselected = await getModules({modName:null,cycId:null,"tab":(isEnE?"endToend":"tabCreate"),"projectid":projId,"moduleid":modId})
+    var moduleselected = await getModules({modName:null,cycId:cycId?cycId:null,"tab":tab,"projectid":projId,"moduleid":modId})
     if(moduleselected.error){displayError(moduleselected.error);return}
     var screendata = await getScreens(projId)
     if(screendata.error){displayError(screendata.error);return}
     dispatch({type:actionTypes.SAVE_MINDMAP,payload:{screendata,moduledata,moduleselected}})
     dispatch({type:actionTypes.SELECT_MODULE,payload:moduleselected})
     setBlockui({show:false});
-    setPopup({show:true,title:'Success',content:'Data saved successfully',submitText:'Ok'})
+    setPopup({show:true,title:'Success',content:isAssign?'Tasks saved successfully':'Data saved successfully',submitText:'Ok'})
     return;
 }
 

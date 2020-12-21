@@ -72,6 +72,35 @@ export const getScreens = async(projectId) => {
             headers: {
                 'Content-Type': 'application/json'
             },
+            data: {projectId:projectId},
+            credentials: 'include'
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'Failed to fetch screens'}
+    }catch(err){
+        console.error(err)
+        return {error:'Failed to fetch screens'}
+    }
+}
+
+/*Component getScreens
+  api returns {screenList: [{name:"",parent:[],_id:""}], testCaseList: [{name:"",parent:[],_id:"",screenid:''}]}
+*/
+
+export const getProjectTypeMM = async(projectId) => {
+    try{
+        const res = await axios(url+'/getProjectTypeMM', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
             data: {"action":"getProjectTypeMM",projectId:projectId},
             credentials: 'include'
         });
@@ -189,6 +218,34 @@ export const getScenarios = async(moduleID) => {
     }
 }
 
+/*Component populateUsers
+  api returns {screenList: [{name:"",parent:[],_id:""}], testCaseList: [{name:"",parent:[],_id:"",screenid:''}]}
+*/
+
+export const populateUsers = async(projectId) => {
+    try{
+        const res = await axios(url+'/populateUsers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {"projectId":projectId},
+            credentials: 'include'
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'Failed to fetch scenarios'}
+    }catch(err){
+        console.error(err)
+        return {error:'Failed to fetch scenarios'}
+    }
+}
 
 
 /*Component excelToMindmap

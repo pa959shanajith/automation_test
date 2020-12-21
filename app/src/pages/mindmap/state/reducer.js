@@ -12,7 +12,8 @@ const initialState = {
     copyNodes: {nodes:[],links:[]},
     deletedNodes: [],
     scenarioList:[],
-    importData:{createdby:undefined,data:undefined}
+    importData:{createdby:undefined,data:undefined},
+    unassignTask:[]
 };
 
 const reducer = (state = initialState , action) => {
@@ -85,6 +86,11 @@ const reducer = (state = initialState , action) => {
                 moduleList: action.payload.moduledata,
                 selectedModule: {},
                 scenarioList:[]
+            }
+        case actionTypes.UPDATE_UNASSIGNTASK:
+            return{
+                ...state,
+                unassignTask: action.payload
             }
         default: 
             return state
