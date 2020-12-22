@@ -38,7 +38,7 @@ export const loginToQTest_ICE = async(qcPassword ,qcURL , qcUsername) => {
         return {error:'Failed to Login'}
     }
 }
-/*Component loginToQTest_ICE
+/*Component qtestProjectDetails_ICE
   use: get Project List i.e. list of all scenario  of Particular project 
   api returns [avoassure_projects:[]]
 */
@@ -71,7 +71,10 @@ export const qtestProjectDetails_ICE = async(domain , userid) => {
         return {error:'Failed to Project Details'}
     }
 }
-
+/*Component qtestFolderDetails_ICE
+  use: get Cycle and TestSuite Details of a Particular Release 
+  api returns [Cycle:"Cycle Name",testsuites:[0:{id: ,name: , testruns:[0:{id: , name:}]}]]
+*/
 export const qtestFolderDetails_ICE = async(projectName ,foldername, domainID , qcaction ,testCasename) => {
     try{
         const res = await axios(url+'/qtestFolderDetails_ICE', {
@@ -102,6 +105,10 @@ export const qtestFolderDetails_ICE = async(projectName ,foldername, domainID , 
         return {error:'Failed to TestSuite Details'}
     }
 }
+/*Component saveQtestDetails_ICE
+  use: Saves the Synced TestCzses and Scenario pair
+  api returns: sucess/ Fail 
+*/
 export const saveQtestDetails_ICE = async(mappedDetails) => {
     try{
         const res = await axios(url+'/saveQtestDetails_ICE', {
@@ -129,6 +136,10 @@ export const saveQtestDetails_ICE = async(mappedDetails) => {
         return {error:'Failed to Save Mapped TestCases'}
     }
 }
+/*Component viewQtestMappedList_ICE
+  use: Gets the Values of the mapped files 
+  api returns: [] 
+*/
 export const viewQtestMappedList_ICE = async(userID) => {
     try{
         const res = await axios(url+'/viewQtestMappedList_ICE', {

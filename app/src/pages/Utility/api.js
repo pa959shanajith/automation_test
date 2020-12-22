@@ -3,6 +3,10 @@ import {RedirectPage} from '../global'
 import {history} from './index'
 const url = "https://"+window.location.hostname+":8443";
 
+/*Component Encrypt_ICE
+  use: gets the Encrypted Value of the users Input based on encryption type also given by user only
+  api returns : value
+*/
 export const Encrypt_ICE = async(encryptionType ,encryptionValue) => {
     try{
         const res = await axios(url+'/Encrypt_ICE', {

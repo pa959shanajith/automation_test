@@ -1,6 +1,10 @@
 import axios from 'axios';
 const url = "https://"+window.location.hostname+":8443";
 
+/*Component getTopMatches_ProfJ
+  use: gets the Reply of ChatBot on Sending UserQuery
+  api returns [[0:Number , 1: Reply Message , 2: Number(link)]]
+*/
 export const getTopMatches_ProfJ = async(userQuery) => {
     try{
         const res = await axios(url+'/getTopMatches_ProfJ', {

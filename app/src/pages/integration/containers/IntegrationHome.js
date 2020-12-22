@@ -3,7 +3,7 @@ import Header from '../../global/components/Header';
 import Footer from '../../global/components/FooterTwo';
 import Leftbar from '../components/Leftbar';
 import Rightbar from '../components/Rightbar';
-import IntegrationCenter from '../components/IntegrationCenter'
+import IntegrationCenter from './IntegrationCenter'
 
 //Integration Screen main Home Renders--> Header, LefbarScreen , CenterScreen, RIghtbarScreen and Main FooterBar // 
 

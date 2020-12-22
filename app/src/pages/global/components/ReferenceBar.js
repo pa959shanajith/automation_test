@@ -30,11 +30,8 @@ const ReferenceBar = (props) => {
     const [showInfo, setShowInfo] = useState(false);
     const [taskPopY, setTaskPopY] = useState(null);
     const [showProfJ , setshowProfJ]= useState(false);
-
-
     const tasksJson = useSelector(state=>state.plugin.tasksJson);
     const dataDict = useSelector(state=>state.plugin.FD);
-
     useEffect(()=>{
             // if(window.location.pathname != '/mindmap'){
             //     $("#mindmapCSS1, #mindmapCSS2").remove();
