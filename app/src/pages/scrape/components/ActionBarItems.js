@@ -336,7 +336,7 @@ const UpperContent = props => {
                         
                         let ob = viewString.view[i];
                         let addcusOb = '';
-                        ob.tempId = lastIdx++;
+                        ob.tempId = ++lastIdx;
                         
                         if (viewString.view[i].xpath === "") addcusOb = 'addCustObj';
                         

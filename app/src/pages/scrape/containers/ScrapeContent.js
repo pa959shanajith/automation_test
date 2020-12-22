@@ -103,7 +103,7 @@ const ScrapeContent = props => {
         let localScrapeItems = [...scrapeItems]
         let objId = "";
         for (let scrapeItem of localScrapeItems){
-            if (scrapeItem.val === value && scrapeItem.objId) {
+            if (scrapeItem.val === value) {
                 scrapeItem.title = newTitle;
                 objId = scrapeItem.objId;
             };
@@ -154,15 +154,16 @@ const ScrapeContent = props => {
     const onDelete = () => {
         let deletedArr = [];
         let scrapeItemsL = [...scrapeItems];
-        scrapeItemsL.forEach((item, idx) => {
+        let newScrapeList = []
+        newScrapeList = scrapeItemsL.filter((item, idx) => {
             if (item.checked){
-                deletedArr.push(item.objId);
-                delete scrapeItems[idx];
-            }
+                if (item.objId) deletedArr.push(item.objId);
+                return false;
+            } else return true;
         })
-        setScrapeItems(scrapeItemsL)
+        setScrapeItems(newScrapeList)
         setDeleted(deletedArr);
-        setDisableBtns({...disableBtns, delete: true})
+        setDisableBtns({...disableBtns, delete: true, save: false})
         console.log(deletedArr)
     }
 

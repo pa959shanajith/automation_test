@@ -224,7 +224,7 @@ const DesignContent = (props) => {
                                             }
                                             testcase[i].stepNo = (i + 1).toString();
                                             testcaseArray.push(testcase[i]);
-                                            props.setDisableActionBar(false);
+                                            // props.setDisableActionBar(false);
                                         }
                                     }
                                     // $("#jqGrid_addNewTestScript").jqGrid('clearGridData');
