@@ -1,7 +1,9 @@
-
 import axios from 'axios';
 const url = "https://"+window.location.hostname+":8443";
 
+/*Component LoginFields
+  api returns String (restart/validCredential/inValidCredential/invalid_username_password/userLogged/inValidLDAPServer/invalidUserConf)
+*/
 export const authenticateUser = async(username, password) => {
     try{
         const res = await axios(url+"/login", {
@@ -12,18 +14,21 @@ export const authenticateUser = async(username, password) => {
             data: {'username': username, 'password': password},
             credentials : 'include'
         });
-        if (res.status === 200) {
+        if (res.status === 200 && res.data !== "fail") {
             return res.data;
         }
         else{
-            console.log(res.status);
+            return {error: 'Failed to Authenticate User'}
         }
     }
     catch(err){
-        console.log(err)
+        return {error: 'Failed to Authenticate User'}
     }
 }
 
+/*Component BasePage
+  api returns {"user_id":"","username":"","email_id":"","additionalrole":[],"firstname":"","lastname":"","role":"","taskwflow":bool,"token":"","dbuser":bool,"ldapuser":bool,"samluser":bool,"openiduser":bool,"rolename":"","pluginsInfo":[{"pluginName":"","pluginValue":bool}],"page":"plugin"}
+*/
 export const loadUserInfo = async(selRole) => {
     try{
         const res = await axios(url+"/loadUserInfo", {
@@ -38,59 +43,17 @@ export const loadUserInfo = async(selRole) => {
             return res.data;
         }
         else{
-            console.log(res.status);
+            return {error: 'Failed to load User info'}
         }
     }
     catch(err){
-        console.log(err);
+        return {error: 'Failed to load User info'}
     }
 }
 
-export const resetPassword = async(newpassword, currpassword) => {
-    try{
-        const res = await axios(url+"/resetPassword", {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json"
-            },
-            data: {'newpassword': newpassword, 'currpassword': currpassword},
-            credentials : 'include'
-        });
-        if (res.status === 200){
-            return res.data;
-        }
-        else{
-            console.log(res.status);
-        }
-    }
-    catch(err){
-        console.log(err);
-    }
-}
-
-
-export const getRoleNameByRoleId = async(roleasarray) => {
-    try{
-        const res = await axios(url+"/getRoleNameByRoleId", {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json"
-            },
-            data: {'action': "getRoleNameByRoleId", 'role': roleasarray},
-            credentials : 'include'
-        });
-        if (res.status === 200){
-            return res.data;
-        }
-        else{
-            console.log(res.status);
-        }
-    }
-    catch(err){
-        console.log(err);
-    }
-}
-
+/*Component BasePage
+  api returns String (fail/unauthorized/badrequest/nouser/nouserprofile/userLogged/inValidCredential/noProjectsAssigned/reload/redirect/Invalid Session)
+*/
 export const validateUserState = async() => {
     try{
         const res = await axios(url+"/validateUserState", {
@@ -101,14 +64,17 @@ export const validateUserState = async() => {
             return res.data;
         }
         else{
-            console.log(res.status);
+            return {error: 'Failed to validate User'}
         }
     }
     catch(err){
-        console.log(err);
+        return {error: 'Failed to validate User'}
     }
 }
 
+/*Component LoginFields
+  api returns {proceed:true} / invalidServerConf
+*/
 export const checkUser = async(user) => {
     try{
         const res = await axios(url+"/checkUser", {
@@ -123,10 +89,10 @@ export const checkUser = async(user) => {
             return res.data;
         }
         else{
-            console.log(res.status);
+            return {error: 'Failed to check user'}
         }
     }
     catch(err){
-        console.log(err);
+        return {error: 'Failed to check user'}
     }
 }

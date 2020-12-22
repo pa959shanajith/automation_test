@@ -1,6 +1,13 @@
 import React from 'react';
 import "../styles/FooterOne.scss"
 
+/*
+    Component: Footer
+    Uses: Provides Footer with text on top and below each other
+    Props: None
+
+*/
+
 const FooterOne = () => {
     return (
         <div className="login-footer">

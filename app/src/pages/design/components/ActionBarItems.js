@@ -1,68 +1,280 @@
-import React, { Fragment } from 'react';
-import { Thumbnail } from '../../global';
+import React, { Fragment, useRef, useState, useEffect } from 'react';
+import { useSelector, useDispatch }  from  "react-redux";
+import { useHistory } from 'react-router-dom';
+import { Thumbnail, ResetSession, RedirectPage } from '../../global';
+import * as DesignApi from "../api";
+import * as DesignActions from '../state/action';
 import "../styles/ActionBarItems.scss"
 
-const UpperContent = ({appType, isMac}) => {
+/*
+    Component: UpperContent , Bottom Content for rendering items on Action Bar
+    Uses: Provides Content for Action Bar
+    Props: 
+    ----------- upperContent ------
+        setDTcFlag -> flips the Dependent Test Case Flag
+        isMac -> Bool value to check if client is running on Mac
+        setOverlay -> overlay msg
+        disable -> flag to check if action bar is required to disable
+        setShowPop -> showPopup state
+        setShowDlg -> Show Dependent TestCase Dialog State
+        dTcFlag -> Dependent TestCase checked/unchecked Flag
+        checkedTc -> list of checked test case IDs'
+        showDlg -> flag to check if dependenet test Case dialog is visible or not
+
+    ---------- bottomContent ---------
+        setShowPop -> showPopup state
+        setImported -> state to switch import status flag
+        setShowConfirmPop -> confirmation dialog popup
+        disable -> flag to check if action bar is required to disable
+*/
+
+const UpperContent = ({setDTcFlag, isMac, setOverlay, disable, setShowPop, setShowDlg, dTcFlag, checkedTc, showDlg}) => {
+
+    const userInfo = useSelector(state=>state.login.userinfo);
+    const current_task = useSelector(state=>state.plugin.CT);
+    const mainTestCases = useSelector(state=>state.design.testCases);
+    const saveEnable = useSelector(state=>state.design.saveEnable);
+
+    let appType = current_task.appType;
+    const history = useHistory();
+    const dispatch = useDispatch();
+
+    const [dependCheck, setDependCheck] = useState(false);
+
+    useEffect(()=>{
+        if (!showDlg) setDependCheck(dTcFlag);
+    }, [showDlg]);
+
+    const WebList = [
+        {'title': "Internet Explorer", 'img': "static/imgs/ic-ie.png", action: ()=>debugTestCases('3'), 'disable': disable}, 
+        {'title': "Google Chrome", 'img': "static/imgs/ic-chrome.png", action: ()=>debugTestCases('1'), 'disable': disable},
+        {'title': "Mozilla Firefox", 'img': "static/imgs/ic-mozilla.png", action: ()=>debugTestCases('2'), 'disable': disable},
+        {'title': "Microsoft Edge", 'svg': "static/imgs/ic-edge.svg", action: ()=>debugTestCases('7'), 'disable': disable},
+        {'title': "Edge Chromium", 'svg': "static/imgs/ic-edge-chromium.svg", action: ()=>debugTestCases('8'), 'disable': disable}
+        ]
+    
+    const oebsList = [{'title': "OEBS Apps" , 'img': 'static/imgs/ic-desktop.png', action: ()=>debugTestCases('1'), 'disable': disable}]
+    
+    const desktopList = [{'title': "Desktop Apps" , 'img': 'static/imgs/ic-desktop.png', action: ()=>debugTestCases('1'), 'disable': disable}]
+    
+    const systemList = [{'title': "System Apps" , 'img': 'static/imgs/ic-desktop.png', action: ()=>debugTestCases('1'), 'disable': disable, 'disable': disable}]
+    
+    const sapList = [{'title': "SAP Apps" , 'img': 'static/imgs/ic-desktop.png', action: ()=>debugTestCases('1'), 'disable': disable}]
+    
+    const webserviceList = [{'title': "Web Services" , 'img': 'static/imgs/ic-webservice.png', action: ()=>debugTestCases('1'), 'disable': disable}]
+    
+    const mobileAppList = [{'title': "Mobile Apps" , 'img': 'static/imgs/ic-mobility.png', action: ()=>debugTestCases('1'), 'disable': disable}]
+    
+    const mobileWebList = [{'title': "Mobile Web" , 'img': 'static/imgs/ic-mobility.png', action: ()=>debugTestCases(), 'disable': disable}]
+    
+    const mainframeList = [{'title': "Mainframe", 'img': "static/imgs/ic-mainframe-o.png", action: ()=>debugTestCases(), 'disable': disable}]
+
+    const addDependentTestCase = event => {
+        if (!event.target.checked) {
+            setDependCheck(false);
+            setDTcFlag(false);
+        }
+        else setShowDlg(true);
+    }
+
     let renderComp = [
-                    <div key={1} className='d__debugOn'>Debug On</div>, 
-                    <div key={3} className="d__thumbnail">
-                        <input id="add_depend" type="checkbox" />
+                    <div key={1} className={'d__debugOn' + (disable ? " disable-thumbnail" : "")}>Debug On</div>, 
+                    <div key={3} className={"d__thumbnail" + (disable ? " disable-thumbnail" : "")}>
+                        <input id="add_depend" type="checkbox" onChange={addDependentTestCase} checked={dependCheck}/>
                         <span className="d__thumbnail_title">Add Dependent Test Cases</span>
                     </div>
                     ];
 
-    if (appType === "Web") {renderComp.splice(1, 0, <Fragment key={2}>
-                                {WebList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} svg={icon.svg} />)}
-                                { isMac && <Thumbnail title="Safari" img="static/imgs/ic-safari.png" />}</Fragment>)}
-    else if (appType === "OEBS") renderComp.splice(1, 0, <Fragment key={2}>{oebsList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</Fragment>)
-    else if (appType === "Desktop") renderComp.splice(1, 0, <Fragment key={2}>{desktopList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</Fragment>)
-    else if (appType === "System") renderComp.splice(1, 0, <Fragment key={2}>{systemList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</Fragment>)
-    else if (appType === "SAP") renderComp.splice(1, 0, <Fragment key={2}>{sapList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</Fragment>)
-    else if (appType === "Webservice") renderComp.splice(1, 0, <Fragment key={2}>{webserviceList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</Fragment>)
-    else if (appType === "MobileApp") renderComp.splice(1, 0, <Fragment key={2}>{mobileAppList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</Fragment>)
-    else if (appType === "MobileWeb") renderComp.splice(1, 0, <Fragment key={2}>{mobileWebList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</Fragment>)
-    else if (appType === "Mainframe") renderComp.splice(1, 0, <Fragment key={2}>{mainframeList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}</Fragment>)
+    const debugTestCases = selectedBrowserType => {
+        let testcaseID = [];
+        let browserType = [];
+        
+        if (appType !== "MobileWeb" && appType !== "Mainframe") browserType.push(selectedBrowserType);
+        
+        // globalSelectedBrowserType = selectedBrowserType;
+
+        if (dTcFlag) testcaseID = checkedTc;
+        else testcaseID.push(current_task.testCaseId);
+    
+        setOverlay('Debug in Progress. Please Wait...');
+        ResetSession.start();
+        DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, appType)
+            .then(data => {
+                setOverlay("");
+                ResetSession.end();
+                if (data === "Invalid Session") return RedirectPage(history);
+                else if (data === "unavailableLocalServer")  setShowPop({'title': "Debug Testcase", 'content': "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."})
+                else if (data === "success") setShowPop({'title': "Debug Testcase", 'content': "Debug completed successfully."})
+                else if (data === "fail") setShowPop({'title': "Debug Testcase", 'content': "Failed to debug."})
+                else if (data === "Terminate") setShowPop({'title': "Debug Testcase", 'content': "Debug Terminated"})
+                else if (data === "browserUnavailable") setShowPop({'title': "Debug Testcase", 'content': "Browser is not available"})
+                else if (data === "scheduleModeOn") setShowPop({'title': "Debug Testcase", 'content': "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."})
+                else if (data === "ExecutionOnlyAllowed") setShowPop({'title': "Debug Testcase", 'content': "Execution Only Allowed"})
+                else if (data.status === "success"){
+                    let rows={}
+                    mainTestCases.forEach((testCase, index) => {
+                        if(index+1 in data){
+                            // $('#jqGrid').jqGrid('setCell', $(this)[0].id, 'objectName', data[$(this)[0].id].xpath);
+                            rows[testCase.custname]=data[index+1].xpath
+                        }
+                    });
+                    dispatch({type: DesignActions.SET_MODIFIED, payload: rows});
+                    dispatch({type: DesignActions.SET_SAVEENABLE, payload: !saveEnable})
+                    console.log(`dispatching ${!saveEnable}`)
+                    setShowPop({'title': "Debug Testcase", 'content': "Debug completed successfully."})
+                } else {
+                    console.log(data);
+                }										
+            })
+            .catch(error => {
+                setOverlay("");
+                ResetSession.end();
+                setOverlay({'title': "Debug Testcase", 'content': "Failed to debug."});
+                console.error("Error while traversing while executing debugTestcase method! \r\n " + (error.data));
+            });
+    };
+
+    
+    switch(appType) {
+        case "Web": renderComp.splice(1, 0, <Fragment key={2}> { WebList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} svg={icon.svg} action={icon.action} disable={icon.disable}/>)}
+                                            { isMac && <Thumbnail title="Safari" img="static/imgs/ic-safari.png" action={()=>debugTestCases('6')} disable={disable}/>}</Fragment>);
+                    break;
+        case "OEBS": renderComp.splice(1, 0, <Fragment key={2}>{oebsList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
+                    break;
+        case "Desktop": renderComp.splice(1, 0, <Fragment key={2}>{desktopList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} disable={icon.disable} />)}</Fragment>);
+                        break;
+        case "System": renderComp.splice(1, 0, <Fragment key={2}>{systemList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
+                        break;
+        case "SAP": renderComp.splice(1, 0, <Fragment key={2}>{sapList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
+                    break;
+        case "Webservice": renderComp.splice(1, 0, <Fragment key={2}>{webserviceList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable}/>)}</Fragment>);
+                            break;
+        case "MobileApp": renderComp.splice(1, 0, <Fragment key={2}>{mobileAppList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
+                            break;
+        case "MobileWeb": renderComp.splice(1, 0, <Fragment key={2}>{mobileWebList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable}/>)}</Fragment>);
+                            break;
+        case "Mainframe": renderComp.splice(1, 0, <Fragment key={2}>{mainframeList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
+                            break;
+        default: break;
+    }
     
     return renderComp;
 };
 
-const BottomContent = () => {
+const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable}) => {
+
+    const current_task = useSelector(state=>state.plugin.CT);
+    const userInfo = useSelector(state=>state.login.userinfo);
+    const history = useHistory();
+    const hiddenInput = useRef(null);
+
+    const exportTestCase =  () => {
+		let testCaseId = current_task.testCaseId;
+		let testCaseName = current_task.testCaseName;
+        let versionnumber = current_task.versionnumber;
+        
+		DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName, versionnumber)
+		.then(response => {
+				if (response === "Invalid Session") RedirectPage(history);
+                
+                let responseData;
+                if (typeof response === 'object') responseData = JSON.stringify(response.testcase, null, 2);
+                let filename = testCaseName + ".json";
+
+                let testCaseBlob = new Blob([responseData], {
+                    type: "text/json;charset=utf-8"
+                })
+
+				if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                    window.navigator.msSaveOrOpenBlob(testCaseBlob, filename);
+                }
+                else {
+                    let a = document.createElement('a');
+                    a.download = filename;
+                    a.href = 'data:text/json;charset=utf-8,' + responseData;
+                    a.target = '_blank';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                  } 
+            })
+            .catch(error => console.error("ERROR::::", error));
+    }
+    
+    const onInputChange = (event) => {
+        let testCaseId = current_task.testCaseId;
+		let testCaseName = current_task.testCaseName;
+        let versionnumber = current_task.versionnumber;
+        let appType = current_task.appType;
+		let import_status = true;
+        let flag = false;
+
+        let file = event.target.files[0];
+        let reader = new FileReader();
+        reader.onload = function (e) {
+            if ((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase() === "json") {
+                let resultString = JSON.parse(reader.result);
+                for (let i = 0; i < resultString.length; i++) {
+                    if (resultString[i].appType.toLowerCase() === "generic" || resultString[i].appType.toLowerCase() === "pdf") {
+                        flag = true;
+                    } else if (resultString[i].appType === appType) {
+                        flag = true;
+                        break;
+                    } else {
+                        flag = false;
+                        break;
+                    }
+                }
+                if (flag === false) setShowPop({'title': "App Type Error", 'content': "Project application type and Imported JSON application type doesn't match, please check!"})
+                else {
+                    DesignApi.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
+                        .then(data => {
+                            if (data == "Invalid Session") RedirectPage(history);
+                            if (data === "success") {
+                                setImported(true);
+                                setShowPop({'title': "Import Testcase", 'content': "TestCase Json imported successfully."});
+                            } else setShowPop({'title': "Import Testcase",'content': "Please Check the file format you have uploaded!"});
+                        })
+                        .catch(error => console.error("ERROR::::", error));
+                }
+            } else setShowPop({'title': "Import Testcase", 'content': "Please Check the file format you have uploaded!"});
+        }
+        reader.readAsText(file);
+    }
+
+    const importTestCase = (overWrite) => {
+        
+        let testCaseId = current_task.testCaseId;
+		let testCaseName = current_task.testCaseName;
+        let versionnumber = current_task.versionnumber;
+        if(overWrite) setShowConfirmPop(false);
+        
+        DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName, versionnumber)
+		.then(response => {
+				if (response === "Invalid Session") RedirectPage(history);
+                if (response.testcase.length === 0 || overWrite) {
+                    // hiddenInput.current.click();
+                    document.getElementById("importTestCaseField").click();
+                }
+                else{
+                    setShowConfirmPop({'title': 'Table Consists of Data', 'content': 'Import will erase your old data. Do you want to continue?', 'onClick': ()=>importTestCase(true)});
+                }
+            })
+        .catch(error => console.error("ERROR::::", error));
+    }
+
     const lowerList = [
-                        {'title': 'Import Test Case', 'img': 'static/imgs/ic-import-script.png'},
-                        {'title': 'Export Test Case', 'img': 'static/imgs/ic-export-script.png'}
+                        {'title': 'Import Test Case', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase()},
+                        {'title': 'Export Test Case', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>exportTestCase(), 'disable': disable}
                     ]
                     // <input style="visibility: hidden;" type="file" id="importTestCaseFile" accept=".json"></li>
                     // <li style="visibility: hidden; display: none;"><a href='#' ng-click="importTestCase1($event)"></a><input style="visibility: hidden;" type="file" id="overWriteJson" accept=".json"></li>
     return (
         <>
-            {lowerList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} />)}
+            {lowerList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable}/>)}
+            <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange} accept=".json"/>
         </>
     );
 };
-
-const WebList = [
-    {'title': "Internet Explorer", 'img': "static/imgs/ic-ie.png"}, 
-    {'title': "Google Chrome", 'img': "static/imgs/ic-chrome.png"},
-    {'title': "Mozilla Firefox", 'img': "static/imgs/ic-mozilla.png"},
-    {'title': "Microsoft Edge", 'svg': "static/imgs/ic-edge.svg"},
-    {'title': "Edge Chromium", 'svg': "static/imgs/ic-edge-chromium.svg"}
-    ]
-
-const oebsList = [{'title': "OEBS Apps" , 'img': 'static/imgs/ic-desktop.png'}]
-
-const desktopList = [{'title': "Desktop Apps" , 'img': 'static/imgs/ic-desktop.png'}]
-
-const systemList = [{'title': "System Apps" , 'img': 'static/imgs/ic-desktop.png'}]
-
-const sapList = [{'title': "SAP Apps" , 'img': 'static/imgs/ic-desktop.png'}]
-
-const webserviceList = [{'title': "Web Services" , 'img': 'static/imgs/ic-webservice.png'}]
-
-const mobileAppList = [{'title': "Mobile Apps" , 'img': 'static/imgs/ic-mobility.png'}]
-
-const mobileWebList = [{'title': "Mobile Web" , 'img': 'static/imgs/ic-mobility.png'}]
-
-const mainframeList = [{'title': "Mainframe", 'img': "static/imgs/ic-mainframe-o.png"}]
-
 
 export { UpperContent, BottomContent };

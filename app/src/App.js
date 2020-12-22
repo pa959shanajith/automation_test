@@ -7,7 +7,7 @@ import Login, {Base} from './pages/login';
 import Admin from './pages/admin';
 import Plugin from './pages/plugin';
 import Mindmap from './pages/mindmap';
-import Scrape from './pages/scrapescreen';
+import Scrape from './pages/scrape';
 import Design from './pages/design';
 import Utility from './pages/utility';
 import Integration from './pages/integration';
