@@ -662,8 +662,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             var lDate = dateB.split("-");
             var gDate = fDate[2] + "-" + fDate[1] + "-" + fDate[0];
             var mDate = lDate[2] + "-" + lDate[1] + "-" + lDate[0];
-            if (new Date(gDate + " " + timeA) < new Date(mDate + " " + timeB)) return -1;
-            if (new Date(gDate + " " + timeA) > new Date(mDate + " " + timeB)) return 1;
+            if (new Date(gDate + " " + timeA) <= new Date(mDate + " " + timeB)) return -1;
+            if (new Date(gDate + " " + timeA) >= new Date(mDate + " " + timeB)) return 1;
             return dateArray;
         })
     }
@@ -683,8 +683,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             var lDate = bB.split("-");
             var gDate = fDate[2] + "-" + fDate[1] + "-" + fDate[0];
             var mDate = lDate[2] + "-" + lDate[1] + "-" + lDate[0];
-            if (new Date(gDate + " " + timeA) > new Date(mDate + " " + timeB)) return -1;
-            if (new Date(gDate + " " + timeA) < new Date(mDate + " " + timeB)) return 1;
+            if (new Date(gDate + " " + timeA) >= new Date(mDate + " " + timeB)) return -1;
+            if (new Date(gDate + " " + timeA) <= new Date(mDate + " " + timeB)) return 1;
             return dateArray;
         })
     }
