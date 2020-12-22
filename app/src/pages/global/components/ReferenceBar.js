@@ -3,6 +3,7 @@ import {ScrollBar, TaskContents} from '../../global';
 import { useSelector } from 'react-redux';
 import "../styles/ReferenceBar.scss";
 import ClickAwayListener from 'react-click-away-listener';
+import ProfJ from '../../profJ';
 
     /* 
         Component : ReferenceBar (Right Bar)
@@ -28,10 +29,10 @@ const ReferenceBar = (props) => {
     const [showTask, setShowTask] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
     const [taskPopY, setTaskPopY] = useState(null);
-    const [taskInfo, setTaskInfo] = useState(null);
-
+    const [showProfJ , setshowProfJ]= useState(false);
     const tasksJson = useSelector(state=>state.plugin.tasksJson);
     const dataDict = useSelector(state=>state.plugin.FD);
+    const [taskInfo, setTaskInfo] = useState(null);
     const current_task = useSelector(state=>state.plugin.CT);
 
     useEffect(()=>{
@@ -151,7 +152,10 @@ const ReferenceBar = (props) => {
         setTaskPopY(event.clientY);
         setShowInfo(!showInfo);
     }
-
+    const callProfJ = event =>{
+        closePopups();
+        setshowProfJ(!showProfJ);
+    }
     return (
         <div className={"ref__wrapper " + (!collapse && "ref__wrapper__expand")}>
         <div className="ref__bar">
@@ -186,7 +190,6 @@ const ReferenceBar = (props) => {
                         </div>
                         </ClickAwayListener>
                     }
-
                     {
                         showInfo && 
                         <ClickAwayListener onClickAway={closePopups}>
@@ -206,7 +209,9 @@ const ReferenceBar = (props) => {
                         </ClickAwayListener>
                     }
                     
-
+                    {
+                        showProfJ && <ProfJ setshowProfJ={setshowProfJ} />
+                    }
                     <ScrollBar scrollId="ref_bar_scroll" trackColor="transparent" thumbColor="#7143b3">
                         <div className="ref__content">
                             <div className="rb_upper_contents">
@@ -217,11 +222,12 @@ const ReferenceBar = (props) => {
                             </div>
                         </div>
                     </ScrollBar>
+                    
                 </div>
             </div>
             <div className="rb__bottom_content">
-                <div className="ic_box"><img className="rb__ic-assist thumb__ic" alt="assist-ic" src="static/imgs/ic-assist.png"/><span className="rb_box_title">Assist</span></div>
-                </div>
+                <div className="ic_box"><img className="rb__ic-assist thumb__ic" alt="assist-ic" src="static/imgs/ic-assist.png" onClick={(e)=>callProfJ(e)}/><span className="rb_box_title">Assist</span></div>
+            </div>
         </>
         }
         </div>
@@ -229,3 +235,4 @@ const ReferenceBar = (props) => {
     );
 }
 export default ReferenceBar;
+
