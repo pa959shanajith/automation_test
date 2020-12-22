@@ -2,9 +2,12 @@ import React from 'react';
 import ChatBot from './components/ChatBot';
 
 /*Renders the main ProfJ Ui */
-const ProfJ = ()=>{
+const ProfJ = (props)=>{
+    const onCloseClick=()=>{
+        props.setshowProfJ(false)
+    }
     return (
-        <ChatBot/>
+        <ChatBot onCloseClick={onCloseClick}/>
     );
 }
 

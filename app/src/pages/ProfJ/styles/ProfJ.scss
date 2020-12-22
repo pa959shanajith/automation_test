@@ -2,7 +2,25 @@
     bottom:0px;
 }
 #assistWrap{
-    width: 360px ;
+    position: fixed;
+    bottom: 46px;
+    width: 360px;
+    right: 97px;
+    z-index: 50;
+    text-align: left;
+}
+.pop_header{
+        cursor: pointer;
+        display: flex;
+        padding: 8px 15px;
+        margin: 0;
+        font-size: 18px;
+        font-family: "LatoWeb";
+        background: #321E4F;
+        border-radius: 5px 5px 0px 0px;
+        -moz-border-radius: 5px 5px 0px 0px;
+        -webkit-border-radius: 5px 5px 0px 0px;
+        padding-right: 0px;
 }
 .assist-image {
     vertical-align: middle;
@@ -22,7 +40,7 @@
     height: auto !important;
     width: auto !important;
     position: relative;
-    float : right;
+    float : right !important;
     padding : 5px 0px;
 }
 #assistContent{

@@ -47,7 +47,7 @@ const  ChatBot = (props) => {
                 <img className="assist-image" alt="message" src="static/imgs/ic-message.png"/>
                 <span className="pop_title">Prof J</span>
                 <span onClick={()=>setChatBox(!chatBox)}><img className="down-arrow-img" alt="message_arrow" src={chatBox ? "static/imgs/ic-down.png": "static/imgs/ic-up.png" }/></span>
-                <img onClick={()=>props.setshowProfJ(false)} className="down-close-img" alt="message_close" src="static/imgs/ic-close.png"/>
+                <img onClick={()=>props.onCloseClick()} className="down-close-img" alt="message_close" src="static/imgs/ic-close.png"/>
             </h4>
             {chatBox ? 
             <div id="assistContent">
