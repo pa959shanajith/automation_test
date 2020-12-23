@@ -55,6 +55,11 @@ const Canvas = (props) => {
     const setBlockui=props.setBlockui
     const displayError = props.displayError
     const CanvasRef = useRef();
+    useEffect(()=>{
+        return ()=>{
+            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+        }
+    },[])
     useEffect(() => {
         var tree;
         count = {
@@ -134,9 +139,6 @@ const Canvas = (props) => {
         setVerticalLayout(props.verticalLayout);
         setBlockui({show:false})
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        return ()=>{
-            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-        }
     }, [props.module,props.reload,props.verticalLayout]);
     useEffect(()=>{
         if(createnew === 'save'){

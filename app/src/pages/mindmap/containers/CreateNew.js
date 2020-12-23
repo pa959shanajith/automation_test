@@ -1,5 +1,5 @@
 import React ,  { Fragment, useEffect, useState, useRef} from 'react';
-import {getProjectList, getModules, getScreens, pdProcess} from '../api';
+import {getProjectList, getModules, getScreens, pdProcess, importMindmap} from '../api';
 import LoadingBar from 'react-top-loading-bar';
 import { useDispatch, useSelector} from 'react-redux';
 import SaveMapButton from '../components/SaveMapButton';
@@ -50,44 +50,25 @@ const CreateNew = () => {
     })()
   },[dispatch])
   useEffect(()=>{
-    if(importData.data && Object.keys(prjList).length>0 && !importProj){
-      setSelectProj(true)
-    }
-    if(importData.data && importProj){
-      loadImportData()
+    if(importData.data && Object.keys(prjList).length>0){
+        if(importData.createdby === "mm"){
+            setBlockui({show:true,content:"Importing File.. Please Wait.."});
+            importFromMm({...importData},importProj,prjList,dispatch,displayError,setBlockui,setImportProj)
+        }else if(!importProj){
+            setSelectProj(true)
+        }else if(importData.createdby === "pd"){
+            setBlockui({show:true,content:"Importing File.. Please Wait.."});
+            importFromPd({...importData},importProj,prjList,dispatch,displayError,setBlockui,setImportProj)
+        }else{
+            setBlockui({show:true,content:"Importing File.. Please Wait.."});
+            loadImportData({...importData},importProj,dispatch,displayError,setBlockui,setImportProj)
+        }
     }
   },[importData,importProj,prjList])
   const closeImport = () => {
     setSelectProj(false)
     setImportProj(false)
     dispatch({type:actionTypes.UPDATE_IMPORTDATA,payload:{createdby:undefined,data:undefined}})
-  }
-  
-  const loadImportData = async() =>{
-    var impData = {...importData}
-    setBlockui({show:true,content:"Importing File.. Please Wait.."});
-    if(importData.createdby === 'pd'){
-      var appType = getApptypePD(importData.data)
-      if(appType!=prjList[importProj].apptypeName.toLowerCase()){
-        displayError("App Type Error", "AppType doesn't match, please check!!")
-        return;
-      }else{
-        var res =  await pdProcess({'projectid':importProj,'file':importData.data})
-        if(res.error){displayError(res.error);return;}
-        var data = getJsonPd(res.data)
-        impData.data = data
-      }
-    }
-    var moduledata = await getModules({"tab":"tabCreate","projectid":importProj,"moduleid":null})
-    if(moduledata.error){displayError(moduledata.error);return;}
-    var screendata = await getScreens(importProj)
-    if(screendata.error){displayError(screendata.error);return;}
-    dispatch({type:actionTypes.SELECT_PROJECT,payload:importProj})
-    dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true,importData:impData}})
-    dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
-    dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
-    dispatch({type:actionTypes.UPDATE_IMPORTDATA,payload:{createdby:undefined,data:undefined}})
-    setImportProj(false)
   }
 
   const displayError = (error) =>{
@@ -193,6 +174,60 @@ const Footer = (props) =>{
         </div>
     </Fragment>
   )
+}
+
+const importFromMm = async(importData,importProj,prjList,dispatch,displayError,setBlockui,setImportProj) => {
+    var data = JSON.parse(importData.data)
+    importProj = data.projectid
+    if(!importProj|| !prjList[importProj]){
+        displayError('This project is not assigned to user')
+        return;
+    }
+    var res = await importMindmap(data)
+    if(res.error){displayError(res.error);return;}
+    var req={
+        tab:"tabCreate",
+        projectid:importData.projectid ,
+        version:0,
+        cycId: null,
+        moduleid:res._id
+    }
+    var res = await getModules(req)
+    if(res.error){displayError(res.error);return;}
+    importData.data = res
+    loadImportData(importData,importProj,dispatch,displayError,setBlockui,setImportProj)
+    return;
+}
+
+const importFromPd = async(importData,importProj,prjList,dispatch,displayError,setBlockui,setImportProj) => {
+    var appType = getApptypePD(importData.data)
+    if(appType!=prjList[importProj].apptypeName.toLowerCase()){
+        displayError("App Type Error", "AppType doesn't match, please check!!")
+        return;
+    }else{
+        var res =  await pdProcess({'projectid':importProj,'file':importData.data})
+        if(res.error){displayError(res.error);return;}
+        var data = getJsonPd(res.data)
+        importData.data = data
+        loadImportData(importData,importProj,dispatch,displayError,setBlockui,setImportProj)
+    }
+}
+
+const loadImportData = async(importData,importProj,dispatch,displayError,setBlockui,setImportProj) =>{
+    var mindmapData = importData.data
+    if(importData.createdby !== 'mm'){
+        mindmapData = {createnew:true,importData:importData}
+    }
+    var moduledata = await getModules({"tab":"tabCreate","projectid":importProj,"moduleid":null})
+    if(moduledata.error){displayError(moduledata.error);return;}
+    var screendata = await getScreens(importProj)
+    if(screendata.error){displayError(screendata.error);return;}
+    dispatch({type:actionTypes.SELECT_PROJECT,payload:importProj})
+    dispatch({type:actionTypes.SELECT_MODULE,payload:mindmapData})
+    dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
+    dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
+    dispatch({type:actionTypes.UPDATE_IMPORTDATA,payload:{createdby:undefined,data:undefined}})
+    setImportProj(false)
 }
 
 export default CreateNew;

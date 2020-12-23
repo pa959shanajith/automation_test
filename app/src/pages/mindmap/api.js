@@ -342,6 +342,34 @@ export const excelToMindmap = async(data) => {
     }
 }
 
+/*Component importMindmap
+  api returns {screenList: [{name:"",parent:[],_id:""}], testCaseList: [{name:"",parent:[],_id:"",screenid:''}]}
+*/
+
+export const importMindmap = async(data) => {
+    try{
+        const res = await axios(url+'/importMindmap', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        return {error:'error fetching data from file'}
+    }catch(err){
+        console.error(err)
+        return {error:'error fetching data from file'}
+    }
+}
+
 /*Component excelToMindmap
   api returns {screenList: [{name:"",parent:[],_id:""}], testCaseList: [{name:"",parent:[],_id:"",screenid:''}]}
 */

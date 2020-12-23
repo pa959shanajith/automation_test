@@ -37,9 +37,9 @@ const CreateOptions = (props) => {
     if(resdata.error){displayError(resdata.error);return;}
     dispatch({type:actionTypes.UPDATE_IMPORTDATA,payload:{createdby:'excel',data:resdata}})
   }
-  const pdImport = (file) => {
+  const fileImport = (file,impType) => {
     props.setOptions('newmindmap')
-    dispatch({type:actionTypes.UPDATE_IMPORTDATA,payload:{createdby:'pd',data:file}})
+    dispatch({type:actionTypes.UPDATE_IMPORTDATA,payload:{createdby:impType,data:file}})
   }
   return (
     <Fragment>
@@ -56,7 +56,7 @@ const CreateOptions = (props) => {
           {options.map((e,i)=>(
             <div className='mindmap__option-box' onClick={()=>{(e.comp === 'importmindmap')?upload.current.click():props.setOptions(e.comp)}} key={i} data-test="OptionBox">
               <div>
-                {(e.comp === 'importmindmap')?<input onChange={(e)=>uploadFile(e,setSheetList,displayError,setData,pdImport)} style={{display:'none'}} type="file" name="xlsfile" accept=".pd,.xls,.xlsx" required="" autoFocus="" ref={upload}/>:null}
+                {(e.comp === 'importmindmap')?<input onChange={(e)=>uploadFile(e,setSheetList,displayError,setData,fileImport)} style={{display:'none'}} type="file" name="xlsfile" accept=".pd,.xls,.xlsx,.mm" required="" autoFocus="" ref={upload}/>:null}
                 <img src={"static/imgs/"+e.ico} alt={e.label}/>
                 <div>{e.label}</div>
               </div>
@@ -85,24 +85,33 @@ function read(file) {
   )
 }
 
-const uploadFile = async(e,setSheetList,displayError,setData,pdImport) =>{
-  var file = e.target.files[0]
-  var extension = file.name.substr(file.name.lastIndexOf('.')+1)
-  const result =  await read(file)
-  setData(result)
-  if(extension === 'pd'){
-    pdImport(result)
-  }else if(extension === 'xls' || extension === 'xlsx'){
-    var res = await excelToMindmap({'content':result,'flag':"sheetname"})
-    if(res.error){displayError(res.error);return;}
-    if(res.length>0){
-      setSheetList(res)
+const uploadFile = async(e,setSheetList,displayError,setData,fileImport) =>{
+    var file = e.target.files[0]
+    var extension = file.name.substr(file.name.lastIndexOf('.')+1)
+    const result =  await read(file)
+    setData(result)
+    if(extension === 'pd'){
+        fileImport(result,'pd')
+    }else if(extension === 'xls' || extension === 'xlsx'){
+        var res = await excelToMindmap({'content':result,'flag':"sheetname"})
+        if(res.error){displayError(res.error);return;}
+        if(res.length>0){
+            setSheetList(res)
+        }else{
+            displayError("File is empty")
+        }
+    }else if(extension === 'json' || extension == 'mm'){
+        var resultString = JSON.parse(result);
+        if (!('testscenarios' in resultString)){
+            displayError("Incorrect JSON imported. Please check the contents!!");
+        }else if(resultString.testscenarios.length == 0){
+            displayError("The file has no node structure to import, please check!!");
+        }else{
+            fileImport(result,'mm')
+        }
     }else{
-      displayError("File is empty")
+        displayError("File is not supported")
     }
-  }else{
-    displayError("File is not supported")
-  }
 }
 
 const Container = (props) => {
