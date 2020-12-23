@@ -1,16 +1,16 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import {ModalContainer, ScrollBar} from '../../global';
 import {useSelector} from 'react-redux'
-import {getModules,exportToJson,exportToExcel} from '../api';
+import {getTestSuiteDetails,exportToJson,exportToExcel} from '../api';
 import '../styles/ExportMapButton.scss'
 
-const ExportMapButton = ({setPopup,setBlockui,displayError}) => {
+const ExportMapButton = ({setPopup,setBlockui,displayError,isAssign,releaseRef,cycleRef}) => {
     const fnameRef = useRef()
     const ftypeRef = useRef()
     const [exportBox,setExportBox] = useState(false)
     const selectedModule = useSelector(state=>state.mindmap.selectedModule)
     const selectedProj = useSelector(state=>state.mindmap.selectedProj)
-    const modName = selectedModule.name
+    const projectList = useSelector(state=>state.mindmap.projectList)
     const openExport = ()=>{
         if(!selectedProj || !selectedModule || !selectedModule._id){
             return;
@@ -29,6 +29,8 @@ const ExportMapButton = ({setPopup,setBlockui,displayError}) => {
         setBlockui({show:true,content:'Exporting Mindmap ...'})
         if(ftype === 'json') toJSON(selectedModule,fname,displayError,setPopup,setBlockui);
         if(ftype === 'excel') toExcel(selectedProj,selectedModule,fname,displayError,setPopup,setBlockui);
+        if(ftype === 'custom') toCustom(selectedProj,selectedModule,projectList,releaseRef,cycleRef,fname,displayError,setPopup,setBlockui);
+
     }
     return(
         <Fragment>
@@ -36,7 +38,7 @@ const ExportMapButton = ({setPopup,setBlockui,displayError}) => {
             title='Export MindMap'
             close={()=>setExportBox(false)}
             footer={<Footer clickExport={clickExport}/>}
-            content={<Container fnameRef={fnameRef} ftypeRef={ftypeRef} modName={modName}/>} 
+            content={<Container fnameRef={fnameRef} ftypeRef={ftypeRef} modName={selectedModule.name} isAssign={isAssign}/>} 
             />:null}
             <svg className={"ct-exportBtn"+(selectedModule._id?"":" disableButton")} id="ct-save" onClick={openExport}>
                 <g id="ct-exportAction" className="ct-actionButton">
@@ -48,7 +50,7 @@ const ExportMapButton = ({setPopup,setBlockui,displayError}) => {
     )
 }
 
-const Container = ({fnameRef,ftypeRef,modName}) =>(
+const Container = ({fnameRef,ftypeRef,modName,isAssign}) =>(
     <div>
         <div className='export-row'>
             <label>File Name: </label>
@@ -59,6 +61,7 @@ const Container = ({fnameRef,ftypeRef,modName}) =>(
             <select ref={ftypeRef} defaultValue={'excel'}>
                 <option value={'excel'}>Excel Workbook (.xlsx)</option>
                 <option value={'json'}>MindMap (.mm)</option>
+                {isAssign && <option value={'custom'}>Custom (.json)</option>}
             </select>
         </div>
     </div>
@@ -109,14 +112,7 @@ const toJSON = async(modId,fname,displayError,setPopup,setBlockui) => {
     try{
         var result =  await exportToJson(modId._id)
         if(result.error){displayError(result.error);return;}
-        var blob = new Blob([JSON.stringify(result)], { type: 'text/json' });
-        var e = document.createEvent('MouseEvents');
-        var a = document.createElement('a');
-        a.download = fname+'.mm';
-        a.href = window.URL.createObjectURL(blob);
-        a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
-        e.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-        a.dispatchEvent(e);
+        jsonDownload(fname+'.mm', JSON.stringify(result));
         setBlockui({show:false,content:''})
         setPopup({
             title:'Mindmap',
@@ -128,6 +124,79 @@ const toJSON = async(modId,fname,displayError,setPopup,setBlockui) => {
         console.error(err)
         displayError('Failed to Export Mindmap')
     }
+}
+
+const toCustom = async (selectedProj,selectedModule,projectList,releaseRef,cycleRef,fname,displayError,setPopup,setBlockui) =>{
+    try{
+        var suiteDetailsTemplate = { "condition": 0, "dataparam": [" "], "scenarioId": "", "scenarioName": "" };
+        var moduleData = { "testsuiteName": "", "testsuiteId": "", "versionNumber": "", "appType": "", "domainName": "", "projectName": "", "projectId": "", "releaseId": "", "cycleName": "", "cycleId": "", "suiteDetails": [suiteDetailsTemplate] };
+        var executionData = { "executionData": [{ "source": "api", "exectionMode": "serial", "browserType": ["1"], "qccredentials": { "qcurl": "", "qcusername": "", "qcpassword": "" }, "batchInfo": [JSON.parse(JSON.stringify(moduleData))], "userInfo": { "tokenhash": "", "tokenname": "", "icename": "" } } ] };
+        var moduleInfo = { "batchInfo": [] };
+        moduleData.appType = projectList[selectedProj].apptype;
+        moduleData.domainName = projectList[selectedProj].domains;
+        moduleData.projectName = projectList[selectedProj].name;
+        moduleData.projectId = projectList[selectedProj].id;
+        moduleData.releaseId = releaseRef.current.selectedOptions[0].innerText;
+        moduleData.cycleName = cycleRef.current.selectedOptions[0].innerText;
+        moduleData.cycleId = cycleRef.current.value;
+        const reqObject = [{
+            "releaseid": moduleData.releaseId,
+            "cycleid": moduleData.cycleId,
+            "testsuiteid": selectedModule._id,
+            "testsuitename": selectedModule.name,
+            "projectidts": moduleData.projectId
+            // "versionnumber": parseFloat(version_num)
+        }];
+        var moduleObj = await getTestSuiteDetails(reqObject)
+        if(moduleObj.error){displayError(moduleObj.error);return;}
+        moduleObj = moduleObj[selectedModule._id];
+        if(moduleObj && moduleObj.testsuiteid != null) {
+            moduleData.testsuiteId = moduleObj.testsuiteid;
+            moduleData.testsuiteName = moduleObj.testsuitename;
+            moduleData.versionNumber = moduleObj.versionnumber;
+            moduleData.suiteDetails = [];
+            for (var j = 0; j < moduleObj.scenarioids.length; j++) {
+                var s_data = JSON.parse(JSON.stringify(suiteDetailsTemplate));
+                s_data.condition = moduleObj.condition[j];
+                s_data.dataparam = [moduleObj.dataparam[j]];
+                s_data.scenarioName = moduleObj.scenarionames[j];
+                s_data.scenarioId = moduleObj.scenarioids[j];
+                moduleData.suiteDetails.push(s_data);
+            }
+            moduleInfo.batchInfo.push(moduleData);
+            jsonDownload(fname+'_moduleinfo.json', JSON.stringify(moduleInfo));
+            jsonDownload(fname+'_executiondata.json', JSON.stringify(executionData));
+            setBlockui({show:false,content:''})
+            setPopup({
+                title:'Mindmap',
+                content:'Data Exported Successfully.',
+                submitText:'Ok',
+                show:true
+            })
+        } else {
+            displayError("Failed to export data");
+        }
+    }catch(err){
+        displayError("Failed to export data");
+        console.error(err);
+    } 
+}
+
+/*
+function : jsonDownload()
+Purpose : download json file
+*/
+
+function jsonDownload(filename, responseData) {
+    var blob = new Blob([responseData], { type: 'text/json' });
+    var e = document.createEvent('MouseEvents');
+    var a = document.createElement('a');
+    a.download = filename;
+    a.href = window.URL.createObjectURL(blob);
+    a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+    e.initMouseEvent('click', true, true, window,
+        0, 0, 0, 0, 0, false, false, false, false, 0, null);
+    a.dispatchEvent(e);
 }
 
 export default ExportMapButton;

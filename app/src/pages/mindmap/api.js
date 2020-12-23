@@ -250,6 +250,39 @@ export const getScenarios = async(moduleID) => {
     }
 }
 
+/*Component getTestSuiteDetails
+  api returns {screenList: [{name:"",parent:[],_id:""}], testCaseList: [{name:"",parent:[],_id:"",screenid:''}]}
+*/
+
+export const getTestSuiteDetails = async(data) => {
+    try{
+        const res = await axios(url+'/readTestSuite_ICE', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {
+				param: 'readTestSuite_ICE',
+				readTestSuite: data,
+				fromFlag: "mindmaps"
+			},
+            credentials: 'include'
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'Failed to fetch testsuites details'}
+    }catch(err){
+        console.error(err)
+        return {error:'Failed to fetch testsuites details'}
+    }
+}
+
 /*Component populateUsers
   api returns {screenList: [{name:"",parent:[],_id:""}], testCaseList: [{name:"",parent:[],_id:"",screenid:''}]}
 */

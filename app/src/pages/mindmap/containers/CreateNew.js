@@ -113,7 +113,7 @@ const CreateNew = () => {
             <ModuleListDrop setPopup={setPopup}/>
             <div id='mp__canvas' className='mp__canvas'>
               {(Object.keys(moduleSelect).length>0)?
-              <Canvas setBlockui={setBlockui} setPopup={setPopup} displayError={displayError} module={moduleSelect} verticalLayout={verticalLayout}/>
+              <Canvas displayError={displayError} setBlockui={setBlockui} setPopup={setPopup} displayError={displayError} module={moduleSelect} verticalLayout={verticalLayout}/>
               :<Fragment>
                 <SaveMapButton disabled={true}/>
                 <Legends/>

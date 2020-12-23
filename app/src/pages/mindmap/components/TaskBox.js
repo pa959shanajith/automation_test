@@ -15,7 +15,6 @@ import * as actionTypes from '../state/action';
 var unassignTask = []
 var reassignFlag = false
 const defaultVal = 'ct-default';
-const userinfo = {"user_id":"5de4e4aed9cdd57f4061bc99","username":"nayak.dheeraj","email_id":"dheerajnayak@gmail.com","additionalrole":[],"firstname":"nayak","lastname":"dheeraj","role":"5db0022cf87fdec084ae49aa","taskwflow":false,"token":"720","dbuser":true,"ldapuser":false,"samluser":false,"openiduser":false,"rolename":"Test Lead","pluginsInfo":[{"pluginName":"Integration","pluginValue":true},{"pluginName":"APG","pluginValue":false},{"pluginName":"Dashboard","pluginValue":false},{"pluginName":"Mindmap","pluginValue":true},{"pluginName":"Neuron Graphs","pluginValue":false},{"pluginName":"Performance Testing","pluginValue":false},{"pluginName":"Reports","pluginValue":true},{"pluginName":"Utility","pluginValue":true},{"pluginName":"Webocular","pluginValue":false}],"page":"plugin","tandc":false}
 const TaskBox = (props) => {
     const dispatch = useDispatch()
     const taskRef = useRef()
@@ -23,7 +22,6 @@ const TaskBox = (props) => {
     const taskDetailsRef =  useRef()
     const projectList = useSelector(state=>state.mindmap.projectList)
     const unassignList = useSelector(state=>state.mindmap.unassignTask)
-    //const assignedObj = useSelector(state=>state.mindmap.assignedObj)
     const userInfo = useSelector(state=>state.login.userinfo)
     const selectedProj = useSelector(state=>state.mindmap.selectedProj)
     const [task,setTask] = useState({arr:[],initVal:undefined})

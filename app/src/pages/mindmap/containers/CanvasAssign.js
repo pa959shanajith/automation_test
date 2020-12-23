@@ -6,6 +6,7 @@ import Legends from '../components/Legends'
 import TaskBox from '../components/TaskBox'
 import ControlBox from '../components/Controlbox'
 import InputBox from '../components/InputBox' 
+import ExportMapButton from '../components/ExportMapButton'
 import SaveMapButton from '../components/SaveMapButton'
 import { useDispatch, useSelector} from 'react-redux';
 import {generateTree,toggleNode,moveNodeEnd,moveNodeBegin,createNode,createNewMap,deleteNode} from './MindmapUtils'
@@ -36,6 +37,7 @@ const CanvasAssign =(props)=>{
     const setPopup=props.setPopup
     const cycleid = props.cycleRef.current.value;
     const releaseid = props.releaseRef.current.value
+    const displayError = props.displayError
     const [ctrlBox,setCtrlBox] = useState(false);
     const [inpBox,setInpBox] = useState(false);
     const [links,setLinks] = useState({})
@@ -148,6 +150,7 @@ const CanvasAssign =(props)=>{
             <Legends/>
             {taskbox?<TaskBox setPopup={setPopup} clickUnassign={clickUnassign} nodeDisplay={{...nodes}} releaseid={releaseid} cycleid={cycleid} ctScale={ctScale} nid={taskbox} dNodes={[...dNodes]} setTaskBox={setTaskBox} clickAddTask={clickAddTask}/>:null}
             <SaveMapButton isAssign={true} dNodes={[...dNodes]} cycId={cycleid} setPopup={setPopup} setBlockui={setBlockui}/>
+            <ExportMapButton isAssign={true} setBlockui={setBlockui} setPopup={setPopup} displayError={displayError} releaseRef={props.releaseRef} cycleRef={props.cycleRef}/>
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
