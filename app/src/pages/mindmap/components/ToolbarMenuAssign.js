@@ -69,6 +69,7 @@ const ToolbarMenuAssign = (props) => {
     const changeRelease = (val) => {
         setRelIndex(val)
         setCycle('Select')
+        dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
         SearchInp.current.value = ""
     }

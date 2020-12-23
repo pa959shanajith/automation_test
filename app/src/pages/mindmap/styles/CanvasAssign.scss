@@ -7,4 +7,8 @@
     width: 100%;
 }
 @media screen and (max-width:890px){
+    .mp__canvas{
+        top: 75px;
+        height: calc(100% - 75px);
+    }
 }

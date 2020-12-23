@@ -5,7 +5,7 @@ import ModuleListDrop from '../components/ModuleListDrop';
 import CanvasAssign from './CanvasAssign';
 import { ScreenOverlay ,PopupMsg,ReferenceBar,SetProgressBar} from '../../global'
 import {getProjectList,exportToExcel} from '../api';
-import { ClickFullScreen , parseProjList} from './MindmapUtils';
+import { ClickFullScreen , parseProjList, ClickSwitchLayout} from './MindmapUtils';
 import * as actionTypes from '../state/action';
 import * as actionTypesLogin from '../../login/state/action';
 import {loadUserInfo} from '../../login/api'
@@ -28,13 +28,6 @@ const CreateAssign = () => {
         if(res.error){displayError(res.error);return;}
         var data = parseProjList(res)
         dispatch({type:actionTypes.UPDATE_PROJECTLIST,payload:data})
-        //var userinfo = await loadUserInfo()
-        //dispatch({type:actionTypesLogin.SET_USERINFO, payload: userinfo});
-        // dispatch({type:actionTypes.SELECT_PROJECT,payload:res.projectId[0]}) 
-        // var moduledata = await getModules({"tab":"endToend","projectid":res.projectId[0],"moduleid":null})
-        // if(moduledata.error){displayError(moduledata.error);return;}
-        // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-        // dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
         SetProgressBar("stop",dispatch)
         })()
     },[])
@@ -57,10 +50,19 @@ const CreateAssign = () => {
               <ModuleListDrop cycleRef={cycleRef} setPopup={setPopup} isAssign={true}/>
             </div>
             <div id='mp__canvas' className='mp__canvas'>
-                {(Object.keys(moduleSelect).length>0)?<CanvasAssign setBlockui={setBlockui} releaseRef={releaseRef} cycleRef={cycleRef} setPopup={setPopup} module={moduleSelect} verticalLayout={verticalLayout}/>:null}
+                {(Object.keys(moduleSelect).length>0 && cycleRef.current)?<CanvasAssign setBlockui={setBlockui} releaseRef={releaseRef} cycleRef={cycleRef} setPopup={setPopup} module={moduleSelect} verticalLayout={verticalLayout}/>:null}
             </div>
             </div>
-            <ReferenceBar collapsible={true} collapse={true}/>
+            <ReferenceBar collapsible={true} collapse={true}>
+                <div className="ic_box" >
+                    <img onClick={()=>ClickSwitchLayout(verticalLayout,setVerticalLayout,moduleSelect,setPopup,setBlockui,dispatch)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " + (verticalLayout?"active_rb_thumb ":"")} src="static/imgs/switch.png"/>
+                    <span className="rb_box_title">Switch</span><span className="rb_box_title">Layout</span>
+                </div>
+                <div className="ic_box" >
+                    <img onClick={()=>ClickFullScreen(setFullScreen,setPopup)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " +(fullScreen?"active_rb_thumb":"")} src="static/imgs/fscr.png"/>
+                    <span className="rb_box_title">Full Screen</span>
+                </div>
+            </ReferenceBar>
         </Fragment>
     )
 }

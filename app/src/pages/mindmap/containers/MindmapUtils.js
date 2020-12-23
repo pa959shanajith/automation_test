@@ -518,6 +518,27 @@ export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay,setP
     return {dNodes,dLinks,linkDisplay,nodeDisplay,deletedNodes}
 }
 
+export const ClickSwitchLayout = (verticalLayout,setVerticalLayout,moduleSelect,setPopup,setBlockui,dispatch) =>{
+    if(verticalLayout){
+      setBlockui({show:true,content:'Switching Layout...'})
+      // dispatch({type:actionTypes.SELECT_MODULE,payload:{switchlayout:true}})
+      setVerticalLayout(false)
+      return;
+    }
+    if(Object.keys(moduleSelect).length<1){
+      setPopup({
+        title:'Warning',
+        content:'Please select a module first',
+        submitText:'Ok',
+        show:true
+      })
+      return;
+    }
+    setBlockui({show:true,content:'Switching Layout...'})
+    // dispatch({type:actionTypes.SELECT_MODULE,payload:{switchlayout:true}})
+    setVerticalLayout(true)
+  }
+
 //pd Utils
 const xml2json = (xml, tab) => {
     var X = {

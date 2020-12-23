@@ -9,6 +9,7 @@ import InputBox from '../components/InputBox'
 import MultiNodeBox from '../components/MultiNodeBox'
 import RectangleBox from '../components/RectangleBox'
 import SaveMapButton from '../components/SaveMapButton'
+import ExportMapButton from '../components/ExportMapButton'
 import { useDispatch, useSelector} from 'react-redux';
 import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap} from './MindmapUtils'
 import * as actionTypes from '../state/action';
@@ -52,6 +53,7 @@ const Canvas = (props) => {
     const [verticalLayout,setVerticalLayout] = useState(false)
     const setPopup=props.setPopup
     const setBlockui=props.setBlockui
+    const displayError = props.displayError
     const CanvasRef = useRef();
     useEffect(() => {
         var tree;
@@ -132,6 +134,9 @@ const Canvas = (props) => {
         setVerticalLayout(props.verticalLayout);
         setBlockui({show:false})
         // eslint-disable-next-line react-hooks/exhaustive-deps
+        return ()=>{
+            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+        }
     }, [props.module,props.reload,props.verticalLayout]);
     useEffect(()=>{
         if(createnew === 'save'){
@@ -244,6 +249,7 @@ const Canvas = (props) => {
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
             <Legends/>
             <SaveMapButton createnew={createnew} dNodes={[...dNodes]} setPopup={setPopup} setBlockui={setBlockui}/>
+            <ExportMapButton setBlockui={setBlockui} setPopup={setPopup} displayError={displayError}/>
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
                 <g className='ct-container'>
                 {Object.entries(links).map((link)=>{

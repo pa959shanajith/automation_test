@@ -87,6 +87,9 @@ const CanvasAssign =(props)=>{
         setVerticalLayout(props.verticalLayout);
         setBlockui({show:false})
         // eslint-disable-next-line react-hooks/exhaustive-deps
+        return ()=>{
+            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+        }
     }, [props.module,props.reload,props.verticalLayout]);
     useEffect(()=>{
         if(createnew !== false){

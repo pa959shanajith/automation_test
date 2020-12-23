@@ -90,9 +90,6 @@ const Toolbarmenu = (props) => {
         d3.select('#copyImg').classed('active-map',false)
         paste({...copyNodes},setPopup)
     }
-    const clickExporttoExcel = () =>{
-        toExcel(initProj,selectedModule)
-    }
     const displayError = (error) =>{
         setPopup({
             title:'ERROR',
@@ -113,7 +110,6 @@ const Toolbarmenu = (props) => {
                 <i className={"fa fa-crop fa-lg"+(selectBox?' active-map':'')} title="add a rectangle" onClick={clickSelectBox}></i>
                 <i className="fa fa-files-o fa-lg" title="copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
                 <i className="fa fa-clipboard fa-lg" title="Paste map" id="pasteImg" onClick={clickPasteNodes}></i>
-                <i className="fa fa-download fa-lg" title="Export To Excel" onClick={clickExporttoExcel}></i>
             </span>
             <span className='toolbar__header-searchbox'>
                 <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}></input>
@@ -123,24 +119,6 @@ const Toolbarmenu = (props) => {
         </div>
         </Fragment>
     )
-}
-
-const toExcel = async(projId,modId) => {
-    var data = {
-        "projectid":projId,
-        "moduleid":modId._id
-    }
-    var result = await exportToExcel(data)
-    var file = new Blob([result], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    var fileURL = URL.createObjectURL(file);
-    var a = document.createElement('a');
-    a.href = fileURL;
-    a.download = 'sample.xlsx';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(fileURL);
-
 }
 
 const paste = (copyNodes,setPopup) =>{

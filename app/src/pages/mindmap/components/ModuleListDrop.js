@@ -45,7 +45,7 @@ const ModuleListDrop = (props) =>{
         }
         if(isAssign){
             req.tab = "tabAssign"
-            req.cycId = props.cycleRef.current.value
+            req.cycId = props.cycleRef.current?props.cycleRef.current.value: ""
         }
         var res = await getModules(req)
         if(res.error){displayError(res.error);return}

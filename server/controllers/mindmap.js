@@ -653,6 +653,17 @@ exports.getScreens = async(req, res) =>{
 	res.send(data);
 };
 
+exports.exportToJson= async (req, res) => {
+	logger.info("Inside UI service: exportMindmap");
+	var d = req.body;
+	var inputs= {
+		"mindmapId":d.mindmapId,
+		"query":"exportMindmap"
+	}
+	var data = await utils.fetchData(inputs, "mindmap/exportMindmap","exportToJson");
+	res.send(data)
+};
+
 exports.exportToExcel = async (req, res) =>{
 	logger.info("Writing Module structure to Excel");
 	var d = req.body;

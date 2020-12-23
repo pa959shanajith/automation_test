@@ -94,6 +94,9 @@ const CanvasEnE =(props)=>{
         setSection(tree.sections)
         setVerticalLayout(props.verticalLayout);
         setBlockui({show:false})
+        return ()=>{
+            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.module,props.reload,props.verticalLayout]);
     useEffect(()=>{

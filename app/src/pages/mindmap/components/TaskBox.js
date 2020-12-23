@@ -50,10 +50,6 @@ const TaskBox = (props) => {
     var p = d3.select('#'+nid);
     var pi = nid.split("_")[1]
     var t = p.attr('data-nodetype');
-    if(dNodes[pi].parent && dNodes[pi].parent.type === 'endtoend'){
-        setTaskBox(false)
-        setPopup({show:true,title:'MindMap',content:'Can not assign scenarios in end to end module. Please select respective modules to assign scenarios',submitText:'Ok'})
-    }
     useEffect(()=>{
         setCoordinate(p,t,ctScale)
         return ()=>{
@@ -62,6 +58,11 @@ const TaskBox = (props) => {
         }
     },[ctScale,nid])
     useEffect(()=>{
+        if(dNodes[pi].parent && dNodes[pi].parent.type === 'endtoend'){
+            setTaskBox(false)
+            setPopup({show:true,title:'MindMap',content:'Can not assign scenarios in end to end module. Please select respective modules to assign scenarios',submitText:'Ok'})
+            return;
+        }
         unassignTask = unassignList
         var nt = (dNodes[pi].task !== undefined || dNodes[pi].task != null) ? dNodes[pi].task : !1; 
         if(nt){
@@ -262,7 +263,7 @@ const TaskBox = (props) => {
                     {task.arr.length>0?
                         <li>
                             <label>Task</label>
-                            <select onChange={changeTask} defaultValue={task.initVal} ref={taskRef}>
+                            <select onChange={changeTask}  disabled={assignbtn.reassign}  defaultValue={task.initVal} ref={taskRef}>
                                 {task.arr.map((e)=>
                                     <option key={e} value={e}>{e}</option>
                                 )}

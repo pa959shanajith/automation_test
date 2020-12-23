@@ -9,7 +9,7 @@ import Legends from '../components/Legends'
 import * as actionTypes from '../state/action';
 import Canvas from './CanvasNew';
 import '../styles/CreateNew.scss';
-import { getApptypePD, getJsonPd, ClickFullScreen} from './MindmapUtils';
+import { getApptypePD, getJsonPd, ClickFullScreen, ClickSwitchLayout} from './MindmapUtils';
 import { ScreenOverlay, PopupMsg, ReferenceBar, ModalContainer} from '../../global';
 
 /*Component CreateNew
@@ -113,7 +113,7 @@ const CreateNew = () => {
             <ModuleListDrop setPopup={setPopup}/>
             <div id='mp__canvas' className='mp__canvas'>
               {(Object.keys(moduleSelect).length>0)?
-              <Canvas setBlockui={setBlockui} setPopup={setPopup} module={moduleSelect} verticalLayout={verticalLayout}/>
+              <Canvas setBlockui={setBlockui} setPopup={setPopup} displayError={displayError} module={moduleSelect} verticalLayout={verticalLayout}/>
               :<Fragment>
                 <SaveMapButton disabled={true}/>
                 <Legends/>
@@ -140,27 +140,6 @@ const CreateNew = () => {
           </ReferenceBar>  
     </Fragment>
   );
-}
-
-const ClickSwitchLayout = (verticalLayout,setVerticalLayout,moduleSelect,setPopup,setBlockui,dispatch) =>{
-  if(verticalLayout){
-    setBlockui({show:true,content:'Switching Layout...'})
-    // dispatch({type:actionTypes.SELECT_MODULE,payload:{switchlayout:true}})
-    setVerticalLayout(false)
-    return;
-  }
-  if(Object.keys(moduleSelect).length<1){
-    setPopup({
-      title:'Warning',
-      content:'Please select a module first',
-      submitText:'Ok',
-      show:true
-    })
-    return;
-  }
-  setBlockui({show:true,content:'Switching Layout...'})
-  // dispatch({type:actionTypes.SELECT_MODULE,payload:{switchlayout:true}})
-  setVerticalLayout(true)
 }
 
 /*function parseProjList

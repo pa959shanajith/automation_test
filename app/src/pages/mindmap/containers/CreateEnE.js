@@ -2,7 +2,7 @@ import React ,  { Fragment, useEffect, useState, useRef} from 'react';
 import { getProjectList, getModules, getScreens} from '../api';
 import { useDispatch, useSelector} from 'react-redux';
 import { ScreenOverlay, PopupMsg, ReferenceBar, SetProgressBar} from '../../global';
-import { ClickFullScreen , parseProjList} from './MindmapUtils'
+import { ClickFullScreen , parseProjList, ClickSwitchLayout} from './MindmapUtils'
 import  ToolbarMenuEnE from '../components/ToolbarMenuEnE'
 import CanvasEnE from './CanvasEnE'
 import * as actionTypes from '../state/action';
@@ -60,26 +60,6 @@ const CreateEnE = () =>{
     </ReferenceBar>  
     </Fragment>
   )
-}
-
-
-const ClickSwitchLayout = (verticalLayout,setVerticalLayout,moduleSelect,setPopup,setBlockui,dispatch) =>{
-  if(verticalLayout){
-    setBlockui({show:true,content:'Switching Layout...'})
-    setVerticalLayout(false)
-    return;
-  }
-  if(Object.keys(moduleSelect).length<1){
-    setPopup({
-      title:'Warning',
-      content:'Please select a module first',
-      submitText:'Ok',
-      show:true
-    })
-    return;
-  }
-  setBlockui({show:true,content:'Switching Layout...'})
-  setVerticalLayout(true)
 }
 
 export default CreateEnE;

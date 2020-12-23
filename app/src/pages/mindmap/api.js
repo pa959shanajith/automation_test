@@ -189,6 +189,38 @@ export const exportToExcel = async(props) => {
     }
 }
 
+/*Component exportToJson
+  api returns Json data
+*/
+
+export const exportToJson = async(moduleId) => {
+    try{
+        const res = await axios(url+'/exportToJson', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {
+                mindmapId:moduleId
+            },
+            credentials: 'include',
+            // responseType:'arraybuffer'
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'Failed to export mindmap'}
+    }catch(err){
+        console.error(err)
+        return {error:'Failed to export mindmap'}
+    }
+}
+
 /*Component getScenarios
   api returns {screenList: [{name:"",parent:[],_id:""}], testCaseList: [{name:"",parent:[],_id:"",screenid:''}]}
 */
