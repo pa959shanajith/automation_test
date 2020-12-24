@@ -54,7 +54,7 @@ const UpperContent = props => {
     }
 
     let renderComp = [
-        <div key={1} className={'ss__scrapeOn' + (disableAppend ? " disable-thumbnail" : "")}>Scrape On</div>,
+        <div key={1} className={'ss__scrapeOn' + (disableAction ? " disable-thumbnail" : "")}>Scrape On</div>,
         <Thumbnail title="Launch PDF utility" img="static/imgs/ic-pdf_scrape.png" action={() => initScraping("pdf")} disable={disableAction} />,
         <div key={3} className={"ss__thumbnail" + (disableAppend ? " disable-thumbnail" : "")}>
             <input id="enable_append" type="checkbox" onChange={onAppend} />
@@ -331,53 +331,34 @@ const UpperContent = props => {
                     if (viewString.view.length !== 0){
                     //Getting the Existing Scrape Data
                     let localScrapeList = [];
-                    let lastIdx = scrapeItems[scrapeItems.length-1].val;
+                    let lastObj = props.scrapeItems[props.scrapeItems.length-1]
+                    let lastIdx = lastObj ? lastObj.val : 0;
+
                     for (let i = 0; i < viewString.view.length; i++) {
                         
-                        let ob = viewString.view[i];
-                        let addcusOb = '';
-                        ob.tempId = ++lastIdx;
+                        let scrapeObject = viewString.view[i];
                         
-                        if (viewString.view[i].xpath === "") addcusOb = 'addCustObj';
-                        
-                        if (ob.cord) {
-                            addcusOb = "";
-                            ob.hiddentag = "No";
-                            ob.tag = `iris;${ob.objectType}`;
-                            ob.url = "";
-                            ob.xpath = `iris;${ob.custname};${ob.left};${ob.top};${(ob.width + ob.left)};${(ob.height + ob.top)};${ob.tag}`;
+                        if (scrapeObject.cord) {
+                            scrapeObject.hiddentag = "No";
+                            scrapeObject.tag = `iris;${scrapeObject.objectType}`;
+                            scrapeObject.url = "";
+                            scrapeObject.xpath = `iris;${scrapeObject.custname};${scrapeObject.left};${scrapeObject.top};${(scrapeObject.width + scrapeObject.left)};${(scrapeObject.height + scrapeObject.top)};${scrapeObject.tag}`;
                         }
 
-                        let scrapeItem = {  objId: ob._id, 
-                                            // xpath: ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' '),
-                                            // left: ob.left,
-                                            // top: ob.top,
-                                            // width: ob.width,
-                                            // height:  ob.height,
-                                            // tag: ob.tag,
-                                            // url: ob.url,
-                                            // hiddentag: ob.hiddentag,
+                        let scrapeItem = {  objId: scrapeObject._id,
                                             objIdx: i,
-                                            val: ob.tempId,
+                                            val: ++lastIdx,
                                             hide: false,
-                                            title: ob.custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim()
+                                            title: scrapeObject.custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim()
                                         }
-                                        
-                        if(ob.hasOwnProperty('editable')){
-                            scrapeItem.disabled = true;
-                            scrapeItem.decryptFlag = true;
-                        } else {
-                            scrapeItem.addCusOb = addcusOb
-                            // custObjLength++;
-                        };
                         
                         localScrapeList.push(scrapeItem)
                     }
+
                     setNewScrapedData(viewString);
                     updateScrapeItems(localScrapeList)
                     
                     if (viewString.view.length > 0) setSaved(false);
-
                 }else{
                     //when viewsstring.view is empty after click and add
                     // save Objects
@@ -504,15 +485,26 @@ const UpperContent = props => {
 }
 
 const BottomContent = () => {
+
     const { appType } = useSelector(state => state.plugin.CT);
-    const { setShowObjModal, scrapeItems, customLen} = useContext(ScrapeContext);
-    let scrapeItemsLength = scrapeItems.length;
+    const disableAction = useSelector(state => state.scrape.disableAction);
+    const { setShowObjModal, scrapeItems } = useContext(ScrapeContext);
+    const [customLen, setCustomLen] = useState(0);
+    const [scrapeItemsLength, setScrapeLen] = useState(0);
     
+    useEffect(()=>{
+        let customs = 0;
+        for (let scrapeItem of scrapeItems){
+            if (scrapeItem.addCusOb) customs++;
+        }
+        setScrapeLen(scrapeItems.length);
+        setCustomLen(customs);
+    }, [scrapeItems])
     
     const lowerList = [
         {'title': 'Add Object', 'img': 'static/imgs/ic-addobject.png', 'action': ()=>setShowObjModal("addObject"), 'show': appType === 'Web' || appType === "MobileWeb"}, 
         {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>console.log("Pressed Map Object"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0},
-        {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0},
+        {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0 || !disableAction },
         {'title': 'Create Object', 'img': 'static/imgs/ic-jq-editstep.png', 'action': ()=>setShowObjModal("createObject"), 'show': appType === 'Web' || appType === "MobileWeb"},
         {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>console.log("Import TestCase"), show: true},
         {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>console.log("Export TestCase"), 'disable': customLen <= 0 && scrapeItemsLength-customLen <= 0, show: true}
