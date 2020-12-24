@@ -1,6 +1,6 @@
 import React ,{useState} from 'react';
 import { ActionBar } from '../../global';
-import  "../styles/LeftBar.scss"
+import  "../styles/Leftbar.scss";
 
 const Leftbar=(props)=>{
     const [focus,setFocus] = useState("encryption") //state to manage css on Icon click
