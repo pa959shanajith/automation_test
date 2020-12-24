@@ -160,7 +160,8 @@ module.exports.Execution_Queue = class Execution_Queue {
                     let pool = this.queue_list[this.ice_list[targetICE]["poolid"]];
                     pool["execution_list"].push(testSuite);
                     //save execution queue to redis
-                    cache.set("execution_queue", this.queue_list);
+                    await cache.set("execution_queue", this.queue_list);
+                    logger.info("Adding Test Suite to Pool: " + pool['name'] + " to be Executed on ICE: " + targetICE);
                     //create response message
                     response['status'] = "pass";
                     if(this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser && this.ice_list[targetICE]["status"]){
@@ -172,8 +173,9 @@ module.exports.Execution_Queue = class Execution_Queue {
                 //if target ICE was not specified fetch the appropriate pool and push
                 pool = this.queue_list[poolid];
                 pool["execution_list"].push(testSuite);
-                cache.set("execution_queue", this.queue_list);
+                await cache.set("execution_queue", this.queue_list);
                 response['status'] = "pass";
+                logger.info("Adding Test Suite to Pool: " + pool['name'] + " to be Executed on any availble ICE");
                 response["message"] = "Execution queued on pool: " + pool["name"] +"\nQueue Length: " + pool["execution_list"].length.toString();
             } else {
                 //check if target ice is connected but not preset in any pool, execute directly if true
@@ -218,7 +220,8 @@ module.exports.Execution_Queue = class Execution_Queue {
         const multiBatchExecutionData = testSuiteRequest.body.executionData;
         try {
             if (testSuiteRequest.body && testSuiteRequest.body.executionData && testSuiteRequest.body.executionData[0] && testSuiteRequest.body.executionData[0].userInfo ) {
-                let suite = testSuiteRequest.body.executionData[0].userInfo
+                let suite = testSuiteRequest.body.executionData[0].userInfo;
+                //Check wether poolname or icename provided (Execution on pool name not supported in this implementation)
                 if(suite.icename) targetICE = testSuiteRequest.body.executionData[0].userInfo.icename;
                 if(suite.poolname){
                     request_pool_name = suite.poolname;
@@ -250,12 +253,14 @@ module.exports.Execution_Queue = class Execution_Queue {
                 pool["execution_list"].push(testSuite);
                 //save execution queue to redis
                 await cache.set("execution_queue", this.queue_list);
+                logger.info("Adding Test Suite to Pool: " + pool['name'] + " to be Executed on ICE: " + targetICE);
                 testSuite['res'] = res; 
             } else if (poolid && poolid in this.queue_list) {
                 let pool = this.queue_list[poolid];
                 pool["execution_list"].push(testSuite);
                 //save execution queue to redis
                 await cache.set("execution_queue", this.queue_list);
+                logger.info("Adding Test Suite to Pool: " + pool['name'] + " to be Executed on any ICE");
                 testSuite['res'] = res; 
             } else if(this.ice_list[targetICE] && this.ice_list[targetICE]["connected"]){
                     const sockmode = await utils.channelStatus(targetICE);
@@ -295,7 +300,7 @@ module.exports.Execution_Queue = class Execution_Queue {
     * @param {string} channel 
     * @param {dictionary} ice_data
     * Function responsible to update ICE status when it changes and execute a test suite from queue when required
-*/  
+    */  
     static triggerExecution = async (channel, ice_data) => {
         let data = JSON.parse(ice_data);
         let result = false;
@@ -364,42 +369,60 @@ module.exports.Execution_Queue = class Execution_Queue {
         }
         return result;
     }
-
+    /** 
+    * @param {dictionary} inputs (which pools to fetch and update)
+    * Function responsible to setup/update pool variables in execution queue (queue_list)
+    */ 
     static async setUpPool(inputs) {
         const fnName = "setUpPool"
         try {
+            //get existing queue from redis
             this.queue_list = await cache.get("execution_queue");
             this.notification_dict = await cache.get("pending_notification");
+            //if queue not present in redis initialize a new queue
             if (!this.notification_dict) this.notification_dict = {}
             if (!this.queue_list) this.queue_list = {}
+            //get all the pools from DB, iterate and add to queue
             var pools = await utils.fetchData(inputs, "admin/getPools", fnName);
             for (let index in pools) {
                 let pool = pools[index]
                 let poolid = pool["_id"];
+                //check if pool already present in queue
                 if (!(poolid in this.queue_list)) {
                     this.queue_list[poolid] = {};
                 }
+                //Except the ID all other fields of pool can be updated hence re initialise are pool variables
                 this.queue_list[poolid]["name"] = pool["poolname"];
+                //Map projects to poolid key == projecid value = poolid
                 this.project_list = this.setUpProjectList(pool["projectids"], poolid);
                 this.queue_list[poolid]["ice_list"] = pool["ice_list"];
+                //Map ice to pool key = ICE_name value = {poolid,mode,status,connected,_id}
                 this.ice_list = this.setUpICEList(pool["ice_list"], poolid);
+                //Initialise execution queue for pool if it dosent exist
                 if (!this.queue_list[poolid]["execution_list"]) {
                     this.queue_list[poolid]["execution_list"] = []
                 }
             }
-            if(inputs["poolid"] === "all"){
+            //Redundant code, DO NOT EDIT, checks if a pool has been deleted from DB but still persists in Redis, deletes such pools if found
+            //This code blocks triggers only if "all" the pools were fetched
+            if(inputs["poolid"] === "all" && Array.isArray(pools)){
                 for (let index in this.queue_list){
                     if(!(index in pools)){
                         delete this.queue_list[index]
                     }
                 }
-            } 
+            }
+            //Store queue to redis 
             cache.set("execution_queue", this.queue_list);
         } catch (exception) {
             logger.error("Error in setUpPool. Error: %s", exception);
         }
     }
-
+    /** 
+    * @param {string} poolid
+    * @param {list} projectids
+    * Function responsible to map projectids with poolid for O(1) searching
+    */ 
     static setUpProjectList(projectids, poolid) {
         if (!projectids || !poolid) {
             return this.project_list;
@@ -414,19 +437,27 @@ module.exports.Execution_Queue = class Execution_Queue {
         }
         return this.project_list
     }
-
+    /** 
+    * @param {string} poolid
+    * @param {dictionary} list_of_ICE
+    * Function responsible to map ice with pool and status data 
+    */ 
     static setUpICEList(list, poolid) {
         if (!list || !poolid) {
             return this.ice_list;
         }
+        //Iterate over all the ICE in a pool
         for (let ice in list) {
             let ice_name = list[ice]["icename"];
+            //If ICE name not in ICE pool mapping, add a new ice and intialise values
+            //If ICE is in ICE pool mapping, just change the pool id to current pool and add ice id for good measure (un allocated ice are in ice poolmapping without a poolid and ice id)
             if(this.ice_list[ice_name]){
                 this.ice_list[ice_name]["poolid"] = poolid;
                 this.ice_list[ice_name]["_id"] = list[ice]["_id"];
             } 
             else this.ice_list[ice_name] = {"poolid":poolid, "mode": false, "status": false, "connected": false, "_id": list[ice]["_id"]};
         }
+        //Redundant code DO NOT EDIT, check if there are ice in the map which used to belong to this pool but have been removed and deletes these ICE
         for(let ice in this.ice_list){
             if(this.ice_list[ice]["poolid"] === poolid){
                 if(!(this.ice_list[ice]['_id'] in list)){
@@ -639,8 +670,12 @@ module.exports.Execution_Queue = class Execution_Queue {
         catch (e) { logger.error(e); }
 
     }
-
+    /** 
+    * @param {string} ice_name
+    * Function responsible to connect unallocated ice and add to ice - pool/status data map
+    */ 
     static async connect_ice(ice_name) {
+        //Add unallocated ICE to ice pool mapping (the pool id and ice id will be blank for such ICE)
         this.queue_list = await cache.get("execution_queue")
         this.ice_list[ice_name] = {"connected":true,"status": true,"mode": false,"poolid":"","_id":""};
     }
