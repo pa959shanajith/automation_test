@@ -276,7 +276,7 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 		"exec_mode": batchData.exectionMode,
 		"exec_env" : batchData.executionEnv,
 		"apptype": batchData.batchInfo[0].appType,
-		"qccredentials": batchData.qccredentials,
+		"integration": batchData.integration,
 		"batchId": "",
 		"executionIds": [],
 		"testsuiteIds": [],
@@ -303,7 +303,15 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 		};
 		const suiteDetails = suite.suiteDetails;
 		for (const tsco of suiteDetails) {
-			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid, batchData.qccredentials.integrationType);
+			var integrationType = "";
+			if(batchData.integration.alm.url) {
+				integrationType = "ALM";
+			} else if (batchData.integration.qtest.url){
+				integrationType = "qTest";
+			} else if (batchData.integration.zephyr.accountid) {
+				integrationType = "Zephyr";
+			}
+			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType);
 			if (scenario == "fail") return "fail";
 			scenario = Object.assign(scenario, tsco);
 			suiteObj.condition.push(scenario.condition);

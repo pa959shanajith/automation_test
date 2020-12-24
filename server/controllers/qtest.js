@@ -20,6 +20,13 @@ exports.loginToQTest_ICE = function (req, res) {
 			var username = req.session.username;
 			var name = undefined
 			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
+			if(name == undefined && Object.keys(myserver.allSocketsICEUser).length >0) {
+				for(var i =0 ; i<Object.keys(myserver.allSocketsICEUser).length ; ++i) {
+					if (username != Object.keys(myserver.allSocketsICEUser)[i]) {
+						name = myserver.allSocketsICEUser[Object.keys(myserver.allSocketsICEUser)[i]][0];
+					}
+				}
+			}
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("ICE Socket connecting IP: %s" , ip);
@@ -110,6 +117,13 @@ exports.qtestProjectDetails_ICE = function (req, res) {
 			var username = req.session.username;
 			var name = undefined
 			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
+			if(name == undefined && Object.keys(myserver.allSocketsICEUser).length >0) {
+				for(var i =0 ; i<Object.keys(myserver.allSocketsICEUser).length ; ++i) {
+					if (username != Object.keys(myserver.allSocketsICEUser)[i]) {
+						name = myserver.allSocketsICEUser[Object.keys(myserver.allSocketsICEUser)[i]][0];
+					}
+				}
+			}
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.debug("ICE Socket requesting Address: %s" , name);
@@ -311,6 +325,13 @@ exports.qtestFolderDetails_ICE = function (req, res) {
 			var username = req.session.username;
 			var name = undefined
 			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
+			if(name == undefined && Object.keys(myserver.allSocketsICEUser).length >0) {
+				for(var i =0 ; i<Object.keys(myserver.allSocketsICEUser).length ; ++i) {
+					if (username != Object.keys(myserver.allSocketsICEUser)[i]) {
+						name = myserver.allSocketsICEUser[Object.keys(myserver.allSocketsICEUser)[i]][0];
+					}
+				}
+			}
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.debug("ICE Socket requesting Address: %s" , name);
@@ -437,7 +458,15 @@ exports.viewQtestMappedList_ICE = function (req, res) {
 	var userid = req.body.user_id;
 	var username = req.session.username;
 	var name = undefined
-			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
+	if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
+	if(name == undefined && Object.keys(myserver.allSocketsICEUser).length >0) {
+		for(var i =0 ; i<Object.keys(myserver.allSocketsICEUser).length ; ++i) {
+			if (username != Object.keys(myserver.allSocketsICEUser)[i]) {
+				name = myserver.allSocketsICEUser[Object.keys(myserver.allSocketsICEUser)[i]][0];
+			}
+		}
+	}
+
 	getQcDetailsForUser(userid, function (responsedata) {
 		redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 			if (redisres[1]>0) {
@@ -586,7 +615,7 @@ function qcscenariodetails(projectid, cb) {
 				client.post(epurl + "qualityCenter/viewIntegrationMappedList_ICE", args,
 					function (qcdetailsows, response) {
 					if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
-						logger.error("Error occurred inqualityCenter/viewIntegrationMappedList_ICE from qcdetails Error Code : ERRDAS");
+						logger.error("Error occurred in qualityCenter/viewIntegrationMappedList_ICE from qcdetails Error Code : ERRDAS");
 					} else {
 						if (qcdetailsows.rows.length != 0) {
 							//flagtocheckifexists = true;
