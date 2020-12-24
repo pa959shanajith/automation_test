@@ -381,7 +381,7 @@ if (cluster.isMaster) {
 			return res.sendFile("index.html", { root: __dirname + "/public/" });
 		});
 
-		app.get('/AvoAssure_ICE', async (req, res) => {
+		app.get('/AvoAssure_ICE.zip', async (req, res) => {
 			const iceFile = "AvoAssure_ICE.zip";
 			const iceFilePath = path.resolve(process.env.HOST_PATH);
 			if (req.query.file == "getICE") {
