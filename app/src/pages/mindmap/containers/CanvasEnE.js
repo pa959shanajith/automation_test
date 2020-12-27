@@ -56,6 +56,12 @@ const CanvasEnE =(props)=>{
         }
     }
     useEffect(()=>{
+        //useEffect to clear redux data selected module on unmount
+        return ()=>{
+            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+        }
+    },[dispatch])
+    useEffect(()=>{
         var tree;
         count = {
             'modules': 0,
@@ -94,9 +100,6 @@ const CanvasEnE =(props)=>{
         setSection(tree.sections)
         setVerticalLayout(props.verticalLayout);
         setBlockui({show:false})
-        return ()=>{
-            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.module,props.reload,props.verticalLayout]);
     useEffect(()=>{
@@ -114,7 +117,7 @@ const CanvasEnE =(props)=>{
         var cdNodes = [...dNodes]
         var cdLinks = [...dLinks]
         var csections = {...sections}
-        Object.entries(scenarioList).map(e => {
+        Object.entries(scenarioList).forEach(e => {
             var res = createNode(0,{...cnodes},{...clinks},[...cdNodes],[...cdLinks],{...csections},{...count},e[1],verticalLayout,e[0])
             cnodes = res.nodeDisplay
             clinks = res.linkDisplay
@@ -128,6 +131,7 @@ const CanvasEnE =(props)=>{
         setdNodes(cdNodes)
         dispatch({type:actionTypes.UPDATE_SCENARIOLIST,payload:{}})
         setBlockui({show:false})
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[scenarioList])
     const clickCollpase=(e)=>{
         var id = e.target.parentElement.id;

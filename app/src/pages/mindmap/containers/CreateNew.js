@@ -13,7 +13,6 @@ import '../styles/CreateNew.scss';
 
 /*Component CreateNew
   use: renders create New Mindmap page
-  todo: invalid session check error handling for apis
 */
     
 const CreateNew = () => {
@@ -75,7 +74,7 @@ const CreateNew = () => {
   }
 
   const displayError = (error) =>{
-    setBlockui(false)
+    setBlockui({show:false})
     setLoading(false)
     setPopup({
         title:'ERROR',

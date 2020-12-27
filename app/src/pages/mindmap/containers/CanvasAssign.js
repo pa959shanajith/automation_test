@@ -4,12 +4,10 @@ import SearchBox from '../components/SearchBox'
 import NavButton from '../components/NavButton'
 import Legends from '../components/Legends'
 import TaskBox from '../components/TaskBox'
-import ControlBox from '../components/Controlbox'
-import InputBox from '../components/InputBox' 
 import ExportMapButton from '../components/ExportMapButton'
 import SaveMapButton from '../components/SaveMapButton'
-import { useDispatch, useSelector} from 'react-redux';
-import {generateTree,toggleNode,moveNodeEnd,moveNodeBegin,createNode,createNewMap,deleteNode} from './MindmapUtils'
+import { useDispatch } from 'react-redux';
+import {generateTree,toggleNode,moveNodeEnd,moveNodeBegin} from './MindmapUtils'
 import * as actionTypes from '../state/action';
 import '../styles/CanvasAssign.scss'
 
@@ -38,30 +36,21 @@ const CanvasAssign =(props)=>{
     const cycleid = props.cycleRef.current.value;
     const releaseid = props.releaseRef.current.value
     const displayError = props.displayError
-    const [ctrlBox,setCtrlBox] = useState(false);
-    const [inpBox,setInpBox] = useState(false);
     const [links,setLinks] = useState({})
     const [nodes,setNodes] = useState({})
     const [dNodes,setdNodes] = useState([])
     const [dLinks,setdLinks] = useState([])
-    const [sections,setSection] =  useState({})
     const [ctScale,setCtScale] = useState({})
     const [verticalLayout,setVerticalLayout] = useState(false)
-    const [createnew,setCreateNew] = useState(false)
     const [taskbox,setTaskBox] = useState(false)
-    const scenarioList = useSelector(state=>state.mindmap.scenarioList)
-    const deletedNodes = useSelector(state=>state.mindmap.deletedNodes)
 
-    const clickDeleteNode=(id)=>{
-        var res = deleteNode(id,[...dNodes],[...dLinks],{...links},{...nodes},setPopup)
-        if(res){
-            dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[...deletedNodes,...res.deletedNodes]})
-            setNodes(res.nodeDisplay)
-            setLinks(res.linkDisplay)
-            setdLinks(res.dLinks)
-            setdNodes(res.dNodes)
+    useEffect(()=>{
+        //useEffect to clear redux data selected module on unmount
+        return ()=>{
+            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         }
-    }
+    },[dispatch])
+
     useEffect(()=>{
         var tree;
         count = {
@@ -85,21 +74,10 @@ const CanvasAssign =(props)=>{
         setNodes(tree.nodes)
         setdNodes(tree.dNodes)
         setCtScale({x:tree.translate[0],y:tree.translate[1],k:1})
-        setSection(tree.sections)
         setVerticalLayout(props.verticalLayout);
         setBlockui({show:false})
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        return ()=>{
-            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-        }
     }, [props.module,props.reload,props.verticalLayout]);
-    useEffect(()=>{
-        if(createnew !== false){
-            var p = d3.select('#node_'+createnew);
-            setCreateNew(false)
-            setInpBox(p)
-        }
-    },[createnew])
 
     const clickCollpase=(e)=>{
         var id = e.target.parentElement.id;
@@ -142,7 +120,6 @@ const CanvasAssign =(props)=>{
     const clickAddTask = (res) =>{
         setNodes(res.nodeDisplay)
         setdNodes(res.dNodes)
-        //dispatch({type:actionTypes.UPDATE_ASSIGNOBJ,payload:res.assignedObj})
         setTaskBox(false)
     }
     return (

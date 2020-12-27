@@ -1,7 +1,7 @@
 import React, { useRef, Fragment, useState } from 'react';
 import {excelToMindmap} from '../api';
 import {ModalContainer,PopupMsg} from '../../global'
-import { useDispatch, useSelector} from 'react-redux';
+import { useDispatch} from 'react-redux';
 import * as actionTypes from '../state/action';
 import '../styles/CreateOptions.scss'
 
@@ -136,11 +136,11 @@ const uploadFile = async(e,setSheetList,displayError,setData,fileImport) =>{
         }else{
             displayError("File is empty")
         }
-    }else if(extension === 'json' || extension == 'mm'){
+    }else if(extension === 'json' || extension === 'mm'){
         var resultString = JSON.parse(result);
         if (!('testscenarios' in resultString)){
             displayError("Incorrect JSON imported. Please check the contents!!");
-        }else if(resultString.testscenarios.length == 0){
+        }else if(resultString.testscenarios.length === 0){
             displayError("The file has no node structure to import, please check!!");
         }else{
             fileImport(result,'mm')

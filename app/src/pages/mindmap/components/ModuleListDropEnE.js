@@ -1,10 +1,13 @@
 import React, { Fragment , useState, useEffect} from 'react';
 import {ScrollBar,ModalContainer} from '../../global';
-import { useSelector, useDispatch, useStore, ReactReduxContext} from 'react-redux';
-import {getModules,getScenarios}  from '../api'
-import {ScreenOverlay} from '../../global'
+import { useSelector, useDispatch} from 'react-redux';
+import {getModules,populateScenarios}  from '../api'
 import * as actionTypes from '../state/action';
 import '../styles/ModuleListDropEnE.scss'
+
+/*Component ModuleListDropEnE
+  use: renders modulelist and scenarios in dropdown for ene called by ToolbarMenuEnE
+*/
 
 const ModuleListDropEnE = (props) =>{
     const dispatch = useDispatch()
@@ -16,11 +19,8 @@ const ModuleListDropEnE = (props) =>{
     const [selectedSc,setSelctedSc] = useState([])
     const [dropdown,setDropdown] = useState(true)
     const [warning,setWarning] = useState(false)
-    const [loading,setLoading] = useState(false)
-    const setPopup = props.setPopup
     const setBlockui = props.setBlockui
     const filterSc = props.filterSc
-
     useEffect(()=>{
         var filter = [...initScList].filter((e)=>e.name.toUpperCase().indexOf(filterSc.toUpperCase())!==-1)
         setScenarioList(filter)
@@ -41,7 +41,7 @@ const ModuleListDropEnE = (props) =>{
         if(type!=='endtoend'){
             setBlockui({content:'loading scenarios',show:true})
             //loading screen
-            var res = await getScenarios(modID)
+            var res = await populateScenarios(modID)
             if(res.error){displayError(res.error);return}
             props.setModName(name)
             setScenarioList(res)
@@ -59,7 +59,7 @@ const ModuleListDropEnE = (props) =>{
     const loadModule = async(modID) =>{
         // setModdrop(false)
         setWarning(false)
-        setLoading(true)        
+        setBlockui({show:true,content:"Loading Module ..."})        
         if(moduleSelect._id === modID){
             dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         }
@@ -74,7 +74,7 @@ const ModuleListDropEnE = (props) =>{
         var res = await getModules(req)
         if(res.error){displayError(res.error);return}
         dispatch({type:actionTypes.SELECT_MODULE,payload:res})
-        setLoading(false)
+        setBlockui({show:false})
     }
     const addScenario = (e) => {
         var sceId = e.currentTarget.getAttribute("value")
@@ -89,7 +89,6 @@ const ModuleListDropEnE = (props) =>{
     }
     const displayError = (err) =>{
         setBlockui({show:false})
-        // setLoading(false)
         props.setPopup({
           title:'ERROR',
           content:err,
@@ -150,10 +149,12 @@ return(
     </Fragment>
 )}
 
+//select module warning popups's content
 const Content = () => (
     <p>Unsaved work will be lost if you continue. Do you want to continue?</p>
 )
 
+//select module warning popups's footer
 const Footer = (props) => (
     <div className='toolbar__module-warning-footer'>
         <button className='btn-yes' onClick={()=>props.loadModule(props.modID)}>Yes</button>

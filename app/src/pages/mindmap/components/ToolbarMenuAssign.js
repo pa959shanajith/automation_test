@@ -1,10 +1,13 @@
-import React, { Fragment, useEffect, useState, useRef} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import { useDispatch, useSelector} from 'react-redux';
-import { getProjectList, getModules, getScreens, getProjectTypeMM} from '../api';
-import { ClickFullScreen , parseProjList} from '../containers/MindmapUtils';
+import { getProjectList, getModules} from '../api';
+import {parseProjList} from '../containers/MindmapUtils';
 import * as actionTypes from '../state/action';
-import '../styles/ToolbarMenuAssign.scss'
+import '../styles/ToolbarMenuAssign.scss';
 
+/*Component ToolbarMenuAssign
+  use: renders Toolbar header
+*/
 const ToolbarMenuAssign = (props) => {
     const dispatch = useDispatch()
     const SearchInp = useRef()
@@ -32,6 +35,7 @@ const ToolbarMenuAssign = (props) => {
                 setBlockui({show:false})
             }
         })()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[selectProj,prjList])
     const updateModuleList = async(cycle) => {
         SearchInp.current.value = ""

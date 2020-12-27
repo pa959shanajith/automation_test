@@ -3,14 +3,14 @@ import { Rnd } from "react-rnd";
 import '../styles/SearchBox.scss'
 import * as d3 from 'd3';
 
-/*Component Canvas
-  use: returns floating search box
-  props: setCtScale,zoom
-*/
-
 var idxSearch = 0
 var nodeID ;
 var drag;
+
+/*Component SearchBox
+  use: returns floating search box
+  props: setCtScale,zoom
+*/
 const SearchBox = (props) => {
     const [inp,setInp] = useState (false)
     const [err,setErr] = useState(false)

@@ -1,3 +1,4 @@
+/*eslint eqeqeq: "off"*/
 import * as d3 from 'd3';
 import {v4 as uuid} from 'uuid'
 
@@ -558,7 +559,7 @@ const xml2json = (xml, tab) => {
                     if (hasElementChild) {
                         if (textChild < 2 && cdataChild < 2) { // structured element with evtl. a single text or/and cdata node ..
                             X.removeWhite(xml);
-                            for (var n = xml.firstChild; n; n = n.nextSibling) {
+                            for (n = xml.firstChild; n; n = n.nextSibling) {
                                 if (n.nodeType == 3)  // text node
                                     o["#text"] = X.escape(n.nodeValue);
                                 else if (n.nodeType == 4)  // cdata node
@@ -590,7 +591,7 @@ const xml2json = (xml, tab) => {
                         if (cdataChild > 1)
                             o = X.escape(X.innerXml(xml));
                         else
-                            for (var n = xml.firstChild; n; n = n.nextSibling)
+                            for (n = xml.firstChild; n; n = n.nextSibling)
                                 o["#cdata"] = X.escape(n.nodeValue);
                     }
                 }
@@ -690,13 +691,14 @@ const xml2json = (xml, tab) => {
 } 
 
 export const getApptypePD = (data) =>{
+    var cdata;
     var file = JSON.parse(data);
     var doc = new DOMParser().parseFromString(file.data,'text/xml');
     var activityJSON = JSON.parse(xml2json(doc).replace("\nundefined",""));
     if(activityJSON["mxGraphModel"]["root"]["Task"].length>1){
-        var cdata = JSON.parse(activityJSON["mxGraphModel"]["root"]["Task"][0]["#cdata"]);  
+        cdata = JSON.parse(activityJSON["mxGraphModel"]["root"]["Task"][0]["#cdata"]);  
     }else{
-        var cdata = JSON.parse(activityJSON["mxGraphModel"]["root"]["Task"]["#cdata"]);
+        cdata = JSON.parse(activityJSON["mxGraphModel"]["root"]["Task"]["#cdata"]);
     }
     return cdata[0]['apptype'].toLowerCase()
 }

@@ -4,13 +4,13 @@ import ToolbarMenuAssign from '../components/ToolbarMenuAssign';
 import ModuleListDrop from '../components/ModuleListDrop';
 import CanvasAssign from './CanvasAssign';
 import { ScreenOverlay ,PopupMsg,ReferenceBar,SetProgressBar} from '../../global'
-import {getProjectList,exportToExcel} from '../api';
+import {getProjectList} from '../api';
 import { ClickFullScreen , parseProjList, ClickSwitchLayout} from './MindmapUtils';
 import * as actionTypes from '../state/action';
-import * as actionTypesLogin from '../../login/state/action';
-import {loadUserInfo} from '../../login/api'
 
-
+/*Component CreateAssign
+  use: renders Mindmap assign page
+*/
 const CreateAssign = () => {
     const dispatch = useDispatch()
     const cycleRef = useRef()
@@ -20,7 +20,6 @@ const CreateAssign = () => {
     const [fullScreen,setFullScreen] = useState(false)
     const [verticalLayout,setVerticalLayout] = useState(false)
     const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
-    const selectProj = useSelector(state=>state.mindmap.selectedProj)
 
     useEffect(()=>{(async()=>{
         SetProgressBar("start",dispatch)
@@ -30,6 +29,7 @@ const CreateAssign = () => {
         dispatch({type:actionTypes.UPDATE_PROJECTLIST,payload:data})
         SetProgressBar("stop",dispatch)
         })()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
     const displayError = (error) =>{
         SetProgressBar("stop",dispatch)
@@ -55,11 +55,11 @@ const CreateAssign = () => {
             </div>
             <ReferenceBar collapsible={true} collapse={true}>
                 <div className="ic_box" >
-                    <img onClick={()=>ClickSwitchLayout(verticalLayout,setVerticalLayout,moduleSelect,setPopup,setBlockui,dispatch)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " + (verticalLayout?"active_rb_thumb ":"")} src="static/imgs/switch.png"/>
+                    <img alt={"Switch Layout"} onClick={()=>ClickSwitchLayout(verticalLayout,setVerticalLayout,moduleSelect,setPopup,setBlockui,dispatch)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " + (verticalLayout?"active_rb_thumb ":"")} src="static/imgs/switch.png"/>
                     <span className="rb_box_title">Switch</span><span className="rb_box_title">Layout</span>
                 </div>
                 <div className="ic_box" >
-                    <img onClick={()=>ClickFullScreen(setFullScreen,setPopup)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " +(fullScreen?"active_rb_thumb":"")} src="static/imgs/fscr.png"/>
+                    <img alt={"Full Screen"} onClick={()=>ClickFullScreen(setFullScreen,setPopup)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " +(fullScreen?"active_rb_thumb":"")} src="static/imgs/fscr.png"/>
                     <span className="rb_box_title">Full Screen</span>
                 </div>
             </ReferenceBar>

@@ -18,7 +18,7 @@ const Complexity = (props) => {
         var clist_tmp = [nclist[0]];
         refs.forEach((e)=>{
             var value = e.current.value
-            if(value == "Select Option"){
+            if(value === "Select Option"){
                 err = true;
                 e.current.style.borderColor = 'red';
             }else{
@@ -46,7 +46,7 @@ const Container = ({type,nclist,refs,setRefs,setNclist}) => {
     const arr = cTableData[type]
     useEffect(()=>{
         setRefs((refs)=>Object.keys(arr).map((_,i)=>refs[i]||createRef()))
-    },[arr])
+    },[arr,setRefs])
     const onFormChange = (e) => {
         var cscore_tmp = 0;
         refs.forEach((e)=>{
@@ -88,7 +88,7 @@ const Footer = ({nclist,type,submitComplexity}) =>{
 )}
 
 const getComplexityLevel = (nType, csc)=>{
-    if (nType == 'scenarios') {
+    if (nType === 'scenarios') {
         if (csc <= 20) {
             return 'Low';
         } else if (csc <= 30) {
@@ -97,7 +97,7 @@ const getComplexityLevel = (nType, csc)=>{
             return 'High';
         }
     }
-    if (nType == 'screens') {
+    if (nType === 'screens') {
         if (csc <= 20) {
             return 'Low';
         } else if (csc <= 30) {
@@ -106,7 +106,7 @@ const getComplexityLevel = (nType, csc)=>{
             return 'High';
         }
     }
-    if (nType == 'testcases') {
+    if (nType === 'testcases') {
         if (csc <= 20) {
             return 'Low';
         } else if (csc <= 35) {

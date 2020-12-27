@@ -26,7 +26,7 @@ const ControlBox = (props) => {
         l = [(parseFloat(l[0]) + 40) * ctScale.k + ctScale.x, (parseFloat(l[1]) + 40) * ctScale.k + ctScale.y];
         var c = d3.select('#ct-ctrlBox').style('top', l[1] + 'px').style('left', l[0] + 'px')
         if(isEnE){
-            if(t=='endtoend'){
+            if(t==='endtoend'){
                 c.select('p.' + faRef.plus).classed('ct-ctrl-hide', !0);
                 c.select('p.' + faRef.plus1).classed('ct-ctrl-hide', !0);
                 c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !1);

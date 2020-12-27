@@ -1,22 +1,20 @@
+/*eslint eqeqeq: "off"*/
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import '../styles/TaskBox.scss';
 import ClickAwayListener from 'react-click-away-listener';
 import {populateUsers} from '../api';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import Complexity, {getComplexityLevel} from './Complexity';
-import * as actionTypes from '../state/action';
-
-
-/*Component TaskBox
-  use: returns TaskBox near module
-*/
-//dispatch({type:actionTypes.UPDATE_UNASSIGNTASK,payload:[]})
 var unassignTask = []
 var reassignFlag = false
 const defaultVal = 'ct-default';
+
+/*Component TaskBox
+  use: returns TaskBox near module
+  note: eslint eqeqeq: "off" added coz many places were logics were needed " == null"
+*/
 const TaskBox = (props) => {
-    const dispatch = useDispatch()
     const taskRef = useRef()
     const batchNameRef = useRef()
     const taskDetailsRef =  useRef()
@@ -54,7 +52,8 @@ const TaskBox = (props) => {
             d3.select('#ct-assignTable').classed('hide',true)
             p.classed('node-highlight',false)
         }
-    },[ctScale,nid])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[ctScale,nid,p,t])
     useEffect(()=>{
         if(dNodes[pi].parent && dNodes[pi].parent.type === 'endtoend'){
             setTaskBox(false)
@@ -177,6 +176,7 @@ const TaskBox = (props) => {
             setComplexity({show:false,clist:undefined,val:undefined})
             SetAssignbtn({disable:true,reassign:false})
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[nid])
     const propList = {
         userInfo,pi,dNodes,userAsgList,userRevList,batchNameRef,taskRef,startDate,endDate,taskDetailsRef,complexity,cycleid,releaseid,appType
@@ -354,7 +354,7 @@ function addTask_11(pi, tObj, qid, cycleid,dNodes,nodeDisplay,cTask) {
        } 
     }
     if (validate[0]) {
-        var taskflag = true;
+        //var taskflag = true;
         if (taskUndef) {
             nodeDisplay[pi].task=true;
             //d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
@@ -617,7 +617,7 @@ const setCoordinate = (p,t,ctScale) => {
 }
 
 const removeTask = (pi,twf,userInfo,propagate,dNodes,nodeDisplay,cycleid,activeNode) => {
-    var reuseDict = getReuseDetails(dNodes);
+    //var reuseDict = getReuseDetails(dNodes);
     //Fetching the config value for strictTaskWorkflow for the first time, hence the check
     if (twf !== false) twf= userInfo.taskwflow; 
     if((dNodes[pi].type=="screens" || dNodes[pi].type=="testcases") && dNodes[pi].task!=null && dNodes[pi].task.cycleid!=cycleid)return;
@@ -638,9 +638,7 @@ const task_unassignment=(pi,twf,dNodes,nodeDisplay,cycleid,userInfo,propagate,ac
     if (twf && (dNodes[pi].type=="screens" || dNodes[pi].type=="testcases")){
         // $('#unassignmentConfirmationPopup').modal("show");
         return;
-    } 
-    var p = d3.select('#node_' + pi);
-    //p.select('.ct-nodeTask').classed('no-disp', !0);
+    }
     if (dNodes[pi].task != null) {
         dNodes[pi].task.status = 'unassigned'; //status and assignedtoname are solely for notification
         if (dNodes[pi].task._id!=null)

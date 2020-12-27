@@ -1,11 +1,13 @@
 import '../styles/ToolbarMenuEnE.scss'
 import React, { useState, useRef, Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {getModules,getScreens,exportToExcel} from '../api';
-import * as d3 from 'd3';
+import {getModules} from '../api';
 import * as actionTypes from '../state/action';
 import ModuleListDropEnE from './ModuleListDropEnE';
 
+/*Component ToolbarMenuEnE
+  use: renders Toolbar header for ene and also container for moduleList dropdown
+*/
 const ToolbarMenuEnE = (props) =>{
     const dispatch = useDispatch()
     const SearchMdInp = useRef()
@@ -54,26 +56,26 @@ const ToolbarMenuEnE = (props) =>{
     var projectList = Object.entries(prjList)
     return(
         <Fragment>
-        <div className='ene_toolbar__header'>
-            <div className='ene_toolbar_module_header'>
-                <label>Project:</label>
-                <select value={initProj} onChange={(e)=>{selectProj(e.target.value)}}>
-                    {projectList.map((e,i)=><option value={e[1].id} key={i}>{e[1].name}</option>)}
-                </select>
-                <span className='ene_toolbar__header-searchbox'>
-                    <input placeholder="Search Modules" ref={SearchMdInp} onChange={(e)=>searchModule(e.target.value)}></input>
-                    <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
-                </span>
+            <div className='ene_toolbar__header'>
+                <div className='ene_toolbar_module_header'>
+                    <label>Project:</label>
+                    <select value={initProj} onChange={(e)=>{selectProj(e.target.value)}}>
+                        {projectList.map((e,i)=><option value={e[1].id} key={i}>{e[1].name}</option>)}
+                    </select>
+                    <span className='ene_toolbar__header-searchbox'>
+                        <input placeholder="Search Modules" ref={SearchMdInp} onChange={(e)=>searchModule(e.target.value)}></input>
+                        <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
+                    </span>
+                </div>
+                <div className='ene_toolbar_scenario'>
+                    <label>{modName?`Module Name: ${modName}`:'Scenarios'}</label>
+                    <span className='ene_toolbar__header-searchbox'>
+                        <input placeholder="Search Scenario" ref={SearchScInp} onChange={(e)=>searchScenario(e.target.value)}></input>
+                        <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
+                    </span>
+                </div>
+                <ModuleListDropEnE {...props} filterSc={filterSc} setModName={setModName}/>
             </div>
-            <div className='ene_toolbar_scenario'>
-                <label>{modName?`Module Name: ${modName}`:'Scenarios'}</label>
-                <span className='ene_toolbar__header-searchbox'>
-                    <input placeholder="Search Scenario" ref={SearchScInp} onChange={(e)=>searchScenario(e.target.value)}></input>
-                    <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
-                </span>
-            </div>
-            <ModuleListDropEnE {...props} filterSc={filterSc} setModName={setModName}/>
-        </div>
         </Fragment>
     )
 }

@@ -1,8 +1,12 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react';
-import {ModalContainer, ScrollBar} from '../../global';
+import React, { Fragment, useRef, useState } from 'react';
+import {ModalContainer} from '../../global';
 import {useSelector} from 'react-redux'
 import {readTestSuite_ICE,exportToJson,exportToExcel} from '../api';
 import '../styles/ExportMapButton.scss'
+
+/*Component ExportMapButton
+  use: renders ExportMapButton and popups for selection on click 
+*/
 
 const ExportMapButton = ({setPopup,setBlockui,displayError,isAssign,releaseRef,cycleRef}) => {
     const fnameRef = useRef()
@@ -126,6 +130,11 @@ const toJSON = async(modId,fname,displayError,setPopup,setBlockui) => {
     }
 }
 
+/*
+    function : toCustom()
+    Purpose : Exporting testsuite and executiondata in json file
+    param :
+*/
 const toCustom = async (selectedProj,selectedModule,projectList,releaseRef,cycleRef,fname,displayError,setPopup,setBlockui) =>{
     try{
         var suiteDetailsTemplate = { "condition": 0, "dataparam": [" "], "scenarioId": "", "scenarioName": "" };
