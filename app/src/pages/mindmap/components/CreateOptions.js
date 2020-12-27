@@ -68,6 +68,40 @@ const CreateOptions = (props) => {
   );
 }
 
+// container for sheet choose popup
+const Container = (props) => {
+  return(
+    <div className = 'mp__sheet-popup'>
+      <select id='mp__import-sheet' onChange={(e)=>props.setSheet(e.target.value)}>
+        <option value="" disabled selected>Please Select Sheet</option>
+        {props.sheetList.map((e,i)=><option value={e} key={i}>{e}</option>)}
+      </select>
+    </div>
+  )
+}
+
+// Footer for sheet choose popup
+const Footer = (props) =>{
+  const [errMsg,setErrMsg] = useState('')
+  const submit = () => {
+    var projid = document.getElementById('mp__import-sheet').value
+    if(projid !== ""){
+      props.submitSheet()
+    }else{
+      setErrMsg("Sheet not selected")
+    }
+  }
+  return(
+    <Fragment>
+        <div className='mnode__buttons'>
+          <label className='err-message'>{errMsg}</label>
+          <button onClick={submit}>OK</button>
+        </div>
+    </Fragment>
+  )
+}
+
+// read promise that resolves on successful input file read
 function read(file) {
   return new Promise ((res,rej)=>{
       var reader = new FileReader();
@@ -84,6 +118,8 @@ function read(file) {
     }
   )
 }
+
+// upload File funtion checks imported file extensions and returns data or error message
 
 const uploadFile = async(e,setSheetList,displayError,setData,fileImport) =>{
     var file = e.target.files[0]
@@ -112,37 +148,6 @@ const uploadFile = async(e,setSheetList,displayError,setData,fileImport) =>{
     }else{
         displayError("File is not supported")
     }
-}
-
-const Container = (props) => {
-  return(
-    <div className = 'mp__sheet-popup'>
-      <select id='mp__import-sheet' onChange={(e)=>props.setSheet(e.target.value)}>
-        <option value="" disabled selected>Please Select Sheet</option>
-        {props.sheetList.map((e,i)=><option value={e} key={i}>{e}</option>)}
-      </select>
-    </div>
-  )
-}
-
-const Footer = (props) =>{
-  const [errMsg,setErrMsg] = useState('')
-  const submit = () => {
-    var projid = document.getElementById('mp__import-sheet').value
-    if(projid !== ""){
-      props.submitSheet()
-    }else{
-      setErrMsg("Sheet not selected")
-    }
-  }
-  return(
-    <Fragment>
-        <div className='mnode__buttons'>
-          <label className='err-message'>{errMsg}</label>
-          <button onClick={submit}>OK</button>
-        </div>
-    </Fragment>
-  )
 }
 
 export default CreateOptions;

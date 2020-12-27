@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState, Fragment } from 'react';
 import * as d3 from 'd3';
-import {v4 as uuid} from 'uuid'
 import SearchBox from '../components/SearchBox'
 import NavButton from '../components/NavButton'
 import Legends from '../components/Legends'
@@ -34,9 +33,8 @@ var temp = {
 };
 var nodeMoving = false;
 
-const Canvas = (props) => {
+const CanvasNew = (props) => {
     const dispatch = useDispatch()
-    const saveBtn = useRef()
     const copyNodes = useSelector(state=>state.mindmap.copyNodes)
     const selectBox = useSelector(state=>state.mindmap.selectBoxState)
     const deletedNodes = useSelector(state=>state.mindmap.deletedNodes)
@@ -56,10 +54,11 @@ const Canvas = (props) => {
     const displayError = props.displayError
     const CanvasRef = useRef();
     useEffect(()=>{
+        //useEffect to clear redux data selected module on unmount
         return ()=>{
             dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         }
-    },[])
+    },[dispatch])
     useEffect(() => {
         var tree;
         count = {
@@ -73,7 +72,7 @@ const Canvas = (props) => {
                 var typeo;
                 var typen;
                 var activeNode=0;
-                // setBlockui({show:true,content:'Creating Nodes...'})
+                //setBlockui({show:true,content:'Creating Nodes...'})
                 props.module.importData.data.forEach((e,i)=>{
                     if (i === 0) {
                         tree = createNewMap(props.verticalLayout,undefined,e.name)
@@ -88,10 +87,10 @@ const Canvas = (props) => {
                             activeNode = tree.dNodes.length - 1;
                         } else if (typen < typeo) {
                             var lvl = typeo - typen;
-                            if (lvl == 1) {
+                            if (lvl === 1) {
                                 activeNode = tree.dNodes[tree.dNodes.length - 1].parent.parent.id;
                             }
-                            if (lvl == 2) {
+                            if (lvl === 2) {
                                 activeNode = tree.dNodes[tree.dNodes.length - 1].parent.parent.parent.id;
                             }
                         }
@@ -149,6 +148,7 @@ const Canvas = (props) => {
             setCreateNew(false)
             setInpBox(p)
         }
+       // eslint-disable-next-line react-hooks/exhaustive-deps
     },[createnew])
     const nodeClick=(e)=>{
         e.stopPropagation()
@@ -397,4 +397,4 @@ const bindZoomListner = (setCtScale,translate) => {
     return zoom
 }
 
-export default Canvas;
+export default CanvasNew;

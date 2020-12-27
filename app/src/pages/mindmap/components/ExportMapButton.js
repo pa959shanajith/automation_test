@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import {ModalContainer, ScrollBar} from '../../global';
 import {useSelector} from 'react-redux'
-import {getTestSuiteDetails,exportToJson,exportToExcel} from '../api';
+import {readTestSuite_ICE,exportToJson,exportToExcel} from '../api';
 import '../styles/ExportMapButton.scss'
 
 const ExportMapButton = ({setPopup,setBlockui,displayError,isAssign,releaseRef,cycleRef}) => {
@@ -147,7 +147,7 @@ const toCustom = async (selectedProj,selectedModule,projectList,releaseRef,cycle
             "projectidts": moduleData.projectId
             // "versionnumber": parseFloat(version_num)
         }];
-        var moduleObj = await getTestSuiteDetails(reqObject)
+        var moduleObj = await readTestSuite_ICE(reqObject)
         if(moduleObj.error){displayError(moduleObj.error);return;}
         moduleObj = moduleObj[selectedModule._id];
         if(moduleObj && moduleObj.testsuiteid != null) {

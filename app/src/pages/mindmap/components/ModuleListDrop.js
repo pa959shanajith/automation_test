@@ -96,10 +96,13 @@ const ModuleListDrop = (props) =>{
         </Fragment>
     )
 }
+
+//content for moduleclick warning popup
 const Content = () => (
     <p>Unsaved work will be lost if you continue. Do you want to continue?</p>
 )
 
+//footer for moduleclick warning popup
 const Footer = (props) => (
     <div className='toolbar__module-warning-footer'>
         <button className='btn-yes' onClick={()=>props.loadModule(props.modID)}>Yes</button>

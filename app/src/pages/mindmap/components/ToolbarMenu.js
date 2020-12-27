@@ -1,6 +1,6 @@
 import React, { useState, useRef, Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {getModules,getScreens,exportToExcel} from '../api';
+import {getModules,getScreens} from '../api';
 import '../styles/ToolbarMenu.scss';
 import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
@@ -10,19 +10,16 @@ import * as actionTypes from '../state/action';
   use: renders tool bar menus of create new page
 */
 
-const Toolbarmenu = (props) => {
+const Toolbarmenu = ({setPopup,setBlockui,displayError}) => {
     const dispatch = useDispatch()
     const SearchInp = useRef()
     const selectBox = useSelector(state=>state.mindmap.selectBoxState)
-    const selectedModule = useSelector(state=>state.mindmap.selectedModule)
     const selectNodes = useSelector(state=>state.mindmap.selectNodes)
     const copyNodes = useSelector(state=>state.mindmap.copyNodes)
     const prjList = useSelector(state=>state.mindmap.projectList)
     const initProj = useSelector(state=>state.mindmap.selectedProj)
     const moduleList = useSelector(state=>state.mindmap.moduleList)
     const [modlist,setModList] = useState(moduleList)
-    const setPopup = props.setPopup
-    const setBlockui = props.setBlockui
     const selectProj = async(proj) => {
         setBlockui({show:true,content:'Loading Modules ...'})
         dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
@@ -90,14 +87,6 @@ const Toolbarmenu = (props) => {
         d3.select('#copyImg').classed('active-map',false)
         paste({...copyNodes},setPopup)
     }
-    const displayError = (error) =>{
-        setPopup({
-            title:'ERROR',
-            content:error,
-            submitText:'Ok',
-            show:true
-        })
-    }
     var projectList = Object.entries(prjList)
     return(
         <Fragment>
@@ -121,6 +110,7 @@ const Toolbarmenu = (props) => {
     )
 }
 
+//check for paste errors and paste action
 const paste = (copyNodes,setPopup) =>{
     var dNodes_c = copyNodes.nodes
     var module_check_flag = false
@@ -145,6 +135,7 @@ const paste = (copyNodes,setPopup) =>{
     }
 }
 
+//check for dangling errors and and copy action
 const copy = (selectNodes,setPopup,copyNodes) =>{
     var dNodes_c = selectNodes.nodes
     var dLinks_c = selectNodes.links

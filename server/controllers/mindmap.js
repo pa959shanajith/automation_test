@@ -4,6 +4,7 @@ var create_ice = require('../controllers/create_ice');
 var myserver = require('../lib/socket.js');
 var logger = require('../../logger');
 var utils = require('../lib/utils');
+var suites = require('../controllers/suite')
 var xlsx = require('xlsx');
 var path = require('path');
 var fs = require('fs');
@@ -653,7 +654,18 @@ exports.getScreens = async(req, res) =>{
 	res.send(data);
 };
 
-exports.exportToJson= async (req, res) => {
+exports.importMindmap = async(req, res) =>{
+	logger.info("Inside UI service: importMindmap");
+	var d = req.body;
+	var inputs= {
+		"mindmap":d,
+		"query":"importMindmap"
+	}
+	var data = await utils.fetchData(inputs, "mindmap/importMindmap", "importMindmap");
+	res.send(data)
+};
+
+exports.exportToJson= async (req, res) =>{
 	logger.info("Inside UI service: exportMindmap");
 	var d = req.body;
 	var inputs= {
@@ -1086,6 +1098,7 @@ exports.pdProcess = function (req, res) {
 				'deleted': false,
 				'screenshot':screenshotdata,
 				'scrapedurl':'',
+				'createdthrough':'PD',
 				'scrapedata': screendataobj[name].data
 			};
 			ordernameidlist.push({'name':'Screen_'+name,'type':3})

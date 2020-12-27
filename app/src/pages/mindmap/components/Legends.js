@@ -3,9 +3,10 @@ import '../styles/Legends.scss'
 
 /*Component Legends
   use: returns static legends at the bottom of the screen
+  for ene send isEnE={true}
 */
 
-const Legends = (props) => {
+const Legends = ({isEnE}) => {
     return(
         <svg className="ct-legendBox">
             <g transform="translate(10,10)">
@@ -17,7 +18,7 @@ const Legends = (props) => {
                     <circle className="ct-scenarios" cx="90" cy="0" r="10"></circle>
                     <text className="ct-nodeLabel" x="105" y="3">Scenarios</text>
                 </g>
-                {!props.isEnE?
+                {!isEnE?
                 <Fragment>
                     <g>
                         <circle className="ct-screens" cx="180" cy="0" r="10"></circle>

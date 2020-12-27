@@ -5,6 +5,12 @@ import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
 import '../styles/SaveMapButton.scss'
 
+/*Component SaveMapButton
+  use: renders save button below canvas on click trigers save node
+  for assingn send isAssign={true}
+  for end send isEnE={true}
+*/
+
 const SaveMapButton = (props) => {
     const dispatch = useDispatch()
     const deletedNodes = useSelector(state=>state.mindmap.deletedNodes)
@@ -13,6 +19,7 @@ const SaveMapButton = (props) => {
     const projectList = useSelector(state=>state.mindmap.projectList)
     useEffect(()=>{
         if(props.createnew==='save')clickSave()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[props.createnew])
     const clickSave = ()=>{
         saveNode(props.setBlockui,props.dNodes,projId,props.cycId,props.setPopup,deletedNodes,unassignTask,dispatch,props.isEnE,props.isAssign,projectList)
@@ -27,6 +34,7 @@ const SaveMapButton = (props) => {
     )
 }
 
+//mindmap save funtion
 const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unassignTask,dispatch,isEnE,isAssign,projectList)=>{
     var tab = "tabCreate"
     var layout_vertical = false;
@@ -103,8 +111,9 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unas
                 selectedProject = d.projectID;
                 return true;
             }
+            return false;
         });
-        if (selectedProject && selectedProject != projId) {
+        if (selectedProject && selectedProject !== projId) {
             displayError("Module belongs to project: " +projectList[selectedProject].name+". Please go back to the same project and Save");
             return;
         }
