@@ -366,18 +366,21 @@ if (cluster.isMaster) {
 
 		app.post('/populateProjects', auth.protect, mindmap.populateProjects);
 		app.post('/populateUsers', mindmap.populateUsers);
-		app.post('/getProjectTypeMM', mindmap.getProjectTypeMM);
+		app.post('/getProjectTypeMM',auth.protect,mindmap.getProjectTypeMM);
 		app.post('/populateScenarios', mindmap.populateScenarios);
 		app.post('/getModules', auth.protect, mindmap.getModules);
 		app.post('/reviewTask', mindmap.reviewTask);
 		app.post('/saveData', mindmap.saveData);
-		app.post('/saveEndtoEndData', mindmap.saveEndtoEndData);
-		app.post('/excelToMindmap', mindmap.excelToMindmap);
+		app.post('/saveEndtoEndData', auth.protect, mindmap.saveEndtoEndData);
+		app.post('/importMindmap', auth.protect, mindmap.importMindmap);		
+		app.post('/excelToMindmap', auth.protect, mindmap.excelToMindmap);
 		app.post('/getScreens', auth.protect, mindmap.getScreens);
+		app.post('/exportToJson', auth.protect, mindmap.exportToJson);
 		app.post('/exportToExcel', auth.protect, mindmap.exportToExcel);
 		app.post('/pdProcess', auth.protect, mindmap.pdProcess);	// process discovery service
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
+		app.post('/checkUserState', authlib.validateUserState);
 		app.post('/validateUserState', authlib.validateUserState);
 		app.post('/loadUserInfo', auth.protect, login.loadUserInfo);
 		app.post('/getRoleNameByRoleId', auth.protect, login.getRoleNameByRoleId);
