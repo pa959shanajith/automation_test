@@ -3,10 +3,12 @@ import {ReferenceBar } from '../../global';
 
 const Rightbar=()=>{
     const hideTask = true ;
-    return (   
-        <ReferenceBar 
-            hideTask={hideTask} 
-        />
+    return (
+        <div className="right_barr">
+            <ReferenceBar 
+                hideTask={hideTask} 
+            />
+        </div>
            
     )
 }

@@ -1,6 +1,6 @@
-import React , {useState ,  useRef ,useEffect } from 'react';
+import React , {useState ,  useRef ,useEffect, Fragment } from 'react';
 import '../styles/ProfJ.scss';
-import {ScrollBar} from '../../global';
+import {ScrollBar , PopupMsg} from '../../global';
 import {getTopMatches_ProfJ } from '../api';
 
 const  ChatBot = (props) => {
@@ -8,7 +8,16 @@ const  ChatBot = (props) => {
     const [chatBox , setChatBox] = useState(false); //State for chat aree open close 
     const [chat , setChat] = useState([])//State stores all the list of chat objects.
     const [linkMsgArr , setLinkMsgArr]= useState([])//stores all the links clicked on the Bot Message
+    const [popup ,setPopup]= useState({show:false});
 
+    const displayError = (error) =>{
+        setPopup({
+          title:'ERROR',
+          content:error,
+          submitText:'Ok',
+          show:true
+        })
+      }
     const callqueryRaised=(e)=>{ //Function to be hit on enter after entering the userQuery
         if(e.key === 'Enter'){
             callsendbutton()
@@ -30,6 +39,7 @@ const  ChatBot = (props) => {
 
     const callProfJ =async(userQuery, chatArr)=>{ //API call and fetch Response from BOT
         const chatReturn = await getTopMatches_ProfJ(userQuery);
+        if(chatReturn.error){displayError(chatReturn.error);return;}
         chatArr.push({message: chatReturn , from: "Bot"})
         setChat(chatArr) 
         
@@ -42,6 +52,8 @@ const  ChatBot = (props) => {
         setLinkMsgArr(linkMsg_Arr)
     }
     return (
+        <Fragment>
+        {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
         <div id="assistWrap" className="filter_pop" >
             <h4 className="pop_header">
                 <img className="assist-image" alt="message" src="static/imgs/ic-message.png"/>
@@ -51,8 +63,9 @@ const  ChatBot = (props) => {
             </h4>
             {chatBox ? 
             <div id="assistContent">
-                <div className="chatArea">
-                    <ScrollBar>
+                
+                <div id="chatBot_Scroll" className="chatArea">
+                    <ScrollBar scrollId="chatBot_Scroll" thumbColor="#321e4f">
                         <div id="specialdiv" >
                             <span className="defautMssg">
                                 Hello, I'm Prof J. I try to be helpful. (But I'm still just a bot. Sorry!) *Type keywords* and hit _enter_ to send your message.
@@ -88,6 +101,7 @@ const  ChatBot = (props) => {
                         </div>
                     </ScrollBar>
                 </div>
+                
                 <input ref={queryref} onKeyPress={(e)=>callqueryRaised(e)} className="profJinpt" type="text" placeholder="Ask Prof.J"/>
                 <div className="projBtns_container">
                     <button onClick ={()=>callClearbtn()}className="projBtns" >Clear</button>
@@ -98,7 +112,7 @@ const  ChatBot = (props) => {
             :null
             }
         </div>
-        
+        </Fragment> 
     )
 }
 

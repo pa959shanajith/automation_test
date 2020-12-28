@@ -3,11 +3,14 @@ import {ReferenceBar } from '../../global';
 
 const Rightbar=()=>{
     const hideInfo = true ;
-    return (    
-        <ReferenceBar 
-            hideInfo={hideInfo} 
-        /> 
-    )
+    return (
+        <div className="right_barr">
+            <ReferenceBar 
+                hideInfo={hideInfo} 
+            />
+        </div>
+           
+            )
 }
 
 export default Rightbar;
