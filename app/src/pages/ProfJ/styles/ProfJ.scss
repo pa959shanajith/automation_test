@@ -6,7 +6,7 @@
     bottom: 46px;
     width: 360px;
     right: 97px;
-    z-index: 50;
+    z-index: 1;
     text-align: left;
 }
 .pop_header{
@@ -71,6 +71,7 @@
     //float: left; 
     display: -webkit-inline-box !important;
     margin-top: 5px !important;
+    margin-right: 10px;
     /* border: 1px solid;*/
     //width: 100%;
     //margin: 3px;
@@ -90,6 +91,8 @@
     display: -webkit-inline-box;
     font-family: 'LatoWeb';
     font-size: 15px;
+    margin-right: 10px;
+
 }
 .profJinpt{
     width: 100%;

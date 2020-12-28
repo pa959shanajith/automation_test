@@ -20,15 +20,15 @@ const ScrollBar = (props) => {
     return(
         <>
          <Fragment>
-            <style type="text/css">
+         <style type="text/css">
                 {`
                 .ps > .ps__rail-x,
                 .ps > .ps__rail-y {
                     opacity: 1!important; 
                 }
-
-                ${props.scrollId?'#'+props.scrollId+' ':''}.ps__thumb-y,
-                ${props.scrollId?'#'+props.scrollId+' ':''}.ps__thumb-y:hover {
+ 
+                ${props.scrollId?'#'+props.scrollId+' > .ps ':''}.ps__thumb-y,
+                ${props.scrollId?'#'+props.scrollId+' > .ps ':''}.ps__thumb-y:hover {
                     opacity: 1!important;
                     left: 0;
                     right: 0;
@@ -36,8 +36,8 @@ const ScrollBar = (props) => {
                     width: ${props.verticalbarWidth?props.verticalbarWidth:'6px'}!important;
                     background:${props.thumbColor?props.thumbColor:'#000'}!important;
                 }
-                ${props.scrollId?'#'+props.scrollId+' ':''}.ps__rail-y, 
-                ${props.scrollId?'#'+props.scrollId+' ':''}.ps__rail-y:hover {
+                ${props.scrollId?'#'+props.scrollId+' > .ps ':''}.ps__rail-y, 
+                ${props.scrollId?'#'+props.scrollId+' > .ps ':''}.ps__rail-y:hover {
                     border-radius: 3px;
                     margin-right: 2px;
                     background: ${props.trackColor?props.trackColor:'white'}!important;
@@ -46,15 +46,15 @@ const ScrollBar = (props) => {
                 }
                 ${
                     props.hoverColor ? 
-                    `${props.scrollId?`#${props.scrollId}:hover `:''}.ps__thumb-y,
-                    ${props.scrollId?`#${props.scrollId}:hover `:''}.ps__thumb-y:hover {
+                    `${props.scrollId?`#${props.scrollId}:hover > .ps `:''}.ps__thumb-y,
+                    ${props.scrollId?`#${props.scrollId}:hover > .ps `:''}.ps__thumb-y:hover {
                         background:${props.hoverColor}!important;
                     }
                     `
                     : ''
                 }
                 `}
-            </style>
+            </style> 
             <PerfectScrollbar style={{maxHeight:'inherit',height:'inherit'}}>
                 {props.children}
             </PerfectScrollbar>

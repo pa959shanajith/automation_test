@@ -40,6 +40,11 @@
     display: inline-block;
     width: 450px;
 }
+.leftAlign p input {
+    border: none ;
+    border-bottom: 1px solid grey;
+    border-radius: none;
+}
 .leftAlign span button{
     float: right;
     background: #643693;

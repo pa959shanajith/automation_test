@@ -1,4 +1,6 @@
 import axios from 'axios';
+import {RedirectPage} from '../global'
+import {history} from './index'
 const url = "https://"+window.location.hostname+":8443";
 
 /*Component getTopMatches_ProfJ
@@ -17,12 +19,17 @@ export const getTopMatches_ProfJ = async(userQuery) => {
             param : 'getTopMatches_ProfJ'
            }
         });
-        if(res.status===200){
-            return res.data;
-        }else{
-            console.error(res.status)
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
         }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'Failed to Fetch Results'}
     }catch(err){
         console.error(err)
+        return {error:'Failed to Fetch Results'}
     }
 }
