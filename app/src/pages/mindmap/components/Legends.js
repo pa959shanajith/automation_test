@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import '../styles/Legends.scss'
 
 /*Component Legends
   use: returns static legends at the bottom of the screen
+  for ene send isEnE={true}
 */
 
-const Legends = () => {
+const Legends = ({isEnE}) => {
     return(
         <svg className="ct-legendBox">
             <g transform="translate(10,10)">
@@ -17,14 +18,18 @@ const Legends = () => {
                     <circle className="ct-scenarios" cx="90" cy="0" r="10"></circle>
                     <text className="ct-nodeLabel" x="105" y="3">Scenarios</text>
                 </g>
-                <g>
-                    <circle className="ct-screens" cx="180" cy="0" r="10"></circle>
-                    <text className="ct-nodeLabel" x="195" y="3">Screens</text>
-                </g>
-                <g>
-                    <circle className="ct-testcases" cx="270" cy="0" r="10"></circle>
-                    <text className="ct-nodeLabel" x="285" y="3">Test Cases</text>
-                </g>
+                {!isEnE?
+                <Fragment>
+                    <g>
+                        <circle className="ct-screens" cx="180" cy="0" r="10"></circle>
+                        <text className="ct-nodeLabel" x="195" y="3">Screens</text>
+                    </g>
+                    <g>
+                        <circle className="ct-testcases" cx="270" cy="0" r="10"></circle>
+                        <text className="ct-nodeLabel" x="285" y="3">Test Cases</text>
+                    </g>
+                </Fragment>
+                :null}
             </g>
         </svg>
     )

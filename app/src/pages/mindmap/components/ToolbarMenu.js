@@ -1,6 +1,6 @@
 import React, { useState, useRef, Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {getModules,getScreens,exportToExcel} from '../api';
+import {getModules,getScreens} from '../api';
 import '../styles/ToolbarMenu.scss';
 import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
@@ -10,20 +10,18 @@ import * as actionTypes from '../state/action';
   use: renders tool bar menus of create new page
 */
 
-const Toolbarmenu = (props) => {
+const Toolbarmenu = ({setPopup,setBlockui,displayError}) => {
     const dispatch = useDispatch()
     const SearchInp = useRef()
     const selectBox = useSelector(state=>state.mindmap.selectBoxState)
-    const selectedModule = useSelector(state=>state.mindmap.selectedModule)
     const selectNodes = useSelector(state=>state.mindmap.selectNodes)
     const copyNodes = useSelector(state=>state.mindmap.copyNodes)
     const prjList = useSelector(state=>state.mindmap.projectList)
     const initProj = useSelector(state=>state.mindmap.selectedProj)
     const moduleList = useSelector(state=>state.mindmap.moduleList)
     const [modlist,setModList] = useState(moduleList)
-    const setPopup = props.setPopup
-
     const selectProj = async(proj) => {
+        setBlockui({show:true,content:'Loading Modules ...'})
         dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
         var moduledata = await getModules({"tab":"tabCreate","projectid":proj,"moduleid":null})
         if(moduledata.error){displayError(moduledata.error);return;}
@@ -34,6 +32,7 @@ const Toolbarmenu = (props) => {
         dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         if(screendata)dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
         SearchInp.current.value = ""
+        setBlockui({show:false})
     }
     const searchModule = (val) =>{
         var filter = modlist.filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
@@ -88,17 +87,6 @@ const Toolbarmenu = (props) => {
         d3.select('#copyImg').classed('active-map',false)
         paste({...copyNodes},setPopup)
     }
-    const clickExporttoExcel = () =>{
-        toExcel(initProj,selectedModule)
-    }
-    const displayError = (error) =>{
-        setPopup({
-          title:'ERROR',
-          content:error,
-          submitText:'Ok',
-          show:true
-        })
-      }
     var projectList = Object.entries(prjList)
     return(
         <Fragment>
@@ -111,7 +99,6 @@ const Toolbarmenu = (props) => {
                 <i className={"fa fa-crop fa-lg"+(selectBox?' active-map':'')} title="add a rectangle" onClick={clickSelectBox}></i>
                 <i className="fa fa-files-o fa-lg" title="copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
                 <i className="fa fa-clipboard fa-lg" title="Paste map" id="pasteImg" onClick={clickPasteNodes}></i>
-                <i className="fa fa-download fa-lg" title="Export To Excel" onClick={clickExporttoExcel}></i>
             </span>
             <span className='toolbar__header-searchbox'>
                 <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}></input>
@@ -123,24 +110,7 @@ const Toolbarmenu = (props) => {
     )
 }
 
-const toExcel = async(projId,modId) => {
-    var data = {
-        "projectid":projId,
-        "moduleid":modId._id
-    }
-    var result = await exportToExcel(data)
-    var file = new Blob([result], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    var fileURL = URL.createObjectURL(file);
-    var a = document.createElement('a');
-    a.href = fileURL;
-    a.download = 'sample.xlsx';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(fileURL);
-
-}
-
+//check for paste errors and paste action
 const paste = (copyNodes,setPopup) =>{
     var dNodes_c = copyNodes.nodes
     var module_check_flag = false
@@ -165,6 +135,7 @@ const paste = (copyNodes,setPopup) =>{
     }
 }
 
+//check for dangling errors and and copy action
 const copy = (selectNodes,setPopup,copyNodes) =>{
     var dNodes_c = selectNodes.nodes
     var dLinks_c = selectNodes.links
