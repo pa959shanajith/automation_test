@@ -5,6 +5,7 @@ import '../styles/TaskBox.scss';
 import ClickAwayListener from 'react-click-away-listener';
 import {populateUsers} from '../api';
 import { useSelector } from 'react-redux';
+import {ModalContainer} from '../../global';
 import Complexity, {getComplexityLevel} from './Complexity';
 var unassignTask = []
 var reassignFlag = false
@@ -22,6 +23,7 @@ const TaskBox = (props) => {
     const unassignList = useSelector(state=>state.mindmap.unassignTask)
     const userInfo = useSelector(state=>state.login.userinfo)
     const selectedProj = useSelector(state=>state.mindmap.selectedProj)
+    const [warning,setWarning]=useState(false)
     const [task,setTask] = useState({arr:[],initVal:undefined})
     const [batchName,setBatchName] = useState({show:false})
     const [userAsgList,setUserAsgList] = useState({arr:[],value:undefined,disabled:true})
@@ -199,6 +201,12 @@ const TaskBox = (props) => {
     const unAssign = (flag) => {
         if(assignbtn.disable)return;
         reassignFlag = flag;
+        var twf= userInfo.taskwflow;
+        if (twf && (dNodes[pi].type=="screens" || dNodes[pi].type=="testcases") && !warning){
+            setWarning(true)
+            return;
+        }
+        setWarning(false)
         removeTask(pi,undefined,userInfo,propagate.val,dNodes,nodeDisplay,cycleid,pi)
         if(nodeDisplay){
             clickUnassign({nodeDisplay,unassignTask})
@@ -255,6 +263,13 @@ const TaskBox = (props) => {
     }
     return(
         <Fragment>
+        {warning?<ModalContainer 
+            title='Confirmation'
+            close={()=>setWarning(false)}
+            footer={<Footer unAssign={()=>unAssign(reassignFlag)} setWarning={setWarning} />}
+            content={<Content/>} 
+            modalClass='modal-sm'
+        />:null}
         <ClickAwayListener onClickAway={(e)=>{if(ignoreClick(e))props.setTaskBox(false)}}>
             <div id='ct-assignTable' className='task-box__container hide'>
                 <ul>
@@ -340,6 +355,19 @@ const TaskBox = (props) => {
         </Fragment>
     )
 }
+
+//content for moduleclick warning popup
+const Content = () => (
+    <p>Taskworkflow Strict mode enabled ! Unassigning Tasks of Screens and Tetscases will lead to failure of Execution. Do you wish to continue?</p>
+)
+
+//footer for moduleclick warning popup
+const Footer = (props) => (
+    <div className='toolbar__module-warning-footer'>
+        <button className='btn-yes' onClick={props.unAssign}>Yes</button>
+        <button onClick={()=>{props.setWarning(false)}}>No</button>
+    </div>
+)
 
 function addTask_11(pi, tObj, qid, cycleid,dNodes,nodeDisplay,cTask) {
     var validate = checkAndUpdate(dNodes[pi], []);
@@ -635,10 +663,6 @@ const removeTask = (pi,twf,userInfo,propagate,dNodes,nodeDisplay,cycleid,activeN
 }
 
 const task_unassignment=(pi,twf,dNodes,nodeDisplay,cycleid,userInfo,propagate,activeNode)=>{
-    if (twf && (dNodes[pi].type=="screens" || dNodes[pi].type=="testcases")){
-        // $('#unassignmentConfirmationPopup').modal("show");
-        return;
-    }
     if (dNodes[pi].task != null) {
         dNodes[pi].task.status = 'unassigned'; //status and assignedtoname are solely for notification
         if (dNodes[pi].task._id!=null)
