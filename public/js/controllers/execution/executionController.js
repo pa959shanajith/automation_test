@@ -9,6 +9,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	var execEnv = "default";
 	$scope.moduleInfo = [];
 	$scope.somevar = {};
+	$scope.smartMode = false
 	$("body").css("background", "#eee");
 	$timeout(function () {
 		$('.scrollbar-inner').scrollbar();
@@ -740,9 +741,12 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	};
 
 	const allocateICEPopup = () =>{
+		$scope.smartMode = false;
+		$scope.selectedICE = "";
 		var projId = JSON.parse(window.localStorage['_CT']).testSuiteDetails[0].projectidts
 		var data = {poolid:"",projectids: [projId]}
 		$("#chooseICEPool option").slice(1).remove()
+		$('#executionType').val('normal')
 		//$("#chooseICEPool option").remove()
 		blockUI('Fetching ICE ...')
 		adminServices.getPools(data)
@@ -780,9 +784,22 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		return;
 	}
 
-	$scope.selectIce = (ice) =>{
-		$scope.selectedICE = ice
-		$('#userIdName').removeClass('error-border')
+	$('#executionType').change(function (e) {
+		$('#userIdName').val("")
+		$scope.smartMode = e.currentTarget.selectedOptions[0].getAttribute('smart') == "true"
+	})
+
+	$scope.iceCheckboxClick = ($event,ice) => {
+		if($scope.smartMode){
+			if($event.target.tagName.toLowerCase() != 'input'){
+				$event.currentTarget.getElementsByTagName('input')[0].checked = !$event.currentTarget.getElementsByTagName('input')[0].checked
+				$event.stopPropagation()
+				$event.preventDefault()
+			}
+		}else{
+			$scope.selectedICE = ice
+			$('#userIdName').removeClass('error-border')
+		}
 	}
 
 	const populateICElist =(arr,unallocated)=>{
@@ -828,9 +845,20 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	}
 
 	$scope.ExecuteOnclick = () =>{
-		$scope.selectedPool = $('#chooseICEPool').val() 
+		$scope.selectedPool = $('#chooseICEPool').val()
 		if($('#chooseICEPool').val() == 'unallocated')$scope.selectedPool = "";
-		if(!$scope.selectedICE){
+		var iceList=[]
+		var smartModeType = ''
+		if($scope.smartMode){
+			smartModeType = $('#executionType').val() //change value of dropdown in execution.html if needed
+			$('#ice-dropdown input:checked').each(function(){
+                if($(this).parent().attr('title')=='Online'){
+                    iceList.push($(this).val())
+                }
+            })
+			$scope.selectedICE = iceList
+		}
+		else if(!$scope.selectedICE){
 			if($('#userIdName').val() == "" && $scope.availableICE && $scope.availableICE.length>0){
 				$scope.selectedICE = ""
 			}else{
@@ -842,6 +870,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		$('#selectIcePoolIce').modal("hide")
 		blockUI("Sending Execution Request");
 		executionData.targetUser = $scope.selectedICE
+		executionData.type = smartModeType
 		executionData.poolid = $scope.selectedPool
 		executionActive = true;
 		$rootScope.resetSession.start();
@@ -906,6 +935,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			var arr = Object.entries({[id]:$scope.poolList[id]})
 		}
 		populateICElist(arr,unallocated)
+		$scope.$apply();
 	})
 	
 	//Execute TestSuite Functionality

@@ -586,21 +586,69 @@ module.exports.executionFunction = async (batchExecutionData, execIds, userInfo,
 exports.ExecuteTestSuite_ICE = async (req, res) => {
 	const fnName = "ExecuteTestSuite_ICE"
 	logger.info("Inside UI service: ExecuteTestSuite_ICE");
-	var targetUser = req.body.executionData.targetUser;
-	if (targetUser && targetUser != ""){
-		let inputs = { "icename": targetUser };
-		var profile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
-	}else{
-		targetUser = EMPTYUSER
-		var profile = {userid:EMPTYUSER,role:"N/A",username:EMPTYUSER}
-	}
-	var poolid = req.body.executionData.poolid;
-	const userInfo = { "userid": profile.userid, "username": profile.name, "role": profile.role, "icename": targetUser,"invokinguser":req.session.userid,"invokingusername":req.session.username,"invokinguserrole":req.session.activeRoleId};
 	const batchExecutionData = req.body.executionData;
-	const execIds = { "batchid": "generate", "execid": {} };
-	var result = await queue.Execution_Queue.addTestSuiteToQueue(batchExecutionData,execIds,userInfo,"ACTIVE",poolid);
+	var targetUser = batchExecutionData.targetUser;
+	const type = batchExecutionData.type;
+	const poolid = batchExecutionData.poolid;
+	var result = {status:"fail",error:"Failed to execute",message:""}
+	var userInfo = {"invokinguser":req.session.userid,"invokingusername":req.session.username,"invokinguserrole":req.session.activeRoleId,"userid": "", "username": "", "role": ""}
+	//Check if execution is normal or smart
+	if(type.toLowerCase().includes('smart')){
+		//Check if users are present in target user
+		if(targetUser && Array.isArray(targetUser) && targetUser.length > 0){
+			var batchInfo =JSON.parse(JSON.stringify(batchExecutionData.batchInfo));
+			batchInfo[0]["iceList"] = targetUser;
+			//Get partitions
+			const partitionResult = await smartSchedule(batchInfo, type, "Now", batchExecutionData.browserType.length)
+			if (partitionResult["status"] == "fail") {
+				result['error'] = "Smart execution Failed";
+			}else{
+				var batchInfo = partitionResult["batchInfo"];
+				//Make batch request for each partition
+				for(let i in batchInfo){
+					let targetUser = batchInfo[i].targetUser;
+					let user = JSON.parse(JSON.stringify(userInfo));
+					user.icename = targetUser;
+					var executionData = JSON.parse(JSON.stringify(batchExecutionData));
+					executionData.batchInfo = [batchInfo[i]]
+					executionData.targetUser = targetUser;
+					//Get profile data and add to queue
+					var makeReq = await makeRequestAndAddToQueue(executionData, targetUser, user, poolid);
+					result["message"] = makeReq["message"] + "\n" + result["message"];
+				}
+				result["status"] = "Success";		
+			}
+		}else{
+			result["error"] = "Please select available Target ICE";
+		}
+	}else{
+		userInfo.icename = targetUser;
+		if (Array.isArray(targetUser)) targetUser = "";
+		var makeReq = await makeRequestAndAddToQueue(batchExecutionData,targetUser,userInfo,poolid);
+		Object.assign(result,makeReq);
+	}
 	return res.send(result);
 };
+
+async function makeRequestAndAddToQueue(batchExecutionData, targetUser, userInfo, poolid, invoker) {
+	const fnName = "makeRequestAndAddToQueue";
+	//get profile data if target user was provided
+	if(targetUser && targetUser != ""){
+		let inputs = { "icename": targetUser };
+		var profile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
+		profile = {userid:profile.userid,username:profile.name,role:profile.role};
+	}else{
+		userInfo.targetUser = EMPTYUSER
+		var profile = {userid:EMPTYUSER,role:"N/A",username:EMPTYUSER}
+	}
+	Object.assign(userInfo,profile);
+	const execIds = { "batchid": "generate", "execid": {} };
+	//add to test queue
+	var result = await queue.Execution_Queue.addTestSuiteToQueue(batchExecutionData,execIds,userInfo,"ACTIVE",poolid);
+	delete userInfo;
+	delete profile;
+	return result;
+}
 
 /** This service executes the testsuite(s) for request from API */
 exports.ExecuteTestSuite_ICE_API = async (req, res) => {
