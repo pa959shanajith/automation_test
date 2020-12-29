@@ -19,7 +19,7 @@ const  Utilities=()=>{
                 <UtilityCenter pairwiseClicked={pairwiseClicked} setPairwiseClicked={setPairwiseClicked} screenType={screenType} setScreenType={setScreenType}/>
                 <Rightbar />
             </div>    
-            <Footer/>
+            <div className="utlFooter"><Footer/></div>
         </div>
     )
 }

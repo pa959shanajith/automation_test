@@ -267,7 +267,7 @@ return (<Fragment>
                 mappedDetails={mappedDetails}
                 selectedScenarioName={selectedScenarioName}
                 /> : 
-        <div className="middleContent">
+        <div className="integration_middleContent">
         <div className="middle_holder">
                 {
                     props.qTestClicked ?
