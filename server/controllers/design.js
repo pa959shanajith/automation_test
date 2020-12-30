@@ -202,7 +202,8 @@ exports.debugTestCase_ICE = function (req, res) {
 		logger.info("Inside UI service: debugTestCase_ICE");
 		if (utils.isSessionActive(req)) {
 			username=req.session.username;
-			icename = myserver.allSocketsICEUser[username];
+			icename = undefined
+			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
 			redisServer.redisSubServer.subscribe('ICE2_' + icename);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
@@ -266,7 +267,7 @@ exports.debugTestCase_ICE = function (req, res) {
 											function result_debugTestCase_listener(channel, message) {
 												data = JSON.parse(message);
 												//LB: make sure to send recieved data to corresponding user
-												if (icename == data.username) {
+												if (icename == data.username && ["unavailableLocalServer", "result_debugTestCase"].includes(data.onAction)) {
 													redisServer.redisSubServer.removeListener('message', result_debugTestCase_listener);
 													if (data.onAction == "unavailableLocalServer") {
 														logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
@@ -302,9 +303,9 @@ exports.debugTestCase_ICE = function (req, res) {
 								function result_debugTestCaseWS_listener(channel, message) {
 									data = JSON.parse(message);
 									//LB: make sure to send recieved data to corresponding user
-									if (data.username == icename) {
+									if (data.username == icename && ["unavailableLocalServer", "result_debugTestCaseWS"].includes(data.onAction)) {
 										redisServer.redisSubServer.removeListener('message', result_debugTestCaseWS_listener);
-										if (data.onAction == "unavailableLocalServer") {
+										if (data.onAction == "unavailableLocalServer" ) {
 											logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
 											if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
 												var soc = myserver.socketMapNotify[username];
@@ -380,7 +381,7 @@ exports.debugTestCase_ICE = function (req, res) {
 									function result_wsdl_listOfOperation_listener(channel, message) {
 										data = JSON.parse(message);
 										//LB: make sure to send recieved data to corresponding user
-										if (data.username == icename) {
+										if (data.username == icename && ["unavailableLocalServer", "result_wsdl_listOfOperation"].includes(data.onAction)) {
 											redisServer.redisSubServer.removeListener('message', result_wsdl_listOfOperation_listener);
 											if (data.onAction == "unavailableLocalServer") {
 												logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
@@ -450,7 +451,7 @@ exports.debugTestCase_ICE = function (req, res) {
 								function result_wsdl_ServiceGenerator_listener(channel, message) {
 									data = JSON.parse(message);
 									//LB: make sure to send recieved data to corresponding user
-									if (data.username == icename) {
+									if (data.username == icename && ["unavailableLocalServer", "result_wsdl_ServiceGenerator"].includes(data.onAction)) {
 										redisServer.redisSubServer.removeListener('message', result_wsdl_ServiceGenerator_listener);
 										if (data.onAction == "unavailableLocalServer") {
 											logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");

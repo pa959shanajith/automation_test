@@ -25,7 +25,8 @@ exports.initScraping_ICE = function (req, res) {
 	try {
 		if (utils.isSessionActive(req)) {
 			username=req.session.username;
-			icename = myserver.allSocketsICEUser[username];
+			icename = undefined
+			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
 			redisServer.redisSubServer.subscribe('ICE2_' + icename);	
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
@@ -122,7 +123,7 @@ exports.initScraping_ICE = function (req, res) {
 					function scrape_listener(channel, message) {
 						var data = JSON.parse(message);
 						//LB: make sure to send recieved data to corresponding user
-						if (icename == data.username) {
+						if (icename == data.username && ["unavailableLocalServer", "scrape"].includes(data.onAction)) {
 							redisServer.redisSubServer.removeListener('message', scrape_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
@@ -221,13 +222,13 @@ exports.updateScreen_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: updateScreen_ICE");
 		if (utils.isSessionActive(req)) {
+			var username = req.session.username;
+			var modifiedByID = req.session.userid;
+			var modifiedByrole = req.session.activeRoleId;
 			var updateData = req.body.scrapeObject;
 			var projectID = updateData.projectId;
 			var screenID = updateData.screenId;
 			var screenName = updateData.screenName;
-			var userInfo = updateData.userinfo;
-			var modifiedByID = userInfo.user_id;
-			var modifiedByrole = userInfo.role;//user_role
 			var param = updateData.param;
 			var delete_list = updateData.delete_list;
 			var update_list = updateData.update_list;
@@ -402,6 +403,38 @@ exports.updateScreen_ICE = function (req, res) {
 				} catch (exception) {
 					logger.error("Exception from the service updateScreen_ICE: updateScrapeData_ICE: %s",exception);
 				}
+			}else if (param == "importScreen") {
+				try {
+					scrapedObjects.view = newData.view;
+					scrapedObjects.mirror = newData.mirror;
+					scrapedObjects.scrapedurl = newData.scrapedurl;
+					scrapeinfo = { 
+						"body" : newData.body,
+						"endPointURL" : newData.endPointURL,
+						"header" : newData.header,
+						"method" : newData.method,
+						"operations" : newData.operations,
+						"responseBody" : newData.responseBody,
+						"responseHeader" : newData.responseHeader
+					};
+					scrapedObjects.scrapeinfo =scrapeinfo
+					scrapedObjects = JSON.stringify(scrapedObjects);
+					scrapedObjects = scrapedObjects.replace(/'+/g, "''");
+					inputs = {
+						"scrapedata": scrapedObjects,
+						"modifiedby": modifiedByID,
+						"modifiedByrole":modifiedByrole,
+						"screenid": screenID,
+						"projectid": projectID,
+						"screenname": screenName,
+						"versionnumber": requestedversionnumber,
+						"type": "importScreen"
+					};
+					logger.info("Calling final function from the service updateScreen_ICE: importScreen");
+					finalFunction(newData);
+				} catch (exception) {
+					logger.error("Exception from the service updateScreen_ICE: importScreen: %s",exception);
+				}
 			}else if (param == "mapScrapeData_ICE") {
 				//add double type check tag=[button,textbox..]
 				updateObj = updateData.toMerge
@@ -550,7 +583,8 @@ exports.updateScreen_ICE = function (req, res) {
 											res.send("success");
 										}
 										else{
-											icename = myserver.allSocketsICEUser[req.session.username];
+											var icename = undefined
+											if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
 											redisServer.redisSubServer.subscribe('ICE2_' + icename);
 											logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 											logger.debug("ICE Socket requesting Address: %s" , icename);
@@ -562,7 +596,7 @@ exports.updateScreen_ICE = function (req, res) {
 													redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 													function checkIrisDuplicate_listener(channel,message) {
 														var data = JSON.parse(message);
-														if(icename == data.username){
+														if(icename == data.username && ["unavailableLocalServer", "iris_operations_result"].includes(data.onAction)){
 															redisServer.redisSubServer.removeListener('message',checkIrisDuplicate_listener);
 															if (data.onAction == "unavailableLocalServer") {
 																logger.error("Error occurred in checkIrisDuplicate_ICE: Socket Disconnected");
@@ -612,7 +646,8 @@ exports.userObjectElement_ICE = function (req, res) {
 		logger.info("Inside UI service: userObjectElement_ICE");
 		if (utils.isSessionActive(req)) {
 			var username=req.session.username;
-			var icename = myserver.allSocketsICEUser[username];
+			var icename = undefined
+			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
 			redisServer.redisSubServer.subscribe('ICE2_' + icename);
 			var operation = req.body.object[0];
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -648,7 +683,7 @@ exports.userObjectElement_ICE = function (req, res) {
 					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					function userObjectElement_ICE_listener(channel, message) {
 						var data = JSON.parse(message);
-						if (icename == data.username) {
+						if (icename == data.username && ["unavailableLocalServer", "scrape"].includes(data.onAction)) {
 							redisServer.redisSubServer.removeListener('message', userObjectElement_ICE_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
@@ -685,7 +720,8 @@ exports.highlightScrapElement_ICE = function (req, res) {
 		logger.info("Inside UI service: highlightScrapElement_ICE");
 		if (utils.isSessionActive(req)) {
 			var username=req.session.username;
-			var icename = myserver.allSocketsICEUser[username];
+			var icename = undefined
+			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
 			redisServer.redisSubServer.subscribe('ICE2_' + icename);
 			var focusParam = req.body.elementXpath;
 			var elementURL = req.body.elementUrl;
@@ -713,7 +749,8 @@ exports.updateIrisDataset = function updateIrisDataset(req, res) {
 		logger.info("Inside UI service: updateIrisDataset");
 		if (utils.isSessionActive(req)) {
 			var username=req.session.username
-			var icename = myserver.allSocketsICEUser[username];
+			var icename = undefined
+			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
 			image_data = req.body.data;
 			redisServer.redisSubServer.subscribe('ICE2_' + icename);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
@@ -725,7 +762,7 @@ exports.updateIrisDataset = function updateIrisDataset(req, res) {
 					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					function updateIrisDataset_listener(channel,message) {
 						var data = JSON.parse(message);
-						if(icename == data.username){
+						if(icename == data.username && ["unavailableLocalServer", "iris_operations_result"].includes(data.onAction)){
 							redisServer.redisSubServer.removeListener('message',updateIrisDataset_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occurred in updateIrisDataset: Socket Disconnected");

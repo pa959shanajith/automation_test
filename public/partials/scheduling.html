@@ -111,7 +111,12 @@
 
 			<div id="left-bottom-section" class="lbs-single">
 				<ul>
-					<li style="position:absolute;" ng-if="getScreenView == 'Web'"><a class="selectParallel" href='#' title="Parallel Execution"><span><img src='imgs/ic-parallel.png' alt='Parallel' height='55' width='57'/></span><font size="2">Parallel Execution</font></a></li>
+					<li style="position:absolute;" ng-if="getScreenView == 'Web'">
+						<a class="selectParallel" href='#' title="Parallel Execution"><span><img src='imgs/ic-parallel.png' alt='Parallel' height='55' width='57'/></span><font size="2">Parallel Execution</font></a>
+						<a class="selectModSmart" onclick="moduleSmartScheduling()" title="Module Smart Scheduling"><span><img src='imgs/ic-module-smart.png' alt='Parallel' height='55' width='57'/></span><font size="2">Module Smart Scheduling</font></a>
+						<a class="selectScnSmart" onclick="scenarioSmartScheduling()" title="Scenario Smart Scheduling"><span><img src='imgs/ic-scenario-smart.png' alt='Parallel' height='55' width='57'/></span><font size="2">Scenario Smart Scheduling</font></a>
+
+					</li>
 				</ul>
 			</div>
 		</div>
@@ -199,7 +204,7 @@
 								<div ng-repeat="scenariolist in schdata.scenariodetails">
 									<div ng-repeat="data in scenariolist" class="scheduleDataBodyRowChild">
 										<div style='width: 18%'>{{schdata.scheduledatetime}}</div>
-										<div style='width: 12%' data-scheduledby={{schdata.scheduledby}}>{{schdata.target}}</div>
+										<div style='width: 12%' value={{schdata.target}} ng-attr-title="{{schdata.target == nulluser?'Pool: '+ (schdata.poolname?schdata.poolname:'Unallocated ICE'):schdata.target}}" data-scheduledby={{schdata.scheduledby}}>{{schdata.target == nulluser?'Pool: '+ (schdata.poolname?schdata.poolname:'Unallocated ICE'):schdata.target}}</div>
 										<div style='width: 20%' title={{data.scenarioname||data.scenarioName}}>{{data.scenarioname||data.scenarioName}}</div>
 										<div style='width: 20%' title={{schdata.testsuitenames[$parent.$index]}} >{{schdata.testsuitenames[$parent.$index]}}</div>
 										<div style='width: 15%'><img ng-repeat="brow in schdata.browserlist" ng-src={{browImg(brow,data.appType)}} style="margin-right: 5px;"/></div>
@@ -335,3 +340,78 @@
 		</div>
 	</div>
 </div>
+<!-- ICE Pool Popup -->
+<div class="modal fade" id="selectIcePoolIce" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-md">
+	   <div class="modal-content">
+		  <div class="modal-header">
+			 <button type="button" class="close" data-dismiss="modal">&times;</button>
+			 <h4 class="modal-title">Allocate ICE to Schedule</h4>
+		  </div>
+		  <div class="modal-body">
+			<div class='adminControl'>
+				<div>
+					<span class="leftControl" title="Token Name">Select ICE Pool</span>
+					<select id='chooseICEPool'>
+						<option value='unallocated'>Unallocated ICE</option>
+						<!-- <option value='all'>Select All Pools</option> -->
+					</select>
+				</div>
+			</div>
+			<div class='adminControl'>
+				<div>
+					<span class="leftControl" title="Token Name">Allocate ICE</span>
+					<div>
+						<input class="btn btn-users dropdown-toggle" type="text" autocomplete="off" id="userIdName" data-toggle="dropdown" ng-click='availableICEFilter.icename="";selectedICE=false' ng-model="availableICEFilter.icename" placeholder="{{'Search ICE to allocate'}}">
+						<!-- <input class="btn btn-users dropdown-toggle" type="text" autocomplete="off" id="userIdName"  ng-model="allocateIcePool.allIcePoolListFilter.poolname" placeholder="Search ICE Pool" > -->
+						<ul id='ice-dropdown' class="dropdown-menu dropdown-menu-users "  aria-labelledby="userIdName">
+							<!-- <li role="presentation"><label><input type="checkbox" /><span id='status' class='online'></span>new</label></li> -->
+							<li ng-if="smartBatch == true" role="presentation" ng-repeat='ice in availableICE | filter:availableICEFilter' ng-click="iceCheckboxClick($event)" >
+								<label title='{{ice.statusCode}}' ng-style="{'font-weight':500}">
+									<input value='{{ice.icename}}' checked type="checkbox"/>
+									<span id='status' ng-style="{'background-color':'{{ice.color}}'}"></span>
+									{{ice.icename}}
+								<label>
+							</li>
+							<li ng-if="smartBatch == false" role="presentation" ng-repeat='ice in availableICE | filter:availableICEFilter' ng-click="availableICEFilter.icename=ice.icename;iceCheckboxClick($event,ice.icename)" >
+								<label title='{{ice.statusCode}}' ng-style="{'font-weight':500}">
+									<!-- <input value='{{ice.icename}}' checked type="checkbox"/> -->
+									<span id='status' ng-style="{'background-color':'{{ice.color}}'}"></span>
+									{{ice.icename}}
+								<label>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		  	<div class='adminControl'>
+				<div>
+					<span class="leftControl" title="ICE STATUS">ICE Status:</span>
+					<div>
+						<ul style="padding-top: 7px;width:100%">
+							<li >
+								<label title='available' class="legends">
+									<span id='status' ng-style="{'background-color':'#95c353'}"></span>
+									 Available
+								</label>
+								<label title='unavailable' class="legends">
+									<span id='status' ng-style="{'background-color':'#fdc010'}"></span>
+									 Unavilable
+								</label>
+								<label title='do not disturb' class="legends">
+									<span id='status' ng-style="{'background-color':'red'}"></span>
+									 Do Not Disturb
+								</label>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-default btn-default-modal" ng-click="scheduleClick($event)">Schedule</button>
+		  </div>
+	   </div>
+	</div>
+ </div>
+ <!-- ICE Pool Popup -->

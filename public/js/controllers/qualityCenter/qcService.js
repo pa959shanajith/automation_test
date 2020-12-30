@@ -48,7 +48,16 @@ mySPA.factory('qcServices', ['$http','$q', function ($http,$q)   {
 						})
 					.then (function(response)	{return response.data;	},
 					function(response){	return $q.reject(response.data);});	
-    		},
+			},
+			saveUnsyncDetails: function(undoMapList){
+				var param = "saveUnsyncDetails";
+				return $http.post('/saveUnsyncDetails', {
+					action: param,
+					undoMapList : undoMapList, 
+				})
+				.then (function(response)	{return response.data;	},
+				function(response){	return $q.reject(response.data);});	
+			},
 				viewQcMappedList_ICE: function(userid){
 						var param = "viewQcMappedList_ICE";
 						var userid = JSON.parse(window.localStorage['_UI']).user_id

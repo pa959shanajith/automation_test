@@ -150,7 +150,7 @@ const routeUtil = {
 	"inhouse": async opts => {
 		authRouter.get(opts.route.login, async (req, res) => {
 			if (req.session.uniqueId) await utils.cloneSession(req);
-			return res.sendFile("app.html", { root: __dirname + "/../../public/" });
+			return res.sendFile("index.html", { root: __dirname + "/../../public/" });
 		});
 		authRouter.post(opts.route.login, (req, res, next) => {
 			logger.info("Inside UI service: login");
@@ -185,16 +185,19 @@ const routeUtil = {
 
 module.exports = () => {
 	passport.serializeUser((user, done) => done(null, user));
-	passport.protect = (req, res, next) => {
-		const sessFlag = (req.isAuthenticated && req.isAuthenticated())
-		const cookies = req.signedCookies;
+	passport.deserializeUser((user, done) => done(null, user));
+	passport.verifySession = req => {
+		const sessFlag = req.isAuthenticated && req.isAuthenticated()
+		const cookies = req.signedCookies || {};
 		const cookieFlag = (cookies["connect.sid"]!==undefined) && (cookies["maintain.sid"]!==undefined);
-		if (sessFlag && cookieFlag) return next();
-		var negotiator = new Negotiator(req);
-		if (negotiator.mediaType() === 'text/html') return res.redirect(options.route.login);
+		if (sessFlag && cookieFlag) return true;
+		return false;
+	};
+	passport.protect = (req, res, next) => {
+		if (passport.verifySession(req)) return next();
+		if (new Negotiator(req).mediaType() === 'text/html') return res.redirect(options.route.login);
 		else return res.send("Invalid Session");
 	};
-	passport.deserializeUser((user, done) => done(null, user));
 	authRouter.use(passport.initialize({ userProperty: "user" }));
 	authRouter.use(passport.session());
 	// Initialize inhouse & ldap login method
@@ -307,7 +310,6 @@ module.exports.validateUserState = async (req, res) => {
 			return res.send("Invalid Session");
 		}
 		let emsg = sess.emsg;
-		const user = req.user;
 		const dndsess = sess.dndSess || (!emsg && sess.logged);
 		if (emsg || dndsess) {
 			if (dndsess) {
@@ -318,7 +320,7 @@ module.exports.validateUserState = async (req, res) => {
 			return res.send(emsg);
 		}
 
-		if (!user) {
+		if (!req.isAuthenticated()) {
 			logger.rewriters[0] = function(level, msg, meta) {
 				meta.username = null;
 				meta.userid = null;
@@ -330,6 +332,7 @@ module.exports.validateUserState = async (req, res) => {
 		}
 
 		emsg = "fail";
+		const user = req.user;
 		const username = (user.username || "").toLowerCase();
 		if (username.length === 0) {
 			logger.error(`User ${username} does not have a valid login session`);

@@ -911,7 +911,8 @@ input[type="radio"]{
 .left-top-section-utility{
 	border-bottom: none !important;
 }
-#left-bottom-section {
+#left-bottom-section,
+#left-bottom-section-app {
     /*height: 25%;*/
     float: left;
     width: 100%;
@@ -919,7 +920,8 @@ input[type="radio"]{
 }
 
 #left-top-section ul,
-#left-bottom-section ul {
+#left-bottom-section ul,
+#left-bottom-section-app ul {
     /* float: left; */
     width: 100%;
     padding: 0;
@@ -927,7 +929,8 @@ input[type="radio"]{
     text-align: center;
 }
 
-#left-bottom-section ul {
+#left-bottom-section ul,
+#left-bottom-section-app ul {
     /*position: absolute;*/
     position: relative;
     /* top: 120px; */
@@ -939,7 +942,8 @@ input[type="radio"]{
 }
 
 #left-top-section ul li,
-#left-bottom-section ul li {
+#left-bottom-section ul li,
+#left-bottom-section-app ul li {
     list-style-type: none;
     float: left;
     width: 100%;
@@ -959,12 +963,14 @@ input[type="radio"]{
     margin-top: 20%;
 }
 
-#left-bottom-section ul li {
+#left-bottom-section ul li,
+#left-bottom-section-app ul li {
     margin-top: 0;
     margin-bottom: 16%;
 }
 
-#left-bottom-section ul li:last-child {
+#left-bottom-section ul li:last-child,
+#left-bottom-section-app ul li:last-child {
     margin-bottom: 0;
 }
 
@@ -976,7 +982,8 @@ input[type="radio"]{
 }
 
 #left-top-section ul li span,
-#left-bottom-section ul li span {
+#left-bottom-section ul li span,
+#left-bottom-section-app ul li span {
     /* font-size: 18px; */
     float: left;
     width: 100%;
@@ -992,7 +999,8 @@ input[type="radio"]{
 }*/
 
 #left-top-section ul li a,
-#left-bottom-section ul li a {
+#left-bottom-section ul li a,
+#left-bottom-section-app ul li a {
     text-decoration: none;
     font-size: 12px;
     font-family: 'LatoWebLight';
@@ -1010,19 +1018,23 @@ input[type="radio"]{
 }
 
 #left-top-section ul li a:focus,
-#left-bottom-section ul li a:focus {
+#left-bottom-section ul li a:focus,
+#left-bottom-section-app ul li a:focus {
     outline: 0
 }
 
 #left-top-section ul li a span img,
 #left-bottom-section ul li a span img,
+#left-bottom-section-app ul li a span img,
 #left-top-section ul li a span span.fa,
-#left-bottom-section ul li a span span.fa {
+#left-bottom-section ul li a span span.fa,
+#left-bottom-section-app ul li a span span.fa {
     padding: 8px 10px;
 }
 
 #left-top-section ul li a span span.fa,
-#left-bottom-section ul li a span span.fa {
+#left-bottom-section ul li a span span.fa,
+#left-bottom-section-app ul li a span span.fa {
     font-size: 30px;
     vertical-align: middle;
     float: none;
@@ -1031,8 +1043,10 @@ input[type="radio"]{
 
 #left-top-section ul li a:hover span img,
 #left-bottom-section ul li a:hover span img,
+#left-bottom-section-app ul li a:hover span img,
 #left-top-section ul li a:hover span span.fa,
-#left-bottom-section ul li a:hover span span.fa {
+#left-bottom-section ul li a:hover span span.fa,
+#left-bottom-section-app ul li a:hover span span.fa {
     /*background: #331d4c;*/
     background: #523176;
     border-radius: 5px;
@@ -1083,7 +1097,8 @@ input[type="radio"]{
 }
 
 #left-top-section ul li label,
-#left-bottom-section ul li a {
+#left-bottom-section ul li a,
+#left-bottom-section-app ul li a {
     font-weight: normal;
     font-size: 16px;
 }
@@ -2396,6 +2411,48 @@ input[disabled]{
 /*****************Execution CSS*****************/
 
 /******Exectuion Mid Section******/
+#selectIcePoolIce .adminControl{ 
+    padding: 0px 40px !important;
+}
+#selectIcePoolIce .error-border{
+    border: 1px solid red!important;
+}
+#selectIcePoolIce select{
+    max-width: 180px;
+    height: 35px;
+}
+#selectIcePoolIce ul {
+    width: 335px;
+    left: 171px;
+    max-height: 123px;
+    background: white;
+}
+#selectIcePoolIce ul input[type="checkbox"] {
+    background-color: red;
+    width:auto
+}
+#selectIcePoolIce .legends{
+    display:'inline-block';
+    font-weight:500;
+}
+#status{
+    height: 7px;
+    width: 7px;
+    margin: 2px 5px;
+    border-radius: 50%;
+    display: inline-block;
+}
+#status.online{
+    background-color: green;
+}
+#selectIcePoolIce #userIdName{
+    width: 335px;
+    left: 171px;
+}
+#selectIcePoolIce .modal-body{
+    height: 200px;
+    padding: 40px 15px;
+}
 #pageContent{
 	float:left;
 	width:100%;
@@ -3363,6 +3420,15 @@ li.select_all .addCustObj{
     text-overflow: ellipsis;
 }
 
+#selectDefIce .adminControl{
+    height: 55px;
+}
+
+#selectDefIce select{
+    height: 27px;
+}
+
+
 
 /******************Header CSS***************************/
 
@@ -3420,9 +3486,13 @@ li.select_all .addCustObj{
     margin-top: 5px;
 }
 
-.adminControl div input, .adminControl div select {
+.adminControl div input, .adminControl div select, .adminControl div ul {
     /* display: inline-block; */
 	width: calc(100% - 130px);
+}
+
+.adminControl div ul {
+	left: 130px;
 }
 
 .adminSelect:focus {
@@ -3711,6 +3781,11 @@ li.select_all .addCustObj{
 	margin-right: 50px;
 }
 
+.userLDAPFetch div ul{
+    left: initial;
+    width: 100%;
+}
+
 .selectlg{
 	margin-left: 0;
     width: 100%;
@@ -3956,6 +4031,93 @@ select[multiple]:-internal-list-box option:checked {
     padding-left: 18px;
     width: fit-content;
 }
+
+/*** ICEPOOL CREATETAB CSS **/
+select:focus{
+    outline: none;
+}
+.error-border{
+    border-bottom: 1px solid red!important;
+}
+#deleteGlobalModal .modal-body p{
+    white-space: pre-wrap;
+}
+#create-icepool .adminControl{
+    width:75%
+}
+#create-icepool .adminControl div span{
+    width: 95px;
+    padding-left: 10px;
+}
+#update-icepool-rename .hide{
+    display: none;
+}
+#allocate-icepool .adminControl {
+    width: 75%;
+    padding-left: 50px;
+}
+#allocate-icepool .adminControl button{
+    margin-right: 10px;
+    border-radius: 6px;
+}
+#allocate-icepool .adminControl span{
+    margin-right: 20px;
+    border-radius: 6px;
+}
+.unactive-opt{
+    box-shadow: 2px 2px #8469a0;
+    background: #6e469896;
+}
+#icepoolNumInp{
+    width: 200px;
+    border: 1px solid !important;;
+}
+#search-ice-pool{
+    padding:0 !important;
+    margin-bottom: 0;
+}
+#search-ice-pool :active{
+    outline: 0!important;
+}
+#search-ice-pool ul{
+   left:0
+}
+#specific-ice-pool{
+    padding: 0;
+}
+#specific-ice-pool .hide{
+    display: none;
+}
+#specific-ice-pool > .left-select{
+    width: 45%;
+}
+#specific-ice-pool > .left-select label{
+    margin-bottom: 14px;
+    line-height: 2;
+}
+#specific-ice-pool > .right-select{
+    width: 45%;
+}
+#specific-ice-pool > .right-select label{
+    line-height: 2;
+}
+#specific-ice-pool > .wrap-editpro button{
+    margin-left: 30%;
+}
+#specific-ice-pool .adminControl {
+    width: 65%;
+    float: right;
+    padding-left: 0px;
+}
+.edit-icepool-proj{
+    margin: 15px 0
+}
+.btn:focus, .btn:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+/*** ICEPOOL CREATETAB CSS **/
+
 /*****************ADMIN CSS NEW ************************/
 
 /******************Reports CSS***************************/
@@ -4505,7 +4667,8 @@ select:-webkit-autofill:focus {
 	/*.leftQcStructure, .rightQcStructure{width: calc(100% - 505px) !important; height: 720px !important;}
 	.qcActionBtnFirstChild{margin-left: 480px !important;}
 	.qcActionBtn label:nth-child(2){left: 440px !important;}*/
-	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 236px) !important;}
+    .qcDomProContainer select, .qcProContainer select{width: calc(100% - 236px) !important;}
+    .zephyrDomProContainer select, .zephyrProContainer select{width: calc(100% - 236px) !important;}
     .mappedFiles{height: calc(100% - 53px) !important;}
 }
 
@@ -4533,16 +4696,24 @@ select:-webkit-autofill:focus {
 	#encrypt_btn, #reset_btn{padding: 0px 25px !important;}
 
     .leftQcStructure, .rightQcStructure{width: calc(100% - 505px) !important; height: 550px !important;}
-	.qcActionBtnFirstChild{margin-left: 472px !important;}
-	.qcActionBtn label:nth-child(2){left: 440px !important;}
-	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 226px) !important;}
+    .leftZephyrStructure, .rightZephyrStructure{width: calc(100% - 505px) !important; height: 550px !important;}
+    .qcActionBtnFirstChild{margin-left: 472px !important;}
+    .zephyrActionBtnFirstChild{margin-left: 472px !important;}
+    .qcActionBtn label:nth-child(2){left: 440px !important;}
+    .zephyActionBtn label:nth-child(2){left: 440px !important;}
+    .qcDomProContainer select, .qcProContainer select{width: calc(100% - 226px) !important;}
+    .zephyrDomProContainer select, .zephyrProContainer select{width: calc(100% - 226px) !important;}
     .mappedFiles{height: calc(100% - 53px) !important;}
 }
 @media only screen and (height:790px){
      .leftQcStructure, .rightQcStructure{width: calc(100% - 506px) !important; height: 570px !important;}
-	.qcActionBtnFirstChild{margin-left: 480px !important;}
-	.qcActionBtn label:nth-child(2){left: 438px !important;}
-	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 225px) !important;}
+     .leftZephyrStructure, .rightZephyrStructure{width: calc(100% - 506px) !important; height: 570px !important;}
+    .qcActionBtnFirstChild{margin-left: 480px !important;}
+    .zephyrActionBtnFirstChild{margin-left: 480px !important;}
+    .qcActionBtn label:nth-child(2){left: 438px !important;}
+    .zephyActionBtn label:nth-child(2){left: 438px !important;}
+    .qcDomProContainer select, .qcProContainer select{width: calc(100% - 225px) !important;}
+    .zephyrDomProContainer select, .zephyrProContainer select{width: calc(100% - 225px) !important;}
     .mappedFiles{height: calc(100% - 54px) !important;}
     .middle-section-testsuites, .bottom-section-testsuites{height: calc(100% - 408px);}
     .suitestartend thead{width: calc(100% - 732px);}
@@ -4645,7 +4816,7 @@ select:-webkit-autofill:focus {
 }
 
 @media screen and (min-height: 1000px) and (max-height: 1080px){
-	#left-bottom-section ul li{margin-bottom:12px;}
+    #left-bottom-section ul li,#left-bottom-section-app ul li {margin-bottom:12px;}
 	.list-inline-right{padding-right: 0;}
 	.list-inline-right li:first-child{margin-right:6px;}
 	.list-inline-right li:nth-child(2){margin-right:-24px;}
@@ -4660,9 +4831,13 @@ select:-webkit-autofill:focus {
 
 @media only screen and (width: 1440px) and (height: 794px){
     .leftQcStructure, .rightQcStructure{width: calc(100% - 580px) !important; height: 578px !important;}
-	.qcActionBtnFirstChild{margin-left: 630px !important;}
-	.qcActionBtn label:nth-child(2){left: 514px !important;}
-	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 264px) !important;}
+    .leftZephyrStructure, .rightZephyrStructure{width: calc(100% - 580px) !important; height: 578px !important;}
+    .qcActionBtnFirstChild{margin-left: 630px !important;}
+    .zephyrActionBtnFirstChild{margin-left: 630px !important;}
+    .qcActionBtn label:nth-child(2){left: 514px !important;}
+    .zephyActionBtn label:nth-child(2){left: 514px !important;}
+    .qcDomProContainer select, .qcProContainer select{width: calc(100% - 264px) !important;}
+    .zephyrDomProContainer select, .zephyrProContainer select{width: calc(100% - 264px) !important;}
     .scenarioReports thead {width: calc(100% - 312px);}
 }
 /**********Specifically for Firefox**********/
@@ -4672,8 +4847,9 @@ select:-webkit-autofill:focus {
 
 /**********Specifically for Internet Explorer**********/
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-	#left-bottom-section{
-		min-height: 36%;
+    #left-bottom-section,
+    #left-bottom-section-app{
+        min-height: 36%;
 	}
 
 	.list-inline-right > li.list-inline-item:nth-child(2){margin-right: -32px !important;}
@@ -5920,7 +6096,9 @@ ul.browserInlineIcons
 }
 .qcTestcaseName{
     padding-left:4px;
-
+}
+.zephyrTestcaseName{
+    padding-left:4px;
 }
 .qcTestcaseId{
     background: #331d4c;
@@ -5931,8 +6109,14 @@ ul.browserInlineIcons
     display: inline;
     padding: 2px;
 }
-.removeScroll
-{
+.zephyrTestcaseId{
+    background: #331d4c;
+    color: #fff;
+    border-radius: 3px;
+    display: inline;
+    padding: 2px;
+}
+.removeScroll{
     overflow: hidden !important;
 }
 
@@ -5942,18 +6126,26 @@ ul.browserInlineIcons
     width: 100%;
     height: 30px;
 }
-.users-edit{
-    width: 87%;
+
+.btn-left{
+    text-align: left;
 }
+
+.users-edit{
+    width: 87% !important;
+}
+
 .dropdown-menu-users{
     max-height:165px;
     overflow-y:scroll;
     width: 100%;
     padding: 6px;
 }
+
 .dropdown-menu-users>li{
     padding: 3px 12px;
 }
+
 .dropdown-menu-users>li:hover{
     background:#633691;
     border-radius: 3px;

@@ -51,8 +51,8 @@ mySPA.factory('LoginService', ['$http', '$q', function ($http, $q) {
 				return $q.reject(response.data);
 			});
 		},
-		checkUserState: function () {
-			return $http.post('/checkUserState')
+		validateUserState: function () {
+			return $http.post('/validateUserState')
 			.then(function (response) {
 				return response.data;
 			},
@@ -63,6 +63,19 @@ mySPA.factory('LoginService', ['$http', '$q', function ($http, $q) {
 		checkUser: function (user) {
 			return $http.post('/checkUser', {
 				username: user
+			})
+			.then(function (response) {
+				return response.data;
+			},
+				function (response) {
+				return $q.reject(response.data);
+			});
+		},
+		storeUserDetails: function (userData) {
+			var param = "storeUserDetails";
+			return $http.post('/storeUserDetails', {
+				action: param,
+				userDetails : userData
 			})
 			.then(function (response) {
 				return response.data;
