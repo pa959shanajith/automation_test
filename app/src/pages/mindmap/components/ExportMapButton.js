@@ -1,7 +1,7 @@
 import React, { Fragment, useRef, useState } from 'react';
 import {ModalContainer} from '../../global';
 import {useSelector} from 'react-redux'
-import {readTestSuite_ICE,exportToJson,exportToExcel} from '../api';
+import {readTestSuite_ICE,exportMindmap,exportToExcel} from '../api';
 import '../styles/ExportMapButton.scss'
 
 /*Component ExportMapButton
@@ -114,7 +114,7 @@ const toExcel = async(projId,modId,fname,displayError,setPopup,setBlockui) => {
 */
 const toJSON = async(modId,fname,displayError,setPopup,setBlockui) => {
     try{
-        var result =  await exportToJson(modId._id)
+        var result =  await exportMindmap(modId._id)
         if(result.error){displayError(result.error);return;}
         jsonDownload(fname+'.mm', JSON.stringify(result));
         setBlockui({show:false,content:''})
