@@ -20,15 +20,6 @@ exports.loginToZephyr_ICE = function (req, res) {
 			var username = req.session.username;
 			var name= undefined
 			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
-			var ice_keys = Object.keys(myserver.allSocketsICEUser);
-			if(name == undefined && ice_keys.length >0) {
-				for(var i =0 ; i<ice_keys.length ; ++i) {
-					if (username != ice_keys[i]) {
-						name = myserver.allSocketsICEUser[ice_keys[i]][0];
-						break;
-					}
-				}
-			}
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("ICE Socket connecting IP: %s" , ip);
@@ -122,15 +113,6 @@ exports.zephyrProjectDetails_ICE = function (req, res) {
 			var username = req.session.username;
 			var name= undefined
 			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
-			var ice_keys = Object.keys(myserver.allSocketsICEUser);
-			if(name == undefined && ice_keys.length >0) {
-				for(var i =0 ; i<ice_keys.length ; ++i) {
-					if (username != ice_keys[i]) {
-						name = myserver.allSocketsICEUser[ice_keys[i]][0];
-						break;
-					}
-				}
-			}
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.debug("ICE Socket requesting Address: %s" , name);
