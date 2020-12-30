@@ -160,13 +160,13 @@ export const exportToExcel = async(props) => {
     }
 }
 
-/*Component exportToJson
+/*Component exportMindmap
   api returns Json data
 */
 
-export const exportToJson = async(moduleId) => {
+export const exportMindmap = async(moduleId) => {
     try{
-        const res = await axios(url+'/exportToJson', {
+        const res = await axios(url+'/exportMindmap', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
