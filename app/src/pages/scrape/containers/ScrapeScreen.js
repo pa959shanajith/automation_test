@@ -179,7 +179,7 @@ const ScrapeScreen = ()=>{
         { showConfirmPop && <ConfirmPopup /> }
         { showObjModal === "addObject" && <AddObjectModal setShow={setShowObjModal} scrapeItems={scrapeItems} setScrapeItems={setScrapeItems}/> }
         { showObjModal === "compareObject" && <CompareObjectModal setShow={setShowObjModal} scrapeItems={scrapeItems} setScrapeItems={setScrapeItems}/> }
-        { showObjModal === "createObject" && <CreateObjectModal setShow={setShowObjModal} scrapeItems={scrapeItems} setScrapeItems={setScrapeItems}/>}
+        { showObjModal === "createObject" && <CreateObjectModal setShow={setShowObjModal} scrapeItems={scrapeItems} setScrapeItems={setScrapeItems} setShowPop={setShowPop}/>}
         { showAppPop && <LaunchApplication setShow={setShowAppPop} appPop={showAppPop} />}
         <div  className="ss__body">
             <Header/>

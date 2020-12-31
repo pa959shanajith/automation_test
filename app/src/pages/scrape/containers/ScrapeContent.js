@@ -245,7 +245,8 @@ const ScrapeContent = props => {
             for (let scrapeItem of scrapeItemsL) {
                 if (!scrapeItem.objId) {
                     // delete some properties then push
-                    added.push({...newScrapedData.view[scrapeItem.objIdx], custname: scrapeItem.title});
+                    if (scrapeItem.isCustom) added.push({custname: scrapeItem.title, xpath: scrapeItem.xpath, tag: scrapeItem.tag});
+                    else added.push({...newScrapedData.view[scrapeItem.objIdx], custname: scrapeItem.title});
                 } else {
                     scrapeData[scrapeItem.objId] = {...mainScrapedData.view[scrapeItem.objIdx], custname: scrapeItem.title}
                 }
@@ -312,6 +313,7 @@ const ScrapeContent = props => {
                     <div className="min">
                     <div className="con">
                     <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' minThumbSize='20px'>
+                    <div className="scrape_object_container">
                     {
                         scrapeItems.map((object, index) => !object.hide && <ScrapeObject key={index} 
                                                                             idx={index}
@@ -322,6 +324,7 @@ const ScrapeContent = props => {
                                                                             renameScrapeItem={renameScrapeItem}
                                                                         />)
                     }
+                    </div>
                     </ScrollBar>
                     </div>
                     </div>
