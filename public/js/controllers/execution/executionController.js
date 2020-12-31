@@ -740,6 +740,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	};
 
 	const allocateICEPopup = () =>{
+		$scope.smartMode = false;
+		$scope.selectedICE = "";
 		var projId = JSON.parse(window.localStorage['_CT']).testSuiteDetails[0].projectidts
 		var data = {poolid:"",projectids: [projId]}
 		$("#chooseICEPool option").slice(1).remove()
@@ -848,7 +850,11 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		var smartModeType = ''
 		if($scope.smartMode){
 			smartModeType = $('#executionType').val() //change value of dropdown in execution.html if needed
-			$('#ice-dropdown input:checked').each(function(){iceList.push($(this).val())})
+			$('#ice-dropdown input:checked').each(function(){
+                if($(this).parent().attr('title')=='Online'){
+                    iceList.push($(this).val())
+                }
+            })
 			$scope.selectedICE = iceList
 		}
 		else if(!$scope.selectedICE){
@@ -928,6 +934,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			var arr = Object.entries({[id]:$scope.poolList[id]})
 		}
 		populateICElist(arr,unallocated)
+		$scope.$apply();
 	})
 	
 	//Execute TestSuite Functionality

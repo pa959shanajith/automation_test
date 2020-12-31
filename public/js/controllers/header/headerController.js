@@ -451,9 +451,9 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 
 	$scope.getIce = async () => {
 		try {
-			const res = await fetch("/AvoAssure_ICE");
+			const res = await fetch("/AvoAssure_ICE.zip");
 			const status = await res.text();
-			if (status == "available") location.href = location.origin+"/AvoAssure_ICE?file=getICE"
+			if (status == "available") location.href = location.origin+"/AvoAssure_ICE.zip?file=getICE"
 			else openHeaderModalPopup("switchRoleStatus", "Download Avo Assure ICE", "Package is not available");
 		} catch (ex) {
 			console.error("Error while downloading ICE package. Error:", ex);
