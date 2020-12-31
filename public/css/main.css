@@ -5775,37 +5775,32 @@ Webocular report css
 display:none
 } 
 
-.divMethodContainer
-{
+.divMethodContainer {
     float:left;
     width: 100%;
     max-height: 500px;
     overflow: auto;
 }
-#tblMethodLevel th
-{
+#tblMethodLevel th {
     font-family: 'LatoWebBold';
     text-align: left;
     border-right: 1px solid #fff;
 }
-#tblMethodLevel th,#tblMethodLevel td
-{
+#tblMethodLevel th,#tblMethodLevel td {
     /*padding: 1px 0px;*/
     text-align: center;
     width: 20%;
     white-space: nowrap;
     padding: 3px;
 }
-#tblMethodLevel td div
-{
+#tblMethodLevel td div {
     white-space: normal;
     word-break: break-all;
     display: block;
     font-family: 'LatoWeb';
     padding: 1%;
 }
-.heading-bold
-{
+.heading-bold {
     font-family: LatoWebBold;
 }
 
@@ -6698,4 +6693,16 @@ h4.titleBadge
     background: #ddd;
     border-radius: 7px;
     cursor: pointer;
+}
+
+.num-idx {
+    white-space: pre;
+}
+
+#tnc-content h4, #tnc-content h5 {
+    font-family: LatoWebBold;
+}
+
+#tnc-content p {
+    text-align: justify;
 }
