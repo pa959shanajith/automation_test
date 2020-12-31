@@ -9,6 +9,9 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		$("#testPlanTab").trigger("click");
 	}, 500);
 	var mappedList = [];
+	var undoMapList = [];
+	var undoMapIdList = [];
+	var undoItem = '';
 	if(window.localStorage['navigateScreen'] != "p_ALM"){
 		return $rootScope.redirectPage();
 	}
@@ -19,20 +22,20 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		$(".selectBrowser").find("img").removeClass("selectedIcon");
 		$(this).find("img").addClass("selectedIcon");
 	});
-	$scope.loadDomains = function(){
-		var domainData = $scope.domainData;
-		if(domainData){
-			$timeout(function(){
-				if((domainData != undefined || domainData != "") && domainData.domain.length > 0){
-					$(".qcSelectDomain").empty();
-					$(".qcSelectDomain").append("<option selected disabled>Select Domain</option>");
-					for(var i=0;i<domainData.domain.length;i++){
-						$(".qcSelectDomain").append("<option value='"+domainData.domain[i]+"'>"+domainData.domain[i]+"</option>");
-					}
-				}
-			}, 500);
-		}
-	};
+	// $scope.loadDomains = function(){
+	// 	var domainData = $scope.domainData;
+	// 	if(domainData){
+	// 		$timeout(function(){
+	// 			if((domainData != undefined || domainData != "") && domainData.domain.length > 0){
+	// 				$(".qcSelectDomain").empty();
+	// 				$(".qcSelectDomain").append("<option selected disabled>Select Domain</option>");
+	// 				for(var i=0;i<domainData.domain.length;i++){
+	// 					$(".qcSelectDomain").append("<option value='"+domainData.domain[i]+"'>"+domainData.domain[i]+"</option>");
+	// 				}
+	// 			}
+	// 		}, 500);
+	// 	}
+	// };
 
 	socket.on('ICEnotAvailable', function () {
 		unblockUI();
@@ -125,6 +128,9 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		$scope.testLabGenerator = false;
 		$(".mappedFiles, .mappedFilesLabel").hide();
 		$("#page-taskName span").text("ALM Integration");
+		$(".totalcountbx").hide();
+		$(".almtestcasesbx").hide();
+		$(".scenariobx").hide();
 		$(".qcActionBtn, .leftQcStructure, .rightQcStructure").show();
 	};
 
@@ -330,37 +336,306 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 	});
 	
 	//Select testset
-	$(document).on('click','.testcaselink', function(){
-		$('.testcaselink').removeClass("selectedToMap");
-		$('.testcaselink').find(".qcSyncronise, .qcUndoSyncronise").hide();
-		$('.testcaselink').prop("style","background-color:none;border-radius:0px;");
-		$(this).addClass("selectedToMap");
-		$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
-		$(this).find(".qcSyncronise, .qcUndoSyncronise").show();
+	$(document).on('click','.testcaselink', function(e){
+		// $('.testcaselink').removeClass("selectedToMap");
+		// $('.testcaselink').find(".qcSyncronise, .qcUndoSyncronise").hide();
+		// $('.testcaselink').prop("style","background-color:none;border-radius:0px;");
+		// $(this).addClass("selectedToMap");
+		if($(this).hasClass("selectedToMap") && !e.ctrlKey) {
+			$('.testcaselink').find(".qcSyncronise, .qcUndoSyncronise").hide();
+			$('.testcaselink').prop("style","background-color:none;border-radius:0px;");
+			$('.testcaselink').removeClass("selectedToMap");
+			$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
+			$(this).find(".qcSyncronise, .qcUndoSyncronise").show();
+			$(this).addClass("selectedToMap");
+		} else if($(this).hasClass("selectedToMap")) {
+			$(this).removeClass("selectedToMap");
+			$(this).prop("style","background-color:none;border-radius:0px;");
+			$(this).find(".qcSyncronise, .qcUndoSyncronise").hide();
+		} else if (e.ctrlKey) {
+			// $(this).addClass("selectedToMap");
+			$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
+			$(this).find(".qcSyncronise, .qcUndoSyncronise").show();
+			$(this).addClass("selectedToMap");
+		}
+		else {
+			// $(this).addClass("selectedToMap");
+			// $('.testcaselink').removeClass("selectedToMap");
+			$('.testcaselink').find(".qcSyncronise, .qcUndoSyncronise").hide();
+			$('.testcaselink').prop("style","background-color:none;border-radius:0px;");
+			$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
+			$(this).find(".qcSyncronise, .qcUndoSyncronise").show();
+			$(this).addClass("selectedToMap");
+		}
+		e.stopPropagation();
 	});
-	$(document).on('click','.testScenariolink', function(){
-		
-		$('.selectedToMap').prop("style","background-color:none;border-radius:0px;");
-		$(this).siblings().removeClass("selectedToMap");
-	//	$(this).siblings().prop("style","background-color:none;border-radius:0px;");
-		$(this).addClass("selectedToMap");
-		$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
-		
+	$(document).on('click','.testScenariolink', function(e){
+		if($(this).hasClass("selectedToMap") && !e.ctrlKey) {
+			$('.testScenariolink').prop("style","background-color:none;border-radius:0px;");
+			$('.testScenariolink').removeClass("selectedToMap");
+			$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
+			$(this).addClass("selectedToMap");
+		} else if($(this).hasClass("selectedToMap")) {
+			$(this).removeClass("selectedToMap");
+			$(this).prop("style","background-color:none;border-radius:0px;");
+		} else if (e.ctrlKey) {
+			// $(this).addClass("selectedToMap");
+			$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
+			$(this).addClass("selectedToMap");
+		}
+		else {
+			// $(this).addClass("selectedToMap");
+			// $('.testcaselink').removeClass("selectedToMap");
+			$('.testScenariolink').prop("style","background-color:none;border-radius:0px;");
+			$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
+			$(this).addClass("selectedToMap");
+		}
+		e.stopPropagation();
+		//ols
+		// $(this).addClass("selectedToMap");
+		// if (e.ctrlKey) {
+		// 	$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
+		// } else {
+		// 	$('.testScenariolink').prop("style","background-color:none;border-radius:0px;");
+		// 	$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
+		// }
 	});
 
-	//Undo Mapping
+	$(document).on('click','.almtestScenariolink', function(e){
+		$('.almtestcaselink').css({"background-color":"#fad7f1fb"});
+		$('.almtestcaselink').find(".viewUndoSyncronise").hide();
+		$('.almtestcaselink').removeClass("selectedToMap");
+		var mapid = $(this).parent().data("mapid");
+		if($(this).hasClass("selectedToMap") && !e.ctrlKey) {
+			$('.almtestScenariolink').css({"background-color": "#E1CAFF"});
+			$('.almtestScenariolink').find(".viewUndoSyncronise").hide();
+			$('.almtestScenariolink label').removeClass("selectedToMap");
+			$(this).css({"background-color": "#c8c8ff"});
+			$(this).find(".viewUndoSyncronise").show();
+			$(this).addClass("selectedToMap");
+		} else if($(this).hasClass("selectedToMap")) {
+			$(this).removeClass("selectedToMap");
+			$(this).css({"background-color": "#E1CAFF"});
+			$(this).find(".viewUndoSyncronise").hide();
+		} else if (e.ctrlKey) {
+			$(this).css({"background-color": "#c8c8ff"});
+			$(this).find(".viewUndoSyncronise").show();
+			$(this).addClass("selectedToMap");
+		} else {
+			$('.almtestScenariolink').css({"background-color": "#E1CAFF"});
+			$('.almtestScenariolink').find(".viewUndoSyncronise").hide();
+			$(this).css({"background-color": "#c8c8ff"});
+			$(this).find(".viewUndoSyncronise").show();
+			$(".almtestScenariolink").removeClass("selectedToMap");
+			$(this).addClass("selectedToMap");
+		}	
+		e.stopPropagation();
+	});
+
+	$(document).on('click','.almtestcaselink', function(e){
+		$('.almtestScenariolink').css({"background-color": "#E1CAFF"});
+		$('.almtestScenariolink').find(".viewUndoSyncronise").hide();
+		$('.almtestScenariolink').removeClass("selectedToMap");
+		if($(this).hasClass("selectedToMap") && !e.ctrlKey) {
+			$('.almtestcaselink').css({"background-color": "#fad7f1fb"});
+			$('.almtestcaselink').find(".viewUndoSyncronise").hide();
+			$('.almtestcaselink label').removeClass("selectedToMap");
+			$(this).css({"background-color": "#c8c8e6"});
+			$(this).find(".viewUndoSyncronise").show();
+			$(this).addClass("selectedToMap");
+		} else if($(this).hasClass("selectedToMap")) {
+			$(this).removeClass("selectedToMap");
+			$(this).css({"background-color": "#fad7f1fb"});
+			$(this).find(".viewUndoSyncronise").hide();
+		} else if (e.ctrlKey) {
+			$(this).css({"background-color": "#c8c8e6"});
+			$(this).find(".viewUndoSyncronise").show();
+			$(this).addClass("selectedToMap");
+		} else {
+			$('.almtestcaselink').css({"background-color": "#fad7f1fb"});
+			$('.almtestcaselink').find(".viewUndoSyncronise").hide();
+			$(this).css({"background-color": "#c8c8e6"});
+			$(this).find(".viewUndoSyncronise").show();
+			$(this).addClass("selectedToMap");
+		}	
+		e.stopPropagation();	
+	});
+
+	$(document).on('click', ".arrowdown", function(event) {
+		var maplist = $(this).parents("div")[0].classList[1];
+		$('.'+maplist).find(".viewTab").css({"display":"block"});
+		if($(this).parents("label").hasClass("almtestcaselink")) {
+			var labList = $('.'+maplist).find(".almtestcaselink");
+			labList[0].style["border-radius"] = "5px 5px 0px 0px";
+			labList[labList.length-1].style["border-radius"] = "0px 0px 5px 5px";
+		} else if ($(this).parents("label").hasClass("almtestScenariolink")) {
+			var labList = $('.'+maplist).find(".almtestScenariolink");
+			labList[0].style["border-radius"] = "5px 5px 0px 0px";
+			labList[labList.length-1].style["border-radius"] = "0px 0px 5px 5px";
+		}
+		$(this).hide();
+		$(this).siblings(".arrowup").show();
+		event.stopPropagation();
+	});
+
+	$(document).on('click', ".arrowup", function(event) {
+		var maplist = $(this).parents("div")[0].classList[1];
+		var styleattr = $('.'+maplist).find(".viewTab");
+		for(var i=2;i<styleattr.length;++i) {
+			styleattr[i].style["display"] = "none";
+		}
+		if($(this).parent().hasClass("almtestcaselink")) {
+			var labList = $('.'+maplist).find(".almtestcaselink");
+			labList[0].style["border-radius"] = "5px";
+		} else if ($(this).parent("label").hasClass("almtestScenariolink")) {
+			var labList = $('.'+maplist).find(".almtestScenariolink");
+			labList[0].style["border-radius"] = "5px";
+		}
+		$(this).hide();
+		$(this).siblings(".arrowdown").show();
+		event.stopPropagation();
+	});
+
+
+	$(document).on('click', ".viewUndoSyncronise", function(event){
+		var undoMapItems = $(".selectedToMap");
+		for (var i=0;i<undoMapItems.length;++i) {
+			var mapid = undoMapItems[i].parentElement.getAttribute("data-mapid");
+
+			//scenid
+			if(undoMapItems[i].classList.contains('almtestScenariolink')) {
+				var scenId = undoMapItems[i].getAttribute("data-testscenid")
+				if(undoItem == 'testcase') {
+					undoMapList = [];
+					undoMapIdList = [];
+				}
+				if (undoMapIdList.length == 0){
+					undoItem = 'testscenario';
+					var newObj = {
+						'mapid': mapid,
+						'testscenarioid': []
+					};
+					newObj.testscenarioid.push(scenId);
+					undoMapList.push(newObj);
+					undoMapIdList.push(mapid);
+				} else if (undoMapIdList.indexOf(mapid) == -1){
+					var newObj = {
+						'mapid': mapid,
+						'testscenarioid': []
+					};
+					newObj.testscenarioid.push(scenId);
+					undoMapList.push(newObj);
+					undoMapIdList.push(mapid);
+				} else {
+					for (var j=0;j<undoMapList.length;++j) {
+						if (undoMapList[j].mapid == mapid) {
+							undoMapList[j].testscenarioid.push(scenId);
+						}
+					}
+				}
+			}
+
+			//testcase
+			if(undoMapItems[i].classList.contains('almtestcaselink')) {
+				var testcase = undoMapItems[i].innerText.trim();
+				var folderpath = undoMapItems[i].getAttribute("data-qcfolderpath");
+				var testset = undoMapItems[i].getAttribute("data-qctestset");
+				if(undoItem == 'testscenario') {
+					undoMapList = [];
+					undoMapIdList = [];
+				}
+				if (undoMapIdList.length == 0){
+					undoItem = 'testcase';
+					var newObj = {
+						'mapid': mapid,
+						'qctestcase': [],
+						'qcfolderpath': [],
+						'qctestset': []
+					};
+					newObj.qctestcase.push(testcase);
+					newObj.qcfolderpath.push(folderpath);
+					newObj.qctestset.push(testset);
+					undoMapList.push(newObj);
+					undoMapIdList.push(mapid);
+				} else if (undoMapIdList.indexOf(mapid) == -1){
+					var newObj = {
+						'mapid': mapid,
+						'qctestcase': [],
+						'qcfolderpath': [],
+						'qctestset': []
+					};
+					newObj.qctestcase.push(testcase);
+					newObj.qcfolderpath.push(folderpath);
+					newObj.qctestset.push(testset);
+					undoMapList.push(newObj);
+					undoMapIdList.push(mapid);
+				} else {
+					for (var j=0;j<undoMapList.length;++j) {
+						if (undoMapList[j].mapid == mapid) {
+							undoMapList[j].qctestcase.push(testcase);
+							undoMapList[j].qcfolderpath.push(folderpath);
+							undoMapList[j].qctestset.push(testset);
+						}
+					}
+				}
+			}
+		}
+		undoMapItems.find(".viewUndoSyncronise").hide();
+		event.stopPropagation();
+	});
+
+	//Save unsync details
+	$scope.saveUnsyncDetails = function(){
+		if(undoMapList.length > 0){
+			qcServices.saveUnsyncDetails(undoMapList)
+			.then(function(data){
+				if(data == "unavailableLocalServer"){
+					openModelPopup("Save Mapped Testcase", "ICE Engine is not available, Please run the batch file and connect to the Server.");
+				}
+				else if(data == "scheduleModeOn"){
+					openModelPopup("Save Mapped Testcase", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+				}
+				else if(data == "fail"){
+					openModelPopup("Save Mapped Testcase", "failed to save");
+				}
+				else if(data == "success"){
+					undoMapList = [];
+					undoMapIdList = [];
+					$('.almtestScenariolink, .almtestcaselink').removeClass("selectedToMap");
+					$('.almtestScenariolink').find(".viewUndoSyncronise").hide();
+					$('.almtestcaselink').find(".viewUndoSyncronise").hide();
+					$('.almtestcaselink').css({"background-color":"#fad7f1fb"});
+					$('.almtestScenariolink').css({"background-color": "#E1CAFF"});
+					openModelPopup("Save Mapped Testcase", "Saved successfully");
+					$scope.displayMappedFilesTab();
+				}
+			},
+			function(error) {	console.log("Error in qcController.js file mapTestcaseToAvoAssure method! \r\n "+(error.data));
+			});
+		}
+		else 	openModelPopup("Save Mapped Testcase", "Unmap testcase/scenario before Save");
+	};
+
+	// Undo Mapping
 	$(document).on('click', ".qcUndoSyncronise", function(){
-		var qcTestcaseName = $(this).siblings("label").text();
-		var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
-		for(var i=0;i<mappedList.length;i++){
-			if(qcTestcaseName == mappedList[i].testcase && qcTestsetName == mappedList[i].testset){
+	var selectedToMap = $(".qcTreeContainer").find(".selectedToMap")
+	var qcTestcase = []
+	for(var i=0;i<selectedToMap.length;i++){
+		qcTestcase.push(selectedToMap[i].innerText.trim())
+	}
+	var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
+	for(var i=0;i<mappedList.length;i++){
+		var mappedTcList = mappedList[i].testcase
+		if (qcTestcase.length==mappedTcList.length){
+			if(qcTestsetName == mappedList[i].testset){
 				delete mappedList[i];
 				mappedList =  mappedList.filter(function(n){ return n != null; });
-				$('.testScenariolink').removeClass("selectedToMap");
-				$('.testScenariolink').prop("style","background-color:none;border-radius:0px;");
-				$(this).parent().css({"background-color":"rgb(225, 202, 255)"});
-				$(this).siblings(".qcSyncronise").show();
-				break;
+				var selectedList = $(".selectedToMap").siblings("label").prevObject
+				for(var i=0;i<selectedList.length;i++){
+					selectedList[i].style.cssText = "background-color: rgb(225, 202, 255)";
+					selectedList[i].children[2].style.cssText="display:inline";
+				}
+				}
 			}
 		}
 	});
@@ -369,29 +644,50 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 	$(document).on('click', ".qcSyncronise", function(event){
 		var getDomainName = $(".qcSelectDomain option:selected").val();
 		var getProjectName = $(".qcSelectProject option:selected").val();
-		var qcTestcaseName = $(this).siblings("label").children()[1].innerText;
-		var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
-		var qcFolderPath = $(this).parent("li").parent("ul").prev("li").parent("ul").prev("li").data("folderpath");
-		var AvoAssureScenarioId = $(".qcAvoAssureTreeContainer").find(".selectedToMap").data("scenarioid");
+		var qcTestcaseNameList = []
+		var qcFolderPath = []
+		var qcTestsetName = []
+		var selectedElements=$(".qcTreeContainer").find(".selectedToMap")
+		for(var i=0;i<selectedElements.length;i++){
+			var cur_obj =  selectedElements[i].innerText
+			var folder = selectedElements[i].parentElement.previousElementSibling.dataset["testsetpath"]
+			var testset = selectedElements[i].parentElement.previousElementSibling.innerText
+			qcTestsetName.push(testset)
+			qcFolderPath.push(folder)
+			qcTestcaseNameList.push(cur_obj)
+		}
+		var avoAssureScenarioList = []
+		var scenarioElements = $(".qcAvoAssureTreeContainer").find(".selectedToMap");
+		for(var i=0;i<scenarioElements.length;i++){
+			var cur_obj = scenarioElements[i].getAttribute("data-scenarioid")
+			avoAssureScenarioList.push(cur_obj)
+		}
+
+		// var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
+		// var qcFolderPath = $(this).parent("li").parent("ul").prev("li").parent("ul").prev("li").data("folderpath");
 		
-		if(!getDomainName)	openModelPopup("Save Mapped Testcase", "Please select domain");
+		if(qcTestcaseNameList.length>1 && avoAssureScenarioList.length>1) {
+			openModelPopup("Save Mapped Testcase","Cannot map multiple test cases with multiple scenarios")
+		}
+		else if(!getDomainName)	openModelPopup("Save Mapped Testcase", "Please select domain");
 		else if(!getProjectName)	openModelPopup("Save Mapped Testcase", "Please select project");
-		else if(!qcTestcaseName)	openModelPopup("Save Mapped Testcase", "Please select Testcase");
-		else if(!qcTestsetName)	openModelPopup("Save Mapped Testcase", "Please select Testset");
-		else if(!AvoAssureScenarioId)	openModelPopup("Save Mapped Testcase", "Please select scenario");
+		else if(qcTestcaseNameList.length == 0)	openModelPopup("Save Mapped Testcase", "Please select Testcase");
+		else if(avoAssureScenarioList.length == 0)  openModelPopup("Save Mapped Testcase", "Please select Scenario");
 		else{
 			mappedList.push({
 				'domain': getDomainName,
 				'project': getProjectName,			
-				'testcase': qcTestcaseName,
+				'testcase': qcTestcaseNameList,
 				'testset': qcTestsetName,
 				'folderpath': qcFolderPath,
-				'scenarioId': AvoAssureScenarioId,
+				'scenarioId': avoAssureScenarioList,
 			});
-			$(this).parent().css({"background-color":"#ddd"});
-			$(this).hide();
-			event.stopPropagation();
+			for(var i=0;i<selectedElements.length;i++){
+				selectedElements[i].style.cssText = "background-color: #ddd";
+				selectedElements[i].children[2].style.cssText="display:hide";
+			}
 		}
+		event.stopPropagation();
 	});
 
 	//Submit mapped details
@@ -410,7 +706,6 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				}
 				else if(data == "success"){
 					mappedList = [];
-					//mappedList = [];
 					$('.testcaselink, .testScenariolink').removeClass("selectedToMap");
 					$('.testcaselink').find(".qcSyncronise, .qcUndoSyncronise").hide();
 					$('.testcaselink, .testScenariolink').prop("style","background-color:none;border-radius:0px;");
@@ -426,9 +721,11 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 	$scope.displayMappedFilesTab = function(){
 		blockUI("Loading...");
 		var userid = JSON.parse(window.localStorage['_UI']).user_id;
+		undoItem = ''; 
+		undoMapIdList = [];
+		undoMapList = [];
 		qcServices.viewQcMappedList_ICE(userid)
 		.then(function(data){
-			// var selectOptions = $("#selAssignUser option:not(:first)");
 			data.sort(function(a,b) {
 				if (a.qctestcase > b.qctestcase) return 1;
 			    else if (a.qctestcase < b.qctestcase) return -1;
@@ -436,21 +733,59 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			});
 			if(data.length > 0){
 				$(".qcActionBtn, .leftQcStructure, .rightQcStructure").hide();
-				$("#page-taskName span").text("Mapped Files");	
+				$("#page-taskName span").text("Mapped Files");
 				$('.mappedFiles').off();
 				$(".mappedFiles").empty().show();
 				$('.mappedFiles').removeClass('scroll-wrapper');
 				$(".mappedFilesLabel").show();
+				var totalMapping = data.length;
+				var almTestCaseMapping = 0;
+				var scenarioMapping = 0;
 				for(var i=0;i<data.length;i++){
-					//there is no testscenarioname 
-					$(".mappedFiles").append('<div class="linkedTestset"><label data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" data-qctestset="'+data[i].qctestset+'">'+data[i].qctestcase+'</label><span class="linkedLine"></span><label data-scenarioid="'+data[i].testscenarioid+'">'+data[i].testscenarioname+'</label></div>');  //testscenarioname ??
-				
+					var data_list = ''+data[i].qctestcase
+					var scenarios = ''+data[i].testscenarioname
+					data_list=data_list.replaceAll(',', ',<br>')
+					scenarioList = scenarios.replaceAll(',',',<br>')
+					$(".mappedFiles").append('<div class="linkedTestset mapline'+i+'" data-mapid="'+data[i]._id+'"></div>');  //testscenarioname ??
+					var maxLen = data[i].testscenarioname.length>=data[i].qctestcase.length ? data[i].testscenarioname.length : data[i].qctestcase.length;
+					for( var j=0;j<maxLen;++j) {
+						if(j==0 && data[i].testscenarioname.length >1){
+							$(".mappedFiles").find(".mapline"+i).append('<label class="almtestScenariolink viewTab" style="display:block; float: left; width: 40%; background-color: #E1CAFF; margin-bottom: 0px; border-radius: 5px" data-testscenid="'+data[i].testscenarioid[j]+'" title="'+data[i].testscenarioname[j]+'"><span class="viewTextSpan">'+data[i].testscenarioname[j]+'</span><span class="viewImageSpan"><img   class="viewUndoSyncronise" title="Undo" src="imgs/ic-qcUndoSyncronise.png"><img class="arrowdown" style="float:right; height:22px;" src="imgs/alm_arrow_down.svg"><img class="arrowup" style="float:right; height:22px; display:none;" src="imgs/alm_arrow_up.svg"></span></label>');
+							scenarioMapping+=1;
+						} else if(j==0 && data[i].testscenarioname.length ==1) {
+							$(".mappedFiles").find(".mapline"+i).append('<label class="almtestScenariolink viewTab" style="display:block; float: left; width: 40%; background-color: #E1CAFF; margin-bottom: 0px; border-radius: 5px" data-testscenid="'+data[i].testscenarioid[j]+'" title="'+data[i].testscenarioname[j]+'"><span class="viewTextSpan">'+data[i].testscenarioname[j]+'</span><span class="viewImageSpan"><img   class="viewUndoSyncronise" title="Undo" src="imgs/ic-qcUndoSyncronise.png"></span></label>');
+							scenarioMapping+=1;
+						} else if(j< data[i].testscenarioname.length) {
+							$(".mappedFiles").find(".mapline"+i).append('<label class="almtestScenariolink viewTab" style="display:none; float: left; width: 40%; background-color: #E1CAFF; margin-bottom: 0px; border-radius: 0px" data-testscenid="'+data[i].testscenarioid[j]+'" title="'+data[i].testscenarioname[j]+'"><span class="viewTextSpan">'+data[i].testscenarioname[j]+'</span><span class="viewImageSpan"><img   class="viewUndoSyncronise" title="Undo" src="imgs/ic-qcUndoSyncronise.png"></span></label>');
+							scenarioMapping+=1;
+						} else {
+							$(".mappedFiles").find(".mapline"+i).append('<label class="viewTab" style="display:none; float: left; width: 40%; margin-bottom: 0px; height: 32px;"></label>');
+						}
+						if(j==0 && data[i].qctestcase.length >1){
+							$(".mappedFiles").find(".mapline"+i).append('<label class="almtestcaselink viewTab" style="display:block; float: right; width: 50%; background-color: #fad7f1fb; margin-bottom: 0px; border-radius: 5px" data-qctestset="'+data[i].qctestset[j]+'" data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath[j]+'" data-qcproject="'+data[i].qcproject+'" title="'+data[i].qctestcase[j]+'"><span class="viewTextSpan">'+data[i].qctestcase[j]+'</span><span class="viewImageSpan"><img  class="viewUndoSyncronise" title="Undo" src="imgs/ic-qcUndoSyncronise.png"><img class="arrowdown" style="height:22px;float:right;" src="imgs/alm_arrow_down.svg"><img class="arrowup" style="display:none; float:right; height:22px;" src="imgs/alm_arrow_up.svg"></span></label>');
+							almTestCaseMapping+=1;
+						} else if(j==0 && data[i].qctestcase.length ==1) {
+							$(".mappedFiles").find(".mapline"+i).append('<label class="almtestcaselink viewTab" style="display:block; float: right; width: 50%; background-color: #fad7f1fb; margin-bottom: 0px; border-radius: 5px" data-qctestset="'+data[i].qctestset[j]+'" data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath[j]+'" data-qcproject="'+data[i].qcproject+'" title="'+data[i].qctestcase[j]+'"><span class="viewTextSpan">'+data[i].qctestcase[j]+'</span><span class="viewImageSpan"><img  class="viewUndoSyncronise" title="Undo" src="imgs/ic-qcUndoSyncronise.png"></span></label>');
+							almTestCaseMapping+=1;
+						} else if(j< data[i].qctestcase.length) {
+							$(".mappedFiles").find(".mapline"+i).append('<label class="almtestcaselink viewTab" style="display:none; float: right; width: 50%; background-color: #fad7f1fb; margin-bottom: 0px; border-radius: 0px" data-qctestset="'+data[i].qctestset[j]+'" data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath[j]+'" data-qcproject="'+data[i].qcproject+'" title="'+data[i].qctestcase[j]+'"><span class="viewTextSpan">'+data[i].qctestcase[j]+'</span><span class="viewImageSpan"><img  class="viewUndoSyncronise" title="Undo" src="imgs/ic-qcUndoSyncronise.png"></span></label>');
+							almTestCaseMapping+=1;
+						} else {
+							$(".mappedFiles").find(".mapline"+i).append('<label class="viewTab" style="display:none; float: right; width: 50%; margin-bottom: 0px; height: 32px;"></label>');
+						}
+					} 
 				}	
-
+				$(".totalcountbx").show();
+				$(".almtestcasesbx").show();
+				$(".scenariobx").show();
+				$(".totalcountbx")[0].innerHTML = "Total Mappings<br>"+totalMapping;
+				$(".almtestcasesbx")[0].innerHTML = "Mapped ALM tests<br>"+almTestCaseMapping;
+				$(".scenariobx")[0].innerHTML = "Mapped Scenarios<br>"+scenarioMapping;
+				$(".linkedTestset").find(".viewUndoSyncronise").hide();
 				$('.scrollbar-inner').scrollbar();
-			}
-			else{
+			} else{
 				openModelPopup("Mapped Testcase", "No mapped details");
+				$scope.hideMappedFilesTab(); 
 			}
 			unblockUI();
 		},

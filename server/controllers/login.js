@@ -1,87 +1,8 @@
-const uidsafe = require('uid-safe');
 const logger = require('../../logger');
 const utils = require('../lib/utils');
 const configpath= require('../config/options');
+const notifications = require('../notifications');
 const bcrypt = require('bcryptjs');
-
-/**
- * @see : function to check whether projects are assigned for user
- * @author : vinay
- */
-const checkAssignedProjects = async (username, usertype) => {
-	const fnName = "checkAssignedProjects";
-	logger.info("Inside " + fnName + " function");
-	let assignedProjects = false;
-	// Get user profile by username
-	let inputs = { username };
-	const userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
-	if (userInfo == "fail") return ['fail'];
-	else if (!userInfo) {
-		let flag = "invalid_username_password";
-		if (["saml","oidc"].includes(usertype)) flag = "nouser";
-		return [flag];
-	}
-	const userid = userInfo._id;
-	const roleid = userInfo.defaultrole;
-	if (userInfo.projects != null) assignedProjects = userInfo.projects.length !== 0;
-	// Get Rolename by role id
-	inputs = {
-		"roleid": roleid,
-		"query": "permissionInfoByRoleID"
-	};
-	const userRole = await utils.fetchData(inputs, "login/loadPermission", fnName);
-	if (userRole == "fail") return ['fail'];
-	else if (userRole === null) return ["invalid_username_password"];
-	else return [null, userid, userRole.rolename, assignedProjects];
-}
-
-// Check User login State - Avo Assure
-exports.checkUserState = async (req, res) => {
-	try {
-		logger.info("Inside UI Service: checkUserState");
-		const sess = req.session;
-		if (sess && (sess.emsg || sess.username)) {
-			let emsg = req.session.emsg || "ok";
-			if (emsg == "ok") {
-				const username = sess.username;
-				const data = await checkAssignedProjects(username, sess.usertype);
-				const err = data[0];
-				if(err) {
-					logger.error("Error occurred in checkUserState. Cause: "+ err);
-					emsg = err;
-				} else {
-					const userid = data[1];
-					const role = data[2];
-					const assignedProjects = data[3];
-					if (role != "Admin" && !assignedProjects) {
-						emsg = "noProjectsAssigned";
-						logger.info("User has not been assigned any projects");
-					} else {
-						req.session.userid = userid;
-						req.session.ip = req.ip;
-						req.session.loggedin = (new Date()).toISOString();
-					}
-				}
-			}
-			if (sess.dndSess) {
-				await utils.cloneSession(req);
-				emsg = "reload";
-			} else {
-				if (emsg == "ok") res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed:true});
-				else req.clearSession();
-			}
-			return res.send(emsg);
-		} else {
-			logger.info("Invalid Session");
-			req.clearSession();
-			res.send("Invalid Session");
-		}
-	} catch (exception) {
-		logger.error(exception.message);
-		req.clearSession();
-		res.send("fail");
-	}
-};
 
 //Load User Information - Avo Assure
 exports.loadUserInfo = async (req, res) => {
@@ -137,6 +58,15 @@ exports.loadUserInfo = async (req, res) => {
 		userProfile.rolename = req.session.defaultRole;
 		userProfile.pluginsInfo = permData.pluginresult;
 		userProfile.page = (userProfile.rolename == "Admin")? "admin":"plugin";
+		userProfile.tandc = false;
+		if (userProfile.rolename != "Admin" && configpath.showEULA) {
+			inputs = {
+				"username": userProfile.username,
+				"query": "loadUserInfo"
+			};
+			const eulaData = await utils.fetchData(inputs, "login/checkTandC", fnName);
+			if (eulaData != "success") userProfile.tandc = true;
+		}
 		return res.send(userProfile);
 	} catch (exception) {
 		logger.error(exception.message);
@@ -195,7 +125,10 @@ exports.resetPassword = async (req, res) => {
 		};
 		const status = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
 		if (status == "fail" || status == "forbidden") return res.send("fail");
-		else res.send(status);
+		else {
+			notifications.notify("userUpdate", {field: "password", user: result});
+			res.send(status);
+		}
 	} catch (exception) {
 		logger.error(exception.message);
 		res.send("fail");
@@ -208,4 +141,32 @@ exports.logoutUser = async (req, res) => {
 	req.logOut();
 	req.clearSession();
 	res.send('Session Expired');
+};
+
+exports.storeUserDetails = async (req, res) => {
+	const fnName = "storeUserDetails";
+	try {
+		logger.info("Inside UI Service: " + fnName);
+		const userDetails = req.body.userDetails;
+		const username = req.session.username;
+		const uId = req.session.userid;
+		const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		const inputs = {
+			"username": username,
+			"userId" : uId,
+			"fullname": userDetails.fullname,
+			"email": userDetails.emailaddress,
+			"acceptance": userDetails.acceptance,
+			"timestamp" : userDetails.timestamp,
+			"ip" : ip,
+			"browserfingerprint" : userDetails.browserfp,
+			"query": "checkTandC"
+		};
+		const status = await utils.fetchData(inputs, "login/checkTandC", fnName);
+		if (status == "fail" || status == "forbidden") return res.send("fail");
+		else res.send(status);
+	} catch (exception) {
+		logger.error(exception.message);
+		return res.send("fail");
+	}
 };

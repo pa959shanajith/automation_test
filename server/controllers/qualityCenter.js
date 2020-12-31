@@ -17,7 +17,9 @@ exports.loginQCServer_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: loginQCServer_ICE");
 		if (utils.isSessionActive(req)) {
-			var name = myserver.allSocketsICEUser[req.session.username];
+			var username = req.session.username;
+			var name= undefined
+			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("ICE Socket connecting IP: %s" , ip);
@@ -47,7 +49,7 @@ exports.loginQCServer_ICE = function (req, res) {
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						function qclogin_listener(channel,message) {
 							var data = JSON.parse(message);
-							if(name == data.username){
+							if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
 								redisServer.redisSubServer.removeListener('message',qclogin_listener);
 								if (data.onAction == "unavailableLocalServer") {
 									logger.error("Error occurred in loginQCServer_ICE: Socket Disconnected");
@@ -97,7 +99,9 @@ exports.qcProjectDetails_ICE = function (req, res) {
 	var name;
 	try {
 		if (utils.isSessionActive(req)) {
-			name = myserver.allSocketsICEUser[req.session.username];
+			var username = req.session.username;
+			var name= undefined
+			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.debug("ICE Socket requesting Address: %s" , name);
@@ -115,7 +119,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						function qclogin_listener(channel,message) {
 							var data = JSON.parse(message);
-							if(name == data.username){
+							if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
 								redisServer.redisSubServer.removeListener('message',qclogin_listener);
 								if (data.onAction == "unavailableLocalServer") {
 									logger.error("Error occurred in qcProjectDetails_ICE: Socket Disconnected");
@@ -291,7 +295,8 @@ exports.qcFolderDetails_ICE = function (req, res) {
 		if (utils.isSessionActive(req)) {
 			var qcDetails = req.body;
 			var username=req.session.username;
-			icename = myserver.allSocketsICEUser[username];
+			var icename= undefined
+			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
 			redisServer.redisSubServer.subscribe('ICE2_' + icename);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.debug("ICE Socket requesting Address: %s" , icename);
@@ -302,7 +307,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					function qclogin_listener(channel,message) {
 						var data = JSON.parse(message);
-						if(icename == data.username){
+						if(icename == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
 							redisServer.redisSubServer.removeListener('message',qclogin_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occurred in qcFolderDetails_ICE: Socket Disconnected");
@@ -366,7 +371,6 @@ exports.saveQcDetails_ICE = function (req, res) {
 		var qctestset = itr.testset;
 		var inputs = {
 			"testscenarioid": testscenarioid,
-			"qcdetailsid": testscenarioid,
 			"qcdomain": qcdomain,
 			"qcfolderpath": qcfolderpath,
 			"qcproject": qcproject,
@@ -413,6 +417,25 @@ exports.saveQcDetails_ICE = function (req, res) {
 	});
 };
 
+exports.saveUnsyncDetails = async (req, res) => {
+	const fnName = "saveUnsyncDetails";
+	try {
+		logger.info("Inside UI service: " + fnName);
+		const undoMapList = req.body.undoMapList;
+		if (undoMapList.length == 0) return res.send("fail");
+		const inputs = {
+			"mapList": undoMapList,
+			"query": "updateMapDetails_ICE"
+		};
+		const result = await utils.fetchData(inputs, "qualityCenter/updateMapDetails_ICE", fnName);
+		if (result == "fail") return res.send("fail");
+		else return res.send("success");
+	} catch (e) {
+		logger.error("Error in %s service. Error: %s", fnName, ex)
+		res.send("fail");
+	}
+};
+
 exports.viewQcMappedList_ICE = function (req, res) {
 	logger.info("Inside UI service: viewQcMappedList_ICE");
 	var userid = req.body.user_id;
@@ -426,6 +449,7 @@ function getQcDetailsForUser(userid, cb) {
 	logger.info("Inside function getQcDetailsForUser");
 	var projectDetailsList = [];
 	var projectidlist = [];
+	var qcDetailsList = [];
 	async.series({
 		getprojectDetails: function (callback1) {
 			var inputs = {
@@ -439,7 +463,7 @@ function getQcDetailsForUser(userid, cb) {
 				}
 
 			};
-				logger.info("Calling DAS Service :qualityCenter/qcProjectDetails_ICE");
+			logger.info("Calling DAS Service :qualityCenter/qcProjectDetails_ICE");
 			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
 				function (projectrows, response) {
 				if (response.statusCode != 200 || projectrows.rows == "fail") {
@@ -459,14 +483,67 @@ function getQcDetailsForUser(userid, cb) {
 			async.forEachSeries(projectidlist, function (itr, callback2) {
 				qcscenariodetails(itr, function (err, projectDetails) {
 					for (i = 0; i < projectDetails.length; i++) {
-						projectDetailsList.push(projectDetails[i]);
+						projectDetailsList = projectDetailsList.concat(projectDetails[i]);
 					}
 					callback2();
 				});
 			}, callback1);
 		},
+		qcdetails: function (callback1) {
+			logger.info("Inside function qcdetails");
+			var inputs = {
+				"query": "qcdetails"
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			logger.info("Calling DAS Service from qcdetails: qualityCenter/viewIntegrationMappedList_ICE");
+			client.post(epurl + "qualityCenter/viewIntegrationMappedList_ICE", args,
+				function (qcdetailsows, response) {
+				if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
+					logger.error("Error occurred in qualityCenter/viewIntegrationMappedList_ICE from qcdetails Error Code : ERRDAS");
+				} else {
+					if (qcdetailsows.rows.length != 0) {
+						for(var i=0;i<qcdetailsows.rows.length;i++){
+							qcdetails = JSON.parse(JSON.stringify(qcdetailsows.rows[i]));
+							qcdetails.testscenarioname = [];
+							var testscenarios = qcdetails.testscenarioid;
+							if(Array.isArray(testscenarios)) {
+								for(var j=0;j<testscenarios.length;++j){
+									flag = false;
+									for(var k=0;k<projectDetailsList.length;++k) {
+										if(projectDetailsList[k]._id == testscenarios[j]) {
+											qcdetails.testscenarioname.push(projectDetailsList[k].name);
+											flag = true;
+											break;
+										} 
+									}
+									if(!flag) {
+										qcdetails.testscenarioid.splice(j,1);
+									}
+								}
+								if(qcdetails.testscenarioname.length != 0){
+									qcDetailsList.push(qcdetails);
+								}
+							} else {
+								for(var k=0;k<projectDetailsList.length;++k) {
+									if(projectDetailsList[k]._id == testscenarios) {
+										qcdetails.testscenarioname.push(projectDetailsList[k].name);
+										qcDetailsList.push(qcdetails);
+									}
+								}
+							}
+						}
+					}
+				}
+				callback1();
+			});
+		},
 		data: function (callback1) {
-			cb(projectDetailsList);
+			cb(qcDetailsList);
 		}
 	});
 }
@@ -501,43 +578,11 @@ function qcscenariodetails(projectid, cb) {
 				} else {
 					if (scenariorows.rows.length != 0) {
 						scenarios_list = JSON.parse(JSON.stringify(scenariorows.rows));
+						qcDetailsList.push(scenarios_list);
 					}
 				}
 				callback1();
 			});
-		},
-		qcdetails: function (callback1) {
-			logger.info("Inside function qcdetails");
-			async.forEachSeries(scenarios_list, function (itr, callback2) {
-				var inputs = {
-					"testscenarioid": itr._id,
-					"query": "qcdetails"
-				};
-				var args = {
-					data: inputs,
-					headers: {
-						"Content-Type": "application/json"
-					}
-				};
-				logger.info("Calling DAS Service from qcdetails: qualityCenter/viewIntegrationMappedList_ICE");
-				client.post(epurl + "qualityCenter/viewIntegrationMappedList_ICE", args,
-					function (qcdetailsows, response) {
-					if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
-						logger.error("Error occurred inqualityCenter/viewIntegrationMappedList_ICE from qcdetails Error Code : ERRDAS");
-					} else {
-						if (qcdetailsows.rows.length != 0) {
-							//flagtocheckifexists = true;
-							qcdetails = JSON.parse(JSON.stringify(qcdetailsows.rows[0]));
-							qcdetails.testscenarioname = itr.name;
-							// projectDetails.project_id = projectid;
-							// projectDetails.scenario_details = scenarios_list;
-							// projectDetails.project_name = projectname;
-							qcDetailsList.push(qcdetails);
-						}
-					}
-					callback2();
-				});
-			}, callback1);
 		},
 		data: function (callback1) {
 			cb(null, qcDetailsList);

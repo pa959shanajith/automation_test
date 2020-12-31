@@ -18,6 +18,8 @@ var cluster = require('cluster');
 var expressWinston = require('express-winston');
 var epurl = "http://" + (process.env.DAS_IP || "127.0.0.1") + ":" + (process.env.DAS_PORT || "1990") + "/";
 process.env.DAS_URL = epurl;
+process.env.nulluser = "5fc137cc72142998e29b5e63";
+process.env.nullpool = "5fc13ea772142998e29b5e64";
 var logger = require('./logger');
 var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 
@@ -100,6 +102,7 @@ if (cluster.isMaster) {
 		app.use("/imgs", express.static(__dirname + "/public/imgs"));
 		app.use("/css", express.static(__dirname + "/public/css"));
 		app.use("/fonts", express.static(__dirname + "/public/fonts"));
+		app.use("/neuronGraphs", express.static(__dirname + "/public/neurongraphs"));
 
 		app.use(bodyParser.json({
 			limit: '50mb'
@@ -158,6 +161,10 @@ if (cluster.isMaster) {
 		const authconf = authlib();
 		const auth = authconf.auth;
 		app.use(authconf.router);
+		var queue = require("./server/lib/executionQueue")
+		queue.Execution_Queue.queue_init()
+		const notf = require("./server/notifications");
+		notf.initalize();
 
 		//Based on NGINX Config Security Headers are configured
 		if (!nginxEnabled) {
@@ -261,10 +268,9 @@ if (cluster.isMaster) {
 			res.redirect('/');
 		});
 
-
 		app.get('/', async (req, res, next) => {
 			if (!(req.url == '/' || req.url.startsWith("/?"))) return next();
-			return res.sendFile("app.html", { root: __dirname + "/public/" });
+			return res.sendFile("index.html", { root: __dirname + "/public/" });
 		});
 
 		// Dummy Service for keeping session alive during long-term execution, etc. #Polling
@@ -289,7 +295,7 @@ if (cluster.isMaster) {
 		});
 
 		//Test Lead and Test Manager can access
-		app.get(/^\/(p_Webocular|neuronGraphs|p_ALM|p_APG|p_Integration|p_qTest)$/, function(req, res) {
+		app.get(/^\/(p_Webocular|neuronGraphs\/|p_ALM|p_APG|p_Integration|p_qTest|p_Zephyr)$/, function(req, res) {
 			var roles = ["Test Manager", "Test Lead"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
@@ -303,12 +309,13 @@ if (cluster.isMaster) {
 				meta.userip = req.headers['client-ip'] != undefined ? req.headers['client-ip'] : req.ip;
 				return meta;
 			};
-
+			var public = __dirname + "/public/";
+			if (req.url === "/neuronGraphs/") public += "neurongraphs/";
 			var sessChk = sess.uniqueId && sess.activeRole;
 			var roleChk = (roles.indexOf(sess.activeRole) != -1);
 			var maintCookie = req.signedCookies["maintain.sid"];
 			if (sessChk && !maintCookie) return res.redirect("/error?e=sessexists");
-			if (sessChk && roleChk) return res.sendFile("app.html", { root: __dirname + "/public/" });
+			if (sessChk && roleChk) return res.sendFile("index.html", { root: public });
 			else {
 				req.clearSession();
 				return res.redirect("/error?e=" + ((sessChk) ? "403" : "401"));
@@ -316,10 +323,10 @@ if (cluster.isMaster) {
 		}
 
 		app.post('/designTestCase', function(req, res) {
-			return res.sendFile("app.html", { root: __dirname + "/public/" });
+			return res.sendFile("index.html", { root: __dirname + "/public/" });
 		});
 
-		app.get('/AvoAssure_ICE', async (req, res) => {
+		app.get('/AvoAssure_ICE.zip', async (req, res) => {
 			const iceFile = "AvoAssure_ICE.zip";
 			const iceFilePath = path.resolve(process.env.HOST_PATH);
 			if (req.query.file == "getICE") {
@@ -346,6 +353,7 @@ if (cluster.isMaster) {
 		var utility = require('./server/controllers/utility');
 		var qc = require('./server/controllers/qualityCenter');
 		var qtest = require('./server/controllers/qtest');
+		var zephyr = require('./server/controllers/zephyr');
 		var webocular = require('./server/controllers/webocular');
 		var chatbot = require('./server/controllers/chatbot');
 		var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
@@ -371,21 +379,21 @@ if (cluster.isMaster) {
 		app.post('/getModules', auth.protect, mindmap.getModules);
 		app.post('/reviewTask', mindmap.reviewTask);
 		app.post('/saveData', mindmap.saveData);
-		app.post('/saveEndtoEndData', auth.protect, mindmap.saveEndtoEndData);
-		app.post('/importMindmap', auth.protect, mindmap.importMindmap);		
-		app.post('/excelToMindmap', auth.protect, mindmap.excelToMindmap);
-		app.post('/getScreens', auth.protect, mindmap.getScreens);
-		app.post('/exportToJson', auth.protect, mindmap.exportToJson);
-		app.post('/exportToExcel', auth.protect, mindmap.exportToExcel);
+		app.post('/saveEndtoEndData', mindmap.saveEndtoEndData);
+		app.post('/excelToMindmap', mindmap.excelToMindmap);
+		app.post('/getScreens', mindmap.getScreens);
+		app.post('/exportToExcel', mindmap.exportToExcel);
+		app.post('/exportMindmap', mindmap.exportMindmap);
+		app.post('/importMindmap', mindmap.importMindmap);
 		app.post('/pdProcess', auth.protect, mindmap.pdProcess);	// process discovery service
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
-		app.post('/checkUserState', authlib.validateUserState);
 		app.post('/validateUserState', authlib.validateUserState);
 		app.post('/loadUserInfo', auth.protect, login.loadUserInfo);
 		app.post('/getRoleNameByRoleId', auth.protect, login.getRoleNameByRoleId);
 		app.post('/logoutUser', login.logoutUser);
 		app.post('/resetPassword', auth.protect, login.resetPassword);
+		app.post('/storeUserDetails', auth.protect, login.storeUserDetails);
 		//Admin Routes
 		app.post('/getUserRoles', admin.getUserRoles);
 		app.post('/getDomains_ICE', admin.getDomains_ICE);
@@ -411,6 +419,17 @@ if (cluster.isMaster) {
 		app.post('/getPreferences', auth.protect, admin.getPreferences);
 		app.post('/provisionIce', auth.protect, admin.provisionICE);
 		app.post('/fetchICE', auth.protect, admin.fetchICE);
+		app.post('/getAvailable_ICE', auth.protect, admin.getAvailable_ICE);
+		app.post('/getICEinPools', auth.protect, admin.getICEinPools);
+		app.post('/deleteICE_pools', auth.protect, admin.deletePools);
+		app.post('/getPools', auth.protect, admin.getPools);
+		app.post('/updatePool', auth.protect, admin.updatePool);
+		app.post('/createPool_ICE', auth.protect, admin.createPool_ICE);
+		app.post('/clearQueue', auth.protect, admin.clearQueue);
+		app.post('/exportProject', auth.protect, admin.exportProject);
+		app.post('/testNotificationChannels', auth.protect, admin.testNotificationChannels);
+		app.post('/manageNotificationChannels', auth.protect, admin.manageNotificationChannels);
+		app.post('/getNotificationChannels', auth.protect, admin.getNotificationChannels);
 
 		//Design Screen Routes
 		app.post('/initScraping_ICE', designscreen.initScraping_ICE);
@@ -431,6 +450,7 @@ if (cluster.isMaster) {
 		app.post('/getTestcaseDetailsForScenario_ICE', auth.protect, suite.getTestcaseDetailsForScenario_ICE);
 		app.post('/ExecuteTestSuite_ICE', auth.protect, suite.ExecuteTestSuite_ICE);
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
+		app.post('/getICE_list', auth.protect, suite.getICE_list);
 		//Scheduling Screen Routes
 		app.post('/testSuitesScheduler_ICE', auth.protect, suite.testSuitesScheduler_ICE);
 		app.post('/getScheduledDetails_ICE', auth.protect, suite.getScheduledDetails_ICE);
@@ -439,12 +459,14 @@ if (cluster.isMaster) {
 		app.post('/getAllSuites_ICE', report.getAllSuites_ICE);
 		app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
 		app.post('/reportStatusScenarios_ICE', report.reportStatusScenarios_ICE);
-		app.post('/renderReport_ICE', report.renderReport_ICE);
-		app.post('/getReport', report.getReport);
-		app.post('/openScreenShot', report.openScreenShot);
+		app.post('/renderReport_ICE', auth.protect, report.renderReport_ICE);
+		app.post('/getReport', auth.protect, report.getReport);
+		app.post('/openScreenShot', auth.protect, report.openScreenShot);
 		app.post('/connectJira_ICE', report.connectJira_ICE);
-		app.post('/getReportsData_ICE', report.getReportsData_ICE);
+		app.post('/downloadVideo', auth.protect, report.downloadVideo);
+		app.post('/getReportsData_ICE', auth.protect, report.getReportsData_ICE);
 		app.post('/getReport_API', report.getReport_API);
+		app.use('/viewReport', report.viewReport);
 		//Plugin Routes
 		app.post('/getProjectIDs', auth.protect, plugin.getProjectIDs);
 		app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
@@ -459,18 +481,26 @@ if (cluster.isMaster) {
 		app.post('/updateFrequency_ProfJ', chatbot.updateFrequency_ProfJ);
 		//NeuronGraphs Plugin Routes
 		app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
+		app.post('/getReport_NG', neuronGraphs2D.getReportNG);
+		app.post('/getReportExecutionStatus_NG', neuronGraphs2D.getReportExecutionStatusNG);
 		//QC Plugin
 		app.post('/loginQCServer_ICE', qc.loginQCServer_ICE);
 		app.post('/qcProjectDetails_ICE', qc.qcProjectDetails_ICE);
 		app.post('/qcFolderDetails_ICE', qc.qcFolderDetails_ICE);
 		app.post('/saveQcDetails_ICE', qc.saveQcDetails_ICE);
+		app.post('/saveUnsyncDetails', auth.protect, qc.saveUnsyncDetails);
 		app.post('/viewQcMappedList_ICE', qc.viewQcMappedList_ICE);
 		//qTest Plugin
 		app.post('/loginToQTest_ICE', qtest.loginToQTest_ICE);
 		app.post('/qtestProjectDetails_ICE', qtest.qtestProjectDetails_ICE);
 		app.post('/qtestFolderDetails_ICE', qtest.qtestFolderDetails_ICE);
 		app.post('/saveQtestDetails_ICE', qtest.saveQtestDetails_ICE);
-		app.post('/viewQtestMappedList_ICE', qtest.viewQtestMappedList_ICE);		
+		app.post('/viewQtestMappedList_ICE', qtest.viewQtestMappedList_ICE);	
+		//Zephyr Plugin
+		app.post('/loginToZephyr_ICE', zephyr.loginToZephyr_ICE);
+		app.post('/zephyrProjectDetails_ICE', zephyr.zephyrProjectDetails_ICE);
+		app.post('/saveZephyrDetails_ICE', zephyr.saveZephyrDetails_ICE);
+		app.post('/viewZephyrMappedList_ICE', zephyr.viewZephyrMappedList_ICE);	
 		//app.post('/manualTestcaseDetails_ICE', qc.manualTestcaseDetails_ICE);
 		// Automated Path Generator Routes
 		app.post('/flowGraphResults', flowGraph.flowGraphResults);
@@ -479,6 +509,8 @@ if (cluster.isMaster) {
 		app.post('/APG_runDeadcodeIdentifier', flowGraph.APG_runDeadcodeIdentifier);
 		// ICE Provisioning
 		app.post('/ICE_provisioning_register', io.registerICE);
+		app.post('/getUserICE', auth.protect, io.getUserICE)
+		app.post('/setDefaultUserICE', auth.protect, io.setDefaultUserICE)
 		//-------------Route Mapping-------------//
 
 		// To prevent can't send header response

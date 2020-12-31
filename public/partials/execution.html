@@ -113,6 +113,7 @@
 			<div id="left-bottom-section" class="lbs-single">
 				<ul>
 					<li ng-if="getScreenView == 'Web'"><a class="selectParallel" href='#' title="Parallel Execution"><span><img src='imgs/ic-parallel.png' alt='Parallel' height='55' width='57'/></span><font size="2">Parallel Execution</font></a></li>
+					<li ng-if="getScreenView == 'Web'"><a class="selectSaucelabs" href='#' title="SauceLabs Execution"><span><img src='imgs/saucelabs.png' alt='Saucelabs' height='55' width='57'/></span><font size="2">SauceLabs Execution</font></a></li>
 					<li><a href='#' onclick="p_redirect('scheduling')" title="Scheduling"><span><img src='imgs/ic-scheduling.png' alt='Scheduling' /></span>Schedule</a></li>
 				</ul>
 			</div>
@@ -140,6 +141,7 @@
 					<option value="" selected disabled>Select Integration</option>
 					<option value="1">ALM</option>
 					<option value="0">qTest</option>
+					<option value="2">Zephyr</option>
 				</select>
 				<button class="btn btn-md pull-right submitTaskBtn" ng-click="submitTaskExecution()"  title="Submit Task">Submit</button>
 				<button class="btn btn-md pull-right reassignTaskBtn" style="display:None" ng-click="submitTaskExecution('reassign')"  title="Reassign Task">Reassign</button>
@@ -222,7 +224,7 @@
 		<!--Images Blocks-->
 
 	  <!--Images Blocks-->
-      <chatbot chatbot></chatbot>
+	  <chatbot chatbot></chatbot>
       <!--Images Blocks-->
 	</div>
 	<!--Right Panel-->
@@ -232,63 +234,6 @@
 <!--Footer-->
 <footer footer id="footer" class="footer-global"></footer>
 <!--Footer-->
-
-<!-- Global Popup -->
-<div class="modal fade" id="executeGlobalModal" role="dialog" data-keyboard="false" data-backdrop="static">
-	<div class="modal-dialog modal-sm">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title"></h4>
-			</div>
-			<div class="modal-body">
-				<p></p>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default btn-accept" data-dismiss="modal">Ok</button>
-			</div>
-		</div>
-	</div>
-</div>
-<!-- Global Popup -->
-
-<!-- Execution Done -->
-<div class="modal fade" id="executionCompleted" role="dialog" data-keyboard="false" data-backdrop="static">
-	<div class="modal-dialog modal-sm">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">Execute Test Suite</h4>
-			</div>
-			<div class="modal-body">
-				<p>Execution completed successfully. <br /> Go to <a style="color: #643693; font-family: 'LatoWebHeavy'" href="#" onclick="p_redirect('p_Reports')">Reports</a></p>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
-			</div>
-		</div>
-	</div>
-</div>
-<!-- Execution Done -->
-
-<!-- Execution Terminated -->
-<div class="modal fade" id="executionTerminated" role="dialog" data-keyboard="false" data-backdrop="static">
-	<div class="modal-dialog modal-sm">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">Execute Test Suite</h4>
-			</div>
-			<div class="modal-body">
-				<p>Execution terminated - By User/Program <br /> Go to <a style="color: #643693; font-family: 'LatoWebHeavy'" href="#" onclick="p_redirect('p_Reports')">Reports</a></p>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
-			</div>
-		</div>
-	</div>
-</div>
-<!-- Execution Terminated -->
 
 <!-- Submitting Task -->
 <div class="modal fade" id="submitTasksExecution" role="dialog" data-keyboard="false" data-backdrop="static">
@@ -470,7 +415,7 @@
 					</p>
 					<p align="right">
 						<span class="error-msg-exeQc"></span>
-						<button type="button" class="btn btn-default btn-default-modal almQclogin" ng-click="saveQTestCredentials($event)">Save</button>
+						<button type="button" class="btn btn-default btn-default-modal" ng-click="saveQTestCredentials($event)">Save</button>
 					</p>
 				</div>
 				<!-- Top -->
@@ -481,6 +426,39 @@
 </div>
 <!-- qTest Window -->
 
+<!-- Zephyr Window -->
+<div class="modal fade" id="ZephyrSyncWindow" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-md" style="width:700px">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Zephyr</h4>
+			</div>
+			<div class="modal-body">
+				<div class="popupWrapRow">
+				<!-- Top -->
+				<div class="textFieldsContainer">
+					<p>
+						<input type="text" class="form-control form-control-custom" placeholder="Enter Zephyr Account ID" ng-model="ZephyrURL" id="ZephyrURL" />
+					</p>
+					<p class="halfWrap" style="margin-right: 3%">
+						<input type="text" class="form-control form-control-custom" placeholder="Enter Access Key" ng-model="ZephyrUserName" id="ZephyrUserName" />
+					</p>
+					<p class="halfWrap">
+						<input type="password" class="form-control form-control-custom" placeholder="Enter Secret Key" ng-model="ZephyrPassword" id="ZephyrPassword" />
+					</p>
+					<p align="right">
+						<span class="error-msg-exeQc"></span>
+						<button type="button" class="btn btn-default btn-default-modal" ng-click="saveZephyrCredentials($event)">Save</button>
+					</p>
+				</div>
+				<!-- Top -->
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Zephyr Window -->
 
 
 <!-- Scenario Description Modal -->
@@ -515,3 +493,80 @@
 <!-- Scenario Description Modal -->
 
 <testcasetemplate testcasetemplate></testcasetemplate>
+
+<!-- ICE Pool Popup -->
+<div class="modal fade" id="selectIcePoolIce" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-md">
+	   <div class="modal-content">
+		  <div class="modal-header">
+			 <button type="button" class="close" data-dismiss="modal">&times;</button>
+			 <h4 class="modal-title">Select ICE to Execute</h4>
+		  </div>
+		  <div class="modal-body">
+			<div class='adminControl'>
+				<div>
+					<span class="leftControl" title="Execution type">Select Execution type</span>
+					<select id='executionType'>
+						<option smart="false" value='normal'>Normal Execution</option>
+						<option	smart="true" value='smartModule'>Module Smart Execution</option>
+						<option	smart="true" value='smartScenario'>Scenario Smart Execution</option>
+					</select>
+				</div>
+			</div>
+			<div class='adminControl'>
+				<div>
+					<span class="leftControl" title="Token Name">Select ICE Pool</span>
+					<select id='chooseICEPool'>
+						<option value='unallocated'>Unallocated ICE</option>
+						<!-- <option value='all'>Select All Pools</option> -->
+					</select>
+				</div>
+			</div>
+			<div class='adminControl'>
+				<div>
+					<span class="leftControl" title="Token Name">Execute on ICE</span>
+					<div>
+						<input class="btn btn-users dropdown-toggle" type="text" autocomplete="off" id="userIdName" data-toggle="dropdown" ng-click='availableICEFilter.icename="";selectedICE=false' ng-model="availableICEFilter.icename" placeholder="{{'Search ICE to execute'}}">
+						<ul id='ice-dropdown' class="dropdown-menu dropdown-menu-users "  aria-labelledby="userIdName">
+							<li role="presentation" ng-repeat='ice in availableICE | filter:availableICEFilter' ng-click="availableICEFilter.icename=!smartMode?ice.icename:'';iceCheckboxClick($event,ice.icename)" >
+								<label ng-hide='smartMode && {{ice.statusCode != "Online"}}' title='{{ice.statusCode}}'  ng-style="{'font-weight':500}">
+									<input ng-hide='!smartMode' value='{{ice.icename}}' checked type="checkbox"/>
+									<span id='status' ng-style="{'background-color':'{{ice.color}}'}"></span>
+									{{ice.icename}}
+								<label>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class='adminControl'>
+				<div>
+					<span class="leftControl" title="Token Name">ICE Status:</span>
+					<div>
+						<ul style="padding-top: 7px;width: 100%;">
+							<li>
+								<label title='available' class="legends">
+									<span id='status' ng-style="{'background-color':'#95c353'}"></span>
+									 Available
+								</label>
+								<label title='unavailable' class="legends">
+									<span id='status' ng-style="{'background-color':'#fdc010'}"></span>
+									 Unavilable
+								</label>
+								<label title='do not disturb' class="legends">
+									<span id='status' ng-style="{'background-color':'red'}"></span>
+									 Do Not Disturb
+								</label>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-default btn-default-modal" ng-click="ExecuteOnclick($event)">Execute</button>
+		  </div>
+	   </div>
+	</div>
+ </div>
+ <!-- ICE Pool Popup -->

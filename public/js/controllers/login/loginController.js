@@ -111,7 +111,7 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 					$(".ic-username").children().attr("src", "imgs/ic-username.png");
 					$(".ic-password").children().attr("src", "imgs/ic-password.png");
 					$(".ic-username, .ic-password").parent().removeClass("input-border-error");
-					window.location = '/';
+					$location.path("/");
 				} else if (data == 'inValidCredential' || data == "invalid_username_password") {
 					$(".ic-username").children().attr("src", "imgs/ic-username-error.png");
 					$(".ic-password").children().attr("src", "imgs/ic-password-error.png");

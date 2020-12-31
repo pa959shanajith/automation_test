@@ -1,0 +1,151 @@
+<!--Header-->
+<header header></header>
+<!--Header-->
+
+<!--Content Area-->
+<section class="container-fluid container-fluid-inner">
+	<!--Left Panel-->
+	<div id="left-nav-section">
+		<div class="scrollbar-macosx">
+			<div id="left-top-section" style='border-bottom: 0px !important'>
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Integration</a></span></li>
+					<li><a id='qtestTab' ng-click="qtestlogin()" data-name="qtest" title="qTest" class="selectBrowser">
+						<span><img src='imgs/qTest.png' alt='qTest' style='width:56px;height:52px;' /></span>qTest</a></li>
+					<li><a id='almTab' ng-click="almlogin()" data-name="alm" title="ALM" class="selectBrowser">
+						<span><img src='imgs/ALM.png' alt='ALM' style='width:56px;height:52px;' /></span>ALM</a></li>
+					<li><a id='zephyrTab' ng-click="zephyrlogin(); hideMappedFilesTab();" data-name="zephyr" title="Zephyr" class="selectBrowser">
+						<span><img src='imgs/Zephyr.png' class='selectedIcon' alt='Zephyr' style='width:56px;height:52px;'/></span>Zephyr</a></li>
+	
+				</ul>
+			</div>
+			<div class='clear-both'></div>
+		</div>
+	</div>
+	<!--Left Panel-->
+	
+	<!--Middle Panel-->
+	<div id="middle-content-section">
+		<!-- Zephyr Tab -->
+		<div style="height: 100%;">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Zephyr Integration</span>
+			</div>
+			<!--Task Name-->
+			<!-- Button -->
+			<div class="zephyrActionBtn">
+				<label style="margin-bottom: 0; float: left; font-size: 16px;">Zephyr Tests</label>
+				<!--<img class="loadALM" style="position: relative; left: 388px; display: none;" src="imgs/loader.gif" alt="Loading...">-->
+				<label style="margin-bottom: 0; position: relative; left: 457px; float: left; font-size: 16px;">Avo Assure Scenarios</label>
+				<button class="saveZephyrbtn zephyrActionBtnFirstChild" ng-click="mapTestcaseToAvoAssure()" title="Save" style="margin-left: 470px;">Save</button>
+				<a class="viewMapbtn" ng-click="displayMappedFilesTab()" title="View Mapped Files">View Mapped Files</a>
+				<button class="saveZephyrbtn" ng-click="exitZephyrConnection()" title="Exit">Exit</button>
+			</div>
+			<!-- Button -->
+			<!-- Action area -->
+			<div class="leftZephyrStructure">
+				<div class="zephyrDomProContainer">
+					<select class="zephyrSelectProject"></select>
+				</div>
+				<div class="zephyrTreeContainer"></div>		
+			</div>
+			<div class="rightZephyrStructure">
+				<div class="zephyrProContainer">
+					<select class="zephyrAvoAssureSelectProject"><option value="" selected disabled>Select Project</option></select>
+					<input type="text" placeholder="Scenario Name" class="searchScenarioZephyr"></input>
+					<span class="searchScenarioAvoAssure" ng-click="searchScenarioAvo()"><img src='imgs/ic-searchIcon-black.png' alt='Search Scenarios' /></span>
+				</div>
+				<div class="zephyrAvoAssureTreeContainer"></div>	
+			</div>
+			<!-- Action area -->
+			<!-- Map Files -->
+			<div class="mappedFilesLabel" style="display: none;"><label style="margin: 0 0 0 11px;">Zephyr Tests</label><label style="position: relative; left: 422px;">Avo Assure Scenarios</label></div>
+			<div class="mappedFiles scrollbar-inner" style="display: none;">
+			</div>
+			<!-- Map Files -->
+		</div>
+		<!-- Zephyr Tab -->
+	</div>
+	<!--Middle Panel-->
+
+	<!--Right Panel-->
+	<div id="right-dependencies-section">
+		<!--Images Blocks-->
+		<div class="thumbnail thumbnail-custom">
+			<a class="slidePopup"> <img class="thumb-ic" title="Info"
+				src="imgs/ic-info.png" alt="Project Info">
+				<div class="caption">
+					<p>Info</p>
+				</div>
+			</a>
+			<!--Popup-->
+			<div tabindex="0" id="window-pi" class="popupWrap">
+				<h4 class="h4-custom closePopup">
+					Information <img class="closePopup pull-right"
+						src="imgs/ic-arrow.png" />
+				</h4>
+				<div class="popupContent projectInfoWrap"></div>
+			</div>
+			<!--Popup-->
+		</div>
+		<!--Images Blocks-->
+
+	  <!--Images Blocks-->
+      <chatbot chatbot></chatbot>
+      <!--Images Blocks-->
+	</div>
+	<!--Right Panel-->
+</section>
+<!--Content Area-->
+
+<!--Footer-->
+<footer footer id="footer" class="footer-global"></footer>
+<!--Footer-->
+
+<!-- Edit Global Model  -->
+<div class="modal fade" id="globalModal" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title"></h4>
+			</div>
+			<div class="modal-body">
+				<p></p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Edit Global Model  -->
+
+<!-- Zephyr Login Popup -->
+	<div class="modal fade" id="loginToZephyrpop" role="dialog" data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog modal-md">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="goBacktoPlugin($event)">&times;</button>
+					<h4 class="modal-title">Zephyr Login</h4>
+				</div>
+				<div class="modal-body">
+					<div class="leftAlign">
+						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter Zephyr Account ID' id='zephyrAccNo'/></p>
+						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter Zephyr Access Key' id='zephyrAcKey'/></p>
+						<p><input class='launchPopupInput form-control' type='password' placeholder='Enter Zephyr Secret Key' id='zephyrSecKey'/></p>
+						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter Jira URL' id='zephyrJiraUrl'/></p>
+						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter Jira Username' id='zephyrJiraUserName'/></p>
+						<p><input class='launchPopupInput form-control' type='password' placeholder='Enter Jira Access Token' id='zephyrJiraAccToken'/></p>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<span id="zephyrErrorMsg" style="color: red; float: left; margin-left: 15px; margin-top: 5px;"></span>
+					<img class="zephyrLoginload" src="imgs/loader.gif" alt="Loading..." style="float: left; display: none;">
+					<button type="button" class="btn btn-default btn-default-modal zephyrConnsubmit" ng-click="loginToZephyr($event)">Submit</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Zephyr Login Popup -->

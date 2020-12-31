@@ -665,14 +665,14 @@ exports.importMindmap = async(req, res) =>{
 	res.send(data)
 };
 
-exports.exportToJson= async (req, res) =>{
+exports.exportMindmap= async (req, res) =>{
 	logger.info("Inside UI service: exportMindmap");
 	var d = req.body;
 	var inputs= {
 		"mindmapId":d.mindmapId,
 		"query":"exportMindmap"
 	}
-	var data = await utils.fetchData(inputs, "mindmap/exportMindmap","exportToJson");
+	var data = await utils.fetchData(inputs, "mindmap/exportMindmap","exportMindmap");
 	res.send(data)
 };
 
@@ -1082,7 +1082,8 @@ exports.pdProcess = function (req, res) {
 		asynclib.forEachSeries(orderlist, function (nodeObj, savedcallback) {
 			var name = nodeObj.label;
 			if(screendataobj[name].data.view[0]!=undefined){
-				var screenshotdeatils = screendataobj[name].data.view[0].screenshot.split(";")[1];
+				var len1=(screendataobj[name].data.view).length
+				var screenshotdeatils = screendataobj[name].data.view[len1-1].screenshot.split(";")[1];
 			    var screenshotdata = screenshotdeatils.split(",")[1];
 			}else{
 				var screenshotdata = "";
@@ -1096,6 +1097,7 @@ exports.pdProcess = function (req, res) {
 				'modifiedby': userid,
 				'modifiedbyrole': role,
 				'deleted': false,
+				'createdthrough':'PD',
 				'screenshot':screenshotdata,
 				'scrapedurl':'',
 				'createdthrough':'PD',
@@ -1116,7 +1118,6 @@ exports.pdProcess = function (req, res) {
 						if (response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail") {
 							logger.error("Error occurred in create_ice/updateScreenname_ICE from fetchScrapedData Error Code : ERRDAS");
 						} else {
-							console.log("screen saved successfully!");
 							if(getScrapeDataQueryresult.rows[0]['parent']!=undefined){
 								var screenid = getScrapeDataQueryresult.rows[0]['parent'][0];
 								var dobjects = getScrapeDataQueryresult.rows;
@@ -1151,7 +1152,6 @@ exports.pdProcess = function (req, res) {
 										if (response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail") {
 											logger.error("Error occurred in design/getScrapeDataScreenLevel_ICE from fetchScrapedData Error Code : ERRDAS");
 										} else {
-											console.log("Testcase saved successfully!");
 											savedcallback();		
 										}
 									} catch (exception) {
@@ -1170,7 +1170,7 @@ exports.pdProcess = function (req, res) {
 			res.send({"success":true,"data":orderMatrix,"history":activityJSON['mxGraphModel']['@history']});
 		});
 	} catch(err) {
-		console.log(err)
+		logger.error("Exception occurred in pdProcess", err)
 		res.status(500).send("fail");
 	}
 };
@@ -1239,6 +1239,8 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectRadioButton',null,null,eachScrapedAction.url,"Web");
 						} else if(eachScrapedAction.tag == "checkbox") {
 							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectCheckbox',null,null,eachScrapedAction.url,"Web");
+						} else if(eachScrapedAction.tag == "table") {
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'cellClick',null,null,eachScrapedAction.url,"Web");
 						} else {
 							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'click',null,null,eachScrapedAction.url,"Web");
 							var custname_split = eachScrapedAction.custname.split('_');
@@ -1264,7 +1266,6 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						}
 						break;		
 					default:
-						console.log("no match found!");
 						break;
 				}
 				if(testcaseObj){
@@ -1322,6 +1323,12 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 				case "tree":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTreeElement',null,null,null,"SAP");
 					break;
+				case "picture":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClick',null,null,null,"SAP");
+					break;
+				case "text":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
+					break;
 				default:
 					logger.info("Import PD: No match found for "+eachScrapedAction.tag+" for SAP apptype.");
 					break;
@@ -1336,7 +1343,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 	if(adjacentItems){
 		// list of sources(only shapes) and targets (assuming only one)
 		if(adjacentItems["error"]){
-			console.log(adjacentItems["error"]);
+			logger.error("Error in pdProcess:generateTestCaseMap, Err: ", adjacentItems["error"]);
 		}
 		else{
 			// old logic
