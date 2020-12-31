@@ -32,13 +32,9 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	if (userRole == 'Admin') {
 		$("#sRole").hide(); //naviPg
 		$("#naviPg").css("cursor", "default");
-	}
-
-	//Global model popup
-	
-	if ($location.$$path == '/admin') {
 		$(".bell-icon-div").hide();
 		$(".resetPassEntry").hide();
+		$(".user-actions-menuitem").hide();
 	}
 
 	if (!userDetails.dbuser){
@@ -47,8 +43,8 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 
 	if ($location.$$path == "/plugin") {
 		$("button.notify-btn").addClass('notify-btn-white');
-
 	}
+
 	$("#notifications-count").hide();
 
 
