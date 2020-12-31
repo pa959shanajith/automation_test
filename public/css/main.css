@@ -2418,7 +2418,7 @@ input[disabled]{
     border: 1px solid red!important;
 }
 #selectIcePoolIce select{
-    max-width: 180px;
+    max-width: 200px;
     height: 35px;
 }
 #selectIcePoolIce ul {
@@ -2450,7 +2450,7 @@ input[disabled]{
     left: 171px;
 }
 #selectIcePoolIce .modal-body{
-    height: 200px;
+    height: 250px;
     padding: 40px 15px;
 }
 #pageContent{
@@ -3418,6 +3418,12 @@ li.select_all .addCustObj{
     width: 110px;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+#selectDefIce .modal-body {
+    position: relative;
+    padding: 30px 15px;
+    height: 100px;
 }
 
 #selectDefIce .adminControl{
