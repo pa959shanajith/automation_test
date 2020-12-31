@@ -249,14 +249,14 @@ const fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
 		inputs = {
 			"testscenarioid": scenarioid
 		};
-		integ = integrationType[k]
+		const integ = integrationType[k];
 		if (integ == 'qTest') inputs.query = "qtestdetails";
 		else if (integ == 'ALM') inputs.query = "qcdetails";
 		else if (integ == 'Zephyr') inputs.query = "zephyrdetails";
 		if (inputs.query) {
 			const qcdetails = await utils.fetchData(inputs, "qualityCenter/viewIntegrationMappedList_ICE", fnName);
 			if(integ == 'ALM' && Array.isArray(qcdetails)) {
-				for(var i=0;i<qcdetails.length;++i) {
+				for (let i=0; i < qcdetails.length; ++i) {
 					if (qcdetails[i] != "fail") qcDetailsList.push(JSON.parse(JSON.stringify(qcdetails[i])));
 				}
 				if (qcDetailsList.length > 0) scenario.qcdetails.push(qcDetailsList);

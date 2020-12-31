@@ -438,7 +438,6 @@ exports.viewQtestMappedList_ICE = function (req, res) {
 	var username = req.session.username;
 	var name = undefined
 	if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
-
 	getQcDetailsForUser(userid, function (responsedata) {
 		redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 			if (redisres[1]>0) {
