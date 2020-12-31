@@ -3420,6 +3420,12 @@ li.select_all .addCustObj{
     text-overflow: ellipsis;
 }
 
+#selectDefIce .modal-body {
+    position: relative;
+    padding: 30px 15px;
+    height: 100px;
+}
+
 #selectDefIce .adminControl{
     height: 55px;
 }
