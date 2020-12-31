@@ -46,9 +46,9 @@ exports.loginToQTest_ICE = function (req, res) {
 						var integrationType = req.body.integrationType;
 						var qcaction = req.body.qcaction;
 						var qcDetails = {
-							"qcUsername": username,
-							"qcPassword": password,
-							"qcURL": url,
+							"qtestusername": username,
+							"qtestpassword": password,
+							"qtesturl": url,
 							"integrationType" : integrationType,
 							"qcaction": qcaction
 						};
@@ -437,7 +437,7 @@ exports.viewQtestMappedList_ICE = function (req, res) {
 	var userid = req.body.user_id;
 	var username = req.session.username;
 	var name = undefined
-			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
+	if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
 	getQcDetailsForUser(userid, function (responsedata) {
 		redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 			if (redisres[1]>0) {
@@ -586,7 +586,7 @@ function qcscenariodetails(projectid, cb) {
 				client.post(epurl + "qualityCenter/viewIntegrationMappedList_ICE", args,
 					function (qcdetailsows, response) {
 					if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
-						logger.error("Error occurred inqualityCenter/viewIntegrationMappedList_ICE from qcdetails Error Code : ERRDAS");
+						logger.error("Error occurred in qualityCenter/viewIntegrationMappedList_ICE from qcdetails Error Code : ERRDAS");
 					} else {
 						if (qcdetailsows.rows.length != 0) {
 							//flagtocheckifexists = true;
