@@ -4,6 +4,7 @@ var create_ice = require('../controllers/create_ice');
 var myserver = require('../lib/socket.js');
 var logger = require('../../logger');
 var utils = require('../lib/utils');
+var suites = require('../controllers/suite')
 var xlsx = require('xlsx');
 var path = require('path');
 var fs = require('fs');
@@ -72,23 +73,17 @@ exports.populateScenarios = function (req, res) {
 	}
 };
 
-exports.getProjectTypeMM = function (req, res) {
+exports.getProjectTypeMM = (req, res) =>{
 	logger.info("Inside UI service: getProjectTypeMM");
-	if (utils.isSessionActive(req)) {
-		var inputs = req.body.projectId;
-		create_ice.getProjectType(inputs, function (err, result) {
-			if (err) {
-				res.status(500).send('Fail');
-			}
-			else {
-				res.status(200).send(result);
-			}
-		});
-	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
-	}
+	var inputs = req.body.projectId;
+	create_ice.getProjectType(inputs, function (err, result) {
+		if (err) {
+			res.status(500).send('Fail');
+		}
+		else {
+			res.status(200).send(result);
+		}
+	});
 };
 
 exports.populateUsers = function (req, res) {
@@ -115,7 +110,7 @@ const getModule = async (d) => {
 	const inputs = {
 		"tab":d.tab,
 		"projectid":d.projectid || null,
-		"modulename":d.modName,
+		// "modulename":d.modName,
 		"moduleid":d.moduleid,
 		"cycleid":d.cycId,
 		"name":"getModules"
@@ -538,132 +533,110 @@ exports.saveData =  async(req, res)=> {
 
 exports.saveEndtoEndData = function (req, res) {
 	logger.info("Inside UI service: saveEndtoEndData");
-	if (utils.isSessionActive(req)) {
-		var nData = [], qList = [], idDict = {};
-		var urlData = req.get('host').split(':');
-		var inputs = req.body;
-		var data = inputs.map;
-		var prjId = inputs.prjId;
-		var deletednodes = inputs.deletednode;
-		var user = req.session.username;
-		var userrole = req.session.activeRole;
-		var userid = req.session.userid;
-		var userroleid = req.session.activeRoleId;
-		var flag = inputs.write;
-		// var relId = inputs.relId;
-		var cycId = inputs.cycId;
-		var createdthrough=inputs.createdthrough || "Web";
-
-		//TO support task deletion
-		var removeTask = inputs.unassignTask;
-		if (flag == 10) {
-			var uidx = 0, rIndex;
-			var vn_from = inputs.vn_from;
-			var vn_to = inputs.vn_from;
-			// var idn_v_idc = {};
-
-			var qObj = { "projectid": prjId, "testsuiteDetails": [], "username": user, "userrole": userrole, "versionnumber": parseFloat(vn_from)|| 0, "newversionnumber": parseFloat(vn_to) || 0 , "userid":userid,"userroleid":userroleid ,"createdthrough":createdthrough,"deletednodes":deletednodes};
-			var nObj = [], tsList = [];
-			data.forEach(function (e, i) {
-				if (e.type == "endtoend") rIndex = uidx; // check for normal modules
-				if (e.task != null) delete e.task.oid;
-				nObj.push({ projectID: e.projectID, _id: e._id || null, name: e.name, task: e.task, children: [] ,state: e.state, childIndex:e.childIndex});
-				if (idDict[e.pid] !== undefined) nObj[idDict[e.pid]].children.push(nObj[uidx]);
-				idDict[e.id] = uidx++;
-			});
-
-			nObj[rIndex].children.forEach(function (ts, i) {
-				var sList = [];
-				tsList.push({ "testscenarioid": ts._id||null, "testscenarioName": ts.name, "tasks": ts.task,"state":ts.state,"childIndex":parseInt(ts.childIndex)});
-				
-			});
-			tsList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1)
-			qObj.testsuiteDetails = [{ "testsuiteId": nObj[rIndex]._id||null, "testsuiteName": nObj[rIndex].name, "task": nObj[rIndex].task, "testscenarioDetails": tsList,"state":nObj[rIndex].state}];
-			
-			create_ice.saveMindmapE2E(qObj, function (err, data) {
-				if (err) {
-					res.status(500).send(err);
-				} else {
-					// if res.rows
-					res.status(200).send(data);
-				}
-			});
-		}
-	} else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
+	var idDict = {};
+	var inputs = req.body;
+	var data = inputs.map;
+	var prjId = inputs.prjId;
+	var deletednodes = inputs.deletednode;
+	var user = req.session.username;
+	var userrole = req.session.activeRole;
+	var userid = req.session.userid;
+	var userroleid = req.session.activeRoleId;
+	var flag = inputs.write;
+	var createdthrough=inputs.createdthrough || "Web";
+	if (flag == 10) {
+		var uidx = 0, rIndex;
+		var vn_from = inputs.vn_from;
+		var vn_to = inputs.vn_from;
+		var qObj = { "projectid": prjId, "testsuiteDetails": [], "username": user, "userrole": userrole, "versionnumber": parseFloat(vn_from)|| 0, "newversionnumber": parseFloat(vn_to) || 0 , "userid":userid,"userroleid":userroleid ,"createdthrough":createdthrough,"deletednodes":deletednodes};
+		var nObj = [], tsList = [];
+		data.forEach(function (e, i) {
+			if (e.type == "endtoend") rIndex = uidx; // check for normal modules
+			if (e.task != null) delete e.task.oid;
+			nObj.push({ projectID: e.projectID, _id: e._id || null, name: e.name, task: e.task, children: [] ,state: e.state, childIndex:e.childIndex});
+			if (idDict[e.pid] !== undefined) nObj[idDict[e.pid]].children.push(nObj[uidx]);
+			idDict[e.id] = uidx++;
+		});
+		nObj[rIndex].children.forEach(function (ts, i) {
+			tsList.push({ "testscenarioid": ts._id||null, "testscenarioName": ts.name, "tasks": ts.task,"state":ts.state,"childIndex":parseInt(ts.childIndex)});
+		});
+		tsList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1)
+		qObj.testsuiteDetails = [{ "testsuiteId": nObj[rIndex]._id||null, "testsuiteName": nObj[rIndex].name, "task": nObj[rIndex].task, "testscenarioDetails": tsList,"state":nObj[rIndex].state}];
+		
+		create_ice.saveMindmapE2E(qObj, function (err, data) {
+			if (err) {
+				res.status(500).send(err);
+			} else {
+				// if res.rows
+				res.status(200).send(data);
+			}
+		});
 	}
 };
 
 exports.excelToMindmap = function (req, res) {
 	logger.info("Inside UI service: excelToMindmap");
 	try {
-		if (utils.isSessionActive(req)) {
-			var wb1 = xlsx.read(req.body.data.content, { type: 'binary' });
-			if (req.body.data.flag == 'sheetname') {
-				return res.status(200).send(wb1.SheetNames);
+		var wb1 = xlsx.read(req.body.data.content, { type: 'binary' });
+		if (req.body.data.flag == 'sheetname') {
+			return res.status(200).send(wb1.SheetNames);
+		}
+		var myCSV = xlsToCSV(wb1, req.body.data.sheetname);
+		var numSheets = myCSV.length / 2;
+		var qObj = [];
+		var err;
+		for (var k = 0; k < numSheets; k++) {
+			var cSheet = myCSV[k * 2 + 1];
+			var cSheetRow = cSheet.split('\n');
+			var scoIdx = -1, scrIdx = -1, sctIdx = -1,modIdx=-1;
+			var uniqueIndex = 0;
+			cSheetRow[0].split(',').forEach(function (e, i) {
+				if(i== 0 && e.toLowerCase()=="module") modIdx = i;
+				if(i== 1 && e.toLowerCase()=="scenario") scoIdx = i;
+				if(i== 2 && e.toLowerCase()=="screen") scrIdx = i;
+				if(i== 3 && e.toLowerCase()=="script") sctIdx = i;
+			});
+			if (modIdx == -1 || scoIdx == -1 || scrIdx == -1 || sctIdx == -1 || cSheetRow.length < 2) {
+				err = true;
+				break;
 			}
-			var myCSV = xlsToCSV(wb1, req.body.data.sheetname);
-			var numSheets = myCSV.length / 2;
-			var qObj = [];
-			var err;
-			for (var k = 0; k < numSheets; k++) {
-				var cSheet = myCSV[k * 2 + 1];
-				var cSheetRow = cSheet.split('\n');
-				var scoIdx = -1, scrIdx = -1, sctIdx = -1,modIdx=-1;
-				var uniqueIndex = 0;
-				cSheetRow[0].split(',').forEach(function (e, i) {
-					if(i== 0 && e.toLowerCase()=="module") modIdx = i;
-					if(i== 1 && e.toLowerCase()=="scenario") scoIdx = i;
-					if(i== 2 && e.toLowerCase()=="screen") scrIdx = i;
-					if(i== 3 && e.toLowerCase()=="script") sctIdx = i;
-				});
-				if (modIdx == -1 || scoIdx == -1 || scrIdx == -1 || sctIdx == -1 || cSheetRow.length < 2) {
-					err = true;
-					break;
+			var e, lastSco = -1, lastScr = -1, nodeDict = {}, scrDict = {};
+			for (var i = 1; i < cSheetRow.length; i++) {
+				var row = cSheetRow[i].split(',');
+				if (row.length < 3) continue;
+				if (row[modIdx] !== '') {
+					e = { id: uuidV4(), name: row[modIdx], type: 0 };
+					qObj.push(e);
 				}
-				var e, lastSco = -1, lastScr = -1, nodeDict = {}, scrDict = {};
-				for (var i = 1; i < cSheetRow.length; i++) {
-					var row = cSheetRow[i].split(',');
-					if (row.length < 3) continue;
-					if (row[modIdx] !== '') {
-						e = { id: uuidV4(), name: row[modIdx], type: 0 };
-						qObj.push(e);
-					}
-					if (row[scoIdx] !== '') {
-						lastSco = uniqueIndex; lastScr = -1; scrDict = {};
-						e = { id: uuidV4(), name: row[scoIdx], type: 1 };
-						qObj.push(e);
-						nodeDict[e.id] = uniqueIndex;
-						uniqueIndex++;
-					}
-					if (row[scrIdx] !== '' && lastSco != -1) {
-						var tName = row[scrIdx];
-						var lScr = qObj[lastScr];
-						if (lScr === undefined || (lScr)) {
-							if (scrDict[tName] === undefined) scrDict[tName] = uuidV4();
-							lastScr = uniqueIndex;
-							e = { id: scrDict[tName], name: tName, type: 2, uidx: lastScr };
-							qObj.push(e);
-							nodeDict[e.id] = uniqueIndex;
-							uniqueIndex++;
-						}
-					}
-					if (row[sctIdx] !== '' && lastScr != -1) {
-						e = { id: uuidV4(), name: row[sctIdx], type: 3, uidx: lastScr };
+				if (row[scoIdx] !== '') {
+					lastSco = uniqueIndex; lastScr = -1; scrDict = {};
+					e = { id: uuidV4(), name: row[scoIdx], type: 1 };
+					qObj.push(e);
+					nodeDict[e.id] = uniqueIndex;
+					uniqueIndex++;
+				}
+				if (row[scrIdx] !== '' && lastSco != -1) {
+					var tName = row[scrIdx];
+					var lScr = qObj[lastScr];
+					if (lScr === undefined || (lScr)) {
+						if (scrDict[tName] === undefined) scrDict[tName] = uuidV4();
+						lastScr = uniqueIndex;
+						e = { id: scrDict[tName], name: tName, type: 2, uidx: lastScr };
 						qObj.push(e);
 						nodeDict[e.id] = uniqueIndex;
 						uniqueIndex++;
 					}
 				}
+				if (row[sctIdx] !== '' && lastScr != -1) {
+					e = { id: uuidV4(), name: row[sctIdx], type: 3, uidx: lastScr };
+					qObj.push(e);
+					nodeDict[e.id] = uniqueIndex;
+					uniqueIndex++;
+				}
 			}
-			if (err) res.status(200).send('fail');
-			else res.status(200).send(qObj);
 		}
-		else {
-			logger.error("Invalid Session");
-			res.send("Invalid Session");
-		}
+		if (err) res.status(200).send('fail');
+		else res.status(200).send(qObj);
 	}
 	catch (exc) {
 		logger.error(exc.message);
@@ -679,6 +652,28 @@ exports.getScreens = async(req, res) =>{
 	}
 	var data = await utils.fetchData(inputs, "mindmap/getScreens", "getScreens");
 	res.send(data);
+};
+
+exports.importMindmap = async(req, res) =>{
+	logger.info("Inside UI service: importMindmap");
+	var d = req.body;
+	var inputs= {
+		"mindmap":d,
+		"query":"importMindmap"
+	}
+	var data = await utils.fetchData(inputs, "mindmap/importMindmap", "importMindmap");
+	res.send(data)
+};
+
+exports.exportMindmap= async (req, res) =>{
+	logger.info("Inside UI service: exportMindmap");
+	var d = req.body;
+	var inputs= {
+		"mindmapId":d.mindmapId,
+		"query":"exportMindmap"
+	}
+	var data = await utils.fetchData(inputs, "mindmap/exportMindmap","exportMindmap");
+	res.send(data)
 };
 
 exports.exportToExcel = async (req, res) =>{
@@ -1087,7 +1082,8 @@ exports.pdProcess = function (req, res) {
 		asynclib.forEachSeries(orderlist, function (nodeObj, savedcallback) {
 			var name = nodeObj.label;
 			if(screendataobj[name].data.view[0]!=undefined){
-				var screenshotdeatils = screendataobj[name].data.view[0].screenshot.split(";")[1];
+				var len1=(screendataobj[name].data.view).length
+				var screenshotdeatils = screendataobj[name].data.view[len1-1].screenshot.split(";")[1];
 			    var screenshotdata = screenshotdeatils.split(",")[1];
 			}else{
 				var screenshotdata = "";
@@ -1101,8 +1097,10 @@ exports.pdProcess = function (req, res) {
 				'modifiedby': userid,
 				'modifiedbyrole': role,
 				'deleted': false,
+				'createdthrough':'PD',
 				'screenshot':screenshotdata,
 				'scrapedurl':'',
+				'createdthrough':'PD',
 				'scrapedata': screendataobj[name].data
 			};
 			ordernameidlist.push({'name':'Screen_'+name,'type':3})
@@ -1120,7 +1118,6 @@ exports.pdProcess = function (req, res) {
 						if (response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail") {
 							logger.error("Error occurred in create_ice/updateScreenname_ICE from fetchScrapedData Error Code : ERRDAS");
 						} else {
-							console.log("screen saved successfully!");
 							if(getScrapeDataQueryresult.rows[0]['parent']!=undefined){
 								var screenid = getScrapeDataQueryresult.rows[0]['parent'][0];
 								var dobjects = getScrapeDataQueryresult.rows;
@@ -1155,7 +1152,6 @@ exports.pdProcess = function (req, res) {
 										if (response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail") {
 											logger.error("Error occurred in design/getScrapeDataScreenLevel_ICE from fetchScrapedData Error Code : ERRDAS");
 										} else {
-											console.log("Testcase saved successfully!");
 											savedcallback();		
 										}
 									} catch (exception) {
@@ -1174,7 +1170,7 @@ exports.pdProcess = function (req, res) {
 			res.send({"success":true,"data":orderMatrix,"history":activityJSON['mxGraphModel']['@history']});
 		});
 	} catch(err) {
-		console.log(err)
+		logger.error("Exception occurred in pdProcess", err)
 		res.status(500).send("fail");
 	}
 };
@@ -1243,6 +1239,8 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectRadioButton',null,null,eachScrapedAction.url,"Web");
 						} else if(eachScrapedAction.tag == "checkbox") {
 							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectCheckbox',null,null,eachScrapedAction.url,"Web");
+						} else if(eachScrapedAction.tag == "table") {
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'cellClick',null,null,eachScrapedAction.url,"Web");
 						} else {
 							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'click',null,null,eachScrapedAction.url,"Web");
 							var custname_split = eachScrapedAction.custname.split('_');
@@ -1268,7 +1266,6 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						}
 						break;		
 					default:
-						console.log("no match found!");
 						break;
 				}
 				if(testcaseObj){
@@ -1326,6 +1323,12 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 				case "tree":
 					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTreeElement',null,null,null,"SAP");
 					break;
+				case "picture":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClick',null,null,null,"SAP");
+					break;
+				case "text":
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
+					break;
 				default:
 					logger.info("Import PD: No match found for "+eachScrapedAction.tag+" for SAP apptype.");
 					break;
@@ -1340,7 +1343,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 	if(adjacentItems){
 		// list of sources(only shapes) and targets (assuming only one)
 		if(adjacentItems["error"]){
-			console.log(adjacentItems["error"]);
+			logger.error("Error in pdProcess:generateTestCaseMap, Err: ", adjacentItems["error"]);
 		}
 		else{
 			// old logic

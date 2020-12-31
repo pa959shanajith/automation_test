@@ -180,7 +180,24 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 			})
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
-    	
+		},
+		exportMindmap: function(mindmapId){
+			var param = "exportMindmap";
+			return $http.post('/exportMindmap',{
+					action: param,
+					mindmapId: mindmapId
+			})
+			.then(function (response) { return response.data; },
+					function (response) { return $q.reject(response.data); });
+		},
+		importMindmap: function(mindmap){
+			var param = "importMindmap";
+			return $http.post('/importMindmap',{
+					action: param,
+					content: mindmap.content
+			})
+			.then(function (response) { return response.data; },
+					function (response) { return $q.reject(response.data); });
 		}
 	}
 }]);

@@ -13,7 +13,10 @@
     float: left;
     flex: 0 1 100%;
 }
-
+.mp__toolbar__container{
+    background-color: #e6e7e9;
+    position: relative;
+}
 .loading-bar{
     position:absolute!important;
 }

@@ -13,7 +13,8 @@ exports.getCrawlResults = function (req, res) {
 		logger.info("Inside UI service: getCrawlResults");
 		if (utils.isSessionActive(req)) {
 			var username=req.session.username;
-			var icename = myserver.allSocketsICEUser[username];
+			var icename = undefined
+			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
 			redisServer.redisSubServer.subscribe('ICE2_' + icename ,1);
 			var url = req.body.url;
 			var level = req.body.level;
@@ -44,7 +45,7 @@ exports.getCrawlResults = function (req, res) {
 					}
 					function webCrawlerGo_listener(channel,message) {
 						var data = JSON.parse(message);
-						if (icename == data.username) {
+						if (icename == data.username && ["unavailableLocalServer", "result_web_crawler", "result_web_crawler_finished"].includes(data.onAction)) {
 							var value = data.value;
 							if (data.onAction == "unavailableLocalServer") {
 								redisServer.redisSubServer.removeListener('message',webCrawlerGo_listener);	

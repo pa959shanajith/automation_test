@@ -7,6 +7,7 @@
     font-family: Latoweb;
     padding-top: 5px;
     padding-bottom: 10px;
+    z-index: 1;
 }
 .ene_toolbar__header label{
     display: inline-block;
@@ -31,7 +32,6 @@
 .ene_toolbar__header-searchbox{
     float: right;
     width: 50%;
-    min-width: 189px;
 }
 .ene_toolbar__header-searchbox input{
     width: 90%;

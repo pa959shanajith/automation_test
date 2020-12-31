@@ -1,12 +1,15 @@
-mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeout','$location','ExecutionService','mindmapServices','DesignServices','cfpLoadingBar', 'socket', function ($scope, $rootScope, $http, $timeout, $location, ExecutionService, mindmapServices,DesignServices,cfpLoadingBar,socket) {
+mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeout','$location','adminServices','ExecutionService','ScheduleService','mindmapServices','DesignServices','cfpLoadingBar', 'socket', function ($scope, $rootScope, $http, $timeout, $location, adminServices, ExecutionService, ScheduleService, mindmapServices,DesignServices,cfpLoadingBar,socket) {
 	cfpLoadingBar.start();
 	var getEachScenario = []; //Contains Each RowData of Scenarios
 	var browserTypeExe = []; // Contains selected browser id for execution
+	var executionData = {}
 	var executionActive = false;
 	var rowId;
 	var execAction = "serial";
+	var execEnv = "default";
 	$scope.moduleInfo = [];
 	$scope.somevar = {};
+	$scope.smartMode = false
 	$("body").css("background", "#eee");
 	$timeout(function () {
 		$('.scrollbar-inner').scrollbar();
@@ -96,7 +99,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					//<img class='expandTable' src='imgs/icon-minus.png'>
 
 					var row = $("#executionDataTable_" + m).find('tbody');
-					console.log("row", row);
 					var count = 1;
 
 					//Building object for each row after getting the data from server
@@ -526,7 +528,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	};
 	//Save TestSuite Functionality
 
-	$scope.qccredentials = {qcurl: "", qcusername: "", qcpassword: "", qctype: ""};
+	$scope.qccredentials = {qcurl: "", qcusername: "", qcpassword: "", integrationType: ""};
 
 	//Save QC Details
 	$scope.saveQcCredentials = function (e) {
@@ -567,13 +569,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					$scope.qccredentials = {
 						qcurl: $("#almURL").val(),
 						qcusername: $("#almUserName").val(),
-						qcpassword: $("#almPassword").val()
+						qcpassword: $("#almPassword").val(),
+						integrationType: "ALM"
 					}
-					//Transaction Activity for SaveQcCredentialsExecution Button Action
-					// var labelArr = [];
-					// var infoArr = [];
-					// labelArr.push(txnHistory.codesDict['SaveQcCredentialsExecution']);
-					// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
 					$("#ALMSyncWindow").find("button.close").trigger("click");
 				}
 			}, function (error) {
@@ -622,15 +620,64 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 						qcusername: $("#qTestUserName").val(),
 						qcpassword: $("#qTestPassword").val(),
 						qteststeps: checkedVal,
-						qctype: "qTest"
+						integrationType: "qTest"
 					}
 					$("#QTestSyncWindow").find("button.close").trigger("click");
 				}
 			}, function (error) {
-				console.log("Error in qcController.js file loginQCServer method! \r\n " + (error.data));
+				console.log("Error in qTestController.js file loginqTestServer method! \r\n " + (error.data));
 			});
 		}
 	};
+
+	//Save Zephyr Details
+	$scope.saveZephyrCredentials = function (e) {
+		$("#ZephyrURL, #ZephyrUserName, #ZephyrPassword").removeClass('inputErrorBorder');
+		if (!$scope.ZephyrURL) {
+			$("#ZephyrURL").addClass('inputErrorBorder');
+			$(".error-msg-exeQc").text("Please Enter Zephyr Account ID.");
+		} else if (!$scope.ZephyrUserName) {
+			$("#ZephyrUserName").addClass('inputErrorBorder');
+			$(".error-msg-exeQc").text("Please Enter Access Key.");
+		} else if (!$scope.ZephyrPassword) {
+			$("#ZephyrPassword").addClass('inputErrorBorder');
+			$(".error-msg-exeQc").text("Please Enter Secret Key.");
+		} else if (appType != "SAP" && browserTypeExe.length === 0) {
+			$("#ZephyrSyncWindow").find("button.close").trigger("click");
+			openDialogExe("Execute Test Suite", "Please select a browser");
+		} else if ($(".exe-ExecuteStatus input:checked").length === 0) {
+			$("#ZephyrSyncWindow").find("button.close").trigger("click");
+			openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
+		} else {
+			$("#ZephyrURL,#ZephyrUserName,#ZephyrPassword").css({
+				"background": "none"
+			});
+			$(".error-msg-exeQc").text("");
+			ExecutionService.loginZephyrServer_ICE($scope.ZephyrURL, $scope.ZephyrUserName, $scope.ZephyrPassword,"Zephyr")
+			.then(function (data) {
+				if (data == "unavailableLocalServer") {
+					$(".error-msg-exeQc").text("Unavailable LocalServer");
+				} else if (data == "Invalid Session") {
+					$(".error-msg-exeQc").text("Invalid Session");
+				} else if (data == "invalidcredentials") {
+					$(".error-msg-exeQc").text("Invalid Credentials");
+				} else if (data == "invalidurl") {
+					$(".error-msg-exeQc").text("Invalid URL");
+				} else {
+					$scope.qccredentials = {
+						qcurl: $("#ZephyrURL").val(),
+						qcusername: $("#ZephyrUserName").val(),
+						qcpassword: $("#ZephyrPassword").val(),
+						integrationType: "Zephyr"
+					}
+					$("#ZephyrSyncWindow").find("button.close").trigger("click");
+				}
+			}, function (error) {
+				console.log("Error in ZephyrController.js file loginZephyrServer method! \r\n " + (error.data));
+			});
+		}
+	};
+
 	
 	//Execute TestSuite Functionality
 	$scope.ExecuteTestSuite = function ($event) {
@@ -680,96 +727,216 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					$scope.moduleInfo.push(suiteInfo);
 				}
 			});
-			blockUI("Execution in progress. Please Wait...");
-			var executionData = {
+			executionData = {
 				source: "task",
 				exectionMode: execAction,
+				executionEnv: execEnv,
 				browserType: browserTypeExe,
 				qccredentials: $scope.qccredentials,
 				batchInfo: $scope.moduleInfo
 			};
-			executionActive = true;
-			$rootScope.resetSession.start();
-			ExecutionService.ExecuteTestSuite_ICE(executionData)
-			.then(function (data) {
-				if (data == "begin") return false;
-				unblockUI();
-				$rootScope.resetSession.end();
-				executionActive = false;
-				if (data == "Invalid Session") return $rootScope.redirectPage();
-				else if (data == "unavailableLocalServer") openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
-				else if (data == "scheduleModeOn") openDialogExe("Execute Test Suite", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
-				else if(data == "NotApproved") openDialogExe("Execute Test Suite", "All the dependent tasks (design, scrape) needs to be approved before execution");
-				else if(data == "NoTask") openDialogExe("Execute Test Suite", "Task does not exist for child node");
-				else if(data == "Modified") openDialogExe("Execute Test Suite", "Task has been modified, Please approve the task");
-				else if (data == "unavailableLocalServer") openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
-				else if (data == "Terminate") {
-					$('#executionTerminated').modal('show');
-					$('#executionTerminated').find('.btn-default').focus();
-				} else if (data == "success") {
-					$('#executionCompleted').modal('show');
-					setTimeout(function () {
-						$("#executionCompleted").find('.btn-default').focus();
-					}, 300);
-				} else openDialogExe("Execute Test Suite", "Failed to execute.");
-				$(".selectBrowser").find("img").removeClass("sb");
-				$(".selectParallel").find("img").removeClass("sb");
-				$(".selectBrowser").find("svg").removeClass("sb");
-				$(".selectParallel").find("svg").removeClass("sb");
-				browserTypeExe = [];
-				$scope.moduleInfo = [];
-				$scope.readTestSuite_ICE();
-				$("#syncScenario").prop("disabled", true);
-				//Transaction Activity for ExecuteTestSuite Button Action
-				// var labelArr = [];
-				// var infoArr = [];
-				// infoArr.push({"appType" : appType});
-				// infoArr.push({"status" : data});
-				// labelArr.push(txnHistory.codesDict['ExecuteTestSuite']);
-				// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
-			}, function (error) {
-				unblockUI();
-				$rootScope.resetSession.end();
-				openDialogExe("Execute Failed", "Failed to execute.");
-				executionActive = false;
-				//$('#executionFailed').modal('show');
-				$(".selectBrowser").find("img").removeClass("sb");
-				$(".selectParallel").find("img").removeClass("sb");
-				$(".selectBrowser").find("svg").removeClass("sb");
-				$(".selectParallel").find("svg").removeClass("sb");
-				browserTypeExe = [];
-				$scope.moduleInfo = [];
-				$scope.readTestSuite_ICE();
-				$("#syncScenario").prop("disabled", true);
-			});
+			allocateICEPopup()
 		}
 	};
 
-	socket.on('result_ExecutionDataInfo', function (data) {
-		if (!executionActive)
-			return false;
-		if (data == "Terminate") {
-			$('#executionTerminated').modal('show');
-			$('#executionTerminated').find('.btn-default').focus();
-		} else if (data == "unavailableLocalServer") {
-			openDialogExe("Execute Test Suite", $rootScope.unavailableLocalServer_msg);
-		} else if (data == "success") {
-			$('#executionCompleted').modal('show');
-			setTimeout(function () {
-				$("#executionCompleted").find('.btn-default').focus();
-			}, 300);
-		} else openDialogExe("Execute Test Suite", "Failed to execute.");
-		unblockUI();
-		$rootScope.resetSession.end();
-		$(".selectBrowser").find("img").removeClass("sb");
-		$(".selectParallel").find("img").removeClass("sb");
-		$(".selectBrowser").find("svg").removeClass("sb");
-		$(".selectParallel").find("svg").removeClass("sb");
-		browserTypeExe = [];
-		$scope.moduleInfo = [];
-		$scope.readTestSuite_ICE();
-		$("#syncScenario").prop("disabled", true);
-	});
+	const allocateICEPopup = () =>{
+		$scope.smartMode = false;
+		$scope.selectedICE = "";
+		var projId = JSON.parse(window.localStorage['_CT']).testSuiteDetails[0].projectidts
+		var data = {poolid:"",projectids: [projId]}
+		$("#chooseICEPool option").slice(1).remove()
+		$('#executionType').val('normal')
+		//$("#chooseICEPool option").remove()
+		blockUI('Fetching ICE ...')
+		adminServices.getPools(data)
+		.then(function(data){
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "fail") {
+				openDialogExe("Suite Execution", "Failed to fetch users.");
+				unblockUI();
+			} else {
+				$scope.poolList = data
+				var arr = Object.entries(data)
+				arr.sort((a,b) => a[1].poolname.localeCompare(b[1].poolname))
+				arr.forEach((e)=>{
+					$("#chooseICEPool").append('<option value='+e[0]+'>'+e[1].poolname+'</option>');
+				})
+				$("#chooseICEPool").val('unallocated')
+				ScheduleService.getICE_list({"projectid":projId})
+				.then(function(data){
+					$scope.iceStatus = data
+					populateICElist(arr,true)
+					$('#selectIcePoolIce').modal("show")
+					unblockUI()
+				}).catch(error=>{
+					unblockUI()
+					console.error(error)
+					openDialogExe("Suite Execution", "Failed to fetch ICE.");
+				})
+			}
+		}, function (error) {
+			unblockUI();
+			console.error(error)
+			openDialogExe("Suite Execution", "Failed to fetch ICE.");
+		});
+		return;
+	}
+
+	$('#executionType').change(function (e) {
+		$('#userIdName').val("")
+		$scope.smartMode = e.currentTarget.selectedOptions[0].getAttribute('smart') == "true"
+	})
+
+	$scope.iceCheckboxClick = ($event,ice) => {
+		if($scope.smartMode){
+			if($event.target.tagName.toLowerCase() != 'input'){
+				$event.currentTarget.getElementsByTagName('input')[0].checked = !$event.currentTarget.getElementsByTagName('input')[0].checked
+				$event.stopPropagation()
+				$event.preventDefault()
+			}
+		}else{
+			$scope.selectedICE = ice
+			$('#userIdName').removeClass('error-border')
+		}
+	}
+
+	const populateICElist =(arr,unallocated)=>{
+		var ice=[]
+		var iceStatus = $scope.iceStatus.ice_ids
+		const statusUpdate = (ice) => {
+			var color = '#fdc010' ;
+			var status = 'Offline';
+			if(ice.connected){
+				color = '#95c353';
+				status = 'Online'
+			}
+			if(ice.mode){
+				color = 'red';
+				status = 'DND mode'
+			}
+			return {color,status}
+		}
+		if(unallocated){
+			arr = Object.entries($scope.iceStatus.unallocatedICE)
+			arr.forEach((e)=>{
+				var res = statusUpdate(e[1])
+				e[1].color = res.color;
+				e[1].statusCode = res.status;
+				ice.push(e[1])
+			})
+		}else{
+			arr.forEach((e)=>{
+				if(e[1].ice_list){
+					Object.entries(e[1].ice_list).forEach((k)=>{
+						if(k[0] in iceStatus){
+							var res = statusUpdate(iceStatus[k[0]])
+							k[1].color = res.color;
+							k[1].statusCode = res.status;
+							ice.push(k[1])
+						}
+					})
+				}
+			})
+		}
+		ice.sort((a,b) => a.icename.localeCompare(b.icename))
+		$scope.availableICE = ice
+	}
+
+	$scope.ExecuteOnclick = () =>{
+		$scope.selectedPool = $('#chooseICEPool').val()
+		if($('#chooseICEPool').val() == 'unallocated')$scope.selectedPool = "";
+		var iceList=[]
+		var smartModeType = ''
+		if($scope.smartMode){
+			smartModeType = $('#executionType').val() //change value of dropdown in execution.html if needed
+			$('#ice-dropdown input:checked').each(function(){
+                if($(this).parent().attr('title')=='Online'){
+                    iceList.push($(this).val())
+                }
+            })
+			$scope.selectedICE = iceList
+		}
+		else if(!$scope.selectedICE){
+			if($('#userIdName').val() == "" && $scope.availableICE && $scope.availableICE.length>0){
+				$scope.selectedICE = ""
+			}else{
+				$('#userIdName').addClass('error-border')
+				return;
+			}
+		}
+		$('#userIdName').val("")
+		$('#selectIcePoolIce').modal("hide")
+		blockUI("Sending Execution Request");
+		executionData.targetUser = $scope.selectedICE
+		executionData.type = smartModeType
+		executionData.poolid = $scope.selectedPool
+		executionActive = true;
+		$rootScope.resetSession.start();
+		ExecutionService.ExecuteTestSuite_ICE(executionData)
+		.then(function (data) {
+			if (data == "begin") return false;
+			unblockUI();
+			$rootScope.resetSession.end();
+			executionActive = false;
+			if(data.status) {
+				if(data.status == "fail") {
+					openDialogExe("Queue Test Suite", data["error"]);
+				} else {
+					openDialogExe("Queue Test Suite", data["message"]);
+				}
+			}
+			$(".selectBrowser").find("img").removeClass("sb");
+			$(".selectParallel").find("img").removeClass("sb");
+			$(".selectSauceLabs").find("img").removeClass("sb");
+			$(".selectBrowser").find("svg").removeClass("sb");
+			$(".selectParallel").find("svg").removeClass("sb");
+			$(".selectSauceLabs").find("svg").removeClass("sb");
+			browserTypeExe = [];
+			execAction = "serial";
+			$scope.moduleInfo = [];
+			$scope.readTestSuite_ICE();
+			$("#syncScenario").prop("disabled", true);
+			//Transaction Activity for ExecuteTestSuite Button Action
+			// var labelArr = [];
+			// var infoArr = [];
+			// infoArr.push({"appType" : appType});
+			// infoArr.push({"status" : data});
+			// labelArr.push(txnHistory.codesDict['ExecuteTestSuite']);
+			// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+		}, function (error) {
+			unblockUI();
+			$rootScope.resetSession.end();
+			openDialogExe("Execute Failed", "Failed to execute.");
+			executionActive = false;
+			//$('#executionFailed').modal('show');
+			$(".selectBrowser").find("img").removeClass("sb");
+			$(".selectParallel").find("img").removeClass("sb");
+			$(".selectSauceLabs").find("img").removeClass("sb");
+			$(".selectBrowser").find("svg").removeClass("sb");
+			$(".selectParallel").find("svg").removeClass("sb");
+			$(".selectSauceLabs").find("svg").removeClass("sb");
+			browserTypeExe = [];
+			$scope.moduleInfo = [];
+			$scope.readTestSuite_ICE();
+			$("#syncScenario").prop("disabled", true);
+		});
+	}
+	
+	$('#chooseICEPool').on('change',(e)=>{
+		var unallocated = false
+		var id = e.currentTarget.value
+		if(id=='all'){
+			var arr = Object.entries($scope.poolList)
+		}else if(id=='unallocated'){
+			unallocated =  true
+		}else{
+			var arr = Object.entries({[id]:$scope.poolList[id]})
+		}
+		populateICElist(arr,unallocated)
+		$scope.$apply();
+	})
+	
 	//Execute TestSuite Functionality
 
 	//Integration Functionality
@@ -792,6 +959,16 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			$scope.qTestUserName = '';
 			$scope.qTestPassword = '';
 			$("#QTestSyncWindow").modal("show");
+			$(".error-msg-exeQc").text('');
+		}
+		else if ($(this).val() == "2") {
+			$("#ZephyrURL").val('');
+			$("#ZephyrUserName").val('');
+			$("#ZephyrPassword").val('');
+			$scope.ZephyrURL = '';
+			$scope.ZephyrUserName = '';
+			$scope.ZephyrPassword = '';
+			$("#ZephyrSyncWindow").modal("show");
 			$(".error-msg-exeQc").text('');
 		}
 	});
@@ -871,12 +1048,23 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 	//select parallel execution
 	$(document).on("click", ".selectParallel", function () {
-		$(this).find("img").toggleClass("sb");
-		$(this).find("svg").toggleClass("sb");
-		if ($("img").hasClass('sb') == true || $("svg").hasClass('sb') == true) {
+		$('.selectParallel').find("img").toggleClass("sb");
+		// $(this).find("svg").toggleClass("sb");
+		if ($('.selectParallel').find("img").hasClass('sb') == true){// || $("svg").hasClass('sb') == true) {
 			execAction = "parallel";
 		} else {
 			execAction = "serial";
+		}
+	});
+
+	//select Saucelabs execution
+	$(document).on("click", ".selectSaucelabs", function () {
+		$(this).find("img").toggleClass("sb");
+		$(this).find("svg").toggleClass("sb");
+		if ($("img").hasClass('sb') == true || $("svg").hasClass('sb') == true) {
+			execEnv = "Saucelabs";
+		} else {
+			execEnv = "default";
 		}
 	});
 

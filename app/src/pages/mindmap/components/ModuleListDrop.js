@@ -20,6 +20,7 @@ const ModuleListDrop = (props) =>{
     const [moddrop,setModdrop]=useState(false)
     const [warning,setWarning]=useState(false)
     const [loading,setLoading] = useState(false)
+    const isAssign = props.isAssign
     const selectModule = (e) => {
         var modID = e.target.getAttribute("value")
         if(Object.keys(moduleSelect).length===0){
@@ -30,22 +31,28 @@ const ModuleListDrop = (props) =>{
         }
     }
     const loadModule = async(modID) =>{
+        dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         setModdrop(false)
         setWarning(false)
-        setLoading(true)        
-        if(moduleSelect._id === modID){
-            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-        }
+        setLoading(true)
         var req={
             tab:"tabCreate",
             projectid:proj,
             version:0,
             cycId: null,
-            modName:"",
+            // modName:"",
             moduleid:modID
+        }
+        if(isAssign){
+            req.tab = "tabAssign"
+            req.cycId = props.cycleRef.current?props.cycleRef.current.value: ""
         }
         var res = await getModules(req)
         if(res.error){displayError(res.error);return}
+        if(isAssign && res.completeFlow === false){
+            displayError("Please select a complete flow to assign tasks.")
+            return;
+        }
         dispatch({type:actionTypes.SELECT_MODULE,payload:res})
         setLoading(false)
     }
@@ -74,7 +81,7 @@ const ModuleListDrop = (props) =>{
                         {moduleList.map((e,i)=>{
                             return(
                                 <div onClick={(e)=>selectModule(e)} value={e._id} key={i} className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")}>
-                                    <img value={e._id}  src={"static/imgs/node-modules.png"} alt='module'></img>
+                                    <img value={e._id}  src={'static/imgs/'+(e.type==="endtoend"?"node-endtoend.png":"node-modules.png")} alt='module'></img>
                                     <span value={e._id} >{e.name}</span>
                                 </div>
                             )
@@ -89,10 +96,13 @@ const ModuleListDrop = (props) =>{
         </Fragment>
     )
 }
+
+//content for moduleclick warning popup
 const Content = () => (
     <p>Unsaved work will be lost if you continue. Do you want to continue?</p>
 )
 
+//footer for moduleclick warning popup
 const Footer = (props) => (
     <div className='toolbar__module-warning-footer'>
         <button className='btn-yes' onClick={()=>props.loadModule(props.modID)}>Yes</button>

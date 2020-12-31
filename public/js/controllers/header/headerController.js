@@ -35,16 +35,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	}
 
 	//Global model popup
-	function openModelPopup(modalId, title, body) {
-		var modalBox = $("#"+modalId);
-		modalBox.find('.modal-title').text(title);
-		modalBox.find('.modal-body p').text(body);
-		modalBox.modal("show");
-		setTimeout(function () {
-			modalBox.find('.btn-default').focus();
-		}, 300);
-	}
-
+	
 	if ($location.$$path == '/admin') {
 		$(".bell-icon-div").hide();
 		$(".resetPassEntry").hide();
@@ -118,6 +109,64 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		}
 	});
 
+	socket.on('display_execution_popup', (value) => {
+		var msg = "";
+		for(val in value){
+			var data = value[val].status;
+			var testSuite = value[val].testSuiteIds;
+			var exec = testSuite[0].testsuitename + ": "
+			if (data == "begin") continue;
+			if (data == "unavailableLocalServer") data = exec + $rootScope.unavailableLocalServer_msg;
+			else if (data == "NotApproved") data = exec + "All the dependent tasks (design, scrape) needs to be approved before execution";
+			else if (data == "NoTask") data = exec + "Task does not exist for child node";
+			else if (data == "Modified") data = exec +"Task has been modified, Please approve the task";
+			else if (data == "Completed") data = exec +"Execution Complete";
+			else if (data == "Terminate") data = exec + "Terminated";
+			else if (data == "UserTerminate") data = exec +"Terminated by User"
+			else if (data == "success") data = exec +"success"
+			else if (data == "API Execution Completed") data = exec + "API Execution Completed"
+			else if (data == "API Execution Fail") data = exec + "API Execution Failed"
+			else data = exec + "Failed to execute.";
+			msg = msg + "\n" + data;
+		}
+		if(msg && msg.trim() != ""){
+			openHeaderModalPopup("executeGlobalModal","Execution Result", msg);
+		}		
+		
+	});
+
+	socket.on('result_ExecutionDataInfo', function (result) {
+		var data = result.status
+		var testSuiteIds = result.testSuiteDetails;
+		var msg = "";
+		testSuiteIds[0]["projectidts"] = testSuiteIds[0]["projectid"];
+		window.localStorage["report"] = JSON.stringify(result);
+		msg = testSuiteIds[0]["testsuitename"]
+		
+		if (data == "Terminate") {
+			$('#executionTerminatedBy').html('Program');
+			$("#executionTerminatedBy").find('.modal-title').text(msg);
+			$('#executionTerminated').modal('show');
+			$('#executionTerminated').find('.btn-default').focus();
+		} else if (data == "UserTerminate") {
+			$('#executionTerminatedBy').html('User');
+			$("#executionTerminatedBy").find('.modal-title').text(msg);
+			$('#executionTerminated').modal('show');
+			$('#executionTerminated').find('.btn-default').focus();
+		} else if (data == "unavailableLocalServer") {
+			openHeaderModalPopup("executeGlobalModal","Execute Test Suite", $rootScope.unavailableLocalServer_msg);
+		} else if (data == "success") {
+			$("#executionCompleted").find('.modal-title').text(msg);
+			$('#executionCompleted').modal('show');
+			setTimeout(function () {
+				$("#executionCompleted").find('.btn-default').focus();
+			}, 300);
+		} else if(data == "Completed"){
+			openHeaderModalPopup("executeGlobalModal","Scheduled Execution Complete", msg);
+		}else openHeaderModalPopup("executeGlobalModal","Execute Test Suite", "Failed to execute.");
+	});
+
+	
 	function unreadNotifications() {
 		if(window.localStorage.notification){
 			var notifications = JSON.parse(window.localStorage.notification);
@@ -188,14 +237,14 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	if(window.localStorage['_SRS']=="success"){
 		delete window.localStorage['_SRS'];
 		setTimeout(function () {
-			openModelPopup("switchRoleStatus", "Switch Role", "Your role is changed to " + window.localStorage['_SR']);
+			openHeaderModalPopup("switchRoleStatus", "Switch Role", "Your role is changed to " + window.localStorage['_SR']);
 		}, 500);
 	}
 
 	$(document).on('click', ".switchRole_confirm", function () {
 		selectedRoleName = $(this).text();
 		selectedRoleID = $(this).valueOf("outerHTML").data("id");
-		openModelPopup("switchRoleModal", "Switch Role", "Are you sure you want to switch role to: " + selectedRoleName);
+		openHeaderModalPopup("switchRoleModal", "Switch Role", "Are you sure you want to switch role to: " + selectedRoleName);
 	});
 
 	$scope.switchRole = function () {
@@ -203,7 +252,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		var roleasarray = userDetails.additionalrole;
 		if (roleasarray.length == 0) {
 			$("#switchRoles").hide();
-			openModelPopup("switchRoleStatus", "Switch Role", "There are no roles to switch");
+			openHeaderModalPopup("switchRoleStatus", "Switch Role", "There are no roles to switch");
 		} else {
 			LoginService.getRoleNameByRoleId(roleasarray)
 			.then(function (data) {
@@ -249,12 +298,12 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 				}
 			} else {
 				console.log("Fail to Switch User");
-				openModelPopup("switchRoleStatus", "Switch Role", "Fail to Switch User");
+				openHeaderModalPopup("switchRoleStatus", "Switch Role", "Fail to Switch User");
 			}
 		}, function (error) {
 			unblockUI();
 			console.log("Fail to Switch User");
-			openModelPopup("switchRoleStatus", "Switch Role", "Fail to Switch User");
+			openHeaderModalPopup("switchRoleStatus", "Switch Role", "Fail to Switch User");
 		});
 	};
 
@@ -265,7 +314,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	};
 
 	$scope.resetPass = function(){
-		openModelPopup("resetPassPopup");
+		openHeaderModalPopup("resetPassPopup");
 	};
 
 	$scope.resetFields = function(){
@@ -305,7 +354,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 					$scope.passwordValidation = "Invalid Session";
 				} else if(data == "success") {
 					$("#resetPassPopup").modal("hide");
-					openModelPopup("resetSuccessPopup");
+					openHeaderModalPopup("resetSuccessPopup");
 				} else if(data == "same"){
 					$(".ic-newpassword").parent().addClass("input-border-error");
 					$(".ic-confpassword").parent().addClass("input-border-error");
@@ -402,13 +451,72 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 
 	$scope.getIce = async () => {
 		try {
-			const res = await fetch("/AvoAssure_ICE");
+			const res = await fetch("/AvoAssure_ICE.zip");
 			const status = await res.text();
-			if (status == "available") location.href = location.origin+"/AvoAssure_ICE?file=getICE"
-			else openModelPopup("switchRoleStatus", "Download Avo Assure ICE", "Package is not available");
+			if (status == "available") location.href = location.origin+"/AvoAssure_ICE.zip?file=getICE"
+			else openHeaderModalPopup("switchRoleStatus", "Download Avo Assure ICE", "Package is not available");
 		} catch (ex) {
 			console.error("Error while downloading ICE package. Error:", ex);
-			openModelPopup("switchRoleStatus", "Download Avo Assure ICE", "Package is not available");
+			openHeaderModalPopup("switchRoleStatus", "Download Avo Assure ICE", "Package is not available");
 		}
 	}
+
+	$scope.changeDefICE = () =>{
+		blockUI("Fetching ICE ...")
+		headerServices.getUserICE()
+		.then(function (data) {
+			unblockUI();
+			if(data == 'fail'){
+				openHeaderModalPopup("executeGlobalModal", "Change Default ICE", $rootScope.unavailableLocalServer_msg);
+			}else{
+				var ice=data.ice_list
+				if(!data.ice_list || ice.length<1){
+					openHeaderModalPopup("executeGlobalModal", "Change Default ICE", $rootScope.unavailableLocalServer_msg);
+					return;
+				}
+				$("#selectDefIce").modal("show")
+				$('#chooseDefICE option').remove()
+				ice.map((e)=>{
+					$('#chooseDefICE').append(`<option value="${e}">${e}</option>`)
+				})
+			}
+		}).catch(error=>{
+			unblockUI()
+			console.error(error)
+			openHeaderModalPopup("executeGlobalModal", "Change Default ICE", $rootScope.unavailableLocalServer_msg);
+		})
+	}
+	
+	$scope.changeDefICEClick = () =>{
+		blockUI("Setting Default ICE ...")
+		$("#selectDefIce").modal("hide")
+		var ice = $('#chooseDefICE').val()
+		headerServices.setDefaultUserICE(ice)
+		.then(function (data) {
+			unblockUI();
+			if(data == 'success'){
+				openHeaderModalPopup("executeGlobalModal", "Change Default ICE", "Changed default ICE successfully");
+			}else{
+				openHeaderModalPopup("executeGlobalModal", "Change Default ICE", "Failed to change default ICE");
+			}
+		}).catch(error=>{
+			unblockUI()
+			console.error(error)
+			openHeaderModalPopup("executeGlobalModal", "Change Default ICE", "Failed to change default ICE");
+		})
+	}
+
+	$scope.redirectToNeuronGraphs = function() {
+		window.location.href='/neuronGraphs/';
+	}
 });
+
+function openHeaderModalPopup(modalId, title, body) {
+	var modalBox = $("#"+modalId);
+	modalBox.find('.modal-title').text(title);
+	modalBox.find('.modal-body p').text(body);
+	modalBox.modal("show");
+	setTimeout(function () {
+		modalBox.find('.btn-default').focus();
+	}, 300);
+}

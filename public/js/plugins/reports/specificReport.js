@@ -32,88 +32,85 @@ function loadReports() {
         var remainingHeight = headerHeight + collapsibleHeight  + resultSummaryHeight + resultSummaryBoxHeight;
         var windowHeight = $( window ).height();
         var  scrollBodyHeight = windowHeight - remainingHeight;
-            var calcDataTableHeight = function() {
-                    return scrollBodyHeight - 100;
-              };  
+		var errorMsg = $('.errormessage').html();
+        var calcDataTableHeight = function() {
+            return scrollBodyHeight - 100;
+        };
         
         var overallStatus = $('.overallStatusVal').text();
-        if(overallStatus.indexOf('Incomplete') != '-1')
-        {
+        if(overallStatus.indexOf('Incomplete') != '-1') {
             $('.toggleIncompleteStatus').hide();
-        }
-        else if(overallStatus.indexOf('Skipped') != '-1'){
+        } else if(overallStatus.indexOf('Skipped') != '-1'){
             $('.toggleIncompleteStatus').show();
             unblockUI();
-        }
-        else
-        {
+        } else {
             $('.toggleIncompleteStatus').show();
         }
         var commentsLength = parseInt($('.commentsLength').text());
         $('.toggleRemarks, .rDremarks').hide();
-        if(commentsLength == 0)
-        {
+        if(commentsLength == 0) {
             $('.toggleCommentsCol,.rDcomments').hide();
-        }
-        else{
+        } else {
             $('.toggleCommentsCol,.rDcomments').show();
         }
         //Datatable
          var oTable =  $('#specificReportDataTable').DataTable({
-                "bDestroy": true,
-                "responsive": true,
-                "bRetrieve": true,
-                "bPaginate": false,
-                "bSort": false,
-                "bFilter": false,
-                "bLengthChange": false,
-                "bInfo": false,
-                "scrollY": calcDataTableHeight,
-                "scrollCollapse": true,
-                "scrollX": true,
-                "paging": false,
-                "oLanguage": {
-                    "sSearch": ""
-                },
-                "aoColumns": [
-                    { "sWidth": "5%" }, // 1st column width 
-                    { "sWidth": "10%" }, // 2nd column width 
-                    { "sWidth": "15%" }, // 3rd column width
-                    { "sWidth": "15%" }, // 4th column width 
-                    { "sWidth": "10%" }, // 5th column width 
-                    { "sWidth": "10%" }, // 6th column width
-                    { "sWidth": "10%" }, // 7th column width 
-                    { "sWidth": "10%" }, // 8th column width
-                    { "sWidth": "10%" }, // 9th column width 
-                    ],
-                "deferRender": true,
-                "fnInitComplete": function(oSettings, json) {
-                    getRows = $('.reportdetailsrow');
-                    for (let i = 0; i < getRows.length; i++) {
-                        var name = getRows[i].children[2].innerHTML;
-                        var rowCount = 0;
-                        var getParentId;
-                        if($(getRows[i]).children('td.rDstatus.tabCont.openscreenshot').attr('data-screenshot') == '')
-                        {
-                            $(getRows[i]).children('td.rDstatus.tabCont.openscreenshot').css('text-decoration','none').addClass('noScreenshot');
-                        }
-                        if($(getRows[i]).children().children().hasClass('openscreenshot') == true)
-                        {
-                            var screenshot =  $(getRows[i]).children().find('.openscreenshot').attr('data-screenshot');
-                        }
-                        if(screenshot && screenshot.length <= 0 && screenshot.toLowerCase().indexOf(".png") == -1) 
-                        {
-                            $(getRows[i]).children().children().removeClass('openscreenshot');
-                        }
-                        if (getRows[i].children[1].innerHTML.indexOf('Start iteration') >= 0) {
-                            getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -110px;"></i>';
-                        }
+            "bDestroy": true,
+            "responsive": true,
+            "bRetrieve": true,
+            "bPaginate": false,
+            "bSort": false,
+            "bFilter": false,
+            "bLengthChange": false,
+            "bInfo": false,
+            "scrollY": calcDataTableHeight,
+            "scrollCollapse": true,
+            "scrollX": true,
+            "paging": false,
+            "oLanguage": {
+                "sSearch": ""
+            },
+            "aoColumns": [
+                { "sWidth": "5%" }, // 1st column width 
+                { "sWidth": "10%" }, // 2nd column width 
+                { "sWidth": "15%" }, // 3rd column width
+                { "sWidth": "15%" }, // 4th column width 
+                { "sWidth": "10%" }, // 5th column width 
+                { "sWidth": "10%" }, // 6th column width
+                { "sWidth": "10%" }, // 7th column width 
+                { "sWidth": "10%" }, // 8th column width
+                { "sWidth": "10%" }, // 9th column width 
+            ],
+            "deferRender": true,
+            "fnInitComplete": function(oSettings, json) {
+                getRows = $('.reportdetailsrow');
+                for (let i = 0; i < getRows.length; i++) {
+                    var name = getRows[i].children[2].innerHTML;
+                    var rowCount = 0;
+                    var getParentId;
+                    if($(getRows[i]).children('td.rDstatus.tabCont.openscreenshot').attr('data-screenshot') == '') {
+                        $(getRows[i]).children('td.rDstatus.tabCont.openscreenshot').css('text-decoration','none').addClass('noScreenshot');
                     }
-                    unblockUI();
+                    if($(getRows[i]).children().children().hasClass('openscreenshot') == true) {
+                        var screenshot =  $(getRows[i]).children().find('.openscreenshot').attr('data-screenshot');
+                    }
+                    if(screenshot && screenshot.length <= 0 && screenshot.toLowerCase().indexOf(".png") == -1) {
+                        $(getRows[i]).children().children().removeClass('openscreenshot');
+                    }
+                    if (getRows[i].children[1].innerHTML.indexOf('Start iteration') >= 0) {
+                        getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -110px;"></i>';
+                    }
                 }
-            });    
+                unblockUI();
+                if (errorMsg) {
+                    blockUI(errorMsg);
+                    $('.toggleIncompleteStatus').hide();
+                    $('#overlayContainer').css('cursor', 'default');
+                }
+            }
+        });
         // var remarksLength = parseInt($('.remarksLength').text());
-        //Open Screenshot for specific reports
+        // Open Screenshot for specific reports
         $(document).on('click', '.openscreenshot', function() {
             var path = $(this).attr("data-screenshot");
             var hostName = window.location.host;
@@ -147,8 +144,7 @@ function loadReports() {
                 });
             }
         })
-        function calcTableHeight(flag)
-        {
+        function calcTableHeight(flag) {
             var windowHeight = $( window ).height();
             var headerHeight =  $('.hearderCon').height();
             var collapsibleHeight =  $('.collapsible').height();
@@ -493,7 +489,7 @@ function loadReports() {
             $(this).html('');
         });
         $('.rDExpectedRes:visible:contains("Scenario cannot be executed")').html('');
-       
+
         $(document).on('click', '.unexpand', function() {
             var getID = $(this).parents('.reportdetailsrow').attr('data-id');
             $(this).removeClass('unexpand').addClass('expand');
@@ -514,5 +510,103 @@ function loadReports() {
                 }
             })
         });
+
+        function downloadFile(filedata, filename) {
+            if (window.navigator.msSaveOrOpenBlob) {
+                window.navigator.msSaveOrOpenBlob(filedata, filename);
+            } else {
+                var a = document.createElement('a');
+                a.href = URL.createObjectURL(filedata);
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                URL.revokeObjectURL(a.href);
+                document.body.removeChild(a);
+            }
+        }
+
+        $(document).on('click', '.export-icons', function() {
+            var repType = $(this).attr("data-rep");
+            var filename = $(".scenarioName").text().substr(2) + "." + repType;
+            var url = window.location.href + '/' + repType;
+            if (repType == "json") {
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    responseType: 'application/json',
+                    success: function(data) {
+                        var responseData = JSON.stringify(data, undefined, 2);
+                        var filedata = new Blob([responseData], {
+                            type: "text/json;charset=utf-8"
+                        });
+                        downloadFile(filedata, filename);
+                    },
+                    error: function(jqXHR) {
+                        unblockUI();
+                        var errRes = jqXHR.responseJSON && jqXHR.responseJSON.error || {};
+                        var err = errRes.emsg || "Error while exporting report JSON";
+                        blockUI(err);
+                        console.log("Error while exporting report JSON. Error: " + JSON.stringify(errRes));
+                        setTimeout(function () {unblockUI()}, 2000);
+                    }
+                });
+            } else if (repType == "pdf") {
+                var xhrOverride = new XMLHttpRequest();
+                xhrOverride.responseType = 'arraybuffer';
+                if (document.getElementById("scrShotChk").checked) url += "?images=true";
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    xhr: function() { return xhrOverride },
+                    success: function(data) {
+                        var filedata = new Blob([data], {
+                            type: "application/pdf;charset=utf-8"
+                        });
+                        downloadFile(filedata, filename);
+                    },
+                    error: function(jqXHR) {
+                        unblockUI();
+                        var err = jqXHR.getResponseHeader("X-Render-Error") || "Error while generating PDF Report";
+                        blockUI(err);
+                        console.log("Error while generating PDF Report. Error: " + JSON.stringify(err));
+                        setTimeout(function () {unblockUI()}, 2000);
+                    }
+                });
+            } else if (repType == "mp4"){
+                var videoPath = $(this).attr("data-path");
+                var hostName = window.location.host;
+                var posturl = 'https://' + hostName + '/downloadVideo';
+                blockUI('Loading....');
+                var xhrOverride = new XMLHttpRequest();
+                xhrOverride.responseType = 'arraybuffer';
+                $.ajax({
+                    type: 'POST',
+                    url: posturl,
+                    data: {'videoPath':videoPath},
+                    xhr: function() { return xhrOverride },
+                    success: function(data1) {
+                        if (data1.byteLength){
+                            var file = new Blob([data1], { type: 'video/mp4' });
+                            downloadFile(file,filename);
+                            unblockUI();
+                        } else{
+                            unblockUI();
+                            var err = "Error while exporting report Video";
+                            blockUI(err);
+                            console.log(err);
+                            setTimeout(function () {unblockUI()}, 2000);
+                        }
+                    },
+                    error: function() {
+                        unblockUI();
+                        var err = "Error while exporting report Video";
+                        blockUI(err);
+                        console.log("Error while exporting report JSON. Error: " + JSON.stringify(err));
+                        setTimeout(function () {unblockUI()}, 2000);
+                    }
+                });
+            }
+        });
+
     }, 500);
 }
