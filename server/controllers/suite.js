@@ -244,24 +244,25 @@ const fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
 	scenario.testcase = JSON.stringify(allTestcaseSteps);
 
 	// Step 3: Get qcdetails
-	inputs = {
-		"testscenarioid": scenarioid
-	};
-	if (integrationType == 'qTest') inputs.query = "qtestdetails";
-	else if (integrationType == 'ALM') inputs.query = "qcdetails";
-	else if (integrationType == 'Zephyr') inputs.query = "zephyrdetails";
-	if (!inputs.query) scenario.qcdetails = {};
-	else {
-		const qcdetails = await utils.fetchData(inputs, "qualityCenter/viewIntegrationMappedList_ICE", fnName);
-		if(integrationType == 'ALM' && Array.isArray(qcdetails)) {
-			for(var i=0;i<qcdetails.length;++i) {
-				if (qcdetails[i] != "fail") qcDetailsList.push(JSON.parse(JSON.stringify(qcdetails[i])));
+	scenario.qcdetails = [];
+	for(var k =0; k<integrationType.length; ++k) {
+		inputs = {
+			"testscenarioid": scenarioid
+		};
+		const integ = integrationType[k];
+		if (integ == 'qTest') inputs.query = "qtestdetails";
+		else if (integ == 'ALM') inputs.query = "qcdetails";
+		else if (integ == 'Zephyr') inputs.query = "zephyrdetails";
+		if (inputs.query) {
+			const qcdetails = await utils.fetchData(inputs, "qualityCenter/viewIntegrationMappedList_ICE", fnName);
+			if(integ == 'ALM' && Array.isArray(qcdetails)) {
+				for (let i=0; i < qcdetails.length; ++i) {
+					if (qcdetails[i] != "fail") qcDetailsList.push(JSON.parse(JSON.stringify(qcdetails[i])));
+				}
+				if (qcDetailsList.length > 0) scenario.qcdetails.push(qcDetailsList);
+			} else {
+				if (qcdetails != "fail" && qcdetails.length > 0) scenario.qcdetails.push(JSON.parse(JSON.stringify(qcdetails[0])));
 			}
-			if (qcDetailsList.length > 0) scenario.qcdetails = qcDetailsList;
-			else scenario.qcdetails = {};
-		} else {
-			if (qcdetails != "fail" && qcdetails.length > 0) scenario.qcdetails = JSON.parse(JSON.stringify(qcdetails[0]));
-			else scenario.qcdetails = {};
 		}
 	}
 	return scenario;
@@ -276,7 +277,7 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 		"exec_mode": batchData.exectionMode,
 		"exec_env" : batchData.executionEnv,
 		"apptype": batchData.batchInfo[0].appType,
-		"qccredentials": batchData.qccredentials,
+		"integration": batchData.integration,
 		"batchId": "",
 		"executionIds": [],
 		"testsuiteIds": [],
@@ -303,7 +304,17 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 		};
 		const suiteDetails = suite.suiteDetails;
 		for (const tsco of suiteDetails) {
-			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid, batchData.qccredentials.integrationType);
+			var integrationType = [];
+			if(batchData.integration.alm.url) {
+				integrationType.push("ALM");
+			} 
+			if (batchData.integration.qtest.url){
+				integrationType.push("qTest");
+			} 
+			if (batchData.integration.zephyr.accountid) {
+				integrationType.push("Zephyr");
+			}
+			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType);
 			if (scenario == "fail") return "fail";
 			scenario = Object.assign(scenario, tsco);
 			suiteObj.condition.push(scenario.condition);
