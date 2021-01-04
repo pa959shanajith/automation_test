@@ -71,7 +71,6 @@ const CreateObjectModal = props => {
             updatedShowFields.push(id);
             setShowFields(updatedShowFields)
         }
-
     }
 
     const onSave = index => {
@@ -84,7 +83,7 @@ const CreateObjectModal = props => {
             errorObj = { [object.tempId]: !object.objName ? "objName" : !object.objType ?  "objType" : "url" };
         } else if (object.name === "" && object.relXpath === "" && object.absXpath === "" && object.className === "" && object.id === "" && object.qSelect === ""){
             errorObj = { missingField: true }
-            props.setShowPop({title: ''})
+            props.setShowPop({title: 'Warning!', content: "Please enter at least one property"});
         }
 
         if (!Object.keys(errorObj).length) {
@@ -98,7 +97,7 @@ const CreateObjectModal = props => {
 				else if (data === "fail")
 					props.setShowPop({title: "Fail", content: "Failed to create object"});
 				else{
-                    let customObject = { custname: `${object.objName}_${!elementType}`,
+                    let customObject = { custname: `${object.objName}_${elementType}`,
                                         tag: tag,
                                         url: data.url,
                                         xpath: data.xpath,
@@ -115,8 +114,40 @@ const CreateObjectModal = props => {
             })
             .catch(error=>console.error(error));
         }
-
         setError(errorObj)
+    }
+
+    const onSubmit = () => {
+        let localScrapeList = [];
+        let viewArray = [];
+        let lastObj = props.scrapeItems[props.scrapeItems.length-1]
+        let lastVal = lastObj ? lastObj.val : 0;
+        let lastIdx = props.newScrapedData.view ? props.newScrapedData.view.length : 0;
+        for (let tempId of Object.keys(customObjList)){
+            localScrapeList.push({
+                objId: undefined,
+                objIdx: lastIdx++,
+                val: ++lastVal,
+                hide: false,
+                title: customObjList[tempId].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim()
+            });
+            viewArray.push({
+                custname: customObjList[tempId].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim(),
+                tag: customObjList[tempId].tag,
+                url: customObjList[tempId].url,
+                xpath: customObjList[tempId].xpath,
+                editable: customObjList[tempId].editable
+            });  
+        }
+        let updatedNewScrapeData = {...props.newScrapedData};
+        if (updatedNewScrapeData.view) updatedNewScrapeData.view.push(...viewArray);
+        else updatedNewScrapeData = { view: [...viewArray] };
+        // update other properties too
+        props.setNewScrapedData(updatedNewScrapeData);
+        props.updateScrapeItems(localScrapeList)
+        props.setSaved(false);
+        props.setShow(false);
+        props.setShowPop({title: "Add Object", content: "Objects has been added successfully."})
     }
 
     const handleType = (event, index) => {
@@ -141,8 +172,8 @@ const CreateObjectModal = props => {
                                                     <option className="createObj_option" value={`${objectType.value}-${objectType.typeOfElement}`}>{objectType.name}</option>
                                                 ) }
                                             </select>
-                                            <button className="createObj_btn" onClick={()=>deleteField(index)}><img src="static/imgs/ic-delete.png" /></button>
-                                            <button className="createObj_btn" onClick={deleteField}><img src="static/imgs/ic-jq-editstep.png" /></button>
+                                            <button className="createObj_btn" onClick={()=>deleteField(index)} disabled={objects.length === 1}><img src="static/imgs/ic-delete.png" /></button>
+                                            <button className="createObj_btn" onClick={()=>onEdit(object.tempId)}><img src="static/imgs/ic-jq-editstep.png" /></button>
                                             { objects.length-1 === index && <button className="createObj_btn" onClick={newField}><img src="static/imgs/ic-add.png" /></button>}
                                         </div>
                                         {
@@ -168,7 +199,7 @@ const CreateObjectModal = props => {
                 close={()=>props.setShow(false)}
                 footer={<>
                     <button>Reset</button>
-                    <button>Submit</button>
+                    <button disabled={showFields.length} onClick={onSubmit}>Submit</button>
                 </>}
             />
         </div>

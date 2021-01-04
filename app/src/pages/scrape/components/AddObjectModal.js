@@ -1,4 +1,4 @@
-import React, { useEffect, useState, createRef } from 'react';
+import React, { useState } from 'react';
 import { ModalContainer, ScrollBar } from '../../global';
 import "../styles/AddObjectModal.scss";
 
@@ -48,7 +48,7 @@ const AddObjectModal = props => {
         let newObjects = []
         let errorObj = {};
         let lastObj = props.scrapeItems[props.scrapeItems.length-1]
-        let lastIdx = lastObj ? lastObj.val : 0;
+        let lastVal = lastObj ? lastObj.val : 0;
         for (let i=0; i<objects.length; i++){
             let name = objects[i].objName;
             let type = objects[i].objType;
@@ -63,7 +63,7 @@ const AddObjectModal = props => {
                     title: `${name}_${value}`, 
                     tag: tag, 
                     xpath: "", 
-                    val: ++lastIdx,
+                    val: ++lastVal,
                     isCustom: true
                 });
             }

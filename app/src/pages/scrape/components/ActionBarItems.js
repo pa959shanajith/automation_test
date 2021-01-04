@@ -20,11 +20,13 @@ const UpperContent = props => {
     const disableAppend = useSelector(state => state.scrape.disableAppend);
     const { appType } = useSelector(state => state.plugin.CT);
     const [isMac, setIsMac] = useState(false);
-    const {setShowAppPop, setSaved, setNewScrapedData, scrapeItems, setOverlay, setShowPop, updateScrapeItems} = useContext(ScrapeContext);
+    const [appendCheck, setAppendCheck] = useState(false);
+    const {setShowAppPop, saved, setSaved, setNewScrapedData, scrapeItems, setOverlay, setShowPop, updateScrapeItems, newScrapedData} = useContext(ScrapeContext);
 
     useEffect(() => {
         setIsMac(navigator.appVersion.indexOf("Mac") !== -1);
-    }, [appType]);
+        if (saved) setAppendCheck(false);
+    }, [appType, saved]);
 
 
     const WebList = [
@@ -51,13 +53,15 @@ const UpperContent = props => {
 
     const onAppend = event => {
         dispatch({ type: actionTypes.SET_DISABLEACTION, payload: !event.target.checked });
+        if (event.target.checked) setAppendCheck(true);
+        else setAppendCheck(false);
     }
 
     let renderComp = [
         <div key={1} className={'ss__scrapeOn' + (disableAction ? " disable-thumbnail" : "")}>Scrape On</div>,
         <Thumbnail title="Launch PDF utility" img="static/imgs/ic-pdf_scrape.png" action={() => initScraping("pdf")} disable={disableAction} />,
         <div key={3} className={"ss__thumbnail" + (disableAppend ? " disable-thumbnail" : "")}>
-            <input id="enable_append" type="checkbox" onChange={onAppend} />
+            <input id="enable_append" type="checkbox" onChange={onAppend} checked={appendCheck} />
             <span className="ss__thumbnail_title">Append</span>
         </div>
     ];
@@ -331,8 +335,9 @@ const UpperContent = props => {
                     if (viewString.view.length !== 0){
                     //Getting the Existing Scrape Data
                     let localScrapeList = [];
-                    let lastObj = props.scrapeItems[props.scrapeItems.length-1]
-                    let lastIdx = lastObj ? lastObj.val : 0;
+                    let lastObj = scrapeItems[scrapeItems.length-1]
+                    let lastVal = lastObj ? lastObj.val : 0;
+                    let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
 
                     for (let i = 0; i < viewString.view.length; i++) {
                         
@@ -346,8 +351,8 @@ const UpperContent = props => {
                         }
 
                         let scrapeItem = {  objId: scrapeObject._id,
-                                            objIdx: i,
-                                            val: ++lastIdx,
+                                            objIdx: lastIdx,
+                                            val: ++lastVal,
                                             hide: false,
                                             title: scrapeObject.custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim()
                                         }
@@ -355,7 +360,11 @@ const UpperContent = props => {
                         localScrapeList.push(scrapeItem)
                     }
 
-                    setNewScrapedData(viewString);
+                    let updatedNewScrapeData = {...newScrapedData};
+                    if (updatedNewScrapeData.view) updatedNewScrapeData.view.push(...viewString.view);
+                    else updatedNewScrapeData = viewString;
+                    // update other properties too
+                    setNewScrapedData(updatedNewScrapeData);
                     updateScrapeItems(localScrapeList)
                     
                     if (viewString.view.length > 0) setSaved(false);

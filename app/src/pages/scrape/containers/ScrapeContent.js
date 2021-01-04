@@ -255,6 +255,7 @@ const ScrapeContent = props => {
             setDisableBtns({...disableBtns, save: true});
             dispatch({type: actionTypes.SET_DISABLEACTION, payload: scrapeItemsL.length !== 0});
             dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: scrapeItemsL.length === 0});
+            setSaved(true);
             console.log("Added:", added);
             console.log("Old:", scrapeData);
             console.log("Modified: ", modified);
